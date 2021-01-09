@@ -10,6 +10,7 @@
 		C820E6C025A9759A006A7AB1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820E6BF25A9759A006A7AB1 /* main.swift */; };
 		C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* aldo.c */; };
 		C820E6D125A97E3B006A7AB1 /* nes.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6D025A97E3B006A7AB1 /* nes.c */; };
+		C820E6E025A98557006A7AB1 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C820E6DE25A982A5006A7AB1 /* libncurses.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -33,6 +34,7 @@
 		C820E6CF25A97E3B006A7AB1 /* nes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nes.h; sourceTree = "<group>"; };
 		C820E6D025A97E3B006A7AB1 /* nes.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nes.c; sourceTree = "<group>"; };
 		C820E6D325A97FB5006A7AB1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		C820E6DE25A982A5006A7AB1 /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -40,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C820E6E025A98557006A7AB1 /* libncurses.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,11 +87,20 @@
 			path = emu;
 			sourceTree = "<group>";
 		};
+		C820E6DD25A982A5006A7AB1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C820E6DE25A982A5006A7AB1 /* libncurses.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		C85E8AD925A9747800FF0025 = {
 			isa = PBXGroup;
 			children = (
 				C820E6C625A97A2F006A7AB1 /* src */,
 				C820E6BE25A9759A006A7AB1 /* AldoDev */,
+				C820E6DD25A982A5006A7AB1 /* Frameworks */,
 				C820E6BD25A9759A006A7AB1 /* Products */,
 			);
 			sourceTree = "<group>";

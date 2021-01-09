@@ -15,13 +15,12 @@ CFLAGS := -Wall -Wextra -pedantic -std=c17
 SP := strip
 
 ifeq ($(OS), Darwin)
-# TODO: gonna use ncurses for temp ui
-#CFLAGS += -I/usr/local/opt/ncurses/include
-#LDFLAGS := -L/usr/local/opt/ncurses/lib
-#LDLIBS := -lncurses
+CFLAGS += -I/usr/local/opt/ncurses/include
+LDFLAGS := -L/usr/local/opt/ncurses/lib
+LDLIBS := -lncurses
 else
-#CFLAGS += -D_POSIX_C_SOURCE=199309L
-#LDLIBS := -lncursesw
+CFLAGS += -D_POSIX_C_SOURCE=199309L
+LDLIBS := -lncursesw
 SPFLAGS := -s
 endif
 

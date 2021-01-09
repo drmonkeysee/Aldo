@@ -8,6 +8,6 @@
 #ifndef Aldo_emu_nes_h
 #define Aldo_emu_nes_h
 
-void nes_hello(void);
+int nes_rand(void);
 
 #endif

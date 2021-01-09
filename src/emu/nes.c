@@ -7,9 +7,9 @@
 
 #include "nes.h"
 
-#include <stdio.h>
+#include <stdlib.h>
 
-void nes_hello(void)
+int nes_rand(void)
 {
-    puts("Hello from NES layer");
+    return rand();
 }

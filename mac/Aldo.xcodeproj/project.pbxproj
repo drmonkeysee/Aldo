@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C820E6C025A9759A006A7AB1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820E6BF25A9759A006A7AB1 /* main.swift */; };
+		C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* aldo.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +26,9 @@
 /* Begin PBXFileReference section */
 		C820E6BC25A9759A006A7AB1 /* AldoDev */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AldoDev; sourceTree = BUILT_PRODUCTS_DIR; };
 		C820E6BF25A9759A006A7AB1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		C820E6C825A97A4E006A7AB1 /* AldoDev-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AldoDev-Bridging-Header.h"; sourceTree = "<group>"; };
+		C820E6C925A97A4E006A7AB1 /* aldo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aldo.h; sourceTree = "<group>"; };
+		C820E6CA25A97A4E006A7AB1 /* aldo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aldo.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,14 +53,26 @@
 		C820E6BE25A9759A006A7AB1 /* AldoDev */ = {
 			isa = PBXGroup;
 			children = (
+				C820E6C825A97A4E006A7AB1 /* AldoDev-Bridging-Header.h */,
 				C820E6BF25A9759A006A7AB1 /* main.swift */,
 			);
 			path = AldoDev;
 			sourceTree = "<group>";
 		};
+		C820E6C625A97A2F006A7AB1 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				C820E6C925A97A4E006A7AB1 /* aldo.h */,
+				C820E6CA25A97A4E006A7AB1 /* aldo.c */,
+			);
+			name = src;
+			path = ../src;
+			sourceTree = "<group>";
+		};
 		C85E8AD925A9747800FF0025 = {
 			isa = PBXGroup;
 			children = (
+				C820E6C625A97A2F006A7AB1 /* src */,
 				C820E6BE25A9759A006A7AB1 /* AldoDev */,
 				C820E6BD25A9759A006A7AB1 /* Products */,
 			);
@@ -93,6 +109,7 @@
 				TargetAttributes = {
 					C820E6BB25A9759A006A7AB1 = {
 						CreatedOnToolsVersion = 12.3;
+						LastSwiftMigration = 1230;
 					};
 				};
 			};
@@ -120,6 +137,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C820E6C025A9759A006A7AB1 /* main.swift in Sources */,
+				C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -181,6 +199,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -188,6 +211,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/AldoDev-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				WARNING_CFLAGS = (
@@ -248,6 +272,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -255,6 +284,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/AldoDev-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				WARNING_CFLAGS = (

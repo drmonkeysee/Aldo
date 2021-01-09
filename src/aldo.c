@@ -32,7 +32,7 @@ int aldo_run(void)
         const int c = getch();
         switch (c) {
         case ' ':
-            printw("NES number: %x\n", (unsigned int)nes_rand());
+            printw("NES number: %X\n", (unsigned int)nes_rand());
             break;
         case 'q':
             running = false;

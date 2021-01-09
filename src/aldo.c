@@ -6,3 +6,12 @@
 //
 
 #include "aldo.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int aldo_run(void)
+{
+    puts("Hello from Aldo!");
+    return EXIT_SUCCESS;
+}

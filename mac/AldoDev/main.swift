@@ -7,5 +7,8 @@
 
 import Foundation
 
-print("Hello, World!")
+print("Aldo Dev Started...")
 
+let result = aldo_run();
+
+exit(result)

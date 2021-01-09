@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		C820E6C025A9759A006A7AB1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820E6BF25A9759A006A7AB1 /* main.swift */; };
 		C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* aldo.c */; };
+		C820E6D125A97E3B006A7AB1 /* nes.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6D025A97E3B006A7AB1 /* nes.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,6 +30,8 @@
 		C820E6C825A97A4E006A7AB1 /* AldoDev-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AldoDev-Bridging-Header.h"; sourceTree = "<group>"; };
 		C820E6C925A97A4E006A7AB1 /* aldo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aldo.h; sourceTree = "<group>"; };
 		C820E6CA25A97A4E006A7AB1 /* aldo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aldo.c; sourceTree = "<group>"; };
+		C820E6CF25A97E3B006A7AB1 /* nes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nes.h; sourceTree = "<group>"; };
+		C820E6D025A97E3B006A7AB1 /* nes.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nes.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,11 +65,21 @@
 		C820E6C625A97A2F006A7AB1 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				C820E6CE25A97E2D006A7AB1 /* emu */,
 				C820E6C925A97A4E006A7AB1 /* aldo.h */,
 				C820E6CA25A97A4E006A7AB1 /* aldo.c */,
 			);
 			name = src;
 			path = ../src;
+			sourceTree = "<group>";
+		};
+		C820E6CE25A97E2D006A7AB1 /* emu */ = {
+			isa = PBXGroup;
+			children = (
+				C820E6CF25A97E3B006A7AB1 /* nes.h */,
+				C820E6D025A97E3B006A7AB1 /* nes.c */,
+			);
+			path = emu;
 			sourceTree = "<group>";
 		};
 		C85E8AD925A9747800FF0025 = {
@@ -136,6 +149,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C820E6D125A97E3B006A7AB1 /* nes.c in Sources */,
 				C820E6C025A9759A006A7AB1 /* main.swift in Sources */,
 				C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */,
 			);

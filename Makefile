@@ -17,10 +17,10 @@ SP := strip
 ifeq ($(OS), Darwin)
 CFLAGS += -I/usr/local/opt/ncurses/include
 LDFLAGS := -L/usr/local/opt/ncurses/lib
-LDLIBS := -lncurses
+LDLIBS := -lpanel -lncurses
 else
 CFLAGS += -D_POSIX_C_SOURCE=199309L
-LDLIBS := -lncursesw
+LDLIBS := -lpanelw -lncursesw
 SPFLAGS := -s
 endif
 

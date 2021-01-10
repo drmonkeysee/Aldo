@@ -66,11 +66,12 @@ static void ui_refresh(void)
 static void ui_cleanup(void)
 {
     ui_vcleanup(&CpuView);
-    ui_vcleanup(&DebugView.v);
+
     del_panel(DebugView.panel);
     DebugView.panel = NULL;
     delwin(DebugView.content);
     DebugView.content = NULL;
+    ui_vcleanup(&DebugView.v);
 }
 
 //

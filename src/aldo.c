@@ -14,6 +14,7 @@
 
 #include <locale.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -22,7 +23,13 @@ struct view {
     PANEL *panel;
 };
 
-static struct view DebugView;
+struct debugview {
+    struct view v;
+    WINDOW *content;
+    PANEL *panel;
+};
+
+static struct debugview DebugView;
 static struct view CpuView;
 
 static void ui_vinit(struct view *v, int h, int w, int y, int x,
@@ -43,7 +50,10 @@ static void ui_vcleanup(struct view *v)
 
 static void ui_init(void)
 {
-    ui_vinit(&DebugView, 40, 22, 1, 1, "Debug");
+    ui_vinit(&DebugView.v, 40, 24, 1, 1, "Debug");
+    DebugView.content = derwin(DebugView.v.win, 38, 22, 1, 1);
+    DebugView.panel = new_panel(DebugView.content);
+    scrollok(DebugView.content, true);
     ui_vinit(&CpuView, 10, 10, 5, 30, "CPU");
 }
 
@@ -56,7 +66,11 @@ static void ui_refresh(void)
 static void ui_cleanup(void)
 {
     ui_vcleanup(&CpuView);
-    ui_vcleanup(&DebugView);
+    ui_vcleanup(&DebugView.v);
+    del_panel(DebugView.panel);
+    DebugView.panel = NULL;
+    delwin(DebugView.content);
+    DebugView.content = NULL;
 }
 
 //
@@ -76,12 +90,17 @@ int aldo_run(void)
 
     ui_init();
     bool running = true;
-    int debug_cursor_y = 1;
+    int debug_cursor_y = -1;
     do {
         const int c = getch();
         switch (c) {
         case ' ':
-            mvwprintw(DebugView.win, debug_cursor_y++, 1, "NES number: %X",
+            if (debug_cursor_y < 37) {
+                ++debug_cursor_y;
+            } else {
+                scroll(DebugView.content);
+            }
+            mvwprintw(DebugView.content, debug_cursor_y, 0, "NES number: %X",
                       (unsigned int)nes_rand());
             break;
         case 'q':

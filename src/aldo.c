@@ -59,6 +59,10 @@ static void ui_cleanup(void)
     ui_vcleanup(&DebugView);
 }
 
+//
+// Public Interface
+//
+
 int aldo_run(void)
 {
     puts("Aldo starting...");

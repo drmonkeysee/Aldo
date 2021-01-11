@@ -19,40 +19,36 @@
 #include <stdlib.h>
 
 struct view {
-    WINDOW *win;
-    PANEL *panel;
+    WINDOW *win, *content;
+    PANEL *outer, *inner;
 };
 
-struct debugview {
-    struct view v;
-    WINDOW *content;
-    PANEL *panel;
-};
-
-static struct debugview DebugView;
+static struct view DebugView;
 static struct view CpuView;
 
 static void ui_vinit(struct view *v, int h, int w, int y, int x,
                      const char *restrict title)
 {
     v->win = newwin(h, w, y, x);
-    v->panel = new_panel(v->win);
+    v->outer = new_panel(v->win);
     box(v->win, 0, 0);
     mvwaddstr(v->win, 0, 1, title);
+    v->content = derwin(v->win, h - 2, w - 2, 1, 1);
+    v->inner = new_panel(v->content);
 }
 
 static void ui_vcleanup(struct view *v)
 {
-    del_panel(v->panel);
+    del_panel(v->inner);
+    delwin(v->content);
+    del_panel(v->outer);
     delwin(v->win);
     *v = (struct view){0};
 }
 
 static void ui_init(void)
 {
-    ui_vinit(&DebugView.v, 40, 24, 1, 1, "Debug");
-    DebugView.content = derwin(DebugView.v.win, 38, 22, 1, 1);
-    DebugView.panel = new_panel(DebugView.content);
+    ui_vinit(&DebugView, 40, 24, 1, 1, "Debug");
     scrollok(DebugView.content, true);
     ui_vinit(&CpuView, 10, 10, 5, 30, "CPU");
 }
@@ -66,12 +62,7 @@ static void ui_refresh(void)
 static void ui_cleanup(void)
 {
     ui_vcleanup(&CpuView);
-
-    del_panel(DebugView.panel);
-    DebugView.panel = NULL;
-    delwin(DebugView.content);
-    DebugView.content = NULL;
-    ui_vcleanup(&DebugView.v);
+    ui_vcleanup(&DebugView);
 }
 
 //

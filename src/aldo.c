@@ -24,7 +24,20 @@ struct view {
 };
 
 static struct view DebugView;
+static struct view HwView;
 static struct view CpuView;
+static struct view RamView;
+
+static void ui_drawcpu(const struct view *v)
+{
+    int cursor_y = 1;
+    mvwaddstr(v->content, cursor_y++, 0, "PC: $FFFF");
+    mvwaddstr(v->content, cursor_y++, 0, "SP: $FF");
+    mvwhline(v->content, cursor_y++, 0, 0, getmaxx(v->content));
+    mvwaddstr(v->content, cursor_y++, 0, "A:  $FF");
+    mvwaddstr(v->content, cursor_y++, 0, "X:  $FF");
+    mvwaddstr(v->content, cursor_y++, 0, "Y:  $FF");
+}
 
 static void ui_vinit(struct view *v, int h, int w, int y, int x,
                      const char *restrict title)
@@ -48,9 +61,12 @@ static void ui_vcleanup(struct view *v)
 
 static void ui_init(void)
 {
-    ui_vinit(&DebugView, 40, 24, 1, 1, "Debug");
+    ui_vinit(&DebugView, 40, 24, 0, 60, "Debug");
     scrollok(DebugView.content, true);
-    ui_vinit(&CpuView, 10, 10, 5, 30, "CPU");
+    ui_vinit(&HwView, 10, 50, 0, 0, "Hardware Traits");
+    ui_vinit(&CpuView, 10, 15, 30, 0, "CPU");
+    ui_vinit(&RamView, 40, 70, 0, 100, "RAM");
+    ui_drawcpu(&CpuView);
 }
 
 static void ui_refresh(void)
@@ -61,7 +77,9 @@ static void ui_refresh(void)
 
 static void ui_cleanup(void)
 {
+    ui_vcleanup(&RamView);
     ui_vcleanup(&CpuView);
+    ui_vcleanup(&HwView);
     ui_vcleanup(&DebugView);
 }
 

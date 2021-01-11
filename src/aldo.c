@@ -28,6 +28,15 @@ static struct view HwView;
 static struct view CpuView;
 static struct view RamView;
 
+static void ui_drawhwtraits(const struct view *v)
+{
+    int cursor_y = 0;
+    mvwaddstr(v->content, cursor_y++, 0, "FPS: N/A");
+    mvwaddstr(v->content, cursor_y++, 0, "Clock: INF Hz");
+    mvwaddstr(v->content, cursor_y++, 0, "Cycle Count: 1");
+    mvwaddstr(v->content, cursor_y++, 0, "Freq Multiplier: 1x");
+}
+
 static void ui_drawcpu(const struct view *v)
 {
     int cursor_y = 1;
@@ -37,6 +46,19 @@ static void ui_drawcpu(const struct view *v)
     mvwaddstr(v->content, cursor_y++, 0, "A:  $FF");
     mvwaddstr(v->content, cursor_y++, 0, "X:  $FF");
     mvwaddstr(v->content, cursor_y++, 0, "Y:  $FF");
+}
+
+static void ui_drawram(const struct view *v)
+{
+    int cursor_x = 0, cursor_y = 0;
+    for (unsigned int i = 0; i < 0x100; ++i) {
+        mvwprintw(v->content, cursor_y, cursor_x, "$%02X", i);
+        cursor_x += 4;
+        if (cursor_x >= getmaxx(v->content)) {
+            cursor_x = 0;
+            ++cursor_y;
+        }
+    }
 }
 
 static void ui_vinit(struct view *v, int h, int w, int y, int x,
@@ -61,12 +83,14 @@ static void ui_vcleanup(struct view *v)
 
 static void ui_init(void)
 {
-    ui_vinit(&DebugView, 40, 24, 0, 60, "Debug");
+    ui_vinit(&DebugView, 40, 24, 0, 23, "Debug");
     scrollok(DebugView.content, true);
-    ui_vinit(&HwView, 10, 50, 0, 0, "Hardware Traits");
+    ui_vinit(&HwView, 10, 22, 0, 0, "Hardware Traits");
     ui_vinit(&CpuView, 10, 15, 30, 0, "CPU");
-    ui_vinit(&RamView, 40, 70, 0, 100, "RAM");
+    ui_vinit(&RamView, 40, 129, 0, 48, "RAM");
+    ui_drawhwtraits(&HwView);
     ui_drawcpu(&CpuView);
+    ui_drawram(&RamView);
 }
 
 static void ui_refresh(void)

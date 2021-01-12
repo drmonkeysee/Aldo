@@ -51,10 +51,11 @@ static void ui_drawcpu(const struct view *v)
 static void ui_drawram(const struct view *v)
 {
     int cursor_x = 0, cursor_y = 0;
+    const int w = getmaxx(v->content);
     for (unsigned int i = 0; i < 0x100; ++i) {
         mvwprintw(v->content, cursor_y, cursor_x, "$%02X", i);
         cursor_x += 4;
-        if (cursor_x >= getmaxx(v->content)) {
+        if (cursor_x >= w) {
             cursor_x = 0;
             ++cursor_y;
         }
@@ -125,11 +126,12 @@ int aldo_run(void)
     ui_init();
     bool running = true;
     int debug_cursor_y = -1;
+    const int visible_debugrows = getmaxy(DebugView.content) - 1;
     do {
         const int c = getch();
         switch (c) {
         case ' ':
-            if (debug_cursor_y < 37) {
+            if (debug_cursor_y < visible_debugrows) {
                 ++debug_cursor_y;
             } else {
                 scroll(DebugView.content);

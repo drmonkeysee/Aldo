@@ -50,15 +50,20 @@ static void ui_drawcpu(const struct view *v)
 
 static void ui_drawram(const struct view *v)
 {
-    int cursor_x = 0, cursor_y = 0;
-    const int w = getmaxx(v->content);
-    for (unsigned int i = 0; i < 0x100; ++i) {
-        mvwprintw(v->content, cursor_y, cursor_x, "$%02X", i);
-        cursor_x += 4;
-        if (cursor_x >= w) {
-            cursor_x = 0;
+    static const int start_x = 6, col_width = 4;
+    int cursor_x = start_x, cursor_y = 1;
+    mvwvline(v->content, 0, start_x - 2, 0, getmaxy(v->content));
+    for (unsigned int page = 0; page < 2; ++page) {
+        for (unsigned int msb = 0; msb < 0x10; ++msb) {
+            mvwprintw(v->content, cursor_y, 0, "$%02X", page);
+            for (unsigned int lsb = 0; lsb < 0x10; ++lsb) {
+                mvwprintw(v->content, cursor_y, cursor_x, "$%X%X", msb, lsb);
+                cursor_x += col_width;
+            }
+            cursor_x = start_x;
             ++cursor_y;
         }
+        ++cursor_y;
     }
 }
 
@@ -88,7 +93,7 @@ static void ui_init(void)
     scrollok(DebugView.content, true);
     ui_vinit(&HwView, 10, 22, 0, 0, "Hardware Traits");
     ui_vinit(&CpuView, 10, 15, 30, 0, "CPU");
-    ui_vinit(&RamView, 40, 129, 0, 48, "RAM");
+    ui_vinit(&RamView, 40, 71, 0, 48, "RAM");
     ui_drawhwtraits(&HwView);
     ui_drawcpu(&CpuView);
     ui_drawram(&RamView);

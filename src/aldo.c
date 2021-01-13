@@ -39,7 +39,7 @@ static void ui_drawhwtraits(const struct view *v)
 
 static void ui_drawcpu(const struct view *v)
 {
-    int cursor_y = 1;
+    int cursor_y = 0;
     mvwaddstr(v->content, cursor_y++, 0, "PC: $FFFF");
     mvwaddstr(v->content, cursor_y++, 0, "SP: $FF");
     mvwhline(v->content, cursor_y++, 0, 0, getmaxx(v->content));
@@ -74,7 +74,7 @@ static void ui_vinit(struct view *v, int h, int w, int y, int x,
     v->outer = new_panel(v->win);
     box(v->win, 0, 0);
     mvwaddstr(v->win, 0, 1, title);
-    v->content = derwin(v->win, h - 2, w - 2, 1, 1);
+    v->content = derwin(v->win, h - 4, w - 4, 2, 2);
     v->inner = new_panel(v->content);
 }
 
@@ -99,11 +99,11 @@ static void ui_vcleanup(struct view *v)
 
 static void ui_init(void)
 {
-    ui_vinit(&DebugView, 35, 24, 0, 23, "Debug");
+    ui_vinit(&DebugView, 37, 25, 0, 25, "Debug");
     scrollok(DebugView.content, true);
-    ui_vinit(&HwView, 10, 22, 0, 0, "Hardware Traits");
-    ui_vinit(&CpuView, 10, 15, 25, 0, "CPU");
-    ui_raminit(&RamView, 35, 71, 0, 48, "RAM", 33, 69);
+    ui_vinit(&HwView, 12, 24, 0, 0, "Hardware Traits");
+    ui_vinit(&CpuView, 12, 17, 25, 0, "CPU");
+    ui_raminit(&RamView, 37, 73, 0, 51, "RAM", 33, 69);
     ui_drawhwtraits(&HwView);
     ui_drawcpu(&CpuView);
     ui_drawram(&RamView);
@@ -112,7 +112,7 @@ static void ui_init(void)
 static void ui_refresh(void)
 {
     update_panels();
-    pnoutrefresh(RamView.content, 0, 0, 1, 49, 34, 118);
+    pnoutrefresh(RamView.content, 0, 0, 2, 53, 36, 123);
     doupdate();
 }
 

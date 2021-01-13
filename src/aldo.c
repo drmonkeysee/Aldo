@@ -78,6 +78,16 @@ static void ui_vinit(struct view *v, int h, int w, int y, int x,
     v->inner = new_panel(v->content);
 }
 
+static void ui_raminit(struct view *v, int h, int w, int y, int x,
+                       const char *restrict title, int pw, int ph)
+{
+    v->win = newwin(h, w, y, x);
+    v->outer = new_panel(v->win);
+    box(v->win, 0, 0);
+    mvwaddstr(v->win, 0, 1, title);
+    v->content = newpad(pw, ph);
+}
+
 static void ui_vcleanup(struct view *v)
 {
     del_panel(v->inner);
@@ -93,7 +103,7 @@ static void ui_init(void)
     scrollok(DebugView.content, true);
     ui_vinit(&HwView, 10, 22, 0, 0, "Hardware Traits");
     ui_vinit(&CpuView, 10, 15, 25, 0, "CPU");
-    ui_vinit(&RamView, 35, 71, 0, 48, "RAM");
+    ui_raminit(&RamView, 35, 71, 0, 48, "RAM", 33, 69);
     ui_drawhwtraits(&HwView);
     ui_drawcpu(&CpuView);
     ui_drawram(&RamView);
@@ -102,6 +112,7 @@ static void ui_init(void)
 static void ui_refresh(void)
 {
     update_panels();
+    pnoutrefresh(RamView.content, 0, 0, 1, 49, 34, 118);
     doupdate();
 }
 

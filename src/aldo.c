@@ -51,7 +51,7 @@ static void ui_drawcpu(const struct view *v)
 static void ui_drawram(const struct view *v)
 {
     static const int start_x = 6, col_width = 4;
-    int cursor_x = start_x, cursor_y = 1;
+    int cursor_x = start_x, cursor_y = 0;
     mvwvline(v->content, 0, start_x - 2, 0, getmaxy(v->content));
     for (unsigned int page = 0; page < 2; ++page) {
         for (unsigned int msb = 0; msb < 0x10; ++msb) {
@@ -89,11 +89,11 @@ static void ui_vcleanup(struct view *v)
 
 static void ui_init(void)
 {
-    ui_vinit(&DebugView, 40, 24, 0, 23, "Debug");
+    ui_vinit(&DebugView, 35, 24, 0, 23, "Debug");
     scrollok(DebugView.content, true);
     ui_vinit(&HwView, 10, 22, 0, 0, "Hardware Traits");
-    ui_vinit(&CpuView, 10, 15, 30, 0, "CPU");
-    ui_vinit(&RamView, 40, 71, 0, 48, "RAM");
+    ui_vinit(&CpuView, 10, 15, 25, 0, "CPU");
+    ui_vinit(&RamView, 35, 71, 0, 48, "RAM");
     ui_drawhwtraits(&HwView);
     ui_drawcpu(&CpuView);
     ui_drawram(&RamView);

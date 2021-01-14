@@ -28,6 +28,7 @@ static const int RamViewBlocks = 4;
 static struct view DebugView;
 static struct view HwView;
 static struct view CpuView;
+static struct view FlagsView;
 static struct view RamView;
 
 static int RamViewBlock;
@@ -50,6 +51,19 @@ static void ui_drawcpu(const struct view *v)
     mvwaddstr(v->content, cursor_y++, 0, "A:  $FF");
     mvwaddstr(v->content, cursor_y++, 0, "X:  $FF");
     mvwaddstr(v->content, cursor_y++, 0, "Y:  $FF");
+}
+
+static void ui_drawflags(const struct view *v)
+{
+    int cursor_y = 0;
+    mvwaddstr(v->content, cursor_y++, 0, "(0) C: $0");
+    mvwaddstr(v->content, cursor_y++, 0, "(1) Z: $0");
+    mvwaddstr(v->content, cursor_y++, 0, "(2) I: $0");
+    mvwaddstr(v->content, cursor_y++, 0, "(3) D: $0");
+    mvwaddstr(v->content, cursor_y++, 0, "(4) B: $0");
+    mvwaddstr(v->content, cursor_y++, 0, "(5) -: $0");
+    mvwaddstr(v->content, cursor_y++, 0, "(6) V: $0");
+    mvwaddstr(v->content, cursor_y++, 0, "(7) N: $0");
 }
 
 static void ui_drawram(const struct view *v)
@@ -109,10 +123,12 @@ static void ui_init(void)
     ui_vinit(&DebugView, 37, 25, 0, 25, "Debug");
     scrollok(DebugView.content, true);
     ui_vinit(&HwView, 12, 24, 0, 0, "Hardware Traits");
-    ui_vinit(&CpuView, 12, 17, 25, 0, "CPU");
+    ui_vinit(&CpuView, 10, 17, 13, 0, "CPU");
+    ui_vinit(&FlagsView, 12, 17, 24, 0, "Flags");
     ui_raminit(&RamView, 37, 73, 0, 51, "RAM");
     ui_drawhwtraits(&HwView);
     ui_drawcpu(&CpuView);
+    ui_drawflags(&FlagsView);
     ui_drawram(&RamView);
 }
 
@@ -135,6 +151,7 @@ static void ui_refresh(void)
 static void ui_cleanup(void)
 {
     ui_vcleanup(&RamView);
+    ui_vcleanup(&FlagsView);
     ui_vcleanup(&CpuView);
     ui_vcleanup(&HwView);
     ui_vcleanup(&DebugView);

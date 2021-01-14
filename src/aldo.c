@@ -23,10 +23,14 @@ struct view {
     PANEL *outer, *inner;
 };
 
+static const int RamViewBlocks = 4;
+
 static struct view DebugView;
 static struct view HwView;
 static struct view CpuView;
 static struct view RamView;
+
+static int RamViewBlock;
 
 static void ui_drawhwtraits(const struct view *v)
 {
@@ -53,17 +57,20 @@ static void ui_drawram(const struct view *v)
     static const int start_x = 6, col_width = 4;
     int cursor_x = start_x, cursor_y = 0;
     mvwvline(v->content, 0, start_x - 2, 0, getmaxy(v->content));
-    for (unsigned int page = 0; page < 2; ++page) {
-        for (unsigned int msb = 0; msb < 0x10; ++msb) {
+    for (unsigned int page = 0; page < 8; ++page) {
+        for (unsigned int upper = 0; upper < 0x10; ++upper) {
             mvwprintw(v->content, cursor_y, 0, "$%02X", page);
-            for (unsigned int lsb = 0; lsb < 0x10; ++lsb) {
-                mvwprintw(v->content, cursor_y, cursor_x, "$%X%X", msb, lsb);
+            for (unsigned int lower = 0; lower < 0x10; ++lower) {
+                mvwprintw(v->content, cursor_y, cursor_x, "$%X%X", upper,
+                          lower);
                 cursor_x += col_width;
             }
             cursor_x = start_x;
             ++cursor_y;
         }
-        ++cursor_y;
+        if (page % 2 == 0) {
+            ++cursor_y;
+        }
     }
 }
 
@@ -79,13 +86,13 @@ static void ui_vinit(struct view *v, int h, int w, int y, int x,
 }
 
 static void ui_raminit(struct view *v, int h, int w, int y, int x,
-                       const char *restrict title, int pw, int ph)
+                       const char *restrict title)
 {
     v->win = newwin(h, w, y, x);
     v->outer = new_panel(v->win);
     box(v->win, 0, 0);
     mvwaddstr(v->win, 0, 1, title);
-    v->content = newpad(pw, ph);
+    v->content = newpad((h - 4) * RamViewBlocks, w - 4);
 }
 
 static void ui_vcleanup(struct view *v)
@@ -103,16 +110,25 @@ static void ui_init(void)
     scrollok(DebugView.content, true);
     ui_vinit(&HwView, 12, 24, 0, 0, "Hardware Traits");
     ui_vinit(&CpuView, 12, 17, 25, 0, "CPU");
-    ui_raminit(&RamView, 37, 73, 0, 51, "RAM", 33, 69);
+    ui_raminit(&RamView, 37, 73, 0, 51, "RAM");
     ui_drawhwtraits(&HwView);
     ui_drawcpu(&CpuView);
     ui_drawram(&RamView);
 }
 
+static void ui_ramrefresh(void)
+{
+    int ram_x, ram_y, ram_w, ram_h;
+    getbegyx(RamView.win, ram_y, ram_x);
+    getmaxyx(RamView.win, ram_h, ram_w);
+    pnoutrefresh(RamView.content, (ram_h - 4) * RamViewBlock, 0, ram_y + 2,
+                 ram_x + 2, ram_h - 3, ram_x + ram_w - 2);
+}
+
 static void ui_refresh(void)
 {
     update_panels();
-    pnoutrefresh(RamView.content, 0, 0, 2, 53, 36, 123);
+    ui_ramrefresh();
     doupdate();
 }
 
@@ -154,6 +170,15 @@ int aldo_run(void)
             }
             mvwprintw(DebugView.content, debug_cursor_y, 0, "NES number: %X",
                       (unsigned int)nes_rand());
+            break;
+        case 'b':
+            --RamViewBlock;
+            if (RamViewBlock < 0) {
+                RamViewBlock = RamViewBlocks - 1;
+            }
+            break;
+        case 'n':
+            RamViewBlock = (RamViewBlock + 1) % RamViewBlocks;
             break;
         case 'q':
             running = false;

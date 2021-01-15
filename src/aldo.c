@@ -56,14 +56,10 @@ static void ui_drawcpu(const struct view *v)
 static void ui_drawflags(const struct view *v)
 {
     int cursor_y = 0;
-    mvwaddstr(v->content, cursor_y++, 0, "(0) C: $0");
-    mvwaddstr(v->content, cursor_y++, 0, "(1) Z: $0");
-    mvwaddstr(v->content, cursor_y++, 0, "(2) I: $0");
-    mvwaddstr(v->content, cursor_y++, 0, "(3) D: $0");
-    mvwaddstr(v->content, cursor_y++, 0, "(4) B: $0");
-    mvwaddstr(v->content, cursor_y++, 0, "(5) -: $0");
-    mvwaddstr(v->content, cursor_y++, 0, "(6) V: $0");
-    mvwaddstr(v->content, cursor_y++, 0, "(7) N: $0");
+    mvwaddstr(v->content, cursor_y++, 0, "7 6 5 4 3 2 1 0");
+    mvwaddstr(v->content, cursor_y++, 0, "N V - B D I Z C");
+    mvwhline(v->content, cursor_y++, 0, 0, getmaxx(v->content));
+    mvwaddstr(v->content, cursor_y++, 0, "0 0 0 0 0 0 0 0");
 }
 
 static void ui_drawram(const struct view *v)
@@ -124,7 +120,7 @@ static void ui_init(void)
     scrollok(DebugView.content, true);
     ui_vinit(&HwView, 12, 24, 0, 0, "Hardware Traits");
     ui_vinit(&CpuView, 10, 17, 13, 0, "CPU");
-    ui_vinit(&FlagsView, 12, 17, 24, 0, "Flags");
+    ui_vinit(&FlagsView, 8, 19, 24, 0, "Flags");
     ui_raminit(&RamView, 37, 73, 0, 51, "RAM");
     ui_drawhwtraits(&HwView);
     ui_drawcpu(&CpuView);

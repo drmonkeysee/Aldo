@@ -58,8 +58,7 @@ void cpu_powerup(struct mos6502 *self)
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
 {
     assert(self != NULL);
-
-    if (!snapshot) return;
+    assert(snapshot != NULL);
 
     snapshot->program_counter = self->pc;
     snapshot->stack_pointer = self->s;

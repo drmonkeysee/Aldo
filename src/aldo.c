@@ -182,13 +182,14 @@ int aldo_run(void)
     keypad(stdscr, true);
     curs_set(0);
 
-    nes *nes = nes_new();
+    nes *console = nes_new();
 
     ui_init();
     bool running = true;
     int debug_cursor_y = -1;
     const int visible_debugrows = getmaxy(DebugView.content) - 1;
     struct console_state snapshot;
+    nes_powerup(console);
     do {
         const int c = getch();
         switch (c) {
@@ -215,14 +216,14 @@ int aldo_run(void)
             break;
         }
         if (running) {
-            nes_snapshot(nes, &snapshot);
+            nes_snapshot(console, &snapshot);
             ui_refresh(&snapshot);
         }
     } while (running);
     ui_cleanup();
 
-    nes_free(nes);
-    nes = NULL;
+    nes_free(console);
+    console = NULL;
 
     endwin();
 

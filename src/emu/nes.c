@@ -28,14 +28,17 @@ struct nes_console {
 
 nes *nes_new(void)
 {
-    nes *self = malloc(sizeof *self);
-    cpu_powerup(&self->cpu);
-    return self;
+    return malloc(sizeof(struct nes_console));
 }
 
 void nes_free(nes *self)
 {
     free(self);
+}
+
+void nes_powerup(nes *self)
+{
+    cpu_powerup(&self->cpu);
 }
 
 void nes_snapshot(nes *self, struct console_state *snapshot)

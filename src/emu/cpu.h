@@ -8,6 +8,8 @@
 #ifndef Aldo_emu_cpu_h
 #define Aldo_emu_cpu_h
 
+#include "traits.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -23,11 +25,15 @@ struct mos6502 {
              i: 1,      // (2) Interrupt Disable
              d: 1,      // (3) Decimal (disabled on the NES)
              b: 1,      // (4) Break
-              : 1,      // (5) Unused
+             u: 1,      // (5) Unused
              v: 1,      // (6) Overflow
              n: 1;      // (7) Sign
-    } p;                // Status Register
+    } p;                // Status
     uint8_t ram[0x800]; // 2 KB RAM
 };
+
+void cpu_powerup(struct mos6502 *self);
+
+void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot);
 
 #endif

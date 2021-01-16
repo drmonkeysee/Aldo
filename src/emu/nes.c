@@ -9,6 +9,7 @@
 
 #include "cpu.h"
 
+#include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -27,10 +28,20 @@ struct nes_console {
 
 nes *nes_new(void)
 {
-    return NULL;
+    nes *self = malloc(sizeof *self);
+    cpu_powerup(&self->cpu);
+    return self;
 }
 
 void nes_free(nes *self)
 {
-    (void)self;
+    free(self);
+}
+
+void nes_snapshot(nes *self, struct console_state *snapshot)
+{
+    assert(self != NULL);
+    if (!snapshot) return;
+
+    cpu_snapshot(&self->cpu, snapshot);
 }

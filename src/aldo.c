@@ -8,18 +8,20 @@
 #include "aldo.h"
 
 #include "emu/nes.h"
+#include "emu/traits.h"
 
 #include <ncurses.h>
 #include <panel.h>
 
 #include <locale.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 struct view {
-    WINDOW *win, *content;
-    PANEL *outer, *inner;
+    WINDOW *restrict win, *restrict content;
+    PANEL *restrict outer, *restrict inner;
 };
 
 static const int RamViewPages = 4;
@@ -41,37 +43,46 @@ static void ui_drawhwtraits(void)
     mvwaddstr(HwView.content, cursor_y++, 0, "Freq Multiplier: 1x");
 }
 
-static void ui_drawcpu(void)
+static void ui_drawcpu(const struct console_state *snapshot)
 {
     int cursor_y = 0;
-    mvwaddstr(CpuView.content, cursor_y++, 0, "PC: $FFFF");
-    mvwaddstr(CpuView.content, cursor_y++, 0, "SP: $FF");
+    mvwprintw(CpuView.content, cursor_y++, 0, "PC: $%04X",
+              snapshot->program_counter);
+    mvwprintw(CpuView.content, cursor_y++, 0, "SP: $%02X",
+              snapshot->stack_pointer);
     mvwhline(CpuView.content, cursor_y++, 0, 0, getmaxx(CpuView.content));
-    mvwaddstr(CpuView.content, cursor_y++, 0, "A:  $FF");
-    mvwaddstr(CpuView.content, cursor_y++, 0, "X:  $FF");
-    mvwaddstr(CpuView.content, cursor_y++, 0, "Y:  $FF");
+    mvwprintw(CpuView.content, cursor_y++, 0, "A:  $%02X", snapshot->accum);
+    mvwprintw(CpuView.content, cursor_y++, 0, "X:  $%02X", snapshot->xindex);
+    mvwprintw(CpuView.content, cursor_y++, 0, "Y:  $%02X", snapshot->yindex);
 }
 
-static void ui_drawflags(void)
+static void ui_drawflags(const struct console_state *snapshot)
 {
-    int cursor_y = 0;
-    mvwaddstr(FlagsView.content, cursor_y++, 0, "7 6 5 4 3 2 1 0");
-    mvwaddstr(FlagsView.content, cursor_y++, 0, "N V - B D I Z C");
-    mvwhline(FlagsView.content, cursor_y++, 0, 0, getmaxx(FlagsView.content));
-    mvwaddstr(FlagsView.content, cursor_y++, 0, "0 0 0 0 0 0 0 0");
+    int cursor_x = 0, cursor_y = 0;
+    mvwaddstr(FlagsView.content, cursor_y++, cursor_x, "7 6 5 4 3 2 1 0");
+    mvwaddstr(FlagsView.content, cursor_y++, cursor_x, "N V - B D I Z C");
+    mvwhline(FlagsView.content, cursor_y++, cursor_x, 0,
+             getmaxx(FlagsView.content));
+    for (size_t i = sizeof snapshot->status * 8; i > 0; --i) {
+        mvwprintw(FlagsView.content, cursor_y, cursor_x, "%u",
+                  (snapshot->status >> (i - 1)) & 1);
+        cursor_x += 2;
+    }
 }
 
-static void ui_drawram(void)
+static void ui_drawram(const struct console_state *snapshot)
 {
     static const int start_x = 6, col_width = 4;
     int cursor_x = start_x, cursor_y = 0;
     mvwvline(RamView.content, 0, start_x - 2, 0, getmaxy(RamView.content));
-    for (unsigned int page = 0; page < 8; ++page) {
-        for (unsigned int upper = 0; upper < 0x10; ++upper) {
+    for (size_t page = 0; page < 8; ++page) {
+        for (size_t page_row = 0; page_row < 0x10; ++page_row) {
             mvwprintw(RamView.content, cursor_y, 0, "$%02X", page);
-            for (unsigned int lower = 0; lower < 0x10; ++lower) {
-                mvwprintw(RamView.content, cursor_y, cursor_x, "$%X%X", upper,
-                          lower);
+            for (size_t page_col = 0; page_col < 0x10; ++page_col) {
+                mvwprintw(RamView.content, cursor_y, cursor_x, "$%02X",
+                          snapshot->ram[page * 0x100
+                                        + page_row * 0x10
+                                        + page_col]);
                 cursor_x += col_width;
             }
             cursor_x = start_x;
@@ -124,10 +135,6 @@ static void ui_init(void)
     ui_vinit(&CpuView, 10, 17, 13, 0, "CPU");
     ui_vinit(&FlagsView, 8, 19, 24, 0, "Flags");
     ui_raminit(37, 73, 0, 51, "RAM");
-    ui_drawhwtraits();
-    ui_drawcpu();
-    ui_drawflags();
-    ui_drawram();
 }
 
 static void ui_ramrefresh(void)
@@ -139,8 +146,13 @@ static void ui_ramrefresh(void)
                  ram_x + 2, ram_h - 3, ram_x + ram_w - 2);
 }
 
-static void ui_refresh(void)
+static void ui_refresh(const struct console_state *snapshot)
 {
+    ui_drawhwtraits();
+    ui_drawcpu(snapshot);
+    ui_drawflags(snapshot);
+    ui_drawram(snapshot);
+
     update_panels();
     ui_ramrefresh();
     doupdate();
@@ -170,10 +182,13 @@ int aldo_run(void)
     keypad(stdscr, true);
     curs_set(0);
 
+    nes *nes = nes_new();
+
     ui_init();
     bool running = true;
     int debug_cursor_y = -1;
     const int visible_debugrows = getmaxy(DebugView.content) - 1;
+    struct console_state snapshot;
     do {
         const int c = getch();
         switch (c) {
@@ -199,9 +214,15 @@ int aldo_run(void)
             running = false;
             break;
         }
-        ui_refresh();
+        if (running) {
+            nes_snapshot(nes, &snapshot);
+            ui_refresh(&snapshot);
+        }
     } while (running);
     ui_cleanup();
+
+    nes_free(nes);
+    nes = NULL;
 
     endwin();
 

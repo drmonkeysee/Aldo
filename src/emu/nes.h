@@ -10,4 +10,9 @@
 
 int nes_rand(void);
 
+typedef struct nes_console nes;
+
+nes *nes_new(void);
+void nes_free(nes *self);
+
 #endif

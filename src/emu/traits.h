@@ -8,6 +8,6 @@
 #ifndef Aldo_emu_traits_h
 #define Aldo_emu_traits_h
 
-// TODO: hardware characteristics go here
+#define RAM_SIZE 0x800u
 
 #endif

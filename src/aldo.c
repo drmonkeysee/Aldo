@@ -8,7 +8,7 @@
 #include "aldo.h"
 
 #include "emu/nes.h"
-#include "emu/traits.h"
+#include "snapshot.h"
 
 #include <ncurses.h>
 #include <panel.h>
@@ -189,7 +189,8 @@ int aldo_run(void)
     int debug_cursor_y = -1;
     const int visible_debugrows = getmaxy(DebugView.content) - 1;
     struct console_state snapshot;
-    nes_powerup(console);
+    uint8_t test_prog[] = { 0xea, 0xea, 0xea }; // just a bunch of NOPs
+    nes_powerup(console, sizeof test_prog, test_prog);
     do {
         const int c = getch();
         switch (c) {

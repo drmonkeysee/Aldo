@@ -8,10 +8,13 @@
 #ifndef Aldo_emu_cpu_h
 #define Aldo_emu_cpu_h
 
-#include "traits.h"
+#include "snapshot.h"
 
 #include <stdbool.h>
 #include <stdint.h>
+
+// NOTE: The MOS6502 processor is a little-endian
+// 8-bit CPU with a 16-bit addressing space.
 
 struct mos6502 {
     uint16_t pc;        // Program Counter
@@ -29,7 +32,7 @@ struct mos6502 {
              v: 1,      // (6) Overflow
              n: 1;      // (7) Sign
     } p;                // Status
-    uint8_t ram[0x800]; // 2 KB RAM
+    uint8_t *ram;       // RAM Bus
 };
 
 void cpu_powerup(struct mos6502 *self);

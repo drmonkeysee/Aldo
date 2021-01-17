@@ -10,7 +10,6 @@
 #include "cpu.h"
 
 #include <assert.h>
-#include <stddef.h>
 #include <stdlib.h>
 
 int nes_rand(void)
@@ -18,8 +17,11 @@ int nes_rand(void)
     return rand();
 }
 
+// NOTE: The NES-001 Motherboard
+
 struct nes_console {
-    struct mos6502 cpu;
+    struct mos6502 cpu; // CPU core within the RP2A03 chip
+    uint8_t ram[0x800]; // 2 KB CPU RAM
 };
 
 //
@@ -28,7 +30,9 @@ struct nes_console {
 
 nes *nes_new(void)
 {
-    return malloc(sizeof(struct nes_console));
+    struct nes_console *self = malloc(sizeof *self);
+    self->cpu.ram = self->ram;
+    return self;
 }
 
 void nes_free(nes *self)
@@ -36,9 +40,15 @@ void nes_free(nes *self)
     free(self);
 }
 
-void nes_powerup(nes *self)
+void nes_powerup(nes *self, size_t sz, uint8_t prog[restrict sz])
 {
+    static const uint16_t start = 0x700;
+
     cpu_powerup(&self->cpu);
+    // TODO: temporarily put programs at $0700
+    for (size_t i = 0; i < sz; ++i) {
+        self->ram[i + start] = prog[i];
+    }
 }
 
 void nes_snapshot(nes *self, struct console_state *snapshot)
@@ -47,4 +57,5 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
     if (!snapshot) return;
 
     cpu_snapshot(&self->cpu, snapshot);
+    snapshot->ram = self->ram;
 }

@@ -10,6 +10,20 @@
 #include <assert.h>
 #include <stddef.h>
 
+// NOTE: hardcoded cpu vector addresses
+static const uint16_t NmiVector = 0xfffa,
+                      ResetVector = 0xfffc,
+                      IrqVector = 0xfffe;
+
+// TODO: for now fake instructions start address at $0700
+// this will be the cartridge rom banks eventually
+static const uint8_t ResetVectorContents[2] = { 0x00, 0x07 };
+
+static void reset_pc(struct mos6502 *self)
+{
+    self->pc = ResetVectorContents[0] | (ResetVectorContents[1] << 8);
+}
+
 static uint8_t get_p(const struct mos6502 *self)
 {
     uint8_t p = 0;
@@ -44,15 +58,10 @@ void cpu_powerup(struct mos6502 *self)
 {
     assert(self != NULL);
 
+    reset_pc(self);
     set_p(self, 0x34);
     self->a = self->x = self->y = 0;
     self->s = 0xfd;
-    // NOTE: fill in fake bytes to verify UI display
-    for (size_t i = 0; i < 8; ++i) {
-        for (size_t j = 0; j < 0x100; ++j) {
-            self->ram[i * 0x100 + j] = 0x13 - i;
-        }
-    }
 }
 
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
@@ -66,5 +75,4 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->xindex = self->x;
     snapshot->yindex = self->y;
     snapshot->status = get_p(self);
-    snapshot->ram = self->ram;
 }

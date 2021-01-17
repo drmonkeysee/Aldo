@@ -11,7 +11,7 @@ OBJ_DIRS := $(OBJ_DIR) $(foreach MDL,$(MODULES),$(OBJ_DIR)/$(MDL))
 PRODUCT := aldo
 TARGET := $(BUILD_DIR)/$(PRODUCT)
 
-CFLAGS := -Wall -Wextra -pedantic -std=c17
+CFLAGS := -Wall -Wextra -pedantic -std=c17 -iquote$(SRC_DIR)
 SP := strip
 
 ifeq ($(OS), Darwin)

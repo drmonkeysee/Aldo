@@ -21,8 +21,8 @@ int nes_rand(void)
 // NOTE: The NES-001 Motherboard
 
 struct nes_console {
-    struct mos6502 cpu;     // CPU core within the RP2A03 chip
-    uint8_t ram[RAM_SIZE];  // 2 KB CPU RAM
+    struct mos6502 cpu;     // CPU Core of RP2A03 Chip
+    uint8_t ram[RAM_SIZE];  // CPU Internal RAM
 };
 
 //

@@ -45,7 +45,7 @@ void nes_powerup(nes *self, size_t sz, uint8_t prog[restrict sz])
 {
     static const uint16_t start = 0x700;
 
-    cpu_powerup(&self->cpu);
+    cpu_reset(&self->cpu);
     // TODO: temporarily put programs at $0700
     for (size_t i = 0; i < sz; ++i) {
         self->ram[i + start] = prog[i];

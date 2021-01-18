@@ -54,8 +54,9 @@ static void set_p(struct mos6502 *self, uint8_t b)
 // Public Interface
 //
 
-void cpu_powerup(struct mos6502 *self)
+void cpu_reset(struct mos6502 *self)
 {
+    // TODO: this will consume 7 cycles
     assert(self != NULL);
 
     reset_pc(self);

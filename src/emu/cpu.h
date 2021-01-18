@@ -35,7 +35,7 @@ struct mos6502 {
     uint8_t *ram;       // RAM Bus
 };
 
-void cpu_powerup(struct mos6502 *self);
+void cpu_reset(struct mos6502 *self);
 
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot);
 

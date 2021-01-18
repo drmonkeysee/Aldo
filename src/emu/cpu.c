@@ -7,21 +7,32 @@
 
 #include "cpu.h"
 
+#include "traits.h"
+
 #include <assert.h>
 #include <stddef.h>
 
-// NOTE: hardcoded cpu vector addresses
-static const uint16_t NmiVector = 0xfffa,
-                      ResetVector = 0xfffc,
-                      IrqVector = 0xfffe;
-
-// TODO: for now fake instructions start address at $0700
-// this will be the cartridge rom banks eventually
-static const uint8_t ResetVectorContents[2] = { 0x00, 0x07 };
+static bool read(const struct mos6502 *self, uint16_t addr,
+                 uint8_t *restrict data)
+{
+    if (addr < RAM_SIZE) {
+        *data = self->ram[addr];
+        return true;
+    }
+    if (CART_MIN_CPU_ADDR <= addr && addr <= CART_MAX_CPU_ADDR) {
+        *data = self->cart[addr & CART_CPU_ADDR_MASK];
+        return true;
+    }
+    return false;
+}
 
 static void reset_pc(struct mos6502 *self)
 {
-    self->pc = ResetVectorContents[0] | (ResetVectorContents[1] << 8);
+    // TODO: what to do if read returns false?
+    uint8_t lo, hi;
+    read(self, RESET_VECTOR, &lo);
+    read(self, RESET_VECTOR + 1, &hi);
+    self->pc = (hi << 8) | lo;
 }
 
 static uint8_t get_p(const struct mos6502 *self)

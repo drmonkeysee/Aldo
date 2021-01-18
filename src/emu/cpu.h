@@ -32,7 +32,8 @@ struct mos6502 {
              v: 1,      // (6) Overflow
              n: 1;      // (7) Sign
     } p;                // Status
-    uint8_t *ram;       // RAM Bus
+    uint8_t *ram,       // RAM Bus
+            *cart;      // TODO: temp pointer to fake cartridge
 };
 
 void cpu_reset(struct mos6502 *self);

@@ -13,8 +13,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-int nes_rand(void);
-
 typedef struct nes_console nes;
 
 nes *nes_new(void);

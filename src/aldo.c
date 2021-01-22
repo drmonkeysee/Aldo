@@ -28,10 +28,10 @@ struct view {
 
 static const int RamViewPages = 4;
 
-static struct view DebugView;
 static struct view HwView;
 static struct view CpuView;
 static struct view FlagsView;
+static struct view ProgView;
 static struct view RamView;
 
 static int CurrentRamViewPage;
@@ -72,23 +72,23 @@ static void ui_drawflags(const struct console_state *snapshot)
     }
 }
 
-static void ui_drawdebug(const struct console_state *snapshot)
+static void ui_drawprog(const struct console_state *snapshot)
 {
     int h, w, vector_offset = 4;
-    getmaxyx(DebugView.content, h, w);
+    getmaxyx(ProgView.content, h, w);
     for (int i = 0; i < h - vector_offset; ++i) {
         const uint16_t addr = snapshot->program_counter + i;
-        mvwprintw(DebugView.content, i, 0, "$%04X $%02X", addr,
+        mvwprintw(ProgView.content, i, 0, "$%04X $%02X", addr,
                   snapshot->cart[addr & CpuCartAddrMask]);
     }
-    mvwhline(DebugView.content, h - vector_offset--, 0, 0, w);
-    mvwprintw(DebugView.content, h - vector_offset--, 0, "$%04X $%04X",
+    mvwhline(ProgView.content, h - vector_offset--, 0, 0, w);
+    mvwprintw(ProgView.content, h - vector_offset--, 0, "$%04X $%04X",
               NmiVector, snapshot->cart[NmiVector & CpuCartAddrMask]
               | (snapshot->cart[NmiVector + 1 & CpuCartAddrMask] << 8));
-    mvwprintw(DebugView.content, h - vector_offset--, 0, "$%04X $%04X",
+    mvwprintw(ProgView.content, h - vector_offset--, 0, "$%04X $%04X",
               ResetVector, snapshot->cart[ResetVector & CpuCartAddrMask]
               | (snapshot->cart[ResetVector + 1 & CpuCartAddrMask] << 8));
-    mvwprintw(DebugView.content, h - vector_offset, 0, "$%04X $%04X",
+    mvwprintw(ProgView.content, h - vector_offset, 0, "$%04X $%04X",
               IrqVector, snapshot->cart[IrqVector & CpuCartAddrMask]
               | (snapshot->cart[IrqVector + 1 & CpuCartAddrMask] << 8));
 }
@@ -152,11 +152,10 @@ static void ui_vcleanup(struct view *v)
 
 static void ui_init(void)
 {
-    ui_vinit(&DebugView, 37, 25, 0, 25, "Debug");
-    scrollok(DebugView.content, true);
     ui_vinit(&HwView, 12, 24, 0, 0, "Hardware Traits");
     ui_vinit(&CpuView, 10, 17, 13, 0, "CPU");
     ui_vinit(&FlagsView, 8, 19, 24, 0, "Flags");
+    ui_vinit(&ProgView, 37, 25, 0, 25, "Program");
     ui_raminit(37, 73, 0, 51, "RAM");
 }
 
@@ -174,7 +173,7 @@ static void ui_refresh(const struct console_state *snapshot)
     ui_drawhwtraits();
     ui_drawcpu(snapshot);
     ui_drawflags(snapshot);
-    ui_drawdebug(snapshot);
+    ui_drawprog(snapshot);
     ui_drawram(snapshot);
 
     update_panels();
@@ -185,10 +184,10 @@ static void ui_refresh(const struct console_state *snapshot)
 static void ui_cleanup(void)
 {
     ui_vcleanup(&RamView);
+    ui_vcleanup(&ProgView);
     ui_vcleanup(&FlagsView);
     ui_vcleanup(&CpuView);
     ui_vcleanup(&HwView);
-    ui_vcleanup(&DebugView);
 }
 
 //

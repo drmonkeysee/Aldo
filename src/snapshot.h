@@ -13,7 +13,7 @@
 struct console_state {
     uint16_t program_counter;
     uint8_t accum, stack_pointer, status, xindex, yindex;
-    const uint8_t *ram;
+    const uint8_t *ram, *cart;
 };
 
 #endif

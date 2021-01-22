@@ -8,6 +8,7 @@
 #include "aldo.h"
 
 #include "emu/nes.h"
+#include "emu/traits.h"
 #include "snapshot.h"
 
 #include <ncurses.h>
@@ -16,6 +17,7 @@
 #include <locale.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -70,6 +72,27 @@ static void ui_drawflags(const struct console_state *snapshot)
     }
 }
 
+static void ui_drawdebug(const struct console_state *snapshot)
+{
+    int h, w, vector_offset = 4;
+    getmaxyx(DebugView.content, h, w);
+    for (int i = 0; i < h - vector_offset; ++i) {
+        const uint16_t addr = snapshot->program_counter + i;
+        mvwprintw(DebugView.content, i, 0, "$%04X $%02X", addr,
+                  snapshot->cart[addr & CpuCartAddrMask]);
+    }
+    mvwhline(DebugView.content, h - vector_offset--, 0, 0, w);
+    mvwprintw(DebugView.content, h - vector_offset--, 0, "$%04X $%04X",
+              NmiVector, snapshot->cart[NmiVector & CpuCartAddrMask]
+              | (snapshot->cart[NmiVector + 1 & CpuCartAddrMask] << 8));
+    mvwprintw(DebugView.content, h - vector_offset--, 0, "$%04X $%04X",
+              ResetVector, snapshot->cart[ResetVector & CpuCartAddrMask]
+              | (snapshot->cart[ResetVector + 1 & CpuCartAddrMask] << 8));
+    mvwprintw(DebugView.content, h - vector_offset, 0, "$%04X $%04X",
+              IrqVector, snapshot->cart[IrqVector & CpuCartAddrMask]
+              | (snapshot->cart[IrqVector + 1 & CpuCartAddrMask] << 8));
+}
+
 static void ui_drawram(const struct console_state *snapshot)
 {
     static const int start_x = 6, col_width = 4;
@@ -80,8 +103,8 @@ static void ui_drawram(const struct console_state *snapshot)
             mvwprintw(RamView.content, cursor_y, 0, "$%02X", page);
             for (size_t page_col = 0; page_col < 0x10; ++page_col) {
                 mvwprintw(RamView.content, cursor_y, cursor_x, "$%02X",
-                          snapshot->ram[page * 0x100
-                                        + page_row * 0x10
+                          snapshot->ram[(page * 0x100)
+                                        + (page_row * 0x10)
                                         + page_col]);
                 cursor_x += col_width;
             }
@@ -151,6 +174,7 @@ static void ui_refresh(const struct console_state *snapshot)
     ui_drawhwtraits();
     ui_drawcpu(snapshot);
     ui_drawflags(snapshot);
+    ui_drawdebug(snapshot);
     ui_drawram(snapshot);
 
     update_panels();
@@ -186,23 +210,12 @@ int aldo_run(void)
 
     ui_init();
     bool running = true;
-    int debug_cursor_y = -1;
-    const int visible_debugrows = getmaxy(DebugView.content) - 1;
     struct console_state snapshot;
     uint8_t test_prog[] = { 0xea, 0xea, 0xea }; // just a bunch of NOPs
     nes_powerup(console, sizeof test_prog, test_prog);
     do {
         const int c = getch();
         switch (c) {
-        case ' ':
-            if (debug_cursor_y < visible_debugrows) {
-                ++debug_cursor_y;
-            } else {
-                scroll(DebugView.content);
-            }
-            mvwprintw(DebugView.content, debug_cursor_y, 0, "NES number: %X",
-                      (unsigned int)nes_rand());
-            break;
         case 'b':
             --CurrentRamViewPage;
             if (CurrentRamViewPage < 0) {

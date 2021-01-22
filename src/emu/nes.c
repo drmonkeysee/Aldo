@@ -22,24 +22,23 @@ int nes_rand(void)
 
 struct nes_console {
     struct mos6502 cpu;     // CPU Core of RP2A03 Chip
-    uint8_t ram[0x800],     // 2 KB CPU Internal RAM
-            cart[0xbfe0];   // TODO: ~49 KB Cartridge RAM/ROM to be replaced
+    uint8_t ram[RAM_SIZE],  // CPU Internal RAM
+            cart[ROM_SIZE]; // TODO: Cartridge ROM to be replaced
                             // eventually with cartridge + mapper
 };
 
 static void load_prog(nes *self, size_t sz, uint8_t prog[restrict sz])
 {
     // TODO: stick test programs at 0x8000 for now
-    static const uint16_t start = 0x8000;
-
-    assert(sz <= 0xffff - start);
+    assert(sz <= ROM_SIZE);
 
     for (size_t i = 0; i < sz; ++i) {
-        self->cart[(i + start) & CpuCartAddrMask] = prog[i];
+        self->cart[(i + CpuCartMinAddr) & CpuCartAddrMask] = prog[i];
     }
-    self->cart[ResetVector & CpuCartAddrMask] = (uint8_t)start;
+    self->cart[0x8020 & CpuCartAddrMask] = 0xff;
+    self->cart[ResetVector & CpuCartAddrMask] = (uint8_t)CpuCartMinAddr;
     self->cart[(ResetVector + 1) & CpuCartAddrMask]
-        = (uint8_t)(start >> 8);
+        = (uint8_t)(CpuCartMinAddr >> 8);
 }
 
 //
@@ -74,4 +73,5 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
 
     cpu_snapshot(&self->cpu, snapshot);
     snapshot->ram = self->ram;
+    snapshot->cart = self->cart;
 }

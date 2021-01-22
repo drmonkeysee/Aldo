@@ -35,10 +35,10 @@ static void load_prog(nes *self, size_t sz, uint8_t prog[restrict sz])
     assert(sz <= 0xffff - start);
 
     for (size_t i = 0; i < sz; ++i) {
-        self->cart[(i + start) & CART_CPU_ADDR_MASK] = prog[i];
+        self->cart[(i + start) & CpuCartAddrMask] = prog[i];
     }
-    self->cart[RESET_VECTOR & CART_CPU_ADDR_MASK] = (uint8_t)start;
-    self->cart[(RESET_VECTOR + 1) & CART_CPU_ADDR_MASK]
+    self->cart[ResetVector & CpuCartAddrMask] = (uint8_t)start;
+    self->cart[(ResetVector + 1) & CpuCartAddrMask]
         = (uint8_t)(start >> 8);
 }
 

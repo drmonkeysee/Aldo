@@ -15,12 +15,12 @@
 static bool read(const struct mos6502 *self, uint16_t addr,
                  uint8_t *restrict data)
 {
-    if (addr < RAM_SIZE) {
-        *data = self->ram[addr];
+    if (addr <= CpuRamMaxAddr) {
+        *data = self->ram[addr & CpuRamAddrMask];
         return true;
     }
-    if (CART_MIN_CPU_ADDR <= addr && addr <= CART_MAX_CPU_ADDR) {
-        *data = self->cart[addr & CART_CPU_ADDR_MASK];
+    if (CpuCartMinAddr <= addr && addr <= CpuCartMaxAddr) {
+        *data = self->cart[addr & CpuCartAddrMask];
         return true;
     }
     return false;
@@ -30,8 +30,8 @@ static void reset_pc(struct mos6502 *self)
 {
     // TODO: what to do if read returns false?
     uint8_t lo, hi;
-    read(self, RESET_VECTOR, &lo);
-    read(self, RESET_VECTOR + 1, &hi);
+    read(self, ResetVector, &lo);
+    read(self, ResetVector + 1, &hi);
     self->pc = (hi << 8) | lo;
 }
 

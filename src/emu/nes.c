@@ -13,7 +13,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
-// NOTE: The NES-001 Motherboard
+// NOTE: The NES-001 Motherboard including the CPU/Audio Generator, PPU,
+// RAM, VRAM, and memory-mapped Cartridge RAM/ROM and Controller Input.
 
 struct nes_console {
     struct mos6502 cpu;     // CPU Core of RP2A03 Chip
@@ -61,7 +62,7 @@ void nes_powerup(nes *self, size_t sz, uint8_t prog[restrict sz])
     cpu_reset(&self->cpu);
 }
 
-void nes_snapshot(nes *self, struct console_state *snapshot)
+void nes_snapshot(nes *self, struct console_state *restrict snapshot)
 {
     assert(self != NULL);
     if (!snapshot) return;

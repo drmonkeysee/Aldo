@@ -49,16 +49,16 @@ static uint8_t get_p(const struct mos6502 *self)
     return p;
 }
 
-static void set_p(struct mos6502 *self, uint8_t b)
+static void set_p(struct mos6502 *self, uint8_t p)
 {
-    self->p.c = b & 0x1;
-    self->p.z = b & 0x2;
-    self->p.i = b & 0x4;
-    self->p.d = b & 0x8;
-    self->p.b = b & 0x10;
-    self->p.u = b & 0x20;
-    self->p.v = b & 0x40;
-    self->p.n = b & 0x80;
+    self->p.c = p & 0x1;
+    self->p.z = p & 0x2;
+    self->p.i = p & 0x4;
+    self->p.d = p & 0x8;
+    self->p.b = p & 0x10;
+    self->p.u = p & 0x20;
+    self->p.v = p & 0x40;
+    self->p.n = p & 0x80;
 }
 
 //
@@ -71,8 +71,11 @@ void cpu_reset(struct mos6502 *self)
     assert(self != NULL);
 
     reset_pc(self);
+    // NOTE: set B, I, and unused flags high
     set_p(self, 0x34);
     self->a = self->x = self->y = 0;
+    // NOTE: S initialized to 0 but reset runs through same sequence as
+    // BRK/IRQ so the stack does 3 phantom pushes moving it to $00 - $3 = $FD.
     self->s = 0xfd;
 }
 

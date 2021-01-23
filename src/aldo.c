@@ -78,29 +78,29 @@ static void ui_drawprog(const struct console_state *snapshot)
     getmaxyx(ProgView.content, h, w);
     for (int i = 0; i < h - vector_offset; ++i) {
         const uint16_t addr = snapshot->program_counter + i;
-        mvwprintw(ProgView.content, i, 0, "$%04X $%02X", addr,
+        mvwprintw(ProgView.content, i, 0, "%04X %02X", addr,
                   snapshot->cart[addr & CpuCartAddrMask]);
     }
     mvwhline(ProgView.content, h - vector_offset--, 0, 0, w);
-    mvwprintw(ProgView.content, h - vector_offset--, 0, "$%04X $%04X",
+    mvwprintw(ProgView.content, h - vector_offset--, 0, "%04X $%04X",
               NmiVector, snapshot->cart[NmiVector & CpuCartAddrMask]
               | (snapshot->cart[NmiVector + 1 & CpuCartAddrMask] << 8));
-    mvwprintw(ProgView.content, h - vector_offset--, 0, "$%04X $%04X",
+    mvwprintw(ProgView.content, h - vector_offset--, 0, "%04X $%04X",
               ResetVector, snapshot->cart[ResetVector & CpuCartAddrMask]
               | (snapshot->cart[ResetVector + 1 & CpuCartAddrMask] << 8));
-    mvwprintw(ProgView.content, h - vector_offset, 0, "$%04X $%04X",
+    mvwprintw(ProgView.content, h - vector_offset, 0, "%04X $%04X",
               IrqVector, snapshot->cart[IrqVector & CpuCartAddrMask]
               | (snapshot->cart[IrqVector + 1 & CpuCartAddrMask] << 8));
 }
 
 static void ui_drawram(const struct console_state *snapshot)
 {
-    static const int start_x = 6, col_width = 4;
+    static const int start_x = 5, col_width = 4;
     int cursor_x = start_x, cursor_y = 0;
     mvwvline(RamView.content, 0, start_x - 2, 0, getmaxy(RamView.content));
     for (size_t page = 0; page < 8; ++page) {
         for (size_t page_row = 0; page_row < 0x10; ++page_row) {
-            mvwprintw(RamView.content, cursor_y, 0, "$%02X", page);
+            mvwprintw(RamView.content, cursor_y, 0, "%02X", page);
             for (size_t page_col = 0; page_col < 0x10; ++page_col) {
                 mvwprintw(RamView.content, cursor_y, cursor_x, "$%02X",
                           snapshot->ram[(page * 0x100)
@@ -156,7 +156,7 @@ static void ui_init(void)
     ui_vinit(&CpuView, 10, 17, 13, 0, "CPU");
     ui_vinit(&FlagsView, 8, 19, 24, 0, "Flags");
     ui_vinit(&ProgView, 37, 25, 0, 25, "Program");
-    ui_raminit(37, 73, 0, 51, "RAM");
+    ui_raminit(37, 72, 0, 51, "RAM");
 }
 
 static void ui_ramrefresh(void)
@@ -164,8 +164,8 @@ static void ui_ramrefresh(void)
     int ram_x, ram_y, ram_w, ram_h;
     getbegyx(RamView.win, ram_y, ram_x);
     getmaxyx(RamView.win, ram_h, ram_w);
-    pnoutrefresh(RamView.content, (ram_h - 4) * CurrentRamViewPage, 0, ram_y + 2,
-                 ram_x + 2, ram_h - 3, ram_x + ram_w - 2);
+    pnoutrefresh(RamView.content, (ram_h - 4) * CurrentRamViewPage, 0,
+                 ram_y + 2, ram_x + 2, ram_h - 3, ram_x + ram_w - 2);
 }
 
 static void ui_refresh(const struct console_state *snapshot)

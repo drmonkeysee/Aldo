@@ -20,6 +20,6 @@ void nes_free(nes *self);
 
 void nes_powerup(nes *self, size_t sz, uint8_t prog[restrict sz]);
 
-void nes_snapshot(nes *self, struct console_state *snapshot);
+void nes_snapshot(nes *self, struct console_state *restrict snapshot);
 
 #endif

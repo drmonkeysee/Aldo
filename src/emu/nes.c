@@ -62,6 +62,13 @@ void nes_powerup(nes *self, size_t sz, uint8_t prog[restrict sz])
     cpu_reset(&self->cpu);
 }
 
+int nes_step(nes *self)
+{
+    assert(self != NULL);
+
+    return 0;
+}
+
 void nes_snapshot(nes *self, struct console_state *restrict snapshot)
 {
     assert(self != NULL);

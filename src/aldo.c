@@ -36,12 +36,14 @@ static struct view RamView;
 
 static int CurrentRamViewPage;
 
-static void ui_drawhwtraits(void)
+static void ui_drawhwtraits(uint64_t cycles)
 {
     int cursor_y = 0;
     mvwaddstr(HwView.content, cursor_y++, 0, "FPS: N/A");
-    mvwaddstr(HwView.content, cursor_y++, 0, "Clock: INF Hz");
-    mvwaddstr(HwView.content, cursor_y++, 0, "Cycle Count: 1");
+    mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
+    mvwaddstr(HwView.content, cursor_y++, 0, "CPU Clock: INF Hz");
+    mvwaddstr(HwView.content, cursor_y++, 0, "PPU Clock: INF Hz");
+    mvwprintw(HwView.content, cursor_y++, 0, "Cycle Count: %u", cycles);
     mvwaddstr(HwView.content, cursor_y++, 0, "Freq Multiplier: 1x");
 }
 
@@ -168,9 +170,9 @@ static void ui_ramrefresh(void)
                  ram_y + 2, ram_x + 2, ram_h - 3, ram_x + ram_w - 2);
 }
 
-static void ui_refresh(const struct console_state *snapshot)
+static void ui_refresh(const struct console_state *snapshot, uint64_t cycles)
 {
-    ui_drawhwtraits();
+    ui_drawhwtraits(cycles);
     ui_drawcpu(snapshot);
     ui_drawflags(snapshot);
     ui_drawprog(snapshot);
@@ -209,12 +211,16 @@ int aldo_run(void)
 
     ui_init();
     bool running = true;
+    uint64_t instruction_cycles = 0;
     struct console_state snapshot;
     uint8_t test_prog[] = { 0xea, 0xea, 0xea }; // just a bunch of NOPs
     nes_powerup(console, sizeof test_prog, test_prog);
     do {
         const int c = getch();
         switch (c) {
+        case ' ':
+            instruction_cycles = nes_step(console);
+            break;
         case 'b':
             --CurrentRamViewPage;
             if (CurrentRamViewPage < 0) {
@@ -230,7 +236,7 @@ int aldo_run(void)
         }
         if (running) {
             nes_snapshot(console, &snapshot);
-            ui_refresh(&snapshot);
+            ui_refresh(&snapshot, instruction_cycles);
         }
     } while (running);
     ui_cleanup();

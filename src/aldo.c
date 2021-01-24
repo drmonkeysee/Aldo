@@ -80,7 +80,7 @@ static void ui_drawprog(const struct console_state *snapshot)
     getmaxyx(ProgView.content, h, w);
     for (int i = 0; i < h - vector_offset; ++i) {
         const uint16_t addr = snapshot->program_counter + i;
-        mvwprintw(ProgView.content, i, 0, "%04X %02X", addr,
+        mvwprintw(ProgView.content, i, 0, "$%04X %02X", addr,
                   snapshot->cart[addr & CpuCartAddrMask]);
     }
     mvwhline(ProgView.content, h - vector_offset--, 0, 0, w);
@@ -97,14 +97,14 @@ static void ui_drawprog(const struct console_state *snapshot)
 
 static void ui_drawram(const struct console_state *snapshot)
 {
-    static const int start_x = 5, col_width = 4;
+    static const int start_x = 5, col_width = 3;
     int cursor_x = start_x, cursor_y = 0;
     mvwvline(RamView.content, 0, start_x - 2, 0, getmaxy(RamView.content));
     for (size_t page = 0; page < 8; ++page) {
         for (size_t page_row = 0; page_row < 0x10; ++page_row) {
             mvwprintw(RamView.content, cursor_y, 0, "%02X", page);
             for (size_t page_col = 0; page_col < 0x10; ++page_col) {
-                mvwprintw(RamView.content, cursor_y, cursor_x, "$%02X",
+                mvwprintw(RamView.content, cursor_y, cursor_x, "%02X",
                           snapshot->ram[(page * 0x100)
                                         + (page_row * 0x10)
                                         + page_col]);
@@ -158,7 +158,7 @@ static void ui_init(void)
     ui_vinit(&CpuView, 10, 17, 13, 0, "CPU");
     ui_vinit(&FlagsView, 8, 19, 24, 0, "Flags");
     ui_vinit(&ProgView, 37, 25, 0, 25, "Program");
-    ui_raminit(37, 72, 0, 51, "RAM");
+    ui_raminit(37, 56, 0, 51, "RAM");
 }
 
 static void ui_ramrefresh(void)

@@ -75,7 +75,7 @@ void cpu_reset(struct mos6502 *self)
     set_p(self, 0x34);
     self->a = self->x = self->y = 0;
     // NOTE: S initialized to 0 but reset runs through same sequence as
-    // BRK/IRQ so the stack does 3 phantom pushes moving it to $00 - $3 = $FD.
+    // BRK/IRQ so the cpu does 3 phantom stack pushes; $00 - $3 = $FD.
     self->s = 0xfd;
 }
 

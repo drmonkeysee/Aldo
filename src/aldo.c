@@ -7,6 +7,7 @@
 
 #include "aldo.h"
 
+#include "asm.h"
 #include "emu/nes.h"
 #include "emu/traits.h"
 #include "snapshot.h"
@@ -52,7 +53,7 @@ static void ui_drawcpu(const struct console_state *snapshot)
     int cursor_y = 0;
     mvwprintw(CpuView.content, cursor_y++, 0, "PC: $%04X",
               snapshot->program_counter);
-    mvwprintw(CpuView.content, cursor_y++, 0, "SP: $%02X",
+    mvwprintw(CpuView.content, cursor_y++, 0, "S:  $%02X",
               snapshot->stack_pointer);
     mvwhline(CpuView.content, cursor_y++, 0, 0, getmaxx(CpuView.content));
     mvwprintw(CpuView.content, cursor_y++, 0, "A:  $%02X", snapshot->accum);
@@ -74,25 +75,65 @@ static void ui_drawflags(const struct console_state *snapshot)
     }
 }
 
+static void ui_drawprogerr(int diserr, int y)
+{
+    const char *err;
+    switch (diserr) {
+    case DIS_FMT_FAIL:
+        err = "OUTPUT FAIL";
+        break;
+    case DIS_EOF:
+        err = "UNEXPECTED EOF";
+        break;
+    default:
+        err = "UNKNOWN ERR";
+        break;
+    }
+    mvwaddstr(ProgView.content, y, 0, err);
+}
+
+static void ui_drawvecs(int h, int w, int y,
+                        const struct console_state *snapshot)
+{
+    mvwhline(ProgView.content, h - y--, 0, 0, w);
+
+    uint8_t lo = snapshot->cart[NmiVector & CpuCartAddrMask],
+            hi = snapshot->cart[(NmiVector + 1) & CpuCartAddrMask];
+    mvwprintw(ProgView.content, h - y--, 0, "$%04X: %02X %02X       NMI $%04X",
+              NmiVector, lo, hi, lo | (hi << 8));
+
+    lo = snapshot->cart[ResetVector & CpuCartAddrMask];
+    hi = snapshot->cart[(ResetVector + 1) & CpuCartAddrMask];
+    mvwprintw(ProgView.content, h - y--, 0, "$%04X: %02X %02X       RST $%04X",
+              ResetVector, lo, hi, lo | (hi << 8));
+
+    lo = snapshot->cart[IrqVector & CpuCartAddrMask];
+    hi = snapshot->cart[(IrqVector + 1) & CpuCartAddrMask];
+    mvwprintw(ProgView.content, h - y, 0, "$%04X: %02X %02X       IRQ $%04X",
+              IrqVector, lo, hi, lo | (hi << 8));
+}
+
 static void ui_drawprog(const struct console_state *snapshot)
 {
     int h, w, vector_offset = 4;
     getmaxyx(ProgView.content, h, w);
-    for (int i = 0; i < h - vector_offset; ++i) {
-        const uint16_t addr = snapshot->program_counter + i;
-        mvwprintw(ProgView.content, i, 0, "$%04X %02X", addr,
-                  snapshot->cart[addr & CpuCartAddrMask]);
+    char disassembly[DIS_INST_SIZE];
+
+    uint16_t addr = snapshot->program_counter;
+    for (int i = 0, bytes = 0; i < h - vector_offset; ++i) {
+        addr += bytes;
+        const size_t cart_offset = addr & CpuCartAddrMask;
+        bytes = dis_inst(addr, snapshot->cart + cart_offset,
+                         ROM_SIZE - cart_offset, disassembly);
+        if (bytes == 0) break;
+        if (bytes < 0) {
+            ui_drawprogerr(bytes, i);
+            break;
+        }
+        mvwaddstr(ProgView.content, i, 0, disassembly);
     }
-    mvwhline(ProgView.content, h - vector_offset--, 0, 0, w);
-    mvwprintw(ProgView.content, h - vector_offset--, 0, "%04X $%04X",
-              NmiVector, snapshot->cart[NmiVector & CpuCartAddrMask]
-              | (snapshot->cart[NmiVector + 1 & CpuCartAddrMask] << 8));
-    mvwprintw(ProgView.content, h - vector_offset--, 0, "%04X $%04X",
-              ResetVector, snapshot->cart[ResetVector & CpuCartAddrMask]
-              | (snapshot->cart[ResetVector + 1 & CpuCartAddrMask] << 8));
-    mvwprintw(ProgView.content, h - vector_offset, 0, "%04X $%04X",
-              IrqVector, snapshot->cart[IrqVector & CpuCartAddrMask]
-              | (snapshot->cart[IrqVector + 1 & CpuCartAddrMask] << 8));
+
+    ui_drawvecs(h, w, vector_offset, snapshot);
 }
 
 static void ui_drawram(const struct console_state *snapshot)
@@ -157,8 +198,8 @@ static void ui_init(void)
     ui_vinit(&HwView, 12, 24, 0, 0, "Hardware Traits");
     ui_vinit(&CpuView, 10, 17, 13, 0, "CPU");
     ui_vinit(&FlagsView, 8, 19, 24, 0, "Flags");
-    ui_vinit(&ProgView, 37, 30, 0, 25, "Program");
-    ui_raminit(37, 56, 0, 56, "RAM");
+    ui_vinit(&ProgView, 37, 34, 0, 25, "Program");
+    ui_raminit(37, 56, 0, 60, "RAM");
 }
 
 static void ui_ramrefresh(void)

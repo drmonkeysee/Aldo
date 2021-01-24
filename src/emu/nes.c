@@ -31,7 +31,6 @@ static void load_prog(nes *self, size_t sz, uint8_t prog[restrict sz])
     for (size_t i = 0; i < sz; ++i) {
         self->cart[(i + CpuCartMinAddr) & CpuCartAddrMask] = prog[i];
     }
-    self->cart[0x801c & CpuCartAddrMask] = 0xff;
     self->cart[ResetVector & CpuCartAddrMask] = (uint8_t)CpuCartMinAddr;
     self->cart[(ResetVector + 1) & CpuCartAddrMask]
         = (uint8_t)(CpuCartMinAddr >> 8);

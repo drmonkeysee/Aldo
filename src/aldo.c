@@ -157,8 +157,8 @@ static void ui_init(void)
     ui_vinit(&HwView, 12, 24, 0, 0, "Hardware Traits");
     ui_vinit(&CpuView, 10, 17, 13, 0, "CPU");
     ui_vinit(&FlagsView, 8, 19, 24, 0, "Flags");
-    ui_vinit(&ProgView, 37, 25, 0, 25, "Program");
-    ui_raminit(37, 56, 0, 51, "RAM");
+    ui_vinit(&ProgView, 37, 30, 0, 25, "Program");
+    ui_raminit(37, 56, 0, 56, "RAM");
 }
 
 static void ui_ramrefresh(void)

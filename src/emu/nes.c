@@ -23,7 +23,7 @@ struct nes_console {
                             // eventually with cartridge + mapper
 };
 
-static void load_prog(nes *self, size_t sz, uint8_t prog[restrict sz])
+static void load_prog(nes *self, size_t sz, const uint8_t prog[restrict sz])
 {
     // TODO: stick test programs at 0x8000 for now
     assert(sz <= ROM_SIZE);
@@ -53,7 +53,7 @@ void nes_free(nes *self)
     free(self);
 }
 
-void nes_powerup(nes *self, size_t sz, uint8_t prog[restrict sz])
+void nes_powerup(nes *self, size_t sz, const uint8_t prog[restrict sz])
 {
     assert(self != NULL);
 
@@ -68,7 +68,7 @@ int nes_step(nes *self)
     return 0;
 }
 
-void nes_snapshot(nes *self, struct console_state *restrict snapshot)
+void nes_snapshot(nes *self, struct console_state *snapshot)
 {
     assert(self != NULL);
     if (!snapshot) return;

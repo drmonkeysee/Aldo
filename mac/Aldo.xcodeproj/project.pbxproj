@@ -88,7 +88,6 @@
 				C85C8DC425BD29AC00611D19 /* asm.h */,
 				C85C8DC525BD29AC00611D19 /* asm.c */,
 				C820E6D325A97FB5006A7AB1 /* main.c */,
-				C842F17C25B404410004E807 /* snapshot.h */,
 			);
 			name = src;
 			path = ../src;
@@ -101,6 +100,7 @@
 				C84B6C2125B2BAF300FCCD88 /* cpu.c */,
 				C820E6CF25A97E3B006A7AB1 /* nes.h */,
 				C820E6D025A97E3B006A7AB1 /* nes.c */,
+				C842F17C25B404410004E807 /* snapshot.h */,
 				C84B6C2525B2C62000FCCD88 /* traits.h */,
 				C8236C2625BA80F900B18301 /* traits.c */,
 			);

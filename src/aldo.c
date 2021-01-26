@@ -9,8 +9,8 @@
 
 #include "asm.h"
 #include "emu/nes.h"
+#include "emu/snapshot.h"
 #include "emu/traits.h"
-#include "snapshot.h"
 
 #include <ncurses.h>
 #include <panel.h>

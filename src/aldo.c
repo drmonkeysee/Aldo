@@ -31,7 +31,7 @@ static const int RamViewPages = 4;
 
 static struct view HwView;
 static struct view ControlsView;
-static struct view CpuView;
+static struct view RegistersView;
 static struct view FlagsView;
 static struct view RomView;
 static struct view RamView;
@@ -57,17 +57,21 @@ static void ui_drawcontrols(void)
     mvwaddstr(ControlsView.content, cursor_y++, 0, "Ram Page Prev: b");
 }
 
-static void ui_drawcpu(const struct console_state *snapshot)
+static void ui_drawregister(const struct console_state *snapshot)
 {
     int cursor_y = 0;
-    mvwprintw(CpuView.content, cursor_y++, 0, "PC: $%04X",
+    mvwprintw(RegistersView.content, cursor_y++, 0, "PC: $%04X",
               snapshot->program_counter);
-    mvwprintw(CpuView.content, cursor_y++, 0, "S:  $%02X",
+    mvwprintw(RegistersView.content, cursor_y++, 0, "S:  $%02X",
               snapshot->stack_pointer);
-    mvwhline(CpuView.content, cursor_y++, 0, 0, getmaxx(CpuView.content));
-    mvwprintw(CpuView.content, cursor_y++, 0, "A:  $%02X", snapshot->accum);
-    mvwprintw(CpuView.content, cursor_y++, 0, "X:  $%02X", snapshot->xindex);
-    mvwprintw(CpuView.content, cursor_y++, 0, "Y:  $%02X", snapshot->yindex);
+    mvwhline(RegistersView.content, cursor_y++, 0, 0,
+             getmaxx(RegistersView.content));
+    mvwprintw(RegistersView.content, cursor_y++, 0, "A:  $%02X",
+              snapshot->accum);
+    mvwprintw(RegistersView.content, cursor_y++, 0, "X:  $%02X",
+              snapshot->xindex);
+    mvwprintw(RegistersView.content, cursor_y++, 0, "Y:  $%02X",
+              snapshot->yindex);
 }
 
 static void ui_drawflags(const struct console_state *snapshot)
@@ -209,7 +213,7 @@ static void ui_init(void)
     ui_vinit(&HwView, hwh, col1w, 0, 0, "Hardware Traits");
     ui_vinit(&ControlsView, ramh - hwh, col1w, hwh, 0, "Controls");
     ui_vinit(&RomView, ramh, col2w, 0, col1w, "ROM");
-    ui_vinit(&CpuView, cpuh, col3w, 0, col1w + col2w, "CPU");
+    ui_vinit(&RegistersView, cpuh, col3w, 0, col1w + col2w, "Registers");
     ui_vinit(&FlagsView, 8, col3w, cpuh, col1w + col2w, "Flags");
     ui_raminit(ramh, col4w, 0, col1w + col2w + col3w, "RAM");
 }
@@ -227,7 +231,7 @@ static void ui_refresh(const struct console_state *snapshot, uint64_t cycles)
 {
     ui_drawhwtraits(cycles);
     ui_drawcontrols();
-    ui_drawcpu(snapshot);
+    ui_drawregister(snapshot);
     ui_drawflags(snapshot);
     ui_drawrom(snapshot);
     ui_drawram(snapshot);
@@ -242,7 +246,7 @@ static void ui_cleanup(void)
     ui_vcleanup(&RamView);
     ui_vcleanup(&RomView);
     ui_vcleanup(&FlagsView);
-    ui_vcleanup(&CpuView);
+    ui_vcleanup(&RegistersView);
     ui_vcleanup(&ControlsView);
     ui_vcleanup(&HwView);
 }

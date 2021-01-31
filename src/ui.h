@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 1/30/21.
 //
 
-#ifndef Aldo_devui_h
-#define Aldo_devui_h
+#ifndef Aldo_ui_h
+#define Aldo_ui_h
 
 #include "emu/snapshot.h"
 

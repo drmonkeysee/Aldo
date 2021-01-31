@@ -7,7 +7,7 @@
 
 #include "aldo.h"
 
-#include "devui.h"
+#include "ui.h"
 #include "emu/nes.h"
 #include "emu/snapshot.h"
 
@@ -16,10 +16,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-//
-// Public Interface
-//
 
 int aldo_run(void)
 {

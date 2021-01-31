@@ -65,18 +65,35 @@ static void set_p(struct mos6502 *self, uint8_t p)
 // Public Interface
 //
 
+void cpu_powerup(struct mos6502 *self)
+{
+    assert(self != NULL);
+
+    // set B, I, and unused flags high
+    set_p(self, 0x34);
+    // zero out other internal registers
+    self->a = self->x = self->y = self->s = 0;
+
+    // Interrupts are inverted, high means no interrupt; rw high is read
+    self->signal.irq = self->signal.nmi = self->signal.res = self->signal.rw
+        = true;
+    self->signal.sync = false;
+
+    // All other cpu elements are indeterminate values on powerup
+}
+
 void cpu_reset(struct mos6502 *self)
 {
-    // TODO: this will consume 7 cycles
+    // this will eventually set a signal and execute an instruction sequence
     assert(self != NULL);
 
     reset_pc(self);
-    // NOTE: set B, I, and unused flags high
-    set_p(self, 0x34);
-    self->a = self->x = self->y = 0;
-    // NOTE: S initialized to 0 but reset runs through same sequence as
-    // BRK/IRQ so the cpu does 3 phantom stack pushes; $00 - $3 = $FD.
-    self->s = 0xfd;
+    // mask interrupt high
+    self->p.i = true;
+    // NOTE: Reset runs through same sequence as BRK/IRQ
+    // so the cpu does 3 phantom stack pushes;
+    // on powerup this would result in $00 - $3 = $FD.
+    self->s -= 3;
 }
 
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)

@@ -57,6 +57,7 @@ void nes_powerup(nes *self, size_t sz, const uint8_t prog[restrict sz])
 {
     assert(self != NULL);
 
+    cpu_powerup(&self->cpu);
     load_prog(self, sz, prog);
     cpu_reset(&self->cpu);
 }

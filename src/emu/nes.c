@@ -23,13 +23,13 @@ struct nes_console {
                             // eventually with cartridge + mapper
 };
 
-static void load_prog(nes *self, size_t sz, const uint8_t prog[restrict sz])
+static void load_prg(nes *self, size_t sz, const uint8_t prg[restrict sz])
 {
     // TODO: stick test programs at 0x8000 for now
     assert(sz <= ROM_SIZE);
 
     for (size_t i = 0; i < sz; ++i) {
-        self->cart[(i + CpuCartMinAddr) & CpuCartAddrMask] = prog[i];
+        self->cart[(i + CpuCartMinAddr) & CpuCartAddrMask] = prg[i];
     }
     self->cart[ResetVector & CpuCartAddrMask] = (uint8_t)CpuCartMinAddr;
     self->cart[(ResetVector + 1) & CpuCartAddrMask]
@@ -53,12 +53,12 @@ void nes_free(nes *self)
     free(self);
 }
 
-void nes_powerup(nes *self, size_t sz, const uint8_t prog[restrict sz])
+void nes_powerup(nes *self, size_t sz, const uint8_t prg[restrict sz])
 {
     assert(self != NULL);
 
     cpu_powerup(&self->cpu);
-    load_prog(self, sz, prog);
+    load_prg(self, sz, prg);
     cpu_reset(&self->cpu);
 }
 

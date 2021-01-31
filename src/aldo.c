@@ -272,8 +272,8 @@ int aldo_run(void)
     bool running = true;
     uint64_t total_cycles = 0;
     struct console_state snapshot;
-    const uint8_t test_prog[] = { 0xea, 0xea, 0xea }; // just a bunch of NOPs
-    nes_powerup(console, sizeof test_prog, test_prog);
+    const uint8_t test_prg[] = { 0xea, 0xea, 0xea }; // just a bunch of NOPs
+    nes_powerup(console, sizeof test_prg, test_prg);
     do {
         const int c = getch();
         switch (c) {

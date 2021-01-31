@@ -13,6 +13,7 @@
 		C820E6E025A98557006A7AB1 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C820E6DE25A982A5006A7AB1 /* libncurses.tbd */; };
 		C8236C2725BA80F900B18301 /* traits.c in Sources */ = {isa = PBXBuildFile; fileRef = C8236C2625BA80F900B18301 /* traits.c */; };
 		C84B6C2225B2BAF300FCCD88 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C84B6C2125B2BAF300FCCD88 /* cpu.c */; };
+		C8557B2F25C661660090296D /* devui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* devui.c */; };
 		C85C8DC625BD29AC00611D19 /* asm.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* asm.c */; };
 		C8C4B48D25ABBFB3006A98BB /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
 /* End PBXBuildFile section */
@@ -44,6 +45,8 @@
 		C84B6C2025B2BAF300FCCD88 /* cpu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpu.h; sourceTree = "<group>"; };
 		C84B6C2125B2BAF300FCCD88 /* cpu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpu.c; sourceTree = "<group>"; };
 		C84B6C2525B2C62000FCCD88 /* traits.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = traits.h; sourceTree = "<group>"; };
+		C8557B2D25C661660090296D /* devui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = devui.h; sourceTree = "<group>"; };
+		C8557B2E25C661660090296D /* devui.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = devui.c; sourceTree = "<group>"; };
 		C85C8DC425BD29AC00611D19 /* asm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = asm.h; sourceTree = "<group>"; };
 		C85C8DC525BD29AC00611D19 /* asm.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = asm.c; sourceTree = "<group>"; };
 		C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpanel.tbd; path = usr/lib/libpanel.tbd; sourceTree = SDKROOT; };
@@ -87,6 +90,8 @@
 				C820E6CA25A97A4E006A7AB1 /* aldo.c */,
 				C85C8DC425BD29AC00611D19 /* asm.h */,
 				C85C8DC525BD29AC00611D19 /* asm.c */,
+				C8557B2D25C661660090296D /* devui.h */,
+				C8557B2E25C661660090296D /* devui.c */,
 				C820E6D325A97FB5006A7AB1 /* main.c */,
 			);
 			name = src;
@@ -189,6 +194,7 @@
 				C820E6C025A9759A006A7AB1 /* main.swift in Sources */,
 				C85C8DC625BD29AC00611D19 /* asm.c in Sources */,
 				C84B6C2225B2BAF300FCCD88 /* cpu.c in Sources */,
+				C8557B2F25C661660090296D /* devui.c in Sources */,
 				C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

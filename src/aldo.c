@@ -30,6 +30,7 @@ struct view {
 static const int RamViewPages = 4;
 
 static struct view HwView;
+static struct view ControlsView;
 static struct view CpuView;
 static struct view FlagsView;
 static struct view RomView;
@@ -44,9 +45,16 @@ static void ui_drawhwtraits(uint64_t cycles)
     mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "CPU Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "PPU Clock: INF Hz");
-    mvwprintw(HwView.content, cursor_y++, 0, "Cycles: %llu", UINT64_MAX);
+    mvwprintw(HwView.content, cursor_y++, 0, "Cycles: %llu", cycles);
     mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Second: N/A");
     mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
+}
+
+static void ui_drawcontrols(void)
+{
+    int cursor_y = 0;
+    mvwaddstr(ControlsView.content, cursor_y++, 0, "Ram Page Next: n");
+    mvwaddstr(ControlsView.content, cursor_y++, 0, "Ram Page Prev: b");
 }
 
 static void ui_drawcpu(const struct console_state *snapshot)
@@ -196,12 +204,14 @@ static void ui_vcleanup(struct view *v)
 
 static void ui_init(void)
 {
-    static const int col1w = 32, col2w = 34, col3w = 19, col4w = 56, cpuh = 10;
-    ui_vinit(&HwView, 12, col1w, 0, 0, "Hardware Traits");
-    ui_vinit(&RomView, 37, col2w, 0, col1w, "ROM");
+    static const int col1w = 32, col2w = 34, col3w = 19, col4w = 56, hwh = 12,
+                        cpuh = 10, ramh = 37;
+    ui_vinit(&HwView, hwh, col1w, 0, 0, "Hardware Traits");
+    ui_vinit(&ControlsView, ramh - hwh, col1w, hwh, 0, "Controls");
+    ui_vinit(&RomView, ramh, col2w, 0, col1w, "ROM");
     ui_vinit(&CpuView, cpuh, col3w, 0, col1w + col2w, "CPU");
     ui_vinit(&FlagsView, 8, col3w, cpuh, col1w + col2w, "Flags");
-    ui_raminit(37, col4w, 0, col1w + col2w + col3w, "RAM");
+    ui_raminit(ramh, col4w, 0, col1w + col2w + col3w, "RAM");
 }
 
 static void ui_ramrefresh(void)
@@ -216,6 +226,7 @@ static void ui_ramrefresh(void)
 static void ui_refresh(const struct console_state *snapshot, uint64_t cycles)
 {
     ui_drawhwtraits(cycles);
+    ui_drawcontrols();
     ui_drawcpu(snapshot);
     ui_drawflags(snapshot);
     ui_drawrom(snapshot);
@@ -232,6 +243,7 @@ static void ui_cleanup(void)
     ui_vcleanup(&RomView);
     ui_vcleanup(&FlagsView);
     ui_vcleanup(&CpuView);
+    ui_vcleanup(&ControlsView);
     ui_vcleanup(&HwView);
 }
 

@@ -59,7 +59,6 @@ struct mos6502 {
 };
 
 void cpu_powerup(struct mos6502 *self);
-
 void cpu_reset(struct mos6502 *self);
 
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot);

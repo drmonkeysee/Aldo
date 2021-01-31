@@ -13,12 +13,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// NOTE: The MOS6502 processor is a little-endian
+// The MOS6502 processor is a little-endian
 // 8-bit CPU with a 16-bit addressing space.
 
 struct mos6502 {
-    // NOTE: Microprocessor Internals
-    // direct modeling of real CPU physical elements.
+    // CPU registers and flags
     uint16_t pc;        // Program Counter
     uint8_t a,          // Accumulator
             s,          // Stack Pointer
@@ -35,15 +34,14 @@ struct mos6502 {
              n: 1;      // (7) Sign
     } p;                // Status
 
-    // Datapath
-    // abstractions over the internal workings of
-    // instruction fetching, execution, and signalling.
-    uint16_t addrbus;   // Value put on the address pins on clock phase ϕ1
-    uint8_t databus,    // Value put on the data pins on clock phase ϕ2
-            opc,        // Current Opcode
+    // Datapath: abstract representation of instruction fetching,
+    // execution, and signaling.
+    uint16_t addrbus;   // Word put on the address pins on clock phase ϕ1
+    uint8_t databus,    // Byte put on the data pins on clock phase ϕ2
+            opc,        // Opcode
             opl,        // Opcode operand low byte
             oph,        // Opcode operand high byte
-            t;          // Current instruction cycle (T0, T1, T2...)
+            t;          // Instruction sequence cycle (T0, T1, T2...)
     struct {
         bool irq: 1,    // Maskable Interrupt Signal (input, inverted)
              nmi: 1,    // Nonmaskable Interrupt Signal (input, inverted)
@@ -52,8 +50,7 @@ struct mos6502 {
              sync: 1;   // SYNC (instruction fetch) Signal (output)
     } signal;
 
-    // Buses
-    // external components connected to the CPU pins by the console.
+    // Buses: external components connected to the CPU pins
     uint8_t *ram,       // RAM Bus
             *cart;      // TODO: temp pointer to fake cartridge
 };

@@ -69,26 +69,25 @@ void cpu_powerup(struct mos6502 *self)
 {
     assert(self != NULL);
 
-    // set B, I, and unused flags high
+    // NOTE: set B, I, and unused flags high
     set_p(self, 0x34);
-    // zero out other internal registers
     self->a = self->x = self->y = self->s = 0;
 
-    // Interrupts are inverted, high means no interrupt; rw high is read
+    // NOTE: Interrupts are inverted, high means no interrupt; rw high is read
     self->signal.irq = self->signal.nmi = self->signal.res = self->signal.rw
         = true;
     self->signal.sync = false;
 
-    // All other cpu elements are indeterminate values on powerup
+    // NOTE: all other cpu elements are indeterminate on powerup
 }
 
 void cpu_reset(struct mos6502 *self)
 {
-    // this will eventually set a signal and execute an instruction sequence
+    // TODO: this will eventually set a signal
+    // and execute an instruction sequence
     assert(self != NULL);
 
     reset_pc(self);
-    // mask interrupt high
     self->p.i = true;
     // NOTE: Reset runs through same sequence as BRK/IRQ
     // so the cpu does 3 phantom stack pushes;

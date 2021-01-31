@@ -13,7 +13,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-// NOTE: The NES-001 Motherboard including the CPU/Audio Generator, PPU,
+// The NES-001 Motherboard including the CPU/Audio Generator, PPU,
 // RAM, VRAM, and memory-mapped Cartridge RAM/ROM and Controller Input.
 
 struct nes_console {

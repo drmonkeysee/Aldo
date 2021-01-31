@@ -1,5 +1,5 @@
 //
-//  devui.h
+//  ui.h
 //  Aldo
 //
 //  Created by Brandon Stansbury on 1/30/21.
@@ -11,8 +11,6 @@
 #include "emu/snapshot.h"
 
 #include <stdint.h>
-
-extern int CurrentRamViewPage;
 
 void ui_init(void);
 void ui_cleanup(void);

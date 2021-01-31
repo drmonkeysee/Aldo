@@ -1,5 +1,5 @@
 //
-//  devui.c
+//  ui.c
 //  Aldo
 //
 //  Created by Brandon Stansbury on 1/30/21.
@@ -31,7 +31,7 @@ static struct view RegistersView;
 static struct view FlagsView;
 static struct view RamView;
 
-int CurrentRamViewPage;
+static int CurrentRamViewPage;
 
 static void ui_drawhwtraits(uint64_t cycles)
 {

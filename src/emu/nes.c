@@ -75,5 +75,5 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
 
     cpu_snapshot(&self->cpu, snapshot);
     snapshot->ram = self->ram;
-    snapshot->cart = self->cart;
+    snapshot->rom = self->cart;
 }

@@ -32,7 +32,7 @@ static const int RamViewPages = 4;
 static struct view HwView;
 static struct view CpuView;
 static struct view FlagsView;
-static struct view ProgView;
+static struct view RomView;
 static struct view RamView;
 
 static int CurrentRamViewPage;
@@ -44,8 +44,9 @@ static void ui_drawhwtraits(uint64_t cycles)
     mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "CPU Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "PPU Clock: INF Hz");
-    mvwprintw(HwView.content, cursor_y++, 0, "Cycle Count: %u", cycles);
-    mvwaddstr(HwView.content, cursor_y++, 0, "Freq Multiplier: 1x");
+    mvwprintw(HwView.content, cursor_y++, 0, "Cycles: %llu", UINT64_MAX);
+    mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Second: N/A");
+    mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
 }
 
 static void ui_drawcpu(const struct console_state *snapshot)
@@ -89,48 +90,48 @@ static void ui_drawprogerr(int diserr, int y)
         err = "UNKNOWN ERR";
         break;
     }
-    mvwaddstr(ProgView.content, y, 0, err);
+    mvwaddstr(RomView.content, y, 0, err);
 }
 
 static void ui_drawvecs(int h, int w, int y,
                         const struct console_state *snapshot)
 {
-    mvwhline(ProgView.content, h - y--, 0, 0, w);
+    mvwhline(RomView.content, h - y--, 0, 0, w);
 
-    uint8_t lo = snapshot->cart[NmiVector & CpuCartAddrMask],
-            hi = snapshot->cart[(NmiVector + 1) & CpuCartAddrMask];
-    mvwprintw(ProgView.content, h - y--, 0, "$%04X: %02X %02X       NMI $%04X",
+    uint8_t lo = snapshot->rom[NmiVector & CpuCartAddrMask],
+            hi = snapshot->rom[(NmiVector + 1) & CpuCartAddrMask];
+    mvwprintw(RomView.content, h - y--, 0, "$%04X: %02X %02X       NMI $%04X",
               NmiVector, lo, hi, lo | (hi << 8));
 
-    lo = snapshot->cart[ResetVector & CpuCartAddrMask];
-    hi = snapshot->cart[(ResetVector + 1) & CpuCartAddrMask];
-    mvwprintw(ProgView.content, h - y--, 0, "$%04X: %02X %02X       RST $%04X",
+    lo = snapshot->rom[ResetVector & CpuCartAddrMask];
+    hi = snapshot->rom[(ResetVector + 1) & CpuCartAddrMask];
+    mvwprintw(RomView.content, h - y--, 0, "$%04X: %02X %02X       RES $%04X",
               ResetVector, lo, hi, lo | (hi << 8));
 
-    lo = snapshot->cart[IrqVector & CpuCartAddrMask];
-    hi = snapshot->cart[(IrqVector + 1) & CpuCartAddrMask];
-    mvwprintw(ProgView.content, h - y, 0, "$%04X: %02X %02X       IRQ $%04X",
+    lo = snapshot->rom[IrqVector & CpuCartAddrMask];
+    hi = snapshot->rom[(IrqVector + 1) & CpuCartAddrMask];
+    mvwprintw(RomView.content, h - y, 0, "$%04X: %02X %02X       IRQ $%04X",
               IrqVector, lo, hi, lo | (hi << 8));
 }
 
-static void ui_drawprog(const struct console_state *snapshot)
+static void ui_drawrom(const struct console_state *snapshot)
 {
     int h, w, vector_offset = 4;
-    getmaxyx(ProgView.content, h, w);
+    getmaxyx(RomView.content, h, w);
     char disassembly[DIS_INST_SIZE];
 
     uint16_t addr = snapshot->program_counter;
     for (int i = 0, bytes = 0; i < h - vector_offset; ++i) {
         addr += bytes;
         const size_t cart_offset = addr & CpuCartAddrMask;
-        bytes = dis_inst(addr, snapshot->cart + cart_offset,
+        bytes = dis_inst(addr, snapshot->rom + cart_offset,
                          ROM_SIZE - cart_offset, disassembly);
         if (bytes == 0) break;
         if (bytes < 0) {
             ui_drawprogerr(bytes, i);
             break;
         }
-        mvwaddstr(ProgView.content, i, 0, disassembly);
+        mvwaddstr(RomView.content, i, 0, disassembly);
     }
 
     ui_drawvecs(h, w, vector_offset, snapshot);
@@ -195,11 +196,12 @@ static void ui_vcleanup(struct view *v)
 
 static void ui_init(void)
 {
-    ui_vinit(&HwView, 12, 24, 0, 0, "Hardware Traits");
-    ui_vinit(&CpuView, 10, 17, 13, 0, "CPU");
-    ui_vinit(&FlagsView, 8, 19, 24, 0, "Flags");
-    ui_vinit(&ProgView, 37, 34, 0, 25, "Program");
-    ui_raminit(37, 56, 0, 60, "RAM");
+    static const int col1w = 32, col2w = 34, col3w = 19, col4w = 56, cpuh = 10;
+    ui_vinit(&HwView, 12, col1w, 0, 0, "Hardware Traits");
+    ui_vinit(&RomView, 37, col2w, 0, col1w, "ROM");
+    ui_vinit(&CpuView, cpuh, col3w, 0, col1w + col2w, "CPU");
+    ui_vinit(&FlagsView, 8, col3w, cpuh, col1w + col2w, "Flags");
+    ui_raminit(37, col4w, 0, col1w + col2w + col3w, "RAM");
 }
 
 static void ui_ramrefresh(void)
@@ -216,7 +218,7 @@ static void ui_refresh(const struct console_state *snapshot, uint64_t cycles)
     ui_drawhwtraits(cycles);
     ui_drawcpu(snapshot);
     ui_drawflags(snapshot);
-    ui_drawprog(snapshot);
+    ui_drawrom(snapshot);
     ui_drawram(snapshot);
 
     update_panels();
@@ -227,7 +229,7 @@ static void ui_refresh(const struct console_state *snapshot, uint64_t cycles)
 static void ui_cleanup(void)
 {
     ui_vcleanup(&RamView);
-    ui_vcleanup(&ProgView);
+    ui_vcleanup(&RomView);
     ui_vcleanup(&FlagsView);
     ui_vcleanup(&CpuView);
     ui_vcleanup(&HwView);
@@ -252,7 +254,7 @@ int aldo_run(void)
 
     ui_init();
     bool running = true;
-    uint64_t instruction_cycles = 0;
+    uint64_t total_cycles = 0;
     struct console_state snapshot;
     uint8_t test_prog[] = { 0xea, 0xea, 0xea }; // just a bunch of NOPs
     nes_powerup(console, sizeof test_prog, test_prog);
@@ -260,7 +262,7 @@ int aldo_run(void)
         const int c = getch();
         switch (c) {
         case ' ':
-            instruction_cycles = nes_step(console);
+            total_cycles += nes_step(console);
             break;
         case 'b':
             --CurrentRamViewPage;
@@ -277,7 +279,7 @@ int aldo_run(void)
         }
         if (running) {
             nes_snapshot(console, &snapshot);
-            ui_refresh(&snapshot, instruction_cycles);
+            ui_refresh(&snapshot, total_cycles);
         }
     } while (running);
     ui_cleanup();

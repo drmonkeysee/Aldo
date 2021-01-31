@@ -31,9 +31,9 @@ static const int RamViewPages = 4;
 
 static struct view HwView;
 static struct view ControlsView;
+static struct view RomView;
 static struct view RegistersView;
 static struct view FlagsView;
-static struct view RomView;
 static struct view RamView;
 
 static int CurrentRamViewPage;
@@ -57,38 +57,7 @@ static void ui_drawcontrols(void)
     mvwaddstr(ControlsView.content, cursor_y++, 0, "Ram Page Prev: b");
 }
 
-static void ui_drawregister(const struct console_state *snapshot)
-{
-    int cursor_y = 0;
-    mvwprintw(RegistersView.content, cursor_y++, 0, "PC: $%04X",
-              snapshot->program_counter);
-    mvwprintw(RegistersView.content, cursor_y++, 0, "S:  $%02X",
-              snapshot->stack_pointer);
-    mvwhline(RegistersView.content, cursor_y++, 0, 0,
-             getmaxx(RegistersView.content));
-    mvwprintw(RegistersView.content, cursor_y++, 0, "A:  $%02X",
-              snapshot->accum);
-    mvwprintw(RegistersView.content, cursor_y++, 0, "X:  $%02X",
-              snapshot->xindex);
-    mvwprintw(RegistersView.content, cursor_y++, 0, "Y:  $%02X",
-              snapshot->yindex);
-}
-
-static void ui_drawflags(const struct console_state *snapshot)
-{
-    int cursor_x = 0, cursor_y = 0;
-    mvwaddstr(FlagsView.content, cursor_y++, cursor_x, "7 6 5 4 3 2 1 0");
-    mvwaddstr(FlagsView.content, cursor_y++, cursor_x, "N V - B D I Z C");
-    mvwhline(FlagsView.content, cursor_y++, cursor_x, 0,
-             getmaxx(FlagsView.content));
-    for (size_t i = sizeof snapshot->status * 8; i > 0; --i) {
-        mvwprintw(FlagsView.content, cursor_y, cursor_x, "%u",
-                  (snapshot->status >> (i - 1)) & 1);
-        cursor_x += 2;
-    }
-}
-
-static void ui_drawprogerr(int diserr, int y)
+static void ui_drawromerr(int diserr, int y)
 {
     const char *err;
     switch (diserr) {
@@ -140,13 +109,44 @@ static void ui_drawrom(const struct console_state *snapshot)
                          ROM_SIZE - cart_offset, disassembly);
         if (bytes == 0) break;
         if (bytes < 0) {
-            ui_drawprogerr(bytes, i);
+            ui_drawromerr(bytes, i);
             break;
         }
         mvwaddstr(RomView.content, i, 0, disassembly);
     }
 
     ui_drawvecs(h, w, vector_offset, snapshot);
+}
+
+static void ui_drawregister(const struct console_state *snapshot)
+{
+    int cursor_y = 0;
+    mvwprintw(RegistersView.content, cursor_y++, 0, "PC: $%04X",
+              snapshot->program_counter);
+    mvwprintw(RegistersView.content, cursor_y++, 0, "S:  $%02X",
+              snapshot->stack_pointer);
+    mvwhline(RegistersView.content, cursor_y++, 0, 0,
+             getmaxx(RegistersView.content));
+    mvwprintw(RegistersView.content, cursor_y++, 0, "A:  $%02X",
+              snapshot->accum);
+    mvwprintw(RegistersView.content, cursor_y++, 0, "X:  $%02X",
+              snapshot->xindex);
+    mvwprintw(RegistersView.content, cursor_y++, 0, "Y:  $%02X",
+              snapshot->yindex);
+}
+
+static void ui_drawflags(const struct console_state *snapshot)
+{
+    int cursor_x = 0, cursor_y = 0;
+    mvwaddstr(FlagsView.content, cursor_y++, cursor_x, "7 6 5 4 3 2 1 0");
+    mvwaddstr(FlagsView.content, cursor_y++, cursor_x, "N V - B D I Z C");
+    mvwhline(FlagsView.content, cursor_y++, cursor_x, 0,
+             getmaxx(FlagsView.content));
+    for (size_t i = sizeof snapshot->status * 8; i > 0; --i) {
+        mvwprintw(FlagsView.content, cursor_y, cursor_x, "%u",
+                  (snapshot->status >> (i - 1)) & 1);
+        cursor_x += 2;
+    }
 }
 
 static void ui_drawram(const struct console_state *snapshot)
@@ -231,9 +231,9 @@ static void ui_refresh(const struct console_state *snapshot, uint64_t cycles)
 {
     ui_drawhwtraits(cycles);
     ui_drawcontrols();
+    ui_drawrom(snapshot);
     ui_drawregister(snapshot);
     ui_drawflags(snapshot);
-    ui_drawrom(snapshot);
     ui_drawram(snapshot);
 
     update_panels();
@@ -244,9 +244,9 @@ static void ui_refresh(const struct console_state *snapshot, uint64_t cycles)
 static void ui_cleanup(void)
 {
     ui_vcleanup(&RamView);
-    ui_vcleanup(&RomView);
     ui_vcleanup(&FlagsView);
     ui_vcleanup(&RegistersView);
+    ui_vcleanup(&RomView);
     ui_vcleanup(&ControlsView);
     ui_vcleanup(&HwView);
 }

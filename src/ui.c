@@ -97,7 +97,7 @@ static void drawrom(const struct console_state *snapshot)
     getmaxyx(RomView.content, h, w);
     char disassembly[DIS_INST_SIZE];
 
-    uint16_t addr = snapshot->program_counter;
+    uint16_t addr = snapshot->registers.program_counter;
     for (int i = 0, bytes = 0; i < h - vector_offset; ++i) {
         addr += bytes;
         const size_t cart_offset = addr & CpuCartAddrMask;
@@ -118,17 +118,17 @@ static void drawregister(const struct console_state *snapshot)
 {
     int cursor_y = 0;
     mvwprintw(RegistersView.content, cursor_y++, 0, "PC: $%04X",
-              snapshot->program_counter);
+              snapshot->registers.program_counter);
     mvwprintw(RegistersView.content, cursor_y++, 0, "S:  $%02X",
-              snapshot->stack_pointer);
+              snapshot->registers.stack_pointer);
     mvwhline(RegistersView.content, cursor_y++, 0, 0,
              getmaxx(RegistersView.content));
     mvwprintw(RegistersView.content, cursor_y++, 0, "A:  $%02X",
-              snapshot->accum);
+              snapshot->registers.accum);
     mvwprintw(RegistersView.content, cursor_y++, 0, "X:  $%02X",
-              snapshot->xindex);
+              snapshot->registers.xindex);
     mvwprintw(RegistersView.content, cursor_y++, 0, "Y:  $%02X",
-              snapshot->yindex);
+              snapshot->registers.yindex);
 }
 
 static void drawflags(const struct console_state *snapshot)
@@ -138,9 +138,9 @@ static void drawflags(const struct console_state *snapshot)
     mvwaddstr(FlagsView.content, cursor_y++, cursor_x, "N V - B D I Z C");
     mvwhline(FlagsView.content, cursor_y++, cursor_x, 0,
              getmaxx(FlagsView.content));
-    for (size_t i = sizeof snapshot->status * 8; i > 0; --i) {
+    for (size_t i = sizeof snapshot->registers.status * 8; i > 0; --i) {
         mvwprintw(FlagsView.content, cursor_y, cursor_x, "%u",
-                  (snapshot->status >> (i - 1)) & 1);
+                  (snapshot->registers.status >> (i - 1)) & 1);
         cursor_x += 2;
     }
 }

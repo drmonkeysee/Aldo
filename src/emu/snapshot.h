@@ -11,8 +11,10 @@
 #include <stdint.h>
 
 struct console_state {
-    uint16_t program_counter;
-    uint8_t accum, stack_pointer, status, xindex, yindex;
+    struct {
+        uint16_t program_counter;
+        uint8_t accum, stack_pointer, status, xindex, yindex;
+    } registers;
     const uint8_t *ram, *rom;
 };
 

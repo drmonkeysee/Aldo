@@ -100,10 +100,10 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     assert(self != NULL);
     assert(snapshot != NULL);
 
-    snapshot->program_counter = self->pc;
-    snapshot->stack_pointer = self->s;
-    snapshot->accum = self->a;
-    snapshot->xindex = self->x;
-    snapshot->yindex = self->y;
-    snapshot->status = get_p(self);
+    snapshot->registers.program_counter = self->pc;
+    snapshot->registers.stack_pointer = self->s;
+    snapshot->registers.accum = self->a;
+    snapshot->registers.xindex = self->x;
+    snapshot->registers.yindex = self->y;
+    snapshot->registers.status = get_p(self);
 }

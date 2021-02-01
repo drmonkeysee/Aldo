@@ -150,6 +150,7 @@ static void drawdatapath(const struct console_state *snapshot)
     static const char *const restrict left = "\u2190",
                       *const restrict right = "\u2192",
                       *const restrict up = "\u2191";
+    static const int vsep1 = 1, vsep2 = 9, vsep3 = 23, vsep4 = 29;
 
     int w = getmaxx(DatapathView.content), cursor_y = 0, cursor_x = w / 3;
 
@@ -159,24 +160,20 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwaddstr(DatapathView.content, cursor_y++, cursor_x * 2, up);
 
     mvwhline(DatapathView.content, cursor_y++, 0, 0, w);
-    wmove(DatapathView.content, cursor_y, 0);
-    waddstr(DatapathView.content, left);
-    wvline(DatapathView.content, 0, 1);
-    cursor_x = getcurx(DatapathView.content);
-    wmove(DatapathView.content, cursor_y, cursor_x + 1);
-    waddstr(DatapathView.content, " $1234 ");
-    wvline(DatapathView.content, 0, 1);
-    cursor_x = getcurx(DatapathView.content);
-    wmove(DatapathView.content, cursor_y, cursor_x + 1);
-    waddstr(DatapathView.content, " UNK ($0000) ");
-    wvline(DatapathView.content, 0, 1);
-    cursor_x = getcurx(DatapathView.content);
-    wmove(DatapathView.content, cursor_y, cursor_x + 1);
-    waddstr(DatapathView.content, " $42 ");
-    wvline(DatapathView.content, 0, 1);
-    cursor_x = getcurx(DatapathView.content);
-    wmove(DatapathView.content, cursor_y, cursor_x + 1);
-    waddstr(DatapathView.content, right);
+
+    mvwvline(DatapathView.content, cursor_y, vsep1, 0, 3);
+    mvwvline(DatapathView.content, cursor_y, vsep2, 0, 3);
+    mvwvline(DatapathView.content, cursor_y, vsep3, 0, 3);
+    mvwvline(DatapathView.content, cursor_y, vsep4, 0, 3);
+    mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, "UNK ($0000)");
+
+    mvwaddstr(DatapathView.content, ++cursor_y, 0, left);
+    mvwaddstr(DatapathView.content, cursor_y, vsep1 + 2, "$1234");
+    mvwaddstr(DatapathView.content, cursor_y, vsep3 + 2, "$42");
+    mvwaddstr(DatapathView.content, cursor_y, vsep4 + 1, right);
+
+    mvwaddstr(DatapathView.content, ++cursor_y, vsep2 + 2, "T0123456");
+
     mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
 
     cursor_x = (w / 4) + 1;
@@ -277,7 +274,7 @@ void ui_init(void)
     vinit(&RomView, ramh, col2w, 0, col1w, "ROM");
     vinit(&RegistersView, cpuh, flagsw, 0, col1w + col2w, "Registers");
     vinit(&FlagsView, flagsh, flagsw, cpuh, col1w + col2w, "Flags");
-    vinit(&DatapathView, 11, col3w, cpuh + flagsh, col1w + col2w, "Datapath");
+    vinit(&DatapathView, 13, col3w, cpuh + flagsh, col1w + col2w, "Datapath");
     raminit(ramh, col4w, 0, col1w + col2w + col3w);
 }
 

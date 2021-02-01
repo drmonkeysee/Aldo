@@ -250,7 +250,7 @@ static void ramrefresh(void)
     getbegyx(RamView.win, ram_y, ram_x);
     getmaxyx(RamView.win, ram_h, ram_w);
     pnoutrefresh(RamView.content, (ram_h - 4) * CurrentRamViewPage, 0,
-                 ram_y + 2, ram_x + 2, ram_h - 3, ram_x + ram_w - 2);
+                 ram_y + 2, ram_x + 2, ram_y + ram_h - 3, ram_x + ram_w - 2);
 }
 
 //

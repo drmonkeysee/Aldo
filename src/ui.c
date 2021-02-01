@@ -71,7 +71,7 @@ static void drawromerr(int diserr, int y)
 }
 
 static void drawvecs(int h, int w, int y,
-                        const struct console_state *snapshot)
+                     const struct console_state *snapshot)
 {
     mvwhline(RomView.content, h - y--, 0, 0, w);
 
@@ -216,7 +216,7 @@ static void drawram(const struct console_state *snapshot)
 }
 
 static void createwin(struct view *v, int h, int w, int y, int x,
-                         const char *restrict title)
+                      const char *restrict title)
 {
     v->win = newwin(h, w, y, x);
     v->outer = new_panel(v->win);
@@ -225,7 +225,7 @@ static void createwin(struct view *v, int h, int w, int y, int x,
 }
 
 static void vinit(struct view *v, int h, int w, int y, int x,
-                     const char *restrict title)
+                  const char *restrict title)
 {
     createwin(v, h, w, y, x, title);
     v->content = derwin(v->win, h - 4, w - 4, 2, 2);

@@ -263,7 +263,7 @@ static void ramrefresh(void)
 void ui_init(void)
 {
     static const int col1w = 32, col2w = 34, col3w = 35, col4w = 56, hwh = 12,
-                        cpuh = 10, flagsh = 8, ramh = 37;
+                        cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");
     initscr();
@@ -275,8 +275,8 @@ void ui_init(void)
     vinit(&HwView, hwh, col1w, 0, 0, "Hardware Traits");
     vinit(&ControlsView, ramh - hwh, col1w, hwh, 0, "Controls");
     vinit(&RomView, ramh, col2w, 0, col1w, "ROM");
-    vinit(&RegistersView, cpuh, col3w, 0, col1w + col2w, "Registers");
-    vinit(&FlagsView, flagsh, col3w, cpuh, col1w + col2w, "Flags");
+    vinit(&RegistersView, cpuh, flagsw, 0, col1w + col2w, "Registers");
+    vinit(&FlagsView, flagsh, flagsw, cpuh, col1w + col2w, "Flags");
     vinit(&DatapathView, 11, col3w, cpuh + flagsh, col1w + col2w, "Datapath");
     raminit(ramh, col4w, 0, col1w + col2w + col3w);
 }

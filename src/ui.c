@@ -29,11 +29,12 @@ static struct view ControlsView;
 static struct view RomView;
 static struct view RegistersView;
 static struct view FlagsView;
+static struct view DatapathView;
 static struct view RamView;
 
 static int CurrentRamViewPage;
 
-static void ui_drawhwtraits(uint64_t cycles)
+static void drawhwtraits(uint64_t cycles)
 {
     int cursor_y = 0;
     mvwaddstr(HwView.content, cursor_y++, 0, "FPS: N/A");
@@ -45,14 +46,14 @@ static void ui_drawhwtraits(uint64_t cycles)
     mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
 }
 
-static void ui_drawcontrols(void)
+static void drawcontrols(void)
 {
     int cursor_y = 0;
     mvwaddstr(ControlsView.content, cursor_y++, 0, "Ram Page Next: n");
     mvwaddstr(ControlsView.content, cursor_y++, 0, "Ram Page Prev: b");
 }
 
-static void ui_drawromerr(int diserr, int y)
+static void drawromerr(int diserr, int y)
 {
     const char *err;
     switch (diserr) {
@@ -69,7 +70,7 @@ static void ui_drawromerr(int diserr, int y)
     mvwaddstr(RomView.content, y, 0, err);
 }
 
-static void ui_drawvecs(int h, int w, int y,
+static void drawvecs(int h, int w, int y,
                         const struct console_state *snapshot)
 {
     mvwhline(RomView.content, h - y--, 0, 0, w);
@@ -90,7 +91,7 @@ static void ui_drawvecs(int h, int w, int y,
               IrqVector, lo, hi, lo | (hi << 8));
 }
 
-static void ui_drawrom(const struct console_state *snapshot)
+static void drawrom(const struct console_state *snapshot)
 {
     int h, w, vector_offset = 4;
     getmaxyx(RomView.content, h, w);
@@ -104,16 +105,16 @@ static void ui_drawrom(const struct console_state *snapshot)
                          ROM_SIZE - cart_offset, disassembly);
         if (bytes == 0) break;
         if (bytes < 0) {
-            ui_drawromerr(bytes, i);
+            drawromerr(bytes, i);
             break;
         }
         mvwaddstr(RomView.content, i, 0, disassembly);
     }
 
-    ui_drawvecs(h, w, vector_offset, snapshot);
+    drawvecs(h, w, vector_offset, snapshot);
 }
 
-static void ui_drawregister(const struct console_state *snapshot)
+static void drawregister(const struct console_state *snapshot)
 {
     int cursor_y = 0;
     mvwprintw(RegistersView.content, cursor_y++, 0, "PC: $%04X",
@@ -130,7 +131,7 @@ static void ui_drawregister(const struct console_state *snapshot)
               snapshot->yindex);
 }
 
-static void ui_drawflags(const struct console_state *snapshot)
+static void drawflags(const struct console_state *snapshot)
 {
     int cursor_x = 0, cursor_y = 0;
     mvwaddstr(FlagsView.content, cursor_y++, cursor_x, "7 6 5 4 3 2 1 0");
@@ -144,7 +145,7 @@ static void ui_drawflags(const struct console_state *snapshot)
     }
 }
 
-static void ui_drawram(const struct console_state *snapshot)
+static void drawram(const struct console_state *snapshot)
 {
     static const int start_x = 5, col_width = 3;
     int cursor_x = start_x, cursor_y = 0;
@@ -168,7 +169,7 @@ static void ui_drawram(const struct console_state *snapshot)
     }
 }
 
-static void ui_createwin(struct view *v, int h, int w, int y, int x,
+static void createwin(struct view *v, int h, int w, int y, int x,
                          const char *restrict title)
 {
     v->win = newwin(h, w, y, x);
@@ -177,22 +178,22 @@ static void ui_createwin(struct view *v, int h, int w, int y, int x,
     mvwaddstr(v->win, 0, 1, title);
 }
 
-static void ui_vinit(struct view *v, int h, int w, int y, int x,
+static void vinit(struct view *v, int h, int w, int y, int x,
                      const char *restrict title)
 {
-    ui_createwin(v, h, w, y, x, title);
+    createwin(v, h, w, y, x, title);
     v->content = derwin(v->win, h - 4, w - 4, 2, 2);
     v->inner = new_panel(v->content);
 }
 
-static void ui_raminit(int h, int w, int y, int x,
+static void raminit(int h, int w, int y, int x,
                        const char *restrict title)
 {
-    ui_createwin(&RamView, h, w, y, x, title);
+    createwin(&RamView, h, w, y, x, title);
     RamView.content = newpad((h - 4) * RamViewPages, w - 4);
 }
 
-static void ui_vcleanup(struct view *v)
+static void vcleanup(struct view *v)
 {
     del_panel(v->inner);
     delwin(v->content);
@@ -201,7 +202,7 @@ static void ui_vcleanup(struct view *v)
     *v = (struct view){0};
 }
 
-static void ui_ramrefresh(void)
+static void ramrefresh(void)
 {
     int ram_x, ram_y, ram_w, ram_h;
     getbegyx(RamView.win, ram_y, ram_x);
@@ -226,22 +227,23 @@ void ui_init(void)
     keypad(stdscr, true);
     curs_set(0);
 
-    ui_vinit(&HwView, hwh, col1w, 0, 0, "Hardware Traits");
-    ui_vinit(&ControlsView, ramh - hwh, col1w, hwh, 0, "Controls");
-    ui_vinit(&RomView, ramh, col2w, 0, col1w, "ROM");
-    ui_vinit(&RegistersView, cpuh, col3w, 0, col1w + col2w, "Registers");
-    ui_vinit(&FlagsView, 8, col3w, cpuh, col1w + col2w, "Flags");
-    ui_raminit(ramh, col4w, 0, col1w + col2w + col3w, "RAM");
+    vinit(&HwView, hwh, col1w, 0, 0, "Hardware Traits");
+    vinit(&ControlsView, ramh - hwh, col1w, hwh, 0, "Controls");
+    vinit(&RomView, ramh, col2w, 0, col1w, "ROM");
+    vinit(&RegistersView, cpuh, col3w, 0, col1w + col2w, "Registers");
+    vinit(&FlagsView, 8, col3w, cpuh, col1w + col2w, "Flags");
+    raminit(ramh, col4w, 0, col1w + col2w + col3w, "RAM");
 }
 
 void ui_cleanup(void)
 {
-    ui_vcleanup(&RamView);
-    ui_vcleanup(&FlagsView);
-    ui_vcleanup(&RegistersView);
-    ui_vcleanup(&RomView);
-    ui_vcleanup(&ControlsView);
-    ui_vcleanup(&HwView);
+    vcleanup(&RamView);
+    vcleanup(&DatapathView);
+    vcleanup(&FlagsView);
+    vcleanup(&RegistersView);
+    vcleanup(&RomView);
+    vcleanup(&ControlsView);
+    vcleanup(&HwView);
 
     endwin();
 }
@@ -266,14 +268,14 @@ void ui_ram_prev(void)
 
 void ui_refresh(const struct console_state *snapshot, uint64_t cycles)
 {
-    ui_drawhwtraits(cycles);
-    ui_drawcontrols();
-    ui_drawrom(snapshot);
-    ui_drawregister(snapshot);
-    ui_drawflags(snapshot);
-    ui_drawram(snapshot);
+    drawhwtraits(cycles);
+    drawcontrols();
+    drawrom(snapshot);
+    drawregister(snapshot);
+    drawflags(snapshot);
+    drawram(snapshot);
 
     update_panels();
-    ui_ramrefresh();
+    ramrefresh();
     doupdate();
 }

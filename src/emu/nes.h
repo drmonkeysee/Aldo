@@ -19,7 +19,10 @@ nes *nes_new(void);
 void nes_free(nes *self);
 
 void nes_powerup(nes *self, size_t sz, const uint8_t prg[restrict sz]);
+
+void nes_cycle(nes *self);
 int nes_step(nes *self);
+void nes_clock(nes *self);
 
 void nes_snapshot(nes *self, struct console_state *snapshot);
 

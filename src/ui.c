@@ -269,13 +269,21 @@ void ui_init(void)
     keypad(stdscr, true);
     curs_set(0);
 
-    vinit(&HwView, hwh, col1w, 0, 0, "Hardware Traits");
-    vinit(&ControlsView, ramh - hwh, col1w, hwh, 0, "Controls");
-    vinit(&RomView, ramh, col2w, 0, col1w, "ROM");
-    vinit(&RegistersView, cpuh, flagsw, 0, col1w + col2w, "Registers");
-    vinit(&FlagsView, flagsh, flagsw, cpuh, col1w + col2w, "Flags");
-    vinit(&DatapathView, 13, col3w, cpuh + flagsh, col1w + col2w, "Datapath");
-    raminit(ramh, col4w, 0, col1w + col2w + col3w);
+    int scrh, scrw;
+    getmaxyx(stdscr, scrh, scrw);
+    const int yoffset = (scrh - ramh) / 2,
+              xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
+    vinit(&HwView, hwh, col1w, yoffset, xoffset, "Hardware Traits");
+    vinit(&ControlsView, ramh - hwh, col1w, yoffset + hwh, xoffset,
+          "Controls");
+    vinit(&RomView, ramh, col2w, yoffset, xoffset + col1w, "ROM");
+    vinit(&RegistersView, cpuh, flagsw, yoffset, xoffset + col1w + col2w,
+          "Registers");
+    vinit(&FlagsView, flagsh, flagsw, yoffset + cpuh, xoffset + col1w + col2w,
+          "Flags");
+    vinit(&DatapathView, 13, col3w, yoffset + cpuh + flagsh,
+          xoffset + col1w + col2w, "Datapath");
+    raminit(ramh, col4w, yoffset, xoffset + col1w + col2w + col3w);
 }
 
 void ui_cleanup(void)

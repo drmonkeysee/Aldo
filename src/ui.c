@@ -145,6 +145,52 @@ static void drawflags(const struct console_state *snapshot)
     }
 }
 
+static void drawdatapath(const struct console_state *snapshot)
+{
+    static const char *const restrict left = "\u2190",
+                      *const restrict right = "\u2192",
+                      *const restrict up = "\u2191";
+
+    int w = getmaxx(DatapathView.content), cursor_y = 0, cursor_x = w / 3;
+
+    mvwaddstr(DatapathView.content, cursor_y, cursor_x - 1, "SYNC");
+    mvwaddstr(DatapathView.content, cursor_y++, (cursor_x * 2) - 1, "R/W");
+    mvwaddstr(DatapathView.content, cursor_y, cursor_x, up);
+    mvwaddstr(DatapathView.content, cursor_y++, cursor_x * 2, up);
+
+    mvwhline(DatapathView.content, cursor_y++, 0, 0, w);
+    wmove(DatapathView.content, cursor_y, 0);
+    waddstr(DatapathView.content, left);
+    wvline(DatapathView.content, 0, 1);
+    cursor_x = getcurx(DatapathView.content);
+    wmove(DatapathView.content, cursor_y, cursor_x + 1);
+    waddstr(DatapathView.content, " $1234 ");
+    wvline(DatapathView.content, 0, 1);
+    cursor_x = getcurx(DatapathView.content);
+    wmove(DatapathView.content, cursor_y, cursor_x + 1);
+    waddstr(DatapathView.content, " UNK ($0000) ");
+    wvline(DatapathView.content, 0, 1);
+    cursor_x = getcurx(DatapathView.content);
+    wmove(DatapathView.content, cursor_y, cursor_x + 1);
+    waddstr(DatapathView.content, " $42 ");
+    wvline(DatapathView.content, 0, 1);
+    cursor_x = getcurx(DatapathView.content);
+    wmove(DatapathView.content, cursor_y, cursor_x + 1);
+    waddstr(DatapathView.content, right);
+    mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
+
+    cursor_x = (w / 4) + 1;
+    mvwaddstr(DatapathView.content, ++cursor_y, cursor_x, up);
+    mvwaddstr(DatapathView.content, cursor_y, cursor_x * 2, up);
+    mvwaddstr(DatapathView.content, cursor_y++, cursor_x * 3, up);
+    mvwaddstr(DatapathView.content, cursor_y, cursor_x - 1,
+              "I\u0305R\u0305Q\u0305");
+    mvwaddstr(DatapathView.content, cursor_y, (cursor_x * 2) - 1,
+              "N\u0305M\u0305I\u0305");
+    mvwaddstr(DatapathView.content, cursor_y, (cursor_x * 3) - 1,
+              "R\u0305E\u0305S\u0305");
+}
+
 static void drawram(const struct console_state *snapshot)
 {
     static const int start_x = 5, col_width = 3;
@@ -186,10 +232,9 @@ static void vinit(struct view *v, int h, int w, int y, int x,
     v->inner = new_panel(v->content);
 }
 
-static void raminit(int h, int w, int y, int x,
-                       const char *restrict title)
+static void raminit(int h, int w, int y, int x)
 {
-    createwin(&RamView, h, w, y, x, title);
+    createwin(&RamView, h, w, y, x, "RAM");
     RamView.content = newpad((h - 4) * RamViewPages, w - 4);
 }
 
@@ -217,8 +262,8 @@ static void ramrefresh(void)
 
 void ui_init(void)
 {
-    static const int col1w = 32, col2w = 34, col3w = 19, col4w = 56, hwh = 12,
-                        cpuh = 10, ramh = 37;
+    static const int col1w = 32, col2w = 34, col3w = 35, col4w = 56, hwh = 12,
+                        cpuh = 10, flagsh = 8, ramh = 37;
 
     setlocale(LC_ALL, "");
     initscr();
@@ -231,8 +276,9 @@ void ui_init(void)
     vinit(&ControlsView, ramh - hwh, col1w, hwh, 0, "Controls");
     vinit(&RomView, ramh, col2w, 0, col1w, "ROM");
     vinit(&RegistersView, cpuh, col3w, 0, col1w + col2w, "Registers");
-    vinit(&FlagsView, 8, col3w, cpuh, col1w + col2w, "Flags");
-    raminit(ramh, col4w, 0, col1w + col2w + col3w, "RAM");
+    vinit(&FlagsView, flagsh, col3w, cpuh, col1w + col2w, "Flags");
+    vinit(&DatapathView, 11, col3w, cpuh + flagsh, col1w + col2w, "Datapath");
+    raminit(ramh, col4w, 0, col1w + col2w + col3w);
 }
 
 void ui_cleanup(void)
@@ -273,6 +319,7 @@ void ui_refresh(const struct console_state *snapshot, uint64_t cycles)
     drawrom(snapshot);
     drawregister(snapshot);
     drawflags(snapshot);
+    drawdatapath(snapshot);
     drawram(snapshot);
 
     update_panels();

@@ -76,7 +76,7 @@ void cpu_powerup(struct mos6502 *self)
     // NOTE: Interrupts are inverted, high means no interrupt; rw high is read
     self->signal.irq = self->signal.nmi = self->signal.res = self->signal.rw
         = true;
-    self->signal.sync = false;
+    self->signal.rdy = self->signal.sync = false;
 
     // NOTE: all other cpu elements are indeterminate on powerup
 }

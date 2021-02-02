@@ -260,7 +260,7 @@ static void ramrefresh(void)
 void ui_init(void)
 {
     static const int col1w = 32, col2w = 34, col3w = 35, col4w = 56, hwh = 12,
-                        cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
+                     cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");
     initscr();

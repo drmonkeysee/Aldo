@@ -149,15 +149,19 @@ static void drawdatapath(const struct console_state *snapshot)
 {
     static const char *const restrict left = "\u2190",
                       *const restrict right = "\u2192",
-                      *const restrict up = "\u2191";
+                      *const restrict up = "\u2191",
+                      *const restrict down = "\u2193";
     static const int vsep1 = 1, vsep2 = 9, vsep3 = 23, vsep4 = 29;
 
-    int w = getmaxx(DatapathView.content), cursor_y = 0, cursor_x = w / 3;
+    const int w = getmaxx(DatapathView.content), line_x = (w / 4) + 1;
+    int cursor_y = 0;
 
-    mvwaddstr(DatapathView.content, cursor_y, cursor_x - 1, "SYNC");
-    mvwaddstr(DatapathView.content, cursor_y++, (cursor_x * 2) - 1, "R/W");
-    mvwaddstr(DatapathView.content, cursor_y, cursor_x, up);
-    mvwaddstr(DatapathView.content, cursor_y++, cursor_x * 2, up);
+    mvwaddstr(DatapathView.content, cursor_y, line_x - 1, "RDY");
+    mvwaddstr(DatapathView.content, cursor_y, (line_x * 2) - 1, "SYNC");
+    mvwaddstr(DatapathView.content, cursor_y++, (line_x * 3) - 1, "R/W");
+    mvwaddstr(DatapathView.content, cursor_y, line_x, down);
+    mvwaddstr(DatapathView.content, cursor_y, line_x * 2, up);
+    mvwaddstr(DatapathView.content, cursor_y++, line_x * 3, up);
 
     mvwhline(DatapathView.content, cursor_y++, 0, 0, w);
 
@@ -176,15 +180,14 @@ static void drawdatapath(const struct console_state *snapshot)
 
     mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
 
-    cursor_x = (w / 4) + 1;
-    mvwaddstr(DatapathView.content, ++cursor_y, cursor_x, up);
-    mvwaddstr(DatapathView.content, cursor_y, cursor_x * 2, up);
-    mvwaddstr(DatapathView.content, cursor_y++, cursor_x * 3, up);
-    mvwaddstr(DatapathView.content, cursor_y, cursor_x - 1,
+    mvwaddstr(DatapathView.content, ++cursor_y, line_x, up);
+    mvwaddstr(DatapathView.content, cursor_y, line_x * 2, up);
+    mvwaddstr(DatapathView.content, cursor_y++, line_x * 3, up);
+    mvwaddstr(DatapathView.content, cursor_y, line_x - 1,
               "I\u0305R\u0305Q\u0305");
-    mvwaddstr(DatapathView.content, cursor_y, (cursor_x * 2) - 1,
+    mvwaddstr(DatapathView.content, cursor_y, (line_x * 2) - 1,
               "N\u0305M\u0305I\u0305");
-    mvwaddstr(DatapathView.content, cursor_y, (cursor_x * 3) - 1,
+    mvwaddstr(DatapathView.content, cursor_y, (line_x * 3) - 1,
               "R\u0305E\u0305S\u0305");
 }
 

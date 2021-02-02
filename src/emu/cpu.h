@@ -46,6 +46,7 @@ struct mos6502 {
         bool irq: 1,    // Maskable Interrupt Signal (input, inverted)
              nmi: 1,    // Nonmaskable Interrupt Signal (input, inverted)
              res: 1,    // Reset Signal (input, inverted)
+             rdy: 1,    // Ready Signal (input)
              rw: 1,     // Read/Write Signal (output, read high)
              sync: 1;   // SYNC (instruction fetch) Signal (output)
     } signal;

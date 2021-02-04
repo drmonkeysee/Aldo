@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C8114E2F25CBBD6D007309CD /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = C8114E2E25CBBD6D007309CD /* decode.c */; };
 		C820E6C025A9759A006A7AB1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820E6BF25A9759A006A7AB1 /* main.swift */; };
 		C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* aldo.c */; };
 		C820E6D125A97E3B006A7AB1 /* nes.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6D025A97E3B006A7AB1 /* nes.c */; };
@@ -31,6 +32,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C8114E2D25CBBD6D007309CD /* decode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = decode.h; sourceTree = "<group>"; };
+		C8114E2E25CBBD6D007309CD /* decode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = decode.c; sourceTree = "<group>"; };
 		C820E6BC25A9759A006A7AB1 /* AldoDev */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AldoDev; sourceTree = BUILT_PRODUCTS_DIR; };
 		C820E6BF25A9759A006A7AB1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		C820E6C825A97A4E006A7AB1 /* AldoDev-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AldoDev-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -103,6 +106,8 @@
 			children = (
 				C84B6C2025B2BAF300FCCD88 /* cpu.h */,
 				C84B6C2125B2BAF300FCCD88 /* cpu.c */,
+				C8114E2D25CBBD6D007309CD /* decode.h */,
+				C8114E2E25CBBD6D007309CD /* decode.c */,
 				C820E6CF25A97E3B006A7AB1 /* nes.h */,
 				C820E6D025A97E3B006A7AB1 /* nes.c */,
 				C842F17C25B404410004E807 /* snapshot.h */,
@@ -194,6 +199,7 @@
 				C820E6C025A9759A006A7AB1 /* main.swift in Sources */,
 				C85C8DC625BD29AC00611D19 /* asm.c in Sources */,
 				C84B6C2225B2BAF300FCCD88 /* cpu.c in Sources */,
+				C8114E2F25CBBD6D007309CD /* decode.c in Sources */,
 				C8557B2F25C661660090296D /* ui.c in Sources */,
 				C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */,
 			);

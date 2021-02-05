@@ -11,7 +11,7 @@
 #include <stddef.h>
 
 // 6502 Instructions
-enum instruction {
+enum inst {
     IN_UNK, // Unknown
 
     IN_ADC, // Add with carry
@@ -85,74 +85,73 @@ enum instruction {
     IN_TYA, // Transfer y index to accumulator
 };
 
-// Addressing mode cycle sequences;
+// Opcode cycle sequences:
 // the 6502 defines several addressing modes, however the same addressing
 // mode may result in different cycle timing depending on the instruction;
-// this table defines the intersection of instruction and addressing mode to
-// define all possible opcode cycle sequences, grouped by addressing
-// mode.
-// read (_R)              - the operation reads from memory into the cpu
-// write (_W)             - the operation writes from the cpu into memory
+// this table defines the intersection of instruction and addressing mode
+// enumerating all possible opcode cycle sequences.
+// read (_R)              - the operation reads from memory into registers
+// write (_W)             - the operation writes from registers into memory
 // read-modify-write (_M) - the operation reads from memory,
 //                          modifies the value, and writes it back
 enum cycle_seq {
     // Implied
-    AS_IMP,     // Implied
+    CS_IMP,     // Implied
 
     // Immediate
-    AS_IMM,     // Immediate
+    CS_IMM,     // Immediate
 
     // Zero-page
-    AS_ZP,      // Zero-page read/write
-    AS_ZP_M,    // Zero-page read-modify-write
+    CS_ZP,      // Zero-page read/write
+    CS_ZP_M,    // Zero-page read-modify-write
 
     // Zero-page, X
-    AS_ZPX,     // Zero-page, X read/write
-    AS_ZPX_M,   // Zero-page, X read-modify-write
+    CS_ZPX,     // Zero-page, X read/write
+    CS_ZPX_M,   // Zero-page, X read-modify-write
 
     // Zero-page, Y
-    AS_ZPY,     // Zero-page, Y read/write
+    CS_ZPY,     // Zero-page, Y read/write
 
     // Absolute
-    AS_ABS,     // Absolute read/write
-    AS_ABS_M,   // Absolute read-modify-write
+    CS_ABS,     // Absolute read/write
+    CS_ABS_M,   // Absolute read-modify-write
 
     // Absolute, X
-    AS_ABSX_R,  // Absolute, X read
-    AS_ABSX_W,  // Absolute, X write
-    AS_ABSX_M,  // Absolute, X read-modify-write
+    CS_ABSX_R,  // Absolute, X read
+    CS_ABSX_W,  // Absolute, X write
+    CS_ABSX_M,  // Absolute, X read-modify-write
 
     // Absolute, Y
-    AS_ABSY_R,  // Absolute, Y read
-    AS_ABSY_W,  // Absolute, Y write
+    CS_ABSY_R,  // Absolute, Y read
+    CS_ABSY_W,  // Absolute, Y write
 
     // (Indirect, X)
-    AS_INDX,    // (Indirect, X) read/write
+    CS_INDX,    // (Indirect, X) read/write
 
     // (Indirect), Y
-    AS_INDY_R,  // (Indirect), Y read
-    AS_INDY_W,  // (Indirect), Y write
+    CS_INDY_R,  // (Indirect), Y read
+    CS_INDY_W,  // (Indirect), Y write
 
     // Stack
-    AS_PSH,     // Push
-    AS_PLL,     // Pull
+    CS_PSH,     // Push
+    CS_PLL,     // Pull
 
     // Branch
-    AS_BCH,     // Relative branch
+    CS_BCH,     // Relative branch
 
     // Jumps
-    AS_JSR,     // Jump to subroutine,
-    AS_RTS,     // Return from subroutine
-    AS_JABS,    // Absolute jump
-    AS_JIND,    // Indirect jump
+    CS_JSR,     // Jump to subroutine,
+    CS_RTS,     // Return from subroutine
+    CS_JABS,    // Absolute jump
+    CS_JIND,    // Indirect jump
 
     // Interrupts
-    AS_BRK,     // Break, interrupt, reset
-    AS_RTI,     // Return from interrupt
+    CS_BRK,     // Break, interrupt, reset
+    CS_RTI,     // Return from interrupt
 };
 
 struct decoded {
-    enum instruction instruction;
+    enum inst instruction;
     enum cycle_seq sequence;
 };
 

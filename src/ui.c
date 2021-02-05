@@ -49,6 +49,11 @@ static void drawhwtraits(uint64_t cycles)
 static void drawcontrols(void)
 {
     int cursor_y = 0;
+    wattron(ControlsView.content, A_STANDOUT);
+    mvwaddstr(ControlsView.content, cursor_y, 0, " HALT ");
+    wattroff(ControlsView.content, A_STANDOUT);
+    mvwaddstr(ControlsView.content, cursor_y, 9, " RUN ");
+    cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y++, 0, "Ram Page Next: n");
     mvwaddstr(ControlsView.content, cursor_y++, 0, "Ram Page Prev: b");
 }
@@ -156,16 +161,20 @@ static void drawdatapath(const struct console_state *snapshot)
     const int w = getmaxx(DatapathView.content), line_x = (w / 4) + 1;
     int cursor_y = 0;
 
+    wattron(DatapathView.content, A_DIM);
     mvwaddstr(DatapathView.content, cursor_y, line_x - 1, "RDY");
+    mvwaddstr(DatapathView.content, cursor_y + 1, line_x, down);
+
     mvwaddstr(DatapathView.content, cursor_y, (line_x * 2) - 1, "SYNC");
-    mvwaddstr(DatapathView.content, cursor_y++, (line_x * 3) - 1, "R/W");
-    mvwaddstr(DatapathView.content, cursor_y, line_x, down);
-    mvwaddstr(DatapathView.content, cursor_y, line_x * 2, up);
-    mvwaddstr(DatapathView.content, cursor_y++, line_x * 3, up);
+    mvwaddstr(DatapathView.content, cursor_y + 1, line_x * 2, up);
+    wattroff(DatapathView.content, A_DIM);
 
-    mvwhline(DatapathView.content, cursor_y++, 0, 0, w);
+    mvwaddstr(DatapathView.content, cursor_y, (line_x * 3) - 1, "R/W");
+    mvwaddstr(DatapathView.content, ++cursor_y, line_x * 3, up);
 
-    mvwvline(DatapathView.content, cursor_y, vsep1, 0, 3);
+    mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
+
+    mvwvline(DatapathView.content, ++cursor_y, vsep1, 0, 3);
     mvwvline(DatapathView.content, cursor_y, vsep2, 0, 3);
     mvwvline(DatapathView.content, cursor_y, vsep3, 0, 3);
     mvwvline(DatapathView.content, cursor_y, vsep4, 0, 3);
@@ -181,13 +190,15 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
 
     mvwaddstr(DatapathView.content, ++cursor_y, line_x, up);
-    mvwaddstr(DatapathView.content, cursor_y, line_x * 2, up);
-    mvwaddstr(DatapathView.content, cursor_y++, line_x * 3, up);
-    mvwaddstr(DatapathView.content, cursor_y, line_x - 1,
+    mvwaddstr(DatapathView.content, cursor_y + 1, line_x - 1,
               "I\u0305R\u0305Q\u0305");
-    mvwaddstr(DatapathView.content, cursor_y, (line_x * 2) - 1,
+
+    mvwaddstr(DatapathView.content, cursor_y, line_x * 2, up);
+    mvwaddstr(DatapathView.content, cursor_y + 1, (line_x * 2) - 1,
               "N\u0305M\u0305I\u0305");
-    mvwaddstr(DatapathView.content, cursor_y, (line_x * 3) - 1,
+
+    mvwaddstr(DatapathView.content, cursor_y, line_x * 3, up);
+    mvwaddstr(DatapathView.content, cursor_y + 1, (line_x * 3) - 1,
               "R\u0305E\u0305S\u0305");
 }
 

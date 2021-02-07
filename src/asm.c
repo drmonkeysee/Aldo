@@ -30,6 +30,7 @@ int dis_mnemonic(uint8_t opcode, uint16_t operand,
         count = sprintf(dis, "UNK ($%04X)", operand);
         if (count < 0) return DIS_FMT_FAIL;
     }
+    assert((unsigned int)count < DIS_MNEM_SIZE);
     return count;
 }
 

@@ -16,7 +16,7 @@ enum inst {
 
     IN_ADC, // Add with carry
     IN_AND, // Logical and
-    IN_ASL, // Arithmetic left shift
+    IN_ASL, // Arithmetic shift left
 
     IN_BCC, // Branch if carry clear
     IN_BCS, // Branch if carry set

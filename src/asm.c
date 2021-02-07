@@ -45,6 +45,7 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
     const uint8_t instruction = *dispc;
     int count;
     unsigned int total;
+    // TODO: get rid of this redundant instruction check with mnemonic
     if (instruction == 0xea) {
         total = count = sprintf(dis, "$%04X: %02X          ", addr,
                                 instruction);

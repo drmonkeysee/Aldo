@@ -7,6 +7,7 @@
 
 #include "cpu.h"
 
+#include "bytes.h"
 #include "traits.h"
 
 #include <assert.h>
@@ -32,7 +33,7 @@ static void reset_pc(struct mos6502 *self)
     uint8_t lo, hi;
     read(self, ResetVector, &lo);
     read(self, ResetVector + 1, &hi);
-    self->pc = lo | (hi << 8);
+    self->pc = byt_tow(lo, hi);
 }
 
 static uint8_t get_p(const struct mos6502 *self)
@@ -119,8 +120,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.yindex = self->y;
 
     snapshot->cpu.addressbus = self->addrbus;
-    snapshot->cpu.operand = self->oph << 8;
-    snapshot->cpu.operand |= self->opl;
+    snapshot->cpu.operand = byt_tow(self->opl, self->oph);
     snapshot->cpu.databus = self->databus;
     snapshot->cpu.opcode = self->opc;
     snapshot->cpu.sequence_cycle = self->t;

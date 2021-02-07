@@ -7,6 +7,7 @@
 
 #include "nes.h"
 
+#include "bytes.h"
 #include "cpu.h"
 #include "traits.h"
 
@@ -31,9 +32,8 @@ static void load_prg(nes *self, size_t sz, const uint8_t prg[restrict sz])
     for (size_t i = 0; i < sz; ++i) {
         self->cart[(i + CpuCartMinAddr) & CpuCartAddrMask] = prg[i];
     }
-    self->cart[ResetVector & CpuCartAddrMask] = (uint8_t)CpuCartMinAddr;
-    self->cart[(ResetVector + 1) & CpuCartAddrMask]
-        = (uint8_t)(CpuCartMinAddr >> 8);
+    byt_frw(CpuCartMinAddr, self->cart + (ResetVector & CpuCartAddrMask),
+            self->cart + ((ResetVector + 1) & CpuCartAddrMask));
 }
 
 //

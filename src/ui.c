@@ -8,6 +8,7 @@
 #include "ui.h"
 
 #include "asm.h"
+#include "emu/bytes.h"
 #include "emu/traits.h"
 
 #include <ncurses.h>
@@ -86,17 +87,17 @@ static void drawvecs(int h, int w, int y,
     uint8_t lo = snapshot->rom[NmiVector & CpuCartAddrMask],
             hi = snapshot->rom[(NmiVector + 1) & CpuCartAddrMask];
     mvwprintw(RomView.content, h - y--, 0, "$%04X: %02X %02X       NMI $%04X",
-              NmiVector, lo, hi, lo | (hi << 8));
+              NmiVector, lo, hi, byt_tow(lo, hi));
 
     lo = snapshot->rom[ResetVector & CpuCartAddrMask];
     hi = snapshot->rom[(ResetVector + 1) & CpuCartAddrMask];
     mvwprintw(RomView.content, h - y--, 0, "$%04X: %02X %02X       RES $%04X",
-              ResetVector, lo, hi, lo | (hi << 8));
+              ResetVector, lo, hi, byt_tow(lo, hi));
 
     lo = snapshot->rom[IrqVector & CpuCartAddrMask];
     hi = snapshot->rom[(IrqVector + 1) & CpuCartAddrMask];
     mvwprintw(RomView.content, h - y, 0, "$%04X: %02X %02X       IRQ $%04X",
-              IrqVector, lo, hi, lo | (hi << 8));
+              IrqVector, lo, hi, byt_tow(lo, hi));
 }
 
 static void drawrom(const struct console_state *snapshot)

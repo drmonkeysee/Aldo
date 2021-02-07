@@ -7,18 +7,10 @@
 
 #include "asm.h"
 
+#include "emu/bytes.h"
+
 #include <assert.h>
 #include <stdio.h>
-
-// NOTE: convert pair of little-endian bytes into 16-bit word
-static uint16_t btow(const uint8_t bytes[static 2])
-{
-    return bytes[0] | (bytes[1] << 8);
-}
-
-//
-// Public Interface
-//
 
 // NOTE: undefined behavior if mnemonic requires more bytes than are pointed
 // to by dispc.
@@ -71,7 +63,7 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
                                 instruction, *(dispc + 1), *(dispc + 2));
         if (count < 0) return DIS_FMT_FAIL;
 
-        count = dis_mnemonic(*dispc, btow(dispc + 1), dis + count);
+        count = dis_mnemonic(*dispc, bya_tow(dispc + 1), dis + count);
         if (count < 0) return count;
 
         total += count;

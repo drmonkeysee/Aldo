@@ -189,12 +189,7 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwvline(DatapathView.content, cursor_y, vsep3, 0, 3);
     mvwvline(DatapathView.content, cursor_y, vsep4, 0, 3);
     char buf[DIS_MNEM_SIZE];
-    uint8_t bytes[] = {
-        snapshot->cpu.opcode,
-        snapshot->cpu.operand & 0xff,
-        snapshot->cpu.operand >> 8,
-    };
-    int wlen = dis_mnemonic(bytes, buf);
+    int wlen = dis_mnemonic(snapshot->cpu.opcode, snapshot->cpu.operand, buf);
     const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
     mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);
 

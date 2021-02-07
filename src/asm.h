@@ -19,7 +19,7 @@ enum {
     DIS_EOF = -2,
 };
 
-int dis_mnemonic(const uint8_t *dispc,
+int dis_mnemonic(uint8_t opcode, uint16_t operand,
                  char dis[restrict static DIS_MNEM_SIZE]);
 int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE]);

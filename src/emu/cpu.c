@@ -32,7 +32,7 @@ static void reset_pc(struct mos6502 *self)
     uint8_t lo, hi;
     read(self, ResetVector, &lo);
     read(self, ResetVector + 1, &hi);
-    self->pc = (hi << 8) | lo;
+    self->pc = lo | (hi << 8);
 }
 
 static uint8_t get_p(const struct mos6502 *self)

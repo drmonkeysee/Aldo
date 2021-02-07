@@ -10,15 +10,24 @@
 #include <assert.h>
 #include <stdio.h>
 
+// NOTE: convert pair of little-endian bytes into 16-bit word
+static uint16_t btow(const uint8_t bytes[static 2])
+{
+    return bytes[0] | (bytes[1] << 8);
+}
+
+//
+// Public Interface
+//
+
 // NOTE: undefined behavior if mnemonic requires more bytes than are pointed
 // to by dispc.
 // TODO: add parameter to disassemble based on current cycle vs fully decoded
-int dis_mnemonic(const uint8_t *dispc, char dis[restrict static DIS_MNEM_SIZE])
+int dis_mnemonic(uint8_t opcode, uint16_t operand,
+                 char dis[restrict static DIS_MNEM_SIZE])
 {
-    assert(dispc != NULL);
     assert(dis != NULL);
 
-    const uint8_t opcode = *dispc;
     int count;
     if (opcode == 0xea) {
         count = sprintf(dis, "NOP");
@@ -26,7 +35,6 @@ int dis_mnemonic(const uint8_t *dispc, char dis[restrict static DIS_MNEM_SIZE])
     } else {
         // TODO: pretend unk operand is
         // indirect absolute address (longest operand in chars)
-        uint16_t operand = *(dispc + 1) | (*(dispc + 2) << 8);
         count = sprintf(dis, "UNK ($%04X)", operand);
         if (count < 0) return DIS_FMT_FAIL;
     }
@@ -51,7 +59,7 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
                                 instruction);
         if (count < 0) return DIS_FMT_FAIL;
 
-        count = dis_mnemonic(dispc, dis + count);
+        count = dis_mnemonic(*dispc, 0, dis + count);
         if (count < 0) return count;
 
         total += count;
@@ -63,7 +71,7 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
                                 instruction, *(dispc + 1), *(dispc + 2));
         if (count < 0) return DIS_FMT_FAIL;
 
-        count = dis_mnemonic(dispc, dis + count);
+        count = dis_mnemonic(*dispc, btow(dispc + 1), dis + count);
         if (count < 0) return count;
 
         total += count;

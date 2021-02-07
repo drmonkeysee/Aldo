@@ -11,11 +11,15 @@
 #include <stdint.h>
 
 struct console_state {
-    struct {
-        uint16_t program_counter;
-        uint8_t accum, stack_pointer, status, xindex, yindex;
-    } registers;
     const uint8_t *ram, *rom;
+    struct {
+        uint16_t addressbus, operand, program_counter;
+        uint8_t accum, databus, sequencecycle, opcode, stack_pointer, status,
+                xindex, yindex;
+    } cpu;
+    struct {
+        _Bool irq, nmi, readwrite, ready, reset, sync;
+    } lines;
 };
 
 #endif

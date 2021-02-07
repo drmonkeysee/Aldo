@@ -66,7 +66,7 @@ static void drawcontrols(void)
     wmove(ControlsView.content, cursor_y, getcurx(ControlsView.content) + 2);
     waddstr(ControlsView.content, "NMI");
     wmove(ControlsView.content, cursor_y++, getcurx(ControlsView.content) + 2);
-    waddstr(ControlsView.content, "RST");
+    waddstr(ControlsView.content, "RES");
     mvwhline(ControlsView.content, ++cursor_y, 0, 0,
              getmaxx(ControlsView.content));
     cursor_y += 2;
@@ -125,7 +125,7 @@ static void drawrom(const struct console_state *snapshot)
     getmaxyx(RomView.content, h, w);
     char disassembly[DIS_INST_SIZE];
 
-    uint16_t addr = snapshot->registers.program_counter;
+    uint16_t addr = snapshot->cpu.program_counter;
     for (int i = 0, bytes = 0; i < h - vector_offset; ++i) {
         addr += bytes;
         const size_t cart_offset = addr & CpuCartAddrMask;
@@ -146,17 +146,17 @@ static void drawregister(const struct console_state *snapshot)
 {
     int cursor_y = 0;
     mvwprintw(RegistersView.content, cursor_y++, 0, "PC: $%04X",
-              snapshot->registers.program_counter);
+              snapshot->cpu.program_counter);
     mvwprintw(RegistersView.content, cursor_y++, 0, "S:  $%02X",
-              snapshot->registers.stack_pointer);
+              snapshot->cpu.stack_pointer);
     mvwhline(RegistersView.content, cursor_y++, 0, 0,
              getmaxx(RegistersView.content));
     mvwprintw(RegistersView.content, cursor_y++, 0, "A:  $%02X",
-              snapshot->registers.accum);
+              snapshot->cpu.accum);
     mvwprintw(RegistersView.content, cursor_y++, 0, "X:  $%02X",
-              snapshot->registers.xindex);
+              snapshot->cpu.xindex);
     mvwprintw(RegistersView.content, cursor_y++, 0, "Y:  $%02X",
-              snapshot->registers.yindex);
+              snapshot->cpu.yindex);
 }
 
 static void drawflags(const struct console_state *snapshot)
@@ -166,9 +166,9 @@ static void drawflags(const struct console_state *snapshot)
     mvwaddstr(FlagsView.content, cursor_y++, cursor_x, "N V - B D I Z C");
     mvwhline(FlagsView.content, cursor_y++, cursor_x, 0,
              getmaxx(FlagsView.content));
-    for (size_t i = sizeof snapshot->registers.status * 8; i > 0; --i) {
+    for (size_t i = sizeof snapshot->cpu.status * 8; i > 0; --i) {
         mvwprintw(FlagsView.content, cursor_y, cursor_x, "%u",
-                  (snapshot->registers.status >> (i - 1)) & 1);
+                  (snapshot->cpu.status >> (i - 1)) & 1);
         cursor_x += 2;
     }
 }

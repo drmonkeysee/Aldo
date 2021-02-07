@@ -13,6 +13,7 @@
 		C820E6D125A97E3B006A7AB1 /* nes.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6D025A97E3B006A7AB1 /* nes.c */; };
 		C820E6E025A98557006A7AB1 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C820E6DE25A982A5006A7AB1 /* libncurses.tbd */; };
 		C8236C2725BA80F900B18301 /* traits.c in Sources */ = {isa = PBXBuildFile; fileRef = C8236C2625BA80F900B18301 /* traits.c */; };
+		C83042BC25CFC89500D6B623 /* bytes.c in Sources */ = {isa = PBXBuildFile; fileRef = C83042BB25CFC89500D6B623 /* bytes.c */; };
 		C84B6C2225B2BAF300FCCD88 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C84B6C2125B2BAF300FCCD88 /* cpu.c */; };
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
 		C85C8DC625BD29AC00611D19 /* asm.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* asm.c */; };
@@ -44,6 +45,8 @@
 		C820E6D325A97FB5006A7AB1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		C820E6DE25A982A5006A7AB1 /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
 		C8236C2625BA80F900B18301 /* traits.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = traits.c; sourceTree = "<group>"; };
+		C83042BA25CFC89500D6B623 /* bytes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bytes.h; sourceTree = "<group>"; };
+		C83042BB25CFC89500D6B623 /* bytes.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bytes.c; sourceTree = "<group>"; };
 		C842F17C25B404410004E807 /* snapshot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = snapshot.h; sourceTree = "<group>"; };
 		C84B6C2025B2BAF300FCCD88 /* cpu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpu.h; sourceTree = "<group>"; };
 		C84B6C2125B2BAF300FCCD88 /* cpu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpu.c; sourceTree = "<group>"; };
@@ -104,6 +107,8 @@
 		C820E6CE25A97E2D006A7AB1 /* emu */ = {
 			isa = PBXGroup;
 			children = (
+				C83042BA25CFC89500D6B623 /* bytes.h */,
+				C83042BB25CFC89500D6B623 /* bytes.c */,
 				C84B6C2025B2BAF300FCCD88 /* cpu.h */,
 				C84B6C2125B2BAF300FCCD88 /* cpu.c */,
 				C8114E2D25CBBD6D007309CD /* decode.h */,
@@ -197,6 +202,7 @@
 				C820E6D125A97E3B006A7AB1 /* nes.c in Sources */,
 				C8236C2725BA80F900B18301 /* traits.c in Sources */,
 				C820E6C025A9759A006A7AB1 /* main.swift in Sources */,
+				C83042BC25CFC89500D6B623 /* bytes.c in Sources */,
 				C85C8DC625BD29AC00611D19 /* asm.c in Sources */,
 				C84B6C2225B2BAF300FCCD88 /* cpu.c in Sources */,
 				C8114E2F25CBBD6D007309CD /* decode.c in Sources */,

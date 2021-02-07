@@ -52,10 +52,33 @@ static void drawcontrols(void)
     wattron(ControlsView.content, A_STANDOUT);
     mvwaddstr(ControlsView.content, cursor_y, 0, " HALT ");
     wattroff(ControlsView.content, A_STANDOUT);
-    mvwaddstr(ControlsView.content, cursor_y, 9, " RUN ");
     cursor_y += 2;
-    mvwaddstr(ControlsView.content, cursor_y++, 0, "Ram Page Next: n");
-    mvwaddstr(ControlsView.content, cursor_y++, 0, "Ram Page Prev: b");
+    mvwaddstr(ControlsView.content, cursor_y, 0, "Mode:");
+    wmove(ControlsView.content, cursor_y, getcurx(ControlsView.content) + 2);
+    waddstr(ControlsView.content, "Cycle");
+    wmove(ControlsView.content, cursor_y, getcurx(ControlsView.content) + 2);
+    waddstr(ControlsView.content, "Step");
+    wmove(ControlsView.content, cursor_y++, getcurx(ControlsView.content) + 2);
+    waddstr(ControlsView.content, "Run");
+    mvwaddstr(ControlsView.content, ++cursor_y, 0, "Send:");
+    wmove(ControlsView.content, cursor_y, getcurx(ControlsView.content) + 2);
+    waddstr(ControlsView.content, "IRQ");
+    wmove(ControlsView.content, cursor_y, getcurx(ControlsView.content) + 2);
+    waddstr(ControlsView.content, "NMI");
+    wmove(ControlsView.content, cursor_y++, getcurx(ControlsView.content) + 2);
+    waddstr(ControlsView.content, "RST");
+    mvwhline(ControlsView.content, ++cursor_y, 0, 0,
+             getmaxx(ControlsView.content));
+    cursor_y += 2;
+    mvwaddstr(ControlsView.content, cursor_y++, 0, "FPS: [1-120]");
+    mvwaddstr(ControlsView.content, cursor_y++, 0, "CPS: [1-100]");
+    mvwhline(ControlsView.content, ++cursor_y, 0, 0,
+             getmaxx(ControlsView.content));
+    cursor_y += 2;
+    mvwaddstr(ControlsView.content, cursor_y++, 0, "RAM: Next Prev");
+    mvwaddstr(ControlsView.content, ++cursor_y, 0, "ROM: up down");
+    mvwaddstr(ControlsView.content, ++cursor_y, 5, "pgup pgdn");
+    mvwaddstr(ControlsView.content, ++cursor_y, 0, "Go:  [$8000-$FFFF]");
 }
 
 static void drawromerr(int diserr, int y)

@@ -78,23 +78,6 @@ static void drawcontrols(void)
     mvwaddstr(ControlsView.content, ++cursor_y, 0, "Go:  [$8000-$FFFF]");
 }
 
-static void drawromerr(int diserr, int y)
-{
-    const char *err;
-    switch (diserr) {
-    case DIS_FMT_FAIL:
-        err = "OUTPUT FAIL";
-        break;
-    case DIS_EOF:
-        err = "UNEXPECTED EOF";
-        break;
-    default:
-        err = "UNKNOWN ERR";
-        break;
-    }
-    mvwaddstr(RomView.content, y, 0, err);
-}
-
 static void drawvecs(int h, int w, int y,
                      const struct console_state *snapshot)
 {
@@ -130,7 +113,7 @@ static void drawrom(const struct console_state *snapshot)
                          ROM_SIZE - cart_offset, disassembly);
         if (bytes == 0) break;
         if (bytes < 0) {
-            drawromerr(bytes, i);
+            mvwaddstr(RomView.content, i, 0, dis_errstr(bytes));
             break;
         }
         mvwaddstr(RomView.content, i, 0, disassembly);
@@ -205,7 +188,15 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwvline(DatapathView.content, cursor_y, vsep2, 0, 3);
     mvwvline(DatapathView.content, cursor_y, vsep3, 0, 3);
     mvwvline(DatapathView.content, cursor_y, vsep4, 0, 3);
-    mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, "UNK ($0000)");
+    char buf[DIS_MNEM_SIZE];
+    uint8_t bytes[] = {
+        snapshot->cpu.opcode,
+        snapshot->cpu.operand & 0xff,
+        snapshot->cpu.operand >> 8,
+    };
+    int wlen = dis_mnemonic(bytes, buf);
+    const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
+    mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);
 
     mvwaddstr(DatapathView.content, ++cursor_y, 0, left);
     mvwprintw(DatapathView.content, cursor_y, vsep1 + 2, "$%04X",

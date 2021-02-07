@@ -101,7 +101,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     assert(snapshot != NULL);
 
     snapshot->cpu.program_counter = self->pc;
-    snapshot->cpu.accum = self->a;
+    snapshot->cpu.accumulator = self->a;
     snapshot->cpu.stack_pointer = self->s;
     snapshot->cpu.status = get_p(self);
     snapshot->cpu.xindex = self->x;
@@ -112,7 +112,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.operand |= self->opl;
     snapshot->cpu.databus = self->databus;
     snapshot->cpu.opcode = self->opc;
-    snapshot->cpu.sequencecycle = self->t;
+    snapshot->cpu.sequence_cycle = self->t;
 
     snapshot->lines.irq = self->signal.irq;
     snapshot->lines.nmi = self->signal.nmi;

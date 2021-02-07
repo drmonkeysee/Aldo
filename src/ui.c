@@ -149,7 +149,7 @@ static void drawregister(const struct console_state *snapshot)
     mvwhline(RegistersView.content, cursor_y++, 0, 0,
              getmaxx(RegistersView.content));
     mvwprintw(RegistersView.content, cursor_y++, 0, "A:  $%02X",
-              snapshot->cpu.accum);
+              snapshot->cpu.accumulator);
     mvwprintw(RegistersView.content, cursor_y++, 0, "X:  $%02X",
               snapshot->cpu.xindex);
     mvwprintw(RegistersView.content, cursor_y++, 0, "Y:  $%02X",

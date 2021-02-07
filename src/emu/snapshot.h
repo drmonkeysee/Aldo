@@ -8,17 +8,18 @@
 #ifndef Aldo_emu_snapshot_h
 #define Aldo_emu_snapshot_h
 
+#include <stdbool.h>
 #include <stdint.h>
 
 struct console_state {
     const uint8_t *ram, *rom;
     struct {
         uint16_t addressbus, operand, program_counter;
-        uint8_t accum, databus, sequencecycle, opcode, stack_pointer, status,
-                xindex, yindex;
+        uint8_t accumulator, databus, sequence_cycle, opcode, stack_pointer,
+                status, xindex, yindex;
     } cpu;
     struct {
-        _Bool irq, nmi, readwrite, ready, reset, sync;
+        bool irq, nmi, readwrite, ready, reset, sync;
     } lines;
 };
 

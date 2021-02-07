@@ -88,8 +88,8 @@ enum inst {
 // Opcode cycle sequences:
 // the 6502 defines several addressing modes, however the same addressing
 // mode may result in different cycle timing depending on the instruction;
-// this table defines the intersection of instruction and addressing mode
-// enumerating all possible opcode cycle sequences.
+// this table enumerates all possible opcode cycle sequences defined by the
+// combination of instruction and addressing mode.
 // read (_R)              - the operation reads from memory into registers
 // write (_W)             - the operation writes from registers into memory
 // read-modify-write (_M) - the operation reads from memory,

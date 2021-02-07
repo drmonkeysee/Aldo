@@ -170,6 +170,20 @@ static void drawflags(const struct console_state *snapshot)
     }
 }
 
+static void drawline(bool signal, int y, int x, int dir_offset,
+                     const char *restrict direction,
+                     const char *restrict label)
+{
+    if (!signal) {
+        wattron(DatapathView.content, A_DIM);
+    }
+    mvwaddstr(DatapathView.content, y, x - 1, label);
+    mvwaddstr(DatapathView.content, y + dir_offset, x, direction);
+    if (!signal) {
+        wattroff(DatapathView.content, A_DIM);
+    }
+}
+
 static void drawdatapath(const struct console_state *snapshot)
 {
     static const char *const restrict left = "\u2190",
@@ -181,16 +195,9 @@ static void drawdatapath(const struct console_state *snapshot)
     const int w = getmaxx(DatapathView.content), line_x = (w / 4) + 1;
     int cursor_y = 0;
 
-    wattron(DatapathView.content, A_DIM);
-    mvwaddstr(DatapathView.content, cursor_y, line_x - 1, "RDY");
-    mvwaddstr(DatapathView.content, cursor_y + 1, line_x, down);
-
-    mvwaddstr(DatapathView.content, cursor_y, (line_x * 2) - 1, "SYNC");
-    mvwaddstr(DatapathView.content, cursor_y + 1, line_x * 2, up);
-    wattroff(DatapathView.content, A_DIM);
-
-    mvwaddstr(DatapathView.content, cursor_y, (line_x * 3) - 1, "R/W");
-    mvwaddstr(DatapathView.content, ++cursor_y, line_x * 3, up);
+    drawline(snapshot->lines.ready, cursor_y, line_x, 1, down, "RDY");
+    drawline(snapshot->lines.sync, cursor_y, line_x * 2, 1, up, "SYNC");
+    drawline(snapshot->lines.readwrite, cursor_y++, line_x * 3, 1, up, "R/W");
 
     mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
 
@@ -201,25 +208,26 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, "UNK ($0000)");
 
     mvwaddstr(DatapathView.content, ++cursor_y, 0, left);
-    mvwaddstr(DatapathView.content, cursor_y, vsep1 + 2, "$1234");
-    mvwaddstr(DatapathView.content, cursor_y, vsep3 + 2, "$42");
-    mvwaddstr(DatapathView.content, cursor_y, vsep4 + 1, right);
+    mvwprintw(DatapathView.content, cursor_y, vsep1 + 2, "$%04X",
+              snapshot->cpu.addressbus);
+    mvwprintw(DatapathView.content, cursor_y, vsep3 + 2, "$%02X",
+              snapshot->cpu.databus);
+    mvwaddstr(DatapathView.content, cursor_y, vsep4 + 1,
+              snapshot->lines.readwrite ? left : right);
 
-    mvwaddstr(DatapathView.content, ++cursor_y, vsep2 + 2, "T0123456");
+    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "%*sT%u",
+              snapshot->cpu.sequence_cycle, "", snapshot->cpu.sequence_cycle);
 
     mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
 
-    mvwaddstr(DatapathView.content, ++cursor_y, line_x, up);
-    mvwaddstr(DatapathView.content, cursor_y + 1, line_x - 1,
-              "I\u0305R\u0305Q\u0305");
-
-    mvwaddstr(DatapathView.content, cursor_y, line_x * 2, up);
-    mvwaddstr(DatapathView.content, cursor_y + 1, (line_x * 2) - 1,
-              "N\u0305M\u0305I\u0305");
-
-    mvwaddstr(DatapathView.content, cursor_y, line_x * 3, up);
-    mvwaddstr(DatapathView.content, cursor_y + 1, (line_x * 3) - 1,
-              "R\u0305E\u0305S\u0305");
+    // NOTE: jump 2 rows as interrupts are drawn direction first
+    cursor_y += 2;
+    drawline(snapshot->lines.irq, cursor_y, line_x, -1, up,
+             "I\u0305R\u0305Q\u0305");
+    drawline(snapshot->lines.nmi, cursor_y, line_x * 2, -1, up,
+             "N\u0305M\u0305I\u0305");
+    drawline(snapshot->lines.reset, cursor_y, line_x * 3, -1, up,
+             "R\u0305E\u0305S\u0305");
 }
 
 static void drawram(const struct console_state *snapshot)

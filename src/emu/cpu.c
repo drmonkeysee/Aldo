@@ -87,12 +87,23 @@ void cpu_reset(struct mos6502 *self)
     // and execute an instruction sequence
     assert(self != NULL);
 
+    // TODO: reset sequence begins after reset signal goes from low to high
+    self->signal.res = true;
+
     reset_pc(self);
     self->p.i = true;
     // NOTE: Reset runs through same sequence as BRK/IRQ
     // so the cpu does 3 phantom stack pushes;
     // on powerup this would result in $00 - $3 = $FD.
     self->s -= 3;
+
+    // TODO: fake the execution of the RES sequence and load relevant
+    // data into the datapath.
+    self->t = 0;
+    self->signal.sync = true;
+    self->addrbus = self->pc;
+    read(self, self->pc, &self->databus);
+    self->opc = self->databus;
 }
 
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)

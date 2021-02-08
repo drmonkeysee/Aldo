@@ -14,9 +14,14 @@
 #define DIS_INST_SIZE 31u   // Disassembled instruction is at most 30 chars
 #define DIS_MNEM_SIZE 12u   // Disassembled mnemonic is at most 11 chars
 
+#define DIS_ERRCODE_X \
+X(FMT_FAIL, -1, "OUTPUT FAIL") \
+X(EOF, -2, "UNEXPECTED EOF")
+
 enum {
-    DIS_FMT_FAIL = -1,
-    DIS_EOF = -2,
+#define X(i, v, s) DIS_ ## i = v,
+    DIS_ERRCODE_X
+#undef X
 };
 
 int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,

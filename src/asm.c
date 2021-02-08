@@ -59,10 +59,9 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
 const char *dis_errstr(int error)
 {
     switch (error) {
-    case DIS_FMT_FAIL:
-        return "OUTPUT FAIL";
-    case DIS_EOF:
-        return "UNEXPECTED EOF";
+#define X(i, v, s) case DIS_ ## i: return s;
+    DIS_ERRCODE_X
+#undef X
     default:
         return "UNKNOWN ERR";
     }

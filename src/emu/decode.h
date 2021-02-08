@@ -95,58 +95,58 @@ X(TYA)  /* Transfer y index to accumulator */
 //                          modifies the value, and writes it back
 #define DEC_CYCLESEQ_X \
 /* Implied */ \
-X(IMP)      /* Implied */ \
+X(IMP, 1)      /* Implied */ \
 \
 /* Immediate */ \
-X(IMM)      /* Immediate */ \
+X(IMM, 2)      /* Immediate */ \
 \
 /* Zero-page */ \
-X(ZP)       /* Zero-page read/write */ \
-X(ZP_M)     /* Zero-page read-modify-write */ \
+X(ZP, 2)       /* Zero-page read/write */ \
+X(ZP_M, 2)     /* Zero-page read-modify-write */ \
 \
 /* Zero-page, X */ \
-X(ZPX)      /* Zero-page, X read/write */ \
-X(ZPX_M)    /* Zero-page, X read-modify-write */ \
+X(ZPX, 2)      /* Zero-page, X read/write */ \
+X(ZPX_M, 2)    /* Zero-page, X read-modify-write */ \
 \
 /* Zero-page, Y */ \
-X(ZPY)      /* Zero-page, Y read/write */ \
+X(ZPY, 2)      /* Zero-page, Y read/write */ \
 \
 /* Absolute */ \
-X(ABS)      /* Absolute read/write */ \
-X(ABS_M)    /* Absolute read-modify-write */ \
+X(ABS, 3)      /* Absolute read/write */ \
+X(ABS_M, 3)    /* Absolute read-modify-write */ \
 \
 /* Absolute, X */ \
-X(ABSX_R)   /* Absolute, X read */ \
-X(ABSX_W)   /* Absolute, X write */ \
-X(ABSX_M)   /* Absolute, X read-modify-write */ \
+X(ABSX_R, 3)   /* Absolute, X read */ \
+X(ABSX_W, 3)   /* Absolute, X write */ \
+X(ABSX_M, 3)   /* Absolute, X read-modify-write */ \
 \
 /* Absolute, Y */ \
-X(ABSY_R)   /* Absolute, Y read */ \
-X(ABSY_W)   /* Absolute, Y write */ \
+X(ABSY_R, 3)   /* Absolute, Y read */ \
+X(ABSY_W, 3)   /* Absolute, Y write */ \
 \
 /* (Indirect, X) */ \
-X(INDX)     /* (Indirect, X) read/write */ \
+X(INDX, 2)     /* (Indirect, X) read/write */ \
 \
 /* (Indirect), Y */ \
-X(INDY_R)   /* (Indirect), Y read */ \
-X(INDY_W)   /* (Indirect), Y write */ \
+X(INDY_R, 2)   /* (Indirect), Y read */ \
+X(INDY_W, 2)   /* (Indirect), Y write */ \
 \
 /* Stack */ \
-X(PSH)      /* Push */ \
-X(PLL)      /* Pull */ \
+X(PSH, 1)      /* Push */ \
+X(PLL, 1)      /* Pull */ \
 \
 /* Branch */ \
-X(BCH)      /* Relative branch */ \
+X(BCH, 2)      /* Relative branch */ \
 \
 /* Jumps */ \
-X(JSR)      /* Jump to subroutine, */ \
-X(RTS)      /* Return from subroutine */ \
-X(JABS)     /* Absolute jump */ \
-X(JIND)     /* Indirect jump */ \
+X(JSR, 3)      /* Jump to subroutine, */ \
+X(RTS, 1)      /* Return from subroutine */ \
+X(JABS, 3)     /* Absolute jump */ \
+X(JIND, 3)     /* Indirect jump */ \
 \
 /* Interrupts */ \
-X(BRK)      /* Break, interrupt, reset */ \
-X(RTI)      /* Return from interrupt */
+X(BRK, 1)      /* Break, interrupt, reset */ \
+X(RTI, 1)      /* Return from interrupt */
 
 enum inst {
 #define X(i) IN_ ## i,
@@ -155,7 +155,7 @@ enum inst {
 };
 
 enum cycle_seq {
-#define X(i) CS_ ## i,
+#define X(i, b) CS_ ## i,
     DEC_CYCLESEQ_X
 #undef X
 };

@@ -8,11 +8,18 @@
 #include "asm.h"
 
 #include "emu/bytes.h"
+#include "emu/decode.h"
 
 #include <assert.h>
 #include <stdio.h>
 
-const char *restrict const DiscardedData = "\u2205";
+static const char *restrict const Mnemonics[] = {
+#define X(i) #i,
+    DEC_INST_X
+#undef X
+};
+
+static const char *restrict const DiscardedData = "\u2205";
 
 // TODO: get rid of this redundant logic between the two dis functions
 

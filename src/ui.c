@@ -84,20 +84,23 @@ static void drawvecs(int h, int w, int y,
 {
     mvwhline(RomView.content, h - y--, 0, 0, w);
 
-    uint8_t lo = snapshot->rom[NmiVector & CpuCartAddrMask],
-            hi = snapshot->rom[(NmiVector + 1) & CpuCartAddrMask];
+    uint16_t vaddr = NmiVector & CpuCartAddrMask;
+    uint8_t lo = snapshot->rom[vaddr],
+            hi = snapshot->rom[vaddr + 1];
     mvwprintw(RomView.content, h - y--, 0, "$%04X: %02X %02X       NMI $%04X",
-              NmiVector, lo, hi, byt_tow(lo, hi));
+              NmiVector, lo, hi, bytowr(lo, hi));
 
-    lo = snapshot->rom[ResetVector & CpuCartAddrMask];
-    hi = snapshot->rom[(ResetVector + 1) & CpuCartAddrMask];
+    vaddr = ResetVector & CpuCartAddrMask;
+    lo = snapshot->rom[vaddr];
+    hi = snapshot->rom[vaddr + 1];
     mvwprintw(RomView.content, h - y--, 0, "$%04X: %02X %02X       RES $%04X",
-              ResetVector, lo, hi, byt_tow(lo, hi));
+              ResetVector, lo, hi, bytowr(lo, hi));
 
-    lo = snapshot->rom[IrqVector & CpuCartAddrMask];
-    hi = snapshot->rom[(IrqVector + 1) & CpuCartAddrMask];
+    vaddr = IrqVector & CpuCartAddrMask;
+    lo = snapshot->rom[vaddr];
+    hi = snapshot->rom[vaddr + 1];
     mvwprintw(RomView.content, h - y, 0, "$%04X: %02X %02X       IRQ $%04X",
-              IrqVector, lo, hi, byt_tow(lo, hi));
+              IrqVector, lo, hi, bytowr(lo, hi));
 }
 
 static void drawrom(const struct console_state *snapshot)

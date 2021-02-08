@@ -64,7 +64,7 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
                                 instruction, *(dispc + 1), *(dispc + 2));
         if (count < 0) return DIS_FMT_FAIL;
 
-        count = dis_mnemonic(*dispc, bya_tow(dispc + 1), dis + count);
+        count = dis_mnemonic(*dispc, batowr(dispc + 1), dis + count);
         if (count < 0) return count;
 
         total += count;

@@ -32,8 +32,7 @@ static void load_prg(nes *self, size_t sz, const uint8_t prg[restrict sz])
     for (size_t i = 0; i < sz; ++i) {
         self->cart[(i + CpuCartMinAddr) & CpuCartAddrMask] = prg[i];
     }
-    byt_frw(CpuCartMinAddr, self->cart + (ResetVector & CpuCartAddrMask),
-            self->cart + ((ResetVector + 1) & CpuCartAddrMask));
+    wrtoba(CpuCartMinAddr, self->cart + (ResetVector & CpuCartAddrMask));
 }
 
 //

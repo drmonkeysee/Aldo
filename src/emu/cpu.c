@@ -33,7 +33,7 @@ static void reset_pc(struct mos6502 *self)
     uint8_t lo, hi;
     read(self, ResetVector, &lo);
     read(self, ResetVector + 1, &hi);
-    self->pc = byt_tow(lo, hi);
+    self->pc = bytowr(lo, hi);
 }
 
 static uint8_t get_p(const struct mos6502 *self)
@@ -120,7 +120,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.yindex = self->y;
 
     snapshot->cpu.addressbus = self->addrbus;
-    snapshot->cpu.operand = byt_tow(self->opl, self->oph);
+    snapshot->cpu.operand = bytowr(self->opl, self->oph);
     snapshot->cpu.databus = self->databus;
     snapshot->cpu.opcode = self->opc;
     snapshot->cpu.sequence_cycle = self->t;

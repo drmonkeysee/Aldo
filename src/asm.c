@@ -12,27 +12,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-// NOTE: undefined behavior if mnemonic requires more bytes than are pointed
-// to by dispc.
-// TODO: add parameter to disassemble based on current cycle vs fully decoded
-int dis_mnemonic(uint8_t opcode, uint16_t operand,
-                 char dis[restrict static DIS_MNEM_SIZE])
-{
-    assert(dis != NULL);
-
-    int count;
-    if (opcode == 0xea) {
-        count = sprintf(dis, "NOP");
-        if (count < 0) return DIS_FMT_FAIL;
-    } else {
-        // TODO: pretend unk operand is
-        // indirect absolute address (longest operand in chars)
-        count = sprintf(dis, "UNK ($%04X)", operand);
-        if (count < 0) return DIS_FMT_FAIL;
-    }
-    assert((unsigned int)count < DIS_MNEM_SIZE);
-    return count;
-}
+const char *restrict const DiscardedData = "\u2205";
 
 int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE])
@@ -52,8 +32,8 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
                                 instruction);
         if (count < 0) return DIS_FMT_FAIL;
 
-        count = dis_mnemonic(*dispc, 0, dis + count);
-        if (count < 0) return count;
+        count = sprintf(dis + count, "NOP");
+        if (count < 0) return DIS_FMT_FAIL;
 
         total += count;
         assert(total < DIS_INST_SIZE);
@@ -64,8 +44,10 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
                                 instruction, *(dispc + 1), *(dispc + 2));
         if (count < 0) return DIS_FMT_FAIL;
 
-        count = dis_mnemonic(*dispc, batowr(dispc + 1), dis + count);
-        if (count < 0) return count;
+        // TODO: pretend unk operand is
+        // indirect absolute address (longest operand in chars)
+        count = sprintf(dis + count, "UNK ($%04X)", batowr(dispc + 1));
+        if (count < 0) return DIS_FMT_FAIL;
 
         total += count;
         assert(total < DIS_INST_SIZE);
@@ -84,4 +66,30 @@ const char *dis_errstr(int error)
     default:
         return "UNKNOWN ERR";
     }
+}
+
+// NOTE: undefined behavior if mnemonic requires more bytes than are pointed
+// to by dispc.
+// TODO: add parameter to disassemble based on current cycle vs fully decoded
+int dis_datapath(uint8_t opcode, uint16_t operand, uint8_t cycle,
+                 char dis[restrict static DIS_MNEM_SIZE])
+{
+    assert(dis != NULL);
+
+    int count;
+    if (opcode == 0xea) {
+        count = sprintf(dis, "NOP");
+        if (count < 0) return DIS_FMT_FAIL;
+        if (cycle == 1) {
+            count = sprintf(dis + count, " %s", DiscardedData);
+            if (count < 0) return DIS_FMT_FAIL;
+        }
+    } else {
+        // TODO: pretend unk operand is
+        // indirect absolute address (longest operand in chars)
+        count = sprintf(dis, "UNK ($%04X)", operand);
+        if (count < 0) return DIS_FMT_FAIL;
+    }
+    assert((unsigned int)count < DIS_MNEM_SIZE);
+    return count;
 }

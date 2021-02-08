@@ -105,7 +105,9 @@ static void drawvecs(int h, int w, int y,
 
 static void drawrom(const struct console_state *snapshot)
 {
-    int h, w, vector_offset = 4;
+    static const int vector_offset = 4;
+
+    int h, w;
     getmaxyx(RomView.content, h, w);
     char disassembly[DIS_INST_SIZE];
 
@@ -224,6 +226,7 @@ static void drawdatapath(const struct console_state *snapshot)
 static void drawram(const struct console_state *snapshot)
 {
     static const int start_x = 5, col_width = 3;
+
     int cursor_x = start_x, cursor_y = 0;
     mvwvline(RamView.content, 0, start_x - 2, 0, getmaxy(RamView.content));
     for (size_t page = 0; page < 8; ++page) {

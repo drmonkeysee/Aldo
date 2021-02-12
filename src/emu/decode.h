@@ -100,8 +100,8 @@ X(ABSX, 3, "abs,X", "$??%02X,X", "$%02X%02X,X") /* Absolute,X */ \
 X(ABSY, 3, "abs,Y", "$??%02X,Y", "$%02X%02X,Y") /* Absolute,Y */ \
 \
 /* Stack */ \
-X(PSH, 1, "sp", "$%02X")                        /* Push */ \
-X(PLL, 1, "sp", "$%02X")                        /* Pull */ \
+X(PSH, 1, "imp", "")                            /* Push */ \
+X(PLL, 1, "imp", "")                            /* Pull */ \
 \
 /* Branch */ \
 X(BCH, 2, "rel", "%04d")                        /* Relative branch */ \
@@ -113,7 +113,7 @@ X(JABS, 3, "abs", "$??%02X", "$%02X%02X")       /* Absolute jump */ \
 X(JIND, 3, "(abs)", "($??%02X)", "($%02X%02X)") /* Indirect jump */ \
 \
 /* Interrupts */ \
-X(BRK, 1, "abs", "$??%02X", "$%02X%02X")        /* Break, interrupt, reset */ \
+X(BRK, 1, "imp", "")                            /* Break, interrupt, reset */ \
 X(RTI, 1, "imp", "")                            /* Return from interrupt */
 
 enum inst {

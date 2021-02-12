@@ -11,6 +11,7 @@
 #include <stddef.h>
 
 // 6502 Instructions
+// X(symbol)
 #define DEC_INST_X \
 X(UNK)  /* Unknown */ \
 \
@@ -84,85 +85,52 @@ X(TXA)  /* Transfer x index to accumulator */ \
 X(TXS)  /* Transfer x index to stack pointer */ \
 X(TYA)  /* Transfer y index to accumulator */
 
-// Opcode cycle sequences:
-// the 6502 defines several addressing modes, however the same addressing
-// mode may result in different cycle timing depending on the instruction;
-// this table enumerates all possible opcode cycle sequences defined by the
-// combination of instruction and addressing mode.
-// read (_R)              - the operation reads from memory into registers
-// write (_W)             - the operation writes from registers into memory
-// read-modify-write (_M) - the operation reads from memory,
-//                          modifies the value, and writes it back
-#define DEC_CYCLESEQ_X \
-/* Implied */ \
-X(IMP, 1)      /* Implied */ \
-\
-/* Immediate */ \
-X(IMM, 2)      /* Immediate */ \
-\
-/* Zero-page */ \
-X(ZP, 2)       /* Zero-page read/write */ \
-X(ZP_M, 2)     /* Zero-page read-modify-write */ \
-\
-/* Zero-page, X */ \
-X(ZPX, 2)      /* Zero-page, X read/write */ \
-X(ZPX_M, 2)    /* Zero-page, X read-modify-write */ \
-\
-/* Zero-page, Y */ \
-X(ZPY, 2)      /* Zero-page, Y read/write */ \
-\
-/* Absolute */ \
-X(ABS, 3)      /* Absolute read/write */ \
-X(ABS_M, 3)    /* Absolute read-modify-write */ \
-\
-/* Absolute, X */ \
-X(ABSX_R, 3)   /* Absolute, X read */ \
-X(ABSX_W, 3)   /* Absolute, X write */ \
-X(ABSX_M, 3)   /* Absolute, X read-modify-write */ \
-\
-/* Absolute, Y */ \
-X(ABSY_R, 3)   /* Absolute, Y read */ \
-X(ABSY_W, 3)   /* Absolute, Y write */ \
-\
-/* (Indirect, X) */ \
-X(INDX, 2)     /* (Indirect, X) read/write */ \
-\
-/* (Indirect), Y */ \
-X(INDY_R, 2)   /* (Indirect), Y read */ \
-X(INDY_W, 2)   /* (Indirect), Y write */ \
+// Addressing Modes
+// X(symbol, byte count)
+#define DEC_ADDRMODE_X \
+X(IMP, 1)   /* Implied */ \
+X(IMM, 2)   /* Immediate */ \
+X(ZP, 2)    /* Zero-page */ \
+X(ZPX, 2)   /* Zero-page, X */ \
+X(ZPY, 2)   /* Zero-page, Y */ \
+X(INDX, 2)  /* (Indirect, X) */ \
+X(INDY, 2)  /* (Indirect), Y */ \
+X(ABS, 3)   /* Absolute */ \
+X(ABSX, 3)  /* Absolute, X */ \
+X(ABSY, 3)  /* Absolute, Y */ \
 \
 /* Stack */ \
-X(PSH, 1)      /* Push */ \
-X(PLL, 1)      /* Pull */ \
+X(PSH, 1)   /* Push */ \
+X(PLL, 1)   /* Pull */ \
 \
 /* Branch */ \
-X(BCH, 2)      /* Relative branch */ \
+X(BCH, 2)   /* Relative branch */ \
 \
 /* Jumps */ \
-X(JSR, 3)      /* Jump to subroutine, */ \
-X(RTS, 1)      /* Return from subroutine */ \
-X(JABS, 3)     /* Absolute jump */ \
-X(JIND, 3)     /* Indirect jump */ \
+X(JSR, 3)   /* Jump to subroutine, */ \
+X(RTS, 1)   /* Return from subroutine */ \
+X(JABS, 3)  /* Absolute jump */ \
+X(JIND, 3)  /* Indirect jump */ \
 \
 /* Interrupts */ \
-X(BRK, 1)      /* Break, interrupt, reset */ \
-X(RTI, 1)      /* Return from interrupt */
+X(BRK, 1)   /* Break, interrupt, reset */ \
+X(RTI, 1)   /* Return from interrupt */
 
 enum inst {
-#define X(i) IN_ ## i,
+#define X(i) IN_##i,
     DEC_INST_X
 #undef X
 };
 
-enum cycle_seq {
-#define X(i, b) CS_ ## i,
-    DEC_CYCLESEQ_X
+enum addrmode {
+#define X(i, b) AM_##i,
+    DEC_ADDRMODE_X
 #undef X
 };
 
 struct decoded {
     enum inst instruction;
-    enum cycle_seq sequence;
+    enum addrmode mode;
 };
 
 extern const struct decoded Decode[];

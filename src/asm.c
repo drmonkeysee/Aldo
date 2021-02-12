@@ -79,7 +79,7 @@ const char *dis_errstr(int error)
 // to by dispc.
 // TODO: add parameter to disassemble based on current cycle vs fully decoded
 int dis_datapath(uint8_t opcode, uint16_t operand, uint8_t cycle,
-                 char dis[restrict static DIS_MNEM_SIZE])
+                 char dis[static DIS_MNEM_SIZE])
 {
     assert(dis != NULL);
 

@@ -33,6 +33,6 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
 const char *dis_errstr(int error);
 
 int dis_datapath(uint8_t opcode, uint16_t operand, uint8_t cycle,
-                 char dis[restrict static DIS_MNEM_SIZE]);
+                 char dis[static DIS_MNEM_SIZE]);
 
 #endif

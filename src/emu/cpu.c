@@ -120,7 +120,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.yindex = self->y;
 
     snapshot->cpu.addressbus = self->addrbus;
-    snapshot->cpu.operand = bytowr(self->opl, self->oph);
+    snapshot->cpu.addrlow_latch = self->adl;
     snapshot->cpu.databus = self->databus;
     snapshot->cpu.opcode = self->opc;
     snapshot->cpu.sequence_cycle = self->t;

@@ -8,6 +8,8 @@
 #ifndef Aldo_asm_h
 #define Aldo_asm_h
 
+#include "emu/snapshot.h"
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -32,7 +34,7 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
 // **WARNING**: do not write through or free this pointer!
 const char *dis_errstr(int error);
 
-int dis_datapath(uint8_t opcode, uint16_t operand, uint8_t cycle,
-                 char dis[static DIS_MNEM_SIZE]);
+int dis_datapath(const struct console_state *snapshot,
+                 char dis[restrict static DIS_MNEM_SIZE]);
 
 #endif

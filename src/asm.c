@@ -75,26 +75,24 @@ const char *dis_errstr(int error)
     }
 }
 
-// NOTE: undefined behavior if mnemonic requires more bytes than are pointed
-// to by dispc.
-// TODO: add parameter to disassemble based on current cycle vs fully decoded
-int dis_datapath(uint8_t opcode, uint16_t operand, uint8_t cycle,
-                 char dis[static DIS_MNEM_SIZE])
+int dis_datapath(const struct console_state *snapshot,
+                 char dis[restrict static DIS_MNEM_SIZE])
 {
     assert(dis != NULL);
 
     int count;
-    if (opcode == 0xea) {
+    if (snapshot->cpu.opcode == 0xea) {
         count = sprintf(dis, "NOP");
         if (count < 0) return DIS_FMT_FAIL;
-        if (cycle == 1) {
+        if (snapshot->cpu.sequence_cycle == 1) {
             count = sprintf(dis + count, " %s", DiscardedData);
             if (count < 0) return DIS_FMT_FAIL;
         }
     } else {
         // TODO: pretend unk operand is
         // absolute indexed address (longest operand in chars)
-        count = sprintf(dis, "UNK $%04X, X", operand);
+        count = sprintf(dis, "UNK $%02X%02X, X", snapshot->cpu.databus,
+                        snapshot->cpu.addrlow_latch);
         if (count < 0) return DIS_FMT_FAIL;
     }
     assert((unsigned int)count < DIS_MNEM_SIZE);

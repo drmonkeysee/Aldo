@@ -39,8 +39,7 @@ struct mos6502 {
     uint16_t addrbus;   // Word put on the address pins on clock phase ϕ1
     uint8_t databus,    // Byte put on the data pins on clock phase ϕ2
             opc,        // Opcode
-            opl,        // Opcode operand low byte
-            oph,        // Opcode operand high byte
+            adl,        // Address low latch
             t;          // Instruction sequence cycle (T0, T1, T2...)
     struct {
         bool irq: 1,    // Maskable Interrupt Signal (input, inverted)

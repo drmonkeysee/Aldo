@@ -14,9 +14,9 @@
 struct console_state {
     const uint8_t *ram, *rom;
     struct {
-        uint16_t addressbus, operand, program_counter;
-        uint8_t accumulator, databus, sequence_cycle, opcode, stack_pointer,
-                status, xindex, yindex;
+        uint16_t addressbus, program_counter;
+        uint8_t accumulator, addrlow_latch, databus, sequence_cycle, opcode,
+                stack_pointer, status, xindex, yindex;
     } cpu;
     struct {
         bool irq, nmi, readwrite, ready, reset, sync;

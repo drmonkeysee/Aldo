@@ -86,35 +86,35 @@ X(TXS)  /* Transfer x index to stack pointer */ \
 X(TYA)  /* Transfer y index to accumulator */
 
 // Addressing Modes
-// X(symbol, byte count)
+// X(symbol, byte count, display strings)
 #define DEC_ADDRMODE_X \
-X(IMP, 1)   /* Implied */ \
-X(IMM, 2)   /* Immediate */ \
-X(ZP, 2)    /* Zero-page */ \
-X(ZPX, 2)   /* Zero-page, X */ \
-X(ZPY, 2)   /* Zero-page, Y */ \
-X(INDX, 2)  /* (Indirect, X) */ \
-X(INDY, 2)  /* (Indirect), Y */ \
-X(ABS, 3)   /* Absolute */ \
-X(ABSX, 3)  /* Absolute, X */ \
-X(ABSY, 3)  /* Absolute, Y */ \
+X(IMP, 1, "imp", "")                                /* Implied */ \
+X(IMM, 2, "imm", "#$%02X")                          /* Immediate */ \
+X(ZP, 2, "zp", "$%02X")                             /* Zero-page */ \
+X(ZPX, 2, "zp, X", "$%02X, X")                      /* Zero-page, X */ \
+X(ZPY, 2, "zp, Y", "$%02X, Y")                      /* Zero-page, Y */ \
+X(INDX, 2, "(zp, X)", "($%02X, X)")                 /* (Indirect, X) */ \
+X(INDY, 2, "(zp), Y", "($%02X), Y")                 /* (Indirect), Y */ \
+X(ABS, 3, "abs", "$??%02X", "$%02X%02X")            /* Absolute */ \
+X(ABSX, 3, "abs, X", "$??%02X, X", "$%02X%02X, X")  /* Absolute, X */ \
+X(ABSY, 3, "abs, Y", "$??%02X, Y", "$%02X%02X, Y")  /* Absolute, Y */ \
 \
 /* Stack */ \
-X(PSH, 1)   /* Push */ \
-X(PLL, 1)   /* Pull */ \
+X(PSH, 1, "sp", "$%02X")    /* Push */ \
+X(PLL, 1, "sp", "$%02X")    /* Pull */ \
 \
 /* Branch */ \
-X(BCH, 2)   /* Relative branch */ \
+X(BCH, 2, "rel", "%04d")    /* Relative branch */ \
 \
 /* Jumps */ \
-X(JSR, 3)   /* Jump to subroutine, */ \
-X(RTS, 1)   /* Return from subroutine */ \
-X(JABS, 3)  /* Absolute jump */ \
-X(JIND, 3)  /* Indirect jump */ \
+X(JSR, 3, "abs", "$??%02X", "$%02X%02X")        /* Jump to subroutine, */ \
+X(RTS, 1, "imp", "")                            /* Return from subroutine */ \
+X(JABS, 3, "abs", "$??%02X", "$%02X%02X")       /* Absolute jump */ \
+X(JIND, 3, "(abs)", "($??%02X)", "($%02X%02X)") /* Indirect jump */ \
 \
 /* Interrupts */ \
-X(BRK, 1)   /* Break, interrupt, reset */ \
-X(RTI, 1)   /* Return from interrupt */
+X(BRK, 1, "abs", "$??%02X", "$%02X%02X")    /* Break, interrupt, reset */ \
+X(RTI, 1, "imp", "")                        /* Return from interrupt */
 
 enum inst {
 #define X(i) IN_##i,
@@ -123,7 +123,7 @@ enum inst {
 };
 
 enum addrmode {
-#define X(i, b) AM_##i,
+#define X(i, b, ...) AM_##i,
     DEC_ADDRMODE_X
 #undef X
 };

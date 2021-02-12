@@ -53,8 +53,8 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
         if (count < 0) return DIS_FMT_FAIL;
 
         // TODO: pretend unk operand is
-        // indirect absolute address (longest operand in chars)
-        count = sprintf(dis + count, "UNK ($%04X)", batowr(dispc + 1));
+        // absolute indexed address (longest operand in chars)
+        count = sprintf(dis + count, "UNK $%04X, X", batowr(dispc + 1));
         if (count < 0) return DIS_FMT_FAIL;
 
         total += count;
@@ -93,8 +93,8 @@ int dis_datapath(uint8_t opcode, uint16_t operand, uint8_t cycle,
         }
     } else {
         // TODO: pretend unk operand is
-        // indirect absolute address (longest operand in chars)
-        count = sprintf(dis, "UNK ($%04X)", operand);
+        // absolute indexed address (longest operand in chars)
+        count = sprintf(dis, "UNK $%04X, X", operand);
         if (count < 0) return DIS_FMT_FAIL;
     }
     assert((unsigned int)count < DIS_MNEM_SIZE);

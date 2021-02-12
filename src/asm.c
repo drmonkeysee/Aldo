@@ -54,7 +54,7 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
 
         // TODO: pretend unk operand is
         // absolute indexed address (longest operand in chars)
-        count = sprintf(dis + count, "UNK $%04X, X", batowr(dispc + 1));
+        count = sprintf(dis + count, "UNK $%04X,X", batowr(dispc + 1));
         if (count < 0) return DIS_FMT_FAIL;
 
         total += count;
@@ -91,7 +91,7 @@ int dis_datapath(const struct console_state *snapshot,
     } else {
         // TODO: pretend unk operand is
         // absolute indexed address (longest operand in chars)
-        count = sprintf(dis, "UNK $%02X%02X, X", snapshot->cpu.databus,
+        count = sprintf(dis, "UNK $%02X%02X,X", snapshot->cpu.databus,
                         snapshot->cpu.addrlow_latch);
         if (count < 0) return DIS_FMT_FAIL;
     }

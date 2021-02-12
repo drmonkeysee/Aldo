@@ -179,9 +179,9 @@ static void drawdatapath(const struct console_state *snapshot)
                       *const restrict right = "\u2192",
                       *const restrict up = "\u2191",
                       *const restrict down = "\u2193";
-    static const int vsep1 = 1, vsep2 = 9, vsep3 = 24, vsep4 = 30;
+    static const int vsep1 = 1, vsep2 = 9, vsep3 = 23, vsep4 = 29;
 
-    const int w = getmaxx(DatapathView.content), line_x = w / 4;
+    const int w = getmaxx(DatapathView.content), line_x = (w / 4) + 1;
     int cursor_y = 0;
 
     drawline(snapshot->lines.ready, cursor_y, line_x, 1, down, "RDY");
@@ -294,7 +294,7 @@ static void ramrefresh(void)
 
 void ui_init(void)
 {
-    static const int col1w = 32, col2w = 35, col3w = 36, col4w = 56, hwh = 12,
+    static const int col1w = 32, col2w = 34, col3w = 35, col4w = 56, hwh = 12,
                      cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");

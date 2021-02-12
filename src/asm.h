@@ -13,8 +13,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define DIS_INST_SIZE 32u   // Disassembled instruction is at most 31 chars
-#define DIS_MNEM_SIZE 13u   // Disassembled mnemonic is at most 12 chars
+#define DIS_INST_SIZE 31u   // Disassembled instruction is at most 30 chars
+#define DIS_MNEM_SIZE 12u   // Disassembled mnemonic is at most 11 chars
 
 // X(symbol, value, error string)
 #define DIS_ERRCODE_X \

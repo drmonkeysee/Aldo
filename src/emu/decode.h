@@ -117,13 +117,13 @@ X(BRK, 1, "abs", "$??%02X", "$%02X%02X")        /* Break, interrupt, reset */ \
 X(RTI, 1, "imp", "")                            /* Return from interrupt */
 
 enum inst {
-#define X(i) IN_##i,
+#define X(s) IN_##s,
     DEC_INST_X
 #undef X
 };
 
 enum addrmode {
-#define X(i, b, ...) AM_##i,
+#define X(s, b, ...) AM_##s,
     DEC_ADDRMODE_X
 #undef X
 };

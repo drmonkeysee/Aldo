@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 static const char *restrict const Mnemonics[] = {
-#define X(i) #i,
+#define X(s) #s,
     DEC_INST_X
 #undef X
 };
@@ -67,7 +67,7 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
 const char *dis_errstr(int error)
 {
     switch (error) {
-#define X(i, v, s) case DIS_##i: return s;
+#define X(s, v, e) case DIS_##s: return e;
     DIS_ERRCODE_X
 #undef X
     default:

@@ -22,7 +22,7 @@ X(FMT_FAIL, -1, "OUTPUT FAIL") \
 X(EOF, -2, "UNEXPECTED EOF")
 
 enum {
-#define X(i, v, s) DIS_##i = v,
+#define X(s, v, e) DIS_##s = v,
     DIS_ERRCODE_X
 #undef X
 };

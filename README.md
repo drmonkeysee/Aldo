@@ -24,7 +24,7 @@ The Homebrew and ncurses steps get you the latest version of ncurses and are opt
 
 ## Resources
 
-- [Nesdev Wiki](http://wiki.nesdev.com/w/index.php/Nesdev_Wiki)
+- [Nesdev Wiki](https://wiki.nesdev.com/w/index.php/Nesdev_Wiki)
 - [One Lone Coder](https://www.youtube.com/c/javidx9)
 - [6502.org](http://6502.org)
 - [Programming the 6502, 4th Edition](https://archive.org/details/Programming_the_6502_OCR)

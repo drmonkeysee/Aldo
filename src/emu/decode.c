@@ -10,6 +10,8 @@
 #define UNK {IN_UNK, AM_IMP}
 
 // TODO: fill this out
+// Decoding table for all official MOS 6502
+// and unofficial Ricoh 2A03 opcodes.
 const struct decoded Decode[] = {
     UNK,    // 00 - BRK
     UNK,    // 01 - ORA (zp,X)

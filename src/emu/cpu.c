@@ -14,6 +14,9 @@
 #include <assert.h>
 #include <stddef.h>
 
+// NOTE: sentinel value for cycle count denoting an imminent opcode fetch
+static const int PreFetch = -1;
+
 static bool read(struct mos6502 *self)
 {
     if (self->addrbus <= CpuRamMaxAddr) {
@@ -25,11 +28,6 @@ static bool read(struct mos6502 *self)
         return true;
     }
     return false;
-}
-
-static void setpc(struct mos6502 *self, uint8_t lo, uint8_t hi)
-{
-    self->pc = bytowr(lo, hi);
 }
 
 static uint8_t get_p(const struct mos6502 *self)
@@ -65,7 +63,7 @@ static void set_p(struct mos6502 *self, uint8_t p)
 static void UNK_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    self->end = true;
+    self->idone = true;
 }
 
 static void ADC_exec(struct mos6502 *self, struct decoded dec)
@@ -237,7 +235,7 @@ static void NOP_exec(struct mos6502 *self, struct decoded dec)
 {
     // NOP does nothing!
     (void)dec;
-    self->end = true;
+    self->idone = true;
 }
 
 static void ORA_exec(struct mos6502 *self, struct decoded dec)
@@ -502,14 +500,16 @@ void cpu_powerup(struct mos6502 *self)
 {
     assert(self != NULL);
 
+    self->a = self->x = self->y = self->s = 0;
     // NOTE: set B, I, and unused flags high
     set_p(self, 0x34);
-    self->a = self->x = self->y = self->s = 0;
+
+    self->t = PreFetch;
 
     // NOTE: Interrupts are inverted, high means no interrupt; rw high is read
     self->signal.irq = self->signal.nmi = self->signal.res = self->signal.rw
         = true;
-    self->signal.rdy = self->signal.sync = false;
+    self->signal.rdy = self->signal.sync = self->idone = false;
 
     // NOTE: all other cpu elements are indeterminate on powerup
 }
@@ -531,7 +531,7 @@ void cpu_reset(struct mos6502 *self)
     self->adl = self->databus;
     self->addrbus = ResetVector + 1;
     read(self);
-    setpc(self, self->adl, self->databus);
+    self->pc = bytowr(self->adl, self->databus);
 
     self->p.i = true;
     // NOTE: Reset runs through same sequence as BRK/IRQ
@@ -539,7 +539,7 @@ void cpu_reset(struct mos6502 *self)
     // on powerup this would result in $00 - $3 = $FD.
     self->s -= 3;
 
-    self->end = true;
+    self->idone = true;
 }
 
 int cpu_clock(struct mos6502 *self, int maxcycles)
@@ -548,11 +548,9 @@ int cpu_clock(struct mos6502 *self, int maxcycles)
 
     if (!self->signal.rdy) return 0;
 
-    if (self->end) {
-        self->end = false;
-        // NOTE: set t to -1 on new instruction;
-        // auto-increment will start current cycle on T0.
-        self->t = -1;
+    if (self->idone) {
+        self->idone = false;
+        self->t = PreFetch;
     }
 
     int cycles = 0;
@@ -587,7 +585,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
 
     snapshot->cpu.addressbus = self->addrbus;
     if (self->signal.sync) {
-        snapshot->cpu.instaddr = self->addrbus;
+        snapshot->cpu.currinst = self->addrbus;
     }
     snapshot->cpu.addrlow_latch = self->adl;
     snapshot->cpu.databus = self->databus;

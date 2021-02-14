@@ -111,7 +111,7 @@ static void drawrom(const struct console_state *snapshot)
     getmaxyx(RomView.content, h, w);
     char disassembly[DIS_INST_SIZE];
 
-    uint16_t addr = snapshot->cpu.instaddr;
+    uint16_t addr = snapshot->cpu.currinst;
     for (int i = 0, bytes = 0; i < h - vector_offset; ++i) {
         addr += bytes;
         const size_t cart_offset = addr & CpuCartAddrMask;

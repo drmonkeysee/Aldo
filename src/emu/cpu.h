@@ -41,8 +41,6 @@ struct mos6502 {
             opc,        // Opcode
             adl;        // Address low latch (held when loading address high)
     int8_t t;           // Instruction sequence cycle (T0, T1, T2...)
-    bool end;           // Current instruction ended on this cycle;
-                        // the next cycle will be an opcode fetch (T0).
     struct {
         bool irq: 1,    // Maskable Interrupt Signal (input, inverted)
              nmi: 1,    // Nonmaskable Interrupt Signal (input, inverted)
@@ -55,6 +53,11 @@ struct mos6502 {
     // Buses: external components connected to the CPU pins
     uint8_t *ram,       // RAM Bus
             *cart;      // TODO: temp pointer to fake cartridge
+
+    // Internals: control flags and other helper fields that do
+    // not correspond directly to actual CPU components.
+    bool idone;         // Instruction completed on this cycle;
+                        // the next cycle will be an opcode fetch (T0).
 };
 
 void cpu_powerup(struct mos6502 *self);

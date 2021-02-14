@@ -112,17 +112,22 @@ static void drawrom(const struct console_state *snapshot)
     char disassembly[DIS_INST_SIZE];
 
     uint16_t addr = snapshot->cpu.currinst;
-    for (int i = 0, bytes = 0; i < h - vector_offset; ++i) {
-        addr += bytes;
-        const size_t cart_offset = addr & CpuCartAddrMask;
-        bytes = dis_inst(addr, snapshot->rom + cart_offset,
-                         ROM_SIZE - cart_offset, disassembly);
-        if (bytes == 0) break;
-        if (bytes < 0) {
-            mvwaddstr(RomView.content, i, 0, dis_errstr(bytes));
-            break;
+    // NOTE: on startup currinst is probably outside ROM range
+    if (addr < CpuCartMinAddr) {
+        mvwaddstr(RomView.content, 0, 0, "OUT OF ROM RANGE");
+    } else {
+        for (int i = 0, bytes = 0; i < h - vector_offset; ++i) {
+            addr += bytes;
+            const size_t cart_offset = addr & CpuCartAddrMask;
+            bytes = dis_inst(addr, snapshot->rom + cart_offset,
+                             ROM_SIZE - cart_offset, disassembly);
+            if (bytes == 0) break;
+            if (bytes < 0) {
+                mvwaddstr(RomView.content, i, 0, dis_errstr(bytes));
+                break;
+            }
+            mvwaddstr(RomView.content, i, 0, disassembly);
         }
-        mvwaddstr(RomView.content, i, 0, disassembly);
     }
 
     drawvecs(h, w, vector_offset, snapshot);

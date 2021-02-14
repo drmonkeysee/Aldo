@@ -19,4 +19,4 @@ const uint16_t
     ResetVector = 0xfffc,
     IrqVector = 0xfffe;
 
-const uint8_t MaxCycleCount = 6;
+const uint8_t MaxCycleCount = 7;

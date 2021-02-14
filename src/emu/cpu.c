@@ -483,6 +483,8 @@ static void RTI_sequence(struct mos6502 *self, struct decoded dec)
 
 static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
 {
+    assert(0 < self->t && self->t < MaxCycleCount);
+
     switch (dec.mode) {
 #define X(s, b, ...) case AM_ENUM(s): s##_sequence(self, dec); break;
         DEC_ADDRMODE_X
@@ -525,7 +527,7 @@ void cpu_reset(struct mos6502 *self)
 
     // TODO: fake the execution of the RES sequence and load relevant
     // data into the datapath.
-    self->t = MaxCycleCount;
+    self->t = MaxCycleCount - 1;
     self->addrbus = ResetVector;
     read(self);
     self->adl = self->databus;

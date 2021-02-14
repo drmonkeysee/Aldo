@@ -10,7 +10,7 @@
 #define UNK {IN_UNK, AM_IMP}
 
 // TODO: fill this out
-// Decoding table for all official MOS 6502
+// Decoding table for all official MOS6502
 // and unofficial Ricoh 2A03 opcodes.
 const struct decoded Decode[] = {
     // TODO: pretend 00 opcode takes 3 bytes to test UI layout

@@ -195,7 +195,7 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwvline(DatapathView.content, cursor_y, vsep3, 0, 3);
     mvwvline(DatapathView.content, cursor_y, vsep4, 0, 3);
     char buf[DIS_DATAP_SIZE];
-    int wlen = dis_datapath(snapshot, buf);
+    const int wlen = dis_datapath(snapshot, buf);
     // NOTE: only update datapath instruction display
     // if something useful was disasm'ed.
     if (wlen != 0) {

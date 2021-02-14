@@ -25,14 +25,16 @@ static const int InstLens[] = {
 #undef X
 };
 
-#define X(s, b, ...) static const char *restrict const s##_StringTable[] = { \
+#define STRTABLE(s) s##_StringTable
+
+#define X(s, b, ...) static const char *restrict const STRTABLE(s)[] = { \
     __VA_ARGS__ \
 };
     DEC_ADDRMODE_X
 #undef X
 
 static const char *restrict const *const StringTables[] = {
-#define X(s, b, ...) s##_StringTable,
+#define X(s, b, ...) STRTABLE(s),
     DEC_ADDRMODE_X
 #undef X
 };
@@ -72,10 +74,25 @@ static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
         count = sprintf(dis + total, strtable[2], batowr(dispc + 1));
         break;
     default:
-        return DIS_INV_ADDRM;
+        return DIS_INV_ADDRMD;
     }
     if (count < 0) return DIS_FMT_FAIL;
     return total + count;
+}
+
+//
+// Public Interface
+//
+
+const char *dis_errstr(int error)
+{
+    switch (error) {
+#define X(s, v, e) case s: return e;
+        ASM_ERRCODE_X
+#undef X
+    default:
+        return "UNKNOWN ERR";
+    }
 }
 
 int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
@@ -109,17 +126,6 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
     return instlen;
 }
 
-const char *dis_errstr(int error)
-{
-    switch (error) {
-#define X(s, v, e) case DIS_##s: return e;
-    DIS_ERRCODE_X
-#undef X
-    default:
-        return "UNKNOWN ERR";
-    }
-}
-
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE])
 {
@@ -151,7 +157,7 @@ int dis_datapath(const struct console_state *snapshot,
                                snapshot->cpu.databus));
         break;
     default:
-        return DIS_INV_DISPCYC;
+        return DIS_INV_DSPCYC;
     }
     if (count < 0) return DIS_FMT_FAIL;
     total += count;

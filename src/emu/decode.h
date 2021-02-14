@@ -86,7 +86,7 @@ X(TXS)  /* Transfer x index to stack pointer */ \
 X(TYA)  /* Transfer y index to accumulator */
 
 // Addressing Modes
-// X(symbol, byte count, display strings)
+// X(symbol, byte count, display strings...)
 #define DEC_ADDRMODE_X \
 X(IMP, 1, "imp", "")                        /* Implied */ \
 X(IMM, 2, "imm", "#$%02X")                  /* Immediate */ \

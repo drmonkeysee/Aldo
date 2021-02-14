@@ -13,10 +13,10 @@
 // CPU Memory Map
 #define RAM_SIZE 0x800u     // 2 KB CPU RAM
 #define ROM_SIZE 0x8000u    // 32 KB Fake ROM
-extern const uint16_t CpuRamMaxAddr, CpuRamAddrMask, CpuCartMinAddr,
-                      CpuCartMaxAddr, CpuCartAddrMask;
+extern const uint16_t
+CpuRamMaxAddr, CpuRamAddrMask, CpuCartMinAddr, CpuCartMaxAddr, CpuCartAddrMask,
 
 // Interrupt Vectors
-extern const uint16_t NmiVector, ResetVector, IrqVector;
+NmiVector, ResetVector, IrqVector;
 
 #endif

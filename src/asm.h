@@ -19,7 +19,9 @@
 // X(symbol, value, error string)
 #define DIS_ERRCODE_X \
 X(FMT_FAIL, -1, "OUTPUT FAIL") \
-X(EOF, -2, "UNEXPECTED EOF")
+X(EOF, -2, "UNEXPECTED EOF") \
+X(INV_ADDRM, -3, "INVALID ADDRMODE") \
+X(INV_DISPCYC, -4, "INVALID DISPLAY CYCLE")
 
 enum {
 #define X(s, v, e) DIS_##s = v,

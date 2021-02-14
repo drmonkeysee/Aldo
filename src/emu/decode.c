@@ -13,7 +13,8 @@
 // Decoding table for all official MOS 6502
 // and unofficial Ricoh 2A03 opcodes.
 const struct decoded Decode[] = {
-    UNK,    // 00 - BRK
+    // TODO: pretend 00 opcode takes 3 bytes to test UI layout
+    {IN_UNK, AM_ABSX},    // 00 - BRK
     UNK,    // 01 - ORA (zp,X)
     UNK,    // 02 - Unofficial
     UNK,    // 03 - Unofficial
@@ -247,7 +248,7 @@ const struct decoded Decode[] = {
     UNK,    // E7 - Unofficial
     UNK,    // E8 - INX
     UNK,    // E9 - SBC imm
-    UNK,    // EA - NOP
+    {IN_NOP, AM_IMP},    // EA - NOP
     UNK,    // EB - Unofficial
     UNK,    // EC - CPX abs
     UNK,    // ED - SBC abs

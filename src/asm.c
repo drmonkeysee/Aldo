@@ -19,9 +19,23 @@ static const char *restrict const Mnemonics[] = {
 #undef X
 };
 
-static const char *restrict const DiscardedData = "\u2205";
+static const int InstLens[] = {
+#define X(s, b, ...) b,
+    DEC_ADDRMODE_X
+#undef X
+};
 
-// TODO: get rid of this redundant logic between the two dis functions
+#define X(s, b, ...) static const char *restrict const s##_StringTable[] = { \
+    __VA_ARGS__ \
+};
+    DEC_ADDRMODE_X
+#undef X
+
+static const char *restrict const *const StringTables[] = {
+#define X(s, b, ...) s##_StringTable,
+    DEC_ADDRMODE_X
+#undef X
+};
 
 int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE])
@@ -32,36 +46,49 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
 
     if (bytesleft == 0) return 0;
 
-    const uint8_t instruction = *dispc;
+    const uint8_t opcode = *dispc;
+    const struct decoded dec = Decode[opcode];
+    const int instlen = InstLens[dec.mode];
+    if (bytesleft < instlen) return DIS_EOF;
+
     int count;
     unsigned int total;
-    if (instruction == 0xea) {
-        total = count = sprintf(dis, "$%04X: %02X          ", addr,
-                                instruction);
-        if (count < 0) return DIS_FMT_FAIL;
+    total = count = sprintf(dis, "$%04X: ", addr);
+    if (count < 0) return DIS_FMT_FAIL;
 
-        count = sprintf(dis + count, "NOP");
+    for (int i = 0; i < instlen; ++i) {
+        count = sprintf(dis + total, "%02X ", *(dispc + i));
         if (count < 0) return DIS_FMT_FAIL;
-
         total += count;
-        assert(total < DIS_INST_SIZE);
-        return 1;
-    } else {
-        if (bytesleft < 3) return DIS_EOF;
-        total = count = sprintf(dis, "$%04X: %02X %02X %02X    ", addr,
-                                instruction, *(dispc + 1), *(dispc + 2));
-        if (count < 0) return DIS_FMT_FAIL;
-
-        // TODO: pretend unk operand is
-        // absolute indexed address (longest operand in chars)
-        count = sprintf(dis + count, "UNK $%04X,X", batowr(dispc + 1));
-        if (count < 0) return DIS_FMT_FAIL;
-
-        total += count;
-        assert(total < DIS_INST_SIZE);
-        // TODO: pretend UNK instruction takes 3 bytes to test UI layout
-        return 3;
     }
+    // Padding between raw bytes and disassembled instruction
+    count = sprintf(dis + total, "%*s", (4 - instlen) * 3, "");
+    if (count < 0) return DIS_FMT_FAIL;
+    total += count;
+
+    count = sprintf(dis + total, "%s ", Mnemonics[dec.instruction]);
+    if (count < 0) return DIS_FMT_FAIL;
+    total += count;
+
+    const char *restrict const *const strtable = StringTables[dec.mode];
+    switch (instlen) {
+    case 1:
+        count = sprintf(dis + total, "%s", strtable[1]);
+        break;
+    case 2:
+        count = sprintf(dis + total, strtable[1], *(dispc + 1));
+        break;
+    case 3:
+        count = sprintf(dis + total, strtable[2], batowr(dispc + 1));
+        break;
+    default:
+        return DIS_INV_ADDRM;
+    }
+    if (count < 0) return DIS_FMT_FAIL;
+    total += count;
+
+    assert(total < DIS_INST_SIZE);
+    return instlen;
 }
 
 const char *dis_errstr(int error)
@@ -80,21 +107,32 @@ int dis_datapath(const struct console_state *snapshot,
 {
     assert(dis != NULL);
 
-    int count;
-    if (snapshot->cpu.opcode == 0xea) {
-        count = sprintf(dis, "NOP");
-        if (count < 0) return DIS_FMT_FAIL;
-        if (snapshot->cpu.sequence_cycle == 1) {
-            count = sprintf(dis + count, " %s", DiscardedData);
-            if (count < 0) return DIS_FMT_FAIL;
-        }
-    } else {
-        // TODO: pretend unk operand is
-        // absolute indexed address (longest operand in chars)
-        count = sprintf(dis, "UNK $%02X%02X,X", snapshot->cpu.databus,
-                        snapshot->cpu.addrlow_latch);
-        if (count < 0) return DIS_FMT_FAIL;
+    // NOTE: stop updating datapath display after max possible bytes
+    // have been read for instruction-decoding
+    if (snapshot->cpu.sequence_cycle > 2) return 0;
+
+    const struct decoded dec = Decode[snapshot->cpu.opcode];
+    int count = sprintf(dis, "%s ", Mnemonics[dec.instruction]);
+    if (count < 0) return DIS_FMT_FAIL;
+
+    const char *const displaystr = StringTables[dec.mode]
+                                               [snapshot->cpu.sequence_cycle];
+    switch (snapshot->cpu.sequence_cycle) {
+    case 0:
+        count = sprintf(dis + count, "%s", displaystr);
+        break;
+    case 1:
+        count = sprintf(dis + count, displaystr, snapshot->cpu.databus);
+        break;
+    case 2:
+        count = sprintf(dis + count, displaystr,
+                        bytowr(snapshot->cpu.addrlow_latch,
+                               snapshot->cpu.databus));
+        break;
+    default:
+        return DIS_INV_DISPCYC;
     }
+
     assert((unsigned int)count < DIS_MNEM_SIZE);
     return count;
 }

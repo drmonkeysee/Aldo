@@ -196,8 +196,12 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwvline(DatapathView.content, cursor_y, vsep4, 0, 3);
     char buf[DIS_MNEM_SIZE];
     int wlen = dis_datapath(snapshot, buf);
-    const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
-    mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);
+    // NOTE: only update datapath instruction display
+    // if something useful was disasm'ed.
+    if (wlen != 0) {
+        const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
+        mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);
+    }
 
     mvwaddstr(DatapathView.content, ++cursor_y, 0, left);
     mvwprintw(DatapathView.content, cursor_y, vsep1 + 2, "$%04X",

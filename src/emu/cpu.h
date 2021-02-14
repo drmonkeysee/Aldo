@@ -55,7 +55,7 @@ struct mos6502 {
             *cart;      // TODO: temp pointer to fake cartridge
 
     // Internals: control flags and other helper fields that do
-    // not correspond directly to actual CPU components.
+    // not correspond directly to CPU components.
     bool idone;         // Instruction completed on this cycle;
                         // the next cycle will be an opcode fetch (T0).
 };

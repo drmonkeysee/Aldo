@@ -19,4 +19,7 @@ CpuRamMaxAddr, CpuRamAddrMask, CpuCartMinAddr, CpuCartMaxAddr, CpuCartAddrMask,
 // Interrupt Vectors
 NmiVector, ResetVector, IrqVector;
 
+// Instruction Constants
+extern const uint8_t MaxCycleCount;
+
 #endif

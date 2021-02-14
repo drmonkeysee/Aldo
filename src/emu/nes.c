@@ -62,9 +62,14 @@ void nes_powerup(nes *self, size_t sz, const uint8_t prg[restrict sz])
     cpu_reset(&self->cpu);
 }
 
-void nes_cycle(nes *self)
+int nes_cycle(nes *self)
 {
     assert(self != NULL);
+
+    self->cpu.signal.rdy = true;
+    const int cycles = cpu_clock(&self->cpu, 1);
+    self->cpu.signal.rdy = false;
+    return cycles;
 }
 
 int nes_step(nes *self)
@@ -74,9 +79,11 @@ int nes_step(nes *self)
     return 0;
 }
 
-void nes_clock(nes *self)
+int nes_clock(nes *self)
 {
     assert(self != NULL);
+
+    return 0;
 }
 
 void nes_snapshot(nes *self, struct console_state *snapshot)

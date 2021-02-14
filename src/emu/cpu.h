@@ -39,8 +39,10 @@ struct mos6502 {
     uint16_t addrbus;   // Word put on the address pins on clock phase ϕ1
     uint8_t databus,    // Byte put on the data pins on clock phase ϕ2
             opc,        // Opcode
-            adl,        // Address low latch (held when loading address high)
-            t;          // Instruction sequence cycle (T0, T1, T2...)
+            adl;        // Address low latch (held when loading address high)
+    int8_t t;           // Instruction sequence cycle (T0, T1, T2...)
+    bool end;           // Current instruction ended on this cycle;
+                        // the next cycle will be an opcode fetch (T0).
     struct {
         bool irq: 1,    // Maskable Interrupt Signal (input, inverted)
              nmi: 1,    // Nonmaskable Interrupt Signal (input, inverted)
@@ -57,6 +59,7 @@ struct mos6502 {
 
 void cpu_powerup(struct mos6502 *self);
 void cpu_reset(struct mos6502 *self);
+int cpu_clock(struct mos6502 *self, int maxcycles);
 
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot);
 

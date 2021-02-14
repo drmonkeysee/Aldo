@@ -111,7 +111,7 @@ static void drawrom(const struct console_state *snapshot)
     getmaxyx(RomView.content, h, w);
     char disassembly[DIS_INST_SIZE];
 
-    uint16_t addr = snapshot->cpu.program_counter;
+    uint16_t addr = snapshot->cpu.instaddr;
     for (int i = 0, bytes = 0; i < h - vector_offset; ++i) {
         addr += bytes;
         const size_t cart_offset = addr & CpuCartAddrMask;
@@ -211,8 +211,9 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwaddstr(DatapathView.content, cursor_y, vsep4 + 1,
               snapshot->lines.readwrite ? left : right);
 
-    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "%*sT%u",
-              snapshot->cpu.exec_cycle, "", snapshot->cpu.exec_cycle);
+    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "%*sT%u%*s",
+              snapshot->cpu.exec_cycle, "", snapshot->cpu.exec_cycle,
+              MaxCycleCount - snapshot->cpu.exec_cycle, "");
 
     mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
 

@@ -33,7 +33,7 @@ int aldo_run(void)
         const int c = ui_pollinput();
         switch (c) {
         case ' ':
-            total_cycles += nes_step(console);
+            total_cycles += nes_cycle(console);
             break;
         case 'b':
             ui_ram_prev();

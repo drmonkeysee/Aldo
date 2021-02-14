@@ -13,26 +13,21 @@
 #include <assert.h>
 #include <stddef.h>
 
-static bool read(const struct mos6502 *self, uint16_t addr,
-                 uint8_t *restrict data)
+static bool read(struct mos6502 *self)
 {
-    if (addr <= CpuRamMaxAddr) {
-        *data = self->ram[addr & CpuRamAddrMask];
+    if (self->addrbus <= CpuRamMaxAddr) {
+        self->databus = self->ram[self->addrbus & CpuRamAddrMask];
         return true;
     }
-    if (CpuCartMinAddr <= addr && addr <= CpuCartMaxAddr) {
-        *data = self->cart[addr & CpuCartAddrMask];
+    if (CpuCartMinAddr <= self->addrbus && self->addrbus <= CpuCartMaxAddr) {
+        self->databus = self->cart[self->addrbus & CpuCartAddrMask];
         return true;
     }
     return false;
 }
 
-static void reset_pc(struct mos6502 *self)
+static void setpc(struct mos6502 *self, uint8_t lo, uint8_t hi)
 {
-    // TODO: what to do if read returns false?
-    uint8_t lo, hi;
-    read(self, ResetVector, &lo);
-    read(self, ResetVector + 1, &hi);
     self->pc = bytowr(lo, hi);
 }
 
@@ -91,20 +86,51 @@ void cpu_reset(struct mos6502 *self)
     // TODO: reset sequence begins after reset signal goes from low to high
     self->signal.res = true;
 
-    reset_pc(self);
+    // TODO: fake the execution of the RES sequence and load relevant
+    // data into the datapath.
+    self->t = MaxCycleCount;
+    self->addrbus = ResetVector;
+    read(self);
+    self->adl = self->databus;
+    self->addrbus = ResetVector + 1;
+    read(self);
+    setpc(self, self->adl, self->databus);
+
     self->p.i = true;
     // NOTE: Reset runs through same sequence as BRK/IRQ
     // so the cpu does 3 phantom stack pushes;
     // on powerup this would result in $00 - $3 = $FD.
     self->s -= 3;
 
-    // TODO: fake the execution of the RES sequence and load relevant
-    // data into the datapath.
-    self->t = 0;
-    self->signal.sync = true;
-    self->addrbus = self->pc;
-    read(self, self->pc, &self->databus);
-    self->opc = self->databus;
+    self->end = true;
+}
+
+int cpu_clock(struct mos6502 *self, int maxcycles)
+{
+    assert(self != NULL);
+
+    if (!self->signal.rdy) return 0;
+
+    if (self->end) {
+        self->end = false;
+        // set t to -1 on new instruction;
+        // auto-increment will start current cycle on T0.
+        self->t = -1;
+    }
+
+    int cycles = 0;
+    while (cycles < maxcycles) {
+        switch (++self->t) {
+        case 0:
+            // NOTE: T0 is always an opcode fetch
+            self->signal.sync = self->signal.rw = true;
+            self->addrbus = self->pc++;
+            read(self);
+            self->opc = self->databus;
+            ++cycles;
+        }
+    }
+    return cycles;
 }
 
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
@@ -120,6 +146,9 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.yindex = self->y;
 
     snapshot->cpu.addressbus = self->addrbus;
+    if (self->signal.sync) {
+        snapshot->cpu.instaddr = self->addrbus;
+    }
     snapshot->cpu.addrlow_latch = self->adl;
     snapshot->cpu.databus = self->databus;
     snapshot->cpu.exec_cycle = self->t;

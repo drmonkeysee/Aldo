@@ -44,11 +44,11 @@ static int print_raw(uint16_t addr, const uint8_t *dispc, int instlen,
 {
     int total, count;
     total = count = sprintf(dis, "$%04X: ", addr);
-    if (count < 0) return DIS_FMT_FAIL;
+    if (count < 0) return ASM_FMT_FAIL;
 
     for (int i = 0; i < instlen; ++i) {
         count = sprintf(dis + total, "%02X ", *(dispc + i));
-        if (count < 0) return DIS_FMT_FAIL;
+        if (count < 0) return ASM_FMT_FAIL;
         total += count;
     }
 
@@ -60,7 +60,7 @@ static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
 {
     int total, count;
     total = count = sprintf(dis, "%s ", Mnemonics[dec->instruction]);
-    if (count < 0) return DIS_FMT_FAIL;
+    if (count < 0) return ASM_FMT_FAIL;
 
     const char *restrict const *const strtable = StringTables[dec->mode];
     switch (instlen) {
@@ -74,9 +74,9 @@ static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
         count = sprintf(dis + total, strtable[2], batowr(dispc + 1));
         break;
     default:
-        return DIS_INV_ADDRMD;
+        return ASM_INV_ADDRMD;
     }
-    if (count < 0) return DIS_FMT_FAIL;
+    if (count < 0) return ASM_FMT_FAIL;
     return total + count;
 }
 
@@ -106,7 +106,7 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
 
     const struct decoded dec = Decode[*dispc];
     const int instlen = InstLens[dec.mode];
-    if (bytesleft < instlen) return DIS_EOF;
+    if (bytesleft < instlen) return ASM_EOF;
 
     int count;
     unsigned int total;
@@ -115,7 +115,7 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
 
     // Padding between raw bytes and disassembled instruction
     count = sprintf(dis + total, "%*s", (4 - instlen) * 3, "");
-    if (count < 0) return DIS_FMT_FAIL;
+    if (count < 0) return ASM_FMT_FAIL;
     total += count;
 
     count = print_mnemonic(&dec, dispc, instlen, dis + total);
@@ -140,7 +140,7 @@ int dis_datapath(const struct console_state *snapshot,
     int count;
     unsigned int total;
     total = count = sprintf(dis, "%s ", Mnemonics[dec.instruction]);
-    if (count < 0) return DIS_FMT_FAIL;
+    if (count < 0) return ASM_FMT_FAIL;
 
     const char *const displaystr = StringTables[dec.mode]
                                                [snapshot->cpu.exec_cycle];
@@ -157,9 +157,9 @@ int dis_datapath(const struct console_state *snapshot,
                                snapshot->cpu.databus));
         break;
     default:
-        return DIS_INV_DSPCYC;
+        return ASM_INV_DSPCYC;
     }
-    if (count < 0) return DIS_FMT_FAIL;
+    if (count < 0) return ASM_FMT_FAIL;
     total += count;
 
     assert(total < DIS_DATAP_SIZE);

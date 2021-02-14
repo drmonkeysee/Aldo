@@ -14,7 +14,7 @@
 #include <stdint.h>
 
 #define DIS_INST_SIZE 31u   // Disassembled instruction is at most 30 chars
-#define DIS_MNEM_SIZE 12u   // Disassembled mnemonic is at most 11 chars
+#define DIS_DATAP_SIZE 12u  // Disassembled datapath is at most 11 chars
 
 // X(symbol, value, error string)
 #define DIS_ERRCODE_X \
@@ -37,6 +37,6 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
 const char *dis_errstr(int error);
 
 int dis_datapath(const struct console_state *snapshot,
-                 char dis[restrict static DIS_MNEM_SIZE]);
+                 char dis[restrict static DIS_DATAP_SIZE]);
 
 #endif

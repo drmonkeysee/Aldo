@@ -555,8 +555,8 @@ int cpu_clock(struct mos6502 *self, int cyclebudget)
         self->t = PreFetch;
     }
 
-    int cycles = 0;
-    while (cycles < cyclebudget) {
+    int cycles;
+    for (cycles = 0; cycles < cyclebudget; ++cycles) {
         if (++self->t == 0) {
             // NOTE: T0 is always an opcode fetch
             self->signal.sync = self->signal.rw = true;
@@ -567,7 +567,6 @@ int cpu_clock(struct mos6502 *self, int cyclebudget)
             self->signal.sync = false;
             dispatch_addrmode(self, Decode[self->opc]);
         }
-        ++cycles;
     }
     return cycles;
 }

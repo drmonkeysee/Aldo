@@ -109,15 +109,15 @@ int dis_datapath(const struct console_state *snapshot,
 
     // NOTE: stop updating datapath display after max possible bytes
     // have been read for instruction-decoding
-    if (snapshot->cpu.sequence_cycle > 2) return 0;
+    if (snapshot->cpu.exec_cycle > 2) return 0;
 
     const struct decoded dec = Decode[snapshot->cpu.opcode];
     int count = sprintf(dis, "%s ", Mnemonics[dec.instruction]);
     if (count < 0) return DIS_FMT_FAIL;
 
     const char *const displaystr = StringTables[dec.mode]
-                                               [snapshot->cpu.sequence_cycle];
-    switch (snapshot->cpu.sequence_cycle) {
+                                               [snapshot->cpu.exec_cycle];
+    switch (snapshot->cpu.exec_cycle) {
     case 0:
         count = sprintf(dis + count, "%s", displaystr);
         break;

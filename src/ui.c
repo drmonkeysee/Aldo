@@ -212,7 +212,7 @@ static void drawdatapath(const struct console_state *snapshot)
               snapshot->lines.readwrite ? left : right);
 
     mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "%*sT%u",
-              snapshot->cpu.sequence_cycle, "", snapshot->cpu.sequence_cycle);
+              snapshot->cpu.exec_cycle, "", snapshot->cpu.exec_cycle);
 
     mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
 

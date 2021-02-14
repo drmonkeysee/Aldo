@@ -122,8 +122,8 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.addressbus = self->addrbus;
     snapshot->cpu.addrlow_latch = self->adl;
     snapshot->cpu.databus = self->databus;
+    snapshot->cpu.exec_cycle = self->t;
     snapshot->cpu.opcode = self->opc;
-    snapshot->cpu.sequence_cycle = self->t;
 
     snapshot->lines.irq = self->signal.irq;
     snapshot->lines.nmi = self->signal.nmi;

@@ -50,14 +50,14 @@ struct mos6502 {
              sync: 1;   // SYNC (instruction fetch) Signal (output)
     } signal;
 
-    // Buses: external components connected to the CPU pins
-    uint8_t *ram,       // RAM Bus
-            *cart;      // TODO: temp pointer to fake cartridge
-
     // Internals: control flags and other helper fields that do
     // not correspond directly to CPU components.
     bool idone;         // Instruction completed on this cycle;
                         // the next cycle will be an opcode fetch (T0).
+
+    // Buses: external components connected to the CPU pins
+    uint8_t *ram,       // RAM Bus
+            *cart;      // TODO: temp pointer to fake cartridge
 };
 
 void cpu_powerup(struct mos6502 *self);

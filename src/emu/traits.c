@@ -18,5 +18,3 @@ const uint16_t
     NmiVector = 0xfffa,
     ResetVector = 0xfffc,
     IrqVector = 0xfffe;
-
-const uint8_t MaxCycleCount = 7;

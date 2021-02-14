@@ -109,13 +109,14 @@ static void drawrom(const struct console_state *snapshot)
 
     int h, w;
     getmaxyx(RomView.content, h, w);
-    char disassembly[DIS_INST_SIZE];
+    werase(RomView.content);
 
     uint16_t addr = snapshot->cpu.currinst;
     // NOTE: on startup currinst is probably outside ROM range
     if (addr < CpuCartMinAddr) {
         mvwaddstr(RomView.content, 0, 0, "OUT OF ROM RANGE");
     } else {
+        char disassembly[DIS_INST_SIZE];
         for (int i = 0, bytes = 0; i < h - vector_offset; ++i) {
             addr += bytes;
             const size_t cart_offset = addr & CpuCartAddrMask;
@@ -185,9 +186,12 @@ static void drawdatapath(const struct console_state *snapshot)
                       *const restrict up = "\u2191",
                       *const restrict down = "\u2193";
     static const int vsep1 = 1, vsep2 = 9, vsep3 = 23, vsep4 = 29;
+    // NOTE: static buffer to remember last datapath paint
+    static char buf[DIS_DATAP_SIZE];
 
     const int w = getmaxx(DatapathView.content), line_x = (w / 4) + 1;
     int cursor_y = 0;
+    werase(DatapathView.content);
 
     drawline(snapshot->lines.ready, cursor_y, line_x, 1, down, "RDY");
     drawline(snapshot->lines.sync, cursor_y, line_x * 2, 1, up, "SYNC");
@@ -199,14 +203,9 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwvline(DatapathView.content, cursor_y, vsep2, 0, 3);
     mvwvline(DatapathView.content, cursor_y, vsep3, 0, 3);
     mvwvline(DatapathView.content, cursor_y, vsep4, 0, 3);
-    char buf[DIS_DATAP_SIZE];
     const int wlen = dis_datapath(snapshot, buf);
-    // NOTE: only update datapath instruction display
-    // if something useful was disasm'ed.
-    if (wlen != 0) {
-        const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
-        mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);
-    }
+    const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
+    mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);
 
     mvwaddstr(DatapathView.content, ++cursor_y, 0, left);
     mvwprintw(DatapathView.content, cursor_y, vsep1 + 2, "$%04X",
@@ -216,9 +215,8 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwaddstr(DatapathView.content, cursor_y, vsep4 + 1,
               snapshot->lines.readwrite ? left : right);
 
-    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "%*sT%u%*s",
-              snapshot->cpu.exec_cycle, "", snapshot->cpu.exec_cycle,
-              MaxCycleCount - snapshot->cpu.exec_cycle, "");
+    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "%*sT%u",
+              snapshot->cpu.exec_cycle, "", snapshot->cpu.exec_cycle);
 
     mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
 

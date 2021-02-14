@@ -62,7 +62,7 @@ struct mos6502 {
 
 void cpu_powerup(struct mos6502 *self);
 void cpu_reset(struct mos6502 *self);
-int cpu_clock(struct mos6502 *self, int maxcycles);
+int cpu_clock(struct mos6502 *self, int cyclebudget);
 
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot);
 

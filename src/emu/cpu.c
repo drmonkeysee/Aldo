@@ -544,7 +544,7 @@ void cpu_reset(struct mos6502 *self)
     self->idone = true;
 }
 
-int cpu_clock(struct mos6502 *self, int maxcycles)
+int cpu_clock(struct mos6502 *self, int cyclebudget)
 {
     assert(self != NULL);
 
@@ -556,18 +556,16 @@ int cpu_clock(struct mos6502 *self, int maxcycles)
     }
 
     int cycles = 0;
-    while (cycles < maxcycles) {
+    while (cycles++ < cyclebudget) {
         if (++self->t == 0) {
             // NOTE: T0 is always an opcode fetch
             self->signal.sync = self->signal.rw = true;
             self->addrbus = self->pc++;
             read(self);
             self->opc = self->databus;
-            ++cycles;
         } else {
             self->signal.sync = false;
             dispatch_addrmode(self, Decode[self->opc]);
-            ++cycles;
         }
     }
     return cycles;

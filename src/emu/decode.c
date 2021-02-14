@@ -14,7 +14,7 @@
 // and unofficial Ricoh 2A03 opcodes.
 const struct decoded Decode[] = {
     // TODO: pretend 00 opcode takes 3 bytes to test UI layout
-    {IN_UNK, AM_ABSX},    // 00 - BRK
+    {IN_UNK, AM_ABS},    // 00 - BRK
     UNK,    // 01 - ORA (zp,X)
     UNK,    // 02 - Unofficial
     UNK,    // 03 - Unofficial

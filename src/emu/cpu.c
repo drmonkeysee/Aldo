@@ -8,6 +8,7 @@
 #include "cpu.h"
 
 #include "bytes.h"
+#include "decode.h"
 #include "traits.h"
 
 #include <assert.h>
@@ -55,6 +56,442 @@ static void set_p(struct mos6502 *self, uint8_t p)
     self->p.u = p & 0x20;
     self->p.v = p & 0x40;
     self->p.n = p & 0x80;
+}
+
+//
+// Instruction Execution
+//
+
+static void UNK_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)dec;
+    self->end = true;
+}
+
+static void ADC_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void AND_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void ASL_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void BCC_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void BCS_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void BEQ_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void BIT_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void BMI_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void BNE_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void BPL_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void BRK_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void BVC_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void BVS_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void CLC_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void CLD_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void CLI_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void CLV_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void CMP_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void CPX_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void CPY_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void DEC_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void DEX_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void DEY_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void EOR_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void INC_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void INX_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void INY_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void JMP_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void JSR_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void LDA_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void LDX_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void LDY_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void LSR_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void NOP_exec(struct mos6502 *self, struct decoded dec)
+{
+    // NOP does nothing!
+    (void)dec;
+    self->end = true;
+}
+
+static void ORA_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void PHA_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void PHP_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void PLA_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void PLP_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void ROL_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void ROR_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void RTI_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void RTS_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void SBC_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void SEC_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void SED_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void SEI_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void STA_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void STX_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void STY_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void TAX_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void TAY_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void TSX_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void TXA_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void TXS_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void TYA_exec(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
+{
+    switch (dec.instruction) {
+#define X(s) case IN_ENUM(s): s##_exec(self, dec); break;
+        DEC_INST_X
+#undef X
+    default:
+        assert(((void)"BAD INSTRUCTION DISPATCH", false));
+    }
+}
+
+//
+// Addressing Mode Sequences
+//
+
+#define BAD_ADDR_SEQ assert(((void)"BAD ADDRMODE SEQUENCE", false));
+
+static void IMP_sequence(struct mos6502 *self, struct decoded dec)
+{
+    assert(self->t == 1);
+
+    // NOTE: implied mode dead read
+    read(self);
+    dispatch_instruction(self, dec);
+}
+
+static void IMM_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void ZP_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void ZPX_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void ZPY_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void INDX_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void INDY_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void ABS_sequence(struct mos6502 *self, struct decoded dec)
+{
+    switch (self->t) {
+    case 1:
+        self->addrbus = self->pc++;
+        read(self);
+        self->adl = self->databus;
+        break;
+    case 2:
+        self->addrbus = self->pc++;
+        read(self);
+        break;
+    case 3:
+        self->addrbus = bytowr(self->adl, self->databus);
+        read(self);
+        dispatch_instruction(self, dec);
+        break;
+    default:
+        BAD_ADDR_SEQ;
+    }
+}
+
+static void ABSX_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void ABSY_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void PSH_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void PLL_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void BCH_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void JSR_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void RTS_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void JABS_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void JIND_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void BRK_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void RTI_sequence(struct mos6502 *self, struct decoded dec)
+{
+    (void)self, (void)dec;
+}
+
+static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
+{
+    switch (dec.mode) {
+#define X(s, b, ...) case AM_ENUM(s): s##_sequence(self, dec); break;
+        DEC_ADDRMODE_X
+#undef X
+    default:
+        assert(((void)"BAD ADDRMODE DISPATCH", false));
+    }
 }
 
 //
@@ -113,20 +550,23 @@ int cpu_clock(struct mos6502 *self, int maxcycles)
 
     if (self->end) {
         self->end = false;
-        // set t to -1 on new instruction;
+        // NOTE: set t to -1 on new instruction;
         // auto-increment will start current cycle on T0.
         self->t = -1;
     }
 
     int cycles = 0;
     while (cycles < maxcycles) {
-        switch (++self->t) {
-        case 0:
+        if (++self->t == 0) {
             // NOTE: T0 is always an opcode fetch
             self->signal.sync = self->signal.rw = true;
             self->addrbus = self->pc++;
             read(self);
             self->opc = self->databus;
+            ++cycles;
+        } else {
+            self->signal.sync = false;
+            dispatch_addrmode(self, Decode[self->opc]);
             ++cycles;
         }
     }

@@ -116,14 +116,18 @@ X(JIND, 3, "(abs)", "($??%02X)", "($%04X)") /* Indirect jump */ \
 X(BRK, 1, "imp", "")                        /* Break, interrupt, reset */ \
 X(RTI, 1, "imp", "")                        /* Return from interrupt */
 
+#define IN_ENUM(s) IN_##s
+
 enum inst {
-#define X(s) IN_##s,
+#define X(s) IN_ENUM(s),
     DEC_INST_X
 #undef X
 };
 
+#define AM_ENUM(s) AM_##s
+
 enum addrmode {
-#define X(s, b, ...) AM_##s,
+#define X(s, b, ...) AM_ENUM(s),
     DEC_ADDRMODE_X
 #undef X
 };

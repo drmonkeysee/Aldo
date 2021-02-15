@@ -32,6 +32,7 @@ int aldo_run(void)
     nes_powerup(console, sizeof test_prg, test_prg);
     // TODO: for now clock the cpu up to the first non-RESET cycle then halt
     appstate.total_cycles += nes_step(console);
+
     do {
         const int c = ui_pollinput();
         switch (c) {
@@ -68,8 +69,8 @@ int aldo_run(void)
             ui_refresh(&appstate, &snapshot);
         }
     } while (appstate.running);
-    ui_cleanup();
 
+    ui_cleanup();
     nes_free(console);
     console = NULL;
 

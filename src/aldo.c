@@ -30,6 +30,8 @@ int aldo_run(void)
     struct console_state snapshot;
     const uint8_t test_prg[] = {0xea, 0xea, 0xea, 0x0, 0x42, 0x6, 0xea, 0xea};
     nes_powerup(console, sizeof test_prg, test_prg);
+    // TODO: for now clock the cpu up to the first non-RESET cycle then halt
+    appstate.total_cycles += nes_step(console);
     do {
         const int c = ui_pollinput();
         switch (c) {

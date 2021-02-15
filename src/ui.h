@@ -11,8 +11,6 @@
 #include "control.h"
 #include "emu/snapshot.h"
 
-#include <stdint.h>
-
 void ui_init(void);
 void ui_cleanup(void);
 

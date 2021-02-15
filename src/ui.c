@@ -23,8 +23,6 @@ struct view {
     PANEL *restrict outer, *restrict inner;
 };
 
-static const int RamViewPages = 4;
-
 static struct view HwView;
 static struct view ControlsView;
 static struct view RomView;
@@ -32,8 +30,6 @@ static struct view RegistersView;
 static struct view FlagsView;
 static struct view DatapathView;
 static struct view RamView;
-
-static int CurrentRamViewPage;
 
 static void drawhwtraits(uint64_t cycles)
 {
@@ -47,19 +43,31 @@ static void drawhwtraits(uint64_t cycles)
     mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
 }
 
-static void drawcontrols(void)
+static void drawtoggle(const char *label, bool state)
+{
+    if (state) {
+        wattron(ControlsView.content, A_STANDOUT);
+    }
+    wprintw(ControlsView.content, " %s ", label);
+    wattroff(ControlsView.content, A_STANDOUT);
+    if (state) {
+        wattroff(ControlsView.content, A_STANDOUT);
+    }
+}
+
+static void drawcontrols(enum excmode exec_mode)
 {
     int cursor_y = 0;
     wattron(ControlsView.content, A_STANDOUT);
     mvwaddstr(ControlsView.content, cursor_y, 0, " HALT ");
     wattroff(ControlsView.content, A_STANDOUT);
+
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y, 0, "Mode: ");
-    wattron(ControlsView.content, A_STANDOUT);
-    waddstr(ControlsView.content, " Cycle ");
-    wattroff(ControlsView.content, A_STANDOUT);
-    waddstr(ControlsView.content, " Step ");
-    waddstr(ControlsView.content, " Run ");
+    drawtoggle("Cycle", exec_mode == EXC_CYCLE);
+    drawtoggle("Step", exec_mode == EXC_STEP);
+    drawtoggle("Run", exec_mode == EXC_RUN);
+
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y, 0, "Send: ");
     waddstr(ControlsView.content, " IRQ ");
@@ -67,11 +75,13 @@ static void drawcontrols(void)
     waddstr(ControlsView.content, " RES ");
     mvwhline(ControlsView.content, ++cursor_y, 0, 0,
              getmaxx(ControlsView.content));
+
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y++, 0, "FPS: [1-120]");
     mvwaddstr(ControlsView.content, cursor_y++, 0, "CPS: [1-100]");
     mvwhline(ControlsView.content, ++cursor_y, 0, 0,
              getmaxx(ControlsView.content));
+
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y++, 0, "RAM: Next Prev");
     mvwaddstr(ControlsView.content, ++cursor_y, 0, "ROM: up down");
@@ -275,7 +285,7 @@ static void vinit(struct view *v, int h, int w, int y, int x,
 static void raminit(int h, int w, int y, int x)
 {
     createwin(&RamView, h, w, y, x, "RAM");
-    RamView.content = newpad((h - 4) * RamViewPages, w - 4);
+    RamView.content = newpad((h - 4) * RamSheets, w - 4);
 }
 
 static void vcleanup(struct view *v)
@@ -287,13 +297,13 @@ static void vcleanup(struct view *v)
     *v = (struct view){0};
 }
 
-static void ramrefresh(void)
+static void ramrefresh(int ramsheet)
 {
     int ram_x, ram_y, ram_w, ram_h;
     getbegyx(RamView.win, ram_y, ram_x);
     getmaxyx(RamView.win, ram_h, ram_w);
-    pnoutrefresh(RamView.content, (ram_h - 4) * CurrentRamViewPage, 0,
-                 ram_y + 2, ram_x + 2, ram_y + ram_h - 3, ram_x + ram_w - 2);
+    pnoutrefresh(RamView.content, (ram_h - 4) * ramsheet, 0, ram_y + 2,
+                 ram_x + 2, ram_y + ram_h - 3, ram_x + ram_w - 2);
 }
 
 //
@@ -347,23 +357,11 @@ int ui_pollinput(void)
     return getch();
 }
 
-void ui_ram_next(void)
+void ui_refresh(const struct control *appstate,
+                const struct console_state *snapshot)
 {
-    CurrentRamViewPage = (CurrentRamViewPage + 1) % RamViewPages;
-}
-
-void ui_ram_prev(void)
-{
-    --CurrentRamViewPage;
-    if (CurrentRamViewPage < 0) {
-        CurrentRamViewPage = RamViewPages - 1;
-    }
-}
-
-void ui_refresh(const struct console_state *snapshot, uint64_t cycles)
-{
-    drawhwtraits(cycles);
-    drawcontrols();
+    drawhwtraits(appstate->total_cycles);
+    drawcontrols(appstate->exec_mode);
     drawrom(snapshot);
     drawregister(snapshot);
     drawflags(snapshot);
@@ -371,6 +369,6 @@ void ui_refresh(const struct console_state *snapshot, uint64_t cycles)
     drawram(snapshot);
 
     update_panels();
-    ramrefresh();
+    ramrefresh(appstate->ramsheet);
     doupdate();
 }

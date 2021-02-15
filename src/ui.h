@@ -8,6 +8,7 @@
 #ifndef Aldo_ui_h
 #define Aldo_ui_h
 
+#include "control.h"
 #include "emu/snapshot.h"
 
 #include <stdint.h>
@@ -16,9 +17,7 @@ void ui_init(void);
 void ui_cleanup(void);
 
 int ui_pollinput(void);
-void ui_ram_next(void);
-void ui_ram_prev(void);
-
-void ui_refresh(const struct console_state *snapshot, uint64_t cycles);
+void ui_refresh(const struct control *appstate,
+                const struct console_state *snapshot);
 
 #endif

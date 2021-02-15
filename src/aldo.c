@@ -7,6 +7,7 @@
 
 #include "aldo.h"
 
+#include "control.h"
 #include "ui.h"
 #include "emu/nes.h"
 #include "emu/snapshot.h"
@@ -24,8 +25,7 @@ int aldo_run(void)
     nes *console = nes_new();
 
     ui_init();
-    bool running = true;
-    uint64_t total_cycles = 0;
+    struct control appstate = {.running = true};
     struct console_state snapshot;
     const uint8_t test_prg[] = {0xea, 0xea, 0xea, 0x0, 0x42, 0x6, 0xea, 0xea};
     nes_powerup(console, sizeof test_prg, test_prg);
@@ -33,23 +33,26 @@ int aldo_run(void)
         const int c = ui_pollinput();
         switch (c) {
         case ' ':
-            total_cycles += nes_cycle(console);
+            appstate.total_cycles += nes_cycle(console);
             break;
         case 'b':
-            ui_ram_prev();
+            ctl_ram_prev(&appstate);
+            break;
+        case 'm':
+            ctl_toggle_excmode(&appstate);
             break;
         case 'n':
-            ui_ram_next();
+            ctl_ram_next(&appstate);
             break;
         case 'q':
-            running = false;
+            appstate.running = false;
             break;
         }
-        if (running) {
+        if (appstate.running) {
             nes_snapshot(console, &snapshot);
-            ui_refresh(&snapshot, total_cycles);
+            ui_refresh(&appstate, &snapshot);
         }
-    } while (running);
+    } while (appstate.running);
     ui_cleanup();
 
     nes_free(console);

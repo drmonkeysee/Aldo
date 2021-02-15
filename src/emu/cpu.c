@@ -370,6 +370,7 @@ static void IMP_sequence(struct mos6502 *self, struct decoded dec)
     assert(self->t == 1);
 
     // NOTE: implied mode dead read
+    self->addrbus = self->pc;
     read(self);
     dispatch_instruction(self, dec);
 }

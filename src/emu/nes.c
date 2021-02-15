@@ -76,7 +76,13 @@ int nes_step(nes *self)
 {
     assert(self != NULL);
 
-    return 0;
+    int cycles = 0;
+    self->cpu.signal.rdy = true;
+    do {
+        cycles += cpu_clock(&self->cpu, 1);
+    } while (!self->cpu.signal.sync);
+    self->cpu.signal.rdy = false;
+    return cycles;
 }
 
 int nes_clock(nes *self)

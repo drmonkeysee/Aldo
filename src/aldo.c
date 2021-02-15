@@ -12,6 +12,7 @@
 #include "emu/nes.h"
 #include "emu/snapshot.h"
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -33,7 +34,19 @@ int aldo_run(void)
         const int c = ui_pollinput();
         switch (c) {
         case ' ':
-            appstate.total_cycles += nes_cycle(console);
+            switch (appstate.exec_mode) {
+            case EXC_CYCLE:
+                appstate.total_cycles += nes_cycle(console);
+                break;
+            case EXC_STEP:
+                appstate.total_cycles += nes_step(console);
+                break;
+            case EXC_RUN:
+                appstate.total_cycles += nes_clock(console);
+                break;
+            default:
+                assert(((void)"INVALID EXC MODE", false));
+            }
             break;
         case 'b':
             ctl_ram_prev(&appstate);

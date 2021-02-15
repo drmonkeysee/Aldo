@@ -52,13 +52,16 @@ int aldo_run(void)
             }
             break;
         case 'b':
-            ctl_ram_prev(&appstate);
+            --appstate.ramsheet;
+            if (appstate.ramsheet < 0) {
+                appstate.ramsheet = RamSheets - 1;
+            }
             break;
         case 'm':
-            ctl_toggle_excmode(&appstate);
+            appstate.exec_mode = (appstate.exec_mode + 1) % EXC_MODECOUNT;
             break;
         case 'n':
-            ctl_ram_next(&appstate);
+            appstate.ramsheet = (appstate.ramsheet + 1) % RamSheets;
             break;
         case 'q':
             appstate.running = false;

@@ -27,22 +27,4 @@ struct control {
 
 extern const int RamSheets;
 
-inline void ctl_toggle_excmode(struct control *c)
-{
-    c->exec_mode = (c->exec_mode + 1) % EXC_MODECOUNT;
-}
-
-inline void ctl_ram_next(struct control *c)
-{
-    c->ramsheet = (c->ramsheet + 1) % RamSheets;
-}
-
-inline void ctl_ram_prev(struct control *c)
-{
-    --c->ramsheet;
-    if (c->ramsheet < 0) {
-        c->ramsheet = RamSheets - 1;
-    }
-}
-
 #endif

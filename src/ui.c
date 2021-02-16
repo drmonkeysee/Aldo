@@ -33,10 +33,11 @@ static const double MillisecondsPerSecond = 1000,
 static const long NanosecondsPerSecond = MillisecondsPerSecond
                                          * NanosecondsPerMillisecond;
 // Approximate a 60hz run loop
-static const struct timespec VSync = {.tv_nsec = NanosecondsPerSecond / 60};
+static const int Fps = 60;
+static const struct timespec VSync = {.tv_nsec = NanosecondsPerSecond / Fps};
 
 static struct timespec Current, Previous;
-static double CycleBudgetMs, FrameTimeMs;
+static double CycleBudgetMs, FrameTimeMs, FrameLeftMs;
 
 static double to_ms(const struct timespec *ts)
 {
@@ -77,6 +78,7 @@ static void sleeploop(void)
     const struct timespec tick_left = {
         .tv_nsec = VSync.tv_nsec - elapsed.tv_nsec
     };
+    FrameLeftMs = to_ms(&tick_left);
     // TODO: use clock_nanosleep for Linux?
     // TODO: handle EINTR
     nanosleep(&tick_left, NULL);
@@ -97,10 +99,11 @@ static struct view RamView;
 static void drawhwtraits(const struct control *appstate)
 {
     int cursor_y = 0;
-    mvwaddstr(HwView.content, cursor_y++, 0, "FPS: N/A");
-    mvwprintw(HwView.content, cursor_y++, 0, "dT: %.3f", FrameTimeMs);
-    mvwprintw(HwView.content, cursor_y++, 0, "CMS: %.3f", CycleBudgetMs);
-    mvwprintw(HwView.content, cursor_y++, 0, "CB: %d", appstate->cyclebudget);
+    mvwprintw(HwView.content, cursor_y++, 0, "FPS: %dhz", Fps);
+    mvwprintw(HwView.content, cursor_y++, 0, "dT: %.3f (+%.3f)", FrameTimeMs,
+              FrameLeftMs);
+    mvwprintw(HwView.content, cursor_y++, 0, "CB: %d (%.3f)",
+              appstate->cyclebudget, CycleBudgetMs);
     mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "CPU Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "PPU Clock: INF Hz");
@@ -385,7 +388,7 @@ static void ramrefresh(int ramsheet)
 
 void ui_init(void)
 {
-    static const int col1w = 32, col2w = 34, col3w = 35, col4w = 56, hwh = 12,
+    static const int col1w = 32, col2w = 34, col3w = 35, col4w = 56, hwh = 13,
                      cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");
@@ -447,8 +450,8 @@ void ui_start_tick(struct control *appstate)
 
 void ui_end_tick(void)
 {
-    sleeploop();
     Previous = Current;
+    sleeploop();
 }
 
 int ui_pollinput(void)

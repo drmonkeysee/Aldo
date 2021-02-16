@@ -14,8 +14,8 @@
 #include <assert.h>
 #include <stddef.h>
 
-// NOTE: sentinel value for cycle count denoting an imminent opcode fetch
-static const int PreFetch = -1,
+static const int PreFetch = -1,     // Sentinel value for cycle count
+                                    // denoting an imminent opcode fetch.
                  MaxCycleCount = 7;
 
 static void read(struct mos6502 *self)

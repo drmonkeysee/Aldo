@@ -54,7 +54,9 @@ static void tick_elapsed(struct timespec *ts)
 {
     struct timespec now;
     clock_gettime(CLOCK_MONOTONIC, &now);
+
     *ts = (struct timespec){.tv_sec = now.tv_sec - Current.tv_sec};
+
     if (Current.tv_nsec > now.tv_nsec) {
         // NOTE: subtract with borrow
         --ts->tv_sec;
@@ -70,8 +72,8 @@ static void sleeploop(void)
     tick_elapsed(&elapsed);
 
     // NOTE: if elapsed nanoseconds is greater than vsync we're over
-    // our time budget; if elapsed seconds is greater we've BLOWN AWAY
-    // our time budget; either way don't sleep.
+    // our time budget; if elapsed seconds is greater than vsync
+    // we've BLOWN AWAY our time budget; either way don't sleep.
     if (elapsed.tv_nsec > VSync.tv_nsec ||
         elapsed.tv_sec > VSync.tv_sec) return;
 

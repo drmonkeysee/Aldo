@@ -14,6 +14,9 @@
 void ui_init(void);
 void ui_cleanup(void);
 
+void ui_start_tick(struct control *appstate);
+void ui_end_tick(void);
+
 int ui_pollinput(void);
 void ui_refresh(const struct control *appstate,
                 const struct console_state *snapshot);

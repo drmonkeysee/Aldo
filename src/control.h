@@ -21,8 +21,7 @@ enum excmode {
 struct control {
     uint64_t total_cycles;
     enum excmode exec_mode;
-    int cycles_per_sec,
-        ramsheet;
+    int cyclebudget, cycles_per_sec, ramsheet;
     bool running;
 };
 

@@ -23,7 +23,7 @@ int aldo_run(void)
 {
     puts("Aldo starting...");
 
-    struct control appstate = {.cycles_per_sec = 1, .running = true};
+    struct control appstate = {.cycles_per_sec = 1, .running = true, .exec_mode = EXC_RUN};
     struct console_state snapshot;
     ui_init();
 
@@ -34,6 +34,7 @@ int aldo_run(void)
     appstate.total_cycles += nes_step(console);
 
     do {
+        ui_start_tick(&appstate);
         const int c = ui_pollinput();
         switch (c) {
         case ' ':
@@ -71,6 +72,7 @@ int aldo_run(void)
             nes_snapshot(console, &snapshot);
             ui_refresh(&appstate, &snapshot);
         }
+        ui_end_tick();
     } while (appstate.running);
 
     ui_cleanup();

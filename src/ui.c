@@ -17,11 +17,37 @@
 #include <locale.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <time.h>
 
 struct view {
     WINDOW *restrict win, *restrict content;
     PANEL *restrict outer, *restrict inner;
 };
+
+//
+// Run Loop Clock
+//
+
+static const double MillisecondsPerSecond = 1000,
+                    NanosecondsPerMillisecond = 1e6;
+
+static struct timespec Current, Previous;
+static double CycleBudgetMs, FrameTimeMs;
+
+static void initclock(void)
+{
+    clock_gettime(CLOCK_MONOTONIC, &Previous);
+}
+
+static double to_ms(const struct timespec *ts)
+{
+    return (ts->tv_sec * MillisecondsPerSecond)
+            + (ts->tv_nsec / NanosecondsPerMillisecond);
+}
+
+//
+// UI Widgets
+//
 
 static struct view HwView;
 static struct view ControlsView;
@@ -35,6 +61,7 @@ static void drawhwtraits(const struct control *appstate)
 {
     int cursor_y = 0;
     mvwaddstr(HwView.content, cursor_y++, 0, "FPS: N/A");
+    mvwprintw(HwView.content, cursor_y++, 0, "dT: %.3f", FrameTimeMs);
     mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "CPU Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "PPU Clock: INF Hz");
@@ -327,6 +354,7 @@ void ui_init(void)
     cbreak();
     noecho();
     keypad(stdscr, true);
+    nodelay(stdscr, true);
     curs_set(0);
 
     int scrh, scrw;
@@ -344,6 +372,8 @@ void ui_init(void)
     vinit(&DatapathView, 13, col3w, yoffset + cpuh + flagsh,
           xoffset + col1w + col2w, "Datapath");
     raminit(ramh, col4w, yoffset, xoffset + col1w + col2w + col3w);
+
+    initclock();
 }
 
 void ui_cleanup(void)
@@ -357,6 +387,27 @@ void ui_cleanup(void)
     vcleanup(&HwView);
 
     endwin();
+}
+
+void ui_start_tick(struct control *appstate)
+{
+    clock_gettime(CLOCK_MONOTONIC, &Current);
+    CycleBudgetMs += FrameTimeMs = to_ms(&Current) - to_ms(&Previous);
+    // Accumulate at most a second of banked cycle time
+    if (CycleBudgetMs >= MillisecondsPerSecond) {
+        CycleBudgetMs = MillisecondsPerSecond;
+    }
+
+    const double mspercycle = MillisecondsPerSecond / appstate->cycles_per_sec;
+    if (CycleBudgetMs >= mspercycle) {
+        appstate->cyclebudget = CycleBudgetMs / mspercycle;
+        CycleBudgetMs -= appstate->cyclebudget * mspercycle;
+    }
+}
+
+void ui_end_tick(void)
+{
+    Previous = Current;
 }
 
 int ui_pollinput(void)

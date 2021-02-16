@@ -62,6 +62,8 @@ static void drawhwtraits(const struct control *appstate)
     int cursor_y = 0;
     mvwaddstr(HwView.content, cursor_y++, 0, "FPS: N/A");
     mvwprintw(HwView.content, cursor_y++, 0, "dT: %.3f", FrameTimeMs);
+    mvwprintw(HwView.content, cursor_y++, 0, "CMS: %.3f", CycleBudgetMs);
+    mvwprintw(HwView.content, cursor_y++, 0, "CB: %d", appstate->cyclebudget);
     mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "CPU Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "PPU Clock: INF Hz");

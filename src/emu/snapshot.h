@@ -17,6 +17,7 @@ struct console_state {
         uint16_t addressbus, program_counter, currinst;
         uint8_t accumulator, addrlow_latch, databus, exec_cycle, opcode,
                 stack_pointer, status, xindex, yindex;
+        bool datafault;
     } cpu;
     struct {
         bool irq, nmi, readwrite, ready, reset, sync;

@@ -220,8 +220,12 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwaddstr(DatapathView.content, ++cursor_y, 0, left);
     mvwprintw(DatapathView.content, cursor_y, vsep1 + 2, "$%04X",
               snapshot->cpu.addressbus);
-    mvwprintw(DatapathView.content, cursor_y, vsep3 + 2, "$%02X",
-              snapshot->cpu.databus);
+    if (snapshot->cpu.datafault) {
+        mvwaddstr(DatapathView.content, cursor_y, vsep3 + 2, "FLT");
+    } else {
+        mvwprintw(DatapathView.content, cursor_y, vsep3 + 2, "$%02X",
+                  snapshot->cpu.databus);
+    }
     mvwaddstr(DatapathView.content, cursor_y, vsep4 + 1,
               snapshot->lines.readwrite ? left : right);
 

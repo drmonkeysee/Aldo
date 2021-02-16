@@ -34,6 +34,7 @@ static void load_prg(nes *self, size_t sz, const uint8_t prg[restrict sz])
         self->cart[(i + CpuCartMinAddr) & CpuCartAddrMask] = prg[i];
     }
     wrtoba(CpuCartMinAddr, self->cart + (ResetVector & CpuCartAddrMask));
+    self->ram[0x642] = 0xdd;
 }
 
 //

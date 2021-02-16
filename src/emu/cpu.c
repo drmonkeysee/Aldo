@@ -15,19 +15,20 @@
 #include <stddef.h>
 
 // NOTE: sentinel value for cycle count denoting an imminent opcode fetch
-static const int PreFetch = -1, MaxCycleCount = 7;
+static const int PreFetch = -1,
+                 MaxCycleCount = 7;
 
-static bool read(struct mos6502 *self)
+static void read(struct mos6502 *self)
 {
     if (self->addrbus <= CpuRamMaxAddr) {
         self->databus = self->ram[self->addrbus & CpuRamAddrMask];
-        return true;
+        return;
     }
     if (CpuCartMinAddr <= self->addrbus && self->addrbus <= CpuCartMaxAddr) {
         self->databus = self->cart[self->addrbus & CpuCartAddrMask];
-        return true;
+        return;
     }
-    return false;
+    self->dflt = true;
 }
 
 static uint8_t get_p(const struct mos6502 *self)
@@ -512,7 +513,7 @@ void cpu_powerup(struct mos6502 *self)
     // NOTE: Interrupts are inverted, high means no interrupt; rw high is read
     self->signal.irq = self->signal.nmi = self->signal.res = self->signal.rw
         = true;
-    self->signal.rdy = self->signal.sync = self->idone = false;
+    self->signal.rdy = self->signal.sync = self->idone = self->dflt = false;
 
     // NOTE: all other cpu elements are indeterminate on powerup
 }
@@ -555,6 +556,9 @@ int cpu_clock(struct mos6502 *self, int cyclebudget)
         self->idone = false;
         self->t = PreFetch;
     }
+    if (self->dflt) {
+        self->dflt = false;
+    }
 
     int cycles;
     for (cycles = 0; cycles < cyclebudget; ++cycles) {
@@ -592,6 +596,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.databus = self->databus;
     snapshot->cpu.exec_cycle = self->t;
     snapshot->cpu.opcode = self->opc;
+    snapshot->cpu.datafault = self->dflt;
 
     snapshot->lines.irq = self->signal.irq;
     snapshot->lines.nmi = self->signal.nmi;

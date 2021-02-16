@@ -52,8 +52,9 @@ struct mos6502 {
 
     // Internals: control flags and other helper fields that do
     // not correspond directly to CPU components.
-    bool idone;         // Instruction completed on this cycle;
+    bool idone,         // Instruction completed on this cycle;
                         // the next cycle will be an opcode fetch (T0).
+         dflt;          // Data fault; read/write to unmapped address
 
     // Buses: external components connected to the CPU pins
     uint8_t *ram,       // RAM Bus

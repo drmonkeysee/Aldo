@@ -439,8 +439,9 @@ void ui_start_tick(struct control *appstate)
 
     const double mspercycle = MillisecondsPerSecond / appstate->cycles_per_sec;
     if (CycleBudgetMs >= mspercycle) {
-        appstate->cyclebudget = CycleBudgetMs / mspercycle;
-        CycleBudgetMs -= appstate->cyclebudget * mspercycle;
+        const int new_cycles = CycleBudgetMs / mspercycle;
+        appstate->cyclebudget += new_cycles;
+        CycleBudgetMs -= new_cycles * mspercycle;
     }
 }
 

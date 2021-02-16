@@ -14,7 +14,7 @@
 struct console_state {
     const uint8_t *ram, *rom;
     struct {
-        uint16_t addressbus, program_counter, currinst;
+        uint16_t addressbus, currinst, program_counter;
         uint8_t accumulator, addrlow_latch, databus, exec_cycle, opcode,
                 stack_pointer, status, xindex, yindex;
         bool datafault;

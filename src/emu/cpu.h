@@ -52,9 +52,9 @@ struct mos6502 {
 
     // Internals: control flags and other helper fields that do
     // not correspond directly to CPU components.
-    bool idone,         // Instruction completed on this cycle;
+    bool dflt,          // Data fault; read/write to unmapped address
+         idone;         // Instruction completed on this cycle;
                         // the next cycle will be an opcode fetch (T0).
-         dflt;          // Data fault; read/write to unmapped address
 
     // Buses: external components connected to the CPU pins
     uint8_t *ram,       // RAM Bus
@@ -63,6 +63,7 @@ struct mos6502 {
 
 void cpu_powerup(struct mos6502 *self);
 void cpu_reset(struct mos6502 *self);
+
 int cpu_clock(struct mos6502 *self, int cyclebudget);
 
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot);

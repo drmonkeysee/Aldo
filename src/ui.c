@@ -37,7 +37,7 @@ static const int Fps = 60;
 static const struct timespec VSync = {.tv_nsec = NanosecondsPerSecond / Fps};
 
 static struct timespec Current, Previous;
-static double CycleBudgetMs, FrameTimeMs, FrameLeftMs;
+static double CycleBudgetMs, FrameLeftMs, FrameTimeMs;
 
 static double to_ms(const struct timespec *ts)
 {
@@ -74,11 +74,11 @@ static void sleeploop(void)
     // NOTE: if elapsed nanoseconds is greater than vsync we're over
     // our time budget; if elapsed seconds is greater than vsync
     // we've BLOWN AWAY our time budget; either way don't sleep.
-    if (elapsed.tv_nsec > VSync.tv_nsec ||
-        elapsed.tv_sec > VSync.tv_sec) return;
+    if (elapsed.tv_nsec > VSync.tv_nsec
+        || elapsed.tv_sec > VSync.tv_sec) return;
 
     const struct timespec tick_left = {
-        .tv_nsec = VSync.tv_nsec - elapsed.tv_nsec
+        .tv_nsec = VSync.tv_nsec - elapsed.tv_nsec,
     };
     FrameLeftMs = to_ms(&tick_left);
     // TODO: use clock_nanosleep for Linux?

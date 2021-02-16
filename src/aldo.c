@@ -23,12 +23,12 @@ int aldo_run(void)
 {
     puts("Aldo starting...");
 
-    nes *console = nes_new();
-
-    ui_init();
-    struct control appstate = {.running = true};
+    struct control appstate = {.cycles_per_sec = 1, .running = true};
     struct console_state snapshot;
+    ui_init();
+
     const uint8_t test_prg[] = {0xea, 0xea, 0xea, 0x0, 0x42, 0x6, 0xea, 0x0, 0x6, 0x42, 0xea};
+    nes *console = nes_new();
     nes_powerup(console, sizeof test_prg, test_prg);
     // TODO: for now clock the cpu up to the first non-RESET cycle then halt
     appstate.total_cycles += nes_step(console);

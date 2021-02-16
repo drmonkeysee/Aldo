@@ -31,15 +31,17 @@ static struct view FlagsView;
 static struct view DatapathView;
 static struct view RamView;
 
-static void drawhwtraits(uint64_t cycles)
+static void drawhwtraits(const struct control *appstate)
 {
     int cursor_y = 0;
     mvwaddstr(HwView.content, cursor_y++, 0, "FPS: N/A");
     mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "CPU Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "PPU Clock: INF Hz");
-    mvwprintw(HwView.content, cursor_y++, 0, "Cycles: %llu", cycles);
-    mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Second: N/A");
+    mvwprintw(HwView.content, cursor_y++, 0, "Cycles: %llu",
+              appstate->total_cycles);
+    mvwprintw(HwView.content, cursor_y++, 0, "Cycles per Second: %d",
+              appstate->cycles_per_sec);
     mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
 }
 
@@ -55,7 +57,7 @@ static void drawtoggle(const char *label, bool state)
     }
 }
 
-static void drawcontrols(enum excmode exec_mode)
+static void drawcontrols(const struct control *appstate)
 {
     int cursor_y = 0;
     wattron(ControlsView.content, A_STANDOUT);
@@ -64,9 +66,9 @@ static void drawcontrols(enum excmode exec_mode)
 
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y, 0, "Mode: ");
-    drawtoggle("Cycle", exec_mode == EXC_CYCLE);
-    drawtoggle("Step", exec_mode == EXC_STEP);
-    drawtoggle("Run", exec_mode == EXC_RUN);
+    drawtoggle("Cycle", appstate->exec_mode == EXC_CYCLE);
+    drawtoggle("Step", appstate->exec_mode == EXC_STEP);
+    drawtoggle("Run", appstate->exec_mode == EXC_RUN);
 
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y, 0, "Send: ");
@@ -77,8 +79,9 @@ static void drawcontrols(enum excmode exec_mode)
              getmaxx(ControlsView.content));
 
     cursor_y += 2;
-    mvwaddstr(ControlsView.content, cursor_y++, 0, "FPS: [1-120]");
-    mvwaddstr(ControlsView.content, cursor_y++, 0, "CPS: [1-100]");
+    mvwaddstr(ControlsView.content, cursor_y++, 0, "FPS [1-120]: N/A");
+    mvwprintw(ControlsView.content, cursor_y++, 0, "CPS [1-100]: %d",
+              appstate->cycles_per_sec);
     mvwhline(ControlsView.content, ++cursor_y, 0, 0,
              getmaxx(ControlsView.content));
 
@@ -364,8 +367,8 @@ int ui_pollinput(void)
 void ui_refresh(const struct control *appstate,
                 const struct console_state *snapshot)
 {
-    drawhwtraits(appstate->total_cycles);
-    drawcontrols(appstate->exec_mode);
+    drawhwtraits(appstate);
+    drawcontrols(appstate);
     drawrom(snapshot);
     drawregister(snapshot);
     drawflags(snapshot);

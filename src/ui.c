@@ -294,10 +294,11 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwaddstr(DatapathView.content, ++cursor_y, 0, left);
     mvwprintw(DatapathView.content, cursor_y, vsep1 + 2, "$%04X",
               snapshot->cpu.addressbus);
+    const int dbus_x = vsep3 + 2;
     if (snapshot->cpu.datafault) {
-        mvwaddstr(DatapathView.content, cursor_y, vsep3 + 2, "FLT");
+        mvwaddstr(DatapathView.content, cursor_y, dbus_x, "FLT");
     } else {
-        mvwprintw(DatapathView.content, cursor_y, vsep3 + 2, "$%02X",
+        mvwprintw(DatapathView.content, cursor_y, dbus_x, "$%02X",
                   snapshot->cpu.databus);
     }
     mvwaddstr(DatapathView.content, cursor_y, vsep4 + 1,
@@ -437,6 +438,7 @@ void ui_start_tick(struct control *appstate)
 {
     clock_gettime(CLOCK_MONOTONIC, &Current);
     CycleBudgetMs += FrameTimeMs = to_ms(&Current) - to_ms(&Previous);
+
     // Accumulate at most a second of banked cycle time
     if (CycleBudgetMs >= MillisecondsPerSecond) {
         CycleBudgetMs = MillisecondsPerSecond;

@@ -30,19 +30,56 @@ struct view {
 
 static const double MillisecondsPerSecond = 1000,
                     NanosecondsPerMillisecond = 1e6;
+static const long NanosecondsPerSecond = MillisecondsPerSecond
+                                         * NanosecondsPerMillisecond;
+// Approximate a 60hz run loop
+static const struct timespec VSync = {.tv_nsec = NanosecondsPerSecond / 60};
 
 static struct timespec Current, Previous;
 static double CycleBudgetMs, FrameTimeMs;
+
+static double to_ms(const struct timespec *ts)
+{
+    return (ts->tv_sec * MillisecondsPerSecond)
+            + (ts->tv_nsec / NanosecondsPerMillisecond);
+}
 
 static void initclock(void)
 {
     clock_gettime(CLOCK_MONOTONIC, &Previous);
 }
 
-static double to_ms(const struct timespec *ts)
+static void tick_elapsed(struct timespec *ts)
 {
-    return (ts->tv_sec * MillisecondsPerSecond)
-            + (ts->tv_nsec / NanosecondsPerMillisecond);
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    *ts = (struct timespec){.tv_sec = now.tv_sec - Current.tv_sec};
+    if (Current.tv_nsec > now.tv_nsec) {
+        // NOTE: subtract with borrow
+        --ts->tv_sec;
+        ts->tv_nsec = NanosecondsPerSecond - (Current.tv_nsec - now.tv_nsec);
+    } else {
+        ts->tv_nsec = now.tv_nsec - Current.tv_nsec;
+    }
+}
+
+static void sleeploop(void)
+{
+    struct timespec elapsed;
+    tick_elapsed(&elapsed);
+
+    // NOTE: if elapsed nanoseconds is greater than vsync we're over
+    // our time budget; if elapsed seconds is greater we've BLOWN AWAY
+    // our time budget; either way don't sleep.
+    if (elapsed.tv_nsec > VSync.tv_nsec ||
+        elapsed.tv_sec > VSync.tv_sec) return;
+
+    const struct timespec tick_left = {
+        .tv_nsec = VSync.tv_nsec - elapsed.tv_nsec
+    };
+    // TODO: use clock_nanosleep for Linux?
+    // TODO: handle EINTR
+    nanosleep(&tick_left, NULL);
 }
 
 //
@@ -409,6 +446,7 @@ void ui_start_tick(struct control *appstate)
 
 void ui_end_tick(void)
 {
+    sleeploop();
     Previous = Current;
 }
 

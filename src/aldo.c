@@ -23,11 +23,7 @@ int aldo_run(void)
 {
     puts("Aldo starting...");
 
-    struct control appstate = {
-        .cycles_per_sec = 1,
-        .exec_mode = EXC_RUN,
-        .running = true,
-    };
+    struct control appstate = {.cycles_per_sec = 1, .running = true};
     struct console_state snapshot;
     ui_init();
 

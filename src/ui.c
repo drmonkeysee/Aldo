@@ -67,7 +67,7 @@ static void tick_sleep(void)
     tick_elapsed(&elapsed);
 
     // NOTE: if elapsed nanoseconds is greater than vsync we're over
-    // our time budget; if elapsed seconds is greater than vsync
+    // our time budget; if elapsed *seconds* is greater than vsync
     // we've BLOWN AWAY our time budget; either way don't sleep.
     if (elapsed.tv_nsec > VSync.tv_nsec
         || elapsed.tv_sec > VSync.tv_sec) return;
@@ -100,12 +100,24 @@ static struct view RamView;
 
 static void drawhwtraits(const struct control *appstate)
 {
+    // NOTE: update timing metrics on a readable interval
+    static const double refresh_interval_ms = 250;
+    static double display_cyclebudget, display_frameleft, display_frametime,
+                  refreshdt;
+    if ((refreshdt += FrameTimeMs) >= refresh_interval_ms) {
+        display_cyclebudget = CycleBudgetMs;
+        display_frameleft = FrameLeftMs;
+        display_frametime = FrameTimeMs;
+        refreshdt = 0;
+    }
+
     int cursor_y = 0;
+    werase(HwView.content);
     mvwprintw(HwView.content, cursor_y++, 0, "FPS: %dhz", Fps);
-    mvwprintw(HwView.content, cursor_y++, 0, "dT: %.3f (+%.3f)", FrameTimeMs,
-              FrameLeftMs);
-    mvwprintw(HwView.content, cursor_y++, 0, "CB: %d (%.3f)",
-              appstate->cyclebudget, CycleBudgetMs);
+    mvwprintw(HwView.content, cursor_y++, 0, "\u0394T: %.3f (+%.3f)",
+              display_frametime, display_frameleft);
+    mvwprintw(HwView.content, cursor_y++, 0, "Cycle Budget: %d (%.3f)",
+              appstate->cyclebudget, display_cyclebudget);
     mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "CPU Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "PPU Clock: INF Hz");

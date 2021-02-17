@@ -19,7 +19,7 @@ CFLAGS += -I/usr/local/opt/ncurses/include
 LDFLAGS := -L/usr/local/opt/ncurses/lib
 LDLIBS := -lpanel -lncurses
 else
-CFLAGS += -D_POSIX_C_SOURCE=199309L
+CFLAGS += -D_POSIX_C_SOURCE=200112L
 LDLIBS := -lpanelw -lncursesw
 SPFLAGS := -s
 endif

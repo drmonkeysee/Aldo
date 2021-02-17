@@ -78,9 +78,12 @@ static void tick_sleep(void)
         .tv_nsec = VSync.tv_nsec - elapsed.tv_nsec,
     };
     FrameLeftMs = to_ms(&tick_left);
-    // TODO: use clock_nanosleep for Linux?
     // TODO: handle EINTR
+#ifdef __APPLE__
     nanosleep(&tick_left, NULL);
+#else
+    clock_nanosleep(CLOCK_MONOTONIC, 0, &tick_left, NULL);
+#endif
 }
 
 //

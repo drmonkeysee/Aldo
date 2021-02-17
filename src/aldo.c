@@ -38,7 +38,7 @@ int aldo_run(void)
     appstate.total_cycles += nes_step(console);
 
     do {
-        ui_start_tick(&appstate);
+        ui_tick_start(&appstate);
         const int c = ui_pollinput();
         switch (c) {
         case ' ':
@@ -76,7 +76,7 @@ int aldo_run(void)
             nes_snapshot(console, &snapshot);
             ui_refresh(&appstate, &snapshot);
         }
-        ui_end_tick();
+        ui_tick_end();
     } while (appstate.running);
 
     ui_cleanup();

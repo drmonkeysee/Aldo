@@ -19,11 +19,6 @@
 #include <stddef.h>
 #include <time.h>
 
-struct view {
-    WINDOW *restrict win, *restrict content;
-    PANEL *restrict outer, *restrict inner;
-};
-
 //
 // Run Loop Clock
 //
@@ -66,7 +61,7 @@ static void tick_elapsed(struct timespec *ts)
     }
 }
 
-static void sleeploop(void)
+static void tick_sleep(void)
 {
     struct timespec elapsed;
     tick_elapsed(&elapsed);
@@ -89,6 +84,11 @@ static void sleeploop(void)
 //
 // UI Widgets
 //
+
+struct view {
+    WINDOW *restrict win, *restrict content;
+    PANEL *restrict outer, *restrict inner;
+};
 
 static struct view HwView;
 static struct view ControlsView;
@@ -434,7 +434,7 @@ void ui_cleanup(void)
     endwin();
 }
 
-void ui_start_tick(struct control *appstate)
+void ui_tick_start(struct control *appstate)
 {
     clock_gettime(CLOCK_MONOTONIC, &Current);
     CycleBudgetMs += FrameTimeMs = to_ms(&Current) - to_ms(&Previous);
@@ -452,10 +452,10 @@ void ui_start_tick(struct control *appstate)
     }
 }
 
-void ui_end_tick(void)
+void ui_tick_end(void)
 {
     Previous = Current;
-    sleeploop();
+    tick_sleep();
 }
 
 int ui_pollinput(void)

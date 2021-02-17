@@ -90,13 +90,13 @@ struct view {
     PANEL *restrict outer, *restrict inner;
 };
 
-static struct view HwView;
-static struct view ControlsView;
-static struct view RomView;
-static struct view RegistersView;
-static struct view FlagsView;
-static struct view DatapathView;
-static struct view RamView;
+static struct view HwView,
+                   ControlsView,
+                   RomView,
+                   RegistersView,
+                   FlagsView,
+                   DatapathView,
+                   RamView;
 
 static void drawhwtraits(const struct control *appstate)
 {

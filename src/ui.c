@@ -27,7 +27,9 @@ static const double MillisecondsPerSecond = 1000,
                     NanosecondsPerMillisecond = 1e6;
 static const long NanosecondsPerSecond = MillisecondsPerSecond
                                          * NanosecondsPerMillisecond;
-// Approximate a 60hz run loop
+// NOTE: Approximate 60 FPS for application event loop;
+// this will be enforced by actual vsync when ported to true GUI
+// and is *distinct* from emulator frequency which can be modified by the user.
 static const int Fps = 60;
 static const struct timespec VSync = {.tv_nsec = NanosecondsPerSecond / Fps};
 
@@ -113,7 +115,7 @@ static void drawhwtraits(const struct control *appstate)
 
     int cursor_y = 0;
     werase(HwView.content);
-    mvwprintw(HwView.content, cursor_y++, 0, "FPS: %dhz", Fps);
+    mvwprintw(HwView.content, cursor_y++, 0, "FPS: %d", Fps);
     mvwprintw(HwView.content, cursor_y++, 0, "\u0394T: %.3f (+%.3f)",
               display_frametime, display_frameleft);
     mvwprintw(HwView.content, cursor_y++, 0, "Cycle Budget: %d (%.3f)",

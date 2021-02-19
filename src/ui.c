@@ -72,7 +72,10 @@ static void tick_sleep(void)
     // our time budget; if elapsed *seconds* is greater than vsync
     // we've BLOWN AWAY our time budget; either way don't sleep.
     if (elapsed.tv_nsec > VSync.tv_nsec
-        || elapsed.tv_sec > VSync.tv_sec) return;
+        || elapsed.tv_sec > VSync.tv_sec) {
+        FrameLeftMs = 0;
+        return;
+    }
 
     const struct timespec tick_left = {
         .tv_nsec = VSync.tv_nsec - elapsed.tv_nsec,
@@ -462,11 +465,9 @@ void ui_tick_start(struct control *appstate)
     }
 
     const double mspercycle = MillisecondsPerSecond / appstate->cycles_per_sec;
-    if (CycleBudgetMs >= mspercycle) {
-        const int new_cycles = CycleBudgetMs / mspercycle;
-        appstate->cyclebudget += new_cycles;
-        CycleBudgetMs -= new_cycles * mspercycle;
-    }
+    const int new_cycles = CycleBudgetMs / mspercycle;
+    appstate->cyclebudget += new_cycles;
+    CycleBudgetMs -= new_cycles * mspercycle;
 }
 
 void ui_tick_end(void)

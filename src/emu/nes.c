@@ -74,10 +74,8 @@ int nes_cycle(nes *self, int cpubudget)
 {
     assert(self != NULL);
 
-    if (cpubudget == 0) return 0;
-
     int cycles = 0;
-    do {
+    while (self->cpu.signal.rdy && cycles < cpubudget) {
         cycles += cpu_cycle(&self->cpu);
         switch (self->mode) {
         case EXC_CYCLE:
@@ -92,7 +90,7 @@ int nes_cycle(nes *self, int cpubudget)
         default:
             assert(((void)"INVALID EXC MODE", false));
         }
-    } while (self->cpu.signal.rdy && cycles < cpubudget);
+    }
     return cycles;
 }
 

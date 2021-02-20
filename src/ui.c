@@ -148,18 +148,18 @@ static void drawtoggle(const char *label, bool state)
     }
 }
 
-static void drawcontrols(const struct control *appstate)
+static void drawcontrols(const struct control *appstate,
+                         const struct console_state *snapshot)
 {
     int cursor_y = 0;
-    wattron(ControlsView.content, A_STANDOUT);
-    mvwaddstr(ControlsView.content, cursor_y, 0, " HALT ");
-    wattroff(ControlsView.content, A_STANDOUT);
+    wmove(ControlsView.content, cursor_y, 0);
+    drawtoggle("HALT", !snapshot->lines.ready);
 
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y, 0, "Mode: ");
-    drawtoggle("Cycle", appstate->exec_mode == EXC_CYCLE);
-    drawtoggle("Step", appstate->exec_mode == EXC_STEP);
-    drawtoggle("Run", appstate->exec_mode == EXC_RUN);
+    drawtoggle("Cycle", snapshot->mode == EXC_CYCLE);
+    drawtoggle("Step", snapshot->mode == EXC_STEP);
+    drawtoggle("Run", snapshot->mode == EXC_RUN);
 
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y, 0, "Send: ");
@@ -454,11 +454,18 @@ void ui_cleanup(void)
     endwin();
 }
 
-void ui_tick_start(struct control *appstate)
+void ui_tick_start(struct control *appstate,
+                   const struct console_state *snapshot)
 {
     clock_gettime(CLOCK_MONOTONIC, &Current);
-    CycleBudgetMs += FrameTimeMs = to_ms(&Current) - to_ms(&Previous);
+    FrameTimeMs = to_ms(&Current) - to_ms(&Previous);
 
+    if (!snapshot->lines.ready) {
+        CycleBudgetMs = 0;
+        return;
+    }
+
+    CycleBudgetMs += FrameTimeMs;
     // Accumulate at most a second of banked cycle time
     if (CycleBudgetMs >= MillisecondsPerSecond) {
         CycleBudgetMs = MillisecondsPerSecond;
@@ -485,7 +492,7 @@ void ui_refresh(const struct control *appstate,
                 const struct console_state *snapshot)
 {
     drawhwtraits(appstate);
-    drawcontrols(appstate);
+    drawcontrols(appstate, snapshot);
     drawrom(snapshot);
     drawregister(snapshot);
     drawflags(snapshot);

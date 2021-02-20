@@ -19,6 +19,7 @@
 // Controller Input.
 
 struct nes_console {
+    enum excmode mode;      // Execution mode
     struct mos6502 cpu;     // CPU Core of RP2A03 Chip
     uint8_t ram[RAM_SIZE],  // CPU Internal RAM
             cart[ROM_SIZE]; // TODO: Cartridge ROM to be replaced
@@ -53,6 +54,13 @@ void nes_free(nes *self)
     free(self);
 }
 
+void nes_mode(nes *self, enum excmode mode)
+{
+    assert(self != NULL);
+
+    self->mode = mode % EXC_MODECOUNT;
+}
+
 void nes_powerup(nes *self, size_t sz, const uint8_t prg[restrict sz])
 {
     assert(self != NULL);
@@ -62,26 +70,29 @@ void nes_powerup(nes *self, size_t sz, const uint8_t prg[restrict sz])
     cpu_reset(&self->cpu);
 }
 
-int nes_cycle(nes *self)
+int nes_cycle(nes *self, int cpubudget)
 {
     assert(self != NULL);
 
-    self->cpu.signal.rdy = true;
-    const int cycles = cpu_clock(&self->cpu, 1);
-    self->cpu.signal.rdy = false;
-    return cycles;
-}
-
-int nes_step(nes *self)
-{
-    assert(self != NULL);
+    if (cpubudget == 0) return 0;
 
     int cycles = 0;
-    self->cpu.signal.rdy = true;
     do {
-        cycles += cpu_clock(&self->cpu, 1);
-    } while (!self->cpu.signal.sync);
-    self->cpu.signal.rdy = false;
+        cycles += cpu_cycle(&self->cpu);
+        switch (self->mode) {
+        case EXC_CYCLE:
+            self->cpu.signal.rdy = false;
+            break;
+        case EXC_STEP:
+            self->cpu.signal.rdy = !self->cpu.signal.sync;
+            break;
+        case EXC_RUN:
+            // Nothing to do, run freely
+            break;
+        default:
+            assert(((void)"INVALID EXC MODE", false));
+        }
+    } while (self->cpu.signal.rdy && cycles < cpubudget);
     return cycles;
 }
 
@@ -89,7 +100,22 @@ int nes_clock(nes *self)
 {
     assert(self != NULL);
 
-    return 0;
+    // TODO: pretend 1000 cycles is one frame for now
+    return nes_cycle(self, 1000);
+}
+
+void nes_halt(nes *self)
+{
+    assert(self != NULL);
+
+    self->cpu.signal.rdy = false;
+}
+
+void nes_ready(nes *self)
+{
+    assert(self != NULL);
+
+    self->cpu.signal.rdy = true;
 }
 
 void nes_snapshot(nes *self, struct console_state *snapshot)
@@ -98,6 +124,7 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
     if (!snapshot) return;
 
     cpu_snapshot(&self->cpu, snapshot);
+    snapshot->mode = self->mode;
     snapshot->ram = self->ram;
     snapshot->rom = self->cart;
 }

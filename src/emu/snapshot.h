@@ -11,8 +11,16 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+enum excmode {
+    EXC_CYCLE,
+    EXC_STEP,
+    EXC_RUN,
+    EXC_MODECOUNT,
+};
+
 struct console_state {
     const uint8_t *ram, *rom;
+    enum excmode mode;
     struct {
         uint16_t addressbus, currinst, program_counter;
         uint8_t accumulator, addrlow_latch, databus, exec_cycle, opcode,

@@ -11,16 +11,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-enum excmode {
-    EXC_CYCLE,
-    EXC_STEP,
-    EXC_RUN,
-    EXC_MODECOUNT,
-};
-
 struct control {
     uint64_t total_cycles;
-    enum excmode exec_mode;
     int cyclebudget, cycles_per_sec, ramsheet;
     bool running;
 };

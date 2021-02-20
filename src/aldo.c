@@ -23,52 +23,52 @@ int aldo_run(void)
 {
     puts("Aldo starting...");
 
-    struct control appstate = {.cycles_per_sec = 1, .running = true};
+    struct control appstate = {.cycles_per_sec = 4, .running = true};
     struct console_state snapshot;
     ui_init();
 
     const uint8_t test_prg[] = {0xea, 0xea, 0xea, 0x0, 0x42, 0x6, 0xea, 0x0, 0x6, 0x42, 0xea};
     nes *console = nes_new();
+    // NOTE: initialize snapshot from console
+    nes_snapshot(console, &snapshot);
     nes_powerup(console, sizeof test_prg, test_prg);
     // TODO: for now clock the cpu up to the first non-RESET cycle then halt
-    appstate.total_cycles += nes_step(console);
+    nes_mode(console, EXC_STEP);
+    nes_ready(console);
+    appstate.total_cycles += nes_clock(console);
+    nes_mode(console, snapshot.mode);
 
     do {
-        ui_tick_start(&appstate);
+        ui_tick_start(&appstate, &snapshot);
         const int c = ui_pollinput();
         switch (c) {
         case ' ':
-            switch (appstate.exec_mode) {
-            case EXC_CYCLE:
-                appstate.total_cycles += nes_cycle(console);
-                break;
-            case EXC_STEP:
-                appstate.total_cycles += nes_step(console);
-                break;
-            case EXC_RUN:
-                appstate.total_cycles += nes_clock(console);
-                break;
-            default:
-                assert(((void)"INVALID EXC MODE", false));
+            if (snapshot.lines.ready) {
+                nes_halt(console);
+            } else {
+                nes_ready(console);
             }
             break;
-        case 'b':
+        case 'm':
+            nes_mode(console, snapshot.mode + 1);
+            break;
+        case 'n':
+            appstate.ramsheet = (appstate.ramsheet + 1) % RamSheets;
+            break;
+        case 'p':
             --appstate.ramsheet;
             if (appstate.ramsheet < 0) {
                 appstate.ramsheet = RamSheets - 1;
             }
-            break;
-        case 'm':
-            appstate.exec_mode = (appstate.exec_mode + 1) % EXC_MODECOUNT;
-            break;
-        case 'n':
-            appstate.ramsheet = (appstate.ramsheet + 1) % RamSheets;
             break;
         case 'q':
             appstate.running = false;
             break;
         }
         if (appstate.running) {
+            const int cycles = nes_cycle(console, appstate.cyclebudget);
+            appstate.cyclebudget -= cycles;
+            appstate.total_cycles += cycles;
             nes_snapshot(console, &snapshot);
             ui_refresh(&appstate, &snapshot);
         }

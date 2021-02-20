@@ -546,7 +546,7 @@ void cpu_reset(struct mos6502 *self)
     self->idone = true;
 }
 
-int cpu_clock(struct mos6502 *self, int cyclebudget)
+int cpu_cycle(struct mos6502 *self)
 {
     assert(self != NULL);
 
@@ -560,20 +560,17 @@ int cpu_clock(struct mos6502 *self, int cyclebudget)
         self->dflt = false;
     }
 
-    int cycles;
-    for (cycles = 0; cycles < cyclebudget; ++cycles) {
-        if (++self->t == 0) {
-            // NOTE: T0 is always an opcode fetch
-            self->signal.sync = self->signal.rw = true;
-            self->addrbus = self->pc++;
-            read(self);
-            self->opc = self->databus;
-        } else {
-            self->signal.sync = false;
-            dispatch_addrmode(self, Decode[self->opc]);
-        }
+    if (++self->t == 0) {
+        // NOTE: T0 is always an opcode fetch
+        self->signal.sync = self->signal.rw = true;
+        self->addrbus = self->pc++;
+        read(self);
+        self->opc = self->databus;
+    } else {
+        self->signal.sync = false;
+        dispatch_addrmode(self, Decode[self->opc]);
     }
-    return cycles;
+    return 1;
 }
 
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)

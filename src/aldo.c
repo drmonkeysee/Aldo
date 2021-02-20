@@ -52,6 +52,9 @@ int aldo_run(void)
         case 'm':
             nes_mode(console, snapshot.mode + 1);
             break;
+        case 'M':
+            nes_mode(console, snapshot.mode - 1);
+            break;
         case 'n':
             appstate.ramsheet = (appstate.ramsheet + 1) % RamSheets;
             break;

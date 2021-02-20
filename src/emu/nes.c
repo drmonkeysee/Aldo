@@ -58,7 +58,11 @@ void nes_mode(nes *self, enum excmode mode)
 {
     assert(self != NULL);
 
-    self->mode = mode % EXC_MODECOUNT;
+    if (mode < 0) {
+        self->mode = EXC_MODECOUNT - 1;
+    } else {
+        self->mode = mode % EXC_MODECOUNT;
+    }
 }
 
 void nes_powerup(nes *self, size_t sz, const uint8_t prg[restrict sz])

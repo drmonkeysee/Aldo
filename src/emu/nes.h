@@ -21,10 +21,10 @@ void nes_free(nes *self);
 void nes_mode(nes *self, enum excmode mode);
 
 void nes_powerup(nes *self, size_t sz, const uint8_t prg[restrict sz]);
+void nes_ready(nes *self);
+void nes_halt(nes *self);
 int nes_cycle(nes *self, int cpubudget);
 int nes_clock(nes *self);
-void nes_halt(nes *self);
-void nes_ready(nes *self);
 
 void nes_snapshot(nes *self, struct console_state *snapshot);
 

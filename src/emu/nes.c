@@ -70,6 +70,20 @@ void nes_powerup(nes *self, size_t sz, const uint8_t prg[restrict sz])
     cpu_reset(&self->cpu);
 }
 
+void nes_ready(nes *self)
+{
+    assert(self != NULL);
+
+    self->cpu.signal.rdy = true;
+}
+
+void nes_halt(nes *self)
+{
+    assert(self != NULL);
+
+    self->cpu.signal.rdy = false;
+}
+
 int nes_cycle(nes *self, int cpubudget)
 {
     assert(self != NULL);
@@ -100,20 +114,6 @@ int nes_clock(nes *self)
 
     // TODO: pretend 1000 cycles is one frame for now
     return nes_cycle(self, 1000);
-}
-
-void nes_halt(nes *self)
-{
-    assert(self != NULL);
-
-    self->cpu.signal.rdy = false;
-}
-
-void nes_ready(nes *self)
-{
-    assert(self != NULL);
-
-    self->cpu.signal.rdy = true;
 }
 
 void nes_snapshot(nes *self, struct console_state *snapshot)

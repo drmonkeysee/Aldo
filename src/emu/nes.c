@@ -19,7 +19,7 @@
 // Controller Input.
 
 struct nes_console {
-    enum excmode mode;      // Execution mode
+    enum nexcmode mode;     // NES execution mode
     struct mos6502 cpu;     // CPU Core of RP2A03 Chip
     uint8_t ram[RAM_SIZE],  // CPU Internal RAM
             cart[ROM_SIZE]; // TODO: Cartridge ROM to be replaced
@@ -54,15 +54,11 @@ void nes_free(nes *self)
     free(self);
 }
 
-void nes_mode(nes *self, enum excmode mode)
+void nes_mode(nes *self, enum nexcmode mode)
 {
     assert(self != NULL);
 
-    if (mode < 0) {
-        self->mode = EXC_MODECOUNT - 1;
-    } else {
-        self->mode = mode % EXC_MODECOUNT;
-    }
+    self->mode = mode < 0 ? NEXC_MODECOUNT - 1 : mode % NEXC_MODECOUNT;
 }
 
 void nes_powerup(nes *self, size_t sz, const uint8_t prg[restrict sz])
@@ -96,13 +92,13 @@ int nes_cycle(nes *self, int cpubudget)
     while (self->cpu.signal.rdy && cycles < cpubudget) {
         cycles += cpu_cycle(&self->cpu);
         switch (self->mode) {
-        case EXC_CYCLE:
+        case NEXC_CYCLE:
             self->cpu.signal.rdy = false;
             break;
-        case EXC_STEP:
+        case NEXC_STEP:
             self->cpu.signal.rdy = !self->cpu.signal.sync;
             break;
-        case EXC_RUN:
+        case NEXC_RUN:
             // Nothing to do, run freely
             break;
         default:

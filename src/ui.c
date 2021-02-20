@@ -170,9 +170,9 @@ static void drawcontrols(const struct control *appstate,
 
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y, 0, "Mode: ");
-    drawtoggle(" Cycle ", snapshot->mode == EXC_CYCLE);
-    drawtoggle(" Step ", snapshot->mode == EXC_STEP);
-    drawtoggle(" Run ", snapshot->mode == EXC_RUN);
+    drawtoggle(" Cycle ", snapshot->mode == NEXC_CYCLE);
+    drawtoggle(" Step ", snapshot->mode == NEXC_STEP);
+    drawtoggle(" Run ", snapshot->mode == NEXC_RUN);
 
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y, 0, "Send: ");

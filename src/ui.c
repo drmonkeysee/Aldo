@@ -14,9 +14,13 @@
 #include <ncurses.h>
 #include <panel.h>
 
+#include <assert.h>
 #include <locale.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <string.h>
 #include <time.h>
 
 //
@@ -141,7 +145,7 @@ static void drawtoggle(const char *label, bool state)
     if (state) {
         wattron(ControlsView.content, A_STANDOUT);
     }
-    wprintw(ControlsView.content, " %s ", label);
+    waddstr(ControlsView.content, label);
     wattroff(ControlsView.content, A_STANDOUT);
     if (state) {
         wattroff(ControlsView.content, A_STANDOUT);
@@ -151,15 +155,24 @@ static void drawtoggle(const char *label, bool state)
 static void drawcontrols(const struct control *appstate,
                          const struct console_state *snapshot)
 {
+    static const char *restrict const halt = "HALT";
+
     int cursor_y = 0;
     wmove(ControlsView.content, cursor_y, 0);
-    drawtoggle("HALT", !snapshot->lines.ready);
+    const int w = getmaxx(ControlsView.content);
+    const double center_offset = (w - strlen(halt)) / 2.0;
+    assert(center_offset > 0);
+    char halt_label[w + 1];
+    snprintf(halt_label, sizeof halt_label, "%*s%s%*s",
+             (int)round(center_offset), "", halt,
+             (int)floor(center_offset), "");
+    drawtoggle(halt_label, !snapshot->lines.ready);
 
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y, 0, "Mode: ");
-    drawtoggle("Cycle", snapshot->mode == EXC_CYCLE);
-    drawtoggle("Step", snapshot->mode == EXC_STEP);
-    drawtoggle("Run", snapshot->mode == EXC_RUN);
+    drawtoggle(" Cycle ", snapshot->mode == EXC_CYCLE);
+    drawtoggle(" Step ", snapshot->mode == EXC_STEP);
+    drawtoggle(" Run ", snapshot->mode == EXC_RUN);
 
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y, 0, "Send: ");

@@ -20,8 +20,7 @@
 #include <stdlib.h>
 
 static void handle_input(struct control *appstate,
-                         const struct console_state *restrict snapshot,
-                         nes *console)
+                         const struct console_state *snapshot, nes *console)
 {
     const int c = ui_pollinput();
     switch (c) {
@@ -73,6 +72,16 @@ static void handle_input(struct control *appstate,
     }
 }
 
+static void update(struct control *appstate, struct console_state *snapshot,
+                   nes *console)
+{
+    const int cycles = nes_cycle(console, appstate->cyclebudget);
+    appstate->cyclebudget -= cycles;
+    appstate->total_cycles += cycles;
+    nes_snapshot(console, snapshot);
+    ui_refresh(appstate, snapshot);
+}
+
 int aldo_run(void)
 {
     puts("Aldo starting...");
@@ -96,11 +105,7 @@ int aldo_run(void)
         ui_tick_start(&appstate, &snapshot);
         handle_input(&appstate, &snapshot, console);
         if (appstate.running) {
-            const int cycles = nes_cycle(console, appstate.cyclebudget);
-            appstate.cyclebudget -= cycles;
-            appstate.total_cycles += cycles;
-            nes_snapshot(console, &snapshot);
-            ui_refresh(&appstate, &snapshot);
+            update(&appstate, &snapshot, console);
         }
         ui_tick_end();
     } while (appstate.running);

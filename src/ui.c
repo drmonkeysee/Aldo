@@ -159,9 +159,11 @@ static void drawcontrols(const struct control *appstate,
 {
     static const char *restrict const halt = "HALT";
 
-    int cursor_y = 0;
-    wmove(ControlsView.content, cursor_y, 0);
     const int w = getmaxx(ControlsView.content);
+    int cursor_y = 0;
+    werase(ControlsView.content);
+    wmove(ControlsView.content, cursor_y, 0);
+
     const double center_offset = (w - strlen(halt)) / 2.0;
     assert(center_offset > 0);
     char halt_label[w + 1];
@@ -192,10 +194,7 @@ static void drawcontrols(const struct control *appstate,
              getmaxx(ControlsView.content));
 
     cursor_y += 2;
-    mvwaddstr(ControlsView.content, cursor_y++, 0, "RAM: Next Prev");
-    mvwaddstr(ControlsView.content, ++cursor_y, 0, "ROM: up down");
-    mvwaddstr(ControlsView.content, ++cursor_y, 5, "pgup pgdn");
-    mvwaddstr(ControlsView.content, ++cursor_y, 0, "Go:  [$8000-$FFFF]");
+    mvwaddstr(ControlsView.content, cursor_y, 0, "Go:  [$8000-$FFFF]");
 }
 
 static void drawvecs(int h, int w, int y,
@@ -470,7 +469,7 @@ void ui_cleanup(void)
 }
 
 void ui_tick_start(struct control *appstate,
-                   const struct console_state *snapshot)
+                   const struct console_state *restrict snapshot)
 {
     clock_gettime(CLOCK_MONOTONIC, &Current);
     FrameTimeMs = to_ms(&Current) - to_ms(&Previous);

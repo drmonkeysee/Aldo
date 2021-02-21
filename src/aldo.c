@@ -19,6 +19,60 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static void handle_input(struct control *appstate,
+                         const struct console_state *restrict snapshot,
+                         nes *console)
+{
+    const int c = ui_pollinput();
+    switch (c) {
+    case ' ':
+        if (snapshot->lines.ready) {
+            nes_halt(console);
+        } else {
+            nes_ready(console);
+        }
+        break;
+    case '=':   // "lowercase" +
+        ++appstate->cycles_per_sec;
+        goto pclamp_cps;
+    case '+':
+        appstate->cycles_per_sec += 10;
+    pclamp_cps:
+        if (appstate->cycles_per_sec > MaxCps) {
+            appstate->cycles_per_sec = MaxCps;
+        }
+        break;
+    case '-':
+        --appstate->cycles_per_sec;
+        goto nclamp_cps;
+    case '_':      // "uppercase" -
+        appstate->cycles_per_sec -= 10;
+    nclamp_cps:
+        if (appstate->cycles_per_sec < MinCps) {
+            appstate->cycles_per_sec = MinCps;
+        }
+        break;
+    case 'm':
+        nes_mode(console, snapshot->mode + 1);
+        break;
+    case 'M':
+        nes_mode(console, snapshot->mode - 1);
+        break;
+    case 'r':
+        appstate->ramsheet = (appstate->ramsheet + 1) % RamSheets;
+        break;
+    case 'R':
+        --appstate->ramsheet;
+        if (appstate->ramsheet < 0) {
+            appstate->ramsheet = RamSheets - 1;
+        }
+        break;
+    case 'q':
+        appstate->running = false;
+        break;
+    }
+}
+
 int aldo_run(void)
 {
     puts("Aldo starting...");
@@ -40,34 +94,7 @@ int aldo_run(void)
 
     do {
         ui_tick_start(&appstate, &snapshot);
-        const int c = ui_pollinput();
-        switch (c) {
-        case ' ':
-            if (snapshot.lines.ready) {
-                nes_halt(console);
-            } else {
-                nes_ready(console);
-            }
-            break;
-        case 'm':
-            nes_mode(console, snapshot.mode + 1);
-            break;
-        case 'M':
-            nes_mode(console, snapshot.mode - 1);
-            break;
-        case 'n':
-            appstate.ramsheet = (appstate.ramsheet + 1) % RamSheets;
-            break;
-        case 'p':
-            --appstate.ramsheet;
-            if (appstate.ramsheet < 0) {
-                appstate.ramsheet = RamSheets - 1;
-            }
-            break;
-        case 'q':
-            appstate.running = false;
-            break;
-        }
+        handle_input(&appstate, &snapshot, console);
         if (appstate.running) {
             const int cycles = nes_cycle(console, appstate.cyclebudget);
             appstate.cyclebudget -= cycles;

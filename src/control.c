@@ -7,4 +7,4 @@
 
 #include "control.h"
 
-const int RamSheets = 4;
+const int MinCps = 1, MaxCps = 100, RamSheets = 4;

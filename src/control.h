@@ -17,6 +17,6 @@ struct control {
     bool running;
 };
 
-extern const int RamSheets;
+extern const int MinCps, MaxCps, RamSheets;
 
 #endif

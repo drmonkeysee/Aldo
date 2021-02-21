@@ -77,7 +77,9 @@ static void tick_sleep(void)
     // we've BLOWN AWAY our time budget; either way don't sleep.
     if (elapsed.tv_nsec > VSync.tv_nsec
         || elapsed.tv_sec > VSync.tv_sec) {
-        FrameLeftMs = 0;
+        // NOTE: we've already blown the frame time so convert everything
+        // to milliseconds to make the math easier.
+        FrameLeftMs = to_ms(&VSync) - to_ms(&elapsed);
         return;
     }
 
@@ -126,7 +128,7 @@ static void drawhwtraits(const struct control *appstate)
     int cursor_y = 0;
     werase(HwView.content);
     mvwprintw(HwView.content, cursor_y++, 0, "FPS: %d", Fps);
-    mvwprintw(HwView.content, cursor_y++, 0, "\u0394T: %.3f (+%.3f)",
+    mvwprintw(HwView.content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_frametime, display_frameleft);
     mvwprintw(HwView.content, cursor_y++, 0, "Cycle Budget: %d (%.3f)",
               appstate->cyclebudget, display_cyclebudget);

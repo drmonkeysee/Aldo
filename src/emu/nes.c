@@ -35,6 +35,11 @@ static void load_prg(nes *self, size_t sz, const uint8_t prg[restrict sz])
         self->cart[(i + CpuCartMinAddr) & CpuCartAddrMask] = prg[i];
     }
     wrtoba(CpuCartMinAddr, self->cart + (ResetVector & CpuCartAddrMask));
+
+    // TODO: throw random stuff into RAM for testing
+    for (size_t i = 0; i < RAM_SIZE; ++i) {
+        self->ram[i] = rand() % (UINT8_MAX + 1);
+    }
 }
 
 //

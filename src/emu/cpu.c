@@ -364,7 +364,7 @@ static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 // Addressing Mode Sequences
 //
 
-#define BAD_ADDR_SEQ assert(((void)"BAD ADDRMODE SEQUENCE", false));
+#define BAD_ADDR_SEQ assert(((void)"BAD ADDRMODE SEQUENCE", false))
 
 static void IMP_sequence(struct mos6502 *self, struct decoded dec)
 {

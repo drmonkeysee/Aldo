@@ -78,9 +78,10 @@ int aldo_run(void)
         ui_tick_end();
     } while (appstate.running);
 
-    ui_cleanup();
     nes_free(console);
     console = NULL;
+    snapshot.ram = snapshot.rom = NULL;
+    ui_cleanup();
 
     puts("Aldo stopping...");
     return EXIT_SUCCESS;

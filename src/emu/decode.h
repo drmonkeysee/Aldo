@@ -8,8 +8,6 @@
 #ifndef Aldo_emu_decode_h
 #define Aldo_emu_decode_h
 
-#include <stddef.h>
-
 // 6502 Instructions
 // X(symbol)
 #define DEC_INST_X \
@@ -138,6 +136,5 @@ struct decoded {
 };
 
 extern const struct decoded Decode[];
-extern const size_t DecodeSize;
 
 #endif

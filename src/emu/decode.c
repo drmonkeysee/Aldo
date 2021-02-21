@@ -271,4 +271,3 @@ const struct decoded Decode[] = {
     UNK,    // FE - INC abs,X
     UNK,    // FF - Unofficial
 };
-const size_t DecodeSize = sizeof Decode / sizeof Decode[0];

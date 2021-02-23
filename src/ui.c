@@ -408,7 +408,7 @@ static void ramrefresh(int ramsheet)
 
 void ui_init(void)
 {
-    static const int col1w = 32, col2w = 34, col3w = 35, col4w = 56, hwh = 13,
+    static const int col1w = 32, col2w = 34, col3w = 35, col4w = 56, hwh = 12,
                      cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");
@@ -424,8 +424,7 @@ void ui_init(void)
     const int yoffset = (scrh - ramh) / 2,
               xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
     vinit(&HwView, hwh, col1w, yoffset, xoffset, "Hardware Traits");
-    vinit(&ControlsView, 9, col1w, yoffset + hwh, xoffset,
-          "Controls");
+    vinit(&ControlsView, 9, col1w, yoffset + hwh, xoffset, "Controls");
     vinit(&RomView, ramh, col2w, yoffset, xoffset + col1w, "ROM");
     vinit(&RegistersView, cpuh, flagsw, yoffset, xoffset + col1w + col2w,
           "Registers");

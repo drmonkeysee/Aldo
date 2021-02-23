@@ -12,7 +12,6 @@
 #include "emu/nes.h"
 #include "emu/snapshot.h"
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

@@ -81,6 +81,10 @@ static void update(struct control *appstate, struct console_state *snapshot,
     ui_refresh(appstate, snapshot);
 }
 
+//
+// Public Interface
+//
+
 int aldo_run(void)
 {
     puts("Aldo starting...");

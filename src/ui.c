@@ -116,10 +116,8 @@ static void drawhwtraits(const struct control *appstate)
 {
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
-    static double display_cyclebudget, display_frameleft, display_frametime,
-                  refreshdt;
+    static double display_frameleft, display_frametime, refreshdt;
     if ((refreshdt += FrameTimeMs) >= refresh_interval_ms) {
-        display_cyclebudget = CycleBudgetMs;
         display_frameleft = FrameLeftMs;
         display_frametime = FrameTimeMs;
         refreshdt = 0;
@@ -130,8 +128,6 @@ static void drawhwtraits(const struct control *appstate)
     mvwprintw(HwView.content, cursor_y++, 0, "FPS: %d", Fps);
     mvwprintw(HwView.content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_frametime, display_frameleft);
-    mvwprintw(HwView.content, cursor_y++, 0, "Cycle Budget: %d (%.3f)",
-              appstate->cyclebudget, display_cyclebudget);
     mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "CPU Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "PPU Clock: INF Hz");
@@ -154,8 +150,7 @@ static void drawtoggle(const char *label, bool state)
     }
 }
 
-static void drawcontrols(const struct control *appstate,
-                         const struct console_state *snapshot)
+static void drawcontrols(const struct console_state *snapshot)
 {
     static const char *restrict const halt = "HALT";
 
@@ -183,18 +178,6 @@ static void drawcontrols(const struct control *appstate,
     waddstr(ControlsView.content, " IRQ ");
     waddstr(ControlsView.content, " NMI ");
     waddstr(ControlsView.content, " RES ");
-    mvwhline(ControlsView.content, ++cursor_y, 0, 0,
-             getmaxx(ControlsView.content));
-
-    cursor_y += 2;
-    mvwaddstr(ControlsView.content, cursor_y++, 0, "FPS [1-120]: N/A");
-    mvwprintw(ControlsView.content, cursor_y++, 0, "CPS [1-100]: %d",
-              appstate->cycles_per_sec);
-    mvwhline(ControlsView.content, ++cursor_y, 0, 0,
-             getmaxx(ControlsView.content));
-
-    cursor_y += 2;
-    mvwaddstr(ControlsView.content, cursor_y, 0, "Go:  [$8000-$FFFF]");
 }
 
 static void drawvecs(int h, int w, int y,
@@ -441,7 +424,7 @@ void ui_init(void)
     const int yoffset = (scrh - ramh) / 2,
               xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
     vinit(&HwView, hwh, col1w, yoffset, xoffset, "Hardware Traits");
-    vinit(&ControlsView, ramh - hwh, col1w, yoffset + hwh, xoffset,
+    vinit(&ControlsView, 9, col1w, yoffset + hwh, xoffset,
           "Controls");
     vinit(&RomView, ramh, col2w, yoffset, xoffset + col1w, "ROM");
     vinit(&RegistersView, cpuh, flagsw, yoffset, xoffset + col1w + col2w,
@@ -506,7 +489,7 @@ void ui_refresh(const struct control *appstate,
                 const struct console_state *snapshot)
 {
     drawhwtraits(appstate);
-    drawcontrols(appstate, snapshot);
+    drawcontrols(snapshot);
     drawrom(snapshot);
     drawregister(snapshot);
     drawflags(snapshot);

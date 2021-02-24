@@ -138,14 +138,14 @@ static void drawhwtraits(const struct control *appstate)
     mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
 }
 
-static void drawtoggle(const char *label, bool state)
+static void drawtoggle(const char *label, bool selected)
 {
-    if (state) {
+    if (selected) {
         wattron(ControlsView.content, A_STANDOUT);
     }
     waddstr(ControlsView.content, label);
     wattroff(ControlsView.content, A_STANDOUT);
-    if (state) {
+    if (selected) {
         wattroff(ControlsView.content, A_STANDOUT);
     }
 }

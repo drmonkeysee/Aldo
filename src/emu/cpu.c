@@ -511,8 +511,8 @@ void cpu_powerup(struct mos6502 *self)
     self->t = PreFetch;
 
     // NOTE: Interrupts are inverted, high means no interrupt; rw high is read
-    self->signal.irq = self->signal.nmi = self->signal.res = self->signal.rw
-        = true;
+    self->signal.irq = self->signal.nmi = self->signal.res = self->signal.rw =
+        true;
     self->signal.rdy = self->signal.sync = self->idone = self->dflt = false;
 
     // NOTE: all other cpu elements are indeterminate on powerup

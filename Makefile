@@ -47,7 +47,7 @@ release: $(TARGET)
 debug: CFLAGS += -g -O0 -DDEBUG
 debug: $(TARGET)
 
-check: CFLAGS += -g -O0 -DDEBUG
+check: CFLAGS += -g -O0 -DDEBUG -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-parameter
 check: LDLIBS := -lcinytest
 check: $(TESTS_TARGET)
 	$(TESTS_TARGET)

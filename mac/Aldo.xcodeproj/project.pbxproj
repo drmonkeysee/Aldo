@@ -40,6 +40,7 @@
 		C8184D3B25E7496B002B3100 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8184D3D25E7496B002B3100 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		C8184D3F25E7496B002B3100 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C8184D5025E74AC5002B3100 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		C81A516B25DA036100361E40 /* control.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = control.h; sourceTree = "<group>"; };
 		C81A516C25DA036100361E40 /* control.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = control.c; sourceTree = "<group>"; };
 		C820E6BC25A9759A006A7AB1 /* Dev */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Dev; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,6 +93,15 @@
 				C8184D3F25E7496B002B3100 /* Info.plist */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		C8184D4E25E74A9F002B3100 /* test */ = {
+			isa = PBXGroup;
+			children = (
+				C8184D5025E74AC5002B3100 /* main.c */,
+			);
+			name = test;
+			path = ../test;
 			sourceTree = "<group>";
 		};
 		C820E6BD25A9759A006A7AB1 /* Products */ = {
@@ -161,6 +171,7 @@
 			isa = PBXGroup;
 			children = (
 				C820E6C625A97A2F006A7AB1 /* src */,
+				C8184D4E25E74A9F002B3100 /* test */,
 				C820E6BE25A9759A006A7AB1 /* Dev */,
 				C8184D3C25E7496B002B3100 /* Tests */,
 				C820E6DD25A982A5006A7AB1 /* Frameworks */,

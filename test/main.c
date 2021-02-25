@@ -5,10 +5,13 @@
 //  Created by Brandon Stansbury on 2/24/21.
 //
 
-#include <stdlib.h>
+#include "tests.h"
 
 int main(int argc, char *argv[argc+1])
 {
-    (void)argv;
-    return EXIT_SUCCESS;
+    const struct ct_testsuite suites[] = {
+        asm_tests(),
+    };
+    const size_t results = ct_run_withargs(suites, argc, argv);
+    return results != 0;
 }

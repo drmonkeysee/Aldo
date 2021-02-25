@@ -7,12 +7,15 @@ OBJ_DIR := $(BUILD_DIR)/obj
 MODULES := emu
 SRC_FILES := $(wildcard $(SRC_DIR)/*.c) $(foreach MDL,$(MODULES),$(wildcard $(SRC_DIR)/$(MDL)/*.c))
 TEST_FILES := $(wildcard $(TEST_DIR)/*.c) $(foreach MDL,$(MODULES),$(wildcard $(TEST_DIR)/$(MDL)/*.c))
+
 OBJ_FILES := $(subst $(SRC_DIR),$(OBJ_DIR),$(SRC_FILES:.c=.o))
 TEST_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(TEST_FILES:.c=.o))
 DEP_FILES := $(OBJ_FILES:.o=.d)
+
 OBJ_DIRS := $(OBJ_DIR) $(foreach MDL,$(MODULES),$(OBJ_DIR)/$(MDL))
 TEST_OBJ_DIRS := $(OBJ_DIR)/$(TEST_DIR) $(foreach MDL,$(MODULES),$(OBJ_DIR)/$(TEST_DIR)/$(MDL))
 TEST_DEPS := $(addprefix $(OBJ_DIR)/,asm.o emu/bytes.o emu/decode.o)
+
 PRODUCT := aldo
 TESTS := $(PRODUCT)tests
 TARGET := $(BUILD_DIR)/$(PRODUCT)

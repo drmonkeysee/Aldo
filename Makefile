@@ -1,15 +1,21 @@
 OS := $(shell uname)
 SRC_DIR := src
+TEST_DIR := test
 BUILD_DIR := build
 OBJ_DIR := $(BUILD_DIR)/obj
 
 MODULES := emu
 SRC_FILES := $(wildcard $(SRC_DIR)/*.c) $(foreach MDL,$(MODULES),$(wildcard $(SRC_DIR)/$(MDL)/*.c))
+TEST_FILES := $(wildcard $(TEST_DIR)/*.c) $(foreach MDL,$(MODULES),$(wildcard $(TEST_DIR)/$(MDL)/*.c))
 OBJ_FILES := $(subst $(SRC_DIR),$(OBJ_DIR),$(SRC_FILES:.c=.o))
+TEST_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(TEST_FILES:.c=.o))
 DEP_FILES := $(OBJ_FILES:.o=.d)
 OBJ_DIRS := $(OBJ_DIR) $(foreach MDL,$(MODULES),$(OBJ_DIR)/$(MDL))
+TEST_OBJ_DIRS := $(OBJ_DIR)/$(TEST_DIR) $(foreach MDL,$(MODULES),$(OBJ_DIR)/$(TEST_DIR)/$(MDL))
 PRODUCT := aldo
+TESTS := $(PRODUCT)tests
 TARGET := $(BUILD_DIR)/$(PRODUCT)
+TESTS_TARGET := $(BUILD_DIR)/$(TESTS)
 
 CFLAGS := -Wall -Wextra -pedantic -std=c17
 SP := strip
@@ -41,7 +47,15 @@ release: $(TARGET)
 debug: CFLAGS += -g -O0 -DDEBUG
 debug: $(TARGET)
 
+check: CFLAGS += -g -O0 -DDEBUG
+check: LDLIBS := -lcinytest
+check: $(TESTS_TARGET)
+	$(TESTS_TARGET)
+
 $(TARGET): $(OBJ_FILES)
+	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
+
+$(TESTS_TARGET): $(TEST_OBJ_FILES)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 -include $(DEP_FILES)
@@ -49,7 +63,13 @@ $(TARGET): $(OBJ_FILES)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIRS)
 	$(CC) $(CFLAGS) -MMD -c $< -o $@
 
+$(OBJ_DIR)/$(TEST_DIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_DIRS)
+	$(CC) $(CFLAGS) -MMD -c $< -o $@
+
 $(OBJ_DIRS):
+	mkdir -p $@
+
+$(TEST_OBJ_DIRS):
 	mkdir -p $@
 
 run: debug

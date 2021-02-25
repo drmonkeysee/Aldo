@@ -19,6 +19,10 @@ static size_t testrunner(int argc, char *argv[argc+1])
     return ct_run_withargs(suites, argc, argv);
 }
 
+//
+// Public Interface
+//
+
 size_t swift_runner(void)
 {
     char *args[] = {"swift-tests", "--ct-colorized=no", NULL};

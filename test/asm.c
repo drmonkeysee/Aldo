@@ -6,7 +6,6 @@
 //
 
 #include "asm.h"
-
 #include "ciny.h"
 
 static void test(void *context)

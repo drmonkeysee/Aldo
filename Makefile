@@ -12,6 +12,7 @@ TEST_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(TEST_FILES:.c=.o))
 DEP_FILES := $(OBJ_FILES:.o=.d)
 OBJ_DIRS := $(OBJ_DIR) $(foreach MDL,$(MODULES),$(OBJ_DIR)/$(MDL))
 TEST_OBJ_DIRS := $(OBJ_DIR)/$(TEST_DIR) $(foreach MDL,$(MODULES),$(OBJ_DIR)/$(TEST_DIR)/$(MDL))
+TEST_DEPS := $(addprefix $(OBJ_DIR)/,asm.o emu/bytes.o emu/decode.o)
 PRODUCT := aldo
 TESTS := $(PRODUCT)tests
 TARGET := $(BUILD_DIR)/$(PRODUCT)
@@ -38,7 +39,7 @@ ifdef XLF
 LDFLAGS += $(XLF)
 endif
 
-.PHONY: release debug run clean
+.PHONY: release debug check run clean
 
 release: CFLAGS += -Werror -Os -flto -DNDEBUG
 release: $(TARGET)
@@ -47,7 +48,8 @@ release: $(TARGET)
 debug: CFLAGS += -g -O0 -DDEBUG
 debug: $(TARGET)
 
-check: CFLAGS += -g -O0 -DDEBUG -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-parameter
+check: CFLAGS += -g -O0 -DDEBUG -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-parameter -iquote$(SRC_DIR)
+# TODO: can i remove extraneous flags set by ifeq above?
 check: LDLIBS := -lcinytest
 check: $(TESTS_TARGET)
 	$(TESTS_TARGET)
@@ -55,7 +57,7 @@ check: $(TESTS_TARGET)
 $(TARGET): $(OBJ_FILES)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
-$(TESTS_TARGET): $(TEST_OBJ_FILES)
+$(TESTS_TARGET): $(TEST_OBJ_FILES) $(TEST_DEPS)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 -include $(DEP_FILES)
@@ -66,10 +68,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIRS)
 $(OBJ_DIR)/$(TEST_DIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_DIRS)
 	$(CC) $(CFLAGS) -MMD -c $< -o $@
 
-$(OBJ_DIRS):
-	mkdir -p $@
-
-$(TEST_OBJ_DIRS):
+$(OBJ_DIRS) $(TEST_OBJ_DIRS):
 	mkdir -p $@
 
 run: debug

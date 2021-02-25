@@ -24,7 +24,7 @@ The Homebrew and ncurses steps get you the latest version of ncurses and are opt
 
 ## Test
 
-The Makefile also provides a unit-test build target:
+The Makefile also provides a unit-test build target.
 
 1. Follow the [CinyTest build/install instructions](https://github.com/drmonkeysee/CinyTest#build-cinytest)
 2. `make check`

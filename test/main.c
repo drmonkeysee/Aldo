@@ -9,6 +9,10 @@
 
 #include <stddef.h>
 
+//
+// Test Suites
+//
+
 struct ct_testsuite asm_tests(void);
 
 static size_t testrunner(int argc, char *argv[argc+1])
@@ -26,7 +30,7 @@ static size_t testrunner(int argc, char *argv[argc+1])
 size_t swift_runner(void)
 {
     char *args[] = {"swift-tests", "--ct-colorized=no", NULL};
-    return testrunner(sizeof args / sizeof args[0], args);
+    return testrunner((sizeof args / sizeof args[0]) - 1, args);
 }
 
 int main(int argc, char *argv[argc+1])

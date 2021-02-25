@@ -10,6 +10,7 @@
 		C8114E2F25CBBD6D007309CD /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = C8114E2E25CBBD6D007309CD /* decode.c */; };
 		C8184D3E25E7496B002B3100 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8184D3D25E7496B002B3100 /* Tests.swift */; };
 		C8184D5325E74B75002B3100 /* asm.c in Sources */ = {isa = PBXBuildFile; fileRef = C8184D5225E74B75002B3100 /* asm.c */; };
+		C8184D7025E750E0002B3100 /* libcinytest.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8184D6F25E750E0002B3100 /* libcinytest.dylib */; };
 		C81A516D25DA036100361E40 /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
 		C820E6C025A9759A006A7AB1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820E6BF25A9759A006A7AB1 /* main.swift */; };
 		C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* aldo.c */; };
@@ -45,6 +46,7 @@
 		C8184D5125E74B74002B3100 /* Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		C8184D5225E74B75002B3100 /* asm.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = asm.c; sourceTree = "<group>"; };
 		C8184D6225E74F0F002B3100 /* tests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tests.h; sourceTree = "<group>"; };
+		C8184D6F25E750E0002B3100 /* libcinytest.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcinytest.dylib; path = /usr/local/lib/libcinytest.dylib; sourceTree = "<absolute>"; };
 		C81A516B25DA036100361E40 /* control.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = control.h; sourceTree = "<group>"; };
 		C81A516C25DA036100361E40 /* control.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = control.c; sourceTree = "<group>"; };
 		C820E6BC25A9759A006A7AB1 /* Dev */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Dev; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -75,6 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8184D7025E750E0002B3100 /* libcinytest.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,6 +171,7 @@
 		C820E6DD25A982A5006A7AB1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C8184D6F25E750E0002B3100 /* libcinytest.dylib */,
 				C820E6DE25A982A5006A7AB1 /* libncurses.tbd */,
 				C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */,
 			);
@@ -335,6 +339,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -378,6 +383,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;

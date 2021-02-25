@@ -18,18 +18,10 @@ TESTS := $(PRODUCT)tests
 TARGET := $(BUILD_DIR)/$(PRODUCT)
 TESTS_TARGET := $(BUILD_DIR)/$(TESTS)
 
-CFLAGS := -Wall -Wextra -pedantic -std=c17
+CFLAGS := -Wall -Wextra -std=c17
+SRC_CFLAGS := -pedantic
+TEST_CFLAGS := -Wno-unused-parameter -iquote$(SRC_DIR)
 SP := strip
-
-ifeq ($(OS), Darwin)
-CFLAGS += -I/usr/local/opt/ncurses/include
-LDFLAGS := -L/usr/local/opt/ncurses/lib
-LDLIBS := -lpanel -lncurses
-else
-CFLAGS += -D_POSIX_C_SOURCE=200112L
-LDLIBS := -lpanelw -lncursesw
-SPFLAGS := -s
-endif
 
 ifdef XCF
 CFLAGS += $(XCF)
@@ -42,18 +34,31 @@ endif
 .PHONY: release debug check run clean
 
 release: CFLAGS += -Werror -Os -flto -DNDEBUG
+ifneq ($(OS), Darwin)
+release: SPFLAGS := -s
+endif
 release: $(TARGET)
 	$(SP) $(SPFLAGS) $(TARGET)
 
 debug: CFLAGS += -g -O0 -DDEBUG
 debug: $(TARGET)
 
-check: CFLAGS += -g -O0 -DDEBUG -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-parameter -iquote$(SRC_DIR)
-# TODO: can i remove extraneous flags set by ifeq above?
+check: CFLAGS += -g -O0 -DDEBUG
+ifeq ($(OS), Darwin)
+check: TEST_CFLAGS += -pedantic -Wno-gnu-zero-variadic-macro-arguments
+else
+check: LDFLAGS := -L/usr/local/lib -Wl,-rpath,/usr/local/lib
+endif
 check: LDLIBS := -lcinytest
 check: $(TESTS_TARGET)
 	$(TESTS_TARGET)
 
+ifeq ($(OS), Darwin)
+$(TARGET): LDFLAGS := -L/usr/local/opt/ncurses/lib
+$(TARGET): LDLIBS := -lpanel -lncurses
+else
+$(TARGET): LDLIBS := -lm -lpanelw -lncursesw
+endif
 $(TARGET): $(OBJ_FILES)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
@@ -62,11 +67,16 @@ $(TESTS_TARGET): $(TEST_OBJ_FILES) $(TEST_DEPS)
 
 -include $(DEP_FILES)
 
+ifeq ($(OS), Darwin)
+$(OBJ_DIR)/%.o: SRC_CFLAGS += -I/usr/local/opt/ncurses/include
+else
+$(OBJ_DIR)/%.o: SRC_CFLAGS += -D_POSIX_C_SOURCE=200112L
+endif
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIRS)
-	$(CC) $(CFLAGS) -MMD -c $< -o $@
+	$(CC) $(CFLAGS) $(SRC_CFLAGS) -MMD -c $< -o $@
 
 $(OBJ_DIR)/$(TEST_DIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_DIRS)
-	$(CC) $(CFLAGS) -MMD -c $< -o $@
+	$(CC) $(CFLAGS) $(TEST_CFLAGS) -MMD -c $< -o $@
 
 $(OBJ_DIRS) $(TEST_OBJ_DIRS):
 	mkdir -p $@

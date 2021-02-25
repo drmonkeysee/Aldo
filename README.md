@@ -22,6 +22,13 @@ The Homebrew and ncurses steps get you the latest version of ncurses and are opt
 3. `[sudo] apt-get install -y build-essential git libncurses-dev` (`libncursesw5-dev` on older OS versions)
 4. `make run`
 
+## Test
+
+The Makefile provides a unit-test build target. The build instructions are identical for Mac/Linux.
+
+1. Follow installation instructions for [CinyTest](https://github.com/drmonkeysee/CinyTest)
+2. `make check`
+
 ## Resources
 
 - [Nesdev Wiki](https://wiki.nesdev.com/w/index.php/Nesdev_Wiki)

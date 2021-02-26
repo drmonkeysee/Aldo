@@ -47,12 +47,6 @@ debug: CFLAGS += -g -O0 -DDEBUG
 debug: $(TARGET)
 
 check: CFLAGS += -g -O0 -DDEBUG
-ifeq ($(OS), Darwin)
-check: TEST_CFLAGS += -pedantic -Wno-gnu-zero-variadic-macro-arguments
-else
-check: LDFLAGS := -L/usr/local/lib -Wl,-rpath,/usr/local/lib
-endif
-check: LDLIBS := -lcinytest
 check: $(TESTS_TARGET)
 	$(TESTS_TARGET)
 
@@ -65,6 +59,10 @@ endif
 $(TARGET): $(OBJ_FILES)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
+ifneq ($(OS), Darwin)
+$(TESTS_TARGET): LDFLAGS := -L/usr/local/lib -Wl,-rpath,/usr/local/lib
+endif
+$(TESTS_TARGET): LDLIBS := -lcinytest
 $(TESTS_TARGET): $(TEST_OBJ_FILES) $(TEST_DEPS)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
@@ -78,6 +76,9 @@ endif
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIRS)
 	$(CC) $(CFLAGS) $(SRC_CFLAGS) -MMD -c $< -o $@
 
+ifeq ($(OS), Darwin)
+$(OBJ_DIR)/$(TEST_DIR)/%.o: TEST_CFLAGS += -pedantic -Wno-gnu-zero-variadic-macro-arguments
+endif
 $(OBJ_DIR)/$(TEST_DIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_DIRS)
 	$(CC) $(CFLAGS) $(TEST_CFLAGS) -MMD -c $< -o $@
 

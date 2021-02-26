@@ -11,14 +11,20 @@
 static void dis_errstr_returns_known_err(void *context)
 {
     const char *const err = dis_errstr(ASM_FMT_FAIL);
+
     ct_assertequalstr("OUTPUT FAIL", err);
 }
 
 static void dis_errstr_returns_unknown_err(void *context)
 {
     const char *const err = dis_errstr(10);
+
     ct_assertequalstr("UNKNOWN ERR", err);
 }
+
+//
+// Test List
+//
 
 struct ct_testsuite asm_tests(void)
 {

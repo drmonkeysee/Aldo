@@ -65,7 +65,8 @@ static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
     const char *restrict const *const strtable = StringTables[dec->mode];
     switch (instlen) {
     case 1:
-        count = sprintf(dis + total, "%s", strtable[1]);
+        // NOTE: nothing else to print, trim the trailing space
+        dis[--count] = '\0';
         break;
     case 2:
         count = sprintf(dis + total, strtable[1], *(dispc + 1));

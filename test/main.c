@@ -14,11 +14,13 @@
 //
 
 struct ct_testsuite asm_tests(void);
+struct ct_testsuite cpu_tests(void);
 
 static size_t testrunner(int argc, char *argv[argc+1])
 {
     const struct ct_testsuite suites[] = {
         asm_tests(),
+        cpu_tests(),
     };
     return ct_run_withargs(suites, argc, argv);
 }

@@ -134,22 +134,30 @@ static void BVS_exec(struct mos6502 *self, struct decoded dec)
 
 static void CLC_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->p.c = false;
+    self->idone = true;
 }
 
 static void CLD_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->p.d = false;
+    self->idone = true;
 }
 
 static void CLI_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->p.i = false;
+    self->idone = true;
 }
 
 static void CLV_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->p.v = false;
+    self->idone = true;
 }
 
 static void CMP_exec(struct mos6502 *self, struct decoded dec)
@@ -291,17 +299,23 @@ static void SBC_exec(struct mos6502 *self, struct decoded dec)
 
 static void SEC_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->p.c = true;
+    self->idone = true;
 }
 
 static void SED_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->p.d = true;
+    self->idone = true;
 }
 
 static void SEI_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->p.i = true;
+    self->idone = true;
 }
 
 static void STA_exec(struct mos6502 *self, struct decoded dec)

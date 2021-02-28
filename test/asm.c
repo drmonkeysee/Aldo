@@ -7,6 +7,9 @@
 
 #include "asm.h"
 #include "ciny.h"
+#include "emu/snapshot.h"
+
+#include <stdint.h>
 
 //
 // dis_errstr
@@ -36,9 +39,9 @@ static void dis_inst_does_nothing_if_no_bytes(void *ctx)
     const uint8_t bytes[1];
     char buf[DIS_INST_SIZE] = {'\0'};
 
-    const int size = dis_inst(a, bytes, 0, buf);
+    const int length = dis_inst(a, bytes, 0, buf);
 
-    ct_assertequal(0, size);
+    ct_assertequal(0, length);
     ct_assertequalstr("", buf);
 }
 
@@ -48,9 +51,9 @@ static void dis_inst_disassembles_onebyte(void *ctx)
     const uint8_t bytes[1] = {0xea};
     char buf[DIS_INST_SIZE];
 
-    const int size = dis_inst(a, bytes, 1, buf);
+    const int length = dis_inst(a, bytes, 1, buf);
 
-    ct_assertequal(1, size);
+    ct_assertequal(1, length);
     ct_assertequalstr("$1234: EA          NOP", buf);
 }
 

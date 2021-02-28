@@ -14,7 +14,7 @@ DEP_FILES := $(OBJ_FILES:.o=.d)
 
 OBJ_DIRS := $(OBJ_DIR) $(foreach MDL,$(MODULES),$(OBJ_DIR)/$(MDL))
 TEST_OBJ_DIRS := $(OBJ_DIR)/$(TEST_DIR) $(foreach MDL,$(MODULES),$(OBJ_DIR)/$(TEST_DIR)/$(MDL))
-TEST_DEPS := $(addprefix $(OBJ_DIR)/,asm.o emu/bytes.o emu/decode.o)
+TEST_DEPS := $(addprefix $(OBJ_DIR)/,asm.o emu/bytes.o emu/cpu.o emu/decode.o emu/traits.o)
 
 PRODUCT := aldo
 TESTS := $(PRODUCT)tests

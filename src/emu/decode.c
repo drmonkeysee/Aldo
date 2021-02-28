@@ -38,7 +38,7 @@ const struct decoded Decode[] = {
     UNK,    // 15 - ORA zp,X
     UNK,    // 16 - ASL zp,X
     UNK,    // 17 - Unofficial
-    UNK,    // 18 - CLC
+    {IN_CLC, AM_IMP},    // 18 - CLC
     UNK,    // 19 - ORA abs,Y
     UNK,    // 1A - Unofficial
     UNK,    // 1B - Unofficial
@@ -70,7 +70,7 @@ const struct decoded Decode[] = {
     UNK,    // 35 - AND zp,X
     UNK,    // 36 - ROL zp,X
     UNK,    // 37 - Unofficial
-    UNK,    // 38 - SEC
+    {IN_SEC, AM_IMP},    // 38 - SEC
     UNK,    // 39 - AND abs,Y
     UNK,    // 3A - Unofficial
     UNK,    // 3B - Unofficial
@@ -102,7 +102,7 @@ const struct decoded Decode[] = {
     UNK,    // 55 - EOR zp,X
     UNK,    // 56 - LSR zp,X
     UNK,    // 57 - Unofficial
-    UNK,    // 58 - CLI
+    {IN_CLI, AM_IMP},    // 58 - CLI
     UNK,    // 59 - EOR abs,Y
     UNK,    // 5A - Unofficial
     UNK,    // 5B - Unofficial
@@ -134,7 +134,7 @@ const struct decoded Decode[] = {
     UNK,    // 75 - ADC zp,X
     UNK,    // 76 - ROR zp,X
     UNK,    // 77 - Unofficial
-    UNK,    // 78 - SEI
+    {IN_SEI, AM_IMP},    // 78 - SEI
     UNK,    // 79 - ADC abs,Y
     UNK,    // 7A - Unofficial
     UNK,    // 7B - Unofficial
@@ -198,7 +198,7 @@ const struct decoded Decode[] = {
     UNK,    // B5 - LDA zp,X
     UNK,    // B6 - LDX zp,Y
     UNK,    // B7 - Unofficial
-    UNK,    // B8 - CLV
+    {IN_CLV, AM_IMP},    // B8 - CLV
     UNK,    // B9 - LDA abs,Y
     UNK,    // BA - TSX
     UNK,    // BB - Unofficial
@@ -230,7 +230,7 @@ const struct decoded Decode[] = {
     UNK,    // D5 - CMP zp,X
     UNK,    // D6 - DEC zp,X
     UNK,    // D7 - Unofficial
-    UNK,    // D8 - CLD
+    {IN_CLD, AM_IMP},    // D8 - CLD
     UNK,    // D9 - CMP abs,Y
     UNK,    // DA - Unofficial
     UNK,    // DB - Unofficial
@@ -262,7 +262,7 @@ const struct decoded Decode[] = {
     UNK,    // F5 - SBC zp,X
     UNK,    // F6 - INC zp,X
     UNK,    // F7 - Unofficial
-    UNK,    // F8 - SED
+    {IN_SED, AM_IMP},    // F8 - SED
     UNK,    // F9 - SBC abs,Y
     UNK,    // FA - Unofficial
     UNK,    // FB - Unofficial

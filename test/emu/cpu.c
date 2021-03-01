@@ -14,9 +14,9 @@
 static void setup_cpu(struct mos6502 *cpu)
 {
     cpu_powerup(cpu);
-    // NOTE: set the cpu to instruction prefetch state
+    // NOTE: set the cpu ready to read instruction at 0x00
     cpu->pc = 0;
-    cpu->signal.rdy = cpu->idone = true;
+    cpu->signal.rdy = true;
 }
 
 static int clock_cpu(struct mos6502 *cpu)
@@ -75,7 +75,7 @@ static void cpu_clc(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertfalse(cpu.p.c);
@@ -92,7 +92,7 @@ static void cpu_cld(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertfalse(cpu.p.d);
@@ -109,7 +109,7 @@ static void cpu_cli(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertfalse(cpu.p.i);
@@ -126,7 +126,7 @@ static void cpu_clv(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertfalse(cpu.p.v);
@@ -143,7 +143,7 @@ static void cpu_dex(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(4u, cpu.x);
@@ -162,7 +162,7 @@ static void cpu_dex_to_zero(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0u, cpu.x);
@@ -182,7 +182,7 @@ static void cpu_dex_to_negative(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0xffu, cpu.x);
@@ -201,7 +201,7 @@ static void cpu_dey(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(4u, cpu.y);
@@ -220,7 +220,7 @@ static void cpu_dey_to_zero(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0u, cpu.y);
@@ -240,7 +240,7 @@ static void cpu_dey_to_negative(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0xffu, cpu.y);
@@ -259,7 +259,7 @@ static void cpu_inx(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(6u, cpu.x);
@@ -279,7 +279,7 @@ static void cpu_inx_to_zero(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0u, cpu.x);
@@ -298,7 +298,7 @@ static void cpu_inx_to_negative(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0x80u, cpu.x);
@@ -317,7 +317,7 @@ static void cpu_iny(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(6u, cpu.y);
@@ -337,7 +337,7 @@ static void cpu_iny_to_zero(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0u, cpu.y);
@@ -356,7 +356,7 @@ static void cpu_iny_to_negative(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0x80u, cpu.y);
@@ -374,7 +374,7 @@ static void cpu_nop(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     // NOTE: verify NOP did nothing
@@ -398,7 +398,7 @@ static void cpu_sec(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_asserttrue(cpu.p.c);
@@ -415,7 +415,7 @@ static void cpu_sed(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_asserttrue(cpu.p.d);
@@ -432,7 +432,7 @@ static void cpu_sei(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_asserttrue(cpu.p.i);
@@ -449,7 +449,7 @@ static void cpu_tax(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(7u, cpu.x);
@@ -467,7 +467,7 @@ static void cpu_tax_to_zero(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0u, cpu.x);
@@ -486,7 +486,7 @@ static void cpu_tax_to_negative(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0xffu, cpu.x);
@@ -505,7 +505,7 @@ static void cpu_tay(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(7u, cpu.y);
@@ -523,7 +523,7 @@ static void cpu_tay_to_zero(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0u, cpu.y);
@@ -542,7 +542,7 @@ static void cpu_tay_to_negative(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0xffu, cpu.y);
@@ -561,7 +561,7 @@ static void cpu_tsx(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(7u, cpu.x);
@@ -579,7 +579,7 @@ static void cpu_tsx_to_zero(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0u, cpu.x);
@@ -598,7 +598,7 @@ static void cpu_tsx_to_negative(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0xffu, cpu.x);
@@ -617,7 +617,7 @@ static void cpu_txa(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(7u, cpu.a);
@@ -635,7 +635,7 @@ static void cpu_txa_to_zero(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0u, cpu.a);
@@ -654,7 +654,7 @@ static void cpu_txa_to_negative(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0xffu, cpu.a);
@@ -673,7 +673,7 @@ static void cpu_txs(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(7u, cpu.s);
@@ -691,7 +691,7 @@ static void cpu_txs_to_zero(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0u, cpu.s);
@@ -710,7 +710,7 @@ static void cpu_txs_to_negative(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0xffu, cpu.s);
@@ -729,7 +729,7 @@ static void cpu_tya(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(7u, cpu.a);
@@ -747,7 +747,7 @@ static void cpu_tya_to_zero(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0u, cpu.a);
@@ -766,7 +766,7 @@ static void cpu_tya_to_negative(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
     ct_assertequal(0xffu, cpu.a);

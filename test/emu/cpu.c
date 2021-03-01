@@ -132,6 +132,238 @@ static void cpu_clv(void *ctx)
     ct_assertfalse(cpu.p.v);
 }
 
+static void cpu_dex(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xca, 0xff};
+    cpu.ram = mem;
+    cpu.x = 5;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(4u, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_dex_to_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xca, 0xff};
+    cpu.ram = mem;
+    cpu.x = 1;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(0u, cpu.x);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_dex_to_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xca, 0xff};
+    cpu.ram = mem;
+    cpu.x = 0;
+    cpu.p.z = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(0xffu, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_dey(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x88, 0xff};
+    cpu.ram = mem;
+    cpu.y = 5;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(4u, cpu.y);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_dey_to_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x88, 0xff};
+    cpu.ram = mem;
+    cpu.y = 1;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(0u, cpu.y);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_dey_to_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x88, 0xff};
+    cpu.ram = mem;
+    cpu.y = 0;
+    cpu.p.z = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(0xffu, cpu.y);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_inx(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xe8, 0xff};
+    cpu.ram = mem;
+    cpu.x = 5;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(6u, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_inx_to_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xe8, 0xff};
+    cpu.ram = mem;
+    cpu.x = 0xff;
+    cpu.p.n = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(0u, cpu.x);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_inx_to_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xe8, 0xff};
+    cpu.ram = mem;
+    cpu.x = 0x7f;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(0x80u, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_iny(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xc8, 0xff};
+    cpu.ram = mem;
+    cpu.y = 5;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(6u, cpu.y);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_iny_to_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xc8, 0xff};
+    cpu.ram = mem;
+    cpu.y = 0xff;
+    cpu.p.n = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(0u, cpu.y);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_iny_to_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xc8, 0xff};
+    cpu.ram = mem;
+    cpu.y = 0x7f;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(0x80u, cpu.y);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
 static void cpu_nop(void *ctx)
 {
     struct mos6502 cpu;
@@ -219,6 +451,18 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_cld),
         ct_maketest(cpu_cli),
         ct_maketest(cpu_clv),
+        ct_maketest(cpu_dex),
+        ct_maketest(cpu_dex_to_zero),
+        ct_maketest(cpu_dex_to_negative),
+        ct_maketest(cpu_dey),
+        ct_maketest(cpu_dey_to_zero),
+        ct_maketest(cpu_dey_to_negative),
+        ct_maketest(cpu_inx),
+        ct_maketest(cpu_inx_to_zero),
+        ct_maketest(cpu_inx_to_negative),
+        ct_maketest(cpu_iny),
+        ct_maketest(cpu_iny_to_zero),
+        ct_maketest(cpu_iny_to_negative),
         ct_maketest(cpu_nop),
         ct_maketest(cpu_sec),
         ct_maketest(cpu_sed),

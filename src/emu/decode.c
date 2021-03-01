@@ -150,7 +150,7 @@ const struct decoded Decode[] = {
     UNK,    // 85 - STA zp
     UNK,    // 86 - STX zp
     UNK,    // 87 - Unofficial
-    UNK,    // 88 - DEY
+    {IN_DEY, AM_IMP},    // 88 - DEY
     UNK,    // 89 - Unofficial
     UNK,    // 8A - TXA
     UNK,    // 8B - Unofficial
@@ -214,9 +214,9 @@ const struct decoded Decode[] = {
     UNK,    // C5 - CMP zp
     UNK,    // C6 - DEC zp
     UNK,    // C7 - Unofficial
-    UNK,    // C8 - INY
+    {IN_INY, AM_IMP},    // C8 - INY
     UNK,    // C9 - CMP imm
-    UNK,    // CA - DEX
+    {IN_DEX, AM_IMP},    // CA - DEX
     UNK,    // CB - Unofficial
     UNK,    // CC - CPY abs
     UNK,    // CD - CMP abs
@@ -246,7 +246,7 @@ const struct decoded Decode[] = {
     UNK,    // E5 - SBC zp
     UNK,    // E6 - INC zp
     UNK,    // E7 - Unofficial
-    UNK,    // E8 - INX
+    {IN_INX, AM_IMP},    // E8 - INX
     UNK,    // E9 - SBC imm
     {IN_NOP, AM_IMP},    // EA - NOP
     UNK,    // EB - Unofficial

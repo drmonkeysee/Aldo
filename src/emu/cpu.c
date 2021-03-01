@@ -45,6 +45,16 @@ static uint8_t get_p(const struct mos6502 *self)
     return p;
 }
 
+static void set_z(struct mos6502 *self, uint8_t r)
+{
+    self->p.z = r == 0;
+}
+
+static void set_n(struct mos6502 *self, uint8_t r)
+{
+    self->p.n = r & 0x80;
+}
+
 static void set_p(struct mos6502 *self, uint8_t p)
 {
     self->p.c = p & 0x1;
@@ -182,12 +192,20 @@ static void DEC_exec(struct mos6502 *self, struct decoded dec)
 
 static void DEX_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    --self->x;
+    set_z(self, self->x);
+    set_n(self, self->x);
+    self->idone = true;
 }
 
 static void DEY_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    --self->y;
+    set_z(self, self->y);
+    set_n(self, self->y);
+    self->idone = true;
 }
 
 static void EOR_exec(struct mos6502 *self, struct decoded dec)
@@ -202,12 +220,20 @@ static void INC_exec(struct mos6502 *self, struct decoded dec)
 
 static void INX_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    ++self->x;
+    set_z(self, self->x);
+    set_n(self, self->x);
+    self->idone = true;
 }
 
 static void INY_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    ++self->y;
+    set_z(self, self->y);
+    set_n(self, self->y);
+    self->idone = true;
 }
 
 static void JMP_exec(struct mos6502 *self, struct decoded dec)

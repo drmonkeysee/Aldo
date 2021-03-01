@@ -152,7 +152,7 @@ const struct decoded Decode[] = {
     UNK,    // 87 - Unofficial
     {IN_DEY, AM_IMP},    // 88 - DEY
     UNK,    // 89 - Unofficial
-    UNK,    // 8A - TXA
+    {IN_TXA, AM_IMP},    // 8A - TXA
     UNK,    // 8B - Unofficial
     UNK,    // 8C - STY abs
     UNK,    // 8D - STA abs
@@ -166,9 +166,9 @@ const struct decoded Decode[] = {
     UNK,    // 95 - STA zp,X
     UNK,    // 96 - STX zp,Y
     UNK,    // 97 - Unofficial
-    UNK,    // 98 - TYA
+    {IN_TYA, AM_IMP},    // 98 - TYA
     UNK,    // 99 - STA abs,Y
-    UNK,    // 9A - TXS
+    {IN_TXS, AM_IMP},    // 9A - TXS
     UNK,    // 9B - Unofficial
     UNK,    // 9C - Unofficial
     UNK,    // 9D - STA abs,X
@@ -182,9 +182,9 @@ const struct decoded Decode[] = {
     UNK,    // A5 - LDA zp
     UNK,    // A6 - LDX zp
     UNK,    // A7 - Unofficial
-    UNK,    // A8 - TAY
+    {IN_TAY, AM_IMP},    // A8 - TAY
     UNK,    // A9 - LDA imm
-    UNK,    // AA - TAX
+    {IN_TAX, AM_IMP},    // AA - TAX
     UNK,    // AB - Unofficial
     UNK,    // AC - LDY abs
     UNK,    // AD - LDA abs
@@ -200,7 +200,7 @@ const struct decoded Decode[] = {
     UNK,    // B7 - Unofficial
     {IN_CLV, AM_IMP},    // B8 - CLV
     UNK,    // B9 - LDA abs,Y
-    UNK,    // BA - TSX
+    {IN_TSX, AM_IMP},    // BA - TSX
     UNK,    // BB - Unofficial
     UNK,    // BC - LDY abs,X
     UNK,    // BD - LDA abs,X

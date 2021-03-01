@@ -361,32 +361,54 @@ static void STY_exec(struct mos6502 *self, struct decoded dec)
 
 static void TAX_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->x = self->a;
+    set_z(self, self->x);
+    set_n(self, self->x);
+    self->idone = true;
 }
 
 static void TAY_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->y = self->a;
+    set_z(self, self->y);
+    set_n(self, self->y);
+    self->idone = true;
 }
 
 static void TSX_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->x = self->s;
+    set_z(self, self->x);
+    set_n(self, self->x);
+    self->idone = true;
 }
 
 static void TXA_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->a = self->x;
+    set_z(self, self->a);
+    set_n(self, self->a);
+    self->idone = true;
 }
 
 static void TXS_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->s = self->x;
+    self->idone = true;
 }
 
 static void TYA_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->a = self->y;
+    set_z(self, self->a);
+    set_n(self, self->a);
+    self->idone = true;
 }
 
 static void dispatch_instruction(struct mos6502 *self, struct decoded dec)

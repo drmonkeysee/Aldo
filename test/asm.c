@@ -10,6 +10,7 @@
 #include "emu/snapshot.h"
 
 #include <stdint.h>
+#include <string.h>
 
 //
 // dis_errstr
@@ -109,8 +110,9 @@ static void dis_datapath_implied_cyclezero(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(7, written);
-    ct_assertequalstr("NOP imp", buf);
+    const char *const exp = "NOP imp";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_implied_cycleone(void *ctx)
@@ -126,8 +128,9 @@ static void dis_datapath_implied_cycleone(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(4, written);
-    ct_assertequalstr("NOP ", buf);
+    const char *const exp = "NOP ";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_implied_cyclen(void *ctx)
@@ -143,8 +146,9 @@ static void dis_datapath_implied_cyclen(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(0, written);
-    ct_assertequalstr("", buf);
+    const char *const exp = "";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_immediate_cyclezero(void *ctx)
@@ -159,8 +163,9 @@ static void dis_datapath_immediate_cyclezero(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(7, written);
-    ct_assertequalstr("LDA imm", buf);
+    const char *const exp = "LDA imm";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_immediate_cycleone(void *ctx)
@@ -176,8 +181,9 @@ static void dis_datapath_immediate_cycleone(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(8, written);
-    ct_assertequalstr("LDA #$43", buf);
+    const char *const exp = "LDA #$43";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_immediate_cyclen(void *ctx)
@@ -193,8 +199,9 @@ static void dis_datapath_immediate_cyclen(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(0, written);
-    ct_assertequalstr("", buf);
+    const char *const exp = "";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_zeropage_cyclezero(void *ctx)
@@ -209,8 +216,9 @@ static void dis_datapath_zeropage_cyclezero(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(6, written);
-    ct_assertequalstr("LDA zp", buf);
+    const char *const exp = "LDA zp";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_zeropage_cycleone(void *ctx)
@@ -226,8 +234,9 @@ static void dis_datapath_zeropage_cycleone(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(7, written);
-    ct_assertequalstr("LDA $43", buf);
+    const char *const exp = "LDA $43";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_zeropage_cycletwo(void *ctx)
@@ -243,8 +252,9 @@ static void dis_datapath_zeropage_cycletwo(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(0, written);
-    ct_assertequalstr("", buf);
+    const char *const exp = "";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_zeropage_cyclen(void *ctx)
@@ -260,8 +270,9 @@ static void dis_datapath_zeropage_cyclen(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(0, written);
-    ct_assertequalstr("", buf);
+    const char *const exp = "";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_absolute_cyclezero(void *ctx)
@@ -276,8 +287,9 @@ static void dis_datapath_absolute_cyclezero(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(7, written);
-    ct_assertequalstr("LDA abs", buf);
+    const char *const exp = "LDA abs";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_absolute_cycleone(void *ctx)
@@ -293,8 +305,9 @@ static void dis_datapath_absolute_cycleone(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(9, written);
-    ct_assertequalstr("LDA $??43", buf);
+    const char *const exp = "LDA $??43";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_absolute_cycletwo(void *ctx)
@@ -311,8 +324,9 @@ static void dis_datapath_absolute_cycletwo(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(9, written);
-    ct_assertequalstr("LDA $2143", buf);
+    const char *const exp = "LDA $2143";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_absolute_cyclethree(void *ctx)
@@ -328,8 +342,9 @@ static void dis_datapath_absolute_cyclethree(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(0, written);
-    ct_assertequalstr("", buf);
+    const char *const exp = "";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void dis_datapath_absolute_cyclen(void *ctx)
@@ -345,8 +360,9 @@ static void dis_datapath_absolute_cyclen(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    ct_assertequal(0, written);
-    ct_assertequalstr("", buf);
+    const char *const exp = "";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 //

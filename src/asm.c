@@ -137,7 +137,7 @@ int dis_datapath(const struct console_state *snapshot,
     const int instlen = InstLens[dec.mode];
 
     // NOTE: stop updating datapath display after all decoding cycles
-    // have run; (>1 for 1,2-byte instructions, >2 for 3-byte instructions).
+    // have run; (2 for 1,2-byte instructions, 3 for 3-byte instructions).
     if (snapshot->cpu.exec_cycle > 1 + (instlen / 3)) return 0;
 
     int count;

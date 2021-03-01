@@ -24,6 +24,8 @@ static int clock_cpu(struct mos6502 *cpu)
     int cycles = 0;
     do {
         cycles += cpu_cycle(cpu);
+        // NOTE: catch instructions that run longer than possible
+        ct_assertfalse(cycles > 7);
     } while (!cpu->idone);
     return cycles;
 }
@@ -47,8 +49,6 @@ static void cpu_powerup_initializes_cpu(void *ctx)
 
     ct_assertequal(0x34u, sn.cpu.status);
 
-    ct_assertequal(-1, cpu.t);
-
     ct_asserttrue(cpu.signal.irq);
     ct_asserttrue(cpu.signal.nmi);
     ct_asserttrue(cpu.signal.res);
@@ -56,7 +56,7 @@ static void cpu_powerup_initializes_cpu(void *ctx)
     ct_assertfalse(cpu.signal.rdy);
     ct_assertfalse(cpu.signal.sync);
 
-    ct_assertfalse(cpu.idone);
+    ct_asserttrue(cpu.idone);
     ct_assertfalse(cpu.dflt);
 }
 
@@ -77,7 +77,6 @@ static void cpu_clc(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(0x1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
-    ct_asserttrue(cpu.idone);
 
     ct_assertfalse(cpu.p.c);
 }
@@ -95,7 +94,6 @@ static void cpu_cld(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(0x1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
-    ct_asserttrue(cpu.idone);
 
     ct_assertfalse(cpu.p.d);
 }
@@ -113,7 +111,6 @@ static void cpu_cli(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(0x1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
-    ct_asserttrue(cpu.idone);
 
     ct_assertfalse(cpu.p.i);
 }
@@ -131,7 +128,6 @@ static void cpu_clv(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(0x1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
-    ct_asserttrue(cpu.idone);
 
     ct_assertfalse(cpu.p.v);
 }
@@ -148,7 +144,6 @@ static void cpu_nop(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(0x1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
-    ct_asserttrue(cpu.idone);
 
     // NOTE: verify NOP did nothing
     struct console_state sn;
@@ -173,7 +168,6 @@ static void cpu_sec(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(0x1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
-    ct_asserttrue(cpu.idone);
 
     ct_asserttrue(cpu.p.c);
 }
@@ -191,7 +185,6 @@ static void cpu_sed(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(0x1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
-    ct_asserttrue(cpu.idone);
 
     ct_asserttrue(cpu.p.d);
 }
@@ -209,7 +202,6 @@ static void cpu_sei(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(0x1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
-    ct_asserttrue(cpu.idone);
 
     ct_asserttrue(cpu.p.i);
 }

@@ -522,12 +522,11 @@ void cpu_powerup(struct mos6502 *self)
     // NOTE: set B, I, and unused flags high
     set_p(self, 0x34);
 
-    self->t = PreFetch;
-
-    // NOTE: Interrupts are inverted, high means no interrupt; rw high is read
+    // NOTE: Interrupts are inverted, high means no interrupt; rw high is read;
+    // idone flag is true to put the cpu into instruction-prefetch state.
     self->signal.irq = self->signal.nmi = self->signal.res = self->signal.rw =
-        true;
-    self->signal.rdy = self->signal.sync = self->idone = self->dflt = false;
+        self->idone = true;
+    self->signal.rdy = self->signal.sync = self->dflt = false;
 
     // NOTE: all other cpu elements are indeterminate on powerup
 }

@@ -266,9 +266,9 @@ static void drawflags(const struct console_state *snapshot)
     }
 }
 
-static void drawline(bool signal, int y, int x, int dir_offset,
-                     const char *restrict direction,
-                     const char *restrict label)
+static void draw_cpu_line(bool signal, int y, int x, int dir_offset,
+                          const char *restrict direction,
+                          const char *restrict label)
 {
     if (!signal) {
         wattron(DatapathView.content, A_DIM);
@@ -294,9 +294,10 @@ static void drawdatapath(const struct console_state *snapshot)
     int cursor_y = 0;
     werase(DatapathView.content);
 
-    drawline(snapshot->lines.ready, cursor_y, line_x, 1, down, "RDY");
-    drawline(snapshot->lines.sync, cursor_y, line_x * 2, 1, up, "SYNC");
-    drawline(snapshot->lines.readwrite, cursor_y++, line_x * 3, 1, up, "R/W");
+    draw_cpu_line(snapshot->lines.ready, cursor_y, line_x, 1, down, "RDY");
+    draw_cpu_line(snapshot->lines.sync, cursor_y, line_x * 2, 1, up, "SYNC");
+    draw_cpu_line(snapshot->lines.readwrite, cursor_y++, line_x * 3, 1, up,
+                  "R/W\u0305");
 
     mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
 
@@ -328,12 +329,12 @@ static void drawdatapath(const struct console_state *snapshot)
 
     // NOTE: jump 2 rows as interrupts are drawn direction first
     cursor_y += 2;
-    drawline(snapshot->lines.irq, cursor_y, line_x, -1, up,
-             "I\u0305R\u0305Q\u0305");
-    drawline(snapshot->lines.nmi, cursor_y, line_x * 2, -1, up,
-             "N\u0305M\u0305I\u0305");
-    drawline(snapshot->lines.reset, cursor_y, line_x * 3, -1, up,
-             "R\u0305E\u0305S\u0305");
+    draw_cpu_line(snapshot->lines.irq, cursor_y, line_x, -1, up,
+                  "I\u0305R\u0305Q\u0305");
+    draw_cpu_line(snapshot->lines.nmi, cursor_y, line_x * 2, -1, up,
+                  "N\u0305M\u0305I\u0305");
+    draw_cpu_line(snapshot->lines.reset, cursor_y, line_x * 3, -1, up,
+                  "R\u0305E\u0305S\u0305");
 }
 
 static void drawram(const struct console_state *snapshot)

@@ -25,7 +25,7 @@ static int clock_cpu(struct mos6502 *cpu)
     do {
         cycles += cpu_cycle(cpu);
         // NOTE: catch instructions that run longer than possible
-        ct_assertfalse(cycles > 7);
+        ct_asserttrue(cycles < 8);
     } while (!cpu->idone);
     return cycles;
 }
@@ -775,6 +775,57 @@ static void cpu_tya_to_negative(void *ctx)
 }
 
 //
+// Immediate Instructions
+//
+
+static void cpu_lda_imm(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xa9, 0x45};
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+}
+
+static void cpu_lda_imm_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xa9, 0x0};
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+}
+
+static void cpu_lda_imm_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xa9, 0x80};
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x80u, cpu.a);
+    ct_asserttrue(cpu.p.n);
+}
+
+//
 // Test List
 //
 
@@ -821,6 +872,10 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_tya),
         ct_maketest(cpu_tya_to_zero),
         ct_maketest(cpu_tya_to_negative),
+
+        ct_maketest(cpu_lda_imm),
+        ct_maketest(cpu_lda_imm_zero),
+        ct_maketest(cpu_lda_imm_negative),
     };
 
     return ct_makesuite(tests);

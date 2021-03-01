@@ -248,7 +248,11 @@ static void JSR_exec(struct mos6502 *self, struct decoded dec)
 
 static void LDA_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    self->a = self->databus;
+    set_z(self, self->a);
+    set_n(self, self->a);
+    self->idone = true;
 }
 
 static void LDX_exec(struct mos6502 *self, struct decoded dec)
@@ -440,7 +444,11 @@ static void IMP_sequence(struct mos6502 *self, struct decoded dec)
 
 static void IMM_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    assert(self->t == 1);
+
+    self->addrbus = self->pc++;
+    read(self);
+    dispatch_instruction(self, dec);
 }
 
 static void ZP_sequence(struct mos6502 *self, struct decoded dec)

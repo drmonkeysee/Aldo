@@ -183,7 +183,7 @@ const struct decoded Decode[] = {
     UNK,    // A6 - LDX zp
     UNK,    // A7 - Unofficial
     {IN_TAY, AM_IMP},    // A8 - TAY
-    UNK,    // A9 - LDA imm
+    {IN_LDA, AM_IMM},    // A9 - LDA imm
     {IN_TAX, AM_IMP},    // AA - TAX
     UNK,    // AB - Unofficial
     UNK,    // AC - LDY abs

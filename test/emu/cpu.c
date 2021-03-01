@@ -454,6 +454,8 @@ static void cpu_tax(void *ctx)
 
     ct_assertequal(7u, cpu.x);
     ct_assertequal(cpu.a, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_tax_to_zero(void *ctx)
@@ -473,6 +475,7 @@ static void cpu_tax_to_zero(void *ctx)
     ct_assertequal(0u, cpu.x);
     ct_assertequal(cpu.a, cpu.x);
     ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_tax_to_negative(void *ctx)
@@ -491,6 +494,7 @@ static void cpu_tax_to_negative(void *ctx)
 
     ct_assertequal(0xffu, cpu.x);
     ct_assertequal(cpu.a, cpu.x);
+    ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
 }
 
@@ -510,6 +514,8 @@ static void cpu_tay(void *ctx)
 
     ct_assertequal(7u, cpu.y);
     ct_assertequal(cpu.a, cpu.y);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_tay_to_zero(void *ctx)
@@ -529,6 +535,7 @@ static void cpu_tay_to_zero(void *ctx)
     ct_assertequal(0u, cpu.y);
     ct_assertequal(cpu.a, cpu.y);
     ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_tay_to_negative(void *ctx)
@@ -547,6 +554,7 @@ static void cpu_tay_to_negative(void *ctx)
 
     ct_assertequal(0xffu, cpu.y);
     ct_assertequal(cpu.a, cpu.y);
+    ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
 }
 
@@ -566,6 +574,8 @@ static void cpu_tsx(void *ctx)
 
     ct_assertequal(7u, cpu.x);
     ct_assertequal(cpu.s, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_tsx_to_zero(void *ctx)
@@ -585,6 +595,7 @@ static void cpu_tsx_to_zero(void *ctx)
     ct_assertequal(0u, cpu.x);
     ct_assertequal(cpu.s, cpu.x);
     ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_tsx_to_negative(void *ctx)
@@ -603,6 +614,7 @@ static void cpu_tsx_to_negative(void *ctx)
 
     ct_assertequal(0xffu, cpu.x);
     ct_assertequal(cpu.s, cpu.x);
+    ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
 }
 
@@ -622,6 +634,8 @@ static void cpu_txa(void *ctx)
 
     ct_assertequal(7u, cpu.a);
     ct_assertequal(cpu.x, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_txa_to_zero(void *ctx)
@@ -641,6 +655,7 @@ static void cpu_txa_to_zero(void *ctx)
     ct_assertequal(0u, cpu.a);
     ct_assertequal(cpu.x, cpu.a);
     ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_txa_to_negative(void *ctx)
@@ -659,6 +674,7 @@ static void cpu_txa_to_negative(void *ctx)
 
     ct_assertequal(0xffu, cpu.a);
     ct_assertequal(cpu.x, cpu.a);
+    ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
 }
 
@@ -678,6 +694,8 @@ static void cpu_txs(void *ctx)
 
     ct_assertequal(7u, cpu.s);
     ct_assertequal(cpu.x, cpu.s);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_txs_to_zero(void *ctx)
@@ -697,6 +715,7 @@ static void cpu_txs_to_zero(void *ctx)
     ct_assertequal(0u, cpu.s);
     ct_assertequal(cpu.x, cpu.s);
     ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_txs_to_negative(void *ctx)
@@ -715,6 +734,7 @@ static void cpu_txs_to_negative(void *ctx)
 
     ct_assertequal(0xffu, cpu.s);
     ct_assertequal(cpu.x, cpu.s);
+    ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
 
@@ -734,6 +754,8 @@ static void cpu_tya(void *ctx)
 
     ct_assertequal(7u, cpu.a);
     ct_assertequal(cpu.y, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_tya_to_zero(void *ctx)
@@ -753,6 +775,7 @@ static void cpu_tya_to_zero(void *ctx)
     ct_assertequal(0u, cpu.a);
     ct_assertequal(cpu.y, cpu.a);
     ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_tya_to_negative(void *ctx)
@@ -771,6 +794,7 @@ static void cpu_tya_to_negative(void *ctx)
 
     ct_assertequal(0xffu, cpu.a);
     ct_assertequal(cpu.y, cpu.a);
+    ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
 }
 
@@ -791,6 +815,8 @@ static void cpu_lda_imm(void *ctx)
     ct_assertequal(2u, cpu.pc);
 
     ct_assertequal(0x45u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_lda_imm_zero(void *ctx)
@@ -807,6 +833,7 @@ static void cpu_lda_imm_zero(void *ctx)
 
     ct_assertequal(0x0u, cpu.a);
     ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_lda_imm_negative(void *ctx)
@@ -822,6 +849,62 @@ static void cpu_lda_imm_negative(void *ctx)
     ct_assertequal(2u, cpu.pc);
 
     ct_assertequal(0x80u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+//
+// Zero-Page Instructions
+//
+
+static void cpu_lda_zp(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xa5, 0x4, 0xff, 0xff, 0x45};
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_lda_zp_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xa5, 0x4, 0xff, 0xff, 0x0};
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_lda_zp_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xa5, 0x4, 0xff, 0xff, 0x80};
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x80u, cpu.a);
+    ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
 }
 
@@ -833,7 +916,7 @@ static void cpu_lda_abs(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0xad, 0x01, 0x80},
+    uint8_t mem[] = {0xad, 0x1, 0x80},
             abs[] = {0xff, 0x45};
     cpu.ram = mem;
     cpu.cart = abs;
@@ -844,14 +927,16 @@ static void cpu_lda_abs(void *ctx)
     ct_assertequal(3u, cpu.pc);
 
     ct_assertequal(0x45u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_lda_abs_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0xad, 0x01, 0x80},
-            abs[] = {0xff, 0x00};
+    uint8_t mem[] = {0xad, 0x1, 0x80},
+            abs[] = {0xff, 0x0};
     cpu.ram = mem;
     cpu.cart = abs;
 
@@ -862,13 +947,14 @@ static void cpu_lda_abs_zero(void *ctx)
 
     ct_assertequal(0x0u, cpu.a);
     ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_lda_abs_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0xad, 0x01, 0x80},
+    uint8_t mem[] = {0xad, 0x1, 0x80},
             abs[] = {0xff, 0x80};
     cpu.ram = mem;
     cpu.cart = abs;
@@ -879,6 +965,7 @@ static void cpu_lda_abs_negative(void *ctx)
     ct_assertequal(3u, cpu.pc);
 
     ct_assertequal(0x80u, cpu.a);
+    ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
 }
 
@@ -933,6 +1020,10 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_lda_imm),
         ct_maketest(cpu_lda_imm_zero),
         ct_maketest(cpu_lda_imm_negative),
+
+        ct_maketest(cpu_lda_zp),
+        ct_maketest(cpu_lda_zp_zero),
+        ct_maketest(cpu_lda_zp_negative),
 
         ct_maketest(cpu_lda_abs),
         ct_maketest(cpu_lda_abs_zero),

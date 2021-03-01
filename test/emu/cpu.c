@@ -826,6 +826,63 @@ static void cpu_lda_imm_negative(void *ctx)
 }
 
 //
+// Absolute Instructions
+//
+
+static void cpu_lda_abs(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xad, 0x01, 0x80},
+            abs[] = {0xff, 0x45};
+    cpu.ram = mem;
+    cpu.cart = abs;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+}
+
+static void cpu_lda_abs_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xad, 0x01, 0x80},
+            abs[] = {0xff, 0x00};
+    cpu.ram = mem;
+    cpu.cart = abs;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+}
+
+static void cpu_lda_abs_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xad, 0x01, 0x80},
+            abs[] = {0xff, 0x80};
+    cpu.ram = mem;
+    cpu.cart = abs;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x80u, cpu.a);
+    ct_asserttrue(cpu.p.n);
+}
+
+//
 // Test List
 //
 
@@ -876,6 +933,10 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_lda_imm),
         ct_maketest(cpu_lda_imm_zero),
         ct_maketest(cpu_lda_imm_negative),
+
+        ct_maketest(cpu_lda_abs),
+        ct_maketest(cpu_lda_abs_zero),
+        ct_maketest(cpu_lda_abs_negative),
     };
 
     return ct_makesuite(tests);

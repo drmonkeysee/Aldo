@@ -45,16 +45,52 @@ static void dis_inst_does_nothing_if_no_bytes(void *ctx)
     ct_assertequalstr("", buf);
 }
 
-static void dis_inst_disassembles_onebyte(void *ctx)
+static void dis_inst_disassembles_implied(void *ctx)
 {
     const uint16_t a = 0x1234;
-    const uint8_t bytes[1] = {0xea};
+    const uint8_t bytes[] = {0xea};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, 1, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(1, length);
     ct_assertequalstr("$1234: EA          NOP", buf);
+}
+
+static void dis_inst_disassembles_immediate(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0xa9, 0x34};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(2, length);
+    ct_assertequalstr("$1234: A9 34       LDA #$34", buf);
+}
+
+static void dis_inst_disassembles_zeropage(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0xa5, 0x34};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(2, length);
+    ct_assertequalstr("$1234: A5 34       LDA $34", buf);
+}
+
+static void dis_inst_disassembles_absolute(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0xad, 0x34, 0x6};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(3, length);
+    ct_assertequalstr("$1234: AD 34 06    LDA $0634", buf);
 }
 
 //
@@ -98,7 +134,211 @@ static void dis_datapath_implied_cyclen(void *ctx)
 {
     const struct console_state sn = {
         .cpu = {
+            .databus = 0xff,
+            .exec_cycle = 2,
+            .opcode = 0xea,
+        },
+    };
+    char buf[DIS_DATAP_SIZE] = {'\0'};
+
+    const int written = dis_datapath(&sn, buf);
+
+    ct_assertequal(0, written);
+    ct_assertequalstr("", buf);
+}
+
+static void dis_datapath_immediate_cyclezero(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 0,
+            .opcode = 0xa9,
+        },
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    ct_assertequal(7, written);
+    ct_assertequalstr("LDA imm", buf);
+}
+
+static void dis_datapath_immediate_cycleone(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .databus = 0x43,
+            .exec_cycle = 1,
+            .opcode = 0xa9,
+        },
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    ct_assertequal(8, written);
+    ct_assertequalstr("LDA #$43", buf);
+}
+
+static void dis_datapath_immediate_cyclen(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .databus = 0xff,
+            .exec_cycle = 2,
+            .opcode = 0xa9,
+        },
+    };
+    char buf[DIS_DATAP_SIZE] = {'\0'};
+
+    const int written = dis_datapath(&sn, buf);
+
+    ct_assertequal(0, written);
+    ct_assertequalstr("", buf);
+}
+
+static void dis_datapath_zeropage_cyclezero(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 0,
+            .opcode = 0xa5,
+        },
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    ct_assertequal(6, written);
+    ct_assertequalstr("LDA zp", buf);
+}
+
+static void dis_datapath_zeropage_cycleone(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .databus = 0x43,
+            .exec_cycle = 1,
+            .opcode = 0xa5,
+        },
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    ct_assertequal(7, written);
+    ct_assertequalstr("LDA $43", buf);
+}
+
+static void dis_datapath_zeropage_cycletwo(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .databus = 0x21,
+            .exec_cycle = 2,
+            .opcode = 0xa5,
+        },
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    ct_assertequal(0, written);
+    ct_assertequalstr("", buf);
+}
+
+static void dis_datapath_zeropage_cyclen(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .databus = 0xff,
             .exec_cycle = 3,
+            .opcode = 0xa5,
+        },
+    };
+    char buf[DIS_DATAP_SIZE] = {'\0'};
+
+    const int written = dis_datapath(&sn, buf);
+
+    ct_assertequal(0, written);
+    ct_assertequalstr("", buf);
+}
+
+static void dis_datapath_absolute_cyclezero(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 0,
+            .opcode = 0xad,
+        },
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    ct_assertequal(7, written);
+    ct_assertequalstr("LDA abs", buf);
+}
+
+static void dis_datapath_absolute_cycleone(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .databus = 0x43,
+            .exec_cycle = 1,
+            .opcode = 0xad,
+        },
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    ct_assertequal(9, written);
+    ct_assertequalstr("LDA $??43", buf);
+}
+
+static void dis_datapath_absolute_cycletwo(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .databus = 0x21,
+            .addrlow_latch = 0x43,
+            .exec_cycle = 2,
+            .opcode = 0xad,
+        },
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    ct_assertequal(9, written);
+    ct_assertequalstr("LDA $2143", buf);
+}
+
+static void dis_datapath_absolute_cyclethree(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .databus = 0xff,
+            .exec_cycle = 3,
+            .opcode = 0xad,
+        },
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    ct_assertequal(0, written);
+    ct_assertequalstr("", buf);
+}
+
+static void dis_datapath_absolute_cyclen(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .databus = 0xff,
+            .exec_cycle = 4,
+            .opcode = 0xad,
         },
     };
     char buf[DIS_DATAP_SIZE] = {'\0'};
@@ -120,11 +360,29 @@ struct ct_testsuite asm_tests(void)
         ct_maketest(dis_errstr_returns_unknown_err),
 
         ct_maketest(dis_inst_does_nothing_if_no_bytes),
-        ct_maketest(dis_inst_disassembles_onebyte),
+        ct_maketest(dis_inst_disassembles_implied),
+        ct_maketest(dis_inst_disassembles_immediate),
+        ct_maketest(dis_inst_disassembles_zeropage),
+        ct_maketest(dis_inst_disassembles_absolute),
 
         ct_maketest(dis_datapath_implied_cyclezero),
         ct_maketest(dis_datapath_implied_cycleone),
         ct_maketest(dis_datapath_implied_cyclen),
+
+        ct_maketest(dis_datapath_immediate_cyclezero),
+        ct_maketest(dis_datapath_immediate_cycleone),
+        ct_maketest(dis_datapath_immediate_cyclen),
+
+        ct_maketest(dis_datapath_zeropage_cyclezero),
+        ct_maketest(dis_datapath_zeropage_cycleone),
+        ct_maketest(dis_datapath_zeropage_cycletwo),
+        ct_maketest(dis_datapath_zeropage_cyclen),
+
+        ct_maketest(dis_datapath_absolute_cyclezero),
+        ct_maketest(dis_datapath_absolute_cycleone),
+        ct_maketest(dis_datapath_absolute_cycletwo),
+        ct_maketest(dis_datapath_absolute_cyclethree),
+        ct_maketest(dis_datapath_absolute_cyclen),
     };
 
     return ct_makesuite(tests);

@@ -133,11 +133,13 @@ int dis_datapath(const struct console_state *snapshot,
     assert(snapshot != NULL);
     assert(dis != NULL);
 
-    // NOTE: stop updating datapath display after max possible bytes
-    // have been read for instruction-decoding ([1-3] cycles, 0-indexed).
-    if (snapshot->cpu.exec_cycle > 2) return 0;
-
     const struct decoded dec = Decode[snapshot->cpu.opcode];
+    const int instlen = InstLens[dec.mode];
+
+    // NOTE: stop updating datapath display after all decoding cycles
+    // have run; (>1 for 1,2-byte instructions, >2 for 3-byte instructions).
+    if (snapshot->cpu.exec_cycle > 1 + (instlen / 3)) return 0;
+
     int count;
     unsigned int total;
     total = count = sprintf(dis, "%s ", Mnemonics[dec.instruction]);

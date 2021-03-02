@@ -74,7 +74,7 @@ static void set_p(struct mos6502 *self, uint8_t p)
 static void UNK_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    self->idone = true;
+    self->presync = true;
 }
 
 static void ADC_exec(struct mos6502 *self, struct decoded dec)
@@ -146,28 +146,28 @@ static void CLC_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
     self->p.c = false;
-    self->idone = true;
+    self->presync = true;
 }
 
 static void CLD_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
     self->p.d = false;
-    self->idone = true;
+    self->presync = true;
 }
 
 static void CLI_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
     self->p.i = false;
-    self->idone = true;
+    self->presync = true;
 }
 
 static void CLV_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
     self->p.v = false;
-    self->idone = true;
+    self->presync = true;
 }
 
 static void CMP_exec(struct mos6502 *self, struct decoded dec)
@@ -196,7 +196,7 @@ static void DEX_exec(struct mos6502 *self, struct decoded dec)
     --self->x;
     set_z(self, self->x);
     set_n(self, self->x);
-    self->idone = true;
+    self->presync = true;
 }
 
 static void DEY_exec(struct mos6502 *self, struct decoded dec)
@@ -205,7 +205,7 @@ static void DEY_exec(struct mos6502 *self, struct decoded dec)
     --self->y;
     set_z(self, self->y);
     set_n(self, self->y);
-    self->idone = true;
+    self->presync = true;
 }
 
 static void EOR_exec(struct mos6502 *self, struct decoded dec)
@@ -224,7 +224,7 @@ static void INX_exec(struct mos6502 *self, struct decoded dec)
     ++self->x;
     set_z(self, self->x);
     set_n(self, self->x);
-    self->idone = true;
+    self->presync = true;
 }
 
 static void INY_exec(struct mos6502 *self, struct decoded dec)
@@ -233,7 +233,7 @@ static void INY_exec(struct mos6502 *self, struct decoded dec)
     ++self->y;
     set_z(self, self->y);
     set_n(self, self->y);
-    self->idone = true;
+    self->presync = true;
 }
 
 static void JMP_exec(struct mos6502 *self, struct decoded dec)
@@ -252,7 +252,7 @@ static void LDA_exec(struct mos6502 *self, struct decoded dec)
     self->a = self->databus;
     set_z(self, self->a);
     set_n(self, self->a);
-    self->idone = true;
+    self->presync = true;
 }
 
 static void LDX_exec(struct mos6502 *self, struct decoded dec)
@@ -274,7 +274,7 @@ static void NOP_exec(struct mos6502 *self, struct decoded dec)
 {
     // NOP does nothing!
     (void)dec;
-    self->idone = true;
+    self->presync = true;
 }
 
 static void ORA_exec(struct mos6502 *self, struct decoded dec)
@@ -331,21 +331,21 @@ static void SEC_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
     self->p.c = true;
-    self->idone = true;
+    self->presync = true;
 }
 
 static void SED_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
     self->p.d = true;
-    self->idone = true;
+    self->presync = true;
 }
 
 static void SEI_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
     self->p.i = true;
-    self->idone = true;
+    self->presync = true;
 }
 
 static void STA_exec(struct mos6502 *self, struct decoded dec)
@@ -369,7 +369,7 @@ static void TAX_exec(struct mos6502 *self, struct decoded dec)
     self->x = self->a;
     set_z(self, self->x);
     set_n(self, self->x);
-    self->idone = true;
+    self->presync = true;
 }
 
 static void TAY_exec(struct mos6502 *self, struct decoded dec)
@@ -378,7 +378,7 @@ static void TAY_exec(struct mos6502 *self, struct decoded dec)
     self->y = self->a;
     set_z(self, self->y);
     set_n(self, self->y);
-    self->idone = true;
+    self->presync = true;
 }
 
 static void TSX_exec(struct mos6502 *self, struct decoded dec)
@@ -387,7 +387,7 @@ static void TSX_exec(struct mos6502 *self, struct decoded dec)
     self->x = self->s;
     set_z(self, self->x);
     set_n(self, self->x);
-    self->idone = true;
+    self->presync = true;
 }
 
 static void TXA_exec(struct mos6502 *self, struct decoded dec)
@@ -396,14 +396,14 @@ static void TXA_exec(struct mos6502 *self, struct decoded dec)
     self->a = self->x;
     set_z(self, self->a);
     set_n(self, self->a);
-    self->idone = true;
+    self->presync = true;
 }
 
 static void TXS_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
     self->s = self->x;
-    self->idone = true;
+    self->presync = true;
 }
 
 static void TYA_exec(struct mos6502 *self, struct decoded dec)
@@ -412,7 +412,7 @@ static void TYA_exec(struct mos6502 *self, struct decoded dec)
     self->a = self->y;
     set_z(self, self->a);
     set_n(self, self->a);
-    self->idone = true;
+    self->presync = true;
 }
 
 static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
@@ -591,9 +591,9 @@ void cpu_powerup(struct mos6502 *self)
     set_p(self, 0x34);
 
     // NOTE: Interrupts are inverted, high means no interrupt; rw high is read;
-    // idone flag is true to put the cpu into instruction-prefetch state.
+    // presync flag is true to put the cpu into instruction-prefetch state.
     self->signal.irq = self->signal.nmi = self->signal.res = self->signal.rw =
-        self->idone = true;
+        self->presync = true;
     self->signal.rdy = self->signal.sync = self->dflt = false;
 
     // NOTE: all other cpu elements are indeterminate on powerup
@@ -624,7 +624,7 @@ void cpu_reset(struct mos6502 *self)
     // on powerup this would result in $00 - $3 = $FD.
     self->s -= 3;
 
-    self->idone = true;
+    self->presync = true;
 }
 
 int cpu_cycle(struct mos6502 *self)
@@ -633,8 +633,8 @@ int cpu_cycle(struct mos6502 *self)
 
     if (!self->signal.rdy) return 0;
 
-    if (self->idone) {
-        self->idone = false;
+    if (self->presync) {
+        self->presync = false;
         self->t = PreFetch;
     }
     if (self->dflt) {

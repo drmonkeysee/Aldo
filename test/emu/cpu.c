@@ -26,7 +26,7 @@ static int clock_cpu(struct mos6502 *cpu)
         cycles += cpu_cycle(cpu);
         // NOTE: catch instructions that run longer than possible
         ct_asserttrue(cycles < 8);
-    } while (!cpu->idone);
+    } while (!cpu->presync);
     return cycles;
 }
 
@@ -56,7 +56,7 @@ static void cpu_powerup_initializes_cpu(void *ctx)
     ct_assertfalse(cpu.signal.rdy);
     ct_assertfalse(cpu.signal.sync);
 
-    ct_asserttrue(cpu.idone);
+    ct_asserttrue(cpu.presync);
     ct_assertfalse(cpu.dflt);
 }
 

@@ -194,7 +194,7 @@ const struct decoded Decode[] = {
     UNK,    // B2 - Unofficial
     UNK,    // B3 - Unofficial
     UNK,    // B4 - LDY zp,X
-    UNK,    // B5 - LDA zp,X
+    {IN_LDA, AM_ZPX},    // B5 - LDA zp,X
     UNK,    // B6 - LDX zp,Y
     UNK,    // B7 - Unofficial
     {IN_CLV, AM_IMP},    // B8 - CLV

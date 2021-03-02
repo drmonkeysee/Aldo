@@ -432,6 +432,30 @@ static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 
 #define BAD_ADDR_SEQ assert(((void)"BAD ADDRMODE SEQUENCE", false))
 
+static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
+                             uint8_t index)
+{
+    switch (self->t) {
+    case 1:
+        self->addrbus = self->pc++;
+        read(self);
+        self->adl = self->databus;
+        break;
+    case 2:
+        // NOTE: ZP,X/Y dead read
+        self->addrbus = bytowr(self->adl, 0x0);
+        read(self);
+        break;
+    case 3:
+        self->addrbus = bytowr(self->adl + index, 0x0);
+        read(self);
+        dispatch_instruction(self, dec);
+        break;
+    default:
+        BAD_ADDR_SEQ;
+    }
+}
+
 static void IMP_sequence(struct mos6502 *self, struct decoded dec)
 {
     assert(self->t == 1);
@@ -470,12 +494,12 @@ static void ZP_sequence(struct mos6502 *self, struct decoded dec)
 
 static void ZPX_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    zeropage_indexed(self, dec, self->x);
 }
 
 static void ZPY_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    zeropage_indexed(self, dec, self->y);
 }
 
 static void INDX_sequence(struct mos6502 *self, struct decoded dec)

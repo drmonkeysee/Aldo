@@ -239,16 +239,16 @@ static void dis_datapath_zeropage_cycleone(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_zeropage_cycletwo(void *ctx)
+static void dis_datapath_zeropage_cyclen(void *ctx)
 {
     const struct console_state sn = {
         .cpu = {
-            .databus = 0x21,
+            .databus = 0xff,
             .exec_cycle = 2,
             .opcode = 0xa5,
         },
     };
-    char buf[DIS_DATAP_SIZE];
+    char buf[DIS_DATAP_SIZE] = {'\0'};
 
     const int written = dis_datapath(&sn, buf);
 
@@ -257,13 +257,48 @@ static void dis_datapath_zeropage_cycletwo(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_zeropage_cyclen(void *ctx)
+static void dis_datapath_zeropage_x_cyclezero(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 0,
+            .opcode = 0xb5,
+        },
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDA zp,X";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_zeropage_x_cycleone(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .databus = 0x43,
+            .exec_cycle = 1,
+            .opcode = 0xb5,
+        },
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDA $43,X";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_zeropage_x_cyclen(void *ctx)
 {
     const struct console_state sn = {
         .cpu = {
             .databus = 0xff,
-            .exec_cycle = 3,
-            .opcode = 0xa5,
+            .exec_cycle = 2,
+            .opcode = 0xb5,
         },
     };
     char buf[DIS_DATAP_SIZE] = {'\0'};
@@ -329,7 +364,7 @@ static void dis_datapath_absolute_cycletwo(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_absolute_cyclethree(void *ctx)
+static void dis_datapath_absolute_cyclen(void *ctx)
 {
     const struct console_state sn = {
         .cpu = {
@@ -339,24 +374,6 @@ static void dis_datapath_absolute_cyclethree(void *ctx)
         },
     };
     char buf[DIS_DATAP_SIZE];
-
-    const int written = dis_datapath(&sn, buf);
-
-    const char *const exp = "";
-    ct_assertequal((int)strlen(exp), written);
-    ct_assertequalstrn(exp, buf, sizeof exp);
-}
-
-static void dis_datapath_absolute_cyclen(void *ctx)
-{
-    const struct console_state sn = {
-        .cpu = {
-            .databus = 0xff,
-            .exec_cycle = 4,
-            .opcode = 0xad,
-        },
-    };
-    char buf[DIS_DATAP_SIZE] = {'\0'};
 
     const int written = dis_datapath(&sn, buf);
 
@@ -391,13 +408,19 @@ struct ct_testsuite asm_tests(void)
 
         ct_maketest(dis_datapath_zeropage_cyclezero),
         ct_maketest(dis_datapath_zeropage_cycleone),
-        ct_maketest(dis_datapath_zeropage_cycletwo),
         ct_maketest(dis_datapath_zeropage_cyclen),
+
+        ct_maketest(dis_datapath_zeropage_x_cyclezero),
+        ct_maketest(dis_datapath_zeropage_x_cycleone),
+        ct_maketest(dis_datapath_zeropage_x_cyclen),
+
+        /*ct_maketest(dis_datapath_zeropage_y_cyclezero),
+        ct_maketest(dis_datapath_zeropage_y_cycleone),
+        ct_maketest(dis_datapath_zeropage_y_cyclen),*/
 
         ct_maketest(dis_datapath_absolute_cyclezero),
         ct_maketest(dis_datapath_absolute_cycleone),
         ct_maketest(dis_datapath_absolute_cycletwo),
-        ct_maketest(dis_datapath_absolute_cyclethree),
         ct_maketest(dis_datapath_absolute_cyclen),
     };
 

@@ -14,7 +14,7 @@
 static void setup_cpu(struct mos6502 *cpu)
 {
     cpu_powerup(cpu);
-    // NOTE: set the cpu ready to read instruction at 0x00
+    // NOTE: set the cpu ready to read instruction at 0x0
     cpu->pc = 0;
     cpu->signal.rdy = true;
 }
@@ -854,7 +854,7 @@ static void cpu_lda_imm_negative(void *ctx)
 }
 
 //
-// Zero-Page Instructions
+// Zero-page Instructions
 //
 
 static void cpu_lda_zp(void *ctx)
@@ -906,6 +906,82 @@ static void cpu_lda_zp_negative(void *ctx)
     ct_assertequal(0x80u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
+}
+
+//
+// Zero-page,X Instructions
+//
+
+static void cpu_lda_zpx(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xb5, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x56};
+    cpu.ram = mem;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x56u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_lda_zpx_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xb5, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0};
+    cpu.ram = mem;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_lda_zpx_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xb5, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x80};
+    cpu.ram = mem;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x80u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_lda_zpx_overflow(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xb5, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x56};
+    cpu.ram = mem;
+    cpu.x = 0xff;   // NOTE: wrap around from $0003 -> $0002
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x22u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 //
@@ -1024,6 +1100,11 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_lda_zp),
         ct_maketest(cpu_lda_zp_zero),
         ct_maketest(cpu_lda_zp_negative),
+
+        ct_maketest(cpu_lda_zpx),
+        ct_maketest(cpu_lda_zpx_zero),
+        ct_maketest(cpu_lda_zpx_negative),
+        ct_maketest(cpu_lda_zpx_overflow),
 
         ct_maketest(cpu_lda_abs),
         ct_maketest(cpu_lda_abs_zero),

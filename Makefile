@@ -5,8 +5,10 @@ BUILD_DIR := build
 OBJ_DIR := $(BUILD_DIR)/obj
 
 MODULES := emu
-SRC_FILES := $(wildcard $(SRC_DIR)/*.c) $(foreach MDL,$(MODULES),$(wildcard $(SRC_DIR)/$(MDL)/*.c))
-TEST_FILES := $(wildcard $(TEST_DIR)/*.c) $(foreach MDL,$(MODULES),$(wildcard $(TEST_DIR)/$(MDL)/*.c))
+SRC_FILES := $(wildcard $(SRC_DIR)/*.c) \
+		$(foreach MDL,$(MODULES),$(wildcard $(SRC_DIR)/$(MDL)/*.c))
+TEST_FILES := $(wildcard $(TEST_DIR)/*.c) \
+		$(foreach MDL,$(MODULES),$(wildcard $(TEST_DIR)/$(MDL)/*.c))
 
 OBJ_FILES := $(subst $(SRC_DIR),$(OBJ_DIR),$(SRC_FILES:.c=.o))
 TEST_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(TEST_FILES:.c=.o))

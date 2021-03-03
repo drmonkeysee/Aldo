@@ -491,7 +491,36 @@ static void ZPY_sequence(struct mos6502 *self, struct decoded dec)
 
 static void INDX_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    switch (self->t) {
+    case 1:
+        self->addrbus = self->pc++;
+        read(self);
+        self->adl = self->databus;
+        break;
+    case 2:
+        // NOTE: (zp,X) dead read
+        self->addrbus = bytowr(self->adl, 0x0);
+        read(self);
+        self->alu = self->adl + self->x;
+        break;
+    case 3:
+        self->addrbus = bytowr(self->alu, 0x0);
+        read(self);
+        self->adl = self->databus;
+        ++self->alu;
+        break;
+    case 4:
+        self->addrbus = bytowr(self->alu, 0x0);
+        read(self);
+        break;
+    case 5:
+        self->addrbus = bytowr(self->adl, self->databus);
+        read(self);
+        dispatch_instruction(self, dec);
+        break;
+    default:
+        BAD_ADDR_SEQ;
+    }
 }
 
 static void INDY_sequence(struct mos6502 *self, struct decoded dec)

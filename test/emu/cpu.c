@@ -985,6 +985,94 @@ static void cpu_lda_zpx_overflow(void *ctx)
 }
 
 //
+// Zero-Page,Y Instructions
+//
+
+//
+// (Indirect,X) Instructions
+//
+
+static void cpu_lda_indx(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xa1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x45};
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_lda_indx_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xa1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x0};
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_lda_indx_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xa1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x80};
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x80u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_lda_indx_overflow(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xa1, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x80, 0x22};
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x22u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+//
 // Absolute Instructions
 //
 
@@ -1105,6 +1193,11 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_lda_zpx_zero),
         ct_maketest(cpu_lda_zpx_negative),
         ct_maketest(cpu_lda_zpx_overflow),
+
+        ct_maketest(cpu_lda_indx),
+        ct_maketest(cpu_lda_indx_zero),
+        ct_maketest(cpu_lda_indx_negative),
+        ct_maketest(cpu_lda_indx_overflow),
 
         ct_maketest(cpu_lda_abs),
         ct_maketest(cpu_lda_abs_zero),

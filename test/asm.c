@@ -363,6 +363,59 @@ static void dis_datapath_indirect_x_cyclen(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
+static void dis_datapath_indirect_y_cyclezero(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 0,
+            .opcode = 0xb1,
+        },
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDA (zp),Y";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_indirect_y_cycleone(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .databus = 0x43,
+            .exec_cycle = 1,
+            .opcode = 0xb1,
+        },
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDA ($43),Y";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_indirect_y_cyclen(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .databus = 0xff,
+            .exec_cycle = 2,
+            .opcode = 0xb1,
+        },
+    };
+    char buf[DIS_DATAP_SIZE] = {'\0'};
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
 static void dis_datapath_absolute_cyclezero(void *ctx)
 {
     const struct console_state sn = {
@@ -474,6 +527,10 @@ struct ct_testsuite asm_tests(void)
         ct_maketest(dis_datapath_indirect_x_cyclezero),
         ct_maketest(dis_datapath_indirect_x_cycleone),
         ct_maketest(dis_datapath_indirect_x_cyclen),
+
+        ct_maketest(dis_datapath_indirect_y_cyclezero),
+        ct_maketest(dis_datapath_indirect_y_cycleone),
+        ct_maketest(dis_datapath_indirect_y_cyclen),
 
         ct_maketest(dis_datapath_absolute_cyclezero),
         ct_maketest(dis_datapath_absolute_cycleone),

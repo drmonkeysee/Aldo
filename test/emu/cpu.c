@@ -854,7 +854,7 @@ static void cpu_lda_imm_negative(void *ctx)
 }
 
 //
-// Zero-page Instructions
+// Zero-Page Instructions
 //
 
 static void cpu_lda_zp(void *ctx)
@@ -909,7 +909,7 @@ static void cpu_lda_zp_negative(void *ctx)
 }
 
 //
-// Zero-page,X Instructions
+// Zero-Page,X Instructions
 //
 
 static void cpu_lda_zpx(void *ctx)

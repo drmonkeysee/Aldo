@@ -88,9 +88,9 @@ X(TYA)  /* Transfer y index to accumulator */
 #define DEC_ADDRMODE_X \
 X(IMP, 1, "imp", "")                        /* Implied */ \
 X(IMM, 2, "imm", "#$%02X")                  /* Immediate */ \
-X(ZP, 2, "zp", "$%02X")                     /* Zero-page */ \
-X(ZPX, 2, "zp,X", "$%02X,X")                /* Zero-page,X */ \
-X(ZPY, 2, "zp,Y", "$%02X,Y")                /* Zero-page,Y */ \
+X(ZP, 2, "zp", "$%02X")                     /* Zero-Page */ \
+X(ZPX, 2, "zp,X", "$%02X,X")                /* Zero-Page,X */ \
+X(ZPY, 2, "zp,Y", "$%02X,Y")                /* Zero-Page,Y */ \
 X(INDX, 2, "(zp,X)", "($%02X,X)")           /* (Indirect,X) */ \
 X(INDY, 2, "(zp),Y", "($%02X),Y")           /* (Indirect),Y */ \
 X(ABS, 3, "abs", "$??%02X", "$%04X")        /* Absolute */ \

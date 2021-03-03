@@ -71,6 +71,13 @@ static void set_p(struct mos6502 *self, uint8_t p)
 // Instruction Execution
 //
 
+static void load_register(struct mos6502 *self, uint8_t *r, uint8_t d)
+{
+    *r = d;
+    set_z(self, *r);
+    set_n(self, *r);
+}
+
 static void UNK_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
@@ -193,18 +200,14 @@ static void DEC_exec(struct mos6502 *self, struct decoded dec)
 static void DEX_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    --self->x;
-    set_z(self, self->x);
-    set_n(self, self->x);
+    load_register(self, &self->x, self->x - 1);
     self->presync = true;
 }
 
 static void DEY_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    --self->y;
-    set_z(self, self->y);
-    set_n(self, self->y);
+    load_register(self, &self->y, self->y - 1);
     self->presync = true;
 }
 
@@ -221,18 +224,14 @@ static void INC_exec(struct mos6502 *self, struct decoded dec)
 static void INX_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    ++self->x;
-    set_z(self, self->x);
-    set_n(self, self->x);
+    load_register(self, &self->x, self->x + 1);
     self->presync = true;
 }
 
 static void INY_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    ++self->y;
-    set_z(self, self->y);
-    set_n(self, self->y);
+    load_register(self, &self->y, self->y + 1);
     self->presync = true;
 }
 
@@ -249,9 +248,7 @@ static void JSR_exec(struct mos6502 *self, struct decoded dec)
 static void LDA_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    self->a = self->databus;
-    set_z(self, self->a);
-    set_n(self, self->a);
+    load_register(self, &self->a, self->databus);
     self->presync = true;
 }
 
@@ -366,36 +363,28 @@ static void STY_exec(struct mos6502 *self, struct decoded dec)
 static void TAX_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    self->x = self->a;
-    set_z(self, self->x);
-    set_n(self, self->x);
+    load_register(self, &self->x, self->a);
     self->presync = true;
 }
 
 static void TAY_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    self->y = self->a;
-    set_z(self, self->y);
-    set_n(self, self->y);
+    load_register(self, &self->y, self->a);
     self->presync = true;
 }
 
 static void TSX_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    self->x = self->s;
-    set_z(self, self->x);
-    set_n(self, self->x);
+    load_register(self, &self->x, self->s);
     self->presync = true;
 }
 
 static void TXA_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    self->a = self->x;
-    set_z(self, self->a);
-    set_n(self, self->a);
+    load_register(self, &self->a, self->x);
     self->presync = true;
 }
 
@@ -409,9 +398,7 @@ static void TXS_exec(struct mos6502 *self, struct decoded dec)
 static void TYA_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    self->a = self->y;
-    set_z(self, self->a);
-    set_n(self, self->a);
+    load_register(self, &self->a, self->y);
     self->presync = true;
 }
 

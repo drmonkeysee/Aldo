@@ -45,16 +45,6 @@ static uint8_t get_p(const struct mos6502 *self)
     return p;
 }
 
-static void set_z(struct mos6502 *self, uint8_t r)
-{
-    self->p.z = r == 0;
-}
-
-static void set_n(struct mos6502 *self, uint8_t r)
-{
-    self->p.n = r & 0x80;
-}
-
 static void set_p(struct mos6502 *self, uint8_t p)
 {
     self->p.c = p & 0x1;
@@ -67,6 +57,16 @@ static void set_p(struct mos6502 *self, uint8_t p)
     self->p.n = p & 0x80;
 }
 
+static void update_z(struct mos6502 *self, uint8_t r)
+{
+    self->p.z = r == 0;
+}
+
+static void update_n(struct mos6502 *self, uint8_t r)
+{
+    self->p.n = r & 0x80;
+}
+
 //
 // Instruction Execution
 //
@@ -74,8 +74,8 @@ static void set_p(struct mos6502 *self, uint8_t p)
 static void load_register(struct mos6502 *self, uint8_t *r, uint8_t d)
 {
     *r = d;
-    set_z(self, *r);
-    set_n(self, *r);
+    update_z(self, *r);
+    update_n(self, *r);
 }
 
 static void UNK_exec(struct mos6502 *self, struct decoded dec)
@@ -432,9 +432,10 @@ static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
         // NOTE: ZP,X/Y dead read
         self->addrbus = bytowr(self->adl, 0x0);
         read(self);
+        self->alu = self->adl + index;
         break;
     case 3:
-        self->addrbus = bytowr(self->adl + index, 0x0);
+        self->addrbus = bytowr(self->alu, 0x0);
         read(self);
         dispatch_instruction(self, dec);
         break;

@@ -41,7 +41,7 @@ struct mos6502 {
             opc,        // Opcode
             adl,        // Address low latch (held when loading address high)
             alu;        // ALU result latch (held during internal ALU
-                        // operations, such as indexed-addressing operations).
+                        // operations, such as indexed-addressing).
     int8_t t;           // Instruction sequence cycle (T0, T1, T2...)
     struct {
         bool irq: 1,    // Maskable Interrupt Signal (input, inverted)

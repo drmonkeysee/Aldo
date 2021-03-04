@@ -1256,6 +1256,42 @@ static void cpu_lda_abs_negative(void *ctx)
 }
 
 //
+// Additional Tests
+//
+
+static void cpu_data_fault(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xad, 0x1f, 0x40};
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_asserttrue(cpu.dflt);
+}
+
+static void cpu_ram_mirroring(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xad, 0x3, 0x8, 0x45}; // NOTE: $0803 -> $0003
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+//
 // Test List
 //
 
@@ -1329,6 +1365,9 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_lda_abs),
         ct_maketest(cpu_lda_abs_zero),
         ct_maketest(cpu_lda_abs_negative),
+
+        ct_maketest(cpu_data_fault),
+        ct_maketest(cpu_ram_mirroring),
     };
 
     return ct_makesuite(tests);

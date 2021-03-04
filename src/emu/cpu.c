@@ -248,6 +248,8 @@ static void JSR_exec(struct mos6502 *self, struct decoded dec)
 static void LDA_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
+    // NOTE: if address carry discard this read and take one more cycle
+    if (self->adc) return;
     load_register(self, &self->a, self->databus);
     self->presync = true;
 }
@@ -426,16 +428,16 @@ static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
     case 1:
         self->addrbus = self->pc++;
         read(self);
-        self->adl = self->databus;
+        self->ada = self->databus;
         break;
     case 2:
         // NOTE: ZP,X/Y dead read
-        self->addrbus = bytowr(self->adl, 0x0);
+        self->addrbus = bytowr(self->ada, 0x0);
         read(self);
-        self->alu = self->adl + index;
+        self->ada += index;
         break;
     case 3:
-        self->addrbus = bytowr(self->alu, 0x0);
+        self->addrbus = bytowr(self->ada, 0x0);
         read(self);
         dispatch_instruction(self, dec);
         break;
@@ -469,9 +471,10 @@ static void ZP_sequence(struct mos6502 *self, struct decoded dec)
     case 1:
         self->addrbus = self->pc++;
         read(self);
+        self->ada = self->databus;
         break;
     case 2:
-        self->addrbus = bytowr(self->databus, 0x0);
+        self->addrbus = bytowr(self->ada, 0x0);
         read(self);
         dispatch_instruction(self, dec);
         break;
@@ -496,26 +499,26 @@ static void INDX_sequence(struct mos6502 *self, struct decoded dec)
     case 1:
         self->addrbus = self->pc++;
         read(self);
-        self->adl = self->databus;
+        self->ada = self->databus;
         break;
     case 2:
         // NOTE: (zp,X) dead read
-        self->addrbus = bytowr(self->adl, 0x0);
+        self->addrbus = bytowr(self->ada, 0x0);
         read(self);
-        self->alu = self->adl + self->x;
+        self->ada += self->x;
         break;
     case 3:
-        self->addrbus = bytowr(self->alu, 0x0);
+        self->addrbus = bytowr(self->ada++, 0x0);
         read(self);
-        self->adl = self->databus;
-        ++self->alu;
+        self->adb = self->databus;
         break;
     case 4:
-        self->addrbus = bytowr(self->alu, 0x0);
+        self->addrbus = bytowr(self->ada, 0x0);
         read(self);
+        self->ada = self->databus;
         break;
     case 5:
-        self->addrbus = bytowr(self->adl, self->databus);
+        self->addrbus = bytowr(self->adb, self->ada);
         read(self);
         dispatch_instruction(self, dec);
         break;
@@ -526,7 +529,39 @@ static void INDX_sequence(struct mos6502 *self, struct decoded dec)
 
 static void INDY_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    switch (self->t) {
+    case 1:
+        self->addrbus = self->pc++;
+        read(self);
+        self->ada = self->databus;
+        break;
+    case 2:
+        self->addrbus = bytowr(self->ada++, 0x0);
+        read(self);
+        self->adb = self->databus;
+        break;
+    case 3:
+        self->addrbus = bytowr(self->ada, 0x0);
+        read(self);
+        self->ada = self->databus;
+        self->adb += self->y;
+        self->adc = self->adb < self->y;
+        break;
+    case 4:
+        self->addrbus = bytowr(self->adb, self->ada);
+        read(self);
+        dispatch_instruction(self, dec);
+        self->ada += self->adc;
+        self->adc = false;
+        break;
+    case 5:
+        self->addrbus = bytowr(self->adb, self->ada);
+        read(self);
+        dispatch_instruction(self, dec);
+        break;
+    default:
+        BAD_ADDR_SEQ;
+    }
 }
 
 static void ABS_sequence(struct mos6502 *self, struct decoded dec)
@@ -535,14 +570,15 @@ static void ABS_sequence(struct mos6502 *self, struct decoded dec)
     case 1:
         self->addrbus = self->pc++;
         read(self);
-        self->adl = self->databus;
+        self->ada = self->databus;
         break;
     case 2:
         self->addrbus = self->pc++;
         read(self);
+        self->adb = self->databus;
         break;
     case 3:
-        self->addrbus = bytowr(self->adl, self->databus);
+        self->addrbus = bytowr(self->ada, self->adb);
         read(self);
         dispatch_instruction(self, dec);
         break;
@@ -654,10 +690,11 @@ void cpu_reset(struct mos6502 *self)
     self->t = MaxCycleCount - 1;
     self->addrbus = ResetVector;
     read(self);
-    self->adl = self->databus;
+    self->ada = self->databus;
     self->addrbus = ResetVector + 1;
     read(self);
-    self->pc = bytowr(self->adl, self->databus);
+    self->adb = self->databus;
+    self->pc = bytowr(self->ada, self->adb);
 
     self->p.i = true;
     // NOTE: Reset runs through same sequence as BRK/IRQ
@@ -711,7 +748,8 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     if (self->signal.sync) {
         snapshot->cpu.currinst = self->addrbus;
     }
-    snapshot->cpu.addrlow_latch = self->adl;
+    // TODO: this isn't always addrlow
+    snapshot->cpu.addrlow_latch = self->ada;
     snapshot->cpu.databus = self->databus;
     snapshot->cpu.exec_cycle = self->t;
     snapshot->cpu.opcode = self->opc;

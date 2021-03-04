@@ -1191,7 +1191,7 @@ static void cpu_lda_indy_overflow(void *ctx)
 
     ct_assertequal(0xb2u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 //

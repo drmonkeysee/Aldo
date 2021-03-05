@@ -339,10 +339,20 @@ static void drawdatapath(const struct console_state *snapshot)
 
 static void drawram(const struct console_state *snapshot)
 {
-    static const int start_x = 5, col_width = 3;
+    static const int start_x = 5, col_width = 3,
+                     toprail_start = start_x + col_width;
 
+    for (int col = 0; col < 0x10; ++col) {
+        mvwprintw(RamView.win, 1, toprail_start + (col * col_width), "%X",
+                  col);
+    }
+    mvwhline(RamView.win, 2, toprail_start - 1, 0,
+             getmaxx(RamView.win) - toprail_start - 5);
+
+    const int h = getmaxy(RamView.content);
     int cursor_x = start_x, cursor_y = 0;
-    mvwvline(RamView.content, 0, start_x - 2, 0, getmaxy(RamView.content));
+    mvwvline(RamView.content, 0, start_x - 2, 0, h);
+    mvwvline(RamView.content, 0, getmaxx(RamView.content) - 3, 0, h);
     for (size_t page = 0; page < 8; ++page) {
         for (size_t page_row = 0; page_row < 0x10; ++page_row) {
             mvwprintw(RamView.content, cursor_y, 0, "%02X", page);
@@ -353,6 +363,8 @@ static void drawram(const struct console_state *snapshot)
                                         + page_col]);
                 cursor_x += col_width;
             }
+            mvwprintw(RamView.content, cursor_y, cursor_x + 2,
+                      "%X", page_row);
             cursor_x = start_x;
             ++cursor_y;
         }
@@ -399,8 +411,8 @@ static void ramrefresh(int ramsheet)
     int ram_x, ram_y, ram_w, ram_h;
     getbegyx(RamView.win, ram_y, ram_x);
     getmaxyx(RamView.win, ram_h, ram_w);
-    pnoutrefresh(RamView.content, (ram_h - 4) * ramsheet, 0, ram_y + 2,
-                 ram_x + 2, ram_y + ram_h - 3, ram_x + ram_w - 2);
+    pnoutrefresh(RamView.content, (ram_h - 4) * ramsheet, 0, ram_y + 3,
+                 ram_x + 2, ram_y + ram_h - 2, ram_x + ram_w - 2);
 }
 
 //
@@ -409,7 +421,7 @@ static void ramrefresh(int ramsheet)
 
 void ui_init(void)
 {
-    static const int col1w = 32, col2w = 34, col3w = 35, col4w = 56, hwh = 12,
+    static const int col1w = 32, col2w = 34, col3w = 35, col4w = 60, hwh = 12,
                      cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");

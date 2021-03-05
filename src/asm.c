@@ -156,7 +156,7 @@ int dis_datapath(const struct console_state *snapshot,
         break;
     case 2:
         count = sprintf(dis + total, displaystr,
-                        bytowr(snapshot->cpu.addrlow_latch,
+                        bytowr(snapshot->cpu.addra_latch,
                                snapshot->cpu.databus));
         break;
     default:

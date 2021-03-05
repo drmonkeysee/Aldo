@@ -301,17 +301,22 @@ static void drawdatapath(const struct console_state *snapshot)
 
     mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
 
-    mvwvline(DatapathView.content, ++cursor_y, vsep1, 0, 3);
-    mvwvline(DatapathView.content, cursor_y, vsep2, 0, 3);
-    mvwvline(DatapathView.content, cursor_y, vsep3, 0, 3);
-    mvwvline(DatapathView.content, cursor_y, vsep4, 0, 3);
+    mvwvline(DatapathView.content, ++cursor_y, vsep1, 0, 5);
+    mvwvline(DatapathView.content, cursor_y, vsep2, 0, 5);
+    mvwvline(DatapathView.content, cursor_y, vsep3, 0, 5);
+    mvwvline(DatapathView.content, cursor_y, vsep4, 0, 5);
     const int wlen = dis_datapath(snapshot, buf);
     const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
     mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);
 
+    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "ada: $%02X",
+              snapshot->cpu.addra_latch);
+
     mvwaddstr(DatapathView.content, ++cursor_y, 0, left);
     mvwprintw(DatapathView.content, cursor_y, vsep1 + 2, "$%04X",
               snapshot->cpu.addressbus);
+    mvwprintw(DatapathView.content, cursor_y, vsep2 + 2, "adb: $%02X",
+              snapshot->cpu.addrb_latch);
     const int dbus_x = vsep3 + 2;
     if (snapshot->cpu.datafault) {
         mvwaddstr(DatapathView.content, cursor_y, dbus_x, "FLT");
@@ -321,6 +326,9 @@ static void drawdatapath(const struct console_state *snapshot)
     }
     mvwaddstr(DatapathView.content, cursor_y, vsep4 + 1,
               snapshot->lines.readwrite ? left : right);
+
+    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adc: %d",
+              snapshot->cpu.addr_carry);
 
     mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "%*sT%u",
               snapshot->cpu.exec_cycle, "", snapshot->cpu.exec_cycle);
@@ -444,7 +452,7 @@ void ui_init(void)
     vinit(&FlagsView, flagsh, flagsw, yoffset + cpuh, xoffset + col1w + col2w,
           2, "Flags");
     vinit(&DatapathView, 13, col3w, yoffset + cpuh + flagsh,
-          xoffset + col1w + col2w, 2, "Datapath");
+          xoffset + col1w + col2w, 1, "Datapath");
     raminit(ramh, col4w, yoffset, xoffset + col1w + col2w + col3w);
 
     initclock();

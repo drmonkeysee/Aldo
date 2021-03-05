@@ -745,8 +745,9 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     if (self->signal.sync) {
         snapshot->cpu.currinst = self->addrbus;
     }
-    // TODO: this isn't always addrlow
-    snapshot->cpu.addrlow_latch = self->ada;
+    snapshot->cpu.addra_latch = self->ada;
+    snapshot->cpu.addrb_latch = self->adb;
+    snapshot->cpu.addr_carry = self->adc;
     snapshot->cpu.databus = self->databus;
     snapshot->cpu.exec_cycle = self->t;
     snapshot->cpu.opcode = self->opc;

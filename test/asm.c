@@ -456,7 +456,7 @@ static void dis_datapath_absolute_cycletwo(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .databus = 0x21,
-            .addrlow_latch = 0x43,
+            .addra_latch = 0x43,
             .exec_cycle = 2,
             .opcode = 0xad,
         },

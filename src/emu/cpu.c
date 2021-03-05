@@ -742,6 +742,8 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.yindex = self->y;
 
     snapshot->cpu.addressbus = self->addrbus;
+    // TODO: fix this so currinst is not based on taking snapshot on sync cycle
+    // calculate based off opcode, pc, and instruction length
     if (self->signal.sync) {
         snapshot->cpu.currinst = self->addrbus;
     }

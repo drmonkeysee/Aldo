@@ -9,6 +9,7 @@
 
 #include "emu/bytes.h"
 #include "emu/decode.h"
+#include "emu/traits.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -133,34 +134,38 @@ int dis_datapath(const struct console_state *snapshot,
     assert(snapshot != NULL);
     assert(dis != NULL);
 
-    const struct decoded dec = Decode[snapshot->cpu.opcode];
-    const int instlen = InstLens[dec.mode];
+    if (snapshot->cpu.currinst > CpuCartMaxAddr) return ASM_EOF;
 
-    // NOTE: stop updating datapath display after all decoding cycles
-    // have run; (2 for 1,2-byte instructions, 3 for 3-byte instructions).
-    if (snapshot->cpu.exec_cycle > 1 + (instlen / 3)) return 0;
+    const uint16_t rom_idx = snapshot->cpu.currinst & CpuCartAddrMask;
+    const uint8_t opcode = snapshot->rom[rom_idx];
+    const struct decoded dec = Decode[opcode];
+    const int instlen = InstLens[dec.mode];
+    if (snapshot->cpu.currinst + instlen > CpuCartMaxAddr) return ASM_EOF;
 
     int count;
     unsigned int total;
     total = count = sprintf(dis, "%s ", Mnemonics[dec.instruction]);
     if (count < 0) return ASM_FMT_FAIL;
 
-    const char *const displaystr = StringTables[dec.mode]
-                                               [snapshot->cpu.exec_cycle];
-    switch (snapshot->cpu.exec_cycle) {
+    // NOTE: stop updating datapath instruction display after all decoding
+    // cycles have run; (2 for 1,2-byte instructions,
+    // 3 for 3-byte instructions).
+    const int max_displayidx = 1 + (instlen / 3),
+              displayidx = snapshot->cpu.exec_cycle < max_displayidx
+                           ? snapshot->cpu.exec_cycle
+                           : max_displayidx;
+    const char *const displaystr = StringTables[dec.mode][displayidx];
+    switch (displayidx) {
     case 0:
         count = sprintf(dis + total, "%s", displaystr);
         break;
     case 1:
-        count = sprintf(dis + total, displaystr, snapshot->cpu.databus);
-        break;
-    case 2:
-        count = sprintf(dis + total, displaystr,
-                        bytowr(snapshot->cpu.addra_latch,
-                               snapshot->cpu.databus));
+        count = sprintf(dis + total, displaystr, snapshot->rom[rom_idx + 1]);
         break;
     default:
-        return ASM_INV_DSPCYC;
+        count = sprintf(dis + total, displaystr,
+                        batowr(snapshot->rom + rom_idx + 1));
+        break;
     }
     if (count < 0) return ASM_FMT_FAIL;
     total += count;

@@ -247,9 +247,7 @@ static void JSR_exec(struct mos6502 *self, struct decoded dec)
 
 static void LDA_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)dec;
-    // NOTE: if address carry discard this read and take one more cycle
-    if (self->adc) return;
+    if (dec.mode == AM_INDY && self->t == 4 && self->adc) return;
     load_register(self, &self->a, self->databus);
     self->presync = true;
 }
@@ -552,7 +550,6 @@ static void INDY_sequence(struct mos6502 *self, struct decoded dec)
         read(self);
         dispatch_instruction(self, dec);
         self->ada += self->adc;
-        self->adc = false;
         break;
     case 5:
         self->addrbus = bytowr(self->adb, self->ada);

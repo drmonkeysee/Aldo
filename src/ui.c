@@ -383,11 +383,11 @@ static void createwin(struct view *v, int h, int w, int y, int x,
     mvwaddstr(v->win, 0, 1, title);
 }
 
-static void vinit(struct view *v, int h, int w, int y, int x,
+static void vinit(struct view *v, int h, int w, int y, int x, int vpad,
                   const char *restrict title)
 {
     createwin(v, h, w, y, x, title);
-    v->content = derwin(v->win, h - 4, w - 4, 2, 2);
+    v->content = derwin(v->win, h - (vpad * 2), w - 4, vpad, 2);
     v->inner = new_panel(v->content);
 }
 
@@ -436,15 +436,15 @@ void ui_init(void)
     getmaxyx(stdscr, scrh, scrw);
     const int yoffset = (scrh - ramh) / 2,
               xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
-    vinit(&HwView, hwh, col1w, yoffset, xoffset, "Hardware Traits");
-    vinit(&ControlsView, 9, col1w, yoffset + hwh, xoffset, "Controls");
-    vinit(&RomView, ramh, col2w, yoffset, xoffset + col1w, "ROM");
-    vinit(&RegistersView, cpuh, flagsw, yoffset, xoffset + col1w + col2w,
+    vinit(&HwView, hwh, col1w, yoffset, xoffset, 2, "Hardware Traits");
+    vinit(&ControlsView, 9, col1w, yoffset + hwh, xoffset, 2, "Controls");
+    vinit(&RomView, ramh, col2w, yoffset, xoffset + col1w, 1, "ROM");
+    vinit(&RegistersView, cpuh, flagsw, yoffset, xoffset + col1w + col2w, 2,
           "Registers");
     vinit(&FlagsView, flagsh, flagsw, yoffset + cpuh, xoffset + col1w + col2w,
-          "Flags");
+          2, "Flags");
     vinit(&DatapathView, 13, col3w, yoffset + cpuh + flagsh,
-          xoffset + col1w + col2w, "Datapath");
+          xoffset + col1w + col2w, 2, "Datapath");
     raminit(ramh, col4w, yoffset, xoffset + col1w + col2w + col3w);
 
     initclock();

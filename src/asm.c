@@ -66,7 +66,7 @@ static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
     const char *restrict const *const strtable = StringTables[dec->mode];
     switch (instlen) {
     case 1:
-        // NOTE: nothing else to print, trim the trailing space
+        // Nothing else to print, trim the trailing space
         dis[--count] = '\0';
         break;
     case 2:
@@ -150,7 +150,7 @@ int dis_datapath(const struct console_state *snapshot,
 
     const struct decoded dec = Decode[snapshot->cpu.opcode];
     const int instlen = InstLens[dec.mode];
-    // NOTE: detect pc overflow
+    // Detect pc overflow
     if ((uint16_t)(instaddr + instlen) < CpuCartMinAddr) return ASM_EOF;
 
     int count;
@@ -158,8 +158,6 @@ int dis_datapath(const struct console_state *snapshot,
     total = count = sprintf(dis, "%s ", Mnemonics[dec.instruction]);
     if (count < 0) return ASM_FMT_FAIL;
 
-    // NOTE: stop updating datapath instruction display after all decoding
-    // cycles have run.
     const int max_offset = 1 + (instlen / 3),
               displayidx = snapshot->cpu.exec_cycle < max_offset
                            ? snapshot->cpu.exec_cycle

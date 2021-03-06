@@ -436,7 +436,7 @@ static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
         self->ada = self->databus;
         break;
     case 2:
-        // NOTE: ZP,X/Y dead read
+        // zp,X/Y dead read
         self->addrbus = bytowr(self->ada, 0x0);
         read(self);
         self->ada += index;
@@ -487,7 +487,7 @@ static void IMP_sequence(struct mos6502 *self, struct decoded dec)
 {
     assert(self->t == 1);
 
-    // NOTE: implied mode dead read
+    // Implied mode dead read
     self->addrbus = self->pc;
     read(self);
     dispatch_instruction(self, dec);
@@ -539,7 +539,7 @@ static void INDX_sequence(struct mos6502 *self, struct decoded dec)
         self->ada = self->databus;
         break;
     case 2:
-        // NOTE: (zp,X) dead read
+        // (zp,X) dead read
         self->addrbus = bytowr(self->ada, 0x0);
         read(self);
         self->ada += self->x;
@@ -700,7 +700,7 @@ void cpu_powerup(struct mos6502 *self)
     assert(self != NULL);
 
     self->a = self->x = self->y = self->s = 0;
-    // NOTE: set B, I, and unused flags high
+    // Set B, I, and unused flags high
     set_p(self, 0x34);
 
     // NOTE: Interrupts are inverted, high means no interrupt; rw high is read;
@@ -756,7 +756,7 @@ int cpu_cycle(struct mos6502 *self)
     }
 
     if (++self->t == 0) {
-        // NOTE: T0 is always an opcode fetch
+        // T0 is always an opcode fetch
         self->signal.sync = self->signal.rw = true;
         self->addrbus = self->pc++;
         read(self);

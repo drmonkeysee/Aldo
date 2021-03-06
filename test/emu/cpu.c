@@ -12,9 +12,9 @@
 
 #include <stdint.h>
 
-// NOTE: one page of rom + extra to test page boundary addressing
+// One page of rom + extra to test page boundary addressing
 static const uint8_t bigrom[] = {
-    // start of page; 256 0xffs
+    // Start of page; 256 0xffs
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -47,14 +47,14 @@ static const uint8_t bigrom[] = {
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    // end of page
+    // End of page
     0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7,
 };
 
 static void setup_cpu(struct mos6502 *cpu)
 {
     cpu_powerup(cpu);
-    // NOTE: set the cpu ready to read instruction at 0x0
+    // Set the cpu ready to read instruction at 0x0
     cpu->pc = 0;
     cpu->signal.rdy = true;
 }
@@ -64,7 +64,7 @@ static int clock_cpu(struct mos6502 *cpu)
     int cycles = 0;
     do {
         cycles += cpu_cycle(cpu);
-        // NOTE: catch instructions that run longer than possible
+        // Catch instructions that run longer than possible
         ct_asserttrue(cycles <= MaxCycleCount);
     } while (!cpu->presync);
     return cycles;
@@ -417,7 +417,7 @@ static void cpu_nop(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    // NOTE: verify NOP did nothing
+    // Verify NOP did nothing
     struct console_state sn;
     cpu_snapshot(&cpu, &sn);
     ct_assertequal(0u, cpu.a);
@@ -1012,7 +1012,7 @@ static void cpu_lda_zpx_overflow(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0xb5, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x56};
     cpu.ram = mem;
-    cpu.x = 0xff;   // NOTE: wrap around from $0003 -> $0002
+    cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1100,7 +1100,7 @@ static void cpu_lda_indx_overflow(void *ctx)
     const uint8_t abs[] = {0xff, 0x80, 0x22};
     cpu.ram = mem;
     cpu.cart = abs;
-    cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
+    cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1183,7 +1183,7 @@ static void cpu_lda_indy_overflow(void *ctx)
     uint8_t mem[] = {0xb1, 0x2, 0xff, 0x80};
     cpu.ram = mem;
     cpu.cart = bigrom;
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1327,7 +1327,7 @@ static void cpu_lda_absx_overflow(void *ctx)
     uint8_t mem[] = {0xbd, 0xff, 0x80};
     cpu.ram = mem;
     cpu.cart = bigrom;
-    cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1410,7 +1410,7 @@ static void cpu_lda_absy_overflow(void *ctx)
     uint8_t mem[] = {0xb9, 0xff, 0x80};
     cpu.ram = mem;
     cpu.cart = bigrom;
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1445,7 +1445,7 @@ static void cpu_ram_mirroring(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0xad, 0x3, 0x8, 0x45}; // NOTE: $0803 -> $0003
+    uint8_t mem[] = {0xad, 0x3, 0x8, 0x45}; // $0803 -> $0003
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);

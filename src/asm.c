@@ -70,10 +70,10 @@ static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
         dis[--count] = '\0';
         break;
     case 2:
-        count = sprintf(dis + total, strtable[1], *(dispc + 1));
+        count = sprintf(dis + total, strtable[instlen - 1], *(dispc + 1));
         break;
     case 3:
-        count = sprintf(dis + total, strtable[2], batowr(dispc + 1));
+        count = sprintf(dis + total, strtable[instlen - 1], batowr(dispc + 1));
         break;
     default:
         return ASM_INV_ADDRMD;
@@ -95,6 +95,17 @@ const char *dis_errstr(int error)
     default:
         return "UNKNOWN ERR";
     }
+}
+
+uint16_t dis_instaddr(const struct console_state *snapshot)
+{
+    assert(snapshot != NULL);
+
+    const struct decoded dec = Decode[snapshot->cpu.opcode];
+    const int len = InstLens[dec.mode],
+              cycle_offset = 1 + snapshot->cpu.exec_cycle,
+              pc_offset = cycle_offset < len ? cycle_offset : len;
+    return snapshot->cpu.program_counter - pc_offset;
 }
 
 int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
@@ -134,13 +145,13 @@ int dis_datapath(const struct console_state *snapshot,
     assert(snapshot != NULL);
     assert(dis != NULL);
 
-    if (snapshot->cpu.currinst > CpuCartMaxAddr) return ASM_EOF;
+    const uint16_t instaddr = dis_instaddr(snapshot);
+    if (instaddr < CpuCartMinAddr) return ASM_EOF;
 
-    const uint16_t rom_idx = snapshot->cpu.currinst & CpuCartAddrMask;
-    const uint8_t opcode = snapshot->rom[rom_idx];
-    const struct decoded dec = Decode[opcode];
+    const struct decoded dec = Decode[snapshot->cpu.opcode];
     const int instlen = InstLens[dec.mode];
-    if (snapshot->cpu.currinst + instlen > CpuCartMaxAddr) return ASM_EOF;
+    // NOTE: detect pc overflow
+    if ((uint16_t)(instaddr + instlen) < CpuCartMinAddr) return ASM_EOF;
 
     int count;
     unsigned int total;
@@ -148,13 +159,13 @@ int dis_datapath(const struct console_state *snapshot,
     if (count < 0) return ASM_FMT_FAIL;
 
     // NOTE: stop updating datapath instruction display after all decoding
-    // cycles have run; (2 for 1,2-byte instructions,
-    // 3 for 3-byte instructions).
-    const int max_displayidx = 1 + (instlen / 3),
-              displayidx = snapshot->cpu.exec_cycle < max_displayidx
+    // cycles have run.
+    const int max_offset = 1 + (instlen / 3),
+              displayidx = snapshot->cpu.exec_cycle < max_offset
                            ? snapshot->cpu.exec_cycle
-                           : max_displayidx;
+                           : max_offset;
     const char *const displaystr = StringTables[dec.mode][displayidx];
+    const uint16_t rom_idx = instaddr & CpuCartAddrMask;
     switch (displayidx) {
     case 0:
         count = sprintf(dis + total, "%s", displaystr);

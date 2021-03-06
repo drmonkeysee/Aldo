@@ -14,8 +14,7 @@
 #include <assert.h>
 #include <stddef.h>
 
-static const int MaxCycleCount = 7,
-                 PreFetch = -1;     // Sentinel value for cycle count
+static const int PreFetch = -1;     // Sentinel value for cycle count
                                     // denoting an imminent opcode fetch.
 
 static void read(struct mos6502 *self)
@@ -742,11 +741,6 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.yindex = self->y;
 
     snapshot->cpu.addressbus = self->addrbus;
-    // TODO: fix this so currinst is not based on taking snapshot on sync cycle
-    // calculate based off opcode, pc, and instruction length
-    if (self->signal.sync) {
-        snapshot->cpu.currinst = self->addrbus;
-    }
     snapshot->cpu.addra_latch = self->ada;
     snapshot->cpu.addrb_latch = self->adb;
     snapshot->cpu.addr_carry = self->adc;

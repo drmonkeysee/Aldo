@@ -20,4 +20,7 @@ extern const uint16_t
 // Interrupt Vectors
     NmiVector, ResetVector, IrqVector;
 
+// Instruction Characteristics
+extern const int MaxCycleCount;
+
 #endif

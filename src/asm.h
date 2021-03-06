@@ -32,6 +32,8 @@ enum {
 // **WARNING**: do not write through or free this pointer!
 const char *dis_errstr(int error);
 
+uint16_t dis_instaddr(const struct console_state *snapshot);
+
 // NOTE: when dis_ functions return 0 the input buffer is untouched
 int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE]);

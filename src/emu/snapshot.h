@@ -22,7 +22,7 @@ struct console_state {
     const uint8_t *ram, *rom;
     enum nexcmode mode;
     struct {
-        uint16_t addressbus, currinst, program_counter;
+        uint16_t addressbus, program_counter;
         uint8_t accumulator, addra_latch, addrb_latch, databus, exec_cycle,
                 opcode, stack_pointer, status, xindex, yindex;
         bool addr_carry, datafault;

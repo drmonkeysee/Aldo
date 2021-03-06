@@ -8,6 +8,7 @@
 #include "ciny.h"
 #include "emu/cpu.h"
 #include "emu/snapshot.h"
+#include "emu/traits.h"
 
 #include <stdint.h>
 
@@ -64,7 +65,7 @@ static int clock_cpu(struct mos6502 *cpu)
     do {
         cycles += cpu_cycle(cpu);
         // NOTE: catch instructions that run longer than possible
-        ct_asserttrue(cycles < 8);
+        ct_asserttrue(cycles <= MaxCycleCount);
     } while (!cpu->presync);
     return cycles;
 }

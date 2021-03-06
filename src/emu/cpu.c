@@ -77,6 +77,14 @@ static void load_register(struct mos6502 *self, uint8_t *r, uint8_t d)
     update_n(self, *r);
 }
 
+static bool addr_carry_delayed(const struct mos6502 *self, struct decoded dec)
+{
+    if ((dec.mode == AM_INDY && self->t == 4)
+        || ((dec.mode == AM_ABSX || dec.mode == AM_ABSY)
+            && self->t == 3)) return self->adc;
+    return false;
+}
+
 static void UNK_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
@@ -246,7 +254,7 @@ static void JSR_exec(struct mos6502 *self, struct decoded dec)
 
 static void LDA_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (dec.mode == AM_INDY && self->t == 4 && self->adc) return;
+    if (addr_carry_delayed(self, dec)) return;
     load_register(self, &self->a, self->databus);
     self->presync = true;
 }
@@ -443,6 +451,38 @@ static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
     }
 }
 
+static void absolute_indexed(struct mos6502 *self, struct decoded dec,
+                             uint8_t index)
+{
+    switch (self->t) {
+    case 1:
+        self->addrbus = self->pc++;
+        read(self);
+        self->ada = self->databus;
+        break;
+    case 2:
+        self->addrbus = self->pc++;
+        read(self);
+        self->ada += index;
+        self->adc = self->ada < index;
+        self->adb = self->databus;
+        break;
+    case 3:
+        self->addrbus = bytowr(self->ada, self->adb);
+        read(self);
+        dispatch_instruction(self, dec);
+        self->adb += self->adc;
+        break;
+    case 4:
+        self->addrbus = bytowr(self->ada, self->adb);
+        read(self);
+        dispatch_instruction(self, dec);
+        break;
+    default:
+        BAD_ADDR_SEQ;
+    }
+}
+
 static void IMP_sequence(struct mos6502 *self, struct decoded dec)
 {
     assert(self->t == 1);
@@ -585,12 +625,12 @@ static void ABS_sequence(struct mos6502 *self, struct decoded dec)
 
 static void ABSX_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    absolute_indexed(self, dec, self->x);
 }
 
 static void ABSY_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    absolute_indexed(self, dec, self->y);
 }
 
 static void PSH_sequence(struct mos6502 *self, struct decoded dec)

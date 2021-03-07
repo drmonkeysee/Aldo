@@ -93,7 +93,7 @@ int aldo_run(void)
     struct console_state snapshot;
     ui_init();
 
-    const uint8_t test_prg[] = {0xa0, 0xef, 0xb9, 0x16, 0x0, 0xad, 0x20, 0x2};
+    const uint8_t test_prg[] = {0xa0, 0xef, 0xad, 0x20, 0x2, 0x31, 0x16, 0x0};
     nes *console = nes_new();
     nes_powerup(console, sizeof test_prg, test_prg);
     // Initialize snapshot from console

@@ -46,35 +46,35 @@ const struct decoded Decode[] = {
     UNK,    // 1E - ASL abs,X
     UNK,    // 1F - Unofficial
     UNK,    // 20 - JSR
-    UNK,    // 21 - AND (zp,X)
+    {IN_AND, AM_INDX},    // 21 - AND (zp,X)
     UNK,    // 22 - Unofficial
     UNK,    // 23 - Unofficial
     UNK,    // 24 - BIT zp
-    UNK,    // 25 - AND zp
+    {IN_AND, AM_ZP},    // 25 - AND zp
     UNK,    // 26 - ROL zp
     UNK,    // 27 - Unofficial
     UNK,    // 28 - PLP
-    UNK,    // 29 - AND imm
+    {IN_AND, AM_IMM},    // 29 - AND imm
     UNK,    // 2A - ROL imp
     UNK,    // 2B - Unofficial
     UNK,    // 2C - BIT abs
-    UNK,    // 2D - AND abs
+    {IN_AND, AM_ABS},    // 2D - AND abs
     UNK,    // 2E - ROL abs
     UNK,    // 2F - Unofficial
     UNK,    // 30 - BMI
-    UNK,    // 31 - AND (zp),Y
+    {IN_AND, AM_INDY},    // 31 - AND (zp),Y
     UNK,    // 32 - Unofficial
     UNK,    // 33 - Unofficial
     UNK,    // 34 - Unofficial
-    UNK,    // 35 - AND zp,X
+    {IN_AND, AM_ZPX},    // 35 - AND zp,X
     UNK,    // 36 - ROL zp,X
     UNK,    // 37 - Unofficial
     {IN_SEC, AM_IMP},    // 38 - SEC
-    UNK,    // 39 - AND abs,Y
+    {IN_AND, AM_ABSY},    // 39 - AND abs,Y
     UNK,    // 3A - Unofficial
     UNK,    // 3B - Unofficial
     UNK,    // 3C - Unofficial
-    UNK,    // 3D - AND abs,X
+    {IN_AND, AM_ABSX},    // 3D - AND abs,X
     UNK,    // 3E - ROL abs,X
     UNK,    // 3F - Unofficial
     UNK,    // 40 - RTI

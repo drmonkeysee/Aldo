@@ -842,6 +842,60 @@ static void cpu_tya_to_negative(void *ctx)
 // Immediate Instructions
 //
 
+static void cpu_and_imm(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x29, 0xfc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xf8u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_and_imm_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x29, 0x0};
+    cpu.a = 0xaa;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_and_imm_ones(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x29, 0xff};
+    cpu.a = 0x45;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void cpu_lda_imm(void *ctx)
 {
     struct mos6502 cpu;
@@ -999,6 +1053,60 @@ static void cpu_ldy_imm_negative(void *ctx)
 // Zero-Page Instructions
 //
 
+static void cpu_and_zp(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x25, 0x4, 0xff, 0xff, 0xfc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xf8u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_and_zp_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x25, 0x4, 0xff, 0xff, 0x0};
+    cpu.a = 0xaa;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_and_zp_ones(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x25, 0x4, 0xff, 0xff, 0xff};
+    cpu.a = 0x45;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void cpu_lda_zp(void *ctx)
 {
     struct mos6502 cpu;
@@ -1155,6 +1263,82 @@ static void cpu_ldy_zp_negative(void *ctx)
 //
 // Zero-Page,X Instructions
 //
+
+static void cpu_and_zpx(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x35, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xf8u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_and_zpx_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x35, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0};
+    cpu.a = 0xaa;
+    cpu.ram = mem;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_and_zpx_ones(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x35, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    cpu.a = 0x45;
+    cpu.ram = mem;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_and_zpx_overflow(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x35, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0xfc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.x = 0xff;   // Wrap around from $0003 -> $0002
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x22u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
 
 static void cpu_lda_zpx(void *ctx)
 {
@@ -1380,6 +1564,90 @@ static void cpu_ldx_zpy_overflow(void *ctx)
 // (Indirect,X) Instructions
 //
 
+static void cpu_and_indx(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x21, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xfc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xf8u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_and_indx_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x21, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0x0};
+    cpu.a = 0xaa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_and_indx_ones(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x21, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff};
+    cpu.a = 0x45;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_and_indx_overflow(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x21, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0x80, 0xfc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 0xff;   // Wrap around from $0002 -> $0001
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xf8u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
 static void cpu_lda_indx(void *ctx)
 {
     struct mos6502 cpu;
@@ -1464,6 +1732,89 @@ static void cpu_lda_indx_overflow(void *ctx)
 // (Indirect),Y Instructions
 //
 
+static void cpu_and_indy(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x31, 0x2, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xf8u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_and_indy_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x31, 0x2, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x0};
+    cpu.a = 0xaa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_and_indy_ones(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x31, 0x2, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xff};
+    cpu.a = 0x45;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_and_indy_overflow(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x31, 0x2, 0xff, 0x80};
+    cpu.a = 0xea;
+    cpu.ram = mem;
+    cpu.cart = bigrom;
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xa2u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
 static void cpu_lda_indy(void *ctx)
 {
     struct mos6502 cpu;
@@ -1546,6 +1897,66 @@ static void cpu_lda_indy_overflow(void *ctx)
 //
 // Absolute Instructions
 //
+
+static void cpu_and_abs(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x2d, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xfc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xf8u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_and_abs_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x2d, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0x0};
+    cpu.a = 0xaa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_and_abs_ones(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x2d,  0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff};
+    cpu.a = 0x45;
+    cpu.ram = mem;
+    cpu.cart = abs;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
 
 static void cpu_lda_abs(void *ctx)
 {
@@ -1722,6 +2133,89 @@ static void cpu_ldy_abs_negative(void *ctx)
 // Absolute,X Instructions
 //
 
+static void cpu_and_absx(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x3d, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xf8u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_and_absx_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x3d, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x0};
+    cpu.a = 0xaa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_and_absx_ones(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x3d, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xff};
+    cpu.a = 0x45;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_and_absx_overflow(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x3d, 0xff, 0x80};
+    cpu.a = 0xea;
+    cpu.ram = mem;
+    cpu.cart = bigrom;
+    cpu.x = 3;  // Cross boundary from $80FF -> $8102
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xa2u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
 static void cpu_lda_absx(void *ctx)
 {
     struct mos6502 cpu;
@@ -1883,6 +2377,89 @@ static void cpu_ldy_absx_overflow(void *ctx)
 //
 // Absolute,Y Instructions
 //
+
+static void cpu_and_absy(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x39, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xf8u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_and_absy_zero(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x39, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x0};
+    cpu.a = 0xaa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_and_absy_ones(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x39, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xff};
+    cpu.a = 0x45;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_and_absy_overflow(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x39, 0xff, 0x80};
+    cpu.a = 0xea;
+    cpu.ram = mem;
+    cpu.cart = bigrom;
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xa2u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
 
 static void cpu_lda_absy(void *ctx)
 {
@@ -2126,6 +2703,9 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_tya_to_zero),
         ct_maketest(cpu_tya_to_negative),
 
+        ct_maketest(cpu_and_imm),
+        ct_maketest(cpu_and_imm_zero),
+        ct_maketest(cpu_and_imm_ones),
         ct_maketest(cpu_lda_imm),
         ct_maketest(cpu_lda_imm_zero),
         ct_maketest(cpu_lda_imm_negative),
@@ -2136,6 +2716,9 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_ldy_imm_zero),
         ct_maketest(cpu_ldy_imm_negative),
 
+        ct_maketest(cpu_and_zp),
+        ct_maketest(cpu_and_zp_zero),
+        ct_maketest(cpu_and_zp_ones),
         ct_maketest(cpu_lda_zp),
         ct_maketest(cpu_lda_zp_zero),
         ct_maketest(cpu_lda_zp_negative),
@@ -2146,6 +2729,10 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_ldy_zp_zero),
         ct_maketest(cpu_ldy_zp_negative),
 
+        ct_maketest(cpu_and_zpx),
+        ct_maketest(cpu_and_zpx_zero),
+        ct_maketest(cpu_and_zpx_ones),
+        ct_maketest(cpu_and_zpx_overflow),
         ct_maketest(cpu_lda_zpx),
         ct_maketest(cpu_lda_zpx_zero),
         ct_maketest(cpu_lda_zpx_negative),
@@ -2160,16 +2747,27 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_ldx_zpy_negative),
         ct_maketest(cpu_ldx_zpy_overflow),
 
+        ct_maketest(cpu_and_indx),
+        ct_maketest(cpu_and_indx_zero),
+        ct_maketest(cpu_and_indx_ones),
+        ct_maketest(cpu_and_indx_overflow),
         ct_maketest(cpu_lda_indx),
         ct_maketest(cpu_lda_indx_zero),
         ct_maketest(cpu_lda_indx_negative),
         ct_maketest(cpu_lda_indx_overflow),
 
+        ct_maketest(cpu_and_indy),
+        ct_maketest(cpu_and_indy_zero),
+        ct_maketest(cpu_and_indy_ones),
+        ct_maketest(cpu_and_indy_overflow),
         ct_maketest(cpu_lda_indy),
         ct_maketest(cpu_lda_indy_zero),
         ct_maketest(cpu_lda_indy_negative),
         ct_maketest(cpu_lda_indy_overflow),
 
+        ct_maketest(cpu_and_abs),
+        ct_maketest(cpu_and_abs_zero),
+        ct_maketest(cpu_and_abs_ones),
         ct_maketest(cpu_lda_abs),
         ct_maketest(cpu_lda_abs_zero),
         ct_maketest(cpu_lda_abs_negative),
@@ -2180,6 +2778,10 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_ldy_abs_zero),
         ct_maketest(cpu_ldy_abs_negative),
 
+        ct_maketest(cpu_and_absx),
+        ct_maketest(cpu_and_absx_zero),
+        ct_maketest(cpu_and_absx_ones),
+        ct_maketest(cpu_and_absx_overflow),
         ct_maketest(cpu_lda_absx),
         ct_maketest(cpu_lda_absx_zero),
         ct_maketest(cpu_lda_absx_negative),
@@ -2189,6 +2791,10 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_ldy_absx_negative),
         ct_maketest(cpu_ldy_absx_overflow),
 
+        ct_maketest(cpu_and_absy),
+        ct_maketest(cpu_and_absy_zero),
+        ct_maketest(cpu_and_absy_ones),
+        ct_maketest(cpu_and_absy_overflow),
         ct_maketest(cpu_lda_absy),
         ct_maketest(cpu_lda_absy_zero),
         ct_maketest(cpu_lda_absy_negative),

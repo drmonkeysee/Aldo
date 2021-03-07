@@ -98,7 +98,9 @@ static void ADC_exec(struct mos6502 *self, struct decoded dec)
 
 static void AND_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    if (addr_carry_delayed(self, dec)) return;
+    load_register(self, &self->a, self->a & self->databus);
+    self->presync = true;
 }
 
 static void ASL_exec(struct mos6502 *self, struct decoded dec)

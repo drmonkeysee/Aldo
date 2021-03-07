@@ -846,8 +846,8 @@ static void cpu_and_imm(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x29, 0xfc};
-    cpu.a = 0xfa;
+    uint8_t mem[] = {0x29, 0xc};
+    cpu.a = 0xa;
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
@@ -855,9 +855,9 @@ static void cpu_and_imm(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0xf8u, cpu.a);
+    ct_assertequal(0x8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_and_imm_zero(void *ctx)
@@ -878,12 +878,12 @@ static void cpu_and_imm_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_imm_ones(void *ctx)
+static void cpu_and_imm_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x29, 0xff};
-    cpu.a = 0x45;
+    uint8_t mem[] = {0x29, 0xfc};
+    cpu.a = 0xfa;
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
@@ -891,9 +891,9 @@ static void cpu_and_imm_ones(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x45u, cpu.a);
+    ct_assertequal(0xf8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_eor_imm(void *ctx)
@@ -918,26 +918,8 @@ static void cpu_eor_imm_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x49, 0x0};
+    uint8_t mem[] = {0x49, 0xaa};
     cpu.a = 0xaa;
-    cpu.ram = mem;
-
-    const int cycles = clock_cpu(&cpu);
-
-    ct_assertequal(2, cycles);
-    ct_assertequal(2u, cpu.pc);
-
-    ct_assertequal(0xaau, cpu.a);
-    ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
-}
-
-static void cpu_eor_imm_ones(void *ctx)
-{
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x49, 0xff};
-    cpu.a = 0xff;
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
@@ -948,6 +930,24 @@ static void cpu_eor_imm_ones(void *ctx)
     ct_assertequal(0x0u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_eor_imm_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x49, 0xc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xf6u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_lda_imm(void *ctx)
@@ -1139,7 +1139,7 @@ static void cpu_ora_imm_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_imm_ones(void *ctx)
+static void cpu_ora_imm_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1165,8 +1165,8 @@ static void cpu_and_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x25, 0x4, 0xff, 0xff, 0xfc};
-    cpu.a = 0xfa;
+    uint8_t mem[] = {0x25, 0x4, 0xff, 0xff, 0xc};
+    cpu.a = 0xa;
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
@@ -1174,9 +1174,9 @@ static void cpu_and_zp(void *ctx)
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0xf8u, cpu.a);
+    ct_assertequal(0x8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_and_zp_zero(void *ctx)
@@ -1197,12 +1197,12 @@ static void cpu_and_zp_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_zp_ones(void *ctx)
+static void cpu_and_zp_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x25, 0x4, 0xff, 0xff, 0xff};
-    cpu.a = 0x45;
+    uint8_t mem[] = {0x25, 0x4, 0xff, 0xff, 0xfc};
+    cpu.a = 0xfa;
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
@@ -1210,9 +1210,9 @@ static void cpu_and_zp_ones(void *ctx)
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x45u, cpu.a);
+    ct_assertequal(0xf8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_eor_zp(void *ctx)
@@ -1237,26 +1237,8 @@ static void cpu_eor_zp_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x45, 0x4, 0xff, 0xff, 0x0};
+    uint8_t mem[] = {0x45, 0x4, 0xff, 0xff, 0xaa};
     cpu.a = 0xaa;
-    cpu.ram = mem;
-
-    const int cycles = clock_cpu(&cpu);
-
-    ct_assertequal(3, cycles);
-    ct_assertequal(2u, cpu.pc);
-
-    ct_assertequal(0xaau, cpu.a);
-    ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
-}
-
-static void cpu_eor_zp_ones(void *ctx)
-{
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x45, 0x4, 0xff, 0xff, 0xff};
-    cpu.a = 0xff;
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
@@ -1267,6 +1249,24 @@ static void cpu_eor_zp_ones(void *ctx)
     ct_assertequal(0x0u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_eor_zp_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x45, 0x4, 0xff, 0xff, 0xc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xf6u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_lda_zp(void *ctx)
@@ -1458,7 +1458,7 @@ static void cpu_ora_zp_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_zp_ones(void *ctx)
+static void cpu_ora_zp_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1484,8 +1484,8 @@ static void cpu_and_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x35, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfc};
-    cpu.a = 0xfa;
+    uint8_t mem[] = {0x35, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc};
+    cpu.a = 0xa;
     cpu.ram = mem;
     cpu.x = 4;
 
@@ -1494,9 +1494,9 @@ static void cpu_and_zpx(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0xf8u, cpu.a);
+    ct_assertequal(0x8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_and_zpx_zero(void *ctx)
@@ -1518,12 +1518,12 @@ static void cpu_and_zpx_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_zpx_ones(void *ctx)
+static void cpu_and_zpx_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x35, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-    cpu.a = 0x45;
+    uint8_t mem[] = {0x35, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfc};
+    cpu.a = 0xfa;
     cpu.ram = mem;
     cpu.x = 4;
 
@@ -1532,9 +1532,9 @@ static void cpu_and_zpx_ones(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x45u, cpu.a);
+    ct_assertequal(0xf8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_and_zpx_overflow(void *ctx)
@@ -1579,27 +1579,8 @@ static void cpu_eor_zpx_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x55, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0};
+    uint8_t mem[] = {0x55, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xaa};
     cpu.a = 0xaa;
-    cpu.ram = mem;
-    cpu.x = 4;
-
-    const int cycles = clock_cpu(&cpu);
-
-    ct_assertequal(4, cycles);
-    ct_assertequal(2u, cpu.pc);
-
-    ct_assertequal(0xaau, cpu.a);
-    ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
-}
-
-static void cpu_eor_zpx_ones(void *ctx)
-{
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x55, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-    cpu.a = 0xff;
     cpu.ram = mem;
     cpu.x = 4;
 
@@ -1611,6 +1592,25 @@ static void cpu_eor_zpx_ones(void *ctx)
     ct_assertequal(0x0u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_eor_zpx_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x55, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xf6u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_eor_zpx_overflow(void *ctx)
@@ -1814,7 +1814,7 @@ static void cpu_ora_zpx_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_zpx_ones(void *ctx)
+static void cpu_ora_zpx_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1937,8 +1937,8 @@ static void cpu_and_indx(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x21, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xfc};
-    cpu.a = 0xfa;
+    const uint8_t abs[] = {0xff, 0xc};
+    cpu.a = 0xa;
     cpu.ram = mem;
     cpu.cart = abs;
     cpu.x = 4;
@@ -1948,9 +1948,9 @@ static void cpu_and_indx(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0xf8u, cpu.a);
+    ct_assertequal(0x8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_and_indx_zero(void *ctx)
@@ -1974,13 +1974,13 @@ static void cpu_and_indx_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_indx_ones(void *ctx)
+static void cpu_and_indx_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x21, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff};
-    cpu.a = 0x45;
+    const uint8_t abs[] = {0xff, 0xfc};
+    cpu.a = 0xfa;
     cpu.ram = mem;
     cpu.cart = abs;
     cpu.x = 4;
@@ -1990,9 +1990,9 @@ static void cpu_and_indx_ones(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x45u, cpu.a);
+    ct_assertequal(0xf8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_and_indx_overflow(void *ctx)
@@ -2000,7 +2000,7 @@ static void cpu_and_indx_overflow(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x21, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x80, 0xfc};
+    const uint8_t abs[] = {0xff, 0x80, 0x22};
     cpu.a = 0xfa;
     cpu.ram = mem;
     cpu.cart = abs;
@@ -2011,9 +2011,9 @@ static void cpu_and_indx_overflow(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0xf8u, cpu.a);
+    ct_assertequal(0x22u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_eor_indx(void *ctx)
@@ -2042,29 +2042,8 @@ static void cpu_eor_indx_zero(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x41, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x0};
+    const uint8_t abs[] = {0xff, 0xaa};
     cpu.a = 0xaa;
-    cpu.ram = mem;
-    cpu.cart = abs;
-    cpu.x = 4;
-
-    const int cycles = clock_cpu(&cpu);
-
-    ct_assertequal(6, cycles);
-    ct_assertequal(2u, cpu.pc);
-
-    ct_assertequal(0xaau, cpu.a);
-    ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
-}
-
-static void cpu_eor_indx_ones(void *ctx)
-{
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x41, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff};
-    cpu.a = 0xff;
     cpu.ram = mem;
     cpu.cart = abs;
     cpu.x = 4;
@@ -2077,6 +2056,27 @@ static void cpu_eor_indx_ones(void *ctx)
     ct_assertequal(0x0u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_eor_indx_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x41, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xf6u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_eor_indx_overflow(void *ctx)
@@ -2222,7 +2222,7 @@ static void cpu_ora_indx_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_indx_ones(void *ctx)
+static void cpu_ora_indx_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -2273,8 +2273,8 @@ static void cpu_and_indy(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x31, 0x2, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
-    cpu.a = 0xfa;
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    cpu.a = 0xa;
     cpu.ram = mem;
     cpu.cart = abs;
     cpu.y = 3;
@@ -2284,9 +2284,9 @@ static void cpu_and_indy(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0xf8u, cpu.a);
+    ct_assertequal(0x8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_and_indy_zero(void *ctx)
@@ -2310,13 +2310,13 @@ static void cpu_and_indy_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_indy_ones(void *ctx)
+static void cpu_and_indy_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x31, 0x2, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xff};
-    cpu.a = 0x45;
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
+    cpu.a = 0xfa;
     cpu.ram = mem;
     cpu.cart = abs;
     cpu.y = 3;
@@ -2326,9 +2326,9 @@ static void cpu_and_indy_ones(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x45u, cpu.a);
+    ct_assertequal(0xf8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_and_indy_overflow(void *ctx)
@@ -2377,29 +2377,8 @@ static void cpu_eor_indy_zero(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x51, 0x2, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x0};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xaa};
     cpu.a = 0xaa;
-    cpu.ram = mem;
-    cpu.cart = abs;
-    cpu.y = 3;
-
-    const int cycles = clock_cpu(&cpu);
-
-    ct_assertequal(5, cycles);
-    ct_assertequal(2u, cpu.pc);
-
-    ct_assertequal(0xaau, cpu.a);
-    ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
-}
-
-static void cpu_eor_indy_ones(void *ctx)
-{
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x51, 0x2, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xff};
-    cpu.a = 0xff;
     cpu.ram = mem;
     cpu.cart = abs;
     cpu.y = 3;
@@ -2412,6 +2391,27 @@ static void cpu_eor_indy_ones(void *ctx)
     ct_assertequal(0x0u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_eor_indy_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x51, 0x2, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xf6u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_eor_indy_overflow(void *ctx)
@@ -2555,7 +2555,7 @@ static void cpu_ora_indy_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_indy_ones(void *ctx)
+static void cpu_ora_indy_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -2605,8 +2605,8 @@ static void cpu_and_abs(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x2d, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xfc};
-    cpu.a = 0xfa;
+    const uint8_t abs[] = {0xff, 0xc};
+    cpu.a = 0xa;
     cpu.ram = mem;
     cpu.cart = abs;
 
@@ -2615,9 +2615,9 @@ static void cpu_and_abs(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0xf8u, cpu.a);
+    ct_assertequal(0x8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_and_abs_zero(void *ctx)
@@ -2640,13 +2640,13 @@ static void cpu_and_abs_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_abs_ones(void *ctx)
+static void cpu_and_abs_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x2d,  0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff};
-    cpu.a = 0x45;
+    const uint8_t abs[] = {0xff, 0xfc};
+    cpu.a = 0xfa;
     cpu.ram = mem;
     cpu.cart = abs;
 
@@ -2655,9 +2655,9 @@ static void cpu_and_abs_ones(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x45u, cpu.a);
+    ct_assertequal(0xf8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_eor_abs(void *ctx)
@@ -2685,28 +2685,8 @@ static void cpu_eor_abs_zero(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x4d, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x0};
+    const uint8_t abs[] = {0xff, 0xaa};
     cpu.a = 0xaa;
-    cpu.ram = mem;
-    cpu.cart = abs;
-
-    const int cycles = clock_cpu(&cpu);
-
-    ct_assertequal(4, cycles);
-    ct_assertequal(3u, cpu.pc);
-
-    ct_assertequal(0xaau, cpu.a);
-    ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
-}
-
-static void cpu_eor_abs_ones(void *ctx)
-{
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x4d,  0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff};
-    cpu.a = 0xff;
     cpu.ram = mem;
     cpu.cart = abs;
 
@@ -2718,6 +2698,26 @@ static void cpu_eor_abs_ones(void *ctx)
     ct_assertequal(0x0u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_eor_abs_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x4d,  0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xf6u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_lda_abs(void *ctx)
@@ -2931,7 +2931,7 @@ static void cpu_ora_abs_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_abs_ones(void *ctx)
+static void cpu_ora_abs_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -2960,8 +2960,8 @@ static void cpu_and_absx(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x3d, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
-    cpu.a = 0xfa;
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    cpu.a = 0xa;
     cpu.ram = mem;
     cpu.cart = abs;
     cpu.x = 3;
@@ -2971,9 +2971,9 @@ static void cpu_and_absx(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0xf8u, cpu.a);
+    ct_assertequal(0x8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_and_absx_zero(void *ctx)
@@ -2997,13 +2997,13 @@ static void cpu_and_absx_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_absx_ones(void *ctx)
+static void cpu_and_absx_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x3d, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xff};
-    cpu.a = 0x45;
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
+    cpu.a = 0xfa;
     cpu.ram = mem;
     cpu.cart = abs;
     cpu.x = 3;
@@ -3013,9 +3013,9 @@ static void cpu_and_absx_ones(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x45u, cpu.a);
+    ct_assertequal(0xf8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_and_absx_overflow(void *ctx)
@@ -3064,29 +3064,8 @@ static void cpu_eor_absx_zero(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x5d, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x0};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xaa};
     cpu.a = 0xaa;
-    cpu.ram = mem;
-    cpu.cart = abs;
-    cpu.x = 3;
-
-    const int cycles = clock_cpu(&cpu);
-
-    ct_assertequal(4, cycles);
-    ct_assertequal(3u, cpu.pc);
-
-    ct_assertequal(0xaau, cpu.a);
-    ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
-}
-
-static void cpu_eor_absx_ones(void *ctx)
-{
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x5d, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xff};
-    cpu.a = 0xff;
     cpu.ram = mem;
     cpu.cart = abs;
     cpu.x = 3;
@@ -3099,6 +3078,27 @@ static void cpu_eor_absx_ones(void *ctx)
     ct_assertequal(0x0u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_eor_absx_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x5d, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xf6u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_eor_absx_overflow(void *ctx)
@@ -3321,7 +3321,7 @@ static void cpu_ora_absx_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_absx_ones(void *ctx)
+static void cpu_ora_absx_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -3371,8 +3371,8 @@ static void cpu_and_absy(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x39, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
-    cpu.a = 0xfa;
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    cpu.a = 0xa;
     cpu.ram = mem;
     cpu.cart = abs;
     cpu.y = 3;
@@ -3382,9 +3382,9 @@ static void cpu_and_absy(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0xf8u, cpu.a);
+    ct_assertequal(0x8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_and_absy_zero(void *ctx)
@@ -3408,13 +3408,13 @@ static void cpu_and_absy_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_absy_ones(void *ctx)
+static void cpu_and_absy_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x39, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xff};
-    cpu.a = 0x45;
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
+    cpu.a = 0xfa;
     cpu.ram = mem;
     cpu.cart = abs;
     cpu.y = 3;
@@ -3424,9 +3424,9 @@ static void cpu_and_absy_ones(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x45u, cpu.a);
+    ct_assertequal(0xf8u, cpu.a);
     ct_assertfalse(cpu.p.z);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_and_absy_overflow(void *ctx)
@@ -3475,29 +3475,8 @@ static void cpu_eor_absy_zero(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x59, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x0};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xaa};
     cpu.a = 0xaa;
-    cpu.ram = mem;
-    cpu.cart = abs;
-    cpu.y = 3;
-
-    const int cycles = clock_cpu(&cpu);
-
-    ct_assertequal(4, cycles);
-    ct_assertequal(3u, cpu.pc);
-
-    ct_assertequal(0xaau, cpu.a);
-    ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.n);
-}
-
-static void cpu_eor_absy_ones(void *ctx)
-{
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x59, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xff};
-    cpu.a = 0xff;
     cpu.ram = mem;
     cpu.cart = abs;
     cpu.y = 3;
@@ -3510,6 +3489,27 @@ static void cpu_eor_absy_ones(void *ctx)
     ct_assertequal(0x0u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_eor_absy_negative(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x59, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    cpu.a = 0xfa;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xf6u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_eor_absy_overflow(void *ctx)
@@ -3732,7 +3732,7 @@ static void cpu_ora_absy_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_absy_ones(void *ctx)
+static void cpu_ora_absy_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -3859,10 +3859,10 @@ struct ct_testsuite cpu_tests(void)
 
         ct_maketest(cpu_and_imm),
         ct_maketest(cpu_and_imm_zero),
-        ct_maketest(cpu_and_imm_ones),
+        ct_maketest(cpu_and_imm_negative),
         ct_maketest(cpu_eor_imm),
         ct_maketest(cpu_eor_imm_zero),
-        ct_maketest(cpu_eor_imm_ones),
+        ct_maketest(cpu_eor_imm_negative),
         ct_maketest(cpu_lda_imm),
         ct_maketest(cpu_lda_imm_zero),
         ct_maketest(cpu_lda_imm_negative),
@@ -3874,14 +3874,14 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_ldy_imm_negative),
         ct_maketest(cpu_ora_imm),
         ct_maketest(cpu_ora_imm_zero),
-        ct_maketest(cpu_ora_imm_ones),
+        ct_maketest(cpu_ora_imm_negative),
 
         ct_maketest(cpu_and_zp),
         ct_maketest(cpu_and_zp_zero),
-        ct_maketest(cpu_and_zp_ones),
+        ct_maketest(cpu_and_zp_negative),
         ct_maketest(cpu_eor_zp),
         ct_maketest(cpu_eor_zp_zero),
-        ct_maketest(cpu_eor_zp_ones),
+        ct_maketest(cpu_eor_zp_negative),
         ct_maketest(cpu_lda_zp),
         ct_maketest(cpu_lda_zp_zero),
         ct_maketest(cpu_lda_zp_negative),
@@ -3893,15 +3893,15 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_ldy_zp_negative),
         ct_maketest(cpu_ora_zp),
         ct_maketest(cpu_ora_zp_zero),
-        ct_maketest(cpu_ora_zp_ones),
+        ct_maketest(cpu_ora_zp_negative),
 
         ct_maketest(cpu_and_zpx),
         ct_maketest(cpu_and_zpx_zero),
-        ct_maketest(cpu_and_zpx_ones),
+        ct_maketest(cpu_and_zpx_negative),
         ct_maketest(cpu_and_zpx_overflow),
         ct_maketest(cpu_eor_zpx),
         ct_maketest(cpu_eor_zpx_zero),
-        ct_maketest(cpu_eor_zpx_ones),
+        ct_maketest(cpu_eor_zpx_negative),
         ct_maketest(cpu_eor_zpx_overflow),
         ct_maketest(cpu_lda_zpx),
         ct_maketest(cpu_lda_zpx_zero),
@@ -3913,7 +3913,7 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_ldy_zpx_overflow),
         ct_maketest(cpu_ora_zpx),
         ct_maketest(cpu_ora_zpx_zero),
-        ct_maketest(cpu_ora_zpx_ones),
+        ct_maketest(cpu_ora_zpx_negative),
         ct_maketest(cpu_ora_zpx_overflow),
 
         ct_maketest(cpu_ldx_zpy),
@@ -3923,11 +3923,11 @@ struct ct_testsuite cpu_tests(void)
 
         ct_maketest(cpu_and_indx),
         ct_maketest(cpu_and_indx_zero),
-        ct_maketest(cpu_and_indx_ones),
+        ct_maketest(cpu_and_indx_negative),
         ct_maketest(cpu_and_indx_overflow),
         ct_maketest(cpu_eor_indx),
         ct_maketest(cpu_eor_indx_zero),
-        ct_maketest(cpu_eor_indx_ones),
+        ct_maketest(cpu_eor_indx_negative),
         ct_maketest(cpu_eor_indx_overflow),
         ct_maketest(cpu_lda_indx),
         ct_maketest(cpu_lda_indx_zero),
@@ -3935,16 +3935,16 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_lda_indx_overflow),
         ct_maketest(cpu_ora_indx),
         ct_maketest(cpu_ora_indx_zero),
-        ct_maketest(cpu_ora_indx_ones),
+        ct_maketest(cpu_ora_indx_negative),
         ct_maketest(cpu_ora_indx_overflow),
 
         ct_maketest(cpu_and_indy),
         ct_maketest(cpu_and_indy_zero),
-        ct_maketest(cpu_and_indy_ones),
+        ct_maketest(cpu_and_indy_negative),
         ct_maketest(cpu_and_indy_overflow),
         ct_maketest(cpu_eor_indy),
         ct_maketest(cpu_eor_indy_zero),
-        ct_maketest(cpu_eor_indy_ones),
+        ct_maketest(cpu_eor_indy_negative),
         ct_maketest(cpu_eor_indy_overflow),
         ct_maketest(cpu_lda_indy),
         ct_maketest(cpu_lda_indy_zero),
@@ -3952,15 +3952,15 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_lda_indy_overflow),
         ct_maketest(cpu_ora_indy),
         ct_maketest(cpu_ora_indy_zero),
-        ct_maketest(cpu_ora_indy_ones),
+        ct_maketest(cpu_ora_indy_negative),
         ct_maketest(cpu_ora_indy_overflow),
 
         ct_maketest(cpu_and_abs),
         ct_maketest(cpu_and_abs_zero),
-        ct_maketest(cpu_and_abs_ones),
+        ct_maketest(cpu_and_abs_negative),
         ct_maketest(cpu_eor_abs),
         ct_maketest(cpu_eor_abs_zero),
-        ct_maketest(cpu_eor_abs_ones),
+        ct_maketest(cpu_eor_abs_negative),
         ct_maketest(cpu_lda_abs),
         ct_maketest(cpu_lda_abs_zero),
         ct_maketest(cpu_lda_abs_negative),
@@ -3972,15 +3972,15 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_ldy_abs_negative),
         ct_maketest(cpu_ora_abs),
         ct_maketest(cpu_ora_abs_zero),
-        ct_maketest(cpu_ora_abs_ones),
+        ct_maketest(cpu_ora_abs_negative),
 
         ct_maketest(cpu_and_absx),
         ct_maketest(cpu_and_absx_zero),
-        ct_maketest(cpu_and_absx_ones),
+        ct_maketest(cpu_and_absx_negative),
         ct_maketest(cpu_and_absx_overflow),
         ct_maketest(cpu_eor_absx),
         ct_maketest(cpu_eor_absx_zero),
-        ct_maketest(cpu_eor_absx_ones),
+        ct_maketest(cpu_eor_absx_negative),
         ct_maketest(cpu_eor_absx_overflow),
         ct_maketest(cpu_lda_absx),
         ct_maketest(cpu_lda_absx_zero),
@@ -3992,16 +3992,16 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_ldy_absx_overflow),
         ct_maketest(cpu_ora_absx),
         ct_maketest(cpu_ora_absx_zero),
-        ct_maketest(cpu_ora_absx_ones),
+        ct_maketest(cpu_ora_absx_negative),
         ct_maketest(cpu_ora_absx_overflow),
 
         ct_maketest(cpu_and_absy),
         ct_maketest(cpu_and_absy_zero),
-        ct_maketest(cpu_and_absy_ones),
+        ct_maketest(cpu_and_absy_negative),
         ct_maketest(cpu_and_absy_overflow),
         ct_maketest(cpu_eor_absy),
         ct_maketest(cpu_eor_absy_zero),
-        ct_maketest(cpu_eor_absy_ones),
+        ct_maketest(cpu_eor_absy_negative),
         ct_maketest(cpu_eor_absy_overflow),
         ct_maketest(cpu_lda_absy),
         ct_maketest(cpu_lda_absy_zero),
@@ -4013,7 +4013,7 @@ struct ct_testsuite cpu_tests(void)
         ct_maketest(cpu_ldx_absy_overflow),
         ct_maketest(cpu_ora_absy),
         ct_maketest(cpu_ora_absy_zero),
-        ct_maketest(cpu_ora_absy_ones),
+        ct_maketest(cpu_ora_absy_negative),
         ct_maketest(cpu_ora_absy_overflow),
 
         ct_maketest(cpu_data_fault),

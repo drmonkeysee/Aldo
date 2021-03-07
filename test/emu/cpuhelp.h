@@ -8,9 +8,9 @@
 #ifndef AldoTests_emu_cpuhelp_h
 #define AldoTests_emu_cpuhelp_h
 
-#include <stdint.h>
-
 #include "emu/cpu.h"
+
+#include <stdint.h>
 
 extern const uint8_t bigrom[];
 

@@ -14,35 +14,35 @@
 // and unofficial Ricoh 2A03 opcodes.
 const struct decoded Decode[] = {
     UNK,    // 00 - BRK
-    UNK,    // 01 - ORA (zp,X)
+    {IN_ORA, AM_INDX},    // 01 - ORA (zp,X)
     UNK,    // 02 - Unofficial
     UNK,    // 03 - Unofficial
     UNK,    // 04 - Unofficial
-    UNK,    // 05 - ORA zp
+    {IN_ORA, AM_ZP},    // 05 - ORA zp
     UNK,    // 06 - ASL zp
     UNK,    // 07 - Unofficial
     UNK,    // 08 - PHP
-    UNK,    // 09 - ORA imm
+    {IN_ORA, AM_IMM},    // 09 - ORA imm
     UNK,    // 0A - ASL imp
     UNK,    // 0B - Unofficial
     UNK,    // 0C - Unofficial
-    UNK,    // 0D - ORA abs
+    {IN_ORA, AM_ABS},    // 0D - ORA abs
     UNK,    // 0E - ASL abs
     UNK,    // 0F - Unofficial
     UNK,    // 10 - BPL
-    UNK,    // 11 - ORA (zp),Y
+    {IN_ORA, AM_INDY},    // 11 - ORA (zp),Y
     UNK,    // 12 - Unofficial
     UNK,    // 13 - Unofficial
     UNK,    // 14 - Unofficial
-    UNK,    // 15 - ORA zp,X
+    {IN_ORA, AM_ZPX},    // 15 - ORA zp,X
     UNK,    // 16 - ASL zp,X
     UNK,    // 17 - Unofficial
     {IN_CLC, AM_IMP},    // 18 - CLC
-    UNK,    // 19 - ORA abs,Y
+    {IN_ORA, AM_ABSY},    // 19 - ORA abs,Y
     UNK,    // 1A - Unofficial
     UNK,    // 1B - Unofficial
     UNK,    // 1C - Unofficial
-    UNK,    // 1D - ORA abs,X
+    {IN_ORA, AM_ABSX},    // 1D - ORA abs,X
     UNK,    // 1E - ASL abs,X
     UNK,    // 1F - Unofficial
     UNK,    // 20 - JSR
@@ -78,35 +78,35 @@ const struct decoded Decode[] = {
     UNK,    // 3E - ROL abs,X
     UNK,    // 3F - Unofficial
     UNK,    // 40 - RTI
-    UNK,    // 41 - EOR (zp,X)
+    {IN_EOR, AM_INDX},    // 41 - EOR (zp,X)
     UNK,    // 42 - Unofficial
     UNK,    // 43 - Unofficial
     UNK,    // 44 - Unofficial
-    UNK,    // 45 - EOR zp
+    {IN_EOR, AM_ZP},    // 45 - EOR zp
     UNK,    // 46 - LSR zp
     UNK,    // 47 - Unofficial
     UNK,    // 48 - PHA
-    UNK,    // 49 - EOR imm
+    {IN_EOR, AM_IMM},    // 49 - EOR imm
     UNK,    // 4A - LSR imp
     UNK,    // 4B - Unofficial
     UNK,    // 4C - JMP abs
-    UNK,    // 4D - EOR abs
+    {IN_EOR, AM_ABS},    // 4D - EOR abs
     UNK,    // 4E - LSR abs
     UNK,    // 4F - Unofficial
     UNK,    // 50 - BVC
-    UNK,    // 51 - EOR (zp),Y
+    {IN_EOR, AM_INDY},    // 51 - EOR (zp),Y
     UNK,    // 52 - Unofficial
     UNK,    // 53 - Unofficial
     UNK,    // 54 - Unofficial
-    UNK,    // 55 - EOR zp,X
+    {IN_EOR, AM_ZPX},    // 55 - EOR zp,X
     UNK,    // 56 - LSR zp,X
     UNK,    // 57 - Unofficial
     {IN_CLI, AM_IMP},    // 58 - CLI
-    UNK,    // 59 - EOR abs,Y
+    {IN_EOR, AM_ABSY},    // 59 - EOR abs,Y
     UNK,    // 5A - Unofficial
     UNK,    // 5B - Unofficial
     UNK,    // 5C - Unofficial
-    UNK,    // 5D - EOR abs,X
+    {IN_EOR, AM_ABSX},    // 5D - EOR abs,X
     UNK,    // 5E - LSR abs,X
     UNK,    // 5F - Unofficial
     UNK,    // 60 - RTS

@@ -222,7 +222,9 @@ static void DEY_exec(struct mos6502 *self, struct decoded dec)
 
 static void EOR_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    if (addr_carry_delayed(self, dec)) return;
+    load_register(self, &self->a, self->a ^ self->databus);
+    self->presync = true;
 }
 
 static void INC_exec(struct mos6502 *self, struct decoded dec)
@@ -289,7 +291,9 @@ static void NOP_exec(struct mos6502 *self, struct decoded dec)
 
 static void ORA_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    if (addr_carry_delayed(self, dec)) return;
+    load_register(self, &self->a, self->a | self->databus);
+    self->presync = true;
 }
 
 static void PHA_exec(struct mos6502 *self, struct decoded dec)

@@ -261,12 +261,16 @@ static void LDA_exec(struct mos6502 *self, struct decoded dec)
 
 static void LDX_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    if (addr_carry_delayed(self, dec)) return;
+    load_register(self, &self->x, self->databus);
+    self->presync = true;
 }
 
 static void LDY_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    if (addr_carry_delayed(self, dec)) return;
+    load_register(self, &self->y, self->databus);
+    self->presync = true;
 }
 
 static void LSR_exec(struct mos6502 *self, struct decoded dec)

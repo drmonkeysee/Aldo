@@ -532,6 +532,66 @@ static void dis_datapath_zeropage_x_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
+static void dis_datapath_zeropage_y_cycle_zero(void *ctx)
+{
+    const uint8_t rom[] = {0xb6, 0x43};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 0,
+            .program_counter = 0x8001,
+            .opcode = 0xb6,
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDX zp,Y";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_zeropage_y_cycle_one(void *ctx)
+{
+    const uint8_t rom[] = {0xb6, 0x43};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 1,
+            .program_counter = 0x8002,
+            .opcode = 0xb6,
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDX $43,Y";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_zeropage_y_cycle_n(void *ctx)
+{
+    const uint8_t rom[] = {0xb6, 0x43};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 2,
+            .program_counter = 0x8002,
+            .opcode = 0xb6,
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDX $43,Y";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
 static void dis_datapath_indirect_x_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0xa1, 0x43};
@@ -778,9 +838,9 @@ struct ct_testsuite asm_tests(void)
         ct_maketest(dis_datapath_zeropage_x_cycle_one),
         ct_maketest(dis_datapath_zeropage_x_cycle_n),
 
-        /*ct_maketest(dis_datapath_zeropage_y_cycle_zero),
+        ct_maketest(dis_datapath_zeropage_y_cycle_zero),
         ct_maketest(dis_datapath_zeropage_y_cycle_one),
-        ct_maketest(dis_datapath_zeropage_y_cycle_n),*/
+        ct_maketest(dis_datapath_zeropage_y_cycle_n),
 
         ct_maketest(dis_datapath_indirect_x_cycle_zero),
         ct_maketest(dis_datapath_indirect_x_cycle_one),

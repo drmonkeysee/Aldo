@@ -173,37 +173,37 @@ const struct decoded Decode[] = {
     UNK,    // 9D - STA abs,X
     UNK,    // 9E - Unofficial
     UNK,    // 9F - Unofficial
-    UNK,    // A0 - LDY imm
+    {IN_LDY, AM_IMM},    // A0 - LDY imm
     {IN_LDA, AM_INDX},    // A1 - LDA (zp,X)
-    UNK,    // A2 - LDX imm
+    {IN_LDX, AM_IMM},    // A2 - LDX imm
     UNK,    // A3 - Unofficial
-    UNK,    // A4 - LDY zp
+    {IN_LDY, AM_ZP},    // A4 - LDY zp
     {IN_LDA, AM_ZP},    // A5 - LDA zp
-    UNK,    // A6 - LDX zp
+    {IN_LDX, AM_ZP},    // A6 - LDX zp
     UNK,    // A7 - Unofficial
     {IN_TAY, AM_IMP},    // A8 - TAY
     {IN_LDA, AM_IMM},    // A9 - LDA imm
     {IN_TAX, AM_IMP},    // AA - TAX
     UNK,    // AB - Unofficial
-    UNK,    // AC - LDY abs
+    {IN_LDY, AM_ABS},    // AC - LDY abs
     {IN_LDA, AM_ABS},    // AD - LDA abs
-    UNK,    // AE - LDX abs
+    {IN_LDX, AM_ABS},    // AE - LDX abs
     UNK,    // AF - Unofficial
     UNK,    // B0 - BCS
     {IN_LDA, AM_INDY},    // B1 - LDA (zp),Y
     UNK,    // B2 - Unofficial
     UNK,    // B3 - Unofficial
-    UNK,    // B4 - LDY zp,X
+    {IN_LDY, AM_ZPX},    // B4 - LDY zp,X
     {IN_LDA, AM_ZPX},    // B5 - LDA zp,X
-    UNK,    // B6 - LDX zp,Y
+    {IN_LDX, AM_ZPY},    // B6 - LDX zp,Y
     UNK,    // B7 - Unofficial
     {IN_CLV, AM_IMP},    // B8 - CLV
     {IN_LDA, AM_ABSY},    // B9 - LDA abs,Y
     {IN_TSX, AM_IMP},    // BA - TSX
     UNK,    // BB - Unofficial
-    UNK,    // BC - LDY abs,X
+    {IN_LDY, AM_ABSX},    // BC - LDY abs,X
     {IN_LDA, AM_ABSX},    // BD - LDA abs,X
-    UNK,    // BE - LDX abs,Y
+    {IN_LDX, AM_ABSY},    // BE - LDX abs,Y
     UNK,    // BF - Unofficial
     UNK,    // C0 - CPY imm
     UNK,    // C1 - CMP (zp,X)

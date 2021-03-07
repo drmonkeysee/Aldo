@@ -96,7 +96,7 @@ int aldo_run(void)
     const uint8_t test_prg[] = {0xa9, 0xaa, 0x49, 0x55, 0x29, 0xf, 0x9, 0xf0};
     nes *console = nes_new();
     nes_powerup(console, sizeof test_prg, test_prg);
-    // Initialize snapshot from console
+    // NOTE: initialize snapshot from console
     nes_snapshot(console, &snapshot);
     // TODO: for now clock the cpu up to the first non-RESET cycle then halt
     nes_mode(console, NEXC_STEP);

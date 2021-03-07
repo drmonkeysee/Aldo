@@ -66,7 +66,7 @@ static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
     const char *restrict const *const strtable = StringTables[dec->mode];
     switch (instlen) {
     case 1:
-        // Nothing else to print, trim the trailing space
+        // NOTE: nothing else to print, trim the trailing space
         dis[--count] = '\0';
         break;
     case 2:
@@ -126,7 +126,7 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
     total = count = print_raw(addr, dispc, instlen, dis);
     if (count < 0) return count;
 
-    // Padding between raw bytes and disassembled instruction
+    // NOTE: padding between raw bytes and disassembled instruction
     count = sprintf(dis + total, "%*s", (4 - instlen) * 3, "");
     if (count < 0) return ASM_FMT_FAIL;
     total += count;
@@ -150,7 +150,7 @@ int dis_datapath(const struct console_state *snapshot,
 
     const struct decoded dec = Decode[snapshot->cpu.opcode];
     const int instlen = InstLens[dec.mode];
-    // Detect pc overflow
+    // NOTE: detect pc overflow
     if ((uint16_t)(instaddr + instlen) < CpuCartMinAddr) return ASM_EOF;
 
     int count;

@@ -59,7 +59,7 @@ static void tick_elapsed(struct timespec *ts)
     *ts = (struct timespec){.tv_sec = now.tv_sec - Current.tv_sec};
 
     if (Current.tv_nsec > now.tv_nsec) {
-        // Subtract with borrow
+        // NOTE: subtract with borrow
         --ts->tv_sec;
         ts->tv_nsec = NanosecondsPerSecond - (Current.tv_nsec - now.tv_nsec);
     } else {
@@ -114,7 +114,7 @@ static struct view HwView,
 
 static void drawhwtraits(const struct control *appstate)
 {
-    // Update timing metrics on a readable interval
+    // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
     static double display_frameleft, display_frametime, refreshdt;
     if ((refreshdt += FrameTimeMs) >= refresh_interval_ms) {
@@ -213,7 +213,7 @@ static void drawrom(const struct console_state *snapshot)
     werase(RomView.content);
 
     uint16_t addr = dis_instaddr(snapshot);
-    // On startup instaddr may be outside ROM range
+    // NOTE: on startup instaddr may be outside ROM range
     if (addr < CpuCartMinAddr) {
         mvwaddstr(RomView.content, 0, 0, "OUT OF ROM RANGE");
     } else {
@@ -287,7 +287,7 @@ static void drawdatapath(const struct console_state *snapshot)
                       *const restrict up = "\u2191",
                       *const restrict down = "\u2193";
     static const int vsep1 = 1, vsep2 = 9, vsep3 = 23, vsep4 = 29, seph = 5;
-    // Static buffer to remember last datapath paint
+    // NOTE: static buffer to remember last datapath paint
     static char buf[DIS_DATAP_SIZE];
 
     const int w = getmaxx(DatapathView.content), line_x = (w / 4) + 1;
@@ -335,7 +335,7 @@ static void drawdatapath(const struct console_state *snapshot)
 
     mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
 
-    // Jump 2 rows as interrupts are drawn direction first
+    // NOTE: jump 2 rows as interrupts are drawn direction first
     cursor_y += 2;
     draw_cpu_line(snapshot->lines.irq, cursor_y, line_x, -1, up,
                   "I\u0305R\u0305Q\u0305");
@@ -483,7 +483,7 @@ void ui_tick_start(struct control *appstate,
     }
 
     CycleBudgetMs += FrameTimeMs;
-    // Accumulate at most a second of banked cycle time
+    // NOTE: accumulate at most a second of banked cycle time
     if (CycleBudgetMs >= MillisecondsPerSecond) {
         CycleBudgetMs = MillisecondsPerSecond;
     }

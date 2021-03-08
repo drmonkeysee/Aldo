@@ -61,6 +61,18 @@ static void update_z(struct mos6502 *self, uint8_t r)
     self->p.z = r == 0;
 }
 
+static void update_v(struct mos6502 *self, uint8_t r, uint8_t a, uint8_t b)
+{
+    // NOTE: overflow happens when two positive operands = negative result or
+    // two negative operands = positive result; in other words overflow
+    // happens if the sign of A does not match the sign of R and the sign
+    // of B does not match the sign of R or:
+    // (Sign A ^ Sign R) & (Sign B ^ Sign R);
+    // (input carry is ignored for overflow).
+    const bool sa = a & 0x80, sb = b & 0x80, sr = r & 0x80;
+    self->p.v = (sa ^ sr) & (sb ^ sr);
+}
+
 static void update_n(struct mos6502 *self, uint8_t r)
 {
     self->p.n = r & 0x80;
@@ -93,7 +105,12 @@ static void UNK_exec(struct mos6502 *self, struct decoded dec)
 
 static void ADC_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    const uint16_t sum = self->a + self->databus + self->p.c;
+    self->p.c = sum >> 8;
+    update_v(self, sum, self->a, self->databus);
+    load_register(self, &self->a, sum);
+    self->presync = true;
 }
 
 static void AND_exec(struct mos6502 *self, struct decoded dec)

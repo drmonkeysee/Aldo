@@ -118,7 +118,7 @@ const struct decoded Decode[] = {
     UNK,    // 66 - ROR zp
     UNK,    // 67 - Unofficial
     UNK,    // 68 - PLA
-    UNK,    // 69 - ADC imm
+    {IN_ADC, AM_IMM},    // 69 - ADC imm
     UNK,    // 6A - ROR imp
     UNK,    // 6B - Unofficial
     UNK,    // 6C - JMP (abs)

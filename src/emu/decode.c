@@ -246,7 +246,7 @@ const struct decoded Decode[] = {
     UNK,    // E6 - INC zp
     UNK,    // E7 - Unofficial
     {IN_INX, AM_IMP},    // E8 - INX
-    UNK,    // E9 - SBC imm
+    {IN_SBC, AM_IMM},    // E9 - SBC imm
     {IN_NOP, AM_IMP},    // EA - NOP
     UNK,    // EB - Unofficial
     UNK,    // EC - CPX abs

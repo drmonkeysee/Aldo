@@ -66,9 +66,9 @@ static void update_v(struct mos6502 *self, uint8_t r, uint8_t a, uint8_t b)
     // NOTE: overflow happens when two positive operands = negative result or
     // two negative operands = positive result; in other words overflow
     // happens if the sign of A does not match the sign of R and the sign
-    // of B does not match the sign of R or:
+    // of B does not match the sign of R:
     // (Sign A ^ Sign R) & (Sign B ^ Sign R);
-    // (input carry is ignored for overflow).
+    // (2s complement works out so carry is not part of overflow check).
     const bool sa = a & 0x80, sb = b & 0x80, sr = r & 0x80;
     self->p.v = (sa ^ sr) & (sb ^ sr);
 }

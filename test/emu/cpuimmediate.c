@@ -96,6 +96,27 @@ static void cpu_adc_imm_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void cpu_adc_imm_zero_wcarry(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x69, 0x0};
+    cpu.p.c = true;
+    cpu.a = 0x0;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x1u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void cpu_adc_imm_unsigned_max(void *ctx)
 {
     struct mos6502 cpu;
@@ -776,6 +797,7 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(cpu_adc_imm_wcarry),
         ct_maketest(cpu_adc_imm_carry),
         ct_maketest(cpu_adc_imm_zero),
+        ct_maketest(cpu_adc_imm_zero_wcarry),
         ct_maketest(cpu_adc_imm_unsigned_max),
         ct_maketest(cpu_adc_imm_unsigned_max_wcarry),
         ct_maketest(cpu_adc_imm_signed_to_zero),

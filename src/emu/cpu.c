@@ -361,7 +361,7 @@ static void RTS_exec(struct mos6502 *self, struct decoded dec)
 static void SBC_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    // NOTE: subtraction is addition with a complemented operand
+    // NOTE: subtraction w/carry is addition w/carry on a complemented operand
     arithmetic_sum(self, ~self->databus);
     self->presync = true;
 }

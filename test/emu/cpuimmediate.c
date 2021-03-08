@@ -137,26 +137,6 @@ static void cpu_adc_imm_unsigned_max_wcarry(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_adc_imm_unsigned_overflow_to_zero(void *ctx)
-{
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x69, 0x1};
-    cpu.a = 0xff;
-    cpu.ram = mem;
-
-    const int cycles = clock_cpu(&cpu);
-
-    ct_assertequal(2, cycles);
-    ct_assertequal(2u, cpu.pc);
-
-    ct_assertequal(0x0u, cpu.a);
-    ct_asserttrue(cpu.p.c);
-    ct_asserttrue(cpu.p.z);
-    ct_assertfalse(cpu.p.v);
-    ct_assertfalse(cpu.p.n);
-}
-
 static void cpu_adc_imm_signed_to_zero(void *ctx)
 {
     struct mos6502 cpu;
@@ -238,26 +218,6 @@ static void cpu_adc_imm_signed_overflow_to_negative(void *ctx)
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.v);
-    ct_asserttrue(cpu.p.n);
-}
-
-static void cpu_adc_imm_negative(void *ctx)
-{
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x69, 0xfb};
-    cpu.a = 0xf6;
-    cpu.ram = mem;
-
-    const int cycles = clock_cpu(&cpu);
-
-    ct_assertequal(2, cycles);
-    ct_assertequal(2u, cpu.pc);
-
-    ct_assertequal(0xf1u, cpu.a);
-    ct_asserttrue(cpu.p.c);
-    ct_assertfalse(cpu.p.z);
-    ct_assertfalse(cpu.p.v);
     ct_asserttrue(cpu.p.n);
 }
 
@@ -720,27 +680,6 @@ static void cpu_sbc_imm_unsigned_max_wocarry(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_sbc_imm_unsigned_overflow_to_zero(void *ctx)
-{
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xe9, 0xff};
-    cpu.p.c = true;
-    cpu.a = 0xff;
-    cpu.ram = mem;
-
-    const int cycles = clock_cpu(&cpu);
-
-    ct_assertequal(2, cycles);
-    ct_assertequal(2u, cpu.pc);
-
-    ct_assertequal(0x0u, cpu.a);
-    ct_asserttrue(cpu.p.c);
-    ct_asserttrue(cpu.p.z);
-    ct_assertfalse(cpu.p.v);
-    ct_assertfalse(cpu.p.n);
-}
-
 static void cpu_sbc_imm_signed_to_zero(void *ctx)
 {
     struct mos6502 cpu;
@@ -826,28 +765,6 @@ static void cpu_sbc_imm_signed_overflow_to_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_sbc_imm_negative(void *ctx)
-{
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xe9, 0x2};
-    cpu.p.c = true;
-    // NOTE: 1 - 2
-    cpu.a = 0x1;
-    cpu.ram = mem;
-
-    const int cycles = clock_cpu(&cpu);
-
-    ct_assertequal(2, cycles);
-    ct_assertequal(2u, cpu.pc);
-
-    ct_assertequal(0xffu, cpu.a);
-    ct_assertfalse(cpu.p.c);
-    ct_assertfalse(cpu.p.z);
-    ct_assertfalse(cpu.p.v);
-    ct_asserttrue(cpu.p.n);
-}
-
 //
 // Test List
 //
@@ -861,12 +778,10 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(cpu_adc_imm_zero),
         ct_maketest(cpu_adc_imm_unsigned_max),
         ct_maketest(cpu_adc_imm_unsigned_max_wcarry),
-        ct_maketest(cpu_adc_imm_unsigned_overflow_to_zero),
         ct_maketest(cpu_adc_imm_signed_to_zero),
         ct_maketest(cpu_adc_imm_signed_to_zero_wcarry),
         ct_maketest(cpu_adc_imm_signed_overflow_to_negative),
         ct_maketest(cpu_adc_imm_signed_overflow_to_positive),
-        ct_maketest(cpu_adc_imm_negative),
         ct_maketest(cpu_and_imm),
         ct_maketest(cpu_and_imm_zero),
         ct_maketest(cpu_and_imm_negative),
@@ -892,12 +807,10 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(cpu_sbc_imm_zero_wocarry),
         ct_maketest(cpu_sbc_imm_unsigned_max),
         ct_maketest(cpu_sbc_imm_unsigned_max_wocarry),
-        ct_maketest(cpu_sbc_imm_unsigned_overflow_to_zero),
         ct_maketest(cpu_sbc_imm_signed_to_zero),
         ct_maketest(cpu_sbc_imm_signed_to_zero_wocarry),
         ct_maketest(cpu_sbc_imm_signed_overflow_to_negative),
         ct_maketest(cpu_sbc_imm_signed_overflow_to_positive),
-        ct_maketest(cpu_sbc_imm_negative),
     };
 
     return ct_makesuite(tests);

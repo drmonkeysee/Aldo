@@ -764,7 +764,7 @@ static void cpu_sbc_borrow_avoids_overflow(void *ctx)
 // Test List
 //
 
-struct ct_testsuite cpuediate_tests(void)
+struct ct_testsuite cpu_immediate_tests(void)
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(cpu_adc),

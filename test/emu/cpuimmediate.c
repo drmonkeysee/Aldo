@@ -579,7 +579,7 @@ static void cpu_sbc_borrow(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0xe9, 0xfa};
-    cpu.a = 0xa;    // NOTE: 10 - (-6 + B)
+    cpu.a = 0xa;    // NOTE: 10 - (-6 + B), B = ~C
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
@@ -725,7 +725,7 @@ static void cpu_sbc_borrow_causes_overflow(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0xe9, 0x0};
-    cpu.a = 0x80;   // NOTE: (-128) - (0 + B)
+    cpu.a = 0x80;   // NOTE: (-128) - (0 + B), B = ~C
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
@@ -745,7 +745,7 @@ static void cpu_sbc_borrow_avoids_overflow(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0xe9, 0xff};
-    cpu.a = 0x7f;   // NOTE: 127 - (-1 + B)
+    cpu.a = 0x7f;   // NOTE: 127 - (-1 + B), B = ~C
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);

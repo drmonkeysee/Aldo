@@ -15,7 +15,7 @@
 // Immediate Instructions
 //
 
-static void cpu_adc_imm(void *ctx)
+static void cpu_adc(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -35,7 +35,7 @@ static void cpu_adc_imm(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_adc_imm_wcarry(void *ctx)
+static void cpu_adc_wcarry(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -56,7 +56,7 @@ static void cpu_adc_imm_wcarry(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_adc_imm_carry(void *ctx)
+static void cpu_adc_carry(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -76,7 +76,7 @@ static void cpu_adc_imm_carry(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_adc_imm_zero(void *ctx)
+static void cpu_adc_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -96,7 +96,7 @@ static void cpu_adc_imm_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_adc_imm_negative(void *ctx)
+static void cpu_adc_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -116,7 +116,7 @@ static void cpu_adc_imm_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_adc_imm_carry_zero(void *ctx)
+static void cpu_adc_carry_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -136,7 +136,7 @@ static void cpu_adc_imm_carry_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_adc_imm_carry_negative(void *ctx)
+static void cpu_adc_carry_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -156,7 +156,7 @@ static void cpu_adc_imm_carry_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_adc_imm_overflow_to_negative(void *ctx)
+static void cpu_adc_overflow_to_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -176,7 +176,7 @@ static void cpu_adc_imm_overflow_to_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_adc_imm_overflow_to_positive(void *ctx)
+static void cpu_adc_overflow_to_positive(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -196,7 +196,7 @@ static void cpu_adc_imm_overflow_to_positive(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_adc_imm_carry_causes_overflow(void *ctx)
+static void cpu_adc_carry_causes_overflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -217,7 +217,7 @@ static void cpu_adc_imm_carry_causes_overflow(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_adc_imm_carry_avoids_overflow(void *ctx)
+static void cpu_adc_carry_avoids_overflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -238,7 +238,7 @@ static void cpu_adc_imm_carry_avoids_overflow(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_and_imm(void *ctx)
+static void cpu_and(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -256,7 +256,7 @@ static void cpu_and_imm(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_imm_zero(void *ctx)
+static void cpu_and_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -274,7 +274,7 @@ static void cpu_and_imm_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_imm_negative(void *ctx)
+static void cpu_and_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -292,7 +292,7 @@ static void cpu_and_imm_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_eor_imm(void *ctx)
+static void cpu_eor(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -310,7 +310,7 @@ static void cpu_eor_imm(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_eor_imm_zero(void *ctx)
+static void cpu_eor_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -328,7 +328,7 @@ static void cpu_eor_imm_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_eor_imm_negative(void *ctx)
+static void cpu_eor_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -346,7 +346,7 @@ static void cpu_eor_imm_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_lda_imm(void *ctx)
+static void cpu_lda(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -363,7 +363,7 @@ static void cpu_lda_imm(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lda_imm_zero(void *ctx)
+static void cpu_lda_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -380,7 +380,7 @@ static void cpu_lda_imm_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lda_imm_negative(void *ctx)
+static void cpu_lda_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -397,7 +397,7 @@ static void cpu_lda_imm_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_ldx_imm(void *ctx)
+static void cpu_ldx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -414,7 +414,7 @@ static void cpu_ldx_imm(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ldx_imm_zero(void *ctx)
+static void cpu_ldx_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -431,7 +431,7 @@ static void cpu_ldx_imm_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ldx_imm_negative(void *ctx)
+static void cpu_ldx_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -448,7 +448,7 @@ static void cpu_ldx_imm_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_ldy_imm(void *ctx)
+static void cpu_ldy(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -465,7 +465,7 @@ static void cpu_ldy_imm(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ldy_imm_zero(void *ctx)
+static void cpu_ldy_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -482,7 +482,7 @@ static void cpu_ldy_imm_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ldy_imm_negative(void *ctx)
+static void cpu_ldy_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -499,7 +499,7 @@ static void cpu_ldy_imm_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_ora_imm(void *ctx)
+static void cpu_ora(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -517,7 +517,7 @@ static void cpu_ora_imm(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_imm_zero(void *ctx)
+static void cpu_ora_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -535,7 +535,7 @@ static void cpu_ora_imm_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_imm_negative(void *ctx)
+static void cpu_ora_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -553,7 +553,7 @@ static void cpu_ora_imm_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_sbc_imm(void *ctx)
+static void cpu_sbc(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -574,7 +574,7 @@ static void cpu_sbc_imm(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sbc_imm_borrow(void *ctx)
+static void cpu_sbc_borrow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -594,7 +594,7 @@ static void cpu_sbc_imm_borrow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sbc_imm_carry(void *ctx)
+static void cpu_sbc_carry(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -615,7 +615,7 @@ static void cpu_sbc_imm_carry(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sbc_imm_negative(void *ctx)
+static void cpu_sbc_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -636,7 +636,7 @@ static void cpu_sbc_imm_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_sbc_imm_carry_zero(void *ctx)
+static void cpu_sbc_carry_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -657,7 +657,7 @@ static void cpu_sbc_imm_carry_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sbc_imm_carry_negative(void *ctx)
+static void cpu_sbc_carry_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -678,7 +678,7 @@ static void cpu_sbc_imm_carry_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_sbc_imm_overflow_to_negative(void *ctx)
+static void cpu_sbc_overflow_to_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -699,7 +699,7 @@ static void cpu_sbc_imm_overflow_to_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_sbc_imm_overflow_to_positive(void *ctx)
+static void cpu_sbc_overflow_to_positive(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -720,7 +720,7 @@ static void cpu_sbc_imm_overflow_to_positive(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sbc_imm_borrow_causes_overflow(void *ctx)
+static void cpu_sbc_borrow_causes_overflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -740,7 +740,7 @@ static void cpu_sbc_imm_borrow_causes_overflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sbc_imm_borrow_avoids_overflow(void *ctx)
+static void cpu_sbc_borrow_avoids_overflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -764,48 +764,48 @@ static void cpu_sbc_imm_borrow_avoids_overflow(void *ctx)
 // Test List
 //
 
-struct ct_testsuite cpu_immediate_tests(void)
+struct ct_testsuite cpuediate_tests(void)
 {
     static const struct ct_testcase tests[] = {
-        ct_maketest(cpu_adc_imm),
-        ct_maketest(cpu_adc_imm_wcarry),
-        ct_maketest(cpu_adc_imm_carry),
-        ct_maketest(cpu_adc_imm_zero),
-        ct_maketest(cpu_adc_imm_negative),
-        ct_maketest(cpu_adc_imm_carry_zero),
-        ct_maketest(cpu_adc_imm_carry_negative),
-        ct_maketest(cpu_adc_imm_overflow_to_negative),
-        ct_maketest(cpu_adc_imm_overflow_to_positive),
-        ct_maketest(cpu_adc_imm_carry_causes_overflow),
-        ct_maketest(cpu_adc_imm_carry_avoids_overflow),
-        ct_maketest(cpu_and_imm),
-        ct_maketest(cpu_and_imm_zero),
-        ct_maketest(cpu_and_imm_negative),
-        ct_maketest(cpu_eor_imm),
-        ct_maketest(cpu_eor_imm_zero),
-        ct_maketest(cpu_eor_imm_negative),
-        ct_maketest(cpu_lda_imm),
-        ct_maketest(cpu_lda_imm_zero),
-        ct_maketest(cpu_lda_imm_negative),
-        ct_maketest(cpu_ldx_imm),
-        ct_maketest(cpu_ldx_imm_zero),
-        ct_maketest(cpu_ldx_imm_negative),
-        ct_maketest(cpu_ldy_imm),
-        ct_maketest(cpu_ldy_imm_zero),
-        ct_maketest(cpu_ldy_imm_negative),
-        ct_maketest(cpu_ora_imm),
-        ct_maketest(cpu_ora_imm_zero),
-        ct_maketest(cpu_ora_imm_negative),
-        ct_maketest(cpu_sbc_imm),
-        ct_maketest(cpu_sbc_imm_borrow),
-        ct_maketest(cpu_sbc_imm_carry),
-        ct_maketest(cpu_sbc_imm_negative),
-        ct_maketest(cpu_sbc_imm_carry_zero),
-        ct_maketest(cpu_sbc_imm_carry_negative),
-        ct_maketest(cpu_sbc_imm_overflow_to_negative),
-        ct_maketest(cpu_sbc_imm_overflow_to_positive),
-        ct_maketest(cpu_sbc_imm_borrow_causes_overflow),
-        ct_maketest(cpu_sbc_imm_borrow_avoids_overflow),
+        ct_maketest(cpu_adc),
+        ct_maketest(cpu_adc_wcarry),
+        ct_maketest(cpu_adc_carry),
+        ct_maketest(cpu_adc_zero),
+        ct_maketest(cpu_adc_negative),
+        ct_maketest(cpu_adc_carry_zero),
+        ct_maketest(cpu_adc_carry_negative),
+        ct_maketest(cpu_adc_overflow_to_negative),
+        ct_maketest(cpu_adc_overflow_to_positive),
+        ct_maketest(cpu_adc_carry_causes_overflow),
+        ct_maketest(cpu_adc_carry_avoids_overflow),
+        ct_maketest(cpu_and),
+        ct_maketest(cpu_and_zero),
+        ct_maketest(cpu_and_negative),
+        ct_maketest(cpu_eor),
+        ct_maketest(cpu_eor_zero),
+        ct_maketest(cpu_eor_negative),
+        ct_maketest(cpu_lda),
+        ct_maketest(cpu_lda_zero),
+        ct_maketest(cpu_lda_negative),
+        ct_maketest(cpu_ldx),
+        ct_maketest(cpu_ldx_zero),
+        ct_maketest(cpu_ldx_negative),
+        ct_maketest(cpu_ldy),
+        ct_maketest(cpu_ldy_zero),
+        ct_maketest(cpu_ldy_negative),
+        ct_maketest(cpu_ora),
+        ct_maketest(cpu_ora_zero),
+        ct_maketest(cpu_ora_negative),
+        ct_maketest(cpu_sbc),
+        ct_maketest(cpu_sbc_borrow),
+        ct_maketest(cpu_sbc_carry),
+        ct_maketest(cpu_sbc_negative),
+        ct_maketest(cpu_sbc_carry_zero),
+        ct_maketest(cpu_sbc_carry_negative),
+        ct_maketest(cpu_sbc_overflow_to_negative),
+        ct_maketest(cpu_sbc_overflow_to_positive),
+        ct_maketest(cpu_sbc_borrow_causes_overflow),
+        ct_maketest(cpu_sbc_borrow_avoids_overflow),
     };
 
     return ct_makesuite(tests);

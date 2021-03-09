@@ -97,9 +97,10 @@ static bool addr_carry_delayed(const struct mos6502 *self, struct decoded dec)
     return false;
 }
 
-static void arithmetic_sum(struct mos6502 *self, uint8_t operand)
+// NOTE: A + (B + C), operand is u16 to catch any carry out of (B + C)
+static void arithmetic_sum(struct mos6502 *self, uint16_t operand)
 {
-    const uint16_t sum = self->a + operand + self->p.c;
+    const uint16_t sum = self->a + operand;
     self->p.c = sum >> 8;
     update_v(self, sum, self->a, operand);
     load_register(self, &self->a, sum);
@@ -114,7 +115,7 @@ static void UNK_exec(struct mos6502 *self, struct decoded dec)
 static void ADC_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    arithmetic_sum(self, self->databus);
+    arithmetic_sum(self, self->databus + self->p.c);
     self->presync = true;
 }
 
@@ -361,8 +362,9 @@ static void RTS_exec(struct mos6502 *self, struct decoded dec)
 static void SBC_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    // NOTE: subtraction w/carry is addition w/carry on a complemented operand
-    arithmetic_sum(self, ~self->databus);
+    // NOTE: A - B => A + 2sComplement(B) equivalent to A - (~B + C), C = 1; or
+    // A - (B - 1) if carry is 0 i.e. there is a borrow: A - (~B + C), C = 0.
+    arithmetic_sum(self, (uint8_t)~self->databus + self->p.c);
     self->presync = true;
 }
 

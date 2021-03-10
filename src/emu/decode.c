@@ -110,11 +110,11 @@ const struct decoded Decode[] = {
     UNK,    // 5E - LSR abs,X
     UNK,    // 5F - Unofficial
     UNK,    // 60 - RTS
-    UNK,    // 61 - ADC (zp,X)
+    {IN_ADC, AM_INDX},    // 61 - ADC (zp,X)
     UNK,    // 62 - Unofficial
     UNK,    // 63 - Unofficial
     UNK,    // 64 - Unofficial
-    UNK,    // 65 - ADC zp
+    {IN_ADC, AM_ZP},    // 65 - ADC zp
     UNK,    // 66 - ROR zp
     UNK,    // 67 - Unofficial
     UNK,    // 68 - PLA
@@ -122,23 +122,23 @@ const struct decoded Decode[] = {
     UNK,    // 6A - ROR imp
     UNK,    // 6B - Unofficial
     UNK,    // 6C - JMP (abs)
-    UNK,    // 6D - ADC abs
+    {IN_ADC, AM_ABS},    // 6D - ADC abs
     UNK,    // 6E - ROR abs
     UNK,    // 6F - Unofficial
     UNK,    // 70 - BVS
-    UNK,    // 71 - ADC (zp),Y
+    {IN_ADC, AM_INDY},    // 71 - ADC (zp),Y
     UNK,    // 72 - Unofficial
     UNK,    // 73 - Unofficial
     UNK,    // 74 - Unofficial
-    UNK,    // 75 - ADC zp,X
+    {IN_ADC, AM_ZPX},    // 75 - ADC zp,X
     UNK,    // 76 - ROR zp,X
     UNK,    // 77 - Unofficial
     {IN_SEI, AM_IMP},    // 78 - SEI
-    UNK,    // 79 - ADC abs,Y
+    {IN_ADC, AM_ABSY},    // 79 - ADC abs,Y
     UNK,    // 7A - Unofficial
     UNK,    // 7B - Unofficial
     UNK,    // 7C - Unofficial
-    UNK,    // 7D - ADC abs,X
+    {IN_ADC, AM_ABSX},    // 7D - ADC abs,X
     UNK,    // 7E - ROR abs,X
     UNK,    // 7F - Unofficial
     UNK,    // 80 - Unofficial
@@ -238,11 +238,11 @@ const struct decoded Decode[] = {
     UNK,    // DE - DEC abs,X
     UNK,    // DF - Unofficial
     UNK,    // E0 - CPX imm
-    UNK,    // E1 - SBC (zp,X)
+    {IN_SBC, AM_INDX},    // E1 - SBC (zp,X)
     UNK,    // E2 - Unofficial
     UNK,    // E3 - Unofficial
     UNK,    // E4 - CPX zp
-    UNK,    // E5 - SBC zp
+    {IN_SBC, AM_ZP},    // E5 - SBC zp
     UNK,    // E6 - INC zp
     UNK,    // E7 - Unofficial
     {IN_INX, AM_IMP},    // E8 - INX
@@ -250,23 +250,23 @@ const struct decoded Decode[] = {
     {IN_NOP, AM_IMP},    // EA - NOP
     UNK,    // EB - Unofficial
     UNK,    // EC - CPX abs
-    UNK,    // ED - SBC abs
+    {IN_SBC, AM_ABS},    // ED - SBC abs
     UNK,    // EE - INC abs
     UNK,    // EF - Unofficial
     UNK,    // F0 - BEQ
-    UNK,    // F1 - SBC (zp),Y
+    {IN_SBC, AM_INDY},    // F1 - SBC (zp),Y
     UNK,    // F2 - Unofficial
     UNK,    // F3 - Unofficial
     UNK,    // F4 - Unofficial
-    UNK,    // F5 - SBC zp,X
+    {IN_SBC, AM_ZPX},    // F5 - SBC zp,X
     UNK,    // F6 - INC zp,X
     UNK,    // F7 - Unofficial
     {IN_SED, AM_IMP},    // F8 - SED
-    UNK,    // F9 - SBC abs,Y
+    {IN_SBC, AM_ABSY},    // F9 - SBC abs,Y
     UNK,    // FA - Unofficial
     UNK,    // FB - Unofficial
     UNK,    // FC - Unofficial
-    UNK,    // FD - SBC abs,X
+    {IN_SBC, AM_ABSX},    // FD - SBC abs,X
     UNK,    // FE - INC abs,X
     UNK,    // FF - Unofficial
 };

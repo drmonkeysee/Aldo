@@ -112,7 +112,7 @@ static void UNK_exec(struct mos6502 *self, struct decoded dec)
 
 static void ADC_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)dec;
+    if (addr_carry_delayed(self, dec)) return;
     // NOTE: add with carry-in; A + B + C
     arithmetic_sum(self, self->databus + self->p.c);
     self->presync = true;
@@ -360,7 +360,7 @@ static void RTS_exec(struct mos6502 *self, struct decoded dec)
 
 static void SBC_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)dec;
+    if (addr_carry_delayed(self, dec)) return;
     // NOTE: subtract with carry-in where ~carry indicates borrow-out;
     // A - B => A + (-B) => A + 2sComplement(B) => A + (~B + 1) where C = 1;
     // C = 0 thus means borrow-out; A + (~B + 0) => A + ~B => A - B - 1.

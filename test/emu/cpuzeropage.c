@@ -15,6 +15,26 @@
 // Zero-Page Instructions
 //
 
+static void cpu_adc_zp(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x65, 0x4, 0xff, 0xff, 0x6};
+    cpu.a = 0xa;    // NOTE: 10 + 6
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void cpu_and_zp(void *ctx)
 {
     struct mos6502 cpu;
@@ -120,9 +140,72 @@ static void cpu_ora_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void cpu_sbc_zp(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xe5, 0x4, 0xff, 0xff, 0x6};
+    cpu.p.c = true;
+    cpu.a = 0xa;    // NOTE: 10 - 6
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x4u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
 //
 // Zero-Page,X Instructions
 //
+
+static void cpu_adc_zpx(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x75, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x6};
+    cpu.a = 0xa;    // NOTE: 10 + 6
+    cpu.ram = mem;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_adc_zpx_pageoverflow(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x75, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x6};
+    cpu.a = 0xa;    // NOTE: 10 + 34
+    cpu.ram = mem;
+    cpu.x = 0xff;   // NOTE: wrap around from $0003 -> $0002
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x2cu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
 
 static void cpu_and_zpx(void *ctx)
 {
@@ -143,7 +226,7 @@ static void cpu_and_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_zpx_pagecross(void *ctx)
+static void cpu_and_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -181,7 +264,7 @@ static void cpu_eor_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_eor_zpx_pagecross(void *ctx)
+static void cpu_eor_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -218,7 +301,7 @@ static void cpu_lda_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lda_zpx_pagecross(void *ctx)
+static void cpu_lda_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -254,7 +337,7 @@ static void cpu_ldy_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ldy_zpx_pagecross(void *ctx)
+static void cpu_ldy_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -291,7 +374,7 @@ static void cpu_ora_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_zpx_pagecross(void *ctx)
+static void cpu_ora_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -308,6 +391,50 @@ static void cpu_ora_zpx_pagecross(void *ctx)
     ct_assertequal(0xfau, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_sbc_zpx(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xf5, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x6};
+    cpu.p.c = true;
+    cpu.a = 0xa;    // NOTE: 10 - 6
+    cpu.ram = mem;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x4u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_sbc_zpx_pageoverflow(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xf5, 0x3, 0x8, 0xff, 0xff, 0xff, 0xff, 0x6};
+    cpu.p.c = true;
+    cpu.a = 0xa;    // NOTE: 10 - 8
+    cpu.ram = mem;
+    cpu.x = 0xff;   // NOTE: wrap around from $0003 -> $0002
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x2u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
 }
 
 //
@@ -332,7 +459,7 @@ static void cpu_ldx_zpy(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ldx_zpy_pagecross(void *ctx)
+static void cpu_ldx_zpy_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -357,26 +484,32 @@ static void cpu_ldx_zpy_pagecross(void *ctx)
 struct ct_testsuite cpu_zeropage_tests(void)
 {
     static const struct ct_testcase tests[] = {
+        ct_maketest(cpu_adc_zp),
         ct_maketest(cpu_and_zp),
         ct_maketest(cpu_eor_zp),
         ct_maketest(cpu_lda_zp),
         ct_maketest(cpu_ldx_zp),
         ct_maketest(cpu_ldy_zp),
         ct_maketest(cpu_ora_zp),
+        ct_maketest(cpu_sbc_zp),
 
+        ct_maketest(cpu_adc_zpx),
+        ct_maketest(cpu_adc_zpx_pageoverflow),
         ct_maketest(cpu_and_zpx),
-        ct_maketest(cpu_and_zpx_pagecross),
+        ct_maketest(cpu_and_zpx_pageoverflow),
         ct_maketest(cpu_eor_zpx),
-        ct_maketest(cpu_eor_zpx_pagecross),
+        ct_maketest(cpu_eor_zpx_pageoverflow),
         ct_maketest(cpu_lda_zpx),
-        ct_maketest(cpu_lda_zpx_pagecross),
+        ct_maketest(cpu_lda_zpx_pageoverflow),
         ct_maketest(cpu_ldy_zpx),
-        ct_maketest(cpu_ldy_zpx_pagecross),
+        ct_maketest(cpu_ldy_zpx_pageoverflow),
         ct_maketest(cpu_ora_zpx),
-        ct_maketest(cpu_ora_zpx_pagecross),
+        ct_maketest(cpu_ora_zpx_pageoverflow),
+        ct_maketest(cpu_sbc_zpx),
+        ct_maketest(cpu_sbc_zpx_pageoverflow),
 
         ct_maketest(cpu_ldx_zpy),
-        ct_maketest(cpu_ldx_zpy_pagecross),
+        ct_maketest(cpu_ldx_zpy_pageoverflow),
     };
 
     return ct_makesuite(tests);

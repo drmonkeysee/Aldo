@@ -63,10 +63,9 @@ static void update_z(struct mos6502 *self, uint8_t r)
 
 static void update_v(struct mos6502 *self, uint8_t r, uint8_t a, uint8_t b)
 {
-    // NOTE: overflow happens when two positive operands = negative result or
-    // two negative operands = positive result; in other words overflow
-    // happens if the sign of A does not match the sign of R and the sign
-    // of B does not match the sign of R:
+    // NOTE: signed overflow happens when positive + positive = negative or
+    // negative + negative = positive, i.e. the sign of A does not match
+    // the sign of R and the sign of B does not match the sign of R:
     // (Sign A ^ Sign R) & (Sign B ^ Sign R) or
     // (A ^ R) & (B ^ R) & SignMask
     self->p.v = (a ^ r) & (b ^ r) & 0x80;
@@ -96,12 +95,12 @@ static bool addr_carry_delayed(const struct mos6502 *self, struct decoded dec)
     return false;
 }
 
-// NOTE: A + (B + C), operand is u16 to catch any carry out of (B + C)
-static void arithmetic_sum(struct mos6502 *self, uint16_t operand)
+// NOTE: A + B; B is u16 as it may contain a carry-out
+static void arithmetic_sum(struct mos6502 *self, uint16_t b)
 {
-    const uint16_t sum = self->a + operand;
+    const uint16_t sum = self->a + b;
     self->p.c = sum >> 8;
-    update_v(self, sum, self->a, operand);
+    update_v(self, sum, self->a, b);
     load_register(self, &self->a, sum);
 }
 
@@ -114,6 +113,7 @@ static void UNK_exec(struct mos6502 *self, struct decoded dec)
 static void ADC_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
+    // NOTE: add with carry-in; A + B + C
     arithmetic_sum(self, self->databus + self->p.c);
     self->presync = true;
 }
@@ -361,8 +361,9 @@ static void RTS_exec(struct mos6502 *self, struct decoded dec)
 static void SBC_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
-    // NOTE: A - B => A + 2sComplement(B) equivalent to A - (~B + C), C = 1; or
-    // A - (B - 1) if carry is 0 i.e. there is a borrow: A - (~B + C), C = 0.
+    // NOTE: subtract with carry-in where ~carry indicates borrow-out;
+    // A - B => A + (-B) => A + 2sComplement(B) => A + (~B + 1) where C = 1;
+    // C = 0 thus means borrow-out; A + (~B + 0) => A + ~B => A - B - 1.
     arithmetic_sum(self, (uint8_t)~self->databus + self->p.c);
     self->presync = true;
 }

@@ -61,13 +61,13 @@ static void update_z(struct mos6502 *self, uint8_t r)
     self->p.z = r == 0;
 }
 
+// NOTE: signed overflow happens when positive + positive = negative
+// or negative + negative = positive, i.e. the sign of A does not match
+// the sign of R and the sign of B does not match the sign of R:
+// (Sign A ^ Sign R) & (Sign B ^ Sign R) or
+// (A ^ R) & (B ^ R) & SignMask
 static void update_v(struct mos6502 *self, uint8_t r, uint8_t a, uint8_t b)
 {
-    // NOTE: signed overflow happens when positive + positive = negative or
-    // negative + negative = positive, i.e. the sign of A does not match
-    // the sign of R and the sign of B does not match the sign of R:
-    // (Sign A ^ Sign R) & (Sign B ^ Sign R) or
-    // (A ^ R) & (B ^ R) & SignMask
     self->p.v = (a ^ r) & (b ^ r) & 0x80;
 }
 
@@ -110,10 +110,10 @@ static void UNK_exec(struct mos6502 *self, struct decoded dec)
     self->presync = true;
 }
 
+// NOTE: add with carry-in; A + B + C
 static void ADC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (addr_carry_delayed(self, dec)) return;
-    // NOTE: add with carry-in; A + B + C
     arithmetic_sum(self, self->databus + self->p.c);
     self->presync = true;
 }
@@ -306,7 +306,6 @@ static void LSR_exec(struct mos6502 *self, struct decoded dec)
 
 static void NOP_exec(struct mos6502 *self, struct decoded dec)
 {
-    // NOTE: NOP does nothing!
     (void)dec;
     self->presync = true;
 }
@@ -358,12 +357,12 @@ static void RTS_exec(struct mos6502 *self, struct decoded dec)
     (void)self, (void)dec;
 }
 
+// NOTE: subtract with carry-in; A - B - ~C, where ~carry indicates borrow-out:
+// A - B => A + (-B) => A + 2sComplement(B) => A + (~B + 1) when C = 1;
+// C = 0 is thus a borrow-out; A + (~B + 0) => A + ~B => A - B - 1.
 static void SBC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (addr_carry_delayed(self, dec)) return;
-    // NOTE: subtract with carry-in where ~carry indicates borrow-out;
-    // A - B => A + (-B) => A + 2sComplement(B) => A + (~B + 1) where C = 1;
-    // C = 0 thus means borrow-out; A + (~B + 0) => A + ~B => A - B - 1.
     arithmetic_sum(self, (uint8_t)~self->databus + self->p.c);
     self->presync = true;
 }

@@ -30,7 +30,7 @@ static void handle_input(struct control *appstate,
             nes_ready(console);
         }
         break;
-    case '=':   // "lowercase" +
+    case '=':   // NOTE: "lowercase" +
         ++appstate->cycles_per_sec;
         goto pclamp_cps;
     case '+':
@@ -43,7 +43,7 @@ static void handle_input(struct control *appstate,
     case '-':
         --appstate->cycles_per_sec;
         goto nclamp_cps;
-    case '_':      // "uppercase" -
+    case '_':   // NOTE: "uppercase" -
         appstate->cycles_per_sec -= 10;
     nclamp_cps:
         if (appstate->cycles_per_sec < MinCps) {
@@ -93,7 +93,20 @@ int aldo_run(void)
     struct console_state snapshot;
     ui_init();
 
-    const uint8_t test_prg[] = {0xa9, 0x5c, 0x38, 0xe9, 0x17};
+    const uint8_t test_prg[] = {
+        0x18,       // CLC
+        0xa9, 0x4c, // LDA 4c
+        0x69, 0xfc, // ADC fc
+        0xaa,       // TAX
+        0xa9, 0x1d, // LDA 1d
+        0x69, 0x1,  // ADC 01
+        0x38,       // SEC
+        0xa9, 0xd7, // LDA d7
+        0xe9, 0x92, // SBC 92
+        0xaa,       // TAX
+        0xa9, 0x11, // LDA 11
+        0xe9, 0x11, // SBC 11
+    };
     nes *console = nes_new();
     nes_powerup(console, sizeof test_prg, test_prg);
     // NOTE: initialize snapshot from console

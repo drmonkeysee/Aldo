@@ -104,7 +104,6 @@ int nes_cycle(nes *self, int cpubudget)
             self->cpu.signal.rdy = !self->cpu.signal.sync;
             break;
         case NEXC_RUN:
-            // Nothing to do, run freely
             break;
         default:
             assert(((void)"INVALID EXC MODE", false));

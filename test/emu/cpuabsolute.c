@@ -62,8 +62,8 @@ static void cpu_bit_abs(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x2c, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x1};
-    cpu.a = 0x9;
+    const uint8_t abs[] = {0xff, 0x6};
+    cpu.a = 0x2;
     cpu.ram = mem;
     cpu.cart = abs;
 
@@ -72,10 +72,10 @@ static void cpu_bit_abs(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x9u, cpu.a);
+    ct_assertequal(0x2u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
-    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_cmp_abs(void *ctx)

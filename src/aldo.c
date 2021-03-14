@@ -94,18 +94,12 @@ int aldo_run(void)
     ui_init();
 
     const uint8_t test_prg[] = {
-        0x18,       // CLC
-        0xa9, 0x4c, // LDA 4c
-        0x69, 0xfc, // ADC fc
-        0xaa,       // TAX
-        0xa9, 0x1d, // LDA 1d
-        0x69, 0x1,  // ADC 01
-        0x38,       // SEC
-        0xa9, 0xd7, // LDA d7
-        0xe9, 0x92, // SBC 92
-        0xaa,       // TAX
-        0xa9, 0x11, // LDA 11
-        0xe9, 0x11, // SBC 11
+        0xa9, 0x10, // lda $10
+        0xc9, 0x20, // cmp $20
+        0xa2, 0xff, // ldx $ff
+        0xe0, 0xfe, // cpx $fe
+        0xa0, 0x80, // ldy $80
+        0xc0, 0x1, // cpy $1
     };
     nes *console = nes_new();
     nes_powerup(console, sizeof test_prg, test_prg);

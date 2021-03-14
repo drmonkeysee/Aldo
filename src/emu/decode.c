@@ -214,7 +214,7 @@ const struct decoded Decode[] = {
     UNK,    // C6 - DEC zp
     UNK,    // C7 - Unofficial
     {IN_INY, AM_IMP},    // C8 - INY
-    UNK,    // C9 - CMP imm
+    {IN_CMP, AM_IMM},    // C9 - CMP imm
     {IN_DEX, AM_IMP},    // CA - DEX
     UNK,    // CB - Unofficial
     UNK,    // CC - CPY abs

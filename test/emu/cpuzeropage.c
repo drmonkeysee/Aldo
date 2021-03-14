@@ -53,6 +53,82 @@ static void cpu_and_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void cpu_bit_zp_maskset(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0x1};
+    cpu.a = 0x9;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x9u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.v);
+}
+
+static void cpu_bit_zp_maskclear(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0x1};
+    cpu.a = 0xa;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xau, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.v);
+}
+
+static void cpu_bit_zp_sethigh(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0xc1};
+    cpu.a = 0x9;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x9u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_asserttrue(cpu.p.v);
+}
+
+static void cpu_bit_zp_zero_sethigh(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0xc1};
+    cpu.a = 0x0;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_asserttrue(cpu.p.v);
+}
+
 static void cpu_cmp_zp(void *ctx)
 {
     struct mos6502 cpu;
@@ -583,6 +659,10 @@ struct ct_testsuite cpu_zeropage_tests(void)
     static const struct ct_testcase tests[] = {
         ct_maketest(cpu_adc_zp),
         ct_maketest(cpu_and_zp),
+        ct_maketest(cpu_bit_zp_maskset),
+        ct_maketest(cpu_bit_zp_maskclear),
+        ct_maketest(cpu_bit_zp_sethigh),
+        ct_maketest(cpu_bit_zp_zero_sethigh),
         ct_maketest(cpu_cmp_zp),
         ct_maketest(cpu_cpx_zp),
         ct_maketest(cpu_cpy_zp),

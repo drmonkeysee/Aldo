@@ -57,6 +57,27 @@ static void cpu_and_abs(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void cpu_bit_abs(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x2c, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0x1};
+    cpu.a = 0x9;
+    cpu.ram = mem;
+    cpu.cart = abs;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x9u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.v);
+}
+
 static void cpu_cmp_abs(void *ctx)
 {
     struct mos6502 cpu;
@@ -929,6 +950,7 @@ struct ct_testsuite cpu_absolute_tests(void)
     static const struct ct_testcase tests[] = {
         ct_maketest(cpu_adc_abs),
         ct_maketest(cpu_and_abs),
+        ct_maketest(cpu_bit_abs),
         ct_maketest(cpu_cmp_abs),
         ct_maketest(cpu_cpx_abs),
         ct_maketest(cpu_cpy_abs),

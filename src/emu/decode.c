@@ -49,7 +49,7 @@ const struct decoded Decode[] = {
     {IN_AND, AM_INDX},    // 21 - AND (zp,X)
     UNK,    // 22 - Unofficial
     UNK,    // 23 - Unofficial
-    UNK,    // 24 - BIT zp
+    {IN_BIT, AM_ZP},    // 24 - BIT zp
     {IN_AND, AM_ZP},    // 25 - AND zp
     UNK,    // 26 - ROL zp
     UNK,    // 27 - Unofficial
@@ -57,7 +57,7 @@ const struct decoded Decode[] = {
     {IN_AND, AM_IMM},    // 29 - AND imm
     UNK,    // 2A - ROL imp
     UNK,    // 2B - Unofficial
-    UNK,    // 2C - BIT abs
+    {IN_BIT, AM_ABS},    // 2C - BIT abs
     {IN_AND, AM_ABS},    // 2D - AND abs
     UNK,    // 2E - ROL abs
     UNK,    // 2F - Unofficial

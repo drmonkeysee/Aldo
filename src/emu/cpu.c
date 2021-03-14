@@ -158,7 +158,11 @@ static void BEQ_exec(struct mos6502 *self, struct decoded dec)
 
 static void BIT_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    update_z(self, self->a & self->databus);
+    self->p.v = self->databus & 0x40;
+    update_n(self, self->databus);
+    self->presync = true;
 }
 
 static void BMI_exec(struct mos6502 *self, struct decoded dec)

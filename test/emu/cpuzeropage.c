@@ -72,6 +72,44 @@ static void cpu_cmp_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void cpu_cpx_zp(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xe4, 0x4, 0xff, 0xff, 0x10};
+    cpu.x = 0x10;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.x);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_cpy_zp(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xc4, 0x4, 0xff, 0xff, 0x10};
+    cpu.y = 0x10;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.y);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void cpu_eor_zp(void *ctx)
 {
     struct mos6502 cpu;
@@ -546,6 +584,8 @@ struct ct_testsuite cpu_zeropage_tests(void)
         ct_maketest(cpu_adc_zp),
         ct_maketest(cpu_and_zp),
         ct_maketest(cpu_cmp_zp),
+        ct_maketest(cpu_cpx_zp),
+        ct_maketest(cpu_cpy_zp),
         ct_maketest(cpu_eor_zp),
         ct_maketest(cpu_lda_zp),
         ct_maketest(cpu_ldx_zp),

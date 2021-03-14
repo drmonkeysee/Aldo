@@ -104,13 +104,24 @@ static void arithmetic_sum(struct mos6502 *self, uint16_t b)
     load_register(self, &self->a, sum);
 }
 
+// NOTE: compare is effectively R - D; modeling the subtraction as
+// R + 2sComplement(D) gets us all the flags for free;
+// see SBC_exec for why this works.
+static void compare_register(struct mos6502 *self, uint8_t r)
+{
+    const uint16_t cmp = r + ((uint8_t)~self->databus + 1);
+    self->p.c = cmp >> 8;
+    update_z(self, cmp);
+    update_n(self, cmp);
+}
+
 static void UNK_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
     self->presync = true;
 }
 
-// NOTE: add with carry-in; A + M + C
+// NOTE: add with carry-in; A + D + C
 static void ADC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (addr_carry_delayed(self, dec)) return;
@@ -208,27 +219,25 @@ static void CLV_exec(struct mos6502 *self, struct decoded dec)
     self->presync = true;
 }
 
-// NOTE: CMP is effectively A - M, modeling the subtraction as
-// A + 2sComplement(M) gets us all the flags for free;
-// see SBC_exec for why this works.
 static void CMP_exec(struct mos6502 *self, struct decoded dec)
 {
     if (addr_carry_delayed(self, dec)) return;
-    const uint16_t cmp = self->a + ((uint8_t)~self->databus + 1);
-    self->p.c = cmp >> 8;
-    update_z(self, cmp);
-    update_n(self, cmp);
+    compare_register(self, self->a);
     self->presync = true;
 }
 
 static void CPX_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    compare_register(self, self->x);
+    self->presync = true;
 }
 
 static void CPY_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    (void)dec;
+    compare_register(self, self->y);
+    self->presync = true;
 }
 
 static void DEC_exec(struct mos6502 *self, struct decoded dec)
@@ -365,9 +374,9 @@ static void RTS_exec(struct mos6502 *self, struct decoded dec)
     (void)self, (void)dec;
 }
 
-// NOTE: subtract with carry-in; A - M - ~C, where ~carry indicates borrow-out:
-// A - M => A + (-M) => A + 2sComplement(M) => A + (~M + 1) when C = 1;
-// C = 0 is thus a borrow-out; A + (~M + 0) => A + ~M => A - M - 1.
+// NOTE: subtract with carry-in; A - D - ~C, where ~carry indicates borrow-out:
+// A - D => A + (-D) => A + 2sComplement(D) => A + (~D + 1) when C = 1;
+// C = 0 is thus a borrow-out; A + (~D + 0) => A + ~D => A - D - 1.
 static void SBC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (addr_carry_delayed(self, dec)) return;

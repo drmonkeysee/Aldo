@@ -57,6 +57,27 @@ static void cpu_and_abs(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void cpu_cmp_abs(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xcd, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0x10};
+    cpu.a = 0x10;
+    cpu.ram = mem;
+    cpu.cart = abs;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void cpu_eor_abs(void *ctx)
 {
     struct mos6502 cpu;
@@ -265,6 +286,49 @@ static void cpu_and_absx_pagecross(void *ctx)
     ct_assertequal(0xa2u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_cmp_absx(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xdd, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
+    cpu.a = 0x10;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.x = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_cmp_absx_pagecross(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xdd, 0xff, 0x80};
+    cpu.a = 0x10;
+    cpu.ram = mem;
+    cpu.cart = bigrom;
+    cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void cpu_eor_absx(void *ctx)
@@ -564,6 +628,49 @@ static void cpu_and_absy_pagecross(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
+static void cpu_cmp_absy(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xd9, 0x1, 0x80};
+    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
+    cpu.a = 0x10;
+    cpu.ram = mem;
+    cpu.cart = abs;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_cmp_absy_pagecross(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xd9, 0xff, 0x80};
+    cpu.a = 0x10;
+    cpu.ram = mem;
+    cpu.cart = bigrom;
+    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void cpu_eor_absy(void *ctx)
 {
     struct mos6502 cpu;
@@ -780,6 +887,7 @@ struct ct_testsuite cpu_absolute_tests(void)
     static const struct ct_testcase tests[] = {
         ct_maketest(cpu_adc_abs),
         ct_maketest(cpu_and_abs),
+        ct_maketest(cpu_cmp_abs),
         ct_maketest(cpu_eor_abs),
         ct_maketest(cpu_lda_abs),
         ct_maketest(cpu_ldx_abs),
@@ -791,6 +899,8 @@ struct ct_testsuite cpu_absolute_tests(void)
         ct_maketest(cpu_adc_absx_pagecross),
         ct_maketest(cpu_and_absx),
         ct_maketest(cpu_and_absx_pagecross),
+        ct_maketest(cpu_cmp_absx),
+        ct_maketest(cpu_cmp_absx_pagecross),
         ct_maketest(cpu_eor_absx),
         ct_maketest(cpu_eor_absx_pagecross),
         ct_maketest(cpu_lda_absx),
@@ -806,6 +916,8 @@ struct ct_testsuite cpu_absolute_tests(void)
         ct_maketest(cpu_adc_absy_pagecross),
         ct_maketest(cpu_and_absy),
         ct_maketest(cpu_and_absy_pagecross),
+        ct_maketest(cpu_cmp_absy),
+        ct_maketest(cpu_cmp_absy_pagecross),
         ct_maketest(cpu_eor_absy),
         ct_maketest(cpu_eor_absy_pagecross),
         ct_maketest(cpu_lda_absy),

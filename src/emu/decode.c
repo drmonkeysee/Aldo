@@ -206,11 +206,11 @@ const struct decoded Decode[] = {
     {IN_LDX, AM_ABSY},    // BE - LDX abs,Y
     UNK,    // BF - Unofficial
     UNK,    // C0 - CPY imm
-    UNK,    // C1 - CMP (zp,X)
+    {IN_CMP, AM_INDX},    // C1 - CMP (zp,X)
     UNK,    // C2 - Unofficial
     UNK,    // C3 - Unofficial
     UNK,    // C4 - CPY zp
-    UNK,    // C5 - CMP zp
+    {IN_CMP, AM_ZP},    // C5 - CMP zp
     UNK,    // C6 - DEC zp
     UNK,    // C7 - Unofficial
     {IN_INY, AM_IMP},    // C8 - INY
@@ -218,23 +218,23 @@ const struct decoded Decode[] = {
     {IN_DEX, AM_IMP},    // CA - DEX
     UNK,    // CB - Unofficial
     UNK,    // CC - CPY abs
-    UNK,    // CD - CMP abs
+    {IN_CMP, AM_ABS},    // CD - CMP abs
     UNK,    // CE - DEC abs
     UNK,    // CF - Unofficial
     UNK,    // D0 - BNE
-    UNK,    // D1 - CMP (zp),Y
+    {IN_CMP, AM_INDY},    // D1 - CMP (zp),Y
     UNK,    // D2 - Unofficial
     UNK,    // D3 - Unofficial
     UNK,    // D4 - Unofficial
-    UNK,    // D5 - CMP zp,X
+    {IN_CMP, AM_ZPX},    // D5 - CMP zp,X
     UNK,    // D6 - DEC zp,X
     UNK,    // D7 - Unofficial
     {IN_CLD, AM_IMP},    // D8 - CLD
-    UNK,    // D9 - CMP abs,Y
+    {IN_CMP, AM_ABSY},    // D9 - CMP abs,Y
     UNK,    // DA - Unofficial
     UNK,    // DB - Unofficial
     UNK,    // DC - Unofficial
-    UNK,    // DD - CMP abs,X
+    {IN_CMP, AM_ABSX},    // DD - CMP abs,X
     UNK,    // DE - DEC abs,X
     UNK,    // DF - Unofficial
     UNK,    // E0 - CPX imm

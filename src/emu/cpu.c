@@ -213,7 +213,7 @@ static void CLV_exec(struct mos6502 *self, struct decoded dec)
 // see SBC_exec for why this works.
 static void CMP_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)dec;
+    if (addr_carry_delayed(self, dec)) return;
     const uint16_t cmp = self->a + ((uint8_t)~self->databus + 1);
     self->p.c = cmp >> 8;
     update_z(self, cmp);

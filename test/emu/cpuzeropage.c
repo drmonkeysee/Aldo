@@ -53,6 +53,25 @@ static void cpu_and_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void cpu_cmp_zp(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xc5, 0x4, 0xff, 0xff, 0x10};
+    cpu.a = 0x10;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void cpu_eor_zp(void *ctx)
 {
     struct mos6502 cpu;
@@ -243,6 +262,46 @@ static void cpu_and_zpx_pageoverflow(void *ctx)
     ct_assertequal(0x22u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_cmp_zpx(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xd5, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x10};
+    cpu.a = 0x10;
+    cpu.ram = mem;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_cmp_zpx_pageoverflow(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xd5, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x10};
+    cpu.a = 0x10;
+    cpu.ram = mem;
+    cpu.x = 0xff;   // NOTE: wrap around from $0003 -> $0002
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_eor_zpx(void *ctx)
@@ -486,6 +545,7 @@ struct ct_testsuite cpu_zeropage_tests(void)
     static const struct ct_testcase tests[] = {
         ct_maketest(cpu_adc_zp),
         ct_maketest(cpu_and_zp),
+        ct_maketest(cpu_cmp_zp),
         ct_maketest(cpu_eor_zp),
         ct_maketest(cpu_lda_zp),
         ct_maketest(cpu_ldx_zp),
@@ -497,6 +557,8 @@ struct ct_testsuite cpu_zeropage_tests(void)
         ct_maketest(cpu_adc_zpx_pageoverflow),
         ct_maketest(cpu_and_zpx),
         ct_maketest(cpu_and_zpx_pageoverflow),
+        ct_maketest(cpu_cmp_zpx),
+        ct_maketest(cpu_cmp_zpx_pageoverflow),
         ct_maketest(cpu_eor_zpx),
         ct_maketest(cpu_eor_zpx_pageoverflow),
         ct_maketest(cpu_lda_zpx),

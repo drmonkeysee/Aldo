@@ -56,9 +56,9 @@ static void set_p(struct mos6502 *self, uint8_t p)
     self->p.n = p & 0x80;
 }
 
-static void update_z(struct mos6502 *self, uint8_t r)
+static void update_z(struct mos6502 *self, uint8_t d)
 {
-    self->p.z = r == 0;
+    self->p.z = d == 0;
 }
 
 // NOTE: signed overflow happens when positive + positive = negative
@@ -71,9 +71,9 @@ static void update_v(struct mos6502 *self, uint8_t r, uint8_t a, uint8_t b)
     self->p.v = (a ^ r) & (b ^ r) & 0x80;
 }
 
-static void update_n(struct mos6502 *self, uint8_t r)
+static void update_n(struct mos6502 *self, uint8_t d)
 {
-    self->p.n = r & 0x80;
+    self->p.n = d & 0x80;
 }
 
 //

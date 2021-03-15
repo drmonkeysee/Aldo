@@ -80,6 +80,12 @@ static void update_n(struct mos6502 *self, uint8_t d)
 // Instruction Execution
 //
 
+// NOTE: compute ones- or twos-complement of D, including any carry-out
+static uint16_t complement(uint8_t d, bool twos)
+{
+    return (uint8_t)~d + twos;
+}
+
 static void load_register(struct mos6502 *self, uint8_t *r, uint8_t d)
 {
     *r = d;
@@ -109,7 +115,7 @@ static void arithmetic_sum(struct mos6502 *self, uint16_t b)
 // see SBC_exec for why this works.
 static void compare_register(struct mos6502 *self, uint8_t r)
 {
-    const uint16_t cmp = r + ((uint8_t)~self->databus + 1);
+    const uint16_t cmp = r + complement(self->databus, true);
     self->p.c = cmp >> 8;
     update_z(self, cmp);
     update_n(self, cmp);
@@ -384,7 +390,7 @@ static void RTS_exec(struct mos6502 *self, struct decoded dec)
 static void SBC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (addr_carry_delayed(self, dec)) return;
-    arithmetic_sum(self, (uint8_t)~self->databus + self->p.c);
+    arithmetic_sum(self, complement(self->databus, self->p.c));
     self->presync = true;
 }
 

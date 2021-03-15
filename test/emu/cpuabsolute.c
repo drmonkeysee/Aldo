@@ -280,6 +280,44 @@ static void cpu_sta_abs(void *ctx)
     ct_assertequal(0xau, mem[516]);
 }
 
+static void cpu_stx_abs(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {
+        0x8e, 0x4, 0x2,
+        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+    };
+    cpu.x = 0xf1;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xf1u, mem[516]);
+}
+
+static void cpu_sty_abs(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {
+        0x8c, 0x4, 0x2,
+        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+    };
+    cpu.y = 0x84;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x84u, mem[516]);
+}
+
 //
 // Absolute,X Instructions
 //
@@ -1062,6 +1100,8 @@ struct ct_testsuite cpu_absolute_tests(void)
         ct_maketest(cpu_ora_abs),
         ct_maketest(cpu_sbc_abs),
         ct_maketest(cpu_sta_abs),
+        ct_maketest(cpu_stx_abs),
+        ct_maketest(cpu_sty_abs),
 
         ct_maketest(cpu_adc_absx),
         ct_maketest(cpu_adc_absx_pagecross),

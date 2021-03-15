@@ -145,25 +145,25 @@ const struct decoded Decode[] = {
     {IN_STA, AM_INDX},    // 81 - STA (zp,X)
     UNK,    // 82 - Unofficial
     UNK,    // 83 - Unofficial
-    UNK,    // 84 - STY zp
+    {IN_STY, AM_ZP},    // 84 - STY zp
     {IN_STA, AM_ZP},    // 85 - STA zp
-    UNK,    // 86 - STX zp
+    {IN_STX, AM_ZP},    // 86 - STX zp
     UNK,    // 87 - Unofficial
     {IN_DEY, AM_IMP},    // 88 - DEY
     UNK,    // 89 - Unofficial
     {IN_TXA, AM_IMP},    // 8A - TXA
     UNK,    // 8B - Unofficial
-    UNK,    // 8C - STY abs
+    {IN_STY, AM_ABS},    // 8C - STY abs
     {IN_STA, AM_ABS},    // 8D - STA abs
-    UNK,    // 8E - STX abs
+    {IN_STX, AM_ABS},    // 8E - STX abs
     UNK,    // 8F - Unofficial
     UNK,    // 90 - BCC
     {IN_STA, AM_INDY},    // 91 - STA (zp),Y
     UNK,    // 92 - Unofficial
     UNK,    // 93 - Unofficial
-    UNK,    // 94 - STY zp,X
+    {IN_STY, AM_ZPX},    // 94 - STY zp,X
     {IN_STA, AM_ZPX},    // 95 - STA zp,X
-    UNK,    // 96 - STX zp,Y
+    {IN_STX, AM_ZPY},    // 96 - STX zp,Y
     UNK,    // 97 - Unofficial
     {IN_TYA, AM_IMP},    // 98 - TYA
     {IN_STA, AM_ABSY},    // 99 - STA abs,Y

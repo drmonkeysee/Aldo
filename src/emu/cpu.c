@@ -135,6 +135,13 @@ static void compare_register(struct mos6502 *self, uint8_t r)
     update_n(self, cmp);
 }
 
+static void store_data(struct mos6502 *self, uint8_t d)
+{
+    self->signal.rw = false;
+    self->databus = d;
+    write(self);
+}
+
 static void UNK_exec(struct mos6502 *self, struct decoded dec)
 {
     (void)dec;
@@ -432,20 +439,20 @@ static void SEI_exec(struct mos6502 *self, struct decoded dec)
 static void STA_exec(struct mos6502 *self, struct decoded dec)
 {
     if (addr_carry_delayed(self, dec, true)) return;
-    self->signal.rw = false;
-    self->databus = self->a;
-    write(self);
+    store_data(self, self->a);
     self->presync = true;
 }
 
 static void STX_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    store_data(self, self->x);
+    self->presync = true;
 }
 
 static void STY_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    store_data(self, self->y);
+    self->presync = true;
 }
 
 static void TAX_exec(struct mos6502 *self, struct decoded dec)

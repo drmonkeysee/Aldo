@@ -38,7 +38,7 @@ static void cpu_adc_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_adc_indx_pagecross(void *ctx)
+static void cpu_adc_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -82,7 +82,7 @@ static void cpu_and_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_indx_pagecross(void *ctx)
+static void cpu_and_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -125,7 +125,7 @@ static void cpu_cmp_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_cmp_indx_pagecross(void *ctx)
+static void cpu_cmp_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -168,7 +168,7 @@ static void cpu_eor_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_eor_indx_pagecross(void *ctx)
+static void cpu_eor_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -209,7 +209,7 @@ static void cpu_lda_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lda_indx_pagecross(void *ctx)
+static void cpu_lda_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -250,7 +250,7 @@ static void cpu_ora_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_indx_pagecross(void *ctx)
+static void cpu_ora_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -295,7 +295,7 @@ static void cpu_sbc_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sbc_indx_pagecross(void *ctx)
+static void cpu_sbc_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -339,7 +339,7 @@ static void cpu_sta_indx(void *ctx)
     ct_assertequal(0xau, mem[11]);
 }
 
-static void cpu_sta_indx_pagecross(void *ctx)
+static void cpu_sta_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -709,21 +709,21 @@ struct ct_testsuite cpu_indirect_tests(void)
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(cpu_adc_indx),
-        ct_maketest(cpu_adc_indx_pagecross),
+        ct_maketest(cpu_adc_indx_pageoverflow),
         ct_maketest(cpu_and_indx),
-        ct_maketest(cpu_and_indx_pagecross),
+        ct_maketest(cpu_and_indx_pageoverflow),
         ct_maketest(cpu_cmp_indx),
-        ct_maketest(cpu_cmp_indx_pagecross),
+        ct_maketest(cpu_cmp_indx_pageoverflow),
         ct_maketest(cpu_eor_indx),
-        ct_maketest(cpu_eor_indx_pagecross),
+        ct_maketest(cpu_eor_indx_pageoverflow),
         ct_maketest(cpu_lda_indx),
-        ct_maketest(cpu_lda_indx_pagecross),
+        ct_maketest(cpu_lda_indx_pageoverflow),
         ct_maketest(cpu_ora_indx),
-        ct_maketest(cpu_ora_indx_pagecross),
+        ct_maketest(cpu_ora_indx_pageoverflow),
         ct_maketest(cpu_sbc_indx),
-        ct_maketest(cpu_sbc_indx_pagecross),
+        ct_maketest(cpu_sbc_indx_pageoverflow),
         ct_maketest(cpu_sta_indx),
-        ct_maketest(cpu_sta_indx_pagecross),
+        ct_maketest(cpu_sta_indx_pageoverflow),
 
         ct_maketest(cpu_adc_indy),
         ct_maketest(cpu_adc_indy_pagecross),

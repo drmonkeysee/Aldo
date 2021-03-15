@@ -319,6 +319,46 @@ static void cpu_sbc_indx_pagecross(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void cpu_sta_indx(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {
+        0x81, 0x2, 0xff, 0xff, 0xff, 0xff, 0xb, 0x0,
+        0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    };
+    cpu.a = 0xa;
+    cpu.ram = mem;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xau, mem[11]);
+}
+
+static void cpu_sta_indx_pagecross(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {
+        0x81, 0x8, 0x0, 0xff, 0xff, 0xff, 0xff, 0xa,
+        0x0, 0x0, 0x0, 0x0, 0x0,
+    };
+    cpu.a = 0xa;
+    cpu.ram = mem;
+    cpu.x = 0xff;   // NOTE: wrap around from $0008 -> $0007
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xau, mem[10]);
+}
+
 //
 // (Indirect),Y Instructions
 //
@@ -620,6 +660,47 @@ static void cpu_sbc_indy_pagecross(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void cpu_sta_indy(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {
+        0x91, 0x2, 0x4, 0x0,
+        0x0, 0x0, 0x0, 0x0, 0x0
+    };
+    cpu.a = 0xa;
+    cpu.ram = mem;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xau, mem[7]);
+}
+
+static void cpu_sta_indy_pagecross(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {
+        0x91, 0x2, 0xff, 0x0,
+        [256] = 0x0, [257] = 0x0, [258] = 0x0, [259] = 0x0,
+    };
+    cpu.a = 0xa;
+    cpu.ram = mem;
+    cpu.cart = bigrom;
+    cpu.y = 3;  // NOTE: cross boundary from $00FF -> $0102
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xau, mem[258]);
+}
+
 //
 // Test List
 //
@@ -641,6 +722,8 @@ struct ct_testsuite cpu_indirect_tests(void)
         ct_maketest(cpu_ora_indx_pagecross),
         ct_maketest(cpu_sbc_indx),
         ct_maketest(cpu_sbc_indx_pagecross),
+        ct_maketest(cpu_sta_indx),
+        ct_maketest(cpu_sta_indx_pagecross),
 
         ct_maketest(cpu_adc_indy),
         ct_maketest(cpu_adc_indy_pagecross),
@@ -656,6 +739,8 @@ struct ct_testsuite cpu_indirect_tests(void)
         ct_maketest(cpu_ora_indy_pagecross),
         ct_maketest(cpu_sbc_indy),
         ct_maketest(cpu_sbc_indy_pagecross),
+        ct_maketest(cpu_sta_indy),
+        ct_maketest(cpu_sta_indy_pagecross),
     };
 
     return ct_makesuite(tests);

@@ -19,12 +19,25 @@ static const int PreFetch = -1;     // Sentinel value for cycle count
 
 static void read(struct mos6502 *self)
 {
+    assert(self->signal.rw);
+
     if (self->addrbus <= CpuRamMaxAddr) {
         self->databus = self->ram[self->addrbus & CpuRamAddrMask];
         return;
     }
     if (CpuCartMinAddr <= self->addrbus && self->addrbus <= CpuCartMaxAddr) {
         self->databus = self->cart[self->addrbus & CpuCartAddrMask];
+        return;
+    }
+    self->dflt = true;
+}
+
+static void write(struct mos6502 *self)
+{
+    assert(!self->signal.rw);
+
+    if (self->addrbus <= CpuRamMaxAddr) {
+        self->ram[self->addrbus & CpuRamAddrMask] = self->databus;
         return;
     }
     self->dflt = true;
@@ -93,11 +106,12 @@ static void load_register(struct mos6502 *self, uint8_t *r, uint8_t d)
     update_n(self, *r);
 }
 
-static bool addr_carry_delayed(const struct mos6502 *self, struct decoded dec)
+static bool addr_carry_delayed(const struct mos6502 *self, struct decoded dec,
+                               bool c)
 {
     if ((dec.mode == AM_INDY && self->t == 4)
         || ((dec.mode == AM_ABSX || dec.mode == AM_ABSY)
-            && self->t == 3)) return self->adc;
+            && self->t == 3)) return c;
     return false;
 }
 
@@ -130,14 +144,14 @@ static void UNK_exec(struct mos6502 *self, struct decoded dec)
 // NOTE: add with carry-in; A + D + C
 static void ADC_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec)) return;
+    if (addr_carry_delayed(self, dec, self->adc)) return;
     arithmetic_sum(self, self->databus + self->p.c);
     self->presync = true;
 }
 
 static void AND_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec)) return;
+    if (addr_carry_delayed(self, dec, self->adc)) return;
     load_register(self, &self->a, self->a & self->databus);
     self->presync = true;
 }
@@ -231,7 +245,7 @@ static void CLV_exec(struct mos6502 *self, struct decoded dec)
 
 static void CMP_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec)) return;
+    if (addr_carry_delayed(self, dec, self->adc)) return;
     compare_register(self, self->a);
     self->presync = true;
 }
@@ -271,7 +285,7 @@ static void DEY_exec(struct mos6502 *self, struct decoded dec)
 
 static void EOR_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec)) return;
+    if (addr_carry_delayed(self, dec, self->adc)) return;
     load_register(self, &self->a, self->a ^ self->databus);
     self->presync = true;
 }
@@ -307,21 +321,21 @@ static void JSR_exec(struct mos6502 *self, struct decoded dec)
 
 static void LDA_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec)) return;
+    if (addr_carry_delayed(self, dec, self->adc)) return;
     load_register(self, &self->a, self->databus);
     self->presync = true;
 }
 
 static void LDX_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec)) return;
+    if (addr_carry_delayed(self, dec, self->adc)) return;
     load_register(self, &self->x, self->databus);
     self->presync = true;
 }
 
 static void LDY_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec)) return;
+    if (addr_carry_delayed(self, dec, self->adc)) return;
     load_register(self, &self->y, self->databus);
     self->presync = true;
 }
@@ -339,7 +353,7 @@ static void NOP_exec(struct mos6502 *self, struct decoded dec)
 
 static void ORA_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec)) return;
+    if (addr_carry_delayed(self, dec, self->adc)) return;
     load_register(self, &self->a, self->a | self->databus);
     self->presync = true;
 }
@@ -389,7 +403,7 @@ static void RTS_exec(struct mos6502 *self, struct decoded dec)
 // C = 0 is thus a borrow-out; A + (~D + 0) => A + ~D => A - D - 1.
 static void SBC_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec)) return;
+    if (addr_carry_delayed(self, dec, self->adc)) return;
     arithmetic_sum(self, complement(self->databus, self->p.c));
     self->presync = true;
 }
@@ -417,7 +431,11 @@ static void SEI_exec(struct mos6502 *self, struct decoded dec)
 
 static void STA_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    if (addr_carry_delayed(self, dec, true)) return;
+    self->signal.rw = false;
+    self->databus = self->a;
+    write(self);
+    self->presync = true;
 }
 
 static void STX_exec(struct mos6502 *self, struct decoded dec)

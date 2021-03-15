@@ -16,7 +16,6 @@ const uint8_t bigrom[] = {
     [261] = 0xb5, [262] = 0xb6, [263] = 0xb7,
 };
 
-
 void setup_cpu(struct mos6502 *cpu)
 {
     cpu_powerup(cpu);

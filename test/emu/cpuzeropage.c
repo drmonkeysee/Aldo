@@ -427,6 +427,22 @@ static void cpu_sbc_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void cpu_sta_zp(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x85, 0x4, 0xff, 0xff, 0x0};
+    cpu.a = 0xa;
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xau, mem[4]);
+}
+
 //
 // Zero-Page,X Instructions
 //
@@ -743,6 +759,40 @@ static void cpu_sbc_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void cpu_sta_zpx(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x95, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0};
+    cpu.a = 0xa;
+    cpu.ram = mem;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xau, mem[7]);
+}
+
+static void cpu_sta_zpx_pageoverflow(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x95, 0x3, 0x8, 0xff, 0xff, 0xff, 0xff, 0x6};
+    cpu.a = 0xa;
+    cpu.ram = mem;
+    cpu.x = 0xff;   // NOTE: wrap around from $0003 -> $0002
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xau, mem[2]);
+}
+
 //
 // Zero-Page,Y Instructions
 //
@@ -812,6 +862,7 @@ struct ct_testsuite cpu_zeropage_tests(void)
         ct_maketest(cpu_ldy_zp),
         ct_maketest(cpu_ora_zp),
         ct_maketest(cpu_sbc_zp),
+        ct_maketest(cpu_sta_zp),
 
         ct_maketest(cpu_adc_zpx),
         ct_maketest(cpu_adc_zpx_pageoverflow),
@@ -829,6 +880,8 @@ struct ct_testsuite cpu_zeropage_tests(void)
         ct_maketest(cpu_ora_zpx_pageoverflow),
         ct_maketest(cpu_sbc_zpx),
         ct_maketest(cpu_sbc_zpx_pageoverflow),
+        ct_maketest(cpu_sta_zpx),
+        ct_maketest(cpu_sta_zpx_pageoverflow),
 
         ct_maketest(cpu_ldx_zpy),
         ct_maketest(cpu_ldx_zpy_pageoverflow),

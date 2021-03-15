@@ -142,11 +142,11 @@ const struct decoded Decode[] = {
     UNK,    // 7E - ROR abs,X
     UNK,    // 7F - Unofficial
     UNK,    // 80 - Unofficial
-    UNK,    // 81 - STA (zp,X)
+    {IN_STA, AM_INDX},    // 81 - STA (zp,X)
     UNK,    // 82 - Unofficial
     UNK,    // 83 - Unofficial
     UNK,    // 84 - STY zp
-    UNK,    // 85 - STA zp
+    {IN_STA, AM_ZP},    // 85 - STA zp
     UNK,    // 86 - STX zp
     UNK,    // 87 - Unofficial
     {IN_DEY, AM_IMP},    // 88 - DEY
@@ -154,23 +154,23 @@ const struct decoded Decode[] = {
     {IN_TXA, AM_IMP},    // 8A - TXA
     UNK,    // 8B - Unofficial
     UNK,    // 8C - STY abs
-    UNK,    // 8D - STA abs
+    {IN_STA, AM_ABS},    // 8D - STA abs
     UNK,    // 8E - STX abs
     UNK,    // 8F - Unofficial
     UNK,    // 90 - BCC
-    UNK,    // 91 - STA (zp),Y
+    {IN_STA, AM_INDY},    // 91 - STA (zp),Y
     UNK,    // 92 - Unofficial
     UNK,    // 93 - Unofficial
     UNK,    // 94 - STY zp,X
-    UNK,    // 95 - STA zp,X
+    {IN_STA, AM_ZPX},    // 95 - STA zp,X
     UNK,    // 96 - STX zp,Y
     UNK,    // 97 - Unofficial
     {IN_TYA, AM_IMP},    // 98 - TYA
-    UNK,    // 99 - STA abs,Y
+    {IN_STA, AM_ABSY},    // 99 - STA abs,Y
     {IN_TXS, AM_IMP},    // 9A - TXS
     UNK,    // 9B - Unofficial
     UNK,    // 9C - Unofficial
-    UNK,    // 9D - STA abs,X
+    {IN_STA, AM_ABSX},    // 9D - STA abs,X
     UNK,    // 9E - Unofficial
     UNK,    // 9F - Unofficial
     {IN_LDY, AM_IMM},    // A0 - LDY imm

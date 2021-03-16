@@ -113,15 +113,6 @@ static void store_register(struct mos6502 *self, uint8_t r)
     write(self);
 }
 
-static bool addr_carry_delayed(const struct mos6502 *self, struct decoded dec,
-                               bool c)
-{
-    if ((dec.mode == AM_INDY && self->t == 4)
-        || ((dec.mode == AM_ABSX || dec.mode == AM_ABSY)
-            && self->t == 3)) return c;
-    return false;
-}
-
 // NOTE: A + B; B is u16 as it may contain a carry-out
 static void arithmetic_sum(struct mos6502 *self, uint16_t b)
 {
@@ -151,14 +142,12 @@ static void UNK_exec(struct mos6502 *self, struct decoded dec)
 // NOTE: add with carry-in; A + D + C
 static void ADC_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec, self->adc)) return;
     arithmetic_sum(self, self->databus + self->p.c);
     self->presync = true;
 }
 
 static void AND_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec, self->adc)) return;
     load_register(self, &self->a, self->a & self->databus);
     self->presync = true;
 }
@@ -252,7 +241,6 @@ static void CLV_exec(struct mos6502 *self, struct decoded dec)
 
 static void CMP_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec, self->adc)) return;
     compare_register(self, self->a);
     self->presync = true;
 }
@@ -292,7 +280,6 @@ static void DEY_exec(struct mos6502 *self, struct decoded dec)
 
 static void EOR_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec, self->adc)) return;
     load_register(self, &self->a, self->a ^ self->databus);
     self->presync = true;
 }
@@ -328,21 +315,18 @@ static void JSR_exec(struct mos6502 *self, struct decoded dec)
 
 static void LDA_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec, self->adc)) return;
     load_register(self, &self->a, self->databus);
     self->presync = true;
 }
 
 static void LDX_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec, self->adc)) return;
     load_register(self, &self->x, self->databus);
     self->presync = true;
 }
 
 static void LDY_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec, self->adc)) return;
     load_register(self, &self->y, self->databus);
     self->presync = true;
 }
@@ -360,7 +344,6 @@ static void NOP_exec(struct mos6502 *self, struct decoded dec)
 
 static void ORA_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec, self->adc)) return;
     load_register(self, &self->a, self->a | self->databus);
     self->presync = true;
 }
@@ -410,7 +393,6 @@ static void RTS_exec(struct mos6502 *self, struct decoded dec)
 // C = 0 is thus a borrow-out; A + (~D + 0) => A + ~D => A - D - 1.
 static void SBC_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec, self->adc)) return;
     arithmetic_sum(self, complement(self->databus, self->p.c));
     self->presync = true;
 }
@@ -438,7 +420,6 @@ static void SEI_exec(struct mos6502 *self, struct decoded dec)
 
 static void STA_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (addr_carry_delayed(self, dec, true)) return;
     store_register(self, self->a);
     self->presync = true;
 }
@@ -514,6 +495,36 @@ static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 
 #define BAD_ADDR_SEQ assert(((void)"BAD ADDRMODE SEQUENCE", false))
 
+// NOTE: all read-modify-write instructions have a miswrite cycle
+static bool mem_write_delayed(const struct mos6502 *self, struct decoded dec)
+{
+    switch (dec.instruction) {
+    case IN_ASL:
+    case IN_DEC:
+    case IN_INC:
+    case IN_LSR:
+    case IN_ROL:
+    case IN_ROR:
+        return true;
+    default:
+        return false;
+    }
+}
+
+// NOTE: store and read-modify-write instructions have a dead read cycle,
+// load instructions have a dead read when address high has a carry-in.
+static bool mem_read_delayed(const struct mos6502 *self, struct decoded dec)
+{
+    switch (dec.instruction) {
+    case IN_STA:
+    case IN_STX:
+    case IN_STY:
+        return true;
+    default:
+        return mem_write_delayed(self, dec) || self->adc;
+    }
+}
+
 static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
                              uint8_t index)
 {
@@ -558,8 +569,11 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
     case 3:
         self->addrbus = bytowr(self->ada, self->adb);
         read(self);
-        dispatch_instruction(self, dec);
-        self->adb += self->adc;
+        if (mem_read_delayed(self, dec)) {
+            self->adb += self->adc;
+        } else {
+            dispatch_instruction(self, dec);
+        }
         break;
     case 4:
         self->addrbus = bytowr(self->ada, self->adb);
@@ -675,8 +689,11 @@ static void INDY_sequence(struct mos6502 *self, struct decoded dec)
     case 4:
         self->addrbus = bytowr(self->adb, self->ada);
         read(self);
-        dispatch_instruction(self, dec);
-        self->ada += self->adc;
+        if (mem_read_delayed(self, dec)) {
+            self->ada += self->adc;
+        } else {
+            dispatch_instruction(self, dec);
+        }
         break;
     case 5:
         self->addrbus = bytowr(self->adb, self->ada);

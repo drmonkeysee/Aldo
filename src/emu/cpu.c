@@ -504,7 +504,7 @@ static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 #define BAD_ADDR_SEQ assert(((void)"BAD ADDRMODE SEQUENCE", false))
 
 // NOTE: all read-modify-write instructions have a miswrite cycle
-static bool mem_write_delayed(const struct mos6502 *self, struct decoded dec)
+static bool mem_write_delayed(struct decoded dec)
 {
     switch (dec.instruction) {
     case IN_ASL:
@@ -529,7 +529,7 @@ static bool mem_read_delayed(const struct mos6502 *self, struct decoded dec)
     case IN_STY:
         return true;
     default:
-        return mem_write_delayed(self, dec) || self->adc;
+        return mem_write_delayed(dec) || self->adc;
     }
 }
 

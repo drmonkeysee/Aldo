@@ -76,12 +76,12 @@ static void update_z(struct mos6502 *self, uint8_t d)
 
 // NOTE: signed overflow happens when positive + positive = negative
 // or negative + negative = positive, i.e. the sign of A does not match
-// the sign of R and the sign of B does not match the sign of R:
-// (Sign A ^ Sign R) & (Sign B ^ Sign R) or
-// (A ^ R) & (B ^ R) & SignMask
-static void update_v(struct mos6502 *self, uint8_t r, uint8_t a, uint8_t b)
+// the sign of S and the sign of B does not match the sign of S:
+// (Sign A ^ Sign S) & (Sign B ^ Sign S) or
+// (A ^ S) & (B ^ S) & SignMask
+static void update_v(struct mos6502 *self, uint8_t s, uint8_t a, uint8_t b)
 {
-    self->p.v = (a ^ r) & (b ^ r) & 0x80;
+    self->p.v = (a ^ s) & (b ^ s) & 0x80;
 }
 
 static void update_n(struct mos6502 *self, uint8_t d)

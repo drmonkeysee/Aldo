@@ -127,11 +127,16 @@ static void arithmetic_sum(struct mos6502 *self, uint16_t b)
 // see SBC_exec for why this works.
 static void compare_register(struct mos6502 *self, uint8_t r)
 {
+    read(self);
     const uint16_t cmp = r + complement(self->databus, true);
     self->p.c = cmp >> 8;
     update_z(self, cmp);
     update_n(self, cmp);
 }
+
+// NOTE: all 6502 cycles are either a read or a write, some of them discarded
+// depending on the instruction and addressing-mode timing; these extra reads
+// and writes are all modeled below to help verify cycle-accurate behavior.
 
 static void UNK_exec(struct mos6502 *self)
 {
@@ -242,21 +247,18 @@ static void CLV_exec(struct mos6502 *self)
 
 static void CMP_exec(struct mos6502 *self)
 {
-    read(self);
     compare_register(self, self->a);
     self->presync = true;
 }
 
 static void CPX_exec(struct mos6502 *self)
 {
-    read(self);
     compare_register(self, self->x);
     self->presync = true;
 }
 
 static void CPY_exec(struct mos6502 *self)
 {
-    read(self);
     compare_register(self, self->y);
     self->presync = true;
 }

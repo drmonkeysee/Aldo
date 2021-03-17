@@ -141,12 +141,14 @@ static void UNK_exec(struct mos6502 *self)
 // NOTE: add with carry-in; A + D + C
 static void ADC_exec(struct mos6502 *self)
 {
+    read(self);
     arithmetic_sum(self, self->databus + self->p.c);
     self->presync = true;
 }
 
 static void AND_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->a, self->a & self->databus);
     self->presync = true;
 }
@@ -173,6 +175,7 @@ static void BEQ_exec(struct mos6502 *self)
 
 static void BIT_exec(struct mos6502 *self)
 {
+    read(self);
     update_z(self, self->a & self->databus);
     self->p.v = self->databus & 0x40;
     update_n(self, self->databus);
@@ -211,42 +214,49 @@ static void BVS_exec(struct mos6502 *self)
 
 static void CLC_exec(struct mos6502 *self)
 {
+    read(self);
     self->p.c = false;
     self->presync = true;
 }
 
 static void CLD_exec(struct mos6502 *self)
 {
+    read(self);
     self->p.d = false;
     self->presync = true;
 }
 
 static void CLI_exec(struct mos6502 *self)
 {
+    read(self);
     self->p.i = false;
     self->presync = true;
 }
 
 static void CLV_exec(struct mos6502 *self)
 {
+    read(self);
     self->p.v = false;
     self->presync = true;
 }
 
 static void CMP_exec(struct mos6502 *self)
 {
+    read(self);
     compare_register(self, self->a);
     self->presync = true;
 }
 
 static void CPX_exec(struct mos6502 *self)
 {
+    read(self);
     compare_register(self, self->x);
     self->presync = true;
 }
 
 static void CPY_exec(struct mos6502 *self)
 {
+    read(self);
     compare_register(self, self->y);
     self->presync = true;
 }
@@ -258,18 +268,21 @@ static void DEC_exec(struct mos6502 *self)
 
 static void DEX_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->x, self->x - 1);
     self->presync = true;
 }
 
 static void DEY_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->y, self->y - 1);
     self->presync = true;
 }
 
 static void EOR_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->a, self->a ^ self->databus);
     self->presync = true;
 }
@@ -281,12 +294,14 @@ static void INC_exec(struct mos6502 *self)
 
 static void INX_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->x, self->x + 1);
     self->presync = true;
 }
 
 static void INY_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->y, self->y + 1);
     self->presync = true;
 }
@@ -303,18 +318,21 @@ static void JSR_exec(struct mos6502 *self)
 
 static void LDA_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->a, self->databus);
     self->presync = true;
 }
 
 static void LDX_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->x, self->databus);
     self->presync = true;
 }
 
 static void LDY_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->y, self->databus);
     self->presync = true;
 }
@@ -326,11 +344,13 @@ static void LSR_exec(struct mos6502 *self)
 
 static void NOP_exec(struct mos6502 *self)
 {
+    read(self);
     self->presync = true;
 }
 
 static void ORA_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->a, self->a | self->databus);
     self->presync = true;
 }
@@ -380,24 +400,28 @@ static void RTS_exec(struct mos6502 *self)
 // C = 0 is thus a borrow-out; A + (~D + 0) => A + ~D => A - D - 1.
 static void SBC_exec(struct mos6502 *self)
 {
+    read(self);
     arithmetic_sum(self, complement(self->databus, self->p.c));
     self->presync = true;
 }
 
 static void SEC_exec(struct mos6502 *self)
 {
+    read(self);
     self->p.c = true;
     self->presync = true;
 }
 
 static void SED_exec(struct mos6502 *self)
 {
+    read(self);
     self->p.d = true;
     self->presync = true;
 }
 
 static void SEI_exec(struct mos6502 *self)
 {
+    read(self);
     self->p.i = true;
     self->presync = true;
 }
@@ -422,36 +446,42 @@ static void STY_exec(struct mos6502 *self)
 
 static void TAX_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->x, self->a);
     self->presync = true;
 }
 
 static void TAY_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->y, self->a);
     self->presync = true;
 }
 
 static void TSX_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->x, self->s);
     self->presync = true;
 }
 
 static void TXA_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->a, self->x);
     self->presync = true;
 }
 
 static void TXS_exec(struct mos6502 *self)
 {
+    read(self);
     self->s = self->x;
     self->presync = true;
 }
 
 static void TYA_exec(struct mos6502 *self)
 {
+    read(self);
     load_register(self, &self->a, self->y);
     self->presync = true;
 }
@@ -520,7 +550,6 @@ static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
         break;
     case 3:
         self->addrbus = bytowr(self->ada, 0x0);
-        read(self);
         dispatch_instruction(self, dec);
         break;
     default:
@@ -546,8 +575,8 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
         break;
     case 3:
         self->addrbus = bytowr(self->ada, self->adb);
-        read(self);
         if (mem_read_delayed(self, dec)) {
+            read(self);
             self->adb += self->adc;
         } else {
             dispatch_instruction(self, dec);
@@ -555,7 +584,6 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
         break;
     case 4:
         self->addrbus = bytowr(self->ada, self->adb);
-        read(self);
         dispatch_instruction(self, dec);
         break;
     default:
@@ -567,9 +595,7 @@ static void IMP_sequence(struct mos6502 *self, struct decoded dec)
 {
     assert(self->t == 1);
 
-    // NOTE: implied mode dead read
     self->addrbus = self->pc;
-    read(self);
     dispatch_instruction(self, dec);
 }
 
@@ -578,7 +604,6 @@ static void IMM_sequence(struct mos6502 *self, struct decoded dec)
     assert(self->t == 1);
 
     self->addrbus = self->pc++;
-    read(self);
     dispatch_instruction(self, dec);
 }
 
@@ -592,7 +617,6 @@ static void ZP_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 2:
         self->addrbus = bytowr(self->ada, 0x0);
-        read(self);
         dispatch_instruction(self, dec);
         break;
     default:
@@ -636,7 +660,6 @@ static void INDX_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 5:
         self->addrbus = bytowr(self->adb, self->ada);
-        read(self);
         dispatch_instruction(self, dec);
         break;
     default:
@@ -666,8 +689,8 @@ static void INDY_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 4:
         self->addrbus = bytowr(self->adb, self->ada);
-        read(self);
         if (mem_read_delayed(self, dec)) {
+            read(self);
             self->ada += self->adc;
         } else {
             dispatch_instruction(self, dec);
@@ -675,7 +698,6 @@ static void INDY_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 5:
         self->addrbus = bytowr(self->adb, self->ada);
-        read(self);
         dispatch_instruction(self, dec);
         break;
     default:
@@ -698,7 +720,6 @@ static void ABS_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 3:
         self->addrbus = bytowr(self->ada, self->adb);
-        read(self);
         dispatch_instruction(self, dec);
         break;
     default:

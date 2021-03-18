@@ -134,6 +134,15 @@ static void compare_register(struct mos6502 *self, uint8_t r)
     update_n(self, cmp);
 }
 
+static void modify_mem(struct mos6502 *self, uint8_t d)
+{
+    self->signal.rw = false;
+    self->databus = d;
+    write(self);
+    update_z(self, d);
+    update_n(self, d);
+}
+
 // NOTE: all 6502 cycles are either a read or a write, some of them discarded
 // depending on the instruction and addressing-mode timing; these extra reads
 // and writes are all modeled below to help verify cycle-accurate behavior.
@@ -265,7 +274,8 @@ static void CPY_exec(struct mos6502 *self)
 
 static void DEC_exec(struct mos6502 *self)
 {
-    (void)self;
+    modify_mem(self, self->databus - 1);
+    self->presync = true;
 }
 
 static void DEX_exec(struct mos6502 *self)
@@ -551,6 +561,17 @@ static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
         break;
     case 3:
         self->addrbus = bytowr(self->ada, 0x0);
+        if (mem_write_delayed(dec)) {
+            read(self);
+        } else {
+            dispatch_instruction(self, dec);
+        }
+        break;
+    case 4:
+        self->signal.rw = false;
+        write(self);
+        break;
+    case 5:
         dispatch_instruction(self, dec);
         break;
     default:
@@ -585,6 +606,17 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
         break;
     case 4:
         self->addrbus = bytowr(self->ada, self->adb);
+        if (mem_write_delayed(dec)) {
+            read(self);
+        } else {
+            dispatch_instruction(self, dec);
+        }
+        break;
+    case 5:
+        self->signal.rw = false;
+        write(self);
+        break;
+    case 6:
         dispatch_instruction(self, dec);
         break;
     default:
@@ -618,6 +650,17 @@ static void ZP_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 2:
         self->addrbus = bytowr(self->ada, 0x0);
+        if (mem_write_delayed(dec)) {
+            read(self);
+        } else {
+            dispatch_instruction(self, dec);
+        }
+        break;
+    case 3:
+        self->signal.rw = false;
+        write(self);
+        break;
+    case 4:
         dispatch_instruction(self, dec);
         break;
     default:
@@ -720,6 +763,17 @@ static void ABS_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 3:
         self->addrbus = bytowr(self->ada, self->adb);
+        if (mem_write_delayed(dec)) {
+            read(self);
+        } else {
+            dispatch_instruction(self, dec);
+        }
+        break;
+    case 4:
+        self->signal.rw = false;
+        write(self);
+        break;
+    case 5:
         dispatch_instruction(self, dec);
         break;
     default:

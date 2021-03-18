@@ -141,6 +141,26 @@ static void cpu_cpy_abs(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void cpu_dec_abs(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {
+        0xce, 0x4, 0x2,
+        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+    };
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xffu, mem[516]);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
 static void cpu_eor_abs(void *ctx)
 {
     struct mos6502 cpu;
@@ -449,6 +469,49 @@ static void cpu_cmp_absx_pagecross(void *ctx)
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_dec_absx(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {
+        0xde, 0x4, 0x2,
+        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [517] = 0x0, [518] = 0x0, [519] = 0x0, [520] = 0x0, [521] = 0x0,
+    };
+    cpu.ram = mem;
+    cpu.x = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xffu, mem[519]);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void cpu_dec_absx_pagecross(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {
+        0xde, 0xff, 0x1,
+        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+    };
+    cpu.ram = mem;
+    cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xffu, mem[514]);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void cpu_eor_absx(void *ctx)
@@ -1093,6 +1156,7 @@ struct ct_testsuite cpu_absolute_tests(void)
         ct_maketest(cpu_cmp_abs),
         ct_maketest(cpu_cpx_abs),
         ct_maketest(cpu_cpy_abs),
+        ct_maketest(cpu_dec_abs),
         ct_maketest(cpu_eor_abs),
         ct_maketest(cpu_lda_abs),
         ct_maketest(cpu_ldx_abs),
@@ -1109,6 +1173,8 @@ struct ct_testsuite cpu_absolute_tests(void)
         ct_maketest(cpu_and_absx_pagecross),
         ct_maketest(cpu_cmp_absx),
         ct_maketest(cpu_cmp_absx_pagecross),
+        ct_maketest(cpu_dec_absx),
+        ct_maketest(cpu_dec_absx_pagecross),
         ct_maketest(cpu_eor_absx),
         ct_maketest(cpu_eor_absx_pagecross),
         ct_maketest(cpu_lda_absx),

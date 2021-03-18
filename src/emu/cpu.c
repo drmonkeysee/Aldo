@@ -545,7 +545,6 @@ static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
         self->ada = self->databus;
         break;
     case 2:
-        // NOTE: zp,X/Y dead read
         self->addrbus = bytowr(self->ada, 0x0);
         read(self);
         self->ada += index;
@@ -579,10 +578,10 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
         self->addrbus = bytowr(self->ada, self->adb);
         if (mem_read_delayed(self, dec)) {
             read(self);
-            self->adb += self->adc;
         } else {
             dispatch_instruction(self, dec);
         }
+        self->adb += self->adc;
         break;
     case 4:
         self->addrbus = bytowr(self->ada, self->adb);
@@ -645,7 +644,6 @@ static void INDX_sequence(struct mos6502 *self, struct decoded dec)
         self->ada = self->databus;
         break;
     case 2:
-        // NOTE: (zp,X) dead read
         self->addrbus = bytowr(self->ada, 0x0);
         read(self);
         self->ada += self->x;
@@ -693,10 +691,10 @@ static void INDY_sequence(struct mos6502 *self, struct decoded dec)
         self->addrbus = bytowr(self->adb, self->ada);
         if (mem_read_delayed(self, dec)) {
             read(self);
-            self->ada += self->adc;
         } else {
             dispatch_instruction(self, dec);
         }
+        self->ada += self->adc;
         break;
     case 5:
         self->addrbus = bytowr(self->adb, self->ada);

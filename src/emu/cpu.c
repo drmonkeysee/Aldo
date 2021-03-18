@@ -301,7 +301,8 @@ static void EOR_exec(struct mos6502 *self)
 
 static void INC_exec(struct mos6502 *self)
 {
-    (void)self;
+    modify_mem(self, self->databus + 1);
+    self->presync = true;
 }
 
 static void INX_exec(struct mos6502 *self)

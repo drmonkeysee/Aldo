@@ -95,6 +95,7 @@ int aldo_run(void)
 
     const uint8_t test_prg[] = {
         0xc6, 0x24,    // DEC $24
+        0xe6, 0x26,    // inc $24
         0xa9, 0xa, // lda #$10
         0x85, 0x20, // sta $20
         0xa5, 0x25, // lda $25

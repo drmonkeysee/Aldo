@@ -243,7 +243,7 @@ const struct decoded Decode[] = {
     UNK,    // E3 - Unofficial
     {IN_CPX, AM_ZP},    // E4 - CPX zp
     {IN_SBC, AM_ZP},    // E5 - SBC zp
-    UNK,    // E6 - INC zp
+    {IN_INC, AM_ZP},    // E6 - INC zp
     UNK,    // E7 - Unofficial
     {IN_INX, AM_IMP},    // E8 - INX
     {IN_SBC, AM_IMM},    // E9 - SBC imm
@@ -251,7 +251,7 @@ const struct decoded Decode[] = {
     UNK,    // EB - Unofficial
     {IN_CPX, AM_ABS},    // EC - CPX abs
     {IN_SBC, AM_ABS},    // ED - SBC abs
-    UNK,    // EE - INC abs
+    {IN_INC, AM_ABS},    // EE - INC abs
     UNK,    // EF - Unofficial
     UNK,    // F0 - BEQ
     {IN_SBC, AM_INDY},    // F1 - SBC (zp),Y
@@ -259,7 +259,7 @@ const struct decoded Decode[] = {
     UNK,    // F3 - Unofficial
     UNK,    // F4 - Unofficial
     {IN_SBC, AM_ZPX},    // F5 - SBC zp,X
-    UNK,    // F6 - INC zp,X
+    {IN_INC, AM_ZPX},    // F6 - INC zp,X
     UNK,    // F7 - Unofficial
     {IN_SED, AM_IMP},    // F8 - SED
     {IN_SBC, AM_ABSY},    // F9 - SBC abs,Y
@@ -267,6 +267,6 @@ const struct decoded Decode[] = {
     UNK,    // FB - Unofficial
     UNK,    // FC - Unofficial
     {IN_SBC, AM_ABSX},    // FD - SBC abs,X
-    UNK,    // FE - INC abs,X
+    {IN_INC, AM_ABSX},    // FE - INC abs,X
     UNK,    // FF - Unofficial
 };

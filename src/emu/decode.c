@@ -23,7 +23,7 @@ const struct decoded Decode[] = {
     UNK,    // 07 - Unofficial
     UNK,    // 08 - PHP
     {IN_ORA, AM_IMM},    // 09 - ORA imm
-    UNK,    // 0A - ASL imp
+    {IN_ASL, AM_IMP},    // 0A - ASL imp
     UNK,    // 0B - Unofficial
     UNK,    // 0C - Unofficial
     {IN_ORA, AM_ABS},    // 0D - ORA abs

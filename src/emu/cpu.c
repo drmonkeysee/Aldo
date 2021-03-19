@@ -141,6 +141,14 @@ static void modify_mem(struct mos6502 *self, uint8_t d)
     update_n(self, d);
 }
 
+static void update_bitop(struct mos6502 *self, struct decoded dec, uint8_t d,
+                         bool co, bool ci)
+{
+    read(self);
+    load_register(self, &self->a, d | ci);
+    self->p.c = co;
+}
+
 // NOTE: all 6502 cycles are either a read or a write, some of them discarded
 // depending on the instruction and addressing-mode timing; these extra reads
 // and writes are all modeled below to help verify cycle-accurate behavior.
@@ -167,7 +175,8 @@ static void AND_exec(struct mos6502 *self)
 
 static void ASL_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    update_bitop(self, dec, self->a << 1, self->a & 0x80, false);
+    self->presync = true;
 }
 
 static void BCC_exec(struct mos6502 *self)

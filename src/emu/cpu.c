@@ -106,10 +106,10 @@ static void load_register(struct mos6502 *self, uint8_t *r, uint8_t d)
     update_n(self, *r);
 }
 
-static void store_register(struct mos6502 *self, uint8_t r)
+static void store_data(struct mos6502 *self, uint8_t d)
 {
     self->signal.rw = false;
-    self->databus = r;
+    self->databus = d;
     write(self);
 }
 
@@ -136,9 +136,7 @@ static void compare_register(struct mos6502 *self, uint8_t r)
 
 static void modify_mem(struct mos6502 *self, uint8_t d)
 {
-    self->signal.rw = false;
-    self->databus = d;
-    write(self);
+    store_data(self, d);
     update_z(self, d);
     update_n(self, d);
 }
@@ -441,19 +439,19 @@ static void SEI_exec(struct mos6502 *self)
 
 static void STA_exec(struct mos6502 *self)
 {
-    store_register(self, self->a);
+    store_data(self, self->a);
     self->presync = true;
 }
 
 static void STX_exec(struct mos6502 *self)
 {
-    store_register(self, self->x);
+    store_data(self, self->x);
     self->presync = true;
 }
 
 static void STY_exec(struct mos6502 *self)
 {
-    store_register(self, self->y);
+    store_data(self, self->y);
     self->presync = true;
 }
 

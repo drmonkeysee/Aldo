@@ -165,9 +165,9 @@ static void AND_exec(struct mos6502 *self)
     self->presync = true;
 }
 
-static void ASL_exec(struct mos6502 *self)
+static void ASL_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self;
+    (void)self, (void)dec;
 }
 
 static void BCC_exec(struct mos6502 *self)
@@ -348,9 +348,9 @@ static void LDY_exec(struct mos6502 *self)
     self->presync = true;
 }
 
-static void LSR_exec(struct mos6502 *self)
+static void LSR_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self;
+    (void)self, (void)dec;
 }
 
 static void NOP_exec(struct mos6502 *self)
@@ -386,14 +386,14 @@ static void PLP_exec(struct mos6502 *self)
     (void)self;
 }
 
-static void ROL_exec(struct mos6502 *self)
+static void ROL_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self;
+    (void)self, (void)dec;
 }
 
-static void ROR_exec(struct mos6502 *self)
+static void ROR_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self;
+    (void)self, (void)dec;
 }
 
 static void RTI_exec(struct mos6502 *self)
@@ -500,7 +500,7 @@ static void TYA_exec(struct mos6502 *self)
 static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 {
     switch (dec.instruction) {
-#define X(s) case IN_ENUM(s): s##_exec(self); break;
+#define X(s, ...) case IN_ENUM(s): s##_exec(__VA_ARGS__); break;
         DEC_INST_X
 #undef X
     default:

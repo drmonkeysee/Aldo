@@ -9,79 +9,79 @@
 #define Aldo_emu_decode_h
 
 // 6502 Instructions
-// X(symbol)
+// X(symbol, instruction dispatch arguments...)
 #define DEC_INST_X \
-X(UNK)  /* Unknown */ \
+X(UNK, self)        /* Unknown */ \
 \
-X(ADC)  /* Add with carry */ \
-X(AND)  /* Logical and */ \
-X(ASL)  /* Arithmetic shift left */ \
+X(ADC, self)        /* Add with carry */ \
+X(AND, self)        /* Logical and */ \
+X(ASL, self, dec)   /* Arithmetic shift left */ \
 \
-X(BCC)  /* Branch if carry clear */ \
-X(BCS)  /* Branch if carry set */ \
-X(BEQ)  /* Branch if zero */ \
-X(BIT)  /* Test bits */ \
-X(BMI)  /* Branch if negative */ \
-X(BNE)  /* Branch if not zero */ \
-X(BPL)  /* Branch if positive */ \
-X(BRK)  /* Break */ \
-X(BVC)  /* Branch if overflow clear */ \
-X(BVS)  /* Branch if overflow set */ \
+X(BCC, self)        /* Branch if carry clear */ \
+X(BCS, self)        /* Branch if carry set */ \
+X(BEQ, self)        /* Branch if zero */ \
+X(BIT, self)        /* Test bits */ \
+X(BMI, self)        /* Branch if negative */ \
+X(BNE, self)        /* Branch if not zero */ \
+X(BPL, self)        /* Branch if positive */ \
+X(BRK, self)        /* Break */ \
+X(BVC, self)        /* Branch if overflow clear */ \
+X(BVS, self)        /* Branch if overflow set */ \
 \
-X(CLC)  /* Clear carry */ \
-X(CLD)  /* Clear decimal */ \
-X(CLI)  /* Clear interrupt disable */ \
-X(CLV)  /* Clear overflow */ \
-X(CMP)  /* Compare to accumulator */ \
-X(CPX)  /* Compare to x index */ \
-X(CPY)  /* Compare to y index */ \
+X(CLC, self)        /* Clear carry */ \
+X(CLD, self)        /* Clear decimal */ \
+X(CLI, self)        /* Clear interrupt disable */ \
+X(CLV, self)        /* Clear overflow */ \
+X(CMP, self)        /* Compare to accumulator */ \
+X(CPX, self)        /* Compare to x index */ \
+X(CPY, self)        /* Compare to y index */ \
 \
-X(DEC)  /* Decrement memory */ \
-X(DEX)  /* Decrement x index */ \
-X(DEY)  /* Decrement y index */ \
+X(DEC, self)        /* Decrement memory */ \
+X(DEX, self)        /* Decrement x index */ \
+X(DEY, self)        /* Decrement y index */ \
 \
-X(EOR)  /* Logical exclusive or */ \
+X(EOR, self)        /* Logical exclusive or */ \
 \
-X(INC)  /* Increment memory */ \
-X(INX)  /* Increment x index */ \
-X(INY)  /* Increment y index */ \
+X(INC, self)        /* Increment memory */ \
+X(INX, self)        /* Increment x index */ \
+X(INY, self)        /* Increment y index */ \
 \
-X(JMP)  /* Jump */ \
-X(JSR)  /* Jump to subroutine */ \
+X(JMP, self)        /* Jump */ \
+X(JSR, self)        /* Jump to subroutine */ \
 \
-X(LDA)  /* Load accumulator */ \
-X(LDX)  /* Load x index */ \
-X(LDY)  /* Load y index */ \
-X(LSR)  /* Logical shift right */ \
+X(LDA, self)        /* Load accumulator */ \
+X(LDX, self)        /* Load x index */ \
+X(LDY, self)        /* Load y index */ \
+X(LSR, self, dec)  /* Logical shift right */ \
 \
-X(NOP)  /* No-op */ \
+X(NOP, self)        /* No-op */ \
 \
-X(ORA)  /* Logical or */ \
+X(ORA, self)        /* Logical or */ \
 \
-X(PHA)  /* Push accumulator */ \
-X(PHP)  /* Push status */ \
-X(PLA)  /* Pull accumulator */ \
-X(PLP)  /* Pull status */ \
+X(PHA, self)        /* Push accumulator */ \
+X(PHP, self)        /* Push status */ \
+X(PLA, self)        /* Pull accumulator */ \
+X(PLP, self)        /* Pull status */ \
 \
-X(ROL)  /* Rotate left */ \
-X(ROR)  /* Rotate right */ \
-X(RTI)  /* Return from interrupt */ \
-X(RTS)  /* Return from subroutine */ \
+X(ROL, self, dec)   /* Rotate left */ \
+X(ROR, self, dec)   /* Rotate right */ \
+X(RTI, self)        /* Return from interrupt */ \
+X(RTS, self)        /* Return from subroutine */ \
 \
-X(SBC)  /* Subtract with carry */ \
-X(SEC)  /* Set carry */ \
-X(SED)  /* Set decimal */ \
-X(SEI)  /* Set interrupt disable */ \
-X(STA)  /* Store accumulator */ \
-X(STX)  /* Store x index */ \
-X(STY)  /* Store y index */ \
+X(SBC, self)        /* Subtract with carry */ \
+X(SEC, self)        /* Set carry */ \
+X(SED, self)        /* Set decimal */ \
+X(SEI, self)        /* Set interrupt disable */ \
+X(STA, self)        /* Store accumulator */ \
+X(STX, self)        /* Store x index */ \
+X(STY, self)        /* Store y index */ \
 \
-X(TAX)  /* Transfer accumulator to x index */ \
-X(TAY)  /* Transfer accumulator to y index */ \
-X(TSX)  /* Transfer stack pointer to x index */ \
-X(TXA)  /* Transfer x index to accumulator */ \
-X(TXS)  /* Transfer x index to stack pointer */ \
-X(TYA)  /* Transfer y index to accumulator */
+X(TAX, self)        /* Transfer accumulator to x index */ \
+X(TAY, self)        /* Transfer accumulator to y index */ \
+X(TSX, self)        /* Transfer stack pointer to x index */ \
+X(TXA, self)        /* Transfer x index to accumulator */ \
+X(TXS, self)        /* Transfer x index to stack pointer */ \
+X(TYA, self)        /* Transfer y index to accumulator */
 
 // Addressing Modes
 // X(symbol, byte count, display strings...)
@@ -117,7 +117,7 @@ X(RTI, 1, "imp", "")                        /* Return from interrupt */
 #define IN_ENUM(s) IN_##s
 
 enum inst {
-#define X(s) IN_ENUM(s),
+#define X(s, ...) IN_ENUM(s),
     DEC_INST_X
 #undef X
 };

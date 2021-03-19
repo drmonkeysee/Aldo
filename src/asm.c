@@ -15,7 +15,7 @@
 #include <stdio.h>
 
 static const char *restrict const Mnemonics[] = {
-#define X(s) #s,
+#define X(s, ...) #s,
     DEC_INST_X
 #undef X
 };

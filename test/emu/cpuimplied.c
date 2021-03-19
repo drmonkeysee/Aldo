@@ -20,7 +20,7 @@ static void cpu_asl(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x0a, 0xff};
+    uint8_t mem[] = {0xa, 0xff};
     cpu.ram = mem;
     cpu.a = 0x1;
 
@@ -40,7 +40,7 @@ static void cpu_asl_carry(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x0a, 0xff};
+    uint8_t mem[] = {0xa, 0xff};
     cpu.ram = mem;
     cpu.a = 0x81;
 
@@ -60,7 +60,7 @@ static void cpu_asl_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x0a, 0xff};
+    uint8_t mem[] = {0xa, 0xff};
     cpu.ram = mem;
     cpu.a = 0x0;
 
@@ -80,7 +80,7 @@ static void cpu_asl_carryzero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x0a, 0xff};
+    uint8_t mem[] = {0xa, 0xff};
     cpu.ram = mem;
     cpu.a = 0x80;
 
@@ -100,7 +100,7 @@ static void cpu_asl_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x0a, 0xff};
+    uint8_t mem[] = {0xa, 0xff};
     cpu.ram = mem;
     cpu.a = 0x40;
 
@@ -120,7 +120,7 @@ static void cpu_asl_carrynegative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x0a, 0xff};
+    uint8_t mem[] = {0xa, 0xff};
     cpu.ram = mem;
     cpu.a = 0xff;
 

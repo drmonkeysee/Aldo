@@ -19,7 +19,7 @@ const struct decoded Decode[] = {
     UNK,    // 03 - Unofficial
     UNK,    // 04 - Unofficial
     {IN_ORA, AM_ZP},    // 05 - ORA zp
-    UNK,    // 06 - ASL zp
+    {IN_ASL, AM_ZP},    // 06 - ASL zp
     UNK,    // 07 - Unofficial
     UNK,    // 08 - PHP
     {IN_ORA, AM_IMM},    // 09 - ORA imm
@@ -27,7 +27,7 @@ const struct decoded Decode[] = {
     UNK,    // 0B - Unofficial
     UNK,    // 0C - Unofficial
     {IN_ORA, AM_ABS},    // 0D - ORA abs
-    UNK,    // 0E - ASL abs
+    {IN_ASL, AM_ABS},    // 0E - ASL abs
     UNK,    // 0F - Unofficial
     UNK,    // 10 - BPL
     {IN_ORA, AM_INDY},    // 11 - ORA (zp),Y
@@ -35,7 +35,7 @@ const struct decoded Decode[] = {
     UNK,    // 13 - Unofficial
     UNK,    // 14 - Unofficial
     {IN_ORA, AM_ZPX},    // 15 - ORA zp,X
-    UNK,    // 16 - ASL zp,X
+    {IN_ASL, AM_ZPX},    // 16 - ASL zp,X
     UNK,    // 17 - Unofficial
     {IN_CLC, AM_IMP},    // 18 - CLC
     {IN_ORA, AM_ABSY},    // 19 - ORA abs,Y
@@ -43,7 +43,7 @@ const struct decoded Decode[] = {
     UNK,    // 1B - Unofficial
     UNK,    // 1C - Unofficial
     {IN_ORA, AM_ABSX},    // 1D - ORA abs,X
-    UNK,    // 1E - ASL abs,X
+    {IN_ASL, AM_ABSX},    // 1E - ASL abs,X
     UNK,    // 1F - Unofficial
     UNK,    // 20 - JSR
     {IN_AND, AM_INDX},    // 21 - AND (zp,X)

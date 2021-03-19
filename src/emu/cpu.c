@@ -141,12 +141,26 @@ static void modify_mem(struct mos6502 *self, uint8_t d)
     update_n(self, d);
 }
 
-static void update_bitop(struct mos6502 *self, struct decoded dec, uint8_t d,
-                         bool co, bool ci)
+enum bitdirection {
+    BIT_LEFT,
+    BIT_RIGHT,
+};
+
+static void update_bitop(struct mos6502 *self, struct decoded dec,
+                         enum bitdirection bd, uint8_t carryout_mask,
+                         uint8_t carryin_mask)
 {
-    read(self);
-    load_register(self, &self->a, d | ci);
-    self->p.c = co;
+    uint8_t d = dec.mode == AM_IMP ? self->a : self->databus;
+    self->p.c = d & carryout_mask;
+    d = bd == BIT_LEFT ? d << 1 : d >> 1;
+    d |= carryin_mask;
+
+    if (dec.mode == AM_IMP) {
+        read(self);
+        load_register(self, &self->a, d);
+    } else {
+        modify_mem(self, d);
+    }
 }
 
 // NOTE: all 6502 cycles are either a read or a write, some of them discarded
@@ -175,7 +189,7 @@ static void AND_exec(struct mos6502 *self)
 
 static void ASL_exec(struct mos6502 *self, struct decoded dec)
 {
-    update_bitop(self, dec, self->a << 1, self->a & 0x80, false);
+    update_bitop(self, dec, BIT_LEFT, 0x80, 0);
     self->presync = true;
 }
 

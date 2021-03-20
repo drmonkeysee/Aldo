@@ -185,7 +185,7 @@ static void cpu_bit_zp_maskset(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0x6};
-    cpu.a = 0x2;
+    cpu.a = 2;
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
@@ -204,7 +204,7 @@ static void cpu_bit_zp_maskclear(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0x5};
-    cpu.a = 0x2;
+    cpu.a = 2;
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
@@ -337,7 +337,7 @@ static void cpu_bit_zp_set_high(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0xc2};
-    cpu.a = 0x2;
+    cpu.a = 2;
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
@@ -356,7 +356,7 @@ static void cpu_bit_zp_zero_set_high(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu);
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0xc2};
-    cpu.a = 0x0;
+    cpu.a = 0;
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);

@@ -22,7 +22,7 @@ static void cpu_asl(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0xa, 0xff};
     cpu.ram = mem;
-    cpu.a = 0x1;
+    cpu.a = 1;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -62,7 +62,7 @@ static void cpu_asl_zero(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0xa, 0xff};
     cpu.ram = mem;
-    cpu.a = 0x0;
+    cpu.a = 0;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -463,7 +463,7 @@ static void cpu_lsr(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0x4a, 0xff};
     cpu.ram = mem;
-    cpu.a = 0x2;
+    cpu.a = 2;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -503,7 +503,7 @@ static void cpu_lsr_zero(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0x4a, 0xff};
     cpu.ram = mem;
-    cpu.a = 0x0;
+    cpu.a = 0;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -523,7 +523,7 @@ static void cpu_lsr_carryzero(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0x4a, 0xff};
     cpu.ram = mem;
-    cpu.a = 0x1;
+    cpu.a = 1;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -607,7 +607,7 @@ static void cpu_rol(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0x2a, 0xff};
     cpu.ram = mem;
-    cpu.a = 0x0;
+    cpu.a = 0;
     cpu.p.c = true;
 
     const int cycles = clock_cpu(&cpu);
@@ -648,7 +648,7 @@ static void cpu_rol_zero(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0x2a, 0xff};
     cpu.ram = mem;
-    cpu.a = 0x0;
+    cpu.a = 0;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -750,7 +750,7 @@ static void cpu_ror(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0x6a, 0xff};
     cpu.ram = mem;
-    cpu.a = 0x2;
+    cpu.a = 2;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -790,7 +790,7 @@ static void cpu_ror_zero(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0x6a, 0xff};
     cpu.ram = mem;
-    cpu.a = 0x0;
+    cpu.a = 0;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -810,7 +810,7 @@ static void cpu_ror_carryzero(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0x6a, 0xff};
     cpu.ram = mem;
-    cpu.a = 0x1;
+    cpu.a = 1;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -830,7 +830,7 @@ static void cpu_ror_negative(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0x6a, 0xff};
     cpu.ram = mem;
-    cpu.a = 0x0;
+    cpu.a = 0;
     cpu.p.c = true;
 
     const int cycles = clock_cpu(&cpu);
@@ -851,7 +851,7 @@ static void cpu_ror_carrynegative(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0x6a, 0xff};
     cpu.ram = mem;
-    cpu.a = 0x1;
+    cpu.a = 1;
     cpu.p.c = true;
 
     const int cycles = clock_cpu(&cpu);

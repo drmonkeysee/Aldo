@@ -388,7 +388,7 @@ static void PLP_exec(struct mos6502 *self)
 
 static void ROL_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    bitoperation(self, dec, BIT_LEFT, 0x80, self->p.c);
 }
 
 static void ROR_exec(struct mos6502 *self, struct decoded dec)

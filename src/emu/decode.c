@@ -55,7 +55,7 @@ const struct decoded Decode[] = {
     UNK,    // 27 - Unofficial
     UNK,    // 28 - PLP
     {IN_AND, AM_IMM},    // 29 - AND imm
-    UNK,    // 2A - ROL imp
+    {IN_ROL, AM_IMP},    // 2A - ROL imp
     UNK,    // 2B - Unofficial
     {IN_BIT, AM_ABS},    // 2C - BIT abs
     {IN_AND, AM_ABS},    // 2D - AND abs

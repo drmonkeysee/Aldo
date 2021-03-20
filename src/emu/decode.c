@@ -115,7 +115,7 @@ const struct decoded Decode[] = {
     UNK,    // 63 - Unofficial
     UNK,    // 64 - Unofficial
     {IN_ADC, AM_ZP},    // 65 - ADC zp
-    UNK,    // 66 - ROR zp
+    {IN_ROR, AM_ZP},    // 66 - ROR zp
     UNK,    // 67 - Unofficial
     UNK,    // 68 - PLA
     {IN_ADC, AM_IMM},    // 69 - ADC imm
@@ -123,7 +123,7 @@ const struct decoded Decode[] = {
     UNK,    // 6B - Unofficial
     UNK,    // 6C - JMP (abs)
     {IN_ADC, AM_ABS},    // 6D - ADC abs
-    UNK,    // 6E - ROR abs
+    {IN_ROR, AM_ABS},    // 6E - ROR abs
     UNK,    // 6F - Unofficial
     UNK,    // 70 - BVS
     {IN_ADC, AM_INDY},    // 71 - ADC (zp),Y
@@ -131,7 +131,7 @@ const struct decoded Decode[] = {
     UNK,    // 73 - Unofficial
     UNK,    // 74 - Unofficial
     {IN_ADC, AM_ZPX},    // 75 - ADC zp,X
-    UNK,    // 76 - ROR zp,X
+    {IN_ROR, AM_ZPX},    // 76 - ROR zp,X
     UNK,    // 77 - Unofficial
     {IN_SEI, AM_IMP},    // 78 - SEI
     {IN_ADC, AM_ABSY},    // 79 - ADC abs,Y
@@ -139,7 +139,7 @@ const struct decoded Decode[] = {
     UNK,    // 7B - Unofficial
     UNK,    // 7C - Unofficial
     {IN_ADC, AM_ABSX},    // 7D - ADC abs,X
-    UNK,    // 7E - ROR abs,X
+    {IN_ROR, AM_ABSX},    // 7E - ROR abs,X
     UNK,    // 7F - Unofficial
     UNK,    // 80 - Unofficial
     {IN_STA, AM_INDX},    // 81 - STA (zp,X)

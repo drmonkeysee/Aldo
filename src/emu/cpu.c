@@ -146,7 +146,7 @@ enum bitdirection {
     BIT_RIGHT,
 };
 
-static void update_bitop(struct mos6502 *self, struct decoded dec,
+static void bitoperation(struct mos6502 *self, struct decoded dec,
                          enum bitdirection bd, uint8_t carryout_mask,
                          uint8_t carryin_mask)
 {
@@ -187,7 +187,7 @@ static void AND_exec(struct mos6502 *self)
 
 static void ASL_exec(struct mos6502 *self, struct decoded dec)
 {
-    update_bitop(self, dec, BIT_LEFT, 0x80, 0);
+    bitoperation(self, dec, BIT_LEFT, 0x80, 0x0);
 }
 
 static void BCC_exec(struct mos6502 *self)
@@ -352,7 +352,7 @@ static void LDY_exec(struct mos6502 *self)
 
 static void LSR_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    bitoperation(self, dec, BIT_RIGHT, 0x1, 0x0);
 }
 
 static void NOP_exec(struct mos6502 *self)

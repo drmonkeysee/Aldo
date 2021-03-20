@@ -87,7 +87,7 @@ const struct decoded Decode[] = {
     UNK,    // 47 - Unofficial
     UNK,    // 48 - PHA
     {IN_EOR, AM_IMM},    // 49 - EOR imm
-    UNK,    // 4A - LSR imp
+    {IN_LSR, AM_IMP},    // 4A - LSR imp
     UNK,    // 4B - Unofficial
     UNK,    // 4C - JMP abs
     {IN_EOR, AM_ABS},    // 4D - EOR abs

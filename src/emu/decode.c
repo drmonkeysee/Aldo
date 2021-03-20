@@ -51,7 +51,7 @@ const struct decoded Decode[] = {
     UNK,    // 23 - Unofficial
     {IN_BIT, AM_ZP},    // 24 - BIT zp
     {IN_AND, AM_ZP},    // 25 - AND zp
-    UNK,    // 26 - ROL zp
+    {IN_ROL, AM_ZP},    // 26 - ROL zp
     UNK,    // 27 - Unofficial
     UNK,    // 28 - PLP
     {IN_AND, AM_IMM},    // 29 - AND imm
@@ -59,7 +59,7 @@ const struct decoded Decode[] = {
     UNK,    // 2B - Unofficial
     {IN_BIT, AM_ABS},    // 2C - BIT abs
     {IN_AND, AM_ABS},    // 2D - AND abs
-    UNK,    // 2E - ROL abs
+    {IN_ROL, AM_ABS},    // 2E - ROL abs
     UNK,    // 2F - Unofficial
     UNK,    // 30 - BMI
     {IN_AND, AM_INDY},    // 31 - AND (zp),Y
@@ -67,7 +67,7 @@ const struct decoded Decode[] = {
     UNK,    // 33 - Unofficial
     UNK,    // 34 - Unofficial
     {IN_AND, AM_ZPX},    // 35 - AND zp,X
-    UNK,    // 36 - ROL zp,X
+    {IN_ROL, AM_ZPX},    // 36 - ROL zp,X
     UNK,    // 37 - Unofficial
     {IN_SEC, AM_IMP},    // 38 - SEC
     {IN_AND, AM_ABSY},    // 39 - AND abs,Y
@@ -75,7 +75,7 @@ const struct decoded Decode[] = {
     UNK,    // 3B - Unofficial
     UNK,    // 3C - Unofficial
     {IN_AND, AM_ABSX},    // 3D - AND abs,X
-    UNK,    // 3E - ROL abs,X
+    {IN_ROL, AM_ABSX},    // 3E - ROL abs,X
     UNK,    // 3F - Unofficial
     UNK,    // 40 - RTI
     {IN_EOR, AM_INDX},    // 41 - EOR (zp,X)

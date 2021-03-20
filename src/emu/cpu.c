@@ -169,7 +169,7 @@ static void update_bitop(struct mos6502 *self, struct decoded dec,
 
 static void UNK_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    // NOTE: unknown instruction, do nothing
 }
 
 // NOTE: add with carry-in; A + D + C
@@ -177,20 +177,17 @@ static void ADC_exec(struct mos6502 *self)
 {
     read(self);
     arithmetic_sum(self, self->databus + self->p.c);
-    self->presync = true;
 }
 
 static void AND_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->a, self->a & self->databus);
-    self->presync = true;
 }
 
 static void ASL_exec(struct mos6502 *self, struct decoded dec)
 {
     update_bitop(self, dec, BIT_LEFT, 0x80, 0);
-    self->presync = true;
 }
 
 static void BCC_exec(struct mos6502 *self)
@@ -214,7 +211,6 @@ static void BIT_exec(struct mos6502 *self)
     update_z(self, self->a & self->databus);
     self->p.v = self->databus & 0x40;
     update_n(self, self->databus);
-    self->presync = true;
 }
 
 static void BMI_exec(struct mos6502 *self)
@@ -251,93 +247,79 @@ static void CLC_exec(struct mos6502 *self)
 {
     read(self);
     self->p.c = false;
-    self->presync = true;
 }
 
 static void CLD_exec(struct mos6502 *self)
 {
     read(self);
     self->p.d = false;
-    self->presync = true;
 }
 
 static void CLI_exec(struct mos6502 *self)
 {
     read(self);
     self->p.i = false;
-    self->presync = true;
 }
 
 static void CLV_exec(struct mos6502 *self)
 {
     read(self);
     self->p.v = false;
-    self->presync = true;
 }
 
 static void CMP_exec(struct mos6502 *self)
 {
     compare_register(self, self->a);
-    self->presync = true;
 }
 
 static void CPX_exec(struct mos6502 *self)
 {
     compare_register(self, self->x);
-    self->presync = true;
 }
 
 static void CPY_exec(struct mos6502 *self)
 {
     compare_register(self, self->y);
-    self->presync = true;
 }
 
 static void DEC_exec(struct mos6502 *self)
 {
     modify_mem(self, self->databus - 1);
-    self->presync = true;
 }
 
 static void DEX_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->x, self->x - 1);
-    self->presync = true;
 }
 
 static void DEY_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->y, self->y - 1);
-    self->presync = true;
 }
 
 static void EOR_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->a, self->a ^ self->databus);
-    self->presync = true;
 }
 
 static void INC_exec(struct mos6502 *self)
 {
     modify_mem(self, self->databus + 1);
-    self->presync = true;
 }
 
 static void INX_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->x, self->x + 1);
-    self->presync = true;
 }
 
 static void INY_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->y, self->y + 1);
-    self->presync = true;
 }
 
 static void JMP_exec(struct mos6502 *self)
@@ -354,21 +336,18 @@ static void LDA_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->a, self->databus);
-    self->presync = true;
 }
 
 static void LDX_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->x, self->databus);
-    self->presync = true;
 }
 
 static void LDY_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->y, self->databus);
-    self->presync = true;
 }
 
 static void LSR_exec(struct mos6502 *self, struct decoded dec)
@@ -379,14 +358,12 @@ static void LSR_exec(struct mos6502 *self, struct decoded dec)
 static void NOP_exec(struct mos6502 *self)
 {
     read(self);
-    self->presync = true;
 }
 
 static void ORA_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->a, self->a | self->databus);
-    self->presync = true;
 }
 
 static void PHA_exec(struct mos6502 *self)
@@ -436,94 +413,82 @@ static void SBC_exec(struct mos6502 *self)
 {
     read(self);
     arithmetic_sum(self, complement(self->databus, self->p.c));
-    self->presync = true;
 }
 
 static void SEC_exec(struct mos6502 *self)
 {
     read(self);
     self->p.c = true;
-    self->presync = true;
 }
 
 static void SED_exec(struct mos6502 *self)
 {
     read(self);
     self->p.d = true;
-    self->presync = true;
 }
 
 static void SEI_exec(struct mos6502 *self)
 {
     read(self);
     self->p.i = true;
-    self->presync = true;
 }
 
 static void STA_exec(struct mos6502 *self)
 {
     store_data(self, self->a);
-    self->presync = true;
 }
 
 static void STX_exec(struct mos6502 *self)
 {
     store_data(self, self->x);
-    self->presync = true;
 }
 
 static void STY_exec(struct mos6502 *self)
 {
     store_data(self, self->y);
-    self->presync = true;
 }
 
 static void TAX_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->x, self->a);
-    self->presync = true;
 }
 
 static void TAY_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->y, self->a);
-    self->presync = true;
 }
 
 static void TSX_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->x, self->s);
-    self->presync = true;
 }
 
 static void TXA_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->a, self->x);
-    self->presync = true;
 }
 
 static void TXS_exec(struct mos6502 *self)
 {
     read(self);
     self->s = self->x;
-    self->presync = true;
 }
 
 static void TYA_exec(struct mos6502 *self)
 {
     read(self);
     load_register(self, &self->a, self->y);
-    self->presync = true;
 }
 
 static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 {
     switch (dec.instruction) {
-#define X(s, ...) case IN_ENUM(s): s##_exec(__VA_ARGS__); break;
+#define X(s, ...) case IN_ENUM(s): s##_exec(__VA_ARGS__); \
+                                   self->presync = true; break;
         DEC_INST_X
 #undef X
     default:

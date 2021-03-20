@@ -161,6 +161,25 @@ static void cpu_asl_zp_carrynegative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
+static void cpu_asl_zp_all_ones(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x6, 0x4, 0xff, 0xff, 0xff};
+    cpu.ram = mem;
+    cpu.p.c = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xfeu, mem[4]);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
 static void cpu_bit_zp_maskset(void *ctx)
 {
     struct mos6502 cpu;
@@ -688,6 +707,24 @@ static void cpu_lsr_zp_negative_to_positive(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void cpu_lsr_zp_all_ones(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x46, 0x4, 0xff, 0xff, 0xff};
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x7fu, mem[4]);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void cpu_ora_zp(void *ctx)
 {
     struct mos6502 cpu;
@@ -1157,7 +1194,6 @@ static void cpu_lsr_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-
 static void cpu_ora_zpx(void *ctx)
 {
     struct mos6502 cpu;
@@ -1397,6 +1433,7 @@ struct ct_testsuite cpu_zeropage_tests(void)
         ct_maketest(cpu_asl_zp_carryzero),
         ct_maketest(cpu_asl_zp_negative),
         ct_maketest(cpu_asl_zp_carrynegative),
+        ct_maketest(cpu_asl_zp_all_ones),
         ct_maketest(cpu_bit_zp_maskset),
         ct_maketest(cpu_bit_zp_maskclear),
         ct_maketest(cpu_bit_zp_highmaskset),
@@ -1426,6 +1463,7 @@ struct ct_testsuite cpu_zeropage_tests(void)
         ct_maketest(cpu_lsr_zp_zero),
         ct_maketest(cpu_lsr_zp_carryzero),
         ct_maketest(cpu_lsr_zp_negative_to_positive),
+        ct_maketest(cpu_lsr_zp_all_ones),
         ct_maketest(cpu_ora_zp),
         ct_maketest(cpu_sbc_zp),
         ct_maketest(cpu_sta_zp),

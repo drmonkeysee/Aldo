@@ -136,6 +136,27 @@ static void cpu_asl_carrynegative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
+static void cpu_asl_all_ones(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xa, 0xff};
+    cpu.ram = mem;
+    cpu.a = 0xff;
+    cpu.p.c = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(0xfeu, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
 static void cpu_clc(void *ctx)
 {
     struct mos6502 cpu;
@@ -532,6 +553,27 @@ static void cpu_lsr_negative_to_positive(void *ctx)
 
     ct_assertequal(0x40u, cpu.a);
     ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void cpu_lsr_all_ones(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x4a, 0xff};
+    cpu.ram = mem;
+    cpu.a = 0xff;
+    cpu.p.c = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(1u, cpu.pc);
+    ct_assertequal(0xffu, cpu.databus);
+
+    ct_assertequal(0x7fu, cpu.a);
+    ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -983,6 +1025,7 @@ struct ct_testsuite cpu_implied_tests(void)
         ct_maketest(cpu_asl_carryzero),
         ct_maketest(cpu_asl_negative),
         ct_maketest(cpu_asl_carrynegative),
+        ct_maketest(cpu_asl_all_ones),
         ct_maketest(cpu_clc),
         ct_maketest(cpu_cld),
         ct_maketest(cpu_cli),
@@ -1004,6 +1047,7 @@ struct ct_testsuite cpu_implied_tests(void)
         ct_maketest(cpu_lsr_zero),
         ct_maketest(cpu_lsr_carryzero),
         ct_maketest(cpu_lsr_negative_to_positive),
+        ct_maketest(cpu_lsr_all_ones),
         ct_maketest(cpu_nop),
         ct_maketest(cpu_sec),
         ct_maketest(cpu_sed),

@@ -83,7 +83,7 @@ const struct decoded Decode[] = {
     UNK,    // 43 - Unofficial
     UNK,    // 44 - Unofficial
     {IN_EOR, AM_ZP},    // 45 - EOR zp
-    UNK,    // 46 - LSR zp
+    {IN_LSR, AM_ZP},    // 46 - LSR zp
     UNK,    // 47 - Unofficial
     UNK,    // 48 - PHA
     {IN_EOR, AM_IMM},    // 49 - EOR imm
@@ -91,7 +91,7 @@ const struct decoded Decode[] = {
     UNK,    // 4B - Unofficial
     UNK,    // 4C - JMP abs
     {IN_EOR, AM_ABS},    // 4D - EOR abs
-    UNK,    // 4E - LSR abs
+    {IN_LSR, AM_ABS},    // 4E - LSR abs
     UNK,    // 4F - Unofficial
     UNK,    // 50 - BVC
     {IN_EOR, AM_INDY},    // 51 - EOR (zp),Y
@@ -99,7 +99,7 @@ const struct decoded Decode[] = {
     UNK,    // 53 - Unofficial
     UNK,    // 54 - Unofficial
     {IN_EOR, AM_ZPX},    // 55 - EOR zp,X
-    UNK,    // 56 - LSR zp,X
+    {IN_LSR, AM_ZPX},    // 56 - LSR zp,X
     UNK,    // 57 - Unofficial
     {IN_CLI, AM_IMP},    // 58 - CLI
     {IN_EOR, AM_ABSY},    // 59 - EOR abs,Y
@@ -107,7 +107,7 @@ const struct decoded Decode[] = {
     UNK,    // 5B - Unofficial
     UNK,    // 5C - Unofficial
     {IN_EOR, AM_ABSX},    // 5D - EOR abs,X
-    UNK,    // 5E - LSR abs,X
+    {IN_LSR, AM_ABSX},    // 5E - LSR abs,X
     UNK,    // 5F - Unofficial
     UNK,    // 60 - RTS
     {IN_ADC, AM_INDX},    // 61 - ADC (zp,X)

@@ -119,7 +119,7 @@ const struct decoded Decode[] = {
     UNK,    // 67 - Unofficial
     UNK,    // 68 - PLA
     {IN_ADC, AM_IMM},    // 69 - ADC imm
-    UNK,    // 6A - ROR imp
+    {IN_ROR, AM_IMP},    // 6A - ROR imp
     UNK,    // 6B - Unofficial
     UNK,    // 6C - JMP (abs)
     {IN_ADC, AM_ABS},    // 6D - ADC abs

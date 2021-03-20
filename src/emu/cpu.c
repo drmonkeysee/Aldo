@@ -393,7 +393,7 @@ static void ROL_exec(struct mos6502 *self, struct decoded dec)
 
 static void ROR_exec(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    bitoperation(self, dec, BIT_RIGHT, 0x1, self->p.c << 7);
 }
 
 static void RTI_exec(struct mos6502 *self)

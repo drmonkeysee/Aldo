@@ -1028,7 +1028,7 @@ static void dis_datapath_absolute_y_cycle_n(void *ctx)
 // Test List
 //
 
-struct ct_testsuite asm_tests(void)
+struct ct_testsuite dis_tests(void)
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(dis_errstr_returns_known_err),

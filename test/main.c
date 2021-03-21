@@ -13,7 +13,7 @@
 // Test Suites
 //
 
-struct ct_testsuite asm_tests(void);
+struct ct_testsuite dis_tests(void);
 struct ct_testsuite cpu_tests(void);
 struct ct_testsuite cpu_absolute_tests(void);
 struct ct_testsuite cpu_immediate_tests(void);
@@ -24,7 +24,7 @@ struct ct_testsuite cpu_zeropage_tests(void);
 static size_t testrunner(int argc, char *argv[argc+1])
 {
     const struct ct_testsuite suites[] = {
-        asm_tests(),
+        dis_tests(),
         cpu_tests(),
         cpu_absolute_tests(),
         cpu_immediate_tests(),

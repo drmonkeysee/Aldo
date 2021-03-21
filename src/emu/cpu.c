@@ -174,6 +174,7 @@ static void bitoperation(struct mos6502 *self, struct decoded dec,
 static void UNK_exec(struct mos6502 *self)
 {
     // NOTE: unknown instruction, do nothing
+    (void)self;
 }
 
 // NOTE: add with carry-in; A + D + C

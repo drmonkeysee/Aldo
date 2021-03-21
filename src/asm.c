@@ -102,9 +102,15 @@ uint16_t dis_instaddr(const struct console_state *snapshot)
     assert(snapshot != NULL);
 
     const struct decoded dec = Decode[snapshot->cpu.opcode];
-    const int len = InstLens[dec.mode],
-              cycle_offset = 1 + snapshot->cpu.exec_cycle,
-              pc_offset = cycle_offset < len ? cycle_offset : len;
+    int pc_offset;
+    // NOTE: if completed JMP instruction use pc value directly
+    if (dec.instruction == IN_JMP && snapshot->cpu.instdone) {
+        pc_offset = 0;
+    } else {
+        const int len = InstLens[dec.mode],
+                  cycle_offset = 1 + snapshot->cpu.exec_cycle;
+        pc_offset = cycle_offset < len ? cycle_offset : len;
+    }
     return snapshot->cpu.program_counter - pc_offset;
 }
 

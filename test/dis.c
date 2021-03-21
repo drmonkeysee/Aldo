@@ -184,6 +184,21 @@ static void dis_instaddr_three_byte_cycle_n(void *ctx)
     ct_assertequal(0x8000u, result);
 }
 
+static void dis_instaddr_jmp_complete_no_offset(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .instdone = true,
+            .opcode = 0x4c,
+            .program_counter = 0x8003,
+        },
+    };
+
+    const uint16_t result = dis_instaddr(&sn);
+
+    ct_assertequal(0x8003u, result);
+}
+
 //
 // dis_inst
 //
@@ -1044,6 +1059,7 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(dis_instaddr_three_byte_cycle_one),
         ct_maketest(dis_instaddr_three_byte_cycle_two),
         ct_maketest(dis_instaddr_three_byte_cycle_n),
+        ct_maketest(dis_instaddr_jmp_complete_no_offset),
 
         ct_maketest(dis_inst_does_nothing_if_no_bytes),
         ct_maketest(dis_inst_disassembles_implied),

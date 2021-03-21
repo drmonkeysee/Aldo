@@ -43,6 +43,23 @@ static void cpu_jmp_indirect(void *ctx)
     ct_assertequal(0xbeefu, cpu.pc);
 }
 
+static void cpu_jmp_indirect_pageboundary_bug(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: *supposed* to read from $80FF, $8100
+    // but actually ignores the carry and reads from $80FF, $8000.
+    uint8_t mem[] = {0x6c, 0xff, 0x80};
+    cpu.ram = mem;
+    cpu.cart = bigrom;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    // NOTE: pc ends up pointing at address built from $80FF, $8000
+    ct_assertequal(0xcafeu, cpu.pc);
+}
+
 //
 // Test List
 //
@@ -52,6 +69,7 @@ struct ct_testsuite cpu_jump_tests(void)
     static const struct ct_testcase tests[] = {
         ct_maketest(cpu_jmp),
         ct_maketest(cpu_jmp_indirect),
+        ct_maketest(cpu_jmp_indirect_pageboundary_bug),
     };
 
     return ct_makesuite(tests);

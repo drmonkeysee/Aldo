@@ -845,7 +845,9 @@ static void JIND_sequence(struct mos6502 *self, struct decoded dec)
         self->ada = self->databus;
         break;
     case 4:
-        ++self->addrbus;
+        // NOTE: increment addrbus as two u8s, not one u16, to recreate
+        // 6502 indirect JMP bug.
+        self->addrbus = bytowr((self->addrbus & 0xff) + 1, self->addrbus >> 8);
         read(self);
         self->adb = self->databus;
         dispatch_instruction(self, dec);

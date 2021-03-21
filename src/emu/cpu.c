@@ -328,7 +328,7 @@ static void INY_exec(struct mos6502 *self)
 
 static void JMP_exec(struct mos6502 *self)
 {
-    (void)self;
+    self->pc = bytowr(self->ada, self->adb);
 }
 
 static void JSR_exec(struct mos6502 *self)
@@ -809,12 +809,50 @@ static void RTS_sequence(struct mos6502 *self, struct decoded dec)
 
 static void JABS_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    switch (self->t) {
+    case 1:
+        self->addrbus = self->pc++;
+        read(self);
+        self->ada = self->databus;
+        break;
+    case 2:
+        self->addrbus = self->pc++;
+        read(self);
+        self->adb = self->databus;
+        dispatch_instruction(self, dec);
+        break;
+    default:
+        BAD_ADDR_SEQ;
+    }
 }
 
 static void JIND_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    switch (self->t) {
+    case 1:
+        self->addrbus = self->pc++;
+        read(self);
+        self->ada = self->databus;
+        break;
+    case 2:
+        self->addrbus = self->pc++;
+        read(self);
+        self->adb = self->databus;
+        break;
+    case 3:
+        self->addrbus = bytowr(self->ada, self->adb);
+        read(self);
+        self->ada = self->databus;
+        break;
+    case 4:
+        ++self->addrbus;
+        read(self);
+        self->adb = self->databus;
+        dispatch_instruction(self, dec);
+        break;
+    default:
+        BAD_ADDR_SEQ;
+    }
 }
 
 static void BRK_sequence(struct mos6502 *self, struct decoded dec)

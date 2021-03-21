@@ -13,13 +13,14 @@
 // Test Suites
 //
 
-struct ct_testsuite dis_tests(void);
-struct ct_testsuite cpu_tests(void);
-struct ct_testsuite cpu_absolute_tests(void);
-struct ct_testsuite cpu_immediate_tests(void);
-struct ct_testsuite cpu_implied_tests(void);
-struct ct_testsuite cpu_indirect_tests(void);
-struct ct_testsuite cpu_zeropage_tests(void);
+struct ct_testsuite dis_tests(void),
+                    cpu_tests(void),
+                    cpu_absolute_tests(void),
+                    cpu_immediate_tests(void),
+                    cpu_implied_tests(void),
+                    cpu_indirect_tests(void),
+                    cpu_jump_tests(void),
+                    cpu_zeropage_tests(void);
 
 static size_t testrunner(int argc, char *argv[argc+1])
 {
@@ -30,6 +31,7 @@ static size_t testrunner(int argc, char *argv[argc+1])
         cpu_immediate_tests(),
         cpu_implied_tests(),
         cpu_indirect_tests(),
+        cpu_jump_tests(),
         cpu_zeropage_tests(),
     };
     return ct_run_withargs(suites, argc, argv);

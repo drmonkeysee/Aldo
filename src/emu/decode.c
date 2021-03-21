@@ -89,7 +89,7 @@ const struct decoded Decode[] = {
     {IN_EOR, AM_IMM},    // 49 - EOR imm
     {IN_LSR, AM_IMP},    // 4A - LSR imp
     UNK,    // 4B - Unofficial
-    UNK,    // 4C - JMP abs
+    {IN_JMP, AM_JABS},    // 4C - JMP abs
     {IN_EOR, AM_ABS},    // 4D - EOR abs
     {IN_LSR, AM_ABS},    // 4E - LSR abs
     UNK,    // 4F - Unofficial
@@ -121,7 +121,7 @@ const struct decoded Decode[] = {
     {IN_ADC, AM_IMM},    // 69 - ADC imm
     {IN_ROR, AM_IMP},    // 6A - ROR imp
     UNK,    // 6B - Unofficial
-    UNK,    // 6C - JMP (abs)
+    {IN_JMP, AM_JIND},    // 6C - JMP (abs)
     {IN_ADC, AM_ABS},    // 6D - ADC abs
     {IN_ROR, AM_ABS},    // 6E - ROR abs
     UNK,    // 6F - Unofficial

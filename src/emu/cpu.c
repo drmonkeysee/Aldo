@@ -147,12 +147,16 @@ enum bitdirection {
 };
 
 static void bitoperation(struct mos6502 *self, struct decoded dec,
-                         enum bitdirection bd, uint8_t carryout_mask,
-                         uint8_t carryin_mask)
+                         enum bitdirection bd, uint8_t carryin_mask)
 {
     uint8_t d = dec.mode == AM_IMP ? self->a : self->databus;
-    self->p.c = d & carryout_mask;
-    d = bd == BIT_LEFT ? d << 1 : d >> 1;
+    if (bd == BIT_LEFT) {
+        self->p.c = d & 0x80;
+        d <<= 1;
+    } else {
+        self->p.c = d & 0x1;
+        d >>= 1;
+    }
     d |= carryin_mask;
 
     if (dec.mode == AM_IMP) {
@@ -187,7 +191,7 @@ static void AND_exec(struct mos6502 *self)
 
 static void ASL_exec(struct mos6502 *self, struct decoded dec)
 {
-    bitoperation(self, dec, BIT_LEFT, 0x80, 0x0);
+    bitoperation(self, dec, BIT_LEFT, 0x0);
 }
 
 static void BCC_exec(struct mos6502 *self)
@@ -352,7 +356,7 @@ static void LDY_exec(struct mos6502 *self)
 
 static void LSR_exec(struct mos6502 *self, struct decoded dec)
 {
-    bitoperation(self, dec, BIT_RIGHT, 0x1, 0x0);
+    bitoperation(self, dec, BIT_RIGHT, 0x0);
 }
 
 static void NOP_exec(struct mos6502 *self)
@@ -388,12 +392,12 @@ static void PLP_exec(struct mos6502 *self)
 
 static void ROL_exec(struct mos6502 *self, struct decoded dec)
 {
-    bitoperation(self, dec, BIT_LEFT, 0x80, self->p.c);
+    bitoperation(self, dec, BIT_LEFT, self->p.c);
 }
 
 static void ROR_exec(struct mos6502 *self, struct decoded dec)
 {
-    bitoperation(self, dec, BIT_RIGHT, 0x1, self->p.c << 7);
+    bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
 }
 
 static void RTI_exec(struct mos6502 *self)

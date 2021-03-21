@@ -170,14 +170,51 @@ static void bitoperation(struct mos6502 *self, struct decoded dec,
 static bool read_delayed(struct mos6502 *self, struct decoded dec,
                          bool delay_condition)
 {
-    if (delay_condition
-        && ((dec.mode == AM_INDY && self->t == 4)
-            || ((dec.mode == AM_ABSX || dec.mode == AM_ABSY)
-                && self->t == 3))) {
-        read(self);
-        return true;
+    if (!delay_condition) return false;
+
+    bool delayed;
+    switch (dec.mode) {
+    case AM_INDY:
+        delayed = self->t == 4;
+        break;
+    case AM_ABSX:
+    case AM_ABSY:
+        delayed = self->t == 3;
+        break;
+    default:
+        delayed = false;
+        break;
     }
-    return false;
+    if (delayed) {
+        read(self);
+    }
+    return delayed;
+}
+
+static bool write_delayed(struct mos6502 *self, struct decoded dec)
+{
+    bool delayed;
+    switch (dec.mode) {
+    case AM_ZP:
+        delayed = self->t == 2;
+        break;
+    case AM_ZPX:
+    case AM_ZPY:
+    case AM_ABS:
+        delayed = self->t == 3;
+        break;
+    case AM_ABSX:
+    case AM_ABSY:
+        delayed = self->t == 4;
+        break;
+    default:
+        delayed = false;
+        break;
+    }
+    if (delayed) {
+        read(self);
+    }
+    return delayed;
 }
 
 // NOTE: all 6502 cycles are either a read or a write, some of them discarded
@@ -208,7 +245,8 @@ static void AND_exec(struct mos6502 *self, struct decoded dec)
 
 static void ASL_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (read_delayed(self, dec, true)) return;
+    if (read_delayed(self, dec, true)
+        || write_delayed(self, dec)) return;
     bitoperation(self, dec, BIT_LEFT, 0x0);
     self->presync = true;
 }
@@ -319,7 +357,8 @@ static void CPY_exec(struct mos6502 *self, struct decoded dec)
 
 static void DEC_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (read_delayed(self, dec, true)) return;
+    if (read_delayed(self, dec, true)
+        || write_delayed(self, dec)) return;
     modify_mem(self, self->databus - 1);
     self->presync = true;
 }
@@ -348,7 +387,8 @@ static void EOR_exec(struct mos6502 *self, struct decoded dec)
 
 static void INC_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (read_delayed(self, dec, true)) return;
+    if (read_delayed(self, dec, true)
+        || write_delayed(self, dec)) return;
     modify_mem(self, self->databus + 1);
     self->presync = true;
 }
@@ -404,7 +444,8 @@ static void LDY_exec(struct mos6502 *self, struct decoded dec)
 
 static void LSR_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (read_delayed(self, dec, true)) return;
+    if (read_delayed(self, dec, true)
+        || write_delayed(self, dec)) return;
     bitoperation(self, dec, BIT_RIGHT, 0x0);
     self->presync = true;
 }
@@ -445,14 +486,16 @@ static void PLP_exec(struct mos6502 *self)
 
 static void ROL_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (read_delayed(self, dec, true)) return;
+    if (read_delayed(self, dec, true)
+        || write_delayed(self, dec)) return;
     bitoperation(self, dec, BIT_LEFT, self->p.c);
     self->presync = true;
 }
 
 static void ROR_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (read_delayed(self, dec, true)) return;
+    if (read_delayed(self, dec, true)
+        || write_delayed(self, dec)) return;
     bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
     self->presync = true;
 }
@@ -579,22 +622,6 @@ static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 
 #define BAD_ADDR_SEQ assert(((void)"BAD ADDRMODE SEQUENCE", false))
 
-// NOTE: all read-modify-write instructions have a miswrite cycle
-static bool mem_write_delayed(struct decoded dec)
-{
-    switch (dec.instruction) {
-    case IN_ASL:
-    case IN_DEC:
-    case IN_INC:
-    case IN_LSR:
-    case IN_ROL:
-    case IN_ROR:
-        return true;
-    default:
-        return false;
-    }
-}
-
 static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
                              uint8_t index)
 {
@@ -611,11 +638,7 @@ static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
         break;
     case 3:
         self->addrbus = bytowr(self->ada, 0x0);
-        if (mem_write_delayed(dec)) {
-            read(self);
-        } else {
-            dispatch_instruction(self, dec);
-        }
+        dispatch_instruction(self, dec);
         break;
     case 4:
         self->signal.rw = false;
@@ -652,11 +675,7 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
         break;
     case 4:
         self->addrbus = bytowr(self->ada, self->adb);
-        if (mem_write_delayed(dec)) {
-            read(self);
-        } else {
-            dispatch_instruction(self, dec);
-        }
+        dispatch_instruction(self, dec);
         break;
     case 5:
         self->signal.rw = false;
@@ -696,11 +715,7 @@ static void ZP_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 2:
         self->addrbus = bytowr(self->ada, 0x0);
-        if (mem_write_delayed(dec)) {
-            read(self);
-        } else {
-            dispatch_instruction(self, dec);
-        }
+        dispatch_instruction(self, dec);
         break;
     case 3:
         self->signal.rw = false;
@@ -805,11 +820,7 @@ static void ABS_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 3:
         self->addrbus = bytowr(self->ada, self->adb);
-        if (mem_write_delayed(dec)) {
-            read(self);
-        } else {
-            dispatch_instruction(self, dec);
-        }
+        dispatch_instruction(self, dec);
         break;
     case 4:
         self->signal.rw = false;

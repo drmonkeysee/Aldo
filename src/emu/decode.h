@@ -13,14 +13,14 @@
 #define DEC_INST_X \
 X(UNK, self)        /* Unknown */ \
 \
-X(ADC, self)        /* Add with carry */ \
-X(AND, self)        /* Logical and */ \
+X(ADC, self, dec)        /* Add with carry */ \
+X(AND, self, dec)        /* Logical and */ \
 X(ASL, self, dec)   /* Arithmetic shift left */ \
 \
 X(BCC, self)        /* Branch if carry clear */ \
 X(BCS, self)        /* Branch if carry set */ \
 X(BEQ, self)        /* Branch if zero */ \
-X(BIT, self)        /* Test bits */ \
+X(BIT, self, dec)        /* Test bits */ \
 X(BMI, self)        /* Branch if negative */ \
 X(BNE, self)        /* Branch if not zero */ \
 X(BPL, self)        /* Branch if positive */ \
@@ -32,31 +32,31 @@ X(CLC, self)        /* Clear carry */ \
 X(CLD, self)        /* Clear decimal */ \
 X(CLI, self)        /* Clear interrupt disable */ \
 X(CLV, self)        /* Clear overflow */ \
-X(CMP, self)        /* Compare to accumulator */ \
-X(CPX, self)        /* Compare to x index */ \
-X(CPY, self)        /* Compare to y index */ \
+X(CMP, self, dec)        /* Compare to accumulator */ \
+X(CPX, self, dec)        /* Compare to x index */ \
+X(CPY, self, dec)        /* Compare to y index */ \
 \
-X(DEC, self)        /* Decrement memory */ \
+X(DEC, self, dec)        /* Decrement memory */ \
 X(DEX, self)        /* Decrement x index */ \
 X(DEY, self)        /* Decrement y index */ \
 \
-X(EOR, self)        /* Logical exclusive or */ \
+X(EOR, self, dec)        /* Logical exclusive or */ \
 \
-X(INC, self)        /* Increment memory */ \
+X(INC, self, dec)        /* Increment memory */ \
 X(INX, self)        /* Increment x index */ \
 X(INY, self)        /* Increment y index */ \
 \
 X(JMP, self)        /* Jump */ \
 X(JSR, self)        /* Jump to subroutine */ \
 \
-X(LDA, self)        /* Load accumulator */ \
-X(LDX, self)        /* Load x index */ \
-X(LDY, self)        /* Load y index */ \
+X(LDA, self, dec)        /* Load accumulator */ \
+X(LDX, self, dec)        /* Load x index */ \
+X(LDY, self, dec)        /* Load y index */ \
 X(LSR, self, dec)  /* Logical shift right */ \
 \
 X(NOP, self)        /* No-op */ \
 \
-X(ORA, self)        /* Logical or */ \
+X(ORA, self, dec)        /* Logical or */ \
 \
 X(PHA, self)        /* Push accumulator */ \
 X(PHP, self)        /* Push status */ \
@@ -68,13 +68,13 @@ X(ROR, self, dec)   /* Rotate right */ \
 X(RTI, self)        /* Return from interrupt */ \
 X(RTS, self)        /* Return from subroutine */ \
 \
-X(SBC, self)        /* Subtract with carry */ \
+X(SBC, self, dec)        /* Subtract with carry */ \
 X(SEC, self)        /* Set carry */ \
 X(SED, self)        /* Set decimal */ \
 X(SEI, self)        /* Set interrupt disable */ \
-X(STA, self)        /* Store accumulator */ \
-X(STX, self)        /* Store x index */ \
-X(STY, self)        /* Store y index */ \
+X(STA, self, dec)        /* Store accumulator */ \
+X(STX, self, dec)        /* Store x index */ \
+X(STY, self, dec)        /* Store y index */ \
 \
 X(TAX, self)        /* Transfer accumulator to x index */ \
 X(TAY, self)        /* Transfer accumulator to y index */ \

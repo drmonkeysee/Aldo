@@ -335,6 +335,30 @@ static void dis_inst_disassembles_absolute_y(void *ctx)
     ct_assertequalstr("$1234: B9 34 06    LDA $0634,Y", buf);
 }
 
+static void dis_inst_disassembles_jmp_absolute(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0x4c, 0x34, 0x6};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(3, length);
+    ct_assertequalstr("$1234: 4C 34 06    JMP $0634", buf);
+}
+
+static void dis_inst_disassembles_jmp_indirect(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0x6c, 0x34, 0x6};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(3, length);
+    ct_assertequalstr("$1234: 6C 34 06    JMP ($0634)", buf);
+}
+
 //
 // dis_datapath
 //
@@ -1039,6 +1063,166 @@ static void dis_datapath_absolute_y_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
+static void dis_datapath_jmp_absolute_cycle_zero(void *ctx)
+{
+    const uint8_t rom[] = {0x4c, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 0,
+            .program_counter = 0x8001,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "JMP abs";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_jmp_absolute_cycle_one(void *ctx)
+{
+    const uint8_t rom[] = {0x4c, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 1,
+            .program_counter = 0x8002,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "JMP $??43";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_jmp_absolute_cycle_two(void *ctx)
+{
+    const uint8_t rom[] = {0x4c, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 2,
+            .program_counter = 0x8003,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "JMP $2143";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_jmp_absolute_cycle_n(void *ctx)
+{
+    const uint8_t rom[] = {0x4c, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 3,
+            .program_counter = 0x8003,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "JMP $2143";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_jmp_indirect_cycle_zero(void *ctx)
+{
+    const uint8_t rom[] = {0x6c, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 0,
+            .program_counter = 0x8001,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "JMP (abs)";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_jmp_indirect_cycle_one(void *ctx)
+{
+    const uint8_t rom[] = {0x6c, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 1,
+            .program_counter = 0x8002,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "JMP ($??43)";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_jmp_indirect_cycle_two(void *ctx)
+{
+    const uint8_t rom[] = {0x6c, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 2,
+            .program_counter = 0x8003,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "JMP ($2143)";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_jmp_indirect_cycle_n(void *ctx)
+{
+    const uint8_t rom[] = {0x6c, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 3,
+            .program_counter = 0x8003,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "JMP ($2143)";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
 //
 // Test List
 //
@@ -1072,6 +1256,8 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(dis_inst_disassembles_absolute),
         ct_maketest(dis_inst_disassembles_absolute_x),
         ct_maketest(dis_inst_disassembles_absolute_y),
+        ct_maketest(dis_inst_disassembles_jmp_absolute),
+        ct_maketest(dis_inst_disassembles_jmp_indirect),
 
         ct_maketest(dis_datapath_addr_too_low),
         ct_maketest(dis_datapath_offset_overflow),
@@ -1118,6 +1304,16 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(dis_datapath_absolute_y_cycle_one),
         ct_maketest(dis_datapath_absolute_y_cycle_two),
         ct_maketest(dis_datapath_absolute_y_cycle_n),
+
+        ct_maketest(dis_datapath_jmp_absolute_cycle_zero),
+        ct_maketest(dis_datapath_jmp_absolute_cycle_one),
+        ct_maketest(dis_datapath_jmp_absolute_cycle_two),
+        ct_maketest(dis_datapath_jmp_absolute_cycle_n),
+
+        ct_maketest(dis_datapath_jmp_indirect_cycle_zero),
+        ct_maketest(dis_datapath_jmp_indirect_cycle_one),
+        ct_maketest(dis_datapath_jmp_indirect_cycle_two),
+        ct_maketest(dis_datapath_jmp_indirect_cycle_n),
     };
 
     return ct_makesuite(tests);

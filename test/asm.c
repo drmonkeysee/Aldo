@@ -236,6 +236,54 @@ static void dis_inst_disassembles_zeropage(void *ctx)
     ct_assertequalstr("$1234: A5 34       LDA $34", buf);
 }
 
+static void dis_inst_disassembles_zeropage_x(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0xb5, 0x34};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(2, length);
+    ct_assertequalstr("$1234: B5 34       LDA $34,X", buf);
+}
+
+static void dis_inst_disassembles_zeropage_y(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0xb6, 0x34};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(2, length);
+    ct_assertequalstr("$1234: B6 34       LDX $34,Y", buf);
+}
+
+static void dis_inst_disassembles_indirect_x(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0xa1, 0x34};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(2, length);
+    ct_assertequalstr("$1234: A1 34       LDA ($34,X)", buf);
+}
+
+static void dis_inst_disassembles_indirect_y(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0xb1, 0x34};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(2, length);
+    ct_assertequalstr("$1234: B1 34       LDA ($34),Y", buf);
+}
+
 static void dis_inst_disassembles_absolute(void *ctx)
 {
     const uint16_t a = 0x1234;
@@ -246,6 +294,30 @@ static void dis_inst_disassembles_absolute(void *ctx)
 
     ct_assertequal(3, length);
     ct_assertequalstr("$1234: AD 34 06    LDA $0634", buf);
+}
+
+static void dis_inst_disassembles_absolute_x(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0xbd, 0x34, 0x6};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(3, length);
+    ct_assertequalstr("$1234: BD 34 06    LDA $0634,X", buf);
+}
+
+static void dis_inst_disassembles_absolute_y(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0xb9, 0x34, 0x6};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(3, length);
+    ct_assertequalstr("$1234: B9 34 06    LDA $0634,Y", buf);
 }
 
 //
@@ -259,7 +331,7 @@ static void dis_datapath_addr_too_low(void *ctx)
         .cpu = {
             .exec_cycle = 0,
             .program_counter = 0x10,
-            .opcode = 0xea,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -279,7 +351,7 @@ static void dis_datapath_offset_overflow(void *ctx)
         .cpu = {
             .exec_cycle = 0,
             .program_counter = 0xfffe,
-            .opcode = 0xad,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -299,7 +371,7 @@ static void dis_datapath_implied_cycle_zero(void *ctx)
         .cpu = {
             .exec_cycle = 0,
             .program_counter = 0x8001,
-            .opcode = 0xea,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -319,7 +391,7 @@ static void dis_datapath_implied_cycle_one(void *ctx)
         .cpu = {
             .exec_cycle = 1,
             .program_counter = 0x8001,
-            .opcode = 0xea,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -339,7 +411,7 @@ static void dis_datapath_implied_cycle_n(void *ctx)
         .cpu = {
             .exec_cycle = 2,
             .program_counter = 0x8001,
-            .opcode = 0xea,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -359,7 +431,7 @@ static void dis_datapath_immediate_cycle_zero(void *ctx)
         .cpu = {
             .exec_cycle = 0,
             .program_counter = 0x8001,
-            .opcode = 0xa9,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -379,7 +451,7 @@ static void dis_datapath_immediate_cycle_one(void *ctx)
         .cpu = {
             .exec_cycle = 1,
             .program_counter = 0x8002,
-            .opcode = 0xa9,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -399,7 +471,7 @@ static void dis_datapath_immediate_cycle_n(void *ctx)
         .cpu = {
             .exec_cycle = 2,
             .program_counter = 0x8002,
-            .opcode = 0xa9,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -419,7 +491,7 @@ static void dis_datapath_zeropage_cycle_zero(void *ctx)
         .cpu = {
             .exec_cycle = 0,
             .program_counter = 0x8001,
-            .opcode = 0xa5,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -439,7 +511,7 @@ static void dis_datapath_zeropage_cycle_one(void *ctx)
         .cpu = {
             .exec_cycle = 1,
             .program_counter = 0x8002,
-            .opcode = 0xa5,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -459,7 +531,7 @@ static void dis_datapath_zeropage_cycle_n(void *ctx)
         .cpu = {
             .exec_cycle = 2,
             .program_counter = 0x8002,
-            .opcode = 0xa5,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -479,7 +551,7 @@ static void dis_datapath_zeropage_x_cycle_zero(void *ctx)
         .cpu = {
             .exec_cycle = 0,
             .program_counter = 0x8001,
-            .opcode = 0xb5,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -499,7 +571,7 @@ static void dis_datapath_zeropage_x_cycle_one(void *ctx)
         .cpu = {
             .exec_cycle = 1,
             .program_counter = 0x8002,
-            .opcode = 0xb5,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -519,7 +591,7 @@ static void dis_datapath_zeropage_x_cycle_n(void *ctx)
         .cpu = {
             .exec_cycle = 2,
             .program_counter = 0x8002,
-            .opcode = 0xb5,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -539,7 +611,7 @@ static void dis_datapath_zeropage_y_cycle_zero(void *ctx)
         .cpu = {
             .exec_cycle = 0,
             .program_counter = 0x8001,
-            .opcode = 0xb6,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -559,7 +631,7 @@ static void dis_datapath_zeropage_y_cycle_one(void *ctx)
         .cpu = {
             .exec_cycle = 1,
             .program_counter = 0x8002,
-            .opcode = 0xb6,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -579,7 +651,7 @@ static void dis_datapath_zeropage_y_cycle_n(void *ctx)
         .cpu = {
             .exec_cycle = 2,
             .program_counter = 0x8002,
-            .opcode = 0xb6,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -599,7 +671,7 @@ static void dis_datapath_indirect_x_cycle_zero(void *ctx)
         .cpu = {
             .exec_cycle = 0,
             .program_counter = 0x8001,
-            .opcode = 0xa1,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -619,7 +691,7 @@ static void dis_datapath_indirect_x_cycle_one(void *ctx)
         .cpu = {
             .exec_cycle = 1,
             .program_counter = 0x8002,
-            .opcode = 0xa1,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -639,7 +711,7 @@ static void dis_datapath_indirect_x_cycle_n(void *ctx)
         .cpu = {
             .exec_cycle = 2,
             .program_counter = 0x8002,
-            .opcode = 0xa1,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -659,7 +731,7 @@ static void dis_datapath_indirect_y_cycle_zero(void *ctx)
         .cpu = {
             .exec_cycle = 0,
             .program_counter = 0x8001,
-            .opcode = 0xb1,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -679,7 +751,7 @@ static void dis_datapath_indirect_y_cycle_one(void *ctx)
         .cpu = {
             .exec_cycle = 1,
             .program_counter = 0x8002,
-            .opcode = 0xb1,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -699,7 +771,7 @@ static void dis_datapath_indirect_y_cycle_n(void *ctx)
         .cpu = {
             .exec_cycle = 2,
             .program_counter = 0x8002,
-            .opcode = 0xb1,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -719,7 +791,7 @@ static void dis_datapath_absolute_cycle_zero(void *ctx)
         .cpu = {
             .exec_cycle = 0,
             .program_counter = 0x8001,
-            .opcode = 0xad,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -739,7 +811,7 @@ static void dis_datapath_absolute_cycle_one(void *ctx)
         .cpu = {
             .exec_cycle = 1,
             .program_counter = 0x8002,
-            .opcode = 0xad,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -759,7 +831,7 @@ static void dis_datapath_absolute_cycle_two(void *ctx)
         .cpu = {
             .exec_cycle = 2,
             .program_counter = 0x8003,
-            .opcode = 0xad,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -779,7 +851,7 @@ static void dis_datapath_absolute_cycle_n(void *ctx)
         .cpu = {
             .exec_cycle = 3,
             .program_counter = 0x8003,
-            .opcode = 0xad,
+            .opcode = rom[0],
         },
         .rom = rom,
     };
@@ -788,6 +860,166 @@ static void dis_datapath_absolute_cycle_n(void *ctx)
     const int written = dis_datapath(&sn, buf);
 
     const char *const exp = "LDA $2143";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_absolute_x_cycle_zero(void *ctx)
+{
+    const uint8_t rom[] = {0xbd, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 0,
+            .program_counter = 0x8001,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDA abs,X";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_absolute_x_cycle_one(void *ctx)
+{
+    const uint8_t rom[] = {0xbd, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 1,
+            .program_counter = 0x8002,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDA $??43,X";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_absolute_x_cycle_two(void *ctx)
+{
+    const uint8_t rom[] = {0xbd, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 2,
+            .program_counter = 0x8003,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDA $2143,X";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_absolute_x_cycle_n(void *ctx)
+{
+    const uint8_t rom[] = {0xbd, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 3,
+            .program_counter = 0x8003,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDA $2143,X";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_absolute_y_cycle_zero(void *ctx)
+{
+    const uint8_t rom[] = {0xb9, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 0,
+            .program_counter = 0x8001,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDA abs,Y";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_absolute_y_cycle_one(void *ctx)
+{
+    const uint8_t rom[] = {0xb9, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 1,
+            .program_counter = 0x8002,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDA $??43,Y";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_absolute_y_cycle_two(void *ctx)
+{
+    const uint8_t rom[] = {0xb9, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 2,
+            .program_counter = 0x8003,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDA $2143,Y";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_absolute_y_cycle_n(void *ctx)
+{
+    const uint8_t rom[] = {0xb9, 0x43, 0x21};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 3,
+            .program_counter = 0x8003,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "LDA $2143,Y";
     ct_assertequal((int)strlen(exp), written);
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
@@ -817,7 +1049,13 @@ struct ct_testsuite asm_tests(void)
         ct_maketest(dis_inst_disassembles_implied),
         ct_maketest(dis_inst_disassembles_immediate),
         ct_maketest(dis_inst_disassembles_zeropage),
+        ct_maketest(dis_inst_disassembles_zeropage_x),
+        ct_maketest(dis_inst_disassembles_zeropage_y),
+        ct_maketest(dis_inst_disassembles_indirect_x),
+        ct_maketest(dis_inst_disassembles_indirect_y),
         ct_maketest(dis_inst_disassembles_absolute),
+        ct_maketest(dis_inst_disassembles_absolute_x),
+        ct_maketest(dis_inst_disassembles_absolute_y),
 
         ct_maketest(dis_datapath_addr_too_low),
         ct_maketest(dis_datapath_offset_overflow),
@@ -854,6 +1092,16 @@ struct ct_testsuite asm_tests(void)
         ct_maketest(dis_datapath_absolute_cycle_one),
         ct_maketest(dis_datapath_absolute_cycle_two),
         ct_maketest(dis_datapath_absolute_cycle_n),
+
+        ct_maketest(dis_datapath_absolute_x_cycle_zero),
+        ct_maketest(dis_datapath_absolute_x_cycle_one),
+        ct_maketest(dis_datapath_absolute_x_cycle_two),
+        ct_maketest(dis_datapath_absolute_x_cycle_n),
+
+        ct_maketest(dis_datapath_absolute_y_cycle_zero),
+        ct_maketest(dis_datapath_absolute_y_cycle_one),
+        ct_maketest(dis_datapath_absolute_y_cycle_two),
+        ct_maketest(dis_datapath_absolute_y_cycle_n),
     };
 
     return ct_makesuite(tests);

@@ -711,10 +711,9 @@ static void ZP_sequence(struct mos6502 *self, struct decoded dec)
     case 1:
         self->addrbus = self->pc++;
         read(self);
-        self->ada = self->databus;
         break;
     case 2:
-        self->addrbus = bytowr(self->ada, 0x0);
+        self->addrbus = bytowr(self->databus, 0x0);
         dispatch_instruction(self, dec);
         break;
     case 3:
@@ -816,10 +815,9 @@ static void ABS_sequence(struct mos6502 *self, struct decoded dec)
     case 2:
         self->addrbus = self->pc++;
         read(self);
-        self->adb = self->databus;
         break;
     case 3:
-        self->addrbus = bytowr(self->ada, self->adb);
+        self->addrbus = bytowr(self->ada, self->databus);
         dispatch_instruction(self, dec);
         break;
     case 4:

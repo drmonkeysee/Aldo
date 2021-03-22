@@ -82,6 +82,27 @@ static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
     return total + count;
 }
 
+static uint16_t datapath_operand(const struct console_state *snapshot,
+                                 struct decoded dec, uint16_t rom_idx)
+{
+    // NOTE: derive operand of JMP instruction from address-latch
+    // internals since JMP adjusts PC and throws off the general
+    // operand derivation.
+    if (dec.instruction == IN_JMP) {
+        if (dec.mode == AM_JABS) {
+            return bytowr(snapshot->cpu.addra_latch, snapshot->cpu.databus);
+        } else {
+            // NOTE: JIND mode: subtract 1 from addrc if past cycle 2 to
+            // offset datapath's advancement of addrc when
+            // fetching jump address high.
+            const uint8_t addrlow_offset = snapshot->cpu.addrc_latch
+                                           - (snapshot->cpu.exec_cycle > 2);
+            return bytowr(addrlow_offset, snapshot->cpu.addrb_latch);
+        }
+    }
+    return batowr(snapshot->rom + rom_idx);
+}
+
 //
 // Public Interface
 //
@@ -178,31 +199,9 @@ int dis_datapath(const struct console_state *snapshot,
         count = sprintf(dis + total, displaystr, snapshot->rom[rom_idx + 1]);
         break;
     default:
-        {
-            uint16_t displayaddr;
-            // NOTE: derive display state of JMP instruction from address-latch
-            // internals since JMP adjusts PC and throws off the general
-            // decoding derivation.
-            if (dec.instruction == IN_JMP) {
-                if (dec.mode == AM_JABS) {
-                    displayaddr = bytowr(snapshot->cpu.addra_latch,
-                                         snapshot->cpu.databus);
-                } else {
-                    // NOTE: subtract 1 from addrc if past cycle 2 to
-                    // offset datapath's advancement of addrc to fetch
-                    // indirect address high.
-                    const uint8_t addrlow_offset = snapshot->cpu.addrc_latch
-                                                   - (snapshot->cpu.exec_cycle
-                                                      > 2);
-                    displayaddr = bytowr(addrlow_offset,
-                                         snapshot->cpu.addrb_latch);
-                }
-            } else {
-                displayaddr = batowr(snapshot->rom + rom_idx + 1);
-            }
-            count = sprintf(dis + total, displaystr, displayaddr);
-            break;
-        }
+        count = sprintf(dis + total, displaystr,
+                        datapath_operand(snapshot, dec, rom_idx + 1));
+        break;
     }
     if (count < 0) return ASM_FMT_FAIL;
     total += count;

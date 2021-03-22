@@ -1088,6 +1088,7 @@ static void dis_datapath_jmp_absolute_cycle_one(void *ctx)
     const uint8_t rom[] = {0x4c, 0x43, 0x21};
     const struct console_state sn = {
         .cpu = {
+            .addra_latch = rom[1],
             .exec_cycle = 1,
             .program_counter = 0x8002,
             .opcode = rom[0],
@@ -1108,6 +1109,8 @@ static void dis_datapath_jmp_absolute_cycle_two(void *ctx)
     const uint8_t rom[] = {0x4c, 0x43, 0x21};
     const struct console_state sn = {
         .cpu = {
+            .addra_latch = rom[1],
+            .databus = rom[2],
             .exec_cycle = 2,
             .program_counter = 0x8003,
             .opcode = rom[0],
@@ -1128,6 +1131,8 @@ static void dis_datapath_jmp_absolute_cycle_n(void *ctx)
     const uint8_t rom[] = {0x4c, 0x43, 0x21};
     const struct console_state sn = {
         .cpu = {
+            .addra_latch = rom[1],
+            .databus = rom[2],
             .exec_cycle = 3,
             .program_counter = 0x8003,
             .opcode = rom[0],
@@ -1168,6 +1173,7 @@ static void dis_datapath_jmp_indirect_cycle_one(void *ctx)
     const uint8_t rom[] = {0x6c, 0x43, 0x21};
     const struct console_state sn = {
         .cpu = {
+            .addrc_latch = rom[1],
             .exec_cycle = 1,
             .program_counter = 0x8002,
             .opcode = rom[0],
@@ -1188,6 +1194,8 @@ static void dis_datapath_jmp_indirect_cycle_two(void *ctx)
     const uint8_t rom[] = {0x6c, 0x43, 0x21};
     const struct console_state sn = {
         .cpu = {
+            .addrc_latch = rom[1],
+            .addrb_latch = rom[2],
             .exec_cycle = 2,
             .program_counter = 0x8003,
             .opcode = rom[0],
@@ -1208,6 +1216,8 @@ static void dis_datapath_jmp_indirect_cycle_n(void *ctx)
     const uint8_t rom[] = {0x6c, 0x43, 0x21};
     const struct console_state sn = {
         .cpu = {
+            .addrc_latch = rom[1] + 1,
+            .addrb_latch = rom[2],
             .exec_cycle = 3,
             .program_counter = 0x8003,
             .opcode = rom[0],

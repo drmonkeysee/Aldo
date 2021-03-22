@@ -40,8 +40,8 @@ struct mos6502 {
     uint8_t databus,    // Byte put on the data pins on clock phase ϕ2
             opc,        // Opcode
             ada,        // Address latch A
-            adb;        // Address latch B
-    bool adc;           // Address carry, used during page-crossing
+            adb,        // Address latch B
+            adc;        // Address latch C/Address carry
     int8_t t;           // Instruction sequence cycle (T0, T1, T2...)
     struct {
         bool irq: 1,    // Maskable Interrupt Signal (input, inverted)

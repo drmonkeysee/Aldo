@@ -327,8 +327,8 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwaddstr(DatapathView.content, cursor_y, vsep4 + 1,
               snapshot->lines.readwrite ? left : right);
 
-    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adc: %d",
-              snapshot->cpu.addr_carry);
+    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adc: $%02X",
+              snapshot->cpu.addrc_latch);
 
     mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "%*sT%u",
               snapshot->cpu.exec_cycle, "", snapshot->cpu.exec_cycle);

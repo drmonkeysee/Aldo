@@ -178,9 +178,31 @@ int dis_datapath(const struct console_state *snapshot,
         count = sprintf(dis + total, displaystr, snapshot->rom[rom_idx + 1]);
         break;
     default:
-        count = sprintf(dis + total, displaystr,
-                        batowr(snapshot->rom + rom_idx + 1));
-        break;
+        {
+            uint16_t displayaddr;
+            // NOTE: derive display state of JMP instruction from address-latch
+            // internals since JMP adjusts PC and throws off the general
+            // decoding derivation.
+            if (dec.instruction == IN_JMP) {
+                if (dec.mode == AM_JABS) {
+                    displayaddr = bytowr(snapshot->cpu.addra_latch,
+                                         snapshot->cpu.databus);
+                } else {
+                    // NOTE: subtract 1 from addrc if past cycle 2 to
+                    // offset datapath's advancement of addrc to fetch
+                    // indirect address high.
+                    const uint8_t addrlow_offset = snapshot->cpu.addrc_latch
+                                                   - (snapshot->cpu.exec_cycle
+                                                      > 2);
+                    displayaddr = bytowr(addrlow_offset,
+                                         snapshot->cpu.addrb_latch);
+                }
+            } else {
+                displayaddr = batowr(snapshot->rom + rom_idx + 1);
+            }
+            count = sprintf(dis + total, displaystr, displayaddr);
+            break;
+        }
     }
     if (count < 0) return ASM_FMT_FAIL;
     total += count;

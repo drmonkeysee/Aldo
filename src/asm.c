@@ -85,19 +85,17 @@ static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
 static uint16_t datapath_operand(const struct console_state *snapshot,
                                  struct decoded dec, uint16_t rom_idx)
 {
-    // NOTE: derive operand of JMP instruction from address-latch
-    // internals since JMP adjusts PC and throws off the general
-    // operand derivation.
-    if (dec.instruction == IN_JMP) {
+    // NOTE: derive operand of final JMP instruction cycle from
+    // address-latch internals since JMP adjusts PC and throws off
+    // the general operand derivation.
+    if (dec.instruction == IN_JMP && snapshot->cpu.instdone) {
         if (dec.mode == AM_JABS) {
             return bytowr(snapshot->cpu.addra_latch, snapshot->cpu.databus);
         } else {
-            // NOTE: JIND mode: subtract 1 from addrc if past cycle 2 to
-            // offset datapath's advancement of addrc when
-            // fetching jump address high.
-            const uint8_t addrlow_offset = snapshot->cpu.addrc_latch
-                                           - (snapshot->cpu.exec_cycle > 2);
-            return bytowr(addrlow_offset, snapshot->cpu.addrb_latch);
+            // NOTE: JIND mode final cycle, addrc is operand-low + 1
+            // due to fetching jump address-high.
+            return bytowr(snapshot->cpu.addrc_latch - 1,
+                          snapshot->cpu.addrb_latch);
         }
     }
     return batowr(snapshot->rom + rom_idx);

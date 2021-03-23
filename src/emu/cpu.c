@@ -167,6 +167,10 @@ static void bitoperation(struct mos6502 *self, struct decoded dec,
     }
 }
 
+// NOTE: all 6502 cycles are either a read or a write, some of them discarded
+// depending on the instruction and addressing-mode timing; these extra reads
+// and writes are all modeled below to help verify cycle-accurate behavior.
+
 static bool read_delayed(struct mos6502 *self, struct decoded dec,
                          bool delay_condition)
 {
@@ -216,10 +220,6 @@ static bool write_delayed(struct mos6502 *self, struct decoded dec)
     }
     return delayed;
 }
-
-// NOTE: all 6502 cycles are either a read or a write, some of them discarded
-// depending on the instruction and addressing-mode timing; these extra reads
-// and writes are all modeled below to help verify cycle-accurate behavior.
 
 static void UNK_exec(struct mos6502 *self)
 {
@@ -1032,8 +1032,6 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.databus = self->databus;
     snapshot->cpu.exec_cycle = self->t;
     snapshot->cpu.opcode = self->opc;
-    snapshot->cpu.datafault = self->dflt;
-    snapshot->cpu.instdone = self->presync;
 
     snapshot->lines.irq = self->signal.irq;
     snapshot->lines.nmi = self->signal.nmi;
@@ -1041,4 +1039,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->lines.ready = self->signal.rdy;
     snapshot->lines.reset = self->signal.res;
     snapshot->lines.sync = self->signal.sync;
+
+    snapshot->cpu.datafault = self->dflt;
+    snapshot->cpu.instdone = self->presync;
 }

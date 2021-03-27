@@ -63,7 +63,7 @@ static void cpu_asl_abs(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0xe, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x1,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x1,
     };
     cpu.ram = mem;
 
@@ -168,7 +168,7 @@ static void cpu_dec_abs(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0xce, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.ram = mem;
 
@@ -208,7 +208,7 @@ static void cpu_inc_abs(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0xee, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.ram = mem;
 
@@ -285,7 +285,7 @@ static void cpu_lsr_abs(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x4e, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x2,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x2,
     };
     cpu.ram = mem;
 
@@ -326,7 +326,7 @@ static void cpu_rol_abs(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x2e, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.p.c = true;
@@ -348,7 +348,7 @@ static void cpu_ror_abs(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x6e, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.p.c = true;
@@ -393,7 +393,7 @@ static void cpu_sta_abs(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x8d, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.a = 0xa;
     cpu.ram = mem;
@@ -412,7 +412,7 @@ static void cpu_stx_abs(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x8e, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.x = 0xf1;
     cpu.ram = mem;
@@ -431,7 +431,7 @@ static void cpu_sty_abs(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x8c, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.y = 0x84;
     cpu.ram = mem;
@@ -540,8 +540,7 @@ static void cpu_asl_absx(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x1e, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
-        [517] = 0x0, [518] = 0x0, [519] = 0x1, [520] = 0x0, [521] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.x = 3;
@@ -563,7 +562,7 @@ static void cpu_asl_absx_pagecross(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x1e, 0xff, 0x1,
-        [512] = 0x0, [513] = 0x0, [514] = 0x1, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x1, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
@@ -628,8 +627,7 @@ static void cpu_dec_absx(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0xde, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
-        [517] = 0x0, [518] = 0x0, [519] = 0x0, [520] = 0x0, [521] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.x = 3;
@@ -650,7 +648,7 @@ static void cpu_dec_absx_pagecross(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0xde, 0xff, 0x1,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
@@ -712,8 +710,7 @@ static void cpu_inc_absx(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0xfe, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
-        [517] = 0x0, [518] = 0x0, [519] = 0x0, [520] = 0x0, [521] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.x = 3;
@@ -734,7 +731,7 @@ static void cpu_inc_absx_pagecross(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0xfe, 0xff, 0x1,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
@@ -833,8 +830,7 @@ static void cpu_lsr_absx(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x5e, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
-        [517] = 0x0, [518] = 0x0, [519] = 0x2, [520] = 0x0, [521] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.x = 3;
@@ -856,7 +852,7 @@ static void cpu_lsr_absx_pagecross(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x5e, 0xff, 0x1,
-        [512] = 0x0, [513] = 0x0, [514] = 0x2, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x2, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
@@ -919,8 +915,7 @@ static void cpu_rol_absx(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x3e, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
-        [517] = 0x0, [518] = 0x0, [519] = 0x0, [520] = 0x0, [521] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.x = 3;
@@ -943,7 +938,7 @@ static void cpu_rol_absx_pagecross(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x3e, 0xff, 0x1,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
@@ -966,8 +961,7 @@ static void cpu_ror_absx(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x7e, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
-        [517] = 0x0, [518] = 0x0, [519] = 0x0, [520] = 0x0, [521] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.x = 3;
@@ -990,7 +984,7 @@ static void cpu_ror_absx_pagecross(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x7e, 0xff, 0x1,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.ram = mem;
     cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
@@ -1060,8 +1054,7 @@ static void cpu_sta_absx(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x9d, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
-        [517] = 0x0, [518] = 0x0, [519] = 0x0, [520] = 0x0, [521] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.a = 0xa;
     cpu.ram = mem;
@@ -1081,7 +1074,7 @@ static void cpu_sta_absx_pagecross(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x9d, 0xff, 0x1,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.a = 0xa;
     cpu.ram = mem;
@@ -1441,8 +1434,7 @@ static void cpu_sta_absy(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x99, 0x4, 0x2,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
-        [517] = 0x0, [518] = 0x0, [519] = 0x0, [520] = 0x0, [521] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.a = 0xa;
     cpu.ram = mem;
@@ -1462,7 +1454,7 @@ static void cpu_sta_absy_pagecross(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x99, 0xff, 0x1,
-        [512] = 0x0, [513] = 0x0, [514] = 0x0, [515] = 0x0, [516] = 0x0,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     cpu.a = 0xa;
     cpu.ram = mem;

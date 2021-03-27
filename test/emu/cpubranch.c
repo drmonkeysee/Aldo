@@ -60,7 +60,7 @@ static void cpu_bcc_positive_overflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[256] = {[250] = 0x90, [251] = 0xa}; // NOTE: $00FD + 10
+    uint8_t mem[] = {[250] = 0x90, 0xa};    // NOTE: $00FD + 10
     cpu.ram = mem;
     cpu.pc = 250;
 
@@ -74,7 +74,7 @@ static void cpu_bcc_negative_overflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[260] = {[256] = 0x90, [257] = 0xf6};    // NOTE: $0102 - 10
+    uint8_t mem[] = {[256] = 0x90, 0xf6};   // NOTE: $0102 - 10
     cpu.ram = mem;
     cpu.pc = 256;
 

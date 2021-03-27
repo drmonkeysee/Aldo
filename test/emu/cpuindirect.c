@@ -686,7 +686,7 @@ static void cpu_sta_indy_pagecross(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {
         0x91, 0x2, 0xff, 0x0,
-        [256] = 0x0, [257] = 0x0, [258] = 0x0, [259] = 0x0,
+        [256] = 0x0, 0x0, 0x0, 0x0,
     };
     cpu.a = 0xa;
     cpu.ram = mem;

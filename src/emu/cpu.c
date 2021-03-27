@@ -718,9 +718,7 @@ static void branch_displacement(struct mos6502 *self)
 
 static void branch_carry(struct mos6502 *self)
 {
-    self->ada = self->pc >> 8;
-    self->ada += self->adc;
-    self->pc = bytowr(self->adb, self->ada);
+    self->pc = bytowr(self->adb, (self->pc >> 8) + self->adc);
     self->presync = true;
 }
 

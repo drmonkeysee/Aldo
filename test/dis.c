@@ -1280,6 +1280,68 @@ static void dis_datapath_jmp_indirect_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
+static void dis_datapath_bch_cycle_zero(void *ctx)
+{
+    const uint8_t rom[] = {0x90, 0x2, 0xff, 0xff, 0xff};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 0,
+            .program_counter = 0x8001,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "BCC rel";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_bch_cycle_one(void *ctx)
+{
+    const uint8_t rom[] = {0x90, 0x2, 0xff, 0xff, 0xff};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 1,
+            .program_counter = 0x8002,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "BCC +2";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_bch_cycle_n(void *ctx)
+{
+    const uint8_t rom[] = {0x90, 0x2, 0xff, 0xff, 0xff};
+    const struct console_state sn = {
+        .cpu = {
+            .addra_latch = rom[1],
+            .exec_cycle = 2,
+            .instdone = true,
+            .program_counter = 0x8004,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "BCC +2";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
 //
 // Test List
 //
@@ -1375,6 +1437,10 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(dis_datapath_jmp_indirect_cycle_one),
         ct_maketest(dis_datapath_jmp_indirect_cycle_two),
         ct_maketest(dis_datapath_jmp_indirect_cycle_n),
+
+        ct_maketest(dis_datapath_bch_cycle_zero),
+        ct_maketest(dis_datapath_bch_cycle_one),
+        ct_maketest(dis_datapath_bch_cycle_n),
     };
 
     return ct_makesuite(tests);

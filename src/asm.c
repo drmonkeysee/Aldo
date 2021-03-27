@@ -85,6 +85,18 @@ static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
 static uint16_t datapath_operand(const struct console_state *snapshot,
                                  struct decoded dec, uint16_t rom_idx)
 {
+    // NOTE: derive operand of final Branch instruction cycle from
+    // address-latch internals since Branch adjusts PC and throws off
+    // the general operand derivation.
+    if (dec.mode == AM_BCH && snapshot->cpu.instdone) {
+        return snapshot->cpu.addra_latch;
+    }
+    return snapshot->rom[rom_idx];
+}
+
+static uint16_t datapath_woperand(const struct console_state *snapshot,
+                                 struct decoded dec, uint16_t rom_idx)
+{
     // NOTE: derive operand of final JMP instruction cycle from
     // address-latch internals since JMP adjusts PC and throws off
     // the general operand derivation.
@@ -195,11 +207,12 @@ int dis_datapath(const struct console_state *snapshot,
         count = sprintf(dis + total, "%s", displaystr);
         break;
     case 1:
-        count = sprintf(dis + total, displaystr, snapshot->rom[rom_idx + 1]);
+        count = sprintf(dis + total, displaystr,
+                        datapath_operand(snapshot, dec, rom_idx + 1));
         break;
     default:
         count = sprintf(dis + total, displaystr,
-                        datapath_operand(snapshot, dec, rom_idx + 1));
+                        datapath_woperand(snapshot, dec, rom_idx + 1));
         break;
     }
     if (count < 0) return ASM_FMT_FAIL;

@@ -102,7 +102,7 @@ X(PSH, 1, "imp", "")                        /* Push */ \
 X(PLL, 1, "imp", "")                        /* Pull */ \
 \
 /* Branch */ \
-X(BCH, 2, "rel", "%04d")                    /* Relative branch */ \
+X(BCH, 2, "rel", "%+hhd")                   /* Relative branch */ \
 \
 /* Jumps */ \
 X(JSR, 3, "abs", "$??%02X", "$%04X")        /* Jump to subroutine, */ \

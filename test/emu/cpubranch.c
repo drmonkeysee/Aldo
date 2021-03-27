@@ -48,7 +48,7 @@ static void cpu_bcc_negative(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0xff, 0xff, 0xff, 0xff, 0x90, 0xfb};   // NOTE: $0006 - 5
     cpu.ram = mem;
-    cpu.pc = 0x8004;
+    cpu.pc = 4;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -87,13 +87,13 @@ static void cpu_bcc_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x90, 0x5};    // NOTE: $0002 + 5
+    uint8_t mem[] = {0x90, 0x0};    // NOTE: $0002 + 0
     cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
-    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(2u, cpu.pc);
 }
 
 //

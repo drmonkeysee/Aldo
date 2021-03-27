@@ -157,7 +157,7 @@ const struct decoded Decode[] = {
     {IN_STA, AM_ABS},    // 8D - STA abs
     {IN_STX, AM_ABS},    // 8E - STX abs
     UNK,    // 8F - Unofficial
-    UNK,    // 90 - BCC
+    {IN_BCC, AM_BCH},    // 90 - BCC
     {IN_STA, AM_INDY},    // 91 - STA (zp),Y
     UNK,    // 92 - Unofficial
     UNK,    // 93 - Unofficial

@@ -251,9 +251,14 @@ static void ASL_exec(struct mos6502 *self, struct decoded dec)
     self->presync = true;
 }
 
+// NOTE: branch instructions do not branch if the opposite condition is TRUE;
+// e.g. BCC (branch on carry clear) will not branch if carry is SET;
+// i.e. BranchOn(Condition) => presync = NOT(Condition).
+
 static void BCC_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    read(self);
+    self->presync = self->p.c;
 }
 
 static void BCS_exec(struct mos6502 *self)
@@ -689,6 +694,36 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
     }
 }
 
+static void branch_displacement(struct mos6502 *self)
+{
+    self->adb = self->pc;
+    self->adb += self->ada;
+    // NOTE: branch uses signed displacement so there are three overflow cases:
+    // no overflow = no adjustment to pc-high;
+    // positive overflow = carry-in to pc-high => pch + 1;
+    // negative overflow = borrow-out from pc-high => pch - 1;
+    // subtracting -overflow condition from +overflow condition results in:
+    // no overflow = 0 - 0 => pch + 0,
+    // +overflow = 1 - 0 => pch + 1,
+    // -overlow = 0 - 1 => pch - 1 => pch + 2sComplement(1) => pch + 0xff.
+    const bool negative_offset = self->ada & 0x80,
+               positive_overflow = self->adb < self->ada && !negative_offset,
+               negative_overflow = self->adb > self->ada && negative_offset;
+    self->adc = positive_overflow - negative_overflow;
+    if (!self->adc) {
+        self->pc = bytowr(self->adb, self->pc >> 8);
+        self->presync = true;
+    }
+}
+
+static void branch_carry(struct mos6502 *self)
+{
+    self->ada = self->pc >> 8;
+    self->ada += self->adc;
+    self->pc = bytowr(self->adb, self->ada);
+    self->presync = true;
+}
+
 static void IMP_sequence(struct mos6502 *self, struct decoded dec)
 {
     assert(self->t == 1);
@@ -854,7 +889,25 @@ static void PLL_sequence(struct mos6502 *self, struct decoded dec)
 
 static void BCH_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    switch (self->t) {
+    case 1:
+        self->addrbus = self->pc++;
+        dispatch_instruction(self, dec);
+        self->ada = self->databus;
+        break;
+    case 2:
+        self->addrbus = self->pc;
+        read(self);
+        branch_displacement(self);
+        break;
+    case 3:
+        self->addrbus = self->pc;
+        read(self);
+        branch_carry(self);
+        break;
+    default:
+        BAD_ADDR_SEQ;
+    }
 }
 
 static void JSR_sequence(struct mos6502 *self, struct decoded dec)

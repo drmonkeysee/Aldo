@@ -122,8 +122,9 @@ uint16_t dis_instaddr(const struct console_state *snapshot)
 
     const struct decoded dec = Decode[snapshot->cpu.opcode];
     int pc_offset;
-    // NOTE: if completed JMP instruction use pc value directly
-    if (dec.instruction == IN_JMP && snapshot->cpu.instdone) {
+    // NOTE: if completed JMP/Branch instruction use pc value directly
+    if ((dec.instruction == IN_JMP || dec.mode == AM_BCH)
+        && snapshot->cpu.instdone) {
         pc_offset = 0;
     } else {
         const int len = InstLens[dec.mode],

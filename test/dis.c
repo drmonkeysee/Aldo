@@ -199,6 +199,21 @@ static void dis_instaddr_jmp_complete_no_offset(void *ctx)
     ct_assertequal(0x8003u, result);
 }
 
+static void dis_instaddr_branch_complete_no_offset(void *ctx)
+{
+    const struct console_state sn = {
+        .cpu = {
+            .instdone = true,
+            .opcode = 0x90,
+            .program_counter = 0x8003,
+        },
+    };
+
+    const uint16_t result = dis_instaddr(&sn);
+
+    ct_assertequal(0x8003u, result);
+}
+
 //
 // dis_inst
 //
@@ -357,6 +372,42 @@ static void dis_inst_disassembles_jmp_indirect(void *ctx)
 
     ct_assertequal(3, length);
     ct_assertequalstr("$1234: 6C 34 06    JMP ($0634)", buf);
+}
+
+static void dis_inst_disassembles_branch_positive(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0x90, 0xa};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(2, length);
+    ct_assertequalstr("$1234: 90 0A       BCC +10", buf);
+}
+
+static void dis_inst_disassembles_branch_negative(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0x90, 0xf6};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(2, length);
+    ct_assertequalstr("$1234: 90 F6       BCC -10", buf);
+}
+
+static void dis_inst_disassembles_branch_zero(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0x90, 0x0};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(2, length);
+    ct_assertequalstr("$1234: 90 00       BCC +0", buf);
 }
 
 //
@@ -1250,6 +1301,7 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(dis_instaddr_three_byte_cycle_two),
         ct_maketest(dis_instaddr_three_byte_cycle_n),
         ct_maketest(dis_instaddr_jmp_complete_no_offset),
+        ct_maketest(dis_instaddr_branch_complete_no_offset),
 
         ct_maketest(dis_inst_does_nothing_if_no_bytes),
         ct_maketest(dis_inst_disassembles_implied),
@@ -1264,6 +1316,9 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(dis_inst_disassembles_absolute_y),
         ct_maketest(dis_inst_disassembles_jmp_absolute),
         ct_maketest(dis_inst_disassembles_jmp_indirect),
+        ct_maketest(dis_inst_disassembles_branch_positive),
+        ct_maketest(dis_inst_disassembles_branch_negative),
+        ct_maketest(dis_inst_disassembles_branch_zero),
 
         ct_maketest(dis_datapath_addr_too_low),
         ct_maketest(dis_datapath_offset_overflow),

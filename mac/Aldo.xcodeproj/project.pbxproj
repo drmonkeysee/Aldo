@@ -32,6 +32,7 @@
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
 		C85C8DC625BD29AC00611D19 /* asm.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* asm.c */; };
 		C86A41892606F73F00D05B98 /* cpujump.c in Sources */ = {isa = PBXBuildFile; fileRef = C86A41882606F73F00D05B98 /* cpujump.c */; };
+		C89E8AC9260ED5FE008395B6 /* cpubranch.c in Sources */ = {isa = PBXBuildFile; fileRef = C89E8AC8260ED5FE008395B6 /* cpubranch.c */; };
 		C8C4B48D25ABBFB3006A98BB /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
 		C8FD257125EB38DF0043F6E6 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C8FD257025EB38DF0043F6E6 /* cpu.c */; };
 		C8FD257425EB39AF0043F6E6 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C84B6C2125B2BAF300FCCD88 /* cpu.c */; };
@@ -90,6 +91,7 @@
 		C85C8DC425BD29AC00611D19 /* asm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = asm.h; sourceTree = "<group>"; };
 		C85C8DC525BD29AC00611D19 /* asm.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = asm.c; sourceTree = "<group>"; };
 		C86A41882606F73F00D05B98 /* cpujump.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpujump.c; sourceTree = "<group>"; };
+		C89E8AC8260ED5FE008395B6 /* cpubranch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpubranch.c; sourceTree = "<group>"; };
 		C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpanel.tbd; path = usr/lib/libpanel.tbd; sourceTree = SDKROOT; };
 		C8FD257025EB38DF0043F6E6 /* cpu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpu.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -217,6 +219,7 @@
 			children = (
 				C8FD257025EB38DF0043F6E6 /* cpu.c */,
 				C807C95F25F5884B00A791B5 /* cpuabsolute.c */,
+				C89E8AC8260ED5FE008395B6 /* cpubranch.c */,
 				C807C94925F585FB00A791B5 /* cpuhelp.h */,
 				C807C94A25F585FB00A791B5 /* cpuhelp.c */,
 				C807C95225F5877000A791B5 /* cpuimmediate.c */,
@@ -322,6 +325,7 @@
 				C8FD257125EB38DF0043F6E6 /* cpu.c in Sources */,
 				C807C95325F5877000A791B5 /* cpuimmediate.c in Sources */,
 				C8184D3E25E7496B002B3100 /* Tests.swift in Sources */,
+				C89E8AC9260ED5FE008395B6 /* cpubranch.c in Sources */,
 				C8184D8225E76555002B3100 /* decode.c in Sources */,
 				C8184D7F25E7654D002B3100 /* bytes.c in Sources */,
 				C807C95C25F5881400A791B5 /* cpuindirect.c in Sources */,

@@ -74,13 +74,14 @@ static void cpu_bcc_negative_overflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x90, 0xf6};   // NOTE: $0002 - 10
+    uint8_t mem[260] = {[256] = 0x90, [257] = 0xf6};    // NOTE: $0102 - 10
     cpu.ram = mem;
+    cpu.pc = 256;
 
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
-    ct_assertequal(0xfff8u, cpu.pc);
+    ct_assertequal(248u, cpu.pc);
 }
 
 static void cpu_bcc_zero(void *ctx)

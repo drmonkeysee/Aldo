@@ -84,6 +84,19 @@ static void cpu_bcc_negative_overflow(void *ctx)
     ct_assertequal(248u, cpu.pc);
 }
 
+static void cpu_bcc_negative_wraparound(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x90, 0xf6};   // NOTE: $0002 - 10
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(0xfff8u, cpu.pc);
+}
+
 static void cpu_bcc_zero(void *ctx)
 {
     struct mos6502 cpu;
@@ -109,6 +122,7 @@ struct ct_testsuite cpu_branch_tests(void)
         ct_maketest(cpu_bcc_negative),
         ct_maketest(cpu_bcc_positive_overflow),
         ct_maketest(cpu_bcc_negative_overflow),
+        ct_maketest(cpu_bcc_negative_wraparound),
         ct_maketest(cpu_bcc_zero),
     };
 

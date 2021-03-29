@@ -1033,6 +1033,7 @@ int cpu_cycle(struct mos6502 *self)
         self->addrbus = self->pc++;
         read(self);
         self->opc = self->databus;
+        self->addrinst = self->addrbus;
     } else {
         self->signal.sync = false;
         dispatch_addrmode(self, Decode[self->opc]);
@@ -1056,6 +1057,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.addra_latch = self->ada;
     snapshot->cpu.addrb_latch = self->adb;
     snapshot->cpu.addrc_latch = self->adc;
+    snapshot->cpu.current_instruction = self->addrinst;
     snapshot->cpu.databus = self->databus;
     snapshot->cpu.exec_cycle = self->t;
     snapshot->cpu.opcode = self->opc;

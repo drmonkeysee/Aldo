@@ -212,8 +212,8 @@ static void drawrom(const struct console_state *snapshot)
     getmaxyx(RomView.content, h, w);
     werase(RomView.content);
 
-    uint16_t addr = dis_instaddr(snapshot);
-    // NOTE: on startup instaddr may be outside ROM range
+    uint16_t addr = snapshot->cpu.current_instruction;
+    // NOTE: on startup addr may be outside ROM range
     if (addr < CpuCartMinAddr) {
         mvwaddstr(RomView.content, 0, 0, "OUT OF ROM RANGE");
     } else {

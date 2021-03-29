@@ -82,37 +82,6 @@ static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
     return total + count;
 }
 
-static uint16_t datapath_operand(const struct console_state *snapshot,
-                                 struct decoded dec, uint16_t rom_idx)
-{
-    // NOTE: derive operand of Branch instruction cycle from
-    // address-latch internals since Branch adjusts PC and throws off
-    // the general operand derivation.
-    if (dec.mode == AM_BCH) {
-        return snapshot->cpu.addra_latch;
-    }
-    return snapshot->rom[rom_idx];
-}
-
-static uint16_t datapath_woperand(const struct console_state *snapshot,
-                                 struct decoded dec, uint16_t rom_idx)
-{
-    // NOTE: derive operand of final JMP instruction cycle from
-    // address-latch internals since JMP adjusts PC and throws off
-    // the general operand derivation.
-    if (dec.instruction == IN_JMP && snapshot->cpu.instdone) {
-        if (dec.mode == AM_JABS) {
-            return bytowr(snapshot->cpu.addra_latch, snapshot->cpu.databus);
-        } else {
-            // NOTE: JIND mode final cycle, addrc is operand-low + 1
-            // due to fetching jump address-high.
-            return bytowr(snapshot->cpu.addrc_latch - 1,
-                          snapshot->cpu.addrb_latch);
-        }
-    }
-    return batowr(snapshot->rom + rom_idx);
-}
-
 //
 // Public Interface
 //
@@ -126,24 +95,6 @@ const char *dis_errstr(int error)
     default:
         return "UNKNOWN ERR";
     }
-}
-
-uint16_t dis_instaddr(const struct console_state *snapshot)
-{
-    assert(snapshot != NULL);
-
-    const struct decoded dec = Decode[snapshot->cpu.opcode];
-    int pc_offset;
-    // NOTE: if completed JMP/Branch instruction use pc value directly
-    if ((dec.instruction == IN_JMP || dec.mode == AM_BCH)
-        && snapshot->cpu.instdone) {
-        pc_offset = 0;
-    } else {
-        const int len = InstLens[dec.mode],
-                  cycle_offset = 1 + snapshot->cpu.exec_cycle;
-        pc_offset = cycle_offset < len ? cycle_offset : len;
-    }
-    return snapshot->cpu.program_counter - pc_offset;
 }
 
 int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
@@ -183,7 +134,7 @@ int dis_datapath(const struct console_state *snapshot,
     assert(snapshot != NULL);
     assert(dis != NULL);
 
-    const uint16_t instaddr = dis_instaddr(snapshot);
+    const uint16_t instaddr = snapshot->cpu.current_instruction;
     if (instaddr < CpuCartMinAddr) return ASM_EOF;
 
     const struct decoded dec = Decode[snapshot->cpu.opcode];
@@ -207,12 +158,11 @@ int dis_datapath(const struct console_state *snapshot,
         count = sprintf(dis + total, "%s", displaystr);
         break;
     case 1:
-        count = sprintf(dis + total, displaystr,
-                        datapath_operand(snapshot, dec, rom_idx + 1));
+        count = sprintf(dis + total, displaystr, snapshot->rom[rom_idx + 1]);
         break;
     default:
         count = sprintf(dis + total, displaystr,
-                        datapath_woperand(snapshot, dec, rom_idx + 1));
+                        batowr(snapshot->rom + rom_idx + 1));
         break;
     }
     if (count < 0) return ASM_FMT_FAIL;

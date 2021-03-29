@@ -36,7 +36,8 @@ struct mos6502 {
 
     // Datapath: abstract representation of instruction fetching,
     // execution, and signaling.
-    uint16_t addrbus;   // Word put on the address pins on clock phase ϕ1
+    uint16_t addrbus,   // Word put on the address pins on clock phase ϕ1
+             addrinst;  // Address of current instruction
     uint8_t databus,    // Byte put on the data pins on clock phase ϕ2
             opc,        // Opcode
             ada,        // Address latch A

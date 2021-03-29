@@ -687,16 +687,12 @@ static void branch_displacement(struct mos6502 *self)
                positive_overflow = self->adb < self->ada && !negative_offset,
                negative_overflow = self->adb > self->ada && negative_offset;
     self->adc = positive_overflow - negative_overflow;
-    if (!self->adc) {
-        self->pc = bytowr(self->adb, self->pc >> 8);
-        self->presync = true;
-    }
+    self->pc = bytowr(self->adb, self->pc >> 8);
 }
 
 static void branch_carry(struct mos6502 *self)
 {
     self->pc = bytowr(self->adb, (self->pc >> 8) + self->adc);
-    self->presync = true;
 }
 
 static void IMP_sequence(struct mos6502 *self, struct decoded dec)
@@ -872,13 +868,15 @@ static void BCH_sequence(struct mos6502 *self, struct decoded dec)
         self->ada = self->databus;
         break;
     case 2:
+        branch_displacement(self);
         self->addrbus = self->pc;
         read(self);
-        branch_displacement(self);
+        self->presync = !self->adc;
         break;
     case 3:
-        read(self);
         branch_carry(self);
+        read(self);
+        self->presync = true;
         break;
     default:
         BAD_ADDR_SEQ;

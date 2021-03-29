@@ -256,7 +256,6 @@ static void ASL_exec(struct mos6502 *self, struct decoded dec)
 
 static void BCC_exec(struct mos6502 *self)
 {
-    read(self);
     self->presync = self->p.c;
 }
 
@@ -872,6 +871,7 @@ static void BCH_sequence(struct mos6502 *self, struct decoded dec)
     switch (self->t) {
     case 1:
         self->addrbus = self->pc++;
+        read(self);
         dispatch_instruction(self, dec);
         self->ada = self->databus;
         break;

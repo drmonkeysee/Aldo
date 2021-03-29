@@ -276,7 +276,7 @@ static void dis_datapath_implied_cycle_zero(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -296,7 +296,7 @@ static void dis_datapath_implied_cycle_one(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 1,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -316,7 +316,7 @@ static void dis_datapath_implied_cycle_n(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 2,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -336,7 +336,7 @@ static void dis_datapath_immediate_cycle_zero(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -356,7 +356,7 @@ static void dis_datapath_immediate_cycle_one(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 1,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -376,7 +376,7 @@ static void dis_datapath_immediate_cycle_n(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 2,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -396,7 +396,7 @@ static void dis_datapath_zeropage_cycle_zero(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -416,7 +416,7 @@ static void dis_datapath_zeropage_cycle_one(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 1,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -436,7 +436,7 @@ static void dis_datapath_zeropage_cycle_n(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 2,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -456,7 +456,7 @@ static void dis_datapath_zeropage_x_cycle_zero(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -476,7 +476,7 @@ static void dis_datapath_zeropage_x_cycle_one(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 1,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -496,7 +496,7 @@ static void dis_datapath_zeropage_x_cycle_n(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 2,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -516,7 +516,7 @@ static void dis_datapath_zeropage_y_cycle_zero(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -536,7 +536,7 @@ static void dis_datapath_zeropage_y_cycle_one(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 1,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -556,7 +556,7 @@ static void dis_datapath_zeropage_y_cycle_n(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 2,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -576,7 +576,7 @@ static void dis_datapath_indirect_x_cycle_zero(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -596,7 +596,7 @@ static void dis_datapath_indirect_x_cycle_one(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 1,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -616,7 +616,7 @@ static void dis_datapath_indirect_x_cycle_n(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 2,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -636,7 +636,7 @@ static void dis_datapath_indirect_y_cycle_zero(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -656,7 +656,7 @@ static void dis_datapath_indirect_y_cycle_one(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 1,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -676,7 +676,7 @@ static void dis_datapath_indirect_y_cycle_n(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 2,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -696,7 +696,7 @@ static void dis_datapath_absolute_cycle_zero(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -716,7 +716,7 @@ static void dis_datapath_absolute_cycle_one(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 1,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -736,7 +736,7 @@ static void dis_datapath_absolute_cycle_two(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 2,
-            .program_counter = 0x8003,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -756,7 +756,7 @@ static void dis_datapath_absolute_cycle_n(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 3,
-            .program_counter = 0x8003,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -776,7 +776,7 @@ static void dis_datapath_absolute_x_cycle_zero(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -796,7 +796,7 @@ static void dis_datapath_absolute_x_cycle_one(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 1,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -816,7 +816,7 @@ static void dis_datapath_absolute_x_cycle_two(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 2,
-            .program_counter = 0x8003,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -836,7 +836,7 @@ static void dis_datapath_absolute_x_cycle_n(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 3,
-            .program_counter = 0x8003,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -856,7 +856,7 @@ static void dis_datapath_absolute_y_cycle_zero(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -876,7 +876,7 @@ static void dis_datapath_absolute_y_cycle_one(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 1,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -896,7 +896,7 @@ static void dis_datapath_absolute_y_cycle_two(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 2,
-            .program_counter = 0x8003,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -916,7 +916,7 @@ static void dis_datapath_absolute_y_cycle_n(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 3,
-            .program_counter = 0x8003,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -936,7 +936,7 @@ static void dis_datapath_jmp_absolute_cycle_zero(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -956,7 +956,7 @@ static void dis_datapath_jmp_absolute_cycle_one(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 1,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -976,7 +976,7 @@ static void dis_datapath_jmp_absolute_cycle_two(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 2,
-            .program_counter = 0x8003,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -995,11 +995,8 @@ static void dis_datapath_jmp_absolute_cycle_n(void *ctx)
     const uint8_t rom[] = {0x4c, 0x43, 0x21};
     const struct console_state sn = {
         .cpu = {
-            .addra_latch = rom[1],
-            .databus = rom[2],
             .exec_cycle = 3,
-            .instdone = true,
-            .program_counter = 0x8000,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1019,7 +1016,7 @@ static void dis_datapath_jmp_indirect_cycle_zero(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1039,7 +1036,7 @@ static void dis_datapath_jmp_indirect_cycle_one(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 1,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1059,7 +1056,7 @@ static void dis_datapath_jmp_indirect_cycle_two(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 2,
-            .program_counter = 0x8003,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1078,11 +1075,8 @@ static void dis_datapath_jmp_indirect_cycle_n(void *ctx)
     const uint8_t rom[] = {0x6c, 0x43, 0x21};
     const struct console_state sn = {
         .cpu = {
-            .addrc_latch = rom[1] + 1,
-            .addrb_latch = rom[2],
             .exec_cycle = 3,
-            .instdone = true,
-            .program_counter = 0x8000,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1102,7 +1096,7 @@ static void dis_datapath_bch_cycle_zero(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x8001,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1122,7 +1116,7 @@ static void dis_datapath_bch_cycle_one(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 1,
-            .program_counter = 0x8002,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1141,10 +1135,8 @@ static void dis_datapath_bch_cycle_n(void *ctx)
     const uint8_t rom[] = {0x90, 0x2, 0xff, 0xff, 0xff};
     const struct console_state sn = {
         .cpu = {
-            .addra_latch = rom[1],
             .exec_cycle = 2,
-            .instdone = true,
-            .program_counter = 0x8004,
+            .current_instruction = 0x8000,
             .opcode = rom[0],
         },
         .rom = rom,

@@ -110,6 +110,9 @@ static void cpu_bcc_negative_wraparound(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0x90, 0xf6};   // NOTE: $0002 - 10
     cpu.ram = mem;
+    // NOTE: 32k rom, starting at $8000 to allow reads of wraparound addresses
+    uint8_t *const rom = calloc(0x8000, sizeof *rom);
+    cpu.cart = rom;
 
     const int cycles = clock_cpu(&cpu);
 

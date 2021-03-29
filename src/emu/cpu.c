@@ -875,6 +875,7 @@ static void BCH_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 3:
         branch_carry(self);
+        self->addrbus = self->pc;
         read(self);
         self->presync = true;
         break;

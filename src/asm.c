@@ -85,10 +85,10 @@ static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
 static uint16_t datapath_operand(const struct console_state *snapshot,
                                  struct decoded dec, uint16_t rom_idx)
 {
-    // NOTE: derive operand of final Branch instruction cycle from
+    // NOTE: derive operand of Branch instruction cycle from
     // address-latch internals since Branch adjusts PC and throws off
     // the general operand derivation.
-    if (dec.mode == AM_BCH && snapshot->cpu.instdone) {
+    if (dec.mode == AM_BCH) {
         return snapshot->cpu.addra_latch;
     }
     return snapshot->rom[rom_idx];

@@ -619,10 +619,9 @@ static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
     case 2:
         self->addrbus = bytowr(self->ada, 0x0);
         read(self);
-        self->ada += index;
         break;
     case 3:
-        self->addrbus = bytowr(self->ada, 0x0);
+        self->addrbus = bytowr(self->ada + index, 0x0);
         dispatch_instruction(self, dec);
         break;
     case 4:
@@ -649,17 +648,16 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
     case 2:
         self->addrbus = self->pc++;
         read(self);
+        self->adb = self->databus;
         self->ada += index;
         self->adc = self->ada < index;
-        self->adb = self->databus;
         break;
     case 3:
         self->addrbus = bytowr(self->ada, self->adb);
         dispatch_instruction(self, dec);
-        self->adb += self->adc;
         break;
     case 4:
-        self->addrbus = bytowr(self->ada, self->adb);
+        self->addrbus = bytowr(self->ada, self->adb + self->adc);
         dispatch_instruction(self, dec);
         break;
     case 5:
@@ -676,8 +674,7 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
 
 static void branch_displacement(struct mos6502 *self)
 {
-    self->adb = self->pc;
-    self->adb += self->ada;
+    self->adb = self->pc + self->ada;
     // NOTE: branch uses signed displacement so there are three overflow cases:
     // no overflow = no adjustment to pc-high;
     // positive overflow = carry-in to pc-high => pch + 1;
@@ -807,10 +804,9 @@ static void INDY_sequence(struct mos6502 *self, struct decoded dec)
     case 4:
         self->addrbus = bytowr(self->adb, self->ada);
         dispatch_instruction(self, dec);
-        self->ada += self->adc;
         break;
     case 5:
-        self->addrbus = bytowr(self->adb, self->ada);
+        self->addrbus = bytowr(self->adb, self->ada + self->adc);
         dispatch_instruction(self, dec);
         break;
     default:
@@ -881,7 +877,6 @@ static void BCH_sequence(struct mos6502 *self, struct decoded dec)
         branch_displacement(self);
         break;
     case 3:
-        self->addrbus = self->pc;
         read(self);
         branch_carry(self);
         break;

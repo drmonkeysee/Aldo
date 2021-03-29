@@ -8,8 +8,10 @@
 #include "ciny.h"
 #include "cpuhelp.h"
 #include "emu/cpu.h"
+#include "emu/traits.h"
 
 #include <stdint.h>
+#include <stdlib.h>
 
 //
 // Branch Instructions
@@ -70,6 +72,24 @@ static void cpu_bcc_positive_overflow(void *ctx)
     ct_assertequal(262u, cpu.pc);
 }
 
+static void cpu_bcc_positive_wraparound(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: 32k rom, starting at $8000 to set up $FFFC + 10
+    uint8_t *const rom = calloc(0x8000, sizeof *rom);
+    rom[0xfffa & CpuCartAddrMask] = 0x90;
+    rom[0xfffb & CpuCartAddrMask] = 0xa;
+    cpu.cart = rom;
+    cpu.pc = 0xfffa;
+
+    const int cycles = clock_cpu(&cpu);
+
+    free(rom);
+    ct_assertequal(4, cycles);
+    ct_assertequal(6u, cpu.pc);
+}
+
 static void cpu_bcc_negative_overflow(void *ctx)
 {
     struct mos6502 cpu;
@@ -121,6 +141,7 @@ struct ct_testsuite cpu_branch_tests(void)
         ct_maketest(cpu_bcc_positive),
         ct_maketest(cpu_bcc_negative),
         ct_maketest(cpu_bcc_positive_overflow),
+        ct_maketest(cpu_bcc_positive_wraparound),
         ct_maketest(cpu_bcc_negative_overflow),
         ct_maketest(cpu_bcc_negative_wraparound),
         ct_maketest(cpu_bcc_zero),

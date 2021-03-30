@@ -261,12 +261,12 @@ static void BCC_exec(struct mos6502 *self)
 
 static void BCS_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    self->presync = !self->p.c;
 }
 
 static void BEQ_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    self->presync = !self->p.z;
 }
 
 static void BIT_exec(struct mos6502 *self, struct decoded dec)
@@ -281,17 +281,17 @@ static void BIT_exec(struct mos6502 *self, struct decoded dec)
 
 static void BMI_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    self->presync = !self->p.n;
 }
 
 static void BNE_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    self->presync = self->p.z;
 }
 
 static void BPL_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    self->presync = self->p.n;
 }
 
 static void BRK_exec(struct mos6502 *self)
@@ -301,12 +301,12 @@ static void BRK_exec(struct mos6502 *self)
 
 static void BVC_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    self->presync = self->p.v;
 }
 
 static void BVS_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    self->presync = !self->p.v;
 }
 
 static void CLC_exec(struct mos6502 *self)

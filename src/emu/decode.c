@@ -29,7 +29,7 @@ const struct decoded Decode[] = {
     {IN_ORA, AM_ABS},    // 0D - ORA abs
     {IN_ASL, AM_ABS},    // 0E - ASL abs
     UNK,    // 0F - Unofficial
-    UNK,    // 10 - BPL
+    {IN_BPL, AM_BCH},    // 10 - BPL
     {IN_ORA, AM_INDY},    // 11 - ORA (zp),Y
     UNK,    // 12 - Unofficial
     UNK,    // 13 - Unofficial
@@ -61,7 +61,7 @@ const struct decoded Decode[] = {
     {IN_AND, AM_ABS},    // 2D - AND abs
     {IN_ROL, AM_ABS},    // 2E - ROL abs
     UNK,    // 2F - Unofficial
-    UNK,    // 30 - BMI
+    {IN_BMI, AM_BCH},    // 30 - BMI
     {IN_AND, AM_INDY},    // 31 - AND (zp),Y
     UNK,    // 32 - Unofficial
     UNK,    // 33 - Unofficial
@@ -93,7 +93,7 @@ const struct decoded Decode[] = {
     {IN_EOR, AM_ABS},    // 4D - EOR abs
     {IN_LSR, AM_ABS},    // 4E - LSR abs
     UNK,    // 4F - Unofficial
-    UNK,    // 50 - BVC
+    {IN_BVC, AM_BCH},    // 50 - BVC
     {IN_EOR, AM_INDY},    // 51 - EOR (zp),Y
     UNK,    // 52 - Unofficial
     UNK,    // 53 - Unofficial
@@ -125,7 +125,7 @@ const struct decoded Decode[] = {
     {IN_ADC, AM_ABS},    // 6D - ADC abs
     {IN_ROR, AM_ABS},    // 6E - ROR abs
     UNK,    // 6F - Unofficial
-    UNK,    // 70 - BVS
+    {IN_BVS, AM_BCH},    // 70 - BVS
     {IN_ADC, AM_INDY},    // 71 - ADC (zp),Y
     UNK,    // 72 - Unofficial
     UNK,    // 73 - Unofficial
@@ -189,7 +189,7 @@ const struct decoded Decode[] = {
     {IN_LDA, AM_ABS},    // AD - LDA abs
     {IN_LDX, AM_ABS},    // AE - LDX abs
     UNK,    // AF - Unofficial
-    UNK,    // B0 - BCS
+    {IN_BCS, AM_BCH},    // B0 - BCS
     {IN_LDA, AM_INDY},    // B1 - LDA (zp),Y
     UNK,    // B2 - Unofficial
     UNK,    // B3 - Unofficial
@@ -221,7 +221,7 @@ const struct decoded Decode[] = {
     {IN_CMP, AM_ABS},    // CD - CMP abs
     {IN_DEC, AM_ABS},    // CE - DEC abs
     UNK,    // CF - Unofficial
-    UNK,    // D0 - BNE
+    {IN_BNE, AM_BCH},    // D0 - BNE
     {IN_CMP, AM_INDY},    // D1 - CMP (zp),Y
     UNK,    // D2 - Unofficial
     UNK,    // D3 - Unofficial
@@ -253,7 +253,7 @@ const struct decoded Decode[] = {
     {IN_SBC, AM_ABS},    // ED - SBC abs
     {IN_INC, AM_ABS},    // EE - INC abs
     UNK,    // EF - Unofficial
-    UNK,    // F0 - BEQ
+    {IN_BEQ, AM_BCH},    // F0 - BEQ
     {IN_SBC, AM_INDY},    // F1 - SBC (zp),Y
     UNK,    // F2 - Unofficial
     UNK,    // F3 - Unofficial

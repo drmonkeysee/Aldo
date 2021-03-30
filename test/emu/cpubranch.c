@@ -133,6 +133,195 @@ static void cpu_bcc_zero(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
+static void cpu_bcs_nobranch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xb0, 0x5};
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+}
+
+static void cpu_bcs_branch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xb0, 0x5};    // NOTE: $0002 + 5
+    cpu.ram = mem;
+    cpu.p.c = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(7u, cpu.pc);
+}
+
+static void cpu_beq_nobranch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xf0, 0x5};
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+}
+
+static void cpu_beq_branch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xf0, 0x5};    // NOTE: $0002 + 5
+    cpu.ram = mem;
+    cpu.p.z = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(7u, cpu.pc);
+}
+
+static void cpu_bmi_nobranch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x30, 0x5};
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+}
+
+static void cpu_bmi_branch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x30, 0x5};    // NOTE: $0002 + 5
+    cpu.ram = mem;
+    cpu.p.n = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(7u, cpu.pc);
+}
+
+static void cpu_bne_nobranch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xd0, 0x5};
+    cpu.ram = mem;
+    cpu.p.z = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+}
+
+static void cpu_bne_branch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xd0, 0x5};    // NOTE: $0002 + 5
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(7u, cpu.pc);
+}
+
+static void cpu_bpl_nobranch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x10, 0x5};
+    cpu.ram = mem;
+    cpu.p.n = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+}
+
+static void cpu_bpl_branch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x10, 0x5};    // NOTE: $0002 + 5
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(7u, cpu.pc);
+}
+
+static void cpu_bvc_nobranch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x50, 0x5};
+    cpu.ram = mem;
+    cpu.p.v = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+}
+
+static void cpu_bvc_branch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x50, 0x5};    // NOTE: $0002 + 5
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(7u, cpu.pc);
+}
+
+static void cpu_bvs_nobranch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x70, 0x5};
+    cpu.ram = mem;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+}
+
+static void cpu_bvs_branch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x70, 0x5};    // NOTE: $0002 + 5
+    cpu.ram = mem;
+    cpu.p.v = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(7u, cpu.pc);
+}
+
 //
 // Test List
 //
@@ -148,6 +337,27 @@ struct ct_testsuite cpu_branch_tests(void)
         ct_maketest(cpu_bcc_negative_overflow),
         ct_maketest(cpu_bcc_negative_wraparound),
         ct_maketest(cpu_bcc_zero),
+
+        ct_maketest(cpu_bcs_nobranch),
+        ct_maketest(cpu_bcs_branch),
+
+        ct_maketest(cpu_beq_nobranch),
+        ct_maketest(cpu_beq_branch),
+
+        ct_maketest(cpu_bmi_nobranch),
+        ct_maketest(cpu_bmi_branch),
+
+        ct_maketest(cpu_bne_nobranch),
+        ct_maketest(cpu_bne_branch),
+
+        ct_maketest(cpu_bpl_nobranch),
+        ct_maketest(cpu_bpl_branch),
+
+        ct_maketest(cpu_bvc_nobranch),
+        ct_maketest(cpu_bvc_branch),
+
+        ct_maketest(cpu_bvs_nobranch),
+        ct_maketest(cpu_bvs_branch),
     };
 
     return ct_makesuite(tests);

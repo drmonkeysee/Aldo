@@ -619,9 +619,10 @@ static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
     case 2:
         self->addrbus = bytowr(self->ada, 0x0);
         read(self);
+        self->ada += index;
         break;
     case 3:
-        self->addrbus = bytowr(self->ada + index, 0x0);
+        self->addrbus = bytowr(self->ada, 0x0);
         dispatch_instruction(self, dec);
         break;
     case 4:
@@ -655,9 +656,10 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
     case 3:
         self->addrbus = bytowr(self->ada, self->adb);
         dispatch_instruction(self, dec);
+        self->adb += self->adc;
         break;
     case 4:
-        self->addrbus = bytowr(self->ada, self->adb + self->adc);
+        self->addrbus = bytowr(self->ada, self->adb);
         dispatch_instruction(self, dec);
         break;
     case 5:
@@ -800,9 +802,10 @@ static void INDY_sequence(struct mos6502 *self, struct decoded dec)
     case 4:
         self->addrbus = bytowr(self->adb, self->ada);
         dispatch_instruction(self, dec);
+        self->ada += self->adc;
         break;
     case 5:
-        self->addrbus = bytowr(self->adb, self->ada + self->adc);
+        self->addrbus = bytowr(self->adb, self->ada);
         dispatch_instruction(self, dec);
         break;
     default:

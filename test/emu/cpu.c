@@ -18,13 +18,13 @@ static void cpu_powerup_initializes_cpu(void *ctx)
 
     cpu_powerup(&cpu);
 
-    struct console_state sn;
-    cpu_snapshot(&cpu, &sn);
     ct_assertequal(0u, cpu.a);
     ct_assertequal(0u, cpu.s);
     ct_assertequal(0u, cpu.x);
     ct_assertequal(0u, cpu.y);
 
+    struct console_state sn;
+    cpu_snapshot(&cpu, &sn);
     ct_assertequal(0x34u, sn.cpu.status);
 
     ct_asserttrue(cpu.signal.irq);

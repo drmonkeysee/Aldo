@@ -21,6 +21,7 @@ struct ct_testsuite dis_tests(void),
                     cpu_implied_tests(void),
                     cpu_indirect_tests(void),
                     cpu_jump_tests(void),
+                    cpu_stack_tests(void),
                     cpu_zeropage_tests(void);
 
 static size_t testrunner(int argc, char *argv[argc+1])
@@ -34,6 +35,7 @@ static size_t testrunner(int argc, char *argv[argc+1])
         cpu_implied_tests(),
         cpu_indirect_tests(),
         cpu_jump_tests(),
+        cpu_stack_tests(),
         cpu_zeropage_tests(),
     };
     return ct_run_withargs(suites, argc, argv);

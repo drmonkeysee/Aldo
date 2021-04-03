@@ -94,11 +94,12 @@ int aldo_run(void)
     ui_init();
 
     const uint8_t test_prg[] = {
-        0x68,   // pla
-        0x68,   // pla
-        0x68,   // pla
-        0x28,   // plp
         0xa9, 0xa, // lda $2
+        0x48,
+        0x68,
+        0x8,
+        0xee, 0xfd, 0x01,
+        0x28,
         0x85, 0xff, // sta $5
         0xa9, 0x80, // lda $80
         0x85, 0x0, // sta $6

@@ -21,7 +21,7 @@ const struct decoded Decode[] = {
     {IN_ORA, AM_ZP},    // 05 - ORA zp
     {IN_ASL, AM_ZP},    // 06 - ASL zp
     UNK,    // 07 - Unofficial
-    UNK,    // 08 - PHP
+    {IN_PHP, AM_PSH},    // 08 - PHP
     {IN_ORA, AM_IMM},    // 09 - ORA imm
     {IN_ASL, AM_IMP},    // 0A - ASL imp
     UNK,    // 0B - Unofficial
@@ -85,7 +85,7 @@ const struct decoded Decode[] = {
     {IN_EOR, AM_ZP},    // 45 - EOR zp
     {IN_LSR, AM_ZP},    // 46 - LSR zp
     UNK,    // 47 - Unofficial
-    UNK,    // 48 - PHA
+    {IN_PHA, AM_PSH},    // 48 - PHA
     {IN_EOR, AM_IMM},    // 49 - EOR imm
     {IN_LSR, AM_IMP},    // 4A - LSR imp
     UNK,    // 4B - Unofficial

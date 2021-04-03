@@ -166,7 +166,7 @@ static void cpu_plp_wraparound(void *ctx)
     struct console_state sn;
     cpu_snapshot(&cpu, &sn);
     ct_assertequal(0x20u, sn.cpu.status);
-    ct_assertequal(4u, cpu.s);
+    ct_assertequal(0u, cpu.s);
 }
 
 //

@@ -53,7 +53,7 @@ const struct decoded Decode[] = {
     {IN_AND, AM_ZP},    // 25 - AND zp
     {IN_ROL, AM_ZP},    // 26 - ROL zp
     UNK,    // 27 - Unofficial
-    UNK,    // 28 - PLP
+    {IN_PLP, AM_PLL},    // 28 - PLP
     {IN_AND, AM_IMM},    // 29 - AND imm
     {IN_ROL, AM_IMP},    // 2A - ROL imp
     UNK,    // 2B - Unofficial
@@ -117,7 +117,7 @@ const struct decoded Decode[] = {
     {IN_ADC, AM_ZP},    // 65 - ADC zp
     {IN_ROR, AM_ZP},    // 66 - ROR zp
     UNK,    // 67 - Unofficial
-    UNK,    // 68 - PLA
+    {IN_PLA, AM_PLL},    // 68 - PLA
     {IN_ADC, AM_IMM},    // 69 - ADC imm
     {IN_ROR, AM_IMP},    // 6A - ROR imp
     UNK,    // 6B - Unofficial

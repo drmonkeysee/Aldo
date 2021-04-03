@@ -166,6 +166,18 @@ static void bitoperation(struct mos6502 *self, struct decoded dec,
     }
 }
 
+static void stack_top(struct mos6502 *self)
+{
+    self->addrbus = bytowr(self->s, 0x1);
+    read(self);
+}
+
+static void stack_pop(struct mos6502 *self)
+{
+    ++self->s;
+    stack_top(self);
+}
+
 // NOTE: all 6502 cycles are either a read or a write, some of them discarded
 // depending on the instruction and addressing-mode timing; these extra reads
 // and writes are all modeled below to help verify cycle-accurate behavior.
@@ -470,11 +482,15 @@ static void PHP_exec(struct mos6502 *self)
 
 static void PLA_exec(struct mos6502 *self)
 {
+    stack_pop(self);
+    load_register(self, &self->a, self->databus);
     self->presync = true;
 }
 
 static void PLP_exec(struct mos6502 *self)
 {
+    stack_pop(self);
+    set_p(self, self->databus);
     self->presync = true;
 }
 
@@ -858,7 +874,20 @@ static void PSH_sequence(struct mos6502 *self, struct decoded dec)
 
 static void PLL_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    switch (self->t) {
+    case 1:
+        self->addrbus = self->pc;
+        read(self);
+        break;
+    case 2:
+        stack_top(self);
+        break;
+    case 3:
+        dispatch_instruction(self, dec);
+        break;
+    default:
+        BAD_ADDR_SEQ;
+    }
 }
 
 static void BCH_sequence(struct mos6502 *self, struct decoded dec)

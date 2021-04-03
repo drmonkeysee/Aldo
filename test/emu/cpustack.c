@@ -16,6 +16,80 @@
 // Stack Instructions
 //
 
+static void cpu_pha(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x48, [260] = 0x0};
+    cpu.ram = mem;
+    cpu.a = 0x20;
+    cpu.s = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(1u, cpu.pc);
+
+    ct_assertequal(0x20u, mem[260]);
+    ct_assertequal(3u, cpu.s);
+}
+
+static void cpu_pha_wraparound(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x48, [256] = 0x0};
+    cpu.ram = mem;
+    cpu.a = 0x20;
+    cpu.s = 0;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(1u, cpu.pc);
+
+    ct_assertequal(0x20u, mem[256]);
+    ct_assertequal(0xffu, cpu.s);
+}
+
+static void cpu_php(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x8, [260] = 0x0};
+    cpu.ram = mem;
+    cpu.p.n = true;
+    cpu.p.z = true;
+    cpu.s = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(1u, cpu.pc);
+
+    ct_assertequal(0xb6u, mem[260]);
+    ct_assertequal(3u, cpu.s);
+}
+
+static void cpu_php_wraparound(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x8, [256] = 0x0};
+    cpu.ram = mem;
+    cpu.p.n = true;
+    cpu.p.z = true;
+    cpu.s = 0;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(1u, cpu.pc);
+
+    ct_assertequal(0xb6u, mem[256]);
+    ct_assertequal(0xffu, cpu.s);
+}
+
 static void cpu_pla(void *ctx)
 {
     struct mos6502 cpu;
@@ -176,6 +250,12 @@ static void cpu_plp_wraparound(void *ctx)
 struct ct_testsuite cpu_stack_tests(void)
 {
     static const struct ct_testcase tests[] = {
+        ct_maketest(cpu_pha),
+        ct_maketest(cpu_pha_wraparound),
+
+        ct_maketest(cpu_php),
+        ct_maketest(cpu_php_wraparound),
+
         ct_maketest(cpu_pla),
         ct_maketest(cpu_pla_zero),
         ct_maketest(cpu_pla_negative),

@@ -226,6 +226,30 @@ static void dis_inst_disassembles_branch_zero(void *ctx)
     ct_assertequalstr("$1234: 90 00       BCC +0", buf);
 }
 
+static void dis_inst_disassembles_push(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0x48};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(1, length);
+    ct_assertequalstr("$1234: 48          PHA", buf);
+}
+
+static void dis_inst_disassembles_pull(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0x68};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(1, length);
+    ct_assertequalstr("$1234: 68          PLA", buf);
+}
+
 //
 // dis_datapath
 //
@@ -236,8 +260,8 @@ static void dis_datapath_addr_too_low(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0x10,
             .opcode = rom[0],
+            .program_counter = 0x10,
         },
         .rom = rom,
     };
@@ -256,8 +280,8 @@ static void dis_datapath_offset_overflow(void *ctx)
     const struct console_state sn = {
         .cpu = {
             .exec_cycle = 0,
-            .program_counter = 0xfffe,
             .opcode = rom[0],
+            .program_counter = 0xfffe,
         },
         .rom = rom,
     };
@@ -1150,6 +1174,126 @@ static void dis_datapath_bch_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
+static void dis_datapath_push_cycle_zero(void *ctx)
+{
+    const uint8_t rom[] = {0x48, 0xff};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 0,
+            .current_instruction = 0x8000,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "PHA imp";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_push_cycle_one(void *ctx)
+{
+    const uint8_t rom[] = {0x48, 0xff};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 1,
+            .current_instruction = 0x8000,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "PHA ";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_push_cycle_n(void *ctx)
+{
+    const uint8_t rom[] = {0x48, 0xff};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 2,
+            .current_instruction = 0x8000,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "PHA ";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_pull_cycle_zero(void *ctx)
+{
+    const uint8_t rom[] = {0x68, 0xff};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 0,
+            .current_instruction = 0x8000,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "PLA imp";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_pull_cycle_one(void *ctx)
+{
+    const uint8_t rom[] = {0x68, 0xff};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 1,
+            .current_instruction = 0x8000,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "PLA ";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void dis_datapath_pull_cycle_n(void *ctx)
+{
+    const uint8_t rom[] = {0x68, 0xff};
+    const struct console_state sn = {
+        .cpu = {
+            .exec_cycle = 2,
+            .current_instruction = 0x8000,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "PLA ";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
 //
 // Test List
 //
@@ -1176,6 +1320,8 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(dis_inst_disassembles_branch_positive),
         ct_maketest(dis_inst_disassembles_branch_negative),
         ct_maketest(dis_inst_disassembles_branch_zero),
+        ct_maketest(dis_inst_disassembles_push),
+        ct_maketest(dis_inst_disassembles_pull),
 
         ct_maketest(dis_datapath_addr_too_low),
         ct_maketest(dis_datapath_offset_overflow),
@@ -1236,6 +1382,14 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(dis_datapath_bch_cycle_zero),
         ct_maketest(dis_datapath_bch_cycle_one),
         ct_maketest(dis_datapath_bch_cycle_n),
+
+        ct_maketest(dis_datapath_push_cycle_zero),
+        ct_maketest(dis_datapath_push_cycle_one),
+        ct_maketest(dis_datapath_push_cycle_n),
+
+        ct_maketest(dis_datapath_pull_cycle_zero),
+        ct_maketest(dis_datapath_pull_cycle_one),
+        ct_maketest(dis_datapath_pull_cycle_n),
     };
 
     return ct_makesuite(tests);

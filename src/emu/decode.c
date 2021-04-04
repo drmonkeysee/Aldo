@@ -109,7 +109,7 @@ const struct decoded Decode[] = {
     {IN_EOR, AM_ABSX},    // 5D - EOR abs,X
     {IN_LSR, AM_ABSX},    // 5E - LSR abs,X
     UNK,    // 5F - Unofficial
-    UNK,    // 60 - RTS
+    {IN_RTS, AM_RTS},    // 60 - RTS
     {IN_ADC, AM_INDX},    // 61 - ADC (zp,X)
     UNK,    // 62 - Unofficial
     UNK,    // 63 - Unofficial

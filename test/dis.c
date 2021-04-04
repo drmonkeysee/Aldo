@@ -271,7 +271,7 @@ static void dis_inst_disassembles_rts(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(1, length);
-    ct_assertequalstr("$1234: 20          RTS", buf);
+    ct_assertequalstr("$1234: 60          RTS", buf);
 }
 
 //

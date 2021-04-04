@@ -526,7 +526,7 @@ static void RTI_exec(struct mos6502 *self)
 
 static void RTS_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    self->pc = bytowr(self->ada, self->databus);
 }
 
 // NOTE: subtract with carry-in; A - D - ~C, where ~carry indicates borrow-out:
@@ -965,7 +965,30 @@ static void JSR_sequence(struct mos6502 *self, struct decoded dec)
 
 static void RTS_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    switch (self->t) {
+    case 1:
+        self->addrbus = self->pc++;
+        read(self);
+        break;
+    case 2:
+        stack_top(self);
+        break;
+    case 3:
+        stack_pop(self);
+        self->ada = self->databus;
+        break;
+    case 4:
+        stack_pop(self);
+        dispatch_instruction(self, dec);
+        break;
+    case 5:
+        self->addrbus = self->pc++;
+        read(self);
+        self->presync = true;
+        break;
+    default:
+        BAD_ADDR_SEQ;
+    }
 }
 
 static void JABS_sequence(struct mos6502 *self, struct decoded dec)

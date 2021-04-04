@@ -46,8 +46,6 @@ static void cpu_rts(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(0x3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[259]);
-    ct_assertequal(0x0u, mem[260]);
     ct_assertequal(4u, cpu.s);
 }
 

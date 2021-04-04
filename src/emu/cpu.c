@@ -919,15 +919,15 @@ static void BCH_sequence(struct mos6502 *self, struct decoded dec)
         self->ada = self->databus;
         break;
     case 2:
-        branch_displacement(self);
         self->addrbus = self->pc;
         read(self);
+        branch_displacement(self);
         self->presync = !self->adc;
         break;
     case 3:
-        branch_carry(self);
         self->addrbus = self->pc;
         read(self);
+        branch_carry(self);
         self->presync = true;
         break;
     default:

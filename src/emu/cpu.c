@@ -807,27 +807,25 @@ static void INDY_sequence(struct mos6502 *self, struct decoded dec)
     case 1:
         self->addrbus = self->pc++;
         read(self);
-        self->ada = self->databus;
         break;
     case 2:
-        self->addrbus = bytowr(self->ada++, 0x0);
+        self->addrbus = bytowr(self->databus, 0x0);
+        self->ada = self->databus + 1;
         read(self);
-        self->adb = self->databus;
         break;
     case 3:
         self->addrbus = bytowr(self->ada, 0x0);
+        self->ada = self->databus + self->y;
+        self->adc = self->ada < self->y;
         read(self);
-        self->ada = self->databus;
-        self->adb += self->y;
-        self->adc = self->adb < self->y;
         break;
     case 4:
-        self->addrbus = bytowr(self->adb, self->ada);
+        self->addrbus = bytowr(self->ada, self->databus);
+        self->adb = self->databus + self->adc;
         dispatch_instruction(self, dec);
-        self->ada += self->adc;
         break;
     case 5:
-        self->addrbus = bytowr(self->adb, self->ada);
+        self->addrbus = bytowr(self->ada, self->adb);
         dispatch_instruction(self, dec);
         break;
     default:

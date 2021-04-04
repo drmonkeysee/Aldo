@@ -668,19 +668,17 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
     case 1:
         self->addrbus = self->pc++;
         read(self);
-        self->ada = self->databus;
         break;
     case 2:
         self->addrbus = self->pc++;
-        read(self);
-        self->adb = self->databus;
-        self->ada += index;
+        self->ada = self->databus + index;
         self->adc = self->ada < index;
+        read(self);
         break;
     case 3:
-        self->addrbus = bytowr(self->ada, self->adb);
+        self->addrbus = bytowr(self->ada, self->databus);
+        self->adb = self->databus + self->adc;
         dispatch_instruction(self, dec);
-        self->adb += self->adc;
         break;
     case 4:
         self->addrbus = bytowr(self->ada, self->adb);
@@ -700,7 +698,7 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
 
 static void branch_displacement(struct mos6502 *self)
 {
-    self->adb = self->pc + self->ada;
+    self->ada = self->pc + self->databus;
     // NOTE: branch uses signed displacement so there are three overflow cases:
     // no overflow = no adjustment to pc-high;
     // positive overflow = carry-in to pc-high => pch + 1;
@@ -709,16 +707,18 @@ static void branch_displacement(struct mos6502 *self)
     // no overflow = 0 - 0 => pch + 0,
     // +overflow = 1 - 0 => pch + 1,
     // -overlow = 0 - 1 => pch - 1 => pch + 2sComplement(1) => pch + 0xff.
-    const bool negative_offset = self->ada & 0x80,
-               positive_overflow = self->adb < self->ada && !negative_offset,
-               negative_overflow = self->adb > self->ada && negative_offset;
+    const bool negative_offset = self->databus & 0x80,
+               positive_overflow = self->ada < self->databus
+                                   && !negative_offset,
+               negative_overflow = self->ada > self->databus
+                                   && negative_offset;
     self->adc = positive_overflow - negative_overflow;
-    self->pc = bytowr(self->adb, self->pc >> 8);
+    self->pc = bytowr(self->ada, self->pc >> 8);
 }
 
 static void branch_carry(struct mos6502 *self)
 {
-    self->pc = bytowr(self->adb, (self->pc >> 8) + self->adc);
+    self->pc = bytowr(self->ada, (self->pc >> 8) + self->adc);
 }
 
 static void IMP_sequence(struct mos6502 *self, struct decoded dec)
@@ -839,10 +839,10 @@ static void ABS_sequence(struct mos6502 *self, struct decoded dec)
     case 1:
         self->addrbus = self->pc++;
         read(self);
-        self->ada = self->databus;
         break;
     case 2:
         self->addrbus = self->pc++;
+        self->ada = self->databus;
         read(self);
         break;
     case 3:
@@ -911,18 +911,17 @@ static void BCH_sequence(struct mos6502 *self, struct decoded dec)
         self->addrbus = self->pc++;
         read(self);
         dispatch_instruction(self, dec);
-        self->ada = self->databus;
         break;
     case 2:
         self->addrbus = self->pc;
-        read(self);
         branch_displacement(self);
+        read(self);
         self->presync = !self->adc;
         break;
     case 3:
         self->addrbus = self->pc;
-        read(self);
         branch_carry(self);
+        read(self);
         self->presync = true;
         break;
     default:
@@ -936,9 +935,9 @@ static void JSR_sequence(struct mos6502 *self, struct decoded dec)
     case 1:
         self->addrbus = self->pc++;
         read(self);
-        self->ada = self->databus;
         break;
     case 2:
+        self->ada = self->databus;
         stack_top(self);
         break;
     case 3:
@@ -970,9 +969,9 @@ static void RTS_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 3:
         stack_pop(self);
-        self->ada = self->databus;
         break;
     case 4:
+        self->ada = self->databus;
         stack_pop(self);
         dispatch_instruction(self, dec);
         break;
@@ -992,10 +991,10 @@ static void JABS_sequence(struct mos6502 *self, struct decoded dec)
     case 1:
         self->addrbus = self->pc++;
         read(self);
-        self->ada = self->databus;
         break;
     case 2:
         self->addrbus = self->pc++;
+        self->ada = self->databus;
         read(self);
         dispatch_instruction(self, dec);
         break;
@@ -1010,20 +1009,20 @@ static void JIND_sequence(struct mos6502 *self, struct decoded dec)
     case 1:
         self->addrbus = self->pc++;
         read(self);
-        self->adc = self->databus;
         break;
     case 2:
         self->addrbus = self->pc++;
+        self->ada = self->databus;
         read(self);
-        self->adb = self->databus;
         break;
     case 3:
-        self->addrbus = bytowr(self->adc++, self->adb);
+        self->addrbus = bytowr(self->ada++, self->databus);
+        self->adb = self->databus;
         read(self);
-        self->ada = self->databus;
         break;
     case 4:
-        self->addrbus = bytowr(self->adc, self->adb);
+        self->addrbus = bytowr(self->ada, self->adb);
+        self->ada = self->databus;
         read(self);
         dispatch_instruction(self, dec);
         break;

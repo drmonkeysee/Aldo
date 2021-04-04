@@ -33,6 +33,7 @@
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
 		C85C8DC625BD29AC00611D19 /* asm.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* asm.c */; };
 		C86A41892606F73F00D05B98 /* cpujump.c in Sources */ = {isa = PBXBuildFile; fileRef = C86A41882606F73F00D05B98 /* cpujump.c */; };
+		C88601EF26195B8100590A1B /* cpusubroutine.c in Sources */ = {isa = PBXBuildFile; fileRef = C88601EE26195B8100590A1B /* cpusubroutine.c */; };
 		C89E8AC9260ED5FE008395B6 /* cpubranch.c in Sources */ = {isa = PBXBuildFile; fileRef = C89E8AC8260ED5FE008395B6 /* cpubranch.c */; };
 		C8C4B48D25ABBFB3006A98BB /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
 		C8FD257125EB38DF0043F6E6 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C8FD257025EB38DF0043F6E6 /* cpu.c */; };
@@ -93,6 +94,7 @@
 		C85C8DC425BD29AC00611D19 /* asm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = asm.h; sourceTree = "<group>"; };
 		C85C8DC525BD29AC00611D19 /* asm.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = asm.c; sourceTree = "<group>"; };
 		C86A41882606F73F00D05B98 /* cpujump.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpujump.c; sourceTree = "<group>"; };
+		C88601EE26195B8100590A1B /* cpusubroutine.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpusubroutine.c; sourceTree = "<group>"; };
 		C89E8AC8260ED5FE008395B6 /* cpubranch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpubranch.c; sourceTree = "<group>"; };
 		C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpanel.tbd; path = usr/lib/libpanel.tbd; sourceTree = SDKROOT; };
 		C8FD257025EB38DF0043F6E6 /* cpu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpu.c; sourceTree = "<group>"; };
@@ -229,6 +231,7 @@
 				C807C95B25F5881400A791B5 /* cpuindirect.c */,
 				C86A41882606F73F00D05B98 /* cpujump.c */,
 				C82FBFD82616B94700E6BB08 /* cpustack.c */,
+				C88601EE26195B8100590A1B /* cpusubroutine.c */,
 				C807C95725F587D500A791B5 /* cpuzeropage.c */,
 			);
 			path = emu;
@@ -327,6 +330,7 @@
 				C8FD257D25EB3B050043F6E6 /* traits.c in Sources */,
 				C8FD257125EB38DF0043F6E6 /* cpu.c in Sources */,
 				C807C95325F5877000A791B5 /* cpuimmediate.c in Sources */,
+				C88601EF26195B8100590A1B /* cpusubroutine.c in Sources */,
 				C8184D3E25E7496B002B3100 /* Tests.swift in Sources */,
 				C89E8AC9260ED5FE008395B6 /* cpubranch.c in Sources */,
 				C8184D8225E76555002B3100 /* decode.c in Sources */,

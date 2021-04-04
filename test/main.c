@@ -21,6 +21,7 @@ struct ct_testsuite cpu_tests(void),
                     cpu_indirect_tests(void),
                     cpu_jump_tests(void),
                     cpu_stack_tests(void),
+                    cpu_subroutine_tests(void),
                     cpu_zeropage_tests(void),
                     dis_tests(void);
 
@@ -35,6 +36,7 @@ static size_t testrunner(int argc, char *argv[argc+1])
         cpu_indirect_tests(),
         cpu_jump_tests(),
         cpu_stack_tests(),
+        cpu_subroutine_tests(),
         cpu_zeropage_tests(),
         dis_tests(),
     };

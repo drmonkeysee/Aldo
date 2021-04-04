@@ -23,8 +23,9 @@ struct console_state {
     enum nexcmode mode;
     struct {
         uint16_t addressbus, program_counter, current_instruction;
-        uint8_t accumulator, addra_latch, addrb_latch, addrc_latch, databus,
-                exec_cycle, opcode, stack_pointer, status, xindex, yindex;
+        uint8_t accumulator, addrlow_latch, addrhigh_latch, addrcarry_latch,
+                databus, exec_cycle, opcode, stack_pointer, status, xindex,
+                yindex;
         bool datafault, instdone;
     } cpu;
     struct {

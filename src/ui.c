@@ -309,14 +309,14 @@ static void drawdatapath(const struct console_state *snapshot)
     const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
     mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);
 
-    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "ada: $%02X",
-              snapshot->cpu.addra_latch);
+    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adl: $%02X",
+              snapshot->cpu.addrlow_latch);
 
     mvwaddstr(DatapathView.content, ++cursor_y, 0, left);
     mvwprintw(DatapathView.content, cursor_y, vsep1 + 2, "$%04X",
               snapshot->cpu.addressbus);
-    mvwprintw(DatapathView.content, cursor_y, vsep2 + 2, "adb: $%02X",
-              snapshot->cpu.addrb_latch);
+    mvwprintw(DatapathView.content, cursor_y, vsep2 + 2, "adh: $%02X",
+              snapshot->cpu.addrhigh_latch);
     const int dbus_x = vsep3 + 2;
     if (snapshot->cpu.datafault) {
         mvwaddstr(DatapathView.content, cursor_y, dbus_x, "FLT");
@@ -328,7 +328,7 @@ static void drawdatapath(const struct console_state *snapshot)
               snapshot->lines.readwrite ? left : right);
 
     mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adc: $%02X",
-              snapshot->cpu.addrc_latch);
+              snapshot->cpu.addrcarry_latch);
 
     mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "%*sT%u",
               snapshot->cpu.exec_cycle, "", snapshot->cpu.exec_cycle);

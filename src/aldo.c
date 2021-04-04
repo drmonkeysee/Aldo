@@ -94,7 +94,12 @@ int aldo_run(void)
     ui_init();
 
     const uint8_t test_prg[] = {
+        0x4c, 0x7, 0x80,   // jmp $8007
+        0x18,   // clc
+        0x69, 0x5, // adc 5
+        0x60, // rts
         0xa9, 0xa, // lda $2
+        0x20, 0x3, 0x80, // jsr $8003
         0x48,
         0x68,
         0x8,

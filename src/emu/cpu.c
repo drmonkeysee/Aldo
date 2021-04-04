@@ -630,6 +630,18 @@ static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 // Addressing Mode Sequences
 //
 
+// NOTE: addressing sequences approximate the cycle-by-cycle behavior of the
+// 6502 processor; each cycle generally breaks down as follows:
+// 1. put current cycle's address on the addressbus (roughly ϕ1)
+// 2. perform internal addressing operations for next cycle
+//    (latching previous databus contents, adding address offsets, etc.)
+// 3. execute read/write/instruction, either reading data to databus
+//    or writing data from databus (roughly ϕ2)
+// Note that the actual 6502 executes instruction side-effects on T0 of the
+// next instruction but we execute all side-effects within the current
+// instruction sequence (generally the last cycle); in other words we don't
+// emulate the 6502's simple pipelining.
+
 #define BAD_ADDR_SEQ assert(((void)"BAD ADDRMODE SEQUENCE", false))
 
 static void zeropage_indexed(struct mos6502 *self, struct decoded dec,

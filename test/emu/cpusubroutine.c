@@ -37,7 +37,7 @@ static void cpu_rts(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x60, 0x5, 0x80, [259] = 0x2, [260] = 0x0};
+    uint8_t mem[] = {0x60, 0xff, 0xff, [259] = 0x2, [260] = 0x0};
     cpu.ram = mem;
     cpu.s = 2;
 

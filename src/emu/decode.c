@@ -45,7 +45,7 @@ const struct decoded Decode[] = {
     {IN_ORA, AM_ABSX},    // 1D - ORA abs,X
     {IN_ASL, AM_ABSX},    // 1E - ASL abs,X
     UNK,    // 1F - Unofficial
-    UNK,    // 20 - JSR
+    {IN_JSR, AM_JSR},    // 20 - JSR
     {IN_AND, AM_INDX},    // 21 - AND (zp,X)
     UNK,    // 22 - Unofficial
     UNK,    // 23 - Unofficial

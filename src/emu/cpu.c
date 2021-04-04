@@ -428,6 +428,7 @@ static void JMP_exec(struct mos6502 *self)
 
 static void JSR_exec(struct mos6502 *self)
 {
+    self->pc = bytowr(self->ada, self->databus);
     self->presync = true;
 }
 
@@ -936,7 +937,30 @@ static void BCH_sequence(struct mos6502 *self, struct decoded dec)
 
 static void JSR_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    switch (self->t) {
+    case 1:
+        self->addrbus = self->pc++;
+        read(self);
+        self->ada = self->databus;
+        break;
+    case 2:
+        stack_top(self);
+        break;
+    case 3:
+        stack_push(self, self->pc >> 8);
+        break;
+    case 4:
+        stack_push(self, self->pc);
+        break;
+    case 5:
+        self->addrbus = self->pc;
+        self->signal.rw = true;
+        read(self);
+        dispatch_instruction(self, dec);
+        break;
+    default:
+        BAD_ADDR_SEQ;
+    }
 }
 
 static void RTS_sequence(struct mos6502 *self, struct decoded dec)

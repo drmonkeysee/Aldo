@@ -48,7 +48,7 @@ static void load_prg(nes *self, size_t sz, const uint8_t prg[restrict sz])
 
 nes *nes_new(void)
 {
-    struct nes_console *self = malloc(sizeof *self);
+    struct nes_console *const self = malloc(sizeof *self);
     self->cpu.ram = self->ram;
     self->cpu.cart = self->cart;
     return self;

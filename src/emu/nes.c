@@ -89,6 +89,45 @@ void nes_halt(nes *self)
     self->cpu.signal.rdy = false;
 }
 
+// NOTE: interrupt lines are active low
+void nes_interrupt(nes *self, enum nes_interrupt signal)
+{
+    assert(self != NULL);
+
+    switch (signal) {
+    case NESI_IRQ:
+        self->cpu.signal.irq = false;
+        break;
+    case NESI_NMI:
+        self->cpu.signal.nmi = false;
+        break;
+    case NESI_RES:
+        self->cpu.signal.res = false;
+        break;
+    default:
+        assert(((void)"INVALID NES INTERRUPT", false));
+    }
+}
+
+void nes_clear(nes *self, enum nes_interrupt signal)
+{
+    assert(self != NULL);
+
+    switch (signal) {
+    case NESI_IRQ:
+        self->cpu.signal.irq = true;
+        break;
+    case NESI_NMI:
+        self->cpu.signal.nmi = true;
+        break;
+    case NESI_RES:
+        self->cpu.signal.res = true;
+        break;
+    default:
+        assert(((void)"INVALID NES INTERRUPT", false));
+    }
+}
+
 int nes_cycle(nes *self, int cpubudget)
 {
     assert(self != NULL);

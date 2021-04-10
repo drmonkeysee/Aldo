@@ -50,11 +50,28 @@ static void handle_input(struct control *appstate,
             appstate->cycles_per_sec = MinCps;
         }
         break;
+    case 'i':
+        if (snapshot->lines.irq) {
+            nes_interrupt(console, NESI_IRQ);
+        } else {
+            nes_clear(console, NESI_IRQ);
+        }
+        break;
     case 'm':
         nes_mode(console, snapshot->mode + 1);
         break;
     case 'M':
         nes_mode(console, snapshot->mode - 1);
+        break;
+    case 'n':
+        if (snapshot->lines.nmi) {
+            nes_interrupt(console, NESI_NMI);
+        } else {
+            nes_clear(console, NESI_NMI);
+        }
+        break;
+    case 'q':
+        appstate->running = false;
         break;
     case 'r':
         appstate->ramsheet = (appstate->ramsheet + 1) % RamSheets;
@@ -65,8 +82,12 @@ static void handle_input(struct control *appstate,
             appstate->ramsheet = RamSheets - 1;
         }
         break;
-    case 'q':
-        appstate->running = false;
+    case 's':
+        if (snapshot->lines.reset) {
+            nes_interrupt(console, NESI_RES);
+        } else {
+            nes_clear(console, NESI_RES);
+        }
         break;
     }
 }

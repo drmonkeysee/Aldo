@@ -174,10 +174,10 @@ static void drawcontrols(const struct console_state *snapshot)
     drawtoggle(" Run ", snapshot->mode == NEXC_RUN);
 
     cursor_y += 2;
-    mvwaddstr(ControlsView.content, cursor_y, 0, "Send: ");
-    waddstr(ControlsView.content, " IRQ ");
-    waddstr(ControlsView.content, " NMI ");
-    waddstr(ControlsView.content, " RES ");
+    mvwaddstr(ControlsView.content, cursor_y, 0, "Signal: ");
+    drawtoggle(" IRQ ", !snapshot->lines.irq);
+    drawtoggle(" NMI ", !snapshot->lines.nmi);
+    drawtoggle(" RES ", !snapshot->lines.reset);
 }
 
 static void drawvecs(int h, int w, int y,

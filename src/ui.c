@@ -144,7 +144,6 @@ static void drawtoggle(const char *label, bool selected)
         wattron(ControlsView.content, A_STANDOUT);
     }
     waddstr(ControlsView.content, label);
-    wattroff(ControlsView.content, A_STANDOUT);
     if (selected) {
         wattroff(ControlsView.content, A_STANDOUT);
     }
@@ -282,28 +281,28 @@ static void draw_cpu_line(bool signal, int y, int x, int dir_offset,
 
 static void draw_interrupt_latch(enum nistate interrupt, int y, int x)
 {
-    const char *label;
-    attr_t style = A_NORMAL;
-
+    const char *modifier = "";
+    attr_t style;
     switch (interrupt) {
     case NIS_CLEAR:
-        style = A_DIM;
+        // NOTE: draw nothing for CLEAR state
+        return;
     case NIS_DETECTED:
-        label = "\u25ef";
-        break;
-    case NIS_PENDING:
         style = A_DIM;
+        break;
     case NIS_COMMITTED:
-        label = "\u2b24";
+        style = A_UNDERLINE;
+        modifier = "\u0305";
         break;
     default:
-        assert(((void)"BAD INTERRUPT DRAW STATE", false));
+        style = A_NORMAL;
+        break;
     }
 
     if (style != A_NORMAL) {
         wattron(DatapathView.content, style);
     }
-    mvwaddstr(DatapathView.content, y, x, label);
+    mvwprintw(DatapathView.content, y, x, "%s%s", "\u25ef", modifier);
     if (style != A_NORMAL) {
         wattroff(DatapathView.content, style);
     }

@@ -280,6 +280,35 @@ static void draw_cpu_line(bool signal, int y, int x, int dir_offset,
     }
 }
 
+static void draw_interrupt_latch(enum nistate interrupt, int y, int x)
+{
+    const char *label;
+    attr_t style = A_NORMAL;
+
+    switch (interrupt) {
+    case NIS_CLEAR:
+        style = A_DIM;
+    case NIS_DETECTED:
+        label = "\u25ef";
+        break;
+    case NIS_PENDING:
+        style = A_DIM;
+    case NIS_COMMITTED:
+        label = "\u2b24";
+        break;
+    default:
+        assert(((void)"BAD INTERRUPT DRAW STATE", false));
+    }
+
+    if (style != A_NORMAL) {
+        wattron(DatapathView.content, style);
+    }
+    mvwaddstr(DatapathView.content, y, x, label);
+    if (style != A_NORMAL) {
+        wattroff(DatapathView.content, style);
+    }
+}
+
 static void drawdatapath(const struct console_state *snapshot)
 {
     static const char *const restrict left = "\u2190",
@@ -336,6 +365,9 @@ static void drawdatapath(const struct console_state *snapshot)
 
     mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
 
+    draw_interrupt_latch(snapshot->datapath.irq, cursor_y, line_x);
+    draw_interrupt_latch(snapshot->datapath.nmi, cursor_y, line_x * 2);
+    draw_interrupt_latch(snapshot->datapath.res, cursor_y, line_x * 3);
     // NOTE: jump 2 rows as interrupts are drawn direction first
     cursor_y += 2;
     draw_cpu_line(snapshot->lines.irq, cursor_y, line_x, -1, up,

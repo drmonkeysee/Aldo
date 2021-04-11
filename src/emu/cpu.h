@@ -36,6 +36,10 @@ struct mos6502 {
 
     // Datapath: abstract representation of instruction fetching,
     // execution, and signaling.
+    int8_t t;           // Instruction sequence cycle (T0, T1, T2...)
+    enum nistate irq,   // IRQ detection latch
+                 nmi,   // NMI detection latch
+                 res;   // RESET detection latch
     uint16_t addrbus,   // Word put on the address pins on clock phase ϕ1
              addrinst;  // Address of current instruction
     uint8_t databus,    // Byte put on the data pins on clock phase ϕ2
@@ -43,7 +47,6 @@ struct mos6502 {
             adl,        // Address latch low
             adh,        // Address latch high
             adc;        // Address carry
-    int8_t t;           // Instruction sequence cycle (T0, T1, T2...)
     struct {
         bool irq: 1,    // Maskable Interrupt Signal (input, inverted)
              nmi: 1,    // Nonmaskable Interrupt Signal (input, inverted)

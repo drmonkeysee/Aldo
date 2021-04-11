@@ -1083,6 +1083,7 @@ void cpu_powerup(struct mos6502 *self)
     self->signal.irq = self->signal.nmi = self->signal.res = self->signal.rw =
         self->presync = true;
     self->signal.rdy = self->signal.sync = self->dflt = false;
+    self->irq = self->nmi = self->res = NIS_CLEAR;
 
     // NOTE: all other cpu elements are indeterminate on powerup
 }
@@ -1162,10 +1163,13 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->datapath.addrcarry_latch = self->adc;
     snapshot->datapath.current_instruction = self->addrinst;
     snapshot->datapath.databus = self->databus;
-    snapshot->datapath.exec_cycle = self->t;
-    snapshot->datapath.opcode = self->opc;
     snapshot->datapath.datafault = self->dflt;
+    snapshot->datapath.exec_cycle = self->t;
     snapshot->datapath.instdone = self->presync;
+    snapshot->datapath.irq = self->irq;
+    snapshot->datapath.nmi = self->nmi;
+    snapshot->datapath.opcode = self->opc;
+    snapshot->datapath.res = self->res;
 
     snapshot->lines.irq = self->signal.irq;
     snapshot->lines.nmi = self->signal.nmi;

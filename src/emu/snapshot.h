@@ -29,15 +29,16 @@ struct console_state {
     const uint8_t *ram, *rom;
     enum nexcmode mode;
     struct {
-        uint16_t program_counter;
-        uint8_t accumulator, stack_pointer, status, xindex, yindex;
-    } cpu;
-    struct {
+        enum nistate irq, nmi, res;
         uint16_t addressbus, current_instruction;
         uint8_t addrlow_latch, addrhigh_latch, addrcarry_latch, databus,
                 exec_cycle, opcode;
         bool datafault, instdone;
     } datapath;
+    struct {
+        uint16_t program_counter;
+        uint8_t accumulator, stack_pointer, status, xindex, yindex;
+    } cpu;
     struct {
         bool irq, nmi, readwrite, ready, reset, sync;
     } lines;

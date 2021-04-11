@@ -19,8 +19,8 @@
 // Controller Input.
 
 struct nes_console {
-    enum nexcmode mode;     // NES execution mode
     struct mos6502 cpu;     // CPU Core of RP2A03 Chip
+    enum nexcmode mode;     // NES execution mode
     uint8_t ram[RAM_SIZE],  // CPU Internal RAM
             cart[ROM_SIZE]; // TODO: Cartridge ROM to be replaced
                             // eventually with cartridge + mapper

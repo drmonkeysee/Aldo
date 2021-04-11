@@ -212,7 +212,7 @@ static void drawrom(const struct console_state *snapshot)
     getmaxyx(RomView.content, h, w);
     werase(RomView.content);
 
-    uint16_t addr = snapshot->cpu.current_instruction;
+    uint16_t addr = snapshot->datapath.current_instruction;
     // NOTE: on startup addr may be outside ROM range
     if (addr < CpuCartMinAddr) {
         mvwaddstr(RomView.content, 0, 0, "OUT OF ROM RANGE");
@@ -310,28 +310,29 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);
 
     mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adl: $%02X",
-              snapshot->cpu.addrlow_latch);
+              snapshot->datapath.addrlow_latch);
 
     mvwaddstr(DatapathView.content, ++cursor_y, 0, left);
     mvwprintw(DatapathView.content, cursor_y, vsep1 + 2, "$%04X",
-              snapshot->cpu.addressbus);
+              snapshot->datapath.addressbus);
     mvwprintw(DatapathView.content, cursor_y, vsep2 + 2, "adh: $%02X",
-              snapshot->cpu.addrhigh_latch);
+              snapshot->datapath.addrhigh_latch);
     const int dbus_x = vsep3 + 2;
-    if (snapshot->cpu.datafault) {
+    if (snapshot->datapath.datafault) {
         mvwaddstr(DatapathView.content, cursor_y, dbus_x, "FLT");
     } else {
         mvwprintw(DatapathView.content, cursor_y, dbus_x, "$%02X",
-                  snapshot->cpu.databus);
+                  snapshot->datapath.databus);
     }
     mvwaddstr(DatapathView.content, cursor_y, vsep4 + 1,
               snapshot->lines.readwrite ? left : right);
 
     mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adc: $%02X",
-              snapshot->cpu.addrcarry_latch);
+              snapshot->datapath.addrcarry_latch);
 
     mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "%*sT%u",
-              snapshot->cpu.exec_cycle, "", snapshot->cpu.exec_cycle);
+              snapshot->datapath.exec_cycle, "",
+              snapshot->datapath.exec_cycle);
 
     mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
 

@@ -134,10 +134,10 @@ int dis_datapath(const struct console_state *snapshot,
     assert(snapshot != NULL);
     assert(dis != NULL);
 
-    const uint16_t instaddr = snapshot->cpu.current_instruction;
+    const uint16_t instaddr = snapshot->datapath.current_instruction;
     if (instaddr < CpuCartMinAddr) return ASM_EOF;
 
-    const struct decoded dec = Decode[snapshot->cpu.opcode];
+    const struct decoded dec = Decode[snapshot->datapath.opcode];
     const int instlen = InstLens[dec.mode];
     // NOTE: detect pc overflow
     if ((uint16_t)(instaddr + instlen) < CpuCartMinAddr) return ASM_EOF;
@@ -148,8 +148,8 @@ int dis_datapath(const struct console_state *snapshot,
     if (count < 0) return ASM_FMT_FAIL;
 
     const int max_offset = 1 + (instlen / 3),
-              displayidx = snapshot->cpu.exec_cycle < max_offset
-                           ? snapshot->cpu.exec_cycle
+              displayidx = snapshot->datapath.exec_cycle < max_offset
+                           ? snapshot->datapath.exec_cycle
                            : max_offset;
     const char *const displaystr = StringTables[dec.mode][displayidx];
     const uint16_t rom_idx = instaddr & CpuCartAddrMask;

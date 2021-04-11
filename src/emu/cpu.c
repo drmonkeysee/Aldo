@@ -1156,14 +1156,16 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.xindex = self->x;
     snapshot->cpu.yindex = self->y;
 
-    snapshot->cpu.addressbus = self->addrbus;
-    snapshot->cpu.addrlow_latch = self->adl;
-    snapshot->cpu.addrhigh_latch = self->adh;
-    snapshot->cpu.addrcarry_latch = self->adc;
-    snapshot->cpu.current_instruction = self->addrinst;
-    snapshot->cpu.databus = self->databus;
-    snapshot->cpu.exec_cycle = self->t;
-    snapshot->cpu.opcode = self->opc;
+    snapshot->datapath.addressbus = self->addrbus;
+    snapshot->datapath.addrlow_latch = self->adl;
+    snapshot->datapath.addrhigh_latch = self->adh;
+    snapshot->datapath.addrcarry_latch = self->adc;
+    snapshot->datapath.current_instruction = self->addrinst;
+    snapshot->datapath.databus = self->databus;
+    snapshot->datapath.exec_cycle = self->t;
+    snapshot->datapath.opcode = self->opc;
+    snapshot->datapath.datafault = self->dflt;
+    snapshot->datapath.instdone = self->presync;
 
     snapshot->lines.irq = self->signal.irq;
     snapshot->lines.nmi = self->signal.nmi;
@@ -1171,7 +1173,4 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->lines.ready = self->signal.rdy;
     snapshot->lines.reset = self->signal.res;
     snapshot->lines.sync = self->signal.sync;
-
-    snapshot->cpu.datafault = self->dflt;
-    snapshot->cpu.instdone = self->presync;
 }

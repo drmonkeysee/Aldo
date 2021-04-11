@@ -18,6 +18,13 @@ enum nexcmode {
     NEXC_MODECOUNT,
 };
 
+enum nistate {
+    NIS_CLEAR,
+    NIS_DETECTED,
+    NIS_PENDING,
+    NIS_COMMITTED,
+};
+
 struct console_state {
     const uint8_t *ram, *rom;
     enum nexcmode mode;

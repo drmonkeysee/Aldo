@@ -315,8 +315,6 @@ static void drawdatapath(const struct console_state *snapshot)
                       *const restrict up = "\u2191",
                       *const restrict down = "\u2193";
     static const int vsep1 = 1, vsep2 = 9, vsep3 = 23, vsep4 = 29, seph = 5;
-    // NOTE: static buffer to remember last datapath paint
-    static char buf[DIS_DATAP_SIZE];
 
     const int w = getmaxx(DatapathView.content), line_x = (w / 4) + 1;
     int cursor_y = 0;
@@ -333,6 +331,8 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwvline(DatapathView.content, cursor_y, vsep2, 0, seph);
     mvwvline(DatapathView.content, cursor_y, vsep3, 0, seph);
     mvwvline(DatapathView.content, cursor_y, vsep4, 0, seph);
+
+    char buf[DIS_DATAP_SIZE];
     const int wlen = dis_datapath(snapshot, buf);
     const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
     mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);

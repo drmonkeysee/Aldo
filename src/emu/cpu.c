@@ -90,6 +90,84 @@ static void update_n(struct mos6502 *self, uint8_t d)
 }
 
 //
+// Interrupt Detection
+//
+
+// NOTE: check interrupt lines (active low) on ϕ2 to
+// initiate interrupt detection.
+static void check_interrupts(struct mos6502 *self)
+{
+    if (!self->signal.res && self->res == NIS_CLEAR) {
+        self->res = NIS_DETECTED;
+    }
+    if (!self->signal.nmi && self->nmi == NIS_CLEAR) {
+        self->nmi = NIS_DETECTED;
+    }
+    if (!self->signal.irq && self->irq == NIS_CLEAR) {
+        self->irq = NIS_DETECTED;
+    }
+}
+
+// NOTE: check persistence of interrupt lines (active low) on ϕ1
+// of following cycle to latch interrupt detection and make polling possible.
+static void latch_interrupts(struct mos6502 *self)
+{
+    // NOTE: res is level-detected but unlike irq it takes effect at
+    // end of this cycle's ϕ2 so it moves directly from pending in this cycle
+    // to committed in the next cycle.
+    if (self->signal.res) {
+        if (self->res == NIS_DETECTED) {
+            self->res = NIS_CLEAR;
+        }
+    } else if (self->res == NIS_DETECTED) {
+        self->res = NIS_PENDING;
+    }
+
+    // NOTE: nmi is edge-detected so once it has latched in it remains
+    // set until cleared by a handler or reset.
+    if (self->signal.nmi) {
+        if (self->nmi == NIS_DETECTED) {
+            self->nmi = NIS_CLEAR;
+        }
+    } else if (self->nmi == NIS_DETECTED) {
+        self->nmi = NIS_PENDING;
+    }
+
+    // NOTE: irq is level-detected so must remain low until polled
+    // or the interrupt is lost.
+    if (self->signal.irq) {
+        if (self->irq == NIS_DETECTED || self->irq == NIS_PENDING) {
+            self->irq = NIS_CLEAR;
+        }
+    } else if (self->irq == NIS_DETECTED) {
+        self->irq = NIS_PENDING;
+    }
+}
+
+// NOTE: res takes effect after two cycles and immediately resets/halts
+// the cpu until the res line goes high again (this isn't strictly true
+// but the real cpu complexity isn't necessary here).
+static bool reset_held(struct mos6502 *self)
+{
+    if (self->res == NIS_PENDING) {
+        self->res = NIS_COMMITTED;
+    }
+    if (self->res == NIS_COMMITTED) {
+        if (self->signal.res) {
+            // TODO: start reset sequence
+            self->pc = 0x8000;
+            self->presync = true;
+            self->res = NIS_CLEAR;
+        } else {
+            self->t = 0;
+            self->irq = self->nmi = NIS_CLEAR;
+            return true;
+        }
+    }
+    return false;
+}
+
+//
 // Instruction Execution
 //
 
@@ -1123,6 +1201,8 @@ int cpu_cycle(struct mos6502 *self)
 
     if (!self->signal.rdy) return 0;
 
+    if (reset_held(self)) return 1;
+
     if (self->presync) {
         self->presync = false;
         self->t = PreFetch;
@@ -1131,6 +1211,7 @@ int cpu_cycle(struct mos6502 *self)
         self->dflt = false;
     }
 
+    latch_interrupts(self);
     if (++self->t == 0) {
         // NOTE: T0 is always an opcode fetch
         self->signal.sync = self->signal.rw = true;
@@ -1142,6 +1223,7 @@ int cpu_cycle(struct mos6502 *self)
         self->signal.sync = false;
         dispatch_addrmode(self, Decode[self->opc]);
     }
+    check_interrupts(self);
     return 1;
 }
 

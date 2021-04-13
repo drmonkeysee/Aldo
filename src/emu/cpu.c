@@ -154,8 +154,19 @@ static bool reset_held(struct mos6502 *self)
     }
     if (self->res == NIS_COMMITTED) {
         if (self->signal.res) {
-            // TODO: start reset sequence
-            self->pc = 0x8000;
+            // TODO: fake the execution of the RES sequence
+            self->addrbus = ResetVector;
+            read(self);
+            self->adl = self->databus;
+            self->addrbus = ResetVector + 1;
+            read(self);
+            self->adh = self->databus;
+            self->pc = bytowr(self->adl, self->adh);
+            self->p.i = true;
+            // NOTE: Reset runs through same sequence as BRK/IRQ
+            // so the cpu does 3 phantom stack pushes;
+            // on powerup this would result in $00 - $3 = $FD.
+            self->s -= 3;
             self->presync = true;
             self->res = NIS_CLEAR;
         } else {
@@ -1168,31 +1179,14 @@ void cpu_powerup(struct mos6502 *self)
 
 void cpu_reset(struct mos6502 *self)
 {
-    // TODO: this will eventually set a signal
-    // and execute an instruction sequence
     assert(self != NULL);
 
-    // TODO: reset sequence begins after reset signal goes from low to high
+    // NOTE: hold reset low and clock the cpu until interrupt is latched in
+    self->signal.res = false;
+    do {
+        cpu_cycle(self);
+    } while (self->res != NIS_PENDING);
     self->signal.res = true;
-
-    // TODO: fake the execution of the RES sequence and load relevant
-    // data into the datapath.
-    self->t = MaxCycleCount - 1;
-    self->addrbus = ResetVector;
-    read(self);
-    self->adl = self->databus;
-    self->addrbus = ResetVector + 1;
-    read(self);
-    self->adh = self->databus;
-    self->pc = bytowr(self->adl, self->adh);
-
-    self->p.i = true;
-    // NOTE: Reset runs through same sequence as BRK/IRQ
-    // so the cpu does 3 phantom stack pushes;
-    // on powerup this would result in $00 - $3 = $FD.
-    self->s -= 3;
-
-    self->presync = true;
 }
 
 int cpu_cycle(struct mos6502 *self)

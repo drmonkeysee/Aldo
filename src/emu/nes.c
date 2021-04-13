@@ -72,7 +72,10 @@ void nes_powerup(nes *self, size_t sz, const uint8_t prg[restrict sz])
 
     cpu_powerup(&self->cpu);
     load_prg(self, sz, prg);
+    // TODO: run cpu through reset sequence then halt
+    nes_ready(self);
     cpu_reset(&self->cpu);
+    nes_halt(self);
 }
 
 void nes_ready(nes *self)

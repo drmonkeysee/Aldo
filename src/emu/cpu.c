@@ -1181,11 +1181,11 @@ void cpu_reset(struct mos6502 *self)
 {
     assert(self != NULL);
 
-    // NOTE: hold reset low and clock the cpu until interrupt is latched in
+    // NOTE: hold reset low and clock the cpu until reset state is entered
     self->signal.res = false;
     do {
         cpu_cycle(self);
-    } while (self->res != NIS_PENDING);
+    } while (self->res != NIS_COMMITTED);
     self->signal.res = true;
 }
 

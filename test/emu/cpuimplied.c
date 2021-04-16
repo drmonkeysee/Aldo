@@ -16,7 +16,7 @@
 // Implied Instructions
 //
 
-static void cpu_asl(void *ctx)
+static void asl(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -36,7 +36,7 @@ static void cpu_asl(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_asl_carry(void *ctx)
+static void asl_carry(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -56,7 +56,7 @@ static void cpu_asl_carry(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_asl_zero(void *ctx)
+static void asl_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -76,7 +76,7 @@ static void cpu_asl_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_asl_carryzero(void *ctx)
+static void asl_carryzero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -96,7 +96,7 @@ static void cpu_asl_carryzero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_asl_negative(void *ctx)
+static void asl_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -116,7 +116,7 @@ static void cpu_asl_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_asl_carrynegative(void *ctx)
+static void asl_carrynegative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -136,7 +136,7 @@ static void cpu_asl_carrynegative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_asl_all_ones(void *ctx)
+static void asl_all_ones(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -157,7 +157,7 @@ static void cpu_asl_all_ones(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_clc(void *ctx)
+static void clc(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -174,7 +174,7 @@ static void cpu_clc(void *ctx)
     ct_assertfalse(cpu.p.c);
 }
 
-static void cpu_cld(void *ctx)
+static void cld(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -191,7 +191,7 @@ static void cpu_cld(void *ctx)
     ct_assertfalse(cpu.p.d);
 }
 
-static void cpu_cli(void *ctx)
+static void cli(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -208,7 +208,7 @@ static void cpu_cli(void *ctx)
     ct_assertfalse(cpu.p.i);
 }
 
-static void cpu_clv(void *ctx)
+static void clv(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -225,7 +225,7 @@ static void cpu_clv(void *ctx)
     ct_assertfalse(cpu.p.v);
 }
 
-static void cpu_dex(void *ctx)
+static void dex(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -244,7 +244,7 @@ static void cpu_dex(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_dex_to_zero(void *ctx)
+static void dex_to_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -263,7 +263,7 @@ static void cpu_dex_to_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_dex_to_negative(void *ctx)
+static void dex_to_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -283,7 +283,7 @@ static void cpu_dex_to_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_dey(void *ctx)
+static void dey(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -302,7 +302,7 @@ static void cpu_dey(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_dey_to_zero(void *ctx)
+static void dey_to_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -321,7 +321,7 @@ static void cpu_dey_to_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_dey_to_negative(void *ctx)
+static void dey_to_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -341,7 +341,7 @@ static void cpu_dey_to_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_inx(void *ctx)
+static void inx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -360,7 +360,7 @@ static void cpu_inx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_inx_to_zero(void *ctx)
+static void inx_to_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -380,7 +380,7 @@ static void cpu_inx_to_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_inx_to_negative(void *ctx)
+static void inx_to_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -399,7 +399,7 @@ static void cpu_inx_to_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_iny(void *ctx)
+static void iny(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -418,7 +418,7 @@ static void cpu_iny(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_iny_to_zero(void *ctx)
+static void iny_to_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -438,7 +438,7 @@ static void cpu_iny_to_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_iny_to_negative(void *ctx)
+static void iny_to_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -457,7 +457,7 @@ static void cpu_iny_to_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_lsr(void *ctx)
+static void lsr(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -477,7 +477,7 @@ static void cpu_lsr(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lsr_carry(void *ctx)
+static void lsr_carry(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -497,7 +497,7 @@ static void cpu_lsr_carry(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lsr_zero(void *ctx)
+static void lsr_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -517,7 +517,7 @@ static void cpu_lsr_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lsr_carryzero(void *ctx)
+static void lsr_carryzero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -537,7 +537,7 @@ static void cpu_lsr_carryzero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lsr_negative_to_positive(void *ctx)
+static void lsr_negative_to_positive(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -557,7 +557,7 @@ static void cpu_lsr_negative_to_positive(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lsr_all_ones(void *ctx)
+static void lsr_all_ones(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -578,7 +578,7 @@ static void cpu_lsr_all_ones(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_nop(void *ctx)
+static void nop(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -601,7 +601,7 @@ static void cpu_nop(void *ctx)
     ct_assertequal(0x34u, sn.cpu.status);
 }
 
-static void cpu_rol(void *ctx)
+static void rol(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -622,7 +622,7 @@ static void cpu_rol(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_rol_carry(void *ctx)
+static void rol_carry(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -642,7 +642,7 @@ static void cpu_rol_carry(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_rol_zero(void *ctx)
+static void rol_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -662,7 +662,7 @@ static void cpu_rol_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_rol_carryzero(void *ctx)
+static void rol_carryzero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -682,7 +682,7 @@ static void cpu_rol_carryzero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_rol_negative(void *ctx)
+static void rol_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -703,7 +703,7 @@ static void cpu_rol_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_rol_carrynegative(void *ctx)
+static void rol_carrynegative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -723,7 +723,7 @@ static void cpu_rol_carrynegative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_rol_all_ones(void *ctx)
+static void rol_all_ones(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -744,7 +744,7 @@ static void cpu_rol_all_ones(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_ror(void *ctx)
+static void ror(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -764,7 +764,7 @@ static void cpu_ror(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ror_carry(void *ctx)
+static void ror_carry(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -784,7 +784,7 @@ static void cpu_ror_carry(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ror_zero(void *ctx)
+static void ror_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -804,7 +804,7 @@ static void cpu_ror_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ror_carryzero(void *ctx)
+static void ror_carryzero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -824,7 +824,7 @@ static void cpu_ror_carryzero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ror_negative(void *ctx)
+static void ror_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -845,7 +845,7 @@ static void cpu_ror_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_ror_carrynegative(void *ctx)
+static void ror_carrynegative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -866,7 +866,7 @@ static void cpu_ror_carrynegative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_ror_all_ones(void *ctx)
+static void ror_all_ones(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -887,7 +887,7 @@ static void cpu_ror_all_ones(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_sec(void *ctx)
+static void sec(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -904,7 +904,7 @@ static void cpu_sec(void *ctx)
     ct_asserttrue(cpu.p.c);
 }
 
-static void cpu_sed(void *ctx)
+static void sed(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -921,7 +921,7 @@ static void cpu_sed(void *ctx)
     ct_asserttrue(cpu.p.d);
 }
 
-static void cpu_sei(void *ctx)
+static void sei(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -938,7 +938,7 @@ static void cpu_sei(void *ctx)
     ct_asserttrue(cpu.p.i);
 }
 
-static void cpu_tax(void *ctx)
+static void tax(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -958,7 +958,7 @@ static void cpu_tax(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_tax_to_zero(void *ctx)
+static void tax_to_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -978,7 +978,7 @@ static void cpu_tax_to_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_tax_to_negative(void *ctx)
+static void tax_to_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -998,7 +998,7 @@ static void cpu_tax_to_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_tay(void *ctx)
+static void tay(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1018,7 +1018,7 @@ static void cpu_tay(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_tay_to_zero(void *ctx)
+static void tay_to_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1038,7 +1038,7 @@ static void cpu_tay_to_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_tay_to_negative(void *ctx)
+static void tay_to_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1058,7 +1058,7 @@ static void cpu_tay_to_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_tsx(void *ctx)
+static void tsx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1078,7 +1078,7 @@ static void cpu_tsx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_tsx_to_zero(void *ctx)
+static void tsx_to_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1098,7 +1098,7 @@ static void cpu_tsx_to_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_tsx_to_negative(void *ctx)
+static void tsx_to_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1118,7 +1118,7 @@ static void cpu_tsx_to_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_txa(void *ctx)
+static void txa(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1138,7 +1138,7 @@ static void cpu_txa(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_txa_to_zero(void *ctx)
+static void txa_to_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1158,7 +1158,7 @@ static void cpu_txa_to_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_txa_to_negative(void *ctx)
+static void txa_to_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1178,7 +1178,7 @@ static void cpu_txa_to_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_txs(void *ctx)
+static void txs(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1198,7 +1198,7 @@ static void cpu_txs(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_txs_to_zero(void *ctx)
+static void txs_to_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1218,7 +1218,7 @@ static void cpu_txs_to_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_txs_to_negative(void *ctx)
+static void txs_to_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1238,7 +1238,7 @@ static void cpu_txs_to_negative(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_tya(void *ctx)
+static void tya(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1258,7 +1258,7 @@ static void cpu_tya(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_tya_to_zero(void *ctx)
+static void tya_to_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1278,7 +1278,7 @@ static void cpu_tya_to_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_tya_to_negative(void *ctx)
+static void tya_to_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1305,71 +1305,71 @@ static void cpu_tya_to_negative(void *ctx)
 struct ct_testsuite cpu_implied_tests(void)
 {
     static const struct ct_testcase tests[] = {
-        ct_maketest(cpu_asl),
-        ct_maketest(cpu_asl_carry),
-        ct_maketest(cpu_asl_zero),
-        ct_maketest(cpu_asl_carryzero),
-        ct_maketest(cpu_asl_negative),
-        ct_maketest(cpu_asl_carrynegative),
-        ct_maketest(cpu_asl_all_ones),
-        ct_maketest(cpu_clc),
-        ct_maketest(cpu_cld),
-        ct_maketest(cpu_cli),
-        ct_maketest(cpu_clv),
-        ct_maketest(cpu_dex),
-        ct_maketest(cpu_dex_to_zero),
-        ct_maketest(cpu_dex_to_negative),
-        ct_maketest(cpu_dey),
-        ct_maketest(cpu_dey_to_zero),
-        ct_maketest(cpu_dey_to_negative),
-        ct_maketest(cpu_inx),
-        ct_maketest(cpu_inx_to_zero),
-        ct_maketest(cpu_inx_to_negative),
-        ct_maketest(cpu_iny),
-        ct_maketest(cpu_iny_to_zero),
-        ct_maketest(cpu_iny_to_negative),
-        ct_maketest(cpu_lsr),
-        ct_maketest(cpu_lsr_carry),
-        ct_maketest(cpu_lsr_zero),
-        ct_maketest(cpu_lsr_carryzero),
-        ct_maketest(cpu_lsr_negative_to_positive),
-        ct_maketest(cpu_lsr_all_ones),
-        ct_maketest(cpu_nop),
-        ct_maketest(cpu_rol),
-        ct_maketest(cpu_rol_carry),
-        ct_maketest(cpu_rol_zero),
-        ct_maketest(cpu_rol_carryzero),
-        ct_maketest(cpu_rol_negative),
-        ct_maketest(cpu_rol_carrynegative),
-        ct_maketest(cpu_rol_all_ones),
-        ct_maketest(cpu_ror),
-        ct_maketest(cpu_ror_carry),
-        ct_maketest(cpu_ror_zero),
-        ct_maketest(cpu_ror_carryzero),
-        ct_maketest(cpu_ror_negative),
-        ct_maketest(cpu_ror_carrynegative),
-        ct_maketest(cpu_ror_all_ones),
-        ct_maketest(cpu_sec),
-        ct_maketest(cpu_sed),
-        ct_maketest(cpu_sei),
-        ct_maketest(cpu_tax),
-        ct_maketest(cpu_tax_to_zero),
-        ct_maketest(cpu_tax_to_negative),
-        ct_maketest(cpu_tay),
-        ct_maketest(cpu_tay_to_zero),
-        ct_maketest(cpu_tay_to_negative),
-        ct_maketest(cpu_tsx),
-        ct_maketest(cpu_tsx_to_zero),
-        ct_maketest(cpu_tsx_to_negative),
-        ct_maketest(cpu_txa),
-        ct_maketest(cpu_txa_to_zero),
-        ct_maketest(cpu_txa_to_negative),
-        ct_maketest(cpu_txs),
-        ct_maketest(cpu_txs_to_zero),
-        ct_maketest(cpu_txs_to_negative),
-        ct_maketest(cpu_tya),
-        ct_maketest(cpu_tya_to_zero),
-        ct_maketest(cpu_tya_to_negative),
+        ct_maketest(asl),
+        ct_maketest(asl_carry),
+        ct_maketest(asl_zero),
+        ct_maketest(asl_carryzero),
+        ct_maketest(asl_negative),
+        ct_maketest(asl_carrynegative),
+        ct_maketest(asl_all_ones),
+        ct_maketest(clc),
+        ct_maketest(cld),
+        ct_maketest(cli),
+        ct_maketest(clv),
+        ct_maketest(dex),
+        ct_maketest(dex_to_zero),
+        ct_maketest(dex_to_negative),
+        ct_maketest(dey),
+        ct_maketest(dey_to_zero),
+        ct_maketest(dey_to_negative),
+        ct_maketest(inx),
+        ct_maketest(inx_to_zero),
+        ct_maketest(inx_to_negative),
+        ct_maketest(iny),
+        ct_maketest(iny_to_zero),
+        ct_maketest(iny_to_negative),
+        ct_maketest(lsr),
+        ct_maketest(lsr_carry),
+        ct_maketest(lsr_zero),
+        ct_maketest(lsr_carryzero),
+        ct_maketest(lsr_negative_to_positive),
+        ct_maketest(lsr_all_ones),
+        ct_maketest(nop),
+        ct_maketest(rol),
+        ct_maketest(rol_carry),
+        ct_maketest(rol_zero),
+        ct_maketest(rol_carryzero),
+        ct_maketest(rol_negative),
+        ct_maketest(rol_carrynegative),
+        ct_maketest(rol_all_ones),
+        ct_maketest(ror),
+        ct_maketest(ror_carry),
+        ct_maketest(ror_zero),
+        ct_maketest(ror_carryzero),
+        ct_maketest(ror_negative),
+        ct_maketest(ror_carrynegative),
+        ct_maketest(ror_all_ones),
+        ct_maketest(sec),
+        ct_maketest(sed),
+        ct_maketest(sei),
+        ct_maketest(tax),
+        ct_maketest(tax_to_zero),
+        ct_maketest(tax_to_negative),
+        ct_maketest(tay),
+        ct_maketest(tay_to_zero),
+        ct_maketest(tay_to_negative),
+        ct_maketest(tsx),
+        ct_maketest(tsx_to_zero),
+        ct_maketest(tsx_to_negative),
+        ct_maketest(txa),
+        ct_maketest(txa_to_zero),
+        ct_maketest(txa_to_negative),
+        ct_maketest(txs),
+        ct_maketest(txs_to_zero),
+        ct_maketest(txs_to_negative),
+        ct_maketest(tya),
+        ct_maketest(tya_to_zero),
+        ct_maketest(tya_to_negative),
     };
 
     return ct_makesuite(tests);

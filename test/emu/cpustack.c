@@ -16,7 +16,7 @@
 // Stack Instructions
 //
 
-static void cpu_pha(void *ctx)
+static void pha(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -34,7 +34,7 @@ static void cpu_pha(void *ctx)
     ct_assertequal(3u, cpu.s);
 }
 
-static void cpu_pha_wraparound(void *ctx)
+static void pha_wraparound(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -52,7 +52,7 @@ static void cpu_pha_wraparound(void *ctx)
     ct_assertequal(0xffu, cpu.s);
 }
 
-static void cpu_php(void *ctx)
+static void php(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -71,7 +71,7 @@ static void cpu_php(void *ctx)
     ct_assertequal(3u, cpu.s);
 }
 
-static void cpu_php_wraparound(void *ctx)
+static void php_wraparound(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -90,7 +90,7 @@ static void cpu_php_wraparound(void *ctx)
     ct_assertequal(0xffu, cpu.s);
 }
 
-static void cpu_pla(void *ctx)
+static void pla(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -109,7 +109,7 @@ static void cpu_pla(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_pla_zero(void *ctx)
+static void pla_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -129,7 +129,7 @@ static void cpu_pla_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_pla_negative(void *ctx)
+static void pla_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -148,7 +148,7 @@ static void cpu_pla_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_pla_wraparound(void *ctx)
+static void pla_wraparound(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -167,7 +167,7 @@ static void cpu_pla_wraparound(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_plp(void *ctx)
+static void plp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -186,7 +186,7 @@ static void cpu_plp(void *ctx)
     ct_assertequal(4u, cpu.s);
 }
 
-static void cpu_plp_zero(void *ctx)
+static void plp_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -205,7 +205,7 @@ static void cpu_plp_zero(void *ctx)
     ct_assertequal(4u, cpu.s);
 }
 
-static void cpu_plp_ones(void *ctx)
+static void plp_ones(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -224,7 +224,7 @@ static void cpu_plp_ones(void *ctx)
     ct_assertequal(4u, cpu.s);
 }
 
-static void cpu_plp_wraparound(void *ctx)
+static void plp_wraparound(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -250,21 +250,21 @@ static void cpu_plp_wraparound(void *ctx)
 struct ct_testsuite cpu_stack_tests(void)
 {
     static const struct ct_testcase tests[] = {
-        ct_maketest(cpu_pha),
-        ct_maketest(cpu_pha_wraparound),
+        ct_maketest(pha),
+        ct_maketest(pha_wraparound),
 
-        ct_maketest(cpu_php),
-        ct_maketest(cpu_php_wraparound),
+        ct_maketest(php),
+        ct_maketest(php_wraparound),
 
-        ct_maketest(cpu_pla),
-        ct_maketest(cpu_pla_zero),
-        ct_maketest(cpu_pla_negative),
-        ct_maketest(cpu_pla_wraparound),
+        ct_maketest(pla),
+        ct_maketest(pla_zero),
+        ct_maketest(pla_negative),
+        ct_maketest(pla_wraparound),
 
-        ct_maketest(cpu_plp),
-        ct_maketest(cpu_plp_zero),
-        ct_maketest(cpu_plp_ones),
-        ct_maketest(cpu_plp_wraparound),
+        ct_maketest(plp),
+        ct_maketest(plp_zero),
+        ct_maketest(plp_ones),
+        ct_maketest(plp_wraparound),
     };
 
     return ct_makesuite(tests);

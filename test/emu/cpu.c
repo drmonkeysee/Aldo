@@ -12,7 +12,7 @@
 
 #include <stdint.h>
 
-static void cpu_powerup_initializes_cpu(void *ctx)
+static void powerup_initializes_cpu(void *ctx)
 {
     struct mos6502 cpu;
 
@@ -38,7 +38,7 @@ static void cpu_powerup_initializes_cpu(void *ctx)
     ct_assertfalse(cpu.dflt);
 }
 
-static void cpu_data_fault(void *ctx)
+static void data_fault(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -53,7 +53,7 @@ static void cpu_data_fault(void *ctx)
     ct_asserttrue(cpu.dflt);
 }
 
-static void cpu_ram_mirroring(void *ctx)
+static void ram_mirroring(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -77,9 +77,9 @@ static void cpu_ram_mirroring(void *ctx)
 struct ct_testsuite cpu_tests(void)
 {
     static const struct ct_testcase tests[] = {
-        ct_maketest(cpu_powerup_initializes_cpu),
-        ct_maketest(cpu_data_fault),
-        ct_maketest(cpu_ram_mirroring),
+        ct_maketest(powerup_initializes_cpu),
+        ct_maketest(data_fault),
+        ct_maketest(ram_mirroring),
     };
 
     return ct_makesuite(tests);

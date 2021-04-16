@@ -15,7 +15,7 @@
 // Jump Instructions
 //
 
-static void cpu_jmp(void *ctx)
+static void jmp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -28,7 +28,7 @@ static void cpu_jmp(void *ctx)
     ct_assertequal(0x8001u, cpu.pc);
 }
 
-static void cpu_jmp_indirect(void *ctx)
+static void jmp_indirect(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -43,7 +43,7 @@ static void cpu_jmp_indirect(void *ctx)
     ct_assertequal(0xbeefu, cpu.pc);
 }
 
-static void cpu_jmp_indirect_pageboundary_bug(void *ctx)
+static void jmp_indirect_pageboundary_bug(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -67,9 +67,9 @@ static void cpu_jmp_indirect_pageboundary_bug(void *ctx)
 struct ct_testsuite cpu_jump_tests(void)
 {
     static const struct ct_testcase tests[] = {
-        ct_maketest(cpu_jmp),
-        ct_maketest(cpu_jmp_indirect),
-        ct_maketest(cpu_jmp_indirect_pageboundary_bug),
+        ct_maketest(jmp),
+        ct_maketest(jmp_indirect),
+        ct_maketest(jmp_indirect_pageboundary_bug),
     };
 
     return ct_makesuite(tests);

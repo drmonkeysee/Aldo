@@ -17,7 +17,7 @@
 // Branch Instructions
 //
 
-static void cpu_bcc_nobranch(void *ctx)
+static void bcc_nobranch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -31,7 +31,7 @@ static void cpu_bcc_nobranch(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
-static void cpu_bcc_positive(void *ctx)
+static void bcc_positive(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -44,7 +44,7 @@ static void cpu_bcc_positive(void *ctx)
     ct_assertequal(7u, cpu.pc);
 }
 
-static void cpu_bcc_negative(void *ctx)
+static void bcc_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -58,7 +58,7 @@ static void cpu_bcc_negative(void *ctx)
     ct_assertequal(1u, cpu.pc);
 }
 
-static void cpu_bcc_positive_overflow(void *ctx)
+static void bcc_positive_overflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -72,7 +72,7 @@ static void cpu_bcc_positive_overflow(void *ctx)
     ct_assertequal(262u, cpu.pc);
 }
 
-static void cpu_bcc_positive_wraparound(void *ctx)
+static void bcc_positive_wraparound(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -90,7 +90,7 @@ static void cpu_bcc_positive_wraparound(void *ctx)
     ct_assertequal(6u, cpu.pc);
 }
 
-static void cpu_bcc_negative_overflow(void *ctx)
+static void bcc_negative_overflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -104,7 +104,7 @@ static void cpu_bcc_negative_overflow(void *ctx)
     ct_assertequal(248u, cpu.pc);
 }
 
-static void cpu_bcc_negative_wraparound(void *ctx)
+static void bcc_negative_wraparound(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -120,7 +120,7 @@ static void cpu_bcc_negative_wraparound(void *ctx)
     ct_assertequal(0xfff8u, cpu.pc);
 }
 
-static void cpu_bcc_zero(void *ctx)
+static void bcc_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -133,7 +133,7 @@ static void cpu_bcc_zero(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
-static void cpu_bcs_nobranch(void *ctx)
+static void bcs_nobranch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -146,7 +146,7 @@ static void cpu_bcs_nobranch(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
-static void cpu_bcs_branch(void *ctx)
+static void bcs_branch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -160,7 +160,7 @@ static void cpu_bcs_branch(void *ctx)
     ct_assertequal(7u, cpu.pc);
 }
 
-static void cpu_beq_nobranch(void *ctx)
+static void beq_nobranch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -173,7 +173,7 @@ static void cpu_beq_nobranch(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
-static void cpu_beq_branch(void *ctx)
+static void beq_branch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -187,7 +187,7 @@ static void cpu_beq_branch(void *ctx)
     ct_assertequal(7u, cpu.pc);
 }
 
-static void cpu_bmi_nobranch(void *ctx)
+static void bmi_nobranch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -200,7 +200,7 @@ static void cpu_bmi_nobranch(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
-static void cpu_bmi_branch(void *ctx)
+static void bmi_branch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -214,7 +214,7 @@ static void cpu_bmi_branch(void *ctx)
     ct_assertequal(7u, cpu.pc);
 }
 
-static void cpu_bne_nobranch(void *ctx)
+static void bne_nobranch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -228,7 +228,7 @@ static void cpu_bne_nobranch(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
-static void cpu_bne_branch(void *ctx)
+static void bne_branch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -241,7 +241,7 @@ static void cpu_bne_branch(void *ctx)
     ct_assertequal(7u, cpu.pc);
 }
 
-static void cpu_bpl_nobranch(void *ctx)
+static void bpl_nobranch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -255,7 +255,7 @@ static void cpu_bpl_nobranch(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
-static void cpu_bpl_branch(void *ctx)
+static void bpl_branch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -268,7 +268,7 @@ static void cpu_bpl_branch(void *ctx)
     ct_assertequal(7u, cpu.pc);
 }
 
-static void cpu_bvc_nobranch(void *ctx)
+static void bvc_nobranch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -282,7 +282,7 @@ static void cpu_bvc_nobranch(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
-static void cpu_bvc_branch(void *ctx)
+static void bvc_branch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -295,7 +295,7 @@ static void cpu_bvc_branch(void *ctx)
     ct_assertequal(7u, cpu.pc);
 }
 
-static void cpu_bvs_nobranch(void *ctx)
+static void bvs_nobranch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -308,7 +308,7 @@ static void cpu_bvs_nobranch(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
-static void cpu_bvs_branch(void *ctx)
+static void bvs_branch(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -329,35 +329,35 @@ static void cpu_bvs_branch(void *ctx)
 struct ct_testsuite cpu_branch_tests(void)
 {
     static const struct ct_testcase tests[] = {
-        ct_maketest(cpu_bcc_nobranch),
-        ct_maketest(cpu_bcc_positive),
-        ct_maketest(cpu_bcc_negative),
-        ct_maketest(cpu_bcc_positive_overflow),
-        ct_maketest(cpu_bcc_positive_wraparound),
-        ct_maketest(cpu_bcc_negative_overflow),
-        ct_maketest(cpu_bcc_negative_wraparound),
-        ct_maketest(cpu_bcc_zero),
+        ct_maketest(bcc_nobranch),
+        ct_maketest(bcc_positive),
+        ct_maketest(bcc_negative),
+        ct_maketest(bcc_positive_overflow),
+        ct_maketest(bcc_positive_wraparound),
+        ct_maketest(bcc_negative_overflow),
+        ct_maketest(bcc_negative_wraparound),
+        ct_maketest(bcc_zero),
 
-        ct_maketest(cpu_bcs_nobranch),
-        ct_maketest(cpu_bcs_branch),
+        ct_maketest(bcs_nobranch),
+        ct_maketest(bcs_branch),
 
-        ct_maketest(cpu_beq_nobranch),
-        ct_maketest(cpu_beq_branch),
+        ct_maketest(beq_nobranch),
+        ct_maketest(beq_branch),
 
-        ct_maketest(cpu_bmi_nobranch),
-        ct_maketest(cpu_bmi_branch),
+        ct_maketest(bmi_nobranch),
+        ct_maketest(bmi_branch),
 
-        ct_maketest(cpu_bne_nobranch),
-        ct_maketest(cpu_bne_branch),
+        ct_maketest(bne_nobranch),
+        ct_maketest(bne_branch),
 
-        ct_maketest(cpu_bpl_nobranch),
-        ct_maketest(cpu_bpl_branch),
+        ct_maketest(bpl_nobranch),
+        ct_maketest(bpl_branch),
 
-        ct_maketest(cpu_bvc_nobranch),
-        ct_maketest(cpu_bvc_branch),
+        ct_maketest(bvc_nobranch),
+        ct_maketest(bvc_branch),
 
-        ct_maketest(cpu_bvs_nobranch),
-        ct_maketest(cpu_bvs_branch),
+        ct_maketest(bvs_nobranch),
+        ct_maketest(bvs_branch),
     };
 
     return ct_makesuite(tests);

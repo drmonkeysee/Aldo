@@ -16,14 +16,14 @@
 // dis_errstr
 //
 
-static void dis_errstr_returns_known_err(void *ctx)
+static void errstr_returns_known_err(void *ctx)
 {
     const char *const err = dis_errstr(ASM_FMT_FAIL);
 
     ct_assertequalstr("OUTPUT FAIL", err);
 }
 
-static void dis_errstr_returns_unknown_err(void *ctx)
+static void errstr_returns_unknown_err(void *ctx)
 {
     const char *const err = dis_errstr(10);
 
@@ -34,7 +34,7 @@ static void dis_errstr_returns_unknown_err(void *ctx)
 // dis_inst
 //
 
-static void dis_inst_does_nothing_if_no_bytes(void *ctx)
+static void inst_does_nothing_if_no_bytes(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[1];
@@ -46,7 +46,7 @@ static void dis_inst_does_nothing_if_no_bytes(void *ctx)
     ct_assertequalstr("", buf);
 }
 
-static void dis_inst_disassembles_implied(void *ctx)
+static void inst_disassembles_implied(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xea};
@@ -58,7 +58,7 @@ static void dis_inst_disassembles_implied(void *ctx)
     ct_assertequalstr("$1234: EA          NOP", buf);
 }
 
-static void dis_inst_disassembles_immediate(void *ctx)
+static void inst_disassembles_immediate(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xa9, 0x34};
@@ -70,7 +70,7 @@ static void dis_inst_disassembles_immediate(void *ctx)
     ct_assertequalstr("$1234: A9 34       LDA #$34", buf);
 }
 
-static void dis_inst_disassembles_zeropage(void *ctx)
+static void inst_disassembles_zeropage(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xa5, 0x34};
@@ -82,7 +82,7 @@ static void dis_inst_disassembles_zeropage(void *ctx)
     ct_assertequalstr("$1234: A5 34       LDA $34", buf);
 }
 
-static void dis_inst_disassembles_zeropage_x(void *ctx)
+static void inst_disassembles_zeropage_x(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xb5, 0x34};
@@ -94,7 +94,7 @@ static void dis_inst_disassembles_zeropage_x(void *ctx)
     ct_assertequalstr("$1234: B5 34       LDA $34,X", buf);
 }
 
-static void dis_inst_disassembles_zeropage_y(void *ctx)
+static void inst_disassembles_zeropage_y(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xb6, 0x34};
@@ -106,7 +106,7 @@ static void dis_inst_disassembles_zeropage_y(void *ctx)
     ct_assertequalstr("$1234: B6 34       LDX $34,Y", buf);
 }
 
-static void dis_inst_disassembles_indirect_x(void *ctx)
+static void inst_disassembles_indirect_x(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xa1, 0x34};
@@ -118,7 +118,7 @@ static void dis_inst_disassembles_indirect_x(void *ctx)
     ct_assertequalstr("$1234: A1 34       LDA ($34,X)", buf);
 }
 
-static void dis_inst_disassembles_indirect_y(void *ctx)
+static void inst_disassembles_indirect_y(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xb1, 0x34};
@@ -130,7 +130,7 @@ static void dis_inst_disassembles_indirect_y(void *ctx)
     ct_assertequalstr("$1234: B1 34       LDA ($34),Y", buf);
 }
 
-static void dis_inst_disassembles_absolute(void *ctx)
+static void inst_disassembles_absolute(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xad, 0x34, 0x6};
@@ -142,7 +142,7 @@ static void dis_inst_disassembles_absolute(void *ctx)
     ct_assertequalstr("$1234: AD 34 06    LDA $0634", buf);
 }
 
-static void dis_inst_disassembles_absolute_x(void *ctx)
+static void inst_disassembles_absolute_x(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xbd, 0x34, 0x6};
@@ -154,7 +154,7 @@ static void dis_inst_disassembles_absolute_x(void *ctx)
     ct_assertequalstr("$1234: BD 34 06    LDA $0634,X", buf);
 }
 
-static void dis_inst_disassembles_absolute_y(void *ctx)
+static void inst_disassembles_absolute_y(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xb9, 0x34, 0x6};
@@ -166,7 +166,7 @@ static void dis_inst_disassembles_absolute_y(void *ctx)
     ct_assertequalstr("$1234: B9 34 06    LDA $0634,Y", buf);
 }
 
-static void dis_inst_disassembles_jmp_absolute(void *ctx)
+static void inst_disassembles_jmp_absolute(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x4c, 0x34, 0x6};
@@ -178,7 +178,7 @@ static void dis_inst_disassembles_jmp_absolute(void *ctx)
     ct_assertequalstr("$1234: 4C 34 06    JMP $0634", buf);
 }
 
-static void dis_inst_disassembles_jmp_indirect(void *ctx)
+static void inst_disassembles_jmp_indirect(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x6c, 0x34, 0x6};
@@ -190,7 +190,7 @@ static void dis_inst_disassembles_jmp_indirect(void *ctx)
     ct_assertequalstr("$1234: 6C 34 06    JMP ($0634)", buf);
 }
 
-static void dis_inst_disassembles_branch_positive(void *ctx)
+static void inst_disassembles_branch_positive(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x90, 0xa};
@@ -202,7 +202,7 @@ static void dis_inst_disassembles_branch_positive(void *ctx)
     ct_assertequalstr("$1234: 90 0A       BCC +10", buf);
 }
 
-static void dis_inst_disassembles_branch_negative(void *ctx)
+static void inst_disassembles_branch_negative(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x90, 0xf6};
@@ -214,7 +214,7 @@ static void dis_inst_disassembles_branch_negative(void *ctx)
     ct_assertequalstr("$1234: 90 F6       BCC -10", buf);
 }
 
-static void dis_inst_disassembles_branch_zero(void *ctx)
+static void inst_disassembles_branch_zero(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x90, 0x0};
@@ -226,7 +226,7 @@ static void dis_inst_disassembles_branch_zero(void *ctx)
     ct_assertequalstr("$1234: 90 00       BCC +0", buf);
 }
 
-static void dis_inst_disassembles_push(void *ctx)
+static void inst_disassembles_push(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x48};
@@ -238,7 +238,7 @@ static void dis_inst_disassembles_push(void *ctx)
     ct_assertequalstr("$1234: 48          PHA", buf);
 }
 
-static void dis_inst_disassembles_pull(void *ctx)
+static void inst_disassembles_pull(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x68};
@@ -250,7 +250,7 @@ static void dis_inst_disassembles_pull(void *ctx)
     ct_assertequalstr("$1234: 68          PLA", buf);
 }
 
-static void dis_inst_disassembles_jsr(void *ctx)
+static void inst_disassembles_jsr(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x20, 0x34, 0x6};
@@ -262,7 +262,7 @@ static void dis_inst_disassembles_jsr(void *ctx)
     ct_assertequalstr("$1234: 20 34 06    JSR $0634", buf);
 }
 
-static void dis_inst_disassembles_rts(void *ctx)
+static void inst_disassembles_rts(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x60};
@@ -278,7 +278,7 @@ static void dis_inst_disassembles_rts(void *ctx)
 // dis_datapath
 //
 
-static void dis_datapath_addr_too_low(void *ctx)
+static void datapath_addr_too_low(void *ctx)
 {
     const uint8_t rom[] = {0xea, 0xff};
     const struct console_state sn = {
@@ -300,7 +300,7 @@ static void dis_datapath_addr_too_low(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_offset_overflow(void *ctx)
+static void datapath_offset_overflow(void *ctx)
 {
     const uint8_t rom[] = {0xad, 0x43, 0x21};
     const struct console_state sn = {
@@ -322,7 +322,7 @@ static void dis_datapath_offset_overflow(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_implied_cycle_zero(void *ctx)
+static void datapath_implied_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0xea, 0xff};
     const struct console_state sn = {
@@ -342,7 +342,7 @@ static void dis_datapath_implied_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_implied_cycle_one(void *ctx)
+static void datapath_implied_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0xea, 0xff};
     const struct console_state sn = {
@@ -362,7 +362,7 @@ static void dis_datapath_implied_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_implied_cycle_n(void *ctx)
+static void datapath_implied_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0xea, 0xff};
     const struct console_state sn = {
@@ -382,7 +382,7 @@ static void dis_datapath_implied_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_immediate_cycle_zero(void *ctx)
+static void datapath_immediate_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0xa9, 0x43};
     const struct console_state sn = {
@@ -402,7 +402,7 @@ static void dis_datapath_immediate_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_immediate_cycle_one(void *ctx)
+static void datapath_immediate_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0xa9, 0x43};
     const struct console_state sn = {
@@ -422,7 +422,7 @@ static void dis_datapath_immediate_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_immediate_cycle_n(void *ctx)
+static void datapath_immediate_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0xa9, 0x43};
     const struct console_state sn = {
@@ -442,7 +442,7 @@ static void dis_datapath_immediate_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_zeropage_cycle_zero(void *ctx)
+static void datapath_zeropage_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0xa5, 0x43};
     const struct console_state sn = {
@@ -462,7 +462,7 @@ static void dis_datapath_zeropage_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_zeropage_cycle_one(void *ctx)
+static void datapath_zeropage_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0xa5, 0x43};
     const struct console_state sn = {
@@ -482,7 +482,7 @@ static void dis_datapath_zeropage_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_zeropage_cycle_n(void *ctx)
+static void datapath_zeropage_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0xa5, 0x43};
     const struct console_state sn = {
@@ -502,7 +502,7 @@ static void dis_datapath_zeropage_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_zeropage_x_cycle_zero(void *ctx)
+static void datapath_zeropage_x_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0xb5, 0x43};
     const struct console_state sn = {
@@ -522,7 +522,7 @@ static void dis_datapath_zeropage_x_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_zeropage_x_cycle_one(void *ctx)
+static void datapath_zeropage_x_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0xb5, 0x43};
     const struct console_state sn = {
@@ -542,7 +542,7 @@ static void dis_datapath_zeropage_x_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_zeropage_x_cycle_n(void *ctx)
+static void datapath_zeropage_x_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0xb5, 0x43};
     const struct console_state sn = {
@@ -562,7 +562,7 @@ static void dis_datapath_zeropage_x_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_zeropage_y_cycle_zero(void *ctx)
+static void datapath_zeropage_y_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0xb6, 0x43};
     const struct console_state sn = {
@@ -582,7 +582,7 @@ static void dis_datapath_zeropage_y_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_zeropage_y_cycle_one(void *ctx)
+static void datapath_zeropage_y_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0xb6, 0x43};
     const struct console_state sn = {
@@ -602,7 +602,7 @@ static void dis_datapath_zeropage_y_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_zeropage_y_cycle_n(void *ctx)
+static void datapath_zeropage_y_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0xb6, 0x43};
     const struct console_state sn = {
@@ -622,7 +622,7 @@ static void dis_datapath_zeropage_y_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_indirect_x_cycle_zero(void *ctx)
+static void datapath_indirect_x_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0xa1, 0x43};
     const struct console_state sn = {
@@ -642,7 +642,7 @@ static void dis_datapath_indirect_x_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_indirect_x_cycle_one(void *ctx)
+static void datapath_indirect_x_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0xa1, 0x43};
     const struct console_state sn = {
@@ -662,7 +662,7 @@ static void dis_datapath_indirect_x_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_indirect_x_cycle_n(void *ctx)
+static void datapath_indirect_x_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0xa1, 0x43};
     const struct console_state sn = {
@@ -682,7 +682,7 @@ static void dis_datapath_indirect_x_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_indirect_y_cycle_zero(void *ctx)
+static void datapath_indirect_y_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0xb1, 0x43};
     const struct console_state sn = {
@@ -702,7 +702,7 @@ static void dis_datapath_indirect_y_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_indirect_y_cycle_one(void *ctx)
+static void datapath_indirect_y_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0xb1, 0x43};
     const struct console_state sn = {
@@ -722,7 +722,7 @@ static void dis_datapath_indirect_y_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_indirect_y_cycle_n(void *ctx)
+static void datapath_indirect_y_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0xb1, 0x43};
     const struct console_state sn = {
@@ -742,7 +742,7 @@ static void dis_datapath_indirect_y_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_absolute_cycle_zero(void *ctx)
+static void datapath_absolute_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0xad, 0x43, 0x21};
     const struct console_state sn = {
@@ -762,7 +762,7 @@ static void dis_datapath_absolute_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_absolute_cycle_one(void *ctx)
+static void datapath_absolute_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0xad, 0x43, 0x21};
     const struct console_state sn = {
@@ -782,7 +782,7 @@ static void dis_datapath_absolute_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_absolute_cycle_two(void *ctx)
+static void datapath_absolute_cycle_two(void *ctx)
 {
     const uint8_t rom[] = {0xad, 0x43, 0x21};
     const struct console_state sn = {
@@ -802,7 +802,7 @@ static void dis_datapath_absolute_cycle_two(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_absolute_cycle_n(void *ctx)
+static void datapath_absolute_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0xad, 0x43, 0x21};
     const struct console_state sn = {
@@ -822,7 +822,7 @@ static void dis_datapath_absolute_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_absolute_x_cycle_zero(void *ctx)
+static void datapath_absolute_x_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0xbd, 0x43, 0x21};
     const struct console_state sn = {
@@ -842,7 +842,7 @@ static void dis_datapath_absolute_x_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_absolute_x_cycle_one(void *ctx)
+static void datapath_absolute_x_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0xbd, 0x43, 0x21};
     const struct console_state sn = {
@@ -862,7 +862,7 @@ static void dis_datapath_absolute_x_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_absolute_x_cycle_two(void *ctx)
+static void datapath_absolute_x_cycle_two(void *ctx)
 {
     const uint8_t rom[] = {0xbd, 0x43, 0x21};
     const struct console_state sn = {
@@ -882,7 +882,7 @@ static void dis_datapath_absolute_x_cycle_two(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_absolute_x_cycle_n(void *ctx)
+static void datapath_absolute_x_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0xbd, 0x43, 0x21};
     const struct console_state sn = {
@@ -902,7 +902,7 @@ static void dis_datapath_absolute_x_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_absolute_y_cycle_zero(void *ctx)
+static void datapath_absolute_y_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0xb9, 0x43, 0x21};
     const struct console_state sn = {
@@ -922,7 +922,7 @@ static void dis_datapath_absolute_y_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_absolute_y_cycle_one(void *ctx)
+static void datapath_absolute_y_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0xb9, 0x43, 0x21};
     const struct console_state sn = {
@@ -942,7 +942,7 @@ static void dis_datapath_absolute_y_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_absolute_y_cycle_two(void *ctx)
+static void datapath_absolute_y_cycle_two(void *ctx)
 {
     const uint8_t rom[] = {0xb9, 0x43, 0x21};
     const struct console_state sn = {
@@ -962,7 +962,7 @@ static void dis_datapath_absolute_y_cycle_two(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_absolute_y_cycle_n(void *ctx)
+static void datapath_absolute_y_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0xb9, 0x43, 0x21};
     const struct console_state sn = {
@@ -982,7 +982,7 @@ static void dis_datapath_absolute_y_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_jmp_absolute_cycle_zero(void *ctx)
+static void datapath_jmp_absolute_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0x4c, 0x43, 0x21};
     const struct console_state sn = {
@@ -1002,7 +1002,7 @@ static void dis_datapath_jmp_absolute_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_jmp_absolute_cycle_one(void *ctx)
+static void datapath_jmp_absolute_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0x4c, 0x43, 0x21};
     const struct console_state sn = {
@@ -1022,7 +1022,7 @@ static void dis_datapath_jmp_absolute_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_jmp_absolute_cycle_two(void *ctx)
+static void datapath_jmp_absolute_cycle_two(void *ctx)
 {
     const uint8_t rom[] = {0x4c, 0x43, 0x21};
     const struct console_state sn = {
@@ -1042,7 +1042,7 @@ static void dis_datapath_jmp_absolute_cycle_two(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_jmp_absolute_cycle_n(void *ctx)
+static void datapath_jmp_absolute_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0x4c, 0x43, 0x21};
     const struct console_state sn = {
@@ -1062,7 +1062,7 @@ static void dis_datapath_jmp_absolute_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_jmp_indirect_cycle_zero(void *ctx)
+static void datapath_jmp_indirect_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0x6c, 0x43, 0x21};
     const struct console_state sn = {
@@ -1082,7 +1082,7 @@ static void dis_datapath_jmp_indirect_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_jmp_indirect_cycle_one(void *ctx)
+static void datapath_jmp_indirect_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0x6c, 0x43, 0x21};
     const struct console_state sn = {
@@ -1102,7 +1102,7 @@ static void dis_datapath_jmp_indirect_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_jmp_indirect_cycle_two(void *ctx)
+static void datapath_jmp_indirect_cycle_two(void *ctx)
 {
     const uint8_t rom[] = {0x6c, 0x43, 0x21};
     const struct console_state sn = {
@@ -1122,7 +1122,7 @@ static void dis_datapath_jmp_indirect_cycle_two(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_jmp_indirect_cycle_n(void *ctx)
+static void datapath_jmp_indirect_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0x6c, 0x43, 0x21};
     const struct console_state sn = {
@@ -1142,7 +1142,7 @@ static void dis_datapath_jmp_indirect_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_bch_cycle_zero(void *ctx)
+static void datapath_bch_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0x90, 0x2, 0xff, 0xff, 0xff};
     const struct console_state sn = {
@@ -1162,7 +1162,7 @@ static void dis_datapath_bch_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_bch_cycle_one(void *ctx)
+static void datapath_bch_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0x90, 0x2, 0xff, 0xff, 0xff};
     const struct console_state sn = {
@@ -1182,7 +1182,7 @@ static void dis_datapath_bch_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_bch_cycle_n(void *ctx)
+static void datapath_bch_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0x90, 0x2, 0xff, 0xff, 0xff};
     const struct console_state sn = {
@@ -1202,7 +1202,7 @@ static void dis_datapath_bch_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_push_cycle_zero(void *ctx)
+static void datapath_push_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0x48, 0xff};
     const struct console_state sn = {
@@ -1222,7 +1222,7 @@ static void dis_datapath_push_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_push_cycle_one(void *ctx)
+static void datapath_push_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0x48, 0xff};
     const struct console_state sn = {
@@ -1242,7 +1242,7 @@ static void dis_datapath_push_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_push_cycle_n(void *ctx)
+static void datapath_push_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0x48, 0xff};
     const struct console_state sn = {
@@ -1262,7 +1262,7 @@ static void dis_datapath_push_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_pull_cycle_zero(void *ctx)
+static void datapath_pull_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0x68, 0xff};
     const struct console_state sn = {
@@ -1282,7 +1282,7 @@ static void dis_datapath_pull_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_pull_cycle_one(void *ctx)
+static void datapath_pull_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0x68, 0xff};
     const struct console_state sn = {
@@ -1302,7 +1302,7 @@ static void dis_datapath_pull_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_pull_cycle_n(void *ctx)
+static void datapath_pull_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0x68, 0xff};
     const struct console_state sn = {
@@ -1322,7 +1322,7 @@ static void dis_datapath_pull_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_jsr_cycle_zero(void *ctx)
+static void datapath_jsr_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0x20, 0x43, 0x21};
     const struct console_state sn = {
@@ -1342,7 +1342,7 @@ static void dis_datapath_jsr_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_jsr_cycle_one(void *ctx)
+static void datapath_jsr_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0x20, 0x43, 0x21};
     const struct console_state sn = {
@@ -1362,7 +1362,7 @@ static void dis_datapath_jsr_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_jsr_cycle_two(void *ctx)
+static void datapath_jsr_cycle_two(void *ctx)
 {
     const uint8_t rom[] = {0x20, 0x43, 0x21};
     const struct console_state sn = {
@@ -1382,7 +1382,7 @@ static void dis_datapath_jsr_cycle_two(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_jsr_cycle_n(void *ctx)
+static void datapath_jsr_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0x20, 0x43, 0x21};
     const struct console_state sn = {
@@ -1402,7 +1402,7 @@ static void dis_datapath_jsr_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_rts_cycle_zero(void *ctx)
+static void datapath_rts_cycle_zero(void *ctx)
 {
     const uint8_t rom[] = {0x60, 0xff};
     const struct console_state sn = {
@@ -1422,7 +1422,7 @@ static void dis_datapath_rts_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_rts_cycle_one(void *ctx)
+static void datapath_rts_cycle_one(void *ctx)
 {
     const uint8_t rom[] = {0x60, 0xff};
     const struct console_state sn = {
@@ -1442,7 +1442,7 @@ static void dis_datapath_rts_cycle_one(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void dis_datapath_rts_cycle_n(void *ctx)
+static void datapath_rts_cycle_n(void *ctx)
 {
     const uint8_t rom[] = {0x60, 0xff};
     const struct console_state sn = {
@@ -1469,106 +1469,106 @@ static void dis_datapath_rts_cycle_n(void *ctx)
 struct ct_testsuite dis_tests(void)
 {
     static const struct ct_testcase tests[] = {
-        ct_maketest(dis_errstr_returns_known_err),
-        ct_maketest(dis_errstr_returns_unknown_err),
+        ct_maketest(errstr_returns_known_err),
+        ct_maketest(errstr_returns_unknown_err),
 
-        ct_maketest(dis_inst_does_nothing_if_no_bytes),
-        ct_maketest(dis_inst_disassembles_implied),
-        ct_maketest(dis_inst_disassembles_immediate),
-        ct_maketest(dis_inst_disassembles_zeropage),
-        ct_maketest(dis_inst_disassembles_zeropage_x),
-        ct_maketest(dis_inst_disassembles_zeropage_y),
-        ct_maketest(dis_inst_disassembles_indirect_x),
-        ct_maketest(dis_inst_disassembles_indirect_y),
-        ct_maketest(dis_inst_disassembles_absolute),
-        ct_maketest(dis_inst_disassembles_absolute_x),
-        ct_maketest(dis_inst_disassembles_absolute_y),
-        ct_maketest(dis_inst_disassembles_jmp_absolute),
-        ct_maketest(dis_inst_disassembles_jmp_indirect),
-        ct_maketest(dis_inst_disassembles_branch_positive),
-        ct_maketest(dis_inst_disassembles_branch_negative),
-        ct_maketest(dis_inst_disassembles_branch_zero),
-        ct_maketest(dis_inst_disassembles_push),
-        ct_maketest(dis_inst_disassembles_pull),
-        ct_maketest(dis_inst_disassembles_jsr),
-        ct_maketest(dis_inst_disassembles_rts),
+        ct_maketest(inst_does_nothing_if_no_bytes),
+        ct_maketest(inst_disassembles_implied),
+        ct_maketest(inst_disassembles_immediate),
+        ct_maketest(inst_disassembles_zeropage),
+        ct_maketest(inst_disassembles_zeropage_x),
+        ct_maketest(inst_disassembles_zeropage_y),
+        ct_maketest(inst_disassembles_indirect_x),
+        ct_maketest(inst_disassembles_indirect_y),
+        ct_maketest(inst_disassembles_absolute),
+        ct_maketest(inst_disassembles_absolute_x),
+        ct_maketest(inst_disassembles_absolute_y),
+        ct_maketest(inst_disassembles_jmp_absolute),
+        ct_maketest(inst_disassembles_jmp_indirect),
+        ct_maketest(inst_disassembles_branch_positive),
+        ct_maketest(inst_disassembles_branch_negative),
+        ct_maketest(inst_disassembles_branch_zero),
+        ct_maketest(inst_disassembles_push),
+        ct_maketest(inst_disassembles_pull),
+        ct_maketest(inst_disassembles_jsr),
+        ct_maketest(inst_disassembles_rts),
 
-        ct_maketest(dis_datapath_addr_too_low),
-        ct_maketest(dis_datapath_offset_overflow),
+        ct_maketest(datapath_addr_too_low),
+        ct_maketest(datapath_offset_overflow),
 
-        ct_maketest(dis_datapath_implied_cycle_zero),
-        ct_maketest(dis_datapath_implied_cycle_one),
-        ct_maketest(dis_datapath_implied_cycle_n),
+        ct_maketest(datapath_implied_cycle_zero),
+        ct_maketest(datapath_implied_cycle_one),
+        ct_maketest(datapath_implied_cycle_n),
 
-        ct_maketest(dis_datapath_immediate_cycle_zero),
-        ct_maketest(dis_datapath_immediate_cycle_one),
-        ct_maketest(dis_datapath_immediate_cycle_n),
+        ct_maketest(datapath_immediate_cycle_zero),
+        ct_maketest(datapath_immediate_cycle_one),
+        ct_maketest(datapath_immediate_cycle_n),
 
-        ct_maketest(dis_datapath_zeropage_cycle_zero),
-        ct_maketest(dis_datapath_zeropage_cycle_one),
-        ct_maketest(dis_datapath_zeropage_cycle_n),
+        ct_maketest(datapath_zeropage_cycle_zero),
+        ct_maketest(datapath_zeropage_cycle_one),
+        ct_maketest(datapath_zeropage_cycle_n),
 
-        ct_maketest(dis_datapath_zeropage_x_cycle_zero),
-        ct_maketest(dis_datapath_zeropage_x_cycle_one),
-        ct_maketest(dis_datapath_zeropage_x_cycle_n),
+        ct_maketest(datapath_zeropage_x_cycle_zero),
+        ct_maketest(datapath_zeropage_x_cycle_one),
+        ct_maketest(datapath_zeropage_x_cycle_n),
 
-        ct_maketest(dis_datapath_zeropage_y_cycle_zero),
-        ct_maketest(dis_datapath_zeropage_y_cycle_one),
-        ct_maketest(dis_datapath_zeropage_y_cycle_n),
+        ct_maketest(datapath_zeropage_y_cycle_zero),
+        ct_maketest(datapath_zeropage_y_cycle_one),
+        ct_maketest(datapath_zeropage_y_cycle_n),
 
-        ct_maketest(dis_datapath_indirect_x_cycle_zero),
-        ct_maketest(dis_datapath_indirect_x_cycle_one),
-        ct_maketest(dis_datapath_indirect_x_cycle_n),
+        ct_maketest(datapath_indirect_x_cycle_zero),
+        ct_maketest(datapath_indirect_x_cycle_one),
+        ct_maketest(datapath_indirect_x_cycle_n),
 
-        ct_maketest(dis_datapath_indirect_y_cycle_zero),
-        ct_maketest(dis_datapath_indirect_y_cycle_one),
-        ct_maketest(dis_datapath_indirect_y_cycle_n),
+        ct_maketest(datapath_indirect_y_cycle_zero),
+        ct_maketest(datapath_indirect_y_cycle_one),
+        ct_maketest(datapath_indirect_y_cycle_n),
 
-        ct_maketest(dis_datapath_absolute_cycle_zero),
-        ct_maketest(dis_datapath_absolute_cycle_one),
-        ct_maketest(dis_datapath_absolute_cycle_two),
-        ct_maketest(dis_datapath_absolute_cycle_n),
+        ct_maketest(datapath_absolute_cycle_zero),
+        ct_maketest(datapath_absolute_cycle_one),
+        ct_maketest(datapath_absolute_cycle_two),
+        ct_maketest(datapath_absolute_cycle_n),
 
-        ct_maketest(dis_datapath_absolute_x_cycle_zero),
-        ct_maketest(dis_datapath_absolute_x_cycle_one),
-        ct_maketest(dis_datapath_absolute_x_cycle_two),
-        ct_maketest(dis_datapath_absolute_x_cycle_n),
+        ct_maketest(datapath_absolute_x_cycle_zero),
+        ct_maketest(datapath_absolute_x_cycle_one),
+        ct_maketest(datapath_absolute_x_cycle_two),
+        ct_maketest(datapath_absolute_x_cycle_n),
 
-        ct_maketest(dis_datapath_absolute_y_cycle_zero),
-        ct_maketest(dis_datapath_absolute_y_cycle_one),
-        ct_maketest(dis_datapath_absolute_y_cycle_two),
-        ct_maketest(dis_datapath_absolute_y_cycle_n),
+        ct_maketest(datapath_absolute_y_cycle_zero),
+        ct_maketest(datapath_absolute_y_cycle_one),
+        ct_maketest(datapath_absolute_y_cycle_two),
+        ct_maketest(datapath_absolute_y_cycle_n),
 
-        ct_maketest(dis_datapath_jmp_absolute_cycle_zero),
-        ct_maketest(dis_datapath_jmp_absolute_cycle_one),
-        ct_maketest(dis_datapath_jmp_absolute_cycle_two),
-        ct_maketest(dis_datapath_jmp_absolute_cycle_n),
+        ct_maketest(datapath_jmp_absolute_cycle_zero),
+        ct_maketest(datapath_jmp_absolute_cycle_one),
+        ct_maketest(datapath_jmp_absolute_cycle_two),
+        ct_maketest(datapath_jmp_absolute_cycle_n),
 
-        ct_maketest(dis_datapath_jmp_indirect_cycle_zero),
-        ct_maketest(dis_datapath_jmp_indirect_cycle_one),
-        ct_maketest(dis_datapath_jmp_indirect_cycle_two),
-        ct_maketest(dis_datapath_jmp_indirect_cycle_n),
+        ct_maketest(datapath_jmp_indirect_cycle_zero),
+        ct_maketest(datapath_jmp_indirect_cycle_one),
+        ct_maketest(datapath_jmp_indirect_cycle_two),
+        ct_maketest(datapath_jmp_indirect_cycle_n),
 
-        ct_maketest(dis_datapath_bch_cycle_zero),
-        ct_maketest(dis_datapath_bch_cycle_one),
-        ct_maketest(dis_datapath_bch_cycle_n),
+        ct_maketest(datapath_bch_cycle_zero),
+        ct_maketest(datapath_bch_cycle_one),
+        ct_maketest(datapath_bch_cycle_n),
 
-        ct_maketest(dis_datapath_push_cycle_zero),
-        ct_maketest(dis_datapath_push_cycle_one),
-        ct_maketest(dis_datapath_push_cycle_n),
+        ct_maketest(datapath_push_cycle_zero),
+        ct_maketest(datapath_push_cycle_one),
+        ct_maketest(datapath_push_cycle_n),
 
-        ct_maketest(dis_datapath_pull_cycle_zero),
-        ct_maketest(dis_datapath_pull_cycle_one),
-        ct_maketest(dis_datapath_pull_cycle_n),
+        ct_maketest(datapath_pull_cycle_zero),
+        ct_maketest(datapath_pull_cycle_one),
+        ct_maketest(datapath_pull_cycle_n),
 
-        ct_maketest(dis_datapath_jsr_cycle_zero),
-        ct_maketest(dis_datapath_jsr_cycle_one),
-        ct_maketest(dis_datapath_jsr_cycle_two),
-        ct_maketest(dis_datapath_jsr_cycle_n),
+        ct_maketest(datapath_jsr_cycle_zero),
+        ct_maketest(datapath_jsr_cycle_one),
+        ct_maketest(datapath_jsr_cycle_two),
+        ct_maketest(datapath_jsr_cycle_n),
 
-        ct_maketest(dis_datapath_rts_cycle_zero),
-        ct_maketest(dis_datapath_rts_cycle_one),
-        ct_maketest(dis_datapath_rts_cycle_n),
+        ct_maketest(datapath_rts_cycle_zero),
+        ct_maketest(datapath_rts_cycle_one),
+        ct_maketest(datapath_rts_cycle_n),
     };
 
     return ct_makesuite(tests);

@@ -15,7 +15,7 @@
 // Subroutine Instructions
 //
 
-static void cpu_jsr(void *ctx)
+static void jsr(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -33,7 +33,7 @@ static void cpu_jsr(void *ctx)
     ct_assertequal(2u, cpu.s);
 }
 
-static void cpu_rts(void *ctx)
+static void rts(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -56,8 +56,8 @@ static void cpu_rts(void *ctx)
 struct ct_testsuite cpu_subroutine_tests(void)
 {
     static const struct ct_testcase tests[] = {
-        ct_maketest(cpu_jsr),
-        ct_maketest(cpu_rts),
+        ct_maketest(jsr),
+        ct_maketest(rts),
     };
 
     return ct_makesuite(tests);

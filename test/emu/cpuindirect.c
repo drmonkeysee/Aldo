@@ -15,7 +15,7 @@
 // (Indirect,X) Instructions
 //
 
-static void cpu_adc_indx(void *ctx)
+static void adc_indx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -38,7 +38,7 @@ static void cpu_adc_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_adc_indx_pageoverflow(void *ctx)
+static void adc_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -61,7 +61,7 @@ static void cpu_adc_indx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_indx(void *ctx)
+static void and_indx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -82,7 +82,7 @@ static void cpu_and_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_indx_pageoverflow(void *ctx)
+static void and_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -103,7 +103,7 @@ static void cpu_and_indx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_cmp_indx(void *ctx)
+static void cmp_indx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -125,7 +125,7 @@ static void cpu_cmp_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_cmp_indx_pageoverflow(void *ctx)
+static void cmp_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -147,7 +147,7 @@ static void cpu_cmp_indx_pageoverflow(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_eor_indx(void *ctx)
+static void eor_indx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -168,7 +168,7 @@ static void cpu_eor_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_eor_indx_pageoverflow(void *ctx)
+static void eor_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -189,7 +189,7 @@ static void cpu_eor_indx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lda_indx(void *ctx)
+static void lda_indx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -209,7 +209,7 @@ static void cpu_lda_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lda_indx_pageoverflow(void *ctx)
+static void lda_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -229,7 +229,7 @@ static void cpu_lda_indx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_indx(void *ctx)
+static void ora_indx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -250,7 +250,7 @@ static void cpu_ora_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_indx_pageoverflow(void *ctx)
+static void ora_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -271,7 +271,7 @@ static void cpu_ora_indx_pageoverflow(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_sbc_indx(void *ctx)
+static void sbc_indx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -295,7 +295,7 @@ static void cpu_sbc_indx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sbc_indx_pageoverflow(void *ctx)
+static void sbc_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -319,7 +319,7 @@ static void cpu_sbc_indx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sta_indx(void *ctx)
+static void sta_indx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -339,7 +339,7 @@ static void cpu_sta_indx(void *ctx)
     ct_assertequal(0xau, mem[11]);
 }
 
-static void cpu_sta_indx_pageoverflow(void *ctx)
+static void sta_indx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -363,7 +363,7 @@ static void cpu_sta_indx_pageoverflow(void *ctx)
 // (Indirect),Y Instructions
 //
 
-static void cpu_adc_indy(void *ctx)
+static void adc_indy(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -386,7 +386,7 @@ static void cpu_adc_indy(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_adc_indy_pagecross(void *ctx)
+static void adc_indy_pagecross(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -408,7 +408,7 @@ static void cpu_adc_indy_pagecross(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_and_indy(void *ctx)
+static void and_indy(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -429,7 +429,7 @@ static void cpu_and_indy(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_indy_pagecross(void *ctx)
+static void and_indy_pagecross(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -449,7 +449,7 @@ static void cpu_and_indy_pagecross(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_cmp_indy(void *ctx)
+static void cmp_indy(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -471,7 +471,7 @@ static void cpu_cmp_indy(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_cmp_indy_pagecross(void *ctx)
+static void cmp_indy_pagecross(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -492,7 +492,7 @@ static void cpu_cmp_indy_pagecross(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_eor_indy(void *ctx)
+static void eor_indy(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -513,7 +513,7 @@ static void cpu_eor_indy(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_eor_indy_pagecross(void *ctx)
+static void eor_indy_pagecross(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -533,7 +533,7 @@ static void cpu_eor_indy_pagecross(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lda_indy(void *ctx)
+static void lda_indy(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -553,7 +553,7 @@ static void cpu_lda_indy(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lda_indy_pagecross(void *ctx)
+static void lda_indy_pagecross(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -572,7 +572,7 @@ static void cpu_lda_indy_pagecross(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_ora_indy(void *ctx)
+static void ora_indy(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -593,7 +593,7 @@ static void cpu_ora_indy(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_indy_pagecross(void *ctx)
+static void ora_indy_pagecross(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -613,7 +613,7 @@ static void cpu_ora_indy_pagecross(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_sbc_indy(void *ctx)
+static void sbc_indy(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -637,7 +637,7 @@ static void cpu_sbc_indy(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sbc_indy_pagecross(void *ctx)
+static void sbc_indy_pagecross(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -660,7 +660,7 @@ static void cpu_sbc_indy_pagecross(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sta_indy(void *ctx)
+static void sta_indy(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -680,7 +680,7 @@ static void cpu_sta_indy(void *ctx)
     ct_assertequal(0xau, mem[7]);
 }
 
-static void cpu_sta_indy_pagecross(void *ctx)
+static void sta_indy_pagecross(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -708,39 +708,39 @@ static void cpu_sta_indy_pagecross(void *ctx)
 struct ct_testsuite cpu_indirect_tests(void)
 {
     static const struct ct_testcase tests[] = {
-        ct_maketest(cpu_adc_indx),
-        ct_maketest(cpu_adc_indx_pageoverflow),
-        ct_maketest(cpu_and_indx),
-        ct_maketest(cpu_and_indx_pageoverflow),
-        ct_maketest(cpu_cmp_indx),
-        ct_maketest(cpu_cmp_indx_pageoverflow),
-        ct_maketest(cpu_eor_indx),
-        ct_maketest(cpu_eor_indx_pageoverflow),
-        ct_maketest(cpu_lda_indx),
-        ct_maketest(cpu_lda_indx_pageoverflow),
-        ct_maketest(cpu_ora_indx),
-        ct_maketest(cpu_ora_indx_pageoverflow),
-        ct_maketest(cpu_sbc_indx),
-        ct_maketest(cpu_sbc_indx_pageoverflow),
-        ct_maketest(cpu_sta_indx),
-        ct_maketest(cpu_sta_indx_pageoverflow),
+        ct_maketest(adc_indx),
+        ct_maketest(adc_indx_pageoverflow),
+        ct_maketest(and_indx),
+        ct_maketest(and_indx_pageoverflow),
+        ct_maketest(cmp_indx),
+        ct_maketest(cmp_indx_pageoverflow),
+        ct_maketest(eor_indx),
+        ct_maketest(eor_indx_pageoverflow),
+        ct_maketest(lda_indx),
+        ct_maketest(lda_indx_pageoverflow),
+        ct_maketest(ora_indx),
+        ct_maketest(ora_indx_pageoverflow),
+        ct_maketest(sbc_indx),
+        ct_maketest(sbc_indx_pageoverflow),
+        ct_maketest(sta_indx),
+        ct_maketest(sta_indx_pageoverflow),
 
-        ct_maketest(cpu_adc_indy),
-        ct_maketest(cpu_adc_indy_pagecross),
-        ct_maketest(cpu_and_indy),
-        ct_maketest(cpu_and_indy_pagecross),
-        ct_maketest(cpu_cmp_indy),
-        ct_maketest(cpu_cmp_indy_pagecross),
-        ct_maketest(cpu_eor_indy),
-        ct_maketest(cpu_eor_indy_pagecross),
-        ct_maketest(cpu_lda_indy),
-        ct_maketest(cpu_lda_indy_pagecross),
-        ct_maketest(cpu_ora_indy),
-        ct_maketest(cpu_ora_indy_pagecross),
-        ct_maketest(cpu_sbc_indy),
-        ct_maketest(cpu_sbc_indy_pagecross),
-        ct_maketest(cpu_sta_indy),
-        ct_maketest(cpu_sta_indy_pagecross),
+        ct_maketest(adc_indy),
+        ct_maketest(adc_indy_pagecross),
+        ct_maketest(and_indy),
+        ct_maketest(and_indy_pagecross),
+        ct_maketest(cmp_indy),
+        ct_maketest(cmp_indy_pagecross),
+        ct_maketest(eor_indy),
+        ct_maketest(eor_indy_pagecross),
+        ct_maketest(lda_indy),
+        ct_maketest(lda_indy_pagecross),
+        ct_maketest(ora_indy),
+        ct_maketest(ora_indy_pagecross),
+        ct_maketest(sbc_indy),
+        ct_maketest(sbc_indy_pagecross),
+        ct_maketest(sta_indy),
+        ct_maketest(sta_indy_pagecross),
     };
 
     return ct_makesuite(tests);

@@ -15,7 +15,7 @@
 // Zero-Page Instructions
 //
 
-static void cpu_adc_zp(void *ctx)
+static void adc_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -35,7 +35,7 @@ static void cpu_adc_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_zp(void *ctx)
+static void and_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -53,7 +53,7 @@ static void cpu_and_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_asl_zp(void *ctx)
+static void asl_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -71,7 +71,7 @@ static void cpu_asl_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_asl_zp_carry(void *ctx)
+static void asl_zp_carry(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -89,7 +89,7 @@ static void cpu_asl_zp_carry(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_asl_zp_zero(void *ctx)
+static void asl_zp_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -107,7 +107,7 @@ static void cpu_asl_zp_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_asl_zp_carryzero(void *ctx)
+static void asl_zp_carryzero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -125,7 +125,7 @@ static void cpu_asl_zp_carryzero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_asl_zp_negative(void *ctx)
+static void asl_zp_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -143,7 +143,7 @@ static void cpu_asl_zp_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_asl_zp_carrynegative(void *ctx)
+static void asl_zp_carrynegative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -161,7 +161,7 @@ static void cpu_asl_zp_carrynegative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_asl_zp_all_ones(void *ctx)
+static void asl_zp_all_ones(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -180,7 +180,7 @@ static void cpu_asl_zp_all_ones(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_bit_zp_maskset(void *ctx)
+static void bit_zp_maskset(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -199,7 +199,7 @@ static void cpu_bit_zp_maskset(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_bit_zp_maskclear(void *ctx)
+static void bit_zp_maskclear(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -218,7 +218,7 @@ static void cpu_bit_zp_maskclear(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_bit_zp_highmaskset(void *ctx)
+static void bit_zp_highmaskset(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -237,7 +237,7 @@ static void cpu_bit_zp_highmaskset(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_bit_zp_highmaskclear(void *ctx)
+static void bit_zp_highmaskclear(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -256,7 +256,7 @@ static void cpu_bit_zp_highmaskclear(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_bit_zp_sixmaskset(void *ctx)
+static void bit_zp_sixmaskset(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -275,7 +275,7 @@ static void cpu_bit_zp_sixmaskset(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_bit_zp_sixmaskclear(void *ctx)
+static void bit_zp_sixmaskclear(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -294,7 +294,7 @@ static void cpu_bit_zp_sixmaskclear(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_bit_zp_sevenmaskset(void *ctx)
+static void bit_zp_sevenmaskset(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -313,7 +313,7 @@ static void cpu_bit_zp_sevenmaskset(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_bit_zp_sevenmaskclear(void *ctx)
+static void bit_zp_sevenmaskclear(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -332,7 +332,7 @@ static void cpu_bit_zp_sevenmaskclear(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_bit_zp_set_high(void *ctx)
+static void bit_zp_set_high(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -351,7 +351,7 @@ static void cpu_bit_zp_set_high(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_bit_zp_zero_set_high(void *ctx)
+static void bit_zp_zero_set_high(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -370,7 +370,7 @@ static void cpu_bit_zp_zero_set_high(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_bit_zp_max_set_high(void *ctx)
+static void bit_zp_max_set_high(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -389,7 +389,7 @@ static void cpu_bit_zp_max_set_high(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_cmp_zp(void *ctx)
+static void cmp_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -408,7 +408,7 @@ static void cpu_cmp_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_cpx_zp(void *ctx)
+static void cpx_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -427,7 +427,7 @@ static void cpu_cpx_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_cpy_zp(void *ctx)
+static void cpy_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -446,7 +446,7 @@ static void cpu_cpy_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_dec_zp(void *ctx)
+static void dec_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -463,7 +463,7 @@ static void cpu_dec_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_dec_zp_zero(void *ctx)
+static void dec_zp_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -480,7 +480,7 @@ static void cpu_dec_zp_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_dec_zp_negative(void *ctx)
+static void dec_zp_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -497,7 +497,7 @@ static void cpu_dec_zp_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_eor_zp(void *ctx)
+static void eor_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -515,7 +515,7 @@ static void cpu_eor_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_inc_zp(void *ctx)
+static void inc_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -532,7 +532,7 @@ static void cpu_inc_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_inc_zp_zero(void *ctx)
+static void inc_zp_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -549,7 +549,7 @@ static void cpu_inc_zp_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_inc_zp_negative(void *ctx)
+static void inc_zp_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -566,7 +566,7 @@ static void cpu_inc_zp_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_lda_zp(void *ctx)
+static void lda_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -583,7 +583,7 @@ static void cpu_lda_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ldx_zp(void *ctx)
+static void ldx_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -600,7 +600,7 @@ static void cpu_ldx_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ldy_zp(void *ctx)
+static void ldy_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -617,7 +617,7 @@ static void cpu_ldy_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lsr_zp(void *ctx)
+static void lsr_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -635,7 +635,7 @@ static void cpu_lsr_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lsr_zp_carry(void *ctx)
+static void lsr_zp_carry(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -653,7 +653,7 @@ static void cpu_lsr_zp_carry(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lsr_zp_zero(void *ctx)
+static void lsr_zp_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -671,7 +671,7 @@ static void cpu_lsr_zp_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lsr_zp_carryzero(void *ctx)
+static void lsr_zp_carryzero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -689,7 +689,7 @@ static void cpu_lsr_zp_carryzero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lsr_zp_negative_to_positive(void *ctx)
+static void lsr_zp_negative_to_positive(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -707,7 +707,7 @@ static void cpu_lsr_zp_negative_to_positive(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lsr_zp_all_ones(void *ctx)
+static void lsr_zp_all_ones(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -725,7 +725,7 @@ static void cpu_lsr_zp_all_ones(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_zp(void *ctx)
+static void ora_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -743,7 +743,7 @@ static void cpu_ora_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_rol_zp(void *ctx)
+static void rol_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -762,7 +762,7 @@ static void cpu_rol_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_rol_zp_carry(void *ctx)
+static void rol_zp_carry(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -780,7 +780,7 @@ static void cpu_rol_zp_carry(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_rol_zp_zero(void *ctx)
+static void rol_zp_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -798,7 +798,7 @@ static void cpu_rol_zp_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_rol_zp_carryzero(void *ctx)
+static void rol_zp_carryzero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -816,7 +816,7 @@ static void cpu_rol_zp_carryzero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_rol_zp_negative(void *ctx)
+static void rol_zp_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -835,7 +835,7 @@ static void cpu_rol_zp_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_rol_zp_carrynegative(void *ctx)
+static void rol_zp_carrynegative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -853,7 +853,7 @@ static void cpu_rol_zp_carrynegative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_rol_zp_all_ones(void *ctx)
+static void rol_zp_all_ones(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -872,7 +872,7 @@ static void cpu_rol_zp_all_ones(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_ror_zp(void *ctx)
+static void ror_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -890,7 +890,7 @@ static void cpu_ror_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ror_zp_carry(void *ctx)
+static void ror_zp_carry(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -908,7 +908,7 @@ static void cpu_ror_zp_carry(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ror_zp_zero(void *ctx)
+static void ror_zp_zero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -926,7 +926,7 @@ static void cpu_ror_zp_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ror_zp_carryzero(void *ctx)
+static void ror_zp_carryzero(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -944,7 +944,7 @@ static void cpu_ror_zp_carryzero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ror_zp_negative(void *ctx)
+static void ror_zp_negative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -963,7 +963,7 @@ static void cpu_ror_zp_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_ror_zp_carrynegative(void *ctx)
+static void ror_zp_carrynegative(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -982,7 +982,7 @@ static void cpu_ror_zp_carrynegative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_ror_zp_all_ones(void *ctx)
+static void ror_zp_all_ones(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1001,7 +1001,7 @@ static void cpu_ror_zp_all_ones(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_sbc_zp(void *ctx)
+static void sbc_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1022,7 +1022,7 @@ static void cpu_sbc_zp(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sta_zp(void *ctx)
+static void sta_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1038,7 +1038,7 @@ static void cpu_sta_zp(void *ctx)
     ct_assertequal(0xau, mem[4]);
 }
 
-static void cpu_stx_zp(void *ctx)
+static void stx_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1054,7 +1054,7 @@ static void cpu_stx_zp(void *ctx)
     ct_assertequal(0xf1u, mem[4]);
 }
 
-static void cpu_sty_zp(void *ctx)
+static void sty_zp(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1074,7 +1074,7 @@ static void cpu_sty_zp(void *ctx)
 // Zero-Page,X Instructions
 //
 
-static void cpu_adc_zpx(void *ctx)
+static void adc_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1095,7 +1095,7 @@ static void cpu_adc_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_adc_zpx_pageoverflow(void *ctx)
+static void adc_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1116,7 +1116,7 @@ static void cpu_adc_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_zpx(void *ctx)
+static void and_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1135,7 +1135,7 @@ static void cpu_and_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_and_zpx_pageoverflow(void *ctx)
+static void and_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1154,7 +1154,7 @@ static void cpu_and_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_asl_zpx(void *ctx)
+static void asl_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1173,7 +1173,7 @@ static void cpu_asl_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_asl_zpx_pageoverflow(void *ctx)
+static void asl_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1192,7 +1192,7 @@ static void cpu_asl_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_cmp_zpx(void *ctx)
+static void cmp_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1212,7 +1212,7 @@ static void cpu_cmp_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_cmp_zpx_pageoverflow(void *ctx)
+static void cmp_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1232,7 +1232,7 @@ static void cpu_cmp_zpx_pageoverflow(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_dec_zpx(void *ctx)
+static void dec_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1250,7 +1250,7 @@ static void cpu_dec_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_dec_zpx_pageoverflow(void *ctx)
+static void dec_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1268,7 +1268,7 @@ static void cpu_dec_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_eor_zpx(void *ctx)
+static void eor_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1287,7 +1287,7 @@ static void cpu_eor_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_eor_zpx_pageoverflow(void *ctx)
+static void eor_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1306,7 +1306,7 @@ static void cpu_eor_zpx_pageoverflow(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_inc_zpx(void *ctx)
+static void inc_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1324,7 +1324,7 @@ static void cpu_inc_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_inc_zpx_pageoverflow(void *ctx)
+static void inc_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1342,7 +1342,7 @@ static void cpu_inc_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lda_zpx(void *ctx)
+static void lda_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1360,7 +1360,7 @@ static void cpu_lda_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lda_zpx_pageoverflow(void *ctx)
+static void lda_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1378,7 +1378,7 @@ static void cpu_lda_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ldy_zpx(void *ctx)
+static void ldy_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1396,7 +1396,7 @@ static void cpu_ldy_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ldy_zpx_pageoverflow(void *ctx)
+static void ldy_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1414,7 +1414,7 @@ static void cpu_ldy_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lsr_zpx(void *ctx)
+static void lsr_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1433,7 +1433,7 @@ static void cpu_lsr_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_lsr_zpx_pageoverflow(void *ctx)
+static void lsr_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1452,7 +1452,7 @@ static void cpu_lsr_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_zpx(void *ctx)
+static void ora_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1471,7 +1471,7 @@ static void cpu_ora_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ora_zpx_pageoverflow(void *ctx)
+static void ora_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1490,7 +1490,7 @@ static void cpu_ora_zpx_pageoverflow(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_rol_zpx(void *ctx)
+static void rol_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1510,7 +1510,7 @@ static void cpu_rol_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_rol_zpx_pageoverflow(void *ctx)
+static void rol_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1529,7 +1529,7 @@ static void cpu_rol_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ror_zpx(void *ctx)
+static void ror_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1549,7 +1549,7 @@ static void cpu_ror_zpx(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void cpu_ror_zpx_pageoverflow(void *ctx)
+static void ror_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1568,7 +1568,7 @@ static void cpu_ror_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sbc_zpx(void *ctx)
+static void sbc_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1590,7 +1590,7 @@ static void cpu_sbc_zpx(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sbc_zpx_pageoverflow(void *ctx)
+static void sbc_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1612,7 +1612,7 @@ static void cpu_sbc_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_sta_zpx(void *ctx)
+static void sta_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1629,7 +1629,7 @@ static void cpu_sta_zpx(void *ctx)
     ct_assertequal(0xau, mem[7]);
 }
 
-static void cpu_sta_zpx_pageoverflow(void *ctx)
+static void sta_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1646,7 +1646,7 @@ static void cpu_sta_zpx_pageoverflow(void *ctx)
     ct_assertequal(0xau, mem[2]);
 }
 
-static void cpu_sty_zpx(void *ctx)
+static void sty_zpx(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1663,7 +1663,7 @@ static void cpu_sty_zpx(void *ctx)
     ct_assertequal(0x84u, mem[7]);
 }
 
-static void cpu_sty_zpx_pageoverflow(void *ctx)
+static void sty_zpx_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1684,7 +1684,7 @@ static void cpu_sty_zpx_pageoverflow(void *ctx)
 // Zero-Page,Y Instructions
 //
 
-static void cpu_ldx_zpy(void *ctx)
+static void ldx_zpy(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1702,7 +1702,7 @@ static void cpu_ldx_zpy(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_ldx_zpy_pageoverflow(void *ctx)
+static void ldx_zpy_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1720,7 +1720,7 @@ static void cpu_ldx_zpy_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void cpu_stx_zpy(void *ctx)
+static void stx_zpy(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1737,7 +1737,7 @@ static void cpu_stx_zpy(void *ctx)
     ct_assertequal(0xf1u, mem[7]);
 }
 
-static void cpu_stx_zpy_pageoverflow(void *ctx)
+static void stx_zpy_pageoverflow(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
@@ -1761,102 +1761,102 @@ static void cpu_stx_zpy_pageoverflow(void *ctx)
 struct ct_testsuite cpu_zeropage_tests(void)
 {
     static const struct ct_testcase tests[] = {
-        ct_maketest(cpu_adc_zp),
-        ct_maketest(cpu_and_zp),
-        ct_maketest(cpu_asl_zp),
-        ct_maketest(cpu_asl_zp_carry),
-        ct_maketest(cpu_asl_zp_zero),
-        ct_maketest(cpu_asl_zp_carryzero),
-        ct_maketest(cpu_asl_zp_negative),
-        ct_maketest(cpu_asl_zp_carrynegative),
-        ct_maketest(cpu_asl_zp_all_ones),
-        ct_maketest(cpu_bit_zp_maskset),
-        ct_maketest(cpu_bit_zp_maskclear),
-        ct_maketest(cpu_bit_zp_highmaskset),
-        ct_maketest(cpu_bit_zp_highmaskclear),
-        ct_maketest(cpu_bit_zp_sixmaskset),
-        ct_maketest(cpu_bit_zp_sixmaskclear),
-        ct_maketest(cpu_bit_zp_sevenmaskset),
-        ct_maketest(cpu_bit_zp_sevenmaskclear),
-        ct_maketest(cpu_bit_zp_set_high),
-        ct_maketest(cpu_bit_zp_zero_set_high),
-        ct_maketest(cpu_bit_zp_max_set_high),
-        ct_maketest(cpu_cmp_zp),
-        ct_maketest(cpu_cpx_zp),
-        ct_maketest(cpu_cpy_zp),
-        ct_maketest(cpu_dec_zp),
-        ct_maketest(cpu_dec_zp_zero),
-        ct_maketest(cpu_dec_zp_negative),
-        ct_maketest(cpu_eor_zp),
-        ct_maketest(cpu_inc_zp),
-        ct_maketest(cpu_inc_zp_zero),
-        ct_maketest(cpu_inc_zp_negative),
-        ct_maketest(cpu_lda_zp),
-        ct_maketest(cpu_ldx_zp),
-        ct_maketest(cpu_ldy_zp),
-        ct_maketest(cpu_lsr_zp),
-        ct_maketest(cpu_lsr_zp_carry),
-        ct_maketest(cpu_lsr_zp_zero),
-        ct_maketest(cpu_lsr_zp_carryzero),
-        ct_maketest(cpu_lsr_zp_negative_to_positive),
-        ct_maketest(cpu_lsr_zp_all_ones),
-        ct_maketest(cpu_ora_zp),
-        ct_maketest(cpu_rol_zp),
-        ct_maketest(cpu_rol_zp_carry),
-        ct_maketest(cpu_rol_zp_zero),
-        ct_maketest(cpu_rol_zp_carryzero),
-        ct_maketest(cpu_rol_zp_negative),
-        ct_maketest(cpu_rol_zp_carrynegative),
-        ct_maketest(cpu_rol_zp_all_ones),
-        ct_maketest(cpu_ror_zp),
-        ct_maketest(cpu_ror_zp_carry),
-        ct_maketest(cpu_ror_zp_zero),
-        ct_maketest(cpu_ror_zp_carryzero),
-        ct_maketest(cpu_ror_zp_negative),
-        ct_maketest(cpu_ror_zp_carrynegative),
-        ct_maketest(cpu_ror_zp_all_ones),
-        ct_maketest(cpu_sbc_zp),
-        ct_maketest(cpu_sta_zp),
-        ct_maketest(cpu_stx_zp),
-        ct_maketest(cpu_sty_zp),
+        ct_maketest(adc_zp),
+        ct_maketest(and_zp),
+        ct_maketest(asl_zp),
+        ct_maketest(asl_zp_carry),
+        ct_maketest(asl_zp_zero),
+        ct_maketest(asl_zp_carryzero),
+        ct_maketest(asl_zp_negative),
+        ct_maketest(asl_zp_carrynegative),
+        ct_maketest(asl_zp_all_ones),
+        ct_maketest(bit_zp_maskset),
+        ct_maketest(bit_zp_maskclear),
+        ct_maketest(bit_zp_highmaskset),
+        ct_maketest(bit_zp_highmaskclear),
+        ct_maketest(bit_zp_sixmaskset),
+        ct_maketest(bit_zp_sixmaskclear),
+        ct_maketest(bit_zp_sevenmaskset),
+        ct_maketest(bit_zp_sevenmaskclear),
+        ct_maketest(bit_zp_set_high),
+        ct_maketest(bit_zp_zero_set_high),
+        ct_maketest(bit_zp_max_set_high),
+        ct_maketest(cmp_zp),
+        ct_maketest(cpx_zp),
+        ct_maketest(cpy_zp),
+        ct_maketest(dec_zp),
+        ct_maketest(dec_zp_zero),
+        ct_maketest(dec_zp_negative),
+        ct_maketest(eor_zp),
+        ct_maketest(inc_zp),
+        ct_maketest(inc_zp_zero),
+        ct_maketest(inc_zp_negative),
+        ct_maketest(lda_zp),
+        ct_maketest(ldx_zp),
+        ct_maketest(ldy_zp),
+        ct_maketest(lsr_zp),
+        ct_maketest(lsr_zp_carry),
+        ct_maketest(lsr_zp_zero),
+        ct_maketest(lsr_zp_carryzero),
+        ct_maketest(lsr_zp_negative_to_positive),
+        ct_maketest(lsr_zp_all_ones),
+        ct_maketest(ora_zp),
+        ct_maketest(rol_zp),
+        ct_maketest(rol_zp_carry),
+        ct_maketest(rol_zp_zero),
+        ct_maketest(rol_zp_carryzero),
+        ct_maketest(rol_zp_negative),
+        ct_maketest(rol_zp_carrynegative),
+        ct_maketest(rol_zp_all_ones),
+        ct_maketest(ror_zp),
+        ct_maketest(ror_zp_carry),
+        ct_maketest(ror_zp_zero),
+        ct_maketest(ror_zp_carryzero),
+        ct_maketest(ror_zp_negative),
+        ct_maketest(ror_zp_carrynegative),
+        ct_maketest(ror_zp_all_ones),
+        ct_maketest(sbc_zp),
+        ct_maketest(sta_zp),
+        ct_maketest(stx_zp),
+        ct_maketest(sty_zp),
 
-        ct_maketest(cpu_adc_zpx),
-        ct_maketest(cpu_adc_zpx_pageoverflow),
-        ct_maketest(cpu_and_zpx),
-        ct_maketest(cpu_and_zpx_pageoverflow),
-        ct_maketest(cpu_asl_zpx),
-        ct_maketest(cpu_asl_zpx_pageoverflow),
-        ct_maketest(cpu_cmp_zpx),
-        ct_maketest(cpu_cmp_zpx_pageoverflow),
-        ct_maketest(cpu_dec_zpx),
-        ct_maketest(cpu_dec_zpx_pageoverflow),
-        ct_maketest(cpu_eor_zpx),
-        ct_maketest(cpu_eor_zpx_pageoverflow),
-        ct_maketest(cpu_inc_zpx),
-        ct_maketest(cpu_inc_zpx_pageoverflow),
-        ct_maketest(cpu_lda_zpx),
-        ct_maketest(cpu_lda_zpx_pageoverflow),
-        ct_maketest(cpu_ldy_zpx),
-        ct_maketest(cpu_ldy_zpx_pageoverflow),
-        ct_maketest(cpu_lsr_zpx),
-        ct_maketest(cpu_lsr_zpx_pageoverflow),
-        ct_maketest(cpu_ora_zpx),
-        ct_maketest(cpu_ora_zpx_pageoverflow),
-        ct_maketest(cpu_rol_zpx),
-        ct_maketest(cpu_rol_zpx_pageoverflow),
-        ct_maketest(cpu_ror_zpx),
-        ct_maketest(cpu_ror_zpx_pageoverflow),
-        ct_maketest(cpu_sbc_zpx),
-        ct_maketest(cpu_sbc_zpx_pageoverflow),
-        ct_maketest(cpu_sta_zpx),
-        ct_maketest(cpu_sta_zpx_pageoverflow),
-        ct_maketest(cpu_sty_zpx),
-        ct_maketest(cpu_sty_zpx_pageoverflow),
+        ct_maketest(adc_zpx),
+        ct_maketest(adc_zpx_pageoverflow),
+        ct_maketest(and_zpx),
+        ct_maketest(and_zpx_pageoverflow),
+        ct_maketest(asl_zpx),
+        ct_maketest(asl_zpx_pageoverflow),
+        ct_maketest(cmp_zpx),
+        ct_maketest(cmp_zpx_pageoverflow),
+        ct_maketest(dec_zpx),
+        ct_maketest(dec_zpx_pageoverflow),
+        ct_maketest(eor_zpx),
+        ct_maketest(eor_zpx_pageoverflow),
+        ct_maketest(inc_zpx),
+        ct_maketest(inc_zpx_pageoverflow),
+        ct_maketest(lda_zpx),
+        ct_maketest(lda_zpx_pageoverflow),
+        ct_maketest(ldy_zpx),
+        ct_maketest(ldy_zpx_pageoverflow),
+        ct_maketest(lsr_zpx),
+        ct_maketest(lsr_zpx_pageoverflow),
+        ct_maketest(ora_zpx),
+        ct_maketest(ora_zpx_pageoverflow),
+        ct_maketest(rol_zpx),
+        ct_maketest(rol_zpx_pageoverflow),
+        ct_maketest(ror_zpx),
+        ct_maketest(ror_zpx_pageoverflow),
+        ct_maketest(sbc_zpx),
+        ct_maketest(sbc_zpx_pageoverflow),
+        ct_maketest(sta_zpx),
+        ct_maketest(sta_zpx_pageoverflow),
+        ct_maketest(sty_zpx),
+        ct_maketest(sty_zpx_pageoverflow),
 
-        ct_maketest(cpu_ldx_zpy),
-        ct_maketest(cpu_ldx_zpy_pageoverflow),
-        ct_maketest(cpu_stx_zpy),
-        ct_maketest(cpu_stx_zpy_pageoverflow),
+        ct_maketest(ldx_zpy),
+        ct_maketest(ldx_zpy_pageoverflow),
+        ct_maketest(stx_zpy),
+        ct_maketest(stx_zpy_pageoverflow),
     };
 
     return ct_makesuite(tests);

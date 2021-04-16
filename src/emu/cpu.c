@@ -187,6 +187,34 @@ static bool reset_held(struct mos6502 *self)
 // Instruction Execution
 //
 
+// NOTE: finish an instruction by polling for interrupts and signaling the
+// next cycle to be an opcode fetch; the order in which this is called
+// simulates the side-effects of 6502's pipelining behavior without actually
+// emulating the cycle timing, for example:
+//
+// assume SEI is setting the I mask from 0 to 1, masking interrupts; SEI is a
+// 2-cycle instruction and therefore polls for interrupts on the T1 (final)
+// cycle, however the I flag is not actually set until T0 of the *next* cycle,
+// so if interrupt-polling finds an active interrupt it will insert a BRK at
+// the end of SEI and an interrupt will fire despite having just executed the
+// "mask interrupt" instruction; similar behavior means CLI will delay an
+// interrupt for an extra instruction;
+
+// committing the operation before executing the register side-effects will
+// emulate this pipelining timing with respect to interrupts without modelling
+// the actual cycle-delay of internal CPU operations.
+static void conditional_commit(struct mos6502 *self, bool c)
+{
+    // NOTE: interrupts are polled regardless of commit condition
+    poll_interrupts(self);
+    self->presync = c;
+}
+
+static void commit_operation(struct mos6502 *self)
+{
+    conditional_commit(self, true);
+}
+
 // NOTE: compute ones- or twos-complement of D, including any carry-out
 static uint16_t complement(uint8_t d, bool twos)
 {
@@ -330,28 +358,6 @@ static bool write_delayed(struct mos6502 *self, struct decoded dec)
         read(self);
     }
     return delayed;
-}
-
-// NOTE: finish an instruction by polling for interrupts and signaling the
-// next cycle to be an opcode fetch; the order in which this is called
-// simulates the side-effects of 6502's pipelining behavior without actually
-// emulating the cycle timing, for example:
-//
-// assume SEI is setting the I mask from 0 to 1, masking interrupts; SEI is a
-// 2-cycle instruction and therefore polls for interrupts on the T1 (final)
-// cycle, however the I flag is not actually set until T0 of the *next* cycle,
-// so if interrupt-polling finds an active interrupt it will insert a BRK at
-// the end of SEI and an interrupt will fire despite having just executed the
-// "mask interrupt" instruction; similar behavior means CLI will delay an
-// interrupt for an extra instruction;
-
-// committing the operation before executing the register side-effects will
-// emulate this pipelining timing with respect to interrupts without modelling
-// the actual cycle-delay of internal CPU operations.
-static void commit_operation(struct mos6502 *self)
-{
-    poll_interrupts(self);
-    self->presync = true;
 }
 
 static void UNK_exec(struct mos6502 *self)

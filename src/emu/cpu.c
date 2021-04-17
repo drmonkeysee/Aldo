@@ -1199,6 +1199,7 @@ void cpu_powerup(struct mos6502 *self)
 
     // NOTE: Interrupts are inverted, high means no interrupt; rw high is read;
     // presync flag is true to put the cpu into instruction-prefetch state.
+    // TODO: i think reset can make many of these initializations obsolete
     self->signal.irq = self->signal.nmi = self->signal.res = self->signal.rw =
         self->presync = true;
     self->signal.rdy = self->signal.sync = self->dflt = false;

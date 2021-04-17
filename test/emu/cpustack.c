@@ -182,7 +182,7 @@ static void plp(void *ctx)
 
     struct console_state sn;
     cpu_snapshot(&cpu, &sn);
-    ct_assertequal(0xaau, sn.cpu.status);
+    ct_assertequal(0xbau, sn.cpu.status);
     ct_assertequal(4u, cpu.s);
 }
 
@@ -201,7 +201,7 @@ static void plp_zero(void *ctx)
 
     struct console_state sn;
     cpu_snapshot(&cpu, &sn);
-    ct_assertequal(0x0u, sn.cpu.status);
+    ct_assertequal(0x30u, sn.cpu.status);
     ct_assertequal(4u, cpu.s);
 }
 
@@ -228,7 +228,7 @@ static void plp_wraparound(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x28, [256] = 0x20};
+    uint8_t mem[] = {0x28, [256] = 0x25};
     cpu.ram = mem;
     cpu.s = 0xff;
 
@@ -239,7 +239,7 @@ static void plp_wraparound(void *ctx)
 
     struct console_state sn;
     cpu_snapshot(&cpu, &sn);
-    ct_assertequal(0x20u, sn.cpu.status);
+    ct_assertequal(0x35u, sn.cpu.status);
     ct_assertequal(0u, cpu.s);
 }
 

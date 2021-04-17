@@ -43,14 +43,14 @@ static void write(struct mos6502 *self)
     self->dflt = true;
 }
 
-static uint8_t get_p(const struct mos6502 *self)
+static uint8_t get_p(const struct mos6502 *self, bool interrupt)
 {
     uint8_t p = 0;
     p |= self->p.c << 0;
     p |= self->p.z << 1;
     p |= self->p.i << 2;
     p |= self->p.d << 3;
-    p |= self->p.b << 4;
+    p |= !interrupt << 4;   // NOTE: B bit is 0 if interrupt, 1 otherwise
     p |= self->p.u << 5;
     p |= self->p.v << 6;
     p |= self->p.n << 7;
@@ -63,7 +63,7 @@ static void set_p(struct mos6502 *self, uint8_t p)
     self->p.z = p & 0x2;
     self->p.i = p & 0x4;
     self->p.d = p & 0x8;
-    self->p.b = p & 0x10;
+    self->p.b = true;   // NOTE: B flag acts as if it's always set
     self->p.u = p & 0x20;
     self->p.v = p & 0x40;
     self->p.n = p & 0x80;
@@ -604,7 +604,7 @@ static void PHA_exec(struct mos6502 *self)
 
 static void PHP_exec(struct mos6502 *self)
 {
-    stack_push(self, get_p(self));
+    stack_push(self, get_p(self, false));
     commit_operation(self);
 }
 
@@ -1260,7 +1260,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.program_counter = self->pc;
     snapshot->cpu.accumulator = self->a;
     snapshot->cpu.stack_pointer = self->s;
-    snapshot->cpu.status = get_p(self);
+    snapshot->cpu.status = get_p(self, false);
     snapshot->cpu.xindex = self->x;
     snapshot->cpu.yindex = self->y;
 

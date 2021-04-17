@@ -238,6 +238,7 @@ static void store_data(struct mos6502 *self, uint8_t d)
 // NOTE: A + B; B is u16 as it may contain a carry-out
 static void arithmetic_sum(struct mos6502 *self, uint16_t b)
 {
+    commit_operation(self);
     const uint16_t sum = self->a + b;
     self->p.c = sum >> 8;
     update_v(self, sum, self->a, b);
@@ -250,6 +251,7 @@ static void arithmetic_sum(struct mos6502 *self, uint16_t b)
 static void compare_register(struct mos6502 *self, uint8_t r)
 {
     read(self);
+    commit_operation(self);
     const uint16_t cmp = r + complement(self->databus, true);
     self->p.c = cmp >> 8;
     update_z(self, cmp);
@@ -271,6 +273,7 @@ enum bitdirection {
 static void bitoperation(struct mos6502 *self, struct decoded dec,
                          enum bitdirection bd, uint8_t carryin_mask)
 {
+    commit_operation(self);
     uint8_t d = dec.mode == AM_IMP ? self->a : self->databus;
     if (bd == BIT_LEFT) {
         self->p.c = d & 0x80;
@@ -362,7 +365,7 @@ static bool write_delayed(struct mos6502 *self, struct decoded dec)
 
 static void UNK_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    commit_operation(self);
 }
 
 // NOTE: add with carry-in; A + D + C
@@ -371,15 +374,14 @@ static void ADC_exec(struct mos6502 *self, struct decoded dec)
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
     arithmetic_sum(self, self->databus + self->p.c);
-    self->presync = true;
 }
 
 static void AND_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
+    commit_operation(self);
     load_register(self, &self->a, self->a & self->databus);
-    self->presync = true;
 }
 
 static void ASL_exec(struct mos6502 *self, struct decoded dec)
@@ -387,7 +389,6 @@ static void ASL_exec(struct mos6502 *self, struct decoded dec)
     if (read_delayed(self, dec, true)
         || write_delayed(self, dec)) return;
     bitoperation(self, dec, BIT_LEFT, 0x0);
-    self->presync = true;
 }
 
 // NOTE: branch instructions do not branch if the opposite condition is TRUE;
@@ -396,42 +397,42 @@ static void ASL_exec(struct mos6502 *self, struct decoded dec)
 
 static void BCC_exec(struct mos6502 *self)
 {
-    self->presync = self->p.c;
+    conditional_commit(self, self->p.c);
 }
 
 static void BCS_exec(struct mos6502 *self)
 {
-    self->presync = !self->p.c;
+    conditional_commit(self, !self->p.c);
 }
 
 static void BEQ_exec(struct mos6502 *self)
 {
-    self->presync = !self->p.z;
+    conditional_commit(self, !self->p.z);
 }
 
 static void BIT_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
+    commit_operation(self);
     update_z(self, self->a & self->databus);
     self->p.v = self->databus & 0x40;
     update_n(self, self->databus);
-    self->presync = true;
 }
 
 static void BMI_exec(struct mos6502 *self)
 {
-    self->presync = !self->p.n;
+    conditional_commit(self, !self->p.n);
 }
 
 static void BNE_exec(struct mos6502 *self)
 {
-    self->presync = self->p.z;
+    conditional_commit(self, self->p.z);
 }
 
 static void BPL_exec(struct mos6502 *self)
 {
-    self->presync = self->p.n;
+    conditional_commit(self, self->p.n);
 }
 
 static void BRK_exec(struct mos6502 *self)
@@ -441,141 +442,138 @@ static void BRK_exec(struct mos6502 *self)
 
 static void BVC_exec(struct mos6502 *self)
 {
-    self->presync = self->p.v;
+    conditional_commit(self, self->p.v);
 }
 
 static void BVS_exec(struct mos6502 *self)
 {
-    self->presync = !self->p.v;
+    conditional_commit(self, !self->p.v);
 }
 
 static void CLC_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     self->p.c = false;
-    self->presync = true;
 }
 
 static void CLD_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     self->p.d = false;
-    self->presync = true;
 }
 
 static void CLI_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     self->p.i = false;
-    self->presync = true;
 }
 
 static void CLV_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     self->p.v = false;
-    self->presync = true;
 }
 
 static void CMP_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     compare_register(self, self->a);
-    self->presync = true;
 }
 
 static void CPX_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     compare_register(self, self->x);
-    self->presync = true;
 }
 
 static void CPY_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     compare_register(self, self->y);
-    self->presync = true;
 }
 
 static void DEC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true)
         || write_delayed(self, dec)) return;
+    commit_operation(self);
     modify_mem(self, self->databus - 1);
-    self->presync = true;
 }
 
 static void DEX_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     load_register(self, &self->x, self->x - 1);
-    self->presync = true;
 }
 
 static void DEY_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     load_register(self, &self->y, self->y - 1);
-    self->presync = true;
 }
 
 static void EOR_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
+    commit_operation(self);
     load_register(self, &self->a, self->a ^ self->databus);
-    self->presync = true;
 }
 
 static void INC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true)
         || write_delayed(self, dec)) return;
+    commit_operation(self);
     modify_mem(self, self->databus + 1);
-    self->presync = true;
 }
 
 static void INX_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     load_register(self, &self->x, self->x + 1);
-    self->presync = true;
 }
 
 static void INY_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     load_register(self, &self->y, self->y + 1);
-    self->presync = true;
 }
 
 static void JMP_exec(struct mos6502 *self)
 {
     self->pc = bytowr(self->adl, self->databus);
-    self->presync = true;
+    commit_operation(self);
 }
 
 static void JSR_exec(struct mos6502 *self)
 {
     self->pc = bytowr(self->adl, self->databus);
-    self->presync = true;
+    commit_operation(self);
 }
 
 static void LDA_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
+    commit_operation(self);
     load_register(self, &self->a, self->databus);
-    self->presync = true;
 }
 
 static void LDX_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
+    commit_operation(self);
     load_register(self, &self->x, self->databus);
-    self->presync = true;
 }
 
 static void LDY_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
+    commit_operation(self);
     load_register(self, &self->y, self->databus);
-    self->presync = true;
 }
 
 static void LSR_exec(struct mos6502 *self, struct decoded dec)
@@ -583,46 +581,45 @@ static void LSR_exec(struct mos6502 *self, struct decoded dec)
     if (read_delayed(self, dec, true)
         || write_delayed(self, dec)) return;
     bitoperation(self, dec, BIT_RIGHT, 0x0);
-    self->presync = true;
 }
 
 static void NOP_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    commit_operation(self);
 }
 
 static void ORA_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
+    commit_operation(self);
     load_register(self, &self->a, self->a | self->databus);
-    self->presync = true;
 }
 
 static void PHA_exec(struct mos6502 *self)
 {
     stack_push(self, self->a);
-    self->presync = true;
+    commit_operation(self);
 }
 
 static void PHP_exec(struct mos6502 *self)
 {
     stack_push(self, get_p(self));
-    self->presync = true;
+    commit_operation(self);
 }
 
 static void PLA_exec(struct mos6502 *self)
 {
     stack_pop(self);
+    commit_operation(self);
     load_register(self, &self->a, self->databus);
-    self->presync = true;
 }
 
 static void PLP_exec(struct mos6502 *self)
 {
     stack_pop(self);
+    commit_operation(self);
     set_p(self, self->databus);
-    self->presync = true;
 }
 
 static void ROL_exec(struct mos6502 *self, struct decoded dec)
@@ -630,7 +627,6 @@ static void ROL_exec(struct mos6502 *self, struct decoded dec)
     if (read_delayed(self, dec, true)
         || write_delayed(self, dec)) return;
     bitoperation(self, dec, BIT_LEFT, self->p.c);
-    self->presync = true;
 }
 
 static void ROR_exec(struct mos6502 *self, struct decoded dec)
@@ -638,7 +634,6 @@ static void ROR_exec(struct mos6502 *self, struct decoded dec)
     if (read_delayed(self, dec, true)
         || write_delayed(self, dec)) return;
     bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
-    self->presync = true;
 }
 
 static void RTI_exec(struct mos6502 *self)
@@ -659,82 +654,81 @@ static void SBC_exec(struct mos6502 *self, struct decoded dec)
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
     arithmetic_sum(self, complement(self->databus, self->p.c));
-    self->presync = true;
 }
 
 static void SEC_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     self->p.c = true;
-    self->presync = true;
 }
 
 static void SED_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     self->p.d = true;
-    self->presync = true;
 }
 
 static void SEI_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     self->p.i = true;
-    self->presync = true;
 }
 
 static void STA_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true)) return;
     store_data(self, self->a);
-    self->presync = true;
+    commit_operation(self);
 }
 
 static void STX_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true)) return;
     store_data(self, self->x);
-    self->presync = true;
+    commit_operation(self);
 }
 
 static void STY_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true)) return;
     store_data(self, self->y);
-    self->presync = true;
+    commit_operation(self);
 }
 
 static void TAX_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     load_register(self, &self->x, self->a);
-    self->presync = true;
 }
 
 static void TAY_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     load_register(self, &self->y, self->a);
-    self->presync = true;
 }
 
 static void TSX_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     load_register(self, &self->x, self->s);
-    self->presync = true;
 }
 
 static void TXA_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     load_register(self, &self->a, self->x);
-    self->presync = true;
 }
 
 static void TXS_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     self->s = self->x;
-    self->presync = true;
 }
 
 static void TYA_exec(struct mos6502 *self)
 {
+    commit_operation(self);
     load_register(self, &self->a, self->y);
-    self->presync = true;
 }
 
 static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
@@ -1050,13 +1044,16 @@ static void BCH_sequence(struct mos6502 *self, struct decoded dec)
         self->addrbus = self->pc;
         branch_displacement(self);
         read(self);
+        // NOTE: interrupt polling does not happen on this cycle!
+        // branch instructions only poll on branch-not-taken and
+        // branch-with-page-crossing cycles.
         self->presync = !self->adc;
         break;
     case 3:
         self->addrbus = self->pc;
         branch_carry(self);
         read(self);
-        self->presync = true;
+        commit_operation(self);
         break;
     default:
         BAD_ADDR_SEQ;
@@ -1112,7 +1109,7 @@ static void RTS_sequence(struct mos6502 *self, struct decoded dec)
     case 5:
         self->addrbus = self->pc++;
         read(self);
-        self->presync = true;
+        commit_operation(self);
         break;
     default:
         BAD_ADDR_SEQ;

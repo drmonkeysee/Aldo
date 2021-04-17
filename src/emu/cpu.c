@@ -51,7 +51,7 @@ static uint8_t get_p(const struct mos6502 *self, bool interrupt)
     p |= self->p.i << 2;
     p |= self->p.d << 3;
     p |= !interrupt << 4;   // NOTE: B bit is 0 if interrupt, 1 otherwise
-    p |= self->p.u << 5;
+    p |= 0x20;              // NOTE: Unused bit is always set
     p |= self->p.v << 6;
     p |= self->p.n << 7;
     return p;
@@ -63,8 +63,7 @@ static void set_p(struct mos6502 *self, uint8_t p)
     self->p.z = p & 0x2;
     self->p.i = p & 0x4;
     self->p.d = p & 0x8;
-    self->p.b = true;   // NOTE: B flag acts as if it's always set
-    self->p.u = p & 0x20;
+    // NOTE: skip B and unused flags, they cannot be set explicitly
     self->p.v = p & 0x40;
     self->p.n = p & 0x80;
 }
@@ -192,16 +191,16 @@ static bool reset_held(struct mos6502 *self)
 // simulates the side-effects of 6502's pipelining behavior without actually
 // emulating the cycle timing, for example:
 //
-// assume SEI is setting the I mask from 0 to 1, masking interrupts; SEI is a
+// SEI is setting the I flag from 0 to 1, disabling interrupts; SEI is a
 // 2-cycle instruction and therefore polls for interrupts on the T1 (final)
 // cycle, however the I flag is not actually set until T0 of the *next* cycle,
 // so if interrupt-polling finds an active interrupt it will insert a BRK at
-// the end of SEI and an interrupt will fire despite having just executed the
-// "mask interrupt" instruction; similar behavior means CLI will delay an
-// interrupt for an extra instruction;
+// the end of SEI and an interrupt will fire despite following the
+// "disable interrupt" instruction; correspondingly CLI will delay an
+// interrupt for an extra instruction for the same reason;
 
 // committing the operation before executing the register side-effects will
-// emulate this pipelining timing with respect to interrupts without modelling
+// emulate this pipeline timing with respect to interrupts without modelling
 // the actual cycle-delay of internal CPU operations.
 static void conditional_commit(struct mos6502 *self, bool c)
 {

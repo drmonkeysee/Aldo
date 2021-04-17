@@ -27,10 +27,9 @@ struct mos6502 {
         bool c: 1,      // (0) Carry
              z: 1,      // (1) Zero
              i: 1,      // (2) Interrupt Disable
-             d: 1,      // (3) Decimal (disabled on the NES)
-             b: 1,      // (4) Break
-             u: 1,      // (5) Unused
-             v: 1,      // (6) Overflow
+             d: 1;      // (3) Decimal (disabled on the NES)
+        int   : 2;      // (4,5) Break/Unused (pseudo-flags, always set)
+        bool v: 1,      // (6) Overflow
              n: 1;      // (7) Sign
     } p;                // Status
 

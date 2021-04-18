@@ -157,7 +157,13 @@ static void latch_interrupts(struct mos6502 *self)
 
 static void poll_interrupts(struct mos6502 *self)
 {
+    if (self->nmi == NIS_PENDING) {
+        self->nmi = NIS_COMMITTED;
+    }
 
+    if (self->irq == NIS_PENDING) {
+        self->irq = NIS_COMMITTED;
+    }
 }
 
 // NOTE: res takes effect after two cycles and immediately resets/halts

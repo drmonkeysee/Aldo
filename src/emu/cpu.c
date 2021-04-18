@@ -97,7 +97,8 @@ static void update_n(struct mos6502 *self, uint8_t d)
 static void check_interrupts(struct mos6502 *self)
 {
     // NOTE: serviced state is only for assisting in nmi edge detection
-    assert(self->res != NIS_SERVICED || self->irq != NIS_SERVICED);
+    assert(self->res != NIS_SERVICED);
+    assert(self->irq != NIS_SERVICED);
 
     if (!self->signal.res && self->res == NIS_CLEAR) {
         self->res = NIS_DETECTED;

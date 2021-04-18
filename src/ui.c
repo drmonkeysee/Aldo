@@ -282,7 +282,7 @@ static void draw_cpu_line(bool signal, int y, int x, int dir_offset,
 static void draw_interrupt_latch(enum nistate interrupt, int y, int x)
 {
     const char *modifier = "";
-    attr_t style;
+    attr_t style = A_NORMAL;
     switch (interrupt) {
     case NIS_CLEAR:
         // NOTE: draw nothing for CLEAR state
@@ -294,8 +294,10 @@ static void draw_interrupt_latch(enum nistate interrupt, int y, int x)
         style = A_UNDERLINE;
         modifier = "\u0305";
         break;
+    case NIS_SERVICED:
+        modifier = "\u0338";
+        break;
     default:
-        style = A_NORMAL;
         break;
     }
 

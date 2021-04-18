@@ -161,7 +161,7 @@ static void poll_interrupts(struct mos6502 *self)
         self->nmi = NIS_COMMITTED;
     }
 
-    if (self->irq == NIS_PENDING) {
+    if (self->irq == NIS_PENDING && !self->p.i) {
         self->irq = NIS_COMMITTED;
     }
 }

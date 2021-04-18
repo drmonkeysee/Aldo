@@ -34,6 +34,7 @@ static void irq_poll_sequence(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     cpu.ram = mem;
+    cpu.p.i = false;
 
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
@@ -99,6 +100,35 @@ static void irq_level_dependent(void *ctx)
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(3u, cpu.pc);
+}
+
+static void irq_masked(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
+    cpu.ram = mem;
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(3u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 }
 
@@ -292,6 +322,7 @@ struct ct_testsuite cpu_interrupt_tests(void)
         ct_maketest(irq_poll_sequence),
         ct_maketest(irq_too_short),
         ct_maketest(irq_level_dependent),
+        ct_maketest(irq_masked),
         ct_maketest(irq_detect_duplicate),
         ct_maketest(nmi_poll_sequence),
         ct_maketest(nmi_too_short),

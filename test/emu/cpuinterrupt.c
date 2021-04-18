@@ -390,6 +390,146 @@ static void irq_masked(void *ctx)
     ct_assertequal(3u, cpu.pc);
 }
 
+static void irq_missed_by_sei(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: SEI
+    uint8_t mem[] = {0x78, 0xff, 0xff, 0xff, 0xff};
+    cpu.ram = mem;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+}
+
+static void irq_missed_by_plp_set_mask(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: PLP (@ $0101)
+    uint8_t mem[] = {0x28, 0xff, 0xff, 0xff, 0xff, [257] = 0x4};
+    cpu.ram = mem;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+}
+
+static void irq_missed_by_cli(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: CLI, LDA #$20
+    uint8_t mem[] = {0x58, 0xa9, 0x20, 0xff, 0xff};
+    cpu.ram = mem;
+    cpu.p.i = true;
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(2u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+}
+
+static void irq_missed_by_plp_clear_mask(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: PLP (@ $0101), LDA #$20
+    uint8_t mem[] = {0x28, 0xa9, 0x20, 0xff, 0xff, [257] = 0x0};
+    cpu.ram = mem;
+    cpu.p.i = true;
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(2u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+}
+
 static void irq_detect_duplicate(void *ctx)
 {
     struct mos6502 cpu;
@@ -838,6 +978,10 @@ struct ct_testsuite cpu_interrupt_tests(void)
         ct_maketest(irq_too_short),
         ct_maketest(irq_level_dependent),
         ct_maketest(irq_masked),
+        ct_maketest(irq_missed_by_sei),
+        ct_maketest(irq_missed_by_plp_set_mask),
+        ct_maketest(irq_missed_by_cli),
+        ct_maketest(irq_missed_by_plp_clear_mask),
         ct_maketest(irq_detect_duplicate),
         ct_maketest(nmi_poll_sequence),
         ct_maketest(nmi_short_sequence),

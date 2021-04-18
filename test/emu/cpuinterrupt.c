@@ -207,6 +207,48 @@ static void irq_delayed_on_branch_taken_if_late_signal(void *ctx)
     ct_assertequal(6u, cpu.pc);
 }
 
+static void irq_delayed_on_infinite_branch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: BEQ -2 jump to itself
+    uint8_t mem[] = {0xf0, 0xfe, 0xff};
+    cpu.ram = mem;
+    cpu.p.z = true;
+    cpu.p.i = false;
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(0u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(0u, cpu.pc);
+}
+
 static void irq_on_branch_page_boundary(void *ctx)
 {
     struct mos6502 cpu;
@@ -724,6 +766,47 @@ static void nmi_delayed_on_branch_taken_if_late_signal(void *ctx)
     ct_assertequal(6u, cpu.pc);
 }
 
+static void nmi_delayed_on_infinite_branch(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: BEQ -2 jump to itself
+    uint8_t mem[] = {0xf0, 0xfe, 0xff};
+    cpu.ram = mem;
+    cpu.p.z = true;
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.nmi);
+    ct_assertequal(0u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.nmi);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(0u, cpu.pc);
+}
+
 static void nmi_on_branch_page_boundary(void *ctx)
 {
     struct mos6502 cpu;
@@ -963,6 +1046,7 @@ struct ct_testsuite cpu_interrupt_tests(void)
         ct_maketest(irq_branch_not_taken),
         ct_maketest(irq_on_branch_taken_if_early_signal),
         ct_maketest(irq_delayed_on_branch_taken_if_late_signal),
+        ct_maketest(irq_delayed_on_infinite_branch),
         ct_maketest(irq_on_branch_page_boundary),
         ct_maketest(irq_just_in_time),
         ct_maketest(irq_too_late),
@@ -980,6 +1064,7 @@ struct ct_testsuite cpu_interrupt_tests(void)
         ct_maketest(nmi_branch_not_taken),
         ct_maketest(nmi_on_branch_taken_if_early_signal),
         ct_maketest(nmi_delayed_on_branch_taken_if_late_signal),
+        ct_maketest(nmi_delayed_on_infinite_branch),
         ct_maketest(nmi_on_branch_page_boundary),
         ct_maketest(nmi_just_in_time),
         ct_maketest(nmi_too_late),

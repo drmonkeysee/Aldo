@@ -32,6 +32,7 @@ static void irq_poll_sequence(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
+    // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     cpu.ram = mem;
     cpu.p.i = false;
@@ -56,6 +57,98 @@ static void irq_poll_sequence(void *ctx)
 
     ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
+}
+
+static void irq_short_sequence(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: LDA #$20
+    uint8_t mem[] = {0xa9, 0x20, 0xff, 0xff, 0xff};
+    cpu.ram = mem;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(2u, cpu.pc);
+}
+
+static void irq_just_in_time(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
+    cpu.ram = mem;
+    cpu.p.i = false;
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(3u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(3u, cpu.pc);
+}
+
+static void irq_too_late(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: LDA $0006 (0x99), LDA #$20
+    uint8_t mem[] = {0xad, 0x6, 0x0, 0xa9, 0x20, 0xff, 0x99};
+    cpu.ram = mem;
+    cpu.p.i = false;
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(3u, cpu.pc);
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(3u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(4u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(5u, cpu.pc);
 }
 
 static void irq_too_short(void *ctx)
@@ -162,6 +255,7 @@ static void nmi_poll_sequence(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
+    // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     cpu.ram = mem;
 
@@ -185,6 +279,95 @@ static void nmi_poll_sequence(void *ctx)
 
     ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
     ct_assertequal(3u, cpu.pc);
+}
+
+static void nmi_short_sequence(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: LDA #$20
+    uint8_t mem[] = {0xa9, 0x20, 0xff, 0xff, 0xff};
+    cpu.ram = mem;
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(2u, cpu.pc);
+}
+
+static void nmi_just_in_time(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
+    cpu.ram = mem;
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(3u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(3u, cpu.pc);
+}
+
+static void nmi_too_late(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: LDA $0006 (0x99), LDA #$20
+    uint8_t mem[] = {0xad, 0x6, 0x0, 0xa9, 0x20, 0xff, 0x99};
+    cpu.ram = mem;
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(3u, cpu.pc);
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(3u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.nmi);
+    ct_assertequal(4u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(5u, cpu.pc);
 }
 
 static void nmi_too_short(void *ctx)
@@ -320,11 +503,17 @@ struct ct_testsuite cpu_interrupt_tests(void)
     static const struct ct_testcase tests[] = {
         ct_maketest(clear_on_startup),
         ct_maketest(irq_poll_sequence),
+        ct_maketest(irq_short_sequence),
+        ct_maketest(irq_just_in_time),
+        ct_maketest(irq_too_late),
         ct_maketest(irq_too_short),
         ct_maketest(irq_level_dependent),
         ct_maketest(irq_masked),
         ct_maketest(irq_detect_duplicate),
         ct_maketest(nmi_poll_sequence),
+        ct_maketest(nmi_short_sequence),
+        ct_maketest(nmi_just_in_time),
+        ct_maketest(nmi_too_late),
         ct_maketest(nmi_too_short),
         ct_maketest(nmi_edge_persist),
         ct_maketest(nmi_serviced_only_clears_on_inactive),

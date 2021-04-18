@@ -23,6 +23,7 @@ enum nistate {
     NIS_DETECTED,
     NIS_PENDING,
     NIS_COMMITTED,
+    NIS_SERVICED,
 };
 
 struct console_state {

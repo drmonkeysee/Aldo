@@ -96,12 +96,23 @@ static void update_n(struct mos6502 *self, uint8_t d)
 // initiate interrupt detection.
 static void check_interrupts(struct mos6502 *self)
 {
+    // NOTE: serviced state is only for assisting in nmi edge detection
+    assert(self->res != NIS_SERVICED || self->irq != NIS_SERVICED);
+
     if (!self->signal.res && self->res == NIS_CLEAR) {
         self->res = NIS_DETECTED;
     }
-    if (!self->signal.nmi && self->nmi == NIS_CLEAR) {
-        self->nmi = NIS_DETECTED;
+
+    if (self->signal.nmi) {
+        if (self->nmi == NIS_SERVICED) {
+            self->nmi = NIS_CLEAR;
+        }
+    } else {
+        if (self->nmi == NIS_CLEAR) {
+            self->nmi = NIS_DETECTED;
+        }
     }
+
     if (!self->signal.irq && self->irq == NIS_CLEAR) {
         self->irq = NIS_DETECTED;
     }
@@ -123,7 +134,7 @@ static void latch_interrupts(struct mos6502 *self)
     }
 
     // NOTE: nmi is edge-detected so once it has latched in it remains
-    // set until cleared by a handler or reset.
+    // set until serviced by a handler or reset.
     if (self->signal.nmi) {
         if (self->nmi == NIS_DETECTED) {
             self->nmi = NIS_CLEAR;

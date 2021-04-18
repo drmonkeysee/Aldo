@@ -80,6 +80,47 @@ static void irq_short_sequence(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
+static void irq_long_sequence(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: DEC $0004 (0x20)
+    uint8_t mem[] = {0xce, 0x4, 0x0, 0xff, 0x20};
+    cpu.ram = mem;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(3u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(3u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(3u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(3u, cpu.pc);
+}
+
 static void irq_just_in_time(void *ctx)
 {
     struct mos6502 cpu;
@@ -301,6 +342,46 @@ static void nmi_short_sequence(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
+static void nmi_long_sequence(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: DEC $0004 (0x20)
+    uint8_t mem[] = {0xce, 0x4, 0x0, 0xff, 0x20};
+    cpu.ram = mem;
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.nmi);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.nmi);
+    ct_assertequal(3u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.nmi);
+    ct_assertequal(3u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.nmi);
+    ct_assertequal(3u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(3u, cpu.pc);
+}
+
 static void nmi_just_in_time(void *ctx)
 {
     struct mos6502 cpu;
@@ -504,6 +585,7 @@ struct ct_testsuite cpu_interrupt_tests(void)
         ct_maketest(clear_on_startup),
         ct_maketest(irq_poll_sequence),
         ct_maketest(irq_short_sequence),
+        ct_maketest(irq_long_sequence),
         ct_maketest(irq_just_in_time),
         ct_maketest(irq_too_late),
         ct_maketest(irq_too_short),
@@ -512,6 +594,7 @@ struct ct_testsuite cpu_interrupt_tests(void)
         ct_maketest(irq_detect_duplicate),
         ct_maketest(nmi_poll_sequence),
         ct_maketest(nmi_short_sequence),
+        ct_maketest(nmi_long_sequence),
         ct_maketest(nmi_just_in_time),
         ct_maketest(nmi_too_late),
         ct_maketest(nmi_too_short),

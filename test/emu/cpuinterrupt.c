@@ -11,7 +11,6 @@
 #include "emu/snapshot.h"
 
 #include <stdint.h>
-#include <stdlib.h>
 
 //
 // Interrupt Signals
@@ -212,37 +211,33 @@ static void irq_on_branch_page_boundary(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    // NOTE: BEQ -3 -> $FFFF
-    uint8_t mem[] = {0xf0, 0xfd, 0xff, [255] = 0xff};
+    // NOTE: BEQ +5 -> $0101
+    uint8_t mem[] = {[250] = 0xf0, 0x5, 0xff, [257] = 0xff};
     cpu.ram = mem;
-    // NOTE: 32k rom, starting at $8000 to allow reads of wraparound addresses
-    uint8_t *const rom = calloc(0x8000, sizeof *rom);
-    cpu.cart = rom;
     cpu.p.z = true;
     cpu.p.i = false;
+    cpu.pc = 250;
 
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_CLEAR, (int)cpu.irq);
-    ct_assertequal(1u, cpu.pc);
+    ct_assertequal(251u, cpu.pc);
 
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_DETECTED, (int)cpu.irq);
-    ct_assertequal(2u, cpu.pc);
+    ct_assertequal(252u, cpu.pc);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_PENDING, (int)cpu.irq);
-    ct_assertequal(0x00ffu, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
-    ct_assertequal(0xffffu, cpu.pc);
-    // TODO: this will not be freed if asserts fail
-    free(rom);
+    ct_assertequal(257u, cpu.pc);
 }
 
 static void irq_just_in_time(void *ctx)
@@ -733,36 +728,32 @@ static void nmi_on_branch_page_boundary(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    // NOTE: BEQ -3 -> $FFFF
-    uint8_t mem[] = {0xf0, 0xfd, 0xff, [255] = 0xff};
+    // NOTE: BEQ +5 -> $0101
+    uint8_t mem[] = {[250] = 0xf0, 0x5, 0xff, [257] = 0xff};
     cpu.ram = mem;
-    // NOTE: 32k rom, starting at $8000 to allow reads of wraparound addresses
-    uint8_t *const rom = calloc(0x8000, sizeof *rom);
-    cpu.cart = rom;
     cpu.p.z = true;
+    cpu.pc = 250;
 
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
-    ct_assertequal(1u, cpu.pc);
+    ct_assertequal(251u, cpu.pc);
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
-    ct_assertequal(2u, cpu.pc);
+    ct_assertequal(252u, cpu.pc);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_PENDING, (int)cpu.nmi);
-    ct_assertequal(0x00ffu, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
-    ct_assertequal(0xffffu, cpu.pc);
-    // TODO: this will not be freed if asserts fail
-    free(rom);
+    ct_assertequal(257u, cpu.pc);
 }
 
 static void nmi_just_in_time(void *ctx)

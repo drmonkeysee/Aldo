@@ -11,6 +11,7 @@
 #include "emu/snapshot.h"
 
 #include <stdint.h>
+#include <stdlib.h>
 
 //
 // Interrupt Signals
@@ -119,6 +120,129 @@ static void irq_long_sequence(void *ctx)
 
     ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
+}
+
+static void irq_branch_not_taken(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: BEQ +3 jump to SEC
+    uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
+    cpu.ram = mem;
+    cpu.p.z = false;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(2u, cpu.pc);
+}
+
+static void irq_on_branch_taken_if_early_signal(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: BEQ +3 jump to SEC
+    uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
+    cpu.ram = mem;
+    cpu.p.z = true;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(5u, cpu.pc);
+}
+
+static void irq_delayed_on_branch_taken_if_late_signal(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: BEQ +3 jump to SEC
+    uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
+    cpu.ram = mem;
+    cpu.p.z = true;
+    cpu.p.i = false;
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(5u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(6u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(6u, cpu.pc);
+}
+
+static void irq_on_branch_page_boundary(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: BEQ -3 -> $FFFF
+    uint8_t mem[] = {0xf0, 0xfd, 0xff, [255] = 0xff};
+    cpu.ram = mem;
+    // NOTE: 32k rom, starting at $8000 to allow reads of wraparound addresses
+    uint8_t *const rom = calloc(0x8000, sizeof *rom);
+    cpu.cart = rom;
+    cpu.p.z = true;
+    cpu.p.i = false;
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(0x00ffu, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(0xffffu, cpu.pc);
+    // TODO: this will not be freed if asserts fail
+    free(rom);
 }
 
 static void irq_just_in_time(void *ctx)
@@ -382,6 +506,125 @@ static void nmi_long_sequence(void *ctx)
     ct_assertequal(3u, cpu.pc);
 }
 
+static void nmi_branch_not_taken(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: BEQ +3 jump to SEC
+    uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
+    cpu.ram = mem;
+    cpu.p.z = false;
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(2u, cpu.pc);
+}
+
+static void nmi_on_branch_taken_if_early_signal(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: BEQ +3 jump to SEC
+    uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
+    cpu.ram = mem;
+    cpu.p.z = true;
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(5u, cpu.pc);
+}
+
+static void nmi_delayed_on_branch_taken_if_late_signal(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: BEQ +3 jump to SEC
+    uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
+    cpu.ram = mem;
+    cpu.p.z = true;
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.nmi);
+    ct_assertequal(5u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.nmi);
+    ct_assertequal(6u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(6u, cpu.pc);
+}
+
+static void nmi_on_branch_page_boundary(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: BEQ -3 -> $FFFF
+    uint8_t mem[] = {0xf0, 0xfd, 0xff, [255] = 0xff};
+    cpu.ram = mem;
+    // NOTE: 32k rom, starting at $8000 to allow reads of wraparound addresses
+    uint8_t *const rom = calloc(0x8000, sizeof *rom);
+    cpu.cart = rom;
+    cpu.p.z = true;
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(1u, cpu.pc);
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(2u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.nmi);
+    ct_assertequal(0x00ffu, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(0xffffu, cpu.pc);
+    // TODO: this will not be freed if asserts fail
+    free(rom);
+}
+
 static void nmi_just_in_time(void *ctx)
 {
     struct mos6502 cpu;
@@ -586,6 +829,10 @@ struct ct_testsuite cpu_interrupt_tests(void)
         ct_maketest(irq_poll_sequence),
         ct_maketest(irq_short_sequence),
         ct_maketest(irq_long_sequence),
+        ct_maketest(irq_branch_not_taken),
+        ct_maketest(irq_on_branch_taken_if_early_signal),
+        ct_maketest(irq_delayed_on_branch_taken_if_late_signal),
+        ct_maketest(irq_on_branch_page_boundary),
         ct_maketest(irq_just_in_time),
         ct_maketest(irq_too_late),
         ct_maketest(irq_too_short),
@@ -595,6 +842,10 @@ struct ct_testsuite cpu_interrupt_tests(void)
         ct_maketest(nmi_poll_sequence),
         ct_maketest(nmi_short_sequence),
         ct_maketest(nmi_long_sequence),
+        ct_maketest(nmi_branch_not_taken),
+        ct_maketest(nmi_on_branch_taken_if_early_signal),
+        ct_maketest(nmi_delayed_on_branch_taken_if_late_signal),
+        ct_maketest(nmi_on_branch_page_boundary),
         ct_maketest(nmi_just_in_time),
         ct_maketest(nmi_too_late),
         ct_maketest(nmi_too_short),

@@ -116,6 +116,7 @@ static void bcc_negative_wraparound(void *ctx)
 
     const int cycles = clock_cpu(&cpu);
 
+    free(rom);
     ct_assertequal(4, cycles);
     ct_assertequal(0xfff8u, cpu.pc);
 }

@@ -177,6 +177,7 @@ static bool reset_held(struct mos6502 *self)
     if (self->res == NIS_COMMITTED) {
         if (self->signal.res) {
             // TODO: fake the execution of the RES sequence
+            self->signal.rw = true;
             self->addrbus = ResetVector;
             read(self);
             self->adl = self->databus;
@@ -190,10 +191,9 @@ static bool reset_held(struct mos6502 *self)
             // on powerup this would result in $00 - $3 = $FD.
             self->s -= 3;
             self->presync = true;
-            self->res = NIS_CLEAR;
+            self->irq = self->nmi = self->res = NIS_CLEAR;
         } else {
             self->t = 0;
-            self->irq = self->nmi = NIS_CLEAR;
             return true;
         }
     }

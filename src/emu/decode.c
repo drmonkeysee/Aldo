@@ -13,7 +13,7 @@
 // Decoding table for all official MOS6502
 // and unofficial Ricoh 2A03 opcodes.
 const struct decoded Decode[] = {
-    UNK,    // 00 - BRK
+    {IN_BRK, AM_BRK},    // 00 - BRK
     {IN_ORA, AM_INDX},    // 01 - ORA (zp,X)
     UNK,    // 02 - Unofficial
     UNK,    // 03 - Unofficial

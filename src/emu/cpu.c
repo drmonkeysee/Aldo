@@ -454,7 +454,10 @@ static void BPL_exec(struct mos6502 *self)
 
 static void BRK_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    self->p.i = true;
+    self->irq = self->nmi = self->res = NIS_CLEAR;
+    self->pc = bytowr(self->adl, self->databus);
+    commit_operation(self);
 }
 
 static void BVC_exec(struct mos6502 *self)
@@ -1181,7 +1184,34 @@ static void JIND_sequence(struct mos6502 *self, struct decoded dec)
 
 static void BRK_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    switch (self->t) {
+    case 1:
+        self->addrbus = self->pc++;
+        read(self);
+        break;
+    case 2:
+        stack_push(self, self->pc >> 8);
+        break;
+    case 3:
+        stack_push(self, self->pc);
+        break;
+    case 4:
+        stack_push(self, get_p(self, false));
+        break;
+    case 5:
+        self->addrbus = IrqVector;
+        self->signal.rw = true;
+        read(self);
+        break;
+    case 6:
+        self->addrbus = IrqVector + 1;
+        self->adl = self->databus;
+        read(self);
+        dispatch_instruction(self, dec);
+        break;
+    default:
+        BAD_ADDR_SEQ;
+    }
 }
 
 static void RTI_sequence(struct mos6502 *self, struct decoded dec)

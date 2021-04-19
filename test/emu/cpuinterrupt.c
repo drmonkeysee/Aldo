@@ -9,11 +9,119 @@
 #include "cpuhelp.h"
 #include "emu/cpu.h"
 #include "emu/snapshot.h"
+#include "emu/traits.h"
 
 #include <stdint.h>
+#include <stdlib.h>
 
 //
-// Interrupt Signals
+// Interrupt Handling
+//
+
+static void interrupt_handler_setup(void **ctx)
+{
+    // NOTE: 32k rom, starting at $8000, for interrupt vectors
+    *ctx = calloc(0x8000, sizeof(uint8_t));
+}
+
+static void interrupt_handler_teardown(void **ctx)
+{
+    free(*ctx);
+}
+
+static void brk_handler(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x0, 0xff, 0xff, [511] = 0xff},
+            *rom = ctx;
+    rom[IrqVector & CpuCartAddrMask] = 0xaa;
+    rom[(IrqVector + 1) & CpuCartAddrMask] = 0xbb;
+    cpu.ram = mem;
+    cpu.cart = rom;
+    cpu.s = 0xff;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(0xbbaau, cpu.pc);
+
+    ct_assertequal(0u, mem[511]);
+    ct_assertequal(2u, mem[510]);
+    ct_assertequal(0x34u, mem[509]);
+}
+
+static void irq_handler(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+static void nmi_handler(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+static void res_handler(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+// NOTE: IRQ committed after push P, ending up with BRK flag (lost IRQ)
+static void brk_masks_irq(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+// NOTE: IRQ committed before push P, ending up with IRQ flag (lost BRK)
+static void irq_hijacks_brk(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+// NOTE: NMI committed after push P of BRK (odd flag state for NMI, BRK lost if NMI doesn't handle this case)
+static void nmi_with_brk_flag(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+// NOTE: NMI committed before push P of BRK (lost BRK)
+static void nmi_hijacks_brk(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+// NOTE: NMI committed before vector select
+static void nmi_hijacks_irq(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+// NOTE: NMI pending on vector select
+static void nmi_delayed_by_irq(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+// NOTE: NMI pending on vector select but goes inactive before interrupt clear
+static void nmi_lost_during_irq(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+// NOTE: set RES on on T4 to show hijack cannot be stopped
+static void res_hijacks_irq(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+// NOTE: set RES on on T4 to show hijack cannot be stopped
+static void res_hijacks_nmi(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+//
+// Interrupt Signal Detection
 //
 
 static void clear_on_startup(void *ctx)
@@ -1033,10 +1141,32 @@ static void res_too_short(void *ctx)
 }
 
 //
-// Test List
+// Test Lists
 //
 
-struct ct_testsuite cpu_interrupt_tests(void)
+struct ct_testsuite cpu_interrupt_handler_tests(void)
+{
+    static const struct ct_testcase tests[] = {
+        ct_maketest(brk_handler),
+        ct_maketest(irq_handler),
+        ct_maketest(nmi_handler),
+        ct_maketest(res_handler),
+        ct_maketest(brk_masks_irq),
+        ct_maketest(irq_hijacks_brk),
+        ct_maketest(nmi_with_brk_flag),
+        ct_maketest(nmi_hijacks_brk),
+        ct_maketest(nmi_hijacks_irq),
+        ct_maketest(nmi_delayed_by_irq),
+        ct_maketest(nmi_lost_during_irq),
+        ct_maketest(res_hijacks_irq),
+        ct_maketest(res_hijacks_nmi),
+    };
+
+    return ct_makesuite_setup_teardown(tests, interrupt_handler_setup,
+                                       interrupt_handler_teardown);
+}
+
+struct ct_testsuite cpu_interrupt_signal_tests(void)
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(clear_on_startup),

@@ -13,7 +13,7 @@
 #include <string.h>
 
 //
-// dis_errstr
+// Error Strings
 //
 
 static void errstr_returns_known_err(void *ctx)
@@ -31,7 +31,7 @@ static void errstr_returns_unknown_err(void *ctx)
 }
 
 //
-// dis_inst
+// Disassemble Instruction
 //
 
 static void inst_does_nothing_if_no_bytes(void *ctx)
@@ -43,6 +43,19 @@ static void inst_does_nothing_if_no_bytes(void *ctx)
     const int length = dis_inst(a, bytes, 0, buf);
 
     ct_assertequal(0, length);
+    ct_assertequalstr("", buf);
+}
+
+static void inst_eof(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    // NOTE: LDA abs with missing 3rd byte
+    const uint8_t bytes[] = {0xad, 0x43};
+    char buf[DIS_INST_SIZE] = {'\0'};
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(ASM_EOF, length);
     ct_assertequalstr("", buf);
 }
 
@@ -275,21 +288,19 @@ static void inst_disassembles_rts(void *ctx)
 }
 
 //
-// dis_datapath
+// Disassemble Datapath
 //
 
-static void datapath_addr_too_low(void *ctx)
+static void datapath_addr_not_in_rom(void *ctx)
 {
-    const uint8_t rom[] = {0xea, 0xff};
+    uint8_t ram[] = {0xa9, 0x43};
     const struct console_state sn = {
-        .cpu = {
-            .program_counter = 0x10,
-        },
         .datapath = {
+            .current_instruction = 0,
             .exec_cycle = 0,
-            .opcode = rom[0],
+            .opcode = ram[0],
         },
-        .rom = rom,
+        .ram = ram,
     };
     char buf[DIS_DATAP_SIZE] = {'\0'};
 
@@ -300,15 +311,14 @@ static void datapath_addr_too_low(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void datapath_offset_overflow(void *ctx)
+static void datapath_end_of_rom(void *ctx)
 {
-    const uint8_t rom[] = {0xad, 0x43, 0x21};
+    // NOTE: LDA abs with missing 3rd byte
+    const uint8_t rom[] = {0xad, 0x43};
     const struct console_state sn = {
-        .cpu = {
-            .program_counter = 0xfffe,
-        },
         .datapath = {
-            .exec_cycle = 0,
+            .current_instruction = 0xfffe,
+            .exec_cycle = 1,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1473,6 +1483,7 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(errstr_returns_unknown_err),
 
         ct_maketest(inst_does_nothing_if_no_bytes),
+        ct_maketest(inst_eof),
         ct_maketest(inst_disassembles_implied),
         ct_maketest(inst_disassembles_immediate),
         ct_maketest(inst_disassembles_zeropage),
@@ -1493,8 +1504,8 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(inst_disassembles_jsr),
         ct_maketest(inst_disassembles_rts),
 
-        ct_maketest(datapath_addr_too_low),
-        ct_maketest(datapath_offset_overflow),
+        ct_maketest(datapath_addr_not_in_rom),
+        ct_maketest(datapath_end_of_rom),
 
         ct_maketest(datapath_implied_cycle_zero),
         ct_maketest(datapath_implied_cycle_one),

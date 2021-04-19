@@ -21,7 +21,14 @@
 static void interrupt_handler_setup(void **ctx)
 {
     // NOTE: 32k rom, starting at $8000, for interrupt vectors
-    *ctx = calloc(0x8000, sizeof(uint8_t));
+    uint8_t *const rom = calloc(0x8000, sizeof(uint8_t));
+    rom[IrqVector & CpuCartAddrMask] = 0xaa;
+    rom[(IrqVector + 1) & CpuCartAddrMask] = 0xbb;
+    rom[NmiVector & CpuCartAddrMask] = 0x88;
+    rom[(NmiVector + 1) & CpuCartAddrMask] = 0x99;
+    rom[ResetVector & CpuCartAddrMask] = 0x44;
+    rom[(ResetVector + 1) & CpuCartAddrMask] = 0x55;
+    *ctx = rom;
 }
 
 static void interrupt_handler_teardown(void **ctx)
@@ -33,12 +40,9 @@ static void brk_handler(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x0, 0xff, 0xff, [511] = 0xff},
-            *rom = ctx;
-    rom[IrqVector & CpuCartAddrMask] = 0xaa;
-    rom[(IrqVector + 1) & CpuCartAddrMask] = 0xbb;
+    uint8_t mem[] = {0x0, 0xff, 0xff, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = rom;
+    cpu.cart = ctx;
     cpu.s = 0xff;
 
     const int cycles = clock_cpu(&cpu);

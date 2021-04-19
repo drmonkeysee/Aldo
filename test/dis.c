@@ -287,6 +287,18 @@ static void inst_disassembles_rts(void *ctx)
     ct_assertequalstr("$1234: 60          RTS", buf);
 }
 
+static void inst_disassembles_brk(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0x0};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+
+    ct_assertequal(1, length);
+    ct_assertequalstr("$1234: 00          BRK", buf);
+}
+
 //
 // Disassemble Datapath
 //
@@ -1472,6 +1484,66 @@ static void datapath_rts_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
+static void datapath_brk_cycle_zero(void *ctx)
+{
+    const uint8_t rom[] = {0x0, 0xff};
+    const struct console_state sn = {
+        .datapath = {
+            .exec_cycle = 0,
+            .current_instruction = 0x8000,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "BRK imp";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void datapath_brk_cycle_one(void *ctx)
+{
+    const uint8_t rom[] = {0x0, 0xff};
+    const struct console_state sn = {
+        .datapath = {
+            .exec_cycle = 1,
+            .current_instruction = 0x8000,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "BRK ";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void datapath_brk_cycle_n(void *ctx)
+{
+    const uint8_t rom[] = {0x0, 0xff};
+    const struct console_state sn = {
+        .datapath = {
+            .exec_cycle = 2,
+            .current_instruction = 0x8000,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "BRK ";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
 //
 // Test List
 //
@@ -1503,6 +1575,7 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(inst_disassembles_pull),
         ct_maketest(inst_disassembles_jsr),
         ct_maketest(inst_disassembles_rts),
+        ct_maketest(inst_disassembles_brk),
 
         ct_maketest(datapath_addr_not_in_rom),
         ct_maketest(datapath_end_of_rom),
@@ -1580,6 +1653,10 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(datapath_rts_cycle_zero),
         ct_maketest(datapath_rts_cycle_one),
         ct_maketest(datapath_rts_cycle_n),
+
+        ct_maketest(datapath_brk_cycle_zero),
+        ct_maketest(datapath_brk_cycle_one),
+        ct_maketest(datapath_brk_cycle_n),
     };
 
     return ct_makesuite(tests);

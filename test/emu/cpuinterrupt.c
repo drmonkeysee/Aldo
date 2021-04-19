@@ -1170,6 +1170,7 @@ struct ct_testsuite cpu_interrupt_signal_tests(void)
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(clear_on_startup),
+
         ct_maketest(irq_poll_sequence),
         ct_maketest(irq_short_sequence),
         ct_maketest(irq_long_sequence),
@@ -1188,6 +1189,7 @@ struct ct_testsuite cpu_interrupt_signal_tests(void)
         ct_maketest(irq_missed_by_cli),
         ct_maketest(irq_missed_by_plp_clear_mask),
         ct_maketest(irq_detect_duplicate),
+
         ct_maketest(nmi_poll_sequence),
         ct_maketest(nmi_short_sequence),
         ct_maketest(nmi_long_sequence),
@@ -1201,6 +1203,7 @@ struct ct_testsuite cpu_interrupt_signal_tests(void)
         ct_maketest(nmi_too_short),
         ct_maketest(nmi_edge_persist),
         ct_maketest(nmi_serviced_only_clears_on_inactive),
+
         ct_maketest(res_detected_and_cpu_held),
         ct_maketest(res_too_short),
     };

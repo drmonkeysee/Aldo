@@ -53,16 +53,75 @@ static void brk_handler(void *ctx)
     ct_assertequal(0u, mem[511]);
     ct_assertequal(2u, mem[510]);
     ct_assertequal(0x34u, mem[509]);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(NIS_CLEAR, (int)cpu.res);
 }
 
 static void irq_handler(void *ctx)
 {
-    ct_assertfail("Not implemented");
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: LDA $0004 (0x20)
+    uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20, [511] = 0xff};
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+    cpu.p.i = false;
+    cpu.signal.irq = false;
+
+    int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+
+    cpu.signal.irq = true;
+    cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(0xbbaau, cpu.pc);
+
+    ct_assertequal(0u, mem[511]);
+    ct_assertequal(3u, mem[510]);
+    ct_assertequal(0x20u, mem[509]);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(NIS_CLEAR, (int)cpu.res);
 }
 
 static void nmi_handler(void *ctx)
 {
-    ct_assertfail("Not implemented");
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: LDA $0004 (0x20)
+    uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20, [511] = 0xff};
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+    cpu.signal.nmi = false;
+
+    int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+
+    cpu.signal.nmi = true;
+    cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(0x9988u, cpu.pc);
+
+    ct_assertequal(0u, mem[511]);
+    ct_assertequal(3u, mem[510]);
+    ct_assertequal(0x24u, mem[509]);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(NIS_SERVICED, (int)cpu.nmi);
+    ct_assertequal(NIS_CLEAR, (int)cpu.res);
 }
 
 static void res_handler(void *ctx)

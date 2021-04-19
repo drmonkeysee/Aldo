@@ -135,6 +135,7 @@ struct decoded {
     enum addrmode mode;
 };
 
+extern const int BrkOpcode;
 extern const struct decoded Decode[];
 
 #endif

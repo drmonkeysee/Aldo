@@ -1178,8 +1178,11 @@ static void BRK_sequence(struct mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
-        self->addrbus = self->pc++;
+        self->addrbus = self->pc;
         read(self);
+        if (self->irq != NIS_COMMITTED) {
+            ++self->pc;
+        }
         break;
     case 2:
         stack_push(self, self->pc >> 8);
@@ -1188,7 +1191,7 @@ static void BRK_sequence(struct mos6502 *self, struct decoded dec)
         stack_push(self, self->pc);
         break;
     case 4:
-        stack_push(self, get_p(self, false));
+        stack_push(self, get_p(self, self->irq == NIS_COMMITTED));
         break;
     case 5:
         self->addrbus = IrqVector;
@@ -1278,9 +1281,14 @@ int cpu_cycle(struct mos6502 *self)
     if (++self->t == 0) {
         // NOTE: T0 is always an opcode fetch
         self->signal.sync = true;
-        self->addrbus = self->pc++;
+        self->addrbus = self->pc;
         read(self);
-        self->opc = self->databus;
+        if (self->irq == NIS_COMMITTED) {
+            self->opc = BrkOpcode;
+        } else {
+            self->opc = self->databus;
+            ++self->pc;
+        }
         self->addrinst = self->addrbus;
     } else {
         self->signal.sync = false;

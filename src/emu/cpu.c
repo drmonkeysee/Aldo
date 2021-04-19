@@ -19,7 +19,7 @@ static const int PreFetch = -1;     // Sentinel value for cycle count
 
 static void read(struct mos6502 *self)
 {
-    assert(self->signal.rw);
+    self->signal.rw = true;
 
     if (self->addrbus <= CpuRamMaxAddr) {
         self->databus = self->ram[self->addrbus & CpuRamAddrMask];
@@ -34,7 +34,7 @@ static void read(struct mos6502 *self)
 
 static void write(struct mos6502 *self)
 {
-    assert(!self->signal.rw);
+    self->signal.rw = false;
 
     if (self->addrbus <= CpuRamMaxAddr) {
         self->ram[self->addrbus & CpuRamAddrMask] = self->databus;
@@ -176,7 +176,6 @@ static bool reset_held(struct mos6502 *self)
     if (self->res == NIS_COMMITTED) {
         if (self->signal.res) {
             // TODO: fake the execution of the RES sequence
-            self->signal.rw = true;
             self->addrbus = ResetVector;
             read(self);
             self->adl = self->databus;
@@ -246,7 +245,6 @@ static void load_register(struct mos6502 *self, uint8_t *r, uint8_t d)
 
 static void store_data(struct mos6502 *self, uint8_t d)
 {
-    self->signal.rw = false;
     self->databus = d;
     write(self);
 }
@@ -797,7 +795,6 @@ static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
         dispatch_instruction(self, dec);
         break;
     case 4:
-        self->signal.rw = false;
         write(self);
         break;
     case 5:
@@ -832,7 +829,6 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
         dispatch_instruction(self, dec);
         break;
     case 5:
-        self->signal.rw = false;
         write(self);
         break;
     case 6:
@@ -897,7 +893,6 @@ static void ZP_sequence(struct mos6502 *self, struct decoded dec)
         dispatch_instruction(self, dec);
         break;
     case 3:
-        self->signal.rw = false;
         write(self);
         break;
     case 4:
@@ -997,7 +992,6 @@ static void ABS_sequence(struct mos6502 *self, struct decoded dec)
         dispatch_instruction(self, dec);
         break;
     case 4:
-        self->signal.rw = false;
         write(self);
         break;
     case 5:
@@ -1098,7 +1092,6 @@ static void JSR_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 5:
         self->addrbus = self->pc;
-        self->signal.rw = true;
         read(self);
         dispatch_instruction(self, dec);
         break;
@@ -1199,7 +1192,6 @@ static void BRK_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 5:
         self->addrbus = IrqVector;
-        self->signal.rw = true;
         read(self);
         break;
     case 6:
@@ -1285,7 +1277,7 @@ int cpu_cycle(struct mos6502 *self)
     latch_interrupts(self);
     if (++self->t == 0) {
         // NOTE: T0 is always an opcode fetch
-        self->signal.sync = self->signal.rw = true;
+        self->signal.sync = true;
         self->addrbus = self->pc++;
         read(self);
         self->opc = self->databus;

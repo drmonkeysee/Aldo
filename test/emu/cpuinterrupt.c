@@ -120,7 +120,7 @@ static void nmi_handler(void *ctx)
     ct_assertequal(0x24u, mem[509]);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(NIS_CLEAR, (int)cpu.irq);
-    ct_assertequal(NIS_SERVICED, (int)cpu.nmi);
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
     ct_assertequal(NIS_CLEAR, (int)cpu.res);
 }
 
@@ -139,6 +139,37 @@ static void brk_masks_irq(void *ctx)
 static void irq_hijacks_brk(void *ctx)
 {
     ct_assertfail("Not implemented");
+}
+
+static void nmi_line_never_cleared(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: LDA $0004 (0x20)
+    uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [511] = 0xff};
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+    cpu.signal.nmi = false;
+
+    int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+
+    cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(0x9988u, cpu.pc);
+
+    ct_assertequal(0u, mem[511]);
+    ct_assertequal(3u, mem[510]);
+    ct_assertequal(0x24u, mem[509]);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(NIS_SERVICED, (int)cpu.nmi);
+    ct_assertequal(NIS_CLEAR, (int)cpu.res);
 }
 
 // NOTE: NMI committed after push P of BRK (odd flag state for NMI, BRK lost if NMI doesn't handle this case)
@@ -752,7 +783,10 @@ static void irq_detect_duplicate(void *ctx)
 
     ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
 
+    // NOTE: reset cpu to simulate interrupt has been serviced
     cpu.irq = NIS_CLEAR;
+    cpu.pc = 0;
+    cpu.presync = true;
     cpu_cycle(&cpu);
 
     // NOTE: if irq is still held active after servicing it'll
@@ -1138,7 +1172,10 @@ static void nmi_serviced_only_clears_on_inactive(void *ctx)
 
     ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
 
+    // NOTE: reset cpu to simulate interrupt has been serviced
     cpu.nmi = NIS_SERVICED;
+    cpu.pc = 0;
+    cpu.presync = true;
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_SERVICED, (int)cpu.nmi);
@@ -1216,6 +1253,7 @@ struct ct_testsuite cpu_interrupt_handler_tests(void)
         ct_maketest(res_handler),
         ct_maketest(brk_masks_irq),
         ct_maketest(irq_hijacks_brk),
+        ct_maketest(nmi_line_never_cleared),
         ct_maketest(nmi_with_brk_flag),
         ct_maketest(nmi_hijacks_brk),
         ct_maketest(nmi_hijacks_irq),

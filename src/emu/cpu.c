@@ -165,6 +165,18 @@ static void poll_interrupts(struct mos6502 *self)
     }
 }
 
+static bool service_interrupt(struct mos6502 *self)
+{
+    return self->nmi == NIS_COMMITTED || self->irq == NIS_COMMITTED;
+}
+
+static uint16_t interrupt_vector(struct mos6502 *self)
+{
+    if (self->res == NIS_COMMITTED) return ResetVector;
+    if (self->nmi == NIS_COMMITTED) return NmiVector;
+    return IrqVector;
+}
+
 // NOTE: res takes effect after two cycles and immediately resets/halts
 // the cpu until the res line goes high again (this isn't strictly true
 // but the real cpu complexity isn't necessary here).
@@ -452,7 +464,8 @@ static void BPL_exec(struct mos6502 *self)
 static void BRK_exec(struct mos6502 *self)
 {
     self->p.i = true;
-    self->irq = self->nmi = self->res = NIS_CLEAR;
+    self->nmi = self->nmi == NIS_COMMITTED ? NIS_SERVICED : NIS_CLEAR;
+    self->irq = self->res = NIS_CLEAR;
     self->pc = bytowr(self->adl, self->databus);
     commit_operation(self);
 }
@@ -1180,7 +1193,7 @@ static void BRK_sequence(struct mos6502 *self, struct decoded dec)
     case 1:
         self->addrbus = self->pc;
         read(self);
-        if (self->irq != NIS_COMMITTED) {
+        if (!service_interrupt(self)) {
             ++self->pc;
         }
         break;
@@ -1191,14 +1204,14 @@ static void BRK_sequence(struct mos6502 *self, struct decoded dec)
         stack_push(self, self->pc);
         break;
     case 4:
-        stack_push(self, get_p(self, self->irq == NIS_COMMITTED));
+        stack_push(self, get_p(self, service_interrupt(self)));
         break;
     case 5:
-        self->addrbus = IrqVector;
+        self->addrbus = interrupt_vector(self);
         read(self);
         break;
     case 6:
-        self->addrbus = IrqVector + 1;
+        self->addrbus = interrupt_vector(self) + 1;
         self->adl = self->databus;
         read(self);
         dispatch_instruction(self, dec);
@@ -1283,7 +1296,7 @@ int cpu_cycle(struct mos6502 *self)
         self->signal.sync = true;
         self->addrbus = self->pc;
         read(self);
-        if (self->irq == NIS_COMMITTED) {
+        if (service_interrupt(self)) {
             self->opc = BrkOpcode;
         } else {
             self->opc = self->databus;

@@ -187,13 +187,7 @@ static bool reset_held(struct mos6502 *self)
         self->res = NIS_COMMITTED;
         self->presync = true;
     }
-    if (self->res == NIS_COMMITTED) {
-        if (!self->signal.res) {
-            self->t = 0;
-            return true;
-        }
-    }
-    return false;
+    return self->res == NIS_COMMITTED && !self->signal.res;
 }
 
 //

@@ -167,7 +167,8 @@ static void poll_interrupts(struct mos6502 *self)
 
 static bool service_interrupt(struct mos6502 *self)
 {
-    return self->nmi == NIS_COMMITTED || self->irq == NIS_COMMITTED;
+    return self->res == NIS_COMMITTED || self->nmi == NIS_COMMITTED
+           || self->irq == NIS_COMMITTED;
 }
 
 static uint16_t interrupt_vector(struct mos6502 *self)
@@ -184,25 +185,10 @@ static bool reset_held(struct mos6502 *self)
 {
     if (self->res == NIS_PENDING) {
         self->res = NIS_COMMITTED;
+        self->presync = true;
     }
     if (self->res == NIS_COMMITTED) {
-        if (self->signal.res) {
-            // TODO: fake the execution of the RES sequence
-            self->addrbus = ResetVector;
-            read(self);
-            self->adl = self->databus;
-            self->addrbus = ResetVector + 1;
-            read(self);
-            self->adh = self->databus;
-            self->pc = bytowr(self->adl, self->adh);
-            self->p.i = true;
-            // NOTE: Reset runs through same sequence as BRK/IRQ
-            // so the cpu does 3 phantom stack pushes;
-            // on powerup this would result in $00 - $3 = $FD.
-            self->s -= 3;
-            self->presync = true;
-            self->irq = self->nmi = self->res = NIS_CLEAR;
-        } else {
+        if (!self->signal.res) {
             self->t = 0;
             return true;
         }
@@ -333,6 +319,15 @@ static void stack_push(struct mos6502 *self, uint8_t d)
 {
     self->addrbus = bytowr(self->s--, 0x1);
     store_data(self, d);
+}
+
+static void interrupt_push(struct mos6502 *self, uint8_t d)
+{
+    if (self->res == NIS_COMMITTED) {
+        --self->s;
+    } else {
+        stack_push(self, d);
+    }
 }
 
 // NOTE: all 6502 cycles are either a read or a write, some of them discarded
@@ -1198,13 +1193,13 @@ static void BRK_sequence(struct mos6502 *self, struct decoded dec)
         }
         break;
     case 2:
-        stack_push(self, self->pc >> 8);
+        interrupt_push(self, self->pc >> 8);
         break;
     case 3:
-        stack_push(self, self->pc);
+        interrupt_push(self, self->pc);
         break;
     case 4:
-        stack_push(self, get_p(self, service_interrupt(self)));
+        interrupt_push(self, get_p(self, service_interrupt(self)));
         break;
     case 5:
         self->addrbus = interrupt_vector(self);

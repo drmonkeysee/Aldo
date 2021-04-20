@@ -24,10 +24,10 @@ static void interrupt_handler_setup(void **ctx)
     uint8_t *const rom = calloc(0x8000, sizeof(uint8_t));
     rom[IrqVector & CpuCartAddrMask] = 0xaa;
     rom[(IrqVector + 1) & CpuCartAddrMask] = 0xbb;
-    rom[NmiVector & CpuCartAddrMask] = 0x88;
+    rom[NmiVector & CpuCartAddrMask] = 0x77;
     rom[(NmiVector + 1) & CpuCartAddrMask] = 0x99;
-    rom[ResetVector & CpuCartAddrMask] = 0x44;
-    rom[(ResetVector + 1) & CpuCartAddrMask] = 0x55;
+    rom[ResetVector & CpuCartAddrMask] = 0x22;
+    rom[(ResetVector + 1) & CpuCartAddrMask] = 0x88;
     *ctx = rom;
 }
 
@@ -53,6 +53,7 @@ static void brk_handler(void *ctx)
     ct_assertequal(0u, mem[511]);
     ct_assertequal(2u, mem[510]);
     ct_assertequal(0x34u, mem[509]);
+    ct_assertequal(0xfcu, cpu.s);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(NIS_CLEAR, (int)cpu.irq);
     ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
@@ -86,6 +87,7 @@ static void irq_handler(void *ctx)
     ct_assertequal(0u, mem[511]);
     ct_assertequal(3u, mem[510]);
     ct_assertequal(0x20u, mem[509]);
+    ct_assertequal(0xfcu, cpu.s);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(NIS_CLEAR, (int)cpu.irq);
     ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
@@ -113,11 +115,12 @@ static void nmi_handler(void *ctx)
     cycles = clock_cpu(&cpu);
 
     ct_assertequal(7, cycles);
-    ct_assertequal(0x9988u, cpu.pc);
+    ct_assertequal(0x9977u, cpu.pc);
 
     ct_assertequal(0u, mem[511]);
     ct_assertequal(3u, mem[510]);
     ct_assertequal(0x24u, mem[509]);
+    ct_assertequal(0xfcu, cpu.s);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(NIS_CLEAR, (int)cpu.irq);
     ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
@@ -126,7 +129,46 @@ static void nmi_handler(void *ctx)
 
 static void res_handler(void *ctx)
 {
-    ct_assertfail("Not implemented");
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: LDA $0004 (0x20)
+    uint8_t mem[] = {
+        0xad, 0x4, 0x0, 0xff, 0x20, [509] = 0xdd, [510] = 0xee, [511] = 0xff,
+    };
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+    cpu.signal.res = false;
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(1u, cpu.pc);
+    ct_assertequal(NIS_DETECTED, (int)cpu.res);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(2u, cpu.pc);
+    ct_assertequal(NIS_PENDING, (int)cpu.res);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(2u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+
+    cpu.signal.res = true;
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(0x8822u, cpu.pc);
+
+    ct_assertequal(0xffu, mem[511]);
+    ct_assertequal(0xeeu, mem[510]);
+    ct_assertequal(0xddu, mem[509]);
+    ct_assertequal(0xfcu, cpu.s);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(NIS_CLEAR, (int)cpu.res);
 }
 
 // NOTE: IRQ committed after push P, ending up with BRK flag (lost IRQ)
@@ -161,11 +203,12 @@ static void nmi_line_never_cleared(void *ctx)
     cycles = clock_cpu(&cpu);
 
     ct_assertequal(7, cycles);
-    ct_assertequal(0x9988u, cpu.pc);
+    ct_assertequal(0x9977u, cpu.pc);
 
     ct_assertequal(0u, mem[511]);
     ct_assertequal(3u, mem[510]);
     ct_assertequal(0x24u, mem[509]);
+    ct_assertequal(0xfcu, cpu.s);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(NIS_CLEAR, (int)cpu.irq);
     ct_assertequal(NIS_SERVICED, (int)cpu.nmi);

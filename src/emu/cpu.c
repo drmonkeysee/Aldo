@@ -318,6 +318,7 @@ static void stack_push(struct mos6502 *self, uint8_t d)
 static void interrupt_push(struct mos6502 *self, uint8_t d)
 {
     if (self->res == NIS_COMMITTED) {
+        stack_top(self);
         --self->s;
     } else {
         stack_push(self, d);

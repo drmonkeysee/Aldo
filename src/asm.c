@@ -40,6 +40,36 @@ static const char *restrict const *const StringTables[] = {
 #undef X
 };
 
+struct instmem {
+    const uint8_t *bytes;
+    enum cpumem space;
+    uint16_t offset, size;
+};
+
+static struct instmem make_imem(uint16_t addr,
+                                const struct console_state *snapshot)
+{
+    const enum cpumem space = addr_to_cpumem(addr);
+    switch (space) {
+    case CMEM_RAM:
+        return (struct instmem){
+            snapshot->ram,
+            space,
+            addr & CpuRamAddrMask,
+            RAM_SIZE,
+        };
+    case CMEM_ROM:
+        return (struct instmem){
+            snapshot->rom,
+            space,
+            addr & CpuCartAddrMask,
+            ROM_SIZE,
+        };
+    default:
+        return (struct instmem){.space = space};
+    }
+}
+
 static int print_raw(uint16_t addr, const uint8_t *dispc, int instlen,
                      char dis[restrict static DIS_INST_SIZE])
 {
@@ -131,23 +161,10 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
 int dis_prgline(uint16_t addr, const struct console_state *snapshot,
                 char dis[restrict static DIS_INST_SIZE])
 {
-    const enum cpumem space = addr_to_cpumem(addr);
-    if (space == CMEM_NONE) return ASM_RANGE;
-
-    uint16_t addrmask;
-    const uint8_t *mem;
-    size_t memsize;
-    if (space == CMEM_RAM) {
-        addrmask = CpuRamAddrMask;
-        mem = snapshot->ram;
-        memsize = RAM_SIZE;
-    } else {
-        addrmask = CpuCartAddrMask;
-        mem = snapshot->rom;
-        memsize = ROM_SIZE;
-    }
-    const size_t mem_offset = addr & addrmask;
-    return dis_inst(addr, mem + mem_offset, memsize - mem_offset, dis);
+    const struct instmem imem = make_imem(addr, snapshot);
+    if (imem.space == CMEM_NONE) return ASM_RANGE;
+    return dis_inst(addr, imem.bytes + imem.offset, imem.size - imem.offset,
+                    dis);
 }
 
 int dis_datapath(const struct console_state *snapshot,
@@ -157,25 +174,12 @@ int dis_datapath(const struct console_state *snapshot,
     assert(dis != NULL);
 
     const uint16_t instaddr = snapshot->datapath.current_instruction;
-    const enum cpumem space = addr_to_cpumem(instaddr);
-    if (space == CMEM_NONE) return ASM_RANGE;
-
-    uint16_t memidx;
-    const uint8_t *mem;
-    size_t memsize;
-    if (space == CMEM_RAM) {
-        memidx = instaddr & CpuRamAddrMask;
-        mem = snapshot->ram;
-        memsize = RAM_SIZE;
-    } else {
-        memidx = instaddr & CpuCartAddrMask;
-        mem = snapshot->rom;
-        memsize = ROM_SIZE;
-    }
+    const struct instmem imem = make_imem(instaddr, snapshot);
+    if (imem.space == CMEM_NONE) return ASM_RANGE;
 
     const struct decoded dec = Decode[snapshot->datapath.opcode];
     const int instlen = InstLens[dec.mode];
-    if ((uint16_t)(memidx + instlen) >= memsize) return ASM_EOF;
+    if ((uint16_t)(imem.offset + instlen) >= imem.size) return ASM_EOF;
 
     int count;
     unsigned int total;
@@ -192,10 +196,11 @@ int dis_datapath(const struct console_state *snapshot,
         count = sprintf(dis + total, "%s", displaystr);
         break;
     case 1:
-        count = sprintf(dis + total, displaystr, mem[memidx + 1]);
+        count = sprintf(dis + total, displaystr, imem.bytes[imem.offset + 1]);
         break;
     default:
-        count = sprintf(dis + total, displaystr, batowr(mem + memidx + 1));
+        count = sprintf(dis + total, displaystr,
+                        batowr(imem.bytes + imem.offset + 1));
         break;
     }
     if (count < 0) return ASM_FMT_FAIL;

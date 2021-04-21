@@ -303,7 +303,7 @@ static void inst_disassembles_brk(void *ctx)
 // Disassemble Datapath
 //
 
-static void datapath_addr_not_in_rom(void *ctx)
+static void datapath_addr_in_ram(void *ctx)
 {
     uint8_t ram[] = {0xa9, 0x43};
     const struct console_state sn = {
@@ -314,12 +314,12 @@ static void datapath_addr_not_in_rom(void *ctx)
         },
         .ram = ram,
     };
-    char buf[DIS_DATAP_SIZE] = {'\0'};
+    char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
 
-    const char *const exp = "";
-    ct_assertequal(ASM_EOF, written);
+    const char *const exp = "LDA imm";
+    ct_assertequal((int)strlen(exp), written);
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
@@ -341,6 +341,26 @@ static void datapath_end_of_rom(void *ctx)
 
     const char *const exp = "";
     ct_assertequal(ASM_EOF, written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void datapath_not_in_valid_addr(void *ctx)
+{
+    const uint8_t rom[] = {0xea, 0xff};
+    const struct console_state sn = {
+        .datapath = {
+            .current_instruction = 0x2000,
+            .exec_cycle = 1,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE] = {'\0'};
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "";
+    ct_assertequal(ASM_RANGE, written);
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
@@ -1766,8 +1786,9 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(inst_disassembles_rts),
         ct_maketest(inst_disassembles_brk),
 
-        ct_maketest(datapath_addr_not_in_rom),
+        ct_maketest(datapath_addr_in_ram),
         ct_maketest(datapath_end_of_rom),
+        ct_maketest(datapath_not_in_valid_addr),
 
         ct_maketest(datapath_implied_cycle_zero),
         ct_maketest(datapath_implied_cycle_one),

@@ -135,12 +135,25 @@ int dis_datapath(const struct console_state *snapshot,
     assert(dis != NULL);
 
     const uint16_t instaddr = snapshot->datapath.current_instruction;
-    if (instaddr < CpuCartMinAddr) return ASM_EOF;
+    const enum cpumem space = addr_to_cpumem(instaddr);
+    if (space == CMEM_NONE) return ASM_RANGE;
+
+    uint16_t memidx;
+    const uint8_t *mem;
+    size_t memsize;
+    if (space == CMEM_RAM) {
+        memidx = instaddr & CpuRamAddrMask;
+        mem = snapshot->ram;
+        memsize = RAM_SIZE;
+    } else {
+        memidx = instaddr & CpuCartAddrMask;
+        mem = snapshot->rom;
+        memsize = ROM_SIZE;
+    }
 
     const struct decoded dec = Decode[snapshot->datapath.opcode];
     const int instlen = InstLens[dec.mode];
-    // NOTE: detect pc overflow
-    if ((uint16_t)(instaddr + instlen) < CpuCartMinAddr) return ASM_EOF;
+    if ((uint16_t)(memidx + instlen) >= memsize) return ASM_EOF;
 
     int count;
     unsigned int total;
@@ -152,17 +165,15 @@ int dis_datapath(const struct console_state *snapshot,
                            ? snapshot->datapath.exec_cycle
                            : max_offset;
     const char *const displaystr = StringTables[dec.mode][displayidx];
-    const uint16_t rom_idx = instaddr & CpuCartAddrMask;
     switch (displayidx) {
     case 0:
         count = sprintf(dis + total, "%s", displaystr);
         break;
     case 1:
-        count = sprintf(dis + total, displaystr, snapshot->rom[rom_idx + 1]);
+        count = sprintf(dis + total, displaystr, mem[memidx + 1]);
         break;
     default:
-        count = sprintf(dis + total, displaystr,
-                        batowr(snapshot->rom + rom_idx + 1));
+        count = sprintf(dis + total, displaystr, batowr(mem + memidx + 1));
         break;
     }
     if (count < 0) return ASM_FMT_FAIL;

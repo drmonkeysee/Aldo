@@ -186,7 +186,7 @@ static void drawinstructions(uint16_t addr, int h, int y,
         addr += bytes;
         const enum cpumem space = addr_to_cpumem(addr);
         if (space == CMEM_NONE) {
-            mvwaddstr(PrgView.content, i, 0, "OUT OF MEM RANGE");
+            mvwaddstr(PrgView.content, i, 0, dis_errstr(ASM_RANGE));
             break;
         }
         char disassembly[DIS_INST_SIZE];

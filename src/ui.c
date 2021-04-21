@@ -183,28 +183,9 @@ static void drawinstructions(uint16_t addr, int h, int y,
                              const struct console_state *snapshot)
 {
     for (int i = 0, bytes = 0; i < h - y; ++i) {
-        addr += bytes;
-        const enum cpumem space = addr_to_cpumem(addr);
-        if (space == CMEM_NONE) {
-            mvwaddstr(PrgView.content, i, 0, dis_errstr(ASM_RANGE));
-            break;
-        }
         char disassembly[DIS_INST_SIZE];
-        uint16_t addrmask;
-        const uint8_t *mem;
-        size_t memsize;
-        if (space == CMEM_RAM) {
-            addrmask = CpuRamAddrMask;
-            mem = snapshot->ram;
-            memsize = RAM_SIZE;
-        } else {
-            addrmask = CpuCartAddrMask;
-            mem = snapshot->rom;
-            memsize = ROM_SIZE;
-        }
-        const size_t mem_offset = addr & addrmask;
-        bytes = dis_inst(addr, mem + mem_offset, memsize - mem_offset,
-                         disassembly);
+        addr += bytes;
+        bytes = dis_prgline(addr, snapshot, disassembly);
         if (bytes == 0) break;
         if (bytes < 0) {
             mvwaddstr(PrgView.content, i, 0, dis_errstr(bytes));

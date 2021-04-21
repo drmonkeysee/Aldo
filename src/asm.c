@@ -128,6 +128,28 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
     return instlen;
 }
 
+int dis_prgline(uint16_t addr, const struct console_state *snapshot,
+                char dis[restrict static DIS_INST_SIZE])
+{
+    const enum cpumem space = addr_to_cpumem(addr);
+    if (space == CMEM_NONE) return ASM_RANGE;
+
+    uint16_t addrmask;
+    const uint8_t *mem;
+    size_t memsize;
+    if (space == CMEM_RAM) {
+        addrmask = CpuRamAddrMask;
+        mem = snapshot->ram;
+        memsize = RAM_SIZE;
+    } else {
+        addrmask = CpuCartAddrMask;
+        mem = snapshot->rom;
+        memsize = ROM_SIZE;
+    }
+    const size_t mem_offset = addr & addrmask;
+    return dis_inst(addr, mem + mem_offset, memsize - mem_offset, dis);
+}
+
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE])
 {

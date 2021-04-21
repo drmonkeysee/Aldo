@@ -107,10 +107,8 @@ static void check_interrupts(struct mos6502 *self)
         if (self->nmi == NIS_SERVICED) {
             self->nmi = NIS_CLEAR;
         }
-    } else {
-        if (self->nmi == NIS_CLEAR) {
-            self->nmi = NIS_DETECTED;
-        }
+    } else if (self->nmi == NIS_CLEAR) {
+        self->nmi = NIS_DETECTED;
     }
 
     if (!self->signal.irq && self->irq == NIS_CLEAR) {

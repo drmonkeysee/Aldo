@@ -106,7 +106,7 @@ struct view {
 
 static struct view HwView,
                    ControlsView,
-                   RomView,
+                   PrgView,
                    RegistersView,
                    FlagsView,
                    DatapathView,
@@ -179,58 +179,75 @@ static void drawcontrols(const struct console_state *snapshot)
     drawtoggle(" RES ", !snapshot->lines.reset);
 }
 
+static void drawinstructions(uint16_t addr, int h, int y,
+                             const struct console_state *snapshot)
+{
+    for (int i = 0, bytes = 0; i < h - y; ++i) {
+        addr += bytes;
+        const enum cpumem space = addr_to_cpumem(addr);
+        if (space == CMEM_NONE) {
+            mvwaddstr(PrgView.content, i, 0, "OUT OF MEM RANGE");
+            break;
+        }
+        char disassembly[DIS_INST_SIZE];
+        uint16_t addrmask;
+        const uint8_t *mem;
+        size_t memsize;
+        if (space == CMEM_RAM) {
+            addrmask = CpuRamAddrMask;
+            mem = snapshot->ram;
+            memsize = RAM_SIZE;
+        } else {
+            addrmask = CpuCartAddrMask;
+            mem = snapshot->rom;
+            memsize = ROM_SIZE;
+        }
+        const size_t mem_offset = addr & addrmask;
+        bytes = dis_inst(addr, mem + mem_offset, memsize - mem_offset,
+                         disassembly);
+        if (bytes == 0) break;
+        if (bytes < 0) {
+            mvwaddstr(PrgView.content, i, 0, dis_errstr(bytes));
+            break;
+        }
+        mvwaddstr(PrgView.content, i, 0, disassembly);
+    }
+}
+
 static void drawvecs(int h, int w, int y,
                      const struct console_state *snapshot)
 {
-    mvwhline(RomView.content, h - y--, 0, 0, w);
+    mvwhline(PrgView.content, h - y--, 0, 0, w);
 
     uint16_t vaddr = NmiVector & CpuCartAddrMask;
     uint8_t lo = snapshot->rom[vaddr],
             hi = snapshot->rom[vaddr + 1];
-    mvwprintw(RomView.content, h - y--, 0, "$%04X: %02X %02X       NMI $%04X",
+    mvwprintw(PrgView.content, h - y--, 0, "$%04X: %02X %02X       NMI $%04X",
               NmiVector, lo, hi, bytowr(lo, hi));
 
     vaddr = ResetVector & CpuCartAddrMask;
     lo = snapshot->rom[vaddr];
     hi = snapshot->rom[vaddr + 1];
-    mvwprintw(RomView.content, h - y--, 0, "$%04X: %02X %02X       RES $%04X",
+    mvwprintw(PrgView.content, h - y--, 0, "$%04X: %02X %02X       RES $%04X",
               ResetVector, lo, hi, bytowr(lo, hi));
 
     vaddr = IrqVector & CpuCartAddrMask;
     lo = snapshot->rom[vaddr];
     hi = snapshot->rom[vaddr + 1];
-    mvwprintw(RomView.content, h - y, 0, "$%04X: %02X %02X       IRQ $%04X",
+    mvwprintw(PrgView.content, h - y, 0, "$%04X: %02X %02X       IRQ $%04X",
               IrqVector, lo, hi, bytowr(lo, hi));
 }
 
-static void drawrom(const struct console_state *snapshot)
+static void drawprg(const struct console_state *snapshot)
 {
     static const int vector_offset = 4;
 
     int h, w;
-    getmaxyx(RomView.content, h, w);
-    werase(RomView.content);
+    getmaxyx(PrgView.content, h, w);
+    werase(PrgView.content);
 
-    uint16_t addr = snapshot->datapath.current_instruction;
-    // NOTE: on startup addr may be outside ROM range
-    if (addr < CpuCartMinAddr) {
-        mvwaddstr(RomView.content, 0, 0, "OUT OF ROM RANGE");
-    } else {
-        char disassembly[DIS_INST_SIZE];
-        for (int i = 0, bytes = 0; i < h - vector_offset; ++i) {
-            addr += bytes;
-            const size_t cart_offset = addr & CpuCartAddrMask;
-            bytes = dis_inst(addr, snapshot->rom + cart_offset,
-                             ROM_SIZE - cart_offset, disassembly);
-            if (bytes == 0) break;
-            if (bytes < 0) {
-                mvwaddstr(RomView.content, i, 0, dis_errstr(bytes));
-                break;
-            }
-            mvwaddstr(RomView.content, i, 0, disassembly);
-        }
-    }
-
+    drawinstructions(snapshot->datapath.current_instruction, h, vector_offset,
+                     snapshot);
     drawvecs(h, w, vector_offset, snapshot);
 }
 
@@ -480,7 +497,7 @@ void ui_init(void)
               xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
     vinit(&HwView, hwh, col1w, yoffset, xoffset, 2, "Hardware Traits");
     vinit(&ControlsView, 9, col1w, yoffset + hwh, xoffset, 2, "Controls");
-    vinit(&RomView, ramh, col2w, yoffset, xoffset + col1w, 1, "ROM");
+    vinit(&PrgView, ramh, col2w, yoffset, xoffset + col1w, 1, "PRG");
     vinit(&RegistersView, cpuh, flagsw, yoffset, xoffset + col1w + col2w, 2,
           "Registers");
     vinit(&FlagsView, flagsh, flagsw, yoffset + cpuh, xoffset + col1w + col2w,
@@ -498,7 +515,7 @@ void ui_cleanup(void)
     vcleanup(&DatapathView);
     vcleanup(&FlagsView);
     vcleanup(&RegistersView);
-    vcleanup(&RomView);
+    vcleanup(&PrgView);
     vcleanup(&ControlsView);
     vcleanup(&HwView);
 
@@ -544,7 +561,7 @@ void ui_refresh(const struct control *appstate,
 {
     drawhwtraits(appstate);
     drawcontrols(snapshot);
-    drawrom(snapshot);
+    drawprg(snapshot);
     drawregister(snapshot);
     drawflags(snapshot);
     drawdatapath(snapshot);

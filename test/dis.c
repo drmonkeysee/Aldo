@@ -300,6 +300,25 @@ static void inst_disassembles_brk(void *ctx)
 }
 
 //
+// Disassemble Program Memory
+//
+
+static void prgline_ram(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+static void prgline_rom(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+static void prgline_invalid_addr(void *ctx)
+{
+    ct_assertfail("Not implemented");
+}
+
+//
 // Disassemble Datapath
 //
 
@@ -344,7 +363,7 @@ static void datapath_end_of_rom(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void datapath_not_in_valid_addr(void *ctx)
+static void datapath_invalid_addr(void *ctx)
 {
     const uint8_t rom[] = {0xea, 0xff};
     const struct console_state sn = {
@@ -1786,9 +1805,13 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(inst_disassembles_rts),
         ct_maketest(inst_disassembles_brk),
 
+        ct_maketest(prgline_ram),
+        ct_maketest(prgline_rom),
+        ct_maketest(prgline_invalid_addr),
+
         ct_maketest(datapath_addr_in_ram),
         ct_maketest(datapath_end_of_rom),
-        ct_maketest(datapath_not_in_valid_addr),
+        ct_maketest(datapath_invalid_addr),
 
         ct_maketest(datapath_implied_cycle_zero),
         ct_maketest(datapath_implied_cycle_one),

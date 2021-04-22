@@ -203,19 +203,19 @@ static void drawvecs(int h, int w, int y,
 {
     mvwhline(PrgView.content, h - y--, 0, 0, w);
 
-    uint16_t vaddr = NmiVector & CpuCartAddrMask;
+    uint16_t vaddr = NmiVector & CpuRomAddrMask;
     uint8_t lo = snapshot->rom[vaddr],
             hi = snapshot->rom[vaddr + 1];
     mvwprintw(PrgView.content, h - y--, 0, "$%04X: %02X %02X       NMI $%04X",
               NmiVector, lo, hi, bytowr(lo, hi));
 
-    vaddr = ResetVector & CpuCartAddrMask;
+    vaddr = ResetVector & CpuRomAddrMask;
     lo = snapshot->rom[vaddr];
     hi = snapshot->rom[vaddr + 1];
     mvwprintw(PrgView.content, h - y--, 0, "$%04X: %02X %02X       RES $%04X",
               ResetVector, lo, hi, bytowr(lo, hi));
 
-    vaddr = IrqVector & CpuCartAddrMask;
+    vaddr = IrqVector & CpuRomAddrMask;
     lo = snapshot->rom[vaddr];
     hi = snapshot->rom[vaddr + 1];
     mvwprintw(PrgView.content, h - y, 0, "$%04X: %02X %02X       IRQ $%04X",

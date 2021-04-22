@@ -22,12 +22,12 @@ static void interrupt_handler_setup(void **ctx)
 {
     // NOTE: 32k rom, starting at $8000, for interrupt vectors
     uint8_t *const rom = calloc(0x8000, sizeof(uint8_t));
-    rom[IrqVector & CpuCartAddrMask] = 0xaa;
-    rom[(IrqVector + 1) & CpuCartAddrMask] = 0xbb;
-    rom[NmiVector & CpuCartAddrMask] = 0x77;
-    rom[(NmiVector + 1) & CpuCartAddrMask] = 0x99;
-    rom[ResetVector & CpuCartAddrMask] = 0x22;
-    rom[(ResetVector + 1) & CpuCartAddrMask] = 0x88;
+    rom[IrqVector & CpuRomAddrMask] = 0xaa;
+    rom[(IrqVector + 1) & CpuRomAddrMask] = 0xbb;
+    rom[NmiVector & CpuRomAddrMask] = 0x77;
+    rom[(NmiVector + 1) & CpuRomAddrMask] = 0x99;
+    rom[ResetVector & CpuRomAddrMask] = 0x22;
+    rom[(ResetVector + 1) & CpuRomAddrMask] = 0x88;
     *ctx = rom;
 }
 

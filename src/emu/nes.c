@@ -32,9 +32,9 @@ static void load_prg(nes *self, size_t sz, const uint8_t prg[restrict sz])
     assert(sz <= ROM_SIZE);
 
     for (size_t i = 0; i < sz; ++i) {
-        self->cart[(i + CpuCartMinAddr) & CpuCartAddrMask] = prg[i];
+        self->cart[(i + CpuRomMinAddr) & CpuRomAddrMask] = prg[i];
     }
-    wrtoba(CpuCartMinAddr, self->cart + (ResetVector & CpuCartAddrMask));
+    wrtoba(CpuRomMinAddr, self->cart + (ResetVector & CpuRomAddrMask));
 
     // TODO: throw random stuff into RAM for testing
     for (size_t i = 0; i < RAM_SIZE; ++i) {

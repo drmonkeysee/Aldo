@@ -57,10 +57,10 @@ static struct instmem make_imem(uint16_t addr,
             RAM_SIZE,
         };
     }
-    if (CpuCartMinAddr <= addr && addr <= CpuCartMaxAddr) {
+    if (CpuRomMinAddr <= addr && addr <= CpuRomMaxAddr) {
         return (struct instmem){
             snapshot->rom,
-            addr & CpuCartAddrMask,
+            addr & CpuRomAddrMask,
             ROM_SIZE,
         };
     }

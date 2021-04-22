@@ -78,8 +78,8 @@ static void bcc_positive_wraparound(void *ctx)
     setup_cpu(&cpu);
     // NOTE: 32k rom, starting at $8000 to set up $FFFC + 10
     uint8_t *const rom = calloc(0x8000, sizeof *rom);
-    rom[0xfffa & CpuCartAddrMask] = 0x90;
-    rom[0xfffb & CpuCartAddrMask] = 0xa;
+    rom[0xfffa & CpuRomAddrMask] = 0x90;
+    rom[0xfffb & CpuRomAddrMask] = 0xa;
     cpu.cart = rom;
     cpu.pc = 0xfffa;
 

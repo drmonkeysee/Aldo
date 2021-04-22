@@ -34,10 +34,10 @@ enum {
 const char *dis_errstr(int error);
 
 // NOTE: when dis_ functions return 0 the input buffer is untouched
-int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
+int dis_inst(uint16_t addr, const uint8_t *bytes, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE]);
-int dis_prgline(uint16_t addr, const struct console_state *snapshot,
-                char dis[restrict static DIS_INST_SIZE]);
+int dis_cpumem(uint16_t addr, const struct console_state *snapshot,
+               char dis[restrict static DIS_INST_SIZE]);
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
 

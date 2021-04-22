@@ -70,7 +70,7 @@ static struct instmem make_imem(uint16_t addr,
     }
 }
 
-static int print_raw(uint16_t addr, const uint8_t *dispc, int instlen,
+static int print_raw(uint16_t addr, const uint8_t *bytes, int instlen,
                      char dis[restrict static DIS_INST_SIZE])
 {
     int total, count;
@@ -78,7 +78,7 @@ static int print_raw(uint16_t addr, const uint8_t *dispc, int instlen,
     if (count < 0) return ASM_FMT_FAIL;
 
     for (int i = 0; i < instlen; ++i) {
-        count = sprintf(dis + total, "%02X ", *(dispc + i));
+        count = sprintf(dis + total, "%02X ", *(bytes + i));
         if (count < 0) return ASM_FMT_FAIL;
         total += count;
     }
@@ -127,22 +127,22 @@ const char *dis_errstr(int error)
     }
 }
 
-int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
+int dis_inst(uint16_t addr, const uint8_t *bytes, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE])
 {
-    assert(dispc != NULL);
+    assert(bytes != NULL);
     assert(bytesleft >= 0);
     assert(dis != NULL);
 
     if (bytesleft == 0) return 0;
 
-    const struct decoded dec = Decode[*dispc];
+    const struct decoded dec = Decode[*bytes];
     const int instlen = InstLens[dec.mode];
     if (bytesleft < instlen) return ASM_EOF;
 
     int count;
     unsigned int total;
-    total = count = print_raw(addr, dispc, instlen, dis);
+    total = count = print_raw(addr, bytes, instlen, dis);
     if (count < 0) return count;
 
     // NOTE: padding between raw bytes and disassembled instruction
@@ -150,7 +150,7 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
     if (count < 0) return ASM_FMT_FAIL;
     total += count;
 
-    count = print_mnemonic(&dec, dispc, instlen, dis + total);
+    count = print_mnemonic(&dec, bytes, instlen, dis + total);
     if (count < 0) return count;
     total += count;
 
@@ -158,8 +158,8 @@ int dis_inst(uint16_t addr, const uint8_t *dispc, ptrdiff_t bytesleft,
     return instlen;
 }
 
-int dis_prgline(uint16_t addr, const struct console_state *snapshot,
-                char dis[restrict static DIS_INST_SIZE])
+int dis_cpumem(uint16_t addr, const struct console_state *snapshot,
+               char dis[restrict static DIS_INST_SIZE])
 {
     const struct instmem imem = make_imem(addr, snapshot);
     if (imem.space == CMEM_NONE) return ASM_RANGE;

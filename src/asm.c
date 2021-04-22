@@ -12,6 +12,7 @@
 #include "emu/traits.h"
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -43,32 +44,27 @@ static const char *restrict const *const StringTables[] = {
 
 struct instmem {
     const uint8_t *bytes;
-    enum cpumem space;
     uint16_t offset, size;
 };
 
 static struct instmem make_imem(uint16_t addr,
                                 const struct console_state *snapshot)
 {
-    const enum cpumem space = addr_to_cpumem(addr);
-    switch (space) {
-    case CMEM_RAM:
+    if (addr <= CpuRamMaxAddr) {
         return (struct instmem){
             snapshot->ram,
-            space,
             addr & CpuRamAddrMask,
             RAM_SIZE,
         };
-    case CMEM_ROM:
+    }
+    if (CpuCartMinAddr <= addr && addr <= CpuCartMaxAddr) {
         return (struct instmem){
             snapshot->rom,
-            space,
             addr & CpuCartAddrMask,
             ROM_SIZE,
         };
-    default:
-        return (struct instmem){.space = space};
     }
+    return (struct instmem){.bytes = NULL};
 }
 
 static int print_raw(uint16_t addr, const uint8_t *bytes, int instlen,
@@ -163,7 +159,7 @@ int dis_cpumem(uint16_t addr, const struct console_state *snapshot,
                char dis[restrict static DIS_INST_SIZE])
 {
     const struct instmem imem = make_imem(addr, snapshot);
-    if (imem.space == CMEM_NONE) return ASM_RANGE;
+    if (!imem.bytes) return ASM_RANGE;
     return dis_inst(addr, imem.bytes + imem.offset, imem.size - imem.offset,
                     dis);
 }
@@ -176,7 +172,7 @@ int dis_datapath(const struct console_state *snapshot,
 
     const uint16_t instaddr = snapshot->datapath.current_instruction;
     const struct instmem imem = make_imem(instaddr, snapshot);
-    if (imem.space == CMEM_NONE) return ASM_RANGE;
+    if (!imem.bytes) return ASM_RANGE;
 
     const struct decoded dec = Decode[snapshot->datapath.opcode];
     const int instlen = InstLens[dec.mode];

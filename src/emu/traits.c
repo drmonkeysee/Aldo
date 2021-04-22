@@ -19,6 +19,4 @@ const uint16_t
     ResetVector = 0xfffc,
     IrqVector = 0xfffe;
 
-extern inline enum cpumem addr_to_cpumem(uint16_t addr);
-
 const int MaxCycleCount = 7;

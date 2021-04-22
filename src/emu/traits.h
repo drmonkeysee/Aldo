@@ -20,19 +20,6 @@ extern const uint16_t
 // Interrupt Vectors
     NmiVector, ResetVector, IrqVector;
 
-enum cpumem {
-    CMEM_NONE,
-    CMEM_RAM,
-    CMEM_ROM,
-};
-
-inline enum cpumem addr_to_cpumem(uint16_t addr)
-{
-    if (addr <= CpuRamMaxAddr) return CMEM_RAM;
-    if (CpuCartMinAddr <= addr && addr <= CpuCartMaxAddr) return CMEM_ROM;
-    return CMEM_NONE;
-}
-
 // Instruction Characteristics
 extern const int MaxCycleCount;
 

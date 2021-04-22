@@ -303,19 +303,46 @@ static void inst_disassembles_brk(void *ctx)
 // Disassemble Program Memory
 //
 
-static void prgline_ram(void *ctx)
+static void cpumem_ram(void *ctx)
 {
-    ct_assertfail("Not implemented");
+    uint8_t ram[] = {0xa9, 0x43};
+    const struct console_state sn = {
+        .ram = ram,
+    };
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_cpumem(0x0, &sn, buf);
+
+    ct_assertequal(2, length);
+    ct_assertequalstr("$0000: A9 43       LDA #$43", buf);
 }
 
-static void prgline_rom(void *ctx)
+static void cpumem_rom(void *ctx)
 {
-    ct_assertfail("Not implemented");
+    uint8_t rom[] = {0xa9, 0x43};
+    const struct console_state sn = {
+        .rom = rom,
+    };
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_cpumem(0x8000, &sn, buf);
+
+    ct_assertequal(2, length);
+    ct_assertequalstr("$8000: A9 43       LDA #$43", buf);
 }
 
-static void prgline_invalid_addr(void *ctx)
+static void cpumem_invalid_addr(void *ctx)
 {
-    ct_assertfail("Not implemented");
+    uint8_t ram[] = {0xa9, 0x43};
+    const struct console_state sn = {
+        .ram = ram,
+    };
+    char buf[DIS_INST_SIZE] = {'\0'};
+
+    const int length = dis_cpumem(0x4000, &sn, buf);
+
+    ct_assertequal(ASM_RANGE, length);
+    ct_assertequalstr("", buf);
 }
 
 //
@@ -344,11 +371,31 @@ static void datapath_addr_in_ram(void *ctx)
 
 static void datapath_end_of_rom(void *ctx)
 {
-    // NOTE: LDA abs with missing 3rd byte
-    const uint8_t rom[] = {0xad, 0x43};
+    const uint8_t rom[] = {0xea};
     const struct console_state sn = {
         .datapath = {
-            .current_instruction = 0xfffe,
+            .current_instruction = 0xffff,
+            .exec_cycle = 1,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "NOP ";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void datapath_unexpected_end_of_rom(void *ctx)
+{
+    // NOTE: LDA imm with missing 2nd byte
+    const uint8_t rom[] = {0xa9};
+    const struct console_state sn = {
+        .datapath = {
+            .current_instruction = 0xffff,
             .exec_cycle = 1,
             .opcode = rom[0],
         },
@@ -1805,12 +1852,13 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(inst_disassembles_rts),
         ct_maketest(inst_disassembles_brk),
 
-        ct_maketest(prgline_ram),
-        ct_maketest(prgline_rom),
-        ct_maketest(prgline_invalid_addr),
+        ct_maketest(cpumem_ram),
+        ct_maketest(cpumem_rom),
+        ct_maketest(cpumem_invalid_addr),
 
         ct_maketest(datapath_addr_in_ram),
         ct_maketest(datapath_end_of_rom),
+        ct_maketest(datapath_unexpected_end_of_rom),
         ct_maketest(datapath_invalid_addr),
 
         ct_maketest(datapath_implied_cycle_zero),

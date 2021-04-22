@@ -13,6 +13,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 static const char *restrict const Mnemonics[] = {
 #define X(s, ...) #s,
@@ -179,7 +180,7 @@ int dis_datapath(const struct console_state *snapshot,
 
     const struct decoded dec = Decode[snapshot->datapath.opcode];
     const int instlen = InstLens[dec.mode];
-    if ((uint16_t)(imem.offset + instlen) >= imem.size) return ASM_EOF;
+    if ((uint16_t)(imem.offset + instlen) > imem.size) return ASM_EOF;
 
     int count;
     unsigned int total;
@@ -196,11 +197,16 @@ int dis_datapath(const struct console_state *snapshot,
         count = sprintf(dis + total, "%s", displaystr);
         break;
     case 1:
-        count = sprintf(dis + total, displaystr, imem.bytes[imem.offset + 1]);
+        count = sprintf(dis + total, displaystr,
+                        strlen(displaystr) > 0
+                        ? imem.bytes[imem.offset + 1]
+                        : 0);
         break;
     default:
         count = sprintf(dis + total, displaystr,
-                        batowr(imem.bytes + imem.offset + 1));
+                        strlen(displaystr) > 0
+                        ? batowr(imem.bytes + imem.offset + 1)
+                        : 0);
         break;
     }
     if (count < 0) return ASM_FMT_FAIL;

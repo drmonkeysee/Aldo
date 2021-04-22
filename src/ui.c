@@ -182,9 +182,9 @@ static void drawcontrols(const struct console_state *snapshot)
 static void drawinstructions(uint16_t addr, int h, int y,
                              const struct console_state *snapshot)
 {
-    for (int i = 0, bytes = 0; i < h - y; ++i) {
+    int bytes;
+    for (int i = 0; i < h - y; ++i) {
         char disassembly[DIS_INST_SIZE];
-        addr += bytes;
         bytes = dis_cpumem(addr, snapshot, disassembly);
         if (bytes == 0) break;
         if (bytes < 0) {
@@ -192,6 +192,9 @@ static void drawinstructions(uint16_t addr, int h, int y,
             break;
         }
         mvwaddstr(PrgView.content, i, 0, disassembly);
+        const uint16_t nextaddr = addr + bytes;
+        if (nextaddr < addr) break;
+        addr = nextaddr;
     }
 }
 

@@ -12,7 +12,6 @@
 #include "emu/traits.h"
 
 #include <assert.h>
-#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -75,7 +74,7 @@ static int print_raw(uint16_t addr, const uint8_t *bytes, int instlen,
     if (count < 0) return ASM_FMT_FAIL;
 
     for (int i = 0; i < instlen; ++i) {
-        count = sprintf(dis + total, "%02X ", *(bytes + i));
+        count = sprintf(dis + total, "%02X ", bytes[i]);
         if (count < 0) return ASM_FMT_FAIL;
         total += count;
     }
@@ -83,7 +82,7 @@ static int print_raw(uint16_t addr, const uint8_t *bytes, int instlen,
     return total;
 }
 
-static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
+static int print_mnemonic(const struct decoded *dec, const uint8_t *bytes,
                           int instlen, char dis[restrict])
 {
     int total, count;
@@ -97,10 +96,10 @@ static int print_mnemonic(const struct decoded *dec, const uint8_t *dispc,
         dis[--count] = '\0';
         break;
     case 2:
-        count = sprintf(dis + total, strtable[instlen - 1], *(dispc + 1));
+        count = sprintf(dis + total, strtable[instlen - 1], bytes[1]);
         break;
     case 3:
-        count = sprintf(dis + total, strtable[instlen - 1], batowr(dispc + 1));
+        count = sprintf(dis + total, strtable[instlen - 1], batowr(bytes + 1));
         break;
     default:
         return ASM_INV_ADDRMD;

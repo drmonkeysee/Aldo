@@ -303,7 +303,7 @@ static void inst_disassembles_brk(void *ctx)
 // Disassemble Program Memory
 //
 
-static void cpumem_ram(void *ctx)
+static void mem_ram(void *ctx)
 {
     uint8_t ram[] = {0xa9, 0x43};
     const struct console_state sn = {
@@ -311,13 +311,13 @@ static void cpumem_ram(void *ctx)
     };
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_cpumem(0x0, &sn, buf);
+    const int length = dis_mem(0x0, &sn, buf);
 
     ct_assertequal(2, length);
     ct_assertequalstr("$0000: A9 43       LDA #$43", buf);
 }
 
-static void cpumem_rom(void *ctx)
+static void mem_rom(void *ctx)
 {
     uint8_t rom[] = {0xa9, 0x43};
     const struct console_state sn = {
@@ -325,13 +325,13 @@ static void cpumem_rom(void *ctx)
     };
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_cpumem(0x8000, &sn, buf);
+    const int length = dis_mem(0x8000, &sn, buf);
 
     ct_assertequal(2, length);
     ct_assertequalstr("$8000: A9 43       LDA #$43", buf);
 }
 
-static void cpumem_invalid_addr(void *ctx)
+static void mem_invalid_addr(void *ctx)
 {
     uint8_t ram[] = {0xa9, 0x43};
     const struct console_state sn = {
@@ -339,7 +339,7 @@ static void cpumem_invalid_addr(void *ctx)
     };
     char buf[DIS_INST_SIZE] = {'\0'};
 
-    const int length = dis_cpumem(0x4000, &sn, buf);
+    const int length = dis_mem(0x4000, &sn, buf);
 
     ct_assertequal(ASM_RANGE, length);
     ct_assertequalstr("", buf);
@@ -1852,9 +1852,9 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(inst_disassembles_rts),
         ct_maketest(inst_disassembles_brk),
 
-        ct_maketest(cpumem_ram),
-        ct_maketest(cpumem_rom),
-        ct_maketest(cpumem_invalid_addr),
+        ct_maketest(mem_ram),
+        ct_maketest(mem_rom),
+        ct_maketest(mem_invalid_addr),
 
         ct_maketest(datapath_addr_in_ram),
         ct_maketest(datapath_end_of_rom),

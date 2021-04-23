@@ -154,8 +154,8 @@ int dis_inst(uint16_t addr, const uint8_t *bytes, ptrdiff_t bytesleft,
     return instlen;
 }
 
-int dis_cpumem(uint16_t addr, const struct console_state *snapshot,
-               char dis[restrict static DIS_INST_SIZE])
+int dis_mem(uint16_t addr, const struct console_state *snapshot,
+            char dis[restrict static DIS_INST_SIZE])
 {
     const struct instmem imem = make_imem(addr, snapshot);
     if (!imem.bytes) return ASM_RANGE;

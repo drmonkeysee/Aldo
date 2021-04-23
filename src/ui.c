@@ -185,7 +185,7 @@ static void drawinstructions(uint16_t addr, int h, int y,
     int bytes;
     for (int i = 0; i < h - y; ++i) {
         char disassembly[DIS_INST_SIZE];
-        bytes = dis_cpumem(addr, snapshot, disassembly);
+        bytes = dis_mem(addr, snapshot, disassembly);
         if (bytes == 0) break;
         if (bytes < 0) {
             mvwaddstr(PrgView.content, i, 0, dis_errstr(bytes));

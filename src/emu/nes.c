@@ -71,8 +71,6 @@ void nes_powerup(nes *self, size_t sz, const uint8_t prg[restrict sz])
     assert(self != NULL);
 
     cpu_powerup(&self->cpu);
-    // TODO: for now startup in a halted state
-    nes_halt(self);
     load_prg(self, sz, prg);
 }
 

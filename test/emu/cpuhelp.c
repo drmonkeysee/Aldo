@@ -8,6 +8,7 @@
 #include "cpuhelp.h"
 
 #include "ciny.h"
+#include "emu/snapshot.h"
 #include "emu/traits.h"
 
 // NOTE: one page of rom + extra to test page boundary addressing
@@ -19,9 +20,10 @@ const uint8_t bigrom[] = {
 void setup_cpu(struct mos6502 *cpu)
 {
     cpu_powerup(cpu);
-    // NOTE: set the cpu ready to read instruction at 0x0
-    cpu->pc = 0;
-    cpu->signal.rdy = true;
+    cpu->a = cpu->x = cpu->y = cpu->s = cpu->pc = 0;
+    cpu->dflt = false;
+    cpu->p.i = cpu->signal.rdy = cpu->presync = true;
+    cpu->irq = cpu->nmi = cpu->res = NIS_CLEAR;
 }
 
 int clock_cpu(struct mos6502 *cpu)

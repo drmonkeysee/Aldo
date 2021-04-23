@@ -8,7 +8,6 @@
 #include "ciny.h"
 #include "cpuhelp.h"
 #include "emu/cpu.h"
-#include "emu/snapshot.h"
 
 #include <stdint.h>
 
@@ -18,24 +17,12 @@ static void powerup_initializes_cpu(void *ctx)
 
     cpu_powerup(&cpu);
 
-    ct_assertequal(0u, cpu.a);
-    ct_assertequal(0u, cpu.s);
-    ct_assertequal(0u, cpu.x);
-    ct_assertequal(0u, cpu.y);
-
-    struct console_state sn;
-    cpu_snapshot(&cpu, &sn);
-    ct_assertequal(0x34u, sn.cpu.status);
-
     ct_asserttrue(cpu.signal.irq);
     ct_asserttrue(cpu.signal.nmi);
     ct_asserttrue(cpu.signal.res);
     ct_asserttrue(cpu.signal.rw);
     ct_assertfalse(cpu.signal.rdy);
     ct_assertfalse(cpu.signal.sync);
-
-    ct_asserttrue(cpu.presync);
-    ct_assertfalse(cpu.dflt);
 }
 
 static void data_fault(void *ctx)

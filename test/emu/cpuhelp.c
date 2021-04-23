@@ -21,7 +21,7 @@ void setup_cpu(struct mos6502 *cpu)
 {
     cpu_powerup(cpu);
     cpu->a = cpu->x = cpu->y = cpu->s = cpu->pc = 0;
-    cpu->dflt = false;
+    cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->dflt = false;
     cpu->p.i = cpu->signal.rdy = cpu->presync = true;
     cpu->irq = cpu->nmi = cpu->res = NIS_CLEAR;
 }

@@ -111,7 +111,7 @@ X(JABS, 3, "abs", "$??%02X", "$%04X")       /* Absolute jump */ \
 X(JIND, 3, "(abs)", "($??%02X)", "($%04X)") /* Indirect jump */ \
 \
 /* Interrupts */ \
-X(BRK, 1, "imp", "")                        /* Break, interrupt, reset */ \
+X(BRK, 1, "imp", "%s")                      /* Break, interrupt, reset */ \
 X(RTI, 1, "imp", "")                        /* Return from interrupt */
 
 #define IN_ENUM(s) IN_##s

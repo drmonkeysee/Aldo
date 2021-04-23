@@ -1630,14 +1630,34 @@ static void datapath_brk_cycle_n(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
+static void datapath_brk_cycle_six(void *ctx)
+{
+    const uint8_t rom[] = {0x0, 0xff};
+    const struct console_state sn = {
+        .datapath = {
+            .exec_cycle = 6,
+            .current_instruction = 0x8000,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "BRK CLR";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
 static void datapath_irq_cycle_zero(void *ctx)
 {
-    ct_assertfail("Not implemented");
     const uint8_t rom[] = {0x0, 0xff};
     const struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
             .current_instruction = 0x8000,
+            .irq = NIS_COMMITTED,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1653,12 +1673,12 @@ static void datapath_irq_cycle_zero(void *ctx)
 
 static void datapath_irq_cycle_one(void *ctx)
 {
-    ct_assertfail("Not implemented");
     const uint8_t rom[] = {0x0, 0xff};
     const struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
             .current_instruction = 0x8000,
+            .irq = NIS_COMMITTED,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1667,19 +1687,19 @@ static void datapath_irq_cycle_one(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    const char *const exp = "BRK ";
+    const char *const exp = "BRK (IRQ)";
     ct_assertequal((int)strlen(exp), written);
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void datapath_irq_cycle_n(void *ctx)
 {
-    ct_assertfail("Not implemented");
     const uint8_t rom[] = {0x0, 0xff};
     const struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
             .current_instruction = 0x8000,
+            .irq = NIS_COMMITTED,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1688,19 +1708,40 @@ static void datapath_irq_cycle_n(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    const char *const exp = "BRK ";
+    const char *const exp = "BRK (IRQ)";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void datapath_irq_cycle_six(void *ctx)
+{
+    const uint8_t rom[] = {0x0, 0xff};
+    const struct console_state sn = {
+        .datapath = {
+            .exec_cycle = 6,
+            .current_instruction = 0x8000,
+            .irq = NIS_COMMITTED,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "BRK CLR";
     ct_assertequal((int)strlen(exp), written);
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void datapath_nmi_cycle_zero(void *ctx)
 {
-    ct_assertfail("Not implemented");
     const uint8_t rom[] = {0x0, 0xff};
     const struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
             .current_instruction = 0x8000,
+            .nmi = NIS_COMMITTED,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1716,12 +1757,12 @@ static void datapath_nmi_cycle_zero(void *ctx)
 
 static void datapath_nmi_cycle_one(void *ctx)
 {
-    ct_assertfail("Not implemented");
     const uint8_t rom[] = {0x0, 0xff};
     const struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
             .current_instruction = 0x8000,
+            .nmi = NIS_COMMITTED,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1730,19 +1771,19 @@ static void datapath_nmi_cycle_one(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    const char *const exp = "BRK ";
+    const char *const exp = "BRK (NMI)";
     ct_assertequal((int)strlen(exp), written);
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void datapath_nmi_cycle_n(void *ctx)
 {
-    ct_assertfail("Not implemented");
     const uint8_t rom[] = {0x0, 0xff};
     const struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
             .current_instruction = 0x8000,
+            .nmi = NIS_COMMITTED,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1751,19 +1792,40 @@ static void datapath_nmi_cycle_n(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    const char *const exp = "BRK ";
+    const char *const exp = "BRK (NMI)";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void datapath_nmi_cycle_six(void *ctx)
+{
+    const uint8_t rom[] = {0x0, 0xff};
+    const struct console_state sn = {
+        .datapath = {
+            .exec_cycle = 6,
+            .current_instruction = 0x8000,
+            .nmi = NIS_COMMITTED,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "BRK CLR";
     ct_assertequal((int)strlen(exp), written);
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void datapath_res_cycle_zero(void *ctx)
 {
-    ct_assertfail("Not implemented");
     const uint8_t rom[] = {0x0, 0xff};
     const struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
             .current_instruction = 0x8000,
+            .res = NIS_COMMITTED,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1779,12 +1841,12 @@ static void datapath_res_cycle_zero(void *ctx)
 
 static void datapath_res_cycle_one(void *ctx)
 {
-    ct_assertfail("Not implemented");
     const uint8_t rom[] = {0x0, 0xff};
     const struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
             .current_instruction = 0x8000,
+            .res = NIS_COMMITTED,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1793,19 +1855,19 @@ static void datapath_res_cycle_one(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    const char *const exp = "BRK ";
+    const char *const exp = "BRK (RES)";
     ct_assertequal((int)strlen(exp), written);
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void datapath_res_cycle_n(void *ctx)
 {
-    ct_assertfail("Not implemented");
     const uint8_t rom[] = {0x0, 0xff};
     const struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
             .current_instruction = 0x8000,
+            .res = NIS_COMMITTED,
             .opcode = rom[0],
         },
         .rom = rom,
@@ -1814,7 +1876,28 @@ static void datapath_res_cycle_n(void *ctx)
 
     const int written = dis_datapath(&sn, buf);
 
-    const char *const exp = "BRK ";
+    const char *const exp = "BRK (RES)";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void datapath_res_cycle_six(void *ctx)
+{
+    const uint8_t rom[] = {0x0, 0xff};
+    const struct console_state sn = {
+        .datapath = {
+            .exec_cycle = 6,
+            .current_instruction = 0x8000,
+            .res = NIS_COMMITTED,
+            .opcode = rom[0],
+        },
+        .rom = rom,
+    };
+    char buf[DIS_DATAP_SIZE];
+
+    const int written = dis_datapath(&sn, buf);
+
+    const char *const exp = "BRK CLR";
     ct_assertequal((int)strlen(exp), written);
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
@@ -1938,18 +2021,22 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(datapath_brk_cycle_zero),
         ct_maketest(datapath_brk_cycle_one),
         ct_maketest(datapath_brk_cycle_n),
+        ct_maketest(datapath_brk_cycle_six),
 
         ct_maketest(datapath_irq_cycle_zero),
         ct_maketest(datapath_irq_cycle_one),
         ct_maketest(datapath_irq_cycle_n),
+        ct_maketest(datapath_irq_cycle_six),
 
         ct_maketest(datapath_nmi_cycle_zero),
         ct_maketest(datapath_nmi_cycle_one),
         ct_maketest(datapath_nmi_cycle_n),
+        ct_maketest(datapath_nmi_cycle_six),
 
         ct_maketest(datapath_res_cycle_zero),
         ct_maketest(datapath_res_cycle_one),
         ct_maketest(datapath_res_cycle_n),
+        ct_maketest(datapath_res_cycle_six),
     };
 
     return ct_makesuite(tests);

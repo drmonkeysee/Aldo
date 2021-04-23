@@ -66,6 +66,15 @@ static struct instmem make_imem(uint16_t addr,
     return (struct instmem){.bytes = NULL};
 }
 
+static const char *interrupt_display(const struct console_state *snapshot)
+{
+    if (snapshot->datapath.exec_cycle == 6) return "CLR";
+    if (snapshot->datapath.res == NIS_COMMITTED) return "(RES)";
+    if (snapshot->datapath.nmi == NIS_COMMITTED) return "(NMI)";
+    if (snapshot->datapath.irq == NIS_COMMITTED) return "(IRQ)";
+    return "";
+}
+
 static int print_raw(uint16_t addr, const uint8_t *bytes, int instlen,
                      char dis[restrict static DIS_INST_SIZE])
 {
@@ -192,10 +201,12 @@ int dis_datapath(const struct console_state *snapshot,
         count = sprintf(dis + total, "%s", displaystr);
         break;
     case 1:
-        count = sprintf(dis + total, displaystr,
-                        strlen(displaystr) > 0
-                        ? imem.bytes[imem.offset + 1]
-                        : 0);
+        count = dec.instruction == IN_BRK
+                ? sprintf(dis + total, displaystr, interrupt_display(snapshot))
+                : sprintf(dis + total, displaystr,
+                          strlen(displaystr) > 0
+                          ? imem.bytes[imem.offset + 1]
+                          : 0);
         break;
     default:
         count = sprintf(dis + total, displaystr,

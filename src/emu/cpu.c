@@ -1235,31 +1235,13 @@ void cpu_powerup(struct mos6502 *self)
 {
     assert(self != NULL);
 
-    self->a = self->x = self->y = self->s = 0;
-    // NOTE: set B, I, and unused flags high
-    set_p(self, 0x34);
+    // NOTE: Initialize physical lines to known state
+    self->signal.irq = self->signal.nmi = self->signal.res =
+        self->signal.rw = true;
+    self->signal.rdy = self->signal.sync = false;
 
-    // NOTE: Interrupts are inverted, high means no interrupt; rw high is read;
-    // presync flag is true to put the cpu into instruction-prefetch state.
-    // TODO: i think reset can make many of these initializations obsolete
-    self->signal.irq = self->signal.nmi = self->signal.res = self->signal.rw =
-        self->presync = true;
-    self->signal.rdy = self->signal.sync = self->dflt = false;
-    self->irq = self->nmi = self->res = NIS_CLEAR;
-
-    // NOTE: all other cpu elements are indeterminate on powerup
-}
-
-void cpu_reset(struct mos6502 *self)
-{
-    assert(self != NULL);
-
-    // NOTE: hold reset low and clock the cpu until reset state is entered
-    self->signal.res = false;
-    do {
-        cpu_cycle(self);
-    } while (self->res != NIS_COMMITTED);
-    self->signal.res = true;
+    // NOTE: all internal cpu elements are indeterminate on powerup; use
+    // RESET sequence to get things into a known state.
 }
 
 int cpu_cycle(struct mos6502 *self)

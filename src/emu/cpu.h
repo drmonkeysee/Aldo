@@ -28,7 +28,7 @@ struct mos6502 {
              z: 1,      // (1) Zero
              i: 1,      // (2) Interrupt Disable
              d: 1;      // (3) Decimal (disabled on the NES)
-        int   : 2;      // (4,5) Break/Unused (pseudo-flags, always set)
+        int   : 2;      // (4,5) Break/Unused (cannot be set directly)
         bool v: 1,      // (6) Overflow
              n: 1;      // (7) Sign
     } p;                // Status
@@ -52,7 +52,7 @@ struct mos6502 {
              res: 1,    // Reset Signal (input, inverted)
              rdy: 1,    // Ready Signal (input, low to halt cpu)
              rw: 1,     // Read/Write Signal (output, read high)
-             sync: 1;   // SYNC (instruction fetch) Signal (output)
+             sync: 1;   // Sync (instruction fetch) Signal (output)
     } signal;
 
     // Internals: control flags and other helper fields that do
@@ -67,7 +67,6 @@ struct mos6502 {
 };
 
 void cpu_powerup(struct mos6502 *self);
-void cpu_reset(struct mos6502 *self);
 
 int cpu_cycle(struct mos6502 *self);
 

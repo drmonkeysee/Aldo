@@ -158,11 +158,6 @@ int aldo_run(void)
     nes_powerup(console, sizeof test_prg, test_prg);
     // NOTE: initialize snapshot from console
     nes_snapshot(console, &snapshot);
-    // TODO: for now clock the cpu up to the first non-RESET cycle then halt
-    nes_mode(console, NEXC_STEP);
-    nes_ready(console);
-    appstate.total_cycles += nes_clock(console);
-    nes_mode(console, snapshot.mode);
 
     do {
         ui_tick_start(&appstate, &snapshot);

@@ -1240,8 +1240,9 @@ void cpu_powerup(struct mos6502 *self)
         self->signal.rw = true;
     self->signal.rdy = self->signal.sync = false;
 
-    // NOTE: all internal cpu elements are indeterminate on powerup; use
-    // RESET sequence to get things into a known state.
+    // NOTE: all internal cpu elements are indeterminate on powerup
+    // TODO: simulate res held low on startup to engage reset sequence.
+    self->res = NIS_PENDING;
 }
 
 int cpu_cycle(struct mos6502 *self)

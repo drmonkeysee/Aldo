@@ -1195,6 +1195,9 @@ static void BRK_sequence(struct mos6502 *self, struct decoded dec)
         interrupt_push(self, get_p(self, service_interrupt(self)));
         break;
     case 5:
+        // NOTE: higher priority interrupts can hijack this break sequence if
+        // latched in by this cycle.
+        poll_interrupts(self);
         self->addrbus = interrupt_vector(self);
         read(self);
         break;

@@ -41,29 +41,29 @@ static const char *restrict const *const StringTables[] = {
 #undef X
 };
 
-struct instmem {
+struct memspan {
     const uint8_t *bytes;
     uint16_t offset, size;
 };
 
-static struct instmem make_imem(uint16_t addr,
-                                const struct console_state *snapshot)
+static struct memspan make_memspan(uint16_t addr,
+                                   const struct console_state *snapshot)
 {
     if (addr <= CpuRamMaxAddr) {
-        return (struct instmem){
+        return (struct memspan){
             snapshot->ram,
             addr & CpuRamAddrMask,
             RAM_SIZE,
         };
     }
     if (CpuRomMinAddr <= addr && addr <= CpuRomMaxAddr) {
-        return (struct instmem){
+        return (struct memspan){
             snapshot->rom,
             addr & CpuRomAddrMask,
             ROM_SIZE,
         };
     }
-    return (struct instmem){.bytes = NULL};
+    return (struct memspan){.bytes = NULL};
 }
 
 static const char *interrupt_display(const struct console_state *snapshot)
@@ -166,9 +166,9 @@ int dis_inst(uint16_t addr, const uint8_t *bytes, ptrdiff_t bytesleft,
 int dis_mem(uint16_t addr, const struct console_state *snapshot,
             char dis[restrict static DIS_INST_SIZE])
 {
-    const struct instmem imem = make_imem(addr, snapshot);
-    if (!imem.bytes) return ASM_RANGE;
-    return dis_inst(addr, imem.bytes + imem.offset, imem.size - imem.offset,
+    const struct memspan span = make_memspan(addr, snapshot);
+    if (!span.bytes) return ASM_RANGE;
+    return dis_inst(addr, span.bytes + span.offset, span.size - span.offset,
                     dis);
 }
 
@@ -179,12 +179,12 @@ int dis_datapath(const struct console_state *snapshot,
     assert(dis != NULL);
 
     const uint16_t instaddr = snapshot->datapath.current_instruction;
-    const struct instmem imem = make_imem(instaddr, snapshot);
-    if (!imem.bytes) return ASM_RANGE;
+    const struct memspan span = make_memspan(instaddr, snapshot);
+    if (!span.bytes) return ASM_RANGE;
 
     const struct decoded dec = Decode[snapshot->datapath.opcode];
     const int instlen = InstLens[dec.mode];
-    if ((uint16_t)(imem.offset + instlen) > imem.size) return ASM_EOF;
+    if ((uint16_t)(span.offset + instlen) > span.size) return ASM_EOF;
 
     int count;
     unsigned int total;
@@ -205,13 +205,13 @@ int dis_datapath(const struct console_state *snapshot,
                 ? sprintf(dis + total, displaystr, interrupt_display(snapshot))
                 : sprintf(dis + total, displaystr,
                           strlen(displaystr) > 0
-                          ? imem.bytes[imem.offset + 1]
+                          ? span.bytes[span.offset + 1]
                           : 0);
         break;
     default:
         count = sprintf(dis + total, displaystr,
                         strlen(displaystr) > 0
-                        ? batowr(imem.bytes + imem.offset + 1)
+                        ? batowr(span.bytes + span.offset + 1)
                         : 0);
         break;
     }

@@ -287,14 +287,15 @@ static void nmi_hijacks_brk(void *ctx)
     cpu.cart = ctx;
     cpu.s = 0xff;
 
-    cpu.signal.nmi = false;
-    cpu_cycle(&cpu);
-    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
-
     for (int i = 0; i < 4; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(NIS_PENDING, (int)cpu.nmi);
+        ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
     }
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
 

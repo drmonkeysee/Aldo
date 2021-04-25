@@ -418,22 +418,218 @@ static void nmi_lost_during_brk(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: NMI committed before vector select
+// NOTE: NMI latched after IRQ started, jumps to NMI handler instead
 static void nmi_hijacks_irq(void *ctx)
 {
-    ct_assertfail("Not implemented");
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: LDA $0004 (0x20)
+    ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
+    ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
+    uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+
+    for (int i = 0; i < 4; ++i) {
+        cpu_cycle(&cpu);
+        ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    }
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(NIS_SERVICED, (int)cpu.nmi);
+    ct_assertequal(250u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(0xfcu, cpu.s);
+    ct_assertequal(0x20u, mem[509]);
+    ct_assertequal(0x3u, mem[510]);
+    ct_assertequal(0x0u, mem[511]);
+
+    cpu_cycle(&cpu);
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+
+    cpu_cycle(&cpu);
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: NMI pending on vector select
+// NOTE: NMI latched after IRQ started, jumps to NMI handler instead,
+// IRQ signal goes inactive too early and IRQ is lost.
+static void nmi_hijacks_and_loses_irq(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: LDA $0004 (0x20)
+    ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
+    ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
+    uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+
+    for (int i = 0; i < 4; ++i) {
+        cpu_cycle(&cpu);
+        ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    }
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(NIS_SERVICED, (int)cpu.nmi);
+    ct_assertequal(250u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(0xfcu, cpu.s);
+    ct_assertequal(0x20u, mem[509]);
+    ct_assertequal(0x3u, mem[510]);
+    ct_assertequal(0x0u, mem[511]);
+
+    cpu_cycle(&cpu);
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+
+    cpu.signal.irq = true;
+    cpu_cycle(&cpu);
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(251u, cpu.pc);
+}
+
+// NOTE: NMI goes active on vector fetch cycle, delaying NMI detection until
+// after first instruction of IRQ handler.
 static void nmi_delayed_by_irq(void *ctx)
 {
-    ct_assertfail("Not implemented");
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
+    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+
+    for (int i = 0; i < 5; ++i) {
+        cpu_cycle(&cpu);
+        ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    }
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(250u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(0xfcu, cpu.s);
+    ct_assertequal(0x20u, mem[509]);
+    ct_assertequal(0x3u, mem[510]);
+    ct_assertequal(0x0u, mem[511]);
+
+    // NOTE: NMI detected and handled after first instruction of BRK handler
+    cpu_cycle(&cpu);
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+
+    cpu_cycle(&cpu);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: NMI pending on vector select but goes inactive before interrupt clear
+// NOTE: NMI goes active on vector fetch cycle, delaying NMI detection until
+// after IRQ sequence, but NMI goes inactive after first cycle of next
+// instruction, losing the NMI.
 static void nmi_lost_during_irq(void *ctx)
 {
-    ct_assertfail("Not implemented");
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
+    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+
+    for (int i = 0; i < 5; ++i) {
+        cpu_cycle(&cpu);
+        ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    }
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(250u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(0xfcu, cpu.s);
+    ct_assertequal(0x20u, mem[509]);
+    ct_assertequal(0x3u, mem[510]);
+    ct_assertequal(0x0u, mem[511]);
+
+    // NOTE: NMI detected and handled after first instruction of BRK handler
+    cpu_cycle(&cpu);
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+
+    cpu.signal.nmi = true;
+    cpu_cycle(&cpu);
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(251u, cpu.pc);
 }
 
 // NOTE: set RES on on T4 to show hijack cannot be stopped
@@ -1494,6 +1690,7 @@ struct ct_testsuite cpu_interrupt_handler_tests(void)
         ct_maketest(nmi_delayed_by_brk),
         ct_maketest(nmi_lost_during_brk),
         ct_maketest(nmi_hijacks_irq),
+        ct_maketest(nmi_hijacks_and_loses_irq),
         ct_maketest(nmi_delayed_by_irq),
         ct_maketest(nmi_lost_during_irq),
 

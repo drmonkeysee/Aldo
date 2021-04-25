@@ -99,6 +99,10 @@ static void check_interrupts(struct mos6502 *self)
     assert(self->res != NIS_SERVICED);
     assert(self->irq != NIS_SERVICED);
 
+    // NOTE: final cycle of BRK sequence holds interrupt latching low,
+    // delaying detection of any still-active interrupt signals by one cycle.
+    if (self->opc == BrkOpcode && self->t == 6) return;
+
     if (!self->signal.res && self->res == NIS_CLEAR) {
         self->res = NIS_DETECTED;
     }

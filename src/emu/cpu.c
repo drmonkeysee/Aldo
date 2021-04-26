@@ -99,13 +99,14 @@ static void check_interrupts(struct mos6502 *self)
     assert(self->res != NIS_SERVICED);
     assert(self->irq != NIS_SERVICED);
 
-    // NOTE: final cycle of BRK sequence holds interrupt latching low,
-    // delaying detection of any still-active interrupt signals by one cycle.
-    if (self->opc == BrkOpcode && self->t == 6) return;
-
     if (!self->signal.res && self->res == NIS_CLEAR) {
         self->res = NIS_DETECTED;
     }
+
+    // NOTE: final cycle of BRK sequence holds interrupt latching low,
+    // delaying detection of any still-active interrupt signals by one cycle
+    // (except RES which is all-powerful).
+    if (self->opc == BrkOpcode && self->t == 6) return;
 
     if (self->signal.nmi) {
         if (self->nmi == NIS_SERVICED) {
@@ -455,9 +456,16 @@ static void BPL_exec(struct mos6502 *self)
 
 static void BRK_exec(struct mos6502 *self)
 {
-    self->p.i = true;
+    // NOTE: res is only cleared by its own handler;
+    // nmi is serviced by its own handler (for edge detection)
+    // but cleared by all others;
+    // irq is cleared by all handlers.
+    if (self->res == NIS_COMMITTED) {
+        self->res = NIS_CLEAR;
+    }
     self->nmi = self->nmi == NIS_COMMITTED ? NIS_SERVICED : NIS_CLEAR;
-    self->irq = self->res = NIS_CLEAR;
+    self->irq = NIS_CLEAR;
+    self->p.i = true;
     self->pc = bytowr(self->adl, self->databus);
     commit_operation(self);
 }

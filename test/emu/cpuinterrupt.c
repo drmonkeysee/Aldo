@@ -375,6 +375,44 @@ static void nmi_delayed_by_brk(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
+// NOTE: NMI goes active on final BRK cycle, delaying NMI detection until
+// after first instruction of BRK handler.
+static void nmi_late_delayed_by_brk(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
+    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    uint8_t mem[] = {0x0, 0xff, 0xff, [250] = 0xea, [511] = 0xff};
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+
+    for (int i = 0; i < 6; ++i) {
+        cpu_cycle(&cpu);
+        ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    }
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(250u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(0xfcu, cpu.s);
+    ct_assertequal(0x34u, mem[509]);
+    ct_assertequal(0x2u, mem[510]);
+    ct_assertequal(0x0u, mem[511]);
+
+    // NOTE: NMI detected and handled after first instruction of BRK handler
+    cpu_cycle(&cpu);
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+
+    cpu_cycle(&cpu);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(251u, cpu.pc);
+}
+
 // NOTE: NMI goes active on vector fetch cycle, delaying NMI detection until
 // after BRK sequence, but NMI goes inactive after first cycle of next
 // instruction, losing the NMI.
@@ -579,6 +617,53 @@ static void nmi_delayed_by_irq(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
+// NOTE: NMI goes active on final IRQ cycle, delaying NMI detection until
+// after first instruction of IRQ handler.
+static void nmi_late_delayed_by_irq(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
+    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+
+    for (int i = 0; i < 6; ++i) {
+        cpu_cycle(&cpu);
+        ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    }
+
+    cpu.signal.nmi = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
+    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(250u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(0xfcu, cpu.s);
+    ct_assertequal(0x20u, mem[509]);
+    ct_assertequal(0x3u, mem[510]);
+    ct_assertequal(0x0u, mem[511]);
+
+    // NOTE: NMI detected and handled after first instruction of BRK handler
+    cpu_cycle(&cpu);
+    ct_assertequal(NIS_DETECTED, (int)cpu.nmi);
+
+    cpu_cycle(&cpu);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(251u, cpu.pc);
+}
+
 // NOTE: NMI goes active on vector fetch cycle, delaying NMI detection until
 // after IRQ sequence, but NMI goes inactive after first cycle of next
 // instruction, losing the NMI.
@@ -632,16 +717,355 @@ static void nmi_lost_during_irq(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: set RES on on T4 to show hijack cannot be stopped
+// NOTE: these tests do not reflect actual 6502 behavior, called
+// "RESET half-hijacks", which exhibit all kinds of glitchy effects;
+// however since no legit software would ever rely on this behavior and it is
+// essentially impossible to recreate these conditions on functioning consumer
+// hardware, it's easier to implement simpler logic that behaves consistently.
+
+// NOTE: set RES on T4 prevents IRQ from finishing
 static void res_hijacks_irq(void *ctx)
 {
-    ct_assertfail("Not implemented");
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
+    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+
+    for (int i = 0; i < 4; ++i) {
+        cpu_cycle(&cpu);
+        ct_assertequal(NIS_CLEAR, (int)cpu.res);
+    }
+
+    cpu.signal.res = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.res);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.res);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+    ct_assertequal(0xfcu, cpu.s);
+    ct_assertequal(0x20u, mem[509]);
+    ct_assertequal(0x3u, mem[510]);
+    ct_assertequal(0x0u, mem[511]);
+    ct_asserttrue(cpu.presync);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(3u, cpu.pc);
+    ct_asserttrue(cpu.presync);
+
+    cpu.signal.res = true;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertfalse(cpu.presync);
+    ct_assertequal(0u, cpu.opc);
 }
 
-// NOTE: set RES on on T4 to show hijack cannot be stopped
+// NOTE: set RES on T5 triggers RES sequence immediately after IRQ sequence
+static void res_following_irq(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
+    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    uint8_t mem[] = {
+        0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
+    };
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+
+    for (int i = 0; i < 5; ++i) {
+        cpu_cycle(&cpu);
+        ct_assertequal(NIS_CLEAR, (int)cpu.res);
+    }
+
+    cpu.signal.res = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.res);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.res);
+    ct_assertequal(250u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(0xfcu, cpu.s);
+    ct_assertequal(0x20u, mem[509]);
+    ct_assertequal(0x3u, mem[510]);
+    ct_assertequal(0x0u, mem[511]);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(250u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(250u, cpu.pc);
+
+    cpu.signal.res = true;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(250u, cpu.pc);
+}
+
+// NOTE: set RES on T6 still triggers reset immediately after IRQ sequence
+static void res_late_on_irq(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
+    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    uint8_t mem[] = {
+        0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
+    };
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+
+    for (int i = 0; i < 6; ++i) {
+        cpu_cycle(&cpu);
+        ct_assertequal(NIS_CLEAR, (int)cpu.res);
+    }
+
+    cpu.signal.res = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.res);
+    ct_assertequal(250u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(0xfcu, cpu.s);
+    ct_assertequal(0x20u, mem[509]);
+    ct_assertequal(0x3u, mem[510]);
+    ct_assertequal(0x0u, mem[511]);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.res);
+    ct_assertequal(251u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(251u, cpu.pc);
+
+    cpu.signal.res = true;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(251u, cpu.pc);
+}
+
+// NOTE: set RES on T4 prevents NMI from finishing
 static void res_hijacks_nmi(void *ctx)
 {
-    ct_assertfail("Not implemented");
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
+    ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
+    uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+
+    cpu.signal.nmi = false;
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+
+    for (int i = 0; i < 4; ++i) {
+        cpu_cycle(&cpu);
+        ct_assertequal(NIS_CLEAR, (int)cpu.res);
+    }
+
+    cpu.signal.res = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.res);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.res);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(3u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(0xfcu, cpu.s);
+    ct_assertequal(0x24u, mem[509]);
+    ct_assertequal(0x3u, mem[510]);
+    ct_assertequal(0x0u, mem[511]);
+    ct_asserttrue(cpu.presync);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(3u, cpu.pc);
+    ct_asserttrue(cpu.presync);
+
+    cpu.signal.res = true;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertfalse(cpu.presync);
+    ct_assertequal(0u, cpu.opc);
+}
+
+// NOTE: set RES on T5 triggers RES sequence immediately after NMI sequence
+static void res_following_nmi(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
+    ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
+    uint8_t mem[] = {
+        0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
+    };
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+
+    cpu.signal.nmi = false;
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+
+    for (int i = 0; i < 5; ++i) {
+        cpu_cycle(&cpu);
+        ct_assertequal(NIS_CLEAR, (int)cpu.res);
+    }
+
+    cpu.signal.res = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.res);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.res);
+    ct_assertequal(250u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(0xfcu, cpu.s);
+    ct_assertequal(0x24u, mem[509]);
+    ct_assertequal(0x3u, mem[510]);
+    ct_assertequal(0x0u, mem[511]);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(250u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(250u, cpu.pc);
+
+    cpu.signal.res = true;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(250u, cpu.pc);
+}
+
+// NOTE: set RES on T6 still triggers reset immediately after NMI sequence
+static void res_late_on_nmi(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
+    ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
+    uint8_t mem[] = {
+        0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
+    };
+    cpu.ram = mem;
+    cpu.cart = ctx;
+    cpu.s = 0xff;
+
+    cpu.signal.nmi = false;
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(NIS_COMMITTED, (int)cpu.nmi);
+
+    for (int i = 0; i < 6; ++i) {
+        cpu_cycle(&cpu);
+        ct_assertequal(NIS_CLEAR, (int)cpu.res);
+    }
+
+    cpu.signal.res = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.res);
+    ct_assertequal(250u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+    ct_assertequal(0xfcu, cpu.s);
+    ct_assertequal(0x24u, mem[509]);
+    ct_assertequal(0x3u, mem[510]);
+    ct_assertequal(0x0u, mem[511]);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.res);
+    ct_assertequal(251u, cpu.pc);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(251u, cpu.pc);
+
+    cpu.signal.res = true;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(251u, cpu.pc);
 }
 
 //
@@ -1688,14 +2112,20 @@ struct ct_testsuite cpu_interrupt_handler_tests(void)
         ct_maketest(nmi_line_never_cleared),
         ct_maketest(nmi_hijacks_brk),
         ct_maketest(nmi_delayed_by_brk),
+        ct_maketest(nmi_late_delayed_by_brk),
         ct_maketest(nmi_lost_during_brk),
         ct_maketest(nmi_hijacks_irq),
         ct_maketest(nmi_hijacks_and_loses_irq),
         ct_maketest(nmi_delayed_by_irq),
+        ct_maketest(nmi_late_delayed_by_irq),
         ct_maketest(nmi_lost_during_irq),
 
         ct_maketest(res_hijacks_irq),
+        ct_maketest(res_following_irq),
+        ct_maketest(res_late_on_irq),
         ct_maketest(res_hijacks_nmi),
+        ct_maketest(res_following_nmi),
+        ct_maketest(res_late_on_nmi),
     };
 
     return ct_makesuite_setup_teardown(tests, interrupt_handler_setup,

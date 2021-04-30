@@ -169,6 +169,52 @@ static void res_handler(void *ctx)
     ct_assertequal(NIS_CLEAR, (int)cpu.res);
 }
 
+static void rti_clear_irq_mask(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x40, 0xff, 0xff, [258] = 0xb3, [259] = 0x5, [260] = 0x0};
+    cpu.ram = mem;
+    cpu.s = 1;
+    cpu.p.i = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(5u, cpu.pc);
+
+    ct_assertequal(4u, cpu.s);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.i);
+    ct_assertfalse(cpu.p.d);
+    ct_assertfalse(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void rti_set_irq_mask(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    uint8_t mem[] = {0x40, 0xff, 0xff, [258] = 0x7c, [259] = 0x2, [260] = 0x0};
+    cpu.ram = mem;
+    cpu.s = 1;
+    cpu.p.i = false;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(5u, cpu.pc);
+
+    ct_assertequal(4u, cpu.s);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.i);
+    ct_asserttrue(cpu.p.d);
+    ct_asserttrue(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
 // NOTE: IRQ latched after soft BRK started;
 // IRQ handler will see IRQ line active but B flag set
 // and PC advanced past BRK instruction.
@@ -1541,6 +1587,55 @@ static void irq_missed_by_plp_set_mask(void *ctx)
     ct_asserttrue(cpu.p.i);
 }
 
+static void irq_stopped_by_rti_set_mask(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: RTI (P @ $0101)
+    uint8_t mem[] = {
+        0x40, 0xff, 0xff, 0xff, 0xff, [257] = 0x4, [258] = 0x5, [259] = 0x0,
+    };
+    cpu.ram = mem;
+    cpu.p.i = false;
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(5u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+}
+
 static void irq_missed_by_cli(void *ctx)
 {
     struct mos6502 cpu;
@@ -1620,6 +1715,55 @@ static void irq_missed_by_plp_clear_mask(void *ctx)
 
     ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+}
+
+static void irq_allowed_by_rti_clear_mask(void *ctx)
+{
+    struct mos6502 cpu;
+    setup_cpu(&cpu);
+    // NOTE: RTI (P @ $0101)
+    uint8_t mem[] = {
+        0x40, 0xff, 0xff, 0xff, 0xff, [257] = 0x0, [258] = 0x5, [259] = 0x0,
+    };
+    cpu.ram = mem;
+    cpu.p.i = true;
+
+    cpu.signal.irq = false;
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_DETECTED, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(1u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(NIS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(5u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 }
 
@@ -2105,6 +2249,8 @@ struct ct_testsuite cpu_interrupt_handler_tests(void)
         ct_maketest(irq_handler),
         ct_maketest(nmi_handler),
         ct_maketest(res_handler),
+        ct_maketest(rti_clear_irq_mask),
+        ct_maketest(rti_set_irq_mask),
 
         ct_maketest(brk_masks_irq),
         ct_maketest(irq_ghost),
@@ -2152,8 +2298,10 @@ struct ct_testsuite cpu_interrupt_signal_tests(void)
         ct_maketest(irq_masked),
         ct_maketest(irq_missed_by_sei),
         ct_maketest(irq_missed_by_plp_set_mask),
+        ct_maketest(irq_stopped_by_rti_set_mask),
         ct_maketest(irq_missed_by_cli),
         ct_maketest(irq_missed_by_plp_clear_mask),
+        ct_maketest(irq_allowed_by_rti_clear_mask),
         ct_maketest(irq_detect_duplicate),
 
         ct_maketest(nmi_poll_sequence),

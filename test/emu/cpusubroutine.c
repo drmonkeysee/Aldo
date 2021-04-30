@@ -44,7 +44,7 @@ static void rts(void *ctx)
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(6, cycles);
-    ct_assertequal(0x3u, cpu.pc);
+    ct_assertequal(3u, cpu.pc);
 
     ct_assertequal(4u, cpu.s);
 }

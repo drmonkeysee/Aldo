@@ -668,7 +668,8 @@ static void ROR_exec(struct mos6502 *self, struct decoded dec)
 
 static void RTI_exec(struct mos6502 *self)
 {
-    self->presync = true;
+    self->pc = bytowr(self->adl, self->databus);
+    commit_operation(self);
 }
 
 static void RTS_exec(struct mos6502 *self)
@@ -1226,7 +1227,29 @@ static void BRK_sequence(struct mos6502 *self, struct decoded dec)
 
 static void RTI_sequence(struct mos6502 *self, struct decoded dec)
 {
-    (void)self, (void)dec;
+    switch (self->t) {
+    case 1:
+        self->addrbus = self->pc++;
+        read(self);
+        break;
+    case 2:
+        stack_top(self);
+        break;
+    case 3:
+        stack_pop(self);
+        break;
+    case 4:
+        set_p(self, self->databus);
+        stack_pop(self);
+        break;
+    case 5:
+        self->adl = self->databus;
+        stack_pop(self);
+        dispatch_instruction(self, dec);
+        break;
+    default:
+        BAD_ADDR_SEQ;
+    }
 }
 
 static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)

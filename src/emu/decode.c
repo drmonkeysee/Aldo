@@ -79,7 +79,7 @@ const struct decoded Decode[] = {
     {IN_AND, AM_ABSX},    // 3D - AND abs,X
     {IN_ROL, AM_ABSX},    // 3E - ROL abs,X
     UNK,    // 3F - Unofficial
-    UNK,    // 40 - RTI
+    {IN_RTI, AM_RTI},    // 40 - RTI
     {IN_EOR, AM_INDX},    // 41 - EOR (zp,X)
     UNK,    // 42 - Unofficial
     UNK,    // 43 - Unofficial

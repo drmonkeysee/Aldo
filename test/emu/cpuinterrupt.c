@@ -196,7 +196,7 @@ static void rti_set_irq_mask(void *ctx)
 {
     struct mos6502 cpu;
     setup_cpu(&cpu);
-    uint8_t mem[] = {0x40, 0xff, 0xff, [258] = 0x7c, [259] = 0x2, [260] = 0x0};
+    uint8_t mem[] = {0x40, 0xff, 0xff, [258] = 0x7c, [259] = 0x5, [260] = 0x0};
     cpu.ram = mem;
     cpu.s = 1;
     cpu.p.i = false;
@@ -1608,25 +1608,25 @@ static void irq_stopped_by_rti_set_mask(void *ctx)
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_PENDING, (int)cpu.irq);
-    ct_assertequal(1u, cpu.pc);
+    ct_assertequal(2u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_PENDING, (int)cpu.irq);
-    ct_assertequal(1u, cpu.pc);
+    ct_assertequal(2u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_PENDING, (int)cpu.irq);
-    ct_assertequal(1u, cpu.pc);
-    ct_asserttrue(cpu.p.i);
+    ct_assertequal(2u, cpu.pc);
+    ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_PENDING, (int)cpu.irq);
-    ct_assertequal(1u, cpu.pc);
+    ct_assertequal(2u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 
     cpu_cycle(&cpu);
@@ -1739,25 +1739,25 @@ static void irq_allowed_by_rti_clear_mask(void *ctx)
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_PENDING, (int)cpu.irq);
-    ct_assertequal(1u, cpu.pc);
+    ct_assertequal(2u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_PENDING, (int)cpu.irq);
-    ct_assertequal(1u, cpu.pc);
+    ct_assertequal(2u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_PENDING, (int)cpu.irq);
-    ct_assertequal(1u, cpu.pc);
-    ct_assertfalse(cpu.p.i);
+    ct_assertequal(2u, cpu.pc);
+    ct_asserttrue(cpu.p.i);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(NIS_PENDING, (int)cpu.irq);
-    ct_assertequal(1u, cpu.pc);
+    ct_assertequal(2u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);

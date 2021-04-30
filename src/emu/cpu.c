@@ -783,7 +783,7 @@ static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 //    (latching previous databus contents, adding address offsets, etc.)
 // 3. execute read/write/instruction, either reading data to databus
 //    or writing data from databus (roughly ϕ2)
-// Note that the actual 6502 executes instruction side-effects on T0 of the
+// Note that the actual 6502 executes instruction side-effects on T0/T1 of the
 // next instruction but we execute all side-effects within the current
 // instruction sequence (generally the last cycle); in other words we don't
 // emulate the 6502's simple pipelining.
@@ -862,7 +862,7 @@ static void branch_displacement(struct mos6502 *self)
     // subtracting -overflow condition from +overflow condition results in:
     // no overflow = 0 - 0 => pch + 0,
     // +overflow = 1 - 0 => pch + 1,
-    // -overlow = 0 - 1 => pch - 1 => pch + 2sComplement(1) => pch + 0xff.
+    // -overflow = 0 - 1 => pch - 1 => pch + 2sComplement(1) => pch + 0xff.
     const bool negative_offset = self->databus & 0x80,
                positive_overflow = self->adl < self->databus
                                    && !negative_offset,

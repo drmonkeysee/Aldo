@@ -15,6 +15,7 @@
 #include <panel.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <locale.h>
 #include <math.h>
 #include <stdbool.h>
@@ -83,16 +84,21 @@ static void tick_sleep(void)
         return;
     }
 
-    const struct timespec tick_left = {
+    struct timespec tick_left = {
         .tv_nsec = VSync.tv_nsec - elapsed.tv_nsec,
-    };
+    }, tick_req;
     FrameLeftMs = to_ms(&tick_left);
-    // TODO: handle EINTR
+
+    int result;
+    do {
+        tick_req = tick_left;
 #ifdef __APPLE__
-    nanosleep(&tick_left, NULL);
+        errno = 0;
+        result = nanosleep(&tick_req, &tick_left) ? errno : 0;
 #else
-    clock_nanosleep(CLOCK_MONOTONIC, 0, &tick_left, NULL);
+        result = clock_nanosleep(CLOCK_MONOTONIC, 0, &tick_req, &tick_left);
 #endif
+    } while (result == EINTR);
 }
 
 //

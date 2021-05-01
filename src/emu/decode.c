@@ -11,7 +11,6 @@
 
 const int BrkOpcode = 0x0;
 
-// TODO: fill this out
 // Decoding table for all official MOS6502
 // and unofficial Ricoh 2A03 opcodes.
 const struct decoded Decode[] = {

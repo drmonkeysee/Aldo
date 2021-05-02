@@ -13,14 +13,16 @@ The Homebrew and ncurses steps get you the latest version of ncurses and are opt
 1. Install Xcode
 2. Install [Homebrew](https://brew.sh)
 3. `brew install ncurses`
-4. `make run`
+4. `make run` to print usage
+5. `make run FILE=<file>` to load a program ROM
 
 ### Debian/Ubuntu
 
 1. Run `locale` to verify your terminal is using a UTF-8 locale (`C.UTF-8` will work)
 2. `[sudo] apt-get update`
 3. `[sudo] apt-get install -y build-essential git libncurses-dev` (`libncursesw5-dev` on older OS versions)
-4. `make run`
+4. `make run` to print usage
+5. `make run FILE=<file>` to load a program ROM
 
 ## Test
 

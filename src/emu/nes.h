@@ -8,6 +8,7 @@
 #ifndef Aldo_emu_nes_h
 #define Aldo_emu_nes_h
 
+#include "cart.h"
 #include "snapshot.h"
 
 #include <stddef.h>
@@ -20,12 +21,12 @@ enum nes_interrupt {
 };
 typedef struct nes_console nes;
 
-nes *nes_new(void);
+nes *nes_new(cart *c);
 void nes_free(nes *self);
 
 void nes_mode(nes *self, enum nexcmode mode);
 
-void nes_powerup(nes *self, size_t sz, const uint8_t prg[restrict sz]);
+void nes_powerup(nes *self);
 
 void nes_ready(nes *self);
 void nes_halt(nes *self);

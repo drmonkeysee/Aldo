@@ -26,7 +26,7 @@ static void read(struct mos6502 *self)
         return;
     }
     if (CpuRomMinAddr <= self->addrbus && self->addrbus <= CpuRomMaxAddr) {
-        self->databus = self->cart[self->addrbus & CpuRomAddrMask];
+        self->databus = self->rom[self->addrbus & CpuRomAddrMask];
         return;
     }
     self->dflt = true;

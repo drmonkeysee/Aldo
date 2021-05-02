@@ -11,6 +11,6 @@ import Foundation
 
 print("Aldo Dev Started...")
 
-let result = aldo_run();
+let result = aldo_run(CommandLine.argc, CommandLine.unsafeArgv);
 
 exit(result)

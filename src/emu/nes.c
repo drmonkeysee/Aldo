@@ -15,48 +15,32 @@
 #include <stdlib.h>
 
 // The NES-001 Motherboard including the CPU/Audio Generator, PPU,
-// RAM, VRAM, and memory-mapped banks for Cartridge RAM/ROM and
-// Controller Input.
+// RAM, VRAM, Cartridge RAM/ROM and Controller Input.
 
 struct nes_console {
     struct mos6502 cpu;     // CPU Core of RP2A03 Chip
+    cart *cart;             // Game Cartridge
     enum nexcmode mode;     // NES execution mode
-    uint8_t ram[RAM_SIZE],  // CPU Internal RAM
-            cart[ROM_SIZE]; // TODO: Cartridge ROM to be replaced
-                            // eventually with cartridge + mapper
+    uint8_t ram[RAM_SIZE];  // CPU Internal RAM
 };
-
-static void load_prg(nes *self, size_t sz, const uint8_t prg[restrict sz])
-{
-    // TODO: stick test programs at 0x8000 for now
-    assert(sz <= ROM_SIZE);
-
-    for (size_t i = 0; i < sz; ++i) {
-        self->cart[(i + CpuRomMinAddr) & CpuRomAddrMask] = prg[i];
-    }
-    wrtoba(CpuRomMinAddr, self->cart + (ResetVector & CpuRomAddrMask));
-    wrtoba(0x8004, self->cart + (IrqVector & CpuRomAddrMask));
-
-    // TODO: throw random stuff into RAM for testing
-    for (size_t i = 0; i < RAM_SIZE; ++i) {
-        self->ram[i] = rand() % 0x100;
-    }
-}
 
 //
 // Public Interface
 //
 
-nes *nes_new(void)
+nes *nes_new(cart *c)
 {
+    assert(c != NULL);
+
     struct nes_console *const self = malloc(sizeof *self);
+    self->cart = c;
     self->cpu.ram = self->ram;
-    self->cpu.cart = self->cart;
     return self;
 }
 
 void nes_free(nes *self)
 {
+    cart_free(self->cart);
     free(self);
 }
 
@@ -67,12 +51,23 @@ void nes_mode(nes *self, enum nexcmode mode)
     self->mode = mode < 0 ? NEXC_MODECOUNT - 1 : mode % NEXC_MODECOUNT;
 }
 
-void nes_powerup(nes *self, size_t sz, const uint8_t prg[restrict sz])
+void nes_powerup(nes *self)
 {
     assert(self != NULL);
 
+    // TODO: vectors hardcoded for now
+    uint8_t *const prgbank = cart_prg_bank(self->cart);
+    wrtoba(CpuRomMinAddr, prgbank + (ResetVector & CpuRomAddrMask));
+    wrtoba(0x8004, prgbank + (IrqVector & CpuRomAddrMask));
+
+    // TODO: throw random stuff into RAM for testing
+    for (size_t i = 0; i < RAM_SIZE; ++i) {
+        self->ram[i] = rand() % 0x100;
+    }
+
+    // TODO: for now wire up single rom bank to cpu
+    self->cpu.rom = prgbank;
     cpu_powerup(&self->cpu);
-    load_prg(self, sz, prg);
 }
 
 void nes_ready(nes *self)
@@ -165,7 +160,7 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
     if (!snapshot) return;
 
     cpu_snapshot(&self->cpu, snapshot);
+    cart_snapshot(self->cart, snapshot);
     snapshot->mode = self->mode;
     snapshot->ram = self->ram;
-    snapshot->rom = self->cart;
 }

@@ -62,8 +62,8 @@ struct mos6502 {
                         // the following cycle as an opcode fetch (T0).
 
     // Buses: external components connected to the CPU pins
-    uint8_t *ram;           // RAM Bus
-    const uint8_t *cart;    // TODO: temp pointer to fake cartridge
+    uint8_t *ram;       // RAM Bus
+    const uint8_t *rom; // ROM Bus
 };
 
 void cpu_powerup(struct mos6502 *self);

@@ -8,6 +8,9 @@
 #ifndef Aldo_emu_cart_h
 #define Aldo_emu_cart_h
 
+#include "snapshot.h"
+
+#include <stdint.h>
 #include <stdio.h>
 
 // X(symbol, value, error string)
@@ -28,8 +31,12 @@ typedef struct cartridge cart;
 // **WARNING**: do not write through or free this pointer!
 const char *cart_errstr(int error);
 
-// NOTE: if cart_create returns non-zero error code, c remains untouched
-int cart_create(cart *c, FILE *f);
+// NOTE: if cart_create returns non-zero error code, *c is unmodified
+int cart_create(cart **c, FILE *f);
 void cart_free(cart *self);
+
+uint8_t *cart_prg_bank(cart *self);
+
+void cart_snapshot(cart *self, struct console_state *snapshot);
 
 #endif

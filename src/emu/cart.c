@@ -11,7 +11,6 @@
 
 #include <assert.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 
 // A NES game cartridge including PRG and CHR ROM banks,
@@ -36,26 +35,45 @@ const char *cart_errstr(int error)
     }
 }
 
-int cart_create(cart *c, FILE *f)
+int cart_create(cart **c, FILE *f)
 {
     assert(c != NULL);
     assert(f != NULL);
 
-    struct cartridge *const self = malloc(sizeof *self);
+    // TODO: calloc to zero out unused ROM
+    struct cartridge *const self = calloc(1, sizeof *self);
     const size_t bufsize = sizeof self->prg / sizeof self->prg[0],
                  count = fread(self->prg, sizeof self->prg[0], bufsize, f);
+    int error;
     if (feof(f)) {
-        c = self;
+        *c = self;
         return 0;
     } else if (ferror(f)) {
-        return CART_IO_ERR;
+        error = CART_IO_ERR;
     } else if (count == bufsize) {
-        return CART_PRG_SIZE;
+        error = CART_PRG_SIZE;
+    } else {
+        error = CART_UNKNOWN;
     }
-    return CART_UNKNOWN;
+    cart_free(self);
+    return error;
 }
 
 void cart_free(cart *self)
 {
     free(self);
+}
+
+uint8_t *cart_prg_bank(cart *self)
+{
+    assert(self != NULL);
+
+    return self->prg;
+}
+
+void cart_snapshot(cart *self, struct console_state *snapshot)
+{
+    assert(self != NULL);
+
+    snapshot->rom = cart_prg_bank(self);
 }

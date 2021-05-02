@@ -183,8 +183,6 @@ static void update(struct control *appstate, struct console_state *snapshot,
 
 int aldo_run(int argc, char *argv[argc+1])
 {
-    puts("Aldo starting...");
-
     struct control appstate = {.cycles_per_sec = 4, .running = true};
     struct console_state snapshot;
     //getchar();
@@ -232,6 +230,5 @@ int aldo_run(int argc, char *argv[argc+1])
     console = NULL;
     snapshot.ram = snapshot.rom = NULL;
 
-    puts("Aldo stopping...");
     return EXIT_SUCCESS;
 }

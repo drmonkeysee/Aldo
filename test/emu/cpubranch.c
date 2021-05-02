@@ -80,7 +80,7 @@ static void bcc_positive_wraparound(void *ctx)
     uint8_t *const rom = calloc(0x8000, sizeof *rom);
     rom[0xfffa & CpuRomAddrMask] = 0x90;
     rom[0xfffb & CpuRomAddrMask] = 0xa;
-    cpu.cart = rom;
+    cpu.rom = rom;
     cpu.pc = 0xfffa;
 
     const int cycles = clock_cpu(&cpu);
@@ -112,7 +112,7 @@ static void bcc_negative_wraparound(void *ctx)
     cpu.ram = mem;
     // NOTE: 32k rom, starting at $8000 to allow reads of wraparound addresses
     uint8_t *const rom = calloc(0x8000, sizeof *rom);
-    cpu.cart = rom;
+    cpu.rom = rom;
 
     const int cycles = clock_cpu(&cpu);
 

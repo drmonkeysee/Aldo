@@ -41,7 +41,7 @@ static void brk_handler(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0x0, 0xff, 0xff, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
 
     const int cycles = clock_cpu(&cpu);
@@ -66,7 +66,7 @@ static void irq_handler(void *ctx)
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.p.i = false;
     cpu.signal.irq = false;
@@ -99,7 +99,7 @@ static void nmi_handler(void *ctx)
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.signal.nmi = false;
 
@@ -134,7 +134,7 @@ static void res_handler(void *ctx)
         0xad, 0x4, 0x0, 0xff, 0x20, [509] = 0xdd, [510] = 0xee, [511] = 0xff,
     };
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.signal.res = false;
 
@@ -226,7 +226,7 @@ static void brk_masks_irq(void *ctx)
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0x0, 0xff, 0xff, [250] = 0xea, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -271,7 +271,7 @@ static void irq_ghost(void *ctx)
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.p.i = false;
     cpu.signal.irq = false;
@@ -309,7 +309,7 @@ static void nmi_line_never_cleared(void *ctx)
     ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.signal.nmi = false;
 
@@ -351,7 +351,7 @@ static void nmi_hijacks_brk(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0x0, 0xff, 0xff, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
 
     for (int i = 0; i < 4; ++i) {
@@ -389,7 +389,7 @@ static void nmi_delayed_by_brk(void *ctx)
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0x0, 0xff, 0xff, [250] = 0xea, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
 
     for (int i = 0; i < 5; ++i) {
@@ -431,7 +431,7 @@ static void nmi_late_delayed_by_brk(void *ctx)
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0x0, 0xff, 0xff, [250] = 0xea, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
 
     for (int i = 0; i < 6; ++i) {
@@ -470,7 +470,7 @@ static void nmi_lost_during_brk(void *ctx)
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0x0, 0xff, 0xff, [250] = 0xea, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
 
     for (int i = 0; i < 5; ++i) {
@@ -512,7 +512,7 @@ static void nmi_hijacks_irq(void *ctx)
     ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -567,7 +567,7 @@ static void nmi_hijacks_and_loses_irq(void *ctx)
     ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -622,7 +622,7 @@ static void nmi_delayed_by_irq(void *ctx)
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -673,7 +673,7 @@ static void nmi_late_delayed_by_irq(void *ctx)
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -721,7 +721,7 @@ static void nmi_lost_during_irq(void *ctx)
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -778,7 +778,7 @@ static void res_hijacks_irq(void *ctx)
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -840,7 +840,7 @@ static void res_following_irq(void *ctx)
         0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
     };
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -899,7 +899,7 @@ static void res_late_on_irq(void *ctx)
         0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
     };
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -952,7 +952,7 @@ static void res_hijacks_nmi(void *ctx)
     ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
 
     cpu.signal.nmi = false;
@@ -1013,7 +1013,7 @@ static void res_following_nmi(void *ctx)
         0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
     };
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
 
     cpu.signal.nmi = false;
@@ -1071,7 +1071,7 @@ static void res_late_on_nmi(void *ctx)
         0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
     };
     cpu.ram = mem;
-    cpu.cart = ctx;
+    cpu.rom = ctx;
     cpu.s = 0xff;
 
     cpu.signal.nmi = false;

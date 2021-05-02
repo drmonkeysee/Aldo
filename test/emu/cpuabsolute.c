@@ -23,7 +23,7 @@ static void adc_abs(void *ctx)
     const uint8_t abs[] = {0xff, 0x6};
     cpu.a = 0xa;    // NOTE: 10 + 6
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -45,7 +45,7 @@ static void and_abs(void *ctx)
     const uint8_t abs[] = {0xff, 0xc};
     cpu.a = 0xa;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -86,7 +86,7 @@ static void bit_abs(void *ctx)
     const uint8_t abs[] = {0xff, 0x6};
     cpu.a = 0x2;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -107,7 +107,7 @@ static void cmp_abs(void *ctx)
     const uint8_t abs[] = {0xff, 0x10};
     cpu.a = 0x10;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -128,7 +128,7 @@ static void cpx_abs(void *ctx)
     const uint8_t abs[] = {0xff, 0x10};
     cpu.x = 0x10;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -149,7 +149,7 @@ static void cpy_abs(void *ctx)
     const uint8_t abs[] = {0xff, 0x10};
     cpu.y = 0x10;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -190,7 +190,7 @@ static void eor_abs(void *ctx)
     const uint8_t abs[] = {0xff, 0xfc};
     cpu.a = 0xfa;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -229,7 +229,7 @@ static void lda_abs(void *ctx)
     uint8_t mem[] = {0xad, 0x1, 0x80};
     const uint8_t abs[] = {0xff, 0x45};
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -248,7 +248,7 @@ static void ldx_abs(void *ctx)
     uint8_t mem[] = {0xae, 0x1, 0x80};
     const uint8_t abs[] = {0xff, 0x45};
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -267,7 +267,7 @@ static void ldy_abs(void *ctx)
     uint8_t mem[] = {0xac, 0x1, 0x80};
     const uint8_t abs[] = {0xff, 0x45};
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -308,7 +308,7 @@ static void ora_abs(void *ctx)
     const uint8_t abs[] = {0xff, 0xc};
     cpu.a = 0xa;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -373,7 +373,7 @@ static void sbc_abs(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - 6
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -456,7 +456,7 @@ static void adc_absx(void *ctx)
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
     cpu.a = 0xa;    // NOTE: 10 + 6
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -478,7 +478,7 @@ static void adc_absx_pagecross(void *ctx)
     uint8_t mem[] = {0x7d, 0xff, 0x80};
     cpu.a = 0xa;    // NOTE: 10 + 178
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -501,7 +501,7 @@ static void and_absx(void *ctx)
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
     cpu.a = 0xa;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -521,7 +521,7 @@ static void and_absx_pagecross(void *ctx)
     uint8_t mem[] = {0x3d, 0xff, 0x80};
     cpu.a = 0xea;
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -586,7 +586,7 @@ static void cmp_absx(void *ctx)
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
     cpu.a = 0x10;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -607,7 +607,7 @@ static void cmp_absx_pagecross(void *ctx)
     uint8_t mem[] = {0xdd, 0xff, 0x80};
     cpu.a = 0x10;
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -671,7 +671,7 @@ static void eor_absx(void *ctx)
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
     cpu.a = 0xfa;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -691,7 +691,7 @@ static void eor_absx_pagecross(void *ctx)
     uint8_t mem[] = {0x5d, 0xff, 0x80};
     cpu.a = 0xea;
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -753,7 +753,7 @@ static void lda_absx(void *ctx)
     uint8_t mem[] = {0xbd, 0x1, 0x80};
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -772,7 +772,7 @@ static void lda_absx_pagecross(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0xbd, 0xff, 0x80};
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -792,7 +792,7 @@ static void ldy_absx(void *ctx)
     uint8_t mem[] = {0xbc, 0x1, 0x80};
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -811,7 +811,7 @@ static void ldy_absx_pagecross(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0xbc, 0xff, 0x80};
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -876,7 +876,7 @@ static void ora_absx(void *ctx)
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
     cpu.a = 0xa;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -896,7 +896,7 @@ static void ora_absx_pagecross(void *ctx)
     uint8_t mem[] = {0x1d, 0xff, 0x80};
     cpu.a = 0xea;
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1010,7 +1010,7 @@ static void sbc_absx(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - 6
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1033,7 +1033,7 @@ static void sbc_absx_pagecross(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - (-78)
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1100,7 +1100,7 @@ static void adc_absy(void *ctx)
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
     cpu.a = 0xa;    // NOTE: 10 + 6
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1122,7 +1122,7 @@ static void adc_absy_pagecross(void *ctx)
     uint8_t mem[] = {0x79, 0xff, 0x80};
     cpu.a = 0xa;    // NOTE: 10 + 178
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1145,7 +1145,7 @@ static void and_absy(void *ctx)
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
     cpu.a = 0xa;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1165,7 +1165,7 @@ static void and_absy_pagecross(void *ctx)
     uint8_t mem[] = {0x39, 0xff, 0x80};
     cpu.a = 0xea;
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1186,7 +1186,7 @@ static void cmp_absy(void *ctx)
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
     cpu.a = 0x10;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1207,7 +1207,7 @@ static void cmp_absy_pagecross(void *ctx)
     uint8_t mem[] = {0xd9, 0xff, 0x80};
     cpu.a = 0x10;
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1229,7 +1229,7 @@ static void eor_absy(void *ctx)
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
     cpu.a = 0xfa;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1249,7 +1249,7 @@ static void eor_absy_pagecross(void *ctx)
     uint8_t mem[] = {0x59, 0xff, 0x80};
     cpu.a = 0xea;
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1269,7 +1269,7 @@ static void lda_absy(void *ctx)
     uint8_t mem[] = {0xb9, 0x1, 0x80};
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1288,7 +1288,7 @@ static void lda_absy_pagecross(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0xb9, 0xff, 0x80};
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1308,7 +1308,7 @@ static void ldx_absy(void *ctx)
     uint8_t mem[] = {0xbe, 0x1, 0x80};
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1327,7 +1327,7 @@ static void ldx_absy_pagecross(void *ctx)
     setup_cpu(&cpu);
     uint8_t mem[] = {0xbe, 0xff, 0x80};
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1348,7 +1348,7 @@ static void ora_absy(void *ctx)
     const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
     cpu.a = 0xa;
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1368,7 +1368,7 @@ static void ora_absy_pagecross(void *ctx)
     uint8_t mem[] = {0x19, 0xff, 0x80};
     cpu.a = 0xea;
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1390,7 +1390,7 @@ static void sbc_absy(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - 6
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1413,7 +1413,7 @@ static void sbc_absy_pagecross(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - (-78)
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);

@@ -35,7 +35,7 @@ static void jmp_indirect(void *ctx)
     uint8_t mem[] = {0x6c, 0x1, 0x80};
     const uint8_t abs[] = {0xff, 0xef, 0xbe};
     cpu.ram = mem;
-    cpu.cart = abs;
+    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -51,7 +51,7 @@ static void jmp_indirect_pageboundary_bug(void *ctx)
     // but actually ignores the carry and reads from $80FF, $8000.
     uint8_t mem[] = {0x6c, 0xff, 0x80};
     cpu.ram = mem;
-    cpu.cart = bigrom;
+    cpu.rom = bigrom;
 
     const int cycles = clock_cpu(&cpu);
 

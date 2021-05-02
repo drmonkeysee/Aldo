@@ -143,9 +143,7 @@ int aldo_run(int argc, char *argv[argc+1])
         return EXIT_FAILURE;
     }
 
-    nes *console = nes_new(c);
-    // NOTE: console takes ownership of cart
-    c = NULL;
+    nes *console = nes_new(&c);
     nes_powerup(console);
     // NOTE: initialize snapshot from console
     nes_snapshot(console, &snapshot);

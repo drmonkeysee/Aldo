@@ -28,12 +28,14 @@ struct nes_console {
 // Public Interface
 //
 
-nes *nes_new(cart *c)
+nes *nes_new(cart **c)
 {
     assert(c != NULL);
+    assert(*c != NULL);
 
     struct nes_console *const self = malloc(sizeof *self);
-    self->cart = c;
+    self->cart = *c;
+    *c = NULL;
     self->cpu.ram = self->ram;
     return self;
 }

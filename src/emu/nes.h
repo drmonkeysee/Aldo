@@ -21,7 +21,8 @@ enum nes_interrupt {
 };
 typedef struct nes_console nes;
 
-nes *nes_new(cart *c);
+// NOTE: nes_new takes ownership of *c and sets it to null
+nes *nes_new(cart **c);
 void nes_free(nes *self);
 
 void nes_mode(nes *self, enum nexcmode mode);

@@ -13,7 +13,7 @@
 
 struct control {
     uint64_t total_cycles;
-    const char *cartfile;
+    const char *cartfile, *me;
     int cyclebudget, cycles_per_sec, ramsheet;
     bool help, running, version;
 };

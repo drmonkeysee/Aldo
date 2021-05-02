@@ -25,14 +25,21 @@ static const char *restrict const Version = "0.2.0";
 
 static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
 {
+    appstate->me = argc >= 1 ? argv[0] : "aldo";
     if (argc >= 2) {
         appstate->cartfile = argv[1];
     }
 }
 
-static void print_usage(void)
+static void print_usage(const struct control *appstate)
 {
-    printf("Aldo Usage:\n");
+    printf("---=== Aldo Usage ===---\n");
+    printf("%s [options...] file\n\n", appstate->me);
+    printf("options\n");
+    printf("  --version, -V\t: print version\n");
+    printf("  --help, -h\t: print usage\n");
+    printf("\narguments\n");
+    printf("  file\t\t: input file containing game cartridge contents\n");
 }
 
 static void print_version(void)
@@ -164,7 +171,7 @@ int aldo_run(int argc, char *argv[argc+1])
     parse_args(&appstate, argc, argv);
 
     if (appstate.help) {
-        print_usage();
+        print_usage(&appstate);
         return EXIT_SUCCESS;
     }
 
@@ -175,7 +182,7 @@ int aldo_run(int argc, char *argv[argc+1])
 
     if (!appstate.cartfile) {
         fprintf(stderr, "Error: no input file specified\n");
-        print_usage();
+        print_usage(&appstate);
         return EXIT_FAILURE;
     }
 

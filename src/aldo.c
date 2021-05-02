@@ -19,15 +19,35 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-// TODO: autogenerate this somehow
-static const char *restrict const Version = "0.2.0";
+static const char
+    *restrict const Version = "0.2.0", // TODO: autogenerate this
+    *restrict const VersionOption = "--version",
+    *restrict const VersionShortOption = "-V",
+    *restrict const HelpOption = "--help",
+    *restrict const HelpShortOption = "-h";
 
 static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
 {
-    appstate->me = argc >= 1 ? argv[0] : "aldo";
-    if (argc >= 2) {
-        appstate->cartfile = argv[1];
+    appstate->me = argc > 0 && strlen(argv[0]) > 0 ? argv[0] : "aldo";
+    if (argc > 1) {
+        for (int i = 1; i < argc; ++i) {
+            const char *const arg = argv[i];
+            if (!arg) {
+                continue;
+            } else if (!strcmp(arg, HelpOption)
+                       || !strcmp(arg, HelpShortOption)) {
+                appstate->help = true;
+            } else if (!strcmp(arg, VersionOption)
+                       || !strcmp(arg, VersionShortOption)) {
+                appstate->version = true;
+            } else {
+                appstate->cartfile = arg;
+            }
+        }
+    } else {
+        appstate->help = true;
     }
 }
 
@@ -58,6 +78,7 @@ static cart *load_cart(const char *filename)
     FILE *const prgfile = fopen(filename, "rb");
     if (!prgfile) {
         perror("Cannot open cart file");
+        fprintf(stderr, "File name: %s\n", filename);
         return program;
     }
 

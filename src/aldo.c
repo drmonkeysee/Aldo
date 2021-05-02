@@ -106,12 +106,13 @@ static void update(struct control *appstate, struct console_state *snapshot,
 // Public Interface
 //
 
-int aldo_run(void)
+int aldo_run(int argc, char *argv[argc+1])
 {
     puts("Aldo starting...");
 
     struct control appstate = {.cycles_per_sec = 4, .running = true};
     struct console_state snapshot;
+    nes *console = nes_new();
     ui_init();
 
     const uint8_t test_prg[] = {
@@ -157,7 +158,6 @@ int aldo_run(void)
         0x99, 0x2, 0x3, // sta $0302,Y
         0x99, 0xff, 0x2, // sta $03ff,Y
     };
-    nes *console = nes_new();
     nes_powerup(console, sizeof test_prg, test_prg);
     // NOTE: initialize snapshot from console
     nes_snapshot(console, &snapshot);
@@ -171,10 +171,10 @@ int aldo_run(void)
         ui_tick_end();
     } while (appstate.running);
 
+    ui_cleanup();
     nes_free(console);
     console = NULL;
     snapshot.ram = snapshot.rom = NULL;
-    ui_cleanup();
 
     puts("Aldo stopping...");
     return EXIT_SUCCESS;

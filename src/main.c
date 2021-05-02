@@ -9,6 +9,5 @@
 
 int main(int argc, char *argv[argc+1])
 {
-    (void)argv;
-    return aldo_run();
+    return aldo_run(argc, argv);
 }

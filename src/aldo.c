@@ -20,11 +20,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static cart *load_cart(void)
+// TODO: autogenerate this somehow
+static const char *restrict const Version = "0.2.0";
+
+static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
 {
-    errno = 0;
+    if (argc >= 2) {
+        appstate->cartfile = argv[1];
+    }
+}
+
+static void print_usage(void)
+{
+    printf("Aldo Usage:\n");
+}
+
+static void print_version(void)
+{
+    printf("Aldo %s", Version);
+#ifdef __VERSION__
+    printf(" (" __VERSION__ ")");
+#endif
+    printf("\n");
+}
+
+static cart *load_cart(const char *filename)
+{
     cart *program = NULL;
-    FILE *const prgfile = fopen("a.out", "rb");
+    errno = 0;
+    FILE *const prgfile = fopen(filename, "rb");
     if (!prgfile) {
         perror("Cannot open cart file");
         return program;
@@ -32,7 +56,7 @@ static cart *load_cart(void)
 
     const int cart_result = cart_create(&program, prgfile);
     if (cart_result < 0) {
-        fprintf(stderr, "Cart load failure: %s", cart_errstr(cart_result));
+        fprintf(stderr, "Cart load failure: %s\n", cart_errstr(cart_result));
         if (cart_result == CART_IO_ERR) {
             perror("Cart IO error");
         }
@@ -135,10 +159,27 @@ int aldo_run(int argc, char *argv[argc+1])
 
     struct control appstate = {.cycles_per_sec = 4, .running = true};
     struct console_state snapshot;
+    //getchar();
 
-    getchar();
+    parse_args(&appstate, argc, argv);
 
-    cart *c = load_cart();
+    if (appstate.help) {
+        print_usage();
+        return EXIT_SUCCESS;
+    }
+
+    if (appstate.version) {
+        print_version();
+        return EXIT_SUCCESS;
+    }
+
+    if (!appstate.cartfile) {
+        fprintf(stderr, "Error: no input file specified\n");
+        print_usage();
+        return EXIT_FAILURE;
+    }
+
+    cart *c = load_cart(appstate.cartfile);
     if (!c) {
         return EXIT_FAILURE;
     }

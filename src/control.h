@@ -13,8 +13,9 @@
 
 struct control {
     uint64_t total_cycles;
+    const char *cartfile;
     int cyclebudget, cycles_per_sec, ramsheet;
-    bool running;
+    bool help, running, version;
 };
 
 extern const int MinCps, MaxCps, RamSheets;

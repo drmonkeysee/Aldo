@@ -184,7 +184,6 @@ static void update(struct control *appstate, struct console_state *snapshot,
 int aldo_run(int argc, char *argv[argc+1])
 {
     struct control appstate = {.cycles_per_sec = 4, .running = true};
-    struct console_state snapshot;
     //getchar();
 
     parse_args(&appstate, argc, argv);
@@ -213,6 +212,7 @@ int aldo_run(int argc, char *argv[argc+1])
     nes *console = nes_new(&c);
     nes_powerup(console);
     // NOTE: initialize snapshot from console
+    struct console_state snapshot;
     nes_snapshot(console, &snapshot);
     ui_init();
 

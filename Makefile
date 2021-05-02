@@ -88,7 +88,7 @@ $(OBJ_DIRS) $(TEST_OBJ_DIRS):
 	mkdir -p $@
 
 run: debug
-	$(TARGET)
+	$(TARGET) $(FILE)
 
 clean:
 	$(RM) -r $(BUILD_DIR)

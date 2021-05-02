@@ -37,6 +37,7 @@
 		C89E8AC9260ED5FE008395B6 /* cpubranch.c in Sources */ = {isa = PBXBuildFile; fileRef = C89E8AC8260ED5FE008395B6 /* cpubranch.c */; };
 		C8C448072627D99D00ABBD5E /* cpuinterrupt.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C448062627D99D00ABBD5E /* cpuinterrupt.c */; };
 		C8C4B48D25ABBFB3006A98BB /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
+		C8F81EDD263E336D0086272D /* cart.c in Sources */ = {isa = PBXBuildFile; fileRef = C8F81EDC263E336D0086272D /* cart.c */; };
 		C8FD257125EB38DF0043F6E6 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C8FD257025EB38DF0043F6E6 /* cpu.c */; };
 		C8FD257425EB39AF0043F6E6 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C84B6C2125B2BAF300FCCD88 /* cpu.c */; };
 		C8FD257D25EB3B050043F6E6 /* traits.c in Sources */ = {isa = PBXBuildFile; fileRef = C8236C2625BA80F900B18301 /* traits.c */; };
@@ -99,6 +100,8 @@
 		C89E8AC8260ED5FE008395B6 /* cpubranch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpubranch.c; sourceTree = "<group>"; };
 		C8C448062627D99D00ABBD5E /* cpuinterrupt.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpuinterrupt.c; sourceTree = "<group>"; };
 		C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpanel.tbd; path = usr/lib/libpanel.tbd; sourceTree = SDKROOT; };
+		C8F81EDB263E336D0086272D /* cart.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cart.h; sourceTree = "<group>"; };
+		C8F81EDC263E336D0086272D /* cart.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cart.c; sourceTree = "<group>"; };
 		C8FD257025EB38DF0043F6E6 /* cpu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpu.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -185,6 +188,8 @@
 			children = (
 				C83042BA25CFC89500D6B623 /* bytes.h */,
 				C83042BB25CFC89500D6B623 /* bytes.c */,
+				C8F81EDB263E336D0086272D /* cart.h */,
+				C8F81EDC263E336D0086272D /* cart.c */,
 				C84B6C2025B2BAF300FCCD88 /* cpu.h */,
 				C84B6C2125B2BAF300FCCD88 /* cpu.c */,
 				C8114E2D25CBBD6D007309CD /* decode.h */,
@@ -363,6 +368,7 @@
 				C81A516D25DA036100361E40 /* control.c in Sources */,
 				C83042BC25CFC89500D6B623 /* bytes.c in Sources */,
 				C85C8DC625BD29AC00611D19 /* asm.c in Sources */,
+				C8F81EDD263E336D0086272D /* cart.c in Sources */,
 				C84B6C2225B2BAF300FCCD88 /* cpu.c in Sources */,
 				C8114E2F25CBBD6D007309CD /* decode.c in Sources */,
 				C8557B2F25C661660090296D /* ui.c in Sources */,

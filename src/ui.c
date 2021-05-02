@@ -513,7 +513,7 @@ void ui_cleanup(void)
 }
 
 void ui_tick_start(struct control *appstate,
-                   const struct console_state *restrict snapshot)
+                   const struct console_state *snapshot)
 {
     clock_gettime(CLOCK_MONOTONIC, &Current);
     FrameTimeMs = to_ms(&Current) - to_ms(&Previous);

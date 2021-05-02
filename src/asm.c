@@ -75,7 +75,7 @@ static const char *interrupt_display(const struct console_state *snapshot)
     return "";
 }
 
-static int print_raw(uint16_t addr, const uint8_t *bytes, int instlen,
+static int print_raw(uint16_t addr, const uint8_t *restrict bytes, int instlen,
                      char dis[restrict static DIS_INST_SIZE])
 {
     int total, count;
@@ -91,8 +91,9 @@ static int print_raw(uint16_t addr, const uint8_t *bytes, int instlen,
     return total;
 }
 
-static int print_mnemonic(const struct decoded *dec, const uint8_t *bytes,
-                          int instlen, char dis[restrict])
+static int print_mnemonic(const struct decoded *dec,
+                          const uint8_t *restrict bytes, int instlen,
+                          char dis[restrict])
 {
     int total, count;
     total = count = sprintf(dis, "%s ", Mnemonics[dec->instruction]);
@@ -132,7 +133,7 @@ const char *dis_errstr(int error)
     }
 }
 
-int dis_inst(uint16_t addr, const uint8_t *bytes, ptrdiff_t bytesleft,
+int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE])
 {
     assert(bytes != NULL);

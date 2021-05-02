@@ -15,7 +15,7 @@ void ui_init(void);
 void ui_cleanup(void);
 
 void ui_tick_start(struct control *appstate,
-                   const struct console_state *restrict snapshot);
+                   const struct console_state *snapshot);
 void ui_tick_end(void);
 
 int ui_pollinput(void);

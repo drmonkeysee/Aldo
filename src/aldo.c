@@ -34,10 +34,7 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
             const char *const arg = argv[i];
-            if (!arg) {
-                continue;
-            } else if (!strcmp(arg, HelpOption)
-                       || !strcmp(arg, HelpShortOption)) {
+            if (!strcmp(arg, HelpOption) || !strcmp(arg, HelpShortOption)) {
                 appstate->help = true;
             } else if (!strcmp(arg, VersionOption)
                        || !strcmp(arg, VersionShortOption)) {
@@ -73,24 +70,24 @@ static void print_version(void)
 
 static cart *load_cart(const char *filename)
 {
-    cart *program = NULL;
+    cart *c = NULL;
     errno = 0;
     FILE *const prgfile = fopen(filename, "rb");
     if (!prgfile) {
         perror("Cannot open cart file");
-        fprintf(stderr, "File name: %s\n", filename);
-        return program;
+        return c;
     }
 
-    const int cart_result = cart_create(&program, prgfile);
+    const int cart_result = cart_create(&c, prgfile);
     if (cart_result < 0) {
-        fprintf(stderr, "Cart load failure: %s\n", cart_errstr(cart_result));
+        fprintf(stderr, "Cart load failure (%d): %s\n",
+                cart_result, cart_errstr(cart_result));
         if (cart_result == CART_IO_ERR) {
             perror("Cart IO error");
         }
     }
 
-    return program;
+    return c;
 }
 
 static void handle_input(struct control *appstate,

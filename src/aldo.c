@@ -37,13 +37,13 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
             const char *const arg = argv[i];
-            if (!strcmp(arg, DisassembleOption)) {
+            if (strcmp(arg, DisassembleOption) == 0) {
                 appstate->disassemble = true;
-            } else if (!strcmp(arg, HelpOption)
-                       || !strcmp(arg, HelpShortOption)) {
+            } else if (strcmp(arg, HelpOption) == 0
+                       || strcmp(arg, HelpShortOption) == 0) {
                 appstate->help = true;
-            } else if (!strcmp(arg, VersionOption)
-                       || !strcmp(arg, VersionShortOption)) {
+            } else if (strcmp(arg, VersionOption) == 0
+                       || strcmp(arg, VersionShortOption) == 0) {
                 appstate->version = true;
             } else {
                 appstate->cartfile = arg;

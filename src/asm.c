@@ -222,3 +222,9 @@ int dis_datapath(const struct console_state *snapshot,
     assert(total < DIS_DATAP_SIZE);
     return total;
 }
+
+int dis_cart(cart *cart)
+{
+    puts("Cart disassembled");
+    return 0;
+}

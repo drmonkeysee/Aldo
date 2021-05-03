@@ -7,6 +7,7 @@
 
 #include "aldo.h"
 
+#include "asm.h"
 #include "control.h"
 #include "ui.h"
 #include "emu/cart.h"
@@ -23,10 +24,12 @@
 
 static const char
     *restrict const Version = "0.2.0", // TODO: autogenerate this
-    *restrict const VersionOption = "--version",
-    *restrict const VersionShortOption = "-V",
+
+    *restrict const DisassembleOption = "-d",
     *restrict const HelpOption = "--help",
-    *restrict const HelpShortOption = "-h";
+    *restrict const HelpShortOption = "-h",
+    *restrict const VersionOption = "--version",
+    *restrict const VersionShortOption = "-V";
 
 static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
 {
@@ -34,7 +37,10 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
             const char *const arg = argv[i];
-            if (!strcmp(arg, HelpOption) || !strcmp(arg, HelpShortOption)) {
+            if (!strcmp(arg, DisassembleOption)) {
+                appstate->disassemble = true;
+            } else if (!strcmp(arg, HelpOption)
+                       || !strcmp(arg, HelpShortOption)) {
                 appstate->help = true;
             } else if (!strcmp(arg, VersionOption)
                        || !strcmp(arg, VersionShortOption)) {
@@ -51,12 +57,14 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
 static void print_usage(const struct control *appstate)
 {
     printf("---=== Aldo Usage ===---\n");
-    printf("%s [options...] file\n\n", appstate->me);
-    printf("options\n");
-    printf("  --version, -V\t: print version\n");
+    printf("%s [options...] file\n", appstate->me);
+    printf("\noptions\n");
+    printf("  -d\t\t: disassemble file\n");
     printf("  --help, -h\t: print usage\n");
+    printf("  --version, -V\t: print version\n");
     printf("\narguments\n");
-    printf("  file\t\t: input file containing game cartridge contents\n");
+    printf("  file\t\t: input file containing cartridge"
+           " or program contents\n");
 }
 
 static void print_version(void)
@@ -174,6 +182,30 @@ static void update(struct control *appstate, struct console_state *snapshot,
     ui_refresh(appstate, snapshot);
 }
 
+static void emu_loop(struct control *appstate, cart *cart)
+{
+    nes *console = nes_new(&cart);
+    nes_powerup(console);
+    // NOTE: initialize snapshot from console
+    struct console_state snapshot;
+    nes_snapshot(console, &snapshot);
+    ui_init();
+
+    do {
+        ui_tick_start(appstate, &snapshot);
+        handle_input(appstate, &snapshot, console);
+        if (appstate->running) {
+            update(appstate, &snapshot, console);
+        }
+        ui_tick_end();
+    } while (appstate->running);
+
+    ui_cleanup();
+    nes_free(console);
+    console = NULL;
+    snapshot.ram = snapshot.rom = NULL;
+}
+
 //
 // Public Interface
 //
@@ -181,8 +213,6 @@ static void update(struct control *appstate, struct console_state *snapshot,
 int aldo_run(int argc, char *argv[argc+1])
 {
     struct control appstate = {.cycles_per_sec = 4, .running = true};
-    //getchar();
-
     parse_args(&appstate, argc, argv);
 
     if (appstate.help) {
@@ -201,31 +231,17 @@ int aldo_run(int argc, char *argv[argc+1])
         return EXIT_FAILURE;
     }
 
-    cart *c = load_cart(appstate.cartfile);
-    if (!c) {
+    cart *const cart = load_cart(appstate.cartfile);
+    if (!cart) {
         return EXIT_FAILURE;
     }
 
-    nes *console = nes_new(&c);
-    nes_powerup(console);
-    // NOTE: initialize snapshot from console
-    struct console_state snapshot;
-    nes_snapshot(console, &snapshot);
-    ui_init();
+    if (appstate.disassemble) {
+        const int result = dis_cart(cart);
+        return result == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+    }
 
-    do {
-        ui_tick_start(&appstate, &snapshot);
-        handle_input(&appstate, &snapshot, console);
-        if (appstate.running) {
-            update(&appstate, &snapshot, console);
-        }
-        ui_tick_end();
-    } while (appstate.running);
-
-    ui_cleanup();
-    nes_free(console);
-    console = NULL;
-    snapshot.ram = snapshot.rom = NULL;
+    emu_loop(&appstate, cart);
 
     return EXIT_SUCCESS;
 }

@@ -118,6 +118,47 @@ static int print_mnemonic(const struct decoded *dec,
     return total + count;
 }
 
+enum duplicate_state {
+    DUP_NONE,
+    DUP_FIRST,
+    DUP_TRUNCATE,
+    DUP_SKIP,
+};
+
+struct repeat_condition {
+    int prev_bytes;
+    enum duplicate_state state;
+};
+
+static void print_prg_line(const char *restrict dis,
+                           int curr_bytes, size_t total,
+                           struct repeat_condition *repeat)
+{
+    if (curr_bytes == repeat->prev_bytes) {
+        switch (repeat->state) {
+        case DUP_NONE:
+            repeat->state = DUP_FIRST;
+            printf("%s\n", dis);
+            break;
+        case DUP_FIRST:
+            repeat->state = DUP_TRUNCATE;
+            // NOTE: if this is the last instruction in the PRG bank
+            // skip printing the truncation indicator.
+            if (total < ROM_SIZE) {
+                printf("*\n");
+            }
+            break;
+        default:
+            repeat->state = DUP_SKIP;
+            break;
+        }
+    } else {
+        printf("%s\n", dis);
+        repeat->prev_bytes = curr_bytes;
+        repeat->state = DUP_NONE;
+    }
+}
+
 //
 // Public Interface
 //
@@ -226,20 +267,35 @@ int dis_datapath(const struct console_state *snapshot,
 int dis_cart(cart *cart)
 {
     const uint8_t *const prgrom = cart_prg_bank(cart);
-    // TODO: ROM_SIZE needs to be bank size instead
-    int bytes = 0;
+    int bytes_read = 0;
+    struct repeat_condition repeat = {.state = DUP_NONE};
     size_t total = 0;
+    char dis[DIS_INST_SIZE];
+
+    // TODO: ROM_SIZE needs to be bank size instead
     while (total < ROM_SIZE) {
-        char disassembly[DIS_INST_SIZE];
-        bytes = dis_inst(CpuRomMinAddr + total, prgrom + total,
-                         ROM_SIZE - total, disassembly);
-        if (bytes == 0) break;
-        if (bytes < 0) {
-            fprintf(stderr, "Dis failure (%d): %s", bytes, dis_errstr(bytes));
-            return bytes;
+        const uint16_t addr = CpuRomMinAddr + total;
+        const uint8_t *const prgoffset = prgrom + total;
+        total += bytes_read = dis_inst(addr, prgoffset, ROM_SIZE - total, dis);
+        if (bytes_read == 0) break;
+        if (bytes_read < 0) {
+            fprintf(stderr, "$%04X: Dis err (%d): %s\n", addr, bytes_read,
+                    dis_errstr(bytes_read));
+            return bytes_read;
         }
-        printf("%s\n", disassembly);
-        total += bytes;
+        // NOTE: convert current instruction bytes into easily comparable value
+        // to check for repeats.
+        int curr_bytes = 0;
+        for (int i = 0; i < bytes_read; ++i) {
+            curr_bytes |= prgoffset[i] << (8 * i);
+        }
+        print_prg_line(dis, curr_bytes, total, &repeat);
+    }
+
+    // NOTE: always print the last line regardless of duplicate state
+    // (if it hasn't already been printed).
+    if (repeat.state != DUP_NONE && repeat.state != DUP_FIRST) {
+        printf("%s\n", dis);
     }
     return 0;
 }

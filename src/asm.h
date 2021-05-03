@@ -41,6 +41,7 @@ int dis_mem(uint16_t addr, const struct console_state *snapshot,
             char dis[restrict static DIS_INST_SIZE]);
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
+
 int dis_cart(cart *cart);
 
 #endif

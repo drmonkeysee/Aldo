@@ -40,8 +40,7 @@ int cart_create(cart **c, FILE *f)
     assert(c != NULL);
     assert(f != NULL);
 
-    // TODO: calloc to zero out unused ROM
-    struct cartridge *const self = calloc(1, sizeof *self);
+    struct cartridge *const self = malloc(sizeof *self);
     const size_t bufsize = sizeof self->prg / sizeof self->prg[0],
                  count = fread(self->prg, sizeof self->prg[0], bufsize, f);
     int error;

@@ -264,9 +264,11 @@ int dis_datapath(const struct console_state *snapshot,
     return total;
 }
 
-int dis_cart(cart *cart)
+int dis_cart(cart *c)
 {
-    const uint8_t *const prgrom = cart_prg_bank(cart);
+    assert(c != NULL);
+
+    const uint8_t *const prgrom = cart_prg_bank(c);
     int bytes_read = 0;
     struct repeat_condition repeat = {.state = DUP_NONE};
     size_t total = 0;

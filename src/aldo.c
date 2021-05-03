@@ -182,9 +182,9 @@ static void update(struct control *appstate, struct console_state *snapshot,
     ui_refresh(appstate, snapshot);
 }
 
-static void emu_loop(struct control *appstate, cart *cart)
+static void emu_loop(struct control *appstate, cart *c)
 {
-    nes *console = nes_new(&cart);
+    nes *console = nes_new(&c);
     nes_powerup(console);
     // NOTE: initialize snapshot from console
     struct console_state snapshot;

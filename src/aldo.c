@@ -25,11 +25,13 @@
 static const char
     *restrict const Version = "0.2.0", // TODO: autogenerate this
 
-    *restrict const DisassembleOption = "-d",
     *restrict const HelpOption = "--help",
     *restrict const HelpShortOption = "-h",
     *restrict const VersionOption = "--version",
     *restrict const VersionShortOption = "-V";
+
+static const char DisassembleFlag = 'd',
+                  VerboseFlag = 'v';
 
 static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
 {
@@ -37,14 +39,17 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
             const char *const arg = argv[i];
-            if (strcmp(arg, DisassembleOption) == 0) {
-                appstate->disassemble = true;
-            } else if (strcmp(arg, HelpOption) == 0
-                       || strcmp(arg, HelpShortOption) == 0) {
+            if (strcmp(arg, HelpOption) == 0
+                || strcmp(arg, HelpShortOption) == 0) {
                 appstate->help = true;
             } else if (strcmp(arg, VersionOption) == 0
                        || strcmp(arg, VersionShortOption) == 0) {
                 appstate->version = true;
+            } else if (arg[0] == '-') {
+                appstate->disassemble = appstate->disassemble
+                                        || strchr(arg, DisassembleFlag);
+                appstate->verbose = appstate->verbose
+                                    || strchr(arg, VerboseFlag);
             } else {
                 appstate->cartfile = arg;
             }
@@ -57,13 +62,15 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
 static void print_usage(const struct control *appstate)
 {
     printf("---=== Aldo Usage ===---\n");
-    printf("%s [options...] file\n", appstate->me);
+    printf("%s [-dv] [command] file\n", appstate->me);
     printf("\noptions\n");
-    printf("  -d\t\t: disassemble file\n");
-    printf("  --help, -h\t: print usage\n");
-    printf("  --version, -V\t: print version\n");
+    printf("  -d\t: disassemble file, with -v will print duplicate lines\n");
+    printf("  -v\t: verbose output\n");
+    printf("\ncommands\n");
+    printf("  -h\t: print usage (also --help)\n");
+    printf("  -V\t: print version (also --version)\n");
     printf("\narguments\n");
-    printf("  file\t\t: input file containing cartridge"
+    printf("  file\t: input file containing cartridge"
            " or program contents\n");
 }
 

@@ -15,7 +15,7 @@ struct control {
     uint64_t total_cycles;
     const char *cartfile, *me;
     int cyclebudget, cycles_per_sec, ramsheet;
-    bool disassemble, help, running, version;
+    bool disassemble, help, running, verbose, version;
 };
 
 extern const int MinCps, MaxCps, RamSheets;

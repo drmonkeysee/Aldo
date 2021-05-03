@@ -244,7 +244,9 @@ int aldo_run(int argc, char *argv[argc+1])
     }
 
     if (appstate.disassemble) {
-        return dis_cart(cart) == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+        return dis_cart(cart, appstate.verbose) == 0
+               ? EXIT_SUCCESS
+               : EXIT_FAILURE;
     }
 
     emu_loop(&appstate, cart);

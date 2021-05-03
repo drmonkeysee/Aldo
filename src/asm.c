@@ -123,6 +123,7 @@ enum duplicate_state {
     DUP_FIRST,
     DUP_TRUNCATE,
     DUP_SKIP,
+    DUP_VERBOSE,
 };
 
 struct repeat_condition {
@@ -134,6 +135,11 @@ static void print_prg_line(const char *restrict dis,
                            int curr_bytes, size_t total,
                            struct repeat_condition *repeat)
 {
+    if (repeat->state == DUP_VERBOSE) {
+        printf("%s\n", dis);
+        return;
+    }
+
     if (curr_bytes == repeat->prev_bytes) {
         switch (repeat->state) {
         case DUP_NONE:
@@ -264,13 +270,15 @@ int dis_datapath(const struct console_state *snapshot,
     return total;
 }
 
-int dis_cart(cart *c)
+int dis_cart(cart *c, bool verbose)
 {
     assert(c != NULL);
 
     const uint8_t *const prgrom = cart_prg_bank(c);
     int bytes_read = 0;
-    struct repeat_condition repeat = {.state = DUP_NONE};
+    struct repeat_condition repeat = {
+        .state = verbose ? DUP_VERBOSE : DUP_NONE,
+    };
     size_t total = 0;
     char dis[DIS_INST_SIZE];
 
@@ -296,7 +304,7 @@ int dis_cart(cart *c)
 
     // NOTE: always print the last line regardless of duplicate state
     // (if it hasn't already been printed).
-    if (repeat.state != DUP_NONE && repeat.state != DUP_FIRST) {
+    if (repeat.state == DUP_TRUNCATE || repeat.state == DUP_SKIP) {
         printf("%s\n", dis);
     }
     return 0;

@@ -225,6 +225,21 @@ int dis_datapath(const struct console_state *snapshot,
 
 int dis_cart(cart *cart)
 {
-    puts("Cart disassembled");
+    const uint8_t *const prgrom = cart_prg_bank(cart);
+    // TODO: ROM_SIZE needs to be bank size instead
+    int bytes = 0;
+    size_t total = 0;
+    while (total < ROM_SIZE) {
+        char disassembly[DIS_INST_SIZE];
+        bytes = dis_inst(CpuRomMinAddr + total, prgrom + total,
+                         ROM_SIZE - total, disassembly);
+        if (bytes == 0) break;
+        if (bytes < 0) {
+            fprintf(stderr, "Dis failure (%d): %s", bytes, dis_errstr(bytes));
+            return bytes;
+        }
+        printf("%s\n", disassembly);
+        total += bytes;
+    }
     return 0;
 }

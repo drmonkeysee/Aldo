@@ -188,8 +188,7 @@ static void drawcontrols(const struct console_state *snapshot)
 static void drawinstructions(uint16_t addr, int h, int y,
                              const struct console_state *snapshot)
 {
-    int bytes;
-    for (int i = 0; i < h - y; ++i) {
+    for (int i = 0, bytes = 0; i < h - y; ++i) {
         char disassembly[DIS_INST_SIZE];
         bytes = dis_mem(addr, snapshot, disassembly);
         if (bytes == 0) break;

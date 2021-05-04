@@ -189,9 +189,9 @@ static void update(struct control *appstate, struct console_state *snapshot,
     ui_refresh(appstate, snapshot);
 }
 
-static void emu_loop(struct control *appstate, cart *c)
+static void emu_loop(struct control *appstate, cart **c)
 {
-    nes *console = nes_new(&c);
+    nes *console = nes_new(c);
     nes_powerup(console);
     // NOTE: initialize snapshot from console
     struct console_state snapshot;
@@ -238,7 +238,7 @@ int aldo_run(int argc, char *argv[argc+1])
         return EXIT_FAILURE;
     }
 
-    cart *const cart = load_cart(appstate.cartfile);
+    cart *cart = load_cart(appstate.cartfile);
     if (!cart) {
         return EXIT_FAILURE;
     }
@@ -249,7 +249,7 @@ int aldo_run(int argc, char *argv[argc+1])
                : EXIT_FAILURE;
     }
 
-    emu_loop(&appstate, cart);
+    emu_loop(&appstate, &cart);
 
     return EXIT_SUCCESS;
 }

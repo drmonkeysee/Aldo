@@ -25,13 +25,25 @@
 static const char
     *restrict const Version = "0.2.0", // TODO: autogenerate this
 
-    *restrict const HelpOption = "--help",
-    *restrict const HelpShortOption = "-h",
-    *restrict const VersionOption = "--version",
-    *restrict const VersionShortOption = "-V";
+    *restrict const DisassembleCmd = "--disassemble",
+    *restrict const HelpCmd = "--help",
+    *restrict const InfoCmd = "--info",
+    *restrict const VersionCmd = "--version";
 
 static const char DisassembleFlag = 'd',
-                  VerboseFlag = 'v';
+                  HelpFlag = 'h',
+                  InfoFlag = 'i',
+                  VerboseFlag = 'v',
+                  VersionFlag = 'V';
+
+static bool parse_flag(const char *restrict arg, char flag,
+                       const char *restrict cmd)
+{
+    return (strlen(arg) > 1 && arg[1] != '-' && strchr(arg, flag))
+           || (cmd && strcmp(arg, cmd) == 0);
+}
+
+#define setflag(f, a, s, l) (f) = (f) || parse_flag(a, s, l)
 
 static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
 {
@@ -39,17 +51,13 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
             const char *const arg = argv[i];
-            if (strcmp(arg, HelpOption) == 0
-                || strcmp(arg, HelpShortOption) == 0) {
-                appstate->help = true;
-            } else if (strcmp(arg, VersionOption) == 0
-                       || strcmp(arg, VersionShortOption) == 0) {
-                appstate->version = true;
-            } else if (arg[0] == '-') {
-                appstate->disassemble = appstate->disassemble
-                                        || strchr(arg, DisassembleFlag);
-                appstate->verbose = appstate->verbose
-                                    || strchr(arg, VerboseFlag);
+            if (arg[0] == '-') {
+                setflag(appstate->disassemble, arg, DisassembleFlag,
+                        DisassembleCmd);
+                setflag(appstate->help, arg, HelpFlag, HelpCmd);
+                setflag(appstate->info, arg, InfoFlag, InfoCmd);
+                setflag(appstate->verbose, arg, VerboseFlag, NULL);
+                setflag(appstate->version, arg, VersionFlag, VersionCmd);
             } else {
                 appstate->cartfile = arg;
             }
@@ -62,12 +70,14 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
 static void print_usage(const struct control *appstate)
 {
     printf("---=== Aldo Usage ===---\n");
-    printf("%s [-dv] [command] file\n", appstate->me);
+    printf("%s [options...] [command] file\n", appstate->me);
     printf("\noptions\n");
-    printf("  -d\t: disassemble file, with -v will print duplicate lines\n");
     printf("  -v\t: verbose output\n");
     printf("\ncommands\n");
+    printf("  -d\t: disassemble file (also --disassemble);"
+           " verbose will print duplicate lines\n");
     printf("  -h\t: print usage (also --help)\n");
+    printf("  -i\t: print file cartridge info (also --info)\n");
     printf("  -V\t: print version (also --version)\n");
     printf("\narguments\n");
     printf("  file\t: input file containing cartridge"
@@ -81,6 +91,12 @@ static void print_version(void)
     printf(" (" __VERSION__ ")");
 #endif
     printf("\n");
+}
+
+static void print_cart_info(const struct control *appstate, cart *c)
+{
+    printf("---=== Cart Info ===---\n");
+    printf("File: %s\n", appstate->cartfile);
 }
 
 static cart *load_cart(const char *filename)
@@ -241,6 +257,11 @@ int aldo_run(int argc, char *argv[argc+1])
     cart *cart = load_cart(appstate.cartfile);
     if (!cart) {
         return EXIT_FAILURE;
+    }
+
+    if (appstate.info) {
+        print_cart_info(&appstate, cart);
+        return EXIT_SUCCESS;
     }
 
     if (appstate.disassemble) {

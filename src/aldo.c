@@ -97,6 +97,7 @@ static void print_cart_info(const struct control *appstate, cart *c)
 {
     printf("---=== Cart Info ===---\n");
     printf("File: %s\n", appstate->cartfile);
+    cart_info_write(c, stdout);
 }
 
 static cart *load_cart(const char *filename)

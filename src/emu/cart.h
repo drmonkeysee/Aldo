@@ -37,6 +37,7 @@ void cart_free(cart *self);
 
 uint8_t *cart_prg_bank(cart *self);
 
+void cart_info_write(cart *self, FILE *f);
 void cart_snapshot(cart *self, struct console_state *snapshot);
 
 #endif

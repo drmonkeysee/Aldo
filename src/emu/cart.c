@@ -19,7 +19,8 @@
 X(UNKNOWN, "Unknown") \
 X(ALDOBIN, "Aldo Binary") \
 X(INES, "iNES") \
-X(NES20, "NES 2.0")
+X(NES20, "NES 2.0") \
+X(NSF, "NES Sound Format")
 
 #define CRTF_ENUM(s) CRTF_##s
 

@@ -36,8 +36,26 @@ enum cartformat {
 // A NES game cartridge including PRG and CHR ROM banks,
 // WRAM or save-state RAM, memory mapper circuitry, and metadata headers.
 
+// TODO: ignoring following fields for now:
+//  - hardcoded mirroring bits, need to know mapper to interpret these
+//  - VS/Playchoice system indicator (does anyone care?)
+//  - TV System (PAL ROMs don't seem to set the flags so again who cares)
+//  - redundant indicators in byte 10
+struct ines_header {
+    uint8_t prg_banks,      // Count of 16KB PRG ROM banks
+            chr_banks,      // Count of 8KB CHR ROM banks (0 indicates CHR RAM)
+            prg_rambanks,   // Count of 8KB PRG RAM banks
+            mapper_id;      // Mapper ID
+    bool prg_ram,           // PRG RAM banks present
+         trainer,           // Trainer data present
+         bus_conflicts;     // Cart has bus conflicts
+};
+
 struct cartridge {
-    enum cartformat format;
+    enum cartformat format;         // Cart File Format
+    union {
+        struct ines_header ns_hdr;  // iNES Header
+    };
     uint8_t prg[ROM_SIZE];  // TODO: assume a single bank of 32KB PRG for now
 };
 
@@ -48,7 +66,7 @@ static int detect_format(cart *self, FILE *f)
     const char *const fmtsuccess = fgets(format, sizeof format, f);
 
     if (!fmtsuccess) {
-        if (feof(f)) return CART_EMPTY;
+        if (feof(f)) return CART_EOF;
         if (ferror(f)) return CART_IO_ERR;
         return CART_UNKNOWN_ERR;
     }
@@ -66,6 +84,32 @@ static int detect_format(cart *self, FILE *f)
 
     // NOTE: reset back to beginning of file to fully parse detected format
     return fseek(f, 0, SEEK_SET) == 0 ? 0 : CART_IO_ERR;
+}
+
+static int parse_ines(cart *self, FILE *f)
+{
+    unsigned char header[16];
+
+    fread(header, sizeof header[0], sizeof header, f);
+    if (feof(f)) return CART_EOF;
+    if (ferror(f)) return CART_IO_ERR;
+
+    // NOTE: if last 4 bytes of header aren't 0 this is a very old format
+    uint32_t tail;
+    memcpy(&tail, header + 12, sizeof tail);
+    if (tail != 0) return CART_OBSOLETE;
+
+    self->ns_hdr.prg_banks = header[4];
+    self->ns_hdr.chr_banks = header[5];
+    self->ns_hdr.prg_ram = header[6] & 0x2;
+    self->ns_hdr.trainer = header[6] & 0x4;
+    self->ns_hdr.mapper_id = (header[6] >> 4) | (header[7] & 0xf0);
+    self->ns_hdr.prg_rambanks = header[8];
+    self->ns_hdr.bus_conflicts = header[10] & 0x20;
+
+    // TODO: parse ROM/RAM banks
+
+    return 0;
 }
 
 // TODO: load file contents into a single ROM bank and hope for the best
@@ -116,6 +160,9 @@ int cart_create(cart **c, FILE *f)
     int error = detect_format(self, f);
     if (error == 0) {
         switch (self->format) {
+        case CRTF_INES:
+            error = parse_ines(self, f);
+            break;
         default:
             error = parse_unknown(self, f);
             break;

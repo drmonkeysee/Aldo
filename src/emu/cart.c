@@ -57,7 +57,9 @@ static int detect_format(cart *self, FILE *f)
         self->format = CRTF_NSF;
     } else if (strncmp(NesFormat, format, strlen(NesFormat)) == 0) {
         // NOTE: NES 2.0 byte 7 matches pattern 0bxxxx10xx
-        self->format = (format[7] & 0xc) == 0x8 ? CRTF_NES20 : CRTF_INES;
+        self->format = ((unsigned char)format[7] & 0xc) == 0x8
+                       ? CRTF_NES20
+                       : CRTF_INES;
     } else {
         self->format = CRTF_UNKNOWN;
     }
@@ -71,15 +73,10 @@ static int parse_unknown(cart *self, FILE *f)
 {
     const size_t bufsize = sizeof self->prg / sizeof self->prg[0],
                  count = fread(self->prg, sizeof self->prg[0], bufsize, f);
-    if (feof(f)) {
-        return 0;
-    }
-    if (ferror(f)) {
-        return CART_IO_ERR;
-    }
-    if (count == bufsize) {
-        return CART_PRG_SIZE;
-    }
+
+    if (feof(f))  return 0;
+    if (ferror(f)) return CART_IO_ERR;
+    if (count == bufsize) return CART_PRG_SIZE;
     return CART_UNKNOWN_ERR;
 }
 
@@ -121,6 +118,7 @@ int cart_create(cart **c, FILE *f)
         switch (self->format) {
         default:
             error = parse_unknown(self, f);
+            break;
         }
     }
 

@@ -92,6 +92,15 @@ static int detect_format(cart *self, FILE *f)
     return fseek(f, 0, SEEK_SET) == 0 ? 0 : CART_IO_ERR;
 }
 
+static int load_chunks(uint8_t **mem, size_t size, FILE *f)
+{
+    *mem = calloc(size, sizeof **mem);
+    fread(*mem, sizeof **mem, size, f);
+    if (feof(f)) return CART_EOF;
+    if (ferror(f)) return CART_IO_ERR;
+    return 0;
+}
+
 static int parse_ines(cart *self, FILE *f)
 {
     unsigned char header[16];
@@ -113,44 +122,36 @@ static int parse_ines(cart *self, FILE *f)
     self->ns_hdr.prgram_count = header[8];
     self->ns_hdr.bus_conflicts = header[10] & 0x20;
 
-    size_t datasz;
+    int error;
     if (self->ns_hdr.trainer) {
         // NOTE: trainers are 512 bytes
-        datasz = 512;
-        self->trainer = calloc(datasz, sizeof *self->trainer);
-        fread(self->trainer, sizeof *self->trainer, datasz, f);
-        if (feof(f)) return CART_EOF;
-        if (ferror(f)) return CART_IO_ERR;
+        error = load_chunks(&self->trainer, 512, f);
+        if (error != 0) return error;
     } else {
         self->trainer = NULL;
     }
 
     if (self->ns_hdr.prg_ram) {
-        datasz = (self->ns_hdr.prgram_count == 0
-                  ? 1
-                  : self->ns_hdr.prgram_count) * HalfChunk;
-        self->prgram = calloc(datasz, sizeof *self->prgram);
+        const size_t sz = (self->ns_hdr.prgram_count == 0
+                           ? 1
+                           : self->ns_hdr.prgram_count) * HalfChunk;
+        self->prgram = calloc(sz, sizeof *self->prgram);
     } else {
         self->prgram = NULL;
     }
 
-    datasz = self->ns_hdr.prgrom_count * FullChunk;
-    self->prgrom = calloc(datasz, sizeof *self->prgrom);
-    fread(self->prgrom, sizeof *self->prgrom, datasz, f);
-    if (feof(f)) return CART_EOF;
-    if (ferror(f)) return CART_IO_ERR;
+    error = load_chunks(&self->prgrom, self->ns_hdr.prgrom_count * FullChunk,
+                        f);
+    if (error != 0) return error;
 
     if (self->ns_hdr.chrmem_count == 0) {
         self->chrmem = calloc(HalfChunk, sizeof *self->chrmem);
     } else {
-        datasz = self->ns_hdr.chrmem_count * HalfChunk;
-        self->chrmem = calloc(datasz, sizeof *self->chrmem);
-        fread(self->chrmem, sizeof *self->chrmem, datasz, f);
-        if (feof(f)) return CART_EOF;
-        if (ferror(f)) return CART_IO_ERR;
+        error = load_chunks(&self->chrmem,
+                            self->ns_hdr.chrmem_count * HalfChunk, f);
     }
 
-    return 0;
+    return error;
 }
 
 // TODO: load file contents into a single ROM bank and hope for the best

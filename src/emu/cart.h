@@ -31,7 +31,7 @@ typedef struct cartridge cart;
 
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
-const char *cart_errstr(int error);
+const char *cart_errstr(int err);
 
 // NOTE: if cart_create returns non-zero error code, *c is unmodified
 int cart_create(cart **c, FILE *f);

@@ -169,9 +169,9 @@ static void print_prg_line(const char *restrict dis,
 // Public Interface
 //
 
-const char *dis_errstr(int error)
+const char *dis_errstr(int err)
 {
-    switch (error) {
+    switch (err) {
 #define X(s, v, e) case s: return e;
         ASM_ERRCODE_X
 #undef X

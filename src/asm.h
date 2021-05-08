@@ -32,7 +32,7 @@ enum {
 
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
-const char *dis_errstr(int error);
+const char *dis_errstr(int err);
 
 // NOTE: when dis_ functions return 0 the input buffer is untouched
 int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,

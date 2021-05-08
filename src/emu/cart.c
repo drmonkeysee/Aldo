@@ -122,11 +122,11 @@ static int parse_ines(cart *self, FILE *f)
     self->ns_hdr.prgram_count = header[8];
     self->ns_hdr.bus_conflicts = header[10] & 0x20;
 
-    int error;
+    int err;
     if (self->ns_hdr.trainer) {
         // NOTE: trainers are 512 bytes
-        error = load_chunks(&self->trainer, 512, f);
-        if (error != 0) return error;
+        err = load_chunks(&self->trainer, 512, f);
+        if (err != 0) return err;
     } else {
         self->trainer = NULL;
     }
@@ -140,18 +140,17 @@ static int parse_ines(cart *self, FILE *f)
         self->prgram = NULL;
     }
 
-    error = load_chunks(&self->prgrom, self->ns_hdr.prgrom_count * FullChunk,
-                        f);
-    if (error != 0) return error;
+    err = load_chunks(&self->prgrom, self->ns_hdr.prgrom_count * FullChunk, f);
+    if (err != 0) return err;
 
     if (self->ns_hdr.chrmem_count == 0) {
         self->chrmem = calloc(HalfChunk, sizeof *self->chrmem);
     } else {
-        error = load_chunks(&self->chrmem,
-                            self->ns_hdr.chrmem_count * HalfChunk, f);
+        err = load_chunks(&self->chrmem, self->ns_hdr.chrmem_count * HalfChunk,
+                          f);
     }
 
-    return error;
+    return err;
 }
 
 // TODO: load file contents into a single ROM bank and hope for the best
@@ -244,9 +243,9 @@ static void write_ines_info(cart *self, FILE *f, bool verbose)
 // Public Interface
 //
 
-const char *cart_errstr(int error)
+const char *cart_errstr(int err)
 {
-    switch (error) {
+    switch (err) {
 #define X(s, v, e) case s: return e;
         CART_ERRCODE_X
 #undef X
@@ -262,24 +261,24 @@ int cart_create(cart **c, FILE *f)
 
     struct cartridge *const self = malloc(sizeof *self);
 
-    int error = detect_format(self, f);
-    if (error == 0) {
+    int err = detect_format(self, f);
+    if (err == 0) {
         switch (self->format) {
         case CRTF_INES:
-            error = parse_ines(self, f);
+            err = parse_ines(self, f);
             break;
         default:
-            error = parse_unknown(self, f);
+            err = parse_unknown(self, f);
             break;
         }
     }
 
-    if (error == 0) {
+    if (err == 0) {
         *c = self;
     } else {
         cart_free(self);
     }
-    return error;
+    return err;
 }
 
 void cart_free(cart *self)

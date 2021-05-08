@@ -300,6 +300,9 @@ uint8_t *cart_prg_bank(cart *self)
 
 void cart_info_write(cart *self, FILE *f, bool verbose)
 {
+    assert(self != NULL);
+    assert(f != NULL);
+
     fprintf(f, "Format\t\t: %s\n", format_name(self->format));
     if (verbose) {
         hr(f);

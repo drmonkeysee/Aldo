@@ -108,13 +108,13 @@ static cart *load_cart(const char *filename)
 {
     cart *c = NULL;
     errno = 0;
-    FILE *const prgfile = fopen(filename, "rb");
-    if (!prgfile) {
+    FILE *const cartfile = fopen(filename, "rb");
+    if (!cartfile) {
         perror("Cannot open cart file");
         return c;
     }
 
-    const int cart_result = cart_create(&c, prgfile);
+    const int cart_result = cart_create(&c, cartfile);
     if (cart_result < 0) {
         fprintf(stderr, "Cart load failure (%d): %s\n",
                 cart_result, cart_errstr(cart_result));
@@ -122,6 +122,7 @@ static cart *load_cart(const char *filename)
             perror("Cart IO error");
         }
     }
+    fclose(cartfile);
 
     return c;
 }
@@ -266,13 +267,14 @@ int aldo_run(int argc, char *argv[argc+1])
 
     if (appstate.info) {
         print_cart_info(&appstate, cart);
+        cart_free(cart);
         return EXIT_SUCCESS;
     }
 
     if (appstate.disassemble) {
-        return dis_cart(cart, appstate.verbose) == 0
-               ? EXIT_SUCCESS
-               : EXIT_FAILURE;
+        const int err = dis_cart(cart, appstate.verbose);
+        cart_free(cart);
+        return err == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
     }
 
     emu_loop(&appstate, &cart);

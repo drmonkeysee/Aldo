@@ -135,6 +135,65 @@ static const char *format_name(enum cartformat f)
     }
 }
 
+static void hr(FILE *f)
+{
+    fprintf(f, "-----------------------\n");
+}
+
+static void write_ines_info(cart *self, FILE *f, bool verbose)
+{
+    static const char
+        *restrict const fullsize = " x 16KB",
+        *restrict const halfsize = " x 8KB",
+        *restrict const prgramlbl = "PRG RAM\t\t: ",
+        *restrict const chrromlbl = "CHR ROM\t\t: ",
+        *restrict const chrramlbl = "CHR RAM\t\t: ";
+
+    fprintf(f, "Mapper\t\t: %03u", self->ns_hdr.mapper_id);
+    if (verbose) {
+        fprintf(f, " (<Board Names>)\n");
+        hr(f);
+    } else {
+        fprintf(f, "\n");
+    }
+
+    fprintf(f, "PRG ROM\t\t: %u%s\n", self->ns_hdr.prg_banks,
+            verbose ? fullsize : "");
+    if (self->ns_hdr.prg_ram) {
+        fprintf(f, "%s%u%s\n", prgramlbl,
+                self->ns_hdr.prg_rambanks == 0
+                    ? 1u
+                    : self->ns_hdr.prg_rambanks,
+                verbose ? halfsize : "");
+    } else if (verbose) {
+        fprintf(f, "%sno\n", prgramlbl);
+    }
+
+    if (self->ns_hdr.chr_banks == 0) {
+        if (verbose) {
+            fprintf(f, "%sno\n", chrromlbl);
+        }
+        fprintf(f, "%s1%s\n", chrramlbl, verbose ? halfsize : "");
+    } else {
+        fprintf(f, "%s%u%s\n", chrromlbl, self->ns_hdr.chr_banks,
+                verbose ? halfsize : "");
+        if (verbose) {
+            fprintf(f, "%sno\n", chrramlbl);
+        }
+    }
+
+    if (verbose) {
+        hr(f);
+    }
+    if (verbose || self->ns_hdr.trainer) {
+        fprintf(f, "Trainer\t\t: %s\n", self->ns_hdr.trainer ? "yes" : "no");
+    }
+    if (verbose || self->ns_hdr.bus_conflicts) {
+        fprintf(f, "Bus Conflicts\t: %s\n",
+                self->ns_hdr.bus_conflicts ? "yes" : "no");
+    }
+}
+
 //
 // Public Interface
 //
@@ -189,9 +248,19 @@ uint8_t *cart_prg_bank(cart *self)
     return self->prg;
 }
 
-void cart_info_write(cart *self, FILE *f)
+void cart_info_write(cart *self, FILE *f, bool verbose)
 {
-    fprintf(f, "Format: %s\n", format_name(self->format));
+    fprintf(f, "Format\t\t: %s\n", format_name(self->format));
+    if (verbose) {
+        hr(f);
+    }
+    switch (self->format) {
+    case CRTF_INES:
+        write_ines_info(self, f, verbose);
+        break;
+    default:
+        break;
+    }
 }
 
 void cart_snapshot(cart *self, struct console_state *snapshot)

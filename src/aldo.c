@@ -75,9 +75,10 @@ static void print_usage(const struct control *appstate)
     printf("  -v\t: verbose output\n");
     printf("\ncommands\n");
     printf("  -d\t: disassemble file (also --disassemble);"
-           " verbose will print duplicate lines\n");
+           " verbose prints duplicate lines\n");
     printf("  -h\t: print usage (also --help)\n");
-    printf("  -i\t: print file cartridge info (also --info)\n");
+    printf("  -i\t: print file cartridge info (also --info);"
+           " verbose prints more details\n");
     printf("  -V\t: print version (also --version)\n");
     printf("\narguments\n");
     printf("  file\t: input file containing cartridge"
@@ -95,9 +96,12 @@ static void print_version(void)
 
 static void print_cart_info(const struct control *appstate, cart *c)
 {
-    printf("---=== Cart Info ===---\n");
-    printf("File: %s\n", appstate->cartfile);
-    cart_info_write(c, stdout);
+    if (appstate->verbose) {
+        printf("---=== Cart Info ===---\n");
+    }
+    const char *const last_slash = strrchr(appstate->cartfile, '/');
+    printf("File\t\t: %s\n", last_slash ? last_slash + 1 : appstate->cartfile);
+    cart_info_write(c, stdout, appstate->verbose);
 }
 
 static cart *load_cart(const char *filename)

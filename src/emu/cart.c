@@ -150,6 +150,11 @@ static int parse_ines(cart *self, FILE *f)
                           f);
     }
 
+    if (err == 0) {
+        // TODO: we've found a ROM with extra bytes after CHR ROM
+        assert(fgetc(f) == EOF && feof(f));
+    }
+
     return err;
 }
 

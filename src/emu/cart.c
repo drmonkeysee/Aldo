@@ -62,7 +62,6 @@ struct cartridge {
     };
     uint8_t *chr,                   // CHR RAM or ROM
             *prg,                   // PRG ROM
-            *trainer,               // Trainer Data
             *wram;                  // Working RAM
 };
 
@@ -125,11 +124,9 @@ static int parse_ines(cart *self, FILE *f)
 
     int err;
     if (self->ns_hdr.trainer) {
-        // NOTE: trainers are 512 bytes
-        err = load_chunks(&self->trainer, 512, f);
+        // NOTE: skip 512 bytes of trainer data
+        err = fseek(f, 512, SEEK_CUR);
         if (err != 0) return err;
-    } else {
-        self->trainer = NULL;
     }
 
     if (self->ns_hdr.wram) {
@@ -161,7 +158,7 @@ static int parse_ines(cart *self, FILE *f)
 // TODO: load file contents into a single ROM bank and hope for the best
 static int parse_unknown(cart *self, FILE *f)
 {
-    self->chr = self->wram = self->trainer = NULL;
+    self->chr = self->wram = NULL;
     // TODO: assume a 32KB binary
     const size_t datasz = 2 * DChunk;
     self->prg = calloc(datasz, sizeof *self->prg);
@@ -291,7 +288,6 @@ void cart_free(cart *self)
     free(self->chr);
     free(self->prg);
     free(self->wram);
-    free(self->trainer);
     free(self);
 }
 

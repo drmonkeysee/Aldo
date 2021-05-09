@@ -11,9 +11,6 @@
 #include "cart.h"
 #include "snapshot.h"
 
-#include <stddef.h>
-#include <stdint.h>
-
 enum nes_interrupt {
     NESI_IRQ,
     NESI_NMI,

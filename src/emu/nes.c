@@ -12,6 +12,8 @@
 #include "traits.h"
 
 #include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 // The NES-001 Motherboard including the CPU/Audio Generator, PPU,

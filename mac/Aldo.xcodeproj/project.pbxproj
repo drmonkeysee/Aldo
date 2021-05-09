@@ -34,6 +34,7 @@
 		C85C8DC625BD29AC00611D19 /* asm.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* asm.c */; };
 		C86A41892606F73F00D05B98 /* cpujump.c in Sources */ = {isa = PBXBuildFile; fileRef = C86A41882606F73F00D05B98 /* cpujump.c */; };
 		C88601EF26195B8100590A1B /* cpusubroutine.c in Sources */ = {isa = PBXBuildFile; fileRef = C88601EE26195B8100590A1B /* cpusubroutine.c */; };
+		C89E505C2648A8B9009732C4 /* memorymap.c in Sources */ = {isa = PBXBuildFile; fileRef = C89E505B2648A8B9009732C4 /* memorymap.c */; };
 		C89E8AC9260ED5FE008395B6 /* cpubranch.c in Sources */ = {isa = PBXBuildFile; fileRef = C89E8AC8260ED5FE008395B6 /* cpubranch.c */; };
 		C8C448072627D99D00ABBD5E /* cpuinterrupt.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C448062627D99D00ABBD5E /* cpuinterrupt.c */; };
 		C8C4B48D25ABBFB3006A98BB /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
@@ -97,6 +98,8 @@
 		C85C8DC525BD29AC00611D19 /* asm.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = asm.c; sourceTree = "<group>"; };
 		C86A41882606F73F00D05B98 /* cpujump.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpujump.c; sourceTree = "<group>"; };
 		C88601EE26195B8100590A1B /* cpusubroutine.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpusubroutine.c; sourceTree = "<group>"; };
+		C89E505A2648A8B9009732C4 /* memorymap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = memorymap.h; sourceTree = "<group>"; };
+		C89E505B2648A8B9009732C4 /* memorymap.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = memorymap.c; sourceTree = "<group>"; };
 		C89E8AC8260ED5FE008395B6 /* cpubranch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpubranch.c; sourceTree = "<group>"; };
 		C8C448062627D99D00ABBD5E /* cpuinterrupt.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpuinterrupt.c; sourceTree = "<group>"; };
 		C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpanel.tbd; path = usr/lib/libpanel.tbd; sourceTree = SDKROOT; };
@@ -194,6 +197,8 @@
 				C84B6C2125B2BAF300FCCD88 /* cpu.c */,
 				C8114E2D25CBBD6D007309CD /* decode.h */,
 				C8114E2E25CBBD6D007309CD /* decode.c */,
+				C89E505A2648A8B9009732C4 /* memorymap.h */,
+				C89E505B2648A8B9009732C4 /* memorymap.c */,
 				C820E6CF25A97E3B006A7AB1 /* nes.h */,
 				C820E6D025A97E3B006A7AB1 /* nes.c */,
 				C842F17C25B404410004E807 /* snapshot.h */,
@@ -365,6 +370,7 @@
 				C820E6D125A97E3B006A7AB1 /* nes.c in Sources */,
 				C8236C2725BA80F900B18301 /* traits.c in Sources */,
 				C820E6C025A9759A006A7AB1 /* main.swift in Sources */,
+				C89E505C2648A8B9009732C4 /* memorymap.c in Sources */,
 				C81A516D25DA036100361E40 /* control.c in Sources */,
 				C83042BC25CFC89500D6B623 /* bytes.c in Sources */,
 				C85C8DC625BD29AC00611D19 /* asm.c in Sources */,

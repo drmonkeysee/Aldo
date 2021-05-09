@@ -27,8 +27,8 @@ X(NSF, "NES Sound Format")
 static const char *restrict const NesFormat = "NES\x1a",
                   *restrict const NsfFormat = "NESM\x1a";
 // NOTE: iNES data is packed into 8 or 16 KB chunks
-static const size_t HalfChunk = 0x2000,
-                    FullChunk = HalfChunk * 2;
+static const size_t Chunk = 0x2000,
+                    DChunk = Chunk * 2;
 
 enum cartformat {
 #define X(s, n) CRTF_ENUM(s),
@@ -37,7 +37,8 @@ enum cartformat {
 };
 
 // A NES game cartridge including PRG and CHR ROM banks,
-// WRAM or save-state RAM, memory mapper circuitry, and metadata headers.
+// working/save-state RAM (PRG RAM), memory mapper circuitry,
+// and metadata headers.
 
 // TODO: ignoring following fields for now:
 //  - hardcoded mirroring bits, need to know mapper to interpret these
@@ -45,12 +46,12 @@ enum cartformat {
 //  - TV System (PAL ROMs don't seem to set the flags so again who cares)
 //  - redundant indicators in byte 10
 struct ines_header {
-    uint8_t chrmem_count,   // CHR ROM half-chunk count (0 indicates CHR RAM)
+    uint8_t chr_chunks,     // CHR ROM chunk count (0 indicates CHR RAM)
             mapper_id,      // Mapper ID
-            prgram_count,   // PRG RAM half-chunk count
-            prgrom_count;   // PRG ROM chunk count
+            wram_chunks,    // WRAM chunk count (mapper may override this)
+            prg_chunks;     // PRG double-chunk count
     bool bus_conflicts,     // Cart has bus conflicts
-         prg_ram,           // PRG RAM banks present
+         wram,              // PRG RAM banks present
          trainer;           // Trainer data present
 };
 
@@ -59,10 +60,10 @@ struct cartridge {
     union {
         struct ines_header ns_hdr;  // iNES Header
     };
-    uint8_t *chrmem,                // CHR RAM or ROM
-            *prgram,                // PRG RAM
-            *prgrom,                // PRG ROM
-            *trainer;               // Trainer Data
+    uint8_t *chr,                   // CHR RAM or ROM
+            *prg,                   // PRG ROM
+            *trainer,               // Trainer Data
+            *wram;                  // Working RAM
 };
 
 static int detect_format(cart *self, FILE *f)
@@ -114,12 +115,12 @@ static int parse_ines(cart *self, FILE *f)
     memcpy(&tail, header + 12, sizeof tail);
     if (tail != 0) return CART_OBSOLETE;
 
-    self->ns_hdr.prgrom_count = header[4];
-    self->ns_hdr.chrmem_count = header[5];
-    self->ns_hdr.prg_ram = header[6] & 0x2;
+    self->ns_hdr.prg_chunks = header[4];
+    self->ns_hdr.chr_chunks = header[5];
+    self->ns_hdr.wram = header[6] & 0x2;
     self->ns_hdr.trainer = header[6] & 0x4;
     self->ns_hdr.mapper_id = (header[6] >> 4) | (header[7] & 0xf0);
-    self->ns_hdr.prgram_count = header[8];
+    self->ns_hdr.wram_chunks = header[8];
     self->ns_hdr.bus_conflicts = header[10] & 0x20;
 
     int err;
@@ -131,27 +132,26 @@ static int parse_ines(cart *self, FILE *f)
         self->trainer = NULL;
     }
 
-    if (self->ns_hdr.prg_ram) {
-        const size_t sz = (self->ns_hdr.prgram_count == 0
+    if (self->ns_hdr.wram) {
+        const size_t sz = (self->ns_hdr.wram_chunks == 0
                            ? 1
-                           : self->ns_hdr.prgram_count) * HalfChunk;
-        self->prgram = calloc(sz, sizeof *self->prgram);
+                           : self->ns_hdr.wram_chunks) * Chunk;
+        self->wram = calloc(sz, sizeof *self->wram);
     } else {
-        self->prgram = NULL;
+        self->wram = NULL;
     }
 
-    err = load_chunks(&self->prgrom, self->ns_hdr.prgrom_count * FullChunk, f);
+    err = load_chunks(&self->prg, self->ns_hdr.prg_chunks * DChunk, f);
     if (err != 0) return err;
 
-    if (self->ns_hdr.chrmem_count == 0) {
-        self->chrmem = calloc(HalfChunk, sizeof *self->chrmem);
+    if (self->ns_hdr.chr_chunks == 0) {
+        self->chr = calloc(Chunk, sizeof *self->chr);
     } else {
-        err = load_chunks(&self->chrmem, self->ns_hdr.chrmem_count * HalfChunk,
-                          f);
+        err = load_chunks(&self->chr, self->ns_hdr.chr_chunks * Chunk, f);
     }
 
     if (err == 0) {
-        // TODO: we've found a ROM with extra bytes after CHR ROM
+        // TODO: we've found a ROM with extra bytes after CHR data
         assert(fgetc(f) == EOF && feof(f));
     }
 
@@ -161,11 +161,11 @@ static int parse_ines(cart *self, FILE *f)
 // TODO: load file contents into a single ROM bank and hope for the best
 static int parse_unknown(cart *self, FILE *f)
 {
-    self->chrmem = self->prgram = self->trainer = NULL;
+    self->chr = self->wram = self->trainer = NULL;
     // TODO: assume a 32KB binary
-    const size_t datasz = 2 * FullChunk;
-    self->prgrom = calloc(datasz, sizeof *self->prgrom);
-    const size_t count = fread(self->prgrom, sizeof *self->prgrom, datasz, f);
+    const size_t datasz = 2 * DChunk;
+    self->prg = calloc(datasz, sizeof *self->prg);
+    const size_t count = fread(self->prg, sizeof *self->prg, datasz, f);
 
     // TODO: feof should be unexpected EOF
     if (feof(f)) return 0;
@@ -195,7 +195,7 @@ static void write_ines_info(cart *self, FILE *f, bool verbose)
     static const char
         *restrict const fullsize = " x 16KB",
         *restrict const halfsize = " x 8KB",
-        *restrict const prgramlbl = "PRG RAM\t\t: ",
+        *restrict const wramlbl = "WRAM\t\t: ",
         *restrict const chrromlbl = "CHR ROM\t\t: ",
         *restrict const chrramlbl = "CHR RAM\t\t: ";
 
@@ -207,25 +207,25 @@ static void write_ines_info(cart *self, FILE *f, bool verbose)
         fprintf(f, "\n");
     }
 
-    fprintf(f, "PRG ROM\t\t: %u%s\n", self->ns_hdr.prgrom_count,
+    fprintf(f, "PRG ROM\t\t: %u%s\n", self->ns_hdr.prg_chunks,
             verbose ? fullsize : "");
-    if (self->ns_hdr.prg_ram) {
-        fprintf(f, "%s%u%s\n", prgramlbl,
-                self->ns_hdr.prgram_count == 0
+    if (self->ns_hdr.wram) {
+        fprintf(f, "%s%u%s\n", wramlbl,
+                self->ns_hdr.wram_chunks == 0
                     ? 1u
-                    : self->ns_hdr.prgram_count,
+                    : self->ns_hdr.wram_chunks,
                 verbose ? halfsize : "");
     } else if (verbose) {
-        fprintf(f, "%sno\n", prgramlbl);
+        fprintf(f, "%sno\n", wramlbl);
     }
 
-    if (self->ns_hdr.chrmem_count == 0) {
+    if (self->ns_hdr.chr_chunks == 0) {
         if (verbose) {
             fprintf(f, "%sno\n", chrromlbl);
         }
         fprintf(f, "%s1%s\n", chrramlbl, verbose ? halfsize : "");
     } else {
-        fprintf(f, "%s%u%s\n", chrromlbl, self->ns_hdr.chrmem_count,
+        fprintf(f, "%s%u%s\n", chrromlbl, self->ns_hdr.chr_chunks,
                 verbose ? halfsize : "");
         if (verbose) {
             fprintf(f, "%sno\n", chrramlbl);
@@ -288,9 +288,9 @@ int cart_create(cart **c, FILE *f)
 
 void cart_free(cart *self)
 {
-    free(self->chrmem);
-    free(self->prgrom);
-    free(self->prgram);
+    free(self->chr);
+    free(self->prg);
+    free(self->wram);
     free(self->trainer);
     free(self);
 }
@@ -299,7 +299,7 @@ uint8_t *cart_prg_bank(cart *self)
 {
     assert(self != NULL);
 
-    return self->prgrom;
+    return self->prg;
 }
 
 void cart_info_write(cart *self, FILE *f, bool verbose)

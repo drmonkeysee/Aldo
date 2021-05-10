@@ -273,7 +273,7 @@ int aldo_run(int argc, char *argv[argc+1])
     }
 
     if (appstate.disassemble) {
-        const int err = dis_cart(cart, appstate.verbose);
+        const int err = dis_cart(cart_prg_bank(c), appstate.verbose);
         cart_free(cart);
         cart = NULL;
         return err == 0 ? EXIT_SUCCESS : EXIT_FAILURE;

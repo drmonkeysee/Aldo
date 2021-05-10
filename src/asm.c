@@ -270,11 +270,10 @@ int dis_datapath(const struct console_state *snapshot,
     return total;
 }
 
-int dis_cart(cart *c, bool verbose)
+int dis_cart(const uint8_t *restrict prgrom, bool verbose)
 {
-    assert(c != NULL);
+    assert(prgrom != NULL);
 
-    const uint8_t *const prgrom = cart_prg_bank(c);
     int bytes_read = 0;
     struct repeat_condition repeat = {
         .state = verbose ? DUP_VERBOSE : DUP_NONE,

@@ -42,6 +42,7 @@ int dis_mem(uint16_t addr, const struct console_state *snapshot,
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
 
-int dis_cart(cart *cart, bool verbose);
+// TODO: pass in prgrom for now to avoid cart dependency until memory map is worked out
+int dis_cart(const uint8_t *restrict prgrom, bool verbose);
 
 #endif

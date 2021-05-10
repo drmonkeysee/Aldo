@@ -17,6 +17,7 @@
 // or a 2KB bank from $0000 - $7FFF with mask 0x800, mirroring $0000 - $07FF
 // through the full 2KB bank.
 
+// NOTE: memorybank does not own any of its pointer members and is safe to copy
 struct memorybank {
     size_t size;        // Bank Size
     uint8_t *mem;       // Bank Memory

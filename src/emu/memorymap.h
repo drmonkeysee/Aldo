@@ -31,8 +31,12 @@ typedef struct memorymap memmap;
 memmap *memmap_new(void);
 void memmap_free(memmap *self);
 
-bool memmap_add(memmap *self, size_t count,
-                const struct memorybank banks[count]);
+#define memmap_add(s, b) memmap_addnbanks(s, 1, b)
+#define memmap_addbanks(s, bs) \
+memmap_addnbanks(s, sizeof (bs) / sizeof (bs)[0], bs)
+bool memmap_addnbanks(memmap *self, size_t count,
+                      const struct memorybank banks[count]);
+
 bool memmap_copy(memmap *self, size_t size, uint8_t buf[restrict size],
                  uint16_t minaddr, uint16_t maxaddr);
 

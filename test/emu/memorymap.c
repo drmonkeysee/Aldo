@@ -32,7 +32,7 @@ static void read_simple_bank(void *ctx)
         .addrmax = (sizeof mem / sizeof mem[0]) - 1,
     };
 
-    ct_asserttrue(memmap_add(m, 1, &b));
+    ct_asserttrue(memmap_add(m, &b));
 
     uint8_t d;
     ct_asserttrue(memmap_read(m, 0x0, &d));
@@ -62,7 +62,7 @@ static void read_small_bank(void *ctx)
         .addrmax = 0xb,
     };
 
-    ct_asserttrue(memmap_add(m, 1, &b));
+    ct_asserttrue(memmap_add(m, &b));
 
     uint8_t d;
     ct_asserttrue(memmap_read(m, 0x3, &d));
@@ -95,7 +95,7 @@ static void write_simple_bank(void *ctx)
         .addrmax = (sizeof mem / sizeof mem[0]) - 1,
     };
 
-    ct_asserttrue(memmap_add(m, 1, &b));
+    ct_asserttrue(memmap_add(m, &b));
 
     ct_asserttrue(memmap_write(m, 0x0, 0xa));
     ct_assertequal(0xau, mem[0]);
@@ -123,7 +123,7 @@ static void write_small_bank(void *ctx)
         .addrmax = 0xb,
     };
 
-    ct_asserttrue(memmap_add(m, 1, &b));
+    ct_asserttrue(memmap_add(m, &b));
 
     ct_asserttrue(memmap_write(m, 0x3, 0xa));
     ct_assertequal(0xau, mem[3]);

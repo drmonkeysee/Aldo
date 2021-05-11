@@ -21,6 +21,14 @@ static void teardown(void **ctx)
     memmap_free(*ctx);
 }
 
+static void new_bank(void *ctx)
+{
+    memmap *const m = ctx;
+
+    ct_assertequal(0u, memmap_size(m));
+    ct_assertequal(2u, memmap_capacity(m));
+}
+
 static void read_simple_bank(void *ctx)
 {
     memmap *const m = ctx;
@@ -33,6 +41,8 @@ static void read_simple_bank(void *ctx)
     };
 
     ct_asserttrue(memmap_add(m, &b));
+    ct_assertequal(1u, memmap_size(m));
+    ct_assertequal(2u, memmap_capacity(m));
 
     uint8_t d;
     ct_asserttrue(memmap_read(m, 0x0, &d));
@@ -63,6 +73,8 @@ static void read_small_bank(void *ctx)
     };
 
     ct_asserttrue(memmap_add(m, &b));
+    ct_assertequal(1u, memmap_size(m));
+    ct_assertequal(2u, memmap_capacity(m));
 
     uint8_t d;
     ct_asserttrue(memmap_read(m, 0x3, &d));
@@ -96,6 +108,8 @@ static void write_simple_bank(void *ctx)
     };
 
     ct_asserttrue(memmap_add(m, &b));
+    ct_assertequal(1u, memmap_size(m));
+    ct_assertequal(2u, memmap_capacity(m));
 
     ct_asserttrue(memmap_write(m, 0x0, 0xa));
     ct_assertequal(0xau, mem[0]);
@@ -124,6 +138,8 @@ static void write_small_bank(void *ctx)
     };
 
     ct_asserttrue(memmap_add(m, &b));
+    ct_assertequal(1u, memmap_size(m));
+    ct_assertequal(2u, memmap_capacity(m));
 
     ct_asserttrue(memmap_write(m, 0x3, 0xa));
     ct_assertequal(0xau, mem[3]);
@@ -150,6 +166,7 @@ static void write_small_bank(void *ctx)
 struct ct_testsuite memorymap_tests(void)
 {
     static const struct ct_testcase tests[] = {
+        ct_maketest(new_bank),
         ct_maketest(read_simple_bank),
         ct_maketest(read_small_bank),
         ct_maketest(write_simple_bank),

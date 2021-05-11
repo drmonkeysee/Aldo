@@ -11,8 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// A Memory Map is a vector of Memory Banks
-
 struct memorymap {
     size_t size, capacity;
     struct memorybank *banks;
@@ -39,24 +37,35 @@ void memmap_free(memmap *self)
     free(self);
 }
 
-bool memmap_addnbanks(memmap *self, size_t count,
-                      const struct memorybank banks[count])
+size_t memmap_size(memmap *self)
 {
     assert(self != NULL);
-    assert(count > 0);
-    assert(banks != NULL);
+    return self->size;
+}
 
-    // TODO: determine if new banks will replace existing banks
-    // any overlap must remove the existing bank, even if that creates holes
+size_t memmap_capacity(memmap *self)
+{
+    assert(self != NULL);
+    return self->capacity;
+}
 
-    const size_t newsize = self->size + count;
+bool memmap_add(memmap *self, const membank *b)
+{
+    assert(self != NULL);
+    assert(b != NULL);
+
+    // TODO: determine if new banks will replace existing banks due to overlap
+    // and figure out index of new bank
+
+    // no overlap check capacity
+    const size_t newsize = self->size + 1;
     if (newsize > self->capacity) {
-        while (newsize >= self->capacity) {
-            // K = 1.5 growth factor
-            self->capacity *= 1.5;
-        }
+        // K = 1.5 growth factor (i.e. N + N/2)
+        self->capacity += self->capacity >> 1;
         self->banks = realloc(self->banks, self->capacity);
     }
+
+    // finally add the new bank and shuffle everything around
 
     return false;
 }

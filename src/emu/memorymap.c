@@ -69,3 +69,19 @@ bool memmap_add(memmap *self, const membank *b)
 
     return false;
 }
+
+bool memmap_read(memmap *self, uint16_t addr, uint8_t *restrict d)
+{
+    return false;
+}
+
+bool memmap_write(memmap *self, uint16_t addr, uint8_t d)
+{
+    return false;
+}
+
+bool memmap_copy(memmap *self, size_t size, uint8_t buf[restrict size],
+                 uint16_t minaddr, uint16_t maxaddr)
+{
+    return false;
+}

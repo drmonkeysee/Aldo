@@ -11,9 +11,29 @@
 #include <stdlib.h>
 #include <string.h>
 
+struct memorybank {
+    struct memorybank *next;    // Next bank in the list
+    size_t size;                // Bank Size
+    uint8_t *mem;               // Bank Memory
+    rpolicy *read;              // Memory-read policy; invoked if READ mode
+    wpolicy *write;             // Memory-write policy; invoked if WRITE mode
+    void *pctx;                 // Context object for RW policies
+    enum memorymode mode;       // Memory access mode
+    uint16_t addrmin,           // Min Address covered by this bank
+             addrmax;           // Max Address covered by this bank
+};
+
 struct memorymap {
-    size_t size, capacity;
-    struct memorybank *banks;
+    size_t addrwidth,               // Address Width in bits
+           pagewidth,               // Page Width in bits
+           size,                    // Active Bank Count
+           capacity,                // Total Bank Count (active and free)
+           pagecount;               // Memory Page Count
+    struct memorybank *banks,       // Active Banks
+                      *freelist;    // Free Banks (available for reuse)
+    uint16_t addrmask,              // Active Address Bits
+             pagehash;              // Address-to-Page-Index Hash Factor
+    struct memorybank *pages[];     // Array of Memory Pages
 };
 
 //

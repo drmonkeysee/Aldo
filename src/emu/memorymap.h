@@ -39,7 +39,6 @@
 // reads and writes may be mediated by a read- or write-policy unique to
 // a bank, emulating underlying circuitry that may be present at the given bus
 // locations (e.g. iNES mappers).
-
 typedef struct memorymap memmap;
 
 typedef bool rpolicy(memmap *, uint8_t, uint16_t, uint8_t *restrict,

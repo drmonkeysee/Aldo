@@ -14,8 +14,8 @@
 #include <assert.h>
 #include <stddef.h>
 
-static const int PreFetch = -1;     // Sentinel value for cycle count
-                                    // denoting an imminent opcode fetch.
+// Sentinel value for cycle count denoting an imminent opcode fetch
+static const int PreFetch = -1;
 
 static void read(struct mos6502 *self)
 {

@@ -26,7 +26,7 @@ X(NSF, "NES Sound Format")
 
 static const char *restrict const NesFormat = "NES\x1a",
                   *restrict const NsfFormat = "NESM\x1a";
-// NOTE: iNES data is packed into 8 or 16 KB chunks
+// NOTE: iNES file data is packed into 8 or 16 KB chunks
 static const size_t Chunk = 0x2000,
                     DChunk = Chunk * 2;
 

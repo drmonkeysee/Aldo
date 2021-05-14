@@ -15,7 +15,6 @@
 
 // The MOS6502 processor is a little-endian
 // 8-bit CPU with a 16-bit addressing space.
-
 struct mos6502 {
     // CPU registers and flags
     uint16_t pc;        // Program Counter

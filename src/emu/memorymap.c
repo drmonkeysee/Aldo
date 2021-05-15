@@ -12,13 +12,12 @@
 #include <string.h>
 
 struct partition {
-    struct busdevice device;    // Device connected to this bus partition
-    uint16_t addrmin,           // Min partition address
-             addrmax;           // Max partition address
+    struct memlink link;    // Link to bus component
+    uint16_t addrmin;       // Min partition address
 };
 
 struct memorymap {
-    size_t size;                    // Partition count
+    size_t count;                   // Partition count
     uint16_t maxaddr;               // Max address covered by this map
     struct partition partitions[];  // Address space partitions
 };
@@ -27,7 +26,18 @@ struct memorymap {
 // Public Interface
 //
 
-memmap *memmap_new(size_t addrwidth)
+const char *memmap_errstr(int err)
+{
+    switch (err) {
+#define X(s, v, e) case s: return e;
+        MEMMAP_ERRCODE_X
+#undef X
+    default:
+        return "UNKNOWN ERR";
+    }
+}
+
+memmap *memmap_new(size_t addrwidth, size_t n, ...)
 {
     assert(0 < addrwidth && addrwidth <= 16);
 
@@ -39,7 +49,30 @@ void memmap_free(memmap *self)
     free(self);
 }
 
-bool memmap_add(memmap *self, struct busdevice d)
+size_t memmap_count(memmap *self)
+{
+    assert(self != NULL);
+
+    return 0;
+}
+
+uint16_t memmap_maxaddr(memmap *self)
+{
+    assert(self != NULL);
+
+    return 0;
+}
+
+int memmap_paddr(memmap *self, size_t i)
+{
+    assert(self != NULL);
+
+    return 0;
+}
+
+extern inline bool memmap_set(memmap *, uint16_t, struct memlink);
+bool memmap_swap(memmap *self, uint16_t addr, struct memlink ml,
+                 struct memlink *prev)
 {
     assert(self != NULL);
 

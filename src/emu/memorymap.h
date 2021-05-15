@@ -12,18 +12,26 @@
 #include <stddef.h>
 #include <stdint.h>
 
-// A Memory Map is an N-bit address space, where N -> (0, 16] representing
-// the available address space of a processing unit; the memory map is divided
-// into bus devices which manage read/write access of some contiguous subset
-// of the N-bit address space and wire it to underlying functionality such as
-// standard memory, switchable RAM/ROM banks, memory-mapped registers,
-// I/O controllers, etc;
+// X(symbol, value, error string)
+#define MEMMAP_ERRCODE_X \
+X(MMAP_PARTITION_RANGE, -1, "PARTITION OUT OF RANGE")
 
-// the partitioning of address space to bus devices is fixed at creation time,
-// however different bus device implementations can be swapped in and out of
-// their respective locations (e.g. swapping a NES cartridge, or a disk drive);
-// it is also possible for no device to be mapped to a particular address
-// partition, in which case there is no hardware wired to that bus location;
+enum {
+#define X(s, v, e) s = v,
+    MEMMAP_ERRCODE_X
+#undef X
+};
+
+// A Memory Map is an N-bit structure, where N -> (0, 16], representing
+// the available address space of a processing unit; the memory map is divided
+// into a fixed-set of address-range partitions where each partition is
+// optionally linked to some functional component such as memory, switchable
+// RAM/ROM banks, memory-mapped registers, I/O controllers, etc;
+
+// although the partitions are fixed, components can be swapped in and out
+// of these partitions provided the component maps to the partition's address
+// range; it is also possible for a partition to have no linked
+// component, in which case the address range is not mapped to anything;
 
 // some examples: a 64KB ROM board wired to $8000 - $BFFF, exposing 16KBs at a
 // time via bank-switching circuitry on the ROM board;
@@ -33,20 +41,43 @@ typedef struct memorymap memmap;
 typedef bool rpolicy(void *ctx, uint16_t, uint8_t *restrict);
 typedef bool wpolicy(void *ctx, uint16_t, uint8_t);
 
-// NOTE: a bus device must be copyable and thus cannot own its pointer members;
-// make sure something else manages the lifetime of ctx.
-struct busdevice {
-    rpolicy *read;  // Read policy (if NULL device is write-only)
-    wpolicy *write; // Write policy (if NULL device is read-only)
+// A Memory Link is a connection from a processing unit's memory map to
+// a component responsible for handling reads and writes to the connected
+// address partition; memlinks are passed by value and do not own their
+// pointer members.
+struct memlink {
+    rpolicy *read;  // Read policy (if NULL, component is write-only)
+    wpolicy *write; // Write policy (if NULL, component is read-only)
     void *ctx;      // Policy context
 };
 
-memmap *memmap_new(size_t addrwidth);
+// NOTE: returns a pointer to a statically allocated string;
+// **WARNING**: do not write through or free this pointer!
+const char *memmap_errstr(int err);
+
+// NOTE: n is partition count, while variadic arguments specify the address at
+// which each partition starts *excluding 0 which is always implied*; thus
+// there is one less variadic argument than the value of n;
+// e.g. (16, 4, 0x2000, 0x4000, 0x8000) ->
+// - 16-bit address space
+// - 4 partitions
+// - mapped as [$0000 - $1FFF, $2000 - $3FFF, $4000 - $7FFF, $8000 - $FFFF]
+memmap *memmap_new(size_t addrwidth, size_t n, ...);
 void memmap_free(memmap *self);
 
+size_t memmap_count(memmap *self);
 uint16_t memmap_maxaddr(memmap *self);
+// NOTE: get start address of partition i, returns < 0 if i is out of range
+int memmap_paddr(memmap *self, size_t i);
 
-bool memmap_add(memmap *self, struct busdevice d);
+// NOTE: value of addr can be anywhere in the range of the targeted partition
+// NOTE: if prev is not null it is set to the contents of the old link
+bool memmap_swap(memmap *self, uint16_t addr, struct memlink ml,
+                 struct memlink *prev);
+inline bool memmap_set(memmap *self, uint16_t addr, struct memlink ml)
+{
+    return memmap_swap(self, addr, ml, NULL);
+}
 
 bool memmap_read(memmap *self, uint16_t addr, uint8_t *restrict d);
 bool memmap_write(memmap *self, uint16_t addr, uint8_t d);

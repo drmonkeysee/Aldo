@@ -68,7 +68,7 @@ void memmap_free(memmap *self);
 size_t memmap_count(memmap *self);
 uint16_t memmap_maxaddr(memmap *self);
 // NOTE: get start address of partition i, returns < 0 if i is out of range
-int memmap_paddr(memmap *self, size_t i);
+int memmap_pstart(memmap *self, size_t i);
 
 // NOTE: value of addr can be anywhere in the range of the targeted partition
 // NOTE: if prev is not null it is set to the contents of the old link

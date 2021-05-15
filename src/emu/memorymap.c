@@ -9,11 +9,10 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include <string.h>
 
 struct partition {
     struct memlink link;    // Link to bus component
-    uint16_t addrmin;       // Min partition address
+    uint16_t start;         // Partition start address
 };
 
 struct memorymap {
@@ -40,6 +39,7 @@ const char *memmap_errstr(int err)
 memmap *memmap_new(size_t addrwidth, size_t n, ...)
 {
     assert(0 < addrwidth && addrwidth <= 16);
+    assert(0 < n);
 
     return NULL;
 }
@@ -63,7 +63,7 @@ uint16_t memmap_maxaddr(memmap *self)
     return 0;
 }
 
-int memmap_paddr(memmap *self, size_t i)
+int memmap_pstart(memmap *self, size_t i)
 {
     assert(self != NULL);
 

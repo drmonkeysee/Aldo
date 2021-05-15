@@ -13,7 +13,8 @@
 
 static void setup(void **ctx)
 {
-    *ctx = memmap_new();
+    // 6-bit address space (64 bytes), 4-bit pages (16 bytes), 4 pages total
+    *ctx = memmap_new(6, 4);
 }
 
 static void teardown(void **ctx)
@@ -26,7 +27,9 @@ static void new_bank(void *ctx)
     memmap *const m = ctx;
 
     ct_assertequal(0u, memmap_size(m));
-    ct_assertequal(2u, memmap_capacity(m));
+    ct_assertequal(0u, memmap_capacity(m));
+    ct_assertequal(8u, memmap_pagecount(m));
+    ct_assertequal(0x3fu, memmap_maxaddr(m));
 }
 
 static void read_simple_bank(void *ctx)
@@ -34,15 +37,11 @@ static void read_simple_bank(void *ctx)
     memmap *const m = ctx;
 
     uint8_t mem[16] = {0xa, 0xb, 0xc, [15] = 0xd};
-    const struct memorybank b = {
-        .size = sizeof mem / sizeof mem[0],
-        .mem = mem,
-        .addrmax = (sizeof mem / sizeof mem[0]) - 1,
-    };
 
-    ct_asserttrue(memmap_add(m, &b));
+    ct_asserttrue(memmap_add(m, sizeof mem / sizeof mem[0], mem, 0,
+                             (sizeof mem / sizeof mem[0]) - 1, MMODE_READ));
     ct_assertequal(1u, memmap_size(m));
-    ct_assertequal(2u, memmap_capacity(m));
+    ct_assertequal(1u, memmap_capacity(m));
 
     uint8_t d;
     ct_asserttrue(memmap_read(m, 0x0, &d));
@@ -54,7 +53,12 @@ static void read_simple_bank(void *ctx)
     ct_asserttrue(memmap_read(m, 0x2, &d));
     ct_assertequal(0xcu, d);
 
+    // NOTE: address outside bank range
     ct_assertfalse(memmap_read(m, 0x10, &d));
+    ct_assertequal(0xcu, d);
+
+    // NOTE: address outside map range
+    ct_assertfalse(memmap_read(m, 0x40, &d));
     ct_assertequal(0xcu, d);
 }
 
@@ -65,16 +69,10 @@ static void read_small_bank(void *ctx)
     uint8_t mem[16] = {
         0xe, 0xe, 0xe, 0xa, 0xb, 0xc, [12] = 0xd, 0xf, [15] = 0xf,
     };
-    const struct memorybank b = {
-        .size = 8,
-        .mem = mem,
-        .addrmin = 0x3,
-        .addrmax = 0xb,
-    };
 
-    ct_asserttrue(memmap_add(m, &b));
+    ct_asserttrue(memmap_add(m, 8, mem, 0x3, 0xb, MMODE_READ));
     ct_assertequal(1u, memmap_size(m));
-    ct_assertequal(2u, memmap_capacity(m));
+    ct_assertequal(1u, memmap_capacity(m));
 
     uint8_t d;
     ct_asserttrue(memmap_read(m, 0x3, &d));
@@ -92,7 +90,12 @@ static void read_small_bank(void *ctx)
     ct_assertfalse(memmap_read(m, 0xc, &d));
     ct_assertequal(0xcu, d);
 
+    // NOTE: address outside bank range
     ct_assertfalse(memmap_read(m, 0x10, &d));
+    ct_assertequal(0xcu, d);
+
+    // NOTE: address outside map range
+    ct_assertfalse(memmap_read(m, 0x40, &d));
     ct_assertequal(0xcu, d);
 }
 
@@ -101,15 +104,11 @@ static void write_simple_bank(void *ctx)
     memmap *const m = ctx;
 
     uint8_t mem[16] = {0xff, 0xff, 0xff, [15] = 0xff};
-    const struct memorybank b = {
-        .size = sizeof mem / sizeof mem[0],
-        .mem = mem,
-        .addrmax = (sizeof mem / sizeof mem[0]) - 1,
-    };
 
-    ct_asserttrue(memmap_add(m, &b));
+    ct_asserttrue(memmap_add(m, sizeof mem / sizeof mem[0], mem, 0,
+                             (sizeof mem / sizeof mem[0]) - 1, MMODE_WRITE));
     ct_assertequal(1u, memmap_size(m));
-    ct_assertequal(2u, memmap_capacity(m));
+    ct_assertequal(1u, memmap_capacity(m));
 
     ct_asserttrue(memmap_write(m, 0x0, 0xa));
     ct_assertequal(0xau, mem[0]);
@@ -120,7 +119,11 @@ static void write_simple_bank(void *ctx)
     ct_asserttrue(memmap_write(m, 0x2, 0xc));
     ct_assertequal(0xcu, mem[2]);
 
+    // NOTE: address outside bank range
     ct_assertfalse(memmap_write(m, 0x10, 0xd));
+
+    // NOTE: address outside map range
+    ct_assertfalse(memmap_write(m, 0x40, 0xd));
 }
 
 static void write_small_bank(void *ctx)
@@ -130,16 +133,10 @@ static void write_small_bank(void *ctx)
     uint8_t mem[16] = {
         0xee, 0xee, 0xee, 0xff, 0xff, 0xff, [12] = 0xff, 0xee, [15] = 0xee,
     };
-    const struct memorybank b = {
-        .size = 8,
-        .mem = mem,
-        .addrmin = 0x3,
-        .addrmax = 0xb,
-    };
 
-    ct_asserttrue(memmap_add(m, &b));
+    ct_asserttrue(memmap_add(m, 8, mem, 0x3, 0xb, MMODE_WRITE));
     ct_assertequal(1u, memmap_size(m));
-    ct_assertequal(2u, memmap_capacity(m));
+    ct_assertequal(1u, memmap_capacity(m));
 
     ct_asserttrue(memmap_write(m, 0x3, 0xa));
     ct_assertequal(0xau, mem[3]);
@@ -156,7 +153,11 @@ static void write_small_bank(void *ctx)
     ct_assertfalse(memmap_write(m, 0xc, 0xd));
     ct_assertequal(0xeeu, mem[0]);
 
+    // NOTE: address outside bank range
     ct_assertfalse(memmap_write(m, 0x10, 0xd));
+
+    // NOTE: address outside map range
+    ct_assertfalse(memmap_write(m, 0x40, 0xd));
 }
 
 //

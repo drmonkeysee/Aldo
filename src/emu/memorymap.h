@@ -12,56 +12,41 @@
 #include <stddef.h>
 #include <stdint.h>
 
-// A Memory Map is a mapping over an N-bit address space, where N -> (0, 16];
-// this memory space is then divided into pages of width P bits where P <= N
-// and N % P = 0; finally the memory map is additionally divided into memory
-// banks which control read/write access of some contiguous subset of the
-// N-bit address space and wire it to an actual underlying memory space;
+// A Memory Map is an N-bit address space, where N -> (0, 16] representing
+// the available address space of a processing unit; the memory map is divided
+// into bus devices which manage read/write access of some contiguous subset
+// of the N-bit address space and wire it to underlying functionality such as
+// standard memory, switchable RAM/ROM banks, memory-mapped registers,
+// I/O controllers, etc;
 
-// Memory Map - how much address space is available
-// Memory Page - the granularity of the address space
-// (i.e. how flexible is the memory layout)
-// Memory Bank - how a range of addresses behave and bind to an underlying
-// bus component
-// (e.g. RAM, ROM, bank-switched, memory-mapped registers, I/O, etc)
+// the partitioning of address space to bus devices is fixed at creation time,
+// however different bus device implementations can be swapped in and out of
+// their respective locations (e.g. swapping a NES cartridge, or a disk drive);
+// it is also possible for no device to be mapped to a particular address
+// partition, in which case there is no hardware wired to that bus location;
 
-// a Memory Bank encompasses one or more pages and banks cannot overlap in
-// either page space or address space; the activation of a bank that overlaps
-// existing banks will deactivate the existing banks; this implies (and allows)
-// for gaps in a memory map, it is a valid configuration to have some address
-// ranges not wire to anything;
-
-// for example a 16KB read-only bank from $8000 - $BFFF over 64KB of memory,
-// where all 64KB are made available through bank-switching;
-// or an 8KB read/write address bank $0000 - $1FFF over 2KB of memory,
-// mirroring a 2KB RAM across the 8KB address window;
-
-// reads and writes may be mediated by a read- or write-policy unique to
-// a bank, emulating underlying circuitry that may be present at the given bus
-// locations (e.g. iNES mappers).
+// some examples: a 64KB ROM board wired to $8000 - $BFFF, exposing 16KBs at a
+// time via bank-switching circuitry on the ROM board;
+// or a 2KB RAM chip wired to an 8KB address range $0000 - $1FFF,
+// mirroring the memory 4x at that bus location.
 typedef struct memorymap memmap;
+typedef bool rpolicy(void *ctx, uint16_t, uint8_t *restrict);
+typedef bool wpolicy(void *ctx, uint16_t, uint8_t);
 
-typedef bool rpolicy(memmap *, uint8_t, uint16_t, uint8_t *restrict,
-                     void *ctx);
-typedef bool wpolicy(memmap *, uint8_t *restrict, uint16_t, uint8_t,
-                     void *ctx);
-
-enum memorymode {
-    MMODE_NONE,
-    MMODE_READ,
-    MMODE_WRITE,
+// NOTE: a bus device must be copyable and thus cannot own its pointer members;
+// make sure something else manages the lifetime of ctx.
+struct busdevice {
+    rpolicy *read;  // Read policy (if NULL device is write-only)
+    wpolicy *write; // Write policy (if NULL device is read-only)
+    void *ctx;      // Policy context
 };
 
-memmap *memmap_new(size_t addrwidth, size_t pagewidth);
+memmap *memmap_new(size_t addrwidth);
 void memmap_free(memmap *self);
 
-size_t memmap_size(memmap *self);
-size_t memmap_capacity(memmap *self);
+uint16_t memmap_maxaddr(memmap *self);
 
-// TODO: should size be in bitwidth as well
-bool memmap_addbank(memmap *self, size_t size, uint8_t mem[size],
-                    uint16_t addrmin, uint16_t addrmax, enum memorymode mode,
-                    rpolicy rp, wpolicy wp, void *policy_ctx);
+bool memmap_add(memmap *self, struct busdevice d);
 
 bool memmap_read(memmap *self, uint16_t addr, uint8_t *restrict d);
 bool memmap_write(memmap *self, uint16_t addr, uint8_t d);

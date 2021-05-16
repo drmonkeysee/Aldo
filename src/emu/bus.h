@@ -51,21 +51,20 @@ struct busdevice {
 // **WARNING**: do not write through or free this pointer!
 const char *bus_errstr(int err);
 
-// NOTE: n is partition count, while variadic arguments specify the addresses
-// which divide the partitions; thus there is one less variadic argument than
-// the value of n;
+// NOTE: n is partition count, while variadic arguments specify where the
+// partition divisions are; thus variadic argument count is n - 1;
 // e.g. (16, 4, 0x2000, 0x4000, 0x8000) ->
 // - 16-bit address space
 // - 4 partitions
 // - mapped as [$0000 - $1FFF, $2000 - $3FFF, $4000 - $7FFF, $8000 - $FFFF]
-bus *bus_new(size_t addrwidth, size_t n, ...);
+bus *bus_new(int bitwidth, size_t n, ...);
 void bus_free(bus *self);
 
 size_t bus_count(bus *self);
 uint16_t bus_maxaddr(bus *self);
 int bus_pstart(bus *self, size_t i);
 
-// NOTE: value of addr can be anywhere in the range of the targeted partition
+// NOTE: addr can be anywhere in the range of the target device's partition
 // NOTE: if prev is not null it is set to the contents of the old device
 bool bus_swap(bus *self, uint16_t addr, struct busdevice bd,
               struct busdevice *prev);

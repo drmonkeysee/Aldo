@@ -36,9 +36,9 @@ const char *bus_errstr(int err)
     }
 }
 
-bus *bus_new(size_t addrwidth, size_t n, ...)
+bus *bus_new(int bitwidth, size_t n, ...)
 {
-    assert(0 < addrwidth && addrwidth <= 16);
+    assert(0 < bitwidth && bitwidth <= 16);
     assert(0 < n);
 
     return NULL;

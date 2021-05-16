@@ -13,12 +13,12 @@
 #include <stdint.h>
 
 // X(symbol, value, error string)
-#define BUS_ERRCODE_X \
-X(BUS_PARTITION_RANGE, -1, "PARTITION OUT OF RANGE")
+#define EMUBUS_ERRCODE_X \
+X(EMUBUS_PARTITION_RANGE, -1, "PARTITION OUT OF RANGE")
 
 enum {
 #define X(s, v, e) s = v,
-    BUS_ERRCODE_X
+    EMUBUS_ERRCODE_X
 #undef X
 };
 

@@ -8,6 +8,7 @@
 #include "bus.h"
 
 #include <assert.h>
+#include <stdarg.h>
 #include <stdlib.h>
 
 struct partition {
@@ -29,7 +30,7 @@ const char *bus_errstr(int err)
 {
     switch (err) {
 #define X(s, v, e) case s: return e;
-        BUS_ERRCODE_X
+        EMUBUS_ERRCODE_X
 #undef X
     default:
         return "UNKNOWN ERR";
@@ -41,7 +42,23 @@ bus *bus_new(int bitwidth, size_t n, ...)
     assert(0 < bitwidth && bitwidth <= 16);
     assert(0 < n);
 
-    return NULL;
+    const size_t psize = sizeof(struct partition) * n;
+    struct addressbus *const self = malloc(sizeof *self + psize);
+    *self = (struct addressbus){
+        .count = n,
+        .maxaddr = (1 << bitwidth) - 1,
+    };
+    self->partitions[0] = (struct partition){0};
+    va_list args;
+    va_start(args, n);
+    for (size_t i = 1; i < n; ++i) {
+        self->partitions[i] = (struct partition){
+            .start = va_arg(args, unsigned int),
+        };
+    }
+    va_end(args);
+
+    return self;
 }
 
 void bus_free(bus *self)
@@ -53,21 +70,23 @@ size_t bus_count(bus *self)
 {
     assert(self != NULL);
 
-    return 0;
+    return self->count;
 }
 
 uint16_t bus_maxaddr(bus *self)
 {
     assert(self != NULL);
 
-    return 0;
+    return self->maxaddr;
 }
 
 int bus_pstart(bus *self, size_t i)
 {
     assert(self != NULL);
 
-    return 0;
+    return i < self->count
+           ? self->partitions[i].start
+           : EMUBUS_PARTITION_RANGE;
 }
 
 extern inline bool bus_set(bus *, uint16_t, struct busdevice);

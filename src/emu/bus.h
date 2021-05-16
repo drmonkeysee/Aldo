@@ -22,10 +22,10 @@ enum {
 #undef X
 };
 
-// A Bus defines what address lines are wired to what components in a
+// A Bus defines how address lines are wired to system components in a
 // processor's address space; the bus is divided into a fixed-set of
-// address-range partitions linked to some device such as memory, switchable
-// RAM/ROM banks, memory-mapped registers, I/O controllers, etc;
+// address-range partitions each linked to some device such as memory,
+// switchable RAM/ROM banks, memory-mapped registers, I/O controllers, etc;
 
 // although the partitions are fixed, devices can be swapped in and out
 // of these partitions provided the device maps to the partition's address
@@ -36,7 +36,7 @@ enum {
 // time via bank-switching circuitry on the ROM board;
 // or a 2KB RAM chip wired to an 8KB address range $0000 - $1FFF,
 // mirroring the memory 4x at that bus location.
-typedef struct systembus bus;
+typedef struct addressbus bus;
 typedef bool rpolicy(void *ctx, uint16_t, uint8_t *restrict);
 typedef bool wpolicy(void *ctx, uint16_t, uint8_t);
 
@@ -51,10 +51,9 @@ struct busdevice {
 // **WARNING**: do not write through or free this pointer!
 const char *bus_errstr(int err);
 
-// NOTE: addrwidth must be in the range (0 - 16]
-// NOTE: n is partition count, while variadic arguments specify the address at
-// which each partition starts *excluding 0 which is always implied*; thus
-// there is one less variadic argument than the value of n;
+// NOTE: n is partition count, while variadic arguments specify the addresses
+// which divide the partitions; thus there is one less variadic argument than
+// the value of n;
 // e.g. (16, 4, 0x2000, 0x4000, 0x8000) ->
 // - 16-bit address space
 // - 4 partitions

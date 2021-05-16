@@ -15,9 +15,9 @@ struct partition {
     uint16_t start;             // Partition start address
 };
 
-struct systembus {
+struct addressbus {
     size_t count;                   // Partition count
-    uint16_t maxaddr;               // Max address covered by this map
+    uint16_t maxaddr;               // Max address decodable on this bus
     struct partition partitions[];  // Address space partitions
 };
 

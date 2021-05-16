@@ -30,21 +30,15 @@ enum {
 // although the partitions are fixed, devices can be swapped in and out
 // of these partitions provided the device maps to the partition's address
 // range; it is also possible for a partition to have no linked
-// device, in which case the address range is not mapped to anything;
-
-// some examples: a 64KB ROM board wired to $8000 - $BFFF, exposing 16KBs at a
-// time via bank-switching circuitry on the ROM board;
-// or a 2KB RAM chip wired to an 8KB address range $0000 - $1FFF,
-// mirroring the memory 4x at that bus location.
+// device, in which case the address range is not mapped to anything.
 typedef struct addressbus bus;
 typedef bool rpolicy(void *ctx, uint16_t, uint8_t *restrict);
 typedef bool wpolicy(void *ctx, uint16_t, uint8_t);
 
-// NOTE: busdevices are passed by value and cannot own their pointer members
 struct busdevice {
     rpolicy *read;  // Read policy (if NULL, device is write-only)
     wpolicy *write; // Write policy (if NULL, device is read-only)
-    void *ctx;      // Policy context
+    void *ctx;      // Policy context (non-owning pointer)
 };
 
 // NOTE: returns a pointer to a statically allocated string;
@@ -65,7 +59,6 @@ uint16_t bus_maxaddr(bus *self);
 int bus_pstart(bus *self, size_t i);
 
 // NOTE: addr can be anywhere in the range of the target device's partition
-// NOTE: if prev is not null it is set to the contents of the old device
 bool bus_swap(bus *self, uint16_t addr, struct busdevice bd,
               struct busdevice *prev);
 inline bool bus_set(bus *self, uint16_t addr, struct busdevice bd)

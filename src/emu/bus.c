@@ -1,21 +1,21 @@
 //
-//  memorymap.c
+//  bus.c
 //  Aldo
 //
-//  Created by Brandon Stansbury on 5/9/21.
+//  Created by Brandon Stansbury on 5/15/21.
 //
 
-#include "memorymap.h"
+#include "bus.h"
 
 #include <assert.h>
 #include <stdlib.h>
 
 struct partition {
-    struct memlink link;    // Link to bus component
-    uint16_t start;         // Partition start address
+    struct busdevice device;    // Bus device wired to this partition
+    uint16_t start;             // Partition start address
 };
 
-struct memorymap {
+struct systembus {
     size_t count;                   // Partition count
     uint16_t maxaddr;               // Max address covered by this map
     struct partition partitions[];  // Address space partitions
@@ -25,18 +25,18 @@ struct memorymap {
 // Public Interface
 //
 
-const char *memmap_errstr(int err)
+const char *bus_errstr(int err)
 {
     switch (err) {
 #define X(s, v, e) case s: return e;
-        MEMMAP_ERRCODE_X
+        BUS_ERRCODE_X
 #undef X
     default:
         return "UNKNOWN ERR";
     }
 }
 
-memmap *memmap_new(size_t addrwidth, size_t n, ...)
+bus *bus_new(size_t addrwidth, size_t n, ...)
 {
     assert(0 < addrwidth && addrwidth <= 16);
     assert(0 < n);
@@ -44,57 +44,57 @@ memmap *memmap_new(size_t addrwidth, size_t n, ...)
     return NULL;
 }
 
-void memmap_free(memmap *self)
+void bus_free(bus *self)
 {
     free(self);
 }
 
-size_t memmap_count(memmap *self)
+size_t bus_count(bus *self)
 {
     assert(self != NULL);
 
     return 0;
 }
 
-uint16_t memmap_maxaddr(memmap *self)
+uint16_t bus_maxaddr(bus *self)
 {
     assert(self != NULL);
 
     return 0;
 }
 
-int memmap_pstart(memmap *self, size_t i)
+int bus_pstart(bus *self, size_t i)
 {
     assert(self != NULL);
 
     return 0;
 }
 
-extern inline bool memmap_set(memmap *, uint16_t, struct memlink);
-bool memmap_swap(memmap *self, uint16_t addr, struct memlink ml,
-                 struct memlink *prev)
+extern inline bool bus_set(bus *, uint16_t, struct busdevice);
+bool bus_swap(bus *self, uint16_t addr, struct busdevice bd,
+              struct busdevice *prev)
 {
     assert(self != NULL);
 
     return false;
 }
 
-bool memmap_read(memmap *self, uint16_t addr, uint8_t *restrict d)
+bool bus_read(bus *self, uint16_t addr, uint8_t *restrict d)
 {
     assert(self != NULL);
 
     return false;
 }
 
-bool memmap_write(memmap *self, uint16_t addr, uint8_t d)
+bool bus_write(bus *self, uint16_t addr, uint8_t d)
 {
     assert(self != NULL);
 
     return false;
 }
 
-bool memmap_copy(memmap *self, size_t size, uint8_t buf[restrict size],
-                 uint16_t minaddr, uint16_t maxaddr)
+bool bus_copy(bus *self, size_t size, uint8_t buf[restrict size],
+              uint16_t minaddr, uint16_t maxaddr)
 {
     assert(self != NULL);
     assert(buf != NULL);

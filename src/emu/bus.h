@@ -22,23 +22,14 @@ enum {
 #undef X
 };
 
-// A Bus defines how address lines are wired to system components in a
-// processor's address space; the bus is divided into a fixed-set of
-// address-range partitions each linked to some device such as memory,
-// switchable RAM/ROM banks, memory-mapped registers, I/O controllers, etc;
-
-// although the partitions are fixed, devices can be swapped in and out
-// of these partitions provided the device maps to the partition's address
-// range; it is also possible for a partition to have no linked
-// device, in which case the address range is not mapped to anything.
 typedef struct addressbus bus;
 typedef bool rpolicy(void *restrict, uint16_t, uint8_t *restrict);
 typedef bool wpolicy(void *, uint16_t, uint8_t);
 
 struct busdevice {
-    rpolicy *read;  // Read policy (if NULL, device is write-only)
-    wpolicy *write; // Write policy (if NULL, device is read-only)
-    void *ctx;      // Policy context (non-owning pointer)
+    rpolicy *read;
+    wpolicy *write;
+    void *ctx;
 };
 
 // NOTE: returns a pointer to a statically allocated string;

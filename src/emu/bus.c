@@ -12,25 +12,22 @@
 #include <stdlib.h>
 
 struct partition {
-    struct busdevice device;    // Bus device wired to this partition
-    uint16_t start;             // Partition start address
+    struct busdevice device;
+    uint16_t start;
 };
 
 struct addressbus {
-    size_t count;                   // Partition count
-    uint16_t maxaddr;               // Max address decodable on this bus
-    struct partition partitions[];  // Address space partitions
+    size_t count;
+    uint16_t maxaddr;
+    struct partition partitions[];
 };
 
 static struct partition *find(struct addressbus *self, uint16_t addr)
 {
-    for (size_t i = self->count - 1; i >= 0; --i) {
+    for (size_t i = self->count - 1; i > 0; --i) {
         if (addr >= self->partitions[i].start) return self->partitions + i;
     }
-    // NOTE: shouldn't happen, the first partition always starts at 0 and
-    // the last partition always extends to the end of the address space
-    // but return the first partition just in case in release builds.
-    assert(((void)"BAD PARTITION LOOKUP", false));
+    // NOTE: return the first partition if we got this far
     return self->partitions;
 }
 

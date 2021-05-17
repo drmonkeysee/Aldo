@@ -65,7 +65,7 @@ struct cartridge {
             *wram;                  // Working RAM
 };
 
-static int detect_format(cart *self, FILE *f)
+static int detect_format(struct cartridge *self, FILE *f)
 {
     // NOTE: grab first 8 bytes as a string to check file format
     char format[9];
@@ -101,7 +101,7 @@ static int load_chunks(uint8_t **mem, size_t size, FILE *f)
     return 0;
 }
 
-static int parse_ines(cart *self, FILE *f)
+static int parse_ines(struct cartridge *self, FILE *f)
 {
     unsigned char header[16];
 
@@ -156,7 +156,7 @@ static int parse_ines(cart *self, FILE *f)
 }
 
 // TODO: load file contents into a single ROM bank and hope for the best
-static int parse_unknown(cart *self, FILE *f)
+static int parse_unknown(struct cartridge *self, FILE *f)
 {
     self->chr = self->wram = NULL;
     // TODO: assume a 32KB binary
@@ -187,7 +187,7 @@ static void hr(FILE *f)
     fprintf(f, "-----------------------\n");
 }
 
-static void write_ines_info(cart *self, FILE *f, bool verbose)
+static void write_ines_info(struct cartridge *self, FILE *f, bool verbose)
 {
     static const char
         *restrict const fullsize = " x 16KB",

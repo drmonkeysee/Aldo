@@ -118,7 +118,8 @@ bool bus_read(bus *self, uint16_t addr, uint8_t *restrict d)
 {
     assert(self != NULL);
 
-    addr &= self->maxaddr;
+    if (addr > self->maxaddr) return false;
+
     struct partition *const target = find(self, addr);
     if (target->device.read) {
         return target->device.read(target->device.ctx, addr, d);
@@ -130,7 +131,8 @@ bool bus_write(bus *self, uint16_t addr, uint8_t d)
 {
     assert(self != NULL);
 
-    addr &= self->maxaddr;
+    if (addr > self->maxaddr) return false;
+
     struct partition *const target = find(self, addr);
     if (target->device.write) {
         return target->device.write(target->device.ctx, addr, d);

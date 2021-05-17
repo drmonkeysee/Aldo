@@ -127,8 +127,8 @@ static void read_device_at_high_partition(void *ctx)
     ct_assertfalse(bus_read(b, 0x1a, &d));
     ct_assertequal(0xdu, d);
 
-    ct_asserttrue(bus_read(b, 0x40, &d));
-    ct_assertequal(0x9u, d);
+    ct_assertfalse(bus_read(b, 0x40, &d));
+    ct_assertequal(0xdu, d);
 }
 
 static void write_device(void *ctx)
@@ -176,8 +176,8 @@ static void write_device_at_high_partition(void *ctx)
 
     ct_assertfalse(bus_write(b, 0x1a, 0xe));
 
-    ct_asserttrue(bus_write(b, 0x40, 0xc));
-    ct_assertequal(0xcu, memlow[0]);
+    ct_assertfalse(bus_write(b, 0x40, 0xe));
+    ct_assertequal(0xffu, memlow[0]);
 }
 
 static void set_device_within_partition_bounds(void *ctx)

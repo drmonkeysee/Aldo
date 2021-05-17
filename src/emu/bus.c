@@ -22,6 +22,18 @@ struct addressbus {
     struct partition partitions[];  // Address space partitions
 };
 
+static struct partition *find(struct addressbus *self, uint16_t addr)
+{
+    for (size_t i = self->count - 1; i >= 0; --i) {
+        if (addr >= self->partitions[i].start) return self->partitions + i;
+    }
+    // NOTE: shouldn't happen, the first partition always starts at 0 and
+    // the last partition always extends to the end of the address space
+    // but return the first partition just in case in release builds.
+    assert(((void)"BAD PARTITION LOOKUP", false));
+    return self->partitions;
+}
+
 //
 // Public Interface
 //
@@ -95,13 +107,25 @@ bool bus_swap(bus *self, uint16_t addr, struct busdevice bd,
 {
     assert(self != NULL);
 
-    return false;
+    if (addr > self->maxaddr) return false;
+
+    struct partition *const target = find(self, addr);
+    if (prev) {
+        *prev = target->device;
+    }
+    target->device = bd;
+    return true;
 }
 
 bool bus_read(bus *self, uint16_t addr, uint8_t *restrict d)
 {
     assert(self != NULL);
 
+    addr &= self->maxaddr;
+    struct partition *const target = find(self, addr);
+    if (target->device.read) {
+        return target->device.read(target->device.ctx, addr, d);
+    }
     return false;
 }
 
@@ -109,6 +133,11 @@ bool bus_write(bus *self, uint16_t addr, uint8_t d)
 {
     assert(self != NULL);
 
+    addr &= self->maxaddr;
+    struct partition *const target = find(self, addr);
+    if (target->device.write) {
+        return target->device.write(target->device.ctx, addr, d);
+    }
     return false;
 }
 

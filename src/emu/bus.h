@@ -32,8 +32,8 @@ enum {
 // range; it is also possible for a partition to have no linked
 // device, in which case the address range is not mapped to anything.
 typedef struct addressbus bus;
-typedef bool rpolicy(void *ctx, uint16_t, uint8_t *restrict);
-typedef bool wpolicy(void *ctx, uint16_t, uint8_t);
+typedef bool rpolicy(void *restrict, uint16_t, uint8_t *restrict);
+typedef bool wpolicy(void *, uint16_t, uint8_t);
 
 struct busdevice {
     rpolicy *read;  // Read policy (if NULL, device is write-only)

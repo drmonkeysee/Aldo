@@ -238,8 +238,8 @@ static void device_swap(void *ctx)
     ct_assertequal(0xbu, mem2[0]);
 
     ct_assertsame(mem1, bd3.ctx);
-    ct_assertnull(bd3.read);
-    ct_assertsame(test_write, bd3.write);
+    ct_assertnull((void *)bd3.read);
+    ct_assertsame((void *)test_write, (void *)bd3.write);
 }
 
 //

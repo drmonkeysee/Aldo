@@ -117,6 +117,7 @@ bool bus_swap(bus *self, uint16_t addr, struct busdevice bd,
 bool bus_read(bus *self, uint16_t addr, uint8_t *restrict d)
 {
     assert(self != NULL);
+    assert(d != NULL);
 
     if (addr > self->maxaddr) return false;
 

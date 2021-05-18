@@ -60,7 +60,4 @@ inline bool bus_set(bus *self, uint16_t addr, struct busdevice bd)
 bool bus_read(bus *self, uint16_t addr, uint8_t *restrict d);
 bool bus_write(bus *self, uint16_t addr, uint8_t d);
 
-bool bus_copy(bus *self, size_t size, uint8_t buf[restrict size],
-              uint16_t minaddr, uint16_t maxaddr);
-
 #endif

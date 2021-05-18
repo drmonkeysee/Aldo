@@ -140,12 +140,3 @@ bool bus_write(bus *self, uint16_t addr, uint8_t d)
     }
     return false;
 }
-
-bool bus_copy(bus *self, size_t size, uint8_t buf[restrict size],
-              uint16_t minaddr, uint16_t maxaddr)
-{
-    assert(self != NULL);
-    assert(buf != NULL);
-
-    return false;
-}

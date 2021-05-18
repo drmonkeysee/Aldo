@@ -63,7 +63,7 @@ static struct memspan make_memspan(uint16_t addr,
             ROM_SIZE,
         };
     }
-    return (struct memspan){.bytes = NULL};
+    return (struct memspan){0};
 }
 
 static const char *interrupt_display(const struct console_state *snapshot)

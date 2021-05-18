@@ -41,7 +41,7 @@ static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
 static void create_cpubus(nes *self)
 {
     // TODO: 3 partitions only for now, 8KB ram, 32KB rom, nothing in between
-    self->cpu.bus = bus_new(16, 3, 0x2000, 0x8000);
+    self->cpu.bus = bus_new(16, 3, CpuRamMaxAddr + 1, CpuRomMinAddr);
     bus_set(self->cpu.bus, 0,
             (struct busdevice){ram_read, ram_write, self->ram});
 }
@@ -57,7 +57,7 @@ nes *nes_new(cart *c)
     struct nes_console *const self = malloc(sizeof *self);
     create_cpubus(self);
     self->cart = c;
-    cart_connectprg(c, self->cpu.bus, 0x8000);
+    cart_connectprg(c, self->cpu.bus, CpuRomMinAddr);
     return self;
 }
 

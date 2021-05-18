@@ -20,13 +20,13 @@ static const int PreFetch = -1;
 static void read(struct mos6502 *self)
 {
     self->signal.rw = true;
-    self->dflt = !bus_read(self->bus, self->addrbus, &self->databus);
+    self->bflt = !bus_read(self->bus, self->addrbus, &self->databus);
 }
 
 static void write(struct mos6502 *self)
 {
     self->signal.rw = false;
-    self->dflt = !bus_write(self->bus, self->addrbus, self->databus);
+    self->bflt = !bus_write(self->bus, self->addrbus, self->databus);
 }
 
 static uint8_t get_p(const struct mos6502 *self, bool interrupt)
@@ -1281,8 +1281,8 @@ int cpu_cycle(struct mos6502 *self)
         self->presync = false;
         self->t = PreFetch;
     }
-    if (self->dflt) {
-        self->dflt = false;
+    if (self->bflt) {
+        self->bflt = false;
     }
 
     latch_interrupts(self);
@@ -1324,7 +1324,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->datapath.addrcarry_latch = self->adc;
     snapshot->datapath.current_instruction = self->addrinst;
     snapshot->datapath.databus = self->databus;
-    snapshot->datapath.datafault = self->dflt;
+    snapshot->datapath.busfault = self->bflt;
     snapshot->datapath.exec_cycle = self->t;
     snapshot->datapath.instdone = self->presync;
     snapshot->datapath.irq = self->irq;

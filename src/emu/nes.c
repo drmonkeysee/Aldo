@@ -21,7 +21,7 @@
 // Cartridge RAM/ROM and Controller Input.
 struct nes_console {
     struct mos6502 cpu;     // CPU Core of RP2A03 Chip
-    cart *cart;             // Game Cartridge
+    cart *cart;             // Game Cartridge; Non-owning Pointer
     enum nexcmode mode;     // NES execution mode
     uint8_t ram[RAM_SIZE];  // CPU Internal RAM
 };
@@ -63,7 +63,6 @@ nes *nes_new(cart *c)
 
 void nes_free(nes *self)
 {
-    cart_free(self->cart);
     bus_free(self->cpu.bus);
     free(self);
 }

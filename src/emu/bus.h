@@ -19,7 +19,7 @@ typedef bool wpolicy(void *, uint16_t, uint8_t);
 struct busdevice {
     rpolicy *read;
     wpolicy *write;
-    void *ctx;
+    void *ctx;      // Non-owning Pointer
 };
 
 // NOTE: n is partition count, while variadic arguments specify where the

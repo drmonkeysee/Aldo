@@ -37,7 +37,7 @@ static void data_fault(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_asserttrue(cpu.dflt);
+    ct_asserttrue(cpu.bflt);
 }
 
 static void ram_mirroring(void *ctx)

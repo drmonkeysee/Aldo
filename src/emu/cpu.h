@@ -57,12 +57,12 @@ struct mos6502 {
 
     // Internals: control flags and other helper fields that do
     // not correspond directly to CPU components.
-    bool dflt,          // Data fault; read/write to unmapped address
+    bool bflt,          // Bus fault; read/write to unmapped or invalid address
          presync;       // Pre-sync cycle; primes the CPU to treat
                         // the following cycle as an opcode fetch (T0).
 
     // System Bus: external components connected to the CPU pins
-    bus *bus;
+    bus *bus;           // Non-owning Pointer
 };
 
 void cpu_powerup(struct mos6502 *self);

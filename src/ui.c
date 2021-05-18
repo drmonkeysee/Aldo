@@ -354,7 +354,7 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwprintw(DatapathView.content, cursor_y, vsep2 + 2, "adh: $%02X",
               snapshot->datapath.addrhigh_latch);
     const int dbus_x = vsep3 + 2;
-    if (snapshot->datapath.datafault) {
+    if (snapshot->datapath.busfault) {
         mvwaddstr(DatapathView.content, cursor_y, dbus_x, "FLT");
     } else {
         mvwprintw(DatapathView.content, cursor_y, dbus_x, "$%02X",

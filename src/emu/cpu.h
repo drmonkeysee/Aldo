@@ -8,6 +8,7 @@
 #ifndef Aldo_emu_cpu_h
 #define Aldo_emu_cpu_h
 
+#include "bus.h"
 #include "snapshot.h"
 
 #include <stdbool.h>
@@ -60,9 +61,8 @@ struct mos6502 {
          presync;       // Pre-sync cycle; primes the CPU to treat
                         // the following cycle as an opcode fetch (T0).
 
-    // Buses: external components connected to the CPU pins
-    uint8_t *ram;       // RAM Bus
-    const uint8_t *rom; // ROM Bus
+    // System Bus: external components connected to the CPU pins
+    bus *bus;
 };
 
 void cpu_powerup(struct mos6502 *self);

@@ -7,6 +7,7 @@
 
 #include "nes.h"
 
+#include "bus.h"
 #include "bytes.h"
 #include "cpu.h"
 #include "traits.h"
@@ -16,14 +17,34 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-// The NES-001 Motherboard including the CPU/Audio Generator, PPU,
-// RAM, VRAM, Cartridge RAM/ROM and Controller Input.
+// The NES-001 Motherboard including the CPU/APU, PPU, RAM, VRAM,
+// Cartridge RAM/ROM and Controller Input.
 struct nes_console {
     struct mos6502 cpu;     // CPU Core of RP2A03 Chip
     cart *cart;             // Game Cartridge
     enum nexcmode mode;     // NES execution mode
     uint8_t ram[RAM_SIZE];  // CPU Internal RAM
 };
+
+static bool ram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
+{
+    *d = ((uint8_t *)ctx)[addr & CpuRamAddrMask];
+    return true;
+}
+
+static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
+{
+    ((uint8_t *)ctx)[addr & CpuRamAddrMask] = d;
+    return true;
+}
+
+static void create_cpubus(nes *self)
+{
+    // TODO: 3 partitions only for now, 8KB ram, 32KB rom, nothing in between
+    self->cpu.bus = bus_new(16, 3, 0x2000, 0x8000);
+    bus_set(self->cpu.bus, 0,
+            (struct busdevice){ram_read, ram_write, self->ram});
+}
 
 //
 // Public Interface
@@ -34,14 +55,15 @@ nes *nes_new(cart *c)
     assert(c != NULL);
 
     struct nes_console *const self = malloc(sizeof *self);
+    create_cpubus(self);
     self->cart = c;
-    self->cpu.ram = self->ram;
     return self;
 }
 
 void nes_free(nes *self)
 {
     cart_free(self->cart);
+    bus_free(self->cpu.bus);
     free(self);
 }
 
@@ -67,7 +89,7 @@ void nes_powerup(nes *self)
     }
 
     // TODO: for now wire up single rom bank to cpu
-    self->cpu.rom = prgbank;
+    //self->cpu.rom = prgbank;
     cpu_powerup(&self->cpu);
 }
 

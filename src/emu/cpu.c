@@ -21,26 +21,23 @@ static void read(struct mos6502 *self)
 {
     self->signal.rw = true;
 
-    if (self->addrbus <= CpuRamMaxAddr) {
+    self->dflt = !bus_read(self->bus, self->addrbus, &self->databus);
+
+/*    if (self->addrbus <= CpuRamMaxAddr) {
         self->databus = self->ram[self->addrbus & CpuRamAddrMask];
         return;
     }
     if (CpuRomMinAddr <= self->addrbus && self->addrbus <= CpuRomMaxAddr) {
         self->databus = self->rom[self->addrbus & CpuRomAddrMask];
         return;
-    }
-    self->dflt = true;
+    }*/
 }
 
 static void write(struct mos6502 *self)
 {
     self->signal.rw = false;
 
-    if (self->addrbus <= CpuRamMaxAddr) {
-        self->ram[self->addrbus & CpuRamAddrMask] = self->databus;
-        return;
-    }
-    self->dflt = true;
+    self->dflt = !bus_write(self->bus, self->addrbus, self->databus);
 }
 
 static uint8_t get_p(const struct mos6502 *self, bool interrupt)

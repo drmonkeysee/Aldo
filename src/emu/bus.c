@@ -35,17 +35,6 @@ static struct partition *find(struct addressbus *self, uint16_t addr)
 // Public Interface
 //
 
-const char *bus_errstr(int err)
-{
-    switch (err) {
-#define X(s, v, e) case s: return e;
-        EMUBUS_ERRCODE_X
-#undef X
-    default:
-        return "UNKNOWN ERR";
-    }
-}
-
 bus *bus_new(int bitwidth, size_t n, ...)
 {
     assert(0 < bitwidth && bitwidth <= 16);
@@ -89,13 +78,16 @@ uint16_t bus_maxaddr(bus *self)
     return self->maxaddr;
 }
 
-int bus_pstart(bus *self, size_t i)
+bool bus_pstart(bus *self, size_t i, uint16_t *a)
 {
     assert(self != NULL);
+    assert(a != NULL);
 
-    return i < self->count
-           ? self->partitions[i].start
-           : EMUBUS_PARTITION_RANGE;
+    if (i < self->count) {
+        *a = self->partitions[i].start;
+        return true;
+    }
+    return false;
 }
 
 extern inline bool bus_set(bus *, uint16_t, struct busdevice);

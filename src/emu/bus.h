@@ -12,16 +12,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-// X(symbol, value, error string)
-#define EMUBUS_ERRCODE_X \
-X(EMUBUS_PARTITION_RANGE, -1, "PARTITION OUT OF RANGE")
-
-enum {
-#define X(s, v, e) s = v,
-    EMUBUS_ERRCODE_X
-#undef X
-};
-
 typedef struct addressbus bus;
 typedef bool rpolicy(void *restrict, uint16_t, uint8_t *restrict);
 typedef bool wpolicy(void *, uint16_t, uint8_t);
@@ -31,10 +21,6 @@ struct busdevice {
     wpolicy *write;
     void *ctx;
 };
-
-// NOTE: returns a pointer to a statically allocated string;
-// **WARNING**: do not write through or free this pointer!
-const char *bus_errstr(int err);
 
 // NOTE: n is partition count, while variadic arguments specify where the
 // partition divisions are; thus variadic argument count is n - 1;
@@ -47,7 +33,7 @@ void bus_free(bus *self);
 
 size_t bus_count(bus *self);
 uint16_t bus_maxaddr(bus *self);
-int bus_pstart(bus *self, size_t i);
+bool bus_pstart(bus *self, size_t i, uint16_t *a);
 
 // NOTE: addr can be anywhere in the range of the target device's partition
 bool bus_swap(bus *self, uint16_t addr, struct busdevice bd,

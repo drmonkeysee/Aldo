@@ -83,10 +83,15 @@ static void new_bus(void *ctx)
 
     ct_assertequal(3u, bus_count(b));
     ct_assertequal(0x3fu, bus_maxaddr(b));
-    ct_assertequal(0x0, bus_pstart(b, 0));
-    ct_assertequal(0x10, bus_pstart(b, 1));
-    ct_assertequal(0x20, bus_pstart(b, 2));
-    ct_assertequal(EMUBUS_PARTITION_RANGE, bus_pstart(b, 3));
+    uint16_t a;
+    ct_asserttrue(bus_pstart(b, 0, &a));
+    ct_assertequal(0x0u, a);
+    ct_asserttrue(bus_pstart(b, 1, &a));
+    ct_assertequal(0x10u, a);
+    ct_asserttrue(bus_pstart(b, 2, &a));
+    ct_assertequal(0x20u, a);
+    ct_assertfalse(bus_pstart(b, 3, &a));
+    ct_assertequal(0x20u, a);
 }
 
 static void empty_device(void *ctx)
@@ -212,10 +217,12 @@ static void set_device_within_partition_bounds(void *ctx)
         .ctx = mem,
     };
     uint8_t d;
+    uint16_t a;
 
     ct_asserttrue(bus_set(b, 0x30, bd));
-    ct_assertequal(0x20, bus_pstart(b, 2));
-    ct_assertequal(EMUBUS_PARTITION_RANGE, bus_pstart(b, 3));
+    ct_asserttrue(bus_pstart(b, 2, &a));
+    ct_assertequal(0x20u, a);
+    ct_assertfalse(bus_pstart(b, 3, &a));
     ct_asserttrue(bus_read(b, 0x20, &d));
     ct_assertequal(0xffu, d);
 }
@@ -229,10 +236,12 @@ static void set_device_too_high(void *ctx)
         .ctx = mem,
     };
     uint8_t d;
+    uint16_t a;
 
     ct_assertfalse(bus_set(b, 0x40, bd));
-    ct_assertequal(0x20, bus_pstart(b, 2));
-    ct_assertequal(EMUBUS_PARTITION_RANGE, bus_pstart(b, 3));
+    ct_asserttrue(bus_pstart(b, 2, &a));
+    ct_assertequal(0x20u, a);
+    ct_assertfalse(bus_pstart(b, 3, &a));
     ct_assertfalse(bus_read(b, 0x40, &d));
 }
 

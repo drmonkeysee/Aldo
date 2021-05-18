@@ -20,23 +20,12 @@ static const int PreFetch = -1;
 static void read(struct mos6502 *self)
 {
     self->signal.rw = true;
-
     self->dflt = !bus_read(self->bus, self->addrbus, &self->databus);
-
-/*    if (self->addrbus <= CpuRamMaxAddr) {
-        self->databus = self->ram[self->addrbus & CpuRamAddrMask];
-        return;
-    }
-    if (CpuRomMinAddr <= self->addrbus && self->addrbus <= CpuRomMaxAddr) {
-        self->databus = self->rom[self->addrbus & CpuRomAddrMask];
-        return;
-    }*/
 }
 
 static void write(struct mos6502 *self)
 {
     self->signal.rw = false;
-
     self->dflt = !bus_write(self->bus, self->addrbus, self->databus);
 }
 

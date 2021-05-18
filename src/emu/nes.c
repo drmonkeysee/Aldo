@@ -57,6 +57,7 @@ nes *nes_new(cart *c)
     struct nes_console *const self = malloc(sizeof *self);
     create_cpubus(self);
     self->cart = c;
+    cart_connectprg(c, self->cpu.bus, 0x8000);
     return self;
 }
 
@@ -88,8 +89,6 @@ void nes_powerup(nes *self)
         self->ram[i] = rand() % 0x100;
     }
 
-    // TODO: for now wire up single rom bank to cpu
-    //self->cpu.rom = prgbank;
     cpu_powerup(&self->cpu);
 }
 

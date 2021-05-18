@@ -242,6 +242,16 @@ static void write_ines_info(struct cartridge *self, FILE *f, bool verbose)
 }
 
 //
+// Read/Write Interfaces
+//
+
+static bool simple_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
+{
+    *d = ((uint8_t *)ctx)[addr & CpuRomAddrMask];
+    return true;
+}
+
+//
 // Public Interface
 //
 
@@ -298,6 +308,18 @@ uint8_t *cart_prg_bank(cart *self)
     return self->prg;
 }
 
+int cart_connectprg(cart *self, bus *b, uint16_t addr)
+{
+    assert(self != NULL);
+    assert(b != NULL);
+
+    // TODO: set up simple read-only for now
+    if (bus_set(b, addr,
+                (struct busdevice)
+                {.read = simple_read, .ctx = self->prg})) return 0;
+    return CART_ADDR_UNAVAILABLE;
+}
+
 void cart_info_write(cart *self, FILE *f, bool verbose)
 {
     assert(self != NULL);
@@ -320,5 +342,5 @@ void cart_snapshot(cart *self, struct console_state *snapshot)
 {
     assert(self != NULL);
 
-    snapshot->rom = cart_prg_bank(self);
+    snapshot->rom = self->prg;
 }

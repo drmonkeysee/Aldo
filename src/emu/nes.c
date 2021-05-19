@@ -38,12 +38,31 @@ static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
     return true;
 }
 
-static void create_cpubus(nes *self)
+static void create_cpubus(struct nes_console *self)
 {
     // TODO: 3 partitions only for now, 8KB ram, 32KB rom, nothing in between
     self->cpu.bus = bus_new(16, 3, CpuRamMaxAddr + 1, CpuRomMinAddr);
     bus_set(self->cpu.bus, 0,
             (struct busdevice){ram_read, ram_write, self->ram});
+    cart_connect_prg(self->cart, self->cpu.bus, CpuRomMinAddr);
+}
+
+static void set_interrupt(struct nes_console *self, enum nes_interrupt signal,
+                          bool value)
+{
+    switch (signal) {
+    case NESI_IRQ:
+        self->cpu.signal.irq = value;
+        break;
+    case NESI_NMI:
+        self->cpu.signal.nmi = value;
+        break;
+    case NESI_RES:
+        self->cpu.signal.res = value;
+        break;
+    default:
+        assert(((void)"INVALID NES INTERRUPT", false));
+    }
 }
 
 //
@@ -55,9 +74,8 @@ nes *nes_new(cart *c)
     assert(c != NULL);
 
     struct nes_console *const self = malloc(sizeof *self);
-    create_cpubus(self);
     self->cart = c;
-    cart_connectprg(c, self->cpu.bus, CpuRomMinAddr);
+    create_cpubus(self);
     return self;
 }
 
@@ -84,7 +102,7 @@ void nes_powerup(nes *self)
     wrtoba(0x8004, prgbank + (IrqVector & CpuRomAddrMask));
 
     // TODO: throw random stuff into RAM for testing
-    for (size_t i = 0; i < RAM_SIZE; ++i) {
+    for (size_t i = 0; i < sizeof self->ram / sizeof self->ram[0]; ++i) {
         self->ram[i] = rand() % 0x100;
     }
 
@@ -110,38 +128,14 @@ void nes_interrupt(nes *self, enum nes_interrupt signal)
 {
     assert(self != NULL);
 
-    switch (signal) {
-    case NESI_IRQ:
-        self->cpu.signal.irq = false;
-        break;
-    case NESI_NMI:
-        self->cpu.signal.nmi = false;
-        break;
-    case NESI_RES:
-        self->cpu.signal.res = false;
-        break;
-    default:
-        assert(((void)"INVALID NES INTERRUPT", false));
-    }
+    set_interrupt(self, signal, false);
 }
 
 void nes_clear(nes *self, enum nes_interrupt signal)
 {
     assert(self != NULL);
 
-    switch (signal) {
-    case NESI_IRQ:
-        self->cpu.signal.irq = true;
-        break;
-    case NESI_NMI:
-        self->cpu.signal.nmi = true;
-        break;
-    case NESI_RES:
-        self->cpu.signal.res = true;
-        break;
-    default:
-        assert(((void)"INVALID NES INTERRUPT", false));
-    }
+    set_interrupt(self, signal, true);
 }
 
 int nes_cycle(nes *self, int cpubudget)

@@ -308,16 +308,16 @@ uint8_t *cart_prg_bank(cart *self)
     return self->prg;
 }
 
-int cart_connectprg(cart *self, bus *b, uint16_t addr)
+int cart_connect_prg(cart *self, bus *b, uint16_t addr)
 {
     assert(self != NULL);
     assert(b != NULL);
 
     // TODO: set up simple read-only for now
-    if (bus_set(b, addr,
-                (struct busdevice)
-                {.read = simple_read, .ctx = self->prg})) return 0;
-    return CART_ADDR_UNAVAILABLE;
+    return bus_set(b, addr,
+                   (struct busdevice){.read = simple_read, .ctx = self->prg})
+           ? 0
+           : CART_ADDR_UNAVAILABLE;
 }
 
 void cart_info_write(cart *self, FILE *f, bool verbose)

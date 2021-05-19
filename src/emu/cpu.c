@@ -1322,9 +1322,9 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->datapath.addrlow_latch = self->adl;
     snapshot->datapath.addrhigh_latch = self->adh;
     snapshot->datapath.addrcarry_latch = self->adc;
+    snapshot->datapath.busfault = self->bflt;
     snapshot->datapath.current_instruction = self->addrinst;
     snapshot->datapath.databus = self->databus;
-    snapshot->datapath.busfault = self->bflt;
     snapshot->datapath.exec_cycle = self->t;
     snapshot->datapath.instdone = self->presync;
     snapshot->datapath.irq = self->irq;

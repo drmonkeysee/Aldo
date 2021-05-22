@@ -44,7 +44,7 @@ static void create_cpubus(struct nes_console *self)
     self->cpu.bus = bus_new(16, 3, CpuRamMaxAddr + 1, CpuRomMinAddr);
     bus_set(self->cpu.bus, 0,
             (struct busdevice){ram_read, ram_write, self->ram});
-    cart_connect_prg(self->cart, self->cpu.bus, CpuRomMinAddr);
+    cart_cpu_connect(self->cart, self->cpu.bus, CpuRomMinAddr);
 }
 
 static void set_interrupt(struct nes_console *self, enum nes_interrupt signal,

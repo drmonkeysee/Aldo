@@ -41,7 +41,7 @@ void cart_free(cart *self);
 
 uint8_t *cart_prg_bank(cart *self);
 
-int cart_connect_prg(cart *self, bus *b, uint16_t addr);
+int cart_cpu_connect(cart *self, bus *b, uint16_t addr);
 
 void cart_info_write(cart *self, FILE *f, bool verbose);
 void cart_snapshot(cart *self, struct console_state *snapshot);

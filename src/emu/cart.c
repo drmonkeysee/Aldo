@@ -308,7 +308,7 @@ uint8_t *cart_prg_bank(cart *self)
     return self->prg;
 }
 
-int cart_connect_prg(cart *self, bus *b, uint16_t addr)
+int cart_cpu_connect(cart *self, bus *b, uint16_t addr)
 {
     assert(self != NULL);
     assert(b != NULL);

@@ -1289,6 +1289,8 @@ int cpu_cycle(struct mos6502 *self)
     if (++self->t == 0) {
         // NOTE: T0 is always an opcode fetch
         self->signal.sync = true;
+        // NOTE: reset adc every instruction, as it affects control flow
+        self->adc = false;
         self->addrbus = self->pc;
         read(self);
         if (service_interrupt(self)) {

@@ -107,8 +107,7 @@ int mapper_rom_img_create(struct mapper **m, FILE *f)
 
     // TODO: assume a 32KB ROM file
     const int err = load_chunks(&self->rom, 2 * DChunk, f);
-    // TODO: ignore EOF for now until we have ROM files that fill out 32KB
-    if (err == 0 || err == CART_EOF) {
+    if (err == 0) {
         *m = (struct mapper *)self;
         return 0;
     } else {

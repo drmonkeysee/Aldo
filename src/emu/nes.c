@@ -97,11 +97,6 @@ void nes_powerup(nes *self)
 {
     assert(self != NULL);
 
-    // TODO: vectors hardcoded for now
-    uint8_t *const prgbank = cart_prg_bank(self->cart);
-    wrtoba(CpuRomMinAddr, prgbank + (ResetVector & CpuRomAddrMask));
-    wrtoba(0x8004, prgbank + (IrqVector & CpuRomAddrMask));
-
     // TODO: throw random stuff into RAM for testing
     for (size_t i = 0; i < sizeof self->ram / sizeof self->ram[0]; ++i) {
         self->ram[i] = rand() % 0x100;

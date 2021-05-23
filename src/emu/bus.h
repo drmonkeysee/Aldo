@@ -13,13 +13,11 @@
 #include <stdint.h>
 
 typedef struct addressbus bus;
-typedef bool rpolicy(void *restrict, uint16_t, uint8_t *restrict);
-typedef bool wpolicy(void *, uint16_t, uint8_t);
 
 struct busdevice {
-    rpolicy *read;
-    wpolicy *write;
-    void *ctx;      // Non-owning Pointer
+    bool (*read)(const void *restrict, uint16_t, uint8_t *restrict);
+    bool (*write)(void *, uint16_t, uint8_t);
+    void *ctx;  // Non-owning Pointer
 };
 
 // NOTE: n is partition count, while variadic arguments specify where the

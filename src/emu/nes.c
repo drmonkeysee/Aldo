@@ -26,9 +26,10 @@ struct nes_console {
     uint8_t ram[RAM_SIZE];  // CPU Internal RAM
 };
 
-static bool ram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
+static bool ram_read(const void *restrict ctx, uint16_t addr,
+                     uint8_t *restrict d)
 {
-    *d = ((uint8_t *)ctx)[addr & CpuRamAddrMask];
+    *d = ((const uint8_t *)ctx)[addr & CpuRamAddrMask];
     return true;
 }
 

@@ -40,9 +40,10 @@ static int load_chunks(uint8_t **mem, size_t size, FILE *f)
 // ROM Implementation
 //
 
-static bool rom_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
+static bool rom_read(const void *restrict ctx, uint16_t addr,
+                     uint8_t *restrict d)
 {
-    *d = ((uint8_t *)ctx)[addr & CpuRomAddrMask];
+    *d = ((const uint8_t *)ctx)[addr & CpuRomAddrMask];
     return true;
 }
 

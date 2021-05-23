@@ -112,6 +112,7 @@ struct view {
 
 static struct view HwView,
                    ControlsView,
+                   CartView,
                    PrgView,
                    RegistersView,
                    FlagsView,
@@ -192,6 +193,24 @@ static void drawcontrols(const struct console_state *snapshot)
               "Speed \u00b11 (\u00b110): -/= (_/+)");
     mvwaddstr(ControlsView.content, ++cursor_y, 0, "Ram F/B: r/R");
     mvwaddstr(ControlsView.content, ++cursor_y, 0, "Quit: q");
+}
+
+static void drawcart(const struct control *appstate,
+                     const struct console_state *snapshot)
+{
+    static const char *const restrict namelabel = "Name: ",
+                      *const restrict ellipsis = "\u2026";
+    // NOTE: ellipsis is one glyph wide despite being > 1 byte long
+    const int namewidth = getmaxx(CartView.content) - strlen(namelabel) - 1;
+    int cursor_y = 0;
+    mvwaddstr(CartView.content, cursor_y, 0, namelabel);
+    const char *const cn = ctrl_cartname(appstate->cartfile);
+    wprintw(CartView.content, "%.*s", namewidth, cn);
+    if (strlen(cn) > (size_t)namewidth) {
+        waddstr(CartView.content, ellipsis);
+    }
+    mvwprintw(CartView.content, ++cursor_y, 0, "Format: %s",
+              snapshot->cart.formatname);
 }
 
 static void drawinstructions(uint16_t addr, int h, int y,
@@ -479,7 +498,7 @@ static void ramrefresh(int ramsheet)
 void ui_init(void)
 {
     static const int col1w = 32, col2w = 34, col3w = 35, col4w = 60, hwh = 12,
-                     cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
+                     crth = 6, cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");
     initscr();
@@ -495,7 +514,9 @@ void ui_init(void)
               xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
     vinit(&HwView, hwh, col1w, yoffset, xoffset, 2, "Hardware Traits");
     vinit(&ControlsView, 16, col1w, yoffset + hwh, xoffset, 2, "Controls");
-    vinit(&PrgView, ramh, col2w, yoffset, xoffset + col1w, 1, "PRG");
+    vinit(&CartView, crth, col2w, yoffset, xoffset + col1w, 2, "Cart");
+    vinit(&PrgView, ramh - crth, col2w, yoffset + crth, xoffset + col1w, 1,
+          "PRG");
     vinit(&RegistersView, cpuh, flagsw, yoffset, xoffset + col1w + col2w, 2,
           "Registers");
     vinit(&FlagsView, flagsh, flagsw, yoffset + cpuh, xoffset + col1w + col2w,
@@ -514,6 +535,7 @@ void ui_cleanup(void)
     vcleanup(&FlagsView);
     vcleanup(&RegistersView);
     vcleanup(&PrgView);
+    vcleanup(&CartView);
     vcleanup(&ControlsView);
     vcleanup(&HwView);
 
@@ -559,6 +581,7 @@ void ui_refresh(const struct control *appstate,
 {
     drawhwtraits(appstate);
     drawcontrols(snapshot);
+    drawcart(appstate, snapshot);
     drawprg(snapshot);
     drawregister(snapshot);
     drawflags(snapshot);

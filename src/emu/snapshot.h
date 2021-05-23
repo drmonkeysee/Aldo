@@ -28,6 +28,9 @@ enum nistate {
 
 struct console_state {
     const uint8_t *ram, *rom;
+    struct {
+        const char *formatname;
+    } cart;
     enum nexcmode mode;
     struct {
         enum nistate irq, nmi, res;

@@ -99,8 +99,7 @@ static void print_cart_info(const struct control *appstate, cart *c)
     if (appstate->verbose) {
         printf("---=== Cart Info ===---\n");
     }
-    const char *const last_slash = strrchr(appstate->cartfile, '/');
-    printf("File\t\t: %s\n", last_slash ? last_slash + 1 : appstate->cartfile);
+    printf("File\t\t: %s\n", ctrl_cartname(appstate->cartfile));
     cart_info_write(c, stdout, appstate->verbose);
 }
 

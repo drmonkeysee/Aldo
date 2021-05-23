@@ -7,4 +7,15 @@
 
 #include "control.h"
 
+#include <assert.h>
+#include <string.h>
+
 const int MinCps = 1, MaxCps = 100, RamSheets = 4;
+
+const char *ctrl_cartname(const char *cartfile)
+{
+    assert(cartfile != NULL);
+
+    const char *const last_slash = strrchr(cartfile, '/');
+    return last_slash ? last_slash + 1 : cartfile;
+}

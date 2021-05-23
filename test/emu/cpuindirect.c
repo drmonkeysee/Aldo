@@ -17,13 +17,11 @@
 
 static void adc_indx(void *ctx)
 {
+    uint8_t mem[] = {0x61, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x6};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x61, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x6};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;    // NOTE: 10 + 6
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 4;
 
     const int cycles = clock_cpu(&cpu);
@@ -40,13 +38,11 @@ static void adc_indx(void *ctx)
 
 static void adc_indx_pageoverflow(void *ctx)
 {
+    uint8_t mem[] = {0x61, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x80, 0x22};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x61, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x80, 0x22};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;    // NOTE: 10 + 34
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
@@ -63,13 +59,11 @@ static void adc_indx_pageoverflow(void *ctx)
 
 static void and_indx(void *ctx)
 {
+    uint8_t mem[] = {0x21, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0xc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x21, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 4;
 
     const int cycles = clock_cpu(&cpu);
@@ -84,13 +78,11 @@ static void and_indx(void *ctx)
 
 static void and_indx_pageoverflow(void *ctx)
 {
+    uint8_t mem[] = {0x21, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x80, 0x22};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x21, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x80, 0x22};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
@@ -105,13 +97,11 @@ static void and_indx_pageoverflow(void *ctx)
 
 static void cmp_indx(void *ctx)
 {
+    uint8_t mem[] = {0xc1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x10};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xc1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x10};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 4;
 
     const int cycles = clock_cpu(&cpu);
@@ -127,13 +117,11 @@ static void cmp_indx(void *ctx)
 
 static void cmp_indx_pageoverflow(void *ctx)
 {
+    uint8_t mem[] = {0xc1, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x80, 0x22};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xc1, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x80, 0x22};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
@@ -149,13 +137,11 @@ static void cmp_indx_pageoverflow(void *ctx)
 
 static void eor_indx(void *ctx)
 {
+    uint8_t mem[] = {0x41, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0xfc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x41, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xfc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 4;
 
     const int cycles = clock_cpu(&cpu);
@@ -170,13 +156,11 @@ static void eor_indx(void *ctx)
 
 static void eor_indx_pageoverflow(void *ctx)
 {
+    uint8_t mem[] = {0x41, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x80, 0xfc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x41, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x80, 0xfc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
@@ -191,12 +175,10 @@ static void eor_indx_pageoverflow(void *ctx)
 
 static void lda_indx(void *ctx)
 {
+    uint8_t mem[] = {0xa1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x45};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xa1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x45};
-    cpu.ram = mem;
-    cpu.rom = abs;
+    setup_cpu(&cpu, mem, abs);
     cpu.x = 4;
 
     const int cycles = clock_cpu(&cpu);
@@ -211,12 +193,10 @@ static void lda_indx(void *ctx)
 
 static void lda_indx_pageoverflow(void *ctx)
 {
+    uint8_t mem[] = {0xa1, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x80, 0x22};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xa1, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x80, 0x22};
-    cpu.ram = mem;
-    cpu.rom = abs;
+    setup_cpu(&cpu, mem, abs);
     cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
@@ -231,13 +211,11 @@ static void lda_indx_pageoverflow(void *ctx)
 
 static void ora_indx(void *ctx)
 {
+    uint8_t mem[] = {0x1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0xc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 4;
 
     const int cycles = clock_cpu(&cpu);
@@ -252,13 +230,11 @@ static void ora_indx(void *ctx)
 
 static void ora_indx_pageoverflow(void *ctx)
 {
+    uint8_t mem[] = {0x1, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x80, 0xfc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x1, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x80, 0xfc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
@@ -273,14 +249,12 @@ static void ora_indx_pageoverflow(void *ctx)
 
 static void sbc_indx(void *ctx)
 {
+    uint8_t mem[] = {0xe1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x6};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xe1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x6};
+    setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - 6
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 4;
 
     const int cycles = clock_cpu(&cpu);
@@ -297,14 +271,12 @@ static void sbc_indx(void *ctx)
 
 static void sbc_indx_pageoverflow(void *ctx)
 {
+    uint8_t mem[] = {0xe1, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x80, 0x6};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xe1, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x80, 0x6};
+    setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - 6
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
@@ -321,14 +293,13 @@ static void sbc_indx_pageoverflow(void *ctx)
 
 static void sta_indx(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x81, 0x2, 0xff, 0xff, 0xff, 0xff, 0xb, 0x0,
         0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
-    cpu.ram = mem;
     cpu.x = 4;
 
     const int cycles = clock_cpu(&cpu);
@@ -341,14 +312,13 @@ static void sta_indx(void *ctx)
 
 static void sta_indx_pageoverflow(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x81, 0x8, 0x0, 0xff, 0xff, 0xff, 0xff, 0xa,
         0x0, 0x0, 0x0, 0x0, 0x0,
     };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
-    cpu.ram = mem;
     cpu.x = 0xff;   // NOTE: wrap around from $0008 -> $0007
 
     const int cycles = clock_cpu(&cpu);
@@ -365,13 +335,11 @@ static void sta_indx_pageoverflow(void *ctx)
 
 static void adc_indy(void *ctx)
 {
+    uint8_t mem[] = {0x71, 0x2, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x71, 0x2, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;    // NOTE: 10 + 6
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -388,12 +356,10 @@ static void adc_indy(void *ctx)
 
 static void adc_indy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x71, 0x2, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0xa;    // NOTE: 10 + 178
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -410,13 +376,11 @@ static void adc_indy_pagecross(void *ctx)
 
 static void and_indy(void *ctx)
 {
+    uint8_t mem[] = {0x31, 0x2, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x31, 0x2, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -431,12 +395,10 @@ static void and_indy(void *ctx)
 
 static void and_indy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x31, 0x2, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0xea;
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -451,13 +413,11 @@ static void and_indy_pagecross(void *ctx)
 
 static void cmp_indy(void *ctx)
 {
+    uint8_t mem[] = {0xd1, 0x2, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xd1, 0x2, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -473,12 +433,10 @@ static void cmp_indy(void *ctx)
 
 static void cmp_indy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xd1, 0x2, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0x10;
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -494,13 +452,11 @@ static void cmp_indy_pagecross(void *ctx)
 
 static void eor_indy(void *ctx)
 {
+    uint8_t mem[] = {0x51, 0x2, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x51, 0x2, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -515,12 +471,10 @@ static void eor_indy(void *ctx)
 
 static void eor_indy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x51, 0x2, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0xea;
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -535,12 +489,10 @@ static void eor_indy_pagecross(void *ctx)
 
 static void lda_indy(void *ctx)
 {
+    uint8_t mem[] = {0xb1, 0x2, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xb1, 0x2, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
-    cpu.ram = mem;
-    cpu.rom = abs;
+    setup_cpu(&cpu, mem, abs);
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -555,11 +507,9 @@ static void lda_indy(void *ctx)
 
 static void lda_indy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xb1, 0x2, 0xff, 0x80};
-    cpu.ram = mem;
-    cpu.rom = bigrom;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -574,13 +524,11 @@ static void lda_indy_pagecross(void *ctx)
 
 static void ora_indy(void *ctx)
 {
+    uint8_t mem[] = {0x11, 0x2, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x11, 0x2, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -595,12 +543,10 @@ static void ora_indy(void *ctx)
 
 static void ora_indy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x11, 0x2, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0xea;
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -615,14 +561,12 @@ static void ora_indy_pagecross(void *ctx)
 
 static void sbc_indy(void *ctx)
 {
+    uint8_t mem[] = {0xf1, 0x2, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xf1, 0x2, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
+    setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - 6
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -639,13 +583,11 @@ static void sbc_indy(void *ctx)
 
 static void sbc_indy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xf1, 0x2, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - (-78)
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -662,14 +604,13 @@ static void sbc_indy_pagecross(void *ctx)
 
 static void sta_indy(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x91, 0x2, 0x4, 0x0,
         0x0, 0x0, 0x0, 0x0, 0x0
     };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
-    cpu.ram = mem;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -682,15 +623,13 @@ static void sta_indy(void *ctx)
 
 static void sta_indy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x91, 0x2, 0xff, 0x0,
         [256] = 0x0, 0x0, 0x0, 0x0,
     };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0xa;
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $00FF -> $0102
 
     const int cycles = clock_cpu(&cpu);

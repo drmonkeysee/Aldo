@@ -37,11 +37,9 @@ static void interrupt_handler_teardown(void **ctx)
 
 static void brk_handler(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x0, 0xff, 0xff, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
 
     const int cycles = clock_cpu(&cpu);
@@ -61,12 +59,10 @@ static void brk_handler(void *ctx)
 
 static void irq_handler(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.p.i = false;
     cpu.signal.irq = false;
@@ -94,12 +90,10 @@ static void irq_handler(void *ctx)
 
 static void nmi_handler(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.signal.nmi = false;
 
@@ -127,14 +121,12 @@ static void nmi_handler(void *ctx)
 
 static void res_handler(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {
         0xad, 0x4, 0x0, 0xff, 0x20, [509] = 0xdd, [510] = 0xee, [511] = 0xff,
     };
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.signal.res = false;
 
@@ -171,10 +163,9 @@ static void res_handler(void *ctx)
 
 static void rti_clear_irq_mask(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x40, 0xff, 0xff, [258] = 0xb3, [259] = 0x5, [260] = 0x0};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 1;
     cpu.p.i = true;
 
@@ -194,10 +185,9 @@ static void rti_clear_irq_mask(void *ctx)
 
 static void rti_set_irq_mask(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x40, 0xff, 0xff, [258] = 0x7c, [259] = 0x5, [260] = 0x0};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 1;
     cpu.p.i = false;
 
@@ -220,13 +210,11 @@ static void rti_set_irq_mask(void *ctx)
 // and PC advanced past BRK instruction.
 static void brk_masks_irq(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0x0, 0xff, 0xff, [250] = 0xea, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -266,12 +254,10 @@ static void brk_masks_irq(void *ctx)
 // leading to an IRQ handler with nothing to service.
 static void irq_ghost(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.p.i = false;
     cpu.signal.irq = false;
@@ -302,14 +288,12 @@ static void irq_ghost(void *ctx)
 // to reset edge detection, so NMI latch never clears.
 static void nmi_line_never_cleared(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: LDA $0004 (0x20)
     ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.signal.nmi = false;
 
@@ -347,11 +331,9 @@ static void nmi_line_never_cleared(void *ctx)
 // BRK is lost if handler does not account for this case.
 static void nmi_hijacks_brk(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x0, 0xff, 0xff, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
 
     for (int i = 0; i < 4; ++i) {
@@ -383,13 +365,11 @@ static void nmi_hijacks_brk(void *ctx)
 // after first instruction of BRK handler.
 static void nmi_delayed_by_brk(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0x0, 0xff, 0xff, [250] = 0xea, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
 
     for (int i = 0; i < 5; ++i) {
@@ -425,13 +405,11 @@ static void nmi_delayed_by_brk(void *ctx)
 // after first instruction of BRK handler.
 static void nmi_late_delayed_by_brk(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0x0, 0xff, 0xff, [250] = 0xea, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
 
     for (int i = 0; i < 6; ++i) {
@@ -464,13 +442,11 @@ static void nmi_late_delayed_by_brk(void *ctx)
 // instruction, losing the NMI.
 static void nmi_lost_during_brk(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0x0, 0xff, 0xff, [250] = 0xea, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
 
     for (int i = 0; i < 5; ++i) {
@@ -505,14 +481,12 @@ static void nmi_lost_during_brk(void *ctx)
 // NOTE: NMI latched after IRQ started, jumps to NMI handler instead
 static void nmi_hijacks_irq(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: LDA $0004 (0x20)
     ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -560,14 +534,12 @@ static void nmi_hijacks_irq(void *ctx)
 // IRQ signal goes inactive too early and IRQ is lost.
 static void nmi_hijacks_and_loses_irq(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: LDA $0004 (0x20)
     ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -616,13 +588,11 @@ static void nmi_hijacks_and_loses_irq(void *ctx)
 // after first instruction of IRQ handler.
 static void nmi_delayed_by_irq(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -667,13 +637,11 @@ static void nmi_delayed_by_irq(void *ctx)
 // after first instruction of IRQ handler.
 static void nmi_late_delayed_by_irq(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -715,13 +683,11 @@ static void nmi_late_delayed_by_irq(void *ctx)
 // instruction, losing the NMI.
 static void nmi_lost_during_irq(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -772,13 +738,11 @@ static void nmi_lost_during_irq(void *ctx)
 // NOTE: set RES on T4 prevents IRQ from finishing
 static void res_hijacks_irq(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -832,15 +796,13 @@ static void res_hijacks_irq(void *ctx)
 // NOTE: set RES on T5 triggers RES sequence immediately after IRQ sequence
 static void res_following_irq(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {
         0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
     };
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -891,15 +853,13 @@ static void res_following_irq(void *ctx)
 // NOTE: set RES on T6 still triggers reset immediately after IRQ sequence
 static void res_late_on_irq(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {
         0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
     };
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
     cpu.p.i = false;
 
@@ -946,13 +906,11 @@ static void res_late_on_irq(void *ctx)
 // NOTE: set RES on T4 prevents NMI from finishing
 static void res_hijacks_nmi(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
 
     cpu.signal.nmi = false;
@@ -1005,15 +963,13 @@ static void res_hijacks_nmi(void *ctx)
 // NOTE: set RES on T5 triggers RES sequence immediately after NMI sequence
 static void res_following_nmi(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {
         0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
     };
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
 
     cpu.signal.nmi = false;
@@ -1063,15 +1019,13 @@ static void res_following_nmi(void *ctx)
 // NOTE: set RES on T6 still triggers reset immediately after NMI sequence
 static void res_late_on_nmi(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
     ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
     uint8_t mem[] = {
         0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
     };
-    cpu.ram = mem;
-    cpu.rom = ctx;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
 
     cpu.signal.nmi = false;
@@ -1120,10 +1074,9 @@ static void res_late_on_nmi(void *ctx)
 
 static void clear_on_startup(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     ct_assertequal(NIS_CLEAR, (int)cpu.irq);
     ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
@@ -1132,11 +1085,10 @@ static void clear_on_startup(void *ctx)
 
 static void irq_poll_sequence(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.i = false;
 
     cpu.signal.irq = false;
@@ -1163,11 +1115,10 @@ static void irq_poll_sequence(void *ctx)
 
 static void irq_short_sequence(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: LDA #$20
     uint8_t mem[] = {0xa9, 0x20, 0xff, 0xff, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.i = false;
 
     cpu.signal.irq = false;
@@ -1184,11 +1135,10 @@ static void irq_short_sequence(void *ctx)
 
 static void irq_long_sequence(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: DEC $0004 (0x20)
     uint8_t mem[] = {0xce, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.i = false;
 
     cpu.signal.irq = false;
@@ -1225,11 +1175,10 @@ static void irq_long_sequence(void *ctx)
 
 static void irq_branch_not_taken(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.z = false;
     cpu.p.i = false;
 
@@ -1247,11 +1196,10 @@ static void irq_branch_not_taken(void *ctx)
 
 static void irq_on_branch_taken_if_early_signal(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
     cpu.p.i = false;
 
@@ -1274,11 +1222,10 @@ static void irq_on_branch_taken_if_early_signal(void *ctx)
 
 static void irq_delayed_on_branch_taken_if_late_signal(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
     cpu.p.i = false;
 
@@ -1311,11 +1258,10 @@ static void irq_delayed_on_branch_taken_if_late_signal(void *ctx)
 
 static void irq_delayed_on_infinite_branch(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: BEQ -2 jump to itself
     uint8_t mem[] = {0xf0, 0xfe, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
     cpu.p.i = false;
 
@@ -1353,11 +1299,10 @@ static void irq_delayed_on_infinite_branch(void *ctx)
 
 static void irq_on_branch_page_boundary(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: BEQ +5 -> $0101
     uint8_t mem[] = {[250] = 0xf0, 0x5, 0xff, [257] = 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
     cpu.p.i = false;
     cpu.pc = 250;
@@ -1386,10 +1331,9 @@ static void irq_on_branch_page_boundary(void *ctx)
 
 static void irq_just_in_time(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.i = false;
 
     cpu_cycle(&cpu);
@@ -1416,11 +1360,10 @@ static void irq_just_in_time(void *ctx)
 
 static void irq_too_late(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: LDA $0006 (0x99), LDA #$20
     uint8_t mem[] = {0xad, 0x6, 0x0, 0xa9, 0x20, 0xff, 0x99};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.i = false;
 
     cpu_cycle(&cpu);
@@ -1457,10 +1400,9 @@ static void irq_too_late(void *ctx)
 
 static void irq_too_short(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
@@ -1477,10 +1419,9 @@ static void irq_too_short(void *ctx)
 
 static void irq_level_dependent(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
@@ -1502,10 +1443,9 @@ static void irq_level_dependent(void *ctx)
 
 static void irq_masked(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
@@ -1531,11 +1471,10 @@ static void irq_masked(void *ctx)
 
 static void irq_missed_by_sei(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: SEI
     uint8_t mem[] = {0x78, 0xff, 0xff, 0xff, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.i = false;
 
     cpu.signal.irq = false;
@@ -1554,11 +1493,10 @@ static void irq_missed_by_sei(void *ctx)
 
 static void irq_missed_by_plp_set_mask(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: PLP (@ $0101)
     uint8_t mem[] = {0x28, 0xff, 0xff, 0xff, 0xff, [257] = 0x4};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.i = false;
 
     cpu.signal.irq = false;
@@ -1589,13 +1527,12 @@ static void irq_missed_by_plp_set_mask(void *ctx)
 
 static void irq_stopped_by_rti_set_mask(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: RTI (P @ $0101)
     uint8_t mem[] = {
         0x40, 0xff, 0xff, 0xff, 0xff, [257] = 0x4, [258] = 0x5, [259] = 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.i = false;
 
     cpu.signal.irq = false;
@@ -1638,11 +1575,10 @@ static void irq_stopped_by_rti_set_mask(void *ctx)
 
 static void irq_missed_by_cli(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: CLI, LDA #$20
     uint8_t mem[] = {0x58, 0xa9, 0x20, 0xff, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.i = true;
 
     cpu.signal.irq = false;
@@ -1673,11 +1609,10 @@ static void irq_missed_by_cli(void *ctx)
 
 static void irq_missed_by_plp_clear_mask(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: PLP (@ $0101), LDA #$20
     uint8_t mem[] = {0x28, 0xa9, 0x20, 0xff, 0xff, [257] = 0x0};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.i = true;
 
     cpu.signal.irq = false;
@@ -1720,13 +1655,12 @@ static void irq_missed_by_plp_clear_mask(void *ctx)
 
 static void irq_allowed_by_rti_clear_mask(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: RTI (P @ $0101)
     uint8_t mem[] = {
         0x40, 0xff, 0xff, 0xff, 0xff, [257] = 0x0, [258] = 0x5, [259] = 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.i = true;
 
     cpu.signal.irq = false;
@@ -1769,10 +1703,9 @@ static void irq_allowed_by_rti_clear_mask(void *ctx)
 
 static void irq_detect_duplicate(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     // NOTE: simulate irq held active during and after servicing interrupt
     cpu.signal.irq = false;
@@ -1798,11 +1731,10 @@ static void irq_detect_duplicate(void *ctx)
 
 static void nmi_poll_sequence(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
@@ -1828,11 +1760,10 @@ static void nmi_poll_sequence(void *ctx)
 
 static void nmi_short_sequence(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: LDA #$20
     uint8_t mem[] = {0xa9, 0x20, 0xff, 0xff, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
@@ -1848,11 +1779,10 @@ static void nmi_short_sequence(void *ctx)
 
 static void nmi_long_sequence(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: DEC $0004 (0x20)
     uint8_t mem[] = {0xce, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
@@ -1888,11 +1818,10 @@ static void nmi_long_sequence(void *ctx)
 
 static void nmi_branch_not_taken(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.z = false;
 
     cpu.signal.nmi = false;
@@ -1909,11 +1838,10 @@ static void nmi_branch_not_taken(void *ctx)
 
 static void nmi_on_branch_taken_if_early_signal(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
 
     cpu.signal.nmi = false;
@@ -1935,11 +1863,10 @@ static void nmi_on_branch_taken_if_early_signal(void *ctx)
 
 static void nmi_delayed_on_branch_taken_if_late_signal(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
 
     cpu_cycle(&cpu);
@@ -1971,11 +1898,10 @@ static void nmi_delayed_on_branch_taken_if_late_signal(void *ctx)
 
 static void nmi_delayed_on_infinite_branch(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: BEQ -2 jump to itself
     uint8_t mem[] = {0xf0, 0xfe, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
 
     cpu_cycle(&cpu);
@@ -2012,11 +1938,10 @@ static void nmi_delayed_on_infinite_branch(void *ctx)
 
 static void nmi_on_branch_page_boundary(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: BEQ +5 -> $0101
     uint8_t mem[] = {[250] = 0xf0, 0x5, 0xff, [257] = 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
     cpu.pc = 250;
 
@@ -2044,10 +1969,9 @@ static void nmi_on_branch_page_boundary(void *ctx)
 
 static void nmi_just_in_time(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     cpu_cycle(&cpu);
 
@@ -2073,11 +1997,10 @@ static void nmi_just_in_time(void *ctx)
 
 static void nmi_too_late(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     // NOTE: LDA $0006 (0x99), LDA #$20
     uint8_t mem[] = {0xad, 0x6, 0x0, 0xa9, 0x20, 0xff, 0x99};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     cpu_cycle(&cpu);
 
@@ -2113,10 +2036,9 @@ static void nmi_too_late(void *ctx)
 
 static void nmi_too_short(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
@@ -2133,10 +2055,9 @@ static void nmi_too_short(void *ctx)
 
 static void nmi_edge_persist(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
@@ -2158,10 +2079,9 @@ static void nmi_edge_persist(void *ctx)
 
 static void nmi_serviced_only_clears_on_inactive(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     // NOTE: simulate nmi held active during and after servicing interrupt
     cpu.signal.nmi = false;
@@ -2191,10 +2111,9 @@ static void nmi_serviced_only_clears_on_inactive(void *ctx)
 
 static void res_detected_and_cpu_held(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     cpu.signal.res = false;
     cpu_cycle(&cpu);
@@ -2220,10 +2139,9 @@ static void res_detected_and_cpu_held(void *ctx)
 
 static void res_too_short(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     cpu.signal.res = false;
     cpu_cycle(&cpu);

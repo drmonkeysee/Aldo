@@ -6,6 +6,7 @@
 //
 
 #include "ciny.h"
+#include "emu/cpuhelp.h"
 
 #include <stddef.h>
 
@@ -46,7 +47,10 @@ static size_t testrunner(int argc, char *argv[argc+1])
         cpu_zeropage_tests(),
         dis_tests(),
     };
-    return ct_run_withargs(suites, argc, argv);
+    setup_testbus();
+    const size_t result = ct_run_withargs(suites, argc, argv);
+    teardown_testbus();
+    return result;
 }
 
 //

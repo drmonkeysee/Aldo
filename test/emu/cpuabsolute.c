@@ -17,13 +17,11 @@
 
 static void adc_abs(void *ctx)
 {
+    uint8_t mem[] = {0x6d, 0x1, 0x80},
+            abs[] = {0xff, 0x6};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x6d, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x6};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;    // NOTE: 10 + 6
-    cpu.ram = mem;
-    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -39,13 +37,11 @@ static void adc_abs(void *ctx)
 
 static void and_abs(void *ctx)
 {
+    uint8_t mem[] = {0x2d, 0x1, 0x80},
+            abs[] = {0xff, 0xc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x2d, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
-    cpu.ram = mem;
-    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -59,13 +55,12 @@ static void and_abs(void *ctx)
 
 static void asl_abs(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0xe, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x1,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     const int cycles = clock_cpu(&cpu);
 
@@ -80,13 +75,11 @@ static void asl_abs(void *ctx)
 
 static void bit_abs(void *ctx)
 {
+    uint8_t mem[] = {0x2c, 0x1, 0x80},
+            abs[] = {0xff, 0x6};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x2c, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x6};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0x2;
-    cpu.ram = mem;
-    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -101,13 +94,11 @@ static void bit_abs(void *ctx)
 
 static void cmp_abs(void *ctx)
 {
+    uint8_t mem[] = {0xcd, 0x1, 0x80},
+            abs[] = {0xff, 0x10};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xcd, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x10};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
-    cpu.ram = mem;
-    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -122,13 +113,11 @@ static void cmp_abs(void *ctx)
 
 static void cpx_abs(void *ctx)
 {
+    uint8_t mem[] = {0xec, 0x1, 0x80},
+            abs[] = {0xff, 0x10};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xec, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x10};
+    setup_cpu(&cpu, mem, abs);
     cpu.x = 0x10;
-    cpu.ram = mem;
-    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -143,13 +132,11 @@ static void cpx_abs(void *ctx)
 
 static void cpy_abs(void *ctx)
 {
+    uint8_t mem[] = {0xcc, 0x1, 0x80},
+            abs[] = {0xff, 0x10};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xcc, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x10};
+    setup_cpu(&cpu, mem, abs);
     cpu.y = 0x10;
-    cpu.ram = mem;
-    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -164,13 +151,12 @@ static void cpy_abs(void *ctx)
 
 static void dec_abs(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0xce, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     const int cycles = clock_cpu(&cpu);
 
@@ -184,13 +170,11 @@ static void dec_abs(void *ctx)
 
 static void eor_abs(void *ctx)
 {
+    uint8_t mem[] = {0x4d, 0x1, 0x80},
+            abs[] = {0xff, 0xfc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x4d, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xfc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
-    cpu.ram = mem;
-    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -204,13 +188,12 @@ static void eor_abs(void *ctx)
 
 static void inc_abs(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0xee, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     const int cycles = clock_cpu(&cpu);
 
@@ -224,12 +207,10 @@ static void inc_abs(void *ctx)
 
 static void lda_abs(void *ctx)
 {
+    uint8_t mem[] = {0xad, 0x1, 0x80},
+            abs[] = {0xff, 0x45};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xad, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x45};
-    cpu.ram = mem;
-    cpu.rom = abs;
+    setup_cpu(&cpu, mem, abs);
 
     const int cycles = clock_cpu(&cpu);
 
@@ -243,12 +224,10 @@ static void lda_abs(void *ctx)
 
 static void ldx_abs(void *ctx)
 {
+    uint8_t mem[] = {0xae, 0x1, 0x80},
+            abs[] = {0xff, 0x45};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xae, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x45};
-    cpu.ram = mem;
-    cpu.rom = abs;
+    setup_cpu(&cpu, mem, abs);
 
     const int cycles = clock_cpu(&cpu);
 
@@ -262,12 +241,10 @@ static void ldx_abs(void *ctx)
 
 static void ldy_abs(void *ctx)
 {
+    uint8_t mem[] = {0xac, 0x1, 0x80},
+            abs[] = {0xff, 0x45};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xac, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x45};
-    cpu.ram = mem;
-    cpu.rom = abs;
+    setup_cpu(&cpu, mem, abs);
 
     const int cycles = clock_cpu(&cpu);
 
@@ -281,13 +258,12 @@ static void ldy_abs(void *ctx)
 
 static void lsr_abs(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x4e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x2,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     const int cycles = clock_cpu(&cpu);
 
@@ -302,13 +278,11 @@ static void lsr_abs(void *ctx)
 
 static void ora_abs(void *ctx)
 {
+    uint8_t mem[] = {0xd, 0x1, 0x80},
+            abs[] = {0xff, 0xc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xd, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
-    cpu.ram = mem;
-    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -322,13 +296,12 @@ static void ora_abs(void *ctx)
 
 static void rol_abs(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x2e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
 
     const int cycles = clock_cpu(&cpu);
@@ -344,13 +317,12 @@ static void rol_abs(void *ctx)
 
 static void ror_abs(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x6e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
 
     const int cycles = clock_cpu(&cpu);
@@ -366,14 +338,12 @@ static void ror_abs(void *ctx)
 
 static void sbc_abs(void *ctx)
 {
+    uint8_t mem[] = {0xed, 0x1, 0x80},
+            abs[] = {0xff, 0x6};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xed, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0x6};
+    setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - 6
-    cpu.ram = mem;
-    cpu.rom = abs;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -389,14 +359,13 @@ static void sbc_abs(void *ctx)
 
 static void sta_abs(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x8d, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
-    cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -408,14 +377,13 @@ static void sta_abs(void *ctx)
 
 static void stx_abs(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x8e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 0xf1;
-    cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -427,14 +395,13 @@ static void stx_abs(void *ctx)
 
 static void sty_abs(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x8c, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.y = 0x84;
-    cpu.ram = mem;
 
     const int cycles = clock_cpu(&cpu);
 
@@ -450,13 +417,11 @@ static void sty_abs(void *ctx)
 
 static void adc_absx(void *ctx)
 {
+    uint8_t mem[] = {0x7d, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x7d, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;    // NOTE: 10 + 6
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -473,12 +438,10 @@ static void adc_absx(void *ctx)
 
 static void adc_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x7d, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0xa;    // NOTE: 10 + 178
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -495,13 +458,11 @@ static void adc_absx_pagecross(void *ctx)
 
 static void and_absx(void *ctx)
 {
+    uint8_t mem[] = {0x3d, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x3d, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -516,12 +477,10 @@ static void and_absx(void *ctx)
 
 static void and_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x3d, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0xea;
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -536,13 +495,12 @@ static void and_absx_pagecross(void *ctx)
 
 static void asl_absx(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x1e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -558,13 +516,12 @@ static void asl_absx(void *ctx)
 
 static void asl_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x1e, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x1, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
 
     const int cycles = clock_cpu(&cpu);
@@ -580,13 +537,11 @@ static void asl_absx_pagecross(void *ctx)
 
 static void cmp_absx(void *ctx)
 {
+    uint8_t mem[] = {0xdd, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xdd, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -602,12 +557,10 @@ static void cmp_absx(void *ctx)
 
 static void cmp_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xdd, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0x10;
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -623,13 +576,12 @@ static void cmp_absx_pagecross(void *ctx)
 
 static void dec_absx(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0xde, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -644,13 +596,12 @@ static void dec_absx(void *ctx)
 
 static void dec_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0xde, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
 
     const int cycles = clock_cpu(&cpu);
@@ -665,13 +616,11 @@ static void dec_absx_pagecross(void *ctx)
 
 static void eor_absx(void *ctx)
 {
+    uint8_t mem[] = {0x5d, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x5d, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -686,12 +635,10 @@ static void eor_absx(void *ctx)
 
 static void eor_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x5d, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0xea;
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -706,13 +653,12 @@ static void eor_absx_pagecross(void *ctx)
 
 static void inc_absx(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0xfe, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -727,13 +673,12 @@ static void inc_absx(void *ctx)
 
 static void inc_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0xfe, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
 
     const int cycles = clock_cpu(&cpu);
@@ -748,12 +693,10 @@ static void inc_absx_pagecross(void *ctx)
 
 static void lda_absx(void *ctx)
 {
+    uint8_t mem[] = {0xbd, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xbd, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
-    cpu.ram = mem;
-    cpu.rom = abs;
+    setup_cpu(&cpu, mem, abs);
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -768,11 +711,9 @@ static void lda_absx(void *ctx)
 
 static void lda_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xbd, 0xff, 0x80};
-    cpu.ram = mem;
-    cpu.rom = bigrom;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -787,12 +728,10 @@ static void lda_absx_pagecross(void *ctx)
 
 static void ldy_absx(void *ctx)
 {
+    uint8_t mem[] = {0xbc, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xbc, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
-    cpu.ram = mem;
-    cpu.rom = abs;
+    setup_cpu(&cpu, mem, abs);
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -807,11 +746,9 @@ static void ldy_absx(void *ctx)
 
 static void ldy_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xbc, 0xff, 0x80};
-    cpu.ram = mem;
-    cpu.rom = bigrom;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -826,13 +763,12 @@ static void ldy_absx_pagecross(void *ctx)
 
 static void lsr_absx(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x5e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -848,13 +784,12 @@ static void lsr_absx(void *ctx)
 
 static void lsr_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x5e, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x2, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
 
     const int cycles = clock_cpu(&cpu);
@@ -870,13 +805,11 @@ static void lsr_absx_pagecross(void *ctx)
 
 static void ora_absx(void *ctx)
 {
+    uint8_t mem[] = {0x1d, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x1d, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -891,12 +824,10 @@ static void ora_absx(void *ctx)
 
 static void ora_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x1d, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0xea;
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -911,13 +842,12 @@ static void ora_absx_pagecross(void *ctx)
 
 static void rol_absx(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x3e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;
     cpu.p.c = true;
 
@@ -934,13 +864,12 @@ static void rol_absx(void *ctx)
 
 static void rol_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x3e, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
     cpu.p.c = true;
 
@@ -957,13 +886,12 @@ static void rol_absx_pagecross(void *ctx)
 
 static void ror_absx(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x7e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;
     cpu.p.c = true;
 
@@ -980,13 +908,12 @@ static void ror_absx(void *ctx)
 
 static void ror_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x7e, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
     cpu.p.c = true;
 
@@ -1003,14 +930,12 @@ static void ror_absx_pagecross(void *ctx)
 
 static void sbc_absx(void *ctx)
 {
+    uint8_t mem[] = {0xfd, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xfd, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
+    setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - 6
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1027,13 +952,11 @@ static void sbc_absx(void *ctx)
 
 static void sbc_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xfd, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - (-78)
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1050,14 +973,13 @@ static void sbc_absx_pagecross(void *ctx)
 
 static void sta_absx(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x9d, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
-    cpu.ram = mem;
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1070,14 +992,13 @@ static void sta_absx(void *ctx)
 
 static void sta_absx_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x9d, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
-    cpu.ram = mem;
     cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
 
     const int cycles = clock_cpu(&cpu);
@@ -1094,13 +1015,11 @@ static void sta_absx_pagecross(void *ctx)
 
 static void adc_absy(void *ctx)
 {
+    uint8_t mem[] = {0x79, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x79, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;    // NOTE: 10 + 6
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1117,12 +1036,10 @@ static void adc_absy(void *ctx)
 
 static void adc_absy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x79, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0xa;    // NOTE: 10 + 178
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1139,13 +1056,11 @@ static void adc_absy_pagecross(void *ctx)
 
 static void and_absy(void *ctx)
 {
+    uint8_t mem[] = {0x39, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x39, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1160,12 +1075,10 @@ static void and_absy(void *ctx)
 
 static void and_absy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x39, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0xea;
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1180,13 +1093,11 @@ static void and_absy_pagecross(void *ctx)
 
 static void cmp_absy(void *ctx)
 {
+    uint8_t mem[] = {0xd9, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xd9, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1202,12 +1113,10 @@ static void cmp_absy(void *ctx)
 
 static void cmp_absy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xd9, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0x10;
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1223,13 +1132,11 @@ static void cmp_absy_pagecross(void *ctx)
 
 static void eor_absy(void *ctx)
 {
+    uint8_t mem[] = {0x59, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x59, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1244,12 +1151,10 @@ static void eor_absy(void *ctx)
 
 static void eor_absy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x59, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0xea;
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1264,12 +1169,10 @@ static void eor_absy_pagecross(void *ctx)
 
 static void lda_absy(void *ctx)
 {
+    uint8_t mem[] = {0xb9, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xb9, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
-    cpu.ram = mem;
-    cpu.rom = abs;
+    setup_cpu(&cpu, mem, abs);
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1284,11 +1187,9 @@ static void lda_absy(void *ctx)
 
 static void lda_absy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xb9, 0xff, 0x80};
-    cpu.ram = mem;
-    cpu.rom = bigrom;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1303,12 +1204,10 @@ static void lda_absy_pagecross(void *ctx)
 
 static void ldx_absy(void *ctx)
 {
+    uint8_t mem[] = {0xbe, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xbe, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
-    cpu.ram = mem;
-    cpu.rom = abs;
+    setup_cpu(&cpu, mem, abs);
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1323,11 +1222,9 @@ static void ldx_absy(void *ctx)
 
 static void ldx_absy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xbe, 0xff, 0x80};
-    cpu.ram = mem;
-    cpu.rom = bigrom;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1342,13 +1239,11 @@ static void ldx_absy_pagecross(void *ctx)
 
 static void ora_absy(void *ctx)
 {
+    uint8_t mem[] = {0x19, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0x19, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1363,12 +1258,10 @@ static void ora_absy(void *ctx)
 
 static void ora_absy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x19, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.a = 0xea;
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1383,14 +1276,12 @@ static void ora_absy_pagecross(void *ctx)
 
 static void sbc_absy(void *ctx)
 {
+    uint8_t mem[] = {0xf9, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
     struct mos6502 cpu;
-    setup_cpu(&cpu);
-    uint8_t mem[] = {0xf9, 0x1, 0x80};
-    const uint8_t abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
+    setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - 6
-    cpu.ram = mem;
-    cpu.rom = abs;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1407,13 +1298,11 @@ static void sbc_absy(void *ctx)
 
 static void sbc_absy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xf9, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, bigrom);
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - (-78)
-    cpu.ram = mem;
-    cpu.rom = bigrom;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -1430,14 +1319,13 @@ static void sbc_absy_pagecross(void *ctx)
 
 static void sta_absy(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x99, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
-    cpu.ram = mem;
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1450,14 +1338,13 @@ static void sta_absy(void *ctx)
 
 static void sta_absy_pagecross(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {
         0x99, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
-    cpu.ram = mem;
     cpu.y = 3;  // NOTE: cross boundary from $01FF -> $0202
 
     const int cycles = clock_cpu(&cpu);

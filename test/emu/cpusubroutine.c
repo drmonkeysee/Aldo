@@ -17,10 +17,9 @@
 
 static void jsr(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x20, 0x5, 0x80, [259] = 0xff, [260] = 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.s = 4;
 
     const int cycles = clock_cpu(&cpu);
@@ -35,10 +34,9 @@ static void jsr(void *ctx)
 
 static void rts(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x60, 0xff, 0xff, [259] = 0x2, [260] = 0x0};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.s = 2;
 
     const int cycles = clock_cpu(&cpu);

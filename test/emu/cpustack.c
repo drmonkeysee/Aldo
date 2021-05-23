@@ -18,10 +18,9 @@
 
 static void pha(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x48, [260] = 0x0};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x20;
     cpu.s = 4;
 
@@ -36,10 +35,9 @@ static void pha(void *ctx)
 
 static void pha_wraparound(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x48, [256] = 0x0};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x20;
     cpu.s = 0;
 
@@ -54,10 +52,9 @@ static void pha_wraparound(void *ctx)
 
 static void php(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x8, [260] = 0x0};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.n = true;
     cpu.p.z = true;
     cpu.s = 4;
@@ -73,10 +70,9 @@ static void php(void *ctx)
 
 static void php_wraparound(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x8, [256] = 0x0};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.n = true;
     cpu.p.z = true;
     cpu.s = 0;
@@ -92,10 +88,9 @@ static void php_wraparound(void *ctx)
 
 static void pla(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x68, [260] = 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.s = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -111,10 +106,9 @@ static void pla(void *ctx)
 
 static void pla_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x68, [260] = 0x0};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.s = 3;
 
@@ -131,10 +125,9 @@ static void pla_zero(void *ctx)
 
 static void pla_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x68, [260] = 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.s = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -150,10 +143,9 @@ static void pla_negative(void *ctx)
 
 static void pla_wraparound(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x68, [256] = 0x20};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.s = 0xff;
 
     const int cycles = clock_cpu(&cpu);
@@ -169,10 +161,9 @@ static void pla_wraparound(void *ctx)
 
 static void plp(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x28, [260] = 0xaa};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.s = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -188,10 +179,9 @@ static void plp(void *ctx)
 
 static void plp_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x28, [260] = 0x0};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.s = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -207,10 +197,9 @@ static void plp_zero(void *ctx)
 
 static void plp_ones(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x28, [260] = 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.s = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -226,10 +215,9 @@ static void plp_ones(void *ctx)
 
 static void plp_wraparound(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x28, [256] = 0x25};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.s = 0xff;
 
     const int cycles = clock_cpu(&cpu);

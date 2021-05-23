@@ -27,10 +27,9 @@ static void powerup_initializes_cpu(void *ctx)
 
 static void data_fault(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x1f, 0x40};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     const int cycles = clock_cpu(&cpu);
 
@@ -42,10 +41,9 @@ static void data_fault(void *ctx)
 
 static void ram_mirroring(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xad, 0x3, 0x8, 0x45}; // NOTE: $0803 -> $0003
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     const int cycles = clock_cpu(&cpu);
 

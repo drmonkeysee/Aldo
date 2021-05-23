@@ -18,10 +18,9 @@
 
 static void asl(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xa, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 1;
 
     const int cycles = clock_cpu(&cpu);
@@ -38,10 +37,9 @@ static void asl(void *ctx)
 
 static void asl_carry(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xa, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x81;
 
     const int cycles = clock_cpu(&cpu);
@@ -58,10 +56,9 @@ static void asl_carry(void *ctx)
 
 static void asl_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xa, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
 
     const int cycles = clock_cpu(&cpu);
@@ -78,10 +75,9 @@ static void asl_zero(void *ctx)
 
 static void asl_carryzero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xa, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x80;
 
     const int cycles = clock_cpu(&cpu);
@@ -98,10 +94,9 @@ static void asl_carryzero(void *ctx)
 
 static void asl_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xa, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x40;
 
     const int cycles = clock_cpu(&cpu);
@@ -118,10 +113,9 @@ static void asl_negative(void *ctx)
 
 static void asl_carrynegative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xa, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
 
     const int cycles = clock_cpu(&cpu);
@@ -138,10 +132,9 @@ static void asl_carrynegative(void *ctx)
 
 static void asl_all_ones(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xa, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
     cpu.p.c = true;
 
@@ -159,10 +152,9 @@ static void asl_all_ones(void *ctx)
 
 static void clc(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x18, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
 
     const int cycles = clock_cpu(&cpu);
@@ -176,10 +168,9 @@ static void clc(void *ctx)
 
 static void cld(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xd8, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.d = true;
 
     const int cycles = clock_cpu(&cpu);
@@ -193,10 +184,9 @@ static void cld(void *ctx)
 
 static void cli(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x58, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.i = true;
 
     const int cycles = clock_cpu(&cpu);
@@ -210,10 +200,9 @@ static void cli(void *ctx)
 
 static void clv(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xb8, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.v = true;
 
     const int cycles = clock_cpu(&cpu);
@@ -227,10 +216,9 @@ static void clv(void *ctx)
 
 static void dex(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xca, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 5;
 
     const int cycles = clock_cpu(&cpu);
@@ -246,10 +234,9 @@ static void dex(void *ctx)
 
 static void dex_to_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xca, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 1;
 
     const int cycles = clock_cpu(&cpu);
@@ -265,10 +252,9 @@ static void dex_to_zero(void *ctx)
 
 static void dex_to_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xca, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 0;
     cpu.p.z = true;
 
@@ -285,10 +271,9 @@ static void dex_to_negative(void *ctx)
 
 static void dey(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x88, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.y = 5;
 
     const int cycles = clock_cpu(&cpu);
@@ -304,10 +289,9 @@ static void dey(void *ctx)
 
 static void dey_to_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x88, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.y = 1;
 
     const int cycles = clock_cpu(&cpu);
@@ -323,10 +307,9 @@ static void dey_to_zero(void *ctx)
 
 static void dey_to_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x88, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.y = 0;
     cpu.p.z = true;
 
@@ -343,10 +326,9 @@ static void dey_to_negative(void *ctx)
 
 static void inx(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xe8, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 5;
 
     const int cycles = clock_cpu(&cpu);
@@ -362,10 +344,9 @@ static void inx(void *ctx)
 
 static void inx_to_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xe8, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 0xff;
     cpu.p.n = true;
 
@@ -382,10 +363,9 @@ static void inx_to_zero(void *ctx)
 
 static void inx_to_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xe8, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 0x7f;
 
     const int cycles = clock_cpu(&cpu);
@@ -401,10 +381,9 @@ static void inx_to_negative(void *ctx)
 
 static void iny(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xc8, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.y = 5;
 
     const int cycles = clock_cpu(&cpu);
@@ -420,10 +399,9 @@ static void iny(void *ctx)
 
 static void iny_to_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xc8, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.y = 0xff;
     cpu.p.n = true;
 
@@ -440,10 +418,9 @@ static void iny_to_zero(void *ctx)
 
 static void iny_to_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xc8, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.y = 0x7f;
 
     const int cycles = clock_cpu(&cpu);
@@ -459,10 +436,9 @@ static void iny_to_negative(void *ctx)
 
 static void lsr(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x4a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 2;
 
     const int cycles = clock_cpu(&cpu);
@@ -479,10 +455,9 @@ static void lsr(void *ctx)
 
 static void lsr_carry(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x4a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
 
     const int cycles = clock_cpu(&cpu);
@@ -499,10 +474,9 @@ static void lsr_carry(void *ctx)
 
 static void lsr_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x4a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
 
     const int cycles = clock_cpu(&cpu);
@@ -519,10 +493,9 @@ static void lsr_zero(void *ctx)
 
 static void lsr_carryzero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x4a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 1;
 
     const int cycles = clock_cpu(&cpu);
@@ -539,10 +512,9 @@ static void lsr_carryzero(void *ctx)
 
 static void lsr_negative_to_positive(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x4a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x80;
 
     const int cycles = clock_cpu(&cpu);
@@ -559,10 +531,9 @@ static void lsr_negative_to_positive(void *ctx)
 
 static void lsr_all_ones(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x4a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
     cpu.p.c = true;
 
@@ -580,10 +551,9 @@ static void lsr_all_ones(void *ctx)
 
 static void nop(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xea, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
 
     const int cycles = clock_cpu(&cpu);
 
@@ -603,10 +573,9 @@ static void nop(void *ctx)
 
 static void rol(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x2a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
     cpu.p.c = true;
 
@@ -624,10 +593,9 @@ static void rol(void *ctx)
 
 static void rol_carry(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x2a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x81;
 
     const int cycles = clock_cpu(&cpu);
@@ -644,10 +612,9 @@ static void rol_carry(void *ctx)
 
 static void rol_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x2a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
 
     const int cycles = clock_cpu(&cpu);
@@ -664,10 +631,9 @@ static void rol_zero(void *ctx)
 
 static void rol_carryzero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x2a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x80;
 
     const int cycles = clock_cpu(&cpu);
@@ -684,10 +650,9 @@ static void rol_carryzero(void *ctx)
 
 static void rol_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x2a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x40;
     cpu.p.c = true;
 
@@ -705,10 +670,9 @@ static void rol_negative(void *ctx)
 
 static void rol_carrynegative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x2a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
 
     const int cycles = clock_cpu(&cpu);
@@ -725,10 +689,9 @@ static void rol_carrynegative(void *ctx)
 
 static void rol_all_ones(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x2a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
     cpu.p.c = true;
 
@@ -746,10 +709,9 @@ static void rol_all_ones(void *ctx)
 
 static void ror(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x6a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 2;
 
     const int cycles = clock_cpu(&cpu);
@@ -766,10 +728,9 @@ static void ror(void *ctx)
 
 static void ror_carry(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x6a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
 
     const int cycles = clock_cpu(&cpu);
@@ -786,10 +747,9 @@ static void ror_carry(void *ctx)
 
 static void ror_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x6a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
 
     const int cycles = clock_cpu(&cpu);
@@ -806,10 +766,9 @@ static void ror_zero(void *ctx)
 
 static void ror_carryzero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x6a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 1;
 
     const int cycles = clock_cpu(&cpu);
@@ -826,10 +785,9 @@ static void ror_carryzero(void *ctx)
 
 static void ror_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x6a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
     cpu.p.c = true;
 
@@ -847,10 +805,9 @@ static void ror_negative(void *ctx)
 
 static void ror_carrynegative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x6a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 1;
     cpu.p.c = true;
 
@@ -868,10 +825,9 @@ static void ror_carrynegative(void *ctx)
 
 static void ror_all_ones(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x6a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
     cpu.p.c = true;
 
@@ -889,10 +845,9 @@ static void ror_all_ones(void *ctx)
 
 static void sec(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x38, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.c = false;
 
     const int cycles = clock_cpu(&cpu);
@@ -906,10 +861,9 @@ static void sec(void *ctx)
 
 static void sed(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xf8, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.d = false;
 
     const int cycles = clock_cpu(&cpu);
@@ -923,10 +877,9 @@ static void sed(void *ctx)
 
 static void sei(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x78, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.i = false;
 
     const int cycles = clock_cpu(&cpu);
@@ -940,10 +893,9 @@ static void sei(void *ctx)
 
 static void tax(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xaa, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 7;
 
     const int cycles = clock_cpu(&cpu);
@@ -960,10 +912,9 @@ static void tax(void *ctx)
 
 static void tax_to_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xaa, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
 
     const int cycles = clock_cpu(&cpu);
@@ -980,10 +931,9 @@ static void tax_to_zero(void *ctx)
 
 static void tax_to_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xaa, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
 
     const int cycles = clock_cpu(&cpu);
@@ -1000,10 +950,9 @@ static void tax_to_negative(void *ctx)
 
 static void tay(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xa8, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 7;
 
     const int cycles = clock_cpu(&cpu);
@@ -1020,10 +969,9 @@ static void tay(void *ctx)
 
 static void tay_to_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xa8, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
 
     const int cycles = clock_cpu(&cpu);
@@ -1040,10 +988,9 @@ static void tay_to_zero(void *ctx)
 
 static void tay_to_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xa8, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
 
     const int cycles = clock_cpu(&cpu);
@@ -1060,10 +1007,9 @@ static void tay_to_negative(void *ctx)
 
 static void tsx(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xba, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.s = 7;
 
     const int cycles = clock_cpu(&cpu);
@@ -1080,10 +1026,9 @@ static void tsx(void *ctx)
 
 static void tsx_to_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xba, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.s = 0;
 
     const int cycles = clock_cpu(&cpu);
@@ -1100,10 +1045,9 @@ static void tsx_to_zero(void *ctx)
 
 static void tsx_to_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0xba, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.s = 0xff;
 
     const int cycles = clock_cpu(&cpu);
@@ -1120,10 +1064,9 @@ static void tsx_to_negative(void *ctx)
 
 static void txa(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x8a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 7;
 
     const int cycles = clock_cpu(&cpu);
@@ -1140,10 +1083,9 @@ static void txa(void *ctx)
 
 static void txa_to_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x8a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 0;
 
     const int cycles = clock_cpu(&cpu);
@@ -1160,10 +1102,9 @@ static void txa_to_zero(void *ctx)
 
 static void txa_to_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x8a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 0xff;
 
     const int cycles = clock_cpu(&cpu);
@@ -1180,10 +1121,9 @@ static void txa_to_negative(void *ctx)
 
 static void txs(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x9a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 7;
 
     const int cycles = clock_cpu(&cpu);
@@ -1200,10 +1140,9 @@ static void txs(void *ctx)
 
 static void txs_to_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x9a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 0;
 
     const int cycles = clock_cpu(&cpu);
@@ -1220,10 +1159,9 @@ static void txs_to_zero(void *ctx)
 
 static void txs_to_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x9a, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.x = 0xff;
 
     const int cycles = clock_cpu(&cpu);
@@ -1240,10 +1178,9 @@ static void txs_to_negative(void *ctx)
 
 static void tya(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x98, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.y = 7;
 
     const int cycles = clock_cpu(&cpu);
@@ -1260,10 +1197,9 @@ static void tya(void *ctx)
 
 static void tya_to_zero(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x98, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.y = 0;
 
     const int cycles = clock_cpu(&cpu);
@@ -1280,10 +1216,9 @@ static void tya_to_zero(void *ctx)
 
 static void tya_to_negative(void *ctx)
 {
-    struct mos6502 cpu;
-    setup_cpu(&cpu);
     uint8_t mem[] = {0x98, 0xff};
-    cpu.ram = mem;
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
     cpu.y = 0xff;
 
     const int cycles = clock_cpu(&cpu);

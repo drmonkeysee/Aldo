@@ -244,7 +244,6 @@ int cart_cpu_connect(cart *self, bus *b, uint16_t addr)
     assert(self != NULL);
     assert(b != NULL);
 
-    // TODO: set up simple read-only for now
     return bus_set(b, addr, self->mapper->make_cpudevice(self->mapper))
            ? 0
            : CART_ADDR_UNAVAILABLE;

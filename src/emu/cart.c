@@ -104,7 +104,7 @@ static int parse_rom(struct cartridge *self, FILE *f)
     const int err = mapper_rom_img_create(&self->mapper, f);
     if (err == 0 && !(fgetc(f) == EOF && feof(f))) {
         // NOTE: ROM file is too big for prg address space
-        return CART_PRG_SIZE;
+        return CART_IMG_SIZE;
     }
     return err;
 }

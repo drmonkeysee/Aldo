@@ -17,7 +17,7 @@
 static const size_t Chunk = 0x2000,
                     DChunk = Chunk * 2;
 
-struct rom_mapper {
+struct rom_img_mapper {
     struct mapper vtable;
     uint8_t *rom;
 };
@@ -37,34 +37,34 @@ static int load_chunks(uint8_t **mem, size_t size, FILE *f)
 }
 
 //
-// ROM Implementation
+// ROM Image Implementation
 //
 
-static bool rom_read(const void *restrict ctx, uint16_t addr,
-                     uint8_t *restrict d)
+static bool rom_img_read(const void *restrict ctx, uint16_t addr,
+                         uint8_t *restrict d)
 {
     *d = ((const uint8_t *)ctx)[addr & CpuRomAddrMask];
     return true;
 }
 
-static void rom_dtor(struct mapper *self)
+static void rom_img_dtor(struct mapper *self)
 {
-    struct rom_mapper *const m = (struct rom_mapper *)self;
+    struct rom_img_mapper *const m = (struct rom_img_mapper *)self;
     free(m->rom);
     free(m);
 }
 
-static struct busdevice rom_make_cpudevice(const struct mapper *self)
+static struct busdevice rom_img_make_cpudevice(const struct mapper *self)
 {
     return (struct busdevice){
-        .read = rom_read,
-        .ctx = ((const struct rom_mapper *)self)->rom,
+        .read = rom_img_read,
+        .ctx = ((const struct rom_img_mapper *)self)->rom,
     };
 }
 
-static uint8_t *rom_getprg(const struct mapper *self)
+static uint8_t *rom_img_getprg(const struct mapper *self)
 {
-    return ((struct rom_mapper *)self)->rom;
+    return ((struct rom_img_mapper *)self)->rom;
 }
 
 //
@@ -95,14 +95,14 @@ static uint8_t *ines_getprg(const struct mapper *self)
 // Public Interface
 //
 
-int rom_mapper_create(struct mapper **m, FILE *f)
+int mapper_rom_img_create(struct mapper **m, FILE *f)
 {
     assert(m != NULL);
     assert(f != NULL);
 
-    struct rom_mapper *self = malloc(sizeof *self);
-    *self = (struct rom_mapper){
-        .vtable = {rom_dtor, rom_make_cpudevice, rom_getprg},
+    struct rom_img_mapper *self = malloc(sizeof *self);
+    *self = (struct rom_img_mapper){
+        .vtable = {rom_img_dtor, rom_img_make_cpudevice, rom_img_getprg},
     };
 
     // TODO: assume a 32KB ROM file
@@ -118,7 +118,7 @@ int rom_mapper_create(struct mapper **m, FILE *f)
     return err;
 }
 
-int ines_mapper_create(struct mapper **m, const struct ines_header *header,
+int mapper_ines_create(struct mapper **m, const struct ines_header *header,
                        FILE *f)
 {
     assert(m != NULL);

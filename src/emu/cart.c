@@ -16,7 +16,7 @@
 
 // X(symbol, name)
 #define CART_FORMAT_X \
-X(ROM, "ROM Image?") \
+X(ROM_IMG, "ROM Image?") \
 X(ALDO, "Aldo") \
 X(INES, "iNES") \
 X(NES20, "NES 2.0") \
@@ -61,7 +61,7 @@ static int detect_format(struct cartridge *self, FILE *f)
                        ? CRTF_NES20
                        : CRTF_INES;
     } else {
-        self->format = CRTF_ROM;
+        self->format = CRTF_ROM_IMG;
     }
 
     // NOTE: reset back to beginning of file to fully parse detected format
@@ -90,7 +90,7 @@ static int parse_ines(struct cartridge *self, FILE *f)
     self->ines_hdr.wram_chunks = header[8];
     self->ines_hdr.bus_conflicts = header[10] & 0x20;
 
-    const int err = ines_mapper_create(&self->mapper, &self->ines_hdr, f);
+    const int err = mapper_ines_create(&self->mapper, &self->ines_hdr, f);
     if (err == 0) {
         // TODO: we've found a ROM with extra bytes after CHR data
         assert(fgetc(f) == EOF && feof(f));
@@ -101,7 +101,7 @@ static int parse_ines(struct cartridge *self, FILE *f)
 // TODO: load file contents into a single ROM bank and hope for the best
 static int parse_rom(struct cartridge *self, FILE *f)
 {
-    const int err = rom_mapper_create(&self->mapper, f);
+    const int err = mapper_rom_img_create(&self->mapper, f);
     if (err == 0 && !(fgetc(f) == EOF && feof(f))) {
         // NOTE: ROM file is too big for prg address space
         return CART_PRG_SIZE;

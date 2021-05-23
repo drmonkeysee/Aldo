@@ -1262,10 +1262,15 @@ void cpu_powerup(struct mos6502 *self)
     // NOTE: Initialize physical lines to known state
     self->signal.irq = self->signal.nmi = self->signal.res =
         self->signal.rw = true;
-    self->signal.rdy = self->signal.sync = false;
+    self->signal.rdy = self->signal.sync = self->bflt = self->presync = false;
 
-    // NOTE: all internal cpu elements are indeterminate on powerup
+    // NOTE: initialize internal registers to known state
+    self->pc = self->a = self->s = self->x = self->y =
+        self->t = self->adl = self->adh = self->adc = 0;
+    set_p(self, 0x34);
+
     // TODO: simulate res held low on startup to engage reset sequence.
+    self->irq = self->nmi = NIS_CLEAR;
     self->res = NIS_PENDING;
 }
 
@@ -1289,8 +1294,6 @@ int cpu_cycle(struct mos6502 *self)
     if (++self->t == 0) {
         // NOTE: T0 is always an opcode fetch
         self->signal.sync = true;
-        // NOTE: reset adc every instruction, as it affects control flow
-        self->adc = false;
         self->addrbus = self->pc;
         read(self);
         if (service_interrupt(self)) {

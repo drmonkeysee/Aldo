@@ -183,6 +183,15 @@ static void drawcontrols(const struct console_state *snapshot)
     drawtoggle(" IRQ ", !snapshot->lines.irq);
     drawtoggle(" NMI ", !snapshot->lines.nmi);
     drawtoggle(" RES ", !snapshot->lines.reset);
+
+    mvwhline(ControlsView.content, ++cursor_y, 0, 0, w);
+    mvwaddstr(ControlsView.content, ++cursor_y, 0, "Halt/Run: <Space>");
+    mvwaddstr(ControlsView.content, ++cursor_y, 0, "Mode: m/M");
+    mvwaddstr(ControlsView.content, ++cursor_y, 0, "Signal: i, n, s");
+    mvwaddstr(ControlsView.content, ++cursor_y, 0,
+              "Speed \u00b11 (\u00b110): -/= (_/+)");
+    mvwaddstr(ControlsView.content, ++cursor_y, 0, "Ram F/B: r/R");
+    mvwaddstr(ControlsView.content, ++cursor_y, 0, "Quit: q");
 }
 
 static void drawinstructions(uint16_t addr, int h, int y,
@@ -485,7 +494,7 @@ void ui_init(void)
     const int yoffset = (scrh - ramh) / 2,
               xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
     vinit(&HwView, hwh, col1w, yoffset, xoffset, 2, "Hardware Traits");
-    vinit(&ControlsView, 9, col1w, yoffset + hwh, xoffset, 2, "Controls");
+    vinit(&ControlsView, 16, col1w, yoffset + hwh, xoffset, 2, "Controls");
     vinit(&PrgView, ramh, col2w, yoffset, xoffset + col1w, 1, "PRG");
     vinit(&RegistersView, cpuh, flagsw, yoffset, xoffset + col1w + col2w, 2,
           "Registers");

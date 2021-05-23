@@ -90,7 +90,8 @@ void nes_mode(nes *self, enum nexcmode mode)
 {
     assert(self != NULL);
 
-    self->mode = mode < 0 ? NEXC_MODECOUNT - 1 : mode % NEXC_MODECOUNT;
+    // NOTE: force signed to check < 0 (underlying type may be uint)
+    self->mode = (int)mode < 0 ? NEXC_MODECOUNT - 1 : mode % NEXC_MODECOUNT;
 }
 
 void nes_powerup(nes *self)

@@ -64,7 +64,7 @@ static struct busdevice rom_img_make_cpudevice(const struct mapper *self)
 
 static uint8_t *rom_img_getprg(const struct mapper *self)
 {
-    return ((struct rom_img_mapper *)self)->rom;
+    return ((const struct rom_img_mapper *)self)->rom;
 }
 
 //
@@ -88,7 +88,7 @@ static struct busdevice ines_make_cpudevice(const struct mapper *self)
 
 static uint8_t *ines_getprg(const struct mapper *self)
 {
-    return ((struct ines_mapper *)self)->prg;
+    return ((const struct ines_mapper *)self)->prg;
 }
 
 //

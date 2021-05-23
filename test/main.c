@@ -6,13 +6,15 @@
 //
 
 #include "ciny.h"
-#include "emu/cpuhelp.h"
 
 #include <stddef.h>
 
 //
 // Test Suites
 //
+
+void setup_testbus(void);
+void teardown_testbus(void);
 
 struct ct_testsuite bus_tests(void),
                     cpu_tests(void),

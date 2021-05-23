@@ -14,9 +14,6 @@
 
 extern uint8_t bigrom[];
 
-void setup_testbus(void);
-void teardown_testbus(void);
-
 void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
                uint8_t *restrict rom);
 int clock_cpu(struct mos6502 *cpu);

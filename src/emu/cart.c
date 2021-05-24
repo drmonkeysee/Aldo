@@ -101,10 +101,10 @@ static int parse_ines(struct cartridge *self, FILE *f)
 // TODO: load file contents into a single ROM bank and hope for the best
 static int parse_rom(struct cartridge *self, FILE *f)
 {
-    const int err = mapper_rom_img_create(&self->mapper, f);
+    int err = mapper_rom_img_create(&self->mapper, f);
+    // NOTE: ROM file is too big for prg address space
     if (err == 0 && !(fgetc(f) == EOF && feof(f))) {
-        // NOTE: ROM file is too big for prg address space
-        return CART_IMG_SIZE;
+        err = CART_IMG_SIZE;
     }
     return err;
 }

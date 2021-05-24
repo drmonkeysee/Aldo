@@ -53,14 +53,14 @@ static struct memspan make_memspan(uint16_t addr,
         return (struct memspan){
             snapshot->ram,
             addr & CpuRamAddrMask,
-            RAM_SIZE,
+            NES_RAM_SIZE,
         };
     }
     if (CpuRomMinAddr <= addr && addr <= CpuRomMaxAddr) {
         return (struct memspan){
             snapshot->rom,
             addr & CpuRomAddrMask,
-            ROM_SIZE,
+            NES_ROM_SIZE,
         };
     }
     return (struct memspan){0};
@@ -150,7 +150,7 @@ static void print_prg_line(const char *restrict dis,
             repeat->state = DUP_TRUNCATE;
             // NOTE: if this is the last instruction in the PRG bank
             // skip printing the truncation indicator.
-            if (total < ROM_SIZE) {
+            if (total < NES_ROM_SIZE) {
                 printf("*\n");
             }
             break;
@@ -281,11 +281,12 @@ int dis_cart(const uint8_t *restrict prgrom, bool verbose)
     size_t total = 0;
     char dis[DIS_INST_SIZE];
 
-    // TODO: ROM_SIZE needs to be bank size instead
-    while (total < ROM_SIZE) {
+    // TODO: NES_ROM_SIZE needs to be bank size instead
+    while (total < NES_ROM_SIZE) {
         const uint16_t addr = CpuRomMinAddr + total;
         const uint8_t *const prgoffset = prgrom + total;
-        total += bytes_read = dis_inst(addr, prgoffset, ROM_SIZE - total, dis);
+        total += bytes_read = dis_inst(addr, prgoffset, NES_ROM_SIZE - total,
+                                       dis);
         if (bytes_read == 0) break;
         if (bytes_read < 0) {
             fprintf(stderr, "$%04X: Dis err (%d): %s\n", addr, bytes_read,

@@ -59,10 +59,9 @@ void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
                uint8_t *restrict rom)
 {
     cpu_powerup(cpu);
-    cpu->a = cpu->x = cpu->y = cpu->s = cpu->pc = 0;
     cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bflt = false;
     cpu->p.i = cpu->signal.rdy = cpu->presync = true;
-    cpu->irq = cpu->nmi = cpu->res = NIS_CLEAR;
+    cpu->res = NIS_CLEAR;
     cpu->bus = TestBus;
     if (ram) {
         Ram.ctx = ram;

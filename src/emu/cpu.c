@@ -19,12 +19,16 @@ static const int PreFetch = -1;
 
 static void read(struct mos6502 *self)
 {
+    assert(self->bus != NULL);
+
     self->signal.rw = true;
     self->bflt = !bus_read(self->bus, self->addrbus, &self->databus);
 }
 
 static void write(struct mos6502 *self)
 {
+    assert(self->bus != NULL);
+
     self->signal.rw = false;
     self->bflt = !bus_write(self->bus, self->addrbus, self->databus);
 }

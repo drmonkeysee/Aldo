@@ -251,6 +251,15 @@ int cart_cpu_connect(cart *self, bus *b, uint16_t addr)
            : CART_ADDR_UNAVAILABLE;
 }
 
+void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr)
+{
+    assert(self != NULL);
+    assert(b != NULL);
+    assert(self->mapper != NULL);
+
+    self->mapper->cpu_disconnect(self->mapper, b, addr);
+}
+
 void cart_info_write(cart *self, FILE *f, bool verbose)
 {
     assert(self != NULL);

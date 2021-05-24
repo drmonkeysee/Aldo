@@ -48,6 +48,13 @@ static void create_cpubus(struct nes_console *self)
     cart_cpu_connect(self->cart, self->cpu.bus, CpuRomMinAddr);
 }
 
+static void free_cpubus(struct nes_console *self)
+{
+    cart_cpu_disconnect(self->cart, self->cpu.bus, CpuRomMinAddr);
+    bus_free(self->cpu.bus);
+    self->cpu.bus = NULL;
+}
+
 static void set_interrupt(struct nes_console *self, enum nes_interrupt signal,
                           bool value)
 {
@@ -82,7 +89,7 @@ nes *nes_new(cart *c)
 
 void nes_free(nes *self)
 {
-    bus_free(self->cpu.bus);
+    free_cpubus(self);
     free(self);
 }
 

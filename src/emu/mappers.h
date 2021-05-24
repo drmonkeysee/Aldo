@@ -17,6 +17,7 @@
 struct mapper {
     void (*dtor)(struct mapper *);
     bool (*cpu_connect)(struct mapper *, bus *, uint16_t);
+    void (*cpu_disconnect)(const struct mapper *, bus *, uint16_t);
     // TODO: temp helper function
     uint8_t *(*getprg)(const struct mapper *);
 };

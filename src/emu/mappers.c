@@ -37,6 +37,16 @@ static int load_chunks(uint8_t **mem, size_t size, FILE *f)
 }
 
 //
+// Common Implementation
+//
+
+static void clear_bus_device(const struct mapper *self, bus *b, uint16_t addr)
+{
+    (void)self;
+    bus_set(b, addr, (struct busdevice){0});
+}
+
+//
 // ROM Image Implementation
 //
 
@@ -102,7 +112,12 @@ int mapper_rom_img_create(struct mapper **m, FILE *f)
 
     struct rom_img_mapper *self = malloc(sizeof *self);
     *self = (struct rom_img_mapper){
-        .vtable = {rom_img_dtor, rom_img_cpu_connect, rom_img_getprg},
+        .vtable = {
+            rom_img_dtor,
+            rom_img_cpu_connect,
+            clear_bus_device,
+            rom_img_getprg,
+        },
     };
 
     // TODO: assume a 32KB ROM file
@@ -127,7 +142,7 @@ int mapper_ines_create(struct mapper **m, const struct ines_header *header,
     // TODO: create specific mapper based on ID
     struct ines_mapper *self = malloc(sizeof *self);
     *self = (struct ines_mapper){
-        .vtable = {ines_dtor, ines_cpu_connect, ines_getprg},
+        .vtable = {ines_dtor, ines_cpu_connect, clear_bus_device, ines_getprg},
         .id = header->mapper_id,
     };
 

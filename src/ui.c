@@ -198,17 +198,21 @@ static void drawcontrols(const struct console_state *snapshot)
 static void drawcart(const struct control *appstate,
                      const struct console_state *snapshot)
 {
-    static const char *const restrict namelabel = "Name: ",
-                      *const restrict ellipsis = "\u2026";
+    static const char *const restrict namelabel = "Name: ";
+
     // NOTE: ellipsis is one glyph wide despite being > 1 byte long
-    const int namewidth = getmaxx(CartView.content) - strlen(namelabel) - 1;
+    const int maxwidth = getmaxx(CartView.content) - strlen(namelabel) - 1;
     int cursor_y = 0;
     mvwaddstr(CartView.content, cursor_y, 0, namelabel);
-    const char *const cn = ctrl_cartname(appstate->cartfile);
-    wprintw(CartView.content, "%.*s", namewidth, cn);
-    if (strlen(cn) > (size_t)namewidth) {
-        waddstr(CartView.content, ellipsis);
+    const char *const cn = ctrl_cartfilename(appstate->cartfile);
+    const char *endofname = strrchr(cn, '.');
+    if (!endofname) {
+        endofname = strrchr(cn, '\0');
     }
+    const ptrdiff_t namelen = endofname - cn;
+    const bool longname = namelen > maxwidth;
+    wprintw(CartView.content, "%.*s%s", longname ? maxwidth : namelen, cn,
+            longname ? "\u2026" : "");
     mvwprintw(CartView.content, ++cursor_y, 0, "Format: %s",
               snapshot->cart.formatname);
 }

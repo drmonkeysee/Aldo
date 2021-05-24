@@ -12,7 +12,7 @@
 
 const int MinCps = 1, MaxCps = 100, RamSheets = 4;
 
-const char *ctrl_cartname(const char *cartfile)
+const char *ctrl_cartfilename(const char *cartfile)
 {
     assert(cartfile != NULL);
 

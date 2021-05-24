@@ -20,6 +20,6 @@ struct control {
 
 extern const int MinCps, MaxCps, RamSheets;
 
-const char *ctrl_cartname(const char *cartfile);
+const char *ctrl_cartfilename(const char *cartfile);
 
 #endif

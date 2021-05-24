@@ -99,7 +99,7 @@ static void print_cart_info(const struct control *appstate, cart *c)
     if (appstate->verbose) {
         printf("---=== Cart Info ===---\n");
     }
-    printf("File\t\t: %s\n", ctrl_cartname(appstate->cartfile));
+    printf("File\t\t: %s\n", ctrl_cartfilename(appstate->cartfile));
     cart_info_write(c, stdout, appstate->verbose);
 }
 

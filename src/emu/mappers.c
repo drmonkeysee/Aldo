@@ -54,12 +54,12 @@ static void rom_img_dtor(struct mapper *self)
     free(m);
 }
 
-static struct busdevice rom_img_make_cpudevice(const struct mapper *self)
+static bool rom_img_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
 {
-    return (struct busdevice){
+    return bus_set(b, addr, (struct busdevice){
         .read = rom_img_read,
         .ctx = ((const struct rom_img_mapper *)self)->rom,
-    };
+    });
 }
 
 static uint8_t *rom_img_getprg(const struct mapper *self)
@@ -80,10 +80,10 @@ static void ines_dtor(struct mapper *self)
     free(m);
 }
 
-static struct busdevice ines_make_cpudevice(const struct mapper *self)
+static bool ines_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
 {
     (void)self;
-    return (struct busdevice){0};
+    return bus_set(b, addr, (struct busdevice){0});
 }
 
 static uint8_t *ines_getprg(const struct mapper *self)
@@ -102,7 +102,7 @@ int mapper_rom_img_create(struct mapper **m, FILE *f)
 
     struct rom_img_mapper *self = malloc(sizeof *self);
     *self = (struct rom_img_mapper){
-        .vtable = {rom_img_dtor, rom_img_make_cpudevice, rom_img_getprg},
+        .vtable = {rom_img_dtor, rom_img_cpu_connect, rom_img_getprg},
     };
 
     // TODO: assume a 32KB ROM file
@@ -127,7 +127,7 @@ int mapper_ines_create(struct mapper **m, const struct ines_header *header,
     // TODO: create specific mapper based on ID
     struct ines_mapper *self = malloc(sizeof *self);
     *self = (struct ines_mapper){
-        .vtable = {ines_dtor, ines_make_cpudevice, ines_getprg},
+        .vtable = {ines_dtor, ines_cpu_connect, ines_getprg},
         .id = header->mapper_id,
     };
 

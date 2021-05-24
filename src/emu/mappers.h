@@ -16,7 +16,7 @@
 
 struct mapper {
     void (*dtor)(struct mapper *);
-    struct busdevice (*make_cpudevice)(const struct mapper *);
+    bool (*cpu_connect)(struct mapper *, bus *, uint16_t);
     // TODO: temp helper function
     uint8_t *(*getprg)(const struct mapper *);
 };

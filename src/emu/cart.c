@@ -235,6 +235,7 @@ void cart_free(cart *self)
 uint8_t *cart_prg_bank(cart *self)
 {
     assert(self != NULL);
+    assert(self->mapper != NULL);
 
     return self->mapper->getprg(self->mapper);
 }
@@ -243,8 +244,9 @@ int cart_cpu_connect(cart *self, bus *b, uint16_t addr)
 {
     assert(self != NULL);
     assert(b != NULL);
+    assert(self->mapper != NULL);
 
-    return bus_set(b, addr, self->mapper->make_cpudevice(self->mapper))
+    return self->mapper->cpu_connect(self->mapper, b, addr)
            ? 0
            : CART_ADDR_UNAVAILABLE;
 }
@@ -270,6 +272,7 @@ void cart_info_write(cart *self, FILE *f, bool verbose)
 void cart_snapshot(cart *self, struct console_state *snapshot)
 {
     assert(self != NULL);
+    assert(self->mapper != NULL);
 
     snapshot->rom = self->mapper->getprg(self->mapper);
     snapshot->cart.formatname = format_name(self->format);

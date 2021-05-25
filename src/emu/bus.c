@@ -7,6 +7,8 @@
 
 #include "bus.h"
 
+#include "traits.h"
+
 #include <assert.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -131,4 +133,19 @@ bool bus_write(bus *self, uint16_t addr, uint8_t d)
         return target->device.write(target->device.ctx, addr, d);
     }
     return false;
+}
+
+size_t bus_dma(bus *self, uint16_t addr, uint8_t *restrict dest, size_t count)
+{
+    assert(self != NULL);
+    assert(dest != NULL);
+    assert(count <= CpuRomMaxAddr);
+
+    if (addr > self->maxaddr) return 0;
+
+    struct partition *const target = find(self, addr);
+    if (target->device.dma) {
+        return target->device.dma(target->device.ctx, addr, dest, count);
+    }
+    return 0;
 }

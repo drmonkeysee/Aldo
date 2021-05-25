@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct test_context {
     bus *b;
@@ -61,6 +62,16 @@ static bool test_highest_write(void *ctx, uint16_t addr, uint8_t d)
     uint8_t *mem = ctx;
     mem[addr % 4] = d;
     return true;
+}
+
+static size_t test_dma(const void *restrict ctx, uint16_t addr,
+                       uint8_t *restrict dest, size_t count)
+{
+    if (addr >= 4) return 0;
+    const uint8_t *mem = ctx;
+    const size_t maxlength = 4 - addr;
+    memcpy(dest, mem + addr, maxlength);
+    return maxlength;
 }
 
 static void setup(void **ctx)
@@ -323,7 +334,11 @@ static void largest_bus(void *ctx)
 
     ct_asserttrue(bus_set(b, 0x0, bd));
 
-    bd = (struct busdevice){test_highest_read, test_highest_write, memhigh};
+    bd = (struct busdevice){
+        .read = test_highest_read,
+        .write = test_highest_write,
+        .ctx = memhigh,
+    };
     ct_asserttrue(bus_set(b, 0x8000, bd));
 
     uint8_t d = 0xff;
@@ -338,6 +353,95 @@ static void largest_bus(void *ctx)
 
     ct_asserttrue(bus_write(b, 0x0, 0x4));
     ct_assertequal(0x4u, memlow[0]);
+}
+
+static void dma(void *ctx)
+{
+    bus *const b = ((struct test_context *)ctx)->b;
+    uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
+    const struct busdevice bd = {
+        .dma = test_dma,
+        .ctx = mem,
+    };
+
+    ct_asserttrue(bus_set(b, 0x0, bd));
+
+    uint8_t dest[4];
+    const size_t count = bus_dma(b, 0x0, dest, sizeof dest / sizeof dest[0]);
+    ct_assertequal(4u, count);
+    for (size_t i = 0; i < sizeof dest / sizeof dest[0]; ++i) {
+        ct_assertequal(mem[i], dest[i], "Failed on idx %lu", i);
+    }
+}
+
+static void dma_partial_bank(void *ctx)
+{
+    bus *const b = ((struct test_context *)ctx)->b;
+    uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
+    const struct busdevice bd = {
+        .dma = test_dma,
+        .ctx = mem,
+    };
+
+    ct_asserttrue(bus_set(b, 0x0, bd));
+
+    uint8_t dest[4];
+    const size_t count = bus_dma(b, 0x1, dest, sizeof dest / sizeof dest[0]);
+    ct_assertequal(3u, count);
+    ct_assertequal(mem[1], dest[0]);
+    ct_assertequal(mem[2], dest[1]);
+    ct_assertequal(mem[3], dest[2]);
+}
+
+static void dma_end_of_bank(void *ctx)
+{
+    bus *const b = ((struct test_context *)ctx)->b;
+    uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
+    const struct busdevice bd = {
+        .dma = test_dma,
+        .ctx = mem,
+    };
+
+    ct_asserttrue(bus_set(b, 0x0, bd));
+
+    uint8_t dest[4];
+    const size_t count = bus_dma(b, 0x3, dest, sizeof dest / sizeof dest[0]);
+    ct_assertequal(1u, count);
+    ct_assertequal(mem[3], dest[0]);
+}
+
+static void dma_past_bank(void *ctx)
+{
+    bus *const b = ((struct test_context *)ctx)->b;
+    uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
+    const struct busdevice bd = {
+        .dma = test_dma,
+        .ctx = mem,
+    };
+
+    ct_asserttrue(bus_set(b, 0x0, bd));
+
+    uint8_t dest[] = {0xff, 0xff, 0xff, 0xff};
+    const size_t count = bus_dma(b, 0x4, dest, sizeof dest / sizeof dest[0]);
+    ct_assertequal(0u, count);
+    ct_assertequal(0xffu, dest[0]);
+}
+
+static void dma_wrong_addr(void *ctx)
+{
+    bus *const b = ((struct test_context *)ctx)->b;
+    uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
+    const struct busdevice bd = {
+        .dma = test_dma,
+        .ctx = mem,
+    };
+
+    ct_asserttrue(bus_set(b, 0x0, bd));
+
+    uint8_t dest[] = {0xff, 0xff, 0xff, 0xff};
+    const size_t count = bus_dma(b, 0x40, dest, sizeof dest / sizeof dest[0]);
+    ct_assertequal(0u, count);
+    ct_assertequal(0xffu, dest[0]);
 }
 
 //
@@ -358,6 +462,11 @@ struct ct_testsuite bus_tests(void)
         ct_maketest(device_swap),
         ct_maketest(smallest_bus),
         ct_maketest(largest_bus),
+        ct_maketest(dma),
+        ct_maketest(dma_partial_bank),
+        ct_maketest(dma_end_of_bank),
+        ct_maketest(dma_past_bank),
+        ct_maketest(dma_wrong_addr),
     };
 
     return ct_makesuite_setup_teardown(tests, setup, teardown);

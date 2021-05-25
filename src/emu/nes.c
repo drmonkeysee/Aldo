@@ -48,7 +48,7 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr,
                  maxcount = count > ramspace ? ramspace : count,
                  bankcount = NES_RAM_SIZE - bankstart;
     const uint8_t *ram = ctx;
-    size_t bytescopy = maxcount < bankcount ? maxcount : bankcount;
+    size_t bytescopy = maxcount > bankcount ? bankcount : maxcount;
     ptrdiff_t bytesleft = maxcount;
     // NOTE: 2KB bank in 8KB space means DMA needs to:
     // 1) start copy from some offset within the 2KB bank (or a bank mirror)

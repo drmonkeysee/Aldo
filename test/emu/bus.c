@@ -70,7 +70,7 @@ static size_t test_dma(const void *restrict ctx, uint16_t addr,
     if (addr >= 4) return 0;
     const uint8_t *mem = ctx;
     const size_t maxlength = 4 - addr;
-    memcpy(dest, mem + addr, maxlength);
+    memcpy(dest, mem + addr, maxlength * sizeof *dest);
     return maxlength;
 }
 
@@ -444,6 +444,23 @@ static void dma_wrong_addr(void *ctx)
     ct_assertequal(0xffu, dest[0]);
 }
 
+static void dma_zero_count(void *ctx)
+{
+    bus *const b = ((struct test_context *)ctx)->b;
+    uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
+    const struct busdevice bd = {
+        .dma = test_dma,
+        .ctx = mem,
+    };
+
+    ct_asserttrue(bus_set(b, 0x0, bd));
+
+    uint8_t dest[] = {0xff, 0xff, 0xff, 0xff};
+    const size_t count = bus_dma(b, 0x0, dest, 0);
+    ct_assertequal(0u, count);
+    ct_assertequal(0xffu, dest[0]);
+}
+
 //
 // Test List
 //
@@ -467,6 +484,7 @@ struct ct_testsuite bus_tests(void)
         ct_maketest(dma_end_of_bank),
         ct_maketest(dma_past_bank),
         ct_maketest(dma_wrong_addr),
+        ct_maketest(dma_zero_count),
     };
 
     return ct_makesuite_setup_teardown(tests, setup, teardown);

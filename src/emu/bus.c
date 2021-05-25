@@ -141,7 +141,7 @@ size_t bus_dma(bus *self, uint16_t addr, uint8_t *restrict dest, size_t count)
     assert(dest != NULL);
     assert(count <= CpuRomMaxAddr);
 
-    if (addr > self->maxaddr) return 0;
+    if (addr > self->maxaddr || count == 0) return 0;
 
     struct partition *const target = find(self, addr);
     if (target->device.dma) {

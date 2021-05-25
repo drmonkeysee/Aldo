@@ -16,6 +16,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 // The NES-001 Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
@@ -39,12 +40,42 @@ static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
     return true;
 }
 
+static size_t ram_dma(const void *restrict ctx, uint16_t addr,
+                      uint8_t *restrict dest, size_t count)
+{
+    uint16_t bankstart = addr & CpuRamAddrMask;
+    const size_t ramspace = (CpuRamMaxAddr + 1) - addr,
+                 maxcount = count > ramspace ? ramspace : count,
+                 bankcount = NES_RAM_SIZE - bankstart;
+    const uint8_t *ram = ctx;
+    size_t bytescopy = maxcount < bankcount ? maxcount : bankcount;
+    ptrdiff_t bytesleft = maxcount;
+    // NOTE: 2KB bank in 8KB space means DMA needs to:
+    // 1) start copy from some offset within the 2KB bank (or a bank mirror)
+    // 2) wraparound if DMA crosses bank boundary within address space
+    // 3) stop copy at end of address window
+    do {
+        memcpy(dest, ram + bankstart, bytescopy * sizeof *dest);
+        // NOTE: first memcpy chunk may be offset from start of bank; any
+        // additional chunks start at 0 due to mirroring-wraparound.
+        bankstart = 0;
+        bytesleft -= bytescopy;
+        dest += bytescopy;
+        bytescopy = bytesleft > (ptrdiff_t)NES_RAM_SIZE
+                    ? NES_RAM_SIZE
+                    : bytesleft;
+    } while (bytesleft > 0);
+    // NOTE: if we went negative our math is wrong
+    assert(bytesleft == 0);
+    return maxcount;
+}
+
 static void create_cpubus(struct nes_console *self)
 {
     // TODO: 3 partitions only for now, 8KB ram, 32KB rom, nothing in between
     self->cpu.bus = bus_new(16, 3, CpuRamMaxAddr + 1, CpuRomMinAddr);
     bus_set(self->cpu.bus, 0,
-            (struct busdevice){ram_read, ram_write, self->ram});
+            (struct busdevice){ram_read, ram_write, ram_dma, self->ram});
     cart_cpu_connect(self->cart, self->cpu.bus, CpuRomMinAddr);
 }
 
@@ -181,5 +212,9 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
     cpu_snapshot(&self->cpu, snapshot);
     cart_snapshot(self->cart, snapshot);
     snapshot->mode = self->mode;
-    snapshot->ram = self->ram;
+    snapshot->mem.ram = snapshot->ram = self->ram;
+    snapshot->mem.prglength = bus_dma(self->cpu.bus,
+                                      snapshot->datapath.current_instruction,
+                                      snapshot->mem.prgview,
+                                      SNP_PRGV_SIZE);
 }

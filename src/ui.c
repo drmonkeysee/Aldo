@@ -220,18 +220,16 @@ static void drawcart(const struct control *appstate,
 static void drawinstructions(uint16_t addr, int h, int y,
                              const struct console_state *snapshot)
 {
-    for (int i = 0, bytes = 0; i < h - y; ++i) {
+    for (int i = 0, bytes = 0, total = 0; i < h - y; ++i, total += bytes) {
         char disassembly[DIS_INST_SIZE];
-        bytes = dis_mem(addr, snapshot, disassembly);
+        bytes = dis_inst(addr + total, snapshot->mem.prgview + total,
+                         snapshot->mem.prglength - total, disassembly);
         if (bytes == 0) break;
         if (bytes < 0) {
             mvwaddstr(PrgView.content, i, 0, dis_errstr(bytes));
             break;
         }
         mvwaddstr(PrgView.content, i, 0, disassembly);
-        const uint16_t nextaddr = addr + bytes;
-        if (nextaddr < addr) break;
-        addr = nextaddr;
     }
 }
 
@@ -438,9 +436,9 @@ static void drawram(const struct console_state *snapshot)
             mvwprintw(RamView.content, cursor_y, 0, "%02X", page);
             for (size_t page_col = 0; page_col < 0x10; ++page_col) {
                 mvwprintw(RamView.content, cursor_y, cursor_x, "%02X",
-                          snapshot->ram[(page * 0x100)
-                                        + (page_row * 0x10)
-                                        + page_col]);
+                          snapshot->mem.ram[(page * 0x100)
+                                            + (page_row * 0x10)
+                                            + page_col]);
                 cursor_x += col_width;
             }
             mvwprintw(RamView.content, cursor_y, cursor_x + 2,

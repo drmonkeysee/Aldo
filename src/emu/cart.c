@@ -16,19 +16,17 @@
 
 // X(symbol, name)
 #define CART_FORMAT_X \
-X(ROM_IMG, "ROM Image?") \
-X(ALDO, "Aldo") \
-X(INES, "iNES") \
-X(NES20, "NES 2.0") \
-X(NSF, "NES Sound Format")
-
-#define CRTF_ENUM(s) CRTF_##s
+X(CRTF_ROM_IMG, "ROM Image?") \
+X(CRTF_ALDO, "Aldo") \
+X(CRTF_INES, "iNES") \
+X(CRTF_NES20, "NES 2.0") \
+X(CRTF_NSF, "NES Sound Format")
 
 static const char *restrict const NesFormat = "NES\x1a",
                   *restrict const NsfFormat = "NESM\x1a";
 
 enum cartformat {
-#define X(s, n) CRTF_ENUM(s),
+#define X(s, n) s,
     CART_FORMAT_X
 #undef X
 };
@@ -112,7 +110,7 @@ static int parse_rom(struct cartridge *self, FILE *f)
 static const char *format_name(enum cartformat f)
 {
     switch (f) {
-#define X(s, n) case CRTF_ENUM(s): return n;
+#define X(s, n) case s: return n;
         CART_FORMAT_X
 #undef X
     default:

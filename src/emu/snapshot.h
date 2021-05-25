@@ -9,7 +9,10 @@
 #define Aldo_emu_snapshot_h
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
+
+#define SNP_PRGV_SIZE 192   // NOTE: max 64 lines @ 3-byte instructions
 
 enum nexcmode {
     NEXC_CYCLE,
@@ -27,7 +30,14 @@ enum nistate {
 };
 
 struct console_state {
+    // TODO: remove these
     const uint8_t *ram, *rom;
+    struct {
+        uint8_t *ram,
+                prgview[SNP_PRGV_SIZE],
+                vectors[6];
+        size_t prglength;   // Number of bytes copied to prgview this frame
+    } mem;
     struct {
         const char *formatname;
     } cart;

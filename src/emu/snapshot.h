@@ -33,8 +33,8 @@ struct console_state {
     // TODO: remove these
     const uint8_t *ram, *rom;
     struct {
-        uint8_t *ram,
-                prgview[SNP_PRGV_SIZE],
+        const uint8_t *ram;
+        uint8_t prgview[SNP_PRGV_SIZE],
                 vectors[6];
         size_t prglength;   // Number of bytes copied to prgview this frame
     } mem;

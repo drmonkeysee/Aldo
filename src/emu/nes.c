@@ -216,5 +216,6 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
     snapshot->mem.prglength = bus_dma(self->cpu.bus,
                                       snapshot->datapath.current_instruction,
                                       snapshot->mem.prgview,
-                                      SNP_PRGV_SIZE);
+                                      sizeof snapshot->mem.prgview
+                                      / sizeof snapshot->mem.prgview[0]);
 }

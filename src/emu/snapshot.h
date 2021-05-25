@@ -12,8 +12,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define SNP_PRGV_SIZE 192   // NOTE: max 64 lines @ 3-byte instructions
-
 enum nexcmode {
     NEXC_CYCLE,
     NEXC_STEP,
@@ -34,9 +32,9 @@ struct console_state {
     const uint8_t *ram, *rom;
     struct {
         const uint8_t *ram;
-        uint8_t prgview[SNP_PRGV_SIZE],
+        uint8_t prgview[192],   // NOTE: 64 lines @ max 3-byte instructions
                 vectors[6];
-        size_t prglength;   // Number of bytes copied to prgview this frame
+        size_t prglength;       // Number of bytes copied to prgview
     } mem;
     struct {
         const char *formatname;

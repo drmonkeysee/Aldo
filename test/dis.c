@@ -300,86 +300,21 @@ static void inst_disassembles_brk(void *ctx)
 }
 
 //
-// Disassemble Program Memory
-//
-
-static void mem_ram(void *ctx)
-{
-    uint8_t ram[] = {0xa9, 0x43};
-    const struct console_state sn = {
-        .ram = ram,
-    };
-    char buf[DIS_INST_SIZE];
-
-    const int length = dis_mem(0x0, &sn, buf);
-
-    ct_assertequal(2, length);
-    ct_assertequalstr("$0000: A9 43       LDA #$43", buf);
-}
-
-static void mem_rom(void *ctx)
-{
-    uint8_t rom[] = {0xa9, 0x43};
-    const struct console_state sn = {
-        .rom = rom,
-    };
-    char buf[DIS_INST_SIZE];
-
-    const int length = dis_mem(0x8000, &sn, buf);
-
-    ct_assertequal(2, length);
-    ct_assertequalstr("$8000: A9 43       LDA #$43", buf);
-}
-
-static void mem_invalid_addr(void *ctx)
-{
-    uint8_t ram[] = {0xa9, 0x43};
-    const struct console_state sn = {
-        .ram = ram,
-    };
-    char buf[DIS_INST_SIZE] = {'\0'};
-
-    const int length = dis_mem(0x4000, &sn, buf);
-
-    ct_assertequal(ASM_RANGE, length);
-    ct_assertequalstr("", buf);
-}
-
-//
 // Disassemble Datapath
 //
 
-static void datapath_addr_in_ram(void *ctx)
-{
-    uint8_t ram[] = {0xa9, 0x43};
-    const struct console_state sn = {
-        .datapath = {
-            .current_instruction = 0,
-            .exec_cycle = 0,
-            .opcode = ram[0],
-        },
-        .ram = ram,
-    };
-    char buf[DIS_DATAP_SIZE];
-
-    const int written = dis_datapath(&sn, buf);
-
-    const char *const exp = "LDA imm";
-    ct_assertequal((int)strlen(exp), written);
-    ct_assertequalstrn(exp, buf, sizeof exp);
-}
-
 static void datapath_end_of_rom(void *ctx)
 {
-    const uint8_t rom[] = {0xea};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
-            .current_instruction = 0xffff,
             .exec_cycle = 1,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xea},
+            .prglength = 1,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -392,15 +327,16 @@ static void datapath_end_of_rom(void *ctx)
 static void datapath_unexpected_end_of_rom(void *ctx)
 {
     // NOTE: LDA imm with missing 2nd byte
-    const uint8_t rom[] = {0xa9};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
-            .current_instruction = 0xffff,
             .exec_cycle = 1,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xa9},
+            .prglength = 1,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE] = {'\0'};
 
     const int written = dis_datapath(&sn, buf);
@@ -410,37 +346,18 @@ static void datapath_unexpected_end_of_rom(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void datapath_invalid_addr(void *ctx)
-{
-    const uint8_t rom[] = {0xea, 0xff};
-    const struct console_state sn = {
-        .datapath = {
-            .current_instruction = 0x2000,
-            .exec_cycle = 1,
-            .opcode = rom[0],
-        },
-        .rom = rom,
-    };
-    char buf[DIS_DATAP_SIZE] = {'\0'};
-
-    const int written = dis_datapath(&sn, buf);
-
-    const char *const exp = "";
-    ct_assertequal(ASM_RANGE, written);
-    ct_assertequalstrn(exp, buf, sizeof exp);
-}
-
 static void datapath_implied_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0xea, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xea, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -452,15 +369,16 @@ static void datapath_implied_cycle_zero(void *ctx)
 
 static void datapath_implied_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0xea, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xea, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -472,15 +390,16 @@ static void datapath_implied_cycle_one(void *ctx)
 
 static void datapath_implied_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0xea, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xea, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -492,15 +411,16 @@ static void datapath_implied_cycle_n(void *ctx)
 
 static void datapath_immediate_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0xa9, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xa9, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -512,15 +432,16 @@ static void datapath_immediate_cycle_zero(void *ctx)
 
 static void datapath_immediate_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0xa9, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xa9, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -532,15 +453,16 @@ static void datapath_immediate_cycle_one(void *ctx)
 
 static void datapath_immediate_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0xa9, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xa9, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -552,15 +474,16 @@ static void datapath_immediate_cycle_n(void *ctx)
 
 static void datapath_zeropage_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0xa5, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xa5, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -572,15 +495,16 @@ static void datapath_zeropage_cycle_zero(void *ctx)
 
 static void datapath_zeropage_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0xa5, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xa5, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -592,15 +516,16 @@ static void datapath_zeropage_cycle_one(void *ctx)
 
 static void datapath_zeropage_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0xa5, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xa5, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -612,15 +537,16 @@ static void datapath_zeropage_cycle_n(void *ctx)
 
 static void datapath_zeropage_x_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0xb5, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xb5, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -632,15 +558,16 @@ static void datapath_zeropage_x_cycle_zero(void *ctx)
 
 static void datapath_zeropage_x_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0xb5, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xb5, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -652,15 +579,16 @@ static void datapath_zeropage_x_cycle_one(void *ctx)
 
 static void datapath_zeropage_x_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0xb5, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xb5, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -672,15 +600,16 @@ static void datapath_zeropage_x_cycle_n(void *ctx)
 
 static void datapath_zeropage_y_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0xb6, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xb6, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -692,15 +621,16 @@ static void datapath_zeropage_y_cycle_zero(void *ctx)
 
 static void datapath_zeropage_y_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0xb6, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xb6, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -712,15 +642,16 @@ static void datapath_zeropage_y_cycle_one(void *ctx)
 
 static void datapath_zeropage_y_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0xb6, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xb6, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -732,15 +663,16 @@ static void datapath_zeropage_y_cycle_n(void *ctx)
 
 static void datapath_indirect_x_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0xa1, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xa1, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -752,15 +684,16 @@ static void datapath_indirect_x_cycle_zero(void *ctx)
 
 static void datapath_indirect_x_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0xa1, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xa1, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -772,15 +705,16 @@ static void datapath_indirect_x_cycle_one(void *ctx)
 
 static void datapath_indirect_x_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0xa1, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xa1, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -792,15 +726,16 @@ static void datapath_indirect_x_cycle_n(void *ctx)
 
 static void datapath_indirect_y_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0xb1, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xb1, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -812,15 +747,16 @@ static void datapath_indirect_y_cycle_zero(void *ctx)
 
 static void datapath_indirect_y_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0xb1, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xb1, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -832,15 +768,16 @@ static void datapath_indirect_y_cycle_one(void *ctx)
 
 static void datapath_indirect_y_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0xb1, 0x43};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xb1, 0x43},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -852,15 +789,16 @@ static void datapath_indirect_y_cycle_n(void *ctx)
 
 static void datapath_absolute_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0xad, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xad, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -872,15 +810,16 @@ static void datapath_absolute_cycle_zero(void *ctx)
 
 static void datapath_absolute_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0xad, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xad, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -892,15 +831,16 @@ static void datapath_absolute_cycle_one(void *ctx)
 
 static void datapath_absolute_cycle_two(void *ctx)
 {
-    const uint8_t rom[] = {0xad, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xad, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -912,15 +852,16 @@ static void datapath_absolute_cycle_two(void *ctx)
 
 static void datapath_absolute_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0xad, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 3,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xad, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -932,15 +873,16 @@ static void datapath_absolute_cycle_n(void *ctx)
 
 static void datapath_absolute_x_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0xbd, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xbd, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -952,15 +894,16 @@ static void datapath_absolute_x_cycle_zero(void *ctx)
 
 static void datapath_absolute_x_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0xbd, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xbd, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -972,15 +915,16 @@ static void datapath_absolute_x_cycle_one(void *ctx)
 
 static void datapath_absolute_x_cycle_two(void *ctx)
 {
-    const uint8_t rom[] = {0xbd, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xbd, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -992,15 +936,16 @@ static void datapath_absolute_x_cycle_two(void *ctx)
 
 static void datapath_absolute_x_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0xbd, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 3,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xbd, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1012,15 +957,16 @@ static void datapath_absolute_x_cycle_n(void *ctx)
 
 static void datapath_absolute_y_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0xb9, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xb9, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1032,15 +978,16 @@ static void datapath_absolute_y_cycle_zero(void *ctx)
 
 static void datapath_absolute_y_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0xb9, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xb9, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1052,15 +999,16 @@ static void datapath_absolute_y_cycle_one(void *ctx)
 
 static void datapath_absolute_y_cycle_two(void *ctx)
 {
-    const uint8_t rom[] = {0xb9, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xb9, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1072,15 +1020,16 @@ static void datapath_absolute_y_cycle_two(void *ctx)
 
 static void datapath_absolute_y_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0xb9, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 3,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0xb9, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1092,15 +1041,16 @@ static void datapath_absolute_y_cycle_n(void *ctx)
 
 static void datapath_jmp_absolute_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0x4c, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x4c, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1112,15 +1062,16 @@ static void datapath_jmp_absolute_cycle_zero(void *ctx)
 
 static void datapath_jmp_absolute_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0x4c, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x4c, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1132,15 +1083,16 @@ static void datapath_jmp_absolute_cycle_one(void *ctx)
 
 static void datapath_jmp_absolute_cycle_two(void *ctx)
 {
-    const uint8_t rom[] = {0x4c, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x4c, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1152,15 +1104,16 @@ static void datapath_jmp_absolute_cycle_two(void *ctx)
 
 static void datapath_jmp_absolute_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0x4c, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 3,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x4c, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1172,15 +1125,16 @@ static void datapath_jmp_absolute_cycle_n(void *ctx)
 
 static void datapath_jmp_indirect_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0x6c, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x6c, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1192,15 +1146,16 @@ static void datapath_jmp_indirect_cycle_zero(void *ctx)
 
 static void datapath_jmp_indirect_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0x6c, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x6c, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1212,15 +1167,16 @@ static void datapath_jmp_indirect_cycle_one(void *ctx)
 
 static void datapath_jmp_indirect_cycle_two(void *ctx)
 {
-    const uint8_t rom[] = {0x6c, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x6c, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1232,15 +1188,16 @@ static void datapath_jmp_indirect_cycle_two(void *ctx)
 
 static void datapath_jmp_indirect_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0x6c, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 3,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x6c, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1252,15 +1209,16 @@ static void datapath_jmp_indirect_cycle_n(void *ctx)
 
 static void datapath_bch_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0x90, 0x2, 0xff, 0xff, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x90, 0x2, 0xff, 0xff, 0xff},
+            .prglength = 5,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1272,15 +1230,16 @@ static void datapath_bch_cycle_zero(void *ctx)
 
 static void datapath_bch_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0x90, 0x2, 0xff, 0xff, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x90, 0x2, 0xff, 0xff, 0xff},
+            .prglength = 5,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1292,15 +1251,16 @@ static void datapath_bch_cycle_one(void *ctx)
 
 static void datapath_bch_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0x90, 0x2, 0xff, 0xff, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x90, 0x2, 0xff, 0xff, 0xff},
+            .prglength = 5,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1312,15 +1272,16 @@ static void datapath_bch_cycle_n(void *ctx)
 
 static void datapath_push_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0x48, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x48, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1332,15 +1293,16 @@ static void datapath_push_cycle_zero(void *ctx)
 
 static void datapath_push_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0x48, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x48, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1352,15 +1314,16 @@ static void datapath_push_cycle_one(void *ctx)
 
 static void datapath_push_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0x48, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x48, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1372,15 +1335,16 @@ static void datapath_push_cycle_n(void *ctx)
 
 static void datapath_pull_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0x68, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x68, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1392,15 +1356,16 @@ static void datapath_pull_cycle_zero(void *ctx)
 
 static void datapath_pull_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0x68, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x68, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1412,15 +1377,16 @@ static void datapath_pull_cycle_one(void *ctx)
 
 static void datapath_pull_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0x68, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x68, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1432,15 +1398,16 @@ static void datapath_pull_cycle_n(void *ctx)
 
 static void datapath_jsr_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0x20, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x20, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1452,15 +1419,16 @@ static void datapath_jsr_cycle_zero(void *ctx)
 
 static void datapath_jsr_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0x20, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x20, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1472,15 +1440,16 @@ static void datapath_jsr_cycle_one(void *ctx)
 
 static void datapath_jsr_cycle_two(void *ctx)
 {
-    const uint8_t rom[] = {0x20, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x20, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1492,15 +1461,16 @@ static void datapath_jsr_cycle_two(void *ctx)
 
 static void datapath_jsr_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0x20, 0x43, 0x21};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 3,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x20, 0x43, 0x21},
+            .prglength = 3,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1512,15 +1482,16 @@ static void datapath_jsr_cycle_n(void *ctx)
 
 static void datapath_rts_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0x60, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x60, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1532,15 +1503,16 @@ static void datapath_rts_cycle_zero(void *ctx)
 
 static void datapath_rts_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0x60, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x60, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1552,15 +1524,16 @@ static void datapath_rts_cycle_one(void *ctx)
 
 static void datapath_rts_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0x60, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x60, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1572,15 +1545,16 @@ static void datapath_rts_cycle_n(void *ctx)
 
 static void datapath_brk_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1592,15 +1566,16 @@ static void datapath_brk_cycle_zero(void *ctx)
 
 static void datapath_brk_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1612,15 +1587,16 @@ static void datapath_brk_cycle_one(void *ctx)
 
 static void datapath_brk_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1632,15 +1608,16 @@ static void datapath_brk_cycle_n(void *ctx)
 
 static void datapath_brk_cycle_six(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 6,
-            .current_instruction = 0x8000,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1652,16 +1629,17 @@ static void datapath_brk_cycle_six(void *ctx)
 
 static void datapath_irq_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
             .irq = NIS_COMMITTED,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1673,16 +1651,17 @@ static void datapath_irq_cycle_zero(void *ctx)
 
 static void datapath_irq_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
             .irq = NIS_COMMITTED,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1694,16 +1673,17 @@ static void datapath_irq_cycle_one(void *ctx)
 
 static void datapath_irq_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
             .irq = NIS_COMMITTED,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1715,16 +1695,17 @@ static void datapath_irq_cycle_n(void *ctx)
 
 static void datapath_irq_cycle_six(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 6,
-            .current_instruction = 0x8000,
             .irq = NIS_COMMITTED,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1736,16 +1717,17 @@ static void datapath_irq_cycle_six(void *ctx)
 
 static void datapath_nmi_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
             .nmi = NIS_COMMITTED,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1757,16 +1739,17 @@ static void datapath_nmi_cycle_zero(void *ctx)
 
 static void datapath_nmi_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
             .nmi = NIS_COMMITTED,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1778,16 +1761,17 @@ static void datapath_nmi_cycle_one(void *ctx)
 
 static void datapath_nmi_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
             .nmi = NIS_COMMITTED,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1799,16 +1783,17 @@ static void datapath_nmi_cycle_n(void *ctx)
 
 static void datapath_nmi_cycle_six(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 6,
-            .current_instruction = 0x8000,
             .nmi = NIS_COMMITTED,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1820,16 +1805,17 @@ static void datapath_nmi_cycle_six(void *ctx)
 
 static void datapath_res_cycle_zero(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .current_instruction = 0x8000,
             .res = NIS_COMMITTED,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1841,16 +1827,17 @@ static void datapath_res_cycle_zero(void *ctx)
 
 static void datapath_res_cycle_one(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .current_instruction = 0x8000,
             .res = NIS_COMMITTED,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1862,16 +1849,17 @@ static void datapath_res_cycle_one(void *ctx)
 
 static void datapath_res_cycle_n(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .current_instruction = 0x8000,
             .res = NIS_COMMITTED,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1883,16 +1871,17 @@ static void datapath_res_cycle_n(void *ctx)
 
 static void datapath_res_cycle_six(void *ctx)
 {
-    const uint8_t rom[] = {0x0, 0xff};
-    const struct console_state sn = {
+    struct console_state sn = {
         .datapath = {
             .exec_cycle = 6,
-            .current_instruction = 0x8000,
             .res = NIS_COMMITTED,
-            .opcode = rom[0],
         },
-        .rom = rom,
+        .mem = {
+            .prgview = {0x0, 0xff},
+            .prglength = 2,
+        },
     };
+    sn.datapath.opcode = sn.mem.prgview[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1935,14 +1924,8 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(inst_disassembles_rts),
         ct_maketest(inst_disassembles_brk),
 
-        ct_maketest(mem_ram),
-        ct_maketest(mem_rom),
-        ct_maketest(mem_invalid_addr),
-
-        ct_maketest(datapath_addr_in_ram),
         ct_maketest(datapath_end_of_rom),
         ct_maketest(datapath_unexpected_end_of_rom),
-        ct_maketest(datapath_invalid_addr),
 
         ct_maketest(datapath_implied_cycle_zero),
         ct_maketest(datapath_implied_cycle_one),

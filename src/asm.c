@@ -41,31 +41,6 @@ static const char *restrict const *const StringTables[] = {
 #undef X
 };
 
-struct memspan {
-    const uint8_t *bytes;
-    uint16_t offset, size;
-};
-
-static struct memspan make_memspan(uint16_t addr,
-                                   const struct console_state *snapshot)
-{
-    if (addr <= CpuRamMaxAddr) {
-        return (struct memspan){
-            snapshot->ram,
-            addr & CpuRamAddrMask,
-            NES_RAM_SIZE,
-        };
-    }
-    if (CpuRomMinAddr <= addr && addr <= CpuRomMaxAddr) {
-        return (struct memspan){
-            snapshot->rom,
-            addr & CpuRomAddrMask,
-            NES_ROM_SIZE,
-        };
-    }
-    return (struct memspan){0};
-}
-
 static const char *interrupt_display(const struct console_state *snapshot)
 {
     if (snapshot->datapath.exec_cycle == 6) return "CLR";
@@ -211,28 +186,15 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
     return instlen;
 }
 
-int dis_mem(uint16_t addr, const struct console_state *snapshot,
-            char dis[restrict static DIS_INST_SIZE])
-{
-    const struct memspan span = make_memspan(addr, snapshot);
-    if (!span.bytes) return ASM_RANGE;
-    return dis_inst(addr, span.bytes + span.offset, span.size - span.offset,
-                    dis);
-}
-
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE])
 {
     assert(snapshot != NULL);
     assert(dis != NULL);
 
-    const uint16_t instaddr = snapshot->datapath.current_instruction;
-    const struct memspan span = make_memspan(instaddr, snapshot);
-    if (!span.bytes) return ASM_RANGE;
-
     const struct decoded dec = Decode[snapshot->datapath.opcode];
     const int instlen = InstLens[dec.mode];
-    if ((uint16_t)(span.offset + instlen) > span.size) return ASM_EOF;
+    if ((size_t)instlen > snapshot->mem.prglength) return ASM_EOF;
 
     int count;
     unsigned int total;
@@ -253,13 +215,13 @@ int dis_datapath(const struct console_state *snapshot,
                 ? sprintf(dis + total, displaystr, interrupt_display(snapshot))
                 : sprintf(dis + total, displaystr,
                           strlen(displaystr) > 0
-                          ? span.bytes[span.offset + 1]
+                          ? snapshot->mem.prgview[1]
                           : 0);
         break;
     default:
         count = sprintf(dis + total, displaystr,
                         strlen(displaystr) > 0
-                        ? batowr(span.bytes + span.offset + 1)
+                        ? batowr(snapshot->mem.prgview + 1)
                         : 0);
         break;
     }

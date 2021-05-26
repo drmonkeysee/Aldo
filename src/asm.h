@@ -21,8 +21,7 @@
 #define ASM_ERRCODE_X \
 X(ASM_FMT_FAIL, -1, "OUTPUT FAIL") \
 X(ASM_EOF, -2, "UNEXPECTED EOF") \
-X(ASM_INV_ADDRMD, -3, "INVALID ADDRMODE") \
-X(ASM_RANGE, -4, "OUT OF RANGE")
+X(ASM_INV_ADDRMD, -3, "INVALID ADDRMODE")
 
 enum {
 #define X(s, v, e) s = v,
@@ -37,8 +36,6 @@ const char *dis_errstr(int err);
 // NOTE: when dis_ functions return 0 the input buffer is untouched
 int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE]);
-int dis_mem(uint16_t addr, const struct console_state *snapshot,
-            char dis[restrict static DIS_INST_SIZE]);
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
 

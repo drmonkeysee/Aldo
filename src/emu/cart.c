@@ -281,6 +281,5 @@ void cart_snapshot(cart *self, struct console_state *snapshot)
     assert(self != NULL);
     assert(self->mapper != NULL);
 
-    snapshot->rom = self->mapper->getprg(self->mapper);
     snapshot->cart.formatname = format_name(self->format);
 }

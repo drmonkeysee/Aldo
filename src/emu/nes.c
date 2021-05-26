@@ -212,7 +212,7 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
     cpu_snapshot(&self->cpu, snapshot);
     cart_snapshot(self->cart, snapshot);
     snapshot->mode = self->mode;
-    snapshot->mem.ram = snapshot->ram = self->ram;
+    snapshot->mem.ram = self->ram;
     snapshot->mem.prglength = bus_dma(self->cpu.bus,
                                       snapshot->datapath.current_instruction,
                                       snapshot->mem.prgview,

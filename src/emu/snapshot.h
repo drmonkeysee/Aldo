@@ -28,8 +28,6 @@ enum nistate {
 };
 
 struct console_state {
-    // TODO: remove these
-    const uint8_t *ram, *rom;
     struct {
         const uint8_t *ram;
         uint8_t prgview[192],   // NOTE: 64 lines @ max 3-byte instructions

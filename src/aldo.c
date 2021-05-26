@@ -231,7 +231,9 @@ static void emu_loop(struct control *appstate, cart *c)
     ui_cleanup();
     nes_free(console);
     console = NULL;
-    snapshot.ram = snapshot.rom = NULL;
+    snapshot.mem.prglength = 0;
+    snapshot.mem.ram = NULL;
+    snapshot.cart.formatname = NULL;
 }
 
 //

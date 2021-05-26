@@ -17,6 +17,9 @@
 // The MOS6502 processor is a little-endian
 // 8-bit CPU with a 16-bit addressing space.
 struct mos6502 {
+    // System Bus: external components connected to the CPU pins
+    bus *bus;           // Non-owning Pointer
+
     // CPU registers and flags
     uint16_t pc;        // Program Counter
     uint8_t a,          // Accumulator
@@ -60,9 +63,6 @@ struct mos6502 {
     bool bflt,          // Bus fault; read/write to unmapped or invalid address
          presync;       // Pre-sync cycle; primes the CPU to treat
                         // the following cycle as an opcode fetch (T0).
-
-    // System Bus: external components connected to the CPU pins
-    bus *bus;           // Non-owning Pointer
 };
 
 void cpu_powerup(struct mos6502 *self);

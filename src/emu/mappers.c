@@ -25,7 +25,7 @@ struct rom_img_mapper {
 
 struct ines_mapper {
     struct mapper vtable;
-    uint8_t id, *prg, *chr, *wram;
+    uint8_t *prg, *chr, *wram, id;
 };
 
 static int load_chunks(uint8_t **mem, size_t size, FILE *f)

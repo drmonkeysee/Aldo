@@ -21,8 +21,8 @@
 // The NES-001 Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
 struct nes_console {
-    struct mos6502 cpu;         // CPU Core of RP2A03 Chip
     cart *cart;                 // Game Cartridge; Non-owning Pointer
+    struct mos6502 cpu;         // CPU Core of RP2A03 Chip
     enum nexcmode mode;         // NES execution mode
     uint8_t ram[NES_RAM_SIZE];  // CPU Internal RAM
 };

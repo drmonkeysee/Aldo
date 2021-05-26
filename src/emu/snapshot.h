@@ -29,14 +29,14 @@ enum nistate {
 
 struct console_state {
     struct {
+        const char *formatname;
+    } cart;
+    struct {
+        size_t prglength;       // Number of bytes copied to prgview
         const uint8_t *ram;
         uint8_t prgview[192],   // NOTE: 64 lines @ max 3-byte instructions
                 vectors[6];
-        size_t prglength;       // Number of bytes copied to prgview
     } mem;
-    struct {
-        const char *formatname;
-    } cart;
     enum nexcmode mode;
     struct {
         enum nistate irq, nmi, res;

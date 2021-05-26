@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 // NOTE: cart file data is packed into 8 or 16 KB chunks
 static const size_t Chunk = 0x2000,
@@ -50,13 +51,6 @@ static void clear_bus_device(const struct mapper *self, bus *b, uint16_t addr)
 // ROM Image Implementation
 //
 
-static bool rom_img_read(const void *restrict ctx, uint16_t addr,
-                         uint8_t *restrict d)
-{
-    *d = ((const uint8_t *)ctx)[addr & CpuRomAddrMask];
-    return true;
-}
-
 static void rom_img_dtor(struct mapper *self)
 {
     struct rom_img_mapper *const m = (struct rom_img_mapper *)self;
@@ -64,10 +58,29 @@ static void rom_img_dtor(struct mapper *self)
     free(m);
 }
 
+static bool rom_img_read(const void *restrict ctx, uint16_t addr,
+                         uint8_t *restrict d)
+{
+    *d = ((const uint8_t *)ctx)[addr & CpuRomAddrMask];
+    return true;
+}
+
+static size_t rom_img_dma(const void *restrict ctx, uint16_t addr,
+                          uint8_t *restrict dest, size_t count)
+{
+    const uint16_t bankstart = addr & CpuRomAddrMask;
+    const size_t bankcount = NES_ROM_SIZE - bankstart,
+                 bytecount = count > bankcount ? bankcount : count;
+    const uint8_t *rom = ctx;
+    memcpy(dest, rom + bankstart, bytecount * sizeof *dest);
+    return bytecount;
+}
+
 static bool rom_img_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
 {
     return bus_set(b, addr, (struct busdevice){
         .read = rom_img_read,
+        .dma = rom_img_dma,
         .ctx = ((const struct rom_img_mapper *)self)->rom,
     });
 }

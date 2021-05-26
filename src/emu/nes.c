@@ -218,4 +218,6 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
                                       snapshot->mem.prgview,
                                       sizeof snapshot->mem.prgview
                                       / sizeof snapshot->mem.prgview[0]);
+    bus_dma(self->cpu.bus, NmiVector, snapshot->mem.vectors,
+            sizeof snapshot->mem.vectors / sizeof snapshot->mem.vectors[0]);
 }

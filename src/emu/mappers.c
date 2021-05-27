@@ -18,7 +18,7 @@
 static const size_t Chunk = 0x2000,
                     DChunk = Chunk * 2;
 
-struct rom_img_mapper {
+struct raw_mapper {
     struct mapper vtable;
     uint8_t *rom;
 };
@@ -48,18 +48,18 @@ static void clear_bus_device(const struct mapper *self, bus *b, uint16_t addr)
 }
 
 //
-// ROM Image Implementation
+// Raw ROM Image Implementation
 //
 
-static bool rom_img_read(const void *restrict ctx, uint16_t addr,
-                         uint8_t *restrict d)
+static bool raw_read(const void *restrict ctx, uint16_t addr,
+                     uint8_t *restrict d)
 {
     *d = ((const uint8_t *)ctx)[addr & CpuRomAddrMask];
     return true;
 }
 
-static size_t rom_img_dma(const void *restrict ctx, uint16_t addr,
-                          uint8_t *restrict dest, size_t count)
+static size_t raw_dma(const void *restrict ctx, uint16_t addr,
+                      uint8_t *restrict dest, size_t count)
 {
     const uint16_t bankstart = addr & CpuRomAddrMask;
     const size_t bankcount = NES_ROM_SIZE - bankstart,
@@ -69,17 +69,17 @@ static size_t rom_img_dma(const void *restrict ctx, uint16_t addr,
     return bytecount;
 }
 
-static void rom_img_dtor(struct mapper *self)
+static void raw_dtor(struct mapper *self)
 {
     assert(self != NULL);
 
-    struct rom_img_mapper *const m = (struct rom_img_mapper *)self;
+    struct raw_mapper *const m = (struct raw_mapper *)self;
     free(m->rom);
     free(m);
 }
 
-static const uint8_t *rom_img_prgbank(const struct mapper *self, size_t i,
-                                      uint16_t *sz)
+static const uint8_t *raw_prgbank(const struct mapper *self, size_t i,
+                                  uint16_t *sz)
 {
     assert(self != NULL);
     assert(sz != NULL);
@@ -90,15 +90,15 @@ static const uint8_t *rom_img_prgbank(const struct mapper *self, size_t i,
     }
 
     *sz = NES_ROM_SIZE;
-    return ((struct rom_img_mapper *)self)->rom;
+    return ((struct raw_mapper *)self)->rom;
 }
 
-static bool rom_img_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
+static bool raw_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
 {
     return bus_set(b, addr, (struct busdevice){
-        .read = rom_img_read,
-        .dma = rom_img_dma,
-        .ctx = ((const struct rom_img_mapper *)self)->rom,
+        .read = raw_read,
+        .dma = raw_dma,
+        .ctx = ((const struct raw_mapper *)self)->rom,
     });
 }
 
@@ -139,17 +139,17 @@ static const uint8_t *ines_prgbank(const struct mapper *self, size_t i,
 // Public Interface
 //
 
-int mapper_rom_img_create(struct mapper **m, FILE *f)
+int mapper_raw_create(struct mapper **m, FILE *f)
 {
     assert(m != NULL);
     assert(f != NULL);
 
-    struct rom_img_mapper *self = malloc(sizeof *self);
-    *self = (struct rom_img_mapper){
+    struct raw_mapper *self = malloc(sizeof *self);
+    *self = (struct raw_mapper){
         .vtable = {
-            rom_img_dtor,
-            rom_img_prgbank,
-            rom_img_cpu_connect,
+            raw_dtor,
+            raw_prgbank,
+            raw_cpu_connect,
             clear_bus_device,
         },
     };

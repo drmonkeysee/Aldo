@@ -16,7 +16,7 @@
 
 // X(symbol, name)
 #define CART_FORMAT_X \
-X(CRTF_ROM_IMG, "ROM Image?") \
+X(CRTF_RAW, "Raw ROM Image?") \
 X(CRTF_ALDO, "Aldo") \
 X(CRTF_INES, "iNES") \
 X(CRTF_NES20, "NES 2.0") \
@@ -59,7 +59,7 @@ static int detect_format(struct cartridge *self, FILE *f)
                        ? CRTF_NES20
                        : CRTF_INES;
     } else {
-        self->format = CRTF_ROM_IMG;
+        self->format = CRTF_RAW;
     }
 
     // NOTE: reset back to beginning of file to fully parse detected format
@@ -96,11 +96,11 @@ static int parse_ines(struct cartridge *self, FILE *f)
     return err;
 }
 
-// NOTE: a ROM image is a file of raw bytes and has no identifying header;
-// if format cannot be determined assume it's this.
-static int parse_rom_img(struct cartridge *self, FILE *f)
+// NOTE: a raw ROM image is just a stream of bytes and has no identifying
+// header; if format cannot be determined, this is the default.
+static int parse_raw(struct cartridge *self, FILE *f)
 {
-    int err = mapper_rom_img_create(&self->mapper, f);
+    int err = mapper_raw_create(&self->mapper, f);
     // NOTE: ROM file is too big for prg address space (no bank-switching)
     if (err == 0 && !(fgetc(f) == EOF && feof(f))) {
         err = CART_IMG_SIZE;
@@ -208,7 +208,7 @@ int cart_create(cart **c, FILE *f)
             err = parse_ines(self, f);
             break;
         default:
-            err = parse_rom_img(self, f);
+            err = parse_raw(self, f);
             break;
         }
     }

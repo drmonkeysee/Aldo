@@ -22,7 +22,7 @@ struct mapper {
 };
 
 // NOTE: if create functions return non-zero error code, *m is unmodified
-int mapper_rom_img_create(struct mapper **m, FILE *f);
+int mapper_raw_create(struct mapper **m, FILE *f);
 int mapper_ines_create(struct mapper **m, const struct ines_header *header,
                        FILE *f);
 

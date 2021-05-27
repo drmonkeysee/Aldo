@@ -179,6 +179,12 @@ static void write_ines_info(const struct cartridge *self, FILE *f,
     }
 }
 
+static void write_raw_info(FILE *f)
+{
+    // TODO: assume 32KB size for now
+    fprintf(f, "PRG Size\t: 32KB\n");
+}
+
 //
 // Public Interface
 //
@@ -275,6 +281,7 @@ void cart_write_info(cart *self, FILE *f, bool verbose)
         write_ines_info(self, f, verbose);
         break;
     default:
+        write_raw_info(f);
         break;
     }
 }

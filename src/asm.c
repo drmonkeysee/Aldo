@@ -106,8 +106,8 @@ struct repeat_condition {
     enum duplicate_state state;
 };
 
-static void print_prg_line(const char *restrict dis,
-                           int curr_bytes, size_t total,
+static void print_prg_line(const char *restrict dis, int curr_bytes,
+                           size_t total, size_t banksize,
                            struct repeat_condition *repeat)
 {
     if (repeat->state == DUP_VERBOSE) {
@@ -125,7 +125,7 @@ static void print_prg_line(const char *restrict dis,
             repeat->state = DUP_TRUNCATE;
             // NOTE: if this is the last instruction in the PRG bank
             // skip printing the truncation indicator.
-            if (total < NES_ROM_SIZE) {
+            if (total < banksize) {
                 printf("*\n");
             }
             break;
@@ -138,6 +138,46 @@ static void print_prg_line(const char *restrict dis,
         repeat->prev_bytes = curr_bytes;
         repeat->state = DUP_NONE;
     }
+}
+
+static int print_bank(const struct bankview *bv, bool verbose)
+{
+    int bytes_read = 0;
+    struct repeat_condition repeat = {
+        .state = verbose ? DUP_VERBOSE : DUP_NONE,
+    };
+    size_t total = 0;
+    char dis[DIS_INST_SIZE];
+    printf("Bank %zu:\n", bv->bank);
+    puts("--------");
+
+    while (total < bv->size) {
+        // TODO: how to pick correct start address?
+        const uint16_t addr = CpuRomMinAddr + total;
+        const uint8_t *const prgoffset = bv->mem + total;
+        total += bytes_read = dis_inst(addr, prgoffset, bv->size - total, dis);
+        if (bytes_read == 0) break;
+        if (bytes_read < 0) {
+            fprintf(stderr, "$%04X: Dis err (%d): %s\n", addr, bytes_read,
+                    dis_errstr(bytes_read));
+            return bytes_read;
+        }
+        // NOTE: convert current instruction bytes into easily comparable
+        // value to check for repeats.
+        int curr_bytes = 0;
+        for (int i = 0; i < bytes_read; ++i) {
+            curr_bytes |= prgoffset[i] << (8 * i);
+        }
+        print_prg_line(dis, curr_bytes, total, bv->size, &repeat);
+    }
+
+    // NOTE: always print the last line regardless of duplicate state
+    // (if it hasn't already been printed).
+    if (repeat.state == DUP_TRUNCATE || repeat.state == DUP_SKIP) {
+        printf("%s\n", dis);
+    }
+
+    return 0;
 }
 
 //
@@ -232,42 +272,20 @@ int dis_datapath(const struct console_state *snapshot,
     return total;
 }
 
-int dis_cart(const uint8_t *restrict prgrom, bool verbose)
+int dis_cart(cart *cart, const struct control *appstate)
 {
-    assert(prgrom != NULL);
+    assert(cart != NULL);
+    assert(appstate != NULL);
 
-    int bytes_read = 0;
-    struct repeat_condition repeat = {
-        .state = verbose ? DUP_VERBOSE : DUP_NONE,
-    };
-    size_t total = 0;
-    char dis[DIS_INST_SIZE];
+    printf("%s: ", appstate->cartfile);
+    cart_write_dis_header(cart, stdout);
+    puts("");
 
-    // TODO: NES_ROM_SIZE needs to be bank size instead
-    while (total < NES_ROM_SIZE) {
-        const uint16_t addr = CpuRomMinAddr + total;
-        const uint8_t *const prgoffset = prgrom + total;
-        total += bytes_read = dis_inst(addr, prgoffset, NES_ROM_SIZE - total,
-                                       dis);
-        if (bytes_read == 0) break;
-        if (bytes_read < 0) {
-            fprintf(stderr, "$%04X: Dis err (%d): %s\n", addr, bytes_read,
-                    dis_errstr(bytes_read));
-            return bytes_read;
-        }
-        // NOTE: convert current instruction bytes into easily comparable value
-        // to check for repeats.
-        int curr_bytes = 0;
-        for (int i = 0; i < bytes_read; ++i) {
-            curr_bytes |= prgoffset[i] << (8 * i);
-        }
-        print_prg_line(dis, curr_bytes, total, &repeat);
-    }
-
-    // NOTE: always print the last line regardless of duplicate state
-    // (if it hasn't already been printed).
-    if (repeat.state == DUP_TRUNCATE || repeat.state == DUP_SKIP) {
-        printf("%s\n", dis);
+    for (struct bankview bv = cart_prgbank(cart, 0);
+         bv.mem;
+         bv = cart_prgbank(cart, bv.bank + 1)) {
+        const int err = print_bank(&bv, appstate->verbose);
+        if (err < 0) return err;
     }
     return 0;
 }

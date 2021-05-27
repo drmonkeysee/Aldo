@@ -51,13 +51,6 @@ static void clear_bus_device(const struct mapper *self, bus *b, uint16_t addr)
 // ROM Image Implementation
 //
 
-static void rom_img_dtor(struct mapper *self)
-{
-    struct rom_img_mapper *const m = (struct rom_img_mapper *)self;
-    free(m->rom);
-    free(m);
-}
-
 static bool rom_img_read(const void *restrict ctx, uint16_t addr,
                          uint8_t *restrict d)
 {
@@ -76,6 +69,30 @@ static size_t rom_img_dma(const void *restrict ctx, uint16_t addr,
     return bytecount;
 }
 
+static void rom_img_dtor(struct mapper *self)
+{
+    assert(self != NULL);
+
+    struct rom_img_mapper *const m = (struct rom_img_mapper *)self;
+    free(m->rom);
+    free(m);
+}
+
+static const uint8_t *rom_img_prgbank(const struct mapper *self, size_t i,
+                                      uint16_t *sz)
+{
+    assert(self != NULL);
+    assert(sz != NULL);
+
+    if (i > 0) {
+        *sz = 0;
+        return NULL;
+    }
+
+    *sz = NES_ROM_SIZE;
+    return ((struct rom_img_mapper *)self)->rom;
+}
+
 static bool rom_img_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
 {
     return bus_set(b, addr, (struct busdevice){
@@ -85,17 +102,14 @@ static bool rom_img_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
     });
 }
 
-static uint8_t *rom_img_getprg(const struct mapper *self)
-{
-    return ((const struct rom_img_mapper *)self)->rom;
-}
-
 //
 // iNES Implementation
 //
 
 static void ines_dtor(struct mapper *self)
 {
+    assert(self != NULL);
+
     struct ines_mapper *const m = (struct ines_mapper *)self;
     free(m->chr);
     free(m->prg);
@@ -109,9 +123,16 @@ static bool ines_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
     return bus_set(b, addr, (struct busdevice){0});
 }
 
-static uint8_t *ines_getprg(const struct mapper *self)
+static const uint8_t *ines_prgbank(const struct mapper *self, size_t i,
+                                   uint16_t *sz)
 {
-    return ((const struct ines_mapper *)self)->prg;
+    assert(self != NULL);
+    assert(sz != NULL);
+
+    // TODO: fill this out
+    (void)i;
+    *sz = 0;
+    return NULL;
 }
 
 //
@@ -127,9 +148,9 @@ int mapper_rom_img_create(struct mapper **m, FILE *f)
     *self = (struct rom_img_mapper){
         .vtable = {
             rom_img_dtor,
+            rom_img_prgbank,
             rom_img_cpu_connect,
             clear_bus_device,
-            rom_img_getprg,
         },
     };
 
@@ -155,7 +176,12 @@ int mapper_ines_create(struct mapper **m, const struct ines_header *header,
     // TODO: create specific mapper based on ID
     struct ines_mapper *self = malloc(sizeof *self);
     *self = (struct ines_mapper){
-        .vtable = {ines_dtor, ines_cpu_connect, clear_bus_device, ines_getprg},
+        .vtable = {
+            ines_dtor,
+            ines_prgbank,
+            ines_cpu_connect,
+            clear_bus_device,
+        },
         .id = header->mapper_id,
     };
 

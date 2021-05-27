@@ -8,6 +8,7 @@
 #ifndef Aldo_asm_h
 #define Aldo_asm_h
 
+#include "control.h"
 #include "emu/cart.h"
 #include "emu/snapshot.h"
 
@@ -38,8 +39,6 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE]);
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
-
-// TODO: pass in prgrom for now to avoid cart dependency until memory map is worked out
-int dis_cart(const uint8_t *restrict prgrom, bool verbose);
+int dis_cart(cart *cart, const struct control *appstate);
 
 #endif

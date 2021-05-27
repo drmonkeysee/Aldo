@@ -16,10 +16,9 @@
 
 struct mapper {
     void (*dtor)(struct mapper *);
+    const uint8_t *(*prgbank)(const struct mapper *, size_t, uint16_t *);
     bool (*cpu_connect)(struct mapper *, bus *, uint16_t);
     void (*cpu_disconnect)(const struct mapper *, bus *, uint16_t);
-    // TODO: temp helper function
-    uint8_t *(*getprg)(const struct mapper *);
 };
 
 // NOTE: if create functions return non-zero error code, *m is unmodified

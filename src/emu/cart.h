@@ -55,6 +55,12 @@ struct ines_header {
          trainer;               // Trainer data present
 };
 
+struct bankview {
+    size_t bank;
+    const uint8_t *mem;
+    uint16_t size;
+};
+
 typedef struct cartridge cart;
 
 // NOTE: returns a pointer to a statically allocated string;
@@ -65,12 +71,13 @@ const char *cart_errstr(int err);
 int cart_create(cart **c, FILE *f);
 void cart_free(cart *self);
 
-uint8_t *cart_prg_bank(cart *self);
+struct bankview cart_prgbank(cart *self, size_t i);
 
 int cart_cpu_connect(cart *self, bus *b, uint16_t addr);
 void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr);
 
-void cart_info_write(cart *self, FILE *f, bool verbose);
+void cart_write_info(cart *self, FILE *f, bool verbose);
+void cart_write_dis_header(cart *self, FILE *f);
 void cart_snapshot(cart *self, struct console_state *snapshot);
 
 #endif

@@ -223,19 +223,21 @@ int cart_create(cart **c, FILE *f)
 
 void cart_free(cart *self)
 {
+    assert(self != NULL);
+
     if (self->mapper) {
         self->mapper->dtor(self->mapper);
     }
     free(self);
 }
 
-// TODO: get rid of this
-uint8_t *cart_prg_bank(cart *self)
+struct bankview cart_prgbank(cart *self, size_t i)
 {
     assert(self != NULL);
-    assert(self->mapper != NULL);
 
-    return self->mapper->getprg(self->mapper);
+    struct bankview bv = {.bank = i};
+    bv.mem = self->mapper->prgbank(self->mapper, i, &bv.size);
+    return bv;
 }
 
 int cart_cpu_connect(cart *self, bus *b, uint16_t addr)
@@ -258,7 +260,7 @@ void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr)
     self->mapper->cpu_disconnect(self->mapper, b, addr);
 }
 
-void cart_info_write(cart *self, FILE *f, bool verbose)
+void cart_write_info(cart *self, FILE *f, bool verbose)
 {
     assert(self != NULL);
     assert(f != NULL);
@@ -274,6 +276,15 @@ void cart_info_write(cart *self, FILE *f, bool verbose)
     default:
         break;
     }
+}
+
+void cart_write_dis_header(cart *self, FILE *f)
+{
+    fprintf(f, "format %s\n\nDisassembly of PRG Banks%s\n",
+            format_name(self->format),
+            self->format == CRTF_ALDO
+                ? ""
+                : "\n(NOTE: approximate for non-Aldo formats)");
 }
 
 void cart_snapshot(cart *self, struct console_state *snapshot)

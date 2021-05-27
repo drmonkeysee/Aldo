@@ -369,9 +369,10 @@ static void dma(void *ctx)
     uint8_t dest[4];
     const size_t count = bus_dma(b, 0x0, dest, sizeof dest / sizeof dest[0]);
     ct_assertequal(4u, count);
-    for (size_t i = 0; i < sizeof dest / sizeof dest[0]; ++i) {
-        ct_assertequal(mem[i], dest[i], "Failed on idx %lu", i);
-    }
+    ct_assertequal(mem[0], dest[0]);
+    ct_assertequal(mem[1], dest[1]);
+    ct_assertequal(mem[2], dest[2]);
+    ct_assertequal(mem[3], dest[3]);
 }
 
 static void dma_partial_bank(void *ctx)

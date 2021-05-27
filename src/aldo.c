@@ -100,7 +100,7 @@ static void print_cart_info(const struct control *appstate, cart *c)
         printf("---=== Cart Info ===---\n");
     }
     printf("File\t\t: %s\n", ctrl_cartfilename(appstate->cartfile));
-    cart_info_write(c, stdout, appstate->verbose);
+    cart_write_info(c, stdout, appstate->verbose);
 }
 
 static cart *load_cart(const char *filename)
@@ -274,7 +274,7 @@ int aldo_run(int argc, char *argv[argc+1])
     }
 
     if (appstate.disassemble) {
-        const int err = dis_cart(cart_prg_bank(cart), appstate.verbose);
+        const int err = dis_cart(cart, &appstate);
         cart_free(cart);
         cart = NULL;
         return err == 0 ? EXIT_SUCCESS : EXIT_FAILURE;

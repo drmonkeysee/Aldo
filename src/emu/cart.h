@@ -22,7 +22,8 @@ X(CART_IO_ERR, -2, "FILE READ ERROR") \
 X(CART_IMG_SIZE, -3, "ROM IMAGE TOO LARGE") \
 X(CART_EOF, -4, "UNEXPECTED EOF") \
 X(CART_OBSOLETE, -5, "OBSOLETE FORMAT") \
-X(CART_ADDR_UNAVAILABLE, -6, "BUS ADDRESS UNAVAILABLE")
+X(CART_ADDR_UNAVAILABLE, -6, "BUS ADDRESS UNAVAILABLE") \
+X(CART_FORMAT, -7, "FORMAT UNSUPPORTED")
 
 enum {
 #define X(s, v, e) s = v,
@@ -30,12 +31,18 @@ enum {
 #undef X
 };
 
+// X(symbol, name)
+#define CART_INES_NTMIRROR_X \
+X(NTM_HORIZONTAL, "Horizontal") \
+X(NTM_VERTICAL, "Vertical") \
+X(NTM_1SCREEN, "Single-Screen") \
+X(NTM_4SCREEN, "4-Screen VRAM") \
+X(NTM_OTHER, "Mapper-Specific")
+
 enum nt_mirroring {
-    NTM_HORIZONTAL,
-    NTM_VERTICAL,
-    NTM_1SCREEN,
-    NTM_4SCREEN,
-    NTM_OTHER,
+#define X(s, n) s,
+    CART_INES_NTMIRROR_X
+#undef X
 };
 
 // iNES File Header

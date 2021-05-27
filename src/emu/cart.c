@@ -79,10 +79,18 @@ static int parse_ines(struct cartridge *self, FILE *f)
     memcpy(&tail, header + 12, sizeof tail);
     if (tail != 0) return CART_OBSOLETE;
 
-    // TODO: finish off setting header fields
     self->ines_hdr.prg_chunks = header[4];
     self->ines_hdr.chr_chunks = header[5];
     self->ines_hdr.wram = header[6] & 0x2;
+
+    // NOTE: mapper may override these two fields
+    self->ines_hdr.mirror = header[6] & 0x8
+                            ? NTM_4SCREEN
+                            : (header[6] & 0x1
+                               ? NTM_VERTICAL
+                               : NTM_HORIZONTAL);
+    self->ines_hdr.mapper_controlled = false;
+
     self->ines_hdr.trainer = header[6] & 0x4;
     self->ines_hdr.mapper_id = (header[6] >> 4) | (header[7] & 0xf0);
     self->ines_hdr.wram_chunks = header[8];
@@ -116,6 +124,17 @@ static const char *format_name(enum cartformat f)
 #undef X
     default:
         assert(((void)"BAD CART FORMAT", false));
+    }
+}
+
+static const char *mirror_name(enum nt_mirroring m)
+{
+    switch (m) {
+#define X(s, n) case s: return n;
+        CART_INES_NTMIRROR_X
+#undef X
+    default:
+        assert(((void)"BAD INES NT MIRROR", false));
     }
 }
 
@@ -167,6 +186,8 @@ static void write_ines_info(const struct cartridge *self, FILE *f,
             fprintf(f, "%sno\n", chrramlbl);
         }
     }
+    fprintf(f, "NT Mirroring\t: %s%s\n", mirror_name(self->ines_hdr.mirror),
+            self->ines_hdr.mapper_controlled ? " (Mapper-Controlled)" : "");
 
     if (verbose) {
         hr(f);
@@ -213,6 +234,11 @@ int cart_create(cart **c, FILE *f)
         switch (self->format) {
         case CRTF_INES:
             err = parse_ines(self, f);
+            break;
+        case CRTF_ALDO:
+        case CRTF_NES20:
+        case CRTF_NSF:
+            err = CART_FORMAT;
             break;
         default:
             err = parse_raw(self, f);

@@ -154,7 +154,7 @@ int mapper_rom_img_create(struct mapper **m, FILE *f)
         },
     };
 
-    // TODO: assume a 32KB ROM file
+    // TODO: assume a 32KB ROM file (can i do mirroring later?)
     const int err = load_chunks(&self->rom, 2 * DChunk, f);
     if (err == 0) {
         *m = (struct mapper *)self;

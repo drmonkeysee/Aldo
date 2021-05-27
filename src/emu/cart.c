@@ -96,11 +96,12 @@ static int parse_ines(struct cartridge *self, FILE *f)
     return err;
 }
 
-// TODO: load file contents into a single ROM bank and hope for the best
-static int parse_rom(struct cartridge *self, FILE *f)
+// NOTE: a ROM image is a file of raw bytes and has no identifying header;
+// if format cannot be determined assume it's this.
+static int parse_rom_img(struct cartridge *self, FILE *f)
 {
     int err = mapper_rom_img_create(&self->mapper, f);
-    // NOTE: ROM file is too big for prg address space
+    // NOTE: ROM file is too big for prg address space (no bank-switching)
     if (err == 0 && !(fgetc(f) == EOF && feof(f))) {
         err = CART_IMG_SIZE;
     }
@@ -207,7 +208,7 @@ int cart_create(cart **c, FILE *f)
             err = parse_ines(self, f);
             break;
         default:
-            err = parse_rom(self, f);
+            err = parse_rom_img(self, f);
             break;
         }
     }

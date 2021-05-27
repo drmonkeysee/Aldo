@@ -78,19 +78,19 @@ static void raw_dtor(struct mapper *self)
     free(m);
 }
 
-static const uint8_t *raw_prgbank(const struct mapper *self, size_t i,
-                                  uint16_t *sz)
+static uint16_t raw_prgbank(const struct mapper *self, size_t i,
+                            const uint8_t *restrict *mem)
 {
     assert(self != NULL);
-    assert(sz != NULL);
+    assert(mem != NULL);
 
     if (i > 0) {
-        *sz = 0;
-        return NULL;
+        *mem = NULL;
+        return 0;
     }
 
-    *sz = NES_ROM_SIZE;
-    return ((struct raw_mapper *)self)->rom;
+    *mem = ((struct raw_mapper *)self)->rom;
+    return NES_ROM_SIZE;
 }
 
 static bool raw_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
@@ -123,16 +123,16 @@ static bool ines_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
     return bus_set(b, addr, (struct busdevice){0});
 }
 
-static const uint8_t *ines_prgbank(const struct mapper *self, size_t i,
-                                   uint16_t *sz)
+static uint16_t ines_prgbank(const struct mapper *self, size_t i,
+                             const uint8_t *restrict *mem)
 {
     assert(self != NULL);
-    assert(sz != NULL);
+    assert(mem != NULL);
 
     // TODO: fill this out
     (void)i;
-    *sz = 0;
-    return NULL;
+    *mem = NULL;
+    return 0;
 }
 
 //

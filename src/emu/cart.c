@@ -237,7 +237,7 @@ struct bankview cart_prgbank(cart *self, size_t i)
     assert(self != NULL);
 
     struct bankview bv = {.bank = i};
-    bv.mem = self->mapper->prgbank(self->mapper, i, &bv.size);
+    bv.size = self->mapper->prgbank(self->mapper, i, &bv.mem);
     return bv;
 }
 

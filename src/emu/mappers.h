@@ -16,7 +16,8 @@
 
 struct mapper {
     void (*dtor)(struct mapper *);
-    const uint8_t *(*prgbank)(const struct mapper *, size_t, uint16_t *);
+    uint16_t (*prgbank)(const struct mapper *, size_t,
+                        const uint8_t *restrict *);
     bool (*cpu_connect)(struct mapper *, bus *, uint16_t);
     void (*cpu_disconnect)(const struct mapper *, bus *, uint16_t);
 };

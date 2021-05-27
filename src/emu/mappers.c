@@ -119,6 +119,7 @@ static void ines_dtor(struct mapper *self)
 
 static bool ines_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
 {
+    // TODO: fill this out
     (void)self;
     return bus_set(b, addr, (struct busdevice){0});
 }

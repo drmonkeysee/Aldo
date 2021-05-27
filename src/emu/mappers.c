@@ -117,20 +117,19 @@ static void ines_dtor(struct mapper *self)
     free(m);
 }
 
-static bool ines_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
+static bool ines_unimplemented_cpu_connect(struct mapper *self, bus *b,
+                                           uint16_t addr)
 {
-    // TODO: fill this out
     (void)self;
     return bus_set(b, addr, (struct busdevice){0});
 }
 
-static uint16_t ines_prgbank(const struct mapper *self, size_t i,
-                             const uint8_t *restrict *mem)
+static uint16_t ines_unimplemented_prgbank(const struct mapper *self, size_t i,
+                                           const uint8_t *restrict *mem)
 {
     assert(self != NULL);
     assert(mem != NULL);
 
-    // TODO: fill this out
     (void)i;
     *mem = NULL;
     return 0;
@@ -167,8 +166,7 @@ int mapper_raw_create(struct mapper **m, FILE *f)
     return err;
 }
 
-int mapper_ines_create(struct mapper **m, const struct ines_header *header,
-                       FILE *f)
+int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
 {
     assert(m != NULL);
     assert(header != NULL);
@@ -179,12 +177,14 @@ int mapper_ines_create(struct mapper **m, const struct ines_header *header,
     *self = (struct ines_mapper){
         .vtable = {
             ines_dtor,
-            ines_prgbank,
-            ines_cpu_connect,
+            ines_unimplemented_prgbank,
+            ines_unimplemented_cpu_connect,
             clear_bus_device,
         },
         .id = header->mapper_id,
     };
+    // TODO: add mapper support
+    header->mapper_implemented = false;
 
     int err;
     if (header->trainer) {

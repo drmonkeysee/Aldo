@@ -51,6 +51,7 @@ struct ines_header {
             prg_chunks;         // PRG double-chunk count
     bool bus_conflicts,         // Cart has bus conflicts
          mapper_controlled,     // Mapper-controlled Nametable Mirroring
+         mapper_implemented,    // Mapper is implemented
          wram,                  // PRG RAM banks present
          trainer;               // Trainer data present
 };

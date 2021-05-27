@@ -120,6 +120,8 @@ nes *nes_new(cart *c)
 
 void nes_free(nes *self)
 {
+    assert(self != NULL);
+
     free_cpubus(self);
     free(self);
 }

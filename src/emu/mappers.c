@@ -10,7 +10,6 @@
 #include "traits.h"
 
 #include <assert.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -78,8 +77,8 @@ static void raw_dtor(struct mapper *self)
     free(m);
 }
 
-static uint16_t raw_prgbank(const struct mapper *self, size_t i,
-                            const uint8_t *restrict *mem)
+static size_t raw_prgbank(const struct mapper *self, size_t i,
+                          const uint8_t *restrict *mem)
 {
     assert(self != NULL);
     assert(mem != NULL);
@@ -124,8 +123,8 @@ static bool ines_unimplemented_cpu_connect(struct mapper *self, bus *b,
     return bus_set(b, addr, (struct busdevice){0});
 }
 
-static uint16_t ines_unimplemented_prgbank(const struct mapper *self, size_t i,
-                                           const uint8_t *restrict *mem)
+static size_t ines_unimplemented_prgbank(const struct mapper *self, size_t i,
+                                         const uint8_t *restrict *mem)
 {
     assert(self != NULL);
     assert(mem != NULL);

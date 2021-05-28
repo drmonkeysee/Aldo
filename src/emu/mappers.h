@@ -11,13 +11,14 @@
 #include "bus.h"
 #include "cart.h"
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 
 struct mapper {
     void (*dtor)(struct mapper *);
-    uint16_t (*prgbank)(const struct mapper *, size_t,
-                        const uint8_t *restrict *);
+    size_t (*prgbank)(const struct mapper *, size_t,
+                      const uint8_t *restrict *);
     bool (*cpu_connect)(struct mapper *, bus *, uint16_t);
     void (*cpu_disconnect)(const struct mapper *, bus *, uint16_t);
 };

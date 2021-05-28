@@ -64,9 +64,8 @@ struct ines_header {
 };
 
 struct bankview {
-    size_t bank;
+    size_t bank, size;
     const uint8_t *mem;
-    uint16_t size;
 };
 
 typedef struct cartridge cart;

@@ -117,7 +117,7 @@ static cart *load_cart(const char *filename)
     if (cart_result < 0) {
         fprintf(stderr, "Cart load failure (%d): %s\n",
                 cart_result, cart_errstr(cart_result));
-        if (cart_result == CART_IO_ERR) {
+        if (cart_result == CART_ERR_IO) {
             perror("Cart IO error");
         }
     }

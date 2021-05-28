@@ -18,7 +18,7 @@
 
 static void errstr_returns_known_err(void *ctx)
 {
-    const char *const err = dis_errstr(ASM_FMT_FAIL);
+    const char *const err = dis_errstr(ASM_ERR_FMT_FAIL);
 
     ct_assertequalstr("OUTPUT FAIL", err);
 }
@@ -55,7 +55,7 @@ static void inst_eof(void *ctx)
 
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
-    ct_assertequal(ASM_EOF, length);
+    ct_assertequal(ASM_ERR_EOF, length);
     ct_assertequalstr("", buf);
 }
 
@@ -342,7 +342,7 @@ static void datapath_unexpected_end_of_rom(void *ctx)
     const int written = dis_datapath(&sn, buf);
 
     const char *const exp = "";
-    ct_assertequal(ASM_EOF, written);
+    ct_assertequal(ASM_ERR_EOF, written);
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 

@@ -46,9 +46,9 @@ static int detect_format(struct cartridge *self, FILE *f)
     const char *const fmtsuccess = fgets(format, sizeof format, f);
 
     if (!fmtsuccess) {
-        if (feof(f)) return CART_EOF;
-        if (ferror(f)) return CART_IO_ERR;
-        return CART_UNKNOWN_ERR;
+        if (feof(f)) return CART_ERR_EOF;
+        if (ferror(f)) return CART_ERR_IO;
+        return CART_ERR_UNKNOWN;
     }
 
     if (strncmp(NsfFormat, format, strlen(NsfFormat)) == 0) {
@@ -63,7 +63,7 @@ static int detect_format(struct cartridge *self, FILE *f)
     }
 
     // NOTE: reset back to beginning of file to fully parse detected format
-    return fseek(f, 0, SEEK_SET) == 0 ? 0 : CART_IO_ERR;
+    return fseek(f, 0, SEEK_SET) == 0 ? 0 : CART_ERR_IO;
 }
 
 static int parse_ines(struct cartridge *self, FILE *f)
@@ -71,13 +71,13 @@ static int parse_ines(struct cartridge *self, FILE *f)
     unsigned char header[16];
 
     fread(header, sizeof header[0], sizeof header, f);
-    if (feof(f)) return CART_EOF;
-    if (ferror(f)) return CART_IO_ERR;
+    if (feof(f)) return CART_ERR_EOF;
+    if (ferror(f)) return CART_ERR_IO;
 
     // NOTE: if last 4 bytes of header aren't 0 this is a very old format
     uint32_t tail;
     memcpy(&tail, header + 12, sizeof tail);
-    if (tail != 0) return CART_OBSOLETE;
+    if (tail != 0) return CART_ERR_OBSOLETE;
 
     self->ines_hdr.prg_chunks = header[4];
     self->ines_hdr.chr_chunks = header[5];
@@ -111,7 +111,7 @@ static int parse_raw(struct cartridge *self, FILE *f)
     int err = mapper_raw_create(&self->mapper, f);
     // NOTE: ROM file is too big for prg address space (no bank-switching)
     if (err == 0 && !(fgetc(f) == EOF && feof(f))) {
-        err = CART_IMG_SIZE;
+        err = CART_ERR_IMG_SIZE;
     }
     return err;
 }
@@ -238,7 +238,7 @@ int cart_create(cart **c, FILE *f)
         case CRTF_ALDO:
         case CRTF_NES20:
         case CRTF_NSF:
-            err = CART_FORMAT;
+            err = CART_ERR_FORMAT;
             break;
         default:
             err = parse_raw(self, f);
@@ -282,7 +282,7 @@ int cart_cpu_connect(cart *self, bus *b, uint16_t addr)
 
     return self->mapper->cpu_connect(self->mapper, b, addr)
            ? 0
-           : CART_ADDR_UNAVAILABLE;
+           : CART_ERR_ADDR_UNAVAILABLE;
 }
 
 void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr)

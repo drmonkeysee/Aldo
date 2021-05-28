@@ -32,8 +32,8 @@ static int load_chunks(uint8_t **mem, size_t size, FILE *f)
 {
     *mem = calloc(size, sizeof **mem);
     fread(*mem, sizeof **mem, size, f);
-    if (feof(f)) return CART_EOF;
-    if (ferror(f)) return CART_IO_ERR;
+    if (feof(f)) return CART_ERR_EOF;
+    if (ferror(f)) return CART_ERR_IO;
     return 0;
 }
 

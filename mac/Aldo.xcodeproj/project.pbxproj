@@ -32,6 +32,8 @@
 		C8236C2725BA80F900B18301 /* traits.c in Sources */ = {isa = PBXBuildFile; fileRef = C8236C2625BA80F900B18301 /* traits.c */; };
 		C82FBFD92616B94700E6BB08 /* cpustack.c in Sources */ = {isa = PBXBuildFile; fileRef = C82FBFD82616B94700E6BB08 /* cpustack.c */; };
 		C83042BC25CFC89500D6B623 /* bytes.c in Sources */ = {isa = PBXBuildFile; fileRef = C83042BB25CFC89500D6B623 /* bytes.c */; };
+		C837FB7126606A5300E84F18 /* cart.c in Sources */ = {isa = PBXBuildFile; fileRef = C8F81EDC263E336D0086272D /* cart.c */; };
+		C837FB7326606A5F00E84F18 /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B02D002659D7CA00C7C97C /* mappers.c */; };
 		C84B6C2225B2BAF300FCCD88 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C84B6C2125B2BAF300FCCD88 /* cpu.c */; };
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
 		C85C8DC625BD29AC00611D19 /* asm.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* asm.c */; };
@@ -353,6 +355,7 @@
 				C8FD257D25EB3B050043F6E6 /* traits.c in Sources */,
 				C8FD257125EB38DF0043F6E6 /* cpu.c in Sources */,
 				C807C95325F5877000A791B5 /* cpuimmediate.c in Sources */,
+				C837FB7126606A5300E84F18 /* cart.c in Sources */,
 				C88601EF26195B8100590A1B /* cpusubroutine.c in Sources */,
 				C8184D3E25E7496B002B3100 /* Tests.swift in Sources */,
 				C8126A102650E9BB00D80B91 /* bus.c in Sources */,
@@ -366,6 +369,7 @@
 				C807C96025F5884B00A791B5 /* cpuabsolute.c in Sources */,
 				C8184D7725E753BB002B3100 /* main.c in Sources */,
 				C8FD257425EB39AF0043F6E6 /* cpu.c in Sources */,
+				C837FB7326606A5F00E84F18 /* mappers.c in Sources */,
 				C82FBFD92616B94700E6BB08 /* cpustack.c in Sources */,
 				C8184D7C25E76541002B3100 /* asm.c in Sources */,
 				C807C94F25F5870A00A791B5 /* cpuimplied.c in Sources */,

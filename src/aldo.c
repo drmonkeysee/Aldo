@@ -40,7 +40,7 @@ static bool parse_flag(const char *restrict arg, char flag,
                        const char *restrict cmd)
 {
     return (strlen(arg) > 1 && arg[1] != '-' && strchr(arg, flag))
-           || (cmd && strcmp(arg, cmd) == 0);
+            || (cmd && strcmp(arg, cmd) == 0);
 }
 
 #define setflag(f, a, s, l) (f) = (f) || parse_flag(a, s, l)

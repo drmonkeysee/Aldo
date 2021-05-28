@@ -255,14 +255,14 @@ int dis_datapath(const struct console_state *snapshot,
                 ? sprintf(dis + total, displaystr, interrupt_display(snapshot))
                 : sprintf(dis + total, displaystr,
                           strlen(displaystr) > 0
-                          ? snapshot->mem.prgview[1]
-                          : 0);
+                            ? snapshot->mem.prgview[1]
+                            : 0);
         break;
     default:
         count = sprintf(dis + total, displaystr,
                         strlen(displaystr) > 0
-                        ? batowr(snapshot->mem.prgview + 1)
-                        : 0);
+                            ? batowr(snapshot->mem.prgview + 1)
+                            : 0);
         break;
     }
     if (count < 0) return DIS_ERR_FMT_FAIL;

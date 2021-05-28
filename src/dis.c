@@ -1,11 +1,11 @@
 //
-//  asm.c
+//  dis.c
 //  Aldo
 //
 //  Created by Brandon Stansbury on 1/23/21.
 //
 
-#include "asm.h"
+#include "dis.h"
 
 #include "emu/bytes.h"
 #include "emu/decode.h"
@@ -55,11 +55,11 @@ static int print_raw(uint16_t addr, const uint8_t *restrict bytes, int instlen,
 {
     int total, count;
     total = count = sprintf(dis, "$%04X: ", addr);
-    if (count < 0) return ASM_ERR_FMT_FAIL;
+    if (count < 0) return DIS_ERR_FMT_FAIL;
 
     for (int i = 0; i < instlen; ++i) {
         count = sprintf(dis + total, "%02X ", bytes[i]);
-        if (count < 0) return ASM_ERR_FMT_FAIL;
+        if (count < 0) return DIS_ERR_FMT_FAIL;
         total += count;
     }
 
@@ -72,7 +72,7 @@ static int print_mnemonic(const struct decoded *dec,
 {
     int total, count;
     total = count = sprintf(dis, "%s ", Mnemonics[dec->instruction]);
-    if (count < 0) return ASM_ERR_FMT_FAIL;
+    if (count < 0) return DIS_ERR_FMT_FAIL;
 
     const char *restrict const *const strtable = StringTables[dec->mode];
     switch (instlen) {
@@ -87,9 +87,9 @@ static int print_mnemonic(const struct decoded *dec,
         count = sprintf(dis + total, strtable[instlen - 1], batowr(bytes + 1));
         break;
     default:
-        return ASM_ERR_INV_ADDRMD;
+        return DIS_ERR_INV_ADDRMD;
     }
-    if (count < 0) return ASM_ERR_FMT_FAIL;
+    if (count < 0) return DIS_ERR_FMT_FAIL;
     return total + count;
 }
 
@@ -188,7 +188,7 @@ const char *dis_errstr(int err)
 {
     switch (err) {
 #define X(s, v, e) case s: return e;
-        ASM_ERRCODE_X
+        DIS_ERRCODE_X
 #undef X
     default:
         return "UNKNOWN ERR";
@@ -206,7 +206,7 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
 
     const struct decoded dec = Decode[*bytes];
     const int instlen = InstLens[dec.mode];
-    if (bytesleft < instlen) return ASM_ERR_EOF;
+    if (bytesleft < instlen) return DIS_ERR_EOF;
 
     int count;
     unsigned int total;
@@ -215,7 +215,7 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
 
     // NOTE: padding between raw bytes and disassembled instruction
     count = sprintf(dis + total, "%*s", (4 - instlen) * 3, "");
-    if (count < 0) return ASM_ERR_FMT_FAIL;
+    if (count < 0) return DIS_ERR_FMT_FAIL;
     total += count;
 
     count = print_mnemonic(&dec, bytes, instlen, dis + total);
@@ -234,12 +234,12 @@ int dis_datapath(const struct console_state *snapshot,
 
     const struct decoded dec = Decode[snapshot->datapath.opcode];
     const int instlen = InstLens[dec.mode];
-    if ((size_t)instlen > snapshot->mem.prglength) return ASM_ERR_EOF;
+    if ((size_t)instlen > snapshot->mem.prglength) return DIS_ERR_EOF;
 
     int count;
     unsigned int total;
     total = count = sprintf(dis, "%s ", Mnemonics[dec.instruction]);
-    if (count < 0) return ASM_ERR_FMT_FAIL;
+    if (count < 0) return DIS_ERR_FMT_FAIL;
 
     const int max_offset = 1 + (instlen / 3),
               displayidx = snapshot->datapath.exec_cycle < max_offset
@@ -265,7 +265,7 @@ int dis_datapath(const struct console_state *snapshot,
                         : 0);
         break;
     }
-    if (count < 0) return ASM_ERR_FMT_FAIL;
+    if (count < 0) return DIS_ERR_FMT_FAIL;
     total += count;
 
     assert(total < DIS_DATAP_SIZE);

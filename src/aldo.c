@@ -7,8 +7,8 @@
 
 #include "aldo.h"
 
-#include "asm.h"
 #include "control.h"
+#include "dis.h"
 #include "ui.h"
 #include "emu/cart.h"
 #include "emu/nes.h"

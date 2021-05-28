@@ -1,12 +1,12 @@
 //
-//  asm.h
+//  dis.h
 //  Aldo
 //
 //  Created by Brandon Stansbury on 1/23/21.
 //
 
-#ifndef Aldo_asm_h
-#define Aldo_asm_h
+#ifndef Aldo_dis_h
+#define Aldo_dis_h
 
 #include "control.h"
 #include "emu/cart.h"
@@ -19,14 +19,14 @@
 #define DIS_DATAP_SIZE 12u  // Disassembled datapath is at most 11 chars
 
 // X(symbol, value, error string)
-#define ASM_ERRCODE_X \
-X(ASM_ERR_FMT_FAIL, -1, "OUTPUT FAIL") \
-X(ASM_ERR_EOF, -2, "UNEXPECTED EOF") \
-X(ASM_ERR_INV_ADDRMD, -3, "INVALID ADDRMODE")
+#define DIS_ERRCODE_X \
+X(DIS_ERR_FMT_FAIL, -1, "OUTPUT FAIL") \
+X(DIS_ERR_EOF, -2, "UNEXPECTED EOF") \
+X(DIS_ERR_INV_ADDRMD, -3, "INVALID ADDRMODE")
 
 enum {
 #define X(s, v, e) s = v,
-    ASM_ERRCODE_X
+    DIS_ERRCODE_X
 #undef X
 };
 

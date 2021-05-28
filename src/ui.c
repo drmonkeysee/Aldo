@@ -7,7 +7,7 @@
 
 #include "ui.h"
 
-#include "asm.h"
+#include "dis.h"
 #include "emu/bytes.h"
 #include "emu/traits.h"
 

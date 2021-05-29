@@ -54,13 +54,13 @@ struct ines_header {
     enum nt_mirroring mirror;   // Nametable Mirroring
     uint8_t chr_chunks,         // CHR ROM chunk count; 0 indicates CHR RAM
             mapper_id,          // Mapper ID
-            wram_chunks,        // WRAM chunk count; may be set by mapper
-            prg_chunks;         // PRG double-chunk count
+            prg_chunks,         // PRG double-chunk count
+            wram_chunks;        // WRAM chunk count; may be set by mapper
     bool bus_conflicts,         // Cart has bus conflicts
          mapper_controlled,     // Mapper-controlled Nametable Mirroring
          mapper_implemented,    // Mapper is implemented
-         wram,                  // PRG RAM banks present
-         trainer;               // Trainer data present
+         trainer,               // Trainer data present
+         wram;                  // PRG RAM banks present
 };
 
 struct bankview {

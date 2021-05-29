@@ -315,7 +315,7 @@ void cart_write_info(cart *self, FILE *f, bool verbose)
 
 void cart_write_dis_header(cart *self, FILE *f)
 {
-    fprintf(f, "format %s\n\nDisassembly of PRG Banks%s\n",
+    fprintf(f, "%s\n\nDisassembly of PRG Banks%s\n",
             format_name(self->format),
             self->format == CRTF_ALDO
                 ? ""

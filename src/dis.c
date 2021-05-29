@@ -148,7 +148,7 @@ static int print_bank(const struct bankview *bv, bool verbose)
     };
     size_t total = 0;
     char dis[DIS_INST_SIZE];
-    printf("Bank %zu:\n", bv->bank);
+    printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> 10);
     puts("--------");
 
     while (total < bv->size) {
@@ -277,7 +277,7 @@ int dis_cart(cart *cart, const struct control *appstate)
     assert(cart != NULL);
     assert(appstate != NULL);
 
-    printf("%s: ", appstate->cartfile);
+    printf("%s\n", appstate->cartfile);
     cart_write_dis_header(cart, stdout);
     puts("");
 

@@ -102,11 +102,11 @@ enum duplicate_state {
 };
 
 struct repeat_condition {
-    int prev_bytes;
+    uint32_t prev_bytes;
     enum duplicate_state state;
 };
 
-static void print_prg_line(const char *restrict dis, int curr_bytes,
+static void print_prg_line(const char *restrict dis, uint32_t curr_bytes,
                            size_t total, size_t banksize,
                            struct repeat_condition *repeat)
 {
@@ -142,20 +142,19 @@ static void print_prg_line(const char *restrict dis, int curr_bytes,
 
 static int print_bank(const struct bankview *bv, bool verbose)
 {
+    printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> 10);
+    puts("--------");
+
     int bytes_read = 0;
     struct repeat_condition repeat = {
         .state = verbose ? DUP_VERBOSE : DUP_NONE,
     };
-    size_t total = 0;
     char dis[DIS_INST_SIZE];
-    printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> 10);
-    puts("--------");
-
-    while (total < bv->size) {
+    for (size_t total = 0; total < bv->size; total += bytes_read) {
         // TODO: how to pick correct start address?
         const uint16_t addr = CpuRomMinAddr + total;
         const uint8_t *const prgoffset = bv->mem + total;
-        total += bytes_read = dis_inst(addr, prgoffset, bv->size - total, dis);
+        bytes_read = dis_inst(addr, prgoffset, bv->size - total, dis);
         if (bytes_read == 0) break;
         if (bytes_read < 0) {
             fprintf(stderr, "$%04X: Dis err (%d): %s\n", addr, bytes_read,
@@ -164,7 +163,7 @@ static int print_bank(const struct bankview *bv, bool verbose)
         }
         // NOTE: convert current instruction bytes into easily comparable
         // value to check for repeats.
-        int curr_bytes = 0;
+        uint32_t curr_bytes = 0;
         for (int i = 0; i < bytes_read; ++i) {
             curr_bytes |= prgoffset[i] << (8 * i);
         }

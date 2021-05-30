@@ -39,7 +39,7 @@ static struct partition *find(struct addressbus *self, uint16_t addr)
 
 bus *bus_new(int bitwidth, size_t n, ...)
 {
-    assert(0 < bitwidth && bitwidth <= 16);
+    assert(0 < bitwidth && bitwidth <= BITWIDTH_64KB);
     assert(0 < n);
 
     const size_t psize = sizeof(struct partition) * n;
@@ -135,7 +135,8 @@ bool bus_write(bus *self, uint16_t addr, uint8_t d)
     return false;
 }
 
-size_t bus_dma(bus *self, uint16_t addr, uint8_t *restrict dest, size_t count)
+size_t bus_dma(bus *self, uint16_t addr, size_t count,
+               uint8_t dest[restrict count])
 {
     assert(self != NULL);
     assert(dest != NULL);
@@ -145,7 +146,7 @@ size_t bus_dma(bus *self, uint16_t addr, uint8_t *restrict dest, size_t count)
 
     struct partition *const target = find(self, addr);
     if (target->device.dma) {
-        return target->device.dma(target->device.ctx, addr, dest, count);
+        return target->device.dma(target->device.ctx, addr, count, dest);
     }
     return 0;
 }

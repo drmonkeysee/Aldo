@@ -72,8 +72,8 @@ static bool raw_read(const void *restrict ctx, uint16_t addr,
     return true;
 }
 
-static size_t raw_dma(const void *restrict ctx, uint16_t addr,
-                      uint8_t *restrict dest, size_t count)
+static size_t raw_dma(const void *restrict ctx, uint16_t addr, size_t count,
+                      uint8_t dest[restrict count])
 {
     // TODO: will raw ever ask for < $8000?
     if (addr < CpuRomMinAddr) return 0;
@@ -162,7 +162,7 @@ static bool ines_000_read(const void *restrict ctx, uint16_t addr,
 }
 
 static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
-                           uint8_t *restrict dest, size_t count)
+                           size_t count, uint8_t dest[restrict count])
 {
     // TODO: no wram support, did 000 ever have wram?
     if (addr < CpuRomMinAddr) return 0;

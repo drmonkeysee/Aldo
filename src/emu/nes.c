@@ -40,8 +40,8 @@ static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
     return true;
 }
 
-static size_t ram_dma(const void *restrict ctx, uint16_t addr,
-                      uint8_t *restrict dest, size_t count)
+static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
+                      uint8_t dest[restrict count])
 {
     return bytecopy_bankmirrored(ctx, BITWIDTH_2KB, addr, BITWIDTH_8KB, count,
                                  dest);
@@ -194,9 +194,10 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
     snapshot->mem.ram = self->ram;
     snapshot->mem.prglength = bus_dma(self->cpu.bus,
                                       snapshot->datapath.current_instruction,
-                                      snapshot->mem.prgview,
                                       sizeof snapshot->mem.prgview
-                                      / sizeof snapshot->mem.prgview[0]);
-    bus_dma(self->cpu.bus, NmiVector, snapshot->mem.vectors,
-            sizeof snapshot->mem.vectors / sizeof snapshot->mem.vectors[0]);
+                                      / sizeof snapshot->mem.prgview[0],
+                                      snapshot->mem.prgview);
+    bus_dma(self->cpu.bus, NmiVector,
+            sizeof snapshot->mem.vectors / sizeof snapshot->mem.vectors[0],
+            snapshot->mem.vectors);
 }

@@ -64,8 +64,8 @@ static bool test_highest_write(void *ctx, uint16_t addr, uint8_t d)
     return true;
 }
 
-static size_t test_dma(const void *restrict ctx, uint16_t addr,
-                       uint8_t *restrict dest, size_t count)
+static size_t test_dma(const void *restrict ctx, uint16_t addr, size_t count,
+                       uint8_t dest[restrict count])
 {
     if (addr >= 4) return 0;
     const uint8_t *mem = ctx;
@@ -367,7 +367,7 @@ static void dma(void *ctx)
     ct_asserttrue(bus_set(b, 0x0, bd));
 
     uint8_t dest[4];
-    const size_t count = bus_dma(b, 0x0, dest, sizeof dest / sizeof dest[0]);
+    const size_t count = bus_dma(b, 0x0, sizeof dest / sizeof dest[0], dest);
     ct_assertequal(4u, count);
     ct_assertequal(mem[0], dest[0]);
     ct_assertequal(mem[1], dest[1]);
@@ -387,7 +387,7 @@ static void dma_partial_bank(void *ctx)
     ct_asserttrue(bus_set(b, 0x0, bd));
 
     uint8_t dest[4];
-    const size_t count = bus_dma(b, 0x1, dest, sizeof dest / sizeof dest[0]);
+    const size_t count = bus_dma(b, 0x1, sizeof dest / sizeof dest[0], dest);
     ct_assertequal(3u, count);
     ct_assertequal(mem[1], dest[0]);
     ct_assertequal(mem[2], dest[1]);
@@ -406,7 +406,7 @@ static void dma_end_of_bank(void *ctx)
     ct_asserttrue(bus_set(b, 0x0, bd));
 
     uint8_t dest[4];
-    const size_t count = bus_dma(b, 0x3, dest, sizeof dest / sizeof dest[0]);
+    const size_t count = bus_dma(b, 0x3, sizeof dest / sizeof dest[0], dest);
     ct_assertequal(1u, count);
     ct_assertequal(mem[3], dest[0]);
 }
@@ -423,7 +423,7 @@ static void dma_past_bank(void *ctx)
     ct_asserttrue(bus_set(b, 0x0, bd));
 
     uint8_t dest[] = {0xff, 0xff, 0xff, 0xff};
-    const size_t count = bus_dma(b, 0x4, dest, sizeof dest / sizeof dest[0]);
+    const size_t count = bus_dma(b, 0x4, sizeof dest / sizeof dest[0], dest);
     ct_assertequal(0u, count);
     ct_assertequal(0xffu, dest[0]);
 }
@@ -440,7 +440,7 @@ static void dma_wrong_addr(void *ctx)
     ct_asserttrue(bus_set(b, 0x0, bd));
 
     uint8_t dest[] = {0xff, 0xff, 0xff, 0xff};
-    const size_t count = bus_dma(b, 0x40, dest, sizeof dest / sizeof dest[0]);
+    const size_t count = bus_dma(b, 0x40, sizeof dest / sizeof dest[0], dest);
     ct_assertequal(0u, count);
     ct_assertequal(0xffu, dest[0]);
 }
@@ -457,7 +457,7 @@ static void dma_zero_count(void *ctx)
     ct_asserttrue(bus_set(b, 0x0, bd));
 
     uint8_t dest[] = {0xff, 0xff, 0xff, 0xff};
-    const size_t count = bus_dma(b, 0x0, dest, 0);
+    const size_t count = bus_dma(b, 0x0, 0, dest);
     ct_assertequal(0u, count);
     ct_assertequal(0xffu, dest[0]);
 }

@@ -140,7 +140,7 @@ static const char *mirror_name(enum nt_mirroring m)
 
 static void hr(FILE *f)
 {
-    fprintf(f, "-----------------------\n");
+    fputs("-----------------------\n", f);
 }
 
 static const char *boolstr(bool value)
@@ -164,7 +164,7 @@ static void write_ines_info(const struct cartridge *self, FILE *f,
         fprintf(f, " (<Board Names>)\n");
         hr(f);
     } else {
-        fprintf(f, "\n");
+        fputs("\n", f);
     }
 
     fprintf(f, "PRG ROM\t\t: %u%s\n", self->ines_hdr.prg_chunks,
@@ -212,7 +212,7 @@ static void write_ines_info(const struct cartridge *self, FILE *f,
 static void write_raw_info(FILE *f)
 {
     // TODO: assume 32KB size for now
-    fprintf(f, "PRG Size\t: 32KB\n");
+    fputs("PRG Size\t: 32KB\n", f);
 }
 
 //
@@ -323,7 +323,7 @@ void cart_write_info(cart *self, FILE *f, bool verbose)
 
 void cart_write_dis_header(cart *self, FILE *f)
 {
-    fprintf(f, "%s", format_name(self->format));
+    fputs(format_name(self->format), f);
     if (self->format == CRTF_INES) {
         fprintf(f, " (%03d)", self->ines_hdr.mapper_id);
     }

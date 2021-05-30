@@ -69,35 +69,35 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
 
 static void print_usage(const struct control *appstate)
 {
-    printf("---=== Aldo Usage ===---\n");
+    puts("---=== Aldo Usage ===---");
     printf("%s [options...] [command] file\n", appstate->me);
-    printf("\noptions\n");
-    printf("  -v\t: verbose output\n");
-    printf("\ncommands\n");
-    printf("  -d\t: disassemble file (also --disassemble);"
-           " verbose prints duplicate lines\n");
-    printf("  -h\t: print usage (also --help)\n");
-    printf("  -i\t: print file cartridge info (also --info);"
-           " verbose prints more details\n");
-    printf("  -V\t: print version (also --version)\n");
-    printf("\narguments\n");
-    printf("  file\t: input file containing cartridge"
-           " or program contents\n");
+    puts("\noptions");
+    puts("  -v\t: verbose output");
+    puts("\ncommands");
+    puts("  -d\t: disassemble file (also --disassemble);"
+           " verbose prints duplicate lines");
+    puts("  -h\t: print usage (also --help)");
+    puts("  -i\t: print file cartridge info (also --info);"
+           " verbose prints more details");
+    puts("  -V\t: print version (also --version)");
+    puts("\narguments");
+    puts("  file\t: input file containing cartridge"
+           " or program contents");
 }
 
 static void print_version(void)
 {
     printf("Aldo %s", Version);
 #ifdef __VERSION__
-    printf(" (" __VERSION__ ")");
+    fputs(" (" __VERSION__ ")", stdout);
 #endif
-    printf("\n");
+    puts("");
 }
 
 static void print_cart_info(const struct control *appstate, cart *c)
 {
     if (appstate->verbose) {
-        printf("---=== Cart Info ===---\n");
+        puts("---=== Cart Info ===---");
     }
     printf("File\t\t: %s\n", ctrl_cartfilename(appstate->cartfile));
     cart_write_info(c, stdout, appstate->verbose);
@@ -255,7 +255,7 @@ int aldo_run(int argc, char *argv[argc+1])
     }
 
     if (!appstate.cartfile) {
-        fprintf(stderr, "Error: no input file specified\n");
+        fputs("Error: no input file specified\n", stderr);
         print_usage(&appstate);
         return EXIT_FAILURE;
     }

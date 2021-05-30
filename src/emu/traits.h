@@ -14,6 +14,7 @@
 enum {
     BITWIDTH_1KB = 10,
     BITWIDTH_2KB = 11,
+    BITWIDTH_4KB = 12,
     BITWIDTH_8KB = 13,
     BITWIDTH_16KB = 14,
     BITWIDTH_32KB = 15,

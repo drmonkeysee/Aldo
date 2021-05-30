@@ -111,7 +111,7 @@ static void print_prg_line(const char *restrict dis, uint32_t curr_bytes,
                            struct repeat_condition *repeat)
 {
     if (repeat->state == DUP_VERBOSE) {
-        printf("%s\n", dis);
+        puts(dis);
         return;
     }
 
@@ -119,14 +119,14 @@ static void print_prg_line(const char *restrict dis, uint32_t curr_bytes,
         switch (repeat->state) {
         case DUP_NONE:
             repeat->state = DUP_FIRST;
-            printf("%s\n", dis);
+            puts(dis);
             break;
         case DUP_FIRST:
             repeat->state = DUP_TRUNCATE;
             // NOTE: if this is the last instruction in the PRG bank
             // skip printing the truncation indicator.
             if (total < banksize) {
-                printf("*\n");
+                puts("*");
             }
             break;
         default:
@@ -134,7 +134,7 @@ static void print_prg_line(const char *restrict dis, uint32_t curr_bytes,
             break;
         }
     } else {
-        printf("%s\n", dis);
+        puts(dis);
         repeat->prev_bytes = curr_bytes;
         repeat->state = DUP_NONE;
     }
@@ -173,7 +173,7 @@ static int print_bank(const struct bankview *bv, bool verbose)
     // NOTE: always print the last line regardless of duplicate state
     // (if it hasn't already been printed).
     if (repeat.state == DUP_TRUNCATE || repeat.state == DUP_SKIP) {
-        printf("%s\n", dis);
+        puts(dis);
     }
 
     return 0;
@@ -276,13 +276,13 @@ int dis_cart(cart *cart, const struct control *appstate)
     assert(cart != NULL);
     assert(appstate != NULL);
 
-    printf("%s\n", appstate->cartfile);
+    puts(appstate->cartfile);
     cart_write_dis_header(cart, stdout);
-    puts("");
 
     for (struct bankview bv = cart_prgbank(cart, 0);
          bv.mem;
          bv = cart_prgbank(cart, bv.bank + 1)) {
+        puts("");
         const int err = print_bank(&bv, appstate->verbose);
         if (err < 0) return err;
     }

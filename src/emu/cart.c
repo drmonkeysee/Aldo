@@ -323,11 +323,14 @@ void cart_write_info(cart *self, FILE *f, bool verbose)
 
 void cart_write_dis_header(cart *self, FILE *f)
 {
-    fprintf(f, "%s\n\nDisassembly of PRG Banks%s\n",
-            format_name(self->format),
-            self->format == CRTF_ALDO
-                ? ""
-                : "\n(NOTE: approximate for non-Aldo formats)");
+    fprintf(f, "%s", format_name(self->format));
+    if (self->format == CRTF_INES) {
+        fprintf(f, " (%03d)", self->ines_hdr.mapper_id);
+    }
+    fputs("\n\nDisassembly of PRG Banks\n", f);
+    if (self->format != CRTF_ALDO) {
+        fputs("(NOTE: approximate for non-Aldo formats)\n", f);
+    }
 }
 
 void cart_snapshot(cart *self, struct console_state *snapshot)

@@ -13,9 +13,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-// NOTE: cart file data is packed into 8 or 16 KB chunks
+// NOTE: cart file data is packed into 8 or 16 KB chunks;
+// banks are treated in various combinations of 1, 2, 4, 8, 16, 32 KB chunks.
 static const size_t Chunk = 0x2000,
                     DChunk = Chunk * 2;
+// NOTE: address masks to convert to properly-sized bank indices
+static const uint16_t Mask16k = 0x3fff,
+                      Mask32k = 0x7fff;
 
 struct raw_mapper {
     struct mapper vtable;
@@ -25,6 +29,11 @@ struct raw_mapper {
 struct ines_mapper {
     struct mapper vtable;
     uint8_t *prg, *chr, *wram, id;
+};
+
+struct ines_000_mapper {
+    struct ines_mapper base;
+    size_t bankcount;
 };
 
 static int load_chunks(uint8_t **mem, size_t size, FILE *f)
@@ -53,6 +62,8 @@ static void clear_bus_device(const struct mapper *self, bus *b, uint16_t addr)
 static bool raw_read(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)
 {
+    // TODO: will raw ever ask for < $8000?
+    if (addr < CpuRomMinAddr) return false;
     *d = ((const uint8_t *)ctx)[addr & CpuRomAddrMask];
     return true;
 }
@@ -60,6 +71,8 @@ static bool raw_read(const void *restrict ctx, uint16_t addr,
 static size_t raw_dma(const void *restrict ctx, uint16_t addr,
                       uint8_t *restrict dest, size_t count)
 {
+    // TODO: will raw ever ask for < $8000?
+    if (addr < CpuRomMinAddr) return 0;
     const uint16_t bankstart = addr & CpuRomAddrMask;
     const size_t bankcount = NES_ROM_SIZE - bankstart,
                  bytecount = count > bankcount ? bankcount : count;
@@ -88,7 +101,7 @@ static size_t raw_prgbank(const struct mapper *self, size_t i,
         return 0;
     }
 
-    *mem = ((struct raw_mapper *)self)->rom;
+    *mem = ((const struct raw_mapper *)self)->rom;
     return NES_ROM_SIZE;
 }
 
@@ -97,7 +110,7 @@ static bool raw_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
     return bus_set(b, addr, (struct busdevice){
         .read = raw_read,
         .dma = raw_dma,
-        .ctx = ((const struct raw_mapper *)self)->rom,
+        .ctx = ((struct raw_mapper *)self)->rom,
     });
 }
 
@@ -116,13 +129,6 @@ static void ines_dtor(struct mapper *self)
     free(m);
 }
 
-static bool ines_unimplemented_cpu_connect(struct mapper *self, bus *b,
-                                           uint16_t addr)
-{
-    (void)self;
-    return bus_set(b, addr, (struct busdevice){0});
-}
-
 static size_t ines_unimplemented_prgbank(const struct mapper *self, size_t i,
                                          const uint8_t *restrict *mem)
 {
@@ -132,6 +138,81 @@ static size_t ines_unimplemented_prgbank(const struct mapper *self, size_t i,
     (void)i;
     *mem = NULL;
     return 0;
+}
+
+static bool ines_unimplemented_cpu_connect(struct mapper *self, bus *b,
+                                           uint16_t addr)
+{
+    (void)self;
+    return bus_set(b, addr, (struct busdevice){0});
+}
+
+//
+// iNES 000
+//
+
+static bool ines_000_read(const void *restrict ctx, uint16_t addr,
+                          uint8_t *restrict d)
+{
+    // TODO: no wram support, did 000 ever have wram?
+    if (addr < CpuRomMinAddr) return false;
+    const struct ines_000_mapper *const m = ctx;
+    const uint16_t mask = m->bankcount == 2 ? Mask32k : Mask16k;
+    *d = m->base.prg[addr & mask];
+    return true;
+}
+
+static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
+                           uint8_t *restrict dest, size_t count)
+{
+    // TODO: no wram support, did 000 ever have wram?
+    if (addr < CpuRomMinAddr) return 0;
+    const struct ines_000_mapper *const m = ctx;
+    uint16_t bankstart = addr & (m->bankcount == 2 ? Mask32k : Mask16k);
+    const size_t prgspace = (CpuRomMaxAddr + 1) - addr,
+                 maxcount = count > prgspace ? prgspace : count,
+                 bankleft = DChunk - bankstart;
+    size_t bytescopy = count > bankleft ? bankleft : count;
+    ptrdiff_t bytesleft = maxcount;
+    do {
+        memcpy(dest, m->base.prg + bankstart, bytescopy * sizeof *dest);
+        // NOTE: first memcpy block may be offset from start of bank; any
+        // additional blocks start at 0 due to mirroring-wraparound.
+        bankstart = 0;
+        bytesleft -= bytescopy;
+        dest += bytescopy;
+        bytescopy = bytesleft > (ptrdiff_t)DChunk ? DChunk : bytesleft;
+    } while (bytesleft > 0);
+    // NOTE: if we went negative our math is wrong
+    assert(bytesleft == 0);
+    return maxcount;
+}
+
+static size_t ines_000_prgbank(const struct mapper *self, size_t i,
+                               const uint8_t *restrict *mem)
+{
+    assert(self != NULL);
+    assert(mem != NULL);
+
+    const struct ines_000_mapper
+    *const m = (const struct ines_000_mapper *)self;
+
+    if (i > m->bankcount) {
+        *mem = NULL;
+        return 0;
+    }
+
+    *mem = m->base.prg + (i * DChunk);
+    return DChunk;
+}
+
+static bool ines_000_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
+{
+    return bus_set(b, addr, (struct busdevice){
+        .read = ines_000_read,
+        .dma = ines_000_dma,
+        .ctx = self,
+    });
 }
 
 //
@@ -171,19 +252,37 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     assert(header != NULL);
     assert(f != NULL);
 
-    // TODO: create specific mapper based on ID
-    struct ines_mapper *self = malloc(sizeof *self);
-    *self = (struct ines_mapper){
-        .vtable = {
-            ines_dtor,
-            ines_unimplemented_prgbank,
-            ines_unimplemented_cpu_connect,
-            clear_bus_device,
-        },
-        .id = header->mapper_id,
-    };
-    // TODO: add mapper support
-    header->mapper_implemented = false;
+    // NOTE: assume implemented, clear flag in default case
+    header->mapper_implemented = true;
+    struct ines_mapper *self;
+    switch (header->mapper_id) {
+    case 0:
+        self = malloc(sizeof(struct ines_000_mapper));
+        *self = (struct ines_mapper){
+            .vtable = {
+                ines_dtor,
+                ines_000_prgbank,
+                ines_000_cpu_connect,
+                clear_bus_device,
+            },
+        };
+        assert(header->prg_chunks <= 2);
+        ((struct ines_000_mapper *)self)->bankcount = header->prg_chunks;
+        break;
+    default:
+        self = malloc(sizeof *self);
+        *self = (struct ines_mapper){
+            .vtable = {
+                ines_dtor,
+                ines_unimplemented_prgbank,
+                ines_unimplemented_cpu_connect,
+                clear_bus_device,
+            },
+        };
+        header->mapper_implemented = false;
+        break;
+    }
+    self->id = header->mapper_id;
 
     int err;
     if (header->trainer) {

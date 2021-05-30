@@ -46,9 +46,9 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr,
     uint16_t bankstart = addr & CpuRamAddrMask;
     const size_t ramspace = (CpuRamMaxAddr + 1) - addr,
                  maxcount = count > ramspace ? ramspace : count,
-                 bankcount = NES_RAM_SIZE - bankstart;
+                 bankleft = NES_RAM_SIZE - bankstart;
     const uint8_t *ram = ctx;
-    size_t bytescopy = maxcount > bankcount ? bankcount : maxcount;
+    size_t bytescopy = maxcount > bankleft ? bankleft : maxcount;
     ptrdiff_t bytesleft = maxcount;
     // NOTE: 2KB bank in 8KB space means DMA needs to:
     // 1) start copy from some offset within the 2KB bank (or a bank mirror)
@@ -56,8 +56,8 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr,
     // 3) stop copy at end of address window
     do {
         memcpy(dest, ram + bankstart, bytescopy * sizeof *dest);
-        // NOTE: first memcpy chunk may be offset from start of bank; any
-        // additional chunks start at 0 due to mirroring-wraparound.
+        // NOTE: first memcpy block may be offset from start of bank; any
+        // additional blocks start at 0 due to mirroring-wraparound.
         bankstart = 0;
         bytesleft -= bytescopy;
         dest += bytescopy;

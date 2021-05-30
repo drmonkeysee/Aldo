@@ -7,6 +7,7 @@
 
 #include "mappers.h"
 
+#include "bytes.h"
 #include "traits.h"
 
 #include <assert.h>
@@ -15,11 +16,14 @@
 
 // NOTE: cart file data is packed into 8 or 16 KB chunks;
 // banks are treated in various combinations of 1, 2, 4, 8, 16, 32 KB chunks.
+// TODO: get rid of these or move them to traits?
 static const size_t Chunk = 0x2000,
-                    DChunk = Chunk * 2;
+                    DChunk = Chunk * 2,
+                    QChunk = Chunk * 4;
 // NOTE: address masks to convert to properly-sized bank indices
-static const uint16_t Mask16k = 0x3fff,
-                      Mask32k = 0x7fff;
+// TODO: get rid of these or move them to traits?
+static const uint16_t Mask16KB = DChunk - 1,
+                      Mask32KB = QChunk - 1;
 
 struct raw_mapper {
     struct mapper vtable;
@@ -64,7 +68,7 @@ static bool raw_read(const void *restrict ctx, uint16_t addr,
 {
     // TODO: will raw ever ask for < $8000?
     if (addr < CpuRomMinAddr) return false;
-    *d = ((const uint8_t *)ctx)[addr & CpuRomAddrMask];
+    *d = ((const uint8_t *)ctx)[addr & Mask32KB];
     return true;
 }
 
@@ -73,12 +77,7 @@ static size_t raw_dma(const void *restrict ctx, uint16_t addr,
 {
     // TODO: will raw ever ask for < $8000?
     if (addr < CpuRomMinAddr) return 0;
-    const uint16_t bankstart = addr & CpuRomAddrMask;
-    const size_t bankcount = NES_ROM_SIZE - bankstart,
-                 bytecount = count > bankcount ? bankcount : count;
-    const uint8_t *rom = ctx;
-    memcpy(dest, rom + bankstart, bytecount * sizeof *dest);
-    return bytecount;
+    return bytescopy_bank(ctx, BITWIDTH_32KB, addr, count, dest);
 }
 
 static void raw_dtor(struct mapper *self)
@@ -157,7 +156,7 @@ static bool ines_000_read(const void *restrict ctx, uint16_t addr,
     // TODO: no wram support, did 000 ever have wram?
     if (addr < CpuRomMinAddr) return false;
     const struct ines_000_mapper *const m = ctx;
-    const uint16_t mask = m->bankcount == 2 ? Mask32k : Mask16k;
+    const uint16_t mask = m->bankcount == 2 ? Mask32KB : Mask16KB;
     *d = m->base.prg[addr & mask];
     return true;
 }
@@ -168,24 +167,11 @@ static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
     // TODO: no wram support, did 000 ever have wram?
     if (addr < CpuRomMinAddr) return 0;
     const struct ines_000_mapper *const m = ctx;
-    uint16_t bankstart = addr & (m->bankcount == 2 ? Mask32k : Mask16k);
-    const size_t prgspace = (CpuRomMaxAddr + 1) - addr,
-                 maxcount = count > prgspace ? prgspace : count,
-                 bankleft = DChunk - bankstart;
-    size_t bytescopy = count > bankleft ? bankleft : count;
-    ptrdiff_t bytesleft = maxcount;
-    do {
-        memcpy(dest, m->base.prg + bankstart, bytescopy * sizeof *dest);
-        // NOTE: first memcpy block may be offset from start of bank; any
-        // additional blocks start at 0 due to mirroring-wraparound.
-        bankstart = 0;
-        bytesleft -= bytescopy;
-        dest += bytescopy;
-        bytescopy = bytesleft > (ptrdiff_t)DChunk ? DChunk : bytesleft;
-    } while (bytesleft > 0);
-    // NOTE: if we went negative our math is wrong
-    assert(bytesleft == 0);
-    return maxcount;
+    if (m->bankcount == 2) {
+        return bytescopy_bank(m->base.prg, BITWIDTH_32KB, addr, count, dest);
+    }
+    return bytecopy_bankmirrored(m->base.prg, BITWIDTH_16KB, addr,
+                                 BITWIDTH_64KB, count, dest);
 }
 
 static size_t ines_000_prgbank(const struct mapper *self, size_t i,
@@ -235,7 +221,7 @@ int mapper_raw_create(struct mapper **m, FILE *f)
     };
 
     // TODO: assume a 32KB ROM file (can i do mirroring later?)
-    const int err = load_chunks(&self->rom, 2 * DChunk, f);
+    const int err = load_chunks(&self->rom, QChunk, f);
     if (err == 0) {
         *m = (struct mapper *)self;
         return 0;

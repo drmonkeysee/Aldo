@@ -43,31 +43,8 @@ static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
 static size_t ram_dma(const void *restrict ctx, uint16_t addr,
                       uint8_t *restrict dest, size_t count)
 {
-    uint16_t bankstart = addr & CpuRamAddrMask;
-    const size_t ramspace = (CpuRamMaxAddr + 1) - addr,
-                 maxcount = count > ramspace ? ramspace : count,
-                 bankleft = NES_RAM_SIZE - bankstart;
-    const uint8_t *ram = ctx;
-    size_t bytescopy = maxcount > bankleft ? bankleft : maxcount;
-    ptrdiff_t bytesleft = maxcount;
-    // NOTE: 2KB bank in 8KB space means DMA needs to:
-    // 1) start copy from some offset within the 2KB bank (or a bank mirror)
-    // 2) wraparound if DMA crosses bank boundary within address space
-    // 3) stop copy at end of address window
-    do {
-        memcpy(dest, ram + bankstart, bytescopy * sizeof *dest);
-        // NOTE: first memcpy block may be offset from start of bank; any
-        // additional blocks start at 0 due to mirroring-wraparound.
-        bankstart = 0;
-        bytesleft -= bytescopy;
-        dest += bytescopy;
-        bytescopy = bytesleft > (ptrdiff_t)NES_RAM_SIZE
-                    ? NES_RAM_SIZE
-                    : bytesleft;
-    } while (bytesleft > 0);
-    // NOTE: if we went negative our math is wrong
-    assert(bytesleft == 0);
-    return maxcount;
+    return bytecopy_bankmirrored(ctx, BITWIDTH_2KB, addr, BITWIDTH_8KB, count,
+                                 dest);
 }
 
 static void create_cpubus(struct nes_console *self)

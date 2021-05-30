@@ -233,7 +233,6 @@ static void emu_loop(struct control *appstate, cart *c)
     console = NULL;
     snapshot.mem.prglength = 0;
     snapshot.mem.ram = NULL;
-    snapshot.cart.formatname = NULL;
 }
 
 //

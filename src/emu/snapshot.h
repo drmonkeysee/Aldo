@@ -29,7 +29,7 @@ enum nistate {
 
 struct console_state {
     struct {
-        const char *formatname;
+        char formatdesc[21];
     } cart;
     struct {
         size_t prglength;       // Number of bytes copied to prgview

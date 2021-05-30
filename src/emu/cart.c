@@ -143,6 +143,11 @@ static void hr(FILE *f)
     fprintf(f, "-----------------------\n");
 }
 
+static const char *boolstr(bool value)
+{
+    return value ? "yes" : "no";
+}
+
 static void write_ines_info(const struct cartridge *self, FILE *f,
                             bool verbose)
 {
@@ -186,18 +191,21 @@ static void write_ines_info(const struct cartridge *self, FILE *f,
             fprintf(f, "%sno\n", chrramlbl);
         }
     }
-    fprintf(f, "NT Mirroring\t: %s%s\n", mirror_name(self->ines_hdr.mirror),
-            self->ines_hdr.mapper_controlled ? " (Mapper-Controlled)" : "");
+    fprintf(f, "NT-Mirroring\t: %s\n", mirror_name(self->ines_hdr.mirror));
+    if (verbose || self->ines_hdr.mapper_controlled) {
+        fprintf(f, "Mapper-Ctrl\t: %s\n",
+                boolstr(self->ines_hdr.mapper_controlled));
+    }
 
     if (verbose) {
         hr(f);
     }
     if (verbose || self->ines_hdr.trainer) {
-        fprintf(f, "Trainer\t\t: %s\n", self->ines_hdr.trainer ? "yes" : "no");
+        fprintf(f, "Trainer\t\t: %s\n", boolstr(self->ines_hdr.trainer));
     }
     if (verbose || self->ines_hdr.bus_conflicts) {
         fprintf(f, "Bus Conflicts\t: %s\n",
-                self->ines_hdr.bus_conflicts ? "yes" : "no");
+                boolstr(self->ines_hdr.bus_conflicts));
     }
 }
 
@@ -327,5 +335,13 @@ void cart_snapshot(cart *self, struct console_state *snapshot)
     assert(self != NULL);
     assert(self->mapper != NULL);
 
-    snapshot->cart.formatname = format_name(self->format);
+    const int len = snprintf(snapshot->cart.formatdesc,
+                             sizeof snapshot->cart.formatdesc, "%s",
+                             format_name(self->format));
+    if (len < 0) return;
+    if (self->format == CRTF_INES) {
+        snprintf(snapshot->cart.formatdesc + len,
+                 sizeof snapshot->cart.formatdesc - len, " (%03d)",
+                 self->ines_hdr.mapper_id);
+    }
 }

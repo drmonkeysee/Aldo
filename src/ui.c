@@ -214,7 +214,7 @@ static void drawcart(const struct control *appstate,
     wprintw(CartView.content, "%.*s%s", longname ? maxwidth - 1 : namelen, cn,
             longname ? "\u2026" : "");
     mvwprintw(CartView.content, ++cursor_y, 0, "Format: %s",
-              snapshot->cart.formatname);
+              snapshot->cart.formatdesc);
 }
 
 static void drawinstructions(uint16_t addr, int h, int y,

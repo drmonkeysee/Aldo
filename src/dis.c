@@ -142,7 +142,7 @@ static void print_prg_line(const char *restrict dis, uint32_t curr_bytes,
 
 static int print_bank(const struct bankview *bv, bool verbose)
 {
-    printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> 10);
+    printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
     puts("--------");
 
     int bytes_read = 0;

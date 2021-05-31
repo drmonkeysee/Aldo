@@ -43,12 +43,15 @@ size_t bytecopy_bankmirrored(const uint8_t *restrict bankmem, int bankwidth,
     assert(dest != NULL);
     assert(BITWIDTH_1KB <= bankwidth && bankwidth <= BITWIDTH_64KB);
     assert(BITWIDTH_1KB <= addrwidth && addrwidth <= BITWIDTH_64KB);
+    assert(bankwidth < addrwidth);
 
     const size_t banksize = 1 << bankwidth,
                  addrspace = 1 << addrwidth;
     // NOTE: addr -> index is always mask(banksize - 1)
     // iff banksize is a power of 2
     uint16_t bankstart = addr & (banksize - 1);
+
+    assert(addrspace > addr);
     const size_t spaceleft = addrspace - addr,
                  maxcount = count > spaceleft ? spaceleft : count,
                  bankleft = banksize - bankstart;
@@ -67,6 +70,7 @@ size_t bytecopy_bankmirrored(const uint8_t *restrict bankmem, int bankwidth,
         dest += bytescopy;
         bytescopy = bytesleft > (ptrdiff_t)banksize ? banksize : bytesleft;
     } while (bytesleft > 0);
+
     // NOTE: if we went negative our math is wrong
     assert(bytesleft == 0);
     return maxcount;

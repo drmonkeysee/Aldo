@@ -13,12 +13,12 @@
 // Bit Width Constants
 enum {
     BITWIDTH_1KB = 10,
-    BITWIDTH_2KB = 11,
-    BITWIDTH_4KB = 12,
-    BITWIDTH_8KB = 13,
-    BITWIDTH_16KB = 14,
-    BITWIDTH_32KB = 15,
-    BITWIDTH_64KB = 16,
+    BITWIDTH_2KB,
+    BITWIDTH_4KB,
+    BITWIDTH_8KB,
+    BITWIDTH_16KB,
+    BITWIDTH_32KB,
+    BITWIDTH_64KB,
 };
 
 // CPU Memory Map

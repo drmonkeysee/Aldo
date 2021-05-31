@@ -152,7 +152,7 @@ static int print_bank(const struct bankview *bv, bool verbose)
     char dis[DIS_INST_SIZE];
     for (size_t total = 0; total < bv->size; total += bytes_read) {
         // TODO: how to pick correct start address?
-        const uint16_t addr = CpuRomMinAddr + total;
+        const uint16_t addr = MEMBLOCK_32KB + total;
         const uint8_t *const prgoffset = bv->mem + total;
         bytes_read = dis_inst(addr, prgoffset, bv->size - total, dis);
         if (bytes_read == 0) break;

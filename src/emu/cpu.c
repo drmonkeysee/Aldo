@@ -166,9 +166,9 @@ static bool service_interrupt(struct mos6502 *self)
 
 static uint16_t interrupt_vector(struct mos6502 *self)
 {
-    if (self->res == NIS_COMMITTED) return ResetVector;
-    if (self->nmi == NIS_COMMITTED) return NmiVector;
-    return IrqVector;
+    if (self->res == NIS_COMMITTED) return CPU_VECTOR_RES;
+    if (self->nmi == NIS_COMMITTED) return CPU_VECTOR_NMI;
+    return CPU_VECTOR_IRQ;
 }
 
 // NOTE: res takes effect after two cycles and immediately resets/halts

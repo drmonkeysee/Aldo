@@ -140,7 +140,7 @@ size_t bus_dma(bus *self, uint16_t addr, size_t count,
 {
     assert(self != NULL);
     assert(dest != NULL);
-    assert(count <= CpuRomMaxAddr);
+    assert(count < MEMBLOCK_64KB);
 
     if (addr > self->maxaddr || count == 0) return 0;
 

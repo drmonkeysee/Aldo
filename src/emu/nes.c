@@ -24,19 +24,19 @@ struct nes_console {
     cart *cart;                 // Game Cartridge; Non-owning Pointer
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
     enum nexcmode mode;         // NES execution mode
-    uint8_t ram[NES_RAM_SIZE];  // CPU Internal RAM
+    uint8_t ram[MEMBLOCK_2KB];  // CPU Internal RAM
 };
 
 static bool ram_read(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)
 {
-    *d = ((const uint8_t *)ctx)[addr & CpuRamAddrMask];
+    *d = ((const uint8_t *)ctx)[addr & ADDRMASK_2KB];
     return true;
 }
 
 static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    ((uint8_t *)ctx)[addr & CpuRamAddrMask] = d;
+    ((uint8_t *)ctx)[addr & ADDRMASK_2KB] = d;
     return true;
 }
 
@@ -50,15 +50,15 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
 static void create_cpubus(struct nes_console *self)
 {
     // TODO: 3 partitions only for now, 8KB ram, 32KB rom, nothing in between
-    self->cpu.bus = bus_new(16, 3, CpuRamMaxAddr + 1, CpuRomMinAddr);
+    self->cpu.bus = bus_new(16, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
     bus_set(self->cpu.bus, 0,
             (struct busdevice){ram_read, ram_write, ram_dma, self->ram});
-    cart_cpu_connect(self->cart, self->cpu.bus, CpuRomMinAddr);
+    cart_cpu_connect(self->cart, self->cpu.bus, MEMBLOCK_32KB);
 }
 
 static void free_cpubus(struct nes_console *self)
 {
-    cart_cpu_disconnect(self->cart, self->cpu.bus, CpuRomMinAddr);
+    cart_cpu_disconnect(self->cart, self->cpu.bus, MEMBLOCK_32KB);
     bus_free(self->cpu.bus);
     self->cpu.bus = NULL;
 }
@@ -197,7 +197,7 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
                                       sizeof snapshot->mem.prgview
                                       / sizeof snapshot->mem.prgview[0],
                                       snapshot->mem.prgview);
-    bus_dma(self->cpu.bus, NmiVector,
+    bus_dma(self->cpu.bus, CPU_VECTOR_NMI,
             sizeof snapshot->mem.vectors / sizeof snapshot->mem.vectors[0],
             snapshot->mem.vectors);
 }

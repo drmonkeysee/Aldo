@@ -240,17 +240,17 @@ static void drawvecs(int h, int w, int y, const struct console_state *snapshot)
     uint8_t lo = snapshot->mem.vectors[0],
             hi = snapshot->mem.vectors[1];
     mvwprintw(PrgView.content, h - y--, 0, "$%04X: %02X %02X       NMI $%04X",
-              NmiVector, lo, hi, bytowr(lo, hi));
+              CPU_VECTOR_NMI, lo, hi, bytowr(lo, hi));
 
     lo = snapshot->mem.vectors[2];
     hi = snapshot->mem.vectors[3];
     mvwprintw(PrgView.content, h - y--, 0, "$%04X: %02X %02X       RES $%04X",
-              ResetVector, lo, hi, bytowr(lo, hi));
+              CPU_VECTOR_RES, lo, hi, bytowr(lo, hi));
 
     lo = snapshot->mem.vectors[4];
     hi = snapshot->mem.vectors[5];
     mvwprintw(PrgView.content, h - y, 0, "$%04X: %02X %02X       IRQ $%04X",
-              IrqVector, lo, hi, bytowr(lo, hi));
+              CPU_VECTOR_IRQ, lo, hi, bytowr(lo, hi));
 }
 
 static void drawprg(const struct console_state *snapshot)

@@ -67,7 +67,7 @@ static bool raw_read(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)
 {
     // TODO: will raw ever ask for < $8000?
-    if (addr < CpuRomMinAddr) return false;
+    if (addr < MEMBLOCK_32KB) return false;
     *d = ((const uint8_t *)ctx)[addr & Mask32KB];
     return true;
 }
@@ -76,7 +76,7 @@ static size_t raw_dma(const void *restrict ctx, uint16_t addr, size_t count,
                       uint8_t dest[restrict count])
 {
     // TODO: will raw ever ask for < $8000?
-    if (addr < CpuRomMinAddr) return 0;
+    if (addr < MEMBLOCK_32KB) return 0;
     return bytescopy_bank(ctx, BITWIDTH_32KB, addr, count, dest);
 }
 
@@ -101,7 +101,7 @@ static size_t raw_prgbank(const struct mapper *self, size_t i,
     }
 
     *mem = ((const struct raw_mapper *)self)->rom;
-    return NES_ROM_SIZE;
+    return MEMBLOCK_32KB;
 }
 
 static bool raw_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
@@ -154,7 +154,7 @@ static bool ines_000_read(const void *restrict ctx, uint16_t addr,
                           uint8_t *restrict d)
 {
     // TODO: no wram support, did 000 ever have wram?
-    if (addr < CpuRomMinAddr) return false;
+    if (addr < MEMBLOCK_32KB) return false;
     const struct ines_000_mapper *const m = ctx;
     const uint16_t mask = m->bankcount == 2 ? Mask32KB : Mask16KB;
     *d = m->base.prg[addr & mask];
@@ -165,7 +165,7 @@ static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
                            size_t count, uint8_t dest[restrict count])
 {
     // TODO: no wram support, did 000 ever have wram?
-    if (addr < CpuRomMinAddr) return 0;
+    if (addr < MEMBLOCK_32KB) return 0;
     const struct ines_000_mapper *const m = ctx;
     if (m->bankcount == 2) {
         return bytescopy_bank(m->base.prg, BITWIDTH_32KB, addr, count, dest);

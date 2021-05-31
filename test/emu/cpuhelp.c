@@ -15,12 +15,12 @@
 static bool TestRead(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)
 {
-    if (addr <= CpuRamMaxAddr) {
-        *d = ((const uint8_t *)ctx)[addr & CpuRamAddrMask];
+    if (addr < MEMBLOCK_8KB) {
+        *d = ((const uint8_t *)ctx)[addr & ADDRMASK_2KB];
         return true;
     }
-    if (CpuRomMinAddr <= addr && addr <= CpuRomMaxAddr) {
-        *d = ((const uint8_t *)ctx)[addr & CpuRomAddrMask];
+    if (MEMBLOCK_32KB <= addr && addr <= ADDRMASK_64KB) {
+        *d = ((const uint8_t *)ctx)[addr & ADDRMASK_32KB];
         return true;
     }
     return false;
@@ -28,8 +28,8 @@ static bool TestRead(const void *restrict ctx, uint16_t addr,
 
 static bool TestWrite(void *ctx, uint16_t addr, uint8_t d)
 {
-    if (addr <= CpuRamMaxAddr) {
-        ((uint8_t *)ctx)[addr & CpuRamAddrMask] = d;
+    if (addr < MEMBLOCK_8KB) {
+        ((uint8_t *)ctx)[addr & ADDRMASK_2KB] = d;
         return true;
     }
     return false;
@@ -47,7 +47,7 @@ uint8_t bigrom[] = {
 
 void setup_testbus(void)
 {
-    TestBus = bus_new(16, 3, CpuRamMaxAddr + 1, CpuRomMinAddr);
+    TestBus = bus_new(16, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
 }
 
 void teardown_testbus(void)
@@ -69,7 +69,7 @@ void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
     }
     if (rom) {
         Rom.ctx = rom;
-        bus_set(TestBus, CpuRomMinAddr, Rom);
+        bus_set(TestBus, MEMBLOCK_32KB, Rom);
     }
 }
 

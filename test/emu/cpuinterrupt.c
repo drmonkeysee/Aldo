@@ -20,13 +20,13 @@
 static void interrupt_handler_setup(void **ctx)
 {
     // NOTE: 32k rom, starting at $8000, for interrupt vectors
-    uint8_t *const rom = calloc(0x8000, sizeof(uint8_t));
-    rom[IrqVector & CpuRomAddrMask] = 0xaa;
-    rom[(IrqVector + 1) & CpuRomAddrMask] = 0xbb;
-    rom[NmiVector & CpuRomAddrMask] = 0x77;
-    rom[(NmiVector + 1) & CpuRomAddrMask] = 0x99;
-    rom[ResetVector & CpuRomAddrMask] = 0x22;
-    rom[(ResetVector + 1) & CpuRomAddrMask] = 0x88;
+    uint8_t *const rom = calloc(MEMBLOCK_32KB, sizeof(uint8_t));
+    rom[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xaa;
+    rom[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0xbb;
+    rom[CPU_VECTOR_NMI & ADDRMASK_32KB] = 0x77;
+    rom[(CPU_VECTOR_NMI + 1) & ADDRMASK_32KB] = 0x99;
+    rom[CPU_VECTOR_RES & ADDRMASK_32KB] = 0x22;
+    rom[(CPU_VECTOR_RES + 1) & ADDRMASK_32KB] = 0x88;
     *ctx = rom;
 }
 
@@ -210,8 +210,8 @@ static void rti_set_irq_mask(void *ctx)
 // and PC advanced past BRK instruction.
 static void brk_masks_irq(void *ctx)
 {
-    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0x0, 0xff, 0xff, [250] = 0xea, [511] = 0xff};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -289,8 +289,8 @@ static void irq_ghost(void *ctx)
 static void nmi_line_never_cleared(void *ctx)
 {
     // NOTE: LDA $0004 (0x20)
-    ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_NMI & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_NMI + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -365,8 +365,8 @@ static void nmi_hijacks_brk(void *ctx)
 // after first instruction of BRK handler.
 static void nmi_delayed_by_brk(void *ctx)
 {
-    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0x0, 0xff, 0xff, [250] = 0xea, [511] = 0xff};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -405,8 +405,8 @@ static void nmi_delayed_by_brk(void *ctx)
 // after first instruction of BRK handler.
 static void nmi_late_delayed_by_brk(void *ctx)
 {
-    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0x0, 0xff, 0xff, [250] = 0xea, [511] = 0xff};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -442,8 +442,8 @@ static void nmi_late_delayed_by_brk(void *ctx)
 // instruction, losing the NMI.
 static void nmi_lost_during_brk(void *ctx)
 {
-    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0x0, 0xff, 0xff, [250] = 0xea, [511] = 0xff};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -482,8 +482,8 @@ static void nmi_lost_during_brk(void *ctx)
 static void nmi_hijacks_irq(void *ctx)
 {
     // NOTE: LDA $0004 (0x20)
-    ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_NMI & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_NMI + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -535,8 +535,8 @@ static void nmi_hijacks_irq(void *ctx)
 static void nmi_hijacks_and_loses_irq(void *ctx)
 {
     // NOTE: LDA $0004 (0x20)
-    ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_NMI & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_NMI + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -588,8 +588,8 @@ static void nmi_hijacks_and_loses_irq(void *ctx)
 // after first instruction of IRQ handler.
 static void nmi_delayed_by_irq(void *ctx)
 {
-    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -637,8 +637,8 @@ static void nmi_delayed_by_irq(void *ctx)
 // after first instruction of IRQ handler.
 static void nmi_late_delayed_by_irq(void *ctx)
 {
-    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -683,8 +683,8 @@ static void nmi_late_delayed_by_irq(void *ctx)
 // instruction, losing the NMI.
 static void nmi_lost_during_irq(void *ctx)
 {
-    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -738,8 +738,8 @@ static void nmi_lost_during_irq(void *ctx)
 // NOTE: set RES on T4 prevents IRQ from finishing
 static void res_hijacks_irq(void *ctx)
 {
-    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -796,8 +796,8 @@ static void res_hijacks_irq(void *ctx)
 // NOTE: set RES on T5 triggers RES sequence immediately after IRQ sequence
 static void res_following_irq(void *ctx)
 {
-    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {
         0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
     };
@@ -853,8 +853,8 @@ static void res_following_irq(void *ctx)
 // NOTE: set RES on T6 still triggers reset immediately after IRQ sequence
 static void res_late_on_irq(void *ctx)
 {
-    ((uint8_t *)ctx)[IrqVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(IrqVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {
         0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
     };
@@ -906,8 +906,8 @@ static void res_late_on_irq(void *ctx)
 // NOTE: set RES on T4 prevents NMI from finishing
 static void res_hijacks_nmi(void *ctx)
 {
-    ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_NMI & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_NMI + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -963,8 +963,8 @@ static void res_hijacks_nmi(void *ctx)
 // NOTE: set RES on T5 triggers RES sequence immediately after NMI sequence
 static void res_following_nmi(void *ctx)
 {
-    ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_NMI & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_NMI + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {
         0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
     };
@@ -1019,8 +1019,8 @@ static void res_following_nmi(void *ctx)
 // NOTE: set RES on T6 still triggers reset immediately after NMI sequence
 static void res_late_on_nmi(void *ctx)
 {
-    ((uint8_t *)ctx)[NmiVector & CpuRomAddrMask] = 0xfa;
-    ((uint8_t *)ctx)[(NmiVector + 1) & CpuRomAddrMask] = 0x0;
+    ((uint8_t *)ctx)[CPU_VECTOR_NMI & ADDRMASK_32KB] = 0xfa;
+    ((uint8_t *)ctx)[(CPU_VECTOR_NMI + 1) & ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {
         0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, 0xea, 0xea, [511] = 0xff,
     };

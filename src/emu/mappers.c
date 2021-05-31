@@ -13,17 +13,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// NOTE: cart file data is packed into 8 or 16 KB chunks;
-// banks are treated in various combinations of 1, 2, 4, 8, 16, 32 KB chunks.
-// TODO: get rid of these or move them to traits?
-static const size_t Chunk = 0x2000,
-                    DChunk = Chunk * 2,
-                    QChunk = Chunk * 4;
-// NOTE: address masks to convert to properly-sized bank indices
-// TODO: get rid of these or move them to traits?
-static const uint16_t Mask16KB = DChunk - 1,
-                      Mask32KB = QChunk - 1;
-
 struct raw_mapper {
     struct mapper vtable;
     uint8_t *rom;
@@ -67,7 +56,7 @@ static bool raw_read(const void *restrict ctx, uint16_t addr,
 {
     // TODO: will raw ever ask for < $8000?
     if (addr < MEMBLOCK_32KB) return false;
-    *d = ((const uint8_t *)ctx)[addr & Mask32KB];
+    *d = ((const uint8_t *)ctx)[addr & ADDRMASK_32KB];
     return true;
 }
 
@@ -155,7 +144,7 @@ static bool ines_000_read(const void *restrict ctx, uint16_t addr,
     // TODO: no wram support, did 000 ever have wram?
     if (addr < MEMBLOCK_32KB) return false;
     const struct ines_000_mapper *const m = ctx;
-    const uint16_t mask = m->bankcount == 2 ? Mask32KB : Mask16KB;
+    const uint16_t mask = m->bankcount == 2 ? ADDRMASK_32KB : ADDRMASK_16KB;
     *d = m->base.prg[addr & mask];
     return true;
 }
@@ -187,8 +176,8 @@ static size_t ines_000_prgbank(const struct mapper *self, size_t i,
         return 0;
     }
 
-    *mem = m->base.prg + (i * DChunk);
-    return DChunk;
+    *mem = m->base.prg + (i * MEMBLOCK_16KB);
+    return MEMBLOCK_16KB;
 }
 
 static bool ines_000_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
@@ -220,7 +209,7 @@ int mapper_raw_create(struct mapper **m, FILE *f)
     };
 
     // TODO: assume a 32KB ROM file (can i do mirroring later?)
-    const int err = load_chunks(&self->rom, QChunk, f);
+    const int err = load_chunks(&self->rom, MEMBLOCK_32KB, f);
     if (err == 0) {
         *m = (struct mapper *)self;
         return 0;
@@ -279,17 +268,17 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     if (header->wram) {
         const size_t sz = (header->wram_chunks == 0
                            ? 1
-                           : header->wram_chunks) * Chunk;
+                           : header->wram_chunks) * MEMBLOCK_8KB;
         self->wram = calloc(sz, sizeof *self->wram);
     }
 
-    err = load_chunks(&self->prg, header->prg_chunks * DChunk, f);
+    err = load_chunks(&self->prg, header->prg_chunks * MEMBLOCK_16KB, f);
     if (err != 0) return err;
 
     if (header->chr_chunks == 0) {
-        self->chr = calloc(Chunk, sizeof *self->chr);
+        self->chr = calloc(MEMBLOCK_8KB, sizeof *self->chr);
     } else {
-        err = load_chunks(&self->chr, header->chr_chunks * Chunk, f);
+        err = load_chunks(&self->chr, header->chr_chunks * MEMBLOCK_8KB, f);
     }
 
     if (err == 0) {

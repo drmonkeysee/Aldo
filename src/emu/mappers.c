@@ -24,7 +24,7 @@ struct ines_mapper {
 };
 
 struct ines_000_mapper {
-    struct ines_mapper base;
+    struct ines_mapper super;
     size_t bankcount;
 };
 
@@ -145,7 +145,7 @@ static bool ines_000_read(const void *restrict ctx, uint16_t addr,
     if (addr < MEMBLOCK_32KB) return false;
     const struct ines_000_mapper *const m = ctx;
     const uint16_t mask = m->bankcount == 2 ? ADDRMASK_32KB : ADDRMASK_16KB;
-    *d = m->base.prg[addr & mask];
+    *d = m->super.prg[addr & mask];
     return true;
 }
 
@@ -156,9 +156,9 @@ static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
     if (addr < MEMBLOCK_32KB) return 0;
     const struct ines_000_mapper *const m = ctx;
     if (m->bankcount == 2) {
-        return bytescopy_bank(m->base.prg, BITWIDTH_32KB, addr, count, dest);
+        return bytescopy_bank(m->super.prg, BITWIDTH_32KB, addr, count, dest);
     }
-    return bytecopy_bankmirrored(m->base.prg, BITWIDTH_16KB, addr,
+    return bytecopy_bankmirrored(m->super.prg, BITWIDTH_16KB, addr,
                                  BITWIDTH_64KB, count, dest);
 }
 
@@ -176,7 +176,7 @@ static size_t ines_000_prgbank(const struct mapper *self, size_t i,
         return 0;
     }
 
-    *mem = m->base.prg + (i * MEMBLOCK_16KB);
+    *mem = m->super.prg + (i * MEMBLOCK_16KB);
     return MEMBLOCK_16KB;
 }
 

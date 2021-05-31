@@ -8,8 +8,6 @@
 #ifndef Aldo_emu_traits_h
 #define Aldo_emu_traits_h
 
-#include <stdint.h>
-
 // Memory-related Constants
 enum {
     BITWIDTH_1KB = 10,

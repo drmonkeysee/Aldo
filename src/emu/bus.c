@@ -7,7 +7,7 @@
 
 #include "bus.h"
 
-#include "traits.h"
+#include "bytes.h"
 
 #include <assert.h>
 #include <stdarg.h>

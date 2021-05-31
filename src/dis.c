@@ -9,7 +9,6 @@
 
 #include "emu/bytes.h"
 #include "emu/decode.h"
-#include "emu/traits.h"
 
 #include <assert.h>
 #include <stdio.h>

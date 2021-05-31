@@ -9,7 +9,6 @@
 
 #include "dis.h"
 #include "emu/bytes.h"
-#include "emu/traits.h"
 
 #include <ncurses.h>
 #include <panel.h>

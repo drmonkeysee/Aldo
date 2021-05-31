@@ -9,8 +9,8 @@
 
 #include "ciny.h"
 #include "emu/bus.h"
+#include "emu/bytes.h"
 #include "emu/snapshot.h"
-#include "emu/traits.h"
 
 static bool TestRead(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)

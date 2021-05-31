@@ -7,8 +7,6 @@
 
 #include "bytes.h"
 
-#include "traits.h"
-
 #include <assert.h>
 #include <string.h>
 

@@ -14,6 +14,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// Helpful CPU constants
+extern const int MaxCycleCount;
+
 // The MOS6502 processor is a little-endian
 // 8-bit CPU with a 16-bit addressing space.
 struct mos6502 {

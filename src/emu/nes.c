@@ -10,7 +10,6 @@
 #include "bus.h"
 #include "bytes.h"
 #include "cpu.h"
-#include "traits.h"
 
 #include <assert.h>
 #include <stddef.h>

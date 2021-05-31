@@ -8,7 +8,6 @@
 #include "mappers.h"
 
 #include "bytes.h"
-#include "traits.h"
 
 #include <assert.h>
 #include <stdlib.h>

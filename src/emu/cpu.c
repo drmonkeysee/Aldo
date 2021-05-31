@@ -9,10 +9,11 @@
 
 #include "bytes.h"
 #include "decode.h"
-#include "traits.h"
 
 #include <assert.h>
 #include <stddef.h>
+
+const int MaxCycleCount = 7;
 
 // NOTE: sentinel value for cycle count denoting an imminent opcode fetch
 static const int PreFetch = -1;

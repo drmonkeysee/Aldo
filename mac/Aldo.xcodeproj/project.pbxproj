@@ -29,7 +29,6 @@
 		C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* aldo.c */; };
 		C820E6D125A97E3B006A7AB1 /* nes.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6D025A97E3B006A7AB1 /* nes.c */; };
 		C820E6E025A98557006A7AB1 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C820E6DE25A982A5006A7AB1 /* libncurses.tbd */; };
-		C8236C2725BA80F900B18301 /* traits.c in Sources */ = {isa = PBXBuildFile; fileRef = C8236C2625BA80F900B18301 /* traits.c */; };
 		C82FBFD92616B94700E6BB08 /* cpustack.c in Sources */ = {isa = PBXBuildFile; fileRef = C82FBFD82616B94700E6BB08 /* cpustack.c */; };
 		C83042BC25CFC89500D6B623 /* bytes.c in Sources */ = {isa = PBXBuildFile; fileRef = C83042BB25CFC89500D6B623 /* bytes.c */; };
 		C837FB7126606A5300E84F18 /* cart.c in Sources */ = {isa = PBXBuildFile; fileRef = C8F81EDC263E336D0086272D /* cart.c */; };
@@ -46,7 +45,6 @@
 		C8F81EDD263E336D0086272D /* cart.c in Sources */ = {isa = PBXBuildFile; fileRef = C8F81EDC263E336D0086272D /* cart.c */; };
 		C8FD257125EB38DF0043F6E6 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C8FD257025EB38DF0043F6E6 /* cpu.c */; };
 		C8FD257425EB39AF0043F6E6 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C84B6C2125B2BAF300FCCD88 /* cpu.c */; };
-		C8FD257D25EB3B050043F6E6 /* traits.c in Sources */ = {isa = PBXBuildFile; fileRef = C8236C2625BA80F900B18301 /* traits.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -92,14 +90,12 @@
 		C820E6D025A97E3B006A7AB1 /* nes.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nes.c; sourceTree = "<group>"; };
 		C820E6D325A97FB5006A7AB1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		C820E6DE25A982A5006A7AB1 /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
-		C8236C2625BA80F900B18301 /* traits.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = traits.c; sourceTree = "<group>"; };
 		C82FBFD82616B94700E6BB08 /* cpustack.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpustack.c; sourceTree = "<group>"; };
 		C83042BA25CFC89500D6B623 /* bytes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bytes.h; sourceTree = "<group>"; };
 		C83042BB25CFC89500D6B623 /* bytes.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bytes.c; sourceTree = "<group>"; };
 		C842F17C25B404410004E807 /* snapshot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = snapshot.h; sourceTree = "<group>"; };
 		C84B6C2025B2BAF300FCCD88 /* cpu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpu.h; sourceTree = "<group>"; };
 		C84B6C2125B2BAF300FCCD88 /* cpu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpu.c; sourceTree = "<group>"; };
-		C84B6C2525B2C62000FCCD88 /* traits.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = traits.h; sourceTree = "<group>"; };
 		C8557B2D25C661660090296D /* ui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ui.h; sourceTree = "<group>"; };
 		C8557B2E25C661660090296D /* ui.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ui.c; sourceTree = "<group>"; };
 		C85C8DC425BD29AC00611D19 /* dis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dis.h; sourceTree = "<group>"; };
@@ -212,8 +208,6 @@
 				C820E6CF25A97E3B006A7AB1 /* nes.h */,
 				C820E6D025A97E3B006A7AB1 /* nes.c */,
 				C842F17C25B404410004E807 /* snapshot.h */,
-				C84B6C2525B2C62000FCCD88 /* traits.h */,
-				C8236C2625BA80F900B18301 /* traits.c */,
 			);
 			path = emu;
 			sourceTree = "<group>";
@@ -352,7 +346,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8126A112650EE4500D80B91 /* bus.c in Sources */,
-				C8FD257D25EB3B050043F6E6 /* traits.c in Sources */,
 				C8FD257125EB38DF0043F6E6 /* cpu.c in Sources */,
 				C807C95325F5877000A791B5 /* cpuimmediate.c in Sources */,
 				C837FB7126606A5300E84F18 /* cart.c in Sources */,
@@ -384,7 +377,6 @@
 			files = (
 				C820E6D125A97E3B006A7AB1 /* nes.c in Sources */,
 				C8126A0E2650E98E00D80B91 /* bus.c in Sources */,
-				C8236C2725BA80F900B18301 /* traits.c in Sources */,
 				C820E6C025A9759A006A7AB1 /* main.swift in Sources */,
 				C8B02D012659D7CA00C7C97C /* mappers.c in Sources */,
 				C81A516D25DA036100361E40 /* control.c in Sources */,

@@ -13,8 +13,6 @@
 #include <assert.h>
 #include <stddef.h>
 
-const int MaxCycleCount = 7;
-
 // NOTE: sentinel value for cycle count denoting an imminent opcode fetch
 static const int PreFetch = -1;
 
@@ -1276,6 +1274,8 @@ static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
 //
 // Public Interface
 //
+
+const int MaxCycleCount = 7;
 
 void cpu_powerup(struct mos6502 *self)
 {

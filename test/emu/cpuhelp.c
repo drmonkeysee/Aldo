@@ -12,6 +12,8 @@
 #include "emu/bytes.h"
 #include "emu/snapshot.h"
 
+#include <stdbool.h>
+
 static bool TestRead(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)
 {

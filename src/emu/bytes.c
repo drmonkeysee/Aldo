@@ -45,11 +45,11 @@ size_t bytecopy_bankmirrored(const uint8_t *restrict bankmem, int bankwidth,
 
     const size_t banksize = 1 << bankwidth,
                  addrspace = 1 << addrwidth;
+    assert(addrspace > addr);
+
     // NOTE: addr -> index is always mask(banksize - 1)
     // iff banksize is a power of 2
     uint16_t bankstart = addr & (banksize - 1);
-
-    assert(addrspace > addr);
     const size_t spaceleft = addrspace - addr,
                  maxcount = count > spaceleft ? spaceleft : count,
                  bankleft = banksize - bankstart;

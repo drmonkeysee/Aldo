@@ -77,6 +77,7 @@ static void set_interrupt(struct nes_console *self, enum nes_interrupt signal,
         break;
     default:
         assert(((void)"INVALID NES INTERRUPT", false));
+        break;
     }
 }
 
@@ -169,6 +170,7 @@ int nes_cycle(nes *self, int cpubudget)
             break;
         default:
             assert(((void)"INVALID EXC MODE", false));
+            break;
         }
     }
     return cycles;

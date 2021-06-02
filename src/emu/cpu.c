@@ -761,6 +761,7 @@ static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 #undef X
     default:
         assert(((void)"BAD INSTRUCTION DISPATCH", false));
+        break;
     }
 }
 
@@ -807,6 +808,7 @@ static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -841,6 +843,7 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -905,6 +908,7 @@ static void ZP_sequence(struct mos6502 *self, struct decoded dec)
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -945,6 +949,7 @@ static void INDX_sequence(struct mos6502 *self, struct decoded dec)
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -977,6 +982,7 @@ static void INDY_sequence(struct mos6502 *self, struct decoded dec)
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -1004,6 +1010,7 @@ static void ABS_sequence(struct mos6502 *self, struct decoded dec)
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -1029,6 +1036,7 @@ static void PSH_sequence(struct mos6502 *self, struct decoded dec)
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -1047,6 +1055,7 @@ static void PLL_sequence(struct mos6502 *self, struct decoded dec)
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -1075,6 +1084,7 @@ static void BCH_sequence(struct mos6502 *self, struct decoded dec)
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -1102,6 +1112,7 @@ static void JSR_sequence(struct mos6502 *self, struct decoded dec)
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -1130,6 +1141,7 @@ static void RTS_sequence(struct mos6502 *self, struct decoded dec)
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -1148,6 +1160,7 @@ static void JABS_sequence(struct mos6502 *self, struct decoded dec)
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -1176,6 +1189,7 @@ static void JIND_sequence(struct mos6502 *self, struct decoded dec)
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -1213,6 +1227,7 @@ static void BRK_sequence(struct mos6502 *self, struct decoded dec)
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -1240,6 +1255,7 @@ static void RTI_sequence(struct mos6502 *self, struct decoded dec)
         break;
     default:
         BAD_ADDR_SEQ;
+        break;
     }
 }
 
@@ -1253,6 +1269,7 @@ static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
 #undef X
     default:
         assert(((void)"BAD ADDRMODE DISPATCH", false));
+        break;
     }
 }
 

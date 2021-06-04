@@ -198,17 +198,15 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE])
 {
     assert(bytes != NULL);
-    assert(bytesleft >= 0);
     assert(dis != NULL);
 
-    if (bytesleft == 0) return 0;
+    if (bytesleft <= 0) return 0;
 
     const struct decoded dec = Decode[*bytes];
     const int instlen = InstLens[dec.mode];
     if (bytesleft < instlen) return DIS_ERR_EOF;
 
-    int count;
-    unsigned int total;
+    int count, total;
     total = count = print_raw(addr, bytes, instlen, dis);
     if (count < 0) return count;
 
@@ -221,7 +219,7 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
     if (count < 0) return count;
     total += count;
 
-    assert(total < DIS_INST_SIZE);
+    assert((unsigned int)total < DIS_INST_SIZE);
     return instlen;
 }
 
@@ -235,8 +233,7 @@ int dis_datapath(const struct console_state *snapshot,
     const int instlen = InstLens[dec.mode];
     if ((size_t)instlen > snapshot->mem.prglength) return DIS_ERR_EOF;
 
-    int count;
-    unsigned int total;
+    int count, total;
     total = count = sprintf(dis, "%s ", Mnemonics[dec.instruction]);
     if (count < 0) return DIS_ERR_FMT_FAIL;
 
@@ -267,7 +264,7 @@ int dis_datapath(const struct console_state *snapshot,
     if (count < 0) return DIS_ERR_FMT_FAIL;
     total += count;
 
-    assert(total < DIS_DATAP_SIZE);
+    assert((unsigned int)total < DIS_DATAP_SIZE);
     return total;
 }
 

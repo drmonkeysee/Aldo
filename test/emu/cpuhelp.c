@@ -21,7 +21,7 @@ static bool TestRead(const void *restrict ctx, uint16_t addr,
         *d = ((const uint8_t *)ctx)[addr & ADDRMASK_2KB];
         return true;
     }
-    if (MEMBLOCK_32KB <= addr && addr <= ADDRMASK_64KB) {
+    if (MEMBLOCK_32KB <= addr) {
         *d = ((const uint8_t *)ctx)[addr & ADDRMASK_32KB];
         return true;
     }

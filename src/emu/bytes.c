@@ -66,7 +66,9 @@ size_t bytecopy_bankmirrored(const uint8_t *restrict bankmem, int bankwidth,
         bankstart = 0;
         bytesleft -= bytescopy;
         dest += bytescopy;
-        bytescopy = bytesleft > (ptrdiff_t)banksize ? banksize : bytesleft;
+        bytescopy = bytesleft > (ptrdiff_t)banksize
+                    ? banksize
+                    : (size_t)bytesleft;
     } while (bytesleft > 0);
 
     // NOTE: if we went negative our math is wrong

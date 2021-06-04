@@ -17,6 +17,7 @@ void setup_testbus(void),
      teardown_testbus(void);
 
 struct ct_testsuite bus_tests(void),
+                    bytes_tests(void),
                     cpu_tests(void),
                     cpu_absolute_tests(void),
                     cpu_branch_tests(void),
@@ -35,6 +36,7 @@ static size_t testrunner(int argc, char *argv[argc+1])
 {
     const struct ct_testsuite suites[] = {
         bus_tests(),
+        bytes_tests(),
         cpu_tests(),
         cpu_absolute_tests(),
         cpu_branch_tests(),

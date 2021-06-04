@@ -40,6 +40,7 @@
 		C88601EF26195B8100590A1B /* cpusubroutine.c in Sources */ = {isa = PBXBuildFile; fileRef = C88601EE26195B8100590A1B /* cpusubroutine.c */; };
 		C89E8AC9260ED5FE008395B6 /* cpubranch.c in Sources */ = {isa = PBXBuildFile; fileRef = C89E8AC8260ED5FE008395B6 /* cpubranch.c */; };
 		C8B02D012659D7CA00C7C97C /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B02D002659D7CA00C7C97C /* mappers.c */; };
+		C8BB97D22669E9B0005E6F5C /* bytes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8BB97D12669E9B0005E6F5C /* bytes.c */; };
 		C8C448072627D99D00ABBD5E /* cpuinterrupt.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C448062627D99D00ABBD5E /* cpuinterrupt.c */; };
 		C8C4B48D25ABBFB3006A98BB /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
 		C8F81EDD263E336D0086272D /* cart.c in Sources */ = {isa = PBXBuildFile; fileRef = C8F81EDC263E336D0086272D /* cart.c */; };
@@ -105,6 +106,7 @@
 		C89E8AC8260ED5FE008395B6 /* cpubranch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpubranch.c; sourceTree = "<group>"; };
 		C8B02CFF2659D7CA00C7C97C /* mappers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mappers.h; sourceTree = "<group>"; };
 		C8B02D002659D7CA00C7C97C /* mappers.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = mappers.c; sourceTree = "<group>"; };
+		C8BB97D12669E9B0005E6F5C /* bytes.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bytes.c; sourceTree = "<group>"; };
 		C8C448062627D99D00ABBD5E /* cpuinterrupt.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpuinterrupt.c; sourceTree = "<group>"; };
 		C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpanel.tbd; path = usr/lib/libpanel.tbd; sourceTree = SDKROOT; };
 		C8F81EDB263E336D0086272D /* cart.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cart.h; sourceTree = "<group>"; };
@@ -238,6 +240,7 @@
 			isa = PBXGroup;
 			children = (
 				C8126A0F2650E9BB00D80B91 /* bus.c */,
+				C8BB97D12669E9B0005E6F5C /* bytes.c */,
 				C8FD257025EB38DF0043F6E6 /* cpu.c */,
 				C807C95F25F5884B00A791B5 /* cpuabsolute.c */,
 				C89E8AC8260ED5FE008395B6 /* cpubranch.c */,
@@ -360,6 +363,7 @@
 				C807C94B25F585FB00A791B5 /* cpuhelp.c in Sources */,
 				C8184D5325E74B75002B3100 /* dis.c in Sources */,
 				C807C96025F5884B00A791B5 /* cpuabsolute.c in Sources */,
+				C8BB97D22669E9B0005E6F5C /* bytes.c in Sources */,
 				C8184D7725E753BB002B3100 /* main.c in Sources */,
 				C8FD257425EB39AF0043F6E6 /* cpu.c in Sources */,
 				C837FB7326606A5F00E84F18 /* mappers.c in Sources */,

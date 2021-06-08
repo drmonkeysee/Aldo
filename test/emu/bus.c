@@ -89,23 +89,6 @@ static void teardown(void **ctx)
     free(*ctx);
 }
 
-static void new_bus(void *ctx)
-{
-    bus *const b = ((struct test_context *)ctx)->b;
-
-    ct_assertequal(3u, bus_count(b));
-    ct_assertequal(0x3fu, bus_maxaddr(b));
-    uint16_t a;
-    ct_asserttrue(bus_pstart(b, 0, &a));
-    ct_assertequal(0x0u, a);
-    ct_asserttrue(bus_pstart(b, 1, &a));
-    ct_assertequal(0x10u, a);
-    ct_asserttrue(bus_pstart(b, 2, &a));
-    ct_assertequal(0x20u, a);
-    ct_assertfalse(bus_pstart(b, 3, &a));
-    ct_assertequal(0x20u, a);
-}
-
 static void empty_device(void *ctx)
 {
     bus *const b = ((struct test_context *)ctx)->b;
@@ -229,12 +212,8 @@ static void set_device_within_partition_bounds(void *ctx)
         .ctx = mem,
     };
     uint8_t d;
-    uint16_t a;
 
     ct_asserttrue(bus_set(b, 0x30, bd));
-    ct_asserttrue(bus_pstart(b, 2, &a));
-    ct_assertequal(0x20u, a);
-    ct_assertfalse(bus_pstart(b, 3, &a));
     ct_asserttrue(bus_read(b, 0x20, &d));
     ct_assertequal(0xffu, d);
 }
@@ -248,12 +227,8 @@ static void set_device_too_high(void *ctx)
         .ctx = mem,
     };
     uint8_t d;
-    uint16_t a;
 
     ct_assertfalse(bus_set(b, 0x40, bd));
-    ct_asserttrue(bus_pstart(b, 2, &a));
-    ct_assertequal(0x20u, a);
-    ct_assertfalse(bus_pstart(b, 3, &a));
     ct_assertfalse(bus_read(b, 0x40, &d));
 }
 
@@ -469,7 +444,6 @@ static void dma_zero_count(void *ctx)
 struct ct_testsuite bus_tests(void)
 {
     static const struct ct_testcase tests[] = {
-        ct_maketest(new_bus),
         ct_maketest(empty_device),
         ct_maketest(read_device),
         ct_maketest(read_device_at_high_partition),

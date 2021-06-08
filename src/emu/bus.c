@@ -66,32 +66,6 @@ void bus_free(bus *self)
     free(self);
 }
 
-size_t bus_count(bus *self)
-{
-    assert(self != NULL);
-
-    return self->count;
-}
-
-uint16_t bus_maxaddr(bus *self)
-{
-    assert(self != NULL);
-
-    return self->maxaddr;
-}
-
-bool bus_pstart(bus *self, size_t i, uint16_t *a)
-{
-    assert(self != NULL);
-    assert(a != NULL);
-
-    if (i < self->count) {
-        *a = self->partitions[i].start;
-        return true;
-    }
-    return false;
-}
-
 extern inline bool bus_set(bus *, uint16_t, struct busdevice);
 bool bus_swap(bus *self, uint16_t addr, struct busdevice bd,
               struct busdevice *prev)

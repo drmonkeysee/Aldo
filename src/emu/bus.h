@@ -30,10 +30,6 @@ struct busdevice {
 bus *bus_new(int bitwidth, size_t n, ...);
 void bus_free(bus *self);
 
-size_t bus_count(bus *self);
-uint16_t bus_maxaddr(bus *self);
-bool bus_pstart(bus *self, size_t i, uint16_t *a);
-
 // NOTE: addr can be anywhere in the range of the target device's partition
 bool bus_swap(bus *self, uint16_t addr, struct busdevice bd,
               struct busdevice *prev);

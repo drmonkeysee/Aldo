@@ -400,8 +400,8 @@ static void ASL_exec(struct mos6502 *self, struct decoded dec)
 }
 
 // NOTE: branch instructions do not branch if the opposite condition is TRUE;
-// e.g. BCC (branch on carry clear) will not branch if carry is SET;
-// i.e. BranchOn(Condition) => presync = NOT(Condition).
+// e.g. BCC (branch on carry clear) will NOT branch if carry is SET;
+// i.e. NOT(Condition) => commit instruction.
 
 static void BCC_exec(struct mos6502 *self)
 {

@@ -82,7 +82,7 @@ size_t bytescopy_bank(const uint8_t *restrict bankmem, int bankwidth,
 
 // Copy mirrored banks @addr into destination buffer; assumes banks and address
 // spaces are sized to power-of-2 KB boundaries between [1, 64].
-size_t bytecopy_bankmirrored(const uint8_t *restrict bankmem, int banksize,
+size_t bytecopy_bankmirrored(const uint8_t *restrict bankmem, int bankwidth,
                              uint16_t addr, int addrspace, size_t count,
                              uint8_t dest[restrict count]);
 

@@ -337,7 +337,6 @@ void cart_write_dis_header(cart *self, FILE *f)
 void cart_snapshot(cart *self, struct console_state *snapshot)
 {
     assert(self != NULL);
-    assert(self->mapper != NULL);
 
     const int len = snprintf(snapshot->cart.formatdesc,
                              sizeof snapshot->cart.formatdesc, "%s",

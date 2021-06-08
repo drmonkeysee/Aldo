@@ -202,8 +202,8 @@ static void drawcart(const struct control *appstate,
     const int maxwidth = getmaxx(CartView.content) - strlen(namelabel);
     int cursor_y = 0;
     mvwaddstr(CartView.content, cursor_y, 0, namelabel);
-    const char *const cn = ctrl_cartfilename(appstate->cartfile);
-    const char *endofname = strrchr(cn, '.');
+    const char *const cn = ctrl_cartfilename(appstate->cartfile),
+               *endofname = strrchr(cn, '.');
     if (!endofname) {
         endofname = strrchr(cn, '\0');
     }

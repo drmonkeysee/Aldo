@@ -169,7 +169,7 @@ static size_t ines_000_prgbank(const struct mapper *self, size_t i,
     assert(mem != NULL);
 
     const struct ines_000_mapper
-    *const m = (const struct ines_000_mapper *)self;
+        *const m = (const struct ines_000_mapper *)self;
 
     if (i >= m->bankcount) {
         *mem = NULL;

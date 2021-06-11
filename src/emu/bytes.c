@@ -15,9 +15,8 @@ extern inline uint16_t bytowr(uint8_t, uint8_t),
 extern inline void wrtoby(uint16_t, uint8_t *restrict, uint8_t *restrict),
                    wrtoba(uint16_t, uint8_t[static 2]);
 
-size_t bytescopy_bank(const uint8_t *restrict bankmem, int bankwidth,
-                      uint16_t addr, size_t count,
-                      uint8_t dest[restrict count])
+size_t bytecopy_bank(const uint8_t *restrict bankmem, int bankwidth,
+                     uint16_t addr, size_t count, uint8_t dest[restrict count])
 {
     assert(bankmem != NULL);
     assert(dest != NULL);

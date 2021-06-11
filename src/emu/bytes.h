@@ -75,10 +75,13 @@ inline void wrtoba(uint16_t word, uint8_t bytes[static 2])
 }
 
 // Copy single bank @addr into destination buffer, assumes bank is sized to
-// power-of-2 KB boundary between [1, 64].
-size_t bytescopy_bank(const uint8_t *restrict bankmem, int bankwidth,
-                      uint16_t addr, size_t count,
-                      uint8_t dest[restrict count]);
+// power-of-2 KB boundary between [1, 64]; note the addr is masked to fit
+// within bankmem meaning this function does not know what address space the
+// bank is mapped to in practice, e.g. the bank may be for $8000-$FFFF so
+// addr 0x8000 will start the copy at byte 0, but so will addr 0x0.
+size_t bytecopy_bank(const uint8_t *restrict bankmem, int bankwidth,
+                     uint16_t addr, size_t count,
+                     uint8_t dest[restrict count]);
 
 // Copy mirrored banks @addr into destination buffer; assumes banks and address
 // spaces are sized to power-of-2 KB boundaries between [1, 64].

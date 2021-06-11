@@ -65,7 +65,7 @@ static size_t raw_dma(const void *restrict ctx, uint16_t addr, size_t count,
 {
     // TODO: will raw ever ask for < $8000?
     if (addr < MEMBLOCK_32KB) return 0;
-    return bytescopy_bank(ctx, BITWIDTH_32KB, addr, count, dest);
+    return bytecopy_bank(ctx, BITWIDTH_32KB, addr, count, dest);
 }
 
 static void raw_dtor(struct mapper *self)
@@ -156,7 +156,7 @@ static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
     if (addr < MEMBLOCK_32KB) return 0;
     const struct ines_000_mapper *const m = ctx;
     if (m->bankcount == 2) {
-        return bytescopy_bank(m->super.prg, BITWIDTH_32KB, addr, count, dest);
+        return bytecopy_bank(m->super.prg, BITWIDTH_32KB, addr, count, dest);
     }
     return bytecopy_bankmirrored(m->super.prg, BITWIDTH_16KB, addr,
                                  BITWIDTH_64KB, count, dest);

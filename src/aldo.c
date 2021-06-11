@@ -93,15 +93,6 @@ static void print_version(void)
     puts("");
 }
 
-static void print_cart_info(const struct control *appstate, cart *c)
-{
-    if (appstate->verbose) {
-        puts("---=== Cart Info ===---");
-    }
-    printf("File\t\t: %s\n", ctrl_cartfilename(appstate->cartfile));
-    cart_write_info(c, stdout, appstate->verbose);
-}
-
 static cart *load_cart(const char *filename)
 {
     cart *c = NULL;
@@ -122,6 +113,16 @@ static cart *load_cart(const char *filename)
     fclose(cartfile);
 
     return c;
+}
+
+static int print_cart_info(const struct control *appstate, cart *c)
+{
+    if (appstate->verbose) {
+        puts("---=== Cart Info ===---");
+    }
+    printf("File\t\t: %s\n", ctrl_cartfilename(appstate->cartfile));
+    cart_write_info(c, stdout, appstate->verbose);
+    return EXIT_SUCCESS;
 }
 
 static void handle_input(struct control *appstate,

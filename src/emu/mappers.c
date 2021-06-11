@@ -21,6 +21,7 @@ struct raw_mapper {
 struct ines_mapper {
     struct mapper vtable;
     uint8_t *prg, *chr, *wram, id;
+    bool chrram;
 };
 
 struct ines_000_mapper {
@@ -180,6 +181,24 @@ static size_t ines_000_prgbank(const struct mapper *self, size_t i,
     return MEMBLOCK_16KB;
 }
 
+static size_t ines_000_chrbank(const struct mapper *self, size_t i,
+                               const uint8_t *restrict *mem)
+{
+    assert(self != NULL);
+    assert(mem != NULL);
+
+    const struct ines_000_mapper
+        *const m = (const struct ines_000_mapper *)self;
+
+    if (m->super.chrram || i > 0) {
+        *mem = NULL;
+        return 0;
+    }
+
+    *mem = m->super.chr + (i * MEMBLOCK_8KB);
+    return MEMBLOCK_8KB;
+}
+
 static bool ines_000_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
 {
     return bus_set(b, addr, (struct busdevice){
@@ -201,10 +220,10 @@ int mapper_raw_create(struct mapper **m, FILE *f)
     struct raw_mapper *self = malloc(sizeof *self);
     *self = (struct raw_mapper){
         .vtable = {
-            raw_dtor,
-            raw_prgbank,
-            raw_cpu_connect,
-            clear_bus_device,
+            .dtor = raw_dtor,
+            .prgbank = raw_prgbank,
+            .cpu_connect = raw_cpu_connect,
+            .cpu_disconnect = clear_bus_device,
         },
     };
 
@@ -238,6 +257,8 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
                 ines_000_prgbank,
                 ines_000_cpu_connect,
                 clear_bus_device,
+
+                ines_000_chrbank,
             },
         };
         assert(header->prg_chunks <= 2);
@@ -247,10 +268,10 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
         self = malloc(sizeof *self);
         *self = (struct ines_mapper){
             .vtable = {
-                ines_dtor,
-                ines_unimplemented_prgbank,
-                ines_unimplemented_cpu_connect,
-                clear_bus_device,
+                .dtor = ines_dtor,
+                .prgbank = ines_unimplemented_prgbank,
+                .cpu_connect = ines_unimplemented_cpu_connect,
+                .cpu_disconnect = clear_bus_device,
             },
         };
         header->mapper_implemented = false;
@@ -276,7 +297,9 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     if (err != 0) return err;
 
     if (header->chr_chunks == 0) {
+        // TODO: this size is controlled by the mapper in many cases
         self->chr = calloc(MEMBLOCK_8KB, sizeof *self->chr);
+        self->chrram = true;
     } else {
         err = load_chunks(&self->chr, header->chr_chunks * MEMBLOCK_8KB, f);
     }

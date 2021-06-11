@@ -140,7 +140,7 @@ static void print_prg_line(const char *restrict dis, uint32_t curr_bytes,
     }
 }
 
-static int print_bank(const struct bankview *bv, bool verbose)
+static int print_prgbank(const struct bankview *bv, bool verbose)
 {
     printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
     puts("--------");
@@ -175,6 +175,16 @@ static int print_bank(const struct bankview *bv, bool verbose)
     if (repeat.state == DUP_TRUNCATE || repeat.state == DUP_SKIP) {
         puts(dis);
     }
+
+    return 0;
+}
+
+static int print_chrbank(const struct bankview *bv)
+{
+    printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
+    puts("--------");
+
+    printf("%02X\n", *bv->mem);
 
     return 0;
 }
@@ -280,8 +290,30 @@ int dis_cart(cart *cart, const struct control *appstate)
          bv.mem;
          bv = cart_prgbank(cart, bv.bank + 1)) {
         puts("");
-        const int err = print_bank(&bv, appstate->verbose);
+        const int err = print_prgbank(&bv, appstate->verbose);
         if (err < 0) return err;
     }
+    return 0;
+}
+
+int dis_cart_chr(cart *cart)
+{
+    assert(cart != NULL);
+
+    struct bankview bv = cart_chrbank(cart, 0);
+    if (!bv.mem) {
+        // TODO: is this where i should print this?
+        const int err = DIS_ERR_CHRROM;
+        fprintf(stderr, "CHR dis error (%d): %s\n", err, dis_errstr(err));
+        return err;
+    }
+
+    do {
+        puts("");
+        const int err = print_chrbank(&bv);
+        if (err < 0) return err;
+        bv = cart_chrbank(cart, bv.bank + 1);
+    } while (bv.mem);
+
     return 0;
 }

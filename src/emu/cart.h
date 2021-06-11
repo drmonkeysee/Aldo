@@ -80,6 +80,7 @@ int cart_create(cart **c, FILE *f);
 void cart_free(cart *self);
 
 struct bankview cart_prgbank(cart *self, size_t i);
+struct bankview cart_chrbank(cart *self, size_t i);
 
 int cart_cpu_connect(cart *self, bus *b, uint16_t addr);
 void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr);

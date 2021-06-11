@@ -22,6 +22,10 @@ struct mapper {
                       const uint8_t *restrict *);
     bool (*cpu_connect)(struct mapper *, bus *, uint16_t);
     void (*cpu_disconnect)(const struct mapper *, bus *, uint16_t);
+
+    // NOTE: optional protocol
+    size_t (*chrbank)(const struct mapper *, size_t,
+                      const uint8_t *restrict *);
 };
 
 // NOTE: if create functions return non-zero error code, *m is unmodified

@@ -277,17 +277,30 @@ void cart_free(cart *self)
 struct bankview cart_prgbank(cart *self, size_t i)
 {
     assert(self != NULL);
+    assert(self->mapper != NULL);
 
     struct bankview bv = {.bank = i};
     bv.size = self->mapper->prgbank(self->mapper, i, &bv.mem);
     return bv;
 }
 
+struct bankview cart_chrbank(cart *self, size_t i)
+{
+    assert(self != NULL);
+    assert(self->mapper != NULL);
+
+    struct bankview bv = {.bank = i};
+    if (self->mapper->chrbank) {
+        bv.size = self->mapper->chrbank(self->mapper, i, &bv.mem);
+    }
+    return bv;
+}
+
 int cart_cpu_connect(cart *self, bus *b, uint16_t addr)
 {
     assert(self != NULL);
-    assert(b != NULL);
     assert(self->mapper != NULL);
+    assert(b != NULL);
 
     return self->mapper->cpu_connect(self->mapper, b, addr)
            ? 0
@@ -297,8 +310,8 @@ int cart_cpu_connect(cart *self, bus *b, uint16_t addr)
 void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr)
 {
     assert(self != NULL);
-    assert(b != NULL);
     assert(self->mapper != NULL);
+    assert(b != NULL);
 
     self->mapper->cpu_disconnect(self->mapper, b, addr);
 }

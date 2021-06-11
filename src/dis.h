@@ -22,7 +22,8 @@
 #define DIS_ERRCODE_X \
 X(DIS_ERR_FMT_FAIL, -1, "OUTPUT FAIL") \
 X(DIS_ERR_EOF, -2, "UNEXPECTED EOF") \
-X(DIS_ERR_INV_ADDRMD, -3, "INVALID ADDRMODE")
+X(DIS_ERR_INV_ADDRMD, -3, "INVALID ADDRMODE") \
+X(DIS_ERR_CHRROM, -4, "NO CHR ROM FOUND")
 
 enum {
 #define X(s, v, e) s = v,
@@ -40,5 +41,6 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
 int dis_cart(cart *cart, const struct control *appstate);
+int dis_cart_chr(cart *cart);
 
 #endif

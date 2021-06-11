@@ -24,12 +24,14 @@
 static const char
     *restrict const Version = "0.2.0", // TODO: autogenerate this
 
+    *restrict const ChrDecodeCmd = "--chr-decode",
     *restrict const DisassembleCmd = "--disassemble",
     *restrict const HelpCmd = "--help",
     *restrict const InfoCmd = "--info",
     *restrict const VersionCmd = "--version";
 
-static const char DisassembleFlag = 'd',
+static const char ChrDecodeFlag = 'c',
+                  DisassembleFlag = 'd',
                   HelpFlag = 'h',
                   InfoFlag = 'i',
                   VerboseFlag = 'v',
@@ -51,6 +53,7 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
         for (int i = 1; i < argc; ++i) {
             const char *const arg = argv[i];
             if (arg[0] == '-') {
+                setflag(appstate->chrdecode, arg, ChrDecodeFlag, ChrDecodeCmd);
                 setflag(appstate->disassemble, arg, DisassembleFlag,
                         DisassembleCmd);
                 setflag(appstate->help, arg, HelpFlag, HelpCmd);
@@ -73,6 +76,7 @@ static void print_usage(const struct control *appstate)
     puts("\noptions");
     puts("  -v\t: verbose output");
     puts("\ncommands");
+    puts("  -c\t: decode CHR ROM (also --chr-decode)");
     puts("  -d\t: disassemble file (also --disassemble);"
            " verbose prints duplicate lines");
     puts("  -h\t: print usage (also --help)");
@@ -209,7 +213,7 @@ static void update(struct control *appstate, struct console_state *snapshot,
     ui_refresh(appstate, snapshot);
 }
 
-static void emu_loop(struct control *appstate, cart *c)
+static int emu_loop(struct control *appstate, cart *c)
 {
     nes *console = nes_new(c);
     nes_powerup(console);
@@ -232,6 +236,7 @@ static void emu_loop(struct control *appstate, cart *c)
     console = NULL;
     snapshot.mem.prglength = 0;
     snapshot.mem.ram = NULL;
+    return EXIT_SUCCESS;
 }
 
 //
@@ -264,23 +269,28 @@ int aldo_run(int argc, char *argv[argc+1])
         return EXIT_FAILURE;
     }
 
+    int result;
+
     if (appstate.info) {
-        print_cart_info(&appstate, cart);
-        cart_free(cart);
-        cart = NULL;
-        return EXIT_SUCCESS;
+        result = print_cart_info(&appstate, cart);
+        goto cart_cleanup;
     }
 
     if (appstate.disassemble) {
-        const int err = dis_cart(cart, &appstate);
-        cart_free(cart);
-        cart = NULL;
-        return err == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+        result = dis_cart(cart, &appstate) == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+        goto cart_cleanup;
     }
 
-    emu_loop(&appstate, cart);
+    if (appstate.chrdecode) {
+        result = dis_cart_chr(cart) == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+        goto cart_cleanup;
+    }
+
+    result = emu_loop(&appstate, cart);
+
+cart_cleanup:
     cart_free(cart);
     cart = NULL;
 
-    return EXIT_SUCCESS;
+    return result;
 }

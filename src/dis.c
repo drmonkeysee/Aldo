@@ -179,12 +179,36 @@ static int print_prgbank(const struct bankview *bv, bool verbose)
     return 0;
 }
 
+#define get_bit(byte, bit) (((byte) >> (bit)) & 1)
+
 static int print_chrbank(const struct bankview *bv)
 {
+    if (bv->size % 16 != 0) return DIS_ERR_CHRSZ;
+
     printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
     puts("--------");
 
-    printf("%02X\n", *bv->mem);
+    for (size_t tiles = 0; tiles < 512; ++tiles) {
+        printf("Tile %zu\n", tiles);
+        const uint8_t *const tile = bv->mem + (2 * 8 * tiles);
+        for (size_t rows = 0; rows < 8; ++rows) {
+            char row[8];
+            const uint8_t plane0 = tile[rows],
+                          plane1 = tile[rows + 8];
+            for (size_t bit = 0; bit < 8; ++bit) {
+                row[bit] = get_bit(plane0, bit);
+                row[bit] |= get_bit(plane1, bit) << 1;
+            }
+            for (int pixel = 7; pixel >= 0; --pixel) {
+                printf("%c", row[pixel] + '0');
+            }
+            puts("");
+        }
+        puts("--------\n");
+        if (tiles == 511) {
+            assert(tile + 16 == bv->mem + bv->size);
+        }
+    }
 
     return 0;
 }
@@ -301,12 +325,7 @@ int dis_cart_chr(cart *cart)
     assert(cart != NULL);
 
     struct bankview bv = cart_chrbank(cart, 0);
-    if (!bv.mem) {
-        // TODO: is this where i should print this?
-        const int err = DIS_ERR_CHRROM;
-        fprintf(stderr, "CHR dis error (%d): %s\n", err, dis_errstr(err));
-        return err;
-    }
+    if (!bv.mem) return DIS_ERR_CHRROM;
 
     do {
         puts("");

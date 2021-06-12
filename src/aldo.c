@@ -282,7 +282,14 @@ int aldo_run(int argc, char *argv[argc+1])
     }
 
     if (appstate.chrdecode) {
-        result = dis_cart_chr(cart) == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+        const int err = dis_cart_chr(cart);
+        if (err < 0) {
+            fprintf(stderr, "CHR decode error (%d): %s\n", err,
+                    dis_errstr(err));
+            result = EXIT_FAILURE;
+        } else {
+            result = EXIT_SUCCESS;
+        }
         goto cart_cleanup;
     }
 

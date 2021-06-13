@@ -47,7 +47,11 @@ enum {
     CPU_VECTOR_IRQ = 0xfffe,
 };
 
-// NOTE: undefined behavior if any pointer/array arguments are null
+// Extract bit @pos from byte
+#define byte_getbit(byte, pos) (((byte) >> (pos)) & 1)
+
+// NOTE: convert unsigned values into little-endian byte representations;
+// undefined behavior if any pointer/array arguments are null.
 
 // Bytes to Word
 inline uint16_t bytowr(uint8_t lo, uint8_t hi)
@@ -72,6 +76,14 @@ inline void wrtoby(uint16_t word, uint8_t *restrict lo, uint8_t *restrict hi)
 inline void wrtoba(uint16_t word, uint8_t bytes[static 2])
 {
     wrtoby(word, bytes, bytes + 1);
+}
+
+// DWord to Byte Array
+inline void dwtoba(uint32_t dword, uint8_t bytes[static 4])
+{
+    for (int i = 0; i < 4; ++i) {
+        bytes[i] = (dword >> (8 * i)) & 0xff;
+    }
 }
 
 // Copy single bank @addr into destination buffer, assumes bank is sized to

@@ -11,6 +11,8 @@
 #include "emu/decode.h"
 
 #include <assert.h>
+#include <errno.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -179,13 +181,126 @@ static int print_prgbank(const struct bankview *bv, bool verbose)
     return 0;
 }
 
-#define get_bit(byte, bit) (((byte) >> (bit)) & 1)
+enum {
+    // NOTE: color depth and palette sizes; NES tiles are actually 2 bpp but
+    // the closest the standard BMP format gets is 4; BMP palette size is also
+    // 4, as are the number of colors representable at 2 bpp so conveniently
+    // all color constants collapse into one value.
+    BMP_COLOR_SIZE = 4,
+    BMP_PALETTE_SIZE = BMP_COLOR_SIZE * BMP_COLOR_SIZE,
+
+    // NOTE: bmp header sizes
+    BMP_FILEHEADER_SIZE = 14,
+    BMP_INFOHEADER_SIZE = 40,
+    BMP_HEADER_SIZE = BMP_FILEHEADER_SIZE + BMP_INFOHEADER_SIZE
+                      + BMP_PALETTE_SIZE,
+
+    // NOTE: 72 DPI (~2835 pixels/meter); nice default for bmp scale
+    BMP_72_DPI = 2835,
+};
+
+static int test_bmp(int32_t width, int32_t height,
+                    const uint8_t pixels[width*height])
+{
+    assert(pixels != NULL);
+    assert(0 < width);
+    assert(0 < height);
+    // TODO: can i do 4bpp with an odd width?
+    assert(width % 2 == 0);
+
+    // NOTE: bmp pixel rows are padded to the nearest 4-byte boundary
+    const int32_t row_size = ceil((BMP_COLOR_SIZE * width) / 32.0) * 4,
+                  pixelslength = row_size * height;
+
+    errno = 0;
+    FILE *const bmpfile = fopen("test.bmp", "wb");
+    if (!bmpfile) return DIS_ERR_IO;
+
+    // NOTE: write BMP header fields; BMP format is little-endian so use
+    // byte arrays rather than structs to avoid arch-specific endianness.
+
+    /*
+     File Header
+     struct BITMAPFILEHEADER {
+        WORD  bfType;
+        DWORD bfSize;
+        WORD  bfReserved1;
+        WORD  bfReserved2;
+        DWORD bfOffBits;
+     };
+     */
+    uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};
+    dwtoba(BMP_HEADER_SIZE + pixelslength, fileheader + 2);
+    dwtoba(BMP_HEADER_SIZE, fileheader + 10);
+    fwrite(fileheader, sizeof fileheader[0],
+           sizeof fileheader / sizeof fileheader[0], bmpfile);
+
+    /*
+     Info Header
+     struct BITMAPINFOHEADER {
+        DWORD biSize;
+        LONG  biWidth;
+        LONG  biHeight;
+        WORD  biPlanes;
+        WORD  biBitCount;
+        DWORD biCompression;
+        DWORD biSizeImage;
+        LONG  biXPelsPerMeter;
+        LONG  biYPelsPerMeter;
+        DWORD biClrUsed;
+        DWORD biClrImportant;
+     };
+     */
+    uint8_t infoheader[BMP_INFOHEADER_SIZE] = {
+        [0] = BMP_INFOHEADER_SIZE,
+        [12] = 1,
+        [14] = BMP_COLOR_SIZE,
+        [32] = BMP_COLOR_SIZE,
+    };
+    dwtoba(width, infoheader + 4);
+    dwtoba(height, infoheader + 8);
+    dwtoba(BMP_72_DPI, infoheader + 24);
+    dwtoba(BMP_72_DPI, infoheader + 28);
+    fwrite(infoheader, sizeof infoheader[0],
+           sizeof infoheader / sizeof infoheader[0], bmpfile);
+
+    /*
+     Palettes
+     struct RGBQUAD {
+        BYTE rgbBlue;
+        BYTE rgbGreen;
+        BYTE rgbRed;
+        BYTE rgbReserved;
+     }[BMP_COLOR_SIZE]
+     */
+    const uint8_t palettes[BMP_PALETTE_SIZE] = {
+        0, 0, 255, 0,       // RED
+        255, 255, 255, 0,   // WHITE
+        255, 0, 0, 0,       // BLUE
+        0, 255, 0, 0,       // GREEN
+    };
+    fwrite(palettes, sizeof palettes[0], sizeof palettes / sizeof palettes[0],
+           bmpfile);
+
+    // NOTE: BMP pixels are written bottom-row first; at 4bpp each byte
+    // contains two pixels with first in upper nibble, second in lower nibble.
+    // TODO: figure out how to handle width and 4-byte boundary padding
+    for (int32_t rowidx = height - 1; rowidx >= 0; --rowidx) {
+        const uint8_t *row = pixels + (rowidx * width),
+                      packedrow[] = {row[0] << 4 | row[1], 0xff, 0xff, 0xff};
+        fwrite(packedrow, sizeof packedrow[0],
+               sizeof packedrow / sizeof packedrow[0], bmpfile);
+    }
+
+    fclose(bmpfile);
+    return 0;
+}
 
 static int print_chrbank(const struct bankview *bv)
 {
     if (bv->size % 16 != 0) return DIS_ERR_CHRSZ;
 
-    printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
+    /*printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
     puts("--------");
 
     for (size_t tiles = 0; tiles < 512; ++tiles) {
@@ -196,8 +311,8 @@ static int print_chrbank(const struct bankview *bv)
             const uint8_t plane0 = tile[rows],
                           plane1 = tile[rows + 8];
             for (size_t bit = 0; bit < 8; ++bit) {
-                row[bit] = get_bit(plane0, bit);
-                row[bit] |= get_bit(plane1, bit) << 1;
+                row[bit] = byte_getbit(plane0, bit);
+                row[bit] |= byte_getbit(plane1, bit) << 1;
             }
             for (int pixel = 7; pixel >= 0; --pixel) {
                 printf("%c", row[pixel] + '0');
@@ -208,9 +323,17 @@ static int print_chrbank(const struct bankview *bv)
         if (tiles == 511) {
             assert(tile + 16 == bv->mem + bv->size);
         }
-    }
+    }*/
 
-    return 0;
+    /* test bitmap
+     | BLUE | GREEN |
+     | RED  | WHITE |
+     */
+    const uint8_t test_pixels[] = {
+        0x2, 0x3, 0x0, 0x1,
+    };
+
+    return test_bmp(2, 2, test_pixels);
 }
 
 //

@@ -282,7 +282,7 @@ static int test_bmp(int32_t width, int32_t height,
     // TODO: figure out how to handle width and 4-byte boundary padding
     for (int32_t rowidx = height - 1; rowidx >= 0; --rowidx) {
         const uint8_t *row = pixels + (rowidx * width),
-                      packedrow[] = {row[0] << 4 | row[1], 0xff, 0xff, 0xff};
+                      packedrow[4] = {row[0] << 4 | row[1]};
         fwrite(packedrow, sizeof packedrow[0],
                sizeof packedrow / sizeof packedrow[0], bmpfile);
     }
@@ -324,6 +324,7 @@ static int print_chrbank(const struct bankview *bv)
      | BLUE | GREEN |
      | RED  | WHITE |
      */
+    // TODO: test with odd dimensions
     const uint8_t test_pixels[] = {
         0x2, 0x3, 0x0, 0x1,
     };

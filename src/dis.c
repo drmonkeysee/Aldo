@@ -194,9 +194,6 @@ enum {
     BMP_INFOHEADER_SIZE = 40,
     BMP_HEADER_SIZE = BMP_FILEHEADER_SIZE + BMP_INFOHEADER_SIZE
                       + BMP_PALETTE_SIZE,
-
-    // NOTE: 72 DPI (~2835 pixels/meter); nice default for bmp scale
-    BMP_72_DPI = 2835,
 };
 
 static int test_bmp(int32_t width, int32_t height,
@@ -259,8 +256,6 @@ static int test_bmp(int32_t width, int32_t height,
     };
     dwtoba(width, infoheader + 4);
     dwtoba(height, infoheader + 8);
-    dwtoba(BMP_72_DPI, infoheader + 24);
-    dwtoba(BMP_72_DPI, infoheader + 28);
     fwrite(infoheader, sizeof infoheader[0],
            sizeof infoheader / sizeof infoheader[0], bmpfile);
 

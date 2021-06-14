@@ -293,34 +293,53 @@ static int test_bmp(int32_t width, int32_t height,
     return 0;
 }
 
+// NOTE: CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is an 8x8
+// byte array of 2-bit palette-indexed pixels composed of two bit-planes where
+// the first plane specifies the pixel low bit and the second plane specifies
+// the pixel high bit.
+enum {
+    CHR_PLANE_SIZE = 8,
+    CHR_TILE_SIZE = 2 * CHR_PLANE_SIZE,
+};
+
 static int print_chrbank(const struct bankview *bv)
 {
-    if (bv->size % 16 != 0) return DIS_ERR_CHRSZ;
+    if (bv->size % CHR_TILE_SIZE != 0) return DIS_ERR_CHRSZ;
 
-    /*printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
+    printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
     puts("--------");
 
+    // TODO: tile count needs to be based on bank size
     for (size_t tiles = 0; tiles < 512; ++tiles) {
+        uint8_t tile[CHR_PLANE_SIZE * CHR_PLANE_SIZE];
         printf("Tile %zu\n", tiles);
-        const uint8_t *const tile = bv->mem + (2 * 8 * tiles);
-        for (size_t rows = 0; rows < 8; ++rows) {
-            char row[8];
-            const uint8_t plane0 = tile[rows],
-                          plane1 = tile[rows + 8];
-            for (size_t bit = 0; bit < 8; ++bit) {
-                row[bit] = byte_getbit(plane0, bit);
-                row[bit] |= byte_getbit(plane1, bit) << 1;
+        const uint8_t *const planes = bv->mem + (CHR_TILE_SIZE * tiles);
+        for (size_t row = 0; row < CHR_PLANE_SIZE; ++row) {
+            const uint8_t plane0 = planes[row],
+                          plane1 = planes[row + CHR_PLANE_SIZE];
+            for (size_t bit = 0; bit < CHR_PLANE_SIZE; ++bit) {
+                // NOTE: tile origins are top-left so in order to pack pixels
+                // left-to-right we need to decode bit-planes least-significant
+                // bit last.
+                const ptrdiff_t idx = (CHR_PLANE_SIZE - bit - 1)
+                                      + (row * CHR_PLANE_SIZE);
+                assert(idx >= 0);
+                tile[idx] = byte_getbit(plane0, bit)
+                            | (byte_getbit(plane1, bit) << 1);
             }
-            for (int pixel = 7; pixel >= 0; --pixel) {
-                printf("%c", row[pixel] + '0');
+        }
+        for (size_t row = 0; row < CHR_PLANE_SIZE; ++row) {
+            for (int pixel = 0; pixel < CHR_PLANE_SIZE; ++pixel) {
+                printf("%c", tile[pixel + (row * CHR_PLANE_SIZE)] + '0');
             }
             puts("");
         }
         puts("--------\n");
+        // NOTE: did we process the entire CHR ROM?
         if (tiles == 511) {
-            assert(tile + 16 == bv->mem + bv->size);
+            assert(planes + CHR_TILE_SIZE == bv->mem + bv->size);
         }
-    }*/
+    }
 
     /* test bitmap
      | BLUE | GREEN |

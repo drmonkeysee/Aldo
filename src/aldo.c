@@ -286,6 +286,9 @@ int aldo_run(int argc, char *argv[argc+1])
         if (err < 0) {
             fprintf(stderr, "CHR decode error (%d): %s\n", err,
                     dis_errstr(err));
+            if (err == DIS_ERR_IO) {
+                perror("CHR decode file error");
+            }
             result = EXIT_FAILURE;
         } else {
             result = EXIT_SUCCESS;

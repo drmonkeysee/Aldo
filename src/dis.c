@@ -15,6 +15,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static const char *restrict const Mnemonics[] = {
@@ -197,25 +198,18 @@ enum {
 };
 
 static int test_bmp(int32_t width, int32_t height,
-                    const uint8_t pixels[width*height])
+                    const uint8_t pixels[restrict width*height],
+                    const char *restrict filename)
 {
-    assert(pixels != NULL);
-    assert(0 < width);
-    assert(0 < height);
-    // TODO: can i do 4bpp with an odd width?
-    assert(width % 2 == 0);
+    errno = 0;
+    FILE *const bmpfile = fopen(filename, "wb");
+    if (!bmpfile) return DIS_ERR_IO;
 
     // NOTE: bmp pixel rows are padded to the nearest 4-byte boundary
-    const int32_t row_size = ceil((BMP_COLOR_SIZE * width) / 32.0) * 4,
-                  pixelslength = row_size * height;
-
-    errno = 0;
-    FILE *const bmpfile = fopen("test.bmp", "wb");
-    if (!bmpfile) return DIS_ERR_IO;
+    const int32_t packedrowsize = ceil((BMP_COLOR_SIZE * width) / 32.0) * 4;
 
     // NOTE: write BMP header fields; BMP format is little-endian so use
     // byte arrays rather than structs to avoid arch-specific endianness.
-
     /*
      File Header
      struct BITMAPFILEHEADER {
@@ -227,7 +221,7 @@ static int test_bmp(int32_t width, int32_t height,
      };
      */
     uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};
-    dwtoba(BMP_HEADER_SIZE + pixelslength, fileheader + 2);
+    dwtoba(BMP_HEADER_SIZE + (packedrowsize * height), fileheader + 2);
     dwtoba(BMP_HEADER_SIZE, fileheader + 10);
     fwrite(fileheader, sizeof fileheader[0],
            sizeof fileheader / sizeof fileheader[0], bmpfile);
@@ -277,15 +271,23 @@ static int test_bmp(int32_t width, int32_t height,
     fwrite(palettes, sizeof palettes[0], sizeof palettes / sizeof palettes[0],
            bmpfile);
 
-    // NOTE: BMP pixels are written bottom-row first; at 4bpp each byte
-    // contains two pixels with first in upper nibble, second in lower nibble.
-    // TODO: figure out how to handle width and 4-byte boundary padding
-    for (int32_t rowidx = height - 1; rowidx >= 0; --rowidx) {
-        const uint8_t *row = pixels + (rowidx * width),
-                      packedrow[4] = {row[0] << 4 | row[1]};
-        fwrite(packedrow, sizeof packedrow[0],
-               sizeof packedrow / sizeof packedrow[0], bmpfile);
+    // NOTE: BMP pixels are written bottom-row first
+    uint8_t *const packedrow = calloc(packedrowsize, sizeof *packedrow);
+    for (int32_t row = height - 1; row >= 0; --row) {
+        const uint8_t *const pixelrow = pixels + (row * width);
+        // NOTE: at 4bpp each byte contains two pixels with first in upper
+        // nibble, second in lower nibble.
+        for (int32_t pixel = 0; pixel < width; ++pixel) {
+            if (pixel % 2 == 0) {
+                packedrow[pixel / 2] = pixelrow[pixel] << 4;
+            } else {
+                packedrow[pixel / 2] |= pixelrow[pixel];
+            }
+        }
+        fwrite(packedrow, sizeof *packedrow, packedrowsize / sizeof *packedrow,
+               bmpfile);
     }
+    free(packedrow);
 
     fclose(bmpfile);
     return 0;
@@ -325,11 +327,41 @@ static int print_chrbank(const struct bankview *bv)
      | RED  | WHITE |
      */
     // TODO: test with odd dimensions
-    const uint8_t test_pixels[] = {
-        0x2, 0x3, 0x0, 0x1,
+    const uint8_t pixels1[] = {
+        0x2, 0x3,
+        0x0, 0x1,
     };
+    test_bmp(2, 2, pixels1, "test1.bmp");
 
-    return test_bmp(2, 2, test_pixels);
+    const uint8_t pixels2[] = {
+        0x2, 0x3, 0x0, 0x1,
+        0x3, 0x0, 0x1, 0x2,
+    };
+    test_bmp(4, 2, pixels2, "test2.bmp");
+
+    const uint8_t pixels3[] = {
+        0x2, 0x3, 0x0, 0x1,
+        0x3, 0x0, 0x1, 0x2,
+        0x0, 0x1, 0x2, 0x3,
+    };
+    test_bmp(4, 3, pixels3, "test3.bmp");
+
+    const uint8_t pixels4[] = {
+        0x2, 0x3, 0x0, 0x1,
+        0x3, 0x0, 0x1, 0x2,
+        0x0, 0x1, 0x2, 0x3,
+        0x1, 0x2, 0x3, 0x0,
+    };
+    test_bmp(4, 4, pixels4, "test4.bmp");
+
+    const uint8_t pixels5[] = {
+        0x2, 0x3, 0x0,
+        0x3, 0x0, 0x1,
+        0x0, 0x1, 0x2,
+    };
+    test_bmp(3, 3, pixels5, "test5.bmp");
+
+    return 0;
 }
 
 //

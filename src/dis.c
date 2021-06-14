@@ -299,28 +299,31 @@ static int test_bmp(int32_t width, int32_t height,
 // the pixel high bit.
 enum {
     CHR_PLANE_SIZE = 8,
-    CHR_TILE_SIZE = 2 * CHR_PLANE_SIZE,
+    CHR_TILE_SPAN = 2 * CHR_PLANE_SIZE,
+    CHR_TILE_SIZE = CHR_PLANE_SIZE * CHR_PLANE_SIZE,
 };
 
 static int print_chrbank(const struct bankview *bv)
 {
-    if (bv->size % CHR_TILE_SIZE != 0) return DIS_ERR_CHRSZ;
+    if (bv->size % CHR_TILE_SPAN != 0) return DIS_ERR_CHRSZ;
 
     printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
     puts("--------");
 
-    // TODO: tile count needs to be based on bank size
-    for (size_t tiles = 0; tiles < 512; ++tiles) {
-        uint8_t tile[CHR_PLANE_SIZE * CHR_PLANE_SIZE];
-        printf("Tile %zu\n", tiles);
-        const uint8_t *const planes = bv->mem + (CHR_TILE_SIZE * tiles);
+    const size_t tilecount = bv->size / CHR_TILE_SPAN;
+    uint8_t *const tiles = calloc(tilecount * CHR_TILE_SIZE,
+                                  sizeof *tiles);
+    for (size_t tileidx = 0; tileidx < tilecount; ++tileidx) {
+        uint8_t *const tile = tiles + (CHR_TILE_SIZE * tileidx);
+        printf("Tile %zu\n", tileidx);
+        const uint8_t *const planes = bv->mem + (CHR_TILE_SPAN * tileidx);
         for (size_t row = 0; row < CHR_PLANE_SIZE; ++row) {
             const uint8_t plane0 = planes[row],
                           plane1 = planes[row + CHR_PLANE_SIZE];
             for (size_t bit = 0; bit < CHR_PLANE_SIZE; ++bit) {
                 // NOTE: tile origins are top-left so in order to pack pixels
-                // left-to-right we need to decode bit-planes least-significant
-                // bit last.
+                // left-to-right we need to decode each bit-plane row
+                // least-significant bit last.
                 const ptrdiff_t idx = (CHR_PLANE_SIZE - bit - 1)
                                       + (row * CHR_PLANE_SIZE);
                 assert(idx >= 0);
@@ -336,10 +339,11 @@ static int print_chrbank(const struct bankview *bv)
         }
         puts("--------\n");
         // NOTE: did we process the entire CHR ROM?
-        if (tiles == 511) {
-            assert(planes + CHR_TILE_SIZE == bv->mem + bv->size);
+        if (tileidx == tilecount - 1) {
+            assert(planes + CHR_TILE_SPAN == bv->mem + bv->size);
         }
     }
+    free(tiles);
 
     /* test bitmap
      | BLUE | GREEN |

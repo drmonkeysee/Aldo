@@ -297,6 +297,7 @@ static int test_bmp(int32_t width, int32_t height,
 // byte array of 2-bit palette-indexed pixels composed of two bit-planes where
 // the first plane specifies the pixel low bit and the second plane specifies
 // the pixel high bit.
+// TODO: do these need to be literals
 enum {
     CHR_PLANE_SIZE = 8,
     CHR_TILE_SPAN = 2 * CHR_PLANE_SIZE,
@@ -315,7 +316,7 @@ static int print_chrbank(const struct bankview *bv)
                                   sizeof *tiles);
     for (size_t tileidx = 0; tileidx < tilecount; ++tileidx) {
         uint8_t *const tile = tiles + (CHR_TILE_SIZE * tileidx);
-        printf("Tile %zu\n", tileidx);
+        //printf("Tile %zu\n", tileidx);
         const uint8_t *const planes = bv->mem + (CHR_TILE_SPAN * tileidx);
         for (size_t row = 0; row < CHR_PLANE_SIZE; ++row) {
             const uint8_t plane0 = planes[row],
@@ -331,17 +332,42 @@ static int print_chrbank(const struct bankview *bv)
                             | (byte_getbit(plane1, bit) << 1);
             }
         }
-        for (size_t row = 0; row < CHR_PLANE_SIZE; ++row) {
-            for (int pixel = 0; pixel < CHR_PLANE_SIZE; ++pixel) {
+        /*for (size_t row = 0; row < CHR_PLANE_SIZE; ++row) {
+            for (size_t pixel = 0; pixel < CHR_PLANE_SIZE; ++pixel) {
                 printf("%c", tile[pixel + (row * CHR_PLANE_SIZE)] + '0');
             }
             puts("");
         }
-        puts("--------\n");
+        puts("--------\n");*/
         // NOTE: did we process the entire CHR ROM?
         if (tileidx == tilecount - 1) {
             assert(planes + CHR_TILE_SPAN == bv->mem + bv->size);
         }
+    }
+
+    // NOTE: 2 sections (L/R) of 16x16 tiles each
+    // Left: tiles 0-255
+    // Right: tiles 256-511
+    // TODO: remove all these magic numbers
+    for (size_t tile_row = 0; tile_row < 16; ++tile_row) {
+        for (size_t pixel_row = 0; pixel_row < 8; ++pixel_row) {
+            for (size_t tile_section = 0; tile_section < 2; ++tile_section) {
+                fputc('|', stdout);
+                for (size_t tile = 0; tile < 16; ++tile) {
+                    const size_t tileidx = CHR_TILE_SIZE
+                                           * (tile + (tile_row * 16)
+                                              + (tile_section * 16 * 16));
+                    for (size_t pixel = 0; pixel < 8; ++pixel) {
+                        const size_t pixelidx = pixel + (pixel_row * 8);
+                        printf("%c", tiles[tileidx + pixelidx] + '0');
+                    }
+                    fputc('|', stdout);
+                }
+                fputs("        ", stdout);
+            }
+            puts("");
+        }
+        puts("");
     }
     free(tiles);
 

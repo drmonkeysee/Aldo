@@ -15,9 +15,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define DIS_INST_SIZE 31u   // Disassembled instruction is at most 30 chars
-#define DIS_DATAP_SIZE 12u  // Disassembled datapath is at most 11 chars
-
 // X(symbol, value, error string)
 #define DIS_ERRCODE_X \
 X(DIS_ERR_FMT_FAIL, -1, "OUTPUT FAIL") \
@@ -31,6 +28,11 @@ enum {
 #define X(s, v, e) s = v,
     DIS_ERRCODE_X
 #undef X
+};
+
+enum {
+    DIS_DATAP_SIZE = 12,    // Disassembled datapath is at most 11 chars
+    DIS_INST_SIZE = 31,     // Disassembled instruction is at most 30 chars
 };
 
 // NOTE: returns a pointer to a statically allocated string;

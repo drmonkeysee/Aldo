@@ -222,7 +222,7 @@ static int test_bmp(int32_t width, int32_t height,
      */
     uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};
     dwtoba(BMP_HEADER_SIZE + (packedrowsize * height), fileheader + 2);
-    dwtoba(BMP_HEADER_SIZE, fileheader + 10);
+    dwtoba(BMP_HEADER_SIZE, fileheader + 10);   // bfOffBits
     fwrite(fileheader, sizeof fileheader[0],
            sizeof fileheader / sizeof fileheader[0], bmpfile);
 
@@ -243,10 +243,10 @@ static int test_bmp(int32_t width, int32_t height,
      };
      */
     uint8_t infoheader[BMP_INFOHEADER_SIZE] = {
-        [0] = BMP_INFOHEADER_SIZE,
-        [12] = 1,
-        [14] = BMP_COLOR_SIZE,
-        [32] = BMP_COLOR_SIZE,
+        BMP_INFOHEADER_SIZE,    // biSize
+        [12] = 1,               // biPlanes
+        [14] = BMP_COLOR_SIZE,  // biBitCount
+        [32] = BMP_COLOR_SIZE,  // biClrUsed
     };
     dwtoba(width, infoheader + 4);
     dwtoba(height, infoheader + 8);
@@ -260,7 +260,7 @@ static int test_bmp(int32_t width, int32_t height,
         BYTE rgbGreen;
         BYTE rgbRed;
         BYTE rgbReserved;
-     }[BMP_COLOR_SIZE]
+     }[BMP_COLOR_SIZE];
      */
     const uint8_t palettes[BMP_PALETTE_SIZE] = {
         0, 0, 255, 0,       // RED

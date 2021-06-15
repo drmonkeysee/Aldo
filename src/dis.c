@@ -206,7 +206,8 @@ static int test_bmp(int32_t width, int32_t height,
     if (!bmpfile) return DIS_ERR_IO;
 
     // NOTE: bmp pixel rows are padded to the nearest 4-byte boundary
-    const int32_t packedrowsize = ceil((BMP_COLOR_SIZE * width) / 32.0) * 4;
+    const int32_t packedrow_size = ceil((BMP_COLOR_SIZE * width) / 32.0) * 4,
+                  pixels_totalsize = packedrow_size * height;
 
     // NOTE: write BMP header fields; BMP format is little-endian so use
     // byte arrays rather than structs to avoid arch-specific endianness.
@@ -220,9 +221,9 @@ static int test_bmp(int32_t width, int32_t height,
         DWORD bfOffBits;
      };
      */
-    uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};
-    dwtoba(BMP_HEADER_SIZE + (packedrowsize * height), fileheader + 2);
-    dwtoba(BMP_HEADER_SIZE, fileheader + 10);   // bfOffBits
+    uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};       // bfType
+    dwtoba(BMP_HEADER_SIZE + pixels_totalsize, fileheader + 2); // bfSize
+    dwtoba(BMP_HEADER_SIZE, fileheader + 10);                   // bfOffBits
     fwrite(fileheader, sizeof fileheader[0],
            sizeof fileheader / sizeof fileheader[0], bmpfile);
 
@@ -272,7 +273,7 @@ static int test_bmp(int32_t width, int32_t height,
            bmpfile);
 
     // NOTE: BMP pixels are written bottom-row first
-    uint8_t *const packedrow = calloc(packedrowsize, sizeof *packedrow);
+    uint8_t *const packedrow = calloc(packedrow_size, sizeof *packedrow);
     for (int32_t row = height - 1; row >= 0; --row) {
         const uint8_t *const pixelrow = pixels + (row * width);
         // NOTE: at 4bpp each byte contains two pixels with first in upper
@@ -284,8 +285,8 @@ static int test_bmp(int32_t width, int32_t height,
                 packedrow[pixel / 2] |= pixelrow[pixel];
             }
         }
-        fwrite(packedrow, sizeof *packedrow, packedrowsize / sizeof *packedrow,
-               bmpfile);
+        fwrite(packedrow, sizeof *packedrow,
+               packedrow_size / sizeof *packedrow, bmpfile);
     }
     free(packedrow);
 

@@ -182,6 +182,17 @@ static int print_prgbank(const struct bankview *bv, bool verbose)
     return 0;
 }
 
+// NOTE: CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is an 8x8
+// byte array of 2-bit palette-indexed pixels composed of two bit-planes where
+// the first plane specifies the pixel low bit and the second plane specifies
+// the pixel high bit.
+// TODO: do these need to be literals
+enum {
+    CHR_PLANE_SIZE = 8,
+    CHR_TILE_SPAN = 2 * CHR_PLANE_SIZE,
+    CHR_TILE_SIZE = CHR_PLANE_SIZE * CHR_PLANE_SIZE,
+};
+
 enum {
     // NOTE: color depth and palette sizes; NES tiles are actually 2 bpp but
     // the closest the standard BMP format gets is 4; BMP palette size is also
@@ -197,16 +208,18 @@ enum {
                       + BMP_PALETTE_SIZE,
 };
 
-static int test_bmp(int32_t width, int32_t height,
-                    const uint8_t pixels[restrict width*height],
-                    const char *restrict filename)
+static int write_tiles_bmp(int32_t tilesx, int32_t tilesy,
+                           const uint8_t *restrict tiles,
+                           const char *restrict filename)
 {
     errno = 0;
     FILE *const bmpfile = fopen(filename, "wb");
     if (!bmpfile) return DIS_ERR_IO;
 
+    const int32_t pixelsx = tilesx * CHR_PLANE_SIZE,
+                  pixelsy = tilesy * CHR_PLANE_SIZE;
     // NOTE: bmp pixel rows are padded to the nearest 4-byte boundary
-    const int32_t packedrow_size = ceil((BMP_COLOR_SIZE * width) / 32.0) * 4;
+    const int32_t packedrow_size = ceil((BMP_COLOR_SIZE * pixelsx) / 32.0) * 4;
 
     // NOTE: write BMP header fields; BMP format is little-endian so use
     // byte arrays rather than structs to avoid arch-specific endianness.
@@ -221,7 +234,7 @@ static int test_bmp(int32_t width, int32_t height,
      };
      */
     uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};   // bfType
-    dwtoba(BMP_HEADER_SIZE + (packedrow_size * height),
+    dwtoba(BMP_HEADER_SIZE + (pixelsy * packedrow_size),
            fileheader + 2);                                 // bfSize
     dwtoba(BMP_HEADER_SIZE, fileheader + 10);               // bfOffBits
     fwrite(fileheader, sizeof fileheader[0],
@@ -244,13 +257,13 @@ static int test_bmp(int32_t width, int32_t height,
      };
      */
     uint8_t infoheader[BMP_INFOHEADER_SIZE] = {
-        BMP_INFOHEADER_SIZE,        // biSize
-        [12] = 1,                   // biPlanes
-        [14] = BMP_COLOR_SIZE,      // biBitCount
-        [32] = BMP_COLOR_SIZE,      // biClrUsed
+        BMP_INFOHEADER_SIZE,            // biSize
+        [12] = 1,                       // biPlanes
+        [14] = BMP_COLOR_SIZE,          // biBitCount
+        [32] = BMP_COLOR_SIZE,          // biClrUsed
     };
-    dwtoba(width, infoheader + 4);  // biWidth
-    dwtoba(height, infoheader + 8); // biHeight
+    dwtoba(pixelsx, infoheader + 4);    // biWidth
+    dwtoba(pixelsy, infoheader + 8);    // biHeight
     fwrite(infoheader, sizeof infoheader[0],
            sizeof infoheader / sizeof infoheader[0], bmpfile);
 
@@ -275,15 +288,20 @@ static int test_bmp(int32_t width, int32_t height,
 
     // NOTE: BMP pixels are written bottom-row first
     uint8_t *const packedrow = calloc(packedrow_size, sizeof *packedrow);
-    for (int32_t row = height - 1; row >= 0; --row) {
-        const uint8_t *const pixelrow = pixels + (row * width);
-        // NOTE: at 4bpp each byte contains two pixels with first in upper
-        // nibble, second in lower nibble.
-        for (int32_t pixel = 0; pixel < width; ++pixel) {
-            if (pixel % 2 == 0) {
-                packedrow[pixel / 2] = pixelrow[pixel] << 4;
-            } else {
-                packedrow[pixel / 2] |= pixelrow[pixel];
+    for (int32_t pixel_row = pixelsy - 1; pixel_row >= 0; --pixel_row) {
+        for (int32_t tilex = 0; tilex < tilesx; ++tilex) {
+            const uint8_t *const tilerow = tiles
+                                           + (tilex * CHR_TILE_SIZE)
+                                           + (pixel_row * CHR_PLANE_SIZE);
+            // NOTE: at 4bpp each byte contains two pixels with first in upper
+            // nibble, second in lower nibble.
+            for (size_t pixel = 0; pixel < CHR_PLANE_SIZE; ++pixel) {
+                const size_t packedpixel = pixel + (tilex * CHR_PLANE_SIZE);
+                if (packedpixel % 2 == 0) {
+                    packedrow[packedpixel / 2] = tilerow[pixel] << 4;
+                } else {
+                    packedrow[packedpixel / 2] |= tilerow[pixel];
+                }
             }
         }
         fwrite(packedrow, sizeof *packedrow,
@@ -294,17 +312,6 @@ static int test_bmp(int32_t width, int32_t height,
     fclose(bmpfile);
     return 0;
 }
-
-// NOTE: CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is an 8x8
-// byte array of 2-bit palette-indexed pixels composed of two bit-planes where
-// the first plane specifies the pixel low bit and the second plane specifies
-// the pixel high bit.
-// TODO: do these need to be literals
-enum {
-    CHR_PLANE_SIZE = 8,
-    CHR_TILE_SPAN = 2 * CHR_PLANE_SIZE,
-    CHR_TILE_SIZE = CHR_PLANE_SIZE * CHR_PLANE_SIZE,
-};
 
 static int print_chrbank(const struct bankview *bv)
 {
@@ -317,9 +324,9 @@ static int print_chrbank(const struct bankview *bv)
     uint8_t *const tiles = calloc(tilecount * CHR_TILE_SIZE,
                                   sizeof *tiles);
     for (size_t tileidx = 0; tileidx < tilecount; ++tileidx) {
-        uint8_t *const tile = tiles + (CHR_TILE_SIZE * tileidx);
+        uint8_t *const tile = tiles + (tileidx * CHR_TILE_SIZE);
         //printf("Tile %zu\n", tileidx);
-        const uint8_t *const planes = bv->mem + (CHR_TILE_SPAN * tileidx);
+        const uint8_t *const planes = bv->mem + (tileidx * CHR_TILE_SPAN);
         for (size_t row = 0; row < CHR_PLANE_SIZE; ++row) {
             const uint8_t plane0 = planes[row],
                           plane1 = planes[row + CHR_PLANE_SIZE];
@@ -351,14 +358,15 @@ static int print_chrbank(const struct bankview *bv)
     // Left: tiles 0-255
     // Right: tiles 256-511
     // TODO: remove all these magic numbers
-    for (size_t tile_row = 0; tile_row < 16; ++tile_row) {
+    for (size_t tile_row = 0; tile_row < 1; ++tile_row) {
         for (size_t pixel_row = 0; pixel_row < 8; ++pixel_row) {
-            for (size_t tile_section = 0; tile_section < 2; ++tile_section) {
+            for (size_t tile_section = 0; tile_section < 1; ++tile_section) {
                 fputc('|', stdout);
-                for (size_t tile = 0; tile < 16; ++tile) {
-                    const size_t tileidx = CHR_TILE_SIZE
-                                           * (tile + (tile_row * 16)
-                                              + (tile_section * 16 * 16));
+                for (size_t tile = 0; tile < 2; ++tile) {
+                    const size_t tileidx = (tile
+                                            + (tile_row * 16)
+                                            + (tile_section * 16 * 16))
+                                           * CHR_TILE_SIZE;
                     for (size_t pixel = 0; pixel < 8; ++pixel) {
                         const size_t pixelidx = pixel + (pixel_row * 8);
                         printf("%c", tiles[tileidx + pixelidx] + '0');
@@ -372,10 +380,11 @@ static int print_chrbank(const struct bankview *bv)
         puts("");
     }
 
-    test_bmp(8, 8, tiles, "tile1.bmp");
+    write_tiles_bmp(2, 1, tiles, "tiles.bmp");
+    /*test_bmp(8, 8, tiles, "tile1.bmp");
     test_bmp(8, 8, tiles + CHR_TILE_SIZE, "tile2.bmp");
     test_bmp(8, 8, tiles + 2 * CHR_TILE_SIZE, "tile3.bmp");
-    test_bmp(8, 8, tiles + 3 * CHR_TILE_SIZE, "tile4.bmp");
+    test_bmp(8, 8, tiles + 3 * CHR_TILE_SIZE, "tile4.bmp");*/
 
     free(tiles);
 
@@ -384,7 +393,7 @@ static int print_chrbank(const struct bankview *bv)
      | RED  | WHITE |
      */
     // TODO: test with odd dimensions
-    const uint8_t pixels1[] = {
+    /*const uint8_t pixels1[] = {
         0x2, 0x3,
         0x0, 0x1,
     };
@@ -416,7 +425,7 @@ static int print_chrbank(const struct bankview *bv)
         0x3, 0x0, 0x1,
         0x0, 0x1, 0x2,
     };
-    test_bmp(3, 3, pixels5, "test5.bmp");
+    test_bmp(3, 3, pixels5, "test5.bmp");*/
 
     return 0;
 }

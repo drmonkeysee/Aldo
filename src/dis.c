@@ -263,11 +263,12 @@ static int test_bmp(int32_t width, int32_t height,
         BYTE rgbReserved;
      }[BMP_COLOR_SIZE];
      */
+    // TODO: donkey kong mario sprite colors (approx)
     const uint8_t palettes[BMP_PALETTE_SIZE] = {
-        0, 0, 255, 0,       // RED
-        255, 255, 255, 0,   // WHITE
-        255, 0, 0, 0,       // BLUE
-        0, 255, 0, 0,       // GREEN
+        0, 0, 0, 0,         // DK BLACK
+        180, 16, 0, 0,      // DK BLUE
+        180, 209, 235, 0,   // DK BEIGE
+        37, 74, 229, 0,     // DK RED
     };
     fwrite(palettes, sizeof palettes[0], sizeof palettes / sizeof palettes[0],
            bmpfile);
@@ -370,6 +371,12 @@ static int print_chrbank(const struct bankview *bv)
         }
         puts("");
     }
+
+    test_bmp(8, 8, tiles, "tile1.bmp");
+    test_bmp(8, 8, tiles + CHR_TILE_SIZE, "tile2.bmp");
+    test_bmp(8, 8, tiles + 2 * CHR_TILE_SIZE, "tile3.bmp");
+    test_bmp(8, 8, tiles + 3 * CHR_TILE_SIZE, "tile4.bmp");
+
     free(tiles);
 
     /* test bitmap

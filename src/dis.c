@@ -206,8 +206,7 @@ static int test_bmp(int32_t width, int32_t height,
     if (!bmpfile) return DIS_ERR_IO;
 
     // NOTE: bmp pixel rows are padded to the nearest 4-byte boundary
-    const int32_t packedrow_size = ceil((BMP_COLOR_SIZE * width) / 32.0) * 4,
-                  pixels_totalsize = packedrow_size * height;
+    const int32_t packedrow_size = ceil((BMP_COLOR_SIZE * width) / 32.0) * 4;
 
     // NOTE: write BMP header fields; BMP format is little-endian so use
     // byte arrays rather than structs to avoid arch-specific endianness.
@@ -221,9 +220,10 @@ static int test_bmp(int32_t width, int32_t height,
         DWORD bfOffBits;
      };
      */
-    uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};       // bfType
-    dwtoba(BMP_HEADER_SIZE + pixels_totalsize, fileheader + 2); // bfSize
-    dwtoba(BMP_HEADER_SIZE, fileheader + 10);                   // bfOffBits
+    uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};   // bfType
+    dwtoba(BMP_HEADER_SIZE + (packedrow_size * height),
+           fileheader + 2);                                 // bfSize
+    dwtoba(BMP_HEADER_SIZE, fileheader + 10);               // bfOffBits
     fwrite(fileheader, sizeof fileheader[0],
            sizeof fileheader / sizeof fileheader[0], bmpfile);
 
@@ -244,13 +244,13 @@ static int test_bmp(int32_t width, int32_t height,
      };
      */
     uint8_t infoheader[BMP_INFOHEADER_SIZE] = {
-        BMP_INFOHEADER_SIZE,    // biSize
-        [12] = 1,               // biPlanes
-        [14] = BMP_COLOR_SIZE,  // biBitCount
-        [32] = BMP_COLOR_SIZE,  // biClrUsed
+        BMP_INFOHEADER_SIZE,        // biSize
+        [12] = 1,                   // biPlanes
+        [14] = BMP_COLOR_SIZE,      // biBitCount
+        [32] = BMP_COLOR_SIZE,      // biClrUsed
     };
-    dwtoba(width, infoheader + 4);
-    dwtoba(height, infoheader + 8);
+    dwtoba(width, infoheader + 4);  // biWidth
+    dwtoba(height, infoheader + 8); // biHeight
     fwrite(infoheader, sizeof infoheader[0],
            sizeof infoheader / sizeof infoheader[0], bmpfile);
 

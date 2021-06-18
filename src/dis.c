@@ -208,18 +208,19 @@ enum {
                       + BMP_PALETTE_SIZE,
 };
 
-static int write_tiles_bmp(int32_t tilesx, int32_t tilesy,
-                           const uint8_t *restrict tiles,
-                           const char *restrict filename)
+static int write_tile_sheet(int32_t tilesx, int32_t tilesy,
+                            const uint8_t *restrict tiles,
+                            const char *restrict filename)
 {
     errno = 0;
     FILE *const bmpfile = fopen(filename, "wb");
     if (!bmpfile) return DIS_ERR_IO;
 
-    const int32_t pixelsx = tilesx * CHR_PLANE_SIZE,
-                  pixelsy = tilesy * CHR_PLANE_SIZE;
-    // NOTE: bmp pixel rows are padded to the nearest 4-byte boundary
-    const int32_t packedrow_size = ceil((BMP_COLOR_SIZE * pixelsx) / 32.0) * 4;
+    const int32_t
+        bmpw = tilesx * CHR_PLANE_SIZE,
+        bmph = tilesy * CHR_PLANE_SIZE,
+        // NOTE: bmp pixel rows are padded to the nearest 4-byte boundary
+        packedrow_size = ceil((BMP_COLOR_SIZE * bmpw) / 32.0) * 4;
 
     // NOTE: write BMP header fields; BMP format is little-endian so use
     // byte arrays rather than structs to avoid arch-specific endianness.
@@ -234,7 +235,7 @@ static int write_tiles_bmp(int32_t tilesx, int32_t tilesy,
      };
      */
     uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};   // bfType
-    dwtoba(BMP_HEADER_SIZE + (pixelsy * packedrow_size),
+    dwtoba(BMP_HEADER_SIZE + (bmph * packedrow_size),
            fileheader + 2);                                 // bfSize
     dwtoba(BMP_HEADER_SIZE, fileheader + 10);               // bfOffBits
     fwrite(fileheader, sizeof fileheader[0],
@@ -257,13 +258,13 @@ static int write_tiles_bmp(int32_t tilesx, int32_t tilesy,
      };
      */
     uint8_t infoheader[BMP_INFOHEADER_SIZE] = {
-        BMP_INFOHEADER_SIZE,            // biSize
-        [12] = 1,                       // biPlanes
-        [14] = BMP_COLOR_SIZE,          // biBitCount
-        [32] = BMP_COLOR_SIZE,          // biClrUsed
+        BMP_INFOHEADER_SIZE,        // biSize
+        [12] = 1,                   // biPlanes
+        [14] = BMP_COLOR_SIZE,      // biBitCount
+        [32] = BMP_COLOR_SIZE,      // biClrUsed
     };
-    dwtoba(pixelsx, infoheader + 4);    // biWidth
-    dwtoba(pixelsy, infoheader + 8);    // biHeight
+    dwtoba(bmpw, infoheader + 4);   // biWidth
+    dwtoba(bmph, infoheader + 8);   // biHeight
     fwrite(infoheader, sizeof infoheader[0],
            sizeof infoheader / sizeof infoheader[0], bmpfile);
 
@@ -288,7 +289,7 @@ static int write_tiles_bmp(int32_t tilesx, int32_t tilesy,
 
     // NOTE: BMP pixels are written bottom-row first
     uint8_t *const packedrow = calloc(packedrow_size, sizeof *packedrow);
-    for (int32_t pixel_row = pixelsy - 1; pixel_row >= 0; --pixel_row) {
+    for (int32_t pixel_row = bmph - 1; pixel_row >= 0; --pixel_row) {
         for (int32_t tilex = 0; tilex < tilesx; ++tilex) {
             const uint8_t *const tilerow = tiles
                                            + (tilex * CHR_TILE_SIZE)
@@ -380,7 +381,7 @@ static int print_chrbank(const struct bankview *bv)
         puts("");
     }
 
-    write_tiles_bmp(2, 1, tiles, "tiles.bmp");
+    write_tile_sheet(2, 1, tiles, "tiles.bmp");
     /*test_bmp(8, 8, tiles, "tile1.bmp");
     test_bmp(8, 8, tiles + CHR_TILE_SIZE, "tile2.bmp");
     test_bmp(8, 8, tiles + 2 * CHR_TILE_SIZE, "tile3.bmp");

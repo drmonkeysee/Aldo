@@ -193,6 +193,8 @@ enum {
     CHR_TILE_SIZE = CHR_PLANE_SIZE * CHR_PLANE_SIZE,
 };
 
+// NOTE: BMP details from:
+// https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-storage
 enum {
     // NOTE: color depth and palette sizes; NES tiles are actually 2 bpp but
     // the closest the standard BMP format gets is 4; BMP palette size is also
@@ -218,19 +220,19 @@ static int write_tile_sheet(size_t banksize,
     // e.g. for an 8KB bank, Left: tiles 0-255, Right: tiles 256-511
     // in PPU address space this would correspond to
     // pattern tables $0000-$0FFF, $1000-$1FFF.
-    int32_t tilesx, tilesy, tile_sections = 1;
+    int32_t tilesdim, tile_sections = 1;
     switch (banksize) {
     case MEMBLOCK_2KB:
         tile_sections = 2;
         // fallthrough
     case MEMBLOCK_1KB:
-        tilesx = tilesy = 8;
+        tilesdim = 8;
         break;
     case MEMBLOCK_8KB:
         tile_sections = 2;
         // fallthrough
     case MEMBLOCK_4KB:
-        tilesx = tilesy = 16;
+        tilesdim = 16;
         break;
     default:
         assert(((void)"INVALID CHR BANK SIZE", false));
@@ -238,11 +240,10 @@ static int write_tile_sheet(size_t banksize,
     }
 
     const int32_t
-        section_size = tilesx * CHR_PLANE_SIZE,
-        pixelsx = section_size * tile_sections,
-        pixelsy = tilesy * CHR_PLANE_SIZE,
-        // NOTE: 4 bpp equals 8 pixels per 4 bytes; bmp pixel rows must then be
-        // padded to the nearest 4-byte boundary.
+        pxlsectiondim = tilesdim * CHR_PLANE_SIZE,
+        pixelsx = pxlsectiondim * tile_sections,
+        // NOTE: 4 bpp equals 8 pixels per 4 bytes; bmp pixel rows must then
+        // be padded to the nearest 4-byte boundary.
         packedrow_size = ceil(pixelsx / 8.0) * 4;
 
     errno = 0;
@@ -261,10 +262,10 @@ static int write_tile_sheet(size_t banksize,
         DWORD bfOffBits;
      };
      */
-    uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};   // bfType
-    dwtoba(BMP_HEADER_SIZE + (pixelsy * packedrow_size),
-           fileheader + 2);                                 // bfSize
-    dwtoba(BMP_HEADER_SIZE, fileheader + 10);               // bfOffBits
+    uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};       // bfType
+    dwtoba(BMP_HEADER_SIZE + (pxlsectiondim * packedrow_size),  // bfSize
+           fileheader + 2);
+    dwtoba(BMP_HEADER_SIZE, fileheader + 10);                   // bfOffBits
     fwrite(fileheader, sizeof fileheader[0],
            sizeof fileheader / sizeof fileheader[0], bmpfile);
 
@@ -285,13 +286,13 @@ static int write_tile_sheet(size_t banksize,
      };
      */
     uint8_t infoheader[BMP_INFOHEADER_SIZE] = {
-        BMP_INFOHEADER_SIZE,            // biSize
-        [12] = 1,                       // biPlanes
-        [14] = BMP_COLOR_SIZE,          // biBitCount
-        [32] = BMP_COLOR_SIZE,          // biClrUsed
+        BMP_INFOHEADER_SIZE,                // biSize
+        [12] = 1,                           // biPlanes
+        [14] = BMP_COLOR_SIZE,              // biBitCount
+        [32] = BMP_COLOR_SIZE,              // biClrUsed
     };
-    dwtoba(pixelsx, infoheader + 4);    // biWidth
-    dwtoba(pixelsy, infoheader + 8);    // biHeight
+    dwtoba(pixelsx, infoheader + 4);        // biWidth
+    dwtoba(pxlsectiondim, infoheader + 8);  // biHeight
     fwrite(infoheader, sizeof infoheader[0],
            sizeof infoheader / sizeof infoheader[0], bmpfile);
 
@@ -316,18 +317,18 @@ static int write_tile_sheet(size_t banksize,
 
     // NOTE: BMP pixels are written bottom-row first
     uint8_t *const packedrow = calloc(packedrow_size, sizeof *packedrow);
-    for (int32_t tiley = tilesy - 1; tiley >= 0; --tiley) {
+    for (int32_t tiley = tilesdim - 1; tiley >= 0; --tiley) {
         for (int32_t pixely = CHR_PLANE_SIZE - 1; pixely >= 0; --pixely) {
             for (int32_t tile_section = 0;
                  tile_section < tile_sections;
                  ++tile_section) {
-                for (int32_t tilex = 0; tilex < tilesx; ++tilex) {
+                for (int32_t tilex = 0; tilex < tilesdim; ++tilex) {
                     // NOTE: tile_start is index of the first pixel
                     // in the current tile.
                     const size_t
                         tile_start = (tilex
-                                      + (tiley * tilesx)
-                                      + (tile_section * tilesx * tilesx))
+                                      + (tiley * tilesdim)
+                                      + (tile_section * tilesdim * tilesdim))
                                      * CHR_TILE_SIZE;
                     for (size_t pixelx = 0;
                          pixelx < CHR_PLANE_SIZE;
@@ -337,7 +338,7 @@ static int write_tile_sheet(size_t banksize,
                         const size_t
                             pixeloffset = pixelx + (pixely * CHR_PLANE_SIZE),
                             packedpixel = pixelx + (tilex * CHR_PLANE_SIZE)
-                                          + (tile_section * section_size);
+                                          + (tile_section * pxlsectiondim);
                         const uint8_t pixel = tiles[tile_start + pixeloffset];
                         if (packedpixel % 2 == 0) {
                             packedrow[packedpixel / 2] = pixel << 4;

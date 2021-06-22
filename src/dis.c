@@ -208,21 +208,46 @@ enum {
                       + BMP_PALETTE_SIZE,
 };
 
-// TODO: derive height/width from bank size
-static int write_tile_sheet(int32_t tilesx, int32_t tilesy,
+static int write_tile_sheet(size_t banksize,
                             const uint8_t *restrict tiles,
                             const char *restrict filename)
 {
-    errno = 0;
-    FILE *const bmpfile = fopen(filename, "wb");
-    if (!bmpfile) return DIS_ERR_IO;
+    // NOTE: display CHR tiles as 8x8 or 16x16 tile sections
+    // labeled "Left" and "Right" containing the lower- and upper-half of
+    // tiles respectively;
+    // e.g. for an 8KB bank, Left: tiles 0-255, Right: tiles 256-511
+    // in PPU address space this would correspond to
+    // pattern tables $0000-$0FFF, $1000-$1FFF.
+    int32_t tilesx, tilesy, tile_sections = 1;
+    switch (banksize) {
+    case MEMBLOCK_2KB:
+        tile_sections = 2;
+        // fallthrough
+    case MEMBLOCK_1KB:
+        tilesx = tilesy = 8;
+        break;
+    case MEMBLOCK_8KB:
+        tile_sections = 2;
+        // fallthrough
+    case MEMBLOCK_4KB:
+        tilesx = tilesy = 16;
+        break;
+    default:
+        assert(((void)"INVALID CHR BANK SIZE", false));
+        break;
+    }
 
     const int32_t
-        pixelsx = tilesx * CHR_PLANE_SIZE,
+        section_size = tilesx * CHR_PLANE_SIZE,
+        pixelsx = section_size * tile_sections,
         pixelsy = tilesy * CHR_PLANE_SIZE,
         // NOTE: 4 bpp equals 8 pixels per 4 bytes; bmp pixel rows must then be
         // padded to the nearest 4-byte boundary.
         packedrow_size = ceil(pixelsx / 8.0) * 4;
+
+    errno = 0;
+    FILE *const bmpfile = fopen(filename, "wb");
+    if (!bmpfile) return DIS_ERR_IO;
 
     // NOTE: write BMP header fields; BMP format is little-endian so use
     // byte arrays rather than structs to avoid arch-specific endianness.
@@ -290,24 +315,34 @@ static int write_tile_sheet(int32_t tilesx, int32_t tilesy,
            bmpfile);
 
     // NOTE: BMP pixels are written bottom-row first
-    // TODO: remove all these magic numbers
     uint8_t *const packedrow = calloc(packedrow_size, sizeof *packedrow);
-    for (int32_t tile_row = tilesy - 1; tile_row >= 0; --tile_row) {
-        for (int32_t pixel_row = CHR_PLANE_SIZE - 1; pixel_row >= 0; --pixel_row) {
-            // TODO: figure out how to render 2 sections
-            for (size_t tile_section = 0; tile_section < 1; ++tile_section) {
-                for (int32_t tile = 0; tile < tilesx; ++tile) {
-                    const size_t tileidx = (tile
-                                            + (tile_row * 16)
-                                            + (tile_section * 16 * 16))
-                                           * CHR_TILE_SIZE;
-                    for (size_t pixel = 0; pixel < CHR_PLANE_SIZE; ++pixel) {
-                        const size_t pixelidx = pixel + (pixel_row * CHR_PLANE_SIZE),
-                                     packedpixel = pixel + (tile * CHR_PLANE_SIZE);
+    for (int32_t tiley = tilesy - 1; tiley >= 0; --tiley) {
+        for (int32_t pixely = CHR_PLANE_SIZE - 1; pixely >= 0; --pixely) {
+            for (int32_t tile_section = 0;
+                 tile_section < tile_sections;
+                 ++tile_section) {
+                for (int32_t tilex = 0; tilex < tilesx; ++tilex) {
+                    // NOTE: tile_start is index of the first pixel
+                    // in the current tile.
+                    const size_t
+                        tile_start = (tilex
+                                      + (tiley * tilesx)
+                                      + (tile_section * tilesx * tilesx))
+                                     * CHR_TILE_SIZE;
+                    for (size_t pixelx = 0;
+                         pixelx < CHR_PLANE_SIZE;
+                         ++pixelx) {
+                        // NOTE: pixeloffset is the pixel index in tile space,
+                        // packedpixel is the pixel in bmp-row space.
+                        const size_t
+                            pixeloffset = pixelx + (pixely * CHR_PLANE_SIZE),
+                            packedpixel = pixelx + (tilex * CHR_PLANE_SIZE)
+                                          + (tile_section * section_size);
+                        const uint8_t pixel = tiles[tile_start + pixeloffset];
                         if (packedpixel % 2 == 0) {
-                            packedrow[packedpixel / 2] = tiles[tileidx + pixelidx] << 4;
+                            packedrow[packedpixel / 2] = pixel << 4;
                         } else {
-                            packedrow[packedpixel / 2] |= tiles[tileidx + pixelidx];
+                            packedrow[packedpixel / 2] |= pixel;
                         }
                     }
                 }
@@ -389,7 +424,7 @@ static int print_chrbank(const struct bankview *bv)
         puts("");
     }
 
-    write_tile_sheet(16, 16, tiles, "tiles.bmp");
+    write_tile_sheet(bv->size, tiles, "tiles.bmp");
     /*test_bmp(8, 8, tiles, "tile1.bmp");
     test_bmp(8, 8, tiles + CHR_TILE_SIZE, "tile2.bmp");
     test_bmp(8, 8, tiles + 2 * CHR_TILE_SIZE, "tile3.bmp");

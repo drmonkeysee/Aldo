@@ -210,6 +210,63 @@ enum {
                       + BMP_PALETTE_SIZE,
 };
 
+static int measure_tile_sheet(size_t banksize, int32_t *restrict dim,
+                              int32_t *restrict sections)
+{
+    // NOTE: display CHR tiles as 8x8 or 16x16 tile sections
+    // labeled "Left" and "Right" containing the lower- and upper-half of
+    // tiles respectively;
+    // e.g. for an 8KB bank, Left: tiles 0-255, Right: tiles 256-511
+    // in PPU address space this would correspond to
+    // pattern tables $0000-$0FFF, $1000-$1FFF.
+    *sections = 1;
+    switch (banksize) {
+    case MEMBLOCK_2KB:
+        *sections = 2;
+        // fallthrough
+    case MEMBLOCK_1KB:
+        *dim = 8;
+        break;
+    case MEMBLOCK_8KB:
+        *sections = 2;
+        // fallthrough
+    case MEMBLOCK_4KB:
+        *dim = 16;
+        break;
+    default:
+        assert(((void)"INVALID CHR BANK SIZE", false));
+        return DIS_ERR_CHRSZ;
+    }
+    return 0;
+}
+
+static void decode_tiles(const struct bankview *bv, size_t tilecount,
+                         uint8_t *restrict tiles)
+{
+    for (size_t tileidx = 0; tileidx < tilecount; ++tileidx) {
+        uint8_t *const tile = tiles + (tileidx * CHR_TILE_SIZE);
+        const uint8_t *const planes = bv->mem + (tileidx * CHR_TILE_SPAN);
+        for (size_t row = 0; row < CHR_PLANE_SIZE; ++row) {
+            const uint8_t plane0 = planes[row],
+                          plane1 = planes[row + CHR_PLANE_SIZE];
+            for (size_t bit = 0; bit < CHR_PLANE_SIZE; ++bit) {
+                // NOTE: tile origins are top-left so in order to pack pixels
+                // left-to-right we need to decode each bit-plane row
+                // least-significant bit last.
+                const ptrdiff_t pixel = (CHR_PLANE_SIZE - bit - 1)
+                                        + (row * CHR_PLANE_SIZE);
+                assert(pixel >= 0);
+                tile[pixel] = byte_getbit(plane0, bit)
+                              | (byte_getbit(plane1, bit) << 1);
+            }
+        }
+        // NOTE: did we process the entire CHR ROM?
+        if (tileidx == tilecount - 1) {
+            assert(planes + CHR_TILE_SPAN == bv->mem + bv->size);
+        }
+    }
+}
+
 static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
                             const uint8_t *restrict tiles,
                             const char *restrict filename)
@@ -335,30 +392,9 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
 
 static int write_chrbank(const struct bankview *bv)
 {
-    // NOTE: display CHR tiles as 8x8 or 16x16 tile sections
-    // labeled "Left" and "Right" containing the lower- and upper-half of
-    // tiles respectively;
-    // e.g. for an 8KB bank, Left: tiles 0-255, Right: tiles 256-511
-    // in PPU address space this would correspond to
-    // pattern tables $0000-$0FFF, $1000-$1FFF.
-    int32_t tilesdim, tile_sections = 1;
-    switch (bv->size) {
-    case MEMBLOCK_2KB:
-        tile_sections = 2;
-        // fallthrough
-    case MEMBLOCK_1KB:
-        tilesdim = 8;
-        break;
-    case MEMBLOCK_8KB:
-        tile_sections = 2;
-        // fallthrough
-    case MEMBLOCK_4KB:
-        tilesdim = 16;
-        break;
-    default:
-        assert(((void)"INVALID CHR BANK SIZE", false));
-        return DIS_ERR_CHRSZ;
-    }
+    int32_t tilesdim, tile_sections;
+    int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
+    if (err < 0) return err;
 
     char bmpfilename[16];
     if (sprintf(bmpfilename, "bank%03zu.bmp", bv->bank) < 0) return DIS_ERR_IO;
@@ -368,35 +404,13 @@ static int write_chrbank(const struct bankview *bv)
            tile_sections == 1 ? "" : "s", bmpfilename);
 
     const size_t tilecount = bv->size / CHR_TILE_SPAN;
-    uint8_t *const tiles = calloc(tilecount * CHR_TILE_SIZE,
-                                  sizeof *tiles);
-    for (size_t tileidx = 0; tileidx < tilecount; ++tileidx) {
-        uint8_t *const tile = tiles + (tileidx * CHR_TILE_SIZE);
-        const uint8_t *const planes = bv->mem + (tileidx * CHR_TILE_SPAN);
-        for (size_t row = 0; row < CHR_PLANE_SIZE; ++row) {
-            const uint8_t plane0 = planes[row],
-                          plane1 = planes[row + CHR_PLANE_SIZE];
-            for (size_t bit = 0; bit < CHR_PLANE_SIZE; ++bit) {
-                // NOTE: tile origins are top-left so in order to pack pixels
-                // left-to-right we need to decode each bit-plane row
-                // least-significant bit last.
-                const ptrdiff_t pixel = (CHR_PLANE_SIZE - bit - 1)
-                                        + (row * CHR_PLANE_SIZE);
-                assert(pixel >= 0);
-                tile[pixel] = byte_getbit(plane0, bit)
-                              | (byte_getbit(plane1, bit) << 1);
-            }
-        }
-        // NOTE: did we process the entire CHR ROM?
-        if (tileidx == tilecount - 1) {
-            assert(planes + CHR_TILE_SPAN == bv->mem + bv->size);
-        }
-    }
+    uint8_t *const tiles = calloc(tilecount * CHR_TILE_SIZE, sizeof *tiles);
 
-    const int result = write_tile_sheet(tilesdim, tile_sections, tiles,
-                                        bmpfilename);
+    decode_tiles(bv, tilecount, tiles);
+    err = write_tile_sheet(tilesdim, tile_sections, tiles, bmpfilename);
+
     free(tiles);
-    return result;
+    return err;
 }
 
 //

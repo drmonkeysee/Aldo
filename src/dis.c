@@ -267,6 +267,7 @@ static void decode_tiles(const struct bankview *bv, size_t tilecount,
     }
 }
 
+// TODO: handle scale
 static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
                             const uint8_t *restrict tiles,
                             const char *restrict filename)
@@ -337,7 +338,7 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
         BYTE rgbReserved;
      }[BMP_COLOR_SIZE];
      */
-    // TODO: donkey kong mario sprite colors (approx)
+    // TODO: replace with grayscale
     const uint8_t palettes[BMP_PALETTE_SIZE] = {
         0, 0, 0, 0,         // DK BLACK
         180, 16, 0, 0,      // DK BLUE

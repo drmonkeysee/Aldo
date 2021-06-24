@@ -338,12 +338,13 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
         BYTE rgbReserved;
      }[BMP_COLOR_SIZE];
      */
-    // TODO: replace with grayscale
+    // NOTE: no fixed palette for tiles so use grayscale;
+    // fun fact, this is the original Gameboy palette.
     const uint8_t palettes[BMP_PALETTE_SIZE] = {
-        0, 0, 0, 0,         // DK BLACK
-        180, 16, 0, 0,      // DK BLUE
-        180, 209, 235, 0,   // DK BEIGE
-        37, 74, 229, 0,     // DK RED
+        0, 0, 0, 0,         // #000000
+        103, 103, 103, 0,   // #676767
+        182, 182, 182, 0,   // #b6b6b6
+        255, 255, 255, 0,   // #ffffff
     };
     fwrite(palettes, sizeof palettes[0], sizeof palettes / sizeof palettes[0],
            bmpfile);

@@ -186,29 +186,9 @@ static int print_prgbank(const struct bankview *bv, bool verbose)
 // byte array of 2-bit palette-indexed pixels composed of two bit-planes where
 // the first plane specifies the pixel low bit and the second plane specifies
 // the pixel high bit.
-// TODO: do these need to be literals
-enum {
-    CHR_PLANE_SIZE = 8,
-    CHR_TILE_SPAN = 2 * CHR_PLANE_SIZE,
-    CHR_TILE_SIZE = CHR_PLANE_SIZE * CHR_PLANE_SIZE,
-};
-
-// NOTE: BMP details from:
-// https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-storage
-enum {
-    // NOTE: color depth and palette sizes; NES tiles are actually 2 bpp but
-    // the closest the standard BMP format gets is 4; BMP palette size is also
-    // 4, as are the number of colors representable at 2 bpp so conveniently
-    // all color constants collapse into one value.
-    BMP_COLOR_SIZE = 4,
-    BMP_PALETTE_SIZE = BMP_COLOR_SIZE * BMP_COLOR_SIZE,
-
-    // NOTE: bmp header sizes
-    BMP_FILEHEADER_SIZE = 14,
-    BMP_INFOHEADER_SIZE = 40,
-    BMP_HEADER_SIZE = BMP_FILEHEADER_SIZE + BMP_INFOHEADER_SIZE
-                      + BMP_PALETTE_SIZE,
-};
+const size_t ChrPlaneSize = 8,
+             ChrTileSpan = 2 * ChrPlaneSize,
+             ChrTileSize = ChrPlaneSize * ChrPlaneSize;
 
 static int measure_tile_sheet(size_t banksize, int32_t *restrict dim,
                               int32_t *restrict sections)
@@ -244,17 +224,17 @@ static void decode_tiles(const struct bankview *bv, size_t tilecount,
                          uint8_t *restrict tiles)
 {
     for (size_t tileidx = 0; tileidx < tilecount; ++tileidx) {
-        uint8_t *const tile = tiles + (tileidx * CHR_TILE_SIZE);
-        const uint8_t *const planes = bv->mem + (tileidx * CHR_TILE_SPAN);
-        for (size_t row = 0; row < CHR_PLANE_SIZE; ++row) {
+        uint8_t *const tile = tiles + (tileidx * ChrTileSize);
+        const uint8_t *const planes = bv->mem + (tileidx * ChrTileSpan);
+        for (size_t row = 0; row < ChrPlaneSize; ++row) {
             const uint8_t plane0 = planes[row],
-                          plane1 = planes[row + CHR_PLANE_SIZE];
-            for (size_t bit = 0; bit < CHR_PLANE_SIZE; ++bit) {
+                          plane1 = planes[row + ChrPlaneSize];
+            for (size_t bit = 0; bit < ChrPlaneSize; ++bit) {
                 // NOTE: tile origins are top-left so in order to pack pixels
                 // left-to-right we need to decode each bit-plane row
                 // least-significant bit last.
-                const ptrdiff_t pixel = (CHR_PLANE_SIZE - bit - 1)
-                                        + (row * CHR_PLANE_SIZE);
+                const ptrdiff_t pixel = (ChrPlaneSize - bit - 1)
+                                        + (row * ChrPlaneSize);
                 assert(pixel >= 0);
                 tile[pixel] = byte_getbit(plane0, bit)
                               | (byte_getbit(plane1, bit) << 1);
@@ -262,10 +242,27 @@ static void decode_tiles(const struct bankview *bv, size_t tilecount,
         }
         // NOTE: did we process the entire CHR ROM?
         if (tileidx == tilecount - 1) {
-            assert(planes + CHR_TILE_SPAN == bv->mem + bv->size);
+            assert(planes + ChrTileSpan == bv->mem + bv->size);
         }
     }
 }
+
+// NOTE: BMP details from:
+// https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-storage
+enum {
+    // NOTE: color depth and palette sizes; NES tiles are actually 2 bpp but
+    // the closest the standard BMP format gets is 4; BMP palette size is also
+    // 4, as are the number of colors representable at 2 bpp so conveniently
+    // all color constants collapse into one value.
+    BMP_COLOR_SIZE = 4,
+    BMP_PALETTE_SIZE = BMP_COLOR_SIZE * BMP_COLOR_SIZE,
+
+    // NOTE: bmp header sizes
+    BMP_FILEHEADER_SIZE = 14,
+    BMP_INFOHEADER_SIZE = 40,
+    BMP_HEADER_SIZE = BMP_FILEHEADER_SIZE + BMP_INFOHEADER_SIZE
+                      + BMP_PALETTE_SIZE,
+};
 
 // TODO: handle scale
 static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
@@ -273,7 +270,7 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
                             const char *restrict filename)
 {
     const int32_t
-        section_pxldim = tilesdim * CHR_PLANE_SIZE,
+        section_pxldim = tilesdim * ChrPlaneSize,
         pixelsx = section_pxldim * tile_sections,
         // NOTE: 4 bpp equals 8 pixels per 4 bytes; bmp pixel rows must then
         // be padded to the nearest 4-byte boundary.
@@ -352,7 +349,7 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
     // NOTE: BMP pixels are written bottom-row first
     uint8_t *const packedrow = calloc(packedrow_size, sizeof *packedrow);
     for (int32_t tiley = tilesdim - 1; tiley >= 0; --tiley) {
-        for (int32_t pixely = CHR_PLANE_SIZE - 1; pixely >= 0; --pixely) {
+        for (int32_t pixely = ChrPlaneSize - 1; pixely >= 0; --pixely) {
             for (int32_t tile_section = 0;
                  tile_section < tile_sections;
                  ++tile_section) {
@@ -363,15 +360,13 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
                         tile_start = (tilex
                                       + (tiley * tilesdim)
                                       + (tile_section * tilesdim * tilesdim))
-                                     * CHR_TILE_SIZE;
-                    for (size_t pixelx = 0;
-                         pixelx < CHR_PLANE_SIZE;
-                         ++pixelx) {
+                                     * ChrTileSize;
+                    for (size_t pixelx = 0; pixelx < ChrPlaneSize; ++pixelx) {
                         // NOTE: pixeloffset is the pixel index in tile space,
                         // packedpixel is the pixel in bmp-row space.
                         const size_t
-                            pixeloffset = pixelx + (pixely * CHR_PLANE_SIZE),
-                            packedpixel = pixelx + (tilex * CHR_PLANE_SIZE)
+                            pixeloffset = pixelx + (pixely * ChrPlaneSize),
+                            packedpixel = pixelx + (tilex * ChrPlaneSize)
                                           + (tile_section * section_pxldim);
                         const uint8_t pixel = tiles[tile_start + pixeloffset];
                         if (packedpixel % 2 == 0) {
@@ -405,8 +400,8 @@ static int write_chrbank(const struct bankview *bv)
            bv->size >> BITWIDTH_1KB, tilesdim, tilesdim, tile_sections,
            tile_sections == 1 ? "" : "s", bmpfilename);
 
-    const size_t tilecount = bv->size / CHR_TILE_SPAN;
-    uint8_t *const tiles = calloc(tilecount * CHR_TILE_SIZE, sizeof *tiles);
+    const size_t tilecount = bv->size / ChrTileSpan;
+    uint8_t *const tiles = calloc(tilecount * ChrTileSize, sizeof *tiles);
 
     decode_tiles(bv, tilecount, tiles);
     err = write_tile_sheet(tilesdim, tile_sections, tiles, bmpfilename);

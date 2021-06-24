@@ -273,8 +273,8 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
                             const char *restrict filename)
 {
     const int32_t
-        pxlsectiondim = tilesdim * CHR_PLANE_SIZE,
-        pixelsx = pxlsectiondim * tile_sections,
+        section_pxldim = tilesdim * CHR_PLANE_SIZE,
+        pixelsx = section_pxldim * tile_sections,
         // NOTE: 4 bpp equals 8 pixels per 4 bytes; bmp pixel rows must then
         // be padded to the nearest 4-byte boundary.
         packedrow_size = ceil(pixelsx / 8.0) * 4;
@@ -296,7 +296,7 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
      };
      */
     uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};       // bfType
-    dwtoba(BMP_HEADER_SIZE + (pxlsectiondim * packedrow_size),  // bfSize
+    dwtoba(BMP_HEADER_SIZE + (section_pxldim * packedrow_size), // bfSize
            fileheader + 2);
     dwtoba(BMP_HEADER_SIZE, fileheader + 10);                   // bfOffBits
     fwrite(fileheader, sizeof fileheader[0],
@@ -325,7 +325,7 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
         [32] = BMP_COLOR_SIZE,              // biClrUsed
     };
     dwtoba(pixelsx, infoheader + 4);        // biWidth
-    dwtoba(pxlsectiondim, infoheader + 8);  // biHeight
+    dwtoba(section_pxldim, infoheader + 8); // biHeight
     fwrite(infoheader, sizeof infoheader[0],
            sizeof infoheader / sizeof infoheader[0], bmpfile);
 
@@ -372,7 +372,7 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
                         const size_t
                             pixeloffset = pixelx + (pixely * CHR_PLANE_SIZE),
                             packedpixel = pixelx + (tilex * CHR_PLANE_SIZE)
-                                          + (tile_section * pxlsectiondim);
+                                          + (tile_section * section_pxldim);
                         const uint8_t pixel = tiles[tile_start + pixeloffset];
                         if (packedpixel % 2 == 0) {
                             packedrow[packedpixel / 2] = pixel << 4;

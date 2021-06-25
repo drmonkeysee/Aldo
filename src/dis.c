@@ -396,7 +396,7 @@ static int write_chrbank(const struct bankview *bv,
 
     char bmpfilename[128];
     prefix = prefix && strlen(prefix) > 0 ? prefix : "bank";
-    if (snprintf(bmpfilename, sizeof bmpfilename, "%s%03zu.bmp", prefix,
+    if (snprintf(bmpfilename, sizeof bmpfilename, "%.120s%03zu.bmp", prefix,
                  bv->bank) < 0) return DIS_ERR_IO;
 
     printf("Bank %zu (%zuKB), %d x %d tiles (%d section%s): %s\n", bv->bank,

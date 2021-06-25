@@ -13,7 +13,7 @@
 
 struct control {
     uint64_t total_cycles;
-    const char *cartfile, *me;
+    const char *cartfile, *chrdecode_prefix, *me;
     int cyclebudget, cycles_per_sec, ramsheet;
     bool chrdecode, disassemble, help, info, running, verbose, version;
 };

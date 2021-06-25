@@ -41,7 +41,7 @@ static bool parse_flag(const char *restrict arg, char flag,
                        const char *restrict cmd)
 {
     return (strlen(arg) > 1 && arg[1] != '-' && strchr(arg, flag))
-            || (cmd && strcmp(arg, cmd) == 0);
+            || (cmd && strncmp(arg, cmd, strlen(cmd)) == 0);
 }
 
 #define setflag(f, a, s, l) (f) = (f) || parse_flag(a, s, l)
@@ -60,6 +60,11 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
                 setflag(appstate->info, arg, InfoFlag, InfoCmd);
                 setflag(appstate->verbose, arg, VerboseFlag, NULL);
                 setflag(appstate->version, arg, VersionFlag, VersionCmd);
+                const char *const opt = strchr(arg, '=');
+                if (opt &&
+                    strncmp(arg, ChrDecodeCmd, strlen(ChrDecodeCmd)) == 0) {
+                    appstate->chrdecode_prefix = opt + 1;
+                }
             } else {
                 appstate->cartfile = arg;
             }
@@ -76,16 +81,17 @@ static void print_usage(const struct control *appstate)
     puts("\noptions");
     puts("  -v\t: verbose output");
     puts("\ncommands");
-    puts("  -c\t: decode CHR ROM (also --chr-decode)");
+    puts("  -c\t: decode CHR ROM into BMP files (also --chr-decode[=prefix];"
+         " prefix default is 'bank')");
     puts("  -d\t: disassemble file (also --disassemble);"
-           " verbose prints duplicate lines");
+         " verbose prints duplicate lines");
     puts("  -h\t: print usage (also --help)");
     puts("  -i\t: print file cartridge info (also --info);"
-           " verbose prints more details");
+         " verbose prints more details");
     puts("  -V\t: print version (also --version)");
     puts("\narguments");
     puts("  file\t: input file containing cartridge"
-           " or program contents");
+         " or program contents");
 }
 
 static void print_version(void)
@@ -282,7 +288,7 @@ int aldo_run(int argc, char *argv[argc+1])
     }
 
     if (appstate.chrdecode) {
-        const int err = dis_cart_chr(cart);
+        const int err = dis_cart_chr(cart, &appstate);
         if (err < 0) {
             fprintf(stderr, "CHR decode error (%d): %s\n", err,
                     dis_errstr(err));

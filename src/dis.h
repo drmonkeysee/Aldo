@@ -45,6 +45,6 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
 int dis_cart(cart *cart, const struct control *appstate);
-int dis_cart_chr(cart *cart);
+int dis_cart_chr(cart *cart, const struct control *appstate);
 
 #endif

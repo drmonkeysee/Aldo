@@ -387,14 +387,17 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
     return 0;
 }
 
-static int write_chrbank(const struct bankview *bv)
+static int write_chrbank(const struct bankview *bv,
+                         const char *restrict prefix)
 {
     int32_t tilesdim, tile_sections;
     int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
     if (err < 0) return err;
 
-    char bmpfilename[16];
-    if (sprintf(bmpfilename, "bank%03zu.bmp", bv->bank) < 0) return DIS_ERR_IO;
+    char bmpfilename[128];
+    prefix = prefix && strlen(prefix) > 0 ? prefix : "bank";
+    if (snprintf(bmpfilename, sizeof bmpfilename, "%s%03zu.bmp", prefix,
+                 bv->bank) < 0) return DIS_ERR_IO;
 
     printf("Bank %zu (%zuKB), %d x %d tiles (%d section%s): %s\n", bv->bank,
            bv->size >> BITWIDTH_1KB, tilesdim, tilesdim, tile_sections,
@@ -517,15 +520,16 @@ int dis_cart(cart *cart, const struct control *appstate)
     return 0;
 }
 
-int dis_cart_chr(cart *cart)
+int dis_cart_chr(cart *cart, const struct control *appstate)
 {
     assert(cart != NULL);
+    assert(appstate != NULL);
 
     struct bankview bv = cart_chrbank(cart, 0);
     if (!bv.mem) return DIS_ERR_CHRROM;
 
     do {
-        const int err = write_chrbank(&bv);
+        const int err = write_chrbank(&bv, appstate->chrdecode_prefix);
         if (err < 0) return err;
         bv = cart_chrbank(cart, bv.bank + 1);
     } while (bv.mem);

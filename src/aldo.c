@@ -136,6 +136,25 @@ static int print_cart_info(const struct control *appstate, cart *c)
     return EXIT_SUCCESS;
 }
 
+static int disassemble_cart_prg(const struct control *appstate, cart *c)
+{
+    return dis_cart(c, appstate) == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+
+static int decode_cart_chr(const struct control *appstate, cart *c)
+{
+    const int err = dis_cart_chr(c, appstate);
+    if (err < 0) {
+        fprintf(stderr, "CHR decode error (%d): %s\n", err,
+                dis_errstr(err));
+        if (err == DIS_ERR_IO) {
+            perror("CHR decode file error");
+        }
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
+}
+
 static void handle_input(struct control *appstate,
                          const struct console_state *snapshot, nes *console)
 {
@@ -284,22 +303,12 @@ int aldo_run(int argc, char *argv[argc+1])
     }
 
     if (appstate.disassemble) {
-        result = dis_cart(cart, &appstate) == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+        result = disassemble_cart_prg(&appstate, cart);
         goto cart_cleanup;
     }
 
     if (appstate.chrdecode) {
-        const int err = dis_cart_chr(cart, &appstate);
-        if (err < 0) {
-            fprintf(stderr, "CHR decode error (%d): %s\n", err,
-                    dis_errstr(err));
-            if (err == DIS_ERR_IO) {
-                perror("CHR decode file error");
-            }
-            result = EXIT_FAILURE;
-        } else {
-            result = EXIT_SUCCESS;
-        }
+        result = decode_cart_chr(&appstate, cart);
         goto cart_cleanup;
     }
 

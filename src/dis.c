@@ -14,7 +14,6 @@
 #include <errno.h>
 #include <math.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -111,10 +110,10 @@ struct repeat_condition {
 
 static void print_prg_line(const char *restrict dis, uint32_t curr_bytes,
                            size_t total, size_t banksize,
-                           struct repeat_condition *repeat)
+                           struct repeat_condition *repeat, FILE *f)
 {
     if (repeat->state == DUP_VERBOSE) {
-        puts(dis);
+        fprintf(f, "%s\n", dis);
         return;
     }
 
@@ -122,14 +121,14 @@ static void print_prg_line(const char *restrict dis, uint32_t curr_bytes,
         switch (repeat->state) {
         case DUP_NONE:
             repeat->state = DUP_FIRST;
-            puts(dis);
+            fprintf(f, "%s\n", dis);
             break;
         case DUP_FIRST:
             repeat->state = DUP_TRUNCATE;
             // NOTE: if this is the last instruction in the PRG bank
             // skip printing the truncation indicator.
             if (total < banksize) {
-                puts("*");
+                fputs("*\n", f);
             }
             break;
         default:
@@ -137,16 +136,16 @@ static void print_prg_line(const char *restrict dis, uint32_t curr_bytes,
             break;
         }
     } else {
-        puts(dis);
+        fprintf(f, "%s\n", dis);
         repeat->prev_bytes = curr_bytes;
         repeat->state = DUP_NONE;
     }
 }
 
-static int print_prgbank(const struct bankview *bv, bool verbose)
+static int print_prgbank(const struct bankview *bv, bool verbose, FILE *f)
 {
-    printf("Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
-    puts("--------");
+    fprintf(f, "Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
+    fputs("--------\n", f);
 
     int bytes_read = 0;
     struct repeat_condition repeat = {
@@ -170,13 +169,13 @@ static int print_prgbank(const struct bankview *bv, bool verbose)
         for (int i = 0; i < bytes_read; ++i) {
             curr_bytes |= prgoffset[i] << (8 * i);
         }
-        print_prg_line(dis, curr_bytes, total, bv->size, &repeat);
+        print_prg_line(dis, curr_bytes, total, bv->size, &repeat, f);
     }
 
     // NOTE: always print the last line regardless of duplicate state
     // (if it hasn't already been printed).
     if (repeat.state == DUP_TRUNCATE || repeat.state == DUP_SKIP) {
-        puts(dis);
+        fprintf(f, "%s\n", dis);
     }
 
     return 0;
@@ -388,7 +387,7 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
 }
 
 static int write_chrbank(const struct bankview *bv,
-                         const char *restrict prefix)
+                         const char *restrict prefix, FILE *f)
 {
     int32_t tilesdim, tile_sections;
     int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
@@ -399,9 +398,9 @@ static int write_chrbank(const struct bankview *bv,
     if (snprintf(bmpfilename, sizeof bmpfilename, "%.120s%03zu.bmp", prefix,
                  bv->bank) < 0) return DIS_ERR_IO;
 
-    printf("Bank %zu (%zuKB), %d x %d tiles (%d section%s): %s\n", bv->bank,
-           bv->size >> BITWIDTH_1KB, tilesdim, tilesdim, tile_sections,
-           tile_sections == 1 ? "" : "s", bmpfilename);
+    fprintf(f, "Bank %zu (%zuKB), %d x %d tiles (%d section%s): %s\n",
+            bv->bank, bv->size >> BITWIDTH_1KB, tilesdim, tilesdim,
+            tile_sections, tile_sections == 1 ? "" : "s", bmpfilename);
 
     const size_t tilecount = bv->size / ChrTileSpan;
     uint8_t *const tiles = calloc(tilecount * ChrTileSize, sizeof *tiles);
@@ -502,34 +501,36 @@ int dis_datapath(const struct console_state *snapshot,
     return total;
 }
 
-int dis_cart(cart *cart, const struct control *appstate)
+int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
 {
     assert(cart != NULL);
     assert(appstate != NULL);
+    assert(f != NULL);
 
-    puts(appstate->cartfile);
-    cart_write_dis_header(cart, stdout);
+    fprintf(f, "%s\n", appstate->cartfile);
+    cart_write_dis_header(cart, f);
 
     for (struct bankview bv = cart_prgbank(cart, 0);
          bv.mem;
          bv = cart_prgbank(cart, bv.bank + 1)) {
-        puts("");
-        const int err = print_prgbank(&bv, appstate->verbose);
+        fputs("\n", f);
+        const int err = print_prgbank(&bv, appstate->verbose, f);
         if (err < 0) return err;
     }
     return 0;
 }
 
-int dis_cart_chr(cart *cart, const struct control *appstate)
+int dis_cart_chr(cart *cart, const struct control *appstate, FILE *f)
 {
     assert(cart != NULL);
     assert(appstate != NULL);
+    assert(f != NULL);
 
     struct bankview bv = cart_chrbank(cart, 0);
     if (!bv.mem) return DIS_ERR_CHRROM;
 
     do {
-        const int err = write_chrbank(&bv, appstate->chrdecode_prefix);
+        const int err = write_chrbank(&bv, appstate->chrdecode_prefix, f);
         if (err < 0) return err;
         bv = cart_chrbank(cart, bv.bank + 1);
     } while (bv.mem);

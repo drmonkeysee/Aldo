@@ -14,6 +14,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 // X(symbol, value, error string)
 #define DIS_ERRCODE_X \
@@ -44,7 +45,7 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE]);
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
-int dis_cart(cart *cart, const struct control *appstate);
-int dis_cart_chr(cart *cart, const struct control *appstate);
+int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f);
+int dis_cart_chr(cart *cart, const struct control *appstate, FILE *f);
 
 #endif

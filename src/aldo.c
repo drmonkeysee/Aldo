@@ -60,10 +60,11 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
                 setflag(appstate->info, arg, InfoFlag, InfoCmd);
                 setflag(appstate->verbose, arg, VerboseFlag, NULL);
                 setflag(appstate->version, arg, VersionFlag, VersionCmd);
-                const char *const opt = strchr(arg, '=');
-                if (opt &&
-                    strncmp(arg, ChrDecodeCmd, strlen(ChrDecodeCmd)) == 0) {
-                    appstate->chrdecode_prefix = opt + 1;
+                if (strncmp(arg, ChrDecodeCmd, strlen(ChrDecodeCmd)) == 0) {
+                    const char *const opt = strchr(arg, '=');
+                    if (opt) {
+                        appstate->chrdecode_prefix = opt + 1;
+                    }
                 }
             } else {
                 appstate->cartfile = arg;

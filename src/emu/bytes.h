@@ -81,7 +81,7 @@ inline void wrtoba(uint16_t word, uint8_t bytes[static 2])
 // DWord to Byte Array
 inline void dwtoba(uint32_t dword, uint8_t bytes[static 4])
 {
-    for (int i = 0; i < 4; ++i) {
+    for (size_t i = 0; i < 4; ++i) {
         bytes[i] = (dword >> (8 * i)) & 0xff;
     }
 }

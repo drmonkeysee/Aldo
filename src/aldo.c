@@ -25,17 +25,21 @@ static const char
     *restrict const Version = "0.2.0", // TODO: autogenerate this
 
     *restrict const ChrDecodeCmd = "--chr-decode",
+    *restrict const ChrScaleCmd = "--chr-scale",
     *restrict const DisassembleCmd = "--disassemble",
     *restrict const HelpCmd = "--help",
     *restrict const InfoCmd = "--info",
     *restrict const VersionCmd = "--version";
 
 static const char ChrDecodeFlag = 'c',
+                  ChrScaleFlag = 's',
                   DisassembleFlag = 'd',
                   HelpFlag = 'h',
                   InfoFlag = 'i',
                   VerboseFlag = 'v',
                   VersionFlag = 'V';
+
+static const int MinScale = 1, MaxScale = 10;
 
 static bool parse_flag(const char *restrict arg, char flag,
                        const char *restrict cmd)
@@ -66,6 +70,17 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
                         appstate->chrdecode_prefix = opt + 1;
                     }
                 }
+                if (parse_flag(arg, ChrScaleFlag, ChrScaleCmd)) {
+                    const int scale = ++i < argc ? atoi(argv[i]) : 0;
+                    if (MinScale <= scale && scale <= MaxScale) {
+                        appstate->chrscale = scale;
+                    } else {
+                        --i;    // NOTE: undo the peekahead
+                        fprintf(stderr,
+                                "Invalid scale format: expected [%d, %d]\n",
+                                MinScale, MaxScale);
+                    }
+                }
             } else {
                 appstate->cartfile = arg;
             }
@@ -89,6 +104,8 @@ static void print_usage(const struct control *appstate)
     puts("  -h\t: print usage (also --help)");
     puts("  -i\t: print file cartridge info (also --info);"
          " verbose prints more details");
+    printf("  -s n\t: CHR ROM BMP scaling factor"
+           " [%d, %d] (also --chr-scale n)\n", MinScale, MaxScale);
     puts("  -V\t: print version (also --version)");
     puts("\narguments");
     puts("  file\t: input file containing cartridge"
@@ -274,7 +291,7 @@ static int emu_loop(struct control *appstate, cart *c)
 int aldo_run(int argc, char *argv[argc+1])
 {
     struct control appstate = {
-        .chrscale = 1,
+        .chrscale = MinScale,
         .cycles_per_sec = 4,
         .running = true,
     };

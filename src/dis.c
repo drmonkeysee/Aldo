@@ -409,9 +409,13 @@ static int write_chrbank(const struct bankview *bv, int scale,
     if (snprintf(bmpfilename, sizeof bmpfilename, "%.120s%03zu.bmp", prefix,
                  bv->bank) < 0) return DIS_ERR_IO;
 
-    fprintf(f, "Bank %zu (%zuKB), %d x %d tiles (%d section%s): %s\n",
+    fprintf(f, "Bank %zu (%zuKB), %d x %d tiles (%d section%s)",
             bv->bank, bv->size >> BITWIDTH_1KB, tilesdim, tilesdim,
-            tile_sections, tile_sections == 1 ? "" : "s", bmpfilename);
+            tile_sections, tile_sections == 1 ? "" : "s");
+    if (scale > 1) {
+        fprintf(f, " (%dx scale)", scale);
+    }
+    fprintf(f, ": %s\n", bmpfilename);
 
     const size_t tilecount = bv->size / ChrTileSpan;
     uint8_t *const tiles = calloc(tilecount * ChrTileSize, sizeof *tiles);

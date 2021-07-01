@@ -70,6 +70,7 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
                         appstate->chrdecode_prefix = opt + 1;
                     }
                 }
+                // TODO: support -s2 and --chr-scale=2 formats?
                 if (parse_flag(arg, ChrScaleFlag, ChrScaleCmd)) {
                     const int scale = ++i < argc ? atoi(argv[i]) : 0;
                     if (MinScale <= scale && scale <= MaxScale) {

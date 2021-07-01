@@ -266,7 +266,7 @@ enum {
 static void fill_tile_sheet_row(uint8_t *restrict packedrow,
                                 int32_t tiley, int32_t pixely,
                                 int32_t tilesdim, int32_t tile_sections,
-                                int32_t scale, int32_t section_pxldim,
+                                int scale, int32_t section_pxldim,
                                 const uint8_t *restrict tiles)
 {
     for (int32_t section = 0; section < tile_sections; ++section) {
@@ -283,7 +283,7 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
                              packedpixel = pixelx + (tilex * ChrPlaneSize)
                                            + (section * section_pxldim);
                 const uint8_t pixel = tiles[tile_start + pixeloffset];
-                for (int32_t scalex = 0; scalex < scale; ++scalex) {
+                for (int scalex = 0; scalex < scale; ++scalex) {
                     const size_t scaledpixel = scalex + (packedpixel * scale);
                     if (scaledpixel % 2 == 0) {
                         packedrow[scaledpixel / 2] = pixel << 4;
@@ -296,8 +296,8 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
     }
 }
 
-static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
-                            int32_t scale, const uint8_t *restrict tiles,
+static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections, int scale,
+                            const uint8_t *restrict tiles,
                             const char *restrict filename)
 {
     const int32_t
@@ -382,7 +382,7 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
     uint8_t *const packedrow = calloc(packedrow_size, sizeof *packedrow);
     for (int32_t tiley = tilesdim - 1; tiley >= 0; --tiley) {
         for (int32_t pixely = ChrPlaneSize - 1; pixely >= 0; --pixely) {
-            for (int32_t scaley = 0; scaley < scale; ++scaley) {
+            for (int scaley = 0; scaley < scale; ++scaley) {
                 fill_tile_sheet_row(packedrow, tiley, pixely, tilesdim,
                                     tile_sections, scale, section_pxldim,
                                     tiles);
@@ -397,7 +397,7 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections,
     return 0;
 }
 
-static int write_chrbank(const struct bankview *bv,
+static int write_chrbank(const struct bankview *bv, int scale,
                          const char *restrict prefix, FILE *f)
 {
     int32_t tilesdim, tile_sections;
@@ -417,7 +417,7 @@ static int write_chrbank(const struct bankview *bv,
     uint8_t *const tiles = calloc(tilecount * ChrTileSize, sizeof *tiles);
 
     decode_tiles(bv, tilecount, tiles);
-    err = write_tile_sheet(tilesdim, tile_sections, 1, tiles, bmpfilename);
+    err = write_tile_sheet(tilesdim, tile_sections, scale, tiles, bmpfilename);
 
     free(tiles);
     return err;
@@ -541,7 +541,8 @@ int dis_cart_chr(cart *cart, const struct control *appstate, FILE *f)
     if (!bv.mem) return DIS_ERR_CHRROM;
 
     do {
-        const int err = write_chrbank(&bv, appstate->chrdecode_prefix, f);
+        const int err = write_chrbank(&bv, appstate->chrscale,
+                                      appstate->chrdecode_prefix, f);
         if (err < 0) return err;
         bv = cart_chrbank(cart, bv.bank + 1);
     } while (bv.mem);

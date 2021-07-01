@@ -273,7 +273,11 @@ static int emu_loop(struct control *appstate, cart *c)
 
 int aldo_run(int argc, char *argv[argc+1])
 {
-    struct control appstate = {.cycles_per_sec = 4, .running = true};
+    struct control appstate = {
+        .chrscale = 1,
+        .cycles_per_sec = 4,
+        .running = true,
+    };
     parse_args(&appstate, argc, argv);
 
     if (appstate.help) {

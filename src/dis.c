@@ -246,23 +246,6 @@ static void decode_tiles(const struct bankview *bv, size_t tilecount,
     }
 }
 
-// NOTE: BMP details from:
-// https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-storage
-enum {
-    // NOTE: color depth and palette sizes; NES tiles are actually 2 bpp but
-    // the closest the standard BMP format gets is 4; BMP palette size is also
-    // 4, as are the number of colors representable at 2 bpp so conveniently
-    // all color constants collapse into one value.
-    BMP_COLOR_SIZE = 4,
-    BMP_PALETTE_SIZE = BMP_COLOR_SIZE * BMP_COLOR_SIZE,
-
-    // NOTE: bmp header sizes
-    BMP_FILEHEADER_SIZE = 14,
-    BMP_INFOHEADER_SIZE = 40,
-    BMP_HEADER_SIZE = BMP_FILEHEADER_SIZE + BMP_INFOHEADER_SIZE
-                      + BMP_PALETTE_SIZE,
-};
-
 static void fill_tile_sheet_row(uint8_t *restrict packedrow,
                                 int32_t tiley, int32_t pixely,
                                 int32_t tilesdim, int32_t tile_sections,
@@ -295,6 +278,23 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
         }
     }
 }
+
+// NOTE: BMP details from:
+// https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-storage
+enum {
+    // NOTE: color depth and palette sizes; NES tiles are actually 2 bpp but
+    // the closest the standard BMP format gets is 4; BMP palette size is also
+    // 4, as are the number of colors representable at 2 bpp so conveniently
+    // all color constants collapse into one value.
+    BMP_COLOR_SIZE = 4,
+    BMP_PALETTE_SIZE = BMP_COLOR_SIZE * BMP_COLOR_SIZE,
+
+    // NOTE: bmp header sizes
+    BMP_FILEHEADER_SIZE = 14,
+    BMP_INFOHEADER_SIZE = 40,
+    BMP_HEADER_SIZE = BMP_FILEHEADER_SIZE + BMP_INFOHEADER_SIZE
+                      + BMP_PALETTE_SIZE,
+};
 
 static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections, int scale,
                             const uint8_t *restrict tiles,

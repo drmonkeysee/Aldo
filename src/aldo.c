@@ -75,7 +75,6 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
                     if (MinScale <= scale && scale <= MaxScale) {
                         appstate->chrscale = scale;
                     } else {
-                        --i;    // NOTE: undo the peekahead
                         fprintf(stderr,
                                 "Invalid scale format: expected [%d, %d]\n",
                                 MinScale, MaxScale);

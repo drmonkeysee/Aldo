@@ -63,10 +63,11 @@ endif
 $(TARGET): $(OBJ_FILES)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
+$(TESTS_TARGET): LDLIBS := -lcinytest
 ifneq ($(OS), Darwin)
 $(TESTS_TARGET): LDFLAGS := -L/usr/local/lib -Wl,-rpath,/usr/local/lib
+$(TESTS_TARGET): LDLIBS += -lm
 endif
-$(TESTS_TARGET): LDLIBS := -lcinytest
 $(TESTS_TARGET): $(TEST_OBJ_FILES) $(TEST_DEPS)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 

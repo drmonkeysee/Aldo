@@ -297,8 +297,7 @@ static void drawflags(const struct console_state *snapshot)
 }
 
 static void draw_cpu_line(bool signal, int y, int x, int dir_offset,
-                          const char *restrict direction,
-                          const char *restrict label)
+                          const char *direction, const char *label)
 {
     if (!signal) {
         wattron(DatapathView.content, A_DIM);

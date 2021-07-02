@@ -79,7 +79,7 @@ static void raw_dtor(struct mapper *self)
 }
 
 static size_t raw_prgbank(const struct mapper *self, size_t i,
-                          const uint8_t *restrict *mem)
+                          const uint8_t **mem)
 {
     assert(self != NULL);
     assert(mem != NULL);
@@ -118,7 +118,7 @@ static void ines_dtor(struct mapper *self)
 }
 
 static size_t ines_unimplemented_prgbank(const struct mapper *self, size_t i,
-                                         const uint8_t *restrict *mem)
+                                         const uint8_t **mem)
 {
     assert(self != NULL);
     assert(mem != NULL);
@@ -164,7 +164,7 @@ static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
 }
 
 static size_t ines_000_prgbank(const struct mapper *self, size_t i,
-                               const uint8_t *restrict *mem)
+                               const uint8_t **mem)
 {
     assert(self != NULL);
     assert(mem != NULL);
@@ -182,7 +182,7 @@ static size_t ines_000_prgbank(const struct mapper *self, size_t i,
 }
 
 static size_t ines_000_chrbank(const struct mapper *self, size_t i,
-                               const uint8_t *restrict *mem)
+                               const uint8_t **mem)
 {
     assert(self != NULL);
     assert(mem != NULL);

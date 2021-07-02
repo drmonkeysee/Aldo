@@ -297,8 +297,7 @@ enum {
 };
 
 static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections, int scale,
-                            const uint8_t *restrict tiles,
-                            const char *restrict filename)
+                            const uint8_t *tiles, const char *filename)
 {
     const int32_t
         section_pxldim = tilesdim * ChrPlaneSize,

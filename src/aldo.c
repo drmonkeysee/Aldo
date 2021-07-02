@@ -41,8 +41,7 @@ static const char ChrDecodeFlag = 'c',
 
 static const int MinScale = 1, MaxScale = 10;
 
-static bool parse_flag(const char *restrict arg, char flag,
-                       const char *restrict cmd)
+static bool parse_flag(const char *arg, char flag, const char *cmd)
 {
     return (strlen(arg) > 1 && arg[1] != '-' && strchr(arg, flag))
             || (cmd && strncmp(arg, cmd, strlen(cmd)) == 0);

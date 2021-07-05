@@ -22,7 +22,7 @@
 #include <string.h>
 
 static const char
-    *restrict const Version = "0.2.0", // TODO: autogenerate this
+    *restrict const Version = "0.2.1", // TODO: autogenerate this
 
     *restrict const ChrDecodeCmd = "--chr-decode",
     *restrict const ChrScaleCmd = "--chr-scale",

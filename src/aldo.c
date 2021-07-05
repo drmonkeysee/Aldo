@@ -39,7 +39,7 @@ static const char ChrDecodeFlag = 'c',
                   VerboseFlag = 'v',
                   VersionFlag = 'V';
 
-static const int MinScale = 1, MaxScale = 10;
+static const int ArgParseFailure = -1, MinScale = 1, MaxScale = 10;
 
 static bool parse_flag(const char *arg, char flag, const char *cmd)
 {
@@ -49,7 +49,26 @@ static bool parse_flag(const char *arg, char flag, const char *cmd)
 
 #define setflag(f, a, s, l) (f) = (f) || parse_flag(a, s, l)
 
-static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
+static int parse_scale(const char *arg, int *argi, int argc,
+                       char *argv[argc+1])
+{
+    // NOTE: first try -sN format
+    int scale = atoi(arg + 2);
+    // NOTE: then try --chr-scale=N format
+    if (scale == 0 && arg[1] == '-') {
+        const char *const opt = strchr(arg, '=');
+        if (opt) {
+            scale = atoi(opt + 1);
+        }
+    }
+    // NOTE: finally try parsing next argument
+    if (scale == 0) {
+        scale = ++*argi < argc ? atoi(argv[*argi]) : 0;
+    }
+    return scale;
+}
+
+static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
 {
     appstate->me = argc > 0 && strlen(argv[0]) > 0 ? argv[0] : "aldo";
     if (argc > 1) {
@@ -69,15 +88,15 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
                         appstate->chrdecode_prefix = opt + 1;
                     }
                 }
-                // TODO: support -s2 and --chr-scale=2 formats?
                 if (parse_flag(arg, ChrScaleFlag, ChrScaleCmd)) {
-                    const int scale = ++i < argc ? atoi(argv[i]) : 0;
+                    const int scale = parse_scale(arg, &i, argc, argv);
                     if (MinScale <= scale && scale <= MaxScale) {
                         appstate->chrscale = scale;
                     } else {
                         fprintf(stderr,
                                 "Invalid scale format: expected [%d, %d]\n",
                                 MinScale, MaxScale);
+                        return ArgParseFailure;
                     }
                 }
             } else {
@@ -87,6 +106,8 @@ static void parse_args(struct control *appstate, int argc, char *argv[argc+1])
     } else {
         appstate->help = true;
     }
+
+    return 0;
 }
 
 static void print_usage(const struct control *appstate)
@@ -294,7 +315,8 @@ int aldo_run(int argc, char *argv[argc+1])
         .cycles_per_sec = 4,
         .running = true,
     };
-    parse_args(&appstate, argc, argv);
+    if (parse_args(&appstate, argc, argv)
+        == ArgParseFailure) return EXIT_FAILURE;
 
     if (appstate.help) {
         print_usage(&appstate);

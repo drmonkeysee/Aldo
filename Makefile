@@ -55,7 +55,7 @@ check: $(TESTS_TARGET)
 	$(TESTS_TARGET)
 
 ifeq ($(OS), Darwin)
-$(TARGET): LDFLAGS := -L/usr/local/opt/ncurses/lib
+$(TARGET): LDFLAGS := -L/opt/homebrew/opt/ncurses/lib
 $(TARGET): LDLIBS := -lpanel -lncurses
 else
 $(TARGET): LDLIBS := -lm -lpanelw -lncursesw
@@ -74,7 +74,7 @@ $(TESTS_TARGET): $(TEST_OBJ_FILES) $(TEST_DEPS)
 -include $(DEP_FILES)
 
 ifeq ($(OS), Darwin)
-$(OBJ_DIR)/%.o: SRC_CFLAGS += -I/usr/local/opt/ncurses/include
+$(OBJ_DIR)/%.o: SRC_CFLAGS += -I/opt/homebrew/opt/ncurses/include
 else
 $(OBJ_DIR)/%.o: SRC_CFLAGS += -D_POSIX_C_SOURCE=200112L
 endif

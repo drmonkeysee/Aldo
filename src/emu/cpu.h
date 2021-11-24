@@ -35,7 +35,7 @@ struct mos6502 {
             z: 1,       // (1) Zero
             i: 1,       // (2) Interrupt Disable
             d: 1;       // (3) Decimal (disabled on the NES)
-        int: 2;         // (4,5) Break/Unused (cannot be set directly)
+        int  : 2;       // (4,5) Break/Unused (cannot be set directly)
         bool
             v: 1,       // (6) Overflow
             n: 1;       // (7) Sign
@@ -58,11 +58,11 @@ struct mos6502 {
             adc;        // Address carry
     struct {
         bool
-            irq: 1,     // Maskable Interrupt Signal (input, inverted)
-            nmi: 1,     // Nonmaskable Interrupt Signal (input, inverted)
-            res: 1,     // Reset Signal (input, inverted)
-            rdy: 1,     // Ready Signal (input, low to halt cpu)
-            rw: 1,      // Read/Write Signal (output, read high)
+            irq : 1,    // Maskable Interrupt Signal (input, inverted)
+            nmi : 1,    // Nonmaskable Interrupt Signal (input, inverted)
+            res : 1,    // Reset Signal (input, inverted)
+            rdy : 1,    // Ready Signal (input, low to halt cpu)
+            rw  : 1,    // Read/Write Signal (output, read high)
             sync: 1;    // Sync (instruction fetch) Signal (output)
     } signal;
 

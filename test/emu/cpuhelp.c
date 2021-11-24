@@ -38,8 +38,8 @@ static bool TestWrite(void *ctx, uint16_t addr, uint8_t d)
 }
 
 static bus *restrict TestBus;
-static struct busdevice Ram = {.read = TestRead, .write = TestWrite};
-static struct busdevice Rom = {.read = TestRead};
+static struct busdevice Ram = {.read = TestRead, .write = TestWrite},
+                        Rom = {.read = TestRead};
 
 // NOTE: one page of rom + extra to test page boundary addressing
 uint8_t bigrom[] = {

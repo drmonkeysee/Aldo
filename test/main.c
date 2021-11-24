@@ -13,8 +13,9 @@
 // Test Suites
 //
 
-void setup_testbus(void),
-     teardown_testbus(void);
+void
+    setup_testbus(void),
+    teardown_testbus(void);
 
 struct ct_testsuite bus_tests(void),
                     bytes_tests(void),

@@ -30,7 +30,7 @@
 static const double MillisecondsPerSecond = 1000,
                     NanosecondsPerMillisecond = 1e6;
 static const long NanosecondsPerSecond = MillisecondsPerSecond
-                                         * NanosecondsPerMillisecond;
+                                            * NanosecondsPerMillisecond;
 // NOTE: Approximate 60 FPS for application event loop;
 // this will be enforced by actual vsync when ported to true GUI
 // and is *distinct* from emulator frequency which can be modified by the user.
@@ -109,14 +109,15 @@ struct view {
     PANEL *restrict outer, *restrict inner;
 };
 
-static struct view HwView,
-                   ControlsView,
-                   CartView,
-                   PrgView,
-                   RegistersView,
-                   FlagsView,
-                   DatapathView,
-                   RamView;
+static struct view
+    HwView,
+    ControlsView,
+    CartView,
+    PrgView,
+    RegistersView,
+    FlagsView,
+    DatapathView,
+    RamView;
 
 static void drawhwtraits(const struct control *appstate)
 {
@@ -202,8 +203,9 @@ static void drawcart(const struct control *appstate,
     const int maxwidth = getmaxx(CartView.content) - strlen(namelabel);
     int cursor_y = 0;
     mvwaddstr(CartView.content, cursor_y, 0, namelabel);
-    const char *const cn = ctrl_cartfilename(appstate->cartfile),
-               *endofname = strrchr(cn, '.');
+    const char
+        *const cn = ctrl_cartfilename(appstate->cartfile),
+        *endofname = strrchr(cn, '.');
     if (!endofname) {
         endofname = strrchr(cn, '\0');
     }
@@ -342,10 +344,11 @@ static void draw_interrupt_latch(enum nistate interrupt, int y, int x)
 
 static void drawdatapath(const struct console_state *snapshot)
 {
-    static const char *const restrict left = "\u2190",
-                      *const restrict right = "\u2192",
-                      *const restrict up = "\u2191",
-                      *const restrict down = "\u2193";
+    static const char
+        *const restrict left = "\u2190",
+        *const restrict right = "\u2192",
+        *const restrict up = "\u2191",
+        *const restrict down = "\u2193";
     static const int vsep1 = 1, vsep2 = 9, vsep3 = 23, vsep4 = 29, seph = 5;
 
     const int w = getmaxx(DatapathView.content), line_x = (w / 4) + 1;
@@ -411,8 +414,8 @@ static void drawdatapath(const struct console_state *snapshot)
 
 static void drawram(const struct console_state *snapshot)
 {
-    static const int start_x = 5, col_width = 3,
-                     toprail_start = start_x + col_width;
+    static const int
+        start_x = 5, col_width = 3, toprail_start = start_x + col_width;
 
     for (int col = 0; col < 0x10; ++col) {
         mvwprintw(RamView.win, 1, toprail_start + (col * col_width), "%X",
@@ -493,8 +496,9 @@ static void ramrefresh(int ramsheet)
 
 void ui_init(void)
 {
-    static const int col1w = 32, col2w = 34, col3w = 35, col4w = 60, hwh = 12,
-                     crth = 6, cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
+    static const int
+        col1w = 32, col2w = 34, col3w = 35, col4w = 60, hwh = 12,
+        crth = 6, cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");
     initscr();
@@ -506,8 +510,9 @@ void ui_init(void)
 
     int scrh, scrw;
     getmaxyx(stdscr, scrh, scrw);
-    const int yoffset = (scrh - ramh) / 2,
-              xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
+    const int
+        yoffset = (scrh - ramh) / 2,
+        xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
     vinit(&HwView, hwh, col1w, yoffset, xoffset, 2, "Hardware Traits");
     vinit(&ControlsView, 16, col1w, yoffset + hwh, xoffset, 2, "Controls");
     vinit(&CartView, crth, col2w, yoffset, xoffset + col1w, 2, "Cart");

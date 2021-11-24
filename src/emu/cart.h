@@ -57,11 +57,12 @@ struct ines_header {
             mapper_id,          // Mapper ID
             prg_chunks,         // PRG double-chunk count
             wram_chunks;        // WRAM chunk count; may be set by mapper
-    bool bus_conflicts,         // Cart has bus conflicts
-         mapper_controlled,     // Mapper-controlled Nametable Mirroring
-         mapper_implemented,    // Mapper is implemented
-         trainer,               // Trainer data present
-         wram;                  // PRG RAM banks present
+    bool
+        bus_conflicts,          // Cart has bus conflicts
+        mapper_controlled,      // Mapper-controlled Nametable Mirroring
+        mapper_implemented,     // Mapper is implemented
+        trainer,                // Trainer data present
+        wram;                   // PRG RAM banks present
 };
 
 struct bankview {

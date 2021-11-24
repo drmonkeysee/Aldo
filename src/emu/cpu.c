@@ -159,8 +159,9 @@ static void poll_interrupts(struct mos6502 *self)
 
 static bool service_interrupt(struct mos6502 *self)
 {
-    return self->res == NIS_COMMITTED || self->nmi == NIS_COMMITTED
-           || self->irq == NIS_COMMITTED;
+    return self->res == NIS_COMMITTED
+            || self->nmi == NIS_COMMITTED
+            || self->irq == NIS_COMMITTED;
 }
 
 static uint16_t interrupt_vector(struct mos6502 *self)
@@ -856,11 +857,10 @@ static void branch_displacement(struct mos6502 *self)
     // no overflow = 0 - 0 => pch + 0,
     // +overflow = 1 - 0 => pch + 1,
     // -overflow = 0 - 1 => pch - 1 => pch + 2sComplement(1) => pch + 0xff.
-    const bool negative_offset = self->databus & 0x80,
-               positive_overflow = self->adl < self->databus
-                                   && !negative_offset,
-               negative_overflow = self->adl > self->databus
-                                   && negative_offset;
+    const bool
+        negative_offset = self->databus & 0x80,
+        positive_overflow = self->adl < self->databus && !negative_offset,
+        negative_overflow = self->adl > self->databus && negative_offset;
     self->adc = positive_overflow - negative_overflow;
     self->pc = bytowr(self->adl, self->pc >> 8);
 }

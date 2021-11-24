@@ -21,8 +21,9 @@ X(CRTF_INES, "iNES") \
 X(CRTF_NES20, "NES 2.0") \
 X(CRTF_NSF, "NES Sound Format")
 
-static const char *restrict const NesFormat = "NES\x1a",
-                  *restrict const NsfFormat = "NESM\x1a";
+static const char
+    *restrict const NesFormat = "NES\x1a",
+    *restrict const NsfFormat = "NESM\x1a";
 
 enum cartformat {
 #define X(s, n) s,
@@ -55,8 +56,8 @@ static int detect_format(struct cartridge *self, FILE *f)
     } else if (strncmp(NesFormat, format, strlen(NesFormat)) == 0) {
         // NOTE: NES 2.0 byte 7 matches pattern 0bxxxx10xx
         self->format = ((unsigned char)format[7] & 0xc) == 0x8
-                       ? CRTF_NES20
-                       : CRTF_INES;
+                        ? CRTF_NES20
+                        : CRTF_INES;
     } else {
         self->format = CRTF_RAW;
     }
@@ -84,10 +85,10 @@ static int parse_ines(struct cartridge *self, FILE *f)
 
     // NOTE: mapper may override these two fields
     self->ines_hdr.mirror = header[6] & 0x8
-                            ? NTM_4SCREEN
-                            : (header[6] & 0x1
-                               ? NTM_VERTICAL
-                               : NTM_HORIZONTAL);
+                                ? NTM_4SCREEN
+                                : (header[6] & 0x1
+                                   ? NTM_VERTICAL
+                                   : NTM_HORIZONTAL);
     self->ines_hdr.mapper_controlled = false;
 
     self->ines_hdr.trainer = header[6] & 0x4;
@@ -303,8 +304,8 @@ int cart_cpu_connect(cart *self, bus *b, uint16_t addr)
     assert(b != NULL);
 
     return self->mapper->cpu_connect(self->mapper, b, addr)
-           ? 0
-           : CART_ERR_ADDR_UNAVAILABLE;
+            ? 0
+            : CART_ERR_ADDR_UNAVAILABLE;
 }
 
 void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr)

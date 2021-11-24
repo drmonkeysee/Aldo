@@ -185,9 +185,10 @@ static int print_prgbank(const struct bankview *bv, bool verbose, FILE *f)
 // byte array of 2-bit palette-indexed pixels composed of two bit-planes where
 // the first plane specifies the pixel low bit and the second plane specifies
 // the pixel high bit.
-const size_t ChrPlaneSize = 8,
-             ChrTileSpan = 2 * ChrPlaneSize,
-             ChrTileSize = ChrPlaneSize * ChrPlaneSize;
+const size_t
+    ChrPlaneSize = 8,
+    ChrTileSpan = 2 * ChrPlaneSize,
+    ChrTileSize = ChrPlaneSize * ChrPlaneSize;
 
 static int measure_tile_sheet(size_t banksize, int32_t *restrict dim,
                               int32_t *restrict sections)
@@ -226,17 +227,18 @@ static void decode_tiles(const struct bankview *bv, size_t tilecount,
         uint8_t *const tile = tiles + (tileidx * ChrTileSize);
         const uint8_t *const planes = bv->mem + (tileidx * ChrTileSpan);
         for (size_t row = 0; row < ChrPlaneSize; ++row) {
-            const uint8_t plane0 = planes[row],
-                          plane1 = planes[row + ChrPlaneSize];
+            const uint8_t
+                plane0 = planes[row],
+                plane1 = planes[row + ChrPlaneSize];
             for (size_t bit = 0; bit < ChrPlaneSize; ++bit) {
                 // NOTE: tile origins are top-left so in order to pack pixels
                 // left-to-right we need to decode each bit-plane row
                 // least-significant bit last.
                 const ptrdiff_t pixel = (ChrPlaneSize - bit - 1)
-                                        + (row * ChrPlaneSize);
+                                            + (row * ChrPlaneSize);
                 assert(pixel >= 0);
                 tile[pixel] = byte_getbit(plane0, bit)
-                              | (byte_getbit(plane1, bit) << 1);
+                                | (byte_getbit(plane1, bit) << 1);
             }
         }
         // NOTE: did we process the entire CHR ROM?
@@ -258,13 +260,14 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
             // in the current tile.
             const size_t tile_start = (tilex + (tiley * tilesdim)
                                        + (section * tilesdim * tilesdim))
-                                      * ChrTileSize;
+                                        * ChrTileSize;
             for (size_t pixelx = 0; pixelx < ChrPlaneSize; ++pixelx) {
                 // NOTE: pixeloffset is the pixel index in tile space,
                 // packedpixel is the pixel in (prescaled) bmp-row space.
-                const size_t pixeloffset = pixelx + (pixely * ChrPlaneSize),
-                             packedpixel = pixelx + (tilex * ChrPlaneSize)
-                                           + (section * section_pxldim);
+                const size_t
+                    pixeloffset = pixelx + (pixely * ChrPlaneSize),
+                    packedpixel = pixelx + (tilex * ChrPlaneSize)
+                                    + (section * section_pxldim);
                 const uint8_t pixel = tiles[tile_start + pixeloffset];
                 for (int scalex = 0; scalex < scale; ++scalex) {
                     const size_t scaledpixel = scalex + (packedpixel * scale);
@@ -293,7 +296,7 @@ enum {
     BMP_FILEHEADER_SIZE = 14,
     BMP_INFOHEADER_SIZE = 40,
     BMP_HEADER_SIZE = BMP_FILEHEADER_SIZE + BMP_INFOHEADER_SIZE
-                      + BMP_PALETTE_SIZE,
+                        + BMP_PALETTE_SIZE,
 };
 
 static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections, int scale,
@@ -484,10 +487,11 @@ int dis_datapath(const struct console_state *snapshot,
     total = count = sprintf(dis, "%s ", Mnemonics[dec.instruction]);
     if (count < 0) return DIS_ERR_FMT_FAIL;
 
-    const int max_offset = 1 + (instlen / 3),
-              displayidx = snapshot->datapath.exec_cycle < max_offset
-                           ? snapshot->datapath.exec_cycle
-                           : max_offset;
+    const int
+        max_offset = 1 + (instlen / 3),
+        displayidx = snapshot->datapath.exec_cycle < max_offset
+                        ? snapshot->datapath.exec_cycle
+                        : max_offset;
     const char *const displaystr = StringTables[dec.mode][displayidx];
     switch (displayidx) {
     case 0:
@@ -495,11 +499,12 @@ int dis_datapath(const struct console_state *snapshot,
         break;
     case 1:
         count = dec.instruction == IN_BRK
-                ? sprintf(dis + total, displaystr, interrupt_display(snapshot))
-                : sprintf(dis + total, displaystr,
-                          strlen(displaystr) > 0
-                            ? snapshot->mem.prgview[1]
-                            : 0);
+                    ? sprintf(dis + total, displaystr,
+                              interrupt_display(snapshot))
+                    : sprintf(dis + total, displaystr,
+                              strlen(displaystr) > 0
+                                ? snapshot->mem.prgview[1]
+                                : 0);
         break;
     default:
         count = sprintf(dis + total, displaystr,

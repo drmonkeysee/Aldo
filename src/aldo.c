@@ -31,13 +31,14 @@ static const char
     *restrict const InfoCmd = "--info",
     *restrict const VersionCmd = "--version";
 
-static const char ChrDecodeFlag = 'c',
-                  ChrScaleFlag = 's',
-                  DisassembleFlag = 'd',
-                  HelpFlag = 'h',
-                  InfoFlag = 'i',
-                  VerboseFlag = 'v',
-                  VersionFlag = 'V';
+static const char
+    ChrDecodeFlag = 'c',
+    ChrScaleFlag = 's',
+    DisassembleFlag = 'd',
+    HelpFlag = 'h',
+    InfoFlag = 'i',
+    VerboseFlag = 'v',
+    VersionFlag = 'V';
 
 static const int ArgParseFailure = -1, MinScale = 1, MaxScale = 10;
 
@@ -176,8 +177,8 @@ static int print_cart_info(const struct control *appstate, cart *c)
 static int disassemble_cart_prg(const struct control *appstate, cart *c)
 {
     return dis_cart_prg(c, appstate, stdout) == 0
-           ? EXIT_SUCCESS
-           : EXIT_FAILURE;
+            ? EXIT_SUCCESS
+            : EXIT_FAILURE;
 }
 
 static int decode_cart_chr(const struct control *appstate, cart *c)

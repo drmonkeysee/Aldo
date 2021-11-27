@@ -4,21 +4,16 @@ TEST_DIR := test
 BUILD_DIR := build
 OBJ_DIR := $(BUILD_DIR)/obj
 
-MODULES := emu
-SRC_FILES := $(wildcard $(SRC_DIR)/*.c) \
-		$(foreach MDL,$(MODULES),$(wildcard $(SRC_DIR)/$(MDL)/*.c))
-TEST_FILES := $(wildcard $(TEST_DIR)/*.c) \
-		$(foreach MDL,$(MODULES),$(wildcard $(TEST_DIR)/$(MDL)/*.c))
+SRC_FILES := $(wildcard $(SRC_DIR)/*.c)
+TEST_FILES := $(wildcard $(TEST_DIR)/*.c)
 
 OBJ_FILES := $(subst $(SRC_DIR),$(OBJ_DIR),$(SRC_FILES:.c=.o))
 TEST_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(TEST_FILES:.c=.o))
 DEP_FILES := $(OBJ_FILES:.o=.d)
 
-OBJ_DIRS := $(OBJ_DIR) $(foreach MDL,$(MODULES),$(OBJ_DIR)/$(MDL))
-TEST_OBJ_DIRS := $(OBJ_DIR)/$(TEST_DIR) \
-			$(foreach MDL,$(MODULES),$(OBJ_DIR)/$(TEST_DIR)/$(MDL))
-TEST_DEPS := $(addprefix $(OBJ_DIR)/,dis.o emu/bus.o emu/bytes.o emu/cart.o \
-		emu/cpu.o emu/decode.o emu/mappers.o)
+TEST_OBJ_DIR := $(OBJ_DIR)/$(TEST_DIR)
+TEST_DEPS := $(addprefix $(OBJ_DIR)/,dis.o bus.o bytes.o cart.o cpu.o \
+		decode.o mappers.o)
 
 PRODUCT := aldo
 TESTS := $(PRODUCT)tests
@@ -78,16 +73,16 @@ $(OBJ_DIR)/%.o: SRC_CFLAGS += -I/opt/homebrew/opt/ncurses/include
 else
 $(OBJ_DIR)/%.o: SRC_CFLAGS += -D_POSIX_C_SOURCE=200112L
 endif
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIRS)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(SRC_CFLAGS) -MMD -c $< -o $@
 
 ifeq ($(OS), Darwin)
-$(OBJ_DIR)/$(TEST_DIR)/%.o: TEST_CFLAGS += -pedantic -Wno-gnu-zero-variadic-macro-arguments
+$(TEST_OBJ_DIR)/%.o: TEST_CFLAGS += -pedantic -Wno-gnu-zero-variadic-macro-arguments
 endif
-$(OBJ_DIR)/$(TEST_DIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_DIRS)
+$(TEST_OBJ_DIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_DIR)
 	$(CC) $(CFLAGS) $(TEST_CFLAGS) -MMD -c $< -o $@
 
-$(OBJ_DIRS) $(TEST_OBJ_DIRS):
+$(OBJ_DIR) $(TEST_OBJ_DIR):
 	mkdir -p $@
 
 run: debug

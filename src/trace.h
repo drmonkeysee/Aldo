@@ -20,6 +20,8 @@ struct traceline {
 bool trace_on(const char *logname);
 void trace_off(void);
 
+bool trace_enabled(void);
+
 void trace_log(const struct traceline *line);
 
 #endif

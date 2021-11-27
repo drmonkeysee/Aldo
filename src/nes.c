@@ -82,11 +82,12 @@ static void set_interrupt(struct nes_console *self, enum nes_interrupt signal,
     }
 }
 
-static void log_trace(const struct nes_console *self,
-                      const struct cycleclock *clock, bool tron)
+// NOTE: trace the just-fetched instruction
+static void instruction_trace(const struct nes_console *self,
+                              const struct cycleclock *clock)
 {
-    // NOTE: trace at the beginning of each instruction
-    if (!tron || !self->cpu.signal.sync) return;
+    if (!trace_enabled() || !self->cpu.signal.sync) return;
+
     struct traceline line = {.cycles = clock->total_cycles};
     cpu_traceline(&self->cpu, &line);
     trace_log(&line);
@@ -163,7 +164,7 @@ void nes_clear(nes *self, enum nes_interrupt signal)
     set_interrupt(self, signal, true);
 }
 
-void nes_cycle(nes *self, struct cycleclock *clock, bool tron)
+void nes_cycle(nes *self, struct cycleclock *clock)
 {
     assert(self != NULL);
 
@@ -172,7 +173,8 @@ void nes_cycle(nes *self, struct cycleclock *clock, bool tron)
         cycles += cpu_cycle(&self->cpu);
         clock->budget -= cycles;
         clock->total_cycles += cycles;
-        log_trace(self, clock, tron);
+        instruction_trace(self, clock);
+
         switch (self->mode) {
         case NEXC_CYCLE:
             self->cpu.signal.rdy = false;

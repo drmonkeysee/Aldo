@@ -273,7 +273,7 @@ static void handle_input(struct control *appstate,
 static void update(struct control *appstate, struct console_state *snapshot,
                    nes *console)
 {
-    nes_cycle(console, &appstate->clock, appstate->tron);
+    nes_cycle(console, &appstate->clock);
     nes_snapshot(console, snapshot);
     ui_refresh(appstate, snapshot);
 }

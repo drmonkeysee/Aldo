@@ -7,8 +7,8 @@
 
 #include "dis.h"
 
-#include "emu/bytes.h"
-#include "emu/decode.h"
+#include "bytes.h"
+#include "decode.h"
 
 #include <assert.h>
 #include <errno.h>

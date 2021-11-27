@@ -7,10 +7,10 @@
 
 #include "cpuhelp.h"
 
+#include "bus.h"
+#include "bytes.h"
 #include "ciny.h"
-#include "emu/bus.h"
-#include "emu/bytes.h"
-#include "emu/snapshot.h"
+#include "snapshot.h"
 
 #include <stdbool.h>
 

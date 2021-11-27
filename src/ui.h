@@ -9,7 +9,7 @@
 #define Aldo_ui_h
 
 #include "control.h"
-#include "emu/snapshot.h"
+#include "snapshot.h"
 
 void ui_init(void);
 void ui_cleanup(void);

@@ -6,9 +6,9 @@
 //
 
 #include "ciny.h"
+#include "cpu.h"
 #include "cpuhelp.h"
-#include "emu/cpu.h"
-#include "emu/snapshot.h"
+#include "snapshot.h"
 
 #include <stdint.h>
 

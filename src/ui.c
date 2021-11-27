@@ -7,8 +7,8 @@
 
 #include "ui.h"
 
+#include "bytes.h"
 #include "dis.h"
-#include "emu/bytes.h"
 
 #include <ncurses.h>
 #include <panel.h>

@@ -8,9 +8,9 @@
 #ifndef Aldo_dis_h
 #define Aldo_dis_h
 
+#include "cart.h"
 #include "control.h"
-#include "emu/cart.h"
-#include "emu/snapshot.h"
+#include "snapshot.h"
 
 #include <stddef.h>
 #include <stdint.h>

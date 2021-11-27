@@ -7,7 +7,7 @@
 
 #include "ciny.h"
 #include "dis.h"
-#include "emu/snapshot.h"
+#include "snapshot.h"
 
 #include <stdint.h>
 #include <string.h>

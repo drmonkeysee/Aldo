@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 5/15/21.
 //
 
+#include "bus.h"
 #include "ciny.h"
-#include "emu/bus.h"
 
 #include <stdbool.h>
 #include <stdint.h>

@@ -40,6 +40,12 @@
 		C8C706B32751EF8D00B45785 /* cpuzeropage.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706A52751EF8D00B45785 /* cpuzeropage.c */; };
 		C8C706B42751EF8D00B45785 /* cpuinterrupt.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706A62751EF8D00B45785 /* cpuinterrupt.c */; };
 		C8C706B52751EF8D00B45785 /* cpustack.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706A72751EF8D00B45785 /* cpustack.c */; };
+		C8C706B62751F0BA00B45785 /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
+		C8C706B72751F0BD00B45785 /* bytes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068F2751EEBA00B45785 /* bytes.c */; };
+		C8C706B82751F0C000B45785 /* cart.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068A2751EEBA00B45785 /* cart.c */; };
+		C8C706B92751F0C700B45785 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706892751EEBA00B45785 /* cpu.c */; };
+		C8C706BA2751F0CB00B45785 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068D2751EEBA00B45785 /* decode.c */; };
+		C8C706BB2751F0CE00B45785 /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -326,19 +332,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8C706B92751F0C700B45785 /* cpu.c in Sources */,
 				C8C706AE2751EF8D00B45785 /* bus.c in Sources */,
 				C8C706B42751EF8D00B45785 /* cpuinterrupt.c in Sources */,
+				C8C706BA2751F0CB00B45785 /* decode.c in Sources */,
 				C8C706B02751EF8D00B45785 /* cpu.c in Sources */,
 				C8C706AC2751EF8D00B45785 /* cpujump.c in Sources */,
+				C8C706B82751F0C000B45785 /* cart.c in Sources */,
 				C8C706B32751EF8D00B45785 /* cpuzeropage.c in Sources */,
 				C8C706AB2751EF8D00B45785 /* cpuindirect.c in Sources */,
 				C8184D3E25E7496B002B3100 /* Tests.swift in Sources */,
+				C8C706B62751F0BA00B45785 /* bus.c in Sources */,
 				C8C706B12751EF8D00B45785 /* cpuimplied.c in Sources */,
 				C8C706A82751EF8D00B45785 /* bytes.c in Sources */,
 				C8C706B22751EF8D00B45785 /* cpusubroutine.c in Sources */,
+				C8C706B72751F0BD00B45785 /* bytes.c in Sources */,
 				C8C706AA2751EF8D00B45785 /* cpuhelp.c in Sources */,
 				C8C706A92751EF8D00B45785 /* cpuimmediate.c in Sources */,
 				C8184D5325E74B75002B3100 /* dis.c in Sources */,
+				C8C706BB2751F0CE00B45785 /* mappers.c in Sources */,
 				C8C706B52751EF8D00B45785 /* cpustack.c in Sources */,
 				C8184D7725E753BB002B3100 /* main.c in Sources */,
 				C8184D7C25E76541002B3100 /* dis.c in Sources */,

@@ -5,10 +5,10 @@
 //  Created by Brandon Stansbury on 4/14/21.
 //
 
+#include "bytes.h"
 #include "ciny.h"
+#include "cpu.h"
 #include "cpuhelp.h"
-#include "emu/bytes.h"
-#include "emu/cpu.h"
 
 #include <stdint.h>
 #include <stdlib.h>

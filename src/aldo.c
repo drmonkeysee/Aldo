@@ -7,12 +7,12 @@
 
 #include "aldo.h"
 
+#include "cart.h"
 #include "control.h"
 #include "dis.h"
+#include "nes.h"
 #include "ui.h"
-#include "emu/cart.h"
-#include "emu/nes.h"
-#include "emu/snapshot.h"
+#include "snapshot.h"
 
 #include <errno.h>
 #include <stdbool.h>

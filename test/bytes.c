@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 6/3/21.
 //
 
+#include "bytes.h"
 #include "ciny.h"
-#include "emu/bytes.h"
 
 static void bank_copy_zero_count(void *ctx)
 {

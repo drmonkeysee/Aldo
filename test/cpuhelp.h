@@ -8,7 +8,7 @@
 #ifndef AldoTests_emu_cpuhelp_h
 #define AldoTests_emu_cpuhelp_h
 
-#include "emu/cpu.h"
+#include "cpu.h"
 
 #include <stdint.h>
 

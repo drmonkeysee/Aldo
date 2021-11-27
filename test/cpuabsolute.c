@@ -6,8 +6,8 @@
 //
 
 #include "ciny.h"
+#include "cpu.h"
 #include "cpuhelp.h"
-#include "emu/cpu.h"
 
 #include <stdint.h>
 

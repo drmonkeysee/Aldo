@@ -281,8 +281,13 @@ static void update(struct control *appstate, struct console_state *snapshot,
 static int emu_loop(struct control *appstate, cart *c)
 {
     if (appstate->tron) {
-        trace_on();
+        if (!trace_on(appstate->tracefile)) {
+            fprintf(stderr, "%s: ", appstate->tracefile);
+            perror("Cannot open trace file");
+            return EXIT_FAILURE;
+        }
     }
+
     nes *console = nes_new(c);
     nes_powerup(console);
     // NOTE: initialize snapshot from console
@@ -318,6 +323,8 @@ int aldo_run(int argc, char *argv[argc+1])
         .chrscale = MinScale,
         .clock = {.cycles_per_sec = 4},
         .running = true,
+        .tracefile = "trace.log",
+        .tron = true,
     };
     if (parse_args(&appstate, argc, argv)
         == ArgParseFailure) return EXIT_FAILURE;

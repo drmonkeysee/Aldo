@@ -7,19 +7,30 @@
 
 #include "trace.h"
 
+#include <inttypes.h>
+#include <stddef.h>
 #include <stdio.h>
 
-bool trace_on(void)
+static FILE *restrict Log;
+
+//
+// Public Interface
+//
+
+bool trace_on(const char *logname)
 {
-    return false;
+    Log = fopen(logname, "w");
+    return Log;
 }
 
 void trace_off(void)
 {
-
+    fclose(Log);
+    Log = NULL;
 }
 
 void trace_log(const struct traceline *line)
 {
-
+    static size_t lineno;
+    fprintf(Log, "%zu: CYC:%" PRIu64 "\n", ++lineno, line->cycles);
 }

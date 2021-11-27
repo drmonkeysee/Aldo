@@ -17,7 +17,7 @@ struct traceline {
     uint8_t a, inst[3], p, sp, x, y;
 };
 
-bool trace_on(void);
+bool trace_on(const char *logname);
 void trace_off(void);
 
 void trace_log(const struct traceline *line);

@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 2/6/21.
 //
 
-#ifndef Aldo_emu_bytes_h
-#define Aldo_emu_bytes_h
+#ifndef Aldo_bytes_h
+#define Aldo_bytes_h
 
 #include <stddef.h>
 #include <stdint.h>

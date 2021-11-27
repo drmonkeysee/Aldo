@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 1/8/21.
 //
 
-#ifndef Aldo_emu_nes_h
-#define Aldo_emu_nes_h
+#ifndef Aldo_nes_h
+#define Aldo_nes_h
 
 #include "cart.h"
 #include "control.h"

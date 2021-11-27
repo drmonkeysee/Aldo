@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 3/7/21.
 //
 
-#ifndef AldoTests_emu_cpuhelp_h
-#define AldoTests_emu_cpuhelp_h
+#ifndef AldoTests_cpuhelp_h
+#define AldoTests_cpuhelp_h
 
 #include "cpu.h"
 

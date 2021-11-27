@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 1/16/21.
 //
 
-#ifndef Aldo_emu_snapshot_h
-#define Aldo_emu_snapshot_h
+#ifndef Aldo_snapshot_h
+#define Aldo_snapshot_h
 
 #include <stdbool.h>
 #include <stddef.h>

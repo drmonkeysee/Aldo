@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 2/3/21.
 //
 
-#ifndef Aldo_emu_decode_h
-#define Aldo_emu_decode_h
+#ifndef Aldo_decode_h
+#define Aldo_decode_h
 
 // 6502 Instructions
 // X(symbol, instruction dispatch arguments...)

@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 5/1/21.
 //
 
-#ifndef Aldo_emu_cart_h
-#define Aldo_emu_cart_h
+#ifndef Aldo_cart_h
+#define Aldo_cart_h
 
 #include "bus.h"
 #include "snapshot.h"

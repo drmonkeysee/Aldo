@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 1/15/21.
 //
 
-#ifndef Aldo_emu_cpu_h
-#define Aldo_emu_cpu_h
+#ifndef Aldo_cpu_h
+#define Aldo_cpu_h
 
 #include "bus.h"
 #include "snapshot.h"

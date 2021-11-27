@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 5/22/21.
 //
 
-#ifndef Aldo_emu_mappers_h
-#define Aldo_emu_mappers_h
+#ifndef Aldo_mappers_h
+#define Aldo_mappers_h
 
 #include "bus.h"
 #include "cart.h"

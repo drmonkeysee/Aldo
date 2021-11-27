@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 5/15/21.
 //
 
-#ifndef Aldo_emu_bus_h
-#define Aldo_emu_bus_h
+#ifndef Aldo_bus_h
+#define Aldo_bus_h
 
 #include <stdbool.h>
 #include <stddef.h>

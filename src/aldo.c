@@ -11,6 +11,7 @@
 #include "control.h"
 #include "dis.h"
 #include "nes.h"
+#include "trace.h"
 #include "ui.h"
 #include "snapshot.h"
 
@@ -208,23 +209,23 @@ static void handle_input(struct control *appstate,
         }
         break;
     case '=':   // NOTE: "lowercase" +
-        ++appstate->cycles_per_sec;
+        ++appstate->clock.cycles_per_sec;
         goto pclamp_cps;
     case '+':
-        appstate->cycles_per_sec += 10;
+        appstate->clock.cycles_per_sec += 10;
     pclamp_cps:
-        if (appstate->cycles_per_sec > MaxCps) {
-            appstate->cycles_per_sec = MaxCps;
+        if (appstate->clock.cycles_per_sec > MaxCps) {
+            appstate->clock.cycles_per_sec = MaxCps;
         }
         break;
     case '-':
-        --appstate->cycles_per_sec;
+        --appstate->clock.cycles_per_sec;
         goto nclamp_cps;
     case '_':   // NOTE: "uppercase" -
-        appstate->cycles_per_sec -= 10;
+        appstate->clock.cycles_per_sec -= 10;
     nclamp_cps:
-        if (appstate->cycles_per_sec < MinCps) {
-            appstate->cycles_per_sec = MinCps;
+        if (appstate->clock.cycles_per_sec < MinCps) {
+            appstate->clock.cycles_per_sec = MinCps;
         }
         break;
     case 'i':
@@ -272,17 +273,14 @@ static void handle_input(struct control *appstate,
 static void update(struct control *appstate, struct console_state *snapshot,
                    nes *console)
 {
-    trace_set_cycles(appstate->total_cycles);
-    const int cycles = nes_cycle(console, appstate->cyclebudget);
-    appstate->cyclebudget -= cycles;
-    appstate->total_cycles += cycles;
+    nes_cycle(console, &appstate->clock, appstate->tron);
     nes_snapshot(console, snapshot);
     ui_refresh(appstate, snapshot);
 }
 
 static int emu_loop(struct control *appstate, cart *c)
 {
-    if (appstate->trace) {
+    if (appstate->tron) {
         trace_on();
     }
     nes *console = nes_new(c);
@@ -318,7 +316,7 @@ int aldo_run(int argc, char *argv[argc+1])
 {
     struct control appstate = {
         .chrscale = MinScale,
-        .cycles_per_sec = 4,
+        .clock = {.cycles_per_sec = 4},
         .running = true,
     };
     if (parse_args(&appstate, argc, argv)

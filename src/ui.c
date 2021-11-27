@@ -139,9 +139,9 @@ static void drawhwtraits(const struct control *appstate)
     mvwaddstr(HwView.content, cursor_y++, 0, "CPU Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "PPU Clock: INF Hz");
     mvwprintw(HwView.content, cursor_y++, 0, "Cycles: %llu",
-              appstate->total_cycles);
+              appstate->clock.total_cycles);
     mvwprintw(HwView.content, cursor_y++, 0, "Cycles per Second: %d",
-              appstate->cycles_per_sec);
+              appstate->clock.cycles_per_sec);
     mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
 }
 
@@ -560,9 +560,10 @@ void ui_tick_start(struct control *appstate,
         CycleBudgetMs = MillisecondsPerSecond;
     }
 
-    const double mspercycle = MillisecondsPerSecond / appstate->cycles_per_sec;
+    const double mspercycle = MillisecondsPerSecond
+                                / appstate->clock.cycles_per_sec;
     const int new_cycles = CycleBudgetMs / mspercycle;
-    appstate->cyclebudget += new_cycles;
+    appstate->clock.budget += new_cycles;
     CycleBudgetMs -= new_cycles * mspercycle;
 }
 

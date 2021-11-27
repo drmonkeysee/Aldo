@@ -11,11 +11,16 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-struct control {
+struct cycleclock {
     uint64_t total_cycles;
+    int budget, cycles_per_sec;
+};
+
+struct control {
+    struct cycleclock clock;
     const char *cartfile, *chrdecode_prefix, *me;
-    int chrscale, cyclebudget, cycles_per_sec, ramsheet;
-    bool chrdecode, disassemble, help, info, running, trace, verbose, version;
+    int chrscale, ramsheet;
+    bool chrdecode, disassemble, help, info, running, tron, verbose, version;
 };
 
 extern const int MinCps, MaxCps, RamSheets;

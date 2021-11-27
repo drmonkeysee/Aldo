@@ -1366,3 +1366,9 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->lines.reset = self->signal.res;
     snapshot->lines.sync = self->signal.sync;
 }
+
+void cpu_traceline(const struct mos6502 *self, struct traceline *line)
+{
+    assert(self != NULL);
+    assert(line != NULL);
+}

@@ -10,6 +10,7 @@
 #include "bus.h"
 #include "bytes.h"
 #include "cpu.h"
+#include "trace.h"
 
 #include <assert.h>
 #include <stdbool.h>
@@ -79,6 +80,16 @@ static void set_interrupt(struct nes_console *self, enum nes_interrupt signal,
         assert(((void)"INVALID NES INTERRUPT", false));
         break;
     }
+}
+
+static void log_trace(const struct nes_console *self,
+                      const struct cycleclock *clock, bool tron)
+{
+    // NOTE: trace at the beginning of each instruction
+    if (!tron || !self->cpu.signal.sync) return;
+    struct traceline line = {.cycles = clock->total_cycles};
+    cpu_traceline(&self->cpu, &line);
+    trace_log(&line);
 }
 
 //
@@ -152,14 +163,16 @@ void nes_clear(nes *self, enum nes_interrupt signal)
     set_interrupt(self, signal, true);
 }
 
-int nes_cycle(nes *self, int cpubudget)
+void nes_cycle(nes *self, struct cycleclock *clock, bool tron)
 {
     assert(self != NULL);
 
     int cycles = 0;
-    while (self->cpu.signal.rdy && cycles < cpubudget) {
+    while (self->cpu.signal.rdy && cycles < clock->budget) {
         cycles += cpu_cycle(&self->cpu);
-        trace_cpu(&self->cpu, cycles);
+        clock->budget -= cycles;
+        clock->total_cycles += cycles;
+        log_trace(self, clock, tron);
         switch (self->mode) {
         case NEXC_CYCLE:
             self->cpu.signal.rdy = false;
@@ -174,15 +187,6 @@ int nes_cycle(nes *self, int cpubudget)
             break;
         }
     }
-    return cycles;
-}
-
-int nes_clock(nes *self)
-{
-    assert(self != NULL);
-
-    // TODO: pretend 1000 cycles is one frame for now
-    return nes_cycle(self, 1000);
 }
 
 void nes_snapshot(nes *self, struct console_state *snapshot)

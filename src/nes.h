@@ -9,6 +9,7 @@
 #define Aldo_emu_nes_h
 
 #include "cart.h"
+#include "control.h"
 #include "snapshot.h"
 
 enum nes_interrupt {
@@ -30,8 +31,7 @@ void nes_halt(nes *self);
 void nes_interrupt(nes *self, enum nes_interrupt signal);
 void nes_clear(nes *self, enum nes_interrupt signal);
 
-int nes_cycle(nes *self, int cpubudget);
-int nes_clock(nes *self);
+void nes_cycle(nes *self, struct cycleclock *clock, bool tron);
 
 void nes_snapshot(nes *self, struct console_state *snapshot);
 

@@ -15,7 +15,7 @@ struct control {
     uint64_t total_cycles;
     const char *cartfile, *chrdecode_prefix, *me;
     int chrscale, cyclebudget, cycles_per_sec, ramsheet;
-    bool chrdecode, disassemble, help, info, running, verbose, version;
+    bool chrdecode, disassemble, help, info, running, trace, verbose, version;
 };
 
 extern const int MinCps, MaxCps, RamSheets;

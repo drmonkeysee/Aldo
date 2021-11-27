@@ -46,6 +46,7 @@
 		C8C706B92751F0C700B45785 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706892751EEBA00B45785 /* cpu.c */; };
 		C8C706BA2751F0CB00B45785 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068D2751EEBA00B45785 /* decode.c */; };
 		C8C706BB2751F0CE00B45785 /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
+		C8C706BE2751F55C00B45785 /* trace.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706BD2751F55C00B45785 /* trace.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -112,6 +113,8 @@
 		C8C706A52751EF8D00B45785 /* cpuzeropage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpuzeropage.c; sourceTree = "<group>"; };
 		C8C706A62751EF8D00B45785 /* cpuinterrupt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpuinterrupt.c; sourceTree = "<group>"; };
 		C8C706A72751EF8D00B45785 /* cpustack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpustack.c; sourceTree = "<group>"; };
+		C8C706BC2751F55C00B45785 /* trace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = trace.h; sourceTree = "<group>"; };
+		C8C706BD2751F55C00B45785 /* trace.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = trace.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -213,6 +216,8 @@
 				C8C706832751EEBA00B45785 /* nes.c */,
 				C8C706872751EEBA00B45785 /* nes.h */,
 				C8C7068B2751EEBA00B45785 /* snapshot.h */,
+				C8C706BC2751F55C00B45785 /* trace.h */,
+				C8C706BD2751F55C00B45785 /* trace.c */,
 				C8557B2E25C661660090296D /* ui.c */,
 				C8557B2D25C661660090296D /* ui.h */,
 			);
@@ -364,6 +369,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8C706922751EEBA00B45785 /* nes.c in Sources */,
+				C8C706BE2751F55C00B45785 /* trace.c in Sources */,
 				C820E6C025A9759A006A7AB1 /* main.swift in Sources */,
 				C8C706932751EEBA00B45785 /* bus.c in Sources */,
 				C8C706962751EEBA00B45785 /* decode.c in Sources */,

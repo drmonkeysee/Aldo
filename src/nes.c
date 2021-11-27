@@ -159,6 +159,7 @@ int nes_cycle(nes *self, int cpubudget)
     int cycles = 0;
     while (self->cpu.signal.rdy && cycles < cpubudget) {
         cycles += cpu_cycle(&self->cpu);
+        trace_cpu(&self->cpu, cycles);
         switch (self->mode) {
         case NEXC_CYCLE:
             self->cpu.signal.rdy = false;

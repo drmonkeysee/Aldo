@@ -272,6 +272,7 @@ static void handle_input(struct control *appstate,
 static void update(struct control *appstate, struct console_state *snapshot,
                    nes *console)
 {
+    trace_set_cycles(appstate->total_cycles);
     const int cycles = nes_cycle(console, appstate->cyclebudget);
     appstate->cyclebudget -= cycles;
     appstate->total_cycles += cycles;
@@ -281,6 +282,9 @@ static void update(struct control *appstate, struct console_state *snapshot,
 
 static int emu_loop(struct control *appstate, cart *c)
 {
+    if (appstate->trace) {
+        trace_on();
+    }
     nes *console = nes_new(c);
     nes_powerup(console);
     // NOTE: initialize snapshot from console
@@ -299,6 +303,7 @@ static int emu_loop(struct control *appstate, cart *c)
 
     ui_cleanup();
     nes_free(console);
+    trace_off();
     console = NULL;
     snapshot.mem.prglength = 0;
     snapshot.mem.ram = NULL;

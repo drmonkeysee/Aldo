@@ -88,7 +88,9 @@ static void instruction_trace(const struct nes_console *self,
 {
     if (!trace_enabled() || !self->cpu.signal.sync) return;
 
-    struct traceline line = {.cycles = clock->total_cycles};
+    // NOTE: trace the cycle count up to the current instruction so do not
+    // count the just-executed instruction fetch cycle.
+    struct traceline line = {.cycles = clock->total_cycles - 1};
     cpu_traceline(&self->cpu, &line);
     trace_log(&line);
 }

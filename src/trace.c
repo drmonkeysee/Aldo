@@ -45,23 +45,32 @@ void trace_log(const struct traceline *line)
 {
     if (!trace_enabled()) return;
 
+    // NOTE: does not include leading space in registers print-format
+    static const int instw = 47;
+
     uint8_t inst[3];
     const size_t instlen = bus_dma(line->cpubus, line->pc,
                                    sizeof inst / sizeof inst[0], inst);
     char disinst[DIS_INST_SIZE];
     const int result = dis_inst(line->pc, inst, instlen, disinst);
+    int written = 0;
     if (result > 0) {
         // NOTE: nestest compatibility:
         //  - convert : to space
         //  - split line to skip two spaces between bytes and mnemonic
         disinst[4] = ' ';
         disinst[16] = '\0';
-        fprintf(Log, "%s%s\t", disinst, disinst + 18);
+        written += fprintf(Log, "%s%s", disinst, disinst + 18);
     } else {
-        fprintf(Log, "%s\t", result < 0 ? dis_errstr(result) : "No inst");
+        written += fprintf(Log, "%s",
+                           result < 0 ? dis_errstr(result) : "No inst");
     }
 
-    fprintf(Log, "A:%02X X:%02X Y:%02X P:%02X SP:%02X\t", line->a, line->x,
+    const int width = written < 0 ? instw : (written > instw
+                                             ? 0
+                                             : instw - written);
+    fprintf(Log, "%*s", width, "");
+    fprintf(Log, " A:%02X X:%02X Y:%02X P:%02X SP:%02X", line->a, line->x,
             line->y, line->p, line->sp);
-    fprintf(Log, "CYC:%" PRIu64 "\n", line->cycles);
+    fprintf(Log, " CYC:%" PRIu64 "\n", line->cycles);
 }

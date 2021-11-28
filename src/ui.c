@@ -241,17 +241,17 @@ static void drawvecs(int h, int w, int y, const struct console_state *snapshot)
 
     uint8_t lo = snapshot->mem.vectors[0],
             hi = snapshot->mem.vectors[1];
-    mvwprintw(PrgView.content, h - y--, 0, "$%04X: %02X %02X       NMI $%04X",
+    mvwprintw(PrgView.content, h - y--, 0, "%04X: %02X %02X       NMI $%04X",
               CPU_VECTOR_NMI, lo, hi, bytowr(lo, hi));
 
     lo = snapshot->mem.vectors[2];
     hi = snapshot->mem.vectors[3];
-    mvwprintw(PrgView.content, h - y--, 0, "$%04X: %02X %02X       RES $%04X",
+    mvwprintw(PrgView.content, h - y--, 0, "%04X: %02X %02X       RES $%04X",
               CPU_VECTOR_RES, lo, hi, bytowr(lo, hi));
 
     lo = snapshot->mem.vectors[4];
     hi = snapshot->mem.vectors[5];
-    mvwprintw(PrgView.content, h - y, 0, "$%04X: %02X %02X       IRQ $%04X",
+    mvwprintw(PrgView.content, h - y, 0, "%04X: %02X %02X       IRQ $%04X",
               CPU_VECTOR_IRQ, lo, hi, bytowr(lo, hi));
 }
 
@@ -271,17 +271,17 @@ static void drawprg(const struct console_state *snapshot)
 static void drawregister(const struct console_state *snapshot)
 {
     int cursor_y = 0;
-    mvwprintw(RegistersView.content, cursor_y++, 0, "PC: $%04X",
+    mvwprintw(RegistersView.content, cursor_y++, 0, "PC: %04X",
               snapshot->cpu.program_counter);
-    mvwprintw(RegistersView.content, cursor_y++, 0, "S:  $%02X",
+    mvwprintw(RegistersView.content, cursor_y++, 0, "S:  %02X",
               snapshot->cpu.stack_pointer);
     mvwhline(RegistersView.content, cursor_y++, 0, 0,
              getmaxx(RegistersView.content));
-    mvwprintw(RegistersView.content, cursor_y++, 0, "A:  $%02X",
+    mvwprintw(RegistersView.content, cursor_y++, 0, "A:  %02X",
               snapshot->cpu.accumulator);
-    mvwprintw(RegistersView.content, cursor_y++, 0, "X:  $%02X",
+    mvwprintw(RegistersView.content, cursor_y++, 0, "X:  %02X",
               snapshot->cpu.xindex);
-    mvwprintw(RegistersView.content, cursor_y++, 0, "Y:  $%02X",
+    mvwprintw(RegistersView.content, cursor_y++, 0, "Y:  %02X",
               snapshot->cpu.yindex);
 }
 
@@ -350,9 +350,9 @@ static void drawdatapath(const struct console_state *snapshot)
         *const restrict right = "\u2192",
         *const restrict up = "\u2191",
         *const restrict down = "\u2193";
-    static const int vsep1 = 1, vsep2 = 9, vsep3 = 23, vsep4 = 29, seph = 5;
+    static const int vsep1 = 1, vsep2 = 8, vsep3 = 22, vsep4 = 27, seph = 5;
 
-    const int w = getmaxx(DatapathView.content), line_x = (w / 4) + 1;
+    const int w = getmaxx(DatapathView.content), line_x = w / 4;
     int cursor_y = 0;
     werase(DatapathView.content);
 
@@ -373,25 +373,25 @@ static void drawdatapath(const struct console_state *snapshot)
     const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
     mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);
 
-    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adl: $%02X",
+    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adl: %02X",
               snapshot->datapath.addrlow_latch);
 
     mvwaddstr(DatapathView.content, ++cursor_y, 0, left);
-    mvwprintw(DatapathView.content, cursor_y, vsep1 + 2, "$%04X",
+    mvwprintw(DatapathView.content, cursor_y, vsep1 + 2, "%04X",
               snapshot->datapath.addressbus);
-    mvwprintw(DatapathView.content, cursor_y, vsep2 + 2, "adh: $%02X",
+    mvwprintw(DatapathView.content, cursor_y, vsep2 + 2, "adh: %02X",
               snapshot->datapath.addrhigh_latch);
     const int dbus_x = vsep3 + 2;
     if (snapshot->datapath.busfault) {
         mvwaddstr(DatapathView.content, cursor_y, dbus_x, "FLT");
     } else {
-        mvwprintw(DatapathView.content, cursor_y, dbus_x, "$%02X",
+        mvwprintw(DatapathView.content, cursor_y, dbus_x, "%02X",
                   snapshot->datapath.databus);
     }
     mvwaddstr(DatapathView.content, cursor_y, vsep4 + 1,
               snapshot->lines.readwrite ? left : right);
 
-    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adc: $%02X",
+    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adc: %02X",
               snapshot->datapath.addrcarry_latch);
 
     mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "%*sT%u",
@@ -498,7 +498,7 @@ static void ramrefresh(int ramsheet)
 void ui_init(void)
 {
     static const int
-        col1w = 32, col2w = 34, col3w = 35, col4w = 60, hwh = 12,
+        col1w = 32, col2w = 33, col3w = 33, col4w = 60, hwh = 12,
         crth = 6, cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");

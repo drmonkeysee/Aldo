@@ -56,7 +56,7 @@ static int print_raw(uint16_t addr, const uint8_t *restrict bytes, int instlen,
                      char dis[restrict static DIS_INST_SIZE])
 {
     int total, count;
-    total = count = sprintf(dis, "$%04X: ", addr);
+    total = count = sprintf(dis, "%04X: ", addr);
     if (count < 0) return DIS_ERR_FMT_FAIL;
 
     for (int i = 0; i < instlen; ++i) {
@@ -159,7 +159,7 @@ static int print_prgbank(const struct bankview *bv, bool verbose, FILE *f)
         bytes_read = dis_inst(addr, prgoffset, bv->size - total, dis);
         if (bytes_read == 0) break;
         if (bytes_read < 0) {
-            fprintf(stderr, "$%04X: Dis err (%d): %s\n", addr, bytes_read,
+            fprintf(stderr, "%04X: Dis err (%d): %s\n", addr, bytes_read,
                     dis_errstr(bytes_read));
             return bytes_read;
         }

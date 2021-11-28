@@ -1371,4 +1371,16 @@ void cpu_traceline(const struct mos6502 *self, struct traceline *line)
 {
     assert(self != NULL);
     assert(line != NULL);
+
+    line->pc = self->addrinst;
+
+    line->a = self->a;
+    line->x = self->x;
+    line->y = self->y;
+    line->sp = self->s;
+
+    // NOTE: nestest log seems to assume Break flag is always set low
+    line->p = get_p(self, true);
+
+    line->cpubus = self->bus;
 }

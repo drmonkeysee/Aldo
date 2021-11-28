@@ -15,6 +15,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <locale.h>
 #include <math.h>
 #include <stdbool.h>
@@ -138,7 +139,7 @@ static void drawhwtraits(const struct control *appstate)
     mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "CPU Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "PPU Clock: INF Hz");
-    mvwprintw(HwView.content, cursor_y++, 0, "Cycles: %llu",
+    mvwprintw(HwView.content, cursor_y++, 0, "Cycles: %" PRIu64,
               appstate->clock.total_cycles);
     mvwprintw(HwView.content, cursor_y++, 0, "Cycles per Second: %d",
               appstate->clock.cycles_per_sec);

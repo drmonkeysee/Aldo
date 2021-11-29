@@ -241,17 +241,17 @@ static void drawvecs(int h, int w, int y, const struct console_state *snapshot)
 
     uint8_t lo = snapshot->mem.vectors[0],
             hi = snapshot->mem.vectors[1];
-    mvwprintw(PrgView.content, h - y--, 0, "%04X: %02X %02X       NMI $%04X",
+    mvwprintw(PrgView.content, h - y--, 0, "%04X: %02X %02X     NMI $%04X",
               CPU_VECTOR_NMI, lo, hi, bytowr(lo, hi));
 
     lo = snapshot->mem.vectors[2];
     hi = snapshot->mem.vectors[3];
-    mvwprintw(PrgView.content, h - y--, 0, "%04X: %02X %02X       RES $%04X",
+    mvwprintw(PrgView.content, h - y--, 0, "%04X: %02X %02X     RES $%04X",
               CPU_VECTOR_RES, lo, hi, bytowr(lo, hi));
 
     lo = snapshot->mem.vectors[4];
     hi = snapshot->mem.vectors[5];
-    mvwprintw(PrgView.content, h - y, 0, "%04X: %02X %02X       IRQ $%04X",
+    mvwprintw(PrgView.content, h - y, 0, "%04X: %02X %02X     IRQ $%04X",
               CPU_VECTOR_IRQ, lo, hi, bytowr(lo, hi));
 }
 
@@ -498,7 +498,7 @@ static void ramrefresh(int ramsheet)
 void ui_init(void)
 {
     static const int
-        col1w = 32, col2w = 33, col3w = 33, col4w = 60, hwh = 12,
+        col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 12,
         crth = 6, cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");

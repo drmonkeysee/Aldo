@@ -68,7 +68,7 @@ static void inst_disassembles_implied(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(1, length);
-    ct_assertequalstr("$1234: EA          NOP", buf);
+    ct_assertequalstr("1234: EA        NOP", buf);
 }
 
 static void inst_disassembles_immediate(void *ctx)
@@ -80,7 +80,7 @@ static void inst_disassembles_immediate(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(2, length);
-    ct_assertequalstr("$1234: A9 34       LDA #$34", buf);
+    ct_assertequalstr("1234: A9 34     LDA #$34", buf);
 }
 
 static void inst_disassembles_zeropage(void *ctx)
@@ -92,7 +92,7 @@ static void inst_disassembles_zeropage(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(2, length);
-    ct_assertequalstr("$1234: A5 34       LDA $34", buf);
+    ct_assertequalstr("1234: A5 34     LDA $34", buf);
 }
 
 static void inst_disassembles_zeropage_x(void *ctx)
@@ -104,7 +104,7 @@ static void inst_disassembles_zeropage_x(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(2, length);
-    ct_assertequalstr("$1234: B5 34       LDA $34,X", buf);
+    ct_assertequalstr("1234: B5 34     LDA $34,X", buf);
 }
 
 static void inst_disassembles_zeropage_y(void *ctx)
@@ -116,7 +116,7 @@ static void inst_disassembles_zeropage_y(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(2, length);
-    ct_assertequalstr("$1234: B6 34       LDX $34,Y", buf);
+    ct_assertequalstr("1234: B6 34     LDX $34,Y", buf);
 }
 
 static void inst_disassembles_indirect_x(void *ctx)
@@ -128,7 +128,7 @@ static void inst_disassembles_indirect_x(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(2, length);
-    ct_assertequalstr("$1234: A1 34       LDA ($34,X)", buf);
+    ct_assertequalstr("1234: A1 34     LDA ($34,X)", buf);
 }
 
 static void inst_disassembles_indirect_y(void *ctx)
@@ -140,7 +140,7 @@ static void inst_disassembles_indirect_y(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(2, length);
-    ct_assertequalstr("$1234: B1 34       LDA ($34),Y", buf);
+    ct_assertequalstr("1234: B1 34     LDA ($34),Y", buf);
 }
 
 static void inst_disassembles_absolute(void *ctx)
@@ -152,7 +152,7 @@ static void inst_disassembles_absolute(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(3, length);
-    ct_assertequalstr("$1234: AD 34 06    LDA $0634", buf);
+    ct_assertequalstr("1234: AD 34 06  LDA $0634", buf);
 }
 
 static void inst_disassembles_absolute_x(void *ctx)
@@ -164,7 +164,7 @@ static void inst_disassembles_absolute_x(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(3, length);
-    ct_assertequalstr("$1234: BD 34 06    LDA $0634,X", buf);
+    ct_assertequalstr("1234: BD 34 06  LDA $0634,X", buf);
 }
 
 static void inst_disassembles_absolute_y(void *ctx)
@@ -176,7 +176,7 @@ static void inst_disassembles_absolute_y(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(3, length);
-    ct_assertequalstr("$1234: B9 34 06    LDA $0634,Y", buf);
+    ct_assertequalstr("1234: B9 34 06  LDA $0634,Y", buf);
 }
 
 static void inst_disassembles_jmp_absolute(void *ctx)
@@ -188,7 +188,7 @@ static void inst_disassembles_jmp_absolute(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(3, length);
-    ct_assertequalstr("$1234: 4C 34 06    JMP $0634", buf);
+    ct_assertequalstr("1234: 4C 34 06  JMP $0634", buf);
 }
 
 static void inst_disassembles_jmp_indirect(void *ctx)
@@ -200,7 +200,7 @@ static void inst_disassembles_jmp_indirect(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(3, length);
-    ct_assertequalstr("$1234: 6C 34 06    JMP ($0634)", buf);
+    ct_assertequalstr("1234: 6C 34 06  JMP ($0634)", buf);
 }
 
 static void inst_disassembles_branch_positive(void *ctx)
@@ -212,7 +212,7 @@ static void inst_disassembles_branch_positive(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(2, length);
-    ct_assertequalstr("$1234: 90 0A       BCC +10", buf);
+    ct_assertequalstr("1234: 90 0A     BCC +10", buf);
 }
 
 static void inst_disassembles_branch_negative(void *ctx)
@@ -224,7 +224,7 @@ static void inst_disassembles_branch_negative(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(2, length);
-    ct_assertequalstr("$1234: 90 F6       BCC -10", buf);
+    ct_assertequalstr("1234: 90 F6     BCC -10", buf);
 }
 
 static void inst_disassembles_branch_zero(void *ctx)
@@ -236,7 +236,7 @@ static void inst_disassembles_branch_zero(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(2, length);
-    ct_assertequalstr("$1234: 90 00       BCC +0", buf);
+    ct_assertequalstr("1234: 90 00     BCC +0", buf);
 }
 
 static void inst_disassembles_push(void *ctx)
@@ -248,7 +248,7 @@ static void inst_disassembles_push(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(1, length);
-    ct_assertequalstr("$1234: 48          PHA", buf);
+    ct_assertequalstr("1234: 48        PHA", buf);
 }
 
 static void inst_disassembles_pull(void *ctx)
@@ -260,7 +260,7 @@ static void inst_disassembles_pull(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(1, length);
-    ct_assertequalstr("$1234: 68          PLA", buf);
+    ct_assertequalstr("1234: 68        PLA", buf);
 }
 
 static void inst_disassembles_jsr(void *ctx)
@@ -272,7 +272,7 @@ static void inst_disassembles_jsr(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(3, length);
-    ct_assertequalstr("$1234: 20 34 06    JSR $0634", buf);
+    ct_assertequalstr("1234: 20 34 06  JSR $0634", buf);
 }
 
 static void inst_disassembles_rts(void *ctx)
@@ -284,7 +284,7 @@ static void inst_disassembles_rts(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(1, length);
-    ct_assertequalstr("$1234: 60          RTS", buf);
+    ct_assertequalstr("1234: 60        RTS", buf);
 }
 
 static void inst_disassembles_brk(void *ctx)
@@ -296,7 +296,7 @@ static void inst_disassembles_brk(void *ctx)
     const int length = dis_inst(a, bytes, sizeof bytes, buf);
 
     ct_assertequal(1, length);
-    ct_assertequalstr("$1234: 00          BRK", buf);
+    ct_assertequalstr("1234: 00        BRK", buf);
 }
 
 //

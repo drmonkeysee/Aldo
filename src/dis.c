@@ -461,7 +461,7 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
     if (count < 0) return count;
 
     // NOTE: padding between raw bytes and disassembled instruction
-    count = sprintf(dis + total, "%*s", (4 - instlen) * 3, "");
+    count = sprintf(dis + total, "%*s", ((3 - instlen) * 3) + 1, "");
     if (count < 0) return DIS_ERR_FMT_FAIL;
     total += count;
 

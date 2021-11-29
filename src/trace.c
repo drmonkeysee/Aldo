@@ -57,10 +57,8 @@ void trace_log(const struct traceline *line)
     if (result > 0) {
         // NOTE: nestest compatibility:
         //  - convert : to space
-        //  - split line to skip two spaces between bytes and mnemonic
         disinst[4] = ' ';
-        disinst[16] = '\0';
-        written += fprintf(Log, "%s%s", disinst, disinst + 18);
+        written += fprintf(Log, "%s", disinst);
     } else {
         written += fprintf(Log, "%s",
                            result < 0 ? dis_errstr(result) : "No inst");

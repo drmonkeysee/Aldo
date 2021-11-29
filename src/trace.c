@@ -52,8 +52,7 @@ void trace_log(const struct traceline *line)
     const size_t instlen = bus_dma(line->cpubus, line->pc,
                                    sizeof inst / sizeof inst[0], inst);
     char disinst[DIS_INST_SIZE];
-    const int result = dis_inst(line->pc, inst, instlen, disinst);
-    int written = 0;
+    int result = dis_inst(line->pc, inst, instlen, disinst), written = 0;
     if (result > 0) {
         // NOTE: nestest compatibility:
         //  - convert : to space
@@ -61,6 +60,15 @@ void trace_log(const struct traceline *line)
         written += fprintf(Log, "%s", disinst);
     } else {
         written += fprintf(Log, "%s",
+                           result < 0 ? dis_errstr(result) : "No inst");
+    }
+
+    char peek[DIS_PEEK_SIZE];
+    result = dis_peek(inst, instlen, line->x, line->y, line->cpubus, peek);
+    if (result > 0) {
+        written += fprintf(Log, " %s", peek);
+    } else {
+        written += fprintf(Log, " %s",
                            result < 0 ? dis_errstr(result) : "No inst");
     }
 

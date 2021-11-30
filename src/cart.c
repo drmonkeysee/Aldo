@@ -166,7 +166,7 @@ static void write_ines_info(const struct cartridge *self, FILE *f,
         fprintf(f, " (<Board Names>)\n");
         hr(f);
     } else {
-        fputs("\n", f);
+        fputc('\n', f);
     }
 
     fprintf(f, "PRG ROM\t\t: %u%s\n", self->ines_hdr.prg_chunks,

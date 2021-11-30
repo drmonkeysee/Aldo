@@ -577,7 +577,7 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
     for (struct bankview bv = cart_prgbank(cart, 0);
          bv.mem;
          bv = cart_prgbank(cart, bv.bank + 1)) {
-        fputs("\n", f);
+        fputc('\n', f);
         const int err = print_prgbank(&bv, appstate->verbose, f);
         if (err < 0) return err;
     }

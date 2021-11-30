@@ -5,7 +5,9 @@
 //  Created by Brandon Stansbury on 2/24/21.
 //
 
+#include "bus.h"
 #include "ciny.h"
+#include "cpuhelp.h"
 #include "dis.h"
 #include "snapshot.h"
 
@@ -53,7 +55,7 @@ static void inst_eof(void *ctx)
     const uint8_t bytes[] = {0xad, 0x43};
     char buf[DIS_INST_SIZE] = {'\0'};
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(DIS_ERR_EOF, length);
     ct_assertequalstr("", buf);
@@ -65,7 +67,7 @@ static void inst_disassembles_implied(void *ctx)
     const uint8_t bytes[] = {0xea};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(1, length);
     ct_assertequalstr("1234: EA        NOP", buf);
@@ -77,7 +79,7 @@ static void inst_disassembles_immediate(void *ctx)
     const uint8_t bytes[] = {0xa9, 0x34};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(2, length);
     ct_assertequalstr("1234: A9 34     LDA #$34", buf);
@@ -89,7 +91,7 @@ static void inst_disassembles_zeropage(void *ctx)
     const uint8_t bytes[] = {0xa5, 0x34};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(2, length);
     ct_assertequalstr("1234: A5 34     LDA $34", buf);
@@ -101,7 +103,7 @@ static void inst_disassembles_zeropage_x(void *ctx)
     const uint8_t bytes[] = {0xb5, 0x34};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(2, length);
     ct_assertequalstr("1234: B5 34     LDA $34,X", buf);
@@ -113,7 +115,7 @@ static void inst_disassembles_zeropage_y(void *ctx)
     const uint8_t bytes[] = {0xb6, 0x34};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(2, length);
     ct_assertequalstr("1234: B6 34     LDX $34,Y", buf);
@@ -125,7 +127,7 @@ static void inst_disassembles_indirect_x(void *ctx)
     const uint8_t bytes[] = {0xa1, 0x34};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(2, length);
     ct_assertequalstr("1234: A1 34     LDA ($34,X)", buf);
@@ -137,7 +139,7 @@ static void inst_disassembles_indirect_y(void *ctx)
     const uint8_t bytes[] = {0xb1, 0x34};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(2, length);
     ct_assertequalstr("1234: B1 34     LDA ($34),Y", buf);
@@ -149,7 +151,7 @@ static void inst_disassembles_absolute(void *ctx)
     const uint8_t bytes[] = {0xad, 0x34, 0x6};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(3, length);
     ct_assertequalstr("1234: AD 34 06  LDA $0634", buf);
@@ -161,7 +163,7 @@ static void inst_disassembles_absolute_x(void *ctx)
     const uint8_t bytes[] = {0xbd, 0x34, 0x6};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(3, length);
     ct_assertequalstr("1234: BD 34 06  LDA $0634,X", buf);
@@ -173,7 +175,7 @@ static void inst_disassembles_absolute_y(void *ctx)
     const uint8_t bytes[] = {0xb9, 0x34, 0x6};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(3, length);
     ct_assertequalstr("1234: B9 34 06  LDA $0634,Y", buf);
@@ -185,7 +187,7 @@ static void inst_disassembles_jmp_absolute(void *ctx)
     const uint8_t bytes[] = {0x4c, 0x34, 0x6};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(3, length);
     ct_assertequalstr("1234: 4C 34 06  JMP $0634", buf);
@@ -197,7 +199,7 @@ static void inst_disassembles_jmp_indirect(void *ctx)
     const uint8_t bytes[] = {0x6c, 0x34, 0x6};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(3, length);
     ct_assertequalstr("1234: 6C 34 06  JMP ($0634)", buf);
@@ -209,7 +211,7 @@ static void inst_disassembles_branch_positive(void *ctx)
     const uint8_t bytes[] = {0x90, 0xa};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(2, length);
     ct_assertequalstr("1234: 90 0A     BCC +10", buf);
@@ -221,7 +223,7 @@ static void inst_disassembles_branch_negative(void *ctx)
     const uint8_t bytes[] = {0x90, 0xf6};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(2, length);
     ct_assertequalstr("1234: 90 F6     BCC -10", buf);
@@ -233,7 +235,7 @@ static void inst_disassembles_branch_zero(void *ctx)
     const uint8_t bytes[] = {0x90, 0x0};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(2, length);
     ct_assertequalstr("1234: 90 00     BCC +0", buf);
@@ -245,7 +247,7 @@ static void inst_disassembles_push(void *ctx)
     const uint8_t bytes[] = {0x48};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(1, length);
     ct_assertequalstr("1234: 48        PHA", buf);
@@ -257,7 +259,7 @@ static void inst_disassembles_pull(void *ctx)
     const uint8_t bytes[] = {0x68};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(1, length);
     ct_assertequalstr("1234: 68        PLA", buf);
@@ -269,7 +271,7 @@ static void inst_disassembles_jsr(void *ctx)
     const uint8_t bytes[] = {0x20, 0x34, 0x6};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(3, length);
     ct_assertequalstr("1234: 20 34 06  JSR $0634", buf);
@@ -281,7 +283,7 @@ static void inst_disassembles_rts(void *ctx)
     const uint8_t bytes[] = {0x60};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(1, length);
     ct_assertequalstr("1234: 60        RTS", buf);
@@ -293,10 +295,56 @@ static void inst_disassembles_brk(void *ctx)
     const uint8_t bytes[] = {0x0};
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes, buf);
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
 
     ct_assertequal(1, length);
     ct_assertequalstr("1234: 00        BRK", buf);
+}
+
+//
+// Disassemble Operand Peek
+//
+
+static void peek_does_nothing_if_no_bytes(void *ctx)
+{
+    const uint8_t bytes[1];
+    uint8_t mem[] = {0x6c, 0xff, 0x80};
+    bus *cpubus = setup_bus(mem, bigrom);
+    char buf[DIS_PEEK_SIZE] = {'\0'};
+
+    const int length = dis_peek(bytes, 0, 0, 0, cpubus, buf);
+
+    ct_assertequal(0, length);
+    ct_assertequalstr("", buf);
+}
+
+static void peek_eof(void *ctx)
+{
+    // NOTE: LDA abs with missing 3rd byte
+    const uint8_t bytes[] = {0xad, 0x43};
+    uint8_t mem[] = {0x6c, 0xff, 0x80};
+    bus *cpubus = setup_bus(mem, bigrom);
+    char buf[DIS_PEEK_SIZE] = {'\0'};
+
+    const int length = dis_peek(bytes, sizeof bytes / sizeof bytes[0], 0, 0,
+                                cpubus, buf);
+
+    ct_assertequal(DIS_ERR_EOF, length);
+    ct_assertequalstr("", buf);
+}
+
+static void peek_sets_empty_string_for_imm(void *ctx)
+{
+    const uint8_t bytes[] = {0xa9, 0x34};
+    uint8_t mem[] = {0x6c, 0xff, 0x80};
+    char buf[DIS_PEEK_SIZE];
+    bus *cpubus = setup_bus(mem, bigrom);
+
+    const int length = dis_peek(bytes, sizeof bytes / sizeof bytes[0], 0, 0,
+                                cpubus, buf);
+
+    ct_assertequal(0, length);
+    ct_assertequalstr("", buf);
 }
 
 //
@@ -1923,6 +1971,10 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(inst_disassembles_jsr),
         ct_maketest(inst_disassembles_rts),
         ct_maketest(inst_disassembles_brk),
+
+        ct_maketest(peek_does_nothing_if_no_bytes),
+        ct_maketest(peek_eof),
+        ct_maketest(peek_sets_empty_string_for_imm),
 
         ct_maketest(datapath_end_of_rom),
         ct_maketest(datapath_unexpected_end_of_rom),

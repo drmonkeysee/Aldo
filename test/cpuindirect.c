@@ -358,7 +358,7 @@ static void adc_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x71, 0x2, 0xff, 0x80};
     struct mos6502 cpu;
-    setup_cpu(&cpu, mem, bigrom);
+    setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xa;    // NOTE: 10 + 178
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
@@ -397,7 +397,7 @@ static void and_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x31, 0x2, 0xff, 0x80};
     struct mos6502 cpu;
-    setup_cpu(&cpu, mem, bigrom);
+    setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
@@ -435,7 +435,7 @@ static void cmp_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xd1, 0x2, 0xff, 0x80};
     struct mos6502 cpu;
-    setup_cpu(&cpu, mem, bigrom);
+    setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0x10;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
@@ -473,7 +473,7 @@ static void eor_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x51, 0x2, 0xff, 0x80};
     struct mos6502 cpu;
-    setup_cpu(&cpu, mem, bigrom);
+    setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
@@ -509,7 +509,7 @@ static void lda_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xb1, 0x2, 0xff, 0x80};
     struct mos6502 cpu;
-    setup_cpu(&cpu, mem, bigrom);
+    setup_cpu(&cpu, mem, BigRom);
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
@@ -545,7 +545,7 @@ static void ora_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x11, 0x2, 0xff, 0x80};
     struct mos6502 cpu;
-    setup_cpu(&cpu, mem, bigrom);
+    setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
 
@@ -585,7 +585,7 @@ static void sbc_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xf1, 0x2, 0xff, 0x80};
     struct mos6502 cpu;
-    setup_cpu(&cpu, mem, bigrom);
+    setup_cpu(&cpu, mem, BigRom);
     cpu.p.c = true;
     cpu.a = 0xa;    // NOTE: 10 - (-78)
     cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
@@ -628,7 +628,7 @@ static void sta_indy_pagecross(void *ctx)
         [256] = 0x0, 0x0, 0x0, 0x0,
     };
     struct mos6502 cpu;
-    setup_cpu(&cpu, mem, bigrom);
+    setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xa;
     cpu.y = 3;  // NOTE: cross boundary from $00FF -> $0102
 

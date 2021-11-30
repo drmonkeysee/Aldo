@@ -41,7 +41,7 @@ static struct busdevice Ram = {.read = TestRead, .write = TestWrite},
                         Rom = {.read = TestRead};
 
 // NOTE: one page of rom + extra to test page boundary addressing
-uint8_t bigrom[] = {
+uint8_t BigRom[] = {
     0xca,
     [255] = 0xfe, 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7,
 };

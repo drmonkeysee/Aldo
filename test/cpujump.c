@@ -46,7 +46,7 @@ static void jmp_indirect_pageboundary_bug(void *ctx)
     // but actually ignores the carry and reads from $80FF, $8000.
     uint8_t mem[] = {0x6c, 0xff, 0x80};
     struct mos6502 cpu;
-    setup_cpu(&cpu, mem, bigrom);
+    setup_cpu(&cpu, mem, BigRom);
 
     const int cycles = clock_cpu(&cpu);
 

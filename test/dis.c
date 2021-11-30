@@ -309,7 +309,7 @@ static void peek_does_nothing_if_no_bytes(void *ctx)
 {
     const uint8_t bytes[1];
     uint8_t mem[] = {0x6c, 0xff, 0x80};
-    bus *cpubus = setup_bus(mem, bigrom);
+    bus *cpubus = setup_bus(mem, BigRom);
     char buf[DIS_PEEK_SIZE] = {'\0'};
 
     const int length = dis_peek(bytes, 0, 0, 0, cpubus, buf);
@@ -323,7 +323,7 @@ static void peek_eof(void *ctx)
     // NOTE: LDA abs with missing 3rd byte
     const uint8_t bytes[] = {0xad, 0x43};
     uint8_t mem[] = {0x6c, 0xff, 0x80};
-    bus *cpubus = setup_bus(mem, bigrom);
+    bus *cpubus = setup_bus(mem, BigRom);
     char buf[DIS_PEEK_SIZE] = {'\0'};
 
     const int length = dis_peek(bytes, sizeof bytes / sizeof bytes[0], 0, 0,
@@ -338,7 +338,7 @@ static void peek_sets_empty_string_for_imm(void *ctx)
     const uint8_t bytes[] = {0xa9, 0x34};
     uint8_t mem[] = {0x6c, 0xff, 0x80};
     char buf[DIS_PEEK_SIZE];
-    bus *cpubus = setup_bus(mem, bigrom);
+    bus *cpubus = setup_bus(mem, BigRom);
 
     const int length = dis_peek(bytes, sizeof bytes / sizeof bytes[0], 0, 0,
                                 cpubus, buf);

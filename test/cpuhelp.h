@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 
-extern uint8_t bigrom[];
+extern uint8_t BigRom[];
 
 bus *setup_bus(uint8_t *restrict ram, uint8_t *restrict rom);
 void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,

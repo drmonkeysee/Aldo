@@ -8,7 +8,6 @@
 #ifndef Aldo_dis_h
 #define Aldo_dis_h
 
-#include "bus.h"
 #include "cart.h"
 #include "control.h"
 #include "snapshot.h"
@@ -35,7 +34,6 @@ enum {
 enum {
     DIS_DATAP_SIZE = 12,    // Disassembled datapath is at most 11 chars
     DIS_INST_SIZE = 28,     // Disassembled instruction is at most 27 chars
-    DIS_PEEK_SIZE = 19,     // Peek disassembly is at most 18 chars
 };
 
 // NOTE: returns a pointer to a statically allocated string;
@@ -45,8 +43,6 @@ const char *dis_errstr(int err);
 // NOTE: when dis_ functions return 0 the input buffer is untouched
 int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE]);
-int dis_peek(const uint8_t *restrict bytes, ptrdiff_t bytesleft, uint8_t x,
-             uint8_t y, bus *cpubus, char peek[restrict static DIS_PEEK_SIZE]);
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
 int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f);

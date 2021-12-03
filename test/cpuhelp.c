@@ -7,6 +7,7 @@
 
 #include "cpuhelp.h"
 
+#include "bus.h"
 #include "bytes.h"
 #include "ciny.h"
 #include "snapshot.h"
@@ -56,8 +57,14 @@ void teardown_testbus(void)
     bus_free(TestBus);
 }
 
-bus *setup_bus(uint8_t *restrict ram, uint8_t *restrict rom)
+void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
+               uint8_t *restrict rom)
 {
+    cpu_powerup(cpu);
+    cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bflt = false;
+    cpu->p.i = cpu->signal.rdy = cpu->presync = true;
+    cpu->res = NIS_CLEAR;
+    cpu->bus = TestBus;
     if (ram) {
         Ram.ctx = ram;
         bus_set(TestBus, 0x0, Ram);
@@ -66,17 +73,6 @@ bus *setup_bus(uint8_t *restrict ram, uint8_t *restrict rom)
         Rom.ctx = rom;
         bus_set(TestBus, MEMBLOCK_32KB, Rom);
     }
-    return TestBus;
-}
-
-void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
-               uint8_t *restrict rom)
-{
-    cpu_powerup(cpu);
-    cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bflt = false;
-    cpu->p.i = cpu->signal.rdy = cpu->presync = true;
-    cpu->res = NIS_CLEAR;
-    cpu->bus = setup_bus(ram, rom);
 }
 
 int clock_cpu(struct mos6502 *cpu)

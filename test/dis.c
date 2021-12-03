@@ -5,9 +5,7 @@
 //  Created by Brandon Stansbury on 2/24/21.
 //
 
-#include "bus.h"
 #include "ciny.h"
-#include "cpuhelp.h"
 #include "dis.h"
 #include "snapshot.h"
 
@@ -299,52 +297,6 @@ static void inst_disassembles_brk(void *ctx)
 
     ct_assertequal(1, length);
     ct_assertequalstr("1234: 00        BRK", buf);
-}
-
-//
-// Disassemble Operand Peek
-//
-
-static void peek_does_nothing_if_no_bytes(void *ctx)
-{
-    const uint8_t bytes[1];
-    uint8_t mem[] = {0x6c, 0xff, 0x80};
-    bus *cpubus = setup_bus(mem, BigRom);
-    char buf[DIS_PEEK_SIZE] = {'\0'};
-
-    const int length = dis_peek(bytes, 0, 0, 0, cpubus, buf);
-
-    ct_assertequal(0, length);
-    ct_assertequalstr("", buf);
-}
-
-static void peek_eof(void *ctx)
-{
-    // NOTE: LDA abs with missing 3rd byte
-    const uint8_t bytes[] = {0xad, 0x43};
-    uint8_t mem[] = {0x6c, 0xff, 0x80};
-    bus *cpubus = setup_bus(mem, BigRom);
-    char buf[DIS_PEEK_SIZE] = {'\0'};
-
-    const int length = dis_peek(bytes, sizeof bytes / sizeof bytes[0], 0, 0,
-                                cpubus, buf);
-
-    ct_assertequal(DIS_ERR_EOF, length);
-    ct_assertequalstr("", buf);
-}
-
-static void peek_sets_empty_string_for_imm(void *ctx)
-{
-    const uint8_t bytes[] = {0xa9, 0x34};
-    uint8_t mem[] = {0x6c, 0xff, 0x80};
-    char buf[DIS_PEEK_SIZE];
-    bus *cpubus = setup_bus(mem, BigRom);
-
-    const int length = dis_peek(bytes, sizeof bytes / sizeof bytes[0], 0, 0,
-                                cpubus, buf);
-
-    ct_assertequal(0, length);
-    ct_assertequalstr("", buf);
 }
 
 //
@@ -1971,10 +1923,6 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(inst_disassembles_jsr),
         ct_maketest(inst_disassembles_rts),
         ct_maketest(inst_disassembles_brk),
-
-        ct_maketest(peek_does_nothing_if_no_bytes),
-        ct_maketest(peek_eof),
-        ct_maketest(peek_sets_empty_string_for_imm),
 
         ct_maketest(datapath_end_of_rom),
         ct_maketest(datapath_unexpected_end_of_rom),

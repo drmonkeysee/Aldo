@@ -14,7 +14,7 @@
 #include <stdint.h>
 
 struct traceline {
-    bus *cpubus;    // NOTE: non-owning pointer
+    bus *cpubus;    // Non-owning pointer
     uint64_t cycles;
     uint16_t pc;
     uint8_t a, p, sp, x, y;

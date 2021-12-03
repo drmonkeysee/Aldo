@@ -12,8 +12,8 @@ TEST_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(TEST_FILES:.c=.o))
 DEP_FILES := $(OBJ_FILES:.o=.d)
 
 TEST_OBJ_DIR := $(OBJ_DIR)/$(TEST_DIR)
-TEST_DEPS := $(addprefix $(OBJ_DIR)/,dis.o bus.o bytes.o cart.o cpu.o \
-		decode.o mappers.o)
+TEST_DEPS := $(addprefix $(OBJ_DIR)/,bus.o bytes.o cart.o cpu.o \
+		decode.o dis.o mappers.o)
 
 PRODUCT := aldo
 TESTS := $(PRODUCT)tests

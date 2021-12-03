@@ -33,7 +33,7 @@ The Makefile also provides a unit-test build target.
 
 ## Resources
 
-- [Nesdev Wiki](https://wiki.nesdev.com/w/index.php/Nesdev_Wiki)
+- [Nesdev Wiki](https://wiki.nesdev.org/w/index.php?title=Nesdev_Wiki)
 - [One Lone Coder](https://www.youtube.com/c/javidx9)
 - [6502.org](http://6502.org)
 - [Programming the 6502, 4th Edition](https://archive.org/details/Programming_the_6502_OCR)

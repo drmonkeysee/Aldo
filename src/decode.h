@@ -11,7 +11,7 @@
 // 6502 Instructions
 // X(symbol, instruction dispatch arguments...)
 #define DEC_INST_X \
-X(UNK, self)        /* Unknown */ \
+X(UDF, self)        /* Undefined */ \
 \
 X(ADC, self, dec)   /* Add with carry */ \
 X(AND, self, dec)   /* Logical and */ \

@@ -372,7 +372,7 @@ static bool write_delayed(struct mos6502 *self, struct decoded dec)
     return delayed;
 }
 
-static void UNK_exec(struct mos6502 *self)
+static void UDF_exec(struct mos6502 *self)
 {
     commit_operation(self);
 }

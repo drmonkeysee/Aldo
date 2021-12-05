@@ -9,6 +9,7 @@
 #define Aldo_cpu_h
 
 #include "bus.h"
+#include "decode.h"
 #include "snapshot.h"
 
 #include <stdbool.h>
@@ -73,6 +74,12 @@ struct mos6502 {
         presync;        // Pre-sync cycle; primes the CPU to treat
                         // the following cycle as an opcode fetch (T0).
 };
+struct cpu_peekstate {
+    enum addrmode mode;
+    uint16_t indexedaddr, indirectaddr;
+    uint8_t data;
+};
+typedef struct cpu_context cpu_ctx;
 
 void cpu_powerup(struct mos6502 *self);
 
@@ -82,8 +89,9 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot);
 void cpu_traceline(const struct mos6502 *self, uint16_t *pc,
                    uint8_t *restrict status);
 
-/*cpu_peek_state *cpu_peek_start(struct mos6502 *self);
-cpu_peek cpu_peek(struct mos6502 *self, uint16_t addr);
-void cpu_peek_end(struct mos6502 *self, const cpu_peek_state *state);*/
+cpu_ctx *cpu_peek_start(struct mos6502 *self);
+bool cpu_peek(struct mos6502 *self, uint16_t addr,
+              struct cpu_peekstate *result);
+void cpu_peek_end(struct mos6502 *self, cpu_ctx *ctx);
 
 #endif

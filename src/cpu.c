@@ -8,13 +8,49 @@
 #include "cpu.h"
 
 #include "bytes.h"
-#include "decode.h"
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 // NOTE: sentinel value for cycle count denoting an imminent opcode fetch
 static const int PreFetch = -1;
+
+//
+// State Management
+//
+
+struct cpu_context {
+    struct cpu_context *next;
+    struct mos6502 cpu;
+};
+// NOTE: Pool is never freed, global pointer is reachable at program exit
+// WARNING: moving contexts in/out of the Pool is not thread-safe!
+static struct cpu_context *Pool;
+
+static struct cpu_context *capture(struct mos6502 *self)
+{
+    struct cpu_context *ctx;
+    if (Pool) {
+        ctx = Pool;
+        Pool = Pool->next;
+    } else {
+        ctx = malloc(sizeof *ctx);
+    }
+    *ctx = (struct cpu_context){.cpu = *self};
+    return ctx;
+}
+
+static void restore(struct mos6502 *self, struct cpu_context *ctx)
+{
+    *self = ctx->cpu;
+    ctx->next = Pool;
+    Pool = ctx;
+}
+
+//
+// Internal Operations
+//
 
 static void read(struct mos6502 *self)
 {
@@ -1377,4 +1413,31 @@ void cpu_traceline(const struct mos6502 *self, uint16_t *pc,
     *pc = self->addrinst;
     // NOTE: nestest log seems to assume Break flag is always set low
     *status = get_p(self, true);
+}
+
+cpu_ctx *cpu_peek_start(struct mos6502 *self)
+{
+    assert(self != NULL);
+
+    cpu_ctx *const ctx = capture(self);
+    // TODO: set cpu into readonly mode
+    return ctx;
+}
+
+bool cpu_peek(struct mos6502 *self, uint16_t addr,
+              struct cpu_peekstate *result)
+{
+    assert(self != NULL);
+
+    if (!result) return false;
+
+    return false;
+}
+
+void cpu_peek_end(struct mos6502 *self, cpu_ctx *ctx)
+{
+    assert(self != NULL);
+    assert(ctx != NULL);
+
+    restore(self, ctx);
 }

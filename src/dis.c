@@ -479,15 +479,15 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
     assert(cpu != NULL);
     assert(peek != NULL);
 
-    /*void *peekstate = cpu_peek_start(cpu);
-    struct peekstate;
-    const bool result = cpu_peek(addr, &peekstate);
-    cpu_peek_end(cpu, peekstate);
-    if (!result) {
+    cpu_ctx *const peekctx = cpu_peek_start(cpu);
+    struct cpu_peekstate result;
+    const bool success = cpu_peek(cpu, addr, &result);
+    cpu_peek_end(cpu, peekctx);
+    if (!success) {
         return DIS_ERR_PEEK;
     }
 
-    switch (peekstate.mode) {
+    switch (result.mode) {
     case AM_ZP:
         // peek: "= {data}"
         break;
@@ -512,7 +512,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
         // NOTE: nothing to print for peek
         peek[0] = '\0';
         break;
-    }*/
+    }
 
     const int total = sprintf(peek, "PEEK TEST");
     assert((unsigned int)total < DIS_PEEK_SIZE);

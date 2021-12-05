@@ -1427,7 +1427,9 @@ cpu_ctx *cpu_peek_start(struct mos6502 *self)
     assert(self != NULL);
 
     cpu_ctx *const ctx = capture(self);
-    // TODO: set cpu into readonly mode
+    if (self->wenable) {
+        write_disable(self);
+    }
     return ctx;
 }
 
@@ -1447,4 +1449,7 @@ void cpu_peek_end(struct mos6502 *self, cpu_ctx *ctx)
     assert(ctx != NULL);
 
     restore(self, ctx);
+    if (ctx->cpu.wenable) {
+        write_enable(self);
+    }
 }

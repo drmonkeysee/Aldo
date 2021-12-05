@@ -118,11 +118,13 @@ static void update_n(struct mos6502 *self, uint8_t d)
 
 static void write_enable(struct mos6502 *self)
 {
+    // TODO: restore any bus devices with side-effect reads
     self->wenable = true;
 }
 
 static void write_disable(struct mos6502 *self)
 {
+    // TODO: adjust any bus devices with side-effect reads
     self->wenable = false;
 }
 

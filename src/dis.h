@@ -10,6 +10,7 @@
 
 #include "cart.h"
 #include "control.h"
+#include "cpu.h"
 #include "snapshot.h"
 
 #include <stddef.h>
@@ -23,7 +24,8 @@ X(DIS_ERR_EOF, -2, "UNEXPECTED EOF") \
 X(DIS_ERR_INV_ADDRMD, -3, "INVALID ADDRMODE") \
 X(DIS_ERR_CHRROM, -4, "NO CHR ROM FOUND") \
 X(DIS_ERR_CHRSZ, -5, "INVALID CHR ROM SIZE") \
-X(DIS_ERR_IO, -6, "I/O ERROR")
+X(DIS_ERR_IO, -6, "I/O ERROR") \
+X(DIS_ERR_PEEK, -7, "CPU PEEK FAIL")
 
 enum {
 #define X(s, v, e) s = v,
@@ -34,6 +36,7 @@ enum {
 enum {
     DIS_DATAP_SIZE = 12,    // Disassembled datapath is at most 11 chars
     DIS_INST_SIZE = 28,     // Disassembled instruction is at most 27 chars
+    DIS_PEEK_SIZE = 19,     // Peek expression is at most 18 chars
 };
 
 // NOTE: returns a pointer to a statically allocated string;
@@ -43,6 +46,8 @@ const char *dis_errstr(int err);
 // NOTE: when dis_ functions return 0 the input buffer is untouched
 int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE]);
+int dis_peek(uint16_t addr, struct mos6502 *cpu,
+             char peek[restrict static DIS_PEEK_SIZE]);
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
 int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f);

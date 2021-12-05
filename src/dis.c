@@ -473,6 +473,52 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
     return instlen;
 }
 
+int dis_peek(uint16_t addr, struct mos6502 *cpu,
+             char peek[restrict static DIS_PEEK_SIZE])
+{
+    assert(cpu != NULL);
+    assert(peek != NULL);
+
+    /*void *peekstate = cpu_peek_start(cpu);
+    struct peekstate;
+    const bool result = cpu_peek(addr, &peekstate);
+    cpu_peek_end(cpu, peekstate);
+    if (!result) {
+        return DIS_ERR_PEEK;
+    }
+
+    switch (peekstate.mode) {
+    case AM_ZP:
+        // peek: "= {data}"
+        break;
+    case AM_ZPX:
+    case AM_ZPY:
+        // peek: "@ {zp+idx} = {data}"
+        break;
+    case AM_INDX:
+        // peek: "@ {zp+x} > {paddr} = {data}"
+        break;
+    case AM_INDY:
+        // peek: "> {paddr} @ {paddr+y} = {data}"
+        break;
+    case AM_ABSX:
+    case AM_ABSY:
+        // peek: "@ {addr+idx} = {data}"
+        break;
+    case AM_JIND:
+        // peek: "> {paddr}"
+        break;
+    default:
+        // NOTE: nothing to print for peek
+        peek[0] = '\0';
+        break;
+    }*/
+
+    const int total = sprintf(peek, "PEEK TEST");
+    assert((unsigned int)total < DIS_PEEK_SIZE);
+    return total;
+}
+
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE])
 {

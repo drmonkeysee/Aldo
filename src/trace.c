@@ -28,8 +28,7 @@ void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu)
                                    sizeof inst / sizeof inst[0], inst);
 
     char disinst[DIS_INST_SIZE];
-    const int result = dis_inst(pc, inst, instlen, disinst);
-    int written = 0;
+    int result = dis_inst(pc, inst, instlen, disinst), written = 0;
     if (result > 0) {
         // NOTE: nestest compatibility:
         //  - convert : to space
@@ -40,11 +39,12 @@ void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu)
                            result < 0 ? dis_errstr(result) : "No inst");
     }
 
-    /*char peek[DIS_PEEK_SIZE];
-    result = dis_peek(inst, instlen, x, y, cpubus, peek);
-    written += fprintf(Log, " %s", result > 0 ? peek : (result < 0
-                                                        ? dis_errstr(result)
-                                                        : "No inst"));*/
+    char peek[DIS_PEEK_SIZE];
+    result = dis_peek(pc, cpu, peek);
+    written += fprintf(tracelog, " %s",
+                       result > 0 ? peek : (result < 0
+                                            ? dis_errstr(result)
+                                            : "No inst"));
 
     const int width = written < 0 ? instw : (written > instw
                                              ? 0

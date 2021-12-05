@@ -64,8 +64,12 @@ static void write(struct mos6502 *self)
 {
     assert(self->bus != NULL);
 
-    self->signal.rw = false;
-    self->bflt = !bus_write(self->bus, self->addrbus, self->databus);
+    if (self->wenable) {
+        self->signal.rw = false;
+        self->bflt = !bus_write(self->bus, self->addrbus, self->databus);
+    } else {
+        read(self);
+    }
 }
 
 static uint8_t get_p(const struct mos6502 *self, bool interrupt)
@@ -110,6 +114,16 @@ static void update_v(struct mos6502 *self, uint8_t s, uint8_t a, uint8_t b)
 static void update_n(struct mos6502 *self, uint8_t d)
 {
     self->p.n = d & 0x80;
+}
+
+static void write_enable(struct mos6502 *self)
+{
+    self->wenable = true;
+}
+
+static void write_disable(struct mos6502 *self)
+{
+    self->wenable = false;
 }
 
 //
@@ -214,6 +228,7 @@ static bool reset_held(struct mos6502 *self)
 {
     if (self->res == NIS_PENDING) {
         self->res = NIS_COMMITTED;
+        write_disable(self);
         self->presync = true;
     }
     return self->res == NIS_COMMITTED && !self->signal.res;
@@ -342,16 +357,6 @@ static void stack_push(struct mos6502 *self, uint8_t d)
 {
     self->addrbus = bytowr(self->s--, 0x1);
     store_data(self, d);
-}
-
-static void interrupt_push(struct mos6502 *self, uint8_t d)
-{
-    if (self->res == NIS_COMMITTED) {
-        stack_top(self);
-        --self->s;
-    } else {
-        stack_push(self, d);
-    }
 }
 
 // NOTE: all 6502 cycles are either a read or a write, some of them discarded
@@ -487,6 +492,7 @@ static void BRK_exec(struct mos6502 *self)
     // but cleared by all others;
     // irq is cleared by all handlers.
     if (self->res == NIS_COMMITTED) {
+        write_enable(self);
         self->res = NIS_CLEAR;
     }
     self->nmi = self->nmi == NIS_COMMITTED ? NIS_SERVICED : NIS_CLEAR;
@@ -1238,13 +1244,13 @@ static void BRK_sequence(struct mos6502 *self, struct decoded dec)
         }
         break;
     case 2:
-        interrupt_push(self, self->pc >> 8);
+        stack_push(self, self->pc >> 8);
         break;
     case 3:
-        interrupt_push(self, self->pc);
+        stack_push(self, self->pc);
         break;
     case 4:
-        interrupt_push(self, get_p(self, service_interrupt(self)));
+        stack_push(self, get_p(self, service_interrupt(self)));
         break;
     case 5:
         // NOTE: higher priority interrupts can hijack this break sequence if
@@ -1320,7 +1326,8 @@ void cpu_powerup(struct mos6502 *self)
     // NOTE: Initialize physical lines to known state
     self->signal.irq = self->signal.nmi = self->signal.res =
         self->signal.rw = true;
-    self->signal.rdy = self->signal.sync = self->bflt = self->presync = false;
+    self->signal.rdy = self->signal.sync = self->bflt = self->presync =
+        self->wenable = false;
 
     // NOTE: initialize internal registers to known state
     self->pc = self->a = self->s = self->x = self->y =

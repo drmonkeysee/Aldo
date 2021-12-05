@@ -71,8 +71,9 @@ struct mos6502 {
     // not correspond directly to CPU components.
     bool
         bflt,           // Bus fault; read/write to unmapped or invalid address
-        presync;        // Pre-sync cycle; primes the CPU to treat
+        presync,        // Pre-sync cycle; primes the CPU to treat
                         // the following cycle as an opcode fetch (T0).
+        wenable;        // Write-enable; put CPU into read-only or r/w state
 };
 struct cpu_peekstate {
     enum addrmode mode;

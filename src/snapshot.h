@@ -33,7 +33,7 @@ struct console_state {
     } cart;
     struct {
         size_t prglength;       // Number of bytes copied to prgview
-        const uint8_t *ram;
+        const uint8_t *ram;     // Non-owning Pointer
         uint8_t prgview[192],   // NOTE: 64 lines @ max 3-byte instructions
                 vectors[6];
     } mem;

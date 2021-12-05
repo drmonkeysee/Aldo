@@ -11,7 +11,6 @@
 #include "control.h"
 #include "dis.h"
 #include "nes.h"
-#include "trace.h"
 #include "ui.h"
 #include "snapshot.h"
 
@@ -280,15 +279,16 @@ static void update(struct control *appstate, struct console_state *snapshot,
 
 static int emu_loop(struct control *appstate, cart *c)
 {
+    FILE *tracelog = NULL;
     if (appstate->tron) {
-        if (!trace_on(appstate->tracefile)) {
+        if (!(tracelog = fopen(appstate->tracefile, "w"))) {
             fprintf(stderr, "%s: ", appstate->tracefile);
             perror("Cannot open trace file");
             return EXIT_FAILURE;
         }
     }
 
-    nes *console = nes_new(c);
+    nes *console = nes_new(c, tracelog);
     nes_powerup(console);
     // NOTE: initialize snapshot from console
     struct console_state snapshot;
@@ -305,11 +305,14 @@ static int emu_loop(struct control *appstate, cart *c)
     } while (appstate->running);
 
     ui_cleanup();
-    nes_free(console);
-    trace_off();
-    console = NULL;
     snapshot.mem.prglength = 0;
     snapshot.mem.ram = NULL;
+    nes_free(console);
+    console = NULL;
+    if (tracelog) {
+        fclose(tracelog);
+        tracelog = NULL;
+    }
     return EXIT_SUCCESS;
 }
 

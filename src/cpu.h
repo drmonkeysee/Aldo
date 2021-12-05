@@ -10,7 +10,6 @@
 
 #include "bus.h"
 #include "snapshot.h"
-#include "trace.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -80,6 +79,11 @@ void cpu_powerup(struct mos6502 *self);
 int cpu_cycle(struct mos6502 *self);
 
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot);
-void cpu_traceline(const struct mos6502 *self, struct traceline *line);
+void cpu_traceline(const struct mos6502 *self, uint16_t *pc,
+                   uint8_t *restrict status);
+
+/*cpu_peek_state *cpu_peek_start(struct mos6502 *self);
+cpu_peek cpu_peek(struct mos6502 *self, uint16_t addr);
+void cpu_peek_end(struct mos6502 *self, const cpu_peek_state *state);*/
 
 #endif

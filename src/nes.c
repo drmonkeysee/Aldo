@@ -22,6 +22,7 @@
 // Cartridge RAM/ROM and Controller Input.
 struct nes_console {
     cart *cart;                 // Game Cartridge; Non-owning Pointer
+    FILE *tracelog;             // Optional trace log; Non-owning Pointer
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
     enum nexcmode mode;         // NES execution mode
     uint8_t ram[MEMBLOCK_2KB];  // CPU Internal RAM
@@ -83,28 +84,27 @@ static void set_interrupt(struct nes_console *self, enum nes_interrupt signal,
 }
 
 // NOTE: trace the just-fetched instruction
-static void instruction_trace(const struct nes_console *self,
+static void instruction_trace(struct nes_console *self,
                               const struct cycleclock *clock)
 {
-    if (!trace_enabled() || !self->cpu.signal.sync) return;
+    if (!self->cpu.signal.sync) return;
 
     // NOTE: trace the cycle count up to the current instruction so do not
     // count the just-executed instruction fetch cycle.
-    struct traceline line = {.cycles = clock->total_cycles - 1};
-    cpu_traceline(&self->cpu, &line);
-    trace_log(&line);
+    trace_line(self->tracelog, clock->total_cycles - 1, &self->cpu);
 }
 
 //
 // Public Interface
 //
 
-nes *nes_new(cart *c)
+nes *nes_new(cart *c, FILE *tracelog)
 {
     assert(c != NULL);
 
     struct nes_console *const self = malloc(sizeof *self);
     self->cart = c;
+    self->tracelog = tracelog;
     create_cpubus(self);
     return self;
 }
@@ -169,6 +169,7 @@ void nes_clear(nes *self, enum nes_interrupt signal)
 void nes_cycle(nes *self, struct cycleclock *clock)
 {
     assert(self != NULL);
+    assert(clock != NULL);
 
     int cycles = 0;
     while (self->cpu.signal.rdy && cycles < clock->budget) {

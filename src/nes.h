@@ -12,6 +12,8 @@
 #include "control.h"
 #include "snapshot.h"
 
+#include <stdio.h>
+
 enum nes_interrupt {
     NESI_IRQ,
     NESI_NMI,
@@ -19,7 +21,7 @@ enum nes_interrupt {
 };
 typedef struct nes_console nes;
 
-nes *nes_new(cart *c);
+nes *nes_new(cart *c, FILE *tracelog);
 void nes_free(nes *self);
 
 void nes_mode(nes *self, enum nexcmode mode);

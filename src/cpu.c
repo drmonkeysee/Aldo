@@ -1427,20 +1427,30 @@ cpu_ctx *cpu_peek_start(struct mos6502 *self)
     assert(self != NULL);
 
     cpu_ctx *const ctx = capture(self);
+    // NOTE: set to read-only and reset all signals to ready cpu
     if (self->wenable) {
         write_disable(self);
     }
+    self->irq = self->nmi = self->res = NIS_CLEAR;
+    self->signal.irq = self->signal.nmi = self->signal.res =
+        self->signal.rdy = true;
     return ctx;
 }
 
-bool cpu_peek(struct mos6502 *self, uint16_t addr,
-              struct cpu_peekstate *result)
+struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
 {
     assert(self != NULL);
 
-    if (!result) return false;
-
-    return false;
+    struct cpu_peekresult result;
+    self->presync = true;
+    self->pc = addr;
+    cpu_cycle(self);
+    result.mode = Decode[self->opc].mode;
+    do {
+        cpu_cycle(self);
+    } while (!self->presync);
+    result.data = self->databus;
+    return result;
 }
 
 void cpu_peek_end(struct mos6502 *self, cpu_ctx *ctx)

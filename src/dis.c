@@ -480,12 +480,8 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
     assert(peek != NULL);
 
     cpu_ctx *const peekctx = cpu_peek_start(cpu);
-    struct cpu_peekstate result;
-    const bool success = cpu_peek(cpu, addr, &result);
+    struct cpu_peekresult result = cpu_peek(cpu, addr);
     cpu_peek_end(cpu, peekctx);
-    if (!success) {
-        return DIS_ERR_PEEK;
-    }
 
     switch (result.mode) {
     case AM_ZP:

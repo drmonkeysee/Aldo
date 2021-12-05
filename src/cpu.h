@@ -75,7 +75,7 @@ struct mos6502 {
                         // the following cycle as an opcode fetch (T0).
         wenable;        // Write-enable; put CPU into read-only or r/w state
 };
-struct cpu_peekstate {
+struct cpu_peekresult {
     enum addrmode mode;
     uint16_t indexedaddr, indirectaddr;
     uint8_t data;
@@ -91,8 +91,7 @@ void cpu_traceline(const struct mos6502 *self, uint16_t *pc,
                    uint8_t *restrict status);
 
 cpu_ctx *cpu_peek_start(struct mos6502 *self);
-bool cpu_peek(struct mos6502 *self, uint16_t addr,
-              struct cpu_peekstate *result);
+struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr);
 void cpu_peek_end(struct mos6502 *self, cpu_ctx *ctx);
 
 #endif

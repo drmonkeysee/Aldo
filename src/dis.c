@@ -483,13 +483,14 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
     struct cpu_peekresult result = cpu_peek(cpu, addr);
     cpu_peek_end(cpu, peekctx);
 
+    int total = 0;
     switch (result.mode) {
     case AM_ZP:
-        // peek: "= {data}"
+        total = sprintf(peek, "= %02X", result.data);
         break;
     case AM_ZPX:
     case AM_ZPY:
-        // peek: "@ {zp+idx} = {data}"
+        total = sprintf(peek, "@ %02X = %02X", result.finaladdr, result.data);
         break;
     case AM_INDX:
         // peek: "@ {zp+x} > {paddr} = {data}"
@@ -499,10 +500,10 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
         break;
     case AM_ABSX:
     case AM_ABSY:
-        // peek: "@ {addr+idx} = {data}"
+        total = sprintf(peek, "@ %04X = %02X", result.finaladdr, result.data);
         break;
     case AM_JIND:
-        // peek: "> {paddr}"
+        total = sprintf(peek, "> %04X", result.finaladdr);
         break;
     default:
         // NOTE: nothing to print for peek
@@ -510,7 +511,6 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
         break;
     }
 
-    const int total = sprintf(peek, "PEEK TEST");
     assert((unsigned int)total < DIS_PEEK_SIZE);
     return total;
 }

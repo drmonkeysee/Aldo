@@ -1441,14 +1441,14 @@ struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
 {
     assert(self != NULL);
 
-    struct cpu_peekresult result;
     self->presync = true;
     self->pc = addr;
     cpu_cycle(self);
-    result.mode = Decode[self->opc].mode;
+    struct cpu_peekresult result = {.mode = Decode[self->opc].mode};
     do {
         cpu_cycle(self);
     } while (!self->presync);
+    result.finaladdr = self->addrbus;
     result.data = self->databus;
     return result;
 }

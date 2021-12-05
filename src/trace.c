@@ -42,9 +42,7 @@ void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu)
     char peek[DIS_PEEK_SIZE];
     result = dis_peek(pc, cpu, peek);
     written += fprintf(tracelog, " %s",
-                       result > 0 ? peek : (result < 0
-                                            ? dis_errstr(result)
-                                            : "No inst"));
+                       result < 0 ? dis_errstr(result) : peek);
 
     const int width = written < 0 ? instw : (written > instw
                                              ? 0

@@ -77,7 +77,7 @@ struct mos6502 {
 };
 struct cpu_peekresult {
     enum addrmode mode;
-    uint16_t indexedaddr, indirectaddr;
+    uint16_t interaddr, finaladdr;
     uint8_t data;
 };
 typedef struct cpu_context cpu_ctx;

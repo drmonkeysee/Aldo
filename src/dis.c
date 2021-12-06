@@ -504,6 +504,9 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
     case AM_ABSY:
         total = sprintf(peek, "@ %04X = %02X", result.finaladdr, result.data);
         break;
+    case AM_BCH:
+        // peek: > {addr+offset}
+        break;
     case AM_JIND:
         total = sprintf(peek, "> %04X", result.finaladdr);
         break;

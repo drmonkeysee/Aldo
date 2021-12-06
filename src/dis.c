@@ -493,10 +493,12 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
         total = sprintf(peek, "@ %02X = %02X", result.finaladdr, result.data);
         break;
     case AM_INDX:
-        // peek: "@ {zp+x} > {paddr} = {data}"
+        total = sprintf(peek, "@ %02X > %04X = %02X", result.interaddr,
+                        result.finaladdr, result.data);
         break;
     case AM_INDY:
-        // peek: "> {paddr} @ {paddr+y} = {data}"
+        total = sprintf(peek, "> %04X @ %04X = %02X", result.interaddr,
+                        result.finaladdr, result.data);
         break;
     case AM_ABSX:
     case AM_ABSY:

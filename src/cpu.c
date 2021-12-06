@@ -1449,6 +1449,16 @@ struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
     struct cpu_peekresult result = {.mode = Decode[self->opc].mode};
     do {
         cpu_cycle(self);
+        if (self->t == 2 && result.mode == AM_INDY) {
+            result.interaddr = bytowr(self->databus, 0x0);
+        }
+        else if (self->t == 3) {
+            if (result.mode == AM_INDX) {
+                result.interaddr = self->addrbus;
+            } else if (result.mode == AM_INDY) {
+                result.interaddr = bytowr(result.interaddr, self->databus);
+            }
+        }
     } while (!self->presync);
     result.finaladdr = self->addrbus;
     result.data = self->databus;

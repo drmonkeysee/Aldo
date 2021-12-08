@@ -1109,7 +1109,9 @@ static void BCH_sequence(struct mos6502 *self, struct decoded dec)
     case 1:
         self->addrbus = self->pc++;
         read(self);
-        dispatch_instruction(self, dec);
+        if (!self->detached) {
+            dispatch_instruction(self, dec);
+        }
         break;
     case 2:
         self->addrbus = self->pc;
@@ -1461,7 +1463,7 @@ struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
             }
         }
     } while (!self->presync);
-    result.finaladdr = self->addrbus;
+    result.finaladdr = result.mode == AM_BCH ? self->pc : self->addrbus;
     result.data = self->databus;
     return result;
 }

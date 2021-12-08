@@ -72,9 +72,9 @@ struct mos6502 {
     bool
         bflt,           // Bus fault; read/write to unmapped or invalid address
         detached,       // Run CPU in detached mode, used mostly for peek-mode:
-                        // - writes disabled
+                        // - memory-writes disabled (includes the stack!)
                         // - bus side-effects suppressed
-                        // - interrupts ignored
+                        // - interrupts never serviced (except RES)
                         // - branches forced
         presync;        // Pre-sync cycle; primes the CPU to treat
                         // the following cycle as an opcode fetch (T0).

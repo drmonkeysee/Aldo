@@ -200,6 +200,8 @@ static void latch_interrupts(struct mos6502 *self)
 
 static void poll_interrupts(struct mos6502 *self)
 {
+    if (self->detached) return;
+
     if (self->nmi == NIS_PENDING) {
         self->nmi = NIS_COMMITTED;
     }

@@ -71,9 +71,13 @@ struct mos6502 {
     // not correspond directly to CPU components.
     bool
         bflt,           // Bus fault; read/write to unmapped or invalid address
-        presync,        // Pre-sync cycle; primes the CPU to treat
+        detached,       // Run CPU in detached mode, used mostly for peek-mode:
+                        // - writes disabled
+                        // - bus side-effects suppressed
+                        // - interrupts ignored
+                        // - branches forced
+        presync;        // Pre-sync cycle; primes the CPU to treat
                         // the following cycle as an opcode fetch (T0).
-        wenable;        // Write-enable; put CPU into read-only or r/w state
 };
 struct cpu_peekresult {
     enum addrmode mode;

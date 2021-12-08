@@ -64,11 +64,11 @@ static void write(struct mos6502 *self)
 {
     assert(self->bus != NULL);
 
-    if (self->wenable) {
+    if (self->detached) {
+        read(self);
+    } else {
         self->signal.rw = false;
         self->bflt = !bus_write(self->bus, self->addrbus, self->databus);
-    } else {
-        read(self);
     }
 }
 
@@ -116,16 +116,16 @@ static void update_n(struct mos6502 *self, uint8_t d)
     self->p.n = d & 0x80;
 }
 
-static void write_enable(struct mos6502 *self)
-{
-    // TODO: restore any bus devices with side-effect reads
-    self->wenable = true;
-}
-
-static void write_disable(struct mos6502 *self)
+static void detach(struct mos6502 *self)
 {
     // TODO: adjust any bus devices with side-effect reads
-    self->wenable = false;
+    self->detached = true;
+}
+
+static void attach(struct mos6502 *self)
+{
+    // TODO: adjust any bus devices with side-effect reads
+    self->detached = false;
 }
 
 //
@@ -230,7 +230,7 @@ static bool reset_held(struct mos6502 *self)
 {
     if (self->res == NIS_PENDING) {
         self->res = NIS_COMMITTED;
-        write_disable(self);
+        detach(self);
         self->presync = true;
     }
     return self->res == NIS_COMMITTED && !self->signal.res;
@@ -494,7 +494,7 @@ static void BRK_exec(struct mos6502 *self)
     // but cleared by all others;
     // irq is cleared by all handlers.
     if (self->res == NIS_COMMITTED) {
-        write_enable(self);
+        attach(self);
         self->res = NIS_CLEAR;
     }
     self->nmi = self->nmi == NIS_COMMITTED ? NIS_SERVICED : NIS_CLEAR;
@@ -1325,11 +1325,10 @@ void cpu_powerup(struct mos6502 *self)
 {
     assert(self != NULL);
 
-    // NOTE: Initialize physical lines to known state
+    // NOTE: Initialize physical lines and control flags to known state
     self->signal.irq = self->signal.nmi = self->signal.res =
-        self->signal.rw = true;
-    self->signal.rdy = self->signal.sync = self->bflt = self->presync =
-        self->wenable = false;
+        self->signal.rw = self->detached = true;
+    self->signal.rdy = self->signal.sync = self->bflt = self->presync = false;
 
     // NOTE: initialize internal registers to known state
     self->pc = self->a = self->s = self->x = self->y =
@@ -1430,8 +1429,8 @@ cpu_ctx *cpu_peek_start(struct mos6502 *self)
 
     cpu_ctx *const ctx = capture(self);
     // NOTE: set to read-only and reset all signals to ready cpu
-    if (self->wenable) {
-        write_disable(self);
+    if (!self->detached) {
+        detach(self);
     }
     self->irq = self->nmi = self->res = NIS_CLEAR;
     self->signal.irq = self->signal.nmi = self->signal.res =
@@ -1471,7 +1470,7 @@ void cpu_peek_end(struct mos6502 *self, cpu_ctx *ctx)
     assert(ctx != NULL);
 
     restore(self, ctx);
-    if (ctx->cpu.wenable) {
-        write_enable(self);
+    if (!ctx->cpu.detached) {
+        attach(self);
     }
 }

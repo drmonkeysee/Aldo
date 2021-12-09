@@ -18,6 +18,7 @@
 		C820E6E025A98557006A7AB1 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C820E6DE25A982A5006A7AB1 /* libncurses.tbd */; };
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
 		C85C8DC625BD29AC00611D19 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
+		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
 		C8C4B48D25ABBFB3006A98BB /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
 		C8C706922751EEBA00B45785 /* nes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706832751EEBA00B45785 /* nes.c */; };
 		C8C706932751EEBA00B45785 /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
@@ -82,6 +83,7 @@
 		C8557B2E25C661660090296D /* ui.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ui.c; sourceTree = "<group>"; };
 		C85C8DC425BD29AC00611D19 /* dis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dis.h; sourceTree = "<group>"; };
 		C85C8DC525BD29AC00611D19 /* dis.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dis.c; sourceTree = "<group>"; };
+		C86030772761A51100F1B27D /* cpupeek.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpupeek.c; sourceTree = "<group>"; };
 		C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpanel.tbd; path = usr/lib/libpanel.tbd; sourceTree = SDKROOT; };
 		C8C706832751EEBA00B45785 /* nes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = nes.c; sourceTree = "<group>"; };
 		C8C706842751EEBA00B45785 /* cpu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu.h; sourceTree = "<group>"; };
@@ -163,6 +165,7 @@
 				C8C7069D2751EF8D00B45785 /* cpuindirect.c */,
 				C8C706A62751EF8D00B45785 /* cpuinterrupt.c */,
 				C8C7069E2751EF8D00B45785 /* cpujump.c */,
+				C86030772761A51100F1B27D /* cpupeek.c */,
 				C8C706A72751EF8D00B45785 /* cpustack.c */,
 				C8C706A42751EF8D00B45785 /* cpusubroutine.c */,
 				C8C706A52751EF8D00B45785 /* cpuzeropage.c */,
@@ -359,6 +362,7 @@
 				C8C706B52751EF8D00B45785 /* cpustack.c in Sources */,
 				C8184D7725E753BB002B3100 /* main.c in Sources */,
 				C8184D7C25E76541002B3100 /* dis.c in Sources */,
+				C86030782761A51100F1B27D /* cpupeek.c in Sources */,
 				C8C706AF2751EF8D00B45785 /* cpubranch.c in Sources */,
 				C8C706AD2751EF8D00B45785 /* cpuabsolute.c in Sources */,
 			);

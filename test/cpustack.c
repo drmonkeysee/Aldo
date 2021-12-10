@@ -10,6 +10,7 @@
 #include "cpuhelp.h"
 #include "snapshot.h"
 
+#include <stddef.h>
 #include <stdint.h>
 
 //

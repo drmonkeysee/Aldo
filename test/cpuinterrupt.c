@@ -10,6 +10,7 @@
 #include "cpu.h"
 #include "cpuhelp.h"
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -20,7 +21,7 @@
 static void interrupt_handler_setup(void **ctx)
 {
     // NOTE: 32k rom, starting at $8000, for interrupt vectors
-    uint8_t *const rom = calloc(MEMBLOCK_32KB, sizeof(uint8_t));
+    uint8_t *const rom = calloc(MEMBLOCK_32KB, sizeof *rom);
     rom[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xaa;
     rom[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0xbb;
     rom[CPU_VECTOR_NMI & ADDRMASK_32KB] = 0x77;

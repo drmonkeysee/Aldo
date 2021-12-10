@@ -8,6 +8,9 @@
 #include "bytes.h"
 #include "ciny.h"
 
+#include <stddef.h>
+#include <stdint.h>
+
 static void bank_copy_zero_count(void *ctx)
 {
     const uint8_t bank[] = {

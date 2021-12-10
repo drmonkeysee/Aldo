@@ -9,6 +9,9 @@
 #include "cpu.h"
 #include "cpuhelp.h"
 
+#include <stddef.h>
+#include <stdint.h>
+
 static void end_restores_state(void *ctx)
 {
     struct mos6502 cpu;

@@ -138,6 +138,25 @@ static void res_not_ignored(void *ctx)
     ct_assertequal(NIS_COMMITTED, (int)cpu.res);
 }
 
+static void writes_ignored(void *ctx)
+{
+    // NOTE: STA $04 (0x20)
+    uint8_t mem[] = {0x85, 0x4, 0x0, 0xff, 0x20};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    // NOTE: throw away return value, no need to clean up peek state in test
+    (void)cpu_peek_start(&cpu);
+
+    int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+    ct_assertequal(0x10u, cpu.a);
+    ct_assertequal(0x20u, mem[4]);
+    ct_assertequal(0x20u, cpu.databus);
+}
+
 //
 // Test List
 //
@@ -150,6 +169,7 @@ struct ct_testsuite cpu_peek_tests(void)
         ct_maketest(irq_ignored),
         ct_maketest(nmi_ignored),
         ct_maketest(res_not_ignored),
+        ct_maketest(writes_ignored),
     };
 
     return ct_makesuite(tests);

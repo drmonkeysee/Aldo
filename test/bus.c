@@ -20,7 +20,7 @@ struct test_context {
 static bool test_read(const void *restrict ctx, uint16_t addr,
                       uint8_t *restrict d)
 {
-    const uint8_t *mem = ctx;
+    const uint8_t *const mem = ctx;
     if (addr > 3) return false;
     *d = mem[addr];
     return true;
@@ -29,7 +29,7 @@ static bool test_read(const void *restrict ctx, uint16_t addr,
 static bool test_high_read(const void *restrict ctx, uint16_t addr,
                            uint8_t *restrict d)
 {
-    const uint8_t *mem = ctx;
+    const uint8_t *const mem = ctx;
     *d = mem[addr & 0x1f];
     return true;
 }
@@ -37,14 +37,14 @@ static bool test_high_read(const void *restrict ctx, uint16_t addr,
 static bool test_highest_read(const void *restrict ctx, uint16_t addr,
                               uint8_t *restrict d)
 {
-    const uint8_t *mem = ctx;
+    const uint8_t *const mem = ctx;
     *d = mem[addr % 4];
     return true;
 }
 
 static bool test_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    uint8_t *mem = ctx;
+    uint8_t *const mem = ctx;
     if (addr > 3) return false;
     mem[addr] = d;
     return true;
@@ -52,14 +52,14 @@ static bool test_write(void *ctx, uint16_t addr, uint8_t d)
 
 static bool test_high_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    uint8_t *mem = ctx;
+    uint8_t *const mem = ctx;
     mem[addr & 0x1f] = d;
     return true;
 }
 
 static bool test_highest_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    uint8_t *mem = ctx;
+    uint8_t *const mem = ctx;
     mem[addr % 4] = d;
     return true;
 }
@@ -68,7 +68,7 @@ static size_t test_dma(const void *restrict ctx, uint16_t addr, size_t count,
                        uint8_t dest[restrict count])
 {
     if (addr >= 4) return 0;
-    const uint8_t *mem = ctx;
+    const uint8_t *const mem = ctx;
     const size_t maxlength = 4 - addr;
     memcpy(dest, mem + addr, maxlength * sizeof *dest);
     return maxlength;

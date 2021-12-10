@@ -480,7 +480,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
     assert(peek != NULL);
 
     cpu_ctx *const peekctx = cpu_peek_start(cpu);
-    struct cpu_peekresult result = cpu_peek(cpu, addr);
+    const struct cpu_peekresult result = cpu_peek(cpu, addr);
     cpu_peek_end(cpu, peekctx);
 
     int total = 0;

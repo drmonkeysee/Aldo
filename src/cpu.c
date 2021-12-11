@@ -44,6 +44,7 @@ static struct cpu_context *capture(struct mos6502 *self)
 static void restore(struct mos6502 *self, struct cpu_context *ctx)
 {
     *self = ctx->cpu;
+    ctx->cpu.bus = NULL;    // clean up any dangling pointers
     ctx->next = Pool;
     Pool = ctx;
 }

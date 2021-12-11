@@ -42,7 +42,7 @@ static void data_fault(void *ctx)
 
 static void ram_mirroring(void *ctx)
 {
-    uint8_t mem[] = {0xad, 0x3, 0x8, 0x45}; // NOTE: $0803 -> $0003
+    uint8_t mem[] = {0xad, 0x3, 0x8, 0x45}; // $0803 -> $0003
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 

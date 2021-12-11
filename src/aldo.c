@@ -207,7 +207,7 @@ static void handle_input(struct control *appstate,
             nes_ready(console);
         }
         break;
-    case '=':   // NOTE: "lowercase" +
+    case '=':   // "Lowercase" +
         ++appstate->clock.cycles_per_sec;
         goto pclamp_cps;
     case '+':
@@ -220,7 +220,7 @@ static void handle_input(struct control *appstate,
     case '-':
         --appstate->clock.cycles_per_sec;
         goto nclamp_cps;
-    case '_':   // NOTE: "uppercase" -
+    case '_':   // "Uppercase" -
         appstate->clock.cycles_per_sec -= 10;
     nclamp_cps:
         if (appstate->clock.cycles_per_sec < MinCps) {

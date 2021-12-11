@@ -22,7 +22,7 @@ static void adc_abs(void *ctx)
             abs[] = {0xff, 0x6};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
-    cpu.a = 0xa;    // NOTE: 10 + 6
+    cpu.a = 0xa;    // 10 + 6
 
     const int cycles = clock_cpu(&cpu);
 
@@ -344,7 +344,7 @@ static void sbc_abs(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
-    cpu.a = 0xa;    // NOTE: 10 - 6
+    cpu.a = 0xa;    // 10 - 6
 
     const int cycles = clock_cpu(&cpu);
 
@@ -422,7 +422,7 @@ static void adc_absx(void *ctx)
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
-    cpu.a = 0xa;    // NOTE: 10 + 6
+    cpu.a = 0xa;    // 10 + 6
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -442,8 +442,8 @@ static void adc_absx_pagecross(void *ctx)
     uint8_t mem[] = {0x7d, 0xff, 0x80};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
-    cpu.a = 0xa;    // NOTE: 10 + 178
-    cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.a = 0xa;    // 10 + 178
+    cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -482,7 +482,7 @@ static void and_absx_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
-    cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -523,7 +523,7 @@ static void asl_absx_pagecross(void *ctx)
     };
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
-    cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
+    cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
     const int cycles = clock_cpu(&cpu);
 
@@ -562,7 +562,7 @@ static void cmp_absx_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0x10;
-    cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -603,7 +603,7 @@ static void dec_absx_pagecross(void *ctx)
     };
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
-    cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
+    cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
     const int cycles = clock_cpu(&cpu);
 
@@ -640,7 +640,7 @@ static void eor_absx_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
-    cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -680,7 +680,7 @@ static void inc_absx_pagecross(void *ctx)
     };
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
-    cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
+    cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
     const int cycles = clock_cpu(&cpu);
 
@@ -715,7 +715,7 @@ static void lda_absx_pagecross(void *ctx)
     uint8_t mem[] = {0xbd, 0xff, 0x80};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
-    cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -750,7 +750,7 @@ static void ldy_absx_pagecross(void *ctx)
     uint8_t mem[] = {0xbc, 0xff, 0x80};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
-    cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -791,7 +791,7 @@ static void lsr_absx_pagecross(void *ctx)
     };
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
-    cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
+    cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
     const int cycles = clock_cpu(&cpu);
 
@@ -829,7 +829,7 @@ static void ora_absx_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
-    cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -871,7 +871,7 @@ static void rol_absx_pagecross(void *ctx)
     };
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
-    cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
+    cpu.x = 3;  // Cross boundary from $01FF -> $0202
     cpu.p.c = true;
 
     const int cycles = clock_cpu(&cpu);
@@ -915,7 +915,7 @@ static void ror_absx_pagecross(void *ctx)
     };
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
-    cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
+    cpu.x = 3;  // Cross boundary from $01FF -> $0202
     cpu.p.c = true;
 
     const int cycles = clock_cpu(&cpu);
@@ -936,7 +936,7 @@ static void sbc_absx(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
-    cpu.a = 0xa;    // NOTE: 10 - 6
+    cpu.a = 0xa;    // 10 - 6
     cpu.x = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -957,8 +957,8 @@ static void sbc_absx_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.p.c = true;
-    cpu.a = 0xa;    // NOTE: 10 - (-78)
-    cpu.x = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.a = 0xa;    // 10 - (-78)
+    cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1000,7 +1000,7 @@ static void sta_absx_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
-    cpu.x = 3;  // NOTE: cross boundary from $01FF -> $0202
+    cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1020,7 +1020,7 @@ static void adc_absy(void *ctx)
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
-    cpu.a = 0xa;    // NOTE: 10 + 6
+    cpu.a = 0xa;    // 10 + 6
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1040,8 +1040,8 @@ static void adc_absy_pagecross(void *ctx)
     uint8_t mem[] = {0x79, 0xff, 0x80};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
-    cpu.a = 0xa;    // NOTE: 10 + 178
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.a = 0xa;    // 10 + 178
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1080,7 +1080,7 @@ static void and_absy_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1118,7 +1118,7 @@ static void cmp_absy_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0x10;
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1156,7 +1156,7 @@ static void eor_absy_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1191,7 +1191,7 @@ static void lda_absy_pagecross(void *ctx)
     uint8_t mem[] = {0xb9, 0xff, 0x80};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1226,7 +1226,7 @@ static void ldx_absy_pagecross(void *ctx)
     uint8_t mem[] = {0xbe, 0xff, 0x80};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1263,7 +1263,7 @@ static void ora_absy_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1282,7 +1282,7 @@ static void sbc_absy(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
-    cpu.a = 0xa;    // NOTE: 10 - 6
+    cpu.a = 0xa;    // 10 - 6
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -1303,8 +1303,8 @@ static void sbc_absy_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.p.c = true;
-    cpu.a = 0xa;    // NOTE: 10 - (-78)
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.a = 0xa;    // 10 - (-78)
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -1346,7 +1346,7 @@ static void sta_absy_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
-    cpu.y = 3;  // NOTE: cross boundary from $01FF -> $0202
+    cpu.y = 3;  // Cross boundary from $01FF -> $0202
 
     const int cycles = clock_cpu(&cpu);
 

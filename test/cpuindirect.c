@@ -22,7 +22,7 @@ static void adc_indx(void *ctx)
             abs[] = {0xff, 0x6};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
-    cpu.a = 0xa;    // NOTE: 10 + 6
+    cpu.a = 0xa;    // 10 + 6
     cpu.x = 4;
 
     const int cycles = clock_cpu(&cpu);
@@ -43,8 +43,8 @@ static void adc_indx_pageoverflow(void *ctx)
             abs[] = {0xff, 0x80, 0x22};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
-    cpu.a = 0xa;    // NOTE: 10 + 34
-    cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
+    cpu.a = 0xa;    // 10 + 34
+    cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
 
@@ -84,7 +84,7 @@ static void and_indx_pageoverflow(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
-    cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
+    cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
 
@@ -123,7 +123,7 @@ static void cmp_indx_pageoverflow(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
-    cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
+    cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
 
@@ -162,7 +162,7 @@ static void eor_indx_pageoverflow(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
-    cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
+    cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
 
@@ -198,7 +198,7 @@ static void lda_indx_pageoverflow(void *ctx)
             abs[] = {0xff, 0x80, 0x22};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
-    cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
+    cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
 
@@ -236,7 +236,7 @@ static void ora_indx_pageoverflow(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
-    cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
+    cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
 
@@ -255,7 +255,7 @@ static void sbc_indx(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
-    cpu.a = 0xa;    // NOTE: 10 - 6
+    cpu.a = 0xa;    // 10 - 6
     cpu.x = 4;
 
     const int cycles = clock_cpu(&cpu);
@@ -277,8 +277,8 @@ static void sbc_indx_pageoverflow(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
-    cpu.a = 0xa;    // NOTE: 10 - 6
-    cpu.x = 0xff;   // NOTE: wrap around from $0002 -> $0001
+    cpu.a = 0xa;    // 10 - 6
+    cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
     const int cycles = clock_cpu(&cpu);
 
@@ -320,7 +320,7 @@ static void sta_indx_pageoverflow(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
-    cpu.x = 0xff;   // NOTE: wrap around from $0008 -> $0007
+    cpu.x = 0xff;   // Wrap around from $0008 -> $0007
 
     const int cycles = clock_cpu(&cpu);
 
@@ -340,7 +340,7 @@ static void adc_indy(void *ctx)
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
-    cpu.a = 0xa;    // NOTE: 10 + 6
+    cpu.a = 0xa;    // 10 + 6
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -360,8 +360,8 @@ static void adc_indy_pagecross(void *ctx)
     uint8_t mem[] = {0x71, 0x2, 0xff, 0x80};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
-    cpu.a = 0xa;    // NOTE: 10 + 178
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.a = 0xa;    // 10 + 178
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -400,7 +400,7 @@ static void and_indy_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -438,7 +438,7 @@ static void cmp_indy_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0x10;
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -476,7 +476,7 @@ static void eor_indy_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -511,7 +511,7 @@ static void lda_indy_pagecross(void *ctx)
     uint8_t mem[] = {0xb1, 0x2, 0xff, 0x80};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -548,7 +548,7 @@ static void ora_indy_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -567,7 +567,7 @@ static void sbc_indy(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
-    cpu.a = 0xa;    // NOTE: 10 - 6
+    cpu.a = 0xa;    // 10 - 6
     cpu.y = 3;
 
     const int cycles = clock_cpu(&cpu);
@@ -588,8 +588,8 @@ static void sbc_indy_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.p.c = true;
-    cpu.a = 0xa;    // NOTE: 10 - (-78)
-    cpu.y = 3;  // NOTE: cross boundary from $80FF -> $8102
+    cpu.a = 0xa;    // 10 - (-78)
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
     const int cycles = clock_cpu(&cpu);
 
@@ -631,7 +631,7 @@ static void sta_indy_pagecross(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xa;
-    cpu.y = 3;  // NOTE: cross boundary from $00FF -> $0102
+    cpu.y = 3;  // Cross boundary from $00FF -> $0102
 
     const int cycles = clock_cpu(&cpu);
 

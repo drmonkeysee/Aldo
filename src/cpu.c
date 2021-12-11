@@ -44,7 +44,7 @@ static struct cpu_context *capture(struct mos6502 *self)
 static void restore(struct mos6502 *self, struct cpu_context *ctx)
 {
     *self = ctx->cpu;
-    ctx->cpu.bus = NULL;    // clean up any dangling pointers
+    ctx->cpu.bus = NULL;    // Clean up any dangling pointers
     ctx->next = Pool;
     Pool = ctx;
 }
@@ -75,12 +75,12 @@ static void write(struct mos6502 *self)
 
 static uint8_t get_p(const struct mos6502 *self, bool interrupt)
 {
-    uint8_t p = 0x20;       // NOTE: Unused bit is always set
+    uint8_t p = 0x20;       // Unused bit is always set
     p |= self->p.c << 0;
     p |= self->p.z << 1;
     p |= self->p.i << 2;
     p |= self->p.d << 3;
-    p |= !interrupt << 4;   // NOTE: B bit is 0 if interrupt, 1 otherwise
+    p |= !interrupt << 4;   // B bit is 0 if interrupt, 1 otherwise
     p |= self->p.v << 6;
     p |= self->p.n << 7;
     return p;

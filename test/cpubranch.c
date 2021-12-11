@@ -32,7 +32,7 @@ static void bcc_nobranch(void *ctx)
 
 static void bcc_positive(void *ctx)
 {
-    uint8_t mem[] = {0x90, 0x5};    // NOTE: $0002 + 5
+    uint8_t mem[] = {0x90, 0x5};    // $0002 + 5
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
@@ -44,7 +44,7 @@ static void bcc_positive(void *ctx)
 
 static void bcc_negative(void *ctx)
 {
-    uint8_t mem[] = {0xff, 0xff, 0xff, 0xff, 0x90, 0xfb};   // NOTE: $0006 - 5
+    uint8_t mem[] = {0xff, 0xff, 0xff, 0xff, 0x90, 0xfb};   // $0006 - 5
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.pc = 4;
@@ -57,7 +57,7 @@ static void bcc_negative(void *ctx)
 
 static void bcc_positive_overflow(void *ctx)
 {
-    uint8_t mem[] = {[250] = 0x90, 0xa};    // NOTE: $00FD + 10
+    uint8_t mem[] = {[250] = 0x90, 0xa};    // $00FD + 10
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.pc = 250;
@@ -87,7 +87,7 @@ static void bcc_positive_wraparound(void *ctx)
 
 static void bcc_negative_overflow(void *ctx)
 {
-    uint8_t mem[] = {[256] = 0x90, 0xf6};   // NOTE: $0102 - 10
+    uint8_t mem[] = {[256] = 0x90, 0xf6};   // $0102 - 10
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.pc = 256;
@@ -100,7 +100,7 @@ static void bcc_negative_overflow(void *ctx)
 
 static void bcc_negative_wraparound(void *ctx)
 {
-    uint8_t mem[] = {0x90, 0xf6};   // NOTE: $0002 - 10
+    uint8_t mem[] = {0x90, 0xf6};   // $0002 - 10
     // NOTE: 32k rom, starting at $8000 to allow reads of wraparound addresses
     uint8_t *const rom = calloc(0x8000, sizeof *rom);
     struct mos6502 cpu;
@@ -115,7 +115,7 @@ static void bcc_negative_wraparound(void *ctx)
 
 static void bcc_zero(void *ctx)
 {
-    uint8_t mem[] = {0x90, 0x0};    // NOTE: $0002 + 0
+    uint8_t mem[] = {0x90, 0x0};    // $0002 + 0
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
@@ -139,7 +139,7 @@ static void bcs_nobranch(void *ctx)
 
 static void bcs_branch(void *ctx)
 {
-    uint8_t mem[] = {0xb0, 0x5};    // NOTE: $0002 + 5
+    uint8_t mem[] = {0xb0, 0x5};    // $0002 + 5
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
@@ -164,7 +164,7 @@ static void beq_nobranch(void *ctx)
 
 static void beq_branch(void *ctx)
 {
-    uint8_t mem[] = {0xf0, 0x5};    // NOTE: $0002 + 5
+    uint8_t mem[] = {0xf0, 0x5};    // $0002 + 5
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
@@ -189,7 +189,7 @@ static void bmi_nobranch(void *ctx)
 
 static void bmi_branch(void *ctx)
 {
-    uint8_t mem[] = {0x30, 0x5};    // NOTE: $0002 + 5
+    uint8_t mem[] = {0x30, 0x5};    // $0002 + 5
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.n = true;
@@ -215,7 +215,7 @@ static void bne_nobranch(void *ctx)
 
 static void bne_branch(void *ctx)
 {
-    uint8_t mem[] = {0xd0, 0x5};    // NOTE: $0002 + 5
+    uint8_t mem[] = {0xd0, 0x5};    // $0002 + 5
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
@@ -240,7 +240,7 @@ static void bpl_nobranch(void *ctx)
 
 static void bpl_branch(void *ctx)
 {
-    uint8_t mem[] = {0x10, 0x5};    // NOTE: $0002 + 5
+    uint8_t mem[] = {0x10, 0x5};    // $0002 + 5
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
@@ -265,7 +265,7 @@ static void bvc_nobranch(void *ctx)
 
 static void bvc_branch(void *ctx)
 {
-    uint8_t mem[] = {0x50, 0x5};    // NOTE: $0002 + 5
+    uint8_t mem[] = {0x50, 0x5};    // $0002 + 5
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
@@ -289,7 +289,7 @@ static void bvs_nobranch(void *ctx)
 
 static void bvs_branch(void *ctx)
 {
-    uint8_t mem[] = {0x70, 0x5};    // NOTE: $0002 + 5
+    uint8_t mem[] = {0x70, 0x5};    // $0002 + 5
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.v = true;

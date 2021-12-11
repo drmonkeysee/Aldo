@@ -93,7 +93,7 @@ static void irq_ignored(void *ctx)
     cpu.p.i = false;
     cpu.signal.irq = false;
 
-    int cycles = clock_cpu(&cpu);
+    const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -112,7 +112,7 @@ static void nmi_ignored(void *ctx)
     cpu.s = 0xff;
     cpu.signal.nmi = false;
 
-    int cycles = clock_cpu(&cpu);
+    const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -131,7 +131,7 @@ static void res_not_ignored(void *ctx)
     cpu.s = 0xff;
     cpu.signal.res = false;
 
-    int cycles = clock_cpu(&cpu);
+    const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -148,13 +148,180 @@ static void writes_ignored(void *ctx)
     // NOTE: throw away return value, no need to clean up peek state in test
     (void)cpu_peek_start(&cpu);
 
-    int cycles = clock_cpu(&cpu);
+    const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
     ct_assertequal(0x10u, cpu.a);
     ct_assertequal(0x20u, mem[4]);
     ct_assertequal(0x20u, cpu.databus);
+}
+
+static void peek_immediate(void *ctx)
+{
+    // NOTE: LDA #$10
+    uint8_t mem[] = {0xa9, 0x10};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    // NOTE: throw away return value, no need to clean up peek state in test
+    (void)cpu_peek_start(&cpu);
+
+    const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
+
+    ct_assertequal(AM_IMM, (int)result.mode);
+    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0x1u, result.finaladdr);
+    ct_assertequal(0x10u, result.data);
+}
+
+static void peek_zeropage(void *ctx)
+{
+    // NOTE: LDA $04
+    uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    // NOTE: throw away return value, no need to clean up peek state in test
+    (void)cpu_peek_start(&cpu);
+
+    const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
+
+    ct_assertequal(AM_ZP, (int)result.mode);
+    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0x4u, result.finaladdr);
+    ct_assertequal(0x20u, result.data);
+}
+
+static void peek_zp_indexed(void *ctx)
+{
+    // NOTE: LDA $03,X
+    uint8_t mem[] = {0xb5, 0x3, 0x0, 0x0, 0x0, 0x30};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    cpu.x = 0x2;
+    // NOTE: throw away return value, no need to clean up peek state in test
+    (void)cpu_peek_start(&cpu);
+
+    const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
+
+    ct_assertequal(AM_ZPX, (int)result.mode);
+    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0x5u, result.finaladdr);
+    ct_assertequal(0x30u, result.data);
+}
+
+static void peek_indexed_indirect(void *ctx)
+{
+    // NOTE: LDA ($02,X)
+    uint8_t mem[] = {0xa1, 0x2, 0x0, 0x0, 0x2, 0x1, [258] = 0x40};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    cpu.x = 0x2;
+    // NOTE: throw away return value, no need to clean up peek state in test
+    (void)cpu_peek_start(&cpu);
+
+    const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
+
+    ct_assertequal(AM_INDX, (int)result.mode);
+    ct_assertequal(0x4u, result.interaddr);
+    ct_assertequal(0x102u, result.finaladdr);
+    ct_assertequal(0x40u, result.data);
+}
+
+static void peek_indirect_indexed(void *ctx)
+{
+    // NOTE: LDA ($02),Y
+    uint8_t mem[] = {0xb1, 0x2, 0x2, 0x1, [263] = 0x60};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    cpu.y = 0x5;
+    // NOTE: throw away return value, no need to clean up peek state in test
+    (void)cpu_peek_start(&cpu);
+
+    const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
+
+    ct_assertequal(AM_INDY, (int)result.mode);
+    ct_assertequal(0x102u, result.interaddr);
+    ct_assertequal(0x107u, result.finaladdr);
+    ct_assertequal(0x60u, result.data);
+}
+
+static void peek_absolute_indexed(void *ctx)
+{
+    // NOTE: LDA $0102,X
+    uint8_t mem[] = {0xbd, 0x2, 0x1, [268] = 0x70};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    cpu.x = 0xa;
+    // NOTE: throw away return value, no need to clean up peek state in test
+    (void)cpu_peek_start(&cpu);
+
+    const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
+
+    ct_assertequal(AM_ABSX, (int)result.mode);
+    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0x10cu, result.finaladdr);
+    ct_assertequal(0x70u, result.data);
+}
+
+static void peek_branch(void *ctx)
+{
+    // NOTE: BEQ +5
+    uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
+    cpu.p.z = true;
+    // NOTE: throw away return value, no need to clean up peek state in test
+    (void)cpu_peek_start(&cpu);
+
+    const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
+
+    ct_assertequal(AM_BCH, (int)result.mode);
+    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0x7u, result.finaladdr);
+    ct_assertequal(0x0u, result.data);
+}
+
+static void peek_branch_forced(void *ctx)
+{
+    // NOTE: BEQ +5
+    uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
+    cpu.p.z = false;
+    // NOTE: throw away return value, no need to clean up peek state in test
+    (void)cpu_peek_start(&cpu);
+
+    const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
+
+    ct_assertequal(AM_BCH, (int)result.mode);
+    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0x7u, result.finaladdr);
+    ct_assertequal(0x0u, result.data);
+}
+
+static void peek_absolute_indirect(void *ctx)
+{
+    // NOTE: LDA ($0102)
+    uint8_t mem[] = {0x6c, 0x2, 0x1, [258] = 0x5, 0x2, [517] = 80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    cpu.x = 0xa;
+    // NOTE: throw away return value, no need to clean up peek state in test
+    (void)cpu_peek_start(&cpu);
+
+    const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
+
+    ct_assertequal(AM_JIND, (int)result.mode);
+    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0x205u, result.finaladdr);
+    ct_assertequal(0x2u, result.data);
 }
 
 //
@@ -170,6 +337,15 @@ struct ct_testsuite cpu_peek_tests(void)
         ct_maketest(nmi_ignored),
         ct_maketest(res_not_ignored),
         ct_maketest(writes_ignored),
+        ct_maketest(peek_immediate),
+        ct_maketest(peek_zeropage),
+        ct_maketest(peek_zp_indexed),
+        ct_maketest(peek_indexed_indirect),
+        ct_maketest(peek_indirect_indexed),
+        ct_maketest(peek_absolute_indexed),
+        ct_maketest(peek_branch),
+        ct_maketest(peek_branch_forced),
+        ct_maketest(peek_absolute_indirect),
     };
 
     return ct_makesuite(tests);

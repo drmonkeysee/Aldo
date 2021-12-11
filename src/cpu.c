@@ -1463,7 +1463,9 @@ struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
             }
         }
     } while (!self->presync);
-    result.finaladdr = result.mode == AM_BCH ? self->pc : self->addrbus;
+    result.finaladdr = result.mode == AM_BCH || result.mode == AM_JIND
+                        ? self->pc
+                        : self->addrbus;
     result.data = self->databus;
     return result;
 }

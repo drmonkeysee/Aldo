@@ -6,6 +6,8 @@
 //
 
 #include "ciny.h"
+#include "cpu.h"
+#include "cpuhelp.h"
 #include "dis.h"
 #include "snapshot.h"
 
@@ -297,6 +299,167 @@ static void inst_disassembles_brk(void *ctx)
 
     ct_assertequal(1, length);
     ct_assertequalstr("1234: 00        BRK", buf);
+}
+
+//
+// Disassemble Peek
+//
+
+static void peek_immediate(void *ctx)
+{
+    // NOTE: LDA #$10
+    uint8_t mem[] = {0xa9, 0x10};
+    struct mos6502 cpu;
+    char buf[DIS_PEEK_SIZE];
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+
+    const int written = dis_peek(0x0, &cpu, buf);
+
+    const char *const exp = "";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+    ct_assertfalse(cpu.detached);
+}
+
+static void peek_zeropage(void *ctx)
+{
+    // NOTE: LDA $04
+    uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
+    struct mos6502 cpu;
+    char buf[DIS_PEEK_SIZE];
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    const int written = dis_peek(0x0, &cpu, buf);
+
+    const char *const exp = "= 20";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+    ct_assertfalse(cpu.detached);
+}
+
+static void peek_zp_indexed(void *ctx)
+{
+    // NOTE: LDA $03,X
+    uint8_t mem[] = {0xb5, 0x3, 0x0, 0x0, 0x0, 0x30};
+    struct mos6502 cpu;
+    char buf[DIS_PEEK_SIZE];
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    cpu.x = 0x2;
+
+    const int written = dis_peek(0x0, &cpu, buf);
+
+    const char *const exp = "@ 05 = 30";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+    ct_assertfalse(cpu.detached);
+}
+
+static void peek_indexed_indirect(void *ctx)
+{
+    // NOTE: LDA ($02,X)
+    uint8_t mem[] = {0xa1, 0x2, 0x0, 0x0, 0x2, 0x1, [258] = 0x40};
+    struct mos6502 cpu;
+    char buf[DIS_PEEK_SIZE];
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    cpu.x = 0x2;
+
+    const int written = dis_peek(0x0, &cpu, buf);
+
+    const char *const exp = "@ 04 > 0102 = 40";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+    ct_assertfalse(cpu.detached);
+}
+
+static void peek_indirect_indexed(void *ctx)
+{
+    // NOTE: LDA ($02),Y
+    uint8_t mem[] = {0xb1, 0x2, 0x2, 0x1, [263] = 0x60};
+    struct mos6502 cpu;
+    char buf[DIS_PEEK_SIZE];
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    cpu.y = 0x5;
+
+    const int written = dis_peek(0x0, &cpu, buf);
+
+    const char *const exp = "> 0102 @ 0107 = 60";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+    ct_assertfalse(cpu.detached);
+}
+
+static void peek_absolute_indexed(void *ctx)
+{
+    // NOTE: LDA $0102,X
+    uint8_t mem[] = {0xbd, 0x2, 0x1, [268] = 0x70};
+    struct mos6502 cpu;
+    char buf[DIS_PEEK_SIZE];
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    cpu.x = 0xa;
+
+    const int written = dis_peek(0x0, &cpu, buf);
+
+    const char *const exp = "@ 010C = 70";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+    ct_assertfalse(cpu.detached);
+}
+
+static void peek_branch(void *ctx)
+{
+    // NOTE: BEQ +5
+    uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
+    struct mos6502 cpu;
+    char buf[DIS_PEEK_SIZE];
+    setup_cpu(&cpu, mem, ctx);
+    cpu.p.z = true;
+
+    const int written = dis_peek(0x0, &cpu, buf);
+
+    const char *const exp = "@ 0007";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+    ct_assertfalse(cpu.detached);
+}
+
+static void peek_branch_forced(void *ctx)
+{
+    // NOTE: BEQ +5
+    uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
+    struct mos6502 cpu;
+    char buf[DIS_PEEK_SIZE];
+    setup_cpu(&cpu, mem, ctx);
+    cpu.p.z = false;
+
+    const int written = dis_peek(0x0, &cpu, buf);
+
+    const char *const exp = "@ 0007";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+    ct_assertfalse(cpu.detached);
+}
+
+static void peek_absolute_indirect(void *ctx)
+{
+    // NOTE: LDA ($0102)
+    uint8_t mem[] = {0x6c, 0x2, 0x1, [258] = 0x5, 0x2, [517] = 80};
+    struct mos6502 cpu;
+    char buf[DIS_PEEK_SIZE];
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    cpu.x = 0xa;
+
+    const int written = dis_peek(0x0, &cpu, buf);
+
+    const char *const exp = "> 0205";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+    ct_assertfalse(cpu.detached);
 }
 
 //
@@ -1923,6 +2086,16 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(inst_disassembles_jsr),
         ct_maketest(inst_disassembles_rts),
         ct_maketest(inst_disassembles_brk),
+
+        ct_maketest(peek_immediate),
+        ct_maketest(peek_zeropage),
+        ct_maketest(peek_zp_indexed),
+        ct_maketest(peek_indexed_indirect),
+        ct_maketest(peek_indirect_indexed),
+        ct_maketest(peek_absolute_indexed),
+        ct_maketest(peek_branch),
+        ct_maketest(peek_branch_forced),
+        ct_maketest(peek_absolute_indirect),
 
         ct_maketest(datapath_end_of_rom),
         ct_maketest(datapath_unexpected_end_of_rom),

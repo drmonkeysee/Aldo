@@ -32,7 +32,7 @@ void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu)
     if (result > 0) {
         // NOTE: nestest compatibility:
         //  - convert : to space
-        disinst[4] = ' ';
+        //disinst[4] = ' ';
         written += fprintf(tracelog, "%s", disinst);
     } else {
         written += fprintf(tracelog, "%s",

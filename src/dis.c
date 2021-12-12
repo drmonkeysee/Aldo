@@ -24,21 +24,21 @@ static const char *restrict const Mnemonics[] = {
 };
 
 static const int InstLens[] = {
-#define X(s, b, ...) b,
+#define X(s, b, p, ...) b,
     DEC_ADDRMODE_X
 #undef X
 };
 
 #define STRTABLE(s) s##_StringTable
 
-#define X(s, b, ...) static const char *restrict const STRTABLE(s)[] = { \
+#define X(s, b, p, ...) static const char *restrict const STRTABLE(s)[] = { \
     __VA_ARGS__ \
 };
     DEC_ADDRMODE_X
 #undef X
 
 static const char *restrict const *const StringTables[] = {
-#define X(s, b, ...) STRTABLE(s),
+#define X(s, b, p, ...) STRTABLE(s),
     DEC_ADDRMODE_X
 #undef X
 };
@@ -474,45 +474,24 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
 }
 
 int dis_peek(uint16_t addr, struct mos6502 *cpu,
-             char peek[restrict static DIS_PEEK_SIZE])
+             char dis[restrict static DIS_PEEK_SIZE])
 {
     assert(cpu != NULL);
-    assert(peek != NULL);
+    assert(dis != NULL);
 
     cpu_ctx *const peekctx = cpu_peek_start(cpu);
-    const struct cpu_peekresult result = cpu_peek(cpu, addr);
+    const struct cpu_peekresult peek = cpu_peek(cpu, addr);
     cpu_peek_end(cpu, peekctx);
 
     int total = 0;
-    switch (result.mode) {
-    case AM_ZP:
-        total = sprintf(peek, "= %02X", result.data);
-        break;
-    case AM_ZPX:
-    case AM_ZPY:
-        total = sprintf(peek, "@ %02X = %02X", result.finaladdr, result.data);
-        break;
-    case AM_INDX:
-        total = sprintf(peek, "@ %02X > %04X = %02X", result.interaddr,
-                        result.finaladdr, result.data);
-        break;
-    case AM_INDY:
-        total = sprintf(peek, "> %04X @ %04X = %02X", result.interaddr,
-                        result.finaladdr, result.data);
-        break;
-    case AM_ABSX:
-    case AM_ABSY:
-        total = sprintf(peek, "@ %04X = %02X", result.finaladdr, result.data);
-        break;
-    case AM_BCH:
-        total = sprintf(peek, "@ %04X", result.finaladdr);
-        break;
-    case AM_JIND:
-        total = sprintf(peek, "> %04X", result.finaladdr);
-        break;
+    switch (peek.mode) {
+#define XPEEK(...) sprintf(dis, __VA_ARGS__)
+#define X(s, b, p, ...) case AM_ENUM(s): total = p; break;
+        DEC_ADDRMODE_X
+#undef X
+#undef XPEEK
     default:
-        // NOTE: nothing to print for peek
-        peek[0] = '\0';
+        assert(((void)"BAD ADDRMODE PEEK", false));
         break;
     }
 

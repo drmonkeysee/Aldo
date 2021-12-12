@@ -46,7 +46,7 @@ const char *dis_errstr(int err);
 int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE]);
 int dis_peek(uint16_t addr, struct mos6502 *cpu,
-             char peek[restrict static DIS_PEEK_SIZE]);
+             char dis[restrict static DIS_PEEK_SIZE]);
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
 int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f);

@@ -1311,7 +1311,7 @@ static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
     assert(0 < self->t && self->t < MaxCycleCount);
 
     switch (dec.mode) {
-#define X(s, b, ...) case AM_ENUM(s): s##_sequence(self, dec); break;
+#define X(s, b, p, ...) case AM_ENUM(s): s##_sequence(self, dec); break;
         DEC_ADDRMODE_X
 #undef X
     default:

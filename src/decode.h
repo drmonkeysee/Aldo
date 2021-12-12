@@ -84,35 +84,73 @@ X(TXS, self)        /* Transfer x index to stack pointer */ \
 X(TYA, self)        /* Transfer y index to accumulator */
 
 // Addressing Modes
-// X(symbol, byte count, display strings...)
+// X(symbol, byte count, peek template, display strings...)
 #define DEC_ADDRMODE_X \
-X(IMP, 1, "imp", "")                        /* Implied */ \
-X(IMM, 2, "imm", "#$%02X")                  /* Immediate */ \
-X(ZP, 2, "zp", "$%02X")                     /* Zero-Page */ \
-X(ZPX, 2, "zp,X", "$%02X,X")                /* Zero-Page,X */ \
-X(ZPY, 2, "zp,Y", "$%02X,Y")                /* Zero-Page,Y */ \
-X(INDX, 2, "(zp,X)", "($%02X,X)")           /* (Indirect,X) */ \
-X(INDY, 2, "(zp),Y", "($%02X),Y")           /* (Indirect),Y */ \
-X(ABS, 3, "abs", "$??%02X", "$%04X")        /* Absolute */ \
-X(ABSX, 3, "abs,X", "$??%02X,X", "$%04X,X") /* Absolute,X */ \
-X(ABSY, 3, "abs,Y", "$??%02X,Y", "$%04X,Y") /* Absolute,Y */ \
+X(IMP, 1,                                       /* Implied */ \
+  XPEEK(""), \
+  "imp", "") \
+X(IMM, 2,                                       /* Immediate */ \
+  XPEEK(""), \
+  "imm", "#$%02X") \
+X(ZP, 2,                                        /* Zero-Page */ \
+  XPEEK("= %02X", peek.data), \
+  "zp", "$%02X") \
+X(ZPX, 2,                                       /* Zero-Page,X */ \
+  XPEEK("@ %02X = %02X", peek.finaladdr, peek.data), \
+  "zp,X", "$%02X,X") \
+X(ZPY, 2,                                       /* Zero-Page,Y */ \
+  XPEEK("@ %02X = %02X", peek.finaladdr, peek.data), \
+  "zp,Y", "$%02X,Y") \
+X(INDX, 2,                                      /* (Indirect,X) */ \
+  XPEEK("@ %02X > %04X = %02X", peek.interaddr, peek.finaladdr, peek.data), \
+  "(zp,X)", "($%02X,X)") \
+X(INDY, 2,                                      /* (Indirect),Y */ \
+  XPEEK("> %04X @ %04X = %02X", peek.interaddr, peek.finaladdr, peek.data), \
+  "(zp),Y", "($%02X),Y") \
+X(ABS, 3,                                       /* Absolute */ \
+  XPEEK(""), \
+  "abs", "$??%02X", "$%04X") \
+X(ABSX, 3,                                      /* Absolute,X */ \
+  XPEEK("@ %04X = %02X", peek.finaladdr, peek.data), \
+  "abs,X", "$??%02X,X", "$%04X,X") \
+X(ABSY, 3,                                      /* Absolute,Y */ \
+  XPEEK("@ %04X = %02X", peek.finaladdr, peek.data), \
+  "abs,Y", "$??%02X,Y", "$%04X,Y") \
 \
 /* Stack */ \
-X(PSH, 1, "imp", "")                        /* Push */ \
-X(PLL, 1, "imp", "")                        /* Pull */ \
+X(PSH, 1,                                       /* Push */ \
+  XPEEK(""), \
+  "imp", "") \
+X(PLL, 1,                                       /* Pull */ \
+  XPEEK(""), \
+  "imp", "") \
 \
 /* Branch */ \
-X(BCH, 2, "rel", "%+hhd")                   /* Relative branch */ \
+X(BCH, 2,                                       /* Relative branch */ \
+  XPEEK("@ %04X", peek.finaladdr), \
+  "rel", "%+hhd") \
 \
 /* Jumps */ \
-X(JSR, 3, "abs", "$??%02X", "$%04X")        /* Jump to subroutine, */ \
-X(RTS, 1, "imp", "")                        /* Return from subroutine */ \
-X(JABS, 3, "abs", "$??%02X", "$%04X")       /* Absolute jump */ \
-X(JIND, 3, "(abs)", "($??%02X)", "($%04X)") /* Indirect jump */ \
+X(JSR, 3,                                       /* Jump to subroutine, */ \
+  XPEEK(""), \
+  "abs", "$??%02X", "$%04X") \
+X(RTS, 1,                                       /* Return from subroutine */ \
+  XPEEK(""), \
+  "imp", "") \
+X(JABS, 3,                                      /* Absolute jump */ \
+  XPEEK(""), \
+  "abs", "$??%02X", "$%04X") \
+X(JIND, 3,                                      /* Indirect jump */ \
+  XPEEK("> %04X", peek.finaladdr), \
+  "(abs)", "($??%02X)", "($%04X)") \
 \
 /* Interrupts */ \
-X(BRK, 1, "imp", "%s")                      /* Break, interrupt, reset */ \
-X(RTI, 1, "imp", "")                        /* Return from interrupt */
+X(BRK, 1,                                       /* Break, interrupt, reset */ \
+  XPEEK(""), \
+  "imp", "%s") \
+X(RTI, 1,                                       /* Return from interrupt */ \
+  XPEEK(""), \
+  "imp", "")
 
 #define IN_ENUM(s) IN_##s
 
@@ -125,7 +163,7 @@ enum inst {
 #define AM_ENUM(s) AM_##s
 
 enum addrmode {
-#define X(s, b, ...) AM_ENUM(s),
+#define X(s, b, p, ...) AM_ENUM(s),
     DEC_ADDRMODE_X
 #undef X
 };

@@ -1424,8 +1424,8 @@ void cpu_traceline(const struct mos6502 *self, uint16_t *pc,
     assert(status != NULL);
 
     *pc = self->addrinst;
-    // NOTE: nestest log seems to assume Break flag is always set low
-    *status = get_p(self, true);
+    // TODO: nestest log seems to assume Break flag is always set low
+    *status = get_p(self, false);
 }
 
 cpu_ctx *cpu_peek_start(struct mos6502 *self)

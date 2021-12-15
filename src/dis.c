@@ -474,10 +474,19 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
 }
 
 int dis_peek(uint16_t addr, struct mos6502 *cpu,
+             const struct console_state *snapshot,
              char dis[restrict static DIS_PEEK_SIZE])
 {
     assert(cpu != NULL);
     assert(dis != NULL);
+
+    const char *const interrupt = interrupt_display(snapshot);
+    const size_t interlen = strlen(interrupt);
+    assert(interlen < DIS_PEEK_SIZE);
+    if (interlen > 0) {
+        strcpy(dis, interrupt);
+        return (int)interlen;
+    }
 
     cpu_ctx *const peekctx = cpu_peek_start(cpu);
     const struct cpu_peekresult peek = cpu_peek(cpu, addr);

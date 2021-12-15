@@ -43,7 +43,8 @@ void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu)
     }
 
     char peek[DIS_PEEK_SIZE];
-    result = dis_peek(snapshot.datapath.current_instruction, cpu, peek);
+    result = dis_peek(snapshot.datapath.current_instruction, cpu, &snapshot,
+                      peek);
     written += fprintf(tracelog, " %s",
                        result < 0 ? dis_errstr(result) : peek);
 

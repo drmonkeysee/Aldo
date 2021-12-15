@@ -52,8 +52,18 @@ void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu)
                                              ? 0
                                              : instw - written);
     fprintf(tracelog, "%*s", width, "");
-    fprintf(tracelog, " A:%02X X:%02X Y:%02X P:%02X SP:%02X",
+    fprintf(tracelog, " A:%02X X:%02X Y:%02X P:%02X (",
             snapshot.cpu.accumulator, snapshot.cpu.xindex, snapshot.cpu.yindex,
-            snapshot.cpu.status, snapshot.cpu.stack_pointer);
+            snapshot.cpu.status);
+    static const char flags[] = {
+        'c', 'C', 'z', 'Z', 'i', 'I', 'd', 'D',
+        'b', 'B', '-', '-', 'v', 'V', 'n', 'N',
+    };
+    for (size_t i = sizeof snapshot.cpu.status * 8; i > 0; --i) {
+        const size_t idx = i - 1;
+        const bool bit = (snapshot.cpu.status >> idx) & 1;
+        fputc(flags[(idx * 2) + bit], tracelog);
+    }
+    fprintf(tracelog, ") SP:%02X", snapshot.cpu.stack_pointer);
     fprintf(tracelog, " CYC:%" PRIu64 "\n", cycles);
 }

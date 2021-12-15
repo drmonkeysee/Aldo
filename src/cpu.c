@@ -1416,18 +1416,6 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->lines.sync = self->signal.sync;
 }
 
-void cpu_traceline(const struct mos6502 *self, uint16_t *pc,
-                   uint8_t *restrict status)
-{
-    assert(self != NULL);
-    assert(pc != NULL);
-    assert(status != NULL);
-
-    *pc = self->addrinst;
-    // TODO: nestest log seems to assume Break flag is always set low
-    *status = get_p(self, false);
-}
-
 cpu_ctx *cpu_peek_start(struct mos6502 *self)
 {
     assert(self != NULL);

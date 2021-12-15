@@ -91,8 +91,6 @@ void cpu_powerup(struct mos6502 *self);
 int cpu_cycle(struct mos6502 *self);
 
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot);
-void cpu_traceline(const struct mos6502 *self, uint16_t *pc,
-                   uint8_t *restrict status);
 
 cpu_ctx *cpu_peek_start(struct mos6502 *self);
 struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr);

@@ -213,7 +213,8 @@ static void drawcart(const struct control *appstate,
     const ptrdiff_t namelen = endofname - cn;
     const bool longname = namelen > maxwidth;
     // NOTE: ellipsis is one glyph wide despite being > 1 byte long
-    wprintw(CartView.content, "%.*s%s", longname ? maxwidth - 1 : namelen, cn,
+    wprintw(CartView.content, "%.*s%s",
+            (int)(longname ? maxwidth - 1 : namelen), cn,
             longname ? "\u2026" : "");
     mvwprintw(CartView.content, ++cursor_y, 0, "Format: %s",
               snapshot->cart.formatdesc);
@@ -431,7 +432,7 @@ static void drawram(const struct console_state *snapshot)
     mvwvline(RamView.content, 0, getmaxx(RamView.content) - 3, 0, h);
     for (size_t page = 0; page < 8; ++page) {
         for (size_t page_row = 0; page_row < 0x10; ++page_row) {
-            mvwprintw(RamView.content, cursor_y, 0, "%02X", page);
+            mvwprintw(RamView.content, cursor_y, 0, "%02zX", page);
             for (size_t page_col = 0; page_col < 0x10; ++page_col) {
                 mvwprintw(RamView.content, cursor_y, cursor_x, "%02X",
                           snapshot->mem.ram[(page * 0x100)
@@ -440,7 +441,7 @@ static void drawram(const struct console_state *snapshot)
                 cursor_x += col_width;
             }
             mvwprintw(RamView.content, cursor_y, cursor_x + 2,
-                      "%X", page_row);
+                      "%zX", page_row);
             cursor_x = start_x;
             ++cursor_y;
         }

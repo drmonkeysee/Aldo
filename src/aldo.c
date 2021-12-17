@@ -7,6 +7,7 @@
 
 #include "aldo.h"
 
+#include "bytes.h"
 #include "cart.h"
 #include "control.h"
 #include "dis.h"
@@ -29,6 +30,7 @@ static const char
     *restrict const DisassembleCmd = "--disassemble",
     *restrict const HelpCmd = "--help",
     *restrict const InfoCmd = "--info",
+    *restrict const ResVectorCmd = "--reset-vector",
     *restrict const VersionCmd = "--version";
 
 static const char
@@ -37,10 +39,15 @@ static const char
     DisassembleFlag = 'd',
     HelpFlag = 'h',
     InfoFlag = 'i',
+    ResVectorFlag = 'R',
     VerboseFlag = 'v',
     VersionFlag = 'V';
 
-static const int ArgParseFailure = -1, MinScale = 1, MaxScale = 10;
+static const int
+    ArgParseFailure = -1, MinScale = 1, MaxScale = 10,
+    // TODO: allow reset vector to go lower than $8000?
+    // strtol parse error = 0 but technically that's a valid address
+    MinVector = MEMBLOCK_32KB, MaxVector = ADDRMASK_64KB;
 
 static bool parse_flag(const char *arg, char flag, const char *cmd)
 {
@@ -50,23 +57,39 @@ static bool parse_flag(const char *arg, char flag, const char *cmd)
 
 #define setflag(f, a, s, l) (f) = (f) || parse_flag(a, s, l)
 
-static int parse_scale(const char *arg, int *argi, int argc,
-                       char *argv[argc+1])
+static long convert_decimal(const char *arg)
 {
-    // NOTE: first try -sN format
-    int scale = atoi(arg + 2);
-    // NOTE: then try --chr-scale=N format
-    if (scale == 0 && arg[1] == '-') {
+    // TODO: use strtol as well? out of range is UB for atoi
+    return atoi(arg);
+}
+
+static long convert_hex(const char *arg)
+{
+    errno = 0;
+    const long result = strtol(arg, NULL, 16);
+    if (errno == ERANGE) {
+        perror("Hex parse failed");
+    }
+    return result;
+}
+
+static long parse_number(const char *arg, int *argi, int argc,
+                         char *argv[argc+1], long (*converter)(const char *))
+{
+    // NOTE: first try -fN format
+    long number = converter(arg + 2);
+    // NOTE: then try --long-cmd=N format
+    if (number == 0 && arg[1] == '-') {
         const char *const opt = strchr(arg, '=');
         if (opt) {
-            scale = atoi(opt + 1);
+            number = converter(opt + 1);
         }
     }
     // NOTE: finally try parsing next argument
-    if (scale == 0) {
-        scale = ++*argi < argc ? atoi(argv[*argi]) : 0;
+    if (number == 0) {
+        number = ++*argi < argc ? converter(argv[*argi]) : 0;
     }
-    return scale;
+    return number;
 }
 
 static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
@@ -90,13 +113,26 @@ static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
                     }
                 }
                 if (parse_flag(arg, ChrScaleFlag, ChrScaleCmd)) {
-                    const int scale = parse_scale(arg, &i, argc, argv);
+                    const long scale = parse_number(arg, &i, argc, argv,
+                                                    convert_decimal);
                     if (MinScale <= scale && scale <= MaxScale) {
-                        appstate->chrscale = scale;
+                        appstate->chrscale = (int)scale;
                     } else {
                         fprintf(stderr,
                                 "Invalid scale format: expected [%d, %d]\n",
                                 MinScale, MaxScale);
+                        return ArgParseFailure;
+                    }
+                }
+                if (parse_flag(arg, ResVectorFlag, ResVectorCmd)) {
+                    const long vector = parse_number(arg, &i, argc, argv,
+                                                     convert_hex);
+                    if (MinVector <= vector && vector <= MaxVector) {
+                        appstate->resetvector = vector;
+                    } else {
+                        fprintf(stderr,
+                                "Invalid vector format: expected [%x, %x]\n",
+                                MinVector, MaxVector);
                         return ArgParseFailure;
                     }
                 }
@@ -116,6 +152,10 @@ static void print_usage(const struct control *appstate)
     puts("---=== Aldo Usage ===---");
     printf("%s [options...] [command] file\n", appstate->me);
     puts("\noptions");
+    printf("  -R x\t: override RESET vector"
+           " [%0X, %0X] (also --reset-vector x)\n", MinVector, MaxVector);
+    printf("  -s n\t: CHR ROM BMP scaling factor"
+           " [%d, %d] (also --chr-scale n)\n", MinScale, MaxScale);
     puts("  -v\t: verbose output");
     puts("\ncommands");
     puts("  -c\t: decode CHR ROM into BMP files (also --chr-decode[=prefix];"
@@ -125,8 +165,6 @@ static void print_usage(const struct control *appstate)
     puts("  -h\t: print usage (also --help)");
     puts("  -i\t: print file cartridge info (also --info);"
          " verbose prints more details");
-    printf("  -s n\t: CHR ROM BMP scaling factor"
-           " [%d, %d] (also --chr-scale n)\n", MinScale, MaxScale);
     puts("  -V\t: print version (also --version)");
     puts("\narguments");
     puts("  file\t: input file containing cartridge"

@@ -478,6 +478,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
              char dis[restrict static DIS_PEEK_SIZE])
 {
     assert(cpu != NULL);
+    assert(snapshot != NULL);
     assert(dis != NULL);
 
     const char *const interrupt = interrupt_display(snapshot);

@@ -10,12 +10,15 @@
 #include "dis.h"
 #include "snapshot.h"
 
+#include <assert.h>
 #include <inttypes.h>
 #include <stddef.h>
 
 // TODO: add nestest compatibility flag
 void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu)
 {
+    assert(cpu != NULL);
+
     if (!tracelog) return;
 
     // NOTE: does not include leading space in registers print-format

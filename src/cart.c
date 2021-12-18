@@ -43,9 +43,8 @@ static int detect_format(struct cartridge *self, FILE *f)
 {
     // NOTE: grab first 8 bytes as a string to check file format
     char format[9];
-    const char *const fmtsuccess = fgets(format, sizeof format, f);
 
-    if (!fmtsuccess) {
+    if (!fgets(format, sizeof format, f)) {
         if (feof(f)) return CART_ERR_EOF;
         if (ferror(f)) return CART_ERR_IO;
         return CART_ERR_UNKNOWN;

@@ -44,10 +44,8 @@ static const char
     VersionFlag = 'V';
 
 static const int
-    ArgParseFailure = -1, MinScale = 1, MaxScale = 10,
-    // TODO: allow reset vector to go lower than $8000?
-    // strtol parse error = 0 but technically that's a valid address
-    MinVector = MEMBLOCK_32KB, MaxVector = ADDRMASK_64KB;
+    ArgParseFailure = -1, MinScale = 1, MaxScale = 10, MinVector = 0,
+    MaxVector = ADDRMASK_64KB;
 
 static bool parse_flag(const char *arg, char flag, const char *cmd)
 {
@@ -57,39 +55,41 @@ static bool parse_flag(const char *arg, char flag, const char *cmd)
 
 #define setflag(f, a, s, l) (f) = (f) || parse_flag(a, s, l)
 
-static long convert_decimal(const char *arg)
+static bool convert_num(const char *arg, int base, long *result)
 {
-    // TODO: use strtol as well? out of range is UB for atoi
-    return atoi(arg);
-}
-
-static long convert_hex(const char *arg)
-{
+    char *end;
     errno = 0;
-    const long result = strtol(arg, NULL, 16);
+    *result = strtol(arg, &end, base);
     if (errno == ERANGE) {
-        perror("Hex parse failed");
+        perror("Number parse failed");
+        return false;
     }
-    return result;
+    if (*result == 0 && arg == end) {
+        return false;
+    }
+    return true;
 }
 
-static long parse_number(const char *arg, int *argi, int argc,
-                         char *argv[argc+1], long (*converter)(const char *))
+// NOTE: value of number is undefined if return value is false
+static bool parse_number(const char *arg, int *argi, int argc,
+                         char *argv[argc+1], int base, long *number)
 {
     // NOTE: first try -fN format
-    long number = converter(arg + 2);
+    bool result = convert_num(arg + 2, base, number);
     // NOTE: then try --long-cmd=N format
-    if (number == 0 && arg[1] == '-') {
+    if (!result && arg[1] == '-') {
         const char *const opt = strchr(arg, '=');
         if (opt) {
-            number = converter(opt + 1);
+            result = convert_num(opt + 1, base, number);
         }
     }
     // NOTE: finally try parsing next argument
-    if (number == 0) {
-        number = ++*argi < argc ? converter(argv[*argi]) : 0;
+    if (!result) {
+        result = ++*argi < argc
+                    ? convert_num(argv[*argi], base, number)
+                    : false;
     }
-    return number;
+    return result;
 }
 
 static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
@@ -113,9 +113,10 @@ static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
                     }
                 }
                 if (parse_flag(arg, ChrScaleFlag, ChrScaleCmd)) {
-                    const long scale = parse_number(arg, &i, argc, argv,
-                                                    convert_decimal);
-                    if (MinScale <= scale && scale <= MaxScale) {
+                    long scale;
+                    const bool result = parse_number(arg, &i, argc, argv, 10,
+                                                     &scale);
+                    if (result && MinScale <= scale && scale <= MaxScale) {
                         appstate->chrscale = (int)scale;
                     } else {
                         fprintf(stderr,
@@ -125,13 +126,14 @@ static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
                     }
                 }
                 if (parse_flag(arg, ResVectorFlag, ResVectorCmd)) {
-                    const long vector = parse_number(arg, &i, argc, argv,
-                                                     convert_hex);
-                    if (MinVector <= vector && vector <= MaxVector) {
-                        appstate->resetvector = vector;
+                    long vector;
+                    const bool result = parse_number(arg, &i, argc, argv, 16,
+                                                     &vector);
+                    if (result && MinVector <= vector && vector <= MaxVector) {
+                        appstate->resetvector = (int)vector;
                     } else {
                         fprintf(stderr,
-                                "Invalid vector format: expected [%x, %x]\n",
+                                "Invalid vector format: expected [%X, %X]\n",
                                 MinVector, MaxVector);
                         return ArgParseFailure;
                     }
@@ -153,7 +155,7 @@ static void print_usage(const struct control *appstate)
     printf("%s [options...] [command] file\n", appstate->me);
     puts("\noptions");
     printf("  -R x\t: override RESET vector"
-           " [%0X, %0X] (also --reset-vector x)\n", MinVector, MaxVector);
+           " [%X, %X] (also --reset-vector x)\n", MinVector, MaxVector);
     printf("  -s n\t: CHR ROM BMP scaling factor"
            " [%d, %d] (also --chr-scale n)\n", MinScale, MaxScale);
     puts("  -v\t: verbose output");
@@ -363,6 +365,7 @@ int aldo_run(int argc, char *argv[argc+1])
     struct control appstate = {
         .chrscale = MinScale,
         .clock = {.cycles_per_sec = 4},
+        .resetvector = -1,
         .running = true,
         .tracefile = "trace.log",
         .tron = true,

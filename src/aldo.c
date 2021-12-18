@@ -328,7 +328,7 @@ static int emu_loop(struct control *appstate, cart *c)
         }
     }
 
-    nes *console = nes_new(c, tracelog);
+    nes *console = nes_new(c, tracelog, appstate->resetvector);
     nes_powerup(console);
     // NOTE: initialize snapshot from console
     struct console_state snapshot;

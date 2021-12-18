@@ -21,7 +21,7 @@ enum nes_interrupt {
 };
 typedef struct nes_console nes;
 
-nes *nes_new(cart *c, FILE *tracelog);
+nes *nes_new(cart *c, FILE *tracelog, int resetoverride);
 void nes_free(nes *self);
 
 void nes_mode(nes *self, enum nexcmode mode);

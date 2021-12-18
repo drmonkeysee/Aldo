@@ -23,7 +23,9 @@
 struct nes_console {
     cart *cart;                 // Game Cartridge; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
+    struct busdevice *reswrap;  // Bus Device Wrapped by RESET Override Device
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
+    int resetoverride;          // RESET Vector Option (<0 if not set)
     enum nexcmode mode;         // NES execution mode
     uint8_t ram[MEMBLOCK_2KB];  // CPU Internal RAM
 };
@@ -48,13 +50,43 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
                                  dest);
 }
 
+static bool resetaddr_read(const void *restrict ctx, uint16_t addr,
+                           uint8_t *restrict d)
+{
+    struct busdevice *const wrapped = (struct busdevice *)ctx;
+    return wrapped->read ? wrapped->read(wrapped->ctx, addr, d) : false;
+}
+
+static bool resetaddr_write(void *ctx, uint16_t addr, uint8_t d)
+{
+    struct busdevice *const wrapped = (struct busdevice *)ctx;
+    return wrapped->write ? wrapped->write(wrapped->ctx, addr, d) : false;
+}
+
+static size_t resetaddr_dma(const void *restrict ctx, uint16_t addr,
+                            size_t count, uint8_t dest[restrict count])
+{
+    struct busdevice *const wrapped = (struct busdevice *)ctx;
+    return wrapped->dma ? wrapped->dma(wrapped->ctx, addr, count, dest) : 0;
+}
+
 static void create_cpubus(struct nes_console *self)
 {
     // TODO: 3 partitions only for now, 8KB ram, 32KB rom, nothing in between
     self->cpu.bus = bus_new(16, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
     bus_set(self->cpu.bus, 0,
             (struct busdevice){ram_read, ram_write, ram_dma, self->ram});
-    cart_cpu_connect(self->cart, self->cpu.bus, MEMBLOCK_32KB);
+
+    const uint16_t cart_busaddr = MEMBLOCK_32KB;
+    cart_cpu_connect(self->cart, self->cpu.bus, cart_busaddr);
+
+    if (self->resetoverride >= 0) {
+        self->reswrap = malloc(sizeof *self->reswrap);
+        struct busdevice resetaddr_device = {
+            resetaddr_read, resetaddr_write, resetaddr_dma, self->reswrap,
+        };
+        bus_swap(self->cpu.bus, cart_busaddr, resetaddr_device, self->reswrap);
+    }
 }
 
 static void free_cpubus(struct nes_console *self)
@@ -98,13 +130,15 @@ static void instruction_trace(struct nes_console *self,
 // Public Interface
 //
 
-nes *nes_new(cart *c, FILE *tracelog)
+nes *nes_new(cart *c, FILE *tracelog, int resetoverride)
 {
     assert(c != NULL);
 
     struct nes_console *const self = malloc(sizeof *self);
     self->cart = c;
     self->tracelog = tracelog;
+    self->reswrap = NULL;
+    self->resetoverride = resetoverride;
     create_cpubus(self);
     return self;
 }
@@ -114,6 +148,7 @@ void nes_free(nes *self)
     assert(self != NULL);
 
     free_cpubus(self);
+    free(self->reswrap);
     free(self);
 }
 

@@ -18,14 +18,18 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+struct resdecorator {
+    struct busdevice inner;
+    uint16_t vector;
+};
+
 // The NES-001 Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
 struct nes_console {
     cart *cart;                 // Game Cartridge; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
-    struct busdevice *reswrap;  // Bus Device Wrapped by RESET Override Device
+    struct resdecorator *dec;   // Device Decorator for RESET Vector Override
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
-    int resetoverride;          // RESET Vector Option (<0 if not set)
     enum nexcmode mode;         // NES execution mode
     uint8_t ram[MEMBLOCK_2KB];  // CPU Internal RAM
 };
@@ -53,24 +57,36 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
 static bool resetaddr_read(const void *restrict ctx, uint16_t addr,
                            uint8_t *restrict d)
 {
-    struct busdevice *const wrapped = (struct busdevice *)ctx;
-    return wrapped->read ? wrapped->read(wrapped->ctx, addr, d) : false;
+    struct resdecorator *const dec = (struct resdecorator *)ctx;
+    if (!dec->inner.read) return false;
+
+    if (CPU_VECTOR_RES <= addr && addr < CPU_VECTOR_IRQ) {
+        uint8_t vector[2];
+        wrtoba(dec->vector, vector);
+        *d = vector[addr - CPU_VECTOR_RES];
+        return true;
+    }
+    return dec->inner.read(dec->inner.ctx, addr, d);
 }
 
 static bool resetaddr_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    struct busdevice *const wrapped = (struct busdevice *)ctx;
-    return wrapped->write ? wrapped->write(wrapped->ctx, addr, d) : false;
+    struct resdecorator *const dec = (struct resdecorator *)ctx;
+    return dec->inner.write
+            ? dec->inner.write(dec->inner.ctx, addr, d)
+            : false;
 }
 
 static size_t resetaddr_dma(const void *restrict ctx, uint16_t addr,
                             size_t count, uint8_t dest[restrict count])
 {
-    struct busdevice *const wrapped = (struct busdevice *)ctx;
-    return wrapped->dma ? wrapped->dma(wrapped->ctx, addr, count, dest) : 0;
+    struct resdecorator *const dec = (struct resdecorator *)ctx;
+    return dec->inner.dma
+            ? dec->inner.dma(dec->inner.ctx, addr, count, dest)
+            : 0;
 }
 
-static void create_cpubus(struct nes_console *self)
+static void create_cpubus(struct nes_console *self, int resetoverride)
 {
     // TODO: 3 partitions only for now, 8KB ram, 32KB rom, nothing in between
     self->cpu.bus = bus_new(16, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
@@ -80,12 +96,14 @@ static void create_cpubus(struct nes_console *self)
     const uint16_t cart_busaddr = MEMBLOCK_32KB;
     cart_cpu_connect(self->cart, self->cpu.bus, cart_busaddr);
 
-    if (self->resetoverride >= 0) {
-        self->reswrap = malloc(sizeof *self->reswrap);
+    if (resetoverride >= 0) {
+        self->dec = malloc(sizeof *self->dec);
+        self->dec->vector = resetoverride;
         struct busdevice resetaddr_device = {
-            resetaddr_read, resetaddr_write, resetaddr_dma, self->reswrap,
+            resetaddr_read, resetaddr_write, resetaddr_dma, self->dec,
         };
-        bus_swap(self->cpu.bus, cart_busaddr, resetaddr_device, self->reswrap);
+        bus_swap(self->cpu.bus, cart_busaddr, resetaddr_device,
+                 &self->dec->inner);
     }
 }
 
@@ -137,9 +155,8 @@ nes *nes_new(cart *c, FILE *tracelog, int resetoverride)
     struct nes_console *const self = malloc(sizeof *self);
     self->cart = c;
     self->tracelog = tracelog;
-    self->reswrap = NULL;
-    self->resetoverride = resetoverride;
-    create_cpubus(self);
+    self->dec = NULL;
+    create_cpubus(self, resetoverride);
     return self;
 }
 
@@ -148,7 +165,7 @@ void nes_free(nes *self)
     assert(self != NULL);
 
     free_cpubus(self);
-    free(self->reswrap);
+    free(self->dec);
     free(self);
 }
 

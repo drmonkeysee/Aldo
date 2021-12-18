@@ -260,6 +260,7 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
                                       sizeof snapshot->mem.prgview
                                         / sizeof snapshot->mem.prgview[0],
                                       snapshot->mem.prgview);
+    snapshot->mem.resvector_override = self->dec ? self->dec->vector : -1;
     bus_dma(self->cpu.bus, CPU_VECTOR_NMI,
             sizeof snapshot->mem.vectors / sizeof snapshot->mem.vectors[0],
             snapshot->mem.vectors);

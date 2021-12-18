@@ -247,8 +247,13 @@ static void drawvecs(int h, int w, int y, const struct console_state *snapshot)
 
     lo = snapshot->mem.vectors[2];
     hi = snapshot->mem.vectors[3];
-    mvwprintw(PrgView.content, h - y--, 0, "%04X: %02X %02X     RES $%04X",
-              CPU_VECTOR_RES, lo, hi, bytowr(lo, hi));
+    mvwprintw(PrgView.content, h - y--, 0, "%04X: %02X %02X     RES",
+              CPU_VECTOR_RES, lo, hi);
+    if (snapshot->mem.resvector_override >= 0) {
+        wprintw(PrgView.content, " !$%04X", snapshot->mem.resvector_override);
+    } else {
+        wprintw(PrgView.content, " $%04X", bytowr(lo, hi));
+    }
 
     lo = snapshot->mem.vectors[4];
     hi = snapshot->mem.vectors[5];

@@ -156,11 +156,10 @@ static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
     // TODO: no wram support, did 000 ever have wram?
     if (addr < MEMBLOCK_32KB) return 0;
     const struct ines_000_mapper *const m = ctx;
-    if (m->bankcount == 2) {
-        return bytecopy_bank(m->super.prg, BITWIDTH_32KB, addr, count, dest);
-    }
-    return bytecopy_bankmirrored(m->super.prg, BITWIDTH_16KB, addr,
-                                 BITWIDTH_64KB, count, dest);
+    return m->bankcount == 2
+        ? bytecopy_bank(m->super.prg, BITWIDTH_32KB, addr, count, dest)
+        : bytecopy_bankmirrored(m->super.prg, BITWIDTH_16KB, addr,
+                                BITWIDTH_64KB, count, dest);
 }
 
 static size_t ines_000_prgbank(const struct mapper *self, size_t i,

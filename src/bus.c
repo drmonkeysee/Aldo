@@ -90,10 +90,9 @@ bool bus_read(bus *self, uint16_t addr, uint8_t *restrict d)
     if (addr > self->maxaddr) return false;
 
     struct partition *const target = find(self, addr);
-    if (target->device.read) {
-        return target->device.read(target->device.ctx, addr, d);
-    }
-    return false;
+    return target->device.read
+            ? target->device.read(target->device.ctx, addr, d)
+            : false;
 }
 
 bool bus_write(bus *self, uint16_t addr, uint8_t d)
@@ -103,10 +102,9 @@ bool bus_write(bus *self, uint16_t addr, uint8_t d)
     if (addr > self->maxaddr) return false;
 
     struct partition *const target = find(self, addr);
-    if (target->device.write) {
-        return target->device.write(target->device.ctx, addr, d);
-    }
-    return false;
+    return target->device.write
+            ? target->device.write(target->device.ctx, addr, d)
+            : false;
 }
 
 size_t bus_dma(bus *self, uint16_t addr, size_t count,
@@ -119,8 +117,7 @@ size_t bus_dma(bus *self, uint16_t addr, size_t count,
     if (addr > self->maxaddr || count == 0) return 0;
 
     struct partition *const target = find(self, addr);
-    if (target->device.dma) {
-        return target->device.dma(target->device.ctx, addr, count, dest);
-    }
-    return 0;
+    return target->device.dma
+            ? target->device.dma(target->device.ctx, addr, count, dest)
+            : 0;
 }

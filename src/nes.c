@@ -31,6 +31,7 @@ struct nes_console {
     struct resdecorator *dec;   // Device Decorator for RESET Vector Override
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
     enum nexcmode mode;         // NES execution mode
+    bool nestest;               // Use Nestest-Compatible Trace Format
     uint8_t ram[MEMBLOCK_2KB];  // CPU Internal RAM
 };
 
@@ -150,14 +151,15 @@ static void instruction_trace(struct nes_console *self,
 // Public Interface
 //
 
-nes *nes_new(cart *c, FILE *tracelog, int resetoverride)
+nes *nes_new(cart *c, FILE *tracelog, bool nestest, int resetoverride)
 {
     assert(c != NULL);
 
     struct nes_console *const self = malloc(sizeof *self);
     self->cart = c;
-    self->tracelog = tracelog;
     self->dec = NULL;
+    self->nestest = nestest;
+    self->tracelog = tracelog;
     create_cpubus(self, resetoverride);
     return self;
 }
@@ -182,11 +184,6 @@ void nes_mode(nes *self, enum nexcmode mode)
 void nes_powerup(nes *self)
 {
     assert(self != NULL);
-
-    // TODO: throw random stuff into RAM for testing
-    for (size_t i = 0; i < sizeof self->ram / sizeof self->ram[0]; ++i) {
-        self->ram[i] = rand() % 0x100;
-    }
 
     cpu_powerup(&self->cpu);
 }

@@ -20,7 +20,9 @@ struct control {
     struct cycleclock clock;
     const char *cartfile, *chrdecode_prefix, *me, *tracefile;
     int chrscale, ramsheet, resetvector;
-    bool chrdecode, disassemble, help, info, running, tron, verbose, version;
+    bool
+        chrdecode, disassemble, help, info, nestest, running, tron, verbose,
+        version;
 };
 
 extern const int MinCps, MaxCps, RamSheets;

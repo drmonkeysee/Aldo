@@ -30,6 +30,7 @@ static const char
     *restrict const DisassembleCmd = "--disassemble",
     *restrict const HelpCmd = "--help",
     *restrict const InfoCmd = "--info",
+    *restrict const NestestCmd = "--nestest-compat",
     *restrict const ResVectorCmd = "--reset-vector",
     *restrict const VersionCmd = "--version";
 
@@ -39,6 +40,7 @@ static const char
     DisassembleFlag = 'd',
     HelpFlag = 'h',
     InfoFlag = 'i',
+    NestestFlag = 'N',
     ResVectorFlag = 'R',
     VerboseFlag = 'v',
     VersionFlag = 'V';
@@ -104,6 +106,7 @@ static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
                         DisassembleCmd);
                 setflag(appstate->help, arg, HelpFlag, HelpCmd);
                 setflag(appstate->info, arg, InfoFlag, InfoCmd);
+                setflag(appstate->nestest, arg, NestestFlag, NestestCmd);
                 setflag(appstate->verbose, arg, VerboseFlag, NULL);
                 setflag(appstate->version, arg, VersionFlag, VersionCmd);
                 if (strncmp(arg, ChrDecodeCmd, strlen(ChrDecodeCmd)) == 0) {
@@ -133,7 +136,8 @@ static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
                         appstate->resetvector = (int)vector;
                     } else {
                         fprintf(stderr,
-                                "Invalid vector format: expected [%X, %X]\n",
+                                "Invalid vector format: "
+                                "expected [0x%X, 0x%X]\n",
                                 MinVector, MaxVector);
                         return ArgParseFailure;
                     }
@@ -154,8 +158,9 @@ static void print_usage(const struct control *appstate)
     puts("---=== Aldo Usage ===---");
     printf("%s [options...] [command] file\n", appstate->me);
     puts("\noptions");
+    puts("  -N\t: Use nestest trace-log format (also --nestest-compat)");
     printf("  -R x\t: override RESET vector"
-           " [%X, %X] (also --reset-vector x)\n", MinVector, MaxVector);
+           " [0x%X, 0x%X] (also --reset-vector x)\n", MinVector, MaxVector);
     printf("  -s n\t: CHR ROM BMP scaling factor"
            " [%d, %d] (also --chr-scale n)\n", MinScale, MaxScale);
     puts("  -v\t: verbose output");
@@ -328,7 +333,8 @@ static int emu_loop(struct control *appstate, cart *c)
         }
     }
 
-    nes *console = nes_new(c, tracelog, appstate->resetvector);
+    nes *console = nes_new(c, tracelog, appstate->nestest,
+                           appstate->resetvector);
     nes_powerup(console);
     // NOTE: initialize snapshot from console
     struct console_state snapshot;

@@ -14,7 +14,8 @@
 #include <stddef.h>
 
 static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
-                             const struct console_state *snapshot)
+                             const struct console_state *snapshot,
+                             bool nestest)
 {
     uint8_t inst[3];
     const size_t instlen = bus_dma(cpu->bus,
@@ -24,9 +25,9 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
     const int result = dis_inst(snapshot->datapath.current_instruction,
                                 inst, instlen, disinst);
     if (result > 0) {
-        // NOTE: nestest compatibility:
-        //  - convert : to space
-        //disinst[4] = ' ';
+        if (nestest) {
+            disinst[4] = ' ';   // Replace ':' with ' '
+        }
         return fprintf(tracelog, "%s", disinst);
     } else {
         return fprintf(tracelog, "%s",
@@ -35,7 +36,8 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
 }
 
 static int trace_instruction_peek(FILE *tracelog, struct mos6502 *cpu,
-                                  const struct console_state *snapshot)
+                                  const struct console_state *snapshot,
+                                  bool nestest)
 {
     char peek[DIS_PEEK_SIZE];
     const int result = dis_peek(snapshot->datapath.current_instruction, cpu,
@@ -44,31 +46,38 @@ static int trace_instruction_peek(FILE *tracelog, struct mos6502 *cpu,
 }
 
 static void trace_registers(FILE *tracelog,
-                            const struct console_state *snapshot)
+                            const struct console_state *snapshot, bool nestest)
 {
     static const char flags[] = {
         'c', 'C', 'z', 'Z', 'i', 'I', 'd', 'D',
         'b', 'B', '-', '-', 'v', 'V', 'n', 'N',
     };
 
-    fprintf(tracelog, " A:%02X X:%02X Y:%02X P:%02X (",
-            snapshot->cpu.accumulator, snapshot->cpu.xindex,
-            snapshot->cpu.yindex, snapshot->cpu.status);
-    for (size_t i = sizeof snapshot->cpu.status * 8; i > 0; --i) {
-        const size_t idx = i - 1;
-        const bool bit = (snapshot->cpu.status >> idx) & 1;
-        fputc(flags[(idx * 2) + bit], tracelog);
+    uint8_t status = snapshot->cpu.status;
+    if (nestest) {
+        status &= 0xef;  // Nestest always sets B low
     }
-    fprintf(tracelog, ") SP:%02X", snapshot->cpu.stack_pointer);
+    fprintf(tracelog, " A:%02X X:%02X Y:%02X P:%02X",
+            snapshot->cpu.accumulator, snapshot->cpu.xindex,
+            snapshot->cpu.yindex, status);
+    if (!nestest) {
+        fputs(" (", tracelog);
+        for (size_t i = sizeof snapshot->cpu.status * 8; i > 0; --i) {
+            const size_t idx = i - 1;
+            const bool bit = (snapshot->cpu.status >> idx) & 1;
+            fputc(flags[(idx * 2) + bit], tracelog);
+        }
+        fputc(')', tracelog);
+    }
+    fprintf(tracelog, " SP:%02X", snapshot->cpu.stack_pointer);
 }
 
 //
 // Public Interface
 //
 
-// TODO: add nestest compatibility flag
 void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu,
-                const struct console_state *snapshot)
+                const struct console_state *snapshot, bool nestest)
 {
     assert(cpu != NULL);
     assert(snapshot != NULL);
@@ -79,10 +88,10 @@ void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu,
     static const int instw = 47;
 
     const int
-        written = trace_instruction(tracelog, cpu, snapshot)
-                    + trace_instruction_peek(tracelog, cpu, snapshot),
+        written = trace_instruction(tracelog, cpu, snapshot, nestest)
+                    + trace_instruction_peek(tracelog, cpu, snapshot, nestest),
         width = written < 0 ? instw : (written > instw ? 0 : instw - written);
     fprintf(tracelog, "%*s", width, "");
-    trace_registers(tracelog, snapshot);
+    trace_registers(tracelog, snapshot, nestest);
     fprintf(tracelog, " CYC:%" PRIu64 "\n", cycles);
 }

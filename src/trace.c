@@ -8,7 +8,6 @@
 #include "trace.h"
 
 #include "dis.h"
-#include "snapshot.h"
 
 #include <assert.h>
 #include <inttypes.h>
@@ -68,23 +67,22 @@ static void trace_registers(FILE *tracelog,
 //
 
 // TODO: add nestest compatibility flag
-void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu)
+void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu,
+                const struct console_state *snapshot)
 {
     assert(cpu != NULL);
+    assert(snapshot != NULL);
 
     if (!tracelog) return;
 
     // NOTE: does not include leading space in registers print-format
     static const int instw = 47;
 
-    struct console_state snapshot;
-    cpu_snapshot(cpu, &snapshot);
-
     const int
-        written = trace_instruction(tracelog, cpu, &snapshot)
-                    + trace_instruction_peek(tracelog, cpu, &snapshot),
+        written = trace_instruction(tracelog, cpu, snapshot)
+                    + trace_instruction_peek(tracelog, cpu, snapshot),
         width = written < 0 ? instw : (written > instw ? 0 : instw - written);
     fprintf(tracelog, "%*s", width, "");
-    trace_registers(tracelog, &snapshot);
+    trace_registers(tracelog, snapshot);
     fprintf(tracelog, " CYC:%" PRIu64 "\n", cycles);
 }

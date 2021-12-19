@@ -139,9 +139,11 @@ static void instruction_trace(struct nes_console *self,
 {
     if (!self->cpu.signal.sync) return;
 
+    struct console_state snapshot;
+    nes_snapshot(self, &snapshot);
     // NOTE: trace the cycle count up to the current instruction so do not
     // count the just-executed instruction fetch cycle.
-    trace_line(self->tracelog, clock->total_cycles - 1, &self->cpu);
+    trace_line(self->tracelog, clock->total_cycles - 1, &self->cpu, &snapshot);
 }
 
 //

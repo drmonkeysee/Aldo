@@ -493,10 +493,61 @@ static void peek_interrupt(void *ctx)
     cpu.a = 0x10;
     cpu.irq = NIS_COMMITTED;
     cpu_snapshot(&cpu, &snapshot);
+    snapshot.mem.resvector_override = -1;
+    snapshot.mem.vectors[4] = 0xbb;
+    snapshot.mem.vectors[5] = 0xaa;
 
     const int written = dis_peek(0x0, &cpu, &snapshot, buf);
 
-    const char *const exp = "(IRQ)";
+    const char *const exp = "(IRQ) > AABB";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+    ct_assertfalse(cpu.detached);
+}
+
+static void peek_overridden_reset(void *ctx)
+{
+    // NOTE: LDA $04
+    uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
+    struct mos6502 cpu;
+    char buf[DIS_PEEK_SIZE];
+    setup_cpu(&cpu, mem, NULL);
+    struct console_state snapshot;
+    cpu.a = 0x10;
+    cpu.res = NIS_COMMITTED;
+    cpu_snapshot(&cpu, &snapshot);
+    snapshot.mem.resvector_override = 0xccdd;
+    snapshot.mem.vectors[2] = 0xbb;
+    snapshot.mem.vectors[3] = 0xaa;
+
+    const int written = dis_peek(0x0, &cpu, &snapshot, buf);
+
+    const char *const exp = "(RES) > !CCDD";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+    ct_assertfalse(cpu.detached);
+}
+
+static void peek_overridden_non_reset(void *ctx)
+{
+    // NOTE: LDA $04
+    uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
+    struct mos6502 cpu;
+    char buf[DIS_PEEK_SIZE];
+    setup_cpu(&cpu, mem, NULL);
+    struct console_state snapshot;
+    cpu.a = 0x10;
+    cpu.nmi = NIS_COMMITTED;
+    cpu_snapshot(&cpu, &snapshot);
+    snapshot.mem.resvector_override = 0xccdd;
+    snapshot.mem.vectors[0] = 0xff;
+    snapshot.mem.vectors[1] = 0xee;
+    snapshot.mem.vectors[2] = 0xbb;
+    snapshot.mem.vectors[3] = 0xaa;
+
+    const int written = dis_peek(0x0, &cpu, &snapshot, buf);
+
+    const char *const exp = "(NMI) > EEFF";
     ct_assertequal((int)strlen(exp), written);
     ct_assertequalstrn(exp, buf, sizeof exp);
     ct_assertfalse(cpu.detached);
@@ -2137,6 +2188,8 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(peek_branch_forced),
         ct_maketest(peek_absolute_indirect),
         ct_maketest(peek_interrupt),
+        ct_maketest(peek_overridden_reset),
+        ct_maketest(peek_overridden_non_reset),
 
         ct_maketest(datapath_end_of_rom),
         ct_maketest(datapath_unexpected_end_of_rom),

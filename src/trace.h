@@ -9,10 +9,12 @@
 #define Aldo_trace_h
 
 #include "cpu.h"
+#include "snapshot.h"
 
 #include <stdint.h>
 #include <stdio.h>
 
-void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu);
+void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu,
+                const struct console_state *snapshot);
 
 #endif

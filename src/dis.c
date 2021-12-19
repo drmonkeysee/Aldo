@@ -52,6 +52,15 @@ static const char *interrupt_display(const struct console_state *snapshot)
     return "";
 }
 
+static uint16_t interrupt_vector(const struct console_state *snapshot)
+{
+    if (snapshot->datapath.nmi == NIS_COMMITTED)
+        return batowr(snapshot->mem.vectors);
+    if (snapshot->datapath.res == NIS_COMMITTED)
+        return batowr(snapshot->mem.vectors + 2);
+    return batowr(snapshot->mem.vectors + 4);
+}
+
 static int print_raw(uint16_t addr, const uint8_t *restrict bytes, int instlen,
                      char dis[restrict static DIS_INST_SIZE])
 {
@@ -481,28 +490,35 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
     assert(snapshot != NULL);
     assert(dis != NULL);
 
-    const char *const interrupt = interrupt_display(snapshot);
-    const size_t interlen = strlen(interrupt);
-    assert(interlen < DIS_PEEK_SIZE);
-    if (interlen > 0) {
-        strcpy(dis, interrupt);
-        return (int)interlen;
-    }
-
-    cpu_ctx *const peekctx = cpu_peek_start(cpu);
-    const struct cpu_peekresult peek = cpu_peek(cpu, addr);
-    cpu_peek_end(cpu, peekctx);
-
     int total = 0;
-    switch (peek.mode) {
+    const char *const interrupt = interrupt_display(snapshot);
+    if (strlen(interrupt) > 0) {
+        total = sprintf(dis, "%s > ", interrupt);
+        const char *fmt;
+        uint16_t vector;
+        if (snapshot->datapath.res == NIS_COMMITTED
+            && snapshot->mem.resvector_override >= 0) {
+            fmt = "!%04X";
+            vector = snapshot->mem.resvector_override;
+        } else {
+            fmt = "%04X";
+            vector = interrupt_vector(snapshot);
+        }
+        total += sprintf(dis + total, fmt, vector);
+    } else {
+        cpu_ctx *const peekctx = cpu_peek_start(cpu);
+        const struct cpu_peekresult peek = cpu_peek(cpu, addr);
+        cpu_peek_end(cpu, peekctx);
+        switch (peek.mode) {
 #define XPEEK(...) sprintf(dis, __VA_ARGS__)
 #define X(s, b, p, ...) case AM_ENUM(s): total = p; break;
-        DEC_ADDRMODE_X
+            DEC_ADDRMODE_X
 #undef X
 #undef XPEEK
-    default:
-        assert(((void)"BAD ADDRMODE PEEK", false));
-        break;
+        default:
+            assert(((void)"BAD ADDRMODE PEEK", false));
+            break;
+        }
     }
 
     assert((unsigned int)total < DIS_PEEK_SIZE);

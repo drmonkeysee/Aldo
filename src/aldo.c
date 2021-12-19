@@ -25,34 +25,34 @@
 static const char
     *restrict const Version = "0.2.1", // TODO: autogenerate this
 
-    *restrict const ChrDecodeCmd = "--chr-decode",
-    *restrict const ChrScaleCmd = "--chr-scale",
-    *restrict const DisassembleCmd = "--disassemble",
-    *restrict const HelpCmd = "--help",
-    *restrict const InfoCmd = "--info",
-    *restrict const NestestCmd = "--nestest-compat",
-    *restrict const ResVectorCmd = "--reset-vector",
-    *restrict const VersionCmd = "--version";
+    *restrict const ChrDecodeLong = "--chr-decode",
+    *restrict const ChrScaleLong = "--chr-scale",
+    *restrict const DisassembleLong = "--disassemble",
+    *restrict const HelpLong = "--help",
+    *restrict const InfoLong = "--info",
+    *restrict const NestestLong = "--nestest-compat",
+    *restrict const ResVectorLong = "--reset-vector",
+    *restrict const VersionLong = "--version";
 
 static const char
-    ChrDecodeFlag = 'c',
-    ChrScaleFlag = 's',
-    DisassembleFlag = 'd',
-    HelpFlag = 'h',
-    InfoFlag = 'i',
-    NestestFlag = 'N',
-    ResVectorFlag = 'R',
-    VerboseFlag = 'v',
-    VersionFlag = 'V';
+    ChrDecodeShort = 'c',
+    ChrScaleShort = 's',
+    DisassembleShort = 'd',
+    HelpShort = 'h',
+    InfoShort = 'i',
+    NestestShort = 'N',
+    ResVectorShort = 'R',
+    VerboseShort = 'v',
+    VersionShort = 'V';
 
 static const int
     ArgParseFailure = -1, MinScale = 1, MaxScale = 10, MinVector = 0,
     MaxVector = ADDRMASK_64KB;
 
-static bool parse_flag(const char *arg, char flag, const char *cmd)
+static bool parse_flag(const char *arg, char shrt, const char *lng)
 {
-    return (strlen(arg) > 1 && arg[1] != '-' && strchr(arg, flag))
-            || (cmd && strncmp(arg, cmd, strlen(cmd)) == 0);
+    return (strlen(arg) > 1 && arg[1] != '-' && strchr(arg, shrt))
+            || (lng && strncmp(arg, lng, strlen(lng)) == 0);
 }
 
 #define setflag(f, a, s, l) (f) = (f) || parse_flag(a, s, l)
@@ -76,9 +76,9 @@ static bool convert_num(const char *arg, int base, long *result)
 static bool parse_number(const char *arg, int *argi, int argc,
                          char *argv[argc+1], int base, long *number)
 {
-    // NOTE: first try -fN format
+    // NOTE: first try -sN format
     bool result = convert_num(arg + 2, base, number);
-    // NOTE: then try --long-cmd=N format
+    // NOTE: then try --long-name=N format
     if (!result && arg[1] == '-') {
         const char *const opt = strchr(arg, '=');
         if (opt) {
@@ -101,21 +101,22 @@ static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
         for (int i = 1; i < argc; ++i) {
             const char *const arg = argv[i];
             if (arg[0] == '-') {
-                setflag(appstate->chrdecode, arg, ChrDecodeFlag, ChrDecodeCmd);
-                setflag(appstate->disassemble, arg, DisassembleFlag,
-                        DisassembleCmd);
-                setflag(appstate->help, arg, HelpFlag, HelpCmd);
-                setflag(appstate->info, arg, InfoFlag, InfoCmd);
-                setflag(appstate->nestest, arg, NestestFlag, NestestCmd);
-                setflag(appstate->verbose, arg, VerboseFlag, NULL);
-                setflag(appstate->version, arg, VersionFlag, VersionCmd);
-                if (strncmp(arg, ChrDecodeCmd, strlen(ChrDecodeCmd)) == 0) {
+                setflag(appstate->chrdecode, arg, ChrDecodeShort,
+                        ChrDecodeLong);
+                setflag(appstate->disassemble, arg, DisassembleShort,
+                        DisassembleLong);
+                setflag(appstate->help, arg, HelpShort, HelpLong);
+                setflag(appstate->info, arg, InfoShort, InfoLong);
+                setflag(appstate->nestest, arg, NestestShort, NestestLong);
+                setflag(appstate->verbose, arg, VerboseShort, NULL);
+                setflag(appstate->version, arg, VersionShort, VersionLong);
+                if (strncmp(arg, ChrDecodeLong, strlen(ChrDecodeLong)) == 0) {
                     const char *const opt = strchr(arg, '=');
                     if (opt) {
                         appstate->chrdecode_prefix = opt + 1;
                     }
                 }
-                if (parse_flag(arg, ChrScaleFlag, ChrScaleCmd)) {
+                if (parse_flag(arg, ChrScaleShort, ChrScaleLong)) {
                     long scale;
                     const bool result = parse_number(arg, &i, argc, argv, 10,
                                                      &scale);
@@ -128,7 +129,7 @@ static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
                         return ArgParseFailure;
                     }
                 }
-                if (parse_flag(arg, ResVectorFlag, ResVectorCmd)) {
+                if (parse_flag(arg, ResVectorShort, ResVectorLong)) {
                     long vector;
                     const bool result = parse_number(arg, &i, argc, argv, 16,
                                                      &vector);

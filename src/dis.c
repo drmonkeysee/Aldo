@@ -212,13 +212,13 @@ static int measure_tile_sheet(size_t banksize, int32_t *restrict dim,
     switch (banksize) {
     case MEMBLOCK_2KB:
         *sections = 2;
-        // fallthrough
+        // Fallthrough
     case MEMBLOCK_1KB:
         *dim = 8;
         break;
     case MEMBLOCK_8KB:
         *sections = 2;
-        // fallthrough
+        // Fallthrough
     case MEMBLOCK_4KB:
         *dim = 16;
         break;

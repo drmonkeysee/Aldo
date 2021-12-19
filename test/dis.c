@@ -11,6 +11,7 @@
 #include "dis.h"
 #include "snapshot.h"
 
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -311,7 +312,7 @@ static void peek_immediate(void *ctx)
     uint8_t mem[] = {0xa9, 0x10};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    setup_cpu(&cpu, mem, ctx);
+    setup_cpu(&cpu, mem, NULL);
     struct console_state snapshot;
     cpu.a = 0x10;
     cpu_snapshot(&cpu, &snapshot);
@@ -330,7 +331,7 @@ static void peek_zeropage(void *ctx)
     uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    setup_cpu(&cpu, mem, ctx);
+    setup_cpu(&cpu, mem, NULL);
     struct console_state snapshot;
     cpu.a = 0x10;
     cpu_snapshot(&cpu, &snapshot);
@@ -350,7 +351,7 @@ static void peek_zp_indexed(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     struct console_state snapshot;
-    setup_cpu(&cpu, mem, ctx);
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 0x2;
     cpu_snapshot(&cpu, &snapshot);
@@ -370,7 +371,7 @@ static void peek_indexed_indirect(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     struct console_state snapshot;
-    setup_cpu(&cpu, mem, ctx);
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 0x2;
     cpu_snapshot(&cpu, &snapshot);
@@ -390,7 +391,7 @@ static void peek_indirect_indexed(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     struct console_state snapshot;
-    setup_cpu(&cpu, mem, ctx);
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.y = 0x5;
     cpu_snapshot(&cpu, &snapshot);
@@ -410,7 +411,7 @@ static void peek_absolute_indexed(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     struct console_state snapshot;
-    setup_cpu(&cpu, mem, ctx);
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 0xa;
     cpu_snapshot(&cpu, &snapshot);
@@ -430,7 +431,7 @@ static void peek_branch(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     struct console_state snapshot;
-    setup_cpu(&cpu, mem, ctx);
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
     cpu_snapshot(&cpu, &snapshot);
 
@@ -449,7 +450,7 @@ static void peek_branch_forced(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     struct console_state snapshot;
-    setup_cpu(&cpu, mem, ctx);
+    setup_cpu(&cpu, mem, NULL);
     cpu.p.z = false;
     cpu_snapshot(&cpu, &snapshot);
 
@@ -468,7 +469,7 @@ static void peek_absolute_indirect(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     struct console_state snapshot;
-    setup_cpu(&cpu, mem, ctx);
+    setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 0xa;
     cpu_snapshot(&cpu, &snapshot);
@@ -487,7 +488,7 @@ static void peek_interrupt(void *ctx)
     uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    setup_cpu(&cpu, mem, ctx);
+    setup_cpu(&cpu, mem, NULL);
     struct console_state snapshot;
     cpu.a = 0x10;
     cpu.irq = NIS_COMMITTED;

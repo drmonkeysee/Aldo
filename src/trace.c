@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <string.h>
 
 static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
                              const struct console_state *snapshot,
@@ -26,7 +27,10 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
                                 inst, instlen, disinst);
     if (result > 0) {
         if (nestest) {
-            disinst[4] = ' ';   // Replace ':' with ' '
+            char *colon = strchr(disinst, ':');
+            if (colon) {
+                *colon = ' ';   // Replace ':' with ' '
+            }
         }
         return fprintf(tracelog, "%s", disinst);
     } else {

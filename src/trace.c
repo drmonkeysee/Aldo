@@ -27,9 +27,16 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
                                 inst, instlen, disinst);
     if (result > 0) {
         if (nestest) {
-            char *colon = strchr(disinst, ':');
-            if (colon) {
-                *colon = ' ';   // Replace ':' with ' '
+            char *cursor;
+            if ((cursor = strchr(disinst, ':'))) {
+                // NOTE: replace instruction addr separator with extra space
+                *cursor = ' ';
+            }
+            if ((cursor = strpbrk(disinst, "+-"))) {
+                // NOTE: replace branch-offset with address hex prefix
+                // (address literal adjustment is done in peek).
+                *cursor++ = '$';
+                *cursor = '\0';
             }
         }
         return fprintf(tracelog, "%s", disinst);
@@ -43,10 +50,30 @@ static int trace_instruction_peek(FILE *tracelog, struct mos6502 *cpu,
                                   const struct console_state *snapshot,
                                   bool nestest)
 {
+    const char *fmt = " %s";
     char peek[DIS_PEEK_SIZE];
     const int result = dis_peek(snapshot->datapath.current_instruction, cpu,
                                 snapshot, peek);
-    return fprintf(tracelog, " %s", result < 0 ? dis_errstr(result) : peek);
+    if (result < 0) return fprintf(tracelog, fmt, dis_errstr(result));
+
+    if (nestest) {
+        char *cursor;
+        if ((cursor = strchr(peek, '>'))) {
+            // NOTE: Replace "points-at" symbol with equals
+            *cursor = '=';
+        } else if ((cursor = strchr(peek, '@')) && !strchr(peek, '=')) {
+            // NOTE: Move branch computed address flush with instruction
+            const char *addr = cursor + 2;  // Advance to start of address
+            assert(addr - peek < (ptrdiff_t)strlen(peek));
+            // NOTE: cannot use strcpy as cursor and addr overlap
+            while (*addr) {
+                *cursor++ = *addr++;
+            }
+            *cursor = '\0';
+            fmt = "%s"; // Remove leading space
+        }
+    }
+    return fprintf(tracelog, fmt, peek);
 }
 
 static void trace_registers(FILE *tracelog,

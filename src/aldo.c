@@ -40,8 +40,8 @@ static const char
     DisassembleShort = 'd',
     HelpShort = 'h',
     InfoShort = 'i',
-    NestestShort = 'N',
-    ResVectorShort = 'R',
+    NestestShort = 'n',
+    ResVectorShort = 'r',
     VerboseShort = 'v',
     VersionShort = 'V';
 
@@ -159,21 +159,24 @@ static void print_usage(const struct control *appstate)
     puts("---=== Aldo Usage ===---");
     printf("%s [options...] [command] file\n", appstate->me);
     puts("\noptions");
-    puts("  -N\t: Use nestest trace-log format (also --nestest-compat)");
-    printf("  -R x\t: override RESET vector"
-           " [0x%X, 0x%X] (also --reset-vector x)\n", MinVector, MaxVector);
-    printf("  -s n\t: CHR ROM BMP scaling factor"
-           " [%d, %d] (also --chr-scale n)\n", MinScale, MaxScale);
-    puts("  -v\t: verbose output");
+    printf("  -%c\t: Use nestest trace-log format (also %s)\n", NestestShort,
+           NestestLong);
+    printf("  -%c x\t: override RESET vector [0x%X, 0x%X]"
+           " (also %s x)\n", ResVectorShort, MinVector, MaxVector,
+           ResVectorLong);
+    printf("  -%c n\t: CHR ROM BMP scaling factor [%d, %d]"
+           " (also %s n)\n", ChrScaleShort, MinScale, MaxScale, ChrScaleLong);
+    printf("  -%c\t: verbose output\n", VerboseShort);
     puts("\ncommands");
-    puts("  -c\t: decode CHR ROM into BMP files (also --chr-decode[=prefix];"
-         " prefix default is 'bank')");
-    puts("  -d\t: disassemble file (also --disassemble);"
-         " verbose prints duplicate lines");
-    puts("  -h\t: print usage (also --help)");
-    puts("  -i\t: print file cartridge info (also --info);"
-         " verbose prints more details");
-    puts("  -V\t: print version (also --version)");
+    printf("  -%c\t: decode CHR ROM into BMP files (also %s[=prefix];"
+           " prefix default is 'bank')\n", ChrDecodeShort, ChrDecodeLong);
+    printf("  -%c\t: disassemble file (also %s);"
+           " verbose prints duplicate lines\n", DisassembleShort,
+           DisassembleLong);
+    printf("  -%c\t: print usage (also %s)\n", HelpShort, HelpLong);
+    printf("  -%c\t: print file cartridge info (also %s);"
+           " verbose prints more details\n", InfoShort, InfoLong);
+    printf("  -%c\t: print version (also %s)\n", VersionShort, VersionLong);
     puts("\narguments");
     puts("  file\t: input file containing cartridge"
          " or program contents");

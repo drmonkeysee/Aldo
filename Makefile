@@ -19,6 +19,8 @@ PRODUCT := aldo
 TESTS := $(PRODUCT)tests
 TARGET := $(BUILD_DIR)/$(PRODUCT)
 TESTS_TARGET := $(BUILD_DIR)/$(TESTS)
+NESTEST_CMP := nestest-cmp.log
+TRACE_CMP := trace-cmp.log
 
 CFLAGS := -Wall -Wextra -std=c17
 SRC_CFLAGS := -pedantic
@@ -33,7 +35,7 @@ ifdef XLF
 LDFLAGS += $(XLF)
 endif
 
-.PHONY: check clean debug nestest release run
+.PHONY: check clean debug nesdiff nestest release run
 
 release: CFLAGS += -Werror -Os -flto -DNDEBUG
 ifneq ($(OS), Darwin)
@@ -89,7 +91,17 @@ run: debug
 	$(TARGET) $(FILE)
 
 nestest: debug
+	rm -f $(TRACE_CMP)
 	$(TARGET) -n -rc000 nestest.nes
+
+$(NESTEST_CMP):
+	sed -E 's/PPU:.{3},.{3} //' nestest.log > $@
+
+$(TRACE_CMP):
+	tail -n +2 trace.log > $@
+
+nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
+	diff --strip-trailing-cr $^
 
 clean:
 	$(RM) -r $(BUILD_DIR)

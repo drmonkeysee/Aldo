@@ -51,8 +51,8 @@ static const int
 
 static bool parse_flag(const char *arg, char shrt, const char *lng)
 {
-    return (strlen(arg) > 1 && arg[1] != '-' && strchr(arg, shrt))
-            || (lng && strncmp(arg, lng, strlen(lng)) == 0);
+    return (strlen(arg) > 1 && arg[1] == shrt)
+            || (lng && strcmp(arg, lng) == 0);
 }
 
 #define setflag(f, a, s, l) (f) = (f) || parse_flag(a, s, l)

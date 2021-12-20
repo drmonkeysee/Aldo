@@ -33,7 +33,7 @@ ifdef XLF
 LDFLAGS += $(XLF)
 endif
 
-.PHONY: release debug check run clean
+.PHONY: check clean debug nestest release run
 
 release: CFLAGS += -Werror -Os -flto -DNDEBUG
 ifneq ($(OS), Darwin)
@@ -87,6 +87,9 @@ $(OBJ_DIR) $(TEST_OBJ_DIR):
 
 run: debug
 	$(TARGET) $(FILE)
+
+nestest: debug
+	$(TARGET) -n -rc000 nestest.nes
 
 clean:
 	$(RM) -r $(BUILD_DIR)

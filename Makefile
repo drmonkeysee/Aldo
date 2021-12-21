@@ -98,7 +98,8 @@ $(NESTEST_CMP):
 	sed 's/PPU:.\{3\},.\{3\} //' nestest.log > $@
 
 $(TRACE_CMP):
-	sed -e 's/:/ /' -e 's/>/=/' -e 's/[+-][[:digit:]]\{1,3\} @ /$$/' \
+	sed -e 's/:/ /' -e 's/>/=/' -e 's/S:/SP:/' -e 's/CPU/CYC/' \
+		-e 's/[+-][[:digit:]]\{1,3\} @ /$$/' \
 		-e 's/\(P:\)\(..\) (.\{8\})/\10x\2/' trace.log \
 		| awk 'BEGIN { FS=" A:" } NR > 1 \
 		{ p=substr($$2, match($$2, /0x../), 4); \

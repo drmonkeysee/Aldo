@@ -55,7 +55,7 @@ static void trace_registers(FILE *tracelog,
         const bool bit = (snapshot->cpu.status >> idx) & 1;
         fputc(flags[(idx * 2) + bit], tracelog);
     }
-    fprintf(tracelog, ") SP:%02X", snapshot->cpu.stack_pointer);
+    fprintf(tracelog, ") S:%02X", snapshot->cpu.stack_pointer);
 }
 
 //
@@ -79,5 +79,5 @@ void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu,
         width = written < 0 ? instw : (written > instw ? 0 : instw - written);
     fprintf(tracelog, "%*s", width, "");
     trace_registers(tracelog, snapshot);
-    fprintf(tracelog, " CYC:%" PRIu64 "\n", cycles);
+    fprintf(tracelog, " CPU:%" PRIu64 "\n", cycles);
 }

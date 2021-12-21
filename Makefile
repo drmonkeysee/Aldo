@@ -92,13 +92,19 @@ run: debug
 
 nestest: debug
 	rm -f $(TRACE_CMP)
-	$(TARGET) -n -rc000 nestest.nes
+	$(TARGET) -rc000 nestest.nes
 
 $(NESTEST_CMP):
-	sed -E 's/PPU:.{3},.{3} //' nestest.log > $@
+	sed 's/PPU:.\{3\},.\{3\} //' nestest.log > $@
 
 $(TRACE_CMP):
-	tail -n +2 trace.log > $@
+	sed -e 's/:/ /' -e 's/>/=/' -e 's/[+-][[:digit:]]\{1,3\} @ /$$/' \
+		-e 's/\(P:\)\(..\) (.\{8\})/\10x\2/' trace.log \
+		| awk 'BEGIN { FS=" A:" } NR > 1 \
+		{ p=substr($$2, match($$2, /0x../), 4); \
+		mask="echo $$((" p " & 0xef))"; mask | getline p; close(mask); \
+		p = sprintf("%X", p); sub(/0x../, p, $$2); \
+		printf "%-47s%s%s\n", $$1, FS, $$2 }' > $@
 
 nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
 	diff --strip-trailing-cr $^

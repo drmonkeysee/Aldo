@@ -30,7 +30,6 @@ static const char
     *restrict const DisassembleLong = "--disassemble",
     *restrict const HelpLong = "--help",
     *restrict const InfoLong = "--info",
-    *restrict const NestestLong = "--nestest-compat",
     *restrict const ResVectorLong = "--reset-vector",
     *restrict const VersionLong = "--version";
 
@@ -40,7 +39,6 @@ static const char
     DisassembleShort = 'd',
     HelpShort = 'h',
     InfoShort = 'i',
-    NestestShort = 'n',
     ResVectorShort = 'r',
     VerboseShort = 'v',
     VersionShort = 'V';
@@ -107,7 +105,6 @@ static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
                         DisassembleLong);
                 setflag(appstate->help, arg, HelpShort, HelpLong);
                 setflag(appstate->info, arg, InfoShort, InfoLong);
-                setflag(appstate->nestest, arg, NestestShort, NestestLong);
                 setflag(appstate->verbose, arg, VerboseShort, NULL);
                 setflag(appstate->version, arg, VersionShort, VersionLong);
                 if (strncmp(arg, ChrDecodeLong, strlen(ChrDecodeLong)) == 0) {
@@ -159,8 +156,6 @@ static void print_usage(const struct control *appstate)
     puts("---=== Aldo Usage ===---");
     printf("%s [options...] [command] file\n", appstate->me);
     puts("\noptions");
-    printf("  -%c\t: Use nestest trace-log format (also %s)\n", NestestShort,
-           NestestLong);
     printf("  -%c x\t: override RESET vector [0x%X, 0x%X]"
            " (also %s x)\n", ResVectorShort, MinVector, MaxVector,
            ResVectorLong);
@@ -337,8 +332,7 @@ static int emu_loop(struct control *appstate, cart *c)
         }
     }
 
-    nes *console = nes_new(c, tracelog, appstate->nestest,
-                           appstate->resetvector);
+    nes *console = nes_new(c, tracelog, appstate->resetvector);
     nes_powerup(console);
     // NOTE: initialize snapshot from console
     struct console_state snapshot;

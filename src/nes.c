@@ -19,7 +19,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static const char *const restrict TraceLog = "trace.log";
+static const char
+    *const restrict TraceLog = "trace.log",
+    *const restrict RamLog = "system.ram";
 
 struct resdecorator {
     struct busdevice inner;
@@ -149,6 +151,20 @@ static void instruction_trace(struct nes_console *self,
     trace_line(self->tracelog, clock->total_cycles - 1, &self->cpu, &snapshot);
 }
 
+static void ram_trace(const struct nes_console *self)
+{
+    errno = 0;
+    FILE *const ramtrace = fopen(RamLog, "wb");
+    if (ramtrace) {
+        fwrite(self->ram, sizeof self->ram[0],
+               sizeof self->ram / sizeof self->ram[0], ramtrace);
+        fclose(ramtrace);
+    } else {
+        fprintf(stderr, "%s: ", RamLog);
+        perror("Cannot open ram trace file");
+    }
+}
+
 //
 // Public Interface
 //
@@ -181,6 +197,7 @@ void nes_free(nes *self)
 
     if (self->tracelog) {
         fclose(self->tracelog);
+        ram_trace(self);
     }
     free_cpubus(self);
     free(self->dec);

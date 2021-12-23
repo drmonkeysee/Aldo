@@ -47,13 +47,17 @@ static const int
     ArgParseFailure = -1, MinScale = 1, MaxScale = 10, MinVector = 0,
     MaxVector = ADDRMASK_64KB;
 
-static bool parse_flag(const char *arg, char shrt, const char *lng)
+static bool parse_flag(const char *arg, char shrt, bool exact,
+                       const char *restrict lng)
 {
-    return (strlen(arg) > 1 && arg[1] == shrt)
+    return (strlen(arg) > 1
+                && exact
+                    ? arg[1] == shrt
+                    : arg[1] != '-' && strchr(arg, shrt) != NULL)
             || (lng && strcmp(arg, lng) == 0);
 }
 
-#define setflag(f, a, s, l) (f) = (f) || parse_flag(a, s, l)
+#define setflag(f, a, s, l) (f) = (f) || parse_flag(a, s, false, l)
 
 static bool convert_num(const char *arg, int base, long *result)
 {
@@ -107,13 +111,14 @@ static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
                 setflag(appstate->info, arg, InfoShort, InfoLong);
                 setflag(appstate->verbose, arg, VerboseShort, NULL);
                 setflag(appstate->version, arg, VersionShort, VersionLong);
-                if (strncmp(arg, ChrDecodeLong, strlen(ChrDecodeLong)) == 0) {
+                const size_t chroptlen = strlen(ChrDecodeLong);
+                if (strncmp(arg, ChrDecodeLong, chroptlen) == 0) {
                     const char *const opt = strchr(arg, '=');
-                    if (opt) {
+                    if (opt && opt - arg == chroptlen) {
                         appstate->chrdecode_prefix = opt + 1;
                     }
                 }
-                if (parse_flag(arg, ChrScaleShort, ChrScaleLong)) {
+                if (parse_flag(arg, ChrScaleShort, true, ChrScaleLong)) {
                     long scale;
                     const bool result = parse_number(arg, &i, argc, argv, 10,
                                                      &scale);
@@ -126,7 +131,7 @@ static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
                         return ArgParseFailure;
                     }
                 }
-                if (parse_flag(arg, ResVectorShort, ResVectorLong)) {
+                if (parse_flag(arg, ResVectorShort, true, ResVectorLong)) {
                     long vector;
                     const bool result = parse_number(arg, &i, argc, argv, 16,
                                                      &vector);

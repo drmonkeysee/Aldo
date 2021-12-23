@@ -439,10 +439,18 @@ static void drawram(const struct console_state *snapshot)
         for (size_t page_row = 0; page_row < 0x10; ++page_row) {
             mvwprintw(RamView.content, cursor_y, 0, "%02zX", page);
             for (size_t page_col = 0; page_col < 0x10; ++page_col) {
+                const size_t ramidx = (page * 0x100) + (page_row * 0x10)
+                                        + page_col;
+                const bool sp = page == 1 && ramidx % 0x100
+                                                == snapshot->cpu.stack_pointer;
+                if (sp) {
+                    wattron(RamView.content, A_STANDOUT);
+                }
                 mvwprintw(RamView.content, cursor_y, cursor_x, "%02X",
-                          snapshot->mem.ram[(page * 0x100)
-                                            + (page_row * 0x10)
-                                            + page_col]);
+                          snapshot->mem.ram[ramidx]);
+                if (sp) {
+                    wattroff(RamView.content, A_STANDOUT);
+                }
                 cursor_x += col_width;
             }
             mvwprintw(RamView.content, cursor_y, cursor_x + 2,

@@ -103,21 +103,6 @@ static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
         for (int i = 1; i < argc; ++i) {
             const char *const arg = argv[i];
             if (arg[0] == '-') {
-                setflag(appstate->chrdecode, arg, ChrDecodeShort,
-                        ChrDecodeLong);
-                setflag(appstate->disassemble, arg, DisassembleShort,
-                        DisassembleLong);
-                setflag(appstate->help, arg, HelpShort, HelpLong);
-                setflag(appstate->info, arg, InfoShort, InfoLong);
-                setflag(appstate->verbose, arg, VerboseShort, NULL);
-                setflag(appstate->version, arg, VersionShort, VersionLong);
-                const size_t chroptlen = strlen(ChrDecodeLong);
-                if (strncmp(arg, ChrDecodeLong, chroptlen) == 0) {
-                    const char *const opt = strchr(arg, '=');
-                    if (opt && opt - arg == chroptlen) {
-                        appstate->chrdecode_prefix = opt + 1;
-                    }
-                }
                 if (parse_flag(arg, ChrScaleShort, true, ChrScaleLong)) {
                     long scale;
                     const bool result = parse_number(arg, &i, argc, argv, 10,
@@ -130,6 +115,7 @@ static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
                                 MinScale, MaxScale);
                         return ArgParseFailure;
                     }
+                    continue;
                 }
                 if (parse_flag(arg, ResVectorShort, true, ResVectorLong)) {
                     long vector;
@@ -143,6 +129,24 @@ static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
                                 "expected [0x%X, 0x%X]\n",
                                 MinVector, MaxVector);
                         return ArgParseFailure;
+                    }
+                    continue;
+                }
+
+                setflag(appstate->disassemble, arg, DisassembleShort,
+                        DisassembleLong);
+                setflag(appstate->help, arg, HelpShort, HelpLong);
+                setflag(appstate->info, arg, InfoShort, InfoLong);
+                setflag(appstate->verbose, arg, VerboseShort, NULL);
+                setflag(appstate->version, arg, VersionShort, VersionLong);
+
+                setflag(appstate->chrdecode, arg, ChrDecodeShort,
+                        ChrDecodeLong);
+                const size_t chroptlen = strlen(ChrDecodeLong);
+                if (strncmp(arg, ChrDecodeLong, chroptlen) == 0) {
+                    const char *const opt = strchr(arg, '=');
+                    if (opt && opt - arg == chroptlen) {
+                        appstate->chrdecode_prefix = opt + 1;
                     }
                 }
             } else {

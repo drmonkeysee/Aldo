@@ -334,6 +334,7 @@ static int emu_loop(struct control *appstate, cart *c)
 {
     FILE *tracelog = NULL;
     if (appstate->tron) {
+        errno = 0;
         if (!(tracelog = fopen(appstate->tracefile, "w"))) {
             fprintf(stderr, "%s: ", appstate->tracefile);
             perror("Cannot open trace file");

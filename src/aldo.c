@@ -332,17 +332,8 @@ static void update(struct control *appstate, struct console_state *snapshot,
 
 static int emu_loop(struct control *appstate, cart *c)
 {
-    FILE *tracelog = NULL;
-    if (appstate->tron) {
-        errno = 0;
-        if (!(tracelog = fopen(appstate->tracefile, "w"))) {
-            fprintf(stderr, "%s: ", appstate->tracefile);
-            perror("Cannot open trace file");
-            return EXIT_FAILURE;
-        }
-    }
-
-    nes *console = nes_new(c, tracelog, appstate->resetvector);
+    nes *console = nes_new(c, appstate->tron, appstate->resetvector);
+    if (!console) return EXIT_FAILURE;
     nes_powerup(console);
     // NOTE: initialize snapshot from console
     struct console_state snapshot;
@@ -363,10 +354,6 @@ static int emu_loop(struct control *appstate, cart *c)
     snapshot.mem.ram = NULL;
     nes_free(console);
     console = NULL;
-    if (tracelog) {
-        fclose(tracelog);
-        tracelog = NULL;
-    }
     return EXIT_SUCCESS;
 }
 

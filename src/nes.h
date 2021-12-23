@@ -12,7 +12,7 @@
 #include "control.h"
 #include "snapshot.h"
 
-#include <stdio.h>
+#include <stdbool.h>
 
 enum nes_interrupt {
     NESI_IRQ,
@@ -21,7 +21,7 @@ enum nes_interrupt {
 };
 typedef struct nes_console nes;
 
-nes *nes_new(cart *c, FILE *tracelog, int resetoverride);
+nes *nes_new(cart *c, bool tron, int resetoverride);
 void nes_free(nes *self);
 
 void nes_mode(nes *self, enum nexcmode mode);

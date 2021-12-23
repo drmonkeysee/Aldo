@@ -13,10 +13,13 @@
 #include "trace.h"
 
 #include <assert.h>
-#include <stdbool.h>
+#include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
+
+static const char *const restrict TraceLog = "trace.log";
 
 struct resdecorator {
     struct busdevice inner;
@@ -150,9 +153,19 @@ static void instruction_trace(struct nes_console *self,
 // Public Interface
 //
 
-nes *nes_new(cart *c, FILE *tracelog, int resetoverride)
+nes *nes_new(cart *c, bool tron, int resetoverride)
 {
     assert(c != NULL);
+
+    FILE *tracelog = NULL;
+    if (tron) {
+        errno = 0;
+        if (!(tracelog = fopen(TraceLog, "w"))) {
+            fprintf(stderr, "%s: ", TraceLog);
+            perror("Cannot open trace file");
+            return NULL;
+        }
+    }
 
     struct nes_console *const self = malloc(sizeof *self);
     self->cart = c;
@@ -166,6 +179,9 @@ void nes_free(nes *self)
 {
     assert(self != NULL);
 
+    if (self->tracelog) {
+        fclose(self->tracelog);
+    }
     free_cpubus(self);
     free(self->dec);
     free(self);

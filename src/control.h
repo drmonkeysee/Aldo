@@ -19,7 +19,7 @@ struct cycleclock {
 struct control {
     struct cycleclock clock;
     const char *cartfile, *chrdecode_prefix, *me;
-    int chrscale, ramsheet, resetvector;
+    int chrscale, haltaddr, ramsheet, resetvector;
     bool chrdecode, disassemble, help, info, running, tron, verbose, version;
 };
 

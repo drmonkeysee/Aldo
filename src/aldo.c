@@ -28,6 +28,7 @@ static const char
     *const restrict ChrDecodeLong = "--chr-decode",
     *const restrict ChrScaleLong = "--chr-scale",
     *const restrict DisassembleLong = "--disassemble",
+    *const restrict HaltLong = "--halt",
     *const restrict HelpLong = "--help",
     *const restrict InfoLong = "--info",
     *const restrict ResVectorLong = "--reset-vector",
@@ -38,6 +39,7 @@ static const char
     ChrDecodeShort = 'c',
     ChrScaleShort = 's',
     DisassembleShort = 'd',
+    HaltShort = 'H',
     HelpShort = 'h',
     InfoShort = 'i',
     ResVectorShort = 'r',
@@ -46,8 +48,7 @@ static const char
     VersionShort = 'V';
 
 static const int
-    ArgParseFailure = -1, MinScale = 1, MaxScale = 10, MinVector = 0,
-    MaxVector = ADDRMASK_64KB;
+    MinScale = 1, MaxScale = 10, MinAddress = 0, MaxAddress = ADDRMASK_64KB;
 
 static bool parse_flag(const char *arg, char shrt, bool exact, const char *lng)
 {
@@ -97,61 +98,75 @@ static bool parse_number(const char *arg, int *restrict argi, int argc,
     return result;
 }
 
-static int parse_args(struct control *restrict appstate, int argc,
-                      char *argv[argc+1])
+static bool parse_address(const char *arg, int *restrict argi, int argc,
+                          char *argv[argc+1], const char *restrict label,
+                          int *restrict parsed)
+{
+    long addr;
+    const bool result = parse_number(arg, argi, argc, argv, 16, &addr);
+    if (result && MinAddress <= addr && addr <= MaxAddress) {
+        *parsed = (int)addr;
+    } else {
+        fprintf(stderr, "Invalid %s format: expected [0x%X, 0x%X]\n", label,
+                MinAddress, MaxAddress);
+        return false;
+    }
+    return true;
+}
+
+static bool parse_arg(struct control *restrict appstate, const char *arg,
+                      int *restrict argi, int argc, char *argv[argc+1])
+{
+    if (parse_flag(arg, ChrScaleShort, true, ChrScaleLong)) {
+        long scale;
+        const bool result = parse_number(arg, argi, argc, argv, 10, &scale);
+        if (result && MinScale <= scale && scale <= MaxScale) {
+            appstate->chrscale = (int)scale;
+        } else {
+            fprintf(stderr, "Invalid scale format: expected [%d, %d]\n",
+                    MinScale, MaxScale);
+            return false;
+        }
+        return true;
+    }
+
+    if (parse_flag(arg, HaltShort, true, HaltLong)) {
+        return parse_address(arg, argi, argc, argv, "address",
+                             &appstate->haltaddr);
+    }
+
+    if (parse_flag(arg, ResVectorShort, true, ResVectorLong)) {
+        return parse_address(arg, argi, argc, argv, "vector",
+                             &appstate->resetvector);
+    }
+
+    setflag(appstate->disassemble, arg, DisassembleShort, DisassembleLong);
+    setflag(appstate->help, arg, HelpShort, HelpLong);
+    setflag(appstate->info, arg, InfoShort, InfoLong);
+    setflag(appstate->tron, arg, TraceShort, TraceLong);
+    setflag(appstate->verbose, arg, VerboseShort, NULL);
+    setflag(appstate->version, arg, VersionShort, VersionLong);
+
+    setflag(appstate->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);
+    const size_t chroptlen = strlen(ChrDecodeLong);
+    if (strncmp(arg, ChrDecodeLong, chroptlen) == 0) {
+        const char *const opt = strchr(arg, '=');
+        if (opt && opt - arg == chroptlen) {
+            appstate->chrdecode_prefix = opt + 1;
+        }
+    }
+    return true;
+}
+
+static bool parse_args(struct control *restrict appstate, int argc,
+                       char *argv[argc+1])
 {
     appstate->me = argc > 0 && strlen(argv[0]) > 0 ? argv[0] : "aldo";
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
             const char *const arg = argv[i];
             if (arg[0] == '-') {
-                if (parse_flag(arg, ChrScaleShort, true, ChrScaleLong)) {
-                    long scale;
-                    const bool result = parse_number(arg, &i, argc, argv, 10,
-                                                     &scale);
-                    if (result && MinScale <= scale && scale <= MaxScale) {
-                        appstate->chrscale = (int)scale;
-                    } else {
-                        fprintf(stderr,
-                                "Invalid scale format: expected [%d, %d]\n",
-                                MinScale, MaxScale);
-                        return ArgParseFailure;
-                    }
-                    continue;
-                }
-                if (parse_flag(arg, ResVectorShort, true, ResVectorLong)) {
-                    long vector;
-                    const bool result = parse_number(arg, &i, argc, argv, 16,
-                                                     &vector);
-                    if (result && MinVector <= vector && vector <= MaxVector) {
-                        appstate->resetvector = (int)vector;
-                    } else {
-                        fprintf(stderr,
-                                "Invalid vector format: "
-                                "expected [0x%X, 0x%X]\n",
-                                MinVector, MaxVector);
-                        return ArgParseFailure;
-                    }
-                    continue;
-                }
-
-                setflag(appstate->disassemble, arg, DisassembleShort,
-                        DisassembleLong);
-                setflag(appstate->help, arg, HelpShort, HelpLong);
-                setflag(appstate->info, arg, InfoShort, InfoLong);
-                setflag(appstate->tron, arg, TraceShort, TraceLong);
-                setflag(appstate->verbose, arg, VerboseShort, NULL);
-                setflag(appstate->version, arg, VersionShort, VersionLong);
-
-                setflag(appstate->chrdecode, arg, ChrDecodeShort,
-                        ChrDecodeLong);
-                const size_t chroptlen = strlen(ChrDecodeLong);
-                if (strncmp(arg, ChrDecodeLong, chroptlen) == 0) {
-                    const char *const opt = strchr(arg, '=');
-                    if (opt && opt - arg == chroptlen) {
-                        appstate->chrdecode_prefix = opt + 1;
-                    }
-                }
+                if (!parse_arg(appstate, arg, &i, argc, argv)) return false;
             } else {
                 appstate->cartfile = arg;
             }
@@ -159,8 +174,7 @@ static int parse_args(struct control *restrict appstate, int argc,
     } else {
         appstate->help = true;
     }
-
-    return 0;
+    return true;
 }
 
 static void print_usage(const struct control *appstate)
@@ -168,14 +182,16 @@ static void print_usage(const struct control *appstate)
     puts("---=== Aldo Usage ===---");
     printf("%s [options...] [command] file\n", appstate->me);
     puts("\noptions");
+    printf("  -%c x\t: HALT when PC reaches this address [0x%X, 0x%X]"
+           " (also %s x)\n", HaltShort, MinAddress, MaxAddress, HaltLong);
     printf("  -%c x\t: override RESET vector [0x%X, 0x%X]"
-           " (also %s x)\n", ResVectorShort, MinVector, MaxVector,
+           " (also %s x)\n", ResVectorShort, MinAddress, MaxAddress,
            ResVectorLong);
     printf("  -%c n\t: CHR ROM BMP scaling factor [%d, %d]"
            " (also %s n)\n", ChrScaleShort, MinScale, MaxScale, ChrScaleLong);
-    printf("  -%c\t: verbose output\n", VerboseShort);
     printf("  -%c\t: turn on trace-logging and ram dumps (also %s)\n",
            TraceShort, TraceLong);
+    printf("  -%c\t: verbose output\n", VerboseShort);
     puts("\ncommands");
     printf("  -%c\t: decode CHR ROM into BMP files (also %s[=prefix];"
            " prefix default is 'bank')\n", ChrDecodeShort, ChrDecodeLong);
@@ -371,11 +387,11 @@ int aldo_run(int argc, char *argv[argc+1])
     struct control appstate = {
         .chrscale = MinScale,
         .clock = {.cycles_per_sec = 4},
+        .haltaddr = -1,
         .resetvector = -1,
         .running = true,
     };
-    if (parse_args(&appstate, argc, argv)
-        == ArgParseFailure) return EXIT_FAILURE;
+    if (!parse_args(&appstate, argc, argv)) return EXIT_FAILURE;
 
     if (appstate.help) {
         print_usage(&appstate);

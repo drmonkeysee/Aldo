@@ -19,6 +19,7 @@
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
 		C85C8DC625BD29AC00611D19 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
 		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
+		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8C4B48D25ABBFB3006A98BB /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
 		C8C706922751EEBA00B45785 /* nes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706832751EEBA00B45785 /* nes.c */; };
 		C8C706932751EEBA00B45785 /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
@@ -84,6 +85,8 @@
 		C85C8DC425BD29AC00611D19 /* dis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dis.h; sourceTree = "<group>"; };
 		C85C8DC525BD29AC00611D19 /* dis.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dis.c; sourceTree = "<group>"; };
 		C86030772761A51100F1B27D /* cpupeek.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpupeek.c; sourceTree = "<group>"; };
+		C8B4664327755790000576EE /* argparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = argparse.h; sourceTree = "<group>"; };
+		C8B4664427755790000576EE /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpanel.tbd; path = usr/lib/libpanel.tbd; sourceTree = SDKROOT; };
 		C8C706832751EEBA00B45785 /* nes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = nes.c; sourceTree = "<group>"; };
 		C8C706842751EEBA00B45785 /* cpu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu.h; sourceTree = "<group>"; };
@@ -199,6 +202,8 @@
 			children = (
 				C820E6C925A97A4E006A7AB1 /* aldo.h */,
 				C820E6CA25A97A4E006A7AB1 /* aldo.c */,
+				C8B4664327755790000576EE /* argparse.h */,
+				C8B4664427755790000576EE /* argparse.c */,
 				C8C706902751EEBA00B45785 /* bus.h */,
 				C8C706852751EEBA00B45785 /* bus.c */,
 				C8C706882751EEBA00B45785 /* bytes.h */,
@@ -380,6 +385,7 @@
 				C81A516D25DA036100361E40 /* control.c in Sources */,
 				C8C706972751EEBA00B45785 /* bytes.c in Sources */,
 				C8C706982751EEBA00B45785 /* mappers.c in Sources */,
+				C8B4664527755790000576EE /* argparse.c in Sources */,
 				C8C706952751EEBA00B45785 /* cart.c in Sources */,
 				C85C8DC625BD29AC00611D19 /* dis.c in Sources */,
 				C8557B2F25C661660090296D /* ui.c in Sources */,

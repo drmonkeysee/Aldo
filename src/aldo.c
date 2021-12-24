@@ -184,6 +184,14 @@ static int emu_loop(struct control *appstate, cart *c)
     return EXIT_SUCCESS;
 }
 
+static int run_cmd(struct control *appstate, cart *c)
+{
+    if (appstate->info) return print_cart_info(appstate, c);
+    if (appstate->disassemble) return disassemble_cart_prg(appstate, c);
+    if (appstate->chrdecode) return decode_cart_chr(appstate, c);
+    return emu_loop(appstate, c);
+}
+
 //
 // Public Interface
 //
@@ -214,26 +222,7 @@ int aldo_run(int argc, char *argv[argc+1])
         return EXIT_FAILURE;
     }
 
-    int result;
-
-    if (appstate.info) {
-        result = print_cart_info(&appstate, cart);
-        goto cart_cleanup;
-    }
-
-    if (appstate.disassemble) {
-        result = disassemble_cart_prg(&appstate, cart);
-        goto cart_cleanup;
-    }
-
-    if (appstate.chrdecode) {
-        result = decode_cart_chr(&appstate, cart);
-        goto cart_cleanup;
-    }
-
-    result = emu_loop(&appstate, cart);
-
-cart_cleanup:
+    const int result = run_cmd(&appstate, cart);
     cart_free(cart);
     cart = NULL;
 

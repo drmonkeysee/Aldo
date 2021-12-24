@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char *restrict const Mnemonics[] = {
+static const char *const restrict Mnemonics[] = {
 #define X(s, ...) #s,
     DEC_INST_X
 #undef X
@@ -31,13 +31,13 @@ static const int InstLens[] = {
 
 #define STRTABLE(s) s##_StringTable
 
-#define X(s, b, p, ...) static const char *restrict const STRTABLE(s)[] = { \
+#define X(s, b, p, ...) static const char *const restrict STRTABLE(s)[] = { \
     __VA_ARGS__ \
 };
     DEC_ADDRMODE_X
 #undef X
 
-static const char *restrict const *const StringTables[] = {
+static const char *const restrict *const StringTables[] = {
 #define X(s, b, p, ...) STRTABLE(s),
     DEC_ADDRMODE_X
 #undef X
@@ -85,7 +85,7 @@ static int print_mnemonic(const struct decoded *dec,
     total = count = sprintf(dis, "%s ", Mnemonics[dec->instruction]);
     if (count < 0) return DIS_ERR_FMT_FAIL;
 
-    const char *restrict const *const strtable = StringTables[dec->mode];
+    const char *const restrict *const strtable = StringTables[dec->mode];
     switch (instlen) {
     case 1:
         // NOTE: nothing else to print, trim the trailing space

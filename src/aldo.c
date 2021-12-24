@@ -23,15 +23,15 @@
 #include <string.h>
 
 static const char
-    *restrict const Version = "0.2.1", // TODO: autogenerate this
+    *const restrict Version = "0.2.1", // TODO: autogenerate this
 
-    *restrict const ChrDecodeLong = "--chr-decode",
-    *restrict const ChrScaleLong = "--chr-scale",
-    *restrict const DisassembleLong = "--disassemble",
-    *restrict const HelpLong = "--help",
-    *restrict const InfoLong = "--info",
-    *restrict const ResVectorLong = "--reset-vector",
-    *restrict const VersionLong = "--version";
+    *const restrict ChrDecodeLong = "--chr-decode",
+    *const restrict ChrScaleLong = "--chr-scale",
+    *const restrict DisassembleLong = "--disassemble",
+    *const restrict HelpLong = "--help",
+    *const restrict InfoLong = "--info",
+    *const restrict ResVectorLong = "--reset-vector",
+    *const restrict VersionLong = "--version";
 
 static const char
     ChrDecodeShort = 'c',

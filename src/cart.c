@@ -22,8 +22,8 @@ X(CRTF_NES20, "NES 2.0") \
 X(CRTF_NSF, "NES Sound Format")
 
 static const char
-    *restrict const NesFormat = "NES\x1a",
-    *restrict const NsfFormat = "NESM\x1a";
+    *const restrict NesFormat = "NES\x1a",
+    *const restrict NsfFormat = "NESM\x1a";
 
 enum cartformat {
 #define X(s, n) s,
@@ -153,11 +153,11 @@ static void write_ines_info(const struct cartridge *self, FILE *f,
                             bool verbose)
 {
     static const char
-        *restrict const fullsize = " x 16KB",
-        *restrict const halfsize = " x 8KB",
-        *restrict const wramlbl = "WRAM\t\t: ",
-        *restrict const chrromlbl = "CHR ROM\t\t: ",
-        *restrict const chrramlbl = "CHR RAM\t\t: ";
+        *const restrict fullsize = " x 16KB",
+        *const restrict halfsize = " x 8KB",
+        *const restrict wramlbl = "WRAM\t\t: ",
+        *const restrict chrromlbl = "CHR ROM\t\t: ",
+        *const restrict chrramlbl = "CHR RAM\t\t: ";
 
     fprintf(f, "Mapper\t\t: %03u%s", self->ines_hdr.mapper_id,
             self->ines_hdr.mapper_implemented ? "" : " (Not Implemented)");

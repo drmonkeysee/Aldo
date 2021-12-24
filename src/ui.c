@@ -159,7 +159,7 @@ static void drawtoggle(const char *label, bool selected)
 
 static void drawcontrols(const struct console_state *snapshot)
 {
-    static const char *restrict const halt = "HALT";
+    static const char *const restrict halt = "HALT";
 
     const int w = getmaxx(ControlsView.content);
     int cursor_y = 0;

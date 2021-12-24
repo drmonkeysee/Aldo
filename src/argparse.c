@@ -186,10 +186,10 @@ bool argparse_parse(struct control *restrict appstate, int argc,
     return true;
 }
 
-void argparse_usage(const struct control *appstate)
+void argparse_usage(const char *me)
 {
     puts("---=== Aldo Usage ===---");
-    printf("%s [options...] [command] file\n", appstate->me);
+    printf("%s [options...] [command] file\n", me);
     puts("\noptions");
     printf("  -%c x\t: HALT when PC reaches this address [0x%X, 0x%X]"
            " (also %s x)\n", HaltShort, MinAddress, MaxAddress, HaltLong);

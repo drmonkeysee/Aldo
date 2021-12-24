@@ -193,7 +193,7 @@ int aldo_run(int argc, char *argv[argc+1])
     if (!argparse_parse(&appstate, argc, argv)) return EXIT_FAILURE;
 
     if (appstate.help) {
-        argparse_usage(&appstate);
+        argparse_usage(appstate.me);
         return EXIT_SUCCESS;
     }
 
@@ -204,7 +204,7 @@ int aldo_run(int argc, char *argv[argc+1])
 
     if (!appstate.cartfile) {
         fputs("Error: no input file specified\n", stderr);
-        argparse_usage(&appstate);
+        argparse_usage(appstate.me);
         return EXIT_FAILURE;
     }
 

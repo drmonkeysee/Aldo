@@ -14,7 +14,7 @@
 
 bool argparse_parse(struct control *restrict appstate, int argc,
                     char *argv[argc+1]);
-void argparse_usage(const struct control *appstate);
+void argparse_usage(const char *me);
 void argparse_version(void);
 
 #endif

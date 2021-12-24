@@ -31,6 +31,7 @@ static const char
     *const restrict HelpLong = "--help",
     *const restrict InfoLong = "--info",
     *const restrict ResVectorLong = "--reset-vector",
+    *const restrict TraceLong = "--trace",
     *const restrict VersionLong = "--version";
 
 static const char
@@ -40,6 +41,7 @@ static const char
     HelpShort = 'h',
     InfoShort = 'i',
     ResVectorShort = 'r',
+    TraceShort = 't',
     VerboseShort = 'v',
     VersionShort = 'V';
 
@@ -137,6 +139,7 @@ static int parse_args(struct control *restrict appstate, int argc,
                         DisassembleLong);
                 setflag(appstate->help, arg, HelpShort, HelpLong);
                 setflag(appstate->info, arg, InfoShort, InfoLong);
+                setflag(appstate->tron, arg, TraceShort, TraceLong);
                 setflag(appstate->verbose, arg, VerboseShort, NULL);
                 setflag(appstate->version, arg, VersionShort, VersionLong);
 
@@ -171,6 +174,8 @@ static void print_usage(const struct control *appstate)
     printf("  -%c n\t: CHR ROM BMP scaling factor [%d, %d]"
            " (also %s n)\n", ChrScaleShort, MinScale, MaxScale, ChrScaleLong);
     printf("  -%c\t: verbose output\n", VerboseShort);
+    printf("  -%c\t: turn on trace-logging and ram dumps (also %s)\n",
+           TraceShort, TraceLong);
     puts("\ncommands");
     printf("  -%c\t: decode CHR ROM into BMP files (also %s[=prefix];"
            " prefix default is 'bank')\n", ChrDecodeShort, ChrDecodeLong);
@@ -368,7 +373,6 @@ int aldo_run(int argc, char *argv[argc+1])
         .clock = {.cycles_per_sec = 4},
         .resetvector = -1,
         .running = true,
-        .tron = true,
     };
     if (parse_args(&appstate, argc, argv)
         == ArgParseFailure) return EXIT_FAILURE;

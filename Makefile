@@ -92,7 +92,7 @@ run: debug
 
 nestest: debug
 	rm -f $(TRACE_CMP)
-	$(TARGET) -rc000 nestest.nes
+	$(TARGET) -t -rc000 nestest.nes
 
 $(NESTEST_CMP):
 	sed 's/PPU:.\{3\},.\{3\} //' nestest.log > $@

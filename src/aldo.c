@@ -368,7 +368,6 @@ int aldo_run(int argc, char *argv[argc+1])
         .clock = {.cycles_per_sec = 4},
         .resetvector = -1,
         .running = true,
-        .tracefile = "trace.log",
         .tron = true,
     };
     if (parse_args(&appstate, argc, argv)

@@ -74,7 +74,7 @@ static bool convert_num(const char *arg, int base, long *restrict result)
         perror("Number parse failed");
         return false;
     }
-    if (*result == 0 && arg == end) {
+    if ((*result == 0 && arg == end) || *end != '\0') {
         return false;
     }
     return true;

@@ -11,7 +11,6 @@
 #include "decode.h"
 
 #include <assert.h>
-#include <errno.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -319,7 +318,6 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections, int scale,
         // be padded to the nearest 4-byte boundary.
         packedrow_size = ceil(bmpw / 8.0) * 4;
 
-    errno = 0;
     FILE *const bmpfile = fopen(filename, "wb");
     if (!bmpfile) return DIS_ERR_IO;
 

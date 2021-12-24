@@ -62,6 +62,7 @@ static int disassemble_cart_prg(const struct control *appstate, cart *c)
 
 static int decode_cart_chr(const struct control *appstate, cart *c)
 {
+    errno = 0;
     const int err = dis_cart_chr(c, appstate, stdout);
     if (err < 0) {
         fprintf(stderr, "CHR decode error (%d): %s\n", err,

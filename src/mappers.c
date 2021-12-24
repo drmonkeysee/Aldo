@@ -29,7 +29,7 @@ struct ines_000_mapper {
     size_t bankcount;
 };
 
-static int load_chunks(uint8_t **mem, size_t size, FILE *f)
+static int load_chunks(uint8_t *restrict *mem, size_t size, FILE *f)
 {
     *mem = calloc(size, sizeof **mem);
     fread(*mem, sizeof **mem, size, f);

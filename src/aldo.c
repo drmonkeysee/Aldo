@@ -47,8 +47,7 @@ static const int
     ArgParseFailure = -1, MinScale = 1, MaxScale = 10, MinVector = 0,
     MaxVector = ADDRMASK_64KB;
 
-static bool parse_flag(const char *arg, char shrt, bool exact,
-                       const char *restrict lng)
+static bool parse_flag(const char *arg, char shrt, bool exact, const char *lng)
 {
     return (strlen(arg) > 1
                 && exact
@@ -59,7 +58,7 @@ static bool parse_flag(const char *arg, char shrt, bool exact,
 
 #define setflag(f, a, s, l) (f) = (f) || parse_flag(a, s, false, l)
 
-static bool convert_num(const char *arg, int base, long *result)
+static bool convert_num(const char *arg, int base, long *restrict result)
 {
     char *end;
     errno = 0;
@@ -75,8 +74,8 @@ static bool convert_num(const char *arg, int base, long *result)
 }
 
 // NOTE: value of number is undefined if return value is false
-static bool parse_number(const char *arg, int *argi, int argc,
-                         char *argv[argc+1], int base, long *number)
+static bool parse_number(const char *arg, int *restrict argi, int argc,
+                         char *argv[argc+1], int base, long *restrict number)
 {
     // NOTE: first try -sN format
     bool result = convert_num(arg + 2, base, number);
@@ -96,7 +95,8 @@ static bool parse_number(const char *arg, int *argi, int argc,
     return result;
 }
 
-static int parse_args(struct control *appstate, int argc, char *argv[argc+1])
+static int parse_args(struct control *restrict appstate, int argc,
+                      char *argv[argc+1])
 {
     appstate->me = argc > 0 && strlen(argv[0]) > 0 ? argv[0] : "aldo";
     if (argc > 1) {

@@ -162,7 +162,8 @@ static void write_ines_info(const struct cartridge *self, FILE *f,
     fprintf(f, "Mapper\t\t: %03u%s", self->ines_hdr.mapper_id,
             self->ines_hdr.mapper_implemented ? "" : " (Not Implemented)");
     if (verbose) {
-        fprintf(f, " (<Board Names>)\n");
+        // TODO: add board names
+        fputs(" (<Board Names>)\n", f);
         hr(f);
     } else {
         fputc('\n', f);

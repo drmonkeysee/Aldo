@@ -58,6 +58,28 @@ static void adc_indx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void adc_indx_zp_wraparound(void *ctx)
+{
+    uint8_t mem[] = {0x80, 0x61, 0x2, [255] = 0x2},
+            abs[] = {0xff, 0x80, 0x11};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    cpu.pc = 0x1;
+    cpu.a = 0xa;    // 10 + 17
+    cpu.x = 0xfd;   // Index to $00FF to fetch address $8002 across zp boundary
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x1bu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void and_indx(void *ctx)
 {
     uint8_t mem[] = {0x21, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
@@ -375,6 +397,28 @@ static void adc_indy_pagecross(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
+static void adc_indy_zp_wraparound(void *ctx)
+{
+    uint8_t mem[] = {0x80, 0x71, 0xff, [255] = 0x1},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x8};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    cpu.pc = 0x1;
+    cpu.a = 0xa;    // 10 + 8
+    cpu.y = 3;  // Index to $00FF to fetch address $8001 + 3 across zp boundary
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x12u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void and_indy(void *ctx)
 {
     uint8_t mem[] = {0x31, 0x2, 0x1, 0x80},
@@ -650,6 +694,7 @@ struct ct_testsuite cpu_indirect_tests(void)
     static const struct ct_testcase tests[] = {
         ct_maketest(adc_indx),
         ct_maketest(adc_indx_pageoverflow),
+        ct_maketest(adc_indx_zp_wraparound),
         ct_maketest(and_indx),
         ct_maketest(and_indx_pageoverflow),
         ct_maketest(cmp_indx),
@@ -667,6 +712,7 @@ struct ct_testsuite cpu_indirect_tests(void)
 
         ct_maketest(adc_indy),
         ct_maketest(adc_indy_pagecross),
+        ct_maketest(adc_indy_zp_wraparound),
         ct_maketest(and_indy),
         ct_maketest(and_indy_pagecross),
         ct_maketest(cmp_indy),

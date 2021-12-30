@@ -11,6 +11,7 @@
 #include "bytes.h"
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -66,6 +67,15 @@ static size_t resetaddr_dma(const void *restrict ctx, uint16_t addr,
 }
 
 //
+// Halt Conditions
+//
+
+static bool bp_instruction(const struct debugger_context *self)
+{
+    return self->cpu->signal.sync && self->cpu->addrinst == self->haltaddr;
+}
+
+//
 // Public Interface
 //
 
@@ -77,6 +87,7 @@ debugctx *debug_new(const struct control *appstate)
     *self = (struct debugger_context){
         .haltaddr = appstate->haltaddr,
         .resetvector = appstate->resetvector,
+        .state = appstate->haltaddr >= 0 ? DBG_RUN : DBG_INACTIVE,
     };
     return self;
 }
@@ -120,7 +131,21 @@ void debug_check(debugctx *self)
 {
     assert(self != NULL);
 
-    if (self->state == DBG_INACTIVE) return;
+    if (!self->cpu) return;
+
+    switch (self->state) {
+    case DBG_RUN:
+        if (bp_instruction(self)) {
+            self->cpu->signal.rdy = false;
+            self->state = DBG_BREAK;
+        }
+        break;
+    case DBG_BREAK:
+        self->state = DBG_RUN;
+        break;
+    default:
+        break;
+    }
 }
 
 void debug_snapshot(debugctx *self, struct console_state *snapshot)

@@ -230,6 +230,7 @@ void nes_cycle(nes *self, struct cycleclock *clock)
             assert(((void)"INVALID EXC MODE", false));
             break;
         }
+        debug_check(self->dbg);
     }
 }
 

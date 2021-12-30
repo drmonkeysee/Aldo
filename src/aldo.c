@@ -10,6 +10,7 @@
 #include "argparse.h"
 #include "cart.h"
 #include "control.h"
+#include "debug.h"
 #include "dis.h"
 #include "nes.h"
 #include "ui.h"
@@ -159,8 +160,14 @@ static void update(struct control *appstate, struct console_state *snapshot,
 
 static int emu_loop(struct control *appstate, cart *c)
 {
-    nes *console = nes_new(c, appstate->tron, appstate->resetvector);
-    if (!console) return EXIT_FAILURE;
+    int result = EXIT_SUCCESS;
+    debugctx *dbg = debug_new(appstate);
+    nes *console = nes_new(c, appstate->tron, dbg);
+    if (!console) {
+        result = EXIT_FAILURE;
+        goto cleanup;
+    };
+
     nes_powerup(console);
     // NOTE: initialize snapshot from console
     struct console_state snapshot;
@@ -181,7 +188,11 @@ static int emu_loop(struct control *appstate, cart *c)
     snapshot.mem.ram = NULL;
     nes_free(console);
     console = NULL;
-    return EXIT_SUCCESS;
+
+cleanup:
+    debug_free(dbg);
+    dbg = NULL;
+    return result;
 }
 
 static int run_cmd(struct control *appstate, cart *c)

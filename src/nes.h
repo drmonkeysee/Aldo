@@ -10,6 +10,7 @@
 
 #include "cart.h"
 #include "control.h"
+#include "debug.h"
 #include "snapshot.h"
 
 #include <stdbool.h>
@@ -21,7 +22,7 @@ enum nes_interrupt {
 };
 typedef struct nes_console nes;
 
-nes *nes_new(cart *c, bool tron, int resetoverride);
+nes *nes_new(cart *c, bool tron, debugctx *dbg);
 void nes_free(nes *self);
 
 void nes_mode(nes *self, enum nexcmode mode);

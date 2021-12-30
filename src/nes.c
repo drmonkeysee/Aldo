@@ -23,17 +23,12 @@ static const char
     *const restrict TraceLog = "trace.log",
     *const restrict RamLog = "system.ram";
 
-struct resdecorator {
-    struct busdevice inner;
-    uint16_t vector;
-};
-
 // The NES-001 Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
 struct nes_console {
     cart *cart;                 // Game Cartridge; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
-    struct resdecorator *dec;   // Device Decorator for RESET Vector Override
+    debugctx *dbg;              // Debugger Context; Non-owning Pointer
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
     enum nexcmode mode;         // NES execution mode
     uint8_t ram[MEMBLOCK_2KB];  // CPU Internal RAM
@@ -59,39 +54,7 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
                                  dest);
 }
 
-static bool resetaddr_read(const void *restrict ctx, uint16_t addr,
-                           uint8_t *restrict d)
-{
-    struct resdecorator *const dec = (struct resdecorator *)ctx;
-    if (!dec->inner.read) return false;
-
-    if (CPU_VECTOR_RES <= addr && addr < CPU_VECTOR_IRQ) {
-        uint8_t vector[2];
-        wrtoba(dec->vector, vector);
-        *d = vector[addr - CPU_VECTOR_RES];
-        return true;
-    }
-    return dec->inner.read(dec->inner.ctx, addr, d);
-}
-
-static bool resetaddr_write(void *ctx, uint16_t addr, uint8_t d)
-{
-    struct resdecorator *const dec = (struct resdecorator *)ctx;
-    return dec->inner.write
-            ? dec->inner.write(dec->inner.ctx, addr, d)
-            : false;
-}
-
-static size_t resetaddr_dma(const void *restrict ctx, uint16_t addr,
-                            size_t count, uint8_t dest[restrict count])
-{
-    struct resdecorator *const dec = (struct resdecorator *)ctx;
-    return dec->inner.dma
-            ? dec->inner.dma(dec->inner.ctx, addr, count, dest)
-            : 0;
-}
-
-static void create_cpubus(struct nes_console *self, int resetoverride)
+static void create_cpubus(struct nes_console *self)
 {
     // TODO: 3 partitions only for now, 8KB ram, 32KB rom, nothing in between
     self->cpu.bus = bus_new(16, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
@@ -101,19 +64,13 @@ static void create_cpubus(struct nes_console *self, int resetoverride)
     const uint16_t cart_busaddr = MEMBLOCK_32KB;
     cart_cpu_connect(self->cart, self->cpu.bus, cart_busaddr);
 
-    if (resetoverride >= 0) {
-        self->dec = malloc(sizeof *self->dec);
-        self->dec->vector = resetoverride;
-        struct busdevice resetaddr_device = {
-            resetaddr_read, resetaddr_write, resetaddr_dma, self->dec,
-        };
-        bus_swap(self->cpu.bus, cart_busaddr, resetaddr_device,
-                 &self->dec->inner);
-    }
+    debug_attach_cpu(self->dbg, &self->cpu);
+    debug_override_reset(self->dbg, cart_busaddr);
 }
 
 static void free_cpubus(struct nes_console *self)
 {
+    debug_detach(self->dbg);
     cart_cpu_disconnect(self->cart, self->cpu.bus, MEMBLOCK_32KB);
     bus_free(self->cpu.bus);
     self->cpu.bus = NULL;
@@ -169,9 +126,10 @@ static void ram_trace(const struct nes_console *self)
 // Public Interface
 //
 
-nes *nes_new(cart *c, bool tron, int resetoverride)
+nes *nes_new(cart *c, bool tron, debugctx *dbg)
 {
     assert(c != NULL);
+    assert(dbg != NULL);
 
     FILE *tracelog = NULL;
     if (tron) {
@@ -185,9 +143,9 @@ nes *nes_new(cart *c, bool tron, int resetoverride)
 
     struct nes_console *const self = malloc(sizeof *self);
     self->cart = c;
-    self->dec = NULL;
+    self->dbg = dbg;
     self->tracelog = tracelog;
-    create_cpubus(self, resetoverride);
+    create_cpubus(self);
     return self;
 }
 
@@ -200,7 +158,6 @@ void nes_free(nes *self)
         ram_trace(self);
     }
     free_cpubus(self);
-    free(self->dec);
     free(self);
 }
 
@@ -283,6 +240,7 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
 
     cpu_snapshot(&self->cpu, snapshot);
     cart_snapshot(self->cart, snapshot);
+    debug_snapshot(self->dbg, snapshot);
     snapshot->mode = self->mode;
     snapshot->mem.ram = self->ram;
     snapshot->mem.prglength = bus_dma(self->cpu.bus,
@@ -290,7 +248,6 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
                                       sizeof snapshot->mem.prgview
                                         / sizeof snapshot->mem.prgview[0],
                                       snapshot->mem.prgview);
-    snapshot->mem.resvector_override = self->dec ? self->dec->vector : -1;
     bus_dma(self->cpu.bus, CPU_VECTOR_NMI,
             sizeof snapshot->mem.vectors / sizeof snapshot->mem.vectors[0],
             snapshot->mem.vectors);

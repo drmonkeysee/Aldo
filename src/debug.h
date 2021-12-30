@@ -12,6 +12,8 @@
 #include "cpu.h"
 #include "snapshot.h"
 
+#include <stdint.h>
+
 typedef struct debugger_context debugctx;
 
 debugctx *debug_new(const struct control *appstate);

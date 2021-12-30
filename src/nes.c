@@ -27,8 +27,8 @@ static const char
 // Cartridge RAM/ROM and Controller Input.
 struct nes_console {
     cart *cart;                 // Game Cartridge; Non-owning Pointer
-    FILE *tracelog;             // Optional trace log; Non-owning Pointer
     debugctx *dbg;              // Debugger Context; Non-owning Pointer
+    FILE *tracelog;             // Optional trace log; Non-owning Pointer
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
     enum nexcmode mode;         // NES execution mode
     uint8_t ram[MEMBLOCK_2KB];  // CPU Internal RAM
@@ -239,8 +239,8 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
     assert(self != NULL);
     if (!snapshot) return;
 
-    cpu_snapshot(&self->cpu, snapshot);
     cart_snapshot(self->cart, snapshot);
+    cpu_snapshot(&self->cpu, snapshot);
     debug_snapshot(self->dbg, snapshot);
     snapshot->mode = self->mode;
     snapshot->mem.ram = self->ram;

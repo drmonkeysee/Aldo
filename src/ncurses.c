@@ -5,11 +5,11 @@
 //  Created by Brandon Stansbury on 12/30/21.
 //
 
-#include "ui.h"
 
 #include "bytes.h"
 #include "debug.h"
 #include "dis.h"
+#include "ui.h"
 
 #include <ncurses.h>
 #include <panel.h>
@@ -572,21 +572,6 @@ static void ncurses_init(void)
     initclock();
 }
 
-static void ncurses_cleanup(void)
-{
-    vcleanup(&RamView);
-    vcleanup(&DatapathView);
-    vcleanup(&FlagsView);
-    vcleanup(&RegistersView);
-    vcleanup(&PrgView);
-    vcleanup(&CartView);
-    vcleanup(&DebuggerView);
-    vcleanup(&ControlsView);
-    vcleanup(&HwView);
-
-    endwin();
-}
-
 static void ncurses_tick_start(struct control *appstate,
                                const struct console_state *snapshot)
 {
@@ -638,6 +623,21 @@ static void ncurses_refresh(const struct control *appstate,
     update_panels();
     ramrefresh(appstate->ramsheet);
     doupdate();
+}
+
+static void ncurses_cleanup(void)
+{
+    vcleanup(&RamView);
+    vcleanup(&DatapathView);
+    vcleanup(&FlagsView);
+    vcleanup(&RegistersView);
+    vcleanup(&PrgView);
+    vcleanup(&CartView);
+    vcleanup(&DebuggerView);
+    vcleanup(&ControlsView);
+    vcleanup(&HwView);
+
+    endwin();
 }
 
 //

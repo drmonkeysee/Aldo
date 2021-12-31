@@ -7,6 +7,7 @@
 
 #include "ui.h"
 
+struct ui_interface ui_batch_init(void);
 struct ui_interface ui_ncurses_init(void);
 
 struct ui_interface ui_init(void)

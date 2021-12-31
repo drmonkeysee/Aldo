@@ -237,7 +237,7 @@ void nes_cycle(nes *self, struct cycleclock *clock)
 void nes_snapshot(nes *self, struct console_state *snapshot)
 {
     assert(self != NULL);
-    if (!snapshot) return;
+    assert(snapshot != NULL);
 
     cart_snapshot(self->cart, snapshot);
     cpu_snapshot(&self->cpu, snapshot);

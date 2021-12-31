@@ -40,7 +40,7 @@ static const int Fps = 60;
 static const struct timespec VSync = {.tv_nsec = NanosecondsPerSecond / Fps};
 
 static struct timespec Current, Previous;
-static double CycleBudgetMs, FrameLeftMs, FrameTimeMs;
+static double FrameLeftMs, FrameTimeMs, TimeBudgetMs;
 
 static double to_ms(const struct timespec *ts)
 {
@@ -579,21 +579,21 @@ static void ncurses_tick_start(struct control *appstate,
     FrameTimeMs = to_ms(&Current) - to_ms(&Previous);
 
     if (!snapshot->lines.ready) {
-        CycleBudgetMs = appstate->clock.budget = 0;
+        TimeBudgetMs = appstate->clock.budget = 0;
         return;
     }
 
-    CycleBudgetMs += FrameTimeMs;
+    TimeBudgetMs += FrameTimeMs;
     // NOTE: accumulate at most a second of banked cycle time
-    if (CycleBudgetMs >= MillisecondsPerSecond) {
-        CycleBudgetMs = MillisecondsPerSecond;
+    if (TimeBudgetMs >= MillisecondsPerSecond) {
+        TimeBudgetMs = MillisecondsPerSecond;
     }
 
     const double mspercycle = MillisecondsPerSecond
                                 / appstate->clock.cycles_per_sec;
-    const int new_cycles = CycleBudgetMs / mspercycle;
+    const int new_cycles = TimeBudgetMs / mspercycle;
     appstate->clock.budget += new_cycles;
-    CycleBudgetMs -= new_cycles * mspercycle;
+    TimeBudgetMs -= new_cycles * mspercycle;
 }
 
 static void ncurses_tick_end(void)

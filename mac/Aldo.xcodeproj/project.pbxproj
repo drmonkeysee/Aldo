@@ -13,8 +13,8 @@
 		C8184D7025E750E0002B3100 /* libcinytest.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8184D6F25E750E0002B3100 /* libcinytest.dylib */; };
 		C8184D7725E753BB002B3100 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = C8184D5025E74AC5002B3100 /* main.c */; };
 		C8184D7C25E76541002B3100 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
-		C8186495277EB0F700CA4AC0 /* ncurses.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186494277EB0F700CA4AC0 /* ncurses.c */; };
-		C8186497277EB45900CA4AC0 /* batch.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186496277EB45900CA4AC0 /* batch.c */; };
+		C8186495277EB0F700CA4AC0 /* uincurses.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186494277EB0F700CA4AC0 /* uincurses.c */; };
+		C8186497277EB45900CA4AC0 /* uibatch.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186496277EB45900CA4AC0 /* uibatch.c */; };
 		C81A516D25DA036100361E40 /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
 		C820E6C025A9759A006A7AB1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820E6BF25A9759A006A7AB1 /* main.swift */; };
 		C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* aldo.c */; };
@@ -76,8 +76,8 @@
 		C8184D5125E74B74002B3100 /* Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		C8184D5225E74B75002B3100 /* dis.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dis.c; sourceTree = "<group>"; };
 		C8184D6F25E750E0002B3100 /* libcinytest.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcinytest.dylib; path = /usr/local/lib/libcinytest.dylib; sourceTree = "<absolute>"; };
-		C8186494277EB0F700CA4AC0 /* ncurses.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ncurses.c; sourceTree = "<group>"; };
-		C8186496277EB45900CA4AC0 /* batch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = batch.c; sourceTree = "<group>"; };
+		C8186494277EB0F700CA4AC0 /* uincurses.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = uincurses.c; sourceTree = "<group>"; };
+		C8186496277EB45900CA4AC0 /* uibatch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = uibatch.c; sourceTree = "<group>"; };
 		C81A516B25DA036100361E40 /* control.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = control.h; sourceTree = "<group>"; };
 		C81A516C25DA036100361E40 /* control.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = control.c; sourceTree = "<group>"; };
 		C820E6BC25A9759A006A7AB1 /* Dev */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Dev; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -211,7 +211,6 @@
 				C820E6CA25A97A4E006A7AB1 /* aldo.c */,
 				C8B4664327755790000576EE /* argparse.h */,
 				C8B4664427755790000576EE /* argparse.c */,
-				C8186496277EB45900CA4AC0 /* batch.c */,
 				C8C706902751EEBA00B45785 /* bus.h */,
 				C8C706852751EEBA00B45785 /* bus.c */,
 				C8C706882751EEBA00B45785 /* bytes.h */,
@@ -233,12 +232,13 @@
 				C8C706912751EEBA00B45785 /* mappers.c */,
 				C8C706872751EEBA00B45785 /* nes.h */,
 				C8C706832751EEBA00B45785 /* nes.c */,
-				C8186494277EB0F700CA4AC0 /* ncurses.c */,
 				C8C7068B2751EEBA00B45785 /* snapshot.h */,
 				C8C706BC2751F55C00B45785 /* trace.h */,
 				C8C706BD2751F55C00B45785 /* trace.c */,
 				C8557B2D25C661660090296D /* ui.h */,
 				C8557B2E25C661660090296D /* ui.c */,
+				C8186496277EB45900CA4AC0 /* uibatch.c */,
+				C8186494277EB0F700CA4AC0 /* uincurses.c */,
 			);
 			name = src;
 			path = ../src;
@@ -390,7 +390,7 @@
 			files = (
 				C8C706922751EEBA00B45785 /* nes.c in Sources */,
 				C8C706BE2751F55C00B45785 /* trace.c in Sources */,
-				C8186497277EB45900CA4AC0 /* batch.c in Sources */,
+				C8186497277EB45900CA4AC0 /* uibatch.c in Sources */,
 				C820E6C025A9759A006A7AB1 /* main.swift in Sources */,
 				C8C706932751EEBA00B45785 /* bus.c in Sources */,
 				C8C706962751EEBA00B45785 /* decode.c in Sources */,
@@ -402,7 +402,7 @@
 				C8C706952751EEBA00B45785 /* cart.c in Sources */,
 				C85C8DC625BD29AC00611D19 /* dis.c in Sources */,
 				C8557B2F25C661660090296D /* ui.c in Sources */,
-				C8186495277EB0F700CA4AC0 /* ncurses.c in Sources */,
+				C8186495277EB0F700CA4AC0 /* uincurses.c in Sources */,
 				C8C706942751EEBA00B45785 /* cpu.c in Sources */,
 				C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */,
 			);

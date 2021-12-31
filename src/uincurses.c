@@ -1,5 +1,5 @@
 //
-//  ncurses.c
+//  uincurses.c
 //  Aldo
 //
 //  Created by Brandon Stansbury on 12/30/21.

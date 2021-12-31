@@ -579,7 +579,7 @@ static void ncurses_tick_start(struct control *appstate,
     FrameTimeMs = to_ms(&Current) - to_ms(&Previous);
 
     if (!snapshot->lines.ready) {
-        CycleBudgetMs = 0;
+        CycleBudgetMs = appstate->clock.budget = 0;
         return;
     }
 

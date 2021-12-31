@@ -77,9 +77,10 @@ static int decode_cart_chr(const struct control *appstate, cart *c)
 }
 
 static void handle_input(struct control *appstate,
-                         const struct console_state *snapshot, nes *console)
+                         const struct console_state *snapshot, nes *console,
+                         const struct ui_interface *ui)
 {
-    const int c = ui_pollinput();
+    const int c = ui->pollinput();
     switch (c) {
     case ' ':
         if (snapshot->lines.ready) {
@@ -151,11 +152,11 @@ static void handle_input(struct control *appstate,
 }
 
 static void update(struct control *appstate, struct console_state *snapshot,
-                   nes *console)
+                   nes *console, const struct ui_interface *ui)
 {
     nes_cycle(console, &appstate->clock);
     nes_snapshot(console, snapshot);
-    ui_refresh(appstate, snapshot);
+    ui->refresh(appstate, snapshot);
 }
 
 static int emu_loop(struct control *appstate, cart *c)
@@ -172,18 +173,18 @@ static int emu_loop(struct control *appstate, cart *c)
     // NOTE: initialize snapshot from console
     struct console_state snapshot;
     nes_snapshot(console, &snapshot);
-    ui_init();
+    struct ui_interface ui = ui_init();
 
     do {
-        ui_tick_start(appstate, &snapshot);
-        handle_input(appstate, &snapshot, console);
+        ui.tick_start(appstate, &snapshot);
+        handle_input(appstate, &snapshot, console, &ui);
         if (appstate->running) {
-            update(appstate, &snapshot, console);
+            update(appstate, &snapshot, console, &ui);
         }
-        ui_tick_end();
+        ui.tick_end();
     } while (appstate->running);
 
-    ui_cleanup();
+    ui.cleanup();
     snapshot.mem.prglength = 0;
     snapshot.mem.ram = NULL;
     nes_free(console);

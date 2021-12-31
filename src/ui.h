@@ -11,15 +11,16 @@
 #include "control.h"
 #include "snapshot.h"
 
-void ui_init(void);
-void ui_cleanup(void);
+struct ui_interface {
+    void (*tick_start)(struct control *appstate,
+                       const struct console_state *snapshot);
+    void (*tick_end)(void);
+    int (*pollinput)(void);
+    void (*refresh)(const struct control *appstate,
+                    const struct console_state *snapshot);
+    void (*cleanup)(void);
+};
 
-void ui_tick_start(struct control *appstate,
-                   const struct console_state *snapshot);
-void ui_tick_end(void);
-
-int ui_pollinput(void);
-void ui_refresh(const struct control *appstate,
-                const struct console_state *snapshot);
+struct ui_interface ui_init(void);
 
 #endif

@@ -495,9 +495,9 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
         const char *fmt;
         uint16_t vector;
         if (snapshot->datapath.res == NIS_COMMITTED
-            && snapshot->mem.resvector_override >= 0) {
+            && snapshot->debugger.resvector_override >= 0) {
             fmt = "!%04X";
-            vector = snapshot->mem.resvector_override;
+            vector = snapshot->debugger.resvector_override;
         } else {
             fmt = "%04X";
             vector = interrupt_vector(snapshot);

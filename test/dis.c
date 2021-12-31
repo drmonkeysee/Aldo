@@ -493,7 +493,7 @@ static void peek_interrupt(void *ctx)
     cpu.a = 0x10;
     cpu.irq = NIS_COMMITTED;
     cpu_snapshot(&cpu, &snapshot);
-    snapshot.mem.resvector_override = -1;
+    snapshot.debugger.resvector_override = -1;
     snapshot.mem.vectors[4] = 0xbb;
     snapshot.mem.vectors[5] = 0xaa;
 
@@ -516,7 +516,7 @@ static void peek_overridden_reset(void *ctx)
     cpu.a = 0x10;
     cpu.res = NIS_COMMITTED;
     cpu_snapshot(&cpu, &snapshot);
-    snapshot.mem.resvector_override = 0xccdd;
+    snapshot.debugger.resvector_override = 0xccdd;
     snapshot.mem.vectors[2] = 0xbb;
     snapshot.mem.vectors[3] = 0xaa;
 
@@ -539,7 +539,7 @@ static void peek_overridden_non_reset(void *ctx)
     cpu.a = 0x10;
     cpu.nmi = NIS_COMMITTED;
     cpu_snapshot(&cpu, &snapshot);
-    snapshot.mem.resvector_override = 0xccdd;
+    snapshot.debugger.resvector_override = 0xccdd;
     snapshot.mem.vectors[0] = 0xff;
     snapshot.mem.vectors[1] = 0xee;
     snapshot.mem.vectors[2] = 0xbb;

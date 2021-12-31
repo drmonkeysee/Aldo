@@ -8,6 +8,7 @@
 #include "ui.h"
 
 #include "bytes.h"
+#include "debug.h"
 #include "dis.h"
 
 #include <ncurses.h>
@@ -200,10 +201,24 @@ static void drawcontrols(const struct console_state *snapshot)
 static void drawdebugger(const struct control *appstate,
                          const struct console_state *snapshot)
 {
-    mvwprintw(DebuggerView.content, 0, 0, "State: %s", "foo");
-    mvwprintw(DebuggerView.content, 1, 0, "Tracing: %s", "bar");
-    mvwprintw(DebuggerView.content, 2, 0, "Reset Override: %s", "baz");
-    mvwprintw(DebuggerView.content, 3, 0, "Halt Address: %s", "beef");
+    int cursor_y = 0;
+    mvwprintw(DebuggerView.content, cursor_y++, 0, "State: %s",
+              debug_description(snapshot->debugger.state));
+    mvwprintw(DebuggerView.content, cursor_y++, 0, "Tracing: %s",
+              appstate->tron ? "On" : "Off");
+    mvwaddstr(DebuggerView.content, cursor_y++, 0, "Reset Override: ");
+    if (snapshot->debugger.resvector_override >= 0) {
+        wprintw(DebuggerView.content, "%04X",
+                snapshot->debugger.resvector_override);
+    } else {
+        waddstr(DebuggerView.content, "None");
+    }
+    mvwaddstr(DebuggerView.content, cursor_y, 0, "Halt @: ");
+    if (snapshot->debugger.halt_address >= 0) {
+        wprintw(DebuggerView.content, "%04X", snapshot->debugger.halt_address);
+    } else {
+        waddstr(DebuggerView.content, "None");
+    }
 }
 
 static void drawcart(const struct control *appstate,
@@ -259,8 +274,9 @@ static void drawvecs(int h, int w, int y, const struct console_state *snapshot)
     hi = snapshot->mem.vectors[3];
     mvwprintw(PrgView.content, h - y--, 0, "%04X: %02X %02X     RES",
               CPU_VECTOR_RES, lo, hi);
-    if (snapshot->mem.resvector_override >= 0) {
-        wprintw(PrgView.content, " !$%04X", snapshot->mem.resvector_override);
+    if (snapshot->debugger.resvector_override >= 0) {
+        wprintw(PrgView.content, " !$%04X",
+                snapshot->debugger.resvector_override);
     } else {
         wprintw(PrgView.content, " $%04X", bytowr(lo, hi));
     }

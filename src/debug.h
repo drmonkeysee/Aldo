@@ -25,6 +25,9 @@ void debug_detach(debugctx *self);
 void debug_override_reset(debugctx *self, uint16_t device_addr);
 void debug_check(debugctx *self);
 
+// NOTE: returns a pointer to a statically allocated sbtring;
+// **WARNING**: do not write through or free this pointer!
+const char *debug_description(int state);
 void debug_snapshot(debugctx *self, struct console_state *snapshot);
 
 #endif

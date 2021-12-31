@@ -15,10 +15,16 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+// X(symbol, description)
+#define DEBUG_STATE_X \
+X(DBG_INACTIVE, "Inactive") \
+X(DBG_RUN, "Run") \
+X(DBG_BREAK, "Break")
+
 enum debugger_state {
-    DBG_INACTIVE,
-    DBG_RUN,
-    DBG_BREAK,
+#define X(s, d) s,
+    DEBUG_STATE_X
+#undef X
 };
 
 struct resdecorator {
@@ -147,10 +153,23 @@ void debug_check(debugctx *self)
     }
 }
 
+const char *debug_description(int state)
+{
+    switch (state) {
+#define X(s, d) case s: return d;
+        DEBUG_STATE_X
+#undef X
+    default:
+        return "Invalid";
+    }
+}
+
 void debug_snapshot(debugctx *self, struct console_state *snapshot)
 {
     assert(self != NULL);
     assert(snapshot != NULL);
 
-    snapshot->mem.resvector_override = self->resetvector;
+    snapshot->debugger.halt_address = self->haltaddr;
+    snapshot->debugger.resvector_override = self->resetvector;
+    snapshot->debugger.state = self->state;
 }

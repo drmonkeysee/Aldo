@@ -41,6 +41,7 @@ struct console_state {
         int halt_address,       // Address for Halt Condition (<0 if not set)
             resvector_override, // RESET Vector Override (<0 if not set)
             state;
+        bool halted;
     } debugger;
     enum nexcmode mode;
     struct {

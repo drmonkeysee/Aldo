@@ -170,6 +170,7 @@ void debug_snapshot(debugctx *self, struct console_state *snapshot)
     assert(snapshot != NULL);
 
     snapshot->debugger.halt_address = self->haltaddr;
+    snapshot->debugger.halted = self->state == DBG_BREAK;
     snapshot->debugger.resvector_override = self->resetvector;
     snapshot->debugger.state = self->state;
 }

@@ -43,8 +43,8 @@ static void handle_sigint(int sig, siginfo_t *info, void *uap)
 
 static int batch_init(void)
 {
-    clock_gettime(CLOCK_MONOTONIC, &Previous);
-    Start = Previous;
+    clock_gettime(CLOCK_MONOTONIC, &Start);
+    Previous = Start;
     struct sigaction act = {
         .sa_sigaction = handle_sigint,
         .sa_flags = SA_SIGINFO,

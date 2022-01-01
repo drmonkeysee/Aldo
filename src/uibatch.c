@@ -99,15 +99,19 @@ static void batch_cleanup(const struct control *appstate,
                           const struct console_state *snapshot)
 {
     const struct timespec elapsed = timespec_elapsed(&Start);
-    const double avgcycles = (appstate->clock.total_cycles
-                              / timespec_to_ms(&elapsed)) * TSU_MS_PER_S;
+    const double runtime = timespec_to_ms(&elapsed);
+    const bool scale_ms = runtime < TSU_MS_PER_S;
 
     clearline();
+    printf("---=== %s ===---\n", ctrl_cartfilename(appstate->cartfile));
     if (snapshot->debugger.halt_address >= 0 && snapshot->debugger.halted) {
         printf("Halted @: %04X\n", snapshot->debugger.halt_address);
     }
-    printf("Avg CPS: %.2f\n", avgcycles);
+    printf("Run Time (%ssec): %.3f\n", scale_ms ? "m" : "",
+           scale_ms ? runtime : runtime / TSU_MS_PER_S);
     printf("Total Cycles: %" PRIu64 "\n", appstate->clock.total_cycles);
+    printf("Avg Cycles/sec: %.2f\n",
+           appstate->clock.total_cycles * (TSU_MS_PER_S / runtime));
 }
 
 //

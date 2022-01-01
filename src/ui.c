@@ -19,7 +19,7 @@ int ui_ncurses_init(struct ui_interface *ui);
 
 int ui_init(struct ui_interface *ui)
 {
-    //return ui_ncurses_init();
+    //return ui_ncurses_init(ui);
     return ui_batch_init(ui);
 }
 

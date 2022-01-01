@@ -101,7 +101,7 @@ static void batch_cleanup(const struct control *appstate,
 {
     const struct timespec elapsed = timespec_elapsed(&Start);
     const double avgcycles = (appstate->clock.total_cycles
-                              / timespec_to_ms(&elapsed)) * UITIL_MS_PER_S;
+                              / timespec_to_ms(&elapsed)) * TSU_MS_PER_S;
 
     clearline();
     if (snapshot->debugger.halt_address >= 0 && snapshot->debugger.halted) {

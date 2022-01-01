@@ -11,15 +11,14 @@
 #include <time.h>
 
 enum {
-    UITIL_MS_PER_S = 1000,
-    UITIL_NS_PER_MS = (int)1e6,
-    UITIL_NS_PER_S = UITIL_MS_PER_S * UITIL_NS_PER_MS,
+    TSU_MS_PER_S = 1000,
+    TSU_NS_PER_MS = (int)1e6,
+    TSU_NS_PER_S = TSU_MS_PER_S * TSU_NS_PER_MS,
 };
 
 inline double timespec_to_ms(const struct timespec *ts)
 {
-    return (ts->tv_sec * UITIL_MS_PER_S)
-            + (ts->tv_nsec / (double)UITIL_NS_PER_MS);
+    return (ts->tv_sec * TSU_MS_PER_S) + (ts->tv_nsec / (double)TSU_NS_PER_MS);
 }
 
 inline struct timespec timespec_elapsed(const struct timespec *from)
@@ -32,7 +31,7 @@ inline struct timespec timespec_elapsed(const struct timespec *from)
     if (from->tv_nsec > now.tv_nsec) {
         // NOTE: subtract with borrow
         --elapsed.tv_sec;
-        elapsed.tv_nsec = UITIL_NS_PER_S - (from->tv_nsec - now.tv_nsec);
+        elapsed.tv_nsec = TSU_NS_PER_S - (from->tv_nsec - now.tv_nsec);
     } else {
         elapsed.tv_nsec = now.tv_nsec - from->tv_nsec;
     }

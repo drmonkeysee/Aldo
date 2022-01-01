@@ -9,6 +9,7 @@
 #include "bytes.h"
 #include "debug.h"
 #include "dis.h"
+#include "tsutil.h"
 #include "ui.h"
 
 #include <ncurses.h>
@@ -29,66 +30,38 @@
 // Run Loop Clock
 //
 
-static const double MillisecondsPerSecond = 1000,
-                    NanosecondsPerMillisecond = 1e6;
-static const long NanosecondsPerSecond = MillisecondsPerSecond
-                                            * NanosecondsPerMillisecond;
 // NOTE: Approximate 60 FPS for application event loop;
 // this will be enforced by actual vsync when ported to true GUI
 // and is *distinct* from emulator frequency which can be modified by the user.
 static const int Fps = 60;
-static const struct timespec VSync = {.tv_nsec = NanosecondsPerSecond / Fps};
+static const struct timespec VSync = {.tv_nsec = TSU_NS_PER_S / Fps};
 
 static struct timespec Current, Previous;
 static double FrameLeftMs, FrameTimeMs, TimeBudgetMs;
-
-static double to_ms(const struct timespec *ts)
-{
-    return (ts->tv_sec * MillisecondsPerSecond)
-            + (ts->tv_nsec / NanosecondsPerMillisecond);
-}
 
 static void initclock(void)
 {
     clock_gettime(CLOCK_MONOTONIC, &Previous);
 }
 
-static void tick_elapsed(struct timespec *ts)
-{
-    struct timespec now;
-    clock_gettime(CLOCK_MONOTONIC, &now);
-
-    *ts = (struct timespec){.tv_sec = now.tv_sec - Current.tv_sec};
-
-    if (Current.tv_nsec > now.tv_nsec) {
-        // NOTE: subtract with borrow
-        --ts->tv_sec;
-        ts->tv_nsec = NanosecondsPerSecond - (Current.tv_nsec - now.tv_nsec);
-    } else {
-        ts->tv_nsec = now.tv_nsec - Current.tv_nsec;
-    }
-}
-
 static void tick_sleep(void)
 {
-    struct timespec elapsed;
-    tick_elapsed(&elapsed);
+    const struct timespec elapsed = timespec_elapsed(&Current);
 
     // NOTE: if elapsed nanoseconds is greater than vsync we're over
     // our time budget; if elapsed *seconds* is greater than vsync
     // we've BLOWN AWAY our time budget; either way don't sleep.
-    if (elapsed.tv_nsec > VSync.tv_nsec
-        || elapsed.tv_sec > VSync.tv_sec) {
+    if (elapsed.tv_nsec > VSync.tv_nsec || elapsed.tv_sec > VSync.tv_sec) {
         // NOTE: we've already blown the frame time so convert everything
         // to milliseconds to make the math easier.
-        FrameLeftMs = to_ms(&VSync) - to_ms(&elapsed);
+        FrameLeftMs = timespec_to_ms(&VSync) - timespec_to_ms(&elapsed);
         return;
     }
 
     struct timespec tick_left = {
         .tv_nsec = VSync.tv_nsec - elapsed.tv_nsec,
     }, tick_req;
-    FrameLeftMs = to_ms(&tick_left);
+    FrameLeftMs = timespec_to_ms(&tick_left);
 
     int result;
     do {
@@ -576,7 +549,7 @@ static void ncurses_tick_start(struct control *appstate,
                                const struct console_state *snapshot)
 {
     clock_gettime(CLOCK_MONOTONIC, &Current);
-    FrameTimeMs = to_ms(&Current) - to_ms(&Previous);
+    FrameTimeMs = timespec_to_ms(&Current) - timespec_to_ms(&Previous);
 
     if (!snapshot->lines.ready) {
         TimeBudgetMs = appstate->clock.budget = 0;
@@ -585,11 +558,11 @@ static void ncurses_tick_start(struct control *appstate,
 
     TimeBudgetMs += FrameTimeMs;
     // NOTE: accumulate at most a second of banked cycle time
-    if (TimeBudgetMs >= MillisecondsPerSecond) {
-        TimeBudgetMs = MillisecondsPerSecond;
+    if (TimeBudgetMs >= TSU_MS_PER_S) {
+        TimeBudgetMs = TSU_MS_PER_S;
     }
 
-    const double mspercycle = MillisecondsPerSecond
+    const double mspercycle = (double)TSU_MS_PER_S
                                 / appstate->clock.cycles_per_sec;
     const int new_cycles = TimeBudgetMs / mspercycle;
     appstate->clock.budget += new_cycles;

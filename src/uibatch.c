@@ -10,7 +10,6 @@
 #include "tsutil.h"
 #include "ui.h"
 
-#include <errno.h>
 #include <inttypes.h>
 #include <signal.h>
 #include <stddef.h>

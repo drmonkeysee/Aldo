@@ -625,8 +625,11 @@ static void ncurses_refresh(const struct control *appstate,
     doupdate();
 }
 
-static void ncurses_cleanup(void)
+static void ncurses_cleanup(const struct control *appstate,
+                            const struct console_state *snapshot)
 {
+    (void)appstate, (void)snapshot;
+
     vcleanup(&RamView);
     vcleanup(&DatapathView);
     vcleanup(&FlagsView);
@@ -644,14 +647,15 @@ static void ncurses_cleanup(void)
 // Public Interface
 //
 
-struct ui_interface ui_ncurses_init(void)
+int ui_ncurses_init(struct ui_interface *ui)
 {
     ncurses_init();
-    return (struct ui_interface){
+    *ui = (struct ui_interface){
         ncurses_tick_start,
         ncurses_tick_end,
         ncurses_pollinput,
         ncurses_refresh,
         ncurses_cleanup,
     };
+    return 0;
 }

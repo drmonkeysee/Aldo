@@ -7,10 +7,22 @@
 
 #include "ui.h"
 
-struct ui_interface ui_batch_init(void);
-struct ui_interface ui_ncurses_init(void);
+int ui_batch_init(struct ui_interface *ui);
+int ui_ncurses_init(struct ui_interface *ui);
 
-struct ui_interface ui_init(void)
+int ui_init(struct ui_interface *ui)
 {
-    return ui_ncurses_init();
+    //return ui_ncurses_init();
+    return ui_batch_init(ui);
+}
+
+const char *ui_errstr(int err)
+{
+    switch (err) {
+#define X(s, v, e) case s: return e;
+        UI_ERRCODE_X
+#undef X
+    default:
+        return "UNKNOWN ERR";
+    }
 }

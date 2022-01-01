@@ -170,10 +170,24 @@ static int emu_loop(struct control *appstate, cart *c)
     };
 
     nes_powerup(console);
+
+    // TODO: if batch mode
+    nes_ready(console);
+    nes_mode(console, NEXC_RUN);
+
     // NOTE: initialize snapshot from console
     struct console_state snapshot;
     nes_snapshot(console, &snapshot);
-    struct ui_interface ui = ui_init();
+
+    struct ui_interface ui;
+    errno = 0;
+    const int err = ui_init(&ui);
+    if (err < 0) {
+        fprintf(stderr, "UI init failure (%d): %s\n", err, ui_errstr(err));
+        if (err == UI_ERR_ERNO) {
+            perror("UI System Error");
+        }
+    }
 
     do {
         ui.tick_start(appstate, &snapshot);
@@ -184,7 +198,7 @@ static int emu_loop(struct control *appstate, cart *c)
         ui.tick_end();
     } while (appstate->running);
 
-    ui.cleanup();
+    ui.cleanup(appstate, &snapshot);
     snapshot.mem.prglength = 0;
     snapshot.mem.ram = NULL;
     nes_free(console);

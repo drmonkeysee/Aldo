@@ -17,7 +17,7 @@
 #include <string.h>
 #include <time.h>
 
-static const char *const restrict DistractorFormat = "%c Still running\u2026";
+static const char *const restrict DistractorFormat = "%c Running\u2026";
 
 static struct timespec Current, Previous, Start;
 static double FrameTimeMs;

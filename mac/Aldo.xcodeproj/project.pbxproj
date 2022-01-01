@@ -87,7 +87,7 @@
 		C820E6CA25A97A4E006A7AB1 /* aldo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aldo.c; sourceTree = "<group>"; };
 		C820E6D325A97FB5006A7AB1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		C820E6DE25A982A5006A7AB1 /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
-		C83965E927810D4300E1E28E /* uiutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = uiutil.h; sourceTree = "<group>"; };
+		C83965E927810D4300E1E28E /* tsutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tsutil.h; sourceTree = "<group>"; };
 		C8557B2D25C661660090296D /* ui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ui.h; sourceTree = "<group>"; };
 		C8557B2E25C661660090296D /* ui.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ui.c; sourceTree = "<group>"; };
 		C85C8DC425BD29AC00611D19 /* dis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dis.h; sourceTree = "<group>"; };
@@ -236,11 +236,11 @@
 				C8C7068B2751EEBA00B45785 /* snapshot.h */,
 				C8C706BC2751F55C00B45785 /* trace.h */,
 				C8C706BD2751F55C00B45785 /* trace.c */,
+				C83965E927810D4300E1E28E /* tsutil.h */,
 				C8557B2D25C661660090296D /* ui.h */,
 				C8557B2E25C661660090296D /* ui.c */,
 				C8186496277EB45900CA4AC0 /* uibatch.c */,
 				C8186494277EB0F700CA4AC0 /* uincurses.c */,
-				C83965E927810D4300E1E28E /* uiutil.h */,
 			);
 			name = src;
 			path = ../src;

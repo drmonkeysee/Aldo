@@ -7,7 +7,7 @@
 
 #include "ui.h"
 
-#include "uiutil.h"
+#include "tsutil.h"
 
 #include <time.h>
 

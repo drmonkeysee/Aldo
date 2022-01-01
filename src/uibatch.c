@@ -7,8 +7,8 @@
 
 #include "control.h"
 #include "snapshot.h"
+#include "tsutil.h"
 #include "ui.h"
-#include "uiutil.h"
 
 #include <errno.h>
 #include <inttypes.h>

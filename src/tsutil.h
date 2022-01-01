@@ -1,12 +1,12 @@
 //
-//  uiutil.h
+//  tsutil.h
 //  Aldo
 //
 //  Created by Brandon Stansbury on 1/1/22.
 //
 
-#ifndef Aldo_uiutil_h
-#define Aldo_uiutil_h
+#ifndef Aldo_tsutil_h
+#define Aldo_tsutil_h
 
 #include <time.h>
 

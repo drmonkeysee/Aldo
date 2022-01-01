@@ -89,7 +89,7 @@ static void batch_refresh(const struct control *appstate,
 {
     static const char distractor[] = {'|', '/', '-', '\\'};
     static const double display_wait = 2000,
-                        refresh_interval_ms = display_wait + 250;
+                        refresh_interval_ms = display_wait + 100;
     static double refreshdt;
     static size_t distractor_frame;
 

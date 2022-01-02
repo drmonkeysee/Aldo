@@ -552,6 +552,9 @@ static void ncurses_init(void)
 static void ncurses_tick_start(struct control *appstate,
                                const struct console_state *snapshot)
 {
+    assert(appstate != NULL);
+    assert(snapshot != NULL);
+
     clock_gettime(CLOCK_MONOTONIC, &Current);
     FrameTimeMs = timespec_to_ms(&Current) - timespec_to_ms(&Previous);
 
@@ -587,6 +590,9 @@ static int ncurses_pollinput(void)
 static void ncurses_refresh(const struct control *appstate,
                             const struct console_state *snapshot)
 {
+    assert(appstate != NULL);
+    assert(snapshot != NULL);
+
     drawhwtraits(appstate);
     drawcontrols(snapshot);
     drawdebugger(appstate, snapshot);
@@ -626,6 +632,8 @@ static void ncurses_cleanup(const struct control *appstate,
 
 int ui_ncurses_init(struct ui_interface *ui)
 {
+    assert(ui != NULL);
+
     ncurses_init();
     *ui = (struct ui_interface){
         ncurses_tick_start,

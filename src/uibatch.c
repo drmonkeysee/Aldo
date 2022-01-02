@@ -10,6 +10,7 @@
 #include "tsutil.h"
 #include "ui.h"
 
+#include <assert.h>
 #include <inttypes.h>
 #include <signal.h>
 #include <stddef.h>
@@ -55,6 +56,9 @@ static int batch_init(void)
 static void batch_tick_start(struct control *appstate,
                              const struct console_state *snapshot)
 {
+    assert(appstate != NULL);
+    assert(snapshot != NULL);
+
     clock_gettime(CLOCK_MONOTONIC, &Current);
     FrameTimeMs = timespec_to_ms(&Current) - timespec_to_ms(&Previous);
 
@@ -120,6 +124,8 @@ static void batch_cleanup(const struct control *appstate,
 
 int ui_batch_init(struct ui_interface *ui)
 {
+    assert(ui != NULL);
+
     const int result = batch_init();
     if (result == 0) {
         *ui = (struct ui_interface){

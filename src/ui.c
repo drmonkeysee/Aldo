@@ -9,6 +9,7 @@
 
 #include "tsutil.h"
 
+#include <assert.h>
 #include <time.h>
 
 extern inline double timespec_to_ms(const struct timespec *);
@@ -19,6 +20,9 @@ int ui_ncurses_init(struct ui_interface *ui);
 
 int ui_init(const struct control *appstate, struct ui_interface *ui)
 {
+    assert(appstate != NULL);
+    assert(ui != NULL);
+
     return appstate->batch ? ui_batch_init(ui) : ui_ncurses_init(ui);
 }
 

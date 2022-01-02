@@ -271,12 +271,6 @@ static void commit_operation(struct mos6502 *self)
     conditional_commit(self, true);
 }
 
-// NOTE: compute ones- or twos-complement of D, including any carry-out
-static uint16_t complement(uint8_t d, bool twos)
-{
-    return (uint8_t)~d + twos;
-}
-
 static void load_register(struct mos6502 *self, uint8_t *r, uint8_t d)
 {
     *r = d;
@@ -290,11 +284,11 @@ static void store_data(struct mos6502 *self, uint8_t d)
     write(self);
 }
 
-// NOTE: A + B; B is u16 as it may contain a carry-out
-static void arithmetic_sum(struct mos6502 *self, uint16_t b)
+// NOTE: A + B + C
+static void arithmetic_sum(struct mos6502 *self, uint8_t b, bool c)
 {
     commit_operation(self);
-    const uint16_t sum = self->a + b;
+    const uint16_t sum = self->a + b + c;
     self->p.c = sum >> 8;
     update_v(self, sum, self->a, b);
     load_register(self, &self->a, sum);
@@ -307,7 +301,7 @@ static void compare_register(struct mos6502 *self, uint8_t r)
 {
     read(self);
     commit_operation(self);
-    const uint16_t cmp = r + complement(self->databus, true);
+    const uint16_t cmp = r + (uint8_t)~self->databus + 1;
     self->p.c = cmp >> 8;
     update_z(self, cmp);
     update_n(self, cmp);
@@ -428,7 +422,7 @@ static void ADC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
-    arithmetic_sum(self, self->databus + self->p.c);
+    arithmetic_sum(self, self->databus, self->p.c);
 }
 
 static void AND_exec(struct mos6502 *self, struct decoded dec)
@@ -721,7 +715,7 @@ static void SBC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
-    arithmetic_sum(self, complement(self->databus, self->p.c));
+    arithmetic_sum(self, ~self->databus, self->p.c);
 }
 
 static void SEC_exec(struct mos6502 *self)

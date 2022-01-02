@@ -228,6 +228,27 @@ static void adc_carryin_avoids_overflow(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
+// SOURCE: nestest
+static void adc_overflow_with_carry(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x7f};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.p.c = true;
+    cpu.a = 0x7f;   // 127 + 127 + C
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xffu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
 static void and(void *ctx)
 {
     uint8_t mem[] = {0x29, 0xc};
@@ -1394,6 +1415,7 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(adc_overflow_to_positive),
         ct_maketest(adc_carryin_causes_overflow),
         ct_maketest(adc_carryin_avoids_overflow),
+        ct_maketest(adc_overflow_with_carry),
         ct_maketest(and),
         ct_maketest(and_zero),
         ct_maketest(and_negative),

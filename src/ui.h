@@ -13,8 +13,7 @@
 
 // X(symbol, value, error string)
 #define UI_ERRCODE_X \
-X(UI_ERR_INIT, -1, "INIT FAILURE") \
-X(UI_ERR_ERNO, -2, "SYSTEM ERROR")
+X(UI_ERR_ERNO, -1, "SYSTEM ERROR")
 
 enum {
 #define X(s, v, e) s = v,

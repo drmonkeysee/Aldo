@@ -21,9 +21,9 @@
 
 static void errstr_returns_known_err(void *ctx)
 {
-    const char *const err = dis_errstr(DIS_ERR_FMT_FAIL);
+    const char *const err = dis_errstr(DIS_ERR_FMT);
 
-    ct_assertequalstr("OUTPUT FAIL", err);
+    ct_assertequalstr("FORMATTED OUTPUT FAILURE", err);
 }
 
 static void errstr_returns_unknown_err(void *ctx)

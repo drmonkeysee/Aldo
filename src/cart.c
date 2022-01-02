@@ -360,11 +360,11 @@ int cart_fmtdescription(int format, uint8_t mapid,
 
     int count, total;
     total = count = sprintf(buf, "%s", format_name(format));
-    if (count < 0) return count;
+    if (count < 0) return CART_ERR_FMT;
 
     if (format == CRTF_INES) {
         count = sprintf(buf + total, " (%03d)", mapid);
-        if (count < 0) return count;
+        if (count < 0) return CART_ERR_FMT;
         total += count;
     }
 

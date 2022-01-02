@@ -65,11 +65,11 @@ static int print_raw(uint16_t addr, const uint8_t *restrict bytes, int instlen,
 {
     int total, count;
     total = count = sprintf(dis, "%04X: ", addr);
-    if (count < 0) return DIS_ERR_FMT_FAIL;
+    if (count < 0) return DIS_ERR_FMT;
 
     for (int i = 0; i < instlen; ++i) {
         count = sprintf(dis + total, "%02X ", bytes[i]);
-        if (count < 0) return DIS_ERR_FMT_FAIL;
+        if (count < 0) return DIS_ERR_FMT;
         total += count;
     }
 
@@ -82,7 +82,7 @@ static int print_mnemonic(const struct decoded *dec,
 {
     int total, count;
     total = count = sprintf(dis, "%s ", Mnemonics[dec->instruction]);
-    if (count < 0) return DIS_ERR_FMT_FAIL;
+    if (count < 0) return DIS_ERR_FMT;
 
     const char *const restrict *const strtable = StringTables[dec->mode];
     switch (instlen) {
@@ -99,7 +99,7 @@ static int print_mnemonic(const struct decoded *dec,
     default:
         return DIS_ERR_INV_ADDRMD;
     }
-    if (count < 0) return DIS_ERR_FMT_FAIL;
+    if (count < 0) return DIS_ERR_FMT;
     return total + count;
 }
 
@@ -469,7 +469,7 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
 
     // NOTE: padding between raw bytes and disassembled instruction
     count = sprintf(dis + total, "%*s", ((3 - instlen) * 3) + 1, "");
-    if (count < 0) return DIS_ERR_FMT_FAIL;
+    if (count < 0) return DIS_ERR_FMT;
     total += count;
 
     count = print_mnemonic(&dec, bytes, instlen, dis + total);
@@ -492,7 +492,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
     const char *const interrupt = interrupt_display(snapshot);
     if (strlen(interrupt) > 0) {
         int count = total = sprintf(dis, "%s > ", interrupt);
-        if (count < 0) return count;
+        if (count < 0) return DIS_ERR_FMT;
         const char *fmt;
         uint16_t vector;
         if (snapshot->datapath.res == NIS_COMMITTED
@@ -504,7 +504,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
             vector = interrupt_vector(snapshot);
         }
         count = sprintf(dis + total, fmt, vector);
-        if (count < 0) return count;
+        if (count < 0) return DIS_ERR_FMT;
         total += count;
     } else {
         cpu_ctx *const peekctx = cpu_peek_start(cpu);
@@ -520,6 +520,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
             assert(((void)"BAD ADDRMODE PEEK", false));
             break;
         }
+        if (total < 0) return DIS_ERR_FMT;
     }
 
     assert((unsigned int)total < DIS_PEEK_SIZE);
@@ -538,7 +539,7 @@ int dis_datapath(const struct console_state *snapshot,
 
     int count, total;
     total = count = sprintf(dis, "%s ", Mnemonics[dec.instruction]);
-    if (count < 0) return DIS_ERR_FMT_FAIL;
+    if (count < 0) return DIS_ERR_FMT;
 
     const int
         max_offset = 1 + (instlen / 3),
@@ -566,7 +567,7 @@ int dis_datapath(const struct console_state *snapshot,
                             : 0);
         break;
     }
-    if (count < 0) return DIS_ERR_FMT_FAIL;
+    if (count < 0) return DIS_ERR_FMT;
     total += count;
 
     assert((unsigned int)total < DIS_DATAP_SIZE);

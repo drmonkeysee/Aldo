@@ -194,7 +194,7 @@ static int emu_loop(struct control *appstate, cart *c)
 
     struct ui_interface ui;
     errno = 0;
-    const int err = ui_init(&ui);
+    const int err = ui_init(appstate, &ui);
     if (err < 0) {
         fprintf(stderr, "UI init failure (%d): %s\n", err, ui_errstr(err));
         if (err == UI_ERR_ERNO) {

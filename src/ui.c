@@ -17,10 +17,9 @@ extern inline struct timespec timespec_elapsed(const struct timespec *);
 int ui_batch_init(struct ui_interface *ui);
 int ui_ncurses_init(struct ui_interface *ui);
 
-int ui_init(struct ui_interface *ui)
+int ui_init(const struct control *appstate, struct ui_interface *ui)
 {
-    //return ui_ncurses_init(ui);
-    return ui_batch_init(ui);
+    return appstate->batch ? ui_batch_init(ui) : ui_ncurses_init(ui);
 }
 
 const char *ui_errstr(int err)

@@ -119,7 +119,7 @@ static void drawhwtraits(const struct control *appstate)
               appstate->clock.total_cycles);
     mvwprintw(HwView.content, cursor_y++, 0, "Cycles per Second: %d",
               appstate->clock.cycles_per_sec);
-    mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
+    mvwaddstr(HwView.content, cursor_y, 0, "Cycles per Frame: N/A");
 }
 
 static void drawtoggle(const char *label, bool selected)
@@ -290,7 +290,7 @@ static void drawregister(const struct console_state *snapshot)
               snapshot->cpu.accumulator);
     mvwprintw(RegistersView.content, cursor_y++, 0, "X:  %02X",
               snapshot->cpu.xindex);
-    mvwprintw(RegistersView.content, cursor_y++, 0, "Y:  %02X",
+    mvwprintw(RegistersView.content, cursor_y, 0, "Y:  %02X",
               snapshot->cpu.yindex);
 }
 

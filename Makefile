@@ -95,7 +95,8 @@ nestest: debug
 	$(TARGET) -bt -Hc6bd -rc000 nestest.nes
 
 $(NESTEST_CMP):
-	sed 's/PPU:.\{3\},.\{3\} //' nestest.log > $@
+	# Strip out PPU column (unimplemented) and Accumulator cue (implied)
+	sed -e 's/PPU:.\{3\},.\{3\} //' -e 's/ A /   /' nestest.log > $@
 
 $(TRACE_CMP):
 	sed -e 's/:/ /' -e 's/>/=/' -e 's/S:/SP:/' -e 's/CPU/CYC/' \

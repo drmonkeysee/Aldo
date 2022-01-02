@@ -491,7 +491,8 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
     int total = 0;
     const char *const interrupt = interrupt_display(snapshot);
     if (strlen(interrupt) > 0) {
-        total = sprintf(dis, "%s > ", interrupt);
+        int count = total = sprintf(dis, "%s > ", interrupt);
+        if (count < 0) return count;
         const char *fmt;
         uint16_t vector;
         if (snapshot->datapath.res == NIS_COMMITTED
@@ -502,7 +503,9 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
             fmt = "%04X";
             vector = interrupt_vector(snapshot);
         }
-        total += sprintf(dis + total, fmt, vector);
+        count = sprintf(dis + total, fmt, vector);
+        if (count < 0) return count;
+        total += count;
     } else {
         cpu_ctx *const peekctx = cpu_peek_start(cpu);
         const struct cpu_peekresult peek = cpu_peek(cpu, addr);

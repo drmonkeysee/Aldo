@@ -29,7 +29,8 @@ enum nistate {
 
 struct console_state {
     struct {
-        char formatdesc[20];
+        int format;
+        uint8_t mapid;
     } cart;
     struct {
         size_t prglength;       // Number of bytes copied to prgview

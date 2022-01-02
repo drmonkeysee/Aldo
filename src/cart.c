@@ -139,6 +139,11 @@ static const char *mirror_name(enum nt_mirroring m)
     }
 }
 
+static uint8_t mapper_id(const struct cartridge *self)
+{
+    return self->format == CRTF_INES ? self->ines_hdr.mapper_id : 0;
+}
+
 static void hr(FILE *f)
 {
     fputs("-----------------------\n", f);
@@ -338,14 +343,33 @@ void cart_write_info(cart *self, FILE *f, bool verbose)
 
 void cart_write_dis_header(cart *self, FILE *f)
 {
-    fputs(format_name(self->format), f);
-    if (self->format == CRTF_INES) {
-        fprintf(f, " (%03d)", self->ines_hdr.mapper_id);
-    }
+    char fmtd[CART_FMT_SIZE];
+    const int result = cart_fmtdescription(self->format, mapper_id(self),
+                                           fmtd);
+    fputs(result > 0 ? fmtd : "Invalid Format", f);
     fputs("\n\nDisassembly of PRG Banks\n", f);
     if (self->format != CRTF_ALDO) {
         fputs("(NOTE: approximate for non-Aldo formats)\n", f);
     }
+}
+
+int cart_fmtdescription(int format, uint8_t mapid,
+                        char buf[restrict static CART_FMT_SIZE])
+{
+    assert(buf != NULL);
+
+    int count, total;
+    total = count = sprintf(buf, "%s", format_name(format));
+    if (count < 0) return count;
+
+    if (format == CRTF_INES) {
+        count = sprintf(buf + total, " (%03d)", mapid);
+        if (count < 0) return count;
+        total += count;
+    }
+
+    assert(total < CART_FMT_SIZE);
+    return total;
 }
 
 void cart_snapshot(cart *self, struct console_state *snapshot)
@@ -353,13 +377,6 @@ void cart_snapshot(cart *self, struct console_state *snapshot)
     assert(self != NULL);
     assert(snapshot != NULL);
 
-    const int len = snprintf(snapshot->cart.formatdesc,
-                             sizeof snapshot->cart.formatdesc, "%s",
-                             format_name(self->format));
-    if (len < 0) return;
-    if (self->format == CRTF_INES) {
-        snprintf(snapshot->cart.formatdesc + len,
-                 sizeof snapshot->cart.formatdesc - len, " (%03d)",
-                 self->ines_hdr.mapper_id);
-    }
+    snapshot->cart.format = self->format;
+    snapshot->cart.mapid = mapper_id(self);
 }

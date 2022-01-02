@@ -46,6 +46,10 @@ enum nt_mirroring {
 #undef X
 };
 
+enum {
+    CART_FMT_SIZE = 17, // Format description is at most 16 chars
+};
+
 // iNES File Header
 // TODO: ignoring following fields for now:
 //  - VS/Playchoice system indicator (does anyone care?)
@@ -88,6 +92,9 @@ void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr);
 
 void cart_write_info(cart *self, FILE *f, bool verbose);
 void cart_write_dis_header(cart *self, FILE *f);
+
+int cart_fmtdescription(int format, uint8_t mapid,
+                        char buf[restrict static CART_FMT_SIZE]);
 void cart_snapshot(cart *self, struct console_state *snapshot);
 
 #endif

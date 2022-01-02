@@ -108,7 +108,7 @@ X(INDY, 2,                                      /* (Indirect),Y */ \
   XPEEK("> %04X @ %04X = %02X", peek.interaddr, peek.finaladdr, peek.data), \
   "(zp),Y", "($%02X),Y") \
 X(ABS, 3,                                       /* Absolute */ \
-  XPEEK(""), \
+  XPEEK("= %02X", peek.data), \
   "abs", "$??%02X", "$%04X") \
 X(ABSX, 3,                                      /* Absolute,X */ \
   XPEEK("@ %04X = %02X", peek.finaladdr, peek.data), \

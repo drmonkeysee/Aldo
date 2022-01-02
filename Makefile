@@ -108,7 +108,7 @@ $(TRACE_CMP):
 		printf "%-47s%s%s\n", $$1, FS, $$2 }' > $@
 
 nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
-	diff -q $^
+	echo "$$(diff $^ | wc -l) lines differ"
 
 clean:
 	$(RM) -r $(BUILD_DIR)

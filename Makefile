@@ -92,7 +92,7 @@ run: debug
 
 nestest: debug
 	rm -f $(TRACE_CMP)
-	$(TARGET) -t -rc000 nestest.nes
+	$(TARGET) -bt -Hc6bd -rc000 nestest.nes
 
 $(NESTEST_CMP):
 	sed 's/PPU:.\{3\},.\{3\} //' nestest.log > $@
@@ -108,7 +108,7 @@ $(TRACE_CMP):
 		printf "%-47s%s%s\n", $$1, FS, $$2 }' > $@
 
 nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
-	diff --strip-trailing-cr $^
+	diff $^
 
 clean:
 	$(RM) -r $(BUILD_DIR)

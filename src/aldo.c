@@ -159,21 +159,37 @@ static void update(struct control *appstate, struct console_state *snapshot,
     ui->refresh(appstate, snapshot);
 }
 
+static void cleanup_debugger(debugctx **dbg)
+{
+    debug_free(*dbg);
+    *dbg = NULL;
+}
+
 static int emu_loop(struct control *appstate, cart *c)
 {
-    int result = EXIT_SUCCESS;
+    if (appstate->batch && appstate->tron && appstate->haltaddr < 0) {
+        fprintf(stderr, "*** WARNING ***\nYou have turned on trace-logging"
+                " with batch mode but specified no halt condition;\n"
+                "this can result in a very large trace file very quickly!\n"
+                "Continue? [yN] ");
+        const int input = getchar();
+        if (input != 'y' && input != 'Y') return EXIT_FAILURE;
+    }
+
     debugctx *dbg = debug_new(appstate);
     nes *console = nes_new(c, appstate->tron, dbg);
     if (!console) {
-        result = EXIT_FAILURE;
-        goto cleanup;
+        cleanup_debugger(&dbg);
+        return EXIT_FAILURE;
     };
 
     nes_powerup(console);
 
-    // TODO: if batch mode
-    nes_ready(console);
-    nes_mode(console, NEXC_RUN);
+    // NOTE: set NES to run immediately in batch mode
+    if (appstate->batch) {
+        nes_mode(console, NEXC_RUN);
+        nes_ready(console);
+    }
 
     // NOTE: initialize snapshot from console
     struct console_state snapshot;
@@ -203,11 +219,8 @@ static int emu_loop(struct control *appstate, cart *c)
     snapshot.mem.ram = NULL;
     nes_free(console);
     console = NULL;
-
-cleanup:
-    debug_free(dbg);
-    dbg = NULL;
-    return result;
+    cleanup_debugger(&dbg);
+    return EXIT_SUCCESS;
 }
 
 static int run_cmd(struct control *appstate, cart *c)

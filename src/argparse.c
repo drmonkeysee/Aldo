@@ -18,6 +18,7 @@
 static const char
     *const restrict Version = "0.3.0", // TODO: autogenerate this
 
+    *const restrict BatchLong = "--batch",
     *const restrict ChrDecodeLong = "--chr-decode",
     *const restrict ChrScaleLong = "--chr-scale",
     *const restrict DisassembleLong = "--disassemble",
@@ -29,6 +30,7 @@ static const char
     *const restrict VersionLong = "--version";
 
 static const char
+    BatchShort = 'b',
     ChrDecodeShort = 'c',
     ChrScaleShort = 's',
     DisassembleShort = 'd',
@@ -144,6 +146,7 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
                              &appstate->resetvector);
     }
 
+    setflag(appstate->batch, arg, BatchShort, BatchLong);
     setflag(appstate->disassemble, arg, DisassembleShort, DisassembleLong);
     setflag(appstate->help, arg, HelpShort, HelpLong);
     setflag(appstate->info, arg, InfoShort, InfoLong);
@@ -191,6 +194,8 @@ void argparse_usage(const char *me)
     puts("---=== Aldo Usage ===---");
     printf("%s [options...] [command] file\n", me);
     puts("\noptions");
+    printf("  -%c\t: run program in batch mode (also %s)\n", BatchShort,
+           BatchLong);
     printf("  -%c x\t: HALT when PC reaches this address [0x%X, 0x%X]"
            " (also %s x)\n", HaltShort, MinAddress, MaxAddress, HaltLong);
     printf("  -%c x\t: override RESET vector [0x%X, 0x%X]"

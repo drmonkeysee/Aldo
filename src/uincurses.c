@@ -181,14 +181,14 @@ static void drawdebugger(const struct control *appstate,
               appstate->tron ? "On" : "Off");
     mvwaddstr(DebuggerView.content, cursor_y++, 0, "Reset Override: ");
     if (snapshot->debugger.resvector_override >= 0) {
-        wprintw(DebuggerView.content, "%04X",
+        wprintw(DebuggerView.content, "$%04X",
                 snapshot->debugger.resvector_override);
     } else {
         waddstr(DebuggerView.content, "None");
     }
     mvwaddstr(DebuggerView.content, cursor_y, 0, "Halt @: ");
     if (snapshot->debugger.halt_address >= 0) {
-        wprintw(DebuggerView.content, "%04X", snapshot->debugger.halt_address);
+        wprintw(DebuggerView.content, "$%04X", snapshot->debugger.halt_address);
     } else {
         waddstr(DebuggerView.content, "None");
     }

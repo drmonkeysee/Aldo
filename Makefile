@@ -108,7 +108,7 @@ $(TRACE_CMP):
 		printf "%-47s%s%s\n", $$1, FS, $$2 }' > $@
 
 nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
-	diff $^
+	diff -q $^
 
 clean:
 	$(RM) -r $(BUILD_DIR)

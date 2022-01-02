@@ -1397,6 +1397,27 @@ static void sbc_borrowout_avoids_overflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+// SOURCE: nestest
+static void sbc_overflow_without_borrow(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.p.c = true;
+    cpu.a = 0x7f;   // 127 - (-128)
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xffu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
 //
 // Test List
 //
@@ -1480,6 +1501,7 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(sbc_overflow_to_positive),
         ct_maketest(sbc_borrowout_causes_overflow),
         ct_maketest(sbc_borrowout_avoids_overflow),
+        ct_maketest(sbc_overflow_without_borrow),
     };
 
     return ct_makesuite(tests);

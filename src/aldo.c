@@ -35,9 +35,6 @@ static cart *load_cart(const char *filename)
     const int err = cart_create(&c, cartfile);
     if (err < 0) {
         fprintf(stderr, "Cart load failure (%d): %s\n", err, cart_errstr(err));
-        if (err == CART_ERR_IO) {
-            perror("Cart IO error");
-        }
     }
     fclose(cartfile);
 
@@ -68,7 +65,7 @@ static int decode_cart_chr(const struct control *appstate, cart *c)
     if (err < 0) {
         fprintf(stderr, "CHR decode error (%d): %s\n", err,
                 dis_errstr(err));
-        if (err == DIS_ERR_IO) {
+        if (err == DIS_ERR_ERNO) {
             perror("CHR decode file error");
         }
         return EXIT_FAILURE;

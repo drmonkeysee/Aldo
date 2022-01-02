@@ -319,7 +319,7 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections, int scale,
         packedrow_size = ceil(bmpw / 8.0) * 4;
 
     FILE *const bmpfile = fopen(filename, "wb");
-    if (!bmpfile) return DIS_ERR_IO;
+    if (!bmpfile) return DIS_ERR_ERNO;
 
     // NOTE: write BMP header fields; BMP format is little-endian so use
     // byte arrays rather than structs to avoid arch-specific endianness.
@@ -416,7 +416,7 @@ static int write_chrbank(const struct bankview *bv, int scale,
     char bmpfilename[128];
     prefix = prefix && strlen(prefix) > 0 ? prefix : "bank";
     if (snprintf(bmpfilename, sizeof bmpfilename, "%.120s%03zu.bmp", prefix,
-                 bv->bank) < 0) return DIS_ERR_IO;
+                 bv->bank) < 0) return DIS_ERR_ERNO;
 
     fprintf(f, "Bank %zu (%zuKB), %d x %d tiles (%d section%s)",
             bv->bank, bv->size >> BITWIDTH_1KB, tilesdim, tilesdim,

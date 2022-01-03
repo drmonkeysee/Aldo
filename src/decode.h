@@ -8,6 +8,8 @@
 #ifndef Aldo_decode_h
 #define Aldo_decode_h
 
+#include <stdbool.h>
+
 // 6502 Instructions
 // X(symbol, instruction dispatch arguments...)
 #define DEC_INST_X \
@@ -171,6 +173,7 @@ enum addrmode {
 struct decoded {
     enum inst instruction;
     enum addrmode mode;
+    bool unofficial;
 };
 
 extern const int BrkOpcode;

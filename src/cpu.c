@@ -1314,11 +1314,10 @@ static void JAM_sequence(struct mos6502 *self, struct decoded dec)
     case 2:
     case 3:
     case 4:
-    case 5:
-    case 6:
         break;
-    case 7:
-        // NOTE: let t go to 7 temporarily to simulate getting stuck at T6
+    case 5:
+        // NOTE: forever instructions have 5 time states (T0-T4)
+        // http://visual6502.org/wiki/index.php?title=6502_Timing_States#Forever_Instructions
         --self->t;
         break;
     default:
@@ -1329,7 +1328,7 @@ static void JAM_sequence(struct mos6502 *self, struct decoded dec)
 
 static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
 {
-    assert(0 < self->t && (self->t < MaxCycleCount || dec.mode == AM_JAM));
+    assert(0 < self->t && self->t < MaxCycleCount);
 
     switch (dec.mode) {
 #define X(s, b, p, ...) case AM_ENUM(s): s##_sequence(self, dec); break;
@@ -1425,7 +1424,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->datapath.exec_cycle = self->t;
     snapshot->datapath.instdone = self->presync;
     snapshot->datapath.irq = self->irq;
-    snapshot->datapath.jammed = self->t == 6
+    snapshot->datapath.jammed = self->t == 4
                                     && Decode[self->opc].mode == AM_JAM;
     snapshot->datapath.nmi = self->nmi;
     snapshot->datapath.opcode = self->opc;

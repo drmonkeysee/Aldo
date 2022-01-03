@@ -1437,7 +1437,7 @@ static void jam(void *ctx)
         ct_assertequal(20, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(1u, cpu.pc, "Failed on opcode %02x", opc);
 
-        ct_assertequal(6, cpu.t, "Failed on opcode %02x", opc);
+        ct_assertequal(4, cpu.t, "Failed on opcode %02x", opc);
         ct_assertequal(0xffu, cpu.databus, "Failed on opcode %02x", opc);
         ct_assertfalse(cpu.presync, "Failed on opcode %02x", opc);
     }

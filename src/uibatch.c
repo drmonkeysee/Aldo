@@ -65,8 +65,8 @@ static void batch_tick_start(struct control *appstate,
     // NOTE: 1 cycle per tick approximates running emu at native cpu speed
     appstate->clock.budget = 1;
 
-    // NOTE: if cpu halts, exit batch mode
-    if (!snapshot->lines.ready) {
+    // NOTE: if cpu halts or jams, exit batch mode
+    if (!snapshot->lines.ready || snapshot->datapath.jammed) {
         appstate->running = false;
     }
 }

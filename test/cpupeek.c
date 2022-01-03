@@ -324,6 +324,20 @@ static void peek_absolute_indirect(void *ctx)
     ct_assertequal(0x2u, result.data);
 }
 
+static void peek_jam(void *ctx)
+{
+    // NOTE: JAM
+    uint8_t mem[] = {0x02, 0x10};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
+    // NOTE: throw away return value, no need to clean up peek state in test
+    (void)cpu_peek_start(&cpu);
+
+    const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
+
+    ct_assertequal(AM_JAM, (int)result.mode);
+}
+
 //
 // Test List
 //
@@ -346,6 +360,7 @@ struct ct_testsuite cpu_peek_tests(void)
         ct_maketest(peek_branch),
         ct_maketest(peek_branch_forced),
         ct_maketest(peek_absolute_indirect),
+        ct_maketest(peek_jam),
     };
 
     return ct_makesuite(tests);

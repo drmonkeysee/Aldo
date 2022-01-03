@@ -793,6 +793,11 @@ static void TYA_exec(struct mos6502 *self)
     load_register(self, &self->a, self->y);
 }
 
+static void JAM_exec(struct mos6502 *self)
+{
+    self->databus = 0xff;
+}
+
 static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 {
     switch (dec.instruction) {
@@ -1300,9 +1305,31 @@ static void RTI_sequence(struct mos6502 *self, struct decoded dec)
     }
 }
 
+static void JAM_sequence(struct mos6502 *self, struct decoded dec)
+{
+    switch (self->t) {
+    case 1:
+        dispatch_instruction(self, dec);
+        break;
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+        break;
+    case 7:
+        // NOTE: let t go to 7 temporarily to simulate getting stuck at T6
+        --self->t;
+        break;
+    default:
+        BAD_ADDR_SEQ;
+        break;
+    }
+}
+
 static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
 {
-    assert(0 < self->t && self->t < MaxCycleCount);
+    assert(0 < self->t && (self->t < MaxCycleCount || dec.mode == AM_JAM));
 
     switch (dec.mode) {
 #define X(s, b, p, ...) case AM_ENUM(s): s##_sequence(self, dec); break;
@@ -1433,6 +1460,8 @@ struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
     self->pc = addr;
     cpu_cycle(self);
     struct cpu_peekresult result = {.mode = Decode[self->opc].mode};
+    if (result.mode == AM_JAM) return result;
+
     do {
         cpu_cycle(self);
         if (self->t == 2 && result.mode == AM_INDY) {

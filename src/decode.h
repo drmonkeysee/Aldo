@@ -83,7 +83,10 @@ X(TAY, self)        /* Transfer accumulator to y index */ \
 X(TSX, self)        /* Transfer stack pointer to x index */ \
 X(TXA, self)        /* Transfer x index to accumulator */ \
 X(TXS, self)        /* Transfer x index to stack pointer */ \
-X(TYA, self)        /* Transfer y index to accumulator */
+X(TYA, self)        /* Transfer y index to accumulator */ \
+\
+/* Unofficial Opcodes */ \
+X(JAM, self)        /* No instruction signal, jams the cpu */
 
 // Addressing Modes
 // X(symbol, byte count, peek template, display strings...)
@@ -151,6 +154,11 @@ X(BRK, 1,                                       /* Break, interrupt, reset */ \
   XPEEK(""), \
   "imp", "%s") \
 X(RTI, 1,                                       /* Return from interrupt */ \
+  XPEEK(""), \
+  "imp", "") \
+\
+/* Unofficial Modes */ \
+X(JAM, 1,                                       /* Jammed instruction */ \
   XPEEK(""), \
   "imp", "")
 

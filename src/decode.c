@@ -10,6 +10,7 @@
 #define UNDEF {IN_UDF, AM_IMP, false}
 #define OP(op, am) {op, am, false}
 #define UP(op, am) {op, am, true}
+#define JAM {IN_JAM, AM_JAM, true}
 
 const int BrkOpcode = 0x0;
 
@@ -18,7 +19,7 @@ const int BrkOpcode = 0x0;
 const struct decoded Decode[] = {
     OP(IN_BRK, AM_BRK),     // 00 - BRK
     OP(IN_ORA, AM_INDX),    // 01 - ORA (zp,X)
-    UNDEF,                  // 02 - Undefined
+    JAM,                    // 02 - JAM (KIL, HLT)
     UNDEF,                  // 03 - Undefined
     UNDEF,                  // 04 - Undefined
     OP(IN_ORA, AM_ZP),      // 05 - ORA zp
@@ -34,7 +35,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // 0F - Undefined
     OP(IN_BPL, AM_BCH),     // 10 - BPL
     OP(IN_ORA, AM_INDY),    // 11 - ORA (zp),Y
-    UNDEF,                  // 12 - Undefined
+    JAM,                    // 12 - JAM (KIL, HLT)
     UNDEF,                  // 13 - Undefined
     UNDEF,                  // 14 - Undefined
     OP(IN_ORA, AM_ZPX),     // 15 - ORA zp,X
@@ -50,7 +51,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // 1F - Undefined
     OP(IN_JSR, AM_JSR),     // 20 - JSR
     OP(IN_AND, AM_INDX),    // 21 - AND (zp,X)
-    UNDEF,                  // 22 - Undefined
+    JAM,                    // 22 - JAM (KIL, HLT)
     UNDEF,                  // 23 - Undefined
     OP(IN_BIT, AM_ZP),      // 24 - BIT zp
     OP(IN_AND, AM_ZP),      // 25 - AND zp
@@ -66,7 +67,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // 2F - Undefined
     OP(IN_BMI, AM_BCH),     // 30 - BMI
     OP(IN_AND, AM_INDY),    // 31 - AND (zp),Y
-    UNDEF,                  // 32 - Undefined
+    JAM,                    // 32 - JAM (KIL, HLT)
     UNDEF,                  // 33 - Undefined
     UNDEF,                  // 34 - Undefined
     OP(IN_AND, AM_ZPX),     // 35 - AND zp,X
@@ -82,7 +83,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // 3F - Undefined
     OP(IN_RTI, AM_RTI),     // 40 - RTI
     OP(IN_EOR, AM_INDX),    // 41 - EOR (zp,X)
-    UNDEF,                  // 42 - Undefined
+    JAM,                    // 42 - JAM (KIL, HLT)
     UNDEF,                  // 43 - Undefined
     UNDEF,                  // 44 - Undefined
     OP(IN_EOR, AM_ZP),      // 45 - EOR zp
@@ -98,7 +99,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // 4F - Undefined
     OP(IN_BVC, AM_BCH),     // 50 - BVC
     OP(IN_EOR, AM_INDY),    // 51 - EOR (zp),Y
-    UNDEF,                  // 52 - Undefined
+    JAM,                    // 52 - JAM (KIL, HLT)
     UNDEF,                  // 53 - Undefined
     UNDEF,                  // 54 - Undefined
     OP(IN_EOR, AM_ZPX),     // 55 - EOR zp,X
@@ -114,7 +115,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // 5F - Undefined
     OP(IN_RTS, AM_RTS),     // 60 - RTS
     OP(IN_ADC, AM_INDX),    // 61 - ADC (zp,X)
-    UNDEF,                  // 62 - Undefined
+    JAM,                    // 62 - JAM (KIL, HLT)
     UNDEF,                  // 63 - Undefined
     UNDEF,                  // 64 - Undefined
     OP(IN_ADC, AM_ZP),      // 65 - ADC zp
@@ -130,7 +131,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // 6F - Undefined
     OP(IN_BVS, AM_BCH),     // 70 - BVS
     OP(IN_ADC, AM_INDY),    // 71 - ADC (zp),Y
-    UNDEF,                  // 72 - Undefined
+    JAM,                    // 72 - JAM (KIL, HLT)
     UNDEF,                  // 73 - Undefined
     UNDEF,                  // 74 - Undefined
     OP(IN_ADC, AM_ZPX),     // 75 - ADC zp,X
@@ -162,7 +163,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // 8F - Undefined
     OP(IN_BCC, AM_BCH),     // 90 - BCC
     OP(IN_STA, AM_INDY),    // 91 - STA (zp),Y
-    UNDEF,                  // 92 - Undefined
+    JAM,                    // 92 - JAM (KIL, HLT)
     UNDEF,                  // 93 - Undefined
     OP(IN_STY, AM_ZPX),     // 94 - STY zp,X
     OP(IN_STA, AM_ZPX),     // 95 - STA zp,X
@@ -194,7 +195,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // AF - Undefined
     OP(IN_BCS, AM_BCH),     // B0 - BCS
     OP(IN_LDA, AM_INDY),    // B1 - LDA (zp),Y
-    UNDEF,                  // B2 - Undefined
+    JAM,                    // B2 - JAM (KIL, HLT)
     UNDEF,                  // B3 - Undefined
     OP(IN_LDY, AM_ZPX),     // B4 - LDY zp,X
     OP(IN_LDA, AM_ZPX),     // B5 - LDA zp,X
@@ -226,7 +227,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // CF - Undefined
     OP(IN_BNE, AM_BCH),     // D0 - BNE
     OP(IN_CMP, AM_INDY),    // D1 - CMP (zp),Y
-    UNDEF,                  // D2 - Undefined
+    JAM,                    // D2 - JAM (KIL, HLT)
     UNDEF,                  // D3 - Undefined
     UNDEF,                  // D4 - Undefined
     OP(IN_CMP, AM_ZPX),     // D5 - CMP zp,X
@@ -258,7 +259,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // EF - Undefined
     OP(IN_BEQ, AM_BCH),     // F0 - BEQ
     OP(IN_SBC, AM_INDY),    // F1 - SBC (zp),Y
-    UNDEF,                  // F2 - Undefined
+    JAM,                    // F2 - JAM (KIL, HLT)
     UNDEF,                  // F3 - Undefined
     UNDEF,                  // F4 - Undefined
     OP(IN_SBC, AM_ZPX),     // F5 - SBC zp,X

@@ -15,7 +15,7 @@
 const int BrkOpcode = 0x0;
 
 // Decoding table for all official MOS6502
-// and unofficial Ricoh 2A03 opcodes.
+// and unofficial (undocumented, illegal) Ricoh 2A03 opcodes.
 const struct decoded Decode[] = {
     OP(IN_BRK, AM_BRK),     // 00 - BRK
     OP(IN_ORA, AM_INDX),    // 01 - ORA (zp,X)

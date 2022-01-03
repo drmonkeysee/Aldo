@@ -302,6 +302,18 @@ static void inst_disassembles_brk(void *ctx)
     ct_assertequalstr("1234: 00        BRK", buf);
 }
 
+static void inst_disassembles_unofficial(void *ctx)
+{
+    const uint16_t a = 0x1234;
+    const uint8_t bytes[] = {0x02};
+    char buf[DIS_INST_SIZE];
+
+    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+
+    ct_assertequal(1, length);
+    ct_assertequalstr("1234: 02       *JAM", buf);
+}
+
 //
 // Disassemble Peek
 //
@@ -2177,6 +2189,7 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(inst_disassembles_jsr),
         ct_maketest(inst_disassembles_rts),
         ct_maketest(inst_disassembles_brk),
+        ct_maketest(inst_disassembles_unofficial),
 
         ct_maketest(peek_immediate),
         ct_maketest(peek_zeropage),

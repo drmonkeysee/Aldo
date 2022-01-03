@@ -474,6 +474,9 @@ int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
 
     count = print_mnemonic(&dec, bytes, instlen, dis + total);
     if (count < 0) return count;
+    if (dec.unofficial && total > 0) {
+        dis[total - 1] = '*';
+    }
     total += count;
 
     assert((unsigned int)total < DIS_INST_SIZE);

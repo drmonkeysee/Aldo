@@ -1425,6 +1425,8 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->datapath.exec_cycle = self->t;
     snapshot->datapath.instdone = self->presync;
     snapshot->datapath.irq = self->irq;
+    snapshot->datapath.jammed = self->t == 6
+                                    && Decode[self->opc].mode == AM_JAM;
     snapshot->datapath.nmi = self->nmi;
     snapshot->datapath.opcode = self->opc;
     snapshot->datapath.res = self->res;

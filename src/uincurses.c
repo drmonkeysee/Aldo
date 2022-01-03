@@ -377,10 +377,16 @@ static void drawdatapath(const struct console_state *snapshot)
     mvwvline(DatapathView.content, cursor_y, vsep3, 0, seph);
     mvwvline(DatapathView.content, cursor_y, vsep4, 0, seph);
 
-    char buf[DIS_DATAP_SIZE];
-    const int wlen = dis_datapath(snapshot, buf);
-    const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
-    mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);
+    if (snapshot->datapath.jammed) {
+        wattron(DatapathView.content, A_STANDOUT);
+        mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, " JAMMED ");
+        wattroff(DatapathView.content, A_STANDOUT);
+    } else {
+        char buf[DIS_DATAP_SIZE];
+        const int wlen = dis_datapath(snapshot, buf);
+        const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
+        mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);
+    }
 
     mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adl: %02X",
               snapshot->datapath.addrlow_latch);

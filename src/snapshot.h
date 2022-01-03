@@ -50,7 +50,7 @@ struct console_state {
         uint16_t addressbus, current_instruction;
         uint8_t addrlow_latch, addrhigh_latch, addrcarry_latch, databus,
                 exec_cycle, opcode;
-        bool busfault, instdone;
+        bool busfault, instdone, jammed;
     } datapath;
     struct {
         uint16_t program_counter;

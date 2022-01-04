@@ -102,6 +102,9 @@ static void batch_refresh(const struct control *appstate,
 static void batch_cleanup(const struct control *appstate,
                           const struct console_state *snapshot)
 {
+    assert(appstate != NULL);
+    assert(snapshot != NULL);
+
     const struct timespec elapsed = timespec_elapsed(&Start);
     const double runtime = timespec_to_ms(&elapsed);
     const bool scale_ms = runtime < TSU_MS_PER_S;

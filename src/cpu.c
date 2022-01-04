@@ -284,7 +284,6 @@ static void store_data(struct mos6502 *self, uint8_t d)
     write(self);
 }
 
-// NOTE: A + B + C
 static void arithmetic_sum(struct mos6502 *self, uint8_t b, bool c)
 {
     commit_operation(self);
@@ -1317,6 +1316,7 @@ static void JAM_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 5:
         // NOTE: forever instructions have 5 time states (T0-T4)
+        // so use T5 to rewind time back to T4, jamming the processor.
         // http://visual6502.org/wiki/index.php?title=6502_Timing_States#Forever_Instructions
         --self->t;
         break;
@@ -1461,6 +1461,8 @@ struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
     self->pc = addr;
     cpu_cycle(self);
     struct cpu_peekresult result = {.mode = Decode[self->opc].mode};
+    // NOTE: can't run the cpu to peek JAM or it'll jam the cpu!
+    // Fortunately all we need is the addressing mode so return that.
     if (result.mode == AM_JAM) return result;
 
     do {

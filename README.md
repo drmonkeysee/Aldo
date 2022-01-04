@@ -38,6 +38,6 @@ The Makefile also provides a unit-test build target.
 - [6502.org](http://6502.org)
 - [Programming the 6502, 4th Edition](https://archive.org/details/Programming_the_6502_OCR)
 - [Easy 6502](https://skilldrick.github.io/easy6502/)
-- [Virtual 6502](http://visual6502.org)
+- [Visual 6502](http://visual6502.org)
 - [Ben Eater](https://eater.net)
 - [Modern C](https://modernc.gforge.inria.fr)

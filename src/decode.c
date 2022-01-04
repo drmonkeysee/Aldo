@@ -30,7 +30,7 @@ const struct decoded Decode[] = {
     OP(IN_ORA, AM_INDX),    // 01 - ORA (zp,X)
     JAM,                    // 02 - *JAM (KIL, HLT)
     UNDEF,                  // 03 - Undefined
-    UNDEF,                  // 04 - Undefined
+    UP(IN_NOP, AM_ZP),      // 04 - *NOP zp
     OP(IN_ORA, AM_ZP),      // 05 - ORA zp
     OP(IN_ASL, AM_ZP),      // 06 - ASL zp
     UNDEF,                  // 07 - Undefined
@@ -94,7 +94,7 @@ const struct decoded Decode[] = {
     OP(IN_EOR, AM_INDX),    // 41 - EOR (zp,X)
     JAM,                    // 42 - *JAM (KIL, HLT)
     UNDEF,                  // 43 - Undefined
-    UNDEF,                  // 44 - Undefined
+    UP(IN_NOP, AM_ZP),      // 44 - *NOP zp
     OP(IN_EOR, AM_ZP),      // 45 - EOR zp
     OP(IN_LSR, AM_ZP),      // 46 - LSR zp
     UNDEF,                  // 47 - Undefined
@@ -126,7 +126,7 @@ const struct decoded Decode[] = {
     OP(IN_ADC, AM_INDX),    // 61 - ADC (zp,X)
     JAM,                    // 62 - *JAM (KIL, HLT)
     UNDEF,                  // 63 - Undefined
-    UNDEF,                  // 64 - Undefined
+    UP(IN_NOP, AM_ZP),      // 64 - *NOP zp
     OP(IN_ADC, AM_ZP),      // 65 - ADC zp
     OP(IN_ROR, AM_ZP),      // 66 - ROR zp
     UNDEF,                  // 67 - Undefined

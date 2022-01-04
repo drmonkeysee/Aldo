@@ -646,7 +646,8 @@ static void LSR_exec(struct mos6502 *self, struct decoded dec)
 static void NOP_exec(struct mos6502 *self, struct decoded dec)
 {
     // NOTE: unofficial NOPs have non-implied addressing modes
-    if (dec.mode == AM_IMM) {
+    // that trigger reads.
+    if (dec.mode != AM_IMP) {
         read(self);
     }
     commit_operation(self);

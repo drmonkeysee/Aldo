@@ -552,25 +552,33 @@ static void lsr_all_ones(void *ctx)
 
 static void nop(void *ctx)
 {
-    
-    uint8_t mem[] = {0xea, 0xff};
-    struct mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    const uint8_t nopcodes[] = {
+        // Official
+        0xea,
+        // Unofficial
+        0x1a, 0x3a, 0x5a, 0x7a, 0xda, 0xfa,
+    };
+    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+        const uint8_t opc = nopcodes[c];
+        uint8_t mem[] = {opc, 0xff};
+        struct mos6502 cpu;
+        setup_cpu(&cpu, mem, NULL);
 
-    const int cycles = clock_cpu(&cpu);
+        const int cycles = clock_cpu(&cpu);
 
-    ct_assertequal(2, cycles);
-    ct_assertequal(1u, cpu.pc);
-    ct_assertequal(0xffu, cpu.databus);
+        ct_assertequal(2, cycles, "Failed on opcode %02x", opc);
+        ct_assertequal(1u, cpu.pc, "Failed on opcode %02x", opc);
+        ct_assertequal(0xffu, cpu.databus, "Failed on opcode %02x", opc);
 
-    // NOTE: verify NOP did nothing
-    struct console_state sn;
-    cpu_snapshot(&cpu, &sn);
-    ct_assertequal(0u, cpu.a);
-    ct_assertequal(0u, cpu.s);
-    ct_assertequal(0u, cpu.x);
-    ct_assertequal(0u, cpu.y);
-    ct_assertequal(0x34u, sn.cpu.status);
+        // NOTE: verify NOP did nothing
+        struct console_state sn;
+        cpu_snapshot(&cpu, &sn);
+        ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.x, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.y, "Failed on opcode %02x", opc);
+        ct_assertequal(0x34u, sn.cpu.status, "Failed on opcode %02x", opc);
+    }
 }
 
 static void rol(void *ctx)

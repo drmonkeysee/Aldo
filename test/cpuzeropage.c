@@ -1665,7 +1665,7 @@ static void stx_zpy_pageoverflow(void *ctx)
 // Unofficial Opcodes
 //
 
-static void nop(void *ctx)
+static void nop_zp(void *ctx)
 {
     const uint8_t nopcodes[] = {0x4, 0x44, 0x64};
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
@@ -1686,6 +1686,60 @@ static void nop(void *ctx)
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.x, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.y, "Failed on opcode %02x", opc);
+        ct_assertequal(0x34u, sn.cpu.status, "Failed on opcode %02x", opc);
+    }
+}
+
+static void nop_zpx(void *ctx)
+{
+    const uint8_t nopcodes[] = {0x14, 0x34, 0x54, 0x74, 0xd4, 0xf4};
+    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+        const uint8_t opc = nopcodes[c];
+        uint8_t mem[] = {opc, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xb};
+        struct mos6502 cpu;
+        setup_cpu(&cpu, mem, NULL);
+        cpu.x = 4;
+
+        const int cycles = clock_cpu(&cpu);
+
+        ct_assertequal(4, cycles, "Failed on opcode %02x", opc);
+        ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
+        ct_assertequal(0xbu, cpu.databus, "Failed on opcode %02x", opc);
+
+        // NOTE: verify NOP did nothing
+        struct console_state sn;
+        cpu_snapshot(&cpu, &sn);
+        ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
+        ct_assertequal(4u, cpu.x, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.y, "Failed on opcode %02x", opc);
+        ct_assertequal(0x34u, sn.cpu.status, "Failed on opcode %02x", opc);
+    }
+}
+
+static void nop_zpx_overflow(void *ctx)
+{
+    const uint8_t nopcodes[] = {0x14, 0x34, 0x54, 0x74, 0xd4, 0xf4};
+    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+        const uint8_t opc = nopcodes[c];
+        uint8_t mem[] = {opc, 0x3, 0x6, 0xff, 0xff, 0xff, 0xff, 0xb};
+        struct mos6502 cpu;
+        setup_cpu(&cpu, mem, NULL);
+        cpu.x = 0xff;   // Wrap around from $0003 -> $0002
+
+        const int cycles = clock_cpu(&cpu);
+
+        ct_assertequal(4, cycles, "Failed on opcode %02x", opc);
+        ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
+        ct_assertequal(0x6u, cpu.databus, "Failed on opcode %02x", opc);
+
+        // NOTE: verify NOP did nothing
+        struct console_state sn;
+        cpu_snapshot(&cpu, &sn);
+        ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
+        ct_assertequal(0xffu, cpu.x, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.y, "Failed on opcode %02x", opc);
         ct_assertequal(0x34u, sn.cpu.status, "Failed on opcode %02x", opc);
     }
@@ -1795,7 +1849,10 @@ struct ct_testsuite cpu_zeropage_tests(void)
         ct_maketest(stx_zpy),
         ct_maketest(stx_zpy_pageoverflow),
 
-        ct_maketest(nop),
+        // Unofficial Opcodes
+        ct_maketest(nop_zp),
+        ct_maketest(nop_zpx),
+        ct_maketest(nop_zpx_overflow),
     };
 
     return ct_makesuite(tests);

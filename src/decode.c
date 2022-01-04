@@ -46,7 +46,7 @@ const struct decoded Decode[] = {
     OP(IN_ORA, AM_INDY),    // 11 - ORA (zp),Y
     JAM,                    // 12 - *JAM (KIL, HLT)
     UNDEF,                  // 13 - Undefined
-    UNDEF,                  // 14 - Undefined
+    UP(IN_NOP, AM_ZPX),     // 14 - *NOP zp,X
     OP(IN_ORA, AM_ZPX),     // 15 - ORA zp,X
     OP(IN_ASL, AM_ZPX),     // 16 - ASL zp,X
     UNDEF,                  // 17 - Undefined
@@ -78,7 +78,7 @@ const struct decoded Decode[] = {
     OP(IN_AND, AM_INDY),    // 31 - AND (zp),Y
     JAM,                    // 32 - *JAM (KIL, HLT)
     UNDEF,                  // 33 - Undefined
-    UNDEF,                  // 34 - Undefined
+    UP(IN_NOP, AM_ZPX),     // 34 - *NOP zp,X
     OP(IN_AND, AM_ZPX),     // 35 - AND zp,X
     OP(IN_ROL, AM_ZPX),     // 36 - ROL zp,X
     UNDEF,                  // 37 - Undefined
@@ -110,7 +110,7 @@ const struct decoded Decode[] = {
     OP(IN_EOR, AM_INDY),    // 51 - EOR (zp),Y
     JAM,                    // 52 - *JAM (KIL, HLT)
     UNDEF,                  // 53 - Undefined
-    UNDEF,                  // 54 - Undefined
+    UP(IN_NOP, AM_ZPX),     // 54 - *NOP zp,X
     OP(IN_EOR, AM_ZPX),     // 55 - EOR zp,X
     OP(IN_LSR, AM_ZPX),     // 56 - LSR zp,X
     UNDEF,                  // 57 - Undefined
@@ -142,7 +142,7 @@ const struct decoded Decode[] = {
     OP(IN_ADC, AM_INDY),    // 71 - ADC (zp),Y
     JAM,                    // 72 - *JAM (KIL, HLT)
     UNDEF,                  // 73 - Undefined
-    UNDEF,                  // 74 - Undefined
+    UP(IN_NOP, AM_ZPX),     // 74 - *NOP zp,X
     OP(IN_ADC, AM_ZPX),     // 75 - ADC zp,X
     OP(IN_ROR, AM_ZPX),     // 76 - ROR zp,X
     UNDEF,                  // 77 - Undefined
@@ -238,7 +238,7 @@ const struct decoded Decode[] = {
     OP(IN_CMP, AM_INDY),    // D1 - CMP (zp),Y
     JAM,                    // D2 - *JAM (KIL, HLT)
     UNDEF,                  // D3 - Undefined
-    UNDEF,                  // D4 - Undefined
+    UP(IN_NOP, AM_ZPX),     // D4 - *NOP zp,X
     OP(IN_CMP, AM_ZPX),     // D5 - CMP zp,X
     OP(IN_DEC, AM_ZPX),     // D6 - DEC zp,X
     UNDEF,                  // D7 - Undefined
@@ -270,7 +270,7 @@ const struct decoded Decode[] = {
     OP(IN_SBC, AM_INDY),    // F1 - SBC (zp),Y
     JAM,                    // F2 - *JAM (KIL, HLT)
     UNDEF,                  // F3 - Undefined
-    UNDEF,                  // F4 - Undefined
+    UP(IN_NOP, AM_ZPX),     // F4 - *NOP zp,X
     OP(IN_SBC, AM_ZPX),     // F5 - SBC zp,X
     OP(IN_INC, AM_ZPX),     // F6 - INC zp,X
     UNDEF,                  // F7 - Undefined

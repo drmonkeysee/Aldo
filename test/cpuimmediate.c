@@ -1533,6 +1533,7 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(sbc_borrowout_avoids_overflow),
         ct_maketest(sbc_overflow_without_borrow),
 
+        // Unofficial Opcodes
         ct_maketest(nop),
     };
 

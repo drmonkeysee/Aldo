@@ -1345,6 +1345,7 @@ struct ct_testsuite cpu_implied_tests(void)
         ct_maketest(tya_to_zero),
         ct_maketest(tya_to_negative),
 
+        // Unofficial Opcodes
         ct_maketest(jam),
     };
 

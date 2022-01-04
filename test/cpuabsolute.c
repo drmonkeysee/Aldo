@@ -1357,6 +1357,33 @@ static void sta_absy_pagecross(void *ctx)
 }
 
 //
+// Unofficial Opcodes
+//
+
+static void nop_abs(void *ctx)
+{
+    uint8_t mem[] = {0xc, 0x1, 0x80},
+            abs[] = {0xff, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+    ct_assertequal(0x6u, cpu.databus);
+
+    // NOTE: verify NOP did nothing
+    struct console_state sn;
+    cpu_snapshot(&cpu, &sn);
+    ct_assertequal(0u, cpu.a);
+    ct_assertequal(0u, cpu.s);
+    ct_assertequal(0u, cpu.x);
+    ct_assertequal(0u, cpu.y);
+    ct_assertequal(0x34u, sn.cpu.status);
+}
+
+//
 // Test List
 //
 
@@ -1434,6 +1461,9 @@ struct ct_testsuite cpu_absolute_tests(void)
         ct_maketest(sbc_absy_pagecross),
         ct_maketest(sta_absy),
         ct_maketest(sta_absy_pagecross),
+
+        // Unofficial Opcodes
+        ct_maketest(nop_abs),
     };
 
     return ct_makesuite(tests);

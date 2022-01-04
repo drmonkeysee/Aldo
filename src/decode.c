@@ -38,7 +38,7 @@ const struct decoded Decode[] = {
     OP(IN_ORA, AM_IMM),     // 09 - ORA imm
     OP(IN_ASL, AM_IMP),     // 0A - ASL imp
     UNDEF,                  // 0B - Undefined
-    UNDEF,                  // 0C - Undefined
+    UP(IN_NOP, AM_ABS),     // 0C - *NOP abs
     OP(IN_ORA, AM_ABS),     // 0D - ORA abs
     OP(IN_ASL, AM_ABS),     // 0E - ASL abs
     UNDEF,                  // 0F - Undefined

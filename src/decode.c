@@ -156,7 +156,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // 7F - Undefined
     UP(IN_NOP, AM_IMM),     // 80 - *NOP imm
     OP(IN_STA, AM_INDX),    // 81 - STA (zp,X)
-    UP(IN_NOP, AM_IMM),     // 82 - *NOP imm (rarely unstable?)
+    UP(IN_NOP, AM_IMM),     // 82 - *NOP imm (occasionally unstable?)
     UNDEF,                  // 83 - Undefined
     OP(IN_STY, AM_ZP),      // 84 - STY zp
     OP(IN_STA, AM_ZP),      // 85 - STA zp
@@ -220,7 +220,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // BF - Undefined
     OP(IN_CPY, AM_IMM),     // C0 - CPY imm
     OP(IN_CMP, AM_INDX),    // C1 - CMP (zp,X)
-    UP(IN_NOP, AM_IMM),     // C2 - *NOP imm (rarely unstable?)
+    UP(IN_NOP, AM_IMM),     // C2 - *NOP imm (occasionally unstable?)
     UNDEF,                  // C3 - Undefined
     OP(IN_CPY, AM_ZP),      // C4 - CPY zp
     OP(IN_CMP, AM_ZP),      // C5 - CMP zp
@@ -252,7 +252,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // DF - Undefined
     OP(IN_CPX, AM_IMM),     // E0 - CPX imm
     OP(IN_SBC, AM_INDX),    // E1 - SBC (zp,X)
-    UP(IN_NOP, AM_IMM),     // E2 - *NOP imm (rarely unstable?)
+    UP(IN_NOP, AM_IMM),     // E2 - *NOP imm (occasionally unstable?)
     UNDEF,                  // E3 - Undefined
     OP(IN_CPX, AM_ZP),      // E4 - CPX zp
     OP(IN_SBC, AM_ZP),      // E5 - SBC zp

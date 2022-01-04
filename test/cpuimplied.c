@@ -552,6 +552,7 @@ static void lsr_all_ones(void *ctx)
 
 static void nop(void *ctx)
 {
+    
     uint8_t mem[] = {0xea, 0xff};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
@@ -1235,6 +1236,35 @@ static void tya_to_negative(void *ctx)
 }
 
 //
+// Unofficial Opcodes
+//
+
+static void jam(void *ctx)
+{
+    const uint8_t jamcodes[] = {
+        0x02, 0x12, 0x22, 0x32, 0x42, 0x52, 0x62, 0x72, 0x92, 0xb2, 0xd2, 0xf2,
+    };
+    for (size_t c = 0; c < sizeof jamcodes / sizeof jamcodes[0]; ++c) {
+        const uint8_t opc = jamcodes[c];
+        uint8_t mem[] = {opc, 0x00};
+        struct mos6502 cpu;
+        setup_cpu(&cpu, mem, NULL);
+
+        int cycles = 0;
+        do {
+            cycles += cpu_cycle(&cpu);
+        } while (cycles < 20);
+
+        ct_assertequal(20, cycles, "Failed on opcode %02x", opc);
+        ct_assertequal(1u, cpu.pc, "Failed on opcode %02x", opc);
+
+        ct_assertequal(4, cpu.t, "Failed on opcode %02x", opc);
+        ct_assertequal(0xffu, cpu.databus, "Failed on opcode %02x", opc);
+        ct_assertfalse(cpu.presync, "Failed on opcode %02x", opc);
+    }
+}
+
+//
 // Test List
 //
 
@@ -1306,6 +1336,8 @@ struct ct_testsuite cpu_implied_tests(void)
         ct_maketest(tya),
         ct_maketest(tya_to_zero),
         ct_maketest(tya_to_negative),
+
+        ct_maketest(jam),
     };
 
     return ct_makesuite(tests);

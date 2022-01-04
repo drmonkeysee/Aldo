@@ -16,6 +16,15 @@ const int BrkOpcode = 0x0;
 
 // Decoding table for all official MOS6502
 // and unofficial (undocumented, illegal) Ricoh 2A03 opcodes.
+
+// Unofficial opcodes are derived from a combination of sources:
+// http://www.oxyron.de/html/opcodes02.html
+// https://www.nesdev.org/6502_cpu.txt
+// https://www.masswerk.at/nowgobang/2021/6502-illegal-opcodes
+// NOTE: nesdev.org documents $82, $C2, and $E2 (NOP imm) will occasionally
+// jam the cpu but other sources don't mention it,
+// so we emulate them as stable NOPs.
+
 const struct decoded Decode[] = {
     OP(IN_BRK, AM_BRK),     // 00 - BRK
     OP(IN_ORA, AM_INDX),    // 01 - ORA (zp,X)
@@ -145,16 +154,16 @@ const struct decoded Decode[] = {
     OP(IN_ADC, AM_ABSX),    // 7D - ADC abs,X
     OP(IN_ROR, AM_ABSX),    // 7E - ROR abs,X
     UNDEF,                  // 7F - Undefined
-    UNDEF,                  // 80 - Undefined
+    UP(IN_NOP, AM_IMM),     // 80 - *NOP imm
     OP(IN_STA, AM_INDX),    // 81 - STA (zp,X)
-    UNDEF,                  // 82 - Undefined
+    UP(IN_NOP, AM_IMM),     // 82 - *NOP imm (rarely unstable?)
     UNDEF,                  // 83 - Undefined
     OP(IN_STY, AM_ZP),      // 84 - STY zp
     OP(IN_STA, AM_ZP),      // 85 - STA zp
     OP(IN_STX, AM_ZP),      // 86 - STX zp
     UNDEF,                  // 87 - Undefined
     OP(IN_DEY, AM_IMP),     // 88 - DEY
-    UNDEF,                  // 89 - Undefined
+    UP(IN_NOP, AM_IMM),     // 89 - *NOP imm
     OP(IN_TXA, AM_IMP),     // 8A - TXA
     UNDEF,                  // 8B - Undefined
     OP(IN_STY, AM_ABS),     // 8C - STY abs
@@ -211,7 +220,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // BF - Undefined
     OP(IN_CPY, AM_IMM),     // C0 - CPY imm
     OP(IN_CMP, AM_INDX),    // C1 - CMP (zp,X)
-    UNDEF,                  // C2 - Undefined
+    UP(IN_NOP, AM_IMM),     // C2 - *NOP imm (rarely unstable?)
     UNDEF,                  // C3 - Undefined
     OP(IN_CPY, AM_ZP),      // C4 - CPY zp
     OP(IN_CMP, AM_ZP),      // C5 - CMP zp
@@ -243,7 +252,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // DF - Undefined
     OP(IN_CPX, AM_IMM),     // E0 - CPX imm
     OP(IN_SBC, AM_INDX),    // E1 - SBC (zp,X)
-    UNDEF,                  // E2 - Undefined
+    UP(IN_NOP, AM_IMM),     // E2 - *NOP imm (rarely unstable?)
     UNDEF,                  // E3 - Undefined
     OP(IN_CPX, AM_ZP),      // E4 - CPX zp
     OP(IN_SBC, AM_ZP),      // E5 - SBC zp

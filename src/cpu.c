@@ -643,8 +643,12 @@ static void LSR_exec(struct mos6502 *self, struct decoded dec)
     bitoperation(self, dec, BIT_RIGHT, 0x0);
 }
 
-static void NOP_exec(struct mos6502 *self)
+static void NOP_exec(struct mos6502 *self, struct decoded dec)
 {
+    // NOTE: unofficial NOPs have non-implied addressing modes
+    if (dec.mode == AM_IMM) {
+        read(self);
+    }
     commit_operation(self);
 }
 

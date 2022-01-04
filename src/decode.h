@@ -56,7 +56,7 @@ X(LDX, self, dec)   /* Load x index */ \
 X(LDY, self, dec)   /* Load y index */ \
 X(LSR, self, dec)   /* Logical shift right */ \
 \
-X(NOP, self)        /* No-op */ \
+X(NOP, self, dec)   /* No-op */ \
 \
 X(ORA, self, dec)   /* Logical or */ \
 \

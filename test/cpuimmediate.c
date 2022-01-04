@@ -1419,6 +1419,36 @@ static void sbc_overflow_without_borrow(void *ctx)
 }
 
 //
+// Unofficial Opcodes
+//
+
+static void nop(void *ctx)
+{
+    const uint8_t nopcodes[] = {0x80, 0x82, 0x89, 0xc2, 0xe2};
+    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+        const uint8_t opc = nopcodes[c];
+        uint8_t mem[] = {opc, 0x10};
+        struct mos6502 cpu;
+        setup_cpu(&cpu, mem, NULL);
+
+        const int cycles = clock_cpu(&cpu);
+
+        ct_assertequal(2, cycles, "Failed on opcode %02x", opc);
+        ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
+        ct_assertequal(0x10u, cpu.databus, "Failed on opcode %02x", opc);
+
+        // NOTE: verify NOP did nothing
+        struct console_state sn;
+        cpu_snapshot(&cpu, &sn);
+        ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.x, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.y, "Failed on opcode %02x", opc);
+        ct_assertequal(0x34u, sn.cpu.status, "Failed on opcode %02x", opc);
+    }
+}
+
+//
 // Test List
 //
 
@@ -1502,6 +1532,8 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(sbc_borrowout_causes_overflow),
         ct_maketest(sbc_borrowout_avoids_overflow),
         ct_maketest(sbc_overflow_without_borrow),
+
+        ct_maketest(nop),
     };
 
     return ct_makesuite(tests);

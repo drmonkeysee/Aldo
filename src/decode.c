@@ -21,8 +21,8 @@ const int BrkOpcode = 0x0;
 // http://www.oxyron.de/html/opcodes02.html
 // https://www.nesdev.org/6502_cpu.txt
 // https://www.masswerk.at/nowgobang/2021/6502-illegal-opcodes
-// NOTE: nesdev.org documents $82, $C2, and $E2 (NOP imm) will occasionally
-// jam the cpu but other sources don't mention it,
+// NOTE: nesdev.org documents $82, $C2, and $E2 (NOP imm) will
+// occasionally jam the cpu but other sources don't mention it,
 // so we emulate them as stable NOPs.
 
 const struct decoded Decode[] = {

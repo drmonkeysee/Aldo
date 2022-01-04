@@ -1383,6 +1383,61 @@ static void nop_abs(void *ctx)
     ct_assertequal(0x34u, sn.cpu.status);
 }
 
+static void nop_absx(void *ctx)
+{
+    const uint8_t nopcodes[] = {0x1c, 0x3c, 0x5c, 0x7c, 0xdc, 0xfc};
+    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+        const uint8_t opc = nopcodes[c];
+        uint8_t mem[] = {opc, 0x1, 0x80},
+                abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
+        struct mos6502 cpu;
+        setup_cpu(&cpu, mem, abs);
+        cpu.x = 3;
+
+        const int cycles = clock_cpu(&cpu);
+
+        ct_assertequal(4, cycles, "Failed on opcode %02x", opc);
+        ct_assertequal(3u, cpu.pc, "Failed on opcode %02x", opc);
+        ct_assertequal(0x6u, cpu.databus, "Failed on opcode %02x", opc);
+
+        // NOTE: verify NOP did nothing
+        struct console_state sn;
+        cpu_snapshot(&cpu, &sn);
+        ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
+        ct_assertequal(3u, cpu.x, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.y, "Failed on opcode %02x", opc);
+        ct_assertequal(0x34u, sn.cpu.status, "Failed on opcode %02x", opc);
+    }
+}
+
+static void nop_absx_pagecross(void *ctx)
+{
+    const uint8_t nopcodes[] = {0x1c, 0x3c, 0x5c, 0x7c, 0xdc, 0xfc};
+    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+        const uint8_t opc = nopcodes[c];
+        uint8_t mem[] = {opc, 0xff, 0x80};
+        struct mos6502 cpu;
+        setup_cpu(&cpu, mem, BigRom);
+        cpu.x = 3;  // Cross boundary from $80FF -> $8102
+
+        const int cycles = clock_cpu(&cpu);
+
+        ct_assertequal(5, cycles, "Failed on opcode %02x", opc);
+        ct_assertequal(3u, cpu.pc, "Failed on opcode %02x", opc);
+        ct_assertequal(0xb2u, cpu.databus, "Failed on opcode %02x", opc);
+
+        // NOTE: verify NOP did nothing
+        struct console_state sn;
+        cpu_snapshot(&cpu, &sn);
+        ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
+        ct_assertequal(3u, cpu.x, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.y, "Failed on opcode %02x", opc);
+        ct_assertequal(0x34u, sn.cpu.status, "Failed on opcode %02x", opc);
+    }
+}
+
 //
 // Test List
 //
@@ -1464,6 +1519,8 @@ struct ct_testsuite cpu_absolute_tests(void)
 
         // Unofficial Opcodes
         ct_maketest(nop_abs),
+        ct_maketest(nop_absx),
+        ct_maketest(nop_absx_pagecross),
     };
 
     return ct_makesuite(tests);

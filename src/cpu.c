@@ -647,6 +647,7 @@ static void NOP_exec(struct mos6502 *self, struct decoded dec)
 {
     // NOTE: unofficial NOPs have non-implied addressing modes
     // that trigger reads.
+    if (read_delayed(self, dec, self->adc)) return;
     if (dec.mode != AM_IMP) {
         read(self);
     }

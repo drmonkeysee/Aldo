@@ -54,7 +54,7 @@ const struct decoded Decode[] = {
     OP(IN_ORA, AM_ABSY),    // 19 - ORA abs,Y
     UP(IN_NOP, AM_IMP),     // 1A - *NOP
     UNDEF,                  // 1B - Undefined
-    UNDEF,                  // 1C - Undefined
+    UP(IN_NOP, AM_ABSX),    // 1C - *NOP abs,X
     OP(IN_ORA, AM_ABSX),    // 1D - ORA abs,X
     OP(IN_ASL, AM_ABSX),    // 1E - ASL abs,X
     UNDEF,                  // 1F - Undefined
@@ -86,7 +86,7 @@ const struct decoded Decode[] = {
     OP(IN_AND, AM_ABSY),    // 39 - AND abs,Y
     UP(IN_NOP, AM_IMP),     // 3A - *NOP
     UNDEF,                  // 3B - Undefined
-    UNDEF,                  // 3C - Undefined
+    UP(IN_NOP, AM_ABSX),    // 3C - *NOP abs,X
     OP(IN_AND, AM_ABSX),    // 3D - AND abs,X
     OP(IN_ROL, AM_ABSX),    // 3E - ROL abs,X
     UNDEF,                  // 3F - Undefined
@@ -118,7 +118,7 @@ const struct decoded Decode[] = {
     OP(IN_EOR, AM_ABSY),    // 59 - EOR abs,Y
     UP(IN_NOP, AM_IMP),     // 5A - *NOP
     UNDEF,                  // 5B - Undefined
-    UNDEF,                  // 5C - Undefined
+    UP(IN_NOP, AM_ABSX),    // 5C - *NOP abs,X
     OP(IN_EOR, AM_ABSX),    // 5D - EOR abs,X
     OP(IN_LSR, AM_ABSX),    // 5E - LSR abs,X
     UNDEF,                  // 5F - Undefined
@@ -150,7 +150,7 @@ const struct decoded Decode[] = {
     OP(IN_ADC, AM_ABSY),    // 79 - ADC abs,Y
     UP(IN_NOP, AM_IMP),     // 7A - *NOP
     UNDEF,                  // 7B - Undefined
-    UNDEF,                  // 7C - Undefined
+    UP(IN_NOP, AM_ABSX),    // 7C - *NOP abs,X
     OP(IN_ADC, AM_ABSX),    // 7D - ADC abs,X
     OP(IN_ROR, AM_ABSX),    // 7E - ROR abs,X
     UNDEF,                  // 7F - Undefined
@@ -246,7 +246,7 @@ const struct decoded Decode[] = {
     OP(IN_CMP, AM_ABSY),    // D9 - CMP abs,Y
     UP(IN_NOP, AM_IMP),     // DA - *NOP
     UNDEF,                  // DB - Undefined
-    UNDEF,                  // DC - Undefined
+    UP(IN_NOP, AM_ABSX),    // DC - *NOP abs,X
     OP(IN_CMP, AM_ABSX),    // DD - CMP abs,X
     OP(IN_DEC, AM_ABSX),    // DE - DEC abs,X
     UNDEF,                  // DF - Undefined
@@ -278,7 +278,7 @@ const struct decoded Decode[] = {
     OP(IN_SBC, AM_ABSY),    // F9 - SBC abs,Y
     UP(IN_NOP, AM_IMP),     // FA - *NOP
     UNDEF,                  // FB - Undefined
-    UNDEF,                  // FC - Undefined
+    UP(IN_NOP, AM_ABSX),    // FC - *NOP abs,X
     OP(IN_SBC, AM_ABSX),    // FD - SBC abs,X
     OP(IN_INC, AM_ABSX),    // FE - INC abs,X
     UNDEF,                  // FF - Undefined

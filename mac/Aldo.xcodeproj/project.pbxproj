@@ -52,6 +52,8 @@
 		C8C706BA2751F0CB00B45785 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068D2751EEBA00B45785 /* decode.c */; };
 		C8C706BB2751F0CE00B45785 /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
 		C8C706BE2751F55C00B45785 /* trace.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706BD2751F55C00B45785 /* trace.c */; };
+		C8D44BDD2786B571005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D44BDC2786B571005AB586 /* argparse.c */; };
+		C8D44BDE2786B6DF005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -128,6 +130,7 @@
 		C8C706A72751EF8D00B45785 /* cpustack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpustack.c; sourceTree = "<group>"; };
 		C8C706BC2751F55C00B45785 /* trace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = trace.h; sourceTree = "<group>"; };
 		C8C706BD2751F55C00B45785 /* trace.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = trace.c; sourceTree = "<group>"; };
+		C8D44BDC2786B571005AB586 /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,6 +167,7 @@
 		C8184D4E25E74A9F002B3100 /* test */ = {
 			isa = PBXGroup;
 			children = (
+				C8D44BDC2786B571005AB586 /* argparse.c */,
 				C8C706A02751EF8D00B45785 /* bus.c */,
 				C8C706992751EF8D00B45785 /* bytes.c */,
 				C8C706A22751EF8D00B45785 /* cpu.c */,
@@ -365,6 +369,7 @@
 				C8C706B02751EF8D00B45785 /* cpu.c in Sources */,
 				C8C706AC2751EF8D00B45785 /* cpujump.c in Sources */,
 				C8C706B82751F0C000B45785 /* cart.c in Sources */,
+				C8D44BDE2786B6DF005AB586 /* argparse.c in Sources */,
 				C8C706B32751EF8D00B45785 /* cpuzeropage.c in Sources */,
 				C8C706AB2751EF8D00B45785 /* cpuindirect.c in Sources */,
 				C8184D3E25E7496B002B3100 /* Tests.swift in Sources */,
@@ -374,6 +379,7 @@
 				C8C706B22751EF8D00B45785 /* cpusubroutine.c in Sources */,
 				C8C706B72751F0BD00B45785 /* bytes.c in Sources */,
 				C8C706AA2751EF8D00B45785 /* cpuhelp.c in Sources */,
+				C8D44BDD2786B571005AB586 /* argparse.c in Sources */,
 				C8C706A92751EF8D00B45785 /* cpuimmediate.c in Sources */,
 				C8184D5325E74B75002B3100 /* dis.c in Sources */,
 				C8C706BB2751F0CE00B45785 /* mappers.c in Sources */,

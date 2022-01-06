@@ -62,7 +62,7 @@ static bool parse_flag(const char *arg, char shrt, bool exact, const char *lng)
                 && exact
                     ? arg[1] == shrt
                     : arg[1] != '-' && strchr(arg, shrt) != NULL)
-            || (lng && strcmp(arg, lng) == 0);
+            || (lng && strncmp(arg, lng, strlen(lng)) == 0);
 }
 
 #define setflag(f, a, s, l) (f) = (f) || parse_flag(a, s, false, l)

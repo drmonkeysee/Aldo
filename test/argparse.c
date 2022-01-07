@@ -148,7 +148,7 @@ static void combined_flags(void *ctx)
 static void short_chr_scale(void *ctx)
 {
     struct control appstate;
-    char *argv[] = {"testaldo", "-s" "5", NULL};
+    char *argv[] = {"testaldo", "-s", "5", NULL};
     const int argc = (sizeof argv / sizeof argv[0]) - 1;
 
     const bool result = argparse_parse(&appstate, argc, argv);
@@ -171,7 +171,7 @@ static void short_chr_scale_no_space(void *ctx)
     ct_assertequal(5, appstate.chrscale);
 }
 
-static void short_chr_scale_with_equals(void *ctx)
+static void short_chr_scale_does_not_support_equals(void *ctx)
 {
     struct control appstate;
     char *argv[] = {"testaldo", "-s=5", NULL};
@@ -187,7 +187,7 @@ static void short_chr_scale_with_equals(void *ctx)
 static void short_chr_scale_out_of_range(void *ctx)
 {
     struct control appstate;
-    char *argv[] = {"testaldo", "-s20", NULL};
+    char *argv[] = {"testaldo", "-s", "20", NULL};
     const int argc = (sizeof argv / sizeof argv[0]) - 1;
 
     const bool result = argparse_parse(&appstate, argc, argv);
@@ -200,7 +200,7 @@ static void short_chr_scale_out_of_range(void *ctx)
 static void short_chr_scale_malformed(void *ctx)
 {
     struct control appstate;
-    char *argv[] = {"testaldo", "-sabc", NULL};
+    char *argv[] = {"testaldo", "-s", "abc", NULL};
     const int argc = (sizeof argv / sizeof argv[0]) - 1;
 
     const bool result = argparse_parse(&appstate, argc, argv);
@@ -321,7 +321,7 @@ static void both_flags_and_values(void *ctx)
 {
     struct control appstate;
     char *argv[] = {
-        "testaldo", "-dv", "-s5", "--chr-decode=myrom", "test.rom", NULL,
+        "testaldo", "-dv", "-s", "5", "--chr-decode=myrom", "test.rom", NULL,
     };
     const int argc = (sizeof argv / sizeof argv[0]) - 1;
 
@@ -366,6 +366,19 @@ static void reset_override_short(void *ctx)
     ct_assertequal(0xabcd, appstate.resetvector);
 }
 
+static void reset_override_short_no_space(void *ctx)
+{
+    struct control appstate;
+    char *argv[] = {"testaldo", "-rabcd", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(&appstate, argc, argv);
+
+    ct_asserttrue(result);
+
+    ct_assertequal(0xabcd, appstate.resetvector);
+}
+
 static void reset_override_short_out_of_range(void *ctx)
 {
     struct control appstate;
@@ -396,6 +409,19 @@ static void reset_override_long(void *ctx)
 {
     struct control appstate;
     char *argv[] = {"testaldo", "--reset-vector=abcd", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(&appstate, argc, argv);
+
+    ct_asserttrue(result);
+
+    ct_assertequal(0xabcd, appstate.resetvector);
+}
+
+static void reset_override_long_with_space(void *ctx)
+{
+    struct control appstate;
+    char *argv[] = {"testaldo", "--reset-vector", "abcd", NULL};
     const int argc = (sizeof argv / sizeof argv[0]) - 1;
 
     const bool result = argparse_parse(&appstate, argc, argv);
@@ -450,7 +476,7 @@ struct ct_testsuite argparse_tests(void)
 
         ct_maketest(short_chr_scale),
         ct_maketest(short_chr_scale_no_space),
-        ct_maketest(short_chr_scale_with_equals),
+        ct_maketest(short_chr_scale_does_not_support_equals),
         ct_maketest(short_chr_scale_out_of_range),
         ct_maketest(short_chr_scale_malformed),
         ct_maketest(long_chr_scale),
@@ -467,9 +493,11 @@ struct ct_testsuite argparse_tests(void)
         ct_maketest(flags_and_values_do_not_combine),
 
         ct_maketest(reset_override_short),
+        ct_maketest(reset_override_short_no_space),
         ct_maketest(reset_override_short_out_of_range),
         ct_maketest(reset_override_short_malformed),
         ct_maketest(reset_override_long),
+        ct_maketest(reset_override_long_with_space),
         ct_maketest(reset_override_long_out_of_range),
         ct_maketest(reset_override_long_malformed),
     };

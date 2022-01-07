@@ -65,7 +65,7 @@ static bool parse_flag(const char *arg, char shrt, bool exact, const char *lng)
             || (lng && strncmp(arg, lng, strlen(lng)) == 0);
 }
 
-#define setflag(f, a, s, l) (f) = (f) || parse_flag(a, s, false, l)
+#define SETFLAG(f, a, s, l) (f) = (f) || parse_flag(a, s, false, l)
 
 static bool convert_num(const char *arg, int base, long *restrict result)
 {
@@ -146,15 +146,15 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
                              &appstate->resetvector);
     }
 
-    setflag(appstate->batch, arg, BatchShort, BatchLong);
-    setflag(appstate->disassemble, arg, DisassembleShort, DisassembleLong);
-    setflag(appstate->help, arg, HelpShort, HelpLong);
-    setflag(appstate->info, arg, InfoShort, InfoLong);
-    setflag(appstate->tron, arg, TraceShort, TraceLong);
-    setflag(appstate->verbose, arg, VerboseShort, NULL);
-    setflag(appstate->version, arg, VersionShort, VersionLong);
+    SETFLAG(appstate->batch, arg, BatchShort, BatchLong);
+    SETFLAG(appstate->disassemble, arg, DisassembleShort, DisassembleLong);
+    SETFLAG(appstate->help, arg, HelpShort, HelpLong);
+    SETFLAG(appstate->info, arg, InfoShort, InfoLong);
+    SETFLAG(appstate->tron, arg, TraceShort, TraceLong);
+    SETFLAG(appstate->verbose, arg, VerboseShort, NULL);
+    SETFLAG(appstate->version, arg, VersionShort, VersionLong);
 
-    setflag(appstate->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);
+    SETFLAG(appstate->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);
     const size_t chroptlen = strlen(ChrDecodeLong);
     if (strncmp(arg, ChrDecodeLong, chroptlen) == 0) {
         const char *const opt = strchr(arg, '=');

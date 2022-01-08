@@ -39,8 +39,7 @@ struct console_state {
                 vectors[6];
     } mem;
     struct {
-        int halt_address,       // Address for Halt Condition (<0 if not set)
-            resvector_override, // RESET Vector Override (<0 if not set)
+        int resvector_override, // RESET Vector Override (<0 if not set)
             state;
         bool halted;
     } debugger;

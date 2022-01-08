@@ -36,7 +36,7 @@ struct debugger_context {
     struct mos6502 *cpu;    // Non-owning Pointer
     struct resdecorator *dec;
     enum debugger_state state;
-    int resetvector, haltaddr;
+    int resetvector;
 };
 
 static bool resetaddr_read(const void *restrict ctx, uint16_t addr,
@@ -77,7 +77,10 @@ static size_t resetaddr_dma(const void *restrict ctx, uint16_t addr,
 
 static bool bp_instruction(const struct debugger_context *self)
 {
-    return self->cpu->signal.sync && self->cpu->addrinst == self->haltaddr;
+    // TODO: revive this once breakpoints are created
+    //return self->cpu->signal.sync && self->cpu->addrinst == self->haltaddr;
+    (void)self;
+    return false;
 }
 
 //
@@ -90,9 +93,8 @@ debugctx *debug_new(const struct control *appstate)
 
     struct debugger_context *const self = malloc(sizeof *self);
     *self = (struct debugger_context){
-        .haltaddr = appstate->haltaddr,
         .resetvector = appstate->resetvector,
-        .state = appstate->haltaddr >= 0 ? DBG_RUN : DBG_INACTIVE,
+        .state = DBG_INACTIVE,
     };
     return self;
 }
@@ -169,7 +171,6 @@ void debug_snapshot(debugctx *self, struct console_state *snapshot)
     assert(self != NULL);
     assert(snapshot != NULL);
 
-    snapshot->debugger.halt_address = self->haltaddr;
     snapshot->debugger.halted = self->state == DBG_BREAK;
     snapshot->debugger.resvector_override = self->resetvector;
     snapshot->debugger.state = self->state;

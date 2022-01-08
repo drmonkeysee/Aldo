@@ -164,9 +164,9 @@ static void cleanup_debugger(debugctx **dbg)
 
 static int emu_loop(struct control *appstate, cart *c)
 {
-    if (appstate->batch && appstate->tron && appstate->haltaddr < 0) {
+    if (appstate->batch && appstate->tron && !appstate->haltexprs) {
         fprintf(stderr, "*** WARNING ***\nYou have turned on trace-logging"
-                " with batch mode but specified no halt condition;\n"
+                " with batch mode but specified no halt conditions;\n"
                 "this can result in a very large trace file very quickly!\n"
                 "Continue? [yN] ");
         const int input = getchar();

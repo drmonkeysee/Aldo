@@ -25,7 +25,6 @@ static void init_control_zero_args(void *ctx)
     ct_assertequalstr("aldo", appstate.me);
     ct_assertequal(1, appstate.chrscale);
     ct_assertequal(4, appstate.clock.cycles_per_sec);
-    ct_assertequal(-1, appstate.haltaddr);
     ct_assertequal(-1, appstate.resetvector);
     ct_asserttrue(appstate.help);
     ct_asserttrue(appstate.running);

@@ -187,12 +187,7 @@ static void drawdebugger(const struct control *appstate,
     } else {
         waddstr(DebuggerView.content, "None");
     }
-    mvwaddstr(DebuggerView.content, cursor_y, 0, "Halt @: ");
-    if (snapshot->debugger.halt_address >= 0) {
-        wprintw(DebuggerView.content, "$%04X", snapshot->debugger.halt_address);
-    } else {
-        waddstr(DebuggerView.content, "None");
-    }
+    mvwaddstr(DebuggerView.content, cursor_y, 0, "Halt @: None");
 }
 
 static void drawcart(const struct control *appstate,

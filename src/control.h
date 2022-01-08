@@ -20,7 +20,7 @@ struct control {
     struct cycleclock clock;
     // NOTE: Non-owning Pointers
     const char *cartfile, *chrdecode_prefix, *haltexprs, *me;
-    int chrscale, haltaddr, ramsheet, resetvector;
+    int chrscale, ramsheet, resetvector;
     bool
         batch, chrdecode, disassemble, help, info, running, tron, verbose,
         version;

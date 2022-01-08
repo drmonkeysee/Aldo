@@ -50,7 +50,6 @@ static void init_control(struct control *appstate)
     *appstate = (struct control){
         .chrscale = MinScale,
         .clock = {.cycles_per_sec = 4},
-        .haltaddr = -1,
         .resetvector = -1,
         .running = true,
     };

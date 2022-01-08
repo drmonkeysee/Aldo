@@ -111,9 +111,6 @@ static void batch_cleanup(const struct control *appstate,
 
     clearline();
     printf("---=== %s ===---\n", ctrl_cartfilename(appstate->cartfile));
-    if (snapshot->debugger.halt_address >= 0 && snapshot->debugger.halted) {
-        printf("Halted @: $%04X\n", snapshot->debugger.halt_address);
-    }
     printf("Run Time (%ssec): %.3f\n", scale_ms ? "m" : "",
            scale_ms ? runtime : runtime / TSU_MS_PER_S);
     printf("Total Cycles: %" PRIu64 "\n", appstate->clock.total_cycles);

@@ -136,11 +136,6 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
         return true;
     }
 
-    if (parse_flag(arg, HaltShort, true, HaltLong)) {
-        return parse_address(arg, argi, argc, argv, "address",
-                             &appstate->haltaddr);
-    }
-
     if (parse_flag(arg, ResVectorShort, true, ResVectorLong)) {
         return parse_address(arg, argi, argc, argv, "vector",
                              &appstate->resetvector);
@@ -160,6 +155,21 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
         const char *const opt = strchr(arg, '=');
         if (opt && opt - arg == chroptlen) {
             appstate->chrdecode_prefix = opt + 1;
+        }
+    }
+
+    const size_t haltoptlen = strlen(HaltLong);
+    if (parse_flag(arg, HaltShort, false, HaltLong)) {
+        if (arg[1] == HaltShort && arg[2] != '\0') {
+            appstate->haltexprs = arg + 2;
+        } else if (strncmp(arg, HaltLong, haltoptlen) == 0) {
+            const char *const opt = strchr(arg, '=');
+            if (opt && opt - arg == haltoptlen) {
+                appstate->haltexprs = opt + 1;
+            }
+        }
+        if (!appstate->haltexprs && ++*argi < argc) {
+            appstate->haltexprs = argv[*argi];
         }
     }
     return true;
@@ -196,8 +206,9 @@ void argparse_usage(const char *me)
     puts("\noptions");
     printf("  -%c\t: run program in batch mode (also %s)\n", BatchShort,
            BatchLong);
-    printf("  -%c x\t: HALT when PC reaches this address [0x%X, 0x%X]"
-           " (also %s x)\n", HaltShort, MinAddress, MaxAddress, HaltLong);
+    printf("  -%c 'exp1,exp2,exp3\t: halt condition expressions;"
+           " see below for syntax (also %s 'exp1,exp2,exp3')\n", HaltShort,
+           HaltLong);
     printf("  -%c x\t: override RESET vector [0x%X, 0x%X]"
            " (also %s x)\n", ResVectorShort, MinAddress, MaxAddress,
            ResVectorLong);

@@ -19,6 +19,7 @@ X(HLT_TIME, "%fs", "%f%1[s]", &expr->runtime, unit) \
 X(HLT_CYCLES, "%" PRIu64 "c", "%" SCNu64 "%1[c]", &expr->cycles, unit)
 
 enum haltcondition {
+    HALT_NONE,
 #define X(s, pri, scn, ...) s,
     HALT_EXPR_X
 #undef X

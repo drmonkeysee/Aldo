@@ -12,11 +12,17 @@
 #include <string.h>
 #include <stdio.h>
 
+const enum haltcondition FirstCondition = HALT_NONE + 1;
+
+//
+// Public Interface
+//
+
 bool haltexpr_parse(const char *str, struct haltexpr *expr, const char **end)
 {
     bool parsed = false;
     char unit[2];
-    for (int i = 0; i < HLT_CONDCOUNT; ++i) {
+    for (int i = FirstCondition; i < HLT_CONDCOUNT; ++i) {
         switch (i) {
 #define X(s, pri, scn, ...) \
         case s: parsed = sscanf(str, scn, __VA_ARGS__) == 2; break;

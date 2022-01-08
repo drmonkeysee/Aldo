@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C808BA6827893976001FDE39 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C80C9E1C277D648F000F2D8B /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
 		C8184D3E25E7496B002B3100 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8184D3D25E7496B002B3100 /* Tests.swift */; };
 		C8184D5325E74B75002B3100 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C8184D5225E74B75002B3100 /* dis.c */; };
@@ -69,6 +70,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C808BA6627893976001FDE39 /* haltexpr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = haltexpr.h; sourceTree = "<group>"; };
+		C808BA6727893976001FDE39 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
 		C80C9E1A277D648F000F2D8B /* debug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
 		C80C9E1B277D648F000F2D8B /* debug.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = debug.c; sourceTree = "<group>"; };
 		C8184D3B25E7496B002B3100 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -232,6 +235,8 @@
 				C8C7068D2751EEBA00B45785 /* decode.c */,
 				C85C8DC425BD29AC00611D19 /* dis.h */,
 				C85C8DC525BD29AC00611D19 /* dis.c */,
+				C808BA6627893976001FDE39 /* haltexpr.h */,
+				C808BA6727893976001FDE39 /* haltexpr.c */,
 				C820E6D325A97FB5006A7AB1 /* main.c */,
 				C8C706862751EEBA00B45785 /* mappers.h */,
 				C8C706912751EEBA00B45785 /* mappers.c */,
@@ -401,6 +406,7 @@
 				C8186497277EB45900CA4AC0 /* uibatch.c in Sources */,
 				C820E6C025A9759A006A7AB1 /* main.swift in Sources */,
 				C8C706932751EEBA00B45785 /* bus.c in Sources */,
+				C808BA6827893976001FDE39 /* haltexpr.c in Sources */,
 				C8C706962751EEBA00B45785 /* decode.c in Sources */,
 				C81A516D25DA036100361E40 /* control.c in Sources */,
 				C80C9E1C277D648F000F2D8B /* debug.c in Sources */,

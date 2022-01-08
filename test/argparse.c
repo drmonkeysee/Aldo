@@ -210,6 +210,19 @@ static void short_chr_scale_malformed(void *ctx)
     ct_assertequal(1, appstate.chrscale);
 }
 
+static void short_chr_scale_missing(void *ctx)
+{
+    struct control appstate;
+    char *argv[] = {"testaldo", "-s", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(&appstate, argc, argv);
+
+    ct_assertfalse(result);
+
+    ct_assertequal(1, appstate.chrscale);
+}
+
 static void long_chr_scale(void *ctx)
 {
     struct control appstate;
@@ -253,6 +266,19 @@ static void long_chr_scale_malformed(void *ctx)
 {
     struct control appstate;
     char *argv[] = {"testaldo", "--chr-scale", "abc", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(&appstate, argc, argv);
+
+    ct_assertfalse(result);
+
+    ct_assertequal(1, appstate.chrscale);
+}
+
+static void long_chr_scale_missing(void *ctx)
+{
+    struct control appstate;
+    char *argv[] = {"testaldo", "--chr-scale", NULL};
     const int argc = (sizeof argv / sizeof argv[0]) - 1;
 
     const bool result = argparse_parse(&appstate, argc, argv);
@@ -405,6 +431,19 @@ static void reset_override_short_malformed(void *ctx)
     ct_assertequal(-1, appstate.resetvector);
 }
 
+static void reset_override_short_missing(void *ctx)
+{
+    struct control appstate;
+    char *argv[] = {"testaldo", "-r", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(&appstate, argc, argv);
+
+    ct_assertfalse(result);
+
+    ct_assertequal(-1, appstate.resetvector);
+}
+
 static void reset_override_long(void *ctx)
 {
     struct control appstate;
@@ -457,6 +496,19 @@ static void reset_override_long_malformed(void *ctx)
     ct_assertequal(-1, appstate.resetvector);
 }
 
+static void reset_override_long_missing(void *ctx)
+{
+    struct control appstate;
+    char *argv[] = {"testaldo", "--reset-vector", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(&appstate, argc, argv);
+
+    ct_assertfalse(result);
+
+    ct_assertequal(-1, appstate.resetvector);
+}
+
 static void halt_short(void *ctx)
 {
     struct control appstate;
@@ -494,6 +546,19 @@ static void halt_short_multiple(void *ctx)
     ct_asserttrue(result);
 
     ct_assertequalstr("foo,bar,baz", appstate.haltexprs);
+}
+
+static void halt_short_missing(void *ctx)
+{
+    struct control appstate;
+    char *argv[] = {"testaldo", "-H", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(&appstate, argc, argv);
+
+    ct_assertfalse(result);
+
+    ct_assertnull(appstate.haltexprs);
 }
 
 static void halt_long(void *ctx)
@@ -535,6 +600,19 @@ static void halt_long_multiple(void *ctx)
     ct_assertequalstr("foo,bar,baz", appstate.haltexprs);
 }
 
+static void halt_long_missing(void *ctx)
+{
+    struct control appstate;
+    char *argv[] = {"testaldo", "--halt", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(&appstate, argc, argv);
+
+    ct_assertfalse(result);
+
+    ct_assertnull(appstate.haltexprs);
+}
+
 //
 // Test List
 //
@@ -557,10 +635,12 @@ struct ct_testsuite argparse_tests(void)
         ct_maketest(short_chr_scale_does_not_support_equals),
         ct_maketest(short_chr_scale_out_of_range),
         ct_maketest(short_chr_scale_malformed),
+        ct_maketest(short_chr_scale_missing),
         ct_maketest(long_chr_scale),
         ct_maketest(long_chr_scale_with_equals),
         ct_maketest(long_chr_scale_out_of_range),
         ct_maketest(long_chr_scale_malformed),
+        ct_maketest(long_chr_scale_missing),
 
         ct_maketest(chr_decode_short),
         ct_maketest(chr_decode_short_does_not_support_prefix),
@@ -574,17 +654,21 @@ struct ct_testsuite argparse_tests(void)
         ct_maketest(reset_override_short_no_space),
         ct_maketest(reset_override_short_out_of_range),
         ct_maketest(reset_override_short_malformed),
+        ct_maketest(reset_override_short_missing),
         ct_maketest(reset_override_long),
         ct_maketest(reset_override_long_with_equals),
         ct_maketest(reset_override_long_out_of_range),
         ct_maketest(reset_override_long_malformed),
+        ct_maketest(reset_override_long_missing),
 
         ct_maketest(halt_short),
         ct_maketest(halt_short_no_space),
         ct_maketest(halt_short_multiple),
+        ct_maketest(halt_short_missing),
         ct_maketest(halt_long),
         ct_maketest(halt_long_with_equals),
         ct_maketest(halt_long_multiple),
+        ct_maketest(halt_long_missing),
     };
 
     return ct_makesuite(tests);

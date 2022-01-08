@@ -170,6 +170,7 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
         if (!appstate->haltexprs && ++*argi < argc) {
             appstate->haltexprs = argv[*argi];
         }
+        if (!appstate->haltexprs) return false;
     }
     return true;
 }

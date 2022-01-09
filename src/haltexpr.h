@@ -16,7 +16,7 @@
 #define HALT_EXPR_X \
 X(HLT_ADDR, "@%04X", " %1[@]%" SCNx16, u, &e.address) \
 X(HLT_TIME, "%fs", "%f %1[s]", &e.runtime, u) \
-X(HLT_CYCLES, "%" PRIu64 "c", "%" SCNu64 "%1[c]", &e.cycles, u)
+X(HLT_CYCLES, "%" PRIu64 "c", "%" SCNu64 " %1[c]", &e.cycles, u)
 
 enum haltcondition {
     HLT_NONE,

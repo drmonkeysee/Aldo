@@ -319,6 +319,102 @@ static void runtime_condition_malformed(void *ctx)
     ct_assertequal('\0', *end);
 }
 
+static void cycles_condition(void *ctx)
+{
+    const char *const str = "42c", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(42u, expr.cycles);
+    ct_assertsame(str + strlen(str), end);
+    ct_assertequal('\0', *end);
+}
+
+static void cycles_condition_with_space(void *ctx)
+{
+    const char *const str = "42   c", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(42u, expr.cycles);
+    ct_assertsame(str + strlen(str), end);
+    ct_assertequal('\0', *end);
+}
+
+static void cycles_condition_with_leading_space(void *ctx)
+{
+    const char *const str = "   42c", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(42u, expr.cycles);
+    ct_assertsame(str + strlen(str), end);
+    ct_assertequal('\0', *end);
+}
+
+static void cycles_condition_with_trailing_space(void *ctx)
+{
+    const char *const str = "42c   ", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(42u, expr.cycles);
+    ct_assertsame(str + strlen(str), end);
+    ct_assertequal('\0', *end);
+}
+
+static void cycles_condition_trailing_exprs(void *ctx)
+{
+    const char *const str = "42c,foo,bar", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(42u, expr.cycles);
+    ct_assertsame(strchr(str, 'f'), end);
+    ct_assertequal('f', *end);
+}
+
+static void cycles_condition_trailing_exprs_spaced(void *ctx)
+{
+    const char *const str = "42c, foo,bar", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(42u, expr.cycles);
+    ct_assertsame(strchr(str, ' '), end);
+    ct_assertequal(' ', *end);
+}
+
+static void cycles_condition_malformed(void *ctx)
+{
+    const char *const str = "fasdf", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_assertfalse(result);
+    ct_assertsame(str + strlen(str), end);
+    ct_assertequal('\0', *end);
+}
+
 static void expr_missing_unit(void *ctx)
 {
     const char *const str = "1234", *end;
@@ -364,6 +460,14 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(runtime_condition_trailing_exprs),
         ct_maketest(runtime_condition_trailing_exprs_spaced),
         ct_maketest(runtime_condition_malformed),
+
+        ct_maketest(cycles_condition),
+        ct_maketest(cycles_condition_with_space),
+        ct_maketest(cycles_condition_with_leading_space),
+        ct_maketest(cycles_condition_with_trailing_space),
+        ct_maketest(cycles_condition_trailing_exprs),
+        ct_maketest(cycles_condition_trailing_exprs_spaced),
+        ct_maketest(cycles_condition_malformed),
 
         ct_maketest(expr_missing_unit),
     };

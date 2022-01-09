@@ -209,6 +209,116 @@ static void address_condition_malformed(void *ctx)
     ct_assertequal('\0', *end);
 }
 
+static void runtime_condition(void *ctx)
+{
+    const char *const str = "1.2s", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
+    ct_assertsame(str + strlen(str), end);
+    ct_assertequal('\0', *end);
+}
+
+static void runtime_condition_with_space(void *ctx)
+{
+    const char *const str = "1.2   s", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
+    ct_assertsame(str + strlen(str), end);
+    ct_assertequal('\0', *end);
+}
+
+static void runtime_condition_with_leading_space(void *ctx)
+{
+    const char *const str = "   1.2s", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
+    ct_assertsame(str + strlen(str), end);
+    ct_assertequal('\0', *end);
+}
+
+static void runtime_condition_with_trailing_space(void *ctx)
+{
+    const char *const str = "1.2s   ", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
+    ct_assertsame(str + strlen(str), end);
+    ct_assertequal('\0', *end);
+}
+
+static void runtime_condition_no_decimal(void *ctx)
+{
+    const char *const str = "5s", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertaboutequal(5.0f, expr.runtime, 0.001);
+    ct_assertsame(str + strlen(str), end);
+    ct_assertequal('\0', *end);
+}
+
+static void runtime_condition_trailing_exprs(void *ctx)
+{
+    const char *const str = "1.2s,foo,bar", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
+    ct_assertsame(strchr(str, 'f'), end);
+    ct_assertequal('f', *end);
+}
+
+static void runtime_condition_trailing_exprs_spaced(void *ctx)
+{
+    const char *const str = "1.2s, foo,bar", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
+    ct_assertsame(strchr(str, ' '), end);
+    ct_assertequal(' ', *end);
+}
+
+static void runtime_condition_malformed(void *ctx)
+{
+    const char *const str = "fasdf", *end;
+    struct haltexpr expr;
+
+    const bool result = haltexpr_parse(str, &expr, &end);
+
+    ct_assertfalse(result);
+    ct_assertsame(str + strlen(str), end);
+    ct_assertequal('\0', *end);
+}
+
 static void expr_missing_unit(void *ctx)
 {
     const char *const str = "1234", *end;
@@ -245,6 +355,15 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(address_condition_overparse),
         ct_maketest(address_condition_underparse),
         ct_maketest(address_condition_malformed),
+
+        ct_maketest(runtime_condition),
+        ct_maketest(runtime_condition_with_space),
+        ct_maketest(runtime_condition_with_leading_space),
+        ct_maketest(runtime_condition_with_trailing_space),
+        ct_maketest(runtime_condition_no_decimal),
+        ct_maketest(runtime_condition_trailing_exprs),
+        ct_maketest(runtime_condition_trailing_exprs_spaced),
+        ct_maketest(runtime_condition_malformed),
 
         ct_maketest(expr_missing_unit),
     };

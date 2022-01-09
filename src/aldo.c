@@ -12,6 +12,7 @@
 #include "control.h"
 #include "debug.h"
 #include "dis.h"
+#include "haltexpr.h"
 #include "nes.h"
 #include "ui.h"
 #include "snapshot.h"
@@ -156,6 +157,33 @@ static void update(struct control *appstate, struct console_state *snapshot,
     ui->refresh(appstate, snapshot);
 }
 
+static debugctx *create_debugger(const struct control *appstate)
+{
+    debugctx *const dbg = debug_new(appstate);
+    const char *start = appstate->haltexprs, *end;
+    struct haltexpr expr;
+    do {
+        if (haltexpr_parse(start, &expr, &end)) {
+            //TODO: debug_addbreakpoint(dbg, &expr);
+            start = end;
+            if (appstate->verbose) {
+                char buf[30];
+                if (haltexpr_fmt(&expr, sizeof buf, buf) < 0) {
+                    fputs("Halt expr display error\n", stderr);
+                } else {
+                    printf("Halt Condition: %s\n", buf);
+                }
+            }
+        } else {
+            fprintf(stderr, "Halt expression parse failure at: \"%.*s\"\n",
+                    (int)(end - start), start);
+            debug_free(dbg);
+            return NULL;
+        }
+    } while (*end != '\0');
+    return dbg;
+}
+
 static void cleanup_debugger(debugctx **dbg)
 {
     debug_free(*dbg);
@@ -173,12 +201,13 @@ static int emu_loop(struct control *appstate, cart *c)
         if (input != 'y' && input != 'Y') return EXIT_FAILURE;
     }
 
-    debugctx *dbg = debug_new(appstate);
+    debugctx *dbg = create_debugger(appstate);
+    if (!dbg) return EXIT_FAILURE;
     nes *console = nes_new(c, appstate->tron, dbg);
     if (!console) {
         cleanup_debugger(&dbg);
         return EXIT_FAILURE;
-    };
+    }
 
     nes_powerup(console);
 

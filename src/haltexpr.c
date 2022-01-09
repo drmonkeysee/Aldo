@@ -19,7 +19,8 @@ bool haltexpr_parse(const char *str, struct haltexpr *expr, const char **end)
     if (str == NULL) return false;
 
     bool parsed = false;
-    char unit[2];
+    char u[2];
+    struct haltexpr e;
     for (int i = HLT_NONE + 1; i < HLT_CONDCOUNT; ++i) {
         switch (i) {
 #define X(s, pri, scn, ...) \
@@ -31,6 +32,7 @@ bool haltexpr_parse(const char *str, struct haltexpr *expr, const char **end)
             break;
         }
         if (parsed) {
+            *expr = e;
             expr->cond = i;
             break;
         }

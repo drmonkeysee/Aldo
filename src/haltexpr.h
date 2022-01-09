@@ -14,9 +14,9 @@
 
 // X(symbol, print format, scan format, scan format args)
 #define HALT_EXPR_X \
-X(HLT_ADDR, "@%04X", " %1[@]%" SCNx16, unit, &expr->address) \
-X(HLT_TIME, "%fs", "%f%1[s]", &expr->runtime, unit) \
-X(HLT_CYCLES, "%" PRIu64 "c", "%" SCNu64 "%1[c]", &expr->cycles, unit)
+X(HLT_ADDR, "@%04X", " %1[@]%" SCNx16, u, &e.address) \
+X(HLT_TIME, "%fs", "%f%1[s]", &e.runtime, u) \
+X(HLT_CYCLES, "%" PRIu64 "c", "%" SCNu64 "%1[c]", &e.cycles, u)
 
 enum haltcondition {
     HLT_NONE,
@@ -35,7 +35,7 @@ struct haltexpr {
     enum haltcondition cond;
 };
 
-// NOTE: if return value is false, *expr is undefined but *end is set to
+// NOTE: if return value is false, *expr is unmodified and *end is set to
 // the end of the expression that failed to parse.
 bool haltexpr_parse(const char *str, struct haltexpr *expr, const char **end);
 

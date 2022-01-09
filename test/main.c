@@ -33,7 +33,8 @@ struct ct_testsuite argparse_tests(void),
                     cpu_stack_tests(void),
                     cpu_subroutine_tests(void),
                     cpu_zeropage_tests(void),
-                    dis_tests(void);
+                    dis_tests(void),
+                    haltexpr_tests(void);
 
 static size_t testrunner(int argc, char *argv[argc+1])
 {
@@ -55,6 +56,7 @@ static size_t testrunner(int argc, char *argv[argc+1])
         cpu_subroutine_tests(),
         cpu_zeropage_tests(),
         dis_tests(),
+        haltexpr_tests(),
     };
     setup_testbus();
     const size_t result = ct_run_withargs(suites, argc, argv);

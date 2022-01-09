@@ -14,6 +14,10 @@
 
 bool haltexpr_parse(const char *str, struct haltexpr *expr, const char **end)
 {
+    assert(expr != NULL);
+
+    if (str == NULL) return false;
+
     bool parsed = false;
     char unit[2];
     for (int i = HLT_NONE + 1; i < HLT_CONDCOUNT; ++i) {
@@ -27,12 +31,13 @@ bool haltexpr_parse(const char *str, struct haltexpr *expr, const char **end)
             break;
         }
         if (parsed) {
-            if (end != NULL) {
-                char *const comma = strchr(str, ',');
-                *end = comma ? comma + 1 : str + strlen(str) + 1;
-            }
+            expr->cond = i;
             break;
         }
+    }
+    if (end != NULL) {
+        const char *const comma = strchr(str, ',');
+        *end = comma ? comma + 1 : str + strlen(str);
     }
     return parsed;
 }

@@ -15,9 +15,15 @@
 
 // X(symbol, print format, print format arg, scan format, scan format args...)
 #define HALT_EXPR_X \
-X(HLT_ADDR, "@%04X", expr->address, " %1[@]%" SCNx16, u, &e.address) \
-X(HLT_TIME, "%fs", expr->runtime, "%f %1[s]", &e.runtime, u) \
-X(HLT_CYCLES, "%" PRIu64 "c", expr->cycles, "%" SCNu64 " %1[c]", &e.cycles, u)
+X(HLT_ADDR, \
+    "@ $%04X", expr->address, \
+    " %1[@]%" SCNx16, u, &e.address) \
+X(HLT_TIME, \
+    "%.3f sec", expr->runtime, \
+    "%f %1[s]", &e.runtime, u) \
+X(HLT_CYCLES, \
+    "%" PRIu64 " cyc", expr->cycles, \
+    "%" SCNu64 " %1[c]", &e.cycles, u)
 
 enum haltcondition {
     HLT_NONE,

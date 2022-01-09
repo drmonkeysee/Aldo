@@ -24,7 +24,7 @@ bool haltexpr_parse(const char *str, struct haltexpr *expr, const char **end)
     for (int i = HLT_NONE + 1; i < HLT_CONDCOUNT; ++i) {
         switch (i) {
 #define X(s, pri, scn, ...) \
-        case s: parsed = sscanf(str, scn, __VA_ARGS__) == 2; break;
+        case s: parsed = sscanf(str, scn, __VA_ARGS__) == 2; e.cond = i; break;
             HALT_EXPR_X
 #undef X
         default:
@@ -33,7 +33,6 @@ bool haltexpr_parse(const char *str, struct haltexpr *expr, const char **end)
         }
         if (parsed) {
             *expr = e;
-            expr->cond = i;
             break;
         }
     }

@@ -613,6 +613,21 @@ static void halt_long_missing(void *ctx)
     ct_assertnull(appstate.haltexprs);
 }
 
+static void option_does_not_trigger_flag(void *ctx)
+{
+    struct control appstate;
+    char *argv[] = {"testaldo", "-Hdv", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(&appstate, argc, argv);
+
+    ct_asserttrue(result);
+
+    ct_assertequalstr("dv", appstate.haltexprs);
+    ct_assertfalse(appstate.disassemble);
+    ct_assertfalse(appstate.verbose);
+}
+
 //
 // Test List
 //
@@ -669,6 +684,8 @@ struct ct_testsuite argparse_tests(void)
         ct_maketest(halt_long_with_equals),
         ct_maketest(halt_long_multiple),
         ct_maketest(halt_long_missing),
+
+        ct_maketest(option_does_not_trigger_flag),
     };
 
     return ct_makesuite(tests);

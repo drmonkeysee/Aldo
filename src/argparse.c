@@ -127,34 +127,17 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
         const bool result = parse_number(arg, argi, argc, argv, 10, &scale);
         if (result && MinScale <= scale && scale <= MaxScale) {
             appstate->chrscale = (int)scale;
+            return true;
         } else {
             fprintf(stderr, "Invalid scale format: expected [%d, %d]\n",
                     MinScale, MaxScale);
             return false;
         }
-        return true;
     }
 
     if (parse_flag(arg, ResVectorShort, true, ResVectorLong)) {
         return parse_address(arg, argi, argc, argv, "vector",
                              &appstate->resetvector);
-    }
-
-    SETFLAG(appstate->batch, arg, BatchShort, BatchLong);
-    SETFLAG(appstate->disassemble, arg, DisassembleShort, DisassembleLong);
-    SETFLAG(appstate->help, arg, HelpShort, HelpLong);
-    SETFLAG(appstate->info, arg, InfoShort, InfoLong);
-    SETFLAG(appstate->tron, arg, TraceShort, TraceLong);
-    SETFLAG(appstate->verbose, arg, VerboseShort, NULL);
-    SETFLAG(appstate->version, arg, VersionShort, VersionLong);
-
-    SETFLAG(appstate->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);
-    const size_t chroptlen = strlen(ChrDecodeLong);
-    if (strncmp(arg, ChrDecodeLong, chroptlen) == 0) {
-        const char *const opt = strchr(arg, '=');
-        if (opt && opt - arg == chroptlen) {
-            appstate->chrdecode_prefix = opt + 1;
-        }
     }
 
     const size_t haltoptlen = strlen(HaltLong);
@@ -170,8 +153,26 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
         if (!appstate->haltexprs && ++*argi < argc) {
             appstate->haltexprs = argv[*argi];
         }
-        if (!appstate->haltexprs) return false;
+        return (bool)appstate->haltexprs;
     }
+
+    SETFLAG(appstate->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);
+    const size_t chroptlen = strlen(ChrDecodeLong);
+    if (strncmp(arg, ChrDecodeLong, chroptlen) == 0) {
+        const char *const opt = strchr(arg, '=');
+        if (opt && opt - arg == chroptlen) {
+            appstate->chrdecode_prefix = opt + 1;
+        }
+    }
+
+    SETFLAG(appstate->batch, arg, BatchShort, BatchLong);
+    SETFLAG(appstate->disassemble, arg, DisassembleShort, DisassembleLong);
+    SETFLAG(appstate->help, arg, HelpShort, HelpLong);
+    SETFLAG(appstate->info, arg, InfoShort, InfoLong);
+    SETFLAG(appstate->tron, arg, TraceShort, TraceLong);
+    SETFLAG(appstate->verbose, arg, VerboseShort, NULL);
+    SETFLAG(appstate->version, arg, VersionShort, VersionLong);
+
     return true;
 }
 

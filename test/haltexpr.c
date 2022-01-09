@@ -427,6 +427,66 @@ static void expr_missing_unit(void *ctx)
     ct_assertequal('\0', *end);
 }
 
+static void multiple_exprs(void *ctx)
+{
+    const char *const str = "@ab12, 1.2s, 42c", *end = str;
+    struct haltexpr expr;
+
+    bool result = haltexpr_parse(end, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_ADDR, (int)expr.cond);
+    ct_assertequal(0xab12u, expr.address);
+    ct_assertsame(strchr(str, ' '), end);
+    ct_assertequal(' ', *end);
+
+    result = haltexpr_parse(end, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
+    ct_assertsame(strrchr(str, ' '), end);
+    ct_assertequal(' ', *end);
+
+    result = haltexpr_parse(end, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(42u, expr.cycles);
+    ct_assertsame(str + strlen(str), end);
+    ct_assertequal('\0', *end);
+}
+
+static void multiple_exprs_failure(void *ctx)
+{
+    const char *const str = "@ab12, sdfsdf, 42c", *end = str;
+    struct haltexpr expr;
+
+    bool result = haltexpr_parse(end, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_ADDR, (int)expr.cond);
+    ct_assertequal(0xab12u, expr.address);
+    ct_assertsame(strchr(str, ' '), end);
+    ct_assertequal(' ', *end);
+
+    result = haltexpr_parse(end, &expr, &end);
+
+    ct_assertfalse(result);
+    ct_assertequal(HLT_ADDR, (int)expr.cond);
+    ct_assertequal(0xab12u, expr.address);
+    ct_assertsame(strrchr(str, ' '), end);
+    ct_assertequal(' ', *end);
+
+    result = haltexpr_parse(end, &expr, &end);
+
+    ct_asserttrue(result);
+    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(42u, expr.cycles);
+    ct_assertsame(str + strlen(str), end);
+    ct_assertequal('\0', *end);
+}
+
 //
 // Test List
 //
@@ -470,6 +530,8 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(cycles_condition_malformed),
 
         ct_maketest(expr_missing_unit),
+        ct_maketest(multiple_exprs),
+        ct_maketest(multiple_exprs_failure),
     };
 
     return ct_makesuite(tests);

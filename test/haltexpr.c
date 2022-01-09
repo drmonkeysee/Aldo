@@ -14,7 +14,7 @@
 
 static void null_string(void *ctx)
 {
-    const char *str = NULL;
+    const char *const str = NULL;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, NULL);
@@ -24,7 +24,7 @@ static void null_string(void *ctx)
 
 static void empty_string(void *ctx)
 {
-    const char *str = "";
+    const char *const str = "";
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, NULL);
@@ -34,7 +34,7 @@ static void empty_string(void *ctx)
 
 static void empty_string_with_end(void *ctx)
 {
-    const char *str = "", *end;
+    const char *const str = "", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);
@@ -45,7 +45,7 @@ static void empty_string_with_end(void *ctx)
 
 static void address_condition(void *ctx)
 {
-    const char *str = "@ab12", *end;
+    const char *const str = "@ab12", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);
@@ -59,7 +59,7 @@ static void address_condition(void *ctx)
 
 static void address_condition_with_space(void *ctx)
 {
-    const char *str = "@   ab12", *end;
+    const char *const str = "@   ab12", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);
@@ -73,7 +73,7 @@ static void address_condition_with_space(void *ctx)
 
 static void address_condition_with_leading_space(void *ctx)
 {
-    const char *str = "   @ab12", *end;
+    const char *const str = "   @ab12", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);
@@ -87,7 +87,7 @@ static void address_condition_with_leading_space(void *ctx)
 
 static void address_condition_with_trailing_space(void *ctx)
 {
-    const char *str = "@ab12   ", *end;
+    const char *const str = "@ab12   ", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);
@@ -101,7 +101,7 @@ static void address_condition_with_trailing_space(void *ctx)
 
 static void address_condition_caps(void *ctx)
 {
-    const char *str = "@AB12", *end;
+    const char *const str = "@AB12", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);
@@ -115,7 +115,7 @@ static void address_condition_caps(void *ctx)
 
 static void address_condition_with_prefix(void *ctx)
 {
-    const char *str = "@0xab12", *end;
+    const char *const str = "@0xab12", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);
@@ -129,7 +129,7 @@ static void address_condition_with_prefix(void *ctx)
 
 static void address_condition_short(void *ctx)
 {
-    const char *str = "@1f", *end;
+    const char *const str = "@1f", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);
@@ -143,7 +143,7 @@ static void address_condition_short(void *ctx)
 
 static void address_condition_trailing_exprs(void *ctx)
 {
-    const char *str = "@ab12,foo,bar", *end;
+    const char *const str = "@ab12,foo,bar", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);
@@ -157,7 +157,7 @@ static void address_condition_trailing_exprs(void *ctx)
 
 static void address_condition_trailing_exprs_spaced(void *ctx)
 {
-    const char *str = "@ab12, foo,bar", *end;
+    const char *const str = "@ab12, foo,bar", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);
@@ -171,7 +171,7 @@ static void address_condition_trailing_exprs_spaced(void *ctx)
 
 static void address_condition_overparse(void *ctx)
 {
-    const char *str = "@12345", *end;
+    const char *const str = "@12345", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);
@@ -185,7 +185,7 @@ static void address_condition_overparse(void *ctx)
 
 static void address_condition_underparse(void *ctx)
 {
-    const char *str = "@asdf", *end;
+    const char *const str = "@asdf", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);
@@ -199,7 +199,7 @@ static void address_condition_underparse(void *ctx)
 
 static void address_condition_malformed(void *ctx)
 {
-    const char *str = "@hjkl", *end;
+    const char *const str = "@hjkl", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);
@@ -211,7 +211,7 @@ static void address_condition_malformed(void *ctx)
 
 static void expr_missing_unit(void *ctx)
 {
-    const char *str = "1234", *end;
+    const char *const str = "1234", *end;
     struct haltexpr expr;
 
     const bool result = haltexpr_parse(str, &expr, &end);

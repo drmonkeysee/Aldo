@@ -207,7 +207,7 @@ void argparse_usage(const char *me)
     puts("\noptions");
     printf("  -%c\t: run program in batch mode (also %s)\n", BatchShort,
            BatchLong);
-    printf("  -%c e\t: halt condition expressions;"
+    printf("  -%c e\t: halt condition expression;"
            " see below for syntax (also %s e)\n", HaltShort,
            HaltLong);
     printf("  -%c x\t: override RESET vector [0x%X, 0x%X]"

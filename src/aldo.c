@@ -160,12 +160,12 @@ static void update(struct control *appstate, struct console_state *snapshot,
 static debugctx *create_debugger(const struct control *appstate)
 {
     debugctx *const dbg = debug_new(appstate);
-    const char *start = appstate->haltexprs, *end;
-    struct haltexpr expr;
-    do {
-        if (haltexpr_parse(start, &expr, &end)) {
+    for (const struct haltarg *arg = appstate->haltlist;
+         arg;
+         arg = arg->next) {
+        struct haltexpr expr;
+        if (haltexpr_parse(arg->expr, &expr, NULL)) {
             //TODO: debug_addbreakpoint(dbg, &expr);
-            start = end;
             if (appstate->verbose) {
                 char buf[30];
                 if (haltexpr_fmt(&expr, sizeof buf, buf) < 0) {
@@ -175,12 +175,12 @@ static debugctx *create_debugger(const struct control *appstate)
                 }
             }
         } else {
-            fprintf(stderr, "Halt expression parse failure at: \"%.*s\"\n",
-                    (int)(end - start), start);
+            fprintf(stderr, "Halt expression parse failure: \"%s\"\n",
+                    arg->expr);
             debug_free(dbg);
             return NULL;
         }
-    } while (*end != '\0');
+    }
     return dbg;
 }
 

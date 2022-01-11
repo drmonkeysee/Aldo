@@ -128,11 +128,10 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
         if (result && MinScale <= scale && scale <= MaxScale) {
             appstate->chrscale = (int)scale;
             return true;
-        } else {
-            fprintf(stderr, "Invalid scale format: expected [%d, %d]\n",
-                    MinScale, MaxScale);
-            return false;
         }
+        fprintf(stderr, "Invalid scale format: expected [%d, %d]\n", MinScale,
+                MaxScale);
+        return false;
     }
 
     if (parse_flag(arg, ResVectorShort, true, ResVectorLong)) {
@@ -142,18 +141,26 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
 
     const size_t haltoptlen = strlen(HaltLong);
     if (parse_flag(arg, HaltShort, false, HaltLong)) {
+        const char *expr = NULL;
         if (arg[1] == HaltShort && arg[2] != '\0') {
-            appstate->haltexprs = arg + 2;
+            expr = arg + 2;
         } else if (strncmp(arg, HaltLong, haltoptlen) == 0) {
             const char *const opt = strchr(arg, '=');
             if (opt && opt - arg == haltoptlen) {
-                appstate->haltexprs = opt + 1;
+                expr = opt + 1;
             }
         }
-        if (!appstate->haltexprs && ++*argi < argc) {
-            appstate->haltexprs = argv[*argi];
+        if (!expr && ++*argi < argc) {
+            expr = argv[*argi];
         }
-        return (bool)appstate->haltexprs;
+        if (expr) {
+            struct haltarg **tail;
+            for (tail = &appstate->haltlist; *tail; tail = &(*tail)->next);
+            *tail = malloc(sizeof **tail);
+            **tail = (struct haltarg){.expr = expr};
+            return true;
+        }
+        return false;
     }
 
     SETFLAG(appstate->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);
@@ -189,7 +196,10 @@ bool argparse_parse(struct control *restrict appstate, int argc,
         for (int i = 1; i < argc; ++i) {
             const char *const arg = argv[i];
             if (arg[0] == '-') {
-                if (!parse_arg(appstate, arg, &i, argc, argv)) return false;
+                if (!parse_arg(appstate, arg, &i, argc, argv)) {
+                    argparse_cleanup(appstate);
+                    return false;
+                }
             } else {
                 appstate->cartfile = arg;
             }
@@ -240,4 +250,13 @@ void argparse_version(void)
     fputs(" (" __VERSION__ ")", stdout);
 #endif
     puts("");
+}
+
+void argparse_cleanup(struct control *appstate)
+{
+    for (struct haltarg *curr;
+         appstate->haltlist;
+         curr = appstate->haltlist,
+            appstate->haltlist = appstate->haltlist->next,
+            free(curr));
 }

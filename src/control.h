@@ -16,10 +16,15 @@ struct cycleclock {
     int budget, cycles_per_sec;
 };
 
+struct haltarg {
+    const char *expr;       // Non-owning Pointer
+    struct haltarg *next;
+};
+
 struct control {
+    struct haltarg *haltlist;
+    const char *cartfile, *chrdecode_prefix, *me;   // Non-owning Pointers
     struct cycleclock clock;
-    // NOTE: Non-owning Pointers
-    const char *cartfile, *chrdecode_prefix, *haltexprs, *me;
     int chrscale, ramsheet, resetvector;
     bool
         batch, chrdecode, disassemble, help, info, running, tron, verbose,

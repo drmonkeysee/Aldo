@@ -192,7 +192,7 @@ static void cleanup_debugger(debugctx **dbg)
 
 static int emu_loop(struct control *appstate, cart *c)
 {
-    if (appstate->batch && appstate->tron && !appstate->haltexprs) {
+    if (appstate->batch && appstate->tron && !appstate->haltlist) {
         fprintf(stderr, "*** WARNING ***\nYou have turned on trace-logging"
                 " with batch mode but specified no halt conditions;\n"
                 "this can result in a very large trace file very quickly!\n"
@@ -266,30 +266,37 @@ int aldo_run(int argc, char *argv[argc+1])
     struct control appstate;
     if (!argparse_parse(&appstate, argc, argv)) return EXIT_FAILURE;
 
+    int result = EXIT_SUCCESS;
+
     if (appstate.help) {
         argparse_usage(appstate.me);
-        return EXIT_SUCCESS;
+        goto exit_argparse;
     }
 
     if (appstate.version) {
         argparse_version();
-        return EXIT_SUCCESS;
+        goto exit_argparse;
     }
 
     if (!appstate.cartfile) {
         fputs("No input file specified\n", stderr);
         argparse_usage(appstate.me);
-        return EXIT_FAILURE;
+        result = EXIT_FAILURE;
+        goto exit_argparse;
     }
 
     cart *cart = load_cart(appstate.cartfile);
     if (!cart) {
-        return EXIT_FAILURE;
+        result = EXIT_FAILURE;
+        goto exit_argparse;
     }
 
-    const int result = run_cmd(&appstate, cart);
+    result = run_cmd(&appstate, cart);
     cart_free(cart);
     cart = NULL;
+
+exit_argparse:
+    argparse_cleanup(&appstate);
 
     return result;
 }

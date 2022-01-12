@@ -119,6 +119,32 @@ static bool parse_address(const char *arg, int *restrict argi, int argc,
     return true;
 }
 
+static bool parse_halt(const char *arg, int *restrict argi, int argc,
+                       char *argv[argc+1], struct control *restrict appstate)
+{
+    const size_t optlen = strlen(HaltLong);
+    const char *expr = NULL;
+    if (arg[1] == HaltShort && arg[2] != '\0') {
+        expr = arg + 2;
+    } else if (strncmp(arg, HaltLong, optlen) == 0) {
+        const char *const opt = strchr(arg, '=');
+        if (opt && opt - arg == optlen) {
+            expr = opt + 1;
+        }
+    }
+    if (!expr && ++*argi < argc) {
+        expr = argv[*argi];
+    }
+    if (expr) {
+        struct haltarg **tail;
+        for (tail = &appstate->haltlist; *tail; tail = &(*tail)->next);
+        *tail = malloc(sizeof **tail);
+        **tail = (struct haltarg){.expr = expr};
+        return true;
+    }
+    return false;
+}
+
 static bool parse_arg(struct control *restrict appstate, const char *arg,
                       int *restrict argi, int argc, char *argv[argc+1])
 {
@@ -139,28 +165,8 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
                              &appstate->resetvector);
     }
 
-    const size_t haltoptlen = strlen(HaltLong);
     if (parse_flag(arg, HaltShort, false, HaltLong)) {
-        const char *expr = NULL;
-        if (arg[1] == HaltShort && arg[2] != '\0') {
-            expr = arg + 2;
-        } else if (strncmp(arg, HaltLong, haltoptlen) == 0) {
-            const char *const opt = strchr(arg, '=');
-            if (opt && opt - arg == haltoptlen) {
-                expr = opt + 1;
-            }
-        }
-        if (!expr && ++*argi < argc) {
-            expr = argv[*argi];
-        }
-        if (expr) {
-            struct haltarg **tail;
-            for (tail = &appstate->haltlist; *tail; tail = &(*tail)->next);
-            *tail = malloc(sizeof **tail);
-            **tail = (struct haltarg){.expr = expr};
-            return true;
-        }
-        return false;
+        return parse_halt(arg, argi, argc, argv, appstate);
     }
 
     SETFLAG(appstate->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);

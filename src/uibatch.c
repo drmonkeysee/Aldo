@@ -105,6 +105,8 @@ static void batch_cleanup(const struct control *appstate,
     assert(appstate != NULL);
     assert(snapshot != NULL);
 
+    if (!appstate->verbose) return;
+
     const struct timespec elapsed = timespec_elapsed(&Start);
     const double runtime = timespec_to_ms(&elapsed);
     const bool scale_ms = runtime < TSU_MS_PER_S;

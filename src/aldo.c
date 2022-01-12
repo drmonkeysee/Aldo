@@ -74,6 +74,33 @@ static int decode_cart_chr(const struct control *appstate, cart *c)
     return EXIT_SUCCESS;
 }
 
+static debugctx *create_debugger(const struct control *appstate)
+{
+    debugctx *const dbg = debug_new(appstate);
+    for (const struct haltarg *arg = appstate->haltlist;
+         arg;
+         arg = arg->next) {
+        struct haltexpr expr;
+        if (haltexpr_parse(arg->expr, &expr, NULL)) {
+            //TODO: debug_addbreakpoint(dbg, &expr);
+            if (appstate->verbose) {
+                char buf[30];
+                if (haltexpr_fmt(&expr, sizeof buf, buf) < 0) {
+                    fputs("Halt expr display error\n", stderr);
+                } else {
+                    printf("Halt Condition: %s\n", buf);
+                }
+            }
+        } else {
+            fprintf(stderr, "Halt expression parse failure: \"%s\"\n",
+                    arg->expr);
+            debug_free(dbg);
+            return NULL;
+        }
+    }
+    return dbg;
+}
+
 static void handle_input(struct control *appstate,
                          const struct console_state *snapshot, nes *console,
                          const struct ui_interface *ui)
@@ -155,33 +182,6 @@ static void update(struct control *appstate, struct console_state *snapshot,
     nes_cycle(console, &appstate->clock);
     nes_snapshot(console, snapshot);
     ui->refresh(appstate, snapshot);
-}
-
-static debugctx *create_debugger(const struct control *appstate)
-{
-    debugctx *const dbg = debug_new(appstate);
-    for (const struct haltarg *arg = appstate->haltlist;
-         arg;
-         arg = arg->next) {
-        struct haltexpr expr;
-        if (haltexpr_parse(arg->expr, &expr, NULL)) {
-            //TODO: debug_addbreakpoint(dbg, &expr);
-            if (appstate->verbose) {
-                char buf[30];
-                if (haltexpr_fmt(&expr, sizeof buf, buf) < 0) {
-                    fputs("Halt expr display error\n", stderr);
-                } else {
-                    printf("Halt Condition: %s\n", buf);
-                }
-            }
-        } else {
-            fprintf(stderr, "Halt expression parse failure: \"%s\"\n",
-                    arg->expr);
-            debug_free(dbg);
-            return NULL;
-        }
-    }
-    return dbg;
 }
 
 static int emu_run(struct control *appstate, cart *c)

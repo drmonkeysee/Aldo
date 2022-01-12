@@ -72,7 +72,7 @@ struct ines_header {
 
 struct bankview {
     size_t bank, size;
-    const uint8_t *mem;
+    const uint8_t *mem; // Non-owning Pointer
 };
 
 typedef struct cartridge cart;

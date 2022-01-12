@@ -184,13 +184,7 @@ static debugctx *create_debugger(const struct control *appstate)
     return dbg;
 }
 
-static void cleanup_debugger(debugctx **dbg)
-{
-    debug_free(*dbg);
-    *dbg = NULL;
-}
-
-static int emu_loop(struct control *appstate, cart *c)
+static int emu_run(struct control *appstate, cart *c)
 {
     if (appstate->batch && appstate->tron && !appstate->haltlist) {
         fprintf(stderr, "*** WARNING ***\nYou have turned on trace-logging"
@@ -203,20 +197,19 @@ static int emu_loop(struct control *appstate, cart *c)
 
     debugctx *dbg = create_debugger(appstate);
     if (!dbg) return EXIT_FAILURE;
+
+    int result = EXIT_SUCCESS;
     nes *console = nes_new(c, appstate->tron, dbg);
     if (!console) {
-        cleanup_debugger(&dbg);
-        return EXIT_FAILURE;
+        result = EXIT_FAILURE;
+        goto exit_debug;
     }
-
     nes_powerup(console);
-
     // NOTE: set NES to run immediately in batch mode
     if (appstate->batch) {
         nes_mode(console, NEXC_RUN);
         nes_ready(console);
     }
-
     // NOTE: initialize snapshot from console
     struct console_state snapshot;
     nes_snapshot(console, &snapshot);
@@ -245,16 +238,48 @@ static int emu_loop(struct control *appstate, cart *c)
     snapshot.mem.ram = NULL;
     nes_free(console);
     console = NULL;
-    cleanup_debugger(&dbg);
-    return EXIT_SUCCESS;
+exit_debug:
+    debug_free(dbg);
+    dbg = NULL;
+    return result;
 }
 
-static int run_cmd(struct control *appstate, cart *c)
+static int cart_run(struct control *appstate, cart *c)
 {
     if (appstate->info) return print_cart_info(appstate, c);
     if (appstate->disassemble) return disassemble_cart_prg(appstate, c);
     if (appstate->chrdecode) return decode_cart_chr(appstate, c);
-    return emu_loop(appstate, c);
+    return emu_run(appstate, c);
+}
+
+static int run(struct control *appstate)
+{
+    if (appstate->help) {
+        argparse_usage(appstate->me);
+        return EXIT_SUCCESS;
+    }
+
+    if (appstate->version) {
+        argparse_version();
+        return EXIT_SUCCESS;
+    }
+
+    if (!appstate->cartfile) {
+        fputs("No input file specified\n", stderr);
+        argparse_usage(appstate->me);
+        return EXIT_FAILURE;
+    }
+
+    cart *cart = load_cart(appstate->cartfile);
+    if (!cart) {
+        return EXIT_FAILURE;
+    }
+
+    const int result = cart_run(appstate, cart);
+
+    cart_free(cart);
+    cart = NULL;
+    return result;
 }
 
 //
@@ -266,37 +291,7 @@ int aldo_run(int argc, char *argv[argc+1])
     struct control appstate;
     if (!argparse_parse(&appstate, argc, argv)) return EXIT_FAILURE;
 
-    int result = EXIT_SUCCESS;
-
-    if (appstate.help) {
-        argparse_usage(appstate.me);
-        goto exit_argparse;
-    }
-
-    if (appstate.version) {
-        argparse_version();
-        goto exit_argparse;
-    }
-
-    if (!appstate.cartfile) {
-        fputs("No input file specified\n", stderr);
-        argparse_usage(appstate.me);
-        result = EXIT_FAILURE;
-        goto exit_argparse;
-    }
-
-    cart *cart = load_cart(appstate.cartfile);
-    if (!cart) {
-        result = EXIT_FAILURE;
-        goto exit_argparse;
-    }
-
-    result = run_cmd(&appstate, cart);
-    cart_free(cart);
-    cart = NULL;
-
-exit_argparse:
+    const int result = run(&appstate);
     argparse_cleanup(&appstate);
-
     return result;
 }

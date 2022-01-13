@@ -8,9 +8,6 @@
 #ifndef Aldo_haltexpr_h
 #define Aldo_haltexpr_h
 
-#include <inttypes.h>
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 
 enum haltcondition {

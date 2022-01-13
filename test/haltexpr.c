@@ -8,9 +8,7 @@
 #include "ciny.h"
 #include "haltexpr.h"
 
-#include <stdbool.h>
 #include <stddef.h>
-#include <string.h>
 
 static void null_string(void *ctx)
 {

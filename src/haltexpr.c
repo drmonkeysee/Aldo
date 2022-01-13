@@ -10,8 +10,11 @@
 #include "bytes.h"
 
 #include <assert.h>
-#include <string.h>
+#include <inttypes.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 
 const char *haltexpr_errstr(int err)
 {
@@ -75,14 +78,16 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
 int haltexpr_fmt(const struct haltexpr *expr,
                  char buf[restrict static HEXPR_FMT_SIZE])
 {
+    static const char *const restrict none = "None";
+
     assert(expr != NULL);
     assert(buf != NULL);
 
     int count;
     switch (expr->cond) {
     case HLT_NONE:
-        strcpy(buf, "None");
-        count = strlen("None");
+        strcpy(buf, none);
+        count = strlen(none);
         break;
     case HLT_ADDR:
         count = sprintf(buf, "@ $%04X", expr->address);

@@ -52,7 +52,7 @@ enum {
 const char *haltexpr_errstr(int err);
 
 // NOTE: if returns non-zero error code, *expr is unmodified
-int haltexpr_parse(const char *str, struct haltexpr *expr);
+int haltexpr_parse(const char *restrict str, struct haltexpr *expr);
 int haltexpr_fmt(const struct haltexpr *expr,
                  char buf[restrict static HEXPR_FMT_SIZE]);
 

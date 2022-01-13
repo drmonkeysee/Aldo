@@ -24,7 +24,7 @@ const char *haltexpr_errstr(int err)
     }
 }
 
-int haltexpr_parse(const char *str, struct haltexpr *expr)
+int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
 {
     assert(expr != NULL);
 

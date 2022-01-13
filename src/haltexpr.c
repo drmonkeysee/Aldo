@@ -30,46 +30,33 @@ int haltexpr_parse(const char *str, struct haltexpr *expr)
 
     if (str == NULL) return HEXPR_ERR_SCAN;
 
-    bool parsed = false;
+    bool parsed = false, valid = false;
     char u[2];
-    struct haltexpr e = {0};
+    struct haltexpr e;
     for (int i = HLT_NONE + 1; i < HLT_CONDCOUNT; ++i) {
         switch (i) {
         case HLT_ADDR:
             {
                 unsigned int addr;
-                if ((parsed = sscanf(str, " %1[@]%X", u, &addr) == 2)) {
-                    if (addr < MEMBLOCK_64KB) {
-                        e = (struct haltexpr){.address = addr, .cond = i};
-                    } else {
-                        return HEXPR_ERR_VALUE;
-                    }
-                }
+                parsed = sscanf(str, " %1[@]%X", u, &addr) == 2;
+                valid = addr < MEMBLOCK_64KB;
+                e = (struct haltexpr){.address = addr, .cond = i};
             }
             break;
         case HLT_TIME:
             {
                 double time;
-                if ((parsed = sscanf(str, "%lf %1[s]", &time, u) == 2)) {
-                    if (time > 0.0) {
-                        e = (struct haltexpr){.runtime = time, .cond = i};
-                    } else {
-                        return HEXPR_ERR_VALUE;
-                    }
-                }
+                parsed = sscanf(str, "%lf %1[s]", &time, u) == 2;
+                valid = time > 0.0;
+                e = (struct haltexpr){.runtime = time, .cond = i};
             }
             break;
         case HLT_CYCLES:
             {
                 uint64_t cycles;
-                if ((parsed = sscanf(str, "%" SCNu64 " %1[c]",
-                                     &cycles, u) == 2)) {
-                    if (cycles > 0) {
-                        e = (struct haltexpr){.cycles = cycles, .cond = i};
-                    } else {
-                        return HEXPR_ERR_VALUE;
-                    }
-                }
+                parsed = sscanf(str, "%" SCNu64 " %1[c]", &cycles, u) == 2;
+                valid = true;
+                e = (struct haltexpr){.cycles = cycles, .cond = i};
             }
             break;
         default:
@@ -77,11 +64,12 @@ int haltexpr_parse(const char *str, struct haltexpr *expr)
             return HEXPR_ERR_COND;
         }
         if (parsed) {
+            if (!valid) return HEXPR_ERR_VALUE;
             *expr = e;
-            break;
+            return 0;
         }
     }
-    return parsed ? 0 : HEXPR_ERR_SCAN;
+    return HEXPR_ERR_SCAN;
 }
 
 int haltexpr_fmt(const struct haltexpr *expr,

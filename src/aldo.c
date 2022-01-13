@@ -81,21 +81,24 @@ static debugctx *create_debugger(const struct control *appstate)
          arg;
          arg = arg->next) {
         struct haltexpr expr;
-        if (haltexpr_parse(arg->expr, &expr)) {
+        int err = haltexpr_parse(arg->expr, &expr);
+        if (err < 0) {
+            fprintf(stderr, "Halt expression parse failure (%d): %s"
+                    " > \"%s\"\n", err, haltexpr_errstr(err), arg->expr);
+            debug_free(dbg);
+            return NULL;
+        } else {
             //TODO: debug_addbreakpoint(dbg, &expr);
             if (appstate->verbose) {
-                char buf[30];
-                if (haltexpr_fmt(&expr, sizeof buf, buf) < 0) {
-                    fputs("Halt expr display error\n", stderr);
+                char buf[HEXPR_FMT_SIZE];
+                err = haltexpr_fmt(&expr, buf);
+                if (err < 0) {
+                    fprintf(stderr, "Halt expr display error (%d): %s\n", err,
+                            haltexpr_errstr(err));
                 } else {
                     printf("Halt Condition: %s\n", buf);
                 }
             }
-        } else {
-            fprintf(stderr, "Halt expression parse failure: \"%s\"\n",
-                    arg->expr);
-            debug_free(dbg);
-            return NULL;
         }
     }
     return dbg;

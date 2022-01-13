@@ -225,6 +225,8 @@ static int emu_run(struct control *appstate, cart *c)
         if (err == UI_ERR_ERNO) {
             perror("UI System Error");
         }
+        result = EXIT_FAILURE;
+        goto exit_console;
     }
 
     do {
@@ -237,6 +239,7 @@ static int emu_run(struct control *appstate, cart *c)
     } while (appstate->running);
 
     ui.cleanup(appstate, &snapshot);
+exit_console:
     snapshot.mem.prglength = 0;
     snapshot.mem.ram = NULL;
     nes_free(console);

@@ -7,52 +7,111 @@
 
 #include "haltexpr.h"
 
+#include "bytes.h"
+
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
 
-bool haltexpr_parse(const char *str, struct haltexpr *expr, const char **end)
+const char *haltexpr_errstr(int err)
+{
+    switch (err) {
+#define X(s, v, e) case s: return e;
+        HEXPR_ERRCODE_X
+#undef X
+    default:
+        return "UNKNOWN ERR";
+    }
+}
+
+int haltexpr_parse(const char *str, struct haltexpr *expr)
 {
     assert(expr != NULL);
 
-    if (str == NULL) return false;
+    if (str == NULL) return HEXPR_ERR_SCAN;
 
     bool parsed = false;
     char u[2];
-    struct haltexpr e;
+    struct haltexpr e = {0};
     for (int i = HLT_NONE + 1; i < HLT_CONDCOUNT; ++i) {
         switch (i) {
-#define X(s, pri, pa, scn, ...) \
-        case s: parsed = sscanf(str, scn, __VA_ARGS__) == 2; e.cond = i; break;
-            HALT_EXPR_X
-#undef X
+        case HLT_ADDR:
+            {
+                unsigned int addr;
+                if ((parsed = sscanf(str, " %1[@]%X", u, &addr) == 2)) {
+                    if (addr < MEMBLOCK_64KB) {
+                        e = (struct haltexpr){.address = addr, .cond = i};
+                    } else {
+                        return HEXPR_ERR_VALUE;
+                    }
+                }
+            }
+            break;
+        case HLT_TIME:
+            {
+                double time;
+                if ((parsed = sscanf(str, "%lf %1[s]", &time, u) == 2)) {
+                    if (time > 0.0) {
+                        e = (struct haltexpr){.runtime = time, .cond = i};
+                    } else {
+                        return HEXPR_ERR_VALUE;
+                    }
+                }
+            }
+            break;
+        case HLT_CYCLES:
+            {
+                uint64_t cycles;
+                if ((parsed = sscanf(str, "%" SCNu64 " %1[c]",
+                                     &cycles, u) == 2)) {
+                    if (cycles > 0) {
+                        e = (struct haltexpr){.cycles = cycles, .cond = i};
+                    } else {
+                        return HEXPR_ERR_VALUE;
+                    }
+                }
+            }
+            break;
         default:
             assert(((void)"INVALID HALT CONDITION", false));
-            break;
+            return HEXPR_ERR_COND;
         }
         if (parsed) {
             *expr = e;
             break;
         }
     }
-    if (end != NULL) {
-        const char *const comma = strchr(str, ',');
-        *end = comma ? comma + 1 : str + strlen(str);
-    }
-    return parsed;
+    return parsed ? 0 : HEXPR_ERR_SCAN;
 }
 
-int haltexpr_fmt(const struct haltexpr *expr, size_t sz,
-                 char buf[restrict sz])
+int haltexpr_fmt(const struct haltexpr *expr,
+                 char buf[restrict static HEXPR_FMT_SIZE])
 {
     assert(expr != NULL);
+    assert(buf != NULL);
 
+    int count;
     switch (expr->cond) {
-#define X(s, pri, pa, scn, ...) case s: return snprintf(buf, sz, pri, pa);
-        HALT_EXPR_X
-#undef X
+    case HLT_NONE:
+        strcpy(buf, "None");
+        count = strlen("None");
+        break;
+    case HLT_ADDR:
+        count = sprintf(buf, "@ $%04X", expr->address);
+        break;
+    case HLT_TIME:
+        count = sprintf(buf, "%.3f sec", expr->runtime);
+        break;
+    case HLT_CYCLES:
+        count = sprintf(buf, "%" PRIu64 " cyc", expr->cycles);
+        break;
     default:
         assert(((void)"INVALID HALT CONDITION", false));
-        return -1;
+        return HEXPR_ERR_COND;
     }
+
+    if (count < 0) return HEXPR_ERR_FMT;
+
+    assert(count < HEXPR_FMT_SIZE);
+    return count;
 }

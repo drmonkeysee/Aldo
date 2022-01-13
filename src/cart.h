@@ -81,7 +81,7 @@ typedef struct cartridge cart;
 // **WARNING**: do not write through or free this pointer!
 const char *cart_errstr(int err);
 
-// NOTE: if cart_create returns non-zero error code, *c is unmodified
+// NOTE: if returns non-zero error code, *c is unmodified
 int cart_create(cart **c, FILE *f);
 void cart_free(cart *self);
 

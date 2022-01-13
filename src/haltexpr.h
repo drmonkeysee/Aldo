@@ -13,41 +13,47 @@
 #include <stddef.h>
 #include <stdint.h>
 
-// X(symbol, print format, print format arg, scan format, scan format args...)
-#define HALT_EXPR_X \
-X(HLT_ADDR, \
-    "@ $%04X", expr->address, \
-    " %1[@]%" SCNx16, u, &e.address) \
-X(HLT_TIME, \
-    "%.3f sec", expr->runtime, \
-    "%f %1[s]", &e.runtime, u) \
-X(HLT_CYCLES, \
-    "%" PRIu64 " cyc", expr->cycles, \
-    "%" SCNu64 " %1[c]", &e.cycles, u)
-
 enum haltcondition {
     HLT_NONE,
-#define X(s, pri, pa, scn, ...) s,
-    HALT_EXPR_X
-#undef X
+    HLT_ADDR,
+    HLT_TIME,
+    HLT_CYCLES,
     HLT_CONDCOUNT,
 };
 
 struct haltexpr {
     union {
         uint64_t cycles;
-        float runtime;
+        double runtime;
         uint16_t address;
     };
     enum haltcondition cond;
 };
 
-// NOTE: if return value is false, *expr is unmodified and *end is set to
-// the end of the expression that failed to parse.
-bool haltexpr_parse(const char *str, struct haltexpr *expr, const char **end);
+enum {
+    HEXPR_FMT_SIZE = 25,    // Halt expr description is at most 24 chars
+};
 
-// NOTE: if sz = 0, behaves like snprintf and buf is allowed to be NULL
-int haltexpr_fmt(const struct haltexpr *expr, size_t sz,
-                 char buf[restrict sz]);
+// X(symbol, value, error string)
+#define HEXPR_ERRCODE_X \
+X(HEXPR_ERR_SCAN, -1, "FORMATTED INPUT FAILURE") \
+X(HEXPR_ERR_VALUE, -2, "INVALID PARSED VALUE") \
+X(HEXPR_ERR_FMT, -3, "FORMATTED OUTPUT FAILURE") \
+X(HEXPR_ERR_COND, -4, "INVALID HALT CONDITION")
+
+enum {
+#define X(s, v, e) s = v,
+    HEXPR_ERRCODE_X
+#undef X
+};
+
+// NOTE: returns a pointer to a statically allocated string;
+// **WARNING**: do not write through or free this pointer!
+const char *haltexpr_errstr(int err);
+
+// NOTE: if returns non-zero error code, *expr is unmodified
+int haltexpr_parse(const char *str, struct haltexpr *expr);
+int haltexpr_fmt(const struct haltexpr *expr,
+                 char buf[restrict static HEXPR_FMT_SIZE]);
 
 #endif

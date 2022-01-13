@@ -17,9 +17,9 @@ static void null_string(void *ctx)
     const char *const str = NULL;
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, NULL);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_assertfalse(result);
+    ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void empty_string(void *ctx)
@@ -27,464 +27,286 @@ static void empty_string(void *ctx)
     const char *const str = "";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, NULL);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_assertfalse(result);
-}
-
-static void empty_string_with_end(void *ctx)
-{
-    const char *const str = "", *end;
-    struct haltexpr expr;
-
-    const bool result = haltexpr_parse(str, &expr, &end);
-
-    ct_assertfalse(result);
-    ct_assertsame(str, end);
+    ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void address_condition(void *ctx)
 {
-    const char *const str = "@ab12", *end;
+    const char *const str = "@ab12";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
     ct_assertequal(0xab12u, expr.address);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
 static void address_condition_with_space(void *ctx)
 {
-    const char *const str = "@   ab12", *end;
+    const char *const str = "@   ab12";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
     ct_assertequal(0xab12u, expr.address);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
 static void address_condition_with_leading_space(void *ctx)
 {
-    const char *const str = "   @ab12", *end;
+    const char *const str = "   @ab12";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
     ct_assertequal(0xab12u, expr.address);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
 static void address_condition_with_trailing_space(void *ctx)
 {
-    const char *const str = "@ab12   ", *end;
+    const char *const str = "@ab12   ";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
     ct_assertequal(0xab12u, expr.address);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
 static void address_condition_caps(void *ctx)
 {
-    const char *const str = "@AB12", *end;
+    const char *const str = "@AB12";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
     ct_assertequal(0xab12u, expr.address);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
 static void address_condition_with_prefix(void *ctx)
 {
-    const char *const str = "@0xab12", *end;
+    const char *const str = "@0xab12";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
     ct_assertequal(0xab12u, expr.address);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
 static void address_condition_short(void *ctx)
 {
-    const char *const str = "@1f", *end;
+    const char *const str = "@1f";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
     ct_assertequal(0x001fu, expr.address);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
-static void address_condition_trailing_exprs(void *ctx)
+static void address_condition_too_large(void *ctx)
 {
-    const char *const str = "@ab12,foo,bar", *end;
-    struct haltexpr expr;
+    const char *const str = "@12345";
+    struct haltexpr expr = {0};
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0xab12u, expr.address);
-    ct_assertsame(strchr(str, 'f'), end);
-    ct_assertequal('f', *end);
+    ct_assertequal(HEXPR_ERR_VALUE, result);
+    ct_assertequal(HLT_NONE, (int)expr.cond);
 }
 
-static void address_condition_trailing_exprs_spaced(void *ctx)
+static void address_condition_negative_overflow(void *ctx)
 {
-    const char *const str = "@ab12, foo,bar", *end;
-    struct haltexpr expr;
+    const char *const str = "@-asdf";
+    struct haltexpr expr = {0};
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0xab12u, expr.address);
-    ct_assertsame(strchr(str, ' '), end);
-    ct_assertequal(' ', *end);
-}
-
-static void address_condition_overparse(void *ctx)
-{
-    const char *const str = "@12345", *end;
-    struct haltexpr expr;
-
-    const bool result = haltexpr_parse(str, &expr, &end);
-
-    ct_asserttrue(result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0x2345u, expr.address);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
-}
-
-static void address_condition_underparse(void *ctx)
-{
-    const char *const str = "@asdf", *end;
-    struct haltexpr expr;
-
-    const bool result = haltexpr_parse(str, &expr, &end);
-
-    ct_asserttrue(result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0xau, expr.address);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
+    ct_assertequal(HEXPR_ERR_VALUE, result);
+    ct_assertequal(HLT_NONE, (int)expr.cond);
 }
 
 static void address_condition_malformed(void *ctx)
 {
-    const char *const str = "@hjkl", *end;
+    const char *const str = "@hjkl";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_assertfalse(result);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
+    ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void runtime_condition(void *ctx)
 {
-    const char *const str = "1.2s", *end;
+    const char *const str = "1.2s";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_TIME, (int)expr.cond);
     ct_assertaboutequal(1.2f, expr.runtime, 0.001);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
 static void runtime_condition_with_space(void *ctx)
 {
-    const char *const str = "1.2   s", *end;
+    const char *const str = "1.2   s";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_TIME, (int)expr.cond);
     ct_assertaboutequal(1.2f, expr.runtime, 0.001);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
 static void runtime_condition_with_leading_space(void *ctx)
 {
-    const char *const str = "   1.2s", *end;
+    const char *const str = "   1.2s";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_TIME, (int)expr.cond);
     ct_assertaboutequal(1.2f, expr.runtime, 0.001);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
 static void runtime_condition_with_trailing_space(void *ctx)
 {
-    const char *const str = "1.2s   ", *end;
+    const char *const str = "1.2s   ";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_TIME, (int)expr.cond);
     ct_assertaboutequal(1.2f, expr.runtime, 0.001);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
 static void runtime_condition_no_decimal(void *ctx)
 {
-    const char *const str = "5s", *end;
+    const char *const str = "5s";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_TIME, (int)expr.cond);
     ct_assertaboutequal(5.0f, expr.runtime, 0.001);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
-static void runtime_condition_trailing_exprs(void *ctx)
+static void runtime_condition_negative(void *ctx)
 {
-    const char *const str = "1.2s,foo,bar", *end;
-    struct haltexpr expr;
+    const char *const str = "-20.4s";
+    struct haltexpr expr = {0};
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
-    ct_assertequal(HLT_TIME, (int)expr.cond);
-    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
-    ct_assertsame(strchr(str, 'f'), end);
-    ct_assertequal('f', *end);
-}
-
-static void runtime_condition_trailing_exprs_spaced(void *ctx)
-{
-    const char *const str = "1.2s, foo,bar", *end;
-    struct haltexpr expr;
-
-    const bool result = haltexpr_parse(str, &expr, &end);
-
-    ct_asserttrue(result);
-    ct_assertequal(HLT_TIME, (int)expr.cond);
-    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
-    ct_assertsame(strchr(str, ' '), end);
-    ct_assertequal(' ', *end);
+    ct_assertequal(HEXPR_ERR_VALUE, result);
+    ct_assertequal(HLT_NONE, (int)expr.cond);
 }
 
 static void runtime_condition_malformed(void *ctx)
 {
-    const char *const str = "fasdf", *end;
+    const char *const str = "hjkls";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_assertfalse(result);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
+    ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void cycles_condition(void *ctx)
 {
-    const char *const str = "42c", *end;
+    const char *const str = "42c";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_CYCLES, (int)expr.cond);
     ct_assertequal(42u, expr.cycles);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
 static void cycles_condition_with_space(void *ctx)
 {
-    const char *const str = "42   c", *end;
+    const char *const str = "42   c";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_CYCLES, (int)expr.cond);
     ct_assertequal(42u, expr.cycles);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
 static void cycles_condition_with_leading_space(void *ctx)
 {
-    const char *const str = "   42c", *end;
+    const char *const str = "   42c";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_CYCLES, (int)expr.cond);
     ct_assertequal(42u, expr.cycles);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
 static void cycles_condition_with_trailing_space(void *ctx)
 {
-    const char *const str = "42c   ", *end;
+    const char *const str = "42c   ";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_CYCLES, (int)expr.cond);
     ct_assertequal(42u, expr.cycles);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
 }
 
-static void cycles_condition_trailing_exprs(void *ctx)
+static void cycles_condition_negative(void *ctx)
 {
-    const char *const str = "42c,foo,bar", *end;
+    const char *const str = "-45c";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_asserttrue(result);
+    ct_assertequal(0, result);
     ct_assertequal(HLT_CYCLES, (int)expr.cond);
-    ct_assertequal(42u, expr.cycles);
-    ct_assertsame(strchr(str, 'f'), end);
-    ct_assertequal('f', *end);
-}
-
-static void cycles_condition_trailing_exprs_spaced(void *ctx)
-{
-    const char *const str = "42c, foo,bar", *end;
-    struct haltexpr expr;
-
-    const bool result = haltexpr_parse(str, &expr, &end);
-
-    ct_asserttrue(result);
-    ct_assertequal(HLT_CYCLES, (int)expr.cond);
-    ct_assertequal(42u, expr.cycles);
-    ct_assertsame(strchr(str, ' '), end);
-    ct_assertequal(' ', *end);
+    ct_assertequal(18446744073709551571u, expr.cycles);
 }
 
 static void cycles_condition_malformed(void *ctx)
 {
-    const char *const str = "fasdf", *end;
+    const char *const str = "hjklc";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_assertfalse(result);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
+    ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void expr_missing_unit(void *ctx)
 {
-    const char *const str = "1234", *end;
+    const char *const str = "1234";
     struct haltexpr expr;
 
-    const bool result = haltexpr_parse(str, &expr, &end);
+    const int result = haltexpr_parse(str, &expr);
 
-    ct_assertfalse(result);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
-}
-
-static void multiple_exprs(void *ctx)
-{
-    const char *const str = "@ab12, 1.2s, 42c", *end = str;
-    struct haltexpr expr;
-
-    bool result = haltexpr_parse(end, &expr, &end);
-
-    ct_asserttrue(result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0xab12u, expr.address);
-    ct_assertsame(strchr(str, ' '), end);
-    ct_assertequal(' ', *end);
-
-    result = haltexpr_parse(end, &expr, &end);
-
-    ct_asserttrue(result);
-    ct_assertequal(HLT_TIME, (int)expr.cond);
-    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
-    ct_assertsame(strrchr(str, ' '), end);
-    ct_assertequal(' ', *end);
-
-    result = haltexpr_parse(end, &expr, &end);
-
-    ct_asserttrue(result);
-    ct_assertequal(HLT_CYCLES, (int)expr.cond);
-    ct_assertequal(42u, expr.cycles);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
-}
-
-static void multiple_exprs_failure(void *ctx)
-{
-    const char *const str = "@ab12, sdfsdf, 42c", *end = str;
-    struct haltexpr expr;
-
-    bool result = haltexpr_parse(end, &expr, &end);
-
-    ct_asserttrue(result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0xab12u, expr.address);
-    ct_assertsame(strchr(str, ' '), end);
-    ct_assertequal(' ', *end);
-
-    result = haltexpr_parse(end, &expr, &end);
-
-    ct_assertfalse(result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0xab12u, expr.address);
-    ct_assertsame(strrchr(str, ' '), end);
-    ct_assertequal(' ', *end);
-
-    result = haltexpr_parse(end, &expr, &end);
-
-    ct_asserttrue(result);
-    ct_assertequal(HLT_CYCLES, (int)expr.cond);
-    ct_assertequal(42u, expr.cycles);
-    ct_assertsame(str + strlen(str), end);
-    ct_assertequal('\0', *end);
+    ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 //
@@ -496,7 +318,6 @@ struct ct_testsuite haltexpr_tests(void)
     static const struct ct_testcase tests[] = {
         ct_maketest(null_string),
         ct_maketest(empty_string),
-        ct_maketest(empty_string_with_end),
 
         ct_maketest(address_condition),
         ct_maketest(address_condition_with_space),
@@ -506,10 +327,8 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(address_condition_with_prefix),
         ct_maketest(address_condition_short),
         ct_maketest(address_condition_with_prefix),
-        ct_maketest(address_condition_trailing_exprs),
-        ct_maketest(address_condition_trailing_exprs_spaced),
-        ct_maketest(address_condition_overparse),
-        ct_maketest(address_condition_underparse),
+        ct_maketest(address_condition_too_large),
+        ct_maketest(address_condition_negative_overflow),
         ct_maketest(address_condition_malformed),
 
         ct_maketest(runtime_condition),
@@ -517,21 +336,17 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(runtime_condition_with_leading_space),
         ct_maketest(runtime_condition_with_trailing_space),
         ct_maketest(runtime_condition_no_decimal),
-        ct_maketest(runtime_condition_trailing_exprs),
-        ct_maketest(runtime_condition_trailing_exprs_spaced),
+        ct_maketest(runtime_condition_negative),
         ct_maketest(runtime_condition_malformed),
 
         ct_maketest(cycles_condition),
         ct_maketest(cycles_condition_with_space),
         ct_maketest(cycles_condition_with_leading_space),
         ct_maketest(cycles_condition_with_trailing_space),
-        ct_maketest(cycles_condition_trailing_exprs),
-        ct_maketest(cycles_condition_trailing_exprs_spaced),
+        ct_maketest(cycles_condition_negative),
         ct_maketest(cycles_condition_malformed),
 
         ct_maketest(expr_missing_unit),
-        ct_maketest(multiple_exprs),
-        ct_maketest(multiple_exprs_failure),
     };
 
     return ct_makesuite(tests);

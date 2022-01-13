@@ -81,7 +81,7 @@ static debugctx *create_debugger(const struct control *appstate)
          arg;
          arg = arg->next) {
         struct haltexpr expr;
-        if (haltexpr_parse(arg->expr, &expr, NULL)) {
+        if (haltexpr_parse(arg->expr, &expr)) {
             //TODO: debug_addbreakpoint(dbg, &expr);
             if (appstate->verbose) {
                 char buf[30];

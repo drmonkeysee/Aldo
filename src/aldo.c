@@ -276,7 +276,6 @@ static int run(struct control *appstate)
     }
 
     const int result = cart_run(appstate, cart);
-
     cart_free(cart);
     cart = NULL;
     return result;

@@ -158,7 +158,7 @@ static void combined_flags(void *ctx)
     ct_asserttrue(appstate->verbose);
 }
 
-static void short_chr_scale(void *ctx)
+static void chr_scale_short(void *ctx)
 {
     struct control *const appstate = ctx;
     char *argv[] = {"testaldo", "-s", "5", NULL};
@@ -171,7 +171,7 @@ static void short_chr_scale(void *ctx)
     ct_assertequal(5, appstate->chrscale);
 }
 
-static void short_chr_scale_no_space(void *ctx)
+static void chr_scale_short_no_space(void *ctx)
 {
     struct control *const appstate = ctx;
     char *argv[] = {"testaldo", "-s5", NULL};
@@ -184,7 +184,7 @@ static void short_chr_scale_no_space(void *ctx)
     ct_assertequal(5, appstate->chrscale);
 }
 
-static void short_chr_scale_does_not_support_equals(void *ctx)
+static void chr_scale_short_does_not_support_equals(void *ctx)
 {
     struct control *const appstate = ctx;
     char *argv[] = {"testaldo", "-s=5", NULL};
@@ -197,7 +197,7 @@ static void short_chr_scale_does_not_support_equals(void *ctx)
     ct_assertequal(1, appstate->chrscale);
 }
 
-static void short_chr_scale_out_of_range(void *ctx)
+static void chr_scale_short_out_of_range(void *ctx)
 {
     struct control *const appstate = ctx;
     char *argv[] = {"testaldo", "-s", "20", NULL};
@@ -210,7 +210,7 @@ static void short_chr_scale_out_of_range(void *ctx)
     ct_assertequal(1, appstate->chrscale);
 }
 
-static void short_chr_scale_malformed(void *ctx)
+static void chr_scale_short_malformed(void *ctx)
 {
     struct control *const appstate = ctx;
     char *argv[] = {"testaldo", "-s", "abc", NULL};
@@ -223,7 +223,7 @@ static void short_chr_scale_malformed(void *ctx)
     ct_assertequal(1, appstate->chrscale);
 }
 
-static void short_chr_scale_missing(void *ctx)
+static void chr_scale_short_missing(void *ctx)
 {
     struct control *const appstate = ctx;
     char *argv[] = {"testaldo", "-s", NULL};
@@ -236,7 +236,7 @@ static void short_chr_scale_missing(void *ctx)
     ct_assertequal(1, appstate->chrscale);
 }
 
-static void long_chr_scale(void *ctx)
+static void chr_scale_long(void *ctx)
 {
     struct control *const appstate = ctx;
     char *argv[] = {"testaldo", "--chr-scale", "5", NULL};
@@ -249,7 +249,7 @@ static void long_chr_scale(void *ctx)
     ct_assertequal(5, appstate->chrscale);
 }
 
-static void long_chr_scale_with_equals(void *ctx)
+static void chr_scale_long_with_equals(void *ctx)
 {
     struct control *const appstate = ctx;
     char *argv[] = {"testaldo", "--chr-scale=5", NULL};
@@ -262,7 +262,7 @@ static void long_chr_scale_with_equals(void *ctx)
     ct_assertequal(5, appstate->chrscale);
 }
 
-static void long_chr_scale_out_of_range(void *ctx)
+static void chr_scale_long_out_of_range(void *ctx)
 {
     struct control *const appstate = ctx;
     char *argv[] = {"testaldo", "--chr-scale", "20", NULL};
@@ -275,7 +275,7 @@ static void long_chr_scale_out_of_range(void *ctx)
     ct_assertequal(1, appstate->chrscale);
 }
 
-static void long_chr_scale_malformed(void *ctx)
+static void chr_scale_long_malformed(void *ctx)
 {
     struct control *const appstate = ctx;
     char *argv[] = {"testaldo", "--chr-scale", "abc", NULL};
@@ -288,7 +288,7 @@ static void long_chr_scale_malformed(void *ctx)
     ct_assertequal(1, appstate->chrscale);
 }
 
-static void long_chr_scale_missing(void *ctx)
+static void chr_scale_long_missing(void *ctx)
 {
     struct control *const appstate = ctx;
     char *argv[] = {"testaldo", "--chr-scale", NULL};
@@ -297,6 +297,19 @@ static void long_chr_scale_missing(void *ctx)
     const bool result = argparse_parse(appstate, argc, argv);
 
     ct_assertfalse(result);
+
+    ct_assertequal(1, appstate->chrscale);
+}
+
+static void chr_scale_long_does_not_overparse(void *ctx)
+{
+    struct control *const appstate = ctx;
+    char *argv[] = {"testaldo", "--chr-scalefoobar", "5", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(appstate, argc, argv);
+
+    ct_asserttrue(result);
 
     ct_assertequal(1, appstate->chrscale);
 }
@@ -354,6 +367,20 @@ static void chr_decode_long_with_prefix(void *ctx)
 
     ct_asserttrue(appstate->chrdecode);
     ct_assertequalstr("myrom", appstate->chrdecode_prefix);
+}
+
+static void chr_decode_long_does_not_overparse(void *ctx)
+{
+    struct control *const appstate = ctx;
+    char *argv[] = {"testaldo", "--chr-decodefoobar=myrom", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(appstate, argc, argv);
+
+    ct_asserttrue(result);
+
+    ct_assertfalse(appstate->chrdecode);
+    ct_assertnull(appstate->chrdecode_prefix);
 }
 
 static void both_flags_and_values(void *ctx)
@@ -522,6 +549,19 @@ static void reset_override_long_missing(void *ctx)
     ct_assertequal(-1, appstate->resetvector);
 }
 
+static void reset_override_long_does_not_overparse(void *ctx)
+{
+    struct control *const appstate = ctx;
+    char *argv[] = {"testaldo", "--reset-vectorfoobar", "98765", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(appstate, argc, argv);
+
+    ct_asserttrue(result);
+
+    ct_assertequal(-1, appstate->resetvector);
+}
+
 static void halt_short(void *ctx)
 {
     struct control *const appstate = ctx;
@@ -642,6 +682,19 @@ static void halt_long_missing(void *ctx)
     ct_assertnull(appstate->haltlist);
 }
 
+static void halt_long_does_not_overparse(void *ctx)
+{
+    struct control *const appstate = ctx;
+    char *argv[] = {"testaldo", "--haltfoobar", "baz", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(appstate, argc, argv);
+
+    ct_asserttrue(result);
+
+    ct_assertnull(appstate->haltlist);
+}
+
 static void option_does_not_trigger_flag(void *ctx)
 {
     struct control *const appstate = ctx;
@@ -676,22 +729,24 @@ struct ct_testsuite argparse_tests(void)
         ct_maketest(mix_long_and_short),
         ct_maketest(combined_flags),
 
-        ct_maketest(short_chr_scale),
-        ct_maketest(short_chr_scale_no_space),
-        ct_maketest(short_chr_scale_does_not_support_equals),
-        ct_maketest(short_chr_scale_out_of_range),
-        ct_maketest(short_chr_scale_malformed),
-        ct_maketest(short_chr_scale_missing),
-        ct_maketest(long_chr_scale),
-        ct_maketest(long_chr_scale_with_equals),
-        ct_maketest(long_chr_scale_out_of_range),
-        ct_maketest(long_chr_scale_malformed),
-        ct_maketest(long_chr_scale_missing),
+        ct_maketest(chr_scale_short),
+        ct_maketest(chr_scale_short_no_space),
+        ct_maketest(chr_scale_short_does_not_support_equals),
+        ct_maketest(chr_scale_short_out_of_range),
+        ct_maketest(chr_scale_short_malformed),
+        ct_maketest(chr_scale_short_missing),
+        ct_maketest(chr_scale_long),
+        ct_maketest(chr_scale_long_with_equals),
+        ct_maketest(chr_scale_long_out_of_range),
+        ct_maketest(chr_scale_long_malformed),
+        ct_maketest(chr_scale_long_missing),
+        ct_maketest(chr_scale_long_does_not_overparse),
 
         ct_maketest(chr_decode_short),
         ct_maketest(chr_decode_short_does_not_support_prefix),
         ct_maketest(chr_decode_long_no_prefix),
         ct_maketest(chr_decode_long_with_prefix),
+        ct_maketest(chr_decode_long_does_not_overparse),
 
         ct_maketest(both_flags_and_values),
         ct_maketest(flags_and_values_do_not_combine),
@@ -706,6 +761,7 @@ struct ct_testsuite argparse_tests(void)
         ct_maketest(reset_override_long_out_of_range),
         ct_maketest(reset_override_long_malformed),
         ct_maketest(reset_override_long_missing),
+        ct_maketest(reset_override_long_does_not_overparse),
 
         ct_maketest(halt_short),
         ct_maketest(halt_short_no_space),
@@ -715,6 +771,7 @@ struct ct_testsuite argparse_tests(void)
         ct_maketest(halt_long_with_equals),
         ct_maketest(halt_long_multiple),
         ct_maketest(halt_long_missing),
+        ct_maketest(halt_long_does_not_overparse),
 
         ct_maketest(option_does_not_trigger_flag),
     };

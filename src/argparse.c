@@ -57,11 +57,13 @@ static void init_control(struct control *appstate)
 
 static bool parse_flag(const char *arg, char shrt, bool exact, const char *lng)
 {
+    const size_t lnglen = lng ? strlen(lng) : 0;
     return (strlen(arg) > 1
                 && exact
                     ? arg[1] == shrt
                     : arg[1] != '-' && strchr(arg, shrt) != NULL)
-            || (lng && strncmp(arg, lng, strlen(lng)) == 0);
+            || (lnglen > 0 && strncmp(arg, lng, lnglen) == 0
+                && (arg[lnglen] == '\0' || arg[lnglen] == '='));
 }
 
 #define SETFLAG(f, a, s, l) (f) = (f) || parse_flag(a, s, false, l)

@@ -68,7 +68,7 @@ static bool parse_flag(const char *arg, char shrt, bool exact, const char *lng)
 
 #define SETFLAG(f, a, s, l) (f) = (f) || parse_flag(a, s, false, l)
 
-static bool convert_num(const char *arg, int base, long *restrict result)
+static bool convert_num(const char *restrict arg, int base, long *result)
 {
     char *end;
     errno = 0;

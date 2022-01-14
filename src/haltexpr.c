@@ -78,16 +78,13 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
 int haltexpr_fmt(const struct haltexpr *expr,
                  char buf[restrict static HEXPR_FMT_SIZE])
 {
-    static const char *const restrict none = "None";
-
     assert(expr != NULL);
     assert(buf != NULL);
 
     int count;
     switch (expr->cond) {
     case HLT_NONE:
-        strcpy(buf, none);
-        count = strlen(none);
+        count = sprintf(buf, "None");
         break;
     case HLT_ADDR:
         count = sprintf(buf, "@ $%04X", expr->address);

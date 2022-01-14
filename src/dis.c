@@ -97,6 +97,7 @@ static int print_mnemonic(const struct decoded *dec,
         count = sprintf(dis + total, strtable[instlen - 1], batowr(bytes + 1));
         break;
     default:
+        assert(((void)"INVALID ADDR MODE LENGTH", false));
         return DIS_ERR_INV_ADDRMD;
     }
     if (count < 0) return DIS_ERR_FMT;
@@ -521,7 +522,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
 #undef XPEEK
         default:
             assert(((void)"BAD ADDRMODE PEEK", false));
-            break;
+            return DIS_ERR_INV_ADDRMD;
         }
         if (total < 0) return DIS_ERR_FMT;
     }

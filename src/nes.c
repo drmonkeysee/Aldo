@@ -218,6 +218,9 @@ void nes_cycle(nes *self, struct cycleclock *clock)
         instruction_trace(self, clock);
 
         switch (self->mode) {
+        default:
+            assert(((void)"INVALID EXC MODE", false));
+            // NOTE: release build fallthrough to single-cycle
         case NEXC_CYCLE:
             self->cpu.signal.rdy = false;
             break;
@@ -225,9 +228,6 @@ void nes_cycle(nes *self, struct cycleclock *clock)
             self->cpu.signal.rdy = !self->cpu.signal.sync;
             break;
         case NEXC_RUN:
-            break;
-        default:
-            assert(((void)"INVALID EXC MODE", false));
             break;
         }
         debug_check(self->dbg);

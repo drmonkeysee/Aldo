@@ -179,12 +179,19 @@ static void handle_input(struct control *appstate,
     }
 }
 
-static void update(struct control *appstate, struct console_state *snapshot,
-                   nes *console, const struct ui_interface *ui)
+static void emu_loop(struct control *appstate, struct console_state *snapshot,
+                     nes *console, const struct ui_interface *ui)
 {
-    nes_cycle(console, &appstate->clock);
-    nes_snapshot(console, snapshot);
-    ui->refresh(appstate, snapshot);
+    do {
+        ui->tick_start(appstate, snapshot);
+        handle_input(appstate, snapshot, console, ui);
+        if (appstate->running) {
+            nes_cycle(console, &appstate->clock);
+            nes_snapshot(console, snapshot);
+            ui->refresh(appstate, snapshot);
+        }
+        ui->tick_end();
+    } while (appstate->running);
 }
 
 static int emu_run(struct control *appstate, cart *c)
@@ -229,14 +236,7 @@ static int emu_run(struct control *appstate, cart *c)
         goto exit_console;
     }
 
-    do {
-        ui.tick_start(appstate, &snapshot);
-        handle_input(appstate, &snapshot, console, &ui);
-        if (appstate->running) {
-            update(appstate, &snapshot, console, &ui);
-        }
-        ui.tick_end();
-    } while (appstate->running);
+    emu_loop(appstate, &snapshot, console, &ui);
 
     ui.cleanup(appstate, &snapshot);
 exit_console:

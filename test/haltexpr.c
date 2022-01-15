@@ -9,6 +9,29 @@
 #include "haltexpr.h"
 
 #include <stddef.h>
+#include <string.h>
+
+//
+// Error Strings
+//
+
+static void errstr_returns_known_err(void *ctx)
+{
+    const char *const err = haltexpr_errstr(HEXPR_ERR_FMT);
+
+    ct_assertequalstr("FORMATTED OUTPUT FAILURE", err);
+}
+
+static void errstr_returns_unknown_err(void *ctx)
+{
+    const char *const err = haltexpr_errstr(10);
+
+    ct_assertequalstr("UNKNOWN ERR", err);
+}
+
+//
+// Expression Parse
+//
 
 static void null_string(void *ctx)
 {
@@ -308,12 +331,67 @@ static void expr_missing_unit(void *ctx)
 }
 
 //
+// Expression Print
+//
+
+static void print_none(void *ctx)
+{
+    struct haltexpr expr = {0};
+    char buf[HEXPR_FMT_SIZE];
+
+    const int result = haltexpr_fmt(&expr, buf);
+
+    const char *const expected = "None";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
+static void print_addr(void *ctx)
+{
+    struct haltexpr expr = {.cond = HLT_ADDR, .address = 0x1234};
+    char buf[HEXPR_FMT_SIZE];
+
+    const int result = haltexpr_fmt(&expr, buf);
+
+    const char *const expected = "@ $1234";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
+static void print_runtime(void *ctx)
+{
+    struct haltexpr expr = {.cond = HLT_TIME, .runtime = 4.36532245};
+    char buf[HEXPR_FMT_SIZE];
+
+    const int result = haltexpr_fmt(&expr, buf);
+
+    const char *const expected = "4.365 sec";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
+static void print_cycles(void *ctx)
+{
+    struct haltexpr expr = {.cond = HLT_CYCLES, .cycles = 982423};
+    char buf[HEXPR_FMT_SIZE];
+
+    const int result = haltexpr_fmt(&expr, buf);
+
+    const char *const expected = "982423 cyc";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
+//
 // Test List
 //
 
 struct ct_testsuite haltexpr_tests(void)
 {
     static const struct ct_testcase tests[] = {
+        ct_maketest(errstr_returns_known_err),
+        ct_maketest(errstr_returns_unknown_err),
+
         ct_maketest(null_string),
         ct_maketest(empty_string),
 
@@ -345,6 +423,11 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(cycles_condition_malformed),
 
         ct_maketest(expr_missing_unit),
+
+        ct_maketest(print_none),
+        ct_maketest(print_addr),
+        ct_maketest(print_runtime),
+        ct_maketest(print_cycles),
     };
 
     return ct_makesuite(tests);

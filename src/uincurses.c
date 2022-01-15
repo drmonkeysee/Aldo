@@ -59,21 +59,12 @@ static void tick_sleep(void)
         return;
     }
 
-    struct timespec tick_left = {
+    const struct timespec tick_left = {
         .tv_nsec = VSync.tv_nsec - elapsed.tv_nsec,
-    }, tick_req;
+    };
     FrameLeftMs = timespec_to_ms(&tick_left);
 
-    int result;
-    do {
-        tick_req = tick_left;
-#ifdef __APPLE__
-        errno = 0;
-        result = nanosleep(&tick_req, &tick_left) ? errno : 0;
-#else
-        result = clock_nanosleep(CLOCK_MONOTONIC, 0, &tick_req, &tick_left);
-#endif
-    } while (result == EINTR);
+    timespec_sleep(tick_left);
 }
 
 //

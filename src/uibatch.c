@@ -38,6 +38,12 @@ static void handle_sigint(int sig, siginfo_t *info, void *uap)
     QuitSignal = 1;
 }
 
+static void tick_sleep(void)
+{
+    // NOTE: sleep for 1ms to avoid monopolizing CPU
+    timespec_sleep((struct timespec){.tv_nsec = TSU_NS_PER_MS});
+}
+
 //
 // UI Interface Implementation
 //
@@ -74,6 +80,7 @@ static void batch_tick_start(struct control *appstate,
 static void batch_tick_end(void)
 {
     Previous = Current;
+    tick_sleep();
 }
 
 static int batch_pollinput(void)

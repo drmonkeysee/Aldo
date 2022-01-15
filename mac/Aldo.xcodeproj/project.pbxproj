@@ -57,6 +57,7 @@
 		C8C706BE2751F55C00B45785 /* trace.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706BD2751F55C00B45785 /* trace.c */; };
 		C8D44BDD2786B571005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D44BDC2786B571005AB586 /* argparse.c */; };
 		C8D44BDE2786B6DF005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
+		C8D8FDA82792691B0073639B /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -137,6 +138,7 @@
 		C8C706BC2751F55C00B45785 /* trace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = trace.h; sourceTree = "<group>"; };
 		C8C706BD2751F55C00B45785 /* trace.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = trace.c; sourceTree = "<group>"; };
 		C8D44BDC2786B571005AB586 /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
+		C8D8FDA72792691B0073639B /* tsutil.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tsutil.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -250,6 +252,7 @@
 				C8C706BC2751F55C00B45785 /* trace.h */,
 				C8C706BD2751F55C00B45785 /* trace.c */,
 				C83965E927810D4300E1E28E /* tsutil.h */,
+				C8D8FDA72792691B0073639B /* tsutil.c */,
 				C8557B2D25C661660090296D /* ui.h */,
 				C8557B2E25C661660090296D /* ui.c */,
 				C8186496277EB45900CA4AC0 /* uibatch.c */,
@@ -422,6 +425,7 @@
 				C8C706952751EEBA00B45785 /* cart.c in Sources */,
 				C85C8DC625BD29AC00611D19 /* dis.c in Sources */,
 				C8557B2F25C661660090296D /* ui.c in Sources */,
+				C8D8FDA82792691B0073639B /* tsutil.c in Sources */,
 				C8186495277EB0F700CA4AC0 /* uincurses.c in Sources */,
 				C8C706942751EEBA00B45785 /* cpu.c in Sources */,
 				C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */,

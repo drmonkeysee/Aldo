@@ -197,10 +197,10 @@ static void emu_loop(struct control *appstate, struct console_state *snapshot,
 static int emu_run(struct control *appstate, cart *c)
 {
     if (appstate->batch && appstate->tron && !appstate->haltlist) {
-        fprintf(stderr, "*** WARNING ***\nYou have turned on trace-logging"
-                " with batch mode but specified no halt conditions;\n"
-                "this can result in a very large trace file very quickly!\n"
-                "Continue? [yN] ");
+        fputs("*** WARNING ***\nYou have turned on trace-logging"
+              " with batch mode but specified no halt conditions;\n"
+              "this can result in a very large trace file very quickly!\n"
+              "Continue? [yN] ", stderr);
         const int input = getchar();
         if (input != 'y' && input != 'Y') return EXIT_FAILURE;
     }

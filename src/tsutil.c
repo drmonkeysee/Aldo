@@ -34,15 +34,15 @@ struct timespec timespec_elapsed(const struct timespec *from)
 
 void timespec_sleep(struct timespec duration)
 {
-    struct timespec ts_req;
+    struct timespec ts_left;
     int result;
     do {
-        ts_req = duration;
 #ifdef __APPLE__
         errno = 0;
-        result = nanosleep(&ts_req, &duration) ? errno : 0;
+        result = nanosleep(&duration, &ts_left) ? errno : 0;
 #else
-        result = clock_nanosleep(CLOCK_MONOTONIC, 0, &tick_req, &tick_left);
+        result = clock_nanosleep(CLOCK_MONOTONIC, 0, &duration, &ts_left);
 #endif
+        duration = ts_left;
     } while (result == EINTR);
 }

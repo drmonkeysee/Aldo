@@ -88,7 +88,7 @@ static debugctx *create_debugger(const struct control *appstate)
             debug_free(dbg);
             return NULL;
         } else {
-            //TODO: debug_addbreakpoint(dbg, &expr);
+            debug_addbreakpoint(dbg, expr);
             if (appstate->verbose) {
                 char buf[HEXPR_FMT_SIZE];
                 err = haltexpr_fmt(&expr, buf);

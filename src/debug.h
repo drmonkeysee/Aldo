@@ -10,6 +10,7 @@
 
 #include "control.h"
 #include "cpu.h"
+#include "haltexpr.h"
 #include "snapshot.h"
 
 #include <stdint.h>
@@ -23,6 +24,7 @@ void debug_attach_cpu(debugctx *self, struct mos6502 *cpu);
 void debug_detach(debugctx *self);
 
 void debug_override_reset(debugctx *self, uint16_t device_addr);
+void debug_addbreakpoint(debugctx *self, struct haltexpr expr);
 void debug_check(debugctx *self);
 
 // NOTE: returns a pointer to a statically allocated string;

@@ -32,12 +32,33 @@ struct resdecorator {
     uint16_t vector;
 };
 
+enum breakpointstatus {
+    BPS_FREE,
+    BPS_DISABLED,
+    BPS_ENABLED,
+};
+
+struct breakpoint {
+    struct haltexpr expr;
+    enum breakpointstatus status;
+};
+
+struct breakpoint_vector {
+    size_t capacity, size;
+    struct breakpoint *items;
+};
+
 struct debugger_context {
     struct mos6502 *cpu;    // Non-owning Pointer
     struct resdecorator *dec;
+    struct breakpoint_vector breakpoints;
     enum debugger_state state;
     int resetvector;
 };
+
+//
+// Bus Interception
+//
 
 static bool resetaddr_read(const void *restrict ctx, uint16_t addr,
                            uint8_t *restrict d)
@@ -72,10 +93,64 @@ static size_t resetaddr_dma(const void *restrict ctx, uint16_t addr,
 }
 
 //
-// Halt Conditions
+// Breakpoint Vector
 //
 
-static bool bp_instruction(const struct debugger_context *self)
+static void bpvector_init(struct breakpoint_vector *vec)
+{
+    static const size_t initial_capacity = 2;
+    *vec = (struct breakpoint_vector){
+        .capacity = initial_capacity,
+        .items = calloc(initial_capacity, sizeof *vec->items),
+    };
+}
+
+static struct breakpoint *bpvector_find_slot(struct breakpoint_vector *vec)
+{
+    for (size_t i = 0; i < vec->capacity; ++i) {
+        if (vec->items[i].status == BPS_FREE) {
+            return vec->items + i;
+        }
+    }
+    return NULL;
+}
+
+static void bpvector_resize(struct breakpoint_vector *vec)
+{
+    static const double k = 1.5;
+    vec->capacity *= k;
+    vec->items = realloc(vec->items, vec->capacity * sizeof *vec->items);
+    assert(vec->items != NULL);
+    for (size_t i = vec->size; i < vec->capacity; ++i) {
+        vec->items[i] = (struct breakpoint){0};
+    }
+}
+
+static void bpvector_insert(struct breakpoint_vector *vec,
+                            struct haltexpr expr)
+{
+    struct breakpoint *slot = bpvector_find_slot(vec);
+    if (!slot) {
+        bpvector_resize(vec);
+        slot = bpvector_find_slot(vec);
+    }
+    assert(slot != NULL);
+    *slot = (struct breakpoint){expr, BPS_ENABLED};
+    ++vec->size;
+
+    assert(vec->size <= vec->capacity);
+}
+
+static void bpvector_free(struct breakpoint_vector *vec)
+{
+    free(vec->items);
+}
+
+//
+// Breakpoints
+//
+
+static bool bp_address(const struct debugger_context *self)
 {
     // TODO: revive this once breakpoints are created
     //return self->cpu->signal.sync && self->cpu->addrinst == self->haltaddr;
@@ -96,6 +171,7 @@ debugctx *debug_new(const struct control *appstate)
         .resetvector = appstate->resetvector,
         .state = DBG_INACTIVE,
     };
+    bpvector_init(&self->breakpoints);
     return self;
 }
 
@@ -103,6 +179,7 @@ void debug_free(debugctx *self)
 {
     assert(self != NULL);
 
+    bpvector_free(&self->breakpoints);
     free(self->dec);
     free(self);
 }
@@ -134,6 +211,13 @@ void debug_override_reset(debugctx *self, uint16_t device_addr)
     bus_swap(self->cpu->bus, device_addr, resetaddr_device, &self->dec->inner);
 }
 
+void debug_addbreakpoint(debugctx *self, struct haltexpr expr)
+{
+    assert(self != NULL);
+
+    bpvector_insert(&self->breakpoints, expr);
+}
+
 void debug_check(debugctx *self)
 {
     assert(self != NULL);
@@ -142,7 +226,7 @@ void debug_check(debugctx *self)
 
     switch (self->state) {
     case DBG_RUN:
-        if (bp_instruction(self)) {
+        if (bp_address(self)) {
             self->cpu->signal.rdy = false;
             self->state = DBG_BREAK;
         }

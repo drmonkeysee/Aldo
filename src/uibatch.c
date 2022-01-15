@@ -14,6 +14,7 @@
 #include <inttypes.h>
 #include <signal.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -21,7 +22,8 @@
 static const char *const restrict DistractorFormat = "%c Running\u2026";
 
 static struct timespec Current, Previous, Start;
-static double FrameTimeMs;
+static double AvgFrameTimeMs, FrameTimeMs;
+static uint64_t Ticks;
 
 static void clearline(void)
 {
@@ -62,8 +64,14 @@ static void batch_tick_start(struct control *appstate,
     clock_gettime(CLOCK_MONOTONIC, &Current);
     FrameTimeMs = timespec_to_ms(&Current) - timespec_to_ms(&Previous);
 
-    // NOTE: 1 cycle per tick approximates running emu at native cpu speed
-    appstate->clock.budget = 1;
+    // NOTE: cumulative moving average:
+    // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
+    AvgFrameTimeMs = (FrameTimeMs + (Ticks * AvgFrameTimeMs)) / (Ticks + 1);
+
+    // NOTE: arbitrary per-tick budget, 6502s often ran at 1 MHz so a million
+    // cycles per tick seems as good a number as any; anything under a billion
+    // has sub-millisecond frame-time on my hardware.
+    appstate->clock.budget = 1e6;
 
     // NOTE: if cpu halts or jams, exit batch mode
     if (!snapshot->lines.ready || snapshot->datapath.jammed) {
@@ -74,6 +82,7 @@ static void batch_tick_start(struct control *appstate,
 static void batch_tick_end(void)
 {
     Previous = Current;
+    ++Ticks;
 }
 
 static int batch_pollinput(void)
@@ -115,6 +124,7 @@ static void batch_cleanup(const struct control *appstate,
     printf("---=== %s ===---\n", ctrl_cartfilename(appstate->cartfile));
     printf("Run Time (%ssec): %.3f\n", scale_ms ? "m" : "",
            scale_ms ? runtime : runtime / TSU_MS_PER_S);
+    printf("Avg Frame Time (msec): %.3f\n", AvgFrameTimeMs);
     printf("Total Cycles: %" PRIu64 "\n", appstate->clock.total_cycles);
     printf("Avg Cycles/sec: %.2f\n",
            appstate->clock.total_cycles * (TSU_MS_PER_S / runtime));

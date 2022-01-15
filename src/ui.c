@@ -10,10 +10,6 @@
 #include "tsutil.h"
 
 #include <assert.h>
-#include <time.h>
-
-extern inline double timespec_to_ms(const struct timespec *);
-extern inline struct timespec timespec_elapsed(const struct timespec *);
 
 int ui_batch_init(struct ui_interface *ui);
 int ui_ncurses_init(struct ui_interface *ui);

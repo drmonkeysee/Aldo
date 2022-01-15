@@ -7,12 +7,16 @@
 
 #include "tsutil.h"
 
+#include <assert.h>
 #include <errno.h>
+#include <stddef.h>
 
 extern inline double timespec_to_ms(const struct timespec *);
 
 struct timespec timespec_elapsed(const struct timespec *from)
 {
+    assert(from != NULL);
+
     struct timespec now, elapsed;
     clock_gettime(CLOCK_MONOTONIC, &now);
 

@@ -121,9 +121,7 @@ static struct breakpoint *
 bpvector_find_slot(const struct breakpoint_vector *vec)
 {
     for (size_t i = 0; i < vec->capacity; ++i) {
-        if (vec->items[i].status == BPS_FREE) {
-            return vec->items + i;
-        }
+        if (vec->items[i].status == BPS_FREE) return vec->items + i;
     }
     return NULL;
 }
@@ -174,6 +172,7 @@ static bphandle bpvector_break(const struct breakpoint_vector *vec,
 static void bpvector_free(struct breakpoint_vector *vec)
 {
     free(vec->items);
+    vec->items = NULL;
 }
 
 //

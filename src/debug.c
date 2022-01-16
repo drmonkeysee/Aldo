@@ -117,8 +117,8 @@ static struct breakpoint *bpvector_find_slot(struct breakpoint_vector *vec)
 
 static void bpvector_resize(struct breakpoint_vector *vec)
 {
-    static const double k = 1.5;
-    vec->capacity *= k;
+    // NOTE: growth factor K = 1.5
+    vec->capacity += vec->capacity / 2;
     vec->items = realloc(vec->items, vec->capacity * sizeof *vec->items);
     assert(vec->items != NULL);
     for (size_t i = vec->size; i < vec->capacity; ++i) {

@@ -64,13 +64,11 @@ static void create_cpubus(struct nes_console *self)
     const uint16_t cart_busaddr = MEMBLOCK_32KB;
     cart_cpu_connect(self->cart, self->cpu.bus, cart_busaddr);
 
-    debug_attach_cpu(self->dbg, &self->cpu);
-    debug_override_reset(self->dbg, cart_busaddr);
+    debug_override_reset(self->dbg, self->cpu.bus, cart_busaddr);
 }
 
 static void free_cpubus(struct nes_console *self)
 {
-    debug_detach(self->dbg);
     cart_cpu_disconnect(self->cart, self->cpu.bus, MEMBLOCK_32KB);
     bus_free(self->cpu.bus);
     self->cpu.bus = NULL;
@@ -230,7 +228,7 @@ void nes_cycle(nes *self, struct cycleclock *clock)
         case NEXC_RUN:
             break;
         }
-        debug_check(self->dbg);
+        debug_check(self->dbg, clock, &self->cpu);
     }
 }
 

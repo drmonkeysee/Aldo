@@ -7,7 +7,6 @@
 
 #include "debug.h"
 
-#include "bus.h"
 #include "bytes.h"
 
 #include <assert.h>
@@ -38,6 +37,9 @@ enum breakpointstatus {
     BPS_ENABLED,
 };
 
+typedef ptrdiff_t bphandle;
+static const bphandle NoBreakpoint = -1;
+
 struct breakpoint {
     struct haltexpr expr;
     enum breakpointstatus status;
@@ -49,9 +51,9 @@ struct breakpoint_vector {
 };
 
 struct debugger_context {
-    struct mos6502 *cpu;    // Non-owning Pointer
     struct resdecorator *dec;
     struct breakpoint_vector breakpoints;
+    bphandle halted;
     enum debugger_state state;
     int resetvector;
 };
@@ -93,6 +95,16 @@ static size_t resetaddr_dma(const void *restrict ctx, uint16_t addr,
 }
 
 //
+// Breakpoints
+//
+
+static bool halt_address(const struct breakpoint *bp,
+                         const struct mos6502 *cpu)
+{
+    return cpu->signal.sync && cpu->addrinst == bp->expr.address;
+}
+
+//
 // Breakpoint Vector
 //
 
@@ -105,7 +117,8 @@ static void bpvector_init(struct breakpoint_vector *vec)
     };
 }
 
-static struct breakpoint *bpvector_find_slot(struct breakpoint_vector *vec)
+static struct breakpoint *
+bpvector_find_slot(const struct breakpoint_vector *vec)
 {
     for (size_t i = 0; i < vec->capacity; ++i) {
         if (vec->items[i].status == BPS_FREE) {
@@ -141,21 +154,26 @@ static void bpvector_insert(struct breakpoint_vector *vec,
     assert(vec->size <= vec->capacity);
 }
 
+static bphandle bpvector_break(const struct breakpoint_vector *vec,
+                               const struct cycleclock *clk,
+                               const struct mos6502 *cpu)
+{
+    for (size_t i = 0; i < vec->capacity; ++i) {
+        const struct breakpoint *const bp = vec->items + i;
+        if (bp->status != BPS_ENABLED) continue;
+        switch (bp->expr.cond) {
+        case HLT_ADDR:
+            if (halt_address(bp, cpu)) return i;
+        default:
+            break;
+        }
+    }
+    return NoBreakpoint;
+}
+
 static void bpvector_free(struct breakpoint_vector *vec)
 {
     free(vec->items);
-}
-
-//
-// Breakpoints
-//
-
-static bool bp_address(const struct debugger_context *self)
-{
-    // TODO: revive this once breakpoints are created
-    //return self->cpu->signal.sync && self->cpu->addrinst == self->haltaddr;
-    (void)self;
-    return false;
 }
 
 //
@@ -168,6 +186,7 @@ debugctx *debug_new(const struct control *appstate)
 
     struct debugger_context *const self = malloc(sizeof *self);
     *self = (struct debugger_context){
+        .halted = NoBreakpoint,
         .resetvector = appstate->resetvector,
         .state = DBG_INACTIVE,
     };
@@ -184,31 +203,19 @@ void debug_free(debugctx *self)
     free(self);
 }
 
-void debug_attach_cpu(debugctx *self, struct mos6502 *cpu)
+void debug_override_reset(debugctx *self, bus *b, uint16_t device_addr)
 {
     assert(self != NULL);
-    assert(cpu != NULL);
+    assert(b != NULL);
 
-    self->cpu = cpu;
-}
-
-void debug_detach(debugctx *self)
-{
-    self->cpu = NULL;
-}
-
-void debug_override_reset(debugctx *self, uint16_t device_addr)
-{
-    assert(self != NULL);
-
-    if (self->resetvector < 0 || !self->cpu) return;
+    if (self->resetvector < 0) return;
 
     self->dec = malloc(sizeof *self->dec);
     self->dec->vector = self->resetvector;
     struct busdevice resetaddr_device = {
         resetaddr_read, resetaddr_write, resetaddr_dma, self->dec,
     };
-    bus_swap(self->cpu->bus, device_addr, resetaddr_device, &self->dec->inner);
+    bus_swap(b, device_addr, resetaddr_device, &self->dec->inner);
 }
 
 void debug_addbreakpoint(debugctx *self, struct haltexpr expr)
@@ -216,23 +223,27 @@ void debug_addbreakpoint(debugctx *self, struct haltexpr expr)
     assert(self != NULL);
 
     bpvector_insert(&self->breakpoints, expr);
+    self->state = DBG_RUN;
 }
 
-void debug_check(debugctx *self)
+void debug_check(debugctx *self, const struct cycleclock *clk,
+                 struct mos6502 *cpu)
 {
     assert(self != NULL);
-
-    if (!self->cpu) return;
+    assert(clk != NULL);
+    assert(cpu != NULL);
 
     switch (self->state) {
     case DBG_RUN:
-        if (bp_address(self)) {
-            self->cpu->signal.rdy = false;
+        if ((self->halted = bpvector_break(&self->breakpoints, clk, cpu))
+            != NoBreakpoint) {
+            cpu->signal.rdy = false;
             self->state = DBG_BREAK;
         }
         break;
     case DBG_BREAK:
         self->state = DBG_RUN;
+        self->halted = NoBreakpoint;
         break;
     default:
         break;

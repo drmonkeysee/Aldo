@@ -70,12 +70,12 @@ static void tick_sleep(void)
 // UI Widgets
 //
 
-struct view {
+struct view ;
+
+static struct view {
     WINDOW *restrict win, *restrict content;
     PANEL *restrict outer, *restrict inner;
-};
-
-static struct view
+}
     HwView,
     ControlsView,
     DebuggerView,

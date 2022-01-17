@@ -20,13 +20,12 @@ static const int PreFetch = -1;
 // State Management
 //
 
-struct cpu_context {
-    struct cpu_context *next;
-    struct mos6502 cpu;
-};
 // NOTE: Pool is never freed, global pointer is reachable at program exit
 // WARNING: moving contexts in/out of the Pool is not thread-safe!
-static struct cpu_context *Pool;
+static struct cpu_context {
+    struct cpu_context *next;
+    struct mos6502 cpu;
+} *Pool;
 
 static struct cpu_context *capture(struct mos6502 *self)
 {

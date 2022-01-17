@@ -25,10 +25,6 @@ void debug_override_reset(debugctx *self, bus *b, uint16_t device_addr);
 void debug_addbreakpoint(debugctx *self, struct haltexpr expr);
 void debug_check(debugctx *self, const struct cycleclock *clk,
                  struct mos6502 *cpu);
-
-// NOTE: returns a pointer to a statically allocated string;
-// **WARNING**: do not write through or free this pointer!
-const char *debug_description(int state);
 void debug_snapshot(debugctx *self, struct console_state *snapshot);
 
 #endif

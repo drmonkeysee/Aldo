@@ -10,6 +10,7 @@
 #include "cart.h"
 #include "debug.h"
 #include "dis.h"
+#include "haltexpr.h"
 #include "tsutil.h"
 #include "ui.h"
 
@@ -166,8 +167,7 @@ static void drawdebugger(const struct control *appstate,
                          const struct console_state *snapshot)
 {
     int cursor_y = 0;
-    mvwprintw(DebuggerView.content, cursor_y++, 0, "State: %s",
-              debug_description(snapshot->debugger.state));
+    werase(DebuggerView.content);
     mvwprintw(DebuggerView.content, cursor_y++, 0, "Tracing: %s",
               appstate->tron ? "On" : "Off");
     mvwaddstr(DebuggerView.content, cursor_y++, 0, "Reset Override: ");
@@ -177,7 +177,11 @@ static void drawdebugger(const struct control *appstate,
     } else {
         waddstr(DebuggerView.content, "None");
     }
-    mvwaddstr(DebuggerView.content, cursor_y, 0, "Halt @: None");
+    char break_desc[HEXPR_FMT_SIZE];
+    const int err = haltexpr_fmt(&snapshot->debugger.break_condition,
+                                 break_desc);
+    mvwprintw(DebuggerView.content, cursor_y, 0, "Break: %s",
+              err < 0 ? haltexpr_errstr(err) : break_desc);
 }
 
 static void drawcart(const struct control *appstate,

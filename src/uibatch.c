@@ -6,6 +6,7 @@
 //
 
 #include "control.h"
+#include "haltexpr.h"
 #include "snapshot.h"
 #include "tsutil.h"
 #include "ui.h"
@@ -128,6 +129,12 @@ static void batch_cleanup(const struct control *appstate,
     printf("Total Cycles: %" PRIu64 "\n", appstate->clock.total_cycles);
     printf("Avg Cycles/sec: %.2f\n",
            appstate->clock.total_cycles * (TSU_MS_PER_S / runtime));
+    if (snapshot->debugger.break_condition.cond != HLT_NONE) {
+        char break_desc[HEXPR_FMT_SIZE];
+        const int err = haltexpr_fmt(&snapshot->debugger.break_condition,
+                                     break_desc);
+        printf("Break: %s\n", err < 0 ? haltexpr_errstr(err) : break_desc);
+    }
 }
 
 //

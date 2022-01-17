@@ -8,6 +8,8 @@
 #ifndef Aldo_snapshot_h
 #define Aldo_snapshot_h
 
+#include "haltexpr.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -39,9 +41,8 @@ struct console_state {
                 vectors[6];
     } mem;
     struct {
-        int resvector_override, // RESET Vector Override (<0 if not set)
-            state;
-        bool halted;
+        int resvector_override; // RESET Vector Override (<0 if not set)
+        struct haltexpr break_condition;
     } debugger;
     enum nexcmode mode;
     struct {

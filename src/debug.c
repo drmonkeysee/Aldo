@@ -14,18 +14,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-// X(symbol, description)
-#define DEBUG_STATE_X \
-X(DBG_INACTIVE, "Inactive") \
-X(DBG_RUN, "Run") \
-X(DBG_BREAK, "Break")
-
-enum debugger_state {
-#define X(s, d) s,
-    DEBUG_STATE_X
-#undef X
-};
-
 struct resdecorator {
     struct busdevice inner;
     uint16_t vector;
@@ -54,7 +42,6 @@ struct debugger_context {
     struct resdecorator *dec;
     struct breakpoint_vector breakpoints;
     bphandle halted;
-    enum debugger_state state;
     int resetvector;
 };
 
@@ -126,6 +113,14 @@ bpvector_find_slot(const struct breakpoint_vector *vec)
     return NULL;
 }
 
+static struct breakpoint *bpvector_at(const struct breakpoint_vector *vec,
+                                      bphandle h)
+{
+    assert(0 <= h && h < (bphandle)vec->capacity);
+
+    return vec->items + h;
+}
+
 static void bpvector_resize(struct breakpoint_vector *vec)
 {
     const size_t oldcap = vec->capacity;
@@ -185,7 +180,6 @@ debugctx *debug_new(const struct control *appstate)
     *self = (struct debugger_context){
         .halted = NoBreakpoint,
         .resetvector = appstate->resetvector,
-        .state = DBG_INACTIVE,
     };
     bpvector_init(&self->breakpoints);
     return self;
@@ -220,7 +214,6 @@ void debug_addbreakpoint(debugctx *self, struct haltexpr expr)
     assert(self != NULL);
 
     bpvector_insert(&self->breakpoints, expr);
-    self->state = DBG_RUN;
 }
 
 void debug_check(debugctx *self, const struct cycleclock *clk,
@@ -230,31 +223,12 @@ void debug_check(debugctx *self, const struct cycleclock *clk,
     assert(clk != NULL);
     assert(cpu != NULL);
 
-    switch (self->state) {
-    case DBG_RUN:
-        if ((self->halted = bpvector_break(&self->breakpoints, clk, cpu))
+    if (self->halted == NoBreakpoint
+        && (self->halted = bpvector_break(&self->breakpoints, clk, cpu))
             != NoBreakpoint) {
-            cpu->signal.rdy = false;
-            self->state = DBG_BREAK;
-        }
-        break;
-    case DBG_BREAK:
-        self->state = DBG_RUN;
+        cpu->signal.rdy = false;
+    } else {
         self->halted = NoBreakpoint;
-        break;
-    default:
-        break;
-    }
-}
-
-const char *debug_description(int state)
-{
-    switch (state) {
-#define X(s, d) case s: return d;
-        DEBUG_STATE_X
-#undef X
-    default:
-        return "Invalid";
     }
 }
 
@@ -263,7 +237,11 @@ void debug_snapshot(debugctx *self, struct console_state *snapshot)
     assert(self != NULL);
     assert(snapshot != NULL);
 
-    snapshot->debugger.halted = self->state == DBG_BREAK;
+    snapshot->debugger.break_condition = self->halted == NoBreakpoint
+                                            ? (struct haltexpr){
+                                                .cond = HLT_NONE,
+                                            }
+                                            : bpvector_at(&self->breakpoints,
+                                                          self->halted)->expr;
     snapshot->debugger.resvector_override = self->resetvector;
-    snapshot->debugger.state = self->state;
 }

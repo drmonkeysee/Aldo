@@ -46,7 +46,7 @@ struct breakpoint {
 };
 
 struct breakpoint_vector {
-    size_t capacity, size;
+    size_t capacity;
     struct breakpoint *items;
 };
 
@@ -128,12 +128,13 @@ bpvector_find_slot(const struct breakpoint_vector *vec)
 
 static void bpvector_resize(struct breakpoint_vector *vec)
 {
+    const size_t oldcap = vec->capacity;
     // NOTE: growth factor K = 1.5
     vec->capacity += vec->capacity / 2;
     vec->items = realloc(vec->items, vec->capacity * sizeof *vec->items);
     assert(vec->items != NULL);
-    for (size_t i = vec->size; i < vec->capacity; ++i) {
-        vec->items[i] = (struct breakpoint){0};
+    for (size_t i = oldcap; i < vec->capacity; ++i) {
+        vec->items[i] = (struct breakpoint){.status = BPS_FREE};
     }
 }
 
@@ -147,9 +148,6 @@ static void bpvector_insert(struct breakpoint_vector *vec,
     }
     assert(slot != NULL);
     *slot = (struct breakpoint){expr, BPS_ENABLED};
-    ++vec->size;
-
-    assert(vec->size <= vec->capacity);
 }
 
 static bphandle bpvector_break(const struct breakpoint_vector *vec,

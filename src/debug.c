@@ -27,8 +27,7 @@ enum breakpointstatus {
     BPS_ENABLED,
 };
 
-typedef ptrdiff_t bphandle;
-static const bphandle NoBreakpoint = -1;
+static const ptrdiff_t NoBreakpoint = -1;
 
 struct breakpoint {
     struct haltexpr expr;
@@ -43,7 +42,7 @@ struct breakpoint_vector {
 struct debugger_context {
     struct resdecorator *dec;
     struct breakpoint_vector breakpoints;
-    bphandle halted;
+    ptrdiff_t halted;
     int resetvector;
 };
 
@@ -128,9 +127,9 @@ bpvector_find_slot(const struct breakpoint_vector *vec)
 }
 
 static struct breakpoint *bpvector_at(const struct breakpoint_vector *vec,
-                                      bphandle h)
+                                      ptrdiff_t h)
 {
-    assert(0 <= h && h < (bphandle)vec->capacity);
+    assert(0 <= h && h < (ptrdiff_t)vec->capacity);
 
     return vec->items + h;
 }
@@ -159,9 +158,9 @@ static void bpvector_insert(struct breakpoint_vector *vec,
     *slot = (struct breakpoint){expr, BPS_ENABLED};
 }
 
-static bphandle bpvector_break(const struct breakpoint_vector *vec,
-                               const struct cycleclock *clk,
-                               const struct mos6502 *cpu)
+static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
+                                const struct cycleclock *clk,
+                                const struct mos6502 *cpu)
 {
     for (size_t i = 0; i < vec->capacity; ++i) {
         const struct breakpoint *const bp = vec->items + i;

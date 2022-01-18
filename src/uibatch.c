@@ -63,7 +63,10 @@ static void batch_tick_start(struct control *appstate,
     assert(snapshot != NULL);
 
     clock_gettime(CLOCK_MONOTONIC, &Current);
-    FrameTimeMs = timespec_to_ms(&Current) - timespec_to_ms(&Previous);
+    const double currentms = timespec_to_ms(&Current);
+    FrameTimeMs = currentms - timespec_to_ms(&Previous);
+    appstate->clock.runtime = (currentms - timespec_to_ms(&Start))
+                                / TSU_MS_PER_S;
 
     // NOTE: cumulative moving average:
     // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average

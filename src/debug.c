@@ -8,8 +8,10 @@
 #include "debug.h"
 
 #include "bytes.h"
+#include "tsutil.h"
 
 #include <assert.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -94,8 +96,7 @@ static bool halt_address(const struct breakpoint *bp,
 static bool halt_runtime(const struct breakpoint *bp,
                          const struct cycleclock *clk)
 {
-    // TODO: implement this
-    return false;
+    return isgreaterequal(clk->runtime - bp->expr.runtime, 1.0 / TSU_MS_PER_S);
 }
 
 static bool halt_cycles(const struct breakpoint *bp,

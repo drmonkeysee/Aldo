@@ -37,12 +37,13 @@
 static const int Fps = 60;
 static const struct timespec VSync = {.tv_nsec = TSU_NS_PER_S / Fps};
 
-static struct timespec Current, Previous;
+static struct timespec Current, Previous, Start;
 static double FrameLeftMs, FrameTimeMs, TimeBudgetMs;
 
 static void initclock(void)
 {
-    clock_gettime(CLOCK_MONOTONIC, &Previous);
+    clock_gettime(CLOCK_MONOTONIC, &Start);
+    Previous = Start;
 }
 
 static void tick_sleep(void)
@@ -103,6 +104,8 @@ static void drawhwtraits(const struct control *appstate)
     mvwprintw(HwView.content, cursor_y++, 0, "FPS: %d", Fps);
     mvwprintw(HwView.content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_frametime, display_frameleft);
+    mvwprintw(HwView.content, cursor_y++, 0, "Runtime: %.3f",
+              appstate->clock.runtime);
     mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "CPU Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "PPU Clock: INF Hz");
@@ -510,7 +513,7 @@ static void ramrefresh(int ramsheet)
 static void ncurses_init(void)
 {
     static const int
-        col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 12, ctrlh = 16,
+        col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 13, ctrlh = 16,
         crth = 6, cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");
@@ -528,7 +531,7 @@ static void ncurses_init(void)
         xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
     vinit(&HwView, hwh, col1w, yoffset, xoffset, 2, "Hardware Traits");
     vinit(&ControlsView, ctrlh, col1w, yoffset + hwh, xoffset, 2, "Controls");
-    vinit(&DebuggerView, 9, col1w, yoffset + hwh + ctrlh, xoffset, 2,
+    vinit(&DebuggerView, 8, col1w, yoffset + hwh + ctrlh, xoffset, 2,
           "Debugger");
     vinit(&CartView, crth, col2w, yoffset, xoffset + col1w, 2, "Cart");
     vinit(&PrgView, ramh - crth, col2w, yoffset + crth, xoffset + col1w, 1,
@@ -551,7 +554,10 @@ static void ncurses_tick_start(struct control *appstate,
     assert(snapshot != NULL);
 
     clock_gettime(CLOCK_MONOTONIC, &Current);
-    FrameTimeMs = timespec_to_ms(&Current) - timespec_to_ms(&Previous);
+    const double currentms = timespec_to_ms(&Current);
+    FrameTimeMs = currentms - timespec_to_ms(&Previous);
+    appstate->clock.runtime = (currentms - timespec_to_ms(&Start))
+                                / TSU_MS_PER_S;
 
     if (!snapshot->lines.ready) {
         TimeBudgetMs = appstate->clock.budget = 0;

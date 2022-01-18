@@ -91,6 +91,13 @@ static bool halt_address(const struct breakpoint *bp,
     return cpu->signal.sync && cpu->addrinst == bp->expr.address;
 }
 
+static bool halt_runtime(const struct breakpoint *bp,
+                         const struct cycleclock *clk)
+{
+    // TODO: implement this
+    return false;
+}
+
 static bool halt_cycles(const struct breakpoint *bp,
                         const struct cycleclock *clk)
 {
@@ -161,6 +168,8 @@ static bphandle bpvector_break(const struct breakpoint_vector *vec,
         switch (bp->expr.cond) {
         case HLT_ADDR:
             if (halt_address(bp, cpu)) return i;
+        case HLT_TIME:
+            if (halt_runtime(bp, clk)) return i;
         case HLT_CYCLES:
             if (halt_cycles(bp, clk)) return i;
         default:

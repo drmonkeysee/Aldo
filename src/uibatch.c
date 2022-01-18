@@ -123,7 +123,7 @@ static void batch_cleanup(const struct control *appstate,
 
     clearline();
     printf("---=== %s ===---\n", ctrl_cartfilename(appstate->cartfile));
-    printf("Run Time (%ssec): %.3f\n", scale_ms ? "m" : "",
+    printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
            scale_ms ? runtime : runtime / TSU_MS_PER_S);
     printf("Avg Frame Time (msec): %.3f\n", AvgFrameTimeMs);
     printf("Total Cycles: %" PRIu64 "\n", appstate->clock.total_cycles);

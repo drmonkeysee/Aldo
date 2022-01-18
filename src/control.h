@@ -13,6 +13,7 @@
 
 struct cycleclock {
     uint64_t total_cycles;
+    double runtime;
     int budget, cycles_per_sec;
 };
 

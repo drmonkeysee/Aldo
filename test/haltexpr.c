@@ -344,6 +344,82 @@ static void cycles_condition_malformed(void *ctx)
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
+static void jam_condition(void *ctx)
+{
+    const char *const str = "jam";
+    struct haltexpr expr;
+
+    const int result = haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(HLT_JAM, (int)expr.cond);
+}
+
+static void jam_condition_uppercase(void *ctx)
+{
+    const char *const str = "JAM";
+    struct haltexpr expr;
+
+    const int result = haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(HLT_JAM, (int)expr.cond);
+}
+
+static void jam_condition_mixedcase(void *ctx)
+{
+    const char *const str = "JaM";
+    struct haltexpr expr;
+
+    const int result = haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(HLT_JAM, (int)expr.cond);
+}
+
+static void jam_condition_with_leading_space(void *ctx)
+{
+    const char *const str = "   jam";
+    struct haltexpr expr;
+
+    const int result = haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(HLT_JAM, (int)expr.cond);
+}
+
+static void jam_condition_with_trailing_space(void *ctx)
+{
+    const char *const str = "jam   ";
+    struct haltexpr expr;
+
+    const int result = haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(HLT_JAM, (int)expr.cond);
+}
+
+static void jam_condition_underparse(void *ctx)
+{
+    const char *const str = "jamming";
+    struct haltexpr expr;
+
+    const int result = haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(HLT_JAM, (int)expr.cond);
+}
+
+static void jam_condition_malformed(void *ctx)
+{
+    const char *const str = "maj";
+    struct haltexpr expr;
+
+    const int result = haltexpr_parse(str, &expr);
+
+    ct_assertequal(HEXPR_ERR_SCAN, result);
+}
+
 static void expr_missing_unit(void *ctx)
 {
     const char *const str = "1234";
@@ -447,6 +523,14 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(cycles_condition_with_trailing_space),
         ct_maketest(cycles_condition_negative),
         ct_maketest(cycles_condition_malformed),
+
+        ct_maketest(jam_condition),
+        ct_maketest(jam_condition_uppercase),
+        ct_maketest(jam_condition_mixedcase),
+        ct_maketest(jam_condition_with_leading_space),
+        ct_maketest(jam_condition_with_trailing_space),
+        ct_maketest(jam_condition_underparse),
+        ct_maketest(jam_condition_malformed),
 
         ct_maketest(expr_missing_unit),
 

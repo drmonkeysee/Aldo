@@ -15,6 +15,7 @@ enum haltcondition {
     HLT_ADDR,
     HLT_TIME,
     HLT_CYCLES,
+    HLT_JAM,
     HLT_CONDCOUNT,
 };
 

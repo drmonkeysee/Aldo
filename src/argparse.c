@@ -249,6 +249,13 @@ void argparse_usage(const char *me)
     puts("\narguments");
     puts("  file\t: input file containing cartridge"
          " or program contents");
+    puts("\nhalt condition expressions");
+    puts("  @XXXX\t: halt on instruction at address XXXX,"
+         " a 2-byte hexadecimal number");
+    puts("  N.Ns\t: halt after running for N.N seconds"
+         " (non-resumable, useful in batch mode"
+         " as a fail-safe halt condition)");
+    puts("  Nc\t: halt after executing N cycles");
 }
 
 void argparse_version(void)

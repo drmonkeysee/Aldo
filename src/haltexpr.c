@@ -49,7 +49,7 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
         case HLT_TIME:
             {
                 double time;
-                parsed = sscanf(str, "%lf %1[sS]", &time, u) == 2;
+                parsed = sscanf(str, "%lf %1[Ss]", &time, u) == 2;
                 valid = time > 0.0;
                 e = (struct haltexpr){.runtime = time, .cond = i};
             }
@@ -57,10 +57,15 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
         case HLT_CYCLES:
             {
                 uint64_t cycles;
-                parsed = sscanf(str, "%" SCNu64 " %1[cC]", &cycles, u) == 2;
+                parsed = sscanf(str, "%" SCNu64 " %1[Cc]", &cycles, u) == 2;
                 valid = true;
                 e = (struct haltexpr){.cycles = cycles, .cond = i};
             }
+            break;
+        case HLT_JAM:
+            parsed = sscanf(str, " %1[Jj]%1[Aa]%1[Mm]", u, u, u) == 3;
+            valid = true;
+            e = (struct haltexpr){.cond = i};
             break;
         default:
             assert(((void)"INVALID HALT CONDITION", false));
@@ -94,6 +99,9 @@ int haltexpr_fmt(const struct haltexpr *expr,
         break;
     case HLT_CYCLES:
         count = sprintf(buf, "%" PRIu64 " cyc", expr->cycles);
+        break;
+    case HLT_JAM:
+        count = sprintf(buf, "JAM");
         break;
     default:
         assert(((void)"INVALID HALT CONDITION", false));

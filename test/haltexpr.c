@@ -482,6 +482,18 @@ static void print_cycles(void *ctx)
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
+static void print_jam(void *ctx)
+{
+    struct haltexpr expr = {.cond = HLT_JAM};
+    char buf[HEXPR_FMT_SIZE];
+
+    const int result = haltexpr_fmt(&expr, buf);
+
+    const char *const expected = "JAM";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
 //
 // Test List
 //
@@ -538,6 +550,7 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(print_addr),
         ct_maketest(print_runtime),
         ct_maketest(print_cycles),
+        ct_maketest(print_jam),
     };
 
     return ct_makesuite(tests);

@@ -120,18 +120,18 @@ static void batch_cleanup(const struct control *appstate,
 
     if (!appstate->verbose) return;
 
-    const struct timespec elapsed = timespec_elapsed(&Start);
-    const double runtime = timespec_to_ms(&elapsed);
-    const bool scale_ms = runtime < TSU_MS_PER_S;
+    const bool scale_ms = appstate->clock.runtime < 1.0;
 
     clearline();
     printf("---=== %s ===---\n", ctrl_cartfilename(appstate->cartfile));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
-           scale_ms ? runtime : runtime / TSU_MS_PER_S);
+           scale_ms
+            ? appstate->clock.runtime * TSU_MS_PER_S
+            : appstate->clock.runtime);
     printf("Avg Frame Time (msec): %.3f\n", AvgFrameTimeMs);
     printf("Total Cycles: %" PRIu64 "\n", appstate->clock.total_cycles);
     printf("Avg Cycles/sec: %.2f\n",
-           appstate->clock.total_cycles * (TSU_MS_PER_S / runtime));
+           appstate->clock.total_cycles / appstate->clock.runtime);
     if (snapshot->debugger.break_condition.cond != HLT_NONE) {
         char break_desc[HEXPR_FMT_SIZE];
         const int err = haltexpr_fmt(&snapshot->debugger.break_condition,

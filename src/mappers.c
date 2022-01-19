@@ -123,7 +123,7 @@ static size_t ines_unimplemented_prgbank(const struct mapper *self, size_t i,
     assert(self != NULL);
     assert(mem != NULL);
 
-    (void)i;
+    (void)self, (void)i;
     *mem = NULL;
     return 0;
 }

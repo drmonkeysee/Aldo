@@ -1407,6 +1407,11 @@ int cpu_cycle(struct mos6502 *self)
     return 1;
 }
 
+bool cpu_jammed(const struct mos6502 *self)
+{
+    return self->t == 4 && Decode[self->opc].mode == AM_JAM;
+}
+
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
 {
     assert(self != NULL);
@@ -1429,8 +1434,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->datapath.exec_cycle = self->t;
     snapshot->datapath.instdone = self->presync;
     snapshot->datapath.irq = self->irq;
-    snapshot->datapath.jammed = self->t == 4
-                                    && Decode[self->opc].mode == AM_JAM;
+    snapshot->datapath.jammed = cpu_jammed(self);
     snapshot->datapath.nmi = self->nmi;
     snapshot->datapath.opcode = self->opc;
     snapshot->datapath.res = self->res;

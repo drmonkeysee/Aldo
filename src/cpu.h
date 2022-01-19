@@ -90,6 +90,7 @@ void cpu_powerup(struct mos6502 *self);
 
 int cpu_cycle(struct mos6502 *self);
 
+bool cpu_jammed(const struct mos6502 *self);
 void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot);
 
 cpu_ctx *cpu_peek_start(struct mos6502 *self);

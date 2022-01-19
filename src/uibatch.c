@@ -76,8 +76,8 @@ static void batch_tick_start(struct control *appstate,
     // cycles per tick seems as good a number as any.
     appstate->clock.budget = 1e6;
 
-    // NOTE: if cpu halts or jams, exit batch mode
-    if (!snapshot->lines.ready || snapshot->datapath.jammed) {
+    // NOTE: exit batch mode if cpu is not running
+    if (!snapshot->lines.ready) {
         appstate->running = false;
     }
 }

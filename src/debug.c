@@ -104,6 +104,11 @@ static bool halt_cycles(const struct breakpoint *bp,
     return clk->total_cycles == bp->expr.cycles;
 }
 
+static bool halt_jammed(const struct mos6502 *cpu)
+{
+    return cpu_jammed(cpu);
+}
+
 //
 // Breakpoint Vector
 //
@@ -172,6 +177,8 @@ static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
             if (halt_runtime(bp, clk)) return i;
         case HLT_CYCLES:
             if (halt_cycles(bp, clk)) return i;
+        case HLT_JAM:
+            if (halt_jammed(cpu)) return i;
         default:
             break;
         }

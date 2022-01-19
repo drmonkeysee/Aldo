@@ -256,6 +256,7 @@ void argparse_usage(const char *me)
          "\n\t  non-resumable, useful in batch mode"
          " as a fail-safe halt condition");
     puts("  Nc\t: halt after executing N cycles");
+    puts("  jam\t: halt when the CPU enters a jammed state");
 }
 
 void argparse_version(void)

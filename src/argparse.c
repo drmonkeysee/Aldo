@@ -223,38 +223,38 @@ void argparse_usage(const char *me)
     puts("---=== Aldo Usage ===---");
     printf("%s [options...] [command] file\n", me);
     puts("\noptions");
-    printf("  -%c\t: run program in batch mode (also %s)\n", BatchShort,
+    printf("  -%c\t: run program in batch mode (alt %s)\n", BatchShort,
            BatchLong);
-    printf("  -%c e\t: halt condition expression;"
-           " see below for syntax (also %s e)\n", HaltShort,
-           HaltLong);
+    printf("  -%c e\t: halt condition expression (alt %s e),"
+           "\n\t  multiple -H options can be specified;"
+           "\n\t  see below usage section for syntax\n", HaltShort, HaltLong);
     printf("  -%c x\t: override RESET vector [0x%X, 0x%X]"
-           " (also %s x)\n", ResVectorShort, MinAddress, MaxAddress,
+           " (alt %s x)\n", ResVectorShort, MinAddress, MaxAddress,
            ResVectorLong);
     printf("  -%c n\t: CHR ROM BMP scaling factor [%d, %d]"
-           " (also %s n)\n", ChrScaleShort, MinScale, MaxScale, ChrScaleLong);
-    printf("  -%c\t: turn on trace-logging and ram dumps (also %s)\n",
+           " (alt %s n)\n", ChrScaleShort, MinScale, MaxScale, ChrScaleLong);
+    printf("  -%c\t: turn on trace-logging and ram dumps (alt %s)\n",
            TraceShort, TraceLong);
     printf("  -%c\t: verbose output\n", VerboseShort);
     puts("\ncommands");
-    printf("  -%c\t: decode CHR ROM into BMP files (also %s[=prefix];"
-           " prefix default is 'bank')\n", ChrDecodeShort, ChrDecodeLong);
-    printf("  -%c\t: disassemble file (also %s);"
-           " verbose prints duplicate lines\n", DisassembleShort,
+    printf("  -%c\t: decode CHR ROM into BMP files (alt %s[=prefix]);"
+           "\n\t  prefix default for alt option is 'bank'\n", ChrDecodeShort,
+           ChrDecodeLong);
+    printf("  -%c\t: disassemble file (alt %s);"
+           "\n\t  with verbose prints duplicate lines\n", DisassembleShort,
            DisassembleLong);
-    printf("  -%c\t: print usage (also %s)\n", HelpShort, HelpLong);
-    printf("  -%c\t: print file cartridge info (also %s);"
-           " verbose prints more details\n", InfoShort, InfoLong);
-    printf("  -%c\t: print version (also %s)\n", VersionShort, VersionLong);
+    printf("  -%c\t: print usage (alt %s)\n", HelpShort, HelpLong);
+    printf("  -%c\t: print file cartridge info (alt %s);"
+           "\n\t  with verbose prints more details\n", InfoShort, InfoLong);
+    printf("  -%c\t: print version (alt %s)\n", VersionShort, VersionLong);
     puts("\narguments");
-    puts("  file\t: input file containing cartridge"
-         " or program contents");
+    puts("  file\t: input file containing cartridge or program contents");
     puts("\nhalt condition expressions");
-    puts("  @XXXX\t: halt on instruction at address XXXX,"
-         " a 2-byte hexadecimal number");
-    puts("  N.Ns\t: halt after running for N.N seconds"
-         " (non-resumable, useful in batch mode"
-         " as a fail-safe halt condition)");
+    puts("  @XXXX\t: halt on instruction at address XXXX;"
+         "\n\t  address is a 1- or 2-byte hexadecimal number");
+    puts("  N.Ns\t: halt after running for N.N seconds;"
+         "\n\t  non-resumable, useful in batch mode"
+         " as a fail-safe halt condition");
     puts("  Nc\t: halt after executing N cycles");
 }
 

@@ -73,8 +73,7 @@ static void batch_tick_start(struct control *appstate,
     AvgFrameTimeMs = (FrameTimeMs + (Ticks * AvgFrameTimeMs)) / (Ticks + 1);
 
     // NOTE: arbitrary per-tick budget, 6502s often ran at 1 MHz so a million
-    // cycles per tick seems as good a number as any; anything under a billion
-    // has sub-millisecond frame-time on my hardware.
+    // cycles per tick seems as good a number as any.
     appstate->clock.budget = 1e6;
 
     // NOTE: if cpu halts or jams, exit batch mode

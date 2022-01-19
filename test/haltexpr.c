@@ -181,6 +181,18 @@ static void runtime_condition(void *ctx)
     ct_assertaboutequal(1.2f, expr.runtime, 0.001);
 }
 
+static void runtime_condition_case_insensitive(void *ctx)
+{
+    const char *const str = "1.2S";
+    struct haltexpr expr;
+
+    const int result = haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
+}
+
 static void runtime_condition_with_space(void *ctx)
 {
     const char *const str = "1.2   s";
@@ -253,6 +265,18 @@ static void runtime_condition_malformed(void *ctx)
 static void cycles_condition(void *ctx)
 {
     const char *const str = "42c";
+    struct haltexpr expr;
+
+    const int result = haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(42u, expr.cycles);
+}
+
+static void cycles_condition_case_insensitive(void *ctx)
+{
+    const char *const str = "42C";
     struct haltexpr expr;
 
     const int result = haltexpr_parse(str, &expr);
@@ -408,6 +432,7 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(address_condition_malformed),
 
         ct_maketest(runtime_condition),
+        ct_maketest(runtime_condition_case_insensitive),
         ct_maketest(runtime_condition_with_space),
         ct_maketest(runtime_condition_with_leading_space),
         ct_maketest(runtime_condition_with_trailing_space),
@@ -416,6 +441,7 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(runtime_condition_malformed),
 
         ct_maketest(cycles_condition),
+        ct_maketest(cycles_condition_case_insensitive),
         ct_maketest(cycles_condition_with_space),
         ct_maketest(cycles_condition_with_leading_space),
         ct_maketest(cycles_condition_with_trailing_space),

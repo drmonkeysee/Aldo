@@ -92,7 +92,7 @@ run: debug
 
 nestest: debug
 	rm -f $(TRACE_CMP)
-	$(TARGET) -bt -Hc72c -rc000 nestest.nes
+	$(TARGET) -btv -Hjam -H3s -rc000 nestest.nes
 
 $(NESTEST_CMP):
 	# NOTE: strip out PPU column (unimplemented) and Accumulator cue (implied)

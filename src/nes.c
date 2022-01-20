@@ -219,7 +219,7 @@ void nes_cycle(nes *self, struct cycleclock *clock)
             assert(((void)"INVALID EXC MODE", false));
             // NOTE: release build fallthrough to single-cycle
         case NEXC_CYCLE:
-            self->cpu.signal.rdy = false;
+            nes_halt(self);
             break;
         case NEXC_STEP:
             self->cpu.signal.rdy = !self->cpu.signal.sync;

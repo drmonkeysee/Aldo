@@ -194,7 +194,7 @@ static void emu_loop(struct control *appstate, struct console_state *snapshot,
     } while (appstate->running);
 }
 
-static int emu_run(struct control *appstate, cart *c)
+static int run_emu(struct control *appstate, cart *c)
 {
     if (appstate->batch && appstate->tron && !appstate->haltlist) {
         fputs("*** WARNING ***\nYou have turned on trace-logging"
@@ -250,15 +250,15 @@ exit_debug:
     return result;
 }
 
-static int cart_run(struct control *appstate, cart *c)
+static int run_cart(struct control *appstate, cart *c)
 {
     if (appstate->info) return print_cart_info(appstate, c);
     if (appstate->disassemble) return disassemble_cart_prg(appstate, c);
     if (appstate->chrdecode) return decode_cart_chr(appstate, c);
-    return emu_run(appstate, c);
+    return run_emu(appstate, c);
 }
 
-static int run(struct control *appstate)
+static int run_with_args(struct control *appstate)
 {
     if (appstate->help) {
         argparse_usage(appstate->me);
@@ -281,7 +281,7 @@ static int run(struct control *appstate)
         return EXIT_FAILURE;
     }
 
-    const int result = cart_run(appstate, cart);
+    const int result = run_cart(appstate, cart);
     cart_free(cart);
     cart = NULL;
     return result;
@@ -296,7 +296,7 @@ int aldo_run(int argc, char *argv[argc+1])
     struct control appstate;
     if (!argparse_parse(&appstate, argc, argv)) return EXIT_FAILURE;
 
-    const int result = run(&appstate);
+    const int result = run_with_args(&appstate);
     argparse_cleanup(&appstate);
     return result;
 }

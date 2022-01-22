@@ -7,6 +7,8 @@
 
 #include "decode.h"
 
+#include <assert.h>
+
 #define UNDEF {IN_UDF, AM_IMP, false}
 #define OP(op, am) {op, am, false}
 #define UP(op, am) {op, am, true}
@@ -193,7 +195,7 @@ const struct decoded Decode[] = {
     OP(IN_LDY, AM_ZP),      // A4 - LDY zp
     OP(IN_LDA, AM_ZP),      // A5 - LDA zp
     OP(IN_LDX, AM_ZP),      // A6 - LDX zp
-    UNDEF,                  // A7 - Undefined
+    UP(IN_LAX, AM_ZP),      // A7 - *LAX zp
     OP(IN_TAY, AM_IMP),     // A8 - TAY
     OP(IN_LDA, AM_IMM),     // A9 - LDA imm
     OP(IN_TAX, AM_IMP),     // AA - TAX
@@ -209,7 +211,7 @@ const struct decoded Decode[] = {
     OP(IN_LDY, AM_ZPX),     // B4 - LDY zp,X
     OP(IN_LDA, AM_ZPX),     // B5 - LDA zp,X
     OP(IN_LDX, AM_ZPY),     // B6 - LDX zp,Y
-    UNDEF,                  // B7 - Undefined
+    UP(IN_LAX, AM_ZPY),     // B7 - *LAX zp,Y
     OP(IN_CLV, AM_IMP),     // B8 - CLV
     OP(IN_LDA, AM_ABSY),    // B9 - LDA abs,Y
     OP(IN_TSX, AM_IMP),     // BA - TSX
@@ -283,3 +285,6 @@ const struct decoded Decode[] = {
     OP(IN_INC, AM_ABSX),    // FE - INC abs,X
     UNDEF,                  // FF - Undefined
 };
+
+static_assert(sizeof Decode / sizeof Decode[0] == 256,
+              "Incorrect decode table size!");

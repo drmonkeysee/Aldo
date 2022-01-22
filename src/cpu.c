@@ -797,9 +797,22 @@ static void TYA_exec(struct mos6502 *self)
     load_register(self, &self->a, self->y);
 }
 
+//
+// Unofficial Instructions
+//
+
 static void JAM_exec(struct mos6502 *self)
 {
     self->databus = 0xff;
+}
+
+static void LAX_exec(struct mos6502 *self, struct decoded dec)
+{
+    if (read_delayed(self, dec, self->adc)) return;
+    read(self);
+    commit_operation(self);
+    load_register(self, &self->a, self->databus);
+    load_register(self, &self->x, self->databus);
 }
 
 static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
@@ -1308,6 +1321,10 @@ static void RTI_sequence(struct mos6502 *self, struct decoded dec)
         break;
     }
 }
+
+//
+// Unofficial Addressing Modes
+//
 
 static void JAM_sequence(struct mos6502 *self, struct decoded dec)
 {

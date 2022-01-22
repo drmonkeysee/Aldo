@@ -35,25 +35,25 @@ X(CLD, self)        /* Clear decimal */ \
 X(CLI, self)        /* Clear interrupt disable */ \
 X(CLV, self)        /* Clear overflow */ \
 X(CMP, self, dec)   /* Compare to accumulator */ \
-X(CPX, self, dec)   /* Compare to x index */ \
-X(CPY, self, dec)   /* Compare to y index */ \
+X(CPX, self, dec)   /* Compare to x-index */ \
+X(CPY, self, dec)   /* Compare to y-index */ \
 \
 X(DEC, self, dec)   /* Decrement memory */ \
-X(DEX, self)        /* Decrement x index */ \
-X(DEY, self)        /* Decrement y index */ \
+X(DEX, self)        /* Decrement x-index */ \
+X(DEY, self)        /* Decrement y-index */ \
 \
 X(EOR, self, dec)   /* Logical exclusive or */ \
 \
 X(INC, self, dec)   /* Increment memory */ \
-X(INX, self)        /* Increment x index */ \
-X(INY, self)        /* Increment y index */ \
+X(INX, self)        /* Increment x-index */ \
+X(INY, self)        /* Increment y-index */ \
 \
 X(JMP, self)        /* Jump */ \
 X(JSR, self)        /* Jump to subroutine */ \
 \
 X(LDA, self, dec)   /* Load accumulator */ \
-X(LDX, self, dec)   /* Load x index */ \
-X(LDY, self, dec)   /* Load y index */ \
+X(LDX, self, dec)   /* Load x-index */ \
+X(LDY, self, dec)   /* Load y-index */ \
 X(LSR, self, dec)   /* Logical shift right */ \
 \
 X(NOP, self, dec)   /* No-op */ \
@@ -75,18 +75,19 @@ X(SEC, self)        /* Set carry */ \
 X(SED, self)        /* Set decimal */ \
 X(SEI, self)        /* Set interrupt disable */ \
 X(STA, self, dec)   /* Store accumulator */ \
-X(STX, self, dec)   /* Store x index */ \
-X(STY, self, dec)   /* Store y index */ \
+X(STX, self, dec)   /* Store x-index */ \
+X(STY, self, dec)   /* Store y-index */ \
 \
-X(TAX, self)        /* Transfer accumulator to x index */ \
-X(TAY, self)        /* Transfer accumulator to y index */ \
-X(TSX, self)        /* Transfer stack pointer to x index */ \
-X(TXA, self)        /* Transfer x index to accumulator */ \
-X(TXS, self)        /* Transfer x index to stack pointer */ \
-X(TYA, self)        /* Transfer y index to accumulator */ \
+X(TAX, self)        /* Transfer accumulator to x-index */ \
+X(TAY, self)        /* Transfer accumulator to y-index */ \
+X(TSX, self)        /* Transfer stack pointer to x-index */ \
+X(TXA, self)        /* Transfer x-index to accumulator */ \
+X(TXS, self)        /* Transfer x-index to stack pointer */ \
+X(TYA, self)        /* Transfer y-index to accumulator */ \
 \
 /* Unofficial Opcodes */ \
-X(JAM, self)        /* No instruction signal, jams the cpu */
+X(JAM, self)        /* No instruction signal, jams the cpu */ \
+X(LAX, self, dec)   /* Load accumulator and x-index */
 
 // Addressing Modes
 // X(symbol, byte count, peek template, display strings...)

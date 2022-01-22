@@ -1665,6 +1665,93 @@ static void stx_zpy_pageoverflow(void *ctx)
 // Unofficial Opcodes
 //
 
+static void lax_zp(void *ctx)
+{
+    uint8_t mem[] = {0xa7, 0x4, 0xff, 0xff, 0x45};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertequal(0x45u, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void lax_zp_zero(void *ctx)
+{
+    uint8_t mem[] = {0xa7, 0x4, 0xff, 0xff, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0x0u, cpu.x);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void lax_zp_negative(void *ctx)
+{
+    uint8_t mem[] = {0xa7, 0x4, 0xff, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x80u, cpu.a);
+    ct_assertequal(0x80u, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void lax_zpy(void *ctx)
+{
+    uint8_t mem[] = {0xb7, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x56};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.y = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x56u, cpu.a);
+    ct_assertequal(0x56u, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void lax_zpy_pageoverflow(void *ctx)
+{
+    uint8_t mem[] = {0xb7, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x56};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.y = 0xff;   // Wrap around from $0003 -> $0002
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x22u, cpu.a);
+    ct_assertequal(0x22u, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void nop_zp(void *ctx)
 {
     const uint8_t nopcodes[] = {0x4, 0x44, 0x64};
@@ -1718,7 +1805,7 @@ static void nop_zpx(void *ctx)
     }
 }
 
-static void nop_zpx_overflow(void *ctx)
+static void nop_zpx_pageoverflow(void *ctx)
 {
     const uint8_t nopcodes[] = {0x14, 0x34, 0x54, 0x74, 0xd4, 0xf4};
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
@@ -1850,9 +1937,15 @@ struct ct_testsuite cpu_zeropage_tests(void)
         ct_maketest(stx_zpy_pageoverflow),
 
         // Unofficial Opcodes
+        ct_maketest(lax_zp),
+        ct_maketest(lax_zp_zero),
+        ct_maketest(lax_zp_negative),
+        ct_maketest(lax_zpy),
+        ct_maketest(lax_zpy_pageoverflow),
+
         ct_maketest(nop_zp),
         ct_maketest(nop_zpx),
-        ct_maketest(nop_zpx_overflow),
+        ct_maketest(nop_zpx_pageoverflow),
     };
 
     return ct_makesuite(tests);

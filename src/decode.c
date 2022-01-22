@@ -191,7 +191,7 @@ const struct decoded Decode[] = {
     OP(IN_LDY, AM_IMM),     // A0 - LDY imm
     OP(IN_LDA, AM_INDX),    // A1 - LDA (zp,X)
     OP(IN_LDX, AM_IMM),     // A2 - LDX imm
-    UNDEF,                  // A3 - Undefined
+    UP(IN_LAX, AM_INDX),    // A3 - *LAX (zp,X)
     OP(IN_LDY, AM_ZP),      // A4 - LDY zp
     OP(IN_LDA, AM_ZP),      // A5 - LDA zp
     OP(IN_LDX, AM_ZP),      // A6 - LDX zp
@@ -207,7 +207,7 @@ const struct decoded Decode[] = {
     OP(IN_BCS, AM_BCH),     // B0 - BCS
     OP(IN_LDA, AM_INDY),    // B1 - LDA (zp),Y
     JAM,                    // B2 - *JAM (KIL, HLT)
-    UNDEF,                  // B3 - Undefined
+    UP(IN_LAX, AM_INDY),    // B3 - *LAX (zp),Y
     OP(IN_LDY, AM_ZPX),     // B4 - LDY zp,X
     OP(IN_LDA, AM_ZPX),     // B5 - LDA zp,X
     OP(IN_LDX, AM_ZPY),     // B6 - LDX zp,Y

@@ -686,6 +686,85 @@ static void sta_indy_pagecross(void *ctx)
 }
 
 //
+// Unofficial Opcodes
+//
+
+static void lax_indx(void *ctx)
+{
+    uint8_t mem[] = {0xa3, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x45};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertequal(0x45u, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void lax_indx_pageoverflow(void *ctx)
+{
+    uint8_t mem[] = {0xa3, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x80, 0x22};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    cpu.x = 0xff;   // Wrap around from $0002 -> $0001
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x22u, cpu.a);
+    ct_assertequal(0x22u, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void lax_indy(void *ctx)
+{
+    uint8_t mem[] = {0xb3, 0x2, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x45u, cpu.a);
+    ct_assertequal(0x45u, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void lax_indy_pagecross(void *ctx)
+{
+    uint8_t mem[] = {0xb3, 0x2, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, BigRom);
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xb2u, cpu.a);
+    ct_assertequal(0xb2u, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+//
 // Test List
 //
 
@@ -727,6 +806,12 @@ struct ct_testsuite cpu_indirect_tests(void)
         ct_maketest(sbc_indy_pagecross),
         ct_maketest(sta_indy),
         ct_maketest(sta_indy_pagecross),
+
+        // Unofficial Opcodes
+        ct_maketest(lax_indx),
+        ct_maketest(lax_indx_pageoverflow),
+        ct_maketest(lax_indy),
+        ct_maketest(lax_indy_pagecross),
     };
 
     return ct_makesuite(tests);

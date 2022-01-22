@@ -37,6 +37,13 @@ static bool TestWrite(void *ctx, uint16_t addr, uint8_t d)
     return false;
 }
 
+static bool CaptureRomWrite(void *ctx, uint16_t addr, uint8_t d)
+{
+    (void)ctx, (void)addr;
+    RomWriteCapture = d;
+    return false;
+}
+
 static bus *restrict TestBus;
 static struct busdevice Ram = {.read = TestRead, .write = TestWrite},
                         Rom = {.read = TestRead};
@@ -46,6 +53,7 @@ uint8_t BigRom[] = {
     0xca,
     [255] = 0xfe, 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7,
 };
+int RomWriteCapture = -1;
 
 void setup_testbus(void)
 {
@@ -74,6 +82,14 @@ void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
         Rom.ctx = rom;
         bus_set(TestBus, MEMBLOCK_32KB, Rom);
     }
+    RomWriteCapture = -1;
+}
+
+void enable_rom_wcapture(void)
+{
+    struct busdevice dv = Rom;
+    dv.write = CaptureRomWrite;
+    bus_set(TestBus, MEMBLOCK_32KB, dv);
 }
 
 int clock_cpu(struct mos6502 *cpu)

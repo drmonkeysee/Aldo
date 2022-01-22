@@ -235,7 +235,7 @@ const struct decoded Decode[] = {
     OP(IN_CPY, AM_ABS),     // CC - CPY abs
     OP(IN_CMP, AM_ABS),     // CD - CMP abs
     OP(IN_DEC, AM_ABS),     // CE - DEC abs
-    UNDEF,                  // CF - Undefined
+    UP(IN_DCP, AM_ABS),     // CF - *DCP (DCM) abs
     OP(IN_BNE, AM_BCH),     // D0 - BNE
     OP(IN_CMP, AM_INDY),    // D1 - CMP (zp),Y
     JAM,                    // D2 - *JAM (KIL, HLT)
@@ -247,11 +247,11 @@ const struct decoded Decode[] = {
     OP(IN_CLD, AM_IMP),     // D8 - CLD
     OP(IN_CMP, AM_ABSY),    // D9 - CMP abs,Y
     UP(IN_NOP, AM_IMP),     // DA - *NOP
-    UNDEF,                  // DB - Undefined
+    UP(IN_DCP, AM_ABSY),    // DB - *DCP (DCM) abs,Y
     UP(IN_NOP, AM_ABSX),    // DC - *NOP abs,X
     OP(IN_CMP, AM_ABSX),    // DD - CMP abs,X
     OP(IN_DEC, AM_ABSX),    // DE - DEC abs,X
-    UNDEF,                  // DF - Undefined
+    UP(IN_DCP, AM_ABSX),    // DF - *DCP (DCM) abs,X
     OP(IN_CPX, AM_IMM),     // E0 - CPX imm
     OP(IN_SBC, AM_INDX),    // E1 - SBC (zp,X)
     UP(IN_NOP, AM_IMM),     // E2 - *NOP imm (occasionally unstable?)

@@ -203,7 +203,7 @@ const struct decoded Decode[] = {
     OP(IN_LDY, AM_ABS),     // AC - LDY abs
     OP(IN_LDA, AM_ABS),     // AD - LDA abs
     OP(IN_LDX, AM_ABS),     // AE - LDX abs
-    UNDEF,                  // AF - Undefined
+    UP(IN_LAX, AM_ABS),     // AF - *LAX abs
     OP(IN_BCS, AM_BCH),     // B0 - BCS
     OP(IN_LDA, AM_INDY),    // B1 - LDA (zp),Y
     JAM,                    // B2 - *JAM (KIL, HLT)
@@ -219,7 +219,7 @@ const struct decoded Decode[] = {
     OP(IN_LDY, AM_ABSX),    // BC - LDY abs,X
     OP(IN_LDA, AM_ABSX),    // BD - LDA abs,X
     OP(IN_LDX, AM_ABSY),    // BE - LDX abs,Y
-    UNDEF,                  // BF - Undefined
+    UP(IN_LAX, AM_ABSY),    // BF - *LAX abs,Y
     OP(IN_CPY, AM_IMM),     // C0 - CPY imm
     OP(IN_CMP, AM_INDX),    // C1 - CMP (zp,X)
     UP(IN_NOP, AM_IMM),     // C2 - *NOP imm (occasionally unstable?)

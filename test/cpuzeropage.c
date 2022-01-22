@@ -1832,6 +1832,56 @@ static void nop_zpx_pageoverflow(void *ctx)
     }
 }
 
+static void sax_zp(void *ctx)
+{
+    uint8_t mem[] = {0x87, 0x4, 0xff, 0xff, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa5;
+    cpu.x = 0x3c;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(3, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x24u, mem[4]);
+}
+
+static void sax_zpy(void *ctx)
+{
+    uint8_t mem[] = {0x97, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa5;
+    cpu.x = 0x3c;
+    cpu.y = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x24u, mem[7]);
+}
+
+static void sax_zpy_pageoverflow(void *ctx)
+{
+    uint8_t mem[] = {0x97, 0x3, 0x8, 0xff, 0xff, 0xff, 0xff, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa5;
+    cpu.x = 0x3c;
+    cpu.y = 0xff;   // Wrap around from $0003 -> $0002
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x24u, mem[2]);
+}
+
 //
 // Test List
 //
@@ -1946,6 +1996,10 @@ struct ct_testsuite cpu_zeropage_tests(void)
         ct_maketest(nop_zp),
         ct_maketest(nop_zpx),
         ct_maketest(nop_zpx_pageoverflow),
+
+        ct_maketest(sax_zp),
+        ct_maketest(sax_zpy),
+        ct_maketest(sax_zpy_pageoverflow),
     };
 
     return ct_makesuite(tests);

@@ -764,6 +764,44 @@ static void lax_indy_pagecross(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
+static void sax_indx(void *ctx)
+{
+    uint8_t mem[] = {
+        0x83, 0x2, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0,
+        0xb, 0x0, 0x0, 0x0, 0x0, 0x0,
+    };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa;
+    cpu.x = 6;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x2u, mem[11]);
+}
+
+static void sax_indx_pageoverflow(void *ctx)
+{
+    uint8_t mem[] = {
+        0x83, 0x8, 0x0, 0xa, 0x0, 0xff, 0xff, 0x0,
+        0x0, 0x0, 0x0, 0x0, 0x0,
+    };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x7;
+    cpu.x = 0xfb;   // Wrap around from $0008 -> $0003
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x3u, mem[10]);
+}
+
 //
 // Test List
 //
@@ -812,6 +850,8 @@ struct ct_testsuite cpu_indirect_tests(void)
         ct_maketest(lax_indx_pageoverflow),
         ct_maketest(lax_indy),
         ct_maketest(lax_indy_pagecross),
+        ct_maketest(sax_indx),
+        ct_maketest(sax_indx_pageoverflow),
     };
 
     return ct_makesuite(tests);

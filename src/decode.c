@@ -159,11 +159,11 @@ const struct decoded Decode[] = {
     UP(IN_NOP, AM_IMM),     // 80 - *NOP imm
     OP(IN_STA, AM_INDX),    // 81 - STA (zp,X)
     UP(IN_NOP, AM_IMM),     // 82 - *NOP imm (occasionally unstable?)
-    UNDEF,                  // 83 - Undefined
+    UP(IN_SAX, AM_INDX),    // 83 - *SAX (AXS, AAX) (zp,X)
     OP(IN_STY, AM_ZP),      // 84 - STY zp
     OP(IN_STA, AM_ZP),      // 85 - STA zp
     OP(IN_STX, AM_ZP),      // 86 - STX zp
-    UNDEF,                  // 87 - Undefined
+    UP(IN_SAX, AM_ZP),      // 87 - *SAX (AXS, AAX) zp
     OP(IN_DEY, AM_IMP),     // 88 - DEY
     UP(IN_NOP, AM_IMM),     // 89 - *NOP imm
     OP(IN_TXA, AM_IMP),     // 8A - TXA
@@ -171,7 +171,7 @@ const struct decoded Decode[] = {
     OP(IN_STY, AM_ABS),     // 8C - STY abs
     OP(IN_STA, AM_ABS),     // 8D - STA abs
     OP(IN_STX, AM_ABS),     // 8E - STX abs
-    UNDEF,                  // 8F - Undefined
+    UP(IN_SAX, AM_ABS),     // 8F - *SAX (AXS, AAX) abs
     OP(IN_BCC, AM_BCH),     // 90 - BCC
     OP(IN_STA, AM_INDY),    // 91 - STA (zp),Y
     JAM,                    // 92 - *JAM (KIL, HLT)
@@ -179,7 +179,7 @@ const struct decoded Decode[] = {
     OP(IN_STY, AM_ZPX),     // 94 - STY zp,X
     OP(IN_STA, AM_ZPX),     // 95 - STA zp,X
     OP(IN_STX, AM_ZPY),     // 96 - STX zp,Y
-    UNDEF,                  // 97 - Undefined
+    UP(IN_SAX, AM_ZPY),     // 97 - *SAX (AXS, AAX) zp,Y
     OP(IN_TYA, AM_IMP),     // 98 - TYA
     OP(IN_STA, AM_ABSY),    // 99 - STA abs,Y
     OP(IN_TXS, AM_IMP),     // 9A - TXS

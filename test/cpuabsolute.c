@@ -1493,6 +1493,25 @@ static void nop_absx_pagecross(void *ctx)
     }
 }
 
+static void sax_abs(void *ctx)
+{
+    uint8_t mem[] = {
+        0x8f, 0x4, 0x2,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
+    };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa5;
+    cpu.x = 0x3c;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x24u, mem[516]);
+}
+
 //
 // Test List
 //
@@ -1580,6 +1599,8 @@ struct ct_testsuite cpu_absolute_tests(void)
         ct_maketest(nop_abs),
         ct_maketest(nop_absx),
         ct_maketest(nop_absx_pagecross),
+
+        ct_maketest(sax_abs),
     };
 
     return ct_makesuite(tests);

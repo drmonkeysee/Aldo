@@ -815,6 +815,13 @@ static void LAX_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->x, self->databus);
 }
 
+static void SAX_exec(struct mos6502 *self, struct decoded dec)
+{
+    if (read_delayed(self, dec, true)) return;
+    store_data(self, self->a & self->x);
+    commit_operation(self);
+}
+
 static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 {
     switch (dec.instruction) {

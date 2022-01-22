@@ -399,6 +399,10 @@ static bool write_delayed(struct mos6502 *self, struct decoded dec)
     case AM_ABSY:
         delayed = self->t == 4;
         break;
+    case AM_INDX:
+    case AM_INDY:
+        delayed = self->t == 5;
+        break;
     default:
         delayed = false;
         break;
@@ -1017,6 +1021,15 @@ static void INDX_sequence(struct mos6502 *self, struct decoded dec)
         self->addrbus = bytowr(self->adl, self->databus);
         dispatch_instruction(self, dec);
         break;
+    case 6:
+        // NOTE: some unofficial RMW opcodes use this addressing mode and
+        // introduce write-delayed cycles similar to zp-indexed
+        // or absolute-indexed.
+        write(self);
+        break;
+    case 7:
+        dispatch_instruction(self, dec);
+        break;
     default:
         BAD_ADDR_SEQ;
         break;
@@ -1048,6 +1061,15 @@ static void INDY_sequence(struct mos6502 *self, struct decoded dec)
         break;
     case 5:
         self->addrbus = bytowr(self->adl, self->adh);
+        dispatch_instruction(self, dec);
+        break;
+    case 6:
+        // NOTE: some unofficial RMW opcodes use this addressing mode and
+        // introduce write-delayed cycles similar to zp-indexed
+        // or absolute-indexed.
+        write(self);
+        break;
+    case 7:
         dispatch_instruction(self, dec);
         break;
     default:
@@ -1375,7 +1397,9 @@ static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
 // Public Interface
 //
 
-const int MaxCycleCount = 7;
+// NOTE: all official opcodes max out at 7 cycles but a handful of
+// unofficial RMW opcodes have 8 cycles when using indirect-addressing modes.
+const int MaxCycleCount = 8;
 
 void cpu_powerup(struct mos6502 *self)
 {

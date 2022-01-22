@@ -1753,6 +1753,7 @@ struct ct_testsuite cpu_immediate_tests(void)
 
         // Unofficial Opcodes
         ct_maketest(nop),
+
         ct_maketest(usbc),
         ct_maketest(usbc_borrowout),
         ct_maketest(usbc_borrow),

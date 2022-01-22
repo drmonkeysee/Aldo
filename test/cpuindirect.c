@@ -689,6 +689,93 @@ static void sta_indy_pagecross(void *ctx)
 // Unofficial Opcodes
 //
 
+static void dcp_indx(void *ctx)
+{
+    uint8_t mem[] = {0xc3, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x10};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    enable_rom_wcapture();
+    cpu.a = 0x10;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(8, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0xf, RomWriteCapture);
+}
+
+static void dcp_indx_pageoverflow(void *ctx)
+{
+    uint8_t mem[] = {0xc3, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x80, 0x22};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    enable_rom_wcapture();
+    cpu.a = 0x10;
+    cpu.x = 0xff;   // Wrap around from $0002 -> $0001
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(8, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+    ct_assertequal(0x21, RomWriteCapture);
+}
+
+static void dcp_indy(void *ctx)
+{
+    uint8_t mem[] = {0xd3, 0x2, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    enable_rom_wcapture();
+    cpu.a = 0x10;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(8, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0xf, RomWriteCapture);
+}
+
+static void dcp_indy_pagecross(void *ctx)
+{
+    uint8_t mem[] = {0xd3, 0x2, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, BigRom);
+    enable_rom_wcapture();
+    cpu.a = 0x10;
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(8, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0xb1, RomWriteCapture);
+}
+
 static void lax_indx(void *ctx)
 {
     uint8_t mem[] = {0xa3, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
@@ -846,10 +933,16 @@ struct ct_testsuite cpu_indirect_tests(void)
         ct_maketest(sta_indy_pagecross),
 
         // Unofficial Opcodes
+        ct_maketest(dcp_indx),
+        ct_maketest(dcp_indx_pageoverflow),
+        ct_maketest(dcp_indy),
+        ct_maketest(dcp_indy_pagecross),
+
         ct_maketest(lax_indx),
         ct_maketest(lax_indx_pageoverflow),
         ct_maketest(lax_indy),
         ct_maketest(lax_indy_pagecross),
+
         ct_maketest(sax_indx),
         ct_maketest(sax_indx_pageoverflow),
     };

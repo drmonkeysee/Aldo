@@ -86,6 +86,7 @@ X(TXS, self)        /* Transfer x-index to stack pointer */ \
 X(TYA, self)        /* Transfer y-index to accumulator */ \
 \
 /* Unofficial Opcodes */ \
+X(DCP, self, dec)   /* Compare to accumulator and decrement memory */ \
 X(JAM, self)        /* No instruction signal, jams the cpu */ \
 X(LAX, self, dec)   /* Load accumulator and x-index */ \
 X(SAX, self)        /* Store logical and of accumulator and x-index */

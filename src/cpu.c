@@ -297,7 +297,6 @@ static void arithmetic_sum(struct mos6502 *self, uint8_t b, bool c)
 // see SBC_exec for why this works.
 static void compare_register(struct mos6502 *self, uint8_t r)
 {
-    read(self);
     commit_operation(self);
     const uint16_t cmp = r + (uint8_t)~self->databus + 1;
     self->p.c = cmp >> 8;
@@ -433,8 +432,7 @@ static void AND_exec(struct mos6502 *self, struct decoded dec)
 
 static void ASL_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (read_delayed(self, dec, true)
-        || write_delayed(self, dec)) return;
+    if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     bitoperation(self, dec, BIT_LEFT, 0x0);
 }
 
@@ -536,25 +534,27 @@ static void CLV_exec(struct mos6502 *self)
 static void CMP_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
+    read(self);
     compare_register(self, self->a);
 }
 
 static void CPX_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
+    read(self);
     compare_register(self, self->x);
 }
 
 static void CPY_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
+    read(self);
     compare_register(self, self->y);
 }
 
 static void DEC_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (read_delayed(self, dec, true)
-        || write_delayed(self, dec)) return;
+    if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
     modify_mem(self, self->databus - 1);
 }
@@ -581,8 +581,7 @@ static void EOR_exec(struct mos6502 *self, struct decoded dec)
 
 static void INC_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (read_delayed(self, dec, true)
-        || write_delayed(self, dec)) return;
+    if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
     modify_mem(self, self->databus + 1);
 }
@@ -637,8 +636,7 @@ static void LDY_exec(struct mos6502 *self, struct decoded dec)
 
 static void LSR_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (read_delayed(self, dec, true)
-        || write_delayed(self, dec)) return;
+    if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     bitoperation(self, dec, BIT_RIGHT, 0x0);
 }
 
@@ -689,15 +687,13 @@ static void PLP_exec(struct mos6502 *self)
 
 static void ROL_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (read_delayed(self, dec, true)
-        || write_delayed(self, dec)) return;
+    if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     bitoperation(self, dec, BIT_LEFT, self->p.c);
 }
 
 static void ROR_exec(struct mos6502 *self, struct decoded dec)
 {
-    if (read_delayed(self, dec, true)
-        || write_delayed(self, dec)) return;
+    if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
 }
 
@@ -800,6 +796,13 @@ static void TYA_exec(struct mos6502 *self)
 //
 // Unofficial Instructions
 //
+
+static void DCP_exec(struct mos6502 *self, struct decoded dec)
+{
+    if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
+    compare_register(self, self->a);
+    store_data(self, self->databus - 1);
+}
 
 static void JAM_exec(struct mos6502 *self)
 {

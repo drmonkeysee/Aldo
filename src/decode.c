@@ -227,7 +227,7 @@ const struct decoded Decode[] = {
     OP(IN_CPY, AM_ZP),      // C4 - CPY zp
     OP(IN_CMP, AM_ZP),      // C5 - CMP zp
     OP(IN_DEC, AM_ZP),      // C6 - DEC zp
-    UNDEF,                  // C7 - Undefined
+    UP(IN_DCP, AM_ZP),      // C7 - *DCP (DCM) zp
     OP(IN_INY, AM_IMP),     // C8 - INY
     OP(IN_CMP, AM_IMM),     // C9 - CMP imm
     OP(IN_DEX, AM_IMP),     // CA - DEX
@@ -243,7 +243,7 @@ const struct decoded Decode[] = {
     UP(IN_NOP, AM_ZPX),     // D4 - *NOP zp,X
     OP(IN_CMP, AM_ZPX),     // D5 - CMP zp,X
     OP(IN_DEC, AM_ZPX),     // D6 - DEC zp,X
-    UNDEF,                  // D7 - Undefined
+    UP(IN_DCP, AM_ZPX),     // D7 - *DCP (DCM) zp,X
     OP(IN_CLD, AM_IMP),     // D8 - CLD
     OP(IN_CMP, AM_ABSY),    // D9 - CMP abs,Y
     UP(IN_NOP, AM_IMP),     // DA - *NOP

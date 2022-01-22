@@ -88,7 +88,7 @@ X(TYA, self)        /* Transfer y-index to accumulator */ \
 /* Unofficial Opcodes */ \
 X(JAM, self)        /* No instruction signal, jams the cpu */ \
 X(LAX, self, dec)   /* Load accumulator and x-index */ \
-X(SAX, self, dec)   /* Store logical and of accumulator and x-index */
+X(SAX, self)        /* Store logical and of accumulator and x-index */
 
 // Addressing Modes
 // X(symbol, byte count, peek template, display strings...)

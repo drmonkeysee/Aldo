@@ -1448,6 +1448,224 @@ static void nop(void *ctx)
     }
 }
 
+static void usbc(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.p.c = true;
+    cpu.a = 0xa;    // 10 - 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x4u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void usbc_borrowout(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa;    // 10 - 6 - B
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x3u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void usbc_borrow(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0xfe};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.p.c = true;
+    cpu.a = 0xa;   // 10 - (-2)
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xcu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void usbc_zero(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.p.c = true;
+    cpu.a = 0;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void usbc_negative(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.p.c = true;
+    cpu.a = 0xff;    // -1 - 1
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xfeu, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void usbc_borrow_negative(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.p.c = true;
+    cpu.a = 0;  // 0 - 1
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xffu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void usbc_overflow_to_negative(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0xff};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.p.c = true;
+    cpu.a = 0x7f;   // 127 - (-1)
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x80u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void usbc_overflow_to_positive(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.p.c = true;
+    cpu.a = 0x80;   // (-128) - 1
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x7fu, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void usbc_borrowout_causes_overflow(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x80;   // (-128) - 0 - B
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x7fu, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void usbc_borrowout_avoids_overflow(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0xff};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x7f;   // 127 - (-1) - B
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x7fu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+// SOURCE: nestest
+static void usbc_overflow_without_borrow(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.p.c = true;
+    cpu.a = 0x7f;   // 127 - (-128)
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xffu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
 //
 // Test List
 //
@@ -1535,6 +1753,17 @@ struct ct_testsuite cpu_immediate_tests(void)
 
         // Unofficial Opcodes
         ct_maketest(nop),
+        ct_maketest(usbc),
+        ct_maketest(usbc_borrowout),
+        ct_maketest(usbc_borrow),
+        ct_maketest(usbc_zero),
+        ct_maketest(usbc_negative),
+        ct_maketest(usbc_borrow_negative),
+        ct_maketest(usbc_overflow_to_negative),
+        ct_maketest(usbc_overflow_to_positive),
+        ct_maketest(usbc_borrowout_causes_overflow),
+        ct_maketest(usbc_borrowout_avoids_overflow),
+        ct_maketest(usbc_overflow_without_borrow),
     };
 
     return ct_makesuite(tests);

@@ -263,7 +263,7 @@ const struct decoded Decode[] = {
     OP(IN_INX, AM_IMP),     // E8 - INX
     OP(IN_SBC, AM_IMM),     // E9 - SBC imm
     OP(IN_NOP, AM_IMP),     // EA - NOP
-    UNDEF,                  // EB - Undefined
+    UP(IN_SBC, AM_IMM),     // EB - *SBC (USBC) imm
     OP(IN_CPX, AM_ABS),     // EC - CPX abs
     OP(IN_SBC, AM_ABS),     // ED - SBC abs
     OP(IN_INC, AM_ABS),     // EE - INC abs

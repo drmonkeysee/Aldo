@@ -295,10 +295,10 @@ static void arithmetic_sum(struct mos6502 *self, uint8_t b, bool c)
 // NOTE: compare is effectively R - D; modeling the subtraction as
 // R + 2sComplement(D) gets us all the flags for free;
 // see SBC_exec for why this works.
-static void compare_register(struct mos6502 *self, uint8_t r)
+static void compare_register(struct mos6502 *self, uint8_t r, uint8_t d)
 {
     commit_operation(self);
-    const uint16_t cmp = r + (uint8_t)~self->databus + 1;
+    const uint16_t cmp = r + (uint8_t)~d + 1;
     self->p.c = cmp >> 8;
     update_z(self, cmp);
     update_n(self, cmp);
@@ -539,21 +539,21 @@ static void CMP_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
-    compare_register(self, self->a);
+    compare_register(self, self->a, self->databus);
 }
 
 static void CPX_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
-    compare_register(self, self->x);
+    compare_register(self, self->x, self->databus);
 }
 
 static void CPY_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
-    compare_register(self, self->y);
+    compare_register(self, self->y, self->databus);
 }
 
 static void DEC_exec(struct mos6502 *self, struct decoded dec)
@@ -804,8 +804,9 @@ static void TYA_exec(struct mos6502 *self)
 static void DCP_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
-    compare_register(self, self->a);
-    store_data(self, self->databus - 1);
+    const uint8_t d = self->databus - 1;
+    compare_register(self, self->a, d);
+    store_data(self, d);
 }
 
 static void JAM_exec(struct mos6502 *self)

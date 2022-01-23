@@ -692,7 +692,7 @@ static void sta_indy_pagecross(void *ctx)
 static void dcp_indx(void *ctx)
 {
     uint8_t mem[] = {0xc3, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
-            abs[] = {0xff, 0x10};
+            abs[] = {0xff, 0x11};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
@@ -708,13 +708,13 @@ static void dcp_indx(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0xf, RomWriteCapture);
+    ct_assertequal(0x10, RomWriteCapture);
 }
 
 static void dcp_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xc3, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
-            abs[] = {0xff, 0x80, 0x22};
+            abs[] = {0xff, 0x80, 0x23};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
@@ -730,13 +730,13 @@ static void dcp_indx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
-    ct_assertequal(0x21, RomWriteCapture);
+    ct_assertequal(0x22, RomWriteCapture);
 }
 
 static void dcp_indy(void *ctx)
 {
     uint8_t mem[] = {0xd3, 0x2, 0x1, 0x80},
-            abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x11};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
@@ -752,7 +752,7 @@ static void dcp_indy(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0xf, RomWriteCapture);
+    ct_assertequal(0x10, RomWriteCapture);
 }
 
 static void dcp_indy_pagecross(void *ctx)
@@ -762,7 +762,7 @@ static void dcp_indy_pagecross(void *ctx)
     setup_cpu(&cpu, mem, BigRom);
     enable_rom_wcapture();
     cpu.a = 0x10;
-    cpu.y = 3;  // Cross boundary from $80FF -> $8102
+    cpu.y = 4;  // Cross boundary from $80FF -> $8103
 
     const int cycles = clock_cpu(&cpu);
 
@@ -773,7 +773,7 @@ static void dcp_indy_pagecross(void *ctx)
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0xb1, RomWriteCapture);
+    ct_assertequal(0xb2, RomWriteCapture);
 }
 
 static void lax_indx(void *ctx)

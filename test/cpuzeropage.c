@@ -1667,7 +1667,7 @@ static void stx_zpy_pageoverflow(void *ctx)
 
 static void dcp_zp_equal(void *ctx)
 {
-    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x10};
+    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x11};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
@@ -1681,12 +1681,12 @@ static void dcp_zp_equal(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0xfu, mem[4]);
+    ct_assertequal(0x10u, mem[4]);
 }
 
 static void dcp_zp_lt(void *ctx)
 {
-    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x40};
+    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x41};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
@@ -1700,12 +1700,12 @@ static void dcp_zp_lt(void *ctx)
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
-    ct_assertequal(0x3fu, mem[4]);
+    ct_assertequal(0x40u, mem[4]);
 }
 
 static void dcp_zp_gt(void *ctx)
 {
-    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x6};
+    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x7};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
@@ -1719,12 +1719,12 @@ static void dcp_zp_gt(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0x5u, mem[4]);
+    ct_assertequal(0x6u, mem[4]);
 }
 
 static void dcp_zp_max_to_min(void *ctx)
 {
-    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x0};
+    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x1};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
@@ -1738,12 +1738,12 @@ static void dcp_zp_max_to_min(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
-    ct_assertequal(0xffu, mem[4]);
+    ct_assertequal(0x0u, mem[4]);
 }
 
 static void dcp_zp_max_to_max(void *ctx)
 {
-    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0xff};
+    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x0};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
@@ -1757,12 +1757,12 @@ static void dcp_zp_max_to_max(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0xfeu, mem[4]);
+    ct_assertequal(0xffu, mem[4]);
 }
 
 static void dcp_zp_min_to_max(void *ctx)
 {
-    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0xff};
+    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x0};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
@@ -1776,12 +1776,12 @@ static void dcp_zp_min_to_max(void *ctx)
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0xfeu, mem[4]);
+    ct_assertequal(0xffu, mem[4]);
 }
 
 static void dcp_zp_min_to_min(void *ctx)
 {
-    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x0};
+    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x1};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
@@ -1795,12 +1795,12 @@ static void dcp_zp_min_to_min(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0xffu, mem[4]);
+    ct_assertequal(0x0u, mem[4]);
 }
 
 static void dcp_zp_neg_equal(void *ctx)
 {
-    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0xa0};
+    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0xa1};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa0;
@@ -1814,12 +1814,12 @@ static void dcp_zp_neg_equal(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0x9fu, mem[4]);
+    ct_assertequal(0xa0u, mem[4]);
 }
 
 static void dcp_zp_neg_lt(void *ctx)
 {
-    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0xff};
+    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x0};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa0;
@@ -1833,12 +1833,12 @@ static void dcp_zp_neg_lt(void *ctx)
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
-    ct_assertequal(0xfeu, mem[4]);
+    ct_assertequal(0xffu, mem[4]);
 }
 
 static void dcp_zp_neg_gt(void *ctx)
 {
-    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x90};
+    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x91};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa0;
@@ -1852,12 +1852,12 @@ static void dcp_zp_neg_gt(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0x8fu, mem[4]);
+    ct_assertequal(0x90u, mem[4]);
 }
 
 static void dcp_zp_negative_to_positive(void *ctx)
 {
-    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x1};
+    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x2};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x80;    // Effectively -128 - 1 = 127
@@ -1872,12 +1872,12 @@ static void dcp_zp_negative_to_positive(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0x0u, mem[4]);
+    ct_assertequal(0x1u, mem[4]);
 }
 
 static void dcp_zp_positive_to_negative(void *ctx)
 {
-    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x1};
+    uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x2};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;  // Effectively 0 - 1 = -1
@@ -1892,12 +1892,12 @@ static void dcp_zp_positive_to_negative(void *ctx)
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
-    ct_assertequal(0x0u, mem[4]);
+    ct_assertequal(0x1u, mem[4]);
 }
 
 static void dcp_zpx(void *ctx)
 {
-    uint8_t mem[] = {0xd7, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x10};
+    uint8_t mem[] = {0xd7, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x11};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
@@ -1912,12 +1912,12 @@ static void dcp_zpx(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0xfu, mem[7]);
+    ct_assertequal(0x10u, mem[7]);
 }
 
 static void dcp_zpx_pageoverflow(void *ctx)
 {
-    uint8_t mem[] = {0xd7, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x10};
+    uint8_t mem[] = {0xd7, 0x3, 0x23, 0xff, 0xff, 0xff, 0xff, 0x10};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
@@ -1932,7 +1932,7 @@ static void dcp_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
-    ct_assertequal(0x21u, mem[2]);
+    ct_assertequal(0x22u, mem[2]);
 }
 
 static void lax_zp(void *ctx)

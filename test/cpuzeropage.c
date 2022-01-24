@@ -1935,7 +1935,7 @@ static void dcp_zpx_pageoverflow(void *ctx)
     ct_assertequal(0x22u, mem[2]);
 }
 
-static void isc(void *ctx)
+static void isc_zp(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x5};
     struct mos6502 cpu;
@@ -1956,7 +1956,7 @@ static void isc(void *ctx)
     ct_assertequal(0x6u, mem[4]);
 }
 
-static void isc_borrowout(void *ctx)
+static void isc_zp_borrowout(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x5};
     struct mos6502 cpu;
@@ -1976,7 +1976,7 @@ static void isc_borrowout(void *ctx)
     ct_assertequal(0x6u, mem[4]);
 }
 
-static void isc_borrow(void *ctx)
+static void isc_zp_borrow(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0xfd};
     struct mos6502 cpu;
@@ -1997,7 +1997,7 @@ static void isc_borrow(void *ctx)
     ct_assertequal(0xfeu, mem[4]);
 }
 
-static void isc_zero(void *ctx)
+static void isc_zp_zero(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0xff};
     struct mos6502 cpu;
@@ -2018,7 +2018,7 @@ static void isc_zero(void *ctx)
     ct_assertequal(0x0u, mem[4]);
 }
 
-static void isc_negative(void *ctx)
+static void isc_zp_negative(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x0};
     struct mos6502 cpu;
@@ -2039,7 +2039,7 @@ static void isc_negative(void *ctx)
     ct_assertequal(0x1u, mem[4]);
 }
 
-static void isc_borrow_negative(void *ctx)
+static void isc_zp_borrow_negative(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x0};
     struct mos6502 cpu;
@@ -2060,7 +2060,7 @@ static void isc_borrow_negative(void *ctx)
     ct_assertequal(0x1u, mem[4]);
 }
 
-static void isc_overflow_to_negative(void *ctx)
+static void isc_zp_overflow_to_negative(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0xfe};
     struct mos6502 cpu;
@@ -2081,7 +2081,7 @@ static void isc_overflow_to_negative(void *ctx)
     ct_assertequal(0xffu, mem[4]);
 }
 
-static void isc_overflow_to_positive(void *ctx)
+static void isc_zp_overflow_to_positive(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x0};
     struct mos6502 cpu;
@@ -2102,7 +2102,7 @@ static void isc_overflow_to_positive(void *ctx)
     ct_assertequal(0x1u, mem[4]);
 }
 
-static void isc_borrowout_causes_overflow(void *ctx)
+static void isc_zp_borrowout_causes_overflow(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0xff};
     struct mos6502 cpu;
@@ -2122,7 +2122,7 @@ static void isc_borrowout_causes_overflow(void *ctx)
     ct_assertequal(0x0u, mem[4]);
 }
 
-static void isc_borrowout_avoids_overflow(void *ctx)
+static void isc_zp_borrowout_avoids_overflow(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0xfe};
     struct mos6502 cpu;
@@ -2143,7 +2143,7 @@ static void isc_borrowout_avoids_overflow(void *ctx)
 }
 
 // SOURCE: nestest
-static void isc_overflow_without_borrow(void *ctx)
+static void isc_zp_overflow_without_borrow(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x7f};
     struct mos6502 cpu;
@@ -2545,17 +2545,17 @@ struct ct_testsuite cpu_zeropage_tests(void)
         ct_maketest(dcp_zpx),
         ct_maketest(dcp_zpx_pageoverflow),
 
-        ct_maketest(isc),
-        ct_maketest(isc_borrowout),
-        ct_maketest(isc_borrow),
-        ct_maketest(isc_zero),
-        ct_maketest(isc_negative),
-        ct_maketest(isc_borrow_negative),
-        ct_maketest(isc_overflow_to_negative),
-        ct_maketest(isc_overflow_to_positive),
-        ct_maketest(isc_borrowout_causes_overflow),
-        ct_maketest(isc_borrowout_avoids_overflow),
-        ct_maketest(isc_overflow_without_borrow),
+        ct_maketest(isc_zp),
+        ct_maketest(isc_zp_borrowout),
+        ct_maketest(isc_zp_borrow),
+        ct_maketest(isc_zp_zero),
+        ct_maketest(isc_zp_negative),
+        ct_maketest(isc_zp_borrow_negative),
+        ct_maketest(isc_zp_overflow_to_negative),
+        ct_maketest(isc_zp_overflow_to_positive),
+        ct_maketest(isc_zp_borrowout_causes_overflow),
+        ct_maketest(isc_zp_borrowout_avoids_overflow),
+        ct_maketest(isc_zp_overflow_without_borrow),
         ct_maketest(isc_zpx),
         ct_maketest(isc_zpx_pageoverflow),
 

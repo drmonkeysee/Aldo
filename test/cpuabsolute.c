@@ -1467,6 +1467,123 @@ static void dcp_absy_pagecross(void *ctx)
     ct_assertequal(0xb2, RomWriteCapture);
 }
 
+static void isc_abs(void *ctx)
+{
+    uint8_t mem[] = {0xef, 0x1, 0x80},
+            abs[] = {0xff, 0x5};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    enable_rom_wcapture();
+    cpu.p.c = true;
+    cpu.a = 0xa;    // 10 - 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x4u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0x6, RomWriteCapture);
+}
+
+static void isc_absx(void *ctx)
+{
+    uint8_t mem[] = {0xff, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x5};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    enable_rom_wcapture();
+    cpu.p.c = true;
+    cpu.a = 0xa;    // 10 - 6
+    cpu.x = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x4u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0x6, RomWriteCapture);
+}
+
+static void isc_absx_pagecross(void *ctx)
+{
+    uint8_t mem[] = {0xff, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, BigRom);
+    enable_rom_wcapture();
+    cpu.p.c = true;
+    cpu.a = 0xa;    // 10 - (-78)
+    cpu.x = 2;  // Cross boundary from $80FF -> $8101
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x58u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0xb2, RomWriteCapture);
+}
+
+static void isc_absy(void *ctx)
+{
+    uint8_t mem[] = {0xfb, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x5};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    enable_rom_wcapture();
+    cpu.p.c = true;
+    cpu.a = 0xa;    // 10 - 6
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x4u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0x6, RomWriteCapture);
+}
+
+static void isc_absy_pagecross(void *ctx)
+{
+    uint8_t mem[] = {0xfb, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, BigRom);
+    enable_rom_wcapture();
+    cpu.p.c = true;
+    cpu.a = 0xa;    // 10 - (-78)
+    cpu.y = 2;  // Cross boundary from $80FF -> $8101
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x58u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0xb2, RomWriteCapture);
+}
+
 static void lax_abs(void *ctx)
 {
     uint8_t mem[] = {0xaf, 0x1, 0x80},
@@ -1704,6 +1821,12 @@ struct ct_testsuite cpu_absolute_tests(void)
         ct_maketest(dcp_absx_pagecross),
         ct_maketest(dcp_absy),
         ct_maketest(dcp_absy_pagecross),
+
+        ct_maketest(isc_abs),
+        ct_maketest(isc_absx),
+        ct_maketest(isc_absx_pagecross),
+        ct_maketest(isc_absy),
+        ct_maketest(isc_absy_pagecross),
 
         ct_maketest(lax_abs),
         ct_maketest(lax_absy),

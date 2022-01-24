@@ -255,7 +255,7 @@ const struct decoded Decode[] = {
     OP(IN_CPX, AM_IMM),     // E0 - CPX imm
     OP(IN_SBC, AM_INDX),    // E1 - SBC (zp,X)
     UP(IN_NOP, AM_IMM),     // E2 - *NOP imm (occasionally unstable?)
-    UNDEF,                  // E3 - Undefined
+    UP(IN_ISC, AM_INDX),    // E3 - *ISC (ISB, INS) (zp,X)
     OP(IN_CPX, AM_ZP),      // E4 - CPX zp
     OP(IN_SBC, AM_ZP),      // E5 - SBC zp
     OP(IN_INC, AM_ZP),      // E6 - INC zp
@@ -267,11 +267,11 @@ const struct decoded Decode[] = {
     OP(IN_CPX, AM_ABS),     // EC - CPX abs
     OP(IN_SBC, AM_ABS),     // ED - SBC abs
     OP(IN_INC, AM_ABS),     // EE - INC abs
-    UNDEF,                  // EF - Undefined
+    UP(IN_ISC, AM_ABS),     // EF - *ISC (ISB, INS) abs
     OP(IN_BEQ, AM_BCH),     // F0 - BEQ
     OP(IN_SBC, AM_INDY),    // F1 - SBC (zp),Y
     JAM,                    // F2 - *JAM (KIL, HLT)
-    UNDEF,                  // F3 - Undefined
+    UP(IN_ISC, AM_INDY),    // F3 - *ISC (ISB, INS) (zp),Y
     UP(IN_NOP, AM_ZPX),     // F4 - *NOP zp,X
     OP(IN_SBC, AM_ZPX),     // F5 - SBC zp,X
     OP(IN_INC, AM_ZPX),     // F6 - INC zp,X
@@ -279,11 +279,11 @@ const struct decoded Decode[] = {
     OP(IN_SED, AM_IMP),     // F8 - SED
     OP(IN_SBC, AM_ABSY),    // F9 - SBC abs,Y
     UP(IN_NOP, AM_IMP),     // FA - *NOP
-    UNDEF,                  // FB - Undefined
+    UP(IN_ISC, AM_ABSY),    // FB - *ISC (ISB, INS) abs,Y
     UP(IN_NOP, AM_ABSX),    // FC - *NOP abs,X
     OP(IN_SBC, AM_ABSX),    // FD - SBC abs,X
     OP(IN_INC, AM_ABSX),    // FE - INC abs,X
-    UNDEF,                  // FF - Undefined
+    UP(IN_ISC, AM_ABSX),    // FF - *ISC (ISB, INS) abs,X
 };
 
 static_assert(sizeof Decode / sizeof Decode[0] == 256,

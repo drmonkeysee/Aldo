@@ -285,7 +285,6 @@ static void store_data(struct mos6502 *self, uint8_t d)
 
 static void arithmetic_sum(struct mos6502 *self, uint8_t b, bool c)
 {
-    commit_operation(self);
     const uint16_t sum = self->a + b + c;
     self->p.c = sum >> 8;
     update_v(self, sum, self->a, b);
@@ -297,7 +296,6 @@ static void arithmetic_sum(struct mos6502 *self, uint8_t b, bool c)
 // see SBC_exec for why this works.
 static void compare_register(struct mos6502 *self, uint8_t r, uint8_t d)
 {
-    commit_operation(self);
     const uint16_t cmp = r + (uint8_t)~d + 1;
     self->p.c = cmp >> 8;
     update_z(self, cmp);
@@ -424,6 +422,7 @@ static void ADC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
+    commit_operation(self);
     arithmetic_sum(self, self->databus, self->p.c);
 }
 
@@ -540,6 +539,7 @@ static void CMP_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
+    commit_operation(self);
     compare_register(self, self->a, self->databus);
 }
 
@@ -547,6 +547,7 @@ static void CPX_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
+    commit_operation(self);
     compare_register(self, self->x, self->databus);
 }
 
@@ -554,6 +555,7 @@ static void CPY_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
+    commit_operation(self);
     compare_register(self, self->y, self->databus);
 }
 
@@ -720,6 +722,7 @@ static void SBC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
+    commit_operation(self);
     arithmetic_sum(self, ~self->databus, self->p.c);
 }
 
@@ -788,8 +791,8 @@ static void TXA_exec(struct mos6502 *self)
 
 static void TXS_exec(struct mos6502 *self)
 {
-    commit_operation(self);
     self->s = self->x;
+    commit_operation(self);
 }
 
 static void TYA_exec(struct mos6502 *self)
@@ -805,17 +808,19 @@ static void TYA_exec(struct mos6502 *self)
 static void DCP_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
+    commit_operation(self);
     const uint8_t d = self->databus - 1;
+    modify_mem(self, d);
     compare_register(self, self->a, d);
-    store_data(self, d);
 }
 
 static void ISC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
+    commit_operation(self);
     const uint8_t d = self->databus + 1;
+    modify_mem(self, d);
     arithmetic_sum(self, ~d, self->p.c);
-    store_data(self, d);
 }
 
 static void JAM_exec(struct mos6502 *self)

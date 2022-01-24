@@ -259,7 +259,7 @@ const struct decoded Decode[] = {
     OP(IN_CPX, AM_ZP),      // E4 - CPX zp
     OP(IN_SBC, AM_ZP),      // E5 - SBC zp
     OP(IN_INC, AM_ZP),      // E6 - INC zp
-    UNDEF,                  // E7 - Undefined
+    UP(IN_ISC, AM_ZP),      // E7 - *ISC (ISB, INS) zp
     OP(IN_INX, AM_IMP),     // E8 - INX
     OP(IN_SBC, AM_IMM),     // E9 - SBC imm
     OP(IN_NOP, AM_IMP),     // EA - NOP
@@ -275,7 +275,7 @@ const struct decoded Decode[] = {
     UP(IN_NOP, AM_ZPX),     // F4 - *NOP zp,X
     OP(IN_SBC, AM_ZPX),     // F5 - SBC zp,X
     OP(IN_INC, AM_ZPX),     // F6 - INC zp,X
-    UNDEF,                  // F7 - Undefined
+    UP(IN_ISC, AM_ZPX),     // F7 - *ISC (ISB, INS) zp,X
     OP(IN_SED, AM_IMP),     // F8 - SED
     OP(IN_SBC, AM_ABSY),    // F9 - SBC abs,Y
     UP(IN_NOP, AM_IMP),     // FA - *NOP

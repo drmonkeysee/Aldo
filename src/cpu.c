@@ -809,6 +809,14 @@ static void DCP_exec(struct mos6502 *self, struct decoded dec)
     store_data(self, d);
 }
 
+static void ISC_exec(struct mos6502 *self, struct decoded dec)
+{
+    if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
+    const uint8_t d = self->databus + 1;
+    arithmetic_sum(self, ~d, self->p.c);
+    store_data(self, d);
+}
+
 static void JAM_exec(struct mos6502 *self)
 {
     self->databus = 0xff;

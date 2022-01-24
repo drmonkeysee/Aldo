@@ -316,8 +316,8 @@ enum bitdirection {
     BIT_RIGHT,
 };
 
-static void bitoperation(struct mos6502 *self, struct decoded dec,
-                         enum bitdirection bd, uint8_t carryin_mask)
+static uint8_t bitoperation(struct mos6502 *self, struct decoded dec,
+                            enum bitdirection bd, uint8_t carryin_mask)
 {
     commit_operation(self);
     uint8_t d = dec.mode == AM_IMP ? self->a : self->databus;
@@ -335,6 +335,7 @@ static void bitoperation(struct mos6502 *self, struct decoded dec,
     } else {
         modify_mem(self, d);
     }
+    return d;
 }
 
 static void stack_top(struct mos6502 *self)
@@ -835,6 +836,13 @@ static void SAX_exec(struct mos6502 *self)
 {
     store_data(self, self->a & self->x);
     commit_operation(self);
+}
+
+static void SLO_exec(struct mos6502 *self, struct decoded dec)
+{
+    if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
+    const uint8_t d = bitoperation(self, dec, BIT_LEFT, 0x0);
+    load_register(self, &self->a, self->a | d);
 }
 
 static void dispatch_instruction(struct mos6502 *self, struct decoded dec)

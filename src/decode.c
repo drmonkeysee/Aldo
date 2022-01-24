@@ -31,11 +31,11 @@ const struct decoded Decode[] = {
     OP(IN_BRK, AM_BRK),     // 00 - BRK
     OP(IN_ORA, AM_INDX),    // 01 - ORA (zp,X)
     JAM,                    // 02 - *JAM (KIL, HLT)
-    UNDEF,                  // 03 - Undefined
+    UP(IN_SLO, AM_INDX),    // 03 - *SLO (ASO) (zp,X)
     UP(IN_NOP, AM_ZP),      // 04 - *NOP zp
     OP(IN_ORA, AM_ZP),      // 05 - ORA zp
     OP(IN_ASL, AM_ZP),      // 06 - ASL zp
-    UNDEF,                  // 07 - Undefined
+    UP(IN_SLO, AM_ZP),      // 07 - *SLO (ASO) zp
     OP(IN_PHP, AM_PSH),     // 08 - PHP
     OP(IN_ORA, AM_IMM),     // 09 - ORA imm
     OP(IN_ASL, AM_IMP),     // 0A - ASL imp
@@ -43,23 +43,23 @@ const struct decoded Decode[] = {
     UP(IN_NOP, AM_ABS),     // 0C - *NOP abs
     OP(IN_ORA, AM_ABS),     // 0D - ORA abs
     OP(IN_ASL, AM_ABS),     // 0E - ASL abs
-    UNDEF,                  // 0F - Undefined
+    UP(IN_SLO, AM_ABS),     // 0F - *SLO (ASO) abs
     OP(IN_BPL, AM_BCH),     // 10 - BPL
     OP(IN_ORA, AM_INDY),    // 11 - ORA (zp),Y
     JAM,                    // 12 - *JAM (KIL, HLT)
-    UNDEF,                  // 13 - Undefined
+    UP(IN_SLO, AM_INDY),    // 13 - *SLO (ASO) (zp),Y
     UP(IN_NOP, AM_ZPX),     // 14 - *NOP zp,X
     OP(IN_ORA, AM_ZPX),     // 15 - ORA zp,X
     OP(IN_ASL, AM_ZPX),     // 16 - ASL zp,X
-    UNDEF,                  // 17 - Undefined
+    UP(IN_SLO, AM_ZPX),     // 17 - *SLO (ASO) zp,X
     OP(IN_CLC, AM_IMP),     // 18 - CLC
     OP(IN_ORA, AM_ABSY),    // 19 - ORA abs,Y
     UP(IN_NOP, AM_IMP),     // 1A - *NOP
-    UNDEF,                  // 1B - Undefined
+    UP(IN_SLO, AM_ABSY),    // 1B - *SLO (ASO) abs,Y
     UP(IN_NOP, AM_ABSX),    // 1C - *NOP abs,X
     OP(IN_ORA, AM_ABSX),    // 1D - ORA abs,X
     OP(IN_ASL, AM_ABSX),    // 1E - ASL abs,X
-    UNDEF,                  // 1F - Undefined
+    UP(IN_SLO, AM_ABSX),    // 1F - *SLO (ASO) abs,X
     OP(IN_JSR, AM_JSR),     // 20 - JSR
     OP(IN_AND, AM_INDX),    // 21 - AND (zp,X)
     JAM,                    // 22 - *JAM (KIL, HLT)

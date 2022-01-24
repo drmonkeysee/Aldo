@@ -90,7 +90,8 @@ X(DCP, self, dec)   /* Compare to accumulator and decrement memory */ \
 X(ISC, self, dec)   /* Subtract with carry and increment memory */ \
 X(JAM, self)        /* No instruction signal, jams the cpu */ \
 X(LAX, self, dec)   /* Load accumulator and x-index */ \
-X(SAX, self)        /* Store logical and of accumulator and x-index */
+X(SAX, self)        /* Store logical and of accumulator and x-index */ \
+X(SLO, self, dec)   /* Arithmetic shift left and logical or */
 
 // Addressing Modes
 // X(symbol, byte count, peek template, display strings...)

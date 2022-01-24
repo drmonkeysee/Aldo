@@ -984,6 +984,93 @@ static void sax_indx_pageoverflow(void *ctx)
     ct_assertequal(0x3u, mem[10]);
 }
 
+static void slo_indx(void *ctx)
+{
+    uint8_t mem[] = {0x3, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    enable_rom_wcapture();
+    cpu.a = 0xa;
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(8, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xeu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0xc, RomWriteCapture);
+}
+
+static void slo_indx_pageoverflow(void *ctx)
+{
+    uint8_t mem[] = {0x3, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x80, 0xfe};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    enable_rom_wcapture();
+    cpu.a = 0xfa;
+    cpu.x = 0xff;   // Wrap around from $0002 -> $0001
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(8, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xfeu, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+    ct_assertequal(0xfc, RomWriteCapture);
+}
+
+static void slo_indy(void *ctx)
+{
+    uint8_t mem[] = {0x13, 0x2, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    enable_rom_wcapture();
+    cpu.a = 0xa;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(8, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xeu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0xc, RomWriteCapture);
+}
+
+static void slo_indy_pagecross(void *ctx)
+{
+    uint8_t mem[] = {0x13, 0x2, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, BigRom);
+    enable_rom_wcapture();
+    cpu.a = 0xea;
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(8, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xeeu, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+    ct_assertequal(0x64, RomWriteCapture);
+}
+
 //
 // Test List
 //
@@ -1045,6 +1132,11 @@ struct ct_testsuite cpu_indirect_tests(void)
 
         ct_maketest(sax_indx),
         ct_maketest(sax_indx_pageoverflow),
+
+        ct_maketest(slo_indx),
+        ct_maketest(slo_indx_pageoverflow),
+        ct_maketest(slo_indy),
+        ct_maketest(slo_indy_pagecross),
     };
 
     return ct_makesuite(tests);

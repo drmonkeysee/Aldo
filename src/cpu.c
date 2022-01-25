@@ -840,6 +840,14 @@ static void LAX_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->x, self->databus);
 }
 
+static void RLA_exec(struct mos6502 *self, struct decoded dec)
+{
+    if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
+    commit_operation(self);
+    const uint8_t d = bitoperation(self, dec, BIT_LEFT, self->p.c);
+    load_register(self, &self->a, self->a & d);
+}
+
 static void SAX_exec(struct mos6502 *self)
 {
     store_data(self, self->a & self->x);
@@ -853,6 +861,10 @@ static void SLO_exec(struct mos6502 *self, struct decoded dec)
     const uint8_t d = bitoperation(self, dec, BIT_LEFT, 0x0);
     load_register(self, &self->a, self->a | d);
 }
+
+//
+// Instruction Dispatch
+//
 
 static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 {
@@ -1404,6 +1416,10 @@ static void JAM_sequence(struct mos6502 *self, struct decoded dec)
         break;
     }
 }
+
+//
+// Address Mode Dispatch
+//
 
 static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
 {

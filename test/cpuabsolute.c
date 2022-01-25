@@ -1717,6 +1717,125 @@ static void nop_absx_pagecross(void *ctx)
     }
 }
 
+static void rla_abs(void *ctx)
+{
+    uint8_t mem[] = {
+        0x2f, 0x4, 0x2,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
+    };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x3;
+    cpu.p.c = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x1u, mem[516]);
+    ct_assertequal(0x1u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void rla_absx(void *ctx)
+{
+    uint8_t mem[] = {
+        0x3f, 0x4, 0x2,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x3;
+    cpu.x = 3;
+    cpu.p.c = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x1u, mem[519]);
+    ct_assertequal(0x1u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void rla_absx_pagecross(void *ctx)
+{
+    uint8_t mem[] = {
+        0x3f, 0xff, 0x1,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
+    };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x3;
+    cpu.x = 3;  // Cross boundary from $01FF -> $0202
+    cpu.p.c = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x1u, mem[514]);
+    ct_assertequal(0x1u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void rla_absy(void *ctx)
+{
+    uint8_t mem[] = {
+        0x3b, 0x4, 0x2,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x3;
+    cpu.y = 3;
+    cpu.p.c = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x1u, mem[519]);
+    ct_assertequal(0x1u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void rla_absy_pagecross(void *ctx)
+{
+    uint8_t mem[] = {
+        0x3b, 0xff, 0x1,
+        [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
+    };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x3;
+    cpu.y = 3;  // Cross boundary from $01FF -> $0202
+    cpu.p.c = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(7, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x1u, mem[514]);
+    ct_assertequal(0x1u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void sax_abs(void *ctx)
 {
     uint8_t mem[] = {
@@ -1949,6 +2068,12 @@ struct ct_testsuite cpu_absolute_tests(void)
         ct_maketest(nop_abs),
         ct_maketest(nop_absx),
         ct_maketest(nop_absx_pagecross),
+
+        ct_maketest(rla_abs),
+        ct_maketest(rla_absx),
+        ct_maketest(rla_absx_pagecross),
+        ct_maketest(rla_absy),
+        ct_maketest(rla_absy_pagecross),
 
         ct_maketest(sax_abs),
 

@@ -63,11 +63,11 @@ const struct decoded Decode[] = {
     OP(IN_JSR, AM_JSR),     // 20 - JSR
     OP(IN_AND, AM_INDX),    // 21 - AND (zp,X)
     JAM,                    // 22 - *JAM (KIL, HLT)
-    UNDEF,                  // 23 - Undefined
+    UP(IN_RLA, AM_INDX),    // 23 - *RLA (zp,X)
     OP(IN_BIT, AM_ZP),      // 24 - BIT zp
     OP(IN_AND, AM_ZP),      // 25 - AND zp
     OP(IN_ROL, AM_ZP),      // 26 - ROL zp
-    UNDEF,                  // 27 - Undefined
+    UP(IN_RLA, AM_ZP),      // 27 - *RLA zp
     OP(IN_PLP, AM_PLL),     // 28 - PLP
     OP(IN_AND, AM_IMM),     // 29 - AND imm
     OP(IN_ROL, AM_IMP),     // 2A - ROL imp
@@ -75,23 +75,23 @@ const struct decoded Decode[] = {
     OP(IN_BIT, AM_ABS),     // 2C - BIT abs
     OP(IN_AND, AM_ABS),     // 2D - AND abs
     OP(IN_ROL, AM_ABS),     // 2E - ROL abs
-    UNDEF,                  // 2F - Undefined
+    UP(IN_RLA, AM_ABS),     // 2F - *RLA abs
     OP(IN_BMI, AM_BCH),     // 30 - BMI
     OP(IN_AND, AM_INDY),    // 31 - AND (zp),Y
     JAM,                    // 32 - *JAM (KIL, HLT)
-    UNDEF,                  // 33 - Undefined
+    UP(IN_RLA, AM_INDY),    // 33 - *RLA (zp),Y
     UP(IN_NOP, AM_ZPX),     // 34 - *NOP zp,X
     OP(IN_AND, AM_ZPX),     // 35 - AND zp,X
     OP(IN_ROL, AM_ZPX),     // 36 - ROL zp,X
-    UNDEF,                  // 37 - Undefined
+    UP(IN_RLA, AM_ZPX),     // 37 - *RLA zp,X
     OP(IN_SEC, AM_IMP),     // 38 - SEC
     OP(IN_AND, AM_ABSY),    // 39 - AND abs,Y
     UP(IN_NOP, AM_IMP),     // 3A - *NOP
-    UNDEF,                  // 3B - Undefined
+    UP(IN_RLA, AM_ABSY),    // 3B - *RLA abs,Y
     UP(IN_NOP, AM_ABSX),    // 3C - *NOP abs,X
     OP(IN_AND, AM_ABSX),    // 3D - AND abs,X
     OP(IN_ROL, AM_ABSX),    // 3E - ROL abs,X
-    UNDEF,                  // 3F - Undefined
+    UP(IN_RLA, AM_ABSX),    // 3F - *RLA abs,X
     OP(IN_RTI, AM_RTI),     // 40 - RTI
     OP(IN_EOR, AM_INDX),    // 41 - EOR (zp,X)
     JAM,                    // 42 - *JAM (KIL, HLT)

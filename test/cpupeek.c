@@ -17,8 +17,8 @@ static void end_restores_state(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, NULL, NULL);
     cpu.pc = 0x8000;
-    cpu.a = 0x5;
-    cpu.x = 0x1;
+    cpu.a = 5;
+    cpu.x = 1;
     cpu.y = 0xa;
     cpu.signal.irq = true;
     cpu.signal.nmi = false;
@@ -43,7 +43,7 @@ static void end_restores_state(void *ctx)
 
     cpu.pc = 0xc000;
     cpu.a = 0x40;
-    cpu.x = 0x4;
+    cpu.x = 4;
     cpu.y = 0xc;
 
     cpu_peek_end(&cpu, cctx);
@@ -200,7 +200,7 @@ static void peek_zp_indexed(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    cpu.x = 0x2;
+    cpu.x = 2;
     // NOTE: throw away return value, no need to clean up peek state in test
     (void)cpu_peek_start(&cpu);
 
@@ -219,7 +219,7 @@ static void peek_indexed_indirect(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    cpu.x = 0x2;
+    cpu.x = 2;
     // NOTE: throw away return value, no need to clean up peek state in test
     (void)cpu_peek_start(&cpu);
 
@@ -238,7 +238,7 @@ static void peek_indirect_indexed(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    cpu.y = 0x5;
+    cpu.y = 5;
     // NOTE: throw away return value, no need to clean up peek state in test
     (void)cpu_peek_start(&cpu);
 

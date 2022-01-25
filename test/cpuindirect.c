@@ -64,7 +64,7 @@ static void adc_indx_zp_wraparound(void *ctx)
             abs[] = {0xff, 0x80, 0x11};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
-    cpu.pc = 0x1;
+    cpu.pc = 1;
     cpu.a = 0xa;    // 10 + 17
     cpu.x = 0xfd;   // Index to $00FF to fetch address $8002 across zp boundary
 
@@ -403,7 +403,7 @@ static void adc_indy_zp_wraparound(void *ctx)
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x8};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
-    cpu.pc = 0x1;
+    cpu.pc = 1;
     cpu.a = 0xa;    // 10 + 8
     cpu.y = 3;  // Index to $00FF to fetch address $8001 + 3 across zp boundary
 
@@ -1155,7 +1155,7 @@ static void sax_indx_pageoverflow(void *ctx)
     };
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
-    cpu.a = 0x7;
+    cpu.a = 7;
     cpu.x = 0xfb;   // Wrap around from $0008 -> $0003
 
     const int cycles = clock_cpu(&cpu);

@@ -365,7 +365,7 @@ static void peek_zp_indexed(void *ctx)
     struct console_state snapshot;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
-    cpu.x = 0x2;
+    cpu.x = 2;
     cpu_snapshot(&cpu, &snapshot);
 
     const int written = dis_peek(0x0, &cpu, &snapshot, buf);
@@ -385,7 +385,7 @@ static void peek_indexed_indirect(void *ctx)
     struct console_state snapshot;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
-    cpu.x = 0x2;
+    cpu.x = 2;
     cpu_snapshot(&cpu, &snapshot);
 
     const int written = dis_peek(0x0, &cpu, &snapshot, buf);
@@ -405,7 +405,7 @@ static void peek_indirect_indexed(void *ctx)
     struct console_state snapshot;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
-    cpu.y = 0x5;
+    cpu.y = 5;
     cpu_snapshot(&cpu, &snapshot);
 
     const int written = dis_peek(0x0, &cpu, &snapshot, buf);

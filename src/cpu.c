@@ -317,7 +317,6 @@ enum bitdirection {
 static uint8_t bitoperation(struct mos6502 *self, struct decoded dec,
                             enum bitdirection bd, uint8_t carryin_mask)
 {
-    commit_operation(self);
     uint8_t d = dec.mode == AM_IMP ? self->a : self->databus;
     if (bd == BIT_LEFT) {
         self->p.c = d & 0x80;
@@ -437,6 +436,7 @@ static void AND_exec(struct mos6502 *self, struct decoded dec)
 static void ASL_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
+    commit_operation(self);
     bitoperation(self, dec, BIT_LEFT, 0x0);
 }
 
@@ -644,6 +644,7 @@ static void LDY_exec(struct mos6502 *self, struct decoded dec)
 static void LSR_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
+    commit_operation(self);
     bitoperation(self, dec, BIT_RIGHT, 0x0);
 }
 
@@ -695,12 +696,14 @@ static void PLP_exec(struct mos6502 *self)
 static void ROL_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
+    commit_operation(self);
     bitoperation(self, dec, BIT_LEFT, self->p.c);
 }
 
 static void ROR_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
+    commit_operation(self);
     bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
 }
 
@@ -846,6 +849,7 @@ static void SAX_exec(struct mos6502 *self)
 static void SLO_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
+    commit_operation(self);
     const uint8_t d = bitoperation(self, dec, BIT_LEFT, 0x0);
     load_register(self, &self->a, self->a | d);
 }

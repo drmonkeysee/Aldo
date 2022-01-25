@@ -2482,25 +2482,6 @@ static void slo_zp_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void slo_zp_zero_overwritten_by_or(void *ctx)
-{
-    uint8_t mem[] = {0x7, 0x4, 0xff, 0xff, 0x0};
-    struct mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
-    cpu.a = 0x1;
-
-    const int cycles = clock_cpu(&cpu);
-
-    ct_assertequal(5, cycles);
-    ct_assertequal(2u, cpu.pc);
-
-    ct_assertequal(0x0u, mem[4]);
-    ct_assertequal(0x1u, cpu.a);
-    ct_assertfalse(cpu.p.c);
-    ct_assertfalse(cpu.p.z);
-    ct_assertfalse(cpu.p.n);
-}
-
 static void slo_zp_carryzero(void *ctx)
 {
     uint8_t mem[] = {0x7, 0x4, 0xff, 0xff, 0x80};
@@ -2574,6 +2555,44 @@ static void slo_zp_all_ones(void *ctx)
     ct_assertequal(0xfeu, mem[4]);
     ct_assertequal(0xffu, cpu.a);
     ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void slo_zp_or_clears_zero(void *ctx)
+{
+    uint8_t mem[] = {0x7, 0x4, 0xff, 0xff, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x1;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, mem[4]);
+    ct_assertequal(0x1u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void slo_zp_or_sets_negative(void *ctx)
+{
+    uint8_t mem[] = {0x7, 0x4, 0xff, 0xff, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x80;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x2u, mem[4]);
+    ct_assertequal(0x82u, cpu.a);
+    ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
 }
@@ -2769,11 +2788,12 @@ struct ct_testsuite cpu_zeropage_tests(void)
         ct_maketest(slo_zp),
         ct_maketest(slo_zp_carry),
         ct_maketest(slo_zp_zero),
-        ct_maketest(slo_zp_zero_overwritten_by_or),
         ct_maketest(slo_zp_carryzero),
         ct_maketest(slo_zp_negative),
         ct_maketest(slo_zp_carrynegative),
         ct_maketest(slo_zp_all_ones),
+        ct_maketest(slo_zp_or_clears_zero),
+        ct_maketest(slo_zp_or_sets_negative),
         ct_maketest(slo_zpx),
         ct_maketest(slo_zpx_pageoverflow),
     };

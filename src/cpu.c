@@ -848,6 +848,14 @@ static void RLA_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->a, self->a & d);
 }
 
+static void RRA_exec(struct mos6502 *self, struct decoded dec)
+{
+    if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
+    commit_operation(self);
+    const uint8_t d = bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
+    arithmetic_sum(self, d, self->p.c);
+}
+
 static void SAX_exec(struct mos6502 *self)
 {
     store_data(self, self->a & self->x);

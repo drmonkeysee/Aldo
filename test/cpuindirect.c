@@ -1037,6 +1037,97 @@ static void rla_indy_pagecross(void *ctx)
     ct_assertequal(0x65, RomWriteCapture);
 }
 
+static void rra_indx(void *ctx)
+{
+    uint8_t mem[] = {0x63, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0xc};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    enable_rom_wcapture();
+    cpu.a = 0xa;    // 10 + 6
+    cpu.x = 4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(8, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0x6, RomWriteCapture);
+}
+
+static void rra_indx_pageoverflow(void *ctx)
+{
+    uint8_t mem[] = {0x63, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
+            abs[] = {0xff, 0x80, 0x44};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    enable_rom_wcapture();
+    cpu.a = 0xa;    // 10 + 34
+    cpu.x = 0xff;   // Wrap around from $0002 -> $0001
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(8, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x2cu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0x22, RomWriteCapture);
+}
+
+static void rra_indy(void *ctx)
+{
+    uint8_t mem[] = {0x73, 0x2, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    enable_rom_wcapture();
+    cpu.a = 0xa;    // 10 + 6
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(8, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0x6, RomWriteCapture);
+}
+
+static void rra_indy_pagecross(void *ctx)
+{
+    uint8_t mem[] = {0x73, 0x2, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, BigRom);
+    enable_rom_wcapture();
+    cpu.a = 0xa;    // 10 + 178
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(8, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x63u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+    ct_assertequal(0x59, RomWriteCapture);
+}
+
 static void sax_indx(void *ctx)
 {
     uint8_t mem[] = {
@@ -1312,6 +1403,11 @@ struct ct_testsuite cpu_indirect_tests(void)
         ct_maketest(rla_indx_pageoverflow),
         ct_maketest(rla_indy),
         ct_maketest(rla_indy_pagecross),
+
+        ct_maketest(rra_indx),
+        ct_maketest(rra_indx_pageoverflow),
+        ct_maketest(rra_indy),
+        ct_maketest(rra_indy_pagecross),
 
         ct_maketest(sax_indx),
         ct_maketest(sax_indx_pageoverflow),

@@ -91,6 +91,7 @@ X(ISC, self, dec)   /* Increment memory and subtract with carry */ \
 X(JAM, self)        /* No instruction signal, jams the cpu */ \
 X(LAX, self, dec)   /* Load accumulator and x-index */ \
 X(RLA, self, dec)   /* Rotate left and logical and */ \
+X(RRA, self, dec)   /* Rotate right and add with carry */ \
 X(SAX, self)        /* Store logical and of accumulator and x-index */ \
 X(SLO, self, dec)   /* Arithmetic shift left and logical or */ \
 X(SRE, self, dec)   /* Logical shift right and exclusive or */

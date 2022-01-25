@@ -127,11 +127,11 @@ const struct decoded Decode[] = {
     OP(IN_RTS, AM_RTS),     // 60 - RTS
     OP(IN_ADC, AM_INDX),    // 61 - ADC (zp,X)
     JAM,                    // 62 - *JAM (KIL, HLT)
-    UNDEF,                  // 63 - Undefined
+    UP(IN_RRA, AM_INDX),    // 63 - *RRA (zp,X)
     UP(IN_NOP, AM_ZP),      // 64 - *NOP zp
     OP(IN_ADC, AM_ZP),      // 65 - ADC zp
     OP(IN_ROR, AM_ZP),      // 66 - ROR zp
-    UNDEF,                  // 67 - Undefined
+    UP(IN_RRA, AM_ZP),      // 67 - *RRA zp
     OP(IN_PLA, AM_PLL),     // 68 - PLA
     OP(IN_ADC, AM_IMM),     // 69 - ADC imm
     OP(IN_ROR, AM_IMP),     // 6A - ROR imp
@@ -139,23 +139,23 @@ const struct decoded Decode[] = {
     OP(IN_JMP, AM_JIND),    // 6C - JMP (abs)
     OP(IN_ADC, AM_ABS),     // 6D - ADC abs
     OP(IN_ROR, AM_ABS),     // 6E - ROR abs
-    UNDEF,                  // 6F - Undefined
+    UP(IN_RRA, AM_ABS),     // 6F - *RRA abs
     OP(IN_BVS, AM_BCH),     // 70 - BVS
     OP(IN_ADC, AM_INDY),    // 71 - ADC (zp),Y
     JAM,                    // 72 - *JAM (KIL, HLT)
-    UNDEF,                  // 73 - Undefined
+    UP(IN_RRA, AM_INDY),    // 73 - *RRA (zp),Y
     UP(IN_NOP, AM_ZPX),     // 74 - *NOP zp,X
     OP(IN_ADC, AM_ZPX),     // 75 - ADC zp,X
     OP(IN_ROR, AM_ZPX),     // 76 - ROR zp,X
-    UNDEF,                  // 77 - Undefined
+    UP(IN_RRA, AM_ZPX),     // 77 - *RRA zp,X
     OP(IN_SEI, AM_IMP),     // 78 - SEI
     OP(IN_ADC, AM_ABSY),    // 79 - ADC abs,Y
     UP(IN_NOP, AM_IMP),     // 7A - *NOP
-    UNDEF,                  // 7B - Undefined
+    UP(IN_RRA, AM_ABSY),    // 7B - *RRA abs,Y
     UP(IN_NOP, AM_ABSX),    // 7C - *NOP abs,X
     OP(IN_ADC, AM_ABSX),    // 7D - ADC abs,X
     OP(IN_ROR, AM_ABSX),    // 7E - ROR abs,X
-    UNDEF,                  // 7F - Undefined
+    UP(IN_RRA, AM_ABSX),    // 7F - *RRA abs,X
     UP(IN_NOP, AM_IMM),     // 80 - *NOP imm
     OP(IN_STA, AM_INDX),    // 81 - STA (zp,X)
     UP(IN_NOP, AM_IMM),     // 82 - *NOP imm (occasionally unstable?)

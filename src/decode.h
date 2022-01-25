@@ -86,13 +86,14 @@ X(TXS, self)        /* Transfer x-index to stack pointer */ \
 X(TYA, self)        /* Transfer y-index to accumulator */ \
 \
 /* Unofficial Opcodes */ \
-X(DCP, self, dec)   /* Compare to accumulator and decrement memory */ \
-X(ISC, self, dec)   /* Subtract with carry and increment memory */ \
+X(DCP, self, dec)   /* Decrement memory and compare to accumulator */ \
+X(ISC, self, dec)   /* Increment memory and subtract with carry */ \
 X(JAM, self)        /* No instruction signal, jams the cpu */ \
 X(LAX, self, dec)   /* Load accumulator and x-index */ \
 X(RLA, self, dec)   /* Rotate left and logical and */ \
 X(SAX, self)        /* Store logical and of accumulator and x-index */ \
-X(SLO, self, dec)   /* Arithmetic shift left and logical or */
+X(SLO, self, dec)   /* Arithmetic shift left and logical or */ \
+X(SRE, self, dec)   /* Logical shift right and exclusive or */
 
 // Addressing Modes
 // X(symbol, byte count, peek template, display strings...)

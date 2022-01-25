@@ -862,6 +862,14 @@ static void SLO_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->a, self->a | d);
 }
 
+static void SRE_exec(struct mos6502 *self, struct decoded dec)
+{
+    if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
+    commit_operation(self);
+    const uint8_t d = bitoperation(self, dec, BIT_RIGHT, 0x0);
+    load_register(self, &self->a, self->a ^ d);
+}
+
 //
 // Instruction Dispatch
 //

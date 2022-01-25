@@ -95,11 +95,11 @@ const struct decoded Decode[] = {
     OP(IN_RTI, AM_RTI),     // 40 - RTI
     OP(IN_EOR, AM_INDX),    // 41 - EOR (zp,X)
     JAM,                    // 42 - *JAM (KIL, HLT)
-    UNDEF,                  // 43 - Undefined
+    UP(IN_SRE, AM_INDX),    // 43 - *SRE (LSE) (zp,X)
     UP(IN_NOP, AM_ZP),      // 44 - *NOP zp
     OP(IN_EOR, AM_ZP),      // 45 - EOR zp
     OP(IN_LSR, AM_ZP),      // 46 - LSR zp
-    UNDEF,                  // 47 - Undefined
+    UP(IN_SRE, AM_ZP),      // 47 - *SRE (LSE) zp
     OP(IN_PHA, AM_PSH),     // 48 - PHA
     OP(IN_EOR, AM_IMM),     // 49 - EOR imm
     OP(IN_LSR, AM_IMP),     // 4A - LSR imp
@@ -107,23 +107,23 @@ const struct decoded Decode[] = {
     OP(IN_JMP, AM_JABS),    // 4C - JMP abs
     OP(IN_EOR, AM_ABS),     // 4D - EOR abs
     OP(IN_LSR, AM_ABS),     // 4E - LSR abs
-    UNDEF,                  // 4F - Undefined
+    UP(IN_SRE, AM_ABS),     // 4F - *SRE (LSE) abs
     OP(IN_BVC, AM_BCH),     // 50 - BVC
     OP(IN_EOR, AM_INDY),    // 51 - EOR (zp),Y
     JAM,                    // 52 - *JAM (KIL, HLT)
-    UNDEF,                  // 53 - Undefined
+    UP(IN_SRE, AM_INDY),    // 53 - *SRE (LSE) (zp),Y
     UP(IN_NOP, AM_ZPX),     // 54 - *NOP zp,X
     OP(IN_EOR, AM_ZPX),     // 55 - EOR zp,X
     OP(IN_LSR, AM_ZPX),     // 56 - LSR zp,X
-    UNDEF,                  // 57 - Undefined
+    UP(IN_SRE, AM_ZPX),     // 57 - *SRE (LSE) zp,X
     OP(IN_CLI, AM_IMP),     // 58 - CLI
     OP(IN_EOR, AM_ABSY),    // 59 - EOR abs,Y
     UP(IN_NOP, AM_IMP),     // 5A - *NOP
-    UNDEF,                  // 5B - Undefined
+    UP(IN_SRE, AM_ABSY),    // 5B - *SRE (LSE) abs,Y
     UP(IN_NOP, AM_ABSX),    // 5C - *NOP abs,X
     OP(IN_EOR, AM_ABSX),    // 5D - EOR abs,X
     OP(IN_LSR, AM_ABSX),    // 5E - LSR abs,X
-    UNDEF,                  // 5F - Undefined
+    UP(IN_SRE, AM_ABSX),    // 5F - *SRE (LSE) abs,X
     OP(IN_RTS, AM_RTS),     // 60 - RTS
     OP(IN_ADC, AM_INDX),    // 61 - ADC (zp,X)
     JAM,                    // 62 - *JAM (KIL, HLT)

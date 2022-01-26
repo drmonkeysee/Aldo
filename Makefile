@@ -103,7 +103,7 @@ $(TRACE_CMP):
 	sed -e 's/:/ /' -e 's/>/=/' -e 's/S:/SP:/' -e 's/CPU/CYC/' \
 		-e 's/[+-][[:digit:]]\{1,3\} @ /$$/' \
 		-e 's/\(P:\)\(..\) (.\{8\})/\10x\2/' \
-		-e 's/\*ISC/\*ISB/' trace.log \
+		-e 's/\*ISC/\*ISB/' -e 's/FLT/FF/' trace.log \
 		| awk 'BEGIN { FS=" A:" } NR > 1 \
 		{ p=substr($$2, match($$2, /0x../), 4); \
 		mask="echo $$((" p " & 0xef))"; mask | getline p; close(mask); \

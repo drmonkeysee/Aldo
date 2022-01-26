@@ -48,6 +48,18 @@ static void restore(struct mos6502 *self, struct cpu_context *ctx)
     Pool = ctx;
 }
 
+static void detach(struct mos6502 *self)
+{
+    // TODO: adjust any bus devices with side-effect reads
+    self->detached = true;
+}
+
+static void attach(struct mos6502 *self)
+{
+    // TODO: adjust any bus devices with side-effect reads
+    self->detached = false;
+}
+
 //
 // Internal Operations
 //
@@ -114,18 +126,6 @@ static void update_v(struct mos6502 *self, uint8_t s, uint8_t a, uint8_t b)
 static void update_n(struct mos6502 *self, uint8_t d)
 {
     self->p.n = d & 0x80;
-}
-
-static void detach(struct mos6502 *self)
-{
-    // TODO: adjust any bus devices with side-effect reads
-    self->detached = true;
-}
-
-static void attach(struct mos6502 *self)
-{
-    // TODO: adjust any bus devices with side-effect reads
-    self->detached = false;
 }
 
 //

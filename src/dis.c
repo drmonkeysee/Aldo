@@ -529,7 +529,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
             char *const data = strrchr(dis, '=');
             if (data) {
                 // NOTE: verify last '=' leaves enough space for "FLT"
-                assert(dis + DIS_PEEK_SIZE - 1 - data >= 5);
+                assert(dis + DIS_PEEK_SIZE - data >= 6);
                 strcpy(data + 2, "FLT");
                 ++total;
             }

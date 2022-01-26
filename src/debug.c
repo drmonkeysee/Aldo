@@ -173,12 +173,16 @@ static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
         switch (bp->expr.cond) {
         case HLT_ADDR:
             if (halt_address(bp, cpu)) return i;
+            break;
         case HLT_TIME:
             if (halt_runtime(bp, clk)) return i;
+            break;
         case HLT_CYCLES:
             if (halt_cycles(bp, clk)) return i;
+            break;
         case HLT_JAM:
             if (halt_jammed(cpu)) return i;
+            break;
         default:
             break;
         }

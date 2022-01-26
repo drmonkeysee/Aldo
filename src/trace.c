@@ -70,13 +70,14 @@ void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu,
 
     if (!tracelog) return;
 
-    // NOTE: does not include leading space in registers print-format
+    // NOTE: does not include leading space in trace_registers
     static const int instw = 47;
 
     const int
         written = trace_instruction(tracelog, cpu, snapshot)
                     + trace_instruction_peek(tracelog, cpu, snapshot),
         width = written < 0 ? instw : (written > instw ? 0 : instw - written);
+    assert(written <= instw);
     fprintf(tracelog, "%*s", width, "");
     trace_registers(tracelog, snapshot);
     fprintf(tracelog, " CPU:%" PRIu64 "\n", cycles);

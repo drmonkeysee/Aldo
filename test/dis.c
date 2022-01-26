@@ -565,6 +565,26 @@ static void peek_overridden_non_reset(void *ctx)
     ct_assertfalse(cpu.detached);
 }
 
+static void peek_busfault(void *ctx)
+{
+    // NOTE: LDA ($02),Y
+    uint8_t mem[] = {0xb1, 0x2, 0x2, 0x40};
+    struct mos6502 cpu;
+    char buf[DIS_PEEK_SIZE];
+    struct console_state snapshot;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x10;
+    cpu.y = 5;
+    cpu_snapshot(&cpu, &snapshot);
+
+    const int written = dis_peek(0x0, &cpu, &snapshot, buf);
+
+    const char *const exp = "> 4002 @ 4007 = FLT";
+    ct_assertequal((int)strlen(exp), written);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+    ct_assertfalse(cpu.detached);
+}
+
 //
 // Disassemble Datapath
 //
@@ -2203,6 +2223,7 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(peek_interrupt),
         ct_maketest(peek_overridden_reset),
         ct_maketest(peek_overridden_non_reset),
+        ct_maketest(peek_busfault),
 
         ct_maketest(datapath_end_of_rom),
         ct_maketest(datapath_unexpected_end_of_rom),

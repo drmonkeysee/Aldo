@@ -366,7 +366,7 @@ static void peek_jam(void *ctx)
     ct_assertequal(AM_JAM, (int)result.mode);
 }
 
-static void peek_datafault(void *ctx)
+static void peek_busfault(void *ctx)
 {
     // NOTE: LDA $4002
     uint8_t mem[] = {0xad, 0x2, 0x40};
@@ -408,7 +408,7 @@ struct ct_testsuite cpu_peek_tests(void)
         ct_maketest(peek_branch_forced),
         ct_maketest(peek_absolute_indirect),
         ct_maketest(peek_jam),
-        ct_maketest(peek_datafault),
+        ct_maketest(peek_busfault),
     };
 
     return ct_makesuite(tests);

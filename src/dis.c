@@ -525,6 +525,15 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
             return DIS_ERR_INV_ADDRMD;
         }
         if (total < 0) return DIS_ERR_FMT;
+        if (peek.busfault) {
+            char *const data = strrchr(dis, '=');
+            if (data) {
+                // NOTE: verify last '=' leaves enough space for "FLT"
+                assert(dis + DIS_PEEK_SIZE - 1 - data >= 5);
+                strcpy(data + 2, "FLT");
+                ++total;
+            }
+        }
     }
 
     assert((unsigned int)total < DIS_PEEK_SIZE);

@@ -35,7 +35,7 @@ enum {
 enum {
     DIS_DATAP_SIZE = 12,    // Disassembled datapath is at most 11 chars
     DIS_INST_SIZE = 28,     // Disassembled instruction is at most 27 chars
-    DIS_PEEK_SIZE = 19,     // Peek expression is at most 18 chars
+    DIS_PEEK_SIZE = 20,     // Peek expression is at most 19 chars
 };
 
 // NOTE: returns a pointer to a statically allocated string;

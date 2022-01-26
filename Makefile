@@ -92,7 +92,7 @@ run: debug
 
 nestest: debug
 	rm -f $(TRACE_CMP)
-	$(TARGET) -btv -Hjam -H3s -rc000 nestest.nes
+	$(TARGET) -btv -H@c66e -Hjam -H3s -rc000 nestest.nes
 
 $(NESTEST_CMP):
 	# NOTE: strip out PPU column (unimplemented) and Accumulator cue (implied)
@@ -111,7 +111,7 @@ $(TRACE_CMP):
 		printf "%-47s%s%s\n", $$1, FS, $$2 }' > $@
 
 nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
-	echo "$$(diff $^ | wc -l) lines differ"
+	echo "$$(diff -y --suppress-common-lines $^ | wc -l) lines differ"
 
 clean:
 	$(RM) -r $(BUILD_DIR)

@@ -1599,6 +1599,7 @@ struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
                         ? self->pc
                         : self->addrbus;
     result.data = self->databus;
+    result.busfault = self->bflt;
     return result;
 }
 

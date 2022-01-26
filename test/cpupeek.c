@@ -173,6 +173,7 @@ static void peek_immediate(void *ctx)
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x1u, result.finaladdr);
     ct_assertequal(0x10u, result.data);
+    ct_assertfalse(result.busfault);
 }
 
 static void peek_zeropage(void *ctx)
@@ -191,6 +192,7 @@ static void peek_zeropage(void *ctx)
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x4u, result.finaladdr);
     ct_assertequal(0x20u, result.data);
+    ct_assertfalse(result.busfault);
 }
 
 static void peek_zp_indexed(void *ctx)
@@ -210,6 +212,7 @@ static void peek_zp_indexed(void *ctx)
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x5u, result.finaladdr);
     ct_assertequal(0x30u, result.data);
+    ct_assertfalse(result.busfault);
 }
 
 static void peek_indexed_indirect(void *ctx)
@@ -229,6 +232,7 @@ static void peek_indexed_indirect(void *ctx)
     ct_assertequal(0x4u, result.interaddr);
     ct_assertequal(0x102u, result.finaladdr);
     ct_assertequal(0x40u, result.data);
+    ct_assertfalse(result.busfault);
 }
 
 static void peek_indirect_indexed(void *ctx)
@@ -248,6 +252,26 @@ static void peek_indirect_indexed(void *ctx)
     ct_assertequal(0x102u, result.interaddr);
     ct_assertequal(0x107u, result.finaladdr);
     ct_assertequal(0x60u, result.data);
+    ct_assertfalse(result.busfault);
+}
+
+static void peek_absolute(void *ctx)
+{
+    // NOTE: LDA $0102
+    uint8_t mem[] = {0xad, 0x2, 0x1, [258] = 0x70};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    // NOTE: throw away return value, no need to clean up peek state in test
+    (void)cpu_peek_start(&cpu);
+
+    const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
+
+    ct_assertequal(AM_ABS, (int)result.mode);
+    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0x102u, result.finaladdr);
+    ct_assertequal(0x70u, result.data);
+    ct_assertfalse(result.busfault);
 }
 
 static void peek_absolute_indexed(void *ctx)
@@ -267,6 +291,7 @@ static void peek_absolute_indexed(void *ctx)
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x10cu, result.finaladdr);
     ct_assertequal(0x70u, result.data);
+    ct_assertfalse(result.busfault);
 }
 
 static void peek_branch(void *ctx)
@@ -285,6 +310,7 @@ static void peek_branch(void *ctx)
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x7u, result.finaladdr);
     ct_assertequal(0x0u, result.data);
+    ct_assertfalse(result.busfault);
 }
 
 static void peek_branch_forced(void *ctx)
@@ -303,6 +329,7 @@ static void peek_branch_forced(void *ctx)
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x7u, result.finaladdr);
     ct_assertequal(0x0u, result.data);
+    ct_assertfalse(result.busfault);
 }
 
 static void peek_absolute_indirect(void *ctx)
@@ -322,6 +349,7 @@ static void peek_absolute_indirect(void *ctx)
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x205u, result.finaladdr);
     ct_assertequal(0x2u, result.data);
+    ct_assertfalse(result.busfault);
 }
 
 static void peek_jam(void *ctx)
@@ -336,6 +364,24 @@ static void peek_jam(void *ctx)
     const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
 
     ct_assertequal(AM_JAM, (int)result.mode);
+}
+
+static void peek_datafault(void *ctx)
+{
+    // NOTE: LDA $4002
+    uint8_t mem[] = {0xad, 0x2, 0x40};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, ctx);
+    cpu.a = 0x10;
+    // NOTE: throw away return value, no need to clean up peek state in test
+    (void)cpu_peek_start(&cpu);
+
+    const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
+
+    ct_assertequal(AM_ABS, (int)result.mode);
+    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0x4002u, result.finaladdr);
+    ct_asserttrue(result.busfault);
 }
 
 //
@@ -356,11 +402,13 @@ struct ct_testsuite cpu_peek_tests(void)
         ct_maketest(peek_zp_indexed),
         ct_maketest(peek_indexed_indirect),
         ct_maketest(peek_indirect_indexed),
+        ct_maketest(peek_absolute),
         ct_maketest(peek_absolute_indexed),
         ct_maketest(peek_branch),
         ct_maketest(peek_branch_forced),
         ct_maketest(peek_absolute_indirect),
         ct_maketest(peek_jam),
+        ct_maketest(peek_datafault),
     };
 
     return ct_makesuite(tests);

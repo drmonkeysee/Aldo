@@ -83,6 +83,7 @@ struct cpu_peekresult {
     enum addrmode mode;
     uint16_t interaddr, finaladdr;
     uint8_t data;
+    bool busfault;
 };
 typedef struct cpu_context cpu_ctx;
 

@@ -1422,6 +1422,115 @@ static void sbc_overflow_without_borrow(void *ctx)
 // Unofficial Opcodes
 //
 
+static void alr(void *ctx)
+{
+    uint8_t mem[] = {0x4b, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x2u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void alr_carry(void *ctx)
+{
+    uint8_t mem[] = {0x4b, 0xf1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xff;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x78u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void alr_zero(void *ctx)
+{
+    uint8_t mem[] = {0x4b, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xff;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void alr_carryzero(void *ctx)
+{
+    uint8_t mem[] = {0x4b, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xff;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void alr_negative_to_positive(void *ctx)
+{
+    uint8_t mem[] = {0x4b, 0xff};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x80;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x40u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void alr_all_ones(void *ctx)
+{
+    uint8_t mem[] = {0x4b, 0xff};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xff;
+    cpu.p.c = true;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x7fu, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void nop(void *ctx)
 {
     const uint8_t nopcodes[] = {0x80, 0x82, 0x89, 0xc2, 0xe2};
@@ -1752,6 +1861,13 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(sbc_overflow_without_borrow),
 
         // Unofficial Opcodes
+        ct_maketest(alr),
+        ct_maketest(alr_carry),
+        ct_maketest(alr_zero),
+        ct_maketest(alr_carryzero),
+        ct_maketest(alr_negative_to_positive),
+        ct_maketest(alr_all_ones),
+
         ct_maketest(nop),
 
         ct_maketest(usbc),

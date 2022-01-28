@@ -317,7 +317,10 @@ enum bitdirection {
 static uint8_t bitoperation(struct mos6502 *self, struct decoded dec,
                             enum bitdirection bd, uint8_t carryin_mask)
 {
-    uint8_t d = dec.mode == AM_IMP ? self->a : self->databus;
+    // NOTE: some unofficial shift/rotate opcodes use immediate mode
+    // to operate on the accumulator.
+    const bool acc_operand = dec.mode == AM_IMP || dec.mode == AM_IMM;
+    uint8_t d = acc_operand ? self->a : self->databus;
     if (bd == BIT_LEFT) {
         self->p.c = d & 0x80;
         d <<= 1;
@@ -327,7 +330,7 @@ static uint8_t bitoperation(struct mos6502 *self, struct decoded dec,
     }
     d |= carryin_mask;
 
-    if (dec.mode == AM_IMP) {
+    if (acc_operand) {
         load_register(self, &self->a, d);
     } else {
         modify_mem(self, d);
@@ -807,6 +810,14 @@ static void TYA_exec(struct mos6502 *self)
 //
 // Unofficial Instructions
 //
+
+static void ALR_exec(struct mos6502 *self, struct decoded dec)
+{
+    read(self);
+    commit_operation(self);
+    load_register(self, &self->a, self->a & self->databus);
+    bitoperation(self, dec, BIT_RIGHT, 0x0);
+}
 
 static void DCP_exec(struct mos6502 *self, struct decoded dec)
 {

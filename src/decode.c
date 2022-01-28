@@ -103,7 +103,7 @@ const struct decoded Decode[] = {
     OP(IN_PHA, AM_PSH),     // 48 - PHA
     OP(IN_EOR, AM_IMM),     // 49 - EOR imm
     OP(IN_LSR, AM_IMP),     // 4A - LSR imp
-    UNDEF,                  // 4B - Undefined
+    UP(IN_ALR, AM_IMM),     // 4B - *ALR (ASR) imm
     OP(IN_JMP, AM_JABS),    // 4C - JMP abs
     OP(IN_EOR, AM_ABS),     // 4D - EOR abs
     OP(IN_LSR, AM_ABS),     // 4E - LSR abs

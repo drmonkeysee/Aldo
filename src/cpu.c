@@ -286,7 +286,7 @@ static void store_data(struct mos6502 *self, uint8_t d)
 static void arithmetic_sum(struct mos6502 *self, uint8_t b, bool c)
 {
     const uint16_t sum = self->a + b + c;
-    self->p.c = sum >> 8;
+    self->p.c = sum & 0x100;
     update_v(self, sum, self->a, b);
     load_register(self, &self->a, sum);
 }
@@ -297,7 +297,7 @@ static void arithmetic_sum(struct mos6502 *self, uint8_t b, bool c)
 static void compare_register(struct mos6502 *self, uint8_t r, uint8_t d)
 {
     const uint16_t cmp = r + (uint8_t)~d + 1;
-    self->p.c = cmp >> 8;
+    self->p.c = cmp & 0x100;
     update_z(self, cmp);
     update_n(self, cmp);
 }

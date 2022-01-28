@@ -215,7 +215,7 @@ const struct decoded Decode[] = {
     OP(IN_CLV, AM_IMP),     // B8 - CLV
     OP(IN_LDA, AM_ABSY),    // B9 - LDA abs,Y
     OP(IN_TSX, AM_IMP),     // BA - TSX
-    UNDEF,                  // BB - Undefined
+    UP(IN_LAS, AM_ABSY),    // BB - *LAS (LAR) abs,Y
     OP(IN_LDY, AM_ABSX),    // BC - LDY abs,X
     OP(IN_LDA, AM_ABSX),    // BD - LDA abs,X
     OP(IN_LDX, AM_ABSY),    // BE - LDX abs,Y

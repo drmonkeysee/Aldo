@@ -1584,6 +1584,89 @@ static void isc_absy_pagecross(void *ctx)
     ct_assertequal(0xb2, RomWriteCapture);
 }
 
+static void las_absy(void *ctx)
+{
+    uint8_t mem[] = {0xbb, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    cpu.s = 0xa;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x8u, cpu.a);
+    ct_assertequal(0x8u, cpu.x);
+    ct_assertequal(0x8u, cpu.s);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void las_absy_zero(void *ctx)
+{
+    uint8_t mem[] = {0xbb, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    cpu.s = 0xa;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0x0u, cpu.x);
+    ct_assertequal(0x0u, cpu.s);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void las_absy_negative(void *ctx)
+{
+    uint8_t mem[] = {0xbb, 0x1, 0x80},
+            abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, abs);
+    cpu.s = 0xfa;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(4, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xf8u, cpu.a);
+    ct_assertequal(0xf8u, cpu.x);
+    ct_assertequal(0xf8u, cpu.s);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void las_absy_pagecross(void *ctx)
+{
+    uint8_t mem[] = {0xbb, 0xff, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, BigRom);
+    cpu.s = 0xea;
+    cpu.y = 3;  // Cross boundary from $80FF -> $8102
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xa2u, cpu.a);
+    ct_assertequal(0xa2u, cpu.x);
+    ct_assertequal(0xa2u, cpu.s);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
 static void lax_abs(void *ctx)
 {
     uint8_t mem[] = {0xaf, 0x1, 0x80},
@@ -2286,6 +2369,11 @@ struct ct_testsuite cpu_absolute_tests(void)
         ct_maketest(isc_absx_pagecross),
         ct_maketest(isc_absy),
         ct_maketest(isc_absy_pagecross),
+
+        ct_maketest(las_absy),
+        ct_maketest(las_absy_zero),
+        ct_maketest(las_absy_negative),
+        ct_maketest(las_absy_pagecross),
 
         ct_maketest(lax_abs),
         ct_maketest(lax_absy),

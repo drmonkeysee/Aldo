@@ -850,6 +850,16 @@ static void JAM_exec(struct mos6502 *self)
     self->databus = 0xff;
 }
 
+static void LAS_exec(struct mos6502 *self, struct decoded dec)
+{
+    if (read_delayed(self, dec, self->adc)) return;
+    read(self);
+    commit_operation(self);
+    self->s &= self->databus;
+    load_register(self, &self->a, self->s);
+    load_register(self, &self->x, self->s);
+}
+
 static void LAX_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;

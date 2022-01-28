@@ -91,6 +91,8 @@ X(ANC, self)        /* Logical and and set carry as if ASL or ROL */ \
 X(DCP, self, dec)   /* Decrement memory and compare to accumulator */ \
 X(ISC, self, dec)   /* Increment memory and subtract with carry */ \
 X(JAM, self)        /* No instruction signal, jams the cpu */ \
+X(LAS, self, dec)   /* Logical and with stack pointer and load
+                       into accumulator, x-index, and stack pointer */ \
 X(LAX, self, dec)   /* Load accumulator and x-index */ \
 X(RLA, self, dec)   /* Rotate left and logical and */ \
 X(RRA, self, dec)   /* Rotate right and add with carry */ \

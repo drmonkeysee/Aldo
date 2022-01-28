@@ -39,7 +39,7 @@ const struct decoded Decode[] = {
     OP(IN_PHP, AM_PSH),     // 08 - PHP
     OP(IN_ORA, AM_IMM),     // 09 - ORA imm
     OP(IN_ASL, AM_IMP),     // 0A - ASL imp
-    UNDEF,                  // 0B - Undefined
+    UP(IN_ANC, AM_IMM),     // 0B - *ANC imm
     UP(IN_NOP, AM_ABS),     // 0C - *NOP abs
     OP(IN_ORA, AM_ABS),     // 0D - ORA abs
     OP(IN_ASL, AM_ABS),     // 0E - ASL abs
@@ -71,7 +71,7 @@ const struct decoded Decode[] = {
     OP(IN_PLP, AM_PLL),     // 28 - PLP
     OP(IN_AND, AM_IMM),     // 29 - AND imm
     OP(IN_ROL, AM_IMP),     // 2A - ROL imp
-    UNDEF,                  // 2B - Undefined
+    UP(IN_ANC, AM_IMM),     // 2B - *ANC (ANC2) imm
     OP(IN_BIT, AM_ABS),     // 2C - BIT abs
     OP(IN_AND, AM_ABS),     // 2D - AND abs
     OP(IN_ROL, AM_ABS),     // 2E - ROL abs

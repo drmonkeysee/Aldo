@@ -819,6 +819,14 @@ static void ALR_exec(struct mos6502 *self, struct decoded dec)
     bitoperation(self, dec, BIT_RIGHT, 0x0);
 }
 
+static void ANC_exec(struct mos6502 *self)
+{
+    read(self);
+    commit_operation(self);
+    load_register(self, &self->a, self->a & self->databus);
+    self->p.c = self->a & 0x80;
+}
+
 static void DCP_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;

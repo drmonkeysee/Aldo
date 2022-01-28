@@ -1531,6 +1531,72 @@ static void alr_all_ones(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void anc(void *ctx)
+{
+    const uint8_t nopcodes[] = {0x0b, 0x2b};
+    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+        const uint8_t opc = nopcodes[c];
+        uint8_t mem[] = {opc, 0xc};
+        struct mos6502 cpu;
+        setup_cpu(&cpu, mem, NULL);
+        cpu.a = 0xa;
+
+        const int cycles = clock_cpu(&cpu);
+
+        ct_assertequal(2, cycles, "Failed on opcode %02x", opc);
+        ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
+
+        ct_assertequal(0x8u, cpu.a, "Failed on opcode %02x", opc);
+        ct_assertfalse(cpu.p.c, "Failed on opcode %02x", opc);
+        ct_assertfalse(cpu.p.z, "Failed on opcode %02x", opc);
+        ct_assertfalse(cpu.p.n, "Failed on opcode %02x", opc);
+    }
+}
+
+static void anc_zero(void *ctx)
+{
+    const uint8_t nopcodes[] = {0x0b, 0x2b};
+    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+        const uint8_t opc = nopcodes[c];
+        uint8_t mem[] = {opc, 0x0};
+        struct mos6502 cpu;
+        setup_cpu(&cpu, mem, NULL);
+        cpu.a = 0xaa;
+
+        const int cycles = clock_cpu(&cpu);
+
+        ct_assertequal(2, cycles, "Failed on opcode %02x", opc);
+        ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
+
+        ct_assertequal(0x0u, cpu.a, "Failed on opcode %02x", opc);
+        ct_assertfalse(cpu.p.c, "Failed on opcode %02x", opc);
+        ct_asserttrue(cpu.p.z, "Failed on opcode %02x", opc);
+        ct_assertfalse(cpu.p.n, "Failed on opcode %02x", opc);
+    }
+}
+
+static void anc_negative(void *ctx)
+{
+    const uint8_t nopcodes[] = {0x0b, 0x2b};
+    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+        const uint8_t opc = nopcodes[c];
+        uint8_t mem[] = {opc, 0xfc};
+        struct mos6502 cpu;
+        setup_cpu(&cpu, mem, NULL);
+        cpu.a = 0xfa;
+
+        const int cycles = clock_cpu(&cpu);
+
+        ct_assertequal(2, cycles, "Failed on opcode %02x", opc);
+        ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
+
+        ct_assertequal(0xf8u, cpu.a, "Failed on opcode %02x", opc);
+        ct_asserttrue(cpu.p.c, "Failed on opcode %02x", opc);
+        ct_assertfalse(cpu.p.z, "Failed on opcode %02x", opc);
+        ct_asserttrue(cpu.p.n, "Failed on opcode %02x", opc);
+    }
+}
+
 static void nop(void *ctx)
 {
     const uint8_t nopcodes[] = {0x80, 0x82, 0x89, 0xc2, 0xe2};
@@ -1867,6 +1933,10 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(alr_carryzero),
         ct_maketest(alr_negative_to_positive),
         ct_maketest(alr_all_ones),
+
+        ct_maketest(anc),
+        ct_maketest(anc_zero),
+        ct_maketest(anc_negative),
 
         ct_maketest(nop),
 

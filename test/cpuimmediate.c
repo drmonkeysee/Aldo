@@ -1623,6 +1623,236 @@ static void nop(void *ctx)
     }
 }
 
+static void sbx_equal(void *ctx)
+{
+    uint8_t mem[] = {0xcb, 0x10};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x11;
+    cpu.x = 0x10;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.x);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbx_lt(void *ctx)
+{
+    uint8_t mem[] = {0xcb, 0x40};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x11;
+    cpu.x = 0x10;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xd0u, cpu.x);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void sbx_gt(void *ctx)
+{
+    uint8_t mem[] = {0xcb, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x11;
+    cpu.x = 0x10;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xau, cpu.x);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbx_max_to_min(void *ctx)
+{
+    uint8_t mem[] = {0xcb, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xff;
+    cpu.x = 0xff;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xffu, cpu.x);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void sbx_max_to_max(void *ctx)
+{
+    uint8_t mem[] = {0xcb, 0xff};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xff;
+    cpu.x = 0xff;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.x);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbx_min_to_max(void *ctx)
+{
+    uint8_t mem[] = {0xcb, 0xff};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa;
+    cpu.x = 0;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x1u, cpu.x);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbx_min_to_min(void *ctx)
+{
+    uint8_t mem[] = {0xcb, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa;
+    cpu.x = 0;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.x);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbx_neg_equal(void *ctx)
+{
+    uint8_t mem[] = {0xcb, 0xa0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xaf;
+    cpu.x = 0xa0;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.x);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbx_neg_lt(void *ctx)
+{
+    uint8_t mem[] = {0xcb, 0xff};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xaf;
+    cpu.x = 0xa0;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xa1u, cpu.x);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void sbx_neg_gt(void *ctx)
+{
+    uint8_t mem[] = {0xcb, 0x90};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xaf;
+    cpu.x = 0xa0;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x10u, cpu.x);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbx_negative_to_positive(void *ctx)
+{
+    uint8_t mem[] = {0xcb, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x8f;
+    cpu.x = 0x80;    // Effectively -128 - 1 = 127
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    // NOTE: negative to positive always implies X > M
+    ct_assertequal(0x7fu, cpu.x);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbx_positive_to_negative(void *ctx)
+{
+    uint8_t mem[] = {0xcb, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa;
+    cpu.x = 0;  // Effectively 0 - 1 = -1
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    // NOTE: positive to negative always implies X < M
+    ct_assertequal(0xffu, cpu.x);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
 static void usbc(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0x6};
@@ -1939,6 +2169,19 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(anc_negative),
 
         ct_maketest(nop),
+
+        ct_maketest(sbx_equal),
+        ct_maketest(sbx_lt),
+        ct_maketest(sbx_gt),
+        ct_maketest(sbx_max_to_min),
+        ct_maketest(sbx_max_to_max),
+        ct_maketest(sbx_min_to_max),
+        ct_maketest(sbx_min_to_min),
+        ct_maketest(sbx_neg_equal),
+        ct_maketest(sbx_neg_lt),
+        ct_maketest(sbx_neg_gt),
+        ct_maketest(sbx_negative_to_positive),
+        ct_maketest(sbx_positive_to_negative),
 
         ct_maketest(usbc),
         ct_maketest(usbc_borrowout),

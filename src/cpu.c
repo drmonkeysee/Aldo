@@ -294,12 +294,13 @@ static void arithmetic_sum(struct mos6502 *self, uint8_t b, bool c)
 // NOTE: compare is effectively R - D; modeling the subtraction as
 // R + 2sComplement(D) gets us all the flags for free;
 // see SBC_exec for why this works.
-static void compare_register(struct mos6502 *self, uint8_t r, uint8_t d)
+static uint8_t compare_register(struct mos6502 *self, uint8_t r, uint8_t d)
 {
     const uint16_t cmp = r + (uint8_t)~d + 1;
     self->p.c = cmp & 0x100;
     update_z(self, cmp);
     update_n(self, cmp);
+    return cmp;
 }
 
 static void modify_mem(struct mos6502 *self, uint8_t d)
@@ -889,6 +890,14 @@ static void SAX_exec(struct mos6502 *self)
 {
     store_data(self, self->a & self->x);
     commit_operation(self);
+}
+
+static void SBX_exec(struct mos6502 *self)
+{
+    read(self);
+    commit_operation(self);
+    const uint8_t c = compare_register(self, self->a & self->x, self->databus);
+    load_register(self, &self->x, c);
 }
 
 static void SLO_exec(struct mos6502 *self, struct decoded dec)

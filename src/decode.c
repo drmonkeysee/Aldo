@@ -231,7 +231,7 @@ const struct decoded Decode[] = {
     OP(IN_INY, AM_IMP),     // C8 - INY
     OP(IN_CMP, AM_IMM),     // C9 - CMP imm
     OP(IN_DEX, AM_IMP),     // CA - DEX
-    UNDEF,                  // CB - Undefined
+    UP(IN_SBX, AM_IMM),     // CB - *SBX (AXS, SAX) imm
     OP(IN_CPY, AM_ABS),     // CC - CPY abs
     OP(IN_CMP, AM_ABS),     // CD - CMP abs
     OP(IN_DEC, AM_ABS),     // CE - DEC abs

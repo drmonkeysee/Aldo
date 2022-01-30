@@ -135,7 +135,7 @@ const struct decoded Decode[] = {
     OP(IN_PLA, AM_PLL),     // 68 - PLA
     OP(IN_ADC, AM_IMM),     // 69 - ADC imm
     OP(IN_ROR, AM_IMP),     // 6A - ROR imp
-    UNDEF,                  // 6B - Undefined
+    UP(IN_ARR, AM_IMM),     // 6B - *ARR imm
     OP(IN_JMP, AM_JIND),    // 6C - JMP (abs)
     OP(IN_ADC, AM_ABS),     // 6D - ADC abs
     OP(IN_ROR, AM_ABS),     // 6E - ROR abs

@@ -88,6 +88,8 @@ X(TYA, self)        /* Transfer y-index to accumulator */ \
 /* Unofficial Opcodes */ \
 X(ALR, self, dec)   /* Logical and and logical shift right */ \
 X(ANC, self)        /* Logical and and set carry as if ASL or ROL */ \
+X(ARR, self, dec)   /* Logical and and rotate right with adder side-effects
+                       interleaved between AND and ROR */ \
 X(DCP, self, dec)   /* Decrement memory and compare to accumulator */ \
 X(ISC, self, dec)   /* Increment memory and subtract with carry */ \
 X(JAM, self)        /* No instruction signal, jams the cpu */ \

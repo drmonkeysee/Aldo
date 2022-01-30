@@ -828,6 +828,28 @@ static void ANC_exec(struct mos6502 *self)
     self->p.c = self->a & 0x80;
 }
 
+static void ARR_exec(struct mos6502 *self, struct decoded dec)
+{
+    read(self);
+    commit_operation(self);
+    // NOTE: not sure this is entirely correct, community docs do not
+    // completely agree on exact sequence of side-effects, but the main
+    // operations are AND + ROR while the invocation of the adder
+    // causes the overflow and carry flags to act strangely; my best guess at
+    // the operation sequence is:
+    //  A := A AND operand
+    //  set v as if A + operand + carry (side-effect of adder)
+    //  set carry to bit 7 of A (strange side-effect of adder maybe?)
+    //  rotate A right but leave carry unaffected (this is implemented as
+    //  a standard ROR and then immediately restoring carry's pre-ROR value)
+    load_register(self, &self->a, self->a & self->databus);
+    const uint16_t sum = self->a + self->databus + self->p.c;
+    update_v(self, sum, self->a, self->databus);
+    const bool c = self->p.c = self->a & 0x80;
+    bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
+    self->p.c = c;
+}
+
 static void DCP_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
@@ -896,8 +918,9 @@ static void SBX_exec(struct mos6502 *self)
 {
     read(self);
     commit_operation(self);
-    const uint8_t c = compare_register(self, self->a & self->x, self->databus);
-    load_register(self, &self->x, c);
+    const uint8_t cmp = compare_register(self, self->a & self->x,
+                                         self->databus);
+    load_register(self, &self->x, cmp);
 }
 
 static void SLO_exec(struct mos6502 *self, struct decoded dec)

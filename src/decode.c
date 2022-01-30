@@ -167,7 +167,7 @@ const struct decoded Decode[] = {
     OP(IN_DEY, AM_IMP),     // 88 - DEY
     UP(IN_NOP, AM_IMM),     // 89 - *NOP imm
     OP(IN_TXA, AM_IMP),     // 8A - TXA
-    UP(IN_ANE, AM_IMM),     // 8B - *ANE (XAA) imm (extremely unstable!)
+    UP(IN_ANE, AM_IMM),     // 8B - *ANE (XAA) imm (extremely unstable!!)
     OP(IN_STY, AM_ABS),     // 8C - STY abs
     OP(IN_STA, AM_ABS),     // 8D - STA abs
     OP(IN_STX, AM_ABS),     // 8E - STX abs
@@ -199,7 +199,7 @@ const struct decoded Decode[] = {
     OP(IN_TAY, AM_IMP),     // A8 - TAY
     OP(IN_LDA, AM_IMM),     // A9 - LDA imm
     OP(IN_TAX, AM_IMP),     // AA - TAX
-    UNDEF,                  // AB - Undefined
+    UP(IN_LXA, AM_IMM),     // AB - *LXA (LAX) imm (extremely unstable!!)
     OP(IN_LDY, AM_ABS),     // AC - LDY abs
     OP(IN_LDA, AM_ABS),     // AD - LDA abs
     OP(IN_LDX, AM_ABS),     // AE - LDX abs

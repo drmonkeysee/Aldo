@@ -89,7 +89,7 @@ X(TYA, self)        /* Transfer y-index to accumulator */ \
 X(ALR, self, dec)   /* Logical and and logical shift right */ \
 X(ANC, self)        /* Logical and and set carry as if ASL or ROL */ \
 X(ANE, self)        /* Accumulator interferes with internal signals, logical
-                       and with x-index and operand, stored in accumulator */ \
+                       and with x-index and operand, load into accumulator */ \
 X(ARR, self, dec)   /* Logical and and rotate right with adder side-effects
                        interleaved between AND and ROR */ \
 X(DCP, self, dec)   /* Decrement memory and compare to accumulator */ \
@@ -98,6 +98,8 @@ X(JAM, self)        /* No instruction signal, jams the cpu */ \
 X(LAS, self, dec)   /* Logical and with stack pointer and load
                        into accumulator, x-index, and stack pointer */ \
 X(LAX, self, dec)   /* Load accumulator and x-index */ \
+X(LXA, self)        /* Accumulator interferes with internal signals, logical
+                       and with operand, load into accumulator and x-index */ \
 X(RLA, self, dec)   /* Rotate left and logical and */ \
 X(RRA, self, dec)   /* Rotate right and add with carry */ \
 X(SAX, self)        /* Store logical and of accumulator and x-index */ \

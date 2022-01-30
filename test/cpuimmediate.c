@@ -1766,6 +1766,61 @@ static void arr_negative_overflow_and_carry(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
+static void lxa(void *ctx)
+{
+    uint8_t mem[] = {0xab, 0xc};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xcu, cpu.a);
+    ct_assertequal(0xcu, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void lxa_zero(void *ctx)
+{
+    uint8_t mem[] = {0xab, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x5a;
+    cpu.x = 1;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0x0u, cpu.x);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void lxa_negative(void *ctx)
+{
+    uint8_t mem[] = {0xab, 0xcf};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa4;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xceu, cpu.a);
+    ct_assertequal(0xceu, cpu.x);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
 static void nop(void *ctx)
 {
     const uint8_t nopcodes[] = {0x80, 0x82, 0x89, 0xc2, 0xe2};
@@ -2347,6 +2402,10 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(arr_overflow),
         ct_maketest(arr_loses_carry),
         ct_maketest(arr_negative_overflow_and_carry),
+
+        ct_maketest(lxa),
+        ct_maketest(lxa_zero),
+        ct_maketest(lxa_negative),
 
         ct_maketest(nop),
 

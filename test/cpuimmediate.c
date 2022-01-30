@@ -1597,6 +1597,60 @@ static void anc_negative(void *ctx)
     }
 }
 
+static void ane(void *ctx)
+{
+    uint8_t mem[] = {0x8b, 0xfc};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x5a;
+    cpu.x = 0x3f;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x3cu, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void ane_zero(void *ctx)
+{
+    uint8_t mem[] = {0x8b, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0x5a;
+    cpu.x = 0x3f;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void ane_negative(void *ctx)
+{
+    uint8_t mem[] = {0x8b, 0xcf};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa5;
+    cpu.x = 0xf3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xc3u, cpu.a);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.n);
+}
+
 static void arr(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0x6};
@@ -2282,6 +2336,10 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(anc),
         ct_maketest(anc_zero),
         ct_maketest(anc_negative),
+
+        ct_maketest(ane),
+        ct_maketest(ane_zero),
+        ct_maketest(ane_negative),
 
         ct_maketest(arr),
         ct_maketest(arr_zero),

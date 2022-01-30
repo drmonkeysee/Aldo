@@ -828,6 +828,17 @@ static void ANC_exec(struct mos6502 *self)
     self->p.c = self->a & 0x80;
 }
 
+static void ANE_exec(struct mos6502 *self)
+{
+    read(self);
+    commit_operation(self);
+    // NOTE: magic constant that interferes with accumulator varies based on
+    // chip manufacture, temperature, state of other signals in the chip,
+    // and maybe other unknown factors; community docs show FF or FE are
+    // commonly-seen values so just go with that.
+    load_register(self, &self->a, (self->a | 0xfe) & self->x & self->databus);
+}
+
 static void ARR_exec(struct mos6502 *self, struct decoded dec)
 {
     read(self);

@@ -851,13 +851,12 @@ static void ARR_exec(struct mos6502 *self, struct decoded dec)
     // causes the overflow and carry flags to act strangely; my best guess at
     // the operation sequence is:
     //  A := A AND operand
-    //  set v as if A + operand + carry (side-effect of adder)
-    //  set carry to bit 7 of A (strange side-effect of adder maybe?)
+    //  set overflow to xor of bit 7 and bit 6 of A (side-effect of adder?)
+    //  set carry to bit 7 of A (side-effect of adder?)
     //  rotate A right but leave carry unaffected (this is implemented as
     //  a standard ROR and then immediately restoring carry's pre-ROR value)
     load_register(self, &self->a, self->a & self->databus);
-    const uint16_t sum = self->a + self->databus + self->p.c;
-    update_v(self, sum, self->a, self->databus);
+    self->p.v = (self->a >> 7) ^ ((self->a >> 6) & 0x1);
     const bool c = self->p.c = self->a & 0x80;
     bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
     self->p.c = c;

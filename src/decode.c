@@ -176,7 +176,7 @@ const struct decoded Decode[] = {
     OP(IN_BCC, AM_BCH),     // 90 - BCC
     OP(IN_STA, AM_INDY),    // 91 - STA (zp),Y
     JAM,                    // 92 - *JAM (KIL, HLT)
-    UNDEF,                  // 93 - Undefined
+    UP(IN_SHA, AM_INDY),    // 93 - *SHA (AHX, AXA) (zp),Y (unstable!)
     OP(IN_STY, AM_ZPX),     // 94 - STY zp,X
     OP(IN_STA, AM_ZPX),     // 95 - STA zp,X
     OP(IN_STX, AM_ZPY),     // 96 - STX zp,Y
@@ -188,7 +188,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // 9C - Undefined
     OP(IN_STA, AM_ABSX),    // 9D - STA abs,X
     UNDEF,                  // 9E - Undefined
-    UNDEF,                  // 9F - Undefined
+    UP(IN_SHA, AM_ABSY),    // 9F - *SHA (AHX, AXA) abs,Y (unstable!)
     OP(IN_LDY, AM_IMM),     // A0 - LDY imm
     OP(IN_LDA, AM_INDX),    // A1 - LDA (zp,X)
     OP(IN_LDX, AM_IMM),     // A2 - LDX imm

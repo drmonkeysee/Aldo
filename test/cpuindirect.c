@@ -1166,6 +1166,49 @@ static void sax_indx_pageoverflow(void *ctx)
     ct_assertequal(0x3u, mem[10]);
 }
 
+static void sha_indy(void *ctx)
+{
+    uint8_t mem[] = {
+        0x93, 0x2, 0x0, 0x1,
+        [256] = 0xff, 0xff, 0xff, 0xee,
+    };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xa;
+    cpu.x = 0xe;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xau, cpu.a);
+    ct_assertequal(0xeu, cpu.x);
+    ct_assertequal(0x2u, mem[259]);
+}
+
+static void sha_indy_pagecross(void *ctx)
+{
+    uint8_t mem[] = {0x93, 0x2, 0xff, 0xfe};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.a = 0xea;
+    cpu.x = 0xf8;
+    cpu.y = 3;  // Cross boundary from $FEFF -> $FF02
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(6, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xeau, cpu.a);
+    ct_assertequal(0xf8u, cpu.x);
+    ct_assertequal(0xe8u, cpu.databus);
+    ct_assertequal(0xe802u, cpu.addrbus);
+    ct_asserttrue(cpu.bflt);
+}
+
 static void slo_indx(void *ctx)
 {
     uint8_t mem[] = {0x3, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
@@ -1411,6 +1454,9 @@ struct ct_testsuite cpu_indirect_tests(void)
 
         ct_maketest(sax_indx),
         ct_maketest(sax_indx_pageoverflow),
+
+        ct_maketest(sha_indy),
+        ct_maketest(sha_indy_pagecross),
 
         ct_maketest(slo_indx),
         ct_maketest(slo_indx_pageoverflow),

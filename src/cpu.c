@@ -945,6 +945,23 @@ static void SBX_exec(struct mos6502 *self)
     load_register(self, &self->x, cmp);
 }
 
+static void SHA_exec(struct mos6502 *self, struct decoded dec)
+{
+    if (read_delayed(self, dec, true)) return;
+    const uint8_t
+        adrhi = self->adc ? self->adh : self->adh + 1,
+        d = self->a & self->x & adrhi;
+    // NOTE: on page-cross boundary this *occasionally* throws the calculated
+    // value into ADDR_HI, emulate that behavior consistently to emphasize the
+    // instability of this instruction.
+    if (self->adc) {
+        self->adh = d;
+        self->addrbus = bytowr(self->adl, self->adh);
+    }
+    store_data(self, d);
+    commit_operation(self);
+}
+
 static void SLO_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;

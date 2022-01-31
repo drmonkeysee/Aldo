@@ -974,6 +974,13 @@ static void SHX_exec(struct mos6502 *self, struct decoded dec)
     commit_operation(self);
 }
 
+static void SHY_exec(struct mos6502 *self, struct decoded dec)
+{
+    if (read_delayed(self, dec, true)) return;
+    store_unstable_addresshigh(self, self->y);
+    commit_operation(self);
+}
+
 static void SLO_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;

@@ -814,9 +814,9 @@ static void TYA_exec(struct mos6502 *self)
 
 // NOTE: magic constant that interferes with accumulator varies based on
 // chip manufacture, temperature, state of chip control signals,
-// and maybe other unknown factors; community docs show FF or FE are
-// commonly-seen values so just go with that.
-static const uint8_t Magic = 0xfe;
+// and maybe other unknown factors; community docs show FF is a
+// commonly-seen value so just go with that.
+static const uint8_t Magic = 0xff;
 
 static void ALR_exec(struct mos6502 *self, struct decoded dec)
 {
@@ -883,7 +883,8 @@ static void ISC_exec(struct mos6502 *self, struct decoded dec)
 
 static void JAM_exec(struct mos6502 *self)
 {
-    self->databus = 0xff;
+    self->databus = Magic;
+    self->addrbus = bytowr(Magic, Magic);
 }
 
 static void LAS_exec(struct mos6502 *self, struct decoded dec)
@@ -1498,9 +1499,12 @@ static void JAM_sequence(struct mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
-        dispatch_instruction(self, dec);
+        self->addrbus = self->pc;
+        read(self);
         break;
     case 2:
+        dispatch_instruction(self, dec);
+        break;
     case 3:
     case 4:
         break;

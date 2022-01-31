@@ -997,6 +997,14 @@ static void SRE_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->a, self->a ^ d);
 }
 
+static void TAS_exec(struct mos6502 *self, struct decoded dec)
+{
+    if (read_delayed(self, dec, true)) return;
+    self->s = self->a & self->x;
+    store_unstable_addresshigh(self, self->s);
+    commit_operation(self);
+}
+
 //
 // Instruction Dispatch
 //

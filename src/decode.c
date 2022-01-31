@@ -184,7 +184,7 @@ const struct decoded Decode[] = {
     OP(IN_TYA, AM_IMP),     // 98 - TYA
     OP(IN_STA, AM_ABSY),    // 99 - STA abs,Y
     OP(IN_TXS, AM_IMP),     // 9A - TXS
-    UNDEF,                  // 9B - Undefined
+    UP(IN_TAS, AM_ABSY),    // 9B - *TAS (XAS, SHS) abs,Y (unstable!)
     UP(IN_SHY, AM_ABSX),    // 9E - *SHY (A11, SYA, SAY) abs,X (unstable!)
     OP(IN_STA, AM_ABSX),    // 9D - STA abs,X
     UP(IN_SHX, AM_ABSY),    // 9E - *SHX (A11, SXA, XAS) abs,Y (unstable!)

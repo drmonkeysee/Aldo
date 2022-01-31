@@ -16,7 +16,7 @@
 X(UDF, self)        /* Undefined */ \
 \
 X(ADC, self, dec)   /* Add with carry */ \
-X(AND, self, dec)   /* Logical and */ \
+X(AND, self, dec)   /* Logical AND */ \
 X(ASL, self, dec)   /* Arithmetic shift left */ \
 \
 X(BCC, self)        /* Branch if carry clear */ \
@@ -42,7 +42,7 @@ X(DEC, self, dec)   /* Decrement memory */ \
 X(DEX, self)        /* Decrement x-index */ \
 X(DEY, self)        /* Decrement y-index */ \
 \
-X(EOR, self, dec)   /* Logical exclusive or */ \
+X(EOR, self, dec)   /* Logical EXCLUSIVE OR */ \
 \
 X(INC, self, dec)   /* Increment memory */ \
 X(INX, self)        /* Increment x-index */ \
@@ -58,7 +58,7 @@ X(LSR, self, dec)   /* Logical shift right */ \
 \
 X(NOP, self, dec)   /* No-op */ \
 \
-X(ORA, self, dec)   /* Logical or */ \
+X(ORA, self, dec)   /* Logical OR */ \
 \
 X(PHA, self)        /* Push accumulator */ \
 X(PHP, self)        /* Push status */ \
@@ -86,33 +86,33 @@ X(TXS, self)        /* Transfer x-index to stack pointer */ \
 X(TYA, self)        /* Transfer y-index to accumulator */ \
 \
 /* Unofficial Opcodes */ \
-X(ALR, self, dec)   /* Logical and and logical shift right */ \
-X(ANC, self)        /* Logical and and set carry as if ASL or ROL */ \
+X(ALR, self, dec)   /* Logical AND and logical shift right */ \
+X(ANC, self)        /* Logical AND and set carry as if ASL or ROL */ \
 X(ANE, self)        /* Accumulator interferes with internal signals, logical
-                       and with x-index and operand, load into accumulator */ \
-X(ARR, self, dec)   /* Logical and and rotate right with adder side-effects
+                       AND with x-index and operand, load into accumulator */ \
+X(ARR, self, dec)   /* Logical AND and rotate right with adder side-effects
                        interleaved between AND and ROR */ \
 X(DCP, self, dec)   /* Decrement memory and compare to accumulator */ \
 X(ISC, self, dec)   /* Increment memory and subtract with carry */ \
 X(JAM, self)        /* No instruction signal, jams the cpu */ \
-X(LAS, self, dec)   /* Logical and with stack pointer and load
+X(LAS, self, dec)   /* Logical AND with stack pointer and load
                        into accumulator, x-index, and stack pointer */ \
 X(LAX, self, dec)   /* Load accumulator and x-index */ \
 X(LXA, self)        /* Accumulator interferes with internal signals, logical
-                       and with operand, load into accumulator and x-index */ \
-X(RLA, self, dec)   /* Rotate left and logical and */ \
+                       AND with operand, load into accumulator and x-index */ \
+X(RLA, self, dec)   /* Rotate left and logical AND */ \
 X(RRA, self, dec)   /* Rotate right and add with carry */ \
-X(SAX, self)        /* Store logical and of accumulator and x-index */ \
-X(SBX, self)        /* Logical and accumulator and x-index,
+X(SAX, self)        /* Store logical AND of accumulator and x-index */ \
+X(SBX, self)        /* Logical AND accumulator and x-index,
                        compare to operand, and load into x-index */ \
-X(SHA, self, dec)   /* Store logical and accumulator and x-index
+X(SHA, self, dec)   /* Store logical AND accumulator and x-index
                        and ADDR_HI + 1 */ \
-X(SHX, self, dec)   /* Store logical and x-index and ADDR_HI + 1 */ \
-X(SHY, self, dec)   /* Store logical and y-index and ADDR_HI + 1 */ \
-X(SLO, self, dec)   /* Arithmetic shift left and logical or */ \
-X(SRE, self, dec)   /* Logical shift right and exclusive or */ \
-X(TAS, self, dec)   /* Load logical and accumulator and x-index into
-                       stack pointer, store logical and accumulator and
+X(SHX, self, dec)   /* Store logical AND x-index and ADDR_HI + 1 */ \
+X(SHY, self, dec)   /* Store logical AND y-index and ADDR_HI + 1 */ \
+X(SLO, self, dec)   /* Arithmetic shift left and logical OR */ \
+X(SRE, self, dec)   /* Logical shift right and logical EXCLUSIVE OR */ \
+X(TAS, self, dec)   /* Load logical AND accumulator and x-index into
+                       stack pointer, store logical AND accumulator and
                        x-index and ADDR_HI + 1 */
 
 // Addressing Modes

@@ -106,6 +106,7 @@ X(SAX, self)        /* Store logical and of accumulator and x-index */ \
 X(SBX, self)        /* Logical and accumulator and x-index,
                        compare to operand, and load into x-index */ \
 X(SHA, self, dec)   /* Logical and accumulator and x-index and ADDR_HI + 1 */ \
+X(SHX, self, dec)   /* Logical and x-index and ADDR_HI + 1 */ \
 X(SLO, self, dec)   /* Arithmetic shift left and logical or */ \
 X(SRE, self, dec)   /* Logical shift right and exclusive or */
 

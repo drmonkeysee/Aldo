@@ -187,7 +187,7 @@ const struct decoded Decode[] = {
     UNDEF,                  // 9B - Undefined
     UNDEF,                  // 9C - Undefined
     OP(IN_STA, AM_ABSX),    // 9D - STA abs,X
-    UNDEF,                  // 9E - Undefined
+    UP(IN_SHX, AM_ABSY),    // 9E - *SHX (A11, SXA, XAS) abs,Y (unstable!)
     UP(IN_SHA, AM_ABSY),    // 9F - *SHA (AHX, AXA) abs,Y (unstable!)
     OP(IN_LDY, AM_IMM),     // A0 - LDY imm
     OP(IN_LDA, AM_INDX),    // A1 - LDA (zp,X)

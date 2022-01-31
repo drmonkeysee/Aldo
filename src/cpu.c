@@ -818,6 +818,21 @@ static void TYA_exec(struct mos6502 *self)
 // commonly-seen value so just go with that.
 static const uint8_t Magic = 0xff;
 
+static void store_unstable_addresshigh(struct mos6502 *self, uint8_t d)
+{
+    // NOTE: if addr carry, +1 has already been stored into adh
+    const uint8_t adrhi = self->adc ? self->adh : self->adh + 1;
+    d &= adrhi;
+    // NOTE: on page-cross boundary this *occasionally* throws the calculated
+    // value into ADDR_HI; emulate that behavior consistently to emphasize the
+    // instability of these instructions.
+    if (self->adc) {
+        self->adh = d;
+        self->addrbus = bytowr(self->adl, self->adh);
+    }
+    store_data(self, d);
+}
+
 static void ALR_exec(struct mos6502 *self, struct decoded dec)
 {
     read(self);
@@ -948,17 +963,14 @@ static void SBX_exec(struct mos6502 *self)
 static void SHA_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true)) return;
-    const uint8_t
-        adrhi = self->adc ? self->adh : self->adh + 1,
-        d = self->a & self->x & adrhi;
-    // NOTE: on page-cross boundary this *occasionally* throws the calculated
-    // value into ADDR_HI, emulate that behavior consistently to emphasize the
-    // instability of this instruction.
-    if (self->adc) {
-        self->adh = d;
-        self->addrbus = bytowr(self->adl, self->adh);
-    }
-    store_data(self, d);
+    store_unstable_addresshigh(self, self->a & self->x);
+    commit_operation(self);
+}
+
+static void SHX_exec(struct mos6502 *self, struct decoded dec)
+{
+    if (read_delayed(self, dec, true)) return;
+    store_unstable_addresshigh(self, self->x);
     commit_operation(self);
 }
 

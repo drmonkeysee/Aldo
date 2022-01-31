@@ -2093,6 +2093,45 @@ static void sha_absy_pagecross(void *ctx)
     ct_asserttrue(cpu.bflt);
 }
 
+static void shx_absy(void *ctx)
+{
+    uint8_t mem[] = {
+        0x9e, 0x0, 0x1,
+        [256] = 0xff, 0xff, 0xff, 0xee,
+    };
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.x = 0xe;
+    cpu.y = 3;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xeu, cpu.x);
+    ct_assertequal(0x2u, mem[259]);
+}
+
+static void shx_absy_pagecross(void *ctx)
+{
+    uint8_t mem[] = {0x9e, 0xff, 0xfe};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.x = 0xe1;
+    cpu.y = 3;  // Cross boundary from $FEFF -> $FF02
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(3u, cpu.pc);
+
+    ct_assertequal(0xe1u, cpu.x);
+    ct_assertequal(0xe1u, cpu.databus);
+    ct_assertequal(0xe102u, cpu.addrbus);
+    ct_asserttrue(cpu.bflt);
+}
+
 static void slo_abs(void *ctx)
 {
     uint8_t mem[] = {
@@ -2442,6 +2481,9 @@ struct ct_testsuite cpu_absolute_tests(void)
 
         ct_maketest(sha_absy),
         ct_maketest(sha_absy_pagecross),
+
+        ct_maketest(shx_absy),
+        ct_maketest(shx_absy_pagecross),
 
         ct_maketest(slo_abs),
         ct_maketest(slo_absx),

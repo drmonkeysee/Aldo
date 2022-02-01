@@ -1596,7 +1596,8 @@ void cpu_powerup(struct mos6502 *self)
     // NOTE: Initialize physical lines and control flags to known state
     self->signal.irq = self->signal.nmi = self->signal.res =
         self->signal.rw = self->detached = true;
-    self->signal.rdy = self->signal.sync = self->bflt = self->presync = false;
+    self->signal.rdy = self->signal.sync = self->bcd = self->bflt =
+        self->presync = false;
 
     // NOTE: initialize internal registers to known state
     self->pc = self->a = self->s = self->x = self->y =

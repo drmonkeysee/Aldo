@@ -70,6 +70,7 @@ struct mos6502 {
     // Internals: control flags and other helper fields that do
     // not correspond directly to CPU components.
     bool
+        bcd,            // BCD (binary-coded decimal) mode is supported
         bflt,           // Bus fault; read/write to unmapped or invalid address
         detached,       // Run CPU in detached mode, used mostly for peek-mode:
                         // - memory-writes disabled (includes the stack!)

@@ -249,6 +249,389 @@ static void adc_overflow_with_carry(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
+static void adc_bcd(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 9;  // 9 + 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x15u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void adc_bcd_not_supported(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = false;
+    cpu.p.d = true;
+    cpu.a = 9;  // 9 + 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xfu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void adc_bcd_carryin(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.c = true;
+    cpu.p.d = true;
+    cpu.a = 9;  // 9 + (6 + C)
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x16u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void adc_bcd_carry(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0x98;   // 98 + 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x4u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void adc_bcd_zero(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0;  // 0 + 0
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void adc_bcd_missed_zero(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0x99;   // 99 + 1
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void adc_bcd_negative(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0x79;   // 79 + 1
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x80u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void adc_bcd_overflow_to_negative(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x30};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0x50;   // 50 + 30
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x80u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void adc_bcd_overflow_to_positive(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x90};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0x89;   // 89 + 90
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x79u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void adc_bcd_carry_overflow_negative(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x90};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0x90;   // 90 + 90
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x80u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void adc_bcd_carryin_causes_overflow(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x29};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.c = true;
+    cpu.p.d = true;
+    cpu.a = 0x50;   // 50 + 29 + C
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x80u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void adc_bcd_positive_to_positive_overflow(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x79};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0x79;   // 79 + 79
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x58u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void adc_bcd_positive_negative_no_overflow(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x80};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0x79;   // 79 + 80
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x59u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void adc_bcd_positive_overflow_caused_by_carry(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x79};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.c = true;
+    cpu.p.d = true;
+    cpu.a = 0x79;   // 79 + 79 + C
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x59u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void adc_bcd_max(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x99};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.c = true;
+    cpu.p.d = true;
+    cpu.a = 0x99;   // 99 + 99
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x98u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void adc_bcd_hex(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0xa;    // 10 + 1 so far so good
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x11u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void adc_bcd_high_hex(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0xf};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0xf;    // 15 + 15 uh oh the lower digit adjustment acts strangely
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x14u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void adc_bcd_max_hex(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0xff};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0xff;   // 30 + 30? 165 + 165??
+                    // who knows, this is basically undefined behavior
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x54u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void and(void *ctx)
 {
     uint8_t mem[] = {0x29, 0xc};
@@ -2314,6 +2697,24 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(adc_carryin_causes_overflow),
         ct_maketest(adc_carryin_avoids_overflow),
         ct_maketest(adc_overflow_with_carry),
+        ct_maketest(adc_bcd),
+        ct_maketest(adc_bcd_not_supported),
+        ct_maketest(adc_bcd_carryin),
+        ct_maketest(adc_bcd_carry),
+        ct_maketest(adc_bcd_zero),
+        ct_maketest(adc_bcd_missed_zero),
+        ct_maketest(adc_bcd_negative),
+        ct_maketest(adc_bcd_overflow_to_negative),
+        ct_maketest(adc_bcd_overflow_to_positive),
+        ct_maketest(adc_bcd_carry_overflow_negative),
+        ct_maketest(adc_bcd_carryin_causes_overflow),
+        ct_maketest(adc_bcd_positive_to_positive_overflow),
+        ct_maketest(adc_bcd_positive_negative_no_overflow),
+        ct_maketest(adc_bcd_positive_overflow_caused_by_carry),
+        ct_maketest(adc_bcd_max),
+        ct_maketest(adc_bcd_hex),
+        ct_maketest(adc_bcd_high_hex),
+        ct_maketest(adc_bcd_max_hex),
         ct_maketest(and),
         ct_maketest(and_zero),
         ct_maketest(and_negative),

@@ -251,6 +251,27 @@ static void adc_overflow_with_carry(void *ctx)
 
 static void adc_bcd(void *ctx)
 {
+    uint8_t mem[] = {0x69, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 1;  // 1 + 1
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x2u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void adc_bcd_digit_rollover(void *ctx)
+{
     uint8_t mem[] = {0x69, 0x6};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
@@ -2698,6 +2719,7 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(adc_carryin_avoids_overflow),
         ct_maketest(adc_overflow_with_carry),
         ct_maketest(adc_bcd),
+        ct_maketest(adc_bcd_digit_rollover),
         ct_maketest(adc_bcd_not_supported),
         ct_maketest(adc_bcd_carryin),
         ct_maketest(adc_bcd_carry),

@@ -662,7 +662,7 @@ static void adc_bcd_max_hex(void *ctx)
     cpu.bcd = true;
     cpu.p.d = true;
     cpu.a = 0xff;   // 30 + 30? 165 + 165??
-                    // who knows, this is basically undefined behavior
+                    // who knows, this is undocumented behavior
 
     const int cycles = clock_cpu(&cpu);
 
@@ -694,7 +694,7 @@ static void adc_visual6502_cases(void *ctx)
         {0x89, 0x76, 0, 0x65, 0, 0, 0, 1},  // 89 + 76
         {0x89, 0x76, 1, 0x66, 0, 0, 1, 1},  // 89 + 76 + C
         {0x80, 0xf0, 0, 0xd0, 0, 1, 0, 1},  // 80 + 150
-        {0x80, 0xfa, 0, 0xe0, 1, 0, 0, 1},  // 80 + 160? (15,10)
+        {0x80, 0xfa, 0, 0xe0, 1, 0, 0, 1},  // 80 + 160?
         {0x2f, 0x4f, 0, 0x74, 0, 0, 0, 0},  // 215? + 415?
         {0x6f, 0x00, 1, 0x76, 0, 0, 0, 0},  // 615? + 0 + C
     };

@@ -229,15 +229,48 @@ static void adc_carryin_avoids_overflow(void *ctx)
 }
 
 // SOURCE: nestest
-static void adc_overflow_with_carry(void *ctx)
+static void adc_overflow_does_not_include_carry(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x7f};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
+    cpu.p.c = false;
+    cpu.pc = 0;
+    cpu.a = 0x7f;   // 127 + 127
+
+    int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xfeu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+
+    mem[1] = 0x80;
+    cpu.p.c = false;
+    cpu.pc = 0;
+    cpu.a = 0x7f;   // 127 + (-128)
+
+    cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xffu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+
+    mem[1] = 0x7f;
     cpu.p.c = true;
+    cpu.pc = 0;
     cpu.a = 0x7f;   // 127 + 127 + C
 
-    const int cycles = clock_cpu(&cpu);
+    cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -503,16 +536,17 @@ static void adc_bcd_carryin_causes_overflow(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
-static void adc_bcd_positive_to_positive_overflow(void *ctx)
+static void adc_bcd_overflow_does_not_include_carry(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x79};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
-    cpu.p.d = true;
+    cpu.p.c = false;
+    cpu.pc = 0;
     cpu.a = 0x79;   // 79 + 79
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -522,18 +556,13 @@ static void adc_bcd_positive_to_positive_overflow(void *ctx)
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.v);
     ct_assertfalse(cpu.p.n);
-}
 
-static void adc_bcd_positive_negative_no_overflow(void *ctx)
-{
-    uint8_t mem[] = {0x69, 0x80};
-    struct mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
-    cpu.bcd = true;
-    cpu.p.d = true;
+    mem[1] = 0x80;
+    cpu.p.c = false;
+    cpu.pc = 0;
     cpu.a = 0x79;   // 79 + 80
 
-    const int cycles = clock_cpu(&cpu);
+    cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -543,19 +572,13 @@ static void adc_bcd_positive_negative_no_overflow(void *ctx)
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
     ct_assertfalse(cpu.p.n);
-}
 
-static void adc_bcd_positive_overflow_caused_by_carry(void *ctx)
-{
-    uint8_t mem[] = {0x69, 0x79};
-    struct mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
-    cpu.bcd = true;
+    mem[1] = 0x79;
     cpu.p.c = true;
-    cpu.p.d = true;
+    cpu.pc = 0;
     cpu.a = 0x79;   // 79 + 79 + C
 
-    const int cycles = clock_cpu(&cpu);
+    cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -651,6 +674,49 @@ static void adc_bcd_max_hex(void *ctx)
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
     ct_assertfalse(cpu.p.n);
+}
+
+// NOTE: test cases listed at
+// http://visual6502.org/wiki/index.php?title=6502DecimalMode
+static void adc_visual6502_cases(void *ctx)
+{
+    uint8_t mem[] = {0x69, 0xff};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    const uint8_t cases[10][8] = {
+        // A  +  M + C =  A   N  V  Z  C
+        {0x00, 0x00, 0, 0x00, 0, 0, 1, 0},  // 0 + 0
+        {0x79, 0x00, 1, 0x80, 1, 1, 0, 0},  // 79 + 0 + C
+        {0x24, 0x56, 0, 0x80, 1, 1, 0, 0},  // 24 + 56
+        {0x93, 0x82, 0, 0x75, 0, 1, 0, 1},  // 93 + 82
+        {0x89, 0x76, 0, 0x65, 0, 0, 0, 1},  // 89 + 76
+        {0x89, 0x76, 1, 0x66, 0, 0, 1, 1},  // 89 + 76 + C
+        {0x80, 0xf0, 0, 0xd0, 0, 1, 0, 1},  // 80 + 150
+        {0x80, 0xfa, 0, 0xe0, 1, 0, 0, 1},  // 80 + 160? (15,10)
+        {0x2f, 0x4f, 0, 0x74, 0, 0, 0, 0},  // 215? + 415?
+        {0x6f, 0x00, 1, 0x76, 0, 0, 0, 0},  // 615? + 0 + C
+    };
+
+    for (size_t i = 0; i < sizeof cases / sizeof cases[0]; ++i) {
+        const uint8_t *const testcase = cases[i];
+        cpu.pc = 0;
+        cpu.a = testcase[0];
+        mem[1] = testcase[1];
+        cpu.p.c = testcase[2];
+
+        const int cycles = clock_cpu(&cpu);
+
+        ct_assertequal(2, cycles, "Failed on case %zu", i);
+        ct_assertequal(2u, cpu.pc, "Failed on case %zu", i);
+
+        ct_assertequal(testcase[3], cpu.a, "Failed on case %zu", i);
+        ct_assertequal(testcase[4], cpu.p.n, "Failed on case %zu", i);
+        ct_assertequal(testcase[5], cpu.p.v, "Failed on case %zu", i);
+        ct_assertequal(testcase[6], cpu.p.z, "Failed on case %zu", i);
+        ct_assertequal(testcase[7], cpu.p.c, "Failed on case %zu", i);
+    }
 }
 
 static void and(void *ctx)
@@ -2717,7 +2783,7 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(adc_overflow_to_positive),
         ct_maketest(adc_carryin_causes_overflow),
         ct_maketest(adc_carryin_avoids_overflow),
-        ct_maketest(adc_overflow_with_carry),
+        ct_maketest(adc_overflow_does_not_include_carry),
         ct_maketest(adc_bcd),
         ct_maketest(adc_bcd_digit_rollover),
         ct_maketest(adc_bcd_not_supported),
@@ -2730,13 +2796,12 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(adc_bcd_overflow_to_positive),
         ct_maketest(adc_bcd_carry_overflow_negative),
         ct_maketest(adc_bcd_carryin_causes_overflow),
-        ct_maketest(adc_bcd_positive_to_positive_overflow),
-        ct_maketest(adc_bcd_positive_negative_no_overflow),
-        ct_maketest(adc_bcd_positive_overflow_caused_by_carry),
+        ct_maketest(adc_bcd_overflow_does_not_include_carry),
         ct_maketest(adc_bcd_max),
         ct_maketest(adc_bcd_hex),
         ct_maketest(adc_bcd_high_hex),
         ct_maketest(adc_bcd_max_hex),
+        ct_maketest(adc_visual6502_cases),
         ct_maketest(and),
         ct_maketest(and_zero),
         ct_maketest(and_negative),

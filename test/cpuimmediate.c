@@ -596,7 +596,6 @@ static void adc_bcd_max(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
-    cpu.p.c = true;
     cpu.p.d = true;
     cpu.a = 0x99;   // 99 + 99
 
@@ -677,7 +676,7 @@ static void adc_bcd_max_hex(void *ctx)
 }
 
 // SOURCE: http://visual6502.org/wiki/index.php?title=6502DecimalMode
-static void adc_visual6502_cases(void *ctx)
+static void adc_bcd_visual6502_cases(void *ctx)
 {
     uint8_t mem[] = {0x69, 0xff};
     struct mos6502 cpu;
@@ -1920,6 +1919,465 @@ static void sbc_overflow_does_not_include_borrow(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
+static void sbc_bcd(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x4};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 4;  // 4 - 2
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x2u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbc_bcd_digit_rollover(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0x10;   // 10 - 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x4u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbc_bcd_not_supported(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = false;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0x10;   // 16 - 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xau, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbc_bcd_borrowout(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0x10;   // 10 - 6 - B
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x3u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbc_bcd_borrow(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x79};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0x10;    // 10 - 79
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x31u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbc_bcd_zero(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 6;  // 6 - 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbc_bcd_negative(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0x90;   // 90 - 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x84u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void sbc_bcd_borrow_negative(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0;  // 0 - 1
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x99u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void sbc_bcd_overflow_to_negative(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x90};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0x79;   // 79 - 90
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x89u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void sbc_bcd_overflow_to_positive(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0x80;   // 80 - 1
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x79u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbc_bcd_borrowout_causes_overflow(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = false;
+    cpu.a = 0x80;   // 80 - 0 - B
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x79u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbc_bcd_overflow_does_not_include_borrow(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x79};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.pc = 0;
+    cpu.a = 0x79;   // 79 - 79
+
+    int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+
+    mem[1] = 0x80;
+    cpu.p.c = true;
+    cpu.pc = 0;
+    cpu.a = 0x79;   // 79 - 80
+
+    cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x99u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+
+    mem[1] = 0x79;
+    cpu.p.c = false;
+    cpu.pc = 0;
+    cpu.a = 0x79;   // 79 - 79 - B
+
+    cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x99u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void sbc_bcd_min(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x0};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0x0;    // 0 - 0
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbc_bcd_max(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x99};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0x99;   // 99 - 99
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbc_bcd_hex(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0xa;    // 10 + 1 so far so good
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x9u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void sbc_bcd_high_hex(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x10};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0xf;    // 15 - 10 = 90,15... 105?
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x9fu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_asserttrue(cpu.p.n);
+}
+
+static void sbc_bcd_max_hex(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0x99};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0xff;   // 165? - 99 = 66.. this actually works
+
+    int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x66u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+
+    mem[1] = 0xff;
+    cpu.a = 0x99;   // 99 - 165? = 34, we're in undocumented behavior territory
+
+    cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x34u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+// SOURCE: http://visual6502.org/wiki/index.php?title=6502DecimalMode
+static void sbc_bcd_visual6502_cases(void *ctx)
+{
+    uint8_t mem[] = {0xe9, 0xff};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    const uint8_t cases[7][8] = {
+        // A  -  M - B =  A   N  V  Z  C
+        {0x00, 0x00, 0, 0x99, 1, 0, 0, 0},  // 0 - 0 - B
+        {0x00, 0x00, 1, 0x00, 0, 0, 1, 1},  // 0 - 0
+        {0x00, 0x01, 1, 0x99, 1, 0, 0, 0},  // 0 - 1
+        {0x0a, 0x00, 1, 0x0a, 0, 0, 0, 1},  // 10 - 0
+        {0x0b, 0x00, 0, 0x0a, 0, 0, 0, 1},  // 11 - 0 - B
+        {0x9a, 0x00, 1, 0x9a, 1, 0, 0, 1},  // 100? - 0
+        {0x9b, 0x00, 0, 0x9a, 1, 0, 0, 1},  // 101? - 0 - B
+    };
+
+    for (size_t i = 0; i < sizeof cases / sizeof cases[0]; ++i) {
+        const uint8_t *const testcase = cases[i];
+        cpu.pc = 0;
+        cpu.a = testcase[0];
+        mem[1] = testcase[1];
+        cpu.p.c = testcase[2];
+
+        const int cycles = clock_cpu(&cpu);
+
+        ct_assertequal(2, cycles, "Failed on case %zu", i);
+        ct_assertequal(2u, cpu.pc, "Failed on case %zu", i);
+
+        ct_assertequal(testcase[3], cpu.a, "Failed on case %zu", i);
+        ct_assertequal(testcase[4], cpu.p.n, "Failed on case %zu", i);
+        ct_assertequal(testcase[5], cpu.p.v, "Failed on case %zu", i);
+        ct_assertequal(testcase[6], cpu.p.z, "Failed on case %zu", i);
+        ct_assertequal(testcase[7], cpu.p.c, "Failed on case %zu", i);
+    }
+}
+
 //
 // Unofficial Opcodes
 //
@@ -2830,6 +3288,72 @@ static void usbc_overflow_does_not_include_borrow(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
+static void usbc_bcd(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0x4};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 4;  // 4 - 2
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x2u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void usbc_bcd_digit_rollover(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0x10;   // 10 - 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x4u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void usbc_bcd_not_supported(void *ctx)
+{
+    uint8_t mem[] = {0xeb, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = false;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0x10;   // 16 - 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xau, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
 //
 // Test List
 //
@@ -2866,7 +3390,7 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(adc_bcd_hex),
         ct_maketest(adc_bcd_high_hex),
         ct_maketest(adc_bcd_max_hex),
-        ct_maketest(adc_visual6502_cases),
+        ct_maketest(adc_bcd_visual6502_cases),
         ct_maketest(and),
         ct_maketest(and_zero),
         ct_maketest(and_negative),
@@ -2932,6 +3456,24 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(sbc_borrowout_causes_overflow),
         ct_maketest(sbc_borrowout_avoids_overflow),
         ct_maketest(sbc_overflow_does_not_include_borrow),
+        ct_maketest(sbc_bcd),
+        ct_maketest(sbc_bcd_digit_rollover),
+        ct_maketest(sbc_bcd_not_supported),
+        ct_maketest(sbc_bcd_borrowout),
+        ct_maketest(sbc_bcd_borrow),
+        ct_maketest(sbc_bcd_zero),
+        ct_maketest(sbc_bcd_negative),
+        ct_maketest(sbc_bcd_borrow_negative),
+        ct_maketest(sbc_bcd_overflow_to_negative),
+        ct_maketest(sbc_bcd_overflow_to_positive),
+        ct_maketest(sbc_bcd_borrowout_causes_overflow),
+        ct_maketest(sbc_bcd_overflow_does_not_include_borrow),
+        ct_maketest(sbc_bcd_min),
+        ct_maketest(sbc_bcd_max),
+        ct_maketest(sbc_bcd_hex),
+        ct_maketest(sbc_bcd_high_hex),
+        ct_maketest(sbc_bcd_max_hex),
+        ct_maketest(sbc_bcd_visual6502_cases),
 
         // Unofficial Opcodes
         ct_maketest(alr),
@@ -2986,6 +3528,9 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(usbc_borrowout_causes_overflow),
         ct_maketest(usbc_borrowout_avoids_overflow),
         ct_maketest(usbc_overflow_does_not_include_borrow),
+        ct_maketest(usbc_bcd),
+        ct_maketest(usbc_bcd_digit_rollover),
+        ct_maketest(usbc_bcd_not_supported),
     };
 
     return ct_makesuite(tests);

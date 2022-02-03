@@ -290,8 +290,8 @@ enum arithmetic_operator {
 
 // NOTE: add with carry-in: A + B + C and subtract with carry-in: A - B - ~C,
 // where ~carry indicates borrow-out, are equivalent in binary mode:
-// A - B => A + (-B) => A + 2sComplement(B) => A + (~B + 1) when C = 1;
-// C = 0 is thus a borrow-out; A + (~B + 0) => A + ~B => A - B - 1.
+//  A - B => A + (-B) => A + 2sComplement(B) => A + (~B + 1) when C = 1;
+//  C = 0 is thus a borrow-out; A + (~B + 0) => A + ~B => A - B - 1.
 static void arithmetic_operation(struct mos6502 *self,
                                  enum arithmetic_operator op, uint8_t b)
 {
@@ -308,7 +308,7 @@ static void arithmetic_operation(struct mos6502 *self,
 
 // NOTE: compare is effectively R - D; modeling the subtraction as
 // R + 2sComplement(D) gets us all the flags for free;
-// see SBC_exec for why this works.
+// see arithmetic_operation for why this works.
 static uint8_t compare_register(struct mos6502 *self, uint8_t r, uint8_t d)
 {
     const uint16_t cmp = r + (uint8_t)~d + 1;
@@ -879,8 +879,9 @@ static void ARR_exec(struct mos6502 *self, struct decoded dec)
     //  A := A AND operand
     //  set overflow to xor of bit 7 and bit 6 of A (side-effect of adder?)
     //  set carry to bit 7 of A (side-effect of adder?)
-    //  rotate A right but leave carry unaffected (this is implemented as
-    //  a standard ROR and then immediately restoring carry's pre-ROR value)
+    //  rotate A right but leave carry unaffected;
+    //      implemented as a standard ROR and then immediately
+    //      restoring carry's pre-ROR value
     load_register(self, &self->a, self->a & self->databus);
     self->p.v = (self->a >> 7) ^ ((self->a >> 6) & 0x1);
     const bool c = self->p.c = self->a & 0x80;

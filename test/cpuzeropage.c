@@ -2164,6 +2164,72 @@ static void isc_zp_overflow_without_borrow(void *ctx)
     ct_assertequal(0x80u, mem[4]);
 }
 
+static void isc_bcd_zp(void *ctx)
+{
+    uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x1};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 4;  // 4 - 2
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x2u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void isc_bcd_zp_digit_rollover(void *ctx)
+{
+    uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x5};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0x10;   // 10 - 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(5, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x4u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void isc_bcd_zp_not_supported(void *ctx)
+{
+    uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x5};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = false;
+    cpu.p.d = true;
+    cpu.p.c = true;
+    cpu.a = 0x10;   // 16 - 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xau, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void isc_zpx(void *ctx)
 {
     uint8_t mem[] = {0xf7, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x5};
@@ -2817,6 +2883,69 @@ static void rra_zp_overflow_with_carry(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
+static void rra_bcd_zp(void *ctx)
+{
+    uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0x2};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 1;  // 1 + 1
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x2u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void rra_bcd_zp_digit_rollover(void *ctx)
+{
+    uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0xc};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 9;  // 9 + 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x15u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void rra_bcd_zp_not_supported(void *ctx)
+{
+    uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0xc};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = false;
+    cpu.p.d = true;
+    cpu.a = 9;  // 9 + 6
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0xfu, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void rra_zpx(void *ctx)
 {
     uint8_t mem[] = {0x77, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc};
@@ -3425,6 +3554,9 @@ struct ct_testsuite cpu_zeropage_tests(void)
         ct_maketest(isc_zp_borrowout_causes_overflow),
         ct_maketest(isc_zp_borrowout_avoids_overflow),
         ct_maketest(isc_zp_overflow_without_borrow),
+        ct_maketest(isc_bcd_zp),
+        ct_maketest(isc_bcd_zp_digit_rollover),
+        ct_maketest(isc_bcd_zp_not_supported),
         ct_maketest(isc_zpx),
         ct_maketest(isc_zpx_pageoverflow),
 
@@ -3461,6 +3593,9 @@ struct ct_testsuite cpu_zeropage_tests(void)
         ct_maketest(rra_zp_carryin_causes_overflow),
         ct_maketest(rra_zp_carryin_avoids_overflow),
         ct_maketest(rra_zp_overflow_with_carry),
+        ct_maketest(rra_bcd_zp),
+        ct_maketest(rra_bcd_zp_digit_rollover),
+        ct_maketest(rra_bcd_zp_not_supported),
         ct_maketest(rra_zpx),
         ct_maketest(rra_zpx_pageoverflow),
 

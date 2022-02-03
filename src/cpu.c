@@ -283,11 +283,26 @@ static void store_data(struct mos6502 *self, uint8_t d)
     write(self);
 }
 
-static void arithmetic_sum(struct mos6502 *self, uint8_t b, bool c)
+enum arithmetic_operator {
+    AOP_ADD,
+    AOP_SUB,
+};
+
+// NOTE: add with carry-in: A + B + C and subtract with carry-in: A - B - ~C,
+// where ~carry indicates borrow-out, are equivalent in binary mode:
+// A - B => A + (-B) => A + 2sComplement(B) => A + (~B + 1) when C = 1;
+// C = 0 is thus a borrow-out; A + (~B + 0) => A + ~B => A - B - 1.
+static void arithmetic_operation(struct mos6502 *self,
+                                 enum arithmetic_operator op, uint8_t b)
 {
-    const uint16_t sum = self->a + b + c;
+    const uint8_t a = self->a;
+    if (op == AOP_SUB) {
+        b = ~b;
+    }
+    const bool c = self->p.c;
+    const uint16_t sum = a + b + c;
     self->p.c = sum & 0x100;
-    update_v(self, sum, self->a, b);
+    update_v(self, sum, a, b);
     load_register(self, &self->a, sum);
 }
 
@@ -420,13 +435,12 @@ static void UDF_exec(struct mos6502 *self)
     commit_operation(self);
 }
 
-// NOTE: add with carry-in; A + D + C
 static void ADC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
     commit_operation(self);
-    arithmetic_sum(self, self->databus, self->p.c);
+    arithmetic_operation(self, AOP_ADD, self->databus);
 }
 
 static void AND_exec(struct mos6502 *self, struct decoded dec)
@@ -722,15 +736,12 @@ static void RTS_exec(struct mos6502 *self)
     self->pc = bytowr(self->adl, self->databus);
 }
 
-// NOTE: subtract with carry-in; A - D - ~C, where ~carry indicates borrow-out:
-// A - D => A + (-D) => A + 2sComplement(D) => A + (~D + 1) when C = 1;
-// C = 0 is thus a borrow-out; A + (~D + 0) => A + ~D => A - D - 1.
 static void SBC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
     commit_operation(self);
-    arithmetic_sum(self, ~self->databus, self->p.c);
+    arithmetic_operation(self, AOP_SUB, self->databus);
 }
 
 static void SEC_exec(struct mos6502 *self)
@@ -892,7 +903,7 @@ static void ISC_exec(struct mos6502 *self, struct decoded dec)
     commit_operation(self);
     const uint8_t d = self->databus + 1;
     modify_mem(self, d);
-    arithmetic_sum(self, ~d, self->p.c);
+    arithmetic_operation(self, AOP_SUB, d);
 }
 
 static void JAM_exec(struct mos6502 *self)
@@ -942,7 +953,7 @@ static void RRA_exec(struct mos6502 *self, struct decoded dec)
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
     const uint8_t d = bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
-    arithmetic_sum(self, d, self->p.c);
+    arithmetic_operation(self, AOP_ADD, d);
 }
 
 static void SAX_exec(struct mos6502 *self)

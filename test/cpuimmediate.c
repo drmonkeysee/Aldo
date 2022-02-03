@@ -1871,25 +1871,41 @@ static void sbc_overflow_does_not_include_borrow(void *ctx)
     uint8_t mem[] = {0xe9, 0x80};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
-    cpu.p.c = false;
+    cpu.p.c = true;
     cpu.pc = 0;
-    cpu.a = 0x7f;   // 127 - (-128) - B
+    cpu.a = 0x80;   // (-128) - (-128)
 
     int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0xfeu, cpu.a);
-    ct_assertfalse(cpu.p.c);
-    ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.v);
-    ct_asserttrue(cpu.p.n);
+    ct_assertequal(0x0u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_asserttrue(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
 
     mem[1] = 0x7f;
+    cpu.p.c = true;
+    cpu.pc = 0;
+    cpu.a = 0x80;   // (-128) - 127
+
+    cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x1u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+
+    mem[1] = 0x80;
     cpu.p.c = false;
     cpu.pc = 0;
-    cpu.a = 0x7f;   // 127 - 127 - B
+    cpu.a = 0x80;   // (-128) - (-128) - B
 
     cycles = clock_cpu(&cpu);
 
@@ -1900,22 +1916,6 @@ static void sbc_overflow_does_not_include_borrow(void *ctx)
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
-    ct_asserttrue(cpu.p.n);
-
-    mem[1] = 0x80;
-    cpu.p.c = true;
-    cpu.pc = 0;
-    cpu.a = 0x7f;   // 127 - (-128)
-
-    cycles = clock_cpu(&cpu);
-
-    ct_assertequal(2, cycles);
-    ct_assertequal(2u, cpu.pc);
-
-    ct_assertequal(0xffu, cpu.a);
-    ct_assertfalse(cpu.p.c);
-    ct_assertfalse(cpu.p.z);
-    ct_asserttrue(cpu.p.v);
     ct_asserttrue(cpu.p.n);
 }
 
@@ -2162,14 +2162,14 @@ static void sbc_bcd_borrowout_causes_overflow(void *ctx)
 
 static void sbc_bcd_overflow_does_not_include_borrow(void *ctx)
 {
-    uint8_t mem[] = {0xe9, 0x79};
+    uint8_t mem[] = {0xe9, 0x80};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
     cpu.p.c = true;
     cpu.pc = 0;
-    cpu.a = 0x79;   // 79 - 79
+    cpu.a = 0x80;   // 80 - 80
 
     int cycles = clock_cpu(&cpu);
 
@@ -2182,26 +2182,26 @@ static void sbc_bcd_overflow_does_not_include_borrow(void *ctx)
     ct_assertfalse(cpu.p.v);
     ct_assertfalse(cpu.p.n);
 
-    mem[1] = 0x80;
+    mem[1] = 0x79;
     cpu.p.c = true;
     cpu.pc = 0;
-    cpu.a = 0x79;   // 79 - 80
+    cpu.a = 0x80;   // 80 - 79
 
     cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x99u, cpu.a);
-    ct_assertfalse(cpu.p.c);
+    ct_assertequal(0x1u, cpu.a);
+    ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.v);
-    ct_asserttrue(cpu.p.n);
+    ct_assertfalse(cpu.p.n);
 
-    mem[1] = 0x79;
+    mem[1] = 0x80;
     cpu.p.c = false;
     cpu.pc = 0;
-    cpu.a = 0x79;   // 79 - 79 - B
+    cpu.a = 0x80;   // 80 - 80 - B
 
     cycles = clock_cpu(&cpu);
 

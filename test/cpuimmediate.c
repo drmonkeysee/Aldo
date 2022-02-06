@@ -2652,7 +2652,7 @@ static void arr_zero(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void arr_negative(void *ctx)
+static void arr_negative_exchanges_with_carry(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0xf6};
     struct mos6502 cpu;
@@ -2664,11 +2664,11 @@ static void arr_negative(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0xf9u, cpu.a);
+    ct_assertequal(0x79u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
-    ct_asserttrue(cpu.p.n);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void arr_overflow(void *ctx)
@@ -2703,11 +2703,11 @@ static void arr_loses_carry(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x10u, cpu.a);
+    ct_assertequal(0x90u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void arr_negative_overflow_and_carry(void *ctx)
@@ -2715,6 +2715,7 @@ static void arr_negative_overflow_and_carry(void *ctx)
     uint8_t mem[] = {0x6b, 0xf0};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
+    cpu.p.c = true;
     cpu.a = 0x80;
 
     const int cycles = clock_cpu(&cpu);
@@ -3496,7 +3497,7 @@ struct ct_testsuite cpu_immediate_tests(void)
 
         ct_maketest(arr),
         ct_maketest(arr_zero),
-        ct_maketest(arr_negative),
+        ct_maketest(arr_negative_exchanges_with_carry),
         ct_maketest(arr_overflow),
         ct_maketest(arr_loses_carry),
         ct_maketest(arr_negative_overflow_and_carry),

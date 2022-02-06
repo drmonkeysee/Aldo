@@ -933,17 +933,18 @@ static void ARR_exec(struct mos6502 *self, struct decoded dec)
     // NOTE: not sure this is entirely correct, community docs do not
     // completely agree on exact sequence of side-effects, but the main
     // operations are AND + ROR while the invocation of the adder
-    // causes the overflow and carry flags to act strangely; my best guess at
-    // the operation sequence is:
+    // causes the overflow and carry flags to act strangely;
+    // https://csdb.dk/release/?id=212346 has the clearest description:
     //  A := A AND operand
-    //  set overflow to xor of bit 7 and bit 6 of A (side-effect of adder?)
-    //  set carry to bit 7 of A (side-effect of adder?)
-    //  rotate A right but leave carry unaffected;
-    //      implemented as a standard ROR and then immediately
-    //      restoring carry's pre-ROR value
+    //  set overflow to xor of bit 7 and bit 6 of A (side-effect of adder)
+    //  set carry to bit 7 of A (side-effect of adder)
+    //      but hold the value until after rotate
+    //  rotate A right but leave carry unaffected
+    //      implemented as a standard ROR and then
+    //      setting carry to held value from ADD/ADC step
     load_register(self, &self->a, self->a & self->databus);
     self->p.v = (self->a >> 7) ^ ((self->a >> 6) & 0x1);
-    const bool c = self->p.c = self->a & 0x80;
+    const bool c = self->a & 0x80;
     bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
     self->p.c = c;
 }

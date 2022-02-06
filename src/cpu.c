@@ -113,6 +113,11 @@ static void update_z(struct mos6502 *self, uint8_t d)
     self->p.z = d == 0;
 }
 
+static bool bcd_mode(struct mos6502 *self)
+{
+    return self->bcd && self->p.d;
+}
+
 // NOTE: signed overflow happens when positive + positive = negative
 // or negative + negative = positive, i.e. the sign of A does not match
 // the sign of S and the sign of B does not match the sign of S:
@@ -348,7 +353,7 @@ static void arithmetic_operation(struct mos6502 *self,
     // so always do binary op regardless of BCD flag.
     binary_add(self, a, op == AOP_SUB ? ~b : b, c);
 
-    if (!self->bcd || !self->p.d) return;
+    if (!bcd_mode(self)) return;
 
     // NOTE: decimal mode is 4-bit nibble arithmetic with carry/borrow
     const uint8_t
@@ -943,10 +948,28 @@ static void ARR_exec(struct mos6502 *self, struct decoded dec)
     //      implemented as a standard ROR and then
     //      setting carry to held value from ADD/ADC step
     load_register(self, &self->a, self->a & self->databus);
+    // NOTE: store AND result for later BCD adjustment if necessary
+    const uint8_t and_result = self->a;
     self->p.v = (self->a >> 7) ^ ((self->a >> 6) & 0x1);
     const bool c = self->a & 0x80;
     bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
     self->p.c = c;
+
+    if (!bcd_mode(self)) return;
+
+    // NOTE: once again https://csdb.dk/release/?id=212346 has the best
+    // description of how BCD affects the final result:
+    //  if low nibble of AND result + lsb of low nibble > 0x5, adjust A by 0x6
+    //      but throw away any carry
+    //  if high nibble of A + lsb of high nibble > 0x50, adjust A by 0x60
+    //      and set carry flag
+    if ((and_result & 0xf) + (and_result & 0x1) > 0x5) {
+        self->a = (self->a & 0xf0) | ((self->a + 0x6) & 0xf);
+    }
+    if ((and_result & 0xf0) + (and_result & 0x10) > 0x50) {
+        self->a = ((self->a + 0x60) & 0xf0) | (self->a & 0xf);
+        self->p.c = true;
+    }
 }
 
 static void DCP_exec(struct mos6502 *self, struct decoded dec)

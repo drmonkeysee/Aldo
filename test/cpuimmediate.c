@@ -2730,6 +2730,69 @@ static void arr_negative_overflow_and_carry(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
+static void arr_bcd(void *ctx)
+{
+    uint8_t mem[] = {0x6b, 0x6};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0xa;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x1u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void arr_bcd_low_adjustment(void *ctx)
+{
+    uint8_t mem[] = {0x6b, 0x5};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0xf;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x8u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
+static void arr_bcd_high_adjustment(void *ctx)
+{
+    uint8_t mem[] = {0x6b, 0x50};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0xf0;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x88u, cpu.a);
+    ct_asserttrue(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void lxa(void *ctx)
 {
     uint8_t mem[] = {0xab, 0xc};
@@ -3501,6 +3564,9 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(arr_overflow),
         ct_maketest(arr_loses_carry),
         ct_maketest(arr_negative_overflow_and_carry),
+        ct_maketest(arr_bcd),
+        ct_maketest(arr_bcd_low_adjustment),
+        ct_maketest(arr_bcd_high_adjustment),
 
         ct_maketest(lxa),
         ct_maketest(lxa_zero),

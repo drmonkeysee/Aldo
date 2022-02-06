@@ -959,10 +959,10 @@ static void ARR_exec(struct mos6502 *self, struct decoded dec)
 
     // NOTE: once again https://csdb.dk/release/?id=212346 has the best
     // description of how BCD affects the final result:
-    //  if low nibble of AND result + lsb of low nibble > 0x5, adjust A by 0x6
-    //      but throw away any carry
-    //  if high nibble of A + lsb of high nibble > 0x50, adjust A by 0x60
-    //      and set carry flag
+    //  if low nibble of AND result + lsb of low nibble > 0x5,
+    //      adjust A by 0x6 but throw away carry
+    //  if high nibble of AND result + lsb of high nibble > 0x50,
+    //      adjust A by 0x60 and set carry flag
     if ((and_result & 0xf) + (and_result & 0x1) > 0x5) {
         self->a = (self->a & 0xf0) | ((self->a + 0x6) & 0xf);
     }

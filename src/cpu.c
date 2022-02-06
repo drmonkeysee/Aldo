@@ -300,8 +300,6 @@ static void binary_add(struct mos6502 *self, uint8_t a, uint8_t b, uint8_t c)
     load_register(self, &self->a, sum);
 }
 
-static const uint8_t NibbleMask = 0xf;
-
 static void decimal_add(struct mos6502 *self, uint8_t alo, uint8_t blo,
                         uint8_t ahi, uint8_t bhi, bool c)
 {
@@ -309,18 +307,18 @@ static void decimal_add(struct mos6502 *self, uint8_t alo, uint8_t blo,
     const bool chi = slo > 0x9;
     if (chi) {
         slo += 0x6;
-        slo &= NibbleMask;
+        slo &= 0xf;
     }
     uint8_t shi = ahi + bhi + chi;
-    // NOTE: overflow is set before decimal adjustment
+    // NOTE: overflow and negative are set before decimal adjustment
     update_v(self, shi << 4, ahi << 4, bhi << 4);
+    update_n(self, shi << 4);
     self->p.c = shi > 0x9;
     if (self->p.c) {
         shi += 0x6;
-        shi &= NibbleMask;
+        shi &= 0xf;
     }
     self->a = (shi << 4) | slo;
-    update_n(self, self->a);
 }
 
 static void decimal_subtract(struct mos6502 *self, uint8_t alo, uint8_t blo,
@@ -330,12 +328,12 @@ static void decimal_subtract(struct mos6502 *self, uint8_t alo, uint8_t blo,
     const bool brwhi = dlo >= 0x80; // dlo < 0
     if (brwhi) {
         dlo -= 0x6;
-        dlo &= NibbleMask;
+        dlo &= 0xf;
     }
     uint8_t dhi = ahi - bhi - brwhi;
     if (dhi >= 0x80) {  // dhi < 0
         dhi -= 0x6;
-        dhi &= NibbleMask;
+        dhi &= 0xf;
     }
     // NOTE: bcd subtract does not adjust flags from earlier binary op
     self->a = (dhi << 4) | dlo;
@@ -354,10 +352,10 @@ static void arithmetic_operation(struct mos6502 *self,
 
     // NOTE: decimal mode is 4-bit nibble arithmetic with carry/borrow
     const uint8_t
-        alo = a & NibbleMask,
-        blo = b & NibbleMask,
-        ahi = (a >> 4) & NibbleMask,
-        bhi = (b >> 4) & NibbleMask;
+        alo = a & 0xf,
+        blo = b & 0xf,
+        ahi = (a >> 4) & 0xf,
+        bhi = (b >> 4) & 0xf;
     if (op == AOP_SUB) {
         const uint8_t borrow = c - 1;
         decimal_subtract(self, alo, blo, ahi, bhi, borrow);

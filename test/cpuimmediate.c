@@ -385,7 +385,7 @@ static void adc_bcd_carry(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void adc_bcd_zero(void *ctx)
@@ -427,7 +427,7 @@ static void adc_bcd_missed_zero(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void adc_bcd_negative(void *ctx)
@@ -493,7 +493,7 @@ static void adc_bcd_overflow_to_positive(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-static void adc_bcd_carry_overflow_negative(void *ctx)
+static void adc_bcd_carry_overflow(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x90};
     struct mos6502 cpu;
@@ -511,7 +511,7 @@ static void adc_bcd_carry_overflow_negative(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.v);
-    ct_asserttrue(cpu.p.n);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void adc_bcd_carryin_causes_overflow(void *ctx)
@@ -556,7 +556,7 @@ static void adc_bcd_overflow_does_not_include_carry(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.v);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 
     mem[1] = 0x80;
     cpu.p.c = false;
@@ -572,7 +572,7 @@ static void adc_bcd_overflow_does_not_include_carry(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 
     mem[1] = 0x79;
     cpu.p.c = true;
@@ -588,7 +588,7 @@ static void adc_bcd_overflow_does_not_include_carry(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.v);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void adc_bcd_max(void *ctx)
@@ -609,7 +609,7 @@ static void adc_bcd_max(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.v);
-    ct_asserttrue(cpu.p.n);
+    ct_assertfalse(cpu.p.n);
 }
 
 static void adc_bcd_hex(void *ctx)
@@ -673,7 +673,7 @@ static void adc_bcd_max_hex(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 // SOURCE: http://visual6502.org/wiki/index.php?title=6502DecimalMode
@@ -692,7 +692,7 @@ static void adc_bcd_visual6502_cases(void *ctx)
         {0x93, 0x82, 0, 0x75, 0, 1, 0, 1},  // 93 + 82
         {0x89, 0x76, 0, 0x65, 0, 0, 0, 1},  // 89 + 76
         {0x89, 0x76, 1, 0x66, 0, 0, 1, 1},  // 89 + 76 + C
-        {0x80, 0xf0, 0, 0xd0, 1, 1, 0, 1},  // 80 + 150 (visual6502 has N=0 but that seems wrong?)
+        {0x80, 0xf0, 0, 0xd0, 0, 1, 0, 1},  // 80 + 150
         {0x80, 0xfa, 0, 0xe0, 1, 0, 0, 1},  // 80 + 160?
         {0x2f, 0x4f, 0, 0x74, 0, 0, 0, 0},  // 215? + 415?
         {0x6f, 0x00, 1, 0x76, 0, 0, 0, 0},  // 615? + 0 + C
@@ -3386,7 +3386,7 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(adc_bcd_negative),
         ct_maketest(adc_bcd_overflow_to_negative),
         ct_maketest(adc_bcd_overflow_to_positive),
-        ct_maketest(adc_bcd_carry_overflow_negative),
+        ct_maketest(adc_bcd_carry_overflow),
         ct_maketest(adc_bcd_carryin_causes_overflow),
         ct_maketest(adc_bcd_overflow_does_not_include_carry),
         ct_maketest(adc_bcd_max),

@@ -2772,6 +2772,27 @@ static void arr_bcd_low_adjustment(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+static void arr_bcd_low_adjustment_lost_carry(void *ctx)
+{
+    uint8_t mem[] = {0x6b, 0x1f};
+    struct mos6502 cpu;
+    setup_cpu(&cpu, mem, NULL);
+    cpu.bcd = true;
+    cpu.p.d = true;
+    cpu.a = 0x1f;
+
+    const int cycles = clock_cpu(&cpu);
+
+    ct_assertequal(2, cycles);
+    ct_assertequal(2u, cpu.pc);
+
+    ct_assertequal(0x5u, cpu.a);
+    ct_assertfalse(cpu.p.c);
+    ct_assertfalse(cpu.p.z);
+    ct_assertfalse(cpu.p.v);
+    ct_assertfalse(cpu.p.n);
+}
+
 static void arr_bcd_high_adjustment(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0x50};
@@ -3566,6 +3587,7 @@ struct ct_testsuite cpu_immediate_tests(void)
         ct_maketest(arr_negative_overflow_and_carry),
         ct_maketest(arr_bcd),
         ct_maketest(arr_bcd_low_adjustment),
+        ct_maketest(arr_bcd_low_adjustment_lost_carry),
         ct_maketest(arr_bcd_high_adjustment),
 
         ct_maketest(lxa),

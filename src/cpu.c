@@ -300,55 +300,69 @@ static void binary_add(struct mos6502 *self, uint8_t a, uint8_t b, uint8_t c)
     load_register(self, &self->a, sum);
 }
 
+static const uint8_t NibbleMask = 0xf;
+
+static void decimal_add(struct mos6502 *self, uint8_t alo, uint8_t blo,
+                        uint8_t ahi, uint8_t bhi, bool c)
+{
+    uint8_t slo = alo + blo + c;
+    const bool chi = slo > 0x9;
+    if (chi) {
+        slo += 0x6;
+        slo &= NibbleMask;
+    }
+    uint8_t shi = ahi + bhi + chi;
+    // NOTE: overflow is set before decimal adjustment
+    update_v(self, shi << 4, ahi << 4, bhi << 4);
+    self->p.c = shi > 0x9;
+    if (self->p.c) {
+        shi += 0x6;
+        shi &= NibbleMask;
+    }
+    self->a = (shi << 4) | slo;
+    update_n(self, self->a);
+}
+
+static void decimal_subtract(struct mos6502 *self, uint8_t alo, uint8_t blo,
+                             uint8_t ahi, uint8_t bhi, uint8_t brw)
+{
+    uint8_t dlo = alo - blo + brw;  // borrow is either 0 or -1
+    const bool brwhi = dlo >= 0x80; // dlo < 0
+    if (brwhi) {
+        dlo -= 0x6;
+        dlo &= NibbleMask;
+    }
+    uint8_t dhi = ahi - bhi - brwhi;
+    if (dhi >= 0x80) {  // dhi < 0
+        dhi -= 0x6;
+        dhi &= NibbleMask;
+    }
+    // NOTE: bcd subtract does not adjust flags from earlier binary op
+    self->a = (dhi << 4) | dlo;
+}
+
 static void arithmetic_operation(struct mos6502 *self,
                                  enum arithmetic_operator op, uint8_t b)
 {
     const uint8_t a = self->a;
     const bool c = self->p.c;
-    // NOTE: even in the event of BCD mode some flags are set as if in binary
-    // mode so always do the binary op.
+    // NOTE: even in BCD mode some flags are set as if in binary mode
+    // so always do binary op regardless of BCD flag.
     binary_add(self, a, op == AOP_SUB ? ~b : b, c);
 
     if (!self->bcd || !self->p.d) return;
 
     // NOTE: decimal mode is 4-bit nibble arithmetic with carry/borrow
     const uint8_t
-        alo = a & 0xf,
-        blo = b & 0xf,
-        ahi = (a >> 4) & 0xf,
-        bhi = (b >> 4) & 0xf;
+        alo = a & NibbleMask,
+        blo = b & NibbleMask,
+        ahi = (a >> 4) & NibbleMask,
+        bhi = (b >> 4) & NibbleMask;
     if (op == AOP_SUB) {
-        // NOTE: carry - 1 => borrow
-        uint8_t dlo = alo - blo + (c - 1);
-        const bool brwhi = dlo >= 0x80;
-        if (brwhi) {
-            dlo -= 0x6;
-            dlo &= 0xf;
-        }
-        uint8_t dhi = ahi - bhi - brwhi;
-        if (dhi >= 0x80) {
-            dhi -= 0x6;
-            dhi &= 0xf;
-        }
-        // NOTE: bcd subtract does not set flags differently from binary mode
-        self->a = (dhi << 4) + dlo;
+        const uint8_t borrow = c - 1;
+        decimal_subtract(self, alo, blo, ahi, bhi, borrow);
     } else {
-        uint8_t slo = alo + blo + c;
-        const bool chi = slo > 0x9;
-        if (chi) {
-            slo += 0x6;
-            slo &= 0xf;
-        }
-        uint8_t shi = ahi + bhi + chi;
-        // NOTE: overflow is set before decimal adjustment
-        update_v(self, shi << 4, ahi << 4, bhi << 4);
-        self->p.c = shi > 0x9;
-        if (self->p.c) {
-            shi += 0x6;
-            shi &= 0xf;
-        }
-        self->a = (shi << 4) + slo;
-        update_n(self, self->a);
+        decimal_add(self, alo, blo, ahi, bhi, c);
     }
 }
 

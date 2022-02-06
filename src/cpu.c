@@ -292,23 +292,55 @@ enum arithmetic_operator {
 // where ~carry indicates borrow-out, are equivalent in binary mode:
 //  A - B => A + (-B) => A + 2sComplement(B) => A + (~B + 1) when C = 1;
 //  C = 0 is thus a borrow-out; A + (~B + 0) => A + ~B => A - B - 1.
-static void arithmetic_operation(struct mos6502 *self,
-                                 enum arithmetic_operator op, uint8_t b)
+static void binary_add(struct mos6502 *self, uint8_t a, uint8_t b, uint8_t c)
 {
-    const uint8_t a = self->a;
-    if (op == AOP_SUB) {
-        b = ~b;
-    }
-    const bool c = self->p.c;
     const uint16_t sum = a + b + c;
     self->p.c = sum & 0x100;
     update_v(self, sum, a, b);
     load_register(self, &self->a, sum);
 }
 
+static void arithmetic_operation(struct mos6502 *self,
+                                 enum arithmetic_operator op, uint8_t b)
+{
+    const uint8_t a = self->a;
+    const bool c = self->p.c;
+    // NOTE: even in the event of BCD mode some flags are set as if in binary
+    // mode so always do the binary op.
+    binary_add(self, a, op == AOP_SUB ? ~b : b, c);
+
+    if (!self->bcd || !self->p.d) return;
+
+    if (op == AOP_SUB) {
+        // decimal subtract
+    } else {
+        const uint8_t
+            alo = a & 0xf,
+            blo = b & 0xf,
+            ahi = (a >> 4) & 0xf,
+            bhi = (b >> 4) & 0xf;
+        uint8_t slo = alo + blo + c;
+        const bool chi = slo > 0x9;
+        if (chi) {
+            slo += 0x6;
+            slo &= 0xf;
+        }
+        uint8_t shi = ahi + bhi + chi;
+        // NOTE: overflow is set before decimal adjustment
+        update_v(self, shi << 4, ahi << 4, bhi << 4);
+        self->p.c = shi > 0x9;
+        if (self->p.c) {
+            shi += 0x6;
+            shi &= 0xf;
+        }
+        self->a = (shi << 4) + slo;
+        update_n(self, self->a);
+    }
+}
+
 // NOTE: compare is effectively R - D; modeling the subtraction as
 // R + 2sComplement(D) gets us all the flags for free;
-// see arithmetic_operation for why this works.
+// see binary_add for why this works.
 static uint8_t compare_register(struct mos6502 *self, uint8_t r, uint8_t d)
 {
     const uint16_t cmp = r + (uint8_t)~d + 1;

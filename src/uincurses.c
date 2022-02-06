@@ -88,7 +88,8 @@ static struct view {
     DatapathView,
     RamView;
 
-static void drawhwtraits(const struct control *appstate)
+static void drawhwtraits(const struct control *appstate,
+                         const struct console_state *snapshot)
 {
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
@@ -113,7 +114,9 @@ static void drawhwtraits(const struct control *appstate)
               appstate->clock.total_cycles);
     mvwprintw(HwView.content, cursor_y++, 0, "Cycles per Second: %d",
               appstate->clock.cycles_per_sec);
-    mvwaddstr(HwView.content, cursor_y, 0, "Cycles per Frame: N/A");
+    mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
+    mvwprintw(HwView.content, cursor_y, 0, "BCD Supported: %s",
+              snapshot->cpu.bcd_support ? "Yes" : "No");
 }
 
 static void drawtoggle(const char *label, bool selected)
@@ -513,7 +516,7 @@ static void ramrefresh(int ramsheet)
 static void ncurses_init(void)
 {
     static const int
-        col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 13, ctrlh = 16,
+        col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 14, ctrlh = 16,
         crth = 6, cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");
@@ -531,7 +534,7 @@ static void ncurses_init(void)
         xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
     vinit(&HwView, hwh, col1w, yoffset, xoffset, 2, "Hardware Traits");
     vinit(&ControlsView, ctrlh, col1w, yoffset + hwh, xoffset, 2, "Controls");
-    vinit(&DebuggerView, 8, col1w, yoffset + hwh + ctrlh, xoffset, 2,
+    vinit(&DebuggerView, 7, col1w, yoffset + hwh + ctrlh, xoffset, 2,
           "Debugger");
     vinit(&CartView, crth, col2w, yoffset, xoffset + col1w, 2, "Cart");
     vinit(&PrgView, ramh - crth, col2w, yoffset + crth, xoffset + col1w, 1,
@@ -594,7 +597,7 @@ static void ncurses_refresh(const struct control *appstate,
     assert(appstate != NULL);
     assert(snapshot != NULL);
 
-    drawhwtraits(appstate);
+    drawhwtraits(appstate, snapshot);
     drawcontrols(snapshot);
     drawdebugger(appstate, snapshot);
     drawcart(appstate, snapshot);

@@ -1734,6 +1734,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->cpu.status = get_p(self, false);
     snapshot->cpu.xindex = self->x;
     snapshot->cpu.yindex = self->y;
+    snapshot->cpu.bcd_support = self->bcd;
 
     snapshot->datapath.addressbus = self->addrbus;
     snapshot->datapath.addrlow_latch = self->adl;

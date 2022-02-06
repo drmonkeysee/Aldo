@@ -55,6 +55,7 @@ struct console_state {
     struct {
         uint16_t program_counter;
         uint8_t accumulator, stack_pointer, status, xindex, yindex;
+        bool bcd_support;
     } cpu;
     struct {
         bool irq, nmi, readwrite, ready, reset, sync;

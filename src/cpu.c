@@ -883,9 +883,10 @@ static void TYA_exec(struct mos6502 *self)
 
 // NOTE: magic constant that interferes with accumulator varies based on
 // chip manufacture, temperature, state of chip control signals,
-// and maybe other unknown factors; community docs show FF is a
-// commonly-seen value so just go with that.
-static const uint8_t Magic = 0xff;
+// and maybe other unknown factors;
+// https://csdb.dk/release/?id=212346 recommends using EE so just go with that.
+
+static const uint8_t Magic = 0xee;
 
 static void store_unstable_addresshigh(struct mos6502 *self, uint8_t d)
 {
@@ -967,8 +968,8 @@ static void ISC_exec(struct mos6502 *self, struct decoded dec)
 
 static void JAM_exec(struct mos6502 *self)
 {
-    self->databus = Magic;
-    self->addrbus = bytowr(Magic, Magic);
+    self->databus = 0xff;
+    self->addrbus = bytowr(0xff, 0xff);
 }
 
 static void LAS_exec(struct mos6502 *self, struct decoded dec)

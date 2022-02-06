@@ -2778,8 +2778,8 @@ static void lxa_negative(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0xcfu, cpu.a);
-    ct_assertequal(0xcfu, cpu.x);
+    ct_assertequal(0xceu, cpu.a);
+    ct_assertequal(0xceu, cpu.x);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
 }

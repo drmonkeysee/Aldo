@@ -1922,7 +1922,7 @@ static void sbc_overflow_does_not_include_borrow(void *ctx)
 
 static void sbc_bcd(void *ctx)
 {
-    uint8_t mem[] = {0xe9, 0x4};
+    uint8_t mem[] = {0xe9, 0x2};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
@@ -2026,7 +2026,7 @@ static void sbc_bcd_borrow(void *ctx)
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 static void sbc_bcd_zero(void *ctx)
@@ -2233,7 +2233,7 @@ static void sbc_bcd_min(void *ctx)
 
     ct_assertequal(0x0u, cpu.a);
     ct_asserttrue(cpu.p.c);
-    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);
     ct_assertfalse(cpu.p.n);
 }
@@ -2255,7 +2255,7 @@ static void sbc_bcd_max(void *ctx)
 
     ct_assertequal(0x0u, cpu.a);
     ct_asserttrue(cpu.p.c);
-    ct_assertfalse(cpu.p.z);
+    ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);
     ct_assertfalse(cpu.p.n);
 }
@@ -2312,6 +2312,7 @@ static void sbc_bcd_max_hex(void *ctx)
     cpu.bcd = true;
     cpu.p.d = true;
     cpu.p.c = true;
+    cpu.pc = 0;
     cpu.a = 0xff;   // 165? - 99 = 66.. this actually works
 
     int cycles = clock_cpu(&cpu);
@@ -2326,6 +2327,7 @@ static void sbc_bcd_max_hex(void *ctx)
     ct_assertfalse(cpu.p.n);
 
     mem[1] = 0xff;
+    cpu.pc = 0;
     cpu.a = 0x99;   // 99 - 165? = 34, we're in undocumented behavior territory
 
     cycles = clock_cpu(&cpu);
@@ -2337,7 +2339,7 @@ static void sbc_bcd_max_hex(void *ctx)
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
-    ct_assertfalse(cpu.p.n);
+    ct_asserttrue(cpu.p.n);
 }
 
 // SOURCE: http://visual6502.org/wiki/index.php?title=6502DecimalMode
@@ -3291,7 +3293,7 @@ static void usbc_overflow_does_not_include_borrow(void *ctx)
 
 static void usbc_bcd(void *ctx)
 {
-    uint8_t mem[] = {0xeb, 0x4};
+    uint8_t mem[] = {0xeb, 0x2};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;

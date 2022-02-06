@@ -2220,7 +2220,7 @@ static void isc_bcd_zp_not_supported(void *ctx)
 
     const int cycles = clock_cpu(&cpu);
 
-    ct_assertequal(2, cycles);
+    ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
     ct_assertequal(0xau, cpu.a);

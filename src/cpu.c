@@ -311,14 +311,28 @@ static void arithmetic_operation(struct mos6502 *self,
 
     if (!self->bcd || !self->p.d) return;
 
+    // NOTE: decimal mode is 4-bit nibble arithmetic with carry/borrow
+    const uint8_t
+        alo = a & 0xf,
+        blo = b & 0xf,
+        ahi = (a >> 4) & 0xf,
+        bhi = (b >> 4) & 0xf;
     if (op == AOP_SUB) {
-        // decimal subtract
+        // NOTE: carry - 1 => borrow
+        uint8_t dlo = alo - blo + (c - 1);
+        const bool brwhi = dlo >= 0x80;
+        if (brwhi) {
+            dlo -= 0x6;
+            dlo &= 0xf;
+        }
+        uint8_t dhi = ahi - bhi - brwhi;
+        if (dhi >= 0x80) {
+            dhi -= 0x6;
+            dhi &= 0xf;
+        }
+        // NOTE: bcd subtract does not set flags differently from binary mode
+        self->a = (dhi << 4) + dlo;
     } else {
-        const uint8_t
-            alo = a & 0xf,
-            blo = b & 0xf,
-            ahi = (a >> 4) & 0xf,
-            bhi = (b >> 4) & 0xf;
         uint8_t slo = alo + blo + c;
         const bool chi = slo > 0x9;
         if (chi) {

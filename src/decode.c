@@ -16,8 +16,8 @@
 
 const int BrkOpcode = 0x0;
 
-// Decoding table for all official MOS6502
-// and unofficial (undocumented, illegal) Ricoh 2A03 opcodes.
+// Decoding table for all official and
+// unofficial (undocumented, illegal) MOS6502 opcodes.
 
 // Unofficial opcodes are derived from a combination of sources:
 //  http://www.oxyron.de/html/opcodes02.html

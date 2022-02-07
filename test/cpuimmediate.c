@@ -684,7 +684,7 @@ static void adc_bcd_visual6502_cases(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
-    const uint8_t cases[10][8] = {
+    const uint8_t cases[][8] = {
         // A  +  M + C =  A   N  V  Z  C
         {0x00, 0x00, 0, 0x00, 0, 0, 1, 0},  // 0 + 0
         {0x79, 0x00, 1, 0x80, 1, 1, 0, 0},  // 79 + 0 + C
@@ -2350,7 +2350,7 @@ static void sbc_bcd_visual6502_cases(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
-    const uint8_t cases[7][8] = {
+    const uint8_t cases[][8] = {
         // A  -  M - B =  A   N  V  Z  C
         {0x00, 0x00, 0, 0x99, 1, 0, 0, 0},  // 0 - 0 - B
         {0x00, 0x00, 1, 0x00, 0, 0, 1, 1},  // 0 - 0

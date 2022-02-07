@@ -1689,12 +1689,11 @@ void cpu_powerup(struct mos6502 *self)
     // NOTE: Initialize physical lines and control flags to known state
     self->signal.irq = self->signal.nmi = self->signal.res =
         self->signal.rw = self->detached = true;
-    self->signal.rdy = self->signal.sync = self->bcd = self->bflt =
-        self->presync = false;
+    self->signal.rdy = self->signal.sync = self->bflt = self->presync = false;
 
     // NOTE: initialize internal registers to known state
     self->pc = self->a = self->s = self->x = self->y =
-        self->t = self->adl = self->adh = self->adc = 0;
+        self->t = self->opc = self->adl = self->adh = self->adc = 0;
     set_p(self, 0x34);
 
     // TODO: simulate res held low on startup to engage reset sequence.

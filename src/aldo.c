@@ -210,7 +210,8 @@ static int run_emu(struct control *appstate, cart *c)
 
     int result = EXIT_SUCCESS;
     // NOTE: always dump RAM contents in batch mode
-    nes *console = nes_new(c, appstate->tron, appstate->batch, dbg);
+    nes *console = nes_new(c, appstate->tron, appstate->batch,
+                           appstate->bcdsupport, dbg);
     if (!console) {
         result = EXIT_FAILURE;
         goto exit_debug;

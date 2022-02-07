@@ -19,6 +19,7 @@ static const char
     *const restrict Version = "0.3.0", // TODO: autogenerate this
 
     *const restrict BatchLong = "--batch",
+    *const restrict BcdLong = "--bcd",
     *const restrict ChrDecodeLong = "--chr-decode",
     *const restrict ChrScaleLong = "--chr-scale",
     *const restrict DisassembleLong = "--disassemble",
@@ -31,6 +32,7 @@ static const char
 
 static const char
     BatchShort = 'b',
+    BcdShort = 'D',
     ChrDecodeShort = 'c',
     ChrScaleShort = 's',
     DisassembleShort = 'd',
@@ -181,6 +183,7 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
     }
 
     SETFLAG(appstate->batch, arg, BatchShort, BatchLong);
+    SETFLAG(appstate->bcdsupport, arg, BcdShort, BcdLong);
     SETFLAG(appstate->disassemble, arg, DisassembleShort, DisassembleLong);
     SETFLAG(appstate->help, arg, HelpShort, HelpLong);
     SETFLAG(appstate->info, arg, InfoShort, InfoLong);
@@ -225,6 +228,8 @@ void argparse_usage(const char *me)
     puts("\noptions");
     printf("  -%c\t: run program in batch mode (alt %s)\n", BatchShort,
            BatchLong);
+    printf("  -%c\t: enable BCD (binary-coded decimal) support (alt %s)\n",
+           BcdShort, BcdLong);
     printf("  -%c e\t: halt condition expression (alt %s e),"
            "\n\t  multiple -H options can be specified;"
            "\n\t  see below usage section for syntax\n", HaltShort, HaltLong);

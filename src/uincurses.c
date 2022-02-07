@@ -88,8 +88,7 @@ static struct view {
     DatapathView,
     RamView;
 
-static void drawhwtraits(const struct control *appstate,
-                         const struct console_state *snapshot)
+static void drawhwtraits(const struct control *appstate)
 {
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
@@ -116,7 +115,7 @@ static void drawhwtraits(const struct control *appstate,
               appstate->clock.cycles_per_sec);
     mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
     mvwprintw(HwView.content, cursor_y, 0, "BCD Supported: %s",
-              snapshot->cpu.bcd_support ? "Yes" : "No");
+              appstate->bcdsupport ? "Yes" : "No");
 }
 
 static void drawtoggle(const char *label, bool selected)
@@ -597,7 +596,7 @@ static void ncurses_refresh(const struct control *appstate,
     assert(appstate != NULL);
     assert(snapshot != NULL);
 
-    drawhwtraits(appstate, snapshot);
+    drawhwtraits(appstate);
     drawcontrols(snapshot);
     drawdebugger(appstate, snapshot);
     drawcart(appstate, snapshot);

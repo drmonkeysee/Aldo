@@ -28,8 +28,8 @@ struct control {
     struct cycleclock clock;
     int chrscale, ramsheet, resetvector;
     bool
-        batch, chrdecode, disassemble, help, info, running, tron, verbose,
-        version;
+        batch, bcdsupport, chrdecode, disassemble, help, info, running, tron,
+        verbose, version;
 };
 
 extern const int MinCps, MaxCps, RamSheets;

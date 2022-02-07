@@ -288,11 +288,6 @@ static void store_data(struct mos6502 *self, uint8_t d)
     write(self);
 }
 
-enum arithmetic_operator {
-    AOP_ADD,
-    AOP_SUB,
-};
-
 // NOTE: add with carry-in: A + B + C and subtract with carry-in: A - B - ~C,
 // where ~carry indicates borrow-out, are equivalent in binary mode:
 //  A - B => A + (-B) => A + 2sComplement(B) => A + (~B + 1) when C = 1;
@@ -343,6 +338,11 @@ static void decimal_subtract(struct mos6502 *self, uint8_t alo, uint8_t blo,
     // NOTE: bcd subtract does not adjust flags from earlier binary op
     self->a = (dhi << 4) | dlo;
 }
+
+enum arithmetic_operator {
+    AOP_ADD,
+    AOP_SUB,
+};
 
 static void arithmetic_operation(struct mos6502 *self,
                                  enum arithmetic_operator op, uint8_t b)
@@ -946,9 +946,8 @@ static void ARR_exec(struct mos6502 *self, struct decoded dec)
     //  rotate A right but leave carry unaffected
     //      implemented as a standard ROR and then
     //      setting carry to held value from ADD/ADC step
-    load_register(self, &self->a, self->a & self->databus);
-    // NOTE: store AND result for later BCD adjustment if necessary
-    const uint8_t and_result = self->a;
+    const uint8_t and_result = self->a & self->databus;
+    load_register(self, &self->a, and_result);
     self->p.v = (self->a >> 7) ^ ((self->a >> 6) & 0x1);
     const bool c = self->a & 0x80;
     bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);

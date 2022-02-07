@@ -107,7 +107,7 @@ static void instruction_trace(struct nes_console *self,
     trace_line(self->tracelog, clock->total_cycles - 1, &self->cpu, &snapshot);
 }
 
-static void ram_trace(const struct nes_console *self)
+static void ram_dump(const struct nes_console *self)
 {
     errno = 0;
     FILE *const ramtrace = fopen(RamLog, "wb");
@@ -158,7 +158,7 @@ void nes_free(nes *self)
         fclose(self->tracelog);
     }
     if (self->dumpram || self->tracelog) {
-        ram_trace(self);
+        ram_dump(self);
     }
     free_cpubus(self);
     free(self);

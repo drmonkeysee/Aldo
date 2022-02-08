@@ -1,6 +1,6 @@
 # BCD (Binary-Coded Decimal) Integration Test
 
-The BCD test is derived from Bruce Clark's verification program at [6502.org](http://6502.org). The original listing can be found in [BCD tutorial page (Appendix B)](http://6502.org/tutorials/decimal_mode.html#B) and the header is duplicated here for reference:
+The BCD test is derived from Bruce Clark's verification program at [6502.org](http://6502.org). The original listing can be found at [BCD tutorial page (Appendix B)](http://6502.org/tutorials/decimal_mode.html#B) but the header is duplicated here for reference:
 
 ```
 ; Verify decimal mode behavior
@@ -32,7 +32,7 @@ The source code was compiled using [Easy 6502](https://skilldrick.github.io/easy
 
 The out file contains only the bytes consisting of the test program. In order to run it in Aldo, **bcdtest.py** expands the program into a 32KB ROM file, **bcdtest.rom**, with the appropriate offsets and RESET vector so it can be run directly with no additional adjustments. This is all automated with the make target **bcdtest**.
 
-The variable table used by the test ROM is listed below:
+The test ROM's variable table is listed below:
 
 ```
 .define ERROR	$00

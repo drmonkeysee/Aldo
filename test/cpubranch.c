@@ -10,6 +10,7 @@
 #include "cpu.h"
 #include "cpuhelp.h"
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 

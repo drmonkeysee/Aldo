@@ -7,8 +7,6 @@
 
 #include "ui.h"
 
-#include "tsutil.h"
-
 #include <assert.h>
 
 int ui_batch_init(struct ui_interface *ui);

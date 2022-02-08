@@ -1,6 +1,6 @@
 # BCD (Binary-Coded Decimal) Integration Test
 
-The BCD test is derived from Bruce Clark's verification program at [6502.org](http://6502.org). The original listing can be found at [BCD tutorial page (Appendix B)](http://6502.org/tutorials/decimal_mode.html#B) but the header is duplicated here for reference:
+The BCD test is derived from Bruce Clark's verification program at [6502.org](http://6502.org). The original listing can be found at [Decimal Mode tutorial (Appendix B)](http://6502.org/tutorials/decimal_mode.html#B) but the header is duplicated here for reference:
 
 ```
 ; Verify decimal mode behavior

@@ -1,6 +1,6 @@
-# BCD (Binary-Coded Decimal) Test
+# BCD (Binary-Coded Decimal) Integration Test
 
-The BCD test is derived from Bruce Clark's verification program at [6502.org](http://6502.org). The original listing can be found in the [BCD tutorial page (Appendix B)](http://6502.org/tutorials/decimal_mode.html#B). The header is duplicated here for reference:
+The BCD test is derived from Bruce Clark's verification program at [6502.org](http://6502.org). The original listing can be found in [BCD tutorial page (Appendix B)](http://6502.org/tutorials/decimal_mode.html#B) and the header is duplicated here for reference:
 
 ```
 ; Verify decimal mode behavior
@@ -28,27 +28,29 @@ The BCD test is derived from Bruce Clark's verification program at [6502.org](ht
 ;
 ```
 
-The source code was compiled using [Easy 6502](https://skilldrick.github.io/easy6502/) with some very minor modifications to match that assembler's syntax expectations, then adjusted to execute within the $86XX memory page rather than Easy 6502's default of $06XX to match the assumptions of a NES emulator memory map. The resulting bytes are saved in **bcdtest.out**.
+The source code was compiled using [Easy 6502](https://skilldrick.github.io/easy6502/) with some very minor modifications to match that assembler's syntax expectations, then adjusted to execute within the $86XX memory page rather than Easy 6502's default of $06XX to match the NES memory map. The resulting bytes are saved in **bcdtest.out**.
 
-The out filecontains only the bytes consisting of the test program. In order to run it in Aldo, **bcdtest.py** expands the program into a 32KB ROM file with the appropriate offsets and RESET vector so it can be run directly with no additional adjustments. The output of **bcdtest.py** is **bcdtest.rom**. This is all automated with the make target **bcdtest**.
+The out file contains only the bytes consisting of the test program. In order to run it in Aldo, **bcdtest.py** expands the program into a 32KB ROM file, **bcdtest.rom**, with the appropriate offsets and RESET vector so it can be run directly with no additional adjustments. This is all automated with the make target **bcdtest**.
 
-Listed below is the variable table and disassembly of the adjusted verification program.
+The variable table used by the test ROM is listed below:
 
 ```
-.define ERROR	$0
-.define AR	$1
-.define CF	$2
-.define DA	$3
-.define DNVZC	$4
-.define HA	$5
-.define HNVZC	$8
-.define N1	$9
-.define N1H	$A
-.define N1L	$B
-.define N2	$C
-.define N2L	$D
-.define NF	$E
-.define VF	$F
+.define ERROR	$00
+.define AR	$01
+.define CF	$02
+.define DA	$03
+.define DNVZC	$04
+.define HA	$05
+.define HNVZC	$08
+.define N1	$09
+.define N1H	$0A
+.define N1L	$0B
+.define N2	$0C
+.define N2L	$0D
+.define NF	$0E
+.define VF	$0F
 .define ZF	$10
 .define N2H	$11
 ```
+
+To get a disassembly of the test program run `build/aldo -d test/bcdtest.rom`.

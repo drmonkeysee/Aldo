@@ -25,7 +25,6 @@ static void powerup_initializes_cpu(void *ctx)
     ct_asserttrue(cpu.detached);
     ct_assertfalse(cpu.signal.rdy);
     ct_assertfalse(cpu.signal.sync);
-    ct_assertfalse(cpu.bcd);
     ct_assertfalse(cpu.bflt);
     ct_assertfalse(cpu.presync);
 }

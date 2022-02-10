@@ -35,7 +35,7 @@ The verification target is made up of these test targets:
 
 - `make test`: Aldo unit tests, written using [CinyTest](https://github.com/drmonkeysee/CinyTest)
 - `make nestest nesdiff`: kevtris's [nestest CPU tests](https://wiki.nesdev.org/w/index.php?title=Emulator_tests)
-- `make bcdtest`: Bruce Clark's [Binary-coded Decimal tests](http://6502.org/tutorials/decimal_mode.html)]; additional details in [BCDTEST.md](test/BCDTEST.md)
+- `make bcdtest`: Bruce Clark's [Binary-coded Decimal tests](http://6502.org/tutorials/decimal_mode.html); additional details in [BCDTEST.md](test/BCDTEST.md)
 
 ## Resources
 

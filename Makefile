@@ -19,9 +19,14 @@ PRODUCT := aldo
 TESTS := $(PRODUCT)tests
 TARGET := $(BUILD_DIR)/$(PRODUCT)
 TESTS_TARGET := $(BUILD_DIR)/$(TESTS)
-NESTEST_CMP := nestest-cmp.log
-TRACE_CMP := trace-cmp.log
+NESTEST_HTTP := https://raw.githubusercontent.com/christopherpow/nes-test-roms/master/other
+NESTEST_ROM := $(TEST_DIR)/nestest.nes
+NESTEST_LOG := $(TEST_DIR)/nestest.log
+NESTEST_CMP := $(TEST_DIR)/nestest-cmp.log
+TRACE_CMP := $(TEST_DIR)/trace-cmp.log
 BCDTEST_ROM := $(TEST_DIR)/bcdtest.rom
+PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) \
+		$(TRACE_CMP) $(BCDTEST_ROM)
 
 CFLAGS := -Wall -Wextra -std=c17
 SRC_CFLAGS := -pedantic
@@ -36,7 +41,7 @@ ifdef XLF
 LDFLAGS += $(XLF)
 endif
 
-.PHONY: bcdtest check clean debug nesdiff nestest release run
+.PHONY: bcdtest check clean debug nesdiff nestest purge release run
 
 release: CFLAGS += -Werror -Os -flto -DNDEBUG
 ifneq ($(OS), Darwin)
@@ -91,13 +96,16 @@ $(OBJ_DIR) $(TEST_OBJ_DIR):
 run: debug
 	$(TARGET) $(FILE)
 
-nestest: debug
-	rm -f $(TRACE_CMP)
-	$(TARGET) -btv -H@c66e -Hjam -H3s -rc000 nestest.nes
+$(NESTEST_ROM) $(NESTEST_LOG):
+	cd $(TEST_DIR) && curl -O '$(NESTEST_HTTP)/$(notdir $@)'
 
-$(NESTEST_CMP):
+nestest: $(NESTEST_ROM) debug
+	rm -f $(TRACE_CMP)
+	$(TARGET) -btv -H@c66e -Hjam -H3s -rc000 $<
+
+$(NESTEST_CMP): $(NESTEST_LOG)
 	# NOTE: strip out PPU column (unimplemented) and Accumulator cue (implied)
-	sed -e 's/PPU:.\{3\},.\{3\} //' -e 's/ A /   /' nestest.log > $@
+	sed -e 's/PPU:.\{3\},.\{3\} //' -e 's/ A /   /' $< > $@
 
 $(TRACE_CMP):
 	# NOTE: convert aldo trace log format to nestest format
@@ -117,10 +125,13 @@ nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
 $(BCDTEST_ROM):
 	python3 $(TEST_DIR)/bcdtest.py
 
-bcdtest: $(BCDTEST_ROM)
+bcdtest: $(BCDTEST_ROM) debug
 	$(TARGET) -bDv -H@864b $<
 	hexdump -C system.ram | head -n1 | awk '{ print "ERROR =",$$2; \
 	if ($$2 == 0) print "Pass!"; else { print "Fail :("; exit 1 }}'
 
 clean:
 	$(RM) -r $(BUILD_DIR)
+
+purge: clean
+	$(RM) $(PURGE_ASSETS)

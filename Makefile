@@ -27,7 +27,7 @@ NESTEST_DIFF := $(TEST_DIR)/nestest.diff
 TRACE_CMP := $(TEST_DIR)/trace-cmp.log
 BCDTEST_ROM := $(TEST_DIR)/bcdtest.rom
 PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) $(NESTEST_DIFF) \
-		$(TRACE_CMP) $(BCDTEST_ROM)
+		$(TRACE_CMP) $(BCDTEST_ROM) trace.log system.ram
 
 CFLAGS := -Wall -Wextra -std=c17
 SRC_CFLAGS := -pedantic

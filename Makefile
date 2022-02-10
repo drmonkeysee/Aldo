@@ -23,9 +23,10 @@ NESTEST_HTTP := https://raw.githubusercontent.com/christopherpow/nes-test-roms/m
 NESTEST_ROM := $(TEST_DIR)/nestest.nes
 NESTEST_LOG := $(TEST_DIR)/nestest.log
 NESTEST_CMP := $(TEST_DIR)/nestest-cmp.log
+NESTEST_DIFF := $(TEST_DIR)/nestest.diff
 TRACE_CMP := $(TEST_DIR)/trace-cmp.log
 BCDTEST_ROM := $(TEST_DIR)/bcdtest.rom
-PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) \
+PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) $(NESTEST_DIFF) \
 		$(TRACE_CMP) $(BCDTEST_ROM)
 
 CFLAGS := -Wall -Wextra -std=c17
@@ -41,7 +42,7 @@ ifdef XLF
 LDFLAGS += $(XLF)
 endif
 
-.PHONY: bcdtest check clean debug nesdiff nestest purge release run
+.PHONY: bcdtest check clean debug nesdiff nestest purge release run test
 
 release: CFLAGS += -Werror -Os -flto -DNDEBUG
 ifneq ($(OS), Darwin)
@@ -53,8 +54,8 @@ release: $(TARGET)
 debug: CFLAGS += -g -O0 -DDEBUG
 debug: $(TARGET)
 
-check: CFLAGS += -g -O0 -DDEBUG
-check: $(TESTS_TARGET)
+test: CFLAGS += -g -O0 -DDEBUG
+test: $(TESTS_TARGET)
 	$(TESTS_TARGET)
 
 ifeq ($(OS), Darwin)
@@ -120,7 +121,10 @@ $(TRACE_CMP):
 		printf "%-47s%s%s\n", $$1, FS, $$2 }' > $@
 
 nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
-	echo "$$(diff -y --suppress-common-lines $^ | wc -l) lines differ"
+	diff -y --suppress-common-lines $^ > $(NESTEST_DIFF) ; \
+	DIFF_RESULT=$$? ; \
+	echo "$$(wc -l < $(NESTEST_DIFF)) lines differ" ; \
+	exit $$DIFF_RESULT
 
 $(BCDTEST_ROM):
 	python3 $(TEST_DIR)/bcdtest.py
@@ -128,7 +132,9 @@ $(BCDTEST_ROM):
 bcdtest: $(BCDTEST_ROM) debug
 	$(TARGET) -bDv -H@864b $<
 	hexdump -C system.ram | head -n1 | awk '{ print "ERROR =",$$2; \
-	if ($$2 == 0) print "Pass!"; else { print "Fail :("; exit 1 }}'
+	if ($$2 == 0) print "BCD Pass!"; else { print "BCD Fail :("; exit 1 }}'
+
+check: test nestest nesdiff bcdtest
 
 clean:
 	$(RM) -r $(BUILD_DIR)

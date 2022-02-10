@@ -234,6 +234,7 @@ cython_debug/
 
 
 # Project
+*.diff
 *.nes
 *.out
 *.r[ao]m

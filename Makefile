@@ -21,6 +21,7 @@ TARGET := $(BUILD_DIR)/$(PRODUCT)
 TESTS_TARGET := $(BUILD_DIR)/$(TESTS)
 NESTEST_CMP := nestest-cmp.log
 TRACE_CMP := trace-cmp.log
+BCDTEST_ROM := $(TEST_DIR)/bcdtest.rom
 
 CFLAGS := -Wall -Wextra -std=c17
 SRC_CFLAGS := -pedantic
@@ -35,7 +36,7 @@ ifdef XLF
 LDFLAGS += $(XLF)
 endif
 
-.PHONY: check clean debug nesdiff nestest release run
+.PHONY: bcdtest check clean debug nesdiff nestest release run
 
 release: CFLAGS += -Werror -Os -flto -DNDEBUG
 ifneq ($(OS), Darwin)
@@ -112,6 +113,14 @@ $(TRACE_CMP):
 
 nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
 	echo "$$(diff -y --suppress-common-lines $^ | wc -l) lines differ"
+
+$(BCDTEST_ROM):
+	python3 $(TEST_DIR)/bcdtest.py
+
+bcdtest: $(BCDTEST_ROM)
+	$(TARGET) -bDv -H@864b $<
+	hexdump -C system.ram | head -n1 | awk '{ print "ERROR =",$$2; \
+	if ($$2 == 0) print "Pass!"; else { print "Fail :("; exit 1 }}'
 
 clean:
 	$(RM) -r $(BUILD_DIR)

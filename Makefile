@@ -24,10 +24,11 @@ NESTEST_ROM := $(TEST_DIR)/nestest.nes
 NESTEST_LOG := $(TEST_DIR)/nestest.log
 NESTEST_CMP := $(TEST_DIR)/nestest-cmp.log
 NESTEST_DIFF := $(TEST_DIR)/nestest.diff
+TRACE_LOG := trace.log
 TRACE_CMP := $(TEST_DIR)/trace-cmp.log
 BCDTEST_ROM := $(TEST_DIR)/bcdtest.rom
 PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) $(NESTEST_DIFF) \
-		$(TRACE_CMP) $(BCDTEST_ROM) trace.log system.ram
+		$(TRACE_CMP) $(BCDTEST_ROM) $(TRACE_LOG) system.ram
 
 CFLAGS := -Wall -Wextra -std=c17
 SRC_CFLAGS := -pedantic
@@ -113,7 +114,7 @@ $(TRACE_CMP):
 	sed -e 's/:/ /' -e 's/>/=/' -e 's/S:/SP:/' -e 's/CPU/CYC/' \
 		-e 's/[+-][[:digit:]]\{1,3\} @ /$$/' \
 		-e 's/\(P:\)\(..\) (.\{8\})/\10x\2/' \
-		-e 's/\*ISC/\*ISB/' -e 's/FLT/FF/' trace.log \
+		-e 's/\*ISC/\*ISB/' -e 's/FLT/FF/' $(TRACE_LOG) \
 		| awk 'BEGIN { FS=" A:" } NR > 1 \
 		{ p=substr($$2, match($$2, /0x../), 4); \
 		mask="echo $$((" p " & 0xef))"; mask | getline p; close(mask); \

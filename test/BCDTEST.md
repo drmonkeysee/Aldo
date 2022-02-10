@@ -30,7 +30,7 @@ Included here is an integration test verifying Aldo's binary-coded decimal arith
 
 The source code was assembled (after some minor syntax tweaks) using [Easy 6502](https://skilldrick.github.io/easy6502/), then relocated from Easy 6502's default $06XX address space to the $86XX page of the NES memory map. **bcdtest.out** contains the resulting program bytes.
 
-The out file contains only the program instructions, so in order to run it in Aldo **bcdtest.py** expands the program into a 32KB ROM image with the appropriate offsets and RESET vector and stores that in **bcdtest.rom**. The make target `bcdtest` automates this conversion step and executes the ROM, printing the result of the integration test.
+The **bcdtest.py** script expands the program into a 32KB ROM image with the appropriate offsets and RESET vector and stores that in **bcdtest.rom**, which can then be run by Aldo. The make target `bcdtest` automates this conversion step and executes the ROM, printing the result of the integration test.
 
 The test ROM's variable table is listed below:
 

@@ -26,10 +26,16 @@ The Homebrew and ncurses steps get you the latest version of ncurses and are opt
 
 ## Test
 
-The Makefile also provides a unit-test build target.
+The Makefile also provides a verification target.
 
 1. Follow the [CinyTest build/install instructions](https://github.com/drmonkeysee/CinyTest#build-cinytest)
 2. `make check`
+
+The verification target is made up of these test targets:
+
+- `make test`: Aldo unit tests, written using [CinyTest](https://github.com/drmonkeysee/CinyTest)
+- `make nestest nesdiff`: kevtris's [nestest CPU tests](https://wiki.nesdev.org/w/index.php?title=Emulator_tests)
+- `make bcdtest`: Bruce Clark's [Binary-coded Decimal tests](http://6502.org/tutorials/decimal_mode.html)]; additional details in [BCDTEST.md](test/BCDTEST.md)
 
 ## Resources
 

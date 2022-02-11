@@ -1,6 +1,8 @@
 # Aldo
 
-A NES emulator written in C, targeting the C17 standard and using (most) of the guidelines of Modern C.
+A [MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502) emulator written in C, targeting the C17 standard and using (most) of the guidelines of Modern C.
+
+The current milestone is to build a NES emulator, but the long-term goal is for Aldo to be a "fantasy" 6502 computer (similar to [PICO-8's](https://www.lexaloffle.com/pico-8.php) "fantasy console" concept), as well as being able to emulate other 6502 systems beyond the NES, such as the [Commodore 64](https://en.wikipedia.org/wiki/Commodore_64) or [Apple II](https://en.wikipedia.org/wiki/Apple_II).
 
 ## Build
 

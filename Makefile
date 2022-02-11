@@ -19,6 +19,7 @@ PRODUCT := aldo
 TESTS := $(PRODUCT)tests
 TARGET := $(BUILD_DIR)/$(PRODUCT)
 TESTS_TARGET := $(BUILD_DIR)/$(TESTS)
+
 NESTEST_HTTP := https://raw.githubusercontent.com/christopherpow/nes-test-roms/master/other
 NESTEST_ROM := $(TEST_DIR)/nestest.nes
 NESTEST_LOG := $(TEST_DIR)/nestest.log
@@ -55,9 +56,35 @@ release: $(TARGET)
 debug: CFLAGS += -g -O0 -DDEBUG
 debug: $(TARGET)
 
+run: debug
+	$(TARGET) $(FILE)
+
+check: test nestest nesdiff bcdtest
+
 test: CFLAGS += -g -O0 -DDEBUG
 test: $(TESTS_TARGET)
 	$(TESTS_TARGET)
+
+nestest: $(NESTEST_ROM) debug
+	rm -f $(TRACE_CMP)
+	$(TARGET) -btv -H@c66e -Hjam -H3s -rc000 $<
+
+nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
+	diff -y --suppress-common-lines $^ > $(NESTEST_DIFF) ; \
+	DIFF_RESULT=$$? ; \
+	echo "$$(wc -l < $(NESTEST_DIFF)) lines differ" ; \
+	exit $$DIFF_RESULT
+
+bcdtest: $(BCDTEST_ROM) debug
+	$(TARGET) -bDv -H@864b $<
+	hexdump -C system.ram | head -n1 | awk '{ print "ERROR =",$$2; \
+	if ($$2 == 0) print "BCD Pass!"; else { print "BCD Fail :("; exit 1 }}'
+
+clean:
+	$(RM) -r $(BUILD_DIR)
+
+purge: clean
+	$(RM) $(PURGE_ASSETS)
 
 ifeq ($(OS), Darwin)
 $(TARGET): LDFLAGS := -L/opt/homebrew/opt/ncurses/lib
@@ -95,15 +122,8 @@ $(TEST_OBJ_DIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_DIR)
 $(OBJ_DIR) $(TEST_OBJ_DIR):
 	mkdir -p $@
 
-run: debug
-	$(TARGET) $(FILE)
-
 $(NESTEST_ROM) $(NESTEST_LOG):
 	cd $(TEST_DIR) && curl -O '$(NESTEST_HTTP)/$(notdir $@)'
-
-nestest: $(NESTEST_ROM) debug
-	rm -f $(TRACE_CMP)
-	$(TARGET) -btv -H@c66e -Hjam -H3s -rc000 $<
 
 $(NESTEST_CMP): $(NESTEST_LOG)
 	# NOTE: strip out PPU column (unimplemented) and Accumulator cue (implied)
@@ -121,24 +141,5 @@ $(TRACE_CMP):
 		p = sprintf("%X", p); sub(/0x../, p, $$2); \
 		printf "%-47s%s%s\n", $$1, FS, $$2 }' > $@
 
-nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
-	diff -y --suppress-common-lines $^ > $(NESTEST_DIFF) ; \
-	DIFF_RESULT=$$? ; \
-	echo "$$(wc -l < $(NESTEST_DIFF)) lines differ" ; \
-	exit $$DIFF_RESULT
-
 $(BCDTEST_ROM):
 	python3 $(TEST_DIR)/bcdtest.py
-
-bcdtest: $(BCDTEST_ROM) debug
-	$(TARGET) -bDv -H@864b $<
-	hexdump -C system.ram | head -n1 | awk '{ print "ERROR =",$$2; \
-	if ($$2 == 0) print "BCD Pass!"; else { print "BCD Fail :("; exit 1 }}'
-
-check: test nestest nesdiff bcdtest
-
-clean:
-	$(RM) -r $(BUILD_DIR)
-
-purge: clean
-	$(RM) $(PURGE_ASSETS)

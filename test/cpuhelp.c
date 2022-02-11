@@ -48,6 +48,10 @@ static bus *restrict TestBus;
 static struct busdevice Ram = {.read = TestRead, .write = TestWrite},
                         Rom = {.read = TestRead};
 
+//
+// Public Interface
+//
+
 // NOTE: one page of rom + extra to test page boundary addressing
 uint8_t BigRom[] = {
     0xca,

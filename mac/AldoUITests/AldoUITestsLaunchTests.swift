@@ -1,14 +1,13 @@
 //
 //  AldoUITestsLaunchTests.swift
-//  AldoUITests
+//  Aldo-AppUITests
 //
 //  Created by Brandon Stansbury on 2/24/22.
 //
 
 import XCTest
 
-class AldoUITestsLaunchTests: XCTestCase {
-
+final class AldoUITestsLaunchTests: XCTestCase {
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true
     }

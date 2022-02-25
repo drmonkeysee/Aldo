@@ -1,6 +1,6 @@
 //
 //  AldoTests.swift
-//  AldoTests
+//  Aldo-AppTests
 //
 //  Created by Brandon Stansbury on 2/24/22.
 //
@@ -8,8 +8,7 @@
 import XCTest
 @testable import Aldo
 
-class AldoTests: XCTestCase {
-
+final class AldoTests: XCTestCase {
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -32,5 +31,4 @@ class AldoTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
-
 }

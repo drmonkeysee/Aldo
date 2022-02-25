@@ -7,10 +7,10 @@
 
 import XCTest
 
-class Tests: XCTestCase {
+final class Tests: XCTestCase {
     func testRunner() throws {
-        let failed = swift_runner();
+        let failed = swift_runner()
 
-        XCTAssertEqual(0, failed);
+        XCTAssertEqual(0, failed)
     }
 }

@@ -8,11 +8,30 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var fileUrl: URL?
+
     var body: some View {
-        Text("Hello from Aldo!")
-            .font(.title)
-            .foregroundColor(.cyan)
+        VStack {
+            Text("Hello from Aldo!")
+                .font(.title)
+                .foregroundColor(.cyan)
+                .padding()
+            Text(fileUrl?.lastPathComponent ?? "No file selected")
+                .padding(.horizontal)
+                .truncationMode(.middle)
+            Button("Choose ROM File") {
+                self.fileUrl = chooseFile()
+            }
             .padding()
+        }
+    }
+
+    private func chooseFile() -> URL? {
+        let panel = NSOpenPanel()
+        panel.message = "Choose a ROM file"
+        return panel.runModal() == NSApplication.ModalResponse.OK
+                ? panel.url
+                : nil
     }
 }
 

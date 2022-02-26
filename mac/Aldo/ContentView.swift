@@ -25,14 +25,12 @@ struct ContentView: View {
             .padding()
         }
     }
+}
 
-    private func chooseFile() -> URL? {
-        let panel = NSOpenPanel()
-        panel.message = "Choose a ROM file"
-        return panel.runModal() == NSApplication.ModalResponse.OK
-                ? panel.url
-                : nil
-    }
+func chooseFile() -> URL? {
+    let panel = NSOpenPanel()
+    panel.message = "Choose a ROM file"
+    return panel.runModal() == NSApplication.ModalResponse.OK ? panel.url : nil
 }
 
 struct ContentView_Previews: PreviewProvider {

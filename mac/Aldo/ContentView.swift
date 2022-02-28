@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ContentView: View {
+    static private let fileLabel = "Open ROM File"
+
     @State private var fileUrl: URL?
 
     var body: some View {
@@ -24,8 +26,9 @@ struct ContentView: View {
         .toolbar {
             ToolbarItem {
                 Button(action: pickFile) {
-                    Label("Open ROM File", systemImage: "plus")
+                    Label(ContentView.fileLabel, systemImage: "plus")
                 }
+                .help(ContentView.fileLabel)
             }
         }
     }

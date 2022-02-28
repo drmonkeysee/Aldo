@@ -19,18 +19,18 @@ struct ContentView: View {
             Text(fileUrl?.lastPathComponent ?? "No file selected")
                 .padding(.horizontal)
                 .truncationMode(.middle)
-            Button("Choose ROM File") {
-                self.fileUrl = chooseFile()
-            }
+            Button("Choose ROM File", action: chooseFile)
             .padding()
         }
     }
-}
 
-func chooseFile() -> URL? {
-    let panel = NSOpenPanel()
-    panel.message = "Choose a ROM file"
-    return panel.runModal() == NSApplication.ModalResponse.OK ? panel.url : nil
+    private func chooseFile() {
+        let panel = NSOpenPanel()
+        panel.message = "Choose a ROM file"
+        fileUrl = panel.runModal() == NSApplication.ModalResponse.OK
+                    ? panel.url
+                    : nil
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {

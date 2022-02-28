@@ -17,14 +17,20 @@ struct ContentView: View {
                 .foregroundColor(.cyan)
                 .padding()
             Text(fileUrl?.lastPathComponent ?? "No file selected")
-                .padding(.horizontal)
+                .frame(minWidth: 300)
+                .padding()
                 .truncationMode(.middle)
-            Button("Choose ROM File", action: chooseFile)
-            .padding()
+        }
+        .toolbar {
+            ToolbarItem {
+                Button(action: pickFile) {
+                    Label("Open ROM File", systemImage: "plus")
+                }
+            }
         }
     }
 
-    private func chooseFile() {
+    private func pickFile() {
         let panel = NSOpenPanel()
         panel.message = "Choose a ROM file"
         fileUrl = panel.runModal() == NSApplication.ModalResponse.OK

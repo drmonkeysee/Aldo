@@ -277,6 +277,8 @@ static void drawregister(const struct console_state *snapshot)
               snapshot->cpu.program_counter);
     mvwprintw(RegistersView.content, cursor_y++, 0, "S:  %02X",
               snapshot->cpu.stack_pointer);
+    mvwprintw(RegistersView.content, cursor_y++, 0, "P:  %02X",
+              snapshot->cpu.status);
     mvwhline(RegistersView.content, cursor_y++, 0, 0,
              getmaxx(RegistersView.content));
     mvwprintw(RegistersView.content, cursor_y++, 0, "A:  %02X",
@@ -515,7 +517,7 @@ static void ncurses_init(void)
 {
     static const int
         col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 14, ctrlh = 16,
-        crth = 6, cpuh = 10, flagsh = 8, flagsw = 19, ramh = 37;
+        crth = 6, cpuh = 11, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");
     initscr();

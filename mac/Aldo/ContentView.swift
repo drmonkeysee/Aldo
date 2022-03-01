@@ -13,16 +13,30 @@ struct ContentView: View {
     @State private var fileUrl: URL?
 
     var body: some View {
-        VStack {
-            Text("Hello from Aldo!")
-                .font(.title)
-                .foregroundColor(.cyan)
-                .padding()
-            Text(fileUrl?.lastPathComponent ?? "No file selected")
-                .frame(minWidth: 300)
-                .padding()
-                .truncationMode(.middle)
+        VStack(alignment: .leading) {
+            Group {
+                Text(fileUrl?.lastPathComponent ?? "No file selected")
+                    .truncationMode(.middle)
+                Text("Format: iNES")
+            }
+            Divider()
+            Text("Mapper: 000")
+            Divider()
+            Group {
+                Text("PRG ROM: 2 x 16KB")
+                Text("WRAM: no")
+                Text("CHR ROM: 1 x 8KB")
+                Text("CHR RAM: no")
+                Text("NT-Mirroring: Vertical")
+                Text("Mapper-Ctrl: no")
+            }
+            Divider()
+            Group {
+                Text("Trainer: no")
+                Text("Bus Conflicts: no")
+            }
         }
+        .padding()
         .toolbar {
             ToolbarItem {
                 Button(action: pickFile) {

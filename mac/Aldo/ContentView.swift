@@ -20,7 +20,7 @@ struct ContentView: View {
                 Text("Format: iNES")
             }
             Divider()
-            Text("Mapper: 000")
+            Text("Mapper: 000 (<Board Names>)")
             Divider()
             Group {
                 Text("PRG ROM: 2 x 16KB")

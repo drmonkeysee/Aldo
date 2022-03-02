@@ -13,56 +13,66 @@ struct ContentView: View {
     @State private var fileUrl: URL?
 
     var body: some View {
-        GroupBox {
-            HStack {
-                VStack(alignment: .trailing) {
-                    Group {
-                        Text("Format:")
-                    }
-                    Group {
-                        Text("Mapper:")
-                    }
-                    Group {
-                        Text("PRG ROM:")
-                        Text("WRAM:")
-                        Text("CHR ROM:")
-                        Text("CHR RAM:")
-                        Text("NT-Mirroring:")
-                        Text("Mapper-Ctrl:")
-                    }
-                    Group {
-                        Text("Trainer:")
-                        Text("Bus Conflicts:")
-                    }
-                }
-                VStack (alignment: .leading) {
-                    Group {
-                        Text("iNES")
-                    }
-                    Group {
-                        Text("000 (<Board Names>)")
-                    }
-                    Group {
-                        Text("2 x 16KB")
-                        Text("no")
-                        Text("1 x 8KB")
-                        Text("no")
-                        Text("Vertical")
-                        Text("no")
-                    }
-                    Group {
-                        Text("no")
-                        Text("no")
-                    }
-                }
-            }
-        } label: {
+        VStack {
             Text(fileUrl?.lastPathComponent ?? "No file selected")
                 .help(fileUrl?.lastPathComponent ?? "")
                 .font(.title)
                 .truncationMode(.middle)
                 .padding(.bottom)
                 .frame(maxWidth: .infinity)
+            HStack {
+                GroupBox {
+                    HStack {
+                        VStack(alignment: .trailing) {
+                            Group {
+                                Text("Format:")
+                            }
+                            Group {
+                                Text("Mapper:")
+                            }
+                            Group {
+                                Text("PRG ROM:")
+                                Text("WRAM:")
+                                Text("CHR ROM:")
+                                Text("CHR RAM:")
+                                Text("NT-Mirroring:")
+                                Text("Mapper-Ctrl:")
+                            }
+                            Group {
+                                Text("Trainer:")
+                                Text("Bus Conflicts:")
+                            }
+                        }
+                        VStack (alignment: .leading) {
+                            Group {
+                                Text("iNES")
+                            }
+                            Group {
+                                Text("000 (<Board Names>)")
+                            }
+                            Group {
+                                Text("2 x 16KB")
+                                Text("no")
+                                Text("1 x 8KB")
+                                Text("no")
+                                Text("Vertical")
+                                Text("no")
+                            }
+                            Group {
+                                Text("no")
+                                Text("no")
+                            }
+                        }
+                    }
+                }
+                Spacer()
+                ZStack {
+                    RoundedRectangle(cornerRadius: 5)
+                        .foregroundColor(.cyan)
+                        .frame(width: 256, height: 128)
+                    Text("No CHR Data")
+                }
+            }
         }
         .padding()
         .toolbar {

@@ -14,26 +14,50 @@ struct ContentView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Group {
-                Text(fileUrl?.lastPathComponent ?? "No file selected")
-                    .truncationMode(.middle)
-                Text("Format: iNES")
-            }
-            Divider()
-            Text("Mapper: 000 (<Board Names>)")
-            Divider()
-            Group {
-                Text("PRG ROM: 2 x 16KB")
-                Text("WRAM: no")
-                Text("CHR ROM: 1 x 8KB")
-                Text("CHR RAM: no")
-                Text("NT-Mirroring: Vertical")
-                Text("Mapper-Ctrl: no")
-            }
-            Divider()
-            Group {
-                Text("Trainer: no")
-                Text("Bus Conflicts: no")
+            HStack {
+                VStack(alignment: .trailing) {
+                    Group {
+                        Text("File:")
+                        Text("Format:")
+                    }
+                    Group {
+                        Text("Mapper:")
+                    }
+                    Group {
+                        Text("PRG ROM:")
+                        Text("WRAM:")
+                        Text("CHR ROM:")
+                        Text("CHR RAM:")
+                        Text("NT-Mirroring:")
+                        Text("Mapper-Ctrl:")
+                    }
+                    Group {
+                        Text("Trainer:")
+                        Text("Bus Conflicts:")
+                    }
+                }
+                VStack (alignment: .leading) {
+                    Group {
+                        Text(fileUrl?.lastPathComponent ?? "No file selected")
+                            .truncationMode(.middle)
+                        Text("iNES")
+                    }
+                    Group {
+                        Text("000 (<Board Names>)")
+                    }
+                    Group {
+                        Text("2 x 16KB")
+                        Text("no")
+                        Text("1 x 8KB")
+                        Text("no")
+                        Text("Vertical")
+                        Text("no")
+                    }
+                    Group {
+                        Text("no")
+                        Text("no")
+                    }
+                }
             }
         }
         .padding()

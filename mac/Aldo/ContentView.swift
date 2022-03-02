@@ -13,50 +13,56 @@ struct ContentView: View {
     @State private var fileUrl: URL?
 
     var body: some View {
-        HStack {
-            VStack(alignment: .trailing) {
-                Group {
-                    Text("File:")
-                    Text("Format:")
+        GroupBox {
+            HStack {
+                VStack(alignment: .trailing) {
+                    Group {
+                        Text("Format:")
+                    }
+                    Group {
+                        Text("Mapper:")
+                    }
+                    Group {
+                        Text("PRG ROM:")
+                        Text("WRAM:")
+                        Text("CHR ROM:")
+                        Text("CHR RAM:")
+                        Text("NT-Mirroring:")
+                        Text("Mapper-Ctrl:")
+                    }
+                    Group {
+                        Text("Trainer:")
+                        Text("Bus Conflicts:")
+                    }
                 }
-                Group {
-                    Text("Mapper:")
-                }
-                Group {
-                    Text("PRG ROM:")
-                    Text("WRAM:")
-                    Text("CHR ROM:")
-                    Text("CHR RAM:")
-                    Text("NT-Mirroring:")
-                    Text("Mapper-Ctrl:")
-                }
-                Group {
-                    Text("Trainer:")
-                    Text("Bus Conflicts:")
+                VStack (alignment: .leading) {
+                    Group {
+                        Text("iNES")
+                    }
+                    Group {
+                        Text("000 (<Board Names>)")
+                    }
+                    Group {
+                        Text("2 x 16KB")
+                        Text("no")
+                        Text("1 x 8KB")
+                        Text("no")
+                        Text("Vertical")
+                        Text("no")
+                    }
+                    Group {
+                        Text("no")
+                        Text("no")
+                    }
                 }
             }
-            VStack (alignment: .leading) {
-                Group {
-                    Text(fileUrl?.lastPathComponent ?? "No file selected")
-                        .truncationMode(.middle)
-                    Text("iNES")
-                }
-                Group {
-                    Text("000 (<Board Names>)")
-                }
-                Group {
-                    Text("2 x 16KB")
-                    Text("no")
-                    Text("1 x 8KB")
-                    Text("no")
-                    Text("Vertical")
-                    Text("no")
-                }
-                Group {
-                    Text("no")
-                    Text("no")
-                }
-            }
+        } label: {
+            Text(fileUrl?.lastPathComponent ?? "No file selected")
+                .help(fileUrl?.lastPathComponent ?? "")
+                .font(.title)
+                .truncationMode(.middle)
+                .padding(.bottom)
+                .frame(maxWidth: .infinity)
         }
         .padding()
         .toolbar {
@@ -67,6 +73,7 @@ struct ContentView: View {
                 .help(ContentView.fileLabel)
             }
         }
+        .navigationTitle("Rom Details")
     }
 
     private func pickFile() {

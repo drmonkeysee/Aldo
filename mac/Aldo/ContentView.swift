@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     static private let fileLabel = "Open ROM File"
+    static private let testRom = "PRG ROM\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah\nblah"
 
     @State private var fileUrl: URL?
 
@@ -20,8 +21,9 @@ struct ContentView: View {
                 .truncationMode(.middle)
                 .padding(.bottom)
                 .frame(maxWidth: .infinity)
-            HStack {
-                GroupBox {
+            HStack(alignment: .top) {
+                GroupBox(label: Label("Format", systemImage: "info.circle")
+                            .font(.headline)) {
                     HStack {
                         VStack(alignment: .trailing) {
                             Group {
@@ -64,13 +66,27 @@ struct ContentView: View {
                             }
                         }
                     }
+                    .frame(minWidth: 230, maxWidth: .infinity)
+                    .padding(.vertical, 5)
                 }
-                Spacer()
-                ZStack {
-                    RoundedRectangle(cornerRadius: 5)
-                        .foregroundColor(.cyan)
-                        .frame(width: 256, height: 128)
-                    Text("No CHR Data")
+                GroupBox(label: Label("PRG ROM", systemImage: "cpu")
+                            .font(.headline)) {
+                    ScrollView {
+                        Text(ContentView.testRom)
+                            .padding(5)
+                            .frame(minWidth: 250, maxWidth: .infinity,
+                                   alignment: .leading)
+                            .multilineTextAlignment(.leading)
+                    }
+                }
+                GroupBox(label: Label("CHR ROM", systemImage: "photo.circle")
+                            .font(.headline)) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 5)
+                            .foregroundColor(.cyan)
+                            .frame(width: 256, height: 128)
+                        Text("No CHR Data")
+                    }
                 }
             }
         }

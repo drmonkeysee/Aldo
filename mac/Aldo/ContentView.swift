@@ -25,7 +25,7 @@ struct ContentView: View {
                                destination: AssemblerView()
                                 .navigationTitle("Assembler"))
                 NavigationLink("Details",
-                               destination: CartDetails(fileUrl: $fileUrl)
+                               destination: CartDetailsView(fileUrl: $fileUrl)
                                 .padding(EdgeInsets(top: 0, leading: 5,
                                                     bottom: 5, trailing: 5))
                                 .navigationTitle("Cart Details"))

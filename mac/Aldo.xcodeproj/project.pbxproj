@@ -25,6 +25,7 @@
 		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
 		C8702CF9278A58C900725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C8702CF8278A58C900725690 /* haltexpr.c */; };
 		C8702CFA278A598A00725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
+		C89D715027D4758900C9177A /* CartDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89D714F27D4758900C9177A /* CartDetails.swift */; };
 		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8C4B48D25ABBFB3006A98BB /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
 		C8C706922751EEBA00B45785 /* nes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706832751EEBA00B45785 /* nes.c */; };
@@ -126,6 +127,7 @@
 		C85C8DC525BD29AC00611D19 /* dis.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dis.c; sourceTree = "<group>"; };
 		C86030772761A51100F1B27D /* cpupeek.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpupeek.c; sourceTree = "<group>"; };
 		C8702CF8278A58C900725690 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
+		C89D714F27D4758900C9177A /* CartDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartDetails.swift; sourceTree = "<group>"; };
 		C8B4664327755790000576EE /* argparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = argparse.h; sourceTree = "<group>"; };
 		C8B4664427755790000576EE /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpanel.tbd; path = usr/lib/libpanel.tbd; sourceTree = SDKROOT; };
@@ -350,6 +352,7 @@
 			isa = PBXGroup;
 			children = (
 				C8DBC90F27C8708A0043994B /* AldoApp.swift */,
+				C89D714F27D4758900C9177A /* CartDetails.swift */,
 				C8DBC91127C8708A0043994B /* ContentView.swift */,
 				C8DBC91327C8708B0043994B /* Assets.xcassets */,
 				C8DBC91827C8708B0043994B /* Aldo.entitlements */,
@@ -625,6 +628,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C89D715027D4758900C9177A /* CartDetails.swift in Sources */,
 				C8DBC91227C8708A0043994B /* ContentView.swift in Sources */,
 				C8DBC91027C8708A0043994B /* AldoApp.swift in Sources */,
 			);

@@ -30,7 +30,10 @@ struct ContentView: View {
                                     Text("(6C)")
                                 }
                                 Spacer()
-                                Text("$(XXXX)").font(.title)
+                                VStack {
+                                    Text("$(8134)").font(.title)
+                                    Text("(34) (81)")
+                                }
                             }
                             Divider()
                             HStack {

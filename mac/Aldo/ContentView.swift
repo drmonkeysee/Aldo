@@ -7,34 +7,36 @@
 
 import SwiftUI
 
+enum NavLinks: CaseIterable, Identifiable {
+    case emulator
+    case breadboard
+    case assembler
+    case details
+
+    var id: Self {
+        self
+    }
+
+    var navLabel: String {
+        switch self {
+        case .details:
+            return "Cart Details"
+        default:
+            return "\(self)".capitalized
+        }
+    }
+}
+
 struct ContentView: View {
     static let fileLabel = "Open ROM File"
 
     @State private var fileUrl: URL?
-    @State private var navSelection: Int? = 0
+    @State private var navSelection: NavLinks? = .emulator
 
     var body: some View {
         NavigationView {
             List {
-                NavigationLink("Aldo",
-                               destination: EmulatorView()
-                                .navigationTitle("Aldo"),
-                               tag: 0, selection: $navSelection)
-                NavigationLink("Breadboard",
-                               destination: BreadboardView()
-                                .navigationTitle("Breadboard"),
-                               tag: 1, selection: $navSelection)
-                NavigationLink("Asm",
-                               destination: AssemblerView()
-                                .navigationTitle("Assembler"),
-                               tag: 2, selection: $navSelection)
-                NavigationLink("Details",
-                               destination: CartDetailsView(fileUrl: $fileUrl)
-                                .padding(EdgeInsets(top: 0, leading: 5,
-                                                    bottom: 5, trailing: 5))
-                                .navigationTitle("Cart Details"),
-                               tag: 3, selection: $navSelection)
-
+                renderNavLinks()
             }
         }
         .toolbar {
@@ -43,6 +45,39 @@ struct ContentView: View {
                     Label(ContentView.fileLabel, systemImage: "plus")
                 }
                 .help(ContentView.fileLabel)
+            }
+        }
+    }
+
+    private func renderNavLinks() -> some View {
+        ForEach(NavLinks.allCases) { link in
+            switch link {
+            case .emulator:
+                NavigationLink(link.navLabel, tag: link,
+                               selection: $navSelection) {
+                    EmulatorView()
+                        .navigationTitle(link.navLabel)
+                }
+            case .breadboard:
+                NavigationLink(link.navLabel, tag: link,
+                               selection: $navSelection) {
+                    BreadboardView()
+                        .navigationTitle(link.navLabel)
+                }
+            case .assembler:
+                NavigationLink(link.navLabel, tag: link,
+                               selection: $navSelection) {
+                    AssemblerView()
+                        .navigationTitle(link.navLabel)
+                }
+            case .details:
+                NavigationLink(link.navLabel, tag: link,
+                               selection: $navSelection) {
+                    CartDetailsView(fileUrl: $fileUrl)
+                        .padding(EdgeInsets(top: 0, leading: 5, bottom: 5,
+                                            trailing: 5))
+                        .navigationTitle(link.navLabel)
+                }
             }
         }
     }

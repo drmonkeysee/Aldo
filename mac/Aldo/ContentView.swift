@@ -18,12 +18,7 @@ enum NavLinks: CaseIterable, Identifiable {
     }
 
     var navLabel: String {
-        switch self {
-        case .details:
-            return "Cart Details"
-        default:
-            return "\(self)".capitalized
-        }
+        "\(self)".capitalized
     }
 }
 
@@ -35,9 +30,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            List {
-                renderNavLinks()
-            }
+            List(content: navLinkViews)
         }
         .toolbar {
             ToolbarItem {
@@ -49,34 +42,25 @@ struct ContentView: View {
         }
     }
 
-    private func renderNavLinks() -> some View {
+    private func navLinkViews() -> some View {
         ForEach(NavLinks.allCases) { link in
-            switch link {
-            case .emulator:
-                NavigationLink(link.navLabel, tag: link,
-                               selection: $navSelection) {
+            NavigationLink(link.navLabel, tag: link,
+                           selection: $navSelection) {
+                switch link {
+                case .emulator:
                     EmulatorView()
-                        .navigationTitle(link.navLabel)
-                }
-            case .breadboard:
-                NavigationLink(link.navLabel, tag: link,
-                               selection: $navSelection) {
+                        .navigationTitle("Aldo")
+                case .breadboard:
                     BreadboardView()
                         .navigationTitle(link.navLabel)
-                }
-            case .assembler:
-                NavigationLink(link.navLabel, tag: link,
-                               selection: $navSelection) {
+                case .assembler:
                     AssemblerView()
                         .navigationTitle(link.navLabel)
-                }
-            case .details:
-                NavigationLink(link.navLabel, tag: link,
-                               selection: $navSelection) {
+                case .details:
                     CartDetailsView(fileUrl: $fileUrl)
                         .padding(EdgeInsets(top: 0, leading: 5, bottom: 5,
                                             trailing: 5))
-                        .navigationTitle(link.navLabel)
+                        .navigationTitle("Cart Details")
                 }
             }
         }

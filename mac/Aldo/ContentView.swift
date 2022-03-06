@@ -14,11 +14,23 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            NavigationLink("Details",
-                           destination: CartDetails(fileUrl: $fileUrl)
-                            .padding(EdgeInsets(top: 0, leading: 5, bottom: 5,
-                                                trailing: 5))
-                            .navigationTitle("Cart Details"))
+            List {
+                NavigationLink("Aldo",
+                               destination: EmulatorView()
+                                .navigationTitle("Aldo"))
+                NavigationLink("Breadboard",
+                               destination: BreadboardView()
+                                .navigationTitle("Breadboard"))
+                NavigationLink("Asm",
+                               destination: AssemblerView()
+                                .navigationTitle("Assembler"))
+                NavigationLink("Details",
+                               destination: CartDetails(fileUrl: $fileUrl)
+                                .padding(EdgeInsets(top: 0, leading: 5,
+                                                    bottom: 5, trailing: 5))
+                                .navigationTitle("Cart Details"))
+
+            }
         }
         .toolbar {
             ToolbarItem {
@@ -36,6 +48,24 @@ struct ContentView: View {
         fileUrl = panel.runModal() == NSApplication.ModalResponse.OK
                     ? panel.url
                     : nil
+    }
+}
+
+struct EmulatorView: View {
+    var body: some View {
+        Text("Emulator view")
+    }
+}
+
+struct BreadboardView: View {
+    var body: some View {
+        Text("Breadboard view")
+    }
+}
+
+struct AssemblerView: View {
+    var body: some View {
+        Text("Assembler view")
     }
 }
 

@@ -64,6 +64,7 @@ struct ContentView: View {
                 }
             }
         }
+        .listStyle(.sidebar)
     }
 
     private func pickFile() {

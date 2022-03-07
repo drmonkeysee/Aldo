@@ -146,8 +146,8 @@ struct CartDetailsView: View {
                 }
                 GroupBox {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 5)
-                            .foregroundColor(.cyan)
+                        Color.cyan
+                            .cornerRadius(5)
                             .frame(width: 256, height: 128)
                         Text("No CHR Data")
                     }

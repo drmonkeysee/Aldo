@@ -29,9 +29,7 @@ struct ContentView: View {
     @State private var navSelection: NavLinks? = .emulator
 
     var body: some View {
-        NavigationView {
-            List(content: navLinkViews)
-        }
+        NavigationView(content: navLinkViews)
         .toolbar {
             ToolbarItem {
                 Button(action: pickFile) {
@@ -43,7 +41,7 @@ struct ContentView: View {
     }
 
     private func navLinkViews() -> some View {
-        ForEach(NavLinks.allCases) { link in
+        List(NavLinks.allCases) { link in
             NavigationLink(link.navLabel, tag: link,
                            selection: $navSelection) {
                 let navPadding = EdgeInsets(top: 0, leading: 5, bottom: 5,

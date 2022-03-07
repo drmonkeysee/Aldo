@@ -46,9 +46,12 @@ struct ContentView: View {
         ForEach(NavLinks.allCases) { link in
             NavigationLink(link.navLabel, tag: link,
                            selection: $navSelection) {
+                let navPadding = EdgeInsets(top: 0, leading: 5, bottom: 5,
+                                            trailing: 5)
                 switch link {
                 case .emulator:
                     EmulatorView()
+                        .padding(navPadding)
                         .navigationTitle("Aldo")
                 case .breadboard:
                     BreadboardView()
@@ -58,8 +61,7 @@ struct ContentView: View {
                         .navigationTitle(link.navLabel)
                 case .details:
                     CartDetailsView(fileUrl: $fileUrl)
-                        .padding(EdgeInsets(top: 0, leading: 5, bottom: 5,
-                                            trailing: 5))
+                        .padding(navPadding)
                         .navigationTitle("Cart Details")
                 }
             }
@@ -76,8 +78,22 @@ struct ContentView: View {
 }
 
 struct EmulatorView: View {
+    static let nesResolution = (256, 240)
+    static let nesScale = 1
+
     var body: some View {
-        Text("Emulator view")
+        HStack {
+            ZStack {
+                Color.cyan
+                    .frame(width: Double(EmulatorView.nesResolution.0
+                                    * EmulatorView.nesScale),
+                           height: Double(EmulatorView.nesResolution.1
+                                    * EmulatorView.nesScale))
+                Text("Emu Screen")
+            }
+            Text("Extra stuff")
+                .frame(minWidth: 200, maxWidth: .infinity)
+        }
     }
 }
 

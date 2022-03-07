@@ -18,7 +18,6 @@ struct CartDetailsView: View {
                 .help(fileUrl?.lastPathComponent ?? "")
                 .font(.title)
                 .truncationMode(.middle)
-                .frame(maxWidth: .infinity)
             HStack(alignment: .top) {
                 VStack {
                     GroupBox {

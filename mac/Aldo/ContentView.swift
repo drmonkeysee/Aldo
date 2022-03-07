@@ -13,13 +13,8 @@ enum NavLinks: String, CaseIterable, Identifiable {
     case assembler = "Assembler"
     case details = "Cart Details"
 
-    var id: Self {
-        self
-    }
-
-    var navLabel: String {
-        "\(self)".capitalized
-    }
+    var id: Self { self }
+    var navLabel: String { "\(self)".capitalized }
 }
 
 struct ContentView: View {
@@ -53,8 +48,7 @@ struct ContentView: View {
 
     @ViewBuilder
     private func destinationView(link: NavLinks) -> some View {
-        let navPadding = EdgeInsets(top: 0, leading: 5, bottom: 5,
-                                    trailing: 5)
+        let navPadding = EdgeInsets(top: 0, leading: 5, bottom: 5, trailing: 5)
         switch link {
         case .emulator:
             EmulatorView()
@@ -79,17 +73,17 @@ struct ContentView: View {
 }
 
 struct EmulatorView: View {
-    static let nesResolution = (256, 240)
+    static let nesResolution = (w: 256, h: 240)
     static let nesScale = 1
 
     var body: some View {
         HStack {
             ZStack {
                 Color.cyan
-                    .frame(width: Double(EmulatorView.nesResolution.0
-                                    * EmulatorView.nesScale),
-                           height: Double(EmulatorView.nesResolution.1
-                                    * EmulatorView.nesScale))
+                    .frame(width: Double(EmulatorView.nesResolution.w
+                                         * EmulatorView.nesScale),
+                           height: Double(EmulatorView.nesResolution.h
+                                          * EmulatorView.nesScale))
                 Text("Emu Screen")
             }
             Text("Extra stuff")

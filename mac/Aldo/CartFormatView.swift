@@ -9,50 +9,47 @@ import SwiftUI
 
 struct CartFormatView: View {
     var body: some View {
-        GroupBox {
-            HStack {
-                VStack(alignment: .trailing) {
-                    Group {
-                        Text("Format:")
-                    }
-                    Group {
-                        Text("Mapper:")
-                    }
-                    Group {
-                        Text("PRG ROM:")
-                        Text("WRAM:")
-                        Text("CHR ROM:")
-                        Text("CHR RAM:")
-                        Text("NT-Mirroring:")
-                        Text("Mapper-Ctrl:")
-                    }
-                    Group {
-                        Text("Trainer:")
-                        Text("Bus Conflicts:")
-                    }
+        HStack {
+            VStack(alignment: .trailing) {
+                Group {
+                    Text("Format:")
                 }
-                VStack (alignment: .leading) {
-                    Group {
-                        Text("iNES")
-                    }
-                    Group {
-                        Text("000 (<Board Names>)")
-                    }
-                    Group {
-                        Text("2 x 16KB")
-                        Text("no")
-                        Text("1 x 8KB")
-                        Text("no")
-                        Text("Vertical")
-                        Text("no")
-                    }
-                    Group {
-                        Text("no")
-                        Text("no")
-                    }
+                Group {
+                    Text("Mapper:")
+                }
+                Group {
+                    Text("PRG ROM:")
+                    Text("WRAM:")
+                    Text("CHR ROM:")
+                    Text("CHR RAM:")
+                    Text("NT-Mirroring:")
+                    Text("Mapper-Ctrl:")
+                }
+                Group {
+                    Text("Trainer:")
+                    Text("Bus Conflicts:")
                 }
             }
-            .frame(maxWidth: .infinity)
+            VStack(alignment: .leading) {
+                Group {
+                    Text("iNES")
+                }
+                Group {
+                    Text("000 (<Board Names>)")
+                }
+                Group {
+                    Text("2 x 16KB")
+                    Text("no")
+                    Text("1 x 8KB")
+                    Text("no")
+                    Text("Vertical")
+                    Text("no")
+                }
+                Group {
+                    Text("no")
+                    Text("no")
+                }
+            }
             .padding(.vertical, 5)
         }
     }

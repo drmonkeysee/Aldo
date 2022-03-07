@@ -9,13 +9,11 @@ import SwiftUI
 
 struct CartChrView: View {
     var body: some View {
-        GroupBox {
-            ZStack {
-                Color.cyan
-                    .cornerRadius(5)
-                    .frame(width: 256, height: 128)
-                Text("No CHR Data")
-            }
+        ZStack {
+            Color.cyan
+                .cornerRadius(5)
+                .frame(width: 256, height: 128)
+            Text("No CHR Data")
         }
     }
 }

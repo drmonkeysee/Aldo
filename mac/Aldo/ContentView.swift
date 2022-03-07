@@ -44,27 +44,29 @@ struct ContentView: View {
         List(NavLinks.allCases) { link in
             NavigationLink(link.navLabel, tag: link,
                            selection: $navSelection) {
-                let navPadding = EdgeInsets(top: 0, leading: 5, bottom: 5,
-                                            trailing: 5)
-                switch link {
-                case .emulator:
-                    EmulatorView()
-                        .padding(navPadding)
-                        .navigationTitle(link.rawValue)
-                case .breadboard:
-                    BreadboardView()
-                        .navigationTitle(link.rawValue)
-                case .assembler:
-                    AssemblerView()
-                        .navigationTitle(link.rawValue)
-                case .details:
-                    CartDetailsView(fileUrl: $fileUrl)
-                        .padding(navPadding)
-                        .navigationTitle(link.rawValue)
-                }
+                destinationView(link: link)
+                    .navigationTitle(link.rawValue)
             }
         }
         .listStyle(.sidebar)
+    }
+
+    @ViewBuilder
+    private func destinationView(link: NavLinks) -> some View {
+        let navPadding = EdgeInsets(top: 0, leading: 5, bottom: 5,
+                                    trailing: 5)
+        switch link {
+        case .emulator:
+            EmulatorView()
+                .padding(navPadding)
+        case .breadboard:
+            BreadboardView()
+        case .assembler:
+            AssemblerView()
+        case .details:
+            CartDetailsView(fileUrl: $fileUrl)
+                .padding(navPadding)
+        }
     }
 
     private func pickFile() {

@@ -11,7 +11,9 @@ enum NavLinks: String, CaseIterable, Identifiable {
     case emulator = "Aldo"
     case breadboard = "Breadboard"
     case assembler = "Assembler"
-    case details = "Cart Details"
+    case program = "Cart PRG Data"
+    case character = "Cart CHR Data"
+    case format = "Cart Format"
 
     var id: Self { self }
     var navLabel: String { "\(self)".capitalized }
@@ -57,9 +59,13 @@ struct ContentView: View {
             BreadboardView()
         case .assembler:
             AssemblerView()
-        case .details:
-            CartDetailsView(fileUrl: $fileUrl)
+        case .program:
+            CartPrgView(fileUrl: $fileUrl)
                 .padding(navPadding)
+        case .character:
+            CartChrView()
+        case .format:
+            CartFormatView()
         }
     }
 

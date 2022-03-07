@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-enum NavLinks: CaseIterable, Identifiable {
-    case emulator
-    case breadboard
-    case assembler
-    case details
+enum NavLinks: String, CaseIterable, Identifiable {
+    case emulator = "Aldo"
+    case breadboard = "Breadboard"
+    case assembler = "Assembler"
+    case details = "Cart Details"
 
     var id: Self {
         self
@@ -50,17 +50,17 @@ struct ContentView: View {
                 case .emulator:
                     EmulatorView()
                         .padding(navPadding)
-                        .navigationTitle("Aldo")
+                        .navigationTitle(link.rawValue)
                 case .breadboard:
                     BreadboardView()
-                        .navigationTitle(link.navLabel)
+                        .navigationTitle(link.rawValue)
                 case .assembler:
                     AssemblerView()
-                        .navigationTitle(link.navLabel)
+                        .navigationTitle(link.rawValue)
                 case .details:
                     CartDetailsView(fileUrl: $fileUrl)
                         .padding(navPadding)
-                        .navigationTitle("Cart Details")
+                        .navigationTitle(link.rawValue)
                 }
             }
         }

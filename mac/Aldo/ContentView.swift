@@ -27,6 +27,11 @@ struct ContentView: View {
     var body: some View {
         NavigationView(content: navLinkViews)
         .toolbar {
+            ToolbarItem(placement: .navigation) {
+                Button(action: toggleSidebar) {
+                    Label("Toggle Sidebar", systemImage: "sidebar.left")
+                }
+            }
             ToolbarItem {
                 Button(action: pickFile) {
                     Label(ContentView.fileLabel, systemImage: "plus")
@@ -64,6 +69,13 @@ struct ContentView: View {
         case .character:
             CartChrView()
         }
+    }
+
+    private func toggleSidebar() {
+        // NOTE: seems kinda janky but oh well
+        // https://stackoverflow.com/a/68331797/2476646
+        NSApp.sendAction(#selector(NSSplitViewController.toggleSidebar(_:)),
+                         to: nil, from: nil)
     }
 
     private func pickFile() {

@@ -12,6 +12,12 @@ struct AldoApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    NSWindow.allowsAutomaticWindowTabbing = false
+                }
+        }
+        .commands {
+            SidebarCommands()
         }
     }
 }

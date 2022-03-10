@@ -65,7 +65,7 @@ struct ContentView: View {
         case .character:
             CartChrView()
         case .format:
-            CartFormatView()
+            CartInfoView()
         }
     }
 

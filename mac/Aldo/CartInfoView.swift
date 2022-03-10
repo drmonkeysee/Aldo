@@ -1,5 +1,5 @@
 //
-//  CartFormatView.swift
+//  CartInfoView.swift
 //  Aldo-App
 //
 //  Created by Brandon Stansbury on 3/6/22.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CartFormatView: View {
+struct CartInfoView: View {
     var body: some View {
         HStack {
             VStack(alignment: .trailing) {
@@ -57,6 +57,6 @@ struct CartFormatView: View {
 
 struct CartFormatView_Previews: PreviewProvider {
     static var previews: some View {
-        CartFormatView()
+        CartInfoView()
     }
 }

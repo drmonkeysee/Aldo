@@ -20,7 +20,7 @@
 		C820E6C025A9759A006A7AB1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820E6BF25A9759A006A7AB1 /* main.swift */; };
 		C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* aldo.c */; };
 		C820E6E025A98557006A7AB1 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C820E6DE25A982A5006A7AB1 /* libncurses.tbd */; };
-		C838D3B527D5DA4400468FDB /* CartFormatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B427D5DA4400468FDB /* CartFormatView.swift */; };
+		C838D3B527D5DA4400468FDB /* CartInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B427D5DA4400468FDB /* CartInfoView.swift */; };
 		C838D3B727D5DB0300468FDB /* CartChrView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B627D5DB0300468FDB /* CartChrView.swift */; };
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
 		C85C8DC625BD29AC00611D19 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
@@ -122,7 +122,7 @@
 		C820E6CA25A97A4E006A7AB1 /* aldo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aldo.c; sourceTree = "<group>"; };
 		C820E6D325A97FB5006A7AB1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		C820E6DE25A982A5006A7AB1 /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
-		C838D3B427D5DA4400468FDB /* CartFormatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartFormatView.swift; sourceTree = "<group>"; };
+		C838D3B427D5DA4400468FDB /* CartInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartInfoView.swift; sourceTree = "<group>"; };
 		C838D3B627D5DB0300468FDB /* CartChrView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartChrView.swift; sourceTree = "<group>"; };
 		C83965E927810D4300E1E28E /* tsutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tsutil.h; sourceTree = "<group>"; };
 		C8557B2D25C661660090296D /* ui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ui.h; sourceTree = "<group>"; };
@@ -357,7 +357,7 @@
 			children = (
 				C8DBC90F27C8708A0043994B /* AldoApp.swift */,
 				C838D3B627D5DB0300468FDB /* CartChrView.swift */,
-				C838D3B427D5DA4400468FDB /* CartFormatView.swift */,
+				C838D3B427D5DA4400468FDB /* CartInfoView.swift */,
 				C89D714F27D4758900C9177A /* CartPrgView.swift */,
 				C8DBC91127C8708A0043994B /* ContentView.swift */,
 				C8DBC91327C8708B0043994B /* Assets.xcassets */,
@@ -635,7 +635,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C89D715027D4758900C9177A /* CartPrgView.swift in Sources */,
-				C838D3B527D5DA4400468FDB /* CartFormatView.swift in Sources */,
+				C838D3B527D5DA4400468FDB /* CartInfoView.swift in Sources */,
 				C8DBC91227C8708A0043994B /* ContentView.swift in Sources */,
 				C8DBC91027C8708A0043994B /* AldoApp.swift in Sources */,
 				C838D3B727D5DB0300468FDB /* CartChrView.swift in Sources */,

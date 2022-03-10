@@ -13,7 +13,6 @@ enum NavLinks: String, CaseIterable, Identifiable {
     case assembler = "Assembler"
     case program = "Cart PRG Data"
     case character = "Cart CHR Data"
-    case format = "Cart Format"
 
     var id: Self { self }
     var navLabel: String { "\(self)".capitalized }
@@ -64,8 +63,6 @@ struct ContentView: View {
                 .padding(navPadding)
         case .character:
             CartChrView()
-        case .format:
-            CartInfoView()
         }
     }
 

@@ -25,8 +25,23 @@ struct EmulatorView: View {
                            height: Double(EmulatorView.nesResolution.h))
                 Text("Emu Screen")
             }
-            Text("Extra stuff")
-                .frame(minWidth: 200, maxWidth: .infinity)
+            TabView {
+                Text("Other Stuff")
+                    .border(.blue)
+                    .tabItem {
+                        Text("Visualization")
+                    }
+                Text("Debugger stuff")
+                    .border(.gray)
+                    .tabItem {
+                        Text("Debug")
+                    }
+                CartInfoView()
+                    .border(.red)
+                    .tabItem {
+                        Text("Cart Info")
+                    }
+            }
         }
     }
 }

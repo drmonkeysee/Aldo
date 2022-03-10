@@ -9,12 +9,13 @@ import SwiftUI
 
 @main
 struct AldoApp: App {
+    init() {
+        NSWindow.allowsAutomaticWindowTabbing = false
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .onAppear {
-                    NSWindow.allowsAutomaticWindowTabbing = false
-                }
         }
         .commands {
             SidebarCommands()

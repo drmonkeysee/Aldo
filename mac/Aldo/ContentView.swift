@@ -78,26 +78,6 @@ struct ContentView: View {
     }
 }
 
-struct EmulatorView: View {
-    static let nesResolution = (w: 256, h: 240)
-    static let nesScale = 1
-
-    var body: some View {
-        HStack {
-            ZStack {
-                Color.cyan
-                    .frame(width: Double(EmulatorView.nesResolution.w
-                                         * EmulatorView.nesScale),
-                           height: Double(EmulatorView.nesResolution.h
-                                          * EmulatorView.nesScale))
-                Text("Emu Screen")
-            }
-            Text("Extra stuff")
-                .frame(minWidth: 200, maxWidth: .infinity)
-        }
-    }
-}
-
 struct BreadboardView: View {
     var body: some View {
         Text("Breadboard view")

@@ -9,16 +9,20 @@ import SwiftUI
 
 struct EmulatorView: View {
     static let nesResolution = (w: 256, h: 240)
-    static let nesScale = 1
+    static let nesScale = 2
 
     var body: some View {
         HStack {
             ZStack {
-                Color.cyan
+                Color(white: 0.15)
+                    .cornerRadius(5)
                     .frame(width: Double(EmulatorView.nesResolution.w
                                          * EmulatorView.nesScale),
                            height: Double(EmulatorView.nesResolution.h
                                           * EmulatorView.nesScale))
+                Color.cyan
+                    .frame(width: Double(EmulatorView.nesResolution.w),
+                           height: Double(EmulatorView.nesResolution.h))
                 Text("Emu Screen")
             }
             Text("Extra stuff")

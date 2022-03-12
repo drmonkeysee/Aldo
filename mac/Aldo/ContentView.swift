@@ -7,17 +7,6 @@
 
 import SwiftUI
 
-enum ContentLinks: String, CaseIterable, Identifiable {
-    case emulator = "Aldo"
-    case breadboard = "Breadboard"
-    case assembler = "Assembler"
-    case program = "Cart PRG Data"
-    case character = "Cart CHR Data"
-
-    var id: Self { self }
-    var navLabel: String { "\(self)".capitalized }
-}
-
 struct ContentView: View {
     static let fileLabel = "Open ROM File"
 
@@ -69,6 +58,17 @@ struct ContentView: View {
                     ? panel.url
                     : nil
     }
+}
+
+fileprivate enum ContentLinks: String, CaseIterable, Identifiable {
+    case emulator = "Aldo"
+    case breadboard = "Breadboard"
+    case assembler = "Assembler"
+    case program = "Cart PRG Data"
+    case character = "Cart CHR Data"
+
+    var id: Self { self }
+    var navLabel: String { "\(self)".capitalized }
 }
 
 fileprivate struct ContentDetail: View {

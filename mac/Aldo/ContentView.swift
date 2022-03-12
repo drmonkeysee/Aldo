@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum NavLinks: String, CaseIterable, Identifiable {
+enum ContentLinks: String, CaseIterable, Identifiable {
     case emulator = "Aldo"
     case breadboard = "Breadboard"
     case assembler = "Assembler"
@@ -22,7 +22,7 @@ struct ContentView: View {
     static let fileLabel = "Open ROM File"
 
     @State private var fileUrl: URL?
-    @State private var navSelection: NavLinks? = .emulator
+    @State private var navSelection: ContentLinks? = .emulator
 
     var body: some View {
         NavigationView(content: navLinkViews)
@@ -42,33 +42,14 @@ struct ContentView: View {
     }
 
     private func navLinkViews() -> some View {
-        List(NavLinks.allCases) { link in
+        List(ContentLinks.allCases) { link in
             NavigationLink(link.navLabel, tag: link,
                            selection: $navSelection) {
-                destinationView(link: link)
+                ContentDetail(link: link, fileUrl: $fileUrl)
                     .navigationTitle(link.rawValue)
             }
         }
         .listStyle(.sidebar)
-    }
-
-    @ViewBuilder
-    private func destinationView(link: NavLinks) -> some View {
-        let navPadding = EdgeInsets(top: 0, leading: 5, bottom: 5, trailing: 5)
-        switch link {
-        case .emulator:
-            EmulatorView()
-                .padding(navPadding)
-        case .breadboard:
-            BreadboardView()
-        case .assembler:
-            AssemblerView()
-        case .program:
-            CartPrgView(fileUrl: $fileUrl)
-                .padding(navPadding)
-        case .character:
-            CartChrView()
-        }
     }
 
     private func toggleSidebar() {
@@ -84,6 +65,29 @@ struct ContentView: View {
         fileUrl = panel.runModal() == NSApplication.ModalResponse.OK
                     ? panel.url
                     : nil
+    }
+}
+
+fileprivate struct ContentDetail: View {
+    let link: ContentLinks
+    @Binding var fileUrl: URL?
+
+    var body: some View {
+        let navPadding = EdgeInsets(top: 0, leading: 5, bottom: 5, trailing: 5)
+        switch link {
+        case .emulator:
+            EmulatorView()
+                .padding(navPadding)
+        case .breadboard:
+            BreadboardView()
+        case .assembler:
+            AssemblerView()
+        case .program:
+            CartPrgView(fileUrl: $fileUrl)
+                .padding(navPadding)
+        case .character:
+            CartChrView()
+        }
     }
 }
 

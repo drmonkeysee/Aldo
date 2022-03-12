@@ -26,19 +26,6 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView(content: navLinkViews)
-        .toolbar {
-            ToolbarItem(placement: .navigation) {
-                Button(action: toggleSidebar) {
-                    Label("Toggle Sidebar", systemImage: "sidebar.left")
-                }
-            }
-            ToolbarItem {
-                Button(action: pickFile) {
-                    Label(ContentView.fileLabel, systemImage: "plus")
-                }
-                .help(ContentView.fileLabel)
-            }
-        }
     }
 
     private func navLinkViews() -> some View {
@@ -47,9 +34,25 @@ struct ContentView: View {
                            selection: $navSelection) {
                 ContentDetail(link: link, fileUrl: $fileUrl)
                     .navigationTitle(link.rawValue)
+                    .toolbar {
+                        ToolbarItem {
+                            Button(action: pickFile) {
+                                Label(ContentView.fileLabel,
+                                      systemImage: "plus")
+                            }
+                            .help(ContentView.fileLabel)
+                        }
+                    }
             }
         }
         .listStyle(.sidebar)
+        .toolbar {
+            ToolbarItem {
+                Button(action: toggleSidebar) {
+                    Label("Toggle Sidebar", systemImage: "sidebar.left")
+                }
+            }
+        }
     }
 
     private func toggleSidebar() {

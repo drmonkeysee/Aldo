@@ -8,10 +8,13 @@
 import SwiftUI
 
 struct CartInfoView: View {
+    let cart: Cart?
+
     var body: some View {
         HStack {
             VStack(alignment: .trailing) {
                 Group {
+                    Text("File:")
                     Text("Format:")
                 }
                 Group {
@@ -32,7 +35,9 @@ struct CartInfoView: View {
             }
             VStack(alignment: .leading) {
                 Group {
-                    Text("iNES")
+                    Text(cart?.fileName ?? "No rom")
+                        .truncationMode(.middle)
+                    Text(cart?.info.name ?? "No format")
                 }
                 Group {
                     Text("000 (<Board Names>)")
@@ -57,6 +62,8 @@ struct CartInfoView: View {
 
 struct CartFormatView_Previews: PreviewProvider {
     static var previews: some View {
-        CartInfoView()
+        // TODO: what to preview here?
+        CartInfoView(
+            cart: Cart(loadFromFile: URL(fileURLWithPath: "test.nes")))
     }
 }

@@ -11,6 +11,8 @@ struct EmulatorView: View {
     static let nesResolution = (w: 256, h: 240)
     static let nesScale = 2
 
+    @EnvironmentObject var appState: AppControl
+
     var body: some View {
         HStack {
             ZStack {
@@ -40,7 +42,7 @@ struct EmulatorView: View {
                     .tabItem {
                         Text("Trace")
                     }
-                CartInfoView()
+                CartInfoView(cart: appState.cart)
                     .border(.red)
                     .tabItem {
                         Text("Cart Info")

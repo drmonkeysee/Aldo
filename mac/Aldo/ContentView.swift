@@ -10,8 +10,8 @@ import SwiftUI
 struct ContentView: View {
     static let fileLabel = "Open ROM File"
 
-    @State private var fileUrl: URL?
     @State private var navSelection: ContentLinks? = .emulator
+    @StateObject private var appState = AppControl()
 
     var body: some View {
         NavigationView(content: navLinkViews)
@@ -21,7 +21,8 @@ struct ContentView: View {
         List(ContentLinks.allCases) { link in
             NavigationLink(link.navLabel, tag: link,
                            selection: $navSelection) {
-                ContentDetail(link: link, fileUrl: $fileUrl)
+                ContentDetail(link: link)
+                    .environmentObject(appState)
                     .navigationTitle(link.rawValue)
                     .toolbar {
                         ToolbarItem {
@@ -54,9 +55,12 @@ struct ContentView: View {
     private func pickFile() {
         let panel = NSOpenPanel()
         panel.message = "Choose a ROM file"
-        fileUrl = panel.runModal() == NSApplication.ModalResponse.OK
-                    ? panel.url
-                    : nil
+        let fileUrl = panel.runModal() == NSApplication.ModalResponse.OK
+                        ? panel.url
+                        : nil
+        if let url = fileUrl {
+            appState.cart = Cart(loadFromFile: url)
+        }
     }
 }
 
@@ -73,7 +77,6 @@ fileprivate enum ContentLinks: String, CaseIterable, Identifiable {
 
 fileprivate struct ContentDetail: View {
     let link: ContentLinks
-    @Binding var fileUrl: URL?
 
     var body: some View {
         let navPadding = EdgeInsets(top: 0, leading: 5, bottom: 5, trailing: 5)
@@ -86,7 +89,7 @@ fileprivate struct ContentDetail: View {
         case .assembler:
             AssemblerView()
         case .program:
-            CartPrgView(fileUrl: $fileUrl)
+            CartPrgView()
                 .padding(navPadding)
         case .character:
             CartChrView()

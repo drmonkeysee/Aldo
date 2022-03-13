@@ -8,13 +8,9 @@
 import Foundation
 
 final class Cart {
-    private(set) var fileUrl: URL
     private(set) var info: CartInfo
 
-    var fileName: String { fileUrl.lastPathComponent }
-
     init(loadFromFile: URL) {
-        fileUrl = loadFromFile
         info = .raw
         print("Cart ctor")
     }

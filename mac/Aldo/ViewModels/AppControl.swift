@@ -8,5 +8,16 @@
 import Foundation
 
 final class AppControl: ObservableObject {
-    @Published var cart: Cart?
+    @Published private(set) var cartFile: URL?
+    @Published private(set) var cart: Cart?
+
+    var cartName: String? { cartFile?.lastPathComponent }
+
+    func loadCart(from: URL?) {
+        guard let url = from else {
+            return
+        }
+        cartFile = url
+        cart = Cart(loadFromFile: url)
+    }
 }

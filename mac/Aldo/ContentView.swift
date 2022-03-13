@@ -58,9 +58,7 @@ struct ContentView: View {
         let fileUrl = panel.runModal() == NSApplication.ModalResponse.OK
                         ? panel.url
                         : nil
-        if let url = fileUrl {
-            appState.cart = Cart(loadFromFile: url)
-        }
+        appState.loadCart(from: fileUrl)
     }
 }
 
@@ -77,6 +75,7 @@ fileprivate enum ContentLinks: String, CaseIterable, Identifiable {
 
 fileprivate struct ContentDetail: View {
     let link: ContentLinks
+    @EnvironmentObject var appState: AppControl
 
     var body: some View {
         let navPadding = EdgeInsets(top: 0, leading: 5, bottom: 5, trailing: 5)
@@ -89,7 +88,7 @@ fileprivate struct ContentDetail: View {
         case .assembler:
             AssemblerView()
         case .program:
-            CartPrgView()
+            CartPrgView(fileUrl: appState.cartFile)
                 .padding(navPadding)
         case .character:
             CartChrView()

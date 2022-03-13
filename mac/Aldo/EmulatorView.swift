@@ -36,6 +36,10 @@ struct EmulatorView: View {
                     .tabItem {
                         Text("Debug")
                     }
+                Text("Trace Log")
+                    .tabItem {
+                        Text("Trace")
+                    }
                 CartInfoView()
                     .border(.red)
                     .tabItem {

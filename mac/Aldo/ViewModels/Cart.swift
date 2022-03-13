@@ -14,7 +14,8 @@ final class Cart: ObservableObject {
     var name: String? { file?.lastPathComponent }
 
     func load(from: URL?) {
-        file = from
+        guard let filePath = from else { return }
+        file = filePath
         info = .raw
     }
 }

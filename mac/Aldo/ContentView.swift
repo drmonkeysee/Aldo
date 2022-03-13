@@ -77,19 +77,19 @@ fileprivate struct ContentDetail: View {
     @ObservedObject var cart: Cart
 
     var body: some View {
-        let navPadding = EdgeInsets(top: 0, leading: 5, bottom: 5, trailing: 5)
         switch link {
         case .emulator:
             EmulatorView()
                 .environmentObject(cart)
-                .padding(navPadding)
+                .padding(5)
         case .breadboard:
             BreadboardView()
         case .assembler:
             AssemblerView()
         case .program:
             CartPrgView(cartName: cart.name)
-                .padding(navPadding)
+                .padding(EdgeInsets(top: 0, leading: 5, bottom: 5,
+                                    trailing: 5))
         case .character:
             CartChrView()
         }

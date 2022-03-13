@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CartInfoView: View {
-    @EnvironmentObject var appState: AppControl
+    @EnvironmentObject var cart: Cart
 
     var body: some View {
         HStack {
@@ -35,9 +35,9 @@ struct CartInfoView: View {
             }
             VStack(alignment: .leading) {
                 Group {
-                    Text(appState.cartName ?? "No rom")
+                    Text(cart.name ?? "No rom")
                         .truncationMode(.middle)
-                    Text(appState.cart?.info.name ?? "No format")
+                    Text(cart.info.name)
                 }
                 Group {
                     Text("000 (<Board Names>)")

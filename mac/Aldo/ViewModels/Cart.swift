@@ -7,26 +7,21 @@
 
 import Foundation
 
-final class Cart {
-    private(set) var info: CartInfo
+final class Cart: ObservableObject {
+    @Published private(set) var file: URL?
+    @Published private(set) var info: CartInfo = .none
 
-    init(loadFromFile: URL) {
+    var name: String? { file?.lastPathComponent }
+
+    func load(from: URL?) {
+        file = from
         info = .raw
-        print("Cart ctor")
-    }
-
-    deinit {
-        print("Cart dtor")
     }
 }
 
 enum CartInfo {
+    case none
     case raw
 
-    var name: String {
-        switch self {
-        case .raw:
-            return "Raw"
-        }
-    }
+    var name: String { "\(self)".capitalized }
 }

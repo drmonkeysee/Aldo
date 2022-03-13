@@ -11,7 +11,7 @@ struct ContentView: View {
     static let fileLabel = "Open ROM File"
 
     @State private var navSelection: ContentLinks? = .emulator
-    @StateObject private var appState = AppControl()
+    @StateObject private var cart = Cart()
 
     var body: some View {
         NavigationView(content: navLinkViews)
@@ -21,8 +21,7 @@ struct ContentView: View {
         List(ContentLinks.allCases) { link in
             NavigationLink(link.navLabel, tag: link,
                            selection: $navSelection) {
-                ContentDetail(link: link)
-                    .environmentObject(appState)
+                ContentDetail(link: link, cart: cart)
                     .navigationTitle(link.rawValue)
                     .toolbar {
                         ToolbarItem {
@@ -58,7 +57,7 @@ struct ContentView: View {
         let fileUrl = panel.runModal() == NSApplication.ModalResponse.OK
                         ? panel.url
                         : nil
-        appState.loadCart(from: fileUrl)
+        cart.load(from: fileUrl)
     }
 }
 
@@ -75,20 +74,21 @@ fileprivate enum ContentLinks: String, CaseIterable, Identifiable {
 
 fileprivate struct ContentDetail: View {
     let link: ContentLinks
-    @EnvironmentObject var appState: AppControl
+    @ObservedObject var cart: Cart
 
     var body: some View {
         let navPadding = EdgeInsets(top: 0, leading: 5, bottom: 5, trailing: 5)
         switch link {
         case .emulator:
             EmulatorView()
+                .environmentObject(cart)
                 .padding(navPadding)
         case .breadboard:
             BreadboardView()
         case .assembler:
             AssemblerView()
         case .program:
-            CartPrgView(fileUrl: appState.cartFile)
+            CartPrgView(cartName: cart.name)
                 .padding(navPadding)
         case .character:
             CartChrView()

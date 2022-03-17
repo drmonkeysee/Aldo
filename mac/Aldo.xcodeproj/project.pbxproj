@@ -22,6 +22,10 @@
 		C820E6E025A98557006A7AB1 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C820E6DE25A982A5006A7AB1 /* libncurses.tbd */; };
 		C838D3B527D5DA4400468FDB /* CartInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B427D5DA4400468FDB /* CartInfoView.swift */; };
 		C838D3B727D5DB0300468FDB /* CartChrView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B627D5DB0300468FDB /* CartChrView.swift */; };
+		C83C663727E2F4E4009CE42C /* cart.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068A2751EEBA00B45785 /* cart.c */; };
+		C83C663827E2F4EF009CE42C /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
+		C83C663927E2F4FE009CE42C /* bytes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068F2751EEBA00B45785 /* bytes.c */; };
+		C83C663A27E2F52C009CE42C /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
 		C85C8DC625BD29AC00611D19 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
 		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
@@ -651,7 +655,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C83C663A27E2F52C009CE42C /* bus.c in Sources */,
+				C83C663827E2F4EF009CE42C /* mappers.c in Sources */,
+				C83C663927E2F4FE009CE42C /* bytes.c in Sources */,
 				C89D715027D4758900C9177A /* CartPrgView.swift in Sources */,
+				C83C663727E2F4E4009CE42C /* cart.c in Sources */,
 				C838D3B527D5DA4400468FDB /* CartInfoView.swift in Sources */,
 				C8DBC91227C8708A0043994B /* ContentView.swift in Sources */,
 				C8A5B77B27DD79AE00A4DD5E /* Cart.swift in Sources */,

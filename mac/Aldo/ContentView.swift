@@ -11,6 +11,7 @@ struct ContentView: View {
     static let fileLabel = "Open ROM File"
 
     @State private var navSelection: ContentLinks? = .emulator
+    @State private var cartLoadFailed: Bool = false
     @StateObject private var cart = Cart()
 
     var body: some View {
@@ -31,6 +32,11 @@ struct ContentView: View {
                             }
                             .help(ContentView.fileLabel)
                         }
+                    }
+                    .alert("Rom Load Failure", isPresented: $cartLoadFailed,
+                           presenting: cart.loadError) {_ in // default action
+                    } message: { err in
+                        Text(err.message)
                     }
             }
         }
@@ -57,7 +63,7 @@ struct ContentView: View {
         let fileUrl = panel.runModal() == NSApplication.ModalResponse.OK
                         ? panel.url
                         : nil
-        cart.load(from: fileUrl)
+        cartLoadFailed = !cart.load(from: fileUrl)
     }
 }
 

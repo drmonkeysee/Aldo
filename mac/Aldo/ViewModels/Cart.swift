@@ -10,22 +10,26 @@ import Foundation
 final class Cart: ObservableObject {
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
-    @Published private(set) var loadError: CartError?
+    private(set) var loadError: CartError?
     private var handle: CartHandle?
 
     var name: String? { file?.lastPathComponent }
 
-    func load(from: URL?) {
-        guard let filePath = from else { return }
-        file = filePath
+    func load(from: URL?) -> Bool {
+        guard let filePath = from else { return false }
+        loadError = nil
         do {
-            handle = try CartHandle(fromFile: file!)
+            handle = try CartHandle(fromFile: filePath)
+            file = filePath
+            info = .raw
+            return true
         } catch let err as CartError {
             loadError = err
+            return false
         } catch {
             loadError = CartError.unknown
+            return false
         }
-        info = .raw
     }
 }
 
@@ -41,14 +45,14 @@ enum CartError: Error {
     case ioError(String)
     case errCode(Int32)
 
-    func message() -> String {
+    var message: String {
         switch self {
         case .unknown:
             return "Unknown error"
         case .ioError(let str):
             return str
         case .errCode(let code):
-            return String(cString: cart_errstr(code))
+            return "\(String(cString: cart_errstr(code))) (\(code))"
         }
     }
 }
@@ -72,6 +76,7 @@ fileprivate final class CartHandle {
     }
 
     deinit {
+        guard self.handle != nil else { return }
         cart_free(self.handle)
         self.handle = nil
     }

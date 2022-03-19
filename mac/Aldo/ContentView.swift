@@ -34,7 +34,8 @@ struct ContentView: View {
                         }
                     }
                     .alert("Rom Load Failure", isPresented: $cartLoadFailed,
-                           presenting: cart.loadError) {_ in // default action
+                           presenting: cart.loadError) { _ in
+                        // NOTE: default action
                     } message: { err in
                         Text(err.message)
                     }

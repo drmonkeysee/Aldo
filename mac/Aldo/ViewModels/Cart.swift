@@ -67,12 +67,10 @@ fileprivate final class CartHandle {
         }) else {
             throw CartError.ioError(String(cString: strerror(errno)))
         }
-
         defer { fclose(cFile) }
+
         let err = cart_create(&handle, cFile)
-        guard err == 0 else {
-            throw CartError.errCode(err)
-        }
+        guard err == 0 else { throw CartError.errCode(err) }
     }
 
     deinit {

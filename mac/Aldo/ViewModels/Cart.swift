@@ -10,6 +10,7 @@ import Foundation
 final class Cart: ObservableObject {
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
+    @Published private(set) var infoText: String?
     private(set) var loadError: CartError?
     private var handle: CartHandle?
 
@@ -25,6 +26,7 @@ final class Cart: ObservableObject {
             handle = try CartHandle(fromFile: filePath)
             file = filePath
             info = .raw
+            infoText = try handle?.getCartInfo()
             return true
         } catch let err as CartError {
             loadError = err
@@ -80,5 +82,19 @@ fileprivate final class CartHandle {
         guard self.handle != nil else { return }
         cart_free(self.handle)
         self.handle = nil
+    }
+
+    func getCartInfo() throws -> String? {
+        let p = Pipe()
+        guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor, "w")
+        else {
+            throw CartError.ioError("Cart data stream failure")
+        }
+
+        cart_write_info(handle, stream, true)
+        fclose(stream)
+
+        let output = p.fileHandleForReading.availableData
+        return String(data: output, encoding: .utf8)
     }
 }

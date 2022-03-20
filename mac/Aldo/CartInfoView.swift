@@ -16,6 +16,7 @@ struct CartInfoView: View {
                 Text(cart.infoText ?? "No rom info")
                     .padding()
             }
+            .frame(maxHeight: 250)
             .background {
                 Color.cyan
             }
@@ -25,21 +26,6 @@ struct CartInfoView: View {
                         Text("File:")
                         Text("Format:")
                     }
-                    Group {
-                        Text("Mapper:")
-                    }
-                    Group {
-                        Text("PRG ROM:")
-                        Text("WRAM:")
-                        Text("CHR ROM:")
-                        Text("CHR RAM:")
-                        Text("NT-Mirroring:")
-                        Text("Mapper-Ctrl:")
-                    }
-                    Group {
-                        Text("Trainer:")
-                        Text("Bus Conflicts:")
-                    }
                 }
                 VStack(alignment: .leading) {
                     Group {
@@ -47,25 +33,46 @@ struct CartInfoView: View {
                             .truncationMode(.middle)
                         Text(cart.info.name)
                     }
-                    Group {
-                        Text("000 (<Board Names>)")
-                    }
-                    Group {
-                        Text("2 x 16KB")
-                        Text("no")
-                        Text("1 x 8KB")
-                        Text("no")
-                        Text("Vertical")
-                        Text("no")
-                    }
-                    Group {
-                        Text("no")
-                        Text("no")
-                    }
                 }
                 .padding(.vertical, 5)
             }
+            DetailsView(info: cart.info)
         }
+    }
+}
+
+fileprivate struct DetailsView: View {
+    var info: CartInfo
+
+    var body: some View {
+        switch info {
+        case .raw:
+            RawFormatView()
+        case .iNes:
+            iNesFormatView()
+        default:
+            Text("No Data")
+        }
+    }
+}
+
+fileprivate struct RawFormatView: View {
+    var body: some View {
+        Text("PRG ROM:")
+    }
+}
+
+fileprivate struct iNesFormatView: View {
+    var body: some View {
+        Text("Mapper:")
+        Text("PRG ROM:")
+        Text("WRAM:")
+        Text("CHR ROM:")
+        Text("CHR RAM:")
+        Text("NT-Mirroring:")
+        Text("Mapper-Ctrl:")
+        Text("Trainer:")
+        Text("Bus Conflicts:")
     }
 }
 

@@ -11,6 +11,7 @@ final class Cart: ObservableObject {
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
     @Published private(set) var infoText: String?
+
     private(set) var loadError: CartError?
     private var handle: CartHandle?
 
@@ -25,7 +26,7 @@ final class Cart: ObservableObject {
         do {
             handle = try CartHandle(fromFile: filePath)
             file = filePath
-            info = .raw
+            info = .raw("Raw")
             infoText = try handle?.getCartInfo()
             return true
         } catch let err as CartError {
@@ -40,9 +41,17 @@ final class Cart: ObservableObject {
 
 enum CartInfo {
     case none
-    case raw
+    case raw(String)
+    case iNes(String, ines_header)
 
-    var name: String { "\(self)".capitalized }
+    var name: String {
+        switch self {
+        case let .raw(str), let .iNes(str, _):
+            return str
+        default:
+            return "\(self)".capitalized
+        }
+    }
 }
 
 enum CartError: Error {
@@ -54,9 +63,9 @@ enum CartError: Error {
         switch self {
         case .unknown:
             return "Unknown error"
-        case .ioError(let str):
+        case let .ioError(str):
             return str
-        case .errCode(let code):
+        case let .errCode(code):
             return "\(String(cString: cart_errstr(code))) (\(code))"
         }
     }

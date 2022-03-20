@@ -16,8 +16,11 @@ final class Cart: ObservableObject {
     var name: String? { file?.lastPathComponent }
 
     func load(from: URL?) -> Bool {
-        guard let filePath = from else { return false }
         loadError = nil
+        guard let filePath = from else {
+            loadError = CartError.ioError("No file selected")
+            return false
+        }
         do {
             handle = try CartHandle(fromFile: filePath)
             file = filePath

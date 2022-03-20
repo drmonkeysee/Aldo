@@ -22,8 +22,8 @@ X(CRTF_NES20, "NES 2.0") \
 X(CRTF_NSF, "NES Sound Format")
 
 static const char
-    *const restrict NesFormat = "NES\x1a",
-    *const restrict NsfFormat = "NESM\x1a";
+    *const restrict NesMagic = "NES\x1a",
+    *const restrict NsfMagic = "NESM\x1a";
 
 enum cartformat {
 #define X(s, n) s,
@@ -50,9 +50,9 @@ static int detect_format(struct cartridge *self, FILE *f)
         return CART_ERR_UNKNOWN;
     }
 
-    if (strncmp(NsfFormat, format, strlen(NsfFormat)) == 0) {
+    if (strncmp(NsfMagic, format, strlen(NsfMagic)) == 0) {
         self->format = CRTF_NSF;
-    } else if (strncmp(NesFormat, format, strlen(NesFormat)) == 0) {
+    } else if (strncmp(NesMagic, format, strlen(NesMagic)) == 0) {
         // NOTE: NES 2.0 byte 7 matches pattern 0bxxxx10xx
         self->format = ((unsigned char)format[7] & 0xc) == 0x8
                         ? CRTF_NES20

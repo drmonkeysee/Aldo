@@ -1,11 +1,11 @@
 //
-//  aldo.c
+//  cli.c
 //  Aldo
 //
 //  Created by Brandon Stansbury on 1/8/21.
 //
 
-#include "aldo.h"
+#include "cli.h"
 
 #include "argparse.h"
 #include "cart.h"
@@ -293,7 +293,7 @@ static int run_with_args(struct control *appstate)
 // Public Interface
 //
 
-int aldo_run(int argc, char *argv[argc+1])
+int cli_run(int argc, char *argv[argc+1])
 {
     struct control appstate;
     if (!argparse_parse(&appstate, argc, argv)) return EXIT_FAILURE;

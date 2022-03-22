@@ -18,7 +18,7 @@
 		C8186497277EB45900CA4AC0 /* uibatch.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186496277EB45900CA4AC0 /* uibatch.c */; };
 		C81A516D25DA036100361E40 /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
 		C820E6C025A9759A006A7AB1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820E6BF25A9759A006A7AB1 /* main.swift */; };
-		C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* aldo.c */; };
+		C820E6CB25A97A4E006A7AB1 /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* cli.c */; };
 		C820E6E025A98557006A7AB1 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C820E6DE25A982A5006A7AB1 /* libncurses.tbd */; };
 		C838D3B527D5DA4400468FDB /* CartInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B427D5DA4400468FDB /* CartInfoView.swift */; };
 		C838D3B727D5DB0300468FDB /* CartChrView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B627D5DB0300468FDB /* CartChrView.swift */; };
@@ -124,8 +124,8 @@
 		C820E6BC25A9759A006A7AB1 /* Dev */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Dev; sourceTree = BUILT_PRODUCTS_DIR; };
 		C820E6BF25A9759A006A7AB1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		C820E6C825A97A4E006A7AB1 /* Dev-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Dev-Bridging-Header.h"; sourceTree = "<group>"; };
-		C820E6C925A97A4E006A7AB1 /* aldo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aldo.h; sourceTree = "<group>"; };
-		C820E6CA25A97A4E006A7AB1 /* aldo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aldo.c; sourceTree = "<group>"; };
+		C820E6C925A97A4E006A7AB1 /* cli.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cli.h; sourceTree = "<group>"; };
+		C820E6CA25A97A4E006A7AB1 /* cli.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cli.c; sourceTree = "<group>"; };
 		C820E6D325A97FB5006A7AB1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		C820E6DE25A982A5006A7AB1 /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
 		C838D3B427D5DA4400468FDB /* CartInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartInfoView.swift; sourceTree = "<group>"; };
@@ -295,8 +295,6 @@
 		C820E6C625A97A2F006A7AB1 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				C820E6C925A97A4E006A7AB1 /* aldo.h */,
-				C820E6CA25A97A4E006A7AB1 /* aldo.c */,
 				C8B4664327755790000576EE /* argparse.h */,
 				C8B4664427755790000576EE /* argparse.c */,
 				C8C706902751EEBA00B45785 /* bus.h */,
@@ -305,6 +303,8 @@
 				C8C7068F2751EEBA00B45785 /* bytes.c */,
 				C8C7068E2751EEBA00B45785 /* cart.h */,
 				C8C7068A2751EEBA00B45785 /* cart.c */,
+				C820E6C925A97A4E006A7AB1 /* cli.h */,
+				C820E6CA25A97A4E006A7AB1 /* cli.c */,
 				C81A516B25DA036100361E40 /* control.h */,
 				C81A516C25DA036100361E40 /* control.c */,
 				C8C706842751EEBA00B45785 /* cpu.h */,
@@ -647,7 +647,7 @@
 				C8D8FDA82792691B0073639B /* tsutil.c in Sources */,
 				C8186495277EB0F700CA4AC0 /* uincurses.c in Sources */,
 				C8C706942751EEBA00B45785 /* cpu.c in Sources */,
-				C820E6CB25A97A4E006A7AB1 /* aldo.c in Sources */,
+				C820E6CB25A97A4E006A7AB1 /* cli.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

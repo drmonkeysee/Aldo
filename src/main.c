@@ -5,9 +5,9 @@
 //  Created by Brandon Stansbury on 1/8/21.
 //
 
-#include "aldo.h"
+#include "cli.h"
 
 int main(int argc, char *argv[argc+1])
 {
-    return aldo_run(argc, argv);
+    return cli_run(argc, argv);
 }

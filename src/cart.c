@@ -13,30 +13,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-// X(symbol, name)
-#define CART_FORMAT_X \
-X(CRTF_RAW, "Raw ROM Image?") \
-X(CRTF_ALDO, "Aldo") \
-X(CRTF_INES, "iNES") \
-X(CRTF_NES20, "NES 2.0") \
-X(CRTF_NSF, "NES Sound Format")
-
 static const char
     *const restrict NesMagic = "NES\x1a",
     *const restrict NsfMagic = "NESM\x1a";
 
-enum cartformat {
-#define X(s, n) s,
-    CART_FORMAT_X
-#undef X
-};
-
 struct cartridge {
     struct mapper *mapper;
-    enum cartformat format;
-    union {
-        struct ines_header ines_hdr;
-    };
+    struct cartinfo info;
 };
 
 static int detect_format(struct cartridge *self, FILE *f)
@@ -51,14 +34,14 @@ static int detect_format(struct cartridge *self, FILE *f)
     }
 
     if (strncmp(NsfMagic, format, strlen(NsfMagic)) == 0) {
-        self->format = CRTF_NSF;
+        self->info.format = CRTF_NSF;
     } else if (strncmp(NesMagic, format, strlen(NesMagic)) == 0) {
         // NOTE: NES 2.0 byte 7 matches pattern 0bxxxx10xx
-        self->format = ((unsigned char)format[7] & 0xc) == 0x8
-                        ? CRTF_NES20
-                        : CRTF_INES;
+        self->info.format = ((unsigned char)format[7] & 0xc) == 0x8
+                                ? CRTF_NES20
+                                : CRTF_INES;
     } else {
-        self->format = CRTF_RAW;
+        self->info.format = CRTF_RAW;
     }
 
     // NOTE: reset back to beginning of file to fully parse detected format
@@ -78,24 +61,25 @@ static int parse_ines(struct cartridge *self, FILE *f)
     memcpy(&tail, header + 12, sizeof tail);
     if (tail != 0) return CART_ERR_OBSOLETE;
 
-    self->ines_hdr.prg_chunks = header[4];
-    self->ines_hdr.chr_chunks = header[5];
-    self->ines_hdr.wram = header[6] & 0x2;
+    struct cartinfo *const info = &self->info;
+    info->ines_hdr.prg_chunks = header[4];
+    info->ines_hdr.chr_chunks = header[5];
+    info->ines_hdr.wram = header[6] & 0x2;
 
     // NOTE: mapper may override these two fields
-    self->ines_hdr.mirror = header[6] & 0x8
+    info->ines_hdr.mirror = header[6] & 0x8
                                 ? NTM_4SCREEN
                                 : (header[6] & 0x1
                                    ? NTM_VERTICAL
                                    : NTM_HORIZONTAL);
-    self->ines_hdr.mapper_controlled = false;
+    info->ines_hdr.mapper_controlled = false;
 
-    self->ines_hdr.trainer = header[6] & 0x4;
-    self->ines_hdr.mapper_id = (header[6] >> 4) | (header[7] & 0xf0);
-    self->ines_hdr.wram_chunks = header[8];
-    self->ines_hdr.bus_conflicts = header[10] & 0x20;
+    info->ines_hdr.trainer = header[6] & 0x4;
+    info->ines_hdr.mapper_id = (header[6] >> 4) | (header[7] & 0xf0);
+    info->ines_hdr.wram_chunks = header[8];
+    info->ines_hdr.bus_conflicts = header[10] & 0x20;
 
-    const int err = mapper_ines_create(&self->mapper, &self->ines_hdr, f);
+    const int err = mapper_ines_create(&self->mapper, &info->ines_hdr, f);
     if (err == 0) {
         // TODO: we've found a ROM with extra bytes after CHR data
         assert(fgetc(f) == EOF && feof(f));
@@ -141,7 +125,7 @@ static const char *mirror_name(enum nt_mirroring m)
 
 static uint8_t mapper_id(const struct cartridge *self)
 {
-    return self->format == CRTF_INES ? self->ines_hdr.mapper_id : 0;
+    return self->info.format == CRTF_INES ? self->info.ines_hdr.mapper_id : 0;
 }
 
 static void hr(FILE *f)
@@ -154,7 +138,7 @@ static const char *boolstr(bool value)
     return value ? "yes" : "no";
 }
 
-static void write_ines_info(const struct cartridge *self, FILE *f,
+static void write_ines_info(const struct cartinfo *self, FILE *f,
                             bool verbose)
 {
     static const char
@@ -246,7 +230,7 @@ int cart_create(cart **c, FILE *f)
 
     int err = detect_format(self, f);
     if (err == 0) {
-        switch (self->format) {
+        switch (self->info.format) {
         case CRTF_INES:
             err = parse_ines(self, f);
             break;
@@ -327,13 +311,13 @@ void cart_write_info(cart *self, FILE *f, bool verbose)
     assert(self != NULL);
     assert(f != NULL);
 
-    fprintf(f, "Format\t\t: %s\n", format_name(self->format));
+    fprintf(f, "Format\t\t: %s\n", format_name(self->info.format));
     if (verbose) {
         hr(f);
     }
-    switch (self->format) {
+    switch (self->info.format) {
     case CRTF_INES:
-        write_ines_info(self, f, verbose);
+        write_ines_info(&self->info, f, verbose);
         break;
     default:
         write_raw_info(f);
@@ -344,11 +328,11 @@ void cart_write_info(cart *self, FILE *f, bool verbose)
 void cart_write_dis_header(cart *self, FILE *f)
 {
     char fmtd[CART_FMT_SIZE];
-    const int result = cart_fmtdescription(self->format, mapper_id(self),
+    const int result = cart_fmtdescription(self->info.format, mapper_id(self),
                                            fmtd);
     fputs(result > 0 ? fmtd : "Invalid Format", f);
     fputs("\n\nDisassembly of PRG Banks\n", f);
-    if (self->format != CRTF_ALDO) {
+    if (self->info.format != CRTF_ALDO) {
         fputs("(NOTE: approximate for non-Aldo formats)\n", f);
     }
 }
@@ -377,6 +361,6 @@ void cart_snapshot(cart *self, struct console_state *snapshot)
     assert(self != NULL);
     assert(snapshot != NULL);
 
-    snapshot->cart.format = self->format;
+    snapshot->cart.format = self->info.format;
     snapshot->cart.mapid = mapper_id(self);
 }

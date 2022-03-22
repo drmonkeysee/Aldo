@@ -34,6 +34,20 @@ enum {
 };
 
 // X(symbol, name)
+#define CART_FORMAT_X \
+X(CRTF_RAW, "Raw ROM Image?") \
+X(CRTF_ALDO, "Aldo") \
+X(CRTF_INES, "iNES") \
+X(CRTF_NES20, "NES 2.0") \
+X(CRTF_NSF, "NES Sound Format")
+
+enum cartformat {
+#define X(s, n) s,
+    CART_FORMAT_X
+#undef X
+};
+
+// X(symbol, name)
 #define CART_INES_NTMIRROR_X \
 X(NTM_HORIZONTAL, "Horizontal") \
 X(NTM_VERTICAL, "Vertical") \
@@ -68,6 +82,13 @@ struct ines_header {
         mapper_implemented,     // Mapper is implemented
         trainer,                // Trainer data present
         wram;                   // PRG RAM banks present
+};
+
+struct cartinfo {
+    enum cartformat format;
+    union {
+        struct ines_header ines_hdr;
+    };
 };
 
 struct bankview {

@@ -101,11 +101,14 @@ typedef struct cartridge cart;
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
 const char *cart_errstr(int err);
+const char *cart_formatname(enum cartformat format);
+const char *cart_mirrorname(enum nt_mirroring mirror);
 
 // NOTE: if returns non-zero error code, *c is unmodified
 int cart_create(cart **c, FILE *f);
 void cart_free(cart *self);
 
+void cart_getinfo(cart *self, struct cartinfo *info);
 struct bankview cart_prgbank(cart *self, size_t i);
 struct bankview cart_chrbank(cart *self, size_t i);
 

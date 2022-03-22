@@ -99,30 +99,6 @@ static int parse_raw(struct cartridge *self, FILE *f)
     return err;
 }
 
-static const char *format_name(enum cartformat f)
-{
-    switch (f) {
-#define X(s, n) case s: return n;
-        CART_FORMAT_X
-#undef X
-    default:
-        assert(((void)"INVALID CART FORMAT", false));
-        break;
-    }
-}
-
-static const char *mirror_name(enum nt_mirroring m)
-{
-    switch (m) {
-#define X(s, n) case s: return n;
-        CART_INES_NTMIRROR_X
-#undef X
-    default:
-        assert(((void)"INVALID INES NT MIRROR", false));
-        break;
-    }
-}
-
 static uint8_t mapper_id(const struct cartridge *self)
 {
     return self->info.format == CRTF_INES ? self->info.ines_hdr.mapper_id : 0;
@@ -138,8 +114,7 @@ static const char *boolstr(bool value)
     return value ? "yes" : "no";
 }
 
-static void write_ines_info(const struct cartinfo *self, FILE *f,
-                            bool verbose)
+static void write_ines_info(const struct cartinfo *self, FILE *f, bool verbose)
 {
     static const char
         *const restrict fullsize = " x 16KB",
@@ -182,7 +157,7 @@ static void write_ines_info(const struct cartinfo *self, FILE *f,
             fprintf(f, "%sno\n", chrramlbl);
         }
     }
-    fprintf(f, "NT-Mirroring\t: %s\n", mirror_name(self->ines_hdr.mirror));
+    fprintf(f, "NT-Mirroring\t: %s\n", cart_mirrorname(self->ines_hdr.mirror));
     if (verbose || self->ines_hdr.mapper_controlled) {
         fprintf(f, "Mapper-Ctrl\t: %s\n",
                 boolstr(self->ines_hdr.mapper_controlled));
@@ -218,6 +193,30 @@ const char *cart_errstr(int err)
 #undef X
     default:
         return "UNKNOWN ERR";
+    }
+}
+
+const char *cart_formatname(enum cartformat format)
+{
+    switch (format) {
+#define X(s, n) case s: return n;
+        CART_FORMAT_X
+#undef X
+    default:
+        assert(((void)"INVALID CART FORMAT", false));
+        break;
+    }
+}
+
+const char *cart_mirrorname(enum nt_mirroring mirror)
+{
+    switch (mirror) {
+#define X(s, n) case s: return n;
+        CART_INES_NTMIRROR_X
+#undef X
+    default:
+        assert(((void)"INVALID INES NT MIRROR", false));
+        break;
     }
 }
 
@@ -262,6 +261,14 @@ void cart_free(cart *self)
         self->mapper->dtor(self->mapper);
     }
     free(self);
+}
+
+void cart_getinfo(cart *self, struct cartinfo *info)
+{
+    assert(self != NULL);
+    assert(info != NULL);
+
+    *info = self->info;
 }
 
 struct bankview cart_prgbank(cart *self, size_t i)
@@ -311,7 +318,7 @@ void cart_write_info(cart *self, FILE *f, bool verbose)
     assert(self != NULL);
     assert(f != NULL);
 
-    fprintf(f, "Format\t\t: %s\n", format_name(self->info.format));
+    fprintf(f, "Format\t\t: %s\n", cart_formatname(self->info.format));
     if (verbose) {
         hr(f);
     }
@@ -343,7 +350,7 @@ int cart_fmtdescription(int format, uint8_t mapid,
     assert(buf != NULL);
 
     int count, total;
-    total = count = sprintf(buf, "%s", format_name(format));
+    total = count = sprintf(buf, "%s", cart_formatname(format));
     if (count < 0) return CART_ERR_FMT;
 
     if (format == CRTF_INES) {

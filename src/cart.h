@@ -62,7 +62,7 @@ enum nt_mirroring {
 };
 
 enum {
-    CART_FMT_SIZE = 17, // Format description is at most 16 chars
+    CART_FMT_SIZE = 17, // Format extended name is at most 16 chars
 };
 
 // iNES File Header

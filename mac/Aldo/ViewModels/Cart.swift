@@ -10,7 +10,6 @@ import Foundation
 final class Cart: ObservableObject {
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
-    @Published private(set) var infoText: String?
 
     private(set) var loadError: CartError?
     private var handle: CartHandle?
@@ -26,8 +25,7 @@ final class Cart: ObservableObject {
         do {
             handle = try CartHandle(fromFile: filePath)
             file = filePath
-            info = .raw("Raw")
-            infoText = try handle?.getCartInfo()
+            info = handle?.getCartInfo() ?? .none
             return true
         } catch let err as CartError {
             loadError = err
@@ -41,6 +39,7 @@ final class Cart: ObservableObject {
 
 enum CartInfo {
     case none
+    case unknown
     case raw(String)
     case iNes(String, ines_header)
 
@@ -72,7 +71,7 @@ enum CartError: Error {
 }
 
 fileprivate final class CartHandle {
-    private var handle: OpaquePointer? = nil
+    private var cartRef: OpaquePointer? = nil
 
     init(fromFile: URL) throws {
         errno = 0
@@ -83,27 +82,29 @@ fileprivate final class CartHandle {
         }
         defer { fclose(cFile) }
 
-        let err = cart_create(&handle, cFile)
+        let err = cart_create(&cartRef, cFile)
         guard err == 0 else { throw CartError.errCode(err) }
     }
 
     deinit {
-        guard self.handle != nil else { return }
-        cart_free(self.handle)
-        self.handle = nil
+        guard cartRef != nil else { return }
+        cart_free(cartRef)
+        cartRef = nil
     }
 
-    func getCartInfo() throws -> String? {
-        let p = Pipe()
-        guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor, "w")
-        else {
-            throw CartError.ioError("Cart data stream failure")
+    func getCartInfo() -> CartInfo {
+        guard cartRef != nil else { return .none }
+
+        var info = cartinfo()
+        cart_getinfo(cartRef, &info)
+        switch info.format {
+        case CRTF_RAW:
+            return .raw(String(cString: cart_formatname(info.format)))
+        case CRTF_INES:
+            return .iNes(String(cString: cart_formatname(info.format)),
+                         info.ines_hdr)
+        default:
+            return .unknown
         }
-
-        cart_write_info(handle, stream, true)
-        fclose(stream)
-
-        let output = p.fileHandleForReading.availableData
-        return String(data: output, encoding: .utf8)
     }
 }

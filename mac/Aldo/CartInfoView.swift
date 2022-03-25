@@ -12,14 +12,6 @@ struct CartInfoView: View {
 
     var body: some View {
         VStack {
-            ScrollView {
-                Text(cart.infoText ?? "No rom info")
-                    .padding()
-            }
-            .frame(maxHeight: 250)
-            .background {
-                Color.cyan
-            }
             HStack {
                 VStack(alignment: .trailing) {
                     Group {

@@ -203,8 +203,7 @@ const char *cart_formatname(enum cartformat format)
         CART_FORMAT_X
 #undef X
     default:
-        assert(((void)"INVALID CART FORMAT", false));
-        break;
+        return "UNKNOWN CART FORMAT";
     }
 }
 
@@ -215,8 +214,7 @@ const char *cart_mirrorname(enum nt_mirroring mirror)
         CART_INES_NTMIRROR_X
 #undef X
     default:
-        assert(((void)"INVALID INES NT MIRROR", false));
-        break;
+        return "UNKNOWN INES NT MIRROR";
     }
 }
 

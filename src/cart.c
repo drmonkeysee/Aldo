@@ -114,7 +114,7 @@ static const char *boolstr(bool value)
     return value ? "yes" : "no";
 }
 
-static void write_ines_info(const struct cartinfo *self, FILE *f, bool verbose)
+static void write_ines_info(const struct cartinfo *info, FILE *f, bool verbose)
 {
     static const char
         *const restrict fullsize = " x 16KB",
@@ -123,8 +123,8 @@ static void write_ines_info(const struct cartinfo *self, FILE *f, bool verbose)
         *const restrict chrromlbl = "CHR ROM\t\t: ",
         *const restrict chrramlbl = "CHR RAM\t\t: ";
 
-    fprintf(f, "Mapper\t\t: %03u%s", self->ines_hdr.mapper_id,
-            self->ines_hdr.mapper_implemented ? "" : " (Not Implemented)");
+    fprintf(f, "Mapper\t\t: %03u%s", info->ines_hdr.mapper_id,
+            info->ines_hdr.mapper_implemented ? "" : " (Not Implemented)");
     if (verbose) {
         // TODO: add board names
         fputs(" (<Board Names>)\n", f);
@@ -133,45 +133,45 @@ static void write_ines_info(const struct cartinfo *self, FILE *f, bool verbose)
         fputc('\n', f);
     }
 
-    fprintf(f, "PRG ROM\t\t: %u%s\n", self->ines_hdr.prg_chunks,
+    fprintf(f, "PRG ROM\t\t: %u%s\n", info->ines_hdr.prg_chunks,
             verbose ? fullsize : "");
-    if (self->ines_hdr.wram) {
+    if (info->ines_hdr.wram) {
         fprintf(f, "%s%u%s\n", wramlbl,
-                self->ines_hdr.wram_chunks == 0
+                info->ines_hdr.wram_chunks == 0
                     ? 1u
-                    : self->ines_hdr.wram_chunks,
+                    : info->ines_hdr.wram_chunks,
                 verbose ? halfsize : "");
     } else if (verbose) {
         fprintf(f, "%sno\n", wramlbl);
     }
 
-    if (self->ines_hdr.chr_chunks == 0) {
+    if (info->ines_hdr.chr_chunks == 0) {
         if (verbose) {
             fprintf(f, "%sno\n", chrromlbl);
         }
         fprintf(f, "%s1%s\n", chrramlbl, verbose ? halfsize : "");
     } else {
-        fprintf(f, "%s%u%s\n", chrromlbl, self->ines_hdr.chr_chunks,
+        fprintf(f, "%s%u%s\n", chrromlbl, info->ines_hdr.chr_chunks,
                 verbose ? halfsize : "");
         if (verbose) {
             fprintf(f, "%sno\n", chrramlbl);
         }
     }
-    fprintf(f, "NT-Mirroring\t: %s\n", cart_mirrorname(self->ines_hdr.mirror));
-    if (verbose || self->ines_hdr.mapper_controlled) {
+    fprintf(f, "NT-Mirroring\t: %s\n", cart_mirrorname(info->ines_hdr.mirror));
+    if (verbose || info->ines_hdr.mapper_controlled) {
         fprintf(f, "Mapper-Ctrl\t: %s\n",
-                boolstr(self->ines_hdr.mapper_controlled));
+                boolstr(info->ines_hdr.mapper_controlled));
     }
 
     if (verbose) {
         hr(f);
     }
-    if (verbose || self->ines_hdr.trainer) {
-        fprintf(f, "Trainer\t\t: %s\n", boolstr(self->ines_hdr.trainer));
+    if (verbose || info->ines_hdr.trainer) {
+        fprintf(f, "Trainer\t\t: %s\n", boolstr(info->ines_hdr.trainer));
     }
-    if (verbose || self->ines_hdr.bus_conflicts) {
+    if (verbose || info->ines_hdr.bus_conflicts) {
         fprintf(f, "Bus Conflicts\t: %s\n",
-                boolstr(self->ines_hdr.bus_conflicts));
+                boolstr(info->ines_hdr.bus_conflicts));
     }
 }
 
@@ -335,8 +335,8 @@ void cart_write_info(cart *self, FILE *f, bool verbose)
 void cart_write_dis_header(cart *self, FILE *f)
 {
     char fmtd[CART_FMT_SIZE];
-    const int result = cart_fmtdescription(self->info.format, mapper_id(self),
-                                           fmtd);
+    const int result = cart_format_extendedname(self->info.format,
+                                                mapper_id(self), fmtd);
     fputs(result > 0 ? fmtd : "Invalid Format", f);
     fputs("\n\nDisassembly of PRG Banks\n", f);
     if (self->info.format != CRTF_ALDO) {
@@ -344,8 +344,8 @@ void cart_write_dis_header(cart *self, FILE *f)
     }
 }
 
-int cart_fmtdescription(int format, uint8_t mapid,
-                        char buf[restrict static CART_FMT_SIZE])
+int cart_format_extendedname(int format, uint8_t mapid,
+                             char buf[restrict static CART_FMT_SIZE])
 {
     assert(buf != NULL);
 

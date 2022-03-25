@@ -209,8 +209,8 @@ static void drawcart(const struct control *appstate,
             (int)(longname ? maxwidth - 1 : namelen), cn,
             longname ? "\u2026" : "");
     char fmtd[CART_FMT_SIZE];
-    const int result = cart_fmtdescription(snapshot->cart.format,
-                                           snapshot->cart.mapid, fmtd);
+    const int result = cart_format_extendedname(snapshot->cart.format,
+                                                snapshot->cart.mapid, fmtd);
     mvwprintw(CartView.content, ++cursor_y, 0, "Format: %s",
               result > 0 ? fmtd : "Invalid Format");
 }

@@ -118,7 +118,7 @@ void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr);
 void cart_write_info(cart *self, FILE *f, bool verbose);
 void cart_write_dis_header(cart *self, FILE *f);
 
-int cart_format_extendedname(int format, uint8_t mapid,
+int cart_format_extendedname(const struct cartinfo *info,
                              char buf[restrict static CART_FMT_SIZE]);
 void cart_snapshot(cart *self, struct console_state *snapshot);
 

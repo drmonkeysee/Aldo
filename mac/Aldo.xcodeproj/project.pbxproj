@@ -28,6 +28,7 @@
 		C83C663A27E2F52C009CE42C /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
 		C85C8DC625BD29AC00611D19 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
+		C85CC20927ED6BF30063276D /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C85CC20827ED6BF30063276D /* snapshot.c */; };
 		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
 		C8702CF9278A58C900725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C8702CF8278A58C900725690 /* haltexpr.c */; };
 		C8702CFA278A598A00725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
@@ -136,6 +137,7 @@
 		C8557B2E25C661660090296D /* ui.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ui.c; sourceTree = "<group>"; };
 		C85C8DC425BD29AC00611D19 /* dis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dis.h; sourceTree = "<group>"; };
 		C85C8DC525BD29AC00611D19 /* dis.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dis.c; sourceTree = "<group>"; };
+		C85CC20827ED6BF30063276D /* snapshot.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = snapshot.c; sourceTree = "<group>"; };
 		C86030772761A51100F1B27D /* cpupeek.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpupeek.c; sourceTree = "<group>"; };
 		C8702CF8278A58C900725690 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
 		C88F3E5627D9A45E00317732 /* EmulatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulatorView.swift; sourceTree = "<group>"; };
@@ -323,6 +325,7 @@
 				C8C706872751EEBA00B45785 /* nes.h */,
 				C8C706832751EEBA00B45785 /* nes.c */,
 				C8C7068B2751EEBA00B45785 /* snapshot.h */,
+				C85CC20827ED6BF30063276D /* snapshot.c */,
 				C8C706BC2751F55C00B45785 /* trace.h */,
 				C8C706BD2751F55C00B45785 /* trace.c */,
 				C83965E927810D4300E1E28E /* tsutil.h */,
@@ -636,6 +639,7 @@
 				C8C706932751EEBA00B45785 /* bus.c in Sources */,
 				C808BA6827893976001FDE39 /* haltexpr.c in Sources */,
 				C8C706962751EEBA00B45785 /* decode.c in Sources */,
+				C85CC20927ED6BF30063276D /* snapshot.c in Sources */,
 				C81A516D25DA036100361E40 /* control.c in Sources */,
 				C80C9E1C277D648F000F2D8B /* debug.c in Sources */,
 				C8C706972751EEBA00B45785 /* bytes.c in Sources */,

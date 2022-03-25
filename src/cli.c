@@ -242,8 +242,7 @@ static int run_emu(struct control *appstate, cart *c)
 
     ui.cleanup(appstate, &snapshot);
 exit_console:
-    snapshot.mem.prglength = 0;
-    snapshot.mem.ram = NULL;
+    snapshot_clear(&snapshot);
     nes_free(console);
     console = NULL;
 exit_debug:

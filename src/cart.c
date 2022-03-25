@@ -99,11 +99,6 @@ static int parse_raw(struct cartridge *self, FILE *f)
     return err;
 }
 
-static uint8_t mapper_id(const struct cartridge *self)
-{
-    return self->info.format == CRTF_INES ? self->info.ines_hdr.mapper_id : 0;
-}
-
 static void hr(FILE *f)
 {
     fputs("-----------------------\n", f);
@@ -332,9 +327,11 @@ void cart_write_info(cart *self, FILE *f, bool verbose)
 
 void cart_write_dis_header(cart *self, FILE *f)
 {
+    assert(self != NULL);
+    assert(f != NULL);
+
     char fmtd[CART_FMT_SIZE];
-    const int result = cart_format_extendedname(self->info.format,
-                                                mapper_id(self), fmtd);
+    const int result = cart_format_extendedname(&self->info, fmtd);
     fputs(result > 0 ? fmtd : "Invalid Format", f);
     fputs("\n\nDisassembly of PRG Banks\n", f);
     if (self->info.format != CRTF_ALDO) {
@@ -342,17 +339,18 @@ void cart_write_dis_header(cart *self, FILE *f)
     }
 }
 
-int cart_format_extendedname(int format, uint8_t mapid,
+int cart_format_extendedname(const struct cartinfo *info,
                              char buf[restrict static CART_FMT_SIZE])
 {
+    assert(info != NULL);
     assert(buf != NULL);
 
     int count, total;
-    total = count = sprintf(buf, "%s", cart_formatname(format));
+    total = count = sprintf(buf, "%s", cart_formatname(info->format));
     if (count < 0) return CART_ERR_FMT;
 
-    if (format == CRTF_INES) {
-        count = sprintf(buf + total, " (%03d)", mapid);
+    if (info->format == CRTF_INES) {
+        count = sprintf(buf + total, " (%03d)", info->ines_hdr.mapper_id);
         if (count < 0) return CART_ERR_FMT;
         total += count;
     }
@@ -366,6 +364,5 @@ void cart_snapshot(cart *self, struct console_state *snapshot)
     assert(self != NULL);
     assert(snapshot != NULL);
 
-    snapshot->cart.format = self->info.format;
-    snapshot->cart.mapid = mapper_id(self);
+    snapshot->cart.info = &self->info;
 }

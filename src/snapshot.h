@@ -31,8 +31,7 @@ enum nistate {
 
 struct console_state {
     struct {
-        int format;
-        uint8_t mapid;
+        const struct cartinfo *info;    // Non-owning Pointer
     } cart;
     struct {
         const uint8_t *ram;     // Non-owning Pointer
@@ -60,5 +59,7 @@ struct console_state {
         bool irq, nmi, readwrite, ready, reset, sync;
     } lines;
 };
+
+void snapshot_clear(struct console_state *snapshot);
 
 #endif

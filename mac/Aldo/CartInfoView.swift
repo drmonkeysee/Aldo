@@ -14,57 +14,111 @@ struct CartInfoView: View {
         VStack {
             HStack {
                 VStack(alignment: .trailing) {
-                    Group {
-                        Text("File:")
-                        Text("Format:")
-                    }
+                    CommonInfoView(section: .labels, cart: cart)
+                    DetailsView(section: .labels, info: cart.info)
+                }
+                VStack {
+                    CommonInfoView(section: .separators, cart: cart)
+                    DetailsView(section: .separators, info: cart.info)
                 }
                 VStack(alignment: .leading) {
-                    Group {
-                        Text(cart.name ?? "No rom")
-                            .truncationMode(.middle)
-                        Text(cart.info.name)
-                    }
+                    CommonInfoView(section: .values, cart: cart)
+                    DetailsView(section: .values, info: cart.info)
                 }
-                .padding(.vertical, 5)
             }
-            DetailsView(info: cart.info)
+        }
+    }
+}
+
+fileprivate enum InfoSection {
+    case labels
+    case separators
+    case values
+}
+
+fileprivate struct CommonInfoView: View {
+    var section: InfoSection
+    @ObservedObject var cart: Cart
+
+    var body: some View {
+        switch section {
+        case .labels:
+            Text("File")
+            Text("Format")
+        case .separators:
+            Text(":")
+            Text(":")
+        case .values:
+            Text(cart.name ?? "No rom")
+                .truncationMode(.middle)
+                .help(cart.name ?? "")
+            Text(cart.info.name)
         }
     }
 }
 
 fileprivate struct DetailsView: View {
+    var section: InfoSection
     var info: CartInfo
 
     var body: some View {
         switch info {
         case .raw:
-            RawFormatView()
+            RawFormatView(section: section)
         case .iNes:
-            iNesFormatView()
+            iNesFormatView(section: section, info: info)
         default:
-            Text("No Data")
+            EmptyView()
         }
     }
 }
 
 fileprivate struct RawFormatView: View {
+    var section: InfoSection
+
     var body: some View {
-        Text("PRG ROM:")
+        switch section {
+        case .labels:
+            Text("PRG ROM")
+        case .separators:
+            Text(":")
+        case .values:
+            Text("32KB")
+        }
     }
 }
 
 fileprivate struct iNesFormatView: View {
+    var section: InfoSection
+    var info: CartInfo
+
     var body: some View {
-        Text("Mapper:")
-        Text("PRG ROM:")
-        Text("WRAM:")
-        Text("CHR ROM:")
-        Text("CHR RAM:")
-        Text("NT-Mirroring:")
-        Text("Mapper-Ctrl:")
-        Text("Trainer:")
-        Text("Bus Conflicts:")
+        switch section {
+        case .labels:
+            Text("Mapper")
+            Text("PRG ROM")
+            Text("WRAM")
+            Text("CHR ROM")
+            Text("CHR RAM")
+            Text("NT-Mirroring")
+            Text("Mapper-Ctrl")
+            Text("Trainer")
+            Text("Bus Conflicts")
+        case .separators:
+            ForEach(0..<9) { _ in
+                Text(":")
+            }
+        case .values:
+            Text("Val")
+            Text("Val")
+            Text("Val")
+            Text("Val")
+            Text("Val")
+            Text("Val")
+            Text("Val")
+            Text("Val")
+            Text("Val")
+        }
     }
 }
 

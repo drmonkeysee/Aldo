@@ -89,23 +89,29 @@ fileprivate struct RawFormatView: View {
 }
 
 fileprivate struct iNesFormatView: View {
+    private static let labels = [
+        "Mapper",
+        "PRG ROM",
+        "WRAM",
+        "CHR ROM",
+        "CHR RAM",
+        "NT-Mirroring",
+        "Mapper-Ctrl",
+        "Trainer",
+        "Bus Conflicts",
+    ]
+
     var section: InfoSection
     var info: CartInfo
 
     var body: some View {
         switch section {
         case .labels:
-            Text("Mapper")
-            Text("PRG ROM")
-            Text("WRAM")
-            Text("CHR ROM")
-            Text("CHR RAM")
-            Text("NT-Mirroring")
-            Text("Mapper-Ctrl")
-            Text("Trainer")
-            Text("Bus Conflicts")
+            ForEach(iNesFormatView.labels, id: \.self) { label in
+                Text(label)
+            }
         case .separators:
-            ForEach(0..<9) { _ in
+            ForEach(0..<iNesFormatView.labels.count, id: \.self) { _ in
                 Text(":")
             }
         case .values:

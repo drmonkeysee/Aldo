@@ -10,7 +10,6 @@ import Foundation
 final class Cart: ObservableObject {
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
-
     private(set) var loadError: CartError?
     private var handle: CartHandle?
 

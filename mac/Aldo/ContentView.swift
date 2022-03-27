@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    static let fileLabel = "Open ROM File"
+    private static let fileLabel = "Open ROM File"
 
     @State private var navSelection: ContentLinks? = .emulator
     @State private var cartLoadFailed: Bool = false

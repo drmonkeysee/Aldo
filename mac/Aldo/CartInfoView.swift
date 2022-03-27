@@ -144,8 +144,8 @@ fileprivate struct iNesDetailsView: View {
         "Trainer",
         "Bus Conflicts",
     ]
-    static let fullSize = "x 16KB"
-    static let halfSize = "x 8KB"
+    private static let fullSize = "x 16KB"
+    private static let halfSize = "x 8KB"
 
     let header: ines_header
     let mirrorName: String

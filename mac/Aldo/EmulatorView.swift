@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct EmulatorView: View {
-    static let nesResolution = (w: 256, h: 240)
-    static let nesScale = 2
+    private static let nesResolution = (w: 256, h: 240)
+    private static let nesScale = 2
 
     var body: some View {
         HStack {

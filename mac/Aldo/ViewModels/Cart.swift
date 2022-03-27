@@ -41,11 +41,11 @@ enum CartInfo {
     case none
     case unknown
     case raw(String)
-    case iNes(String, ines_header)
+    case iNes(String, ines_header, String)
 
     var name: String {
         switch self {
-        case let .raw(str), let .iNes(str, _):
+        case let .raw(str), let .iNes(str, _, _):
             return str
         default:
             return "\(self)".capitalized
@@ -102,7 +102,9 @@ fileprivate final class CartHandle {
             return .raw(String(cString: cart_formatname(info.format)))
         case CRTF_INES:
             return .iNes(String(cString: cart_formatname(info.format)),
-                         info.ines_hdr)
+                         info.ines_hdr,
+                         String(cString: cart_mirrorname(
+                            info.ines_hdr.mirror)))
         default:
             return .unknown
         }

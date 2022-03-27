@@ -122,8 +122,8 @@ fileprivate struct DetailValuesView: View {
         switch info {
         case .raw:
             RawDetailsView()
-        case .iNes:
-            iNesDetailsView(info: info)
+        case .iNes(_, let hdr, let mirrorName):
+            iNesDetailsView(header: hdr, mirrorName: mirrorName)
         default:
             EmptyView()
         }
@@ -141,6 +141,7 @@ fileprivate struct RawDetailsView: View {
 fileprivate struct iNesDetailsView: View {
     static let labels = [
         "Mapper",
+        "Board Names",
         "PRG ROM",
         "WRAM",
         "CHR ROM",
@@ -150,20 +151,38 @@ fileprivate struct iNesDetailsView: View {
         "Trainer",
         "Bus Conflicts",
     ]
+    static let fullSize = "x 16KB"
+    static let halfSize = "x 8KB"
 
-    let info: CartInfo
+    let header: ines_header
+    let mirrorName: String
 
     var body: some View {
-        Text("Val")
-        Text("Val")
-        Text("Val")
-        Text("Val")
-        Text("Val")
-        Text("Val")
-        Text("Val")
-        Text("Val")
-        Text("Val")
+        Text(String(format: "%03u%@", header.mapper_id,
+                    header.mapper_implemented ? "" : " (Not Implemented)"))
+        Text("<Board Names>")
+        Text("\(header.prg_chunks) \(iNesDetailsView.fullSize)")
+        Text(header.wram ? wramStr : "no")
+        Text(header.chr_chunks == 0 ? "no" : chrStr)
+        Text(header.chr_chunks == 0 ? "1 \(iNesDetailsView.halfSize)" : "no")
+        Text(mirrorName)
+        Text(boolToStr(header.mapper_controlled))
+        Text(boolToStr(header.trainer))
+        Text(boolToStr(header.bus_conflicts))
     }
+
+    private var wramStr: String {
+        let chunkCount = header.wram_chunks == 0 ? 1 : header.wram_chunks
+        return "\(chunkCount) \(iNesDetailsView.halfSize)"
+    }
+
+    private var chrStr: String {
+        "\(header.chr_chunks) \(iNesDetailsView.halfSize)"
+    }
+}
+
+fileprivate func boolToStr(_ val: Bool) -> String {
+    return val ? "yes" : "no"
 }
 
 struct CartFormatView_Previews: PreviewProvider {

@@ -42,7 +42,7 @@ fileprivate struct CommonInfoView: View {
         "Format",
     ]
 
-    var section: InfoSection
+    let section: InfoSection
     @ObservedObject var cart: Cart
 
     var body: some View {
@@ -61,8 +61,8 @@ fileprivate struct CommonInfoView: View {
 }
 
 fileprivate struct DetailsView: View {
-    var section: InfoSection
-    var info: CartInfo
+    let section: InfoSection
+    let info: CartInfo
 
     var body: some View {
         switch section {
@@ -116,7 +116,7 @@ fileprivate struct DetailSeparatorsView: View {
 }
 
 fileprivate struct DetailValuesView: View {
-    var info: CartInfo
+    let info: CartInfo
 
     var body: some View {
         switch info {
@@ -151,7 +151,7 @@ fileprivate struct iNesDetailsView: View {
         "Bus Conflicts",
     ]
 
-    var info: CartInfo
+    let info: CartInfo
 
     var body: some View {
         Text("Val")

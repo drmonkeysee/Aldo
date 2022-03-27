@@ -37,10 +37,7 @@ fileprivate enum InfoSection {
 }
 
 fileprivate struct CommonInfoView: View {
-    private static let labels = [
-        "File",
-        "Format",
-    ]
+    private static let labels = ["File", "Format"]
 
     let section: InfoSection
     @ObservedObject var cart: Cart
@@ -163,8 +160,13 @@ fileprivate struct iNesDetailsView: View {
         Text("<Board Names>")
         Text("\(header.prg_chunks) \(iNesDetailsView.fullSize)")
         Text(header.wram ? wramStr : "no")
-        Text(header.chr_chunks == 0 ? "no" : chrStr)
-        Text(header.chr_chunks == 0 ? "1 \(iNesDetailsView.halfSize)" : "no")
+        if header.chr_chunks == 0 {
+            Text("no")
+            Text("1 \(iNesDetailsView.halfSize)")
+        } else {
+            Text("\(header.chr_chunks) \(iNesDetailsView.halfSize)")
+            Text("no")
+        }
         Text(mirrorName)
         Text(boolToStr(header.mapper_controlled))
         Text(boolToStr(header.trainer))
@@ -175,15 +177,9 @@ fileprivate struct iNesDetailsView: View {
         let chunkCount = header.wram_chunks == 0 ? 1 : header.wram_chunks
         return "\(chunkCount) \(iNesDetailsView.halfSize)"
     }
-
-    private var chrStr: String {
-        "\(header.chr_chunks) \(iNesDetailsView.halfSize)"
-    }
 }
 
-fileprivate func boolToStr(_ val: Bool) -> String {
-    return val ? "yes" : "no"
-}
+fileprivate func boolToStr(_ val: Bool) -> String { val ? "yes" : "no" }
 
 struct CartFormatView_Previews: PreviewProvider {
     private static let cart = Cart()

@@ -37,17 +37,20 @@ fileprivate enum InfoSection {
 }
 
 fileprivate struct CommonInfoView: View {
+    private static let labels = [
+        "File",
+        "Format",
+    ]
+
     var section: InfoSection
     @ObservedObject var cart: Cart
 
     var body: some View {
         switch section {
         case .labels:
-            Text("File")
-            Text("Format")
+            DetailLabelsView(labels: CommonInfoView.labels)
         case .separators:
-            Text(":")
-            Text(":")
+            DetailSeparatorsView(count: CommonInfoView.labels.count)
         case .values:
             Text(cart.name ?? "No rom")
                 .truncationMode(.middle)
@@ -62,34 +65,81 @@ fileprivate struct DetailsView: View {
     var info: CartInfo
 
     var body: some View {
+        switch section {
+        case .labels:
+            DetailLabelsView(labels: labels)
+        case .separators:
+            DetailSeparatorsView(count: labels?.count ?? 0)
+        case .values:
+            DetailValuesView(info: info)
+        }
+    }
+
+    private var labels: [String]? {
         switch info {
         case .raw:
-            RawFormatView(section: section)
+            return RawDetailsView.labels
         case .iNes:
-            iNesFormatView(section: section, info: info)
+            return iNesDetailsView.labels
+        default:
+            return nil
+        }
+    }
+}
+
+fileprivate struct DetailLabelsView: View {
+    let labels: [String]?
+
+    var body: some View {
+        if let viewLabels = labels {
+            ForEach(viewLabels, id: \.self) { label in
+                Text(label)
+            }
+        } else {
+            EmptyView()
+        }
+    }
+}
+
+fileprivate struct DetailSeparatorsView: View {
+    let count: Int
+
+    var body: some View {
+        if count > 0 {
+            ForEach(0..<count, id: \.self) { _ in
+                Text(":")
+            }
+        } else {
+            EmptyView()
+        }
+    }
+}
+
+fileprivate struct DetailValuesView: View {
+    var info: CartInfo
+
+    var body: some View {
+        switch info {
+        case .raw:
+            RawDetailsView()
+        case .iNes:
+            iNesDetailsView(info: info)
         default:
             EmptyView()
         }
     }
 }
 
-fileprivate struct RawFormatView: View {
-    var section: InfoSection
+fileprivate struct RawDetailsView: View {
+    static let labels = ["PRG ROM"]
 
     var body: some View {
-        switch section {
-        case .labels:
-            Text("PRG ROM")
-        case .separators:
-            Text(":")
-        case .values:
-            Text("32KB")
-        }
+        Text("32KB")
     }
 }
 
-fileprivate struct iNesFormatView: View {
-    private static let labels = [
+fileprivate struct iNesDetailsView: View {
+    static let labels = [
         "Mapper",
         "PRG ROM",
         "WRAM",
@@ -101,30 +151,18 @@ fileprivate struct iNesFormatView: View {
         "Bus Conflicts",
     ]
 
-    var section: InfoSection
     var info: CartInfo
 
     var body: some View {
-        switch section {
-        case .labels:
-            ForEach(iNesFormatView.labels, id: \.self) { label in
-                Text(label)
-            }
-        case .separators:
-            ForEach(0..<iNesFormatView.labels.count, id: \.self) { _ in
-                Text(":")
-            }
-        case .values:
-            Text("Val")
-            Text("Val")
-            Text("Val")
-            Text("Val")
-            Text("Val")
-            Text("Val")
-            Text("Val")
-            Text("Val")
-            Text("Val")
-        }
+        Text("Val")
+        Text("Val")
+        Text("Val")
+        Text("Val")
+        Text("Val")
+        Text("Val")
+        Text("Val")
+        Text("Val")
+        Text("Val")
     }
 }
 

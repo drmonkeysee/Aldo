@@ -92,8 +92,6 @@ fileprivate struct DetailLabelsView: View {
             ForEach(viewLabels, id: \.self) { label in
                 Text(label)
             }
-        } else {
-            EmptyView()
         }
     }
 }
@@ -106,8 +104,6 @@ fileprivate struct DetailSeparatorsView: View {
             ForEach(0..<count, id: \.self) { _ in
                 Text(":")
             }
-        } else {
-            EmptyView()
         }
     }
 }

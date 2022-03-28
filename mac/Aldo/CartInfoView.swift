@@ -194,8 +194,7 @@ fileprivate struct CopyToClipboardView: View {
                     .opacity(clipOpacity)
                 Image(systemName: "checkmark.diamond")
                     .opacity(checkOpacity)
-                    .symbolRenderingMode(.palette)
-                    .foregroundStyle(.green, .green)
+                    .foregroundStyle(.green)
             }
         }
         .buttonStyle(.plain)

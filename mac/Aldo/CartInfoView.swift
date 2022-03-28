@@ -12,7 +12,7 @@ struct CartInfoView: View {
 
     var body: some View {
         VStack {
-            HStack {
+            HStack(alignment: .top) {
                 VStack(alignment: .trailing) {
                     CommonInfoView(section: .labels, cart: cart)
                     DetailsView(section: .labels, info: cart.info)
@@ -25,8 +25,10 @@ struct CartInfoView: View {
                     CommonInfoView(section: .values, cart: cart)
                     DetailsView(section: .values, info: cart.info)
                 }
+                if cart.file != nil {
+                    CopyToClipboardView()
+                }
             }
-            CopyToClipboardView()
         }
     }
 }
@@ -157,12 +159,12 @@ fileprivate struct iNesDetailsView: View {
         Text("<Board Names>")
         Text("\(header.prg_chunks) \(iNesDetailsView.fullSize)")
         Text(header.wram ? wramStr : "no")
-        if header.chr_chunks == 0 {
-            Text("no")
-            Text("1 \(iNesDetailsView.halfSize)")
-        } else {
+        if header.chr_chunks > 0 {
             Text("\(header.chr_chunks) \(iNesDetailsView.halfSize)")
             Text("no")
+        } else {
+            Text("no")
+            Text("1 \(iNesDetailsView.halfSize)")
         }
         Text(mirrorName)
         Text(boolToStr(header.mapper_controlled))
@@ -171,7 +173,7 @@ fileprivate struct iNesDetailsView: View {
     }
 
     private var wramStr: String {
-        let chunkCount = header.wram_chunks == 0 ? 1 : header.wram_chunks
+        let chunkCount = header.wram_chunks > 0 ? header.wram_chunks : 1
         return "\(chunkCount) \(iNesDetailsView.halfSize)"
     }
 }
@@ -189,9 +191,12 @@ fileprivate struct CopyToClipboardView: View {
                     .opacity(clipOpacity)
                 Image(systemName: "checkmark.diamond")
                     .opacity(checkOpacity)
+                    .symbolRenderingMode(.palette)
+                    .foregroundStyle(.green, .green)
             }
         }
         .buttonStyle(.plain)
+        .help("Copy to Clipboard")
     }
 
     private func copyToClipboard() {

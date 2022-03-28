@@ -132,25 +132,25 @@ static void write_ines_info(const struct cartinfo *info, FILE *f, bool verbose)
             verbose ? fullsize : "");
     if (info->ines_hdr.wram) {
         fprintf(f, "%s%u%s\n", wramlbl,
-                info->ines_hdr.wram_chunks == 0
-                    ? 1u
-                    : info->ines_hdr.wram_chunks,
+                info->ines_hdr.wram_chunks > 0
+                    ? info->ines_hdr.wram_chunks
+                    : 1u,
                 verbose ? halfsize : "");
     } else if (verbose) {
         fprintf(f, "%sno\n", wramlbl);
     }
 
-    if (info->ines_hdr.chr_chunks == 0) {
-        if (verbose) {
-            fprintf(f, "%sno\n", chrromlbl);
-        }
-        fprintf(f, "%s1%s\n", chrramlbl, verbose ? halfsize : "");
-    } else {
+    if (info->ines_hdr.chr_chunks > 0) {
         fprintf(f, "%s%u%s\n", chrromlbl, info->ines_hdr.chr_chunks,
                 verbose ? halfsize : "");
         if (verbose) {
             fprintf(f, "%sno\n", chrramlbl);
         }
+    } else {
+        if (verbose) {
+            fprintf(f, "%sno\n", chrromlbl);
+        }
+        fprintf(f, "%s1%s\n", chrramlbl, verbose ? halfsize : "");
     }
     fprintf(f, "NT-Mirroring\t: %s\n", cart_mirrorname(info->ines_hdr.mirror));
     if (verbose || info->ines_hdr.mapper_controlled) {

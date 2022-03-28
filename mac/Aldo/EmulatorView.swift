@@ -41,7 +41,6 @@ struct EmulatorView: View {
                         Text("Trace")
                     }
                 CartInfoView()
-                    .border(.red)
                     .tabItem {
                         Text("Cart Info")
                     }

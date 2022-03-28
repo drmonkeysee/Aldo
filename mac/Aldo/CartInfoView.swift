@@ -26,6 +26,7 @@ struct CartInfoView: View {
                     DetailsView(section: .values, info: cart.info)
                 }
             }
+            CopyToClipboardView()
         }
     }
 }
@@ -172,6 +173,38 @@ fileprivate struct iNesDetailsView: View {
     private var wramStr: String {
         let chunkCount = header.wram_chunks == 0 ? 1 : header.wram_chunks
         return "\(chunkCount) \(iNesDetailsView.halfSize)"
+    }
+}
+
+fileprivate struct CopyToClipboardView: View {
+    private static let fadeDuration = 2.0
+
+    @State private var clipOpacity = 1.0
+    @State private var checkOpacity = 0.0
+
+    var body: some View {
+        Button(action: copyToClipboard) {
+            ZStack {
+                Image(systemName: "arrow.up.doc.on.clipboard")
+                    .opacity(clipOpacity)
+                Image(systemName: "checkmark.diamond")
+                    .opacity(checkOpacity)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func copyToClipboard() {
+        checkOpacity = 1.0
+        clipOpacity = 0.0
+        let halfDuration = CopyToClipboardView.fadeDuration / 2.0
+        withAnimation(.easeOut(duration: halfDuration).delay(halfDuration)) {
+            checkOpacity = 0.0
+        }
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + CopyToClipboardView.fadeDuration) {
+            clipOpacity = 1.0
+        }
     }
 }
 

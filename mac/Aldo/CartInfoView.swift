@@ -201,7 +201,7 @@ fileprivate struct CopyToClipboardView: View {
         .buttonStyle(.plain)
         .help("Copy to Clipboard")
         .alert("Clipboard Copy Failure", isPresented: $copyError,
-               presenting: cart.loadError) { _ in
+               presenting: cart.currentError) { _ in
             // NOTE: default action
         } message: { err in
             Text(err.message)

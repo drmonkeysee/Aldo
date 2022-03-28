@@ -10,15 +10,15 @@ import Foundation
 final class Cart: ObservableObject {
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
-    private(set) var loadError: CartError?
+    private(set) var currentError: CartError?
     private var handle: CartHandle?
 
     var name: String? { file?.lastPathComponent }
 
     func load(from: URL?) -> Bool {
-        loadError = nil
+        currentError = nil
         guard let filePath = from else {
-            loadError = CartError.ioError("No file selected")
+            currentError = CartError.ioError("No file selected")
             return false
         }
         do {
@@ -27,10 +27,10 @@ final class Cart: ObservableObject {
             info = handle?.getCartInfo() ?? .none
             return true
         } catch let err as CartError {
-            loadError = err
+            currentError = err
             return false
         } catch {
-            loadError = CartError.unknown
+            currentError = CartError.unknown
             return false
         }
     }
@@ -39,9 +39,9 @@ final class Cart: ObservableObject {
         do {
             return try handle?.getInfoText()
         } catch let err as CartError {
-            loadError = err
+            currentError = err
         } catch {
-            loadError = CartError.unknown
+            currentError = CartError.unknown
         }
         return nil
     }

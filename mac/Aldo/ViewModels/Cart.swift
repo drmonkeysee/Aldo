@@ -102,8 +102,8 @@ fileprivate final class CartHandle {
         case CRTF_INES:
             return .iNes(String(cString: cart_formatname(info.format)),
                          info.ines_hdr,
-                         String(cString: cart_mirrorname(
-                            info.ines_hdr.mirror)))
+                         String(
+                            cString: cart_mirrorname(info.ines_hdr.mirror)))
         default:
             return .unknown
         }

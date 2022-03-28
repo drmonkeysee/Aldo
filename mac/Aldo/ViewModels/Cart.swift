@@ -34,6 +34,17 @@ final class Cart: ObservableObject {
             return false
         }
     }
+
+    func getInfoText() -> String? {
+        do {
+            return try handle?.getInfoText()
+        } catch let err as CartError {
+            loadError = err
+        } catch {
+            loadError = CartError.unknown
+        }
+        return nil
+    }
 }
 
 enum CartInfo {
@@ -107,5 +118,25 @@ fileprivate final class CartHandle {
         default:
             return .unknown
         }
+    }
+
+    func getInfoText() throws -> String {
+        guard cartRef != nil else {
+            throw CartError.ioError("No cart found")
+        }
+        let p = Pipe()
+        guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor, "w")
+        else {
+            throw CartError.ioError("Cannot open cart data stream")
+        }
+
+        cart_write_info(cartRef, stream, true)
+        fclose(stream)
+
+        let output = p.fileHandleForReading.availableData
+        guard let result = String(data: output, encoding: .utf8) else {
+            throw CartError.unknown
+        }
+        return result
     }
 }

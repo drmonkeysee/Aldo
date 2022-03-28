@@ -26,7 +26,7 @@ struct CartInfoView: View {
                     DetailsView(section: .values, info: cart.info)
                 }
                 if cart.file != nil {
-                    CopyToClipboardView()
+                    CopyToClipboardView(cart: cart)
                 }
             }
         }
@@ -181,8 +181,11 @@ fileprivate struct iNesDetailsView: View {
 fileprivate struct CopyToClipboardView: View {
     private static let fadeDuration = 2.0
 
+    let cart: Cart
+
     @State private var clipOpacity = 1.0
     @State private var checkOpacity = 0.0
+    @State private var copyError = false
 
     var body: some View {
         Button(action: copyToClipboard) {
@@ -197,9 +200,21 @@ fileprivate struct CopyToClipboardView: View {
         }
         .buttonStyle(.plain)
         .help("Copy to Clipboard")
+        .alert("Clipboard Copy Failure", isPresented: $copyError,
+               presenting: cart.loadError) { _ in
+            // NOTE: default action
+        } message: { err in
+            Text(err.message)
+        }
     }
 
     private func copyToClipboard() {
+        guard let text = cart.getInfoText() else {
+            copyError = true
+            return
+        }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
         checkOpacity = 1.0
         clipOpacity = 0.0
         let halfDuration = CopyToClipboardView.fadeDuration / 2.0

@@ -118,14 +118,12 @@ static void write_ines_info(const struct cartinfo *info, FILE *f, bool verbose)
         *const restrict chrromlbl = "CHR ROM\t\t: ",
         *const restrict chrramlbl = "CHR RAM\t\t: ";
 
-    fprintf(f, "Mapper\t\t: %03u%s", info->ines_hdr.mapper_id,
+    fprintf(f, "Mapper\t\t: %03u%s\n", info->ines_hdr.mapper_id,
             info->ines_hdr.mapper_implemented ? "" : " (Not Implemented)");
     if (verbose) {
         // TODO: add board names
-        fputs(" (<Board Names>)\n", f);
+        fputs("Boards\t\t: <Board Names>\n", f);
         hr(f);
-    } else {
-        fputc('\n', f);
     }
 
     fprintf(f, "PRG ROM\t\t: %u%s\n", info->ines_hdr.prg_chunks,

@@ -137,7 +137,7 @@ fileprivate struct RawDetailsView: View {
 fileprivate struct iNesDetailsView: View {
     static let labels = [
         "Mapper",
-        "Board Names",
+        "Boards",
         "PRG ROM",
         "WRAM",
         "CHR ROM",

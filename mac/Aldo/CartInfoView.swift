@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CartInfoView: View {
-    @EnvironmentObject var cart: Cart
+    @ObservedObject var cart: Cart
 
     var body: some View {
         VStack {
@@ -184,7 +184,6 @@ struct CartFormatView_Previews: PreviewProvider {
     private static let cart = Cart()
 
     static var previews: some View {
-        CartInfoView()
-            .environmentObject(cart)
+        CartInfoView(cart: cart)
     }
 }

@@ -25,6 +25,11 @@ struct ContentView: View {
                 ContentDetail(link: link, cart: cart)
                     .navigationTitle(link.rawValue)
                     .toolbar {
+                        ToolbarItem(placement: .navigation) {
+                            Button(action: toggleSidebar) {
+                                Label("Toggle Sidebar", systemImage: "sidebar.left")
+                            }
+                        }
                         ToolbarItem {
                             Button(action: pickFile) {
                                 Label(ContentView.fileLabel,
@@ -42,13 +47,6 @@ struct ContentView: View {
             }
         }
         .listStyle(.sidebar)
-        .toolbar {
-            ToolbarItem {
-                Button(action: toggleSidebar) {
-                    Label("Toggle Sidebar", systemImage: "sidebar.left")
-                }
-            }
-        }
     }
 
     private func toggleSidebar() {
@@ -71,8 +69,7 @@ fileprivate enum ContentLinks: String, CaseIterable, Identifiable {
     case emulator = "Aldo"
     case breadboard = "Breadboard"
     case assembler = "Assembler"
-    case program = "Cart PRG Data"
-    case character = "Cart CHR Data"
+    case cart = "Cart Details"
 
     var id: Self { self }
     var navLabel: String { "\(self)".capitalized }
@@ -92,12 +89,27 @@ fileprivate struct ContentDetail: View {
             BreadboardView()
         case .assembler:
             AssemblerView()
-        case .program:
-            CartPrgView(cartName: cart.name)
+        case .cart:
+            CartView(cart: cart)
+        }
+    }
+}
+
+struct CartView: View {
+    @ObservedObject var cart: Cart
+
+    var body: some View {
+        TabView {
+            CartPrgView(cart: cart)
                 .padding(EdgeInsets(top: 0, leading: 5, bottom: 5,
                                     trailing: 5))
-        case .character:
+                .tabItem {
+                    Text("PRG ROM")
+                }
             CartChrView()
+                .tabItem {
+                    Text("CHR ROM")
+                }
         }
     }
 }

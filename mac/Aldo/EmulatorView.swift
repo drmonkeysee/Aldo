@@ -40,10 +40,6 @@ struct EmulatorView: View {
                     .tabItem {
                         Text("Trace")
                     }
-                CartInfoView()
-                    .tabItem {
-                        Text("Cart Info")
-                    }
             }
         }
     }

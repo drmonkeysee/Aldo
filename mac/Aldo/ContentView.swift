@@ -90,12 +90,12 @@ fileprivate struct ContentDetail: View {
         case .assembler:
             AssemblerView()
         case .cart:
-            CartView(cart: cart)
+            CartDetailsView(cart: cart)
         }
     }
 }
 
-struct CartView: View {
+struct CartDetailsView: View {
     @ObservedObject var cart: Cart
 
     var body: some View {

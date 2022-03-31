@@ -1,5 +1,5 @@
 //
-//  CartDetailsView.swift
+//  CartPrgView.swift
 //  Aldo-App
 //
 //  Created by Brandon Stansbury on 3/5/22.
@@ -30,7 +30,7 @@ struct CartPrgView: View {
                             .textSelection(.enabled)
                     }
                 }
-                VStack(alignment: .leading) {
+                VStack {
                     GroupBox {
                         VStack(alignment: .leading) {
                             HStack {

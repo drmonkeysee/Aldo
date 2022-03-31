@@ -60,6 +60,7 @@ struct CartPrgView: View {
                 GroupBox {
                     ScrollView {
                         Text(CartPrgView.testRom)
+                            .font(.system(.body, design: .monospaced))
                             .padding(5)
                             .frame(minWidth: 250, maxWidth: .infinity,
                                    alignment: .leading)

@@ -27,7 +27,8 @@ struct ContentView: View {
                     .toolbar {
                         ToolbarItem(placement: .navigation) {
                             Button(action: toggleSidebar) {
-                                Label("Toggle Sidebar", systemImage: "sidebar.left")
+                                Label("Toggle Sidebar",
+                                      systemImage: "sidebar.left")
                             }
                         }
                         ToolbarItem {

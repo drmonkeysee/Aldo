@@ -12,6 +12,20 @@ struct CartChrView: View {
 
     var body: some View {
         HStack {
+            ScrollView {
+                ForEach(1..<5) { i in
+                    VStack {
+                        Text("Bank \(i)").font(.caption)
+                        Color.cyan
+                            .cornerRadius(5)
+                            .frame(width: Double(CartChrView.sheetSize.w)
+                                            / 2.0,
+                                   height: Double(CartChrView.sheetSize.h)
+                                            / 2.0)
+                    }
+                }
+            }
+            .border(.red)
             VStack {
                 ZStack {
                     Color.cyan
@@ -27,21 +41,6 @@ struct CartChrView: View {
                 }
             }
             .padding()
-            ScrollView {
-                ForEach(1..<5) { i in
-                    VStack {
-                        Text("Bank \(i)").font(.caption)
-                        Color.cyan
-                            .cornerRadius(5)
-                            .frame(width: Double(CartChrView.sheetSize.w)
-                                            / 2.0,
-                                   height: Double(CartChrView.sheetSize.h)
-                                            / 2.0)
-                    }
-                }
-            }
-            .border(.red)
-
         }
     }
 }

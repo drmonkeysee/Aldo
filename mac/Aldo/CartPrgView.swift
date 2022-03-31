@@ -43,43 +43,15 @@ struct CartPrgView: View {
                         HStack {
                             Text("Flags")
                             Spacer()
-                            ZStack {
-                                Circle().frame(width: 20)
-                                Text("N").font(.footnote)
-                                    .foregroundColor(.black)
-                            }
-                            ZStack {
-                                Circle().frame(width: 20)
-                                Text("V").font(.footnote)
-                                    .foregroundColor(.black)
-                            }
-                            ZStack {
-                                Circle().frame(width: 20)
-                                Text("B").font(.footnote)
-                                    .foregroundColor(.black)
-                            }
-                            ZStack {
-                                Circle().frame(width: 20)
-                                Text("D").font(.footnote)
-                                    .foregroundColor(.black)
-                            }
-                            ZStack {
-                                Circle().frame(width: 20)
-                                Text("I").font(.footnote)
-                                    .foregroundColor(.black)
-                            }
-                            ZStack {
-                                Circle().frame(width: 20)
-                                Text("Z").font(.footnote)
-                                    .foregroundColor(.black)
-                            }
-                            ZStack {
-                                Circle().frame(width: 20)
-                                Text("C").font(.footnote)
-                                    .foregroundColor(.black)
-                            }
+                            Image(systemName: "n.circle")
+                            Image(systemName: "v.circle")
+                            Image(systemName: "b.circle")
+                            Image(systemName: "d.circle")
+                            Image(systemName: "i.circle")
+                            Image(systemName: "z.circle")
+                            Image(systemName: "c.circle")
                         }
-                        .scaledToFit()
+                        .imageScale(.large)
                     }
                     .padding(EdgeInsets(top: 0, leading: 5, bottom: 5,
                                         trailing: 5))

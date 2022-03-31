@@ -11,38 +11,38 @@ struct CartChrView: View {
     private static let sheetSize = (w: 256, h: 128)
 
     var body: some View {
-        VStack {
-            ScrollView(.horizontal) {
-                HStack {
-                    ForEach(1..<5) { i in
-                        VStack {
-                            Text("Bank \(i)").font(.caption)
-                            Color.cyan
-                                .cornerRadius(5)
-                                .frame(width: Double(CartChrView.sheetSize.w)
-                                                / 2.0,
-                                       height: Double(CartChrView.sheetSize.h)
-                                                / 2.0)
-                        }
+        HStack {
+            VStack {
+                ZStack {
+                    Color.cyan
+                        .cornerRadius(5)
+                        .frame(width: Double(CartChrView.sheetSize.w) * 2.0,
+                               height: Double(CartChrView.sheetSize.h) * 2.0)
+                    Text("No CHR Data")
+                }
+                ZStack {
+                    Color.cyan
+                        .cornerRadius(5)
+                    Text("Palette")
+                }
+            }
+            .padding()
+            ScrollView {
+                ForEach(1..<5) { i in
+                    VStack {
+                        Text("Bank \(i)").font(.caption)
+                        Color.cyan
+                            .cornerRadius(5)
+                            .frame(width: Double(CartChrView.sheetSize.w)
+                                            / 2.0,
+                                   height: Double(CartChrView.sheetSize.h)
+                                            / 2.0)
                     }
                 }
-                .border(.blue)
             }
             .border(.red)
-            ZStack {
-                Color.cyan
-                    .cornerRadius(5)
-                    .frame(width: Double(CartChrView.sheetSize.w) * 2.0,
-                           height: Double(CartChrView.sheetSize.h) * 2.0)
-                Text("No CHR Data")
-            }
-            ZStack {
-                Color.cyan
-                    .cornerRadius(5)
-                Text("Palette")
-            }
+
         }
-        .padding()
     }
 }
 

@@ -32,6 +32,7 @@
 		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
 		C8702CF9278A58C900725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C8702CF8278A58C900725690 /* haltexpr.c */; };
 		C8702CFA278A598A00725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
+		C88A5E8527F6A1750039382D /* CartDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88A5E8427F6A1750039382D /* CartDetailsView.swift */; };
 		C88F3E5727D9A45E00317732 /* EmulatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88F3E5627D9A45E00317732 /* EmulatorView.swift */; };
 		C89D715027D4758900C9177A /* CartPrgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89D714F27D4758900C9177A /* CartPrgView.swift */; };
 		C8A5B77B27DD79AE00A4DD5E /* Cart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A5B77A27DD79AE00A4DD5E /* Cart.swift */; };
@@ -141,6 +142,7 @@
 		C85CC20827ED6BF30063276D /* snapshot.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = snapshot.c; sourceTree = "<group>"; };
 		C86030772761A51100F1B27D /* cpupeek.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpupeek.c; sourceTree = "<group>"; };
 		C8702CF8278A58C900725690 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
+		C88A5E8427F6A1750039382D /* CartDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartDetailsView.swift; sourceTree = "<group>"; };
 		C88F3E5627D9A45E00317732 /* EmulatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulatorView.swift; sourceTree = "<group>"; };
 		C89D714F27D4758900C9177A /* CartPrgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartPrgView.swift; sourceTree = "<group>"; };
 		C8A5B77A27DD79AE00A4DD5E /* Cart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cart.swift; sourceTree = "<group>"; };
@@ -381,6 +383,7 @@
 				C8A5B77927DD799200A4DD5E /* ViewModels */,
 				C8DBC90F27C8708A0043994B /* AldoApp.swift */,
 				C838D3B627D5DB0300468FDB /* CartChrView.swift */,
+				C88A5E8427F6A1750039382D /* CartDetailsView.swift */,
 				C838D3B427D5DA4400468FDB /* CartInfoView.swift */,
 				C89D714F27D4758900C9177A /* CartPrgView.swift */,
 				C8DBC91127C8708A0043994B /* ContentView.swift */,
@@ -673,6 +676,7 @@
 				C88F3E5727D9A45E00317732 /* EmulatorView.swift in Sources */,
 				C8AA371D27F26CE80076E083 /* CopyToClipboardView.swift in Sources */,
 				C8DBC91027C8708A0043994B /* AldoApp.swift in Sources */,
+				C88A5E8527F6A1750039382D /* CartDetailsView.swift in Sources */,
 				C838D3B727D5DB0300468FDB /* CartChrView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

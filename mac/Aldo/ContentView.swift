@@ -100,17 +100,23 @@ struct CartDetailsView: View {
     @ObservedObject var cart: Cart
 
     var body: some View {
-        TabView {
-            CartPrgView(cart: cart)
-                .padding(EdgeInsets(top: 0, leading: 5, bottom: 5,
-                                    trailing: 5))
-                .tabItem {
-                    Text("PRG ROM")
-                }
-            CartChrView()
-                .tabItem {
-                    Text("CHR ROM")
-                }
+        VStack {
+            Text(cart.name ?? "No file selected")
+                .font(.title)
+                .truncationMode(.middle)
+                .help(cart.name ?? "")
+            TabView {
+                CartPrgView(cart: cart)
+                    .padding(EdgeInsets(top: 0, leading: 5, bottom: 5,
+                                        trailing: 5))
+                    .tabItem {
+                        Text("PRG ROM")
+                    }
+                CartChrView()
+                    .tabItem {
+                        Text("CHR ROM")
+                    }
+            }
         }
     }
 }

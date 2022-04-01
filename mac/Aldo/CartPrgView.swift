@@ -13,64 +13,58 @@ struct CartPrgView: View {
     @ObservedObject var cart: Cart
 
     var body: some View {
-        VStack {
-            Text(cart.name ?? "No file selected")
-                .help(cart.name ?? "")
-                .font(.title)
-                .truncationMode(.middle)
-            HStack(alignment: .top) {
-                GroupBox {
-                    ScrollView {
-                        Text(CartPrgView.testRom)
-                            .font(.system(.body, design: .monospaced))
-                            .padding(5)
-                            .frame(minWidth: 250, maxWidth: .infinity,
-                                   alignment: .leading)
-                            .multilineTextAlignment(.leading)
-                            .textSelection(.enabled)
-                    }
+        HStack(alignment: .top) {
+            GroupBox {
+                ScrollView {
+                    Text(CartPrgView.testRom)
+                        .font(.system(.body, design: .monospaced))
+                        .padding(5)
+                        .frame(minWidth: 250, maxWidth: .infinity,
+                               alignment: .leading)
+                        .multilineTextAlignment(.leading)
+                        .textSelection(.enabled)
                 }
-                VStack {
-                    GroupBox {
-                        VStack(alignment: .leading) {
-                            HStack {
-                                VStack {
-                                    Text("JMP").font(.title)
-                                    Text("(6C)")
-                                }
-                                Spacer()
-                                VStack {
-                                    Text("$(8134)").font(.title)
-                                    Text("(34) (81)")
-                                }
+            }
+            VStack {
+                GroupBox {
+                    VStack(alignment: .leading) {
+                        HStack {
+                            VStack {
+                                Text("JMP").font(.title)
+                                Text("(6C)")
                             }
-                            Divider()
-                            HStack {
-                                Text("Jump")
-                                Spacer()
-                                Text("Absolute Indirect")
+                            Spacer()
+                            VStack {
+                                Text("$(8134)").font(.title)
+                                Text("(34) (81)")
                             }
-                            .font(.footnote)
-                            Divider()
-                            HStack {
-                                Text("Flags")
-                                Spacer()
-                                Image(systemName: "n.circle")
-                                Image(systemName: "v.circle")
-                                Image(systemName: "b.circle")
-                                Image(systemName: "d.circle")
-                                Image(systemName: "i.circle")
-                                Image(systemName: "z.circle")
-                                Image(systemName: "c.circle")
-                            }
-                            .imageScale(.large)
-                            Divider()
-                            CartInfoView(cart: cart)
                         }
-                        .padding(EdgeInsets(top: 0, leading: 5, bottom: 5,
-                                            trailing: 5))
-                        .frame(minWidth: 240, maxWidth: .infinity)
+                        Divider()
+                        HStack {
+                            Text("Jump")
+                            Spacer()
+                            Text("Absolute Indirect")
+                        }
+                        .font(.footnote)
+                        Divider()
+                        HStack {
+                            Text("Flags")
+                            Spacer()
+                            Image(systemName: "n.circle")
+                            Image(systemName: "v.circle")
+                            Image(systemName: "b.circle")
+                            Image(systemName: "d.circle")
+                            Image(systemName: "i.circle")
+                            Image(systemName: "z.circle")
+                            Image(systemName: "c.circle")
+                        }
+                        .imageScale(.large)
+                        Divider()
+                        CartInfoView(cart: cart)
                     }
+                    .padding(EdgeInsets(top: 0, leading: 5, bottom: 5,
+                                        trailing: 5))
+                    .frame(minWidth: 240, maxWidth: .infinity)
                 }
             }
         }

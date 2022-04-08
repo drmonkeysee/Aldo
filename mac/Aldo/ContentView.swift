@@ -68,8 +68,6 @@ struct ContentView: View {
 
 fileprivate enum ContentLinks: String, CaseIterable, Identifiable {
     case emulator = "Aldo"
-    case breadboard = "Breadboard"
-    case assembler = "Assembler"
     case cart = "Cart Details"
 
     var id: Self { self }
@@ -86,25 +84,9 @@ fileprivate struct ContentDetail: View {
             EmulatorView()
                 .environmentObject(cart)
                 .padding(5)
-        case .breadboard:
-            BreadboardView()
-        case .assembler:
-            AssemblerView()
         case .cart:
             CartDetailsView(cart: cart)
         }
-    }
-}
-
-struct BreadboardView: View {
-    var body: some View {
-        Text("Breadboard view")
-    }
-}
-
-struct AssemblerView: View {
-    var body: some View {
-        Text("Assembler view")
     }
 }
 

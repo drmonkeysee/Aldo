@@ -16,15 +16,9 @@ struct CartDetailsView: View {
                 .font(.title2)
                 .truncationMode(.middle)
                 .help(cart.name ?? "")
-            TabView {
+            HStack {
                 CartPrgView(cart: cart)
-                    .tabItem {
-                        Text("PRG ROM")
-                    }
                 CartChrView()
-                    .tabItem {
-                        Text("CHR ROM")
-                    }
             }
         }
     }

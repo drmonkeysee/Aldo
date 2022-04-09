@@ -1,5 +1,5 @@
 //
-//  CartGutterView.swift
+//  CartFocusView.swift
 //  Aldo-App
 //
 //  Created by Brandon Stansbury on 4/8/22.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CartGutterView: View {
+struct CartFocusView: View {
     var cart: Cart
 
     var body: some View {
@@ -64,6 +64,6 @@ struct CartGutterView_Previews: PreviewProvider {
     private static let cart = Cart()
 
     static var previews: some View {
-        CartGutterView(cart: cart)
+        CartFocusView(cart: cart)
     }
 }

@@ -85,7 +85,7 @@ fileprivate struct ContentDetail: View {
                 .environmentObject(cart)
                 .padding(5)
         case .cart:
-            CartDetailsView(cart: cart)
+            CartView(cart: cart)
         }
     }
 }

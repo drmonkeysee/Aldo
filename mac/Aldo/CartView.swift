@@ -1,5 +1,5 @@
 //
-//  CartDetailsView.swift
+//  CartView.swift
 //  Aldo-App
 //
 //  Created by Brandon Stansbury on 3/31/22.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CartDetailsView: View {
+struct CartView: View {
     var cart: Cart
 
     var body: some View {
@@ -17,7 +17,7 @@ struct CartDetailsView: View {
                     .padding(EdgeInsets(top: 5, leading: 5, bottom: 5,
                                         trailing: .zero))
                 Divider()
-                CartGutterView(cart: cart)
+                CartFocusView(cart: cart)
                     .padding(5)
                     .frame(maxWidth: .infinity)
                 Divider()
@@ -32,6 +32,6 @@ struct CartDetailsView_Previews: PreviewProvider {
     private static let cart = Cart()
 
     static var previews: some View {
-        CartDetailsView(cart: cart)
+        CartView(cart: cart)
     }
 }

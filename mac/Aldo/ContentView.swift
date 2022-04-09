@@ -23,7 +23,7 @@ struct ContentView: View {
             NavigationLink(link.navLabel, tag: link,
                            selection: $navSelection) {
                 ContentDetail(link: link, cart: cart)
-                    .navigationTitle(link.rawValue)
+                    .navigationTitle(cart.name ?? link.rawValue)
                     .toolbar {
                         ToolbarItem(placement: .navigation) {
                             Button(action: toggleSidebar) {

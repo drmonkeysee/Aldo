@@ -8,39 +8,32 @@
 import SwiftUI
 
 struct CartChrView: View {
-    private static let sheetSize = (w: 256, h: 128)
+    private static let sheetSize = (w: 256.0 * 2, h: 128.0 * 2)
+    private static let sheetPadding = 5.0
 
     var body: some View {
-        HStack {
-            ScrollView {
-                ForEach(1..<5) { i in
-                    VStack {
-                        Text("Bank \(i)").font(.caption)
-                        Color.cyan
-                            .cornerRadius(5)
-                            .frame(width: Double(CartChrView.sheetSize.w)
-                                            / 2.0,
-                                   height: Double(CartChrView.sheetSize.h)
-                                            / 2.0)
+        VStack {
+            ScrollView(.horizontal) {
+                HStack {
+                    ForEach(1..<5) { i in
+                        VStack {
+                            Text("Bank \(i)").font(.caption)
+                            Color.cyan
+                                .cornerRadius(5)
+                                .frame(width: CartChrView.sheetSize.w,
+                                       height: CartChrView.sheetSize.h)
+                        }
                     }
                 }
+                .padding(CartChrView.sheetPadding)
             }
-            .border(.red)
-            VStack {
-                ZStack {
-                    Color.cyan
-                        .cornerRadius(5)
-                        .frame(width: Double(CartChrView.sheetSize.w) * 2.0,
-                               height: Double(CartChrView.sheetSize.h) * 2.0)
-                    Text("No CHR Data")
-                }
-                ZStack {
-                    Color.cyan
-                        .cornerRadius(5)
-                    Text("Palette")
-                }
+            .frame(width: CartChrView.sheetSize.w
+                   + (CartChrView.sheetPadding * 2))
+            ZStack {
+                Color.cyan
+                    .cornerRadius(5)
+                Text("Palette")
             }
-            .padding()
         }
     }
 }

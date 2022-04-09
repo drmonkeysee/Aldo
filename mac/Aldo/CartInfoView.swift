@@ -155,22 +155,24 @@ fileprivate struct iNesView: View {
     let mirrorName: String
 
     var body: some View {
-        Text(String(format: "%03u%@", header.mapper_id,
-                    header.mapper_implemented ? "" : " (Not Implemented)"))
-        Text("<Board Names>")
-        Text("\(header.prg_chunks) \(iNesView.fullSize)")
-        Text(header.wram ? wramStr : "no")
-        if header.chr_chunks > 0 {
-            Text("\(header.chr_chunks) \(iNesView.halfSize)")
-            Text("no")
-        } else {
-            Text("no")
-            Text("1 \(iNesView.halfSize)")
+        VStack(alignment: .leading) {
+            Text(String(format: "%03u%@", header.mapper_id,
+                        header.mapper_implemented ? "" : " (Not Implemented)"))
+            Text("<Board Names>")
+            Text("\(header.prg_chunks) \(iNesView.fullSize)")
+            Text(header.wram ? wramStr : "no")
+            if header.chr_chunks > 0 {
+                Text("\(header.chr_chunks) \(iNesView.halfSize)")
+                Text("no")
+            } else {
+                Text("no")
+                Text("1 \(iNesView.halfSize)")
+            }
+            Text(mirrorName)
+            Text(boolToStr(header.mapper_controlled))
+            Text(boolToStr(header.trainer))
+            Text(boolToStr(header.bus_conflicts))
         }
-        Text(mirrorName)
-        Text(boolToStr(header.mapper_controlled))
-        Text(boolToStr(header.trainer))
-        Text(boolToStr(header.bus_conflicts))
     }
 
     private var wramStr: String {

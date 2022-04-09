@@ -45,7 +45,7 @@ struct CartFocusView: View {
                 }
                 .imageScale(.large)
             } label: {
-                Label("Instruction", systemImage: "pencil")
+                Label("Selected Instruction", systemImage: "pencil")
                     .font(.headline)
             }
             Divider()
@@ -53,7 +53,7 @@ struct CartFocusView: View {
                 CartInfoView(cart: cart)
                     .frame(minWidth: 270, maxWidth: .infinity)
             } label: {
-                Label("Format", systemImage: "scribble")
+                Label("Cart Format", systemImage: "scribble")
                     .font(.headline)
             }
         }

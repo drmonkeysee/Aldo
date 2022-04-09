@@ -12,7 +12,9 @@ struct CartChrView: View {
     private static let sheetPadding = 5.0
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
+            Label("CHR ROM", systemImage: "photo")
+                .font(.headline)
             ScrollView(.horizontal) {
                 HStack {
                     ForEach(1..<5) { i in
@@ -29,11 +31,13 @@ struct CartChrView: View {
             }
             .frame(width: CartChrView.sheetSize.w
                    + (CartChrView.sheetPadding * 2))
+            .padding(.trailing, CartChrView.sheetPadding)
             ZStack {
                 Color.cyan
                     .cornerRadius(5)
                 Text("Palette")
             }
+            .padding(.leading, CartChrView.sheetPadding)
         }
     }
 }

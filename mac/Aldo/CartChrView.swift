@@ -16,7 +16,7 @@ struct CartChrView: View {
             Label("CHR ROM", systemImage: "photo")
                 .font(.headline)
             ScrollView(.horizontal) {
-                HStack {
+                LazyHStack {
                     ForEach(1..<5) { i in
                         VStack {
                             Text("Bank \(i)").font(.caption)

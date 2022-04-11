@@ -51,6 +51,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
 int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f);
+int dis_cart_chrbank(const struct bankview *bv, int scale, FILE *f);
 int dis_cart_chr(cart *cart, const struct control *appstate, FILE *f);
 
 #endif

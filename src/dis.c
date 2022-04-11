@@ -606,6 +606,16 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
     return 0;
 }
 
+int dis_cart_chrbank(const struct bankview *bv, int scale, FILE *f)
+{
+    assert(bv != NULL);
+    assert(scale > 0;)
+    assert(f != NULL);
+
+    if (!bv.mem) return DIS_ERR_CHRROM;
+    return 0;
+}
+
 int dis_cart_chr(cart *cart, const struct control *appstate, FILE *f)
 {
     assert(cart != NULL);

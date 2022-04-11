@@ -8,10 +8,12 @@
 import Foundation
 
 enum AldoError: Error {
+    private static let errCodeFormat = "%s (%d)"
+
     case unknown
     case ioError(String)
     case cartErr(Int32)
-    case disErr(Int32)
+    case disErr(Int32, String?)
 
     var message: String {
         switch self {
@@ -20,13 +22,21 @@ enum AldoError: Error {
         case let .ioError(str):
             return str
         case let .cartErr(code):
-            return "\(String(cString: cart_errstr(code))) (\(code))"
-        case let .disErr(code):
-            var msg = "\(String(cString: dis_errstr(code))) (\(code))"
-            if code == DIS_ERR_ERNO {
-                msg.append(": \(String(cString: strerror(errno)))")
+            return String(format: AldoError.errCodeFormat, cart_errstr(code),
+                          code)
+        case let .disErr(code, sysErr):
+            var msg = String(format: AldoError.errCodeFormat, dis_errstr(code),
+                             code)
+            if let se = sysErr {
+                msg.append(": \(se)")
             }
             return msg
         }
+    }
+
+    static func wrapDisError(code: Int32) -> Self {
+        return AldoError.disErr(code, code == DIS_ERR_ERNO
+                                        ? String(cString: strerror(errno))
+                                        : nil)
     }
 }

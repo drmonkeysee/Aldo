@@ -132,7 +132,7 @@ fileprivate final class CartHandle {
         var bankview = cart_chrbank(cartRef, bank)
         let streamData = try captureCStream { stream in
             let err = dis_cart_chrbank(&bankview, 2, stream)
-            if err < 0 { throw AldoError.disErr(err) }
+            if err < 0 { throw AldoError.wrapDisError(code: err) }
         }
         return NSImage(data: streamData)
     }

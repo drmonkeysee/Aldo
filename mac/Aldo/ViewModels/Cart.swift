@@ -5,6 +5,7 @@
 //  Created by Brandon Stansbury on 3/12/22.
 //
 
+import Cocoa
 import Foundation
 
 final class Cart: ObservableObject {
@@ -22,10 +23,7 @@ final class Cart: ObservableObject {
             return false
         }
         do {
-            handle = try CartHandle(fromFile: filePath)
-            file = filePath
-            info = handle?.getCartInfo() ?? .none
-            return true
+            handle = try CartHandle(filePath)
         } catch let err as AldoError {
             currentError = err
             return false
@@ -33,15 +31,28 @@ final class Cart: ObservableObject {
             currentError = AldoError.unknown
             return false
         }
+        file = filePath
+        info = handle?.getCartInfo() ?? .none
+        return true
     }
 
     func getInfoText() -> String? {
-        do {
-            return try handle?.getInfoText()
-        } catch let err as AldoError {
-            currentError = err
-        } catch {
-            currentError = AldoError.unknown
+        return getHandleData(handle?.getInfoText)
+    }
+
+    func getChrBank(bank: Int) -> NSImage? {
+        return getHandleData { try self.handle?.getChrBank(bank) }
+    }
+
+    private func getHandleData<T>(_ op: (() throws -> T?)?) -> T? {
+        if let operation = op {
+            do {
+                return try operation()
+            } catch let err as AldoError {
+                currentError = err
+            } catch {
+                currentError = AldoError.unknown
+            }
         }
         return nil
     }
@@ -66,7 +77,7 @@ enum CartInfo {
 fileprivate final class CartHandle {
     private var cartRef: OpaquePointer? = nil
 
-    init(fromFile: URL) throws {
+    init(_ fromFile: URL) throws {
         errno = 0
         guard let cFile = fromFile.withUnsafeFileSystemRepresentation({
             fopen($0, "rb")
@@ -104,9 +115,7 @@ fileprivate final class CartHandle {
     }
 
     func getInfoText() throws -> String {
-        guard cartRef != nil else {
-            throw AldoError.ioError("No cart found")
-        }
+        try verifyRef()
         let p = Pipe()
         guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor, "w")
         else {
@@ -121,5 +130,21 @@ fileprivate final class CartHandle {
             throw AldoError.unknown
         }
         return result
+    }
+
+    func getChrBank(_ bank: Int) throws -> NSImage? {
+        try verifyRef()
+        let bankview = cart_chrbank(cartRef, bank)
+        // open stream
+        // call write chr bank
+        // close stream
+        // convert data to nsimage
+        return nil
+    }
+
+    private func verifyRef() throws {
+        if cartRef == nil {
+            throw AldoError.ioError("No cart set")
+        }
     }
 }

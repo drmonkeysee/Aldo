@@ -10,7 +10,7 @@ import Foundation
 final class Cart: ObservableObject {
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
-    private(set) var currentError: CartError?
+    private(set) var currentError: AldoError?
     private var handle: CartHandle?
 
     var name: String? { file?.lastPathComponent }
@@ -18,7 +18,7 @@ final class Cart: ObservableObject {
     func load(from: URL?) -> Bool {
         currentError = nil
         guard let filePath = from else {
-            currentError = CartError.ioError("No file selected")
+            currentError = AldoError.ioError("No file selected")
             return false
         }
         do {
@@ -26,11 +26,11 @@ final class Cart: ObservableObject {
             file = filePath
             info = handle?.getCartInfo() ?? .none
             return true
-        } catch let err as CartError {
+        } catch let err as AldoError {
             currentError = err
             return false
         } catch {
-            currentError = CartError.unknown
+            currentError = AldoError.unknown
             return false
         }
     }
@@ -38,10 +38,10 @@ final class Cart: ObservableObject {
     func getInfoText() -> String? {
         do {
             return try handle?.getInfoText()
-        } catch let err as CartError {
+        } catch let err as AldoError {
             currentError = err
         } catch {
-            currentError = CartError.unknown
+            currentError = AldoError.unknown
         }
         return nil
     }
@@ -63,23 +63,6 @@ enum CartInfo {
     }
 }
 
-enum CartError: Error {
-    case unknown
-    case ioError(String)
-    case errCode(Int32)
-
-    var message: String {
-        switch self {
-        case .unknown:
-            return "Unknown error"
-        case let .ioError(str):
-            return str
-        case let .errCode(code):
-            return "\(String(cString: cart_errstr(code))) (\(code))"
-        }
-    }
-}
-
 fileprivate final class CartHandle {
     private var cartRef: OpaquePointer? = nil
 
@@ -88,12 +71,12 @@ fileprivate final class CartHandle {
         guard let cFile = fromFile.withUnsafeFileSystemRepresentation({
             fopen($0, "rb")
         }) else {
-            throw CartError.ioError(String(cString: strerror(errno)))
+            throw AldoError.ioError(String(cString: strerror(errno)))
         }
         defer { fclose(cFile) }
 
         let err = cart_create(&cartRef, cFile)
-        guard err == 0 else { throw CartError.errCode(err) }
+        guard err == 0 else { throw AldoError.cartErr(err) }
     }
 
     deinit {
@@ -122,12 +105,12 @@ fileprivate final class CartHandle {
 
     func getInfoText() throws -> String {
         guard cartRef != nil else {
-            throw CartError.ioError("No cart found")
+            throw AldoError.ioError("No cart found")
         }
         let p = Pipe()
         guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor, "w")
         else {
-            throw CartError.ioError("Cannot open cart data stream")
+            throw AldoError.ioError("Cannot open cart data stream")
         }
 
         cart_write_info(cartRef, stream, true)
@@ -135,7 +118,7 @@ fileprivate final class CartHandle {
 
         let output = p.fileHandleForReading.availableData
         guard let result = String(data: output, encoding: .utf8) else {
-            throw CartError.unknown
+            throw AldoError.unknown
         }
         return result
     }

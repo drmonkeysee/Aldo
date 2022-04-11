@@ -66,7 +66,7 @@ enum CartInfo {
 
     var name: String {
         switch self {
-        case let .raw(str), let .iNes(str, _, _):
+        case let .raw(str), .iNes(let str, _, _):
             return str
         default:
             return "\(self)".capitalized
@@ -87,7 +87,7 @@ fileprivate final class CartHandle {
         defer { fclose(cFile) }
 
         let err = cart_create(&cartRef, cFile)
-        guard err == 0 else { throw AldoError.cartErr(err) }
+        if err < 0 { throw AldoError.cartErr(err) }
     }
 
     deinit {
@@ -129,19 +129,15 @@ fileprivate final class CartHandle {
     func getChrBank(_ bank: Int) throws -> NSImage? {
         try verifyRef()
         var bankview = cart_chrbank(cartRef, bank)
-        let output = try captureCStream { stream in
+        let streamData = try captureCStream { stream in
             let err = dis_cart_chrbank(&bankview, 2, stream)
-            if err < 0 {
-                throw AldoError.disErr(err)
-            }
+            if err < 0 { throw AldoError.disErr(err) }
         }
-        return NSImage(data: output)
+        return NSImage(data: streamData)
     }
 
     private func verifyRef() throws {
-        if cartRef == nil {
-            throw AldoError.ioError("No cart set")
-        }
+        if cartRef == nil { throw AldoError.ioError("No cart set") }
     }
 
     private func
@@ -153,8 +149,10 @@ fileprivate final class CartHandle {
             throw AldoError.ioError("Cannot open cart data stream")
         }
 
-        try op(stream)
-        fclose(stream)
+        do {
+            defer { fclose(stream) }
+            try op(stream)
+        }
 
         return p.fileHandleForReading.availableData
     }

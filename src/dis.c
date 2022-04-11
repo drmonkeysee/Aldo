@@ -416,7 +416,7 @@ static int write_chrtiles(const struct bankview *bv, int32_t tilesdim,
 }
 
 static int write_chrbank(const struct bankview *bv, int scale,
-                         const char *restrict prefix, FILE *f)
+                         const char *restrict prefix, FILE *output)
 {
     int32_t tilesdim, tile_sections;
     int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
@@ -433,13 +433,13 @@ static int write_chrbank(const struct bankview *bv, int scale,
     fclose(bmpfile);
 
     if (err == 0) {
-        fprintf(f, "Bank %zu (%zuKB), %d x %d tiles (%d section%s)",
+        fprintf(output, "Bank %zu (%zuKB), %d x %d tiles (%d section%s)",
                 bv->bank, bv->size >> BITWIDTH_1KB, tilesdim, tilesdim,
                 tile_sections, tile_sections == 1 ? "" : "s");
         if (scale > 1) {
-            fprintf(f, " (%dx scale)", scale);
+            fprintf(output, " (%dx scale)", scale);
         }
-        fprintf(f, ": %s\n", bmpfilename);
+        fprintf(output, ": %s\n", bmpfilename);
     }
 
     return err;
@@ -624,18 +624,18 @@ int dis_cart_chrbank(const struct bankview *bv, int scale, FILE *f)
     return 0;
 }
 
-int dis_cart_chr(cart *cart, const struct control *appstate, FILE *f)
+int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output)
 {
     assert(cart != NULL);
     assert(appstate != NULL);
-    assert(f != NULL);
+    assert(output != NULL);
 
     struct bankview bv = cart_chrbank(cart, 0);
     if (!bv.mem) return DIS_ERR_CHRROM;
 
     do {
         const int err = write_chrbank(&bv, appstate->chrscale,
-                                      appstate->chrdecode_prefix, f);
+                                      appstate->chrdecode_prefix, output);
         if (err < 0) return err;
         bv = cart_chrbank(cart, bv.bank + 1);
     } while (bv.mem);

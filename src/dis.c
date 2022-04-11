@@ -309,7 +309,7 @@ enum {
 };
 
 static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections, int scale,
-                            const uint8_t *tiles, const char *filename)
+                            const uint8_t *restrict tiles, FILE *bmpfile)
 {
     const int32_t
         section_pxldim = tilesdim * ChrPlaneSize,
@@ -318,9 +318,6 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections, int scale,
         // NOTE: 4 bpp equals 8 pixels per 4 bytes; bmp pixel rows must then
         // be padded to the nearest 4-byte boundary.
         packedrow_size = ceil(bmpw / 8.0) * 4;
-
-    FILE *const bmpfile = fopen(filename, "wb");
-    if (!bmpfile) return DIS_ERR_ERNO;
 
     // NOTE: write BMP header fields; BMP format is little-endian so use
     // byte arrays rather than structs to avoid arch-specific endianness.
@@ -403,8 +400,19 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections, int scale,
     }
     free(packedrow);
 
-    fclose(bmpfile);
     return 0;
+}
+
+static int write_chrtiles(const struct bankview *bv, int32_t tilesdim,
+                          int32_t tile_sections, int scale, FILE *bmpfile)
+{
+    const size_t tilecount = bv->size / ChrTileSpan;
+    uint8_t *const tiles = calloc(tilecount * ChrTileSize, sizeof *tiles);
+    decode_tiles(bv, tilecount, tiles);
+    const int err = write_tile_sheet(tilesdim, tile_sections, scale, tiles,
+                                     bmpfile);
+    free(tiles);
+    return err;
 }
 
 static int write_chrbank(const struct bankview *bv, int scale,
@@ -418,22 +426,22 @@ static int write_chrbank(const struct bankview *bv, int scale,
     prefix = prefix && strlen(prefix) > 0 ? prefix : "bank";
     if (snprintf(bmpfilename, sizeof bmpfilename, "%.120s%03zu.bmp", prefix,
                  bv->bank) < 0) return DIS_ERR_FMT;
+    FILE *const bmpfile = fopen(bmpfilename, "wb");
+    if (!bmpfile) return DIS_ERR_ERNO;
 
-    fprintf(f, "Bank %zu (%zuKB), %d x %d tiles (%d section%s)",
-            bv->bank, bv->size >> BITWIDTH_1KB, tilesdim, tilesdim,
-            tile_sections, tile_sections == 1 ? "" : "s");
-    if (scale > 1) {
-        fprintf(f, " (%dx scale)", scale);
+    err = write_chrtiles(bv, tilesdim, tile_sections, scale, bmpfile);
+    fclose(bmpfile);
+
+    if (err == 0) {
+        fprintf(f, "Bank %zu (%zuKB), %d x %d tiles (%d section%s)",
+                bv->bank, bv->size >> BITWIDTH_1KB, tilesdim, tilesdim,
+                tile_sections, tile_sections == 1 ? "" : "s");
+        if (scale > 1) {
+            fprintf(f, " (%dx scale)", scale);
+        }
+        fprintf(f, ": %s\n", bmpfilename);
     }
-    fprintf(f, ": %s\n", bmpfilename);
 
-    const size_t tilecount = bv->size / ChrTileSpan;
-    uint8_t *const tiles = calloc(tilecount * ChrTileSize, sizeof *tiles);
-
-    decode_tiles(bv, tilecount, tiles);
-    err = write_tile_sheet(tilesdim, tile_sections, scale, tiles, bmpfilename);
-
-    free(tiles);
     return err;
 }
 

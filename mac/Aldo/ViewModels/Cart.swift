@@ -79,9 +79,10 @@ fileprivate final class CartHandle {
 
     init(_ fromFile: URL) throws {
         errno = 0
-        guard let cFile = fromFile.withUnsafeFileSystemRepresentation({
+        let cFile = fromFile.withUnsafeFileSystemRepresentation {
             fopen($0, "rb")
-        }) else {
+        }
+        guard cFile != nil else {
             throw AldoError.ioError(String(cString: strerror(errno)))
         }
         defer { fclose(cFile) }

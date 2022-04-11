@@ -22,29 +22,23 @@ final class Cart: ObservableObject {
             currentError = AldoError.ioError("No file selected")
             return false
         }
-        do {
-            handle = try CartHandle(filePath)
-        } catch let err as AldoError {
-            currentError = err
-            return false
-        } catch {
-            currentError = AldoError.unknown
-            return false
-        }
+        handle = callHandle { try CartHandle(filePath) }
+        guard handle != nil else { return false }
         file = filePath
         info = handle?.getCartInfo() ?? .none
         return true
     }
 
     func getInfoText() -> String? {
-        return getHandleData(handle?.getInfoText)
+        return callHandle(handle?.getInfoText)
     }
 
     func getChrBank(bank: Int) -> NSImage? {
-        return getHandleData { try self.handle?.getChrBank(bank) }
+        // TODO: cache images?
+        return callHandle { try self.handle?.getChrBank(bank) }
     }
 
-    private func getHandleData<T>(_ op: (() throws -> T?)?) -> T? {
+    private func callHandle<T>(_ op: (() throws -> T?)?) -> T? {
         if let operation = op {
             do {
                 return try operation()

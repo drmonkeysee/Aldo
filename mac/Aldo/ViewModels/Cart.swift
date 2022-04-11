@@ -116,16 +116,10 @@ fileprivate final class CartHandle {
 
     func getInfoText() throws -> String {
         try verifyRef()
-        let p = Pipe()
-        guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor, "w")
-        else {
-            throw AldoError.ioError("Cannot open cart data stream")
+
+        let output = try captureCStream { stream in
+            cart_write_info(cartRef, stream, true)
         }
-
-        cart_write_info(cartRef, stream, true)
-        fclose(stream)
-
-        let output = p.fileHandleForReading.availableData
         guard let result = String(data: output, encoding: .utf8) else {
             throw AldoError.unknown
         }
@@ -134,17 +128,34 @@ fileprivate final class CartHandle {
 
     func getChrBank(_ bank: Int) throws -> NSImage? {
         try verifyRef()
-        let bankview = cart_chrbank(cartRef, bank)
-        // open stream
-        // call write chr bank
-        // close stream
-        // convert data to nsimage
-        return nil
+        var bankview = cart_chrbank(cartRef, bank)
+        let output = try captureCStream { stream in
+            let err = dis_cart_chrbank(&bankview, 2, stream)
+            if err < 0 {
+                throw AldoError.disErr(err)
+            }
+        }
+        return NSImage(data: output)
     }
 
     private func verifyRef() throws {
         if cartRef == nil {
             throw AldoError.ioError("No cart set")
         }
+    }
+
+    private func
+    captureCStream(_ op: (UnsafeMutablePointer<FILE>) throws -> Void)
+    throws -> Data {
+        let p = Pipe()
+        guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor, "w")
+        else {
+            throw AldoError.ioError("Cannot open cart data stream")
+        }
+
+        try op(stream)
+        fclose(stream)
+
+        return p.fileHandleForReading.availableData
     }
 }

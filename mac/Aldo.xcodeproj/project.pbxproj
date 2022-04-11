@@ -68,6 +68,9 @@
 		C8C706BA2751F0CB00B45785 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068D2751EEBA00B45785 /* decode.c */; };
 		C8C706BB2751F0CE00B45785 /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
 		C8C706BE2751F55C00B45785 /* trace.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706BD2751F55C00B45785 /* trace.c */; };
+		C8C9FB652803F8900093D9A7 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
+		C8C9FB662803F8BD0093D9A7 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068D2751EEBA00B45785 /* decode.c */; };
+		C8C9FB672803F8C90093D9A7 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706892751EEBA00B45785 /* cpu.c */; };
 		C8D44BDD2786B571005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D44BDC2786B571005AB586 /* argparse.c */; };
 		C8D44BDE2786B6DF005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8D8FDA82792691B0073639B /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
@@ -677,12 +680,15 @@
 				C83C663927E2F4FE009CE42C /* bytes.c in Sources */,
 				C89D715027D4758900C9177A /* CartPrgView.swift in Sources */,
 				C83C663727E2F4E4009CE42C /* cart.c in Sources */,
+				C8C9FB672803F8C90093D9A7 /* cpu.c in Sources */,
+				C8C9FB652803F8900093D9A7 /* dis.c in Sources */,
 				C838D3B527D5DA4400468FDB /* CartInfoView.swift in Sources */,
 				C8DBC91227C8708A0043994B /* ContentView.swift in Sources */,
 				C8A5B77B27DD79AE00A4DD5E /* Cart.swift in Sources */,
 				C88F3E5727D9A45E00317732 /* EmulatorView.swift in Sources */,
 				C8AA371D27F26CE80076E083 /* CopyToClipboardView.swift in Sources */,
 				C8DBC91027C8708A0043994B /* AldoApp.swift in Sources */,
+				C8C9FB662803F8BD0093D9A7 /* decode.c in Sources */,
 				C8B5303B2801300C00576D9F /* CartFocusView.swift in Sources */,
 				C88A5E8527F6A1750039382D /* CartView.swift in Sources */,
 				C838D3B727D5DB0300468FDB /* CartChrView.swift in Sources */,

@@ -621,7 +621,12 @@ int dis_cart_chrbank(const struct bankview *bv, int scale, FILE *f)
 
     if (!bv->mem) return DIS_ERR_CHRROM;
     if (scale <= 0) return DIS_ERR_CHRSCL;
-    return 0;
+
+    int32_t tilesdim, tile_sections;
+    const int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
+    if (err < 0) return err;
+
+    return write_chrtiles(bv, tilesdim, tile_sections, scale, f);
 }
 
 int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output)

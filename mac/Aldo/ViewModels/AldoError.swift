@@ -11,6 +11,7 @@ enum AldoError: Error {
     private static let errCodeFormat = "%s (%d)"
 
     case unknown
+    case systemError(String)
     case ioError(String)
     case cartErr(Int32)
     case disErr(Int32, String?)
@@ -19,7 +20,7 @@ enum AldoError: Error {
         switch self {
         case .unknown:
             return "Unknown error"
-        case let .ioError(str):
+        case let .systemError(str), let .ioError(str):
             return str
         case let .cartErr(code):
             return String(format: AldoError.errCodeFormat, cart_errstr(code),

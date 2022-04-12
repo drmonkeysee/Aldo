@@ -22,7 +22,7 @@ final class Cart: ObservableObject {
             currentError = AldoError.ioError("No file selected")
             return false
         }
-        handle = callHandle { try CartHandle(filePath) }
+        handle = tryHandleOp { try CartHandle(filePath) }
         guard handle != nil else { return false }
         file = filePath
         info = handle?.getCartInfo() ?? .none
@@ -30,12 +30,12 @@ final class Cart: ObservableObject {
     }
 
     func getInfoText() -> String? {
-        return callHandle(handle?.getInfoText)
+        return tryHandleOp(handle?.getInfoText)
     }
 
     func getChrBank(bank: Int) -> NSImage? {
         // TODO: cache images?
-        let chrImage = callHandle { try self.handle?.getChrBank(bank) }
+        let chrImage = tryHandleOp { try self.handle?.getChrBank(bank) }
         if chrImage == nil {
             let msg = handle == nil
                         ? "No cart"
@@ -45,14 +45,15 @@ final class Cart: ObservableObject {
         return chrImage
     }
 
-    private func callHandle<T>(_ op: (() throws -> T?)?) -> T? {
+    private func tryHandleOp<T>(_ op: (() throws -> T?)?) -> T? {
         if let operation = op {
             do {
                 return try operation()
             } catch let err as AldoError {
                 currentError = err
             } catch {
-                currentError = AldoError.unknown
+                currentError = AldoError.systemError(
+                    error.localizedDescription)
             }
         }
         return nil
@@ -124,20 +125,23 @@ fileprivate final class CartHandle {
         let output = try captureCStream { stream in
             cart_write_info(cartRef, stream, true)
         }
-        guard let result = String(data: output, encoding: .utf8) else {
-            throw AldoError.unknown
+        if let o = output, let result = String(data: o, encoding: .utf8) {
+            return result
         }
-        return result
+        throw AldoError.unknown
     }
 
     func getChrBank(_ bank: Int) throws -> NSImage? {
         try verifyRef()
+        var bankview = cart_chrbank(cartRef, bank)
         let streamData = try captureCStream(binary: true) { stream in
-            var bankview = cart_chrbank(cartRef, bank)
-            let err = dis_cart_chrbank(&bankview, 2, stream)
+            let err = dis_cart_chrbank(&bankview, 1, stream)
             if err < 0 { throw AldoError.wrapDisError(code: err) }
         }
-        return NSImage(data: streamData)
+        if let sd = streamData {
+            return NSImage(data: sd)
+        }
+        throw AldoError.unknown
     }
 
     private func verifyRef() throws {
@@ -145,7 +149,7 @@ fileprivate final class CartHandle {
     }
 
     private func captureCStream(binary: Bool = false,
-                                op: (CFile) throws -> Void) throws -> Data {
+                                op: (CFile) throws -> Void) throws -> Data? {
         let p = Pipe()
         guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor,
                                   binary ? "wb" : "w")
@@ -158,6 +162,6 @@ fileprivate final class CartHandle {
             try op(stream)
         }
 
-        return p.fileHandleForReading.availableData
+        return try p.fileHandleForReading.readToEnd()
     }
 }

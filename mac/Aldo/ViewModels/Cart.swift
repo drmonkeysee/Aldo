@@ -35,7 +35,14 @@ final class Cart: ObservableObject {
 
     func getChrBank(bank: Int) -> NSImage? {
         // TODO: cache images?
-        return callHandle { try self.handle?.getChrBank(bank) }
+        let chrImage = callHandle { try self.handle?.getChrBank(bank) }
+        if chrImage == nil {
+            let msg = handle == nil
+                        ? "No cart"
+                        : (currentError?.message ?? "Unknown")
+            print("CHR decode failure: \(msg)")
+        }
+        return chrImage
     }
 
     private func callHandle<T>(_ op: (() throws -> T?)?) -> T? {
@@ -69,6 +76,8 @@ enum CartInfo {
 }
 
 fileprivate final class CartHandle {
+    private typealias CFile = UnsafeMutablePointer<FILE>
+
     private var cartRef: OpaquePointer? = nil
 
     init(_ fromFile: URL) throws {
@@ -123,8 +132,8 @@ fileprivate final class CartHandle {
 
     func getChrBank(_ bank: Int) throws -> NSImage? {
         try verifyRef()
-        var bankview = cart_chrbank(cartRef, bank)
-        let streamData = try captureCStream { stream in
+        let streamData = try captureCStream(binary: true) { stream in
+            var bankview = cart_chrbank(cartRef, bank)
             let err = dis_cart_chrbank(&bankview, 2, stream)
             if err < 0 { throw AldoError.wrapDisError(code: err) }
         }
@@ -135,11 +144,11 @@ fileprivate final class CartHandle {
         if cartRef == nil { throw AldoError.ioError("No cart set") }
     }
 
-    private func
-    captureCStream(_ op: (UnsafeMutablePointer<FILE>) throws -> Void)
-    throws -> Data {
+    private func captureCStream(binary: Bool = false,
+                                op: (CFile) throws -> Void) throws -> Data {
         let p = Pipe()
-        guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor, "w")
+        guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor,
+                                  binary ? "wb" : "w")
         else {
             throw AldoError.ioError("Cannot open cart data stream")
         }

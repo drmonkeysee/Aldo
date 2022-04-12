@@ -57,7 +57,9 @@ struct CopyToClipboardView: View {
 }
 
 struct CopyToClipboardView_Previews: PreviewProvider {
+    private static let cart = Cart()
+
     static var previews: some View {
-        CopyToClipboardView(cart: Cart())
+        CopyToClipboardView(cart: cart)
     }
 }

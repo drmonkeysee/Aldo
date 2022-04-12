@@ -25,8 +25,11 @@ struct CartInfoView: View {
                     CommonInfoView(section: .values, cart: cart)
                     FormatView(section: .values, info: cart.info)
                 }
-                if cart.file != nil {
+                switch cart.info {
+                case .raw, .iNes:
                     CopyToClipboardView(cart: cart)
+                default:
+                    EmptyView()
                 }
             }
         }

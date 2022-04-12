@@ -76,7 +76,7 @@ fileprivate enum ContentLinks: String, CaseIterable, Identifiable {
 
 fileprivate struct ContentDetail: View {
     let link: ContentLinks
-    @ObservedObject var cart: Cart
+    let cart: Cart
 
     var body: some View {
         switch link {

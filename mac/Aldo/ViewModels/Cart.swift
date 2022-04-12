@@ -35,17 +35,22 @@ final class Cart: ObservableObject {
 
     func getChrBank(bank: Int) -> NSImage? {
         // TODO: cache images?
+        guard handle != nil else { return nil }
+
         let chrImage = tryHandleOp { try self.handle?.getChrBank(bank) }
-        if chrImage == nil {
-            let msg = handle == nil
-                        ? "No cart"
-                        : (currentError?.message ?? "Unknown")
+        #if DEBUG
+        if chrImage?.isValid != true {
+            let msg = currentError?.message ?? (chrImage == nil
+                                                ? "Image init failed"
+                                                : "Image data   invalid")
             print("CHR decode failure: \(msg)")
         }
+        #endif
         return chrImage
     }
 
     private func tryHandleOp<T>(_ op: (() throws -> T?)?) -> T? {
+        currentError = nil
         if let operation = op {
             do {
                 return try operation()
@@ -79,7 +84,7 @@ enum CartInfo {
 fileprivate final class CartHandle {
     private typealias CFile = UnsafeMutablePointer<FILE>
 
-    private var cartRef: OpaquePointer? = nil
+    private var cartRef: OpaquePointer?
 
     init(_ fromFile: URL) throws {
         errno = 0
@@ -133,6 +138,7 @@ fileprivate final class CartHandle {
 
     func getChrBank(_ bank: Int) throws -> NSImage? {
         try verifyRef()
+
         var bankview = cart_chrbank(cartRef, bank)
         let streamData = try captureCStream(binary: true) { stream in
             let err = dis_cart_chrbank(&bankview, 1, stream)
@@ -152,16 +158,13 @@ fileprivate final class CartHandle {
                                 op: (CFile) throws -> Void) throws -> Data? {
         let p = Pipe()
         guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor,
-                                  binary ? "wb" : "w")
-        else {
+                                  binary ? "wb" : "w") else {
             throw AldoError.ioError("Cannot open cart data stream")
         }
-
         do {
             defer { fclose(stream) }
             try op(stream)
         }
-
         return try p.fileHandleForReading.readToEnd()
     }
 }

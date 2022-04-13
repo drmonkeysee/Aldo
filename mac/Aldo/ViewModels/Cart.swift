@@ -42,7 +42,7 @@ final class Cart: ObservableObject {
         if chrImage?.isValid != true {
             let msg = currentError?.message ?? (chrImage == nil
                                                 ? "Image init failed"
-                                                : "Image data   invalid")
+                                                : "Image data invalid")
             print("CHR decode failure: \(msg)")
         }
         #endif

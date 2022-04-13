@@ -23,7 +23,7 @@ struct CartView: View {
                     .padding(5)
                     .frame(maxWidth: .infinity)
                 Divider()
-                CartChrView()
+                CartChrView(cart: cart)
                     .padding(CartView.romPadding)
             }
         }

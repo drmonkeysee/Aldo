@@ -29,6 +29,7 @@ struct CartChrView: View {
                 }
                 .padding(CartChrView.sheetPadding)
             }
+            .fixedSize(horizontal: false, vertical: true)
             .frame(width: CartChrView.sheetSize.w
                    + (CartChrView.sheetPadding * 2))
             .padding(.trailing, CartChrView.sheetPadding)

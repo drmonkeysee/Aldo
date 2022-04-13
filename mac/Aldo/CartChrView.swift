@@ -8,10 +8,6 @@
 import SwiftUI
 
 struct CartChrView: View {
-    private static let sheetSize = (w: 256.0 * 2, h: 128.0 * 2)
-    private static let sheetPadding = 5.0
-    private static let outerWidth = sheetSize.w + (sheetPadding * 2)
-
     @ObservedObject var cart: Cart
 
     var body: some View {
@@ -19,39 +15,66 @@ struct CartChrView: View {
             Label("CHR ROM", systemImage: "photo")
                 .font(.headline)
             if case .iNes(_, let header, _) = cart.info {
-                ScrollView(.horizontal) {
-                    LazyHStack {
-                        ForEach(0..<Int(header.chr_chunks), id: \.self) { i in
-                            VStack {
-                                Text("Bank \(i)")
-                                    .font(.caption)
-                                Color.cyan
-                                    .cornerRadius(5)
-                                    .frame(width: CartChrView.sheetSize.w,
-                                           height: CartChrView.sheetSize.h)
-                            }
-                        }
-                    }
-                    .padding(CartChrView.sheetPadding)
-                }
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(width: CartChrView.outerWidth)
-                .padding(.trailing, CartChrView.sheetPadding)
-                ZStack {
-                    Color.cyan
-                        .cornerRadius(5)
-                    Text("Palette")
-                }
-                .padding(.leading, CartChrView.sheetPadding)
+                ChrBanksView(bankCount: Int(header.chr_chunks))
             } else {
-                GroupBox {
-                    Text("No CHR ROM Available")
-                        .padding()
-                }
-                .frame(width: CartChrView.outerWidth)
-                .padding(.trailing, CartChrView.sheetPadding)
+                NoChrView()
             }
+            PaletteView()
         }
+    }
+}
+
+fileprivate struct Constraints {
+    static let sheetSize = (w: 256.0 * 2, h: 128.0 * 2)
+    static let sheetPadding = 5.0
+    static let outerWidth = sheetSize.w + (sheetPadding * 2)
+}
+
+fileprivate struct ChrBanksView: View {
+    let bankCount: Int
+
+    var body: some View {
+        ScrollView(.horizontal) {
+            LazyHStack {
+                ForEach(0..<bankCount, id: \.self) { i in
+                    VStack {
+                        let _ = print("create \(i)")
+                        Text("Bank \(i)")
+                            .font(.caption)
+                        Color.cyan
+                            .cornerRadius(5)
+                            .frame(width: Constraints.sheetSize.w,
+                                   height: Constraints.sheetSize.h)
+                    }
+                }
+            }
+            .padding(Constraints.sheetPadding)
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(width: Constraints.outerWidth)
+        .padding(.trailing, Constraints.sheetPadding)
+    }
+}
+
+fileprivate struct NoChrView: View {
+    var body: some View {
+        GroupBox {
+            Text("No CHR ROM Available")
+                .padding()
+        }
+        .frame(width: Constraints.outerWidth)
+        .padding(.trailing, Constraints.sheetPadding)
+    }
+}
+
+fileprivate struct PaletteView: View {
+    var body: some View {
+        ZStack {
+            Color.cyan
+                .cornerRadius(5)
+            Text("Palette")
+        }
+        .padding(.leading, Constraints.sheetPadding)
     }
 }
 

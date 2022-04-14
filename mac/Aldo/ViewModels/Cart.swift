@@ -54,8 +54,8 @@ final class Cart: ObservableObject {
         if let operation = op {
             do {
                 return try operation()
-            } catch let err as AldoError {
-                currentError = err
+            } catch let error as AldoError {
+                currentError = error
             } catch {
                 currentError = AldoError.systemError(
                     error.localizedDescription)

@@ -15,7 +15,7 @@ struct CartChrView: View {
             Label("CHR ROM", systemImage: "photo")
                 .font(.headline)
             if case .iNes(_, let header, _) = cart.info {
-                ChrBanksView(bankCount: Int(header.chr_chunks))
+                ChrBanksView(cart: cart, bankCount: Int(header.chr_chunks))
             } else {
                 NoChrView()
             }
@@ -31,6 +31,7 @@ fileprivate struct Constraints {
 }
 
 fileprivate struct ChrBanksView: View {
+    @ObservedObject var cart: Cart
     let bankCount: Int
 
     var body: some View {
@@ -38,13 +39,20 @@ fileprivate struct ChrBanksView: View {
             LazyHStack {
                 ForEach(0..<bankCount, id: \.self) { i in
                     VStack {
-                        let _ = print("create \(i)")
                         Text("Bank \(i)")
                             .font(.caption)
-                        Color.cyan
-                            .cornerRadius(5)
-                            .frame(width: Constraints.sheetSize.w,
-                                   height: Constraints.sheetSize.h)
+                        if let img = cart.getChrBank(bank: i) {
+                            Image(nsImage: img)
+                                .interpolation(.none)
+                        } else {
+                            ZStack {
+                                Color.cyan
+                                    .cornerRadius(5)
+                                    .frame(width: Constraints.sheetSize.w,
+                                           height: Constraints.sheetSize.h)
+                                Text("CHR Bank Not Available")
+                            }
+                        }
                     }
                 }
             }

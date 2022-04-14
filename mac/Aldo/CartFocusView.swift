@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CartFocusView: View {
-    var cart: Cart
+    let cart: Cart
 
     var body: some View {
         VStack(alignment: .leading) {

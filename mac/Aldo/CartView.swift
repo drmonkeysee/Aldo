@@ -11,7 +11,7 @@ struct CartView: View {
     private static let romPadding = EdgeInsets(top: 5, leading: 5, bottom: 5,
                                                trailing: .zero)
 
-    var cart: Cart
+    let cart: Cart
 
     var body: some View {
         VStack(spacing: 0) {

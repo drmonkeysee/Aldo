@@ -29,9 +29,7 @@ final class Cart: ObservableObject {
         return true
     }
 
-    func getInfoText() -> String? {
-        return tryHandleOp(handle?.getInfoText)
-    }
+    func getInfoText() -> String? { tryHandleOp(handle?.getInfoText) }
 
     func getChrBank(bank: Int) -> NSImage? {
         // TODO: cache images?

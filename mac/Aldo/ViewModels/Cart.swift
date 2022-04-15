@@ -130,9 +130,7 @@ fileprivate final class CartHandle {
         let output = try captureCStream { stream in
             cart_write_info(cartRef, stream, true)
         }
-        if let o = output, let result = String(data: o, encoding: .utf8) {
-            return result
-        }
+        if let result = String(data: output, encoding: .utf8) { return result }
         throw AldoError.unknown
     }
 
@@ -141,13 +139,10 @@ fileprivate final class CartHandle {
 
         var bankview = cart_chrbank(cartRef, bank)
         let streamData = try captureCStream(binary: true) { stream in
-            let err = dis_cart_chrbank(&bankview, 1, stream)
+            let err = dis_cart_chrbank(&bankview, 2, stream)
             if err < 0 { throw AldoError.wrapDisError(code: err) }
         }
-        if let sd = streamData {
-            return NSImage(data: sd)
-        }
-        throw AldoError.unknown
+        return NSImage(data: streamData)
     }
 
     private func verifyRef() throws {
@@ -155,17 +150,33 @@ fileprivate final class CartHandle {
     }
 
     private func captureCStream(binary: Bool = false,
-                                op: (CFile) throws -> Void) throws -> Data? {
+                                op: (CFile) throws -> Void) throws -> Data {
         let p = Pipe()
         errno = 0
         guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor,
                                   binary ? "wb" : "w") else {
             throw fileOpenFailure
         }
+        var streamData = Data()
+        let g = DispatchGroup()
+        g.enter()
+        p.fileHandleForReading.readabilityHandler = { h in
+            let d = h.availableData
+            if d.isEmpty {
+                p.fileHandleForReading.readabilityHandler = nil
+                g.leave()
+                return
+            }
+            streamData.append(d)
+        }
         do {
             defer { fclose(stream) }
             try op(stream)
         }
-        return try p.fileHandleForReading.readToEnd()
+        // TODO: can i make this async instead of waiting
+        guard case .success = g.wait(timeout: .now() + 0.2) else {
+            throw AldoError.ioError("File stream read timed out")
+        }
+        return streamData
     }
 }

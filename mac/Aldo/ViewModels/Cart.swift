@@ -157,6 +157,7 @@ fileprivate final class CartHandle {
                                   binary ? "wb" : "w") else {
             throw fileOpenFailure
         }
+
         var streamData = Data()
         let g = DispatchGroup()
         g.enter()
@@ -169,12 +170,15 @@ fileprivate final class CartHandle {
             }
             streamData.append(d)
         }
+
         do {
             defer { fclose(stream) }
             try op(stream)
         }
+
         // TODO: can i make this async instead of waiting
         guard case .success = g.wait(timeout: .now() + 0.2) else {
+            p.fileHandleForReading.readabilityHandler = nil
             throw AldoError.ioError("File stream read timed out")
         }
         return streamData

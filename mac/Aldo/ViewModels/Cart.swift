@@ -29,7 +29,13 @@ final class Cart: ObservableObject {
         return true
     }
 
-    func getInfoText() -> String? { tryHandleOp(handle?.getInfoText) }
+    func getInfoText() -> String? {
+        guard handle != nil else { return nil }
+
+        return tryHandleOp {
+            try self.handle?.getInfoText(cartName: self.name ?? "No cart file")
+        }
+    }
 
     func getChrBank(bank: Int) -> NSImage? {
         // TODO: cache images?
@@ -124,11 +130,11 @@ fileprivate final class CartHandle {
         }
     }
 
-    func getInfoText() throws -> String {
+    func getInfoText(cartName: String) throws -> String {
         try verifyRef()
 
         let output = try captureCStream { stream in
-            cart_write_info(cartRef, stream, true)
+            cart_write_info(cartRef, cartName, stream, true)
         }
         if let result = String(data: output, encoding: .utf8) { return result }
         throw AldoError.unknown

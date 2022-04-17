@@ -47,8 +47,8 @@ static int print_cart_info(const struct control *appstate, cart *c)
     if (appstate->verbose) {
         puts("---=== Cart Info ===---");
     }
-    printf("File\t\t: %s\n", ctrl_cartfilename(appstate->cartfile));
-    cart_write_info(c, stdout, appstate->verbose);
+    cart_write_info(c, ctrl_cartfilename(appstate->cartfile), stdout,
+                    appstate->verbose);
     return EXIT_SUCCESS;
 }
 

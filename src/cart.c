@@ -304,11 +304,14 @@ void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr)
     self->mapper->cpu_disconnect(self->mapper, b, addr);
 }
 
-void cart_write_info(cart *self, FILE *f, bool verbose)
+void cart_write_info(cart *self, const char *restrict cartname, FILE *f,
+                     bool verbose)
 {
     assert(self != NULL);
+    assert(cartname != NULL);
     assert(f != NULL);
 
+    fprintf(f, "File\t\t: %s\n", cartname);
     fprintf(f, "Format\t\t: %s\n", cart_formatname(self->info.format));
     if (verbose) {
         hr(f);

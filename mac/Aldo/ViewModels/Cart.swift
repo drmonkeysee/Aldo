@@ -91,16 +91,12 @@ fileprivate final class CartHandle {
 
     private var cartRef: OpaquePointer?
 
-    private var fileOpenFailure: AldoError {
-        AldoError.ioError(String(cString: strerror(errno)))
-    }
-
     init(_ fromFile: URL) throws {
         errno = 0
         let cFile = fromFile.withUnsafeFileSystemRepresentation { name in
             fopen(name, "rb")
         }
-        guard cFile != nil else { throw fileOpenFailure }
+        guard cFile != nil else { throw AldoError.ioErrno }
         defer { fclose(cFile) }
 
         let err = cart_create(&cartRef, cFile)
@@ -162,7 +158,7 @@ fileprivate final class CartHandle {
         errno = 0
         guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor,
                                   binary ? "wb" : "w") else {
-            throw fileOpenFailure
+            throw AldoError.ioErrno
         }
 
         var streamData = Data()

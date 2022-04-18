@@ -11,7 +11,7 @@ struct ContentView: View {
     private static let fileLabel = "Open ROM File"
 
     @State private var navSelection: ContentLinks? = .cart
-    @State private var cartLoadFailed: Bool = false
+    @State private var cartLoadFailed = false
     @StateObject private var cart = Cart()
 
     var body: some View {

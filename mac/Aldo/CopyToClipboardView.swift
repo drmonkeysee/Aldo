@@ -10,11 +10,11 @@ import SwiftUI
 struct CopyToClipboardView: View {
     private static let fadeDuration = 2.0
 
-    let cart: Cart
-
     @State private var clipOpacity = 1.0
     @State private var checkOpacity = 0.0
     @State private var copyError = false
+
+    let cart: Cart
 
     var body: some View {
         Button(action: copyToClipboard) {

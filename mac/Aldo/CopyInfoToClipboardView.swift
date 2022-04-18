@@ -1,5 +1,5 @@
 //
-//  CopyToClipboardView.swift
+//  CopyInfoToClipboardView.swift
 //  Aldo-App
 //
 //  Created by Brandon Stansbury on 3/28/22.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CopyToClipboardView: View {
+struct CopyInfoToClipboardView: View {
     private static let fadeDuration = 2.0
 
     @State private var clipOpacity = 1.0
@@ -45,12 +45,12 @@ struct CopyToClipboardView: View {
         NSPasteboard.general.setString(text, forType: .string)
         checkOpacity = 1.0
         clipOpacity = 0.0
-        let halfDuration = CopyToClipboardView.fadeDuration / 2.0
+        let halfDuration = CopyInfoToClipboardView.fadeDuration / 2.0
         withAnimation(.easeOut(duration: halfDuration).delay(halfDuration)) {
             checkOpacity = 0.0
         }
         DispatchQueue.main.asyncAfter(
-            deadline: .now() + CopyToClipboardView.fadeDuration) {
+            deadline: .now() + CopyInfoToClipboardView.fadeDuration) {
             clipOpacity = 1.0
         }
     }
@@ -60,6 +60,6 @@ struct CopyToClipboardView_Previews: PreviewProvider {
     private static let cart = Cart()
 
     static var previews: some View {
-        CopyToClipboardView(cart: cart)
+        CopyInfoToClipboardView(cart: cart)
     }
 }

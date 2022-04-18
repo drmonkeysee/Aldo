@@ -27,7 +27,7 @@ struct CartInfoView: View {
                 }
                 switch cart.info {
                 case .raw, .iNes:
-                    CopyToClipboardView(cart: cart)
+                    CopyInfoToClipboardView(cart: cart)
                 default:
                     EmptyView()
                 }

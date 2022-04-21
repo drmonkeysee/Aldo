@@ -30,14 +30,6 @@ final class Cart: ObservableObject {
         return true
     }
 
-    func getInfoText() -> String? {
-        guard handle != nil else { return nil }
-
-        return tryHandleOp {
-            try self.handle?.getInfoText(cartName: self.name ?? "No cart file")
-        }
-    }
-
     func readInfoText(onComplete: @escaping (CStreamResult) -> Void) {
         guard handle != nil else {
             onComplete(.error(AldoError.ioError("No cart set")))
@@ -136,16 +128,6 @@ fileprivate final class CartHandle {
         default:
             return .unknown
         }
-    }
-
-    func getInfoText(cartName: String) throws -> String {
-        try verifyRef()
-
-        let output = try captureCStream { stream in
-            cart_write_info(cartRef, cartName, stream, true)
-        }
-        if let result = String(data: output, encoding: .utf8) { return result }
-        throw AldoError.unknown
     }
 
     func getChrBank(_ bank: Int) throws -> NSImage? {

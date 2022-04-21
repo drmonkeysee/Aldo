@@ -11,13 +11,13 @@ enum AldoError: Error {
     private static let errCodeFormat = "%s (%d)"
 
     static var ioErrno: Self {
-        AldoError.ioError(String(cString: strerror(errno)))
+        .ioError(String(cString: strerror(errno)))
     }
 
     static func wrapDisError(code: Int32) -> Self {
-        AldoError.disErr(code, code == DIS_ERR_ERNO
-                                ? String(cString: strerror(errno))
-                                : nil)
+        .disErr(code, code == DIS_ERR_ERNO
+                        ? String(cString: strerror(errno))
+                        : nil)
     }
 
     case unknown

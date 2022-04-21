@@ -24,7 +24,7 @@ final class CopyInfoCommand: ObservableObject {
                     self.successIconOpacity = 1.0
                     self.copyIconOpacity = 0.0
                 } else {
-                    self.setError(AldoError.ioError("Invalid info data"))
+                    self.setError(.unknown)
                 }
             case .error(let err):
                 self.setError(err)

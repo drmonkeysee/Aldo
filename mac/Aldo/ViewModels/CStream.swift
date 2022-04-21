@@ -20,7 +20,7 @@ func readCStream(binary: Bool = false, operation: (CStream) throws -> Void,
     errno = 0
     guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor,
                               binary ? "wb" : "w") else {
-        onComplete(.error(AldoError.ioErrno))
+        onComplete(.error(.ioErrno))
         return
     }
 
@@ -44,6 +44,6 @@ func readCStream(binary: Bool = false, operation: (CStream) throws -> Void,
     } catch let error as AldoError {
         onComplete(.error(error))
     } catch {
-        onComplete(.error(AldoError.systemError(error.localizedDescription)))
+        onComplete(.error(.systemError(error.localizedDescription)))
     }
 }

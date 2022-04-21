@@ -20,7 +20,7 @@ final class Cart: ObservableObject {
     func load(from: URL?) -> Bool {
         currentError = nil
         guard let filePath = from else {
-            currentError = AldoError.ioError("No file selected")
+            currentError = .ioError("No file selected")
             return false
         }
         handle = tryHandleOp { try CartHandle(filePath) }
@@ -32,7 +32,7 @@ final class Cart: ObservableObject {
 
     func readInfoText(onComplete: @escaping (CStreamResult) -> Void) {
         guard handle != nil else {
-            onComplete(.error(AldoError.ioError("No cart set")))
+            onComplete(.error(.ioError("No cart set")))
             return
         }
         readCStream(operation: { stream in
@@ -64,8 +64,7 @@ final class Cart: ObservableObject {
             } catch let error as AldoError {
                 currentError = error
             } catch {
-                currentError = AldoError.systemError(
-                    error.localizedDescription)
+                currentError = .systemError(error.localizedDescription)
             }
         }
         return nil

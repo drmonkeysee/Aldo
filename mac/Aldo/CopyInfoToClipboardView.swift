@@ -41,9 +41,12 @@ struct CopyInfoToClipboardView: View {
     private func animateSuccess(val: Double) {
         guard val == 1.0 else { return }
 
-        let halfDuration = CopyInfoToClipboardView.fadeDuration / 2.0
-        withAnimation(.easeOut(duration: halfDuration).delay(halfDuration)) {
-            command.successIconOpacity = 0.0
+        DispatchQueue.main.async {
+            let halfDuration = CopyInfoToClipboardView.fadeDuration / 2.0
+            withAnimation(
+                .easeOut(duration: halfDuration).delay(halfDuration)) {
+                    command.successIconOpacity = 0.0
+            }
         }
         DispatchQueue.main.asyncAfter(
             deadline: .now() + CopyInfoToClipboardView.fadeDuration) {

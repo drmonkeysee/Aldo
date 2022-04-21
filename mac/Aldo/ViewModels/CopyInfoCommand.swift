@@ -21,8 +21,8 @@ final class CopyInfoCommand: ObservableObject {
                 if let text = String(data: data, encoding: .utf8) {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(text, forType: .string)
-                    self.successIconOpacity = 1.0
                     self.copyIconOpacity = 0.0
+                    self.successIconOpacity = 1.0
                 } else {
                     self.setError(.unknown)
                 }

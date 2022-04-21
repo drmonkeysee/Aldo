@@ -38,6 +38,16 @@ final class Cart: ObservableObject {
         }
     }
 
+    func readInfoText(onComplete: @escaping (CStreamResult) -> Void) {
+        guard handle != nil else {
+            onComplete(.error(AldoError.ioError("No cart set")))
+            return
+        }
+        readCStream(operation: { stream in
+            cart_write_info(handle?.unwrap(), name, stream, true)
+        }, onComplete: onComplete)
+    }
+
     func getChrBank(bank: Int) -> NSImage? {
         // TODO: cache images?
         guard handle != nil else { return nil }
@@ -109,9 +119,10 @@ fileprivate final class CartHandle {
         cartRef = nil
     }
 
-    func getCartInfo() -> CartInfo {
-        guard cartRef != nil else { return .none }
+    // NOTE: init won't let a live instance ever have a nil reference
+    func unwrap() -> OpaquePointer { cartRef! }
 
+    func getCartInfo() -> CartInfo {
         var info = cartinfo()
         cart_getinfo(cartRef, &info)
         switch info.format {

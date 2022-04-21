@@ -10,28 +10,28 @@ import SwiftUI
 struct CopyInfoToClipboardView: View {
     private static let fadeDuration = 2.0
 
-    @StateObject private var copyInfoCmd = CopyInfoCommand()
+    @StateObject private var command = CopyInfoCommand()
 
     let cart: Cart
 
     var body: some View {
         Button {
-            copyInfoCmd.execute(cart: cart)
+            command.execute(cart: cart)
         } label: {
             ZStack {
                 Image(systemName: "arrow.up.doc.on.clipboard")
-                    .opacity(copyInfoCmd.copyIconOpacity)
+                    .opacity(command.copyIconOpacity)
                 Image(systemName: "checkmark.diamond")
-                    .opacity(copyInfoCmd.successIconOpacity)
+                    .opacity(command.successIconOpacity)
                     .foregroundStyle(.green)
-                    .onReceive(copyInfoCmd.$successIconOpacity,
+                    .onReceive(command.$successIconOpacity,
                                perform: animateSuccess)
             }
         }
         .buttonStyle(.plain)
         .help("Copy to Clipboard")
-        .alert("Clipboard Copy Failure", isPresented: $copyInfoCmd.copyError,
-               presenting: cart.currentError) { _ in
+        .alert("Clipboard Copy Failure", isPresented: $command.failed,
+               presenting: command.currentError) { _ in
             // NOTE: default action
         } message: { err in
             Text(err.message)
@@ -43,11 +43,11 @@ struct CopyInfoToClipboardView: View {
 
         let halfDuration = CopyInfoToClipboardView.fadeDuration / 2.0
         withAnimation(.easeOut(duration: halfDuration).delay(halfDuration)) {
-            copyInfoCmd.successIconOpacity = 0.0
+            command.successIconOpacity = 0.0
         }
         DispatchQueue.main.asyncAfter(
             deadline: .now() + CopyInfoToClipboardView.fadeDuration) {
-                copyInfoCmd.copyIconOpacity = 1.0
+                command.copyIconOpacity = 1.0
         }
     }
 }

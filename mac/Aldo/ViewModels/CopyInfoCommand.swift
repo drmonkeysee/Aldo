@@ -10,16 +10,30 @@ import AppKit
 final class CopyInfoCommand: ObservableObject {
     @Published var copyIconOpacity = 1.0
     @Published var successIconOpacity = 0.0
-    @Published var copyError = false
+    @Published var failed = false
+    private(set) var currentError: AldoError?
 
     func execute(cart: Cart) {
-        guard let text = cart.getInfoText() else {
-            copyError = true
-            return
+        currentError = nil
+        cart.readInfoText { result in
+            switch result {
+            case .success(let data):
+                if let text = String(data: data, encoding: .utf8) {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(text, forType: .string)
+                    self.successIconOpacity = 1.0
+                    self.copyIconOpacity = 0.0
+                } else {
+                    self.setError(AldoError.ioError("Invalid info data"))
+                }
+            case .error(let err):
+                self.setError(err)
+            }
         }
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(text, forType: .string)
-        successIconOpacity = 1.0
-        copyIconOpacity = 0.0
+    }
+
+    private func setError(_ err: AldoError) {
+        currentError = err
+        failed = true
     }
 }

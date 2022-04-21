@@ -82,6 +82,7 @@
 		C8DBC92227C8708B0043994B /* AldoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBC92127C8708B0043994B /* AldoTests.swift */; };
 		C8DBC92C27C8708B0043994B /* AldoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBC92B27C8708B0043994B /* AldoUITests.swift */; };
 		C8DBC92E27C8708B0043994B /* AldoUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBC92D27C8708B0043994B /* AldoUITestsLaunchTests.swift */; };
+		C8F2985B2810ECEF00ECFD7E /* CStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F2985A2810ECEF00ECFD7E /* CStream.swift */; };
 		C8FB31D12803D6EC00E6B0EF /* AldoError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8FB31D02803D6EC00E6B0EF /* AldoError.swift */; };
 /* End PBXBuildFile section */
 
@@ -203,6 +204,7 @@
 		C8DBC92727C8708B0043994B /* AldoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AldoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8DBC92B27C8708B0043994B /* AldoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoUITests.swift; sourceTree = "<group>"; };
 		C8DBC92D27C8708B0043994B /* AldoUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		C8F2985A2810ECEF00ECFD7E /* CStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CStream.swift; sourceTree = "<group>"; };
 		C8FB31D02803D6EC00E6B0EF /* AldoError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -383,6 +385,7 @@
 				C8FB31D02803D6EC00E6B0EF /* AldoError.swift */,
 				C8A5B77A27DD79AE00A4DD5E /* Cart.swift */,
 				C8197524280E725B00762462 /* CopyInfoCommand.swift */,
+				C8F2985A2810ECEF00ECFD7E /* CStream.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -684,6 +687,7 @@
 				C89D715027D4758900C9177A /* CartPrgView.swift in Sources */,
 				C83C663727E2F4E4009CE42C /* cart.c in Sources */,
 				C8C9FB672803F8C90093D9A7 /* cpu.c in Sources */,
+				C8F2985B2810ECEF00ECFD7E /* CStream.swift in Sources */,
 				C8C9FB652803F8900093D9A7 /* dis.c in Sources */,
 				C838D3B527D5DA4400468FDB /* CartInfoView.swift in Sources */,
 				C8DBC91227C8708A0043994B /* ContentView.swift in Sources */,

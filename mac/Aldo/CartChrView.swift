@@ -53,6 +53,8 @@ fileprivate struct ChrBanksView: View {
 }
 
 fileprivate struct ChrSheetView: View {
+    @StateObject var query = ChrSheetQuery()
+
     @ObservedObject var cart: Cart
     let bank: Int
 

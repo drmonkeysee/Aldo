@@ -33,6 +33,7 @@
 		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
 		C8702CF9278A58C900725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C8702CF8278A58C900725690 /* haltexpr.c */; };
 		C8702CFA278A598A00725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
+		C88949B12813B2DB00795CC0 /* ChrSheetQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88949B02813B2DB00795CC0 /* ChrSheetQuery.swift */; };
 		C88A5E8527F6A1750039382D /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88A5E8427F6A1750039382D /* CartView.swift */; };
 		C88F3E5727D9A45E00317732 /* EmulatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88F3E5627D9A45E00317732 /* EmulatorView.swift */; };
 		C89D715027D4758900C9177A /* CartPrgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89D714F27D4758900C9177A /* CartPrgView.swift */; };
@@ -150,6 +151,7 @@
 		C85CC20827ED6BF30063276D /* snapshot.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = snapshot.c; sourceTree = "<group>"; };
 		C86030772761A51100F1B27D /* cpupeek.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpupeek.c; sourceTree = "<group>"; };
 		C8702CF8278A58C900725690 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
+		C88949B02813B2DB00795CC0 /* ChrSheetQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChrSheetQuery.swift; sourceTree = "<group>"; };
 		C88A5E8427F6A1750039382D /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
 		C88F3E5627D9A45E00317732 /* EmulatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulatorView.swift; sourceTree = "<group>"; };
 		C89D714F27D4758900C9177A /* CartPrgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartPrgView.swift; sourceTree = "<group>"; };
@@ -384,6 +386,7 @@
 			children = (
 				C8FB31D02803D6EC00E6B0EF /* AldoError.swift */,
 				C8A5B77A27DD79AE00A4DD5E /* Cart.swift */,
+				C88949B02813B2DB00795CC0 /* ChrSheetQuery.swift */,
 				C8197524280E725B00762462 /* CopyInfoCommand.swift */,
 				C8F2985A2810ECEF00ECFD7E /* CStream.swift */,
 			);
@@ -691,6 +694,7 @@
 				C8C9FB652803F8900093D9A7 /* dis.c in Sources */,
 				C838D3B527D5DA4400468FDB /* CartInfoView.swift in Sources */,
 				C8DBC91227C8708A0043994B /* ContentView.swift in Sources */,
+				C88949B12813B2DB00795CC0 /* ChrSheetQuery.swift in Sources */,
 				C8A5B77B27DD79AE00A4DD5E /* Cart.swift in Sources */,
 				C88F3E5727D9A45E00317732 /* EmulatorView.swift in Sources */,
 				C8AA371D27F26CE80076E083 /* CopyInfoToClipboardView.swift in Sources */,

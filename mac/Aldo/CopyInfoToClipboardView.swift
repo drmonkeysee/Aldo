@@ -10,9 +10,9 @@ import SwiftUI
 struct CopyInfoToClipboardView: View {
     private static let fadeDuration = 2.0
 
-    @StateObject private var command = CopyInfoCommand()
-
     let cart: Cart
+
+    @StateObject private var command = CopyInfoCommand()
 
     var body: some View {
         Button {

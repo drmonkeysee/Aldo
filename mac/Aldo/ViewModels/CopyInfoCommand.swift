@@ -11,6 +11,7 @@ final class CopyInfoCommand: ObservableObject {
     @Published var copyIconOpacity = 1.0
     @Published var successIconOpacity = 0.0
     @Published var failed = false
+
     private(set) var currentError: AldoError?
 
     func execute(cart: Cart) {

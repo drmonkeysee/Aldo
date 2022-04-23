@@ -10,9 +10,7 @@ import Foundation
 enum AldoError: Error {
     private static let errCodeFormat = "%s (%d)"
 
-    static var ioErrno: Self {
-        .ioError(String(cString: strerror(errno)))
-    }
+    static var ioErrno: Self { .ioError(String(cString: strerror(errno))) }
 
     static func wrapDisError(code: Int32) -> Self {
         .disErr(code, code == DIS_ERR_ERNO

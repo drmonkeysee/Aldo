@@ -9,11 +9,11 @@ import Cocoa
 import Foundation
 
 final class Cart: ObservableObject {
-    private var handle: CartHandle?
-
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
     private(set) var currentError: AldoError?
+
+    private var handle: CartHandle?
 
     var name: String? { file?.lastPathComponent }
 

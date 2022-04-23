@@ -14,12 +14,15 @@ struct CartChrView: View {
         VStack(alignment: .leading) {
             Label("CHR ROM", systemImage: "photo")
                 .font(.headline)
-            if case .iNes(_, let header, _) = cart.info {
+            switch cart.info {
+            case .iNes(_, let header, _) where header.chr_chunks > 0:
                 ChrBanksView(cart: cart, bankCount: Int(header.chr_chunks))
-            } else {
-                NoChrView()
+                PaletteView()
+            case .iNes:
+                NoChrView(reason: "Cart uses CHR RAM")
+            default:
+                NoChrView(reason: "No CHR ROM Available")
             }
-            PaletteView()
         }
     }
 }
@@ -38,22 +41,7 @@ fileprivate struct ChrBanksView: View {
         ScrollView(.horizontal) {
             LazyHStack {
                 ForEach(0..<bankCount, id: \.self) { i in
-                    VStack {
-                        Text("Bank \(i)")
-                            .font(.caption)
-                        if let img = cart.getChrBank(bank: i) {
-                            Image(nsImage: img)
-                                .interpolation(.none)
-                        } else {
-                            ZStack {
-                                Color.cyan
-                                    .cornerRadius(5)
-                                    .frame(width: Constraints.sheetSize.w,
-                                           height: Constraints.sheetSize.h)
-                                Text("CHR Bank Not Available")
-                            }
-                        }
-                    }
+                    ChrSheetView(cart: cart, bank: i)
                 }
             }
             .padding(Constraints.sheetPadding)
@@ -64,14 +52,42 @@ fileprivate struct ChrBanksView: View {
     }
 }
 
+fileprivate struct ChrSheetView: View {
+    @ObservedObject var cart: Cart
+    let bank: Int
+
+    var body: some View {
+        VStack {
+            Text("Bank \(bank)")
+                .font(.caption)
+            if let img = cart.getChrBank(bank: bank) {
+                Image(nsImage: img)
+                    .interpolation(.none)
+            } else {
+                ZStack {
+                    Color.cyan
+                        .cornerRadius(5)
+                        .frame(width: Constraints.sheetSize.w,
+                               height: Constraints.sheetSize.h)
+                    Text("CHR Bank Not Available")
+                }
+            }
+        }
+    }
+}
+
 fileprivate struct NoChrView: View {
+    let reason: String
+
     var body: some View {
         GroupBox {
-            Text("No CHR ROM Available")
-                .padding()
+            Text(reason)
+                .frame(width: Constraints.sheetSize.w,
+                       height: Constraints.sheetSize.h)
         }
         .frame(width: Constraints.outerWidth)
-        .padding(.trailing, Constraints.sheetPadding)
+        .padding(.leading, Constraints.sheetPadding)
+        .padding(.trailing, Constraints.sheetPadding * 2)
     }
 }
 

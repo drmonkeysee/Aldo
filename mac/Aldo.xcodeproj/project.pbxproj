@@ -16,7 +16,7 @@
 		C8184D7C25E76541002B3100 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
 		C8186495277EB0F700CA4AC0 /* uincurses.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186494277EB0F700CA4AC0 /* uincurses.c */; };
 		C8186497277EB45900CA4AC0 /* uibatch.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186496277EB45900CA4AC0 /* uibatch.c */; };
-		C8197525280E725B00762462 /* CopyInfoCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8197524280E725B00762462 /* CopyInfoCommand.swift */; };
+		C8197525280E725B00762462 /* CopyCartInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8197524280E725B00762462 /* CopyCartInfo.swift */; };
 		C81A516D25DA036100361E40 /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
 		C820E6C025A9759A006A7AB1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820E6BF25A9759A006A7AB1 /* main.swift */; };
 		C820E6CB25A97A4E006A7AB1 /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* cli.c */; };
@@ -130,7 +130,7 @@
 		C8184D6F25E750E0002B3100 /* libcinytest.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcinytest.dylib; path = /usr/local/lib/libcinytest.dylib; sourceTree = "<absolute>"; };
 		C8186494277EB0F700CA4AC0 /* uincurses.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = uincurses.c; sourceTree = "<group>"; };
 		C8186496277EB45900CA4AC0 /* uibatch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = uibatch.c; sourceTree = "<group>"; };
-		C8197524280E725B00762462 /* CopyInfoCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyInfoCommand.swift; sourceTree = "<group>"; };
+		C8197524280E725B00762462 /* CopyCartInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyCartInfo.swift; sourceTree = "<group>"; };
 		C81A516B25DA036100361E40 /* control.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = control.h; sourceTree = "<group>"; };
 		C81A516C25DA036100361E40 /* control.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = control.c; sourceTree = "<group>"; };
 		C820E6BC25A9759A006A7AB1 /* Dev */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Dev; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -386,7 +386,7 @@
 			children = (
 				C8FB31D02803D6EC00E6B0EF /* AldoError.swift */,
 				C8A5B77A27DD79AE00A4DD5E /* Cart.swift */,
-				C8197524280E725B00762462 /* CopyInfoCommand.swift */,
+				C8197524280E725B00762462 /* CopyCartInfo.swift */,
 				C8F2985A2810ECEF00ECFD7E /* CStream.swift */,
 				C88949B02813B2DB00795CC0 /* LoadChrSheet.swift */,
 			);
@@ -701,7 +701,7 @@
 				C8DBC91027C8708A0043994B /* AldoApp.swift in Sources */,
 				C8C9FB662803F8BD0093D9A7 /* decode.c in Sources */,
 				C8B5303B2801300C00576D9F /* CartFocusView.swift in Sources */,
-				C8197525280E725B00762462 /* CopyInfoCommand.swift in Sources */,
+				C8197525280E725B00762462 /* CopyCartInfo.swift in Sources */,
 				C88A5E8527F6A1750039382D /* CartView.swift in Sources */,
 				C838D3B727D5DB0300468FDB /* CartChrView.swift in Sources */,
 			);

@@ -12,7 +12,7 @@ struct CopyInfoToClipboardView: View {
 
     let cart: Cart
 
-    @StateObject private var command = CopyInfoCommand()
+    @StateObject private var command = CopyCartInfo()
 
     var body: some View {
         Button {

@@ -1,5 +1,5 @@
 //
-//  CopyInfoCommand.swift
+//  CopyCartInfo.swift
 //  Aldo-App
 //
 //  Created by Brandon Stansbury on 4/18/22.
@@ -7,7 +7,7 @@
 
 import AppKit
 
-final class CopyInfoCommand: ObservableObject {
+final class CopyCartInfo: ObservableObject {
     @Published var copyIconOpacity = 1.0
     @Published var successIconOpacity = 0.0
     @Published var failed = false

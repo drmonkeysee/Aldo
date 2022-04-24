@@ -25,6 +25,7 @@ func readCStream(binary: Bool = false, operation: (CStream) throws -> Void,
     }
 
     var streamData = Data()
+    var opFailed = false
     let g = DispatchGroup()
     g.enter()
     p.fileHandleForReading.readabilityHandler = { h in
@@ -36,14 +37,19 @@ func readCStream(binary: Bool = false, operation: (CStream) throws -> Void,
         }
         streamData.append(d)
     }
-    g.notify(queue: DispatchQueue.main) { onComplete(.success(streamData)) }
+    g.notify(queue: DispatchQueue.main) {
+        if opFailed { return }
+        onComplete(.success(streamData))
+    }
 
     do {
         defer { fclose(stream) }
         try operation(stream)
     } catch let error as AldoError {
+        opFailed = true
         onComplete(.error(error))
     } catch {
+        opFailed = true
         onComplete(.error(.systemError(error.localizedDescription)))
     }
 }

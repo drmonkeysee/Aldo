@@ -64,14 +64,7 @@ fileprivate struct ChrSheetView: View {
                 .font(.caption)
             switch command.status {
             case .pending:
-                let _ = command.execute(cart: cart, bank: bank)
-                ZStack {
-                    Color.cyan
-                        .cornerRadius(5)
-                        .frame(width: Constraints.sheetSize.w,
-                               height: Constraints.sheetSize.h)
-                    Text("Loading CHR Bank...")
-                }
+                PendingChrView(command, cart, bank)
             case .loaded(let img):
                 Image(nsImage: img)
                     .interpolation(.none)
@@ -84,6 +77,22 @@ fileprivate struct ChrSheetView: View {
                     Text("CHR Bank Not Available")
                 }
             }
+        }
+    }
+}
+
+fileprivate struct PendingChrView: View {
+    init(_ cmd: LoadChrSheet, _ cart: Cart, _ bank: Int) {
+        cmd.execute(cart: cart, bank: bank)
+    }
+
+    var body: some View {
+        ZStack {
+            Color.cyan
+                .cornerRadius(5)
+                .frame(width: Constraints.sheetSize.w,
+                       height: Constraints.sheetSize.h)
+            Text("Loading CHR Bank...")
         }
     }
 }

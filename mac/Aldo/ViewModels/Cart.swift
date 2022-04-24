@@ -5,7 +5,7 @@
 //  Created by Brandon Stansbury on 3/12/22.
 //
 
-import Cocoa
+import Foundation
 
 final class Cart: ObservableObject {
     @Published private(set) var file: URL?
@@ -22,10 +22,10 @@ final class Cart: ObservableObject {
             currentError = .ioError("No file selected")
             return false
         }
-        handle = tryHandleOp { try CartHandle(filePath) }
-        guard handle != nil else { return false }
+        handle = loadCart(filePath)
+        guard let h = handle else { return false }
         file = filePath
-        info = handle?.getCartInfo() ?? .none
+        info = h.getCartInfo()
         return true
     }
 
@@ -52,32 +52,14 @@ final class Cart: ObservableObject {
         }, onComplete: onComplete)
     }
 
-    func getChrBank(bank: Int) -> NSImage? {
-        // TODO: cache images?
-        guard handle != nil else { return nil }
-
-        let chrImage = tryHandleOp { try self.handle?.getChrBank(bank) }
-        #if DEBUG
-        if chrImage?.isValid != true {
-            let msg = currentError?.message ?? (chrImage == nil
-                                                ? "Image init failed"
-                                                : "Image data invalid")
-            print("CHR decode failure: \(msg)")
-        }
-        #endif
-        return chrImage
-    }
-
-    private func tryHandleOp<T>(_ op: (() throws -> T?)?) -> T? {
+    private func loadCart(_ filePath: URL) -> CartHandle? {
         currentError = nil
-        if let operation = op {
-            do {
-                return try operation()
-            } catch let error as AldoError {
-                currentError = error
-            } catch {
-                currentError = .systemError(error.localizedDescription)
-            }
+        do {
+            return try CartHandle(filePath)
+        } catch let error as AldoError {
+            currentError = error
+        } catch {
+            currentError = .systemError(error.localizedDescription)
         }
         return nil
     }
@@ -100,8 +82,6 @@ enum CartInfo {
 }
 
 fileprivate final class CartHandle {
-    private typealias CFile = UnsafeMutablePointer<FILE>
-
     private var cartRef: OpaquePointer?
 
     init(_ fromFile: URL) throws {
@@ -139,55 +119,5 @@ fileprivate final class CartHandle {
         default:
             return .unknown
         }
-    }
-
-    func getChrBank(_ bank: Int) throws -> NSImage? {
-        try verifyRef()
-
-        var bankview = cart_chrbank(cartRef, bank)
-        let streamData = try captureCStream(binary: true) { stream in
-            let err = dis_cart_chrbank(&bankview, 2, stream)
-            if err < 0 { throw AldoError.wrapDisError(code: err) }
-        }
-        return NSImage(data: streamData)
-    }
-
-    private func verifyRef() throws {
-        if cartRef == nil { throw AldoError.ioError("No cart set") }
-    }
-
-    private func captureCStream(binary: Bool = false,
-                                op: (CFile) throws -> Void) throws -> Data {
-        let p = Pipe()
-        errno = 0
-        guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor,
-                                  binary ? "wb" : "w") else {
-            throw AldoError.ioErrno
-        }
-
-        var streamData = Data()
-        let g = DispatchGroup()
-        g.enter()
-        p.fileHandleForReading.readabilityHandler = { h in
-            let d = h.availableData
-            if d.isEmpty {
-                p.fileHandleForReading.readabilityHandler = nil
-                g.leave()
-                return
-            }
-            streamData.append(d)
-        }
-
-        do {
-            defer { fclose(stream) }
-            try op(stream)
-        }
-
-        // TODO: can i make this async instead of waiting
-        guard case .success = g.wait(timeout: .now() + 0.2) else {
-            p.fileHandleForReading.readabilityHandler = nil
-            throw AldoError.ioError("File stream read timed out")
-        }
-        return streamData
     }
 }

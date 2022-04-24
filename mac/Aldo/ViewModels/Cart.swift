@@ -6,7 +6,6 @@
 //
 
 import Cocoa
-import Foundation
 
 final class Cart: ObservableObject {
     @Published private(set) var file: URL?

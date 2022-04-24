@@ -56,16 +56,26 @@ fileprivate struct ChrSheetView: View {
     @ObservedObject var cart: Cart
     let bank: Int
 
-    @StateObject private var query = ChrSheetQuery()
+    @StateObject private var command = LoadChrSheet()
 
     var body: some View {
         VStack {
             Text("Bank \(bank)")
                 .font(.caption)
-            if let img = cart.getChrBank(bank: bank) {
+            switch command.status {
+            case .pending:
+                let _ = command.execute(cart: cart, bank: bank)
+                ZStack {
+                    Color.cyan
+                        .cornerRadius(5)
+                        .frame(width: Constraints.sheetSize.w,
+                               height: Constraints.sheetSize.h)
+                    Text("Loading CHR Bank...")
+                }
+            case .loaded(let img):
                 Image(nsImage: img)
                     .interpolation(.none)
-            } else {
+            case .failed:
                 ZStack {
                     Color.cyan
                         .cornerRadius(5)

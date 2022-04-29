@@ -11,7 +11,6 @@ struct CopyInfoToClipboardView: View {
     private static let fadeDuration = 2.0
 
     let cart: Cart
-
     @StateObject private var command = CopyCartInfo()
 
     var body: some View {

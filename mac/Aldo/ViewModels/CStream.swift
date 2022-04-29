@@ -37,7 +37,7 @@ func readCStream(binary: Bool = false, operation: (CStream) throws -> Void,
         }
         streamData.append(d)
     }
-    g.notify(queue: DispatchQueue.main) {
+    g.notify(queue: .main) {
         if opFailed { return }
         onComplete(.success(streamData))
     }

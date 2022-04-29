@@ -1,5 +1,5 @@
 //
-//  LoadChrSheet.swift
+//  ChrSheet.swift
 //  Aldo-App
 //
 //  Created by Brandon Stansbury on 4/22/22.
@@ -13,15 +13,17 @@ enum ChrSheetStatus {
     case failed
 }
 
-final class LoadChrSheet: ObservableObject {
+final class ChrSheet: ObservableObject {
+    let cart: Cart
     let bank: Int
     @Published private(set) var status = ChrSheetStatus.pending
 
-    init(bank: Int) {
+    init(_ cart: Cart, bank: Int) {
+        self.cart = cart
         self.bank = bank
     }
 
-    func execute(cart: Cart) {
+    func load() {
         cart.readChrBank(bank: bank) { result in
             switch result {
             case .success(let data):

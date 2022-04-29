@@ -11,7 +11,6 @@ final class Cart: ObservableObject {
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
     private(set) var currentError: AldoError?
-
     private var handle: CartHandle?
 
     var name: String? { file?.lastPathComponent }

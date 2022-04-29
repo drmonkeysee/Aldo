@@ -41,7 +41,7 @@ fileprivate struct ChrBanksView: View {
         ScrollView(.horizontal) {
             LazyHStack {
                 ForEach(0..<bankCount, id: \.self) { i in
-                    ChrSheetView(cart: cart, bank: i)
+                    ChrSheetView(cart: cart, command: LoadChrSheet(bank: i))
                 }
             }
             .padding(Constraints.sheetPadding)
@@ -54,17 +54,15 @@ fileprivate struct ChrBanksView: View {
 
 fileprivate struct ChrSheetView: View {
     let cart: Cart
-    let bank: Int
-
-    @StateObject private var command = LoadChrSheet()
+    @ObservedObject var command: LoadChrSheet
 
     var body: some View {
         VStack {
-            Text("Bank \(bank)")
+            Text("Bank \(command.bank)")
                 .font(.caption)
             switch command.status {
             case .pending:
-                PendingChrView(command, cart, bank)
+                PendingChrView(command, cart)
             case .loaded(let img):
                 Image(nsImage: img)
                     .interpolation(.none)
@@ -82,9 +80,7 @@ fileprivate struct ChrSheetView: View {
 }
 
 fileprivate struct PendingChrView: View {
-    init(_ cmd: LoadChrSheet, _ cart: Cart, _ bank: Int) {
-        cmd.execute(cart: cart, bank: bank)
-    }
+    init(_ cmd: LoadChrSheet, _ cart: Cart) { cmd.execute(cart: cart) }
 
     var body: some View {
         ZStack {

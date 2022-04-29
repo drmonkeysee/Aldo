@@ -14,9 +14,14 @@ enum ChrSheetStatus {
 }
 
 final class LoadChrSheet: ObservableObject {
+    let bank: Int
     @Published private(set) var status = ChrSheetStatus.pending
 
-    func execute(cart: Cart, bank: Int) {
+    init(bank: Int) {
+        self.bank = bank
+    }
+
+    func execute(cart: Cart) {
         cart.readChrBank(bank: bank) { result in
             switch result {
             case .success(let data):

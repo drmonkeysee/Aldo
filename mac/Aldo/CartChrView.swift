@@ -34,7 +34,7 @@ fileprivate struct Constraints {
 }
 
 fileprivate struct ChrBanksView: View {
-    @ObservedObject var cart: Cart
+    let cart: Cart
     let bankCount: Int
 
     var body: some View {
@@ -53,7 +53,7 @@ fileprivate struct ChrBanksView: View {
 }
 
 fileprivate struct ChrSheetView: View {
-    @ObservedObject var cart: Cart
+    let cart: Cart
     let bank: Int
 
     @StateObject private var command = LoadChrSheet()

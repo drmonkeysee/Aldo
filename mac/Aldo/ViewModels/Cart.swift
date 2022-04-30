@@ -5,9 +5,10 @@
 //  Created by Brandon Stansbury on 3/12/22.
 //
 
-import Foundation
+import Cocoa
 
 final class Cart: ObservableObject {
+    let chrSheetCache = BankCache<NSImage>()
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
     private(set) var currentError: AldoError?
@@ -25,6 +26,11 @@ final class Cart: ObservableObject {
         guard let h = handle else { return false }
         file = filePath
         info = h.getCartInfo()
+        if case .iNes(_, let header, _) = info, header.chr_chunks > 0 {
+            chrSheetCache.reset(capacity: Int(header.chr_chunks))
+        } else {
+            chrSheetCache.clear()
+        }
         return true
     }
 
@@ -77,6 +83,32 @@ enum CartInfo {
         default:
             return "\(self)".capitalized
         }
+    }
+}
+
+final class BankCache<T: AnyObject> {
+    private var items = [T?]()
+
+    subscript(index: Int) -> T? {
+        get {
+            guard validIndex(index) else { return nil }
+            return items[index]
+        }
+        set(newValue) {
+            if validIndex(index), let val = newValue { items[index] = val }
+        }
+    }
+
+    fileprivate func reset(capacity: Int) {
+        items = [T?](repeating: nil, count: capacity)
+    }
+
+    fileprivate func clear() {
+        items.removeAll()
+    }
+
+    private func validIndex(_ index: Int) -> Bool {
+        items.startIndex <= index && index < items.endIndex
     }
 }
 

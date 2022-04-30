@@ -24,11 +24,16 @@ final class ChrSheet: ObservableObject {
     }
 
     func load() {
+        if let img = cart.chrSheetCache[bank] {
+            self.status = .loaded(img)
+            return
+        }
         cart.readChrBank(bank: bank) { result in
             switch result {
             case .success(let data):
                 let chrSheet = NSImage(data: data)
                 if let img = chrSheet, img.isValid {
+                    self.cart.chrSheetCache[self.bank] = img
                     self.status = .loaded(img)
                 } else {
                     self.logFailure("CHR Decode Failure",

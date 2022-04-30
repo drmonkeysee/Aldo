@@ -34,7 +34,7 @@ fileprivate struct Constraints {
 }
 
 fileprivate struct ChrBanksView: View {
-    let cart: Cart
+    @ObservedObject var cart: Cart
     let bankCount: Int
 
     var body: some View {

@@ -23,7 +23,7 @@ struct CartPrgView: View {
                     .font(.headline)
             }
             ScrollView {
-                Text(CartPrgView.testRom)
+                Text(Self.testRom)
                     .font(.system(.body, design: .monospaced))
                     .frame(minWidth: 250, maxWidth: .infinity,
                            alignment: .leading)

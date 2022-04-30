@@ -31,10 +31,9 @@ enum AldoError: Error {
         case let .systemError(str), let .ioError(str):
             return str
         case let .cartErr(code):
-            return String(format: AldoError.errCodeFormat, cart_errstr(code),
-                          code)
+            return String(format: Self.errCodeFormat, cart_errstr(code), code)
         case let .disErr(code, sysErr):
-            var msg = String(format: AldoError.errCodeFormat, dis_errstr(code),
+            var msg = String(format: Self.errCodeFormat, dis_errstr(code),
                              code)
             if let se = sysErr {
                 msg.append(": \(se)")

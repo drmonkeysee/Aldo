@@ -17,14 +17,14 @@ struct CartView: View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 0) {
                 CartPrgView()
-                    .padding(CartView.romPadding)
+                    .padding(Self.romPadding)
                 Divider()
                 CartFocusView(cart: cart)
                     .padding(5)
                     .frame(maxWidth: .infinity)
                 Divider()
                 CartChrView(cart: cart)
-                    .padding(CartView.romPadding)
+                    .padding(Self.romPadding)
             }
         }
     }

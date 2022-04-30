@@ -33,10 +33,9 @@ struct ContentView: View {
                         }
                         ToolbarItem {
                             Button(action: pickFile) {
-                                Label(ContentView.fileLabel,
-                                      systemImage: "plus")
+                                Label(Self.fileLabel, systemImage: "plus")
                             }
-                            .help(ContentView.fileLabel)
+                            .help(Self.fileLabel)
                         }
                     }
                     .alert("Rom Load Failure", isPresented: $cartLoadFailed,

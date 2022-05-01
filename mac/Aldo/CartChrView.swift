@@ -28,9 +28,10 @@ struct CartChrView: View {
 }
 
 fileprivate struct Constraints {
-    static let sheetSize = (w: 256.0 * 2, h: 128.0 * 2)
-    static let sheetPadding = 5.0
+    static let cornerRadius = 5.0
     static let outerWidth = sheetSize.w + (sheetPadding * 2)
+    static let sheetPadding = 5.0
+    static let sheetSize = (w: 256.0 * 2, h: 128.0 * 2)
 }
 
 fileprivate struct ChrBanksView: View {
@@ -65,10 +66,15 @@ fileprivate struct ChrSheetView: View {
             case .loaded(let img):
                 Image(nsImage: img)
                     .interpolation(.none)
+                    .cornerRadius(Constraints.cornerRadius)
+                    .overlay(
+                        RoundedRectangle(
+                            cornerRadius: Constraints.cornerRadius)
+                        .stroke(.white, lineWidth: 1))
             case .failed:
                 ZStack {
                     Color.cyan
-                        .cornerRadius(5)
+                        .cornerRadius(Constraints.cornerRadius)
                         .frame(width: Constraints.sheetSize.w,
                                height: Constraints.sheetSize.h)
                     Text("CHR Bank Not Available")
@@ -84,7 +90,7 @@ fileprivate struct PendingChrView: View {
     var body: some View {
         ZStack {
             Color.cyan
-                .cornerRadius(5)
+                .cornerRadius(Constraints.cornerRadius)
                 .frame(width: Constraints.sheetSize.w,
                        height: Constraints.sheetSize.h)
             Text("Loading CHR Bank...")
@@ -111,7 +117,7 @@ fileprivate struct PaletteView: View {
     var body: some View {
         ZStack {
             Color.cyan
-                .cornerRadius(5)
+                .cornerRadius(Constraints.cornerRadius)
             Text("Palette")
         }
         .padding(.leading, Constraints.sheetPadding)

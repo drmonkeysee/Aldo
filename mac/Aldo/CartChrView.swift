@@ -29,6 +29,7 @@ struct CartChrView: View {
 
 fileprivate struct Constraints {
     static let cornerRadius = 5.0
+    static let groupboxPadding = 10.0
     static let outerWidth = sheetSize.w + (sheetPadding * 2)
     static let sheetPadding = 5.0
     static let sheetSize = (w: 256.0 * 2, h: 128.0 * 2)
@@ -104,10 +105,11 @@ fileprivate struct NoChrView: View {
     var body: some View {
         GroupBox {
             Text(reason)
-                .frame(width: Constraints.sheetSize.w,
-                       height: Constraints.sheetSize.h)
+                .frame(width: Constraints.sheetSize.w
+                                - Constraints.groupboxPadding,
+                       height: Constraints.sheetSize.h
+                                - Constraints.groupboxPadding)
         }
-        .frame(width: Constraints.outerWidth)
         .padding(.leading, Constraints.sheetPadding)
         .padding(.trailing, Constraints.sheetPadding * 2)
     }

@@ -30,9 +30,10 @@ struct CartChrView: View {
 fileprivate struct Constraints {
     static let cornerRadius = 5.0
     static let groupboxPadding = 10.0
-    static let outerWidth = sheetSize.w + (sheetPadding * 2)
+    static let outerWidth = sheetSize.w + groupboxPadding
+    static let scale = 2.0
     static let sheetPadding = 5.0
-    static let sheetSize = (w: 256.0 * 2, h: 128.0 * 2)
+    static let sheetSize = (w: 256.0 * scale, h: 128.0 * scale)
 }
 
 fileprivate struct ChrBanksView: View {
@@ -43,7 +44,9 @@ fileprivate struct ChrBanksView: View {
         ScrollView(.horizontal) {
             LazyHStack {
                 ForEach(0..<bankCount, id: \.self) { i in
-                    ChrSheetView(sheet: ChrSheet(cart, bank: i))
+                    ChrSheetView(
+                        sheet: ChrSheet(cart, bank: i,
+                                        scale: Int(Constraints.scale)))
                 }
             }
             .padding(Constraints.sheetPadding)
@@ -111,7 +114,7 @@ fileprivate struct NoChrView: View {
                                 - Constraints.groupboxPadding)
         }
         .padding(.leading, Constraints.sheetPadding)
-        .padding(.trailing, Constraints.sheetPadding * 2)
+        .padding(.trailing, Constraints.groupboxPadding)
     }
 }
 

@@ -44,7 +44,7 @@ final class Cart: ObservableObject {
         }, onComplete: onComplete)
     }
 
-    func readChrBank(bank: Int,
+    func readChrBank(bank: Int, scale: Int,
                      onComplete: @escaping (CStreamResult) -> Void) {
         guard let h = handle else {
             onComplete(.error(.ioError("No cart set")))
@@ -52,7 +52,7 @@ final class Cart: ObservableObject {
         }
         readCStream(binary: true, operation: { stream in
             var bankview = cart_chrbank(h.unwrap(), bank)
-            let err = dis_cart_chrbank(&bankview, 2, stream)
+            let err = dis_cart_chrbank(&bankview, Int32(scale), stream)
             if err < 0 { throw AldoError.wrapDisError(code: err) }
         }, onComplete: onComplete)
     }

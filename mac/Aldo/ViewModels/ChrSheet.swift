@@ -16,11 +16,13 @@ enum ChrSheetStatus {
 final class ChrSheet: ObservableObject {
     let cart: Cart
     let bank: Int
+    let scale: Int
     @Published private(set) var status = ChrSheetStatus.pending
 
-    init(_ cart: Cart, bank: Int) {
+    init(_ cart: Cart, bank: Int, scale: Int) {
         self.cart = cart
         self.bank = bank
+        self.scale = scale
     }
 
     func load() {
@@ -28,7 +30,7 @@ final class ChrSheet: ObservableObject {
             self.status = .loaded(img)
             return
         }
-        cart.readChrBank(bank: bank) { result in
+        cart.readChrBank(bank: bank, scale: scale) { result in
             switch result {
             case .success(let data):
                 let chrSheet = NSImage(data: data)

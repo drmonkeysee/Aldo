@@ -16,6 +16,7 @@ struct CartPrgView: View {
     }
 
     @State var bankSelection = 0
+    @State var lineSelection: Int?
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -27,41 +28,19 @@ struct CartPrgView: View {
                 Label("PRG ROM", systemImage: "doc.plaintext")
                     .font(.headline)
             }
-            /*ScrollView {
-                Text(Self.testRom)
-                    .font(.system(.body, design: .monospaced))
-                    .frame(minWidth: 250, maxWidth: .infinity,
-                           alignment: .leading)
-                    .multilineTextAlignment(.leading)
-                    .textSelection(.enabled)
-            }*/
-            List(testDissassembly) { line in
+            List(0..<testDissassembly.count, id: \.self,
+                 selection: $lineSelection) { i in
+                let line = testDissassembly[i]
                 switch line {
                 case let .instruction(offset, inst):
                     Text(inst.listing(offset: offset))
                         .font(.system(.body, design: .monospaced))
-                        .frame(minWidth: 250, maxWidth: .infinity,
-                               alignment: .leading)
-                        .textSelection(.enabled)
                 default:
                     Text("No inst")
                 }
             }
-            /*ScrollView {
-                ForEach(testDissassembly) { line in
-                    switch line {
-                    case let .instruction(offset, inst):
-                        Text(inst.listing(offset: offset))
-                            .font(.system(.body, design: .monospaced))
-                            .frame(minWidth: 250, maxWidth: .infinity,
-                                   alignment: .leading)
-                            .textSelection(.enabled)
-                    default:
-                        Text("No inst")
-                    }
-                }
-            }*/
         }
+        .frame(width: 250)
     }
 }
 

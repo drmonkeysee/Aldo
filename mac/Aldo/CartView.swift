@@ -8,23 +8,19 @@
 import SwiftUI
 
 struct CartView: View {
-    let cart: Cart
-
     var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 0) {
-                CartPrgView(cart: cart)
+                CartPrgView()
                 Divider()
-                CartChrView(cart: cart)
+                CartChrView()
             }
         }
     }
 }
 
 struct CartView_Previews: PreviewProvider {
-    private static let cart = Cart()
-
     static var previews: some View {
-        CartView(cart: cart)
+        CartView()
     }
 }

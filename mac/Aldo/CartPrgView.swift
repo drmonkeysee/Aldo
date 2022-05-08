@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CartPrgView: View {
-    let cart: Cart
+    @EnvironmentObject var cart: Cart
     @State private var bank = 0
 
     var body: some View {
@@ -107,9 +107,7 @@ struct PrgDetailView: View {
 }
 
 struct CartPrgView_Previews: PreviewProvider {
-    private static let cart = Cart()
-
     static var previews: some View {
-        CartPrgView(cart: cart)
+        CartPrgView()
     }
 }

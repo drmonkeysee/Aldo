@@ -82,10 +82,9 @@ fileprivate struct ContentDetail: View {
         switch link {
         case .emulator:
             EmulatorView()
-                .environmentObject(cart)
-                .padding(5)
         case .cart:
-            CartView(cart: cart)
+            CartView()
+                .environmentObject(cart)
         }
     }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CartChrView: View {
-    @ObservedObject var cart: Cart
+    @EnvironmentObject var cart: Cart
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -131,9 +131,7 @@ fileprivate struct PaletteView: View {
 }
 
 struct CartChrView_Previews: PreviewProvider {
-    private static let cart = Cart()
-
     static var previews: some View {
-        CartChrView(cart: cart)
+        CartChrView()
     }
 }

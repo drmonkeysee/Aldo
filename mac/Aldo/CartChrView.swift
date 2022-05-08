@@ -24,6 +24,7 @@ struct CartChrView: View {
                 NoChrView(reason: "No CHR ROM Available")
             }
         }
+        .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: .zero))
     }
 }
 
@@ -120,12 +121,12 @@ fileprivate struct NoChrView: View {
 
 fileprivate struct PaletteView: View {
     var body: some View {
-        ZStack {
-            Color.cyan
-                .cornerRadius(Constraints.cornerRadius)
-            Text("Palette")
-        }
-        .padding(.leading, Constraints.sheetPadding)
+        Text("Palette")
+            .frame(width: Constraints.sheetSize.w / 2,
+                   height: Constraints.sheetSize.h / 2)
+            .background(.cyan)
+            .cornerRadius(Constraints.cornerRadius)
+            .padding(.trailing, Constraints.sheetPadding)
     }
 }
 

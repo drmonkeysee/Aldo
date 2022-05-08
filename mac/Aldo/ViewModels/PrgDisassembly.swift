@@ -7,10 +7,6 @@
 
 import Foundation
 
-final class DisassemblySelection: ObservableObject {
-    @Published var line: Int?
-}
-
 final class ProgramListing: ObservableObject {
     let cart: Cart
     let bank: Int
@@ -27,11 +23,12 @@ final class ProgramListing: ObservableObject {
             return
         }
         DispatchQueue.global(qos: .background).async {
+            sleep(1)
             let prgListing = (0..<100).map { i in
                 PrgLine.disassembled(i, Instruction(bytes: [0x6c, 0x34, 0x81]))
             }
-            self.cart.prgListingCache[self.bank] = prgListing
             DispatchQueue.main.async {
+                self.cart.prgListingCache[self.bank] = prgListing
                 self.status = .loaded(prgListing)
             }
         }
@@ -54,7 +51,7 @@ struct Instruction {
     var addressMode: String { "Absolute Indirect" }
     var description: String { "Unconditional jump to an address" }
 
-    func listing(offset: UInt16) -> String {
+    func line(offset: UInt16) -> String {
         let addr = 0xc000 + offset
         let byteStr = bytes.reduce("") { (result, byte) in
             result.appendingFormat("%02X ", byte)

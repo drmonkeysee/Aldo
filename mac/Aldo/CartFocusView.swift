@@ -9,12 +9,17 @@ import SwiftUI
 
 struct CartFocusView: View {
     let cart: Cart
-    let prgSelection: DisassemblySelection
+    let instruction: Instruction?
+
+    init(cart: Cart, instruction: Instruction? = nil) {
+        self.cart = cart
+        self.instruction = instruction
+    }
 
     var body: some View {
         VStack(alignment: .leading) {
             GroupBox {
-                InstructionDetailsView(selection: prgSelection)
+                InstructionDetailsView(instruction: instruction)
             } label: {
                 Label("Selected Instruction", systemImage: "pencil")
                     .font(.headline)
@@ -32,12 +37,12 @@ struct CartFocusView: View {
 }
 
 struct InstructionDetailsView: View {
-    @ObservedObject var selection: DisassemblySelection
+    let instruction: Instruction?
 
     var body: some View {
         HStack {
             VStack {
-                Text("--").font(.title)
+                Text(instruction?.mnemonic ?? "--").font(.title)
                 Text("")
             }
             Spacer()
@@ -73,6 +78,6 @@ struct CartFocusView_Previews: PreviewProvider {
     private static let cart = Cart()
 
     static var previews: some View {
-        CartFocusView(cart: cart, prgSelection: DisassemblySelection())
+        CartFocusView(cart: cart, instruction: Instruction(bytes: [0x0]))
     }
 }

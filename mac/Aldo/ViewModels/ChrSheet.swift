@@ -7,17 +7,11 @@
 
 import Cocoa
 
-enum ChrSheetStatus {
-    case pending
-    case loaded(NSImage)
-    case failed
-}
-
 final class ChrSheet: ObservableObject {
     let cart: Cart
     let bank: Int
     let scale: Int
-    @Published private(set) var status = ChrSheetStatus.pending
+    @Published private(set) var status: BankLoadStatus<NSImage> = .pending
 
     init(_ cart: Cart, bank: Int, scale: Int) {
         self.cart = cart

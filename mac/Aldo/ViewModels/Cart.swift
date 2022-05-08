@@ -9,6 +9,7 @@ import Cocoa
 
 final class Cart: ObservableObject {
     let chrSheetCache = BankCache<NSImage>()
+    let prgListingCache = BankCache<[PrgLine]>()
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
     private(set) var currentError: AldoError?
@@ -86,7 +87,13 @@ enum CartInfo {
     }
 }
 
-final class BankCache<T: AnyObject> {
+enum BankLoadStatus<T> {
+    case pending
+    case loaded(T)
+    case failed
+}
+
+final class BankCache<T> {
     private var items = [T?]()
 
     subscript(index: Int) -> T? {

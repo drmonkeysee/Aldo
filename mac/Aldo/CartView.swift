@@ -8,23 +8,22 @@
 import SwiftUI
 
 struct CartView: View {
-    private static let romPadding = EdgeInsets(top: 5, leading: 5, bottom: 5,
-                                               trailing: .zero)
-
     let cart: Cart
 
     var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 0) {
-                CartPrgView()
-                    .padding(Self.romPadding)
+                let prgSelection = DisassemblySelection()
+                CartPrgView(cart: cart, selection: prgSelection)
+                    .padding(5)
                 Divider()
-                CartFocusView(cart: cart)
+                CartFocusView(cart: cart, prgSelection: prgSelection)
                     .padding(5)
                     .frame(maxWidth: .infinity)
                 Divider()
                 CartChrView(cart: cart)
-                    .padding(Self.romPadding)
+                    .padding(EdgeInsets(top: 5, leading: 5, bottom: 5,
+                                        trailing: .zero))
             }
         }
     }

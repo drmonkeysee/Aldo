@@ -9,41 +9,12 @@ import SwiftUI
 
 struct CartFocusView: View {
     let cart: Cart
+    let prgSelection: DisassemblySelection
 
     var body: some View {
         VStack(alignment: .leading) {
             GroupBox {
-                HStack {
-                    VStack {
-                        Text("JMP").font(.title)
-                        Text("(6C)")
-                    }
-                    Spacer()
-                    VStack {
-                        Text("$(8134)").font(.title)
-                        Text("(34) (81)")
-                    }
-                }
-                Divider()
-                HStack {
-                    Text("Jump")
-                    Spacer()
-                    Text("Absolute Indirect")
-                }
-                .font(.footnote)
-                Divider()
-                HStack {
-                    Text("Flags")
-                    Spacer()
-                    Image(systemName: "n.circle")
-                    Image(systemName: "v.circle")
-                    Image(systemName: "b.circle")
-                    Image(systemName: "d.circle")
-                    Image(systemName: "i.circle")
-                    Image(systemName: "z.circle")
-                    Image(systemName: "c.circle")
-                }
-                .imageScale(.large)
+                InstructionDetailsView(selection: prgSelection)
             } label: {
                 Label("Selected Instruction", systemImage: "pencil")
                     .font(.headline)
@@ -60,10 +31,48 @@ struct CartFocusView: View {
     }
 }
 
-struct CartGutterView_Previews: PreviewProvider {
+struct InstructionDetailsView: View {
+    @ObservedObject var selection: DisassemblySelection
+
+    var body: some View {
+        HStack {
+            VStack {
+                Text("--").font(.title)
+                Text("")
+            }
+            Spacer()
+            VStack {
+                Text("--").font(.title)
+                Text("")
+            }
+        }
+        Divider()
+        HStack {
+            Text("--")
+            Spacer()
+            Text("--")
+        }
+        .font(.footnote)
+        Divider()
+        HStack {
+            Text("Flags")
+            Spacer()
+            Image(systemName: "n.circle")
+            Image(systemName: "v.circle")
+            Image(systemName: "b.circle")
+            Image(systemName: "d.circle")
+            Image(systemName: "i.circle")
+            Image(systemName: "z.circle")
+            Image(systemName: "c.circle")
+        }
+        .imageScale(.large)
+    }
+}
+
+struct CartFocusView_Previews: PreviewProvider {
     private static let cart = Cart()
 
     static var previews: some View {
-        CartFocusView(cart: cart)
+        CartFocusView(cart: cart, prgSelection: DisassemblySelection())
     }
 }

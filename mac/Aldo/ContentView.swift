@@ -33,7 +33,8 @@ struct ContentView: View {
                         }
                         ToolbarItem {
                             Button(action: pickFile) {
-                                Label(Self.fileLabel, systemImage: "plus")
+                                Label(Self.fileLabel,
+                                      systemImage: "arrow.up.doc")
                             }
                             .help(Self.fileLabel)
                         }

@@ -51,6 +51,7 @@ struct Instruction {
     var name: String { "Jump" }
     var addressMode: String { "Absolute Indirect" }
     var description: String { "Unconditional jump to an address" }
+    var flags: UInt8 { 0x34 }
 
     func line(offset: UInt16) -> String {
         let addr = 0xc000 + offset

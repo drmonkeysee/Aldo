@@ -26,7 +26,7 @@ final class ChrSheet: ObservableObject {
         }
         cart.readChrBank(bank: bank, scale: scale) { result in
             switch result {
-            case .success(let data):
+            case let .success(data):
                 let chrSheet = NSImage(data: data)
                 if let img = chrSheet, img.isValid {
                     self.cart.chrSheetCache[self.bank] = img
@@ -38,7 +38,7 @@ final class ChrSheet: ObservableObject {
                                         : "Image data invalid")
                     self.status = .failed
                 }
-            case .error(let err):
+            case let .error(err):
                 self.logFailure("CHR Read Failure", err.message)
                 self.status = .failed
             }

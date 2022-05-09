@@ -15,8 +15,8 @@ struct CartChrView: View {
             Label("CHR ROM", systemImage: "photo")
                 .font(.headline)
             switch cart.info {
-            case .iNes(_, let header, _) where header.chr_chunks > 0:
-                ChrBanksView(bankCount: Int(header.chr_chunks))
+            case .iNes where cart.info.chrBanks > 0:
+                ChrBanksView(bankCount: cart.info.chrBanks)
                 PaletteView()
             case .iNes:
                 NoChrView(reason: "Cart uses CHR RAM")
@@ -68,7 +68,7 @@ fileprivate struct ChrSheetView: View {
             switch sheet.status {
             case .pending:
                 PendingChrView(sheet)
-            case .loaded(let img):
+            case let .loaded(img):
                 Image(nsImage: img)
                     .interpolation(.none)
                     .cornerRadius(Constraints.cornerRadius)

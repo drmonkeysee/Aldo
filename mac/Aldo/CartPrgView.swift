@@ -34,7 +34,7 @@ fileprivate struct ProgramView: View {
     var body: some View {
         HStack {
             Picker(selection: $banks.selectedBank) {
-                ForEach(0..<banks.cart.info.prgBanks, id: \.self) { i in
+                ForEach(0..<banks.count, id: \.self) { i in
                     Text("Bank \(i)")
                 }
             } label: {
@@ -54,7 +54,7 @@ fileprivate struct ProgramListingView: View {
         switch listing.status {
         case .pending:
             PendingPrgView(listing)
-        case .loaded(let prg):
+        case let .loaded(prg):
             List(0..<prg.count, id: \.self) { i in
                 let line = prg[i]
                 switch line {

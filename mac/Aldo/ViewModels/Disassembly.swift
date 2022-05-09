@@ -11,6 +11,8 @@ final class ProgramBanks: ObservableObject {
     let cart: Cart
     @Published var selectedBank = 0
 
+    var count: Int { cart.info.prgBanks }
+
     var currentListing: ProgramListing {
         ProgramListing(cart: cart, bank: selectedBank)
     }

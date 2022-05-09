@@ -17,7 +17,7 @@ final class CopyCartInfo: ObservableObject {
         currentError = nil
         cart.readInfoText { result in
             switch result {
-            case .success(let data):
+            case let .success(data):
                 if let text = String(data: data, encoding: .utf8) {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(text, forType: .string)
@@ -26,7 +26,7 @@ final class CopyCartInfo: ObservableObject {
                 } else {
                     self.setError(.unknown)
                 }
-            case .error(let err):
+            case let .error(err):
                 self.setError(err)
             }
         }

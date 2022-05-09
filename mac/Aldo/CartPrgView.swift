@@ -31,14 +31,15 @@ struct CartPrgView: View {
             }
             .frame(width: 250)
             .padding(5)
-            CartFocusView(cart: cart)
-                .frame(maxHeight: .infinity, alignment: .top)
-                .padding(5)
+            PrgDetailView()
+        }
+        .onReceive(cart.$file) { _ in
+            bank = 0
         }
     }
 }
 
-struct ProgramListingView: View {
+fileprivate struct ProgramListingView: View {
     @ObservedObject var listing: ProgramListing
     @State var selectedLine: Int?
 
@@ -52,7 +53,7 @@ struct ProgramListingView: View {
                 switch line {
                 case let .disassembled(offset, inst):
                     NavigationLink(tag: i, selection: $selectedLine) {
-                        PrgDetailView(listing.cart, inst)
+                        PrgDetailView(inst)
                     } label: {
                         Text(inst.line(offset: offset))
                             .font(.system(.body, design: .monospaced))
@@ -69,7 +70,7 @@ struct ProgramListingView: View {
     }
 }
 
-struct PendingPrgView: View {
+fileprivate struct PendingPrgView: View {
     init(_ listing: ProgramListing) {
         listing.load()
     }
@@ -79,7 +80,7 @@ struct PendingPrgView: View {
     }
 }
 
-struct NoPrgView: View {
+fileprivate struct NoPrgView: View {
     let reason: String
 
     var body: some View {
@@ -90,17 +91,15 @@ struct NoPrgView: View {
     }
 }
 
-struct PrgDetailView: View {
-    let cart: Cart
+fileprivate struct PrgDetailView: View {
     let instruction: Instruction?
 
-    init(_ cart: Cart, _ instruction: Instruction?) {
-        self.cart = cart
+    init(_ instruction: Instruction? = nil) {
         self.instruction = instruction
     }
 
     var body: some View {
-        CartFocusView(cart: cart, instruction: instruction)
+        CartFocusView(instruction: instruction)
             .frame(maxHeight: .infinity, alignment: .top)
             .padding(5)
     }

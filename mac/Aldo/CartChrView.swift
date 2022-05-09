@@ -16,7 +16,7 @@ struct CartChrView: View {
                 .font(.headline)
             switch cart.info {
             case .iNes(_, let header, _) where header.chr_chunks > 0:
-                ChrBanksView(cart: cart, bankCount: Int(header.chr_chunks))
+                ChrBanksView(bankCount: Int(header.chr_chunks))
                 PaletteView()
             case .iNes:
                 NoChrView(reason: "Cart uses CHR RAM")
@@ -38,7 +38,7 @@ fileprivate struct Constraints {
 }
 
 fileprivate struct ChrBanksView: View {
-    @ObservedObject var cart: Cart
+    @EnvironmentObject var cart: Cart
     let bankCount: Int
 
     var body: some View {

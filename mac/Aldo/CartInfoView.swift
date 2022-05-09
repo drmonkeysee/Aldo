@@ -8,21 +8,21 @@
 import SwiftUI
 
 struct CartInfoView: View {
-    @ObservedObject var cart: Cart
+    @EnvironmentObject var cart: Cart
 
     var body: some View {
         VStack {
             HStack(alignment: .top) {
                 VStack(alignment: .trailing) {
-                    CommonInfoView(section: .labels, cart: cart)
+                    CommonInfoView(section: .labels)
                     FormatView(section: .labels, info: cart.info)
                 }
                 VStack {
-                    CommonInfoView(section: .separators, cart: cart)
+                    CommonInfoView(section: .separators)
                     FormatView(section: .separators, info: cart.info)
                 }
                 VStack(alignment: .leading) {
-                    CommonInfoView(section: .values, cart: cart)
+                    CommonInfoView(section: .values)
                     FormatView(section: .values, info: cart.info)
                 }
                 switch cart.info {
@@ -46,7 +46,7 @@ fileprivate struct CommonInfoView: View {
     private static let labels = ["File", "Format"]
 
     let section: InfoSection
-    @ObservedObject var cart: Cart
+    @EnvironmentObject var cart: Cart
 
     var body: some View {
         switch section {
@@ -187,9 +187,7 @@ fileprivate struct iNesView: View {
 fileprivate func boolToStr(_ val: Bool) -> String { val ? "yes" : "no" }
 
 struct CartInfoView_Previews: PreviewProvider {
-    private static let cart = Cart()
-
     static var previews: some View {
-        CartInfoView(cart: cart)
+        CartInfoView()
     }
 }

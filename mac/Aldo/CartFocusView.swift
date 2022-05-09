@@ -8,11 +8,9 @@
 import SwiftUI
 
 struct CartFocusView: View {
-    let cart: Cart
     let instruction: Instruction?
 
-    init(cart: Cart, instruction: Instruction? = nil) {
-        self.cart = cart
+    init(instruction: Instruction? = nil) {
         self.instruction = instruction
     }
 
@@ -26,7 +24,7 @@ struct CartFocusView: View {
             }
             Divider()
             GroupBox {
-                CartInfoView(cart: cart)
+                CartInfoView()
                     .frame(minWidth: 270, maxWidth: .infinity)
             } label: {
                 Label("Cart Format", systemImage: "scribble")
@@ -36,7 +34,7 @@ struct CartFocusView: View {
     }
 }
 
-struct InstructionDetailsView: View {
+fileprivate struct InstructionDetailsView: View {
     let instruction: Instruction?
 
     var body: some View {
@@ -75,9 +73,7 @@ struct InstructionDetailsView: View {
 }
 
 struct CartFocusView_Previews: PreviewProvider {
-    private static let cart = Cart()
-
     static var previews: some View {
-        CartFocusView(cart: cart, instruction: Instruction(bytes: [0x0]))
+        CartFocusView(instruction: Instruction(bytes: [0x0]))
     }
 }

@@ -7,6 +7,19 @@
 
 import Foundation
 
+final class ProgramBanks: ObservableObject {
+    let cart: Cart
+    @Published var selectedBank = 0
+
+    var currentListing: ProgramListing {
+        ProgramListing(cart: cart, bank: selectedBank)
+    }
+
+    init(_ cart: Cart) {
+        self.cart = cart
+    }
+}
+
 final class ProgramListing: ObservableObject {
     let cart: Cart
     let bank: Int

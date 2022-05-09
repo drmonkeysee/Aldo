@@ -9,33 +9,42 @@ import SwiftUI
 
 struct CartPrgView: View {
     @EnvironmentObject var cart: Cart
-    @State private var bank = 0
 
     var body: some View {
         NavigationView {
             VStack(alignment: .leading) {
-                HStack {
-                    Picker(selection: $bank) {
-                        ForEach(0..<4) { i in
-                            Text("Bank \(i)")
-                        }
-                    } label: {
-                        Label("PRG ROM", systemImage: "doc.plaintext")
-                            .font(.headline)
-                    }
-                    // TODO: make this work with prg bank
-                    CopyInfoToClipboardView(cart: cart)
+                switch cart.info {
+                case .iNes, .raw:
+                    ProgramView(banks: ProgramBanks(cart))
+                default:
+                    prgLabel()
+                        .padding(.top, 2)
+                    NoPrgView(reason: "No PRG ROM Available")
                 }
-                ProgramListingView(listing: ProgramListing(cart: cart,
-                                                           bank: bank))
             }
             .frame(width: 250)
             .padding(5)
             PrgDetailView()
         }
-        .onReceive(cart.$file) { _ in
-            bank = 0
+    }
+}
+
+fileprivate struct ProgramView: View {
+    @ObservedObject var banks: ProgramBanks
+
+    var body: some View {
+        HStack {
+            Picker(selection: $banks.selectedBank) {
+                ForEach(0..<4) { i in
+                    Text("Bank \(i)")
+                }
+            } label: {
+                prgLabel()
+            }
+            // TODO: make this work with prg bank
+            CopyInfoToClipboardView(cart: banks.cart)
         }
+        ProgramListingView(listing: banks.currentListing)
     }
 }
 
@@ -102,6 +111,11 @@ fileprivate struct PrgDetailView: View {
             .frame(maxHeight: .infinity, alignment: .top)
             .padding(5)
     }
+}
+
+fileprivate func prgLabel() -> some View {
+    Label("PRG ROM", systemImage: "doc.plaintext")
+        .font(.headline)
 }
 
 struct CartPrgView_Previews: PreviewProvider {

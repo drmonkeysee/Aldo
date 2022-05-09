@@ -41,7 +41,6 @@ struct CartPrgView: View {
 
 fileprivate struct ProgramListingView: View {
     @ObservedObject var listing: ProgramListing
-    @State var selectedLine: Int?
 
     var body: some View {
         switch listing.status {
@@ -52,7 +51,7 @@ fileprivate struct ProgramListingView: View {
                 let line = prg[i]
                 switch line {
                 case let .disassembled(offset, inst):
-                    NavigationLink(tag: i, selection: $selectedLine) {
+                    NavigationLink(tag: i, selection: $listing.selectedLine) {
                         PrgDetailView(inst)
                     } label: {
                         Text(inst.line(offset: offset))

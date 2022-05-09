@@ -10,6 +10,7 @@ import Foundation
 final class ProgramListing: ObservableObject {
     let cart: Cart
     let bank: Int
+    @Published var selectedLine: Int?
     @Published private(set) var status: BankLoadStatus<[PrgLine]> = .pending
 
     init(cart: Cart, bank: Int) {

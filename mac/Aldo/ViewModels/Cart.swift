@@ -27,11 +27,7 @@ final class Cart: ObservableObject {
         guard let h = handle else { return false }
         file = filePath
         info = h.getCartInfo()
-        if case .iNes(_, let header, _) = info, header.chr_chunks > 0 {
-            chrSheetCache.reset(capacity: Int(header.chr_chunks))
-        } else {
-            chrSheetCache.clear()
-        }
+        resetCaches()
         return true
     }
 
@@ -68,6 +64,23 @@ final class Cart: ObservableObject {
             currentError = .systemError(error.localizedDescription)
         }
         return nil
+    }
+
+    private func resetCaches() {
+        if case .iNes(_, let header, _) = info, header.chr_chunks > 0 {
+            chrSheetCache.reset(capacity: Int(header.chr_chunks))
+        } else {
+            chrSheetCache.clear()
+        }
+
+        switch info {
+        case .iNes(_, let header, _):
+            prgListingCache.reset(capacity: Int(header.prg_chunks))
+        case .raw:
+            prgListingCache.reset(capacity: 1)
+        default:
+            prgListingCache.clear()
+        }
     }
 }
 

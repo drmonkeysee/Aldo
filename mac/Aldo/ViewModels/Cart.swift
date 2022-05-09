@@ -8,8 +8,8 @@
 import Cocoa
 
 final class Cart: ObservableObject {
-    let chrSheetCache = BankCache<NSImage>()
     let prgListingCache = BankCache<[PrgLine]>()
+    let chrSheetCache = BankCache<NSImage>()
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
     private(set) var currentError: AldoError?
@@ -67,20 +67,8 @@ final class Cart: ObservableObject {
     }
 
     private func resetCaches() {
-        if case .iNes(_, let header, _) = info, header.chr_chunks > 0 {
-            chrSheetCache.reset(capacity: Int(header.chr_chunks))
-        } else {
-            chrSheetCache.clear()
-        }
-
-        switch info {
-        case .iNes(_, let header, _):
-            prgListingCache.reset(capacity: Int(header.prg_chunks))
-        case .raw:
-            prgListingCache.reset(capacity: 1)
-        default:
-            prgListingCache.clear()
-        }
+        prgListingCache.reset(capacity: info.prgBanks)
+        chrSheetCache.reset(capacity: info.chrBanks)
     }
 }
 
@@ -96,6 +84,26 @@ enum CartInfo {
             return str
         default:
             return "\(self)".capitalized
+        }
+    }
+
+    var prgBanks: Int {
+        switch self {
+        case .iNes(_, let header, _):
+            return Int(header.prg_chunks)
+        case .raw:
+            return 1
+        default:
+            return 0
+        }
+    }
+
+    var chrBanks: Int {
+        switch self {
+        case .iNes(_, let header, _):
+            return Int(header.chr_chunks)
+        default:
+            return 0
         }
     }
 }
@@ -120,11 +128,15 @@ final class BankCache<T> {
     }
 
     fileprivate func reset(capacity: Int) {
-        items = [T?](repeating: nil, count: capacity)
+        if capacity > 0 {
+            items = [T?](repeating: nil, count: capacity)
+        } else {
+            items.removeAll()
+        }
     }
 
     fileprivate func clear() {
-        items.removeAll()
+        reset(capacity: 0)
     }
 
     private func validIndex(_ index: Int) -> Bool {

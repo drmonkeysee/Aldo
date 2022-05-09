@@ -13,10 +13,9 @@ struct CartPrgView: View {
     var body: some View {
         NavigationView {
             VStack(alignment: .leading) {
-                switch cart.info {
-                case .iNes, .raw:
+                if cart.info.prgBanks > 0 {
                     ProgramView(banks: ProgramBanks(cart))
-                default:
+                } else {
                     prgLabel()
                         .padding(.top, 2)
                     NoPrgView(reason: "No PRG ROM Available")
@@ -35,7 +34,7 @@ fileprivate struct ProgramView: View {
     var body: some View {
         HStack {
             Picker(selection: $banks.selectedBank) {
-                ForEach(0..<4) { i in
+                ForEach(0..<banks.cart.info.prgBanks, id: \.self) { i in
                     Text("Bank \(i)")
                 }
             } label: {

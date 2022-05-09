@@ -27,7 +27,7 @@
 		C83C663827E2F4EF009CE42C /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
 		C83C663927E2F4FE009CE42C /* bytes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068F2751EEBA00B45785 /* bytes.c */; };
 		C83C663A27E2F52C009CE42C /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
-		C8497E402822015100F4952E /* PrgDisassembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8497E3F2822015100F4952E /* PrgDisassembly.swift */; };
+		C8497E402822015100F4952E /* Disassembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8497E3F2822015100F4952E /* Disassembly.swift */; };
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
 		C85C8DC625BD29AC00611D19 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
 		C85CC20927ED6BF30063276D /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C85CC20827ED6BF30063276D /* snapshot.c */; };
@@ -145,7 +145,7 @@
 		C838D3B627D5DB0300468FDB /* CartChrView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartChrView.swift; sourceTree = "<group>"; };
 		C83965E927810D4300E1E28E /* tsutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tsutil.h; sourceTree = "<group>"; };
 		C83C663327E2F2E6009CE42C /* Aldo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Aldo-Bridging-Header.h"; sourceTree = "<group>"; };
-		C8497E3F2822015100F4952E /* PrgDisassembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrgDisassembly.swift; sourceTree = "<group>"; };
+		C8497E3F2822015100F4952E /* Disassembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disassembly.swift; sourceTree = "<group>"; };
 		C8557B2D25C661660090296D /* ui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ui.h; sourceTree = "<group>"; };
 		C8557B2E25C661660090296D /* ui.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ui.c; sourceTree = "<group>"; };
 		C85C8DC425BD29AC00611D19 /* dis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dis.h; sourceTree = "<group>"; };
@@ -391,7 +391,7 @@
 				C88949B02813B2DB00795CC0 /* ChrSheet.swift */,
 				C8197524280E725B00762462 /* CopyCartInfo.swift */,
 				C8F2985A2810ECEF00ECFD7E /* CStream.swift */,
-				C8497E3F2822015100F4952E /* PrgDisassembly.swift */,
+				C8497E3F2822015100F4952E /* Disassembly.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -694,7 +694,7 @@
 				C83C663727E2F4E4009CE42C /* cart.c in Sources */,
 				C8C9FB672803F8C90093D9A7 /* cpu.c in Sources */,
 				C8F2985B2810ECEF00ECFD7E /* CStream.swift in Sources */,
-				C8497E402822015100F4952E /* PrgDisassembly.swift in Sources */,
+				C8497E402822015100F4952E /* Disassembly.swift in Sources */,
 				C8C9FB652803F8900093D9A7 /* dis.c in Sources */,
 				C838D3B527D5DA4400468FDB /* CartInfoView.swift in Sources */,
 				C8DBC91227C8708A0043994B /* ContentView.swift in Sources */,

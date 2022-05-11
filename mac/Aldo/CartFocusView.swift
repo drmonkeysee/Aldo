@@ -10,9 +10,7 @@ import SwiftUI
 struct CartFocusView: View {
     let instruction: Instruction?
 
-    init(instruction: Instruction? = nil) {
-        self.instruction = instruction
-    }
+    init(instruction: Instruction? = nil) { self.instruction = instruction }
 
     var body: some View {
         VStack(alignment: .leading) {

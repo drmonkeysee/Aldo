@@ -78,9 +78,7 @@ fileprivate struct ProgramListingView: View {
 }
 
 fileprivate struct PendingPrgView: View {
-    init(_ listing: ProgramListing) {
-        listing.load()
-    }
+    init(_ listing: ProgramListing) { listing.load() }
 
     var body: some View {
         NoPrgView(reason: "Loading PRG Bank...")
@@ -101,9 +99,7 @@ fileprivate struct NoPrgView: View {
 fileprivate struct PrgDetailView: View {
     let instruction: Instruction?
 
-    init(_ instruction: Instruction? = nil) {
-        self.instruction = instruction
-    }
+    init(_ instruction: Instruction? = nil) { self.instruction = instruction }
 
     var body: some View {
         CartFocusView(instruction: instruction)

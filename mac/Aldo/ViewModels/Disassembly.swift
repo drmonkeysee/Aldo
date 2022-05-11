@@ -17,9 +17,7 @@ final class ProgramBanks: ObservableObject {
         ProgramListing(cart: cart, bank: selectedBank)
     }
 
-    init(_ cart: Cart) {
-        self.cart = cart
-    }
+    init(_ cart: Cart) { self.cart = cart }
 }
 
 final class ProgramListing: ObservableObject {

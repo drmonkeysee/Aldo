@@ -9,9 +9,7 @@ import SwiftUI
 
 @main
 struct AldoApp: App {
-    init() {
-        NSWindow.allowsAutomaticWindowTabbing = false
-    }
+    init() { NSWindow.allowsAutomaticWindowTabbing = false }
 
     var body: some Scene {
         WindowGroup {

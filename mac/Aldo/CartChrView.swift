@@ -16,7 +16,7 @@ struct CartChrView: View {
                 .font(.headline)
             switch cart.info {
             case .iNes where cart.info.chrBanks > 0:
-                ChrBanksView(cart: cart, bankCount: cart.info.chrBanks)
+                ChrBanksView(banks: ChrBanks(cart))
                 PaletteView()
             case .iNes:
                 NoChrView(reason: "Cart uses CHR RAM")
@@ -38,16 +38,15 @@ fileprivate struct Constraints {
 }
 
 fileprivate struct ChrBanksView: View {
-    let cart: Cart
-    let bankCount: Int
+    let banks: ChrBanks
 
     var body: some View {
         ScrollView(.horizontal) {
             LazyHStack {
-                ForEach(0..<bankCount, id: \.self) { i in
+                ForEach(0..<banks.count, id: \.self) { i in
                     ChrSheetView(
-                        sheet: ChrSheet(cart, bank: i,
-                                        scale: Int(Constraints.scale)))
+                        sheet: banks.sheet(bank: i,
+                                           scale: Int(Constraints.scale)))
                 }
             }
             .padding(Constraints.sheetPadding)

@@ -7,6 +7,20 @@
 
 import Cocoa
 
+final class ChrBanks {
+    let cart: Cart
+
+    var count: Int { self.cart.info.chrBanks }
+
+    init(_ cart: Cart) {
+        self.cart = cart
+    }
+
+    func sheet(bank: Int, scale: Int) -> ChrSheet {
+        ChrSheet(cart, bank: bank, scale: scale)
+    }
+}
+
 final class ChrSheet: ObservableObject {
     let cart: Cart
     let bank: Int

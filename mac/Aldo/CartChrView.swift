@@ -16,7 +16,7 @@ struct CartChrView: View {
                 .font(.headline)
             switch cart.info {
             case .iNes where cart.info.chrBanks > 0:
-                ChrBanksView(bankCount: cart.info.chrBanks)
+                ChrBanksView(cart: cart, bankCount: cart.info.chrBanks)
                 PaletteView()
             case .iNes:
                 NoChrView(reason: "Cart uses CHR RAM")
@@ -38,7 +38,7 @@ fileprivate struct Constraints {
 }
 
 fileprivate struct ChrBanksView: View {
-    @EnvironmentObject var cart: Cart
+    let cart: Cart
     let bankCount: Int
 
     var body: some View {

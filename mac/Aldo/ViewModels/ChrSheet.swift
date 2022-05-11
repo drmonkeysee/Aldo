@@ -14,21 +14,21 @@ final class ChrBanks {
 
     init(_ cart: Cart) { self.cart = cart }
 
-    func sheet(bank: Int, scale: Int) -> ChrSheet {
-        ChrSheet(cart, bank: bank, scale: scale)
+    func sheet(at bank: Int) -> ChrSheet {
+        ChrSheet(cart, bank: bank)
     }
 }
 
 final class ChrSheet: ObservableObject {
+    static let scale = 2
+
     let cart: Cart
     let bank: Int
-    let scale: Int
     @Published private(set) var status: BankLoadStatus<NSImage> = .pending
 
-    init(_ cart: Cart, bank: Int, scale: Int) {
+    init(_ cart: Cart, bank: Int) {
         self.cart = cart
         self.bank = bank
-        self.scale = scale
     }
 
     func load() {
@@ -36,7 +36,7 @@ final class ChrSheet: ObservableObject {
             self.status = .loaded(img)
             return
         }
-        cart.readChrBank(bank: bank, scale: scale) { result in
+        cart.readChrBank(bank: bank, scale: Self.scale) { result in
             switch result {
             case let .success(data):
                 let chrSheet = NSImage(data: data)

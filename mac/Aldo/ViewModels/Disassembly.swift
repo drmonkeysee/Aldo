@@ -14,7 +14,7 @@ final class ProgramBanks: ObservableObject {
     var count: Int { cart.info.prgBanks }
 
     var currentListing: ProgramListing {
-        ProgramListing(cart: cart, bank: selectedBank)
+        ProgramListing(cart, bank: selectedBank)
     }
 
     init(_ cart: Cart) { self.cart = cart }
@@ -26,7 +26,7 @@ final class ProgramListing: ObservableObject {
     @Published var selectedLine: Int?
     @Published private(set) var status: BankLoadStatus<[PrgLine]> = .pending
 
-    init(cart: Cart, bank: Int) {
+    init(_ cart: Cart, bank: Int) {
         self.cart = cart
         self.bank = bank
     }

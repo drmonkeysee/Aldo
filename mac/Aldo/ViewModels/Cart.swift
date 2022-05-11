@@ -26,7 +26,7 @@ final class Cart: ObservableObject {
         handle = loadCart(filePath)
         guard let h = handle else { return false }
         file = filePath
-        info = h.getCartInfo()
+        info = h.cartInfo
         resetCaches()
         return true
     }
@@ -37,7 +37,7 @@ final class Cart: ObservableObject {
             return
         }
         readCStream(operation: { stream in
-            cart_write_info(h.unwrap(), name, stream, true)
+            cart_write_info(h.unwrapped, name, stream, true)
         }, onComplete: onComplete)
     }
 
@@ -48,7 +48,7 @@ final class Cart: ObservableObject {
             return
         }
         readCStream(binary: true, operation: { stream in
-            var bankview = cart_chrbank(h.unwrap(), bank)
+            var bankview = cart_chrbank(h.unwrapped, bank)
             let err = dis_cart_chrbank(&bankview, Int32(scale), stream)
             if err < 0 { throw AldoError.wrapDisError(code: err) }
         }, onComplete: onComplete)
@@ -135,10 +135,6 @@ final class BankCache<T> {
         }
     }
 
-    fileprivate func clear() {
-        reset(capacity: 0)
-    }
-
     private func validIndex(_ index: Int) -> Bool {
         items.startIndex <= index && index < items.endIndex
     }
@@ -146,6 +142,25 @@ final class BankCache<T> {
 
 fileprivate final class CartHandle {
     private var cartRef: OpaquePointer?
+
+    // NOTE: init won't let a live instance ever have a nil reference
+    var unwrapped: OpaquePointer { cartRef! }
+
+    var cartInfo: CartInfo {
+        var info = cartinfo()
+        cart_getinfo(cartRef, &info)
+        switch info.format {
+        case CRTF_RAW:
+            return .raw(String(cString: cart_formatname(info.format)))
+        case CRTF_INES:
+            return .iNes(String(cString: cart_formatname(info.format)),
+                         info.ines_hdr,
+                         String(
+                            cString: cart_mirrorname(info.ines_hdr.mirror)))
+        default:
+            return .unknown
+        }
+    }
 
     init(_ fromFile: URL) throws {
         errno = 0
@@ -163,24 +178,5 @@ fileprivate final class CartHandle {
         guard cartRef != nil else { return }
         cart_free(cartRef)
         cartRef = nil
-    }
-
-    // NOTE: init won't let a live instance ever have a nil reference
-    func unwrap() -> OpaquePointer { cartRef! }
-
-    func getCartInfo() -> CartInfo {
-        var info = cartinfo()
-        cart_getinfo(cartRef, &info)
-        switch info.format {
-        case CRTF_RAW:
-            return .raw(String(cString: cart_formatname(info.format)))
-        case CRTF_INES:
-            return .iNes(String(cString: cart_formatname(info.format)),
-                         info.ines_hdr,
-                         String(
-                            cString: cart_mirrorname(info.ines_hdr.mirror)))
-        default:
-            return .unknown
-        }
     }
 }

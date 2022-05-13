@@ -39,11 +39,16 @@ enum {
     DIS_PEEK_SIZE = 20,     // Peek expression is at most 19 chars
 };
 
+struct dis_instruction {
+    struct decoded decode;
+    uint8_t bytes[3], length;
+};
+
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
 const char *dis_errstr(int err);
 
-// NOTE: when dis_ functions return 0 the input buffer is untouched
+// NOTE: functions w/buffer params leave buffer untouched when returning <= 0
 int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
              char dis[restrict static DIS_INST_SIZE]);
 int dis_peek(uint16_t addr, struct mos6502 *cpu,
@@ -51,6 +56,9 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
              char dis[restrict static DIS_PEEK_SIZE]);
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
+
+int dis_parse_inst(const struct bankview *bv, size_t at,
+                   struct dis_instruction *parsed);
 int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f);
 int dis_cart_chrbank(const struct bankview *bv, int scale, FILE *f);
 int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output);

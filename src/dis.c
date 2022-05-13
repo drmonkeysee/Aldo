@@ -595,6 +595,25 @@ int dis_datapath(const struct console_state *snapshot,
     return total;
 }
 
+int dis_parse_inst(const struct bankview *bv, size_t at,
+                   struct dis_instruction *parsed)
+{
+    assert(bv != NULL);
+    assert(parsed != NULL);
+
+    if (at >= bv->size) return 0;
+
+    const uint8_t opcode = bv->mem[at];
+    const struct decoded dec = Decode[opcode];
+    const int instlen = InstLens[dec.mode];
+    if ((size_t)instlen > bv->size - at) return DIS_ERR_EOF;
+
+    *parsed = (struct dis_instruction){.decode = dec, .length = instlen};
+    memcpy(parsed->bytes, bv->mem + at, instlen);
+
+    return instlen;
+}
+
 int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
 {
     assert(cart != NULL);

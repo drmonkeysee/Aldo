@@ -2178,6 +2178,93 @@ static void datapath_res_cycle_six(void *ctx)
 }
 
 //
+// Parse Instructions
+//
+
+static void parse_inst_empty_bankview(void *ctx)
+{
+    struct bankview bv = {.size = 0};
+    struct dis_instruction inst;
+
+    const int result = dis_parse_inst(&bv, 0, &inst);
+
+    ct_assertequal(0, result);
+}
+
+static void parse_inst_at_start(void *ctx)
+{
+    const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
+    struct bankview bv = {.mem = mem, .size = sizeof mem / sizeof *mem};
+    struct dis_instruction inst;
+
+    const int result = dis_parse_inst(&bv, 0, &inst);
+
+    ct_assertequal(1, result);
+    ct_assertequal(0xeau, inst.bytes[0]);
+    ct_assertequal(1u, inst.length);
+    ct_assertequal(IN_NOP, (int)inst.decode.instruction);
+    ct_assertequal(AM_IMP, (int)inst.decode.mode);
+    ct_assertfalse(inst.decode.unofficial);
+}
+
+static void parse_inst_in_middle(void *ctx)
+{
+    const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
+    struct bankview bv = {.mem = mem, .size = sizeof mem / sizeof *mem};
+    struct dis_instruction inst;
+
+    const int result = dis_parse_inst(&bv, 3, &inst);
+
+    ct_assertequal(3, result);
+    ct_assertequal(0x4cu, inst.bytes[0]);
+    ct_assertequal(0x34u, inst.bytes[1]);
+    ct_assertequal(0x6u, inst.bytes[2]);
+    ct_assertequal(3u, inst.length);
+    ct_assertequal(IN_JMP, (int)inst.decode.instruction);
+    ct_assertequal(AM_JABS, (int)inst.decode.mode);
+    ct_assertfalse(inst.decode.unofficial);
+}
+
+static void parse_inst_unofficial(void *ctx)
+{
+    const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
+    struct bankview bv = {.mem = mem, .size = sizeof mem / sizeof *mem};
+    struct dis_instruction inst;
+
+    const int result = dis_parse_inst(&bv, 2, &inst);
+
+    ct_assertequal(2, result);
+    ct_assertequal(0x34u, inst.bytes[0]);
+    ct_assertequal(0x4cu, inst.bytes[1]);
+    ct_assertequal(2u, inst.length);
+    ct_assertequal(IN_NOP, (int)inst.decode.instruction);
+    ct_assertequal(AM_ZPX, (int)inst.decode.mode);
+    ct_asserttrue(inst.decode.unofficial);
+}
+
+static void parse_inst_eof(void *ctx)
+{
+    const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
+    struct bankview bv = {.mem = mem, .size = sizeof mem / sizeof *mem};
+    struct dis_instruction inst;
+
+    const int result = dis_parse_inst(&bv, 5, &inst);
+
+    ct_assertequal(DIS_ERR_EOF, result);
+}
+
+static void parse_inst_out_of_bounds(void *ctx)
+{
+    const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
+    struct bankview bv = {.mem = mem, .size = sizeof mem / sizeof *mem};
+    struct dis_instruction inst;
+
+    const int result = dis_parse_inst(&bv, 10, &inst);
+
+    ct_assertequal(0, result);
+}
+
+//
 // Test List
 //
 
@@ -2321,6 +2408,13 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(datapath_res_cycle_one),
         ct_maketest(datapath_res_cycle_n),
         ct_maketest(datapath_res_cycle_six),
+
+        ct_maketest(parse_inst_empty_bankview),
+        ct_maketest(parse_inst_at_start),
+        ct_maketest(parse_inst_in_middle),
+        ct_maketest(parse_inst_unofficial),
+        ct_maketest(parse_inst_eof),
+        ct_maketest(parse_inst_out_of_bounds),
     };
 
     return ct_makesuite(tests);

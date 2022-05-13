@@ -34,6 +34,7 @@ enum {
 };
 
 enum {
+    DIS_OPERAND_SIZE = 8,   // Disassembled operand is at most 7 chars
     DIS_DATAP_SIZE = 12,    // Disassembled datapath is at most 11 chars
     DIS_INST_SIZE = 28,     // Disassembled instruction is at most 27 chars
     DIS_PEEK_SIZE = 20,     // Peek expression is at most 19 chars
@@ -59,6 +60,12 @@ int dis_datapath(const struct console_state *snapshot,
 
 int dis_parse_inst(const struct bankview *bv, size_t at,
                    struct dis_instruction *parsed);
+const char *dis_inst_mnemonic(const struct dis_instruction *inst);
+const char *dis_inst_addrmode(const struct dis_instruction *inst);
+uint8_t dis_inst_flags(const struct dis_instruction *inst);
+int dis_inst_operand(const struct dis_instruction *inst,
+                     char dis[restrict static DIS_OPERAND_SIZE]);
+
 int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f);
 int dis_cart_chrbank(const struct bankview *bv, int scale, FILE *f);
 int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output);

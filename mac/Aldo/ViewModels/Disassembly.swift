@@ -71,20 +71,18 @@ struct Instruction {
 fileprivate func prgBanks(_ cart: Cart) -> Int { cart.info.prgBanks }
 
 fileprivate actor PrgLoader {
-    private let prgListingCache: BankCache<[PrgLine]>
+    private let cache: BankCache<[PrgLine]>
 
-    init(bankCount: Int) {
-        prgListingCache = .init(capacity: bankCount)
-    }
+    init(bankCount: Int) { cache = .init(capacity: bankCount) }
 
     func load(bank: Int) -> [PrgLine] {
-        if let listing = prgListingCache[bank] { return listing }
+        if let listing = cache[bank] { return listing }
 
         sleep(1)
         let prgListing = (0..<100).map { i in
             PrgLine.disassembled(i, Instruction(bytes: [0x6c, 0x34, 0x81]))
         }
-        prgListingCache[bank] = prgListing
+        cache[bank] = prgListing
         return prgListing
     }
 }

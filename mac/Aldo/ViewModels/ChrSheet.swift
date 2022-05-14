@@ -9,17 +9,17 @@ import Cocoa
 
 final class ChrBanks {
     let cart: Cart
-    private let chrSheetCache: BankCache<NSImage>
+    private let cache: BankCache<NSImage>
 
     var count: Int { chrBanks(cart) }
 
     init(_ cart: Cart) {
         self.cart = cart
-        chrSheetCache = .init(capacity: chrBanks(cart))
+        cache = .init(capacity: chrBanks(cart))
     }
 
     func sheet(at bank: Int) -> ChrSheet {
-        .init(cart, bank: bank, cache: chrSheetCache)
+        .init(cart, bank: bank, cache: cache)
     }
 }
 

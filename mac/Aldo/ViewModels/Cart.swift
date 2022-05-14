@@ -8,8 +8,7 @@
 import Cocoa
 
 final class Cart: ObservableObject {
-    let prgListingCache = BankCache<[PrgLine]>()
-    let chrSheetCache = BankCache<NSImage>()
+    let chrSheetCache = BankCache<NSImage>(capacity: 0)
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
     private(set) var currentError: AldoError?
@@ -67,7 +66,6 @@ final class Cart: ObservableObject {
     }
 
     private func resetCaches() {
-        prgListingCache.reset(capacity: info.prgBanks)
         chrSheetCache.reset(capacity: info.chrBanks)
     }
 }
@@ -115,7 +113,9 @@ enum BankLoadStatus<T> {
 }
 
 final class BankCache<T> {
-    private var items = [T?]()
+    private var items: [T?]
+
+    init(capacity: Int) { items = .init(repeating: nil, count: capacity) }
 
     subscript(index: Int) -> T? {
         get {

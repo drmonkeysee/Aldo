@@ -53,7 +53,7 @@ fileprivate struct ProgramListingView: View {
     var body: some View {
         switch listing.status {
         case .pending:
-            PendingPrgView(listing)
+            PendingPrgView(listing: listing)
         case let .loaded(prg):
             List(0..<prg.count, id: \.self) { i in
                 let line = prg[i]
@@ -78,10 +78,11 @@ fileprivate struct ProgramListingView: View {
 }
 
 fileprivate struct PendingPrgView: View {
-    init(_ listing: ProgramListing) { listing.load() }
+    let listing: ProgramListing
 
     var body: some View {
         NoPrgView(reason: "Loading PRG Bank...")
+            .task { await listing.load() }
     }
 }
 

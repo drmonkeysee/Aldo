@@ -10,14 +10,18 @@ import Foundation
 final class ProgramBanks: ObservableObject {
     let cart: Cart
     @Published var selectedBank = 0
+    private let loader: PrgLoader
 
-    var count: Int { cart.info.prgBanks }
+    var count: Int { prgBanks(cart) }
 
     var currentListing: ProgramListing {
-        ProgramListing(cart, bank: selectedBank)
+        .init(cart, bank: selectedBank, loader: loader)
     }
 
-    init(_ cart: Cart) { self.cart = cart }
+    init(_ cart: Cart) {
+        self.cart = cart
+        loader = .init(bankCount: prgBanks(cart))
+    }
 }
 
 final class ProgramListing: ObservableObject {
@@ -25,28 +29,16 @@ final class ProgramListing: ObservableObject {
     let bank: Int
     @Published var selectedLine: Int?
     @Published private(set) var status = BankLoadStatus<[PrgLine]>.pending
+    private let loader: PrgLoader
 
-    init(_ cart: Cart, bank: Int) {
+    fileprivate init(_ cart: Cart, bank: Int, loader: PrgLoader) {
         self.cart = cart
         self.bank = bank
+        self.loader = loader
     }
 
-    func load() {
-        if let listing = cart.prgListingCache[bank] {
-            status = .loaded(listing)
-            return
-        }
-        DispatchQueue.global(qos: .background).async {
-            sleep(1)
-            let prgListing = (0..<100).map { i in
-                PrgLine.disassembled(i, Instruction(bytes: [0x6c, 0x34, 0x81]))
-            }
-            DispatchQueue.main.async {
-                self.cart.prgListingCache[self.bank] = prgListing
-                self.status = .loaded(prgListing)
-            }
-        }
-    }
+    @MainActor
+    func load() async { status = .loaded(await loader.load(bank: bank)) }
 }
 
 enum PrgLine {
@@ -72,5 +64,27 @@ struct Instruction {
             result.appendingFormat("%02X ", byte)
         }
         return "\(String(format: "%04X", addr)): \(byteStr.padding(toLength: 10, withPad: " ", startingAt: 0))\(mnemonic) \(operand)"
+    }
+}
+
+// NOTE: standalone func to share between initializer and computed property
+fileprivate func prgBanks(_ cart: Cart) -> Int { cart.info.prgBanks }
+
+fileprivate actor PrgLoader {
+    private let prgListingCache: BankCache<[PrgLine]>
+
+    init(bankCount: Int) {
+        prgListingCache = .init(capacity: bankCount)
+    }
+
+    func load(bank: Int) -> [PrgLine] {
+        if let listing = prgListingCache[bank] { return listing }
+
+        sleep(1)
+        let prgListing = (0..<100).map { i in
+            PrgLine.disassembled(i, Instruction(bytes: [0x6c, 0x34, 0x81]))
+        }
+        prgListingCache[bank] = prgListing
+        return prgListing
     }
 }

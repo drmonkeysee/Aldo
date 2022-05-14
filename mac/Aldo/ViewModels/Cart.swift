@@ -5,7 +5,7 @@
 //  Created by Brandon Stansbury on 3/12/22.
 //
 
-import Cocoa
+import Foundation
 
 final class Cart: ObservableObject {
     @Published private(set) var file: URL?

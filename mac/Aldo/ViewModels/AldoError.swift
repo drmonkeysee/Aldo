@@ -10,11 +10,11 @@ import Foundation
 enum AldoError: Error {
     private static let errCodeFormat = "%s (%d)"
 
-    static var ioErrno: Self { .ioError(String(cString: strerror(errno))) }
+    static var ioErrno: Self { .ioError(.init(cString: strerror(errno))) }
 
     static func wrapDisError(code: Int32) -> Self {
         .disErr(code, code == DIS_ERR_ERNO
-                        ? String(cString: strerror(errno))
+                        ? .init(cString: strerror(errno))
                         : nil)
     }
 
@@ -31,13 +31,11 @@ enum AldoError: Error {
         case let .systemError(str), let .ioError(str):
             return str
         case let .cartErr(code):
-            return String(format: Self.errCodeFormat, cart_errstr(code), code)
+            return .init(format: Self.errCodeFormat, cart_errstr(code), code)
         case let .disErr(code, sysErr):
             var msg = String(format: Self.errCodeFormat, dis_errstr(code),
                              code)
-            if let se = sysErr {
-                msg.append(": \(se)")
-            }
+            if let se = sysErr { msg.append(": \(se)") }
             return msg
         }
     }

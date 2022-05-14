@@ -80,7 +80,7 @@ fileprivate actor PrgLoader {
 
         sleep(1)
         let prgListing = (0..<100).map { i in
-            PrgLine.disassembled(i, Instruction(bytes: [0x6c, 0x34, 0x81]))
+            PrgLine.disassembled(i, .init(bytes: [0x6c, 0x34, 0x81]))
         }
         cache[bank] = prgListing
         return prgListing

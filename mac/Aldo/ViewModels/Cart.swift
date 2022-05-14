@@ -49,7 +49,7 @@ final class Cart: ObservableObject {
     private func loadCart(_ filePath: URL) -> CartHandle? {
         currentError = nil
         do {
-            return try CartHandle(filePath)
+            return try .init(filePath)
         } catch let error as AldoError {
             currentError = error
         } catch {
@@ -132,12 +132,11 @@ fileprivate final class CartHandle {
         cart_getinfo(cartRef, &info)
         switch info.format {
         case CRTF_RAW:
-            return .raw(String(cString: cart_formatname(info.format)))
+            return .raw(.init(cString: cart_formatname(info.format)))
         case CRTF_INES:
-            return .iNes(String(cString: cart_formatname(info.format)),
+            return .iNes(.init(cString: cart_formatname(info.format)),
                          info.ines_hdr,
-                         String(
-                            cString: cart_mirrorname(info.ines_hdr.mirror)))
+                         .init(cString: cart_mirrorname(info.ines_hdr.mirror)))
         default:
             return .unknown
         }

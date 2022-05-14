@@ -13,22 +13,21 @@ final class CopyCartInfo: ObservableObject {
     @Published var failed = false
     private(set) var currentError: AldoError?
 
-    func execute(cart: Cart) {
+    func execute(cart: Cart) async {
         currentError = nil
-        cart.readInfoText { result in
-            switch result {
-            case let .success(data):
-                if let text = String(data: data, encoding: .utf8) {
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(text, forType: .string)
-                    self.copyIconOpacity = 0.0
-                    self.successIconOpacity = 1.0
-                } else {
-                    self.setError(.unknown)
-                }
-            case let .error(err):
-                self.setError(err)
+        let result = await cart.readInfoText()
+        switch result {
+        case let .success(data):
+            if let text = String(data: data, encoding: .utf8) {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(text, forType: .string)
+                copyIconOpacity = 0.0
+                successIconOpacity = 1.0
+            } else {
+                setError(.unknown)
             }
+        case let .error(err):
+            setError(err)
         }
     }
 

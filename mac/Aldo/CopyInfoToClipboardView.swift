@@ -15,7 +15,10 @@ struct CopyInfoToClipboardView: View {
 
     var body: some View {
         Button {
-            command.execute(cart: cart)
+            // TODO: this is blocking regardless of priority
+            Task(priority: .userInitiated) {
+                await command.execute(cart: cart)
+            }
         } label: {
             ZStack {
                 Image(systemName: "arrow.up.doc.on.clipboard")

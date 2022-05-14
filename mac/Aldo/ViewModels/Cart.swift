@@ -28,20 +28,18 @@ final class Cart: ObservableObject {
         return true
     }
 
-    func readInfoText(onComplete: @escaping (CStreamResult) -> Void) {
-        guard let h = handle else {
-            onComplete(.error(.ioError("No cart set")))
-            return
+    func readInfoText() async -> CStreamResult {
+        guard let h = handle else { return .error(.ioError("No cart set")) }
+
+        return await readCStream { stream in
+            cart_write_info(h.unwrapped, self.name, stream, true)
         }
-        readCStream(operation: { stream in
-            cart_write_info(h.unwrapped, name, stream, true)
-        }, onComplete: onComplete)
     }
 
     func readChrBank(bank: Int, scale: Int) async -> CStreamResult {
         guard let h = handle else { return .error(.ioError("No cart set")) }
 
-        return await readCStreamAsync(binary: true) { stream in
+        return await readCStream(binary: true) { stream in
             var bankview = cart_chrbank(h.unwrapped, bank)
             let err = dis_cart_chrbank(&bankview, Int32(scale), stream)
             if err < 0 { throw AldoError.wrapDisError(code: err) }

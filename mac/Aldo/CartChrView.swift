@@ -64,7 +64,7 @@ fileprivate struct ChrSheetView: View {
                 .font(.caption)
             switch sheet.status {
             case .pending:
-                PendingChrView(sheet)
+                PendingChrView(sheet: sheet)
             case let .loaded(img):
                 Image(nsImage: img)
                     .interpolation(.none)
@@ -87,7 +87,7 @@ fileprivate struct ChrSheetView: View {
 }
 
 fileprivate struct PendingChrView: View {
-    init(_ sheet: ChrSheet) { sheet.load() }
+    let sheet: ChrSheet
 
     var body: some View {
         ZStack {
@@ -97,6 +97,7 @@ fileprivate struct PendingChrView: View {
                        height: Constraints.sheetSize.h)
             Text("Loading CHR Bank...")
         }
+        .task { await sheet.load() }
     }
 }
 

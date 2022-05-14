@@ -45,9 +45,7 @@ func readCStream(binary: Bool = false,
     }
 
     var streamData = Data()
-    for await d in asyncStream {
-        streamData.append(d)
-    }
+    for await d in asyncStream { streamData.append(d) }
     return .success(streamData)
 }
 

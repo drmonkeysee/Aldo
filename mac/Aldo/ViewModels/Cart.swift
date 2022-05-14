@@ -121,14 +121,6 @@ final class BankCache<T> {
         }
     }
 
-    fileprivate func reset(capacity: Int) {
-        if capacity > 0 {
-            items = [T?](repeating: nil, count: capacity)
-        } else {
-            items.removeAll()
-        }
-    }
-
     private func validIndex(_ index: Int) -> Bool {
         items.startIndex <= index && index < items.endIndex
     }

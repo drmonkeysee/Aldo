@@ -24,7 +24,7 @@ final class ChrSheet: ObservableObject {
 
     let cart: Cart
     let bank: Int
-    @Published private(set) var status: BankLoadStatus<NSImage> = .pending
+    @Published private(set) var status = BankLoadStatus<NSImage>.pending
 
     init(_ cart: Cart, bank: Int) {
         self.cart = cart

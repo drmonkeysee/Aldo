@@ -24,7 +24,7 @@ final class ProgramListing: ObservableObject {
     let cart: Cart
     let bank: Int
     @Published var selectedLine: Int?
-    @Published private(set) var status: BankLoadStatus<[PrgLine]> = .pending
+    @Published private(set) var status = BankLoadStatus<[PrgLine]>.pending
 
     init(_ cart: Cart, bank: Int) {
         self.cart = cart

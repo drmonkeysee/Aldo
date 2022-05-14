@@ -25,14 +25,14 @@ func readCStream(binary: Bool = false,
     }
 
     let op = OpRunner(operation)
-    let asyncStream = AsyncStream<Data> { c in
-        p.fileHandleForReading.readabilityHandler = { h in
-            let d = h.availableData
+    let asyncStream = AsyncStream<Data> { continuation in
+        p.fileHandleForReading.readabilityHandler = { handle in
+            let d = handle.availableData
             if d.isEmpty {
-                p.fileHandleForReading.readabilityHandler = nil
-                c.finish()
+                handle.readabilityHandler = nil
+                continuation.finish()
             }
-            c.yield(d)
+            continuation.yield(d)
         }
     }
 

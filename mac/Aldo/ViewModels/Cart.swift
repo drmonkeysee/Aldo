@@ -8,7 +8,6 @@
 import Cocoa
 
 final class Cart: ObservableObject {
-    let chrSheetCache = BankCache<NSImage>(capacity: 0)
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
     private(set) var currentError: AldoError?
@@ -26,7 +25,6 @@ final class Cart: ObservableObject {
         guard let h = handle else { return false }
         file = filePath
         info = h.cartInfo
-        resetCaches()
         return true
     }
 
@@ -63,10 +61,6 @@ final class Cart: ObservableObject {
             currentError = .systemError(error.localizedDescription)
         }
         return nil
-    }
-
-    private func resetCaches() {
-        chrSheetCache.reset(capacity: info.chrBanks)
     }
 }
 

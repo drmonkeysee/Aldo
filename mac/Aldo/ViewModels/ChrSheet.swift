@@ -9,13 +9,17 @@ import Cocoa
 
 final class ChrBanks {
     let cart: Cart
+    private let chrSheetCache: BankCache<NSImage>
 
-    var count: Int { self.cart.info.chrBanks }
+    var count: Int { chrBanks(cart) }
 
-    init(_ cart: Cart) { self.cart = cart }
+    init(_ cart: Cart) {
+        self.cart = cart
+        chrSheetCache = .init(capacity: chrBanks(cart))
+    }
 
     func sheet(at bank: Int) -> ChrSheet {
-        ChrSheet(cart, bank: bank)
+        .init(cart, bank: bank, cache: chrSheetCache)
     }
 }
 
@@ -25,14 +29,16 @@ final class ChrSheet: ObservableObject {
     let cart: Cart
     let bank: Int
     @Published private(set) var status = BankLoadStatus<NSImage>.pending
+    private let cache: BankCache<NSImage>
 
-    init(_ cart: Cart, bank: Int) {
+    init(_ cart: Cart, bank: Int, cache: BankCache<NSImage>) {
         self.cart = cart
         self.bank = bank
+        self.cache = cache
     }
 
     func load() {
-        if let img = cart.chrSheetCache[bank] {
+        if let img = cache[bank] {
             self.status = .loaded(img)
             return
         }
@@ -41,7 +47,7 @@ final class ChrSheet: ObservableObject {
             case let .success(data):
                 let chrSheet = NSImage(data: data)
                 if let img = chrSheet, img.isValid {
-                    self.cart.chrSheetCache[self.bank] = img
+                    self.cache[self.bank] = img
                     self.status = .loaded(img)
                 } else {
                     self.logFailure("CHR Decode Failure",
@@ -63,3 +69,6 @@ final class ChrSheet: ObservableObject {
         #endif
     }
 }
+
+// NOTE: standalone func to share between initializer and computed property
+fileprivate func chrBanks(_ cart: Cart) -> Int { cart.info.chrBanks }

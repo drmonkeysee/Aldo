@@ -13,6 +13,7 @@ final class CopyCartInfo: ObservableObject {
     @Published var failed = false
     private(set) var currentError: AldoError?
 
+    @MainActor
     func execute(cart: Cart) async {
         currentError = nil
         let result = await cart.readInfoText()

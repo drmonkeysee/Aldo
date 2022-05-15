@@ -10,17 +10,17 @@ import Foundation
 final class ProgramBanks: ObservableObject {
     let cart: Cart
     @Published var selectedBank = 0
-    private let loader: PrgLoader
+    private let cache: BankCache<[PrgLine]>
 
     var count: Int { prgBanks(cart) }
 
     var currentListing: ProgramListing {
-        .init(cart, bank: selectedBank, loader: loader)
+        .init(cart, bank: selectedBank, cache: cache)
     }
 
     init(_ cart: Cart) {
         self.cart = cart
-        loader = .init(bankCount: prgBanks(cart))
+        cache = .init(slots: prgBanks(cart))
     }
 }
 
@@ -29,16 +29,26 @@ final class ProgramListing: ObservableObject {
     let bank: Int
     @Published var selectedLine: Int?
     @Published private(set) var status = BankLoadStatus<[PrgLine]>.pending
-    private let loader: PrgLoader
+    private let cache: BankCache<[PrgLine]>
 
-    fileprivate init(_ cart: Cart, bank: Int, loader: PrgLoader) {
+    fileprivate init(_ cart: Cart, bank: Int, cache: BankCache<[PrgLine]>) {
         self.cart = cart
         self.bank = bank
-        self.loader = loader
+        self.cache = cache
     }
 
     @MainActor
-    func load() async { status = .loaded(await loader.load(bank: bank)) }
+    func load() async {
+        if let listing = await cache[bank] {
+            status = .loaded(listing)
+            return
+        }
+
+        let loader = PrgLoader()
+        let prgListing = await loader.load(bank: bank)
+        await cache.setItem(prgListing, at: bank)
+        status = .loaded(prgListing)
+    }
 }
 
 enum PrgLine {
@@ -71,18 +81,10 @@ struct Instruction {
 fileprivate func prgBanks(_ cart: Cart) -> Int { cart.info.prgBanks }
 
 fileprivate actor PrgLoader {
-    private let cache: BankCache<[PrgLine]>
-
-    init(bankCount: Int) { cache = .init(capacity: bankCount) }
-
     func load(bank: Int) -> [PrgLine] {
-        if let listing = cache[bank] { return listing }
-
         sleep(1)
-        let prgListing = (0..<100).map { i in
+        return (0..<100).map { i in
             PrgLine.disassembled(i, .init(bytes: [0x6c, 0x34, 0x81]))
         }
-        cache[bank] = prgListing
-        return prgListing
     }
 }

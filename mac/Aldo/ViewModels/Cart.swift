@@ -101,19 +101,19 @@ enum BankLoadStatus<T> {
     case failed
 }
 
-final class BankCache<T> {
+actor BankCache<T> {
     private var items: [T?]
 
-    init(capacity: Int) { items = .init(repeating: nil, count: capacity) }
+    init(slots: Int) { items = .init(repeating: nil, count: slots) }
 
     subscript(index: Int) -> T? {
-        get {
-            guard validIndex(index) else { return nil }
-            return items[index]
-        }
-        set(newValue) {
-            if validIndex(index), let val = newValue { items[index] = val }
-        }
+        guard validIndex(index) else { return nil }
+        return items[index]
+    }
+
+    // NOTE: no async writeable subscripts yet
+    func setItem(_ newValue: T?, at index: Int) {
+        if validIndex(index), let val = newValue { items[index] = val }
     }
 
     private func validIndex(_ index: Int) -> Bool {

@@ -15,7 +15,7 @@ final class ChrBanks {
 
     init(_ cart: Cart) {
         self.cart = cart
-        cache = .init(capacity: chrBanks(cart))
+        cache = .init(slots: chrBanks(cart))
     }
 
     func sheet(at bank: Int) -> ChrSheet {
@@ -39,7 +39,7 @@ final class ChrSheet: ObservableObject {
 
     @MainActor
     func load() async {
-        if let img = cache[bank] {
+        if let img = await cache[bank] {
             status = .loaded(img)
             return
         }
@@ -49,18 +49,17 @@ final class ChrSheet: ObservableObject {
         case let .success(data):
             let chrSheet = NSImage(data: data)
             if let img = chrSheet, img.isValid {
-                self.cache[self.bank] = img
-                self.status = .loaded(img)
+                await cache.setItem(img, at: bank)
+                status = .loaded(img)
             } else {
-                self.logFailure("CHR Decode Failure",
-                                chrSheet == nil
-                                    ? "Image init failed"
-                                    : "Image data invalid")
-                self.status = .failed
+                logFailure("CHR Decode Failure", chrSheet == nil
+                                                    ? "Image init failed"
+                                                    : "Image data invalid")
+                status = .failed
             }
         case let .error(err):
-            self.logFailure("CHR Read Failure", err.message)
-            self.status = .failed
+            logFailure("CHR Read Failure", err.message)
+            status = .failed
         }
     }
 

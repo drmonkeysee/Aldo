@@ -10,45 +10,30 @@ import Foundation
 final class ProgramBanks: ObservableObject {
     let cart: Cart
     @Published var selectedBank = 0
-    private let cache: BankCache<[PrgLine]>
+    private let store: PrgStore
 
     var count: Int { prgBanks(cart) }
-
-    var currentListing: ProgramListing {
-        .init(cart, bank: selectedBank, cache: cache)
-    }
+    var currentListing: ProgramListing { .init(store, bank: selectedBank) }
 
     init(_ cart: Cart) {
         self.cart = cart
-        cache = .init(slots: prgBanks(cart))
+        store = .init(bankCount: prgBanks(cart))
     }
 }
 
 final class ProgramListing: ObservableObject {
-    let cart: Cart
     let bank: Int
     @Published var selectedLine: Int?
     @Published private(set) var status = BankLoadStatus<[PrgLine]>.pending
-    private let cache: BankCache<[PrgLine]>
+    private let store: PrgStore
 
-    fileprivate init(_ cart: Cart, bank: Int, cache: BankCache<[PrgLine]>) {
-        self.cart = cart
+    fileprivate init(_ store: PrgStore, bank: Int) {
+        self.store = store
         self.bank = bank
-        self.cache = cache
     }
 
     @MainActor
-    func load() async {
-        if let listing = await cache[bank] {
-            status = .loaded(listing)
-            return
-        }
-
-        let loader = PrgLoader()
-        let prgListing = await loader.load(bank: bank)
-        await cache.setItem(prgListing, at: bank)
-        status = .loaded(prgListing)
-    }
+    func load() async { status = await store.load(bank: bank) }
 }
 
 enum PrgLine {
@@ -80,11 +65,19 @@ struct Instruction {
 // NOTE: standalone func to share between initializer and computed property
 fileprivate func prgBanks(_ cart: Cart) -> Int { cart.info.prgBanks }
 
-fileprivate actor PrgLoader {
-    func load(bank: Int) -> [PrgLine] {
+fileprivate actor PrgStore {
+    private let cache: BankCache<[PrgLine]>
+
+    init(bankCount: Int) { cache = .init(slots: bankCount) }
+
+    func load(bank: Int) -> BankLoadStatus<[PrgLine]> {
+        if let listing = cache[bank] { return .loaded(listing) }
+
         sleep(1)
-        return (0..<100).map { i in
+        let prgListing = (0..<100).map { i in
             PrgLine.disassembled(i, .init(bytes: [0x6c, 0x34, 0x81]))
         }
+        cache[bank] = prgListing
+        return .loaded(prgListing)
     }
 }

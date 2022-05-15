@@ -9,57 +9,66 @@ import Cocoa
 
 final class ChrBanks {
     let cart: Cart
-    private let cache: BankCache<NSImage>
+    private let store: ChrStore
 
     var count: Int { chrBanks(cart) }
 
     init(_ cart: Cart) {
         self.cart = cart
-        cache = .init(slots: chrBanks(cart))
+        store = .init(cart, bankCount: chrBanks(cart))
     }
 
-    func sheet(at bank: Int) -> ChrSheet {
-        .init(cart, bank: bank, cache: cache)
-    }
+    func sheet(at bank: Int) -> ChrSheet { .init(store, bank: bank) }
 }
 
 final class ChrSheet: ObservableObject {
     static let scale = 2
 
-    let cart: Cart
     let bank: Int
     @Published private(set) var status = BankLoadStatus<NSImage>.pending
-    private let cache: BankCache<NSImage>
+    private let store: ChrStore
 
-    fileprivate init(_ cart: Cart, bank: Int, cache: BankCache<NSImage>) {
-        self.cart = cart
+    fileprivate init(_ store: ChrStore, bank: Int) {
+        self.store = store
         self.bank = bank
-        self.cache = cache
     }
 
     @MainActor
     func load() async {
-        if let img = await cache[bank] {
-            status = .loaded(img)
-            return
-        }
+        status = await store.load(bank: bank, scale: Self.scale)
+    }
+}
 
-        let result = await cart.readChrBank(bank: bank, scale: Self.scale)
+// NOTE: standalone func to share between initializer and computed property
+fileprivate func chrBanks(_ cart: Cart) -> Int { cart.info.chrBanks }
+
+fileprivate actor ChrStore {
+    let cart: Cart
+    private let cache: BankCache<NSImage>
+
+    init(_ cart: Cart, bankCount: Int) {
+        self.cart = cart
+        cache = .init(slots: bankCount)
+    }
+
+    func load(bank: Int, scale: Int) async -> BankLoadStatus<NSImage> {
+        if let img = cache[bank] { return .loaded(img) }
+
+        let result = await cart.readChrBank(bank: bank, scale: scale)
         switch result {
         case let .success(data):
             let chrSheet = NSImage(data: data)
             if let img = chrSheet, img.isValid {
-                await cache.setItem(img, at: bank)
-                status = .loaded(img)
-            } else {
-                logFailure("CHR Decode Failure", chrSheet == nil
-                                                    ? "Image init failed"
-                                                    : "Image data invalid")
-                status = .failed
+                cache[bank] = img
+                return .loaded(img)
             }
+            logFailure("CHR Decode Failure", chrSheet == nil
+                                                ? "Image init failed"
+                                                : "Image data invalid")
+            return .failed
         case let .error(err):
             logFailure("CHR Read Failure", err.message)
-            status = .failed
+            return .failed
         }
     }
 
@@ -69,6 +78,3 @@ final class ChrSheet: ObservableObject {
         #endif
     }
 }
-
-// NOTE: standalone func to share between initializer and computed property
-fileprivate func chrBanks(_ cart: Cart) -> Int { cart.info.chrBanks }

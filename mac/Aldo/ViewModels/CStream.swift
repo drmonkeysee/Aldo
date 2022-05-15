@@ -16,7 +16,7 @@ enum CStreamResult {
 }
 
 func readCStream(binary: Bool = false,
-                 operation: @escaping CStreamOp) async -> CStreamResult {
+                 operation: CStreamOp) async -> CStreamResult {
     let p = Pipe()
     errno = 0
     guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor,
@@ -24,7 +24,6 @@ func readCStream(binary: Bool = false,
         return .error(.ioErrno)
     }
 
-    let op = OpRunner(operation)
     let asyncStream = AsyncStream<Data> { continuation in
         p.fileHandleForReading.readabilityHandler = { handle in
             let d = handle.availableData
@@ -37,7 +36,8 @@ func readCStream(binary: Bool = false,
     }
 
     do {
-        try await op.run(stream)
+        defer { fclose(stream) }
+        try operation(stream)
     } catch let error as AldoError {
         return .error(error)
     } catch {
@@ -47,15 +47,4 @@ func readCStream(binary: Bool = false,
     var streamData = Data()
     for await d in asyncStream { streamData.append(d) }
     return .success(streamData)
-}
-
-fileprivate actor OpRunner {
-    private let op: CStreamOp
-
-    init(_ op: @escaping CStreamOp) { self.op = op }
-
-    func run(_ stream: CStream) throws {
-        defer { fclose(stream) }
-        try op(stream)
-    }
 }

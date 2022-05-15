@@ -33,7 +33,7 @@ final class ProgramListing: ObservableObject {
     }
 
     @MainActor
-    func load() async { status = await store.load(bank: bank) }
+    func load() async { status = await store.fetch(bank: bank) }
 }
 
 enum PrgLine {
@@ -70,7 +70,7 @@ fileprivate actor PrgStore {
 
     init(bankCount: Int) { cache = .init(slots: bankCount) }
 
-    func load(bank: Int) -> BankLoadStatus<[PrgLine]> {
+    func fetch(bank: Int) -> BankLoadStatus<[PrgLine]> {
         if let listing = cache[bank] { return .loaded(listing) }
 
         sleep(1)

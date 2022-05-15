@@ -35,7 +35,7 @@ final class ChrSheet: ObservableObject {
 
     @MainActor
     func load() async {
-        status = await store.load(bank: bank, scale: Self.scale)
+        status = await store.fetch(bank: bank, scale: Self.scale)
     }
 }
 
@@ -51,7 +51,7 @@ fileprivate actor ChrStore {
         cache = .init(slots: bankCount)
     }
 
-    func load(bank: Int, scale: Int) async -> BankLoadStatus<NSImage> {
+    func fetch(bank: Int, scale: Int) async -> BankLoadStatus<NSImage> {
         if let img = cache[bank] { return .loaded(img) }
 
         let result = await cart.readChrBank(bank: bank, scale: scale)

@@ -2204,12 +2204,12 @@ static void parse_inst_at_start(void *ctx)
     const int result = dis_parse_inst(&bv, 0, &inst);
 
     ct_assertequal(1, result);
-    ct_assertequal(bv.bank, inst.view.bank);
-    ct_assertequal(0xeau, inst.view.mem[0]);
-    ct_assertequal(1u, inst.view.size);
-    ct_assertequal(IN_NOP, (int)inst.decode.instruction);
-    ct_assertequal(AM_IMP, (int)inst.decode.mode);
-    ct_assertfalse(inst.decode.unofficial);
+    ct_assertequal(bv.bank, inst.bv.bank);
+    ct_assertequal(0xeau, inst.bv.mem[0]);
+    ct_assertequal(1u, inst.bv.size);
+    ct_assertequal(IN_NOP, (int)inst.d.instruction);
+    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertfalse(inst.d.unofficial);
 }
 
 static void parse_inst_in_middle(void *ctx)
@@ -2225,14 +2225,14 @@ static void parse_inst_in_middle(void *ctx)
     const int result = dis_parse_inst(&bv, 3, &inst);
 
     ct_assertequal(3, result);
-    ct_assertequal(bv.bank, inst.view.bank);
-    ct_assertequal(0x4cu, inst.view.mem[0]);
-    ct_assertequal(0x34u, inst.view.mem[1]);
-    ct_assertequal(0x6u, inst.view.mem[2]);
-    ct_assertequal(3u, inst.view.size);
-    ct_assertequal(IN_JMP, (int)inst.decode.instruction);
-    ct_assertequal(AM_JABS, (int)inst.decode.mode);
-    ct_assertfalse(inst.decode.unofficial);
+    ct_assertequal(bv.bank, inst.bv.bank);
+    ct_assertequal(0x4cu, inst.bv.mem[0]);
+    ct_assertequal(0x34u, inst.bv.mem[1]);
+    ct_assertequal(0x6u, inst.bv.mem[2]);
+    ct_assertequal(3u, inst.bv.size);
+    ct_assertequal(IN_JMP, (int)inst.d.instruction);
+    ct_assertequal(AM_JABS, (int)inst.d.mode);
+    ct_assertfalse(inst.d.unofficial);
 }
 
 static void parse_inst_unofficial(void *ctx)
@@ -2248,13 +2248,13 @@ static void parse_inst_unofficial(void *ctx)
     const int result = dis_parse_inst(&bv, 2, &inst);
 
     ct_assertequal(2, result);
-    ct_assertequal(bv.bank, inst.view.bank);
-    ct_assertequal(0x34u, inst.view.mem[0]);
-    ct_assertequal(0x4cu, inst.view.mem[1]);
-    ct_assertequal(2u, inst.view.size);
-    ct_assertequal(IN_NOP, (int)inst.decode.instruction);
-    ct_assertequal(AM_ZPX, (int)inst.decode.mode);
-    ct_asserttrue(inst.decode.unofficial);
+    ct_assertequal(bv.bank, inst.bv.bank);
+    ct_assertequal(0x34u, inst.bv.mem[0]);
+    ct_assertequal(0x4cu, inst.bv.mem[1]);
+    ct_assertequal(2u, inst.bv.size);
+    ct_assertequal(IN_NOP, (int)inst.d.instruction);
+    ct_assertequal(AM_ZPX, (int)inst.d.mode);
+    ct_asserttrue(inst.d.unofficial);
 }
 
 static void parse_inst_eof(void *ctx)

@@ -41,8 +41,8 @@ enum {
 };
 
 struct dis_instruction {
-    struct bankview view;
-    struct decoded decode;
+    struct bankview bv;
+    struct decoded d;
 };
 
 // NOTE: returns a pointer to a statically allocated string;

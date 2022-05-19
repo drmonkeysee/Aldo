@@ -608,9 +608,7 @@ int dis_parse_inst(const struct bankview *bv, size_t at,
     const int instlen = InstLens[dec.mode];
     if ((size_t)instlen > bv->size - at) return DIS_ERR_EOF;
 
-    *parsed = (struct dis_instruction){.decode = dec, .length = instlen};
-    memcpy(parsed->bytes, bv->mem + at, instlen);
-
+    *parsed = (struct dis_instruction){{bv->bank, instlen, bv->mem + at}, dec};
     return instlen;
 }
 

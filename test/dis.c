@@ -2194,14 +2194,19 @@ static void parse_inst_empty_bankview(void *ctx)
 static void parse_inst_at_start(void *ctx)
 {
     const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct bankview bv = {.mem = mem, .size = sizeof mem / sizeof *mem};
+    struct bankview bv = {
+        .mem = mem,
+        .size = sizeof mem / sizeof *mem,
+        .bank = 1,
+    };
     struct dis_instruction inst;
 
     const int result = dis_parse_inst(&bv, 0, &inst);
 
     ct_assertequal(1, result);
-    ct_assertequal(0xeau, inst.bytes[0]);
-    ct_assertequal(1u, inst.length);
+    ct_assertequal(bv.bank, inst.view.bank);
+    ct_assertequal(0xeau, inst.view.mem[0]);
+    ct_assertequal(1u, inst.view.size);
     ct_assertequal(IN_NOP, (int)inst.decode.instruction);
     ct_assertequal(AM_IMP, (int)inst.decode.mode);
     ct_assertfalse(inst.decode.unofficial);
@@ -2210,16 +2215,21 @@ static void parse_inst_at_start(void *ctx)
 static void parse_inst_in_middle(void *ctx)
 {
     const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct bankview bv = {.mem = mem, .size = sizeof mem / sizeof *mem};
+    struct bankview bv = {
+        .mem = mem,
+        .size = sizeof mem / sizeof *mem,
+        .bank = 1,
+    };
     struct dis_instruction inst;
 
     const int result = dis_parse_inst(&bv, 3, &inst);
 
     ct_assertequal(3, result);
-    ct_assertequal(0x4cu, inst.bytes[0]);
-    ct_assertequal(0x34u, inst.bytes[1]);
-    ct_assertequal(0x6u, inst.bytes[2]);
-    ct_assertequal(3u, inst.length);
+    ct_assertequal(bv.bank, inst.view.bank);
+    ct_assertequal(0x4cu, inst.view.mem[0]);
+    ct_assertequal(0x34u, inst.view.mem[1]);
+    ct_assertequal(0x6u, inst.view.mem[2]);
+    ct_assertequal(3u, inst.view.size);
     ct_assertequal(IN_JMP, (int)inst.decode.instruction);
     ct_assertequal(AM_JABS, (int)inst.decode.mode);
     ct_assertfalse(inst.decode.unofficial);
@@ -2228,15 +2238,20 @@ static void parse_inst_in_middle(void *ctx)
 static void parse_inst_unofficial(void *ctx)
 {
     const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct bankview bv = {.mem = mem, .size = sizeof mem / sizeof *mem};
+    struct bankview bv = {
+        .mem = mem,
+        .size = sizeof mem / sizeof *mem,
+        .bank = 1,
+    };
     struct dis_instruction inst;
 
     const int result = dis_parse_inst(&bv, 2, &inst);
 
     ct_assertequal(2, result);
-    ct_assertequal(0x34u, inst.bytes[0]);
-    ct_assertequal(0x4cu, inst.bytes[1]);
-    ct_assertequal(2u, inst.length);
+    ct_assertequal(bv.bank, inst.view.bank);
+    ct_assertequal(0x34u, inst.view.mem[0]);
+    ct_assertequal(0x4cu, inst.view.mem[1]);
+    ct_assertequal(2u, inst.view.size);
     ct_assertequal(IN_NOP, (int)inst.decode.instruction);
     ct_assertequal(AM_ZPX, (int)inst.decode.mode);
     ct_asserttrue(inst.decode.unofficial);
@@ -2245,7 +2260,11 @@ static void parse_inst_unofficial(void *ctx)
 static void parse_inst_eof(void *ctx)
 {
     const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct bankview bv = {.mem = mem, .size = sizeof mem / sizeof *mem};
+    struct bankview bv = {
+        .mem = mem,
+        .size = sizeof mem / sizeof *mem,
+        .bank = 1,
+    };
     struct dis_instruction inst;
 
     const int result = dis_parse_inst(&bv, 5, &inst);
@@ -2256,7 +2275,11 @@ static void parse_inst_eof(void *ctx)
 static void parse_inst_out_of_bounds(void *ctx)
 {
     const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct bankview bv = {.mem = mem, .size = sizeof mem / sizeof *mem};
+    struct bankview bv = {
+        .mem = mem,
+        .size = sizeof mem / sizeof *mem,
+        .bank = 1,
+    };
     struct dis_instruction inst;
 
     const int result = dis_parse_inst(&bv, 10, &inst);

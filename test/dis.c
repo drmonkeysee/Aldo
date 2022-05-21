@@ -2352,6 +2352,37 @@ static void parse_inst_out_of_bounds(void *ctx)
 }
 
 //
+// Mnemonics
+//
+
+static void mnemonic_valid(void *ctx)
+{
+    const struct dis_instruction inst = {.d = { IN_ADC, AM_IMM }};
+
+    const char *const result = dis_inst_mnemonic(&inst);
+
+    ct_assertequalstr("ADC", result);
+}
+
+static void mnemonic_unofficial(void *ctx)
+{
+    const struct dis_instruction inst = {.d = { IN_ANC, AM_IMM }};
+
+    const char *const result = dis_inst_mnemonic(&inst);
+
+    ct_assertequalstr("ANC", result);
+}
+
+static void mnemonic_invalid(void *ctx)
+{
+    const struct dis_instruction inst = {.d = { -4, AM_IMM }};
+
+    const char *const result = dis_inst_mnemonic(&inst);
+
+    ct_assertequalstr("UDF", result);
+}
+
+//
 // Test List
 //
 
@@ -2501,6 +2532,10 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(parse_inst_unofficial),
         ct_maketest(parse_inst_eof),
         ct_maketest(parse_inst_out_of_bounds),
+
+        ct_maketest(mnemonic_valid),
+        ct_maketest(mnemonic_unofficial),
+        ct_maketest(mnemonic_invalid),
     };
 
     return ct_makesuite(tests);

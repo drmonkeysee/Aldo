@@ -59,6 +59,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
 
+// NOTE: parsed will be zeroed-out if return value is <= 0
 int dis_parse_inst(const struct bankview *bv, size_t at,
                    struct dis_instruction *parsed);
 const char *dis_inst_mnemonic(const struct dis_instruction *inst);

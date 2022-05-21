@@ -614,6 +614,7 @@ int dis_parse_inst(const struct bankview *bv, size_t at,
     assert(bv != NULL);
     assert(parsed != NULL);
 
+    *parsed = (struct dis_instruction){0};
     if (at >= bv->size) return 0;
 
     const uint8_t opcode = bv->mem[at];

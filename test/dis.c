@@ -2250,6 +2250,13 @@ static void parse_inst_empty_bankview(void *ctx)
     const int result = dis_parse_inst(&bv, 0, &inst);
 
     ct_assertequal(0, result);
+    ct_assertequal(0u, inst.bv.bank);
+    ct_assertnull(inst.bv.mem);
+    ct_assertequal(0u, inst.bv.size);
+    ct_assertequal(0u, inst.offset);
+    ct_assertequal(IN_UDF, (int)inst.d.instruction);
+    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertfalse(inst.d.unofficial);
 }
 
 static void parse_inst_at_start(void *ctx)

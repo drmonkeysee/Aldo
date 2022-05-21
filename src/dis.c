@@ -615,7 +615,7 @@ int dis_parse_inst(const struct bankview *bv, size_t at,
     assert(parsed != NULL);
 
     *parsed = (struct dis_instruction){0};
-    if (at >= bv->size) return 0;
+    if (!bv->mem || at >= bv->size) return 0;
 
     const uint8_t opcode = bv->mem[at];
     const struct decoded dec = Decode[opcode];
@@ -628,6 +628,16 @@ int dis_parse_inst(const struct bankview *bv, size_t at,
         dec,
     };
     return instlen;
+}
+
+int dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
+                      size_t at, struct dis_instruction *parsed)
+{
+    const struct bankview bv = {
+        .mem = mem,
+        .size = size,
+    };
+    return dis_parse_inst(&bv, at, parsed);
 }
 
 int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)

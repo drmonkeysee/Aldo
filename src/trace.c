@@ -21,9 +21,8 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
     const size_t instlen = bus_dma(cpu->bus,
                                    snapshot->datapath.current_instruction,
                                    sizeof bytes / sizeof bytes[0], bytes);
-    const struct bankview bv = {.mem = bytes, .size = instlen};
     struct dis_instruction inst;
-    int result = dis_parse_inst(&bv, 0, &inst);
+    int result = dis_parsemem_inst(instlen, bytes, 0, &inst);
     char disinst[DIS_INST_SIZE];
     if (result > 0) {
         result = dis_inst(snapshot->datapath.current_instruction, &inst,

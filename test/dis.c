@@ -2372,6 +2372,115 @@ static void parse_inst_out_of_bounds(void *ctx)
     ct_assertfalse(inst.d.unofficial);
 }
 
+static void parsemem_inst_empty_bankview(void *ctx)
+{
+    struct dis_instruction inst;
+
+    const int result = dis_parsemem_inst(0, NULL, 0, &inst);
+
+    ct_assertequal(0, result);
+    ct_assertequal(0u, inst.bv.bank);
+    ct_assertnull(inst.bv.mem);
+    ct_assertequal(0u, inst.bv.size);
+    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(IN_UDF, (int)inst.d.instruction);
+    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertfalse(inst.d.unofficial);
+}
+
+static void parsemem_inst_at_start(void *ctx)
+{
+    const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
+    struct dis_instruction inst;
+
+    const int result = dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 0,
+                                         &inst);
+
+    ct_assertequal(1, result);
+    ct_assertequal(0u, inst.bv.bank);
+    ct_assertequal(0xeau, inst.bv.mem[0]);
+    ct_assertequal(1u, inst.bv.size);
+    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(IN_NOP, (int)inst.d.instruction);
+    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertfalse(inst.d.unofficial);
+}
+
+static void parsemem_inst_in_middle(void *ctx)
+{
+    const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
+    struct dis_instruction inst;
+
+    const int result = dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 3,
+                                         &inst);
+
+    ct_assertequal(3, result);
+    ct_assertequal(0u, inst.bv.bank);
+    ct_assertequal(0x4cu, inst.bv.mem[0]);
+    ct_assertequal(0x34u, inst.bv.mem[1]);
+    ct_assertequal(0x6u, inst.bv.mem[2]);
+    ct_assertequal(3u, inst.bv.size);
+    ct_assertequal(3u, inst.bankoffset);
+    ct_assertequal(IN_JMP, (int)inst.d.instruction);
+    ct_assertequal(AM_JABS, (int)inst.d.mode);
+    ct_assertfalse(inst.d.unofficial);
+}
+
+static void parsemem_inst_unofficial(void *ctx)
+{
+    const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
+    struct dis_instruction inst;
+
+    const int result = dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 2,
+                                         &inst);
+
+    ct_assertequal(2, result);
+    ct_assertequal(0u, inst.bv.bank);
+    ct_assertequal(0x34u, inst.bv.mem[0]);
+    ct_assertequal(0x4cu, inst.bv.mem[1]);
+    ct_assertequal(2u, inst.bv.size);
+    ct_assertequal(2u, inst.bankoffset);
+    ct_assertequal(IN_NOP, (int)inst.d.instruction);
+    ct_assertequal(AM_ZPX, (int)inst.d.mode);
+    ct_asserttrue(inst.d.unofficial);
+}
+
+static void parsemem_inst_eof(void *ctx)
+{
+    const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
+    struct dis_instruction inst;
+
+    const int result = dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 5,
+                                         &inst);
+
+    ct_assertequal(DIS_ERR_EOF, result);
+    ct_assertequal(0u, inst.bv.bank);
+    ct_assertnull(inst.bv.mem);
+    ct_assertequal(0u, inst.bv.size);
+    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(IN_UDF, (int)inst.d.instruction);
+    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertfalse(inst.d.unofficial);
+}
+
+static void parsemem_inst_out_of_bounds(void *ctx)
+{
+    const uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
+    struct dis_instruction inst;
+
+    const int result = dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 10,
+                                         &inst);
+
+    ct_assertequal(0, result);
+    ct_assertequal(0u, inst.bv.bank);
+    ct_assertnull(inst.bv.mem);
+    ct_assertequal(0u, inst.bv.size);
+    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(IN_UDF, (int)inst.d.instruction);
+    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertfalse(inst.d.unofficial);
+}
+
 //
 // Mnemonics
 //
@@ -2553,6 +2662,12 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(parse_inst_unofficial),
         ct_maketest(parse_inst_eof),
         ct_maketest(parse_inst_out_of_bounds),
+        ct_maketest(parsemem_inst_empty_bankview),
+        ct_maketest(parsemem_inst_at_start),
+        ct_maketest(parsemem_inst_in_middle),
+        ct_maketest(parsemem_inst_unofficial),
+        ct_maketest(parsemem_inst_eof),
+        ct_maketest(parsemem_inst_out_of_bounds),
 
         ct_maketest(mnemonic_valid),
         ct_maketest(mnemonic_unofficial),

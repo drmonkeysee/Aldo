@@ -62,6 +62,8 @@ int dis_datapath(const struct console_state *snapshot,
 // NOTE: parsed will be zeroed-out if return value is <= 0
 int dis_parse_inst(const struct bankview *bv, size_t at,
                    struct dis_instruction *parsed);
+int dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
+                      size_t at, struct dis_instruction *parsed);
 const char *dis_inst_mnemonic(const struct dis_instruction *inst);
 const char *dis_inst_addrmode(const struct dis_instruction *inst);
 uint8_t dis_inst_flags(const struct dis_instruction *inst);

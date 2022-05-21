@@ -15,6 +15,16 @@
 #include <stdint.h>
 #include <string.h>
 
+static struct dis_instruction create_instruction(const uint8_t *bytes,
+                                                 size_t sz)
+{
+    struct bankview bv = {.mem = bytes, .size = sz};
+    struct dis_instruction inst;
+    const int err = dis_parse_inst(&bv, 0, &inst);
+    ct_asserttrue(err > 0);
+    return inst;
+}
+
 //
 // Error Strings
 //
@@ -40,278 +50,329 @@ static void errstr_returns_unknown_err(void *ctx)
 static void inst_does_nothing_if_no_bytes(void *ctx)
 {
     const uint16_t a = 0x1234;
-    const uint8_t bytes[1];
+    const struct dis_instruction inst = {0};
     char buf[DIS_INST_SIZE] = {'\0'};
 
-    const int length = dis_inst(a, bytes, 0, buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(0, length);
-    ct_assertequalstr("", buf);
-}
-
-static void inst_eof(void *ctx)
-{
-    const uint16_t a = 0x1234;
-    // NOTE: LDA abs with missing 3rd byte
-    const uint8_t bytes[] = {0xad, 0x43};
-    char buf[DIS_INST_SIZE] = {'\0'};
-
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
-
-    ct_assertequal(DIS_ERR_EOF, length);
-    ct_assertequalstr("", buf);
+    const char *const exp = "";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_implied(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xea};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(1, length);
-    ct_assertequalstr("1234: EA        NOP", buf);
+    const char *const exp = "1234: EA        NOP";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_immediate(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xa9, 0x34};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(2, length);
-    ct_assertequalstr("1234: A9 34     LDA #$34", buf);
+    const char *const exp = "1234: A9 34     LDA #$34";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_zeropage(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xa5, 0x34};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(2, length);
-    ct_assertequalstr("1234: A5 34     LDA $34", buf);
+    const char *const exp = "1234: A5 34     LDA $34";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_zeropage_x(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xb5, 0x34};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(2, length);
-    ct_assertequalstr("1234: B5 34     LDA $34,X", buf);
+    const char *const exp = "1234: B5 34     LDA $34,X";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_zeropage_y(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xb6, 0x34};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(2, length);
-    ct_assertequalstr("1234: B6 34     LDX $34,Y", buf);
+    const char *const exp = "1234: B6 34     LDX $34,Y";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_indirect_x(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xa1, 0x34};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(2, length);
-    ct_assertequalstr("1234: A1 34     LDA ($34,X)", buf);
+    const char *const exp = "1234: A1 34     LDA ($34,X)";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_indirect_y(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xb1, 0x34};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(2, length);
-    ct_assertequalstr("1234: B1 34     LDA ($34),Y", buf);
+    const char *const exp = "1234: B1 34     LDA ($34),Y";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_absolute(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xad, 0x34, 0x6};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(3, length);
-    ct_assertequalstr("1234: AD 34 06  LDA $0634", buf);
+    const char *const exp = "1234: AD 34 06  LDA $0634";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_absolute_x(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xbd, 0x34, 0x6};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(3, length);
-    ct_assertequalstr("1234: BD 34 06  LDA $0634,X", buf);
+    const char *const exp = "1234: BD 34 06  LDA $0634,X";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_absolute_y(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xb9, 0x34, 0x6};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(3, length);
-    ct_assertequalstr("1234: B9 34 06  LDA $0634,Y", buf);
+    const char *const exp = "1234: B9 34 06  LDA $0634,Y";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_jmp_absolute(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x4c, 0x34, 0x6};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(3, length);
-    ct_assertequalstr("1234: 4C 34 06  JMP $0634", buf);
+    const char *const exp = "1234: 4C 34 06  JMP $0634";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_jmp_indirect(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x6c, 0x34, 0x6};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(3, length);
-    ct_assertequalstr("1234: 6C 34 06  JMP ($0634)", buf);
+    const char *const exp = "1234: 6C 34 06  JMP ($0634)";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_branch_positive(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x90, 0xa};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(2, length);
-    ct_assertequalstr("1234: 90 0A     BCC +10", buf);
+    const char *const exp = "1234: 90 0A     BCC +10";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_branch_negative(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x90, 0xf6};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(2, length);
-    ct_assertequalstr("1234: 90 F6     BCC -10", buf);
+    const char *const exp = "1234: 90 F6     BCC -10";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_branch_zero(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x90, 0x0};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(2, length);
-    ct_assertequalstr("1234: 90 00     BCC +0", buf);
+    const char *const exp = "1234: 90 00     BCC +0";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_push(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x48};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(1, length);
-    ct_assertequalstr("1234: 48        PHA", buf);
+    const char *const exp = "1234: 48        PHA";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_pull(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x68};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(1, length);
-    ct_assertequalstr("1234: 68        PLA", buf);
+    const char *const exp = "1234: 68        PLA";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_jsr(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x20, 0x34, 0x6};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(3, length);
-    ct_assertequalstr("1234: 20 34 06  JSR $0634", buf);
+    const char *const exp = "1234: 20 34 06  JSR $0634";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_rts(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x60};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(1, length);
-    ct_assertequalstr("1234: 60        RTS", buf);
+    const char *const exp = "1234: 60        RTS";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_brk(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x0};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(1, length);
-    ct_assertequalstr("1234: 00        BRK", buf);
+    const char *const exp = "1234: 00        BRK";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 static void inst_disassembles_unofficial(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x02};
+    const struct dis_instruction
+        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
     char buf[DIS_INST_SIZE];
 
-    const int length = dis_inst(a, bytes, sizeof bytes / sizeof bytes[0], buf);
+    const int length = dis_inst(a, &inst, buf);
 
-    ct_assertequal(1, length);
-    ct_assertequalstr("1234: 02       *JAM", buf);
+    const char *const exp = "1234: 02       *JAM";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
 //
@@ -2207,6 +2268,7 @@ static void parse_inst_at_start(void *ctx)
     ct_assertequal(bv.bank, inst.bv.bank);
     ct_assertequal(0xeau, inst.bv.mem[0]);
     ct_assertequal(1u, inst.bv.size);
+    ct_assertequal(0u, inst.offset);
     ct_assertequal(IN_NOP, (int)inst.d.instruction);
     ct_assertequal(AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
@@ -2230,6 +2292,7 @@ static void parse_inst_in_middle(void *ctx)
     ct_assertequal(0x34u, inst.bv.mem[1]);
     ct_assertequal(0x6u, inst.bv.mem[2]);
     ct_assertequal(3u, inst.bv.size);
+    ct_assertequal(3u, inst.offset);
     ct_assertequal(IN_JMP, (int)inst.d.instruction);
     ct_assertequal(AM_JABS, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
@@ -2252,6 +2315,7 @@ static void parse_inst_unofficial(void *ctx)
     ct_assertequal(0x34u, inst.bv.mem[0]);
     ct_assertequal(0x4cu, inst.bv.mem[1]);
     ct_assertequal(2u, inst.bv.size);
+    ct_assertequal(2u, inst.offset);
     ct_assertequal(IN_NOP, (int)inst.d.instruction);
     ct_assertequal(AM_ZPX, (int)inst.d.mode);
     ct_asserttrue(inst.d.unofficial);
@@ -2298,7 +2362,6 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(errstr_returns_unknown_err),
 
         ct_maketest(inst_does_nothing_if_no_bytes),
-        ct_maketest(inst_eof),
         ct_maketest(inst_disassembles_implied),
         ct_maketest(inst_disassembles_immediate),
         ct_maketest(inst_disassembles_zeropage),

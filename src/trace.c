@@ -17,13 +17,18 @@
 static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
                              const struct console_state *snapshot)
 {
-    uint8_t inst[3];
+    uint8_t bytes[3];
     const size_t instlen = bus_dma(cpu->bus,
                                    snapshot->datapath.current_instruction,
-                                   sizeof inst / sizeof inst[0], inst);
+                                   sizeof bytes / sizeof bytes[0], bytes);
+    const struct bankview bv = {.mem = bytes, .size = instlen};
+    struct dis_instruction inst;
+    int result = dis_parse_inst(&bv, 0, &inst);
     char disinst[DIS_INST_SIZE];
-    const int result = dis_inst(snapshot->datapath.current_instruction,
-                                inst, instlen, disinst);
+    if (result > 0) {
+        result = dis_inst(snapshot->datapath.current_instruction, &inst,
+                          disinst);
+    }
     return fprintf(tracelog, "%s",
                    result > 0 ? disinst : (result < 0
                                            ? dis_errstr(result)

@@ -42,6 +42,12 @@ static const char *const restrict *const StringTables[] = {
 #undef X
 };
 
+static const char *mnemonic(enum inst in)
+{
+    static const size_t mnem_sz = sizeof Mnemonics / sizeof Mnemonics[0];
+    return 0 <= in && in < mnem_sz ? Mnemonics[in] : Mnemonics[IN_UDF];
+}
+
 static const char *interrupt_display(const struct console_state *snapshot)
 {
     if (snapshot->datapath.exec_cycle == 6) return "CLR";
@@ -60,15 +66,15 @@ static uint16_t interrupt_vector(const struct console_state *snapshot)
     return batowr(snapshot->mem.vectors + 4);
 }
 
-static int print_raw(uint16_t addr, const uint8_t *restrict bytes, int instlen,
+static int print_raw(uint16_t addr, const struct dis_instruction *inst,
                      char dis[restrict static DIS_INST_SIZE])
 {
     int total, count;
     total = count = sprintf(dis, "%04X: ", addr);
     if (count < 0) return DIS_ERR_FMT;
 
-    for (int i = 0; i < instlen; ++i) {
-        count = sprintf(dis + total, "%02X ", bytes[i]);
+    for (size_t i = 0; i < inst->bv.size; ++i) {
+        count = sprintf(dis + total, "%02X ", inst->bv.mem[i]);
         if (count < 0) return DIS_ERR_FMT;
         total += count;
     }
@@ -76,25 +82,27 @@ static int print_raw(uint16_t addr, const uint8_t *restrict bytes, int instlen,
     return total;
 }
 
-static int print_mnemonic(const struct decoded *dec,
-                          const uint8_t *restrict bytes, int instlen,
+static int print_mnemonic(const struct dis_instruction *inst,
                           char dis[restrict])
 {
     int total, count;
-    total = count = sprintf(dis, "%s ", Mnemonics[dec->instruction]);
+    total = count = sprintf(dis, "%s ", mnemonic(inst->d.instruction));
     if (count < 0) return DIS_ERR_FMT;
 
-    const char *const restrict *const strtable = StringTables[dec->mode];
-    switch (instlen) {
+    const char *const restrict *const strtable = StringTables[inst->d.mode];
+    switch (inst->bv.size) {
     case 1:
         // NOTE: nothing else to print, trim the trailing space
         dis[--count] = '\0';
+        total = 0;
         break;
     case 2:
-        count = sprintf(dis + total, strtable[instlen - 1], bytes[1]);
+        count = sprintf(dis + total, strtable[inst->bv.size - 1],
+                        inst->bv.mem[1]);
         break;
     case 3:
-        count = sprintf(dis + total, strtable[instlen - 1], batowr(bytes + 1));
+        count = sprintf(dis + total, strtable[inst->bv.size - 1],
+                        batowr(inst->bv.mem + 1));
         break;
     default:
         assert(((void)"INVALID ADDR MODE LENGTH", false));
@@ -156,38 +164,39 @@ static int print_prgbank(const struct bankview *bv, bool verbose, FILE *f)
     fprintf(f, "Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
     fputs("--------\n", f);
 
-    int bytes_read = 0;
     struct repeat_condition repeat = {
         .state = verbose ? DUP_VERBOSE : DUP_NONE,
     };
+    struct dis_instruction inst;
     char dis[DIS_INST_SIZE];
-    for (size_t total = 0; total < bv->size; total += bytes_read) {
-        // NOTE: by convention, count backwards from CPU vector locations
-        const uint16_t addr = MEMBLOCK_64KB - bv->size + total;
-        const uint8_t *const prgoffset = bv->mem + total;
-        bytes_read = dis_inst(addr, prgoffset, bv->size - total, dis);
-        if (bytes_read == 0) break;
-        if (bytes_read < 0) {
-            fprintf(stderr, "%04X: Dis err (%d): %s\n", addr, bytes_read,
-                    dis_errstr(bytes_read));
-            return bytes_read;
-        }
+    // NOTE: by convention, count backwards from CPU vector locations
+    uint16_t addr = MEMBLOCK_64KB - bv->size;
+
+    int result;
+    for (result = dis_parse_inst(bv, 0, &inst);
+         result > 0;
+         result = dis_parse_inst(bv, inst.offset + inst.bv.size, &inst)) {
+        result = dis_inst(addr, &inst, dis);
+        if (result <= 0) break;
         // NOTE: convert current instruction bytes into easily comparable
         // value to check for repeats.
         uint32_t curr_bytes = 0;
-        for (int i = 0; i < bytes_read; ++i) {
-            curr_bytes |= prgoffset[i] << (8 * i);
+        for (size_t i = 0; i < inst.bv.size; ++i) {
+            curr_bytes |= inst.bv.mem[i] << (8 * i);
         }
-        print_prg_line(dis, curr_bytes, total, bv->size, &repeat, f);
+        print_prg_line(dis, curr_bytes, inst.offset, bv->size, &repeat, f);
+        addr += inst.bv.size;
     }
 
+    if (result < 0) {
+        fprintf(stderr, "%04X: Dis err (%d): %s\n", addr, result,
+                dis_errstr(result));
+    } else if (repeat.state == DUP_TRUNCATE || repeat.state == DUP_SKIP) {
     // NOTE: always print the last line regardless of duplicate state
     // (if it hasn't already been printed).
-    if (repeat.state == DUP_TRUNCATE || repeat.state == DUP_SKIP) {
         fprintf(f, "%s\n", dis);
     }
-
-    return 0;
+    return result;
 }
 
 // NOTE: CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is an 8x8
@@ -460,36 +469,40 @@ const char *dis_errstr(int err)
     }
 }
 
-int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
+int dis_inst(uint16_t addr, const struct dis_instruction *inst,
              char dis[restrict static DIS_INST_SIZE])
 {
-    assert(bytes != NULL);
+    assert(inst != NULL);
     assert(dis != NULL);
 
-    if (bytesleft <= 0) return 0;
-
-    const struct decoded dec = Decode[*bytes];
-    const int instlen = InstLens[dec.mode];
-    if (bytesleft < instlen) return DIS_ERR_EOF;
+    if (!inst->bv.mem) return 0;
 
     int count, total;
-    total = count = print_raw(addr, bytes, instlen, dis);
+    total = count = print_raw(addr, inst, dis);
     if (count < 0) return count;
 
     // NOTE: padding between raw bytes and disassembled instruction
-    count = sprintf(dis + total, "%*s", ((3 - instlen) * 3) + 1, "");
+    count = sprintf(dis + total, "%*s", ((3 - (int)inst->bv.size) * 3) + 1,
+                    "");
     if (count < 0) return DIS_ERR_FMT;
     total += count;
 
-    count = print_mnemonic(&dec, bytes, instlen, dis + total);
+    count = print_mnemonic(inst, dis + total);
     if (count < 0) return count;
-    if (dec.unofficial && total > 0) {
+    if (inst->d.unofficial && total > 0) {
         dis[total - 1] = '*';
     }
     total += count;
 
     assert((unsigned int)total < DIS_INST_SIZE);
-    return instlen;
+    return total;
+}
+
+const char *dis_inst_mnemonic(const struct dis_instruction *inst)
+{
+    assert(inst != NULL);
+
+    return mnemonic(inst->d.instruction);
 }
 
 int dis_peek(uint16_t addr, struct mos6502 *cpu,
@@ -559,7 +572,7 @@ int dis_datapath(const struct console_state *snapshot,
     if ((size_t)instlen > snapshot->mem.prglength) return DIS_ERR_EOF;
 
     int count, total;
-    total = count = sprintf(dis, "%s ", Mnemonics[dec.instruction]);
+    total = count = sprintf(dis, "%s ", mnemonic(dec.instruction));
     if (count < 0) return DIS_ERR_FMT;
 
     const int
@@ -608,7 +621,11 @@ int dis_parse_inst(const struct bankview *bv, size_t at,
     const int instlen = InstLens[dec.mode];
     if ((size_t)instlen > bv->size - at) return DIS_ERR_EOF;
 
-    *parsed = (struct dis_instruction){{bv->bank, instlen, bv->mem + at}, dec};
+    *parsed = (struct dis_instruction){
+        {bv->bank, instlen, bv->mem + at},
+        at,
+        dec,
+    };
     return instlen;
 }
 

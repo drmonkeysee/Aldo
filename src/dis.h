@@ -42,6 +42,7 @@ enum {
 
 struct dis_instruction {
     struct bankview bv;
+    size_t offset;
     struct decoded d;
 };
 
@@ -50,7 +51,7 @@ struct dis_instruction {
 const char *dis_errstr(int err);
 
 // NOTE: functions w/buffer params leave buffer untouched when returning <= 0
-int dis_inst(uint16_t addr, const uint8_t *restrict bytes, ptrdiff_t bytesleft,
+int dis_inst(uint16_t addr, const struct dis_instruction *inst,
              char dis[restrict static DIS_INST_SIZE]);
 int dis_peek(uint16_t addr, struct mos6502 *cpu,
              const struct console_state *snapshot,

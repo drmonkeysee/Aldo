@@ -217,16 +217,24 @@ static void drawcart(const struct control *appstate,
 static void drawinstructions(uint16_t addr, int h, int y,
                              const struct console_state *snapshot)
 {
-    for (int i = 0, bytes = 0, total = 0; i < h - y; ++i, total += bytes) {
+    const struct bankview prg = {
+        .mem = snapshot->mem.prgview,
+        .size = snapshot->mem.prglength,
+    };
+    struct dis_instruction inst = {0};
+    for (int i = 0; i < h - y; ++i) {
         char disassembly[DIS_INST_SIZE];
-        bytes = dis_inst(addr + total, snapshot->mem.prgview + total,
-                         snapshot->mem.prglength - total, disassembly);
-        if (bytes == 0) break;
-        if (bytes < 0) {
-            mvwaddstr(PrgView.content, i, 0, dis_errstr(bytes));
+        int result = dis_parse_inst(&prg, inst.offset + inst.bv.size, &inst);
+        if (result > 0) {
+            result = dis_inst(addr, &inst, disassembly);
+        }
+        if (result == 0) break;
+        if (result < 0) {
+            mvwaddstr(PrgView.content, i, 0, dis_errstr(result));
             break;
         }
         mvwaddstr(PrgView.content, i, 0, disassembly);
+        addr += inst.bv.size;
     }
 }
 

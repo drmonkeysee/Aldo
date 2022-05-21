@@ -2341,6 +2341,13 @@ static void parse_inst_eof(void *ctx)
     const int result = dis_parse_inst(&bv, 5, &inst);
 
     ct_assertequal(DIS_ERR_EOF, result);
+    ct_assertequal(0u, inst.bv.bank);
+    ct_assertnull(inst.bv.mem);
+    ct_assertequal(0u, inst.bv.size);
+    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(IN_UDF, (int)inst.d.instruction);
+    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertfalse(inst.d.unofficial);
 }
 
 static void parse_inst_out_of_bounds(void *ctx)
@@ -2356,6 +2363,13 @@ static void parse_inst_out_of_bounds(void *ctx)
     const int result = dis_parse_inst(&bv, 10, &inst);
 
     ct_assertequal(0, result);
+    ct_assertequal(0u, inst.bv.bank);
+    ct_assertnull(inst.bv.mem);
+    ct_assertequal(0u, inst.bv.size);
+    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(IN_UDF, (int)inst.d.instruction);
+    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertfalse(inst.d.unofficial);
 }
 
 //
@@ -2364,7 +2378,7 @@ static void parse_inst_out_of_bounds(void *ctx)
 
 static void mnemonic_valid(void *ctx)
 {
-    const struct dis_instruction inst = {.d = { IN_ADC, AM_IMM }};
+    const struct dis_instruction inst = {.d = {IN_ADC, AM_IMM, false}};
 
     const char *const result = dis_inst_mnemonic(&inst);
 
@@ -2373,7 +2387,7 @@ static void mnemonic_valid(void *ctx)
 
 static void mnemonic_unofficial(void *ctx)
 {
-    const struct dis_instruction inst = {.d = { IN_ANC, AM_IMM }};
+    const struct dis_instruction inst = {.d = {IN_ANC, AM_IMM, true}};
 
     const char *const result = dis_inst_mnemonic(&inst);
 
@@ -2382,7 +2396,7 @@ static void mnemonic_unofficial(void *ctx)
 
 static void mnemonic_invalid(void *ctx)
 {
-    const struct dis_instruction inst = {.d = { -4, AM_IMM }};
+    const struct dis_instruction inst = {.d = {-4, AM_IMM, false}};
 
     const char *const result = dis_inst_mnemonic(&inst);
 

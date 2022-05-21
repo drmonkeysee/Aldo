@@ -175,7 +175,7 @@ static int print_prgbank(const struct bankview *bv, bool verbose, FILE *f)
     int result;
     for (result = dis_parse_inst(bv, 0, &inst);
          result > 0;
-         result = dis_parse_inst(bv, inst.offset + inst.bv.size, &inst)) {
+         result = dis_parse_inst(bv, inst.bankoffset + inst.bv.size, &inst)) {
         result = dis_inst(addr, &inst, dis);
         if (result <= 0) break;
         // NOTE: convert current instruction bytes into easily comparable
@@ -184,7 +184,7 @@ static int print_prgbank(const struct bankview *bv, bool verbose, FILE *f)
         for (size_t i = 0; i < inst.bv.size; ++i) {
             curr_bytes |= inst.bv.mem[i] << (8 * i);
         }
-        print_prg_line(dis, curr_bytes, inst.offset, bv->size, &repeat, f);
+        print_prg_line(dis, curr_bytes, inst.bankoffset, bv->size, &repeat, f);
         addr += inst.bv.size;
     }
 
@@ -623,8 +623,8 @@ int dis_parse_inst(const struct bankview *bv, size_t at,
     if ((size_t)instlen > bv->size - at) return DIS_ERR_EOF;
 
     *parsed = (struct dis_instruction){
-        {bv->bank, instlen, bv->mem + at},
         at,
+        {bv->bank, instlen, bv->mem + at},
         dec,
     };
     return instlen;

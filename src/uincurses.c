@@ -224,7 +224,8 @@ static void drawinstructions(uint16_t addr, int h, int y,
     struct dis_instruction inst = {0};
     for (int i = 0; i < h - y; ++i) {
         char disassembly[DIS_INST_SIZE];
-        int result = dis_parse_inst(&prg, inst.offset + inst.bv.size, &inst);
+        int result = dis_parse_inst(&prg, inst.bankoffset + inst.bv.size,
+                                    &inst);
         if (result > 0) {
             result = dis_inst(addr, &inst, disassembly);
         }

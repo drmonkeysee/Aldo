@@ -41,8 +41,8 @@ enum {
 };
 
 struct dis_instruction {
+    size_t bankoffset;
     struct bankview bv;
-    size_t offset;
     struct decoded d;
 };
 

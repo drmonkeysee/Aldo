@@ -82,8 +82,8 @@ static int print_raw(uint16_t addr, const struct dis_instruction *inst,
     return total;
 }
 
-static int print_mnemonic(const struct dis_instruction *inst,
-                          char dis[restrict])
+static int print_instruction(const struct dis_instruction *inst,
+                             char dis[restrict])
 {
     int total, count;
     total = count = sprintf(dis, "%s ", mnemonic(inst->d.instruction));
@@ -487,7 +487,7 @@ int dis_inst(uint16_t addr, const struct dis_instruction *inst,
     if (count < 0) return DIS_ERR_FMT;
     total += count;
 
-    count = print_mnemonic(inst, dis + total);
+    count = print_instruction(inst, dis + total);
     if (count < 0) return count;
     if (inst->d.unofficial && total > 0) {
         dis[total - 1] = '*';

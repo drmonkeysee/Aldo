@@ -649,7 +649,7 @@ int dis_datapath(const struct console_state *snapshot,
 
     struct dis_instruction inst;
     const int err = dis_parsemem_inst(snapshot->mem.prglength,
-                                      snapshot->mem.prgsamp, 0, &inst);
+                                      snapshot->mem.currprg, 0, &inst);
     if (err < 0) return err;
 
     int count, total;

@@ -966,7 +966,7 @@ static void datapath_end_of_rom(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0xea},
+            .currprg = {0xea},
             .prglength = 1,
         },
     };
@@ -987,7 +987,7 @@ static void datapath_unexpected_end_of_rom(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0xa9},
+            .currprg = {0xa9},
             .prglength = 1,
         },
     };
@@ -1007,7 +1007,7 @@ static void datapath_implied_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0xea, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
@@ -1027,7 +1027,7 @@ static void datapath_implied_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0xea, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
@@ -1047,7 +1047,7 @@ static void datapath_implied_cycle_n(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0xea, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
@@ -1067,7 +1067,7 @@ static void datapath_immediate_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0xa9, 0x43},
+            .currprg = {0xa9, 0x43},
             .prglength = 2,
         },
     };
@@ -1087,7 +1087,7 @@ static void datapath_immediate_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0xa9, 0x43},
+            .currprg = {0xa9, 0x43},
             .prglength = 2,
         },
     };
@@ -1107,7 +1107,7 @@ static void datapath_immediate_cycle_n(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0xa9, 0x43},
+            .currprg = {0xa9, 0x43},
             .prglength = 2,
         },
     };
@@ -1127,7 +1127,7 @@ static void datapath_zeropage_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0xa5, 0x43},
+            .currprg = {0xa5, 0x43},
             .prglength = 2,
         },
     };
@@ -1147,7 +1147,7 @@ static void datapath_zeropage_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0xa5, 0x43},
+            .currprg = {0xa5, 0x43},
             .prglength = 2,
         },
     };
@@ -1167,7 +1167,7 @@ static void datapath_zeropage_cycle_n(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0xa5, 0x43},
+            .currprg = {0xa5, 0x43},
             .prglength = 2,
         },
     };
@@ -1187,7 +1187,7 @@ static void datapath_zeropage_x_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0xb5, 0x43},
+            .currprg = {0xb5, 0x43},
             .prglength = 2,
         },
     };
@@ -1207,7 +1207,7 @@ static void datapath_zeropage_x_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0xb5, 0x43},
+            .currprg = {0xb5, 0x43},
             .prglength = 2,
         },
     };
@@ -1227,7 +1227,7 @@ static void datapath_zeropage_x_cycle_n(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0xb5, 0x43},
+            .currprg = {0xb5, 0x43},
             .prglength = 2,
         },
     };
@@ -1247,7 +1247,7 @@ static void datapath_zeropage_y_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0xb6, 0x43},
+            .currprg = {0xb6, 0x43},
             .prglength = 2,
         },
     };
@@ -1267,7 +1267,7 @@ static void datapath_zeropage_y_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0xb6, 0x43},
+            .currprg = {0xb6, 0x43},
             .prglength = 2,
         },
     };
@@ -1287,7 +1287,7 @@ static void datapath_zeropage_y_cycle_n(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0xb6, 0x43},
+            .currprg = {0xb6, 0x43},
             .prglength = 2,
         },
     };
@@ -1307,7 +1307,7 @@ static void datapath_indirect_x_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0xa1, 0x43},
+            .currprg = {0xa1, 0x43},
             .prglength = 2,
         },
     };
@@ -1327,7 +1327,7 @@ static void datapath_indirect_x_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0xa1, 0x43},
+            .currprg = {0xa1, 0x43},
             .prglength = 2,
         },
     };
@@ -1347,7 +1347,7 @@ static void datapath_indirect_x_cycle_n(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0xa1, 0x43},
+            .currprg = {0xa1, 0x43},
             .prglength = 2,
         },
     };
@@ -1367,7 +1367,7 @@ static void datapath_indirect_y_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0xb1, 0x43},
+            .currprg = {0xb1, 0x43},
             .prglength = 2,
         },
     };
@@ -1387,7 +1387,7 @@ static void datapath_indirect_y_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0xb1, 0x43},
+            .currprg = {0xb1, 0x43},
             .prglength = 2,
         },
     };
@@ -1407,7 +1407,7 @@ static void datapath_indirect_y_cycle_n(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0xb1, 0x43},
+            .currprg = {0xb1, 0x43},
             .prglength = 2,
         },
     };
@@ -1427,7 +1427,7 @@ static void datapath_absolute_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0xad, 0x43, 0x21},
+            .currprg = {0xad, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1447,7 +1447,7 @@ static void datapath_absolute_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0xad, 0x43, 0x21},
+            .currprg = {0xad, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1467,7 +1467,7 @@ static void datapath_absolute_cycle_two(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0xad, 0x43, 0x21},
+            .currprg = {0xad, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1487,7 +1487,7 @@ static void datapath_absolute_cycle_n(void *ctx)
             .exec_cycle = 3,
         },
         .mem = {
-            .prgsamp = {0xad, 0x43, 0x21},
+            .currprg = {0xad, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1507,7 +1507,7 @@ static void datapath_absolute_x_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0xbd, 0x43, 0x21},
+            .currprg = {0xbd, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1527,7 +1527,7 @@ static void datapath_absolute_x_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0xbd, 0x43, 0x21},
+            .currprg = {0xbd, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1547,7 +1547,7 @@ static void datapath_absolute_x_cycle_two(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0xbd, 0x43, 0x21},
+            .currprg = {0xbd, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1567,7 +1567,7 @@ static void datapath_absolute_x_cycle_n(void *ctx)
             .exec_cycle = 3,
         },
         .mem = {
-            .prgsamp = {0xbd, 0x43, 0x21},
+            .currprg = {0xbd, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1587,7 +1587,7 @@ static void datapath_absolute_y_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0xb9, 0x43, 0x21},
+            .currprg = {0xb9, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1607,7 +1607,7 @@ static void datapath_absolute_y_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0xb9, 0x43, 0x21},
+            .currprg = {0xb9, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1627,7 +1627,7 @@ static void datapath_absolute_y_cycle_two(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0xb9, 0x43, 0x21},
+            .currprg = {0xb9, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1647,7 +1647,7 @@ static void datapath_absolute_y_cycle_n(void *ctx)
             .exec_cycle = 3,
         },
         .mem = {
-            .prgsamp = {0xb9, 0x43, 0x21},
+            .currprg = {0xb9, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1667,7 +1667,7 @@ static void datapath_jmp_absolute_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0x4c, 0x43, 0x21},
+            .currprg = {0x4c, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1687,7 +1687,7 @@ static void datapath_jmp_absolute_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0x4c, 0x43, 0x21},
+            .currprg = {0x4c, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1707,7 +1707,7 @@ static void datapath_jmp_absolute_cycle_two(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0x4c, 0x43, 0x21},
+            .currprg = {0x4c, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1727,7 +1727,7 @@ static void datapath_jmp_absolute_cycle_n(void *ctx)
             .exec_cycle = 3,
         },
         .mem = {
-            .prgsamp = {0x4c, 0x43, 0x21},
+            .currprg = {0x4c, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1747,7 +1747,7 @@ static void datapath_jmp_indirect_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0x6c, 0x43, 0x21},
+            .currprg = {0x6c, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1767,7 +1767,7 @@ static void datapath_jmp_indirect_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0x6c, 0x43, 0x21},
+            .currprg = {0x6c, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1787,7 +1787,7 @@ static void datapath_jmp_indirect_cycle_two(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0x6c, 0x43, 0x21},
+            .currprg = {0x6c, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1807,7 +1807,7 @@ static void datapath_jmp_indirect_cycle_n(void *ctx)
             .exec_cycle = 3,
         },
         .mem = {
-            .prgsamp = {0x6c, 0x43, 0x21},
+            .currprg = {0x6c, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -1827,7 +1827,7 @@ static void datapath_bch_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0x90, 0x2, 0xff, 0xff, 0xff},
+            .currprg = {0x90, 0x2, 0xff, 0xff, 0xff},
             .prglength = 5,
         },
     };
@@ -1847,7 +1847,7 @@ static void datapath_bch_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0x90, 0x2, 0xff, 0xff, 0xff},
+            .currprg = {0x90, 0x2, 0xff, 0xff, 0xff},
             .prglength = 5,
         },
     };
@@ -1867,7 +1867,7 @@ static void datapath_bch_cycle_n(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0x90, 0x2, 0xff, 0xff, 0xff},
+            .currprg = {0x90, 0x2, 0xff, 0xff, 0xff},
             .prglength = 5,
         },
     };
@@ -1887,7 +1887,7 @@ static void datapath_push_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0x48, 0xff},
+            .currprg = {0x48, 0xff},
             .prglength = 2,
         },
     };
@@ -1907,7 +1907,7 @@ static void datapath_push_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0x48, 0xff},
+            .currprg = {0x48, 0xff},
             .prglength = 2,
         },
     };
@@ -1927,7 +1927,7 @@ static void datapath_push_cycle_n(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0x48, 0xff},
+            .currprg = {0x48, 0xff},
             .prglength = 2,
         },
     };
@@ -1947,7 +1947,7 @@ static void datapath_pull_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0x68, 0xff},
+            .currprg = {0x68, 0xff},
             .prglength = 2,
         },
     };
@@ -1967,7 +1967,7 @@ static void datapath_pull_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0x68, 0xff},
+            .currprg = {0x68, 0xff},
             .prglength = 2,
         },
     };
@@ -1987,7 +1987,7 @@ static void datapath_pull_cycle_n(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0x68, 0xff},
+            .currprg = {0x68, 0xff},
             .prglength = 2,
         },
     };
@@ -2007,7 +2007,7 @@ static void datapath_jsr_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0x20, 0x43, 0x21},
+            .currprg = {0x20, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -2027,7 +2027,7 @@ static void datapath_jsr_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0x20, 0x43, 0x21},
+            .currprg = {0x20, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -2047,7 +2047,7 @@ static void datapath_jsr_cycle_two(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0x20, 0x43, 0x21},
+            .currprg = {0x20, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -2067,7 +2067,7 @@ static void datapath_jsr_cycle_n(void *ctx)
             .exec_cycle = 3,
         },
         .mem = {
-            .prgsamp = {0x20, 0x43, 0x21},
+            .currprg = {0x20, 0x43, 0x21},
             .prglength = 3,
         },
     };
@@ -2087,7 +2087,7 @@ static void datapath_rts_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0x60, 0xff},
+            .currprg = {0x60, 0xff},
             .prglength = 2,
         },
     };
@@ -2107,7 +2107,7 @@ static void datapath_rts_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0x60, 0xff},
+            .currprg = {0x60, 0xff},
             .prglength = 2,
         },
     };
@@ -2127,7 +2127,7 @@ static void datapath_rts_cycle_n(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0x60, 0xff},
+            .currprg = {0x60, 0xff},
             .prglength = 2,
         },
     };
@@ -2147,7 +2147,7 @@ static void datapath_brk_cycle_zero(void *ctx)
             .exec_cycle = 0,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2167,7 +2167,7 @@ static void datapath_brk_cycle_one(void *ctx)
             .exec_cycle = 1,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2187,7 +2187,7 @@ static void datapath_brk_cycle_n(void *ctx)
             .exec_cycle = 2,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2207,7 +2207,7 @@ static void datapath_brk_cycle_six(void *ctx)
             .exec_cycle = 6,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2228,7 +2228,7 @@ static void datapath_irq_cycle_zero(void *ctx)
             .irq = NIS_COMMITTED,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2249,7 +2249,7 @@ static void datapath_irq_cycle_one(void *ctx)
             .irq = NIS_COMMITTED,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2270,7 +2270,7 @@ static void datapath_irq_cycle_n(void *ctx)
             .irq = NIS_COMMITTED,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2291,7 +2291,7 @@ static void datapath_irq_cycle_six(void *ctx)
             .irq = NIS_COMMITTED,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2312,7 +2312,7 @@ static void datapath_nmi_cycle_zero(void *ctx)
             .nmi = NIS_COMMITTED,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2333,7 +2333,7 @@ static void datapath_nmi_cycle_one(void *ctx)
             .nmi = NIS_COMMITTED,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2354,7 +2354,7 @@ static void datapath_nmi_cycle_n(void *ctx)
             .nmi = NIS_COMMITTED,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2375,7 +2375,7 @@ static void datapath_nmi_cycle_six(void *ctx)
             .nmi = NIS_COMMITTED,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2396,7 +2396,7 @@ static void datapath_res_cycle_zero(void *ctx)
             .res = NIS_COMMITTED,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2417,7 +2417,7 @@ static void datapath_res_cycle_one(void *ctx)
             .res = NIS_COMMITTED,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2438,7 +2438,7 @@ static void datapath_res_cycle_n(void *ctx)
             .res = NIS_COMMITTED,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };
@@ -2459,7 +2459,7 @@ static void datapath_res_cycle_six(void *ctx)
             .res = NIS_COMMITTED,
         },
         .mem = {
-            .prgsamp = {0x0, 0xff},
+            .currprg = {0x0, 0xff},
             .prglength = 2,
         },
     };

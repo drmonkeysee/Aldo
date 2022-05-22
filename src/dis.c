@@ -498,13 +498,6 @@ int dis_inst(uint16_t addr, const struct dis_instruction *inst,
     return total;
 }
 
-const char *dis_inst_mnemonic(const struct dis_instruction *inst)
-{
-    assert(inst != NULL);
-
-    return mnemonic(inst->d.instruction);
-}
-
 int dis_peek(uint16_t addr, struct mos6502 *cpu,
              const struct console_state *snapshot,
              char dis[restrict static DIS_PEEK_SIZE])
@@ -638,6 +631,39 @@ int dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
         .size = size,
     };
     return dis_parse_inst(&bv, at, parsed);
+}
+
+const char *dis_inst_mnemonic(const struct dis_instruction *inst)
+{
+    assert(inst != NULL);
+
+    return mnemonic(inst->d.instruction);
+}
+
+const char *dis_inst_addrmode(const struct dis_instruction *inst)
+{
+    assert(inst != NULL);
+
+    int notimplemented;
+    return NULL;
+}
+
+uint8_t dis_inst_flags(const struct dis_instruction *inst)
+{
+    assert(inst != NULL);
+
+    int notimplemented;
+    return 0;
+}
+
+int dis_inst_operand(const struct dis_instruction *inst,
+                     char dis[restrict static DIS_OPERAND_SIZE])
+{
+    assert(inst != NULL);
+    assert(dis != NULL);
+
+    int notimplemented;
+    return 0;
 }
 
 int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)

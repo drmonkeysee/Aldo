@@ -15,8 +15,9 @@
 #include <stdint.h>
 #include <string.h>
 
-static struct dis_instruction create_instruction(const uint8_t *bytes,
-                                                 size_t sz)
+#define makeinst(b) create_instruction(sizeof (b) / sizeof (b)[0], b)
+static struct dis_instruction create_instruction(size_t sz,
+                                                 const uint8_t bytes[sz])
 {
     struct bankview bv = {.mem = bytes, .size = sz};
     struct dis_instruction inst;
@@ -44,6 +45,61 @@ static void errstr_returns_unknown_err(void *ctx)
 }
 
 //
+// Instruction Operand
+//
+
+static void inst_operand_empty_instruction(void *ctx)
+{
+    const struct dis_instruction inst = {0};
+    char buf[DIS_OPERAND_SIZE];
+
+    const int length = dis_inst_operand(&inst, buf);
+
+    const char *const exp = "";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void inst_operand_no_operand(void *ctx)
+{
+    const uint8_t mem[] = {0xea};
+    const struct dis_instruction inst = makeinst(mem);
+    char buf[DIS_OPERAND_SIZE];
+
+    const int length = dis_inst_operand(&inst, buf);
+
+    const char *const exp = "";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void inst_operand_one_byte_operand(void *ctx)
+{
+    const uint8_t mem[] = {0x65, 0x6};
+    const struct dis_instruction inst = makeinst(mem);
+    char buf[DIS_OPERAND_SIZE];
+
+    const int length = dis_inst_operand(&inst, buf);
+
+    const char *const exp = "$06";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+static void inst_operand_two_byte_operand(void *ctx)
+{
+    const uint8_t mem[] = {0xad, 0x34, 0x4c};
+    const struct dis_instruction inst = makeinst(mem);
+    char buf[DIS_OPERAND_SIZE];
+
+    const int length = dis_inst_operand(&inst, buf);
+
+    const char *const exp = "$4C34";
+    ct_assertequal((int)strlen(exp), length);
+    ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+//
 // Disassemble Instruction
 //
 
@@ -64,8 +120,7 @@ static void inst_disassembles_implied(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xea};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -79,8 +134,7 @@ static void inst_disassembles_immediate(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xa9, 0x34};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -94,8 +148,7 @@ static void inst_disassembles_zeropage(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xa5, 0x34};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -109,8 +162,7 @@ static void inst_disassembles_zeropage_x(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xb5, 0x34};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -124,8 +176,7 @@ static void inst_disassembles_zeropage_y(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xb6, 0x34};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -139,8 +190,7 @@ static void inst_disassembles_indirect_x(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xa1, 0x34};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -154,8 +204,7 @@ static void inst_disassembles_indirect_y(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xb1, 0x34};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -169,8 +218,7 @@ static void inst_disassembles_absolute(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xad, 0x34, 0x6};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -184,8 +232,7 @@ static void inst_disassembles_absolute_x(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xbd, 0x34, 0x6};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -199,8 +246,7 @@ static void inst_disassembles_absolute_y(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0xb9, 0x34, 0x6};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -214,8 +260,7 @@ static void inst_disassembles_jmp_absolute(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x4c, 0x34, 0x6};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -229,8 +274,7 @@ static void inst_disassembles_jmp_indirect(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x6c, 0x34, 0x6};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -244,8 +288,7 @@ static void inst_disassembles_branch_positive(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x90, 0xa};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -259,8 +302,7 @@ static void inst_disassembles_branch_negative(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x90, 0xf6};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -274,8 +316,7 @@ static void inst_disassembles_branch_zero(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x90, 0x0};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -289,8 +330,7 @@ static void inst_disassembles_push(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x48};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -304,8 +344,7 @@ static void inst_disassembles_pull(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x68};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -319,8 +358,7 @@ static void inst_disassembles_jsr(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x20, 0x34, 0x6};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -334,8 +372,7 @@ static void inst_disassembles_rts(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x60};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -349,8 +386,7 @@ static void inst_disassembles_brk(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x0};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -364,8 +400,7 @@ static void inst_disassembles_unofficial(void *ctx)
 {
     const uint16_t a = 0x1234;
     const uint8_t bytes[] = {0x02};
-    const struct dis_instruction
-        inst = create_instruction(bytes, sizeof bytes / sizeof bytes[0]);
+    const struct dis_instruction inst = makeinst(bytes);
     char buf[DIS_INST_SIZE];
 
     const int length = dis_inst(a, &inst, buf);
@@ -2521,6 +2556,11 @@ struct ct_testsuite dis_tests(void)
     static const struct ct_testcase tests[] = {
         ct_maketest(errstr_returns_known_err),
         ct_maketest(errstr_returns_unknown_err),
+
+        ct_maketest(inst_operand_empty_instruction),
+        ct_maketest(inst_operand_no_operand),
+        ct_maketest(inst_operand_one_byte_operand),
+        ct_maketest(inst_operand_two_byte_operand),
 
         ct_maketest(inst_does_nothing_if_no_bytes),
         ct_maketest(inst_disassembles_implied),

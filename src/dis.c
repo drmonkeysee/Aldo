@@ -82,26 +82,20 @@ static int print_raw(uint16_t addr, const struct dis_instruction *inst,
     return total;
 }
 
-static int print_instruction(const struct dis_instruction *inst,
-                             char dis[restrict])
+static int print_operand(const struct dis_instruction *inst,
+                         char dis[restrict])
 {
-    int total, count;
-    total = count = sprintf(dis, "%s ", mnemonic(inst->d.instruction));
-    if (count < 0) return DIS_ERR_FMT;
-
     const char *const restrict *const strtable = StringTables[inst->d.mode];
+    int count = 0;
     switch (inst->bv.size) {
     case 1:
-        // NOTE: nothing else to print, trim the trailing space
-        dis[--count] = '\0';
-        total = 0;
+        dis[0] = '\0';
         break;
     case 2:
-        count = sprintf(dis + total, strtable[inst->bv.size - 1],
-                        inst->bv.mem[1]);
+        count = sprintf(dis, strtable[inst->bv.size - 1], inst->bv.mem[1]);
         break;
     case 3:
-        count = sprintf(dis + total, strtable[inst->bv.size - 1],
+        count = sprintf(dis, strtable[inst->bv.size - 1],
                         batowr(inst->bv.mem + 1));
         break;
     default:
@@ -109,7 +103,23 @@ static int print_instruction(const struct dis_instruction *inst,
         return DIS_ERR_INV_ADDRMD;
     }
     if (count < 0) return DIS_ERR_FMT;
-    return total + count;
+    return count;
+}
+
+static int print_instruction(const struct dis_instruction *inst,
+                             char dis[restrict])
+{
+    int operation = sprintf(dis, "%s ", mnemonic(inst->d.instruction));
+    if (operation < 0) return DIS_ERR_FMT;
+
+    const int operand = print_operand(inst, dis + operation);
+
+    if (operand < 0) return DIS_ERR_FMT;
+    if (operand == 0) {
+        // NOTE: no operand to print, trim the trailing space
+        dis[--operation] = '\0';
+    }
+    return operation + operand;
 }
 
 enum duplicate_state {
@@ -662,8 +672,15 @@ int dis_inst_operand(const struct dis_instruction *inst,
     assert(inst != NULL);
     assert(dis != NULL);
 
-    int notimplemented;
-    return 0;
+    if (!inst->bv.mem) {
+        dis[0] = '\0';
+        return 0;
+    }
+
+    const int count = print_operand(inst, dis);
+
+    assert((unsigned int)count < DIS_OPERAND_SIZE);
+    return count;
 }
 
 int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)

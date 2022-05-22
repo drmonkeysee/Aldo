@@ -666,13 +666,13 @@ int dis_datapath(const struct console_state *snapshot,
                               interrupt_display(snapshot))
                     : sprintf(dis + total, displaystr,
                               strlen(displaystr) > 0
-                                ? snapshot->mem.prgview[1]
+                                ? snapshot->mem.prgsamp[1]
                                 : 0);
         break;
     default:
         count = sprintf(dis + total, displaystr,
                         strlen(displaystr) > 0
-                            ? batowr(snapshot->mem.prgview + 1)
+                            ? batowr(snapshot->mem.prgsamp + 1)
                             : 0);
         break;
     }

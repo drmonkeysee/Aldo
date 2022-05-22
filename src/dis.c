@@ -86,10 +86,11 @@ static int print_operand(const struct dis_instruction *inst,
                          char dis[restrict])
 {
     const char *const restrict *const strtable = StringTables[inst->d.mode];
-    int count = 0;
+    int count;
     switch (inst->bv.size) {
     case 1:
         dis[0] = '\0';
+        count = 0;
         break;
     case 2:
         count = sprintf(dis, strtable[inst->bv.size - 1], inst->bv.mem[1]);
@@ -485,13 +486,18 @@ int dis_parse_inst(const struct bankview *bv, size_t at,
     assert(bv != NULL);
     assert(parsed != NULL);
 
-    *parsed = (struct dis_instruction){0};
-    if (!bv->mem || at >= bv->size) return 0;
+    if (!bv->mem || at >= bv->size) {
+        *parsed = (struct dis_instruction){0};
+        return 0;
+    }
 
     const uint8_t opcode = bv->mem[at];
     const struct decoded dec = Decode[opcode];
     const int instlen = InstLens[dec.mode];
-    if ((size_t)instlen > bv->size - at) return DIS_ERR_EOF;
+    if ((size_t)instlen > bv->size - at) {
+        *parsed = (struct dis_instruction){0};
+        return DIS_ERR_EOF;
+    }
 
     *parsed = (struct dis_instruction){
         at,

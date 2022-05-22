@@ -970,7 +970,6 @@ static void datapath_end_of_rom(void *ctx)
             .prglength = 1,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -992,7 +991,6 @@ static void datapath_unexpected_end_of_rom(void *ctx)
             .prglength = 1,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE] = {'\0'};
 
     const int written = dis_datapath(&sn, buf);
@@ -1013,7 +1011,6 @@ static void datapath_implied_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1034,7 +1031,6 @@ static void datapath_implied_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1055,7 +1051,6 @@ static void datapath_implied_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1076,7 +1071,6 @@ static void datapath_immediate_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1097,7 +1091,6 @@ static void datapath_immediate_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1118,7 +1111,6 @@ static void datapath_immediate_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1139,7 +1131,6 @@ static void datapath_zeropage_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1160,7 +1151,6 @@ static void datapath_zeropage_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1181,7 +1171,6 @@ static void datapath_zeropage_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1202,7 +1191,6 @@ static void datapath_zeropage_x_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1223,7 +1211,6 @@ static void datapath_zeropage_x_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1244,7 +1231,6 @@ static void datapath_zeropage_x_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1265,7 +1251,6 @@ static void datapath_zeropage_y_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1286,7 +1271,6 @@ static void datapath_zeropage_y_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1307,7 +1291,6 @@ static void datapath_zeropage_y_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1328,7 +1311,6 @@ static void datapath_indirect_x_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1349,7 +1331,6 @@ static void datapath_indirect_x_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1370,7 +1351,6 @@ static void datapath_indirect_x_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1391,7 +1371,6 @@ static void datapath_indirect_y_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1412,7 +1391,6 @@ static void datapath_indirect_y_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1433,7 +1411,6 @@ static void datapath_indirect_y_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1454,7 +1431,6 @@ static void datapath_absolute_cycle_zero(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1475,7 +1451,6 @@ static void datapath_absolute_cycle_one(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1496,7 +1471,6 @@ static void datapath_absolute_cycle_two(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1517,7 +1491,6 @@ static void datapath_absolute_cycle_n(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1538,7 +1511,6 @@ static void datapath_absolute_x_cycle_zero(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1559,7 +1531,6 @@ static void datapath_absolute_x_cycle_one(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1580,7 +1551,6 @@ static void datapath_absolute_x_cycle_two(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1601,7 +1571,6 @@ static void datapath_absolute_x_cycle_n(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1622,7 +1591,6 @@ static void datapath_absolute_y_cycle_zero(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1643,7 +1611,6 @@ static void datapath_absolute_y_cycle_one(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1664,7 +1631,6 @@ static void datapath_absolute_y_cycle_two(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1685,7 +1651,6 @@ static void datapath_absolute_y_cycle_n(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1706,7 +1671,6 @@ static void datapath_jmp_absolute_cycle_zero(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1727,7 +1691,6 @@ static void datapath_jmp_absolute_cycle_one(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1748,7 +1711,6 @@ static void datapath_jmp_absolute_cycle_two(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1769,7 +1731,6 @@ static void datapath_jmp_absolute_cycle_n(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1790,7 +1751,6 @@ static void datapath_jmp_indirect_cycle_zero(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1811,7 +1771,6 @@ static void datapath_jmp_indirect_cycle_one(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1832,7 +1791,6 @@ static void datapath_jmp_indirect_cycle_two(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1853,7 +1811,6 @@ static void datapath_jmp_indirect_cycle_n(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1874,7 +1831,6 @@ static void datapath_bch_cycle_zero(void *ctx)
             .prglength = 5,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1895,7 +1851,6 @@ static void datapath_bch_cycle_one(void *ctx)
             .prglength = 5,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1916,7 +1871,6 @@ static void datapath_bch_cycle_n(void *ctx)
             .prglength = 5,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1937,7 +1891,6 @@ static void datapath_push_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1958,7 +1911,6 @@ static void datapath_push_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -1979,7 +1931,6 @@ static void datapath_push_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2000,7 +1951,6 @@ static void datapath_pull_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2021,7 +1971,6 @@ static void datapath_pull_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2042,7 +1991,6 @@ static void datapath_pull_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2063,7 +2011,6 @@ static void datapath_jsr_cycle_zero(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2084,7 +2031,6 @@ static void datapath_jsr_cycle_one(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2105,7 +2051,6 @@ static void datapath_jsr_cycle_two(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2126,7 +2071,6 @@ static void datapath_jsr_cycle_n(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2147,7 +2091,6 @@ static void datapath_rts_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2168,7 +2111,6 @@ static void datapath_rts_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2189,7 +2131,6 @@ static void datapath_rts_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2210,7 +2151,6 @@ static void datapath_brk_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2231,7 +2171,6 @@ static void datapath_brk_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2252,7 +2191,6 @@ static void datapath_brk_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2273,7 +2211,6 @@ static void datapath_brk_cycle_six(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2295,7 +2232,6 @@ static void datapath_irq_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2317,7 +2253,6 @@ static void datapath_irq_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2339,7 +2274,6 @@ static void datapath_irq_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2361,7 +2295,6 @@ static void datapath_irq_cycle_six(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2383,7 +2316,6 @@ static void datapath_nmi_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2405,7 +2337,6 @@ static void datapath_nmi_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2427,7 +2358,6 @@ static void datapath_nmi_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2449,7 +2379,6 @@ static void datapath_nmi_cycle_six(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2471,7 +2400,6 @@ static void datapath_res_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2493,7 +2421,6 @@ static void datapath_res_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2515,7 +2442,6 @@ static void datapath_res_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2537,7 +2463,6 @@ static void datapath_res_cycle_six(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.prgsamp[0];
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);

@@ -114,7 +114,6 @@ static int print_instruction(const struct dis_instruction *inst,
     if (operation < 0) return DIS_ERR_FMT;
 
     const int operand = print_operand(inst, dis + operation);
-
     if (operand < 0) return DIS_ERR_FMT;
     if (operand == 0) {
         // NOTE: no operand to print, trim the trailing space
@@ -648,38 +647,35 @@ int dis_datapath(const struct console_state *snapshot,
     assert(snapshot != NULL);
     assert(dis != NULL);
 
-    const struct decoded dec = Decode[snapshot->datapath.opcode];
-    const int instlen = InstLens[dec.mode];
-    if ((size_t)instlen > snapshot->mem.prglength) return DIS_ERR_EOF;
+    struct dis_instruction inst;
+    const int err = dis_parsemem_inst(snapshot->mem.prglength,
+                                      snapshot->mem.prgsamp, 0, &inst);
+    if (err < 0) return err;
 
     int count, total;
-    total = count = sprintf(dis, "%s ", mnemonic(dec.instruction));
+    total = count = sprintf(dis, "%s ", mnemonic(inst.d.instruction));
     if (count < 0) return DIS_ERR_FMT;
 
-    const int
-        max_offset = 1 + (instlen / 3),
+    const size_t
+        max_offset = 1 + (inst.bv.size / 3),
         displayidx = snapshot->datapath.exec_cycle < max_offset
                         ? snapshot->datapath.exec_cycle
                         : max_offset;
-    const char *const displaystr = StringTables[dec.mode][displayidx];
+    const char *const displaystr = StringTables[inst.d.mode][displayidx];
     switch (displayidx) {
     case 0:
         count = sprintf(dis + total, "%s", displaystr);
         break;
     case 1:
-        count = dec.instruction == IN_BRK
+        count = inst.d.instruction == IN_BRK
                     ? sprintf(dis + total, displaystr,
                               interrupt_display(snapshot))
                     : sprintf(dis + total, displaystr,
-                              strlen(displaystr) > 0
-                                ? snapshot->mem.prgsamp[1]
-                                : 0);
+                              strlen(displaystr) > 0 ? inst.bv.mem[1] : 0);
         break;
     default:
         count = sprintf(dis + total, displaystr,
-                        strlen(displaystr) > 0
-                            ? batowr(snapshot->mem.prgsamp + 1)
-                            : 0);
+                        strlen(displaystr) > 0 ? batowr(inst.bv.mem + 1) : 0);
         break;
     }
     if (count < 0) return DIS_ERR_FMT;

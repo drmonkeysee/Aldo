@@ -50,15 +50,6 @@ struct dis_instruction {
 // **WARNING**: do not write through or free this pointer!
 const char *dis_errstr(int err);
 
-// NOTE: functions w/buffer params leave buffer untouched when returning <= 0
-int dis_inst(uint16_t addr, const struct dis_instruction *inst,
-             char dis[restrict static DIS_INST_SIZE]);
-int dis_peek(uint16_t addr, struct mos6502 *cpu,
-             const struct console_state *snapshot,
-             char dis[restrict static DIS_PEEK_SIZE]);
-int dis_datapath(const struct console_state *snapshot,
-                 char dis[restrict static DIS_DATAP_SIZE]);
-
 // NOTE: parsed will be zeroed-out if return value is <= 0
 int dis_parse_inst(const struct bankview *bv, size_t at,
                    struct dis_instruction *parsed);
@@ -69,6 +60,15 @@ const char *dis_inst_addrmode(const struct dis_instruction *inst);
 uint8_t dis_inst_flags(const struct dis_instruction *inst);
 int dis_inst_operand(const struct dis_instruction *inst,
                      char dis[restrict static DIS_OPERAND_SIZE]);
+
+// NOTE: functions w/buffer params leave buffer untouched when returning <= 0
+int dis_inst(uint16_t addr, const struct dis_instruction *inst,
+             char dis[restrict static DIS_INST_SIZE]);
+int dis_peek(uint16_t addr, struct mos6502 *cpu,
+             const struct console_state *snapshot,
+             char dis[restrict static DIS_PEEK_SIZE]);
+int dis_datapath(const struct console_state *snapshot,
+                 char dis[restrict static DIS_DATAP_SIZE]);
 
 int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f);
 int dis_cart_chrbank(const struct bankview *bv, int scale, FILE *f);

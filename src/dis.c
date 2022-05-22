@@ -479,6 +479,78 @@ const char *dis_errstr(int err)
     }
 }
 
+int dis_parse_inst(const struct bankview *bv, size_t at,
+                   struct dis_instruction *parsed)
+{
+    assert(bv != NULL);
+    assert(parsed != NULL);
+
+    *parsed = (struct dis_instruction){0};
+    if (!bv->mem || at >= bv->size) return 0;
+
+    const uint8_t opcode = bv->mem[at];
+    const struct decoded dec = Decode[opcode];
+    const int instlen = InstLens[dec.mode];
+    if ((size_t)instlen > bv->size - at) return DIS_ERR_EOF;
+
+    *parsed = (struct dis_instruction){
+        at,
+        {bv->bank, instlen, bv->mem + at},
+        dec,
+    };
+    return instlen;
+}
+
+int dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
+                      size_t at, struct dis_instruction *parsed)
+{
+    const struct bankview bv = {
+        .mem = mem,
+        .size = size,
+    };
+    return dis_parse_inst(&bv, at, parsed);
+}
+
+const char *dis_inst_mnemonic(const struct dis_instruction *inst)
+{
+    assert(inst != NULL);
+
+    return mnemonic(inst->d.instruction);
+}
+
+const char *dis_inst_addrmode(const struct dis_instruction *inst)
+{
+    assert(inst != NULL);
+
+    int notimplemented;
+    return NULL;
+}
+
+uint8_t dis_inst_flags(const struct dis_instruction *inst)
+{
+    assert(inst != NULL);
+
+    int notimplemented;
+    return 0;
+}
+
+int dis_inst_operand(const struct dis_instruction *inst,
+                     char dis[restrict static DIS_OPERAND_SIZE])
+{
+    assert(inst != NULL);
+    assert(dis != NULL);
+
+    if (!inst->bv.mem) {
+        dis[0] = '\0';
+        return 0;
+    }
+
+    const int count = print_operand(inst, dis);
+
+    assert((unsigned int)count < DIS_OPERAND_SIZE);
+    return count;
+}
+
 int dis_inst(uint16_t addr, const struct dis_instruction *inst,
              char dis[restrict static DIS_INST_SIZE])
 {
@@ -609,78 +681,6 @@ int dis_datapath(const struct console_state *snapshot,
 
     assert((unsigned int)total < DIS_DATAP_SIZE);
     return total;
-}
-
-int dis_parse_inst(const struct bankview *bv, size_t at,
-                   struct dis_instruction *parsed)
-{
-    assert(bv != NULL);
-    assert(parsed != NULL);
-
-    *parsed = (struct dis_instruction){0};
-    if (!bv->mem || at >= bv->size) return 0;
-
-    const uint8_t opcode = bv->mem[at];
-    const struct decoded dec = Decode[opcode];
-    const int instlen = InstLens[dec.mode];
-    if ((size_t)instlen > bv->size - at) return DIS_ERR_EOF;
-
-    *parsed = (struct dis_instruction){
-        at,
-        {bv->bank, instlen, bv->mem + at},
-        dec,
-    };
-    return instlen;
-}
-
-int dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
-                      size_t at, struct dis_instruction *parsed)
-{
-    const struct bankview bv = {
-        .mem = mem,
-        .size = size,
-    };
-    return dis_parse_inst(&bv, at, parsed);
-}
-
-const char *dis_inst_mnemonic(const struct dis_instruction *inst)
-{
-    assert(inst != NULL);
-
-    return mnemonic(inst->d.instruction);
-}
-
-const char *dis_inst_addrmode(const struct dis_instruction *inst)
-{
-    assert(inst != NULL);
-
-    int notimplemented;
-    return NULL;
-}
-
-uint8_t dis_inst_flags(const struct dis_instruction *inst)
-{
-    assert(inst != NULL);
-
-    int notimplemented;
-    return 0;
-}
-
-int dis_inst_operand(const struct dis_instruction *inst,
-                     char dis[restrict static DIS_OPERAND_SIZE])
-{
-    assert(inst != NULL);
-    assert(dis != NULL);
-
-    if (!inst->bv.mem) {
-        dis[0] = '\0';
-        return 0;
-    }
-
-    const int count = print_operand(inst, dis);
-
-    assert((unsigned int)count < DIS_OPERAND_SIZE);
-    return count;
 }
 
 int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)

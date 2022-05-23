@@ -226,10 +226,10 @@ static void drawinstructions(uint16_t addr, int h, int y,
                                        &inst);
         if (result > 0) {
             result = dis_inst(addr, &inst, disassembly);
-        }
-        if (result == 0) break;
-        if (result < 0) {
-            mvwaddstr(PrgView.content, i, 0, dis_errstr(result));
+        } else {
+            if (result < 0) {
+                mvwaddstr(PrgView.content, i, 0, dis_errstr(result));
+            }
             break;
         }
         mvwaddstr(PrgView.content, i, 0, disassembly);

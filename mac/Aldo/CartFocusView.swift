@@ -72,6 +72,6 @@ fileprivate struct InstructionDetailsView: View {
 
 struct CartFocusView_Previews: PreviewProvider {
     static var previews: some View {
-        CartFocusView(instruction: Instruction(bytes: [0x0]))
+        CartFocusView(instruction: Instruction(dis_instruction()))
     }
 }

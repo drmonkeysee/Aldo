@@ -28,6 +28,11 @@ final class Cart: ObservableObject {
         return true
     }
 
+    func getPrgBank(_ bank: Int) -> bankview? {
+        guard let h = handle else { return nil }
+        return cart_prgbank(h.unwrapped, bank)
+    }
+
     func readInfoText() async -> CStreamResult {
         guard let h = handle else { return .error(.ioError("No cart set")) }
 

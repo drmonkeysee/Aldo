@@ -58,11 +58,11 @@ fileprivate struct ProgramListingView: View {
             List(0..<prg.count, id: \.self) { i in
                 let line = prg[i]
                 switch line {
-                case let .disassembled(offset, inst):
+                case let .disassembled(addr, inst):
                     NavigationLink(tag: i, selection: $listing.selectedLine) {
                         PrgDetailView(inst)
                     } label: {
-                        Text(inst.line(offset: offset))
+                        Text(inst.line(addr: addr))
                             .font(.system(.body, design: .monospaced))
                     }
                 default:

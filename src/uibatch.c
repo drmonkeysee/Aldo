@@ -28,7 +28,8 @@ static uint64_t Ticks;
 
 static void clearline(void)
 {
-    static const size_t linelength = strlen(DistractorFormat) * 2;
+    static size_t linelength;
+    linelength = strlen(DistractorFormat) * 2;
     for (size_t i = 0; i < linelength; ++i) {
         fputc('\b', stderr);
     }

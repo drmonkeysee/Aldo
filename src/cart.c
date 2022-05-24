@@ -51,10 +51,16 @@ static int detect_format(struct cartridge *self, FILE *f)
 static int parse_ines(struct cartridge *self, FILE *f)
 {
     unsigned char header[16];
+    size_t items_expected, items_read = 0, item_size;
 
-    fread(header, sizeof header[0], sizeof header, f);
-    if (feof(f)) return CART_ERR_EOF;
-    if (ferror(f)) return CART_ERR_IO;
+    item_size = sizeof header[0];
+    items_expected = sizeof header;
+    while (items_read < items_expected) {
+	items_read = fread(&header[item_size * items_read], item_size, items_expected, f);
+
+	if (feof(f)) return CART_ERR_EOF;
+	if (ferror(f)) return CART_ERR_IO;
+    }
 
     // NOTE: if last 4 bytes of header aren't 0 this is a very old format
     uint32_t tail;

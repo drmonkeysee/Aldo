@@ -31,10 +31,21 @@ struct ines_000_mapper {
 
 static int load_chunks(uint8_t *restrict *mem, size_t size, FILE *f)
 {
+    size_t items_expected, items_read = 0, item_size;
+
     *mem = calloc(size, sizeof **mem);
-    fread(*mem, sizeof **mem, size, f);
-    if (feof(f)) return CART_ERR_EOF;
-    if (ferror(f)) return CART_ERR_IO;
+
+    item_size = sizeof **mem;
+    items_expected = size;
+
+    while (items_read < items_expected) {
+	items_read += fread(mem[item_size * items_read], item_size,
+			    items_expected - items_read, f);
+
+	if (feof(f)) return CART_ERR_EOF;
+	if (ferror(f)) return CART_ERR_IO;
+    }
+
     return 0;
 }
 

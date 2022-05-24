@@ -36,6 +36,11 @@ SRC_CFLAGS := -pedantic
 TEST_CFLAGS := -Wno-unused-parameter -iquote$(SRC_DIR)
 SP := strip
 
+# GCC fails with decode.h zero-length format strings
+# GCC fails with dis.c notimplemented instructions having unused parameters
+# GCC fails with dis.c notimplemented instructions having unused variables
+CFLAGS += -Wno-format-zero-length -Wno-unused-parameter -Wno-unused-variable
+
 ifdef XCF
 CFLAGS += $(XCF)
 endif

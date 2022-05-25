@@ -56,7 +56,8 @@ static int parse_ines(struct cartridge *self, FILE *f)
     item_size = sizeof header[0];
     items_expected = sizeof header;
     while (items_read < items_expected) {
-	items_read = fread(&header[item_size * items_read], item_size, items_expected, f);
+	items_read = fread(&header[item_size * items_read], item_size,
+			   items_expected - items_read, f);
 
 	if (feof(f)) return CART_ERR_EOF;
 	if (ferror(f)) return CART_ERR_IO;

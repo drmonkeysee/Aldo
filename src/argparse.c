@@ -132,7 +132,7 @@ static bool parse_halt(const char *arg, int *restrict argi, int argc,
         expr = arg + 2;
     } else if (strncmp(arg, HaltLong, optlen) == 0) {
         const char *const opt = strchr(arg, '=');
-        if (opt && opt - arg == optlen) {
+        if (opt && opt - arg == (ptrdiff_t)optlen) {
             expr = opt + 1;
         }
     }
@@ -177,7 +177,7 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
     const size_t chroptlen = strlen(ChrDecodeLong);
     if (strncmp(arg, ChrDecodeLong, chroptlen) == 0) {
         const char *const opt = strchr(arg, '=');
-        if (opt && opt - arg == chroptlen) {
+        if (opt && opt - arg == (ptrdiff_t)chroptlen) {
             appstate->chrdecode_prefix = opt + 1;
         }
     }

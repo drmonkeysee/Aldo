@@ -32,6 +32,10 @@ PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) $(NESTEST_DIFF) \
 		$(TRACE_CMP) $(BCDTEST_ROM) $(TRACE_LOG) system.ram
 
 CFLAGS := -Wall -Wextra -std=c17
+ifneq ($(OS), Darwin)
+CFLAGS += -Wno-format-zero-length
+endif
+
 SRC_CFLAGS := -pedantic
 TEST_CFLAGS := -Wno-unused-parameter -iquote$(SRC_DIR)
 SP := strip

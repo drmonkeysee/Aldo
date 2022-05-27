@@ -45,12 +45,17 @@ enum PrgLine {
 struct Instruction {
     static func parse(_ instData: dis_instruction) -> Self {
         withUnsafePointer(to: instData) { p in
-            .init(mnemonic: String(cString: dis_inst_mnemonic(p)),
-                  operand: parseOperand(p))
+                .init(bytes: getBytes(p),
+                      mnemonic: String(cString: dis_inst_mnemonic(p)),
+                      operand: getOperand(p))
         }
     }
 
-    private static func parseOperand(_ p: CInstPtr)-> String {
+    private static func getBytes(_ p: CInstPtr) -> [UInt8] {
+        (0..<p.pointee.bv.size).map { i in p.pointee.bv.mem[i] }
+    }
+
+    private static func getOperand(_ p: CInstPtr)-> String {
         let buffer = CBuffer.allocate(capacity: DIS_OPERAND_SIZE)
         defer { buffer.deallocate() }
         let err = dis_inst_operand(p, buffer)
@@ -62,6 +67,7 @@ struct Instruction {
         return .init(cString: buffer)
     }
 
+    let bytes: [UInt8]
     let mnemonic: String
     let operand: String
 
@@ -73,6 +79,11 @@ struct Instruction {
     func line(addr: UInt16) -> String {
         let byteStr = "XX XX XX"
         return "\(String(format: "%04X", addr)): \(byteStr.padding(toLength: 10, withPad: " ", startingAt: 0))\(mnemonic) \(operand)"
+    }
+
+    func byte(at: Int) -> UInt8? {
+        guard 0 <= at && at < bytes.count else { return nil }
+        return bytes[at]
     }
 }
 

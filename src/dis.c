@@ -698,8 +698,8 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
          bv.mem;
          bv = cart_prgbank(cart, bv.bank + 1)) {
         fputc('\n', f);
-        const int err = print_prgbank(&bv, appstate->verbose, f);
-        if (err < 0) return err;
+        // NOTE: ignore return value, doesn't matter for printing next bank
+        print_prgbank(&bv, appstate->verbose, f);
     }
     return 0;
 }

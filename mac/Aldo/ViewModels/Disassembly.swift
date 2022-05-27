@@ -56,8 +56,8 @@ struct Instruction {
             defer { buffer.deallocate() }
             let err = dis_inst_operand(p, buffer)
             if err < 0 {
-                logFailure("Operand Parse Error",
-                           AldoError.wrapDisError(code: err).message)
+                aldoLog("Operand Parse Error",
+                        AldoError.wrapDisError(code: err).message)
                 return "ERR"
             }
             return .init(cString: buffer)
@@ -76,12 +76,6 @@ struct Instruction {
 }
 
 fileprivate func prgBanks(_ cart: Cart) -> Int { cart.info.prgBanks }
-
-fileprivate func logFailure(_ items: String...) {
-    #if DEBUG
-    print(items)
-    #endif
-}
 
 fileprivate actor PrgStore {
     let cart: Cart

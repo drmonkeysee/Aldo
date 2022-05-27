@@ -40,3 +40,9 @@ enum AldoError: Error {
         }
     }
 }
+
+func aldoLog(_ items: Any...) {
+    #if DEBUG
+    debugPrint(items, separator: ":")
+    #endif
+}

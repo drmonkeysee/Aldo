@@ -43,26 +43,27 @@ enum PrgLine {
 }
 
 struct Instruction {
-    let mnemonic: String
-    let operand: String
-
-    init(_ instData: dis_instruction) {
-        mnemonic = withUnsafePointer(to: instData) { p in
-            .init(cString: dis_inst_mnemonic(p))
-        }
-        operand = withUnsafePointer(to: instData) { p in
-            let buffer = UnsafeMutablePointer<CChar>.allocate(
-                capacity: DIS_OPERAND_SIZE)
-            defer { buffer.deallocate() }
-            let err = dis_inst_operand(p, buffer)
-            if err < 0 {
-                aldoLog("Operand Parse Error",
-                        AldoError.wrapDisError(code: err).message)
-                return "ERR"
-            }
-            return .init(cString: buffer)
+    static func parse(_ instData: dis_instruction) -> Self {
+        withUnsafePointer(to: instData) { p in
+            .init(mnemonic: String(cString: dis_inst_mnemonic(p)),
+                  operand: parseOperand(p))
         }
     }
+
+    private static func parseOperand(_ p: CInstPtr)-> String {
+        let buffer = CBuffer.allocate(capacity: DIS_OPERAND_SIZE)
+        defer { buffer.deallocate() }
+        let err = dis_inst_operand(p, buffer)
+        if err < 0 {
+            aldoLog("Operand Parse Error",
+                    AldoError.wrapDisError(code: err).message)
+            return "ERR"
+        }
+        return .init(cString: buffer)
+    }
+
+    let mnemonic: String
+    let operand: String
 
     var name: String { "Jump" }
     var addressMode: String { "Absolute Indirect" }
@@ -131,6 +132,6 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
             parseErr = true
             return .failure(addr, .wrapDisError(code: err))
         }
-        return .disassembled(addr, .init(inst))
+        return .disassembled(addr, .parse(inst))
     }
 }

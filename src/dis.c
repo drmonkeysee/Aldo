@@ -197,16 +197,14 @@ static int print_prgbank(const struct bankview *bv, bool verbose, FILE *f)
         print_prg_line(dis, curr_bytes, inst.bankoffset, bv->size, &repeat, f);
         addr += inst.bv.size;
     }
+    if (result < 0) return result;
 
-    if (result < 0) {
-        fprintf(stderr, "%04X: Dis err (%d): %s\n", addr, result,
-                dis_errstr(result));
-    } else if (repeat.state == DUP_TRUNCATE || repeat.state == DUP_SKIP) {
     // NOTE: always print the last line regardless of duplicate state
     // (if it hasn't already been printed).
+    if (repeat.state == DUP_TRUNCATE || repeat.state == DUP_SKIP) {
         fprintf(f, "%s\n", dis);
     }
-    return result;
+    return 0;
 }
 
 // NOTE: CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is an 8x8
@@ -698,8 +696,10 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
          bv.mem;
          bv = cart_prgbank(cart, bv.bank + 1)) {
         fputc('\n', f);
-        // NOTE: ignore return value, doesn't matter for printing next bank
-        print_prgbank(&bv, appstate->verbose, f);
+        const int err = print_prgbank(&bv, appstate->verbose, f);
+        if (err < 0) {
+            fprintf(stderr, "Dis err (%d): %s\n", err, dis_errstr(err));
+        }
     }
     return 0;
 }
@@ -731,7 +731,9 @@ int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output)
     do {
         const int err = write_chrbank(&bv, appstate->chrscale,
                                       appstate->chrdecode_prefix, output);
-        if (err < 0) return err;
+        if (err < 0) {
+            fprintf(stderr, "Chr err (%d): %s\n", err, dis_errstr(err));
+        }
         bv = cart_chrbank(cart, bv.bank + 1);
     } while (bv.mem);
 

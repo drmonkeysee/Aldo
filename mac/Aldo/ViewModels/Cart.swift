@@ -48,8 +48,10 @@ final class Cart: ObservableObject {
         guard let h = handle else { return .error(.ioError("No cart set")) }
 
         return await readCStream(binary: true) { stream in
-            var bankview = cart_chrbank(h.unwrapped, bank)
-            let err = dis_cart_chrbank(&bankview, Int32(scale), stream)
+            let bankview = cart_chrbank(h.unwrapped, bank)
+            let err = withUnsafePointer(to: bankview) { p in
+                dis_cart_chrbank(p, Int32(scale), stream)
+            }
             if err < 0 { throw AldoError.wrapDisError(code: err) }
         }
     }

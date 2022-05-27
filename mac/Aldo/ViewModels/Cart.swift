@@ -23,8 +23,8 @@ final class Cart: ObservableObject {
             currentError = .ioError("No file selected")
             return false
         }
-        handle = loadCart(filePath)
-        guard let h = handle else { return false }
+        guard let h = loadCart(filePath) else { return false }
+        handle = h
         file = filePath
         info = h.cartInfo
         resetCaches()

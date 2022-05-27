@@ -89,25 +89,31 @@ fileprivate actor PrgStore {
 
 fileprivate struct PrgLines: Sequence, IteratorProtocol {
     let bv: bankview
+    private var addr: UInt16
     private var cursor = 0
     private var parseErr = false
 
     init?(_ prgbank: bankview?) {
         guard let pb = prgbank else { return nil }
         bv = pb
+        // NOTE: by convention, count backwards from CPU vector locations
+        addr = UInt16(MEMBLOCK_64KB - bv.size)
     }
 
     mutating func next() -> PrgLine? {
         if parseErr { return nil }
 
-        // NOTE: by convention, count backwards from CPU vector locations
-        let addr = UInt16(MEMBLOCK_64KB - bv.size + cursor);
         var inst = dis_instruction()
         let err = withUnsafePointer(to: bv) { p in
             dis_parse_inst(p, cursor, &inst)
         }
 
-        defer { cursor += inst.bv.size }
+        defer {
+            if err > 0 {
+                cursor += inst.bv.size
+                addr &+= UInt16(inst.bv.size)
+            }
+        }
         if err == 0 { return nil }
         if err < 0 {
             parseErr = true

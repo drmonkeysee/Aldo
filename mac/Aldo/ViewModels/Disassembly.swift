@@ -55,8 +55,8 @@ struct Instruction {
         defer { buffer.deallocate() }
         let err = dis_inst_operand(p, buffer)
         if err < 0 {
-            aldoLog("Operand Parse Error",
-                    AldoError.wrapDisError(code: err).message)
+            let msg = AldoError.wrapDisError(code: err).message
+            aldoLog.debug("Operand Parse Error: \(msg)")
             return "ERR"
         }
         return .init(cString: buffer)

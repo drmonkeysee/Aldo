@@ -5,7 +5,9 @@
 //  Created by Brandon Stansbury on 4/10/22.
 //
 
-import Foundation
+import os
+
+let aldoLog = Logger()
 
 enum AldoError: Error {
     private static let errCodeFormat = "%s (%d)"
@@ -39,10 +41,4 @@ enum AldoError: Error {
             return msg
         }
     }
-}
-
-func aldoLog(_ items: Any...) {
-    #if DEBUG
-    debugPrint(items, separator: ":")
-    #endif
 }

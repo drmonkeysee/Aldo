@@ -62,12 +62,13 @@ fileprivate actor ChrStore {
                 cache[bank] = img
                 return .loaded(img)
             }
-            aldoLog("CHR Decode Failure", chrSheet == nil
-                                            ? "Image init failed"
-                                            : "Image data invalid")
+            let reason = chrSheet == nil
+                            ? "Image init failed"
+                            : "Image data invalid"
+            aldoLog.debug("CHR Decode Failure: \(reason)")
             return .failed
         case let .error(err):
-            aldoLog("CHR Read Failure", err.message)
+            aldoLog.debug("CHR Read Failure: \(err.message)")
             return .failed
         }
     }

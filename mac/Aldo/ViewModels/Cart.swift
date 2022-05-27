@@ -5,9 +5,11 @@
 //  Created by Brandon Stansbury on 3/12/22.
 //
 
-import Foundation
+import Cocoa
 
 final class Cart: ObservableObject {
+    let prgCache = BankCache<[PrgLine]>()
+    let chrCache = BankCache<NSImage>()
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
     private(set) var currentError: AldoError?
@@ -25,6 +27,7 @@ final class Cart: ObservableObject {
         guard let h = handle else { return false }
         file = filePath
         info = h.cartInfo
+        resetCaches()
         return true
     }
 
@@ -61,6 +64,11 @@ final class Cart: ObservableObject {
             currentError = .systemError(error.localizedDescription)
         }
         return nil
+    }
+
+    private func resetCaches() {
+        prgCache.reset()
+        chrCache.reset()
     }
 }
 
@@ -107,9 +115,7 @@ enum BankLoadStatus<T> {
 }
 
 final class BankCache<T> {
-    private var items: [T?]
-
-    init(slots: Int) { items = .init(repeating: nil, count: slots) }
+    private var items = [T?]()
 
     subscript(index: Int) -> T? {
         get {
@@ -120,6 +126,13 @@ final class BankCache<T> {
             if validIndex(index), let val = newValue { items[index] = val }
         }
     }
+
+    func ensure(slots: Int) {
+        guard items.isEmpty else { return }
+        items = .init(repeating: nil, count: slots)
+    }
+
+    func reset() { items = [] }
 
     private func validIndex(_ index: Int) -> Bool {
         items.startIndex <= index && index < items.endIndex

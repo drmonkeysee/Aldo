@@ -15,7 +15,7 @@ final class ChrBanks {
 
     init(_ cart: Cart) {
         self.cart = cart
-        store = .init(cart, bankCount: chrBanks(cart))
+        store = .init(cart)
     }
 
     func sheet(at bank: Int) -> ChrSheet { .init(store, bank: bank) }
@@ -39,16 +39,16 @@ final class ChrSheet: ObservableObject {
     }
 }
 
-// NOTE: standalone func to share between initializer and computed property
 fileprivate func chrBanks(_ cart: Cart) -> Int { cart.info.chrBanks }
 
 fileprivate actor ChrStore {
     let cart: Cart
-    private let cache: BankCache<NSImage>
+    let cache: BankCache<NSImage>
 
-    init(_ cart: Cart, bankCount: Int) {
+    init(_ cart: Cart) {
         self.cart = cart
-        cache = .init(slots: bankCount)
+        cache = cart.chrCache
+        cache.ensure(slots: chrBanks(cart))
     }
 
     func fetch(bank: Int, scale: Int) async -> BankLoadStatus<NSImage> {

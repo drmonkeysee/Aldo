@@ -17,7 +17,7 @@ final class ProgramBanks: ObservableObject {
 
     init(_ cart: Cart) {
         self.cart = cart
-        store = .init(cart, bankCount: prgBanks(cart))
+        store = .init(cart)
     }
 }
 
@@ -63,16 +63,16 @@ struct Instruction {
     }
 }
 
-// NOTE: standalone func to share between initializer and computed property
 fileprivate func prgBanks(_ cart: Cart) -> Int { cart.info.prgBanks }
 
 fileprivate actor PrgStore {
     let cart: Cart
-    private let cache: BankCache<[PrgLine]>
+    let cache: BankCache<[PrgLine]>
 
-    init(_ cart: Cart, bankCount: Int) {
+    init(_ cart: Cart) {
         self.cart = cart
-        cache = .init(slots: bankCount)
+        cache = cart.prgCache
+        cache.ensure(slots: prgBanks(cart))
     }
 
     func fetch(bank: Int) -> BankLoadStatus<[PrgLine]> {

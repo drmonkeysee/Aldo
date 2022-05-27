@@ -31,7 +31,8 @@ The Homebrew and ncurses steps get you the latest version of ncurses and are opt
 The Makefile also provides a verification target.
 
 1. Follow the [CinyTest build/install instructions](https://github.com/drmonkeysee/CinyTest#build-cinytest)
-2. `make check`
+2. Install [Python3](https://www.python.org) (for bcdtest)
+3. `make check`
 
 The verification target is made up of these test targets:
 

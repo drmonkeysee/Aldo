@@ -44,14 +44,26 @@ enum PrgLine {
 
 struct Instruction {
     let mnemonic: String
+    let operand: String
 
     init(_ instData: dis_instruction) {
         mnemonic = withUnsafePointer(to: instData) { p in
             .init(cString: dis_inst_mnemonic(p))
         }
+        operand = withUnsafePointer(to: instData) { p in
+            let buffer = UnsafeMutablePointer<CChar>.allocate(
+                capacity: DIS_OPERAND_SIZE)
+            defer { buffer.deallocate() }
+            let err = dis_inst_operand(p, buffer)
+            if err < 0 {
+                logFailure("Operand Parse Error",
+                           AldoError.wrapDisError(code: err).message)
+                return "ERR"
+            }
+            return .init(cString: buffer)
+        }
     }
 
-    var operand: String { "$(8134)" }
     var name: String { "Jump" }
     var addressMode: String { "Absolute Indirect" }
     var description: String { "Unconditional jump to an address" }
@@ -64,6 +76,12 @@ struct Instruction {
 }
 
 fileprivate func prgBanks(_ cart: Cart) -> Int { cart.info.prgBanks }
+
+fileprivate func logFailure(_ items: String...) {
+    #if DEBUG
+    print(items)
+    #endif
+}
 
 fileprivate actor PrgStore {
     let cart: Cart

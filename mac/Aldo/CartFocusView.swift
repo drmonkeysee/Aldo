@@ -43,7 +43,7 @@ fileprivate struct InstructionDetailsView: View {
             }
             Spacer()
             VStack {
-                Text("--").font(.title)
+                Text(instruction?.operand ?? "--").font(.title)
                 Text("")
             }
         }

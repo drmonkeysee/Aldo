@@ -11,7 +11,7 @@ struct CartPrgView: View {
     @EnvironmentObject var cart: Cart
 
     var body: some View {
-        NavigationView {
+        HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .leading) {
                 if cart.info.prgBanks > 0 {
                     ProgramView(banks: ProgramBanks(cart))
@@ -23,6 +23,7 @@ struct CartPrgView: View {
             }
             .frame(width: 255)
             .padding(5)
+            Divider()
             PrgDetailView()
         }
     }
@@ -55,20 +56,17 @@ fileprivate struct ProgramListingView: View {
         case .pending:
             PendingPrgView(listing: listing)
         case let .loaded(prg):
-            List(0..<prg.count, id: \.self) { i in
+            List(0..<prg.count, id: \.self,
+                 selection: $listing.selectedLine) { i in
                 let line = prg[i]
                 switch line {
                 case let .disassembled(addr, inst):
-                    NavigationLink(tag: i, selection: $listing.selectedLine) {
-                        PrgDetailView(inst)
-                    } label: {
-                        Text(inst.line(addr: addr))
-                            .font(.system(.body, design: .monospaced))
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 2)
-                    .background(
-                        InstructionBackground(unofficial: inst.unofficial))
+                    Text(inst.line(addr: addr))
+                        .font(.system(.body, design: .monospaced))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 2)
+                        .background(
+                            InstructionBackground(unofficial: inst.unofficial))
                 default:
                     // TODO: handle all PrgLine types
                     Text("No inst")

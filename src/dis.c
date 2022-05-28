@@ -23,29 +23,41 @@ static const char *const restrict Mnemonics[] = {
 };
 
 static const int InstLens[] = {
-#define X(s, b, p, ...) b,
+#define X(s, b, n, p, ...) b,
+    DEC_ADDRMODE_X
+#undef X
+};
+
+static const char *const restrict ModeNames[] = {
+#define X(s, b, n, p, ...) n,
     DEC_ADDRMODE_X
 #undef X
 };
 
 #define STRTABLE(s) s##_StringTable
 
-#define X(s, b, p, ...) static const char *const restrict STRTABLE(s)[] = { \
+#define X(s, b, n, p, ...) static const char *const restrict STRTABLE(s)[] = { \
     __VA_ARGS__ \
 };
     DEC_ADDRMODE_X
 #undef X
 
 static const char *const restrict *const StringTables[] = {
-#define X(s, b, p, ...) STRTABLE(s),
+#define X(s, b, n, p, ...) STRTABLE(s),
     DEC_ADDRMODE_X
 #undef X
 };
 
 static const char *mnemonic(enum inst in)
 {
-    static const size_t mnem_sz = sizeof Mnemonics / sizeof Mnemonics[0];
-    return 0 <= in && in < mnem_sz ? Mnemonics[in] : Mnemonics[IN_UDF];
+    static const size_t sz = sizeof Mnemonics / sizeof Mnemonics[0];
+    return 0 <= in && in < sz ? Mnemonics[in] : Mnemonics[IN_UDF];
+}
+
+static const char *modename(enum addrmode am)
+{
+    static const size_t sz = sizeof ModeNames / sizeof ModeNames[0];
+    return 0 <= am && am < sz ? ModeNames[am] : ModeNames[AM_IMP];
 }
 
 static const char *interrupt_display(const struct console_state *snapshot)
@@ -525,8 +537,7 @@ const char *dis_inst_addrmode(const struct dis_instruction *inst)
 {
     assert(inst != NULL);
 
-    int notimplemented;
-    return NULL;
+    return modename(inst->d.mode);
 }
 
 uint8_t dis_inst_flags(const struct dis_instruction *inst)
@@ -615,7 +626,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
         cpu_peek_end(cpu, peekctx);
         switch (peek.mode) {
 #define XPEEK(...) sprintf(dis, __VA_ARGS__)
-#define X(s, b, p, ...) case AM_ENUM(s): total = p; break;
+#define X(s, b, n, p, ...) case AM_ENUM(s): total = p; break;
             DEC_ADDRMODE_X
 #undef X
 #undef XPEEK

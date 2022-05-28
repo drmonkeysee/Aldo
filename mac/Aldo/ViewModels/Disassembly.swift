@@ -45,8 +45,9 @@ enum PrgLine {
 struct Instruction {
     static func parse(_ instData: dis_instruction) -> Self {
         withUnsafePointer(to: instData) { p in
-                .init(bytes: getBytes(p),
-                      mnemonic: String(cString: dis_inst_mnemonic(p)),
+                .init(addressMode: .init(cString: dis_inst_addrmode(p)),
+                      bytes: getBytes(p),
+                      mnemonic: .init(cString: dis_inst_mnemonic(p)),
                       operand: getOperand(p),
                       unofficial: p.pointee.d.unofficial)
         }
@@ -68,13 +69,13 @@ struct Instruction {
         return .init(cString: buffer)
     }
 
+    let addressMode: String
     let bytes: [UInt8]
     let mnemonic: String
     let operand: String
     let unofficial: Bool
 
     var name: String { "Jump" }
-    var addressMode: String { "Absolute Indirect" }
     var description: String { "Unconditional jump to an address" }
     var flags: UInt8 { 0x34 }
 

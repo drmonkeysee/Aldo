@@ -54,7 +54,7 @@ fileprivate struct InstructionDetailsView: View {
         HStack {
             Text("--")
             Spacer()
-            Text("--")
+            Text(instruction?.addressMode ?? "--")
         }
         .font(.footnote)
         Divider()

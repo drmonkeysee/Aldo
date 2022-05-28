@@ -319,6 +319,37 @@ static void mnemonic_invalid(void *ctx)
 }
 
 //
+// Address Mode Names
+//
+
+static void modename_valid(void *ctx)
+{
+    const struct dis_instruction inst = {.d = {IN_ADC, AM_ZP, false}};
+
+    const char *const result = dis_inst_addrmode(&inst);
+
+    ct_assertequalstr("Zero-Page", result);
+}
+
+static void modename_unofficial(void *ctx)
+{
+    const struct dis_instruction inst = {.d = {IN_ADC, AM_JAM, true}};
+
+    const char *const result = dis_inst_addrmode(&inst);
+
+    ct_assertequalstr("Implied", result);
+}
+
+static void modename_invalid(void *ctx)
+{
+    const struct dis_instruction inst = {.d = {IN_ADC, -4, false}};
+
+    const char *const result = dis_inst_addrmode(&inst);
+
+    ct_assertequalstr("Implied", result);
+}
+
+//
 // Instruction Operand
 //
 
@@ -2498,6 +2529,10 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(mnemonic_valid),
         ct_maketest(mnemonic_unofficial),
         ct_maketest(mnemonic_invalid),
+
+        ct_maketest(modename_valid),
+        ct_maketest(modename_unofficial),
+        ct_maketest(modename_invalid),
 
         ct_maketest(inst_operand_empty_instruction),
         ct_maketest(inst_operand_no_operand),

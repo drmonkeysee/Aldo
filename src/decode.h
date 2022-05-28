@@ -116,76 +116,76 @@ X(TAS, self, dec)   /* Load logical AND accumulator and x-index into
                        x-index and ADDR_HI + 1 */
 
 // Addressing Modes
-// X(symbol, byte count, peek template, display strings...)
+// X(symbol, byte count, name, peek template, display strings...)
 #define DEC_ADDRMODE_X \
-X(IMP, 1,                                       /* Implied */ \
+X(IMP, 1, "Implied",                            /* Implied */ \
   XPEEK(""), \
   "imp", "") \
-X(IMM, 2,                                       /* Immediate */ \
+X(IMM, 2, "Immediate",                          /* Immediate */ \
   XPEEK(""), \
   "imm", "#$%02X") \
-X(ZP, 2,                                        /* Zero-Page */ \
+X(ZP, 2, "Zero-Page",                           /* Zero-Page */ \
   XPEEK("= %02X", peek.data), \
   "zp", "$%02X") \
-X(ZPX, 2,                                       /* Zero-Page,X */ \
+X(ZPX, 2, "Zero-Page,X",                        /* Zero-Page,X */ \
   XPEEK("@ %02X = %02X", peek.finaladdr, peek.data), \
   "zp,X", "$%02X,X") \
-X(ZPY, 2,                                       /* Zero-Page,Y */ \
+X(ZPY, 2, "Zero-Page,Y",                        /* Zero-Page,Y */ \
   XPEEK("@ %02X = %02X", peek.finaladdr, peek.data), \
   "zp,Y", "$%02X,Y") \
-X(INDX, 2,                                      /* (Indirect,X) */ \
+X(INDX, 2, "(Indirect,X)",                      /* (Indirect,X) */ \
   XPEEK("@ %02X > %04X = %02X", peek.interaddr, peek.finaladdr, peek.data), \
   "(zp,X)", "($%02X,X)") \
-X(INDY, 2,                                      /* (Indirect),Y */ \
+X(INDY, 2, "(Indirect),Y",                      /* (Indirect),Y */ \
   XPEEK("> %04X @ %04X = %02X", peek.interaddr, peek.finaladdr, peek.data), \
   "(zp),Y", "($%02X),Y") \
-X(ABS, 3,                                       /* Absolute */ \
+X(ABS, 3, "Absolute",                           /* Absolute */ \
   XPEEK("= %02X", peek.data), \
   "abs", "$??%02X", "$%04X") \
-X(ABSX, 3,                                      /* Absolute,X */ \
+X(ABSX, 3, "Absolute,X",                        /* Absolute,X */ \
   XPEEK("@ %04X = %02X", peek.finaladdr, peek.data), \
   "abs,X", "$??%02X,X", "$%04X,X") \
-X(ABSY, 3,                                      /* Absolute,Y */ \
+X(ABSY, 3, "Absolute,Y",                        /* Absolute,Y */ \
   XPEEK("@ %04X = %02X", peek.finaladdr, peek.data), \
   "abs,Y", "$??%02X,Y", "$%04X,Y") \
 \
 /* Stack */ \
-X(PSH, 1,                                       /* Push */ \
+X(PSH, 1, "Implied",                            /* Push */ \
   XPEEK(""), \
   "imp", "") \
-X(PLL, 1,                                       /* Pull */ \
+X(PLL, 1, "Implied",                            /* Pull */ \
   XPEEK(""), \
   "imp", "") \
 \
 /* Branch */ \
-X(BCH, 2,                                       /* Relative branch */ \
+X(BCH, 2, "Relative",                           /* Relative branch */ \
   XPEEK("@ %04X", peek.finaladdr), \
   "rel", "%+hhd") \
 \
 /* Jumps */ \
-X(JSR, 3,                                       /* Jump to subroutine, */ \
+X(JSR, 3, "Absolute",                           /* Jump to subroutine, */ \
   XPEEK(""), \
   "abs", "$??%02X", "$%04X") \
-X(RTS, 1,                                       /* Return from subroutine */ \
+X(RTS, 1, "Implied",                            /* Return from subroutine */ \
   XPEEK(""), \
   "imp", "") \
-X(JABS, 3,                                      /* Absolute jump */ \
+X(JABS, 3, "Absolute",                          /* Absolute jump */ \
   XPEEK(""), \
   "abs", "$??%02X", "$%04X") \
-X(JIND, 3,                                      /* Indirect jump */ \
+X(JIND, 3, "Indirect",                          /* Indirect jump */ \
   XPEEK("> %04X", peek.finaladdr), \
   "(abs)", "($??%02X)", "($%04X)") \
 \
 /* Interrupts */ \
-X(BRK, 1,                                       /* Break, interrupt, reset */ \
+X(BRK, 1, "Implied",                            /* Break, interrupt, reset */ \
   XPEEK(""), \
   "imp", "%s") \
-X(RTI, 1,                                       /* Return from interrupt */ \
+X(RTI, 1, "Implied",                            /* Return from interrupt */ \
   XPEEK(""), \
   "imp", "") \
 \
 /* Unofficial Modes */ \
-X(JAM, 1,                                       /* Jammed instruction */ \
+X(JAM, 1, "Implied",                            /* Jammed instruction */ \
   XPEEK(""), \
   "imp", "")
 

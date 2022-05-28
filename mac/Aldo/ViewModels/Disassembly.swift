@@ -47,7 +47,8 @@ struct Instruction {
         withUnsafePointer(to: instData) { p in
                 .init(bytes: getBytes(p),
                       mnemonic: String(cString: dis_inst_mnemonic(p)),
-                      operand: getOperand(p))
+                      operand: getOperand(p),
+                      unofficial: p.pointee.d.unofficial)
         }
     }
 
@@ -70,6 +71,7 @@ struct Instruction {
     let bytes: [UInt8]
     let mnemonic: String
     let operand: String
+    let unofficial: Bool
 
     var name: String { "Jump" }
     var addressMode: String { "Absolute Indirect" }
@@ -77,8 +79,12 @@ struct Instruction {
     var flags: UInt8 { 0x34 }
 
     func line(addr: UInt16) -> String {
-        let byteStr = "XX XX XX"
-        return "\(String(format: "%04X", addr)): \(byteStr.padding(toLength: 10, withPad: " ", startingAt: 0))\(mnemonic) \(operand)"
+        let addrStr = String(format: "%04X", addr)
+        let byteStr = bytes
+                        .map { b in String(format: "%02X", b) }
+                        .joined(separator: " ")
+                        .padding(toLength: 10, withPad: " ", startingAt: 0)
+        return "\(addrStr): \(byteStr)\(mnemonic) \(operand)"
     }
 
     func byte(at: Int) -> UInt8? {

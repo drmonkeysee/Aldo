@@ -21,7 +21,7 @@ struct CartPrgView: View {
                     NoPrgView(reason: "No PRG ROM Available")
                 }
             }
-            .frame(width: 250)
+            .frame(width: 255)
             .padding(5)
             PrgDetailView()
         }
@@ -65,6 +65,10 @@ fileprivate struct ProgramListingView: View {
                         Text(inst.line(addr: addr))
                             .font(.system(.body, design: .monospaced))
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 2)
+                    .background(
+                        InstructionBackground(unofficial: inst.unofficial))
                 default:
                     // TODO: handle all PrgLine types
                     Text("No inst")
@@ -73,6 +77,18 @@ fileprivate struct ProgramListingView: View {
             .cornerRadius(5)
         case .failed:
             NoPrgView(reason: "PRG Bank Not Available")
+        }
+    }
+}
+
+fileprivate struct InstructionBackground: View {
+    let unofficial: Bool
+
+    var body: some View {
+        if unofficial {
+            RoundedRectangle(cornerRadius: 5)
+                .fill(.red)
+                .opacity(0.3)
         }
     }
 }

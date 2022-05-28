@@ -39,12 +39,15 @@ fileprivate struct InstructionDetailsView: View {
         HStack {
             VStack {
                 Text(instruction?.mnemonic ?? "--").font(.title)
-                Text("")
+                Text(displayByte(instruction?.byte(at: 0)))
             }
             Spacer()
             VStack {
                 Text(instruction?.operand ?? "--").font(.title)
-                Text("")
+                Text("""
+                     \(displayByte(instruction?.byte(at: 1))) \
+                     \(displayByte(instruction?.byte(at: 2)))
+                     """)
             }
         }
         Divider()
@@ -67,6 +70,11 @@ fileprivate struct InstructionDetailsView: View {
             Image(systemName: "c.circle")
         }
         .imageScale(.large)
+    }
+
+    private func displayByte(_ byte: UInt8?) -> String {
+        if let b = byte { return .init(format: "(%02X)", b) }
+        return ""
     }
 }
 

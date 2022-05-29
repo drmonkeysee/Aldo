@@ -29,11 +29,6 @@ enum nistate {
     NIS_SERVICED,
 };
 
-struct bankview {
-    size_t bank, size;
-    const uint8_t *mem; // Non-owning Pointer
-};
-
 struct console_state {
     struct {
         const struct cartinfo *info;    // Non-owning Pointer

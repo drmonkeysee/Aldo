@@ -92,7 +92,7 @@ fileprivate struct LoadedPrgView: View {
             let line = prgLines[i]
             switch line {
             case let .disassembled(addr, inst):
-                Text(inst.line(addr: addr))
+                Text(inst.displayLine(addr: addr))
                     .font(.system(.body, design: .monospaced))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 2)

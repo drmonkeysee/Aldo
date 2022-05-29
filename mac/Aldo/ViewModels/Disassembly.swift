@@ -86,13 +86,13 @@ struct Instruction {
     var description: String { "Unconditional jump to an address" }
     var flags: UInt8 { 0x34 }
 
-    func line(addr: UInt16) -> String {
+    func displayLine(addr: UInt16) -> String {
         let addrStr = String(format: "%04X", addr)
         let byteStr = bytes
                         .map { b in String(format: "%02X", b) }
                         .joined(separator: " ")
-                        .padding(toLength: 10, withPad: " ", startingAt: 0)
-        return "\(addrStr): \(byteStr)\(mnemonic) \(operand)"
+                        .padding(toLength: 9, withPad: " ", startingAt: 0)
+        return "\(addrStr): \(byteStr) \(mnemonic) \(operand)"
     }
 
     func byte(at: Int) -> UInt8? {

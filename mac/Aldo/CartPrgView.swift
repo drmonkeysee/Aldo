@@ -11,10 +11,19 @@ struct CartPrgView: View {
     @EnvironmentObject var cart: Cart
 
     var body: some View {
+        ProgramView(banks: ProgramBanks(cart))
+    }
+}
+
+fileprivate struct ProgramView: View {
+    @ObservedObject var banks: ProgramBanks
+
+    var body: some View {
         HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .leading) {
-                if cart.info.prgBanks > 0 {
-                    ProgramView(banks: ProgramBanks(cart))
+                if banks.cart.info.prgBanks > 0 {
+                    BankSelectionView(banks: banks)
+                    ProgramListingView()
                 } else {
                     prgLabel()
                         .padding(.top, 2)
@@ -26,10 +35,11 @@ struct CartPrgView: View {
             Divider()
             PrgDetailView()
         }
+        .environmentObject(banks.currentListing)
     }
 }
 
-fileprivate struct ProgramView: View {
+fileprivate struct BankSelectionView: View {
     @ObservedObject var banks: ProgramBanks
 
     var body: some View {
@@ -44,49 +54,20 @@ fileprivate struct ProgramView: View {
             // TODO: make this work with prg bank
             CopyInfoToClipboardView(cart: banks.cart)
         }
-        ProgramListingView(listing: banks.currentListing)
     }
 }
 
 fileprivate struct ProgramListingView: View {
-    @ObservedObject var listing: ProgramListing
+    @EnvironmentObject var listing: ProgramListing
 
     var body: some View {
         switch listing.status {
         case .pending:
             PendingPrgView(listing: listing)
         case let .loaded(prg):
-            List(0..<prg.count, id: \.self,
-                 selection: $listing.selectedLine) { i in
-                let line = prg[i]
-                switch line {
-                case let .disassembled(addr, inst):
-                    Text(inst.line(addr: addr))
-                        .font(.system(.body, design: .monospaced))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 2)
-                        .background(
-                            InstructionBackground(unofficial: inst.unofficial))
-                default:
-                    // TODO: handle all PrgLine types
-                    Text("No inst")
-                }
-            }
-            .cornerRadius(5)
+            LoadedPrgView(prgLines: prg)
         case .failed:
             NoPrgView(reason: "PRG Bank Not Available")
-        }
-    }
-}
-
-fileprivate struct InstructionBackground: View {
-    let unofficial: Bool
-
-    var body: some View {
-        if unofficial {
-            RoundedRectangle(cornerRadius: 5)
-                .fill(.red)
-                .opacity(0.3)
         }
     }
 }
@@ -97,6 +78,31 @@ fileprivate struct PendingPrgView: View {
     var body: some View {
         NoPrgView(reason: "Loading PRG Bank...")
             .task { await listing.load() }
+    }
+}
+
+fileprivate struct LoadedPrgView: View {
+    let prgLines: [PrgLine]
+    @EnvironmentObject var listing: ProgramListing
+
+    var body: some View {
+        List(0..<prgLines.count, id: \.self,
+             selection: $listing.selectedLine) { i in
+            let line = prgLines[i]
+            switch line {
+            case let .disassembled(addr, inst):
+                Text(inst.line(addr: addr))
+                    .font(.system(.body, design: .monospaced))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 2)
+                    .background(
+                        InstructionBackground(unofficial: inst.unofficial))
+            default:
+                // TODO: handle all PrgLine types
+                Text("No inst")
+            }
+        }
+        .cornerRadius(5)
     }
 }
 
@@ -112,14 +118,32 @@ fileprivate struct NoPrgView: View {
 }
 
 fileprivate struct PrgDetailView: View {
-    let instruction: Instruction?
-
-    init(_ instruction: Instruction? = nil) { self.instruction = instruction }
+    @EnvironmentObject var listing: ProgramListing
 
     var body: some View {
-        CartFocusView(instruction: instruction)
+        CartFocusView(instruction: currentInstruction)
             .frame(maxHeight: .infinity, alignment: .top)
             .padding(5)
+    }
+
+    private var currentInstruction: Instruction? {
+        if let line = listing.currentLine,
+           case .disassembled(_, let inst) = line {
+            return inst
+        }
+        return nil
+    }
+}
+
+fileprivate struct InstructionBackground: View {
+    let unofficial: Bool
+
+    var body: some View {
+        if unofficial {
+            RoundedRectangle(cornerRadius: 5)
+                .fill(.red)
+                .opacity(0.3)
+        }
     }
 }
 

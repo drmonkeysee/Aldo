@@ -27,6 +27,13 @@ final class ProgramListing: ObservableObject {
     @Published private(set) var status = BankLoadStatus<[PrgLine]>.pending
     private let store: PrgStore
 
+    var currentLine: PrgLine? {
+        if let line = selectedLine, let bank = store.cache[bank] {
+            return bank[line]
+        }
+        return nil
+    }
+
     fileprivate init(_ store: PrgStore, bank: Int) {
         self.store = store
         self.bank = bank

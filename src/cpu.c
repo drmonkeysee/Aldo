@@ -1105,7 +1105,7 @@ static void TAS_exec(struct mos6502 *self, struct decoded dec)
 static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 {
     switch (dec.instruction) {
-#define X(s, ...) case IN_ENUM(s): s##_exec(__VA_ARGS__); break;
+#define X(s, d, f, ...) case IN_ENUM(s): s##_exec(__VA_ARGS__); break;
         DEC_INST_X
 #undef X
     default:

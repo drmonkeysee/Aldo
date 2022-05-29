@@ -46,7 +46,7 @@ fileprivate struct InstructionDetailsView: View {
         }
         Divider()
         HStack {
-            Text(inst?.name ?? "--")
+            Text(inst?.description ?? "--")
             Spacer()
             Text(inst?.addressMode ?? "--")
         }

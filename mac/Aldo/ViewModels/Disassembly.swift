@@ -55,7 +55,7 @@ struct Instruction {
                 .init(addressMode: .init(cString: dis_inst_addrmode(p)),
                       bytes: getBytes(p),
                       mnemonic: .init(cString: dis_inst_mnemonic(p)),
-                      name: "Operand Name",
+                      description: "Operand description",
                       operand: getOperand(p),
                       unofficial: p.pointee.d.unofficial,
                       flags: CpuFlags(0))
@@ -81,7 +81,7 @@ struct Instruction {
     let addressMode: String
     let bytes: [UInt8]
     let mnemonic: String
-    let name: String
+    let description: String
     let operand: String
     let unofficial: Bool
     let flags: CpuFlags

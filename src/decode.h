@@ -11,109 +11,210 @@
 #include <stdbool.h>
 
 // 6502 Instructions
-// X(symbol, instruction dispatch arguments...)
+// X(symbol, description, affected flags, instruction dispatch arguments...)
 #define DEC_INST_X \
-X(UDF, self)        /* Undefined */ \
+X(UDF, "Undefined",                 /* Undefined */ \
+  0x00, self) \
 \
-X(ADC, self, dec)   /* Add with carry */ \
-X(AND, self, dec)   /* Logical AND */ \
-X(ASL, self, dec)   /* Arithmetic shift left */ \
+X(ADC, "Add with carry",            /* Add with carry */ \
+  0x00, self, dec) \
+X(AND, "Logical AND",               /* Logical AND */ \
+  0x00, self, dec) \
+X(ASL, "Arithmetic shift left",     /* Arithmetic shift left */ \
+  0x00, self, dec) \
 \
-X(BCC, self)        /* Branch if carry clear */ \
-X(BCS, self)        /* Branch if carry set */ \
-X(BEQ, self)        /* Branch if zero */ \
-X(BIT, self, dec)   /* Test bits */ \
-X(BMI, self)        /* Branch if negative */ \
-X(BNE, self)        /* Branch if not zero */ \
-X(BPL, self)        /* Branch if positive */ \
-X(BRK, self)        /* Break */ \
-X(BVC, self)        /* Branch if overflow clear */ \
-X(BVS, self)        /* Branch if overflow set */ \
+X(BCC, "Branch if carry clear",     /* Branch if carry clear */ \
+  0x00, self) \
+X(BCS, "Branch if carry set",       /* Branch if carry set */ \
+  0x00, self) \
+X(BEQ, "Branch if zero",            /* Branch if zero */ \
+  0x00, self) \
+X(BIT, "Test bits with A",          /* Test bits */ \
+  0x00, self, dec) \
+X(BMI, "Branch if negative ",       /* Branch if negative */ \
+  0x00, self) \
+X(BNE, "Branch if not zero",        /* Branch if not zero */ \
+  0x00, self) \
+X(BPL, "Branch if positive",        /* Branch if positive */ \
+  0x00, self) \
+X(BRK, "Break",                     /* Break */ \
+  0x00, self) \
+X(BVC, "Branch if overflow clear",  /* Branch if overflow clear */ \
+  0x00, self) \
+X(BVS, "Branch if overflow set",    /* Branch if overflow set */ \
+  0x00, self) \
 \
-X(CLC, self)        /* Clear carry */ \
-X(CLD, self)        /* Clear decimal */ \
-X(CLI, self)        /* Clear interrupt disable */ \
-X(CLV, self)        /* Clear overflow */ \
-X(CMP, self, dec)   /* Compare to accumulator */ \
-X(CPX, self, dec)   /* Compare to x-index */ \
-X(CPY, self, dec)   /* Compare to y-index */ \
+X(CLC, "Clear carry",               /* Clear carry */ \
+  0x00, self) \
+X(CLD, "Clear decimal mode",        /* Clear decimal mode */ \
+  0x00, self) \
+X(CLI, "Clear interrupt disable",   /* Clear interrupt disable */ \
+  0x00, self) \
+X(CLV, "Clear overflow",            /* Clear overflow */ \
+  0x00, self) \
+X(CMP, "Compare to A",              /* Compare to accumulator */ \
+  0x00, self, dec) \
+X(CPX, "Compare to X",              /* Compare to x-index */ \
+  0x00, self, dec) \
+X(CPY, "Compare to Y",              /* Compare to y-index */ \
+  0x00, self, dec) \
 \
-X(DEC, self, dec)   /* Decrement memory */ \
-X(DEX, self)        /* Decrement x-index */ \
-X(DEY, self)        /* Decrement y-index */ \
+X(DEC, "Decrement memory",          /* Decrement memory */ \
+  0x00, self, dec) \
+X(DEX, "Decrement X",               /* Decrement x-index */ \
+  0x00, self) \
+X(DEY, "Decrement Y",               /* Decrement y-index */ \
+  0x00, self) \
 \
-X(EOR, self, dec)   /* Logical EXCLUSIVE OR */ \
+X(EOR, "Logical EXCLUSIVE OR",      /* Logical EXCLUSIVE OR */ \
+  0x00, self, dec) \
 \
-X(INC, self, dec)   /* Increment memory */ \
-X(INX, self)        /* Increment x-index */ \
-X(INY, self)        /* Increment y-index */ \
+X(INC, "Increment memory",          /* Increment memory */ \
+  0x00, self, dec) \
+X(INX, "Increment X",               /* Increment x-index */ \
+  0x00, self) \
+X(INY, "Increment Y",               /* Increment y-index */ \
+  0x00, self) \
 \
-X(JMP, self)        /* Jump */ \
-X(JSR, self)        /* Jump to subroutine */ \
+X(JMP, "Jump",                      /* Jump */ \
+  0x00, self) \
+X(JSR, "Jump to subroutine",        /* Jump to subroutine */ \
+  0x00, self) \
 \
-X(LDA, self, dec)   /* Load accumulator */ \
-X(LDX, self, dec)   /* Load x-index */ \
-X(LDY, self, dec)   /* Load y-index */ \
-X(LSR, self, dec)   /* Logical shift right */ \
+X(LDA, "Load A",                    /* Load accumulator */ \
+  0x00, self, dec) \
+X(LDX, "Load X",                    /* Load x-index */ \
+  0x00, self, dec) \
+X(LDY, "Load Y",                    /* Load y-index */ \
+  0x00, self, dec) \
+X(LSR, "Logical shift right",       /* Logical shift right */ \
+  0x00, self, dec) \
 \
-X(NOP, self, dec)   /* No-op */ \
+X(NOP, "No operation",              /* No-op */ \
+  0x00, self, dec) \
 \
-X(ORA, self, dec)   /* Logical OR */ \
+X(ORA, "Logical OR",                /* Logical OR */ \
+  0x00, self, dec) \
 \
-X(PHA, self)        /* Push accumulator */ \
-X(PHP, self)        /* Push status */ \
-X(PLA, self)        /* Pull accumulator */ \
-X(PLP, self)        /* Pull status */ \
+X(PHA, "Push A",                    /* Push accumulator */ \
+  0x00, self) \
+X(PHP, "Push S",                    /* Push status */ \
+  0x00, self) \
+X(PLA, "Pull A",                    /* Pull accumulator */ \
+  0x00, self) \
+X(PLP, "Pull S",                    /* Pull status */ \
+  0x00, self) \
 \
-X(ROL, self, dec)   /* Rotate left */ \
-X(ROR, self, dec)   /* Rotate right */ \
-X(RTI, self)        /* Return from interrupt */ \
-X(RTS, self)        /* Return from subroutine */ \
+X(ROL, "Rotate left",               /* Rotate left */ \
+  0x00, self, dec) \
+X(ROR, "Rotate left",               /* Rotate right */ \
+  0x00, self, dec) \
+X(RTI, "Return from interrupt",     /* Return from interrupt */ \
+  0x00, self) \
+X(RTS, "Return from subroutine",    /* Return from subroutine */ \
+  0x00, self) \
 \
-X(SBC, self, dec)   /* Subtract with carry */ \
-X(SEC, self)        /* Set carry */ \
-X(SED, self)        /* Set decimal */ \
-X(SEI, self)        /* Set interrupt disable */ \
-X(STA, self, dec)   /* Store accumulator */ \
-X(STX, self, dec)   /* Store x-index */ \
-X(STY, self, dec)   /* Store y-index */ \
+X(SBC, "Subtract with carry",       /* Subtract with carry */ \
+  0x00, self, dec) \
+X(SEC, "Set carry",                 /* Set carry */ \
+  0x00, self) \
+X(SED, "Set decimal mode",          /* Set decimal mode */ \
+  0x00, self) \
+X(SEI, "Set interrupt disable",     /* Set interrupt disable */ \
+  0x00, self) \
+X(STA, "Store A",                   /* Store accumulator */ \
+  0x00, self, dec) \
+X(STX, "Store X",                   /* Store x-index */ \
+  0x00, self, dec) \
+X(STY, "Store Y",                   /* Store y-index */ \
+  0x00, self, dec) \
 \
-X(TAX, self)        /* Transfer accumulator to x-index */ \
-X(TAY, self)        /* Transfer accumulator to y-index */ \
-X(TSX, self)        /* Transfer stack pointer to x-index */ \
-X(TXA, self)        /* Transfer x-index to accumulator */ \
-X(TXS, self)        /* Transfer x-index to stack pointer */ \
-X(TYA, self)        /* Transfer y-index to accumulator */ \
+X(TAX, "Transfer A to X",           /* Transfer accumulator to x-index */ \
+  0x00, self) \
+X(TAY, "Transfer A to Y",           /* Transfer accumulator to y-index */ \
+  0x00, self) \
+X(TSX, "Transfer SP to X",          /* Transfer stack pointer to x-index */ \
+  0x00, self) \
+X(TXA, "Transfer X to A",           /* Transfer x-index to accumulator */ \
+  0x00, self) \
+X(TXS, "Transfer X to SP",          /* Transfer x-index to stack pointer */ \
+  0x00, self) \
+X(TYA, "Transfer Y to A",           /* Transfer y-index to accumulator */ \
+  0x00, self) \
 \
 /* Unofficial Opcodes */ \
-X(ALR, self, dec)   /* Logical AND and logical shift right */ \
-X(ANC, self)        /* Logical AND and set carry as if ASL or ROL */ \
-X(ANE, self)        /* Accumulator interferes with internal signals, logical
-                       AND with x-index and operand, load into accumulator */ \
-X(ARR, self, dec)   /* Logical AND and rotate right with adder side-effects
-                       interleaved between AND and ROR */ \
-X(DCP, self, dec)   /* Decrement memory and compare to accumulator */ \
-X(ISC, self, dec)   /* Increment memory and subtract with carry */ \
-X(JAM, self)        /* No instruction signal, jams the cpu */ \
-X(LAS, self, dec)   /* Logical AND with stack pointer and load
-                       into accumulator, x-index, and stack pointer */ \
-X(LAX, self, dec)   /* Load accumulator and x-index */ \
-X(LXA, self)        /* Accumulator interferes with internal signals, logical
-                       AND with operand, load into accumulator and x-index */ \
-X(RLA, self, dec)   /* Rotate left and logical AND */ \
-X(RRA, self, dec)   /* Rotate right and add with carry */ \
-X(SAX, self)        /* Store logical AND of accumulator and x-index */ \
-X(SBX, self)        /* Logical AND accumulator and x-index,
-                       compare to operand, and load into x-index */ \
-X(SHA, self, dec)   /* Store logical AND accumulator and x-index
-                       and ADDR_HI + 1 */ \
-X(SHX, self, dec)   /* Store logical AND x-index and ADDR_HI + 1 */ \
-X(SHY, self, dec)   /* Store logical AND y-index and ADDR_HI + 1 */ \
-X(SLO, self, dec)   /* Arithmetic shift left and logical OR */ \
-X(SRE, self, dec)   /* Logical shift right and logical EXCLUSIVE OR */ \
-X(TAS, self, dec)   /* Load logical AND accumulator and x-index into
-                       stack pointer, store logical AND accumulator and
-                       x-index and ADDR_HI + 1 */
+X(ALR, "AND + LSR",                 /* Logical AND and logical shift right */ \
+  0x00, self, dec) \
+X(ANC,                              /* Logical AND and set carry as if
+                                       ASL or ROL */ \
+  "AND + set carry as if ASL or ROL", \
+  0x00, self) \
+X(ANE,                              /* Accumulator interferes with internal
+                                       signals, logical AND with x-index and
+                                       operand, load into accumulator */ \
+  "AND with X + LDA (highly unstable)", \
+  0x00, self) \
+X(ARR,                              /* Logical AND and rotate right with adder
+                                       side-effects interleaved between
+                                       AND and ROR */ \
+  "AND + ROR with adder side-effects", \
+  0x00, self, dec) \
+X(DCP, "DEC + CMP",                 /* Decrement memory and compare
+                                       to accumulator */ \
+  0x00, self, dec) \
+X(ISC, "INC + SBC",                 /* Increment memory and subtract
+                                       with carry */ \
+  0x00, self, dec) \
+X(JAM, "Jams the CPU",              /* No instruction signal, jams the cpu */ \
+  0x00, self) \
+X(LAS,                              /* Logical AND with stack pointer and load
+                                       into accumulator, x-index, and
+                                       stack pointer */ \
+  "AND with SP + store SP + LDA/TSX", \
+  0x00, self, dec) \
+X(LAX, "LDA + LDX",                 /* Load accumulator and x-index */ \
+  0x00, self, dec) \
+X(LXA,                              /* Accumulator interferes with internal
+                                       signals, logical AND with operand,
+                                       load into accumulator and x-index */ \
+  "AND + LDA/LDX (highly unstable)", \
+  0x00, self) \
+X(RLA, "ROL + AND",                 /* Rotate left and logical AND */ \
+  0x00, self, dec) \
+X(RRA, "ROR + ADC",                 /* Rotate right and add with carry */ \
+  0x00, self, dec) \
+X(SAX,                              /* Store logical AND of accumulator
+                                       and x-index */ \
+  "Store AND(A,X)", \
+  0x00, self) \
+X(SBX,                              /* Logical AND accumulator and x-index,
+                                       compare to operand, and load into
+                                       x-index */ \
+  "AND(A,X) + CMP + LDX", \
+  0x00, self) \
+X(SHA,                              /* Store logical AND accumulator and
+                                       x-index and ADDR_HI + 1 */ \
+  "Store AND(A,X,ADDR_HI + 1) (unstable)", \
+  0x00, self, dec) \
+X(SHX,                              /* Store logical AND x-index and
+                                       ADDR_HI + 1 */ \
+  "Store AND(X,ADDR_HI + 1) (unstable)", \
+  0x00, self, dec) \
+X(SHY,                              /* Store logical AND y-index and
+                                       ADDR_HI + 1 */ \
+  "Store AND(Y,ADDR_HI + 1) (unstable)", \
+  0x00, self, dec) \
+X(SLO, "ASL + ORA",                 /* Arithmetic shift left and logical OR */ \
+  0x00,self, dec) \
+X(SRE, "LSR + EOR",                 /* Logical shift right and logical
+                                       EXCLUSIVE OR */ \
+  0x00, self, dec) \
+X(TAS,                              /* Load logical AND accumulator and x-index
+                                       into stack pointer, store logical AND
+                                       accumulator and x-index and
+                                       ADDR_HI + 1 */ \
+  "Load AND(A,X) into SP + store AND(A,X,ADDR_HI + 1) (unstable)", \
+  0x00, self, dec)
 
 // Addressing Modes
 // X(symbol, byte count, name, peek template, display strings...)
@@ -192,7 +293,7 @@ X(JAM, 1, "Implied",                            /* Jammed instruction */ \
 #define IN_ENUM(s) IN_##s
 
 enum inst {
-#define X(s, ...) IN_ENUM(s),
+#define X(s, d, f, ...) IN_ENUM(s),
     DEC_INST_X
 #undef X
 };

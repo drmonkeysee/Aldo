@@ -14,216 +14,216 @@
 // X(symbol, description, affected flags, instruction dispatch arguments...)
 #define DEC_INST_X \
 X(UDF, "Undefined",                 /* Undefined */ \
-  0x00, self) \
+  0x20, self) \
 \
 X(ADC, "Add with carry",            /* Add with carry */ \
-  0x00, self, dec) \
+  0xe3, self, dec) \
 X(AND, "Logical AND",               /* Logical AND */ \
-  0x00, self, dec) \
+  0xa2, self, dec) \
 X(ASL, "Arithmetic shift left",     /* Arithmetic shift left */ \
-  0x00, self, dec) \
+  0xa3, self, dec) \
 \
 X(BCC, "Branch if carry clear",     /* Branch if carry clear */ \
-  0x00, self) \
+  0x20, self) \
 X(BCS, "Branch if carry set",       /* Branch if carry set */ \
-  0x00, self) \
+  0x20, self) \
 X(BEQ, "Branch if zero",            /* Branch if zero */ \
-  0x00, self) \
+  0x20, self) \
 X(BIT, "Test bits with A",          /* Test bits */ \
-  0x00, self, dec) \
+  0xe2, self, dec) \
 X(BMI, "Branch if negative ",       /* Branch if negative */ \
-  0x00, self) \
+  0x20, self) \
 X(BNE, "Branch if not zero",        /* Branch if not zero */ \
-  0x00, self) \
+  0x20, self) \
 X(BPL, "Branch if positive",        /* Branch if positive */ \
-  0x00, self) \
+  0x20, self) \
 X(BRK, "Break",                     /* Break */ \
-  0x00, self) \
+  0x34, self) \
 X(BVC, "Branch if overflow clear",  /* Branch if overflow clear */ \
-  0x00, self) \
+  0x20, self) \
 X(BVS, "Branch if overflow set",    /* Branch if overflow set */ \
-  0x00, self) \
+  0x20, self) \
 \
 X(CLC, "Clear carry",               /* Clear carry */ \
-  0x00, self) \
+  0x21, self) \
 X(CLD, "Clear decimal mode",        /* Clear decimal mode */ \
-  0x00, self) \
+  0x28, self) \
 X(CLI, "Clear interrupt disable",   /* Clear interrupt disable */ \
-  0x00, self) \
+  0x24, self) \
 X(CLV, "Clear overflow",            /* Clear overflow */ \
-  0x00, self) \
+  0x60, self) \
 X(CMP, "Compare to A",              /* Compare to accumulator */ \
-  0x00, self, dec) \
+  0xa3, self, dec) \
 X(CPX, "Compare to X",              /* Compare to x-index */ \
-  0x00, self, dec) \
+  0xa3, self, dec) \
 X(CPY, "Compare to Y",              /* Compare to y-index */ \
-  0x00, self, dec) \
+  0xa3, self, dec) \
 \
 X(DEC, "Decrement memory",          /* Decrement memory */ \
-  0x00, self, dec) \
+  0xa2, self, dec) \
 X(DEX, "Decrement X",               /* Decrement x-index */ \
-  0x00, self) \
+  0xa2, self) \
 X(DEY, "Decrement Y",               /* Decrement y-index */ \
-  0x00, self) \
+  0xa2, self) \
 \
 X(EOR, "Logical EXCLUSIVE OR",      /* Logical EXCLUSIVE OR */ \
-  0x00, self, dec) \
+  0xa2, self, dec) \
 \
 X(INC, "Increment memory",          /* Increment memory */ \
-  0x00, self, dec) \
+  0xa2, self, dec) \
 X(INX, "Increment X",               /* Increment x-index */ \
-  0x00, self) \
+  0xa2, self) \
 X(INY, "Increment Y",               /* Increment y-index */ \
-  0x00, self) \
+  0xa2, self) \
 \
 X(JMP, "Jump",                      /* Jump */ \
-  0x00, self) \
+  0x20, self) \
 X(JSR, "Jump to subroutine",        /* Jump to subroutine */ \
-  0x00, self) \
+  0x20, self) \
 \
 X(LDA, "Load A",                    /* Load accumulator */ \
-  0x00, self, dec) \
+  0xa2, self, dec) \
 X(LDX, "Load X",                    /* Load x-index */ \
-  0x00, self, dec) \
+  0xa2, self, dec) \
 X(LDY, "Load Y",                    /* Load y-index */ \
-  0x00, self, dec) \
+  0xa2, self, dec) \
 X(LSR, "Logical shift right",       /* Logical shift right */ \
-  0x00, self, dec) \
+  0xa3, self, dec) \
 \
 X(NOP, "No operation",              /* No-op */ \
-  0x00, self, dec) \
+  0x20, self, dec) \
 \
 X(ORA, "Logical OR",                /* Logical OR */ \
-  0x00, self, dec) \
+  0xa2, self, dec) \
 \
 X(PHA, "Push A",                    /* Push accumulator */ \
-  0x00, self) \
+  0x20, self) \
 X(PHP, "Push S",                    /* Push status */ \
-  0x00, self) \
+  0x20, self) \
 X(PLA, "Pull A",                    /* Pull accumulator */ \
-  0x00, self) \
+  0xa2, self) \
 X(PLP, "Pull S",                    /* Pull status */ \
-  0x00, self) \
+  0xff, self) \
 \
 X(ROL, "Rotate left",               /* Rotate left */ \
-  0x00, self, dec) \
+  0xa3, self, dec) \
 X(ROR, "Rotate left",               /* Rotate right */ \
-  0x00, self, dec) \
+  0xa3, self, dec) \
 X(RTI, "Return from interrupt",     /* Return from interrupt */ \
-  0x00, self) \
+  0xff, self) \
 X(RTS, "Return from subroutine",    /* Return from subroutine */ \
-  0x00, self) \
+  0x20, self) \
 \
 X(SBC, "Subtract with carry",       /* Subtract with carry */ \
-  0x00, self, dec) \
+  0xe3, self, dec) \
 X(SEC, "Set carry",                 /* Set carry */ \
-  0x00, self) \
+  0x21, self) \
 X(SED, "Set decimal mode",          /* Set decimal mode */ \
-  0x00, self) \
+  0x28, self) \
 X(SEI, "Set interrupt disable",     /* Set interrupt disable */ \
-  0x00, self) \
+  0x24, self) \
 X(STA, "Store A",                   /* Store accumulator */ \
-  0x00, self, dec) \
+  0x20, self, dec) \
 X(STX, "Store X",                   /* Store x-index */ \
-  0x00, self, dec) \
+  0x20, self, dec) \
 X(STY, "Store Y",                   /* Store y-index */ \
-  0x00, self, dec) \
+  0x20, self, dec) \
 \
 X(TAX, "Transfer A to X",           /* Transfer accumulator to x-index */ \
-  0x00, self) \
+  0xa2, self) \
 X(TAY, "Transfer A to Y",           /* Transfer accumulator to y-index */ \
-  0x00, self) \
+  0xa2, self) \
 X(TSX, "Transfer SP to X",          /* Transfer stack pointer to x-index */ \
-  0x00, self) \
+  0xa2, self) \
 X(TXA, "Transfer X to A",           /* Transfer x-index to accumulator */ \
-  0x00, self) \
+  0xa2, self) \
 X(TXS, "Transfer X to SP",          /* Transfer x-index to stack pointer */ \
-  0x00, self) \
+  0x20, self) \
 X(TYA, "Transfer Y to A",           /* Transfer y-index to accumulator */ \
-  0x00, self) \
+  0xa2, self) \
 \
 /* Unofficial Opcodes */ \
 X(ALR,                              /* Logical AND and logical shift right */ \
   "AND + LSR", \
-  0x00, self, dec) \
+  0xa3, self, dec) \
 X(ANC,                              /* Logical AND and set carry as if
                                        ASL or ROL */ \
   "AND + set carry as if ASL or ROL", \
-  0x00, self) \
+  0xa3, self) \
 X(ANE,                              /* Accumulator interferes with internal
                                        signals, logical AND with x-index and
                                        operand, load into accumulator */ \
   "AND with X + LDA (highly unstable)", \
-  0x00, self) \
+  0xa2, self) \
 X(ARR,                              /* Logical AND and rotate right with adder
                                        side-effects interleaved between
                                        AND and ROR */ \
   "AND + ROR with adder side-effects", \
-  0x00, self, dec) \
+  0xe3, self, dec) \
 X(DCP,                              /* Decrement memory and compare
                                        to accumulator */ \
   "DEC + CMP", \
-  0x00, self, dec) \
+  0xa3, self, dec) \
 X(ISC,                              /* Increment memory and subtract
                                        with carry */ \
   "INC + SBC", \
-  0x00, self, dec) \
+  0xe3, self, dec) \
 X(JAM,                              /* No instruction signal, jams the cpu */ \
   "Jams the CPU", \
-  0x00, self) \
+  0x20, self) \
 X(LAS,                              /* Logical AND with stack pointer and load
                                        into accumulator, x-index, and
                                        stack pointer */ \
   "AND with SP + store SP + LDA/TSX", \
-  0x00, self, dec) \
+  0xa2, self, dec) \
 X(LAX,                              /* Load accumulator and x-index */ \
   "LDA + LDX", \
-  0x00, self, dec) \
+  0xa2, self, dec) \
 X(LXA,                              /* Accumulator interferes with internal
                                        signals, logical AND with operand,
                                        load into accumulator and x-index */ \
   "AND + LDA/LDX (highly unstable)", \
-  0x00, self) \
+  0xa2, self) \
 X(RLA,                              /* Rotate left and logical AND */ \
   "ROL + AND", \
-  0x00, self, dec) \
+  0xa2, self, dec) \
 X(RRA,                              /* Rotate right and add with carry */ \
   "ROR + ADC", \
-  0x00, self, dec) \
+  0xe3, self, dec) \
 X(SAX,                              /* Store logical AND of accumulator
                                        and x-index */ \
   "Store AND(A,X)", \
-  0x00, self) \
+  0x20, self) \
 X(SBX,                              /* Logical AND accumulator and x-index,
                                        compare to operand, and load into
                                        x-index */ \
   "AND(A,X) + CMP + LDX", \
-  0x00, self) \
+  0xa3, self) \
 X(SHA,                              /* Store logical AND accumulator and
                                        x-index and ADDR_HI + 1 */ \
   "Store AND(A,X,ADDR_HI + 1) (unstable)", \
-  0x00, self, dec) \
+  0x20, self, dec) \
 X(SHX,                              /* Store logical AND x-index and
                                        ADDR_HI + 1 */ \
   "Store AND(X,ADDR_HI + 1) (unstable)", \
-  0x00, self, dec) \
+  0x20, self, dec) \
 X(SHY,                              /* Store logical AND y-index and
                                        ADDR_HI + 1 */ \
   "Store AND(Y,ADDR_HI + 1) (unstable)", \
-  0x00, self, dec) \
+  0x20, self, dec) \
 X(SLO,                              /* Arithmetic shift left and logical OR */ \
   "ASL + ORA", \
-  0x00, self, dec) \
+  0xa3, self, dec) \
 X(SRE,                              /* Logical shift right and logical
                                        EXCLUSIVE OR */ \
   "LSR + EOR", \
-  0x00, self, dec) \
+  0xa3, self, dec) \
 X(TAS,                              /* Load logical AND accumulator and x-index
                                        into stack pointer, store logical AND
                                        accumulator and x-index and
                                        ADDR_HI + 1 */ \
   "Load AND(A,X) into SP + store AND(A,X,ADDR_HI + 1) (unstable)", \
-  0x00, self, dec)
+  0x20, self, dec)
 
 // Addressing Modes
 // X(symbol, byte count, name, peek template, display strings...)

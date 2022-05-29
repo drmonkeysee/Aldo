@@ -186,7 +186,7 @@ X(LXA,                              /* Accumulator interferes with internal
   0xa2, self) \
 X(RLA,                              /* Rotate left and logical AND */ \
   "ROL + AND", \
-  0xa2, self, dec) \
+  0xa3, self, dec) \
 X(RRA,                              /* Rotate right and add with carry */ \
   "ROR + ADC", \
   0xe3, self, dec) \

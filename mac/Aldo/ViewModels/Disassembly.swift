@@ -55,10 +55,10 @@ struct Instruction {
                 .init(addressMode: .init(cString: dis_inst_addrmode(p)),
                       bytes: getBytes(p),
                       mnemonic: .init(cString: dis_inst_mnemonic(p)),
-                      description: "Operand description",
+                      description: .init(cString: dis_inst_description(p)),
                       operand: getOperand(p),
                       unofficial: p.pointee.d.unofficial,
-                      flags: CpuFlags(0))
+                      flags: CpuFlags(dis_inst_flags(p)))
         }
     }
 

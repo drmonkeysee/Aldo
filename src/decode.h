@@ -143,7 +143,8 @@ X(TYA, "Transfer Y to A",           /* Transfer y-index to accumulator */ \
   0x00, self) \
 \
 /* Unofficial Opcodes */ \
-X(ALR, "AND + LSR",                 /* Logical AND and logical shift right */ \
+X(ALR,                              /* Logical AND and logical shift right */ \
+  "AND + LSR", \
   0x00, self, dec) \
 X(ANC,                              /* Logical AND and set carry as if
                                        ASL or ROL */ \
@@ -159,29 +160,35 @@ X(ARR,                              /* Logical AND and rotate right with adder
                                        AND and ROR */ \
   "AND + ROR with adder side-effects", \
   0x00, self, dec) \
-X(DCP, "DEC + CMP",                 /* Decrement memory and compare
+X(DCP,                              /* Decrement memory and compare
                                        to accumulator */ \
+  "DEC + CMP", \
   0x00, self, dec) \
-X(ISC, "INC + SBC",                 /* Increment memory and subtract
+X(ISC,                              /* Increment memory and subtract
                                        with carry */ \
+  "INC + SBC", \
   0x00, self, dec) \
-X(JAM, "Jams the CPU",              /* No instruction signal, jams the cpu */ \
+X(JAM,                              /* No instruction signal, jams the cpu */ \
+  "Jams the CPU", \
   0x00, self) \
 X(LAS,                              /* Logical AND with stack pointer and load
                                        into accumulator, x-index, and
                                        stack pointer */ \
   "AND with SP + store SP + LDA/TSX", \
   0x00, self, dec) \
-X(LAX, "LDA + LDX",                 /* Load accumulator and x-index */ \
+X(LAX,                              /* Load accumulator and x-index */ \
+  "LDA + LDX", \
   0x00, self, dec) \
 X(LXA,                              /* Accumulator interferes with internal
                                        signals, logical AND with operand,
                                        load into accumulator and x-index */ \
   "AND + LDA/LDX (highly unstable)", \
   0x00, self) \
-X(RLA, "ROL + AND",                 /* Rotate left and logical AND */ \
+X(RLA,                              /* Rotate left and logical AND */ \
+  "ROL + AND", \
   0x00, self, dec) \
-X(RRA, "ROR + ADC",                 /* Rotate right and add with carry */ \
+X(RRA,                              /* Rotate right and add with carry */ \
+  "ROR + ADC", \
   0x00, self, dec) \
 X(SAX,                              /* Store logical AND of accumulator
                                        and x-index */ \
@@ -204,10 +211,12 @@ X(SHY,                              /* Store logical AND y-index and
                                        ADDR_HI + 1 */ \
   "Store AND(Y,ADDR_HI + 1) (unstable)", \
   0x00, self, dec) \
-X(SLO, "ASL + ORA",                 /* Arithmetic shift left and logical OR */ \
-  0x00,self, dec) \
-X(SRE, "LSR + EOR",                 /* Logical shift right and logical
+X(SLO,                              /* Arithmetic shift left and logical OR */ \
+  "ASL + ORA", \
+  0x00, self, dec) \
+X(SRE,                              /* Logical shift right and logical
                                        EXCLUSIVE OR */ \
+  "LSR + EOR", \
   0x00, self, dec) \
 X(TAS,                              /* Load logical AND accumulator and x-index
                                        into stack pointer, store logical AND
@@ -219,74 +228,74 @@ X(TAS,                              /* Load logical AND accumulator and x-index
 // Addressing Modes
 // X(symbol, byte count, name, peek template, display strings...)
 #define DEC_ADDRMODE_X \
-X(IMP, 1, "Implied",                            /* Implied */ \
+X(IMP, 1, "Implied",                /* Implied */ \
   XPEEK(""), \
   "imp", "") \
-X(IMM, 2, "Immediate",                          /* Immediate */ \
+X(IMM, 2, "Immediate",              /* Immediate */ \
   XPEEK(""), \
   "imm", "#$%02X") \
-X(ZP, 2, "Zero-Page",                           /* Zero-Page */ \
+X(ZP, 2, "Zero-Page",               /* Zero-Page */ \
   XPEEK("= %02X", peek.data), \
   "zp", "$%02X") \
-X(ZPX, 2, "Zero-Page,X",                        /* Zero-Page,X */ \
+X(ZPX, 2, "Zero-Page,X",            /* Zero-Page,X */ \
   XPEEK("@ %02X = %02X", peek.finaladdr, peek.data), \
   "zp,X", "$%02X,X") \
-X(ZPY, 2, "Zero-Page,Y",                        /* Zero-Page,Y */ \
+X(ZPY, 2, "Zero-Page,Y",            /* Zero-Page,Y */ \
   XPEEK("@ %02X = %02X", peek.finaladdr, peek.data), \
   "zp,Y", "$%02X,Y") \
-X(INDX, 2, "(Indirect,X)",                      /* (Indirect,X) */ \
+X(INDX, 2, "(Indirect,X)",          /* (Indirect,X) */ \
   XPEEK("@ %02X > %04X = %02X", peek.interaddr, peek.finaladdr, peek.data), \
   "(zp,X)", "($%02X,X)") \
-X(INDY, 2, "(Indirect),Y",                      /* (Indirect),Y */ \
+X(INDY, 2, "(Indirect),Y",          /* (Indirect),Y */ \
   XPEEK("> %04X @ %04X = %02X", peek.interaddr, peek.finaladdr, peek.data), \
   "(zp),Y", "($%02X),Y") \
-X(ABS, 3, "Absolute",                           /* Absolute */ \
+X(ABS, 3, "Absolute",               /* Absolute */ \
   XPEEK("= %02X", peek.data), \
   "abs", "$??%02X", "$%04X") \
-X(ABSX, 3, "Absolute,X",                        /* Absolute,X */ \
+X(ABSX, 3, "Absolute,X",            /* Absolute,X */ \
   XPEEK("@ %04X = %02X", peek.finaladdr, peek.data), \
   "abs,X", "$??%02X,X", "$%04X,X") \
-X(ABSY, 3, "Absolute,Y",                        /* Absolute,Y */ \
+X(ABSY, 3, "Absolute,Y",            /* Absolute,Y */ \
   XPEEK("@ %04X = %02X", peek.finaladdr, peek.data), \
   "abs,Y", "$??%02X,Y", "$%04X,Y") \
 \
 /* Stack */ \
-X(PSH, 1, "Implied",                            /* Push */ \
+X(PSH, 1, "Implied",                /* Push */ \
   XPEEK(""), \
   "imp", "") \
-X(PLL, 1, "Implied",                            /* Pull */ \
+X(PLL, 1, "Implied",                /* Pull */ \
   XPEEK(""), \
   "imp", "") \
 \
 /* Branch */ \
-X(BCH, 2, "Relative",                           /* Relative branch */ \
+X(BCH, 2, "Relative",               /* Relative branch */ \
   XPEEK("@ %04X", peek.finaladdr), \
   "rel", "%+hhd") \
 \
 /* Jumps */ \
-X(JSR, 3, "Absolute",                           /* Jump to subroutine, */ \
+X(JSR, 3, "Absolute",               /* Jump to subroutine, */ \
   XPEEK(""), \
   "abs", "$??%02X", "$%04X") \
-X(RTS, 1, "Implied",                            /* Return from subroutine */ \
+X(RTS, 1, "Implied",                /* Return from subroutine */ \
   XPEEK(""), \
   "imp", "") \
-X(JABS, 3, "Absolute",                          /* Absolute jump */ \
+X(JABS, 3, "Absolute",              /* Absolute jump */ \
   XPEEK(""), \
   "abs", "$??%02X", "$%04X") \
-X(JIND, 3, "Indirect",                          /* Indirect jump */ \
+X(JIND, 3, "Indirect",              /* Indirect jump */ \
   XPEEK("> %04X", peek.finaladdr), \
   "(abs)", "($??%02X)", "($%04X)") \
 \
 /* Interrupts */ \
-X(BRK, 1, "Implied",                            /* Break, interrupt, reset */ \
+X(BRK, 1, "Implied",                /* Break, interrupt, reset */ \
   XPEEK(""), \
   "imp", "%s") \
-X(RTI, 1, "Implied",                            /* Return from interrupt */ \
+X(RTI, 1, "Implied",                /* Return from interrupt */ \
   XPEEK(""), \
   "imp", "") \
 \
 /* Unofficial Modes */ \
-X(JAM, 1, "Implied",                            /* Jammed instruction */ \
+X(JAM, 1, "Implied",                /* Jammed instruction */ \
   XPEEK(""), \
   "imp", "")
 

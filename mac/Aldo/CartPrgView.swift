@@ -21,7 +21,7 @@ fileprivate struct ProgramView: View {
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .leading) {
-                if banks.cart.info.prgBanks > 0 {
+                if banks.count > 0 {
                     BankSelectionView(banks: banks)
                     ProgramListingView()
                 } else {
@@ -33,7 +33,9 @@ fileprivate struct ProgramView: View {
             .frame(width: 255)
             .padding(5)
             Divider()
-            PrgDetailView()
+            CartFocusView()
+                .frame(maxHeight: .infinity, alignment: .top)
+                .padding(5)
         }
         .environmentObject(banks.currentListing)
     }
@@ -65,7 +67,7 @@ fileprivate struct ProgramListingView: View {
         case .pending:
             PendingPrgView(listing: listing)
         case let .loaded(prg):
-            LoadedPrgView(prgLines: prg)
+            LoadedPrgView(prgLines: prg, selectedLine: $listing.selectedLine)
         case .failed:
             NoPrgView(reason: "PRG Bank Not Available")
         }
@@ -83,11 +85,10 @@ fileprivate struct PendingPrgView: View {
 
 fileprivate struct LoadedPrgView: View {
     let prgLines: [PrgLine]
-    @EnvironmentObject var listing: ProgramListing
+    let selectedLine: Binding<Int?>
 
     var body: some View {
-        List(0..<prgLines.count, id: \.self,
-             selection: $listing.selectedLine) { i in
+        List(0..<prgLines.count, id: \.self, selection: selectedLine) { i in
             let line = prgLines[i]
             switch line {
             case let .disassembled(addr, inst):
@@ -114,24 +115,6 @@ fileprivate struct NoPrgView: View {
             Text(reason)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-    }
-}
-
-fileprivate struct PrgDetailView: View {
-    @EnvironmentObject var listing: ProgramListing
-
-    var body: some View {
-        CartFocusView(instruction: currentInstruction)
-            .frame(maxHeight: .infinity, alignment: .top)
-            .padding(5)
-    }
-
-    private var currentInstruction: Instruction? {
-        if let line = listing.currentLine,
-           case .disassembled(_, let inst) = line {
-            return inst
-        }
-        return nil
     }
 }
 

@@ -8,14 +8,10 @@
 import SwiftUI
 
 struct CartFocusView: View {
-    let instruction: Instruction?
-
-    init(instruction: Instruction? = nil) { self.instruction = instruction }
-
     var body: some View {
         VStack(alignment: .leading) {
             GroupBox {
-                InstructionDetailsView(instruction: instruction)
+                InstructionDetailsView()
             } label: {
                 Label("Selected Instruction", systemImage: "pencil")
                     .font(.headline)
@@ -33,28 +29,26 @@ struct CartFocusView: View {
 }
 
 fileprivate struct InstructionDetailsView: View {
-    let instruction: Instruction?
+    @EnvironmentObject var listing: ProgramListing
 
     var body: some View {
+        let inst = currentInstruction
         HStack {
             VStack {
-                Text(instruction?.mnemonic ?? "--").font(.title)
-                Text(displayByte(instruction?.byte(at: 0)))
+                Text(inst?.mnemonic ?? "--").font(.title)
+                Text(displayByte(inst?.byte(at: 0)))
             }
             Spacer()
             VStack {
-                Text(instruction?.operand ?? "--").font(.title)
-                Text("""
-                     \(displayByte(instruction?.byte(at: 1))) \
-                     \(displayByte(instruction?.byte(at: 2)))
-                     """)
+                Text(inst?.operand ?? "--").font(.title)
+                Text(operandBytes(inst))
             }
         }
         Divider()
         HStack {
             Text("--")
             Spacer()
-            Text(instruction?.addressMode ?? "--")
+            Text(inst?.addressMode ?? "--")
         }
         .font(.footnote)
         Divider()
@@ -72,6 +66,18 @@ fileprivate struct InstructionDetailsView: View {
         .imageScale(.large)
     }
 
+    private var currentInstruction: Instruction? {
+        if let line = listing.currentLine,
+           case .disassembled(_, let inst) = line {
+            return inst
+        }
+        return nil
+    }
+
+    private func operandBytes(_ inst: Instruction?) -> String {
+        "\(displayByte(inst?.byte(at: 1))) \(displayByte(inst?.byte(at: 2)))"
+    }
+
     private func displayByte(_ byte: UInt8?) -> String {
         if let b = byte { return .init(format: "(%02X)", b) }
         return ""
@@ -80,6 +86,6 @@ fileprivate struct InstructionDetailsView: View {
 
 struct CartFocusView_Previews: PreviewProvider {
     static var previews: some View {
-        CartFocusView(instruction: .parse(dis_instruction()))
+        CartFocusView()
     }
 }

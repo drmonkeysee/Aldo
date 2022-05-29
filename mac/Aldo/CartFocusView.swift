@@ -46,7 +46,7 @@ fileprivate struct InstructionDetailsView: View {
         }
         Divider()
         HStack {
-            Text("--")
+            Text(inst?.name ?? "--")
             Spacer()
             Text(inst?.addressMode ?? "--")
         }
@@ -55,13 +55,7 @@ fileprivate struct InstructionDetailsView: View {
         HStack {
             Text("Flags")
             Spacer()
-            Image(systemName: "n.circle")
-            Image(systemName: "v.circle")
-            Image(systemName: "b.circle")
-            Image(systemName: "d.circle")
-            Image(systemName: "i.circle")
-            Image(systemName: "z.circle")
-            Image(systemName: "c.circle")
+            FlagsView(flags: inst?.flags)
         }
         .imageScale(.large)
     }
@@ -81,6 +75,24 @@ fileprivate struct InstructionDetailsView: View {
     private func displayByte(_ byte: UInt8?) -> String {
         if let b = byte { return .init(format: "(%02X)", b) }
         return ""
+    }
+}
+
+fileprivate struct FlagsView: View {
+    let flags: CpuFlags?
+
+    var body: some View {
+        Image(systemName: icon(val: flags?.negative ?? false, label: "n"))
+        Image(systemName: icon(val: flags?.overflow ?? false, label: "v"))
+        Image(systemName: icon(val: flags?.softbreak ?? false, label: "b"))
+        Image(systemName: icon(val: flags?.decimal ?? false, label: "d"))
+        Image(systemName: icon(val: flags?.interrupt ?? false, label: "i"))
+        Image(systemName: icon(val: flags?.zero ?? false, label: "z"))
+        Image(systemName: icon(val: flags?.carry ?? false, label: "c"))
+    }
+
+    private func icon(val: Bool, label: String) -> String {
+        "\(label).circle\(val ? ".fill" : "")"
     }
 }
 

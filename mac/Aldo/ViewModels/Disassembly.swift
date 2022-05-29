@@ -55,8 +55,10 @@ struct Instruction {
                 .init(addressMode: .init(cString: dis_inst_addrmode(p)),
                       bytes: getBytes(p),
                       mnemonic: .init(cString: dis_inst_mnemonic(p)),
+                      name: "Operand Name",
                       operand: getOperand(p),
-                      unofficial: p.pointee.d.unofficial)
+                      unofficial: p.pointee.d.unofficial,
+                      flags: CpuFlags(0))
         }
     }
 
@@ -79,12 +81,10 @@ struct Instruction {
     let addressMode: String
     let bytes: [UInt8]
     let mnemonic: String
+    let name: String
     let operand: String
     let unofficial: Bool
-
-    var name: String { "Jump" }
-    var description: String { "Unconditional jump to an address" }
-    var flags: UInt8 { 0x34 }
+    let flags: CpuFlags
 
     func displayLine(addr: UInt16) -> String {
         let addrStr = String(format: "%04X", addr)
@@ -98,6 +98,26 @@ struct Instruction {
     func byte(at: Int) -> UInt8? {
         guard 0 <= at && at < bytes.count else { return nil }
         return bytes[at]
+    }
+}
+
+struct CpuFlags {
+    let carry: Bool
+    let zero: Bool
+    let interrupt: Bool
+    let decimal: Bool
+    let softbreak: Bool
+    let overflow: Bool
+    let negative: Bool
+
+    init(_ status: UInt8) {
+        carry = status & 0x1 != 0
+        zero = status & 0x2 != 0
+        interrupt = status & 0x4 != 0
+        decimal = status & 0x8 != 0
+        softbreak = status & 0x10 != 0
+        overflow = status & 0x40 != 0
+        negative = status & 0x80 != 0
     }
 }
 

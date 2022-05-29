@@ -319,6 +319,37 @@ static void mnemonic_invalid(void *ctx)
 }
 
 //
+// Descriptions
+//
+
+static void description_valid(void *ctx)
+{
+    const struct dis_instruction inst = {.d = {IN_ADC, AM_IMM, false}};
+
+    const char *const result = dis_inst_description(&inst);
+
+    ct_assertequalstr("Add with carry", result);
+}
+
+static void description_unofficial(void *ctx)
+{
+    const struct dis_instruction inst = {.d = {IN_ANC, AM_IMM, true}};
+
+    const char *const result = dis_inst_description(&inst);
+
+    ct_assertequalstr("AND + set carry as if ASL or ROL", result);
+}
+
+static void description_invalid(void *ctx)
+{
+    const struct dis_instruction inst = {.d = {-4, AM_IMM, false}};
+
+    const char *const result = dis_inst_description(&inst);
+
+    ct_assertequalstr("Undefined", result);
+}
+
+//
 // Address Mode Names
 //
 
@@ -347,6 +378,37 @@ static void modename_invalid(void *ctx)
     const char *const result = dis_inst_addrmode(&inst);
 
     ct_assertequalstr("Implied", result);
+}
+
+//
+// Flags
+//
+
+static void flags_valid(void *ctx)
+{
+    const struct dis_instruction inst = {.d = {IN_ADC, AM_IMM, false}};
+
+    const uint8_t result = dis_inst_flags(&inst);
+
+    ct_assertequal(0xe3u, result);
+}
+
+static void flags_unofficial(void *ctx)
+{
+    const struct dis_instruction inst = {.d = {IN_ANC, AM_IMM, true}};
+
+    const uint8_t result = dis_inst_flags(&inst);
+
+    ct_assertequal(0xa3u, result);
+}
+
+static void flags_invalid(void *ctx)
+{
+    const struct dis_instruction inst = {.d = {-4, AM_IMM, false}};
+
+    const uint8_t result = dis_inst_flags(&inst);
+
+    ct_assertequal(0x20u, result);
 }
 
 //
@@ -2530,9 +2592,17 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(mnemonic_unofficial),
         ct_maketest(mnemonic_invalid),
 
+        ct_maketest(description_valid),
+        ct_maketest(description_unofficial),
+        ct_maketest(description_invalid),
+
         ct_maketest(modename_valid),
         ct_maketest(modename_unofficial),
         ct_maketest(modename_invalid),
+
+        ct_maketest(flags_valid),
+        ct_maketest(flags_unofficial),
+        ct_maketest(flags_invalid),
 
         ct_maketest(inst_operand_empty_instruction),
         ct_maketest(inst_operand_no_operand),

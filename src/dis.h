@@ -56,6 +56,7 @@ int dis_parse_inst(const struct bankview *bv, size_t at,
 int dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
                       size_t at, struct dis_instruction *parsed);
 const char *dis_inst_mnemonic(const struct dis_instruction *inst);
+const char *dis_inst_description(const struct dis_instruction *inst);
 const char *dis_inst_addrmode(const struct dis_instruction *inst);
 uint8_t dis_inst_flags(const struct dis_instruction *inst);
 int dis_inst_operand(const struct dis_instruction *inst,

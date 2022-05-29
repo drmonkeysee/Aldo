@@ -22,6 +22,18 @@ static const char *const restrict Mnemonics[] = {
 #undef X
 };
 
+static const char *const restrict Descriptions[] = {
+#define X(s, d, f, ...) d,
+    DEC_INST_X
+#undef X
+};
+
+static const uint8_t Flags[] = {
+#define X(s, d, f, ...) f,
+    DEC_INST_X
+#undef X
+};
+
 static const int InstLens[] = {
 #define X(s, b, n, p, ...) b,
     DEC_ADDRMODE_X
@@ -54,10 +66,22 @@ static const char *mnemonic(enum inst in)
     return 0 <= in && in < sz ? Mnemonics[in] : Mnemonics[IN_UDF];
 }
 
+static const char *description(enum inst in)
+{
+    static const size_t sz = sizeof Descriptions / sizeof Descriptions[0];
+    return 0 <= in && in < sz ? Descriptions[in] : Descriptions[IN_UDF];
+}
+
 static const char *modename(enum addrmode am)
 {
     static const size_t sz = sizeof ModeNames / sizeof ModeNames[0];
     return 0 <= am && am < sz ? ModeNames[am] : ModeNames[AM_IMP];
+}
+
+static uint8_t flags(enum inst in)
+{
+    static const size_t sz = sizeof Flags / sizeof Flags[0];
+    return 0 <= in && in < sz ? Flags[in] : Flags[IN_UDF];
 }
 
 static const char *interrupt_display(const struct console_state *snapshot)
@@ -533,6 +557,13 @@ const char *dis_inst_mnemonic(const struct dis_instruction *inst)
     return mnemonic(inst->d.instruction);
 }
 
+const char *dis_inst_description(const struct dis_instruction *inst)
+{
+    assert(inst != NULL);
+
+    return description(inst->d.instruction);
+}
+
 const char *dis_inst_addrmode(const struct dis_instruction *inst)
 {
     assert(inst != NULL);
@@ -544,8 +575,7 @@ uint8_t dis_inst_flags(const struct dis_instruction *inst)
 {
     assert(inst != NULL);
 
-    int notimplemented;
-    return 0;
+    return flags(inst->d.instruction);
 }
 
 int dis_inst_operand(const struct dis_instruction *inst,

@@ -90,20 +90,18 @@ fileprivate struct LoadedPrgView: View {
     var body: some View {
         List(0..<prgLines.count, id: \.self, selection: selectedLine) { i in
             let line = prgLines[i]
-            switch line {
-            case let .disassembled(addr, inst):
-                Text(inst.displayLine(addr: addr))
-                    .font(.system(.body, design: .monospaced))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 2)
-                    .background(
-                        InstructionBackground(unofficial: inst.unofficial))
-            default:
-                // TODO: handle all PrgLine types
-                Text("No inst")
-            }
+            Text(line.display)
+                .font(.system(.body, design: .monospaced))
+                .frame(maxWidth: .infinity, alignment: lineAlignment(line))
+                .padding(.horizontal, 2)
+                .background(PrgLineBackground(line: line))
         }
         .cornerRadius(5)
+    }
+
+    private func lineAlignment(_ line: PrgLine) -> Alignment {
+        if case .elision = line { return .center }
+        return .leading
     }
 }
 
@@ -118,14 +116,25 @@ fileprivate struct NoPrgView: View {
     }
 }
 
-fileprivate struct InstructionBackground: View {
-    let unofficial: Bool
+fileprivate struct PrgLineBackground: View {
+    let line: PrgLine
 
     var body: some View {
-        if unofficial {
+        if let c = bgColor {
             RoundedRectangle(cornerRadius: 5)
-                .fill(.red)
+                .fill(c)
                 .opacity(0.3)
+        }
+    }
+
+    private var bgColor: Color? {
+        switch line {
+        case .disassembled(_, let inst) where inst.unofficial:
+            return .cyan
+        case .failure:
+            return .red
+        default:
+            return nil
         }
     }
 }

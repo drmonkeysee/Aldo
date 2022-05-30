@@ -47,6 +47,21 @@ enum PrgLine {
     case disassembled(UInt16, Instruction)
     case elision(UInt16)
     case failure(UInt16, AldoError)
+
+    var display: String {
+        switch self {
+        case let .disassembled(addr, inst):
+            return "\(addrStr(addr)): \(inst.display)"
+        case .elision:
+            return "⋯"
+        case let .failure(addr, err):
+            return "\(addrStr(addr)): \(err.message)"
+        }
+    }
+
+    private func addrStr(_ addr: UInt16) -> String {
+        .init(format: "%04X", addr)
+    }
 }
 
 struct Instruction {
@@ -58,7 +73,7 @@ struct Instruction {
                       description: .init(cString: dis_inst_description(p)),
                       operand: getOperand(p),
                       unofficial: p.pointee.d.unofficial,
-                      flags: CpuFlags(dis_inst_flags(p)))
+                      flags: .init(dis_inst_flags(p)))
         }
     }
 
@@ -86,13 +101,12 @@ struct Instruction {
     let unofficial: Bool
     let flags: CpuFlags
 
-    func displayLine(addr: UInt16) -> String {
-        let addrStr = String(format: "%04X", addr)
+    var display: String {
         let byteStr = bytes
                         .map { b in String(format: "%02X", b) }
                         .joined(separator: " ")
                         .padding(toLength: 9, withPad: " ", startingAt: 0)
-        return "\(addrStr): \(byteStr) \(mnemonic) \(operand)"
+        return "\(byteStr) \(mnemonic) \(operand)"
     }
 
     func byte(at: Int) -> UInt8? {
@@ -149,34 +163,59 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
     let bv: bankview
     private var addr: UInt16
     private var cursor = 0
-    private var parseErr = false
+    private var done = false
+    private var prevInstruction = dis_instruction()
+    private var skip = false
 
     init?(_ prgbank: bankview?) {
         guard let pb = prgbank else { return nil }
         bv = pb
         // NOTE: by convention, count backwards from CPU vector locations
-        addr = UInt16(MEMBLOCK_64KB - bv.size)
+        addr = .init(MEMBLOCK_64KB - bv.size)
     }
 
     mutating func next() -> PrgLine? {
-        if parseErr { return nil }
+        if done { return nil }
+        return getInstruction()
+    }
 
-        var inst = dis_instruction()
-        let err = withUnsafePointer(to: bv) { p in
-            dis_parse_inst(p, cursor, &inst)
-        }
-
-        defer {
-            if err > 0 {
-                cursor += inst.bv.size
-                addr &+= UInt16(inst.bv.size)
+    private mutating func getInstruction() -> PrgLine? {
+        repeat {
+            var inst = dis_instruction()
+            let err = withUnsafePointer(to: bv) { p in
+                dis_parse_inst(p, cursor, &inst)
             }
-        }
-        if err == 0 { return nil }
-        if err < 0 {
-            parseErr = true
-            return .failure(addr, .wrapDisError(code: err))
-        }
-        return .disassembled(addr, .parse(inst))
+
+            if err > 0 {
+                defer {
+                    cursor += inst.bv.size
+                    addr &+= .init(inst.bv.size)
+                }
+                if dis_inst_equal(&inst, &prevInstruction) {
+                    if !skip {
+                        skip = true
+                        return .elision(addr)
+                    }
+                } else {
+                    prevInstruction = inst
+                    skip = false
+                    return .disassembled(addr, .parse(inst))
+                }
+            } else if err < 0 {
+                done = true
+                return .failure(addr, .wrapDisError(code: err))
+            } else {
+                // NOTE: always print the last line even if it would
+                // normally be skipped.
+                if skip {
+                    done = true
+                    // NOTE: back up address to the last line
+                    addr &-= .init(prevInstruction.bv.size)
+                    return .disassembled(addr, .parse(prevInstruction))
+                }
+                break
+            }
+        } while skip
+        return nil
     }
 }

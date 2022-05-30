@@ -62,7 +62,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-d $(PROJECT_DIR)/../a.rom"
+            argument = "--batch"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

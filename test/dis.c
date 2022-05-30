@@ -56,7 +56,7 @@ static void parse_inst_empty_bankview(void *ctx)
 
     const int result = dis_parse_inst(&bv, 0, &inst);
 
-    ct_assertequal(0, result);
+    ct_assertequal(DIS_ERR_PRGROM, result);
     ct_assertequal(0u, inst.bv.bank);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
@@ -185,7 +185,7 @@ static void parsemem_inst_empty_bankview(void *ctx)
 
     const int result = dis_parsemem_inst(0, NULL, 0, &inst);
 
-    ct_assertequal(0, result);
+    ct_assertequal(DIS_ERR_PRGROM, result);
     ct_assertequal(0u, inst.bv.bank);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);

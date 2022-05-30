@@ -489,18 +489,14 @@ int dis_parse_inst(const struct bankview *bv, size_t at,
     assert(bv != NULL);
     assert(parsed != NULL);
 
-    if (!bv->mem || at >= bv->size) {
-        *parsed = (struct dis_instruction){0};
-        return 0;
-    }
+    *parsed = (struct dis_instruction){0};
+    if (!bv->mem) return DIS_ERR_PRGROM;
+    if (at >= bv->size) return 0;
 
     const uint8_t opcode = bv->mem[at];
     const struct decoded dec = Decode[opcode];
     const int instlen = InstLens[dec.mode];
-    if ((size_t)instlen > bv->size - at) {
-        *parsed = (struct dis_instruction){0};
-        return DIS_ERR_EOF;
-    }
+    if ((size_t)instlen > bv->size - at) return DIS_ERR_EOF;
 
     *parsed = (struct dis_instruction){
         at,

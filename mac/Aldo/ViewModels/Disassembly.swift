@@ -167,7 +167,7 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
     private var skip = false
 
     init?(_ prgbank: bankview?) {
-        guard let pb = prgbank else { return nil }
+        guard let pb = prgbank, pb.size > 0 else { return nil }
         bv = pb
         // NOTE: by convention, count backwards from CPU vector locations
         addr = .init(MEMBLOCK_64KB - bv.size)

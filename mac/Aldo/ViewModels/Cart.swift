@@ -50,7 +50,7 @@ final class Cart: ObservableObject {
         return await readCStream(binary: true) { stream in
             let bankview = cart_chrbank(h.unwrapped, bank)
             let err = withUnsafePointer(to: bankview) { p in
-                dis_cart_chrbank(p, Int32(scale), stream)
+                dis_cart_chrbank(p, .init(scale), stream)
             }
             if err < 0 { throw AldoError.wrapDisError(code: err) }
         }
@@ -92,7 +92,7 @@ enum CartInfo {
     var prgBanks: Int {
         switch self {
         case .iNes(_, let header, _):
-            return Int(header.prg_chunks)
+            return .init(header.prg_chunks)
         case .raw:
             return 1
         default:
@@ -103,7 +103,7 @@ enum CartInfo {
     var chrBanks: Int {
         switch self {
         case .iNes(_, let header, _):
-            return Int(header.chr_chunks)
+            return .init(header.chr_chunks)
         default:
             return 0
         }

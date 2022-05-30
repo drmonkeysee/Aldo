@@ -33,8 +33,8 @@ fileprivate struct Constraints {
     static let groupboxPadding = 10.0
     static let outerWidth = sheetSize.w + groupboxPadding
     static let sheetPadding = 5.0
-    static let sheetSize = (w: 256.0 * Double(ChrSheet.scale),
-                            h: 128.0 * Double(ChrSheet.scale))
+    static let sheetSize = (w: 256.0 * .init(ChrSheet.scale),
+                            h: 128.0 * .init(ChrSheet.scale))
 }
 
 fileprivate struct ChrBanksView: View {

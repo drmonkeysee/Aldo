@@ -16,12 +16,11 @@ struct EmulatorView: View {
             ZStack {
                 Color(white: 0.15)
                     .cornerRadius(5)
-                    .frame(width: Double(Self.nesResolution.w * Self.nesScale),
-                           height: Double(Self.nesResolution.h
-                                          * Self.nesScale))
+                    .frame(width: .init(Self.nesResolution.w * Self.nesScale),
+                           height: .init(Self.nesResolution.h * Self.nesScale))
                 Color.cyan
-                    .frame(width: Double(Self.nesResolution.w),
-                           height: Double(Self.nesResolution.h))
+                    .frame(width: .init(Self.nesResolution.w),
+                           height: .init(Self.nesResolution.h))
                 Text("Emu Screen")
             }
             TabView {

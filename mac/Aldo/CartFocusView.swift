@@ -29,26 +29,30 @@ struct CartFocusView: View {
 }
 
 fileprivate struct InstructionDetailsView: View {
+    static private let blank = "--"
+
     @EnvironmentObject var listing: ProgramListing
 
     var body: some View {
         let inst = currentInstruction
         HStack {
             VStack {
-                Text(inst?.mnemonic ?? "--").font(.title)
+                Text(inst?.mnemonic ?? Self.blank)
+                    .font(.title)
                 Text(displayByte(inst?.byte(at: 0)))
             }
             Spacer()
             VStack {
-                Text(inst?.operand ?? "--").font(.title)
+                Text(inst?.operand ?? Self.blank)
+                    .font(.title)
                 Text(operandBytes(inst))
             }
         }
         Divider()
         HStack {
-            Text(inst?.description ?? "--")
+            Text(inst?.description ?? Self.blank)
             Spacer()
-            Text(inst?.addressMode ?? "--")
+            Text(inst?.addressMode ?? Self.blank)
         }
         .font(.footnote)
         Divider()

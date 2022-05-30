@@ -176,35 +176,21 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
 
     mutating func next() -> PrgLine? {
         if done { return nil }
-        return getInstruction()
+        return nextLine()
     }
 
-    private mutating func getInstruction() -> PrgLine? {
+    private mutating func nextLine() -> PrgLine? {
         repeat {
             var inst = dis_instruction()
             let err = withUnsafePointer(to: bv) { p in
                 dis_parse_inst(p, cursor, &inst)
             }
 
-            if err > 0 {
-                defer {
-                    cursor += inst.bv.size
-                    addr &+= .init(inst.bv.size)
-                }
-                if dis_inst_equal(&inst, &prevInstruction) {
-                    if !skip {
-                        skip = true
-                        return .elision(addr)
-                    }
-                } else {
-                    prevInstruction = inst
-                    skip = false
-                    return .disassembled(addr, .parse(inst))
-                }
-            } else if err < 0 {
+            if err < 0 {
                 done = true
                 return .failure(addr, .wrapDisError(code: err))
-            } else {
+            }
+            if err == 0 {
                 // NOTE: always print the last line even if it would
                 // normally be skipped.
                 if skip {
@@ -214,6 +200,21 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
                     return .disassembled(addr, .parse(prevInstruction))
                 }
                 break
+            }
+
+            defer {
+                cursor += inst.bv.size
+                addr &+= .init(inst.bv.size)
+            }
+            if dis_inst_equal(&inst, &prevInstruction) {
+                if !skip {
+                    skip = true
+                    return .elision(addr)
+                }
+            } else {
+                prevInstruction = inst
+                skip = false
+                return .disassembled(addr, .parse(inst))
             }
         } while skip
         return nil

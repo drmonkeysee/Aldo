@@ -12,7 +12,6 @@
 
 #include <assert.h>
 #include <math.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -158,50 +157,30 @@ static int print_instruction(const struct dis_instruction *inst,
     return operation + operand;
 }
 
-enum duplicate_state {
-    DUP_NONE,
-    DUP_FIRST,
-    DUP_TRUNCATE,
-    DUP_SKIP,
-    DUP_VERBOSE,
-};
-
 struct repeat_condition {
-    uint32_t prev_bytes;
-    enum duplicate_state state;
+    struct dis_instruction prev_inst;
+    bool skip;
 };
 
-static void print_prg_line(const char *restrict dis, uint32_t curr_bytes,
-                           size_t total, size_t banksize,
+static void print_prg_line(const char *restrict dis, bool verbose,
+                           const struct dis_instruction *curr_inst,
                            struct repeat_condition *repeat, FILE *f)
 {
-    if (repeat->state == DUP_VERBOSE) {
+    if (verbose) {
         fprintf(f, "%s\n", dis);
         return;
     }
 
-    if (curr_bytes == repeat->prev_bytes) {
-        switch (repeat->state) {
-        case DUP_NONE:
-            repeat->state = DUP_FIRST;
-            fprintf(f, "%s\n", dis);
-            break;
-        case DUP_FIRST:
-            repeat->state = DUP_TRUNCATE;
-            // NOTE: if this is the last instruction in the PRG bank
-            // skip printing the truncation indicator.
-            if (total < banksize) {
-                fputs("*\n", f);
-            }
-            break;
-        default:
-            repeat->state = DUP_SKIP;
-            break;
+    if (dis_inst_equal(curr_inst, &repeat->prev_inst)) {
+        // NOTE: only print placeholder on first duplicate seen
+        if (!repeat->skip) {
+            repeat->skip = true;
+            fputs("*\n", f);
         }
     } else {
         fprintf(f, "%s\n", dis);
-        repeat->prev_bytes = curr_bytes;
-        repeat->state = DUP_NONE;
+        repeat->prev_inst = *curr_inst;
+        repeat->skip = false;
     }
 }
 
@@ -210,9 +189,7 @@ static int print_prgbank(const struct bankview *bv, bool verbose, FILE *f)
     fprintf(f, "Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
     fputs("--------\n", f);
 
-    struct repeat_condition repeat = {
-        .state = verbose ? DUP_VERBOSE : DUP_NONE,
-    };
+    struct repeat_condition repeat = {0};
     struct dis_instruction inst;
     char dis[DIS_INST_SIZE];
     // NOTE: by convention, count backwards from CPU vector locations
@@ -224,20 +201,13 @@ static int print_prgbank(const struct bankview *bv, bool verbose, FILE *f)
          result = dis_parse_inst(bv, inst.bankoffset + inst.bv.size, &inst)) {
         result = dis_inst(addr, &inst, dis);
         if (result <= 0) break;
-        // NOTE: convert current instruction bytes into easily comparable
-        // value to check for repeats.
-        uint32_t curr_bytes = 0;
-        for (size_t i = 0; i < inst.bv.size; ++i) {
-            curr_bytes |= inst.bv.mem[i] << (8 * i);
-        }
-        print_prg_line(dis, curr_bytes, inst.bankoffset, bv->size, &repeat, f);
+        print_prg_line(dis, verbose, &inst, &repeat, f);
         addr += inst.bv.size;
     }
     if (result < 0) return result;
 
-    // NOTE: always print the last line regardless of duplicate state
-    // (if it hasn't already been printed).
-    if (repeat.state == DUP_TRUNCATE || repeat.state == DUP_SKIP) {
+    // NOTE: always print the last line even if it would normally be skipped
+    if (repeat.skip) {
         fprintf(f, "%s\n", dis);
     }
     return 0;
@@ -593,6 +563,13 @@ int dis_inst_operand(const struct dis_instruction *inst,
 
     assert((unsigned int)count < DIS_OPERAND_SIZE);
     return count;
+}
+
+bool dis_inst_equal(const struct dis_instruction *lhs,
+                    const struct dis_instruction *rhs)
+{
+    return lhs && rhs && lhs->bv.size == rhs->bv.size
+            && memcmp(lhs->bv.mem, rhs->bv.mem, lhs->bv.size) == 0;
 }
 
 int dis_inst(uint16_t addr, const struct dis_instruction *inst,

@@ -11,6 +11,7 @@
 #include "dis.h"
 #include "snapshot.h"
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -464,6 +465,77 @@ static void inst_operand_two_byte_operand(void *ctx)
     const char *const exp = "$4C34";
     ct_assertequal((int)strlen(exp), length);
     ct_assertequalstrn(exp, buf, sizeof exp);
+}
+
+//
+// Instruction Equality
+//
+
+static void inst_eq_both_are_null(void *ctx)
+{
+    const bool result = dis_inst_equal(NULL, NULL);
+
+    ct_assertfalse(result);
+}
+
+static void inst_eq_rhs_is_null(void *ctx)
+{
+    const uint8_t a[] = {0xea};
+    const struct dis_instruction lhs = makeinst(a);
+
+    const bool result = dis_inst_equal(&lhs, NULL);
+
+    ct_assertfalse(result);
+}
+
+static void inst_eq_lhs_is_null(void *ctx)
+{
+    const uint8_t b[] = {0xad, 0x34, 0x4c};
+    const struct dis_instruction rhs = makeinst(b);
+
+    const bool result = dis_inst_equal(NULL, &rhs);
+
+    ct_assertfalse(result);
+}
+
+static void inst_eq_different_lengths(void *ctx)
+{
+    const uint8_t a[] = {0xea}, b[] = {0xad, 0x34, 0x4c};
+    const struct dis_instruction lhs = makeinst(a), rhs = makeinst(b);
+
+    const bool result = dis_inst_equal(&lhs, &rhs);
+
+    ct_assertfalse(result);
+}
+
+static void inst_eq_different_bytes(void *ctx)
+{
+    const uint8_t a[] = {0xad, 0x44, 0x80}, b[] = {0xad, 0x34, 0x4c};
+    const struct dis_instruction lhs = makeinst(a), rhs = makeinst(b);
+
+    const bool result = dis_inst_equal(&lhs, &rhs);
+
+    ct_assertfalse(result);
+}
+
+static void inst_eq_same_bytes(void *ctx)
+{
+    const uint8_t a[] = {0xad, 0x34, 0x4c}, b[] = {0xad, 0x34, 0x4c};
+    const struct dis_instruction lhs = makeinst(a), rhs = makeinst(b);
+
+    const bool result = dis_inst_equal(&lhs, &rhs);
+
+    ct_asserttrue(result);
+}
+
+static void inst_eq_same_object(void *ctx)
+{
+    const uint8_t a[] = {0xad, 0x44, 0x80};
+    const struct dis_instruction lhs = makeinst(a);
+
+    const bool result = dis_inst_equal(&lhs, &lhs);
+
+    ct_asserttrue(result);
 }
 
 //
@@ -2608,6 +2680,14 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(inst_operand_no_operand),
         ct_maketest(inst_operand_one_byte_operand),
         ct_maketest(inst_operand_two_byte_operand),
+
+        ct_maketest(inst_eq_both_are_null),
+        ct_maketest(inst_eq_rhs_is_null),
+        ct_maketest(inst_eq_lhs_is_null),
+        ct_maketest(inst_eq_different_lengths),
+        ct_maketest(inst_eq_different_bytes),
+        ct_maketest(inst_eq_same_bytes),
+        ct_maketest(inst_eq_same_object),
 
         ct_maketest(inst_does_nothing_if_no_bytes),
         ct_maketest(inst_disassembles_implied),

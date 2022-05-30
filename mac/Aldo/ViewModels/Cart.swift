@@ -120,12 +120,11 @@ final class BankCache<T> {
     private var items = [T?]()
 
     subscript(index: Int) -> T? {
-        get {
-            guard validIndex(index) else { return nil }
-            return items[index]
-        }
+        get { items.indices.contains(index) ? items[index] : nil }
         set(newValue) {
-            if validIndex(index), let val = newValue { items[index] = val }
+            if items.indices.contains(index), let val = newValue {
+                items[index] = val
+            }
         }
     }
 
@@ -135,10 +134,6 @@ final class BankCache<T> {
     }
 
     func reset() { items = [] }
-
-    private func validIndex(_ index: Int) -> Bool {
-        items.startIndex <= index && index < items.endIndex
-    }
 }
 
 fileprivate final class CartHandle {

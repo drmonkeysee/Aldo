@@ -110,8 +110,7 @@ struct Instruction {
     }
 
     func byte(at: Int) -> UInt8? {
-        guard 0 <= at && at < bytes.count else { return nil }
-        return bytes[at]
+        bytes.indices.contains(at) ? bytes[at] : nil
     }
 }
 

@@ -175,32 +175,31 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
 
     mutating func next() -> PrgLine? {
         if done { return nil }
-        return nextLine()
+        var line: PrgLine?
+        repeat { line = nextLine() } while line == nil && !done
+        return line
     }
 
     private mutating func nextLine() -> PrgLine? {
-        repeat {
-            var inst = dis_instruction()
-            let err = withUnsafePointer(to: bv) { p in
-                dis_parse_inst(p, cursor, &inst)
-            }
+        var inst = dis_instruction()
+        let err = withUnsafePointer(to: bv) { p in
+            dis_parse_inst(p, cursor, &inst)
+        }
 
-            if err < 0 {
-                done = true
-                return .failure(addr, .wrapDisError(code: err))
+        if err < 0 {
+            done = true
+            return .failure(addr, .wrapDisError(code: err))
+        }
+        else if err == 0 {
+            done = true
+            // NOTE: always print the last line even if it would
+            // normally be skipped.
+            if skip {
+                // NOTE: back up address to the last line
+                addr &-= .init(prevInstruction.bv.size)
+                return .disassembled(addr, .parse(prevInstruction))
             }
-            if err == 0 {
-                // NOTE: always print the last line even if it would
-                // normally be skipped.
-                if skip {
-                    done = true
-                    // NOTE: back up address to the last line
-                    addr &-= .init(prevInstruction.bv.size)
-                    return .disassembled(addr, .parse(prevInstruction))
-                }
-                break
-            }
-
+        } else {
             defer {
                 cursor += inst.bv.size
                 addr &+= .init(inst.bv.size)
@@ -215,7 +214,7 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
                 skip = false
                 return .disassembled(addr, .parse(inst))
             }
-        } while skip
+        }
         return nil
     }
 }

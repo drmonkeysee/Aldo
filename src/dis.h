@@ -63,8 +63,8 @@ const char *dis_inst_addrmode(const struct dis_instruction *inst);
 uint8_t dis_inst_flags(const struct dis_instruction *inst);
 int dis_inst_operand(const struct dis_instruction *inst,
                      char dis[restrict static DIS_OPERAND_SIZE]);
-bool dis_inst_equal(const struct dis_instruction *a,
-                    const struct dis_instruction *b);
+bool dis_inst_equal(const struct dis_instruction *lhs,
+                    const struct dis_instruction *rhs);
 
 // NOTE: functions w/buffer params leave buffer untouched when returning <= 0
 int dis_inst(uint16_t addr, const struct dis_instruction *inst,

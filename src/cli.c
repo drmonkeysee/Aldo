@@ -54,9 +54,12 @@ static int print_cart_info(const struct control *appstate, cart *c)
 
 static int disassemble_cart_prg(const struct control *appstate, cart *c)
 {
-    return dis_cart_prg(c, appstate, stdout) == 0
-            ? EXIT_SUCCESS
-            : EXIT_FAILURE;
+    const int err = dis_cart_prg(c, appstate, stdout);
+    if (err < 0) {
+        fprintf(stderr, "PRG decode error (%d): %s\n", err, dis_errstr(err));
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }
 
 static int decode_cart_chr(const struct control *appstate, cart *c)
@@ -64,8 +67,7 @@ static int decode_cart_chr(const struct control *appstate, cart *c)
     errno = 0;
     const int err = dis_cart_chr(c, appstate, stdout);
     if (err < 0) {
-        fprintf(stderr, "CHR decode error (%d): %s\n", err,
-                dis_errstr(err));
+        fprintf(stderr, "CHR decode error (%d): %s\n", err, dis_errstr(err));
         if (err == DIS_ERR_ERNO) {
             perror("CHR decode file error");
         }

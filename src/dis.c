@@ -706,15 +706,18 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
     fprintf(f, "%s\n", appstate->cartfile);
     cart_write_dis_header(cart, f);
 
-    for (struct bankview bv = cart_prgbank(cart, 0);
-         bv.mem;
-         bv = cart_prgbank(cart, bv.bank + 1)) {
+    struct bankview bv = cart_prgbank(cart, 0);
+    if (!bv.mem) return DIS_ERR_PRGROM;
+
+    do {
         fputc('\n', f);
         const int err = print_prgbank(&bv, appstate->verbose, f);
         if (err < 0) {
             fprintf(stderr, "Dis err (%d): %s\n", err, dis_errstr(err));
         }
-    }
+        bv = cart_prgbank(cart, bv.bank + 1);
+    } while (bv.mem);
+
     return 0;
 }
 

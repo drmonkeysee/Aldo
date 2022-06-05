@@ -53,9 +53,8 @@ fileprivate struct BankSelectionView: View {
             } label: {
                 prgLabel()
             }
-            CopyToClipboardView(command: ClipboardCopy {
-                await banks.cart.readAllPrgBanks()
-            })
+            CopyToClipboardView(
+                command: ClipboardCopy(fromStream: banks.cart.readAllPrgBanks))
         }
     }
 }

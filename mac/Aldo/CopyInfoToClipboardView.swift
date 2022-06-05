@@ -10,14 +10,13 @@ import SwiftUI
 struct CopyInfoToClipboardView: View {
     private static let fadeDuration = 2.0
 
-    let cart: Cart
-    @StateObject private var command = CopyCartInfo()
+    @ObservedObject var command: CopyCartInfo
 
     var body: some View {
         Button {
             // TODO: this is blocking regardless of priority
             Task(priority: .userInitiated) {
-                await command.execute(cart: cart)
+                await command.execute()
             }
         } label: {
             ZStack {
@@ -57,9 +56,9 @@ struct CopyInfoToClipboardView: View {
 }
 
 struct CopyToClipboardView_Previews: PreviewProvider {
-    private static let cart = Cart()
-
     static var previews: some View {
-        CopyInfoToClipboardView(cart: cart)
+        CopyInfoToClipboardView(command: CopyCartInfo(fromStream: {
+            .success(.init())
+        }))
     }
 }

@@ -23,6 +23,7 @@ struct CartChrView: View {
             default:
                 NoChrView(reason: "No CHR ROM Available")
             }
+            ExportView()
         }
         .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: .zero))
     }
@@ -125,6 +126,30 @@ fileprivate struct PaletteView: View {
             .background(.cyan)
             .cornerRadius(Constraints.cornerRadius)
             .padding(.trailing, Constraints.sheetPadding)
+    }
+}
+
+fileprivate struct ExportView: View {
+    @State var scale = 1
+
+    var body: some View {
+        GroupBox {
+            HStack {
+                Picker(selection: $scale) {
+                    ForEach(1..<10) { i in
+                        Text("\(i)x")
+                    }
+                } label: {
+                    Text("Scale")
+                }
+                Button("Export") {
+                    // do nothing
+                }
+            }
+            Text("Output")
+        }
+        .frame(width: Constraints.sheetSize.w / 2)
+        .padding(.leading, Constraints.sheetPadding)
     }
 }
 

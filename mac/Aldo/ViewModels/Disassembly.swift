@@ -45,7 +45,7 @@ final class ProgramListing: ObservableObject {
 
 enum PrgLine {
     case disassembled(UInt16, Instruction)
-    case elision(UInt16)
+    case elision
     case failure(UInt16, AldoError)
 
     var display: String {
@@ -207,7 +207,7 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
             if dis_inst_equal(&inst, &prevInstruction) {
                 if !skip {
                     skip = true
-                    return .elision(addr)
+                    return .elision
                 }
             } else {
                 prevInstruction = inst

@@ -14,9 +14,7 @@ struct CopyToClipboardView: View {
 
     var body: some View {
         Button {
-            Task(priority: .userInitiated) {
-                await command.execute()
-            }
+            Task(priority: .userInitiated) { await command.execute() }
         } label: {
             ZStack {
                 Image(systemName: "arrow.up.doc.on.clipboard")

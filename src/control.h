@@ -29,7 +29,7 @@ struct control {
     int chrscale, ramsheet, resetvector;
     bool
         batch, bcdsupport, chrdecode, disassemble, help, info, running, tron,
-        verbose, version;
+        unified_disoutput, verbose, version;
 };
 
 extern const int MinCps, MaxCps, RamSheets;

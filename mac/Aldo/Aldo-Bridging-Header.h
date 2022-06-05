@@ -4,4 +4,5 @@
 
 #include "bytes.h"
 #include "cart.h"
+#include "control.h"
 #include "dis.h"

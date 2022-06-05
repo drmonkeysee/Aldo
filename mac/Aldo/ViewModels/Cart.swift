@@ -56,6 +56,22 @@ final class Cart: ObservableObject {
         }
     }
 
+    func readAllPrgBanks() async -> CStreamResult {
+        guard let n = name, let h = handle else {
+            return .error(.ioError("No cart set"))
+        }
+
+        return await readCStream { stream in
+            try n.withCString { cartFile in
+                var appstate = control()
+                appstate.cartfile = cartFile
+                appstate.unified_disoutput = true
+                let err = dis_cart_prg(h.unwrapped, &appstate, stream)
+                if err < 0 { throw AldoError.wrapDisError(code: err) }
+            }
+        }
+    }
+
     private func loadCart(_ filePath: URL) -> CartHandle? {
         currentError = nil
         do {

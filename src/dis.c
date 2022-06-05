@@ -713,7 +713,8 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
         fputc('\n', f);
         const int err = print_prgbank(&bv, appstate->verbose, f);
         if (err < 0) {
-            fprintf(stderr, "Dis err (%d): %s\n", err, dis_errstr(err));
+            fprintf(appstate->unified_disoutput ? f : stderr,
+                    "Dis err (%d): %s\n", err, dis_errstr(err));
         }
         bv = cart_prgbank(cart, bv.bank + 1);
     } while (bv.mem);

@@ -54,7 +54,7 @@ fileprivate struct BankSelectionView: View {
                 prgLabel()
             }
             // TODO: make this work with prg bank
-            CopyInfoToClipboardView(command: CopyCartInfo {
+            CopyToClipboardView(command: ClipboardCopy {
                 await banks.cart.readInfoText()
             })
         }

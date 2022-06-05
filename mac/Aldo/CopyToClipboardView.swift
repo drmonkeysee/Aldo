@@ -1,5 +1,5 @@
 //
-//  CopyInfoToClipboardView.swift
+//  CopyToClipboardView.swift
 //  Aldo-App
 //
 //  Created by Brandon Stansbury on 3/28/22.
@@ -7,14 +7,13 @@
 
 import SwiftUI
 
-struct CopyInfoToClipboardView: View {
+struct CopyToClipboardView: View {
     private static let fadeDuration = 2.0
 
-    @ObservedObject var command: CopyCartInfo
+    @ObservedObject var command: ClipboardCopy
 
     var body: some View {
         Button {
-            // TODO: this is blocking regardless of priority
             Task(priority: .userInitiated) {
                 await command.execute()
             }
@@ -57,7 +56,7 @@ struct CopyInfoToClipboardView: View {
 
 struct CopyToClipboardView_Previews: PreviewProvider {
     static var previews: some View {
-        CopyInfoToClipboardView(command: CopyCartInfo(fromStream: {
+        CopyToClipboardView(command: ClipboardCopy(fromStream: {
             .success(.init())
         }))
     }

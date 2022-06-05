@@ -1,5 +1,5 @@
 //
-//  CopyCartInfo.swift
+//  ClipboardCopy.swift
 //  Aldo-App
 //
 //  Created by Brandon Stansbury on 4/18/22.
@@ -7,7 +7,7 @@
 
 import AppKit
 
-final class CopyCartInfo: ObservableObject {
+final class ClipboardCopy: ObservableObject {
     let textStream: () async -> CStreamResult
     @Published var copyIconOpacity = 1.0
     @Published var successIconOpacity = 0.0

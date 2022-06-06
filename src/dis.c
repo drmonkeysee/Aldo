@@ -712,6 +712,8 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
     do {
         fputc('\n', f);
         const int err = print_prgbank(&bv, appstate->verbose, f);
+        // NOTE: disassembly errors may occur normally if data bytes are
+        // interpreted as instructions so note the result and continue.
         if (err < 0) {
             fprintf(appstate->unified_disoutput ? f : stderr,
                     "Dis err (%d): %s\n", err, dis_errstr(err));
@@ -746,14 +748,12 @@ int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output)
     struct bankview bv = cart_chrbank(cart, 0);
     if (!bv.mem) return DIS_ERR_CHRROM;
 
+    int err;
     do {
-        const int err = write_chrbank(&bv, appstate->chrscale,
-                                      appstate->chrdecode_prefix, output);
-        if (err < 0) {
-            fprintf(stderr, "Chr err (%d): %s\n", err, dis_errstr(err));
-        }
+        err = write_chrbank(&bv, appstate->chrscale,
+                            appstate->chrdecode_prefix, output);
+        if (err < 0) break;
         bv = cart_chrbank(cart, bv.bank + 1);
     } while (bv.mem);
-
-    return 0;
+    return err;
 }

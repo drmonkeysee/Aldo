@@ -56,10 +56,10 @@ fileprivate struct CommonInfoView: View {
         case .separators:
             FormatSeparatorsView(count: Self.labels.count)
         case .values:
-            Text(cart.name ?? "No rom")
+            Text(cart.fileName ?? "No rom")
                 .lineLimit(1)
                 .truncationMode(.middle)
-                .help(cart.name ?? "")
+                .help(cart.fileName ?? "")
             Text(cart.info.name)
         }
     }

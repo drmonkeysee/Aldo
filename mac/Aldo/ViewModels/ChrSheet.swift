@@ -53,6 +53,7 @@ final class ChrExport: ObservableObject {
         self.cart = cart
     }
 
+    @MainActor
     func exportChrBanks(to: URL?) async {
         guard let folder = to else { return }
 

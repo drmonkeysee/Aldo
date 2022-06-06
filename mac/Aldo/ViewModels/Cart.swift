@@ -15,7 +15,8 @@ final class Cart: ObservableObject {
     private(set) var currentError: AldoError?
     private var handle: CartHandle?
 
-    var name: String? { file?.lastPathComponent }
+    var fileName: String? { file?.lastPathComponent }
+    var name: String? { file?.deletingPathExtension().lastPathComponent }
 
     func load(from: URL?) -> Bool {
         currentError = nil
@@ -35,7 +36,7 @@ final class Cart: ObservableObject {
         guard let h = handle else { return .error(.ioError("No cart set")) }
 
         return await readCStream { stream in
-            cart_write_info(h.unwrapped, self.name, stream, true)
+            cart_write_info(h.unwrapped, self.fileName, stream, true)
         }
     }
 
@@ -45,7 +46,7 @@ final class Cart: ObservableObject {
     }
 
     func readAllPrgBanks() async -> CStreamResult {
-        guard let n = name, let h = handle else {
+        guard let n = fileName, let h = handle else {
             return .error(.ioError("No cart set"))
         }
 
@@ -73,7 +74,27 @@ final class Cart: ObservableObject {
     }
 
     func exportChrBanks(scale: Int, folder: URL) async -> CStreamResult {
-        .error(.wrapDisError(code: Int32(DIS_ERR_CHRROM)))
+        guard let n = name, let h = handle else {
+            return .error(.ioError("No cart set"))
+        }
+
+        return await readCStream { stream in
+            let prefix = "\(folder.appendingPathComponent(n).path)-bank"
+            try prefix.withCString { chrprefix in
+                var appstate = control()
+                appstate.unified_disoutput = true
+                appstate.chrdecode_prefix = chrprefix
+                appstate.chrscale = Int32(scale)
+                errno = 0
+                let err = dis_cart_chr(h.unwrapped, &appstate, stream)
+                if err < 0 {
+                    if err == DIS_ERR_ERNO {
+                        throw AldoError.ioErrno
+                    }
+                    throw AldoError.wrapDisError(code: err)
+                }
+            }
+        }
     }
 
     private func loadCart(_ filePath: URL) -> CartHandle? {

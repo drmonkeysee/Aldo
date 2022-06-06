@@ -84,6 +84,7 @@
 		C8DBC92227C8708B0043994B /* AldoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBC92127C8708B0043994B /* AldoTests.swift */; };
 		C8DBC92C27C8708B0043994B /* AldoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBC92B27C8708B0043994B /* AldoUITests.swift */; };
 		C8DBC92E27C8708B0043994B /* AldoUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBC92D27C8708B0043994B /* AldoUITestsLaunchTests.swift */; };
+		C8ED8339284DAA5100B563EC /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
 		C8F2985B2810ECEF00ECFD7E /* CStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F2985A2810ECEF00ECFD7E /* CStream.swift */; };
 		C8FB31D12803D6EC00E6B0EF /* AldoError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8FB31D02803D6EC00E6B0EF /* AldoError.swift */; };
 /* End PBXBuildFile section */
@@ -704,6 +705,7 @@
 				C8AA371D27F26CE80076E083 /* CopyToClipboardView.swift in Sources */,
 				C8DBC91027C8708A0043994B /* AldoApp.swift in Sources */,
 				C8C9FB662803F8BD0093D9A7 /* decode.c in Sources */,
+				C8ED8339284DAA5100B563EC /* control.c in Sources */,
 				C8B5303B2801300C00576D9F /* CartFocusView.swift in Sources */,
 				C8197525280E725B00762462 /* ClipboardCopy.swift in Sources */,
 				C88A5E8527F6A1750039382D /* CartView.swift in Sources */,

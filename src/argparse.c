@@ -44,13 +44,12 @@ static const char
     VerboseShort = 'v',
     VersionShort = 'V';
 
-static const int
-    MinScale = 1, MaxScale = 10, MinAddress = 0, MaxAddress = ADDRMASK_64KB;
+static const int MinAddress = 0, MaxAddress = ADDRMASK_64KB;
 
 static void init_control(struct control *appstate)
 {
     *appstate = (struct control){
-        .chrscale = MinScale,
+        .chrscale = MinChrScale,
         .clock = {.cycles_per_sec = 4},
         .resetvector = -1,
         .running = true,
@@ -155,12 +154,12 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
     if (parse_flag(arg, ChrScaleShort, true, ChrScaleLong)) {
         long scale;
         const bool result = parse_number(arg, argi, argc, argv, 10, &scale);
-        if (result && MinScale <= scale && scale <= MaxScale) {
+        if (result && MinChrScale <= scale && scale <= MaxChrScale) {
             appstate->chrscale = (int)scale;
             return true;
         }
-        fprintf(stderr, "Invalid scale format: expected [%d, %d]\n", MinScale,
-                MaxScale);
+        fprintf(stderr, "Invalid scale format: expected [%d, %d]\n",
+                MinChrScale, MaxChrScale);
         return false;
     }
 
@@ -237,7 +236,8 @@ void argparse_usage(const char *me)
            " (alt %s x)\n", ResVectorShort, MinAddress, MaxAddress,
            ResVectorLong);
     printf("  -%c n\t: CHR ROM BMP scaling factor [%d, %d]"
-           " (alt %s n)\n", ChrScaleShort, MinScale, MaxScale, ChrScaleLong);
+           " (alt %s n)\n", ChrScaleShort, MinChrScale, MaxChrScale,
+           ChrScaleLong);
     printf("  -%c\t: turn on trace-logging and ram dumps (alt %s)\n",
            TraceShort, TraceLong);
     printf("  -%c\t: verbose output\n", VerboseShort);

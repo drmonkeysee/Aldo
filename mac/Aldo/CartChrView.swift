@@ -23,7 +23,7 @@ struct CartChrView: View {
             default:
                 NoChrView(reason: "No CHR ROM Available")
             }
-            ExportView()
+            ExportView(command: ChrExport(cart))
         }
         .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: .zero))
     }
@@ -130,26 +130,73 @@ fileprivate struct PaletteView: View {
 }
 
 fileprivate struct ExportView: View {
-    @State var scale = 1
+    @ObservedObject var command: ChrExport
 
     var body: some View {
         GroupBox {
-            HStack {
-                Picker(selection: $scale) {
-                    ForEach(1..<10) { i in
-                        Text("\(i)x")
+            HStack(alignment: .top) {
+                VStack(alignment: .leading) {
+                    Picker(selection: $command.scale) {
+                        ForEach(command.scales, id: \.self) { i in
+                            Text("\(i)x")
+                        }
+                    } label: {
+                        Text("Scale")
+                    }
+                    HStack {
+                        Button("Export", action: pickFolder)
+                        Spacer()
+                        Button(action: openTargetFolder) {
+                            Image(systemName: "folder")
+                        }
+                        .disabled(!command.done)
+                        .help("Open export folder")
+                    }
+                    .alert("CHR Export Failure", isPresented: $command.failed,
+                           presenting: command.currentError) { _ in
+                        // NOTE: default action
+                    } message: { err in
+                        Text(err.message)
+                    }
+                }
+                .frame(width: 120)
+                GroupBox {
+                    ScrollView {
+                        Text(command.output ?? "")
+                            .font(.system(.body, design: .monospaced))
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 } label: {
-                    Text("Scale")
-                }
-                Button("Export") {
-                    // do nothing
+                    Label("Output", systemImage: "text.alignleft")
+                        .font(.subheadline)
                 }
             }
-            Text("Output")
+            .frame(width: Constraints.sheetSize.w
+                            - Constraints.groupboxPadding)
         }
-        .frame(width: Constraints.sheetSize.w / 2)
+        .frame(height: Constraints.sheetSize.h / 2)
         .padding(.leading, Constraints.sheetPadding)
+        .padding(.trailing, Constraints.groupboxPadding)
+    }
+
+    private func pickFolder() {
+        let panel = NSOpenPanel()
+        panel.message = "Choose export target folder"
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.canCreateDirectories = true
+        if panel.runModal() == .OK {
+            Task(priority: .userInitiated) {
+                await command.exportChrBanks(to: panel.url)
+            }
+        }
+    }
+
+    private func openTargetFolder() {
+        guard let folder = command.selectedFolder,
+              folder.hasDirectoryPath else { return }
+        NSWorkspace.shared.selectFile(nil,
+                                      inFileViewerRootedAtPath: folder.path)
     }
 }
 

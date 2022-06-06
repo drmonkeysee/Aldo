@@ -60,7 +60,7 @@ struct ContentView: View {
     private func pickFile() {
         let panel = NSOpenPanel()
         panel.message = "Choose a ROM file"
-        if panel.runModal() == NSApplication.ModalResponse.OK {
+        if panel.runModal() == .OK {
             cartLoadFailed = !cart.load(from: panel.url)
         }
     }

@@ -72,6 +72,10 @@ final class Cart: ObservableObject {
         }
     }
 
+    func exportChrBanks(scale: Int, folder: URL) async -> CStreamResult {
+        .error(.wrapDisError(code: Int32(DIS_ERR_CHRROM)))
+    }
+
     private func loadCart(_ filePath: URL) -> CartHandle? {
         currentError = nil
         do {

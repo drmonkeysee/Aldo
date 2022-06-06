@@ -32,7 +32,7 @@ struct control {
         unified_disoutput, verbose, version;
 };
 
-extern const int MinCps, MaxCps, RamSheets;
+extern const int MinChrScale, MaxChrScale, MinCps, MaxCps, RamSheets;
 
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!

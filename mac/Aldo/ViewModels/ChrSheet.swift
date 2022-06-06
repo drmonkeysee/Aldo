@@ -39,6 +39,46 @@ final class ChrSheet: ObservableObject {
     }
 }
 
+final class ChrExport: ObservableObject {
+    let cart: Cart
+    let scales = Array(Int(MinChrScale)...Int(MaxChrScale))
+    @Published var scale = ChrSheet.scale
+    @Published var output: String?
+    @Published var done = false
+    @Published var failed = false
+    var selectedFolder: URL?
+    private(set) var currentError: AldoError?
+
+    init(_ cart: Cart) {
+        self.cart = cart
+    }
+
+    func exportChrBanks(to: URL?) async {
+        guard let folder = to else { return }
+
+        selectedFolder = folder
+        done = false
+        currentError = nil
+        let result = await cart.exportChrBanks(scale: scale, folder: folder)
+        switch result {
+        case let .success(data):
+            if let text = String(data: data, encoding: .utf8) {
+                output = text
+                done = true
+            } else {
+                setError(.unknown)
+            }
+        case let .error(err):
+            setError(err)
+        }
+    }
+
+    private func setError(_ err: AldoError) {
+        currentError = err
+        failed = true
+    }
+}
+
 fileprivate func chrBanks(_ cart: Cart) -> Int { cart.info.chrBanks }
 
 fileprivate actor ChrStore {

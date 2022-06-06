@@ -17,6 +17,7 @@ final class Cart: ObservableObject {
 
     var fileName: String? { file?.lastPathComponent }
     var name: String? { file?.deletingPathExtension().lastPathComponent }
+    private var noCart: CStreamResult { .error(.ioError("No cart set")) }
 
     func load(from: URL?) -> Bool {
         currentError = nil
@@ -33,7 +34,7 @@ final class Cart: ObservableObject {
     }
 
     func readInfoText() async -> CStreamResult {
-        guard let h = handle else { return .error(.ioError("No cart set")) }
+        guard let h = handle else { return noCart }
 
         return await readCStream { stream in
             cart_write_info(h.unwrapped, self.fileName, stream, true)
@@ -46,9 +47,7 @@ final class Cart: ObservableObject {
     }
 
     func readAllPrgBanks() async -> CStreamResult {
-        guard let n = fileName, let h = handle else {
-            return .error(.ioError("No cart set"))
-        }
+        guard let n = fileName, let h = handle else { return noCart }
 
         return await readCStream { stream in
             try n.withCString { cartFile in
@@ -62,7 +61,7 @@ final class Cart: ObservableObject {
     }
 
     func readChrBank(bank: Int, scale: Int) async -> CStreamResult {
-        guard let h = handle else { return .error(.ioError("No cart set")) }
+        guard let h = handle else { return noCart }
 
         return await readCStream(binary: true) { stream in
             let bankview = cart_chrbank(h.unwrapped, bank)
@@ -74,9 +73,7 @@ final class Cart: ObservableObject {
     }
 
     func exportChrBanks(scale: Int, folder: URL) async -> CStreamResult {
-        guard let n = name, let h = handle else {
-            return .error(.ioError("No cart set"))
-        }
+        guard let n = name, let h = handle else { return noCart }
 
         return await readCStream { stream in
             let prefix = "\(folder.appendingPathComponent(n).path)-bank"

@@ -194,7 +194,10 @@ fileprivate struct ExportView: View {
 
     private func openTargetFolder() {
         guard let folder = command.selectedFolder,
-              folder.hasDirectoryPath else { return }
+              folder.hasDirectoryPath else {
+            aldoLog.debug("Missing/invalid target folder for button action")
+            return
+        }
         NSWorkspace.shared.selectFile(nil,
                                       inFileViewerRootedAtPath: folder.path)
     }

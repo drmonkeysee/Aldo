@@ -13,10 +13,12 @@ struct CartChrView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Label("CHR ROM", systemImage: "photo")
-                    .font(.headline)
                 if case .iNes = cart.info, cart.info.chrBanks > 0 {
+                    chrLabel()
                     ExportView(command: ChrExport(cart))
+                } else {
+                    chrLabel()
+                        .padding(.top, 2)
                 }
             }
             switch cart.info {
@@ -30,6 +32,11 @@ struct CartChrView: View {
             }
         }
         .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: .zero))
+    }
+
+    private func chrLabel() -> some View {
+        Label("CHR ROM", systemImage: "photo")
+            .font(.headline)
     }
 }
 

@@ -748,12 +748,12 @@ int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output)
     struct bankview bv = cart_chrbank(cart, 0);
     if (!bv.mem) return DIS_ERR_CHRROM;
 
-    int err;
     do {
-        err = write_chrbank(&bv, appstate->chrscale,
-                            appstate->chrdecode_prefix, output);
-        if (err < 0) break;
+        const int err = write_chrbank(&bv, appstate->chrscale,
+                                      appstate->chrdecode_prefix, output);
+        if (err < 0) return err;
         bv = cart_chrbank(cart, bv.bank + 1);
     } while (bv.mem);
-    return err;
+
+    return 0;
 }

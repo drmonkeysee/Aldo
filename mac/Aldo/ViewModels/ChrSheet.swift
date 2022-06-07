@@ -46,7 +46,7 @@ final class ChrExport: ObservableObject {
     @Published var output: String?
     @Published var done = false
     @Published var failed = false
-    var selectedFolder: URL?
+    private(set) var selectedFolder: URL?
     private(set) var currentError: AldoError?
 
     init(_ cart: Cart) {

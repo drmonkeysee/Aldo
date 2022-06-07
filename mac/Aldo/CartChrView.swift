@@ -146,7 +146,7 @@ fileprivate struct ExportView: View {
     var body: some View {
         HStack {
             Button(action: pickFolder) {
-                Label("Export", systemImage: "arrow.up.doc")
+                Label("Export", systemImage: "square.and.arrow.up.circle")
             }
             Picker(selection: $command.scale) {
                 ForEach(command.scales, id: \.self) { i in

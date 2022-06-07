@@ -38,16 +38,6 @@
                ReferencedContainer = "container:Aldo.xcodeproj">
             </BuildableReference>
          </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C8DBC92627C8708B0043994B"
-               BuildableName = "AldoUITests.xctest"
-               BlueprintName = "AldoUITests"
-               ReferencedContainer = "container:Aldo.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

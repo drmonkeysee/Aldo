@@ -12,8 +12,13 @@ struct CartChrView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Label("CHR ROM", systemImage: "photo")
-                .font(.headline)
+            HStack {
+                Label("CHR ROM", systemImage: "photo")
+                    .font(.headline)
+                if case .iNes = cart.info, cart.info.chrBanks > 0 {
+                    ExportView(command: ChrExport(cart))
+                }
+            }
             switch cart.info {
             case .iNes where cart.info.chrBanks > 0:
                 ChrBanksView(banks: ChrBanks(cart))
@@ -23,7 +28,6 @@ struct CartChrView: View {
             default:
                 NoChrView(reason: "No CHR ROM Available")
             }
-            ExportView(command: ChrExport(cart))
         }
         .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: .zero))
     }
@@ -133,55 +137,35 @@ fileprivate struct ExportView: View {
     @ObservedObject var command: ChrExport
 
     var body: some View {
-        GroupBox {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading) {
-                    Picker(selection: $command.scale) {
-                        ForEach(command.scales, id: \.self) { i in
-                            Text("\(i)x")
-                        }
-                    } label: {
-                        Text("Scale")
-                    }
-                    HStack {
-                        Button("Export", action: pickFolder)
-                        Spacer()
-                        Button(action: openTargetFolder) {
-                            Image(systemName: "folder")
-                        }
-                        .disabled(!command.done)
-                        .help("Open export folder")
-                    }
-                    .alert("CHR Export Failure", isPresented: $command.failed,
-                           presenting: command.currentError) { _ in
-                        // NOTE: default action
-                    } message: { err in
-                        Text(err.message)
-                    }
-                }
-                .frame(width: 120)
-                GroupBox {
-                    ScrollView {
-                        Text(command.output ?? "")
-                            .font(.system(.body, design: .monospaced))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                } label: {
-                    Label("Output", systemImage: "text.alignleft")
-                        .font(.subheadline)
-                }
+        HStack {
+            Button(action: pickFolder) {
+                Label("Export", systemImage: "arrow.up.doc")
             }
-            .frame(width: Constraints.sheetSize.w
-                            - Constraints.groupboxPadding)
+            Picker(selection: $command.scale) {
+                ForEach(command.scales, id: \.self) { i in
+                    Text("\(i)x")
+                }
+            } label: {
+                Text("Scale")
+            }
+            .frame(width: 120)
+            Button(action: openTargetFolder) {
+                Image(systemName: "folder")
+            }
+            .disabled(!command.done)
+            .help("Open export folder")
         }
-        .frame(height: Constraints.sheetSize.h / 2)
-        .padding(.leading, Constraints.sheetPadding)
-        .padding(.trailing, Constraints.groupboxPadding)
+        .alert("CHR Export Failure", isPresented: $command.failed,
+               presenting: command.currentError) { _ in
+            // NOTE: default action
+        } message: { err in
+            Text(err.message)
+        }
     }
 
     private func pickFolder() {
         let panel = NSOpenPanel()
-        panel.message = "Choose export target folder"
+        panel.message = "Choose export folder"
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.canCreateDirectories = true
@@ -195,7 +179,7 @@ fileprivate struct ExportView: View {
     private func openTargetFolder() {
         guard let folder = command.selectedFolder,
               folder.hasDirectoryPath else {
-            aldoLog.debug("Missing/invalid target folder for button action")
+            aldoLog.debug("Missing/invalid export target folder")
             return
         }
         NSWorkspace.shared.selectFile(nil,

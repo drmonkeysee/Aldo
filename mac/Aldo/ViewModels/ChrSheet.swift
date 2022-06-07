@@ -43,7 +43,6 @@ final class ChrExport: ObservableObject {
     let cart: Cart
     let scales = Array(Int(MinChrScale)...Int(MaxChrScale))
     @Published var scale = ChrSheet.scale
-    @Published var output: String?
     @Published var done = false
     @Published var failed = false
     private(set) var selectedFolder: URL?
@@ -64,7 +63,7 @@ final class ChrExport: ObservableObject {
         switch result {
         case let .success(data):
             if let text = String(data: data, encoding: .utf8) {
-                output = text
+                aldoLog.debug("CHR Export:\n\(text)")
                 done = true
             } else {
                 setError(.unknown)

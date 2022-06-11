@@ -57,7 +57,7 @@ static void parse_inst_empty_bankview(void *ctx)
     const int result = dis_parse_inst(&bv, 0, &inst);
 
     ct_assertequal(DIS_ERR_PRGROM, result);
-    ct_assertequal(0u, inst.bv.bank);
+    ct_assertequal(0u, inst.bv.index);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
     ct_assertequal(0u, inst.bankoffset);
@@ -72,14 +72,14 @@ static void parse_inst_at_start(void *ctx)
     struct bankview bv = {
         .mem = mem,
         .size = sizeof mem / sizeof mem[0],
-        .bank = 1,
+        .index = 1,
     };
     struct dis_instruction inst;
 
     const int result = dis_parse_inst(&bv, 0, &inst);
 
     ct_assertequal(1, result);
-    ct_assertequal(bv.bank, inst.bv.bank);
+    ct_assertequal(bv.index, inst.bv.index);
     ct_assertequal(0xeau, inst.bv.mem[0]);
     ct_assertequal(1u, inst.bv.size);
     ct_assertequal(0u, inst.bankoffset);
@@ -94,14 +94,14 @@ static void parse_inst_in_middle(void *ctx)
     struct bankview bv = {
         .mem = mem,
         .size = sizeof mem / sizeof mem[0],
-        .bank = 1,
+        .index = 1,
     };
     struct dis_instruction inst;
 
     const int result = dis_parse_inst(&bv, 3, &inst);
 
     ct_assertequal(3, result);
-    ct_assertequal(bv.bank, inst.bv.bank);
+    ct_assertequal(bv.index, inst.bv.index);
     ct_assertequal(0x4cu, inst.bv.mem[0]);
     ct_assertequal(0x34u, inst.bv.mem[1]);
     ct_assertequal(0x6u, inst.bv.mem[2]);
@@ -118,14 +118,14 @@ static void parse_inst_unofficial(void *ctx)
     struct bankview bv = {
         .mem = mem,
         .size = sizeof mem / sizeof mem[0],
-        .bank = 1,
+        .index = 1,
     };
     struct dis_instruction inst;
 
     const int result = dis_parse_inst(&bv, 2, &inst);
 
     ct_assertequal(2, result);
-    ct_assertequal(bv.bank, inst.bv.bank);
+    ct_assertequal(bv.index, inst.bv.index);
     ct_assertequal(0x34u, inst.bv.mem[0]);
     ct_assertequal(0x4cu, inst.bv.mem[1]);
     ct_assertequal(2u, inst.bv.size);
@@ -141,14 +141,14 @@ static void parse_inst_eof(void *ctx)
     struct bankview bv = {
         .mem = mem,
         .size = sizeof mem / sizeof mem[0],
-        .bank = 1,
+        .index = 1,
     };
     struct dis_instruction inst;
 
     const int result = dis_parse_inst(&bv, 5, &inst);
 
     ct_assertequal(DIS_ERR_EOF, result);
-    ct_assertequal(0u, inst.bv.bank);
+    ct_assertequal(0u, inst.bv.index);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
     ct_assertequal(0u, inst.bankoffset);
@@ -163,14 +163,14 @@ static void parse_inst_out_of_bounds(void *ctx)
     struct bankview bv = {
         .mem = mem,
         .size = sizeof mem / sizeof mem[0],
-        .bank = 1,
+        .index = 1,
     };
     struct dis_instruction inst;
 
     const int result = dis_parse_inst(&bv, 10, &inst);
 
     ct_assertequal(0, result);
-    ct_assertequal(0u, inst.bv.bank);
+    ct_assertequal(0u, inst.bv.index);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
     ct_assertequal(0u, inst.bankoffset);
@@ -186,7 +186,7 @@ static void parsemem_inst_empty_bankview(void *ctx)
     const int result = dis_parsemem_inst(0, NULL, 0, &inst);
 
     ct_assertequal(DIS_ERR_PRGROM, result);
-    ct_assertequal(0u, inst.bv.bank);
+    ct_assertequal(0u, inst.bv.index);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
     ct_assertequal(0u, inst.bankoffset);
@@ -204,7 +204,7 @@ static void parsemem_inst_at_start(void *ctx)
                                          &inst);
 
     ct_assertequal(1, result);
-    ct_assertequal(0u, inst.bv.bank);
+    ct_assertequal(0u, inst.bv.index);
     ct_assertequal(0xeau, inst.bv.mem[0]);
     ct_assertequal(1u, inst.bv.size);
     ct_assertequal(0u, inst.bankoffset);
@@ -222,7 +222,7 @@ static void parsemem_inst_in_middle(void *ctx)
                                          &inst);
 
     ct_assertequal(3, result);
-    ct_assertequal(0u, inst.bv.bank);
+    ct_assertequal(0u, inst.bv.index);
     ct_assertequal(0x4cu, inst.bv.mem[0]);
     ct_assertequal(0x34u, inst.bv.mem[1]);
     ct_assertequal(0x6u, inst.bv.mem[2]);
@@ -242,7 +242,7 @@ static void parsemem_inst_unofficial(void *ctx)
                                          &inst);
 
     ct_assertequal(2, result);
-    ct_assertequal(0u, inst.bv.bank);
+    ct_assertequal(0u, inst.bv.index);
     ct_assertequal(0x34u, inst.bv.mem[0]);
     ct_assertequal(0x4cu, inst.bv.mem[1]);
     ct_assertequal(2u, inst.bv.size);
@@ -261,7 +261,7 @@ static void parsemem_inst_eof(void *ctx)
                                          &inst);
 
     ct_assertequal(DIS_ERR_EOF, result);
-    ct_assertequal(0u, inst.bv.bank);
+    ct_assertequal(0u, inst.bv.index);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
     ct_assertequal(0u, inst.bankoffset);
@@ -279,7 +279,7 @@ static void parsemem_inst_out_of_bounds(void *ctx)
                                          &inst);
 
     ct_assertequal(0, result);
-    ct_assertequal(0u, inst.bv.bank);
+    ct_assertequal(0u, inst.bv.index);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
     ct_assertequal(0u, inst.bankoffset);

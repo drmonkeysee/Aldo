@@ -92,7 +92,7 @@ struct cartinfo {
 };
 
 struct bankview {
-    size_t bank, size;
+    size_t index, size;
     const uint8_t *mem; // Non-owning Pointer
 };
 

@@ -243,7 +243,7 @@ void argparse_usage(const char *me)
     printf("  -%c\t: verbose output\n", VerboseShort);
     puts("\ncommands");
     printf("  -%c\t: decode CHR ROM into BMP files (alt %s[=prefix]);"
-           "\n\t  prefix default for alt option is 'bank'\n", ChrDecodeShort,
+           "\n\t  prefix default for alt option is 'chr'\n", ChrDecodeShort,
            ChrDecodeLong);
     printf("  -%c\t: disassemble file (alt %s);"
            "\n\t  with verbose prints duplicate lines\n", DisassembleShort,

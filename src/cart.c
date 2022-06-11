@@ -268,7 +268,7 @@ struct bankview cart_prgblock(cart *self, size_t i)
     assert(self != NULL);
     assert(self->mapper != NULL);
 
-    struct bankview bv = {.bank = i};
+    struct bankview bv = {.index = i};
     const uint8_t *const prg = self->mapper->prgrom(self->mapper);
     switch (self->info.format) {
     case CRTF_INES:
@@ -292,7 +292,7 @@ struct bankview cart_chrblock(cart *self, size_t i)
     assert(self != NULL);
     assert(self->mapper != NULL);
 
-    struct bankview bv = {.bank = i};
+    struct bankview bv = {.index = i};
     if (self->mapper->chrrom) {
         const uint8_t *const chr = self->mapper->chrrom(self->mapper);
         switch (self->info.format) {

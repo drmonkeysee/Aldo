@@ -32,6 +32,7 @@
 		C85C8DC625BD29AC00611D19 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
 		C85CC20927ED6BF30063276D /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C85CC20827ED6BF30063276D /* snapshot.c */; };
 		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
+		C86A4F4828543C01007973D1 /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
 		C8702CF9278A58C900725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C8702CF8278A58C900725690 /* haltexpr.c */; };
 		C8702CFA278A598A00725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C88949B12813B2DB00795CC0 /* ChrSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88949B02813B2DB00795CC0 /* ChrSheet.swift */; };
@@ -567,6 +568,7 @@
 				C8C706B92751F0C700B45785 /* cpu.c in Sources */,
 				C8C706AE2751EF8D00B45785 /* bus.c in Sources */,
 				C8C706B42751EF8D00B45785 /* cpuinterrupt.c in Sources */,
+				C86A4F4828543C01007973D1 /* control.c in Sources */,
 				C8C706BA2751F0CB00B45785 /* decode.c in Sources */,
 				C8C706B02751EF8D00B45785 /* cpu.c in Sources */,
 				C8C706AC2751EF8D00B45785 /* cpujump.c in Sources */,

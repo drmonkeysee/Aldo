@@ -7,35 +7,35 @@
 
 import Cocoa
 
-final class ChrBanks {
+final class ChrBlocks {
     let cart: Cart
     private let store: ChrStore
 
-    var count: Int { chrBanks(cart) }
+    var count: Int { chrBlocks(cart) }
 
     init(_ cart: Cart) {
         self.cart = cart
         store = .init(cart)
     }
 
-    func sheet(at bank: Int) -> ChrSheet { .init(store, bank: bank) }
+    func sheet(at: Int) -> ChrSheet { .init(store, index: at) }
 }
 
 final class ChrSheet: ObservableObject {
     static let scale = 2
 
-    let bank: Int
-    @Published private(set) var status = BankLoadStatus<NSImage>.pending
+    let index: Int
+    @Published private(set) var status = BlockLoadStatus<NSImage>.pending
     private let store: ChrStore
 
-    fileprivate init(_ store: ChrStore, bank: Int) {
+    fileprivate init(_ store: ChrStore, index: Int) {
         self.store = store
-        self.bank = bank
+        self.index = index
     }
 
     @MainActor
     func load() async {
-        status = await store.fetch(bank: bank, scale: Self.scale)
+        status = await store.fetch(at: index, scale: Self.scale)
     }
 }
 
@@ -53,13 +53,13 @@ final class ChrExport: ObservableObject {
     }
 
     @MainActor
-    func exportChrBanks(to: URL?) async {
+    func exportChrRom(to: URL?) async {
         guard let folder = to else { return }
 
         selectedFolder = folder
         done = false
         currentError = nil
-        let result = await cart.exportChrBanks(scale: scale, folder: folder)
+        let result = await cart.exportChrRom(scale: scale, folder: folder)
         switch result {
         case let .success(data):
             if let text = String(data: data, encoding: .utf8) {
@@ -79,27 +79,27 @@ final class ChrExport: ObservableObject {
     }
 }
 
-fileprivate func chrBanks(_ cart: Cart) -> Int { cart.info.chrBanks }
+fileprivate func chrBlocks(_ cart: Cart) -> Int { cart.info.chrBlocks }
 
 fileprivate actor ChrStore {
     let cart: Cart
-    let cache: BankCache<NSImage>
+    let cache: BlockCache<NSImage>
 
     init(_ cart: Cart) {
         self.cart = cart
         cache = cart.chrCache
-        cache.ensure(slots: chrBanks(cart))
+        cache.ensure(slots: chrBlocks(cart))
     }
 
-    func fetch(bank: Int, scale: Int) async -> BankLoadStatus<NSImage> {
-        if let img = cache[bank] { return .loaded(img) }
+    func fetch(at: Int, scale: Int) async -> BlockLoadStatus<NSImage> {
+        if let img = cache[at] { return .loaded(img) }
 
-        let result = await cart.readChrBank(bank: bank, scale: scale)
+        let result = await cart.readChrBlock(at: at, scale: scale)
         switch result {
         case let .success(data):
             let chrSheet = NSImage(data: data)
             if let img = chrSheet, img.isValid {
-                cache[bank] = img
+                cache[at] = img
                 return .loaded(img)
             }
             let reason = chrSheet == nil

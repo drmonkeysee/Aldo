@@ -7,13 +7,13 @@
 
 import Foundation
 
-final class ProgramBanks: ObservableObject {
+final class ProgramBlocks: ObservableObject {
     let cart: Cart
-    @Published var selectedBank = 0
+    @Published var selectedBlock = 0
     private let store: PrgStore
 
-    var count: Int { prgBanks(cart) }
-    var currentListing: ProgramListing { .init(store, bank: selectedBank) }
+    var count: Int { prgBlocks(cart) }
+    var currentListing: ProgramListing { .init(store, index: selectedBlock) }
 
     init(_ cart: Cart) {
         self.cart = cart
@@ -22,25 +22,25 @@ final class ProgramBanks: ObservableObject {
 }
 
 final class ProgramListing: ObservableObject {
-    let bank: Int
+    let index: Int
     @Published var selectedLine: Int?
-    @Published private(set) var status = BankLoadStatus<[PrgLine]>.pending
+    @Published private(set) var status = BlockLoadStatus<[PrgLine]>.pending
     private let store: PrgStore
 
     var currentLine: PrgLine? {
-        if let line = selectedLine, let bank = store.cache[bank] {
-            return bank[line]
+        if let line = selectedLine, let block = store.cache[index] {
+            return block[line]
         }
         return nil
     }
 
-    fileprivate init(_ store: PrgStore, bank: Int) {
+    fileprivate init(_ store: PrgStore, index: Int) {
         self.store = store
-        self.bank = bank
+        self.index = index
     }
 
     @MainActor
-    func load() async { status = await store.fetch(bank: bank) }
+    func load() async { status = await store.fetch(at: index) }
 }
 
 enum PrgLine {
@@ -134,26 +134,26 @@ struct CpuFlags {
     }
 }
 
-fileprivate func prgBanks(_ cart: Cart) -> Int { cart.info.prgBanks }
+fileprivate func prgBlocks(_ cart: Cart) -> Int { cart.info.prgBlocks }
 
 fileprivate actor PrgStore {
     let cart: Cart
-    let cache: BankCache<[PrgLine]>
+    let cache: BlockCache<[PrgLine]>
 
     init(_ cart: Cart) {
         self.cart = cart
         cache = cart.prgCache
-        cache.ensure(slots: prgBanks(cart))
+        cache.ensure(slots: prgBlocks(cart))
     }
 
-    func fetch(bank: Int) -> BankLoadStatus<[PrgLine]> {
-        if let listing = cache[bank] { return .loaded(listing) }
+    func fetch(at: Int) -> BlockLoadStatus<[PrgLine]> {
+        if let listing = cache[at] { return .loaded(listing) }
 
-        guard let prgbank = PrgLines(cart.getPrgBank(bank)) else {
+        guard let prgblock = PrgLines(cart.getPrgBlock(at)) else {
             return .failed
         }
-        let prgListing = Array(prgbank)
-        cache[bank] = prgListing
+        let prgListing = Array(prgblock)
+        cache[at] = prgListing
         return .loaded(prgListing)
     }
 }
@@ -166,8 +166,8 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
     private var prevInstruction = dis_instruction()
     private var skip = false
 
-    init?(_ prgbank: bankview?) {
-        guard let pb = prgbank, pb.size > 0 else { return nil }
+    init?(_ prgblock: bankview?) {
+        guard let pb = prgblock, pb.size > 0 else { return nil }
         bv = pb
         // NOTE: by convention, count backwards from CPU vector locations
         addr = .init(MEMBLOCK_64KB - bv.size)

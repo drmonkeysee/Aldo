@@ -8,8 +8,8 @@
 import Cocoa
 
 final class Cart: ObservableObject {
-    let prgCache = BankCache<[PrgLine]>()
-    let chrCache = BankCache<NSImage>()
+    let prgCache = BlockCache<[PrgLine]>()
+    let chrCache = BlockCache<NSImage>()
     @Published private(set) var file: URL?
     @Published private(set) var info = CartInfo.none
     private(set) var currentError: AldoError?
@@ -41,12 +41,12 @@ final class Cart: ObservableObject {
         }
     }
 
-    func getPrgBank(_ bank: Int) -> bankview? {
+    func getPrgBlock(_ at: Int) -> bankview? {
         guard let h = handle else { return nil }
-        return cart_prgblock(h.unwrapped, bank)
+        return cart_prgblock(h.unwrapped, at)
     }
 
-    func readAllPrgBanks() async -> CStreamResult {
+    func readPrgRom() async -> CStreamResult {
         guard let n = fileName, let h = handle else { return noCart }
 
         return await readCStream { stream in
@@ -60,11 +60,11 @@ final class Cart: ObservableObject {
         }
     }
 
-    func readChrBank(bank: Int, scale: Int) async -> CStreamResult {
+    func readChrBlock(at: Int, scale: Int) async -> CStreamResult {
         guard let h = handle else { return noCart }
 
         return await readCStream(binary: true) { stream in
-            let bankview = cart_chrblock(h.unwrapped, bank)
+            let bankview = cart_chrblock(h.unwrapped, at)
             let err = withUnsafePointer(to: bankview) { p in
                 dis_cart_chrbank(p, .init(scale), stream)
             }
@@ -72,11 +72,11 @@ final class Cart: ObservableObject {
         }
     }
 
-    func exportChrBanks(scale: Int, folder: URL) async -> CStreamResult {
+    func exportChrRom(scale: Int, folder: URL) async -> CStreamResult {
         guard let n = name, let h = handle else { return noCart }
 
         return await readCStream { stream in
-            let prefix = "\(folder.appendingPathComponent(n).path)-bank"
+            let prefix = "\(folder.appendingPathComponent(n).path)-chr"
             try prefix.withCString { chrprefix in
                 var appstate = control()
                 appstate.unified_disoutput = true
@@ -127,7 +127,7 @@ enum CartInfo {
         }
     }
 
-    var prgBanks: Int {
+    var prgBlocks: Int {
         switch self {
         case .iNes(_, let header, _):
             return .init(header.prg_chunks)
@@ -138,7 +138,7 @@ enum CartInfo {
         }
     }
 
-    var chrBanks: Int {
+    var chrBlocks: Int {
         switch self {
         case .iNes(_, let header, _):
             return .init(header.chr_chunks)
@@ -148,13 +148,13 @@ enum CartInfo {
     }
 }
 
-enum BankLoadStatus<T> {
+enum BlockLoadStatus<T> {
     case pending
     case loaded(T)
     case failed
 }
 
-final class BankCache<T> {
+final class BlockCache<T> {
     private var items = [T?]()
 
     subscript(index: Int) -> T? {

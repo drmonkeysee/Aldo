@@ -11,18 +11,18 @@ struct CartPrgView: View {
     @EnvironmentObject var cart: Cart
 
     var body: some View {
-        ProgramView(banks: ProgramBanks(cart))
+        ProgramView(blocks: ProgramBlocks(cart))
     }
 }
 
 fileprivate struct ProgramView: View {
-    @ObservedObject var banks: ProgramBanks
+    @ObservedObject var blocks: ProgramBlocks
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .leading) {
-                if banks.count > 0 {
-                    BankSelectionView(banks: banks)
+                if blocks.count > 0 {
+                    BlockSelectionView(blocks: blocks)
                     ProgramListingView()
                 } else {
                     prgLabel()
@@ -37,24 +37,24 @@ fileprivate struct ProgramView: View {
                 .frame(maxHeight: .infinity, alignment: .top)
                 .padding(5)
         }
-        .environmentObject(banks.currentListing)
+        .environmentObject(blocks.currentListing)
     }
 }
 
-fileprivate struct BankSelectionView: View {
-    @ObservedObject var banks: ProgramBanks
+fileprivate struct BlockSelectionView: View {
+    @ObservedObject var blocks: ProgramBlocks
 
     var body: some View {
         HStack {
-            Picker(selection: $banks.selectedBank) {
-                ForEach(0..<banks.count, id: \.self) { i in
+            Picker(selection: $blocks.selectedBlock) {
+                ForEach(0..<blocks.count, id: \.self) { i in
                     Text("Block \(i)")
                 }
             } label: {
                 prgLabel()
             }
             CopyToClipboardView(
-                command: ClipboardCopy(fromStream: banks.cart.readAllPrgBanks))
+                command: ClipboardCopy(fromStream: blocks.cart.readPrgRom))
         }
     }
 }
@@ -69,7 +69,7 @@ fileprivate struct ProgramListingView: View {
         case let .loaded(prg):
             LoadedPrgView(prgLines: prg, selectedLine: $listing.selectedLine)
         case .failed:
-            NoPrgView(reason: "PRG Bank Not Available")
+            NoPrgView(reason: "PRG Block Not Available")
         }
     }
 }
@@ -78,7 +78,7 @@ fileprivate struct PendingPrgView: View {
     let listing: ProgramListing
 
     var body: some View {
-        NoPrgView(reason: "Loading PRG Bank...")
+        NoPrgView(reason: "Loading PRG Block...")
             .task { await listing.load() }
     }
 }

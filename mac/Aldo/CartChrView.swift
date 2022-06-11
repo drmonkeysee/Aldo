@@ -13,7 +13,7 @@ struct CartChrView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                if case .iNes = cart.info, cart.info.chrBanks > 0 {
+                if case .iNes = cart.info, cart.info.chrBlocks > 0 {
                     chrLabel()
                     ExportView(command: ChrExport(cart))
                 } else {
@@ -22,8 +22,8 @@ struct CartChrView: View {
                 }
             }
             switch cart.info {
-            case .iNes where cart.info.chrBanks > 0:
-                ChrBanksView(banks: ChrBanks(cart))
+            case .iNes where cart.info.chrBlocks > 0:
+                ChrBlocksView(blocks: ChrBlocks(cart))
                 PaletteView()
             case .iNes:
                 NoChrView(reason: "Cart uses CHR RAM")
@@ -49,14 +49,14 @@ fileprivate struct Constraints {
                             h: 128.0 * .init(ChrSheet.scale))
 }
 
-fileprivate struct ChrBanksView: View {
-    let banks: ChrBanks
+fileprivate struct ChrBlocksView: View {
+    let blocks: ChrBlocks
 
     var body: some View {
         ScrollView(.horizontal) {
             LazyHStack {
-                ForEach(0..<banks.count, id: \.self) { i in
-                    ChrSheetView(sheet: banks.sheet(at: i))
+                ForEach(0..<blocks.count, id: \.self) { i in
+                    ChrSheetView(sheet: blocks.sheet(at: i))
                 }
             }
             .padding(Constraints.sheetPadding)
@@ -72,7 +72,7 @@ fileprivate struct ChrSheetView: View {
 
     var body: some View {
         VStack {
-            Text("Block \(sheet.bank)")
+            Text("Block \(sheet.index)")
                 .font(.caption)
             switch sheet.status {
             case .pending:
@@ -91,7 +91,7 @@ fileprivate struct ChrSheetView: View {
                         .cornerRadius(Constraints.cornerRadius)
                         .frame(width: Constraints.sheetSize.w,
                                height: Constraints.sheetSize.h)
-                    Text("CHR Bank Not Available")
+                    Text("CHR Block Not Available")
                 }
             }
         }
@@ -107,7 +107,7 @@ fileprivate struct PendingChrView: View {
                 .cornerRadius(Constraints.cornerRadius)
                 .frame(width: Constraints.sheetSize.w,
                        height: Constraints.sheetSize.h)
-            Text("Loading CHR Bank...")
+            Text("Loading CHR Block...")
         }
         .task { await sheet.load() }
     }
@@ -178,7 +178,7 @@ fileprivate struct ExportView: View {
         panel.canCreateDirectories = true
         if panel.runModal() == .OK {
             Task(priority: .userInitiated) {
-                await command.exportChrBanks(to: panel.url)
+                await command.exportChrRom(to: panel.url)
             }
         }
     }

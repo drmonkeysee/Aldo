@@ -703,7 +703,7 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
     assert(appstate != NULL);
     assert(f != NULL);
 
-    struct bankview bv = cart_prgbank(cart, 0);
+    struct bankview bv = cart_prgblock(cart, 0);
     if (!bv.mem) return DIS_ERR_PRGROM;
 
     fprintf(f, "%s\n", appstate->cartfile);
@@ -718,7 +718,7 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
             fprintf(appstate->unified_disoutput ? f : stderr,
                     "Dis err (%d): %s\n", err, dis_errstr(err));
         }
-        bv = cart_prgbank(cart, bv.bank + 1);
+        bv = cart_prgblock(cart, bv.bank + 1);
     } while (bv.mem);
 
     return 0;
@@ -745,14 +745,14 @@ int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output)
     assert(appstate != NULL);
     assert(output != NULL);
 
-    struct bankview bv = cart_chrbank(cart, 0);
+    struct bankview bv = cart_chrblock(cart, 0);
     if (!bv.mem) return DIS_ERR_CHRROM;
 
     do {
         const int err = write_chrbank(&bv, appstate->chrscale,
                                       appstate->chrdecode_prefix, output);
         if (err < 0) return err;
-        bv = cart_chrbank(cart, bv.bank + 1);
+        bv = cart_chrblock(cart, bv.bank + 1);
     } while (bv.mem);
 
     return 0;

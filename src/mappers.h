@@ -12,18 +12,17 @@
 #include "cart.h"
 
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 
 struct mapper {
     void (*dtor)(struct mapper *);
-    size_t (*prgbank)(const struct mapper *, size_t, const uint8_t **);
+    const uint8_t *(*prgrom)(const struct mapper *);
     bool (*cpu_connect)(struct mapper *, bus *, uint16_t);
     void (*cpu_disconnect)(const struct mapper *, bus *, uint16_t);
 
     // NOTE: optional protocol
-    size_t (*chrbank)(const struct mapper *, size_t, const uint8_t **);
+    const uint8_t *(*chrrom)(const struct mapper *);
 };
 
 // NOTE: if create functions return non-zero error code, *m is unmodified

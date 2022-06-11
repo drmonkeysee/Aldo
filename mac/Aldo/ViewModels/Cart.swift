@@ -43,7 +43,7 @@ final class Cart: ObservableObject {
 
     func getPrgBank(_ bank: Int) -> bankview? {
         guard let h = handle else { return nil }
-        return cart_prgbank(h.unwrapped, bank)
+        return cart_prgblock(h.unwrapped, bank)
     }
 
     func readAllPrgBanks() async -> CStreamResult {
@@ -64,7 +64,7 @@ final class Cart: ObservableObject {
         guard let h = handle else { return noCart }
 
         return await readCStream(binary: true) { stream in
-            let bankview = cart_chrbank(h.unwrapped, bank)
+            let bankview = cart_chrblock(h.unwrapped, bank)
             let err = withUnsafePointer(to: bankview) { p in
                 dis_cart_chrbank(p, .init(scale), stream)
             }

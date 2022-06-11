@@ -7,6 +7,7 @@
 
 #include "cart.h"
 
+#include "bytes.h"
 #include "mappers.h"
 
 #include <assert.h>
@@ -262,24 +263,49 @@ void cart_getinfo(cart *self, struct cartinfo *info)
     *info = self->info;
 }
 
-struct bankview cart_prgbank(cart *self, size_t i)
+struct bankview cart_prgblock(cart *self, size_t i)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
 
     struct bankview bv = {.bank = i};
-    bv.size = self->mapper->prgbank(self->mapper, i, &bv.mem);
+    const uint8_t *const prg = self->mapper->prgrom(self->mapper);
+    switch (self->info.format) {
+    case CRTF_INES:
+        if (i < self->info.ines_hdr.prg_chunks) {
+            bv.size = MEMBLOCK_16KB;
+            bv.mem = prg + (i * bv.size);
+        }
+        break;
+    default:
+        if (i == 0) {
+            bv.mem = prg;
+            bv.size = MEMBLOCK_32KB;
+        }
+        break;
+    }
     return bv;
 }
 
-struct bankview cart_chrbank(cart *self, size_t i)
+struct bankview cart_chrblock(cart *self, size_t i)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
 
     struct bankview bv = {.bank = i};
-    if (self->mapper->chrbank) {
-        bv.size = self->mapper->chrbank(self->mapper, i, &bv.mem);
+    if (self->mapper->chrrom) {
+        const uint8_t *const chr = self->mapper->chrrom(self->mapper);
+        switch (self->info.format) {
+        case CRTF_INES:
+            if (i < self->info.ines_hdr.chr_chunks) {
+                bv.size = MEMBLOCK_8KB;
+                bv.mem = chr + (i * bv.size);
+            }
+            break;
+        default:
+            // No CHR ROM
+            break;
+        }
     }
     return bv;
 }

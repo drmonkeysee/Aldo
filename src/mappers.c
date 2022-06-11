@@ -10,6 +10,7 @@
 #include "bytes.h"
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -78,19 +79,11 @@ static void raw_dtor(struct mapper *self)
     free(m);
 }
 
-static size_t raw_prgbank(const struct mapper *self, size_t i,
-                          const uint8_t **mem)
+static const uint8_t *raw_prgrom(const struct mapper *self)
 {
     assert(self != NULL);
-    assert(mem != NULL);
 
-    if (i > 0) {
-        *mem = NULL;
-        return 0;
-    }
-
-    *mem = ((const struct raw_mapper *)self)->rom;
-    return MEMBLOCK_32KB;
+    return ((const struct raw_mapper *)self)->rom;
 }
 
 static bool raw_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
@@ -117,15 +110,18 @@ static void ines_dtor(struct mapper *self)
     free(m);
 }
 
-static size_t ines_unimplemented_prgbank(const struct mapper *self, size_t i,
-                                         const uint8_t **mem)
+static const uint8_t *ines_prgrom(const struct mapper *self)
 {
     assert(self != NULL);
-    assert(mem != NULL);
 
-    (void)self, (void)i;
-    *mem = NULL;
-    return 0;
+    return ((const struct ines_mapper *)self)->prg;
+}
+
+static const uint8_t *ines_chrrom(const struct mapper *self)
+{
+    assert(self != NULL);
+
+    return ((const struct ines_mapper *)self)->chr;
 }
 
 static bool ines_unimplemented_cpu_connect(struct mapper *self, bus *b,
@@ -162,42 +158,6 @@ static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
                                 BITWIDTH_64KB, count, dest);
 }
 
-static size_t ines_000_prgbank(const struct mapper *self, size_t i,
-                               const uint8_t **mem)
-{
-    assert(self != NULL);
-    assert(mem != NULL);
-
-    const struct ines_000_mapper
-        *const m = (const struct ines_000_mapper *)self;
-
-    if (i >= m->bankcount) {
-        *mem = NULL;
-        return 0;
-    }
-
-    *mem = m->super.prg + (i * MEMBLOCK_16KB);
-    return MEMBLOCK_16KB;
-}
-
-static size_t ines_000_chrbank(const struct mapper *self, size_t i,
-                               const uint8_t **mem)
-{
-    assert(self != NULL);
-    assert(mem != NULL);
-
-    const struct ines_000_mapper
-        *const m = (const struct ines_000_mapper *)self;
-
-    if (m->super.chrram || i > 0) {
-        *mem = NULL;
-        return 0;
-    }
-
-    *mem = m->super.chr + (i * MEMBLOCK_8KB);
-    return MEMBLOCK_8KB;
-}
-
 static bool ines_000_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
 {
     return bus_set(b, addr, (struct busdevice){
@@ -220,7 +180,7 @@ int mapper_raw_create(struct mapper **m, FILE *f)
     *self = (struct raw_mapper){
         .vtable = {
             .dtor = raw_dtor,
-            .prgbank = raw_prgbank,
+            .prgrom = raw_prgrom,
             .cpu_connect = raw_cpu_connect,
             .cpu_disconnect = clear_bus_device,
         },
@@ -253,11 +213,11 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
         *self = (struct ines_mapper){
             .vtable = {
                 ines_dtor,
-                ines_000_prgbank,
+                ines_prgrom,
                 ines_000_cpu_connect,
                 clear_bus_device,
 
-                ines_000_chrbank,
+                ines_chrrom,
             },
         };
         assert(header->prg_chunks <= 2);
@@ -268,7 +228,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
         *self = (struct ines_mapper){
             .vtable = {
                 .dtor = ines_dtor,
-                .prgbank = ines_unimplemented_prgbank,
+                .prgrom = ines_prgrom,
                 .cpu_connect = ines_unimplemented_cpu_connect,
                 .cpu_disconnect = clear_bus_device,
             },

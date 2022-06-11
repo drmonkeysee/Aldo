@@ -148,12 +148,10 @@ fileprivate struct ExportView: View {
             Button(action: pickFolder) {
                 Label("Export", systemImage: "square.and.arrow.up.circle")
             }
-            Picker(selection: $command.scale) {
+            Picker("Scale", selection: $command.scale) {
                 ForEach(command.scales, id: \.self) { i in
                     Text("\(i)x")
                 }
-            } label: {
-                Text("Scale")
             }
             .frame(width: 120)
             Button(action: openTargetFolder) {

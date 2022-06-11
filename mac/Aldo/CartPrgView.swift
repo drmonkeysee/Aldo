@@ -48,7 +48,7 @@ fileprivate struct BankSelectionView: View {
         HStack {
             Picker(selection: $banks.selectedBank) {
                 ForEach(0..<banks.count, id: \.self) { i in
-                    Text("Bank \(i)")
+                    Text("Block \(i)")
                 }
             } label: {
                 prgLabel()

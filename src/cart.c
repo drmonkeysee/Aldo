@@ -334,7 +334,7 @@ void cart_write_dis_header(cart *self, FILE *f)
     char fmtd[CART_FMT_SIZE];
     const int result = cart_format_extendedname(&self->info, fmtd);
     fputs(result > 0 ? fmtd : "Invalid Format", f);
-    fputs("\n\nDisassembly of PRG Banks\n", f);
+    fputs("\n\nDisassembly of PRG ROM\n", f);
     if (self->info.format != CRTF_ALDO) {
         fputs("(NOTE: approximate for non-Aldo formats)\n", f);
     }

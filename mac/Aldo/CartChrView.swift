@@ -72,7 +72,7 @@ fileprivate struct ChrSheetView: View {
 
     var body: some View {
         VStack {
-            Text("Bank \(sheet.bank)")
+            Text("Block \(sheet.bank)")
                 .font(.caption)
             switch sheet.status {
             case .pending:

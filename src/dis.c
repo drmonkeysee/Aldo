@@ -186,7 +186,7 @@ static void print_prg_line(const char *restrict dis, bool verbose,
 
 static int print_prgbank(const struct bankview *bv, bool verbose, FILE *f)
 {
-    fprintf(f, "Bank %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
+    fprintf(f, "Block %zu (%zuKB)\n", bv->bank, bv->size >> BITWIDTH_1KB);
     fputs("--------\n", f);
 
     struct repeat_condition repeat = {0};
@@ -446,7 +446,7 @@ static int write_chrbank(const struct bankview *bv, int scale,
     if (err < 0) return err;
 
     char bmpfilename[128];
-    prefix = prefix && strlen(prefix) > 0 ? prefix : "bank";
+    prefix = prefix && strlen(prefix) > 0 ? prefix : "chr";
     if (snprintf(bmpfilename, sizeof bmpfilename, "%.120s%03zu.bmp", prefix,
                  bv->bank) < 0) return DIS_ERR_FMT;
     FILE *const bmpfile = fopen(bmpfilename, "wb");
@@ -456,7 +456,7 @@ static int write_chrbank(const struct bankview *bv, int scale,
     fclose(bmpfile);
 
     if (err == 0) {
-        fprintf(output, "Bank %zu (%zuKB), %d x %d tiles (%d section%s)",
+        fprintf(output, "Block %zu (%zuKB), %d x %d tiles (%d section%s)",
                 bv->bank, bv->size >> BITWIDTH_1KB, tilesdim, tilesdim,
                 tile_sections, tile_sections == 1 ? "" : "s");
         if (scale > 1) {

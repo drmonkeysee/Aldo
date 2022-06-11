@@ -204,37 +204,34 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     assert(header != NULL);
     assert(f != NULL);
 
-    // NOTE: assume implemented, clear flag in default case
-    header->mapper_implemented = true;
     struct ines_mapper *self;
     switch (header->mapper_id) {
     case 0:
         self = malloc(sizeof(struct ines_000_mapper));
         *self = (struct ines_mapper){
             .vtable = {
-                ines_dtor,
-                ines_prgrom,
-                ines_000_cpu_connect,
-                clear_bus_device,
-
-                ines_chrrom,
+                .cpu_connect = ines_000_cpu_connect,
             },
         };
         assert(header->prg_blocks <= 2);
         ((struct ines_000_mapper *)self)->bankcount = header->prg_blocks;
+        header->mapper_implemented = true;
         break;
     default:
         self = malloc(sizeof *self);
         *self = (struct ines_mapper){
             .vtable = {
-                .dtor = ines_dtor,
-                .prgrom = ines_prgrom,
                 .cpu_connect = ines_unimplemented_cpu_connect,
-                .cpu_disconnect = clear_bus_device,
             },
         };
         header->mapper_implemented = false;
         break;
+    }
+    self->vtable.dtor = ines_dtor;
+    self->vtable.prgrom = ines_prgrom;
+    self->vtable.cpu_disconnect = clear_bus_device;
+    if (header->chr_blocks > 0) {
+        self->vtable.chrrom = ines_chrrom;
     }
     self->id = header->mapper_id;
 

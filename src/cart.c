@@ -293,19 +293,13 @@ struct bankview cart_chrblock(cart *self, size_t i)
     assert(self->mapper != NULL);
 
     struct bankview bv = {.index = i};
-    if (self->mapper->chrrom) {
-        const uint8_t *const chr = self->mapper->chrrom(self->mapper);
-        switch (self->info.format) {
-        case CRTF_INES:
-            if (i < self->info.ines_hdr.chr_blocks) {
-                bv.size = MEMBLOCK_8KB;
-                bv.mem = chr + (i * bv.size);
-            }
-            break;
-        default:
-            // No CHR ROM
-            break;
-        }
+    if (!self->mapper->chrrom) return bv;
+
+    // NOTE: only iNES carts have chr rom
+    const uint8_t *const chr = self->mapper->chrrom(self->mapper);
+    if (i < self->info.ines_hdr.chr_blocks) {
+        bv.size = MEMBLOCK_8KB;
+        bv.mem = chr + (i * bv.size);
     }
     return bv;
 }

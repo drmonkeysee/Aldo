@@ -72,10 +72,13 @@ enum {
 //  - redundant indicators in byte 10
 struct ines_header {
     enum nt_mirroring mirror;   // Nametable Mirroring
-    uint8_t chr_chunks,         // CHR ROM chunk count; 0 indicates CHR RAM
+    uint8_t chr_blocks,         // CHR ROM block count; 0 indicates CHR RAM
+                                //      1 block = 8KB
             mapper_id,          // Mapper ID
-            prg_chunks,         // PRG double-chunk count
-            wram_chunks;        // WRAM chunk count; may be set by mapper
+            prg_blocks,         // PRG double-block count
+                                //      1 block = 16KB
+            wram_blocks;        // WRAM block count; may be set by mapper
+                                //      1 block = 8KB
     bool
         bus_conflicts,          // Cart has bus conflicts
         mapper_controlled,      // Mapper-controlled Nametable Mirroring

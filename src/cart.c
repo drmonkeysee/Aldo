@@ -63,8 +63,8 @@ static int parse_ines(struct cartridge *self, FILE *f)
     if (tail != 0) return CART_ERR_OBSOLETE;
 
     struct cartinfo *const info = &self->info;
-    info->ines_hdr.prg_chunks = header[4];
-    info->ines_hdr.chr_chunks = header[5];
+    info->ines_hdr.prg_blocks = header[4];
+    info->ines_hdr.chr_blocks = header[5];
     info->ines_hdr.wram = header[6] & 0x2;
 
     // NOTE: mapper may override these two fields
@@ -77,7 +77,7 @@ static int parse_ines(struct cartridge *self, FILE *f)
 
     info->ines_hdr.trainer = header[6] & 0x4;
     info->ines_hdr.mapper_id = (header[6] >> 4) | (header[7] & 0xf0);
-    info->ines_hdr.wram_chunks = header[8];
+    info->ines_hdr.wram_blocks = header[8];
     info->ines_hdr.bus_conflicts = header[10] & 0x20;
 
     const int err = mapper_ines_create(&self->mapper, &info->ines_hdr, f);
@@ -127,20 +127,20 @@ static void write_ines_info(const struct cartinfo *info, FILE *f, bool verbose)
         hr(f);
     }
 
-    fprintf(f, "PRG ROM\t\t: %u%s\n", info->ines_hdr.prg_chunks,
+    fprintf(f, "PRG ROM\t\t: %u%s\n", info->ines_hdr.prg_blocks,
             verbose ? fullsize : "");
     if (info->ines_hdr.wram) {
         fprintf(f, "%s%u%s\n", wramlbl,
-                info->ines_hdr.wram_chunks > 0
-                    ? info->ines_hdr.wram_chunks
+                info->ines_hdr.wram_blocks > 0
+                    ? info->ines_hdr.wram_blocks
                     : 1u,
                 verbose ? halfsize : "");
     } else if (verbose) {
         fprintf(f, "%sno\n", wramlbl);
     }
 
-    if (info->ines_hdr.chr_chunks > 0) {
-        fprintf(f, "%s%u%s\n", chrromlbl, info->ines_hdr.chr_chunks,
+    if (info->ines_hdr.chr_blocks > 0) {
+        fprintf(f, "%s%u%s\n", chrromlbl, info->ines_hdr.chr_blocks,
                 verbose ? halfsize : "");
         if (verbose) {
             fprintf(f, "%sno\n", chrramlbl);
@@ -272,7 +272,7 @@ struct bankview cart_prgblock(cart *self, size_t i)
     const uint8_t *const prg = self->mapper->prgrom(self->mapper);
     switch (self->info.format) {
     case CRTF_INES:
-        if (i < self->info.ines_hdr.prg_chunks) {
+        if (i < self->info.ines_hdr.prg_blocks) {
             bv.size = MEMBLOCK_16KB;
             bv.mem = prg + (i * bv.size);
         }
@@ -297,7 +297,7 @@ struct bankview cart_chrblock(cart *self, size_t i)
         const uint8_t *const chr = self->mapper->chrrom(self->mapper);
         switch (self->info.format) {
         case CRTF_INES:
-            if (i < self->info.ines_hdr.chr_chunks) {
+            if (i < self->info.ines_hdr.chr_blocks) {
                 bv.size = MEMBLOCK_8KB;
                 bv.mem = chr + (i * bv.size);
             }

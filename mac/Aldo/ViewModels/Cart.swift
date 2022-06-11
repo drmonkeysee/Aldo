@@ -130,7 +130,7 @@ enum CartInfo {
     var prgBlocks: Int {
         switch self {
         case .iNes(_, let header, _):
-            return .init(header.prg_chunks)
+            return .init(header.prg_blocks)
         case .raw:
             return 1
         default:
@@ -141,7 +141,7 @@ enum CartInfo {
     var chrBlocks: Int {
         switch self {
         case .iNes(_, let header, _):
-            return .init(header.chr_chunks)
+            return .init(header.chr_blocks)
         default:
             return 0
         }

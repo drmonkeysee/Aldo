@@ -30,7 +30,7 @@ struct ines_000_mapper {
     size_t bankcount;
 };
 
-static int load_chunks(uint8_t *restrict *mem, size_t size, FILE *f)
+static int load_blocks(uint8_t *restrict *mem, size_t size, FILE *f)
 {
     *mem = calloc(size, sizeof **mem);
     fread(*mem, sizeof **mem, size, f);
@@ -187,7 +187,7 @@ int mapper_raw_create(struct mapper **m, FILE *f)
     };
 
     // TODO: assume a 32KB ROM file (can i do mirroring later?)
-    const int err = load_chunks(&self->rom, MEMBLOCK_32KB, f);
+    const int err = load_blocks(&self->rom, MEMBLOCK_32KB, f);
     if (err == 0) {
         *m = (struct mapper *)self;
         return 0;
@@ -220,8 +220,8 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
                 ines_chrrom,
             },
         };
-        assert(header->prg_chunks <= 2);
-        ((struct ines_000_mapper *)self)->bankcount = header->prg_chunks;
+        assert(header->prg_blocks <= 2);
+        ((struct ines_000_mapper *)self)->bankcount = header->prg_blocks;
         break;
     default:
         self = malloc(sizeof *self);
@@ -246,21 +246,21 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     }
 
     if (header->wram) {
-        const size_t sz = (header->wram_chunks == 0
+        const size_t sz = (header->wram_blocks == 0
                            ? 1
-                           : header->wram_chunks) * MEMBLOCK_8KB;
+                           : header->wram_blocks) * MEMBLOCK_8KB;
         self->wram = calloc(sz, sizeof *self->wram);
     }
 
-    err = load_chunks(&self->prg, header->prg_chunks * MEMBLOCK_16KB, f);
+    err = load_blocks(&self->prg, header->prg_blocks * MEMBLOCK_16KB, f);
     if (err != 0) return err;
 
-    if (header->chr_chunks == 0) {
+    if (header->chr_blocks == 0) {
         // TODO: this size is controlled by the mapper in many cases
         self->chr = calloc(MEMBLOCK_8KB, sizeof *self->chr);
         self->chrram = true;
     } else {
-        err = load_chunks(&self->chr, header->chr_chunks * MEMBLOCK_8KB, f);
+        err = load_blocks(&self->chr, header->chr_blocks * MEMBLOCK_8KB, f);
     }
 
     if (err == 0) {

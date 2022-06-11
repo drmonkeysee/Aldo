@@ -163,10 +163,10 @@ fileprivate struct iNesView: View {
             Text(String(format: "%03u%@", header.mapper_id,
                         header.mapper_implemented ? "" : " (Not Implemented)"))
             Text("<Board Names>")
-            Text("\(header.prg_chunks) \(Self.fullSize)")
+            Text("\(header.prg_blocks) \(Self.fullSize)")
             Text(header.wram ? wramStr : "no")
-            if header.chr_chunks > 0 {
-                Text("\(header.chr_chunks) \(Self.halfSize)")
+            if header.chr_blocks > 0 {
+                Text("\(header.chr_blocks) \(Self.halfSize)")
                 Text("no")
             } else {
                 Text("no")
@@ -180,8 +180,8 @@ fileprivate struct iNesView: View {
     }
 
     private var wramStr: String {
-        let chunkCount = header.wram_chunks > 0 ? header.wram_chunks : 1
-        return "\(chunkCount) \(Self.halfSize)"
+        let blockCount = header.wram_blocks > 0 ? header.wram_blocks : 1
+        return "\(blockCount) \(Self.halfSize)"
     }
 }
 

@@ -21,7 +21,12 @@ func readCStream(binary: Bool = false,
                  operation: CStreamOp) async -> CStreamResult {
     let p = Pipe()
     errno = 0
-    guard let stream = fdopen(p.fileHandleForWriting.fileDescriptor,
+    // NOTE: when reading multiple async cstreams Swift and C don't seem to
+    // agree on when a file descriptor is available and FDs will be recycled
+    // for FileHandles before fclose frees them, causing a read-after-close
+    // error; handing C a duplicate FD solves this problem as long as both
+    // descriptors are closed in the right order (see cleanup below).
+    guard let stream = fdopen(dup(p.fileHandleForWriting.fileDescriptor),
                               binary ? "wb" : "w") else {
         return .error(.ioErrno)
     }
@@ -37,16 +42,37 @@ func readCStream(binary: Bool = false,
         }
     }
 
+    var cleanupError: CStreamResult?
     do {
-        defer { fclose(stream) }
+        defer { cleanupError = cleanup(stream, p.fileHandleForWriting) }
         try operation(stream)
     } catch let error as AldoError {
         return .error(error)
     } catch {
         return .error(.systemError(error.localizedDescription))
     }
+    if let err = cleanupError { return err }
 
     var streamData = Data()
     for await d in asyncStream { streamData.append(d) }
     return .success(streamData)
+}
+
+fileprivate func cleanup(_ stream: CStream,
+                         _ file: FileHandle) -> CStreamResult? {
+    // fclose the cstream first to flush the buffer and clean up the
+    // FILE structure, then close the FileHandle so its readability
+    // handler gets EOF and completes the async read.
+    errno = 0
+    if fclose(stream) == 0 {
+        do {
+            try file.close()
+        } catch {
+            return .error(.systemError(error.localizedDescription))
+        }
+    }
+    else {
+        return .error(.ioErrno)
+    }
+    return nil
 }

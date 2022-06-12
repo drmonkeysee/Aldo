@@ -44,7 +44,7 @@ enum {
 
 struct dis_instruction {
     size_t bankoffset;
-    struct bankview bv;
+    struct blockview bv;
     struct decoded d;
 };
 
@@ -53,7 +53,7 @@ struct dis_instruction {
 const char *dis_errstr(int err);
 
 // NOTE: parsed will be zeroed-out if return value is <= 0
-int dis_parse_inst(const struct bankview *bv, size_t at,
+int dis_parse_inst(const struct blockview *bv, size_t at,
                    struct dis_instruction *parsed);
 int dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
                       size_t at, struct dis_instruction *parsed);
@@ -76,7 +76,7 @@ int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
 
 int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f);
-int dis_cart_chrbank(const struct bankview *bv, int scale, FILE *f);
+int dis_cart_chrbank(const struct blockview *bv, int scale, FILE *f);
 int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output);
 
 #endif

@@ -94,8 +94,8 @@ struct cartinfo {
     };
 };
 
-struct bankview {
-    size_t index, size;
+struct blockview {
+    size_t ord, size;
     const uint8_t *mem; // Non-owning Pointer
 };
 
@@ -112,8 +112,8 @@ int cart_create(cart **c, FILE *f);
 void cart_free(cart *self);
 
 void cart_getinfo(cart *self, struct cartinfo *info);
-struct bankview cart_prgblock(cart *self, size_t i);
-struct bankview cart_chrblock(cart *self, size_t i);
+struct blockview cart_prgblock(cart *self, size_t i);
+struct blockview cart_chrblock(cart *self, size_t i);
 
 int cart_cpu_connect(cart *self, bus *b, uint16_t addr);
 void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr);

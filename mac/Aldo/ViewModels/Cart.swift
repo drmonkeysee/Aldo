@@ -41,7 +41,7 @@ final class Cart: ObservableObject {
         }
     }
 
-    func getPrgBlock(_ at: Int) -> bankview? {
+    func getPrgBlock(_ at: Int) -> blockview? {
         guard let h = handle else { return nil }
         return cart_prgblock(h.unwrapped, at)
     }

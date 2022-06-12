@@ -184,9 +184,9 @@ static void print_prg_line(const char *restrict dis, bool verbose,
     }
 }
 
-static int print_prgbank(const struct bankview *bv, bool verbose, FILE *f)
+static int print_prgbank(const struct blockview *bv, bool verbose, FILE *f)
 {
-    fprintf(f, "Block %zu (%zuKB)\n", bv->index, bv->size >> BITWIDTH_1KB);
+    fprintf(f, "Block %zu (%zuKB)\n", bv->ord, bv->size >> BITWIDTH_1KB);
     fputs("--------\n", f);
 
     struct repeat_condition repeat = {0};
@@ -252,7 +252,7 @@ static int measure_tile_sheet(size_t banksize, int32_t *restrict dim,
     return 0;
 }
 
-static void decode_tiles(const struct bankview *bv, size_t tilecount,
+static void decode_tiles(const struct blockview *bv, size_t tilecount,
                          uint8_t *restrict tiles)
 {
     for (size_t tileidx = 0; tileidx < tilecount; ++tileidx) {
@@ -426,7 +426,7 @@ static int write_tile_sheet(int32_t tilesdim, int32_t tile_sections, int scale,
     return 0;
 }
 
-static int write_chrtiles(const struct bankview *bv, int32_t tilesdim,
+static int write_chrtiles(const struct blockview *bv, int32_t tilesdim,
                           int32_t tile_sections, int scale, FILE *bmpfile)
 {
     const size_t tilecount = bv->size / ChrTileSpan;
@@ -438,7 +438,7 @@ static int write_chrtiles(const struct bankview *bv, int32_t tilesdim,
     return err;
 }
 
-static int write_chrblock(const struct bankview *bv, int scale,
+static int write_chrblock(const struct blockview *bv, int scale,
                           const char *restrict prefix, FILE *output)
 {
     int32_t tilesdim, tile_sections;
@@ -448,7 +448,7 @@ static int write_chrblock(const struct bankview *bv, int scale,
     char bmpfilename[128];
     prefix = prefix && strlen(prefix) > 0 ? prefix : "chr";
     if (snprintf(bmpfilename, sizeof bmpfilename, "%.120s%03zu.bmp", prefix,
-                 bv->index) < 0) return DIS_ERR_FMT;
+                 bv->ord) < 0) return DIS_ERR_FMT;
     FILE *const bmpfile = fopen(bmpfilename, "wb");
     if (!bmpfile) return DIS_ERR_ERNO;
 
@@ -457,7 +457,7 @@ static int write_chrblock(const struct bankview *bv, int scale,
 
     if (err == 0) {
         fprintf(output, "Block %zu (%zuKB), %d x %d tiles (%d section%s)",
-                bv->index, bv->size >> BITWIDTH_1KB, tilesdim, tilesdim,
+                bv->ord, bv->size >> BITWIDTH_1KB, tilesdim, tilesdim,
                 tile_sections, tile_sections == 1 ? "" : "s");
         if (scale > 1) {
             fprintf(output, " (%dx scale)", scale);
@@ -483,7 +483,7 @@ const char *dis_errstr(int err)
     }
 }
 
-int dis_parse_inst(const struct bankview *bv, size_t at,
+int dis_parse_inst(const struct blockview *bv, size_t at,
                    struct dis_instruction *parsed)
 {
     assert(bv != NULL);
@@ -500,7 +500,7 @@ int dis_parse_inst(const struct bankview *bv, size_t at,
 
     *parsed = (struct dis_instruction){
         at,
-        {bv->index, instlen, bv->mem + at},
+        {bv->ord, instlen, bv->mem + at},
         dec,
     };
     return instlen;
@@ -509,7 +509,7 @@ int dis_parse_inst(const struct bankview *bv, size_t at,
 int dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
                       size_t at, struct dis_instruction *parsed)
 {
-    const struct bankview bv = {
+    const struct blockview bv = {
         .mem = mem,
         .size = size,
     };
@@ -703,7 +703,7 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
     assert(appstate != NULL);
     assert(f != NULL);
 
-    struct bankview bv = cart_prgblock(cart, 0);
+    struct blockview bv = cart_prgblock(cart, 0);
     if (!bv.mem) return DIS_ERR_PRGROM;
 
     fprintf(f, "%s\n", appstate->cartfile);
@@ -718,13 +718,13 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
             fprintf(appstate->unified_disoutput ? f : stderr,
                     "Dis err (%d): %s\n", err, dis_errstr(err));
         }
-        bv = cart_prgblock(cart, bv.index + 1);
+        bv = cart_prgblock(cart, bv.ord + 1);
     } while (bv.mem);
 
     return 0;
 }
 
-int dis_cart_chrbank(const struct bankview *bv, int scale, FILE *f)
+int dis_cart_chrbank(const struct blockview *bv, int scale, FILE *f)
 {
     assert(bv != NULL);
     assert(f != NULL);
@@ -745,14 +745,14 @@ int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output)
     assert(appstate != NULL);
     assert(output != NULL);
 
-    struct bankview bv = cart_chrblock(cart, 0);
+    struct blockview bv = cart_chrblock(cart, 0);
     if (!bv.mem) return DIS_ERR_CHRROM;
 
     do {
         const int err = write_chrblock(&bv, appstate->chrscale,
                                        appstate->chrdecode_prefix, output);
         if (err < 0) return err;
-        bv = cart_chrblock(cart, bv.index + 1);
+        bv = cart_chrblock(cart, bv.ord + 1);
     } while (bv.mem);
 
     return 0;

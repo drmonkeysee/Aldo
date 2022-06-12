@@ -263,12 +263,12 @@ void cart_getinfo(cart *self, struct cartinfo *info)
     *info = self->info;
 }
 
-struct bankview cart_prgblock(cart *self, size_t i)
+struct blockview cart_prgblock(cart *self, size_t i)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
 
-    struct bankview bv = {.index = i};
+    struct blockview bv = {.ord = i};
     const uint8_t *const prg = self->mapper->prgrom(self->mapper);
     switch (self->info.format) {
     case CRTF_INES:
@@ -287,12 +287,12 @@ struct bankview cart_prgblock(cart *self, size_t i)
     return bv;
 }
 
-struct bankview cart_chrblock(cart *self, size_t i)
+struct blockview cart_chrblock(cart *self, size_t i)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
 
-    struct bankview bv = {.index = i};
+    struct blockview bv = {.ord = i};
     if (!self->mapper->chrrom) return bv;
 
     // NOTE: only iNES carts have chr rom

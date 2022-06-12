@@ -62,7 +62,7 @@ fileprivate func cleanup(_ stream: CStream,
                          _ file: FileHandle) -> CStreamResult? {
     // fclose the cstream first to flush the buffer and clean up the
     // FILE structure, then close the FileHandle so its readability
-    // handler gets EOF and completes the async read.
+    // handler gets EOF and completes the buffered read.
     errno = 0
     if fclose(stream) == 0 {
         do {

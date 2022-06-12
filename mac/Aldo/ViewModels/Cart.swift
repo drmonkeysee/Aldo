@@ -79,7 +79,6 @@ final class Cart: ObservableObject {
             let prefix = "\(folder.appendingPathComponent(n).path)-chr"
             try prefix.withCString { chrprefix in
                 var appstate = control()
-                appstate.unified_disoutput = true
                 appstate.chrdecode_prefix = chrprefix
                 appstate.chrscale = Int32(scale)
                 errno = 0

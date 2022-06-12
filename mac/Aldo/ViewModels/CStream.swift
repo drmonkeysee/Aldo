@@ -23,7 +23,7 @@ func readCStream(binary: Bool = false,
     errno = 0
     // NOTE: when reading multiple async cstreams Swift and C don't seem to
     // agree on when a file descriptor is available and FDs will be recycled
-    // for FileHandles before fclose frees them, causing a read-after-close
+    // for new Pipes before fclose frees them, causing a read-after-close
     // error; handing C a duplicate FD solves this problem as long as both
     // descriptors are closed in the right order (see cleanup below).
     guard let stream = fdopen(dup(p.fileHandleForWriting.fileDescriptor),

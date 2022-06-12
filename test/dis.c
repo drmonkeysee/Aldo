@@ -60,7 +60,7 @@ static void parse_inst_empty_bankview(void *ctx)
     ct_assertequal(0u, inst.bv.ord);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
-    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(0u, inst.offset);
     ct_assertequal(IN_UDF, (int)inst.d.instruction);
     ct_assertequal(AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
@@ -82,7 +82,7 @@ static void parse_inst_at_start(void *ctx)
     ct_assertequal(bv.ord, inst.bv.ord);
     ct_assertequal(0xeau, inst.bv.mem[0]);
     ct_assertequal(1u, inst.bv.size);
-    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(0u, inst.offset);
     ct_assertequal(IN_NOP, (int)inst.d.instruction);
     ct_assertequal(AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
@@ -106,7 +106,7 @@ static void parse_inst_in_middle(void *ctx)
     ct_assertequal(0x34u, inst.bv.mem[1]);
     ct_assertequal(0x6u, inst.bv.mem[2]);
     ct_assertequal(3u, inst.bv.size);
-    ct_assertequal(3u, inst.bankoffset);
+    ct_assertequal(3u, inst.offset);
     ct_assertequal(IN_JMP, (int)inst.d.instruction);
     ct_assertequal(AM_JABS, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
@@ -129,7 +129,7 @@ static void parse_inst_unofficial(void *ctx)
     ct_assertequal(0x34u, inst.bv.mem[0]);
     ct_assertequal(0x4cu, inst.bv.mem[1]);
     ct_assertequal(2u, inst.bv.size);
-    ct_assertequal(2u, inst.bankoffset);
+    ct_assertequal(2u, inst.offset);
     ct_assertequal(IN_NOP, (int)inst.d.instruction);
     ct_assertequal(AM_ZPX, (int)inst.d.mode);
     ct_asserttrue(inst.d.unofficial);
@@ -151,7 +151,7 @@ static void parse_inst_eof(void *ctx)
     ct_assertequal(0u, inst.bv.ord);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
-    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(0u, inst.offset);
     ct_assertequal(IN_UDF, (int)inst.d.instruction);
     ct_assertequal(AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
@@ -173,13 +173,13 @@ static void parse_inst_out_of_bounds(void *ctx)
     ct_assertequal(0u, inst.bv.ord);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
-    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(0u, inst.offset);
     ct_assertequal(IN_UDF, (int)inst.d.instruction);
     ct_assertequal(AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
 }
 
-static void parsemem_inst_empty_bankview(void *ctx)
+static void parsemem_inst_empty_blockview(void *ctx)
 {
     struct dis_instruction inst;
 
@@ -189,7 +189,7 @@ static void parsemem_inst_empty_bankview(void *ctx)
     ct_assertequal(0u, inst.bv.ord);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
-    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(0u, inst.offset);
     ct_assertequal(IN_UDF, (int)inst.d.instruction);
     ct_assertequal(AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
@@ -207,7 +207,7 @@ static void parsemem_inst_at_start(void *ctx)
     ct_assertequal(0u, inst.bv.ord);
     ct_assertequal(0xeau, inst.bv.mem[0]);
     ct_assertequal(1u, inst.bv.size);
-    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(0u, inst.offset);
     ct_assertequal(IN_NOP, (int)inst.d.instruction);
     ct_assertequal(AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
@@ -227,7 +227,7 @@ static void parsemem_inst_in_middle(void *ctx)
     ct_assertequal(0x34u, inst.bv.mem[1]);
     ct_assertequal(0x6u, inst.bv.mem[2]);
     ct_assertequal(3u, inst.bv.size);
-    ct_assertequal(3u, inst.bankoffset);
+    ct_assertequal(3u, inst.offset);
     ct_assertequal(IN_JMP, (int)inst.d.instruction);
     ct_assertequal(AM_JABS, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
@@ -246,7 +246,7 @@ static void parsemem_inst_unofficial(void *ctx)
     ct_assertequal(0x34u, inst.bv.mem[0]);
     ct_assertequal(0x4cu, inst.bv.mem[1]);
     ct_assertequal(2u, inst.bv.size);
-    ct_assertequal(2u, inst.bankoffset);
+    ct_assertequal(2u, inst.offset);
     ct_assertequal(IN_NOP, (int)inst.d.instruction);
     ct_assertequal(AM_ZPX, (int)inst.d.mode);
     ct_asserttrue(inst.d.unofficial);
@@ -264,7 +264,7 @@ static void parsemem_inst_eof(void *ctx)
     ct_assertequal(0u, inst.bv.ord);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
-    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(0u, inst.offset);
     ct_assertequal(IN_UDF, (int)inst.d.instruction);
     ct_assertequal(AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
@@ -282,7 +282,7 @@ static void parsemem_inst_out_of_bounds(void *ctx)
     ct_assertequal(0u, inst.bv.ord);
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
-    ct_assertequal(0u, inst.bankoffset);
+    ct_assertequal(0u, inst.offset);
     ct_assertequal(IN_UDF, (int)inst.d.instruction);
     ct_assertequal(AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
@@ -2653,7 +2653,7 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(parse_inst_unofficial),
         ct_maketest(parse_inst_eof),
         ct_maketest(parse_inst_out_of_bounds),
-        ct_maketest(parsemem_inst_empty_bankview),
+        ct_maketest(parsemem_inst_empty_blockview),
         ct_maketest(parsemem_inst_at_start),
         ct_maketest(parsemem_inst_in_middle),
         ct_maketest(parsemem_inst_unofficial),

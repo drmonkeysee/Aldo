@@ -184,7 +184,7 @@ static void print_prg_line(const char *restrict dis, bool verbose,
     }
 }
 
-static int print_prgbank(const struct blockview *bv, bool verbose, FILE *f)
+static int print_prgblock(const struct blockview *bv, bool verbose, FILE *f)
 {
     fprintf(f, "Block %zu (%zuKB)\n", bv->ord, bv->size >> BITWIDTH_1KB);
     fputs("--------\n", f);
@@ -198,7 +198,7 @@ static int print_prgbank(const struct blockview *bv, bool verbose, FILE *f)
     int result;
     for (result = dis_parse_inst(bv, 0, &inst);
          result > 0;
-         result = dis_parse_inst(bv, inst.bankoffset + inst.bv.size, &inst)) {
+         result = dis_parse_inst(bv, inst.offset + inst.bv.size, &inst)) {
         result = dis_inst(addr, &inst, dis);
         if (result <= 0) break;
         print_prg_line(dis, verbose, &inst, &repeat, f);
@@ -711,7 +711,7 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
 
     do {
         fputc('\n', f);
-        const int err = print_prgbank(&bv, appstate->verbose, f);
+        const int err = print_prgblock(&bv, appstate->verbose, f);
         // NOTE: disassembly errors may occur normally if data bytes are
         // interpreted as instructions so note the result and continue.
         if (err < 0) {

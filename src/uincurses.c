@@ -222,7 +222,7 @@ static void drawinstructions(uint16_t addr, int h, int y,
         char disassembly[DIS_INST_SIZE];
         int result = dis_parsemem_inst(snapshot->mem.prglength,
                                        snapshot->mem.currprg,
-                                       inst.bankoffset + inst.bv.size,
+                                       inst.offset + inst.bv.size,
                                        &inst);
         if (result > 0) {
             result = dis_inst(addr, &inst, disassembly);

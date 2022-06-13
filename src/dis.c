@@ -439,16 +439,12 @@ static int write_chrtiles(const struct blockview *bv, int32_t tilesdim,
 }
 
 static int write_chrblock(const struct blockview *bv, int scale,
-                          const char *restrict prefix, FILE *output)
+                          const char *restrict bmpfilename, FILE *output)
 {
     int32_t tilesdim, tile_sections;
     int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
     if (err < 0) return err;
 
-    char bmpfilename[128];
-    prefix = prefix && strlen(prefix) > 0 ? prefix : "chr";
-    if (snprintf(bmpfilename, sizeof bmpfilename, "%.120s%03zu.bmp", prefix,
-                 bv->ord) < 0) return DIS_ERR_FMT;
     FILE *const bmpfile = fopen(bmpfilename, "wb");
     if (!bmpfile) return DIS_ERR_ERNO;
 
@@ -748,12 +744,26 @@ int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output)
     struct blockview bv = cart_chrblock(cart, 0);
     if (!bv.mem) return DIS_ERR_CHRROM;
 
+    const char *const prefix = appstate->chrdecode_prefix
+                                    && appstate->chrdecode_prefix[0] != '\0'
+                                ? appstate->chrdecode_prefix
+                                : "chr";
+    const size_t prefixlen = strlen(prefix),
+                    namesize = prefixlen + 8;   // NOTE: prefix + nnn.bmp + nul
+    char *const bmpfilename = malloc(namesize);
+
+    int err;
     do {
-        const int err = write_chrblock(&bv, appstate->chrscale,
-                                       appstate->chrdecode_prefix, output);
-        if (err < 0) return err;
+        err = snprintf(bmpfilename, namesize, "%s%03zu.bmp", prefix, bv.ord);
+        if (err < 0) {
+            err = DIS_ERR_FMT;
+            break;
+        }
+        err = write_chrblock(&bv, appstate->chrscale, bmpfilename, output);
+        if (err < 0) break;
         bv = cart_chrblock(cart, bv.ord + 1);
     } while (bv.mem);
 
-    return 0;
+    free(bmpfilename);
+    return err;
 }

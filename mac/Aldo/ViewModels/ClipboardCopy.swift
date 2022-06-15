@@ -11,6 +11,7 @@ final class ClipboardCopy: ObservableObject {
     let textStream: () async -> CStreamResult
     @Published var copyIconOpacity = 1.0
     @Published var successIconOpacity = 0.0
+    @Published var inProgress = false
     @Published var failed = false
     private(set) var currentError: AldoError?
 
@@ -20,7 +21,9 @@ final class ClipboardCopy: ObservableObject {
 
     @MainActor
     func execute() async {
+        inProgress = true
         currentError = nil
+        defer { inProgress = false }
         let result = await textStream()
         switch result {
         case let .success(data):

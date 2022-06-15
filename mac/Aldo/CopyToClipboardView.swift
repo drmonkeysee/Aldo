@@ -21,13 +21,14 @@ struct CopyToClipboardView: View {
                     .opacity(command.copyIconOpacity)
                 Image(systemName: "checkmark.diamond")
                     .opacity(command.successIconOpacity)
-                    .foregroundStyle(.green)
+                    .foregroundColor(.green)
                     .onReceive(command.$successIconOpacity,
                                perform: animateSuccess)
             }
         }
         .buttonStyle(.plain)
         .help("Copy to Clipboard")
+        .disabled(command.inProgress)
         .alert("Clipboard Copy Failure", isPresented: $command.failed,
                presenting: command.currentError) { _ in
             // NOTE: default action

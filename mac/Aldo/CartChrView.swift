@@ -185,7 +185,7 @@ fileprivate struct ExportView: View {
         panel.canCreateDirectories = true
         if panel.runModal() == .OK {
             Task(priority: .userInitiated) {
-                await command.exportChrRom(to: panel.url)
+                await command.export(to: panel.url)
             }
         }
     }

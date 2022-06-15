@@ -8,8 +8,10 @@
 import AppKit
 
 final class ClipboardCopy: ObservableObject {
+    static let transitionDuration = 2.0
+
     let textStream: () async -> CStreamResult
-    @Published var copyIconOpacity = 1.0
+    @Published var actionIconOpacity = 1.0
     @Published var successIconOpacity = 0.0
     @Published var inProgress = false
     @Published var failed = false
@@ -23,15 +25,15 @@ final class ClipboardCopy: ObservableObject {
     func execute() async {
         inProgress = true
         currentError = nil
-        defer { inProgress = false }
         let result = await textStream()
         switch result {
         case let .success(data):
             if let text = String(data: data, encoding: .utf8) {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(text, forType: .string)
-                copyIconOpacity = 0.0
+                actionIconOpacity = 0.0
                 successIconOpacity = 1.0
+                finishTransition()
             } else {
                 setError(.unknown)
             }
@@ -43,5 +45,14 @@ final class ClipboardCopy: ObservableObject {
     private func setError(_ err: AldoError) {
         currentError = err
         failed = true
+        inProgress = false
+    }
+
+    private func finishTransition() {
+        DispatchQueue.main.asyncAfter(deadline: .now()
+                                      + Self.transitionDuration) {
+            self.actionIconOpacity = 1.0
+            self.inProgress = false
+        }
     }
 }

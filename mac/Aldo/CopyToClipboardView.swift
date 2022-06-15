@@ -8,27 +8,26 @@
 import SwiftUI
 
 struct CopyToClipboardView: View {
-    private static let fadeDuration = 2.0
-
     @ObservedObject var command: ClipboardCopy
 
     var body: some View {
-        Button {
-            Task(priority: .userInitiated) { await command.execute() }
-        } label: {
-            ZStack {
+        ZStack {
+            Button {
+                Task(priority: .userInitiated) { await command.execute() }
+            } label: {
                 Image(systemName: "arrow.up.doc.on.clipboard")
-                    .opacity(command.copyIconOpacity)
-                Image(systemName: "checkmark.diamond")
-                    .opacity(command.successIconOpacity)
-                    .foregroundColor(.green)
-                    .onReceive(command.$successIconOpacity,
-                               perform: animateSuccess)
+                    .opacity(command.actionIconOpacity)
             }
+            .buttonStyle(.plain)
+            .help("Copy to Clipboard")
+            .disabled(command.inProgress)
+            Image(systemName: "checkmark.diamond")
+                .opacity(command.successIconOpacity)
+                .font(.body.bold())
+                .foregroundColor(.green)
+                .onReceive(command.$successIconOpacity,
+                           perform: animateSuccess)
         }
-        .buttonStyle(.plain)
-        .help("Copy to Clipboard")
-        .disabled(command.inProgress)
         .alert("Clipboard Copy Failure", isPresented: $command.failed,
                presenting: command.currentError) { _ in
             // NOTE: default action
@@ -41,14 +40,11 @@ struct CopyToClipboardView: View {
         guard val == 1.0 else { return }
 
         DispatchQueue.main.async {
-            let halfDuration = Self.fadeDuration / 2.0
+            let halfDuration = ClipboardCopy.transitionDuration / 2.0
             withAnimation(
                 .easeOut(duration: halfDuration).delay(halfDuration)) {
                     command.successIconOpacity = 0.0
             }
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + Self.fadeDuration) {
-            command.copyIconOpacity = 1.0
         }
     }
 }

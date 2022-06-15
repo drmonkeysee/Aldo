@@ -146,8 +146,17 @@ fileprivate struct ExportView: View {
     var body: some View {
         HStack {
             Button(action: pickFolder) {
-                Label("Export", systemImage: "square.and.arrow.up.circle")
+                ZStack {
+                    Label("Export", systemImage: "square.and.arrow.up.circle")
+                        .opacity(command.actionIconOpacity)
+                    Label("Done!", systemImage: "checkmark.circle")
+                        .opacity(command.successIconOpacity)
+                        .foregroundColor(.green)
+                        .onReceive(command.$successIconOpacity,
+                                   perform: animateSuccess)
+                }
             }
+            .disabled(command.inProgress)
             Picker("Scale", selection: $command.scale) {
                 ForEach(command.scales, id: \.self) { i in
                     Text("\(i)x")
@@ -189,6 +198,18 @@ fileprivate struct ExportView: View {
         }
         NSWorkspace.shared.selectFile(nil,
                                       inFileViewerRootedAtPath: folder.path)
+    }
+
+    private func animateSuccess(val: Double) {
+        guard val == 1.0 else { return }
+
+        DispatchQueue.main.async {
+            let halfDuration = ChrExport.transitionDuration / 2.0
+            withAnimation(
+                .easeOut(duration: halfDuration).delay(halfDuration)) {
+                    command.successIconOpacity = 0.0
+            }
+        }
     }
 }
 

@@ -15,7 +15,7 @@ struct CartChrView: View {
             HStack {
                 if case .iNes = cart.info, cart.info.chrBlocks > 0 {
                     chrLabel()
-                    ExportView(command: ChrExport(cart))
+                    ChrExportView(cart)
                 } else {
                     chrLabel()
                         .padding(.top, 2)
@@ -137,79 +137,6 @@ fileprivate struct PaletteView: View {
             .background(.cyan)
             .cornerRadius(Constraints.cornerRadius)
             .padding(.trailing, Constraints.sheetPadding)
-    }
-}
-
-fileprivate struct ExportView: View {
-    @ObservedObject var command: ChrExport
-
-    var body: some View {
-        HStack {
-            Button(action: pickFolder) {
-                ZStack {
-                    Label("Export", systemImage: "square.and.arrow.up.circle")
-                        .opacity(command.actionIconOpacity)
-                    Label("Done!", systemImage: "checkmark.circle")
-                        .opacity(command.successIconOpacity)
-                        .foregroundColor(.green)
-                        .onReceive(command.$successIconOpacity,
-                                   perform: animateSuccess)
-                }
-            }
-            .disabled(command.inProgress)
-            Picker("Scale", selection: $command.scale) {
-                ForEach(command.scales, id: \.self) { i in
-                    Text("\(i)x")
-                }
-            }
-            .frame(width: 120)
-            Button(action: openTargetFolder) {
-                Image(systemName: "folder")
-            }
-            .disabled(!command.done)
-            .help("Open export folder")
-        }
-        .alert("CHR Export Failure", isPresented: $command.failed,
-               presenting: command.currentError) { _ in
-            // NOTE: default action
-        } message: { err in
-            Text(err.message)
-        }
-    }
-
-    private func pickFolder() {
-        let panel = NSOpenPanel()
-        panel.message = "Choose export folder"
-        panel.canChooseFiles = false
-        panel.canChooseDirectories = true
-        panel.canCreateDirectories = true
-        if panel.runModal() == .OK {
-            Task(priority: .userInitiated) {
-                await command.export(to: panel.url)
-            }
-        }
-    }
-
-    private func openTargetFolder() {
-        guard let folder = command.selectedFolder,
-              folder.hasDirectoryPath else {
-            aldoLog.debug("Missing/invalid export target folder")
-            return
-        }
-        NSWorkspace.shared.selectFile(nil,
-                                      inFileViewerRootedAtPath: folder.path)
-    }
-
-    private func animateSuccess(val: Double) {
-        guard val == 1.0 else { return }
-
-        DispatchQueue.main.async {
-            let halfDuration = ChrExport.transitionDuration / 2.0
-            withAnimation(
-                .easeOut(duration: halfDuration).delay(halfDuration)) {
-                    command.successIconOpacity = 0.0
-            }
-        }
     }
 }
 

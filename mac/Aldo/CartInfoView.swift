@@ -27,8 +27,7 @@ struct CartInfoView: View {
                 }
                 switch cart.info {
                 case .raw, .iNes:
-                    CopyToClipboardView(
-                        command: ClipboardCopy(fromStream: cart.readInfoText))
+                    CopyToClipboardView(fromStream: cart.readInfoText)
                 default:
                     EmptyView()
                 }

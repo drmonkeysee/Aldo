@@ -53,8 +53,7 @@ fileprivate struct BlockSelectionView: View {
             } label: {
                 prgLabel()
             }
-            CopyToClipboardView(
-                command: ClipboardCopy(fromStream: blocks.cart.readPrgRom))
+            CopyToClipboardView(fromStream: blocks.cart.readPrgRom)
         }
     }
 }

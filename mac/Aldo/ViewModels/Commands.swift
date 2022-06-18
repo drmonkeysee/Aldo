@@ -7,7 +7,7 @@
 
 import AppKit
 
-final class ClipboardCopy: TransitionCommand {
+final class ClipboardCopy: TimedFeedbackCommand {
     let textStream: () async -> CStreamResult
 
     init(fromStream: @escaping () async -> CStreamResult) {
@@ -36,7 +36,7 @@ final class ClipboardCopy: TransitionCommand {
     }
 }
 
-final class ChrExport: TransitionCommand {
+final class ChrExport: TimedFeedbackCommand {
     let cart: Cart
     let scales = Array(Int(MinChrScale)...Int(MaxChrScale))
     @Published var scale = ChrSheet.scale
@@ -73,7 +73,7 @@ final class ChrExport: TransitionCommand {
     }
 }
 
-class TransitionCommand: ObservableObject {
+class TimedFeedbackCommand: ObservableObject {
     static let transitionDuration = 2.0
 
     @Published var actionIconOpacity = 1.0

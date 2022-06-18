@@ -15,7 +15,9 @@ struct CartInfoView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .trailing) {
                     CommonInfoView(section: .labels)
+                        .textSelection(.enabled)
                     FormatView(section: .labels, info: cart.info)
+                        .textSelection(.enabled)
                 }
                 VStack {
                     CommonInfoView(section: .separators)
@@ -23,7 +25,9 @@ struct CartInfoView: View {
                 }
                 VStack(alignment: .leading) {
                     CommonInfoView(section: .values)
+                        .textSelection(.enabled)
                     FormatView(section: .values, info: cart.info)
+                        .textSelection(.enabled)
                 }
                 switch cart.info {
                 case .raw, .iNes:

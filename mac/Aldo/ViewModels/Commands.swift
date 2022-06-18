@@ -7,7 +7,7 @@
 
 import AppKit
 
-final class ClipboardCopy: TimedCommand {
+final class ClipboardCopy: TimedFeedbackCommand {
     let textStream: () async -> CStreamResult
 
     init(fromStream: @escaping () async -> CStreamResult) {
@@ -24,8 +24,6 @@ final class ClipboardCopy: TimedCommand {
             if let text = String(data: data, encoding: .utf8) {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(text, forType: .string)
-                actionIconOpacity = 0.0
-                successIconOpacity = 1.0
                 finishTransition()
             } else {
                 setError(.unknown)
@@ -36,11 +34,11 @@ final class ClipboardCopy: TimedCommand {
     }
 }
 
-final class ChrExport: TimedCommand {
+final class ChrExport: TimedFeedbackCommand {
     let cart: Cart
     let scales = Array(Int(MinChrScale)...Int(MaxChrScale))
     @Published var scale = ChrSheet.scale
-    @Published var done = false
+    @Published var folderAvailable = false
     private(set) var selectedFolder: URL?
 
     init(_ cart: Cart) {
@@ -52,7 +50,7 @@ final class ChrExport: TimedCommand {
         guard let folder = to else { return }
 
         inProgress = true
-        done = false
+        folderAvailable = false
         currentError = nil
         selectedFolder = folder
         let result = await cart.exportChrRom(scale: scale, folder: folder)
@@ -60,9 +58,7 @@ final class ChrExport: TimedCommand {
         case let .success(data):
             if let text = String(data: data, encoding: .utf8) {
                 aldoLog.debug("CHR Export:\n\(text)")
-                actionIconOpacity = 0.0
-                successIconOpacity = 1.0
-                done = true
+                folderAvailable = true
                 finishTransition()
             } else {
                 setError(.unknown)
@@ -73,7 +69,7 @@ final class ChrExport: TimedCommand {
     }
 }
 
-class TimedCommand: ObservableObject {
+class TimedFeedbackCommand: ObservableObject {
     static let transitionDuration = 2.0
 
     @Published var actionIconOpacity = 1.0
@@ -89,6 +85,8 @@ class TimedCommand: ObservableObject {
     }
 
     fileprivate func finishTransition() {
+        actionIconOpacity = 0.0
+        successIconOpacity = 1.0
         DispatchQueue.main.asyncAfter(deadline: .now()
                                       + Self.transitionDuration) {
             self.actionIconOpacity = 1.0

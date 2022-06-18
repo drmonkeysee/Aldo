@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CopyToClipboardView: TimedCommandView {
+struct CopyToClipboardView: TimedFeedbackCommandView {
     @ObservedObject var command: ClipboardCopy
 
     init(fromStream: @escaping () async -> CStreamResult) {
@@ -41,7 +41,7 @@ struct CopyToClipboardView: TimedCommandView {
     }
 }
 
-struct ChrExportView: TimedCommandView {
+struct ChrExportView: TimedFeedbackCommandView {
     @ObservedObject var command: ChrExport
 
     init(_ cart: Cart) {
@@ -71,7 +71,7 @@ struct ChrExportView: TimedCommandView {
             Button(action: openTargetFolder) {
                 Image(systemName: "folder")
             }
-            .disabled(!command.done)
+            .disabled(!command.folderAvailable)
             .help("Open export folder")
         }
         .alert("CHR Export Failure", isPresented: $command.failed,
@@ -106,13 +106,13 @@ struct ChrExportView: TimedCommandView {
     }
 }
 
-protocol TimedCommandView: View {
-    associatedtype Command: TimedCommand
+protocol TimedFeedbackCommandView: View {
+    associatedtype Command: TimedFeedbackCommand
 
     var command: Command { get }
 }
 
-extension TimedCommandView {
+extension TimedFeedbackCommandView {
     fileprivate func animateSuccess(val: Double) {
         guard val == 1.0 else { return }
 

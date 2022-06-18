@@ -78,7 +78,7 @@ struct Instruction {
     }
 
     private static func getBytes(_ p: CInstPtr) -> [UInt8] {
-        (0..<p.pointee.bv.size).map { i in p.pointee.bv.mem[i] }
+        (0..<p.pointee.bv.size).map { p.pointee.bv.mem[$0] }
     }
 
     private static func getOperand(_ p: CInstPtr)-> String {
@@ -103,7 +103,7 @@ struct Instruction {
 
     var display: String {
         let byteStr = bytes
-                        .map { b in String(format: "%02X", b) }
+                        .map { String(format: "%02X", $0) }
                         .joined(separator: " ")
                         .padding(toLength: 9, withPad: " ", startingAt: 0)
         return "\(byteStr) \(mnemonic) \(operand)"
@@ -182,8 +182,8 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
 
     private mutating func nextLine() -> PrgLine? {
         var inst = dis_instruction()
-        let err = withUnsafePointer(to: bv) { p in
-            dis_parse_inst(p, cursor, &inst)
+        let err = withUnsafePointer(to: bv) {
+            dis_parse_inst($0, cursor, &inst)
         }
 
         if err < 0 {

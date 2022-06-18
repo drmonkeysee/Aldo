@@ -47,8 +47,8 @@ fileprivate struct BlockSelectionView: View {
     var body: some View {
         HStack {
             Picker(selection: $blocks.selectedBlock) {
-                ForEach(0..<blocks.count, id: \.self) { i in
-                    Text("Block \(i)")
+                ForEach(0..<blocks.count, id: \.self) {
+                    Text("Block \($0)")
                 }
             } label: {
                 prgLabel()

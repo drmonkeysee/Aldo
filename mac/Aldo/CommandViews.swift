@@ -35,8 +35,8 @@ struct CopyToClipboardView: TimedFeedbackCommandView {
         .alert("Clipboard Copy Failure", isPresented: $command.failed,
                presenting: command.currentError) { _ in
             // NOTE: default action
-        } message: { err in
-            Text(err.message)
+        } message: {
+            Text($0.message)
         }
     }
 }
@@ -63,8 +63,8 @@ struct ChrExportView: TimedFeedbackCommandView {
             }
             .disabled(command.inProgress)
             Picker("Scale", selection: $command.scale) {
-                ForEach(command.scales, id: \.self) { i in
-                    Text("\(i)x")
+                ForEach(command.scales, id: \.self) {
+                    Text("\($0)x")
                 }
             }
             .frame(width: 120)
@@ -77,8 +77,8 @@ struct ChrExportView: TimedFeedbackCommandView {
         .alert("CHR Export Failure", isPresented: $command.failed,
                presenting: command.currentError) { _ in
             // NOTE: default action
-        } message: { err in
-            Text(err.message)
+        } message: {
+            Text($0.message)
         }
     }
 

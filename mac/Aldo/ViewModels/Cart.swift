@@ -36,8 +36,8 @@ final class Cart: ObservableObject {
     func readInfoText() async -> CStreamResult {
         guard let h = handle else { return noCart }
 
-        return await readCStream { stream in
-            cart_write_info(h.unwrapped, self.fileName, stream, true)
+        return await readCStream {
+            cart_write_info(h.unwrapped, self.fileName, $0, true)
         }
     }
 
@@ -65,8 +65,8 @@ final class Cart: ObservableObject {
 
         return await readCStream(binary: true) { stream in
             let bv = cart_chrblock(h.unwrapped, at)
-            let err = withUnsafePointer(to: bv) { p in
-                dis_cart_chrbank(p, .init(scale), stream)
+            let err = withUnsafePointer(to: bv) {
+                dis_cart_chrbank($0, .init(scale), stream)
             }
             if err < 0 { throw AldoError.wrapDisError(code: err) }
         }
@@ -196,8 +196,8 @@ fileprivate final class CartHandle {
 
     init(_ fromFile: URL) throws {
         errno = 0
-        let cFile = fromFile.withUnsafeFileSystemRepresentation { name in
-            fopen(name, "rb")
+        let cFile = fromFile.withUnsafeFileSystemRepresentation {
+            fopen($0, "rb")
         }
         guard cFile != nil else { throw AldoError.ioErrno }
         defer { fclose(cFile) }

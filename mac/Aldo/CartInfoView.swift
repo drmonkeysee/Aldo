@@ -96,8 +96,8 @@ fileprivate struct FormatLabelsView: View {
 
     var body: some View {
         if let viewLabels = labels {
-            ForEach(viewLabels, id: \.self) { label in
-                Text(label)
+            ForEach(viewLabels, id: \.self) {
+                Text($0)
             }
         }
     }

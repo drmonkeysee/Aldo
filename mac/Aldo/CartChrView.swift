@@ -55,8 +55,8 @@ fileprivate struct ChrBlocksView: View {
     var body: some View {
         ScrollView(.horizontal) {
             LazyHStack {
-                ForEach(0..<blocks.count, id: \.self) { i in
-                    ChrSheetView(sheet: blocks.sheet(at: i))
+                ForEach(0..<blocks.count, id: \.self) {
+                    ChrSheetView(sheet: blocks.sheet(at: $0))
                 }
             }
             .padding(Constraints.sheetPadding)

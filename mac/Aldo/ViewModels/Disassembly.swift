@@ -116,9 +116,10 @@ struct Instruction {
     }
 
     var cycleCount: String {
+        let cy = cycles.count < 0 ? "∞" : "\(cycles.count)"
         let br = cycles.branchTaken ? "\n(+1 if branch taken)" : ""
         let pg = cycles.pageBoundary ? "\n(+1 if page-boundary crossed)" : ""
-        return "\(cycles.count) cycles\(br)\(pg)"
+        return "\(cy) cycles\(br)\(pg)"
     }
 
     func byte(at: Int) -> UInt8? {

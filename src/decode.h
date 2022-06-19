@@ -319,7 +319,10 @@ enum addrmode {
 struct decoded {
     enum inst instruction;
     enum addrmode mode;
-    uint8_t cycles;
+    struct {
+        int8_t count;
+        bool branch_taken, page_boundary;
+    } cycles;
     bool unofficial;
 };
 

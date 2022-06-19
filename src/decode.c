@@ -36,7 +36,7 @@ const int BrkOpcode = 0x0;
 // (!!) = extremely unstable
 
 const struct decoded Decode[] = {
-    OP(IN_BRK, AM_BRK, CY(9)),  // 00 - BRK
+    OP(IN_BRK, AM_BRK, CY(7)),  // 00 - BRK
     OP(IN_ORA, AM_INDX, CY(6)), // 01 - ORA (zp,X)
     JAM,                        // 02 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_SLO, AM_INDX, CY(8)), // 03 - *SLO (ASO) (zp,X)
@@ -68,7 +68,7 @@ const struct decoded Decode[] = {
     OP(IN_ORA, AM_ABSY, PG(4)), // 1D - ORA abs,X
     OP(IN_ASL, AM_ABSY, CY(7)), // 1E - ASL abs,X
     UP(IN_SLO, AM_ABSY, CY(7)), // 1F - *SLO (ASO) abs,X
-    OP(IN_JSR, AM_JSR, CY(9)),  // 20 - JSR
+    OP(IN_JSR, AM_JSR, CY(6)),  // 20 - JSR
     OP(IN_AND, AM_INDX, CY(6)), // 21 - AND (zp,X)
     JAM,                        // 22 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_RLA, AM_INDX, CY(8)), // 23 - *RLA (RLN) (zp,X)
@@ -100,7 +100,7 @@ const struct decoded Decode[] = {
     OP(IN_AND, AM_ABSY, PG(4)), // 3D - AND abs,X
     OP(IN_ROL, AM_ABSY, CY(7)), // 3E - ROL abs,X
     UP(IN_RLA, AM_ABSY, CY(7)), // 3F - *RLA (RLN) abs,X
-    OP(IN_RTI, AM_RTI, CY(9)),  // 40 - RTI
+    OP(IN_RTI, AM_RTI, CY(6)),  // 40 - RTI
     OP(IN_EOR, AM_INDX, CY(6)), // 41 - EOR (zp,X)
     JAM,                        // 42 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_SRE, AM_INDX, CY(8)), // 43 - *SRE (LSE) (zp,X)
@@ -112,7 +112,7 @@ const struct decoded Decode[] = {
     OP(IN_EOR, AM_IMM, CY(2)),  // 49 - EOR imm
     OP(IN_LSR, AM_IMP, CY(2)),  // 4A - LSR imp
     UP(IN_ALR, AM_IMM, CY(2)),  // 4B - *ALR (ASR) imm
-    OP(IN_JMP, AM_JABS, CY(9)), // 4C - JMP abs
+    OP(IN_JMP, AM_JABS, CY(3)), // 4C - JMP abs
     OP(IN_EOR, AM_ABS, CY(4)),  // 4D - EOR abs
     OP(IN_LSR, AM_ABS, CY(6)),  // 4E - LSR abs
     UP(IN_SRE, AM_ABS, CY(6)),  // 4F - *SRE (LSE) abs
@@ -132,7 +132,7 @@ const struct decoded Decode[] = {
     OP(IN_EOR, AM_ABSY, PG(4)), // 5D - EOR abs,X
     OP(IN_LSR, AM_ABSY, CY(7)), // 5E - LSR abs,X
     UP(IN_SRE, AM_ABSY, CY(7)), // 5F - *SRE (LSE) abs,X
-    OP(IN_RTS, AM_RTS, CY(9)),  // 60 - RTS
+    OP(IN_RTS, AM_RTS, CY(6)),  // 60 - RTS
     OP(IN_ADC, AM_INDX, CY(6)), // 61 - ADC (zp,X)
     JAM,                        // 62 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_RRA, AM_INDX, CY(8)), // 63 - *RRA (RLD) (zp,X)
@@ -144,7 +144,7 @@ const struct decoded Decode[] = {
     OP(IN_ADC, AM_IMM, CY(2)),  // 69 - ADC imm
     OP(IN_ROR, AM_IMP, CY(2)),  // 6A - ROR imp
     UP(IN_ARR, AM_IMM, CY(2)),  // 6B - *ARR imm
-    OP(IN_JMP, AM_JIND, CY(9)), // 6C - JMP (abs)
+    OP(IN_JMP, AM_JIND, CY(5)), // 6C - JMP (abs)
     OP(IN_ADC, AM_ABS, CY(4)),  // 6D - ADC abs
     OP(IN_ROR, AM_ABS, CY(6)),  // 6E - ROR abs
     UP(IN_RRA, AM_ABS, CY(6)),  // 6F - *RRA (RLD) abs

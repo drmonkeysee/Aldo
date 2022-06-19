@@ -56,10 +56,10 @@ const struct decoded Decode[] = {
     OP(IN_ORA, AM_INDY, CY(9)), // 11 - ORA (zp, CY(9)),Y
     JAM,                        // 12 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_SLO, AM_INDY, CY(9)), // 13 - *SLO (ASO) (zp, CY(9)),Y
-    UP(IN_NOP, AM_ZPX, CY(9)),  // 14 - *NOP (DOP, SKB, IGN) zp,X
-    OP(IN_ORA, AM_ZPX, CY(9)),  // 15 - ORA zp,X
-    OP(IN_ASL, AM_ZPX, CY(9)),  // 16 - ASL zp,X
-    UP(IN_SLO, AM_ZPX, CY(9)),  // 17 - *SLO (ASO) zp,X
+    UP(IN_NOP, AM_ZPX, CY(4)),  // 14 - *NOP (DOP, SKB, IGN) zp,X
+    OP(IN_ORA, AM_ZPX, CY(4)),  // 15 - ORA zp,X
+    OP(IN_ASL, AM_ZPX, CY(6)),  // 16 - ASL zp,X
+    UP(IN_SLO, AM_ZPX, CY(6)),  // 17 - *SLO (ASO) zp,X
     OP(IN_CLC, AM_IMP, CY(2)),  // 18 - CLC
     OP(IN_ORA, AM_ABSY, CY(9)), // 19 - ORA abs,Y
     UP(IN_NOP, AM_IMP, CY(2)),  // 1A - *NOP (NPO, UNP)
@@ -88,10 +88,10 @@ const struct decoded Decode[] = {
     OP(IN_AND, AM_INDY, CY(9)), // 31 - AND (zp, CY(9)),Y
     JAM,                        // 32 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_RLA, AM_INDY, CY(9)), // 33 - *RLA (RLN) (zp, CY(9)),Y
-    UP(IN_NOP, AM_ZPX, CY(9)),  // 34 - *NOP (DOP, SKB, IGN) zp,X
-    OP(IN_AND, AM_ZPX, CY(9)),  // 35 - AND zp,X
-    OP(IN_ROL, AM_ZPX, CY(9)),  // 36 - ROL zp,X
-    UP(IN_RLA, AM_ZPX, CY(9)),  // 37 - *RLA (RLN) zp,X
+    UP(IN_NOP, AM_ZPX, CY(4)),  // 34 - *NOP (DOP, SKB, IGN) zp,X
+    OP(IN_AND, AM_ZPX, CY(4)),  // 35 - AND zp,X
+    OP(IN_ROL, AM_ZPX, CY(6)),  // 36 - ROL zp,X
+    UP(IN_RLA, AM_ZPX, CY(6)),  // 37 - *RLA (RLN) zp,X
     OP(IN_SEC, AM_IMP, CY(2)),  // 38 - SEC
     OP(IN_AND, AM_ABSY, CY(9)), // 39 - AND abs,Y
     UP(IN_NOP, AM_IMP, CY(2)),  // 3A - *NOP (NPO, UNP)
@@ -120,10 +120,10 @@ const struct decoded Decode[] = {
     OP(IN_EOR, AM_INDY, CY(9)), // 51 - EOR (zp, CY(9)),Y
     JAM,                        // 52 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_SRE, AM_INDY, CY(9)), // 53 - *SRE (LSE) (zp, CY(9)),Y
-    UP(IN_NOP, AM_ZPX, CY(9)),  // 54 - *NOP (DOP, SKB, IGN) zp,X
-    OP(IN_EOR, AM_ZPX, CY(9)),  // 55 - EOR zp,X
-    OP(IN_LSR, AM_ZPX, CY(9)),  // 56 - LSR zp,X
-    UP(IN_SRE, AM_ZPX, CY(9)),  // 57 - *SRE (LSE) zp,X
+    UP(IN_NOP, AM_ZPX, CY(4)),  // 54 - *NOP (DOP, SKB, IGN) zp,X
+    OP(IN_EOR, AM_ZPX, CY(4)),  // 55 - EOR zp,X
+    OP(IN_LSR, AM_ZPX, CY(6)),  // 56 - LSR zp,X
+    UP(IN_SRE, AM_ZPX, CY(6)),  // 57 - *SRE (LSE) zp,X
     OP(IN_CLI, AM_IMP, CY(2)),  // 58 - CLI
     OP(IN_EOR, AM_ABSY, CY(9)), // 59 - EOR abs,Y
     UP(IN_NOP, AM_IMP, CY(2)),  // 5A - *NOP (NPO, UNP)
@@ -152,10 +152,10 @@ const struct decoded Decode[] = {
     OP(IN_ADC, AM_INDY, CY(9)), // 71 - ADC (zp, CY(9)),Y
     JAM,                        // 72 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_RRA, AM_INDY, CY(9)), // 73 - *RRA (RLD) (zp, CY(9)),Y
-    UP(IN_NOP, AM_ZPX, CY(9)),  // 74 - *NOP (DOP, SKB, IGN) zp,X
-    OP(IN_ADC, AM_ZPX, CY(9)),  // 75 - ADC zp,X
-    OP(IN_ROR, AM_ZPX, CY(9)),  // 76 - ROR zp,X
-    UP(IN_RRA, AM_ZPX, CY(9)),  // 77 - *RRA (RLD) zp,X
+    UP(IN_NOP, AM_ZPX, CY(4)),  // 74 - *NOP (DOP, SKB, IGN) zp,X
+    OP(IN_ADC, AM_ZPX, CY(4)),  // 75 - ADC zp,X
+    OP(IN_ROR, AM_ZPX, CY(6)),  // 76 - ROR zp,X
+    UP(IN_RRA, AM_ZPX, CY(6)),  // 77 - *RRA (RLD) zp,X
     OP(IN_SEI, AM_IMP, CY(2)),  // 78 - SEI
     OP(IN_ADC, AM_ABSY, CY(9)), // 79 - ADC abs,Y
     UP(IN_NOP, AM_IMP, CY(2)),  // 7A - *NOP (NPO, UNP)
@@ -184,10 +184,10 @@ const struct decoded Decode[] = {
     OP(IN_STA, AM_INDY, CY(9)), // 91 - STA (zp, CY(9)),Y
     JAM,                        // 92 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_SHA, AM_INDY, CY(9)), // 93 - *SHA (AHX, AXA, TEA) (zp, CY(9)),Y (!)
-    OP(IN_STY, AM_ZPX, CY(9)),  // 94 - STY zp,X
-    OP(IN_STA, AM_ZPX, CY(9)),  // 95 - STA zp,X
-    OP(IN_STX, AM_ZPY, CY(9)),  // 96 - STX zp,Y
-    UP(IN_SAX, AM_ZPY, CY(9)),  // 97 - *SAX (AXS, AAX) zp,Y
+    OP(IN_STY, AM_ZPX, CY(4)),  // 94 - STY zp,X
+    OP(IN_STA, AM_ZPX, CY(4)),  // 95 - STA zp,X
+    OP(IN_STX, AM_ZPY, CY(4)),  // 96 - STX zp,Y
+    UP(IN_SAX, AM_ZPY, CY(4)),  // 97 - *SAX (AXS, AAX) zp,Y
     OP(IN_TYA, AM_IMP, CY(2)),  // 98 - TYA
     OP(IN_STA, AM_ABSY, CY(9)), // 99 - STA abs,Y
     OP(IN_TXS, AM_IMP, CY(2)),  // 9A - TXS
@@ -216,10 +216,10 @@ const struct decoded Decode[] = {
     OP(IN_LDA, AM_INDY, CY(9)), // B1 - LDA (zp, CY(9)),Y
     JAM,                        // B2 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_LAX, AM_INDY, CY(9)), // B3 - *LAX (zp, CY(9)),Y
-    OP(IN_LDY, AM_ZPX, CY(9)),  // B4 - LDY zp,X
-    OP(IN_LDA, AM_ZPX, CY(9)),  // B5 - LDA zp,X
-    OP(IN_LDX, AM_ZPY, CY(9)),  // B6 - LDX zp,Y
-    UP(IN_LAX, AM_ZPY, CY(9)),  // B7 - *LAX zp,Y
+    OP(IN_LDY, AM_ZPX, CY(4)),  // B4 - LDY zp,X
+    OP(IN_LDA, AM_ZPX, CY(4)),  // B5 - LDA zp,X
+    OP(IN_LDX, AM_ZPY, CY(4)),  // B6 - LDX zp,Y
+    UP(IN_LAX, AM_ZPY, CY(4)),  // B7 - *LAX zp,Y
     OP(IN_CLV, AM_IMP, CY(2)),  // B8 - CLV
     OP(IN_LDA, AM_ABSY, CY(9)), // B9 - LDA abs,Y
     OP(IN_TSX, AM_IMP, CY(2)),  // BA - TSX
@@ -248,10 +248,10 @@ const struct decoded Decode[] = {
     OP(IN_CMP, AM_INDY, CY(9)), // D1 - CMP (zp, CY(9)),Y
     JAM,                        // D2 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_DCP, AM_INDY, CY(9)), // D3 - *DCP (DCM) (zp, CY(9)),Y
-    UP(IN_NOP, AM_ZPX, CY(9)),  // D4 - *NOP (DOP, SKB, IGN) zp,X
-    OP(IN_CMP, AM_ZPX, CY(9)),  // D5 - CMP zp,X
-    OP(IN_DEC, AM_ZPX, CY(9)),  // D6 - DEC zp,X
-    UP(IN_DCP, AM_ZPX, CY(9)),  // D7 - *DCP (DCM) zp,X
+    UP(IN_NOP, AM_ZPX, CY(4)),  // D4 - *NOP (DOP, SKB, IGN) zp,X
+    OP(IN_CMP, AM_ZPX, CY(4)),  // D5 - CMP zp,X
+    OP(IN_DEC, AM_ZPX, CY(6)),  // D6 - DEC zp,X
+    UP(IN_DCP, AM_ZPX, CY(6)),  // D7 - *DCP (DCM) zp,X
     OP(IN_CLD, AM_IMP, CY(2)),  // D8 - CLD
     OP(IN_CMP, AM_ABSY, CY(9)), // D9 - CMP abs,Y
     UP(IN_NOP, AM_IMP, CY(2)),  // DA - *NOP (NPO, UNP)
@@ -280,10 +280,10 @@ const struct decoded Decode[] = {
     OP(IN_SBC, AM_INDY, CY(9)), // F1 - SBC (zp, CY(9)),Y
     JAM,                        // F2 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_ISC, AM_INDY, CY(9)), // F3 - *ISC (ISB, INS) (zp, CY(9)),Y
-    UP(IN_NOP, AM_ZPX, CY(9)),  // F4 - *NOP (DOP, SKB, IGN) zp,X
-    OP(IN_SBC, AM_ZPX, CY(9)),  // F5 - SBC zp,X
-    OP(IN_INC, AM_ZPX, CY(9)),  // F6 - INC zp,X
-    UP(IN_ISC, AM_ZPX, CY(9)),  // F7 - *ISC (ISB, INS) zp,X
+    UP(IN_NOP, AM_ZPX, CY(4)),  // F4 - *NOP (DOP, SKB, IGN) zp,X
+    OP(IN_SBC, AM_ZPX, CY(4)),  // F5 - SBC zp,X
+    OP(IN_INC, AM_ZPX, CY(6)),  // F6 - INC zp,X
+    UP(IN_ISC, AM_ZPX, CY(6)),  // F7 - *ISC (ISB, INS) zp,X
     OP(IN_SED, AM_IMP, CY(2)),  // F8 - SED
     OP(IN_SBC, AM_ABSY, CY(9)), // F9 - SBC abs,Y
     UP(IN_NOP, AM_IMP, CY(2)),  // FA - *NOP (NPO, UNP)

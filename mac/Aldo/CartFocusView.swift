@@ -56,6 +56,10 @@ fileprivate struct InstructionDetailsView: View {
         }
         .font(.footnote)
         Divider()
+        Text(inst?.cycleCount ?? Self.blank)
+            .font(.footnote)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        Divider()
         HStack {
             Text("Flags")
             Spacer()

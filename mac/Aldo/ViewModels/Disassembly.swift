@@ -73,7 +73,12 @@ struct Instruction {
                       description: .init(cString: dis_inst_description(p)),
                       operand: getOperand(p),
                       unofficial: p.pointee.d.unofficial,
-                      flags: .init(dis_inst_flags(p)))
+                      flags: .init(dis_inst_flags(p)),
+                      cycles: Cycles(count: p.pointee.d.cycles.count,
+                                     pageBoundary: p.pointee.d
+                                                    .cycles.page_boundary,
+                                     branchTaken: p.pointee.d
+                                                    .cycles.branch_taken))
         }
     }
 
@@ -100,6 +105,7 @@ struct Instruction {
     let operand: String
     let unofficial: Bool
     let flags: CpuFlags
+    let cycles: Cycles
 
     var display: String {
         let byteStr = bytes
@@ -107,6 +113,12 @@ struct Instruction {
                         .joined(separator: " ")
                         .padding(toLength: 9, withPad: " ", startingAt: 0)
         return "\(byteStr) \(mnemonic) \(operand)"
+    }
+
+    var cycleCount: String {
+        let br = cycles.branchTaken ? "\n(+1 if branch taken)" : ""
+        let pg = cycles.pageBoundary ? "\n(+1 if page-boundary crossed)" : ""
+        return "\(cycles.count) cycles\(br)\(pg)"
     }
 
     func byte(at: Int) -> UInt8? {
@@ -132,6 +144,12 @@ struct CpuFlags {
         overflow = status & 0x40 != 0
         negative = status & 0x80 != 0
     }
+}
+
+struct Cycles {
+    let count: Int8
+    let pageBoundary: Bool
+    let branchTaken: Bool
 }
 
 fileprivate func prgBlocks(_ cart: Cart) -> Int { cart.info.prgBlocks }

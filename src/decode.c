@@ -48,10 +48,10 @@ const struct decoded Decode[] = {
     OP(IN_ORA, AM_IMM, CY(2)),  // 09 - ORA imm
     OP(IN_ASL, AM_IMP, CY(2)),  // 0A - ASL imp
     UP(IN_ANC, AM_IMM, CY(2)),  // 0B - *ANC (ANA, ANB) imm
-    UP(IN_NOP, AM_ABS, CY(9)),  // 0C - *NOP (TOP, SKW, IGN) abs
-    OP(IN_ORA, AM_ABS, CY(9)),  // 0D - ORA abs
-    OP(IN_ASL, AM_ABS, CY(9)),  // 0E - ASL abs
-    UP(IN_SLO, AM_ABS, CY(9)),  // 0F - *SLO (ASO) abs
+    UP(IN_NOP, AM_ABS, CY(4)),  // 0C - *NOP (TOP, SKW, IGN) abs
+    OP(IN_ORA, AM_ABS, CY(4)),  // 0D - ORA abs
+    OP(IN_ASL, AM_ABS, CY(6)),  // 0E - ASL abs
+    UP(IN_SLO, AM_ABS, CY(6)),  // 0F - *SLO (ASO) abs
     OP(IN_BPL, AM_BCH, CY(9)),  // 10 - BPL
     OP(IN_ORA, AM_INDY, PG(5)), // 11 - ORA (zp, CY(9)),Y
     JAM,                        // 12 - *JAM (KIL, HLT, CIM, CRP)
@@ -80,10 +80,10 @@ const struct decoded Decode[] = {
     OP(IN_AND, AM_IMM, CY(2)),  // 29 - AND imm
     OP(IN_ROL, AM_IMP, CY(2)),  // 2A - ROL imp
     UP(IN_ANC, AM_IMM, CY(2)),  // 2B - *ANC (ANC2) imm
-    OP(IN_BIT, AM_ABS, CY(9)),  // 2C - BIT abs
-    OP(IN_AND, AM_ABS, CY(9)),  // 2D - AND abs
-    OP(IN_ROL, AM_ABS, CY(9)),  // 2E - ROL abs
-    UP(IN_RLA, AM_ABS, CY(9)),  // 2F - *RLA (RLN) abs
+    OP(IN_BIT, AM_ABS, CY(4)),  // 2C - BIT abs
+    OP(IN_AND, AM_ABS, CY(4)),  // 2D - AND abs
+    OP(IN_ROL, AM_ABS, CY(6)),  // 2E - ROL abs
+    UP(IN_RLA, AM_ABS, CY(6)),  // 2F - *RLA (RLN) abs
     OP(IN_BMI, AM_BCH, CY(9)),  // 30 - BMI
     OP(IN_AND, AM_INDY, PG(5)), // 31 - AND (zp, CY(9)),Y
     JAM,                        // 32 - *JAM (KIL, HLT, CIM, CRP)
@@ -113,9 +113,9 @@ const struct decoded Decode[] = {
     OP(IN_LSR, AM_IMP, CY(2)),  // 4A - LSR imp
     UP(IN_ALR, AM_IMM, CY(2)),  // 4B - *ALR (ASR) imm
     OP(IN_JMP, AM_JABS, CY(9)), // 4C - JMP abs
-    OP(IN_EOR, AM_ABS, CY(9)),  // 4D - EOR abs
-    OP(IN_LSR, AM_ABS, CY(9)),  // 4E - LSR abs
-    UP(IN_SRE, AM_ABS, CY(9)),  // 4F - *SRE (LSE) abs
+    OP(IN_EOR, AM_ABS, CY(4)),  // 4D - EOR abs
+    OP(IN_LSR, AM_ABS, CY(6)),  // 4E - LSR abs
+    UP(IN_SRE, AM_ABS, CY(6)),  // 4F - *SRE (LSE) abs
     OP(IN_BVC, AM_BCH, CY(9)),  // 50 - BVC
     OP(IN_EOR, AM_INDY, PG(5)), // 51 - EOR (zp, CY(9)),Y
     JAM,                        // 52 - *JAM (KIL, HLT, CIM, CRP)
@@ -145,9 +145,9 @@ const struct decoded Decode[] = {
     OP(IN_ROR, AM_IMP, CY(2)),  // 6A - ROR imp
     UP(IN_ARR, AM_IMM, CY(2)),  // 6B - *ARR imm
     OP(IN_JMP, AM_JIND, CY(9)), // 6C - JMP (abs)
-    OP(IN_ADC, AM_ABS, CY(9)),  // 6D - ADC abs
-    OP(IN_ROR, AM_ABS, CY(9)),  // 6E - ROR abs
-    UP(IN_RRA, AM_ABS, CY(9)),  // 6F - *RRA (RLD) abs
+    OP(IN_ADC, AM_ABS, CY(4)),  // 6D - ADC abs
+    OP(IN_ROR, AM_ABS, CY(6)),  // 6E - ROR abs
+    UP(IN_RRA, AM_ABS, CY(6)),  // 6F - *RRA (RLD) abs
     OP(IN_BVS, AM_BCH, CY(9)),  // 70 - BVS
     OP(IN_ADC, AM_INDY, PG(5)), // 71 - ADC (zp, CY(9)),Y
     JAM,                        // 72 - *JAM (KIL, HLT, CIM, CRP)
@@ -176,10 +176,10 @@ const struct decoded Decode[] = {
     UP(IN_NOP, AM_IMM, CY(2)),  // 89 - *NOP (DOP, SKB) imm
     OP(IN_TXA, AM_IMP, CY(2)),  // 8A - TXA
     UP(IN_ANE, AM_IMM, CY(2)),  // 8B - *ANE (XAA, AXM) imm (!!)
-    OP(IN_STY, AM_ABS, CY(9)),  // 8C - STY abs
-    OP(IN_STA, AM_ABS, CY(9)),  // 8D - STA abs
-    OP(IN_STX, AM_ABS, CY(9)),  // 8E - STX abs
-    UP(IN_SAX, AM_ABS, CY(9)),  // 8F - *SAX (AXS, AAX) abs
+    OP(IN_STY, AM_ABS, CY(4)),  // 8C - STY abs
+    OP(IN_STA, AM_ABS, CY(4)),  // 8D - STA abs
+    OP(IN_STX, AM_ABS, CY(4)),  // 8E - STX abs
+    UP(IN_SAX, AM_ABS, CY(4)),  // 8F - *SAX (AXS, AAX) abs
     OP(IN_BCC, AM_BCH, CY(9)),  // 90 - BCC
     OP(IN_STA, AM_INDY, CY(6)), // 91 - STA (zp, CY(9)),Y
     JAM,                        // 92 - *JAM (KIL, HLT, CIM, CRP)
@@ -208,10 +208,10 @@ const struct decoded Decode[] = {
     OP(IN_LDA, AM_IMM, CY(2)),  // A9 - LDA imm
     OP(IN_TAX, AM_IMP, CY(2)),  // AA - TAX
     UP(IN_LXA, AM_IMM, CY(2)),  // AB - *LXA (LAX, ATX, OAL, ANX) imm (!!)
-    OP(IN_LDY, AM_ABS, CY(9)),  // AC - LDY abs
-    OP(IN_LDA, AM_ABS, CY(9)),  // AD - LDA abs
-    OP(IN_LDX, AM_ABS, CY(9)),  // AE - LDX abs
-    UP(IN_LAX, AM_ABS, CY(9)),  // AF - *LAX abs
+    OP(IN_LDY, AM_ABS, CY(4)),  // AC - LDY abs
+    OP(IN_LDA, AM_ABS, CY(4)),  // AD - LDA abs
+    OP(IN_LDX, AM_ABS, CY(4)),  // AE - LDX abs
+    UP(IN_LAX, AM_ABS, CY(4)),  // AF - *LAX abs
     OP(IN_BCS, AM_BCH, CY(9)),  // B0 - BCS
     OP(IN_LDA, AM_INDY, PG(5)), // B1 - LDA (zp, CY(9)),Y
     JAM,                        // B2 - *JAM (KIL, HLT, CIM, CRP)
@@ -240,10 +240,10 @@ const struct decoded Decode[] = {
     OP(IN_CMP, AM_IMM, CY(2)),  // C9 - CMP imm
     OP(IN_DEX, AM_IMP, CY(2)),  // CA - DEX
     UP(IN_SBX, AM_IMM, CY(2)),  // CB - *SBX (AXS, SAX, XMA) imm
-    OP(IN_CPY, AM_ABS, CY(9)),  // CC - CPY abs
-    OP(IN_CMP, AM_ABS, CY(9)),  // CD - CMP abs
-    OP(IN_DEC, AM_ABS, CY(9)),  // CE - DEC abs
-    UP(IN_DCP, AM_ABS, CY(9)),  // CF - *DCP (DCM) abs
+    OP(IN_CPY, AM_ABS, CY(4)),  // CC - CPY abs
+    OP(IN_CMP, AM_ABS, CY(4)),  // CD - CMP abs
+    OP(IN_DEC, AM_ABS, CY(6)),  // CE - DEC abs
+    UP(IN_DCP, AM_ABS, CY(6)),  // CF - *DCP (DCM) abs
     OP(IN_BNE, AM_BCH, CY(9)),  // D0 - BNE
     OP(IN_CMP, AM_INDY, PG(5)), // D1 - CMP (zp, CY(9)),Y
     JAM,                        // D2 - *JAM (KIL, HLT, CIM, CRP)
@@ -272,10 +272,10 @@ const struct decoded Decode[] = {
     OP(IN_SBC, AM_IMM, CY(2)),  // E9 - SBC imm
     OP(IN_NOP, AM_IMP, CY(2)),  // EA - NOP
     UP(IN_SBC, AM_IMM, CY(2)),  // EB - *SBC (USBC, USB) imm
-    OP(IN_CPX, AM_ABS, CY(9)),  // EC - CPX abs
-    OP(IN_SBC, AM_ABS, CY(9)),  // ED - SBC abs
-    OP(IN_INC, AM_ABS, CY(9)),  // EE - INC abs
-    UP(IN_ISC, AM_ABS, CY(9)),  // EF - *ISC (ISB, INS) abs
+    OP(IN_CPX, AM_ABS, CY(4)),  // EC - CPX abs
+    OP(IN_SBC, AM_ABS, CY(4)),  // ED - SBC abs
+    OP(IN_INC, AM_ABS, CY(6)),  // EE - INC abs
+    UP(IN_ISC, AM_ABS, CY(6)),  // EF - *ISC (ISB, INS) abs
     OP(IN_BEQ, AM_BCH, CY(9)),  // F0 - BEQ
     OP(IN_SBC, AM_INDY, PG(5)), // F1 - SBC (zp, CY(9)),Y
     JAM,                        // F2 - *JAM (KIL, HLT, CIM, CRP)

@@ -52,7 +52,7 @@ const struct decoded Decode[] = {
     OP(IN_ORA, AM_ABS, CY(4)),  // 0D - ORA abs
     OP(IN_ASL, AM_ABS, CY(6)),  // 0E - ASL abs
     UP(IN_SLO, AM_ABS, CY(6)),  // 0F - *SLO (ASO) abs
-    OP(IN_BPL, AM_BCH, CY(9)),  // 10 - BPL
+    OP(IN_BPL, AM_BCH, BR(2)),  // 10 - BPL
     OP(IN_ORA, AM_INDY, PG(5)), // 11 - ORA (zp, CY(9)),Y
     JAM,                        // 12 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_SLO, AM_INDY, CY(8)), // 13 - *SLO (ASO) (zp, CY(9)),Y
@@ -84,7 +84,7 @@ const struct decoded Decode[] = {
     OP(IN_AND, AM_ABS, CY(4)),  // 2D - AND abs
     OP(IN_ROL, AM_ABS, CY(6)),  // 2E - ROL abs
     UP(IN_RLA, AM_ABS, CY(6)),  // 2F - *RLA (RLN) abs
-    OP(IN_BMI, AM_BCH, CY(9)),  // 30 - BMI
+    OP(IN_BMI, AM_BCH, BR(2)),  // 30 - BMI
     OP(IN_AND, AM_INDY, PG(5)), // 31 - AND (zp, CY(9)),Y
     JAM,                        // 32 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_RLA, AM_INDY, CY(8)), // 33 - *RLA (RLN) (zp, CY(9)),Y
@@ -116,7 +116,7 @@ const struct decoded Decode[] = {
     OP(IN_EOR, AM_ABS, CY(4)),  // 4D - EOR abs
     OP(IN_LSR, AM_ABS, CY(6)),  // 4E - LSR abs
     UP(IN_SRE, AM_ABS, CY(6)),  // 4F - *SRE (LSE) abs
-    OP(IN_BVC, AM_BCH, CY(9)),  // 50 - BVC
+    OP(IN_BVC, AM_BCH, BR(2)),  // 50 - BVC
     OP(IN_EOR, AM_INDY, PG(5)), // 51 - EOR (zp, CY(9)),Y
     JAM,                        // 52 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_SRE, AM_INDY, CY(8)), // 53 - *SRE (LSE) (zp, CY(9)),Y
@@ -148,7 +148,7 @@ const struct decoded Decode[] = {
     OP(IN_ADC, AM_ABS, CY(4)),  // 6D - ADC abs
     OP(IN_ROR, AM_ABS, CY(6)),  // 6E - ROR abs
     UP(IN_RRA, AM_ABS, CY(6)),  // 6F - *RRA (RLD) abs
-    OP(IN_BVS, AM_BCH, CY(9)),  // 70 - BVS
+    OP(IN_BVS, AM_BCH, BR(2)),  // 70 - BVS
     OP(IN_ADC, AM_INDY, PG(5)), // 71 - ADC (zp, CY(9)),Y
     JAM,                        // 72 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_RRA, AM_INDY, CY(8)), // 73 - *RRA (RLD) (zp, CY(9)),Y
@@ -180,7 +180,7 @@ const struct decoded Decode[] = {
     OP(IN_STA, AM_ABS, CY(4)),  // 8D - STA abs
     OP(IN_STX, AM_ABS, CY(4)),  // 8E - STX abs
     UP(IN_SAX, AM_ABS, CY(4)),  // 8F - *SAX (AXS, AAX) abs
-    OP(IN_BCC, AM_BCH, CY(9)),  // 90 - BCC
+    OP(IN_BCC, AM_BCH, BR(2)),  // 90 - BCC
     OP(IN_STA, AM_INDY, CY(6)), // 91 - STA (zp, CY(9)),Y
     JAM,                        // 92 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_SHA, AM_INDY, CY(6)), // 93 - *SHA (AHX, AXA, TEA) (zp, CY(9)),Y (!)
@@ -212,7 +212,7 @@ const struct decoded Decode[] = {
     OP(IN_LDA, AM_ABS, CY(4)),  // AD - LDA abs
     OP(IN_LDX, AM_ABS, CY(4)),  // AE - LDX abs
     UP(IN_LAX, AM_ABS, CY(4)),  // AF - *LAX abs
-    OP(IN_BCS, AM_BCH, CY(9)),  // B0 - BCS
+    OP(IN_BCS, AM_BCH, BR(2)),  // B0 - BCS
     OP(IN_LDA, AM_INDY, PG(5)), // B1 - LDA (zp, CY(9)),Y
     JAM,                        // B2 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_LAX, AM_INDY, PG(5)), // B3 - *LAX (zp, CY(9)),Y
@@ -244,7 +244,7 @@ const struct decoded Decode[] = {
     OP(IN_CMP, AM_ABS, CY(4)),  // CD - CMP abs
     OP(IN_DEC, AM_ABS, CY(6)),  // CE - DEC abs
     UP(IN_DCP, AM_ABS, CY(6)),  // CF - *DCP (DCM) abs
-    OP(IN_BNE, AM_BCH, CY(9)),  // D0 - BNE
+    OP(IN_BNE, AM_BCH, BR(2)),  // D0 - BNE
     OP(IN_CMP, AM_INDY, PG(5)), // D1 - CMP (zp, CY(9)),Y
     JAM,                        // D2 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_DCP, AM_INDY, CY(8)), // D3 - *DCP (DCM) (zp, CY(9)),Y
@@ -276,7 +276,7 @@ const struct decoded Decode[] = {
     OP(IN_SBC, AM_ABS, CY(4)),  // ED - SBC abs
     OP(IN_INC, AM_ABS, CY(6)),  // EE - INC abs
     UP(IN_ISC, AM_ABS, CY(6)),  // EF - *ISC (ISB, INS) abs
-    OP(IN_BEQ, AM_BCH, CY(9)),  // F0 - BEQ
+    OP(IN_BEQ, AM_BCH, BR(2)),  // F0 - BEQ
     OP(IN_SBC, AM_INDY, PG(5)), // F1 - SBC (zp, CY(9)),Y
     JAM,                        // F2 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_ISC, AM_INDY, CY(8)), // F3 - *ISC (ISB, INS) (zp, CY(9)),Y

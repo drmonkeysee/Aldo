@@ -9,6 +9,7 @@
 #define Aldo_decode_h
 
 #include <stdbool.h>
+#include <stdint.h>
 
 // 6502 Instructions
 // X(symbol, description, affected flags, instruction dispatch arguments...)
@@ -318,6 +319,7 @@ enum addrmode {
 struct decoded {
     enum inst instruction;
     enum addrmode mode;
+    uint8_t cycles;
     bool unofficial;
 };
 

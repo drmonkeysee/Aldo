@@ -44,7 +44,7 @@ const struct decoded Decode[] = {
     OP(IN_ORA, AM_ZP, CY(3)),   // 05 - ORA zp
     OP(IN_ASL, AM_ZP, CY(5)),   // 06 - ASL zp
     UP(IN_SLO, AM_ZP, CY(5)),   // 07 - *SLO (ASO) zp
-    OP(IN_PHP, AM_PSH, CY(9)),  // 08 - PHP
+    OP(IN_PHP, AM_PSH, CY(3)),  // 08 - PHP
     OP(IN_ORA, AM_IMM, CY(2)),  // 09 - ORA imm
     OP(IN_ASL, AM_IMP, CY(2)),  // 0A - ASL imp
     UP(IN_ANC, AM_IMM, CY(2)),  // 0B - *ANC (ANA, ANB) imm
@@ -76,7 +76,7 @@ const struct decoded Decode[] = {
     OP(IN_AND, AM_ZP, CY(3)),   // 25 - AND zp
     OP(IN_ROL, AM_ZP, CY(5)),   // 26 - ROL zp
     UP(IN_RLA, AM_ZP, CY(5)),   // 27 - *RLA (RLN) zp
-    OP(IN_PLP, AM_PLL, CY(9)),  // 28 - PLP
+    OP(IN_PLP, AM_PLL, CY(4)),  // 28 - PLP
     OP(IN_AND, AM_IMM, CY(2)),  // 29 - AND imm
     OP(IN_ROL, AM_IMP, CY(2)),  // 2A - ROL imp
     UP(IN_ANC, AM_IMM, CY(2)),  // 2B - *ANC (ANC2) imm
@@ -108,7 +108,7 @@ const struct decoded Decode[] = {
     OP(IN_EOR, AM_ZP, CY(3)),   // 45 - EOR zp
     OP(IN_LSR, AM_ZP, CY(5)),   // 46 - LSR zp
     UP(IN_SRE, AM_ZP, CY(5)),   // 47 - *SRE (LSE) zp
-    OP(IN_PHA, AM_PSH, CY(9)),  // 48 - PHA
+    OP(IN_PHA, AM_PSH, CY(3)),  // 48 - PHA
     OP(IN_EOR, AM_IMM, CY(2)),  // 49 - EOR imm
     OP(IN_LSR, AM_IMP, CY(2)),  // 4A - LSR imp
     UP(IN_ALR, AM_IMM, CY(2)),  // 4B - *ALR (ASR) imm
@@ -140,7 +140,7 @@ const struct decoded Decode[] = {
     OP(IN_ADC, AM_ZP, CY(3)),   // 65 - ADC zp
     OP(IN_ROR, AM_ZP, CY(5)),   // 66 - ROR zp
     UP(IN_RRA, AM_ZP, CY(5)),   // 67 - *RRA (RLD) zp
-    OP(IN_PLA, AM_PLL, CY(9)),  // 68 - PLA
+    OP(IN_PLA, AM_PLL, CY(4)),  // 68 - PLA
     OP(IN_ADC, AM_IMM, CY(2)),  // 69 - ADC imm
     OP(IN_ROR, AM_IMP, CY(2)),  // 6A - ROR imp
     UP(IN_ARR, AM_IMM, CY(2)),  // 6B - *ARR imm

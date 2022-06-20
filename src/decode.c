@@ -11,10 +11,13 @@
 
 #define N {0}
 #define AP {.a = true, .p = true}
+#define APS {.a = true, .p = true, .s = true}
 #define XP {.x = true, .p = true}
 #define YP {.y = true, .p = true}
 #define P {.p = true}
+#define PS {.p = true, .s = true}
 #define PM {.p = true, .m = true}
+#define S {.s = true}
 #define SI {.s = true, .pc = true}
 #define I {.pc = true}
 
@@ -53,7 +56,7 @@ const struct decoded Decode[] = {
     OP(IN_ORA, AM_ZP, AP, CY(3)),   // 05 - ORA zp
     OP(IN_ASL, AM_ZP, PM, CY(5)),   // 06 - ASL zp
     UP(IN_SLO, AM_ZP, FOO, CY(5)),   // 07 - *SLO (ASO) zp
-    OP(IN_PHP, AM_PSH, FOO, CY(3)),  // 08 - PHP
+    OP(IN_PHP, AM_PSH, S, CY(3)),  // 08 - PHP
     OP(IN_ORA, AM_IMM, AP, CY(2)),  // 09 - ORA imm
     OP(IN_ASL, AM_IMP, AP, CY(2)),  // 0A - ASL imp
     UP(IN_ANC, AM_IMM, FOO, CY(2)),  // 0B - *ANC (ANA, ANB) imm
@@ -85,7 +88,7 @@ const struct decoded Decode[] = {
     OP(IN_AND, AM_ZP, AP, CY(3)),   // 25 - AND zp
     OP(IN_ROL, AM_ZP, PM, CY(5)),   // 26 - ROL zp
     UP(IN_RLA, AM_ZP, FOO, CY(5)),   // 27 - *RLA (RLN) zp
-    OP(IN_PLP, AM_PLL, FOO, CY(4)),  // 28 - PLP
+    OP(IN_PLP, AM_PLL, PS, CY(4)),  // 28 - PLP
     OP(IN_AND, AM_IMM, AP, CY(2)),  // 29 - AND imm
     OP(IN_ROL, AM_IMP, AP, CY(2)),  // 2A - ROL imp
     UP(IN_ANC, AM_IMM, FOO, CY(2)),  // 2B - *ANC (ANC2) imm
@@ -117,7 +120,7 @@ const struct decoded Decode[] = {
     OP(IN_EOR, AM_ZP, AP, CY(3)),   // 45 - EOR zp
     OP(IN_LSR, AM_ZP, PM, CY(5)),   // 46 - LSR zp
     UP(IN_SRE, AM_ZP, FOO, CY(5)),   // 47 - *SRE (LSE) zp
-    OP(IN_PHA, AM_PSH, FOO, CY(3)),  // 48 - PHA
+    OP(IN_PHA, AM_PSH, S, CY(3)),  // 48 - PHA
     OP(IN_EOR, AM_IMM, AP, CY(2)),  // 49 - EOR imm
     OP(IN_LSR, AM_IMP, AP, CY(2)),  // 4A - LSR imp
     UP(IN_ALR, AM_IMM, FOO, CY(2)),  // 4B - *ALR (ASR) imm
@@ -149,7 +152,7 @@ const struct decoded Decode[] = {
     OP(IN_ADC, AM_ZP, AP, CY(3)),   // 65 - ADC zp
     OP(IN_ROR, AM_ZP, PM, CY(5)),   // 66 - ROR zp
     UP(IN_RRA, AM_ZP, FOO, CY(5)),   // 67 - *RRA (RLD) zp
-    OP(IN_PLA, AM_PLL, FOO, CY(4)),  // 68 - PLA
+    OP(IN_PLA, AM_PLL, APS, CY(4)),  // 68 - PLA
     OP(IN_ADC, AM_IMM, AP, CY(2)),  // 69 - ADC imm
     OP(IN_ROR, AM_IMP, AP, CY(2)),  // 6A - ROR imp
     UP(IN_ARR, AM_IMM, FOO, CY(2)),  // 6B - *ARR imm

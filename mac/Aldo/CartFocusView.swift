@@ -69,7 +69,7 @@ fileprivate struct InstructionDetailsView: View {
         HStack {
             Text("Data")
             Spacer()
-            DataView()
+            DataView(cells: inst?.cells)
         }
         .imageScale(.large)
     }
@@ -118,21 +118,27 @@ fileprivate struct FlagsView: View {
 }
 
 fileprivate struct DataView: View {
+    let cells: DataCells?
+
     var body: some View {
         Group {
-            Image(systemName: icon(val: false, label: "m"))
+            Image(systemName: icon(val: cells?.memory ?? false, label: "m"))
                 .help("Main Memory")
-            Image(systemName: icon(val: false, label: "i"))
+            Image(systemName: icon(val: cells?.programCounter ?? false,
+                                   label: "i"))
                 .help("Instruction Register (Program Counter)")
-            Image(systemName: icon(val: false, label: "s"))
+            Image(systemName: icon(val: cells?.stackPointer ?? false,
+                                   label: "s"))
                 .help("Stack Pointer")
-            Image(systemName: icon(val: false, label: "p"))
+            Image(systemName: icon(val: cells?.processorStatus ?? false,
+                                   label: "p"))
                 .help("Processor Status")
-            Image(systemName: icon(val: false, label: "y"))
+            Image(systemName: icon(val: cells?.yIndex ?? false, label: "y"))
                 .help("Y-Index")
-            Image(systemName: icon(val: false, label: "x"))
+            Image(systemName: icon(val: cells?.xIndex ?? false, label: "x"))
                 .help("X-Index")
-            Image(systemName: icon(val: false, label: "a"))
+            Image(systemName: icon(val: cells?.accumulator ?? false,
+                                   label: "a"))
                 .help("Accumulator")
         }
         .padding(.trailing, 1)

@@ -205,37 +205,37 @@ const struct decoded Decode[] = {
     OP(IN_STA, AM_ABSY, FOO, CY(5)), // 9D - STA abs,X
     UP(IN_SHX, AM_ABSY, FOO, CY(5)), // 9E - *SHX (A11, SXA, XAS, TEX) abs,Y (!)
     UP(IN_SHA, AM_ABSY, FOO, CY(5)), // 9F - *SHA (AHX, AXA, TEA) abs,Y (!)
-    OP(IN_LDY, AM_IMM, FOO, CY(2)),  // A0 - LDY imm
+    OP(IN_LDY, AM_IMM, YP, CY(2)),  // A0 - LDY imm
     OP(IN_LDA, AM_INDX, AP, CY(6)), // A1 - LDA (zp,X)
-    OP(IN_LDX, AM_IMM, FOO, CY(2)),  // A2 - LDX imm
+    OP(IN_LDX, AM_IMM, XP, CY(2)),  // A2 - LDX imm
     UP(IN_LAX, AM_INDX, FOO, CY(6)), // A3 - *LAX (zp,X)
-    OP(IN_LDY, AM_ZP, FOO, CY(3)),   // A4 - LDY zp
+    OP(IN_LDY, AM_ZP, YP, CY(3)),   // A4 - LDY zp
     OP(IN_LDA, AM_ZP, AP, CY(3)),   // A5 - LDA zp
-    OP(IN_LDX, AM_ZP, FOO, CY(3)),   // A6 - LDX zp
+    OP(IN_LDX, AM_ZP, XP, CY(3)),   // A6 - LDX zp
     UP(IN_LAX, AM_ZP, FOO, CY(3)),   // A7 - *LAX zp
     OP(IN_TAY, AM_IMP, FOO, CY(2)),  // A8 - TAY
     OP(IN_LDA, AM_IMM, AP, CY(2)),  // A9 - LDA imm
     OP(IN_TAX, AM_IMP, FOO, CY(2)),  // AA - TAX
     UP(IN_LXA, AM_IMM, FOO, CY(2)),  // AB - *LXA (LAX, ATX, OAL, ANX) imm (!!)
-    OP(IN_LDY, AM_ABS, FOO, CY(4)),  // AC - LDY abs
+    OP(IN_LDY, AM_ABS, YP, CY(4)),  // AC - LDY abs
     OP(IN_LDA, AM_ABS, AP, CY(4)),  // AD - LDA abs
-    OP(IN_LDX, AM_ABS, FOO, CY(4)),  // AE - LDX abs
+    OP(IN_LDX, AM_ABS, XP, CY(4)),  // AE - LDX abs
     UP(IN_LAX, AM_ABS, FOO, CY(4)),  // AF - *LAX abs
     OP(IN_BCS, AM_BCH, I, BR(2)),  // B0 - BCS
     OP(IN_LDA, AM_INDY, AP, PG(5)), // B1 - LDA (zp),Y
     JAM,                        // B2 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_LAX, AM_INDY, FOO, PG(5)), // B3 - *LAX (zp),Y
-    OP(IN_LDY, AM_ZPX, FOO, CY(4)),  // B4 - LDY zp,X
+    OP(IN_LDY, AM_ZPX, YP, CY(4)),  // B4 - LDY zp,X
     OP(IN_LDA, AM_ZPX, AP, CY(4)),  // B5 - LDA zp,X
-    OP(IN_LDX, AM_ZPY, FOO, CY(4)),  // B6 - LDX zp,Y
+    OP(IN_LDX, AM_ZPY, XP, CY(4)),  // B6 - LDX zp,Y
     UP(IN_LAX, AM_ZPY, FOO, CY(4)),  // B7 - *LAX zp,Y
     OP(IN_CLV, AM_IMP, P, CY(2)),  // B8 - CLV
     OP(IN_LDA, AM_ABSY, AP, PG(4)), // B9 - LDA abs,Y
     OP(IN_TSX, AM_IMP, FOO, CY(2)),  // BA - TSX
     UP(IN_LAS, AM_ABSY, FOO, PG(4)), // BB - *LAS (LAR) abs,Y
-    OP(IN_LDY, AM_ABSY, FOO, PG(4)), // BC - LDY abs,X
+    OP(IN_LDY, AM_ABSY, YP, PG(4)), // BC - LDY abs,X
     OP(IN_LDA, AM_ABSY, AP, PG(4)), // BD - LDA abs,X
-    OP(IN_LDX, AM_ABSY, FOO, PG(4)), // BE - LDX abs,Y
+    OP(IN_LDX, AM_ABSY, XP, PG(4)), // BE - LDX abs,Y
     UP(IN_LAX, AM_ABSY, FOO, PG(4)), // BF - *LAX abs,Y
     OP(IN_CPY, AM_IMM, P, CY(2)),  // C0 - CPY imm
     OP(IN_CMP, AM_INDX, P, CY(6)), // C1 - CMP (zp,X)

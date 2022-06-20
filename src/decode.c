@@ -16,10 +16,12 @@
 #define YP {.y = true, .p = true}
 #define P {.p = true}
 #define PS {.p = true, .s = true}
+#define PSI {.p = true, .s = true, .pc = true}
 #define PM {.p = true, .m = true}
 #define S {.s = true}
 #define SI {.s = true, .pc = true}
 #define I {.pc = true}
+#define M {.m = true}
 
 #define CY(n) {.count = n}
 #define PG(n) {.count = n, .page_boundary = true}
@@ -112,7 +114,7 @@ const struct decoded Decode[] = {
     OP(IN_AND, AM_ABSY, AP, PG(4)), // 3D - AND abs,X
     OP(IN_ROL, AM_ABSY, PM, CY(7)), // 3E - ROL abs,X
     UP(IN_RLA, AM_ABSY, FOO, CY(7)), // 3F - *RLA (RLN) abs,X
-    OP(IN_RTI, AM_RTI, FOO, CY(6)),  // 40 - RTI
+    OP(IN_RTI, AM_RTI, PSI, CY(6)),  // 40 - RTI
     OP(IN_EOR, AM_INDX, AP, CY(6)), // 41 - EOR (zp,X)
     JAM,                        // 42 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_SRE, AM_INDX, FOO, CY(8)), // 43 - *SRE (LSE) (zp,X)
@@ -144,7 +146,7 @@ const struct decoded Decode[] = {
     OP(IN_EOR, AM_ABSY, AP, PG(4)), // 5D - EOR abs,X
     OP(IN_LSR, AM_ABSY, PM, CY(7)), // 5E - LSR abs,X
     UP(IN_SRE, AM_ABSY, FOO, CY(7)), // 5F - *SRE (LSE) abs,X
-    OP(IN_RTS, AM_RTS, FOO, CY(6)),  // 60 - RTS
+    OP(IN_RTS, AM_RTS, SI, CY(6)),  // 60 - RTS
     OP(IN_ADC, AM_INDX, AP, CY(6)), // 61 - ADC (zp,X)
     JAM,                        // 62 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_RRA, AM_INDX, FOO, CY(8)), // 63 - *RRA (RLD) (zp,X)
@@ -177,35 +179,35 @@ const struct decoded Decode[] = {
     OP(IN_ROR, AM_ABSY, PM, CY(7)), // 7E - ROR abs,X
     UP(IN_RRA, AM_ABSY, FOO, CY(7)), // 7F - *RRA (RLD) abs,X
     UP(IN_NOP, AM_IMM, N, CY(2)),  // 80 - *NOP (DOP, SKB) imm
-    OP(IN_STA, AM_INDX, FOO, CY(6)), // 81 - STA (zp,X)
+    OP(IN_STA, AM_INDX, M, CY(6)), // 81 - STA (zp,X)
     UP(IN_NOP, AM_IMM, N, CY(2)),  // 82 - *NOP (DOP, SKB) imm (?)
     UP(IN_SAX, AM_INDX, FOO, CY(6)), // 83 - *SAX (AXS, AAX) (zp,X)
-    OP(IN_STY, AM_ZP, FOO, CY(3)),   // 84 - STY zp
-    OP(IN_STA, AM_ZP, FOO, CY(3)),   // 85 - STA zp
-    OP(IN_STX, AM_ZP, FOO, CY(3)),   // 86 - STX zp
+    OP(IN_STY, AM_ZP, M, CY(3)),   // 84 - STY zp
+    OP(IN_STA, AM_ZP, M, CY(3)),   // 85 - STA zp
+    OP(IN_STX, AM_ZP, M, CY(3)),   // 86 - STX zp
     UP(IN_SAX, AM_ZP, FOO, CY(3)),   // 87 - *SAX (AXS, AAX) zp
     OP(IN_DEY, AM_IMP, YP, CY(2)),  // 88 - DEY
     UP(IN_NOP, AM_IMM, N, CY(2)),  // 89 - *NOP (DOP, SKB) imm
     OP(IN_TXA, AM_IMP, AP, CY(2)),  // 8A - TXA
     UP(IN_ANE, AM_IMM, FOO, CY(2)),  // 8B - *ANE (XAA, AXM) imm (!!)
-    OP(IN_STY, AM_ABS, FOO, CY(4)),  // 8C - STY abs
-    OP(IN_STA, AM_ABS, FOO, CY(4)),  // 8D - STA abs
-    OP(IN_STX, AM_ABS, FOO, CY(4)),  // 8E - STX abs
+    OP(IN_STY, AM_ABS, M, CY(4)),  // 8C - STY abs
+    OP(IN_STA, AM_ABS, M, CY(4)),  // 8D - STA abs
+    OP(IN_STX, AM_ABS, M, CY(4)),  // 8E - STX abs
     UP(IN_SAX, AM_ABS, FOO, CY(4)),  // 8F - *SAX (AXS, AAX) abs
     OP(IN_BCC, AM_BCH, I, BR(2)),  // 90 - BCC
-    OP(IN_STA, AM_INDY, FOO, CY(6)), // 91 - STA (zp),Y
+    OP(IN_STA, AM_INDY, M, CY(6)), // 91 - STA (zp),Y
     JAM,                        // 92 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_SHA, AM_INDY, FOO, CY(6)), // 93 - *SHA (AHX, AXA, TEA) (zp),Y (!)
-    OP(IN_STY, AM_ZPX, FOO, CY(4)),  // 94 - STY zp,X
-    OP(IN_STA, AM_ZPX, FOO, CY(4)),  // 95 - STA zp,X
-    OP(IN_STX, AM_ZPY, FOO, CY(4)),  // 96 - STX zp,Y
+    OP(IN_STY, AM_ZPX, M, CY(4)),  // 94 - STY zp,X
+    OP(IN_STA, AM_ZPX, M, CY(4)),  // 95 - STA zp,X
+    OP(IN_STX, AM_ZPY, M, CY(4)),  // 96 - STX zp,Y
     UP(IN_SAX, AM_ZPY, FOO, CY(4)),  // 97 - *SAX (AXS, AAX) zp,Y
     OP(IN_TYA, AM_IMP, AP, CY(2)),  // 98 - TYA
-    OP(IN_STA, AM_ABSY, FOO, CY(5)), // 99 - STA abs,Y
+    OP(IN_STA, AM_ABSY, M, CY(5)), // 99 - STA abs,Y
     OP(IN_TXS, AM_IMP, FOO, CY(2)),  // 9A - TXS
     UP(IN_TAS, AM_ABSY, FOO, CY(5)), // 9B - *TAS (XAS, SHS) abs,Y (!)
     UP(IN_SHY, AM_ABSY, FOO, CY(5)), // 9E - *SHY (A11, SYA, SAY, TEY) abs,X (!)
-    OP(IN_STA, AM_ABSY, FOO, CY(5)), // 9D - STA abs,X
+    OP(IN_STA, AM_ABSY, M, CY(5)), // 9D - STA abs,X
     UP(IN_SHX, AM_ABSY, FOO, CY(5)), // 9E - *SHX (A11, SXA, XAS, TEX) abs,Y (!)
     UP(IN_SHA, AM_ABSY, FOO, CY(5)), // 9F - *SHA (AHX, AXA, TEA) abs,Y (!)
     OP(IN_LDY, AM_IMM, YP, CY(2)),  // A0 - LDY imm

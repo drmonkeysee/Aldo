@@ -13,10 +13,10 @@
 #define AP {.a = true, .p = true}
 #define XP {.x = true, .p = true}
 #define YP {.y = true, .p = true}
-#define I {.pc = true}
 #define P {.p = true}
-#define SI {.s = true, .pc = true}
 #define PM {.p = true, .m = true}
+#define SI {.s = true, .pc = true}
+#define I {.pc = true}
 
 #define CY(n) {.count = n}
 #define PG(n) {.count = n, .page_boundary = true}
@@ -77,7 +77,7 @@ const struct decoded Decode[] = {
     OP(IN_ORA, AM_ABSY, AP, PG(4)), // 1D - ORA abs,X
     OP(IN_ASL, AM_ABSY, PM, CY(7)), // 1E - ASL abs,X
     UP(IN_SLO, AM_ABSY, FOO, CY(7)), // 1F - *SLO (ASO) abs,X
-    OP(IN_JSR, AM_JSR, FOO, CY(6)),  // 20 - JSR
+    OP(IN_JSR, AM_JSR, SI, CY(6)),  // 20 - JSR
     OP(IN_AND, AM_INDX, AP, CY(6)), // 21 - AND (zp,X)
     JAM,                        // 22 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_RLA, AM_INDX, FOO, CY(8)), // 23 - *RLA (RLN) (zp,X)
@@ -121,7 +121,7 @@ const struct decoded Decode[] = {
     OP(IN_EOR, AM_IMM, AP, CY(2)),  // 49 - EOR imm
     OP(IN_LSR, AM_IMP, AP, CY(2)),  // 4A - LSR imp
     UP(IN_ALR, AM_IMM, FOO, CY(2)),  // 4B - *ALR (ASR) imm
-    OP(IN_JMP, AM_JABS, FOO, CY(3)), // 4C - JMP abs
+    OP(IN_JMP, AM_JABS, I, CY(3)), // 4C - JMP abs
     OP(IN_EOR, AM_ABS, AP, CY(4)),  // 4D - EOR abs
     OP(IN_LSR, AM_ABS, PM, CY(6)),  // 4E - LSR abs
     UP(IN_SRE, AM_ABS, FOO, CY(6)),  // 4F - *SRE (LSE) abs
@@ -153,7 +153,7 @@ const struct decoded Decode[] = {
     OP(IN_ADC, AM_IMM, AP, CY(2)),  // 69 - ADC imm
     OP(IN_ROR, AM_IMP, AP, CY(2)),  // 6A - ROR imp
     UP(IN_ARR, AM_IMM, FOO, CY(2)),  // 6B - *ARR imm
-    OP(IN_JMP, AM_JIND, FOO, CY(5)), // 6C - JMP (abs)
+    OP(IN_JMP, AM_JIND, I, CY(5)), // 6C - JMP (abs)
     OP(IN_ADC, AM_ABS, AP, CY(4)),  // 6D - ADC abs
     OP(IN_ROR, AM_ABS, PM, CY(6)),  // 6E - ROR abs
     UP(IN_RRA, AM_ABS, FOO, CY(6)),  // 6F - *RRA (RLD) abs

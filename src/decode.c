@@ -45,7 +45,7 @@ const int BrkOpcode = 0x0;
 // (!!) = extremely unstable
 
 const struct decoded Decode[] = {
-    OP(IN_BRK, AM_BRK, FOO, CY(7)),  // 00 - BRK
+    OP(IN_BRK, AM_BRK, SI, CY(7)),  // 00 - BRK
     OP(IN_ORA, AM_INDX, AP, CY(6)), // 01 - ORA (zp,X)
     JAM,                        // 02 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_SLO, AM_INDX, FOO, CY(8)), // 03 - *SLO (ASO) (zp,X)

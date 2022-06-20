@@ -105,7 +105,7 @@ X(INY,                              /* Increment y-index */ \
   "Increment y-index", \
   0xa2, self) \
 \
-X(JMP,                              /* Jump */ \
+X(JMP,                              /* Jump to address */ \
   "Jump to address", \
   0x20, self) \
 X(JSR,                              /* Jump to subroutine */ \
@@ -379,13 +379,13 @@ struct decoded {
     enum addrmode mode;
     struct {
         bool
-            a: 1,
-            x: 1,
-            y: 1,
-            p: 1,
-            s: 1,
-            pc: 1,
-            m: 1;
+            a: 1,   // Accumulator
+            x: 1,   // X-Index
+            y: 1,   // Y-Index
+            p: 1,   // Processor Status
+            s: 1,   // Stack Pointer
+            pc: 1,  // Program Counter
+            m: 1;   // Memory
     } datacells;
     struct {
         int8_t count;

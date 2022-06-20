@@ -28,8 +28,8 @@ struct mos6502 {
     uint16_t pc;        // Program Counter
     uint8_t a,          // Accumulator
             s,          // Stack Pointer
-            x,          // X Index
-            y;          // Y Index
+            x,          // X-Index
+            y;          // Y-Index
     struct {
         bool
             c: 1,       // (0) Carry

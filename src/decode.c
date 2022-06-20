@@ -11,6 +11,8 @@
 
 #define N {0}
 #define AP {.a = true, .p = true}
+#define XP {.x = true, .p = true}
+#define YP {.y = true, .p = true}
 #define I {.pc = true}
 #define P {.p = true}
 #define SI {.s = true, .pc = true}
@@ -179,7 +181,7 @@ const struct decoded Decode[] = {
     OP(IN_STA, AM_ZP, FOO, CY(3)),   // 85 - STA zp
     OP(IN_STX, AM_ZP, FOO, CY(3)),   // 86 - STX zp
     UP(IN_SAX, AM_ZP, FOO, CY(3)),   // 87 - *SAX (AXS, AAX) zp
-    OP(IN_DEY, AM_IMP, FOO, CY(2)),  // 88 - DEY
+    OP(IN_DEY, AM_IMP, YP, CY(2)),  // 88 - DEY
     UP(IN_NOP, AM_IMM, FOO, CY(2)),  // 89 - *NOP (DOP, SKB) imm
     OP(IN_TXA, AM_IMP, AP, CY(2)),  // 8A - TXA
     UP(IN_ANE, AM_IMM, FOO, CY(2)),  // 8B - *ANE (XAA, AXM) imm (!!)
@@ -243,9 +245,9 @@ const struct decoded Decode[] = {
     OP(IN_CMP, AM_ZP, P, CY(3)),   // C5 - CMP zp
     OP(IN_DEC, AM_ZP, PM, CY(5)),   // C6 - DEC zp
     UP(IN_DCP, AM_ZP, FOO, CY(5)),   // C7 - *DCP (DCM) zp
-    OP(IN_INY, AM_IMP, FOO, CY(2)),  // C8 - INY
+    OP(IN_INY, AM_IMP, YP, CY(2)),  // C8 - INY
     OP(IN_CMP, AM_IMM, P, CY(2)),  // C9 - CMP imm
-    OP(IN_DEX, AM_IMP, FOO, CY(2)),  // CA - DEX
+    OP(IN_DEX, AM_IMP, XP, CY(2)),  // CA - DEX
     UP(IN_SBX, AM_IMM, FOO, CY(2)),  // CB - *SBX (AXS, SAX, XMA) imm
     OP(IN_CPY, AM_ABS, P, CY(4)),  // CC - CPY abs
     OP(IN_CMP, AM_ABS, P, CY(4)),  // CD - CMP abs
@@ -275,7 +277,7 @@ const struct decoded Decode[] = {
     OP(IN_SBC, AM_ZP, AP, CY(3)),   // E5 - SBC zp
     OP(IN_INC, AM_ZP, PM, CY(5)),   // E6 - INC zp
     UP(IN_ISC, AM_ZP, FOO, CY(5)),   // E7 - *ISC (ISB, INS) zp
-    OP(IN_INX, AM_IMP, FOO, CY(2)),  // E8 - INX
+    OP(IN_INX, AM_IMP, XP, CY(2)),  // E8 - INX
     OP(IN_SBC, AM_IMM, AP, CY(2)),  // E9 - SBC imm
     OP(IN_NOP, AM_IMP, FOO, CY(2)),  // EA - NOP
     UP(IN_SBC, AM_IMM, AP, CY(2)),  // EB - *SBC (USBC, USB) imm

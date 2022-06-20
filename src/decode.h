@@ -378,6 +378,16 @@ struct decoded {
     enum inst instruction;
     enum addrmode mode;
     struct {
+        bool
+            a: 1,
+            x: 1,
+            y: 1,
+            p: 1,
+            s: 1,
+            pc: 1,
+            m: 1;
+    } datacells;
+    struct {
         int8_t count;
         bool branch_taken, page_boundary;
     } cycles;

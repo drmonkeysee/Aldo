@@ -73,12 +73,19 @@ struct Instruction {
                       description: .init(cString: dis_inst_description(p)),
                       operand: getOperand(p),
                       unofficial: p.pointee.d.unofficial,
-                      flags: .init(dis_inst_flags(p)),
                       cycles: Cycles(count: p.pointee.d.cycles.count,
                                      pageBoundary: p.pointee.d
                                                     .cycles.page_boundary,
                                      branchTaken: p.pointee.d
-                                                    .cycles.branch_taken))
+                                                    .cycles.branch_taken),
+                      flags: .init(dis_inst_flags(p)),
+                      cells: .init(accumulator: p.pointee.d.datacells.a,
+                                   xIndex: p.pointee.d.datacells.x,
+                                   yIndex: p.pointee.d.datacells.y,
+                                   processorStatus: p.pointee.d.datacells.p,
+                                   stackPointer: p.pointee.d.datacells.s,
+                                   programCounter: p.pointee.d.datacells.pc,
+                                   memory: p.pointee.d.datacells.m))
         }
     }
 
@@ -104,8 +111,9 @@ struct Instruction {
     let description: String
     let operand: String
     let unofficial: Bool
-    let flags: CpuFlags
     let cycles: Cycles
+    let flags: CpuFlags
+    let cells: DataCells
 
     var display: String {
         let byteStr = bytes
@@ -125,6 +133,12 @@ struct Instruction {
     func byte(at: Int) -> UInt8? {
         bytes.indices.contains(at) ? bytes[at] : nil
     }
+}
+
+struct Cycles {
+    let count: Int8
+    let pageBoundary: Bool
+    let branchTaken: Bool
 }
 
 struct CpuFlags {
@@ -147,10 +161,14 @@ struct CpuFlags {
     }
 }
 
-struct Cycles {
-    let count: Int8
-    let pageBoundary: Bool
-    let branchTaken: Bool
+struct DataCells {
+    let accumulator: Bool
+    let xIndex: Bool
+    let yIndex: Bool
+    let processorStatus: Bool
+    let stackPointer: Bool
+    let programCounter: Bool
+    let memory: Bool
 }
 
 fileprivate func prgBlocks(_ cart: Cart) -> Int { cart.info.prgBlocks }

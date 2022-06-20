@@ -75,20 +75,20 @@ X(CMP,                              /* Compare to accumulator */ \
   "Compare to accumulator", \
   0xa3, self, dec) \
 X(CPX,                              /* Compare to x-index */ \
-  "Compare to X-index", \
+  "Compare to x-index", \
   0xa3, self, dec) \
 X(CPY,                              /* Compare to y-index */ \
-  "Compare to Y-index", \
+  "Compare to y-index", \
   0xa3, self, dec) \
 \
 X(DEC,                              /* Decrement memory */ \
   "Decrement memory", \
   0xa2, self, dec) \
 X(DEX,                              /* Decrement x-index */ \
-  "Decrement X-index", \
+  "Decrement x-index", \
   0xa2, self) \
 X(DEY,                              /* Decrement y-index */ \
-  "Decrement Y-index", \
+  "Decrement y-index", \
   0xa2, self) \
 \
 X(EOR,                              /* Logical EXCLUSIVE OR */ \
@@ -99,10 +99,10 @@ X(INC,                              /* Increment memory */ \
   "Increment memory", \
   0xa2, self, dec) \
 X(INX,                              /* Increment x-index */ \
-  "Increment X-index", \
+  "Increment x-index", \
   0xa2, self) \
 X(INY,                              /* Increment y-index */ \
-  "Increment Y-index", \
+  "Increment y-index", \
   0xa2, self) \
 \
 X(JMP,                              /* Jump */ \
@@ -116,10 +116,10 @@ X(LDA,                              /* Load accumulator */ \
   "Load accumulator", \
   0xa2, self, dec) \
 X(LDX,                              /* Load x-index */ \
-  "Load X-index", \
+  "Load x-index", \
   0xa2, self, dec) \
 X(LDY,                              /* Load y-index */ \
-  "Load Y-index", \
+  "Load y-index", \
   0xa2, self, dec) \
 X(LSR,                              /* Logical shift right */ \
   "Logical shift right", \
@@ -175,29 +175,29 @@ X(STA,                              /* Store accumulator */ \
   "Store accumulator", \
   0x20, self, dec) \
 X(STX,                              /* Store x-index */ \
-  "Store X-index", \
+  "Store x-index", \
   0x20, self, dec) \
 X(STY,                              /* Store y-index */ \
-  "Store Y-index", \
+  "Store y-index", \
   0x20, self, dec) \
 \
 X(TAX,                              /* Transfer accumulator to x-index */ \
-  "Transfer accumulator to X-index", \
+  "Transfer accumulator to x-index", \
   0xa2, self) \
 X(TAY,                              /* Transfer accumulator to y-index */ \
-  "Transfer accumulator to Y-index", \
+  "Transfer accumulator to y-index", \
   0xa2, self) \
 X(TSX,                              /* Transfer stack pointer to x-index */ \
-  "Transfer stack pointer to X-index", \
+  "Transfer stack pointer to x-index", \
   0xa2, self) \
 X(TXA,                              /* Transfer x-index to accumulator */ \
-  "Transfer X-index to accumulator", \
+  "Transfer x-index to accumulator", \
   0xa2, self) \
 X(TXS,                              /* Transfer x-index to stack pointer */ \
-  "Transfer X-index to stack pointer", \
+  "Transfer x-index to stack pointer", \
   0x20, self) \
 X(TYA,                              /* Transfer y-index to accumulator */ \
-  "Transfer Y-index to accumulator", \
+  "Transfer y-index to accumulator", \
   0xa2, self) \
 \
 /* Unofficial Opcodes */ \
@@ -211,7 +211,7 @@ X(ANC,                              /* Logical AND and set carry as if
 X(ANE,                              /* Accumulator interferes with internal
                                        signals, logical AND with x-index and
                                        operand, load into accumulator */ \
-  "AND with X-index + LDA with accumulator interference (highly unstable)", \
+  "AND with x-index + LDA with accumulator interference (highly unstable)", \
   0xa2, self) \
 X(ARR,                              /* Logical AND and rotate right with adder
                                        side-effects interleaved between
@@ -250,24 +250,24 @@ X(RRA,                              /* Rotate right and add with carry */ \
   0xe3, self, dec) \
 X(SAX,                              /* Store logical AND of accumulator
                                        and x-index */ \
-  "Store AND of accumulator and X-index", \
+  "Store AND of accumulator and x-index", \
   0x20, self) \
 X(SBX,                              /* Logical AND accumulator and x-index,
                                        compare to operand, and load into
                                        x-index */ \
-  "AND accumulator and X-index + CMP + LDX", \
+  "AND accumulator and x-index + CMP + LDX", \
   0xa3, self) \
 X(SHA,                              /* Store logical AND accumulator and
                                        x-index and ADDR_HI + 1 */ \
-  "Store AND of accumulator, X-index, and high address byte + 1 (unstable)", \
+  "Store AND of accumulator, x-index, and high address byte + 1 (unstable)", \
   0x20, self, dec) \
 X(SHX,                              /* Store logical AND x-index and
                                        ADDR_HI + 1 */ \
-  "Store AND of X-index, and high address byte + 1 (unstable)", \
+  "Store AND of x-index, and high address byte + 1 (unstable)", \
   0x20, self, dec) \
 X(SHY,                              /* Store logical AND y-index and
                                        ADDR_HI + 1 */ \
-  "Store AND of Y-index, and high address byte + 1 (unstable)", \
+  "Store AND of y-index, and high address byte + 1 (unstable)", \
   0x20, self, dec) \
 X(SLO,                              /* Arithmetic shift left and logical OR */ \
   "ASL + ORA", \
@@ -281,7 +281,7 @@ X(TAS,                              /* Load logical AND accumulator and x-index
                                        accumulator and x-index and
                                        ADDR_HI + 1 */ \
   "Load AND of accumulator and x-index into stack pointer +" \
-  " store AND of X-index, and high address byte + 1 (unstable)", \
+  " store AND of x-index, and high address byte + 1 (unstable)", \
   0x20, self, dec)
 
 // Addressing Modes

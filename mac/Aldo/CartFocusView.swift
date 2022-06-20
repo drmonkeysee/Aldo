@@ -66,6 +66,12 @@ fileprivate struct InstructionDetailsView: View {
             FlagsView(flags: inst?.flags)
         }
         .imageScale(.large)
+        HStack {
+            Text("Data")
+            Spacer()
+            DataView()
+        }
+        .imageScale(.large)
     }
 
     private var currentInstruction: Instruction? {
@@ -91,16 +97,49 @@ fileprivate struct FlagsView: View {
 
     var body: some View {
         Image(systemName: icon(val: flags?.negative ?? false, label: "n"))
+            .help("Negative")
         Image(systemName: icon(val: flags?.overflow ?? false, label: "v"))
+            .help("Overflow")
         Image(systemName: icon(val: flags?.softbreak ?? false, label: "b"))
+            .help("Soft-Break")
         Image(systemName: icon(val: flags?.decimal ?? false, label: "d"))
+            .help("Decimal Mode")
         Image(systemName: icon(val: flags?.interrupt ?? false, label: "i"))
+            .help("Interrupts Disabled")
         Image(systemName: icon(val: flags?.zero ?? false, label: "z"))
+            .help("Zero")
         Image(systemName: icon(val: flags?.carry ?? false, label: "c"))
+            .help("Carry")
     }
 
     private func icon(val: Bool, label: String) -> String {
         "\(label).circle\(val ? ".fill" : "")"
+    }
+}
+
+fileprivate struct DataView: View {
+    var body: some View {
+        Group {
+            Image(systemName: icon(val: false, label: "m"))
+                .help("Main Memory")
+            Image(systemName: icon(val: false, label: "i"))
+                .help("Instruction Register (Program Counter)")
+            Image(systemName: icon(val: false, label: "s"))
+                .help("Stack Pointer")
+            Image(systemName: icon(val: false, label: "p"))
+                .help("Processor Status")
+            Image(systemName: icon(val: false, label: "y"))
+                .help("Y-Index")
+            Image(systemName: icon(val: false, label: "x"))
+                .help("X-Index")
+            Image(systemName: icon(val: false, label: "a"))
+                .help("Accumulator")
+        }
+        .padding(.trailing, 1)
+    }
+
+    private func icon(val: Bool, label: String) -> String {
+        "\(label).square\(val ? ".fill" : "")"
     }
 }
 

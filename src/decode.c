@@ -12,6 +12,7 @@
 #define N {0}
 #define AP {.a = true, .p = true}
 #define APS {.a = true, .p = true, .s = true}
+#define APM {.a = true, .p = true, .m = true}
 #define XP {.x = true, .p = true}
 #define YP {.y = true, .p = true}
 #define P {.p = true}
@@ -27,10 +28,10 @@
 #define PG(n) {.count = n, .page_boundary = true}
 #define BR(n) {n, true, true}
 
-#define UNDEF {IN_UDF, AM_IMP, {0}, CY(2), false}
+#define UNDEF {IN_UDF, AM_IMP, N, CY(2), false}
 #define OP(op, am, d, c) {op, am, d, c, false}
 #define UP(op, am, d, c) {op, am, d, c, true}
-#define JAM {IN_JAM, AM_JAM, {0}, CY(-1), true}
+#define JAM {IN_JAM, AM_JAM, N, CY(-1), true}
 
 const int BrkOpcode = 0x0;
 
@@ -53,99 +54,99 @@ const struct decoded Decode[] = {
     OP(IN_BRK, AM_BRK, SI, CY(7)),  // 00 - BRK
     OP(IN_ORA, AM_INDX, AP, CY(6)), // 01 - ORA (zp,X)
     JAM,                        // 02 - *JAM (KIL, HLT, CIM, CRP)
-    UP(IN_SLO, AM_INDX, FOO, CY(8)), // 03 - *SLO (ASO) (zp,X)
+    UP(IN_SLO, AM_INDX, APM, CY(8)), // 03 - *SLO (ASO) (zp,X)
     UP(IN_NOP, AM_ZP, N, CY(3)),   // 04 - *NOP (DOP, SKB, IGN) zp
     OP(IN_ORA, AM_ZP, AP, CY(3)),   // 05 - ORA zp
     OP(IN_ASL, AM_ZP, PM, CY(5)),   // 06 - ASL zp
-    UP(IN_SLO, AM_ZP, FOO, CY(5)),   // 07 - *SLO (ASO) zp
+    UP(IN_SLO, AM_ZP, APM, CY(5)),   // 07 - *SLO (ASO) zp
     OP(IN_PHP, AM_PSH, S, CY(3)),  // 08 - PHP
     OP(IN_ORA, AM_IMM, AP, CY(2)),  // 09 - ORA imm
     OP(IN_ASL, AM_IMP, AP, CY(2)),  // 0A - ASL imp
-    UP(IN_ANC, AM_IMM, FOO, CY(2)),  // 0B - *ANC (ANA, ANB) imm
+    UP(IN_ANC, AM_IMM, AP, CY(2)),  // 0B - *ANC (ANA, ANB) imm
     UP(IN_NOP, AM_ABS, N, CY(4)),  // 0C - *NOP (TOP, SKW, IGN) abs
     OP(IN_ORA, AM_ABS, AP, CY(4)),  // 0D - ORA abs
     OP(IN_ASL, AM_ABS, PM, CY(6)),  // 0E - ASL abs
-    UP(IN_SLO, AM_ABS, FOO, CY(6)),  // 0F - *SLO (ASO) abs
+    UP(IN_SLO, AM_ABS, APM, CY(6)),  // 0F - *SLO (ASO) abs
     OP(IN_BPL, AM_BCH, I, BR(2)),  // 10 - BPL
     OP(IN_ORA, AM_INDY, AP, PG(5)), // 11 - ORA (zp),Y
     JAM,                        // 12 - *JAM (KIL, HLT, CIM, CRP)
-    UP(IN_SLO, AM_INDY, FOO, CY(8)), // 13 - *SLO (ASO) (zp),Y
+    UP(IN_SLO, AM_INDY, APM, CY(8)), // 13 - *SLO (ASO) (zp),Y
     UP(IN_NOP, AM_ZPX, N, CY(4)),  // 14 - *NOP (DOP, SKB, IGN) zp,X
     OP(IN_ORA, AM_ZPX, AP, CY(4)),  // 15 - ORA zp,X
     OP(IN_ASL, AM_ZPX, PM, CY(6)),  // 16 - ASL zp,X
-    UP(IN_SLO, AM_ZPX, FOO, CY(6)),  // 17 - *SLO (ASO) zp,X
+    UP(IN_SLO, AM_ZPX, APM, CY(6)),  // 17 - *SLO (ASO) zp,X
     OP(IN_CLC, AM_IMP, P, CY(2)),  // 18 - CLC
     OP(IN_ORA, AM_ABSY, AP, PG(4)), // 19 - ORA abs,Y
     UP(IN_NOP, AM_IMP, N, CY(2)),  // 1A - *NOP (NPO, UNP)
-    UP(IN_SLO, AM_ABSY, FOO, CY(7)), // 1B - *SLO (ASO) abs,Y
+    UP(IN_SLO, AM_ABSY, APM, CY(7)), // 1B - *SLO (ASO) abs,Y
     UP(IN_NOP, AM_ABSY, N, PG(4)), // 1C - *NOP (TOP, SKW, IGN) abs,X
     OP(IN_ORA, AM_ABSY, AP, PG(4)), // 1D - ORA abs,X
     OP(IN_ASL, AM_ABSY, PM, CY(7)), // 1E - ASL abs,X
-    UP(IN_SLO, AM_ABSY, FOO, CY(7)), // 1F - *SLO (ASO) abs,X
+    UP(IN_SLO, AM_ABSY, APM, CY(7)), // 1F - *SLO (ASO) abs,X
     OP(IN_JSR, AM_JSR, SI, CY(6)),  // 20 - JSR
     OP(IN_AND, AM_INDX, AP, CY(6)), // 21 - AND (zp,X)
     JAM,                        // 22 - *JAM (KIL, HLT, CIM, CRP)
-    UP(IN_RLA, AM_INDX, FOO, CY(8)), // 23 - *RLA (RLN) (zp,X)
+    UP(IN_RLA, AM_INDX, APM, CY(8)), // 23 - *RLA (RLN) (zp,X)
     OP(IN_BIT, AM_ZP, P, CY(3)),   // 24 - BIT zp
     OP(IN_AND, AM_ZP, AP, CY(3)),   // 25 - AND zp
     OP(IN_ROL, AM_ZP, PM, CY(5)),   // 26 - ROL zp
-    UP(IN_RLA, AM_ZP, FOO, CY(5)),   // 27 - *RLA (RLN) zp
+    UP(IN_RLA, AM_ZP, APM, CY(5)),   // 27 - *RLA (RLN) zp
     OP(IN_PLP, AM_PLL, PS, CY(4)),  // 28 - PLP
     OP(IN_AND, AM_IMM, AP, CY(2)),  // 29 - AND imm
     OP(IN_ROL, AM_IMP, AP, CY(2)),  // 2A - ROL imp
-    UP(IN_ANC, AM_IMM, FOO, CY(2)),  // 2B - *ANC (ANC2) imm
+    UP(IN_ANC, AM_IMM, AP, CY(2)),  // 2B - *ANC (ANC2) imm
     OP(IN_BIT, AM_ABS, P, CY(4)),  // 2C - BIT abs
     OP(IN_AND, AM_ABS, AP, CY(4)),  // 2D - AND abs
     OP(IN_ROL, AM_ABS, PM, CY(6)),  // 2E - ROL abs
-    UP(IN_RLA, AM_ABS, FOO, CY(6)),  // 2F - *RLA (RLN) abs
+    UP(IN_RLA, AM_ABS, APM, CY(6)),  // 2F - *RLA (RLN) abs
     OP(IN_BMI, AM_BCH, I, BR(2)),  // 30 - BMI
     OP(IN_AND, AM_INDY, AP, PG(5)), // 31 - AND (zp),Y
     JAM,                        // 32 - *JAM (KIL, HLT, CIM, CRP)
-    UP(IN_RLA, AM_INDY, FOO, CY(8)), // 33 - *RLA (RLN) (zp),Y
+    UP(IN_RLA, AM_INDY, APM, CY(8)), // 33 - *RLA (RLN) (zp),Y
     UP(IN_NOP, AM_ZPX, N, CY(4)),  // 34 - *NOP (DOP, SKB, IGN) zp,X
     OP(IN_AND, AM_ZPX, AP, CY(4)),  // 35 - AND zp,X
     OP(IN_ROL, AM_ZPX, PM, CY(6)),  // 36 - ROL zp,X
-    UP(IN_RLA, AM_ZPX, FOO, CY(6)),  // 37 - *RLA (RLN) zp,X
+    UP(IN_RLA, AM_ZPX, APM, CY(6)),  // 37 - *RLA (RLN) zp,X
     OP(IN_SEC, AM_IMP, P, CY(2)),  // 38 - SEC
     OP(IN_AND, AM_ABSY, AP, PG(4)), // 39 - AND abs,Y
     UP(IN_NOP, AM_IMP, N, CY(2)),  // 3A - *NOP (NPO, UNP)
-    UP(IN_RLA, AM_ABSY, FOO, CY(7)), // 3B - *RLA (RLN) abs,Y
+    UP(IN_RLA, AM_ABSY, APM, CY(7)), // 3B - *RLA (RLN) abs,Y
     UP(IN_NOP, AM_ABSY, N, PG(4)), // 3C - *NOP (TOP, SKW, IGN) abs,X
     OP(IN_AND, AM_ABSY, AP, PG(4)), // 3D - AND abs,X
     OP(IN_ROL, AM_ABSY, PM, CY(7)), // 3E - ROL abs,X
-    UP(IN_RLA, AM_ABSY, FOO, CY(7)), // 3F - *RLA (RLN) abs,X
+    UP(IN_RLA, AM_ABSY, APM, CY(7)), // 3F - *RLA (RLN) abs,X
     OP(IN_RTI, AM_RTI, PSI, CY(6)),  // 40 - RTI
     OP(IN_EOR, AM_INDX, AP, CY(6)), // 41 - EOR (zp,X)
     JAM,                        // 42 - *JAM (KIL, HLT, CIM, CRP)
-    UP(IN_SRE, AM_INDX, FOO, CY(8)), // 43 - *SRE (LSE) (zp,X)
+    UP(IN_SRE, AM_INDX, APM, CY(8)), // 43 - *SRE (LSE) (zp,X)
     UP(IN_NOP, AM_ZP, N, CY(3)),   // 44 - *NOP (DOP, SKB, IGN) zp
     OP(IN_EOR, AM_ZP, AP, CY(3)),   // 45 - EOR zp
     OP(IN_LSR, AM_ZP, PM, CY(5)),   // 46 - LSR zp
-    UP(IN_SRE, AM_ZP, FOO, CY(5)),   // 47 - *SRE (LSE) zp
+    UP(IN_SRE, AM_ZP, APM, CY(5)),   // 47 - *SRE (LSE) zp
     OP(IN_PHA, AM_PSH, S, CY(3)),  // 48 - PHA
     OP(IN_EOR, AM_IMM, AP, CY(2)),  // 49 - EOR imm
     OP(IN_LSR, AM_IMP, AP, CY(2)),  // 4A - LSR imp
-    UP(IN_ALR, AM_IMM, FOO, CY(2)),  // 4B - *ALR (ASR) imm
+    UP(IN_ALR, AM_IMM, AP, CY(2)),  // 4B - *ALR (ASR) imm
     OP(IN_JMP, AM_JABS, I, CY(3)), // 4C - JMP abs
     OP(IN_EOR, AM_ABS, AP, CY(4)),  // 4D - EOR abs
     OP(IN_LSR, AM_ABS, PM, CY(6)),  // 4E - LSR abs
-    UP(IN_SRE, AM_ABS, FOO, CY(6)),  // 4F - *SRE (LSE) abs
-    OP(IN_BVC, AM_BCH, FOO, BR(2)),  // 50 - BVC
+    UP(IN_SRE, AM_ABS, APM, CY(6)),  // 4F - *SRE (LSE) abs
+    OP(IN_BVC, AM_BCH, I, BR(2)),  // 50 - BVC
     OP(IN_EOR, AM_INDY, AP, PG(5)), // 51 - EOR (zp),Y
     JAM,                        // 52 - *JAM (KIL, HLT, CIM, CRP)
-    UP(IN_SRE, AM_INDY, FOO, CY(8)), // 53 - *SRE (LSE) (zp),Y
+    UP(IN_SRE, AM_INDY, APM, CY(8)), // 53 - *SRE (LSE) (zp),Y
     UP(IN_NOP, AM_ZPX, N, CY(4)),  // 54 - *NOP (DOP, SKB, IGN) zp,X
     OP(IN_EOR, AM_ZPX, AP, CY(4)),  // 55 - EOR zp,X
     OP(IN_LSR, AM_ZPX, PM, CY(6)),  // 56 - LSR zp,X
-    UP(IN_SRE, AM_ZPX, FOO, CY(6)),  // 57 - *SRE (LSE) zp,X
+    UP(IN_SRE, AM_ZPX, APM, CY(6)),  // 57 - *SRE (LSE) zp,X
     OP(IN_CLI, AM_IMP, P, CY(2)),  // 58 - CLI
     OP(IN_EOR, AM_ABSY, AP, PG(4)), // 59 - EOR abs,Y
     UP(IN_NOP, AM_IMP, N, CY(2)),  // 5A - *NOP (NPO, UNP)
-    UP(IN_SRE, AM_ABSY, FOO, CY(7)), // 5B - *SRE (LSE) abs,Y
+    UP(IN_SRE, AM_ABSY, APM, CY(7)), // 5B - *SRE (LSE) abs,Y
     UP(IN_NOP, AM_ABSY, N, PG(4)), // 5C - *NOP (TOP, SKW, IGN) abs,X
     OP(IN_EOR, AM_ABSY, AP, PG(4)), // 5D - EOR abs,X
     OP(IN_LSR, AM_ABSY, PM, CY(7)), // 5E - LSR abs,X
-    UP(IN_SRE, AM_ABSY, FOO, CY(7)), // 5F - *SRE (LSE) abs,X
+    UP(IN_SRE, AM_ABSY, APM, CY(7)), // 5F - *SRE (LSE) abs,X
     OP(IN_RTS, AM_RTS, SI, CY(6)),  // 60 - RTS
     OP(IN_ADC, AM_INDX, AP, CY(6)), // 61 - ADC (zp,X)
     JAM,                        // 62 - *JAM (KIL, HLT, CIM, CRP)
@@ -162,7 +163,7 @@ const struct decoded Decode[] = {
     OP(IN_ADC, AM_ABS, AP, CY(4)),  // 6D - ADC abs
     OP(IN_ROR, AM_ABS, PM, CY(6)),  // 6E - ROR abs
     UP(IN_RRA, AM_ABS, FOO, CY(6)),  // 6F - *RRA (RLD) abs
-    OP(IN_BVS, AM_BCH, FOO, BR(2)),  // 70 - BVS
+    OP(IN_BVS, AM_BCH, I, BR(2)),  // 70 - BVS
     OP(IN_ADC, AM_INDY, AP, PG(5)), // 71 - ADC (zp),Y
     JAM,                        // 72 - *JAM (KIL, HLT, CIM, CRP)
     UP(IN_RRA, AM_INDY, FOO, CY(8)), // 73 - *RRA (RLD) (zp),Y

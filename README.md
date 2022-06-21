@@ -34,9 +34,9 @@ The Makefile also provides a verification target.
 
 1. Follow the [CinyTest build/install instructions](https://github.com/drmonkeysee/CinyTest#build-cinytest)
 2. Install [Python3](https://www.python.org) (in order of recommended options)
-	- managing Python installs via [pyenv](https://github.com/pyenv/pyenv) installed as `brew install pyenv`
-	- OR directly as `brew install Python@3.8` (any version >= 3.8)
-	- OR installed from the official site linked above
+	- manage Python installs via [pyenv](https://github.com/pyenv/pyenv) `brew install pyenv` and install any version >= 3.8
+	- OR directly `brew install Python@3.8` (any version >= 3.8)
+	- OR install from the official site linked above
 3. `make check`
 
 ### Debian/Ubuntu

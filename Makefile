@@ -71,7 +71,7 @@ test: $(TESTS_TARGET)
 
 nestest: $(NESTEST_ROM) debug
 	rm -f $(TRACE_CMP)
-	$(TARGET) -btv -H@c66e -Hjam -H3s -rc000 $<
+	$(TARGET) -btvz -H@c66e -Hjam -H3s -rc000 $<
 
 nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
 	diff -y --suppress-common-lines $^ > $(NESTEST_DIFF) ; \

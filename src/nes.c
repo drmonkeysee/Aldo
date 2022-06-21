@@ -32,7 +32,9 @@ struct nes_console {
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
     enum nexcmode mode;         // NES execution mode
     uint8_t ram[MEMBLOCK_2KB];  // CPU Internal RAM
-    bool dumpram;               // Dump RAM banks to disk on exit
+    bool
+        dumpram,                // Dump RAM banks to disk on exit
+        zeroram;                // Zero-out RAM on power-up or reset
 };
 
 static bool ram_read(const void *restrict ctx, uint16_t addr,
@@ -125,13 +127,14 @@ static void ram_dump(const struct nes_console *self)
 // Public Interface
 //
 
-nes *nes_new(cart *c, bool tron, bool dumpram, bool bcd, debugctx *dbg)
+nes *nes_new(cart *c, debugctx *dbg, const struct control *appstate)
 {
     assert(c != NULL);
     assert(dbg != NULL);
+    assert(appstate != NULL);
 
     FILE *tracelog = NULL;
-    if (tron) {
+    if (appstate->tron) {
         errno = 0;
         if (!(tracelog = fopen(TraceLog, "w"))) {
             fprintf(stderr, "%s: ", TraceLog);
@@ -143,10 +146,11 @@ nes *nes_new(cart *c, bool tron, bool dumpram, bool bcd, debugctx *dbg)
     struct nes_console *const self = malloc(sizeof *self);
     self->cart = c;
     self->dbg = dbg;
-    self->dumpram = dumpram;
+    self->dumpram = appstate->tron || appstate->batch;
     self->tracelog = tracelog;
+    self->zeroram = appstate->zeroram;
     // TODO: ditch this option when aldo can emulate more than just NES
-    self->cpu.bcd = bcd;
+    self->cpu.bcd = appstate->bcdsupport;
     create_cpubus(self);
     return self;
 }

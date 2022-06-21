@@ -22,7 +22,7 @@ enum nes_interrupt {
 };
 typedef struct nes_console nes;
 
-nes *nes_new(cart *c, bool tron, bool dumpram, bool bcd, debugctx *dbg);
+nes *nes_new(cart *c, debugctx *dbg, const struct control *appstate);
 void nes_free(nes *self);
 
 void nes_mode(nes *self, enum nexcmode mode);

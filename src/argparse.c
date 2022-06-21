@@ -28,7 +28,8 @@ static const char
     *const restrict InfoLong = "--info",
     *const restrict ResVectorLong = "--reset-vector",
     *const restrict TraceLong = "--trace",
-    *const restrict VersionLong = "--version";
+    *const restrict VersionLong = "--version",
+    *const restrict ZeroRamLong = "--zero-ram";
 
 static const char
     BatchShort = 'b',
@@ -42,7 +43,8 @@ static const char
     ResVectorShort = 'r',
     TraceShort = 't',
     VerboseShort = 'v',
-    VersionShort = 'V';
+    VersionShort = 'V',
+    ZeroRamShort = 'z';
 
 static const int MinAddress = 0, MaxAddress = ADDRMASK_64KB;
 
@@ -189,6 +191,7 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
     SETFLAG(appstate->tron, arg, TraceShort, TraceLong);
     SETFLAG(appstate->verbose, arg, VerboseShort, NULL);
     SETFLAG(appstate->version, arg, VersionShort, VersionLong);
+    SETFLAG(appstate->zeroram, arg, ZeroRamShort, ZeroRamLong);
 
     return true;
 }
@@ -241,6 +244,8 @@ void argparse_usage(const char *me)
     printf("  -%c\t: turn on trace-logging and ram dumps (alt %s)\n",
            TraceShort, TraceLong);
     printf("  -%c\t: verbose output\n", VerboseShort);
+    printf("  -%c\t: zero-out RAM on startup (alt %s)\n", ZeroRamShort,
+           ZeroRamLong);
     puts("\ncommands");
     printf("  -%c\t: decode CHR ROM into BMP files (alt %s[=prefix]);"
            "\n\t  prefix default for alt option is 'chr'\n", ChrDecodeShort,

@@ -79,20 +79,10 @@ void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
     cpu->p.i = cpu->signal.rdy = cpu->presync = true;
     cpu->res = NIS_CLEAR;
     cpu->bus = TestBus;
-    if (ram) {
-        Ram.ctx = ram;
-        bus_set(TestBus, 0x0, Ram);
-    } else {
-        Ram.ctx = NULL;
-        bus_set(TestBus, 0x0, (struct busdevice){0});
-    }
-    if (rom) {
-        Rom.ctx = rom;
-        bus_set(TestBus, MEMBLOCK_32KB, Rom);
-    } else {
-        Rom.ctx = NULL;
-        bus_set(TestBus, MEMBLOCK_32KB, (struct busdevice){0});
-    }
+    Ram.ctx = ram;
+    bus_set(TestBus, 0x0, ram ? Ram : (struct busdevice){0});
+    Rom.ctx = rom;
+    bus_set(TestBus, MEMBLOCK_32KB, rom ? Rom : (struct busdevice){0});
     RomWriteCapture = -1;
 }
 

@@ -13,7 +13,6 @@
 #include "snapshot.h"
 
 #include <stdbool.h>
-#include <stddef.h>
 
 static bool TestRead(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)

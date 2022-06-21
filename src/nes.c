@@ -18,6 +18,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static const char
     *const restrict TraceLog = "trace.log",
@@ -181,6 +182,11 @@ void nes_powerup(nes *self)
 {
     assert(self != NULL);
 
+    // TODO: for now start in cycle-step mode
+    self->mode = NEXC_CYCLE;
+    if (self->zeroram) {
+        memset(self->ram, 0, sizeof self->ram / sizeof self->ram[0]);
+    }
     cpu_powerup(&self->cpu);
 }
 

@@ -13,6 +13,7 @@
 #include "snapshot.h"
 
 #include <stdbool.h>
+#include <stddef.h>
 
 static bool TestRead(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)
@@ -81,10 +82,16 @@ void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
     if (ram) {
         Ram.ctx = ram;
         bus_set(TestBus, 0x0, Ram);
+    } else {
+        Ram.ctx = NULL;
+        bus_set(TestBus, 0x0, (struct busdevice){0});
     }
     if (rom) {
         Rom.ctx = rom;
         bus_set(TestBus, MEMBLOCK_32KB, Rom);
+    } else {
+        Rom.ctx = NULL;
+        bus_set(TestBus, MEMBLOCK_32KB, (struct busdevice){0});
     }
     RomWriteCapture = -1;
 }

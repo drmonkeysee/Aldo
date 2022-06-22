@@ -296,10 +296,10 @@ X(IMM, 2, "Immediate",              /* Immediate */ \
 X(ZP, 2, "Zero-Page",               /* Zero-Page */ \
   XPEEK("= %02X", peek.data), \
   "zp", "$%02X") \
-X(ZPX, 2, "Zero-Page X-Indexed",    /* Zero-Page,X */ \
+X(ZPX, 2, "Zero-Page Indexed",      /* Zero-Page,X */ \
   XPEEK("@ %02X = %02X", peek.finaladdr, peek.data), \
   "zp,X", "$%02X,X") \
-X(ZPY, 2, "Zero-Page Y-Indexed",    /* Zero-Page,Y */ \
+X(ZPY, 2, "Zero-Page Indexed",      /* Zero-Page,Y */ \
   XPEEK("@ %02X = %02X", peek.finaladdr, peek.data), \
   "zp,Y", "$%02X,Y") \
 X(INDX, 2, "Indexed Indirect",      /* (Indirect,X) */ \
@@ -311,10 +311,10 @@ X(INDY, 2, "Indirect Indexed",      /* (Indirect),Y */ \
 X(ABS, 3, "Absolute",               /* Absolute */ \
   XPEEK("= %02X", peek.data), \
   "abs", "$??%02X", "$%04X") \
-X(ABSX, 3, "Absolute X-Indexed",    /* Absolute,X */ \
+X(ABSX, 3, "Absolute Indexed",      /* Absolute,X */ \
   XPEEK("@ %04X = %02X", peek.finaladdr, peek.data), \
   "abs,X", "$??%02X,X", "$%04X,X") \
-X(ABSY, 3, "Absolute Y-Indexed",    /* Absolute,Y */ \
+X(ABSY, 3, "Absolute Indexed",      /* Absolute,Y */ \
   XPEEK("@ %04X = %02X", peek.finaladdr, peek.data), \
   "abs,Y", "$??%02X,Y", "$%04X,Y") \
 \

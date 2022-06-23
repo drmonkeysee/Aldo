@@ -16,7 +16,7 @@
 #include <string.h>
 
 static const char
-    *const restrict Version = "0.4.0", // TODO: autogenerate this
+    *const restrict Version = "0.4.1", // TODO: autogenerate this
 
     *const restrict BatchLong = "--batch",
     *const restrict BcdLong = "--bcd",

@@ -1768,6 +1768,7 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->datapath.irq = self->irq;
     snapshot->datapath.jammed = cpu_jammed(self);
     snapshot->datapath.nmi = self->nmi;
+    snapshot->datapath.opcode = self->opc;
     snapshot->datapath.res = self->res;
 
     snapshot->lines.irq = self->signal.irq;

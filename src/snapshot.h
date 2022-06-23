@@ -48,7 +48,7 @@ struct console_state {
         enum nistate irq, nmi, res;
         uint16_t addressbus, current_instruction;
         uint8_t addrlow_latch, addrhigh_latch, addrcarry_latch, databus,
-                exec_cycle;
+                exec_cycle, opcode;
         bool busfault, instdone, jammed;
     } datapath;
     struct {

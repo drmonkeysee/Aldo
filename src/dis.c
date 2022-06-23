@@ -85,6 +85,7 @@ static uint8_t flags(enum inst in)
 
 static const char *interrupt_display(const struct console_state *snapshot)
 {
+    if (snapshot->datapath.opcode != BrkOpcode) return "";
     if (snapshot->datapath.exec_cycle == 6) return "CLR";
     if (snapshot->datapath.res == NIS_COMMITTED) return "(RES)";
     if (snapshot->datapath.nmi == NIS_COMMITTED) return "(NMI)";
@@ -660,6 +661,14 @@ int dis_datapath(const struct console_state *snapshot,
                                       snapshot->mem.currprg, 0, &inst);
     if (err < 0) return err;
 
+    // NOTE: we're in an interrupt state so adjust the instruction to render
+    // the datapath correctly.
+    if (snapshot->datapath.opcode == BrkOpcode
+        && inst.d.instruction != IN_BRK) {
+        inst.d = Decode[snapshot->datapath.opcode];
+        inst.bv.size = InstLens[inst.d.mode];
+    }
+
     int count, total;
     total = count = sprintf(dis, "%s ", mnemonic(inst.d.instruction));
     if (count < 0) return DIS_ERR_FMT;
@@ -675,7 +684,7 @@ int dis_datapath(const struct console_state *snapshot,
         count = sprintf(dis + total, "%s", displaystr);
         break;
     case 1:
-        count = inst.d.instruction == IN_BRK
+        count = snapshot->datapath.opcode == BrkOpcode
                     ? sprintf(dis + total, displaystr,
                               interrupt_display(snapshot))
                     : sprintf(dis + total, displaystr,

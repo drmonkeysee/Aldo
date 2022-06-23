@@ -8,6 +8,7 @@
 #include "ciny.h"
 #include "cpu.h"
 #include "cpuhelp.h"
+#include "decode.h"
 #include "dis.h"
 #include "snapshot.h"
 
@@ -2472,11 +2473,11 @@ static void datapath_irq_cycle_zero(void *ctx)
             .irq = NIS_COMMITTED,
         },
         .mem = {
-            .currprg = {0x0, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    sn.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2494,11 +2495,11 @@ static void datapath_irq_cycle_one(void *ctx)
             .irq = NIS_COMMITTED,
         },
         .mem = {
-            .currprg = {0x0, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    sn.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2516,11 +2517,11 @@ static void datapath_irq_cycle_n(void *ctx)
             .irq = NIS_COMMITTED,
         },
         .mem = {
-            .currprg = {0x0, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    sn.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2538,11 +2539,11 @@ static void datapath_irq_cycle_six(void *ctx)
             .irq = NIS_COMMITTED,
         },
         .mem = {
-            .currprg = {0x0, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    sn.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2560,11 +2561,11 @@ static void datapath_nmi_cycle_zero(void *ctx)
             .nmi = NIS_COMMITTED,
         },
         .mem = {
-            .currprg = {0x0, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    sn.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2582,11 +2583,11 @@ static void datapath_nmi_cycle_one(void *ctx)
             .nmi = NIS_COMMITTED,
         },
         .mem = {
-            .currprg = {0x0, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    sn.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2604,11 +2605,11 @@ static void datapath_nmi_cycle_n(void *ctx)
             .nmi = NIS_COMMITTED,
         },
         .mem = {
-            .currprg = {0x0, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    sn.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2626,11 +2627,11 @@ static void datapath_nmi_cycle_six(void *ctx)
             .nmi = NIS_COMMITTED,
         },
         .mem = {
-            .currprg = {0x0, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    sn.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2648,11 +2649,11 @@ static void datapath_res_cycle_zero(void *ctx)
             .res = NIS_COMMITTED,
         },
         .mem = {
-            .currprg = {0x0, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    sn.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2670,11 +2671,11 @@ static void datapath_res_cycle_one(void *ctx)
             .res = NIS_COMMITTED,
         },
         .mem = {
-            .currprg = {0x0, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    sn.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2692,11 +2693,11 @@ static void datapath_res_cycle_n(void *ctx)
             .res = NIS_COMMITTED,
         },
         .mem = {
-            .currprg = {0x0, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    sn.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);
@@ -2714,11 +2715,11 @@ static void datapath_res_cycle_six(void *ctx)
             .res = NIS_COMMITTED,
         },
         .mem = {
-            .currprg = {0x0, 0xff},
+            .currprg = {0xea, 0xff},
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    sn.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     const int written = dis_datapath(&sn, buf);

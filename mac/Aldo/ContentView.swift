@@ -9,13 +9,69 @@ import SwiftUI
 
 struct ContentView: View {
     private static let fileLabel = "Open ROM File"
+    private static let inset = 5.0
 
     @State private var navSelection: ContentLinks? = .emulator
     @State private var cartLoadFailed = false
     @StateObject private var cart = Cart()
 
     var body: some View {
-        NavigationView(content: navLinkViews)
+        HStack(alignment: .top, spacing: Self.inset) {
+            VStack(alignment: .leading) {
+                GroupBox {
+                    Text("Running Stats")
+                        .frame(maxWidth: .infinity)
+                } label: {
+                    Label("Stats", systemImage: "laptopcomputer")
+                }
+                .frame(maxWidth: .infinity)
+                GroupBox {
+                    Text("Controls")
+                        .frame(maxWidth: .infinity)
+                } label: {
+                    Label("Controls", systemImage: "gamecontroller")
+                }
+                .frame(maxWidth: .infinity)
+                GroupBox {
+                    CartInfoView()
+                        .font(.footnote)
+                        .environmentObject(cart)
+                        .frame(maxWidth: .infinity)
+                } label: {
+                    Label("Cart Format", systemImage: "scribble")
+                }
+            }
+            .frame(width: 300)
+            .padding([.leading, .top], Self.inset)
+            Divider()
+            ScreenView()
+                .padding(.top, Self.inset)
+            Divider()
+            SystemView()
+                .padding([.trailing, .bottom], Self.inset)
+                .environmentObject(cart)
+        }
+        .navigationTitle(cart.name ?? appName)
+        .toolbar {
+            ToolbarItem {
+                Button(action: pickFile) {
+                    Label(Self.fileLabel,
+                          systemImage: "arrow.up.doc")
+                }
+                .help(Self.fileLabel)
+            }
+        }
+        .alert("Rom Load Failure", isPresented: $cartLoadFailed,
+               presenting: cart.currentError) { _ in
+            // NOTE: default action
+        } message: {
+            Text($0.message)
+        }
+    }
+
+    private var appName: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
+            ?? "CFBundleFailure"
     }
 
     private func navLinkViews() -> some View {

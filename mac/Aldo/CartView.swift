@@ -9,12 +9,11 @@ import SwiftUI
 
 struct CartView: View {
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .top, spacing: 0) {
-                CartPrgView()
-                Divider()
-                CartChrView()
-            }
+        VStack(spacing: 5) {
+            CartPrgView()
+            Divider()
+            CartChrView()
+                .frame(height: 325)
         }
     }
 }

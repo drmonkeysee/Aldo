@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct ScreenView: View {
-    private static let nesResolution = (w: 256.0, h: 240.0)
-    private static let nesScale = 2.5
+    private static let nesResolution = (w: 256, h: 240)
+    private static let nesScale = 2
 
     var body: some View {
         ZStack {

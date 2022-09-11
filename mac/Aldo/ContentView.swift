@@ -17,27 +17,26 @@ struct ContentView: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: Self.inset) {
-            VStack(alignment: .leading) {
-                GroupBox {
-                    Text("Running Stats")
-                        .frame(maxWidth: .infinity)
-                } label: {
-                    Label("Stats", systemImage: "laptopcomputer")
+            VStack {
+                ScreenView()
+                HStack {
+                    GroupBox {
+                        Text("Running Stats")
+                            .frame(maxWidth: .infinity)
+                    } label: {
+                        Label("Stats", systemImage: "laptopcomputer")
+                    }
+                    .frame(maxWidth: .infinity)
+                    GroupBox {
+                        Text("Controls")
+                            .frame(maxWidth: .infinity)
+                    } label: {
+                        Label("Controls", systemImage: "gamecontroller")
+                    }
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
-                GroupBox {
-                    Text("Controls")
-                        .frame(maxWidth: .infinity)
-                } label: {
-                    Label("Controls", systemImage: "gamecontroller")
-                }
-                .frame(maxWidth: .infinity)
             }
-            .frame(width: 300)
             .padding([.leading, .top], Self.inset)
-            Divider()
-            ScreenView()
-                .padding(.top, Self.inset)
             Divider()
             SystemView()
                 .padding([.trailing, .bottom], Self.inset)

@@ -34,7 +34,6 @@ fileprivate struct ProgramView: View {
             Divider()
             CartFocusView()
                 .frame(maxHeight: .infinity, alignment: .top)
-                .padding(5)
         }
         .environmentObject(blocks.currentListing)
     }

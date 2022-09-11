@@ -11,9 +11,11 @@ struct CartView: View {
     var body: some View {
         VStack(spacing: 5) {
             CartPrgView()
+                .padding(.horizontal, 5)
             Divider()
             CartChrView()
                 .frame(height: 325)
+                .padding(.horizontal, 5)
         }
     }
 }

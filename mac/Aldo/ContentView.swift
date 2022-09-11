@@ -32,14 +32,6 @@ struct ContentView: View {
                     Label("Controls", systemImage: "gamecontroller")
                 }
                 .frame(maxWidth: .infinity)
-                GroupBox {
-                    CartInfoView()
-                        .font(.footnote)
-                        .environmentObject(cart)
-                        .frame(maxWidth: .infinity)
-                } label: {
-                    Label("Cart Format", systemImage: "scribble")
-                }
             }
             .frame(width: 300)
             .padding([.leading, .top], Self.inset)

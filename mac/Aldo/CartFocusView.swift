@@ -16,6 +16,13 @@ struct CartFocusView: View {
                 Label("Selected Instruction", systemImage: "pencil")
                     .font(.headline)
             }
+            GroupBox {
+                CartInfoView()
+                    .frame(maxWidth: .infinity)
+            } label: {
+                Label("Cart Format", systemImage: "scribble")
+                    .font(.headline)
+            }
         }
     }
 }

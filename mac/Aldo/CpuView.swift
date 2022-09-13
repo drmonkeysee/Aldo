@@ -1,92 +1,13 @@
 //
-//  EmulatorView.swift
+//  CpuView.swift
 //  Aldo-App
 //
-//  Created by Brandon Stansbury on 3/9/22.
+//  Created by Brandon Stansbury on 9/12/22.
 //
 
 import SwiftUI
 
-struct ScreenView: View {
-    private static let nesResolution = (w: 256, h: 240)
-    private static let nesScale = 2
-
-    var body: some View {
-        ZStack {
-            Color(white: 0.15)
-                .cornerRadius(5)
-                .frame(width: .init(Self.nesResolution.w * Self.nesScale),
-                       height: .init(Self.nesResolution.h * Self.nesScale))
-            Color.cyan
-                .frame(width: .init(Self.nesResolution.w),
-                       height: .init(Self.nesResolution.h))
-            Text("Emu Screen")
-        }
-    }
-}
-
-struct SystemView: View {
-    var body: some View {
-        TabView {
-            CartView()
-                .tabItem {
-                    Text("Cart")
-                }
-            EmuDetailsView()
-                .tabItem {
-                    Text("Details")
-                }
-                .border(.blue)
-            Text("Debugger stuff")
-                .border(.gray)
-                .tabItem {
-                    Text("Debug")
-                }
-            Text("Trace Log")
-                .tabItem {
-                    Text("Trace")
-                }
-        }
-    }
-}
-
-struct EmulatorView: View {
-    private static let nesResolution = (w: 256, h: 240)
-    private static let nesScale = 2
-
-    var body: some View {
-        HStack {
-            ZStack {
-                Color(white: 0.15)
-                    .cornerRadius(5)
-                    .frame(width: .init(Self.nesResolution.w * Self.nesScale),
-                           height: .init(Self.nesResolution.h * Self.nesScale))
-                Color.cyan
-                    .frame(width: .init(Self.nesResolution.w),
-                           height: .init(Self.nesResolution.h))
-                Text("Emu Screen")
-            }
-            TabView {
-                EmuDetailsView()
-                    .tabItem {
-                        Text("Details")
-                    }
-                    .border(.blue)
-                Text("Debugger stuff")
-                    .border(.gray)
-                    .tabItem {
-                        Text("Debug")
-                    }
-                Text("Trace Log")
-                    .tabItem {
-                        Text("Trace")
-                    }
-            }
-        }
-    }
-}
-
-struct EmuDetailsView: View {
+struct CpuView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack(alignment: .top) {
@@ -155,8 +76,8 @@ struct EmuDetailsView: View {
     }
 }
 
-struct EmulatorView_Previews: PreviewProvider {
+struct CpuView_Previews: PreviewProvider {
     static var previews: some View {
-        EmulatorView()
+        CpuView()
     }
 }

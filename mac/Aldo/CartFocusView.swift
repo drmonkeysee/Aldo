@@ -11,7 +11,7 @@ struct CartFocusView: View {
     var body: some View {
         VStack(alignment: .leading) {
             GroupBox {
-                InstructionDetailsView()
+                InstructionDefinitionView()
             } label: {
                 Label("Selected Instruction", systemImage: "pencil")
                     .font(.headline)
@@ -28,7 +28,7 @@ struct CartFocusView: View {
     }
 }
 
-fileprivate struct InstructionDetailsView: View {
+fileprivate struct InstructionDefinitionView: View {
     static private let blank = "--"
 
     @EnvironmentObject var listing: ProgramListing

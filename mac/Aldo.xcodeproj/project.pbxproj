@@ -32,11 +32,12 @@
 		C85CC20927ED6BF30063276D /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C85CC20827ED6BF30063276D /* snapshot.c */; };
 		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
 		C86A4F4828543C01007973D1 /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
+		C86B6A8228D0332000AA263A /* CpuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86B6A8128D0332000AA263A /* CpuView.swift */; };
 		C8702CF9278A58C900725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C8702CF8278A58C900725690 /* haltexpr.c */; };
 		C8702CFA278A598A00725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C88949B12813B2DB00795CC0 /* ChrSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88949B02813B2DB00795CC0 /* ChrSheet.swift */; };
 		C88A5E8527F6A1750039382D /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88A5E8427F6A1750039382D /* CartView.swift */; };
-		C88F3E5727D9A45E00317732 /* EmulatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88F3E5627D9A45E00317732 /* EmulatorView.swift */; };
+		C88F3E5727D9A45E00317732 /* ScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88F3E5627D9A45E00317732 /* ScreenView.swift */; };
 		C89D715027D4758900C9177A /* CartPrgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89D714F27D4758900C9177A /* CartPrgView.swift */; };
 		C8A5B77B27DD79AE00A4DD5E /* Cart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A5B77A27DD79AE00A4DD5E /* Cart.swift */; };
 		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
@@ -144,10 +145,11 @@
 		C85C8DC525BD29AC00611D19 /* dis.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dis.c; sourceTree = "<group>"; };
 		C85CC20827ED6BF30063276D /* snapshot.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = snapshot.c; sourceTree = "<group>"; };
 		C86030772761A51100F1B27D /* cpupeek.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpupeek.c; sourceTree = "<group>"; };
+		C86B6A8128D0332000AA263A /* CpuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CpuView.swift; sourceTree = "<group>"; };
 		C8702CF8278A58C900725690 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
 		C88949B02813B2DB00795CC0 /* ChrSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChrSheet.swift; sourceTree = "<group>"; };
 		C88A5E8427F6A1750039382D /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
-		C88F3E5627D9A45E00317732 /* EmulatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulatorView.swift; sourceTree = "<group>"; };
+		C88F3E5627D9A45E00317732 /* ScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenView.swift; sourceTree = "<group>"; };
 		C89D714F27D4758900C9177A /* CartPrgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartPrgView.swift; sourceTree = "<group>"; };
 		C8A5B77A27DD79AE00A4DD5E /* Cart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cart.swift; sourceTree = "<group>"; };
 		C8B4664327755790000576EE /* argparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = argparse.h; sourceTree = "<group>"; };
@@ -390,7 +392,8 @@
 				C88A5E8427F6A1750039382D /* CartView.swift */,
 				C8B87D46285E82BD000E0D2E /* CommandViews.swift */,
 				C8DBC91127C8708A0043994B /* ContentView.swift */,
-				C88F3E5627D9A45E00317732 /* EmulatorView.swift */,
+				C86B6A8128D0332000AA263A /* CpuView.swift */,
+				C88F3E5627D9A45E00317732 /* ScreenView.swift */,
 				C8DBC91327C8708B0043994B /* Assets.xcassets */,
 				C8DBC91827C8708B0043994B /* Aldo.entitlements */,
 				C8DBC91527C8708B0043994B /* Preview Content */,
@@ -632,6 +635,7 @@
 				C83C663A27E2F52C009CE42C /* bus.c in Sources */,
 				C8FB31D12803D6EC00E6B0EF /* AldoError.swift in Sources */,
 				C8B87D47285E82BD000E0D2E /* CommandViews.swift in Sources */,
+				C86B6A8228D0332000AA263A /* CpuView.swift in Sources */,
 				C83C663827E2F4EF009CE42C /* mappers.c in Sources */,
 				C83C663927E2F4FE009CE42C /* bytes.c in Sources */,
 				C89D715027D4758900C9177A /* CartPrgView.swift in Sources */,
@@ -644,7 +648,7 @@
 				C8DBC91227C8708A0043994B /* ContentView.swift in Sources */,
 				C88949B12813B2DB00795CC0 /* ChrSheet.swift in Sources */,
 				C8A5B77B27DD79AE00A4DD5E /* Cart.swift in Sources */,
-				C88F3E5727D9A45E00317732 /* EmulatorView.swift in Sources */,
+				C88F3E5727D9A45E00317732 /* ScreenView.swift in Sources */,
 				C8DBC91027C8708A0043994B /* AldoApp.swift in Sources */,
 				C8C9FB662803F8BD0093D9A7 /* decode.c in Sources */,
 				C8ED8339284DAA5100B563EC /* control.c in Sources */,

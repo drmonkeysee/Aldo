@@ -19,21 +19,9 @@ struct ContentView: View {
         HStack(alignment: .top, spacing: Self.inset) {
             VStack {
                 ScreenView()
-                HStack {
-                    GroupBox {
-                        Text("Running Stats")
-                            .frame(maxWidth: .infinity)
-                    } label: {
-                        Label("Stats", systemImage: "laptopcomputer")
-                    }
-                    .frame(maxWidth: .infinity)
-                    GroupBox {
-                        Text("Controls")
-                            .frame(maxWidth: .infinity)
-                    } label: {
-                        Label("Controls", systemImage: "gamecontroller")
-                    }
-                    .frame(maxWidth: .infinity)
+                HStack(alignment: .top) {
+                    TraitsView()
+                    ControlsView()
                 }
             }
             .padding([.leading, .top], Self.inset)
@@ -109,6 +97,49 @@ struct ContentView: View {
         panel.message = "Choose a ROM file"
         if panel.runModal() == .OK {
             cartLoadFailed = !cart.load(from: panel.url)
+        }
+    }
+}
+
+fileprivate struct TraitsView: View {
+    var body: some View {
+        GroupBox {
+            Group {
+                Text("FPS: 60 (50.54)")
+                Text("ΔT: 20.291 (+14.876)")
+                Text("Frames: 286")
+                Text("Runtime: 5.659")
+                Text("Cycles: 0")
+                Text("Master Clock: INF Hz")
+                Text("CPU/PPU Clock: INF/INF Hz")
+                Text("Cycles per Second: 4")
+                Text("Cycles per Frame: N/A")
+                Text("BCD Supported: No")
+            }
+            .frame(maxWidth: .infinity)
+        } label: {
+            Label("Traits", systemImage: "server.rack")
+        }
+    }
+}
+
+fileprivate struct ControlsView: View {
+    var body: some View {
+        GroupBox {
+            Group {
+                Text("HALT")
+                Text("Mode:  Cycle  Step  Run")
+                Text("Signal:  IRQ  NMI  RES")
+                Text("Halt/Run: <Space>")
+                Text("Mode: m/M")
+                Text("Signal: i, n, s")
+                Text("Speed ±1 (±10): -/= (_/+)")
+                Text("Ram F/B: r/R")
+                Text("Quit: q")
+            }
+            .frame(maxWidth: .infinity)
+        } label: {
+            Label("Controls", systemImage: "gamecontroller")
         }
     }
 }

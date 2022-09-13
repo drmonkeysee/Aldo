@@ -192,7 +192,7 @@ static void emu_loop(struct control *appstate, struct console_state *snapshot,
             nes_snapshot(console, snapshot);
             ui->refresh(appstate, snapshot);
         }
-        ui->tick_end();
+        ui->tick_end(appstate);
     } while (appstate->running);
 }
 

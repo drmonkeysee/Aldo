@@ -24,7 +24,6 @@ static const char *const restrict DistractorFormat = "%c Running\u2026";
 
 static struct timespec Current, Previous, Start;
 static double AvgFrameTimeMs, FrameTimeMs;
-static uint64_t Ticks;
 
 static void clearline(void)
 {
@@ -71,7 +70,8 @@ static void batch_tick_start(struct control *appstate,
 
     // NOTE: cumulative moving average:
     // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-    AvgFrameTimeMs = (FrameTimeMs + (Ticks * AvgFrameTimeMs)) / (Ticks + 1);
+    const uint64_t ticks = appstate->clock.frames;
+    AvgFrameTimeMs = (FrameTimeMs + (ticks * AvgFrameTimeMs)) / (ticks + 1);
 
     // NOTE: arbitrary per-tick budget, 6502s often ran at 1 MHz so a million
     // cycles per tick seems as good a number as any.
@@ -83,10 +83,10 @@ static void batch_tick_start(struct control *appstate,
     }
 }
 
-static void batch_tick_end(void)
+static void batch_tick_end(struct control *appstate)
 {
     Previous = Current;
-    ++Ticks;
+    ++appstate->clock.frames;
 }
 
 static int batch_pollinput(void)

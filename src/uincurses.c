@@ -98,16 +98,18 @@ static void drawhwtraits(const struct control *appstate)
 
     int cursor_y = 0;
     werase(HwView.content);
-    mvwprintw(HwView.content, cursor_y++, 0, "FPS: %d", Fps);
+    mvwprintw(HwView.content, cursor_y++, 0, "FPS: %d (%.2f)", Fps,
+              appstate->clock.frames / appstate->clock.runtime);
     mvwprintw(HwView.content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_frametime, display_frameleft);
+    mvwprintw(HwView.content, cursor_y++, 0, "Frames: %" PRIu64,
+              appstate->clock.frames);
     mvwprintw(HwView.content, cursor_y++, 0, "Runtime: %.3f",
               appstate->clock.runtime);
-    mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
-    mvwaddstr(HwView.content, cursor_y++, 0, "CPU Clock: INF Hz");
-    mvwaddstr(HwView.content, cursor_y++, 0, "PPU Clock: INF Hz");
     mvwprintw(HwView.content, cursor_y++, 0, "Cycles: %" PRIu64,
               appstate->clock.total_cycles);
+    mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
+    mvwaddstr(HwView.content, cursor_y++, 0, "CPU/PPU Clock: INF/INF Hz");
     mvwprintw(HwView.content, cursor_y++, 0, "Cycles per Second: %d",
               appstate->clock.cycles_per_sec);
     mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
@@ -584,9 +586,10 @@ static void ncurses_tick_start(struct control *appstate,
     TimeBudgetMs -= new_cycles * mspercycle;
 }
 
-static void ncurses_tick_end(void)
+static void ncurses_tick_end(struct control *appstate)
 {
     Previous = Current;
+    ++appstate->clock.frames;
     tick_sleep();
 }
 

@@ -24,7 +24,7 @@ enum {
 struct ui_interface {
     void (*tick_start)(struct control *appstate,
                        const struct console_state *snapshot);
-    void (*tick_end)(void);
+    void (*tick_end)(struct control *appstate);
     int (*pollinput)(void);
     void (*refresh)(const struct control *appstate,
                     const struct console_state *snapshot);

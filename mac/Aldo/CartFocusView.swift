@@ -18,8 +18,7 @@ struct CartFocusView: View {
             }
             GroupBox {
                 CartInfoView()
-                    .font(.footnote)
-                    .frame(maxWidth: .infinity)
+                    .frame(minWidth: 270, maxWidth: .infinity)
             } label: {
                 Label("Cart Format", systemImage: "scribble")
                     .font(.headline)

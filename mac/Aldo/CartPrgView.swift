@@ -19,7 +19,7 @@ fileprivate struct ProgramView: View {
     @ObservedObject var blocks: ProgramBlocks
 
     var body: some View {
-        HStack(alignment: .top) {
+        HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .leading) {
                 if blocks.count > 0 {
                     BlockSelectionView(blocks: blocks)
@@ -31,9 +31,11 @@ fileprivate struct ProgramView: View {
                 }
             }
             .frame(width: 255)
+            .padding(5)
             Divider()
             CartFocusView()
                 .frame(maxHeight: .infinity, alignment: .top)
+                .padding(5)
         }
         .environmentObject(blocks.currentListing)
     }

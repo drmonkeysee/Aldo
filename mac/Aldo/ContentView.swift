@@ -23,6 +23,11 @@ struct ContentView: View {
 
     var body: some View {
         TabView {
+            CartView()
+                .tabItem {
+                    Text("Cart")
+                }
+                .environmentObject(model.cart)
             ScreenView(scene: model.driver)
                 .tabItem {
                     Text("NES")
@@ -33,11 +38,6 @@ struct ContentView: View {
                         cornerRadius: 5)
                     .stroke(.black, lineWidth: 1))
                 .padding(Self.inset)
-            CartView()
-                .tabItem {
-                    Text("Cart")
-                }
-                .environmentObject(model.cart)
         }
         .navigationTitle(model.cart.name ?? appName)
         .toolbar {

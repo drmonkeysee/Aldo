@@ -23,17 +23,15 @@ struct CartChrView: View {
             }
             switch cart.info {
             case .iNes where cart.info.chrBlocks > 0:
-                HStack {
-                    ChrBlocksView(blocks: ChrBlocks(cart))
-                    PaletteView()
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                ChrBlocksView(blocks: ChrBlocks(cart))
+                PaletteView()
             case .iNes:
                 NoChrView(reason: "Cart uses CHR RAM")
             default:
                 NoChrView(reason: "No CHR ROM Available")
             }
         }
+        .padding([.leading, .top, .bottom], 5)
     }
 
     private func chrLabel() -> some View {
@@ -55,17 +53,17 @@ fileprivate struct ChrBlocksView: View {
     let blocks: ChrBlocks
 
     var body: some View {
-        ScrollView {
-            LazyVStack {
+        ScrollView(.horizontal) {
+            LazyHStack {
                 ForEach(0..<blocks.count, id: \.self) {
                     ChrSheetView(sheet: blocks.sheet(at: $0))
                 }
             }
-            //.padding(Constraints.sheetPadding)
+            .padding(Constraints.sheetPadding)
         }
-        .fixedSize(horizontal: true, vertical: false)
-        //.frame(height: Constraints.sheetSize.h + 100)
-        //.padding(.trailing, Constraints.sheetPadding)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(width: Constraints.outerWidth)
+        .padding(.trailing, Constraints.sheetPadding)
     }
 }
 
@@ -134,8 +132,8 @@ fileprivate struct NoChrView: View {
 fileprivate struct PaletteView: View {
     var body: some View {
         Text("Palette")
-            .frame(width: Constraints.sheetSize.w / 8,
-                   height: Constraints.sheetSize.h)
+            .frame(width: Constraints.sheetSize.w / 2,
+                   height: Constraints.sheetSize.h / 2)
             .background(.cyan)
             .cornerRadius(Constraints.cornerRadius)
             .padding(.trailing, Constraints.sheetPadding)

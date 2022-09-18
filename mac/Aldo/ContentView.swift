@@ -7,19 +7,27 @@
 
 import SwiftUI
 
+final class ContentModel: ObservableObject {
+    let cart = Cart()
+    let driver = EmulatorScene()
+
+    var frameClock: FrameClock { driver.clock }
+}
+
 struct ContentView: View {
     private static let fileLabel = "Open ROM File"
     private static let inset = 5.0
 
     @State private var cartLoadFailed = false
-    @StateObject private var cart = Cart()
+    @StateObject private var model = ContentModel()
 
     var body: some View {
         HStack(alignment: .top, spacing: Self.inset) {
             VStack {
-                ScreenView()
+                ScreenView(scene: model.driver)
                 HStack(alignment: .top) {
                     TraitsView()
+                        .environmentObject(model.frameClock)
                     ControlsView()
                 }
             }
@@ -36,9 +44,9 @@ struct ContentView: View {
                     }
             }
             .padding([.trailing, .bottom], Self.inset)
-            .environmentObject(cart)
+            .environmentObject(model.cart)
         }
-        .navigationTitle(cart.name ?? appName)
+        .navigationTitle(model.cart.name ?? appName)
         .toolbar {
             ToolbarItem {
                 Button(action: pickFile) {
@@ -49,7 +57,7 @@ struct ContentView: View {
             }
         }
         .alert("Rom Load Failure", isPresented: $cartLoadFailed,
-               presenting: cart.currentError) { _ in
+               presenting: model.cart.currentError) { _ in
             // NOTE: default action
         } message: {
             Text($0.message)
@@ -65,12 +73,14 @@ struct ContentView: View {
         let panel = NSOpenPanel()
         panel.message = "Choose a ROM file"
         if panel.runModal() == .OK {
-            cartLoadFailed = !cart.load(from: panel.url)
+            cartLoadFailed = !model.cart.load(from: panel.url)
         }
     }
 }
 
 fileprivate struct TraitsView: View {
+    @EnvironmentObject var clock: FrameClock
+
     var body: some View {
         GroupBox {
             Group {

@@ -9,9 +9,9 @@ import SwiftUI
 
 final class ContentModel: ObservableObject {
     let cart = Cart()
-    let driver = EmulatorScene()
+    let renderer = EmulatorScene()
 
-    var frameClock: FrameClock { driver.clock }
+    var frameClock: FrameClock { renderer.clock }
 }
 
 struct ContentView: View {
@@ -23,12 +23,7 @@ struct ContentView: View {
 
     var body: some View {
         TabView {
-            CartView()
-                .tabItem {
-                    Text("Cart")
-                }
-                .environmentObject(model.cart)
-            ScreenView(scene: model.driver)
+            EmulationView(scene: model.renderer)
                 .tabItem {
                     Text("NES")
                 }
@@ -38,6 +33,11 @@ struct ContentView: View {
                         cornerRadius: 5)
                     .stroke(.black, lineWidth: 1))
                 .padding(Self.inset)
+            CartView()
+                .tabItem {
+                    Text("Cart")
+                }
+                .environmentObject(model.cart)
         }
         .navigationTitle(model.cart.name ?? appName)
         .toolbar {

@@ -84,10 +84,10 @@ fileprivate struct TraitsView: View {
     var body: some View {
         GroupBox {
             Group {
-                Text("FPS: 60 (50.54)")
-                Text("ΔT: 20.291 (+14.876)")
-                Text("Frames: 286")
-                Text("Runtime: 5.659")
+                Text("FPS: \(FrameClock.targetFps) (\(String(format: "%.2f", 1 / clock.frameTime)))")
+                Text("ΔT: \(String(format: "%.3f", clock.frameTime * 1000)) (+14.876)")
+                Text("Frames: \(clock.info.frames)")
+                Text("Runtime: \(String(format: "%.3f", clock.info.runtime))")
                 Text("Cycles: 0")
                 Text("Master Clock: INF Hz")
                 Text("CPU/PPU Clock: INF/INF Hz")
@@ -97,7 +97,7 @@ fileprivate struct TraitsView: View {
             }
             .frame(maxWidth: .infinity)
         } label: {
-            Label("Traits", systemImage: "server.rack")
+            Label("Emulator Traits", systemImage: "server.rack")
         }
     }
 }

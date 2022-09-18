@@ -21,6 +21,7 @@ struct ScreenView: View {
                 .frame(width: .init(Self.nesResolution.w * Self.nesScale),
                        height: .init(Self.nesResolution.h * Self.nesScale))
             SpriteView(scene: scene,
+                       preferredFramesPerSecond: FrameClock.targetFps,
                        options: [.ignoresSiblingOrder,
                                  .shouldCullNonVisibleNodes],
                        debugOptions: [.showsFPS,

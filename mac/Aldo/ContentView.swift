@@ -22,29 +22,22 @@ struct ContentView: View {
     @StateObject private var model = ContentModel()
 
     var body: some View {
-        HStack(alignment: .top, spacing: Self.inset) {
-            VStack {
-                ScreenView(scene: model.driver)
-                HStack(alignment: .top) {
-                    TraitsView()
-                        .environmentObject(model.frameClock)
-                    ControlsView()
+        TabView {
+            ScreenView(scene: model.driver)
+                .tabItem {
+                    Text("NES")
                 }
-            }
-            .padding([.leading, .top], Self.inset)
-            Divider()
-            TabView {
-                CartView()
-                    .tabItem {
-                        Text("Cart")
-                    }
-                CpuView()
-                    .tabItem {
-                        Text("CPU")
-                    }
-            }
-            .padding([.trailing, .bottom], Self.inset)
-            .environmentObject(model.cart)
+                .cornerRadius(5)
+                .overlay(
+                    RoundedRectangle(
+                        cornerRadius: 5)
+                    .stroke(.black, lineWidth: 1))
+                .padding(Self.inset)
+            CartView()
+                .tabItem {
+                    Text("Cart")
+                }
+                .environmentObject(model.cart)
         }
         .navigationTitle(model.cart.name ?? appName)
         .toolbar {

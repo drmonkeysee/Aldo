@@ -13,36 +13,42 @@ final class EmulatorScene: SKScene {
     private static let waitFrames = 120
 
     let clock = FrameClock()
+    private let screen = SKSpriteNode(color: .cyan,
+                                      size: .init(width: 256, height: 240))
     private let block = SKSpriteNode(color: .yellow,
                                      size: .init(
                                         width: EmulatorScene.blockDim,
                                         height: EmulatorScene.blockDim))
-    private var velocity: CGPoint = .init(x: 1, y: 1)
+    private let otherBlock = SKSpriteNode(color: .blue,
+                                          size: .init(width: 256, height: 240))
+    private var velocity = CGVector(dx: 1, dy: 1)
     private var waitCount = 0
 
     override func didMove(to view: SKView) {
         size = view.bounds.size
-        backgroundColor = .cyan
-        block.position = .init(x: size.width / 2,
-                                    y: size.height / 2)
-        addChild(block)
+        scaleMode = .resizeFill
+        backgroundColor = .black
+        addChild(screen)
+        addChild(otherBlock)
+        screen.addChild(block)
+    }
+
+    override func didChangeSize(_ oldSize: CGSize) {
+        screen.position = .init(x: size.width / 2, y: size.height / 2)
     }
 
     override func update(_ currentTime: TimeInterval) {
-        clock.frameStart(currentTime)
-        if waitCount < Self.waitFrames {
-            waitCount += 1
-            return
+        block.position.x += velocity.dx
+        let screenHalfWidth = screen.size.width / 2
+        let screenHalfHeight = screen.size.height / 2
+        if block.position.x - Self.blockHalfDim < -screenHalfWidth
+            || block.position.x + Self.blockHalfDim >= screenHalfWidth {
+            velocity.dx = -velocity.dx
         }
-        block.position.x += velocity.x
-        if block.position.x - Self.blockHalfDim < 0
-            || block.position.x + Self.blockHalfDim >= size.width {
-            velocity.x = -velocity.x
-        }
-        block.position.y += velocity.y
-        if block.position.y - Self.blockHalfDim < 0
-            || block.position.y + Self.blockHalfDim >= size.height {
-            velocity.y = -velocity.y
+        block.position.y += velocity.dy
+        if block.position.y - Self.blockHalfDim < -screenHalfHeight
+            || block.position.y + Self.blockHalfDim >= screenHalfHeight {
+            velocity.dy = -velocity.dy
         }
     }
 

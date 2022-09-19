@@ -122,6 +122,7 @@ fileprivate struct EmulatorTraits: RenderElement {
                                    size: .init(width: 100, height: 200))
     private let fps = makeLabelNode()
     private let frames = makeLabelNode()
+    private let runtime = makeLabelNode()
 
     var rootNode: SKNode { get { box } }
 
@@ -131,13 +132,17 @@ fileprivate struct EmulatorTraits: RenderElement {
         fps.position = .init(x: leftMargin, y: topOffset)
         topOffset -= 15
         frames.position = .init(x: leftMargin, y: topOffset)
+        topOffset -= 15
+        runtime.position = .init(x: leftMargin, y: topOffset)
         box.addChild(fps)
         box.addChild(frames)
+        box.addChild(runtime)
         return box
     }
 
     func update(_ clock: FrameClock) {
         fps.text = "FPS: 60"
         frames.text = "Frames: \(clock.info.frames)"
+        runtime.text = "Runtime: \(String(format: "%.3f", clock.info.runtime))"
     }
 }

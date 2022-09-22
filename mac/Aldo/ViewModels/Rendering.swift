@@ -13,6 +13,7 @@ final class EmulatorScene: SKScene {
     let clock = FrameClock()
     private let testAnimation = AnimationTest()
     private let traits = EmulatorTraits()
+    private let ram = RamViewer()
     private let otherBlock = SKSpriteNode(color: .blue,
                                           size: .init(width: 256, height: 240))
     private var waitCount = 0
@@ -23,19 +24,23 @@ final class EmulatorScene: SKScene {
         backgroundColor = .black
         addChild(testAnimation.createRenderNode())
         addChild(traits.createRenderNode())
+        addChild(ram.createRenderNode())
     }
 
     override func didChangeSize(_ oldSize: CGSize) {
         testAnimation.rootNode.position = .init(x: size.width / 2,
                                                 y: size.height / 2)
-        traits.rootNode.position = .init(x: (100 / 2) + 5,
+        traits.rootNode.position = .init(x: (150 / 2) + 5,
                                          y: size.height - (200 / 2) - 5)
+        ram.rootNode.position = .init(x: (300 / 2) + 160,
+                                      y: size.height - (500 / 2) - 5)
     }
 
     override func update(_ currentTime: TimeInterval) {
         clock.frameStart(currentTime)
         testAnimation.update(clock)
         traits.update(clock)
+        ram.update(clock)
     }
 
     override func didFinishUpdate() {
@@ -119,7 +124,7 @@ fileprivate final class AnimationTest: RenderElement {
 
 fileprivate struct EmulatorTraits: RenderElement {
     private let box = SKSpriteNode(color: .darkGray,
-                                   size: .init(width: 100, height: 200))
+                                   size: .init(width: 150, height: 200))
     private let fps = makeLabelNode()
     private let frames = makeLabelNode()
     private let runtime = makeLabelNode()
@@ -144,5 +149,32 @@ fileprivate struct EmulatorTraits: RenderElement {
         fps.text = "FPS: 60"
         frames.text = "Frames: \(clock.info.frames)"
         runtime.text = "Runtime: \(String(format: "%.3f", clock.info.runtime))"
+    }
+}
+
+fileprivate struct RamViewer: RenderElement {
+    private let box = SKSpriteNode(color: .darkGray,
+                                   size: .init(width: 300, height: 500))
+    private let byteLabels = (0..<32).map { _ in makeLabelNode() }
+
+    var rootNode: SKNode { box }
+
+    func createRenderNode() -> SKNode {
+        let leftMargin = -(box.size.width / 2) + 5
+        var topOffset = (box.size.height / 2) - 20
+        for y in 0..<32 {
+            let lbl = byteLabels[y]
+            lbl.position = .init(x: leftMargin, y: topOffset)
+            box.addChild(lbl)
+            topOffset -= 15
+        }
+        return box
+    }
+
+    func update(_ clock: FrameClock) {
+        for lbl in byteLabels {
+            let bytes = (0..<16).map { _ in String(format: "%02X", UInt8.random(in: 0...255)) }
+            lbl.text = bytes.joined(separator: " ")
+        }
     }
 }

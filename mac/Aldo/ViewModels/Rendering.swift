@@ -28,12 +28,12 @@ final class EmulatorScene: SKScene {
     }
 
     override func didChangeSize(_ oldSize: CGSize) {
-        testAnimation.rootNode.position = .init(x: size.width / 2,
-                                                y: size.height / 2)
-        traits.rootNode.position = .init(x: (150 / 2) + 5,
-                                         y: size.height - (200 / 2) - 5)
-        ram.rootNode.position = .init(x: (300 / 2) + 160,
-                                      y: size.height - (500 / 2) - 5)
+        testAnimation.rootPosition = .init(x: size.width / 2,
+                                           y: size.height / 2)
+        traits.rootPosition = .init(x: (150 / 2) + 5,
+                                    y: size.height - (200 / 2) - 5)
+        ram.rootPosition = .init(x: (300 / 2) + 160,
+                                 y: size.height - (500 / 2) - 5)
     }
 
     override func update(_ currentTime: TimeInterval) {
@@ -75,7 +75,7 @@ final class FrameClock: ObservableObject {
 }
 
 fileprivate protocol RenderElement {
-    var rootNode: SKNode { get }
+    var rootPosition: CGPoint { get set }
 
     func createRenderNode() -> SKNode
     func update(_ clock: FrameClock)
@@ -97,7 +97,10 @@ fileprivate final class AnimationTest: RenderElement {
                                        size: .init(width: 50, height: 50))
     private var velocity = CGVector(dx: 1, dy: 1)
 
-    var rootNode: SKNode { get { bounds }}
+    var rootPosition: CGPoint {
+        get { bounds.position }
+        set(value) { bounds.position = value }
+    }
 
     func createRenderNode() -> SKNode {
         bounds.addChild(bouncer)
@@ -122,14 +125,17 @@ fileprivate final class AnimationTest: RenderElement {
     }
 }
 
-fileprivate struct EmulatorTraits: RenderElement {
+fileprivate final class EmulatorTraits: RenderElement {
     private let box = SKSpriteNode(color: .darkGray,
                                    size: .init(width: 150, height: 200))
     private let fps = makeLabelNode()
     private let frames = makeLabelNode()
     private let runtime = makeLabelNode()
 
-    var rootNode: SKNode { get { box } }
+    var rootPosition: CGPoint {
+        get { box.position }
+        set(value) { box.position = value }
+    }
 
     func createRenderNode() -> SKNode {
         let leftMargin = -(box.size.width / 2) + 5
@@ -152,12 +158,15 @@ fileprivate struct EmulatorTraits: RenderElement {
     }
 }
 
-fileprivate struct RamViewer: RenderElement {
+fileprivate final class RamViewer: RenderElement {
     private let box = SKSpriteNode(color: .darkGray,
                                    size: .init(width: 300, height: 500))
     private let byteLabels = (0..<32).map { _ in makeLabelNode() }
 
-    var rootNode: SKNode { box }
+    var rootPosition: CGPoint {
+        get { box.position }
+        set(value) { box.position = value }
+    }
 
     func createRenderNode() -> SKNode {
         let leftMargin = -(box.size.width / 2) + 5

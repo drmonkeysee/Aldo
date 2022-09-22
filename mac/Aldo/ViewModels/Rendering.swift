@@ -54,22 +54,29 @@ final class FrameClock: ObservableObject {
 
     @Published private(set) var info = cycleclock()
     @Published private(set) var frameTime = 0.0
-    @Published private(set) var frameLeft = 0.0
+    @Published private(set) var used = 0.0
+    @Published private(set) var renderTime = 0.0
     private var current = 0.0
     private var previous = 0.0
     private var start: Double?
+    private var frameStart = 0.0
+    private var elapsed = 0.0
 
     func frameStart(_ currentTime: TimeInterval) {
         if start == nil {
             start = currentTime
         }
+        frameStart = ProcessInfo.processInfo.systemUptime
         current = currentTime
         frameTime = current - previous
+        renderTime = (frameStart - elapsed) * 1000
         info.runtime = current - start!
     }
 
     func frameEnd() {
         previous = current
+        elapsed = ProcessInfo.processInfo.systemUptime
+        used = elapsed - frameStart
         info.frames += 1
     }
 }
@@ -129,6 +136,8 @@ fileprivate final class EmulatorTraits: RenderElement {
     private let box = SKSpriteNode(color: .darkGray,
                                    size: .init(width: 150, height: 200))
     private let fps = makeLabelNode()
+    private let used = makeLabelNode()
+    private let renderTime = makeLabelNode()
     private let frames = makeLabelNode()
     private let runtime = makeLabelNode()
 
@@ -142,10 +151,16 @@ fileprivate final class EmulatorTraits: RenderElement {
         var topOffset = (box.size.height / 2) - 10
         fps.position = .init(x: leftMargin, y: topOffset)
         topOffset -= 15
+        used.position = .init(x: leftMargin, y: topOffset)
+        topOffset -= 15
+        renderTime.position = .init(x: leftMargin, y: topOffset)
+        topOffset -= 15
         frames.position = .init(x: leftMargin, y: topOffset)
         topOffset -= 15
         runtime.position = .init(x: leftMargin, y: topOffset)
         box.addChild(fps)
+        box.addChild(used)
+        box.addChild(renderTime)
         box.addChild(frames)
         box.addChild(runtime)
         return box
@@ -153,6 +168,8 @@ fileprivate final class EmulatorTraits: RenderElement {
 
     func update(_ clock: FrameClock) {
         fps.text = "FPS: 60"
+        used.text = String(format: "%+.3f", clock.used)
+        renderTime.text = String(format: "%.3f", clock.renderTime)
         frames.text = "Frames: \(clock.info.frames)"
         runtime.text = "Runtime: \(String(format: "%.3f", clock.info.runtime))"
     }

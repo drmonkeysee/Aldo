@@ -9,7 +9,7 @@ import Foundation
 
 // NOTE: cli target used for IDE editor support
 
-print("Aldo CLI Started...")
+print("Aldo CLI started...")
 
 let result = cli_run(CommandLine.argc, CommandLine.unsafeArgv)
 

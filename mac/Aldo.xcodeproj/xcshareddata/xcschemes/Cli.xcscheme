@@ -7,7 +7,7 @@
       buildImplicitDependencies = "YES">
       <BuildActionEntries>
          <BuildActionEntry
-            buildForTesting = "YES"
+            buildForTesting = "NO"
             buildForRunning = "YES"
             buildForProfiling = "YES"
             buildForArchiving = "YES"
@@ -15,8 +15,22 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C820E6BB25A9759A006A7AB1"
-               BuildableName = "Dev"
-               BlueprintName = "Dev"
+               BuildableName = "Cli"
+               BlueprintName = "Cli"
+               ReferencedContainer = "container:Aldo.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "C8184D3A25E7496B002B3100"
+               BuildableName = "Tests.xctest"
+               BlueprintName = "Tests"
                ReferencedContainer = "container:Aldo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -49,14 +63,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
-      allowLocationSimulation = "YES">
+      allowLocationSimulation = "YES"
+      viewDebuggingEnabled = "No">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C820E6BB25A9759A006A7AB1"
-            BuildableName = "Dev"
-            BlueprintName = "Dev"
+            BuildableName = "Cli"
+            BlueprintName = "Cli"
             ReferencedContainer = "container:Aldo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -78,8 +93,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C820E6BB25A9759A006A7AB1"
-            BuildableName = "Dev"
-            BlueprintName = "Dev"
+            BuildableName = "Cli"
+            BlueprintName = "Cli"
             ReferencedContainer = "container:Aldo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

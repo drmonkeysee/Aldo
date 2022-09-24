@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C8DBC90C27C8708A0043994B"
-               BuildableName = "Aldo.app"
-               BlueprintName = "Aldo"
+               BuildableName = "AldoSwiftUI.app"
+               BlueprintName = "AldoSwiftUI"
                ReferencedContainer = "container:Aldo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -33,8 +33,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C8DBC91C27C8708B0043994B"
-               BuildableName = "AldoTests.xctest"
-               BlueprintName = "AldoTests"
+               BuildableName = "AldoSwiftUITests.xctest"
+               BlueprintName = "AldoSwiftUITests"
                ReferencedContainer = "container:Aldo.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -55,8 +55,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C8DBC90C27C8708A0043994B"
-            BuildableName = "Aldo.app"
-            BlueprintName = "Aldo"
+            BuildableName = "AldoSwiftUI.app"
+            BlueprintName = "AldoSwiftUI"
             ReferencedContainer = "container:Aldo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -72,8 +72,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C8DBC90C27C8708A0043994B"
-            BuildableName = "Aldo.app"
-            BlueprintName = "Aldo"
+            BuildableName = "AldoSwiftUI.app"
+            BlueprintName = "AldoSwiftUI"
             ReferencedContainer = "container:Aldo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

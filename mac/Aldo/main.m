@@ -1,6 +1,6 @@
 //
 //  main.m
-//  Aldo-App
+//  Aldo-Gui
 //
 //  Created by Brandon Stansbury on 9/23/22.
 //
@@ -9,6 +9,8 @@
 
 int main(int argc, const char *argv[argc+1])
 {
-    NSLog(@"Aldo GUI started...");
+    @autoreleasepool {
+        NSLog(@"Aldo GUI started...");
+    }
     return NSApplicationMain(argc, argv);
 }

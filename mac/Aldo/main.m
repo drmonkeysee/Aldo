@@ -21,11 +21,12 @@ int main(int argc, char *argv[argc+1])
         return EXIT_FAILURE;
     }
 
+    const int winw = 800, winh = 600;
     int status = EXIT_SUCCESS;
     SDL_Window *const window = SDL_CreateWindow("Aldo",
                                                 SDL_WINDOWPOS_UNDEFINED,
                                                 SDL_WINDOWPOS_UNDEFINED,
-                                                800, 600, 0);
+                                                winw, winh, 0);
     if (!window) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "SDL window creation failure: %s", SDL_GetError());
@@ -44,10 +45,6 @@ int main(int argc, char *argv[argc+1])
         goto exit_window;
     }
 
-    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-    SDL_RenderClear(renderer);
-    SDL_RenderPresent(renderer);
-
     SDL_Event ev;
     bool running = true;
     do {
@@ -56,6 +53,19 @@ int main(int argc, char *argv[argc+1])
                 running = false;
             }
         }
+
+        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, SDL_ALPHA_OPAQUE);
+        SDL_RenderClear(renderer);
+
+        const int w = 256, h = 240;
+        const SDL_Rect box = {(winw - w) / 2, (winh - h) / 2, w, h};
+        SDL_SetRenderDrawColor(renderer, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
+        SDL_RenderFillRect(renderer, &box);
+
+        SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
+        SDL_RenderDrawLine(renderer, 200, 100, 600, 500);
+
+        SDL_RenderPresent(renderer);
     } while (running);
 
     SDL_DestroyRenderer(renderer);

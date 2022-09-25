@@ -11,22 +11,41 @@
 #include <SDL2/SDL.h>
 
 #include <exception>
+#include <stdexcept>
 
 #include <cstdlib>
 
 namespace
 {
 
-int sdl_demo(const aldo::initopts& opts)
-{
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-                        "SDL initialization failure: %s", SDL_GetError());
-        return EXIT_FAILURE;
+class SDLRuntime final {
+public:
+    SDLRuntime()
+    {
+        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+            SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+                            "SDL initialization failure: %s", SDL_GetError());
+            throw std::runtime_error{"SDL init failure"};
+        }
+        SDL_Log("SDL INIT");
     }
 
+    SDLRuntime(const SDLRuntime&) = delete;
+    SDLRuntime& operator=(const SDLRuntime&) = delete;
+
+    ~SDLRuntime()
+    {
+        SDL_Log("SDL QUIT");
+        SDL_Quit();
+    }
+};
+
+auto sdl_demo(const aldo::initopts& opts)
+{
+    SDLRuntime initSdl;
+
     const int winw = 800, winh = 600;
-    Uint32 winflags = opts.hi_dpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0;
+    const Uint32 winflags = opts.hi_dpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0;
     SDL_Window* const window = SDL_CreateWindow("Aldo",
                                                 SDL_WINDOWPOS_UNDEFINED,
                                                 SDL_WINDOWPOS_UNDEFINED,
@@ -34,8 +53,6 @@ int sdl_demo(const aldo::initopts& opts)
     if (!window) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "SDL window creation failure: %s", SDL_GetError());
-        // TODO: fix with RAII
-        SDL_Quit();
         return EXIT_FAILURE;
     }
 
@@ -48,7 +65,6 @@ int sdl_demo(const aldo::initopts& opts)
                         "SDL renderer creation failure: %s", SDL_GetError());
         // TODO: fix with RAII
         SDL_DestroyWindow(window);
-        SDL_Quit();
         return EXIT_FAILURE;
     }
     SDL_RenderSetScale(renderer, opts.render_scale_factor,
@@ -95,7 +111,6 @@ int sdl_demo(const aldo::initopts& opts)
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    SDL_Quit();
     return EXIT_SUCCESS;
 }
 

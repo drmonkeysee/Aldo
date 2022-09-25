@@ -39,9 +39,10 @@ int main(int argc, char *argv[argc+1])
     SDL_Event ev;
     bool running = true;
     do {
-        SDL_PollEvent(&ev);
-        if (ev.type == SDL_QUIT) {
-            running = false;
+        while (SDL_PollEvent(&ev)) {
+            if (ev.type == SDL_QUIT) {
+                running = false;
+            }
         }
     } while (running);
 

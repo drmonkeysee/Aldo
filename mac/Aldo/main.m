@@ -9,15 +9,15 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 int main(int argc, char *argv[argc+1])
 {
     (void)argv;
-    puts("Aldo GUI started...");
+    SDL_Log("Aldo GUI started...");
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        fprintf(stderr, "SDL initialization failure: %s\n", SDL_GetError());
+        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+                        "SDL initialization failure: %s", SDL_GetError());
         return EXIT_FAILURE;
     }
 
@@ -27,7 +27,8 @@ int main(int argc, char *argv[argc+1])
                                                 SDL_WINDOWPOS_UNDEFINED,
                                                 800, 600, 0);
     if (!window) {
-        fprintf(stderr, "SDL window creation failure: %s\n", SDL_GetError());
+        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+                        "SDL window creation failure: %s", SDL_GetError());
         status = EXIT_FAILURE;
         goto exit_sdl;
     }

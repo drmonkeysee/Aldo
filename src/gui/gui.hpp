@@ -5,13 +5,15 @@
 //  Created by Brandon Stansbury on 9/24/22.
 //
 
-#ifndef Aldo_gui_hpp
-#define Aldo_gui_hpp
+#ifndef Aldo_gui_gui_hpp
+#define Aldo_gui_gui_hpp
+
+#include "options.h"
 
 namespace aldo
 {
 
-int run_with_args(int argc, char* argv[]);
+int run_with_args(int argc, char* argv[], const initopts& options);
 
 }
 

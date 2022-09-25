@@ -18,15 +18,16 @@
 // Public Interface
 //
 
-int aldo::run_with_args(int, char*[])
+int aldo::run_with_args(int, char*[], const initopts&)
 {
     return EXIT_SUCCESS;
 }
 
-int aldo::aldo_run_with_args(int argc, char* argv[]) noexcept
+int aldo::aldo_run_with_args(int argc, char* argv[],
+                             const initopts *opts) noexcept
 {
     try {
-        return run_with_args(argc, argv);
+        return run_with_args(argc, argv, *opts);
     } catch (const std::exception& ex) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                      "Unhandled error in Aldo: %s", ex.what());

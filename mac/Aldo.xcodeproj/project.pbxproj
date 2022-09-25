@@ -177,6 +177,7 @@
 		C8B0E66A28E01B760054547D /* gui.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gui.cpp; sourceTree = "<group>"; };
 		C8B0E66B28E01B760054547D /* gui.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = gui.hpp; sourceTree = "<group>"; };
 		C8B0E66D28E01C670054547D /* gui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gui.h; sourceTree = "<group>"; };
+		C8B0E66E28E021370054547D /* options.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = options.h; sourceTree = "<group>"; };
 		C8B4664327755790000576EE /* argparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = argparse.h; sourceTree = "<group>"; };
 		C8B4664427755790000576EE /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8B5303A2801300C00576D9F /* CartFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartFocusView.swift; sourceTree = "<group>"; };
@@ -436,6 +437,7 @@
 				C8B0E66D28E01C670054547D /* gui.h */,
 				C8B0E66B28E01B760054547D /* gui.hpp */,
 				C8B0E66A28E01B760054547D /* gui.cpp */,
+				C8B0E66E28E021370054547D /* options.h */,
 			);
 			path = gui;
 			sourceTree = "<group>";

@@ -8,6 +8,7 @@
 #import <AppKit/AppKit.h>
 
 #include "gui.h"
+#include "options.h"
 
 #include <SDL2/SDL.h>
 
@@ -17,7 +18,6 @@
 
 int main(int argc, char *argv[argc+1])
 {
-    (void)argv;
     SDL_Log("Aldo GUI started...");
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
@@ -26,7 +26,11 @@ int main(int argc, char *argv[argc+1])
     }
 
     const int winw = 800, winh = 600;
-    int status = aldo_run_with_args(argc, argv);
+    struct initopts opts = {.hi_dpi = true};
+    @autoreleasepool {
+        opts.render_scale_factor = NSScreen.mainScreen.backingScaleFactor;
+    }
+    int status = aldo_run_with_args(argc, argv, &opts);
     SDL_Window *const window = SDL_CreateWindow("Aldo",
                                                 SDL_WINDOWPOS_UNDEFINED,
                                                 SDL_WINDOWPOS_UNDEFINED,

@@ -5,6 +5,8 @@
 //  Created by Brandon Stansbury on 9/23/22.
 //
 
+#import <AppKit/AppKit.h>
+
 #include <SDL2/SDL.h>
 
 #include <stdbool.h>
@@ -45,6 +47,8 @@ int main(int argc, char *argv[argc+1])
         status = EXIT_FAILURE;
         goto exit_window;
     }
+    const float scale_factor = NSScreen.mainScreen.backingScaleFactor;
+    SDL_RenderSetScale(renderer, scale_factor, scale_factor);
 
     SDL_Event ev;
     bool running = true;

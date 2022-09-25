@@ -13,7 +13,7 @@
 namespace aldo
 {
 
-int run_with_args(int argc, char* argv[], const initopts& options);
+int run_with_args(int argc, char* argv[], const aldo::initopts& options);
 
 }
 

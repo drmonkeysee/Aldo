@@ -14,17 +14,27 @@
 
 #include <cstdlib>
 
-//
-// Public Interface
-//
+namespace
+{
 
-int aldo::run_with_args(int, char*[], const initopts&)
+int sdl_demo(const aldo::initopts&)
 {
     return EXIT_SUCCESS;
 }
 
+}
+
+//
+// Public Interface
+//
+
+int aldo::run_with_args(int, char*[], const aldo::initopts& opts)
+{
+    return sdl_demo(opts);
+}
+
 int aldo::aldo_run_with_args(int argc, char* argv[],
-                             const initopts *opts) noexcept
+                             const aldo::initopts *opts) noexcept
 {
     try {
         return run_with_args(argc, argv, *opts);

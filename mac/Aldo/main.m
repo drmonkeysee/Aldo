@@ -7,6 +7,8 @@
 
 #import <AppKit/AppKit.h>
 
+#include "gui.h"
+
 #include <SDL2/SDL.h>
 
 #include <stdbool.h>
@@ -24,7 +26,7 @@ int main(int argc, char *argv[argc+1])
     }
 
     const int winw = 800, winh = 600;
-    int status = EXIT_SUCCESS;
+    int status = aldo_run_with_args(argc, argv);
     SDL_Window *const window = SDL_CreateWindow("Aldo",
                                                 SDL_WINDOWPOS_UNDEFINED,
                                                 SDL_WINDOWPOS_UNDEFINED,

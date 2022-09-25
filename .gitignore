@@ -239,3 +239,4 @@ cython_debug/
 *.out
 *.r[ao]m
 !test/bcdtest.out
+ext/

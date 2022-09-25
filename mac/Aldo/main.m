@@ -52,6 +52,9 @@ int main(int argc, char *argv[argc+1])
 
     SDL_Event ev;
     bool running = true;
+    const SDL_Rect box = {(winw - 256) / 2, (winh - 240) / 2, 256, 240};
+    SDL_Rect bouncer = {(winw - 50) / 2, (winh - 50) / 2, 50, 50};
+    SDL_Point velocity = {1, 1};
     do {
         while (SDL_PollEvent(&ev)) {
             if (ev.type == SDL_QUIT) {
@@ -59,16 +62,26 @@ int main(int argc, char *argv[argc+1])
             }
         }
 
+        bouncer.x += velocity.x;
+        bouncer.y += velocity.y;
+        if (bouncer.x < box.x || (bouncer.x + bouncer.w) > (box.x + box.w)) {
+            velocity.x *= -1;
+        }
+        if (bouncer.y < box.y || (bouncer.y + bouncer.h) > (box.y + box.h)) {
+            velocity.y *= -1;
+        }
+
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
 
-        const int w = 256, h = 240;
-        const SDL_Rect box = {(winw - w) / 2, (winh - h) / 2, w, h};
         SDL_SetRenderDrawColor(renderer, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
         SDL_RenderFillRect(renderer, &box);
 
+        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
+        SDL_RenderFillRect(renderer, &bouncer);
+
         SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
-        SDL_RenderDrawLine(renderer, 200, 100, 600, 500);
+        SDL_RenderDrawLine(renderer, 100, 80, 250, 500);
 
         SDL_RenderPresent(renderer);
     } while (running);

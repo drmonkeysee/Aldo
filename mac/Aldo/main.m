@@ -49,6 +49,9 @@ int main(int argc, char *argv[argc+1])
     }
     const float scale_factor = NSScreen.mainScreen.backingScaleFactor;
     SDL_RenderSetScale(renderer, scale_factor, scale_factor);
+    SDL_RendererInfo info;
+    SDL_GetRendererInfo(renderer, &info);
+    SDL_Log("Render name: %s (%X)", info.name, info.flags);
 
     SDL_Event ev;
     bool running = true;

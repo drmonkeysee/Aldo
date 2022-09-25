@@ -88,6 +88,7 @@
 		C8DBC91427C8708B0043994B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8DBC91327C8708B0043994B /* Assets.xcassets */; };
 		C8DBC91727C8708B0043994B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8DBC91627C8708B0043994B /* Preview Assets.xcassets */; };
 		C8DBC92227C8708B0043994B /* AldoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBC92127C8708B0043994B /* AldoTests.swift */; };
+		C8DC9CB328DFD57B000D8D97 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; };
 		C8E76BAA285985CE004C1479 /* Commands.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E76BA9285985CE004C1479 /* Commands.swift */; };
 		C8ED8339284DAA5100B563EC /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
 		C8F2985B2810ECEF00ECFD7E /* CStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F2985A2810ECEF00ECFD7E /* CStream.swift */; };
@@ -212,6 +213,7 @@
 		C8DBC91827C8708B0043994B /* Aldo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Aldo.entitlements; sourceTree = "<group>"; };
 		C8DBC91D27C8708B0043994B /* AldoSwiftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AldoSwiftUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8DBC92127C8708B0043994B /* AldoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoTests.swift; sourceTree = "<group>"; };
+		C8DC9CB228DFD57B000D8D97 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../ext/SDL2.framework; sourceTree = "<group>"; };
 		C8E76BA9285985CE004C1479 /* Commands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Commands.swift; sourceTree = "<group>"; };
 		C8F2985A2810ECEF00ECFD7E /* CStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CStream.swift; sourceTree = "<group>"; };
 		C8FB31D02803D6EC00E6B0EF /* AldoError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoError.swift; sourceTree = "<group>"; };
@@ -239,6 +241,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8DC9CB328DFD57B000D8D97 /* SDL2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,6 +369,7 @@
 		C820E6DD25A982A5006A7AB1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C8DC9CB228DFD57B000D8D97 /* SDL2.framework */,
 				C8184D6F25E750E0002B3100 /* libcinytest.dylib */,
 				C820E6DE25A982A5006A7AB1 /* libncurses.tbd */,
 				C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */,

@@ -221,6 +221,7 @@
 		C8DBC91D27C8708B0043994B /* AldoSwiftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AldoSwiftUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8DBC92127C8708B0043994B /* AldoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoTests.swift; sourceTree = "<group>"; };
 		C8DC9CB228DFD57B000D8D97 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../ext/SDL2.framework; sourceTree = "<group>"; };
+		C8DC9CB828DFE5B4000D8D97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C8E76BA9285985CE004C1479 /* Commands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Commands.swift; sourceTree = "<group>"; };
 		C8F2985A2810ECEF00ECFD7E /* CStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CStream.swift; sourceTree = "<group>"; };
 		C8FB31D02803D6EC00E6B0EF /* AldoError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoError.swift; sourceTree = "<group>"; };
@@ -387,9 +388,10 @@
 		C830036228DEDDD100480F29 /* Aldo */ = {
 			isa = PBXGroup;
 			children = (
-				C830036628DEDDD200480F29 /* Assets.xcassets */,
 				C830036B28DEDDD200480F29 /* main.m */,
+				C830036628DEDDD200480F29 /* Assets.xcassets */,
 				C830036D28DEDDD200480F29 /* Aldo.entitlements */,
+				C8DC9CB828DFE5B4000D8D97 /* Info.plist */,
 			);
 			path = Aldo;
 			sourceTree = "<group>";
@@ -883,6 +885,7 @@
 				FRAMEWORK_SEARCH_PATHS = ../ext;
 				GCC_WARN_PEDANTIC = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Aldo/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Brandon Stansbury";
 				INFOPLIST_KEY_NSPrincipalClass = SDLApplication;
@@ -921,6 +924,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "NDEBUG=1";
 				GCC_WARN_PEDANTIC = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Aldo/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Brandon Stansbury";
 				INFOPLIST_KEY_NSPrincipalClass = SDLApplication;

@@ -26,7 +26,8 @@ int main(int argc, char *argv[argc+1])
     SDL_Window *const window = SDL_CreateWindow("Aldo",
                                                 SDL_WINDOWPOS_UNDEFINED,
                                                 SDL_WINDOWPOS_UNDEFINED,
-                                                winw, winh, 0);
+                                                winw, winh,
+                                                SDL_WINDOW_ALLOW_HIGHDPI);
     if (!window) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "SDL window creation failure: %s", SDL_GetError());

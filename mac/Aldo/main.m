@@ -47,8 +47,10 @@ int main(int argc, char *argv[argc+1])
         status = EXIT_FAILURE;
         goto exit_window;
     }
-    const float scale_factor = NSScreen.mainScreen.backingScaleFactor;
-    SDL_RenderSetScale(renderer, scale_factor, scale_factor);
+    @autoreleasepool {
+        const float scale_factor = NSScreen.mainScreen.backingScaleFactor;
+        SDL_RenderSetScale(renderer, scale_factor, scale_factor);
+    }
     SDL_RendererInfo info;
     SDL_GetRendererInfo(renderer, &info);
     SDL_Log("Render name: %s (%X)", info.name, info.flags);

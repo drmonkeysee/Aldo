@@ -33,9 +33,20 @@ int main(int argc, char *argv[argc+1])
         goto exit_sdl;
     }
 
-    SDL_Surface *const surface = SDL_GetWindowSurface(window);
-    SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 0xff, 0xff, 0xff));
-    SDL_UpdateWindowSurface(window);
+    SDL_Renderer *const
+    renderer = SDL_CreateRenderer(window, -1,
+                                  SDL_RENDERER_ACCELERATED
+                                  | SDL_RENDERER_PRESENTVSYNC);
+    if (!renderer) {
+        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+                        "SDL renderer creation failure: %s", SDL_GetError());
+        status = EXIT_FAILURE;
+        goto exit_window;
+    }
+
+    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+    SDL_RenderClear(renderer);
+    SDL_RenderPresent(renderer);
 
     SDL_Event ev;
     bool running = true;
@@ -47,6 +58,8 @@ int main(int argc, char *argv[argc+1])
         }
     } while (running);
 
+    SDL_DestroyRenderer(renderer);
+exit_window:
     SDL_DestroyWindow(window);
 exit_sdl:
     SDL_Quit();

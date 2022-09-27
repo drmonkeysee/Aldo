@@ -15,9 +15,9 @@ namespace aldo
 #include <stdbool.h>
 #endif
 
-struct initopts {
-    bool hi_dpi;
+struct guiopts {
     float render_scale_factor;
+    bool hi_dpi;
 };
 
 #ifdef __cplusplus

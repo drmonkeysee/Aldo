@@ -43,7 +43,7 @@ public:
     ~SDLRuntime() { SDL_Quit(); }
 };
 
-auto sdl_demo(const aldo::initopts& opts)
+auto sdl_demo(const aldo::guiopts& opts)
 {
     SDLRuntime initSdl;
 
@@ -123,13 +123,13 @@ auto sdl_demo(const aldo::initopts& opts)
 // Public Interface
 //
 
-int aldo::run_with_args(int, char*[], const aldo::initopts& opts)
+int aldo::run_with_args(int, char*[], const aldo::guiopts& opts)
 {
     return sdl_demo(opts);
 }
 
 int aldo::aldo_run_with_args(int argc, char* argv[],
-                             const aldo::initopts *opts) noexcept
+                             const aldo::guiopts *opts) noexcept
 {
     try {
         return run_with_args(argc, argv, *opts);

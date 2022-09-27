@@ -47,7 +47,7 @@ auto sdl_demo(const aldo::guiopts& opts)
 {
     SDLRuntime initSdl;
 
-    const auto winW = 800, winH = 600;
+    static constexpr auto winW = 800, winH = 600;
     const Uint32 winFlags = opts.hi_dpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0;
     const winhandle window{SDL_CreateWindow("Aldo",
                                             SDL_WINDOWPOS_UNDEFINED,
@@ -59,8 +59,8 @@ auto sdl_demo(const aldo::guiopts& opts)
         return EXIT_FAILURE;
     }
 
-    const Uint32 renderFlags = SDL_RENDERER_ACCELERATED
-                                | SDL_RENDERER_PRESENTVSYNC;
+    static constexpr Uint32 renderFlags = SDL_RENDERER_ACCELERATED
+                                            | SDL_RENDERER_PRESENTVSYNC;
     const renderhandle renderer{SDL_CreateRenderer(window.get(), -1,
                                                    renderFlags)};
     if (!renderer) {
@@ -74,7 +74,12 @@ auto sdl_demo(const aldo::guiopts& opts)
     SDL_GetRendererInfo(renderer.get(), &info);
     SDL_Log("Render name: %s (%X)", info.name, info.flags);
 
-    const SDL_Rect box{(winW - 256) / 2, (winH - 240) / 2, 256, 240};
+    static constexpr SDL_Rect box{
+        (winW - 256) / 2,
+        (winH - 240) / 2,
+        256,
+        240,
+    };
     SDL_Rect bouncer{(winW - 50) / 2, (winH - 50) / 2, 50, 50};
     SDL_Point velocity{1, 1};
     SDL_Event ev;

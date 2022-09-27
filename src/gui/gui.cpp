@@ -43,12 +43,12 @@ public:
     ~SDLRuntime() { SDL_Quit(); }
 };
 
-auto sdl_demo(const aldo::guiopts& opts)
+auto sdl_demo(const aldo::guiopts& options)
 {
     SDLRuntime initSdl;
 
     static constexpr auto winW = 800, winH = 600;
-    const Uint32 winFlags = opts.hi_dpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0;
+    const Uint32 winFlags = options.hi_dpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0;
     const winhandle window{SDL_CreateWindow("Aldo",
                                             SDL_WINDOWPOS_UNDEFINED,
                                             SDL_WINDOWPOS_UNDEFINED,
@@ -68,8 +68,8 @@ auto sdl_demo(const aldo::guiopts& opts)
                         "SDL renderer creation failure: %s", SDL_GetError());
         return EXIT_FAILURE;
     }
-    SDL_RenderSetScale(renderer.get(), opts.render_scale_factor,
-                       opts.render_scale_factor);
+    SDL_RenderSetScale(renderer.get(), options.render_scale_factor,
+                       options.render_scale_factor);
     SDL_RendererInfo info;
     SDL_GetRendererInfo(renderer.get(), &info);
     SDL_Log("Render name: %s (%X)", info.name, info.flags);
@@ -128,16 +128,16 @@ auto sdl_demo(const aldo::guiopts& opts)
 // Public Interface
 //
 
-int aldo::run_with_args(int, char*[], const aldo::guiopts& opts)
+int aldo::run_with_args(int, char*[], const aldo::guiopts& options)
 {
-    return sdl_demo(opts);
+    return sdl_demo(options);
 }
 
 int aldo::aldo_run_with_args(int argc, char* argv[],
-                             const aldo::guiopts *opts) noexcept
+                             const aldo::guiopts *options) noexcept
 {
     try {
-        return run_with_args(argc, argv, *opts);
+        return run_with_args(argc, argv, *options);
     } catch (const std::exception& ex) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                      "Unhandled error in Aldo: %s", ex.what());

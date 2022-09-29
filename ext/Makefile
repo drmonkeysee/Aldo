@@ -14,7 +14,7 @@ $(SDL_DMG):
 imgui:
 	mkdir -p $@
 	cd $@; \
-	curl -L -O $(IMGUI_HTTP); \
+	curl -L -O '$(IMGUI_HTTP)'; \
 	tar -xzf $(notdir $(IMGUI_HTTP)); \
 	cp -v $(IMGUI_SRC)/*.{h,cpp} .; \
 	cp -v $(IMGUI_SRC)/backends/imgui_impl_{sdl,sdlrenderer}.{h,cpp} .; \

@@ -18,9 +18,9 @@
 int main(int argc, char *argv[argc+1])
 {
     SDL_Log("Aldo GUI started...");
-    struct guiopts opts = {.hi_dpi = true};
+    struct aldo_guiopts opts = {.hi_dpi = true};
     @autoreleasepool {
         opts.render_scale_factor = NSScreen.mainScreen.backingScaleFactor;
     }
-    return aldo_run_with_args(argc, argv, &opts);
+    return aldo_rungui_with_args(argc, argv, &opts);
 }

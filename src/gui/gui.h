@@ -13,19 +13,19 @@
 #ifdef __cplusplus
 #define ALDO_EXPORT extern "C"
 #define ALDO_ARGV char* argv[]
-#define ALDO_OPTS aldo::guiopts
+#define ALDO_OPTS const aldo::aldo_guiopts* options
 #define ALDO_NOEXCEPT noexcept
 namespace aldo
 {
 #else
 #define ALDO_EXPORT
 #define ALDO_ARGV char *argv[argc+1]
-#define ALDO_OPTS struct guiopts
+#define ALDO_OPTS const struct aldo_guiopts *options
 #define ALDO_NOEXCEPT
 #endif
 
-ALDO_EXPORT int aldo_run_with_args(int argc, ALDO_ARGV,
-                                   const ALDO_OPTS *options) ALDO_NOEXCEPT;
+ALDO_EXPORT int aldo_rungui_with_args(int argc, ALDO_ARGV,
+                                      ALDO_OPTS) ALDO_NOEXCEPT;
 
 #ifdef __cplusplus
 }

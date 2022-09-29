@@ -43,7 +43,7 @@ public:
     ~SDLRuntime() { SDL_Quit(); }
 };
 
-auto sdl_demo(const aldo::guiopts& options)
+auto sdl_demo(const aldo::aldo_guiopts& options)
 {
     SDLRuntime initSdl;
 
@@ -128,16 +128,16 @@ auto sdl_demo(const aldo::guiopts& options)
 // Public Interface
 //
 
-int aldo::run_with_args(int, char*[], const aldo::guiopts& options)
+int aldo::rungui_with_args(int, char*[], const aldo::aldo_guiopts& options)
 {
     return sdl_demo(options);
 }
 
-int aldo::aldo_run_with_args(int argc, char* argv[],
-                             const aldo::guiopts *options) noexcept
+int aldo::aldo_rungui_with_args(int argc, char* argv[],
+                                const aldo::aldo_guiopts* options) noexcept
 {
     try {
-        return run_with_args(argc, argv, *options);
+        return rungui_with_args(argc, argv, *options);
     } catch (const std::exception& ex) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                      "Unhandled error in Aldo: %s", ex.what());

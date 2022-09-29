@@ -9,3 +9,4 @@
 ## Resource List
 
 - [SDL2](https://www.libsdl.org) (Simple Directmedia Layer)
+- [Dear ImGui](https://github.com/ocornut/imgui)

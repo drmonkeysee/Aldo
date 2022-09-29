@@ -6,12 +6,12 @@ IMGUI_VERSION := 1.88
 IMGUI_HTTP := https://github.com/ocornut/imgui/archive/refs/tags/v$(IMGUI_VERSION).tar.gz
 IMGUI_SRC := imgui-$(IMGUI_VERSION)
 
-download: $(SDL_DMG) dearimgui
+download: $(SDL_DMG) imgui
 
 $(SDL_DMG):
 	curl -L -O '$(SDL_HTTP)/$@'
 
-dearimgui:
+imgui:
 	mkdir -p $@
 	cd $@; \
 	curl -L -O $(IMGUI_HTTP); \

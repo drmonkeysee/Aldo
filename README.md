@@ -8,7 +8,7 @@ The current milestone is to build a [NES](https://en.wikipedia.org/wiki/Nintendo
 
 At some point I may look into replacing this with [CMake](https://cmake.org) but at the moment the build is pretty simple.
 
-### macOS
+### macOS CLI
 
 The Homebrew and ncurses steps get you the latest version of ncurses and are optional. The OS-shipped version works just as well and will be used automatically if the brew version is not installed.
 
@@ -18,7 +18,13 @@ The Homebrew and ncurses steps get you the latest version of ncurses and are opt
 4. `make run` to print usage
 5. `make run FILE=<file>` to load a program ROM
 
-### Debian/Ubuntu
+### macOS GUI
+
+1. Install Xcode
+2. Run `make ext` and follow additional instructions
+3. Open mac/Aldo.xcodeproj and build/run the "Aldo" target
+
+### Debian/Ubuntu CLI
 
 1. Run `locale` to verify your terminal is using a UTF-8 locale (`C.UTF-8` will work)
 2. `[sudo] apt update`
@@ -50,6 +56,21 @@ The verification target is made up of these test targets:
 - `make test`: Aldo unit tests, written using [CinyTest](https://github.com/drmonkeysee/CinyTest)
 - `make nestest nesdiff`: kevtris's [nestest CPU tests](https://wiki.nesdev.org/w/index.php?title=Emulator_tests)
 - `make bcdtest`: Bruce Clark's [Binary-coded Decimal tests](http://6502.org/tutorials/decimal_mode.html); additional details in [BCDTEST.md](test/BCDTEST.md)
+
+## External Dependencies
+
+Dependencies needed to build and run Aldo components.
+
+### CLI/Test
+
+- [ncurses](https://invisible-island.net/ncurses/man/)
+- [Python3](https://www.python.org)
+- [CinyTest](https://github.com/drmonkeysee/CinyTest)
+
+### GUI
+
+- [SDL2](https://www.libsdl.org) (Simple Directmedia Layer)
+- [Dear ImGui](https://github.com/ocornut/imgui)
 
 ## Resources
 

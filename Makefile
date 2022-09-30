@@ -48,7 +48,13 @@ ifdef XLF
 LDFLAGS += $(XLF)
 endif
 
-.PHONY: bcdtest check clean debug nesdiff nestest purge release run test
+.PHONY: bcdtest check clean debug ext extclean nesdiff nestest purge release run test
+
+ext:
+	$(MAKE) -C $@
+
+extclean:
+	$(MAKE) clean -C ext
 
 release: CFLAGS += -Werror -Os -flto -DNDEBUG
 ifneq ($(OS), Darwin)
@@ -70,7 +76,7 @@ test: $(TESTS_TARGET)
 	$(TESTS_TARGET)
 
 nestest: $(NESTEST_ROM) debug
-	rm -f $(TRACE_CMP)
+	$(RM) $(TRACE_CMP)
 	$(TARGET) -btvz -H@c66e -Hjam -H3s -rc000 $<
 
 nesdiff: $(NESTEST_CMP) $(TRACE_CMP)

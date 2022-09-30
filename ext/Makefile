@@ -18,11 +18,6 @@ clean:
 
 $(SDL_DMG):
 	curl -L -O '$(SDL_HTTP)/$@'
-	$(info ================================)
-	$(info Next steps...)
-	$(info Mount $(SDL_DMG))
-	$(info Copy SDL2.framework to $(CURDIR))
-	$(info ================================)
 
 $(IMGUI_TARGET):
 	mkdir -p $@

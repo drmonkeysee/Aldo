@@ -21,8 +21,14 @@ The Homebrew and ncurses steps get you the latest version of ncurses and are opt
 ### macOS GUI
 
 1. Install Xcode
-2. Run `make ext` and follow additional instructions
-3. Open mac/Aldo.xcodeproj and build/run the "Aldo" target
+2. Run `make ext`
+3. Open ext/ folder
+4. Mount SDL2 dmg file
+5. Copy SDL2.framework to ext/ folder
+5. Open mac/Aldo.xcodeproj
+6. Build "Aldo" target
+7. Update any `#include <SDL*.h>` lines that fail to `#include <SDL2/SDL*.h>`
+8. Build and Run "Aldo" target
 
 ### Debian/Ubuntu CLI
 

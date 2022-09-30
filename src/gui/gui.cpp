@@ -77,6 +77,12 @@ auto sdl_demo(const aldo::aldo_guiopts& options)
     SDL_GetRendererInfo(renderer.get(), &info);
     SDL_Log("Render name: %s (%X)", info.name, info.flags);
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsLight();
+    ImGui_ImplSDL2_InitForSDLRenderer(window.get(), renderer.get());
+    ImGui_ImplSDLRenderer_Init(renderer.get());
+
     static constexpr SDL_Rect box{
         (winW - 256) / 2,
         (winH - 240) / 2,
@@ -89,6 +95,7 @@ auto sdl_demo(const aldo::aldo_guiopts& options)
     auto running = true;
     do {
         while (SDL_PollEvent(&ev)) {
+            ImGui_ImplSDL2_ProcessEvent(&ev);
             if (ev.type == SDL_QUIT) {
                 running = false;
             }
@@ -102,6 +109,16 @@ auto sdl_demo(const aldo::aldo_guiopts& options)
         if (bouncer.y < box.y || (bouncer.y + bouncer.h) > (box.y + box.h)) {
             velocity.y *= -1;
         }
+
+        ImGui_ImplSDLRenderer_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Begin("First Window");
+        ImGui::Text("Hello From Aldo+Dear ImGui");
+        ImGui::End();
+
+        ImGui::Render();
 
         SDL_SetRenderDrawColor(renderer.get(),
                                0xff, 0xff, 0xff, SDL_ALPHA_OPAQUE);
@@ -119,8 +136,13 @@ auto sdl_demo(const aldo::aldo_guiopts& options)
                                0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
         SDL_RenderDrawLine(renderer.get(), 100, 80, 250, 500);
 
+        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
         SDL_RenderPresent(renderer.get());
     } while (running);
+
+    ImGui_ImplSDLRenderer_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
 
     return EXIT_SUCCESS;
 }

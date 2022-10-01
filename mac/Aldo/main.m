@@ -13,8 +13,6 @@
 // NOTE: include SDL for potential SDL_main replacement
 #include <SDL2/SDL.h>
 
-#include <stdbool.h>
-
 int main(int argc, char *argv[argc+1])
 {
     SDL_Log("Aldo GUI started...");

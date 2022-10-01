@@ -238,5 +238,4 @@ cython_debug/
 *.nes
 *.out
 *.r[ao]m
-!test/bcdtest.out
 ext/

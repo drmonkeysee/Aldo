@@ -12,9 +12,7 @@ IMGUI_SRC := $(IMGUI_TARGET)-$(IMGUI_VERSION)
 fetch: $(SDL_DMG) $(IMGUI_TARGET)
 
 clean:
-	$(RM) $(SDL_DMG)
-	$(RM) -r SDL2.framework
-	$(RM) -r $(IMGUI_TARGET)
+	find . -not -name Makefile -and -not -name '.*' -maxdepth 1 -exec $(RM) -rv {} +
 
 $(SDL_DMG):
 	curl -L -O '$(SDL_HTTP)/$@'
@@ -25,5 +23,9 @@ $(IMGUI_TARGET):
 	curl -L -O '$(IMGUI_HTTP)'; \
 	tar -xzf $(notdir $(IMGUI_HTTP)); \
 	cp -v $(IMGUI_SRC)/*.{h,cpp} .; \
-	cp -v $(IMGUI_SRC)/backends/imgui_impl_{sdl,sdlrenderer}.{h,cpp} .; \
+	for impl in sdl sdlrenderer; do \
+		cp -v $(IMGUI_SRC)/backends/imgui_impl_$${impl}.h .; \
+		sed 's/\(#include <SDL\)/\12\/SDL/' $(IMGUI_SRC)/backends/imgui_impl_$${impl}.cpp \
+			> imgui_impl_$${impl}.cpp; \
+	done; \
 	$(RM) -r $(IMGUI_SRC)

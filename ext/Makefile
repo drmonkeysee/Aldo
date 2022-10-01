@@ -19,13 +19,13 @@ $(SDL_DMG):
 
 $(IMGUI_TARGET):
 	mkdir -p $@
-	cd $@; \
-	curl -L -O '$(IMGUI_HTTP)'; \
-	tar -xzf $(notdir $(IMGUI_HTTP)); \
-	cp -v $(IMGUI_SRC)/*.{h,cpp} .; \
+	cd $@ && \
+	curl -L -O '$(IMGUI_HTTP)' && \
+	tar -xzf $(notdir $(IMGUI_HTTP)) && \
+	cp -v $(IMGUI_SRC)/*.{h,cpp} . && \
 	for impl in sdl sdlrenderer; do \
-		cp -v $(IMGUI_SRC)/backends/imgui_impl_$${impl}.h .; \
+		cp -v $(IMGUI_SRC)/backends/imgui_impl_$${impl}.h . && \
 		sed 's/\(#include <SDL\)/\12\/SDL/' $(IMGUI_SRC)/backends/imgui_impl_$${impl}.cpp \
 			> imgui_impl_$${impl}.cpp; \
-	done; \
+	done && \
 	$(RM) -r $(IMGUI_SRC)

@@ -80,9 +80,9 @@ nestest: $(NESTEST_ROM) debug
 	$(TARGET) -btvz -H@c66e -Hjam -H3s -rc000 $<
 
 nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
-	diff -y --suppress-common-lines $^ > $(NESTEST_DIFF) ; \
-	DIFF_RESULT=$$? ; \
-	echo "$$(wc -l < $(NESTEST_DIFF)) lines differ" ; \
+	diff -y --suppress-common-lines $^ > $(NESTEST_DIFF); \
+	DIFF_RESULT=$$?; \
+	echo "$$(wc -l < $(NESTEST_DIFF)) lines differ"; \
 	exit $$DIFF_RESULT
 
 bcdtest: $(BCDTEST_ROM) debug

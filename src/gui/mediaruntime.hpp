@@ -82,11 +82,11 @@ public:
                             SDL_GetError());
             throw std::runtime_error{"SDL renderer creation failure"};
         }
-        SDL_RenderSetScale(ren.get(),
+        SDL_RenderSetScale(raw(),
                            options.render_scale_factor,
                            options.render_scale_factor);
         SDL_RendererInfo info;
-        SDL_GetRendererInfo(ren.get(), &info);
+        SDL_GetRendererInfo(raw(), &info);
         SDL_Log("Render name: %s (%X)", info.name, info.flags);
     }
 

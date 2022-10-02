@@ -28,7 +28,8 @@ auto create_window(const aldo::aldo_guiopts& options,
 
 auto create_renderer(const aldo::WindowHandle& hwin) noexcept
 {
-    const Uint32 flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
+    static constexpr Uint32 flags = SDL_RENDERER_ACCELERATED
+                                    | SDL_RENDERER_PRESENTVSYNC;
     return SDL_CreateRenderer(hwin.raw(), -1, flags);
 }
 

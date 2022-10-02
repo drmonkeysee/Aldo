@@ -26,6 +26,8 @@ public:
     SdlLib();
     SdlLib(const SdlLib&) = delete;
     SdlLib& operator=(const SdlLib&) = delete;
+    SdlLib(SdlLib&&) = delete;
+    SdlLib& operator=(SdlLib&&) = delete;
     ~SdlLib();
 };
 
@@ -56,6 +58,8 @@ public:
                  const aldo::RendererHandle& hren);
     DearImGuiLib(const DearImGuiLib&) = delete;
     DearImGuiLib& operator=(const DearImGuiLib&) = delete;
+    DearImGuiLib(DearImGuiLib&&) = delete;
+    DearImGuiLib& operator=(DearImGuiLib&&) = delete;
     ~DearImGuiLib();
 };
 

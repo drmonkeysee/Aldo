@@ -33,29 +33,27 @@ public:
 
 class WindowHandle final {
 public:
-    WindowHandle(const aldo::aldo_guiopts& options, SDL_Point windowSize);
+    WindowHandle(const guiopts& options, SDL_Point windowSize);
 
     SDL_Window* raw() const noexcept { return win.get(); }
 
 private:
-    std::unique_ptr<SDL_Window, aldo::sdl_deleter<SDL_DestroyWindow>> win;
+    std::unique_ptr<SDL_Window, sdl_deleter<SDL_DestroyWindow>> win;
 };
 
 class RendererHandle final {
 public:
-    RendererHandle(const aldo::aldo_guiopts& options,
-                   const aldo::WindowHandle& hwin);
+    RendererHandle(const guiopts& options, const WindowHandle& hwin);
 
     SDL_Renderer* raw() const noexcept { return ren.get(); }
 
 private:
-    std::unique_ptr<SDL_Renderer, aldo::sdl_deleter<SDL_DestroyRenderer>> ren;
+    std::unique_ptr<SDL_Renderer, sdl_deleter<SDL_DestroyRenderer>> ren;
 };
 
 class DearImGuiLib final {
 public:
-    DearImGuiLib(const aldo::WindowHandle& hwin,
-                 const aldo::RendererHandle& hren);
+    DearImGuiLib(const WindowHandle& hwin, const RendererHandle& hren);
     DearImGuiLib(const DearImGuiLib&) = delete;
     DearImGuiLib& operator=(const DearImGuiLib&) = delete;
     DearImGuiLib(DearImGuiLib&&) = delete;
@@ -65,17 +63,17 @@ public:
 
 class MediaRuntime final {
 public:
-    MediaRuntime(const aldo::aldo_guiopts& options, SDL_Point windowSize)
+    MediaRuntime(const guiopts& options, SDL_Point windowSize)
     : win{options, windowSize}, ren{options, win}, imgui{win, ren} { }
 
     SDL_Window* window() const noexcept { return win.raw(); }
     SDL_Renderer* renderer() const noexcept { return ren.raw(); }
 
 private:
-    aldo::SdlLib sdl;
-    aldo::WindowHandle win;
-    aldo::RendererHandle ren;
-    aldo::DearImGuiLib imgui;
+    SdlLib sdl;
+    WindowHandle win;
+    RendererHandle ren;
+    DearImGuiLib imgui;
 };
 
 }

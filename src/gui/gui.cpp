@@ -29,7 +29,7 @@ struct Vec4 final {
 };
 using U8Vec4 = Vec4<Uint8>;
 
-auto sdl_demo(const aldo::aldo_guiopts& options)
+auto sdl_demo(const aldo::guiopts& options)
 {
     static constexpr SDL_Point windowSize{1280, 800};
     aldo::MediaRuntime runtime{options, windowSize};
@@ -76,7 +76,7 @@ auto sdl_demo(const aldo::aldo_guiopts& options)
         ImGui::NewFrame();
 
         if (ImGui::BeginMainMenuBar()) {
-            if (ImGui::BeginMenu("Tools")) {
+            if (ImGui::BeginMenu("Support")) {
                 ImGui::MenuItem("ImGui Demo", nullptr, &showDemo);
                 ImGui::EndMenu();
             }
@@ -121,18 +121,18 @@ auto sdl_demo(const aldo::aldo_guiopts& options)
 // Public Interface
 //
 
-int aldo::rungui_with_args(int, char*[], const aldo::aldo_guiopts& options)
+int aldo::rungui_with_args(int, char*[], const aldo::guiopts& options)
 {
     return sdl_demo(options);
 }
 
 int aldo::aldo_rungui_with_args(int argc, char* argv[],
-                                const aldo::aldo_guiopts* options) noexcept
+                                const aldo::guiopts* options) noexcept
 {
     assert(options != nullptr);
 
     try {
-        return rungui_with_args(argc, argv, *options);
+        return aldo::rungui_with_args(argc, argv, *options);
     } catch (const std::exception& ex) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                      "Unhandled error in Aldo: %s", ex.what());

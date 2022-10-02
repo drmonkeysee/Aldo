@@ -13,8 +13,7 @@
 namespace aldo
 {
 
-int rungui_with_args(int argc, char* argv[],
-                     const aldo::aldo_guiopts& options);
+int rungui_with_args(int argc, char* argv[], const guiopts& options);
 
 }
 

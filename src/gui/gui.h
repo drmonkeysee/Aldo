@@ -13,7 +13,7 @@
 #ifdef __cplusplus
 #define ALDO_EXPORT extern "C"
 #define ALDO_ARGV char* argv[]
-#define ALDO_OPTS const aldo::aldo_guiopts* options
+#define ALDO_OPTS const guiopts* options
 #define ALDO_NOEXCEPT noexcept
 namespace aldo
 {

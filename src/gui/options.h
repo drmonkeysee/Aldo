@@ -21,6 +21,7 @@ struct aldo_guiopts {
 };
 
 #ifdef __cplusplus
+using guiopts = aldo_guiopts;
 }
 #endif
 

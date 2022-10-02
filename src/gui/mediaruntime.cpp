@@ -16,8 +16,7 @@
 namespace
 {
 
-auto create_window(const aldo::aldo_guiopts& options,
-                   SDL_Point windowSize) noexcept
+auto create_window(const aldo::guiopts& options, SDL_Point windowSize) noexcept
 {
    const Uint32 flags = options.hi_dpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0;
    return SDL_CreateWindow("Aldo",
@@ -53,7 +52,7 @@ aldo::SdlLib::~SdlLib()
     SDL_Quit();
 }
 
-aldo::WindowHandle::WindowHandle(const aldo::aldo_guiopts& options,
+aldo::WindowHandle::WindowHandle(const aldo::guiopts& options,
                                  SDL_Point windowSize)
 : win{create_window(options, windowSize)}
 {
@@ -64,7 +63,7 @@ aldo::WindowHandle::WindowHandle(const aldo::aldo_guiopts& options,
     }
 }
 
-aldo::RendererHandle::RendererHandle(const aldo::aldo_guiopts& options,
+aldo::RendererHandle::RendererHandle(const aldo::guiopts& options,
                                      const aldo::WindowHandle& hwin)
 : ren{create_renderer(hwin)}
 {

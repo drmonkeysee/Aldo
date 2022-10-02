@@ -13,6 +13,7 @@
 #include "imgui_impl_sdlrenderer.h"
 #include <SDL2/SDL.h>
 
+#include <concepts>
 #include <exception>
 #include <memory>
 #include <stdexcept>
@@ -46,11 +47,17 @@ public:
     ~SDLRuntime() { SDL_Quit(); }
 };
 
+template<std::integral T = int>
+struct Vec4 final {
+    T x, y, z, w;
+};
+using U8Vec4 = Vec4<Uint8>;
+
 auto sdl_demo(const aldo::aldo_guiopts& options)
 {
     SDLRuntime initSdl;
 
-    static constexpr auto winW = 800, winH = 600;
+    static constexpr auto winW = 1280, winH = 800;
     const Uint32 winFlags = options.hi_dpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0;
     const winhandle window{SDL_CreateWindow("Aldo",
                                             SDL_WINDOWPOS_UNDEFINED,
@@ -79,7 +86,7 @@ auto sdl_demo(const aldo::aldo_guiopts& options)
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGui::StyleColorsLight();
+    ImGui::StyleColorsDark();
     ImGui_ImplSDL2_InitForSDLRenderer(window.get(), renderer.get());
     ImGui_ImplSDLRenderer_Init(renderer.get());
 
@@ -92,7 +99,8 @@ auto sdl_demo(const aldo::aldo_guiopts& options)
     SDL_Rect bouncer{(winW - 50) / 2, (winH - 50) / 2, 50, 50};
     SDL_Point velocity{1, 1};
     SDL_Event ev;
-    auto running = true;
+    auto running = true, showDemo = false;
+    static constexpr U8Vec4 fillColor{0x1e, 0x1e, 0x1e, SDL_ALPHA_OPAQUE};
     do {
         while (SDL_PollEvent(&ev)) {
             ImGui_ImplSDL2_ProcessEvent(&ev);
@@ -114,14 +122,25 @@ auto sdl_demo(const aldo::aldo_guiopts& options)
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
+        if (ImGui::BeginMainMenuBar()) {
+            if (ImGui::BeginMenu("Tools")) {
+                ImGui::MenuItem("ImGui Demo", nullptr, &showDemo);
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
+        }
+
+        if (showDemo) {
+            ImGui::ShowDemoWindow();
+        }
         ImGui::Begin("First Window");
         ImGui::Text("Hello From Aldo+Dear ImGui");
         ImGui::End();
 
         ImGui::Render();
 
-        SDL_SetRenderDrawColor(renderer.get(),
-                               0xff, 0xff, 0xff, SDL_ALPHA_OPAQUE);
+        SDL_SetRenderDrawColor(renderer.get(), fillColor.x, fillColor.y,
+                               fillColor.z, fillColor.w);
         SDL_RenderClear(renderer.get());
 
         SDL_SetRenderDrawColor(renderer.get(),

@@ -19,6 +19,7 @@
 #include <stdexcept>
 #include <type_traits>
 
+#include <cassert>
 #include <cstdlib>
 
 namespace
@@ -180,6 +181,8 @@ int aldo::rungui_with_args(int, char*[], const aldo::aldo_guiopts& options)
 int aldo::aldo_rungui_with_args(int argc, char* argv[],
                                 const aldo::aldo_guiopts* options) noexcept
 {
+    assert(options != nullptr);
+
     try {
         return rungui_with_args(argc, argv, *options);
     } catch (const std::exception& ex) {

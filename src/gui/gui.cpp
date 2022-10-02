@@ -36,13 +36,20 @@ auto sdl_demo(const aldo::aldo_guiopts& options)
 
     ImGui::StyleColorsDark();
 
+    static constexpr SDL_Point boxSize{256, 240};
     static constexpr SDL_Rect box{
-        (windowSize.x - 256) / 2,
-        (windowSize.y - 240) / 2,
-        256,
-        240,
+        (windowSize.x - boxSize.x) / 2,
+        (windowSize.y - boxSize.y) / 2,
+        boxSize.x,
+        boxSize.y,
     };
-    SDL_Rect bouncer{(windowSize.x - 50) / 2, (windowSize.y - 50) / 2, 50, 50};
+    static constexpr auto bounceDim = 50;
+    SDL_Rect bouncer{
+        (windowSize.x - bounceDim) / 2,
+        (windowSize.y - bounceDim) / 2,
+        bounceDim,
+        bounceDim,
+    };
     SDL_Point velocity{1, 1};
     SDL_Event ev;
     auto running = true, showDemo = false;

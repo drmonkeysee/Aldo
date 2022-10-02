@@ -191,6 +191,7 @@
 		C86030772761A51100F1B27D /* cpupeek.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpupeek.c; sourceTree = "<group>"; };
 		C86B6A8128D0332000AA263A /* CpuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CpuView.swift; sourceTree = "<group>"; };
 		C8702CF8278A58C900725690 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
+		C87141C928E939F600718803 /* mediaruntime.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = mediaruntime.hpp; sourceTree = "<group>"; };
 		C88949B02813B2DB00795CC0 /* ChrSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChrSheet.swift; sourceTree = "<group>"; };
 		C88A5E8427F6A1750039382D /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
 		C88F3E5627D9A45E00317732 /* EmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationView.swift; sourceTree = "<group>"; };
@@ -492,6 +493,7 @@
 				C8B0E66B28E01B760054547D /* gui.hpp */,
 				C8B0E66A28E01B760054547D /* gui.cpp */,
 				C8B0E66E28E021370054547D /* options.h */,
+				C87141C928E939F600718803 /* mediaruntime.hpp */,
 			);
 			path = gui;
 			sourceTree = "<group>";

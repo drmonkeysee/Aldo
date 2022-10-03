@@ -8,7 +8,7 @@
 #ifndef Aldo_gui_mediaruntime_hpp
 #define Aldo_gui_mediaruntime_hpp
 
-#include "options.h"
+#include "options.hpp"
 
 #include <SDL2/SDL.h>
 

@@ -201,8 +201,7 @@
 		C8A5B77A27DD79AE00A4DD5E /* Cart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cart.swift; sourceTree = "<group>"; };
 		C8B0E66A28E01B760054547D /* gui.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gui.cpp; sourceTree = "<group>"; };
 		C8B0E66B28E01B760054547D /* gui.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = gui.hpp; sourceTree = "<group>"; };
-		C8B0E66D28E01C670054547D /* gui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gui.h; sourceTree = "<group>"; };
-		C8B0E66E28E021370054547D /* options.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = options.h; sourceTree = "<group>"; };
+		C8B0E66E28E021370054547D /* options.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = options.hpp; sourceTree = "<group>"; };
 		C8B4664327755790000576EE /* argparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = argparse.h; sourceTree = "<group>"; };
 		C8B4664427755790000576EE /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8B5303A2801300C00576D9F /* CartFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartFocusView.swift; sourceTree = "<group>"; };
@@ -491,10 +490,9 @@
 		C8B0E66728E01B3E0054547D /* gui */ = {
 			isa = PBXGroup;
 			children = (
-				C8B0E66D28E01C670054547D /* gui.h */,
 				C8B0E66B28E01B760054547D /* gui.hpp */,
 				C8B0E66A28E01B760054547D /* gui.cpp */,
-				C8B0E66E28E021370054547D /* options.h */,
+				C8B0E66E28E021370054547D /* options.hpp */,
 				C87141C928E939F600718803 /* mediaruntime.hpp */,
 				C87141CB28E9408D00718803 /* mediaruntime.cpp */,
 			);

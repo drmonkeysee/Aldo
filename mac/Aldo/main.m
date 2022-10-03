@@ -7,8 +7,8 @@
 
 #import <AppKit/AppKit.h>
 
-#include "gui.h"
-#include "options.h"
+#include "gui.hpp"
+#include "options.hpp"
 
 // NOTE: include SDL for potential SDL_main replacement
 #include <SDL2/SDL.h>

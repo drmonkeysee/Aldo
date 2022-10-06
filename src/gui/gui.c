@@ -13,55 +13,98 @@
 #include <SDL2/SDL.h>
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 
-static int sdl_demo(struct control *appstate,
-                    const struct gui_platform *platform)
+static SDL_Window *restrict Window;
+static SDL_Renderer *restrict Renderer;
+
+enum guicleanup {
+    GUI_CLEANUP_ALL,
+    GUI_CLEANUP_WINDOW,
+    GUI_CLEANUP_SDL,
+};
+
+static void ui_cleanup(enum guicleanup status)
+{
+    switch (status) {
+    case GUI_CLEANUP_ALL:
+        SDL_DestroyRenderer(Renderer);
+        Renderer = NULL;
+        // NOTE: fallthrough
+    case GUI_CLEANUP_WINDOW:
+        SDL_DestroyWindow(Window);
+        Window = NULL;
+        // NOTE: fallthrough
+    default:
+        SDL_Quit();
+    }
+}
+
+static bool ui_init(const struct gui_platform *platform)
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "SDL initialization failure: %s", SDL_GetError());
-        return EXIT_FAILURE;
+        return false;
     }
 
-    static const SDL_Point winsize = {1280, 800};
     const bool hidpi = platform->is_hidpi();
     SDL_Log("Is HIDPI: %d", hidpi);
-    SDL_Window *const win = SDL_CreateWindow("Aldo",
-                                             SDL_WINDOWPOS_CENTERED,
-                                             SDL_WINDOWPOS_CENTERED,
-                                             winsize.x, winsize.y,
-                                             hidpi
-                                                ? SDL_WINDOW_ALLOW_HIGHDPI
-                                                : 0);
-    if (!win) {
+    Window = SDL_CreateWindow("Aldo",
+                              SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                              1280, 800, hidpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0);
+    if (!Window) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "SDL window creation failure: %s", SDL_GetError());
-        goto exit_sdl;
+        ui_cleanup(GUI_CLEANUP_SDL);
+        return false;
     }
 
-    SDL_Renderer *const ren = SDL_CreateRenderer(win, -1,
-                                                 SDL_RENDERER_ACCELERATED
-                                                 | SDL_RENDERER_PRESENTVSYNC);
-    if (!ren) {
+    Renderer = SDL_CreateRenderer(Window, -1,
+                                  SDL_RENDERER_ACCELERATED
+                                  | SDL_RENDERER_PRESENTVSYNC);
+    if (!Renderer) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "SDL renderer creation failure: %s",
                         SDL_GetError());
-        goto exit_window;
+        ui_cleanup(GUI_CLEANUP_WINDOW);
+        return false;
     }
-    const float render_scale_factor = platform->render_scale_factor(win);
-    SDL_RenderSetScale(ren, render_scale_factor, render_scale_factor);
+    const float render_scale_factor = platform->render_scale_factor(Window);
+    SDL_RenderSetScale(Renderer, render_scale_factor, render_scale_factor);
     SDL_RendererInfo info;
-    SDL_GetRendererInfo(ren, &info);
+    SDL_GetRendererInfo(Renderer, &info);
     SDL_Log("Render info: %s (%04X) (x%.1f)", info.name, info.flags,
             render_scale_factor);
+
+    return true;
+}
+
+static void handle_input(SDL_Event *ev, struct control *appstate)
+{
+    while (SDL_PollEvent(ev)) {
+        //ImGui_ImplSDL2_ProcessEvent(&ev);
+        if (ev->type == SDL_QUIT) {
+            appstate->running = false;
+        }
+    }
+}
+
+static int sdl_demo(struct control *appstate,
+                    const struct gui_platform *platform)
+{
+    if (!ui_init(platform)) return EXIT_FAILURE;
+
 
     /*aldo::MediaRuntime runtime{options, windowSize};
 
     ImGui::StyleColorsDark();*/
 
     static const SDL_Point boxsize = {256, 240};
+    SDL_Point winsize;
+    SDL_GetWindowSize(Window, &winsize.x, &winsize.y);
     const SDL_Rect box = {
         (winsize.x - boxsize.x) / 2,
         (winsize.y - boxsize.y) / 2,
@@ -79,12 +122,7 @@ static int sdl_demo(struct control *appstate,
     SDL_Event ev;
     //auto showDemo = false;
     do {
-        while (SDL_PollEvent(&ev)) {
-            //ImGui_ImplSDL2_ProcessEvent(&ev);
-            if (ev.type == SDL_QUIT) {
-                appstate->running = false;
-            }
-        }
+        handle_input(&ev, appstate);
 
         bouncer.x += velocity.x;
         bouncer.y += velocity.y;
@@ -116,27 +154,23 @@ static int sdl_demo(struct control *appstate,
 
         ImGui::Render();*/
 
-        SDL_SetRenderDrawColor(ren, 0x1e, 0x1e, 0x1e, SDL_ALPHA_OPAQUE);
-        SDL_RenderClear(ren);
+        SDL_SetRenderDrawColor(Renderer, 0x1e, 0x1e, 0x1e, SDL_ALPHA_OPAQUE);
+        SDL_RenderClear(Renderer);
 
-        SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
-        SDL_RenderFillRect(ren, &box);
+        SDL_SetRenderDrawColor(Renderer, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
+        SDL_RenderFillRect(Renderer, &box);
 
-        SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
-        SDL_RenderFillRect(ren, &bouncer);
+        SDL_SetRenderDrawColor(Renderer, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
+        SDL_RenderFillRect(Renderer, &bouncer);
 
-        SDL_SetRenderDrawColor(ren, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
-        SDL_RenderDrawLine(ren, 100, 80, 250, 500);
+        SDL_SetRenderDrawColor(Renderer, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
+        SDL_RenderDrawLine(Renderer, 100, 80, 250, 500);
 
         //ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-        SDL_RenderPresent(ren);
+        SDL_RenderPresent(Renderer);
     } while (appstate->running);
 
-    SDL_DestroyRenderer(ren);
-exit_window:
-    SDL_DestroyWindow(win);
-exit_sdl:
-    SDL_Quit();
+    ui_cleanup(GUI_CLEANUP_ALL);
 
     return EXIT_SUCCESS;
 }

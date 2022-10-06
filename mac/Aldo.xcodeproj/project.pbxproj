@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		C803504228D692430022A4B9 /* Rendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = C803504128D692430022A4B9 /* Rendering.swift */; };
+		C8041C3728EE6EC000A3695F /* gui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8041C3628EE6EC000A3695F /* gui.c */; };
+		C8041C3A28EE740900A3695F /* macplatform.m in Sources */ = {isa = PBXBuildFile; fileRef = C8041C3928EE740900A3695F /* macplatform.m */; };
 		C808BA6827893976001FDE39 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C80C9E1C277D648F000F2D8B /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
 		C8184D3E25E7496B002B3100 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8184D3D25E7496B002B3100 /* Tests.swift */; };
@@ -138,6 +140,10 @@
 
 /* Begin PBXFileReference section */
 		C803504128D692430022A4B9 /* Rendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rendering.swift; sourceTree = "<group>"; };
+		C8041C3528EE6EC000A3695F /* gui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gui.h; sourceTree = "<group>"; };
+		C8041C3628EE6EC000A3695F /* gui.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gui.c; sourceTree = "<group>"; };
+		C8041C3828EE72E600A3695F /* guiplatform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = guiplatform.h; sourceTree = "<group>"; };
+		C8041C3928EE740900A3695F /* macplatform.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = macplatform.m; sourceTree = "<group>"; };
 		C808BA6627893976001FDE39 /* haltexpr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = haltexpr.h; sourceTree = "<group>"; };
 		C808BA6727893976001FDE39 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
 		C80C9E1A277D648F000F2D8B /* debug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
@@ -418,6 +424,7 @@
 		C830036228DEDDD100480F29 /* Aldo */ = {
 			isa = PBXGroup;
 			children = (
+				C8041C3928EE740900A3695F /* macplatform.m */,
 				C830036B28DEDDD200480F29 /* main.m */,
 				C830036628DEDDD200480F29 /* Assets.xcassets */,
 				C830036D28DEDDD200480F29 /* Aldo.entitlements */,
@@ -490,8 +497,11 @@
 		C8B0E66728E01B3E0054547D /* gui */ = {
 			isa = PBXGroup;
 			children = (
+				C8041C3528EE6EC000A3695F /* gui.h */,
+				C8041C3628EE6EC000A3695F /* gui.c */,
 				C8B0E66B28E01B760054547D /* gui.hpp */,
 				C8B0E66A28E01B760054547D /* gui.cpp */,
+				C8041C3828EE72E600A3695F /* guiplatform.h */,
 				C8B0E66E28E021370054547D /* options.hpp */,
 				C87141C928E939F600718803 /* mediaruntime.hpp */,
 				C87141CB28E9408D00718803 /* mediaruntime.cpp */,
@@ -782,6 +792,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8041C3728EE6EC000A3695F /* gui.c in Sources */,
 				C854873828E685D00045BA42 /* imgui_impl_sdlrenderer.cpp in Sources */,
 				C830036C28DEDDD200480F29 /* main.m in Sources */,
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,
@@ -791,6 +802,7 @@
 				C854873D28E685D00045BA42 /* imgui_impl_sdl.cpp in Sources */,
 				C854873B28E685D00045BA42 /* imgui_tables.cpp in Sources */,
 				C854873C28E685D00045BA42 /* imgui_demo.cpp in Sources */,
+				C8041C3A28EE740900A3695F /* macplatform.m in Sources */,
 				C854873A28E685D00045BA42 /* imgui.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -10,6 +10,8 @@
 		C803504228D692430022A4B9 /* Rendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = C803504128D692430022A4B9 /* Rendering.swift */; };
 		C8041C3728EE6EC000A3695F /* gui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8041C3628EE6EC000A3695F /* gui.c */; };
 		C8041C3A28EE740900A3695F /* macplatform.m in Sources */ = {isa = PBXBuildFile; fileRef = C8041C3928EE740900A3695F /* macplatform.m */; };
+		C8041C3B28EE839900A3695F /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
+		C8041C3C28EE83A600A3695F /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
 		C808BA6827893976001FDE39 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C80C9E1C277D648F000F2D8B /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
 		C8184D3E25E7496B002B3100 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8184D3D25E7496B002B3100 /* Tests.swift */; };
@@ -795,6 +797,8 @@
 				C8041C3728EE6EC000A3695F /* gui.c in Sources */,
 				C854873828E685D00045BA42 /* imgui_impl_sdlrenderer.cpp in Sources */,
 				C830036C28DEDDD200480F29 /* main.m in Sources */,
+				C8041C3C28EE83A600A3695F /* control.c in Sources */,
+				C8041C3B28EE839900A3695F /* argparse.c in Sources */,
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,
 				C87141CC28E9408D00718803 /* mediaruntime.cpp in Sources */,
 				C8B0E66C28E01B760054547D /* gui.cpp in Sources */,

@@ -1,6 +1,6 @@
 //
 //  macplatform.m
-//  Aldo
+//  Aldo-Gui
 //
 //  Created by Brandon Stansbury on 10/5/22.
 //

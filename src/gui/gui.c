@@ -26,11 +26,13 @@ static int sdl_demo(struct control *appstate,
     }
 
     static const SDL_Point winsize = {1280, 800};
+    const bool hidpi = platform->is_hidpi();
+    SDL_Log("Is HIDPI: %d", hidpi);
     SDL_Window *const win = SDL_CreateWindow("Aldo",
                                              SDL_WINDOWPOS_CENTERED,
                                              SDL_WINDOWPOS_CENTERED,
                                              winsize.x, winsize.y,
-                                             platform->is_hidpi()
+                                             hidpi
                                                 ? SDL_WINDOW_ALLOW_HIGHDPI
                                                 : 0);
     if (!win) {
@@ -52,7 +54,8 @@ static int sdl_demo(struct control *appstate,
     SDL_RenderSetScale(ren, render_scale_factor, render_scale_factor);
     SDL_RendererInfo info;
     SDL_GetRendererInfo(ren, &info);
-    SDL_Log("Render name: %s (%04X)", info.name, info.flags);
+    SDL_Log("Render info: %s (%04X) (x%.1f)", info.name, info.flags,
+            render_scale_factor);
 
     /*aldo::MediaRuntime runtime{options, windowSize};
 

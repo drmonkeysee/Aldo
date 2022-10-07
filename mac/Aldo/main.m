@@ -8,7 +8,7 @@
 #include "gui.h"
 #include "guiplatform.h"
 
-// NOTE: always include SDL with main for potential SDL_main replacement
+// NOTE: always include SDL with main in case SDL_main applies
 #include <SDL2/SDL.h>
 
 #include <stdlib.h>
@@ -25,12 +25,4 @@ int main(int argc, char *argv[argc+1])
     }
 
     return gui_run(argc, argv, &platform);
-    /*struct aldo_guiopts opts;
-    @autoreleasepool {
-        opts.hi_dpi = [[NSBundle.mainBundle
-                       objectForInfoDictionaryKey:@"NSHighResolutionCapable"]
-                       boolValue];
-        opts.render_scale_factor = NSScreen.mainScreen.backingScaleFactor;
-    }
-    return aldo_rungui_with_args(argc, argv, &opts);*/
 }

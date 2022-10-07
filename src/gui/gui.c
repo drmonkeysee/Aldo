@@ -9,6 +9,7 @@
 
 #include "argparse.h"
 #include "control.h"
+#include "uiimgui.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -22,6 +23,7 @@ static SDL_Renderer *restrict Renderer;
 
 enum guicleanup {
     GUI_CLEANUP_ALL,
+    GUI_CLEANUP_RENDERER,
     GUI_CLEANUP_WINDOW,
     GUI_CLEANUP_SDL,
 };
@@ -30,6 +32,9 @@ static void ui_cleanup(enum guicleanup status)
 {
     switch (status) {
     case GUI_CLEANUP_ALL:
+        imgui_cleanup();
+        // NOTE: fallthrough
+    case GUI_CLEANUP_RENDERER:
         SDL_DestroyRenderer(Renderer);
         Renderer = NULL;
         // NOTE: fallthrough
@@ -79,13 +84,18 @@ static bool ui_init(const struct gui_platform *platform)
     SDL_Log("Render info: %s (%04X) (x%.1f)", info.name, info.flags,
             render_scale_factor);
 
+    if (!imgui_init(Window, Renderer)) {
+        ui_cleanup(GUI_CLEANUP_RENDERER);
+        return false;
+    }
+
     return true;
 }
 
 static void handle_input(SDL_Event *ev, struct control *appstate)
 {
     while (SDL_PollEvent(ev)) {
-        //ImGui_ImplSDL2_ProcessEvent(&ev);
+        imgui_handle_input(ev);
         if (ev->type == SDL_QUIT) {
             appstate->running = false;
         }
@@ -96,11 +106,6 @@ static int sdl_demo(struct control *appstate,
                     const struct gui_platform *platform)
 {
     if (!ui_init(platform)) return EXIT_FAILURE;
-
-
-    /*aldo::MediaRuntime runtime{options, windowSize};
-
-    ImGui::StyleColorsDark();*/
 
     static const SDL_Point boxsize = {256, 240};
     SDL_Point winsize;
@@ -120,7 +125,7 @@ static int sdl_demo(struct control *appstate,
     };
     SDL_Point velocity = {1, 1};
     SDL_Event ev;
-    //auto showDemo = false;
+    bool show_demo = false;
     do {
         handle_input(&ev, appstate);
 
@@ -133,26 +138,7 @@ static int sdl_demo(struct control *appstate,
             velocity.y *= -1;
         }
 
-        /*ImGui_ImplSDLRenderer_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
-
-        if (ImGui::BeginMainMenuBar()) {
-            if (ImGui::BeginMenu("Support")) {
-                ImGui::MenuItem("ImGui Demo", nullptr, &showDemo);
-                ImGui::EndMenu();
-            }
-            ImGui::EndMainMenuBar();
-        }*/
-
-        /*if (showDemo) {
-            ImGui::ShowDemoWindow();
-        }
-        ImGui::Begin("First Window");
-        ImGui::Text("Hello From Aldo+Dear ImGui");
-        ImGui::End();
-
-        ImGui::Render();*/
+        imgui_render(&show_demo);
 
         SDL_SetRenderDrawColor(Renderer, 0x1e, 0x1e, 0x1e, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(Renderer);
@@ -166,7 +152,8 @@ static int sdl_demo(struct control *appstate,
         SDL_SetRenderDrawColor(Renderer, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
         SDL_RenderDrawLine(Renderer, 100, 80, 250, 500);
 
-        //ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+        // TODO: drop this extra step once demo render is rolled into imgui
+        imgui_commit_render();
         SDL_RenderPresent(Renderer);
     } while (appstate->running);
 

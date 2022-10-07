@@ -50,13 +50,11 @@
 		C86B6A8228D0332000AA263A /* CpuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86B6A8128D0332000AA263A /* CpuView.swift */; };
 		C8702CF9278A58C900725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C8702CF8278A58C900725690 /* haltexpr.c */; };
 		C8702CFA278A598A00725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
-		C87141CC28E9408D00718803 /* mediaruntime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C87141CB28E9408D00718803 /* mediaruntime.cpp */; };
 		C88949B12813B2DB00795CC0 /* ChrSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88949B02813B2DB00795CC0 /* ChrSheet.swift */; };
 		C88A5E8527F6A1750039382D /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88A5E8427F6A1750039382D /* CartView.swift */; };
 		C88F3E5727D9A45E00317732 /* EmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88F3E5627D9A45E00317732 /* EmulationView.swift */; };
 		C89D715027D4758900C9177A /* CartPrgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89D714F27D4758900C9177A /* CartPrgView.swift */; };
 		C8A5B77B27DD79AE00A4DD5E /* Cart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A5B77A27DD79AE00A4DD5E /* Cart.swift */; };
-		C8B0E66C28E01B760054547D /* gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8B0E66A28E01B760054547D /* gui.cpp */; };
 		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8B5303B2801300C00576D9F /* CartFocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B5303A2801300C00576D9F /* CartFocusView.swift */; };
 		C8B87D47285E82BD000E0D2E /* CommandViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B87D46285E82BD000E0D2E /* CommandViews.swift */; };
@@ -203,16 +201,11 @@
 		C86030772761A51100F1B27D /* cpupeek.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpupeek.c; sourceTree = "<group>"; };
 		C86B6A8128D0332000AA263A /* CpuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CpuView.swift; sourceTree = "<group>"; };
 		C8702CF8278A58C900725690 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
-		C87141C928E939F600718803 /* mediaruntime.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = mediaruntime.hpp; sourceTree = "<group>"; };
-		C87141CB28E9408D00718803 /* mediaruntime.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mediaruntime.cpp; sourceTree = "<group>"; };
 		C88949B02813B2DB00795CC0 /* ChrSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChrSheet.swift; sourceTree = "<group>"; };
 		C88A5E8427F6A1750039382D /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
 		C88F3E5627D9A45E00317732 /* EmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationView.swift; sourceTree = "<group>"; };
 		C89D714F27D4758900C9177A /* CartPrgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartPrgView.swift; sourceTree = "<group>"; };
 		C8A5B77A27DD79AE00A4DD5E /* Cart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cart.swift; sourceTree = "<group>"; };
-		C8B0E66A28E01B760054547D /* gui.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gui.cpp; sourceTree = "<group>"; };
-		C8B0E66B28E01B760054547D /* gui.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = gui.hpp; sourceTree = "<group>"; };
-		C8B0E66E28E021370054547D /* options.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = options.hpp; sourceTree = "<group>"; };
 		C8B4664327755790000576EE /* argparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = argparse.h; sourceTree = "<group>"; };
 		C8B4664427755790000576EE /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8B5303A2801300C00576D9F /* CartFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartFocusView.swift; sourceTree = "<group>"; };
@@ -504,12 +497,7 @@
 			children = (
 				C8041C3528EE6EC000A3695F /* gui.h */,
 				C8041C3628EE6EC000A3695F /* gui.c */,
-				C8B0E66B28E01B760054547D /* gui.hpp */,
-				C8B0E66A28E01B760054547D /* gui.cpp */,
 				C8041C3828EE72E600A3695F /* guiplatform.h */,
-				C8B0E66E28E021370054547D /* options.hpp */,
-				C87141C928E939F600718803 /* mediaruntime.hpp */,
-				C87141CB28E9408D00718803 /* mediaruntime.cpp */,
 				C84A0D4F28EFC19A00D298AB /* uiimgui.hpp */,
 				C84A0D4E28EFC19A00D298AB /* uiimgui.cpp */,
 			);
@@ -805,8 +793,6 @@
 				C8041C3C28EE83A600A3695F /* control.c in Sources */,
 				C8041C3B28EE839900A3695F /* argparse.c in Sources */,
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,
-				C87141CC28E9408D00718803 /* mediaruntime.cpp in Sources */,
-				C8B0E66C28E01B760054547D /* gui.cpp in Sources */,
 				C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */,
 				C854873D28E685D00045BA42 /* imgui_impl_sdl.cpp in Sources */,
 				C854873B28E685D00045BA42 /* imgui_tables.cpp in Sources */,

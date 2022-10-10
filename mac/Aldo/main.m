@@ -24,5 +24,7 @@ int main(int argc, char *argv[argc+1])
         return EXIT_FAILURE;
     }
 
-    return gui_run(argc, argv, &platform);
+    const int result = gui_run(argc, argv, &platform);
+    platform.cleanup();
+    return result;
 }

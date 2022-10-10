@@ -13,8 +13,10 @@
 #include <stdbool.h>
 
 struct gui_platform {
+    const char *(*appname)(void);
     bool (*is_hidpi)(void);
     float (*render_scale_factor)(SDL_Window *);
+    void (*cleanup)(void);
 };
 
 bool gui_platform_init(struct gui_platform *platform);

@@ -57,7 +57,8 @@ static bool ui_init(const struct gui_platform *platform)
 
     const bool hidpi = platform->is_hidpi();
     SDL_Log("HIDPI: %d", hidpi);
-    Window = SDL_CreateWindow("Aldo",
+    const char *const name = platform->appname();
+    Window = SDL_CreateWindow(name ? name : "DisplayNameErr",
                               SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               1280, 800, hidpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0);
     if (!Window) {

@@ -977,6 +977,7 @@
 				GCC_WARN_PEDANTIC = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Aldo/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(TARGET_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Brandon Stansbury";
 				INFOPLIST_KEY_NSPrincipalClass = SDLApplication;
@@ -1016,6 +1017,7 @@
 				GCC_WARN_PEDANTIC = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Aldo/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(TARGET_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Brandon Stansbury";
 				INFOPLIST_KEY_NSPrincipalClass = SDLApplication;

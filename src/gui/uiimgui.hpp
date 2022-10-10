@@ -15,25 +15,33 @@ namespace aldo
 {
 extern "C"
 {
-#define ALDO_NOEXCEPT noexcept
 #define ALDO_NOARG
+#define ALDO_BOUNCE aldo::bounce
+#define ALDO_NOEXCEPT noexcept
 #else
 #include <stdbool.h>
-#define ALDO_NOEXCEPT
 #define ALDO_NOARG void
+#define ALDO_BOUNCE struct bounce
+#define ALDO_NOEXCEPT
 #endif
+
+struct bounce {
+    SDL_Point bounds, pos, velocity;
+    int dim;
+};
 
 bool imgui_init(SDL_Window *win, SDL_Renderer *ren) ALDO_NOEXCEPT;
 void imgui_handle_input(SDL_Event *ev) ALDO_NOEXCEPT;
-void imgui_render(bool *show_demo) ALDO_NOEXCEPT;
-void imgui_commit_render(ALDO_NOARG) ALDO_NOEXCEPT;
+void imgui_render(const ALDO_BOUNCE *bouncer, bool *show_demo,
+                  SDL_Window *win, SDL_Renderer *ren) ALDO_NOEXCEPT;
 void imgui_cleanup(ALDO_NOARG) ALDO_NOEXCEPT;
 
 #ifdef __cplusplus
 }
 }
 #endif
-#undef ALDO_NOARG
 #undef ALDO_NOEXCEPT
+#undef ALDO_BOUNCE
+#undef ALDO_NOARG
 
 #endif

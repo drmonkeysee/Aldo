@@ -70,7 +70,8 @@ static bool ui_init(const struct gui_platform *platform)
 
     Renderer = SDL_CreateRenderer(Window, -1,
                                   SDL_RENDERER_ACCELERATED
-                                  | SDL_RENDERER_PRESENTVSYNC);
+                                  | SDL_RENDERER_PRESENTVSYNC
+                                  | SDL_RENDERER_TARGETTEXTURE);
     if (!Renderer) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "SDL renderer creation failure: %s",
@@ -103,59 +104,38 @@ static void handle_input(SDL_Event *ev, struct control *appstate)
     }
 }
 
+static void update(struct bounce *bouncer)
+{
+    const int halfdim = bouncer->dim / 2;
+    if (bouncer->pos.x - halfdim < 0
+        || bouncer->pos.x + halfdim > bouncer->bounds.x) {
+        bouncer->velocity.x *= -1;
+    }
+    if (bouncer->pos.y - halfdim < 0
+        || bouncer->pos.y + halfdim > bouncer->bounds.y) {
+        bouncer->velocity.y *= -1;
+    }
+    bouncer->pos.x += bouncer->velocity.x;
+    bouncer->pos.y += bouncer->velocity.y;
+}
+
 static int sdl_demo(struct control *appstate,
                     const struct gui_platform *platform)
 {
     if (!ui_init(platform)) return EXIT_FAILURE;
 
-    static const SDL_Point boxsize = {256, 240};
-    SDL_Point winsize;
-    SDL_GetWindowSize(Window, &winsize.x, &winsize.y);
-    const SDL_Rect box = {
-        (winsize.x - boxsize.x) / 2,
-        (winsize.y - boxsize.y) / 2,
-        boxsize.x,
-        boxsize.y,
+    struct bounce bouncer = {
+        {256, 240},
+        {256 / 2, 240 / 2},
+        {1, 1},
+        50,
     };
-    static const int bounce_dim = 50;
-    SDL_Rect bouncer = {
-        (winsize.x - bounce_dim) / 2,
-        (winsize.y - bounce_dim) / 2,
-        bounce_dim,
-        bounce_dim,
-    };
-    SDL_Point velocity = {1, 1};
     SDL_Event ev;
     bool show_demo = false;
     do {
         handle_input(&ev, appstate);
-
-        bouncer.x += velocity.x;
-        bouncer.y += velocity.y;
-        if (bouncer.x < box.x || (bouncer.x + bouncer.w) > (box.x + box.w)) {
-            velocity.x *= -1;
-        }
-        if (bouncer.y < box.y || (bouncer.y + bouncer.h) > (box.y + box.h)) {
-            velocity.y *= -1;
-        }
-
-        imgui_render(&show_demo);
-
-        SDL_SetRenderDrawColor(Renderer, 0x1e, 0x1e, 0x1e, SDL_ALPHA_OPAQUE);
-        SDL_RenderClear(Renderer);
-
-        SDL_SetRenderDrawColor(Renderer, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
-        SDL_RenderFillRect(Renderer, &box);
-
-        SDL_SetRenderDrawColor(Renderer, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
-        SDL_RenderFillRect(Renderer, &bouncer);
-
-        SDL_SetRenderDrawColor(Renderer, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
-        SDL_RenderDrawLine(Renderer, 100, 80, 250, 500);
-
-        // TODO: drop this extra step once demo render is rolled into imgui
-        imgui_commit_render();
-        SDL_RenderPresent(Renderer);
+        update(&bouncer);
+        imgui_render(&bouncer, &show_demo, Window, Renderer);
     } while (appstate->running);
 
     ui_cleanup(GUI_CLEANUP_ALL);

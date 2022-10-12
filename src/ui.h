@@ -8,9 +8,6 @@
 #ifndef Aldo_ui_h
 #define Aldo_ui_h
 
-#include "control.h"
-#include "snapshot.h"
-
 // X(symbol, value, error string)
 #define UI_ERRCODE_X \
 X(UI_ERR_ERNO, -1, "SYSTEM ERROR")
@@ -20,6 +17,10 @@ enum {
     UI_ERRCODE_X
 #undef X
 };
+
+// NOTE: pre-declare types to minimize ui includes, simplifying C++ interop
+struct console_state;
+struct control;
 
 struct ui_interface {
     void (*tick_start)(struct control *appstate,

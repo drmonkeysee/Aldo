@@ -9,7 +9,9 @@
 
 #include "argparse.h"
 #include "control.h"
+#include "snapshot.h"
 #include "uiimgui.hpp"
+#include "ui.h"
 
 #include <SDL2/SDL.h>
 
@@ -17,6 +19,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
+
+// TODO: move this to ui.c somehow
+int ui_sdl_init(struct ui_interface *ui);
 
 static SDL_Window *restrict Window;
 static SDL_Renderer *restrict Renderer;
@@ -47,7 +52,7 @@ static void ui_cleanup(enum guicleanup status)
     }
 }
 
-static bool ui_init(const struct gui_platform *platform)
+static bool demo_init(const struct gui_platform *platform)
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
@@ -122,7 +127,7 @@ static void update(struct bounce *bouncer)
 static int sdl_demo(struct control *appstate,
                     const struct gui_platform *platform)
 {
-    if (!ui_init(platform)) return EXIT_FAILURE;
+    if (!demo_init(platform)) return EXIT_FAILURE;
 
     struct bounce bouncer = {
         {256, 240},
@@ -130,15 +135,25 @@ static int sdl_demo(struct control *appstate,
         {1, 1},
         50,
     };
+
+    struct console_state snapshot = {0};
+
+    struct ui_interface ui;
+    if (ui_sdl_init(&ui) < 0) return EXIT_FAILURE;
     SDL_Event ev;
     bool show_demo = false;
     do {
+        ui.tick_start(appstate, &snapshot);
+        ui.pollinput();
         handle_input(&ev, appstate);
         update(&bouncer);
+        ui.refresh(appstate, &snapshot);
+        ui.tick_end(appstate);
         imgui_render(&bouncer, &show_demo, Window, Renderer);
     } while (appstate->running);
 
     ui_cleanup(GUI_CLEANUP_ALL);
+    ui.cleanup(appstate, &snapshot);
 
     return EXIT_SUCCESS;
 }

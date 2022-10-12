@@ -5,11 +5,12 @@
 //  Created by Brandon Stansbury on 12/30/21.
 //
 
+#include "ui.h"
+
 #include "control.h"
 #include "haltexpr.h"
 #include "snapshot.h"
 #include "tsutil.h"
-#include "ui.h"
 
 #include <assert.h>
 #include <inttypes.h>
@@ -85,6 +86,8 @@ static void batch_tick_start(struct control *appstate,
 
 static void batch_tick_end(struct control *appstate)
 {
+    assert(appstate != NULL);
+
     Previous = Current;
     ++appstate->clock.frames;
 }
@@ -97,6 +100,9 @@ static int batch_pollinput(void)
 static void batch_refresh(const struct control *appstate,
                           const struct console_state *snapshot)
 {
+    assert(appstate != NULL);
+    assert(snapshot != NULL);
+
     static const char distractor[] = {'|', '/', '-', '\\'};
     static const double display_wait = 2000,
                         refresh_interval_ms = display_wait + 100;

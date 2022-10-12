@@ -14,6 +14,8 @@
 		C8041C3C28EE83A600A3695F /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
 		C808BA6827893976001FDE39 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C80C9E1C277D648F000F2D8B /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
+		C8165F5928F65A5300FF2872 /* uisdl.c in Sources */ = {isa = PBXBuildFile; fileRef = C8165F5828F65A5300FF2872 /* uisdl.c */; };
+		C8165F5C28F65AF600FF2872 /* sdlimgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8165F5A28F65AF600FF2872 /* sdlimgui.cpp */; };
 		C8184D3E25E7496B002B3100 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8184D3D25E7496B002B3100 /* Tests.swift */; };
 		C8184D5325E74B75002B3100 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C8184D5225E74B75002B3100 /* dis.c */; };
 		C8184D7025E750E0002B3100 /* libcinytest.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8184D6F25E750E0002B3100 /* libcinytest.dylib */; };
@@ -149,6 +151,9 @@
 		C808BA6727893976001FDE39 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
 		C80C9E1A277D648F000F2D8B /* debug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
 		C80C9E1B277D648F000F2D8B /* debug.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = debug.c; sourceTree = "<group>"; };
+		C8165F5828F65A5300FF2872 /* uisdl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = uisdl.c; sourceTree = "<group>"; };
+		C8165F5A28F65AF600FF2872 /* sdlimgui.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sdlimgui.cpp; sourceTree = "<group>"; };
+		C8165F5B28F65AF600FF2872 /* sdlimgui.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = sdlimgui.hpp; sourceTree = "<group>"; };
 		C8184D3B25E7496B002B3100 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8184D3D25E7496B002B3100 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		C8184D3F25E7496B002B3100 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -500,6 +505,9 @@
 				C8041C3828EE72E600A3695F /* guiplatform.h */,
 				C84A0D4F28EFC19A00D298AB /* uiimgui.hpp */,
 				C84A0D4E28EFC19A00D298AB /* uiimgui.cpp */,
+				C8165F5828F65A5300FF2872 /* uisdl.c */,
+				C8165F5B28F65AF600FF2872 /* sdlimgui.hpp */,
+				C8165F5A28F65AF600FF2872 /* sdlimgui.cpp */,
 			);
 			path = gui;
 			sourceTree = "<group>";
@@ -794,11 +802,13 @@
 				C8041C3B28EE839900A3695F /* argparse.c in Sources */,
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,
 				C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */,
+				C8165F5928F65A5300FF2872 /* uisdl.c in Sources */,
 				C854873D28E685D00045BA42 /* imgui_impl_sdl.cpp in Sources */,
 				C854873B28E685D00045BA42 /* imgui_tables.cpp in Sources */,
 				C854873C28E685D00045BA42 /* imgui_demo.cpp in Sources */,
 				C8041C3A28EE740900A3695F /* macplatform.m in Sources */,
 				C854873A28E685D00045BA42 /* imgui.cpp in Sources */,
+				C8165F5C28F65AF600FF2872 /* sdlimgui.cpp in Sources */,
 				C84A0D5028EFC19A00D298AB /* uiimgui.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

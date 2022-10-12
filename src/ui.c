@@ -7,7 +7,10 @@
 
 #include "ui.h"
 
+#include "control.h"
+
 #include <assert.h>
+#include <stddef.h>
 
 int ui_batch_init(struct ui_interface *ui);
 int ui_ncurses_init(struct ui_interface *ui);

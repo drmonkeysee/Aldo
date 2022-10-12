@@ -1,5 +1,5 @@
 //
-//  uincurses.c
+//  uicurses.c
 //  Aldo
 //
 //  Created by Brandon Stansbury on 12/30/21.
@@ -642,7 +642,7 @@ static void cleanup_ui(const struct control *appstate,
 // Public Interface
 //
 
-int ui_ncurses_init(struct ui_interface *ui)
+int ui_curses_init(struct ui_interface *ui)
 {
     assert(ui != NULL);
 

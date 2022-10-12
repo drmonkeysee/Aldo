@@ -46,7 +46,7 @@ static void handle_sigint(int sig, siginfo_t *info, void *uap)
 // UI Interface Implementation
 //
 
-static int batch_init(void)
+static int init_ui(void)
 {
     clock_gettime(CLOCK_MONOTONIC, &Start);
     Previous = Start;
@@ -57,8 +57,8 @@ static int batch_init(void)
     return sigaction(SIGINT, &act, NULL) == 0 ? 0 : UI_ERR_ERNO;
 }
 
-static void batch_tick_start(struct control *appstate,
-                             const struct console_state *snapshot)
+static void tick_start(struct control *appstate,
+                       const struct console_state *snapshot)
 {
     assert(appstate != NULL);
     assert(snapshot != NULL);
@@ -84,7 +84,7 @@ static void batch_tick_start(struct control *appstate,
     }
 }
 
-static void batch_tick_end(struct control *appstate)
+static void tick_end(struct control *appstate)
 {
     assert(appstate != NULL);
 
@@ -92,13 +92,13 @@ static void batch_tick_end(struct control *appstate)
     ++appstate->clock.frames;
 }
 
-static int batch_pollinput(void)
+static int pollinput(void)
 {
     return QuitSignal == 0 ? 0 : 'q';
 }
 
-static void batch_refresh(const struct control *appstate,
-                          const struct console_state *snapshot)
+static void refresh_ui(const struct control *appstate,
+                       const struct console_state *snapshot)
 {
     assert(appstate != NULL);
     assert(snapshot != NULL);
@@ -118,8 +118,8 @@ static void batch_refresh(const struct control *appstate,
     }
 }
 
-static void batch_cleanup(const struct control *appstate,
-                          const struct console_state *snapshot)
+static void cleanup_ui(const struct control *appstate,
+                       const struct console_state *snapshot)
 {
     assert(appstate != NULL);
     assert(snapshot != NULL);
@@ -154,14 +154,14 @@ int ui_batch_init(struct ui_interface *ui)
 {
     assert(ui != NULL);
 
-    const int result = batch_init();
+    const int result = init_ui();
     if (result == 0) {
         *ui = (struct ui_interface){
-            batch_tick_start,
-            batch_tick_end,
-            batch_pollinput,
-            batch_refresh,
-            batch_cleanup,
+            tick_start,
+            tick_end,
+            pollinput,
+            refresh_ui,
+            cleanup_ui,
         };
     }
     return result;

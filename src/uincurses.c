@@ -520,7 +520,7 @@ static void ramrefresh(int ramsheet)
 // UI Interface Implementation
 //
 
-static void ncurses_init(void)
+static void init_ui(void)
 {
     static const int
         col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 14, ctrlh = 16,
@@ -557,8 +557,8 @@ static void ncurses_init(void)
     initclock();
 }
 
-static void ncurses_tick_start(struct control *appstate,
-                               const struct console_state *snapshot)
+static void tick_start(struct control *appstate,
+                       const struct console_state *snapshot)
 {
     assert(appstate != NULL);
     assert(snapshot != NULL);
@@ -587,20 +587,20 @@ static void ncurses_tick_start(struct control *appstate,
     TimeBudgetMs -= new_cycles * mspercycle;
 }
 
-static void ncurses_tick_end(struct control *appstate)
+static void tick_end(struct control *appstate)
 {
     Previous = Current;
     ++appstate->clock.frames;
     tick_sleep();
 }
 
-static int ncurses_pollinput(void)
+static int pollinput(void)
 {
     return getch();
 }
 
-static void ncurses_refresh(const struct control *appstate,
-                            const struct console_state *snapshot)
+static void refresh_ui(const struct control *appstate,
+                       const struct console_state *snapshot)
 {
     assert(appstate != NULL);
     assert(snapshot != NULL);
@@ -620,8 +620,8 @@ static void ncurses_refresh(const struct control *appstate,
     doupdate();
 }
 
-static void ncurses_cleanup(const struct control *appstate,
-                            const struct console_state *snapshot)
+static void cleanup_ui(const struct control *appstate,
+                       const struct console_state *snapshot)
 {
     (void)appstate, (void)snapshot;
 
@@ -646,13 +646,13 @@ int ui_ncurses_init(struct ui_interface *ui)
 {
     assert(ui != NULL);
 
-    ncurses_init();
+    init_ui();
     *ui = (struct ui_interface){
-        ncurses_tick_start,
-        ncurses_tick_end,
-        ncurses_pollinput,
-        ncurses_refresh,
-        ncurses_cleanup,
+        tick_start,
+        tick_end,
+        pollinput,
+        refresh_ui,
+        cleanup_ui,
     };
     return 0;
 }

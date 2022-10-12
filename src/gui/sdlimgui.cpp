@@ -13,6 +13,11 @@
 
 namespace
 {
+
+//
+// UI Interface Implementation
+//
+
 int init_ui() noexcept
 {
     SDL_Log("SDLIMGUI INIT");
@@ -41,8 +46,8 @@ int pollinput() noexcept
     return 0;
 }
 
-void refresh(const struct control* appstate,
-             const struct console_state* snapshot) noexcept
+void refresh_ui(const struct control* appstate,
+                const struct console_state* snapshot) noexcept
 {
     assert(appstate != nullptr);
     assert(snapshot != nullptr);
@@ -50,8 +55,8 @@ void refresh(const struct control* appstate,
     SDL_Log("SDLIMGUI REFRESH");
 }
 
-void cleanup(const struct control* appstate,
-             const struct console_state* snapshot) noexcept
+void cleanup_ui(const struct control* appstate,
+                const struct console_state* snapshot) noexcept
 {
     assert(appstate != nullptr);
     assert(snapshot != nullptr);
@@ -75,8 +80,8 @@ int aldo::sdlimgui_init(struct ui_interface* ui) noexcept
             tick_start,
             tick_end,
             pollinput,
-            refresh,
-            cleanup,
+            refresh_ui,
+            cleanup_ui,
         };
     }
     return result;

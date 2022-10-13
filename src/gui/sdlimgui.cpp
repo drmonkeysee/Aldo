@@ -9,7 +9,7 @@
 
 #include <SDL2/SDL.h>
 
-#include <assert.h>
+#include <cassert>
 
 namespace
 {
@@ -24,8 +24,7 @@ int init_ui() noexcept
     return 0;
 }
 
-void tick_start(struct control* appstate,
-                const struct console_state* snapshot) noexcept
+void tick_start(control* appstate, const console_state* snapshot) noexcept
 {
     assert(appstate != nullptr);
     assert(snapshot != nullptr);
@@ -33,7 +32,7 @@ void tick_start(struct control* appstate,
     SDL_Log("SDLIMGUI TICK START");
 }
 
-void tick_end(struct control* appstate) noexcept
+void tick_end(control* appstate) noexcept
 {
     assert(appstate != nullptr);
 
@@ -46,8 +45,8 @@ int pollinput() noexcept
     return 0;
 }
 
-void refresh_ui(const struct control* appstate,
-                const struct console_state* snapshot) noexcept
+void refresh_ui(const control* appstate,
+                const console_state* snapshot) noexcept
 {
     assert(appstate != nullptr);
     assert(snapshot != nullptr);
@@ -55,8 +54,8 @@ void refresh_ui(const struct control* appstate,
     SDL_Log("SDLIMGUI REFRESH");
 }
 
-void cleanup_ui(const struct control* appstate,
-                const struct console_state* snapshot) noexcept
+void cleanup_ui(const control* appstate,
+                const console_state* snapshot) noexcept
 {
     assert(appstate != nullptr);
     assert(snapshot != nullptr);
@@ -70,7 +69,7 @@ void cleanup_ui(const struct control* appstate,
 // Public Interface
 //
 
-int aldo::sdlimgui_init(struct ui_interface* ui) noexcept
+int aldo::sdlimgui_init(ui_interface* ui) noexcept
 {
     assert(ui != nullptr);
 

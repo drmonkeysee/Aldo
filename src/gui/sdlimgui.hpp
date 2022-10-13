@@ -15,17 +15,20 @@ namespace aldo
 {
 extern "C"
 {
+#define ALDO_UIARG ui_interface* ui
 #define ALDO_NOEXCEPT noexcept
 #else
+#define ALDO_UIARG struct ui_interface *ui
 #define ALDO_NOEXCEPT
 #endif
 
-int sdlimgui_init(struct ui_interface *ui) ALDO_NOEXCEPT;
+int sdlimgui_init(ALDO_UIARG) ALDO_NOEXCEPT;
 
 #ifdef __cplusplus
 }
 }
 #endif
 #undef ALDO_NOEXCEPT
+#undef ALDO_UIARG
 
 #endif

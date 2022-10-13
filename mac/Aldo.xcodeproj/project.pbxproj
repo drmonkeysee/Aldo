@@ -503,11 +503,11 @@
 				C8041C3528EE6EC000A3695F /* gui.h */,
 				C8041C3628EE6EC000A3695F /* gui.c */,
 				C8041C3828EE72E600A3695F /* guiplatform.h */,
+				C8165F5B28F65AF600FF2872 /* sdlimgui.hpp */,
+				C8165F5A28F65AF600FF2872 /* sdlimgui.cpp */,
 				C84A0D4F28EFC19A00D298AB /* uiimgui.hpp */,
 				C84A0D4E28EFC19A00D298AB /* uiimgui.cpp */,
 				C8165F5828F65A5300FF2872 /* uisdl.c */,
-				C8165F5B28F65AF600FF2872 /* sdlimgui.hpp */,
-				C8165F5A28F65AF600FF2872 /* sdlimgui.cpp */,
 			);
 			path = gui;
 			sourceTree = "<group>";

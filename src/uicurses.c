@@ -599,8 +599,8 @@ static int pollinput(void)
     return getch();
 }
 
-static void refresh_ui(const struct control *appstate,
-                       const struct console_state *snapshot)
+static void render_ui(const struct control *appstate,
+                      const struct console_state *snapshot)
 {
     assert(appstate != NULL);
     assert(snapshot != NULL);
@@ -651,7 +651,7 @@ int ui_curses_init(struct ui_interface *ui)
         tick_start,
         tick_end,
         pollinput,
-        refresh_ui,
+        render_ui,
         cleanup_ui,
     };
     return 0;

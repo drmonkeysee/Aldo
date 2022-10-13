@@ -27,8 +27,8 @@ struct ui_interface {
                        const struct console_state *snapshot);
     void (*tick_end)(struct control *appstate);
     int (*pollinput)(void);
-    void (*refresh)(const struct control *appstate,
-                    const struct console_state *snapshot);
+    void (*render)(const struct control *appstate,
+                   const struct console_state *snapshot);
     void (*cleanup)(const struct control *appstate,
                     const struct console_state *snapshot);
 };

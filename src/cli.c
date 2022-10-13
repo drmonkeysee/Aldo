@@ -190,7 +190,7 @@ static void emu_loop(struct control *appstate, struct console_state *snapshot,
         if (appstate->running) {
             nes_cycle(console, &appstate->clock);
             nes_snapshot(console, snapshot);
-            ui->refresh(appstate, snapshot);
+            ui->render(appstate, snapshot);
         }
         ui->tick_end(appstate);
     } while (appstate->running);

@@ -147,7 +147,7 @@ static int sdl_demo(struct control *appstate,
         ui.pollinput();
         handle_input(&ev, appstate);
         update(&bouncer);
-        ui.refresh(appstate, &snapshot);
+        ui.render(appstate, &snapshot);
         ui.tick_end(appstate);
         imgui_render(&bouncer, &show_demo, Window, Renderer);
     } while (appstate->running);

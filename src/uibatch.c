@@ -97,8 +97,8 @@ static int pollinput(void)
     return QuitSignal == 0 ? 0 : 'q';
 }
 
-static void refresh_ui(const struct control *appstate,
-                       const struct console_state *snapshot)
+static void render_ui(const struct control *appstate,
+                      const struct console_state *snapshot)
 {
     assert(appstate != NULL);
     assert(snapshot != NULL);
@@ -160,7 +160,7 @@ int ui_batch_init(struct ui_interface *ui)
             tick_start,
             tick_end,
             pollinput,
-            refresh_ui,
+            render_ui,
             cleanup_ui,
         };
     }

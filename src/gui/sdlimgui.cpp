@@ -45,8 +45,7 @@ int pollinput() noexcept
     return 0;
 }
 
-void refresh_ui(const control* appstate,
-                const console_state* snapshot) noexcept
+void render_ui(const control* appstate, const console_state* snapshot) noexcept
 {
     assert(appstate != nullptr);
     assert(snapshot != nullptr);
@@ -79,7 +78,7 @@ int aldo::sdlimgui_init(ui_interface* ui) noexcept
             tick_start,
             tick_end,
             pollinput,
-            refresh_ui,
+            render_ui,
             cleanup_ui,
         };
     }

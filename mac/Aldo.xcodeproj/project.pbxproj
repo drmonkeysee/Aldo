@@ -262,6 +262,7 @@
 		C8DC9CB828DFE5B4000D8D97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C8E76BA9285985CE004C1479 /* Commands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Commands.swift; sourceTree = "<group>"; };
 		C8F2985A2810ECEF00ECFD7E /* CStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CStream.swift; sourceTree = "<group>"; };
+		C8F617A228F7B62A0086A34C /* cartinfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cartinfo.h; sourceTree = "<group>"; };
 		C8FB31D02803D6EC00E6B0EF /* AldoError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -379,6 +380,7 @@
 				C8C7068F2751EEBA00B45785 /* bytes.c */,
 				C8C7068E2751EEBA00B45785 /* cart.h */,
 				C8C7068A2751EEBA00B45785 /* cart.c */,
+				C8F617A228F7B62A0086A34C /* cartinfo.h */,
 				C820E6C925A97A4E006A7AB1 /* cli.h */,
 				C820E6CA25A97A4E006A7AB1 /* cli.c */,
 				C81A516B25DA036100361E40 /* control.h */,

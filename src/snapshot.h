@@ -8,6 +8,7 @@
 #ifndef Aldo_snapshot_h
 #define Aldo_snapshot_h
 
+#include "cartinfo.h"
 #include "haltexpr.h"
 
 #include <stdbool.h>

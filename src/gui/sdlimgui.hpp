@@ -8,27 +8,25 @@
 #ifndef Aldo_gui_sdlimgui_hpp
 #define Aldo_gui_sdlimgui_hpp
 
-#include "ui.h"
-
 #ifdef __cplusplus
 namespace aldo
 {
 extern "C"
 {
-#define ALDO_UIARG ui_interface* ui
+#define ALDO_NOARG
 #define ALDO_NOEXCEPT noexcept
 #else
-#define ALDO_UIARG struct ui_interface *ui
+#define ALDO_NOARG void
 #define ALDO_NOEXCEPT
 #endif
 
-int sdlimgui_init(ALDO_UIARG) ALDO_NOEXCEPT;
+int sdlimgui_init(ALDO_NOARG) ALDO_NOEXCEPT;
 
 #ifdef __cplusplus
 }
 }
 #endif
 #undef ALDO_NOEXCEPT
-#undef ALDO_UIARG
+#undef ALDO_NOARG
 
 #endif

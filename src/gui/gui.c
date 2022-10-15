@@ -21,7 +21,10 @@
 #include <stdlib.h>
 
 // TODO: move this to ui.c somehow
-int ui_sdl_init(struct ui_interface *ui);
+int ui_sdl_init(struct ui_interface *ui)
+{
+    return -1;
+}
 
 static SDL_Window *restrict Window;
 static SDL_Renderer *restrict Renderer;

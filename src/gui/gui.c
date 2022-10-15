@@ -31,7 +31,7 @@ enum guicleanup {
     GUI_CLEANUP_SDL,
 };
 
-static int ui_init(const struct control *appstate, struct ui_interface *ui)
+static int init_ui(const struct control *appstate, struct ui_interface *ui)
 {
     return appstate->batch ? ui_batch_init(ui) : ui_sdl_init(ui);
 }
@@ -141,7 +141,7 @@ static int sdl_demo(struct control *appstate,
 
     struct console_state snapshot = {0};
     struct ui_interface ui;
-    const int err = ui_init(appstate, &ui);
+    const int err = init_ui(appstate, &ui);
     if (err < 0) {
         SDL_Log("UI init failure (%d): %s", err, ui_errstr(err));
         return EXIT_FAILURE;

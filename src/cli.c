@@ -26,11 +26,6 @@
 // NOTE: forward-declare CLI's interactive mode
 int ui_curses_init(struct ui_interface *ui);
 
-static int ui_init(const struct control *appstate, struct ui_interface *ui)
-{
-    return appstate->batch ? ui_batch_init(ui) : ui_curses_init(ui);
-}
-
 static cart *load_cart(const char *filename)
 {
     cart *c = NULL;
@@ -112,6 +107,11 @@ static debugctx *create_debugger(const struct control *appstate)
         }
     }
     return dbg;
+}
+
+static int init_ui(const struct control *appstate, struct ui_interface *ui)
+{
+    return appstate->batch ? ui_batch_init(ui) : ui_curses_init(ui);
 }
 
 static void handle_input(struct control *appstate,
@@ -236,7 +236,7 @@ static int run_emu(struct control *appstate, cart *c)
 
     struct ui_interface ui;
     errno = 0;
-    const int err = ui_init(appstate, &ui);
+    const int err = init_ui(appstate, &ui);
     if (err < 0) {
         fprintf(stderr, "UI init failure (%d): %s\n", err, ui_errstr(err));
         if (err == UI_ERR_ERNO) {

@@ -8,18 +8,24 @@
 #ifndef Aldo_ui_h
 #define Aldo_ui_h
 
-#include "control.h"
-#include "snapshot.h"
+/*#include "control.h"
+#include "snapshot.h"*/
+
+#include "interopopen.h"
 
 // X(symbol, value, error string)
 #define UI_ERRCODE_X \
-X(UI_ERR_ERNO, -1, "SYSTEM ERROR")
+X(UI_ERR_ERNO, -1, "SYSTEM ERROR") \
+X(UI_ERR_LIBINIT, -2, "LIBRARY INIT FAILURE")
 
 enum {
 #define X(s, v, e) s = v,
     UI_ERRCODE_X
 #undef X
 };
+
+struct console_state;
+struct control;
 
 struct ui_interface {
     void (*tick_start)(struct control *appstate,
@@ -39,4 +45,5 @@ const char *ui_errstr(int err);
 // NOTE: common batch mode for CLI and GUI mode
 int ui_batch_init(struct ui_interface *ui);
 
+#include "interopclose.h"
 #endif

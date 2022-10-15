@@ -8,19 +8,19 @@
 #ifndef Aldo_gui_uisdl_hpp
 #define Aldo_gui_uisdl_hpp
 
-struct ui_interface;
+#include "ui.h"
 
 #ifdef __cplusplus
 namespace aldo
 {
-extern "C"
-{
 #endif
+#include "interopopen.h"
 
-int ui_sdl_init(struct ui_interface* ui);
+ALDO_NODISCARD("error code")
+int ui_sdl_init(struct ui_interface* ui) ALDO_NOEXCEPT;
 
+#include "interopclose.h"
 #ifdef __cplusplus
-}
 }
 #endif
 

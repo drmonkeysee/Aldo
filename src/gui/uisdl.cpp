@@ -7,9 +7,7 @@
 
 #include "uisdl.hpp"
 
-//#include "ui.h"
-
-int aldo::ui_sdl_init(ui_interface*)
+int aldo::ui_sdl_init(ui_interface*) noexcept
 {
-    return -1;
+    return UI_ERR_LIBINIT;
 }

@@ -21,7 +21,7 @@ struct gui_platform {
     void (*cleanup)(void);
 };
 
-bool gui_platform_init(struct gui_platform *platform);
+bool gui_platform_init(struct gui_platform *platform) aldo_noexcept;
 
 #include "interopclose.h"
 #endif

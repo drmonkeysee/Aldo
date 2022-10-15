@@ -39,10 +39,10 @@ struct ui_interface {
 
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
-const char *ui_errstr(int err);
+const char *ui_errstr(int err) aldo_noexcept;
 
 // NOTE: common batch mode for CLI and GUI mode
-int ui_batch_init(struct ui_interface *ui);
+int ui_batch_init(struct ui_interface *ui) aldo_noexcept;
 
 #include "interopclose.h"
 #endif

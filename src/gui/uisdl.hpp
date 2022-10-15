@@ -18,10 +18,10 @@ namespace aldo
 #endif
 #include "interopopen.h"
 
-ALDO_NODISCARD("error code")
+aldo_nodiscard("error code")
 int ui_sdl_init(struct ui_interface* ui,
                 const struct control* appstate,
-                const struct gui_platform* platform) ALDO_NOEXCEPT;
+                const struct gui_platform* platform) aldo_noexcept;
 
 #include "interopclose.h"
 #ifdef __cplusplus

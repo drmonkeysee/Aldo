@@ -711,9 +711,7 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
     struct blockview bv = cart_prgblock(cart, 0);
     if (!bv.mem) return DIS_ERR_PRGROM;
 
-    fprintf(f, "%s\n", appstate->cartfile);
     cart_write_dis_header(cart, f);
-
     do {
         fputc('\n', f);
         const int err = print_prgblock(&bv, appstate->verbose, f);

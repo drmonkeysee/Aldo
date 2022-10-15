@@ -356,6 +356,7 @@ void cart_write_dis_header(cart *self, FILE *f)
     assert(self != NULL);
     assert(f != NULL);
 
+    fprintf(f, "%s\n", cart_filename(&self->info));
     char fmtd[CART_FMT_SIZE];
     const int result = cart_format_extendedname(&self->info, fmtd);
     fputs(result > 0 ? fmtd : "Invalid Format", f);

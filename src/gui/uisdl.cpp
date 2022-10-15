@@ -9,7 +9,7 @@
 
 //#include "ui.h"
 
-int aldo::ui_sdl_init(struct ui_interface*)
+int aldo::ui_sdl_init(ui_interface*)
 {
     return -1;
 }

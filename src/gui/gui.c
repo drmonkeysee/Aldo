@@ -140,10 +140,10 @@ static int sdl_demo(struct control *appstate,
     };
 
     struct console_state snapshot = {0};
-
     struct ui_interface ui;
-    if (ui_init(appstate, &ui) < 0) {
-        SDL_Log("BAD UI");
+    const int err = ui_init(appstate, &ui);
+    if (err < 0) {
+        SDL_Log("UI init failure (%d): %s", err, ui_errstr(err));
         return EXIT_FAILURE;
     }
     SDL_Event ev;

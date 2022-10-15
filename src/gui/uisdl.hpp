@@ -16,14 +16,14 @@
 namespace aldo
 {
 #endif
-#include "interopopen.h"
+#include "bridgeopen.h"
 
 aldo_nodiscard("error code")
 int ui_sdl_init(struct ui_interface* ui,
                 const struct control* appstate,
                 const struct gui_platform* platform) aldo_noexcept;
 
-#include "interopclose.h"
+#include "bridgeclose.h"
 #ifdef __cplusplus
 }
 #endif

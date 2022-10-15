@@ -12,7 +12,7 @@
 
 #include <stdbool.h>
 
-#include "interopopen.h"
+#include "bridgeopen.h"
 
 struct gui_platform {
     const char *(*appname)(void);
@@ -23,5 +23,5 @@ struct gui_platform {
 
 bool gui_platform_init(struct gui_platform *platform) aldo_noexcept;
 
-#include "interopclose.h"
+#include "bridgeclose.h"
 #endif

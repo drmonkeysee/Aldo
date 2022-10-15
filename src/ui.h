@@ -12,7 +12,7 @@
 #include "nes.h"
 #include "snapshot.h"
 
-#include "interopopen.h"
+#include "bridgeopen.h"
 
 // X(symbol, value, error string)
 #define UI_ERRCODE_X \
@@ -34,5 +34,5 @@ const char *ui_errstr(int err) aldo_noexcept;
 // NOTE: common batch mode for CLI and GUI mode
 int ui_batch_init(ui_loop **loop) aldo_noexcept;
 
-#include "interopclose.h"
+#include "bridgeclose.h"
 #endif

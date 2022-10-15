@@ -11,8 +11,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "interopopen.h"
-
 struct cycleclock {
     uint64_t frames, total_cycles;
     double runtime;
@@ -43,5 +41,4 @@ struct control {
         unified_disoutput, verbose, version, zeroram;
 };
 
-#include "interopclose.h"
 #endif

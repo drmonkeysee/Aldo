@@ -7,6 +7,7 @@
 
 #include "ui.h"
 
+#include "cart.h"
 #include "haltexpr.h"
 #include "tsutil.h"
 
@@ -112,7 +113,7 @@ static void write_summary(const struct control *appstate,
     const bool scale_ms = appstate->clock.runtime < 1.0;
 
     clearline();
-    printf("---=== %s ===---\n", ctrl_cartfilename(appstate->cartfile));
+    printf("---=== %s ===---\n", cart_filename(snapshot->cart.info));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
            scale_ms
             ? appstate->clock.runtime * TSU_MS_PER_S

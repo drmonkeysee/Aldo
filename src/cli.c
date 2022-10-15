@@ -30,17 +30,13 @@ static cart *load_cart(const char *filename)
 {
     cart *c = NULL;
     errno = 0;
-    FILE *const cartfile = fopen(filename, "rb");
-    if (!cartfile) {
-        perror("Cannot open cart file");
-        return c;
-    }
-
-    const int err = cart_create(&c, cartfile);
+    const int err = cart_create(&c, filename);
     if (err < 0) {
         fprintf(stderr, "Cart load failure (%d): %s\n", err, cart_errstr(err));
+        if (err == CART_ERR_ERNO) {
+            perror("Cannot open cart file");
+        }
     }
-    fclose(cartfile);
 
     return c;
 }
@@ -50,8 +46,7 @@ static int print_cart_info(const struct control *appstate, cart *c)
     if (appstate->verbose) {
         puts("---=== Cart Info ===---");
     }
-    cart_write_info(c, ctrl_cartfilename(appstate->cartfile), stdout,
-                    appstate->verbose);
+    cart_write_info(c, stdout, appstate->verbose);
     return EXIT_SUCCESS;
 }
 

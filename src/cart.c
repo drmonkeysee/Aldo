@@ -212,10 +212,15 @@ const char *cart_mirrorname(enum nt_mirroring mirror)
     }
 }
 
-int cart_create(cart **c, FILE *f)
+int cart_create(cart **c, const char *restrict filepath)
 {
     assert(c != NULL);
-    assert(f != NULL);
+    assert(filepath != NULL);
+
+    FILE *const f = fopen(filepath, "rb");
+    if (!f) {
+        return CART_ERR_ERNO;
+    }
 
     struct cartridge *self = malloc(sizeof *self);
 
@@ -237,11 +242,13 @@ int cart_create(cart **c, FILE *f)
     }
 
     if (err == 0) {
+        self->info.filepath = filepath;
         *c = self;
     } else {
         cart_free(self);
         self = NULL;
     }
+    fclose(f);
     return err;
 }
 
@@ -324,14 +331,12 @@ void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr)
     self->mapper->cpu_disconnect(self->mapper, b, addr);
 }
 
-void cart_write_info(cart *self, const char *restrict cartname, FILE *f,
-                     bool verbose)
+void cart_write_info(cart *self, FILE *f, bool verbose)
 {
     assert(self != NULL);
-    assert(cartname != NULL);
     assert(f != NULL);
 
-    fprintf(f, "File\t\t: %s\n", cartname);
+    fprintf(f, "File\t\t: %s\n", cart_filename(&self->info));
     fprintf(f, "Format\t\t: %s\n", cart_formatname(self->info.format));
     if (verbose) {
         hr(f);
@@ -358,6 +363,14 @@ void cart_write_dis_header(cart *self, FILE *f)
     if (self->info.format != CRTF_ALDO) {
         fputs("(NOTE: approximate for non-Aldo formats)\n", f);
     }
+}
+
+const char *cart_filename(const struct cartinfo *info)
+{
+    assert(info != NULL);
+
+    const char *const last_slash = strrchr(info->filepath, '/');
+    return last_slash ? last_slash + 1 : info->filepath;
 }
 
 int cart_format_extendedname(const struct cartinfo *info,

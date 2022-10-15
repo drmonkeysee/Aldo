@@ -192,8 +192,7 @@ static void drawdebugger(const struct control *appstate,
               err < 0 ? haltexpr_errstr(err) : break_desc);
 }
 
-static void drawcart(const struct control *appstate,
-                     const struct console_state *snapshot)
+static void drawcart(const struct console_state *snapshot)
 {
     static const char *const restrict namelabel = "Name: ";
 
@@ -201,7 +200,7 @@ static void drawcart(const struct control *appstate,
     int cursor_y = 0;
     mvwaddstr(CartView.content, cursor_y, 0, namelabel);
     const char
-        *const cn = ctrl_cartfilename(appstate->cartfile),
+        *const cn = cart_filename(snapshot->cart.info),
         *endofname = strrchr(cn, '.');
     if (!endofname) {
         endofname = strrchr(cn, '\0');
@@ -674,7 +673,7 @@ static void refresh_ui(const struct control *appstate,
     drawhwtraits(appstate);
     drawcontrols(snapshot);
     drawdebugger(appstate, snapshot);
-    drawcart(appstate, snapshot);
+    drawcart(snapshot);
     drawprg(snapshot);
     drawregister(snapshot);
     drawflags(snapshot);

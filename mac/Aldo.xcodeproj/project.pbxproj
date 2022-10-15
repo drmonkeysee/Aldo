@@ -11,7 +11,6 @@
 		C8041C3728EE6EC000A3695F /* gui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8041C3628EE6EC000A3695F /* gui.c */; };
 		C8041C3A28EE740900A3695F /* macplatform.m in Sources */ = {isa = PBXBuildFile; fileRef = C8041C3928EE740900A3695F /* macplatform.m */; };
 		C8041C3B28EE839900A3695F /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
-		C8041C3C28EE83A600A3695F /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
 		C808BA6827893976001FDE39 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C80C9E1C277D648F000F2D8B /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
 		C8184D3E25E7496B002B3100 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8184D3D25E7496B002B3100 /* Tests.swift */; };
@@ -21,7 +20,6 @@
 		C8184D7C25E76541002B3100 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
 		C8186495277EB0F700CA4AC0 /* uicurses.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186494277EB0F700CA4AC0 /* uicurses.c */; };
 		C8186497277EB45900CA4AC0 /* uibatch.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186496277EB45900CA4AC0 /* uibatch.c */; };
-		C81A516D25DA036100361E40 /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
 		C820E6C025A9759A006A7AB1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820E6BF25A9759A006A7AB1 /* main.swift */; };
 		C820E6CB25A97A4E006A7AB1 /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* cli.c */; };
 		C820E6E025A98557006A7AB1 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C820E6DE25A982A5006A7AB1 /* libncurses.tbd */; };
@@ -46,7 +44,6 @@
 		C85C8DC625BD29AC00611D19 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
 		C85CC20927ED6BF30063276D /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C85CC20827ED6BF30063276D /* snapshot.c */; };
 		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
-		C86A4F4828543C01007973D1 /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
 		C86B6A8228D0332000AA263A /* CpuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86B6A8128D0332000AA263A /* CpuView.swift */; };
 		C8702CF9278A58C900725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C8702CF8278A58C900725690 /* haltexpr.c */; };
 		C8702CFA278A598A00725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
@@ -106,7 +103,6 @@
 		C8DC9CB428DFD5BA000D8D97 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; };
 		C8DC9CB528DFD5BA000D8D97 /* SDL2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C8E76BAA285985CE004C1479 /* Commands.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E76BA9285985CE004C1479 /* Commands.swift */; };
-		C8ED8339284DAA5100B563EC /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = C81A516C25DA036100361E40 /* control.c */; };
 		C8F2985B2810ECEF00ECFD7E /* CStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F2985A2810ECEF00ECFD7E /* CStream.swift */; };
 		C8FB31D12803D6EC00E6B0EF /* AldoError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8FB31D02803D6EC00E6B0EF /* AldoError.swift */; };
 /* End PBXBuildFile section */
@@ -164,7 +160,6 @@
 		C8186494277EB0F700CA4AC0 /* uicurses.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = uicurses.c; sourceTree = "<group>"; };
 		C8186496277EB45900CA4AC0 /* uibatch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = uibatch.c; sourceTree = "<group>"; };
 		C81A516B25DA036100361E40 /* control.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = control.h; sourceTree = "<group>"; };
-		C81A516C25DA036100361E40 /* control.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = control.c; sourceTree = "<group>"; };
 		C820E6BC25A9759A006A7AB1 /* Cli */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Cli; sourceTree = BUILT_PRODUCTS_DIR; };
 		C820E6BF25A9759A006A7AB1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		C820E6C825A97A4E006A7AB1 /* Cli-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Cli-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -388,7 +383,6 @@
 				C820E6C925A97A4E006A7AB1 /* cli.h */,
 				C820E6CA25A97A4E006A7AB1 /* cli.c */,
 				C81A516B25DA036100361E40 /* control.h */,
-				C81A516C25DA036100361E40 /* control.c */,
 				C8C706842751EEBA00B45785 /* cpu.h */,
 				C8C706892751EEBA00B45785 /* cpu.c */,
 				C80C9E1A277D648F000F2D8B /* debug.h */,
@@ -741,7 +735,6 @@
 				C8C706B92751F0C700B45785 /* cpu.c in Sources */,
 				C8C706AE2751EF8D00B45785 /* bus.c in Sources */,
 				C8C706B42751EF8D00B45785 /* cpuinterrupt.c in Sources */,
-				C86A4F4828543C01007973D1 /* control.c in Sources */,
 				C8C706BA2751F0CB00B45785 /* decode.c in Sources */,
 				C8C706B02751EF8D00B45785 /* cpu.c in Sources */,
 				C8C706AC2751EF8D00B45785 /* cpujump.c in Sources */,
@@ -783,7 +776,6 @@
 				C808BA6827893976001FDE39 /* haltexpr.c in Sources */,
 				C8C706962751EEBA00B45785 /* decode.c in Sources */,
 				C85CC20927ED6BF30063276D /* snapshot.c in Sources */,
-				C81A516D25DA036100361E40 /* control.c in Sources */,
 				C80C9E1C277D648F000F2D8B /* debug.c in Sources */,
 				C8C706972751EEBA00B45785 /* bytes.c in Sources */,
 				C8C706982751EEBA00B45785 /* mappers.c in Sources */,
@@ -806,7 +798,6 @@
 				C854873828E685D00045BA42 /* imgui_impl_sdlrenderer.cpp in Sources */,
 				C830036C28DEDDD200480F29 /* main.m in Sources */,
 				C88CABE028FA521C00551C65 /* haltexpr.c in Sources */,
-				C8041C3C28EE83A600A3695F /* control.c in Sources */,
 				C8041C3B28EE839900A3695F /* argparse.c in Sources */,
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,
 				C88CABE228FA624D00551C65 /* ui.c in Sources */,
@@ -847,7 +838,6 @@
 				C8DBC91027C8708A0043994B /* AldoApp.swift in Sources */,
 				C803504228D692430022A4B9 /* Rendering.swift in Sources */,
 				C8C9FB662803F8BD0093D9A7 /* decode.c in Sources */,
-				C8ED8339284DAA5100B563EC /* control.c in Sources */,
 				C8E76BAA285985CE004C1479 /* Commands.swift in Sources */,
 				C8B5303B2801300C00576D9F /* CartFocusView.swift in Sources */,
 				C88A5E8527F6A1750039382D /* CartView.swift in Sources */,

@@ -43,9 +43,5 @@ struct control {
         unified_disoutput, verbose, version, zeroram;
 };
 
-// NOTE: returns a pointer to a statically allocated string;
-// **WARNING**: do not write through or free this pointer!
-const char *ctrl_cartfilename(const char *cartfile) aldo_noexcept;
-
 #include "interopclose.h"
 #endif

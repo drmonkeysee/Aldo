@@ -12,6 +12,8 @@
 
 #include <stdbool.h>
 
+#include "interopopen.h"
+
 struct gui_platform {
     const char *(*appname)(void);
     bool (*is_hidpi)(void);
@@ -21,4 +23,5 @@ struct gui_platform {
 
 bool gui_platform_init(struct gui_platform *platform);
 
+#include "interopclose.h"
 #endif

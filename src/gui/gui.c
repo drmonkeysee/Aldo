@@ -21,85 +21,13 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-static SDL_Window *restrict Window;
-static SDL_Renderer *restrict Renderer;
-
-enum guicleanup {
-    GUI_CLEANUP_ALL,
-    GUI_CLEANUP_RENDERER,
-    GUI_CLEANUP_WINDOW,
-    GUI_CLEANUP_SDL,
-};
-
-static int init_ui(const struct control *appstate, struct ui_interface *ui)
+static int init_ui(const struct control *appstate,
+                   const struct gui_platform *platform,
+                   struct ui_interface *ui)
 {
-    return appstate->batch ? ui_batch_init(ui) : ui_sdl_init(ui);
-}
-
-static void ui_cleanup(enum guicleanup status)
-{
-    switch (status) {
-    case GUI_CLEANUP_ALL:
-        imgui_cleanup();
-        // NOTE: fallthrough
-    case GUI_CLEANUP_RENDERER:
-        SDL_DestroyRenderer(Renderer);
-        Renderer = NULL;
-        // NOTE: fallthrough
-    case GUI_CLEANUP_WINDOW:
-        SDL_DestroyWindow(Window);
-        Window = NULL;
-        // NOTE: fallthrough
-    default:
-        SDL_Quit();
-    }
-}
-
-static bool demo_init(const struct gui_platform *platform)
-{
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-                        "SDL initialization failure: %s", SDL_GetError());
-        return false;
-    }
-
-    const bool hidpi = platform->is_hidpi();
-    SDL_Log("HIDPI: %d", hidpi);
-    const char *const name = platform->appname();
-    Window = SDL_CreateWindow(name ? name : "DisplayNameErr",
-                              SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                              1280, 800, hidpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0);
-    if (!Window) {
-        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-                        "SDL window creation failure: %s", SDL_GetError());
-        ui_cleanup(GUI_CLEANUP_SDL);
-        return false;
-    }
-
-    Renderer = SDL_CreateRenderer(Window, -1,
-                                  SDL_RENDERER_ACCELERATED
-                                  | SDL_RENDERER_PRESENTVSYNC
-                                  | SDL_RENDERER_TARGETTEXTURE);
-    if (!Renderer) {
-        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-                        "SDL renderer creation failure: %s",
-                        SDL_GetError());
-        ui_cleanup(GUI_CLEANUP_WINDOW);
-        return false;
-    }
-    const float render_scale_factor = platform->render_scale_factor(Window);
-    SDL_RenderSetScale(Renderer, render_scale_factor, render_scale_factor);
-    SDL_RendererInfo info;
-    SDL_GetRendererInfo(Renderer, &info);
-    SDL_Log("Render info: %s (%04X) (x%.1f)", info.name, info.flags,
-            render_scale_factor);
-
-    if (!imgui_init(Window, Renderer)) {
-        ui_cleanup(GUI_CLEANUP_RENDERER);
-        return false;
-    }
-
-    return true;
+    return appstate->batch
+            ? ui_batch_init(ui)
+            : ui_sdl_init(ui, appstate, platform);
 }
 
 static void handle_input(SDL_Event *ev, struct control *appstate)
@@ -130,9 +58,7 @@ static void update(struct bounce *bouncer)
 static int sdl_demo(struct control *appstate,
                     const struct gui_platform *platform)
 {
-    if (!demo_init(platform)) return EXIT_FAILURE;
-
-    struct bounce bouncer = {
+    appstate->bouncer = (struct bounce){
         {256, 240},
         {256 / 2, 240 / 2},
         {1, 1},
@@ -141,24 +67,21 @@ static int sdl_demo(struct control *appstate,
 
     struct console_state snapshot = {0};
     struct ui_interface ui;
-    const int err = init_ui(appstate, &ui);
+    const int err = init_ui(appstate, platform, &ui);
     if (err < 0) {
         SDL_Log("UI init failure (%d): %s", err, ui_errstr(err));
         return EXIT_FAILURE;
     }
     SDL_Event ev;
-    bool show_demo = false;
     do {
         ui.tick_start(appstate, &snapshot);
         ui.pollinput();
         handle_input(&ev, appstate);
-        update(&bouncer);
+        update(&appstate->bouncer);
         ui.render(appstate, &snapshot);
         ui.tick_end(appstate);
-        imgui_render(&bouncer, &show_demo, Window, Renderer);
     } while (appstate->running);
 
-    ui_cleanup(GUI_CLEANUP_ALL);
     ui.cleanup(appstate, &snapshot);
 
     return EXIT_SUCCESS;

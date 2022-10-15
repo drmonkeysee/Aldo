@@ -8,8 +8,8 @@
 #ifndef Aldo_ui_h
 #define Aldo_ui_h
 
-/*#include "control.h"
-#include "snapshot.h"*/
+#include "control.h"
+//#include "snapshot.h"
 
 #include "interopopen.h"
 
@@ -25,7 +25,6 @@ enum {
 };
 
 struct console_state;
-struct control;
 
 struct ui_interface {
     void (*tick_start)(struct control *appstate,

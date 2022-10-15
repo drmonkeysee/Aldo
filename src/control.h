@@ -11,6 +11,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "interopopen.h"
+
 struct cycleclock {
     uint64_t frames, total_cycles;
     double runtime;
@@ -22,10 +24,19 @@ struct haltarg {
     struct haltarg *next;
 };
 
+// TODO: temp struct for gui demo
+struct bounce {
+    struct {
+        int x, y;
+    } bounds, pos, velocity;
+    int dim;
+};
+
 struct control {
     struct haltarg *haltlist;
     const char *cartfile, *chrdecode_prefix, *me;   // Non-owning Pointers
     struct cycleclock clock;
+    struct bounce bouncer;
     int chrscale, ramsheet, resetvector;
     bool
         batch, bcdsupport, chrdecode, disassemble, help, info, running, tron,
@@ -38,4 +49,5 @@ extern const int MinChrScale, MaxChrScale, MinCps, MaxCps, RamSheets;
 // **WARNING**: do not write through or free this pointer!
 const char *ctrl_cartfilename(const char *cartfile);
 
+#include "interopclose.h"
 #endif

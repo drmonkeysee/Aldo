@@ -40,14 +40,12 @@ static void init_control_zero_args(void *ctx)
     ct_assertequal(4, appstate->clock.cycles_per_sec);
     ct_assertequal(-1, appstate->resetvector);
     ct_asserttrue(appstate->help);
-    ct_asserttrue(appstate->running);
 
     ct_assertequal(0u, appstate->clock.total_cycles);
     ct_assertequal(0, appstate->clock.budget);
     ct_assertnull(appstate->cartfile);
     ct_assertnull(appstate->chrdecode_prefix);
     ct_assertnull(appstate->haltlist);
-    ct_assertequal(0, appstate->ramsheet);
     ct_assertfalse(appstate->batch);
     ct_assertfalse(appstate->chrdecode);
     ct_assertfalse(appstate->disassemble);

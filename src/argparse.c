@@ -46,7 +46,11 @@ static const char
     VersionShort = 'V',
     ZeroRamShort = 'z';
 
-static const int MinAddress = 0, MaxAddress = ADDRMASK_64KB;
+static const int
+    MinAddress = 0,
+    MaxAddress = ADDRMASK_64KB,
+    MinChrScale = 1,
+    MaxChrScale = 10;
 
 static void init_control(struct control *appstate)
 {
@@ -54,7 +58,6 @@ static void init_control(struct control *appstate)
         .chrscale = MinChrScale,
         .clock = {.cycles_per_sec = 4},
         .resetvector = -1,
-        .running = true,
     };
 }
 

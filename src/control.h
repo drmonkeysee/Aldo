@@ -37,13 +37,11 @@ struct control {
     const char *cartfile, *chrdecode_prefix, *me;   // Non-owning Pointers
     struct cycleclock clock;
     struct bounce bouncer;
-    int chrscale, ramsheet, resetvector;
+    int chrscale, resetvector;
     bool
-        batch, bcdsupport, chrdecode, disassemble, help, info, running, tron,
+        batch, bcdsupport, chrdecode, disassemble, help, info, tron,
         unified_disoutput, verbose, version, zeroram;
 };
-
-extern const int MinChrScale, MaxChrScale, MinCps, MaxCps, RamSheets;
 
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!

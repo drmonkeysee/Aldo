@@ -76,7 +76,7 @@ static void tick_start(struct control *appstate,
 
     // NOTE: exit batch mode if cpu is not running
     if (!snapshot->lines.ready) {
-        appstate->running = false;
+        QuitSignal = 1;
     }
 }
 
@@ -84,13 +84,6 @@ static void tick_end(struct control *appstate)
 {
     Previous = Current;
     ++appstate->clock.frames;
-}
-
-static void check_signal(struct control *appstate)
-{
-    if (QuitSignal != 0) {
-        appstate->running = false;
-    }
 }
 
 static void update_progress(const struct control *appstate,
@@ -149,8 +142,7 @@ static void batch_loop(struct control *appstate, nes *console,
         nes_snapshot(console, snapshot);
         update_progress(appstate, snapshot);
         tick_end(appstate);
-        check_signal(appstate);
-    } while (appstate->running);
+    } while (QuitSignal == 0);
     write_summary(appstate, snapshot);
 }
 

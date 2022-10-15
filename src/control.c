@@ -10,10 +10,6 @@
 #include <assert.h>
 #include <string.h>
 
-const int
-    MinChrScale = 1, MaxChrScale = 10, MinCps = 1, MaxCps = 1000,
-    RamSheets = 4;
-
 const char *ctrl_cartfilename(const char *cartfile)
 {
     assert(cartfile != NULL);

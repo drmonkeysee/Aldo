@@ -33,11 +33,15 @@
 // NOTE: Approximate 60 FPS for application event loop;
 // this will be enforced by actual vsync when ported to true GUI
 // and is *distinct* from emulator frequency which can be modified by the user.
-static const int Fps = 60;
+static const int Fps = 60, MinCps = 1, MaxCps = 1000, RamSheets = 4;
 static const struct timespec VSync = {.tv_nsec = TSU_NS_PER_S / Fps};
 
 static struct timespec Current, Previous, Start;
 static double FrameLeftMs, FrameTimeMs, TimeBudgetMs;
+static struct {
+    int ramsheet;
+    bool running;
+} ViewState = {.running = true};
 
 static void initclock(void)
 {
@@ -506,13 +510,13 @@ static void vcleanup(struct view *v)
     *v = (struct view){0};
 }
 
-static void ramrefresh(int ramsheet)
+static void ramrefresh(void)
 {
     int ram_x, ram_y, ram_w, ram_h;
     getbegyx(RamView.win, ram_y, ram_x);
     getmaxyx(RamView.win, ram_h, ram_w);
-    pnoutrefresh(RamView.content, (ram_h - 4) * ramsheet, 0, ram_y + 3,
-                 ram_x + 2, ram_y + ram_h - 2, ram_x + ram_w - 2);
+    pnoutrefresh(RamView.content, (ram_h - 4) * ViewState.ramsheet, 0,
+                 ram_y + 3, ram_x + 2, ram_y + ram_h - 2, ram_x + ram_w - 2);
 }
 
 //
@@ -643,15 +647,15 @@ static void handle_input(struct control *appstate, nes *console,
         }
         break;
     case 'q':
-        appstate->running = false;
+        ViewState.running = false;
         break;
     case 'r':
-        appstate->ramsheet = (appstate->ramsheet + 1) % RamSheets;
+        ViewState.ramsheet = (ViewState.ramsheet + 1) % RamSheets;
         break;
     case 'R':
-        --appstate->ramsheet;
-        if (appstate->ramsheet < 0) {
-            appstate->ramsheet = RamSheets - 1;
+        --ViewState.ramsheet;
+        if (ViewState.ramsheet < 0) {
+            ViewState.ramsheet = RamSheets - 1;
         }
         break;
     case 's':
@@ -678,7 +682,7 @@ static void refresh_ui(const struct control *appstate,
     drawram(snapshot);
 
     update_panels();
-    ramrefresh(appstate->ramsheet);
+    ramrefresh();
     doupdate();
 }
 
@@ -707,13 +711,13 @@ static void curses_loop(struct control *appstate, nes *console,
     do {
         tick_start(appstate, snapshot);
         handle_input(appstate, console, snapshot);
-        if (appstate->running) {
+        if (ViewState.running) {
             nes_cycle(console, &appstate->clock);
             nes_snapshot(console, snapshot);
             refresh_ui(appstate, snapshot);
         }
         tick_end(appstate);
-    } while (appstate->running);
+    } while (ViewState.running);
     cleanup_ui();
 }
 

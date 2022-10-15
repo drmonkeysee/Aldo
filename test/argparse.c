@@ -712,6 +712,50 @@ static void option_does_not_trigger_flag(void *ctx)
     ct_assertfalse(appstate->verbose);
 }
 
+static void double_dash_ends_option_parsing(void *ctx)
+{
+    struct control *const appstate = ctx;
+    char *argv[] = {
+        "testaldo",
+        "-dv", "--", "-b", "-s", "5", "--chr-decode=myrom", "test.rom", NULL,
+    };
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(appstate, argc, argv);
+
+    ct_asserttrue(result);
+
+    ct_asserttrue(appstate->disassemble);
+    ct_asserttrue(appstate->verbose);
+    ct_assertfalse(appstate->batch);
+    ct_assertequal(1, appstate->chrscale);
+    ct_assertfalse(appstate->chrdecode);
+    ct_assertnull(appstate->chrdecode_prefix);
+    ct_assertequalstr("test.rom", appstate->cartfile);
+}
+
+static void double_dash_ends_option_parsing_unordered(void *ctx)
+{
+    struct control *const appstate = ctx;
+    char *argv[] = {
+        "testaldo",
+        "-dv", "--", "-b", "test.rom", "-s5", "--chr-decode=myrom", NULL,
+    };
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(appstate, argc, argv);
+
+    ct_asserttrue(result);
+
+    ct_asserttrue(appstate->disassemble);
+    ct_asserttrue(appstate->verbose);
+    ct_assertfalse(appstate->batch);
+    ct_assertequal(1, appstate->chrscale);
+    ct_assertfalse(appstate->chrdecode);
+    ct_assertnull(appstate->chrdecode_prefix);
+    ct_assertequalstr("test.rom", appstate->cartfile);
+}
+
 //
 // Test List
 //
@@ -774,6 +818,8 @@ struct ct_testsuite argparse_tests(void)
         ct_maketest(halt_long_does_not_overparse),
 
         ct_maketest(option_does_not_trigger_flag),
+        ct_maketest(double_dash_ends_option_parsing),
+        ct_maketest(double_dash_ends_option_parsing_unordered),
     };
 
     return ct_makesuite_setup_teardown(tests, setup, teardown);

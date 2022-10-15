@@ -52,6 +52,10 @@
 		C8702CFA278A598A00725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C88949B12813B2DB00795CC0 /* ChrSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88949B02813B2DB00795CC0 /* ChrSheet.swift */; };
 		C88A5E8527F6A1750039382D /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88A5E8427F6A1750039382D /* CartView.swift */; };
+		C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C88CABDC28FA4DDD00551C65 /* uisdl.cpp */; };
+		C88CABDF28FA520900551C65 /* uibatch.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186496277EB45900CA4AC0 /* uibatch.c */; };
+		C88CABE028FA521C00551C65 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
+		C88CABE128FA522D00551C65 /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
 		C88F3E5727D9A45E00317732 /* EmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88F3E5627D9A45E00317732 /* EmulationView.swift */; };
 		C89D715027D4758900C9177A /* CartPrgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89D714F27D4758900C9177A /* CartPrgView.swift */; };
 		C8A5B77B27DD79AE00A4DD5E /* Cart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A5B77A27DD79AE00A4DD5E /* Cart.swift */; };
@@ -203,6 +207,8 @@
 		C8702CF8278A58C900725690 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
 		C88949B02813B2DB00795CC0 /* ChrSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChrSheet.swift; sourceTree = "<group>"; };
 		C88A5E8427F6A1750039382D /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
+		C88CABDC28FA4DDD00551C65 /* uisdl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = uisdl.cpp; sourceTree = "<group>"; };
+		C88CABDD28FA4DDD00551C65 /* uisdl.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = uisdl.hpp; sourceTree = "<group>"; };
 		C88F3E5627D9A45E00317732 /* EmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationView.swift; sourceTree = "<group>"; };
 		C89D714F27D4758900C9177A /* CartPrgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartPrgView.swift; sourceTree = "<group>"; };
 		C8A5B77A27DD79AE00A4DD5E /* Cart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cart.swift; sourceTree = "<group>"; };
@@ -502,6 +508,8 @@
 				C8041C3828EE72E600A3695F /* guiplatform.h */,
 				C84A0D4F28EFC19A00D298AB /* uiimgui.hpp */,
 				C84A0D4E28EFC19A00D298AB /* uiimgui.cpp */,
+				C88CABDD28FA4DDD00551C65 /* uisdl.hpp */,
+				C88CABDC28FA4DDD00551C65 /* uisdl.cpp */,
 			);
 			path = gui;
 			sourceTree = "<group>";
@@ -792,14 +800,18 @@
 				C8041C3728EE6EC000A3695F /* gui.c in Sources */,
 				C854873828E685D00045BA42 /* imgui_impl_sdlrenderer.cpp in Sources */,
 				C830036C28DEDDD200480F29 /* main.m in Sources */,
+				C88CABE028FA521C00551C65 /* haltexpr.c in Sources */,
 				C8041C3C28EE83A600A3695F /* control.c in Sources */,
 				C8041C3B28EE839900A3695F /* argparse.c in Sources */,
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,
+				C88CABDF28FA520900551C65 /* uibatch.c in Sources */,
 				C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */,
 				C854873D28E685D00045BA42 /* imgui_impl_sdl.cpp in Sources */,
 				C854873B28E685D00045BA42 /* imgui_tables.cpp in Sources */,
 				C854873C28E685D00045BA42 /* imgui_demo.cpp in Sources */,
 				C8041C3A28EE740900A3695F /* macplatform.m in Sources */,
+				C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */,
+				C88CABE128FA522D00551C65 /* tsutil.c in Sources */,
 				C854873A28E685D00045BA42 /* imgui.cpp in Sources */,
 				C84A0D5028EFC19A00D298AB /* uiimgui.cpp in Sources */,
 			);

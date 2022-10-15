@@ -23,6 +23,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// NOTE: forward-declare CLI's interactive mode
+int ui_curses_init(struct ui_interface *ui);
+
+static int ui_init(const struct control *appstate, struct ui_interface *ui)
+{
+    return appstate->batch ? ui_batch_init(ui) : ui_curses_init(ui);
+}
+
 static cart *load_cart(const char *filename)
 {
     cart *c = NULL;

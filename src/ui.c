@@ -7,22 +7,6 @@
 
 #include "ui.h"
 
-#include "control.h"
-
-#include <assert.h>
-#include <stddef.h>
-
-int ui_batch_init(struct ui_interface *ui);
-int ui_curses_init(struct ui_interface *ui);
-
-int ui_init(const struct control *appstate, struct ui_interface *ui)
-{
-    assert(appstate != NULL);
-    assert(ui != NULL);
-
-    return appstate->batch ? ui_batch_init(ui) : ui_curses_init(ui);
-}
-
 const char *ui_errstr(int err)
 {
     switch (err) {

@@ -205,11 +205,16 @@ bool argparse_parse(struct control *restrict appstate, int argc,
 {
     init_control(appstate);
     appstate->me = argc > 0 && strlen(argv[0]) > 0 ? argv[0] : "aldo";
+    bool opt_parse = true;
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
             const char *const arg = argv[i];
             if (arg[0] == '-') {
-                if (!parse_arg(appstate, arg, &i, argc, argv)) {
+                if (!opt_parse) {
+                    continue;
+                } else if (arg[1] == '-' && arg[2] == '\0') {
+                    opt_parse = false;
+                } else if (!parse_arg(appstate, arg, &i, argc, argv)) {
                     argparse_cleanup(appstate);
                     return false;
                 }

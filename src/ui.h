@@ -36,6 +36,7 @@ struct ui_interface {
 // **WARNING**: do not write through or free this pointer!
 const char *ui_errstr(int err);
 
-int ui_init(const struct control *appstate, struct ui_interface *ui);
+// NOTE: common batch mode for CLI and GUI mode
+int ui_batch_init(struct ui_interface *ui);
 
 #endif

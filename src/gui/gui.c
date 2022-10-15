@@ -10,8 +10,9 @@
 #include "argparse.h"
 #include "control.h"
 #include "snapshot.h"
-#include "uiimgui.hpp"
 #include "ui.h"
+#include "uiimgui.hpp"
+#include "uisdl.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -19,12 +20,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
-
-// TODO: move this to ui.c somehow
-int ui_sdl_init(struct ui_interface *ui)
-{
-    return -1;
-}
 
 static SDL_Window *restrict Window;
 static SDL_Renderer *restrict Renderer;
@@ -35,6 +30,11 @@ enum guicleanup {
     GUI_CLEANUP_WINDOW,
     GUI_CLEANUP_SDL,
 };
+
+static int ui_init(const struct control *appstate, struct ui_interface *ui)
+{
+    return appstate->batch ? ui_batch_init(ui) : ui_sdl_init(ui);
+}
 
 static void ui_cleanup(enum guicleanup status)
 {
@@ -142,7 +142,10 @@ static int sdl_demo(struct control *appstate,
     struct console_state snapshot = {0};
 
     struct ui_interface ui;
-    if (ui_sdl_init(&ui) < 0) return EXIT_FAILURE;
+    if (ui_init(appstate, &ui) < 0) {
+        SDL_Log("BAD UI");
+        return EXIT_FAILURE;
+    }
     SDL_Event ev;
     bool show_demo = false;
     do {

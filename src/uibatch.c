@@ -7,14 +7,13 @@
 
 #include "ui.h"
 
-#include "control.h"
 #include "haltexpr.h"
-#include "snapshot.h"
 #include "tsutil.h"
 
 #include <assert.h>
 #include <inttypes.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -43,7 +42,7 @@ static void handle_sigint(int sig, siginfo_t *info, void *uap)
 }
 
 //
-// UI Interface Implementation
+// UI Loop Implementation
 //
 
 static int init_ui(void)
@@ -60,9 +59,6 @@ static int init_ui(void)
 static void tick_start(struct control *appstate,
                        const struct console_state *snapshot)
 {
-    assert(appstate != NULL);
-    assert(snapshot != NULL);
-
     clock_gettime(CLOCK_MONOTONIC, &Current);
     const double currentms = timespec_to_ms(&Current);
     FrameTimeMs = currentms - timespec_to_ms(&Previous);
@@ -86,23 +82,20 @@ static void tick_start(struct control *appstate,
 
 static void tick_end(struct control *appstate)
 {
-    assert(appstate != NULL);
-
     Previous = Current;
     ++appstate->clock.frames;
 }
 
-static int pollinput(void)
+static void check_signal(struct control *appstate)
 {
-    return QuitSignal == 0 ? 0 : 'q';
+    if (QuitSignal != 0) {
+        appstate->running = false;
+    }
 }
 
-static void render_ui(const struct control *appstate,
-                      const struct console_state *snapshot)
+static void update_progress(const struct control *appstate,
+                            const struct console_state *snapshot)
 {
-    assert(appstate != NULL);
-    assert(snapshot != NULL);
-
     static const char distractor[] = {'|', '/', '-', '\\'};
     static const double display_wait = 2000,
                         refresh_interval_ms = display_wait + 100;
@@ -118,12 +111,9 @@ static void render_ui(const struct control *appstate,
     }
 }
 
-static void cleanup_ui(const struct control *appstate,
-                       const struct console_state *snapshot)
+static void write_summary(const struct control *appstate,
+                          const struct console_state *snapshot)
 {
-    assert(appstate != NULL);
-    assert(snapshot != NULL);
-
     if (!appstate->verbose) return;
 
     const bool scale_ms = appstate->clock.runtime < 1.0;
@@ -146,23 +136,33 @@ static void cleanup_ui(const struct control *appstate,
     }
 }
 
+static void batch_loop(struct control *appstate, nes *console,
+                       struct console_state *snapshot)
+{
+    assert(appstate != NULL);
+    assert(console != NULL);
+    assert(snapshot != NULL);
+
+    do {
+        tick_start(appstate, snapshot);
+        nes_cycle(console, &appstate->clock);
+        nes_snapshot(console, snapshot);
+        update_progress(appstate, snapshot);
+        tick_end(appstate);
+        check_signal(appstate);
+    } while (appstate->running);
+    write_summary(appstate, snapshot);
+}
+
 //
 // Public Interface
 //
 
-int ui_batch_init(struct ui_interface *ui)
+int ui_batch_init(ui_loop **loop)
 {
-    assert(ui != NULL);
+    assert(loop != NULL);
 
-    const int result = init_ui();
-    if (result == 0) {
-        *ui = (struct ui_interface){
-            tick_start,
-            tick_end,
-            pollinput,
-            render_ui,
-            cleanup_ui,
-        };
-    }
-    return result;
+    const int err = init_ui();
+    *loop = err == 0 ? batch_loop : NULL;
+    return err;
 }

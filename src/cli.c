@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 // NOTE: forward-declare CLI's interactive mode
-int ui_curses_init(struct ui_interface *ui);
+int ui_curses_init(ui_loop **loop);
 
 static cart *load_cart(const char *filename)
 {
@@ -109,99 +109,9 @@ static debugctx *create_debugger(const struct control *appstate)
     return dbg;
 }
 
-static int init_ui(const struct control *appstate, struct ui_interface *ui)
+static int init_ui(const struct control *appstate, ui_loop **loop)
 {
-    return appstate->batch ? ui_batch_init(ui) : ui_curses_init(ui);
-}
-
-static void handle_input(struct control *appstate,
-                         const struct console_state *snapshot, nes *console,
-                         const struct ui_interface *ui)
-{
-    const int c = ui->pollinput();
-    switch (c) {
-    case ' ':
-        if (snapshot->lines.ready) {
-            nes_halt(console);
-        } else {
-            nes_ready(console);
-        }
-        break;
-    case '=':   // "Lowercase" +
-        ++appstate->clock.cycles_per_sec;
-        goto pclamp_cps;
-    case '+':
-        appstate->clock.cycles_per_sec += 10;
-    pclamp_cps:
-        if (appstate->clock.cycles_per_sec > MaxCps) {
-            appstate->clock.cycles_per_sec = MaxCps;
-        }
-        break;
-    case '-':
-        --appstate->clock.cycles_per_sec;
-        goto nclamp_cps;
-    case '_':   // "Uppercase" -
-        appstate->clock.cycles_per_sec -= 10;
-    nclamp_cps:
-        if (appstate->clock.cycles_per_sec < MinCps) {
-            appstate->clock.cycles_per_sec = MinCps;
-        }
-        break;
-    case 'i':
-        if (snapshot->lines.irq) {
-            nes_interrupt(console, NESI_IRQ);
-        } else {
-            nes_clear(console, NESI_IRQ);
-        }
-        break;
-    case 'm':
-        nes_mode(console, snapshot->mode + 1);
-        break;
-    case 'M':
-        nes_mode(console, snapshot->mode - 1);
-        break;
-    case 'n':
-        if (snapshot->lines.nmi) {
-            nes_interrupt(console, NESI_NMI);
-        } else {
-            nes_clear(console, NESI_NMI);
-        }
-        break;
-    case 'q':
-        appstate->running = false;
-        break;
-    case 'r':
-        appstate->ramsheet = (appstate->ramsheet + 1) % RamSheets;
-        break;
-    case 'R':
-        --appstate->ramsheet;
-        if (appstate->ramsheet < 0) {
-            appstate->ramsheet = RamSheets - 1;
-        }
-        break;
-    case 's':
-        if (snapshot->lines.reset) {
-            nes_interrupt(console, NESI_RES);
-        } else {
-            nes_clear(console, NESI_RES);
-        }
-        break;
-    }
-}
-
-static void emu_loop(struct control *appstate, struct console_state *snapshot,
-                     nes *console, const struct ui_interface *ui)
-{
-    do {
-        ui->tick_start(appstate, snapshot);
-        handle_input(appstate, snapshot, console, ui);
-        if (appstate->running) {
-            nes_cycle(console, &appstate->clock);
-            nes_snapshot(console, snapshot);
-            ui->render(appstate, snapshot);
-        }
-        ui->tick_end(appstate);
-    } while (appstate->running);
+    return appstate->batch ? ui_batch_init(loop) : ui_curses_init(loop);
 }
 
 static int run_emu(struct control *appstate, cart *c)
@@ -234,9 +144,9 @@ static int run_emu(struct control *appstate, cart *c)
     struct console_state snapshot;
     nes_snapshot(console, &snapshot);
 
-    struct ui_interface ui;
+    ui_loop *ui_loop;
     errno = 0;
-    const int err = init_ui(appstate, &ui);
+    const int err = init_ui(appstate, &ui_loop);
     if (err < 0) {
         fprintf(stderr, "UI init failure (%d): %s\n", err, ui_errstr(err));
         if (err == UI_ERR_ERNO) {
@@ -246,9 +156,7 @@ static int run_emu(struct control *appstate, cart *c)
         goto exit_console;
     }
 
-    emu_loop(appstate, &snapshot, console, &ui);
-
-    ui.cleanup(appstate, &snapshot);
+    ui_loop(appstate, console, &snapshot);
 exit_console:
     snapshot_clear(&snapshot);
     nes_free(console);

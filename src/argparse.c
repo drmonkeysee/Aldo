@@ -152,8 +152,8 @@ static bool parse_halt(const char *arg, int *restrict argi, int argc,
     return false;
 }
 
-static bool parse_arg(struct cliargs *restrict args, const char *arg,
-                      int *restrict argi, int argc, char *argv[argc+1])
+static bool parse_arg(const char *arg, int *restrict argi, int argc,
+                      char *argv[argc+1], struct cliargs *restrict args)
 {
     if (parse_flag(arg, ChrScaleShort, true, ChrScaleLong)) {
         long scale;
@@ -216,7 +216,7 @@ bool argparse_parse(struct cliargs *restrict args, int argc,
                     continue;
                 } else if (arg[1] == '-' && arg[2] == '\0') {
                     opt_parse = false;
-                } else if (!parse_arg(args, arg, &i, argc, argv)) {
+                } else if (!parse_arg(arg, &i, argc, argv, args)) {
                     argparse_cleanup(args);
                     return false;
                 }

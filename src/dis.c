@@ -702,7 +702,7 @@ int dis_datapath(const struct console_state *snapshot,
     return total;
 }
 
-int dis_cart_prg(cart *cart, bool verbose, bool unified_disoutput, FILE *f)
+int dis_cart_prg(cart *cart, bool verbose, bool unified_output, FILE *f)
 {
     assert(cart != NULL);
     assert(f != NULL);
@@ -717,7 +717,7 @@ int dis_cart_prg(cart *cart, bool verbose, bool unified_disoutput, FILE *f)
         // NOTE: disassembly errors may occur normally if data bytes are
         // interpreted as instructions so note the result and continue.
         if (err < 0) {
-            fprintf(unified_disoutput ? f : stderr,
+            fprintf(unified_output ? f : stderr,
                     "Dis err (%d): %s\n", err, dis_errstr(err));
         }
         bv = cart_prgblock(cart, bv.ord + 1);

@@ -29,8 +29,8 @@ struct cliargs {
     struct bounce bouncer;
     int chrscale, resetvector;
     bool
-        batch, bcdsupport, chrdecode, disassemble, help, info, tron,
-        unified_disoutput, verbose, version, zeroram;
+        batch, bcdsupport, chrdecode, disassemble, help, info, tron, verbose,
+        version, zeroram;
 };
 
 #endif

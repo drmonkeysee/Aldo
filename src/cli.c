@@ -52,8 +52,7 @@ static int print_cart_info(const struct cliargs *args, cart *c)
 
 static int disassemble_cart_prg(const struct cliargs *args, cart *c)
 {
-    const int err = dis_cart_prg(c, args->verbose, args->unified_disoutput,
-                                 stdout);
+    const int err = dis_cart_prg(c, args->verbose, false, stdout);
     if (err < 0) {
         fprintf(stderr, "PRG decode error (%d): %s\n", err, dis_errstr(err));
         return EXIT_FAILURE;

@@ -11,6 +11,7 @@
 #include "bus.h"
 #include "control.h"
 #include "cpu.h"
+#include "cycleclock.h"
 #include "haltexpr.h"
 #include "snapshot.h"
 

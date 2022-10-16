@@ -25,14 +25,15 @@ enum {
 #undef X
 };
 
-typedef void ui_loop(struct control *, nes *, struct console_state *) aldo_noexcept;
+typedef void ui_loop(nes *, struct console_state *) aldo_noexcept;
 
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
 const char *ui_errstr(int err) aldo_noexcept;
 
 // NOTE: common batch mode for CLI and GUI mode
-int ui_batch_init(ui_loop **loop) aldo_noexcept;
+int ui_batch_init(const struct control *appstate,
+                  ui_loop **loop) aldo_noexcept;
 
 #include "bridgeclose.h"
 #endif

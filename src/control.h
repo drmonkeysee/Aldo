@@ -9,13 +9,6 @@
 #define Aldo_control_h
 
 #include <stdbool.h>
-#include <stdint.h>
-
-struct cycleclock {
-    uint64_t frames, total_cycles;
-    double runtime;
-    int budget, cycles_per_sec;
-};
 
 struct haltarg {
     const char *expr;       // Non-owning Pointer
@@ -33,7 +26,6 @@ struct bounce {
 struct control {
     struct haltarg *haltlist;
     const char *cartfile, *chrdecode_prefix, *me;   // Non-owning Pointers
-    struct cycleclock clock;
     struct bounce bouncer;
     int chrscale, resetvector;
     bool

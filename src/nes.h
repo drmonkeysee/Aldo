@@ -10,6 +10,7 @@
 
 #include "cart.h"
 #include "control.h"
+#include "cycleclock.h"
 #include "debug.h"
 #include "snapshot.h"
 

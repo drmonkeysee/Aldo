@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 // NOTE: forward-declare CLI's interactive mode
-int ui_curses_init(ui_loop **loop);
+int ui_curses_init(const struct control *appstate, ui_loop **loop);
 
 static cart *load_cart(const char *filename)
 {
@@ -106,7 +106,9 @@ static debugctx *create_debugger(const struct control *appstate)
 
 static int init_ui(const struct control *appstate, ui_loop **loop)
 {
-    return appstate->batch ? ui_batch_init(loop) : ui_curses_init(loop);
+    return appstate->batch
+            ? ui_batch_init(appstate, loop)
+            : ui_curses_init(appstate, loop);
 }
 
 static int run_emu(struct control *appstate, cart *c)
@@ -151,7 +153,7 @@ static int run_emu(struct control *appstate, cart *c)
         goto exit_console;
     }
 
-    ui_loop(appstate, console, &snapshot);
+    ui_loop(console, &snapshot);
 exit_console:
     snapshot_clear(&snapshot);
     nes_free(console);

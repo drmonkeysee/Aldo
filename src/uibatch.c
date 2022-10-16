@@ -8,6 +8,7 @@
 #include "ui.h"
 
 #include "cart.h"
+#include "cycleclock.h"
 #include "haltexpr.h"
 #include "tsutil.h"
 
@@ -24,7 +25,9 @@
 static const char *const restrict DistractorFormat = "%c Running\u2026";
 
 static struct timespec Current, Previous, Start;
+static struct cycleclock Clock;
 static double AvgFrameTimeMs, FrameTimeMs;
+static bool Verbose;
 
 static void clearline(void)
 {
@@ -46,8 +49,9 @@ static void handle_sigint(int sig, siginfo_t *info, void *uap)
 // UI Loop Implementation
 //
 
-static int init_ui(void)
+static int init_ui(const struct control *appstate)
 {
+    Verbose = appstate->verbose;
     clock_gettime(CLOCK_MONOTONIC, &Start);
     Previous = Start;
     struct sigaction act = {
@@ -57,23 +61,21 @@ static int init_ui(void)
     return sigaction(SIGINT, &act, NULL) == 0 ? 0 : UI_ERR_ERNO;
 }
 
-static void tick_start(struct control *appstate,
-                       const struct console_state *snapshot)
+static void tick_start(const struct console_state *snapshot)
 {
     clock_gettime(CLOCK_MONOTONIC, &Current);
     const double currentms = timespec_to_ms(&Current);
     FrameTimeMs = currentms - timespec_to_ms(&Previous);
-    appstate->clock.runtime = (currentms - timespec_to_ms(&Start))
-                                / TSU_MS_PER_S;
+    Clock.runtime = (currentms - timespec_to_ms(&Start)) / TSU_MS_PER_S;
 
     // NOTE: cumulative moving average:
     // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-    const uint64_t ticks = appstate->clock.frames;
+    const uint64_t ticks = Clock.frames;
     AvgFrameTimeMs = (FrameTimeMs + (ticks * AvgFrameTimeMs)) / (ticks + 1);
 
     // NOTE: arbitrary per-tick budget, 6502s often ran at 1 MHz so a million
     // cycles per tick seems as good a number as any.
-    appstate->clock.budget = 1e6;
+    Clock.budget = 1e6;
 
     // NOTE: exit batch mode if cpu is not running
     if (!snapshot->lines.ready) {
@@ -81,10 +83,10 @@ static void tick_start(struct control *appstate,
     }
 }
 
-static void tick_end(struct control *appstate)
+static void tick_end(void)
 {
     Previous = Current;
-    ++appstate->clock.frames;
+    ++Clock.frames;
 }
 
 static void update_progress(void)
@@ -103,23 +105,19 @@ static void update_progress(void)
     }
 }
 
-static void write_summary(const struct control *appstate,
-                          const struct console_state *snapshot)
+static void write_summary(const struct console_state *snapshot)
 {
-    if (!appstate->verbose) return;
+    if (!Verbose) return;
 
-    const bool scale_ms = appstate->clock.runtime < 1.0;
+    const bool scale_ms = Clock.runtime < 1.0;
 
     clearline();
     printf("---=== %s ===---\n", cart_filename(snapshot->cart.info));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
-           scale_ms
-            ? appstate->clock.runtime * TSU_MS_PER_S
-            : appstate->clock.runtime);
+           scale_ms ? Clock.runtime * TSU_MS_PER_S : Clock.runtime);
     printf("Avg Frame Time (msec): %.3f\n", AvgFrameTimeMs);
-    printf("Total Cycles: %" PRIu64 "\n", appstate->clock.total_cycles);
-    printf("Avg Cycles/sec: %.2f\n",
-           appstate->clock.total_cycles / appstate->clock.runtime);
+    printf("Total Cycles: %" PRIu64 "\n", Clock.total_cycles);
+    printf("Avg Cycles/sec: %.2f\n", Clock.total_cycles / Clock.runtime);
     if (snapshot->debugger.break_condition.cond != HLT_NONE) {
         char break_desc[HEXPR_FMT_SIZE];
         const int err = haltexpr_fmt(&snapshot->debugger.break_condition,
@@ -128,32 +126,31 @@ static void write_summary(const struct control *appstate,
     }
 }
 
-static void batch_loop(struct control *appstate, nes *console,
-                       struct console_state *snapshot)
+static void batch_loop(nes *console, struct console_state *snapshot)
 {
-    assert(appstate != NULL);
     assert(console != NULL);
     assert(snapshot != NULL);
 
     do {
-        tick_start(appstate, snapshot);
-        nes_cycle(console, &appstate->clock);
+        tick_start(snapshot);
+        nes_cycle(console, &Clock);
         nes_snapshot(console, snapshot);
         update_progress();
-        tick_end(appstate);
+        tick_end();
     } while (QuitSignal == 0);
-    write_summary(appstate, snapshot);
+    write_summary(snapshot);
 }
 
 //
 // Public Interface
 //
 
-int ui_batch_init(ui_loop **loop)
+int ui_batch_init(const struct control *appstate, ui_loop **loop)
 {
+    assert(appstate != NULL);
     assert(loop != NULL);
 
-    const int err = init_ui();
+    const int err = init_ui(appstate);
     *loop = err == 0 ? batch_loop : NULL;
     return err;
 }

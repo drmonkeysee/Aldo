@@ -9,6 +9,7 @@
 
 #include "bytes.h"
 #include "cart.h"
+#include "cycleclock.h"
 #include "dis.h"
 #include "haltexpr.h"
 #include "tsutil.h"
@@ -39,9 +40,10 @@ static const struct timespec VSync = {.tv_nsec = TSU_NS_PER_S / Fps};
 static struct timespec Current, Previous, Start;
 static double FrameLeftMs, FrameTimeMs, TimeBudgetMs;
 static struct {
+    struct cycleclock clock;
     int ramsheet;
-    bool running;
-} ViewState = {.running = true};
+    bool bcdsupport, running, tron;
+} ViewState = {.clock = {.cycles_per_sec = 4}, .running = true};
 
 static void initclock(void)
 {
@@ -89,7 +91,7 @@ static struct view {
     DatapathView,
     RamView;
 
-static void drawhwtraits(const struct control *appstate)
+static void drawhwtraits(void)
 {
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
@@ -103,22 +105,22 @@ static void drawhwtraits(const struct control *appstate)
     int cursor_y = 0;
     werase(HwView.content);
     mvwprintw(HwView.content, cursor_y++, 0, "FPS: %d (%.2f)", Fps,
-              appstate->clock.frames / appstate->clock.runtime);
+              ViewState.clock.frames / ViewState.clock.runtime);
     mvwprintw(HwView.content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_frametime, display_frameleft);
     mvwprintw(HwView.content, cursor_y++, 0, "Frames: %" PRIu64,
-              appstate->clock.frames);
+              ViewState.clock.frames);
     mvwprintw(HwView.content, cursor_y++, 0, "Runtime: %.3f",
-              appstate->clock.runtime);
+              ViewState.clock.runtime);
     mvwprintw(HwView.content, cursor_y++, 0, "Cycles: %" PRIu64,
-              appstate->clock.total_cycles);
+              ViewState.clock.total_cycles);
     mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "CPU/PPU Clock: INF/INF Hz");
     mvwprintw(HwView.content, cursor_y++, 0, "Cycles per Second: %d",
-              appstate->clock.cycles_per_sec);
+              ViewState.clock.cycles_per_sec);
     mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
     mvwprintw(HwView.content, cursor_y, 0, "BCD Supported: %s",
-              appstate->bcdsupport ? "Yes" : "No");
+              ViewState.bcdsupport ? "Yes" : "No");
 }
 
 static void drawtoggle(const char *label, bool selected)
@@ -171,13 +173,12 @@ static void drawcontrols(const struct console_state *snapshot)
     mvwaddstr(ControlsView.content, ++cursor_y, 0, "Quit: q");
 }
 
-static void drawdebugger(const struct control *appstate,
-                         const struct console_state *snapshot)
+static void drawdebugger(const struct console_state *snapshot)
 {
     int cursor_y = 0;
     werase(DebuggerView.content);
     mvwprintw(DebuggerView.content, cursor_y++, 0, "Tracing: %s",
-              appstate->tron ? "On" : "Off");
+              ViewState.tron ? "On" : "Off");
     mvwaddstr(DebuggerView.content, cursor_y++, 0, "Reset Override: ");
     if (snapshot->debugger.resvector_override >= 0) {
         wprintw(DebuggerView.content, "$%04X",
@@ -522,7 +523,7 @@ static void ramrefresh(void)
 // UI Loop Implementation
 //
 
-static void init_ui(void)
+static void init_ui(const struct control *appstate)
 {
     static const int
         col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 14, ctrlh = 16,
@@ -556,20 +557,21 @@ static void init_ui(void)
           xoffset + col1w + col2w, 1, "Datapath");
     raminit(ramh, col4w, yoffset, xoffset + col1w + col2w + col3w);
 
+    ViewState.bcdsupport = appstate->bcdsupport;
+    ViewState.tron = appstate->tron;
     initclock();
 }
 
-static void tick_start(struct control *appstate,
-                       const struct console_state *snapshot)
+static void tick_start(const struct console_state *snapshot)
 {
     clock_gettime(CLOCK_MONOTONIC, &Current);
     const double currentms = timespec_to_ms(&Current);
     FrameTimeMs = currentms - timespec_to_ms(&Previous);
-    appstate->clock.runtime = (currentms - timespec_to_ms(&Start))
+    ViewState.clock.runtime = (currentms - timespec_to_ms(&Start))
                                 / TSU_MS_PER_S;
 
     if (!snapshot->lines.ready) {
-        TimeBudgetMs = appstate->clock.budget = 0;
+        TimeBudgetMs = ViewState.clock.budget = 0;
         return;
     }
 
@@ -580,21 +582,20 @@ static void tick_start(struct control *appstate,
     }
 
     const double mspercycle = (double)TSU_MS_PER_S
-                                / appstate->clock.cycles_per_sec;
+                                / ViewState.clock.cycles_per_sec;
     const int new_cycles = TimeBudgetMs / mspercycle;
-    appstate->clock.budget += new_cycles;
+    ViewState.clock.budget += new_cycles;
     TimeBudgetMs -= new_cycles * mspercycle;
 }
 
-static void tick_end(struct control *appstate)
+static void tick_end(void)
 {
     Previous = Current;
-    ++appstate->clock.frames;
+    ++ViewState.clock.frames;
     tick_sleep();
 }
 
-static void handle_input(struct control *appstate, nes *console,
-                         const struct console_state *snapshot)
+static void handle_input(nes *console, const struct console_state *snapshot)
 {
     const int c = getch();
     switch (c) {
@@ -606,23 +607,23 @@ static void handle_input(struct control *appstate, nes *console,
         }
         break;
     case '=':   // "Lowercase" +
-        ++appstate->clock.cycles_per_sec;
+        ++ViewState.clock.cycles_per_sec;
         goto pclamp_cps;
     case '+':
-        appstate->clock.cycles_per_sec += 10;
+        ViewState.clock.cycles_per_sec += 10;
     pclamp_cps:
-        if (appstate->clock.cycles_per_sec > MaxCps) {
-            appstate->clock.cycles_per_sec = MaxCps;
+        if (ViewState.clock.cycles_per_sec > MaxCps) {
+            ViewState.clock.cycles_per_sec = MaxCps;
         }
         break;
     case '-':
-        --appstate->clock.cycles_per_sec;
+        --ViewState.clock.cycles_per_sec;
         goto nclamp_cps;
     case '_':   // "Uppercase" -
-        appstate->clock.cycles_per_sec -= 10;
+        ViewState.clock.cycles_per_sec -= 10;
     nclamp_cps:
-        if (appstate->clock.cycles_per_sec < MinCps) {
-            appstate->clock.cycles_per_sec = MinCps;
+        if (ViewState.clock.cycles_per_sec < MinCps) {
+            ViewState.clock.cycles_per_sec = MinCps;
         }
         break;
     case 'i':
@@ -667,12 +668,11 @@ static void handle_input(struct control *appstate, nes *console,
     }
 }
 
-static void refresh_ui(const struct control *appstate,
-                       const struct console_state *snapshot)
+static void refresh_ui(const struct console_state *snapshot)
 {
-    drawhwtraits(appstate);
+    drawhwtraits();
     drawcontrols(snapshot);
-    drawdebugger(appstate, snapshot);
+    drawdebugger(snapshot);
     drawcart(snapshot);
     drawprg(snapshot);
     drawregister(snapshot);
@@ -700,22 +700,20 @@ static void cleanup_ui(void)
     endwin();
 }
 
-static void curses_loop(struct control *appstate, nes *console,
-                        struct console_state *snapshot)
+static void curses_loop(nes *console, struct console_state *snapshot)
 {
-    assert(appstate != NULL);
     assert(console != NULL);
     assert(snapshot != NULL);
 
     do {
-        tick_start(appstate, snapshot);
-        handle_input(appstate, console, snapshot);
+        tick_start(snapshot);
+        handle_input(console, snapshot);
         if (ViewState.running) {
-            nes_cycle(console, &appstate->clock);
+            nes_cycle(console, &ViewState.clock);
             nes_snapshot(console, snapshot);
-            refresh_ui(appstate, snapshot);
+            refresh_ui(snapshot);
         }
-        tick_end(appstate);
+        tick_end();
     } while (ViewState.running);
     cleanup_ui();
 }
@@ -724,11 +722,12 @@ static void curses_loop(struct control *appstate, nes *console,
 // Public Interface
 //
 
-int ui_curses_init(ui_loop **loop)
+int ui_curses_init(const struct control *appstate, ui_loop **loop)
 {
+    assert(appstate != NULL);
     assert(loop != NULL);
 
-    init_ui();
+    init_ui(appstate);
     *loop = curses_loop;
     return 0;
 }

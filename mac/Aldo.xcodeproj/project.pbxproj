@@ -175,6 +175,7 @@
 		C838D3B627D5DB0300468FDB /* CartChrView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartChrView.swift; sourceTree = "<group>"; };
 		C83965E927810D4300E1E28E /* tsutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tsutil.h; sourceTree = "<group>"; };
 		C83C663327E2F2E6009CE42C /* Aldo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Aldo-Bridging-Header.h"; sourceTree = "<group>"; };
+		C848C1B228FB9D630025ABD2 /* cycleclock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cycleclock.h; sourceTree = "<group>"; };
 		C8497E3F2822015100F4952E /* Disassembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disassembly.swift; sourceTree = "<group>"; };
 		C84A0D4E28EFC19A00D298AB /* uiimgui.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = uiimgui.cpp; sourceTree = "<group>"; };
 		C84A0D4F28EFC19A00D298AB /* uiimgui.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = uiimgui.hpp; sourceTree = "<group>"; };
@@ -387,6 +388,7 @@
 				C81A516B25DA036100361E40 /* control.h */,
 				C8C706842751EEBA00B45785 /* cpu.h */,
 				C8C706892751EEBA00B45785 /* cpu.c */,
+				C848C1B228FB9D630025ABD2 /* cycleclock.h */,
 				C80C9E1A277D648F000F2D8B /* debug.h */,
 				C80C9E1B277D648F000F2D8B /* debug.c */,
 				C8C7068C2751EEBA00B45785 /* decode.h */,

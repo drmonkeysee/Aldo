@@ -128,8 +128,8 @@ static int run_emu(const struct cliargs *args, cart *c)
     if (!dbg) return EXIT_FAILURE;
 
     int result = EXIT_SUCCESS;
-    nes *console = nes_new(c, dbg, args->tron, args->tron || args->batch,
-                           args->zeroram, args->bcdsupport);
+    nes *console = nes_new(c, dbg, args->bcdsupport, args->zeroram, args->tron,
+                           args->tron || args->batch);
     if (!console) {
         result = EXIT_FAILURE;
         goto exit_debug;

@@ -128,8 +128,8 @@ static void ram_dump(const struct nes_console *self)
 // Public Interface
 //
 
-nes *nes_new(cart *c, debugctx *dbg, bool tron, bool dumpram, bool zeroram,
-             bool bcdsupport)
+nes *nes_new(cart *c, debugctx *dbg, bool bcdsupport, bool zeroram, bool tron,
+             bool dumpram)
 {
     assert(c != NULL);
     assert(dbg != NULL);

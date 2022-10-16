@@ -63,7 +63,7 @@ struct blockview cart_chrblock(cart *self, size_t i);
 int cart_cpu_connect(cart *self, bus *b, uint16_t addr);
 void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr);
 
-void cart_write_info(cart *self, FILE *f, bool verbose);
+void cart_write_info(cart *self, bool verbose, FILE *f);
 void cart_write_dis_header(cart *self, FILE *f);
 
 // NOTE: returns a pointer to a statically allocated string;

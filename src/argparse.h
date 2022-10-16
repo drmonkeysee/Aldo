@@ -8,14 +8,14 @@
 #ifndef Aldo_argparse_h
 #define Aldo_argparse_h
 
-#include "control.h"
+#include "cliargs.h"
 
 #include <stdbool.h>
 
-bool argparse_parse(struct control *restrict appstate, int argc,
+bool argparse_parse(struct cliargs *restrict args, int argc,
                     char *argv[argc+1]);
 void argparse_usage(const char *me);
 void argparse_version(void);
-void argparse_cleanup(struct control *appstate);
+void argparse_cleanup(struct cliargs *args);
 
 #endif

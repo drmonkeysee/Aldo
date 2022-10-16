@@ -9,7 +9,6 @@
 #define Aldo_dis_h
 
 #include "cart.h"
-#include "control.h"
 #include "cpu.h"
 #include "snapshot.h"
 
@@ -75,8 +74,9 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
 int dis_datapath(const struct console_state *snapshot,
                  char dis[restrict static DIS_DATAP_SIZE]);
 
-int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f);
+int dis_cart_prg(cart *cart, bool verbose, bool unified_disoutput, FILE *f);
 int dis_cart_chrbank(const struct blockview *bv, int scale, FILE *f);
-int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output);
+int dis_cart_chr(cart *cart, int chrscale,
+                 const char *restrict chrdecode_prefix, FILE *output);
 
 #endif

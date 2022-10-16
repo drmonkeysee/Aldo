@@ -702,10 +702,9 @@ int dis_datapath(const struct console_state *snapshot,
     return total;
 }
 
-int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
+int dis_cart_prg(cart *cart, bool verbose, bool unified_disoutput, FILE *f)
 {
     assert(cart != NULL);
-    assert(appstate != NULL);
     assert(f != NULL);
 
     struct blockview bv = cart_prgblock(cart, 0);
@@ -714,11 +713,11 @@ int dis_cart_prg(cart *cart, const struct control *appstate, FILE *f)
     cart_write_dis_header(cart, f);
     do {
         fputc('\n', f);
-        const int err = print_prgblock(&bv, appstate->verbose, f);
+        const int err = print_prgblock(&bv, verbose, f);
         // NOTE: disassembly errors may occur normally if data bytes are
         // interpreted as instructions so note the result and continue.
         if (err < 0) {
-            fprintf(appstate->unified_disoutput ? f : stderr,
+            fprintf(unified_disoutput ? f : stderr,
                     "Dis err (%d): %s\n", err, dis_errstr(err));
         }
         bv = cart_prgblock(cart, bv.ord + 1);
@@ -742,18 +741,17 @@ int dis_cart_chrbank(const struct blockview *bv, int scale, FILE *f)
     return write_chrtiles(bv, tilesdim, tile_sections, scale, f);
 }
 
-int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output)
+int dis_cart_chr(cart *cart, int chrscale,
+                 const char *restrict chrdecode_prefix, FILE *output)
 {
     assert(cart != NULL);
-    assert(appstate != NULL);
     assert(output != NULL);
 
     struct blockview bv = cart_chrblock(cart, 0);
     if (!bv.mem) return DIS_ERR_CHRROM;
 
-    const char *const prefix = appstate->chrdecode_prefix
-                                    && appstate->chrdecode_prefix[0] != '\0'
-                                ? appstate->chrdecode_prefix
+    const char *const prefix = chrdecode_prefix && chrdecode_prefix[0] != '\0'
+                                ? chrdecode_prefix
                                 : "chr";
     const size_t prefixlen = strlen(prefix),
                     namesize = prefixlen + 8;   // NOTE: prefix + nnn.bmp + nul
@@ -766,7 +764,7 @@ int dis_cart_chr(cart *cart, const struct control *appstate, FILE *output)
             err = DIS_ERR_FMT;
             break;
         }
-        err = write_chrblock(&bv, appstate->chrscale, bmpfilename, output);
+        err = write_chrblock(&bv, chrscale, bmpfilename, output);
         if (err < 0) break;
         bv = cart_chrblock(cart, bv.ord + 1);
     } while (bv.mem);

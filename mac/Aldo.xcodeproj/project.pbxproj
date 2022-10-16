@@ -159,7 +159,7 @@
 		C8184D6F25E750E0002B3100 /* libcinytest.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcinytest.dylib; path = /usr/local/lib/libcinytest.dylib; sourceTree = "<absolute>"; };
 		C8186494277EB0F700CA4AC0 /* uicurses.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = uicurses.c; sourceTree = "<group>"; };
 		C8186496277EB45900CA4AC0 /* uibatch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = uibatch.c; sourceTree = "<group>"; };
-		C81A516B25DA036100361E40 /* control.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = control.h; sourceTree = "<group>"; };
+		C81A516B25DA036100361E40 /* cliargs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cliargs.h; sourceTree = "<group>"; };
 		C820E6BC25A9759A006A7AB1 /* Cli */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Cli; sourceTree = BUILT_PRODUCTS_DIR; };
 		C820E6BF25A9759A006A7AB1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		C820E6C825A97A4E006A7AB1 /* Cli-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Cli-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -385,7 +385,7 @@
 				C8F617A228F7B62A0086A34C /* cartinfo.h */,
 				C820E6C925A97A4E006A7AB1 /* cli.h */,
 				C820E6CA25A97A4E006A7AB1 /* cli.c */,
-				C81A516B25DA036100361E40 /* control.h */,
+				C81A516B25DA036100361E40 /* cliargs.h */,
 				C8C706842751EEBA00B45785 /* cpu.h */,
 				C8C706892751EEBA00B45785 /* cpu.c */,
 				C848C1B228FB9D630025ABD2 /* cycleclock.h */,

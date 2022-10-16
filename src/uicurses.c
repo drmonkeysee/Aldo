@@ -523,7 +523,7 @@ static void ramrefresh(void)
 // UI Loop Implementation
 //
 
-static void init_ui(const struct control *appstate)
+static void init_ui(const struct cliargs *args)
 {
     static const int
         col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 14, ctrlh = 16,
@@ -557,8 +557,8 @@ static void init_ui(const struct control *appstate)
           xoffset + col1w + col2w, 1, "Datapath");
     raminit(ramh, col4w, yoffset, xoffset + col1w + col2w + col3w);
 
-    ViewState.bcdsupport = appstate->bcdsupport;
-    ViewState.tron = appstate->tron;
+    ViewState.bcdsupport = args->bcdsupport;
+    ViewState.tron = args->tron;
     initclock();
 }
 
@@ -722,12 +722,12 @@ static void curses_loop(nes *console, struct console_state *snapshot)
 // Public Interface
 //
 
-int ui_curses_init(const struct control *appstate, ui_loop **loop)
+int ui_curses_init(const struct cliargs *args, ui_loop **loop)
 {
-    assert(appstate != NULL);
+    assert(args != NULL);
     assert(loop != NULL);
 
-    init_ui(appstate);
+    init_ui(args);
     *loop = curses_loop;
     return 0;
 }

@@ -331,7 +331,7 @@ void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr)
     self->mapper->cpu_disconnect(self->mapper, b, addr);
 }
 
-void cart_write_info(cart *self, FILE *f, bool verbose)
+void cart_write_info(cart *self, bool verbose, FILE *f)
 {
     assert(self != NULL);
     assert(f != NULL);

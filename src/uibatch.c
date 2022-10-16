@@ -49,9 +49,9 @@ static void handle_sigint(int sig, siginfo_t *info, void *uap)
 // UI Loop Implementation
 //
 
-static int init_ui(const struct control *appstate)
+static int init_ui(const struct cliargs *args)
 {
-    Verbose = appstate->verbose;
+    Verbose = args->verbose;
     clock_gettime(CLOCK_MONOTONIC, &Start);
     Previous = Start;
     struct sigaction act = {
@@ -145,12 +145,12 @@ static void batch_loop(nes *console, struct console_state *snapshot)
 // Public Interface
 //
 
-int ui_batch_init(const struct control *appstate, ui_loop **loop)
+int ui_batch_init(const struct cliargs *args, ui_loop **loop)
 {
-    assert(appstate != NULL);
+    assert(args != NULL);
     assert(loop != NULL);
 
-    const int err = init_ui(appstate);
+    const int err = init_ui(args);
     *loop = err == 0 ? batch_loop : NULL;
     return err;
 }

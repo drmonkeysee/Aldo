@@ -8,7 +8,7 @@
 #ifndef Aldo_ui_h
 #define Aldo_ui_h
 
-#include "control.h"
+#include "cliargs.h"
 #include "nes.h"
 #include "snapshot.h"
 
@@ -32,8 +32,7 @@ typedef void ui_loop(nes *, struct console_state *) aldo_noexcept;
 const char *ui_errstr(int err) aldo_noexcept;
 
 // NOTE: common batch mode for CLI and GUI mode
-int ui_batch_init(const struct control *appstate,
-                  ui_loop **loop) aldo_noexcept;
+int ui_batch_init(const struct cliargs *args, ui_loop **loop) aldo_noexcept;
 
 #include "bridgeclose.h"
 #endif

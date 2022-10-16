@@ -9,7 +9,6 @@
 #define Aldo_debug_h
 
 #include "bus.h"
-#include "control.h"
 #include "cpu.h"
 #include "cycleclock.h"
 #include "haltexpr.h"
@@ -19,7 +18,7 @@
 
 typedef struct debugger_context debugctx;
 
-debugctx *debug_new(const struct control *appstate);
+debugctx *debug_new(int resetvector_override);
 void debug_free(debugctx *self);
 
 void debug_override_reset(debugctx *self, bus *b, uint16_t device_addr);

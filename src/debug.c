@@ -200,14 +200,12 @@ static void bpvector_free(struct breakpoint_vector *vec)
 // Public Interface
 //
 
-debugctx *debug_new(const struct control *appstate)
+debugctx *debug_new(int resetvector_override)
 {
-    assert(appstate != NULL);
-
     struct debugger_context *const self = malloc(sizeof *self);
     *self = (struct debugger_context){
         .halted = NoBreakpoint,
-        .resetvector = appstate->resetvector,
+        .resetvector = resetvector_override,
     };
     bpvector_init(&self->breakpoints);
     return self;

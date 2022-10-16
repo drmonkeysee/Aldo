@@ -9,7 +9,7 @@
 
 #include "argparse.h"
 #include "cart.h"
-#include "control.h"
+#include "cliargs.h"
 #include "debug.h"
 #include "dis.h"
 #include "haltexpr.h"
@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 // NOTE: forward-declare CLI's interactive mode
-int ui_curses_init(const struct control *appstate, ui_loop **loop);
+int ui_curses_init(const struct cliargs *args, ui_loop **loop);
 
 static cart *load_cart(const char *filename)
 {
@@ -41,18 +41,19 @@ static cart *load_cart(const char *filename)
     return c;
 }
 
-static int print_cart_info(const struct control *appstate, cart *c)
+static int print_cart_info(const struct cliargs *args, cart *c)
 {
-    if (appstate->verbose) {
+    if (args->verbose) {
         puts("---=== Cart Info ===---");
     }
-    cart_write_info(c, stdout, appstate->verbose);
+    cart_write_info(c, args->verbose, stdout);
     return EXIT_SUCCESS;
 }
 
-static int disassemble_cart_prg(const struct control *appstate, cart *c)
+static int disassemble_cart_prg(const struct cliargs *args, cart *c)
 {
-    const int err = dis_cart_prg(c, appstate, stdout);
+    const int err = dis_cart_prg(c, args->verbose, args->unified_disoutput,
+                                 stdout);
     if (err < 0) {
         fprintf(stderr, "PRG decode error (%d): %s\n", err, dis_errstr(err));
         return EXIT_FAILURE;
@@ -60,10 +61,11 @@ static int disassemble_cart_prg(const struct control *appstate, cart *c)
     return EXIT_SUCCESS;
 }
 
-static int decode_cart_chr(const struct control *appstate, cart *c)
+static int decode_cart_chr(const struct cliargs *args, cart *c)
 {
     errno = 0;
-    const int err = dis_cart_chr(c, appstate, stdout);
+    const int err = dis_cart_chr(c, args->chrscale, args->chrdecode_prefix,
+                                 stdout);
     if (err < 0) {
         fprintf(stderr, "CHR decode error (%d): %s\n", err, dis_errstr(err));
         if (err == DIS_ERR_ERNO) {
@@ -74,10 +76,10 @@ static int decode_cart_chr(const struct control *appstate, cart *c)
     return EXIT_SUCCESS;
 }
 
-static debugctx *create_debugger(const struct control *appstate)
+static debugctx *create_debugger(const struct cliargs *args)
 {
-    debugctx *const dbg = debug_new(appstate);
-    for (const struct haltarg *arg = appstate->haltlist;
+    debugctx *const dbg = debug_new(args->resetvector);
+    for (const struct haltarg *arg = args->haltlist;
          arg;
          arg = arg->next) {
         struct haltexpr expr;
@@ -89,7 +91,7 @@ static debugctx *create_debugger(const struct control *appstate)
             return NULL;
         } else {
             debug_addbreakpoint(dbg, expr);
-            if (appstate->verbose) {
+            if (args->verbose) {
                 char buf[HEXPR_FMT_SIZE];
                 err = haltexpr_fmt(&expr, buf);
                 if (err < 0) {
@@ -104,16 +106,16 @@ static debugctx *create_debugger(const struct control *appstate)
     return dbg;
 }
 
-static int init_ui(const struct control *appstate, ui_loop **loop)
+static int init_ui(const struct cliargs *args, ui_loop **loop)
 {
-    return appstate->batch
-            ? ui_batch_init(appstate, loop)
-            : ui_curses_init(appstate, loop);
+    return args->batch
+            ? ui_batch_init(args, loop)
+            : ui_curses_init(args, loop);
 }
 
-static int run_emu(struct control *appstate, cart *c)
+static int run_emu(const struct cliargs *args, cart *c)
 {
-    if (appstate->batch && appstate->tron && !appstate->haltlist) {
+    if (args->batch && args->tron && !args->haltlist) {
         fputs("*** WARNING ***\nYou have turned on trace-logging"
               " with batch mode but specified no halt conditions;\n"
               "this can result in a very large trace file very quickly!\n"
@@ -122,18 +124,19 @@ static int run_emu(struct control *appstate, cart *c)
         if (input != 'y' && input != 'Y') return EXIT_FAILURE;
     }
 
-    debugctx *dbg = create_debugger(appstate);
+    debugctx *dbg = create_debugger(args);
     if (!dbg) return EXIT_FAILURE;
 
     int result = EXIT_SUCCESS;
-    nes *console = nes_new(c, dbg, appstate);
+    nes *console = nes_new(c, dbg, args->tron, args->tron || args->batch,
+                           args->zeroram, args->bcdsupport);
     if (!console) {
         result = EXIT_FAILURE;
         goto exit_debug;
     }
     nes_powerup(console);
     // NOTE: when in batch mode set NES to run immediately
-    if (appstate->batch) {
+    if (args->batch) {
         nes_mode(console, NEXC_RUN);
         nes_ready(console);
     }
@@ -143,7 +146,7 @@ static int run_emu(struct control *appstate, cart *c)
 
     ui_loop *ui_loop;
     errno = 0;
-    const int err = init_ui(appstate, &ui_loop);
+    const int err = init_ui(args, &ui_loop);
     if (err < 0) {
         fprintf(stderr, "UI init failure (%d): %s\n", err, ui_errstr(err));
         if (err == UI_ERR_ERNO) {
@@ -164,38 +167,38 @@ exit_debug:
     return result;
 }
 
-static int run_cart(struct control *appstate, cart *c)
+static int run_cart(const struct cliargs *args, cart *c)
 {
-    if (appstate->info) return print_cart_info(appstate, c);
-    if (appstate->disassemble) return disassemble_cart_prg(appstate, c);
-    if (appstate->chrdecode) return decode_cart_chr(appstate, c);
-    return run_emu(appstate, c);
+    if (args->info) return print_cart_info(args, c);
+    if (args->disassemble) return disassemble_cart_prg(args, c);
+    if (args->chrdecode) return decode_cart_chr(args, c);
+    return run_emu(args, c);
 }
 
-static int run_with_args(struct control *appstate)
+static int run_with_args(const struct cliargs *args)
 {
-    if (appstate->help) {
-        argparse_usage(appstate->me);
+    if (args->help) {
+        argparse_usage(args->me);
         return EXIT_SUCCESS;
     }
 
-    if (appstate->version) {
+    if (args->version) {
         argparse_version();
         return EXIT_SUCCESS;
     }
 
-    if (!appstate->cartfile) {
+    if (!args->cartfile) {
         fputs("No input file specified\n", stderr);
-        argparse_usage(appstate->me);
+        argparse_usage(args->me);
         return EXIT_FAILURE;
     }
 
-    cart *cart = load_cart(appstate->cartfile);
+    cart *cart = load_cart(args->cartfile);
     if (!cart) {
         return EXIT_FAILURE;
     }
 
-    const int result = run_cart(appstate, cart);
+    const int result = run_cart(args, cart);
     cart_free(cart);
     cart = NULL;
     return result;
@@ -207,10 +210,10 @@ static int run_with_args(struct control *appstate)
 
 int cli_run(int argc, char *argv[argc+1])
 {
-    struct control appstate;
-    if (!argparse_parse(&appstate, argc, argv)) return EXIT_FAILURE;
+    struct cliargs args;
+    if (!argparse_parse(&args, argc, argv)) return EXIT_FAILURE;
 
-    const int result = run_with_args(&appstate);
-    argparse_cleanup(&appstate);
+    const int result = run_with_args(&args);
+    argparse_cleanup(&args);
     return result;
 }

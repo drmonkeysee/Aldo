@@ -1,12 +1,12 @@
 //
-//  control.h
+//  cliargs.h
 //  Aldo
 //
 //  Created by Brandon Stansbury on 2/14/21.
 //
 
-#ifndef Aldo_control_h
-#define Aldo_control_h
+#ifndef Aldo_cliargs_h
+#define Aldo_cliargs_h
 
 #include <stdbool.h>
 
@@ -23,7 +23,7 @@ struct bounce {
     int dim;
 };
 
-struct control {
+struct cliargs {
     struct haltarg *haltlist;
     const char *cartfile, *chrdecode_prefix, *me;   // Non-owning Pointers
     struct bounce bouncer;

@@ -128,14 +128,14 @@ static void ram_dump(const struct nes_console *self)
 // Public Interface
 //
 
-nes *nes_new(cart *c, debugctx *dbg, const struct control *appstate)
+nes *nes_new(cart *c, debugctx *dbg, bool tron, bool dumpram, bool zeroram,
+             bool bcdsupport)
 {
     assert(c != NULL);
     assert(dbg != NULL);
-    assert(appstate != NULL);
 
     FILE *tracelog = NULL;
-    if (appstate->tron) {
+    if (tron) {
         errno = 0;
         if (!(tracelog = fopen(TraceLog, "w"))) {
             fprintf(stderr, "%s: ", TraceLog);
@@ -147,11 +147,11 @@ nes *nes_new(cart *c, debugctx *dbg, const struct control *appstate)
     struct nes_console *const self = malloc(sizeof *self);
     self->cart = c;
     self->dbg = dbg;
-    self->dumpram = appstate->tron || appstate->batch;
+    self->dumpram = dumpram;
     self->tracelog = tracelog;
-    self->zeroram = appstate->zeroram;
+    self->zeroram = zeroram;
     // TODO: ditch this option when aldo can emulate more than just NES
-    self->cpu.bcd = appstate->bcdsupport;
+    self->cpu.bcd = bcdsupport;
     create_cpubus(self);
     return self;
 }

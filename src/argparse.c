@@ -52,9 +52,9 @@ static const int
     MinChrScale = 1,
     MaxChrScale = 10;
 
-static void init_control(struct control *appstate)
+static void init_cliargs(struct cliargs *args)
 {
-    *appstate = (struct control){
+    *args = (struct cliargs){
         .chrscale = MinChrScale,
         .resetvector = -1,
     };
@@ -127,7 +127,7 @@ static bool parse_address(const char *arg, int *restrict argi, int argc,
 }
 
 static bool parse_halt(const char *arg, int *restrict argi, int argc,
-                       char *argv[argc+1], struct control *restrict appstate)
+                       char *argv[argc+1], struct cliargs *restrict args)
 {
     const size_t optlen = strlen(HaltLong);
     const char *expr = NULL;
@@ -144,7 +144,7 @@ static bool parse_halt(const char *arg, int *restrict argi, int argc,
     }
     if (expr) {
         struct haltarg **tail;
-        for (tail = &appstate->haltlist; *tail; tail = &(*tail)->next);
+        for (tail = &args->haltlist; *tail; tail = &(*tail)->next);
         *tail = malloc(sizeof **tail);
         **tail = (struct haltarg){.expr = expr};
         return true;
@@ -152,14 +152,14 @@ static bool parse_halt(const char *arg, int *restrict argi, int argc,
     return false;
 }
 
-static bool parse_arg(struct control *restrict appstate, const char *arg,
+static bool parse_arg(struct cliargs *restrict args, const char *arg,
                       int *restrict argi, int argc, char *argv[argc+1])
 {
     if (parse_flag(arg, ChrScaleShort, true, ChrScaleLong)) {
         long scale;
         const bool result = parse_number(arg, argi, argc, argv, 10, &scale);
         if (result && MinChrScale <= scale && scale <= MaxChrScale) {
-            appstate->chrscale = (int)scale;
+            args->chrscale = (int)scale;
             return true;
         }
         fprintf(stderr, "Invalid scale format: expected [%d, %d]\n",
@@ -169,31 +169,31 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
 
     if (parse_flag(arg, ResVectorShort, true, ResVectorLong)) {
         return parse_address(arg, argi, argc, argv, "vector",
-                             &appstate->resetvector);
+                             &args->resetvector);
     }
 
     if (parse_flag(arg, HaltShort, false, HaltLong)) {
-        return parse_halt(arg, argi, argc, argv, appstate);
+        return parse_halt(arg, argi, argc, argv, args);
     }
 
-    SETFLAG(appstate->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);
+    SETFLAG(args->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);
     const size_t chroptlen = strlen(ChrDecodeLong);
     if (strncmp(arg, ChrDecodeLong, chroptlen) == 0) {
         const char *const opt = strchr(arg, '=');
         if (opt && opt - arg == (ptrdiff_t)chroptlen) {
-            appstate->chrdecode_prefix = opt + 1;
+            args->chrdecode_prefix = opt + 1;
         }
     }
 
-    SETFLAG(appstate->batch, arg, BatchShort, BatchLong);
-    SETFLAG(appstate->bcdsupport, arg, BcdShort, BcdLong);
-    SETFLAG(appstate->disassemble, arg, DisassembleShort, DisassembleLong);
-    SETFLAG(appstate->help, arg, HelpShort, HelpLong);
-    SETFLAG(appstate->info, arg, InfoShort, InfoLong);
-    SETFLAG(appstate->tron, arg, TraceShort, TraceLong);
-    SETFLAG(appstate->verbose, arg, VerboseShort, NULL);
-    SETFLAG(appstate->version, arg, VersionShort, VersionLong);
-    SETFLAG(appstate->zeroram, arg, ZeroRamShort, ZeroRamLong);
+    SETFLAG(args->batch, arg, BatchShort, BatchLong);
+    SETFLAG(args->bcdsupport, arg, BcdShort, BcdLong);
+    SETFLAG(args->disassemble, arg, DisassembleShort, DisassembleLong);
+    SETFLAG(args->help, arg, HelpShort, HelpLong);
+    SETFLAG(args->info, arg, InfoShort, InfoLong);
+    SETFLAG(args->tron, arg, TraceShort, TraceLong);
+    SETFLAG(args->verbose, arg, VerboseShort, NULL);
+    SETFLAG(args->version, arg, VersionShort, VersionLong);
+    SETFLAG(args->zeroram, arg, ZeroRamShort, ZeroRamLong);
 
     return true;
 }
@@ -202,11 +202,11 @@ static bool parse_arg(struct control *restrict appstate, const char *arg,
 // Public Interface
 //
 
-bool argparse_parse(struct control *restrict appstate, int argc,
+bool argparse_parse(struct cliargs *restrict args, int argc,
                     char *argv[argc+1])
 {
-    init_control(appstate);
-    appstate->me = argc > 0 && strlen(argv[0]) > 0 ? argv[0] : "aldo";
+    init_cliargs(args);
+    args->me = argc > 0 && strlen(argv[0]) > 0 ? argv[0] : "aldo";
     bool opt_parse = true;
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
@@ -216,16 +216,16 @@ bool argparse_parse(struct control *restrict appstate, int argc,
                     continue;
                 } else if (arg[1] == '-' && arg[2] == '\0') {
                     opt_parse = false;
-                } else if (!parse_arg(appstate, arg, &i, argc, argv)) {
-                    argparse_cleanup(appstate);
+                } else if (!parse_arg(args, arg, &i, argc, argv)) {
+                    argparse_cleanup(args);
                     return false;
                 }
             } else {
-                appstate->cartfile = arg;
+                args->cartfile = arg;
             }
         }
     } else {
-        appstate->help = true;
+        args->help = true;
     }
     return true;
 }
@@ -285,11 +285,11 @@ void argparse_version(void)
     puts("");
 }
 
-void argparse_cleanup(struct control *appstate)
+void argparse_cleanup(struct cliargs *args)
 {
     for (struct haltarg *curr;
-         appstate->haltlist;
-         curr = appstate->haltlist,
-            appstate->haltlist = appstate->haltlist->next,
+         args->haltlist;
+         curr = args->haltlist,
+            args->haltlist = args->haltlist->next,
             free(curr));
 }

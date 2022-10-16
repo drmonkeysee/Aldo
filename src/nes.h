@@ -9,7 +9,6 @@
 #define Aldo_nes_h
 
 #include "cart.h"
-#include "control.h"
 #include "cycleclock.h"
 #include "debug.h"
 #include "snapshot.h"
@@ -23,7 +22,8 @@ enum nes_interrupt {
 };
 typedef struct nes_console nes;
 
-nes *nes_new(cart *c, debugctx *dbg, const struct control *appstate);
+nes *nes_new(cart *c, debugctx *dbg, bool tron, bool dumpram, bool zeroram,
+             bool bcdsupport);
 void nes_free(nes *self);
 
 void nes_mode(nes *self, enum nexcmode mode);

@@ -87,8 +87,7 @@ static void tick_end(struct control *appstate)
     ++appstate->clock.frames;
 }
 
-static void update_progress(const struct control *appstate,
-                            const struct console_state *snapshot)
+static void update_progress(void)
 {
     static const char distractor[] = {'|', '/', '-', '\\'};
     static const double display_wait = 2000,
@@ -96,7 +95,6 @@ static void update_progress(const struct control *appstate,
     static double refreshdt;
     static size_t distractor_frame;
 
-    (void)appstate, (void)snapshot;
     if ((refreshdt += FrameTimeMs) >= refresh_interval_ms) {
         refreshdt = display_wait;
         clearline();
@@ -141,7 +139,7 @@ static void batch_loop(struct control *appstate, nes *console,
         tick_start(appstate, snapshot);
         nes_cycle(console, &appstate->clock);
         nes_snapshot(console, snapshot);
-        update_progress(appstate, snapshot);
+        update_progress();
         tick_end(appstate);
     } while (QuitSignal == 0);
     write_summary(appstate, snapshot);

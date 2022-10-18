@@ -8,6 +8,7 @@
 #include "ciny.h"
 #include "cpu.h"
 #include "cpuhelp.h"
+#include "ctrlsignal.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -24,9 +25,9 @@ static void end_restores_state(void *ctx)
     cpu.signal.nmi = false;
     cpu.signal.res = true;
     cpu.signal.rdy = false;
-    cpu.irq = NIS_PENDING;
-    cpu.nmi = NIS_SERVICED;
-    cpu.res = NIS_COMMITTED;
+    cpu.irq = CSGS_PENDING;
+    cpu.nmi = CSGS_SERVICED;
+    cpu.res = CSGS_COMMITTED;
 
     ct_assertfalse(cpu.detached);
 
@@ -36,9 +37,9 @@ static void end_restores_state(void *ctx)
     ct_asserttrue(cpu.signal.nmi);
     ct_asserttrue(cpu.signal.res);
     ct_asserttrue(cpu.signal.rdy);
-    ct_assertequal(NIS_CLEAR, (int)cpu.irq);
-    ct_assertequal(NIS_CLEAR, (int)cpu.nmi);
-    ct_assertequal(NIS_CLEAR, (int)cpu.res);
+    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
+    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(CSGS_CLEAR, (int)cpu.res);
     ct_asserttrue(cpu.detached);
 
     cpu.pc = 0xc000;
@@ -52,9 +53,9 @@ static void end_restores_state(void *ctx)
     ct_assertfalse(cpu.signal.nmi);
     ct_asserttrue(cpu.signal.res);
     ct_assertfalse(cpu.signal.rdy);
-    ct_assertequal(NIS_PENDING, (int)cpu.irq);
-    ct_assertequal(NIS_SERVICED, (int)cpu.nmi);
-    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(CSGS_SERVICED, (int)cpu.nmi);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
     ct_assertfalse(cpu.detached);
 
     ct_assertequal(0x8000u, cpu.pc);
@@ -97,7 +98,7 @@ static void irq_ignored(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(NIS_PENDING, (int)cpu.irq);
+    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
 }
 
 static void nmi_ignored(void *ctx)
@@ -116,7 +117,7 @@ static void nmi_ignored(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(NIS_PENDING, (int)cpu.nmi);
+    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
 }
 
 static void res_not_ignored(void *ctx)
@@ -135,7 +136,7 @@ static void res_not_ignored(void *ctx)
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
-    ct_assertequal(NIS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
 }
 
 static void writes_ignored(void *ctx)

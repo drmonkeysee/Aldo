@@ -8,6 +8,7 @@
 #include "ciny.h"
 #include "cpu.h"
 #include "cpuhelp.h"
+#include "ctrlsignal.h"
 #include "decode.h"
 #include "dis.h"
 #include "snapshot.h"
@@ -1055,7 +1056,7 @@ static void peek_interrupt(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     struct console_state snapshot;
     cpu.a = 0x10;
-    cpu.irq = NIS_COMMITTED;
+    cpu.irq = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snapshot);
     snapshot.debugger.resvector_override = -1;
     snapshot.mem.vectors[4] = 0xbb;
@@ -1078,7 +1079,7 @@ static void peek_overridden_reset(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     struct console_state snapshot;
     cpu.a = 0x10;
-    cpu.res = NIS_COMMITTED;
+    cpu.res = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snapshot);
     snapshot.debugger.resvector_override = 0xccdd;
     snapshot.mem.vectors[2] = 0xbb;
@@ -1101,7 +1102,7 @@ static void peek_overridden_non_reset(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     struct console_state snapshot;
     cpu.a = 0x10;
-    cpu.nmi = NIS_COMMITTED;
+    cpu.nmi = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snapshot);
     snapshot.debugger.resvector_override = 0xccdd;
     snapshot.mem.vectors[0] = 0xff;
@@ -2470,7 +2471,7 @@ static void datapath_irq_cycle_zero(void *ctx)
     struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .irq = NIS_COMMITTED,
+            .irq = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2492,7 +2493,7 @@ static void datapath_irq_cycle_one(void *ctx)
     struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .irq = NIS_COMMITTED,
+            .irq = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2514,7 +2515,7 @@ static void datapath_irq_cycle_n(void *ctx)
     struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .irq = NIS_COMMITTED,
+            .irq = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2536,7 +2537,7 @@ static void datapath_irq_cycle_six(void *ctx)
     struct console_state sn = {
         .datapath = {
             .exec_cycle = 6,
-            .irq = NIS_COMMITTED,
+            .irq = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2558,7 +2559,7 @@ static void datapath_nmi_cycle_zero(void *ctx)
     struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .nmi = NIS_COMMITTED,
+            .nmi = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2580,7 +2581,7 @@ static void datapath_nmi_cycle_one(void *ctx)
     struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .nmi = NIS_COMMITTED,
+            .nmi = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2602,7 +2603,7 @@ static void datapath_nmi_cycle_n(void *ctx)
     struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .nmi = NIS_COMMITTED,
+            .nmi = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2624,7 +2625,7 @@ static void datapath_nmi_cycle_six(void *ctx)
     struct console_state sn = {
         .datapath = {
             .exec_cycle = 6,
-            .nmi = NIS_COMMITTED,
+            .nmi = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2646,7 +2647,7 @@ static void datapath_res_cycle_zero(void *ctx)
     struct console_state sn = {
         .datapath = {
             .exec_cycle = 0,
-            .res = NIS_COMMITTED,
+            .res = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2668,7 +2669,7 @@ static void datapath_res_cycle_one(void *ctx)
     struct console_state sn = {
         .datapath = {
             .exec_cycle = 1,
-            .res = NIS_COMMITTED,
+            .res = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2690,7 +2691,7 @@ static void datapath_res_cycle_n(void *ctx)
     struct console_state sn = {
         .datapath = {
             .exec_cycle = 2,
-            .res = NIS_COMMITTED,
+            .res = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2712,7 +2713,7 @@ static void datapath_res_cycle_six(void *ctx)
     struct console_state sn = {
         .datapath = {
             .exec_cycle = 6,
-            .res = NIS_COMMITTED,
+            .res = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},

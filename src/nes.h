@@ -9,31 +9,27 @@
 #define Aldo_nes_h
 
 #include "cart.h"
+#include "ctrlsignal.h"
 #include "cycleclock.h"
 #include "debug.h"
 #include "snapshot.h"
 
 #include <stdbool.h>
 
-enum nes_interrupt {
-    NESI_IRQ,
-    NESI_NMI,
-    NESI_RES,
-};
 typedef struct nes_console nes;
 
 nes *nes_new(cart *c, debugctx *dbg, bool bcdsupport, bool zeroram, bool tron,
              bool dumpram);
 void nes_free(nes *self);
 
-void nes_mode(nes *self, enum nexcmode mode);
+void nes_mode(nes *self, enum csig_excmode mode);
 
 void nes_powerup(nes *self);
 
 void nes_ready(nes *self);
 void nes_halt(nes *self);
-void nes_interrupt(nes *self, enum nes_interrupt signal);
-void nes_clear(nes *self, enum nes_interrupt signal);
+void nes_interrupt(nes *self, enum csig_interrupt signal);
+void nes_clear(nes *self, enum csig_interrupt signal);
 
 void nes_cycle(nes *self, struct cycleclock *clock);
 

@@ -142,11 +142,11 @@ static void update_n(struct mos6502 *self, uint8_t d)
 static void check_interrupts(struct mos6502 *self)
 {
     // NOTE: serviced state is only for assisting in nmi edge detection
-    assert(self->res != NIS_SERVICED);
-    assert(self->irq != NIS_SERVICED);
+    assert(self->res != CSGS_SERVICED);
+    assert(self->irq != CSGS_SERVICED);
 
-    if (!self->signal.res && self->res == NIS_CLEAR) {
-        self->res = NIS_DETECTED;
+    if (!self->signal.res && self->res == CSGS_CLEAR) {
+        self->res = CSGS_DETECTED;
     }
 
     // NOTE: final cycle of BRK sequence holds interrupt latching low,
@@ -155,15 +155,15 @@ static void check_interrupts(struct mos6502 *self)
     if (self->opc == BrkOpcode && self->t == 6) return;
 
     if (self->signal.nmi) {
-        if (self->nmi == NIS_SERVICED) {
-            self->nmi = NIS_CLEAR;
+        if (self->nmi == CSGS_SERVICED) {
+            self->nmi = CSGS_CLEAR;
         }
-    } else if (self->nmi == NIS_CLEAR) {
-        self->nmi = NIS_DETECTED;
+    } else if (self->nmi == CSGS_CLEAR) {
+        self->nmi = CSGS_DETECTED;
     }
 
-    if (!self->signal.irq && self->irq == NIS_CLEAR) {
-        self->irq = NIS_DETECTED;
+    if (!self->signal.irq && self->irq == CSGS_CLEAR) {
+        self->irq = CSGS_DETECTED;
     }
 }
 
@@ -175,31 +175,31 @@ static void latch_interrupts(struct mos6502 *self)
     // end of this cycle's ϕ2 so it moves directly from pending in this cycle
     // to committed in the next cycle.
     if (self->signal.res) {
-        if (self->res == NIS_DETECTED) {
-            self->res = NIS_CLEAR;
+        if (self->res == CSGS_DETECTED) {
+            self->res = CSGS_CLEAR;
         }
-    } else if (self->res == NIS_DETECTED) {
-        self->res = NIS_PENDING;
+    } else if (self->res == CSGS_DETECTED) {
+        self->res = CSGS_PENDING;
     }
 
     // NOTE: nmi is edge-detected so once it has latched in it remains
     // set until serviced by a handler or reset.
     if (self->signal.nmi) {
-        if (self->nmi == NIS_DETECTED) {
-            self->nmi = NIS_CLEAR;
+        if (self->nmi == CSGS_DETECTED) {
+            self->nmi = CSGS_CLEAR;
         }
-    } else if (self->nmi == NIS_DETECTED) {
-        self->nmi = NIS_PENDING;
+    } else if (self->nmi == CSGS_DETECTED) {
+        self->nmi = CSGS_PENDING;
     }
 
     // NOTE: irq is level-detected so must remain low until polled
     // or the interrupt is lost.
     if (self->signal.irq) {
-        if (self->irq == NIS_DETECTED || self->irq == NIS_PENDING) {
-            self->irq = NIS_CLEAR;
+        if (self->irq == CSGS_DETECTED || self->irq == CSGS_PENDING) {
+            self->irq = CSGS_CLEAR;
         }
-    } else if (self->irq == NIS_DETECTED) {
-        self->irq = NIS_PENDING;
+    } else if (self->irq == CSGS_DETECTED) {
+        self->irq = CSGS_PENDING;
     }
 }
 
@@ -207,26 +207,26 @@ static void poll_interrupts(struct mos6502 *self)
 {
     if (self->detached) return;
 
-    if (self->nmi == NIS_PENDING) {
-        self->nmi = NIS_COMMITTED;
+    if (self->nmi == CSGS_PENDING) {
+        self->nmi = CSGS_COMMITTED;
     }
 
-    if (self->irq == NIS_PENDING && !self->p.i) {
-        self->irq = NIS_COMMITTED;
+    if (self->irq == CSGS_PENDING && !self->p.i) {
+        self->irq = CSGS_COMMITTED;
     }
 }
 
 static bool service_interrupt(struct mos6502 *self)
 {
-    return self->res == NIS_COMMITTED
-            || self->nmi == NIS_COMMITTED
-            || self->irq == NIS_COMMITTED;
+    return self->res == CSGS_COMMITTED
+            || self->nmi == CSGS_COMMITTED
+            || self->irq == CSGS_COMMITTED;
 }
 
 static uint16_t interrupt_vector(struct mos6502 *self)
 {
-    if (self->res == NIS_COMMITTED) return CPU_VECTOR_RES;
-    if (self->nmi == NIS_COMMITTED) return CPU_VECTOR_NMI;
+    if (self->res == CSGS_COMMITTED) return CPU_VECTOR_RES;
+    if (self->nmi == CSGS_COMMITTED) return CPU_VECTOR_NMI;
     return CPU_VECTOR_IRQ;
 }
 
@@ -235,12 +235,12 @@ static uint16_t interrupt_vector(struct mos6502 *self)
 // but the real cpu complexity isn't necessary here).
 static bool reset_held(struct mos6502 *self)
 {
-    if (self->res == NIS_PENDING) {
-        self->res = NIS_COMMITTED;
+    if (self->res == CSGS_PENDING) {
+        self->res = CSGS_COMMITTED;
         detach(self);
         self->presync = true;
     }
-    return self->res == NIS_COMMITTED && !self->signal.res;
+    return self->res == CSGS_COMMITTED && !self->signal.res;
 }
 
 //
@@ -571,12 +571,12 @@ static void BRK_exec(struct mos6502 *self)
     // nmi is serviced by its own handler (for edge detection)
     // but cleared by all others;
     // irq is cleared by all handlers.
-    if (self->res == NIS_COMMITTED) {
+    if (self->res == CSGS_COMMITTED) {
         attach(self);
-        self->res = NIS_CLEAR;
+        self->res = CSGS_CLEAR;
     }
-    self->nmi = self->nmi == NIS_COMMITTED ? NIS_SERVICED : NIS_CLEAR;
-    self->irq = NIS_CLEAR;
+    self->nmi = self->nmi == CSGS_COMMITTED ? CSGS_SERVICED : CSGS_CLEAR;
+    self->irq = CSGS_CLEAR;
     self->p.i = true;
     self->pc = bytowr(self->adl, self->databus);
     commit_operation(self);
@@ -1698,8 +1698,8 @@ void cpu_powerup(struct mos6502 *self)
     set_p(self, 0x34);
 
     // TODO: simulate res held low on startup to engage reset sequence.
-    self->irq = self->nmi = NIS_CLEAR;
-    self->res = NIS_PENDING;
+    self->irq = self->nmi = CSGS_CLEAR;
+    self->res = CSGS_PENDING;
 }
 
 int cpu_cycle(struct mos6502 *self)
@@ -1788,7 +1788,7 @@ cpu_ctx *cpu_peek_start(struct mos6502 *self)
     if (!self->detached) {
         detach(self);
     }
-    self->irq = self->nmi = self->res = NIS_CLEAR;
+    self->irq = self->nmi = self->res = CSGS_CLEAR;
     self->signal.irq = self->signal.nmi = self->signal.res =
         self->signal.rdy = true;
     return ctx;

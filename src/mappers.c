@@ -8,6 +8,7 @@
 #include "mappers.h"
 
 #include "bytes.h"
+#include "cart.h"
 
 #include <assert.h>
 #include <stddef.h>

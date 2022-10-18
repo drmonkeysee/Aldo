@@ -10,6 +10,7 @@
 
 #include "cart.h"
 #include "cpu.h"
+#include "decode.h"
 #include "snapshot.h"
 
 #include <stdbool.h>

@@ -9,6 +9,7 @@
 #define Aldo_cpu_h
 
 #include "bus.h"
+#include "ctrlsignal.h"
 #include "decode.h"
 #include "snapshot.h"
 
@@ -45,7 +46,7 @@ struct mos6502 {
     // Datapath: abstract representation of instruction fetching,
     // execution, and signaling.
     int8_t t;           // Instruction sequence cycle (T0, T1, T2...)
-    enum nistate
+    enum csig_state
         irq,            // IRQ detection latch
         nmi,            // NMI detection latch
         res;            // RESET detection latch

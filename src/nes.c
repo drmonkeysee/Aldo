@@ -31,7 +31,7 @@ struct nes_console {
     debugctx *dbg;              // Debugger Context; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
-    enum nexcmode mode;         // NES execution mode
+    enum csig_excmode mode;     // NES execution mode
     uint8_t ram[MEMBLOCK_2KB];  // CPU Internal RAM
     bool
         dumpram,                // Dump RAM banks to disk on exit
@@ -78,17 +78,17 @@ static void free_cpubus(struct nes_console *self)
     self->cpu.bus = NULL;
 }
 
-static void set_interrupt(struct nes_console *self, enum nes_interrupt signal,
+static void set_interrupt(struct nes_console *self, enum csig_interrupt signal,
                           bool value)
 {
     switch (signal) {
-    case NESI_IRQ:
+    case CSGI_IRQ:
         self->cpu.signal.irq = value;
         break;
-    case NESI_NMI:
+    case CSGI_NMI:
         self->cpu.signal.nmi = value;
         break;
-    case NESI_RES:
+    case CSGI_RES:
         self->cpu.signal.res = value;
         break;
     default:
@@ -170,12 +170,12 @@ void nes_free(nes *self)
     free(self);
 }
 
-void nes_mode(nes *self, enum nexcmode mode)
+void nes_mode(nes *self, enum csig_excmode mode)
 {
     assert(self != NULL);
 
     // NOTE: force signed to check < 0 (underlying type may be uint)
-    self->mode = (int)mode < 0 ? NEXC_MODECOUNT - 1 : mode % NEXC_MODECOUNT;
+    self->mode = (int)mode < 0 ? CSGM_MODECOUNT - 1 : mode % CSGM_MODECOUNT;
 }
 
 void nes_powerup(nes *self)
@@ -183,7 +183,7 @@ void nes_powerup(nes *self)
     assert(self != NULL);
 
     // TODO: for now start in cycle-step mode
-    self->mode = NEXC_CYCLE;
+    self->mode = CSGM_CYCLE;
     if (self->zeroram) {
         memset(self->ram, 0, sizeof self->ram / sizeof self->ram[0]);
     }
@@ -205,14 +205,14 @@ void nes_halt(nes *self)
 }
 
 // NOTE: interrupt lines are active low
-void nes_interrupt(nes *self, enum nes_interrupt signal)
+void nes_interrupt(nes *self, enum csig_interrupt signal)
 {
     assert(self != NULL);
 
     set_interrupt(self, signal, false);
 }
 
-void nes_clear(nes *self, enum nes_interrupt signal)
+void nes_clear(nes *self, enum csig_interrupt signal)
 {
     assert(self != NULL);
 
@@ -234,13 +234,13 @@ void nes_cycle(nes *self, struct cycleclock *clock)
         default:
             assert(((void)"INVALID EXC MODE", false));
             // NOTE: release build fallthrough to single-cycle
-        case NEXC_CYCLE:
+        case CSGM_CYCLE:
             nes_halt(self);
             break;
-        case NEXC_STEP:
+        case CSGM_STEP:
             self->cpu.signal.rdy = !self->cpu.signal.sync;
             break;
-        case NEXC_RUN:
+        case CSGM_RUN:
             break;
         }
         debug_check(self->dbg, clock, &self->cpu);

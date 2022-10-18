@@ -10,6 +10,7 @@
 #include "argparse.h"
 #include "cart.h"
 #include "cliargs.h"
+#include "ctrlsignal.h"
 #include "debug.h"
 #include "dis.h"
 #include "haltexpr.h"
@@ -136,7 +137,7 @@ static int run_emu(const struct cliargs *args, cart *c)
     nes_powerup(console);
     // NOTE: when in batch mode set NES to run immediately
     if (args->batch) {
-        nes_mode(console, NEXC_RUN);
+        nes_mode(console, CSGM_RUN);
         nes_ready(console);
     }
     // NOTE: initialize snapshot from console

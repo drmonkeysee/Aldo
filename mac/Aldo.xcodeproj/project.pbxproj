@@ -261,6 +261,7 @@
 		C8DC9CB228DFD57B000D8D97 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../ext/SDL2.framework; sourceTree = "<group>"; };
 		C8DC9CB828DFE5B4000D8D97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C8E76BA9285985CE004C1479 /* Commands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Commands.swift; sourceTree = "<group>"; };
+		C8E9478128FE45EA0073D1AA /* ctrlsignal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ctrlsignal.h; sourceTree = "<group>"; };
 		C8F2985A2810ECEF00ECFD7E /* CStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CStream.swift; sourceTree = "<group>"; };
 		C8F617A228F7B62A0086A34C /* cartinfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cartinfo.h; sourceTree = "<group>"; };
 		C8FB31D02803D6EC00E6B0EF /* AldoError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoError.swift; sourceTree = "<group>"; };
@@ -386,6 +387,7 @@
 				C820E6C925A97A4E006A7AB1 /* cli.h */,
 				C820E6CA25A97A4E006A7AB1 /* cli.c */,
 				C81A516B25DA036100361E40 /* cliargs.h */,
+				C8E9478128FE45EA0073D1AA /* ctrlsignal.h */,
 				C8C706842751EEBA00B45785 /* cpu.h */,
 				C8C706892751EEBA00B45785 /* cpu.c */,
 				C848C1B228FB9D630025ABD2 /* cycleclock.h */,

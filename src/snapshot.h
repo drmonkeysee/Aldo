@@ -9,26 +9,12 @@
 #define Aldo_snapshot_h
 
 #include "cartinfo.h"
+#include "ctrlsignal.h"
 #include "haltexpr.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-enum nexcmode {
-    NEXC_CYCLE,
-    NEXC_STEP,
-    NEXC_RUN,
-    NEXC_MODECOUNT,
-};
-
-enum nistate {
-    NIS_CLEAR,
-    NIS_DETECTED,
-    NIS_PENDING,
-    NIS_COMMITTED,
-    NIS_SERVICED,
-};
 
 struct console_state {
     struct {
@@ -44,9 +30,9 @@ struct console_state {
         int resvector_override; // RESET Vector Override (<0 if not set)
         struct haltexpr break_condition;
     } debugger;
-    enum nexcmode mode;
+    enum csig_excmode mode;
     struct {
-        enum nistate irq, nmi, res;
+        enum csig_state irq, nmi, res;
         uint16_t addressbus, current_instruction;
         uint8_t addrlow_latch, addrhigh_latch, addrcarry_latch, databus,
                 exec_cycle, opcode;

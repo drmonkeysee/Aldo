@@ -9,6 +9,7 @@
 
 #include "bytes.h"
 #include "cart.h"
+#include "ctrlsignal.h"
 #include "cycleclock.h"
 #include "dis.h"
 #include "haltexpr.h"
@@ -153,9 +154,9 @@ static void drawcontrols(const struct console_state *snapshot)
 
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y, 0, "Mode: ");
-    drawtoggle(" Cycle ", snapshot->mode == NEXC_CYCLE);
-    drawtoggle(" Step ", snapshot->mode == NEXC_STEP);
-    drawtoggle(" Run ", snapshot->mode == NEXC_RUN);
+    drawtoggle(" Cycle ", snapshot->mode == CSGM_CYCLE);
+    drawtoggle(" Step ", snapshot->mode == CSGM_STEP);
+    drawtoggle(" Run ", snapshot->mode == CSGM_RUN);
 
     cursor_y += 2;
     mvwaddstr(ControlsView.content, cursor_y, 0, "Signal: ");
@@ -326,22 +327,22 @@ static void draw_cpu_line(bool signal, int y, int x, int dir_offset,
     }
 }
 
-static void draw_interrupt_latch(enum nistate interrupt, int y, int x)
+static void draw_interrupt_latch(enum csig_state interrupt, int y, int x)
 {
     const char *modifier = "";
     attr_t style = A_NORMAL;
     switch (interrupt) {
-    case NIS_CLEAR:
+    case CSGS_CLEAR:
         // NOTE: draw nothing for CLEAR state
         return;
-    case NIS_DETECTED:
+    case CSGS_DETECTED:
         style = A_DIM;
         break;
-    case NIS_COMMITTED:
+    case CSGS_COMMITTED:
         style = A_UNDERLINE;
         modifier = "\u0305";
         break;
-    case NIS_SERVICED:
+    case CSGS_SERVICED:
         modifier = "\u0338";
         break;
     default:
@@ -628,9 +629,9 @@ static void handle_input(nes *console, const struct console_state *snapshot)
         break;
     case 'i':
         if (snapshot->lines.irq) {
-            nes_interrupt(console, NESI_IRQ);
+            nes_interrupt(console, CSGI_IRQ);
         } else {
-            nes_clear(console, NESI_IRQ);
+            nes_clear(console, CSGI_IRQ);
         }
         break;
     case 'm':
@@ -641,9 +642,9 @@ static void handle_input(nes *console, const struct console_state *snapshot)
         break;
     case 'n':
         if (snapshot->lines.nmi) {
-            nes_interrupt(console, NESI_NMI);
+            nes_interrupt(console, CSGI_NMI);
         } else {
-            nes_clear(console, NESI_NMI);
+            nes_clear(console, CSGI_NMI);
         }
         break;
     case 'q':
@@ -660,9 +661,9 @@ static void handle_input(nes *console, const struct console_state *snapshot)
         break;
     case 's':
         if (snapshot->lines.reset) {
-            nes_interrupt(console, NESI_RES);
+            nes_interrupt(console, CSGI_RES);
         } else {
-            nes_clear(console, NESI_RES);
+            nes_clear(console, CSGI_RES);
         }
         break;
     }

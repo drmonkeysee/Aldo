@@ -8,7 +8,7 @@
 #include "dis.h"
 
 #include "bytes.h"
-#include "decode.h"
+#include "ctrlsignal.h"
 
 #include <assert.h>
 #include <math.h>
@@ -87,17 +87,17 @@ static const char *interrupt_display(const struct console_state *snapshot)
 {
     if (snapshot->datapath.opcode != BrkOpcode) return "";
     if (snapshot->datapath.exec_cycle == 6) return "CLR";
-    if (snapshot->datapath.res == NIS_COMMITTED) return "(RES)";
-    if (snapshot->datapath.nmi == NIS_COMMITTED) return "(NMI)";
-    if (snapshot->datapath.irq == NIS_COMMITTED) return "(IRQ)";
+    if (snapshot->datapath.res == CSGS_COMMITTED) return "(RES)";
+    if (snapshot->datapath.nmi == CSGS_COMMITTED) return "(NMI)";
+    if (snapshot->datapath.irq == CSGS_COMMITTED) return "(IRQ)";
     return "";
 }
 
 static uint16_t interrupt_vector(const struct console_state *snapshot)
 {
-    if (snapshot->datapath.nmi == NIS_COMMITTED)
+    if (snapshot->datapath.nmi == CSGS_COMMITTED)
         return batowr(snapshot->mem.vectors);
-    if (snapshot->datapath.res == NIS_COMMITTED)
+    if (snapshot->datapath.res == CSGS_COMMITTED)
         return batowr(snapshot->mem.vectors + 2);
     return batowr(snapshot->mem.vectors + 4);
 }
@@ -609,7 +609,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
         if (count < 0) return DIS_ERR_FMT;
         const char *fmt;
         uint16_t vector;
-        if (snapshot->datapath.res == NIS_COMMITTED
+        if (snapshot->datapath.res == CSGS_COMMITTED
             && snapshot->debugger.resvector_override >= 0) {
             fmt = "!%04X";
             vector = snapshot->debugger.resvector_override;

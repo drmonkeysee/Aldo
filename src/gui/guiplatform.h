@@ -21,7 +21,7 @@ struct gui_platform {
     void (*cleanup)(void);
 };
 
-bool gui_platform_init(struct gui_platform *platform) aldo_noexcept;
+bool gui_platform_init(struct gui_platform *platform) aldo_nothrow;
 
 #include "bridgeclose.h"
 #endif

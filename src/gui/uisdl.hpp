@@ -18,10 +18,10 @@ namespace aldo
 #endif
 #include "bridgeopen.h"
 
-aldo_nodiscard("error code")
+aldo_checkreturn("error code")
 int ui_sdl_init(struct ui_interface* ui,
                 const struct control* appstate,
-                const struct gui_platform* platform) aldo_noexcept;
+                const struct gui_platform* platform) aldo_nothrow;
 
 #include "bridgeclose.h"
 #ifdef __cplusplus

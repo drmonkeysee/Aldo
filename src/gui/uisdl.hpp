@@ -8,7 +8,7 @@
 #ifndef Aldo_gui_uisdl_hpp
 #define Aldo_gui_uisdl_hpp
 
-#include "control.h"
+#include "cliargs.h"
 #include "guiplatform.h"
 #include "ui.h"
 
@@ -19,9 +19,9 @@ namespace aldo
 #include "bridgeopen.h"
 
 aldo_checkreturn("error code")
-int ui_sdl_init(struct ui_interface* ui,
-                const struct control* appstate,
-                const struct gui_platform* platform) aldo_nothrow;
+int ui_sdl_init(const struct cliargs* args,
+                const struct gui_platform* platform,
+                ui_loop** loop) aldo_nothrow;
 
 #include "bridgeclose.h"
 #ifdef __cplusplus

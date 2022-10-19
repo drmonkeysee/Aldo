@@ -144,9 +144,9 @@ static int run_emu(const struct cliargs *args, cart *c)
     struct console_state snapshot;
     nes_snapshot(console, &snapshot);
 
-    ui_loop *ui_loop;
+    ui_loop *loop;
     errno = 0;
-    const int err = init_ui(args, &ui_loop);
+    const int err = init_ui(args, &loop);
     if (err < 0) {
         fprintf(stderr, "UI init failure (%d): %s\n", err, ui_errstr(err));
         if (err == UI_ERR_ERNO) {
@@ -156,7 +156,7 @@ static int run_emu(const struct cliargs *args, cart *c)
         goto exit_console;
     }
 
-    ui_loop(console, &snapshot);
+    loop(console, &snapshot);
 exit_console:
     snapshot_clear(&snapshot);
     nes_free(console);

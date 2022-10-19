@@ -10,8 +10,9 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_sdlrenderer.h"
-
 #include <SDL2/SDL.h>
+
+#include <cassert>
 
 namespace
 {
@@ -19,7 +20,11 @@ namespace
 SDL_Window* Window;
 SDL_Renderer* Renderer;
 SDL_Texture* BouncerTexture;
-bool ShowDemo;
+bool Running = true, ShowDemo;
+struct bouncer {
+    SDL_Point bounds, pos, velocity;
+    int dim;
+} Bouncer{{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 50};
 
 enum guicleanup {
     GUI_CLEANUP_ALL,
@@ -55,7 +60,7 @@ void ui_cleanup(guicleanup status) noexcept
     }
 }
 
-void render_bouncer(const bounce& bouncer) noexcept
+void render_bouncer() noexcept
 {
     SDL_SetRenderTarget(Renderer, BouncerTexture);
     SDL_SetRenderDrawColor(Renderer, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
@@ -65,18 +70,18 @@ void render_bouncer(const bounce& bouncer) noexcept
     SDL_RenderDrawLine(Renderer, 30, 7, 50, 200);
 
     SDL_SetRenderDrawColor(Renderer, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
-    const int halfDim = bouncer.dim / 2;
+    const int halfDim = Bouncer.dim / 2;
     const SDL_Rect pos{
-        bouncer.pos.x - halfDim,
-        bouncer.pos.y - halfDim,
-        bouncer.dim,
-        bouncer.dim,
+        Bouncer.pos.x - halfDim,
+        Bouncer.pos.y - halfDim,
+        Bouncer.dim,
+        Bouncer.dim,
     };
     SDL_RenderFillRect(Renderer, &pos);
     SDL_SetRenderTarget(Renderer, nullptr);
 
     ImGui::Begin("Bouncer");
-    const ImVec2 sz{(float)bouncer.bounds.x, (float)bouncer.bounds.y};
+    const ImVec2 sz{(float)Bouncer.bounds.x, (float)Bouncer.bounds.y};
     ImGui::Image(BouncerTexture, sz);
     ImGui::End();
 }
@@ -86,7 +91,7 @@ void render_bouncer(const bounce& bouncer) noexcept
 //
 
 [[nodiscard("error code")]]
-int init_ui(const control& appstate, const gui_platform& platform) noexcept
+int init_ui(const gui_platform& platform) noexcept
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
@@ -127,8 +132,8 @@ int init_ui(const control& appstate, const gui_platform& platform) noexcept
 
     BouncerTexture = SDL_CreateTexture(Renderer, SDL_PIXELFORMAT_RGBA8888,
                                        SDL_TEXTUREACCESS_TARGET,
-                                       appstate.bouncer.bounds.x,
-                                       appstate.bouncer.bounds.y);
+                                       Bouncer.bounds.x,
+                                       Bouncer.bounds.y);
     if (!BouncerTexture) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "Bouncer texture creation failure: %s",
@@ -151,23 +156,33 @@ int init_ui(const control& appstate, const gui_platform& platform) noexcept
     return 0;
 }
 
-void tick_start(control*, const console_state*) noexcept
+void handle_input() noexcept
 {
-    // TODO: do nothing
+    SDL_Event ev;
+    while (SDL_PollEvent(&ev)) {
+        ImGui_ImplSDL2_ProcessEvent(&ev);
+        if (ev.type == SDL_QUIT) {
+            Running = false;
+        }
+    }
 }
 
-void tick_end(control*) noexcept
+void update_stuff() noexcept
 {
-    // TODO: do nothing
+    const int halfdim = Bouncer.dim / 2;
+    if (Bouncer.pos.x - halfdim < 0
+        || Bouncer.pos.x + halfdim > Bouncer.bounds.x) {
+        Bouncer.velocity.x *= -1;
+    }
+    if (Bouncer.pos.y - halfdim < 0
+        || Bouncer.pos.y + halfdim > Bouncer.bounds.y) {
+        Bouncer.velocity.y *= -1;
+    }
+    Bouncer.pos.x += Bouncer.velocity.x;
+    Bouncer.pos.y += Bouncer.velocity.y;
 }
 
-int pollinput() noexcept
-{
-    // TODO: need to move SDL_Event handling here
-    return 0;
-}
-
-void render_ui(const control* appstate, const console_state*) noexcept
+void render_ui() noexcept
 {
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame();
@@ -188,7 +203,7 @@ void render_ui(const control* appstate, const console_state*) noexcept
     ImGui::Text("Hello From Aldo+Dear ImGui");
     ImGui::End();
 
-    render_bouncer(appstate->bouncer);
+    render_bouncer();
 
     ImGui::Render();
     SDL_SetRenderDrawColor(Renderer, 0x1e, 0x1e, 0x1e, SDL_ALPHA_OPAQUE);
@@ -197,9 +212,24 @@ void render_ui(const control* appstate, const console_state*) noexcept
     SDL_RenderPresent(Renderer);
 }
 
-void cleanup_ui(const control*, const console_state*) noexcept
+void cleanup_ui() noexcept
 {
     ui_cleanup(GUI_CLEANUP_ALL);
+}
+
+void sdl_loop(nes* console, struct console_state* snapshot) noexcept
+{
+    assert(console != nullptr);
+    assert(snapshot != nullptr);
+
+    do {
+        handle_input();
+        if (Running) {
+            update_stuff();
+            render_ui();
+        }
+    } while (Running);
+    cleanup_ui();
 }
 
 }
@@ -208,18 +238,15 @@ void cleanup_ui(const control*, const console_state*) noexcept
 // Public Interface
 //
 
-int aldo::ui_sdl_init(ui_interface* ui, const control* appstate,
-                      const gui_platform* platform) noexcept
+int aldo::ui_sdl_init(const struct cliargs* args,
+                      const struct gui_platform* platform,
+                      ui_loop** loop) noexcept
 {
-    const auto err = init_ui(*appstate, *platform);
-    if (err == 0) {
-        *ui = {
-            tick_start,
-            tick_end,
-            pollinput,
-            render_ui,
-            cleanup_ui,
-        };
-    }
+    assert(args != nullptr);
+    assert(platform != nullptr);
+    assert(loop != nullptr);
+
+    const int err = init_ui(*platform);
+    *loop = err == 0 ? sdl_loop : nullptr;
     return err;
 }

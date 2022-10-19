@@ -32,7 +32,6 @@
 		C83C663927E2F4FE009CE42C /* bytes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068F2751EEBA00B45785 /* bytes.c */; };
 		C83C663A27E2F52C009CE42C /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
 		C8497E402822015100F4952E /* Disassembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8497E3F2822015100F4952E /* Disassembly.swift */; };
-		C84A0D5028EFC19A00D298AB /* uiimgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C84A0D4E28EFC19A00D298AB /* uiimgui.cpp */; };
 		C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C854872728E685D00045BA42 /* imgui_widgets.cpp */; };
 		C854873828E685D00045BA42 /* imgui_impl_sdlrenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C854872B28E685D00045BA42 /* imgui_impl_sdlrenderer.cpp */; };
 		C854873A28E685D00045BA42 /* imgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C854872D28E685D00045BA42 /* imgui.cpp */; };
@@ -177,8 +176,6 @@
 		C83C663327E2F2E6009CE42C /* Aldo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Aldo-Bridging-Header.h"; sourceTree = "<group>"; };
 		C848C1B228FB9D630025ABD2 /* cycleclock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cycleclock.h; sourceTree = "<group>"; };
 		C8497E3F2822015100F4952E /* Disassembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disassembly.swift; sourceTree = "<group>"; };
-		C84A0D4E28EFC19A00D298AB /* uiimgui.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = uiimgui.cpp; sourceTree = "<group>"; };
-		C84A0D4F28EFC19A00D298AB /* uiimgui.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = uiimgui.hpp; sourceTree = "<group>"; };
 		C854872428E685D00045BA42 /* imgui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imgui.h; sourceTree = "<group>"; };
 		C854872528E685D00045BA42 /* imstb_textedit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imstb_textedit.h; sourceTree = "<group>"; };
 		C854872628E685D00045BA42 /* imconfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imconfig.h; sourceTree = "<group>"; };
@@ -509,8 +506,6 @@
 				C8041C3528EE6EC000A3695F /* gui.h */,
 				C8041C3628EE6EC000A3695F /* gui.c */,
 				C8041C3828EE72E600A3695F /* guiplatform.h */,
-				C84A0D4F28EFC19A00D298AB /* uiimgui.hpp */,
-				C84A0D4E28EFC19A00D298AB /* uiimgui.cpp */,
 				C88CABDD28FA4DDD00551C65 /* uisdl.hpp */,
 				C88CABDC28FA4DDD00551C65 /* uisdl.cpp */,
 			);
@@ -814,7 +809,6 @@
 				C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */,
 				C88CABE128FA522D00551C65 /* tsutil.c in Sources */,
 				C854873A28E685D00045BA42 /* imgui.cpp in Sources */,
-				C84A0D5028EFC19A00D298AB /* uiimgui.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

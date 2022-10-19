@@ -14,6 +14,7 @@
 
 typedef struct addressbus bus;
 
+#include "bridgeopen.h"
 struct busdevice {
     bool (*read)(const void *restrict, uint16_t, uint8_t *restrict);
     bool (*write)(void *, uint16_t, uint8_t);
@@ -42,5 +43,6 @@ bool bus_read(bus *self, uint16_t addr, uint8_t *restrict d);
 bool bus_write(bus *self, uint16_t addr, uint8_t d);
 size_t bus_dma(bus *self, uint16_t addr, size_t count,
                uint8_t dest[restrict count]);
+#include "bridgeclose.h"
 
 #endif

@@ -46,6 +46,7 @@ struct blockview {
 
 typedef struct cartridge cart;
 
+#include "bridgeopen.h"
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
 const char *cart_errstr(int err);
@@ -72,5 +73,6 @@ const char *cart_filename(const struct cartinfo *info);
 int cart_format_extendedname(const struct cartinfo *info,
                              char buf[restrict static CART_FMT_SIZE]);
 void cart_snapshot(cart *self, struct console_state *snapshot);
+#include "bridgeclose.h"
 
 #endif

@@ -47,6 +47,8 @@ struct console_state {
     } lines;
 };
 
+#include "bridgeopen.h"
 void snapshot_clear(struct console_state *snapshot);
+#include "bridgeclose.h"
 
 #endif

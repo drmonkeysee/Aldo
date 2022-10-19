@@ -394,7 +394,9 @@ struct decoded {
     bool unofficial;
 };
 
+#include "bridgeopen.h"
 extern const int BrkOpcode;
 extern const struct decoded Decode[];
+#include "bridgeclose.h"
 
 #endif

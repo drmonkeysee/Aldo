@@ -45,6 +45,7 @@ enum {
 #undef X
 };
 
+#include "bridgeopen.h"
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
 const char *haltexpr_errstr(int err);
@@ -53,5 +54,6 @@ const char *haltexpr_errstr(int err);
 int haltexpr_parse(const char *restrict str, struct haltexpr *expr);
 int haltexpr_fmt(const struct haltexpr *expr,
                  char buf[restrict static HEXPR_FMT_SIZE]);
+#include "bridgeclose.h"
 
 #endif

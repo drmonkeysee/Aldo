@@ -18,6 +18,7 @@
 
 typedef struct nes_console nes;
 
+#include "bridgeopen.h"
 nes *nes_new(cart *c, debugctx *dbg, bool bcdsupport, bool zeroram, bool tron,
              bool dumpram);
 void nes_free(nes *self);
@@ -34,5 +35,6 @@ void nes_clear(nes *self, enum csig_interrupt signal);
 void nes_cycle(nes *self, struct cycleclock *clock);
 
 void nes_snapshot(nes *self, struct console_state *snapshot);
+#include "bridgeclose.h"
 
 #endif

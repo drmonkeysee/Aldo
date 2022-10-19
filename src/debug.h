@@ -18,6 +18,7 @@
 
 typedef struct debugger_context debugctx;
 
+#include "bridgeopen.h"
 debugctx *debug_new(int resetvector_override);
 void debug_free(debugctx *self);
 
@@ -26,5 +27,6 @@ void debug_addbreakpoint(debugctx *self, struct haltexpr expr);
 void debug_check(debugctx *self, const struct cycleclock *clk,
                  struct mos6502 *cpu);
 void debug_snapshot(debugctx *self, struct console_state *snapshot);
+#include "bridgeclose.h"
 
 #endif

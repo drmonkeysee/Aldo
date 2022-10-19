@@ -16,9 +16,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// Helpful CPU constants
-extern const int MaxCycleCount;
-
 // The MOS6502 processor is a little-endian
 // 8-bit CPU with a 16-bit addressing space.
 struct mos6502 {
@@ -89,6 +86,9 @@ struct cpu_peekresult {
 };
 typedef struct cpu_context cpu_ctx;
 
+#include "bridgeopen.h"
+extern const int MaxCycleCount;
+
 void cpu_powerup(struct mos6502 *self);
 
 int cpu_cycle(struct mos6502 *self);
@@ -99,5 +99,6 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot);
 cpu_ctx *cpu_peek_start(struct mos6502 *self);
 struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr);
 void cpu_peek_end(struct mos6502 *self, cpu_ctx *ctx);
+#include "bridgeclose.h"
 
 #endif

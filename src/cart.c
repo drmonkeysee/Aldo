@@ -358,7 +358,7 @@ void cart_write_dis_header(cart *self, FILE *f)
 
     fprintf(f, "%s\n", cart_filename(&self->info));
     char fmtd[CART_FMT_SIZE];
-    const int result = cart_format_extendedname(&self->info, fmtd);
+    const int result = cart_format_extname(&self->info, fmtd);
     fputs(result > 0 ? fmtd : "Invalid Format", f);
     fputs("\n\nDisassembly of PRG ROM\n", f);
     if (self->info.format != CRTF_ALDO) {
@@ -374,8 +374,8 @@ const char *cart_filename(const struct cartinfo *info)
     return last_slash ? last_slash + 1 : info->filepath;
 }
 
-int cart_format_extendedname(const struct cartinfo *info,
-                             char buf[restrict static CART_FMT_SIZE])
+int cart_format_extname(const struct cartinfo *info,
+                        char buf[restrict static CART_FMT_SIZE])
 {
     assert(info != NULL);
     assert(buf != NULL);

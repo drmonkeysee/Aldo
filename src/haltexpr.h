@@ -54,7 +54,7 @@ const char *haltexpr_errstr(int err) bd_nothrow;
 int haltexpr_parse(const char *bd_noalias str,
                    struct haltexpr *expr) bd_nothrow;
 int haltexpr_fmt(const struct haltexpr *expr,
-                 char buf[bd_noalias_fxdsz(HEXPR_FMT_SIZE)]) bd_nothrow;
+                 char buf[bd_noalias_csz(HEXPR_FMT_SIZE)]) bd_nothrow;
 #include "bridgeclose.h"
 
 #endif

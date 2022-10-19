@@ -10,7 +10,7 @@
 #define bd_checkreturn(str) [[nodiscard((str))]]
 #define bd_noalias
 #define bd_noalias_sz(var)
-#define bd_noalias_fxdsz(val)
+#define bd_noalias_csz(val)
 #define bd_nothrow noexcept
 extern "C"
 {
@@ -18,6 +18,6 @@ extern "C"
 #define bd_checkreturn(str)
 #define bd_noalias restrict
 #define bd_noalias_sz(var) restrict var
-#define bd_noalias_fxdsz(val) restrict static val
+#define bd_noalias_csz(val) restrict static val
 #define bd_nothrow
 #endif

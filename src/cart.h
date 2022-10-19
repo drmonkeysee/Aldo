@@ -70,9 +70,8 @@ void cart_write_dis_header(cart *self, FILE *f) bd_nothrow;
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
 const char *cart_filename(const struct cartinfo *info) bd_nothrow;
-int
-cart_format_extendedname(const struct cartinfo *info,
-                         char buf[bd_noalias_fxdsz(CART_FMT_SIZE)]) bd_nothrow;
+int cart_format_extname(const struct cartinfo *info,
+                        char buf[bd_noalias_csz(CART_FMT_SIZE)]) bd_nothrow;
 void cart_snapshot(cart *self, struct console_state *snapshot) bd_nothrow;
 #include "bridgeclose.h"
 

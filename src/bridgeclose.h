@@ -10,7 +10,7 @@
 }   // NOTE: end extern "C"
 #endif
 #undef bd_nothrow
-#undef bd_noalias_fxdsz
+#undef bd_noalias_csz
 #undef bd_noalias_sz
 #undef bd_noalias
 #undef bd_checkreturn

@@ -12,8 +12,6 @@
 #include "nes.h"
 #include "snapshot.h"
 
-#include "bridgeopen.h"
-
 // X(symbol, value, error string)
 #define UI_ERRCODE_X \
 X(UI_ERR_ERNO, -1, "SYSTEM ERROR") \
@@ -25,6 +23,7 @@ enum {
 #undef X
 };
 
+#include "bridgeopen.h"
 typedef void ui_loop(nes *, struct console_state *) aldo_nothrow;
 
 // NOTE: returns a pointer to a statically allocated string;
@@ -33,6 +32,6 @@ const char *ui_errstr(int err) aldo_nothrow;
 
 // NOTE: common batch mode for CLI and GUI mode
 int ui_batch_init(const struct cliargs *args, ui_loop **loop) aldo_nothrow;
-
 #include "bridgeclose.h"
+
 #endif

@@ -12,8 +12,6 @@
 
 #include <stdbool.h>
 
-#include "bridgeopen.h"
-
 struct gui_platform {
     const char *(*appname)(void);
     bool (*is_hidpi)(void);
@@ -21,7 +19,8 @@ struct gui_platform {
     void (*cleanup)(void);
 };
 
+#include "bridgeopen.h"
 bool gui_platform_init(struct gui_platform *platform) aldo_nothrow;
-
 #include "bridgeclose.h"
+
 #endif

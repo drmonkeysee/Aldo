@@ -9,8 +9,8 @@
 #ifdef __cplusplus
 }   // NOTE: end extern "C"
 #endif
-#undef aldo_nothrow
-#undef aldo_noalias_fxdsz
-#undef aldo_noalias_sz
-#undef aldo_noalias
-#undef aldo_checkreturn
+#undef bd_nothrow
+#undef bd_noalias_fxdsz
+#undef bd_noalias_sz
+#undef bd_noalias
+#undef bd_checkreturn

@@ -89,16 +89,17 @@ typedef struct cpu_context cpu_ctx;
 #include "bridgeopen.h"
 extern const int MaxCycleCount;
 
-void cpu_powerup(struct mos6502 *self) aldo_nothrow;
+void cpu_powerup(struct mos6502 *self) bd_nothrow;
 
-int cpu_cycle(struct mos6502 *self) aldo_nothrow;
+int cpu_cycle(struct mos6502 *self) bd_nothrow;
 
-bool cpu_jammed(const struct mos6502 *self) aldo_nothrow;
-void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot) aldo_nothrow;
+bool cpu_jammed(const struct mos6502 *self) bd_nothrow;
+void cpu_snapshot(const struct mos6502 *self,
+                  struct console_state *snapshot) bd_nothrow;
 
-cpu_ctx *cpu_peek_start(struct mos6502 *self) aldo_nothrow;
-struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr) aldo_nothrow;
-void cpu_peek_end(struct mos6502 *self, cpu_ctx *ctx) aldo_nothrow;
+cpu_ctx *cpu_peek_start(struct mos6502 *self) bd_nothrow;
+struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr) bd_nothrow;
+void cpu_peek_end(struct mos6502 *self, cpu_ctx *ctx) bd_nothrow;
 #include "bridgeclose.h"
 
 #endif

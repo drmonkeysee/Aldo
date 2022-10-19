@@ -48,7 +48,7 @@ struct console_state {
 };
 
 #include "bridgeopen.h"
-void snapshot_clear(struct console_state *snapshot);
+void snapshot_clear(struct console_state *snapshot) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

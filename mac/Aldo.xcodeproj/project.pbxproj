@@ -91,6 +91,17 @@
 		C8C9FB652803F8900093D9A7 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
 		C8C9FB662803F8BD0093D9A7 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068D2751EEBA00B45785 /* decode.c */; };
 		C8C9FB672803F8C90093D9A7 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706892751EEBA00B45785 /* cpu.c */; };
+		C8CAF74628FFB9EB00358339 /* cart.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068A2751EEBA00B45785 /* cart.c */; };
+		C8CAF74728FFB9FB00358339 /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
+		C8CAF74828FFBA0900358339 /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
+		C8CAF74928FFBA1200358339 /* bytes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068F2751EEBA00B45785 /* bytes.c */; };
+		C8CAF74A28FFBA1B00358339 /* nes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706832751EEBA00B45785 /* nes.c */; };
+		C8CAF74B28FFBA2200358339 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706892751EEBA00B45785 /* cpu.c */; };
+		C8CAF74C28FFBA2A00358339 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068D2751EEBA00B45785 /* decode.c */; };
+		C8CAF74D28FFBA3200358339 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
+		C8CAF74E28FFBA3800358339 /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C85CC20827ED6BF30063276D /* snapshot.c */; };
+		C8CAF74F28FFBA4000358339 /* trace.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706BD2751F55C00B45785 /* trace.c */; };
+		C8CAF75028FFBA4F00358339 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
 		C8D44BDD2786B571005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D44BDC2786B571005AB586 /* argparse.c */; };
 		C8D44BDE2786B6DF005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8D8FDA82792691B0073639B /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
@@ -793,14 +804,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8CAF74B28FFBA2200358339 /* cpu.c in Sources */,
+				C8CAF74F28FFBA4000358339 /* trace.c in Sources */,
+				C8CAF74728FFB9FB00358339 /* mappers.c in Sources */,
+				C8CAF74628FFB9EB00358339 /* cart.c in Sources */,
+				C8CAF74C28FFBA2A00358339 /* decode.c in Sources */,
 				C8041C3728EE6EC000A3695F /* gui.c in Sources */,
 				C854873828E685D00045BA42 /* imgui_impl_sdlrenderer.cpp in Sources */,
 				C830036C28DEDDD200480F29 /* main.m in Sources */,
 				C88CABE028FA521C00551C65 /* haltexpr.c in Sources */,
+				C8CAF74A28FFBA1B00358339 /* nes.c in Sources */,
 				C8041C3B28EE839900A3695F /* argparse.c in Sources */,
+				C8CAF74828FFBA0900358339 /* bus.c in Sources */,
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,
+				C8CAF74E28FFBA3800358339 /* snapshot.c in Sources */,
 				C88CABE228FA624D00551C65 /* ui.c in Sources */,
+				C8CAF75028FFBA4F00358339 /* dis.c in Sources */,
 				C88CABDF28FA520900551C65 /* uibatch.c in Sources */,
+				C8CAF74928FFBA1200358339 /* bytes.c in Sources */,
+				C8CAF74D28FFBA3200358339 /* debug.c in Sources */,
 				C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */,
 				C854873D28E685D00045BA42 /* imgui_impl_sdl.cpp in Sources */,
 				C854873B28E685D00045BA42 /* imgui_tables.cpp in Sources */,

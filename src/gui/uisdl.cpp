@@ -217,9 +217,9 @@ void cleanup_ui() noexcept
     ui_cleanup(GUI_CLEANUP_ALL);
 }
 
-void sdl_loop(nes* console, struct console_state* snapshot) noexcept
+void sdl_loop(nes*, struct console_state* snapshot) noexcept
 {
-    assert(console != nullptr);
+    //assert(console != nullptr);
     assert(snapshot != nullptr);
 
     do {

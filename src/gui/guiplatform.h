@@ -20,6 +20,7 @@ struct gui_platform {
 };
 
 #include "bridgeopen.h"
+br_checkerror
 bool gui_platform_init(struct gui_platform *platform) br_nothrow;
 #include "bridgeclose.h"
 

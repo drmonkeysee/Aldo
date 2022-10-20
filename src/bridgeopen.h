@@ -7,7 +7,7 @@
 
 // NOTE: open block for c/c++ bridge headers
 #ifdef __cplusplus
-#define br_checkreturn(str) [[nodiscard((str))]]
+#define br_checkerror [[nodiscard("check error")]]
 #define br_noalias
 #define br_noalias_sz(var)
 #define br_noalias_csz(val)
@@ -15,7 +15,7 @@
 extern "C"
 {
 #else
-#define br_checkreturn(str)
+#define br_checkerror
 #define br_noalias restrict
 #define br_noalias_sz(var) restrict var
 #define br_noalias_csz(val) restrict static val

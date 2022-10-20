@@ -31,6 +31,7 @@ typedef void ui_loop(nes *, struct console_state *) br_nothrow;
 const char *ui_errstr(int err) br_nothrow;
 
 // NOTE: common batch mode for CLI and GUI mode
+br_checkerror
 int ui_batch_init(const struct cliargs *args, ui_loop **loop) br_nothrow;
 #include "bridgeclose.h"
 

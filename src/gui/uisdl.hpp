@@ -18,7 +18,7 @@ namespace aldo
 #endif
 
 #include "bridgeopen.h"
-br_checkreturn("error code")
+br_checkerror
 int ui_sdl_init(const struct cliargs* args,
                 const struct gui_platform* platform,
                 ui_loop** loop) br_nothrow;

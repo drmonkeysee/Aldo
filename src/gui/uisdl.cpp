@@ -90,7 +90,7 @@ void render_bouncer() noexcept
 // UI Interface Implementation
 //
 
-[[nodiscard("error code")]]
+[[nodiscard("check error")]]
 int init_ui(const gui_platform& platform) noexcept
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {

@@ -51,8 +51,10 @@ enum {
 const char *haltexpr_errstr(int err) br_nothrow;
 
 // NOTE: if returns non-zero error code, *expr is unmodified
+br_checkerror
 int haltexpr_parse(const char *br_noalias str,
                    struct haltexpr *expr) br_nothrow;
+br_checkerror
 int haltexpr_fmt(const struct haltexpr *expr,
                  char buf[br_noalias_csz(HEXPR_FMT_SIZE)]) br_nothrow;
 #include "bridgeclose.h"

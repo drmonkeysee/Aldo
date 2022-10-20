@@ -24,14 +24,14 @@ enum {
 };
 
 #include "bridgeopen.h"
-typedef void ui_loop(nes *, struct console_state *) bd_nothrow;
+typedef void ui_loop(nes *, struct console_state *) br_nothrow;
 
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
-const char *ui_errstr(int err) bd_nothrow;
+const char *ui_errstr(int err) br_nothrow;
 
 // NOTE: common batch mode for CLI and GUI mode
-int ui_batch_init(const struct cliargs *args, ui_loop **loop) bd_nothrow;
+int ui_batch_init(const struct cliargs *args, ui_loop **loop) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

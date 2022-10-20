@@ -20,21 +20,21 @@ typedef struct nes_console nes;
 
 #include "bridgeopen.h"
 nes *nes_new(cart *c, debugctx *dbg, bool bcdsupport, bool zeroram, bool tron,
-             bool dumpram) bd_nothrow;
-void nes_free(nes *self) bd_nothrow;
+             bool dumpram) br_nothrow;
+void nes_free(nes *self) br_nothrow;
 
-void nes_mode(nes *self, enum csig_excmode mode) bd_nothrow;
+void nes_mode(nes *self, enum csig_excmode mode) br_nothrow;
 
-void nes_powerup(nes *self) bd_nothrow;
+void nes_powerup(nes *self) br_nothrow;
 
-void nes_ready(nes *self) bd_nothrow;
-void nes_halt(nes *self) bd_nothrow;
-void nes_interrupt(nes *self, enum csig_interrupt signal) bd_nothrow;
-void nes_clear(nes *self, enum csig_interrupt signal) bd_nothrow;
+void nes_ready(nes *self) br_nothrow;
+void nes_halt(nes *self) br_nothrow;
+void nes_interrupt(nes *self, enum csig_interrupt signal) br_nothrow;
+void nes_clear(nes *self, enum csig_interrupt signal) br_nothrow;
 
-void nes_cycle(nes *self, struct cycleclock *clock) bd_nothrow;
+void nes_cycle(nes *self, struct cycleclock *clock) br_nothrow;
 
-void nes_snapshot(nes *self, struct console_state *snapshot) bd_nothrow;
+void nes_snapshot(nes *self, struct console_state *snapshot) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

@@ -19,15 +19,15 @@
 typedef struct debugger_context debugctx;
 
 #include "bridgeopen.h"
-debugctx *debug_new(int resetvector_override) bd_nothrow;
-void debug_free(debugctx *self) bd_nothrow;
+debugctx *debug_new(int resetvector_override) br_nothrow;
+void debug_free(debugctx *self) br_nothrow;
 
 void debug_override_reset(debugctx *self, bus *b,
-                          uint16_t device_addr) bd_nothrow;
-void debug_addbreakpoint(debugctx *self, struct haltexpr expr) bd_nothrow;
+                          uint16_t device_addr) br_nothrow;
+void debug_addbreakpoint(debugctx *self, struct haltexpr expr) br_nothrow;
 void debug_check(debugctx *self, const struct cycleclock *clk,
-                 struct mos6502 *cpu) bd_nothrow;
-void debug_snapshot(debugctx *self, struct console_state *snapshot) bd_nothrow;
+                 struct mos6502 *cpu) br_nothrow;
+void debug_snapshot(debugctx *self, struct console_state *snapshot) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

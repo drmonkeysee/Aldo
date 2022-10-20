@@ -42,19 +42,19 @@ void ui_cleanup(guicleanup status) noexcept
         ImGui_ImplSDLRenderer_Shutdown();
         ImGui_ImplSDL2_Shutdown();
         ImGui::DestroyContext();
-        // NOTE: fallthrough
+        [[fallthrough]];
     case GUI_CLEANUP_BOUNCER:
         SDL_DestroyTexture(BouncerTexture);
         BouncerTexture = nullptr;
-        // NOTE: fallthrough
+        [[fallthrough]];
     case GUI_CLEANUP_RENDERER:
         SDL_DestroyRenderer(Renderer);
         Renderer = nullptr;
-        // NOTE: fallthrough
+        [[fallthrough]];
     case GUI_CLEANUP_WINDOW:
         SDL_DestroyWindow(Window);
         Window = nullptr;
-        // NOTE: fallthrough
+        [[fallthrough]];
     default:
         SDL_Quit();
     }

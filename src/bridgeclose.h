@@ -13,4 +13,5 @@
 #undef br_noalias_csz
 #undef br_noalias_sz
 #undef br_noalias
+#undef br_ownresult
 #undef br_checkerror

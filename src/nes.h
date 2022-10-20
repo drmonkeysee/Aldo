@@ -19,6 +19,7 @@
 typedef struct nes_console nes;
 
 #include "bridgeopen.h"
+br_ownresult
 nes *nes_new(cart *c, debugctx *dbg, bool bcdsupport, bool zeroram, bool tron,
              bool dumpram) br_nothrow;
 void nes_free(nes *self) br_nothrow;

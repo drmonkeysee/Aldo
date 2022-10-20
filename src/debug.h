@@ -19,6 +19,7 @@
 typedef struct debugger_context debugctx;
 
 #include "bridgeopen.h"
+br_ownresult
 debugctx *debug_new(int resetvector_override) br_nothrow;
 void debug_free(debugctx *self) br_nothrow;
 

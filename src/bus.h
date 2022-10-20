@@ -29,6 +29,7 @@ struct busdevice {
 // - 16-bit address space
 // - 4 partitions
 // - mapped as [$0000 - $1FFF, $2000 - $3FFF, $4000 - $7FFF, $8000 - $FFFF]
+br_ownresult
 bus *bus_new(int bitwidth, size_t n, ...) br_nothrow;
 void bus_free(bus *self) br_nothrow;
 

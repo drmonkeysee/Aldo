@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 2/14/21.
 //
 
-#ifndef Aldo_cliargs_h
-#define Aldo_cliargs_h
+#ifndef Aldo_cli_cliargs_h
+#define Aldo_cli_cliargs_h
 
 #include <stdbool.h>
 

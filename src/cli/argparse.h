@@ -5,8 +5,8 @@
 //  Created by Brandon Stansbury on 12/23/21.
 //
 
-#ifndef Aldo_argparse_h
-#define Aldo_argparse_h
+#ifndef Aldo_cli_argparse_h
+#define Aldo_cli_argparse_h
 
 #include "cliargs.h"
 

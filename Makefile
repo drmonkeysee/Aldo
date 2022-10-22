@@ -1,21 +1,23 @@
 OS := $(shell uname)
 SRC_DIR := src
+CLI_DIR := cli
 TEST_DIR := test
 BUILD_DIR := build
 OBJ_DIR := $(BUILD_DIR)/obj
 
-SRC_FILES := $(wildcard $(SRC_DIR)/*.c)
+SRC_FILES := $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/$(CLI_DIR)/*.c)
 TEST_FILES := $(wildcard $(TEST_DIR)/*.c)
 
 OBJ_FILES := $(subst $(SRC_DIR),$(OBJ_DIR),$(SRC_FILES:.c=.o))
 TEST_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(TEST_FILES:.c=.o))
 DEP_FILES := $(OBJ_FILES:.o=.d)
 
+OBJ_DIRS := $(OBJ_DIR) $(OBJ_DIR)/$(CLI_DIR)
 TEST_OBJ_DIR := $(OBJ_DIR)/$(TEST_DIR)
-TEST_DEPS := $(addprefix $(OBJ_DIR)/,argparse.o bus.o bytes.o cart.o \
+TEST_DEPS := $(addprefix $(OBJ_DIR)/,$(CLI_DIR)/argparse.o bus.o bytes.o cart.o \
 		 cpu.o decode.o dis.o haltexpr.o mappers.o)
 
-PRODUCT := aldo
+PRODUCT := aldoc
 TESTS := $(PRODUCT)tests
 TARGET := $(BUILD_DIR)/$(PRODUCT)
 TESTS_TARGET := $(BUILD_DIR)/$(TESTS)
@@ -31,13 +33,13 @@ BCDTEST_ROM := $(TEST_DIR)/bcdtest.rom
 PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) $(NESTEST_DIFF) \
 		$(TRACE_CMP) $(BCDTEST_ROM) $(TRACE_LOG) system.ram
 
-CFLAGS := -Wall -Wextra -std=c17
+CFLAGS := -Wall -Wextra -std=c17 -iquote$(SRC_DIR)
 ifneq ($(OS), Darwin)
 CFLAGS += -Wno-format-zero-length
 endif
 
 SRC_CFLAGS := -pedantic
-TEST_CFLAGS := -Wno-unused-parameter -iquote$(SRC_DIR)
+TEST_CFLAGS := -Wno-unused-parameter -iquote$(SRC_DIR)/$(CLI_DIR)
 SP := strip
 
 ifdef XCF
@@ -120,7 +122,7 @@ $(OBJ_DIR)/%.o: SRC_CFLAGS += -I/opt/homebrew/opt/ncurses/include
 else
 $(OBJ_DIR)/%.o: SRC_CFLAGS += -D_POSIX_C_SOURCE=200112L
 endif
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIRS)
 	$(CC) $(CFLAGS) $(SRC_CFLAGS) -MMD -c $< -o $@
 
 ifeq ($(OS), Darwin)
@@ -129,7 +131,7 @@ endif
 $(TEST_OBJ_DIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_DIR)
 	$(CC) $(CFLAGS) $(TEST_CFLAGS) -MMD -c $< -o $@
 
-$(OBJ_DIR) $(TEST_OBJ_DIR):
+$(OBJ_DIRS) $(TEST_OBJ_DIR):
 	mkdir -p $@
 
 $(NESTEST_ROM) $(NESTEST_LOG):

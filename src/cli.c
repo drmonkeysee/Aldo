@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// NOTE: forward-declare CLI's interactive mode
+int ui_batch_init(const struct cliargs *args, ui_loop **loop);
 int ui_curses_init(const struct cliargs *args, ui_loop **loop);
 
 static cart *load_cart(const char *filename)

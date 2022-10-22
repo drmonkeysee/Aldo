@@ -8,6 +8,7 @@
 #include "ui.h"
 
 #include "cart.h"
+#include "cliargs.h"
 #include "cycleclock.h"
 #include "haltexpr.h"
 #include "tsutil.h"

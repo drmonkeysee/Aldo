@@ -8,7 +8,6 @@
 #ifndef Aldo_gui_uisdl_hpp
 #define Aldo_gui_uisdl_hpp
 
-#include "cliargs.h"
 #include "guiplatform.h"
 #include "ui.h"
 
@@ -19,8 +18,7 @@ namespace aldo
 
 #include "bridgeopen.h"
 br_checkerror
-int ui_sdl_init(const struct cliargs* args,
-                const struct gui_platform* platform,
+int ui_sdl_init(const struct gui_platform* platform,
                 ui_loop** loop) br_nothrow;
 #include "bridgeclose.h"
 

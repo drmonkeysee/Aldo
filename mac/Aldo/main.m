@@ -15,6 +15,7 @@
 
 int main(int argc, char *argv[argc+1])
 {
+    (void)argv;
     SDL_Log("Aldo GUI started...");
 
     struct gui_platform platform;
@@ -24,7 +25,7 @@ int main(int argc, char *argv[argc+1])
         return EXIT_FAILURE;
     }
 
-    const int result = gui_run(argc, argv, &platform);
+    const int result = gui_run(&platform);
     platform.cleanup();
     return result;
 }

@@ -238,11 +238,9 @@ void sdl_loop(nes*, struct console_state* snapshot) noexcept
 // Public Interface
 //
 
-int aldo::ui_sdl_init(const struct cliargs* args,
-                      const struct gui_platform* platform,
+int aldo::ui_sdl_init(const struct gui_platform* platform,
                       ui_loop** loop) noexcept
 {
-    assert(args != nullptr);
     assert(platform != nullptr);
     assert(loop != nullptr);
 

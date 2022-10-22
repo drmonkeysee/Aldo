@@ -1,15 +1,15 @@
 //
 //  main.swift
-//  Aldo-Cli
+//  Aldo-Dev
 //
 //  Created by Brandon Stansbury on 1/8/21.
 //
 
 import Foundation
 
-// NOTE: cli target used for IDE editor support
+// NOTE: dev target used for IDE editor support
 
-print("Aldo CLI started...")
+print("Aldo Dev started...")
 
 let result = cli_run(CommandLine.argc, CommandLine.unsafeArgv)
 

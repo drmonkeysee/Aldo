@@ -168,9 +168,9 @@
 		C8186494277EB0F700CA4AC0 /* uicurses.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = uicurses.c; sourceTree = "<group>"; };
 		C8186496277EB45900CA4AC0 /* uibatch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = uibatch.c; sourceTree = "<group>"; };
 		C81A516B25DA036100361E40 /* cliargs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cliargs.h; sourceTree = "<group>"; };
-		C820E6BC25A9759A006A7AB1 /* Cli */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Cli; sourceTree = BUILT_PRODUCTS_DIR; };
+		C820E6BC25A9759A006A7AB1 /* Dev */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Dev; sourceTree = BUILT_PRODUCTS_DIR; };
 		C820E6BF25A9759A006A7AB1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		C820E6C825A97A4E006A7AB1 /* Cli-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Cli-Bridging-Header.h"; sourceTree = "<group>"; };
+		C820E6C825A97A4E006A7AB1 /* Dev-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Dev-Bridging-Header.h"; sourceTree = "<group>"; };
 		C820E6C925A97A4E006A7AB1 /* cli.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cli.h; sourceTree = "<group>"; };
 		C820E6CA25A97A4E006A7AB1 /* cli.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cli.c; sourceTree = "<group>"; };
 		C820E6D325A97FB5006A7AB1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
@@ -357,7 +357,7 @@
 		C820E6BD25A9759A006A7AB1 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C820E6BC25A9759A006A7AB1 /* Cli */,
+				C820E6BC25A9759A006A7AB1 /* Dev */,
 				C8184D3B25E7496B002B3100 /* Tests.xctest */,
 				C8DBC90D27C8708A0043994B /* AldoSwiftUI.app */,
 				C8DBC91D27C8708B0043994B /* AldoSwiftUITests.xctest */,
@@ -366,13 +366,13 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		C820E6BE25A9759A006A7AB1 /* Cli */ = {
+		C820E6BE25A9759A006A7AB1 /* Dev */ = {
 			isa = PBXGroup;
 			children = (
-				C820E6C825A97A4E006A7AB1 /* Cli-Bridging-Header.h */,
+				C820E6C825A97A4E006A7AB1 /* Dev-Bridging-Header.h */,
 				C820E6BF25A9759A006A7AB1 /* main.swift */,
 			);
-			path = Cli;
+			path = Dev;
 			sourceTree = "<group>";
 		};
 		C820E6C625A97A2F006A7AB1 /* src */ = {
@@ -488,7 +488,7 @@
 				C830036228DEDDD100480F29 /* Aldo */,
 				C8DBC90E27C8708A0043994B /* AldoSwiftUI */,
 				C8DBC92027C8708B0043994B /* AldoSwiftUITests */,
-				C820E6BE25A9759A006A7AB1 /* Cli */,
+				C820E6BE25A9759A006A7AB1 /* Dev */,
 				C8184D3C25E7496B002B3100 /* Tests */,
 				C820E6DD25A982A5006A7AB1 /* Frameworks */,
 				C820E6BD25A9759A006A7AB1 /* Products */,
@@ -579,9 +579,9 @@
 			productReference = C8184D3B25E7496B002B3100 /* Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		C820E6BB25A9759A006A7AB1 /* Cli */ = {
+		C820E6BB25A9759A006A7AB1 /* Dev */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C820E6C325A9759A006A7AB1 /* Build configuration list for PBXNativeTarget "Cli" */;
+			buildConfigurationList = C820E6C325A9759A006A7AB1 /* Build configuration list for PBXNativeTarget "Dev" */;
 			buildPhases = (
 				C820E6B825A9759A006A7AB1 /* Sources */,
 				C820E6B925A9759A006A7AB1 /* Frameworks */,
@@ -591,9 +591,9 @@
 			);
 			dependencies = (
 			);
-			name = Cli;
-			productName = Cli;
-			productReference = C820E6BC25A9759A006A7AB1 /* Cli */;
+			name = Dev;
+			productName = Dev;
+			productReference = C820E6BC25A9759A006A7AB1 /* Dev */;
 			productType = "com.apple.product-type.tool";
 		};
 		C830036028DEDDD100480F29 /* Aldo */ = {
@@ -695,7 +695,7 @@
 				C830036028DEDDD100480F29 /* Aldo */,
 				C8DBC90C27C8708A0043994B /* AldoSwiftUI */,
 				C8DBC91C27C8708B0043994B /* AldoSwiftUITests */,
-				C820E6BB25A9759A006A7AB1 /* Cli */,
+				C820E6BB25A9759A006A7AB1 /* Dev */,
 				C8184D3A25E7496B002B3100 /* Tests */,
 			);
 		};
@@ -950,7 +950,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/Cli-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/$(TARGET_NAME)-Bridging-Header.h";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
@@ -979,7 +979,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/Cli-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/$(TARGET_NAME)-Bridging-Header.h";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
@@ -1304,7 +1304,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C820E6C325A9759A006A7AB1 /* Build configuration list for PBXNativeTarget "Cli" */ = {
+		C820E6C325A9759A006A7AB1 /* Build configuration list for PBXNativeTarget "Dev" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C820E6C125A9759A006A7AB1 /* Debug */,

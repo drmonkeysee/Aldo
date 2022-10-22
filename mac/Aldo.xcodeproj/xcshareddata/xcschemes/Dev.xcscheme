@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C820E6BB25A9759A006A7AB1"
-               BuildableName = "Cli"
-               BlueprintName = "Cli"
+               BuildableName = "Dev"
+               BlueprintName = "Dev"
                ReferencedContainer = "container:Aldo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -70,8 +70,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C820E6BB25A9759A006A7AB1"
-            BuildableName = "Cli"
-            BlueprintName = "Cli"
+            BuildableName = "Dev"
+            BlueprintName = "Dev"
             ReferencedContainer = "container:Aldo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -93,8 +93,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C820E6BB25A9759A006A7AB1"
-            BuildableName = "Cli"
-            BlueprintName = "Cli"
+            BuildableName = "Dev"
+            BlueprintName = "Dev"
             ReferencedContainer = "container:Aldo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

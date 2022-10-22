@@ -733,3 +733,8 @@ int ui_curses_init(const struct cliargs *args, ui_loop **loop)
     *loop = curses_loop;
     return 0;
 }
+
+const char *ui_curses_version(void)
+{
+    return curses_version();
+}

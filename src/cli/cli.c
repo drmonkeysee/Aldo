@@ -17,6 +17,7 @@
 #include "nes.h"
 #include "ui.h"
 #include "snapshot.h"
+#include "version.h"
 
 #include <errno.h>
 #include <stdbool.h>
@@ -26,6 +27,16 @@
 
 int ui_batch_init(const struct cliargs *args, ui_loop **loop);
 int ui_curses_init(const struct cliargs *args, ui_loop **loop);
+const char *ui_curses_version(void);
+
+static void print_version(void)
+{
+    printf("Aldo %s", get_version());
+#ifdef __VERSION__
+    fputs(" (" __VERSION__ ")", stdout);
+#endif
+    printf("\n%s\n", ui_curses_version());
+}
 
 static cart *load_cart(const char *filename)
 {
@@ -183,7 +194,7 @@ static int run_with_args(const struct cliargs *args)
     }
 
     if (args->version) {
-        argparse_version();
+        print_version();
         return EXIT_SUCCESS;
     }
 

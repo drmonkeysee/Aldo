@@ -16,8 +16,6 @@
 #include <string.h>
 
 static const char
-    *const restrict Version = "0.4.1", // TODO: autogenerate this
-
     *const restrict BatchLong = "--batch",
     *const restrict BcdLong = "--bcd",
     *const restrict ChrDecodeLong = "--chr-decode",
@@ -274,15 +272,6 @@ void argparse_usage(const char *me)
          " as a fail-safe halt condition");
     puts("  Nc\t: halt after executing N cycles");
     puts("  jam\t: halt when the CPU enters a jammed state");
-}
-
-void argparse_version(void)
-{
-    printf("Aldo %s", Version);
-#ifdef __VERSION__
-    fputs(" (" __VERSION__ ")", stdout);
-#endif
-    puts("");
 }
 
 void argparse_cleanup(struct cliargs *args)

@@ -27,6 +27,7 @@
 		C838D3B527D5DA4400468FDB /* CartInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B427D5DA4400468FDB /* CartInfoView.swift */; };
 		C838D3B727D5DB0300468FDB /* CartChrView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B627D5DB0300468FDB /* CartChrView.swift */; };
 		C83A30772904987F00749A17 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
+		C83A307A2904A2B000749A17 /* version.c in Sources */ = {isa = PBXBuildFile; fileRef = C83A30792904A2B000749A17 /* version.c */; };
 		C83C663727E2F4E4009CE42C /* cart.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068A2751EEBA00B45785 /* cart.c */; };
 		C83C663827E2F4EF009CE42C /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
 		C83C663927E2F4FE009CE42C /* bytes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068F2751EEBA00B45785 /* bytes.c */; };
@@ -182,6 +183,8 @@
 		C838D3B427D5DA4400468FDB /* CartInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartInfoView.swift; sourceTree = "<group>"; };
 		C838D3B627D5DB0300468FDB /* CartChrView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartChrView.swift; sourceTree = "<group>"; };
 		C83965E927810D4300E1E28E /* tsutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tsutil.h; sourceTree = "<group>"; };
+		C83A30782904A2B000749A17 /* version.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
+		C83A30792904A2B000749A17 /* version.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = version.c; sourceTree = "<group>"; };
 		C83C663327E2F2E6009CE42C /* Aldo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Aldo-Bridging-Header.h"; sourceTree = "<group>"; };
 		C848C1B228FB9D630025ABD2 /* cycleclock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cycleclock.h; sourceTree = "<group>"; };
 		C8497E3F2822015100F4952E /* Disassembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disassembly.swift; sourceTree = "<group>"; };
@@ -413,6 +416,8 @@
 				C8D8FDA72792691B0073639B /* tsutil.c */,
 				C8557B2D25C661660090296D /* ui.h */,
 				C8557B2E25C661660090296D /* ui.c */,
+				C83A30782904A2B000749A17 /* version.h */,
+				C83A30792904A2B000749A17 /* version.c */,
 			);
 			name = src;
 			path = ../src;
@@ -784,6 +789,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C83A307A2904A2B000749A17 /* version.c in Sources */,
 				C8C706922751EEBA00B45785 /* nes.c in Sources */,
 				C8C706BE2751F55C00B45785 /* trace.c in Sources */,
 				C8186497277EB45900CA4AC0 /* uibatch.c in Sources */,

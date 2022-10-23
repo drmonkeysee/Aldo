@@ -6,10 +6,11 @@
 //
 
 #include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc, char *argv[argc+1])
 {
-    // insert code here...
-    printf("Hello, World!\n");
-    return 0;
+    (void)argv;
+    puts("Aldo CLI Placeholder...");
+    return EXIT_SUCCESS;
 }

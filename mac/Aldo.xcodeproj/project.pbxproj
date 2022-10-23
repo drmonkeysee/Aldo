@@ -103,6 +103,7 @@
 		C8CAF74F28FFBA4000358339 /* trace.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706BD2751F55C00B45785 /* trace.c */; };
 		C8CAF75028FFBA4F00358339 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
 		C8D3CA032904E1BD0087316F /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D3CA022904E1BD0087316F /* main.c */; };
+		C8D3CA0A2904E50F0087316F /* aldoc in Embed Cli */ = {isa = PBXBuildFile; fileRef = C8D3CA002904E1BD0087316F /* aldoc */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		C8D44BDD2786B571005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D44BDC2786B571005AB586 /* argparse.c */; };
 		C8D8FDA82792691B0073639B /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
 		C8DBC91027C8708A0043994B /* AldoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBC90F27C8708A0043994B /* AldoApp.swift */; };
@@ -118,6 +119,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		C8D3CA072904E4CE0087316F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C85E8ADA25A9747800FF0025 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C8D3C9FF2904E1BD0087316F;
+			remoteInfo = Cli;
+		};
 		C8DBC91E27C8708B0043994B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C85E8ADA25A9747800FF0025 /* Project object */;
@@ -145,6 +153,17 @@
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 1;
+		};
+		C8D3CA092904E4D90087316F /* Embed Cli */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Cli;
+			dstSubfolderSpec = 6;
+			files = (
+				C8D3CA0A2904E50F0087316F /* aldoc in Embed Cli */,
+			);
+			name = "Embed Cli";
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C8DC9CB628DFD5BA000D8D97 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -646,10 +665,12 @@
 				C830035E28DEDDD100480F29 /* Frameworks */,
 				C830035F28DEDDD100480F29 /* Resources */,
 				C8DC9CB628DFD5BA000D8D97 /* Embed Frameworks */,
+				C8D3CA092904E4D90087316F /* Embed Cli */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				C8D3CA082904E4CE0087316F /* PBXTargetDependency */,
 			);
 			name = Aldo;
 			productName = Aldo;
@@ -944,6 +965,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		C8D3CA082904E4CE0087316F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C8D3C9FF2904E1BD0087316F /* Cli */;
+			targetProxy = C8D3CA072904E4CE0087316F /* PBXContainerItemProxy */;
+		};
 		C8DBC91F27C8708B0043994B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = C8DBC90C27C8708A0043994B /* AldoSwiftUI */;

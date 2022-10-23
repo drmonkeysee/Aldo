@@ -267,7 +267,7 @@
 		C8C706A72751EF8D00B45785 /* cpustack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpustack.c; sourceTree = "<group>"; };
 		C8C706BC2751F55C00B45785 /* trace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = trace.h; sourceTree = "<group>"; };
 		C8C706BD2751F55C00B45785 /* trace.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = trace.c; sourceTree = "<group>"; };
-		C8D3CA002904E1BD0087316F /* Cli */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Cli; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8D3CA002904E1BD0087316F /* aldoc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = aldoc; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8D3CA022904E1BD0087316F /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		C8D44BDC2786B571005AB586 /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8D8FDA72792691B0073639B /* tsutil.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tsutil.c; sourceTree = "<group>"; };
@@ -384,7 +384,7 @@
 				C8DBC90D27C8708A0043994B /* AldoSwiftUI.app */,
 				C8DBC91D27C8708B0043994B /* AldoSwiftUITests.xctest */,
 				C830036128DEDDD100480F29 /* Aldo.app */,
-				C8D3CA002904E1BD0087316F /* Cli */,
+				C8D3CA002904E1BD0087316F /* aldoc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -670,7 +670,7 @@
 			);
 			name = Cli;
 			productName = Cli;
-			productReference = C8D3CA002904E1BD0087316F /* Cli */;
+			productReference = C8D3CA002904E1BD0087316F /* aldoc */;
 			productType = "com.apple.product-type.tool";
 		};
 		C8DBC90C27C8708A0043994B /* AldoSwiftUI */ = {
@@ -1246,33 +1246,47 @@
 		C8D3CA042904E1BD0087316F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PC9FS9P8R2;
 				ENABLE_HARDENED_RUNTIME = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_WARN_PEDANTIC = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				OTHER_CODE_SIGN_FLAGS = "$(inherited) -i $(PRODUCT_BUNDLE_IDENTIFIER)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.Aldo.Cli;
+				PRODUCT_NAME = aldoc;
 				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+				);
 			};
 			name = Debug;
 		};
 		C8D3CA052904E1BD0087316F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PC9FS9P8R2;
 				ENABLE_HARDENED_RUNTIME = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_PREPROCESSOR_DEFINITIONS = "NDEBUG=1";
+				GCC_WARN_PEDANTIC = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				OTHER_CODE_SIGN_FLAGS = "$(inherited) -i $(PRODUCT_BUNDLE_IDENTIFIER)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.Aldo.Cli;
+				PRODUCT_NAME = aldoc;
 				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+				);
 			};
 			name = Release;
 		};

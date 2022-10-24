@@ -78,6 +78,8 @@
 		C8B88AB329062B0F00B7CB23 /* trace.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706BD2751F55C00B45785 /* trace.c */; };
 		C8B88AB429062B1300B7CB23 /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
 		C8B88AB529062B1800B7CB23 /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
+		C8B88AB629062C6E00B7CB23 /* libaldo.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B88AA42906277800B7CB23 /* libaldo.dylib */; };
+		C8B88AB729062C6E00B7CB23 /* libaldo.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = C8B88AA42906277800B7CB23 /* libaldo.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		C8C4B48D25ABBFB3006A98BB /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
 		C8C706922751EEBA00B45785 /* nes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706832751EEBA00B45785 /* nes.c */; };
 		C8C706932751EEBA00B45785 /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
@@ -126,6 +128,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		C8B88AB829062C6E00B7CB23 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C85E8ADA25A9747800FF0025 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C8B88AA32906277800B7CB23;
+			remoteInfo = Lib;
+		};
 		C8D3CA072904E4CE0087316F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C85E8ADA25A9747800FF0025 /* Project object */;
@@ -151,6 +160,17 @@
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 1;
+		};
+		C8B88ABA29062C6E00B7CB23 /* Embed Libraries */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C8B88AB729062C6E00B7CB23 /* libaldo.dylib in Embed Libraries */,
+			);
+			name = "Embed Libraries";
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C8D3C9FE2904E1BD0087316F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -352,6 +372,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8B88A9E29061D1500B7CB23 /* libncurses.tbd in Frameworks */,
+				C8B88AB629062C6E00B7CB23 /* libaldo.dylib in Frameworks */,
 				C8B88A9F29061D2000B7CB23 /* libpanel.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -719,10 +740,12 @@
 				C8D3C9FC2904E1BD0087316F /* Sources */,
 				C8D3C9FD2904E1BD0087316F /* Frameworks */,
 				C8D3C9FE2904E1BD0087316F /* CopyFiles */,
+				C8B88ABA29062C6E00B7CB23 /* Embed Libraries */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				C8B88AB929062C6E00B7CB23 /* PBXTargetDependency */,
 			);
 			name = Cli;
 			productName = Cli;
@@ -1016,6 +1039,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		C8B88AB929062C6E00B7CB23 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C8B88AA32906277800B7CB23 /* Lib */;
+			targetProxy = C8B88AB829062C6E00B7CB23 /* PBXContainerItemProxy */;
+		};
 		C8D3CA082904E4CE0087316F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = C8D3C9FF2904E1BD0087316F /* Cli */;

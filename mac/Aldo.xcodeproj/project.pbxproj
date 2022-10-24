@@ -308,7 +308,6 @@
 		C8C706BC2751F55C00B45785 /* trace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = trace.h; sourceTree = "<group>"; };
 		C8C706BD2751F55C00B45785 /* trace.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = trace.c; sourceTree = "<group>"; };
 		C8D3CA002904E1BD0087316F /* aldoc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = aldoc; sourceTree = BUILT_PRODUCTS_DIR; };
-		C8D3CA022904E1BD0087316F /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		C8D44BDC2786B571005AB586 /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8D8FDA72792691B0073639B /* tsutil.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tsutil.c; sourceTree = "<group>"; };
 		C8DBC90D27C8708A0043994B /* AldoSwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AldoSwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -561,7 +560,6 @@
 				C820E6C625A97A2F006A7AB1 /* src */,
 				C8184D4E25E74A9F002B3100 /* test */,
 				C830036228DEDDD100480F29 /* Aldo */,
-				C8D3CA012904E1BD0087316F /* Cli */,
 				C8DBC90E27C8708A0043994B /* AldoSwiftUI */,
 				C8DBC92027C8708B0043994B /* AldoSwiftUITests */,
 				C820E6BE25A9759A006A7AB1 /* Dev */,
@@ -595,14 +593,6 @@
 				C88CABDC28FA4DDD00551C65 /* uisdl.cpp */,
 			);
 			path = gui;
-			sourceTree = "<group>";
-		};
-		C8D3CA012904E1BD0087316F /* Cli */ = {
-			isa = PBXGroup;
-			children = (
-				C8D3CA022904E1BD0087316F /* main.c */,
-			);
-			path = Cli;
 			sourceTree = "<group>";
 		};
 		C8DBC90E27C8708A0043994B /* AldoSwiftUI */ = {

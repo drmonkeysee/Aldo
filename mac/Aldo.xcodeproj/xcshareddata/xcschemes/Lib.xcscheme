@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C8B88AA32906277800B7CB23"
-               BuildableName = "libLib.dylib"
+               BuildableName = "libaldo.dylib"
                BlueprintName = "Lib"
                ReferencedContainer = "container:Aldo.xcodeproj">
             </BuildableReference>
@@ -51,7 +51,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C8B88AA32906277800B7CB23"
-            BuildableName = "libLib.dylib"
+            BuildableName = "libaldo.dylib"
             BlueprintName = "Lib"
             ReferencedContainer = "container:Aldo.xcodeproj">
          </BuildableReference>

@@ -59,6 +59,28 @@
 		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8B5303B2801300C00576D9F /* CartFocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B5303A2801300C00576D9F /* CartFocusView.swift */; };
 		C8B87D47285E82BD000E0D2E /* CommandViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B87D46285E82BD000E0D2E /* CommandViews.swift */; };
+		C8B88A8A29061C3500B7CB23 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
+		C8B88A8B29061C3800B7CB23 /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* cli.c */; };
+		C8B88A8C29061C3C00B7CB23 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6D325A97FB5006A7AB1 /* main.c */; };
+		C8B88A8D29061C3F00B7CB23 /* uibatch.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186496277EB45900CA4AC0 /* uibatch.c */; };
+		C8B88A8E29061C4100B7CB23 /* uicurses.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186494277EB0F700CA4AC0 /* uicurses.c */; };
+		C8B88A8F29061C5100B7CB23 /* bytes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068F2751EEBA00B45785 /* bytes.c */; };
+		C8B88A9029061C5700B7CB23 /* cart.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068A2751EEBA00B45785 /* cart.c */; };
+		C8B88A9129061C6700B7CB23 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
+		C8B88A9229061C7000B7CB23 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
+		C8B88A9329061C7A00B7CB23 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
+		C8B88A9429061C8A00B7CB23 /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
+		C8B88A9529061C9400B7CB23 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068D2751EEBA00B45785 /* decode.c */; };
+		C8B88A9629061C9D00B7CB23 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706892751EEBA00B45785 /* cpu.c */; };
+		C8B88A9729061CAA00B7CB23 /* version.c in Sources */ = {isa = PBXBuildFile; fileRef = C83A30792904A2B000749A17 /* version.c */; };
+		C8B88A9829061CBA00B7CB23 /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
+		C8B88A9929061CC300B7CB23 /* nes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706832751EEBA00B45785 /* nes.c */; };
+		C8B88A9A29061CCB00B7CB23 /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C85CC20827ED6BF30063276D /* snapshot.c */; };
+		C8B88A9B29061CD500B7CB23 /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
+		C8B88A9C29061CDE00B7CB23 /* trace.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706BD2751F55C00B45785 /* trace.c */; };
+		C8B88A9D29061CE600B7CB23 /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
+		C8B88A9E29061D1500B7CB23 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C820E6DE25A982A5006A7AB1 /* libncurses.tbd */; };
+		C8B88A9F29061D2000B7CB23 /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
 		C8C4B48D25ABBFB3006A98BB /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
 		C8C706922751EEBA00B45785 /* nes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706832751EEBA00B45785 /* nes.c */; };
 		C8C706932751EEBA00B45785 /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
@@ -102,7 +124,6 @@
 		C8CAF74E28FFBA3800358339 /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C85CC20827ED6BF30063276D /* snapshot.c */; };
 		C8CAF74F28FFBA4000358339 /* trace.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706BD2751F55C00B45785 /* trace.c */; };
 		C8CAF75028FFBA4F00358339 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
-		C8D3CA032904E1BD0087316F /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D3CA022904E1BD0087316F /* main.c */; };
 		C8D3CA0A2904E50F0087316F /* aldoc in Embed Cli */ = {isa = PBXBuildFile; fileRef = C8D3CA002904E1BD0087316F /* aldoc */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		C8D44BDD2786B571005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D44BDC2786B571005AB586 /* argparse.c */; };
 		C8D8FDA82792691B0073639B /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
@@ -337,6 +358,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8B88A9E29061D1500B7CB23 /* libncurses.tbd in Frameworks */,
+				C8B88A9F29061D2000B7CB23 /* libpanel.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -919,7 +942,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C8D3CA032904E1BD0087316F /* main.c in Sources */,
+				C8B88A9429061C8A00B7CB23 /* bus.c in Sources */,
+				C8B88A9629061C9D00B7CB23 /* cpu.c in Sources */,
+				C8B88A9529061C9400B7CB23 /* decode.c in Sources */,
+				C8B88A8B29061C3800B7CB23 /* cli.c in Sources */,
+				C8B88A9729061CAA00B7CB23 /* version.c in Sources */,
+				C8B88A8A29061C3500B7CB23 /* argparse.c in Sources */,
+				C8B88A8D29061C3F00B7CB23 /* uibatch.c in Sources */,
+				C8B88A8F29061C5100B7CB23 /* bytes.c in Sources */,
+				C8B88A9B29061CD500B7CB23 /* tsutil.c in Sources */,
+				C8B88A9029061C5700B7CB23 /* cart.c in Sources */,
+				C8B88A9829061CBA00B7CB23 /* mappers.c in Sources */,
+				C8B88A8E29061C4100B7CB23 /* uicurses.c in Sources */,
+				C8B88A9229061C7000B7CB23 /* dis.c in Sources */,
+				C8B88A9929061CC300B7CB23 /* nes.c in Sources */,
+				C8B88A9C29061CDE00B7CB23 /* trace.c in Sources */,
+				C8B88A9329061C7A00B7CB23 /* haltexpr.c in Sources */,
+				C8B88A8C29061C3C00B7CB23 /* main.c in Sources */,
+				C8B88A9A29061CCB00B7CB23 /* snapshot.c in Sources */,
+				C8B88A9129061C6700B7CB23 /* debug.c in Sources */,
+				C8B88A9D29061CE600B7CB23 /* ui.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

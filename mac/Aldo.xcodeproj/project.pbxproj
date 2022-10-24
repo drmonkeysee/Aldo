@@ -1324,7 +1324,7 @@
 				MTL_FAST_MATH = YES;
 				OTHER_CODE_SIGN_FLAGS = "$(inherited) -i $(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.Aldo.Cli;
-				PRODUCT_NAME = aldoc;
+				PRODUCT_NAME = "$(PROJECT_NAME:lower)c";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				WARNING_CFLAGS = (
@@ -1348,7 +1348,7 @@
 				MTL_FAST_MATH = YES;
 				OTHER_CODE_SIGN_FLAGS = "$(inherited) -i $(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.Aldo.Cli;
-				PRODUCT_NAME = aldoc;
+				PRODUCT_NAME = "$(PROJECT_NAME:lower)c";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				WARNING_CFLAGS = (

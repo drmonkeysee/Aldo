@@ -79,7 +79,6 @@
 		C8B88AB429062B1300B7CB23 /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
 		C8B88AB529062B1800B7CB23 /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
 		C8B88AB629062C6E00B7CB23 /* libaldo.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B88AA42906277800B7CB23 /* libaldo.dylib */; };
-		C8B88AB729062C6E00B7CB23 /* libaldo.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = C8B88AA42906277800B7CB23 /* libaldo.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		C8C4B48D25ABBFB3006A98BB /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
 		C8C706922751EEBA00B45785 /* nes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706832751EEBA00B45785 /* nes.c */; };
 		C8C706932751EEBA00B45785 /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
@@ -160,17 +159,6 @@
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 1;
-		};
-		C8B88ABA29062C6E00B7CB23 /* Embed Libraries */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				C8B88AB729062C6E00B7CB23 /* libaldo.dylib in Embed Libraries */,
-			);
-			name = "Embed Libraries";
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C8D3C9FE2904E1BD0087316F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -740,7 +728,6 @@
 				C8D3C9FC2904E1BD0087316F /* Sources */,
 				C8D3C9FD2904E1BD0087316F /* Frameworks */,
 				C8D3C9FE2904E1BD0087316F /* CopyFiles */,
-				C8B88ABA29062C6E00B7CB23 /* Embed Libraries */,
 			);
 			buildRules = (
 			);

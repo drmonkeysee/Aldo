@@ -274,6 +274,7 @@
 		C8B4664427755790000576EE /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8B5303A2801300C00576D9F /* CartFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartFocusView.swift; sourceTree = "<group>"; };
 		C8B87D46285E82BD000E0D2E /* CommandViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandViews.swift; sourceTree = "<group>"; };
+		C8B88AA42906277800B7CB23 /* libLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libLib.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpanel.tbd; path = usr/lib/libpanel.tbd; sourceTree = SDKROOT; };
 		C8C706832751EEBA00B45785 /* nes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = nes.c; sourceTree = "<group>"; };
 		C8C706842751EEBA00B45785 /* cpu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu.h; sourceTree = "<group>"; };
@@ -353,6 +354,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C8B88AA22906277800B7CB23 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C8D3C9FD2904E1BD0087316F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -426,6 +434,7 @@
 				C8DBC91D27C8708B0043994B /* AldoSwiftUITests.xctest */,
 				C830036128DEDDD100480F29 /* Aldo.app */,
 				C8D3CA002904E1BD0087316F /* aldoc */,
+				C8B88AA42906277800B7CB23 /* libLib.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -635,6 +644,16 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		C8B88AA02906277800B7CB23 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
 		C8184D3A25E7496B002B3100 /* Tests */ = {
 			isa = PBXNativeTarget;
@@ -689,6 +708,23 @@
 			productName = Aldo;
 			productReference = C830036128DEDDD100480F29 /* Aldo.app */;
 			productType = "com.apple.product-type.application";
+		};
+		C8B88AA32906277800B7CB23 /* Lib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C8B88AA52906277800B7CB23 /* Build configuration list for PBXNativeTarget "Lib" */;
+			buildPhases = (
+				C8B88AA02906277800B7CB23 /* Headers */,
+				C8B88AA12906277800B7CB23 /* Sources */,
+				C8B88AA22906277800B7CB23 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Lib;
+			productName = Lib;
+			productReference = C8B88AA42906277800B7CB23 /* libLib.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
 		};
 		C8D3C9FF2904E1BD0087316F /* Cli */ = {
 			isa = PBXNativeTarget;
@@ -762,6 +798,9 @@
 					C830036028DEDDD100480F29 = {
 						CreatedOnToolsVersion = 14.0;
 					};
+					C8B88AA32906277800B7CB23 = {
+						CreatedOnToolsVersion = 14.0.1;
+					};
 					C8D3C9FF2904E1BD0087316F = {
 						CreatedOnToolsVersion = 14.0.1;
 					};
@@ -790,6 +829,7 @@
 			targets = (
 				C830036028DEDDD100480F29 /* Aldo */,
 				C8D3C9FF2904E1BD0087316F /* Cli */,
+				C8B88AA32906277800B7CB23 /* Lib */,
 				C8DBC90C27C8708A0043994B /* AldoSwiftUI */,
 				C8DBC91C27C8708B0043994B /* AldoSwiftUITests */,
 				C820E6BB25A9759A006A7AB1 /* Dev */,
@@ -925,6 +965,13 @@
 				C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */,
 				C88CABE128FA522D00551C65 /* tsutil.c in Sources */,
 				C854873A28E685D00045BA42 /* imgui.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C8B88AA12906277800B7CB23 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1301,6 +1348,45 @@
 			};
 			name = Release;
 		};
+		C8B88AA62906277800B7CB23 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = PC9FS9P8R2;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		C8B88AA72906277800B7CB23 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = PC9FS9P8R2;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		C8D3CA042904E1BD0087316F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1502,6 +1588,15 @@
 			buildConfigurations = (
 				C85E8ADE25A9747800FF0025 /* Debug */,
 				C85E8ADF25A9747800FF0025 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C8B88AA52906277800B7CB23 /* Build configuration list for PBXNativeTarget "Lib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C8B88AA62906277800B7CB23 /* Debug */,
+				C8B88AA72906277800B7CB23 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

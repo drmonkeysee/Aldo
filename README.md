@@ -28,6 +28,12 @@ The Homebrew and ncurses steps get you the latest version of ncurses and are opt
 6. Open mac/Aldo.xcodeproj
 7. Build and Run "Aldo" target
 
+The GUI app will include a build of the CLI binary in **Aldo.app/Contents/MacOS/Cli**. Unlike the make target, this build will always link to the OS ncurses libraries. In addition, the GUI and CLI executables depend on a shared library embedded in the app bundle rather than statically linking everything. This means the linking and runtime characteristics of the CLI differ somewhat from the make build. Specifically, the bundled CLI binary cannot be moved to another folder or it won't find **libaldo** at load time. If you want a friendlier path for the CLI you can create a soft-link to it in your location of choice, for example:
+
+```sh
+ln -s /Applications/Aldo.app/Contents/MacOS/Cli/aldoc /usr/local/bin/aldoc
+```
+
 ### Debian/Ubuntu CLI
 
 1. Run `locale` to verify your terminal is using a UTF-8 locale (`C.UTF-8` will work)
@@ -60,6 +66,8 @@ The verification target is made up of these test targets:
 - `make test`: Aldo unit tests, written using [CinyTest](https://github.com/drmonkeysee/CinyTest)
 - `make nestest nesdiff`: kevtris's [nestest CPU tests](https://wiki.nesdev.org/w/index.php?title=Emulator_tests)
 - `make bcdtest`: Bruce Clark's [Binary-coded Decimal tests](http://6502.org/tutorials/decimal_mode.html); additional details in [BCDTEST.md](test/BCDTEST.md)
+
+Additionally, the macOS Xcode project's **Dev** target can run the Aldo unit tests. This is equivalent to the `make test` target.
 
 ## External Dependencies
 

@@ -48,13 +48,14 @@ enum {
 #include "bridgeopen.h"
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
+br_libexport
 const char *haltexpr_errstr(int err) br_nothrow;
 
 // NOTE: if returns non-zero error code, *expr is unmodified
-br_checkerror
+br_libexport br_checkerror
 int haltexpr_parse(const char *br_noalias str,
                    struct haltexpr *expr) br_nothrow;
-br_checkerror
+br_libexport br_checkerror
 int haltexpr_fmt(const struct haltexpr *expr,
                  char buf[br_noalias_csz(HEXPR_FMT_SIZE)]) br_nothrow;
 #include "bridgeclose.h"

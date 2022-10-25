@@ -27,6 +27,7 @@ typedef void ui_loop(nes *, struct console_state *) br_nothrow;
 
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
+br_libexport
 const char *ui_errstr(int err) br_nothrow;
 #include "bridgeclose.h"
 

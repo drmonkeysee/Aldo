@@ -48,36 +48,44 @@ struct dis_instruction {
     struct decoded d;
 };
 
+#include "bridgeopen.h"
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
+br_libexport
 const char *dis_errstr(int err);
 
 // NOTE: parsed will be zeroed-out if return value is <= 0
 int dis_parse_inst(const struct blockview *bv, size_t at,
                    struct dis_instruction *parsed);
-int dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
+br_libexport
+int dis_parsemem_inst(size_t size, const uint8_t mem[br_noalias_sz(size)],
                       size_t at, struct dis_instruction *parsed);
 const char *dis_inst_mnemonic(const struct dis_instruction *inst);
 const char *dis_inst_description(const struct dis_instruction *inst);
 const char *dis_inst_addrmode(const struct dis_instruction *inst);
 uint8_t dis_inst_flags(const struct dis_instruction *inst);
 int dis_inst_operand(const struct dis_instruction *inst,
-                     char dis[restrict static DIS_OPERAND_SIZE]);
+                     char dis[br_noalias_csz(DIS_OPERAND_SIZE)]);
 bool dis_inst_equal(const struct dis_instruction *lhs,
                     const struct dis_instruction *rhs);
 
 // NOTE: functions w/buffer params leave buffer untouched when returning <= 0
+br_libexport
 int dis_inst(uint16_t addr, const struct dis_instruction *inst,
-             char dis[restrict static DIS_INST_SIZE]);
+             char dis[br_noalias_csz(DIS_INST_SIZE)]);
 int dis_peek(uint16_t addr, struct mos6502 *cpu,
              const struct console_state *snapshot,
-             char dis[restrict static DIS_PEEK_SIZE]);
+             char dis[br_noalias_csz(DIS_PEEK_SIZE)]);
+br_libexport
 int dis_datapath(const struct console_state *snapshot,
-                 char dis[restrict static DIS_DATAP_SIZE]);
+                 char dis[br_noalias_csz(DIS_DATAP_SIZE)]);
 
+br_libexport
 int dis_cart_prg(cart *cart, bool verbose, bool unified_output, FILE *f);
 int dis_cart_chrbank(const struct blockview *bv, int scale, FILE *f);
+br_libexport
 int dis_cart_chr(cart *cart, int chrscale,
-                 const char *restrict chrdecode_prefix, FILE *output);
+                 const char *br_noalias chrdecode_prefix, FILE *output);
+#include "bridgeclose.h"
 
 #endif

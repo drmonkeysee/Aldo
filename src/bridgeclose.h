@@ -12,6 +12,8 @@
 #undef br_nothrow
 #undef br_noalias_csz
 #undef br_noalias_sz
+#undef br_csz
 #undef br_noalias
 #undef br_ownresult
 #undef br_checkerror
+#undef br_libexport

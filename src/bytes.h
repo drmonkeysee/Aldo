@@ -50,36 +50,39 @@ enum {
 // Extract bit @pos from byte
 #define byte_getbit(byte, pos) (((byte) >> (pos)) & 1)
 
+#include "bridgeopen.h"
 // NOTE: convert unsigned values into little-endian byte representations;
 // undefined behavior if any pointer/array arguments are null.
 
 // Bytes to Word
+br_libexport
 inline uint16_t bytowr(uint8_t lo, uint8_t hi)
 {
     return lo | (hi << 8);
 }
 
 // Byte Array to Word
-inline uint16_t batowr(const uint8_t bytes[static 2])
+inline uint16_t batowr(const uint8_t bytes[br_csz(2)])
 {
     return bytowr(bytes[0], bytes[1]);
 }
 
 // Word to Bytes
-inline void wrtoby(uint16_t word, uint8_t *restrict lo, uint8_t *restrict hi)
+inline void wrtoby(uint16_t word, uint8_t *br_noalias lo,
+                   uint8_t *br_noalias hi)
 {
     *lo = word & 0xff;
     *hi = word >> 8;
 }
 
 // Word to Byte Array
-inline void wrtoba(uint16_t word, uint8_t bytes[static 2])
+inline void wrtoba(uint16_t word, uint8_t bytes[br_csz(2)])
 {
     wrtoby(word, bytes, bytes + 1);
 }
 
 // DWord to Byte Array
-inline void dwtoba(uint32_t dword, uint8_t bytes[static 4])
+inline void dwtoba(uint32_t dword, uint8_t bytes[br_csz(4)])
 {
     for (size_t i = 0; i < 4; ++i) {
         bytes[i] = (dword >> (8 * i)) & 0xff;
@@ -88,15 +91,16 @@ inline void dwtoba(uint32_t dword, uint8_t bytes[static 4])
 
 // Copy single bank @addr into destination buffer, assumes bank is sized to
 // power-of-2 KB boundary between [1, 64].
-size_t bytecopy_bank(const uint8_t *restrict bankmem, int bankwidth,
+size_t bytecopy_bank(const uint8_t *br_noalias bankmem, int bankwidth,
                      uint16_t addr, size_t count,
-                     uint8_t dest[restrict count]);
+                     uint8_t dest[br_noalias_sz(count)]);
 
 // Copy mirrored banks @addr into destination buffer where address space of
 // bank is larger than bank memory; assumes banks and address spaces are sized
 // to power-of-2 KB boundaries between [1, 64].
-size_t bytecopy_bankmirrored(const uint8_t *restrict bankmem, int bankwidth,
+size_t bytecopy_bankmirrored(const uint8_t *br_noalias bankmem, int bankwidth,
                              uint16_t addr, int addrspace, size_t count,
-                             uint8_t dest[restrict count]);
+                             uint8_t dest[br_noalias_sz(count)]);
+#include "bridgeclose.h"
 
 #endif

@@ -19,12 +19,14 @@
 typedef struct debugger_context debugctx;
 
 #include "bridgeopen.h"
-br_ownresult
+br_libexport br_ownresult
 debugctx *debug_new(int resetvector_override) br_nothrow;
+br_libexport
 void debug_free(debugctx *self) br_nothrow;
 
 void debug_override_reset(debugctx *self, bus *b,
                           uint16_t device_addr) br_nothrow;
+br_libexport
 void debug_addbreakpoint(debugctx *self, struct haltexpr expr) br_nothrow;
 void debug_check(debugctx *self, const struct cycleclock *clk,
                  struct mos6502 *cpu) br_nothrow;

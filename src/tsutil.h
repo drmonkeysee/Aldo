@@ -16,12 +16,17 @@ enum {
     TSU_NS_PER_S = TSU_MS_PER_S * TSU_NS_PER_MS,
 };
 
+#include "bridgeopen.h"
+br_libexport
 inline double timespec_to_ms(const struct timespec *ts)
 {
     return (ts->tv_sec * TSU_MS_PER_S) + (ts->tv_nsec / (double)TSU_NS_PER_MS);
 }
 
+br_libexport
 struct timespec timespec_elapsed(const struct timespec *from);
+br_libexport
 void timespec_sleep(struct timespec duration);
+#include "bridgeclose.h"
 
 #endif

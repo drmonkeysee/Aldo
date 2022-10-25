@@ -48,6 +48,7 @@ struct console_state {
 };
 
 #include "bridgeopen.h"
+br_libexport
 void snapshot_clear(struct console_state *snapshot) br_nothrow;
 #include "bridgeclose.h"
 

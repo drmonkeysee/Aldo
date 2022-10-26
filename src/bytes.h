@@ -54,12 +54,20 @@ enum {
 // NOTE: convert unsigned values into little-endian byte representations;
 // undefined behavior if any pointer/array arguments are null.
 
+//
+// Export
+//
+
 // Bytes to Word
 br_libexport
 inline uint16_t bytowr(uint8_t lo, uint8_t hi)
 {
     return lo | (hi << 8);
 }
+
+//
+// Internal
+//
 
 // Byte Array to Word
 inline uint16_t batowr(const uint8_t bytes[br_csz(2)])

@@ -10,6 +10,6 @@
 
 #include "guiplatform.h"
 
-int gui_run(const struct gui_platform *restrict platform);
+int gui_run(const struct gui_platform *platform);
 
 #endif

@@ -45,7 +45,7 @@ exit_console:
 // Public Interface
 //
 
-int gui_run(const struct gui_platform *restrict platform)
+int gui_run(const struct gui_platform *platform)
 {
     assert(platform != NULL);
 

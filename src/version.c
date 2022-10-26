@@ -7,7 +7,4 @@
 
 #include "version.h"
 
-const char *get_version(void)
-{
-    return "0.4.1"; // TODO: autogenerate this
-}
+const char *const restrict AldoVersion = "0.4.1";

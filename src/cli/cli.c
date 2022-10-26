@@ -31,7 +31,7 @@ const char *ui_curses_version(void);
 
 static void print_version(void)
 {
-    printf("Aldo %s", get_version());
+    printf("Aldo %s", AldoVersion);
 #ifdef __VERSION__
     fputs(" (" __VERSION__ ")", stdout);
 #endif

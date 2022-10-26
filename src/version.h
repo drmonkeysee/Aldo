@@ -8,6 +8,6 @@
 #ifndef Aldo_version_h
 #define Aldo_version_h
 
-const char *get_version(void);
+extern const char *const restrict AldoVersion;
 
 #endif

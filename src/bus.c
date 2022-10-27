@@ -46,7 +46,7 @@ bus *bus_new(int bitwidth, size_t n, ...)
     struct addressbus *const self = malloc(sizeof *self + psize);
     *self = (struct addressbus){
         .count = n,
-        .maxaddr = (1 << bitwidth) - 1,
+        .maxaddr = (uint16_t)(1 << bitwidth) - 1,
     };
     self->partitions[0] = (struct partition){0};
     va_list args;

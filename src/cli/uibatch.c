@@ -25,9 +25,11 @@
 
 static const char *const restrict DistractorFormat = "%c Running\u2026";
 
-static struct timespec Current, Previous, Start;
-static struct cycleclock Clock;
-static double AvgFrameTimeMs, FrameTimeMs;
+static struct {
+    struct timespec current, previous, start;
+    struct cycleclock cyclock;
+    double avgframetime_ms, frametime_ms;
+} Clock;
 static bool Verbose;
 
 static void clearline(void)
@@ -53,8 +55,8 @@ static void handle_sigint(int sig, siginfo_t *info, void *uap)
 static int init_ui(const struct cliargs *args)
 {
     Verbose = args->verbose;
-    clock_gettime(CLOCK_MONOTONIC, &Start);
-    Previous = Start;
+    clock_gettime(CLOCK_MONOTONIC, &Clock.start);
+    Clock.previous = Clock.start;
     struct sigaction act = {
         .sa_sigaction = handle_sigint,
         .sa_flags = SA_SIGINFO,
@@ -64,19 +66,21 @@ static int init_ui(const struct cliargs *args)
 
 static void tick_start(const struct console_state *snapshot)
 {
-    clock_gettime(CLOCK_MONOTONIC, &Current);
-    const double currentms = timespec_to_ms(&Current);
-    FrameTimeMs = currentms - timespec_to_ms(&Previous);
-    Clock.runtime = (currentms - timespec_to_ms(&Start)) / TSU_MS_PER_S;
+    clock_gettime(CLOCK_MONOTONIC, &Clock.current);
+    const double currentms = timespec_to_ms(&Clock.current);
+    Clock.frametime_ms = currentms - timespec_to_ms(&Clock.previous);
+    Clock.cyclock.runtime = (currentms - timespec_to_ms(&Clock.start))
+                                / TSU_MS_PER_S;
 
     // NOTE: cumulative moving average:
     // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-    const uint64_t ticks = Clock.frames;
-    AvgFrameTimeMs = (FrameTimeMs + (ticks * AvgFrameTimeMs)) / (ticks + 1);
+    const uint64_t ticks = Clock.cyclock.frames;
+    Clock.avgframetime_ms = (Clock.frametime_ms
+                             + (ticks * Clock.avgframetime_ms)) / (ticks + 1);
 
     // NOTE: arbitrary per-tick budget, 6502s often ran at 1 MHz so a million
     // cycles per tick seems as good a number as any.
-    Clock.budget = 1e6;
+    Clock.cyclock.budget = 1e6;
 
     // NOTE: exit batch mode if cpu is not running
     if (!snapshot->lines.ready) {
@@ -86,8 +90,8 @@ static void tick_start(const struct console_state *snapshot)
 
 static void tick_end(void)
 {
-    Previous = Current;
-    ++Clock.frames;
+    Clock.previous = Clock.current;
+    ++Clock.cyclock.frames;
 }
 
 static void update_progress(void)
@@ -98,7 +102,7 @@ static void update_progress(void)
     static double refreshdt;
     static size_t distractor_frame;
 
-    if ((refreshdt += FrameTimeMs) >= refresh_interval_ms) {
+    if ((refreshdt += Clock.frametime_ms) >= refresh_interval_ms) {
         refreshdt = display_wait;
         clearline();
         fprintf(stderr, DistractorFormat, distractor[distractor_frame++]);
@@ -110,15 +114,18 @@ static void write_summary(const struct console_state *snapshot)
 {
     if (!Verbose) return;
 
-    const bool scale_ms = Clock.runtime < 1.0;
+    const bool scale_ms = Clock.cyclock.runtime < 1.0;
 
     clearline();
     printf("---=== %s ===---\n", cart_filename(snapshot->cart.info));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
-           scale_ms ? Clock.runtime * TSU_MS_PER_S : Clock.runtime);
-    printf("Avg Frame Time (msec): %.3f\n", AvgFrameTimeMs);
-    printf("Total Cycles: %" PRIu64 "\n", Clock.total_cycles);
-    printf("Avg Cycles/sec: %.2f\n", Clock.total_cycles / Clock.runtime);
+           scale_ms
+            ? Clock.cyclock.runtime * TSU_MS_PER_S
+            : Clock.cyclock.runtime);
+    printf("Avg Frame Time (msec): %.3f\n", Clock.avgframetime_ms);
+    printf("Total Cycles: %" PRIu64 "\n", Clock.cyclock.total_cycles);
+    printf("Avg Cycles/sec: %.2f\n",
+           Clock.cyclock.total_cycles / Clock.cyclock.runtime);
     if (snapshot->debugger.break_condition.cond != HLT_NONE) {
         char break_desc[HEXPR_FMT_SIZE];
         const int err = haltexpr_fmt(&snapshot->debugger.break_condition,
@@ -134,7 +141,7 @@ static void batch_loop(nes *console, struct console_state *snapshot)
 
     do {
         tick_start(snapshot);
-        nes_cycle(console, &Clock);
+        nes_cycle(console, &Clock.cyclock);
         nes_snapshot(console, snapshot);
         update_progress();
         tick_end();

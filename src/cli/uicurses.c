@@ -39,23 +39,25 @@
 static const int Fps = 60, MinCps = 1, MaxCps = 1000, RamSheets = 4;
 static const struct timespec VSync = {.tv_nsec = TSU_NS_PER_S / Fps};
 
-static struct timespec Current, Previous, Start;
-static double FrameLeftMs, FrameTimeMs, TimeBudgetMs;
 static struct {
-    struct cycleclock clock;
+    struct timespec current, previous, start;
+    struct cycleclock cyclock;
+    double frameleft_ms, frametime_ms, timebudget_ms;
+} Clock = {.cyclock = {.cycles_per_sec = 4}};
+static struct {
     int ramsheet;
     bool bcdsupport, running, tron;
-} ViewState = {.clock = {.cycles_per_sec = 4}, .running = true};
+} ViewState = {.running = true};
 
 static void initclock(void)
 {
-    clock_gettime(CLOCK_MONOTONIC, &Start);
-    Previous = Start;
+    clock_gettime(CLOCK_MONOTONIC, &Clock.start);
+    Clock.previous = Clock.start;
 }
 
 static void tick_sleep(void)
 {
-    const struct timespec elapsed = timespec_elapsed(&Current);
+    const struct timespec elapsed = timespec_elapsed(&Clock.current);
 
     // NOTE: if elapsed nanoseconds is greater than vsync we're over
     // our time budget; if elapsed *seconds* is greater than vsync
@@ -63,14 +65,14 @@ static void tick_sleep(void)
     if (elapsed.tv_nsec > VSync.tv_nsec || elapsed.tv_sec > VSync.tv_sec) {
         // NOTE: we've already blown the frame time so convert everything
         // to milliseconds to make the math easier.
-        FrameLeftMs = timespec_to_ms(&VSync) - timespec_to_ms(&elapsed);
+        Clock.frameleft_ms = timespec_to_ms(&VSync) - timespec_to_ms(&elapsed);
         return;
     }
 
     const struct timespec tick_left = {
         .tv_nsec = VSync.tv_nsec - elapsed.tv_nsec,
     };
-    FrameLeftMs = timespec_to_ms(&tick_left);
+    Clock.frameleft_ms = timespec_to_ms(&tick_left);
 
     timespec_sleep(tick_left);
 }
@@ -98,28 +100,28 @@ static void drawhwtraits(void)
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
     static double display_frameleft, display_frametime, refreshdt;
-    if ((refreshdt += FrameTimeMs) >= refresh_interval_ms) {
-        display_frameleft = FrameLeftMs;
-        display_frametime = FrameTimeMs;
+    if ((refreshdt += Clock.frametime_ms) >= refresh_interval_ms) {
+        display_frameleft = Clock.frameleft_ms;
+        display_frametime = Clock.frametime_ms;
         refreshdt = 0;
     }
 
     int cursor_y = 0;
     werase(HwView.content);
     mvwprintw(HwView.content, cursor_y++, 0, "FPS: %d (%.2f)", Fps,
-              ViewState.clock.frames / ViewState.clock.runtime);
+              Clock.cyclock.frames / Clock.cyclock.runtime);
     mvwprintw(HwView.content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_frametime, display_frameleft);
     mvwprintw(HwView.content, cursor_y++, 0, "Frames: %" PRIu64,
-              ViewState.clock.frames);
+              Clock.cyclock.frames);
     mvwprintw(HwView.content, cursor_y++, 0, "Runtime: %.3f",
-              ViewState.clock.runtime);
+              Clock.cyclock.runtime);
     mvwprintw(HwView.content, cursor_y++, 0, "Cycles: %" PRIu64,
-              ViewState.clock.total_cycles);
+              Clock.cyclock.total_cycles);
     mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(HwView.content, cursor_y++, 0, "CPU/PPU Clock: INF/INF Hz");
     mvwprintw(HwView.content, cursor_y++, 0, "Cycles per Second: %d",
-              ViewState.clock.cycles_per_sec);
+              Clock.cyclock.cycles_per_sec);
     mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
     mvwprintw(HwView.content, cursor_y, 0, "BCD Supported: %s",
               ViewState.bcdsupport ? "Yes" : "No");
@@ -566,34 +568,34 @@ static void init_ui(const struct cliargs *args)
 
 static void tick_start(const struct console_state *snapshot)
 {
-    clock_gettime(CLOCK_MONOTONIC, &Current);
-    const double currentms = timespec_to_ms(&Current);
-    FrameTimeMs = currentms - timespec_to_ms(&Previous);
-    ViewState.clock.runtime = (currentms - timespec_to_ms(&Start))
+    clock_gettime(CLOCK_MONOTONIC, &Clock.current);
+    const double currentms = timespec_to_ms(&Clock.current);
+    Clock.frametime_ms = currentms - timespec_to_ms(&Clock.previous);
+    Clock.cyclock.runtime = (currentms - timespec_to_ms(&Clock.start))
                                 / TSU_MS_PER_S;
 
     if (!snapshot->lines.ready) {
-        TimeBudgetMs = ViewState.clock.budget = 0;
+        Clock.timebudget_ms = Clock.cyclock.budget = 0;
         return;
     }
 
-    TimeBudgetMs += FrameTimeMs;
+    Clock.timebudget_ms += Clock.frametime_ms;
     // NOTE: accumulate at most a second of banked cycle time
-    if (TimeBudgetMs >= TSU_MS_PER_S) {
-        TimeBudgetMs = TSU_MS_PER_S;
+    if (Clock.timebudget_ms >= TSU_MS_PER_S) {
+        Clock.timebudget_ms = TSU_MS_PER_S;
     }
 
     const double mspercycle = (double)TSU_MS_PER_S
-                                / ViewState.clock.cycles_per_sec;
-    const int new_cycles = TimeBudgetMs / mspercycle;
-    ViewState.clock.budget += new_cycles;
-    TimeBudgetMs -= new_cycles * mspercycle;
+                                / Clock.cyclock.cycles_per_sec;
+    const int new_cycles = Clock.timebudget_ms / mspercycle;
+    Clock.cyclock.budget += new_cycles;
+    Clock.timebudget_ms -= new_cycles * mspercycle;
 }
 
 static void tick_end(void)
 {
-    Previous = Current;
-    ++ViewState.clock.frames;
+    Clock.previous = Clock.current;
+    ++Clock.cyclock.frames;
     tick_sleep();
 }
 
@@ -609,23 +611,23 @@ static void handle_input(nes *console, const struct console_state *snapshot)
         }
         break;
     case '=':   // "Lowercase" +
-        ++ViewState.clock.cycles_per_sec;
+        ++Clock.cyclock.cycles_per_sec;
         goto pclamp_cps;
     case '+':
-        ViewState.clock.cycles_per_sec += 10;
+        Clock.cyclock.cycles_per_sec += 10;
     pclamp_cps:
-        if (ViewState.clock.cycles_per_sec > MaxCps) {
-            ViewState.clock.cycles_per_sec = MaxCps;
+        if (Clock.cyclock.cycles_per_sec > MaxCps) {
+            Clock.cyclock.cycles_per_sec = MaxCps;
         }
         break;
     case '-':
-        --ViewState.clock.cycles_per_sec;
+        --Clock.cyclock.cycles_per_sec;
         goto nclamp_cps;
     case '_':   // "Uppercase" -
-        ViewState.clock.cycles_per_sec -= 10;
+        Clock.cyclock.cycles_per_sec -= 10;
     nclamp_cps:
-        if (ViewState.clock.cycles_per_sec < MinCps) {
-            ViewState.clock.cycles_per_sec = MinCps;
+        if (Clock.cyclock.cycles_per_sec < MinCps) {
+            Clock.cyclock.cycles_per_sec = MinCps;
         }
         break;
     case 'i':
@@ -711,7 +713,7 @@ static void curses_loop(nes *console, struct console_state *snapshot)
         tick_start(snapshot);
         handle_input(console, snapshot);
         if (ViewState.running) {
-            nes_cycle(console, &ViewState.clock);
+            nes_cycle(console, &Clock.cyclock);
             nes_snapshot(console, snapshot);
             refresh_ui(snapshot);
         }

@@ -19,6 +19,13 @@ if [ -n "$date" ] ; then
 fi
 build_no=$(date "${input_date[@]}" '+%Y.%j')
 
-echo "Version: $ver"
-echo "Build: $build_no"
-echo "$PWD"
+echo "Setting version $ver ($build_no)..."
+
+sed -i .bak "s/\(AldoVersion = \)\".*\"/\1\"$ver ($build_no)\"/" ${PWD}/src/version.c
+echo 'Updated version.c'
+
+# TODO: guard or select this explicitly for macOS
+pushd mac
+xcrun agvtool vers
+xcrun agvtool mvers
+popd

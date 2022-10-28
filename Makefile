@@ -50,7 +50,11 @@ ifdef XLF
 LDFLAGS += $(XLF)
 endif
 
-.PHONY: bcdtest check clean debug ext extclean nesdiff nestest purge release run test
+.PHONY: bcdtest check clean debug empty ext extclean nesdiff nestest purge \
+	release run test version
+
+empty:
+	$(info Please specify a make target)
 
 ext:
 	$(MAKE) -C $@
@@ -155,3 +159,12 @@ $(TRACE_CMP):
 
 $(BCDTEST_ROM):
 	python3 $(TEST_DIR)/bcdtest.py
+
+ifdef DATE
+version: DATE_FLAG := -d $(DATE)
+endif
+ifdef VER
+version: VER_FLAG := -v $(VER)
+endif
+version:
+	tools/version.sh $(DATE_FLAG) $(VER_FLAG)

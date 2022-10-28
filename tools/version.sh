@@ -15,7 +15,7 @@ if [ -z "$ver" ] ; then
 fi
 
 if [ -n "$date" ] ; then
-	input_date=('-j' '-f' '%Y-%m-%d' "$date")
+	input_date=( '-j' '-f' '%Y-%m-%d' "$date" )
 fi
 build_no=$(date "${input_date[@]}" '+%Y.%j')
 

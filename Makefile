@@ -38,7 +38,7 @@ ifneq ($(OS), Darwin)
 CFLAGS += -Wno-format-zero-length
 endif
 
-SRC_CFLAGS := -pedantic
+SRC_CFLAGS := -Wconversion -pedantic
 TEST_CFLAGS := -Wno-unused-parameter -iquote$(SRC_DIR)/$(CLI_DIR)
 SP := strip
 

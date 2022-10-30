@@ -167,7 +167,7 @@ static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
                                 const struct cycleclock *clk,
                                 const struct mos6502 *cpu)
 {
-    for (size_t i = 0; i < vec->capacity; ++i) {
+    for (ptrdiff_t i = 0; i < (ptrdiff_t)vec->capacity; ++i) {
         const struct breakpoint *const bp = vec->items + i;
         if (bp->status != BPS_ENABLED) continue;
         switch (bp->expr.cond) {
@@ -228,7 +228,7 @@ void debug_override_reset(debugctx *self, bus *b, uint16_t device_addr)
     if (self->resetvector < 0) return;
 
     self->dec = malloc(sizeof *self->dec);
-    self->dec->vector = self->resetvector;
+    self->dec->vector = (uint16_t)self->resetvector;
     struct busdevice resetaddr_device = {
         resetaddr_read, resetaddr_write, resetaddr_dma, self->dec,
     };

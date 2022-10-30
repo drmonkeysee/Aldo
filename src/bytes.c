@@ -57,7 +57,7 @@ size_t bytecopy_bankmirrored(const uint8_t *restrict bankmem, int bankwidth,
         maxcount = count > spaceleft ? spaceleft : count,
         bankleft = banksize - bankstart;
     size_t bytescopy = count > bankleft ? bankleft : count;
-    ptrdiff_t bytesleft = maxcount;
+    ptrdiff_t bytesleft = (ptrdiff_t)maxcount;
     // NOTE: Mirrored bank bytecopy needs to:
     // 1) start copy from some offset within the bank or a bank mirror
     // 2) wraparound if copy crosses bank boundary within address space

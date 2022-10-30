@@ -62,7 +62,7 @@ enum {
 br_libexport
 inline uint16_t bytowr(uint8_t lo, uint8_t hi)
 {
-    return lo | (hi << 8);
+    return lo | (uint16_t)(hi << 8);
 }
 
 //

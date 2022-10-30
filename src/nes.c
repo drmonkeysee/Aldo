@@ -227,7 +227,7 @@ void nes_cycle(nes *self, struct cycleclock *clock)
     while (self->cpu.signal.rdy && clock->budget > 0) {
         const int cycles = cpu_cycle(&self->cpu);
         clock->budget -= cycles;
-        clock->total_cycles += cycles;
+        clock->total_cycles += (uint64_t)cycles;
         instruction_trace(self, clock);
 
         switch (self->mode) {

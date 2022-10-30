@@ -53,7 +53,7 @@ bus *bus_new(int bitwidth, size_t n, ...)
     va_start(args, n);
     for (size_t i = 1; i < n; ++i) {
         self->partitions[i] = (struct partition){
-            .start = va_arg(args, unsigned int),
+            .start = (uint16_t)va_arg(args, unsigned int),
         };
     }
     va_end(args);

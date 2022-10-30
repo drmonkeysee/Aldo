@@ -147,7 +147,7 @@ static void drawcontrols(const struct console_state *snapshot)
     werase(ControlsView.content);
     wmove(ControlsView.content, cursor_y, 0);
 
-    const double center_offset = (w - strlen(halt)) / 2.0;
+    const double center_offset = (w - (int)strlen(halt)) / 2.0;
     assert(center_offset > 0);
     char halt_label[w + 1];
     snprintf(halt_label, sizeof halt_label, "%*s%s%*s",
@@ -201,7 +201,7 @@ static void drawcart(const struct console_state *snapshot)
 {
     static const char *const restrict namelabel = "Name: ";
 
-    const int maxwidth = getmaxx(CartView.content) - strlen(namelabel);
+    const int maxwidth = getmaxx(CartView.content) - (int)strlen(namelabel);
     int cursor_y = 0;
     mvwaddstr(CartView.content, cursor_y, 0, namelabel);
     const char
@@ -587,7 +587,7 @@ static void tick_start(const struct console_state *snapshot)
 
     const double mspercycle = (double)TSU_MS_PER_S
                                 / Clock.cyclock.cycles_per_sec;
-    const int new_cycles = Clock.timebudget_ms / mspercycle;
+    const int new_cycles = (int)(Clock.timebudget_ms / mspercycle);
     Clock.cyclock.budget += new_cycles;
     Clock.timebudget_ms -= new_cycles * mspercycle;
 }

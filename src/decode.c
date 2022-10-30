@@ -36,7 +36,7 @@
 #define UP(op, am, d, c) {op, am, d, c, true}
 #define JAM {IN_JAM, AM_JAM, N, CY(-1), true}
 
-const int BrkOpcode = 0x0;
+const uint8_t BrkOpcode = 0x0;
 
 // Decoding table for all official and
 // unofficial (undocumented, illegal) MOS6502 opcodes.

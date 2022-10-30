@@ -296,8 +296,9 @@ static void binary_add(struct mos6502 *self, uint8_t a, uint8_t b, uint8_t c)
 {
     const uint16_t sum = a + b + c;
     self->p.c = sum & 0x100;
-    update_v(self, sum, a, b);
-    load_register(self, &self->a, sum);
+    const uint8_t result = (uint8_t)sum;
+    update_v(self, result, a, b);
+    load_register(self, &self->a, result);
 }
 
 static void decimal_add(struct mos6502 *self, uint8_t alo, uint8_t blo,
@@ -309,16 +310,18 @@ static void decimal_add(struct mos6502 *self, uint8_t alo, uint8_t blo,
         slo += 0x6;
         slo &= 0xf;
     }
-    uint8_t shi = ahi + bhi + chi;
+    uint8_t shi = ahi + bhi + chi,
+            shinib = (uint8_t)(shi << 4);
     // NOTE: overflow and negative are set before decimal adjustment
-    update_v(self, shi << 4, ahi << 4, bhi << 4);
-    update_n(self, shi << 4);
+    update_v(self, shinib, (uint8_t)(ahi << 4), (uint8_t)(bhi << 4));
+    update_n(self, shinib);
     self->p.c = shi > 0x9;
     if (self->p.c) {
         shi += 0x6;
         shi &= 0xf;
     }
-    self->a = (shi << 4) | slo;
+    shinib = (uint8_t)(shi << 4);
+    self->a = shinib | slo;
 }
 
 static void decimal_subtract(struct mos6502 *self, uint8_t alo, uint8_t blo,
@@ -336,7 +339,7 @@ static void decimal_subtract(struct mos6502 *self, uint8_t alo, uint8_t blo,
         dhi &= 0xf;
     }
     // NOTE: bcd subtract does not adjust flags from earlier binary op
-    self->a = (dhi << 4) | dlo;
+    self->a = (uint8_t)(dhi << 4) | dlo;
 }
 
 enum arithmetic_operator {
@@ -376,9 +379,10 @@ static uint8_t compare_register(struct mos6502 *self, uint8_t r, uint8_t d)
 {
     const uint16_t cmp = r + (uint8_t)~d + 1;
     self->p.c = cmp & 0x100;
-    update_z(self, cmp);
-    update_n(self, cmp);
-    return cmp;
+    const uint8_t result = (uint8_t)cmp;
+    update_z(self, result);
+    update_n(self, result);
+    return result;
 }
 
 static void modify_mem(struct mos6502 *self, uint8_t d)
@@ -785,7 +789,7 @@ static void ROR_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
-    bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
+    bitoperation(self, dec, BIT_RIGHT, (uint8_t)(self->p.c << 7));
 }
 
 static void RTI_exec(struct mos6502 *self)
@@ -950,7 +954,7 @@ static void ARR_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->a, and_result);
     self->p.v = (self->a >> 7) ^ ((self->a >> 6) & 0x1);
     const bool c = self->a & 0x80;
-    bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
+    bitoperation(self, dec, BIT_RIGHT, (uint8_t)(self->p.c << 7));
     self->p.c = c;
 
     if (!bcd_mode(self)) return;
@@ -1034,7 +1038,8 @@ static void RRA_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
-    const uint8_t d = bitoperation(self, dec, BIT_RIGHT, self->p.c << 7);
+    const uint8_t d = bitoperation(self, dec, BIT_RIGHT,
+                                   (uint8_t)(self->p.c << 7));
     arithmetic_operation(self, AOP_ADD, d);
 }
 
@@ -1198,7 +1203,7 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
 
 static void branch_displacement(struct mos6502 *self)
 {
-    self->adl = self->pc + self->databus;
+    self->adl = (uint8_t)self->pc + self->databus;
     // NOTE: branch uses signed displacement so there are three overflow cases:
     // no overflow = no adjustment to pc-high;
     // positive overflow = carry-in to pc-high => pch + 1;
@@ -1471,7 +1476,7 @@ static void JSR_sequence(struct mos6502 *self, struct decoded dec)
         stack_push(self, self->pc >> 8);
         break;
     case 4:
-        stack_push(self, self->pc);
+        stack_push(self, (uint8_t)self->pc);
         break;
     case 5:
         self->addrbus = self->pc;
@@ -1575,7 +1580,7 @@ static void BRK_sequence(struct mos6502 *self, struct decoded dec)
         stack_push(self, self->pc >> 8);
         break;
     case 3:
-        stack_push(self, self->pc);
+        stack_push(self, (uint8_t)self->pc);
         break;
     case 4:
         stack_push(self, get_p(self, service_interrupt(self)));
@@ -1763,7 +1768,8 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->datapath.busfault = self->bflt;
     snapshot->datapath.current_instruction = self->addrinst;
     snapshot->datapath.databus = self->databus;
-    snapshot->datapath.exec_cycle = self->t;
+    assert(self->t >= 0);
+    snapshot->datapath.exec_cycle = (uint8_t)self->t;
     snapshot->datapath.instdone = self->presync;
     snapshot->datapath.irq = self->irq;
     snapshot->datapath.jammed = cpu_jammed(self);
@@ -1815,7 +1821,8 @@ struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
             if (result.mode == AM_INDX) {
                 result.interaddr = self->addrbus;
             } else if (result.mode == AM_INDY) {
-                result.interaddr = bytowr(result.interaddr, self->databus);
+                result.interaddr = bytowr((uint8_t)result.interaddr,
+                                          self->databus);
             }
         }
     } while (!self->presync);

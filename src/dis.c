@@ -219,12 +219,12 @@ static int print_prgblock(const struct blockview *bv, bool verbose, FILE *f)
 // byte array of 2-bit palette-indexed pixels composed of two bit-planes where
 // the first plane specifies the pixel low bit and the second plane specifies
 // the pixel high bit.
-const size_t
+static const size_t
     ChrPlaneSize = 8,
     ChrTileSpan = 2 * ChrPlaneSize,
     ChrTileSize = ChrPlaneSize * ChrPlaneSize;
-// NOTE: hardcode max scale to around 1 MB bmp file size
-static const int ScaleGuard = 16;
+// NOTE: hardcode max scale to ~7MB bmp file size
+static const int ScaleGuard = 20;
 
 static int measure_tile_sheet(size_t banksize, uint32_t *restrict dim,
                               uint32_t *restrict sections)

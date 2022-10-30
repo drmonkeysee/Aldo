@@ -33,8 +33,11 @@ BCDTEST_ROM := $(TEST_DIR)/bcdtest.rom
 PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) $(NESTEST_DIFF) \
 		$(TRACE_CMP) $(BCDTEST_ROM) $(TRACE_LOG) system.ram
 
-CFLAGS := -Wall -Wextra -Wconversion -std=c17 -iquote$(SRC_DIR)
-ifneq ($(OS), Darwin)
+CFLAGS := -Wall -Wextra -std=c17 -iquote$(SRC_DIR)
+# gcc's -Wconversion is WAY too aggressive so only use on clang for now
+ifeq ($(OS), Darwin)
+CFLAGS += -Wconversion
+else
 CFLAGS += -Wno-format-zero-length
 endif
 

@@ -318,7 +318,9 @@ static void mnemonic_unofficial(void *ctx)
 
 static void mnemonic_invalid(void *ctx)
 {
-    const struct dis_instruction inst = {.d = {-4, AM_IMM, {0}, {0}, false}};
+    const struct dis_instruction inst = {
+        .d = {(enum inst)-4, AM_IMM, {0}, {0}, false},
+    };
 
     const char *const result = dis_inst_mnemonic(&inst);
 
@@ -353,7 +355,9 @@ static void description_unofficial(void *ctx)
 
 static void description_invalid(void *ctx)
 {
-    const struct dis_instruction inst = {.d = {-4, AM_IMM, {0}, {0}, false}};
+    const struct dis_instruction inst = {
+        .d = {(enum inst)-4, AM_IMM, {0}, {0}, false},
+    };
 
     const char *const result = dis_inst_description(&inst);
 
@@ -388,7 +392,9 @@ static void modename_unofficial(void *ctx)
 
 static void modename_invalid(void *ctx)
 {
-    const struct dis_instruction inst = {.d = {IN_ADC, -4, {0}, {0}, false}};
+    const struct dis_instruction inst = {
+        .d = {IN_ADC, (enum addrmode)-4, {0}, {0}, false},
+    };
 
     const char *const result = dis_inst_addrmode(&inst);
 
@@ -423,7 +429,9 @@ static void flags_unofficial(void *ctx)
 
 static void flags_invalid(void *ctx)
 {
-    const struct dis_instruction inst = {.d = {-4, AM_IMM, {0}, {0}, false}};
+    const struct dis_instruction inst = {
+        .d = {(enum inst)-4, AM_IMM, {0}, {0}, false},
+    };
 
     const uint8_t result = dis_inst_flags(&inst);
 

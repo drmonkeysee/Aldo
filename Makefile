@@ -33,12 +33,12 @@ BCDTEST_ROM := $(TEST_DIR)/bcdtest.rom
 PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) $(NESTEST_DIFF) \
 		$(TRACE_CMP) $(BCDTEST_ROM) $(TRACE_LOG) system.ram
 
-CFLAGS := -Wall -Wextra -std=c17 -iquote$(SRC_DIR)
+CFLAGS := -Wall -Wextra -Wconversion -std=c17 -iquote$(SRC_DIR)
 ifneq ($(OS), Darwin)
 CFLAGS += -Wno-format-zero-length
 endif
 
-SRC_CFLAGS := -Wconversion -pedantic
+SRC_CFLAGS := -pedantic
 TEST_CFLAGS := -Wno-unused-parameter -iquote$(SRC_DIR)/$(CLI_DIR)
 SP := strip
 

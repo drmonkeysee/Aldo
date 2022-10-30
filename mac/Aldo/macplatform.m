@@ -55,7 +55,7 @@ static float render_scale_factor(SDL_Window *win)
         if (winfo.subsystem == SDL_SYSWM_COCOA) {
             @autoreleasepool {
                 NSWindow *const native = winfo.info.cocoa.window;
-                return native.backingScaleFactor;
+                return (float)native.backingScaleFactor;
             }
         } else {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
@@ -66,7 +66,7 @@ static float render_scale_factor(SDL_Window *win)
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                      "Unable to retrieve window info: %s", SDL_GetError());
     }
-    return 1.0;
+    return 1.0f;
 }
 
 static void cleanup(void)

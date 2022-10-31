@@ -20,34 +20,6 @@ static const int8_t PreFetch = -1;
 // State Management
 //
 
-// NOTE: Pool is never freed, global pointer is reachable at program exit
-// WARNING: moving contexts in/out of the Pool is not thread-safe!
-static struct cpu_context {
-    struct cpu_context *next;
-    struct mos6502 cpu;
-} *Pool;
-
-static struct cpu_context *capture(struct mos6502 *self)
-{
-    struct cpu_context *ctx;
-    if (Pool) {
-        ctx = Pool;
-        Pool = Pool->next;
-    } else {
-        ctx = malloc(sizeof *ctx);
-    }
-    *ctx = (struct cpu_context){.cpu = *self};
-    return ctx;
-}
-
-static void restore(struct mos6502 *self, struct cpu_context *ctx)
-{
-    *self = ctx->cpu;
-    ctx->cpu.bus = NULL;    // Clean up any dangling pointers
-    ctx->next = Pool;
-    Pool = ctx;
-}
-
 static void detach(struct mos6502 *self)
 {
     // TODO: adjust any bus devices with side-effect reads
@@ -1785,11 +1757,12 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->lines.sync = self->signal.sync;
 }
 
-cpu_ctx *cpu_peek_start(struct mos6502 *self)
+void cpu_peek_start(struct mos6502 *self, struct mos6502 *restore)
 {
     assert(self != NULL);
+    assert(restore != NULL);
 
-    cpu_ctx *const ctx = capture(self);
+    *restore = *self;
     // NOTE: set to read-only and reset all signals to ready cpu
     if (!self->detached) {
         detach(self);
@@ -1797,7 +1770,6 @@ cpu_ctx *cpu_peek_start(struct mos6502 *self)
     self->irq = self->nmi = self->res = CSGS_CLEAR;
     self->signal.irq = self->signal.nmi = self->signal.res =
         self->signal.rdy = true;
-    return ctx;
 }
 
 struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
@@ -1834,13 +1806,13 @@ struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
     return result;
 }
 
-void cpu_peek_end(struct mos6502 *self, cpu_ctx *ctx)
+void cpu_peek_end(struct mos6502 *self, struct mos6502 *restore)
 {
     assert(self != NULL);
-    assert(ctx != NULL);
+    assert(restore != NULL);
 
-    restore(self, ctx);
-    if (!ctx->cpu.detached) {
+    *self = *restore;
+    if (!restore->detached) {
         attach(self);
     }
 }

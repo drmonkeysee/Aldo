@@ -628,9 +628,10 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
         if (count < 0) return DIS_ERR_FMT;
         total += count;
     } else {
-        cpu_ctx *const peekctx = cpu_peek_start(cpu);
+        struct mos6502 restore_point;
+        cpu_peek_start(cpu, &restore_point);
         const struct cpu_peekresult peek = cpu_peek(cpu, addr);
-        cpu_peek_end(cpu, peekctx);
+        cpu_peek_end(cpu, &restore_point);
         switch (peek.mode) {
 #define XPEEK(...) sprintf(dis, __VA_ARGS__)
 #define X(s, b, n, p, ...) case AM_ENUM(s): total = p; break;

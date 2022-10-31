@@ -31,7 +31,8 @@ static void end_restores_state(void *ctx)
 
     ct_assertfalse(cpu.detached);
 
-    cpu_ctx *const cctx = cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     ct_asserttrue(cpu.signal.irq);
     ct_asserttrue(cpu.signal.nmi);
@@ -47,7 +48,7 @@ static void end_restores_state(void *ctx)
     cpu.x = 4;
     cpu.y = 0xc;
 
-    cpu_peek_end(&cpu, cctx);
+    cpu_peek_end(&cpu, &bak);
 
     ct_asserttrue(cpu.signal.irq);
     ct_assertfalse(cpu.signal.nmi);
@@ -72,11 +73,12 @@ static void end_retains_detached_state(void *ctx)
 
     ct_asserttrue(cpu.detached);
 
-    cpu_ctx *const cctx = cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     ct_asserttrue(cpu.detached);
 
-    cpu_peek_end(&cpu, cctx);
+    cpu_peek_end(&cpu, &bak);
 
     ct_asserttrue(cpu.detached);
 }
@@ -88,8 +90,8 @@ static void irq_ignored(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
 
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
     cpu.s = 0xff;
     cpu.p.i = false;
     cpu.signal.irq = false;
@@ -108,8 +110,8 @@ static void nmi_ignored(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
 
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
     cpu.s = 0xff;
     cpu.signal.nmi = false;
 
@@ -127,8 +129,8 @@ static void res_not_ignored(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
 
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
     cpu.s = 0xff;
     cpu.signal.res = false;
 
@@ -146,8 +148,8 @@ static void writes_ignored(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     const int cycles = clock_cpu(&cpu);
 
@@ -165,8 +167,8 @@ static void peek_immediate(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
 
@@ -184,8 +186,8 @@ static void peek_zeropage(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
 
@@ -204,8 +206,8 @@ static void peek_zp_indexed(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
     cpu.x = 2;
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
 
@@ -224,8 +226,8 @@ static void peek_indexed_indirect(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
     cpu.x = 2;
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
 
@@ -244,8 +246,8 @@ static void peek_indirect_indexed(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
     cpu.y = 5;
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
 
@@ -263,8 +265,8 @@ static void peek_absolute(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
 
@@ -283,8 +285,8 @@ static void peek_absolute_indexed(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
     cpu.x = 0xa;
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
 
@@ -302,8 +304,8 @@ static void peek_branch(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.p.z = true;
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
 
@@ -321,8 +323,8 @@ static void peek_branch_forced(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.p.z = false;
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
 
@@ -341,8 +343,8 @@ static void peek_absolute_indirect(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
     cpu.x = 0xa;
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
 
@@ -359,8 +361,8 @@ static void peek_jam(void *ctx)
     uint8_t mem[] = {0x02, 0x10};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
 
@@ -374,8 +376,8 @@ static void peek_busfault(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    // NOTE: throw away return value, no need to clean up peek state in test
-    (void)cpu_peek_start(&cpu);
+    struct mos6502 bak;
+    cpu_peek_start(&cpu, &bak);
 
     const struct cpu_peekresult result = cpu_peek(&cpu, 0x0);
 

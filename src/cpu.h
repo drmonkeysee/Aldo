@@ -84,7 +84,6 @@ struct cpu_peekresult {
     uint8_t data;
     bool busfault;
 };
-typedef struct cpu_context cpu_ctx;
 
 #include "bridgeopen.h"
 extern const int MaxCycleCount;
@@ -97,9 +96,9 @@ bool cpu_jammed(const struct mos6502 *self) br_nothrow;
 void cpu_snapshot(const struct mos6502 *self,
                   struct console_state *snapshot) br_nothrow;
 
-cpu_ctx *cpu_peek_start(struct mos6502 *self) br_nothrow;
+void cpu_peek_start(struct mos6502 *self, struct mos6502 *restore) br_nothrow;
 struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr) br_nothrow;
-void cpu_peek_end(struct mos6502 *self, cpu_ctx *ctx) br_nothrow;
+void cpu_peek_end(struct mos6502 *self, struct mos6502 *restore) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

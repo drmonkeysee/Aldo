@@ -15,18 +15,9 @@ struct haltarg {
     struct haltarg *next;
 };
 
-// TODO: temp struct for gui demo
-struct bounce {
-    struct {
-        int x, y;
-    } bounds, pos, velocity;
-    int dim;
-};
-
 struct cliargs {
     struct haltarg *haltlist;
     const char *cartfile, *chrdecode_prefix, *me;   // Non-owning Pointers
-    struct bounce bouncer;
     int chrscale, resetvector;
     bool
         batch, bcdsupport, chrdecode, disassemble, help, info, tron, verbose,

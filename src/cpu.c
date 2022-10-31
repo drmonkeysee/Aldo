@@ -11,7 +11,6 @@
 
 #include <assert.h>
 #include <stddef.h>
-#include <stdlib.h>
 
 // NOTE: sentinel value for cycle count denoting an imminent opcode fetch
 static const int8_t PreFetch = -1;
@@ -1757,12 +1756,14 @@ void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
     snapshot->lines.sync = self->signal.sync;
 }
 
-void cpu_peek_start(struct mos6502 *self, struct mos6502 *restore)
+void cpu_peek_start(struct mos6502 *restrict self,
+                    struct mos6502 *restrict restore)
 {
     assert(self != NULL);
-    assert(restore != NULL);
 
-    *restore = *self;
+    if (restore) {
+        *restore = *self;
+    }
     // NOTE: set to read-only and reset all signals to ready cpu
     if (!self->detached) {
         detach(self);
@@ -1806,10 +1807,12 @@ struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
     return result;
 }
 
-void cpu_peek_end(struct mos6502 *self, struct mos6502 *restore)
+void cpu_peek_end(struct mos6502 *restrict self,
+                  struct mos6502 *restrict restore)
 {
     assert(self != NULL);
-    assert(restore != NULL);
+
+    if (!restore) return;
 
     *self = *restore;
     if (!restore->detached) {

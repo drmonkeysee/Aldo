@@ -86,14 +86,15 @@ static void write(struct mos6502 *self)
 
 static uint8_t get_p(const struct mos6502 *self, bool interrupt)
 {
-    return (uint8_t)(self->p.c
-            | self->p.z << 1
-            | self->p.i << 2
-            | self->p.d << 3
-            | !interrupt << 4   // B bit is 0 if interrupt, 1 otherwise
-            | 1 << 5            // Unused bit is always set
-            | self->p.v << 6
-            | self->p.n << 7);
+    return (uint8_t)
+        (self->p.c
+         | self->p.z << 1
+         | self->p.i << 2
+         | self->p.d << 3
+         | !interrupt << 4  // B bit is 0 if interrupt, 1 otherwise
+         | 1 << 5           // Unused bit is always set
+         | self->p.v << 6
+         | self->p.n << 7);
 }
 
 static void set_p(struct mos6502 *self, uint8_t p)

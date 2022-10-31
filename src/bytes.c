@@ -26,7 +26,7 @@ size_t bytecopy_bank(const uint8_t *restrict bankmem, int bankwidth,
     const size_t banksize = 1 << bankwidth;
     // NOTE: addr -> index is always mask(banksize - 1)
     // iff banksize is a power of 2
-    const uint16_t start = addr & (banksize - 1);
+    const uint16_t start = addr & (uint16_t)(banksize - 1);
     const size_t
         bytesleft = banksize - start,
         bytecount = count > bytesleft ? bytesleft : count;
@@ -51,7 +51,7 @@ size_t bytecopy_bankmirrored(const uint8_t *restrict bankmem, int bankwidth,
 
     // NOTE: addr -> index is always mask(banksize - 1)
     // iff banksize is a power of 2
-    uint16_t bankstart = addr & (banksize - 1);
+    uint16_t bankstart = addr & (uint16_t)(banksize - 1);
     const size_t
         spaceleft = addrspace - addr,
         maxcount = count > spaceleft ? spaceleft : count,
@@ -67,7 +67,7 @@ size_t bytecopy_bankmirrored(const uint8_t *restrict bankmem, int bankwidth,
         // NOTE: first memcpy block may be offset from start of bank; any
         // additional blocks start at 0 due to mirroring-wraparound.
         bankstart = 0;
-        bytesleft -= bytescopy;
+        bytesleft -= (ptrdiff_t)bytescopy;
         dest += bytescopy;
         bytescopy = bytesleft > (ptrdiff_t)banksize
                         ? banksize

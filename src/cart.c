@@ -76,7 +76,8 @@ static int parse_ines(struct cartridge *self, FILE *f)
     info->ines_hdr.mapper_controlled = false;
 
     info->ines_hdr.trainer = header[6] & 0x4;
-    info->ines_hdr.mapper_id = (header[6] >> 4) | (header[7] & 0xf0);
+    info->ines_hdr.mapper_id = (uint8_t)((header[6] >> 4)
+                                         | (header[7] & 0xf0));
     info->ines_hdr.wram_blocks = header[8];
     info->ines_hdr.bus_conflicts = header[10] & 0x20;
 

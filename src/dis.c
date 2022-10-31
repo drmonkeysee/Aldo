@@ -204,7 +204,7 @@ static int print_prgblock(const struct blockview *bv, bool verbose, FILE *f)
         result = dis_inst(addr, &inst, dis);
         if (result <= 0) break;
         print_prg_line(dis, verbose, &inst, &repeat, f);
-        addr += inst.bv.size;
+        addr += (uint16_t)inst.bv.size;
     }
     if (result < 0) return result;
 
@@ -219,7 +219,7 @@ static int print_prgblock(const struct blockview *bv, bool verbose, FILE *f)
 // byte array of 2-bit palette-indexed pixels composed of two bit-planes where
 // the first plane specifies the pixel low bit and the second plane specifies
 // the pixel high bit.
-static const size_t
+static const uint32_t
     ChrPlaneSize = 8,
     ChrTileSpan = 2 * ChrPlaneSize,
     ChrTileSize = ChrPlaneSize * ChrPlaneSize;
@@ -273,8 +273,8 @@ static void decode_tiles(const struct blockview *bv, size_t tilecount,
                 const ptrdiff_t pixel = (ptrdiff_t)((ChrPlaneSize - bit - 1)
                                                     + (row * ChrPlaneSize));
                 assert(pixel >= 0);
-                tile[pixel] = (byte_getbit(plane0, bit)
-                                | (uint8_t)(byte_getbit(plane1, bit) << 1));
+                tile[pixel] = (uint8_t)((byte_getbit(plane0, bit)
+                                         | (byte_getbit(plane1, bit) << 1)));
             }
         }
         // NOTE: did we process the entire CHR ROM?
@@ -416,7 +416,9 @@ static int write_tile_sheet(uint32_t tilesdim, uint32_t tile_sections,
     // NOTE: BMP pixels are written bottom-row first
     uint8_t *const packedrow = calloc(packedrow_size, sizeof *packedrow);
     for (int32_t tiley = (int32_t)(tilesdim - 1); tiley >= 0; --tiley) {
-        for (int32_t pixely = ChrPlaneSize - 1; pixely >= 0; --pixely) {
+        for (int32_t pixely = (int32_t)(ChrPlaneSize - 1);
+             pixely >= 0;
+             --pixely) {
             for (uint32_t scaley = 0; scaley < scale; ++scaley) {
                 fill_tile_sheet_row(packedrow, (uint32_t)tiley,
                                     (uint32_t)pixely, tilesdim, tile_sections,

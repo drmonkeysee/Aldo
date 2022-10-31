@@ -14,7 +14,7 @@
 #include <stdlib.h>
 
 // NOTE: sentinel value for cycle count denoting an imminent opcode fetch
-static const int PreFetch = -1;
+static const int8_t PreFetch = -1;
 
 //
 // State Management
@@ -86,15 +86,14 @@ static void write(struct mos6502 *self)
 
 static uint8_t get_p(const struct mos6502 *self, bool interrupt)
 {
-    uint8_t p = 0x20;       // Unused bit is always set
-    p |= self->p.c << 0;
-    p |= self->p.z << 1;
-    p |= self->p.i << 2;
-    p |= self->p.d << 3;
-    p |= !interrupt << 4;   // B bit is 0 if interrupt, 1 otherwise
-    p |= self->p.v << 6;
-    p |= self->p.n << 7;
-    return p;
+    return (uint8_t)(self->p.c
+            | self->p.z << 1
+            | self->p.i << 2
+            | self->p.d << 3
+            | !interrupt << 4   // B bit is 0 if interrupt, 1 otherwise
+            | 1 << 5            // Unused bit is always set
+            | self->p.v << 6
+            | self->p.n << 7);
 }
 
 static void set_p(struct mos6502 *self, uint8_t p)
@@ -294,7 +293,7 @@ static void store_data(struct mos6502 *self, uint8_t d)
 //  C = 0 is thus a borrow-out; A + (~B + 0) => A + ~B => A - B - 1.
 static void binary_add(struct mos6502 *self, uint8_t a, uint8_t b, uint8_t c)
 {
-    const uint16_t sum = a + b + c;
+    const uint16_t sum = (uint16_t)(a + b + c);
     self->p.c = sum & 0x100;
     const uint8_t result = (uint8_t)sum;
     update_v(self, result, a, b);
@@ -304,13 +303,13 @@ static void binary_add(struct mos6502 *self, uint8_t a, uint8_t b, uint8_t c)
 static void decimal_add(struct mos6502 *self, uint8_t alo, uint8_t blo,
                         uint8_t ahi, uint8_t bhi, bool c)
 {
-    uint8_t slo = alo + blo + c;
+    uint8_t slo = (uint8_t)(alo + blo + c);
     const bool chi = slo > 0x9;
     if (chi) {
         slo += 0x6;
         slo &= 0xf;
     }
-    uint8_t shi = ahi + bhi + chi,
+    uint8_t shi = (uint8_t)(ahi + bhi + chi),
             shinib = (uint8_t)(shi << 4);
     // NOTE: overflow and negative are set before decimal adjustment
     update_v(self, shinib, (uint8_t)(ahi << 4), (uint8_t)(bhi << 4));
@@ -327,13 +326,13 @@ static void decimal_add(struct mos6502 *self, uint8_t alo, uint8_t blo,
 static void decimal_subtract(struct mos6502 *self, uint8_t alo, uint8_t blo,
                              uint8_t ahi, uint8_t bhi, uint8_t brw)
 {
-    uint8_t dlo = alo - blo + brw;  // borrow is either 0 or -1
+    uint8_t dlo = (uint8_t)(alo - blo + brw);   // borrow is either 0 or -1
     const bool brwhi = dlo >= 0x80; // dlo < 0
     if (brwhi) {
         dlo -= 0x6;
         dlo &= 0xf;
     }
-    uint8_t dhi = ahi - bhi - brwhi;
+    uint8_t dhi = (uint8_t)(ahi - bhi - brwhi);
     if (dhi >= 0x80) {  // dhi < 0
         dhi -= 0x6;
         dhi &= 0xf;
@@ -377,7 +376,7 @@ static void arithmetic_operation(struct mos6502 *self,
 // see binary_add for why this works.
 static uint8_t compare_register(struct mos6502 *self, uint8_t r, uint8_t d)
 {
-    const uint16_t cmp = r + (uint8_t)~d + 1;
+    const uint16_t cmp = (uint16_t)(r + (uint8_t)~d + 1);
     self->p.c = cmp & 0x100;
     const uint8_t result = (uint8_t)cmp;
     update_z(self, result);
@@ -966,10 +965,10 @@ static void ARR_exec(struct mos6502 *self, struct decoded dec)
     //  if high nibble of AND result + lsb of high nibble > 0x50,
     //      adjust A by 0x60 and set carry flag
     if ((and_result & 0xf) + (and_result & 0x1) > 0x5) {
-        self->a = (self->a & 0xf0) | ((self->a + 0x6) & 0xf);
+        self->a = (uint8_t)((self->a & 0xf0) | ((self->a + 0x6) & 0xf));
     }
     if ((and_result & 0xf0) + (and_result & 0x10) > 0x50) {
-        self->a = ((self->a + 0x60) & 0xf0) | (self->a & 0xf);
+        self->a = (uint8_t)(((self->a + 0x60) & 0xf0) | (self->a & 0xf));
         self->p.c = true;
     }
 }
@@ -1217,12 +1216,12 @@ static void branch_displacement(struct mos6502 *self)
         positive_overflow = self->adl < self->databus && !negative_offset,
         negative_overflow = self->adl > self->databus && negative_offset;
     self->adc = positive_overflow - negative_overflow;
-    self->pc = bytowr(self->adl, self->pc >> 8);
+    self->pc = bytowr(self->adl, (uint8_t)(self->pc >> 8));
 }
 
 static void branch_carry(struct mos6502 *self)
 {
-    self->pc = bytowr(self->adl, (self->pc >> 8) + self->adc);
+    self->pc = bytowr(self->adl, (uint8_t)((self->pc >> 8) + self->adc));
 }
 
 static void IMP_sequence(struct mos6502 *self, struct decoded dec)
@@ -1473,7 +1472,7 @@ static void JSR_sequence(struct mos6502 *self, struct decoded dec)
         stack_top(self);
         break;
     case 3:
-        stack_push(self, self->pc >> 8);
+        stack_push(self, (uint8_t)(self->pc >> 8));
         break;
     case 4:
         stack_push(self, (uint8_t)self->pc);
@@ -1577,7 +1576,7 @@ static void BRK_sequence(struct mos6502 *self, struct decoded dec)
         }
         break;
     case 2:
-        stack_push(self, self->pc >> 8);
+        stack_push(self, (uint8_t)(self->pc >> 8));
         break;
     case 3:
         stack_push(self, (uint8_t)self->pc);
@@ -1697,9 +1696,9 @@ void cpu_powerup(struct mos6502 *self)
     self->signal.rdy = self->signal.sync = self->bflt = self->presync = false;
 
     // NOTE: initialize internal registers to known state
-    self->pc = self->a = self->s = self->x = self->y =
-        self->t = self->addrinst = self->opc = self->adl = self->adh =
-        self->adc = 0;
+    self->pc = self->addrinst = self->a = self->s = self->x = self->y =
+        self->opc = self->adl = self->adh = self->adc = 0u;
+    self->t = 0;
     set_p(self, 0x34);
 
     // TODO: simulate res held low on startup to engage reset sequence.

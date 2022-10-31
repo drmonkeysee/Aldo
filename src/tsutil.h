@@ -20,7 +20,8 @@ enum {
 br_libexport
 inline double timespec_to_ms(const struct timespec *ts)
 {
-    return (ts->tv_sec * TSU_MS_PER_S) + (ts->tv_nsec / (double)TSU_NS_PER_MS);
+    return (double)(ts->tv_sec * TSU_MS_PER_S)
+                    + ((double)ts->tv_nsec / (double)TSU_NS_PER_MS);
 }
 
 br_libexport

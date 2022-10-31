@@ -62,7 +62,7 @@ enum {
 br_libexport
 inline uint16_t bytowr(uint8_t lo, uint8_t hi)
 {
-    return lo | (uint16_t)(hi << 8);
+    return (uint16_t)(lo | (hi << 8));
 }
 
 //
@@ -79,8 +79,8 @@ inline uint16_t batowr(const uint8_t bytes[br_csz(2)])
 inline void wrtoby(uint16_t word, uint8_t *br_noalias lo,
                    uint8_t *br_noalias hi)
 {
-    *lo = word & 0xff;
-    *hi = word >> 8;
+    *lo = (uint8_t)(word & 0xff);
+    *hi = (uint8_t)(word >> 8);
 }
 
 // Word to Byte Array

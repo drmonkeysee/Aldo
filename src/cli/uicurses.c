@@ -109,7 +109,7 @@ static void drawhwtraits(void)
     int cursor_y = 0;
     werase(HwView.content);
     mvwprintw(HwView.content, cursor_y++, 0, "FPS: %d (%.2f)", Fps,
-              Clock.cyclock.frames / Clock.cyclock.runtime);
+              (double)Clock.cyclock.frames / Clock.cyclock.runtime);
     mvwprintw(HwView.content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_frametime, display_frameleft);
     mvwprintw(HwView.content, cursor_y++, 0, "Frames: %" PRIu64,
@@ -241,7 +241,7 @@ static void drawinstructions(uint16_t addr, int h, int y,
             break;
         }
         mvwaddstr(PrgView.content, i, 0, disassembly);
-        addr += inst.bv.size;
+        addr += (uint16_t)inst.bv.size;
     }
 }
 

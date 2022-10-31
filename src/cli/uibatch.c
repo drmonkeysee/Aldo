@@ -74,7 +74,7 @@ static void tick_start(const struct console_state *snapshot)
 
     // NOTE: cumulative moving average:
     // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-    const uint64_t ticks = Clock.cyclock.frames;
+    const double ticks = (double)Clock.cyclock.frames;
     Clock.avgframetime_ms = (Clock.frametime_ms
                              + (ticks * Clock.avgframetime_ms)) / (ticks + 1);
 
@@ -125,7 +125,7 @@ static void write_summary(const struct console_state *snapshot)
     printf("Avg Frame Time (msec): %.3f\n", Clock.avgframetime_ms);
     printf("Total Cycles: %" PRIu64 "\n", Clock.cyclock.total_cycles);
     printf("Avg Cycles/sec: %.2f\n",
-           Clock.cyclock.total_cycles / Clock.cyclock.runtime);
+           (double)Clock.cyclock.total_cycles / Clock.cyclock.runtime);
     if (snapshot->debugger.break_condition.cond != HLT_NONE) {
         char break_desc[HEXPR_FMT_SIZE];
         const int err = haltexpr_fmt(&snapshot->debugger.break_condition,

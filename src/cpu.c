@@ -1773,14 +1773,14 @@ void cpu_peek_start(struct mos6502 *restrict self,
         self->signal.rdy = true;
 }
 
-struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
+struct peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
 {
     assert(self != NULL);
 
     self->presync = true;
     self->pc = addr;
     cpu_cycle(self);
-    struct cpu_peekresult result = {.mode = Decode[self->opc].mode};
+    struct peekresult result = {.mode = Decode[self->opc].mode};
     // NOTE: can't run the cpu to peek JAM or it'll jam the cpu!
     // Fortunately all we need is the addressing mode so return that.
     if (result.mode == AM_JAM) return result;

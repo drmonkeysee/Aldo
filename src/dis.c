@@ -630,7 +630,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
     } else {
         struct mos6502 restore_point;
         cpu_peek_start(cpu, &restore_point);
-        const struct cpu_peekresult peek = cpu_peek(cpu, addr);
+        const struct peekresult peek = cpu_peek(cpu, addr);
         cpu_peek_end(cpu, &restore_point);
         switch (peek.mode) {
 #define XPEEK(...) sprintf(dis, __VA_ARGS__)

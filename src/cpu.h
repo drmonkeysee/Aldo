@@ -78,7 +78,8 @@ struct mos6502 {
         presync;        // Pre-sync cycle; primes the CPU to treat
                         // the following cycle as an opcode fetch (T0).
 };
-struct cpu_peekresult {
+
+struct peekresult {
     enum addrmode mode;
     uint16_t interaddr, finaladdr;
     uint8_t data;
@@ -98,7 +99,7 @@ void cpu_snapshot(const struct mos6502 *self,
 
 void cpu_peek_start(struct mos6502 *br_noalias self,
                     struct mos6502 *br_noalias restore) br_nothrow;
-struct cpu_peekresult cpu_peek(struct mos6502 *self, uint16_t addr) br_nothrow;
+struct peekresult cpu_peek(struct mos6502 *self, uint16_t addr) br_nothrow;
 void cpu_peek_end(struct mos6502 *br_noalias self,
                   struct mos6502 *br_noalias restore) br_nothrow;
 #include "bridgeclose.h"

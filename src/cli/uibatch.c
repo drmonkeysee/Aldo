@@ -5,13 +5,14 @@
 //  Created by Brandon Stansbury on 12/30/21.
 //
 
-#include "ui.h"
-
 #include "cart.h"
 #include "cliargs.h"
 #include "cycleclock.h"
 #include "haltexpr.h"
+#include "nes.h"
+#include "snapshot.h"
 #include "tsutil.h"
+#include "ui.h"
 
 #include <assert.h>
 #include <inttypes.h>
@@ -134,7 +135,18 @@ static void write_summary(const struct console_state *snapshot)
     }
 }
 
-static void batch_loop(nes *console, struct console_state *snapshot)
+//
+// Public Interface
+//
+
+int ui_batch_init(const struct cliargs *args)
+{
+    assert(args != NULL);
+
+    return init_ui(args);
+}
+
+void ui_batch_loop(nes *console, struct console_state *snapshot)
 {
     assert(console != NULL);
     assert(snapshot != NULL);
@@ -147,18 +159,4 @@ static void batch_loop(nes *console, struct console_state *snapshot)
         tick_end();
     } while (QuitSignal == 0);
     write_summary(snapshot);
-}
-
-//
-// Public Interface
-//
-
-int ui_batch_init(const struct cliargs *args, ui_loop **loop)
-{
-    assert(args != NULL);
-    assert(loop != NULL);
-
-    const int err = init_ui(args);
-    *loop = err == 0 ? batch_loop : NULL;
-    return err;
 }

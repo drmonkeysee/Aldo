@@ -5,6 +5,7 @@
 //  Created by Brandon Stansbury on 10/14/22.
 //
 
+#include "ui.h"
 #include "uisdl.hpp"
 
 #include "imgui.h"
@@ -217,11 +218,21 @@ void cleanup_ui() noexcept
     ui_cleanup(GUI_CLEANUP_ALL);
 }
 
-void sdl_loop(nes*, struct console_state* snapshot) noexcept
-{
-    //assert(console != nullptr);
-    assert(snapshot != nullptr);
+}
 
+//
+// Public Interface
+//
+
+int aldo::ui_sdl_init(const struct gui_platform* platform) noexcept
+{
+    assert(platform != nullptr);
+
+    return init_ui(*platform);
+}
+
+void aldo::ui_sdl_runloop() noexcept
+{
     do {
         handle_input();
         if (Running) {
@@ -230,21 +241,4 @@ void sdl_loop(nes*, struct console_state* snapshot) noexcept
         }
     } while (Running);
     cleanup_ui();
-}
-
-}
-
-//
-// Public Interface
-//
-
-int aldo::ui_sdl_init(const struct gui_platform* platform,
-                      ui_loop** loop) noexcept
-{
-    assert(platform != nullptr);
-    assert(loop != nullptr);
-
-    const int err = init_ui(*platform);
-    *loop = err == 0 ? sdl_loop : nullptr;
-    return err;
 }

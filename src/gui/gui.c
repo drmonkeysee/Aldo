@@ -7,7 +7,6 @@
 
 #include "gui.h"
 
-#include "snapshot.h"
 #include "ui.h"
 #include "uisdl.hpp"
 
@@ -17,28 +16,15 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-static int init_ui(const struct gui_platform *platform, ui_loop **loop)
-{
-    return ui_sdl_init(platform, loop);
-}
-
 static int sdl_demo(const struct gui_platform *platform)
 {
-    int result = EXIT_SUCCESS;
-    struct console_state snapshot = {0};
-
-    ui_loop *loop;
-    const int err = init_ui(platform, &loop);
+    const int err = ui_sdl_init(platform);
     if (err < 0) {
         SDL_Log("UI init failure (%d): %s", err, ui_errstr(err));
-        result = EXIT_FAILURE;
-        goto exit_console;
+        return EXIT_FAILURE;
     }
-
-    loop(NULL, &snapshot);
-exit_console:
-    snapshot_clear(&snapshot);
-    return result;
+    ui_sdl_runloop();
+    return EXIT_SUCCESS;
 }
 
 //

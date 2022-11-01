@@ -15,8 +15,8 @@
 #include "dis.h"
 #include "haltexpr.h"
 #include "nes.h"
-#include "ui.h"
 #include "snapshot.h"
+#include "ui.h"
 #include "version.h"
 
 #include <errno.h>
@@ -25,9 +25,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int ui_batch_init(const struct cliargs *args, ui_loop **loop);
-int ui_curses_init(const struct cliargs *args, ui_loop **loop);
+//
+// Common UI Declarations
+//
+
+typedef void ui_loop(nes *, struct console_state *);
+int ui_batch_init(const struct cliargs *);
+int ui_curses_init(const struct cliargs *);
+void ui_batch_loop(nes *, struct console_state *);
+void ui_curses_loop(nes *, struct console_state *);
 const char *ui_curses_version(void);
+
+//
+// Common Commands
+//
 
 static void print_version(void)
 {
@@ -119,9 +130,13 @@ static debugctx *create_debugger(const struct cliargs *args)
 
 static int init_ui(const struct cliargs *args, ui_loop **loop)
 {
-    return args->batch
-            ? ui_batch_init(args, loop)
-            : ui_curses_init(args, loop);
+    if (args->batch) {
+        *loop = ui_batch_loop;
+        return ui_batch_init(args);
+    } else {
+        *loop = ui_curses_loop;
+        return ui_curses_init(args);
+    }
 }
 
 static int run_emu(const struct cliargs *args, cart *c)
@@ -155,9 +170,9 @@ static int run_emu(const struct cliargs *args, cart *c)
     struct console_state snapshot;
     nes_snapshot(console, &snapshot);
 
-    ui_loop *loop;
+    ui_loop *run_loop;
     errno = 0;
-    const int err = init_ui(args, &loop);
+    const int err = init_ui(args, &run_loop);
     if (err < 0) {
         fprintf(stderr, "UI init failure (%d): %s\n", err, ui_errstr(err));
         if (err == UI_ERR_ERNO) {
@@ -166,8 +181,8 @@ static int run_emu(const struct cliargs *args, cart *c)
         result = EXIT_FAILURE;
         goto exit_console;
     }
+    run_loop(console, &snapshot);
 
-    loop(console, &snapshot);
 exit_console:
     snapshot_clear(&snapshot);
     nes_free(console);

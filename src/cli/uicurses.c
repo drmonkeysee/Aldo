@@ -5,8 +5,6 @@
 //  Created by Brandon Stansbury on 12/30/21.
 //
 
-#include "ui.h"
-
 #include "bytes.h"
 #include "cart.h"
 #include "cliargs.h"
@@ -14,6 +12,8 @@
 #include "cycleclock.h"
 #include "dis.h"
 #include "haltexpr.h"
+#include "nes.h"
+#include "snapshot.h"
 #include "tsutil.h"
 
 #include <ncurses.h>
@@ -704,7 +704,19 @@ static void cleanup_ui(void)
     endwin();
 }
 
-static void curses_loop(nes *console, struct console_state *snapshot)
+//
+// Public Interface
+//
+
+int ui_curses_init(const struct cliargs *args)
+{
+    assert(args != NULL);
+
+    init_ui(args);
+    return 0;
+}
+
+void ui_curses_loop(nes *console, struct console_state *snapshot)
 {
     assert(console != NULL);
     assert(snapshot != NULL);
@@ -720,20 +732,6 @@ static void curses_loop(nes *console, struct console_state *snapshot)
         tick_end();
     } while (ViewState.running);
     cleanup_ui();
-}
-
-//
-// Public Interface
-//
-
-int ui_curses_init(const struct cliargs *args, ui_loop **loop)
-{
-    assert(args != NULL);
-    assert(loop != NULL);
-
-    init_ui(args);
-    *loop = curses_loop;
-    return 0;
 }
 
 const char *ui_curses_version(void)

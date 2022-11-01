@@ -8,9 +8,6 @@
 #ifndef Aldo_ui_h
 #define Aldo_ui_h
 
-#include "nes.h"
-#include "snapshot.h"
-
 // X(symbol, value, error string)
 #define UI_ERRCODE_X \
 X(UI_ERR_ERNO, -1, "SYSTEM ERROR") \
@@ -23,8 +20,6 @@ enum {
 };
 
 #include "bridgeopen.h"
-typedef void ui_loop(nes *, struct console_state *) br_nothrow;
-
 // NOTE: returns a pointer to a statically allocated string;
 // **WARNING**: do not write through or free this pointer!
 br_libexport

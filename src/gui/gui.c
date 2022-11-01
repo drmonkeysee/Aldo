@@ -18,12 +18,16 @@
 
 static int sdl_demo(const struct gui_platform *platform)
 {
-    const int err = ui_sdl_init(platform);
+    int err = ui_sdl_init(platform);
     if (err < 0) {
         SDL_Log("UI init failure (%d): %s", err, ui_errstr(err));
         return EXIT_FAILURE;
     }
-    ui_sdl_runloop();
+    err = ui_sdl_runloop();
+    if (err < 0) {
+        SDL_Log("UI run failure (%d): %s", err, ui_errstr(err));
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }
 

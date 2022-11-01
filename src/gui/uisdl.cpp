@@ -231,7 +231,7 @@ int aldo::ui_sdl_init(const struct gui_platform* platform) noexcept
     return init_ui(*platform);
 }
 
-void aldo::ui_sdl_runloop() noexcept
+int aldo::ui_sdl_runloop() noexcept
 {
     do {
         handle_input();
@@ -241,4 +241,5 @@ void aldo::ui_sdl_runloop() noexcept
         }
     } while (Running);
     cleanup_ui();
+    return 0;
 }

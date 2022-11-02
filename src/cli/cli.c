@@ -25,20 +25,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//
-// Common UI Declarations
-//
-
-typedef void ui_loop(nes *, struct console_state *);
-int ui_batch_init(const struct cliargs *);
-int ui_curses_init(const struct cliargs *);
-void ui_batch_loop(nes *, struct console_state *);
-void ui_curses_loop(nes *, struct console_state *);
+typedef int ui_loop(const struct cliargs *, nes *, struct console_state *);
+int ui_batch_loop(const struct cliargs *, nes *, struct console_state *);
+int ui_curses_loop(const struct cliargs *, nes *, struct console_state *);
 const char *ui_curses_version(void);
-
-//
-// Common Commands
-//
 
 static void print_version(void)
 {
@@ -128,15 +118,19 @@ static debugctx *create_debugger(const struct cliargs *args)
     return dbg;
 }
 
-static int init_ui(const struct cliargs *args, ui_loop **loop)
+static ui_loop *setup_ui(const struct cliargs *args, nes *console,
+                         struct console_state *snapshot)
 {
+    ui_loop *loop = ui_curses_loop;
     if (args->batch) {
-        *loop = ui_batch_loop;
-        return ui_batch_init(args);
-    } else {
-        *loop = ui_curses_loop;
-        return ui_curses_init(args);
+        // NOTE: when in batch mode set NES to run immediately
+        nes_mode(console, CSGM_RUN);
+        nes_ready(console);
+        loop = ui_batch_loop;
     }
+    // NOTE: initialize snapshot from console
+    nes_snapshot(console, snapshot);
+    return loop;
 }
 
 static int run_emu(const struct cliargs *args, cart *c)
@@ -161,29 +155,18 @@ static int run_emu(const struct cliargs *args, cart *c)
         goto exit_debug;
     }
     nes_powerup(console);
-    // NOTE: when in batch mode set NES to run immediately
-    if (args->batch) {
-        nes_mode(console, CSGM_RUN);
-        nes_ready(console);
-    }
-    // NOTE: initialize snapshot from console
-    struct console_state snapshot;
-    nes_snapshot(console, &snapshot);
 
-    ui_loop *run_loop;
+    struct console_state snapshot;
+    ui_loop *const run_loop = setup_ui(args, console, &snapshot);
     errno = 0;
-    const int err = init_ui(args, &run_loop);
+    const int err = run_loop(args, console, &snapshot);
     if (err < 0) {
-        fprintf(stderr, "UI init failure (%d): %s\n", err, ui_errstr(err));
+        fprintf(stderr, "UI run failure (%d): %s\n", err, ui_errstr(err));
         if (err == UI_ERR_ERNO) {
             perror("UI System Error");
         }
         result = EXIT_FAILURE;
-        goto exit_console;
     }
-    run_loop(console, &snapshot);
-
-exit_console:
     snapshot_clear(&snapshot);
     nes_free(console);
     console = NULL;

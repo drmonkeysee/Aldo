@@ -139,17 +139,15 @@ static void write_summary(const struct console_state *snapshot)
 // Public Interface
 //
 
-int ui_batch_init(const struct cliargs *args)
+int ui_batch_loop(const struct cliargs *args, nes *console,
+                  struct console_state *snapshot)
 {
     assert(args != NULL);
-
-    return init_ui(args);
-}
-
-void ui_batch_loop(nes *console, struct console_state *snapshot)
-{
     assert(console != NULL);
     assert(snapshot != NULL);
+
+    const int err = init_ui(args);
+    if (err < 0) return err;
 
     do {
         tick_start(snapshot);
@@ -159,4 +157,5 @@ void ui_batch_loop(nes *console, struct console_state *snapshot)
         tick_end();
     } while (QuitSignal == 0);
     write_summary(snapshot);
+    return 0;
 }

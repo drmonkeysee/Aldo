@@ -18,12 +18,7 @@
 
 static int sdl_demo(const struct gui_platform *platform)
 {
-    int err = ui_sdl_init(platform);
-    if (err < 0) {
-        SDL_Log("UI init failure (%d): %s", err, ui_errstr(err));
-        return EXIT_FAILURE;
-    }
-    err = ui_sdl_runloop();
+    const int err = ui_sdl_runloop(platform);
     if (err < 0) {
         SDL_Log("UI run failure (%d): %s", err, ui_errstr(err));
         return EXIT_FAILURE;

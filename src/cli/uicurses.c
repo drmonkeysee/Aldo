@@ -708,19 +708,14 @@ static void cleanup_ui(void)
 // Public Interface
 //
 
-int ui_curses_init(const struct cliargs *args)
+int ui_curses_loop(const struct cliargs *args, nes *console,
+                   struct console_state *snapshot)
 {
     assert(args != NULL);
-
-    init_ui(args);
-    return 0;
-}
-
-void ui_curses_loop(nes *console, struct console_state *snapshot)
-{
     assert(console != NULL);
     assert(snapshot != NULL);
 
+    init_ui(args);
     do {
         tick_start(snapshot);
         handle_input(console, snapshot);
@@ -732,6 +727,7 @@ void ui_curses_loop(nes *console, struct console_state *snapshot)
         tick_end();
     } while (ViewState.running);
     cleanup_ui();
+    return 0;
 }
 
 const char *ui_curses_version(void)

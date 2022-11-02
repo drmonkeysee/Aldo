@@ -10,7 +10,6 @@
 #define br_libexport [[gnu::visibility("default")]]
 #define br_checkerror [[nodiscard("check error")]]
 #define br_ownresult [[nodiscard("take ownership of result")]]
-#define br_noargs
 #define br_noalias
 #define br_csz(val)
 #define br_noalias_sz(var)
@@ -22,7 +21,6 @@ extern "C"
 #define br_libexport __attribute__((visibility("default")))
 #define br_checkerror
 #define br_ownresult
-#define br_noargs void
 #define br_noalias restrict
 #define br_csz(val) static val
 #define br_noalias_sz(var) restrict var

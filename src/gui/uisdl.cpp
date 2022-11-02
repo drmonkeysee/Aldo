@@ -224,15 +224,13 @@ void cleanup_ui() noexcept
 // Public Interface
 //
 
-int aldo::ui_sdl_init(const struct gui_platform* platform) noexcept
+int aldo::ui_sdl_runloop(const struct gui_platform* platform) noexcept
 {
     assert(platform != nullptr);
 
-    return init_ui(*platform);
-}
+    const int err = init_ui(*platform);
+    if (err < 0) return err;
 
-int aldo::ui_sdl_runloop() noexcept
-{
     do {
         handle_input();
         if (Running) {

@@ -115,11 +115,10 @@ static void write_summary(const struct cliargs *args,
                           const struct console_state *snapshot,
                           const struct runclock *clock)
 {
+    clearline();
     if (!args->verbose) return;
 
     const bool scale_ms = clock->cyclock.runtime < 1.0;
-
-    clearline();
     printf("---=== %s ===---\n", cart_filename(snapshot->cart.info));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
            scale_ms

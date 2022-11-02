@@ -727,6 +727,7 @@ int ui_curses_loop(const struct cliargs *args, nes *console,
         tick_end();
     } while (ViewState.running);
     cleanup_ui();
+
     return 0;
 }
 

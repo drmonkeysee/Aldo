@@ -26,12 +26,11 @@
 
 static const char *const restrict DistractorFormat = "%c Running\u2026";
 
-static struct {
+struct runclock {
     struct timespec current, previous, start;
     struct cycleclock cyclock;
     double avgframetime_ms, frametime_ms;
-} Clock;
-static bool Verbose;
+};
 
 static void clearline(void)
 {
@@ -53,11 +52,10 @@ static void handle_sigint(int sig, siginfo_t *info, void *uap)
 // UI Loop Implementation
 //
 
-static int init_ui(const struct cliargs *args)
+static int init_ui(struct runclock *clock)
 {
-    Verbose = args->verbose;
-    clock_gettime(CLOCK_MONOTONIC, &Clock.start);
-    Clock.previous = Clock.start;
+    clock_gettime(CLOCK_MONOTONIC, &clock->start);
+    clock->previous = clock->start;
     struct sigaction act = {
         .sa_sigaction = handle_sigint,
         .sa_flags = SA_SIGINFO,
@@ -65,23 +63,25 @@ static int init_ui(const struct cliargs *args)
     return sigaction(SIGINT, &act, NULL) == 0 ? 0 : UI_ERR_ERNO;
 }
 
-static void tick_start(const struct console_state *snapshot)
+static void tick_start(const struct console_state *snapshot,
+                       struct runclock *clock)
 {
-    clock_gettime(CLOCK_MONOTONIC, &Clock.current);
-    const double currentms = timespec_to_ms(&Clock.current);
-    Clock.frametime_ms = currentms - timespec_to_ms(&Clock.previous);
-    Clock.cyclock.runtime = (currentms - timespec_to_ms(&Clock.start))
+    clock_gettime(CLOCK_MONOTONIC, &clock->current);
+    const double currentms = timespec_to_ms(&clock->current);
+    clock->frametime_ms = currentms - timespec_to_ms(&clock->previous);
+    clock->cyclock.runtime = (currentms - timespec_to_ms(&clock->start))
                                 / TSU_MS_PER_S;
 
     // NOTE: cumulative moving average:
     // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-    const double ticks = (double)Clock.cyclock.frames;
-    Clock.avgframetime_ms = (Clock.frametime_ms
-                             + (ticks * Clock.avgframetime_ms)) / (ticks + 1);
+    const double ticks = (double)clock->cyclock.frames;
+    clock->avgframetime_ms = (clock->frametime_ms
+                                    + (ticks * clock->avgframetime_ms))
+                                / (ticks + 1);
 
     // NOTE: arbitrary per-tick budget, 6502s often ran at 1 MHz so a million
     // cycles per tick seems as good a number as any.
-    Clock.cyclock.budget = 1e6;
+    clock->cyclock.budget = 1e6;
 
     // NOTE: exit batch mode if cpu is not running
     if (!snapshot->lines.ready) {
@@ -89,13 +89,13 @@ static void tick_start(const struct console_state *snapshot)
     }
 }
 
-static void tick_end(void)
+static void tick_end(struct runclock *clock)
 {
-    Clock.previous = Clock.current;
-    ++Clock.cyclock.frames;
+    clock->previous = clock->current;
+    ++clock->cyclock.frames;
 }
 
-static void update_progress(void)
+static void update_progress(const struct runclock *clock)
 {
     static const char distractor[] = {'|', '/', '-', '\\'};
     static const double display_wait = 2000,
@@ -103,7 +103,7 @@ static void update_progress(void)
     static double refreshdt;
     static size_t distractor_frame;
 
-    if ((refreshdt += Clock.frametime_ms) >= refresh_interval_ms) {
+    if ((refreshdt += clock->frametime_ms) >= refresh_interval_ms) {
         refreshdt = display_wait;
         clearline();
         fprintf(stderr, DistractorFormat, distractor[distractor_frame++]);
@@ -111,22 +111,24 @@ static void update_progress(void)
     }
 }
 
-static void write_summary(const struct console_state *snapshot)
+static void write_summary(const struct cliargs *args,
+                          const struct console_state *snapshot,
+                          const struct runclock *clock)
 {
-    if (!Verbose) return;
+    if (!args->verbose) return;
 
-    const bool scale_ms = Clock.cyclock.runtime < 1.0;
+    const bool scale_ms = clock->cyclock.runtime < 1.0;
 
     clearline();
     printf("---=== %s ===---\n", cart_filename(snapshot->cart.info));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
            scale_ms
-            ? Clock.cyclock.runtime * TSU_MS_PER_S
-            : Clock.cyclock.runtime);
-    printf("Avg Frame Time (msec): %.3f\n", Clock.avgframetime_ms);
-    printf("Total Cycles: %" PRIu64 "\n", Clock.cyclock.total_cycles);
+            ? clock->cyclock.runtime * TSU_MS_PER_S
+            : clock->cyclock.runtime);
+    printf("Avg Frame Time (msec): %.3f\n", clock->avgframetime_ms);
+    printf("Total Cycles: %" PRIu64 "\n", clock->cyclock.total_cycles);
     printf("Avg Cycles/sec: %.2f\n",
-           (double)Clock.cyclock.total_cycles / Clock.cyclock.runtime);
+           (double)clock->cyclock.total_cycles / clock->cyclock.runtime);
     if (snapshot->debugger.break_condition.cond != HLT_NONE) {
         char break_desc[HEXPR_FMT_SIZE];
         const int err = haltexpr_fmt(&snapshot->debugger.break_condition,
@@ -146,16 +148,18 @@ int ui_batch_loop(const struct cliargs *args, nes *console,
     assert(console != NULL);
     assert(snapshot != NULL);
 
-    const int err = init_ui(args);
+    struct runclock clock;
+    const int err = init_ui(&clock);
     if (err < 0) return err;
 
     do {
-        tick_start(snapshot);
-        nes_cycle(console, &Clock.cyclock);
+        tick_start(snapshot, &clock);
+        nes_cycle(console, &clock.cyclock);
         nes_snapshot(console, snapshot);
-        update_progress();
-        tick_end();
+        update_progress(&clock);
+        tick_end(&clock);
     } while (QuitSignal == 0);
-    write_summary(snapshot);
+    write_summary(args, snapshot, &clock);
+
     return 0;
 }

@@ -39,25 +39,27 @@
 static const int Fps = 60, MinCps = 1, MaxCps = 1000, RamSheets = 4;
 static const struct timespec VSync = {.tv_nsec = TSU_NS_PER_S / Fps};
 
-static struct {
+struct runclock {
     struct timespec current, previous, start;
     struct cycleclock cyclock;
     double frameleft_ms, frametime_ms, timebudget_ms;
-} Clock = {.cyclock = {.cycles_per_sec = 4}};
-static struct {
+};
+
+struct viewstate {
     int ramsheet;
     bool bcdsupport, running, tron;
-} ViewState = {.running = true};
+};
 
-static void initclock(void)
+static void initclock(struct runclock *c)
 {
-    clock_gettime(CLOCK_MONOTONIC, &Clock.start);
-    Clock.previous = Clock.start;
+    *c = (struct runclock){.cyclock = {.cycles_per_sec = 4}};
+    clock_gettime(CLOCK_MONOTONIC, &c->start);
+    c->previous = c->start;
 }
 
-static void tick_sleep(void)
+static void tick_sleep(struct runclock *c)
 {
-    const struct timespec elapsed = timespec_elapsed(&Clock.current);
+    const struct timespec elapsed = timespec_elapsed(&c->current);
 
     // NOTE: if elapsed nanoseconds is greater than vsync we're over
     // our time budget; if elapsed *seconds* is greater than vsync
@@ -65,14 +67,14 @@ static void tick_sleep(void)
     if (elapsed.tv_nsec > VSync.tv_nsec || elapsed.tv_sec > VSync.tv_sec) {
         // NOTE: we've already blown the frame time so convert everything
         // to milliseconds to make the math easier.
-        Clock.frameleft_ms = timespec_to_ms(&VSync) - timespec_to_ms(&elapsed);
+        c->frameleft_ms = timespec_to_ms(&VSync) - timespec_to_ms(&elapsed);
         return;
     }
 
     const struct timespec tick_left = {
         .tv_nsec = VSync.tv_nsec - elapsed.tv_nsec,
     };
-    Clock.frameleft_ms = timespec_to_ms(&tick_left);
+    c->frameleft_ms = timespec_to_ms(&tick_left);
 
     timespec_sleep(tick_left);
 }
@@ -81,71 +83,74 @@ static void tick_sleep(void)
 // UI Widgets
 //
 
-static struct view {
-    WINDOW *restrict win, *restrict content;
-    PANEL *restrict outer, *restrict inner;
-}
-    HwView,
-    ControlsView,
-    DebuggerView,
-    CartView,
-    PrgView,
-    RegistersView,
-    FlagsView,
-    DatapathView,
-    RamView;
+struct layout {
+    struct view {
+        WINDOW *win, *content;
+        PANEL *outer, *inner;
+    }
+        hwtraits,
+        controls,
+        debugger,
+        cart,
+        prg,
+        registers,
+        flags,
+        datapath,
+        ram;
+};
 
-static void drawhwtraits(void)
+static void drawhwtraits(const struct view *v, const struct viewstate *s,
+                         const struct runclock *c)
 {
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
     static double display_frameleft, display_frametime, refreshdt;
-    if ((refreshdt += Clock.frametime_ms) >= refresh_interval_ms) {
-        display_frameleft = Clock.frameleft_ms;
-        display_frametime = Clock.frametime_ms;
+    if ((refreshdt += c->frametime_ms) >= refresh_interval_ms) {
+        display_frameleft = c->frameleft_ms;
+        display_frametime = c->frametime_ms;
         refreshdt = 0;
     }
 
     int cursor_y = 0;
-    werase(HwView.content);
-    mvwprintw(HwView.content, cursor_y++, 0, "FPS: %d (%.2f)", Fps,
-              (double)Clock.cyclock.frames / Clock.cyclock.runtime);
-    mvwprintw(HwView.content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
+    werase(v->content);
+    mvwprintw(v->content, cursor_y++, 0, "FPS: %d (%.2f)", Fps,
+              (double)c->cyclock.frames / c->cyclock.runtime);
+    mvwprintw(v->content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_frametime, display_frameleft);
-    mvwprintw(HwView.content, cursor_y++, 0, "Frames: %" PRIu64,
-              Clock.cyclock.frames);
-    mvwprintw(HwView.content, cursor_y++, 0, "Runtime: %.3f",
-              Clock.cyclock.runtime);
-    mvwprintw(HwView.content, cursor_y++, 0, "Cycles: %" PRIu64,
-              Clock.cyclock.total_cycles);
-    mvwaddstr(HwView.content, cursor_y++, 0, "Master Clock: INF Hz");
-    mvwaddstr(HwView.content, cursor_y++, 0, "CPU/PPU Clock: INF/INF Hz");
-    mvwprintw(HwView.content, cursor_y++, 0, "Cycles per Second: %d",
-              Clock.cyclock.cycles_per_sec);
-    mvwaddstr(HwView.content, cursor_y++, 0, "Cycles per Frame: N/A");
-    mvwprintw(HwView.content, cursor_y, 0, "BCD Supported: %s",
-              ViewState.bcdsupport ? "Yes" : "No");
+    mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64,
+              c->cyclock.frames);
+    mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f", c->cyclock.runtime);
+    mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
+              c->cyclock.total_cycles);
+    mvwaddstr(v->content, cursor_y++, 0, "Master Clock: INF Hz");
+    mvwaddstr(v->content, cursor_y++, 0, "CPU/PPU Clock: INF/INF Hz");
+    mvwprintw(v->content, cursor_y++, 0, "Cycles per Second: %d",
+              c->cyclock.cycles_per_sec);
+    mvwaddstr(v->content, cursor_y++, 0, "Cycles per Frame: N/A");
+    mvwprintw(v->content, cursor_y, 0, "BCD Supported: %s",
+              s->bcdsupport ? "Yes" : "No");
 }
 
-static void drawtoggle(const char *label, bool selected)
+static void drawtoggle(const struct view *v, const char *label, bool selected)
 {
     if (selected) {
-        wattron(ControlsView.content, A_STANDOUT);
+        wattron(v->content, A_STANDOUT);
     }
-    waddstr(ControlsView.content, label);
+    waddstr(v->content, label);
     if (selected) {
-        wattroff(ControlsView.content, A_STANDOUT);
+        wattroff(v->content, A_STANDOUT);
     }
 }
 
-static void drawcontrols(const struct console_state *snapshot)
+static void drawcontrols(const struct view *v,
+                         const struct console_state *snapshot)
 {
     static const char *const restrict halt = "HALT";
 
-    const int w = getmaxx(ControlsView.content);
+    const int w = getmaxx(v->content);
     int cursor_y = 0;
-    werase(ControlsView.content);
-    wmove(ControlsView.content, cursor_y, 0);
+    werase(v->content);
+    wmove(v->content, cursor_y, 0);
 
     const double center_offset = (w - (int)strlen(halt)) / 2.0;
     assert(center_offset > 0);
@@ -153,57 +158,58 @@ static void drawcontrols(const struct console_state *snapshot)
     snprintf(halt_label, sizeof halt_label, "%*s%s%*s",
              (int)round(center_offset), "", halt,
              (int)floor(center_offset), "");
-    drawtoggle(halt_label, !snapshot->lines.ready);
+    drawtoggle(v, halt_label, !snapshot->lines.ready);
 
     cursor_y += 2;
-    mvwaddstr(ControlsView.content, cursor_y, 0, "Mode: ");
-    drawtoggle(" Cycle ", snapshot->mode == CSGM_CYCLE);
-    drawtoggle(" Step ", snapshot->mode == CSGM_STEP);
-    drawtoggle(" Run ", snapshot->mode == CSGM_RUN);
+    mvwaddstr(v->content, cursor_y, 0, "Mode: ");
+    drawtoggle(v, " Cycle ", snapshot->mode == CSGM_CYCLE);
+    drawtoggle(v, " Step ", snapshot->mode == CSGM_STEP);
+    drawtoggle(v, " Run ", snapshot->mode == CSGM_RUN);
 
     cursor_y += 2;
-    mvwaddstr(ControlsView.content, cursor_y, 0, "Signal: ");
-    drawtoggle(" IRQ ", !snapshot->lines.irq);
-    drawtoggle(" NMI ", !snapshot->lines.nmi);
-    drawtoggle(" RES ", !snapshot->lines.reset);
+    mvwaddstr(v->content, cursor_y, 0, "Signal: ");
+    drawtoggle(v, " IRQ ", !snapshot->lines.irq);
+    drawtoggle(v, " NMI ", !snapshot->lines.nmi);
+    drawtoggle(v, " RES ", !snapshot->lines.reset);
 
-    mvwhline(ControlsView.content, ++cursor_y, 0, 0, w);
-    mvwaddstr(ControlsView.content, ++cursor_y, 0, "Halt/Run: <Space>");
-    mvwaddstr(ControlsView.content, ++cursor_y, 0, "Mode: m/M");
-    mvwaddstr(ControlsView.content, ++cursor_y, 0, "Signal: i, n, s");
-    mvwaddstr(ControlsView.content, ++cursor_y, 0,
+    mvwhline(v->content, ++cursor_y, 0, 0, w);
+    mvwaddstr(v->content, ++cursor_y, 0, "Halt/Run: <Space>");
+    mvwaddstr(v->content, ++cursor_y, 0, "Mode: m/M");
+    mvwaddstr(v->content, ++cursor_y, 0, "Signal: i, n, s");
+    mvwaddstr(v->content, ++cursor_y, 0,
               "Speed \u00b11 (\u00b110): -/= (_/+)");
-    mvwaddstr(ControlsView.content, ++cursor_y, 0, "Ram F/B: r/R");
-    mvwaddstr(ControlsView.content, ++cursor_y, 0, "Quit: q");
+    mvwaddstr(v->content, ++cursor_y, 0, "Ram F/B: r/R");
+    mvwaddstr(v->content, ++cursor_y, 0, "Quit: q");
 }
 
-static void drawdebugger(const struct console_state *snapshot)
+static void drawdebugger(const struct view *v, const struct viewstate *s,
+                         const struct console_state *snapshot)
 {
     int cursor_y = 0;
-    werase(DebuggerView.content);
-    mvwprintw(DebuggerView.content, cursor_y++, 0, "Tracing: %s",
-              ViewState.tron ? "On" : "Off");
-    mvwaddstr(DebuggerView.content, cursor_y++, 0, "Reset Override: ");
+    werase(v->content);
+    mvwprintw(v->content, cursor_y++, 0, "Tracing: %s",
+              s->tron ? "On" : "Off");
+    mvwaddstr(v->content, cursor_y++, 0, "Reset Override: ");
     if (snapshot->debugger.resvector_override >= 0) {
-        wprintw(DebuggerView.content, "$%04X",
-                snapshot->debugger.resvector_override);
+        wprintw(v->content, "$%04X", snapshot->debugger.resvector_override);
     } else {
-        waddstr(DebuggerView.content, "None");
+        waddstr(v->content, "None");
     }
     char break_desc[HEXPR_FMT_SIZE];
     const int err = haltexpr_fmt(&snapshot->debugger.break_condition,
                                  break_desc);
-    mvwprintw(DebuggerView.content, cursor_y, 0, "Break: %s",
+    mvwprintw(v->content, cursor_y, 0, "Break: %s",
               err < 0 ? haltexpr_errstr(err) : break_desc);
 }
 
-static void drawcart(const struct console_state *snapshot)
+static void drawcart(const struct view *v,
+                     const struct console_state *snapshot)
 {
     static const char *const restrict namelabel = "Name: ";
 
-    const int maxwidth = getmaxx(CartView.content) - (int)strlen(namelabel);
+    const int maxwidth = getmaxx(v->content) - (int)strlen(namelabel);
     int cursor_y = 0;
-    mvwaddstr(CartView.content, cursor_y, 0, namelabel);
+    mvwaddstr(v->content, cursor_y, 0, namelabel);
     const char
         *const cn = cart_filename(snapshot->cart.info),
         *endofname = strrchr(cn, '.');
@@ -213,16 +219,15 @@ static void drawcart(const struct console_state *snapshot)
     const ptrdiff_t namelen = endofname - cn;
     const bool longname = namelen > maxwidth;
     // NOTE: ellipsis is one glyph wide despite being > 1 byte long
-    wprintw(CartView.content, "%.*s%s",
-            (int)(longname ? maxwidth - 1 : namelen), cn,
-            longname ? "\u2026" : "");
+    wprintw(v->content, "%.*s%s", (int)(longname ? maxwidth - 1 : namelen),
+            cn, longname ? "\u2026" : "");
     char fmtd[CART_FMT_SIZE];
     const int result = cart_format_extname(snapshot->cart.info, fmtd);
-    mvwprintw(CartView.content, ++cursor_y, 0, "Format: %s",
+    mvwprintw(v->content, ++cursor_y, 0, "Format: %s",
               result > 0 ? fmtd : "Invalid Format");
 }
 
-static void drawinstructions(uint16_t addr, int h, int y,
+static void drawinstructions(const struct view *v, uint16_t addr, int h, int y,
                              const struct console_state *snapshot)
 {
     struct dis_instruction inst = {0};
@@ -236,101 +241,101 @@ static void drawinstructions(uint16_t addr, int h, int y,
             result = dis_inst(addr, &inst, disassembly);
         } else {
             if (result < 0) {
-                mvwaddstr(PrgView.content, i, 0, dis_errstr(result));
+                mvwaddstr(v->content, i, 0, dis_errstr(result));
             }
             break;
         }
-        mvwaddstr(PrgView.content, i, 0, disassembly);
+        mvwaddstr(v->content, i, 0, disassembly);
         addr += (uint16_t)inst.bv.size;
     }
 }
 
-static void drawvecs(int h, int w, int y, const struct console_state *snapshot)
+static void drawvecs(const struct view *v, int h, int w, int y,
+                     const struct console_state *snapshot)
 {
-    mvwhline(PrgView.content, h - y--, 0, 0, w);
+    mvwhline(v->content, h - y--, 0, 0, w);
 
     uint8_t lo = snapshot->mem.vectors[0],
             hi = snapshot->mem.vectors[1];
-    mvwprintw(PrgView.content, h - y--, 0, "%04X: %02X %02X     NMI $%04X",
+    mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     NMI $%04X",
               CPU_VECTOR_NMI, lo, hi, bytowr(lo, hi));
 
     lo = snapshot->mem.vectors[2];
     hi = snapshot->mem.vectors[3];
-    mvwprintw(PrgView.content, h - y--, 0, "%04X: %02X %02X     RES",
+    mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     RES",
               CPU_VECTOR_RES, lo, hi);
     if (snapshot->debugger.resvector_override >= 0) {
-        wprintw(PrgView.content, " !$%04X",
-                snapshot->debugger.resvector_override);
+        wprintw(v->content, " !$%04X", snapshot->debugger.resvector_override);
     } else {
-        wprintw(PrgView.content, " $%04X", bytowr(lo, hi));
+        wprintw(v->content, " $%04X", bytowr(lo, hi));
     }
 
     lo = snapshot->mem.vectors[4];
     hi = snapshot->mem.vectors[5];
-    mvwprintw(PrgView.content, h - y, 0, "%04X: %02X %02X     IRQ $%04X",
+    mvwprintw(v->content, h - y, 0, "%04X: %02X %02X     IRQ $%04X",
               CPU_VECTOR_IRQ, lo, hi, bytowr(lo, hi));
 }
 
-static void drawprg(const struct console_state *snapshot)
+static void drawprg(const struct view *v,
+                    const struct console_state *snapshot)
 {
     static const int vector_offset = 4;
 
     int h, w;
-    getmaxyx(PrgView.content, h, w);
-    werase(PrgView.content);
+    getmaxyx(v->content, h, w);
+    werase(v->content);
 
-    drawinstructions(snapshot->datapath.current_instruction, h, vector_offset,
-                     snapshot);
-    drawvecs(h, w, vector_offset, snapshot);
+    drawinstructions(v, snapshot->datapath.current_instruction, h,
+                     vector_offset, snapshot);
+    drawvecs(v, h, w, vector_offset, snapshot);
 }
 
-static void drawregister(const struct console_state *snapshot)
+static void drawregister(const struct view *v,
+                         const struct console_state *snapshot)
 {
     int cursor_y = 0;
-    mvwprintw(RegistersView.content, cursor_y++, 0, "PC: %04X",
+    mvwprintw(v->content, cursor_y++, 0, "PC: %04X",
               snapshot->cpu.program_counter);
-    mvwprintw(RegistersView.content, cursor_y++, 0, "S:  %02X",
+    mvwprintw(v->content, cursor_y++, 0, "S:  %02X",
               snapshot->cpu.stack_pointer);
-    mvwprintw(RegistersView.content, cursor_y++, 0, "P:  %02X",
-              snapshot->cpu.status);
-    mvwhline(RegistersView.content, cursor_y++, 0, 0,
-             getmaxx(RegistersView.content));
-    mvwprintw(RegistersView.content, cursor_y++, 0, "A:  %02X",
+    mvwprintw(v->content, cursor_y++, 0, "P:  %02X", snapshot->cpu.status);
+    mvwhline(v->content, cursor_y++, 0, 0, getmaxx(v->content));
+    mvwprintw(v->content, cursor_y++, 0, "A:  %02X",
               snapshot->cpu.accumulator);
-    mvwprintw(RegistersView.content, cursor_y++, 0, "X:  %02X",
-              snapshot->cpu.xindex);
-    mvwprintw(RegistersView.content, cursor_y, 0, "Y:  %02X",
-              snapshot->cpu.yindex);
+    mvwprintw(v->content, cursor_y++, 0, "X:  %02X", snapshot->cpu.xindex);
+    mvwprintw(v->content, cursor_y, 0, "Y:  %02X", snapshot->cpu.yindex);
 }
 
-static void drawflags(const struct console_state *snapshot)
+static void drawflags(const struct view *v,
+                      const struct console_state *snapshot)
 {
     int cursor_x = 0, cursor_y = 0;
-    mvwaddstr(FlagsView.content, cursor_y++, cursor_x, "7 6 5 4 3 2 1 0");
-    mvwaddstr(FlagsView.content, cursor_y++, cursor_x, "N V - B D I Z C");
-    mvwhline(FlagsView.content, cursor_y++, cursor_x, 0,
-             getmaxx(FlagsView.content));
+    mvwaddstr(v->content, cursor_y++, cursor_x, "7 6 5 4 3 2 1 0");
+    mvwaddstr(v->content, cursor_y++, cursor_x, "N V - B D I Z C");
+    mvwhline(v->content, cursor_y++, cursor_x, 0, getmaxx(v->content));
     for (size_t i = sizeof snapshot->cpu.status * 8; i > 0; --i) {
-        mvwprintw(FlagsView.content, cursor_y, cursor_x, "%u",
+        mvwprintw(v->content, cursor_y, cursor_x, "%u",
                   (snapshot->cpu.status >> (i - 1)) & 1);
         cursor_x += 2;
     }
 }
 
-static void draw_cpu_line(bool signal, int y, int x, int dir_offset,
-                          const char *direction, const char *label)
+static void draw_cpu_line(const struct view *v, bool signal, int y, int x,
+                          int dir_offset, const char *direction,
+                          const char *label)
 {
     if (!signal) {
-        wattron(DatapathView.content, A_DIM);
+        wattron(v->content, A_DIM);
     }
-    mvwaddstr(DatapathView.content, y, x - 1, label);
-    mvwaddstr(DatapathView.content, y + dir_offset, x, direction);
+    mvwaddstr(v->content, y, x - 1, label);
+    mvwaddstr(v->content, y + dir_offset, x, direction);
     if (!signal) {
-        wattroff(DatapathView.content, A_DIM);
+        wattroff(v->content, A_DIM);
     }
 }
 
-static void draw_interrupt_latch(enum csig_state interrupt, int y, int x)
+static void draw_interrupt_latch(const struct view *v,
+                                 enum csig_state interrupt, int y, int x)
 {
     const char *modifier = "";
     attr_t style = A_NORMAL;
@@ -353,15 +358,16 @@ static void draw_interrupt_latch(enum csig_state interrupt, int y, int x)
     }
 
     if (style != A_NORMAL) {
-        wattron(DatapathView.content, style);
+        wattron(v->content, style);
     }
-    mvwprintw(DatapathView.content, y, x, "%s%s", "\u25ef", modifier);
+    mvwprintw(v->content, y, x, "%s%s", "\u25ef", modifier);
     if (style != A_NORMAL) {
-        wattroff(DatapathView.content, style);
+        wattroff(v->content, style);
     }
 }
 
-static void drawdatapath(const struct console_state *snapshot)
+static void drawdatapath(const struct view *v,
+                         const struct console_state *snapshot)
 {
     static const char
         *const restrict left = "\u2190",
@@ -370,109 +376,109 @@ static void drawdatapath(const struct console_state *snapshot)
         *const restrict down = "\u2193";
     static const int vsep1 = 1, vsep2 = 8, vsep3 = 22, vsep4 = 27, seph = 5;
 
-    const int w = getmaxx(DatapathView.content), line_x = w / 4;
+    const int w = getmaxx(v->content), line_x = w / 4;
     int cursor_y = 0;
-    werase(DatapathView.content);
+    werase(v->content);
 
-    draw_cpu_line(snapshot->lines.ready, cursor_y, line_x, 1, down, "RDY");
-    draw_cpu_line(snapshot->lines.sync, cursor_y, line_x * 2, 1, up, "SYNC");
-    draw_cpu_line(snapshot->lines.readwrite, cursor_y++, line_x * 3, 1, up,
+    draw_cpu_line(v, snapshot->lines.ready, cursor_y, line_x, 1, down, "RDY");
+    draw_cpu_line(v, snapshot->lines.sync, cursor_y, line_x * 2, 1, up,
+                  "SYNC");
+    draw_cpu_line(v, snapshot->lines.readwrite, cursor_y++, line_x * 3, 1, up,
                   "R/W\u0305");
 
-    mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
+    mvwhline(v->content, ++cursor_y, 0, 0, w);
 
-    mvwvline(DatapathView.content, ++cursor_y, vsep1, 0, seph);
-    mvwvline(DatapathView.content, cursor_y, vsep2, 0, seph);
-    mvwvline(DatapathView.content, cursor_y, vsep3, 0, seph);
-    mvwvline(DatapathView.content, cursor_y, vsep4, 0, seph);
+    mvwvline(v->content, ++cursor_y, vsep1, 0, seph);
+    mvwvline(v->content, cursor_y, vsep2, 0, seph);
+    mvwvline(v->content, cursor_y, vsep3, 0, seph);
+    mvwvline(v->content, cursor_y, vsep4, 0, seph);
 
     if (snapshot->datapath.jammed) {
-        wattron(DatapathView.content, A_STANDOUT);
-        mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, " JAMMED ");
-        wattroff(DatapathView.content, A_STANDOUT);
+        wattron(v->content, A_STANDOUT);
+        mvwaddstr(v->content, cursor_y, vsep2 + 2, " JAMMED ");
+        wattroff(v->content, A_STANDOUT);
     } else {
         char buf[DIS_DATAP_SIZE];
         const int wlen = dis_datapath(snapshot, buf);
         const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
-        mvwaddstr(DatapathView.content, cursor_y, vsep2 + 2, mnemonic);
+        mvwaddstr(v->content, cursor_y, vsep2 + 2, mnemonic);
     }
 
-    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adl: %02X",
+    mvwprintw(v->content, ++cursor_y, vsep2 + 2, "adl: %02X",
               snapshot->datapath.addrlow_latch);
 
-    mvwaddstr(DatapathView.content, ++cursor_y, 0, left);
-    mvwprintw(DatapathView.content, cursor_y, vsep1 + 2, "%04X",
+    mvwaddstr(v->content, ++cursor_y, 0, left);
+    mvwprintw(v->content, cursor_y, vsep1 + 2, "%04X",
               snapshot->datapath.addressbus);
-    mvwprintw(DatapathView.content, cursor_y, vsep2 + 2, "adh: %02X",
+    mvwprintw(v->content, cursor_y, vsep2 + 2, "adh: %02X",
               snapshot->datapath.addrhigh_latch);
     const int dbus_x = vsep3 + 2;
     if (snapshot->datapath.busfault) {
-        mvwaddstr(DatapathView.content, cursor_y, dbus_x, "FLT");
+        mvwaddstr(v->content, cursor_y, dbus_x, "FLT");
     } else {
-        mvwprintw(DatapathView.content, cursor_y, dbus_x, "%02X",
+        mvwprintw(v->content, cursor_y, dbus_x, "%02X",
                   snapshot->datapath.databus);
     }
-    mvwaddstr(DatapathView.content, cursor_y, vsep4 + 1,
+    mvwaddstr(v->content, cursor_y, vsep4 + 1,
               snapshot->lines.readwrite ? left : right);
 
-    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "adc: %02X",
+    mvwprintw(v->content, ++cursor_y, vsep2 + 2, "adc: %02X",
               snapshot->datapath.addrcarry_latch);
 
-    mvwprintw(DatapathView.content, ++cursor_y, vsep2 + 2, "%*sT%u",
+    mvwprintw(v->content, ++cursor_y, vsep2 + 2, "%*sT%u",
               snapshot->datapath.exec_cycle, "",
               snapshot->datapath.exec_cycle);
 
-    mvwhline(DatapathView.content, ++cursor_y, 0, 0, w);
+    mvwhline(v->content, ++cursor_y, 0, 0, w);
 
-    draw_interrupt_latch(snapshot->datapath.irq, cursor_y, line_x);
-    draw_interrupt_latch(snapshot->datapath.nmi, cursor_y, line_x * 2);
-    draw_interrupt_latch(snapshot->datapath.res, cursor_y, line_x * 3);
+    draw_interrupt_latch(v, snapshot->datapath.irq, cursor_y, line_x);
+    draw_interrupt_latch(v, snapshot->datapath.nmi, cursor_y, line_x * 2);
+    draw_interrupt_latch(v, snapshot->datapath.res, cursor_y, line_x * 3);
     // NOTE: jump 2 rows as interrupts are drawn direction first
     cursor_y += 2;
-    draw_cpu_line(snapshot->lines.irq, cursor_y, line_x, -1, up,
+    draw_cpu_line(v, snapshot->lines.irq, cursor_y, line_x, -1, up,
                   "I\u0305R\u0305Q\u0305");
-    draw_cpu_line(snapshot->lines.nmi, cursor_y, line_x * 2, -1, up,
+    draw_cpu_line(v, snapshot->lines.nmi, cursor_y, line_x * 2, -1, up,
                   "N\u0305M\u0305I\u0305");
-    draw_cpu_line(snapshot->lines.reset, cursor_y, line_x * 3, -1, up,
+    draw_cpu_line(v, snapshot->lines.reset, cursor_y, line_x * 3, -1, up,
                   "R\u0305E\u0305S\u0305");
 }
 
-static void drawram(const struct console_state *snapshot)
+static void drawram(const struct view *v, const struct console_state *snapshot)
 {
     static const int
         start_x = 5, col_width = 3, toprail_start = start_x + col_width;
 
     for (int col = 0; col < 0x10; ++col) {
-        mvwprintw(RamView.win, 1, toprail_start + (col * col_width), "%X",
-                  col);
+        mvwprintw(v->win, 1, toprail_start + (col * col_width), "%X", col);
     }
-    mvwhline(RamView.win, 2, toprail_start - 1, 0,
-             getmaxx(RamView.win) - toprail_start - 5);
+    mvwhline(v->win, 2, toprail_start - 1, 0,
+             getmaxx(v->win) - toprail_start - 5);
 
-    const int h = getmaxy(RamView.content);
+    const int h = getmaxy(v->content);
     int cursor_x = start_x, cursor_y = 0;
-    mvwvline(RamView.content, 0, start_x - 2, 0, h);
-    mvwvline(RamView.content, 0, getmaxx(RamView.content) - 3, 0, h);
+    mvwvline(v->content, 0, start_x - 2, 0, h);
+    mvwvline(v->content, 0, getmaxx(v->content) - 3, 0, h);
     for (size_t page = 0; page < 8; ++page) {
         for (size_t page_row = 0; page_row < 0x10; ++page_row) {
-            mvwprintw(RamView.content, cursor_y, 0, "%02zX", page);
+            mvwprintw(v->content, cursor_y, 0, "%02zX", page);
             for (size_t page_col = 0; page_col < 0x10; ++page_col) {
                 const size_t ramidx = (page * 0x100) + (page_row * 0x10)
                                         + page_col;
-                const bool sp = page == 1 && ramidx % 0x100
-                                                == snapshot->cpu.stack_pointer;
+                const bool sp = page == 1
+                                    && ramidx % 0x100
+                                        == snapshot->cpu.stack_pointer;
                 if (sp) {
-                    wattron(RamView.content, A_STANDOUT);
+                    wattron(v->content, A_STANDOUT);
                 }
-                mvwprintw(RamView.content, cursor_y, cursor_x, "%02X",
+                mvwprintw(v->content, cursor_y, cursor_x, "%02X",
                           snapshot->mem.ram[ramidx]);
                 if (sp) {
-                    wattroff(RamView.content, A_STANDOUT);
+                    wattroff(v->content, A_STANDOUT);
                 }
                 cursor_x += col_width;
             }
-            mvwprintw(RamView.content, cursor_y, cursor_x + 2,
-                      "%zX", page_row);
+            mvwprintw(v->content, cursor_y, cursor_x + 2, "%zX", page_row);
             cursor_x = start_x;
             ++cursor_y;
         }
@@ -499,10 +505,11 @@ static void vinit(struct view *v, int h, int w, int y, int x, int vpad,
     v->inner = new_panel(v->content);
 }
 
-static void raminit(int h, int w, int y, int x)
+static void raminit(struct view *v, int h, int w, int y, int x)
 {
-    createwin(&RamView, h, w, y, x, "RAM");
-    RamView.content = newpad((h - 4) * RamSheets, w - 4);
+    createwin(v, h, w, y, x, "RAM");
+    v->content = newpad((h - 4) * RamSheets, w - 4);
+    v->inner = NULL;
 }
 
 static void vcleanup(struct view *v)
@@ -514,20 +521,20 @@ static void vcleanup(struct view *v)
     *v = (struct view){0};
 }
 
-static void ramrefresh(void)
+static void ramrefresh(const struct view *v, const struct viewstate *state)
 {
     int ram_x, ram_y, ram_w, ram_h;
-    getbegyx(RamView.win, ram_y, ram_x);
-    getmaxyx(RamView.win, ram_h, ram_w);
-    pnoutrefresh(RamView.content, (ram_h - 4) * ViewState.ramsheet, 0,
-                 ram_y + 3, ram_x + 2, ram_y + ram_h - 2, ram_x + ram_w - 2);
+    getbegyx(v->win, ram_y, ram_x);
+    getmaxyx(v->win, ram_h, ram_w);
+    pnoutrefresh(v->content, (ram_h - 4) * state->ramsheet, 0, ram_y + 3,
+                 ram_x + 2, ram_y + ram_h - 2, ram_x + ram_w - 2);
 }
 
 //
 // UI Loop Implementation
 //
 
-static void init_ui(const struct cliargs *args)
+static void init_ui(struct layout *l)
 {
     static const int
         col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 14, ctrlh = 16,
@@ -546,63 +553,60 @@ static void init_ui(const struct cliargs *args)
     const int
         yoffset = (scrh - ramh) / 2,
         xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
-    vinit(&HwView, hwh, col1w, yoffset, xoffset, 2, "Hardware Traits");
-    vinit(&ControlsView, ctrlh, col1w, yoffset + hwh, xoffset, 2, "Controls");
-    vinit(&DebuggerView, 7, col1w, yoffset + hwh + ctrlh, xoffset, 2,
+    vinit(&l->hwtraits, hwh, col1w, yoffset, xoffset, 2, "Hardware Traits");
+    vinit(&l->controls, ctrlh, col1w, yoffset + hwh, xoffset, 2, "Controls");
+    vinit(&l->debugger, 7, col1w, yoffset + hwh + ctrlh, xoffset, 2,
           "Debugger");
-    vinit(&CartView, crth, col2w, yoffset, xoffset + col1w, 2, "Cart");
-    vinit(&PrgView, ramh - crth, col2w, yoffset + crth, xoffset + col1w, 1,
+    vinit(&l->cart, crth, col2w, yoffset, xoffset + col1w, 2, "Cart");
+    vinit(&l->prg, ramh - crth, col2w, yoffset + crth, xoffset + col1w, 1,
           "PRG");
-    vinit(&RegistersView, cpuh, flagsw, yoffset, xoffset + col1w + col2w, 2,
+    vinit(&l->registers, cpuh, flagsw, yoffset, xoffset + col1w + col2w, 2,
           "Registers");
-    vinit(&FlagsView, flagsh, flagsw, yoffset + cpuh, xoffset + col1w + col2w,
-          2, "Flags");
-    vinit(&DatapathView, 13, col3w, yoffset + cpuh + flagsh,
+    vinit(&l->flags, flagsh, flagsw, yoffset + cpuh,
+          xoffset + col1w + col2w, 2, "Flags");
+    vinit(&l->datapath, 13, col3w, yoffset + cpuh + flagsh,
           xoffset + col1w + col2w, 1, "Datapath");
-    raminit(ramh, col4w, yoffset, xoffset + col1w + col2w + col3w);
-
-    ViewState.bcdsupport = args->bcdsupport;
-    ViewState.tron = args->tron;
-    initclock();
+    raminit(&l->ram, ramh, col4w, yoffset, xoffset + col1w + col2w + col3w);
 }
 
-static void tick_start(const struct console_state *snapshot)
+static void tick_start(struct runclock *c,
+                       const struct console_state *snapshot)
 {
-    clock_gettime(CLOCK_MONOTONIC, &Clock.current);
-    const double currentms = timespec_to_ms(&Clock.current);
-    Clock.frametime_ms = currentms - timespec_to_ms(&Clock.previous);
-    Clock.cyclock.runtime = (currentms - timespec_to_ms(&Clock.start))
-                                / TSU_MS_PER_S;
+    clock_gettime(CLOCK_MONOTONIC, &c->current);
+    const double currentms = timespec_to_ms(&c->current);
+    c->frametime_ms = currentms - timespec_to_ms(&c->previous);
+    c->cyclock.runtime = (currentms - timespec_to_ms(&c->start))
+                            / TSU_MS_PER_S;
 
     if (!snapshot->lines.ready) {
-        Clock.timebudget_ms = Clock.cyclock.budget = 0;
+        c->timebudget_ms = c->cyclock.budget = 0;
         return;
     }
 
-    Clock.timebudget_ms += Clock.frametime_ms;
+    c->timebudget_ms += c->frametime_ms;
     // NOTE: accumulate at most a second of banked cycle time
-    if (Clock.timebudget_ms >= TSU_MS_PER_S) {
-        Clock.timebudget_ms = TSU_MS_PER_S;
+    if (c->timebudget_ms >= TSU_MS_PER_S) {
+        c->timebudget_ms = TSU_MS_PER_S;
     }
 
-    const double mspercycle = (double)TSU_MS_PER_S
-                                / Clock.cyclock.cycles_per_sec;
-    const int new_cycles = (int)(Clock.timebudget_ms / mspercycle);
-    Clock.cyclock.budget += new_cycles;
-    Clock.timebudget_ms -= new_cycles * mspercycle;
+    const double mspercycle = (double)TSU_MS_PER_S / c->cyclock.cycles_per_sec;
+    const int new_cycles = (int)(c->timebudget_ms / mspercycle);
+    c->cyclock.budget += new_cycles;
+    c->timebudget_ms -= new_cycles * mspercycle;
 }
 
-static void tick_end(void)
+static void tick_end(struct runclock *c)
 {
-    Clock.previous = Clock.current;
-    ++Clock.cyclock.frames;
-    tick_sleep();
+    c->previous = c->current;
+    ++c->cyclock.frames;
+    tick_sleep(c);
 }
 
-static void handle_input(nes *console, const struct console_state *snapshot)
+static void handle_input(struct viewstate *s, struct runclock *c,
+                         nes *console, const struct console_state *snapshot)
 {
-    const int c = getch();
-    switch (c) {
+    const int input = getch();
+    switch (input) {
     case ' ':
         if (snapshot->lines.ready) {
             nes_halt(console);
@@ -611,23 +615,23 @@ static void handle_input(nes *console, const struct console_state *snapshot)
         }
         break;
     case '=':   // "Lowercase" +
-        ++Clock.cyclock.cycles_per_sec;
+        ++c->cyclock.cycles_per_sec;
         goto pclamp_cps;
     case '+':
-        Clock.cyclock.cycles_per_sec += 10;
+        c->cyclock.cycles_per_sec += 10;
     pclamp_cps:
-        if (Clock.cyclock.cycles_per_sec > MaxCps) {
-            Clock.cyclock.cycles_per_sec = MaxCps;
+        if (c->cyclock.cycles_per_sec > MaxCps) {
+            c->cyclock.cycles_per_sec = MaxCps;
         }
         break;
     case '-':
-        --Clock.cyclock.cycles_per_sec;
+        --c->cyclock.cycles_per_sec;
         goto nclamp_cps;
     case '_':   // "Uppercase" -
-        Clock.cyclock.cycles_per_sec -= 10;
+        c->cyclock.cycles_per_sec -= 10;
     nclamp_cps:
-        if (Clock.cyclock.cycles_per_sec < MinCps) {
-            Clock.cyclock.cycles_per_sec = MinCps;
+        if (c->cyclock.cycles_per_sec < MinCps) {
+            c->cyclock.cycles_per_sec = MinCps;
         }
         break;
     case 'i':
@@ -651,15 +655,15 @@ static void handle_input(nes *console, const struct console_state *snapshot)
         }
         break;
     case 'q':
-        ViewState.running = false;
+        s->running = false;
         break;
     case 'r':
-        ViewState.ramsheet = (ViewState.ramsheet + 1) % RamSheets;
+        s->ramsheet = (s->ramsheet + 1) % RamSheets;
         break;
     case 'R':
-        --ViewState.ramsheet;
-        if (ViewState.ramsheet < 0) {
-            ViewState.ramsheet = RamSheets - 1;
+        --s->ramsheet;
+        if (s->ramsheet < 0) {
+            s->ramsheet = RamSheets - 1;
         }
         break;
     case 's':
@@ -672,34 +676,36 @@ static void handle_input(nes *console, const struct console_state *snapshot)
     }
 }
 
-static void refresh_ui(const struct console_state *snapshot)
+static void refresh_ui(const struct layout *l, const struct viewstate *s,
+                       const struct runclock *c,
+                       const struct console_state *snapshot)
 {
-    drawhwtraits();
-    drawcontrols(snapshot);
-    drawdebugger(snapshot);
-    drawcart(snapshot);
-    drawprg(snapshot);
-    drawregister(snapshot);
-    drawflags(snapshot);
-    drawdatapath(snapshot);
-    drawram(snapshot);
+    drawhwtraits(&l->hwtraits, s, c);
+    drawcontrols(&l->controls, snapshot);
+    drawdebugger(&l->debugger, s, snapshot);
+    drawcart(&l->cart, snapshot);
+    drawprg(&l->prg, snapshot);
+    drawregister(&l->registers, snapshot);
+    drawflags(&l->flags, snapshot);
+    drawdatapath(&l->datapath, snapshot);
+    drawram(&l->ram, snapshot);
 
     update_panels();
-    ramrefresh();
+    ramrefresh(&l->ram, s);
     doupdate();
 }
 
-static void cleanup_ui(void)
+static void cleanup_ui(struct layout *l)
 {
-    vcleanup(&RamView);
-    vcleanup(&DatapathView);
-    vcleanup(&FlagsView);
-    vcleanup(&RegistersView);
-    vcleanup(&PrgView);
-    vcleanup(&CartView);
-    vcleanup(&DebuggerView);
-    vcleanup(&ControlsView);
-    vcleanup(&HwView);
+    vcleanup(&l->ram);
+    vcleanup(&l->datapath);
+    vcleanup(&l->flags);
+    vcleanup(&l->registers);
+    vcleanup(&l->prg);
+    vcleanup(&l->cart);
+    vcleanup(&l->debugger);
+    vcleanup(&l->controls);
+    vcleanup(&l->hwtraits);
 
     endwin();
 }
@@ -715,18 +721,26 @@ int ui_curses_loop(const struct cliargs *args, nes *console,
     assert(console != NULL);
     assert(snapshot != NULL);
 
-    init_ui(args);
+    struct viewstate state = {
+        .bcdsupport = args->bcdsupport,
+        .running = true,
+        .tron = args->tron,
+    };
+    struct layout layout;
+    init_ui(&layout);
+    struct runclock clock;
+    initclock(&clock);
     do {
-        tick_start(snapshot);
-        handle_input(console, snapshot);
-        if (ViewState.running) {
-            nes_cycle(console, &Clock.cyclock);
+        tick_start(&clock, snapshot);
+        handle_input(&state, &clock, console, snapshot);
+        if (state.running) {
+            nes_cycle(console, &clock.cyclock);
             nes_snapshot(console, snapshot);
-            refresh_ui(snapshot);
+            refresh_ui(&layout, &state, &clock, snapshot);
         }
-        tick_end();
-    } while (ViewState.running);
-    cleanup_ui();
+        tick_end(&clock);
+    } while (state.running);
+    cleanup_ui(&layout);
 
     return 0;
 }

@@ -147,7 +147,7 @@ int ui_batch_loop(const struct cliargs *args, nes *console,
     assert(console != NULL);
     assert(snapshot != NULL);
 
-    struct runclock clock;
+    struct runclock clock = {0};
     const int err = init_ui(&clock);
     if (err < 0) return err;
 

@@ -10,13 +10,11 @@
 
 #include <stdbool.h>
 
-struct haltarg {
-    const char *expr;       // Non-owning Pointer
-    struct haltarg *next;
-};
-
 struct cliargs {
-    struct haltarg *haltlist;
+    struct haltarg {
+        const char *expr;                           // Non-owning Pointer
+        struct haltarg *next;
+    } *haltlist;
     const char *cartfile, *chrdecode_prefix, *me;   // Non-owning Pointers
     int chrscale, resetvector;
     bool

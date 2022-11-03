@@ -16,11 +16,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-struct resdecorator {
-    struct busdevice inner;
-    uint16_t vector;
-};
-
 enum breakpointstatus {
     BPS_FREE,
     BPS_DISABLED,
@@ -29,19 +24,18 @@ enum breakpointstatus {
 
 static const ptrdiff_t NoBreakpoint = -1;
 
-struct breakpoint {
-    struct haltexpr expr;
-    enum breakpointstatus status;
-};
-
-struct breakpoint_vector {
-    size_t capacity;
-    struct breakpoint *items;
-};
-
 struct debugger_context {
-    struct resdecorator *dec;
-    struct breakpoint_vector breakpoints;
+    struct resdecorator {
+        struct busdevice inner;
+        uint16_t vector;
+    } *dec;
+    struct breakpoint_vector {
+        size_t capacity;
+        struct breakpoint {
+            struct haltexpr expr;
+            enum breakpointstatus status;
+        } *items;
+    } breakpoints;
     ptrdiff_t halted;
     int resetvector;
 };

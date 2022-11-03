@@ -13,15 +13,13 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-struct partition {
-    struct busdevice device;
-    uint16_t start;
-};
-
 struct addressbus {
     size_t count;
     uint16_t maxaddr;
-    struct partition partitions[];
+    struct partition {
+        struct busdevice device;
+        uint16_t start;
+    } partitions[];
 };
 
 static struct partition *find(struct addressbus *self, uint16_t addr)

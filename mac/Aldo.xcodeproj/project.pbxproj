@@ -41,6 +41,7 @@
 		C854873D28E685D00045BA42 /* imgui_impl_sdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C854873228E685D00045BA42 /* imgui_impl_sdl.cpp */; };
 		C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C854873328E685D00045BA42 /* imgui_draw.cpp */; };
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
+		C8561A0C29149EA600290B53 /* mediaruntime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8561A0A29149EA600290B53 /* mediaruntime.cpp */; };
 		C85C8DC625BD29AC00611D19 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
 		C85CC20927ED6BF30063276D /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C85CC20827ED6BF30063276D /* snapshot.c */; };
 		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
@@ -259,6 +260,8 @@
 		C854873328E685D00045BA42 /* imgui_draw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imgui_draw.cpp; sourceTree = "<group>"; };
 		C8557B2D25C661660090296D /* ui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ui.h; sourceTree = "<group>"; };
 		C8557B2E25C661660090296D /* ui.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ui.c; sourceTree = "<group>"; };
+		C8561A0A29149EA600290B53 /* mediaruntime.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mediaruntime.cpp; sourceTree = "<group>"; };
+		C8561A0B29149EA600290B53 /* mediaruntime.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = mediaruntime.hpp; sourceTree = "<group>"; };
 		C85C8DC425BD29AC00611D19 /* dis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dis.h; sourceTree = "<group>"; };
 		C85C8DC525BD29AC00611D19 /* dis.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dis.c; sourceTree = "<group>"; };
 		C85CC20827ED6BF30063276D /* snapshot.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = snapshot.c; sourceTree = "<group>"; };
@@ -604,6 +607,8 @@
 				C8041C3528EE6EC000A3695F /* gui.h */,
 				C8041C3628EE6EC000A3695F /* gui.c */,
 				C8041C3828EE72E600A3695F /* guiplatform.h */,
+				C8561A0B29149EA600290B53 /* mediaruntime.hpp */,
+				C8561A0A29149EA600290B53 /* mediaruntime.cpp */,
 				C88CABDD28FA4DDD00551C65 /* uisdl.hpp */,
 				C88CABDC28FA4DDD00551C65 /* uisdl.cpp */,
 			);
@@ -949,6 +954,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8041C3728EE6EC000A3695F /* gui.c in Sources */,
+				C8561A0C29149EA600290B53 /* mediaruntime.cpp in Sources */,
 				C854873828E685D00045BA42 /* imgui_impl_sdlrenderer.cpp in Sources */,
 				C830036C28DEDDD200480F29 /* main.m in Sources */,
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,

@@ -11,7 +11,8 @@
 // X(symbol, value, error string)
 #define UI_ERRCODE_X \
 X(UI_ERR_ERNO, -1, "SYSTEM ERROR") \
-X(UI_ERR_LIBINIT, -2, "LIBRARY INIT FAILURE")
+X(UI_ERR_LIBINIT, -2, "LIBRARY INIT FAILURE") \
+X(UI_ERR_UNKNOWN, -3, "UNKNOWN FAILURE")
 
 enum {
 #define X(s, v, e) s = v,

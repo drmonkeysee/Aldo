@@ -46,8 +46,9 @@ struct runclock {
 };
 
 struct viewstate {
+    const struct cliargs *args; // Non-owning Pointer
     int ramsheet;
-    bool bcdsupport, running, tron;
+    bool running;
 };
 
 static void initclock(struct runclock *c)
@@ -128,7 +129,7 @@ static void drawhwtraits(const struct view *v, const struct viewstate *s,
               c->cyclock.cycles_per_sec);
     mvwaddstr(v->content, cursor_y++, 0, "Cycles per Frame: N/A");
     mvwprintw(v->content, cursor_y, 0, "BCD Supported: %s",
-              s->bcdsupport ? "Yes" : "No");
+              s->args->bcdsupport ? "Yes" : "No");
 }
 
 static void drawtoggle(const struct view *v, const char *label, bool selected)
@@ -188,7 +189,7 @@ static void drawdebugger(const struct view *v, const struct viewstate *s,
     int cursor_y = 0;
     werase(v->content);
     mvwprintw(v->content, cursor_y++, 0, "Tracing: %s",
-              s->tron ? "On" : "Off");
+              s->args->tron ? "On" : "Off");
     mvwaddstr(v->content, cursor_y++, 0, "Reset Override: ");
     if (snapshot->debugger.resvector_override >= 0) {
         wprintw(v->content, "$%04X", snapshot->debugger.resvector_override);
@@ -721,11 +722,7 @@ int ui_curses_loop(const struct cliargs *args, nes *console,
     assert(console != NULL);
     assert(snapshot != NULL);
 
-    struct viewstate state = {
-        .bcdsupport = args->bcdsupport,
-        .running = true,
-        .tron = args->tron,
-    };
+    struct viewstate state = {.args = args, .running = true};
     struct layout layout;
     init_ui(&layout);
     struct runclock clock;

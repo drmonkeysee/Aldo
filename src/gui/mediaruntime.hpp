@@ -59,7 +59,7 @@ public:
     static int initStatus() noexcept { return InitStatus; }
 
     MediaRuntime(SDL_Point windowSize, SDL_Point screenResolution,
-                 const gui_platform& p) noexcept;
+                 const gui_platform& p);
     MediaRuntime(const MediaRuntime&) = delete;
     MediaRuntime& operator=(const MediaRuntime&) = delete;
     MediaRuntime(MediaRuntime&&) = delete;

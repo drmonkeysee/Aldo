@@ -14,6 +14,7 @@
 #include "imgui_impl_sdlrenderer.h"
 #include <SDL2/SDL.h>
 
+#include <exception>
 #include <cassert>
 
 namespace
@@ -119,18 +120,10 @@ void render_ui(const viewstate& s, const bouncer& bouncer,
     SDL_RenderPresent(ren);
 }
 
-}
-
-//
-// Public Interface
-//
-
-int aldo::ui_sdl_runloop(const struct gui_platform* platform) noexcept
+int gui_run(const gui_platform& platform)
 {
-    assert(platform != nullptr);
-
     bouncer bouncer{{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 50};
-    aldo::MediaRuntime runtime{{1280, 800}, bouncer.bounds, *platform};
+    aldo::MediaRuntime runtime{{1280, 800}, bouncer.bounds, platform};
 
     const int err = runtime.initStatus();
     if (err < 0) return err;
@@ -144,4 +137,27 @@ int aldo::ui_sdl_runloop(const struct gui_platform* platform) noexcept
         }
     } while (state.running);
     return 0;
+}
+
+}
+
+//
+// Public Interface
+//
+
+int aldo::ui_sdl_runloop(const struct gui_platform* platform) noexcept
+{
+    assert(platform != nullptr);
+
+    try {
+        return gui_run(*platform);
+    } catch (const std::exception& ex) {
+        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+                        "GUI runtime exception: %s", ex.what());
+    } catch (...) {
+        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "Unknown GUI error!");
+    }
+    const int err = aldo::MediaRuntime::initStatus();
+    if (err < 0) return err;
+    return UI_ERR_UNKNOWN;
 }

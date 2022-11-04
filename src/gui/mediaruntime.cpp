@@ -21,8 +21,9 @@ namespace
 std::string build_sdl_error(std::string_view message)
 {
     std::string errorText{message};
-    errorText += ": ";
+    errorText += " (";
     errorText += SDL_GetError();
+    errorText += ')';
     return errorText;
 }
 
@@ -110,17 +111,11 @@ aldo::DearImGuiLib::~DearImGuiLib()
 
 aldo::MediaRuntime::MediaRuntime(SDL_Point windowSize,
                                  SDL_Point screenResolution,
-                                 const gui_platform& p) noexcept
+                                 const gui_platform& p)
 try : hwin{create_window(windowSize, p)},
         hren{create_renderer(hwin, p)},
         htex{create_bouncer_texture(screenResolution, hren)},
         imgui{hwin, hren} {}
-catch (const std::exception& ex) {
-    SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "%s", ex.what());
-    InitStatus = UI_ERR_LIBINIT;
-}
 catch (...) {
-    SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-                    "Unknown GUI initialization error!");
-    InitStatus = UI_ERR_UNKNOWN;
+    InitStatus = UI_ERR_LIBINIT;
 }

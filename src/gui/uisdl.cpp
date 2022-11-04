@@ -120,14 +120,10 @@ void render_ui(viewstate& s, const bouncer& bouncer,
     SDL_RenderPresent(ren);
 }
 
-int gui_run(const gui_platform& platform)
+void gui_run(const gui_platform& platform)
 {
     bouncer bouncer{{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 50};
     aldo::MediaRuntime runtime{{1280, 800}, bouncer.bounds, platform};
-
-    const int err = runtime.initStatus();
-    if (err < 0) return err;
-
     viewstate state{true, false};
     do {
         handle_input(state);
@@ -136,7 +132,6 @@ int gui_run(const gui_platform& platform)
             render_ui(state, bouncer, runtime);
         }
     } while (state.running);
-    return 0;
 }
 
 }
@@ -150,14 +145,15 @@ int aldo::ui_sdl_runloop(const struct gui_platform* platform) noexcept
     assert(platform != nullptr);
 
     try {
-        return gui_run(*platform);
+        gui_run(*platform);
+        return 0;
     } catch (const std::exception& ex) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "GUI runtime exception: %s", ex.what());
     } catch (...) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "Unknown GUI error!");
     }
-    const int err = aldo::MediaRuntime::initStatus();
+    const auto err = aldo::MediaRuntime::initStatus();
     if (err < 0) return err;
     return UI_ERR_UNKNOWN;
 }

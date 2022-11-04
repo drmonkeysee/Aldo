@@ -88,7 +88,7 @@ void update_stuff(bouncer& bouncer) noexcept
     bouncer.pos.y += bouncer.velocity.y;
 }
 
-void render_ui(const viewstate& s, const bouncer& bouncer,
+void render_ui(viewstate& s, const bouncer& bouncer,
                const aldo::MediaRuntime& runtime) noexcept
 {
     ImGui_ImplSDLRenderer_NewFrame();
@@ -97,7 +97,7 @@ void render_ui(const viewstate& s, const bouncer& bouncer,
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Support")) {
-            ImGui::MenuItem("ImGui Demo", nullptr, &(s.showDemo));
+            ImGui::MenuItem("ImGui Demo", nullptr, &s.showDemo);
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();

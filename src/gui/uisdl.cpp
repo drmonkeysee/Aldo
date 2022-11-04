@@ -29,7 +29,7 @@ struct bouncer {
     int halfdim;
 };
 
-void render_bouncer(const bouncer& bouncer,
+auto render_bouncer(const bouncer& bouncer,
                     const aldo::MediaRuntime& runtime) noexcept
 {
     const auto ren = runtime.renderer();
@@ -59,10 +59,10 @@ void render_bouncer(const bouncer& bouncer,
 }
 
 //
-// UI Interface Implementation
+// UI Loop Implementation
 //
 
-void handle_input(viewstate& s) noexcept
+auto handle_input(viewstate& s) noexcept
 {
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
@@ -73,7 +73,7 @@ void handle_input(viewstate& s) noexcept
     }
 }
 
-void update_stuff(bouncer& bouncer) noexcept
+auto update_stuff(bouncer& bouncer) noexcept
 {
     if (bouncer.pos.x - bouncer.halfdim < 0
         || bouncer.pos.x + bouncer.halfdim > bouncer.bounds.x) {
@@ -87,7 +87,7 @@ void update_stuff(bouncer& bouncer) noexcept
     bouncer.pos.y += bouncer.velocity.y;
 }
 
-void render_ui(viewstate& s, const bouncer& bouncer,
+auto render_ui(viewstate& s, const bouncer& bouncer,
                const aldo::MediaRuntime& runtime) noexcept
 {
     ImGui_ImplSDLRenderer_NewFrame();
@@ -119,7 +119,7 @@ void render_ui(viewstate& s, const bouncer& bouncer,
     SDL_RenderPresent(ren);
 }
 
-void gui_run(const gui_platform& platform)
+auto gui_run(const gui_platform& platform)
 {
     bouncer bouncer{{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 25};
     aldo::MediaRuntime runtime{{1280, 800}, bouncer.bounds, platform};

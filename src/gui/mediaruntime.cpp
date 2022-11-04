@@ -18,7 +18,7 @@
 namespace
 {
 
-std::string build_sdl_error(std::string_view message)
+auto build_sdl_error(std::string_view message)
 {
     std::string errorText{message};
     errorText += " (";
@@ -27,7 +27,7 @@ std::string build_sdl_error(std::string_view message)
     return errorText;
 }
 
-SDL_Window* create_window(SDL_Point windowSize, const gui_platform& p)
+auto create_window(SDL_Point windowSize, const gui_platform& p)
 {
     const auto hidpi = p.is_hidpi();
     SDL_Log("HIDPI: %d", hidpi);
@@ -41,8 +41,7 @@ SDL_Window* create_window(SDL_Point windowSize, const gui_platform& p)
     return win;
 }
 
-SDL_Renderer* create_renderer(const aldo::win_handle& hwin,
-                              const gui_platform& p)
+auto create_renderer(const aldo::win_handle& hwin, const gui_platform& p)
 {
     const auto ren = SDL_CreateRenderer(hwin.get(), -1,
                                         SDL_RENDERER_ACCELERATED
@@ -59,8 +58,8 @@ SDL_Renderer* create_renderer(const aldo::win_handle& hwin,
     return ren;
 }
 
-SDL_Texture* create_bouncer_texture(SDL_Point screenResolution,
-                                    const aldo::ren_handle& hren)
+auto create_bouncer_texture(SDL_Point screenResolution,
+                            const aldo::ren_handle& hren)
 {
     const auto tex = SDL_CreateTexture(hren.get(), SDL_PIXELFORMAT_RGBA8888,
                                        SDL_TEXTUREACCESS_TARGET,

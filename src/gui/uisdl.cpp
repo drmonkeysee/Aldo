@@ -26,7 +26,7 @@ struct viewstate {
 
 struct bouncer {
     SDL_Point bounds, pos, velocity;
-    int dim;
+    int halfdim;
 };
 
 void render_bouncer(const bouncer& bouncer,
@@ -42,12 +42,12 @@ void render_bouncer(const bouncer& bouncer,
     SDL_RenderDrawLine(ren, 30, 7, 50, 200);
 
     SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
-    const int halfDim = bouncer.dim / 2;
+    const auto fulldim = bouncer.halfdim * 2;
     const SDL_Rect pos{
-        bouncer.pos.x - halfDim,
-        bouncer.pos.y - halfDim,
-        bouncer.dim,
-        bouncer.dim,
+        bouncer.pos.x - bouncer.halfdim,
+        bouncer.pos.y - bouncer.halfdim,
+        fulldim,
+        fulldim,
     };
     SDL_RenderFillRect(ren, &pos);
     SDL_SetRenderTarget(ren, nullptr);
@@ -75,13 +75,12 @@ void handle_input(viewstate& s) noexcept
 
 void update_stuff(bouncer& bouncer) noexcept
 {
-    const int halfdim = bouncer.dim / 2;
-    if (bouncer.pos.x - halfdim < 0
-        || bouncer.pos.x + halfdim > bouncer.bounds.x) {
+    if (bouncer.pos.x - bouncer.halfdim < 0
+        || bouncer.pos.x + bouncer.halfdim > bouncer.bounds.x) {
         bouncer.velocity.x *= -1;
     }
-    if (bouncer.pos.y - halfdim < 0
-        || bouncer.pos.y + halfdim > bouncer.bounds.y) {
+    if (bouncer.pos.y - bouncer.halfdim < 0
+        || bouncer.pos.y + bouncer.halfdim > bouncer.bounds.y) {
         bouncer.velocity.y *= -1;
     }
     bouncer.pos.x += bouncer.velocity.x;
@@ -122,7 +121,7 @@ void render_ui(viewstate& s, const bouncer& bouncer,
 
 void gui_run(const gui_platform& platform)
 {
-    bouncer bouncer{{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 50};
+    bouncer bouncer{{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 25};
     aldo::MediaRuntime runtime{{1280, 800}, bouncer.bounds, platform};
     viewstate state{true, false};
     do {

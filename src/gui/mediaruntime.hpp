@@ -31,7 +31,7 @@ using tex_handle
 
 class SdlError final : public std::runtime_error {
 public:
-    SdlError(std::string_view message);
+    explicit SdlError(std::string_view message);
 };
 
 class SdlLib final {

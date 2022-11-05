@@ -29,6 +29,13 @@ struct bouncer {
     int halfdim;
 };
 
+auto start_renderframe() noexcept
+{
+    ImGui_ImplSDLRenderer_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
+}
+
 auto render_bouncer(const bouncer& bouncer,
                     const aldo::MediaRuntime& runtime) noexcept
 {
@@ -56,6 +63,15 @@ auto render_bouncer(const bouncer& bouncer,
     const ImVec2 sz{(float)bouncer.bounds.x, (float)bouncer.bounds.y};
     ImGui::Image(tex, sz);
     ImGui::End();
+}
+
+auto end_renderframe(SDL_Renderer* ren)
+{
+    ImGui::Render();
+    SDL_SetRenderDrawColor(ren, 0x1e, 0x1e, 0x1e, SDL_ALPHA_OPAQUE);
+    SDL_RenderClear(ren);
+    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+    SDL_RenderPresent(ren);
 }
 
 //
@@ -90,33 +106,28 @@ auto update_stuff(bouncer& bouncer) noexcept
 auto render_ui(viewstate& s, const bouncer& bouncer,
                const aldo::MediaRuntime& runtime) noexcept
 {
-    ImGui_ImplSDLRenderer_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
-    ImGui::NewFrame();
+    start_renderframe();
 
     if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("Support")) {
+        if (ImGui::BeginMenu("Aldo")) {
+            ImGui::MenuItem("About");
             ImGui::MenuItem("ImGui Demo", nullptr, &s.showDemo);
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("File")) {
+            ImGui::MenuItem("Open");
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
     }
 
+    render_bouncer(bouncer, runtime);
+
     if (s.showDemo) {
         ImGui::ShowDemoWindow();
     }
-    ImGui::Begin("First Window");
-    ImGui::Text("Hello From Aldo+Dear ImGui");
-    ImGui::End();
 
-    render_bouncer(bouncer, runtime);
-
-    const auto ren = runtime.renderer();
-    ImGui::Render();
-    SDL_SetRenderDrawColor(ren, 0x1e, 0x1e, 0x1e, SDL_ALPHA_OPAQUE);
-    SDL_RenderClear(ren);
-    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-    SDL_RenderPresent(ren);
+    end_renderframe(runtime.renderer());
 }
 
 auto gui_run(const gui_platform& platform)

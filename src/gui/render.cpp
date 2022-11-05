@@ -36,6 +36,19 @@ aldo::RenderFrame::~RenderFrame()
 
 void aldo::RenderFrame::render() const noexcept
 {
+    renderMainMenu();
+    renderBouncer();
+    if (state.showDemo) {
+        ImGui::ShowDemoWindow();
+    }
+}
+
+//
+// Private Interface
+//
+
+void aldo::RenderFrame::renderMainMenu() const noexcept
+{
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Aldo")) {
             ImGui::MenuItem("About");
@@ -49,17 +62,7 @@ void aldo::RenderFrame::render() const noexcept
         }
         ImGui::EndMainMenuBar();
     }
-
-    renderBouncer();
-
-    if (state.showDemo) {
-        ImGui::ShowDemoWindow();
-    }
 }
-
-//
-// Private Interface
-//
 
 void aldo::RenderFrame::renderBouncer() const noexcept
 {

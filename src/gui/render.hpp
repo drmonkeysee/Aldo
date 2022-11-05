@@ -27,6 +27,7 @@ public:
     void render() const noexcept;
 
 private:
+    void renderMainMenu() const noexcept;
     void renderBouncer() const noexcept;
 
     viewstate& state;

@@ -5,14 +5,14 @@
 //  Created by Brandon Stansbury on 10/14/22.
 //
 
-#include "mediaruntime.hpp"
-#include "ui.h"
 #include "uisdl.hpp"
+
+#include "mediaruntime.hpp"
+#include "render.hpp"
+#include "ui.h"
 #include "viewstate.hpp"
 
-#include "imgui.h"
 #include "imgui_impl_sdl.h"
-#include "imgui_impl_sdlrenderer.h"
 #include <SDL2/SDL.h>
 
 #include <exception>
@@ -20,51 +20,6 @@
 
 namespace
 {
-
-auto start_renderframe() noexcept
-{
-    ImGui_ImplSDLRenderer_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
-    ImGui::NewFrame();
-}
-
-auto render_bouncer(const aldo::viewstate& s,
-                    const aldo::MediaRuntime& runtime) noexcept
-{
-    const auto ren = runtime.renderer();
-    const auto tex = runtime.bouncerTexture();
-    SDL_SetRenderTarget(ren, tex);
-    SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff,SDL_ALPHA_OPAQUE);
-    SDL_RenderClear(ren);
-
-    SDL_SetRenderDrawColor(ren, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
-    SDL_RenderDrawLine(ren, 30, 7, 50, 200);
-
-    SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
-    const auto fulldim = s.bouncer.halfdim * 2;
-    const SDL_Rect pos{
-        s.bouncer.pos.x - s.bouncer.halfdim,
-        s.bouncer.pos.y - s.bouncer.halfdim,
-        fulldim,
-        fulldim,
-    };
-    SDL_RenderFillRect(ren, &pos);
-    SDL_SetRenderTarget(ren, nullptr);
-
-    ImGui::Begin("Bouncer");
-    const ImVec2 sz{(float)s.bouncer.bounds.x, (float)s.bouncer.bounds.y};
-    ImGui::Image(tex, sz);
-    ImGui::End();
-}
-
-auto end_renderframe(SDL_Renderer* ren)
-{
-    ImGui::Render();
-    SDL_SetRenderDrawColor(ren, 0x1e, 0x1e, 0x1e, SDL_ALPHA_OPAQUE);
-    SDL_RenderClear(ren);
-    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-    SDL_RenderPresent(ren);
-}
 
 //
 // UI Loop Implementation
@@ -97,29 +52,8 @@ auto update_stuff(aldo::viewstate& s) noexcept
 
 auto render_ui(aldo::viewstate& s, const aldo::MediaRuntime& runtime) noexcept
 {
-    start_renderframe();
-
-    if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("Aldo")) {
-            ImGui::MenuItem("About");
-            ImGui::MenuItem("ImGui Demo", nullptr, &s.showDemo);
-            ImGui::MenuItem("Quit");
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("File")) {
-            ImGui::MenuItem("Open");
-            ImGui::EndMenu();
-        }
-        ImGui::EndMainMenuBar();
-    }
-
-    render_bouncer(s, runtime);
-
-    if (s.showDemo) {
-        ImGui::ShowDemoWindow();
-    }
-
-    end_renderframe(runtime.renderer());
+    aldo::RenderFrame frame{s, runtime};
+    frame.render();
 }
 
 auto gui_run(const gui_platform& platform)

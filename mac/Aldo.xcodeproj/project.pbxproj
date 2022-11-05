@@ -125,6 +125,7 @@
 		C8DC9CB428DFD5BA000D8D97 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; };
 		C8DC9CB528DFD5BA000D8D97 /* SDL2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C8E76BAA285985CE004C1479 /* Commands.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E76BA9285985CE004C1479 /* Commands.swift */; };
+		C8EC72202916150700DF750A /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8EC721E2916150700DF750A /* render.cpp */; };
 		C8F2985B2810ECEF00ECFD7E /* CStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F2985A2810ECEF00ECFD7E /* CStream.swift */; };
 		C8FB31D12803D6EC00E6B0EF /* AldoError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8FB31D02803D6EC00E6B0EF /* AldoError.swift */; };
 /* End PBXBuildFile section */
@@ -330,6 +331,9 @@
 		C8DC9CB828DFE5B4000D8D97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C8E76BA9285985CE004C1479 /* Commands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Commands.swift; sourceTree = "<group>"; };
 		C8E9478128FE45EA0073D1AA /* ctrlsignal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ctrlsignal.h; sourceTree = "<group>"; };
+		C8EC721E2916150700DF750A /* render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = render.cpp; sourceTree = "<group>"; };
+		C8EC721F2916150700DF750A /* render.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = render.hpp; sourceTree = "<group>"; };
+		C8EC7222291615AB00DF750A /* viewstate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = viewstate.hpp; sourceTree = "<group>"; };
 		C8F2985A2810ECEF00ECFD7E /* CStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CStream.swift; sourceTree = "<group>"; };
 		C8F617A228F7B62A0086A34C /* cartinfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cartinfo.h; sourceTree = "<group>"; };
 		C8FB31D02803D6EC00E6B0EF /* AldoError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoError.swift; sourceTree = "<group>"; };
@@ -609,8 +613,11 @@
 				C8041C3828EE72E600A3695F /* guiplatform.h */,
 				C8561A0B29149EA600290B53 /* mediaruntime.hpp */,
 				C8561A0A29149EA600290B53 /* mediaruntime.cpp */,
+				C8EC721F2916150700DF750A /* render.hpp */,
+				C8EC721E2916150700DF750A /* render.cpp */,
 				C88CABDD28FA4DDD00551C65 /* uisdl.hpp */,
 				C88CABDC28FA4DDD00551C65 /* uisdl.cpp */,
+				C8EC7222291615AB00DF750A /* viewstate.hpp */,
 			);
 			path = gui;
 			sourceTree = "<group>";
@@ -959,6 +966,7 @@
 				C830036C28DEDDD200480F29 /* main.m in Sources */,
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,
 				C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */,
+				C8EC72202916150700DF750A /* render.cpp in Sources */,
 				C854873D28E685D00045BA42 /* imgui_impl_sdl.cpp in Sources */,
 				C854873B28E685D00045BA42 /* imgui_tables.cpp in Sources */,
 				C854873C28E685D00045BA42 /* imgui_demo.cpp in Sources */,

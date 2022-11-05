@@ -8,6 +8,7 @@
 #include "mediaruntime.hpp"
 #include "ui.h"
 #include "uisdl.hpp"
+#include "viewstate.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -20,15 +21,6 @@
 namespace
 {
 
-struct viewstate {
-    bool running, showDemo;
-};
-
-struct bouncer {
-    SDL_Point bounds, pos, velocity;
-    int halfdim;
-};
-
 auto start_renderframe() noexcept
 {
     ImGui_ImplSDLRenderer_NewFrame();
@@ -36,7 +28,7 @@ auto start_renderframe() noexcept
     ImGui::NewFrame();
 }
 
-auto render_bouncer(const bouncer& bouncer,
+auto render_bouncer(const aldo::viewstate& s,
                     const aldo::MediaRuntime& runtime) noexcept
 {
     const auto ren = runtime.renderer();
@@ -49,10 +41,10 @@ auto render_bouncer(const bouncer& bouncer,
     SDL_RenderDrawLine(ren, 30, 7, 50, 200);
 
     SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
-    const auto fulldim = bouncer.halfdim * 2;
+    const auto fulldim = s.bouncer.halfdim * 2;
     const SDL_Rect pos{
-        bouncer.pos.x - bouncer.halfdim,
-        bouncer.pos.y - bouncer.halfdim,
+        s.bouncer.pos.x - s.bouncer.halfdim,
+        s.bouncer.pos.y - s.bouncer.halfdim,
         fulldim,
         fulldim,
     };
@@ -60,7 +52,7 @@ auto render_bouncer(const bouncer& bouncer,
     SDL_SetRenderTarget(ren, nullptr);
 
     ImGui::Begin("Bouncer");
-    const ImVec2 sz{(float)bouncer.bounds.x, (float)bouncer.bounds.y};
+    const ImVec2 sz{(float)s.bouncer.bounds.x, (float)s.bouncer.bounds.y};
     ImGui::Image(tex, sz);
     ImGui::End();
 }
@@ -78,7 +70,7 @@ auto end_renderframe(SDL_Renderer* ren)
 // UI Loop Implementation
 //
 
-auto handle_input(viewstate& s) noexcept
+auto handle_input(aldo::viewstate& s) noexcept
 {
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
@@ -89,22 +81,21 @@ auto handle_input(viewstate& s) noexcept
     }
 }
 
-auto update_stuff(bouncer& bouncer) noexcept
+auto update_stuff(aldo::viewstate& s) noexcept
 {
-    if (bouncer.pos.x - bouncer.halfdim < 0
-        || bouncer.pos.x + bouncer.halfdim > bouncer.bounds.x) {
-        bouncer.velocity.x *= -1;
+    if (s.bouncer.pos.x - s.bouncer.halfdim < 0
+        || s.bouncer.pos.x + s.bouncer.halfdim > s.bouncer.bounds.x) {
+        s.bouncer.velocity.x *= -1;
     }
-    if (bouncer.pos.y - bouncer.halfdim < 0
-        || bouncer.pos.y + bouncer.halfdim > bouncer.bounds.y) {
-        bouncer.velocity.y *= -1;
+    if (s.bouncer.pos.y - s.bouncer.halfdim < 0
+        || s.bouncer.pos.y + s.bouncer.halfdim > s.bouncer.bounds.y) {
+        s.bouncer.velocity.y *= -1;
     }
-    bouncer.pos.x += bouncer.velocity.x;
-    bouncer.pos.y += bouncer.velocity.y;
+    s.bouncer.pos.x += s.bouncer.velocity.x;
+    s.bouncer.pos.y += s.bouncer.velocity.y;
 }
 
-auto render_ui(viewstate& s, const bouncer& bouncer,
-               const aldo::MediaRuntime& runtime) noexcept
+auto render_ui(aldo::viewstate& s, const aldo::MediaRuntime& runtime) noexcept
 {
     start_renderframe();
 
@@ -112,6 +103,7 @@ auto render_ui(viewstate& s, const bouncer& bouncer,
         if (ImGui::BeginMenu("Aldo")) {
             ImGui::MenuItem("About");
             ImGui::MenuItem("ImGui Demo", nullptr, &s.showDemo);
+            ImGui::MenuItem("Quit");
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("File")) {
@@ -121,7 +113,7 @@ auto render_ui(viewstate& s, const bouncer& bouncer,
         ImGui::EndMainMenuBar();
     }
 
-    render_bouncer(bouncer, runtime);
+    render_bouncer(s, runtime);
 
     if (s.showDemo) {
         ImGui::ShowDemoWindow();
@@ -132,14 +124,17 @@ auto render_ui(viewstate& s, const bouncer& bouncer,
 
 auto gui_run(const gui_platform& platform)
 {
-    bouncer bouncer{{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 25};
-    aldo::MediaRuntime runtime{{1280, 800}, bouncer.bounds, platform};
-    viewstate state{true, false};
+    aldo::viewstate state{
+        {{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 25},
+        true,
+        false,
+    };
+    aldo::MediaRuntime runtime{{1280, 800}, state.bouncer.bounds, platform};
     do {
         handle_input(state);
         if (state.running) {
-            update_stuff(bouncer);
-            render_ui(state, bouncer, runtime);
+            update_stuff(state);
+            render_ui(state, runtime);
         }
     } while (state.running);
 }

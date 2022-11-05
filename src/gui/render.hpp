@@ -17,6 +17,7 @@ namespace aldo
 class RenderFrame final {
 public:
     RenderFrame(viewstate& s, const MediaRuntime& r) noexcept;
+    RenderFrame(viewstate& s, MediaRuntime&& r) = delete;
     RenderFrame(const RenderFrame&) = delete;
     RenderFrame& operator=(const RenderFrame&) = delete;
     RenderFrame(RenderFrame&&) = delete;

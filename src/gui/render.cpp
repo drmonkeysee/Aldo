@@ -99,19 +99,19 @@ void aldo::RenderFrame::renderBouncer() const noexcept
 void aldo::RenderFrame::renderCpu() const noexcept
 {
     static constexpr char flags[] = {'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C'};
-    static constexpr size_t flagsLength = sizeof flags;
+    static constexpr size_t flagsLength = (sizeof flags) - 1;
 
     if (ImGui::Begin("CPU")) {
         if (ImGui::CollapsingHeader("Registers")) {
             ImGui::BeginGroup();
             {
-                ImGui::TextUnformatted(" A:");
+                ImGui::TextUnformatted("A:");
                 ImGui::SameLine();
                 ImGui::TextUnformatted("FF");
-                ImGui::TextUnformatted(" X:");
+                ImGui::TextUnformatted("X:");
                 ImGui::SameLine();
                 ImGui::TextUnformatted("FF");
-                ImGui::TextUnformatted(" Y:");
+                ImGui::TextUnformatted("Y:");
                 ImGui::SameLine();
                 ImGui::TextUnformatted("FF");
             }
@@ -132,15 +132,24 @@ void aldo::RenderFrame::renderCpu() const noexcept
             ImGui::EndGroup();
         }
         if (ImGui::CollapsingHeader("Flags")) {
-            for (ptrdiff_t i = flagsLength - 1; i >= 0; --i) {
+            for (ptrdiff_t i = flagsLength; i >= 0; --i) {
                 ImGui::Text("%td", i);
-                ImGui::SameLine();
+                if (i > 0) {
+                    ImGui::SameLine();
+                }
             }
-            ImGui::NewLine();
             for (auto c : flags) {
                 ImGui::Text("%c", c);
-                ImGui::SameLine();
+                if (c != flags[flagsLength]) {
+                    ImGui::SameLine();
+                }
             }
+            const auto drawList = ImGui::GetWindowDrawList();
+            const auto pos = ImGui::GetCursorScreenPos();
+            const auto fontSz = ImGui::GetFontSize();
+            const ImVec2 center{pos.x + 20, pos.y + 10};
+            drawList->AddCircleFilled(center, 10, IM_COL32(255, 255, 0, 255));
+            drawList->AddText({center.x - (fontSz / 4), center.y - (fontSz / 2)}, IM_COL32_BLACK, "N");
         }
     }
     ImGui::End();

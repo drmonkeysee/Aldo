@@ -29,6 +29,7 @@ public:
 private:
     void renderMainMenu() const noexcept;
     void renderBouncer() const noexcept;
+    void renderCpu() const noexcept;
 
     viewstate& state;
     const MediaRuntime& runtime;

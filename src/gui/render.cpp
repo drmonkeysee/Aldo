@@ -38,6 +38,7 @@ void aldo::RenderFrame::render() const noexcept
 {
     renderMainMenu();
     renderBouncer();
+    renderCpu();
     if (state.showDemo) {
         ImGui::ShowDemoWindow();
     }
@@ -66,30 +67,81 @@ void aldo::RenderFrame::renderMainMenu() const noexcept
 
 void aldo::RenderFrame::renderBouncer() const noexcept
 {
-    const auto ren = runtime.renderer();
-    const auto tex = runtime.bouncerTexture();
-    SDL_SetRenderTarget(ren, tex);
-    SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff,SDL_ALPHA_OPAQUE);
-    SDL_RenderClear(ren);
+    if (ImGui::Begin("Bouncer")) {
+        const auto ren = runtime.renderer();
+        const auto tex = runtime.bouncerTexture();
+        SDL_SetRenderTarget(ren, tex);
+        SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff,SDL_ALPHA_OPAQUE);
+        SDL_RenderClear(ren);
 
-    SDL_SetRenderDrawColor(ren, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
-    SDL_RenderDrawLine(ren, 30, 7, 50, 200);
+        SDL_SetRenderDrawColor(ren, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
+        SDL_RenderDrawLine(ren, 30, 7, 50, 200);
 
-    SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
+        SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
 
-    const auto& bouncer = state.bouncer;
-    const auto fulldim = bouncer.halfdim * 2;
-    const SDL_Rect pos{
-        bouncer.pos.x - bouncer.halfdim,
-        bouncer.pos.y - bouncer.halfdim,
-        fulldim,
-        fulldim,
-    };
-    SDL_RenderFillRect(ren, &pos);
-    SDL_SetRenderTarget(ren, nullptr);
+        const auto& bouncer = state.bouncer;
+        const auto fulldim = bouncer.halfdim * 2;
+        const SDL_Rect pos{
+            bouncer.pos.x - bouncer.halfdim,
+            bouncer.pos.y - bouncer.halfdim,
+            fulldim,
+            fulldim,
+        };
+        SDL_RenderFillRect(ren, &pos);
+        SDL_SetRenderTarget(ren, nullptr);
 
-    ImGui::Begin("Bouncer");
-    const ImVec2 sz{(float)bouncer.bounds.x, (float)bouncer.bounds.y};
-    ImGui::Image(tex, sz);
+        const ImVec2 sz{(float)bouncer.bounds.x, (float)bouncer.bounds.y};
+        ImGui::Image(tex, sz);
+    }
+    ImGui::End();
+}
+
+void aldo::RenderFrame::renderCpu() const noexcept
+{
+    static constexpr char flags[] = {'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C'};
+    static constexpr size_t flagsLength = sizeof flags;
+
+    if (ImGui::Begin("CPU")) {
+        if (ImGui::CollapsingHeader("Registers")) {
+            ImGui::BeginGroup();
+            {
+                ImGui::TextUnformatted(" A:");
+                ImGui::SameLine();
+                ImGui::TextUnformatted("FF");
+                ImGui::TextUnformatted(" X:");
+                ImGui::SameLine();
+                ImGui::TextUnformatted("FF");
+                ImGui::TextUnformatted(" Y:");
+                ImGui::SameLine();
+                ImGui::TextUnformatted("FF");
+            }
+            ImGui::EndGroup();
+            ImGui::SameLine(100);
+            ImGui::BeginGroup();
+            {
+                ImGui::TextUnformatted("PC:");
+                ImGui::SameLine();
+                ImGui::TextUnformatted("FFFF");
+                ImGui::TextUnformatted(" S:");
+                ImGui::SameLine();
+                ImGui::TextUnformatted("FF");
+                ImGui::TextUnformatted(" P:");
+                ImGui::SameLine();
+                ImGui::TextUnformatted("FF");
+            }
+            ImGui::EndGroup();
+        }
+        if (ImGui::CollapsingHeader("Flags")) {
+            for (ptrdiff_t i = flagsLength - 1; i >= 0; --i) {
+                ImGui::Text("%td", i);
+                ImGui::SameLine();
+            }
+            ImGui::NewLine();
+            for (auto c : flags) {
+                ImGui::Text("%c", c);
+                ImGui::SameLine();
+            }
+        }
+    }
     ImGui::End();
 }

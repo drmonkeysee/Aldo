@@ -37,7 +37,7 @@ final class Cart: ObservableObject {
         guard let h = handle else { return noCart }
 
         return await readCStream {
-            cart_write_info(h.unwrapped, self.fileName, $0, true)
+            cart_write_info(h.unwrapped, true, $0)
         }
     }
 
@@ -51,10 +51,10 @@ final class Cart: ObservableObject {
 
         return await readCStream { stream in
             try n.withCString { cartFile in
-                var appstate = control()
+                var appstate = cliargs()
                 appstate.cartfile = cartFile
-                appstate.unified_disoutput = true
-                let err = dis_cart_prg(h.unwrapped, &appstate, stream)
+                //appstate.unified_disoutput = true
+                let err = dis_cart_prg(h.unwrapped, false, true, stream)
                 if err < 0 { throw AldoError.wrapDisError(code: err) }
             }
         }
@@ -78,11 +78,11 @@ final class Cart: ObservableObject {
         return await readCStream { stream in
             let prefix = "\(folder.appendingPathComponent(n).path)-chr"
             try prefix.withCString { chrprefix in
-                var appstate = control()
+                var appstate = cliargs()
                 appstate.chrdecode_prefix = chrprefix
                 appstate.chrscale = Int32(scale)
                 errno = 0
-                let err = dis_cart_chr(h.unwrapped, &appstate, stream)
+                let err = dis_cart_chr(h.unwrapped, appstate.chrscale, appstate.chrdecode_prefix, stream)
                 if err < 0 {
                     if err == DIS_ERR_ERNO {
                         throw AldoError.ioErrno

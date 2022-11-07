@@ -11,6 +11,9 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_sdlrenderer.h"
 
+#include <cstddef>
+#include <cstdint>
+
 //
 // Public Interface
 //
@@ -98,9 +101,6 @@ void aldo::RenderFrame::renderBouncer() const noexcept
 
 void aldo::RenderFrame::renderCpu() const noexcept
 {
-    static constexpr char flags[] = {'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C'};
-    static constexpr size_t flagsLength = (sizeof flags) - 1;
-
     if (ImGui::Begin("CPU")) {
         if (ImGui::CollapsingHeader("Registers")) {
             ImGui::BeginGroup();
@@ -131,25 +131,39 @@ void aldo::RenderFrame::renderCpu() const noexcept
             }
             ImGui::EndGroup();
         }
+
+        static constexpr char flags[] = {
+            'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
+        };
+        static constexpr auto
+            flagOn = IM_COL32(255, 255, 0, 255),
+            flagOff = IM_COL32(67, 57, 54, 255),
+            textOn = IM_COL32_BLACK,
+            textOff = IM_COL32_WHITE;
+        static constexpr auto radius = 10.0f;
+        static constexpr std::uint8_t status = 0x34;
         if (ImGui::CollapsingHeader("Flags")) {
-            for (ptrdiff_t i = flagsLength; i >= 0; --i) {
-                ImGui::Text("%td", i);
-                if (i > 0) {
-                    ImGui::SameLine();
-                }
-            }
-            for (auto c : flags) {
-                ImGui::Text("%c", c);
-                if (c != flags[flagsLength]) {
-                    ImGui::SameLine();
-                }
-            }
-            const auto drawList = ImGui::GetWindowDrawList();
             const auto pos = ImGui::GetCursorScreenPos();
-            const auto fontSz = ImGui::GetFontSize();
-            const ImVec2 center{pos.x + 20, pos.y + 10};
-            drawList->AddCircleFilled(center, 10, IM_COL32(255, 255, 0, 255));
-            drawList->AddText({center.x - (fontSz / 4), center.y - (fontSz / 2)}, IM_COL32_BLACK, "N");
+            ImVec2 center{pos.x + radius, pos.y + radius};
+            const auto
+                fontSz = ImGui::GetFontSize(),
+                xOffset = fontSz / 4,
+                yOffset = fontSz / 2;
+            const auto drawList = ImGui::GetWindowDrawList();
+            for (std::size_t i = 0; i < sizeof flags; ++i) {
+                ImU32 fill, text;
+                if (status & (1 << (sizeof flags - 1 - i))) {
+                    fill = flagOn;
+                    text = textOn;
+                } else {
+                    fill = flagOff;
+                    text = textOff;
+                }
+                drawList->AddCircleFilled(center, radius, fill);
+                drawList->AddText({center.x - xOffset, center.y - yOffset},
+                                  text, flags + i, flags + i + 1);
+                center.x += 25;
+            }
         }
     }
     ImGui::End();

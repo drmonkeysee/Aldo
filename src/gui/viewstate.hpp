@@ -18,7 +18,7 @@ struct viewstate {
         SDL_Point bounds, pos, velocity;
         int halfdim;
     } bouncer;
-    bool running, showDemo;
+    bool running = true, showBouncer = true, showCpu = true, showDemo = false;
 };
 
 }

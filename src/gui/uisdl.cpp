@@ -60,8 +60,6 @@ auto gui_run(const gui_platform& platform)
 {
     aldo::viewstate state{
         {{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 25},
-        true,
-        false,
     };
     aldo::MediaRuntime runtime{{1280, 800}, state.bouncer.bounds, platform};
     do {

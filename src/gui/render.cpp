@@ -13,6 +13,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 
 //
 // Public Interface
@@ -57,11 +58,18 @@ void aldo::RenderFrame::renderMainMenu() const noexcept
         if (ImGui::BeginMenu("Aldo")) {
             ImGui::MenuItem("About");
             ImGui::MenuItem("ImGui Demo", nullptr, &state.showDemo);
-            ImGui::MenuItem("Quit");
+            if (ImGui::MenuItem("Quit", "Cmd+Q")) {
+                state.running = false;
+            };
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("File")) {
             ImGui::MenuItem("Open");
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Window")) {
+            ImGui::MenuItem("Bouncer", nullptr, &state.showBouncer);
+            ImGui::MenuItem("CPU", nullptr, &state.showCpu);
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
@@ -70,7 +78,9 @@ void aldo::RenderFrame::renderMainMenu() const noexcept
 
 void aldo::RenderFrame::renderBouncer() const noexcept
 {
-    if (ImGui::Begin("Bouncer")) {
+    if (!state.showBouncer) return;
+
+    if (ImGui::Begin("Bouncer", &state.showBouncer)) {
         const auto ren = runtime.renderer();
         const auto tex = runtime.bouncerTexture();
         SDL_SetRenderTarget(ren, tex);
@@ -101,7 +111,9 @@ void aldo::RenderFrame::renderBouncer() const noexcept
 
 void aldo::RenderFrame::renderCpu() const noexcept
 {
-    if (ImGui::Begin("CPU")) {
+    if (!state.showCpu) return;
+
+    if (ImGui::Begin("CPU", &state.showCpu)) {
         if (ImGui::CollapsingHeader("Registers")) {
             ImGui::BeginGroup();
             {
@@ -116,7 +128,7 @@ void aldo::RenderFrame::renderCpu() const noexcept
                 ImGui::TextUnformatted("FF");
             }
             ImGui::EndGroup();
-            ImGui::SameLine(100);
+            ImGui::SameLine(125);
             ImGui::BeginGroup();
             {
                 ImGui::TextUnformatted("PC:");
@@ -164,6 +176,27 @@ void aldo::RenderFrame::renderCpu() const noexcept
                                   text, flags + i, flags + i + 1);
                 center.x += 25;
             }
+            ImGui::Dummy({radius * 2, radius * 2});
+        }
+
+        if (ImGui::CollapsingHeader("PRG @ PC")) {
+            static int selected = -1;
+            char buf[28];
+            std::uint16_t addr = 0x804f;
+            for (int i = 0; i < 7; ++i) {
+                std::snprintf(buf, sizeof buf, "%04X: FF FF FF *ISC $FFFF,X",
+                              addr);
+                if (ImGui::Selectable(buf, selected == i)) {
+                    selected = i;
+                }
+                addr += 3;
+            }
+        }
+
+        if (ImGui::CollapsingHeader("Vectors")) {
+            ImGui::TextUnformatted("FFFA: 04 80     NMI $8004");
+            ImGui::TextUnformatted("FFFC: 00 80     RES $8000");
+            ImGui::TextUnformatted("FFFE: 04 80     IRQ $8004");
         }
     }
     ImGui::End();

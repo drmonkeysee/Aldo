@@ -8,14 +8,14 @@
 #ifndef Aldo_gui_mediaruntime_hpp
 #define Aldo_gui_mediaruntime_hpp
 
-#include "guiplatform.h"
-
 #include <SDL2/SDL.h>
 
 #include <memory>
 #include <stdexcept>
 #include <string_view>
 #include <type_traits>
+
+struct gui_platform;
 
 namespace aldo
 {

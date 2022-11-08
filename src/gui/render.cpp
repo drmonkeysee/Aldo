@@ -7,6 +7,9 @@
 
 #include "render.hpp"
 
+#include "mediaruntime.hpp"
+#include "viewstate.hpp"
+
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_sdlrenderer.h"

@@ -8,11 +8,11 @@
 #ifndef Aldo_gui_render_hpp
 #define Aldo_gui_render_hpp
 
-#include "mediaruntime.hpp"
-#include "viewstate.hpp"
-
 namespace aldo
 {
+
+class MediaRuntime;
+struct viewstate;
 
 class RenderFrame final {
 public:

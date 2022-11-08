@@ -7,6 +7,7 @@
 
 #include "mediaruntime.hpp"
 
+#include "guiplatform.h"
 #include "ui.h"
 
 #include "imgui.h"

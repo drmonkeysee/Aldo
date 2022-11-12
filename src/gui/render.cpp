@@ -44,6 +44,7 @@ aldo::RenderFrame::~RenderFrame()
 void aldo::RenderFrame::render() const noexcept
 {
     renderMainMenu();
+    renderHardwareTraits();
     renderBouncer();
     renderCpu();
     if (state.showDemo) {
@@ -77,6 +78,49 @@ void aldo::RenderFrame::renderMainMenu() const noexcept
         }
         ImGui::EndMainMenuBar();
     }
+}
+
+void aldo::RenderFrame::renderHardwareTraits() const noexcept
+{
+    if (ImGui::Begin("Hardware Traits")) {
+        static int cps = 4;
+        static bool halt = false;
+        ImGui::TextUnformatted("FPS: 60");
+        ImGui::TextUnformatted("Runtime: N.NN");
+        ImGui::TextUnformatted("Frames: NN");
+        ImGui::TextUnformatted("Cycles: NN");
+
+        ImGui::Separator();
+
+        ImGui::AlignTextToFramePadding();
+        ImGui::TextUnformatted("Cycles/Second");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(40);
+        ImGui::DragInt("##cyclesPerSecond", &cps, 1.0f, 1, 100, "%d",
+                       ImGuiSliderFlags_AlwaysClamp);
+
+        ImGui::Separator();
+
+        ImGui::Checkbox("HALT", &halt);
+        ImGui::TextUnformatted("Mode");
+        ImGui::RadioButton("Cycle", true);
+        ImGui::SameLine();
+        ImGui::RadioButton("Step", false);
+        ImGui::SameLine();
+        ImGui::RadioButton("Run", false);
+
+        // TODO: fake toggle button by using on/off flags to adjust colors
+        ImGui::TextUnformatted("Signal");
+        ImGui::PushStyleColor(ImGuiCol_Button,
+                              IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE));
+        ImGui::Button("IRQ");
+        ImGui::SameLine();
+        ImGui::Button("NMI");
+        ImGui::SameLine();
+        ImGui::Button("RES");
+        ImGui::PopStyleColor();
+    }
+    ImGui::End();
 }
 
 void aldo::RenderFrame::renderBouncer() const noexcept

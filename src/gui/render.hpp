@@ -31,6 +31,7 @@ private:
     void renderHardwareTraits() const noexcept;
     void renderBouncer() const noexcept;
     void renderCpu() const noexcept;
+    void renderRam() const noexcept;
 
     viewstate& state;
     const MediaRuntime& runtime;

@@ -14,9 +14,27 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_sdlrenderer.h"
 
+#include <array>
+#include <random>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
+
+namespace
+{
+
+// NOTE: not actually noexcept
+auto fake_ram(std::array<int, 0x800>& testRam) noexcept
+{
+    std::random_device d;
+    std::mt19937_64 gen{d()};
+    std::uniform_int_distribution dist{0, 255};
+    for (auto& c : testRam) {
+        c = dist(gen);
+    }
+}
+
+}
 
 //
 // Public Interface
@@ -47,6 +65,7 @@ void aldo::RenderFrame::render() const noexcept
     renderHardwareTraits();
     renderBouncer();
     renderCpu();
+    renderRam();
     if (state.showDemo) {
         ImGui::ShowDemoWindow();
     }
@@ -244,6 +263,43 @@ void aldo::RenderFrame::renderCpu() const noexcept
             ImGui::TextUnformatted("FFFA: 04 80     NMI $8004");
             ImGui::TextUnformatted("FFFC: 00 80     RES $8000");
             ImGui::TextUnformatted("FFFE: 04 80     IRQ $8004");
+        }
+    }
+    ImGui::End();
+}
+
+void aldo::RenderFrame::renderRam() const noexcept
+{
+    if (ImGui::Begin("RAM")) {
+        static constexpr auto width = 16, cols = width + 2;
+        if (ImGui::BeginTable("ram", cols, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg)) {
+            char col[3];
+            ImGui::TableSetupColumn("Addr");
+            for (auto i = 0; i < width; ++i) {
+                snprintf(col, sizeof col, " %01X", i);
+                ImGui::TableSetupColumn(col);
+            }
+            ImGui::TableSetupColumn("ASCII");
+            ImGui::TableHeadersRow();
+
+            std::array<int, 0x800> testRam{};
+            fake_ram(testRam);
+            const auto rowCount = testRam.size() / width;
+            std::uint16_t addr = 0;
+            for (std::size_t i = 0; i < rowCount; ++i) {
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("%04X", addr);
+                for (auto j = 0; j < width; ++j) {
+                    const auto val = testRam[(std::size_t)j + (i * width)];
+                    ImGui::TableSetColumnIndex(j + 1);
+                    ImGui::Text("%02X", val);
+                }
+                ImGui::TableSetColumnIndex(cols - 1);
+                ImGui::TextUnformatted("...\5s.6.%0a.Ab>");
+                addr += width;
+            }
+            ImGui::EndTable();
         }
     }
     ImGui::End();

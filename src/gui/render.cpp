@@ -87,7 +87,7 @@ void aldo::RenderFrame::renderBouncer() const noexcept
         const auto ren = runtime.renderer();
         const auto tex = runtime.bouncerTexture();
         SDL_SetRenderTarget(ren, tex);
-        SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff,SDL_ALPHA_OPAQUE);
+        SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(ren);
 
         SDL_SetRenderDrawColor(ren, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
@@ -151,8 +151,8 @@ void aldo::RenderFrame::renderCpu() const noexcept
             'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
         };
         static constexpr auto
-            flagOn = IM_COL32(255, 255, 0, 255),
-            flagOff = IM_COL32(67, 57, 54, 255),
+            flagOn = IM_COL32(0xff, 0xff, 0, SDL_ALPHA_OPAQUE),
+            flagOff = IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE),
             textOn = IM_COL32_BLACK,
             textOff = IM_COL32_WHITE;
         static constexpr auto radius = 10.0f;

@@ -15,26 +15,9 @@
 #include "imgui_impl_sdlrenderer.h"
 
 #include <array>
-#include <random>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
-
-namespace
-{
-
-// NOTE: not actually noexcept
-auto fake_ram(std::array<int, 0x800>& testRam) noexcept
-{
-    std::random_device d;
-    std::mt19937_64 gen{d()};
-    std::uniform_int_distribution dist{0, 255};
-    for (auto& c : testRam) {
-        c = dist(gen);
-    }
-}
-
-}
 
 //
 // Public Interface
@@ -103,7 +86,7 @@ void aldo::RenderFrame::renderHardwareTraits() const noexcept
 {
     if (ImGui::Begin("Hardware Traits")) {
         static int cps = 4;
-        static bool halt = false;
+        static bool halt = true, irq = false, nmi = false, res = false;
         ImGui::TextUnformatted("FPS: 60");
         ImGui::TextUnformatted("Runtime: N.NN");
         ImGui::TextUnformatted("Frames: NN");
@@ -130,14 +113,19 @@ void aldo::RenderFrame::renderHardwareTraits() const noexcept
 
         // TODO: fake toggle button by using on/off flags to adjust colors
         ImGui::TextUnformatted("Signal");
-        ImGui::PushStyleColor(ImGuiCol_Button,
+        /*ImGui::PushStyleColor(ImGuiCol_Button,
                               IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE));
         ImGui::Button("IRQ");
         ImGui::SameLine();
         ImGui::Button("NMI");
         ImGui::SameLine();
         ImGui::Button("RES");
-        ImGui::PopStyleColor();
+        ImGui::PopStyleColor();*/
+        ImGui::Checkbox("IRQ", &irq);
+        ImGui::SameLine();
+        ImGui::Checkbox("NMI", &nmi);
+        ImGui::SameLine();
+        ImGui::Checkbox("RES", &res);
     }
     ImGui::End();
 }
@@ -218,8 +206,9 @@ void aldo::RenderFrame::renderCpu() const noexcept
             flagOff = IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE),
             textOn = IM_COL32_BLACK,
             textOff = IM_COL32_WHITE;
-        static constexpr auto radius = 10.0f;
         static constexpr std::uint8_t status = 0x34;
+        const auto textSize = ImGui::CalcTextSize("A");
+        const auto radius = (textSize.x + textSize.y) / 2.0f;
         if (ImGui::CollapsingHeader("Flags")) {
             const auto pos = ImGui::GetCursorScreenPos();
             ImVec2 center{pos.x + radius, pos.y + radius};
@@ -271,33 +260,41 @@ void aldo::RenderFrame::renderCpu() const noexcept
 void aldo::RenderFrame::renderRam() const noexcept
 {
     if (ImGui::Begin("RAM")) {
-        static constexpr auto width = 16, cols = width + 2;
-        if (ImGui::BeginTable("ram", cols, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg)) {
+        static constexpr std::array<int, 0x800> testRam{};
+        static constexpr auto tableDim = 16, cols = tableDim + 2;
+        static constexpr auto rowCount = testRam.size() / tableDim;
+        static constexpr auto tableConfig = ImGuiTableFlags_BordersV
+                                            | ImGuiTableFlags_BordersOuter
+                                            | ImGuiTableFlags_SizingFixedFit
+                                            | ImGuiTableFlags_RowBg
+                                            | ImGuiTableFlags_ScrollY;
+        const ImVec2 tableSize{
+            0, ImGui::GetTextLineHeightWithSpacing() * tableDim,
+        };
+        if (ImGui::BeginTable("ram", cols, tableConfig, tableSize)) {
             char col[3];
+            ImGui::TableSetupScrollFreeze(0, 1);
             ImGui::TableSetupColumn("Addr");
-            for (auto i = 0; i < width; ++i) {
+            for (auto i = 0; i < tableDim; ++i) {
                 snprintf(col, sizeof col, " %01X", i);
                 ImGui::TableSetupColumn(col);
             }
             ImGui::TableSetupColumn("ASCII");
             ImGui::TableHeadersRow();
 
-            std::array<int, 0x800> testRam{};
-            fake_ram(testRam);
-            const auto rowCount = testRam.size() / width;
             std::uint16_t addr = 0;
             for (std::size_t i = 0; i < rowCount; ++i) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
                 ImGui::Text("%04X", addr);
-                for (auto j = 0; j < width; ++j) {
-                    const auto val = testRam[(std::size_t)j + (i * width)];
+                for (auto j = 0; j < tableDim; ++j) {
+                    const auto val = testRam[(std::size_t)j + (i * tableDim)];
                     ImGui::TableSetColumnIndex(j + 1);
                     ImGui::Text("%02X", val);
                 }
                 ImGui::TableSetColumnIndex(cols - 1);
-                ImGui::TextUnformatted("...\5s.6.%0a.Ab>");
-                addr += width;
+                ImGui::TextUnformatted("................");
+                addr += tableDim;
             }
             ImGui::EndTable();
         }

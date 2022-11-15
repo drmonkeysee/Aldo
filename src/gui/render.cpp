@@ -317,7 +317,7 @@ void aldo::RenderFrame::renderRam() const noexcept
                                             | ImGuiTableFlags_SizingFixedFit
                                             | ImGuiTableFlags_ScrollY;
         const ImVec2 tableSize{
-            0, ImGui::GetTextLineHeightWithSpacing() * tableDim,
+            0, ImGui::GetTextLineHeightWithSpacing() * (tableDim + 1),
         };
         if (ImGui::BeginTable("ram", cols, tableConfig, tableSize)) {
             char col[3];
@@ -332,6 +332,13 @@ void aldo::RenderFrame::renderRam() const noexcept
 
             std::uint16_t addr = 0;
             for (std::size_t i = 0; i < rowCount; ++i) {
+                if (addr % 0x100 == 0 && i > 0) {
+                    ImGui::TableNextRow();
+                    for (auto j = 0; j < cols; ++j) {
+                        ImGui::TableSetColumnIndex(j);
+                        ImGui::Dummy({0, ImGui::GetTextLineHeight()});
+                    }
+                }
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
                 ImGui::Text("%04X", addr);

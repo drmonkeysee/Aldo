@@ -86,7 +86,7 @@ void aldo::RenderFrame::renderHardwareTraits() const noexcept
 {
     if (ImGui::Begin("Hardware Traits")) {
         static int cps = 4;
-        static bool halt = true, irq = false, nmi = false, res = false;
+        static bool halt = true, irq, nmi, res;
         ImGui::TextUnformatted("FPS: 60");
         ImGui::TextUnformatted("Runtime: N.NN");
         ImGui::TextUnformatted("Frames: NN");
@@ -174,9 +174,11 @@ void aldo::RenderFrame::renderCpu() const noexcept
                 ImGui::TextUnformatted("A:");
                 ImGui::SameLine();
                 ImGui::TextUnformatted("FF");
+
                 ImGui::TextUnformatted("X:");
                 ImGui::SameLine();
                 ImGui::TextUnformatted("FF");
+
                 ImGui::TextUnformatted("Y:");
                 ImGui::SameLine();
                 ImGui::TextUnformatted("FF");
@@ -188,9 +190,11 @@ void aldo::RenderFrame::renderCpu() const noexcept
                 ImGui::TextUnformatted("PC:");
                 ImGui::SameLine();
                 ImGui::TextUnformatted("FFFF");
+
                 ImGui::TextUnformatted(" S:");
                 ImGui::SameLine();
                 ImGui::TextUnformatted("FF");
+
                 ImGui::TextUnformatted(" P:");
                 ImGui::SameLine();
                 ImGui::TextUnformatted("FF");
@@ -234,6 +238,50 @@ void aldo::RenderFrame::renderCpu() const noexcept
             ImGui::Dummy({radius * 2, radius * 2});
         }
 
+        if (ImGui::CollapsingHeader("Datapath")) {
+            ImGui::TextUnformatted("Address:");
+            ImGui::SameLine();
+            ImGui::TextUnformatted("01FB");
+            ImGui::TextUnformatted("Data:");
+            ImGui::SameLine();
+            ImGui::TextUnformatted("00");
+            ImGui::SameLine();
+            ImGui::TextUnformatted("R/W");
+
+            ImGui::Separator();
+
+            ImGui::TextUnformatted("Decode:");
+            ImGui::SameLine();
+            ImGui::TextUnformatted("RTS");
+            ImGui::TextUnformatted("adl:");
+            ImGui::SameLine();
+            ImGui::TextUnformatted("07");
+            ImGui::TextUnformatted("adh:");
+            ImGui::SameLine();
+            ImGui::TextUnformatted("00");
+            ImGui::TextUnformatted("adc:");
+            ImGui::SameLine();
+            ImGui::TextUnformatted("00");
+            ImGui::TextUnformatted("t:");
+            ImGui::SameLine();
+            ImGui::TextUnformatted("2");
+
+            ImGui::Separator();
+
+            static bool activeHi, activeLow = true;
+            ImGui::Checkbox("RDY", &activeHi);
+            ImGui::SameLine();
+            ImGui::Checkbox("SYNC", &activeHi);
+            ImGui::SameLine();
+            ImGui::Checkbox("R/W", &activeHi);
+
+            ImGui::Checkbox("IRQ", &activeLow);
+            ImGui::SameLine();
+            ImGui::Checkbox("NMI ", &activeLow);
+            ImGui::SameLine();
+            ImGui::Checkbox("RES", &activeLow);
+        }
+
         if (ImGui::CollapsingHeader("PRG @ PC")) {
             static int selected = -1;
             char buf[28];
@@ -263,10 +311,10 @@ void aldo::RenderFrame::renderRam() const noexcept
         static constexpr std::array<int, 0x800> testRam{};
         static constexpr auto tableDim = 16, cols = tableDim + 2;
         static constexpr auto rowCount = testRam.size() / tableDim;
-        static constexpr auto tableConfig = ImGuiTableFlags_BordersV
-                                            | ImGuiTableFlags_BordersOuter
-                                            | ImGuiTableFlags_SizingFixedFit
+        static constexpr auto tableConfig = ImGuiTableFlags_BordersOuter
+                                            | ImGuiTableFlags_BordersV
                                             | ImGuiTableFlags_RowBg
+                                            | ImGuiTableFlags_SizingFixedFit
                                             | ImGuiTableFlags_ScrollY;
         const ImVec2 tableSize{
             0, ImGui::GetTextLineHeightWithSpacing() * tableDim,

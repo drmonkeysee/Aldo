@@ -18,6 +18,8 @@ static char *restrict AppName;
 
 static const char *appname(void)
 {
+    if (AppName) return AppName;
+
     @autoreleasepool {
         static const NSStringEncoding encoding = NSUTF8StringEncoding;
         NSString *const displayName = [NSBundle.mainBundle

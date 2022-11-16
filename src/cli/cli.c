@@ -50,7 +50,6 @@ static cart *load_cart(const char *filename)
             perror("Cannot open cart file");
         }
     }
-
     return c;
 }
 

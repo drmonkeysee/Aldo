@@ -20,7 +20,7 @@ typedef struct nes_console nes;
 
 #include "bridgeopen.h"
 br_libexport br_ownresult
-nes *nes_new(cart *c, debugctx *dbg, bool bcdsupport, bool zeroram, bool tron,
+nes *nes_new(debugctx *dbg, bool bcdsupport, bool zeroram, bool tron,
              bool dumpram) br_nothrow;
 br_libexport
 void nes_free(nes *self) br_nothrow;
@@ -29,7 +29,7 @@ br_libexport
 void nes_mode(nes *self, enum csig_excmode mode) br_nothrow;
 
 br_libexport
-void nes_powerup(nes *self) br_nothrow;
+void nes_powerup(nes *self, cart *c) br_nothrow;
 
 br_libexport
 void nes_ready(nes *self) br_nothrow;

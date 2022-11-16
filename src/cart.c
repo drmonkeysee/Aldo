@@ -23,6 +23,8 @@ struct cartridge {
     struct cartinfo info;
 };
 
+static struct cartinfo NoInfo = {.filepath = "NOCART"};
+
 static int detect_format(struct cartridge *self, FILE *f)
 {
     // NOTE: grab first 8 bytes as a string to check file format
@@ -397,8 +399,9 @@ int cart_format_extname(const struct cartinfo *info,
 
 void cart_snapshot(cart *self, struct console_state *snapshot)
 {
-    assert(self != NULL);
     assert(snapshot != NULL);
 
-    snapshot->cart.info = &self->info;
+    // NOTE: unlike most snapshot functions, self *can* be null if the
+    // emulator was started without a cart.
+    snapshot->cart.info = self ? &self->info : &NoInfo;
 }

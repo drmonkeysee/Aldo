@@ -64,16 +64,25 @@ static void create_cpubus(struct nes_console *self)
     self->cpu.bus = bus_new(16, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
     bus_set(self->cpu.bus, 0,
             (struct busdevice){ram_read, ram_write, ram_dma, self->ram});
+}
 
+static void connect_cart(struct nes_console *self, cart *c)
+{
+    self->cart = c;
     const uint16_t cart_busaddr = MEMBLOCK_32KB;
     cart_cpu_connect(self->cart, self->cpu.bus, cart_busaddr);
-
     debug_override_reset(self->dbg, self->cpu.bus, cart_busaddr);
+}
+
+static void disconnect_cart(struct nes_console *self)
+{
+    if (!self->cart) return;
+    cart_cpu_disconnect(self->cart, self->cpu.bus, MEMBLOCK_32KB);
+    self->cart = NULL;
 }
 
 static void free_cpubus(struct nes_console *self)
 {
-    cart_cpu_disconnect(self->cart, self->cpu.bus, MEMBLOCK_32KB);
     bus_free(self->cpu.bus);
     self->cpu.bus = NULL;
 }
@@ -128,10 +137,9 @@ static void ram_dump(const struct nes_console *self)
 // Public Interface
 //
 
-nes *nes_new(cart *c, debugctx *dbg, bool bcdsupport, bool zeroram, bool tron,
+nes *nes_new(debugctx *dbg, bool bcdsupport, bool zeroram, bool tron,
              bool dumpram)
 {
-    assert(c != NULL);
     assert(dbg != NULL);
 
     FILE *tracelog = NULL;
@@ -145,7 +153,7 @@ nes *nes_new(cart *c, debugctx *dbg, bool bcdsupport, bool zeroram, bool tron,
     }
 
     struct nes_console *const self = malloc(sizeof *self);
-    self->cart = c;
+    self->cart = NULL;
     self->dbg = dbg;
     self->dumpram = dumpram;
     self->tracelog = tracelog;
@@ -166,6 +174,7 @@ void nes_free(nes *self)
     if (self->dumpram || self->tracelog) {
         ram_dump(self);
     }
+    disconnect_cart(self);
     free_cpubus(self);
     free(self);
 }
@@ -178,10 +187,14 @@ void nes_mode(nes *self, enum csig_excmode mode)
     self->mode = (int)mode < 0 ? CSGM_MODECOUNT - 1 : mode % CSGM_MODECOUNT;
 }
 
-void nes_powerup(nes *self)
+void nes_powerup(nes *self, cart *c)
 {
     assert(self != NULL);
 
+    if (c) {
+        disconnect_cart(self);
+        connect_cart(self, c);
+    }
     // TODO: for now start in cycle-step mode
     self->mode = CSGM_CYCLE;
     if (self->zeroram) {

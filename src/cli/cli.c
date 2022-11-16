@@ -147,13 +147,13 @@ static int run_emu(const struct cliargs *args, cart *c)
     if (!dbg) return EXIT_FAILURE;
 
     int result = EXIT_SUCCESS;
-    nes *console = nes_new(c, dbg, args->bcdsupport, args->zeroram, args->tron,
+    nes *console = nes_new(dbg, args->bcdsupport, args->zeroram, args->tron,
                            args->tron || args->batch);
     if (!console) {
         result = EXIT_FAILURE;
         goto exit_debug;
     }
-    nes_powerup(console);
+    nes_powerup(console, c);
 
     struct console_state snapshot;
     ui_loop *const run_loop = setup_ui(args, console, &snapshot);

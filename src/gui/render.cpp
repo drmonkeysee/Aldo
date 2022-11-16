@@ -206,7 +206,7 @@ void aldo::RenderFrame::renderCpu() const noexcept
             'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
         };
         static constexpr auto
-            flagOn = IM_COL32(0xff, 0xff, 0, SDL_ALPHA_OPAQUE),
+            flagOn = IM_COL32(0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE),
             flagOff = IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE),
             textOn = IM_COL32_BLACK,
             textOff = IM_COL32_WHITE;
@@ -235,14 +235,14 @@ void aldo::RenderFrame::renderCpu() const noexcept
                                   text, flags + i, flags + i + 1);
                 center.x += 25;
             }
-            ImGui::Dummy({radius * 2, radius * 2});
+            ImGui::Dummy({0, radius * 2});
         }
 
         if (ImGui::CollapsingHeader("Datapath")) {
-            ImGui::TextUnformatted("Address:");
+            ImGui::TextUnformatted("Address Bus:");
             ImGui::SameLine();
             ImGui::TextUnformatted("01FB");
-            ImGui::TextUnformatted("Data:");
+            ImGui::TextUnformatted("Data Bus:");
             ImGui::SameLine();
             ImGui::TextUnformatted("00");
             ImGui::SameLine();
@@ -316,6 +316,7 @@ void aldo::RenderFrame::renderRam() const noexcept
                                             | ImGuiTableFlags_RowBg
                                             | ImGuiTableFlags_SizingFixedFit
                                             | ImGuiTableFlags_ScrollY;
+        static constexpr std::uint8_t stackPointer = 0xf4;
         const ImVec2 tableSize{
             0, ImGui::GetTextLineHeightWithSpacing() * (tableDim + 1),
         };
@@ -343,9 +344,20 @@ void aldo::RenderFrame::renderRam() const noexcept
                 ImGui::TableSetColumnIndex(0);
                 ImGui::Text("%04X", addr);
                 for (auto j = 0; j < tableDim; ++j) {
-                    const auto val = testRam[(std::size_t)j + (i * tableDim)];
+                    const auto ramIdx = (std::size_t)j + (i * tableDim);
+                    const auto val = testRam[ramIdx];
+                    const auto stackPage = tableDim <= i && i < (tableDim * 2);
                     ImGui::TableSetColumnIndex(j + 1);
-                    ImGui::Text("%02X", val);
+                    if (stackPage && ramIdx % 0x100 == stackPointer) {
+                        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
+                                               IM_COL32(0x0, 0xff, 0x0,
+                                                        SDL_ALPHA_OPAQUE));
+                        const auto textColor
+                            = ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
+                        ImGui::TextColored(textColor, "%02X", val);
+                    } else {
+                        ImGui::Text("%02X", val);
+                    }
                 }
                 ImGui::TableSetColumnIndex(cols - 1);
                 ImGui::TextUnformatted("................");

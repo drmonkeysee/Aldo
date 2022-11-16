@@ -206,7 +206,7 @@ void aldo::RenderFrame::renderCpu() const noexcept
             'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
         };
         static constexpr auto
-            flagOn = IM_COL32(0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE),
+            flagOn = IM_COL32(0xff, 0xfc, 0x53, SDL_ALPHA_OPAQUE),
             flagOff = IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE),
             textOn = IM_COL32_BLACK,
             textOff = IM_COL32_WHITE;
@@ -350,7 +350,7 @@ void aldo::RenderFrame::renderRam() const noexcept
                     ImGui::TableSetColumnIndex(j + 1);
                     if (stackPage && ramIdx % 0x100 == stackPointer) {
                         ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
-                                               IM_COL32(0x0, 0xff, 0x0,
+                                               IM_COL32(0xff, 0xfc, 0x53,
                                                         SDL_ALPHA_OPAQUE));
                         const auto textColor
                             = ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);

@@ -51,8 +51,6 @@ typedef struct cartridge cart;
 // Export
 //
 
-// NOTE: returns a pointer to a statically allocated string;
-// **WARNING**: do not write through or free this pointer!
 br_libexport
 const char *cart_errstr(int err) br_nothrow;
 br_libexport

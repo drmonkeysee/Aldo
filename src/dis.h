@@ -53,8 +53,6 @@ struct dis_instruction {
 // Export
 //
 
-// NOTE: returns a pointer to a statically allocated string;
-// **WARNING**: do not write through or free this pointer!
 br_libexport
 const char *dis_errstr(int err);
 

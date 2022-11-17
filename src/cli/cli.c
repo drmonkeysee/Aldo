@@ -132,6 +132,23 @@ static ui_loop *setup_ui(const struct cliargs *args, nes *console,
     return loop;
 }
 
+static void dump_ram(const struct cliargs *args, nes *console)
+{
+    static const char *const restrict ramfile = "system.ram";
+
+    if (args->tron || args->batch) {
+        errno = 0;
+        const int err = nes_dumpram(console, ramfile);
+        if (err < 0) {
+            fprintf(stderr, "Ram dump failure: %s - %s", ramfile,
+                    nes_errstr(err));
+            if (err == NES_ERR_ERNO) {
+                perror("System error");
+            }
+        }
+    }
+}
+
 static int run_emu(const struct cliargs *args, cart *c)
 {
     if (args->batch && args->tron && !args->haltlist) {
@@ -147,13 +164,12 @@ static int run_emu(const struct cliargs *args, cart *c)
     if (!dbg) return EXIT_FAILURE;
 
     int result = EXIT_SUCCESS;
-    nes *console = nes_new(dbg, args->bcdsupport, args->zeroram, args->tron,
-                           args->tron || args->batch);
+    nes *console = nes_new(dbg, args->bcdsupport, args->tron);
     if (!console) {
         result = EXIT_FAILURE;
         goto exit_debug;
     }
-    nes_powerup(console, c);
+    nes_powerup(console, c, args->zeroram);
 
     struct console_state snapshot;
     ui_loop *const run_loop = setup_ui(args, console, &snapshot);
@@ -166,6 +182,7 @@ static int run_emu(const struct cliargs *args, cart *c)
         }
         result = EXIT_FAILURE;
     }
+    dump_ram(args, console);
     snapshot_clear(&snapshot);
     nes_free(console);
     console = NULL;

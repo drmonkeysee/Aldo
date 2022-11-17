@@ -221,9 +221,7 @@ int cart_create(cart **c, const char *restrict filepath)
     assert(filepath != NULL);
 
     FILE *const f = fopen(filepath, "rb");
-    if (!f) {
-        return CART_ERR_ERNO;
-    }
+    if (!f) return CART_ERR_ERNO;
 
     struct cartridge *self = malloc(sizeof *self);
 

@@ -20,9 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char
-    *const restrict TraceLog = "trace.log",
-    *const restrict RamLog = "system.ram";
+static const char *const restrict TraceLog = "trace.log";
 
 // The NES-001 Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
@@ -33,9 +31,6 @@ struct nes_console {
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
     enum csig_excmode mode;     // NES execution mode
     uint8_t ram[MEMBLOCK_2KB];  // CPU Internal RAM
-    bool
-        dumpram,                // Dump RAM banks to disk on exit
-        zeroram;                // Zero-out RAM on power-up or reset
 };
 
 static bool ram_read(const void *restrict ctx, uint16_t addr,
@@ -119,26 +114,22 @@ static void instruction_trace(struct nes_console *self,
     trace_line(self->tracelog, clock->total_cycles - 1, &self->cpu, &snapshot);
 }
 
-static void ram_dump(const struct nes_console *self)
-{
-    errno = 0;
-    FILE *const ramtrace = fopen(RamLog, "wb");
-    if (ramtrace) {
-        fwrite(self->ram, sizeof self->ram[0],
-               sizeof self->ram / sizeof self->ram[0], ramtrace);
-        fclose(ramtrace);
-    } else {
-        fprintf(stderr, "%s: ", RamLog);
-        perror("Cannot open ram trace file");
-    }
-}
-
 //
 // Public Interface
 //
 
-nes *nes_new(debugctx *dbg, bool bcdsupport, bool zeroram, bool tron,
-             bool dumpram)
+const char *nes_errstr(int err)
+{
+    switch (err) {
+#define X(s, v, e) case s: return e;
+        NES_ERRCODE_X
+#undef X
+    default:
+        return "UNKNOWN ERR";
+    }
+}
+
+nes *nes_new(debugctx *dbg, bool bcdsupport, bool tron)
 {
     assert(dbg != NULL);
 
@@ -155,9 +146,7 @@ nes *nes_new(debugctx *dbg, bool bcdsupport, bool zeroram, bool tron,
     struct nes_console *const self = malloc(sizeof *self);
     self->cart = NULL;
     self->dbg = dbg;
-    self->dumpram = dumpram;
     self->tracelog = tracelog;
-    self->zeroram = zeroram;
     // TODO: ditch this option when aldo can emulate more than just NES
     self->cpu.bcd = bcdsupport;
     create_cpubus(self);
@@ -171,23 +160,12 @@ void nes_free(nes *self)
     if (self->tracelog) {
         fclose(self->tracelog);
     }
-    if (self->dumpram || self->tracelog) {
-        ram_dump(self);
-    }
     disconnect_cart(self);
     free_cpubus(self);
     free(self);
 }
 
-void nes_mode(nes *self, enum csig_excmode mode)
-{
-    assert(self != NULL);
-
-    // NOTE: force signed to check < 0 (underlying type may be uint)
-    self->mode = (int)mode < 0 ? CSGM_MODECOUNT - 1 : mode % CSGM_MODECOUNT;
-}
-
-void nes_powerup(nes *self, cart *c)
+void nes_powerup(nes *self, cart *c, bool zeroram)
 {
     assert(self != NULL);
 
@@ -197,10 +175,18 @@ void nes_powerup(nes *self, cart *c)
     }
     // TODO: for now start in cycle-step mode
     self->mode = CSGM_CYCLE;
-    if (self->zeroram) {
+    if (zeroram) {
         memset(self->ram, 0, sizeof self->ram / sizeof self->ram[0]);
     }
     cpu_powerup(&self->cpu);
+}
+
+void nes_mode(nes *self, enum csig_excmode mode)
+{
+    assert(self != NULL);
+
+    // NOTE: force signed to check < 0 (underlying type may be uint)
+    self->mode = (int)mode < 0 ? CSGM_MODECOUNT - 1 : mode % CSGM_MODECOUNT;
 }
 
 void nes_ready(nes *self)
@@ -278,4 +264,17 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
     bus_dma(self->cpu.bus, CPU_VECTOR_NMI,
             sizeof snapshot->mem.vectors / sizeof snapshot->mem.vectors[0],
             snapshot->mem.vectors);
+}
+
+int nes_dumpram(nes *self, const char *restrict filepath)
+{
+    assert(self != NULL);
+    assert(filepath != NULL);
+
+    FILE *const ramtrace = fopen(filepath, "wb");
+    if (!ramtrace) return NES_ERR_ERNO;
+    fwrite(self->ram, sizeof self->ram[0],
+           sizeof self->ram / sizeof self->ram[0], ramtrace);
+    fclose(ramtrace);
+    return 0;
 }

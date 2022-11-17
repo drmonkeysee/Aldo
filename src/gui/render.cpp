@@ -46,6 +46,7 @@ void aldo::RenderFrame::render() const noexcept
 {
     renderMainMenu();
     renderHardwareTraits();
+    renderCart();
     renderBouncer();
     renderCpu();
     renderRam();
@@ -126,6 +127,20 @@ void aldo::RenderFrame::renderHardwareTraits() const noexcept
         ImGui::Checkbox("NMI", &nmi);
         ImGui::SameLine();
         ImGui::Checkbox("RES", &res);
+    }
+    ImGui::End();
+}
+
+void aldo::RenderFrame::renderCart() const noexcept
+{
+    if (ImGui::Begin("Cart")) {
+        ImGui::TextUnformatted("Name:");
+        ImGui::SameLine();
+        ImGui::TextUnformatted("test rom");
+
+        ImGui::TextUnformatted("Format:");
+        ImGui::SameLine();
+        ImGui::TextUnformatted("unknown");
     }
     ImGui::End();
 }

@@ -29,6 +29,7 @@ public:
 private:
     void renderMainMenu() const noexcept;
     void renderHardwareTraits() const noexcept;
+    void renderCart() const noexcept;
     void renderBouncer() const noexcept;
     void renderCpu() const noexcept;
     void renderRam() const noexcept;

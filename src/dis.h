@@ -58,20 +58,20 @@ struct dis_instruction {
 br_libexport
 const char *dis_errstr(int err);
 
-br_libexport
+br_libexport br_checkerror
 int dis_parsemem_inst(size_t size, const uint8_t mem[br_noalias_sz(size)],
                       size_t at, struct dis_instruction *parsed);
 // NOTE: functions w/buffer params leave buffer untouched when returning <= 0
-br_libexport
+br_libexport br_checkerror
 int dis_inst(uint16_t addr, const struct dis_instruction *inst,
              char dis[br_noalias_csz(DIS_INST_SIZE)]);
-br_libexport
+br_libexport br_checkerror
 int dis_datapath(const struct console_state *snapshot,
                  char dis[br_noalias_csz(DIS_DATAP_SIZE)]);
 
-br_libexport
+br_libexport br_checkerror
 int dis_cart_prg(cart *cart, bool verbose, bool unified_output, FILE *f);
-br_libexport
+br_libexport br_checkerror
 int dis_cart_chr(cart *cart, int chrscale,
                  const char *br_noalias chrdecode_prefix, FILE *output);
 

@@ -448,9 +448,10 @@ static void drawdatapath(const struct view *v,
 static void drawram(const struct view *v, const struct console_state *snapshot)
 {
     static const int
-        start_x = 5, col_width = 3, toprail_start = start_x + col_width;
+        start_x = 5, col_width = 3, toprail_start = start_x + col_width,
+        page_size = 0x100, page_dim = 0x10;
 
-    for (int col = 0; col < 0x10; ++col) {
+    for (int col = 0; col < page_dim; ++col) {
         mvwprintw(v->win, 1, toprail_start + (col * col_width), "%X", col);
     }
     mvwhline(v->win, 2, toprail_start - 1, 0,
@@ -461,14 +462,14 @@ static void drawram(const struct view *v, const struct console_state *snapshot)
     mvwvline(v->content, 0, start_x - 2, 0, h);
     mvwvline(v->content, 0, getmaxx(v->content) - 3, 0, h);
     for (size_t page = 0; page < 8; ++page) {
-        for (size_t page_row = 0; page_row < 0x10; ++page_row) {
+        for (size_t page_row = 0; page_row < page_dim; ++page_row) {
             mvwprintw(v->content, cursor_y, 0, "%02zX", page);
-            for (size_t page_col = 0; page_col < 0x10; ++page_col) {
-                const size_t ramidx = (page * 0x100) + (page_row * 0x10)
-                                        + page_col;
+            for (size_t page_col = 0; page_col < page_dim; ++page_col) {
+                const size_t ramidx = (page * page_size)
+                                        + (page_row * page_dim) + page_col;
                 const bool sp = page == 1
-                                    && ramidx % 0x100
-                                        == snapshot->cpu.stack_pointer;
+                                && ramidx % page_size
+                                    == snapshot->cpu.stack_pointer;
                 if (sp) {
                     wattron(v->content, A_STANDOUT);
                 }

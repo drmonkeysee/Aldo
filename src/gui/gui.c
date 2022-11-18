@@ -16,7 +16,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-static int sdl_demo(const struct gui_platform *platform)
+static int emu_run(const struct gui_platform *platform)
 {
     const int err = ui_sdl_runloop(platform);
     if (err < 0) {
@@ -34,5 +34,5 @@ int gui_run(const struct gui_platform *platform)
 {
     assert(platform != NULL);
 
-    return sdl_demo(platform);
+    return emu_run(platform);
 }

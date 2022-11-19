@@ -47,7 +47,7 @@ static int load_blocks(uint8_t *restrict *mem, size_t size, FILE *f)
 static void clear_bus_device(const struct mapper *self, bus *b, uint16_t addr)
 {
     (void)self;
-    bus_set(b, addr, (struct busdevice){0});
+    bus_clear(b, addr);
 }
 
 //
@@ -129,7 +129,7 @@ static bool ines_unimplemented_cpu_connect(struct mapper *self, bus *b,
                                            uint16_t addr)
 {
     (void)self;
-    return bus_set(b, addr, (struct busdevice){0});
+    return bus_clear(b, addr);
 }
 
 //

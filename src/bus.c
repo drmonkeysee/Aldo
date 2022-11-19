@@ -65,6 +65,7 @@ void bus_free(bus *self)
 }
 
 extern inline bool bus_set(bus *, uint16_t, struct busdevice);
+extern inline bool bus_clear(bus *, uint16_t);
 bool bus_swap(bus *self, uint16_t addr, struct busdevice bd,
               struct busdevice *prev)
 {

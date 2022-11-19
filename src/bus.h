@@ -40,6 +40,10 @@ inline bool bus_set(bus *self, uint16_t addr, struct busdevice bd) br_nothrow
 {
     return bus_swap(self, addr, bd, NULL);
 }
+inline bool bus_clear(bus *self, uint16_t addr) br_nothrow
+{
+    return bus_set(self, addr, (struct busdevice){0});
+}
 
 bool bus_read(bus *self, uint16_t addr, uint8_t *br_noalias d) br_nothrow;
 bool bus_write(bus *self, uint16_t addr, uint8_t d) br_nothrow;

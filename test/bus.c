@@ -262,6 +262,30 @@ static void device_swap(void *ctx)
     ct_assertsame((void *)test_write, (void *)bd3.write);
 }
 
+static void device_clear(void *ctx)
+{
+    bus *const b = ((struct test_context *)ctx)->b;
+    uint8_t mem[] = {0xff, 0xff, 0xff, 0xff};
+    struct busdevice bd1 = {
+        .read = test_read,
+        .write = test_write,
+        .ctx = mem,
+    };
+    uint8_t d = 0xff;
+
+    ct_asserttrue(bus_set(b, 0x0, bd1));
+    ct_asserttrue(bus_write(b, 0x0, 0xa));
+    ct_assertequal(0xau, mem[0]);
+    ct_asserttrue(bus_read(b, 0x0, &d));
+    ct_assertequal(0xau, d);
+
+    d = 0xff;
+    ct_asserttrue(bus_clear(b, 0x0));
+    ct_assertfalse(bus_write(b, 0x0, 0xb));
+    ct_assertfalse(bus_read(b, 0x0, &d));
+    ct_assertequal(0xffu, d);
+}
+
 static void smallest_bus(void *ctx)
 {
     struct test_context *const c = ctx;
@@ -453,6 +477,7 @@ struct ct_testsuite bus_tests(void)
         ct_maketest(set_device_within_partition_bounds),
         ct_maketest(set_device_too_high),
         ct_maketest(device_swap),
+        ct_maketest(device_clear),
         ct_maketest(smallest_bus),
         ct_maketest(largest_bus),
         ct_maketest(dma),

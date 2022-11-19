@@ -37,6 +37,7 @@ struct debugger_context {
     struct resdecorator {
         struct busdevice inner;
         uint16_t vector;
+        bool active;
     } dec;
     ptrdiff_t halted;
     int resetvector;
@@ -249,8 +250,18 @@ void debug_override_reset(debugctx *self)
     struct busdevice resetaddr_device = {
         resetaddr_read, resetaddr_write, resetaddr_dma, &self->dec,
     };
-    bus_swap(self->cpu->bus, CPU_VECTOR_RES, resetaddr_device,
-             &self->dec.inner);
+    self->dec.active = bus_swap(self->cpu->bus, CPU_VECTOR_RES,
+                                resetaddr_device, &self->dec.inner);
+}
+
+void debug_remove_reset(debugctx *self)
+{
+    assert(self != NULL);
+
+    if (!self->dec.active) return;
+
+    bus_set(self->cpu->bus, CPU_VECTOR_RES, self->dec.inner);
+    self->dec = (struct resdecorator){0};
 }
 
 void debug_addbreakpoint(debugctx *self, struct haltexpr expr)

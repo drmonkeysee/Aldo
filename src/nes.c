@@ -72,6 +72,7 @@ static void connect_cart(struct nes_console *self, cart *c)
 static void disconnect_cart(struct nes_console *self)
 {
     if (!self->cart) return;
+    debug_remove_reset(self->dbg);
     cart_cpu_disconnect(self->cart, self->cpu.bus, MEMBLOCK_32KB);
     self->cart = NULL;
 }

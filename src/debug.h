@@ -40,6 +40,7 @@ void debug_set_reset(debugctx *self, int resetvector) br_nothrow;
 void debug_cpu_connect(debugctx *self, struct mos6502 *cpu) br_nothrow;
 void debug_cpu_disconnect(debugctx *self) br_nothrow;
 void debug_override_reset(debugctx *self) br_nothrow;
+void debug_remove_reset(debugctx *self) br_nothrow;
 void debug_check(debugctx *self, const struct cycleclock *clk) br_nothrow;
 void debug_snapshot(debugctx *self, struct console_state *snapshot) br_nothrow;
 #include "bridgeclose.h"

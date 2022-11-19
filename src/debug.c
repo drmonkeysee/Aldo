@@ -14,6 +14,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 enum breakpointstatus {
@@ -25,10 +26,6 @@ enum breakpointstatus {
 static const ptrdiff_t NoBreakpoint = -1;
 
 struct debugger_context {
-    struct resdecorator {
-        struct busdevice inner;
-        uint16_t vector;
-    } *dec;
     struct breakpoint_vector {
         size_t capacity;
         struct breakpoint {
@@ -36,6 +33,11 @@ struct debugger_context {
             enum breakpointstatus status;
         } *items;
     } breakpoints;
+    struct mos6502 *cpu;    // Non-owning Pointer
+    struct resdecorator {
+        struct busdevice inner;
+        uint16_t vector;
+    } dec;
     ptrdiff_t halted;
     int resetvector;
 };
@@ -194,12 +196,14 @@ static void bpvector_free(struct breakpoint_vector *vec)
 // Public Interface
 //
 
-debugctx *debug_new(int resetvector_override)
+const int NoResetVector = -1;
+
+debugctx *debug_new(void)
 {
     struct debugger_context *const self = malloc(sizeof *self);
     *self = (struct debugger_context){
         .halted = NoBreakpoint,
-        .resetvector = resetvector_override,
+        .resetvector = NoResetVector,
     };
     bpvector_init(&self->breakpoints);
     return self;
@@ -210,23 +214,43 @@ void debug_free(debugctx *self)
     assert(self != NULL);
 
     bpvector_free(&self->breakpoints);
-    free(self->dec);
     free(self);
 }
 
-void debug_override_reset(debugctx *self, bus *b, uint16_t device_addr)
+void debug_set_reset(debugctx *self, int resetvector)
 {
     assert(self != NULL);
-    assert(b != NULL);
 
-    if (self->resetvector < 0) return;
+    self->resetvector = resetvector;
+}
 
-    self->dec = malloc(sizeof *self->dec);
-    self->dec->vector = (uint16_t)self->resetvector;
+void debug_cpu_connect(debugctx *self, struct mos6502 *cpu)
+{
+    assert(self != NULL);
+    assert(cpu != NULL);
+
+    self->cpu = cpu;
+}
+
+void debug_cpu_disconnect(debugctx *self)
+{
+    assert(self != NULL);
+
+    self->cpu = NULL;
+}
+
+void debug_override_reset(debugctx *self)
+{
+    assert(self != NULL);
+
+    if (self->resetvector == NoResetVector || !self->cpu) return;
+
+    self->dec = (struct resdecorator){.vector = (uint16_t)self->resetvector};
     struct busdevice resetaddr_device = {
-        resetaddr_read, resetaddr_write, resetaddr_dma, self->dec,
+        resetaddr_read, resetaddr_write, resetaddr_dma, &self->dec,
     };
-    bus_swap(b, device_addr, resetaddr_device, &self->dec->inner);
+    bus_swap(self->cpu->bus, CPU_VECTOR_RES, resetaddr_device,
+             &self->dec.inner);
 }
 
 void debug_addbreakpoint(debugctx *self, struct haltexpr expr)
@@ -236,17 +260,17 @@ void debug_addbreakpoint(debugctx *self, struct haltexpr expr)
     bpvector_insert(&self->breakpoints, expr);
 }
 
-void debug_check(debugctx *self, const struct cycleclock *clk,
-                 struct mos6502 *cpu)
+void debug_check(debugctx *self, const struct cycleclock *clk)
 {
     assert(self != NULL);
     assert(clk != NULL);
-    assert(cpu != NULL);
+
+    if (!self->cpu) return;
 
     if (self->halted == NoBreakpoint
-        && (self->halted = bpvector_break(&self->breakpoints, clk, cpu))
+        && (self->halted = bpvector_break(&self->breakpoints, clk, self->cpu))
             != NoBreakpoint) {
-        cpu->signal.rdy = false;
+        self->cpu->signal.rdy = false;
     } else {
         self->halted = NoBreakpoint;
     }

@@ -89,7 +89,8 @@ static int decode_cart_chr(const struct cliargs *args, cart *c)
 
 static debugctx *create_debugger(const struct cliargs *args)
 {
-    debugctx *const dbg = debug_new(args->resetvector);
+    debugctx *const dbg = debug_new();
+    debug_set_reset(dbg, args->resetvector);
     for (const struct haltarg *arg = args->haltlist;
          arg;
          arg = arg->next) {

@@ -8,6 +8,7 @@
 #include "argparse.h"
 
 #include "bytes.h"
+#include "debug.h"
 
 #include <errno.h>
 #include <stddef.h>
@@ -54,7 +55,7 @@ static void init_cliargs(struct cliargs *args)
 {
     *args = (struct cliargs){
         .chrscale = MinChrScale,
-        .resetvector = -1,
+        .resetvector = NoResetVector,
     };
 }
 

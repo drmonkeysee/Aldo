@@ -59,14 +59,14 @@ static void create_cpubus(struct nes_console *self)
     self->cpu.bus = bus_new(16, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
     bus_set(self->cpu.bus, 0,
             (struct busdevice){ram_read, ram_write, ram_dma, self->ram});
+    debug_cpu_connect(self->dbg, &self->cpu);
 }
 
 static void connect_cart(struct nes_console *self, cart *c)
 {
     self->cart = c;
-    const uint16_t cart_busaddr = MEMBLOCK_32KB;
-    cart_cpu_connect(self->cart, self->cpu.bus, cart_busaddr);
-    debug_override_reset(self->dbg, self->cpu.bus, cart_busaddr);
+    cart_cpu_connect(self->cart, self->cpu.bus, MEMBLOCK_32KB);
+    debug_override_reset(self->dbg);
 }
 
 static void disconnect_cart(struct nes_console *self)
@@ -78,6 +78,7 @@ static void disconnect_cart(struct nes_console *self)
 
 static void free_cpubus(struct nes_console *self)
 {
+    debug_cpu_disconnect(self->dbg);
     bus_free(self->cpu.bus);
     self->cpu.bus = NULL;
 }
@@ -242,7 +243,7 @@ void nes_cycle(nes *self, struct cycleclock *clock)
         case CSGM_RUN:
             break;
         }
-        debug_check(self->dbg, clock, &self->cpu);
+        debug_check(self->dbg, clock);
     }
 }
 

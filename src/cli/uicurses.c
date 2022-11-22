@@ -461,14 +461,15 @@ static void drawram(const struct view *v, const struct console_state *snapshot)
     int cursor_x = start_x, cursor_y = 0;
     mvwvline(v->content, 0, start_x - 2, 0, h);
     mvwvline(v->content, 0, getmaxx(v->content) - 3, 0, h);
-    for (size_t page = 0; page < 8; ++page) {
-        for (size_t page_row = 0; page_row < page_dim; ++page_row) {
-            mvwprintw(v->content, cursor_y, 0, "%02zX", page);
-            for (size_t page_col = 0; page_col < page_dim; ++page_col) {
-                const size_t ramidx = (page * page_size)
-                                        + (page_row * page_dim) + page_col;
+    for (int page = 0; page < 8; ++page) {
+        for (int page_row = 0; page_row < page_dim; ++page_row) {
+            mvwprintw(v->content, cursor_y, 0, "%02X", page);
+            for (int page_col = 0; page_col < page_dim; ++page_col) {
+                const size_t ramidx = (size_t)((page * page_size)
+                                               + (page_row * page_dim)
+                                               + page_col);
                 const bool sp = page == 1
-                                && ramidx % page_size
+                                && ramidx % (size_t)page_size
                                     == snapshot->cpu.stack_pointer;
                 if (sp) {
                     wattron(v->content, A_STANDOUT);
@@ -480,7 +481,7 @@ static void drawram(const struct view *v, const struct console_state *snapshot)
                 }
                 cursor_x += col_width;
             }
-            mvwprintw(v->content, cursor_y, cursor_x + 2, "%zX", page_row);
+            mvwprintw(v->content, cursor_y, cursor_x + 2, "%X", page_row);
             cursor_x = start_x;
             ++cursor_y;
         }

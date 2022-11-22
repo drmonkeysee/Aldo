@@ -232,8 +232,8 @@ static void drawinstructions(const struct view *v, uint16_t addr, int h, int y,
                              const struct console_state *snapshot)
 {
     struct dis_instruction inst = {0};
+    char disassembly[DIS_INST_SIZE];
     for (int i = 0; i < h - y; ++i) {
-        char disassembly[DIS_INST_SIZE];
         int result = dis_parsemem_inst(snapshot->mem.prglength,
                                        snapshot->mem.currprg,
                                        inst.offset + inst.bv.size,

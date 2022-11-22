@@ -9,6 +9,7 @@
 #ifdef __cplusplus
 }   // NOTE: end extern "C"
 #endif
+#undef br_empty
 #undef br_nothrow
 #undef br_noalias_csz
 #undef br_noalias_sz

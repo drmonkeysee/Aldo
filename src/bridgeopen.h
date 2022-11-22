@@ -15,6 +15,7 @@
 #define br_noalias_sz(var)
 #define br_noalias_csz(val)
 #define br_nothrow noexcept
+#define br_empty(T) {}
 extern "C"
 {
 #else
@@ -26,4 +27,5 @@ extern "C"
 #define br_noalias_sz(var) restrict var
 #define br_noalias_csz(val) restrict static val
 #define br_nothrow
+#define br_empty(T) (T){0}
 #endif

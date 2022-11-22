@@ -42,7 +42,7 @@ inline bool bus_set(bus *self, uint16_t addr, struct busdevice bd) br_nothrow
 }
 inline bool bus_clear(bus *self, uint16_t addr) br_nothrow
 {
-    return bus_set(self, addr, (struct busdevice){0});
+    return bus_set(self, addr, br_empty(struct busdevice));
 }
 
 bool bus_read(bus *self, uint16_t addr, uint8_t *br_noalias d) br_nothrow;

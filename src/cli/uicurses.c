@@ -240,14 +240,16 @@ static void drawinstructions(const struct view *v, uint16_t addr, int h, int y,
                                        &inst);
         if (result > 0) {
             result = dis_inst(addr, &inst, disassembly);
-        } else {
-            if (result < 0) {
-                mvwaddstr(v->content, i, 0, dis_errstr(result));
+            if (result > 0) {
+                mvwaddstr(v->content, i, 0, disassembly);
+                addr += (uint16_t)inst.bv.size;
+                continue;
             }
-            break;
         }
-        mvwaddstr(v->content, i, 0, disassembly);
-        addr += (uint16_t)inst.bv.size;
+        if (result < 0) {
+            mvwaddstr(v->content, i, 0, dis_errstr(result));
+        }
+        break;
     }
 }
 

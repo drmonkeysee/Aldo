@@ -50,7 +50,7 @@ struct debugger_context {
 static bool resetaddr_read(const void *restrict ctx, uint16_t addr,
                            uint8_t *restrict d)
 {
-    struct resdecorator *const dec = (struct resdecorator *)ctx;
+    const struct resdecorator *const dec = ctx;
     if (!dec->inner.read) return false;
 
     if (CPU_VECTOR_RES <= addr && addr < CPU_VECTOR_IRQ) {
@@ -64,7 +64,7 @@ static bool resetaddr_read(const void *restrict ctx, uint16_t addr,
 
 static bool resetaddr_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    struct resdecorator *const dec = (struct resdecorator *)ctx;
+    struct resdecorator *const dec = ctx;
     return dec->inner.write
             ? dec->inner.write(dec->inner.ctx, addr, d)
             : false;
@@ -73,7 +73,7 @@ static bool resetaddr_write(void *ctx, uint16_t addr, uint8_t d)
 static size_t resetaddr_dma(const void *restrict ctx, uint16_t addr,
                             size_t count, uint8_t dest[restrict count])
 {
-    struct resdecorator *const dec = (struct resdecorator *)ctx;
+    const struct resdecorator *const dec = ctx;
     return dec->inner.dma
             ? dec->inner.dma(dec->inner.ctx, addr, count, dest)
             : 0;

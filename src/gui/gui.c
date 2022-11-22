@@ -7,6 +7,9 @@
 
 #include "gui.h"
 
+#include "debug.h"
+#include "nes.h"
+#include "snapshot.h"
 #include "ui.h"
 #include "uisdl.hpp"
 
@@ -18,12 +21,31 @@
 
 static int run_emu(const struct gui_platform *platform)
 {
-    const int err = ui_sdl_runloop(platform);
+    debugctx *dbg = debug_new();
+    if (!dbg) return EXIT_FAILURE;
+
+    int result = EXIT_SUCCESS;
+    nes *console = nes_new(dbg, false, false);
+    if (!console) {
+        result = EXIT_FAILURE;
+        goto exit_debug;
+    }
+    nes_powerup(console, NULL, false);
+
+    struct console_state snapshot;
+    nes_snapshot(console, &snapshot);
+    const int err = ui_sdl_runloop(platform, &snapshot);
     if (err < 0) {
         SDL_Log("UI run failure (%d): %s", err, ui_errstr(err));
-        return EXIT_FAILURE;
+        result = EXIT_FAILURE;
     }
-    return EXIT_SUCCESS;
+    snapshot_clear(&snapshot);
+    nes_free(console);
+    console = NULL;
+exit_debug:
+    debug_free(dbg);
+    dbg = NULL;
+    return result;
 }
 
 //

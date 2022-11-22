@@ -8,6 +8,8 @@
 #ifndef Aldo_gui_viewstate_hpp
 #define Aldo_gui_viewstate_hpp
 
+#include "snapshot.h"
+
 #include <SDL2/SDL.h>
 
 namespace aldo
@@ -18,7 +20,8 @@ struct viewstate {
         SDL_Point bounds, pos, velocity;
         int halfdim;
     } bouncer;
-    bool running = true, showBouncer = true, showCpu = true, showDemo = true;
+    const struct console_state& snapshot;
+    bool running = true, showBouncer = true, showCpu = true, showDemo = false;
 };
 
 }

@@ -56,10 +56,10 @@ auto render_ui(aldo::viewstate& s, const aldo::MediaRuntime& runtime) noexcept
     frame.render();
 }
 
-auto runloop(const gui_platform& platform)
+auto runloop(const gui_platform& platform, const console_state& snapshot)
 {
     aldo::viewstate state{
-        {{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 25},
+        {{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 25}, snapshot
     };
     const aldo::MediaRuntime runtime{
         {1280, 800}, state.bouncer.bounds, platform,
@@ -79,12 +79,13 @@ auto runloop(const gui_platform& platform)
 // Public Interface
 //
 
-int aldo::ui_sdl_runloop(const struct gui_platform* platform) noexcept
+int aldo::ui_sdl_runloop(const gui_platform* platform,
+                         const console_state* snapshot) noexcept
 {
     assert(platform != nullptr);
 
     try {
-        runloop(*platform);
+        runloop(*platform, *snapshot);
         return 0;
     } catch (const std::exception& ex) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,

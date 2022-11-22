@@ -9,6 +9,7 @@
 #define Aldo_gui_uisdl_hpp
 
 #include "guiplatform.h"
+#include "snapshot.h"
 
 #ifdef __cplusplus
 namespace aldo
@@ -17,7 +18,8 @@ namespace aldo
 
 #include "bridgeopen.h"
 br_checkerror
-int ui_sdl_runloop(const struct gui_platform* platform) br_nothrow;
+int ui_sdl_runloop(const struct gui_platform* platform,
+                   const struct console_state* snapshot) br_nothrow;
 #include "bridgeclose.h"
 
 #ifdef __cplusplus

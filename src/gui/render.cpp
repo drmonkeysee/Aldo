@@ -195,7 +195,8 @@ void aldo::RenderFrame::renderCpu() const noexcept
 
     if (ImGui::Begin("CPU", &state.showCpu)) {
         const auto& cpu = snapshot.cpu;
-        if (ImGui::CollapsingHeader("Registers")) {
+        if (ImGui::CollapsingHeader("Registers",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::BeginGroup();
             {
                 ImGui::Text("A: %02X", cpu.accumulator);
@@ -223,7 +224,7 @@ void aldo::RenderFrame::renderCpu() const noexcept
             textOff = IM_COL32_WHITE;
         const auto textSize = ImGui::CalcTextSize("A");
         const auto radius = (textSize.x + textSize.y) / 2.0f;
-        if (ImGui::CollapsingHeader("Flags")) {
+        if (ImGui::CollapsingHeader("Flags", ImGuiTreeNodeFlags_DefaultOpen)) {
             const auto pos = ImGui::GetCursorScreenPos();
             ImVec2 center{pos.x + radius, pos.y + radius};
             const auto
@@ -249,7 +250,8 @@ void aldo::RenderFrame::renderCpu() const noexcept
         }
 
         const auto& datapath = snapshot.datapath;
-        if (ImGui::CollapsingHeader("Datapath")) {
+        if (ImGui::CollapsingHeader("Datapath",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
             const auto& lines = snapshot.lines;
 
             ImGui::Text("Address Bus: %04X", datapath.addressbus);
@@ -296,7 +298,8 @@ void aldo::RenderFrame::renderCpu() const noexcept
         }
 
         const auto& prgMem = snapshot.mem;
-        if (ImGui::CollapsingHeader("PRG @ PC")) {
+        if (ImGui::CollapsingHeader("PRG @ PC",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
             static constexpr auto instCount = 7;
             static auto selected = -1;
             auto addr = datapath.current_instruction;
@@ -324,7 +327,8 @@ void aldo::RenderFrame::renderCpu() const noexcept
             }
         }
 
-        if (ImGui::CollapsingHeader("Vectors")) {
+        if (ImGui::CollapsingHeader("Vectors",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
             auto lo = prgMem.vectors[0], hi = prgMem.vectors[1];
             ImGui::Text("%04X: %02X %02X     NMI $%04X", CPU_VECTOR_NMI, lo,
                         hi, bytowr(lo, hi));

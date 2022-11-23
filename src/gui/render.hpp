@@ -18,30 +18,27 @@ struct viewstate;
 
 class RenderFrame final {
 public:
-    RenderFrame(viewstate& s, const MediaRuntime& r,
-                const console_state& cs) noexcept;
-    RenderFrame(viewstate&, MediaRuntime&&, console_state&&) = delete;
-    RenderFrame(viewstate&, const MediaRuntime&, console_state&&) = delete;
-    RenderFrame(viewstate&, MediaRuntime&&, const console_state&) = delete;
+    explicit RenderFrame(const MediaRuntime& r) noexcept;
+    RenderFrame(MediaRuntime&&) = delete;
     RenderFrame(const RenderFrame&) = delete;
     RenderFrame& operator=(const RenderFrame&) = delete;
     RenderFrame(RenderFrame&&) = delete;
     RenderFrame& operator=(RenderFrame&&) = delete;
     ~RenderFrame();
 
-    void render() const noexcept;
+    void render(viewstate& state,
+                const console_state& snapshot) const noexcept;
 
 private:
-    void renderMainMenu() const noexcept;
+    void renderMainMenu(viewstate& state) const noexcept;
     void renderHardwareTraits() const noexcept;
-    void renderCart() const noexcept;
-    void renderBouncer() const noexcept;
-    void renderCpu() const noexcept;
-    void renderRam() const noexcept;
+    void renderCart(const console_state& snapshot) const noexcept;
+    void renderBouncer(viewstate& state) const noexcept;
+    void renderCpu(viewstate& state,
+                   const console_state& snapshot) const noexcept;
+    void renderRam(const console_state& snapshot) const noexcept;
 
-    viewstate& state;
     const MediaRuntime& runtime;
-    const console_state& snapshot;
 };
 
 }

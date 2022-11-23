@@ -53,8 +53,8 @@ auto update_stuff(aldo::viewstate& s) noexcept
 auto render_ui(aldo::viewstate& s, const aldo::MediaRuntime& runtime,
                const console_state& snapshot) noexcept
 {
-    const aldo::RenderFrame frame{s, runtime, snapshot};
-    frame.render();
+    const aldo::RenderFrame frame{runtime};
+    frame.render(s, snapshot);
 }
 
 auto runloop(const gui_platform& platform, const console_state& snapshot)

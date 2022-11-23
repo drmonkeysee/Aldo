@@ -36,9 +36,8 @@ constexpr auto bool_to_linestate(bool v) noexcept
 // Public Interface
 //
 
-aldo::RenderFrame::RenderFrame(aldo::viewstate& s, const aldo::MediaRuntime& r,
-                               const console_state& cs) noexcept
-: state{s}, runtime{r}, snapshot{cs}
+aldo::RenderFrame::RenderFrame(const aldo::MediaRuntime& r) noexcept
+: runtime{r}
 {
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame();
@@ -55,14 +54,15 @@ aldo::RenderFrame::~RenderFrame()
     SDL_RenderPresent(ren);
 }
 
-void aldo::RenderFrame::render() const noexcept
+void aldo::RenderFrame::render(aldo::viewstate& state,
+                               const console_state& snapshot) const noexcept
 {
-    renderMainMenu();
+    renderMainMenu(state);
     renderHardwareTraits();
-    renderCart();
-    renderBouncer();
-    renderCpu();
-    renderRam();
+    renderCart(snapshot);
+    renderBouncer(state);
+    renderCpu(state, snapshot);
+    renderRam(snapshot);
     if (state.showDemo) {
         ImGui::ShowDemoWindow();
     }
@@ -72,7 +72,7 @@ void aldo::RenderFrame::render() const noexcept
 // Private Interface
 //
 
-void aldo::RenderFrame::renderMainMenu() const noexcept
+void aldo::RenderFrame::renderMainMenu(aldo::viewstate& state) const noexcept
 {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Aldo")) {
@@ -144,7 +144,8 @@ void aldo::RenderFrame::renderHardwareTraits() const noexcept
     ImGui::End();
 }
 
-void aldo::RenderFrame::renderCart() const noexcept
+void
+aldo::RenderFrame::renderCart(const console_state& snapshot) const noexcept
 {
     if (ImGui::Begin("Cart")) {
         const auto& cart = snapshot.cart;
@@ -156,7 +157,8 @@ void aldo::RenderFrame::renderCart() const noexcept
     ImGui::End();
 }
 
-void aldo::RenderFrame::renderBouncer() const noexcept
+void
+aldo::RenderFrame::renderBouncer(aldo::viewstate& state) const noexcept
 {
     if (!state.showBouncer) return;
 
@@ -189,7 +191,8 @@ void aldo::RenderFrame::renderBouncer() const noexcept
     ImGui::End();
 }
 
-void aldo::RenderFrame::renderCpu() const noexcept
+void aldo::RenderFrame::renderCpu(aldo::viewstate& state,
+                                  const console_state& snapshot) const noexcept
 {
     if (!state.showCpu) return;
 
@@ -357,7 +360,7 @@ void aldo::RenderFrame::renderCpu() const noexcept
     ImGui::End();
 }
 
-void aldo::RenderFrame::renderRam() const noexcept
+void aldo::RenderFrame::renderRam(const console_state& snapshot) const noexcept
 {
     if (ImGui::Begin("RAM")) {
         static constexpr auto pageSize = 0x100, pageDim = 0x10,

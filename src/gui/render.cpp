@@ -11,6 +11,7 @@
 #include "cart.h"
 #include "ctrlsignal.h"
 #include "dis.h"
+#include "guievent.hpp"
 #include "mediaruntime.hpp"
 #include "viewstate.hpp"
 
@@ -55,11 +56,11 @@ aldo::RenderFrame::~RenderFrame()
     SDL_RenderPresent(ren);
 }
 
-void aldo::RenderFrame::render(aldo::viewstate& state, nes* console,
+void aldo::RenderFrame::render(aldo::viewstate& state,
                                const console_state& snapshot) const noexcept
 {
     renderMainMenu(state);
-    renderHardwareTraits(console, snapshot);
+    renderHardwareTraits(state, snapshot);
     renderCart(snapshot);
     renderBouncer(state);
     renderCpu(state, snapshot);
@@ -99,7 +100,7 @@ void aldo::RenderFrame::renderMainMenu(aldo::viewstate& state) const noexcept
 
 void
 aldo::RenderFrame::
-renderHardwareTraits(nes* console,
+renderHardwareTraits(aldo::viewstate& state,
                      const console_state& snapshot) const noexcept
 {
     if (ImGui::Begin("Hardware Traits")) {
@@ -122,25 +123,24 @@ renderHardwareTraits(nes* console,
 
         auto halt = !snapshot.lines.ready;
         if (ImGui::Checkbox("HALT", &halt)) {
-            if (halt) {
-                nes_halt(console);
-            } else {
-                nes_ready(console);
-            }
+            state.guiEvents.emplace(command::Halt, halt);
         };
 
-        const auto mode = snapshot.mode;
+        auto mode = snapshot.mode;
         ImGui::TextUnformatted("Mode");
-        if (ImGui::RadioButton("Cycle", mode == CSGM_CYCLE)) {
-            nes_mode(console, CSGM_CYCLE);
+        if (ImGui::RadioButton("Cycle", mode == CSGM_CYCLE)
+            && mode != CSGM_CYCLE) {
+            state.guiEvents.emplace(command::Mode, CSGM_CYCLE);
         }
         ImGui::SameLine();
-        if (ImGui::RadioButton("Step", mode == CSGM_STEP)) {
-            nes_mode(console, CSGM_STEP);
+        if (ImGui::RadioButton("Step", mode == CSGM_STEP)
+            && mode != CSGM_STEP) {
+            state.guiEvents.emplace(command::Mode, CSGM_STEP);
         }
         ImGui::SameLine();
-        if (ImGui::RadioButton("Run", mode == CSGM_RUN)) {
-            nes_mode(console, CSGM_RUN);
+        if (ImGui::RadioButton("Run", mode == CSGM_RUN)
+            && mode != CSGM_RUN) {
+            state.guiEvents.emplace(command::Mode, CSGM_RUN);
         }
 
         // TODO: fake toggle button by using on/off flags to adjust colors
@@ -158,27 +158,15 @@ renderHardwareTraits(nes* console,
                 nmi = !snapshot.lines.nmi,
                 res = !snapshot.lines.reset;
         if (ImGui::Checkbox("IRQ", &irq)) {
-            if (irq) {
-                nes_interrupt(console, CSGI_IRQ);
-            } else {
-                nes_clear(console, CSGI_IRQ);
-            }
+            state.guiEvents.emplace(command::Irq, irq);
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("NMI", &nmi)) {
-            if (nmi) {
-                nes_interrupt(console, CSGI_NMI);
-            } else {
-                nes_clear(console, CSGI_NMI);
-            }
+            state.guiEvents.emplace(command::Nmi, nmi);
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("RES", &res)) {
-            if (res) {
-                nes_interrupt(console, CSGI_RES);
-            } else {
-                nes_clear(console, CSGI_RES);
-            }
+            state.guiEvents.emplace(command::Res, res);
         }
     }
     ImGui::End();

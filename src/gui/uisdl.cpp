@@ -7,6 +7,7 @@
 
 #include "uisdl.hpp"
 
+#include "guievent.hpp"
 #include "mediaruntime.hpp"
 #include "render.hpp"
 #include "ui.h"
@@ -25,8 +26,10 @@ namespace
 // UI Loop Implementation
 //
 
-auto handle_input(aldo::viewstate& s) noexcept
+auto handle_input(aldo::viewstate& s, nes* console)
 {
+    aldo::guievent_process(s.guiEvents, console);
+
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
         ImGui_ImplSDL2_ProcessEvent(&ev);
@@ -53,24 +56,26 @@ auto update_stuff(aldo::viewstate& s, nes* console,
 }
 
 auto render_ui(aldo::viewstate& s, const aldo::MediaRuntime& runtime,
-               nes* console, const console_state* snapshot) noexcept
+               const console_state* snapshot) noexcept
 {
     const aldo::RenderFrame frame{runtime};
-    frame.render(s, console, *snapshot);
+    frame.render(s, *snapshot);
 }
 
 auto runloop(const gui_platform& platform, nes* console,
              console_state* snapshot)
 {
-    aldo::viewstate state{{{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 25}};
+    aldo::viewstate state{
+        .bouncer{{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 25},
+    };
     const aldo::MediaRuntime runtime{
         {1280, 800}, state.bouncer.bounds, platform,
     };
     do {
-        handle_input(state);
+        handle_input(state, console);
         if (state.running) {
             update_stuff(state, console, snapshot);
-            render_ui(state, runtime, console, snapshot);
+            render_ui(state, runtime, snapshot);
         }
     } while (state.running);
 }

@@ -8,7 +8,6 @@
 #ifndef Aldo_gui_render_hpp
 #define Aldo_gui_render_hpp
 
-#include "nes.h"
 #include "snapshot.h"
 
 namespace aldo
@@ -27,12 +26,12 @@ public:
     RenderFrame& operator=(RenderFrame&&) = delete;
     ~RenderFrame();
 
-    void render(viewstate& state, nes* console,
+    void render(viewstate& state,
                 const console_state& snapshot) const noexcept;
 
 private:
     void renderMainMenu(viewstate& state) const noexcept;
-    void renderHardwareTraits(nes* console,
+    void renderHardwareTraits(viewstate& state,
                               const console_state& snapshot) const noexcept;
     void renderCart(const console_state& snapshot) const noexcept;
     void renderBouncer(viewstate& state) const noexcept;

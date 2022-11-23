@@ -27,7 +27,7 @@ enum class Command {
 
 struct guievent {
     template<typename T>
-    guievent(Command c, T v) : cmd{c}, value{v} {}
+    constexpr guievent(Command c, T v) noexcept : cmd{c}, value{v} {}
 
     Command cmd;
     std::variant<bool, csig_excmode> value;

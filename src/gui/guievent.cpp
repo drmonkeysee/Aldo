@@ -7,8 +7,22 @@
 
 #include "guievent.hpp"
 
+#include <sstream>
+#include <stdexcept>
+#include <type_traits>
+
 namespace
 {
+
+auto invalid_command(aldo::Command c)
+{
+    std::stringstream s;
+    s
+        << "Invalid gui event command ("
+        << static_cast<std::underlying_type_t<aldo::Command>>(c)
+        << ')';
+    return s.str();
+}
 
 auto process_event(const aldo::guievent& ev, nes* console)
 {
@@ -44,6 +58,8 @@ auto process_event(const aldo::guievent& ev, nes* console)
             nes_clear(console, CSGI_RES);
         }
         break;
+    default:
+        throw std::domain_error{invalid_command(ev.cmd)};
     }
 }
 

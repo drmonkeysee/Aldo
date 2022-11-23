@@ -395,7 +395,7 @@ void aldo::RenderFrame::renderRam() const noexcept
                     ImGui::TableSetColumnIndex(0);
                     ImGui::Text("%04X", addr);
                     const auto& lcl = std::locale::classic();
-                    char ascii[pageDim + 1]{};
+                    char ascii[pageDim + 1];
                     for (std::size_t ramCol = 0; ramCol < pageDim; ++ramCol) {
                         const auto ramIdx = (page * pageSize)
                                             + (pageRow * pageDim) + ramCol;
@@ -414,6 +414,7 @@ void aldo::RenderFrame::renderRam() const noexcept
                                         : '.';
                     }
                     ImGui::TableSetColumnIndex(cols - 1);
+                    ascii[pageDim] = '\0';
                     ImGui::TextUnformatted(ascii);
                     addr += pageDim;
                 }

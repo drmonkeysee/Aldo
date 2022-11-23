@@ -17,19 +17,19 @@
 namespace aldo
 {
 
-enum class command {
-    Halt,
-    Mode,
-    Irq,
-    Nmi,
-    Res,
+enum class Command {
+    halt,
+    mode,
+    irq,
+    nmi,
+    res,
 };
 
 struct guievent {
     template<typename T>
-    guievent(command c, T v) : cmd{c}, value{v} {}
+    guievent(Command c, T v) : cmd{c}, value{v} {}
 
-    command cmd;
+    Command cmd;
     std::variant<bool, csig_excmode> value;
 };
 

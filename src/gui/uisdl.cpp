@@ -36,7 +36,8 @@ auto handle_input(aldo::viewstate& s) noexcept
     }
 }
 
-auto update_stuff(aldo::viewstate& s) noexcept
+auto update_stuff(aldo::viewstate& s, nes* console,
+                  console_state* snapshot) noexcept
 {
     if (s.bouncer.pos.x - s.bouncer.halfdim < 0
         || s.bouncer.pos.x + s.bouncer.halfdim > s.bouncer.bounds.x) {
@@ -48,16 +49,18 @@ auto update_stuff(aldo::viewstate& s) noexcept
     }
     s.bouncer.pos.x += s.bouncer.velocity.x;
     s.bouncer.pos.y += s.bouncer.velocity.y;
+    nes_snapshot(console, snapshot);
 }
 
 auto render_ui(aldo::viewstate& s, const aldo::MediaRuntime& runtime,
-               const console_state& snapshot) noexcept
+               nes* console, const console_state* snapshot) noexcept
 {
     const aldo::RenderFrame frame{runtime};
-    frame.render(s, snapshot);
+    frame.render(s, console, *snapshot);
 }
 
-auto runloop(const gui_platform& platform, const console_state& snapshot)
+auto runloop(const gui_platform& platform, nes* console,
+             console_state* snapshot)
 {
     aldo::viewstate state{{{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 25}};
     const aldo::MediaRuntime runtime{
@@ -66,8 +69,8 @@ auto runloop(const gui_platform& platform, const console_state& snapshot)
     do {
         handle_input(state);
         if (state.running) {
-            update_stuff(state);
-            render_ui(state, runtime, snapshot);
+            update_stuff(state, console, snapshot);
+            render_ui(state, runtime, console, snapshot);
         }
     } while (state.running);
 }
@@ -78,13 +81,15 @@ auto runloop(const gui_platform& platform, const console_state& snapshot)
 // Public Interface
 //
 
-int aldo::ui_sdl_runloop(const gui_platform* platform,
-                         const console_state* snapshot) noexcept
+int aldo::ui_sdl_runloop(const gui_platform* platform, nes* console,
+                         console_state* snapshot) noexcept
 {
     assert(platform != nullptr);
+    assert(console != nullptr);
+    assert(snapshot != nullptr);
 
     try {
-        runloop(*platform, *snapshot);
+        runloop(*platform, console, snapshot);
         return 0;
     } catch (const std::exception& ex) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,

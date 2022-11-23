@@ -34,7 +34,7 @@ static int run_emu(const struct gui_platform *platform)
 
     struct console_state snapshot;
     nes_snapshot(console, &snapshot);
-    const int err = ui_sdl_runloop(platform, &snapshot);
+    const int err = ui_sdl_runloop(platform, console, &snapshot);
     if (err < 0) {
         SDL_Log("UI run failure (%d): %s", err, ui_errstr(err));
         result = EXIT_FAILURE;

@@ -36,9 +36,9 @@ constexpr auto bool_to_linestate(bool v) noexcept
 // Public Interface
 //
 
-aldo::RenderFrame::RenderFrame(aldo::viewstate& s,
-                               const aldo::MediaRuntime& r) noexcept
-: state{s}, runtime{r}
+aldo::RenderFrame::RenderFrame(aldo::viewstate& s, const aldo::MediaRuntime& r,
+                               const console_state& cs) noexcept
+: state{s}, runtime{r}, snapshot{cs}
 {
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame();
@@ -147,7 +147,7 @@ void aldo::RenderFrame::renderHardwareTraits() const noexcept
 void aldo::RenderFrame::renderCart() const noexcept
 {
     if (ImGui::Begin("Cart")) {
-        const auto& cart = state.snapshot.cart;
+        const auto& cart = snapshot.cart;
         ImGui::Text("Name: %s", cart_filename(cart.info));
         char cartFormat[CART_FMT_SIZE];
         const auto result = cart_format_extname(cart.info, cartFormat);
@@ -194,7 +194,7 @@ void aldo::RenderFrame::renderCpu() const noexcept
     if (!state.showCpu) return;
 
     if (ImGui::Begin("CPU", &state.showCpu)) {
-        const auto& cpu = state.snapshot.cpu;
+        const auto& cpu = snapshot.cpu;
         if (ImGui::CollapsingHeader("Registers")) {
             ImGui::BeginGroup();
             {
@@ -248,9 +248,9 @@ void aldo::RenderFrame::renderCpu() const noexcept
             ImGui::Dummy({0, radius * 2});
         }
 
+        const auto& datapath = snapshot.datapath;
         if (ImGui::CollapsingHeader("Datapath")) {
-            const auto& datapath = state.snapshot.datapath;
-            const auto& lines = state.snapshot.lines;
+            const auto& lines = snapshot.lines;
 
             ImGui::Text("Address Bus: %04X", datapath.addressbus);
             const char* dataStr;
@@ -271,7 +271,7 @@ void aldo::RenderFrame::renderCpu() const noexcept
             if (datapath.jammed) {
                 mnemonic = "JAMMED";
             } else {
-                const auto wlen = dis_datapath(&state.snapshot, buf);
+                const auto wlen = dis_datapath(&snapshot, buf);
                 mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
             }
             ImGui::Text("Decode: %s", mnemonic);
@@ -295,11 +295,11 @@ void aldo::RenderFrame::renderCpu() const noexcept
             ImGui::Text("RES: %s", bool_to_linestate(lines.reset));
         }
 
-        const auto& prgMem = state.snapshot.mem;
+        const auto& prgMem = snapshot.mem;
         if (ImGui::CollapsingHeader("PRG @ PC")) {
             static constexpr auto instCount = 7;
             static auto selected = -1;
-            auto addr = state.snapshot.datapath.current_instruction;
+            auto addr = datapath.current_instruction;
             dis_instruction inst{};
             char disasm[DIS_INST_SIZE];
             for (int i = 0; i < instCount; ++i) {
@@ -331,7 +331,7 @@ void aldo::RenderFrame::renderCpu() const noexcept
 
             lo = prgMem.vectors[2];
             hi = prgMem.vectors[3];
-            const auto& debugger = state.snapshot.debugger;
+            const auto& debugger = snapshot.debugger;
             const char* indicator;
             std::uint16_t resVector;
             if (debugger.resvector_override >= 0) {
@@ -380,7 +380,7 @@ void aldo::RenderFrame::renderRam() const noexcept
             ImGui::TableSetupColumn("ASCII");
             ImGui::TableHeadersRow();
 
-            const auto sp = state.snapshot.cpu.stack_pointer;
+            const auto sp = snapshot.cpu.stack_pointer;
             std::uint16_t addr = 0;
             for (std::size_t page = 0; page < pageCount; ++page) {
                 for (std::size_t pageRow = 0; pageRow < pageDim; ++pageRow) {
@@ -399,7 +399,7 @@ void aldo::RenderFrame::renderRam() const noexcept
                     for (std::size_t ramCol = 0; ramCol < pageDim; ++ramCol) {
                         const auto ramIdx = (page * pageSize)
                                             + (pageRow * pageDim) + ramCol;
-                        const auto val = state.snapshot.mem.ram[ramIdx];
+                        const auto val = snapshot.mem.ram[ramIdx];
                         ImGui::TableSetColumnIndex((int)ramCol + 1);
                         if (page == 1 && ramIdx % pageSize == sp) {
                             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,

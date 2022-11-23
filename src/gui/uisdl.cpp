@@ -50,17 +50,16 @@ auto update_stuff(aldo::viewstate& s) noexcept
     s.bouncer.pos.y += s.bouncer.velocity.y;
 }
 
-auto render_ui(aldo::viewstate& s, const aldo::MediaRuntime& runtime) noexcept
+auto render_ui(aldo::viewstate& s, const aldo::MediaRuntime& runtime,
+               const console_state& snapshot) noexcept
 {
-    const aldo::RenderFrame frame{s, runtime};
+    const aldo::RenderFrame frame{s, runtime, snapshot};
     frame.render();
 }
 
 auto runloop(const gui_platform& platform, const console_state& snapshot)
 {
-    aldo::viewstate state{
-        {{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 25}, snapshot
-    };
+    aldo::viewstate state{{{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 25}};
     const aldo::MediaRuntime runtime{
         {1280, 800}, state.bouncer.bounds, platform,
     };
@@ -68,7 +67,7 @@ auto runloop(const gui_platform& platform, const console_state& snapshot)
         handle_input(state);
         if (state.running) {
             update_stuff(state);
-            render_ui(state, runtime);
+            render_ui(state, runtime, snapshot);
         }
     } while (state.running);
 }

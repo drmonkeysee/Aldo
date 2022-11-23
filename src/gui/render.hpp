@@ -8,6 +8,8 @@
 #ifndef Aldo_gui_render_hpp
 #define Aldo_gui_render_hpp
 
+#include "snapshot.h"
+
 namespace aldo
 {
 
@@ -16,8 +18,11 @@ struct viewstate;
 
 class RenderFrame final {
 public:
-    RenderFrame(viewstate& s, const MediaRuntime& r) noexcept;
-    RenderFrame(viewstate& s, MediaRuntime&& r) = delete;
+    RenderFrame(viewstate& s, const MediaRuntime& r,
+                const console_state& cs) noexcept;
+    RenderFrame(viewstate&, MediaRuntime&&, console_state&&) = delete;
+    RenderFrame(viewstate&, const MediaRuntime&, console_state&&) = delete;
+    RenderFrame(viewstate&, MediaRuntime&&, const console_state&) = delete;
     RenderFrame(const RenderFrame&) = delete;
     RenderFrame& operator=(const RenderFrame&) = delete;
     RenderFrame(RenderFrame&&) = delete;
@@ -36,6 +41,7 @@ private:
 
     viewstate& state;
     const MediaRuntime& runtime;
+    const console_state& snapshot;
 };
 
 }

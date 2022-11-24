@@ -39,15 +39,15 @@ auto invalid_command(aldo::Command c)
 auto process_event(const aldo::event& ev, aldo::viewstate& state, nes* console)
 {
     switch (ev.cmd) {
-    case aldo::Command::execMode:
-        nes_mode(console, std::get<csig_excmode>(ev.value));
-        break;
     case aldo::Command::halt:
         if (std::get<bool>(ev.value)) {
             nes_halt(console);
         } else {
             nes_ready(console);
         }
+        break;
+    case aldo::Command::mode:
+        nes_mode(console, std::get<csig_excmode>(ev.value));
         break;
     case aldo::Command::quit:
         state.running = false;

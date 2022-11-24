@@ -20,9 +20,9 @@ namespace aldo
 {
 
 enum class Command {
-    execMode,
     halt,
     interrupt,
+    mode,
     quit,
 };
 

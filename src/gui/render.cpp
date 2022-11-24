@@ -129,17 +129,17 @@ renderHardwareTraits(aldo::viewstate& state,
         ImGui::TextUnformatted("Mode");
         if (ImGui::RadioButton("Cycle", mode == CSGM_CYCLE)
             && mode != CSGM_CYCLE) {
-            state.events.emplace(aldo::Command::execMode, CSGM_CYCLE);
+            state.events.emplace(aldo::Command::mode, CSGM_CYCLE);
         }
         ImGui::SameLine();
         if (ImGui::RadioButton("Step", mode == CSGM_STEP)
             && mode != CSGM_STEP) {
-            state.events.emplace(aldo::Command::execMode, CSGM_STEP);
+            state.events.emplace(aldo::Command::mode, CSGM_STEP);
         }
         ImGui::SameLine();
         if (ImGui::RadioButton("Run", mode == CSGM_RUN)
             && mode != CSGM_RUN) {
-            state.events.emplace(aldo::Command::execMode, CSGM_RUN);
+            state.events.emplace(aldo::Command::mode, CSGM_RUN);
         }
 
         // TODO: fake toggle button by using on/off flags to adjust colors

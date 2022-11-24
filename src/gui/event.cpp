@@ -1,11 +1,11 @@
 //
-//  guievent.cpp
+//  event.cpp
 //  Aldo
 //
 //  Created by Brandon Stansbury on 11/23/22.
 //
 
-#include "guievent.hpp"
+#include "event.hpp"
 
 #include <sstream>
 #include <stdexcept>
@@ -24,7 +24,7 @@ auto invalid_command(aldo::Command c)
     return s.str();
 }
 
-auto process_event(const aldo::guievent& ev, nes* console)
+auto process_event(const aldo::event& ev, nes* console)
 {
     switch (ev.cmd) {
     case aldo::Command::halt:
@@ -65,7 +65,7 @@ auto process_event(const aldo::guievent& ev, nes* console)
 
 }
 
-void aldo::guievent_process(std::queue<aldo::guievent>& events, nes* console)
+void aldo::handle_events(std::queue<aldo::event>& events, nes* console)
 {
     while (!events.empty()) {
         const auto& ev = events.front();

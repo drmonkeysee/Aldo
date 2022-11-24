@@ -8,7 +8,7 @@
 #ifndef Aldo_gui_viewstate_hpp
 #define Aldo_gui_viewstate_hpp
 
-#include "guievent.hpp"
+#include "event.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -18,7 +18,7 @@ namespace aldo
 {
 
 struct viewstate {
-    std::queue<guievent> guiEvents;
+    std::queue<event> events;
     struct {
         SDL_Point bounds, pos, velocity;
         int halfdim;

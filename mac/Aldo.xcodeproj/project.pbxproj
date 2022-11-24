@@ -52,7 +52,7 @@
 		C88A5E8527F6A1750039382D /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88A5E8427F6A1750039382D /* CartView.swift */; };
 		C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C88CABDC28FA4DDD00551C65 /* uisdl.cpp */; };
 		C88F3E5727D9A45E00317732 /* EmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88F3E5627D9A45E00317732 /* EmulationView.swift */; };
-		C8921762292EBFAB002CE1FA /* guievent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8921760292EBFAB002CE1FA /* guievent.cpp */; };
+		C8921762292EBFAB002CE1FA /* event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8921760292EBFAB002CE1FA /* event.cpp */; };
 		C89D715027D4758900C9177A /* CartPrgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89D714F27D4758900C9177A /* CartPrgView.swift */; };
 		C8A5B77B27DD79AE00A4DD5E /* Cart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A5B77A27DD79AE00A4DD5E /* Cart.swift */; };
 		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
@@ -277,8 +277,8 @@
 		C88CABE328FA63DD00551C65 /* bridgeopen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bridgeopen.h; sourceTree = "<group>"; };
 		C88CABE428FA63E700551C65 /* bridgeclose.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bridgeclose.h; sourceTree = "<group>"; };
 		C88F3E5627D9A45E00317732 /* EmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationView.swift; sourceTree = "<group>"; };
-		C8921760292EBFAB002CE1FA /* guievent.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = guievent.cpp; sourceTree = "<group>"; };
-		C8921761292EBFAB002CE1FA /* guievent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = guievent.hpp; sourceTree = "<group>"; };
+		C8921760292EBFAB002CE1FA /* event.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = event.cpp; sourceTree = "<group>"; };
+		C8921761292EBFAB002CE1FA /* event.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = event.hpp; sourceTree = "<group>"; };
 		C89D714F27D4758900C9177A /* CartPrgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartPrgView.swift; sourceTree = "<group>"; };
 		C8A5B77A27DD79AE00A4DD5E /* Cart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cart.swift; sourceTree = "<group>"; };
 		C8B4664327755790000576EE /* argparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = argparse.h; sourceTree = "<group>"; };
@@ -613,8 +613,8 @@
 			children = (
 				C8041C3528EE6EC000A3695F /* gui.h */,
 				C8041C3628EE6EC000A3695F /* gui.c */,
-				C8921761292EBFAB002CE1FA /* guievent.hpp */,
-				C8921760292EBFAB002CE1FA /* guievent.cpp */,
+				C8921761292EBFAB002CE1FA /* event.hpp */,
+				C8921760292EBFAB002CE1FA /* event.cpp */,
 				C8041C3828EE72E600A3695F /* guiplatform.h */,
 				C8561A0B29149EA600290B53 /* mediaruntime.hpp */,
 				C8561A0A29149EA600290B53 /* mediaruntime.cpp */,
@@ -965,7 +965,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C8921762292EBFAB002CE1FA /* guievent.cpp in Sources */,
+				C8921762292EBFAB002CE1FA /* event.cpp in Sources */,
 				C8041C3728EE6EC000A3695F /* gui.c in Sources */,
 				C8561A0C29149EA600290B53 /* mediaruntime.cpp in Sources */,
 				C854873828E685D00045BA42 /* imgui_impl_sdlrenderer.cpp in Sources */,

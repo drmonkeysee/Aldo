@@ -7,7 +7,7 @@
 
 #include "uisdl.hpp"
 
-#include "guievent.hpp"
+#include "event.hpp"
 #include "mediaruntime.hpp"
 #include "render.hpp"
 #include "ui.h"
@@ -28,7 +28,7 @@ namespace
 
 auto handle_input(aldo::viewstate& s, nes* console)
 {
-    aldo::guievent_process(s.guiEvents, console);
+    aldo::handle_events(s.events, console);
 
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {

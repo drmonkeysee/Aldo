@@ -11,7 +11,6 @@
 #include "cart.h"
 #include "ctrlsignal.h"
 #include "dis.h"
-#include "event.hpp"
 #include "mediaruntime.hpp"
 #include "viewstate.hpp"
 
@@ -81,7 +80,7 @@ void aldo::RenderFrame::renderMainMenu(aldo::viewstate& state) const noexcept
             ImGui::MenuItem("About");
             ImGui::MenuItem("ImGui Demo", nullptr, &state.showDemo);
             if (ImGui::MenuItem("Quit", "Cmd+Q")) {
-                state.running = false;
+                state.events.emplace(aldo::Command::quit);
             };
             ImGui::EndMenu();
         }

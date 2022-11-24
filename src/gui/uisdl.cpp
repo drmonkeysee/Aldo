@@ -7,7 +7,7 @@
 
 #include "uisdl.hpp"
 
-#include "event.hpp"
+#include "ctrlsignal.h"
 #include "mediaruntime.hpp"
 #include "render.hpp"
 #include "ui.h"
@@ -17,10 +17,65 @@
 #include <SDL2/SDL.h>
 
 #include <exception>
+#include <sstream>
+#include <stdexcept>
+#include <type_traits>
 #include <cassert>
 
 namespace
 {
+
+auto invalid_command(aldo::Command c)
+{
+    std::stringstream s;
+    s
+        << "Invalid gui event command ("
+        << static_cast<std::underlying_type_t<aldo::Command>>(c)
+        << ')';
+    return s.str();
+}
+
+auto process_event(const aldo::event& ev, aldo::viewstate& state, nes* console)
+{
+    switch (ev.cmd) {
+    case aldo::Command::execMode:
+        nes_mode(console, std::get<csig_excmode>(ev.value));
+        break;
+    case aldo::Command::halt:
+        if (std::get<bool>(ev.value)) {
+            nes_halt(console);
+        } else {
+            nes_ready(console);
+        }
+        break;
+    case aldo::Command::quit:
+        state.running = false;
+        break;
+    case aldo::Command::signalIRQ:
+        if (std::get<bool>(ev.value)) {
+            nes_interrupt(console, CSGI_IRQ);
+        } else {
+            nes_clear(console, CSGI_IRQ);
+        }
+        break;
+    case aldo::Command::signalNMI:
+        if (std::get<bool>(ev.value)) {
+            nes_interrupt(console, CSGI_NMI);
+        } else {
+            nes_clear(console, CSGI_NMI);
+        }
+        break;
+    case aldo::Command::signalReset:
+        if (std::get<bool>(ev.value)) {
+            nes_interrupt(console, CSGI_RES);
+        } else {
+            nes_clear(console, CSGI_RES);
+        }
+        break;
+    default:
+        throw std::domain_error{invalid_command(ev.cmd)};
+    }
+}
 
 //
 // UI Loop Implementation
@@ -28,14 +83,17 @@ namespace
 
 auto handle_input(aldo::viewstate& s, nes* console)
 {
-    aldo::handle_events(s.events, console);
-
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
         ImGui_ImplSDL2_ProcessEvent(&ev);
         if (ev.type == SDL_QUIT) {
-            s.running = false;
+            s.events.emplace(aldo::Command::quit);
         }
+    }
+    while (!s.events.empty()) {
+        const auto& ev = s.events.front();
+        process_event(ev, s, console);
+        s.events.pop();
     }
 }
 

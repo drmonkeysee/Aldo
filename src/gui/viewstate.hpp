@@ -8,6 +8,8 @@
 #ifndef Aldo_gui_viewstate_hpp
 #define Aldo_gui_viewstate_hpp
 
+#include "ctrlsignal.h"
+
 #include <SDL2/SDL.h>
 
 #include <queue>
@@ -27,7 +29,7 @@ enum class Command {
 using interrupt_event = std::pair<csig_interrupt, bool>;
 
 struct event {
-    constexpr event(Command c) : cmd{c} {}
+    constexpr event(Command c) noexcept : cmd{c} {}
     template<typename T>
     constexpr event(Command c, T v) noexcept : cmd{c}, value{v} {}
 

@@ -20,6 +20,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
+#include <variant>
 #include <cassert>
 
 namespace
@@ -51,25 +52,14 @@ auto process_event(const aldo::event& ev, aldo::viewstate& state, nes* console)
     case aldo::Command::quit:
         state.running = false;
         break;
-    case aldo::Command::signalIRQ:
-        if (std::get<bool>(ev.value)) {
-            nes_interrupt(console, CSGI_IRQ);
-        } else {
-            nes_clear(console, CSGI_IRQ);
-        }
-        break;
-    case aldo::Command::signalNMI:
-        if (std::get<bool>(ev.value)) {
-            nes_interrupt(console, CSGI_NMI);
-        } else {
-            nes_clear(console, CSGI_NMI);
-        }
-        break;
-    case aldo::Command::signalReset:
-        if (std::get<bool>(ev.value)) {
-            nes_interrupt(console, CSGI_RES);
-        } else {
-            nes_clear(console, CSGI_RES);
+    case aldo::Command::interrupt:
+        {
+            const auto& val = std::get<aldo::interrupt_event>(ev.value);
+            if (val.second) {
+                nes_interrupt(console, val.first);
+            } else {
+                nes_clear(console, val.first);
+            }
         }
         break;
     default:

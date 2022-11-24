@@ -157,15 +157,18 @@ renderHardwareTraits(aldo::viewstate& state,
                 nmi = !snapshot.lines.nmi,
                 res = !snapshot.lines.reset;
         if (ImGui::Checkbox("IRQ", &irq)) {
-            state.events.emplace(aldo::Command::signalIRQ, irq);
+            state.events.emplace(aldo::Command::interrupt,
+                                 aldo::interrupt_event{CSGI_IRQ, irq});
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("NMI", &nmi)) {
-            state.events.emplace(aldo::Command::signalNMI, nmi);
+            state.events.emplace(aldo::Command::interrupt,
+                                 aldo::interrupt_event{CSGI_NMI, nmi});
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("RES", &res)) {
-            state.events.emplace(aldo::Command::signalReset, res);
+            state.events.emplace(aldo::Command::interrupt,
+                                 aldo::interrupt_event{CSGI_RES, res});
         }
     }
     ImGui::End();

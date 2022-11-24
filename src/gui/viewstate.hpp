@@ -11,6 +11,7 @@
 #include <SDL2/SDL.h>
 
 #include <queue>
+#include <utility>
 #include <variant>
 
 namespace aldo
@@ -19,11 +20,11 @@ namespace aldo
 enum class Command {
     execMode,
     halt,
+    interrupt,
     quit,
-    signalIRQ,
-    signalNMI,
-    signalReset,
 };
+
+using interrupt_event = std::pair<csig_interrupt, bool>;
 
 struct event {
     constexpr event(Command c) : cmd{c} {}
@@ -31,7 +32,12 @@ struct event {
     constexpr event(Command c, T v) noexcept : cmd{c}, value{v} {}
 
     Command cmd;
-    std::variant<std::monostate, bool, csig_excmode> value;
+    std::variant<
+        std::monostate,
+        bool,
+        csig_excmode,
+        interrupt_event
+    > value;
 };
 
 struct viewstate {

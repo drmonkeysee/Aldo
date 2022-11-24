@@ -18,11 +18,12 @@ namespace aldo
 {
 
 enum class Command {
+    execMode,
     halt,
-    mode,
-    irq,
-    nmi,
-    res,
+    quit,
+    signalIRQ,
+    signalNMI,
+    signalReset,
 };
 
 struct event {

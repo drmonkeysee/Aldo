@@ -27,6 +27,9 @@ auto invalid_command(aldo::Command c)
 auto process_event(const aldo::event& ev, nes* console)
 {
     switch (ev.cmd) {
+    case aldo::Command::execMode:
+        nes_mode(console, std::get<csig_excmode>(ev.value));
+        break;
     case aldo::Command::halt:
         if (std::get<bool>(ev.value)) {
             nes_halt(console);
@@ -34,24 +37,21 @@ auto process_event(const aldo::event& ev, nes* console)
             nes_ready(console);
         }
         break;
-    case aldo::Command::mode:
-        nes_mode(console, std::get<csig_excmode>(ev.value));
-        break;
-    case aldo::Command::irq:
+    case aldo::Command::signalIRQ:
         if (std::get<bool>(ev.value)) {
             nes_interrupt(console, CSGI_IRQ);
         } else {
             nes_clear(console, CSGI_IRQ);
         }
         break;
-    case aldo::Command::nmi:
+    case aldo::Command::signalNMI:
         if (std::get<bool>(ev.value)) {
             nes_interrupt(console, CSGI_NMI);
         } else {
             nes_clear(console, CSGI_NMI);
         }
         break;
-    case aldo::Command::res:
+    case aldo::Command::signalReset:
         if (std::get<bool>(ev.value)) {
             nes_interrupt(console, CSGI_RES);
         } else {

@@ -50,12 +50,6 @@ struct viewstate {
     bool running;
 };
 
-static void initclock(struct runclock *c)
-{
-    *c = (struct runclock){.cyclock = {.cycles_per_sec = 4}};
-    cycleclock_start(&c->cyclock);
-}
-
 static void tick_sleep(struct runclock *c)
 {
     const struct timespec elapsed = timespec_elapsed(&c->cyclock.current);
@@ -658,6 +652,13 @@ static void handle_input(struct viewstate *s, struct runclock *c,
     }
 }
 
+static void emu_update(nes *console, struct console_state *snapshot,
+                       struct runclock *c)
+{
+    nes_cycle(console, &c->cyclock);
+    nes_snapshot(console, snapshot);
+}
+
 static void refresh_ui(const struct layout *l, const struct viewstate *s,
                        const struct runclock *c,
                        const struct console_state *snapshot)
@@ -706,14 +707,13 @@ int ui_curses_loop(const struct cliargs *args, nes *console,
     struct viewstate state = {.args = args, .running = true};
     struct layout layout;
     init_ui(&layout);
-    struct runclock clock;
-    initclock(&clock);
+    struct runclock clock = {.cyclock = {.cycles_per_sec = 4}};
+    cycleclock_start(&clock.cyclock);
     do {
         tick_start(&clock, snapshot);
         handle_input(&state, &clock, console, snapshot);
         if (state.running) {
-            nes_cycle(console, &clock.cyclock);
-            nes_snapshot(console, snapshot);
+            emu_update(console, snapshot, &clock);
             refresh_ui(&layout, &state, &clock, snapshot);
         }
         tick_end(&clock);

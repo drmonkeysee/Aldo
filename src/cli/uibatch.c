@@ -51,9 +51,9 @@ static void handle_sigint(int sig, siginfo_t *info, void *uap)
 // UI Loop Implementation
 //
 
-static int init_ui(struct runclock *clock)
+static int init_ui(struct runclock *c)
 {
-    cycleclock_start(&clock->cyclock);
+    cycleclock_start(&c->cyclock);
     struct sigaction act = {
         .sa_sigaction = handle_sigint,
         .sa_flags = SA_SIGINFO,
@@ -62,20 +62,19 @@ static int init_ui(struct runclock *clock)
 }
 
 static void tick_start(const struct console_state *snapshot,
-                       struct runclock *clock)
+                       struct runclock *c)
 {
-    cycleclock_tickstart(&clock->cyclock, true);
+    cycleclock_tickstart(&c->cyclock, true);
 
     // NOTE: cumulative moving average:
     // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-    const double ticks = (double)clock->cyclock.frames;
-    clock->avgframetime_ms = (clock->cyclock.frametime_ms
-                                    + (ticks * clock->avgframetime_ms))
-                                / (ticks + 1);
+    const double ticks = (double)c->cyclock.frames;
+    c->avgframetime_ms = (c->cyclock.frametime_ms
+                          + (ticks * c->avgframetime_ms)) / (ticks + 1);
 
     // NOTE: arbitrary per-tick budget, 6502s often ran at 1 MHz so a million
     // cycles per tick seems as good a number as any.
-    clock->cyclock.budget = 1e6;
+    c->cyclock.budget = 1e6;
 
     // NOTE: exit batch mode if cpu is not running
     if (!snapshot->lines.ready) {
@@ -83,12 +82,14 @@ static void tick_start(const struct console_state *snapshot,
     }
 }
 
-static void tick_end(struct runclock *clock)
+static void emu_update(nes *console, struct console_state *snapshot,
+                       struct runclock *c)
 {
-    cycleclock_tickend(&clock->cyclock);
+    nes_cycle(console, &c->cyclock);
+    nes_snapshot(console, snapshot);
 }
 
-static void update_progress(const struct runclock *clock)
+static void update_progress(const struct runclock *c)
 {
     static const char distractor[] = {'|', '/', '-', '\\'};
     static const double display_wait = 2000,
@@ -96,7 +97,7 @@ static void update_progress(const struct runclock *clock)
     static double refreshdt;
     static size_t distractor_frame;
 
-    if ((refreshdt += clock->cyclock.frametime_ms) >= refresh_interval_ms) {
+    if ((refreshdt += c->cyclock.frametime_ms) >= refresh_interval_ms) {
         refreshdt = display_wait;
         clearline();
         fprintf(stderr, DistractorFormat, distractor[distractor_frame++]);
@@ -104,23 +105,28 @@ static void update_progress(const struct runclock *clock)
     }
 }
 
+static void tick_end(struct runclock *c)
+{
+    cycleclock_tickend(&c->cyclock);
+}
+
 static void write_summary(const struct cliargs *args,
                           const struct console_state *snapshot,
-                          const struct runclock *clock)
+                          const struct runclock *c)
 {
     clearline();
     if (!args->verbose) return;
 
-    const bool scale_ms = clock->cyclock.runtime < 1.0;
+    const bool scale_ms = c->cyclock.runtime < 1.0;
     printf("---=== %s ===---\n", cart_filename(snapshot->cart.info));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
            scale_ms
-            ? clock->cyclock.runtime * TSU_MS_PER_S
-            : clock->cyclock.runtime);
-    printf("Avg Frame Time (msec): %.3f\n", clock->avgframetime_ms);
-    printf("Total Cycles: %" PRIu64 "\n", clock->cyclock.total_cycles);
+            ? c->cyclock.runtime * TSU_MS_PER_S
+            : c->cyclock.runtime);
+    printf("Avg Frame Time (msec): %.3f\n", c->avgframetime_ms);
+    printf("Total Cycles: %" PRIu64 "\n", c->cyclock.total_cycles);
     printf("Avg Cycles/sec: %.2f\n",
-           (double)clock->cyclock.total_cycles / clock->cyclock.runtime);
+           (double)c->cyclock.total_cycles / c->cyclock.runtime);
     if (snapshot->debugger.break_condition.cond != HLT_NONE) {
         char break_desc[HEXPR_FMT_SIZE];
         const int err = haltexpr_fmt(&snapshot->debugger.break_condition,
@@ -146,8 +152,7 @@ int ui_batch_loop(const struct cliargs *args, nes *console,
 
     do {
         tick_start(snapshot, &clock);
-        nes_cycle(console, &clock.cyclock);
-        nes_snapshot(console, snapshot);
+        emu_update(console, snapshot, &clock);
         update_progress(&clock);
         tick_end(&clock);
     } while (QuitSignal == 0);

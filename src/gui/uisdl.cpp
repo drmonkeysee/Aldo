@@ -8,8 +8,10 @@
 #include "uisdl.hpp"
 
 #include "ctrlsignal.h"
+#include "cycleclock.h"
 #include "mediaruntime.hpp"
 #include "render.hpp"
+#include "tsutil.h"
 #include "ui.h"
 #include "viewstate.hpp"
 
@@ -22,9 +24,36 @@
 #include <type_traits>
 #include <variant>
 #include <cassert>
+#include <ctime>
 
 namespace
 {
+
+struct runclock {
+    void start()
+    {
+        cycleclock_start(&cyclock);
+    }
+
+    void tick_start(const struct console_state* snapshot)
+    {
+        cycleclock_tickstart(&cyclock, !snapshot->lines.ready);
+    }
+
+    void emutime()
+    {
+        const std::timespec elapsed = timespec_elapsed(&cyclock.current);
+        emutime_ms = timespec_to_ms(&elapsed);
+    }
+
+    void tick_end()
+    {
+        cycleclock_tickend(&cyclock);
+    }
+
+    cycleclock cyclock{.cycles_per_sec = 4};
+    double emutime_ms = 0;
+};
 
 auto invalid_command(aldo::Command c)
 {
@@ -87,8 +116,8 @@ auto handle_input(aldo::viewstate& s, nes* console)
     }
 }
 
-auto update_stuff(aldo::viewstate& s, nes* console,
-                  console_state* snapshot) noexcept
+auto emu_update(nes* console, console_state* snapshot, aldo::viewstate& s,
+                runclock& c) noexcept
 {
     if (s.bouncer.pos.x - s.bouncer.halfdim < 0
         || s.bouncer.pos.x + s.bouncer.halfdim > s.bouncer.bounds.x) {
@@ -100,7 +129,9 @@ auto update_stuff(aldo::viewstate& s, nes* console,
     }
     s.bouncer.pos.x += s.bouncer.velocity.x;
     s.bouncer.pos.y += s.bouncer.velocity.y;
+    nes_cycle(console, &c.cyclock);
     nes_snapshot(console, snapshot);
+    c.emutime();
 }
 
 auto render_ui(aldo::viewstate& s, const aldo::MediaRuntime& runtime,
@@ -119,12 +150,16 @@ auto runloop(const gui_platform& platform, nes* console,
     const aldo::MediaRuntime runtime{
         {1280, 800}, state.bouncer.bounds, platform,
     };
+    runclock clock;
+    clock.start();
     do {
+        clock.tick_start(snapshot);
         handle_input(state, console);
         if (state.running) {
-            update_stuff(state, console, snapshot);
+            emu_update(console, snapshot, state, clock);
             render_ui(state, runtime, snapshot);
         }
+        clock.tick_end();
     } while (state.running);
 }
 

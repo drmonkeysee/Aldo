@@ -19,6 +19,7 @@
 #include "imgui_impl_sdlrenderer.h"
 
 #include <locale>
+#include <cinttypes>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
@@ -103,11 +104,11 @@ renderHardwareTraits(aldo::viewstate& state,
                      const console_state& snapshot) const noexcept
 {
     if (ImGui::Begin("Hardware Traits")) {
-        static int cps = 4;
+        auto& cyclock = state.clock.cyclock;
         ImGui::TextUnformatted("FPS: 60");
-        ImGui::TextUnformatted("Runtime: N.NN");
-        ImGui::TextUnformatted("Frames: NN");
-        ImGui::TextUnformatted("Cycles: NN");
+        ImGui::Text("Runtime: %.3f", cyclock.runtime);
+        ImGui::Text("Frames: %" PRIu64, cyclock.frames);
+        ImGui::Text("Cycles: %" PRIu64, cyclock.total_cycles);
 
         ImGui::Separator();
 
@@ -115,8 +116,8 @@ renderHardwareTraits(aldo::viewstate& state,
         ImGui::TextUnformatted("Cycles/Second");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(40);
-        ImGui::DragInt("##cyclesPerSecond", &cps, 1.0f, 1, 100, "%d",
-                       ImGuiSliderFlags_AlwaysClamp);
+        ImGui::DragInt("##cyclesPerSecond", &cyclock.cycles_per_sec, 1.0f, 1,
+                       100, "%d", ImGuiSliderFlags_AlwaysClamp);
 
         ImGui::Separator();
 

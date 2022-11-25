@@ -19,8 +19,14 @@ struct cycleclock {
     int budget, cycles_per_sec;
 };
 
-void cycleclock_start(struct cycleclock *self);
-void cycleclock_tickstart(struct cycleclock *self, bool reset_budget);
-void cycleclock_tickend(struct cycleclock *self);
+#include "bridgeopen.h"
+br_libexport
+void cycleclock_start(struct cycleclock *self) br_nothrow;
+br_libexport
+void cycleclock_tickstart(struct cycleclock *self,
+                          bool reset_budget) br_nothrow;
+br_libexport
+void cycleclock_tickend(struct cycleclock *self) br_nothrow;
+#include "bridgeclose.h"
 
 #endif

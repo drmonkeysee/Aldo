@@ -13,6 +13,7 @@
 		C808BA6827893976001FDE39 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C80C9E1C277D648F000F2D8B /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
 		C80CCE062930495300664730 /* cycleclock.c in Sources */ = {isa = PBXBuildFile; fileRef = C80CCE052930495300664730 /* cycleclock.c */; };
+		C80CCE0729306D8A00664730 /* cycleclock.c in Sources */ = {isa = PBXBuildFile; fileRef = C80CCE052930495300664730 /* cycleclock.c */; };
 		C8184D3E25E7496B002B3100 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8184D3D25E7496B002B3100 /* Tests.swift */; };
 		C8184D5325E74B75002B3100 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C8184D5225E74B75002B3100 /* dis.c */; };
 		C8184D7025E750E0002B3100 /* libcinytest.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8184D6F25E750E0002B3100 /* libcinytest.dylib */; };
@@ -994,6 +995,7 @@
 				C8B88AAC29062AF000B7CB23 /* debug.c in Sources */,
 				C8B88AAF29062AFE00B7CB23 /* haltexpr.c in Sources */,
 				C8B88AAA29062AE600B7CB23 /* cart.c in Sources */,
+				C80CCE0729306D8A00664730 /* cycleclock.c in Sources */,
 				C8B88AAB29062AEB00B7CB23 /* cpu.c in Sources */,
 				C8B88AAE29062AFA00B7CB23 /* dis.c in Sources */,
 				C8B88AA929062AE100B7CB23 /* bytes.c in Sources */,

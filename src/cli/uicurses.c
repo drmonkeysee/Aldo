@@ -40,9 +40,8 @@ static const int Fps = 60, MinCps = 1, MaxCps = 1000, RamSheets = 4;
 static const struct timespec VSync = {.tv_nsec = TSU_NS_PER_S / Fps};
 
 struct runclock {
-    struct timespec current, previous, start;
     struct cycleclock cyclock;
-    double frameleft_ms, frametime_ms, timebudget_ms;
+    double frameleft_ms;
 };
 
 struct viewstate {
@@ -54,13 +53,12 @@ struct viewstate {
 static void initclock(struct runclock *c)
 {
     *c = (struct runclock){.cyclock = {.cycles_per_sec = 4}};
-    clock_gettime(CLOCK_MONOTONIC, &c->start);
-    c->previous = c->start;
+    cycleclock_start(&c->cyclock);
 }
 
 static void tick_sleep(struct runclock *c)
 {
-    const struct timespec elapsed = timespec_elapsed(&c->current);
+    const struct timespec elapsed = timespec_elapsed(&c->cyclock.current);
 
     // NOTE: if elapsed nanoseconds is greater than vsync we're over
     // our time budget; if elapsed *seconds* is greater than vsync
@@ -106,9 +104,9 @@ static void drawhwtraits(const struct view *v, const struct viewstate *s,
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
     static double display_frameleft, display_frametime, refreshdt;
-    if ((refreshdt += c->frametime_ms) >= refresh_interval_ms) {
+    if ((refreshdt += c->cyclock.frametime_ms) >= refresh_interval_ms) {
         display_frameleft = c->frameleft_ms;
-        display_frametime = c->frametime_ms;
+        display_frametime = c->cyclock.frametime_ms;
         refreshdt = 0;
     }
 
@@ -577,33 +575,12 @@ static void init_ui(struct layout *l)
 static void tick_start(struct runclock *c,
                        const struct console_state *snapshot)
 {
-    clock_gettime(CLOCK_MONOTONIC, &c->current);
-    const double currentms = timespec_to_ms(&c->current);
-    c->frametime_ms = currentms - timespec_to_ms(&c->previous);
-    c->cyclock.runtime = (currentms - timespec_to_ms(&c->start))
-                            / TSU_MS_PER_S;
-
-    if (!snapshot->lines.ready) {
-        c->timebudget_ms = c->cyclock.budget = 0;
-        return;
-    }
-
-    c->timebudget_ms += c->frametime_ms;
-    // NOTE: accumulate at most a second of banked cycle time
-    if (c->timebudget_ms >= TSU_MS_PER_S) {
-        c->timebudget_ms = TSU_MS_PER_S;
-    }
-
-    const double mspercycle = (double)TSU_MS_PER_S / c->cyclock.cycles_per_sec;
-    const int new_cycles = (int)(c->timebudget_ms / mspercycle);
-    c->cyclock.budget += new_cycles;
-    c->timebudget_ms -= new_cycles * mspercycle;
+    cycleclock_tickstart(&c->cyclock, !snapshot->lines.ready);
 }
 
 static void tick_end(struct runclock *c)
 {
-    c->previous = c->current;
-    ++c->cyclock.frames;
+    cycleclock_tickend(&c->cyclock);
     tick_sleep(c);
 }
 

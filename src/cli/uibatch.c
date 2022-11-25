@@ -27,9 +27,8 @@
 static const char *const restrict DistractorFormat = "%c Running\u2026";
 
 struct runclock {
-    struct timespec current, previous, start;
     struct cycleclock cyclock;
-    double avgframetime_ms, frametime_ms;
+    double avgframetime_ms;
 };
 
 static void clearline(void)
@@ -54,8 +53,7 @@ static void handle_sigint(int sig, siginfo_t *info, void *uap)
 
 static int init_ui(struct runclock *clock)
 {
-    clock_gettime(CLOCK_MONOTONIC, &clock->start);
-    clock->previous = clock->start;
+    cycleclock_start(&clock->cyclock);
     struct sigaction act = {
         .sa_sigaction = handle_sigint,
         .sa_flags = SA_SIGINFO,
@@ -66,16 +64,12 @@ static int init_ui(struct runclock *clock)
 static void tick_start(const struct console_state *snapshot,
                        struct runclock *clock)
 {
-    clock_gettime(CLOCK_MONOTONIC, &clock->current);
-    const double currentms = timespec_to_ms(&clock->current);
-    clock->frametime_ms = currentms - timespec_to_ms(&clock->previous);
-    clock->cyclock.runtime = (currentms - timespec_to_ms(&clock->start))
-                                / TSU_MS_PER_S;
+    cycleclock_tickstart(&clock->cyclock, true);
 
     // NOTE: cumulative moving average:
     // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
     const double ticks = (double)clock->cyclock.frames;
-    clock->avgframetime_ms = (clock->frametime_ms
+    clock->avgframetime_ms = (clock->cyclock.frametime_ms
                                     + (ticks * clock->avgframetime_ms))
                                 / (ticks + 1);
 
@@ -91,8 +85,7 @@ static void tick_start(const struct console_state *snapshot,
 
 static void tick_end(struct runclock *clock)
 {
-    clock->previous = clock->current;
-    ++clock->cyclock.frames;
+    cycleclock_tickend(&clock->cyclock);
 }
 
 static void update_progress(const struct runclock *clock)
@@ -103,7 +96,7 @@ static void update_progress(const struct runclock *clock)
     static double refreshdt;
     static size_t distractor_frame;
 
-    if ((refreshdt += clock->frametime_ms) >= refresh_interval_ms) {
+    if ((refreshdt += clock->cyclock.frametime_ms) >= refresh_interval_ms) {
         refreshdt = display_wait;
         clearline();
         fprintf(stderr, DistractorFormat, distractor[distractor_frame++]);

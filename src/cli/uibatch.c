@@ -50,9 +50,8 @@ static void handle_sigint(int sig, siginfo_t *info, void *uap)
 // UI Loop Implementation
 //
 
-static int init_ui(struct runclock *c)
+static int init_ui(void)
 {
-    cycleclock_start(&c->cyclock);
     struct sigaction act = {
         .sa_sigaction = handle_sigint,
         .sa_flags = SA_SIGINFO,
@@ -145,10 +144,11 @@ int ui_batch_loop(const struct cliargs *args, nes *console,
     assert(console != NULL);
     assert(snapshot != NULL);
 
-    struct runclock clock = {0};
-    const int err = init_ui(&clock);
+    const int err = init_ui();
     if (err < 0) return err;
 
+    struct runclock clock = {0};
+    cycleclock_start(&clock.cyclock);
     do {
         tick_start(snapshot, &clock);
         emu_update(console, snapshot, &clock);

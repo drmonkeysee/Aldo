@@ -39,13 +39,12 @@
 static const int Fps = 60, MinCps = 1, MaxCps = 1000, RamSheets = 4;
 static const struct timespec VSync = {.tv_nsec = TSU_NS_PER_S / Fps};
 
-struct runclock {
-    struct cycleclock cyclock;
-    double frameleft_ms;
-};
-
 struct viewstate {
     const struct cliargs *args; // Non-owning Pointer
+    struct runclock {
+        struct cycleclock cyclock;
+        double frameleft_ms;
+    } clock;
     int ramsheet;
     bool running;
 };
@@ -92,33 +91,33 @@ struct layout {
         ram;
 };
 
-static void drawhwtraits(const struct view *v, const struct viewstate *s,
-                         const struct runclock *c)
+static void drawhwtraits(const struct view *v, const struct viewstate *s)
 {
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
     static double display_frameleft, display_frametime, refreshdt;
-    if ((refreshdt += c->cyclock.frametime_ms) >= refresh_interval_ms) {
-        display_frameleft = c->frameleft_ms;
-        display_frametime = c->cyclock.frametime_ms;
+    if ((refreshdt += s->clock.cyclock.frametime_ms) >= refresh_interval_ms) {
+        display_frameleft = s->clock.frameleft_ms;
+        display_frametime = s->clock.cyclock.frametime_ms;
         refreshdt = 0;
     }
 
     int cursor_y = 0;
     werase(v->content);
     mvwprintw(v->content, cursor_y++, 0, "FPS: %d (%.2f)", Fps,
-              (double)c->cyclock.frames / c->cyclock.runtime);
+              (double)s->clock.cyclock.frames / s->clock.cyclock.runtime);
     mvwprintw(v->content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_frametime, display_frameleft);
     mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64,
-              c->cyclock.frames);
-    mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f", c->cyclock.runtime);
+              s->clock.cyclock.frames);
+    mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f",
+              s->clock.cyclock.runtime);
     mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
-              c->cyclock.total_cycles);
+              s->clock.cyclock.total_cycles);
     mvwaddstr(v->content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(v->content, cursor_y++, 0, "CPU/PPU Clock: INF/INF Hz");
     mvwprintw(v->content, cursor_y++, 0, "Cycles per Second: %d",
-              c->cyclock.cycles_per_sec);
+              s->clock.cyclock.cycles_per_sec);
     mvwaddstr(v->content, cursor_y++, 0, "Cycles per Frame: N/A");
     mvwprintw(v->content, cursor_y, 0, "BCD Supported: %s",
               s->args->bcdsupport ? "Yes" : "No");
@@ -578,8 +577,8 @@ static void tick_end(struct runclock *c)
     tick_sleep(c);
 }
 
-static void handle_input(struct viewstate *s, struct runclock *c,
-                         nes *console, const struct console_state *snapshot)
+static void handle_input(struct viewstate *s, nes *console,
+                         const struct console_state *snapshot)
 {
     const int input = getch();
     switch (input) {
@@ -591,23 +590,23 @@ static void handle_input(struct viewstate *s, struct runclock *c,
         }
         break;
     case '=':   // "Lowercase" +
-        ++c->cyclock.cycles_per_sec;
+        ++s->clock.cyclock.cycles_per_sec;
         goto pclamp_cps;
     case '+':
-        c->cyclock.cycles_per_sec += 10;
+        s->clock.cyclock.cycles_per_sec += 10;
     pclamp_cps:
-        if (c->cyclock.cycles_per_sec > MaxCps) {
-            c->cyclock.cycles_per_sec = MaxCps;
+        if (s->clock.cyclock.cycles_per_sec > MaxCps) {
+            s->clock.cyclock.cycles_per_sec = MaxCps;
         }
         break;
     case '-':
-        --c->cyclock.cycles_per_sec;
+        --s->clock.cyclock.cycles_per_sec;
         goto nclamp_cps;
     case '_':   // "Uppercase" -
-        c->cyclock.cycles_per_sec -= 10;
+        s->clock.cyclock.cycles_per_sec -= 10;
     nclamp_cps:
-        if (c->cyclock.cycles_per_sec < MinCps) {
-            c->cyclock.cycles_per_sec = MinCps;
+        if (s->clock.cyclock.cycles_per_sec < MinCps) {
+            s->clock.cyclock.cycles_per_sec = MinCps;
         }
         break;
     case 'i':
@@ -660,10 +659,9 @@ static void emu_update(nes *console, struct console_state *snapshot,
 }
 
 static void refresh_ui(const struct layout *l, const struct viewstate *s,
-                       const struct runclock *c,
                        const struct console_state *snapshot)
 {
-    drawhwtraits(&l->hwtraits, s, c);
+    drawhwtraits(&l->hwtraits, s);
     drawcontrols(&l->controls, snapshot);
     drawdebugger(&l->debugger, s, snapshot);
     drawcart(&l->cart, snapshot);
@@ -704,19 +702,22 @@ int ui_curses_loop(const struct cliargs *args, nes *console,
     assert(console != NULL);
     assert(snapshot != NULL);
 
-    struct viewstate state = {.args = args, .running = true};
+    struct viewstate state = {
+        .args = args,
+        .clock = {.cyclock = {.cycles_per_sec = 4}},
+        .running = true,
+    };
     struct layout layout;
     init_ui(&layout);
-    struct runclock clock = {.cyclock = {.cycles_per_sec = 4}};
-    cycleclock_start(&clock.cyclock);
+    cycleclock_start(&state.clock.cyclock);
     do {
-        tick_start(&clock, snapshot);
-        handle_input(&state, &clock, console, snapshot);
+        tick_start(&state.clock, snapshot);
+        handle_input(&state, console, snapshot);
         if (state.running) {
-            emu_update(console, snapshot, &clock);
-            refresh_ui(&layout, &state, &clock, snapshot);
+            emu_update(console, snapshot, &state.clock);
+            refresh_ui(&layout, &state, snapshot);
         }
-        tick_end(&clock);
+        tick_end(&state.clock);
     } while (state.running);
     cleanup_ui(&layout);
 

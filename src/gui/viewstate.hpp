@@ -56,10 +56,10 @@ struct runclock {
         cycleclock_tickstart(&cyclock, !snapshot->lines.ready);
     }
 
-    void deltaTimeUpdate()
+    void markDtUpdate()
     {
         const std::timespec elapsed = timespec_elapsed(&cyclock.current);
-        updateDtMs = timespec_to_ms(&elapsed);
+        dtUpdateMs = timespec_to_ms(&elapsed);
     }
 
     void tickEnd()
@@ -68,7 +68,7 @@ struct runclock {
     }
 
     cycleclock cyclock{.cycles_per_sec = 4};
-    double updateDtMs = 0;
+    double dtUpdateMs = 0;
 };
 
 struct viewstate {

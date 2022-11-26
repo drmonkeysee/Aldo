@@ -102,7 +102,7 @@ auto emu_update(nes* console, console_state* snapshot,
     s.bouncer.pos.y += s.bouncer.velocity.y;
     nes_cycle(console, &s.clock.cyclock);
     nes_snapshot(console, snapshot);
-    s.clock.deltaTimeUpdate();
+    s.clock.markDtUpdate();
 }
 
 auto render_ui(aldo::viewstate& s, const aldo::MediaRuntime& runtime,

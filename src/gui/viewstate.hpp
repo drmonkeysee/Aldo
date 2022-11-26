@@ -51,24 +51,24 @@ struct runclock {
         cycleclock_start(&cyclock);
     }
 
-    void tick_start(const struct console_state* snapshot)
+    void tickStart(const struct console_state* snapshot)
     {
         cycleclock_tickstart(&cyclock, !snapshot->lines.ready);
     }
 
-    void emutime()
+    void deltaTimeUpdate()
     {
         const std::timespec elapsed = timespec_elapsed(&cyclock.current);
-        emutime_ms = timespec_to_ms(&elapsed);
+        updateDtMs = timespec_to_ms(&elapsed);
     }
 
-    void tick_end()
+    void tickEnd()
     {
         cycleclock_tickend(&cyclock);
     }
 
     cycleclock cyclock{.cycles_per_sec = 4};
-    double emutime_ms = 0;
+    double updateDtMs = 0;
 };
 
 struct viewstate {

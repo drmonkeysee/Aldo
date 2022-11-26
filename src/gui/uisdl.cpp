@@ -102,7 +102,7 @@ auto emu_update(nes* console, console_state* snapshot,
     s.bouncer.pos.y += s.bouncer.velocity.y;
     nes_cycle(console, &s.clock.cyclock);
     nes_snapshot(console, snapshot);
-    s.clock.emutime();
+    s.clock.deltaTimeUpdate();
 }
 
 auto render_ui(aldo::viewstate& s, const aldo::MediaRuntime& runtime,
@@ -123,13 +123,13 @@ auto runloop(const gui_platform& platform, nes* console,
     };
     state.clock.start();
     do {
-        state.clock.tick_start(snapshot);
+        state.clock.tickStart(snapshot);
         handle_input(state, console);
         if (state.running) {
             emu_update(console, snapshot, state);
             render_ui(state, runtime, snapshot);
         }
-        state.clock.tick_end();
+        state.clock.tickEnd();
     } while (state.running);
 }
 

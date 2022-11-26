@@ -106,7 +106,7 @@ renderHardwareTraits(aldo::viewstate& state,
     if (ImGui::Begin("Hardware Traits")) {
         auto& cyclock = state.clock.cyclock;
         ImGui::TextUnformatted("FPS: 60");
-        ImGui::Text("dT: %.3f", state.clock.emutime_ms);
+        ImGui::Text("dT: %.3f", state.clock.updateDtMs);
         ImGui::Text("Frames: %" PRIu64, cyclock.frames);
         ImGui::Text("Runtime: %.3f", cyclock.runtime);
         ImGui::Text("Cycles: %" PRIu64, cyclock.total_cycles);

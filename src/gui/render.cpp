@@ -104,9 +104,15 @@ renderHardwareTraits(aldo::viewstate& state,
                      const console_state& snapshot) const noexcept
 {
     if (ImGui::Begin("Hardware Traits")) {
+        static constexpr auto refreshIntervalMs = 250;
+        static double displayUpdateDt, refreshDt;
         auto& cyclock = state.clock.cyclock;
+        if ((refreshDt += cyclock.frametime_ms) >= refreshIntervalMs) {
+            displayUpdateDt = state.clock.updateDtMs;
+            refreshDt = 0;
+        }
         ImGui::TextUnformatted("FPS: 60");
-        ImGui::Text("dT: %.3f", state.clock.updateDtMs);
+        ImGui::Text("dT: %.3f", displayUpdateDt);
         ImGui::Text("Frames: %" PRIu64, cyclock.frames);
         ImGui::Text("Runtime: %.3f", cyclock.runtime);
         ImGui::Text("Cycles: %" PRIu64, cyclock.total_cycles);

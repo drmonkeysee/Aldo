@@ -296,108 +296,117 @@ void aldo::RenderFrame::renderCpu(aldo::viewstate& state,
     if (!state.showCpu) return;
 
     if (ImGui::Begin("CPU", &state.showCpu)) {
-        const auto& cpu = snapshot.cpu;
-        if (ImGui::CollapsingHeader("Registers",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
-            ImGui::BeginGroup();
-            {
-                ImGui::Text("A: %02X", cpu.accumulator);
-                ImGui::Text("X: %02X", cpu.xindex);
-                ImGui::Text("Y: %02X", cpu.yindex);
-            }
-            ImGui::EndGroup();
-            ImGui::SameLine(125);
-            ImGui::BeginGroup();
-            {
-                ImGui::Text("PC: %04X", cpu.program_counter);
-                ImGui::Text(" S: %02X", cpu.stack_pointer);
-                ImGui::Text(" P: %02X", cpu.status);
-            }
-            ImGui::EndGroup();
-        }
-
-        static constexpr char flags[] = {
-            'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
-        };
-        static constexpr auto
-            flagOn = IM_COL32(0xff, 0xfc, 0x53, SDL_ALPHA_OPAQUE),
-            flagOff = IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE),
-            textOn = IM_COL32_BLACK,
-            textOff = IM_COL32_WHITE;
-        const auto textSize = ImGui::CalcTextSize("A");
-        const auto radius = (textSize.x + textSize.y) / 2.0f;
-        if (ImGui::CollapsingHeader("Flags", ImGuiTreeNodeFlags_DefaultOpen)) {
-            const auto pos = ImGui::GetCursorScreenPos();
-            ImVec2 center{pos.x + radius, pos.y + radius};
-            const auto
-                fontSz = ImGui::GetFontSize(),
-                xOffset = fontSz / 4,
-                yOffset = fontSz / 2;
-            const auto drawList = ImGui::GetWindowDrawList();
-            for (std::size_t i = 0; i < sizeof flags; ++i) {
-                ImU32 fill, text;
-                if (cpu.status & (1 << (sizeof flags - 1 - i))) {
-                    fill = flagOn;
-                    text = textOn;
-                } else {
-                    fill = flagOff;
-                    text = textOff;
+        if (ImGui::BeginChild("CpuLeft", {200, 0})) {
+            const auto& cpu = snapshot.cpu;
+            if (ImGui::CollapsingHeader("Registers",
+                                        ImGuiTreeNodeFlags_DefaultOpen)) {
+                ImGui::BeginGroup();
+                {
+                    ImGui::Text("A: %02X", cpu.accumulator);
+                    ImGui::Text("X: %02X", cpu.xindex);
+                    ImGui::Text("Y: %02X", cpu.yindex);
                 }
-                drawList->AddCircleFilled(center, radius, fill);
-                drawList->AddText({center.x - xOffset, center.y - yOffset},
-                                  text, flags + i, flags + i + 1);
-                center.x += 25;
+                ImGui::EndGroup();
+                ImGui::SameLine(125);
+                ImGui::BeginGroup();
+                {
+                    ImGui::Text("PC: %04X", cpu.program_counter);
+                    ImGui::Text(" S: %02X", cpu.stack_pointer);
+                    ImGui::Text(" P: %02X", cpu.status);
+                }
+                ImGui::EndGroup();
             }
-            ImGui::Dummy({0, radius * 2});
+
+            static constexpr char flags[] = {
+                'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
+            };
+            static constexpr auto
+                flagOn = IM_COL32(0xff, 0xfc, 0x53, SDL_ALPHA_OPAQUE),
+                flagOff = IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE),
+                textOn = IM_COL32_BLACK,
+                textOff = IM_COL32_WHITE;
+            const auto textSize = ImGui::CalcTextSize("A");
+            const auto radius = (textSize.x + textSize.y) / 2.0f;
+            if (ImGui::CollapsingHeader("Flags", ImGuiTreeNodeFlags_DefaultOpen)) {
+                const auto pos = ImGui::GetCursorScreenPos();
+                ImVec2 center{pos.x + radius, pos.y + radius};
+                const auto
+                    fontSz = ImGui::GetFontSize(),
+                    xOffset = fontSz / 4,
+                    yOffset = fontSz / 2;
+                const auto drawList = ImGui::GetWindowDrawList();
+                for (std::size_t i = 0; i < sizeof flags; ++i) {
+                    ImU32 fill, text;
+                    if (cpu.status & (1 << (sizeof flags - 1 - i))) {
+                        fill = flagOn;
+                        text = textOn;
+                    } else {
+                        fill = flagOff;
+                        text = textOff;
+                    }
+                    drawList->AddCircleFilled(center, radius, fill);
+                    drawList->AddText({center.x - xOffset, center.y - yOffset},
+                                      text, flags + i, flags + i + 1);
+                    center.x += 25;
+                }
+                ImGui::Dummy({0, radius * 2});
+            }
         }
+        ImGui::EndChild();
 
-        if (ImGui::CollapsingHeader("Datapath",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
-            const auto& datapath = snapshot.datapath;
-            const auto& lines = snapshot.lines;
+        ImGui::SameLine();
 
-            ImGui::Text("Address Bus: %04X", datapath.addressbus);
-            const char* dataStr;
-            char dataHex[3];
-            if (datapath.busfault) {
-                dataStr = "FLT";
-            } else {
-                snprintf(dataHex, sizeof dataHex, "%02X", datapath.databus);
-                dataStr = dataHex;
+        if (ImGui::BeginChild("CpuRight")) {
+            if (ImGui::CollapsingHeader("Datapath",
+                                        ImGuiTreeNodeFlags_DefaultOpen)) {
+                const auto& datapath = snapshot.datapath;
+                const auto& lines = snapshot.lines;
+
+                ImGui::Text("Address Bus: %04X", datapath.addressbus);
+                const char* dataStr;
+                char dataHex[3];
+                if (datapath.busfault) {
+                    dataStr = "FLT";
+                } else {
+                    snprintf(dataHex, sizeof dataHex,
+                             "%02X", datapath.databus);
+                    dataStr = dataHex;
+                }
+                ImGui::Text("Data Bus: %s %c", dataStr,
+                            lines.readwrite ? 'R' : 'W');
+
+                ImGui::Separator();
+
+                const char* mnemonic;
+                char buf[DIS_DATAP_SIZE];
+                if (datapath.jammed) {
+                    mnemonic = "JAMMED";
+                } else {
+                    const auto wlen = dis_datapath(&snapshot, buf);
+                    mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
+                }
+                ImGui::Text("Decode: %s", mnemonic);
+                ImGui::Text("adl: %02X", datapath.addrlow_latch);
+                ImGui::Text("adh: %02X", datapath.addrhigh_latch);
+                ImGui::Text("adc: %02X", datapath.addrcarry_latch);
+                ImGui::Text("t: %u", datapath.exec_cycle);
+
+                ImGui::Separator();
+
+                ImGui::Text("RDY: %s", bool_to_linestate(lines.ready));
+                ImGui::SameLine();
+                ImGui::Text("SYNC: %s", bool_to_linestate(lines.sync));
+                ImGui::SameLine();
+                ImGui::Text("R/W: %s", bool_to_linestate(lines.readwrite));
+
+                ImGui::Text("IRQ: %s", bool_to_linestate(lines.irq));
+                ImGui::SameLine();
+                ImGui::Text("NMI:  %s", bool_to_linestate(lines.nmi));
+                ImGui::SameLine();
+                ImGui::Text("RES: %s", bool_to_linestate(lines.reset));
             }
-            ImGui::Text("Data Bus: %s %c", dataStr,
-                        lines.readwrite ? 'R' : 'W');
-
-            ImGui::Separator();
-
-            const char* mnemonic;
-            char buf[DIS_DATAP_SIZE];
-            if (datapath.jammed) {
-                mnemonic = "JAMMED";
-            } else {
-                const auto wlen = dis_datapath(&snapshot, buf);
-                mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
-            }
-            ImGui::Text("Decode: %s", mnemonic);
-            ImGui::Text("adl: %02X", datapath.addrlow_latch);
-            ImGui::Text("adh: %02X", datapath.addrhigh_latch);
-            ImGui::Text("adc: %02X", datapath.addrcarry_latch);
-            ImGui::Text("t: %u", datapath.exec_cycle);
-
-            ImGui::Separator();
-
-            ImGui::Text("RDY: %s", bool_to_linestate(lines.ready));
-            ImGui::SameLine();
-            ImGui::Text("SYNC: %s", bool_to_linestate(lines.sync));
-            ImGui::SameLine();
-            ImGui::Text("R/W: %s", bool_to_linestate(lines.readwrite));
-
-            ImGui::Text("IRQ: %s", bool_to_linestate(lines.irq));
-            ImGui::SameLine();
-            ImGui::Text("NMI:  %s", bool_to_linestate(lines.nmi));
-            ImGui::SameLine();
-            ImGui::Text("RES: %s", bool_to_linestate(lines.reset));
         }
+        ImGui::EndChild();
     }
     ImGui::End();
 }

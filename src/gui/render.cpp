@@ -36,15 +36,13 @@ constexpr auto display_signalstate(csig_state s) noexcept
 {
     switch (s) {
     case CSGS_PENDING:
-        return "(P)";
+        return " (P)";
     case CSGS_DETECTED:
-        return "(D)";
+        return " (D)";
     case CSGS_COMMITTED:
-        return "(C)";
+        return " (C)";
     case CSGS_SERVICED:
-        return "(S)";
-    case CSGS_CLEAR:
-        [[fallthrough]];
+        return " (S)";
     default:
         return "";
     }
@@ -424,11 +422,11 @@ void aldo::RenderFrame::renderCpu(aldo::viewstate& state,
 
                 ImGui::BeginGroup();
                 {
-                    ImGui::Text("IRQ: %s %s", display_linestate(lines.irq),
+                    ImGui::Text("IRQ: %s%s", display_linestate(lines.irq),
                                 display_signalstate(datapath.irq));
-                    ImGui::Text("NMI: %s %s", display_linestate(lines.nmi),
+                    ImGui::Text("NMI: %s%s", display_linestate(lines.nmi),
                                 display_signalstate(datapath.nmi));
-                    ImGui::Text("RES: %s %s", display_linestate(lines.reset),
+                    ImGui::Text("RES: %s%s", display_linestate(lines.reset),
                                 display_signalstate(datapath.res));
                 }
                 ImGui::EndGroup();

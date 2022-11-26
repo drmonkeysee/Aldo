@@ -27,9 +27,27 @@
 namespace
 {
 
-constexpr auto bool_to_linestate(bool v) noexcept
+constexpr auto display_linestate(bool v) noexcept
 {
     return v ? "HI" : "LO";
+}
+
+constexpr auto display_signalstate(csig_state s) noexcept
+{
+    switch (s) {
+    case CSGS_PENDING:
+        return "(P)";
+    case CSGS_DETECTED:
+        return "(D)";
+    case CSGS_COMMITTED:
+        return "(C)";
+    case CSGS_SERVICED:
+        return "(S)";
+    case CSGS_CLEAR:
+        [[fallthrough]];
+    default:
+        return "";
+    }
 }
 
 }
@@ -307,7 +325,7 @@ void aldo::RenderFrame::renderCpu(aldo::viewstate& state,
                     ImGui::Text("Y: %02X", cpu.yindex);
                 }
                 ImGui::EndGroup();
-                ImGui::SameLine(125);
+                ImGui::SameLine(0, 90);
                 ImGui::BeginGroup();
                 {
                     ImGui::Text("PC: %04X", cpu.program_counter);
@@ -393,17 +411,27 @@ void aldo::RenderFrame::renderCpu(aldo::viewstate& state,
 
                 ImGui::Separator();
 
-                ImGui::Text("RDY: %s", bool_to_linestate(lines.ready));
-                ImGui::SameLine();
-                ImGui::Text("SYNC: %s", bool_to_linestate(lines.sync));
-                ImGui::SameLine();
-                ImGui::Text("R/W: %s", bool_to_linestate(lines.readwrite));
+                ImGui::BeginGroup();
+                {
+                    ImGui::Text("RDY:  %s", display_linestate(lines.ready));
+                    ImGui::Text("SYNC: %s", display_linestate(lines.sync));
+                    ImGui::Text("R/W:  %s",
+                                display_linestate(lines.readwrite));
+                }
+                ImGui::EndGroup();
 
-                ImGui::Text("IRQ: %s", bool_to_linestate(lines.irq));
-                ImGui::SameLine();
-                ImGui::Text("NMI:  %s", bool_to_linestate(lines.nmi));
-                ImGui::SameLine();
-                ImGui::Text("RES: %s", bool_to_linestate(lines.reset));
+                ImGui::SameLine(0, 40);
+
+                ImGui::BeginGroup();
+                {
+                    ImGui::Text("IRQ: %s %s", display_linestate(lines.irq),
+                                display_signalstate(datapath.irq));
+                    ImGui::Text("NMI: %s %s", display_linestate(lines.nmi),
+                                display_signalstate(datapath.nmi));
+                    ImGui::Text("RES: %s %s", display_linestate(lines.reset),
+                                display_signalstate(datapath.res));
+                }
+                ImGui::EndGroup();
             }
         }
         ImGui::EndChild();

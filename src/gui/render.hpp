@@ -34,6 +34,7 @@ private:
     void renderHardwareTraits(viewstate& state,
                               const console_state& snapshot) const noexcept;
     void renderCart(const console_state& snapshot) const noexcept;
+    void renderPrg(const console_state& snapshot) const noexcept;
     void renderBouncer(viewstate& state) const noexcept;
     void renderCpu(viewstate& state,
                    const console_state& snapshot) const noexcept;

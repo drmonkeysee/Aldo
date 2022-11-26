@@ -62,6 +62,7 @@ void aldo::RenderFrame::render(aldo::viewstate& state,
     renderMainMenu(state);
     renderHardwareTraits(state, snapshot);
     renderCart(snapshot);
+    renderPrg(snapshot);
     renderBouncer(state);
     renderCpu(state, snapshot);
     renderRam(snapshot);
@@ -195,6 +196,66 @@ aldo::RenderFrame::renderCart(const console_state& snapshot) const noexcept
     ImGui::End();
 }
 
+void aldo::RenderFrame::renderPrg(const console_state& snapshot) const noexcept
+{
+    if (ImGui::Begin("PRG @ PC")) {
+        static constexpr auto instCount = 20;
+        static auto selected = -1;
+        const auto& prgMem = snapshot.mem;
+        auto addr = snapshot.datapath.current_instruction;
+        dis_instruction inst{};
+        char disasm[DIS_INST_SIZE];
+        for (int i = 0; i < instCount; ++i) {
+            auto result = dis_parsemem_inst(prgMem.prglength,
+                                            prgMem.currprg,
+                                            inst.offset + inst.bv.size,
+                                            &inst);
+            if (result > 0) {
+                result = dis_inst(addr, &inst, disasm);
+                if (result > 0) {
+                    if (ImGui::Selectable(disasm, selected == i)) {
+                        selected = i;
+                    }
+                    addr += inst.bv.size;
+                    continue;
+                }
+            }
+            if (result < 0) {
+                ImGui::TextUnformatted(dis_errstr(result));
+            }
+            break;
+        }
+
+        if (ImGui::CollapsingHeader("Vectors",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+            auto lo = prgMem.vectors[0], hi = prgMem.vectors[1];
+            ImGui::Text("%04X: %02X %02X     NMI $%04X", CPU_VECTOR_NMI, lo,
+                        hi, bytowr(lo, hi));
+
+            lo = prgMem.vectors[2];
+            hi = prgMem.vectors[3];
+            const auto& debugger = snapshot.debugger;
+            const char* indicator;
+            std::uint16_t resVector;
+            if (debugger.resvector_override >= 0) {
+                indicator = "!";
+                resVector = (std::uint16_t)debugger.resvector_override;
+            } else {
+                indicator = "";
+                resVector = bytowr(lo, hi);
+            }
+            ImGui::Text("%04X: %02X %02X     RES %s$%04X", CPU_VECTOR_RES, lo,
+                        hi, indicator, resVector);
+
+            lo = prgMem.vectors[4];
+            hi = prgMem.vectors[5];
+            ImGui::Text("%04X: %02X %02X     IRQ $%04X", CPU_VECTOR_IRQ, lo,
+                        hi, bytowr(lo, hi));
+        }
+    }
+    ImGui::End();
+}
+
 void
 aldo::RenderFrame::renderBouncer(aldo::viewstate& state) const noexcept
 {
@@ -290,9 +351,9 @@ void aldo::RenderFrame::renderCpu(aldo::viewstate& state,
             ImGui::Dummy({0, radius * 2});
         }
 
-        const auto& datapath = snapshot.datapath;
         if (ImGui::CollapsingHeader("Datapath",
                                     ImGuiTreeNodeFlags_DefaultOpen)) {
+            const auto& datapath = snapshot.datapath;
             const auto& lines = snapshot.lines;
 
             ImGui::Text("Address Bus: %04X", datapath.addressbus);
@@ -336,63 +397,6 @@ void aldo::RenderFrame::renderCpu(aldo::viewstate& state,
             ImGui::Text("NMI:  %s", bool_to_linestate(lines.nmi));
             ImGui::SameLine();
             ImGui::Text("RES: %s", bool_to_linestate(lines.reset));
-        }
-
-        const auto& prgMem = snapshot.mem;
-        if (ImGui::CollapsingHeader("PRG @ PC",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
-            static constexpr auto instCount = 7;
-            static auto selected = -1;
-            auto addr = datapath.current_instruction;
-            dis_instruction inst{};
-            char disasm[DIS_INST_SIZE];
-            for (int i = 0; i < instCount; ++i) {
-                auto result = dis_parsemem_inst(prgMem.prglength,
-                                                prgMem.currprg,
-                                                inst.offset + inst.bv.size,
-                                                &inst);
-                if (result > 0) {
-                    result = dis_inst(addr, &inst, disasm);
-                    if (result > 0) {
-                        if (ImGui::Selectable(disasm, selected == i)) {
-                            selected = i;
-                        }
-                        addr += inst.bv.size;
-                        continue;
-                    }
-                }
-                if (result < 0) {
-                    ImGui::TextUnformatted(dis_errstr(result));
-                }
-                break;
-            }
-        }
-
-        if (ImGui::CollapsingHeader("Vectors",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
-            auto lo = prgMem.vectors[0], hi = prgMem.vectors[1];
-            ImGui::Text("%04X: %02X %02X     NMI $%04X", CPU_VECTOR_NMI, lo,
-                        hi, bytowr(lo, hi));
-
-            lo = prgMem.vectors[2];
-            hi = prgMem.vectors[3];
-            const auto& debugger = snapshot.debugger;
-            const char* indicator;
-            std::uint16_t resVector;
-            if (debugger.resvector_override >= 0) {
-                indicator = "!";
-                resVector = (std::uint16_t)debugger.resvector_override;
-            } else {
-                indicator = "";
-                resVector = bytowr(lo, hi);
-            }
-            ImGui::Text("%04X: %02X %02X     RES %s$%04X", CPU_VECTOR_RES, lo,
-                        hi, indicator, resVector);
-
-            lo = prgMem.vectors[4];
-            hi = prgMem.vectors[5];
-            ImGui::Text("%04X: %02X %02X     IRQ $%04X", CPU_VECTOR_IRQ, lo,
-                        hi, bytowr(lo, hi));
         }
     }
     ImGui::End();

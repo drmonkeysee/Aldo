@@ -26,8 +26,8 @@
 #include <stdlib.h>
 
 typedef int ui_loop(const struct cliargs *, nes *, struct console_state *);
-int ui_batch_loop(const struct cliargs *, nes *, struct console_state *);
-int ui_curses_loop(const struct cliargs *, nes *, struct console_state *);
+ui_loop ui_batch_loop;
+ui_loop ui_curses_loop;
 const char *ui_curses_version(void);
 
 static void print_version(void)

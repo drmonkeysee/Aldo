@@ -115,9 +115,7 @@ auto render_ui(aldo::viewstate& s, const aldo::MediaRuntime& runtime,
 auto runloop(const gui_platform& platform, nes* console,
              console_state* snapshot)
 {
-    aldo::viewstate state{
-        .bouncer{{256, 240}, {256 / 2, 240 / 2}, {1, 1}, 25},
-    };
+    aldo::viewstate state;
     const aldo::MediaRuntime runtime{
         {1280, 800}, state.bouncer.bounds, platform,
     };

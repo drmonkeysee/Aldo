@@ -115,8 +115,7 @@ void aldo::RenderFrame::renderMainMenu(aldo::viewstate& state) const noexcept
     }
 }
 
-void
-aldo::RenderFrame::
+void aldo::RenderFrame::
 renderHardwareTraits(aldo::viewstate& state,
                      const console_state& snapshot) const noexcept
 {

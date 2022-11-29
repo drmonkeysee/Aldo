@@ -122,7 +122,7 @@ renderHardwareTraits(aldo::viewstate& state,
 {
     if (ImGui::Begin("Hardware Traits")) {
         static constexpr auto refreshIntervalMs = 250;
-        static double displayDtUpdate, refreshDt;
+        static constinit double displayDtUpdate, refreshDt;
         auto& cyclock = state.clock.cyclock;
         if ((refreshDt += cyclock.frametime_ms) >= refreshIntervalMs) {
             displayDtUpdate = state.clock.dtUpdateMs;
@@ -216,7 +216,7 @@ void aldo::RenderFrame::renderPrg(const console_state& snapshot) const noexcept
 {
     if (ImGui::Begin("PRG @ PC")) {
         static constexpr auto instCount = 20;
-        static auto selected = -1;
+        static constinit auto selected = -1;
         const auto& prgMem = snapshot.mem;
         auto addr = snapshot.datapath.current_instruction;
         dis_instruction inst{};

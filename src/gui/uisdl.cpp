@@ -106,10 +106,10 @@ auto emu_update(nes* console, console_state* snapshot,
 }
 
 auto render_ui(aldo::viewstate& s, const aldo::MediaRuntime& runtime,
-               const console_state* snapshot) noexcept
+               const console_state& snapshot) noexcept
 {
     const aldo::RenderFrame frame{runtime};
-    frame.render(s, *snapshot);
+    frame.render(s, snapshot);
 }
 
 auto runloop(const gui_platform& platform, nes* console,
@@ -123,11 +123,11 @@ auto runloop(const gui_platform& platform, nes* console,
     };
     state.clock.start();
     do {
-        state.clock.tickStart(snapshot);
+        state.clock.tickStart(*snapshot);
         handle_input(state, console);
         if (state.running) {
             emu_update(console, snapshot, state);
-            render_ui(state, runtime, snapshot);
+            render_ui(state, runtime, *snapshot);
         }
         state.clock.tickEnd();
     } while (state.running);

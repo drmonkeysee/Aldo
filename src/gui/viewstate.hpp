@@ -51,9 +51,9 @@ struct runclock {
         cycleclock_start(&cyclock);
     }
 
-    void tickStart(const struct console_state* snapshot)
+    void tickStart(const console_state& snapshot)
     {
-        cycleclock_tickstart(&cyclock, !snapshot->lines.ready);
+        cycleclock_tickstart(&cyclock, !snapshot.lines.ready);
     }
 
     void markDtUpdate()

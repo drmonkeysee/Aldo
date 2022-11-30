@@ -15,7 +15,7 @@ DEP_FILES := $(OBJ_FILES:.o=.d)
 OBJ_DIRS := $(OBJ_DIR) $(OBJ_DIR)/$(CLI_DIR)
 TEST_OBJ_DIR := $(OBJ_DIR)/$(TEST_DIR)
 TEST_DEPS := $(addprefix $(OBJ_DIR)/,$(CLI_DIR)/argparse.o bus.o bytes.o cart.o \
-		 cpu.o decode.o dis.o haltexpr.o mappers.o)
+		 cpu.o debug.o decode.o dis.o haltexpr.o mappers.o)
 
 PRODUCT := aldoc
 TESTS := $(PRODUCT)tests

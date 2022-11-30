@@ -213,13 +213,13 @@ static int run_with_args(const struct cliargs *args)
         return EXIT_SUCCESS;
     }
 
-    if (!args->cartfile) {
+    if (!args->cartfilepath) {
         fputs("No input file specified\n", stderr);
         argparse_usage(args->me);
         return EXIT_FAILURE;
     }
 
-    cart *cart = load_cart(args->cartfile);
+    cart *cart = load_cart(args->cartfilepath);
     if (!cart) {
         return EXIT_FAILURE;
     }

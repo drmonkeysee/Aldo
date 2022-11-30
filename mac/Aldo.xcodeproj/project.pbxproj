@@ -29,6 +29,7 @@
 		C830036C28DEDDD200480F29 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C830036B28DEDDD200480F29 /* main.m */; };
 		C838D3B527D5DA4400468FDB /* CartInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B427D5DA4400468FDB /* CartInfoView.swift */; };
 		C838D3B727D5DB0300468FDB /* CartChrView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B627D5DB0300468FDB /* CartChrView.swift */; };
+		C838F8572936FC9800D52004 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
 		C83A30772904987F00749A17 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C83A307A2904A2B000749A17 /* version.c in Sources */ = {isa = PBXBuildFile; fileRef = C83A30792904A2B000749A17 /* version.c */; };
 		C83C663727E2F4E4009CE42C /* cart.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068A2751EEBA00B45785 /* cart.c */; };
@@ -927,6 +928,7 @@
 				C8702CFA278A598A00725690 /* haltexpr.c in Sources */,
 				C8D44BDD2786B571005AB586 /* argparse.c in Sources */,
 				C8C706A92751EF8D00B45785 /* cpuimmediate.c in Sources */,
+				C838F8572936FC9800D52004 /* debug.c in Sources */,
 				C8184D5325E74B75002B3100 /* dis.c in Sources */,
 				C8C706BB2751F0CE00B45785 /* mappers.c in Sources */,
 				C8C706B52751EF8D00B45785 /* cpustack.c in Sources */,

@@ -145,13 +145,13 @@ static void dump_ram(const struct cliargs *args, nes *console)
 
     if (args->tron || args->batch) {
         errno = 0;
-        const int err = nes_dumpram(console, ramfile);
-        if (err < 0) {
-            fprintf(stderr, "Ram dump failure: %s - %s", ramfile,
-                    nes_errstr(err));
-            if (err == NES_ERR_ERNO) {
-                perror("System error");
-            }
+        FILE *const f = fopen(ramfile, "wb");
+        if (f) {
+            nes_dumpram(console, f);
+            fclose(f);
+        } else {
+            fprintf(stderr, "%s: ", ramfile);
+            perror("Cannot open file");
         }
     }
 }

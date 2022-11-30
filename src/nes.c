@@ -16,7 +16,6 @@
 #include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -119,17 +118,6 @@ static void instruction_trace(struct nes_console *self,
 //
 // Public Interface
 //
-
-const char *nes_errstr(int err)
-{
-    switch (err) {
-#define X(s, v, e) case s: return e;
-        NES_ERRCODE_X
-#undef X
-    default:
-        return "UNKNOWN ERR";
-    }
-}
 
 nes *nes_new(debugctx *dbg, bool bcdsupport, bool tron)
 {
@@ -268,15 +256,11 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
             snapshot->mem.vectors);
 }
 
-int nes_dumpram(nes *self, const char *restrict filepath)
+void nes_dumpram(nes *self, FILE *f)
 {
     assert(self != NULL);
-    assert(filepath != NULL);
+    assert(f != NULL);
 
-    FILE *const ramtrace = fopen(filepath, "wb");
-    if (!ramtrace) return NES_ERR_ERNO;
     fwrite(self->ram, sizeof self->ram[0],
-           sizeof self->ram / sizeof self->ram[0], ramtrace);
-    fclose(ramtrace);
-    return 0;
+           sizeof self->ram / sizeof self->ram[0], f);
 }

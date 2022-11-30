@@ -13,13 +13,10 @@
 #include "trace.h"
 
 #include <assert.h>
-#include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
-static const char *const restrict TraceLog = "trace.log";
 
 // The NES-001 Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
@@ -119,19 +116,9 @@ static void instruction_trace(struct nes_console *self,
 // Public Interface
 //
 
-nes *nes_new(debugctx *dbg, bool bcdsupport, bool tron)
+nes *nes_new(debugctx *dbg, bool bcdsupport, FILE *tracelog)
 {
     assert(dbg != NULL);
-
-    FILE *tracelog = NULL;
-    if (tron) {
-        errno = 0;
-        if (!(tracelog = fopen(TraceLog, "w"))) {
-            fprintf(stderr, "%s: ", TraceLog);
-            perror("Cannot open trace file");
-            return NULL;
-        }
-    }
 
     struct nes_console *const self = malloc(sizeof *self);
     self->cart = NULL;
@@ -147,9 +134,6 @@ void nes_free(nes *self)
 {
     assert(self != NULL);
 
-    if (self->tracelog) {
-        fclose(self->tracelog);
-    }
     disconnect_cart(self);
     free_cpubus(self);
     free(self);

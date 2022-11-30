@@ -159,6 +159,8 @@ static void dump_ram(const struct cliargs *args, nes *console)
 
 static int run_emu(const struct cliargs *args, cart *c)
 {
+    static const char *const restrict tracefile = "trace.log";
+
     if (args->batch && args->tron && !args->haltlist) {
         fputs("*** WARNING ***\nYou have turned on trace-logging"
               " with batch mode but specified no halt conditions;\n"
@@ -172,10 +174,20 @@ static int run_emu(const struct cliargs *args, cart *c)
     if (!dbg) return EXIT_FAILURE;
 
     int result = EXIT_SUCCESS;
-    nes *console = nes_new(dbg, args->bcdsupport, args->tron);
+    FILE *tracelog = NULL;
+    if (args->tron) {
+        errno = 0;
+        if (!(tracelog = fopen(tracefile, "w"))) {
+            fprintf(stderr, "%s: ", tracefile);
+            perror("Cannot open trace file");
+            result = EXIT_FAILURE;
+            goto exit_debug;
+        }
+    }
+    nes *console = nes_new(dbg, args->bcdsupport, tracelog);
     if (!console) {
         result = EXIT_FAILURE;
-        goto exit_debug;
+        goto exit_trace;
     }
     nes_powerup(console, c, args->zeroram);
 
@@ -194,6 +206,10 @@ static int run_emu(const struct cliargs *args, cart *c)
     snapshot_clear(&snapshot);
     nes_free(console);
     console = NULL;
+exit_trace:
+    if (tracelog) {
+        fclose(tracelog);
+    }
 exit_debug:
     debug_free(dbg);
     dbg = NULL;

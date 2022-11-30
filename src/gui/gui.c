@@ -25,7 +25,7 @@ static int run_emu(const struct gui_platform *platform)
     if (!dbg) return EXIT_FAILURE;
 
     int result = EXIT_SUCCESS;
-    nes *console = nes_new(dbg, false, false);
+    nes *console = nes_new(dbg, false, NULL);
     if (!console) {
         result = EXIT_FAILURE;
         goto exit_debug;

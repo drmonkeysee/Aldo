@@ -52,6 +52,7 @@ static cart *load_cart(const char *filename)
         }
         fclose(f);
     } else {
+        fprintf(stderr, "%s: ", filename);
         perror("Cannot open cart file");
     }
     return c;
@@ -151,7 +152,7 @@ static void dump_ram(const struct cliargs *args, nes *console)
             fclose(f);
         } else {
             fprintf(stderr, "%s: ", ramfile);
-            perror("Cannot open file");
+            perror("Cannot open ramdump file");
         }
     }
 }

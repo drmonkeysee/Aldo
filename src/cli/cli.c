@@ -62,7 +62,8 @@ static int print_cart_info(const struct cliargs *args, cart *c)
     if (args->verbose) {
         puts("---=== Cart Info ===---");
     }
-    cart_write_info(c, args->cartfilename, args->verbose, stdout);
+    cart_write_info(c, args->verbose ? args->cartfilepath : args->cartfilename,
+                    args->verbose, stdout);
     return EXIT_SUCCESS;
 }
 

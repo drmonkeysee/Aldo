@@ -75,8 +75,8 @@ struct viewstate {
     std::queue<event> events;
     runclock clock;
     struct {
-        SDL_Point bounds{256, 240}, pos{bounds.x / 2, bounds.y / 2},
-                    velocity{1, 1};
+        SDL_Point
+            bounds{256, 240}, pos{bounds.x / 2, bounds.y / 2}, velocity{1, 1};
         int halfdim = 25;
     } bouncer;
     bool running = true, showBouncer = true, showCpu = true, showDemo = false;

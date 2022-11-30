@@ -18,12 +18,12 @@ static const char
     *const restrict NesMagic = "NES\x1a",
     *const restrict NsfMagic = "NESM\x1a";
 
+static const struct cartinfo NoInfo;
+
 struct cartridge {
     struct mapper *mapper;
     struct cartinfo info;
 };
-
-static struct cartinfo NoInfo = {.filepath = "NOCART"};
 
 static int detect_format(struct cartridge *self, FILE *f)
 {
@@ -215,13 +215,10 @@ const char *cart_mirrorname(enum nt_mirroring mirror)
     }
 }
 
-int cart_create(cart **c, const char *restrict filepath)
+int cart_create(cart **c, FILE *f)
 {
     assert(c != NULL);
-    assert(filepath != NULL);
-
-    FILE *const f = fopen(filepath, "rb");
-    if (!f) return CART_ERR_ERNO;
+    assert(f != NULL);
 
     struct cartridge *self = malloc(sizeof *self);
 
@@ -243,13 +240,11 @@ int cart_create(cart **c, const char *restrict filepath)
     }
 
     if (err == 0) {
-        self->info.filepath = filepath;
         *c = self;
     } else {
         cart_free(self);
         self = NULL;
     }
-    fclose(f);
     return err;
 }
 
@@ -332,12 +327,14 @@ void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr)
     self->mapper->cpu_disconnect(self->mapper, b, addr);
 }
 
-void cart_write_info(cart *self, bool verbose, FILE *f)
+void cart_write_info(cart *self, const char *restrict name, bool verbose,
+                     FILE *f)
 {
     assert(self != NULL);
+    assert(name != NULL);
     assert(f != NULL);
 
-    fprintf(f, "File\t\t: %s\n", cart_filename(&self->info));
+    fprintf(f, "File\t\t: %s\n", name);
     fprintf(f, "Format\t\t: %s\n", cart_formatname(self->info.format));
     if (verbose) {
         hr(f);
@@ -352,12 +349,13 @@ void cart_write_info(cart *self, bool verbose, FILE *f)
     }
 }
 
-void cart_write_dis_header(cart *self, FILE *f)
+void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)
 {
     assert(self != NULL);
+    assert(name != NULL);
     assert(f != NULL);
 
-    fprintf(f, "%s\n", cart_filename(&self->info));
+    fprintf(f, "%s\n", name);
     char fmtd[CART_FMT_SIZE];
     const int result = cart_format_extname(&self->info, fmtd);
     fputs(result > 0 ? fmtd : "Invalid Format", f);
@@ -365,14 +363,6 @@ void cart_write_dis_header(cart *self, FILE *f)
     if (self->info.format != CRTF_ALDO) {
         fputs("(NOTE: approximate for non-Aldo formats)\n", f);
     }
-}
-
-const char *cart_filename(const struct cartinfo *info)
-{
-    assert(info != NULL);
-
-    const char *const last_slash = strrchr(info->filepath, '/');
-    return last_slash ? last_slash + 1 : info->filepath;
 }
 
 int cart_format_extname(const struct cartinfo *info,

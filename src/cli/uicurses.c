@@ -194,7 +194,7 @@ static void drawdebugger(const struct view *v, const struct viewstate *s,
               err < 0 ? haltexpr_errstr(err) : break_desc);
 }
 
-static void drawcart(const struct view *v,
+static void drawcart(const struct view *v, const struct viewstate *s,
                      const struct console_state *snapshot)
 {
     static const char *const restrict namelabel = "Name: ";
@@ -203,7 +203,7 @@ static void drawcart(const struct view *v,
     int cursor_y = 0;
     mvwaddstr(v->content, cursor_y, 0, namelabel);
     const char
-        *const cn = cart_filename(snapshot->cart.info),
+        *const cn = s->args->cartfilename,
         *endofname = strrchr(cn, '.');
     if (!endofname) {
         endofname = strrchr(cn, '\0');
@@ -664,7 +664,7 @@ static void refresh_ui(const struct layout *l, const struct viewstate *s,
     drawhwtraits(&l->hwtraits, s);
     drawcontrols(&l->controls, snapshot);
     drawdebugger(&l->debugger, s, snapshot);
-    drawcart(&l->cart, snapshot);
+    drawcart(&l->cart, s, snapshot);
     drawprg(&l->prg, snapshot);
     drawregister(&l->registers, snapshot);
     drawflags(&l->flags, snapshot);

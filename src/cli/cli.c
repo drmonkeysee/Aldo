@@ -43,12 +43,16 @@ static cart *load_cart(const char *filename)
 {
     cart *c = NULL;
     errno = 0;
-    const int err = cart_create(&c, filename);
-    if (err < 0) {
-        fprintf(stderr, "Cart load failure (%d): %s\n", err, cart_errstr(err));
-        if (err == CART_ERR_ERNO) {
-            perror("Cannot open cart file");
+    FILE *const f = fopen(filename, "rb");
+    if (f) {
+        const int err = cart_create(&c, f);
+        if (err < 0) {
+            fprintf(stderr, "Cart load failure (%d): %s\n", err,
+                    cart_errstr(err));
         }
+        fclose(f);
+    } else {
+        perror("Cannot open cart file");
     }
     return c;
 }
@@ -58,13 +62,14 @@ static int print_cart_info(const struct cliargs *args, cart *c)
     if (args->verbose) {
         puts("---=== Cart Info ===---");
     }
-    cart_write_info(c, args->verbose, stdout);
+    cart_write_info(c, args->cartfilename, args->verbose, stdout);
     return EXIT_SUCCESS;
 }
 
 static int disassemble_cart_prg(const struct cliargs *args, cart *c)
 {
-    const int err = dis_cart_prg(c, args->verbose, false, stdout);
+    const int err = dis_cart_prg(c, args->cartfilename, args->verbose, false,
+                                 stdout);
     if (err < 0) {
         fprintf(stderr, "PRG decode error (%d): %s\n", err, dis_errstr(err));
         return EXIT_FAILURE;

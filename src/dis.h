@@ -68,7 +68,8 @@ int dis_datapath(const struct console_state *snapshot,
                  char dis[br_noalias_csz(DIS_DATAP_SIZE)]);
 
 br_libexport br_checkerror
-int dis_cart_prg(cart *cart, bool verbose, bool unified_output, FILE *f);
+int dis_cart_prg(cart *cart, const char *br_noalias name, bool verbose,
+                 bool unified_output, FILE *f);
 br_libexport br_checkerror
 int dis_cart_chr(cart *cart, int chrscale,
                  const char *br_noalias chrdecode_prefix, FILE *output);

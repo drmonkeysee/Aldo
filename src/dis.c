@@ -710,15 +710,17 @@ int dis_datapath(const struct console_state *snapshot,
     return total;
 }
 
-int dis_cart_prg(cart *cart, bool verbose, bool unified_output, FILE *f)
+int dis_cart_prg(cart *cart, const char *restrict name, bool verbose,
+                 bool unified_output, FILE *f)
 {
     assert(cart != NULL);
+    assert(name != NULL);
     assert(f != NULL);
 
     struct blockview bv = cart_prgblock(cart, 0);
     if (!bv.mem) return DIS_ERR_PRGROM;
 
-    cart_write_dis_header(cart, f);
+    cart_write_dis_header(cart, name, f);
     do {
         fputc('\n', f);
         const int err = print_prgblock(&bv, verbose, f);

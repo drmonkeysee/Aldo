@@ -62,7 +62,6 @@ struct ines_header {
 };
 
 struct cartinfo {
-    const char *filepath;       // Non-owning Pointer
     enum cartformat format;
     union {
         struct ines_header ines_hdr;

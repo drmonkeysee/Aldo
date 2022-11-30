@@ -203,7 +203,7 @@ aldo::RenderFrame::renderCart(const console_state& snapshot) const noexcept
 {
     if (ImGui::Begin("Cart")) {
         const auto& cart = snapshot.cart;
-        ImGui::Text("Name: %s", cart_filename(cart.info));
+        ImGui::Text("Name: %s", "NOCART");
         char cartFormat[CART_FMT_SIZE];
         const auto result = cart_format_extname(cart.info, cartFormat);
         ImGui::Text("Format: %s", result > 0 ? cartFormat : "Invalid Format");

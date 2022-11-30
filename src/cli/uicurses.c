@@ -5,6 +5,7 @@
 //  Created by Brandon Stansbury on 12/30/21.
 //
 
+#include "argparse.h"
 #include "bytes.h"
 #include "cart.h"
 #include "cliargs.h"
@@ -203,7 +204,7 @@ static void drawcart(const struct view *v, const struct viewstate *s,
     int cursor_y = 0;
     mvwaddstr(v->content, cursor_y, 0, namelabel);
     const char
-        *const cn = s->args->cartfilename,
+        *const cn = argparse_filename(s->args->filepath),
         *endofname = strrchr(cn, '.');
     if (!endofname) {
         endofname = strrchr(cn, '\0');

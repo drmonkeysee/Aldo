@@ -197,14 +197,6 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
     return true;
 }
 
-static const char *get_filename(const char *filepath)
-{
-    if (!filepath) return NULL;
-
-    const char *const last_slash = strrchr(filepath, '/');
-    return last_slash ? last_slash + 1 : filepath;
-}
-
 //
 // Public Interface
 //
@@ -228,14 +220,21 @@ bool argparse_parse(struct cliargs *restrict args, int argc,
                     return false;
                 }
             } else {
-                args->cartfilepath = arg;
-                args->cartfilename = get_filename(args->cartfilepath);
+                args->filepath = arg;
             }
         }
     } else {
         args->help = true;
     }
     return true;
+}
+
+const char *argparse_filename(const char *filepath)
+{
+    if (!filepath) return NULL;
+
+    const char *const last_slash = strrchr(filepath, '/');
+    return last_slash ? last_slash + 1 : filepath;
 }
 
 void argparse_usage(const char *me)

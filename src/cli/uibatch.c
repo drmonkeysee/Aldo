@@ -5,6 +5,7 @@
 //  Created by Brandon Stansbury on 12/30/21.
 //
 
+#include "argparse.h"
 #include "cart.h"
 #include "cliargs.h"
 #include "cycleclock.h"
@@ -116,7 +117,7 @@ static void write_summary(const struct cliargs *args,
     if (!args->verbose) return;
 
     const bool scale_ms = c->cyclock.runtime < 1.0;
-    printf("---=== %s ===---\n", args->cartfilename);
+    printf("---=== %s ===---\n", argparse_filename(args->filepath));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
            scale_ms
             ? c->cyclock.runtime * TSU_MS_PER_S

@@ -40,8 +40,8 @@ static void init_control_zero_args(void *ctx)
     ct_assertequal(-1, args->resetvector);
     ct_asserttrue(args->help);
 
-    ct_assertnull(args->cartfilepath);
-    ct_assertnull(args->cartfilename);
+    ct_assertnull(args->filepath);
+    ct_assertnull(argparse_filename(args->filepath));
     ct_assertnull(args->chrdecode_prefix);
     ct_assertnull(args->haltlist);
     ct_assertfalse(args->batch);
@@ -78,8 +78,8 @@ static void single_arg(void *ctx)
     ct_asserttrue(result);
 
     ct_assertequalstr("testaldo", args->me);
-    ct_assertequalstr("test.rom", args->cartfilepath);
-    ct_assertequalstr("test.rom", args->cartfilename);
+    ct_assertequalstr("test.rom", args->filepath);
+    ct_assertequalstr("test.rom", argparse_filename(args->filepath));
     ct_assertfalse(args->help);
 }
 
@@ -94,8 +94,8 @@ static void full_filepath(void *ctx)
     ct_asserttrue(result);
 
     ct_assertequalstr("testaldo", args->me);
-    ct_assertequalstr("/foo/bar/test.rom", args->cartfilepath);
-    ct_assertequalstr("test.rom", args->cartfilename);
+    ct_assertequalstr("/foo/bar/test.rom", args->filepath);
+    ct_assertequalstr("test.rom", argparse_filename(args->filepath));
     ct_assertfalse(args->help);
 }
 
@@ -413,8 +413,8 @@ static void both_flags_and_values(void *ctx)
     ct_assertequal(5, args->chrscale);
     ct_asserttrue(args->chrdecode);
     ct_assertequalstr("myrom", args->chrdecode_prefix);
-    ct_assertequalstr("test.rom", args->cartfilepath);
-    ct_assertequalstr("test.rom", args->cartfilename);
+    ct_assertequalstr("test.rom", args->filepath);
+    ct_assertequalstr("test.rom", argparse_filename(args->filepath));
 }
 
 static void flags_and_values_do_not_combine(void *ctx)
@@ -430,8 +430,8 @@ static void flags_and_values_do_not_combine(void *ctx)
     // NOTE: 's' param is skipped so '5' is misparsed as the cart file
     ct_asserttrue(args->disassemble);
     ct_assertequal(1, args->chrscale);
-    ct_assertequalstr("5", args->cartfilepath);
-    ct_assertequalstr("5", args->cartfilename);
+    ct_assertequalstr("5", args->filepath);
+    ct_assertequalstr("5", argparse_filename(args->filepath));
 }
 
 static void reset_override_short(void *ctx)
@@ -746,8 +746,8 @@ static void double_dash_ends_option_parsing(void *ctx)
     ct_assertequal(1, args->chrscale);
     ct_assertfalse(args->chrdecode);
     ct_assertnull(args->chrdecode_prefix);
-    ct_assertequalstr("test.rom", args->cartfilepath);
-    ct_assertequalstr("test.rom", args->cartfilename);
+    ct_assertequalstr("test.rom", args->filepath);
+    ct_assertequalstr("test.rom", argparse_filename(args->filepath));
 }
 
 static void double_dash_ends_option_parsing_unordered(void *ctx)
@@ -769,8 +769,8 @@ static void double_dash_ends_option_parsing_unordered(void *ctx)
     ct_assertequal(1, args->chrscale);
     ct_assertfalse(args->chrdecode);
     ct_assertnull(args->chrdecode_prefix);
-    ct_assertequalstr("test.rom", args->cartfilepath);
-    ct_assertequalstr("test.rom", args->cartfilename);
+    ct_assertequalstr("test.rom", args->filepath);
+    ct_assertequalstr("test.rom", argparse_filename(args->filepath));
 }
 
 //

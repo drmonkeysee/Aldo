@@ -12,12 +12,10 @@
 
 struct cliargs {
     struct haltarg {
-        const char *expr;               // Non-owning Pointer
+        const char *expr;                           // Non-owning Pointer
         struct haltarg *next;
     } *haltlist;
-    const char                          // Non-owning Pointers
-        *cartfilepath, *cartfilename,
-        *chrdecode_prefix, *me;
+    const char *filepath, *chrdecode_prefix, *me;   // Non-owning Pointers
     int chrscale, resetvector;
     bool
         batch, bcdsupport, chrdecode, disassemble, help, info, tron, verbose,

@@ -63,15 +63,17 @@ static int print_cart_info(const struct cliargs *args, cart *c)
     if (args->verbose) {
         puts("---=== Cart Info ===---");
     }
-    cart_write_info(c, args->verbose ? args->cartfilepath : args->cartfilename,
-                    args->verbose, stdout);
+    const char *const name = args->verbose
+                                ? args->filepath
+                                : argparse_filename(args->filepath);
+    cart_write_info(c, name, args->verbose, stdout);
     return EXIT_SUCCESS;
 }
 
 static int disassemble_cart_prg(const struct cliargs *args, cart *c)
 {
-    const int err = dis_cart_prg(c, args->cartfilename, args->verbose, false,
-                                 stdout);
+    const int err = dis_cart_prg(c, argparse_filename(args->filepath),
+                                 args->verbose, false, stdout);
     if (err < 0) {
         fprintf(stderr, "PRG decode error (%d): %s\n", err, dis_errstr(err));
         return EXIT_FAILURE;
@@ -144,16 +146,16 @@ static void dump_ram(const struct cliargs *args, nes *console)
 {
     static const char *const restrict ramfile = "system.ram";
 
-    if (args->tron || args->batch) {
-        errno = 0;
-        FILE *const f = fopen(ramfile, "wb");
-        if (f) {
-            nes_dumpram(console, f);
-            fclose(f);
-        } else {
-            fprintf(stderr, "%s: ", ramfile);
-            perror("Cannot open ramdump file");
-        }
+    if (!args->tron && !args->batch) return;
+
+    errno = 0;
+    FILE *const f = fopen(ramfile, "wb");
+    if (f) {
+        nes_dumpram(console, f);
+        fclose(f);
+    } else {
+        fprintf(stderr, "%s: ", ramfile);
+        perror("Cannot open ramdump file");
     }
 }
 
@@ -236,13 +238,13 @@ static int run_with_args(const struct cliargs *args)
         return EXIT_SUCCESS;
     }
 
-    if (!args->cartfilepath) {
+    if (!args->filepath) {
         fputs("No input file specified\n", stderr);
         argparse_usage(args->me);
         return EXIT_FAILURE;
     }
 
-    cart *cart = load_cart(args->cartfilepath);
+    cart *cart = load_cart(args->filepath);
     if (!cart) {
         return EXIT_FAILURE;
     }

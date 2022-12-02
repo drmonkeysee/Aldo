@@ -10,6 +10,7 @@
 #include "bytes.h"
 #include "debug.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -204,6 +205,9 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
 bool argparse_parse(struct cliargs *restrict args, int argc,
                     char *argv[argc+1])
 {
+    assert(args != NULL);
+    assert(argc > 0 ? argv != NULL : true);
+
     init_cliargs(args);
     args->me = argc > 0 && strlen(argv[0]) > 0 ? argv[0] : "aldo";
     bool opt_parse = true;
@@ -240,7 +244,7 @@ const char *argparse_filename(const char *filepath)
 void argparse_usage(const char *me)
 {
     puts("---=== Aldo Usage ===---");
-    printf("%s [options...] [command] file\n", me);
+    printf("%s [options...] [command] file\n", me ? me : "MISSING NAME");
     puts("\noptions");
     printf("  -%c\t: run program in batch mode (alt %s)\n", BatchShort,
            BatchLong);
@@ -285,6 +289,8 @@ void argparse_usage(const char *me)
 
 void argparse_cleanup(struct cliargs *args)
 {
+    assert(args != NULL);
+
     for (struct haltarg *curr;
          args->haltlist;
          curr = args->haltlist,

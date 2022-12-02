@@ -450,8 +450,8 @@ void aldo::RenderFrame::renderRam(const console_state& snapshot) const noexcept
         const ImVec2 tableSize{
             0, ImGui::GetTextLineHeightWithSpacing() * 2 * (pageDim + 1),
         };
-        const auto spHighlightText
-            = ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
+        const auto spHighlightText =
+            ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
         if (ImGui::BeginTable("ram", cols, tableConfig, tableSize)) {
             char col[3];
             ImGui::TableSetupScrollFreeze(0, 1);

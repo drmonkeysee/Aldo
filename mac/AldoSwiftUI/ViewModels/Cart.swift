@@ -37,7 +37,7 @@ final class Cart: ObservableObject {
         guard let h = handle else { return noCart }
 
         return await readCStream {
-            cart_write_info(h.unwrapped, true, $0)
+            cart_write_info(h.unwrapped, name, true, $0)
         }
     }
 
@@ -52,9 +52,9 @@ final class Cart: ObservableObject {
         return await readCStream { stream in
             try n.withCString { cartFile in
                 var appstate = cliargs()
-                appstate.cartfilepath = cartFile
+                appstate.filepath = cartFile
                 //appstate.unified_disoutput = true
-                let err = dis_cart_prg(h.unwrapped, false, true, stream)
+                let err = dis_cart_prg(h.unwrapped, name, false, true, stream)
                 if err < 0 { throw AldoError.wrapDisError(code: err) }
             }
         }

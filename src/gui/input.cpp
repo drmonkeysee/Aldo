@@ -49,11 +49,12 @@ auto process_event(const aldo::event& ev, aldo::viewstate& state, nes* console)
         break;
     case aldo::Command::interrupt:
         {
-            const auto& val = std::get<aldo::interrupt_event>(ev.value);
-            if (val.second) {
-                nes_interrupt(console, val.first);
+            const auto [signal, active]
+                = std::get<aldo::interrupt_event>(ev.value);
+            if (active) {
+                nes_interrupt(console, signal);
             } else {
-                nes_clear(console, val.first);
+                nes_clear(console, signal);
             }
         }
         break;

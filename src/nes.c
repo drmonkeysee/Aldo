@@ -142,9 +142,9 @@ void nes_free(nes *self)
 void nes_powerup(nes *self, cart *c, bool zeroram)
 {
     assert(self != NULL);
+    assert(self->cart == NULL);
 
     if (c) {
-        disconnect_cart(self);
         connect_cart(self, c);
     }
     // TODO: for now start in cycle-step mode
@@ -153,6 +153,14 @@ void nes_powerup(nes *self, cart *c, bool zeroram)
         memset(self->ram, 0, sizeof self->ram / sizeof self->ram[0]);
     }
     cpu_powerup(&self->cpu);
+}
+
+void nes_powerdown(nes *self)
+{
+    assert(self != NULL);
+
+    nes_halt(self);
+    disconnect_cart(self);
 }
 
 void nes_mode(nes *self, enum csig_excmode mode)

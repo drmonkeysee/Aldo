@@ -27,6 +27,8 @@ void nes_free(nes *self) br_nothrow;
 
 br_libexport
 void nes_powerup(nes *self, cart *c, bool zeroram) br_nothrow;
+br_libexport
+void nes_powerdown(nes *self) br_nothrow;
 
 br_libexport
 void nes_mode(nes *self, enum csig_excmode mode) br_nothrow;

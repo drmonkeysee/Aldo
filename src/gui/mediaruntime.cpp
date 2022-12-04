@@ -32,8 +32,9 @@ auto create_window(SDL_Point windowSize, const gui_platform& p)
 {
     const auto hidpi = p.is_hidpi();
     SDL_Log("HIDPI: %d", hidpi);
-    const auto name = p.appname();
-    const auto win = SDL_CreateWindow(name ? name : "DisplayNameErr",
+    char name[5];
+    const auto success = p.appname(sizeof name, name, nullptr);
+    const auto win = SDL_CreateWindow(success ? name : "DisplayNameErr",
                                       SDL_WINDOWPOS_CENTERED,
                                       SDL_WINDOWPOS_CENTERED,
                                       windowSize.x, windowSize.y,

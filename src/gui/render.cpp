@@ -17,6 +17,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_sdlrenderer.h"
+#include <SDL2/SDL.h>
 
 #include <locale>
 #include <cinttypes>
@@ -94,7 +95,7 @@ void aldo::RenderFrame::render(aldo::viewstate& state,
 void aldo::RenderFrame::renderMainMenu(aldo::viewstate& state) const noexcept
 {
     if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("Aldo")) {
+        if (ImGui::BeginMenu(SDL_GetWindowTitle(runtime.window()))) {
             ImGui::MenuItem("About");
             ImGui::MenuItem("ImGui Demo", nullptr, &state.showDemo);
             if (ImGui::MenuItem("Quit", "Cmd+Q")) {

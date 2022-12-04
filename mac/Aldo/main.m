@@ -26,6 +26,5 @@ int main(int argc, char *argv[argc+1])
     }
 
     const int result = gui_run(&platform);
-    platform.cleanup();
     return result;
 }

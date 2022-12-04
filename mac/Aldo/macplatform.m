@@ -11,33 +11,25 @@
 
 #include <SDL2/SDL_syswm.h>
 
-#include <stddef.h>
-#include <stdlib.h>
+#include <assert.h>
 
-static char *restrict AppName;
-
-static const char *appname(void)
+static bool appname(size_t sz, char buf[sz], size_t *len)
 {
-    if (AppName) return AppName;
-
     @autoreleasepool {
         static const NSStringEncoding encoding = NSUTF8StringEncoding;
         NSString *const displayName = [NSBundle.mainBundle
                                        objectForInfoDictionaryKey:
                                            @"CFBundleDisplayName"];
-        const NSUInteger len = [displayName
-                                lengthOfBytesUsingEncoding: encoding];
-        if (len > 0) {
-            const NSUInteger sz = len + 1;
-            char *const buf = malloc(sz);
-            if ([displayName getCString:buf maxLength:sz encoding:encoding]) {
-                AppName = buf;
-            } else {
-                free(buf);
-            }
+        const NSUInteger namelen = [displayName
+                                    lengthOfBytesUsingEncoding: encoding];
+        if (len) {
+            *len = namelen;
         }
+        if (buf && 0 < namelen && namelen < sz) {
+            return [displayName getCString:buf maxLength:sz encoding:encoding];
+        }
+        return false;
     }
-    return AppName;
 }
 
 static bool is_hidpi(void)
@@ -51,6 +43,8 @@ static bool is_hidpi(void)
 
 static float render_scale_factor(SDL_Window *win)
 {
+    assert(win != NULL);
+
     SDL_SysWMinfo winfo;
     SDL_VERSION(&winfo.version);
     if (SDL_GetWindowWMInfo(win, &winfo)) {
@@ -71,10 +65,11 @@ static float render_scale_factor(SDL_Window *win)
     return 1.0f;
 }
 
-static void cleanup(void)
+static bool open_file(size_t sz, char buf[sz], size_t *len)
 {
-    free(AppName);
-    AppName = NULL;
+    NSOpenPanel *panel = [NSOpenPanel openPanel];
+    panel.message = @"Choose a ROM file";
+    return [panel runModal];
 }
 
 //
@@ -87,7 +82,7 @@ bool gui_platform_init(struct gui_platform *platform)
         appname,
         is_hidpi,
         render_scale_factor,
-        cleanup,
+        open_file,
     };
     return true;
 }

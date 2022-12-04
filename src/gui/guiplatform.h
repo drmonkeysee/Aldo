@@ -11,12 +11,13 @@
 #include <SDL2/SDL.h>
 
 #include <stdbool.h>
+#include <stddef.h>
 
 struct gui_platform {
-    const char *(*appname)(void);
+    bool (*appname)(size_t, char[], size_t *);
     bool (*is_hidpi)(void);
     float (*render_scale_factor)(SDL_Window *);
-    void (*cleanup)(void);
+    bool (*open_file)(size_t, char[], size_t *);
 };
 
 #include "bridgeopen.h"

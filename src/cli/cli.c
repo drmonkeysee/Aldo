@@ -173,7 +173,10 @@ static int run_emu(const struct cliargs *args, cart *c)
     }
 
     debugctx *dbg = create_debugger(args);
-    if (!dbg) return EXIT_FAILURE;
+    if (!dbg) {
+        fputs("Unable to initialize debugger!\n", stderr);
+        return EXIT_FAILURE;
+    }
 
     int result = EXIT_SUCCESS;
     FILE *tracelog = NULL;
@@ -188,6 +191,7 @@ static int run_emu(const struct cliargs *args, cart *c)
     }
     nes *console = nes_new(dbg, args->bcdsupport, tracelog);
     if (!console) {
+        fputs("Unable to initialize console!\n", stderr);
         result = EXIT_FAILURE;
         goto exit_trace;
     }

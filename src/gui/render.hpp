@@ -33,7 +33,8 @@ private:
     void renderMainMenu(viewstate& state) const noexcept;
     void renderHardwareTraits(viewstate& state,
                               const console_state& snapshot) const noexcept;
-    void renderCart(const console_state& snapshot) const noexcept;
+    void renderCart(const aldo::viewstate& state,
+                    const console_state& snapshot) const;
     void renderPrg(const console_state& snapshot) const noexcept;
     void renderBouncer(viewstate& state) const noexcept;
     void renderCpu(viewstate& state,

@@ -8,6 +8,7 @@
 #ifndef Aldo_gui_viewstate_hpp
 #define Aldo_gui_viewstate_hpp
 
+#include "cart.hpp"
 #include "ctrlsignal.h"
 #include "cycleclock.h"
 #include "tsutil.h"
@@ -73,6 +74,7 @@ struct runclock {
 };
 
 struct viewstate {
+    Cart cart;
     std::queue<event> events;
     runclock clock;
     struct {

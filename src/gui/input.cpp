@@ -36,14 +36,18 @@ auto is_guikey_shortcut(SDL_Event* ev) noexcept
     return ev->key.keysym.mod == KMOD_LGUI || ev->key.keysym.mod == KMOD_RGUI;
 }
 
-auto open_cart_file(nes* console, const gui_platform& p) noexcept
+auto open_cart_file(aldo::viewstate& s, nes* console,
+                    const gui_platform& p) noexcept
 {
     char filepath[1024];
     size_t len = 0;
-    const auto ok = p.open_file(sizeof filepath, filepath, &len);
+    // TODO: halt to prevent interrupted play during dialog; but how to
+    // disconnect cart properly if load from file fails?
     nes_halt(console);
+    const auto ok = p.open_file(sizeof filepath, filepath, &len);
     if (ok) {
         SDL_Log("File selected: %s", filepath);
+        s.cart.loadFrom(filepath);
     }
     if (!ok && len > 0) {
         SDL_Log("Filepath needed %zu bytes", len);
@@ -66,7 +70,7 @@ auto process_event(const aldo::event& ev, aldo::viewstate& s, nes* console,
         nes_mode(console, std::get<csig_excmode>(ev.value));
         break;
     case aldo::Command::openFile:
-        open_cart_file(console, p);
+        open_cart_file(s, console, p);
         break;
     case aldo::Command::quit:
         s.running = false;

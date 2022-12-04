@@ -23,8 +23,8 @@ class Cart final {
 public:
     void loadFrom(std::string_view filepath) noexcept;
 
-    std::string_view name() const noexcept;
-    cart* get() const noexcept;
+    std::string_view name() const;
+    cart* get() const noexcept { return handle.get(); }
 
 private:
     std::string filepath;

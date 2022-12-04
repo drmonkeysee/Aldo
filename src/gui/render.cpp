@@ -78,7 +78,7 @@ void aldo::RenderFrame::render(aldo::viewstate& state,
 {
     renderMainMenu(state);
     renderHardwareTraits(state, snapshot);
-    renderCart(snapshot);
+    renderCart(state, snapshot);
     renderPrg(snapshot);
     renderBouncer(state);
     renderCpu(state, snapshot);
@@ -202,11 +202,13 @@ renderHardwareTraits(aldo::viewstate& state,
 }
 
 void
-aldo::RenderFrame::renderCart(const console_state& snapshot) const noexcept
+aldo::RenderFrame::renderCart(const aldo::viewstate& state,
+                              const console_state& snapshot) const
 {
     if (ImGui::Begin("Cart")) {
         const auto& cart = snapshot.cart;
-        ImGui::Text("Name: %s", "NOCART");
+        const auto name = state.cart.name();
+        ImGui::Text("Name: %.*s", (int)name.length(), name.data());
         char cartFormat[CART_FMT_SIZE];
         const auto result = cart_format_extname(cart.info, cartFormat);
         ImGui::Text("Format: %s", result > 0 ? cartFormat : "Invalid Format");

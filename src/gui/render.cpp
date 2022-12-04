@@ -11,6 +11,7 @@
 #include "cart.h"
 #include "ctrlsignal.h"
 #include "dis.h"
+#include "emulator.hpp"
 #include "mediaruntime.hpp"
 #include "viewstate.hpp"
 
@@ -74,11 +75,12 @@ aldo::RenderFrame::~RenderFrame()
 }
 
 void aldo::RenderFrame::render(aldo::viewstate& state,
-                               const console_state& snapshot) const noexcept
+                               const aldo::EmuController& controller,
+                               const console_state& snapshot) const
 {
     renderMainMenu(state);
     renderHardwareTraits(state, snapshot);
-    renderCart(state, snapshot);
+    renderCart(controller, snapshot);
     renderPrg(snapshot);
     renderBouncer(state);
     renderCpu(state, snapshot);
@@ -92,26 +94,26 @@ void aldo::RenderFrame::render(aldo::viewstate& state,
 // Private Interface
 //
 
-void aldo::RenderFrame::renderMainMenu(aldo::viewstate& state) const noexcept
+void aldo::RenderFrame::renderMainMenu(aldo::viewstate& s) const noexcept
 {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu(SDL_GetWindowTitle(runtime.window()))) {
             ImGui::MenuItem("About");
-            ImGui::MenuItem("ImGui Demo", nullptr, &state.showDemo);
+            ImGui::MenuItem("ImGui Demo", nullptr, &s.showDemo);
             if (ImGui::MenuItem("Quit", "Cmd+Q")) {
-                state.events.emplace(aldo::Command::quit);
+                s.events.emplace(aldo::Command::quit);
             };
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Open", "Cmd+O")) {
-                state.events.emplace(aldo::Command::openFile);
+                s.events.emplace(aldo::Command::openFile);
             }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Window")) {
-            ImGui::MenuItem("Bouncer", nullptr, &state.showBouncer);
-            ImGui::MenuItem("CPU", nullptr, &state.showCpu);
+            ImGui::MenuItem("Bouncer", nullptr, &s.showBouncer);
+            ImGui::MenuItem("CPU", nullptr, &s.showCpu);
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
@@ -119,15 +121,15 @@ void aldo::RenderFrame::renderMainMenu(aldo::viewstate& state) const noexcept
 }
 
 void aldo::RenderFrame::
-renderHardwareTraits(aldo::viewstate& state,
-                     const console_state& snapshot) const noexcept
+renderHardwareTraits(aldo::viewstate& s,
+                     const console_state& snp) const noexcept
 {
     if (ImGui::Begin("Hardware Traits")) {
         static constexpr auto refreshIntervalMs = 250;
         static constinit double displayDtUpdate, refreshDt;
-        auto& cyclock = state.clock.cyclock;
+        auto& cyclock = s.clock.cyclock;
         if ((refreshDt += cyclock.frametime_ms) >= refreshIntervalMs) {
-            displayDtUpdate = state.clock.dtUpdateMs;
+            displayDtUpdate = s.clock.dtUpdateMs;
             refreshDt = 0;
         }
         ImGui::TextUnformatted("FPS: 60");
@@ -147,26 +149,25 @@ renderHardwareTraits(aldo::viewstate& state,
 
         ImGui::Separator();
 
-        auto halt = !snapshot.lines.ready;
+        auto halt = !snp.lines.ready;
         if (ImGui::Checkbox("HALT", &halt)) {
-            state.events.emplace(aldo::Command::halt, halt);
+            s.events.emplace(aldo::Command::halt, halt);
         };
 
-        auto mode = snapshot.mode;
         ImGui::TextUnformatted("Mode");
-        if (ImGui::RadioButton("Cycle", mode == CSGM_CYCLE)
-            && mode != CSGM_CYCLE) {
-            state.events.emplace(aldo::Command::mode, CSGM_CYCLE);
+        if (ImGui::RadioButton("Cycle", snp.mode == CSGM_CYCLE)
+            && snp.mode != CSGM_CYCLE) {
+            s.events.emplace(aldo::Command::mode, CSGM_CYCLE);
         }
         ImGui::SameLine();
-        if (ImGui::RadioButton("Step", mode == CSGM_STEP)
-            && mode != CSGM_STEP) {
-            state.events.emplace(aldo::Command::mode, CSGM_STEP);
+        if (ImGui::RadioButton("Step", snp.mode == CSGM_STEP)
+            && snp.mode != CSGM_STEP) {
+            s.events.emplace(aldo::Command::mode, CSGM_STEP);
         }
         ImGui::SameLine();
-        if (ImGui::RadioButton("Run", mode == CSGM_RUN)
-            && mode != CSGM_RUN) {
-            state.events.emplace(aldo::Command::mode, CSGM_RUN);
+        if (ImGui::RadioButton("Run", snp.mode == CSGM_RUN)
+            && snp.mode != CSGM_RUN) {
+            s.events.emplace(aldo::Command::mode, CSGM_RUN);
         }
 
         // TODO: fake toggle button by using on/off flags to adjust colors
@@ -180,35 +181,33 @@ renderHardwareTraits(aldo::viewstate& state,
         ImGui::Button("RES");
         ImGui::PopStyleColor();*/
         // NOTE: interrupt signals are all low-active
-        auto irq = !snapshot.lines.irq,
-                nmi = !snapshot.lines.nmi,
-                res = !snapshot.lines.reset;
+        auto
+            irq = !snp.lines.irq, nmi = !snp.lines.nmi, res = !snp.lines.reset;
         if (ImGui::Checkbox("IRQ", &irq)) {
-            state.events.emplace(aldo::Command::interrupt,
-                                 aldo::interrupt_event{CSGI_IRQ, irq});
+            s.events.emplace(aldo::Command::interrupt,
+                             aldo::interrupt_event{CSGI_IRQ, irq});
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("NMI", &nmi)) {
-            state.events.emplace(aldo::Command::interrupt,
-                                 aldo::interrupt_event{CSGI_NMI, nmi});
+            s.events.emplace(aldo::Command::interrupt,
+                             aldo::interrupt_event{CSGI_NMI, nmi});
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("RES", &res)) {
-            state.events.emplace(aldo::Command::interrupt,
-                                 aldo::interrupt_event{CSGI_RES, res});
+            s.events.emplace(aldo::Command::interrupt,
+                             aldo::interrupt_event{CSGI_RES, res});
         }
     }
     ImGui::End();
 }
 
-void
-aldo::RenderFrame::renderCart(const aldo::viewstate& state,
-                              const console_state& snapshot) const
+void aldo::RenderFrame::renderCart(const aldo::EmuController& c,
+                                   const console_state& snp) const
 {
     if (ImGui::Begin("Cart")) {
-        const auto& cart = snapshot.cart;
-        const auto name = state.cart.name();
+        const auto name = c.cartName();
         ImGui::Text("Name: %.*s", (int)name.length(), name.data());
+        const auto& cart = snp.cart;
         char cartFormat[CART_FMT_SIZE];
         const auto result = cart_format_extname(cart.info, cartFormat);
         ImGui::Text("Format: %s", result > 0 ? cartFormat : "Invalid Format");
@@ -216,13 +215,13 @@ aldo::RenderFrame::renderCart(const aldo::viewstate& state,
     ImGui::End();
 }
 
-void aldo::RenderFrame::renderPrg(const console_state& snapshot) const noexcept
+void aldo::RenderFrame::renderPrg(const console_state& snp) const noexcept
 {
     if (ImGui::Begin("PRG @ PC")) {
         static constexpr auto instCount = 20;
         static constinit auto selected = -1;
-        const auto& prgMem = snapshot.mem;
-        auto addr = snapshot.datapath.current_instruction;
+        const auto& prgMem = snp.mem;
+        auto addr = snp.datapath.current_instruction;
         dis_instruction inst{};
         char disasm[DIS_INST_SIZE];
         for (int i = 0; i < instCount; ++i) {
@@ -254,7 +253,7 @@ void aldo::RenderFrame::renderPrg(const console_state& snapshot) const noexcept
 
             lo = prgMem.vectors[2];
             hi = prgMem.vectors[3];
-            const auto& debugger = snapshot.debugger;
+            const auto& debugger = snp.debugger;
             const char* indicator;
             std::uint16_t resVector;
             if (debugger.resvector_override >= 0) {
@@ -277,11 +276,11 @@ void aldo::RenderFrame::renderPrg(const console_state& snapshot) const noexcept
 }
 
 void
-aldo::RenderFrame::renderBouncer(aldo::viewstate& state) const noexcept
+aldo::RenderFrame::renderBouncer(aldo::viewstate& s) const noexcept
 {
-    if (!state.showBouncer) return;
+    if (!s.showBouncer) return;
 
-    if (ImGui::Begin("Bouncer", &state.showBouncer)) {
+    if (ImGui::Begin("Bouncer", &s.showBouncer)) {
         const auto ren = runtime.renderer();
         const auto tex = runtime.bouncerTexture();
         SDL_SetRenderTarget(ren, tex);
@@ -293,7 +292,7 @@ aldo::RenderFrame::renderBouncer(aldo::viewstate& state) const noexcept
 
         SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
 
-        const auto& bouncer = state.bouncer;
+        const auto& bouncer = s.bouncer;
         const auto fulldim = bouncer.halfdim * 2;
         const SDL_Rect pos{
             bouncer.pos.x - bouncer.halfdim,
@@ -310,14 +309,14 @@ aldo::RenderFrame::renderBouncer(aldo::viewstate& state) const noexcept
     ImGui::End();
 }
 
-void aldo::RenderFrame::renderCpu(aldo::viewstate& state,
-                                  const console_state& snapshot) const noexcept
+void aldo::RenderFrame::renderCpu(aldo::viewstate& s,
+                                  const console_state& snp) const noexcept
 {
-    if (!state.showCpu) return;
+    if (!s.showCpu) return;
 
-    if (ImGui::Begin("CPU", &state.showCpu)) {
+    if (ImGui::Begin("CPU", &s.showCpu)) {
         if (ImGui::BeginChild("CpuLeft", {200, 0})) {
-            const auto& cpu = snapshot.cpu;
+            const auto& cpu = snp.cpu;
             if (ImGui::CollapsingHeader("Registers",
                                         ImGuiTreeNodeFlags_DefaultOpen)) {
                 ImGui::BeginGroup();
@@ -379,8 +378,8 @@ void aldo::RenderFrame::renderCpu(aldo::viewstate& state,
         if (ImGui::BeginChild("CpuRight")) {
             if (ImGui::CollapsingHeader("Datapath",
                                         ImGuiTreeNodeFlags_DefaultOpen)) {
-                const auto& datapath = snapshot.datapath;
-                const auto& lines = snapshot.lines;
+                const auto& datapath = snp.datapath;
+                const auto& lines = snp.lines;
 
                 ImGui::Text("Address Bus: %04X", datapath.addressbus);
                 const char* dataStr;
@@ -402,7 +401,7 @@ void aldo::RenderFrame::renderCpu(aldo::viewstate& state,
                 if (datapath.jammed) {
                     mnemonic = "JAMMED";
                 } else {
-                    const auto wlen = dis_datapath(&snapshot, buf);
+                    const auto wlen = dis_datapath(&snp, buf);
                     mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
                 }
                 ImGui::Text("Decode: %s", mnemonic);
@@ -441,7 +440,7 @@ void aldo::RenderFrame::renderCpu(aldo::viewstate& state,
     ImGui::End();
 }
 
-void aldo::RenderFrame::renderRam(const console_state& snapshot) const noexcept
+void aldo::RenderFrame::renderRam(const console_state& snp) const noexcept
 {
     if (ImGui::Begin("RAM")) {
         static constexpr auto pageSize = 0x100, pageDim = 0x10,
@@ -468,7 +467,7 @@ void aldo::RenderFrame::renderRam(const console_state& snapshot) const noexcept
             ImGui::TableSetupColumn("ASCII");
             ImGui::TableHeadersRow();
 
-            const auto sp = snapshot.cpu.stack_pointer;
+            const auto sp = snp.cpu.stack_pointer;
             std::uint16_t addr = 0;
             for (std::size_t page = 0; page < pageCount; ++page) {
                 for (std::size_t pageRow = 0; pageRow < pageDim; ++pageRow) {
@@ -487,7 +486,7 @@ void aldo::RenderFrame::renderRam(const console_state& snapshot) const noexcept
                     for (std::size_t ramCol = 0; ramCol < pageDim; ++ramCol) {
                         const auto ramIdx = (page * pageSize)
                                             + (pageRow * pageDim) + ramCol;
-                        const auto val = snapshot.mem.ram[ramIdx];
+                        const auto val = snp.mem.ram[ramIdx];
                         ImGui::TableSetColumnIndex((int)ramCol + 1);
                         if (page == 1 && ramIdx % pageSize == sp) {
                             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,

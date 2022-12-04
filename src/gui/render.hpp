@@ -13,6 +13,7 @@
 namespace aldo
 {
 
+class EmuController;
 class MediaRuntime;
 struct viewstate;
 
@@ -26,20 +27,17 @@ public:
     RenderFrame& operator=(RenderFrame&&) = delete;
     ~RenderFrame();
 
-    void render(viewstate& state,
-                const console_state& snapshot) const noexcept;
+    void render(viewstate& state, const EmuController& controller,
+                const console_state& snapshot) const;
 
 private:
-    void renderMainMenu(viewstate& state) const noexcept;
-    void renderHardwareTraits(viewstate& state,
-                              const console_state& snapshot) const noexcept;
-    void renderCart(const aldo::viewstate& state,
-                    const console_state& snapshot) const;
-    void renderPrg(const console_state& snapshot) const noexcept;
-    void renderBouncer(viewstate& state) const noexcept;
-    void renderCpu(viewstate& state,
-                   const console_state& snapshot) const noexcept;
-    void renderRam(const console_state& snapshot) const noexcept;
+    void renderMainMenu(viewstate&) const noexcept;
+    void renderHardwareTraits(viewstate&, const console_state&) const noexcept;
+    void renderCart(const EmuController&, const console_state&) const;
+    void renderPrg(const console_state&) const noexcept;
+    void renderBouncer(viewstate&) const noexcept;
+    void renderCpu(viewstate&, const console_state&) const noexcept;
+    void renderRam(const console_state&) const noexcept;
 
     const MediaRuntime& runtime;
 };

@@ -22,29 +22,35 @@
 static int run_emu(const struct gui_platform *platform)
 {
     debugctx *dbg = debug_new();
-    if (!dbg) return EXIT_FAILURE;
+    if (!dbg) {
+        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+                        "Unable to initialize debugger!");
+        return EXIT_FAILURE;
+    }
 
-    int result = EXIT_SUCCESS;
     nes *console = nes_new(dbg, false, NULL);
     if (!console) {
-        result = EXIT_FAILURE;
-        goto exit_debug;
+        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+                        "Unable to initialize console!");
+        debug_free(dbg);
+        return EXIT_FAILURE;
     }
     nes_powerup(console, NULL, false);
 
     struct console_state snapshot;
     nes_snapshot(console, &snapshot);
-    const int err = ui_sdl_runloop(platform, console, &snapshot);
+    const int err = ui_sdl_runloop(platform, dbg, console, &snapshot);
+    // NOTE: ui loop takes ownership of these two,
+    // even in the event of UI init failure.
+    console = NULL;
+    dbg = NULL;
+    int result = EXIT_SUCCESS;
     if (err < 0) {
-        SDL_Log("UI run failure (%d): %s", err, ui_errstr(err));
+        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+                        "UI run failure (%d): %s", err, ui_errstr(err));
         result = EXIT_FAILURE;
     }
     snapshot_clear(&snapshot);
-    nes_free(console);
-    console = NULL;
-exit_debug:
-    debug_free(dbg);
-    dbg = NULL;
     return result;
 }
 

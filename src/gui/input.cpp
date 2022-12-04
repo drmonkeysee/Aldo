@@ -40,7 +40,7 @@ auto open_cart_file(aldo::viewstate& s, nes* console,
                     const gui_platform& p) noexcept
 {
     char filepath[1024];
-    size_t len = 0;
+    size_t len;
     // TODO: halt to prevent interrupted play during dialog; but how to
     // disconnect cart properly if load from file fails?
     nes_halt(console);

@@ -79,6 +79,9 @@ static bool open_file(size_t sz, char buf[sz], size_t *len)
         if (r == NSModalResponseOK) {
             return fillbuf_from_string(sz, buf, len, panel.URL.absoluteString);
         }
+        if (len) {
+            *len = 0;
+        }
         return false;
     }
 }

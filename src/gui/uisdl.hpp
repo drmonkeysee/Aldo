@@ -11,7 +11,6 @@
 #include "debug.h"
 #include "guiplatform.h"
 #include "nes.h"
-#include "snapshot.h"
 
 #ifdef __cplusplus
 namespace aldo
@@ -21,7 +20,7 @@ namespace aldo
 #include "bridgeopen.h"
 br_checkerror
 int ui_sdl_runloop(const struct gui_platform* platform, debugctx* debug,
-                   nes* console, struct console_state* snapshot) br_nothrow;
+                   nes* console) br_nothrow;
 #include "bridgeclose.h"
 
 #ifdef __cplusplus

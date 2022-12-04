@@ -11,6 +11,7 @@
 #include "emulator.hpp"
 #include "mediaruntime.hpp"
 #include "render.hpp"
+#include "snapshot.h"
 #include "ui.h"
 #include "viewstate.hpp"
 
@@ -21,6 +22,24 @@
 
 namespace
 {
+
+class SnapshotLifetime final {
+public:
+    explicit SnapshotLifetime(nes& console) noexcept
+    {
+        nes_snapshot(&console, &snapshot);
+    }
+    SnapshotLifetime(const SnapshotLifetime&) = delete;
+    SnapshotLifetime& operator=(const SnapshotLifetime&) = delete;
+    SnapshotLifetime(SnapshotLifetime&&) = delete;
+    SnapshotLifetime& operator=(SnapshotLifetime&&) = delete;
+    ~SnapshotLifetime() { snapshot_clear(&snapshot); }
+
+    console_state& get() noexcept { return snapshot; }
+
+private:
+    console_state snapshot;
+};
 
 auto update_bouncer(aldo::viewstate& s, const console_state& snapshot)
 {
@@ -58,21 +77,21 @@ auto render_ui(aldo::viewstate& s, const aldo::EmuController& c,
     frame.render(s, c, snapshot);
 }
 
-auto runloop(const gui_platform& platform, debugctx& debug, nes& console,
-             console_state& snapshot)
+auto runloop(const gui_platform& platform, debugctx& debug, nes& console)
 {
     aldo::EmuController controller{debug, console};
+    SnapshotLifetime lsnapshot{console};
     aldo::viewstate state;
     const aldo::MediaRuntime runtime{
         {1280, 800}, state.bouncer.bounds, platform,
     };
     state.clock.start();
     do {
-        state.clock.tickStart(snapshot);
+        state.clock.tickStart(lsnapshot.get());
         controller.handleInput(state, platform);
         if (state.running) {
-            emu_update(controller, snapshot, state);
-            render_ui(state, controller, runtime, snapshot);
+            emu_update(controller, lsnapshot.get(), state);
+            render_ui(state, controller, runtime, lsnapshot.get());
         }
         state.clock.tickEnd();
     } while (state.running);
@@ -85,15 +104,14 @@ auto runloop(const gui_platform& platform, debugctx& debug, nes& console,
 //
 
 int aldo::ui_sdl_runloop(const gui_platform* platform, debugctx* debug,
-                         nes* console, console_state* snapshot) noexcept
+                         nes* console) noexcept
 {
     assert(platform != nullptr);
     assert(debug != nullptr);
     assert(console != nullptr);
-    assert(snapshot != nullptr);
 
     try {
-        runloop(*platform, *debug, *console, *snapshot);
+        runloop(*platform, *debug, *console);
         return 0;
     } catch (const std::exception& ex) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,

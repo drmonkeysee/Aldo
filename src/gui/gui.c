@@ -9,7 +9,6 @@
 
 #include "debug.h"
 #include "nes.h"
-#include "snapshot.h"
 #include "ui.h"
 #include "uisdl.hpp"
 
@@ -21,6 +20,8 @@
 
 static int run_emu(const struct gui_platform *platform)
 {
+    // NOTE: create initial debugger and console objects before launching
+    // UI loop cuz if we can't get this far we can bail immediately.
     debugctx *dbg = debug_new();
     if (!dbg) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
@@ -37,21 +38,17 @@ static int run_emu(const struct gui_platform *platform)
     }
     nes_powerup(console, NULL, false);
 
-    struct console_state snapshot;
-    nes_snapshot(console, &snapshot);
-    const int err = ui_sdl_runloop(platform, dbg, console, &snapshot);
+    const int err = ui_sdl_runloop(platform, dbg, console);
     // NOTE: ui loop takes ownership of these two,
     // even in the event of UI init failure.
     console = NULL;
     dbg = NULL;
-    int result = EXIT_SUCCESS;
     if (err < 0) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "UI run failure (%d): %s", err, ui_errstr(err));
-        result = EXIT_FAILURE;
+        return EXIT_FAILURE;
     }
-    snapshot_clear(&snapshot);
-    return result;
+    return EXIT_SUCCESS;
 }
 
 //

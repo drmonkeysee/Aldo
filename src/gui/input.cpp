@@ -36,11 +36,12 @@ auto is_guikey_shortcut(SDL_Event* ev) noexcept
     return ev->key.keysym.mod == KMOD_LGUI || ev->key.keysym.mod == KMOD_RGUI;
 }
 
-auto open_cart_file(const gui_platform& p) noexcept
+auto open_cart_file(nes* console, const gui_platform& p) noexcept
 {
     char filepath[1024];
     size_t len = 0;
     const auto ok = p.open_file(sizeof filepath, filepath, &len);
+    nes_halt(console);
     if (ok) {
         SDL_Log("File selected: %s", filepath);
     }
@@ -65,7 +66,7 @@ auto process_event(const aldo::event& ev, aldo::viewstate& s, nes* console,
         nes_mode(console, std::get<csig_excmode>(ev.value));
         break;
     case aldo::Command::openFile:
-        open_cart_file(p);
+        open_cart_file(console, p);
         break;
     case aldo::Command::quit:
         s.running = false;
@@ -104,7 +105,7 @@ void aldo::handle_input(aldo::viewstate& s, nes* console,
         case SDL_KEYDOWN:
             if (is_guikey_shortcut(&ev) && !ev.key.repeat
                 && ev.key.keysym.sym == SDLK_o) {
-                s.queueOpenFile();
+                s.events.emplace(aldo::Command::openFile);
             }
             break;
         case SDL_QUIT:

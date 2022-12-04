@@ -17,6 +17,7 @@
 
 #include <string>
 #include <string_view>
+#include <utility>
 
 namespace aldo
 {
@@ -30,8 +31,8 @@ using debug_handle = handle<debugctx, debug_free>;
 
 class EmuController final {
 public:
-    // TODO: make ownership transfer clear
-    EmuController(debugctx& d, nes& n) noexcept : hdebug{&d}, hconsole{&n} {}
+    EmuController(debug_handle d, console_handle n) noexcept
+    : hdebug{std::move(d)}, hconsole{std::move(n)} {}
 
     std::string_view cartName() const;
 

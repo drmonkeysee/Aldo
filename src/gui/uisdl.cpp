@@ -77,10 +77,12 @@ auto render_ui(aldo::viewstate& s, const aldo::EmuController& c,
     frame.render(s, c, snapshot);
 }
 
-auto runloop(const gui_platform& platform, debugctx& debug, nes& console)
+auto runloop(const gui_platform& platform, debugctx* debug, nes* console)
 {
-    aldo::EmuController controller{debug, console};
-    SnapshotLifetime lsnapshot{console};
+    aldo::EmuController controller{
+        aldo::debug_handle{debug}, aldo::console_handle{console},
+    };
+    SnapshotLifetime lsnapshot{*console};
     aldo::viewstate state;
     const aldo::MediaRuntime runtime{
         {1280, 800}, state.bouncer.bounds, platform,
@@ -111,7 +113,7 @@ int aldo::ui_sdl_runloop(const gui_platform* platform, debugctx* debug,
     assert(console != nullptr);
 
     try {
-        runloop(*platform, *debug, *console);
+        runloop(*platform, debug, console);
         return 0;
     } catch (const std::exception& ex) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,

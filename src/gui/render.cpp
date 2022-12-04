@@ -75,16 +75,15 @@ aldo::RenderFrame::~RenderFrame()
 }
 
 void aldo::RenderFrame::render(aldo::viewstate& state,
-                               const aldo::EmuController& controller,
-                               const console_state& snapshot) const
+                               const aldo::EmuController& controller) const
 {
     renderMainMenu(state);
-    renderHardwareTraits(state, snapshot);
-    renderCart(controller, snapshot);
-    renderPrg(snapshot);
+    renderHardwareTraits(state, controller.snapshot());
+    renderCart(controller);
+    renderPrg(controller.snapshot());
     renderBouncer(state);
-    renderCpu(state, snapshot);
-    renderRam(snapshot);
+    renderCpu(state, controller.snapshot());
+    renderRam(controller.snapshot());
     if (state.showDemo) {
         ImGui::ShowDemoWindow();
     }
@@ -201,13 +200,12 @@ renderHardwareTraits(aldo::viewstate& s,
     ImGui::End();
 }
 
-void aldo::RenderFrame::renderCart(const aldo::EmuController& c,
-                                   const console_state& snp) const
+void aldo::RenderFrame::renderCart(const aldo::EmuController& c) const
 {
     if (ImGui::Begin("Cart")) {
         const auto name = c.cartName();
         ImGui::Text("Name: %.*s", (int)name.length(), name.data());
-        const auto& cart = snp.cart;
+        const auto& cart = c.snapshot().cart;
         char cartFormat[CART_FMT_SIZE];
         const auto result = cart_format_extname(cart.info, cartFormat);
         ImGui::Text("Format: %s", result > 0 ? cartFormat : "Invalid Format");

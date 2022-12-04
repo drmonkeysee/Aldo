@@ -86,11 +86,10 @@ void aldo::EmuController::handleInput(aldo::viewstate& state,
     }
 }
 
-void aldo::EmuController::update(aldo::viewstate& state,
-                                 console_state& snapshot) const noexcept
+void aldo::EmuController::update(aldo::viewstate& state) noexcept
 {
     nes_cycle(hconsole.get(), &state.clock.cyclock);
-    nes_snapshot(hconsole.get(), &snapshot);
+    nes_snapshot(hconsole.get(), snapshotp());
 }
 
 //

@@ -27,13 +27,12 @@ public:
     RenderFrame& operator=(RenderFrame&&) = delete;
     ~RenderFrame();
 
-    void render(viewstate& state, const EmuController& controller,
-                const console_state& snapshot) const;
+    void render(viewstate& state, const EmuController& controller) const;
 
 private:
     void renderMainMenu(viewstate&) const noexcept;
     void renderHardwareTraits(viewstate&, const console_state&) const noexcept;
-    void renderCart(const EmuController&, const console_state&) const;
+    void renderCart(const EmuController&) const;
     void renderPrg(const console_state&) const noexcept;
     void renderBouncer(viewstate&) const noexcept;
     void renderCpu(viewstate&, const console_state&) const noexcept;

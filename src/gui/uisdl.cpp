@@ -23,24 +23,6 @@
 namespace
 {
 
-class SnapshotLifetime final {
-public:
-    explicit SnapshotLifetime(nes& console) noexcept
-    {
-        nes_snapshot(&console, &snapshot);
-    }
-    SnapshotLifetime(const SnapshotLifetime&) = delete;
-    SnapshotLifetime& operator=(const SnapshotLifetime&) = delete;
-    SnapshotLifetime(SnapshotLifetime&&) = delete;
-    SnapshotLifetime& operator=(SnapshotLifetime&&) = delete;
-    ~SnapshotLifetime() { snapshot_clear(&snapshot); }
-
-    console_state& get() noexcept { return snapshot; }
-
-private:
-    console_state snapshot;
-};
-
 auto update_bouncer(aldo::viewstate& s, const console_state& snapshot)
 {
     if (!snapshot.lines.ready) return;
@@ -61,20 +43,18 @@ auto update_bouncer(aldo::viewstate& s, const console_state& snapshot)
 // UI Loop Implementation
 //
 
-auto emu_update(aldo::EmuController& controller, console_state& snapshot,
-                aldo::viewstate& s) noexcept
+auto emu_update(aldo::EmuController& controller, aldo::viewstate& s) noexcept
 {
-    controller.update(s, snapshot);
-    update_bouncer(s, snapshot);
+    controller.update(s);
+    update_bouncer(s, controller.snapshot());
     s.clock.markDtUpdate();
 }
 
 auto render_ui(aldo::viewstate& s, const aldo::EmuController& c,
-               const aldo::MediaRuntime& r,
-               const console_state& snapshot) noexcept
+               const aldo::MediaRuntime& r) noexcept
 {
     const aldo::RenderFrame frame{r};
-    frame.render(s, c, snapshot);
+    frame.render(s, c);
 }
 
 auto runloop(const gui_platform& platform, debugctx* debug, nes* console)
@@ -82,18 +62,17 @@ auto runloop(const gui_platform& platform, debugctx* debug, nes* console)
     aldo::EmuController controller{
         aldo::debug_handle{debug}, aldo::console_handle{console},
     };
-    SnapshotLifetime lsnapshot{*console};
     aldo::viewstate state;
     const aldo::MediaRuntime runtime{
         {1280, 800}, state.bouncer.bounds, platform,
     };
     state.clock.start();
     do {
-        state.clock.tickStart(lsnapshot.get());
+        state.clock.tickStart(controller.snapshot());
         controller.handleInput(state, platform);
         if (state.running) {
-            emu_update(controller, lsnapshot.get(), state);
-            render_ui(state, controller, runtime, lsnapshot.get());
+            emu_update(controller, state);
+            render_ui(state, controller, runtime);
         }
         state.clock.tickEnd();
     } while (state.running);

@@ -8,26 +8,21 @@
 #ifndef Aldo_gui_mediaruntime_hpp
 #define Aldo_gui_mediaruntime_hpp
 
+#include "handle.hpp"
+
 #include <SDL2/SDL.h>
 
-#include <memory>
 #include <stdexcept>
 #include <string_view>
-#include <type_traits>
 
 struct gui_platform;
 
 namespace aldo
 {
 
-template<auto f>
-using func_deleter = std::integral_constant<std::decay_t<decltype(f)>, f>;
-using win_handle =
-    std::unique_ptr<SDL_Window, func_deleter<SDL_DestroyWindow>>;
-using ren_handle =
-    std::unique_ptr<SDL_Renderer, func_deleter<SDL_DestroyRenderer>>;
-using tex_handle =
-    std::unique_ptr<SDL_Texture, func_deleter<SDL_DestroyTexture>>;
+using win_handle = handle<SDL_Window, SDL_DestroyWindow>;
+using ren_handle = handle<SDL_Renderer, SDL_DestroyRenderer>;
+using tex_handle = handle<SDL_Texture, SDL_DestroyTexture>;
 
 class SdlError final : public std::runtime_error {
 public:

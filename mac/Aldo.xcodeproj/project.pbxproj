@@ -11,6 +11,7 @@
 		C8041C3728EE6EC000A3695F /* gui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8041C3628EE6EC000A3695F /* gui.c */; };
 		C8041C3A28EE740900A3695F /* macplatform.m in Sources */ = {isa = PBXBuildFile; fileRef = C8041C3928EE740900A3695F /* macplatform.m */; };
 		C808BA6827893976001FDE39 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
+		C80902D9293C020300DF31F2 /* cart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C80902D7293C020300DF31F2 /* cart.cpp */; };
 		C80C9E1C277D648F000F2D8B /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
 		C80CCE062930495300664730 /* cycleclock.c in Sources */ = {isa = PBXBuildFile; fileRef = C80CCE052930495300664730 /* cycleclock.c */; };
 		C80CCE0729306D8A00664730 /* cycleclock.c in Sources */ = {isa = PBXBuildFile; fileRef = C80CCE052930495300664730 /* cycleclock.c */; };
@@ -217,6 +218,9 @@
 		C8041C3928EE740900A3695F /* macplatform.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = macplatform.m; sourceTree = "<group>"; };
 		C808BA6627893976001FDE39 /* haltexpr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = haltexpr.h; sourceTree = "<group>"; };
 		C808BA6727893976001FDE39 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
+		C80902D7293C020300DF31F2 /* cart.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cart.cpp; sourceTree = "<group>"; };
+		C80902D8293C020300DF31F2 /* cart.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = cart.hpp; sourceTree = "<group>"; };
+		C80902DB293C04C500DF31F2 /* handle.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = handle.hpp; sourceTree = "<group>"; };
 		C80C9E1A277D648F000F2D8B /* debug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
 		C80C9E1B277D648F000F2D8B /* debug.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = debug.c; sourceTree = "<group>"; };
 		C80CCE052930495300664730 /* cycleclock.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cycleclock.c; sourceTree = "<group>"; };
@@ -616,9 +620,12 @@
 		C8B0E66728E01B3E0054547D /* gui */ = {
 			isa = PBXGroup;
 			children = (
+				C80902D8293C020300DF31F2 /* cart.hpp */,
+				C80902D7293C020300DF31F2 /* cart.cpp */,
 				C8041C3528EE6EC000A3695F /* gui.h */,
 				C8041C3628EE6EC000A3695F /* gui.c */,
 				C8041C3828EE72E600A3695F /* guiplatform.h */,
+				C80902DB293C04C500DF31F2 /* handle.hpp */,
 				C82358392935ADD9002C9B31 /* input.hpp */,
 				C82358382935ADD9002C9B31 /* input.cpp */,
 				C8561A0B29149EA600290B53 /* mediaruntime.hpp */,
@@ -980,6 +987,7 @@
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,
 				C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */,
 				C8EC72202916150700DF750A /* render.cpp in Sources */,
+				C80902D9293C020300DF31F2 /* cart.cpp in Sources */,
 				C854873D28E685D00045BA42 /* imgui_impl_sdl.cpp in Sources */,
 				C854873B28E685D00045BA42 /* imgui_tables.cpp in Sources */,
 				C854873C28E685D00045BA42 /* imgui_demo.cpp in Sources */,

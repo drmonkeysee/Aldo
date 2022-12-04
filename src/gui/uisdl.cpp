@@ -22,8 +22,10 @@
 namespace
 {
 
-auto update_bouncer(aldo::viewstate& s)
+auto update_bouncer(aldo::viewstate& s, console_state* snapshot)
 {
+    if (!snapshot->lines.ready) return;
+
     if (s.bouncer.pos.x - s.bouncer.halfdim < 0
         || s.bouncer.pos.x + s.bouncer.halfdim > s.bouncer.bounds.x) {
         s.bouncer.velocity.x *= -1;
@@ -43,9 +45,9 @@ auto update_bouncer(aldo::viewstate& s)
 auto emu_update(nes* console, console_state* snapshot,
                 aldo::viewstate& s) noexcept
 {
-    update_bouncer(s);
     nes_cycle(console, &s.clock.cyclock);
     nes_snapshot(console, snapshot);
+    update_bouncer(s, snapshot);
     s.clock.markDtUpdate();
 }
 
@@ -66,7 +68,7 @@ auto runloop(const gui_platform& platform, nes* console,
     state.clock.start();
     do {
         state.clock.tickStart(*snapshot);
-        aldo::handle_input(state, console);
+        aldo::handle_input(state, console, platform);
         if (state.running) {
             emu_update(console, snapshot, state);
             render_ui(state, runtime, *snapshot);

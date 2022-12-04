@@ -104,7 +104,9 @@ void aldo::RenderFrame::renderMainMenu(aldo::viewstate& state) const noexcept
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("File")) {
-            ImGui::MenuItem("Open");
+            if (ImGui::MenuItem("Open", "Cmd+O")) {
+                state.queueOpenFile();
+            }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Window")) {

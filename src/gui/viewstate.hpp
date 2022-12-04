@@ -26,6 +26,7 @@ enum class Command {
     halt,
     interrupt,
     mode,
+    openFile,
     quit,
 };
 
@@ -72,6 +73,14 @@ struct runclock {
 };
 
 struct viewstate {
+    // TODO: this is messy; is viewstate a POD or an interface
+    void queueOpenFile()
+    {
+        // NOTE: pause execution before opening the modal
+        events.emplace(Command::halt, true);
+        events.emplace(Command::openFile);
+    }
+
     std::queue<event> events;
     runclock clock;
     struct {

@@ -13,22 +13,27 @@
 
 #include <assert.h>
 
+static bool fillbuf_from_string(size_t sz, char buf[sz], size_t *len,
+                                NSString *string)
+{
+    static const NSStringEncoding encoding = NSUTF8StringEncoding;
+    const NSUInteger strLength = [string lengthOfBytesUsingEncoding: encoding];
+    if (len) {
+        *len = strLength;
+    }
+    if (buf && 0 < strLength && strLength < sz) {
+        return [string getCString:buf maxLength:sz encoding:encoding];
+    }
+    return false;
+}
+
 static bool appname(size_t sz, char buf[sz], size_t *len)
 {
     @autoreleasepool {
-        static const NSStringEncoding encoding = NSUTF8StringEncoding;
         NSString *const displayName = [NSBundle.mainBundle
                                        objectForInfoDictionaryKey:
                                            @"CFBundleDisplayName"];
-        const NSUInteger namelen = [displayName
-                                    lengthOfBytesUsingEncoding: encoding];
-        if (len) {
-            *len = namelen;
-        }
-        if (buf && 0 < namelen && namelen < sz) {
-            return [displayName getCString:buf maxLength:sz encoding:encoding];
-        }
-        return false;
+        return fillbuf_from_string(sz, buf, len, displayName);
     }
 }
 
@@ -67,9 +72,15 @@ static float render_scale_factor(SDL_Window *win)
 
 static bool open_file(size_t sz, char buf[sz], size_t *len)
 {
-    NSOpenPanel *panel = [NSOpenPanel openPanel];
-    panel.message = @"Choose a ROM file";
-    return [panel runModal];
+    @autoreleasepool {
+        NSOpenPanel *const panel = [NSOpenPanel openPanel];
+        panel.message = @"Choose a ROM file";
+        const NSModalResponse r = [panel runModal];
+        if (r == NSModalResponseOK) {
+            return fillbuf_from_string(sz, buf, len, panel.URL.absoluteString);
+        }
+        return false;
+    }
 }
 
 //

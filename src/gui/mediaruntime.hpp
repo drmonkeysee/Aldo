@@ -55,11 +55,6 @@ public:
 
     MediaRuntime(SDL_Point windowSize, SDL_Point screenResolution,
                  const gui_platform& p);
-    MediaRuntime(const MediaRuntime&) = delete;
-    MediaRuntime& operator=(const MediaRuntime&) = delete;
-    MediaRuntime(MediaRuntime&&) = delete;
-    MediaRuntime& operator=(MediaRuntime&&) = delete;
-    ~MediaRuntime() = default;
 
     SDL_Window* window() const noexcept { return hwin.get(); }
     SDL_Renderer* renderer() const noexcept { return hren.get(); }

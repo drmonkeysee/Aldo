@@ -16,10 +16,15 @@
 #include <type_traits>
 #include <variant>
 #include <cassert>
+#include <cerrno>
 #include <cstddef>
+#include <cstdio>
+#include <cstring>
 
 namespace
 {
+
+using file_handle = aldo::handle<FILE, std::fclose>;
 
 auto invalid_command(aldo::Command c)
 {
@@ -98,14 +103,34 @@ void aldo::EmuController::update(aldo::viewstate& state) noexcept
 
 void aldo::EmuController::loadCartFrom(std::string_view filepath)
 {
-    cartFilepath = filepath;
+    std::string newfile{filepath};
+    cart* c;
+    errno = 0;
+    file_handle f{std::fopen(newfile.c_str(), "rb")};
+    if (f) {
+        const int err = cart_create(&c, f.get());
+        if (err < 0) {
+            SDL_Log("Cart load failure (%d): %s", err, cart_errstr(err));
+            return;
+            // TODO: return ERROR here
+        }
+    } else {
+        SDL_Log("Cannot open cart file: %s (%s)", newfile.c_str(),
+                std::strerror(errno));
+        return;
+        // TODO: return ERROR here
+    }
+    nes_powerdown(hconsole.get());
+    hcart.reset(c);
+    nes_powerup(hconsole.get(), hcart.get(), false);
+    cartFilepath = newfile;
 }
 
 void aldo::EmuController::openCartFile(const gui_platform& p)
 {
     char filepath[1024];
     std::size_t len;
-    // NOTE: halt console before popping modal to prevent time jump on close
+    // NOTE: halt console to prevent time-jump from modal delay
     // TODO: does this make sense long-term?
     nes_halt(hconsole.get());
     const auto ok = p.open_file(sizeof filepath, filepath, &len);

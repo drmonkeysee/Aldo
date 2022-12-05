@@ -77,7 +77,10 @@ static bool open_file(size_t sz, char buf[sz], size_t *len)
         panel.message = @"Choose a ROM file";
         const NSModalResponse r = [panel runModal];
         if (r == NSModalResponseOK) {
-            return fillbuf_from_string(sz, buf, len, panel.URL.absoluteString);
+            NSString
+                *const path = panel.URL.absoluteString,
+                *const decoded = path.stringByRemovingPercentEncoding;
+            return fillbuf_from_string(sz, buf, len, decoded ? decoded : path);
         }
         if (len) {
             *len = 0;

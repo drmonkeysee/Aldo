@@ -81,8 +81,7 @@ static bool open_file(size_t sz, char buf[sz], size_t *len)
             if (buf && 0 < strLen && strLen < sz) {
                 return [path getFileSystemRepresentation:buf maxLength:sz];
             }
-        }
-        if (len) {
+        } else if (len) {
             *len = 0;
         }
         return false;

@@ -7,7 +7,6 @@
 
 #include "uisdl.hpp"
 
-#include "ctrlsignal.h"
 #include "emulator.hpp"
 #include "mediaruntime.hpp"
 #include "render.hpp"

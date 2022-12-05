@@ -21,7 +21,7 @@
 static int run_emu(const struct gui_platform *platform)
 {
     // NOTE: create initial debugger and console objects before launching
-    // UI loop cuz if we can't get this far we can bail immediately.
+    // UI loop cuz if we can't get this far then bail immediately.
     debugctx *dbg = debug_new();
     if (!dbg) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,

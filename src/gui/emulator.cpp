@@ -5,6 +5,7 @@
 //  Created by Brandon Stansbury on 12/4/22.
 //
 
+#include "ctrlsignal.h"
 #include "emulator.hpp"
 #include "viewstate.hpp"
 
@@ -24,7 +25,7 @@
 namespace
 {
 
-using file_handle = aldo::handle<FILE, std::fclose>;
+using file_handle = aldo::handle<std::FILE, std::fclose>;
 
 auto invalid_command(aldo::Command c)
 {
@@ -54,13 +55,13 @@ std::string_view aldo::EmuController::cartName() const
     std::string_view v = cartFilepath;
     auto slash = v.rfind('/');
     const auto dot = v.rfind('.');
-    if (dot < slash) return v;
-
     if (slash == std::string_view::npos) {
         slash = 0;
     } else {
         ++slash;    // NOTE: one-past the last slash
     }
+    if (dot < slash) return v;
+
     // NOTE: if not found dot will be npos which will work for end-of-string,
     // even with slash subtracted.
     return v.substr(slash, dot - slash);

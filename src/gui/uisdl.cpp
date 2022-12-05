@@ -23,7 +23,7 @@
 namespace
 {
 
-auto update_bouncer(aldo::viewstate& s, const console_state& snapshot)
+auto update_bouncer(aldo::viewstate& s, const console_state& snapshot) noexcept
 {
     if (!snapshot.lines.ready) return;
 
@@ -51,7 +51,7 @@ auto emu_update(aldo::EmuController& controller, aldo::viewstate& s) noexcept
 }
 
 auto render_ui(aldo::viewstate& s, const aldo::EmuController& c,
-               const aldo::MediaRuntime& r) noexcept
+               const aldo::MediaRuntime& r)
 {
     const aldo::RenderFrame frame{r};
     frame.render(s, c);

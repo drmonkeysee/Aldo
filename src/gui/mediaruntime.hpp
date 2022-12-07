@@ -12,9 +12,6 @@
 
 #include <SDL2/SDL.h>
 
-#include <stdexcept>
-#include <string_view>
-
 struct gui_platform;
 
 namespace aldo
@@ -23,11 +20,6 @@ namespace aldo
 using win_handle = handle<SDL_Window, SDL_DestroyWindow>;
 using ren_handle = handle<SDL_Renderer, SDL_DestroyRenderer>;
 using tex_handle = handle<SDL_Texture, SDL_DestroyTexture>;
-
-class SdlError final : public std::runtime_error {
-public:
-    explicit SdlError(std::string_view message);
-};
 
 class SdlLib final {
 public:

@@ -7,6 +7,7 @@
 
 #include "mediaruntime.hpp"
 
+#include "error.hpp"
 #include "guiplatform.h"
 #include "ui.h"
 
@@ -14,19 +15,8 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_sdlrenderer.h"
 
-#include <string>
-
 namespace
 {
-
-auto build_sdl_error(std::string_view message)
-{
-    std::string errorText{message};
-    errorText += " (";
-    errorText += SDL_GetError();
-    errorText += ')';
-    return errorText;
-}
 
 auto create_window(SDL_Point windowSize, const gui_platform& p)
 {
@@ -75,9 +65,6 @@ auto create_bouncer_texture(SDL_Point screenResolution,
 //
 // Public Interface
 //
-
-aldo::SdlError::SdlError(std::string_view message)
-: std::runtime_error{build_sdl_error(message)} {}
 
 aldo::SdlLib::SdlLib()
 {

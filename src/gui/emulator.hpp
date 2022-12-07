@@ -30,17 +30,13 @@ using cart_handle = handle<cart, cart_free>;
 using console_handle = handle<nes, nes_free>;
 using debug_handle = handle<debugctx, debug_free>;
 
-class SnapshotLifetime final {
+class SnapshotScope final {
 public:
-    explicit SnapshotLifetime(nes* console) noexcept
+    explicit SnapshotScope(nes* console) noexcept
     {
         nes_snapshot(console, getp());
     }
-    SnapshotLifetime(const SnapshotLifetime&) = delete;
-    SnapshotLifetime& operator=(const SnapshotLifetime&) = delete;
-    SnapshotLifetime(SnapshotLifetime&&) = delete;
-    SnapshotLifetime& operator=(SnapshotLifetime&&) = delete;
-    ~SnapshotLifetime() { snapshot_clear(getp()); }
+    ~SnapshotScope() { snapshot_clear(getp()); }
 
     const console_state& get() const noexcept { return snapshot; }
     console_state& get() noexcept { return snapshot; }
@@ -74,7 +70,7 @@ private:
     debug_handle hdebug;
     cart_handle hcart;
     console_handle hconsole;
-    SnapshotLifetime lsnapshot;
+    SnapshotScope lsnapshot;
 };
 
 }

@@ -8,7 +8,7 @@
 #ifndef Aldo_gui_render_hpp
 #define Aldo_gui_render_hpp
 
-#include "snapshot.h"
+struct console_state;
 
 namespace aldo
 {

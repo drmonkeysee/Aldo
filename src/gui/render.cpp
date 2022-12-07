@@ -13,6 +13,7 @@
 #include "dis.h"
 #include "emulator.hpp"
 #include "mediaruntime.hpp"
+#include "snapshot.h"
 #include "viewstate.hpp"
 
 #include "imgui.h"

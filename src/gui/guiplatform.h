@@ -18,6 +18,7 @@ struct gui_platform {
     bool (*is_hidpi)(void);
     float (*render_scale_factor)(SDL_Window *);
     bool (*open_file)(size_t, char[], size_t *);
+    bool (*display_error)(const char *, const char *);
 };
 
 #include "bridgeopen.h"

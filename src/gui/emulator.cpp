@@ -7,6 +7,8 @@
 
 #include "ctrlsignal.h"
 #include "emulator.hpp"
+#include "error.hpp"
+#include "guiplatform.h"
 #include "viewstate.hpp"
 
 #include "imgui_impl_sdl.h"
@@ -111,15 +113,10 @@ void aldo::EmuController::loadCartFrom(std::string_view filepath)
     if (f) {
         const int err = cart_create(&c, f.get());
         if (err < 0) {
-            SDL_Log("Cart load failure (%d): %s", err, cart_errstr(err));
-            return;
-            // TODO: return ERROR here
+            throw aldo::DisplayError{"Cart load failure", err, cart_errstr};
         }
     } else {
-        SDL_Log("Cannot open cart file: %s (%s)", newfile.c_str(),
-                std::strerror(errno));
-        return;
-        // TODO: return ERROR here
+        throw aldo::DisplayError{"Cannot open cart file", newfile, errno};
     }
     nes_powerdown(hconsole.get());
     hcart.reset(c);
@@ -137,7 +134,12 @@ void aldo::EmuController::openCartFile(const gui_platform& p)
     const auto ok = p.open_file(sizeof filepath, filepath, &len);
     if (ok) {
         SDL_Log("File selected: %s", filepath);
-        loadCartFrom(filepath);
+        try {
+            loadCartFrom(filepath);
+        } catch (const aldo::DisplayError& err) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s", err.what());
+            p.display_error(err.title(), err.message());
+        }
     }
     if (!ok && len > 0) {
         SDL_Log("Filepath needed %zu bytes", len);

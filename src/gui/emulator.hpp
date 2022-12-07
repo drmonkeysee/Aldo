@@ -10,7 +10,6 @@
 
 #include "cart.h"
 #include "debug.h"
-#include "guiplatform.h"
 #include "handle.hpp"
 #include "nes.h"
 #include "snapshot.h"
@@ -18,6 +17,8 @@
 #include <string>
 #include <string_view>
 #include <utility>
+
+struct gui_platform;
 
 namespace aldo
 {

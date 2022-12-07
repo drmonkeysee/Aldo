@@ -88,6 +88,17 @@ static bool open_file(size_t sz, char buf[sz], size_t *len)
     }
 }
 
+static bool display_error(const char *title, const char *message)
+{
+    @autoreleasepool {
+        NSAlert *modal = [[NSAlert alloc] init];
+        modal.messageText = [NSString stringWithUTF8String:title];
+        modal.informativeText = [NSString stringWithUTF8String:message];
+        modal.alertStyle = NSAlertStyleWarning;
+        return [modal runModal] == NSModalResponseOK;
+    }
+}
+
 //
 // Public Interface
 //
@@ -99,6 +110,7 @@ bool gui_platform_init(struct gui_platform *platform)
         is_hidpi,
         render_scale_factor,
         open_file,
+        display_error,
     };
     return true;
 }

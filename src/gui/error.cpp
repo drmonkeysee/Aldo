@@ -48,8 +48,8 @@ aldo::SdlError::SdlError(std::string message)
 : std::runtime_error{build_sdl_error(std::move(message))} {}
 
 aldo::DisplayError::DisplayError(std::string title, std::string message)
-: std::runtime_error{std::move(title)}, msg{std::move(message)},
-    wht{build_display_what(this->title(), this->message())} {}
+: std::runtime_error{title}, msg{std::move(message)},
+    wht{build_display_what(title, msg)} {}
 
 aldo::DisplayError::DisplayError(std::string title, std::string_view label,
                                  int errnoVal)

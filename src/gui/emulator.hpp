@@ -62,7 +62,7 @@ public:
 private:
     console_state* snapshotp() noexcept { return lsnapshot.getp(); }
 
-    void loadCartFrom(std::string_view);
+    void loadCartFrom(const char*);
     void openCartFile(const gui_platform&);
     void processEvent(const event&, viewstate&, const gui_platform&);
 

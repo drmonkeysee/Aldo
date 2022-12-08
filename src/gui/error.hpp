@@ -11,31 +11,30 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <utility>
 
 namespace aldo
 {
 
 class SdlError final : public std::runtime_error {
 public:
-    explicit SdlError(std::string_view message);
+    explicit SdlError(std::string message);
 };
 
 class DisplayError final : public std::runtime_error {
 public:
-    DisplayError(std::string_view title, std::string_view message);
-    DisplayError(std::string_view title, std::string_view errnoLabel,
-                 int errnoVal);
+    DisplayError(std::string title, std::string message);
+    DisplayError(std::string title, std::string_view label, int errnoVal);
     template <typename F>
-    DisplayError(std::string_view title, int err, F errResolver)
-    : DisplayError{title, emuErrMessage(err, errResolver(err))} {}
+    DisplayError(std::string title, int err, F errResolver)
+    : DisplayError{std::move(title), emuErrMessage(err, errResolver(err))} {}
 
     const char* what() const noexcept override { return wht.c_str(); }
     const char* title() const noexcept { return std::runtime_error::what(); }
     const char* message() const noexcept { return msg.c_str(); }
 
 private:
-    static std::string errnoMessage(std::string_view label, int err);
-    static std::string emuErrMessage(int err, std::string_view errstr);
+    static std::string emuErrMessage(int, std::string_view);
 
     std::string msg;
     std::string wht;

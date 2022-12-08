@@ -104,24 +104,23 @@ void aldo::EmuController::update(aldo::viewstate& state) noexcept
 // Private Interface
 //
 
-void aldo::EmuController::loadCartFrom(std::string_view filepath)
+void aldo::EmuController::loadCartFrom(const char* filepath)
 {
-    std::string newfile{filepath};
     cart* c;
     errno = 0;
-    file_handle f{std::fopen(newfile.c_str(), "rb")};
+    file_handle f{std::fopen(filepath, "rb")};
     if (f) {
         const int err = cart_create(&c, f.get());
         if (err < 0) {
             throw aldo::DisplayError{"Cart load failure", err, cart_errstr};
         }
     } else {
-        throw aldo::DisplayError{"Cannot open cart file", newfile, errno};
+        throw aldo::DisplayError{"Cannot open cart file", filepath, errno};
     }
     nes_powerdown(hconsole.get());
     hcart.reset(c);
     nes_powerup(hconsole.get(), hcart.get(), false);
-    cartFilepath = newfile;
+    cartFilepath = filepath;
 }
 
 void aldo::EmuController::openCartFile(const gui_platform& p)

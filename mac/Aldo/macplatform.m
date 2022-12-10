@@ -11,10 +11,9 @@
 
 #include <SDL2/SDL_syswm.h>
 
-#include <assert.h>
 #include <string.h>
 
-static bool appname(size_t sz, char buf[sz], size_t *len)
+static bool appname(size_t sz, char buf[restrict sz], size_t *len)
 {
     @autoreleasepool {
         static const NSStringEncoding encoding = NSUTF8StringEncoding;
@@ -44,8 +43,6 @@ static bool is_hidpi(void)
 
 static float render_scale_factor(SDL_Window *win)
 {
-    assert(win != NULL);
-
     SDL_SysWMinfo winfo;
     SDL_VERSION(&winfo.version);
     if (SDL_GetWindowWMInfo(win, &winfo)) {
@@ -66,7 +63,7 @@ static float render_scale_factor(SDL_Window *win)
     return 1.0f;
 }
 
-static bool open_file(size_t sz, char buf[sz], size_t *len)
+static bool open_file(size_t sz, char buf[restrict sz], size_t *len)
 {
     @autoreleasepool {
         NSOpenPanel *const panel = [NSOpenPanel openPanel];
@@ -91,7 +88,7 @@ static bool open_file(size_t sz, char buf[sz], size_t *len)
 static bool display_error(const char *title, const char *message)
 {
     @autoreleasepool {
-        NSAlert *modal = [[NSAlert alloc] init];
+        NSAlert *const modal = [[NSAlert alloc] init];
         modal.messageText = [NSString stringWithUTF8String:title];
         modal.informativeText = [NSString stringWithUTF8String:message];
         modal.alertStyle = NSAlertStyleWarning;

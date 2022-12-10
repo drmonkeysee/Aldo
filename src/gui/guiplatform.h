@@ -13,15 +13,15 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#include "bridgeopen.h"
 struct gui_platform {
-    bool (*appname)(size_t, char[], size_t *);
+    bool (*appname)(size_t, char[br_noalias], size_t *);
     bool (*is_hidpi)(void);
     float (*render_scale_factor)(SDL_Window *);
-    bool (*open_file)(size_t, char[], size_t *);
+    bool (*open_file)(size_t, char[br_noalias], size_t *);
     bool (*display_error)(const char *, const char *);
 };
 
-#include "bridgeopen.h"
 br_checkerror
 bool gui_platform_init(struct gui_platform *platform) br_nothrow;
 #include "bridgeclose.h"

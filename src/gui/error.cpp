@@ -48,19 +48,18 @@ auto errno_message(std::string&& label, int err)
 aldo::SdlError::SdlError(std::string message)
 : std::runtime_error{build_sdl_error(std::move(message))} {}
 
-aldo::DisplayError::DisplayError(std::string title, std::string message)
+aldo::AldoError::AldoError(std::string title, std::string message)
 : std::runtime_error{title}, msg{std::move(message)},
     wht{build_display_what(title, msg)} {}
 
-aldo::DisplayError::DisplayError(std::string title, std::string label,
-                                 int errnoVal)
-: DisplayError{std::move(title), errno_message(std::move(label), errnoVal)} {}
+aldo::AldoError::AldoError(std::string title, std::string label, int errnoVal)
+: AldoError{std::move(title), errno_message(std::move(label), errnoVal)} {}
 
 //
 // Private Interface
 //
 
-std::string aldo::DisplayError::emuErrMessage(int err, std::string&& errstr)
+std::string aldo::AldoError::emuErrMessage(int err, std::string&& errstr)
 {
     std::stringstream s;
     s << errstr << " (" << err << ')';

@@ -112,10 +112,10 @@ void aldo::EmuController::loadCartFrom(const char* filepath)
     if (f) {
         const int err = cart_create(&c, f.get());
         if (err < 0) {
-            throw aldo::DisplayError{"Cart load failure", err, cart_errstr};
+            throw aldo::AldoError{"Cart load failure", err, cart_errstr};
         }
     } else {
-        throw aldo::DisplayError{"Cannot open cart file", filepath, errno};
+        throw aldo::AldoError{"Cannot open cart file", filepath, errno};
     }
     nes_powerdown(hconsole.get());
     hcart.reset(c);
@@ -135,7 +135,7 @@ void aldo::EmuController::openCartFile(const gui_platform& p)
         SDL_Log("File selected: %s", filepath);
         try {
             loadCartFrom(filepath);
-        } catch (const aldo::DisplayError& err) {
+        } catch (const aldo::AldoError& err) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s", err.what());
             p.display_error(err.title(), err.message());
         }

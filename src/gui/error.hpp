@@ -20,13 +20,13 @@ public:
     explicit SdlError(std::string message);
 };
 
-class DisplayError final : public std::runtime_error {
+class AldoError final : public std::runtime_error {
 public:
-    DisplayError(std::string title, std::string message);
-    DisplayError(std::string title, std::string label, int errnoVal);
+    AldoError(std::string title, std::string message);
+    AldoError(std::string title, std::string label, int errnoVal);
     template <typename F>
-    DisplayError(std::string title, int err, F errResolver)
-    : DisplayError{std::move(title), emuErrMessage(err, errResolver(err))} {}
+    AldoError(std::string title, int err, F errResolver)
+    : AldoError{std::move(title), emuErrMessage(err, errResolver(err))} {}
 
     const char* what() const noexcept override { return wht.c_str(); }
     const char* title() const noexcept { return std::runtime_error::what(); }

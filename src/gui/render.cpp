@@ -206,10 +206,10 @@ void aldo::RenderFrame::renderCart(const aldo::EmuController& c) const
     if (ImGui::Begin("Cart")) {
         const auto name = c.cartName();
         ImGui::Text("Name: %.*s", (int)name.length(), name.data());
-        const auto& cart = c.snapshot().cart;
         char cartFormat[CART_FMT_SIZE];
-        const auto result = cart_format_extname(cart.info, cartFormat);
-        ImGui::Text("Format: %s", result > 0 ? cartFormat : "Invalid Format");
+        const auto result = cart_format_extname(c.cartp(), cartFormat);
+        ImGui::Text("Format: %s",
+                    result > 0 ? cartFormat : cart_errstr(result));
     }
     ImGui::End();
 }

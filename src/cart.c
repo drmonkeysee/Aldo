@@ -365,8 +365,9 @@ void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)
 
 int cart_format_extname(cart *self, char buf[restrict static CART_FMT_SIZE])
 {
-    assert(self != NULL);
     assert(buf != NULL);
+
+    if (!self) return CART_ERR_NOCART;
 
     int count, total;
     total = count = sprintf(buf, "%s", cart_formatname(self->info.format));

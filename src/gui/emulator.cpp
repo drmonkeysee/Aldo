@@ -52,7 +52,7 @@ auto is_guikey_shortcut(SDL_Event* ev) noexcept
 
 std::string_view aldo::EmuController::cartName() const
 {
-    if (cartFilepath.empty()) return "NO CART";
+    if (cartFilepath.empty()) return cart_errstr(CART_ERR_NOCART);
 
     std::string_view v = cartFilepath;
     auto slash = v.rfind('/');

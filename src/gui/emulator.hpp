@@ -53,6 +53,7 @@ public:
     {}
 
     std::string_view cartName() const;
+    cart* cartp() const noexcept { return hcart.get(); }
     const console_state& snapshot() const noexcept { return lsnapshot.get(); }
     console_state& snapshot() noexcept { return lsnapshot.get(); }
 

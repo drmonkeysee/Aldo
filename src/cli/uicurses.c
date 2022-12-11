@@ -212,9 +212,9 @@ static void drawcart(const struct view *v, const struct emulator *emu)
     wprintw(v->content, "%.*s%s", (int)(longname ? maxwidth - 1 : namelen),
             cn, longname ? "\u2026" : "");
     char fmtd[CART_FMT_SIZE];
-    const int result = cart_format_extname(emu->cart, fmtd);
+    const int err = cart_format_extname(emu->cart, fmtd);
     mvwprintw(v->content, ++cursor_y, 0, "Format: %s",
-              result > 0 ? fmtd : "Invalid Format");
+              err < 0 ? cart_errstr(err) : fmtd);
 }
 
 static void drawinstructions(const struct view *v, uint16_t addr, int h, int y,

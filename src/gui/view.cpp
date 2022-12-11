@@ -180,9 +180,8 @@ protected:
         const auto name = c.cartName();
         ImGui::Text("Name: %.*s", (int)name.length(), name.data());
         char cartFormat[CART_FMT_SIZE];
-        const auto result = cart_format_extname(c.cartp(), cartFormat);
-        ImGui::Text("Format: %s",
-                    result > 0 ? cartFormat : cart_errstr(result));
+        const auto err = cart_format_extname(c.cartp(), cartFormat);
+        ImGui::Text("Format: %s", err < 0 ? cart_errstr(err) : cartFormat);
     }
 };
 

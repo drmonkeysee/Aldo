@@ -119,6 +119,10 @@ int haltexpr_fmt(const struct haltexpr *expr,
 
     if (count < 0) return HEXPR_ERR_FMT;
 
+    // NOTE: safe the buffer if nothing was printed for some reason
+    if (count == 0) {
+        buf[0] = '\0';
+    }
     assert(count < HEXPR_FMT_SIZE);
     return count;
 }

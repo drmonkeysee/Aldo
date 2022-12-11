@@ -54,7 +54,7 @@ std::string_view aldo::EmuController::cartName() const
 {
     if (cartFilepath.empty()) return cart_errstr(CART_ERR_NOCART);
 
-    std::string_view v = cartFilepath;
+    const std::string_view v = cartFilepath;
     auto slash = v.rfind('/');
     const auto dot = v.rfind('.');
     if (slash == std::string_view::npos) {

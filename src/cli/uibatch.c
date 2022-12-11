@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "haltexpr.h"
 #include "nes.h"
-#include "snapshot.h"
 #include "tsutil.h"
 #include "ui.h"
 
@@ -59,8 +58,7 @@ static int init_ui(void)
     return sigaction(SIGINT, &act, NULL) == 0 ? 0 : UI_ERR_ERNO;
 }
 
-static void tick_start(const struct console_state *snapshot,
-                       struct runclock *c)
+static void tick_start(const struct emulator *emu, struct runclock *c)
 {
     cycleclock_tickstart(&c->cyclock, true);
 
@@ -75,7 +73,7 @@ static void tick_start(const struct console_state *snapshot,
     c->cyclock.budget = 1e6;
 
     // NOTE: exit batch mode if cpu is not running
-    if (!snapshot->lines.ready) {
+    if (!emu->snapshot.lines.ready) {
         QuitSignal = 1;
     }
 }
@@ -144,7 +142,7 @@ int ui_batch_loop(struct emulator *emu)
     struct runclock clock = {0};
     cycleclock_start(&clock.cyclock);
     do {
-        tick_start(&emu->snapshot, &clock);
+        tick_start(emu, &clock);
         emu_update(emu, &clock);
         update_progress(&clock);
         tick_end(&clock);

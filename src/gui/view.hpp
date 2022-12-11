@@ -37,6 +37,7 @@ public:
 
 protected:
     virtual void renderContents() const = 0;
+
     std::string title;
     viewstate& s;
     const EmuController& c;
@@ -47,9 +48,9 @@ protected:
 class Layout final {
 public:
     Layout(viewstate& s, const EmuController& c, const MediaRuntime& r);
-    Layout(viewstate& s, EmuController&& c, const MediaRuntime& r) = delete;
-    Layout(viewstate& s, const EmuController& c, MediaRuntime&& r) = delete;
-    Layout(viewstate& s, EmuController&& c, MediaRuntime&& r) = delete;
+    Layout(viewstate&, EmuController&&, const MediaRuntime&) = delete;
+    Layout(viewstate&, const EmuController&, MediaRuntime&&) = delete;
+    Layout(viewstate&, EmuController&&, MediaRuntime&&) = delete;
 
     void render() const;
 

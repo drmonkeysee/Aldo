@@ -23,30 +23,13 @@
 namespace
 {
 
-auto update_bouncer(aldo::viewstate& s, const console_state& snapshot) noexcept
-{
-    if (!snapshot.lines.ready) return;
-
-    if (s.bouncer.pos.x - s.bouncer.halfdim < 0
-        || s.bouncer.pos.x + s.bouncer.halfdim > s.bouncer.bounds.x) {
-        s.bouncer.velocity.x *= -1;
-    }
-    if (s.bouncer.pos.y - s.bouncer.halfdim < 0
-        || s.bouncer.pos.y + s.bouncer.halfdim > s.bouncer.bounds.y) {
-        s.bouncer.velocity.y *= -1;
-    }
-    s.bouncer.pos.x += s.bouncer.velocity.x;
-    s.bouncer.pos.y += s.bouncer.velocity.y;
-}
-
 //
 // UI Loop Implementation
 //
 
-auto emu_update(aldo::EmuController& controller, aldo::viewstate& s) noexcept
+auto emu_update(aldo::EmuController& c, aldo::viewstate& s) noexcept
 {
-    controller.update(s);
-    update_bouncer(s, controller.snapshot());
+    c.update(s);
     s.clock.markDtUpdate();
 }
 

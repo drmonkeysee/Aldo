@@ -98,6 +98,7 @@ void aldo::EmuController::update(aldo::viewstate& state) noexcept
 {
     nes_cycle(hconsole.get(), &state.clock.cyclock);
     nes_snapshot(hconsole.get(), snapshotp());
+    updateBouncer(state);
 }
 
 //
@@ -180,4 +181,20 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
     default:
         throw std::domain_error{invalid_command(ev.cmd)};
     }
+}
+
+void aldo::EmuController::updateBouncer(aldo::viewstate& s) const noexcept
+{
+    if (!snapshot().lines.ready) return;
+
+    if (s.bouncer.pos.x - s.bouncer.halfdim < 0
+        || s.bouncer.pos.x + s.bouncer.halfdim > s.bouncer.bounds.x) {
+        s.bouncer.velocity.x *= -1;
+    }
+    if (s.bouncer.pos.y - s.bouncer.halfdim < 0
+        || s.bouncer.pos.y + s.bouncer.halfdim > s.bouncer.bounds.y) {
+        s.bouncer.velocity.y *= -1;
+    }
+    s.bouncer.pos.x += s.bouncer.velocity.x;
+    s.bouncer.pos.y += s.bouncer.velocity.y;
 }

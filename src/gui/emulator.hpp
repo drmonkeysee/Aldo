@@ -66,6 +66,7 @@ private:
     void loadCartFrom(const char*);
     void openCartFile(const gui_platform&);
     void processEvent(const event&, viewstate&, const gui_platform&);
+    void updateBouncer(viewstate&) const noexcept;
 
     std::string cartFilepath;
     debug_handle hdebug;

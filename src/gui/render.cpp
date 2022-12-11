@@ -14,10 +14,6 @@
 #include "imgui_impl_sdlrenderer.h"
 #include <SDL2/SDL.h>
 
-//
-// Public Interface
-//
-
 aldo::RenderFrame::RenderFrame(const aldo::MediaRuntime& r) noexcept : r{r}
 {
     ImGui_ImplSDLRenderer_NewFrame();

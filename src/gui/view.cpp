@@ -257,7 +257,7 @@ class Bouncer final : public aldo::View {
 public:
     Bouncer(aldo::viewstate& s, const aldo::EmuController& c,
             const aldo::MediaRuntime& r) noexcept
-    : View{"Bouncer", s, c, r} {}
+    : View{"Bouncer", s, c, r, &s.showBouncer} {}
 
 protected:
     void renderContents() const override
@@ -293,7 +293,7 @@ class Cpu final : public aldo::View {
 public:
     Cpu(aldo::viewstate& s, const aldo::EmuController& c,
         const aldo::MediaRuntime& r) noexcept
-    : View{"CPU", s, c, r} {}
+    : View{"CPU", s, c, r, &s.showCpu} {}
 
 protected:
     void renderContents() const override
@@ -511,7 +511,9 @@ protected:
 
 void aldo::View::View::render() const
 {
-    if (ImGui::Begin(title.c_str())) {
+    if (visible && !*visible) return;
+
+    if (ImGui::Begin(title.c_str(), visible)) {
         renderContents();
     }
     ImGui::End();

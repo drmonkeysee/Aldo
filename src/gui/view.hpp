@@ -23,13 +23,14 @@ struct viewstate;
 class View {
 public:
     View(std::string title, viewstate& s, const EmuController& c,
-         const MediaRuntime& r) noexcept
-    : title{std::move(title)}, s{s}, c{c}, r{r} {}
+         const MediaRuntime& r, bool* v = nullptr) noexcept
+    : title{std::move(title)}, s{s}, c{c}, r{r}, visible{v} {}
     View(std::string, viewstate&, EmuController&&,
-         const MediaRuntime&) = delete;
+         const MediaRuntime&, bool*) = delete;
     View(std::string, viewstate&, const EmuController&&,
-         MediaRuntime&&) = delete;
-    View(std::string, viewstate&, EmuController&&, MediaRuntime&&) = delete;
+         MediaRuntime&&, bool*) = delete;
+    View(std::string, viewstate&, EmuController&&, MediaRuntime&&,
+         bool*) = delete;
     virtual ~View() = default;
 
     void render() const;
@@ -40,6 +41,7 @@ protected:
     viewstate& s;
     const EmuController& c;
     const MediaRuntime& r;
+    bool* visible;
 };
 
 class Layout final {

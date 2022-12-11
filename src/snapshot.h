@@ -8,7 +8,6 @@
 #ifndef Aldo_snapshot_h
 #define Aldo_snapshot_h
 
-#include "cartinfo.h"
 #include "ctrlsignal.h"
 #include "haltexpr.h"
 

@@ -347,7 +347,6 @@
 		C8EC721F2916150700DF750A /* render.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = render.hpp; sourceTree = "<group>"; };
 		C8EC7222291615AB00DF750A /* viewstate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = viewstate.hpp; sourceTree = "<group>"; };
 		C8F2985A2810ECEF00ECFD7E /* CStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CStream.swift; sourceTree = "<group>"; };
-		C8F617A228F7B62A0086A34C /* cartinfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cartinfo.h; sourceTree = "<group>"; };
 		C8FB31D02803D6EC00E6B0EF /* AldoError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -486,7 +485,6 @@
 				C8C7068F2751EEBA00B45785 /* bytes.c */,
 				C8C7068E2751EEBA00B45785 /* cart.h */,
 				C8C7068A2751EEBA00B45785 /* cart.c */,
-				C8F617A228F7B62A0086A34C /* cartinfo.h */,
 				C8C706842751EEBA00B45785 /* cpu.h */,
 				C8C706892751EEBA00B45785 /* cpu.c */,
 				C8E9478128FE45EA0073D1AA /* ctrlsignal.h */,

@@ -4,7 +4,6 @@
 
 #include "bytes.h"
 #include "cart.h"
-#include "cartinfo.h"
 #include "cliargs.h"
 #include "cycleclock.h"
 #include "dis.h"

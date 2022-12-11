@@ -11,9 +11,11 @@
 
 #include <SDL2/SDL_syswm.h>
 
+#include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
-static bool appname(size_t sz, char buf[restrict sz], size_t *len)
+static char *appname(void)
 {
     @autoreleasepool {
         static const NSStringEncoding encoding = NSUTF8StringEncoding;
@@ -22,13 +24,17 @@ static bool appname(size_t sz, char buf[restrict sz], size_t *len)
                                            @"CFBundleDisplayName"];
         const NSUInteger strLen = [displayName
                                    lengthOfBytesUsingEncoding: encoding];
-        if (len) {
-            *len = strLen;
+        if (strLen == 0) return NULL;
+
+        const size_t sz = strLen + 1;
+        char *const str = malloc(sz);
+        if ([displayName getCString:str maxLength:sz encoding:encoding]) {
+            return str;
         }
-        if (buf && 0 < strLen && strLen < sz) {
-            return [displayName getCString:buf maxLength:sz encoding:encoding];
-        }
-        return false;
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                     "Unable to copy app name into buffer");
+        free(str);
+        return NULL;
     }
 }
 
@@ -63,25 +69,27 @@ static float render_scale_factor(SDL_Window *win)
     return 1.0f;
 }
 
-static bool open_file(size_t sz, char buf[restrict sz], size_t *len)
+static char *open_file(void)
 {
     @autoreleasepool {
         NSOpenPanel *const panel = [NSOpenPanel openPanel];
         panel.message = @"Choose a ROM file";
         const NSModalResponse r = [panel runModal];
-        if (r == NSModalResponseOK) {
-            NSURL *const path = panel.URL;
-            const size_t strLen = strlen(path.fileSystemRepresentation);
-            if (len) {
-                *len = strLen;
-            }
-            if (buf && 0 < strLen && strLen < sz) {
-                return [path getFileSystemRepresentation:buf maxLength:sz];
-            }
-        } else if (len) {
-            *len = 0;
+        if (r != NSModalResponseOK) return NULL;
+
+        NSURL *const path = panel.URL;
+        const size_t strLen = strlen(path.fileSystemRepresentation);
+        if (strLen == 0) return NULL;
+
+        const size_t sz = strLen + 1;
+        char *const str = malloc(sz);
+        if ([path getFileSystemRepresentation:str maxLength:sz]) {
+            return str;
         }
-        return false;
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                     "Unable to copy file representation into buffer");
+        free(str);
+        return NULL;
     }
 }
 

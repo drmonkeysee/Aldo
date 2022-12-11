@@ -15,6 +15,8 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_sdlrenderer.h"
 
+#include <memory>
+
 namespace
 {
 
@@ -22,9 +24,8 @@ auto create_window(SDL_Point windowSize, const gui_platform& p)
 {
     const auto hidpi = p.is_hidpi();
     SDL_Log("HIDPI: %d", hidpi);
-    char name[5];
-    const auto success = p.appname(sizeof name, name, nullptr);
-    const auto win = SDL_CreateWindow(success ? name : "DisplayNameErr",
+    const std::unique_ptr<char> name{p.appname()};
+    const auto win = SDL_CreateWindow(name ? name.get() : "DisplayNameErr",
                                       SDL_WINDOWPOS_CENTERED,
                                       SDL_WINDOWPOS_CENTERED,
                                       windowSize.x, windowSize.y,

@@ -14,15 +14,13 @@
 #include "imgui_impl_sdl.h"
 #include <SDL2/SDL.h>
 
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
 #include <variant>
-#include <cassert>
 #include <cerrno>
-#include <cstddef>
 #include <cstdio>
-#include <cstring>
 
 namespace
 {
@@ -126,24 +124,19 @@ void aldo::EmuController::loadCartFrom(const char* filepath)
 
 void aldo::EmuController::openCartFile(const gui_platform& p)
 {
-    char filepath[1024];
-    std::size_t len;
     // NOTE: halt console to prevent time-jump from modal delay
     // TODO: does this make sense long-term?
     nes_halt(hconsole.get());
-    const auto ok = p.open_file(sizeof filepath, filepath, &len);
-    if (ok) {
-        SDL_Log("File selected: %s", filepath);
-        try {
-            loadCartFrom(filepath);
-        } catch (const aldo::AldoError& err) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s", err.what());
-            p.display_error(err.title(), err.message());
-        }
-    }
-    if (!ok && len > 0) {
-        SDL_Log("Filepath needed %zu bytes", len);
-        assert(((void)"Cart filepath buffer too small", false));
+
+    const std::unique_ptr<char> filepath{p.open_file()};
+    if (!filepath) return;
+
+    SDL_Log("File selected: %s", filepath.get());
+    try {
+        loadCartFrom(filepath.get());
+    } catch (const aldo::AldoError& err) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s", err.what());
+        p.display_error(err.title(), err.message());
     }
 }
 

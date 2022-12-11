@@ -8,10 +8,10 @@
 #include "argparse.h"
 #include "bytes.h"
 #include "cart.h"
-#include "cliargs.h"
 #include "ctrlsignal.h"
 #include "cycleclock.h"
 #include "dis.h"
+#include "emu.h"
 #include "haltexpr.h"
 #include "nes.h"
 #include "snapshot.h"
@@ -41,7 +41,6 @@ static const int Fps = 60, MinCps = 1, MaxCps = 1000, RamSheets = 4;
 static const struct timespec VSync = {.tv_nsec = TSU_NS_PER_S / Fps};
 
 struct viewstate {
-    const struct cliargs *args; // Non-owning Pointer
     struct runclock {
         struct cycleclock cyclock;
         double frameleft_ms;
@@ -92,7 +91,8 @@ struct layout {
         ram;
 };
 
-static void drawhwtraits(const struct view *v, const struct viewstate *s)
+static void drawhwtraits(const struct view *v, const struct viewstate *s,
+                         const struct emulator *emu)
 {
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
@@ -121,7 +121,7 @@ static void drawhwtraits(const struct view *v, const struct viewstate *s)
               s->clock.cyclock.cycles_per_sec);
     mvwaddstr(v->content, cursor_y++, 0, "Cycles per Frame: N/A");
     mvwprintw(v->content, cursor_y, 0, "BCD Supported: %s",
-              s->args->bcdsupport ? "Yes" : "No");
+              emu->args->bcdsupport ? "Yes" : "No");
 }
 
 static void drawtoggle(const struct view *v, const char *label, bool selected)
@@ -175,28 +175,27 @@ static void drawcontrols(const struct view *v,
     mvwaddstr(v->content, ++cursor_y, 0, "Quit: q");
 }
 
-static void drawdebugger(const struct view *v, const struct viewstate *s,
-                         const struct console_state *snapshot)
+static void drawdebugger(const struct view *v, const struct emulator *emu)
 {
     int cursor_y = 0;
     werase(v->content);
     mvwprintw(v->content, cursor_y++, 0, "Tracing: %s",
-              s->args->tron ? "On" : "Off");
+              emu->args->tron ? "On" : "Off");
     mvwaddstr(v->content, cursor_y++, 0, "Reset Override: ");
-    if (snapshot->debugger.resvector_override >= 0) {
-        wprintw(v->content, "$%04X", snapshot->debugger.resvector_override);
+    if (emu->snapshot.debugger.resvector_override >= 0) {
+        wprintw(v->content, "$%04X",
+                emu->snapshot.debugger.resvector_override);
     } else {
         waddstr(v->content, "None");
     }
     char break_desc[HEXPR_FMT_SIZE];
-    const int err = haltexpr_fmt(&snapshot->debugger.break_condition,
+    const int err = haltexpr_fmt(&emu->snapshot.debugger.break_condition,
                                  break_desc);
     mvwprintw(v->content, cursor_y, 0, "Break: %s",
               err < 0 ? haltexpr_errstr(err) : break_desc);
 }
 
-static void drawcart(const struct view *v, const struct viewstate *s,
-                     const struct console_state *snapshot)
+static void drawcart(const struct view *v, const struct emulator *emu)
 {
     static const char *const restrict namelabel = "Name: ";
 
@@ -204,7 +203,7 @@ static void drawcart(const struct view *v, const struct viewstate *s,
     int cursor_y = 0;
     mvwaddstr(v->content, cursor_y, 0, namelabel);
     const char
-        *const cn = argparse_filename(s->args->filepath),
+        *const cn = argparse_filename(emu->args->filepath),
         *endofname = strrchr(cn, '.');
     if (!endofname) {
         endofname = strrchr(cn, '\0');
@@ -215,7 +214,7 @@ static void drawcart(const struct view *v, const struct viewstate *s,
     wprintw(v->content, "%.*s%s", (int)(longname ? maxwidth - 1 : namelen),
             cn, longname ? "\u2026" : "");
     char fmtd[CART_FMT_SIZE];
-    const int result = cart_format_extname(snapshot->cart.info, fmtd);
+    const int result = cart_format_extname(emu->cart, fmtd);
     mvwprintw(v->content, ++cursor_y, 0, "Format: %s",
               result > 0 ? fmtd : "Invalid Format");
 }
@@ -578,16 +577,15 @@ static void tick_end(struct runclock *c)
     tick_sleep(c);
 }
 
-static void handle_input(struct viewstate *s, nes *console,
-                         const struct console_state *snapshot)
+static void handle_input(struct viewstate *s, const struct emulator *emu)
 {
     const int input = getch();
     switch (input) {
     case ' ':
-        if (snapshot->lines.ready) {
-            nes_halt(console);
+        if (emu->snapshot.lines.ready) {
+            nes_halt(emu->console);
         } else {
-            nes_ready(console);
+            nes_ready(emu->console);
         }
         break;
     case '=':   // "Lowercase" +
@@ -611,23 +609,23 @@ static void handle_input(struct viewstate *s, nes *console,
         }
         break;
     case 'i':
-        if (snapshot->lines.irq) {
-            nes_interrupt(console, CSGI_IRQ);
+        if (emu->snapshot.lines.irq) {
+            nes_interrupt(emu->console, CSGI_IRQ);
         } else {
-            nes_clear(console, CSGI_IRQ);
+            nes_clear(emu->console, CSGI_IRQ);
         }
         break;
     case 'm':
-        nes_mode(console, snapshot->mode + 1);
+        nes_mode(emu->console, emu->snapshot.mode + 1);
         break;
     case 'M':
-        nes_mode(console, snapshot->mode - 1);
+        nes_mode(emu->console, emu->snapshot.mode - 1);
         break;
     case 'n':
-        if (snapshot->lines.nmi) {
-            nes_interrupt(console, CSGI_NMI);
+        if (emu->snapshot.lines.nmi) {
+            nes_interrupt(emu->console, CSGI_NMI);
         } else {
-            nes_clear(console, CSGI_NMI);
+            nes_clear(emu->console, CSGI_NMI);
         }
         break;
     case 'q':
@@ -643,34 +641,33 @@ static void handle_input(struct viewstate *s, nes *console,
         }
         break;
     case 's':
-        if (snapshot->lines.reset) {
-            nes_interrupt(console, CSGI_RES);
+        if (emu->snapshot.lines.reset) {
+            nes_interrupt(emu->console, CSGI_RES);
         } else {
-            nes_clear(console, CSGI_RES);
+            nes_clear(emu->console, CSGI_RES);
         }
         break;
     }
 }
 
-static void emu_update(nes *console, struct console_state *snapshot,
-                       struct runclock *c)
+static void emu_update(struct emulator *emu, struct runclock *c)
 {
-    nes_cycle(console, &c->cyclock);
-    nes_snapshot(console, snapshot);
+    nes_cycle(emu->console, &c->cyclock);
+    nes_snapshot(emu->console, &emu->snapshot);
 }
 
 static void refresh_ui(const struct layout *l, const struct viewstate *s,
-                       const struct console_state *snapshot)
+                       const struct emulator *emu)
 {
-    drawhwtraits(&l->hwtraits, s);
-    drawcontrols(&l->controls, snapshot);
-    drawdebugger(&l->debugger, s, snapshot);
-    drawcart(&l->cart, s, snapshot);
-    drawprg(&l->prg, snapshot);
-    drawregister(&l->registers, snapshot);
-    drawflags(&l->flags, snapshot);
-    drawdatapath(&l->datapath, snapshot);
-    drawram(&l->ram, snapshot);
+    drawhwtraits(&l->hwtraits, s, emu);
+    drawcontrols(&l->controls, &emu->snapshot);
+    drawdebugger(&l->debugger, emu);
+    drawcart(&l->cart, emu);
+    drawprg(&l->prg, &emu->snapshot);
+    drawregister(&l->registers, &emu->snapshot);
+    drawflags(&l->flags, &emu->snapshot);
+    drawdatapath(&l->datapath, &emu->snapshot);
+    drawram(&l->ram, &emu->snapshot);
 
     update_panels();
     ramrefresh(&l->ram, s);
@@ -696,15 +693,11 @@ static void cleanup_ui(struct layout *l)
 // Public Interface
 //
 
-int ui_curses_loop(const struct cliargs *args, nes *console,
-                   struct console_state *snapshot)
+int ui_curses_loop(struct emulator *emu)
 {
-    assert(args != NULL);
-    assert(console != NULL);
-    assert(snapshot != NULL);
+    assert(emu != NULL);
 
     struct viewstate state = {
-        .args = args,
         .clock = {.cyclock = {.cycles_per_sec = 4}},
         .running = true,
     };
@@ -712,11 +705,11 @@ int ui_curses_loop(const struct cliargs *args, nes *console,
     init_ui(&layout);
     cycleclock_start(&state.clock.cyclock);
     do {
-        tick_start(&state.clock, snapshot);
-        handle_input(&state, console, snapshot);
+        tick_start(&state.clock, &emu->snapshot);
+        handle_input(&state, emu);
         if (state.running) {
-            emu_update(console, snapshot, &state.clock);
-            refresh_ui(&layout, &state, snapshot);
+            emu_update(emu, &state.clock);
+            refresh_ui(&layout, &state, emu);
         }
         tick_end(&state.clock);
     } while (state.running);

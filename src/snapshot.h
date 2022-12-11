@@ -18,9 +18,6 @@
 
 struct console_state {
     struct {
-        const struct cartinfo *info;    // Non-owning Pointer
-    } cart;
-    struct {
         const uint8_t *ram;     // Non-owning Pointer
         size_t prglength;       // Number of bytes copied to currprg
         uint8_t currprg[192],   // 64 lines @ max 3-byte instructions

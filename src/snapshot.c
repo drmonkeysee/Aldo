@@ -15,5 +15,4 @@ void snapshot_clear(struct console_state *snapshot)
 
     snapshot->mem.prglength = 0;
     snapshot->mem.ram = NULL;
-    snapshot->cart.info = NULL;
 }

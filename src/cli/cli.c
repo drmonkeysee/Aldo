@@ -13,6 +13,7 @@
 #include "ctrlsignal.h"
 #include "debug.h"
 #include "dis.h"
+#include "emu.h"
 #include "haltexpr.h"
 #include "nes.h"
 #include "snapshot.h"
@@ -25,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef int ui_loop(const struct cliargs *, nes *, struct console_state *);
+typedef int ui_loop(struct emulator *);
 ui_loop ui_batch_loop;
 ui_loop ui_curses_loop;
 const char *ui_curses_version(void);
@@ -127,31 +128,30 @@ static debugctx *create_debugger(const struct cliargs *args)
     return dbg;
 }
 
-static ui_loop *setup_ui(const struct cliargs *args, nes *console,
-                         struct console_state *snapshot)
+static ui_loop *setup_ui(struct emulator *emu)
 {
     ui_loop *loop = ui_curses_loop;
-    if (args->batch) {
+    if (emu->args->batch) {
         // NOTE: when in batch mode set NES to run immediately
-        nes_mode(console, CSGM_RUN);
-        nes_ready(console);
+        nes_mode(emu->console, CSGM_RUN);
+        nes_ready(emu->console);
         loop = ui_batch_loop;
     }
     // NOTE: initialize snapshot from console
-    nes_snapshot(console, snapshot);
+    nes_snapshot(emu->console, &emu->snapshot);
     return loop;
 }
 
-static void dump_ram(const struct cliargs *args, nes *console)
+static void dump_ram(const struct emulator *emu)
 {
     static const char *const restrict ramfile = "system.ram";
 
-    if (!args->tron && !args->batch) return;
+    if (!emu->args->tron && !emu->args->batch) return;
 
     errno = 0;
     FILE *const f = fopen(ramfile, "wb");
     if (f) {
-        nes_dumpram(console, f);
+        nes_dumpram(emu->console, f);
         fclose(f);
     } else {
         fprintf(stderr, "%s: ", ramfile);
@@ -163,7 +163,8 @@ static int run_emu(const struct cliargs *args, cart *c)
 {
     static const char *const restrict tracefile = "trace.log";
 
-    if (args->batch && args->tron && !args->haltlist) {
+    struct emulator emu = {.args = args, .cart = c};
+    if (emu.args->batch && emu.args->tron && !emu.args->haltlist) {
         fputs("*** WARNING ***\nYou have turned on trace-logging"
               " with batch mode but specified no halt conditions;\n"
               "this can result in a very large trace file very quickly!\n"
@@ -172,15 +173,15 @@ static int run_emu(const struct cliargs *args, cart *c)
         if (input != 'y' && input != 'Y') return EXIT_FAILURE;
     }
 
-    debugctx *dbg = create_debugger(args);
-    if (!dbg) {
+    emu.dbg = create_debugger(args);
+    if (!emu.dbg) {
         fputs("Unable to initialize debugger!\n", stderr);
         return EXIT_FAILURE;
     }
 
     int result = EXIT_SUCCESS;
     FILE *tracelog = NULL;
-    if (args->tron) {
+    if (emu.args->tron) {
         errno = 0;
         if (!(tracelog = fopen(tracefile, "w"))) {
             fprintf(stderr, "%s: ", tracefile);
@@ -189,18 +190,17 @@ static int run_emu(const struct cliargs *args, cart *c)
             goto exit_debug;
         }
     }
-    nes *console = nes_new(dbg, args->bcdsupport, tracelog);
-    if (!console) {
+    emu.console = nes_new(emu.dbg, emu.args->bcdsupport, tracelog);
+    if (!emu.console) {
         fputs("Unable to initialize console!\n", stderr);
         result = EXIT_FAILURE;
         goto exit_trace;
     }
-    nes_powerup(console, c, args->zeroram);
+    nes_powerup(emu.console, c, emu.args->zeroram);
 
-    struct console_state snapshot;
-    ui_loop *const run_loop = setup_ui(args, console, &snapshot);
+    ui_loop *const run_loop = setup_ui(&emu);
     errno = 0;
-    const int err = run_loop(args, console, &snapshot);
+    const int err = run_loop(&emu);
     if (err < 0) {
         fprintf(stderr, "UI run failure (%d): %s\n", err, ui_errstr(err));
         if (err == UI_ERR_ERNO) {
@@ -208,17 +208,17 @@ static int run_emu(const struct cliargs *args, cart *c)
         }
         result = EXIT_FAILURE;
     }
-    dump_ram(args, console);
-    snapshot_clear(&snapshot);
-    nes_free(console);
-    console = NULL;
+    dump_ram(&emu);
+    snapshot_clear(&emu.snapshot);
+    nes_free(emu.console);
+    emu.console = NULL;
 exit_trace:
     if (tracelog) {
         fclose(tracelog);
     }
 exit_debug:
-    debug_free(dbg);
-    dbg = NULL;
+    debug_free(emu.dbg);
+    emu.dbg = NULL;
     return result;
 }
 

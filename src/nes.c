@@ -233,7 +233,6 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
     assert(self != NULL);
     assert(snapshot != NULL);
 
-    cart_snapshot(self->cart, snapshot);
     cpu_snapshot(&self->cpu, snapshot);
     debug_snapshot(self->dbg, snapshot);
     snapshot->mode = self->mode;

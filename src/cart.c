@@ -18,8 +18,6 @@ static const char
     *const restrict NesMagic = "NES\x1a",
     *const restrict NsfMagic = "NESM\x1a";
 
-static const struct cartinfo NoInfo;
-
 struct cartridge {
     struct mapper *mapper;
     struct cartinfo info;
@@ -357,7 +355,7 @@ void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)
 
     fprintf(f, "%s\n", name);
     char fmtd[CART_FMT_SIZE];
-    const int result = cart_format_extname(&self->info, fmtd);
+    const int result = cart_format_extname(self, fmtd);
     fputs(result > 0 ? fmtd : "Invalid Format", f);
     fputs("\n\nDisassembly of PRG ROM\n", f);
     if (self->info.format != CRTF_ALDO) {
@@ -365,31 +363,21 @@ void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)
     }
 }
 
-int cart_format_extname(const struct cartinfo *info,
-                        char buf[restrict static CART_FMT_SIZE])
+int cart_format_extname(cart *self, char buf[restrict static CART_FMT_SIZE])
 {
-    assert(info != NULL);
+    assert(self != NULL);
     assert(buf != NULL);
 
     int count, total;
-    total = count = sprintf(buf, "%s", cart_formatname(info->format));
+    total = count = sprintf(buf, "%s", cart_formatname(self->info.format));
     if (count < 0) return CART_ERR_FMT;
 
-    if (info->format == CRTF_INES) {
-        count = sprintf(buf + total, " (%03d)", info->ines_hdr.mapper_id);
+    if (self->info.format == CRTF_INES) {
+        count = sprintf(buf + total, " (%03d)", self->info.ines_hdr.mapper_id);
         if (count < 0) return CART_ERR_FMT;
         total += count;
     }
 
     assert(total < CART_FMT_SIZE);
     return total;
-}
-
-void cart_snapshot(cart *self, struct console_state *snapshot)
-{
-    assert(snapshot != NULL);
-
-    // NOTE: unlike most snapshot functions, self *can* be null if the
-    // emulator was started without a cart.
-    snapshot->cart.info = self ? &self->info : &NoInfo;
 }

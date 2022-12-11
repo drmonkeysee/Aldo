@@ -10,7 +10,6 @@
 
 #include "bus.h"
 #include "cartinfo.h"
-#include "snapshot.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -52,9 +51,6 @@ typedef struct cartridge cart;
 
 br_libexport
 const char *cart_errstr(int err) br_nothrow;
-br_libexport br_checkerror
-int cart_format_extname(const struct cartinfo *info,
-                        char buf[br_noalias_csz(CART_FMT_SIZE)]) br_nothrow;
 
 // NOTE: if returns non-zero error code, *c is unmodified
 br_libexport br_checkerror
@@ -62,6 +58,9 @@ int cart_create(cart **c, FILE *f) br_nothrow;
 br_libexport
 void cart_free(cart *self) br_nothrow;
 
+br_libexport br_checkerror
+int cart_format_extname(cart *self,
+                        char buf[br_noalias_csz(CART_FMT_SIZE)]) br_nothrow;
 br_libexport
 void cart_write_info(cart *self, const char *br_noalias name, bool verbose,
                      FILE *f) br_nothrow;
@@ -82,8 +81,6 @@ void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr) br_nothrow;
 
 void cart_write_dis_header(cart *self, const char *br_noalias name,
                            FILE *f) br_nothrow;
-
-void cart_snapshot(cart *self, struct console_state *snapshot) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

@@ -287,6 +287,7 @@
 		C88CABE328FA63DD00551C65 /* bridgeopen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bridgeopen.h; sourceTree = "<group>"; };
 		C88CABE428FA63E700551C65 /* bridgeclose.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bridgeclose.h; sourceTree = "<group>"; };
 		C88F3E5627D9A45E00317732 /* EmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationView.swift; sourceTree = "<group>"; };
+		C894F0EC2945732800C6575F /* emu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = emu.h; sourceTree = "<group>"; };
 		C89D714F27D4758900C9177A /* CartPrgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartPrgView.swift; sourceTree = "<group>"; };
 		C8A5B77A27DD79AE00A4DD5E /* Cart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cart.swift; sourceTree = "<group>"; };
 		C8B4664327755790000576EE /* argparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = argparse.h; sourceTree = "<group>"; };
@@ -549,6 +550,7 @@
 				C820E6C925A97A4E006A7AB1 /* cli.h */,
 				C820E6CA25A97A4E006A7AB1 /* cli.c */,
 				C81A516B25DA036100361E40 /* cliargs.h */,
+				C894F0EC2945732800C6575F /* emu.h */,
 				C820E6D325A97FB5006A7AB1 /* main.c */,
 				C8186496277EB45900CA4AC0 /* uibatch.c */,
 				C8186494277EB0F700CA4AC0 /* uicurses.c */,

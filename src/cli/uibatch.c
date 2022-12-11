@@ -6,9 +6,8 @@
 //
 
 #include "argparse.h"
-#include "cart.h"
-#include "cliargs.h"
 #include "cycleclock.h"
+#include "emu.h"
 #include "haltexpr.h"
 #include "nes.h"
 #include "snapshot.h"
@@ -81,11 +80,10 @@ static void tick_start(const struct console_state *snapshot,
     }
 }
 
-static void emu_update(nes *console, struct console_state *snapshot,
-                       struct runclock *c)
+static void emu_update(struct emulator *emu, struct runclock *c)
 {
-    nes_cycle(console, &c->cyclock);
-    nes_snapshot(console, snapshot);
+    nes_cycle(emu->console, &c->cyclock);
+    nes_snapshot(emu->console, &emu->snapshot);
 }
 
 static void update_progress(const struct runclock *c)
@@ -109,15 +107,13 @@ static void tick_end(struct runclock *c)
     cycleclock_tickend(&c->cyclock);
 }
 
-static void write_summary(const struct cliargs *args,
-                          const struct console_state *snapshot,
-                          const struct runclock *c)
+static void write_summary(const struct emulator *emu, const struct runclock *c)
 {
     clearline();
-    if (!args->verbose) return;
+    if (!emu->args->verbose) return;
 
     const bool scale_ms = c->cyclock.runtime < 1.0;
-    printf("---=== %s ===---\n", argparse_filename(args->filepath));
+    printf("---=== %s ===---\n", argparse_filename(emu->args->filepath));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
            scale_ms
             ? c->cyclock.runtime * TSU_MS_PER_S
@@ -126,9 +122,9 @@ static void write_summary(const struct cliargs *args,
     printf("Total Cycles: %" PRIu64 "\n", c->cyclock.total_cycles);
     printf("Avg Cycles/sec: %.2f\n",
            (double)c->cyclock.total_cycles / c->cyclock.runtime);
-    if (snapshot->debugger.break_condition.cond != HLT_NONE) {
+    if (emu->snapshot.debugger.break_condition.cond != HLT_NONE) {
         char break_desc[HEXPR_FMT_SIZE];
-        const int err = haltexpr_fmt(&snapshot->debugger.break_condition,
+        const int err = haltexpr_fmt(&emu->snapshot.debugger.break_condition,
                                      break_desc);
         printf("Break: %s\n", err < 0 ? haltexpr_errstr(err) : break_desc);
     }
@@ -138,12 +134,9 @@ static void write_summary(const struct cliargs *args,
 // Public Interface
 //
 
-int ui_batch_loop(const struct cliargs *args, nes *console,
-                  struct console_state *snapshot)
+int ui_batch_loop(struct emulator *emu)
 {
-    assert(args != NULL);
-    assert(console != NULL);
-    assert(snapshot != NULL);
+    assert(emu != NULL);
 
     const int err = init_ui();
     if (err < 0) return err;
@@ -151,12 +144,12 @@ int ui_batch_loop(const struct cliargs *args, nes *console,
     struct runclock clock = {0};
     cycleclock_start(&clock.cyclock);
     do {
-        tick_start(snapshot, &clock);
-        emu_update(console, snapshot, &clock);
+        tick_start(&emu->snapshot, &clock);
+        emu_update(emu, &clock);
         update_progress(&clock);
         tick_end(&clock);
     } while (QuitSignal == 0);
-    write_summary(args, snapshot, &clock);
+    write_summary(emu, &clock);
 
     return 0;
 }

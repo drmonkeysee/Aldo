@@ -57,6 +57,7 @@
 		C88A5E8527F6A1750039382D /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88A5E8427F6A1750039382D /* CartView.swift */; };
 		C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C88CABDC28FA4DDD00551C65 /* uisdl.cpp */; };
 		C88F3E5727D9A45E00317732 /* EmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88F3E5627D9A45E00317732 /* EmulationView.swift */; };
+		C894F0EF2945850E00C6575F /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C894F0ED2945850E00C6575F /* view.cpp */; };
 		C89D715027D4758900C9177A /* CartPrgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89D714F27D4758900C9177A /* CartPrgView.swift */; };
 		C8A5B77B27DD79AE00A4DD5E /* Cart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A5B77A27DD79AE00A4DD5E /* Cart.swift */; };
 		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
@@ -288,6 +289,8 @@
 		C88CABE428FA63E700551C65 /* bridgeclose.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bridgeclose.h; sourceTree = "<group>"; };
 		C88F3E5627D9A45E00317732 /* EmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationView.swift; sourceTree = "<group>"; };
 		C894F0EC2945732800C6575F /* emu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = emu.h; sourceTree = "<group>"; };
+		C894F0ED2945850E00C6575F /* view.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = view.cpp; sourceTree = "<group>"; };
+		C894F0EE2945850E00C6575F /* view.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = view.hpp; sourceTree = "<group>"; };
 		C89D714F27D4758900C9177A /* CartPrgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartPrgView.swift; sourceTree = "<group>"; };
 		C8A5B77A27DD79AE00A4DD5E /* Cart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cart.swift; sourceTree = "<group>"; };
 		C8B4664327755790000576EE /* argparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = argparse.h; sourceTree = "<group>"; };
@@ -634,6 +637,8 @@
 				C8EC721E2916150700DF750A /* render.cpp */,
 				C88CABDD28FA4DDD00551C65 /* uisdl.hpp */,
 				C88CABDC28FA4DDD00551C65 /* uisdl.cpp */,
+				C894F0EE2945850E00C6575F /* view.hpp */,
+				C894F0ED2945850E00C6575F /* view.cpp */,
 				C8EC7222291615AB00DF750A /* viewstate.hpp */,
 			);
 			path = gui;
@@ -983,6 +988,7 @@
 				C8561A0C29149EA600290B53 /* mediaruntime.cpp in Sources */,
 				C854873828E685D00045BA42 /* imgui_impl_sdlrenderer.cpp in Sources */,
 				C830036C28DEDDD200480F29 /* main.m in Sources */,
+				C894F0EF2945850E00C6575F /* view.cpp in Sources */,
 				C8283E74293D44CB00CDB572 /* emulator.cpp in Sources */,
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,
 				C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */,

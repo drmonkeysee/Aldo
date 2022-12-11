@@ -10,6 +10,7 @@
 
 #include "ctrlsignal.h"
 #include "cycleclock.h"
+#include "snapshot.h"
 #include "tsutil.h"
 
 #include <SDL2/SDL.h>

@@ -12,6 +12,7 @@
 #include "render.hpp"
 #include "snapshot.h"
 #include "ui.h"
+#include "view.hpp"
 #include "viewstate.hpp"
 
 #include <SDL2/SDL.h>
@@ -49,11 +50,10 @@ auto emu_update(aldo::EmuController& controller, aldo::viewstate& s) noexcept
     s.clock.markDtUpdate();
 }
 
-auto render_ui(aldo::viewstate& s, const aldo::EmuController& c,
-               const aldo::MediaRuntime& r)
+auto render_ui(const aldo::Layout& l, const aldo::MediaRuntime& r)
 {
     const aldo::RenderFrame frame{r};
-    frame.render(s, c);
+    l.render();
 }
 
 auto runloop(const gui_platform& platform, debugctx* debug, nes* console)
@@ -65,13 +65,14 @@ auto runloop(const gui_platform& platform, debugctx* debug, nes* console)
     const aldo::MediaRuntime runtime{
         {1280, 800}, state.bouncer.bounds, platform,
     };
+    const aldo::Layout layout{state, controller, runtime};
     state.clock.start();
     do {
         state.clock.tickStart(controller.snapshot());
         controller.handleInput(state, platform);
         if (state.running) {
             emu_update(controller, state);
-            render_ui(state, controller, runtime);
+            render_ui(layout, runtime);
         }
         state.clock.tickEnd();
     } while (state.running);

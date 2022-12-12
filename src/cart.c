@@ -379,10 +379,6 @@ int cart_format_extname(cart *self, char buf[restrict static CART_FMT_SIZE])
         total += count;
     }
 
-    // NOTE: safe the buffer if nothing was printed for some reason
-    if (total == 0) {
-        buf[0] = '\0';
-    }
     assert(total < CART_FMT_SIZE);
     return total;
 }

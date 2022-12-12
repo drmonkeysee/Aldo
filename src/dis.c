@@ -554,10 +554,10 @@ int dis_inst_operand(const struct dis_instruction *inst,
     assert(inst != NULL);
     assert(dis != NULL);
 
-    // NOTE: safe the buffer in case inst is empty or nothing was printed
-    dis[0] = '\0';
-
-    if (!inst->bv.mem) return 0;
+    if (!inst->bv.mem) {
+        dis[0] = '\0';
+        return 0;
+    }
 
     const int count = print_operand(inst, dis);
 
@@ -578,10 +578,10 @@ int dis_inst(uint16_t addr, const struct dis_instruction *inst,
     assert(inst != NULL);
     assert(dis != NULL);
 
-    // NOTE: safe the buffer in case inst is empty or nothing was printed
-    dis[0] = '\0';
-
-    if (!inst->bv.mem) return 0;
+    if (!inst->bv.mem) {
+        dis[0] = '\0';
+        return 0;
+    }
 
     int count, total;
     total = count = print_raw(addr, inst, dis);
@@ -657,10 +657,6 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
         }
     }
 
-    // NOTE: safe the buffer if nothing was printed for some reason
-    if (total == 0) {
-        dis[0] = '\0';
-    }
     assert((unsigned int)total < DIS_PEEK_SIZE);
     return total;
 }
@@ -713,10 +709,6 @@ int dis_datapath(const struct console_state *snapshot,
     if (count < 0) return DIS_ERR_FMT;
     total += count;
 
-    // NOTE: safe the buffer if nothing was printed for some reason
-    if (total == 0) {
-        dis[0] = '\0';
-    }
     assert((unsigned int)total < DIS_DATAP_SIZE);
     return total;
 }

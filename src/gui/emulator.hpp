@@ -39,7 +39,7 @@ public:
     ~SnapshotScope() { snapshot_clear(getp()); }
 
     const console_state& get() const noexcept { return snapshot; }
-    console_state& get() noexcept { return snapshot; }
+    const console_state* getp() const noexcept { return &snapshot; }
     console_state* getp() noexcept { return &snapshot; }
 
 private:
@@ -55,7 +55,9 @@ public:
     std::string_view cartName() const;
     cart* cartp() const noexcept { return hcart.get(); }
     const console_state& snapshot() const noexcept { return lsnapshot.get(); }
-    console_state& snapshot() noexcept { return lsnapshot.get(); }
+    const console_state* snapshotp() const noexcept {
+        return lsnapshot.getp();
+    }
 
     void handleInput(viewstate& state, const gui_platform& platform);
     void update(viewstate& state) noexcept;

@@ -109,10 +109,20 @@ public:
 protected:
     void renderContents() const override
     {
+        renderStats();
+        ImGui::Separator();
+        renderSpeedControls();
+        ImGui::Separator();
+        renderRunControls();
+    }
+
+private:
+    void renderStats() const noexcept
+    {
         static constexpr auto refreshIntervalMs = 250;
         static constinit double displayDtUpdate, refreshDt;
 
-        auto& cyclock = s.clock.cyclock;
+        const auto& cyclock = s.clock.cyclock;
         if ((refreshDt += cyclock.frametime_ms) >= refreshIntervalMs) {
             displayDtUpdate = s.clock.dtUpdateMs;
             refreshDt = 0;
@@ -122,18 +132,20 @@ protected:
         ImGui::Text("Frames: %" PRIu64, cyclock.frames);
         ImGui::Text("Runtime: %.3f", cyclock.runtime);
         ImGui::Text("Cycles: %" PRIu64, cyclock.total_cycles);
+    }
 
-        ImGui::Separator();
-
+    void renderSpeedControls() const noexcept
+    {
         ImGui::AlignTextToFramePadding();
         ImGui::TextUnformatted("Cycles/Second");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(40);
-        ImGui::DragInt("##cyclesPerSecond", &cyclock.cycles_per_sec, 1.0f, 1,
-                       100, "%d", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::DragInt("##cyclesPerSecond", &s.clock.cyclock.cycles_per_sec,
+                       1.0f, 1, 100, "%d", ImGuiSliderFlags_AlwaysClamp);
+    }
 
-        ImGui::Separator();
-
+    void renderRunControls() const noexcept
+    {
         const auto& snp = c.snapshot();
         auto halt = !snp.lines.ready;
         if (ImGui::Checkbox("HALT", &halt)) {
@@ -186,11 +198,11 @@ protected:
     }
 };
 
-class Cart final : public aldo::View {
+class CartInfo final : public aldo::View {
 public:
-    Cart(aldo::viewstate& s, const aldo::EmuController& c,
-         const aldo::MediaRuntime& r) noexcept
-    : View{"Cart", s, c, r} {}
+    CartInfo(aldo::viewstate& s, const aldo::EmuController& c,
+             const aldo::MediaRuntime& r) noexcept
+    : View{"Cart Info", s, c, r} {}
 
 protected:
     void renderContents() const override
@@ -235,6 +247,13 @@ public:
 protected:
     void renderContents() const override
     {
+        renderPrg();
+        renderVectors();
+    }
+
+private:
+    void renderPrg() const noexcept
+    {
         static constexpr auto instCount = 20;
         static constinit auto selected = -1;
 
@@ -263,9 +282,15 @@ protected:
             }
             break;
         }
+    }
 
+    void renderVectors() const noexcept
+    {
         if (ImGui::CollapsingHeader("Vectors",
                                     ImGuiTreeNodeFlags_DefaultOpen)) {
+            const auto& snp = c.snapshot();
+            const auto& prgMem = snp.mem;
+
             auto lo = prgMem.vectors[0], hi = prgMem.vectors[1];
             ImGui::Text("%04X: %02X %02X     NMI $%04X", CPU_VECTOR_NMI, lo,
                         hi, bytowr(lo, hi));
@@ -338,130 +363,142 @@ public:
 protected:
     void renderContents() const override
     {
-        const auto& snp = c.snapshot();
         if (ImGui::BeginChild("CpuLeft", {200, 0})) {
-            const auto& cpu = snp.cpu;
-            if (ImGui::CollapsingHeader("Registers",
-                                        ImGuiTreeNodeFlags_DefaultOpen)) {
-                ImGui::BeginGroup();
-                {
-                    ImGui::Text("A: %02X", cpu.accumulator);
-                    ImGui::Text("X: %02X", cpu.xindex);
-                    ImGui::Text("Y: %02X", cpu.yindex);
-                }
-                ImGui::EndGroup();
-                ImGui::SameLine(0, 90);
-                ImGui::BeginGroup();
-                {
-                    ImGui::Text("PC: %04X", cpu.program_counter);
-                    ImGui::Text(" S: %02X", cpu.stack_pointer);
-                    ImGui::Text(" P: %02X", cpu.status);
-                }
-                ImGui::EndGroup();
+            renderRegisters();
+            renderFlags();
+        }
+        ImGui::EndChild();
+        ImGui::SameLine();
+        if (ImGui::BeginChild("CpuRight")) {
+            renderDatapath();
+        }
+        ImGui::EndChild();
+    }
+
+private:
+    void renderRegisters() const noexcept
+    {
+        const auto& cpu = c.snapshot().cpu;
+        if (ImGui::CollapsingHeader("Registers",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::BeginGroup();
+            {
+                ImGui::Text("A: %02X", cpu.accumulator);
+                ImGui::Text("X: %02X", cpu.xindex);
+                ImGui::Text("Y: %02X", cpu.yindex);
             }
+            ImGui::EndGroup();
+            ImGui::SameLine(0, 90);
+            ImGui::BeginGroup();
+            {
+                ImGui::Text("PC: %04X", cpu.program_counter);
+                ImGui::Text(" S: %02X", cpu.stack_pointer);
+                ImGui::Text(" P: %02X", cpu.status);
+            }
+            ImGui::EndGroup();
+        }
+    }
 
-            static constexpr char flags[] = {
-                'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
-            };
-            static constexpr auto
-                flagOn = IM_COL32(0xff, 0xfc, 0x53, SDL_ALPHA_OPAQUE),
-                flagOff = IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE),
-                textOn = IM_COL32_BLACK,
-                textOff = IM_COL32_WHITE;
+    void renderFlags() const noexcept
+    {
+        static constexpr char flags[] = {
+            'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
+        };
+        static constexpr auto
+            flagOn = IM_COL32(0xff, 0xfc, 0x53, SDL_ALPHA_OPAQUE),
+            flagOff = IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE),
+            textOn = IM_COL32_BLACK,
+            textOff = IM_COL32_WHITE;
 
+        if (ImGui::CollapsingHeader("Flags",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
             const auto textSz = glyph_size();
             const auto radius = (textSz.x + textSz.y) / 2.0f;
-            if (ImGui::CollapsingHeader("Flags",
-                                        ImGuiTreeNodeFlags_DefaultOpen)) {
-                const auto pos = ImGui::GetCursorScreenPos();
-                ImVec2 center{pos.x + radius, pos.y + radius};
-                const auto
-                    fontSz = ImGui::GetFontSize(),
-                    xOffset = fontSz / 4,
-                    yOffset = fontSz / 2;
-                const auto drawList = ImGui::GetWindowDrawList();
-                for (std::size_t i = 0; i < sizeof flags; ++i) {
-                    ImU32 fill, text;
-                    if (cpu.status & (1 << (sizeof flags - 1 - i))) {
-                        fill = flagOn;
-                        text = textOn;
-                    } else {
-                        fill = flagOff;
-                        text = textOff;
-                    }
-                    drawList->AddCircleFilled(center, radius, fill);
-                    drawList->AddText({center.x - xOffset, center.y - yOffset},
-                                      text, flags + i, flags + i + 1);
-                    center.x += 25;
-                }
-                ImGui::Dummy({0, radius * 2});
-            }
-        }
-        ImGui::EndChild();
-
-        ImGui::SameLine();
-
-        if (ImGui::BeginChild("CpuRight")) {
-            if (ImGui::CollapsingHeader("Datapath",
-                                        ImGuiTreeNodeFlags_DefaultOpen)) {
-                const auto& datapath = snp.datapath;
-                const auto& lines = snp.lines;
-
-                ImGui::Text("Address Bus: %04X", datapath.addressbus);
-                const char* dataStr;
-                char dataHex[3];
-                if (datapath.busfault) {
-                    dataStr = "FLT";
+            const auto pos = ImGui::GetCursorScreenPos();
+            ImVec2 center{pos.x + radius, pos.y + radius};
+            const auto
+                fontSz = ImGui::GetFontSize(),
+                xOffset = fontSz / 4,
+                yOffset = fontSz / 2;
+            const auto drawList = ImGui::GetWindowDrawList();
+            for (std::size_t i = 0; i < sizeof flags; ++i) {
+                ImU32 fill, text;
+                if (c.snapshot().cpu.status & (1 << (sizeof flags - 1 - i))) {
+                    fill = flagOn;
+                    text = textOn;
                 } else {
-                    std::snprintf(dataHex, sizeof dataHex, "%02X",
-                                  datapath.databus);
-                    dataStr = dataHex;
+                    fill = flagOff;
+                    text = textOff;
                 }
-                ImGui::Text("Data Bus: %s %c", dataStr,
-                            lines.readwrite ? 'R' : 'W');
-
-                ImGui::Separator();
-
-                const char* mnemonic;
-                char buf[DIS_DATAP_SIZE];
-                if (datapath.jammed) {
-                    mnemonic = "JAMMED";
-                } else {
-                    const auto wlen = dis_datapath(&snp, buf);
-                    mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
-                }
-                ImGui::Text("Decode: %s", mnemonic);
-                ImGui::Text("adl: %02X", datapath.addrlow_latch);
-                ImGui::Text("adh: %02X", datapath.addrhigh_latch);
-                ImGui::Text("adc: %02X", datapath.addrcarry_latch);
-                ImGui::Text("t: %u", datapath.exec_cycle);
-
-                ImGui::Separator();
-
-                ImGui::BeginGroup();
-                {
-                    ImGui::Text("RDY:  %s", display_linestate(lines.ready));
-                    ImGui::Text("SYNC: %s", display_linestate(lines.sync));
-                    ImGui::Text("R/W:  %s",
-                                display_linestate(lines.readwrite));
-                }
-                ImGui::EndGroup();
-
-                ImGui::SameLine(0, 40);
-
-                ImGui::BeginGroup();
-                {
-                    ImGui::Text("IRQ: %s%s", display_linestate(lines.irq),
-                                display_signalstate(datapath.irq));
-                    ImGui::Text("NMI: %s%s", display_linestate(lines.nmi),
-                                display_signalstate(datapath.nmi));
-                    ImGui::Text("RES: %s%s", display_linestate(lines.reset),
-                                display_signalstate(datapath.res));
-                }
-                ImGui::EndGroup();
+                drawList->AddCircleFilled(center, radius, fill);
+                drawList->AddText({center.x - xOffset, center.y - yOffset},
+                                  text, flags + i, flags + i + 1);
+                center.x += 25;
             }
+            ImGui::Dummy({0, radius * 2});
         }
-        ImGui::EndChild();
+    }
+
+    void renderDatapath() const noexcept
+    {
+        if (ImGui::CollapsingHeader("Datapath",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+            const auto& datapath = c.snapshot().datapath;
+            const auto& lines = c.snapshot().lines;
+
+            ImGui::Text("Address Bus: %04X", datapath.addressbus);
+            const char* dataStr;
+            char dataHex[3];
+            if (datapath.busfault) {
+                dataStr = "FLT";
+            } else {
+                std::snprintf(dataHex, sizeof dataHex, "%02X",
+                              datapath.databus);
+                dataStr = dataHex;
+            }
+            ImGui::Text("Data Bus: %s %c", dataStr,
+                        lines.readwrite ? 'R' : 'W');
+
+            ImGui::Separator();
+
+            const char* mnemonic;
+            char buf[DIS_DATAP_SIZE];
+            if (datapath.jammed) {
+                mnemonic = "JAMMED";
+            } else {
+                const auto err = dis_datapath(c.snapshotp(), buf);
+                mnemonic = err < 0 ? dis_errstr(err) : buf;
+            }
+            ImGui::Text("Decode: %s", mnemonic);
+            ImGui::Text("adl: %02X", datapath.addrlow_latch);
+            ImGui::Text("adh: %02X", datapath.addrhigh_latch);
+            ImGui::Text("adc: %02X", datapath.addrcarry_latch);
+            ImGui::Text("t: %u", datapath.exec_cycle);
+
+            ImGui::Separator();
+
+            ImGui::BeginGroup();
+            {
+                ImGui::Text("RDY:  %s", display_linestate(lines.ready));
+                ImGui::Text("SYNC: %s", display_linestate(lines.sync));
+                ImGui::Text("R/W:  %s",
+                            display_linestate(lines.readwrite));
+            }
+            ImGui::EndGroup();
+
+            ImGui::SameLine(0, 40);
+
+            ImGui::BeginGroup();
+            {
+                ImGui::Text("IRQ: %s%s", display_linestate(lines.irq),
+                            display_signalstate(datapath.irq));
+                ImGui::Text("NMI: %s%s", display_linestate(lines.nmi),
+                            display_signalstate(datapath.nmi));
+                ImGui::Text("RES: %s%s", display_linestate(lines.reset),
+                            display_signalstate(datapath.res));
+            }
+            ImGui::EndGroup();
+        }
     }
 };
 
@@ -565,7 +602,7 @@ aldo::Layout::Layout(aldo::viewstate& s, const aldo::EmuController& c,
 {
     add_views<
         HardwareTraits,
-        Cart,
+        CartInfo,
         PrgAtPc,
         Bouncer,
         Cpu,

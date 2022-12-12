@@ -48,6 +48,13 @@ constexpr auto display_signalstate(csig_state s) noexcept
     }
 }
 
+template <typename... Vs>
+auto add_views(std::vector<std::unique_ptr<aldo::View>>& v, aldo::viewstate& s,
+               const aldo::EmuController& c, const aldo::MediaRuntime& r)
+{
+    (v.push_back(std::make_unique<Vs>(s, c, r)), ...);
+}
+
 //
 // Widgets
 //
@@ -518,16 +525,18 @@ void aldo::View::View::render() const
     ImGui::End();
 }
 
-aldo::Layout::Layout(viewstate& s, const EmuController& c,
-                     const MediaRuntime& r)
+aldo::Layout::Layout(aldo::viewstate& s, const aldo::EmuController& c,
+                     const aldo::MediaRuntime& r)
 : s{s}, r{r}
 {
-    views.push_back(std::make_unique<HardwareTraits>(s, c, r));
-    views.push_back(std::make_unique<Cart>(s, c, r));
-    views.push_back(std::make_unique<PrgAtPc>(s, c, r));
-    views.push_back(std::make_unique<Bouncer>(s, c, r));
-    views.push_back(std::make_unique<Cpu>(s, c, r));
-    views.push_back(std::make_unique<Ram>(s, c, r));
+    add_views<
+        HardwareTraits,
+        Cart,
+        PrgAtPc,
+        Bouncer,
+        Cpu,
+        Ram
+    >(views, s, c, r);
 }
 
 void aldo::Layout::render() const

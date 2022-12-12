@@ -49,8 +49,8 @@ private:
 class EmuController final {
 public:
     EmuController(debug_handle d, console_handle n) noexcept
-    : hdebug{std::move(d)}, hconsole{std::move(n)}, lsnapshot{hconsole.get()}
-    {}
+    : hdebug{std::move(d)}, hconsole{std::move(n)},
+        lsnapshot{hconsole.get()} {}
 
     std::string_view cartName() const;
     cart* cartp() const noexcept { return hcart.get(); }

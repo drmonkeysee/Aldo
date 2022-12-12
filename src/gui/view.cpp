@@ -18,7 +18,9 @@
 #include "imgui.h"
 #include <SDL2/SDL.h>
 
+#include <algorithm>
 #include <locale>
+#include <string_view>
 #include <cinttypes>
 #include <cstddef>
 #include <cstdint>
@@ -26,6 +28,10 @@
 
 namespace
 {
+
+//
+// Helpers
+//
 
 constexpr auto display_linestate(bool v) noexcept
 {
@@ -46,6 +52,11 @@ constexpr auto display_signalstate(csig_state s) noexcept
     default:
         return "";
     }
+}
+
+auto glyph_size() noexcept
+{
+    return ImGui::CalcTextSize("A");
 }
 
 template <typename... Vs>
@@ -184,8 +195,31 @@ public:
 protected:
     void renderContents() const override
     {
+        using namespace std::literals::string_view_literals;
+        static constexpr auto label = "Name: "sv;
+
+        const auto textSz = glyph_size(),
+                    availSpace = ImGui::GetContentRegionAvail();
+        const auto nameFit = (int)((availSpace.x / textSz.x) - label.length());
         const auto name = c.cartName();
-        ImGui::Text("Name: %.*s", (int)name.length(), name.data());
+
+        std::string_view trail;
+        int nameLen;
+        auto truncated = false;
+        if (nameFit < (int)name.length()) {
+            truncated = true;
+            trail = "..."sv;
+            nameLen = std::max(0, nameFit - (int)trail.length());
+        } else {
+            trail = ""sv;
+            nameLen = (int)name.length();
+        }
+        ImGui::Text("%.*s%.*s%.*s", (int)label.length(), label.data(), nameLen,
+                    name.data(), (int)trail.length(), trail.data());
+        if (truncated && ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("%.*s", (int)name.length(), name.data());
+        }
+
         char cartFormat[CART_FMT_SIZE];
         const auto err = cart_format_extname(c.cartp(), cartFormat);
         ImGui::Text("Format: %s", err < 0 ? cart_errstr(err) : cartFormat);
@@ -335,8 +369,8 @@ protected:
                 textOn = IM_COL32_BLACK,
                 textOff = IM_COL32_WHITE;
 
-            const auto textSize = ImGui::CalcTextSize("A");
-            const auto radius = (textSize.x + textSize.y) / 2.0f;
+            const auto textSz = glyph_size();
+            const auto radius = (textSz.x + textSz.y) / 2.0f;
             if (ImGui::CollapsingHeader("Flags",
                                         ImGuiTreeNodeFlags_DefaultOpen)) {
                 const auto pos = ImGui::GetCursorScreenPos();

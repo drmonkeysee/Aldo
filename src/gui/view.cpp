@@ -19,7 +19,9 @@
 #include <SDL2/SDL.h>
 
 #include <algorithm>
+#include <array>
 #include <locale>
+#include <string>
 #include <string_view>
 #include <cinttypes>
 #include <cstddef>
@@ -401,7 +403,7 @@ private:
 
     void renderFlags() const noexcept
     {
-        static constexpr char flags[] = {
+        static constexpr std::array flags{
             'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
         };
         static constexpr auto
@@ -421,18 +423,19 @@ private:
                 xOffset = fontSz / 4,
                 yOffset = fontSz / 2;
             const auto drawList = ImGui::GetWindowDrawList();
-            for (std::size_t i = 0; i < sizeof flags; ++i) {
-                ImU32 fill, text;
-                if (c.snapshot().cpu.status & (1 << (sizeof flags - 1 - i))) {
-                    fill = flagOn;
-                    text = textOn;
+            for (std::size_t i = 0; i < flags.size(); ++i) {
+                ImU32 fillColor, textColor;
+                if (c.snapshot().cpu.status & (1 << (flags.size() - 1 - i))) {
+                    fillColor = flagOn;
+                    textColor = textOn;
                 } else {
-                    fill = flagOff;
-                    text = textOff;
+                    fillColor = flagOff;
+                    textColor = textOff;
                 }
-                drawList->AddCircleFilled(center, radius, fill);
+                drawList->AddCircleFilled(center, radius, fillColor);
                 drawList->AddText({center.x - xOffset, center.y - yOffset},
-                                  text, flags + i, flags + i + 1);
+                                  textColor, flags.data() + i,
+                                  flags.data() + i + 1);
                 center.x += 25;
             }
             ImGui::Dummy({0, radius * 2});
@@ -448,13 +451,13 @@ private:
 
             ImGui::Text("Address Bus: %04X", datapath.addressbus);
             const char* dataStr;
-            char dataHex[3];
+            std::array<char, 3> dataHex;
             if (datapath.busfault) {
                 dataStr = "FLT";
             } else {
-                std::snprintf(dataHex, sizeof dataHex, "%02X",
+                std::snprintf(dataHex.data(), dataHex.size(), "%02X",
                               datapath.databus);
-                dataStr = dataHex;
+                dataStr = dataHex.data();
             }
             ImGui::Text("Data Bus: %s %c", dataStr,
                         lines.readwrite ? 'R' : 'W');
@@ -525,12 +528,12 @@ protected:
         const auto spHighlightText =
             ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
         if (ImGui::BeginTable("ram", cols, tableConfig, tableSize)) {
-            char col[3];
+            std::array<char, 3> col;
             ImGui::TableSetupScrollFreeze(0, 1);
             ImGui::TableSetupColumn("Addr");
             for (auto i = 0; i < pageDim; ++i) {
-                std::snprintf(col, sizeof col, " %01X", i);
-                ImGui::TableSetupColumn(col);
+                std::snprintf(col.data(), col.size(), " %01X", i);
+                ImGui::TableSetupColumn(col.data());
             }
             ImGui::TableSetupColumn("ASCII");
             ImGui::TableHeadersRow();
@@ -551,7 +554,7 @@ protected:
                     ImGui::TableSetColumnIndex(0);
                     ImGui::Text("%04X", addr);
                     const auto& lcl = std::locale::classic();
-                    char ascii[pageDim + 1];
+                    std::string ascii(pageDim, '.');
                     for (std::size_t ramCol = 0; ramCol < pageDim; ++ramCol) {
                         const auto ramIdx = (page * pageSize)
                                             + (pageRow * pageDim) + ramCol;
@@ -565,13 +568,12 @@ protected:
                         } else {
                             ImGui::Text("%02X", val);
                         }
-                        ascii[ramCol] = std::isprint((char)val, lcl)
-                                        ? (char)val
-                                        : '.';
+                        if (std::isprint((char)val, lcl)) {
+                            ascii[ramCol] = (std::string::value_type)val;
+                        }
                     }
                     ImGui::TableSetColumnIndex(cols - 1);
-                    ascii[pageDim] = '\0';
-                    ImGui::TextUnformatted(ascii);
+                    ImGui::TextUnformatted(ascii.c_str());
                     addr += pageDim;
                 }
             }

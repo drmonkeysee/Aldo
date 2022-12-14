@@ -32,14 +32,14 @@ public:
     AldoError(std::string title, std::string label, int errnoVal);
     template<ErrConverter F>
     AldoError(std::string title, int err, F errConv)
-    : AldoError{std::move(title), emuErrMessage(err, errConv(err))} {}
+    : AldoError{std::move(title), errMessage(err, errConv(err))} {}
 
     const char* what() const noexcept override { return wht.c_str(); }
     const char* title() const noexcept { return std::runtime_error::what(); }
     const char* message() const noexcept { return msg.c_str(); }
 
 private:
-    static std::string emuErrMessage(int, std::string&&);
+    static std::string errMessage(int, std::string&&);
 
     std::string msg;
     std::string wht;

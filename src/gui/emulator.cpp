@@ -15,7 +15,6 @@
 #include <SDL2/SDL.h>
 
 #include <memory>
-#include <sstream>
 #include <stdexcept>
 #include <type_traits>
 #include <variant>
@@ -29,12 +28,10 @@ using file_handle = aldo::handle<std::FILE, std::fclose>;
 
 auto invalid_command(aldo::Command c)
 {
-    std::stringstream s;
-    s
-        << "Invalid gui event command ("
-        << static_cast<std::underlying_type_t<aldo::Command>>(c)
-        << ')';
-    return s.str();
+    std::string s = "Invalid gui event command (";
+    s += std::to_string(static_cast<std::underlying_type_t<aldo::Command>>(c));
+    s += ')';
+    return s;
 }
 
 auto is_guikey_shortcut(SDL_Event* ev) noexcept

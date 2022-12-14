@@ -215,25 +215,28 @@ protected:
 
         const auto textSz = glyph_size(),
                     availSpace = ImGui::GetContentRegionAvail();
-        const auto nameFit = (int)((availSpace.x / textSz.x) - label.length());
+        const auto nameFit =
+            static_cast<int>((availSpace.x / textSz.x) - label.length());
         const auto name = c.cartName();
 
         std::string_view trail;
         int nameLen;
         bool truncated;
-        if (nameFit < (int)name.length()) {
+        if (nameFit < static_cast<int>(name.length())) {
             trail = "..."sv;
-            nameLen = std::max(0, nameFit - (int)trail.length());
+            nameLen = std::max(0, nameFit - static_cast<int>(trail.length()));
             truncated = true;
         } else {
             trail = ""sv;
-            nameLen = (int)name.length();
+            nameLen = static_cast<int>(name.length());
             truncated = false;
         }
-        ImGui::Text("%.*s%.*s%.*s", (int)label.length(), label.data(), nameLen,
-                    name.data(), (int)trail.length(), trail.data());
+        ImGui::Text("%.*s%.*s%.*s", static_cast<int>(label.length()),
+                    label.data(), nameLen, name.data(),
+                    static_cast<int>(trail.length()), trail.data());
         if (truncated && ImGui::IsItemHovered()) {
-            ImGui::SetTooltip("%.*s", (int)name.length(), name.data());
+            ImGui::SetTooltip("%.*s", static_cast<int>(name.length()),
+                              name.data());
         }
 
         char cartFormat[CART_FMT_SIZE];
@@ -306,7 +309,8 @@ private:
             std::uint16_t resVector;
             if (debugger.resvector_override >= 0) {
                 indicator = "!";
-                resVector = (std::uint16_t)debugger.resvector_override;
+                resVector =
+                    static_cast<std::uint16_t>(debugger.resvector_override);
             } else {
                 indicator = "";
                 resVector = bytowr(lo, hi);
@@ -353,7 +357,10 @@ protected:
         SDL_RenderFillRect(ren, &pos);
         SDL_SetRenderTarget(ren, nullptr);
 
-        const ImVec2 sz{(float)bouncer.bounds.x, (float)bouncer.bounds.y};
+        const ImVec2 sz{
+            static_cast<float>(bouncer.bounds.x),
+            static_cast<float>(bouncer.bounds.y),
+        };
         ImGui::Image(tex, sz);
     }
 };
@@ -561,7 +568,8 @@ protected:
                         const auto ramIdx = (page * pageSize)
                                             + (pageRow * pageDim) + ramCol;
                         const auto val = snp.mem.ram[ramIdx];
-                        ImGui::TableSetColumnIndex((int)ramCol + 1);
+                        ImGui::TableSetColumnIndex(static_cast<int>(ramCol)
+                                                   + 1);
                         if (page == 1 && ramIdx % pageSize == sp) {
                             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
                                                    IM_COL32(0xff, 0xfc, 0x53,
@@ -570,8 +578,9 @@ protected:
                         } else {
                             ImGui::Text("%02X", val);
                         }
-                        if (std::isprint((char)val, lcl)) {
-                            ascii[ramCol] = (std::string::value_type)val;
+                        if (std::isprint(static_cast<char>(val), lcl)) {
+                            ascii[ramCol] =
+                                static_cast<std::string::value_type>(val);
                         }
                     }
                     ImGui::TableSetColumnIndex(cols - 1);

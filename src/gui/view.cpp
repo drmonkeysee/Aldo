@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <array>
+#include <concepts>
 #include <locale>
 #include <string>
 #include <string_view>
@@ -61,7 +62,7 @@ auto glyph_size() noexcept
     return ImGui::CalcTextSize("A");
 }
 
-template<typename... Vs>
+template<std::derived_from<aldo::View>... Vs>
 auto add_views(std::vector<std::unique_ptr<aldo::View>>& v, aldo::viewstate& s,
                const aldo::EmuController& c, const aldo::MediaRuntime& r)
 {

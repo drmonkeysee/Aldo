@@ -8,12 +8,18 @@
 #ifndef Aldo_gui_error_hpp
 #define Aldo_gui_error_hpp
 
+#include <concepts>
 #include <stdexcept>
 #include <string>
 #include <utility>
 
 namespace aldo
 {
+
+template<typename F>
+concept ErrConverter = requires(F f) {
+    { f(0) } -> std::convertible_to<std::string>;
+};
 
 class SdlError final : public std::runtime_error {
 public:
@@ -24,9 +30,9 @@ class AldoError final : public std::runtime_error {
 public:
     AldoError(std::string title, std::string message);
     AldoError(std::string title, std::string label, int errnoVal);
-    template<typename F>
-    AldoError(std::string title, int err, F errResolver)
-    : AldoError{std::move(title), emuErrMessage(err, errResolver(err))} {}
+    template<ErrConverter F>
+    AldoError(std::string title, int err, F errConv)
+    : AldoError{std::move(title), emuErrMessage(err, errConv(err))} {}
 
     const char* what() const noexcept override { return wht.c_str(); }
     const char* title() const noexcept { return std::runtime_error::what(); }

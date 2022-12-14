@@ -24,7 +24,7 @@ class AldoError final : public std::runtime_error {
 public:
     AldoError(std::string title, std::string message);
     AldoError(std::string title, std::string label, int errnoVal);
-    template <typename F>
+    template<typename F>
     AldoError(std::string title, int err, F errResolver)
     : AldoError{std::move(title), emuErrMessage(err, errResolver(err))} {}
 

@@ -61,7 +61,7 @@ auto glyph_size() noexcept
     return ImGui::CalcTextSize("A");
 }
 
-template <typename... Vs>
+template<typename... Vs>
 auto add_views(std::vector<std::unique_ptr<aldo::View>>& v, aldo::viewstate& s,
                const aldo::EmuController& c, const aldo::MediaRuntime& r)
 {
@@ -219,14 +219,15 @@ protected:
 
         std::string_view trail;
         int nameLen;
-        auto truncated = false;
+        bool truncated;
         if (nameFit < (int)name.length()) {
-            truncated = true;
             trail = "..."sv;
             nameLen = std::max(0, nameFit - (int)trail.length());
+            truncated = true;
         } else {
             trail = ""sv;
             nameLen = (int)name.length();
+            truncated = false;
         }
         ImGui::Text("%.*s%.*s%.*s", (int)label.length(), label.data(), nameLen,
                     name.data(), (int)trail.length(), trail.data());

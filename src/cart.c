@@ -173,7 +173,7 @@ static void write_ines_info(const struct cartinfo *info, FILE *f, bool verbose)
 static void write_raw_info(FILE *f)
 {
     // TODO: assume 32KB size for now
-    fputs("PRG Size\t: 32KB\n", f);
+    fputs("PRG ROM\t: 1 x 32KB\n", f);
 }
 
 //

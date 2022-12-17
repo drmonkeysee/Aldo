@@ -14,6 +14,7 @@
 #include "nes.h"
 #include "snapshot.h"
 
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -53,6 +54,7 @@ public:
         lsnapshot{hconsole.get()} {}
 
     std::string_view cartName() const;
+    std::optional<cartinfo> cartInfo() const;
     cart* cartp() const noexcept { return hcart.get(); }
     const console_state& snapshot() const noexcept { return lsnapshot.get(); }
     const console_state* snapshotp() const noexcept {

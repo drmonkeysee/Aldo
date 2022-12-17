@@ -64,6 +64,15 @@ std::string_view aldo::EmuController::cartName() const
     return v.substr(slash, dot - slash);
 }
 
+std::optional<cartinfo> aldo::EmuController::cartInfo() const
+{
+    if (!hcart) return {};
+
+    cartinfo info;
+    cart_getinfo(cartp(), &info);
+    return info;
+}
+
 void aldo::EmuController::handleInput(aldo::viewstate& state,
                                       const gui_platform& platform)
 {

@@ -57,6 +57,11 @@ constexpr auto display_signalstate(csig_state s) noexcept
     }
 }
 
+constexpr auto boolstr(bool v) noexcept
+{
+    return v ? "yes" : "no";
+}
+
 auto glyph_size() noexcept
 {
     return ImGui::CalcTextSize("A");
@@ -239,9 +244,61 @@ protected:
                               name.data());
         }
 
-        char cartFormat[CART_FMT_SIZE];
-        const auto err = cart_format_extname(c.cartp(), cartFormat);
-        ImGui::Text("Format: %s", err < 0 ? cart_errstr(err) : cartFormat);
+        const auto info = c.cartInfo();
+        if (info) {
+            ImGui::Text("Format: %s", cart_formatname(info->format));
+            ImGui::Separator();
+            switch (info->format) {
+            case CRTF_INES:
+                renderiNesInfo(info.value());
+                break;
+            default:
+                renderRawInfo();
+                break;
+            }
+        } else {
+            ImGui::TextUnformatted("Format: None");
+        }
+    }
+
+    void renderiNesInfo(const cartinfo& info) const noexcept
+    {
+        ImGui::Text("Mapper: %03u%s", info.ines_hdr.mapper_id,
+                    info.ines_hdr.mapper_implemented
+                        ? ""
+                        : " (Not Implemented)");
+        ImGui::TextUnformatted("Boards: <Board Names>");
+        ImGui::Separator();
+        ImGui::Text("PRG ROM: %u x 16KB", info.ines_hdr.prg_blocks);
+
+        if (info.ines_hdr.wram) {
+            ImGui::Text("WRAM: %u x 8KB",
+                        std::max(static_cast<std::uint8_t>(1),
+                                 info.ines_hdr.wram_blocks));
+        } else {
+            ImGui::TextUnformatted("WRAM: no");
+        }
+
+        if (info.ines_hdr.chr_blocks > 0) {
+            ImGui::Text("CHR ROM: %u x 8KB", info.ines_hdr.chr_blocks);
+            ImGui::TextUnformatted("CHR RAM: no");
+        } else {
+            ImGui::TextUnformatted("CHR ROM: no");
+            ImGui::TextUnformatted("CHR RAM: 1 x 8KB");
+        }
+
+        ImGui::Text("NT-Mirroring: %s", cart_mirrorname(info.ines_hdr.mirror));
+        ImGui::Text("Mapper-Ctrl: %s",
+                    boolstr(info.ines_hdr.mapper_controlled));
+        ImGui::Separator();
+        ImGui::Text("Trainer: %s", boolstr(info.ines_hdr.trainer));
+        ImGui::Text("Bus Conflicts: %s", boolstr(info.ines_hdr.bus_conflicts));
+    }
+
+    void renderRawInfo() const noexcept
+    {
+        // TODO: assume 32KB size for now
+        ImGui::TextUnformatted("PRG ROM: 1 x 32KB");
     }
 };
 

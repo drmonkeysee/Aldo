@@ -115,21 +115,23 @@ int cart_create(cart **c, FILE *f) br_nothrow;
 br_libexport
 void cart_free(cart *self) br_nothrow;
 
+br_libexport
+const char *cart_formatname(enum cartformat format) br_nothrow;
+br_libexport
+const char *cart_mirrorname(enum nt_mirroring mirror) br_nothrow;
 br_libexport br_checkerror
 int cart_format_extname(cart *self,
                         char buf[br_noalias_csz(CART_FMT_SIZE)]) br_nothrow;
 br_libexport
 void cart_write_info(cart *self, const char *br_noalias name, bool verbose,
                      FILE *f) br_nothrow;
+br_libexport
+void cart_getinfo(cart *self, struct cartinfo *info) br_nothrow;
 
 //
 // Internal
 //
 
-const char *cart_formatname(enum cartformat format) br_nothrow;
-const char *cart_mirrorname(enum nt_mirroring mirror) br_nothrow;
-
-void cart_getinfo(cart *self, struct cartinfo *info) br_nothrow;
 struct blockview cart_prgblock(cart *self, size_t i) br_nothrow;
 struct blockview cart_chrblock(cart *self, size_t i) br_nothrow;
 

@@ -73,7 +73,7 @@ auto add_views(std::vector<std::unique_ptr<aldo::View>>& v, aldo::viewstate& s,
 // Widgets
 //
 
-auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r) noexcept
+auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
 {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu(SDL_GetWindowTitle(r.window()))) {
@@ -147,7 +147,7 @@ private:
                        1.0f, 1, 100, "%d", ImGuiSliderFlags_AlwaysClamp);
     }
 
-    void renderRunControls() const noexcept
+    void renderRunControls() const
     {
         const auto& snp = c.snapshot();
         auto halt = !snp.lines.ready;

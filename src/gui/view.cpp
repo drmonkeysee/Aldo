@@ -516,28 +516,26 @@ private:
         const auto& lines = c.snapshot().lines;
 
         ImGui::Text("Address Bus: %04X", datapath.addressbus);
-        const char* dataStr;
-        std::array<char, 3> dataHex;
         if (datapath.busfault) {
-            dataStr = "FLT";
+            ImGui::TextUnformatted("Data Bus: FLT");
         } else {
+            std::array<char, 3> dataHex;
             std::snprintf(dataHex.data(), dataHex.size(), "%02X",
                           datapath.databus);
-            dataStr = dataHex.data();
+            ImGui::Text("Data Bus: %s", dataHex.data());
         }
-        ImGui::Text("Data Bus: %s %c", dataStr, lines.readwrite ? 'R' : 'W');
+        ImGui::SameLine();
+        ImGui::TextUnformatted(lines.readwrite ? "R" : "W");
 
         ImGui::Separator();
 
-        const char* mnemonic;
-        char buf[DIS_DATAP_SIZE];
         if (datapath.jammed) {
-            mnemonic = "JAMMED";
+            ImGui::TextUnformatted("Decode: JAMMED");
         } else {
+            char buf[DIS_DATAP_SIZE];
             const auto err = dis_datapath(c.snapshotp(), buf);
-            mnemonic = err < 0 ? dis_errstr(err) : buf;
+            ImGui::Text("Decode: %s", err < 0 ? dis_errstr(err) : buf);
         }
-        ImGui::Text("Decode: %s", mnemonic);
         ImGui::Text("adl: %02X", datapath.addrlow_latch);
         ImGui::Text("adh: %02X", datapath.addrhigh_latch);
         ImGui::Text("adc: %02X", datapath.addrcarry_latch);

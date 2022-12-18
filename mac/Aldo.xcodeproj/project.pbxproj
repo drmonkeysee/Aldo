@@ -23,7 +23,7 @@
 		C820E6C025A9759A006A7AB1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820E6BF25A9759A006A7AB1 /* main.swift */; };
 		C820E6CB25A97A4E006A7AB1 /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* cli.c */; };
 		C820E6E025A98557006A7AB1 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C820E6DE25A982A5006A7AB1 /* libncurses.tbd */; };
-		C8264C56294EDF5C004CD6A5 /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8264C55294EDF5C004CD6A5 /* Platform.swift */; };
+		C8264C56294EDF5C004CD6A5 /* MacPlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8264C55294EDF5C004CD6A5 /* MacPlatform.swift */; };
 		C8283E74293D44CB00CDB572 /* emulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8283E72293D44CB00CDB572 /* emulator.cpp */; };
 		C830036728DEDDD200480F29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C830036628DEDDD200480F29 /* Assets.xcassets */; };
 		C830036C28DEDDD200480F29 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C830036B28DEDDD200480F29 /* main.m */; };
@@ -240,7 +240,7 @@
 		C820E6D325A97FB5006A7AB1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		C820E6DE25A982A5006A7AB1 /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
 		C8264C54294EDF5C004CD6A5 /* Aldo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Aldo-Bridging-Header.h"; sourceTree = "<group>"; };
-		C8264C55294EDF5C004CD6A5 /* Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Platform.swift; sourceTree = "<group>"; };
+		C8264C55294EDF5C004CD6A5 /* MacPlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPlatform.swift; sourceTree = "<group>"; };
 		C8283E72293D44CB00CDB572 /* emulator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = emulator.cpp; sourceTree = "<group>"; };
 		C8283E73293D44CB00CDB572 /* emulator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = emulator.hpp; sourceTree = "<group>"; };
 		C830036128DEDDD100480F29 /* Aldo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Aldo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -537,7 +537,7 @@
 			children = (
 				C8264C54294EDF5C004CD6A5 /* Aldo-Bridging-Header.h */,
 				C830036B28DEDDD200480F29 /* main.m */,
-				C8264C55294EDF5C004CD6A5 /* Platform.swift */,
+				C8264C55294EDF5C004CD6A5 /* MacPlatform.swift */,
 				C830036628DEDDD200480F29 /* Assets.xcassets */,
 				C830036D28DEDDD200480F29 /* Aldo.entitlements */,
 				C8DC9CB828DFE5B4000D8D97 /* Info.plist */,
@@ -990,7 +990,7 @@
 				C8041C3728EE6EC000A3695F /* gui.c in Sources */,
 				C8561A0C29149EA600290B53 /* mediaruntime.cpp in Sources */,
 				C854873828E685D00045BA42 /* imgui_impl_sdlrenderer.cpp in Sources */,
-				C8264C56294EDF5C004CD6A5 /* Platform.swift in Sources */,
+				C8264C56294EDF5C004CD6A5 /* MacPlatform.swift in Sources */,
 				C830036C28DEDDD200480F29 /* main.m in Sources */,
 				C894F0EF2945850E00C6575F /* view.cpp in Sources */,
 				C8283E74293D44CB00CDB572 /* emulator.cpp in Sources */,

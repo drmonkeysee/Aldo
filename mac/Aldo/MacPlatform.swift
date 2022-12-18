@@ -1,5 +1,5 @@
 //
-//  Platform.swift
+//  MacPlatform.swift
 //  Aldo-Gui
 //
 //  Created by Brandon Stansbury on 12/17/22.
@@ -16,7 +16,7 @@ typealias RenderFunc = @convention(c) (UnsafeMutableRawPointer?) -> Float
 
 let aldoLog = Logger()
 
-final class Platform: NSObject {
+final class MacPlatform: NSObject {
     @objc static func setup(_ platform: HPlatform,
                             withScaleFunc: @escaping RenderFunc) -> Bool {
         let lifetime = TestLifetime()
@@ -35,7 +35,7 @@ final class Platform: NSObject {
 
 class TestLifetime: NSObject {
     deinit {
-        NSLog("DELETE TEST LIFETIME")
+        aldoLog.debug("DELETE TEST LIFETIME")
     }
 }
 

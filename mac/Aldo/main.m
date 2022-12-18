@@ -42,7 +42,7 @@ static float render_scale_factor(void *sdl_win)
 static int run_app(void)
 {
     struct gui_platform platform;
-    if (![Platform setup:&platform withScaleFunc:render_scale_factor]) {
+    if (![MacPlatform setup:&platform withScaleFunc:render_scale_factor]) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "Failed to create platform interface!");
         return EXIT_FAILURE;

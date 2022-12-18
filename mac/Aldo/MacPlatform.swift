@@ -89,7 +89,7 @@ fileprivate func displayError(title: CString?, message: CString?) -> Bool {
     return modal.runModal() == .OK
 }
 
-fileprivate func freeBuffer(buffer: CBuffer?) {
+fileprivate func freeBuffer(_ buffer: CBuffer?) {
     buffer?.deallocate()
 }
 

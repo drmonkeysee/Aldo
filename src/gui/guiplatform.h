@@ -8,8 +8,6 @@
 #ifndef Aldo_gui_guiplatform_h
 #define Aldo_gui_guiplatform_h
 
-#include <SDL2/SDL.h>
-
 #include <stdbool.h>
 
 #include "bridgeopen.h"
@@ -17,14 +15,14 @@ struct gui_platform {
     br_ownresult
     char *(*appname)(void);
     bool (*is_hidpi)(void);
-    float (*render_scale_factor)(SDL_Window *);
+    float (*render_scale_factor)(void *);
     br_ownresult
     char *(*open_file)(void);
     bool (*display_error)(const char *, const char *);
+    void (*free_buffer)(char *);
+    void (*cleanup)(void **ctx);
+    void *ctx;
 };
-
-br_checkerror
-bool gui_platform_init(struct gui_platform *platform) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

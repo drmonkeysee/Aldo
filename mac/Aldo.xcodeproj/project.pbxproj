@@ -1128,7 +1128,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/$(TARGET_NAME)-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/Tests-Bridging-Header.h";
 				USER_HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					../src,
@@ -1158,7 +1158,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/$(TARGET_NAME)-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/Tests-Bridging-Header.h";
 				USER_HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					../src,
@@ -1188,7 +1188,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/$(TARGET_NAME)-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/Dev-Bridging-Header.h";
 			};
 			name = Debug;
 		};
@@ -1211,7 +1211,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/$(TARGET_NAME)-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/Dev-Bridging-Header.h";
 			};
 			name = Release;
 		};

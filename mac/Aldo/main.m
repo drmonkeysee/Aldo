@@ -52,6 +52,10 @@ static int run_app(void)
     return result;
 }
 
+//
+// App Entrypoint
+//
+
 int main(int argc, char *argv[argc+1])
 {
     (void)argv;

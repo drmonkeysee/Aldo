@@ -134,7 +134,7 @@ void aldo::EmuController::openCartFile(const gui_platform& p)
     // TODO: does this make sense long-term?
     nes_halt(hconsole.get());
 
-    const std::unique_ptr<char> filepath{p.open_file()};
+    const aldo::platform_buffer filepath{p.open_file(), p.free_buffer};
     if (!filepath) return;
 
     SDL_Log("File selected: %s", filepath.get());

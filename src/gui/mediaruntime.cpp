@@ -24,7 +24,7 @@ auto create_window(SDL_Point windowSize, const gui_platform& p)
 {
     const auto hidpi = p.is_hidpi();
     SDL_Log("HIDPI: %d", hidpi);
-    const std::unique_ptr<char> name{p.appname()};
+    const aldo::platform_buffer name{p.appname(), p.free_buffer};
     const auto win = SDL_CreateWindow(name ? name.get() : "DisplayNameErr",
                                       SDL_WINDOWPOS_CENTERED,
                                       SDL_WINDOWPOS_CENTERED,

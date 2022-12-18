@@ -5,13 +5,16 @@
 //  Created by Brandon Stansbury on 12/17/22.
 //
 
-import Foundation
+import AppKit
+import os
 
 typealias CBuffer = UnsafeMutablePointer<CChar>
 typealias CString = UnsafePointer<CChar>
 typealias HPlatform = UnsafeMutablePointer<gui_platform>
 typealias HContext = UnsafeMutablePointer<UnsafeMutableRawPointer?>
 typealias RenderFunc = @convention(c) (UnsafeMutableRawPointer?) -> Float
+
+let aldoLog = Logger()
 
 final class Platform: NSObject {
     @objc static func setup(_ platform: HPlatform,
@@ -51,19 +54,39 @@ fileprivate func appName() -> CBuffer? {
 }
 
 fileprivate func isHiDPI() -> Bool {
-    return false
-}
-
-fileprivate func renderScaleFactor(window: OpaquePointer?) -> Float {
-    return 1.0
+    guard let hidpi = bundleHighRes() as? Bool else { return false }
+    return hidpi
 }
 
 fileprivate func openFile() -> CBuffer? {
-    return nil
+    let panel = NSOpenPanel()
+    panel.message = "Choose a ROM file"
+    guard panel.runModal() == .OK, let path = panel.url else { return nil }
+    return path.withUnsafeFileSystemRepresentation {
+        guard let filepath = $0 else {
+            aldoLog.error("Unable to represent file selection as system path")
+            return nil
+        }
+        let buffer = CBuffer.allocate(capacity: strlen(filepath) + 1)
+        strcpy(buffer, filepath)
+        return buffer
+    }
 }
 
 fileprivate func displayError(title: CString?, message: CString?) -> Bool {
-    return false
+    let modal = NSAlert()
+    if let titlep = title {
+        modal.messageText = .init(cString: titlep)
+    } else {
+        modal.messageText = "INVALID TITLE"
+    }
+    if let messagep = message {
+        modal.informativeText = .init(cString: messagep)
+    } else {
+        modal.informativeText = "INVALID MESSAGE"
+    }
+    modal.alertStyle = .warning
+    return modal.runModal() == .OK
 }
 
 fileprivate func freeBuffer(buffer: CBuffer?) {
@@ -71,12 +94,19 @@ fileprivate func freeBuffer(buffer: CBuffer?) {
 }
 
 fileprivate func cleanup(ctx: HContext?) {
-    let p = ctx?.pointee
-    let _: TestLifetime = Unmanaged.fromOpaque(p.unsafelyUnwrapped)
-                            .takeRetainedValue()
+    guard let p = ctx?.pointee else { return }
+    let _: TestLifetime = Unmanaged.fromOpaque(p).takeRetainedValue()
     ctx?.pointee = nil
 }
 
+//
+// Helpers
+//
+
 fileprivate func bundleName() -> Any? {
     Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName")
+}
+
+fileprivate func bundleHighRes() -> Any? {
+    Bundle.main.object(forInfoDictionaryKey: "NSHighResolutionCapable")
 }

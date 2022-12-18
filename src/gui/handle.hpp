@@ -8,8 +8,11 @@
 #ifndef Aldo_gui_handle_hpp
 #define Aldo_gui_handle_hpp
 
+#include "guiplatform.h"
+
 #include <memory>
 #include <type_traits>
+#include <utility>
 
 namespace aldo
 {
@@ -19,6 +22,11 @@ using func_deleter = std::integral_constant<std::decay_t<decltype(f)>, f>;
 
 template<typename T, auto f>
 using handle = std::unique_ptr<T, func_deleter<f>>;
+
+using platform_deleter =
+    std::decay_t<decltype(std::declval<gui_platform>().free_buffer)>;
+
+using platform_buffer = std::unique_ptr<char, platform_deleter>;
 
 }
 

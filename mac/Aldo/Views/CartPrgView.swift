@@ -142,9 +142,3 @@ fileprivate func prgLabel() -> some View {
     Label("PRG ROM", systemImage: "doc.plaintext")
         .font(.headline)
 }
-
-struct CartPrgView_Previews: PreviewProvider {
-    static var previews: some View {
-        CartPrgView()
-    }
-}

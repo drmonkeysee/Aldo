@@ -125,15 +125,3 @@ extension TimedFeedbackCommandView {
         }
     }
 }
-
-struct CopyToClipboardView_Previews: PreviewProvider {
-    static var previews: some View {
-        CopyToClipboardView(fromStream: {.success(.init())})
-    }
-}
-
-struct ChrExportView_Previews: PreviewProvider {
-    static var previews: some View {
-        ChrExportView(Cart())
-    }
-}

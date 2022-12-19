@@ -51,9 +51,3 @@ struct CartInspectorView: View {
         }
     }
 }
-
-struct CartInspectorView_Previews: PreviewProvider {
-    static var previews: some View {
-        CartInspectorView()
-    }
-}

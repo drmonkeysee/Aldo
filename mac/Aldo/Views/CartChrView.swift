@@ -139,9 +139,3 @@ fileprivate struct PaletteView: View {
             .padding(.trailing, Constraints.sheetPadding)
     }
 }
-
-struct CartChrView_Previews: PreviewProvider {
-    static var previews: some View {
-        CartChrView()
-    }
-}

@@ -189,9 +189,3 @@ fileprivate struct iNesView: View {
 }
 
 fileprivate func boolToStr(_ val: Bool) -> String { val ? "yes" : "no" }
-
-struct CartInfoView_Previews: PreviewProvider {
-    static var previews: some View {
-        CartInfoView()
-    }
-}

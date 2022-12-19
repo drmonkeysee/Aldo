@@ -147,9 +147,3 @@ fileprivate struct DataView: View {
         "\(label).square\(val ? ".fill" : "")"
     }
 }
-
-struct CartFocusView_Previews: PreviewProvider {
-    static var previews: some View {
-        CartFocusView()
-    }
-}

@@ -1,16 +1,11 @@
 //
 //  CStream.swift
-//  Aldo-App
+//  Aldo-Gui
 //
 //  Created by Brandon Stansbury on 4/20/22.
 //
 
 import Foundation
-
-typealias CBuffer = UnsafeMutablePointer<CChar>
-typealias CInstPtr = UnsafePointer<dis_instruction>
-typealias CStream = UnsafeMutablePointer<FILE>
-typealias CStreamOp = (CStream) throws -> Void
 
 enum CStreamResult {
     case success(Data)

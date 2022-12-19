@@ -128,12 +128,14 @@ void cart_write_info(cart *self, const char *br_noalias name, bool verbose,
 br_libexport
 void cart_getinfo(cart *self, struct cartinfo *info) br_nothrow;
 
+br_libexport
+struct blockview cart_prgblock(cart *self, size_t i) br_nothrow;
+br_libexport
+struct blockview cart_chrblock(cart *self, size_t i) br_nothrow;
+
 //
 // Internal
 //
-
-struct blockview cart_prgblock(cart *self, size_t i) br_nothrow;
-struct blockview cart_chrblock(cart *self, size_t i) br_nothrow;
 
 int cart_cpu_connect(cart *self, bus *b, uint16_t addr) br_nothrow;
 void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr) br_nothrow;

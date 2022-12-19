@@ -1,13 +1,9 @@
 //
 //  AldoError.swift
-//  Aldo-App
+//  Aldo-Gui
 //
 //  Created by Brandon Stansbury on 4/10/22.
 //
-
-import os
-
-let aldoLog = Logger()
 
 enum AldoError: Error {
     private static let errCodeFormat = "%s (%d)"

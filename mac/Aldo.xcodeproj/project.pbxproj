@@ -26,6 +26,12 @@
 		C8264C56294EDF5C004CD6A5 /* MacPlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8264C55294EDF5C004CD6A5 /* MacPlatform.swift */; };
 		C8264C59294FE981004CD6A5 /* CartInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8264C58294FE981004CD6A5 /* CartInspectorView.swift */; };
 		C8264C5C294FF50F004CD6A5 /* Aliases.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8264C5B294FF50F004CD6A5 /* Aliases.swift */; };
+		C8264C5D294FFE5F004CD6A5 /* AldoError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8FB31D02803D6EC00E6B0EF /* AldoError.swift */; };
+		C8264C5E294FFE85004CD6A5 /* Cart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A5B77A27DD79AE00A4DD5E /* Cart.swift */; };
+		C8264C5F294FFE94004CD6A5 /* CStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F2985A2810ECEF00ECFD7E /* CStream.swift */; };
+		C8264C60294FFE9A004CD6A5 /* ChrSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88949B02813B2DB00795CC0 /* ChrSheet.swift */; };
+		C8264C61294FFEA4004CD6A5 /* Commands.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E76BA9285985CE004C1479 /* Commands.swift */; };
+		C8264C62294FFEA7004CD6A5 /* Disassembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8497E3F2822015100F4952E /* Disassembly.swift */; };
 		C8283E74293D44CB00CDB572 /* emulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8283E72293D44CB00CDB572 /* emulator.cpp */; };
 		C830036728DEDDD200480F29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C830036628DEDDD200480F29 /* Assets.xcassets */; };
 		C830036C28DEDDD200480F29 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C830036B28DEDDD200480F29 /* main.m */; };
@@ -38,7 +44,6 @@
 		C83C663827E2F4EF009CE42C /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
 		C83C663927E2F4FE009CE42C /* bytes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068F2751EEBA00B45785 /* bytes.c */; };
 		C83C663A27E2F52C009CE42C /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
-		C8497E402822015100F4952E /* Disassembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8497E3F2822015100F4952E /* Disassembly.swift */; };
 		C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C854872728E685D00045BA42 /* imgui_widgets.cpp */; };
 		C854873828E685D00045BA42 /* imgui_impl_sdlrenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C854872B28E685D00045BA42 /* imgui_impl_sdlrenderer.cpp */; settings = {COMPILER_FLAGS = "-Wno-conversion"; }; };
 		C854873A28E685D00045BA42 /* imgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C854872D28E685D00045BA42 /* imgui.cpp */; };
@@ -55,13 +60,11 @@
 		C8702CF9278A58C900725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C8702CF8278A58C900725690 /* haltexpr.c */; };
 		C8702CFA278A598A00725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C882854829403C2100BAC249 /* error.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C882854629403C2100BAC249 /* error.cpp */; };
-		C88949B12813B2DB00795CC0 /* ChrSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88949B02813B2DB00795CC0 /* ChrSheet.swift */; };
 		C88A5E8527F6A1750039382D /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88A5E8427F6A1750039382D /* CartView.swift */; };
 		C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C88CABDC28FA4DDD00551C65 /* uisdl.cpp */; };
 		C88F3E5727D9A45E00317732 /* EmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88F3E5627D9A45E00317732 /* EmulationView.swift */; };
 		C894F0EF2945850E00C6575F /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C894F0ED2945850E00C6575F /* view.cpp */; };
 		C89D715027D4758900C9177A /* CartPrgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89D714F27D4758900C9177A /* CartPrgView.swift */; };
-		C8A5B77B27DD79AE00A4DD5E /* Cart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A5B77A27DD79AE00A4DD5E /* Cart.swift */; };
 		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8B5303B2801300C00576D9F /* CartFocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B5303A2801300C00576D9F /* CartFocusView.swift */; };
 		C8B87D47285E82BD000E0D2E /* CommandViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B87D46285E82BD000E0D2E /* CommandViews.swift */; };
@@ -132,10 +135,7 @@
 		C8DBC92227C8708B0043994B /* AldoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBC92127C8708B0043994B /* AldoTests.swift */; };
 		C8DC9CB428DFD5BA000D8D97 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; };
 		C8DC9CB528DFD5BA000D8D97 /* SDL2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C8E76BAA285985CE004C1479 /* Commands.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E76BA9285985CE004C1479 /* Commands.swift */; };
 		C8EC72202916150700DF750A /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8EC721E2916150700DF750A /* render.cpp */; };
-		C8F2985B2810ECEF00ECFD7E /* CStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F2985A2810ECEF00ECFD7E /* CStream.swift */; };
-		C8FB31D12803D6EC00E6B0EF /* AldoError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8FB31D02803D6EC00E6B0EF /* AldoError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -547,7 +547,13 @@
 		C8264C5A294FF4DE004CD6A5 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				C8FB31D02803D6EC00E6B0EF /* AldoError.swift */,
 				C8264C5B294FF50F004CD6A5 /* Aliases.swift */,
+				C8A5B77A27DD79AE00A4DD5E /* Cart.swift */,
+				C88949B02813B2DB00795CC0 /* ChrSheet.swift */,
+				C8E76BA9285985CE004C1479 /* Commands.swift */,
+				C8F2985A2810ECEF00ECFD7E /* CStream.swift */,
+				C8497E3F2822015100F4952E /* Disassembly.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -633,12 +639,6 @@
 		C8A5B77927DD799200A4DD5E /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				C8FB31D02803D6EC00E6B0EF /* AldoError.swift */,
-				C8A5B77A27DD79AE00A4DD5E /* Cart.swift */,
-				C88949B02813B2DB00795CC0 /* ChrSheet.swift */,
-				C8E76BA9285985CE004C1479 /* Commands.swift */,
-				C8F2985A2810ECEF00ECFD7E /* CStream.swift */,
-				C8497E3F2822015100F4952E /* Disassembly.swift */,
 				C803504128D692430022A4B9 /* Rendering.swift */,
 			);
 			path = ViewModels;
@@ -1015,13 +1015,19 @@
 				C8264C56294EDF5C004CD6A5 /* MacPlatform.swift in Sources */,
 				C830036C28DEDDD200480F29 /* main.m in Sources */,
 				C894F0EF2945850E00C6575F /* view.cpp in Sources */,
+				C8264C5D294FFE5F004CD6A5 /* AldoError.swift in Sources */,
+				C8264C5E294FFE85004CD6A5 /* Cart.swift in Sources */,
 				C8283E74293D44CB00CDB572 /* emulator.cpp in Sources */,
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,
 				C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */,
 				C8EC72202916150700DF750A /* render.cpp in Sources */,
+				C8264C62294FFEA7004CD6A5 /* Disassembly.swift in Sources */,
 				C854873D28E685D00045BA42 /* imgui_impl_sdl.cpp in Sources */,
 				C8264C59294FE981004CD6A5 /* CartInspectorView.swift in Sources */,
+				C8264C5F294FFE94004CD6A5 /* CStream.swift in Sources */,
+				C8264C60294FFE9A004CD6A5 /* ChrSheet.swift in Sources */,
 				C854873B28E685D00045BA42 /* imgui_tables.cpp in Sources */,
+				C8264C61294FFEA4004CD6A5 /* Commands.swift in Sources */,
 				C854873C28E685D00045BA42 /* imgui_demo.cpp in Sources */,
 				C8264C5C294FF50F004CD6A5 /* Aliases.swift in Sources */,
 				C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */,
@@ -1070,7 +1076,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C83C663A27E2F52C009CE42C /* bus.c in Sources */,
-				C8FB31D12803D6EC00E6B0EF /* AldoError.swift in Sources */,
 				C8B87D47285E82BD000E0D2E /* CommandViews.swift in Sources */,
 				C86B6A8228D0332000AA263A /* CpuView.swift in Sources */,
 				C83C663827E2F4EF009CE42C /* mappers.c in Sources */,
@@ -1078,18 +1083,13 @@
 				C89D715027D4758900C9177A /* CartPrgView.swift in Sources */,
 				C83C663727E2F4E4009CE42C /* cart.c in Sources */,
 				C8C9FB672803F8C90093D9A7 /* cpu.c in Sources */,
-				C8F2985B2810ECEF00ECFD7E /* CStream.swift in Sources */,
-				C8497E402822015100F4952E /* Disassembly.swift in Sources */,
 				C8C9FB652803F8900093D9A7 /* dis.c in Sources */,
 				C838D3B527D5DA4400468FDB /* CartInfoView.swift in Sources */,
 				C8DBC91227C8708A0043994B /* ContentView.swift in Sources */,
-				C88949B12813B2DB00795CC0 /* ChrSheet.swift in Sources */,
-				C8A5B77B27DD79AE00A4DD5E /* Cart.swift in Sources */,
 				C88F3E5727D9A45E00317732 /* EmulationView.swift in Sources */,
 				C8DBC91027C8708A0043994B /* AldoApp.swift in Sources */,
 				C803504228D692430022A4B9 /* Rendering.swift in Sources */,
 				C8C9FB662803F8BD0093D9A7 /* decode.c in Sources */,
-				C8E76BAA285985CE004C1479 /* Commands.swift in Sources */,
 				C8B5303B2801300C00576D9F /* CartFocusView.swift in Sources */,
 				C88A5E8527F6A1750039382D /* CartView.swift in Sources */,
 				C838D3B727D5DB0300468FDB /* CartChrView.swift in Sources */,

@@ -1,6 +1,6 @@
 //
 //  Commands.swift
-//  Aldo-App
+//  Aldo-Gui
 //
 //  Created by Brandon Stansbury on 6/14/22.
 //
@@ -36,7 +36,7 @@ final class ClipboardCopy: TimedFeedbackCommand {
 
 final class ChrExport: TimedFeedbackCommand {
     let cart: Cart
-    let scales = Array(Int(1)...Int(10))
+    let scales = Array(1...10)//Int(MinChrScale)...Int(MaxChrScale))
     @Published var scale = ChrSheet.scale
     @Published var folderAvailable = false
     private(set) var selectedFolder: URL?

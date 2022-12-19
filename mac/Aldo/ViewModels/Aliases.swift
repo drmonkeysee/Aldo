@@ -8,8 +8,11 @@
 import Foundation
 
 typealias CBuffer = UnsafeMutablePointer<CChar>
+typealias CInstPtr = UnsafePointer<dis_instruction>
+typealias ContextHandle = UnsafeMutablePointer<UnsafeMutableRawPointer?>
+typealias CStream = UnsafeMutablePointer<FILE>
+typealias CStreamOp = (CStream) throws -> Void
 typealias CString = UnsafePointer<CChar>
 typealias PlatformHandle = UnsafeMutablePointer<gui_platform>
-typealias ContextHandle = UnsafeMutablePointer<UnsafeMutableRawPointer?>
 typealias PlatformRenderFunc =
     @convention(c) (UnsafeMutableRawPointer?) -> Float

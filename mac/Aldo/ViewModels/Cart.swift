@@ -1,6 +1,6 @@
 //
 //  Cart.swift
-//  Aldo-App
+//  Aldo-Gui
 //
 //  Created by Brandon Stansbury on 3/12/22.
 //
@@ -51,9 +51,6 @@ final class Cart: ObservableObject {
 
         return await readCStream { stream in
             try n.withCString { cartFile in
-                var appstate = cliargs()
-                appstate.filepath = cartFile
-                //appstate.unified_disoutput = true
                 let err = dis_cart_prg(h.unwrapped, name, false, true, stream)
                 if err < 0 { throw AldoError.wrapDisError(code: err) }
             }
@@ -78,11 +75,9 @@ final class Cart: ObservableObject {
         return await readCStream { stream in
             let prefix = "\(folder.appendingPathComponent(n).path)-chr"
             try prefix.withCString { chrprefix in
-                var appstate = cliargs()
-                appstate.chrdecode_prefix = chrprefix
-                appstate.chrscale = Int32(scale)
                 errno = 0
-                let err = dis_cart_chr(h.unwrapped, appstate.chrscale, appstate.chrdecode_prefix, stream)
+                let err = dis_cart_chr(h.unwrapped, Int32(scale), chrprefix,
+                                       stream)
                 if err < 0 {
                     if err == DIS_ERR_ERNO {
                         throw AldoError.ioErrno

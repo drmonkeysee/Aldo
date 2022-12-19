@@ -56,6 +56,10 @@ struct dis_instruction {
 br_libexport
 const char *dis_errstr(int err);
 
+// NOTE: parsed will be zeroed-out if return value is <= 0
+br_libexport br_checkerror
+int dis_parse_inst(const struct blockview *bv, size_t at,
+                   struct dis_instruction *parsed);
 br_libexport br_checkerror
 int dis_parsemem_inst(size_t size, const uint8_t mem[br_noalias_sz(size)],
                       size_t at, struct dis_instruction *parsed);
@@ -73,27 +77,32 @@ int dis_cart_prg(cart *cart, const char *br_noalias name, bool verbose,
 br_libexport br_checkerror
 int dis_cart_chr(cart *cart, int chrscale,
                  const char *br_noalias chrdecode_prefix, FILE *output);
+br_libexport br_checkerror
+int dis_cart_chrbank(const struct blockview *bv, int scale, FILE *f);
+
+br_libexport
+const char *dis_inst_mnemonic(const struct dis_instruction *inst);
+br_libexport
+const char *dis_inst_description(const struct dis_instruction *inst);
+br_libexport
+const char *dis_inst_addrmode(const struct dis_instruction *inst);
+br_libexport
+uint8_t dis_inst_flags(const struct dis_instruction *inst);
+br_libexport br_checkerror
+int dis_inst_operand(const struct dis_instruction *inst,
+                     char dis[br_noalias_csz(DIS_OPERAND_SIZE)]);
+br_libexport
+bool dis_inst_equal(const struct dis_instruction *lhs,
+                    const struct dis_instruction *rhs);
+
 
 //
 // Internal
 //
 
-// NOTE: parsed will be zeroed-out if return value is <= 0
-int dis_parse_inst(const struct blockview *bv, size_t at,
-                   struct dis_instruction *parsed);
-const char *dis_inst_mnemonic(const struct dis_instruction *inst);
-const char *dis_inst_description(const struct dis_instruction *inst);
-const char *dis_inst_addrmode(const struct dis_instruction *inst);
-uint8_t dis_inst_flags(const struct dis_instruction *inst);
-int dis_inst_operand(const struct dis_instruction *inst,
-                     char dis[br_noalias_csz(DIS_OPERAND_SIZE)]);
-bool dis_inst_equal(const struct dis_instruction *lhs,
-                    const struct dis_instruction *rhs);
-
 int dis_peek(uint16_t addr, struct mos6502 *cpu,
              const struct console_state *snapshot,
              char dis[br_noalias_csz(DIS_PEEK_SIZE)]);
-int dis_cart_chrbank(const struct blockview *bv, int scale, FILE *f);
 #include "bridgeclose.h"
 
 #endif

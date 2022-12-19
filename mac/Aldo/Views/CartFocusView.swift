@@ -1,6 +1,6 @@
 //
 //  CartFocusView.swift
-//  Aldo-App
+//  Aldo-Gui
 //
 //  Created by Brandon Stansbury on 4/8/22.
 //

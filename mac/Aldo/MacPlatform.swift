@@ -8,17 +8,12 @@
 import AppKit
 import os
 
-typealias CBuffer = UnsafeMutablePointer<CChar>
-typealias CString = UnsafePointer<CChar>
-typealias HPlatform = UnsafeMutablePointer<gui_platform>
-typealias HContext = UnsafeMutablePointer<UnsafeMutableRawPointer?>
-typealias RenderFunc = @convention(c) (UnsafeMutableRawPointer?) -> Float
-
 let aldoLog = Logger()
 
 final class MacPlatform: NSObject {
-    @objc static func setup(_ platform: HPlatform,
-                            withScaleFunc: @escaping RenderFunc) -> Bool {
+    @objc static func setup(_ platform: PlatformHandle,
+                            withScaleFunc: @escaping PlatformRenderFunc)
+                            -> Bool {
         platform.pointee = .init(appname: appName,
                                  is_hidpi: isHiDPI,
                                  render_scale_factor: withScaleFunc,
@@ -109,7 +104,7 @@ fileprivate func freeBuffer(_ buffer: CBuffer?) {
     buffer?.deallocate()
 }
 
-fileprivate func cleanup(ctx: HContext?) {
+fileprivate func cleanup(ctx: ContextHandle?) {
     guard let p = ctx?.pointee else { return }
     let _: CartInspector = Unmanaged.fromOpaque(p).takeRetainedValue()
     ctx?.pointee = nil

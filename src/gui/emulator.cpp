@@ -150,6 +150,9 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
                                        const gui_platform& p)
 {
     switch (ev.cmd) {
+    case aldo::Command::activateCartInspector:
+        p.activate_cart_inspector(p.ctx);
+        break;
     case aldo::Command::halt:
         if (std::get<bool>(ev.value)) {
             nes_halt(hconsole.get());

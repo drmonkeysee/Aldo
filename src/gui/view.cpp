@@ -83,7 +83,6 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu(SDL_GetWindowTitle(r.window()))) {
             ImGui::MenuItem("About");
-            ImGui::MenuItem("ImGui Demo", nullptr, &s.showDemo);
             if (ImGui::MenuItem("Quit", "Cmd+Q")) {
                 s.events.emplace(aldo::Command::quit);
             };
@@ -98,6 +97,11 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
         if (ImGui::BeginMenu("Window")) {
             ImGui::MenuItem("Bouncer", nullptr, &s.showBouncer);
             ImGui::MenuItem("CPU", nullptr, &s.showCpu);
+            ImGui::Separator();
+            ImGui::MenuItem("ImGui Demo", nullptr, &s.showDemo);
+            if (ImGui::MenuItem("Cart Inspector")) {
+                s.events.emplace(aldo::Command::activateCartInspector);
+            }
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();

@@ -19,24 +19,30 @@ let aldoLog = Logger()
 final class MacPlatform: NSObject {
     @objc static func setup(_ platform: HPlatform,
                             withScaleFunc: @escaping RenderFunc) -> Bool {
-        let lifetime = TestLifetime()
         platform.pointee = .init(appname: appName,
                                  is_hidpi: isHiDPI,
                                  render_scale_factor: withScaleFunc,
                                  open_file: openFile,
+                                 activate_cart_inspector: activateInspector,
                                  display_error: displayError,
                                  free_buffer: freeBuffer,
                                  cleanup: cleanup,
-                                 ctx: Unmanaged.passRetained(lifetime)
+                                 ctx: Unmanaged.passRetained(CartInspector())
                                         .toOpaque())
         return true
     }
 }
 
-class TestLifetime: NSObject {
-    deinit {
-        aldoLog.debug("DELETE TEST LIFETIME")
-    }
+final class CartInspector {
+    private lazy var controller = {
+        let win = NSWindow(contentViewController: createCartInspectorView())
+        win.title = "Cart Inspector"
+        return NSWindowController(window: win)
+    }()
+
+    func activateWindow() { controller.showWindow(nil) }
+
+    deinit { aldoLog.debug("Cart Inspector Cleanup") }
 }
 
 //
@@ -73,6 +79,16 @@ fileprivate func openFile() -> CBuffer? {
     }
 }
 
+fileprivate func activateInspector(_ ctx: UnsafeMutableRawPointer?) {
+    guard let p = ctx else {
+        aldoLog.warning("Nil context on inspector activate")
+        return
+    }
+    let inspector: CartInspector = Unmanaged.fromOpaque(p)
+                                    .takeUnretainedValue()
+    inspector.activateWindow()
+}
+
 fileprivate func displayError(title: CString?, message: CString?) -> Bool {
     let modal = NSAlert()
     if let titlep = title {
@@ -95,7 +111,7 @@ fileprivate func freeBuffer(_ buffer: CBuffer?) {
 
 fileprivate func cleanup(ctx: HContext?) {
     guard let p = ctx?.pointee else { return }
-    let _: TestLifetime = Unmanaged.fromOpaque(p).takeRetainedValue()
+    let _: CartInspector = Unmanaged.fromOpaque(p).takeRetainedValue()
     ctx?.pointee = nil
 }
 

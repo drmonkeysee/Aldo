@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C803504228D692430022A4B9 /* Rendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = C803504128D692430022A4B9 /* Rendering.swift */; };
 		C8041C3728EE6EC000A3695F /* gui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8041C3628EE6EC000A3695F /* gui.c */; };
 		C808BA6827893976001FDE39 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C80C9E1C277D648F000F2D8B /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
@@ -44,10 +43,6 @@
 		C838F8572936FC9800D52004 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
 		C83A30772904987F00749A17 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C83A307A2904A2B000749A17 /* version.c in Sources */ = {isa = PBXBuildFile; fileRef = C83A30792904A2B000749A17 /* version.c */; };
-		C83C663727E2F4E4009CE42C /* cart.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068A2751EEBA00B45785 /* cart.c */; };
-		C83C663827E2F4EF009CE42C /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
-		C83C663927E2F4FE009CE42C /* bytes.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068F2751EEBA00B45785 /* bytes.c */; };
-		C83C663A27E2F52C009CE42C /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
 		C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C854872728E685D00045BA42 /* imgui_widgets.cpp */; };
 		C854873828E685D00045BA42 /* imgui_impl_sdlrenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C854872B28E685D00045BA42 /* imgui_impl_sdlrenderer.cpp */; settings = {COMPILER_FLAGS = "-Wno-conversion"; }; };
 		C854873A28E685D00045BA42 /* imgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C854872D28E685D00045BA42 /* imgui.cpp */; };
@@ -60,12 +55,10 @@
 		C85C8DC625BD29AC00611D19 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
 		C85CC20927ED6BF30063276D /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C85CC20827ED6BF30063276D /* snapshot.c */; };
 		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
-		C86B6A8228D0332000AA263A /* CpuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86B6A8128D0332000AA263A /* CpuView.swift */; };
 		C8702CF9278A58C900725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C8702CF8278A58C900725690 /* haltexpr.c */; };
 		C8702CFA278A598A00725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C882854829403C2100BAC249 /* error.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C882854629403C2100BAC249 /* error.cpp */; };
 		C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C88CABDC28FA4DDD00551C65 /* uisdl.cpp */; };
-		C88F3E5727D9A45E00317732 /* EmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88F3E5627D9A45E00317732 /* EmulationView.swift */; };
 		C894F0EF2945850E00C6575F /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C894F0ED2945850E00C6575F /* view.cpp */; };
 		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8B88A8A29061C3500B7CB23 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
@@ -122,17 +115,9 @@
 		C8C706BA2751F0CB00B45785 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068D2751EEBA00B45785 /* decode.c */; };
 		C8C706BB2751F0CE00B45785 /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
 		C8C706BE2751F55C00B45785 /* trace.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706BD2751F55C00B45785 /* trace.c */; };
-		C8C9FB652803F8900093D9A7 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
-		C8C9FB662803F8BD0093D9A7 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068D2751EEBA00B45785 /* decode.c */; };
-		C8C9FB672803F8C90093D9A7 /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706892751EEBA00B45785 /* cpu.c */; };
 		C8D3CA0A2904E50F0087316F /* aldoc in Embed Cli */ = {isa = PBXBuildFile; fileRef = C8D3CA002904E1BD0087316F /* aldoc */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		C8D44BDD2786B571005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D44BDC2786B571005AB586 /* argparse.c */; };
 		C8D8FDA82792691B0073639B /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
-		C8DBC91027C8708A0043994B /* AldoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBC90F27C8708A0043994B /* AldoApp.swift */; };
-		C8DBC91227C8708A0043994B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBC91127C8708A0043994B /* ContentView.swift */; };
-		C8DBC91427C8708B0043994B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8DBC91327C8708B0043994B /* Assets.xcassets */; };
-		C8DBC91727C8708B0043994B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8DBC91627C8708B0043994B /* Preview Assets.xcassets */; };
-		C8DBC92227C8708B0043994B /* AldoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBC92127C8708B0043994B /* AldoTests.swift */; };
 		C8DC9CB428DFD5BA000D8D97 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; };
 		C8DC9CB528DFD5BA000D8D97 /* SDL2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C8EC72202916150700DF750A /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8EC721E2916150700DF750A /* render.cpp */; };
@@ -159,13 +144,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = C8D3C9FF2904E1BD0087316F;
 			remoteInfo = Cli;
-		};
-		C8DBC91E27C8708B0043994B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C85E8ADA25A9747800FF0025 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C8DBC90C27C8708A0043994B;
-			remoteInfo = Aldo;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -214,7 +192,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		C803504128D692430022A4B9 /* Rendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rendering.swift; sourceTree = "<group>"; };
 		C8041C3528EE6EC000A3695F /* gui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gui.h; sourceTree = "<group>"; };
 		C8041C3628EE6EC000A3695F /* gui.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gui.c; sourceTree = "<group>"; };
 		C8041C3828EE72E600A3695F /* guiplatform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = guiplatform.h; sourceTree = "<group>"; };
@@ -256,7 +233,6 @@
 		C83965E927810D4300E1E28E /* tsutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tsutil.h; sourceTree = "<group>"; };
 		C83A30782904A2B000749A17 /* version.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
 		C83A30792904A2B000749A17 /* version.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = version.c; sourceTree = "<group>"; };
-		C83C663327E2F2E6009CE42C /* Aldo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Aldo-Bridging-Header.h"; sourceTree = "<group>"; };
 		C848C1B228FB9D630025ABD2 /* cycleclock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cycleclock.h; sourceTree = "<group>"; };
 		C8497E3F2822015100F4952E /* Disassembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disassembly.swift; sourceTree = "<group>"; };
 		C854872428E685D00045BA42 /* imgui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imgui.h; sourceTree = "<group>"; };
@@ -282,7 +258,6 @@
 		C85C8DC525BD29AC00611D19 /* dis.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dis.c; sourceTree = "<group>"; };
 		C85CC20827ED6BF30063276D /* snapshot.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = snapshot.c; sourceTree = "<group>"; };
 		C86030772761A51100F1B27D /* cpupeek.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpupeek.c; sourceTree = "<group>"; };
-		C86B6A8128D0332000AA263A /* CpuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CpuView.swift; sourceTree = "<group>"; };
 		C8702CF8278A58C900725690 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
 		C882854629403C2100BAC249 /* error.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = error.cpp; sourceTree = "<group>"; };
 		C882854729403C2100BAC249 /* error.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = error.hpp; sourceTree = "<group>"; };
@@ -292,7 +267,6 @@
 		C88CABDD28FA4DDD00551C65 /* uisdl.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = uisdl.hpp; sourceTree = "<group>"; };
 		C88CABE328FA63DD00551C65 /* bridgeopen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bridgeopen.h; sourceTree = "<group>"; };
 		C88CABE428FA63E700551C65 /* bridgeclose.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bridgeclose.h; sourceTree = "<group>"; };
-		C88F3E5627D9A45E00317732 /* EmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationView.swift; sourceTree = "<group>"; };
 		C894F0EC2945732800C6575F /* emu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = emu.h; sourceTree = "<group>"; };
 		C894F0ED2945850E00C6575F /* view.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = view.cpp; sourceTree = "<group>"; };
 		C894F0EE2945850E00C6575F /* view.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = view.hpp; sourceTree = "<group>"; };
@@ -339,14 +313,6 @@
 		C8D3CA002904E1BD0087316F /* aldoc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = aldoc; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8D44BDC2786B571005AB586 /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8D8FDA72792691B0073639B /* tsutil.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tsutil.c; sourceTree = "<group>"; };
-		C8DBC90D27C8708A0043994B /* AldoSwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AldoSwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C8DBC90F27C8708A0043994B /* AldoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoApp.swift; sourceTree = "<group>"; };
-		C8DBC91127C8708A0043994B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		C8DBC91327C8708B0043994B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		C8DBC91627C8708B0043994B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		C8DBC91827C8708B0043994B /* Aldo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Aldo.entitlements; sourceTree = "<group>"; };
-		C8DBC91D27C8708B0043994B /* AldoSwiftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AldoSwiftUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		C8DBC92127C8708B0043994B /* AldoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoTests.swift; sourceTree = "<group>"; };
 		C8DC9CB228DFD57B000D8D97 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../ext/SDL2.framework; sourceTree = "<group>"; };
 		C8DC9CB828DFE5B4000D8D97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C8E76BA9285985CE004C1479 /* Commands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Commands.swift; sourceTree = "<group>"; };
@@ -402,20 +368,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C8DBC90A27C8708A0043994B /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C8DBC91A27C8708B0043994B /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -462,8 +414,6 @@
 			children = (
 				C820E6BC25A9759A006A7AB1 /* Dev */,
 				C8184D3B25E7496B002B3100 /* Tests.xctest */,
-				C8DBC90D27C8708A0043994B /* AldoSwiftUI.app */,
-				C8DBC91D27C8708B0043994B /* AldoSwiftUITests.xctest */,
 				C830036128DEDDD100480F29 /* Aldo.app */,
 				C8D3CA002904E1BD0087316F /* aldoc */,
 				C8B88AA42906277800B7CB23 /* libaldo.dylib */,
@@ -633,21 +583,11 @@
 				C820E6C625A97A2F006A7AB1 /* src */,
 				C8184D4E25E74A9F002B3100 /* test */,
 				C830036228DEDDD100480F29 /* Aldo */,
-				C8DBC90E27C8708A0043994B /* AldoSwiftUI */,
-				C8DBC92027C8708B0043994B /* AldoSwiftUITests */,
 				C820E6BE25A9759A006A7AB1 /* Dev */,
 				C8184D3C25E7496B002B3100 /* Tests */,
 				C820E6DD25A982A5006A7AB1 /* Frameworks */,
 				C820E6BD25A9759A006A7AB1 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		C8A5B77927DD799200A4DD5E /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				C803504128D692430022A4B9 /* Rendering.swift */,
-			);
-			path = ViewModels;
 			sourceTree = "<group>";
 		};
 		C8B0E66728E01B3E0054547D /* gui */ = {
@@ -672,38 +612,6 @@
 				C8EC7222291615AB00DF750A /* viewstate.hpp */,
 			);
 			path = gui;
-			sourceTree = "<group>";
-		};
-		C8DBC90E27C8708A0043994B /* AldoSwiftUI */ = {
-			isa = PBXGroup;
-			children = (
-				C83C663327E2F2E6009CE42C /* Aldo-Bridging-Header.h */,
-				C8A5B77927DD799200A4DD5E /* ViewModels */,
-				C8DBC90F27C8708A0043994B /* AldoApp.swift */,
-				C8DBC91127C8708A0043994B /* ContentView.swift */,
-				C86B6A8128D0332000AA263A /* CpuView.swift */,
-				C88F3E5627D9A45E00317732 /* EmulationView.swift */,
-				C8DBC91327C8708B0043994B /* Assets.xcassets */,
-				C8DBC91827C8708B0043994B /* Aldo.entitlements */,
-				C8DBC91527C8708B0043994B /* Preview Content */,
-			);
-			path = AldoSwiftUI;
-			sourceTree = "<group>";
-		};
-		C8DBC91527C8708B0043994B /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				C8DBC91627C8708B0043994B /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		C8DBC92027C8708B0043994B /* AldoSwiftUITests */ = {
-			isa = PBXGroup;
-			children = (
-				C8DBC92127C8708B0043994B /* AldoTests.swift */,
-			);
-			path = AldoSwiftUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -809,41 +717,6 @@
 			productReference = C8D3CA002904E1BD0087316F /* aldoc */;
 			productType = "com.apple.product-type.tool";
 		};
-		C8DBC90C27C8708A0043994B /* AldoSwiftUI */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = C8DBC92F27C8708B0043994B /* Build configuration list for PBXNativeTarget "AldoSwiftUI" */;
-			buildPhases = (
-				C8DBC90927C8708A0043994B /* Sources */,
-				C8DBC90A27C8708A0043994B /* Frameworks */,
-				C8DBC90B27C8708A0043994B /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = AldoSwiftUI;
-			productName = AldoSwiftUI;
-			productReference = C8DBC90D27C8708A0043994B /* AldoSwiftUI.app */;
-			productType = "com.apple.product-type.application";
-		};
-		C8DBC91C27C8708B0043994B /* AldoSwiftUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = C8DBC93227C8708B0043994B /* Build configuration list for PBXNativeTarget "AldoSwiftUITests" */;
-			buildPhases = (
-				C8DBC91927C8708B0043994B /* Sources */,
-				C8DBC91A27C8708B0043994B /* Frameworks */,
-				C8DBC91B27C8708B0043994B /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				C8DBC91F27C8708B0043994B /* PBXTargetDependency */,
-			);
-			name = AldoSwiftUITests;
-			productName = AldoSwiftUITests;
-			productReference = C8DBC91D27C8708B0043994B /* AldoSwiftUITests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -871,14 +744,6 @@
 					C8D3C9FF2904E1BD0087316F = {
 						CreatedOnToolsVersion = 14.0.1;
 					};
-					C8DBC90C27C8708A0043994B = {
-						CreatedOnToolsVersion = 13.2.1;
-						LastSwiftMigration = 1330;
-					};
-					C8DBC91C27C8708B0043994B = {
-						CreatedOnToolsVersion = 13.2.1;
-						TestTargetID = C8DBC90C27C8708A0043994B;
-					};
 				};
 			};
 			buildConfigurationList = C85E8ADD25A9747800FF0025 /* Build configuration list for PBXProject "Aldo" */;
@@ -897,8 +762,6 @@
 				C830036028DEDDD100480F29 /* Aldo */,
 				C8D3C9FF2904E1BD0087316F /* Cli */,
 				C8B88AA32906277800B7CB23 /* Lib */,
-				C8DBC90C27C8708A0043994B /* AldoSwiftUI */,
-				C8DBC91C27C8708B0043994B /* AldoSwiftUITests */,
 				C820E6BB25A9759A006A7AB1 /* Dev */,
 				C8184D3A25E7496B002B3100 /* Tests */,
 			);
@@ -918,22 +781,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C830036728DEDDD200480F29 /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C8DBC90B27C8708A0043994B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C8DBC91727C8708B0043994B /* Preview Assets.xcassets in Resources */,
-				C8DBC91427C8708B0043994B /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C8DBC91B27C8708B0043994B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1077,33 +924,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C8DBC90927C8708A0043994B /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C83C663A27E2F52C009CE42C /* bus.c in Sources */,
-				C86B6A8228D0332000AA263A /* CpuView.swift in Sources */,
-				C83C663827E2F4EF009CE42C /* mappers.c in Sources */,
-				C83C663927E2F4FE009CE42C /* bytes.c in Sources */,
-				C83C663727E2F4E4009CE42C /* cart.c in Sources */,
-				C8C9FB672803F8C90093D9A7 /* cpu.c in Sources */,
-				C8C9FB652803F8900093D9A7 /* dis.c in Sources */,
-				C8DBC91227C8708A0043994B /* ContentView.swift in Sources */,
-				C88F3E5727D9A45E00317732 /* EmulationView.swift in Sources */,
-				C8DBC91027C8708A0043994B /* AldoApp.swift in Sources */,
-				C803504228D692430022A4B9 /* Rendering.swift in Sources */,
-				C8C9FB662803F8BD0093D9A7 /* decode.c in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C8DBC91927C8708B0043994B /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C8DBC92227C8708B0043994B /* AldoTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1121,11 +941,6 @@
 			isa = PBXTargetDependency;
 			target = C8D3C9FF2904E1BD0087316F /* Cli */;
 			targetProxy = C8D3CA072904E4CE0087316F /* PBXContainerItemProxy */;
-		};
-		C8DBC91F27C8708B0043994B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C8DBC90C27C8708A0043994B /* AldoSwiftUI */;
-			targetProxy = C8DBC91E27C8708B0043994B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1523,125 +1338,6 @@
 			};
 			name = Release;
 		};
-		C8DBC93027C8708B0043994B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CODE_SIGN_ENTITLEMENTS = AldoSwiftUI/Aldo.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2022.173;
-				DEVELOPMENT_ASSET_PATHS = "\"AldoSwiftUI/Preview Content\"";
-				DEVELOPMENT_TEAM = PC9FS9P8R2;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				GCC_WARN_PEDANTIC = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Brandon Stansbury";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MARKETING_VERSION = 0.4.1;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.AldoSwiftUI;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/Aldo-Bridging-Header.h";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wextra",
-				);
-			};
-			name = Debug;
-		};
-		C8DBC93127C8708B0043994B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CODE_SIGN_ENTITLEMENTS = AldoSwiftUI/Aldo.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2022.173;
-				DEVELOPMENT_ASSET_PATHS = "\"AldoSwiftUI/Preview Content\"";
-				DEVELOPMENT_TEAM = PC9FS9P8R2;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = "NDEBUG=1";
-				GCC_WARN_PEDANTIC = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Brandon Stansbury";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				LLVM_LTO = YES;
-				MARKETING_VERSION = 0.4.1;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.AldoSwiftUI;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/Aldo-Bridging-Header.h";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wextra",
-				);
-			};
-			name = Release;
-		};
-		C8DBC93327C8708B0043994B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2022.173;
-				DEVELOPMENT_TEAM = PC9FS9P8R2;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 0.4.1;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.AldoTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Aldo.app/Contents/MacOS/Aldo";
-			};
-			name = Debug;
-		};
-		C8DBC93427C8708B0043994B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2022.173;
-				DEVELOPMENT_TEAM = PC9FS9P8R2;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 0.4.1;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.AldoTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Aldo.app/Contents/MacOS/Aldo";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1695,24 +1391,6 @@
 			buildConfigurations = (
 				C8D3CA042904E1BD0087316F /* Debug */,
 				C8D3CA052904E1BD0087316F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		C8DBC92F27C8708B0043994B /* Build configuration list for PBXNativeTarget "AldoSwiftUI" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C8DBC93027C8708B0043994B /* Debug */,
-				C8DBC93127C8708B0043994B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		C8DBC93227C8708B0043994B /* Build configuration list for PBXNativeTarget "AldoSwiftUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C8DBC93327C8708B0043994B /* Debug */,
-				C8DBC93427C8708B0043994B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

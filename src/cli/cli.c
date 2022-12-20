@@ -211,14 +211,12 @@ static int run_emu(const struct cliargs *args, cart *c)
     dump_ram(&emu);
     snapshot_clear(&emu.snapshot);
     nes_free(emu.console);
-    emu.console = NULL;
 exit_trace:
     if (tracelog) {
         fclose(tracelog);
     }
 exit_debug:
     debug_free(emu.dbg);
-    emu.dbg = NULL;
     return result;
 }
 
@@ -248,14 +246,13 @@ static int run_with_args(const struct cliargs *args)
         return EXIT_FAILURE;
     }
 
-    cart *cart = load_cart(args->filepath);
+    cart *const cart = load_cart(args->filepath);
     if (!cart) {
         return EXIT_FAILURE;
     }
 
     const int result = run_cart(args, cart);
     cart_free(cart);
-    cart = NULL;
     return result;
 }
 

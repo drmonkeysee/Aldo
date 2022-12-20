@@ -177,7 +177,7 @@ int mapper_raw_create(struct mapper **m, FILE *f)
     assert(m != NULL);
     assert(f != NULL);
 
-    struct raw_mapper *self = malloc(sizeof *self);
+    struct raw_mapper *const self = malloc(sizeof *self);
     *self = (struct raw_mapper){
         .vtable = {
             .dtor = raw_dtor,
@@ -194,7 +194,6 @@ int mapper_raw_create(struct mapper **m, FILE *f)
         return 0;
     } else {
         self->vtable.dtor((struct mapper *)self);
-        self = NULL;
     }
     return err;
 }
@@ -265,7 +264,6 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
         *m = (struct mapper *)self;
     } else {
         self->vtable.dtor((struct mapper *)self);
-        self = NULL;
     }
     return err;
 }

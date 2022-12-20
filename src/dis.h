@@ -95,7 +95,6 @@ br_libexport
 bool dis_inst_equal(const struct dis_instruction *lhs,
                     const struct dis_instruction *rhs);
 
-
 //
 // Internal
 //

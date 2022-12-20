@@ -218,7 +218,7 @@ int cart_create(cart **c, FILE *f)
     assert(c != NULL);
     assert(f != NULL);
 
-    struct cartridge *self = malloc(sizeof *self);
+    struct cartridge *const self = malloc(sizeof *self);
 
     int err = detect_format(self, f);
     if (err == 0) {
@@ -241,7 +241,6 @@ int cart_create(cart **c, FILE *f)
         *c = self;
     } else {
         cart_free(self);
-        self = NULL;
     }
     return err;
 }

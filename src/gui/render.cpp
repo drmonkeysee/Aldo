@@ -14,7 +14,11 @@
 #include "imgui_impl_sdlrenderer.h"
 #include <SDL2/SDL.h>
 
-aldo::RenderFrame::RenderFrame(const aldo::MediaRuntime& r) noexcept : r{r}
+#include <utility>
+
+aldo::RenderFrame::RenderFrame(const aldo::MediaRuntime& r,
+                               aldo::RunTimer t) noexcept
+: r{r}, t{std::move(t)}
 {
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame();
@@ -28,5 +32,7 @@ aldo::RenderFrame::~RenderFrame()
     SDL_SetRenderDrawColor(ren, 0x1e, 0x1e, 0x1e, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(ren);
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+    // NOTE: record render timing here, otherwise we're just measuring VSYNC
+    t.record();
     SDL_RenderPresent(ren);
 }

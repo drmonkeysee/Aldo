@@ -53,7 +53,7 @@ public:
     SDL_Texture* bouncerTexture() const noexcept { return htex.get(); }
 
 private:
-    inline static constinit int InitStatus = 0;
+    inline static int InitStatus;
 
     SdlLib sdl;
     win_handle hwin;

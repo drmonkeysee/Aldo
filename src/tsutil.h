@@ -18,16 +18,16 @@ enum {
 
 #include "bridgeopen.h"
 br_libexport
-inline double timespec_to_ms(const struct timespec *ts)
+inline double timespec_to_ms(const struct timespec *ts) br_nothrow
 {
     return (double)(ts->tv_sec * TSU_MS_PER_S)
                     + ((double)ts->tv_nsec / (double)TSU_NS_PER_MS);
 }
 
 br_libexport
-struct timespec timespec_elapsed(const struct timespec *from);
+struct timespec timespec_elapsed(const struct timespec *from) br_nothrow;
 br_libexport
-void timespec_sleep(struct timespec duration);
+void timespec_sleep(struct timespec duration) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

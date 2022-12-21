@@ -8,6 +8,8 @@
 #ifndef Aldo_gui_render_hpp
 #define Aldo_gui_render_hpp
 
+#include "runclock.hpp"
+
 namespace aldo
 {
 
@@ -15,8 +17,8 @@ class MediaRuntime;
 
 class RenderFrame final {
 public:
-    explicit RenderFrame(const MediaRuntime& r) noexcept;
-    RenderFrame(MediaRuntime&&) = delete;
+    RenderFrame(const MediaRuntime& r, RunTimer t) noexcept;
+    RenderFrame(MediaRuntime&&, RunTimer) = delete;
     RenderFrame(const RenderFrame&) = delete;
     RenderFrame& operator=(const RenderFrame&) = delete;
     RenderFrame(RenderFrame&&) = delete;
@@ -25,6 +27,7 @@ public:
 
 private:
     const MediaRuntime& r;
+    RunTimer t;
 };
 
 }

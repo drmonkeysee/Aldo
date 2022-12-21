@@ -132,15 +132,18 @@ private:
     void renderStats() const noexcept
     {
         static constexpr auto refreshIntervalMs = 250;
-        static constinit double displayDtUpdate, refreshDt;
+        static double dispDtInput, dispDtUpdate, dispDtRender, refreshDt;
 
         const auto& cyclock = s.clock.cyclock;
         if ((refreshDt += cyclock.frametime_ms) >= refreshIntervalMs) {
-            displayDtUpdate = s.clock.dtUpdateMs;
+            dispDtInput = s.clock.dtInputMs;
+            dispDtUpdate = s.clock.dtUpdateMs;
+            dispDtRender = s.clock.dtRenderMs;
             refreshDt = 0;
         }
-        ImGui::TextUnformatted("FPS: 60");
-        ImGui::Text("Update dT: %.3f", displayDtUpdate);
+        ImGui::Text("Input dT: %.3f", dispDtInput);
+        ImGui::Text("Update dT: %.3f", dispDtUpdate);
+        ImGui::Text("Render dT: %.3f", dispDtRender);
         ImGui::Text("Frames: %" PRIu64, cyclock.frames);
         ImGui::Text("Runtime: %.3f", cyclock.runtime);
         ImGui::Text("Cycles: %" PRIu64, cyclock.total_cycles);

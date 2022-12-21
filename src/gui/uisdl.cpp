@@ -27,15 +27,23 @@ namespace
 // UI Loop Implementation
 //
 
-auto emu_update(aldo::EmuController& c, aldo::viewstate& s) noexcept
+auto handle_input(aldo::EmuController& c, aldo::viewstate& s,
+                  const gui_platform& p)
 {
-    c.update(s);
-    s.clock.markDtUpdate();
+    const auto timer = s.clock.timeInput();
+    c.handleInput(s, p);
 }
 
-auto render_ui(const aldo::Layout& l, const aldo::MediaRuntime& r)
+auto emu_update(aldo::EmuController& c, aldo::viewstate& s) noexcept
 {
-    const aldo::RenderFrame frame{r};
+    const auto timer = s.clock.timeUpdate();
+    c.update(s);
+}
+
+auto render_ui(const aldo::Layout& l, const aldo::MediaRuntime& r,
+               aldo::viewstate& s)
+{
+    const aldo::RenderFrame frame{r, s.clock.timeRender()};
     l.render();
 }
 
@@ -51,11 +59,11 @@ auto runloop(const gui_platform& platform, debugctx* debug, nes* console)
     const aldo::Layout layout{state, controller, runtime};
     state.clock.start();
     do {
-        state.clock.tickStart(controller.snapshot());
-        controller.handleInput(state, platform);
+        state.clock.tickStart(!controller.snapshot().lines.ready);
+        handle_input(controller, state, platform);
         if (state.running) {
             emu_update(controller, state);
-            render_ui(layout, runtime);
+            render_ui(layout, runtime, state);
         }
         state.clock.tickEnd();
     } while (state.running);

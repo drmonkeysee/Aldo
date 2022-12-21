@@ -9,16 +9,13 @@
 #define Aldo_gui_viewstate_hpp
 
 #include "ctrlsignal.h"
-#include "cycleclock.h"
-#include "snapshot.h"
-#include "tsutil.h"
+#include "runclock.hpp"
 
 #include <SDL2/SDL.h>
 
 #include <queue>
 #include <utility>
 #include <variant>
-#include <ctime>
 
 namespace aldo
 {
@@ -46,32 +43,6 @@ struct event {
         csig_excmode,
         interrupt_event
     > value;
-};
-
-struct runclock {
-    void start()
-    {
-        cycleclock_start(&cyclock);
-    }
-
-    void tickStart(const console_state& snapshot)
-    {
-        cycleclock_tickstart(&cyclock, !snapshot.lines.ready);
-    }
-
-    void markDtUpdate()
-    {
-        const std::timespec elapsed = timespec_elapsed(&cyclock.current);
-        dtUpdateMs = timespec_to_ms(&elapsed);
-    }
-
-    void tickEnd()
-    {
-        cycleclock_tickend(&cyclock);
-    }
-
-    cycleclock cyclock{.cycles_per_sec = 4};
-    double dtUpdateMs = 0;
 };
 
 struct viewstate {

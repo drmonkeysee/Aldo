@@ -6,9 +6,6 @@
 //
 
 import AppKit
-import os
-
-let aldoLog = Logger()
 
 final class MacPlatform: NSObject {
     @objc static func setup(_ platform: PlatformHandle,

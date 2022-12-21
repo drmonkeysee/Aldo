@@ -55,20 +55,31 @@ private:
     double& result;
 };
 
+class RunTick final {
+public:
+    RunTick(cycleclock& c, bool resetBudget) noexcept : cyclock{c}
+    {
+        cycleclock_tickstart(&cyclock, resetBudget);
+    }
+    RunTick(const RunTick&) = delete;
+    RunTick& operator=(const RunTick&) = delete;
+    RunTick(RunTick&&) = delete;
+    RunTick& operator=(RunTick&&) = delete;
+    ~RunTick() { cycleclock_tickend(&cyclock); }
+
+private:
+    cycleclock& cyclock;
+};
+
 struct runclock {
     void start() noexcept
     {
         cycleclock_start(&cyclock);
     }
 
-    void tickStart(bool resetBudget) noexcept
+    RunTick startTick(bool resetBudget) noexcept
     {
-        cycleclock_tickstart(&cyclock, resetBudget);
-    }
-
-    void tickEnd() noexcept
-    {
-        cycleclock_tickend(&cyclock);
+        return RunTick(cyclock, resetBudget);
     }
 
     RunTimer timeInput() noexcept { return RunTimer{dtInputMs}; }

@@ -59,13 +59,13 @@ auto runloop(const gui_platform& platform, debugctx* debug, nes* console)
     const aldo::Layout layout{state, controller, runtime};
     state.clock.start();
     do {
-        state.clock.tickStart(!controller.snapshot().lines.ready);
+        const auto ready = controller.snapshot().lines.ready;
+        const auto tick = state.clock.startTick(!ready);
         handle_input(controller, state, platform);
         if (state.running) {
             emu_update(controller, state);
             render_ui(layout, runtime, state);
         }
-        state.clock.tickEnd();
     } while (state.running);
 }
 

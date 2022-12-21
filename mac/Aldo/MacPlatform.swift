@@ -27,9 +27,12 @@ final class MacPlatform: NSObject {
 
 final class CartInspector {
     private lazy var controller = {
-        let win = NSWindow(contentViewController: createCartInspectorView())
-        win.title = "Cart Inspector"
-        return NSWindowController(window: win)
+        let c = NSWindowController(window:
+                                    NSWindow(contentViewController:
+                                                createCartInspectorView()))
+        c.windowFrameAutosaveName = "AldoSwiftCartInspector"
+        c.window?.title = "Cart Inspector"
+        return c
     }()
 
     func activateWindow() { controller.showWindow(nil) }

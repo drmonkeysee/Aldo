@@ -36,14 +36,12 @@ final class ClipboardCopy: TimedFeedbackCommand {
 
 final class ChrExport: TimedFeedbackCommand {
     let cart: Cart
-    let scales = Array(1...10)// TODO: Int(MinChrScale)...Int(MaxChrScale))
+    let scales = Array(MinChrScale...MaxChrScale)
     @Published var scale = ChrSheet.scale
     @Published var folderAvailable = false
     private(set) var selectedFolder: URL?
 
-    init(_ cart: Cart) {
-        self.cart = cart
-    }
+    init(_ cart: Cart) { self.cart = cart }
 
     @MainActor
     func export(to: URL?) async {

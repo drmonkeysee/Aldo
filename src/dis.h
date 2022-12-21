@@ -54,6 +54,9 @@ struct dis_instruction {
 //
 
 br_libexport
+extern const int MinChrScale, MaxChrScale;
+
+br_libexport
 const char *dis_errstr(int err);
 
 // NOTE: parsed will be zeroed-out if return value is <= 0

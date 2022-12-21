@@ -9,6 +9,7 @@
 
 #include "bytes.h"
 #include "debug.h"
+#include "dis.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -46,11 +47,7 @@ static const char
     VersionShort = 'V',
     ZeroRamShort = 'z';
 
-static const int
-    MinAddress = 0,
-    MaxAddress = ADDRMASK_64KB,
-    MinChrScale = 1,
-    MaxChrScale = 10;
+static const int MinAddress = 0, MaxAddress = ADDRMASK_64KB;
 
 static void init_cliargs(struct cliargs *args)
 {

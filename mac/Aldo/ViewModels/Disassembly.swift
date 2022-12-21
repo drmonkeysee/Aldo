@@ -226,8 +226,7 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
         if err < 0 {
             done = true
             return .failure(addr, .wrapDisError(code: err))
-        }
-        else if err == 0 {
+        } else if err == 0 {
             done = true
             // NOTE: always print the last line even if it would
             // normally be skipped.

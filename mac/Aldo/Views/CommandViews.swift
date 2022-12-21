@@ -44,9 +44,7 @@ struct CopyToClipboardView: TimedFeedbackCommandView {
 struct ChrExportView: TimedFeedbackCommandView {
     @ObservedObject var command: ChrExport
 
-    init(_ cart: Cart) {
-        command = .init(cart)
-    }
+    init(_ cart: Cart) { command = .init(cart) }
 
     var body: some View {
         HStack {

@@ -79,9 +79,7 @@ final class Cart: ObservableObject {
                 let err = dis_cart_chr(h.unwrapped, Int32(scale), chrprefix,
                                        stream)
                 if err < 0 {
-                    if err == DIS_ERR_ERNO {
-                        throw AldoError.ioErrno
-                    }
+                    if err == DIS_ERR_ERNO { throw AldoError.ioErrno }
                     throw AldoError.wrapDisError(code: err)
                 }
             }

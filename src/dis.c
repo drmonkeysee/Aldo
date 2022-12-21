@@ -476,6 +476,8 @@ static int write_chrblock(const struct blockview *bv, uint32_t scale,
 // Public Interface
 //
 
+const int MinChrScale = 1, MaxChrScale = 10;
+
 const char *dis_errstr(int err)
 {
     switch (err) {

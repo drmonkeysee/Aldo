@@ -86,16 +86,10 @@ fileprivate func activateInspector(_ ctx: UnsafeMutableRawPointer?) {
 
 fileprivate func displayError(title: CString?, message: CString?) -> Bool {
     let modal = NSAlert()
-    if let titlep = title {
-        modal.messageText = .init(cString: titlep)
-    } else {
-        modal.messageText = "INVALID TITLE"
-    }
-    if let messagep = message {
-        modal.informativeText = .init(cString: messagep)
-    } else {
-        modal.informativeText = "INVALID MESSAGE"
-    }
+    modal.messageText = title == nil ? "INVALID TITLE" : .init(cString: title!)
+    modal.informativeText = message == nil
+                            ? "INVALID MESSAGE"
+                            : .init(cString: message!)
     modal.alertStyle = .warning
     return modal.runModal() == .OK
 }

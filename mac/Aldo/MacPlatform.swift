@@ -26,19 +26,7 @@ final class MacPlatform: NSObject {
 }
 
 final class CartInspector {
-    private lazy var controller = {
-        let comp = createCartInspectorComposition()
-        // NOTE: it seems to matter that window+controller are bound together
-        // before setting any window properties, so always access window
-        // from its controller.
-        let c = NSWindowController(window: NSWindow(contentViewController:
-                                                        comp.content))
-        c.windowFrameAutosaveName = "AldoSwiftCartInspector"
-        c.window?.title = "Cart Inspector"
-        c.window?.toolbar = .init()
-        c.window?.addTitlebarAccessoryViewController(comp.accessory)
-        return c
-    }()
+    private lazy var controller = { createCartInspectorController() }()
 
     func activateWindow() { controller.showWindow(nil) }
 

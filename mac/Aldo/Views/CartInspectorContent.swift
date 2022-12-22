@@ -7,16 +7,25 @@
 
 import SwiftUI
 
-typealias InspectorComposition = (content: NSViewController,
-                                  accessory: NSTitlebarAccessoryViewController)
+func createCartInspectorController() -> NSWindowController {
+    let contentView = CartInspectorView()
 
-func createCartInspectorComposition() -> InspectorComposition {
-    let v = CartInspectorView()
-    let c = NSTitlebarAccessoryViewController()
-    c.view = NSHostingView(rootView: v.createToolbarView())
-    c.view.frame.size = c.view.fittingSize
-    c.layoutAttribute = .trailing
-    return (NSHostingController(rootView: v), c)
+    // NOTE: it seems to matter that window+controller are bound together
+    // before setting any window properties, so always access window
+    // from its controller.
+    let c = NSWindowController(window: NSWindow(
+        contentViewController: NSHostingController(rootView: contentView)))
+    c.windowFrameAutosaveName = "AldoSwiftCartInspector"
+    c.window?.title = "Cart Inspector"
+    c.window?.toolbar = .init()
+
+    let accessory = NSTitlebarAccessoryViewController()
+    accessory.view = NSHostingView(rootView: contentView.createToolbarView())
+    accessory.view.frame.size = accessory.view.fittingSize
+    accessory.layoutAttribute = .trailing
+    c.window?.addTitlebarAccessoryViewController(accessory)
+
+    return c
 }
 
 fileprivate struct CartInspectorView: View {

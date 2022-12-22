@@ -19,11 +19,11 @@
 #include <stdlib.h>
 
 // NOTE: this function uses preprocessor macros and can't bridge to Swift
-static float render_scale_factor(void *sdl_win)
+static float render_scale_factor(void *sdlwindow)
 {
     SDL_SysWMinfo winfo;
     SDL_VERSION(&winfo.version);
-    if (SDL_GetWindowWMInfo(sdl_win, &winfo)) {
+    if (SDL_GetWindowWMInfo(sdlwindow, &winfo)) {
         if (winfo.subsystem == SDL_SYSWM_COCOA) {
             NSWindow *const native = winfo.info.cocoa.window;
             return (float)native.backingScaleFactor;

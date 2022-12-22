@@ -79,7 +79,7 @@ fileprivate func openFile() -> CBuffer? {
     }
 }
 
-fileprivate func activateInspector(_ ctx: UnsafeMutableRawPointer?) {
+fileprivate func activateInspector(_ ctx: PlatformCtx?) {
     guard let p = ctx else {
         aldoLog.warning("Nil context on inspector activate")
         return
@@ -103,7 +103,7 @@ fileprivate func freeBuffer(_ buffer: CBuffer?) {
     buffer?.deallocate()
 }
 
-fileprivate func cleanup(ctx: ContextHandle?) {
+fileprivate func cleanup(ctx: PlatformCtxHandle?) {
     guard let p = ctx?.pointee else { return }
     let _: CartInspector = Unmanaged.fromOpaque(p).takeRetainedValue()
     ctx?.pointee = nil

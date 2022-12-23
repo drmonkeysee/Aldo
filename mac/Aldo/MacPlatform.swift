@@ -6,6 +6,16 @@
 //
 
 import AppKit
+import os
+
+typealias CBuffer = UnsafeMutablePointer<CChar>
+typealias CString = UnsafePointer<CChar>
+
+typealias PlatformHandle = UnsafeMutablePointer<gui_platform>
+typealias PlatformRenderFunc =
+    @convention(c) (UnsafeMutableRawPointer?) -> Float
+
+let aldoLog = Logger()
 
 final class MacPlatform: NSObject {
     @objc static func setup(_ platform: PlatformHandle,
@@ -15,11 +25,9 @@ final class MacPlatform: NSObject {
                                  is_hidpi: isHiDPI,
                                  render_scale_factor: withScaleFunc,
                                  open_file: openFile,
-                                 activate_cart_inspector: activateInspector,
+                                 launch_studio: launchStudio,
                                  display_error: displayError,
-                                 free_buffer: freeBuffer,
-                                 cleanup: cleanup,
-                                 ctx: nil)
+                                 free_buffer: freeBuffer)
         return true
     }
 }
@@ -58,7 +66,7 @@ fileprivate func openFile() -> CBuffer? {
     }
 }
 
-fileprivate func activateInspector(_ ctx: PlatformCtx?) {
+fileprivate func launchStudio() {
     aldoLog.warning("Not implemented")
 }
 
@@ -74,10 +82,6 @@ fileprivate func displayError(title: CString?, message: CString?) -> Bool {
 
 fileprivate func freeBuffer(_ buffer: CBuffer?) {
     buffer?.deallocate()
-}
-
-fileprivate func cleanup(ctx: PlatformCtxHandle?) {
-    aldoLog.warning("Not implemented")
 }
 
 //

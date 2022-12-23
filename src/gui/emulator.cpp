@@ -151,7 +151,7 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
 {
     switch (ev.cmd) {
     case aldo::Command::activateCartInspector:
-        p.activate_cart_inspector(p.ctx);
+        p.launch_studio();
         break;
     case aldo::Command::halt:
         if (std::get<bool>(ev.value)) {

@@ -15,11 +15,9 @@ struct gui_platform {
     bool (*is_hidpi)(void);
     float (*render_scale_factor)(void *);
     char *(*open_file)(void);
-    void (*activate_cart_inspector)(void *);
+    void (*launch_studio)(void);
     bool (*display_error)(const char *, const char *);
     void (*free_buffer)(char *);
-    void (*cleanup)(void **ctx);
-    void *ctx;
 };
 
 #endif

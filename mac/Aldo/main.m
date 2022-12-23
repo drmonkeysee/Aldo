@@ -48,7 +48,6 @@ static int run_app(void)
         return EXIT_FAILURE;
     }
     const int result = gui_run(&platform);
-    platform.cleanup(&platform.ctx);
     return result;
 }
 

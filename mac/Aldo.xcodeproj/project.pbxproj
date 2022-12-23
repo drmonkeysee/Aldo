@@ -280,6 +280,7 @@
 		C8B3A9C0295535F4009C1770 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C8B3A9C5295535F4009C1770 /* AldoStudio.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AldoStudio.entitlements; sourceTree = "<group>"; };
 		C8B3A9D829553D23009C1770 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
+		C8B3A9DA29553F4C009C1770 /* AldoStudio-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AldoStudio-Bridging-Header.h"; sourceTree = "<group>"; };
 		C8B4664327755790000576EE /* argparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = argparse.h; sourceTree = "<group>"; };
 		C8B4664427755790000576EE /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8B5303A2801300C00576D9F /* CartFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartFocusView.swift; sourceTree = "<group>"; };
@@ -621,6 +622,7 @@
 			isa = PBXGroup;
 			children = (
 				C8264C5A294FF4DE004CD6A5 /* ViewModels */,
+				C8B3A9DA29553F4C009C1770 /* AldoStudio-Bridging-Header.h */,
 				C8B3A9BC295535F3009C1770 /* AldoStudioApp.swift */,
 				C838D3B627D5DB0300468FDB /* CartChrView.swift */,
 				C8B5303A2801300C00576D9F /* CartFocusView.swift */,
@@ -779,6 +781,7 @@
 					};
 					C8B3A9B9295535F3009C1770 = {
 						CreatedOnToolsVersion = 14.2;
+						LastSwiftMigration = 1420;
 					};
 					C8B88AA32906277800B7CB23 = {
 						CreatedOnToolsVersion = 14.0.1;
@@ -1331,6 +1334,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/AldoStudio-Bridging-Header.h";
 			};
 			name = Debug;
 		};
@@ -1361,6 +1365,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/AldoStudio-Bridging-Header.h";
 			};
 			name = Release;
 		};

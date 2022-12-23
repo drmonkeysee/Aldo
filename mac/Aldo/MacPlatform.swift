@@ -37,7 +37,7 @@ final class MacPlatform: NSObject {
 //
 
 fileprivate func appName() -> CBuffer? {
-    guard let displayName = bundleName() as? String,
+    guard let displayName = bundleName(),
           let cstring = displayName.cString(using: .utf8) else {
         return nil
     }
@@ -47,7 +47,7 @@ fileprivate func appName() -> CBuffer? {
 }
 
 fileprivate func isHiDPI() -> Bool {
-    guard let hidpi = bundleHighRes() as? Bool else { return false }
+    guard let hidpi = bundleHighRes() else { return false }
     return hidpi
 }
 
@@ -80,18 +80,17 @@ fileprivate func displayError(title: CString?, message: CString?) -> Bool {
     return modal.runModal() == .OK
 }
 
-fileprivate func freeBuffer(_ buffer: CBuffer?) {
-    buffer?.deallocate()
-}
+fileprivate func freeBuffer(_ buffer: CBuffer?) { buffer?.deallocate() }
 
 //
 // Helpers
 //
 
-fileprivate func bundleName() -> Any? {
-    Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName")
+fileprivate func bundleName() -> String? {
+    Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
 }
 
-fileprivate func bundleHighRes() -> Any? {
+fileprivate func bundleHighRes() -> Bool? {
     Bundle.main.object(forInfoDictionaryKey: "NSHighResolutionCapable")
+        as? Bool
 }

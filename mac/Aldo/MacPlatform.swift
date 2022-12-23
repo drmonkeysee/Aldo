@@ -66,36 +66,43 @@ fileprivate func openFile() -> CBuffer? {
     }
 }
 
+fileprivate let openStudioErrorTitle = "Open Studio Error"
+
 fileprivate func launchStudio() {
     guard let studioUrl = Bundle.main.url(
             forAuxiliaryExecutable: "AldoStudio.app") else {
-        aldoLog.error("Unable to find Aldo Studio app bundle")
+        let msg = "Unable to find Aldo Studio app bundle"
+        aldoLog.error("Studio URL Error: \(msg)")
+        let _ = aldoAlert(title: openStudioErrorTitle, message: msg)
         return
     }
     aldoLog.debug("Studio bundle located at \(studioUrl)")
+    let config = NSWorkspace.OpenConfiguration()
+    config.promptsUserIfNeeded = false
     NSWorkspace.shared.openApplication(at: studioUrl,
-                                       configuration: .init()) { _, err in
+                                       configuration: config) { _, err in
         if let err {
             aldoLog.error(
-                "Error opening Aldo Studio: \(err.localizedDescription)")
+                "Aldo Studio Launch Error: \(err.localizedDescription)")
+            Task { @MainActor in
+                let _ = aldoAlert(title: openStudioErrorTitle,
+                                  message: err.localizedDescription)
+            }
         }
     }
 }
 
 fileprivate func displayError(title: CString?, message: CString?) -> Bool {
-    let modal = NSAlert()
+    var titleStr: String? = nil
+    var msgStr: String? = nil
     if let title {
-        modal.messageText = .init(cString: title)
-    } else {
-        modal.messageText = "INVALID TITLE"
+        titleStr = .init(cString: title)
     }
     if let message {
-        modal.informativeText = .init(cString: message)
-    } else {
-        modal.informativeText = "INVALID MESSAGE"
+        msgStr = .init(cString: message)
     }
-    modal.alertStyle = .warning
-    return modal.runModal() == .OK
+    return aldoAlert(title: titleStr ?? "INVALID TITLE",
+                     message: msgStr ?? "INVALID MESSAGE")
 }
 
 fileprivate func freeBuffer(_ buffer: CBuffer?) { buffer?.deallocate() }
@@ -103,6 +110,14 @@ fileprivate func freeBuffer(_ buffer: CBuffer?) { buffer?.deallocate() }
 //
 // Helpers
 //
+
+fileprivate func aldoAlert(title: String, message: String) -> Bool {
+    let modal = NSAlert()
+    modal.messageText = title
+    modal.informativeText = message
+    modal.alertStyle = .warning
+    return modal.runModal() == .OK
+}
 
 fileprivate func bundleName() -> String? {
     Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String

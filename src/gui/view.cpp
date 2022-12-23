@@ -99,8 +99,8 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
             ImGui::MenuItem("CPU", nullptr, &s.showCpu);
             ImGui::Separator();
             ImGui::MenuItem("ImGui Demo", nullptr, &s.showDemo);
-            if (ImGui::MenuItem("Cart Inspector")) {
-                s.events.emplace(aldo::Command::activateCartInspector);
+            if (ImGui::MenuItem("Aldo Studio")) {
+                s.events.emplace(aldo::Command::launchStudio);
             }
             ImGui::EndMenu();
         }

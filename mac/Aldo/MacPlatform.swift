@@ -67,7 +67,19 @@ fileprivate func openFile() -> CBuffer? {
 }
 
 fileprivate func launchStudio() {
-    aldoLog.warning("Not implemented")
+    guard let studioUrl = Bundle.main.url(
+            forAuxiliaryExecutable: "AldoStudio.app") else {
+        aldoLog.error("Unable to find Aldo Studio app bundle")
+        return
+    }
+    aldoLog.debug("Studio bundle located at \(studioUrl)")
+    NSWorkspace.shared.openApplication(at: studioUrl,
+                                       configuration: .init()) { _, err in
+        if let err = err {
+            aldoLog.error(
+                "Error opening Aldo Studio: \(err.localizedDescription)")
+        }
+    }
 }
 
 fileprivate func displayError(title: CString?, message: CString?) -> Bool {

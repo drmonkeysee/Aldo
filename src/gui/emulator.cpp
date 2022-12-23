@@ -150,7 +150,7 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
                                        const gui_platform& p)
 {
     switch (ev.cmd) {
-    case aldo::Command::activateCartInspector:
+    case aldo::Command::launchStudio:
         p.launch_studio();
         break;
     case aldo::Command::halt:

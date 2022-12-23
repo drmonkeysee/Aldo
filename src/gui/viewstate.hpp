@@ -21,10 +21,10 @@ namespace aldo
 {
 
 enum class Command {
-    activateCartInspector,
     halt,
     interrupt,
     mode,
+    launchStudio,
     openFile,
     quit,
 };

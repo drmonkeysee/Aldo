@@ -19,18 +19,9 @@ final class MacPlatform: NSObject {
                                  display_error: displayError,
                                  free_buffer: freeBuffer,
                                  cleanup: cleanup,
-                                 ctx: Unmanaged.passRetained(CartInspector())
-                                        .toOpaque())
+                                 ctx: nil)
         return true
     }
-}
-
-final class CartInspector {
-    private lazy var controller = { createCartInspectorController() }()
-
-    func activateWindow() { controller.showWindow(nil) }
-
-    deinit { aldoLog.debug("Cart Inspector Cleanup") }
 }
 
 //
@@ -68,13 +59,7 @@ fileprivate func openFile() -> CBuffer? {
 }
 
 fileprivate func activateInspector(_ ctx: PlatformCtx?) {
-    guard let p = ctx else {
-        aldoLog.warning("Nil context on inspector activate")
-        return
-    }
-    let inspector: CartInspector = Unmanaged.fromOpaque(p)
-                                    .takeUnretainedValue()
-    inspector.activateWindow()
+    aldoLog.warning("Not implemented")
 }
 
 fileprivate func displayError(title: CString?, message: CString?) -> Bool {
@@ -92,9 +77,7 @@ fileprivate func freeBuffer(_ buffer: CBuffer?) {
 }
 
 fileprivate func cleanup(ctx: PlatformCtxHandle?) {
-    guard let p = ctx?.pointee else { return }
-    let _: CartInspector = Unmanaged.fromOpaque(p).takeRetainedValue()
-    ctx?.pointee = nil
+    aldoLog.warning("Not implemented")
 }
 
 //

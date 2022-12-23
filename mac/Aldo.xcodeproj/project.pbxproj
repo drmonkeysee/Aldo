@@ -63,6 +63,7 @@
 		C8B3A9D329553BCD009C1770 /* Cart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A5B77A27DD79AE00A4DD5E /* Cart.swift */; };
 		C8B3A9D429553BD0009C1770 /* AldoError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8FB31D02803D6EC00E6B0EF /* AldoError.swift */; };
 		C8B3A9D929553D23009C1770 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B3A9D829553D23009C1770 /* Common.swift */; };
+		C8B3A9DD295540B4009C1770 /* libaldo.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B88AA42906277800B7CB23 /* libaldo.dylib */; };
 		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8B88A8A29061C3500B7CB23 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8B88A8B29061C3800B7CB23 /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* cli.c */; };
@@ -365,6 +366,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8B3A9DD295540B4009C1770 /* libaldo.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

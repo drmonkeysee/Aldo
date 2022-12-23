@@ -8,7 +8,6 @@
 import Foundation
 import os
 
-typealias CBuffer = UnsafeMutablePointer<CChar>
 typealias CInstPtr = UnsafePointer<dis_instruction>
 typealias CStream = UnsafeMutablePointer<FILE>
 typealias CStreamOp = (CStream) throws -> Void

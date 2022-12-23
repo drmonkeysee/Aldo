@@ -65,6 +65,8 @@ enum PrgLine {
 }
 
 struct Instruction {
+    private static let errStr = "ERR"
+
     static func parse(_ instData: dis_instruction) -> Self {
         withUnsafePointer(to: instData) { p in
                 .init(addressMode: .init(cString: dis_inst_addrmode(p)),
@@ -94,15 +96,20 @@ struct Instruction {
     }
 
     private static func getOperand(_ p: CInstPtr)-> String {
-        let buffer = CBuffer.allocate(capacity: DIS_OPERAND_SIZE)
-        defer { buffer.deallocate() }
-        let err = dis_inst_operand(p, buffer)
-        if err < 0 {
-            let msg = AldoError.wrapDisError(code: err).message
-            aldoLog.debug("Operand Parse Error: \(msg)")
-            return "ERR"
-        }
-        return .init(cString: buffer)
+        return withUnsafeTemporaryAllocation(
+            of: CChar.self, capacity: DIS_OPERAND_SIZE) { buffer in
+                guard let bufferp = buffer.baseAddress else {
+                    aldoLog.debug("Invalid buffer pointer")
+                    return Self.errStr
+                }
+                let err = dis_inst_operand(p, bufferp)
+                if err < 0 {
+                    let msg = AldoError.wrapDisError(code: err).message
+                    aldoLog.debug("Operand Parse Error: \(msg)")
+                    return Self.errStr
+                }
+                return String(cString: bufferp)
+            }
     }
 
     let addressMode: String

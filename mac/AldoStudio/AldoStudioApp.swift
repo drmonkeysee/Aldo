@@ -1,6 +1,6 @@
 //
 //  AldoStudioApp.swift
-//  AldoStudio
+//  Aldo-Studio
 //
 //  Created by Brandon Stansbury on 12/22/22.
 //

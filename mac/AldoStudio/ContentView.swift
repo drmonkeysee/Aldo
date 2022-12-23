@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  AldoStudio
+//  Aldo-Studio
 //
 //  Created by Brandon Stansbury on 12/22/22.
 //
@@ -16,11 +16,5 @@ struct ContentView: View {
             Text("Hello, world!")
         }
         .padding()
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
     }
 }

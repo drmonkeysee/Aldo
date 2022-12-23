@@ -60,6 +60,10 @@
 		C882854829403C2100BAC249 /* error.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C882854629403C2100BAC249 /* error.cpp */; };
 		C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C88CABDC28FA4DDD00551C65 /* uisdl.cpp */; };
 		C894F0EF2945850E00C6575F /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C894F0ED2945850E00C6575F /* view.cpp */; };
+		C8B3A9BD295535F3009C1770 /* AldoStudioApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B3A9BC295535F3009C1770 /* AldoStudioApp.swift */; };
+		C8B3A9BF295535F3009C1770 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B3A9BE295535F3009C1770 /* ContentView.swift */; };
+		C8B3A9C1295535F4009C1770 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8B3A9C0295535F4009C1770 /* Assets.xcassets */; };
+		C8B3A9C4295535F4009C1770 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8B3A9C3295535F4009C1770 /* Preview Assets.xcassets */; };
 		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8B88A8A29061C3500B7CB23 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8B88A8B29061C3800B7CB23 /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* cli.c */; };
@@ -272,6 +276,12 @@
 		C894F0EE2945850E00C6575F /* view.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = view.hpp; sourceTree = "<group>"; };
 		C89D714F27D4758900C9177A /* CartPrgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartPrgView.swift; sourceTree = "<group>"; };
 		C8A5B77A27DD79AE00A4DD5E /* Cart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cart.swift; sourceTree = "<group>"; };
+		C8B3A9BA295535F3009C1770 /* AldoStudio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AldoStudio.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8B3A9BC295535F3009C1770 /* AldoStudioApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoStudioApp.swift; sourceTree = "<group>"; };
+		C8B3A9BE295535F3009C1770 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C8B3A9C0295535F4009C1770 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C8B3A9C3295535F4009C1770 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C8B3A9C5295535F4009C1770 /* AldoStudio.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AldoStudio.entitlements; sourceTree = "<group>"; };
 		C8B4664327755790000576EE /* argparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = argparse.h; sourceTree = "<group>"; };
 		C8B4664427755790000576EE /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8B5303A2801300C00576D9F /* CartFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartFocusView.swift; sourceTree = "<group>"; };
@@ -352,6 +362,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C8B3A9B7295535F3009C1770 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C8B88AA22906277800B7CB23 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -418,6 +435,7 @@
 				C830036128DEDDD100480F29 /* Aldo.app */,
 				C8D3CA002904E1BD0087316F /* aldoc */,
 				C8B88AA42906277800B7CB23 /* libaldo.dylib */,
+				C8B3A9BA295535F3009C1770 /* AldoStudio.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -586,6 +604,7 @@
 				C830036228DEDDD100480F29 /* Aldo */,
 				C820E6BE25A9759A006A7AB1 /* Dev */,
 				C8184D3C25E7496B002B3100 /* Tests */,
+				C8B3A9BB295535F3009C1770 /* AldoStudio */,
 				C820E6DD25A982A5006A7AB1 /* Frameworks */,
 				C820E6BD25A9759A006A7AB1 /* Products */,
 			);
@@ -614,6 +633,26 @@
 				C8EC7222291615AB00DF750A /* viewstate.hpp */,
 			);
 			path = gui;
+			sourceTree = "<group>";
+		};
+		C8B3A9BB295535F3009C1770 /* AldoStudio */ = {
+			isa = PBXGroup;
+			children = (
+				C8B3A9BC295535F3009C1770 /* AldoStudioApp.swift */,
+				C8B3A9BE295535F3009C1770 /* ContentView.swift */,
+				C8B3A9C0295535F4009C1770 /* Assets.xcassets */,
+				C8B3A9C5295535F4009C1770 /* AldoStudio.entitlements */,
+				C8B3A9C2295535F4009C1770 /* Preview Content */,
+			);
+			path = AldoStudio;
+			sourceTree = "<group>";
+		};
+		C8B3A9C2295535F4009C1770 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				C8B3A9C3295535F4009C1770 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -684,6 +723,23 @@
 			productReference = C830036128DEDDD100480F29 /* Aldo.app */;
 			productType = "com.apple.product-type.application";
 		};
+		C8B3A9B9295535F3009C1770 /* AldoStudio */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C8B3A9C8295535F4009C1770 /* Build configuration list for PBXNativeTarget "AldoStudio" */;
+			buildPhases = (
+				C8B3A9B6295535F3009C1770 /* Sources */,
+				C8B3A9B7295535F3009C1770 /* Frameworks */,
+				C8B3A9B8295535F3009C1770 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AldoStudio;
+			productName = AldoStudio;
+			productReference = C8B3A9BA295535F3009C1770 /* AldoStudio.app */;
+			productType = "com.apple.product-type.application";
+		};
 		C8B88AA32906277800B7CB23 /* Lib */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C8B88AA52906277800B7CB23 /* Build configuration list for PBXNativeTarget "Lib" */;
@@ -725,7 +781,7 @@
 		C85E8ADA25A9747800FF0025 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1320;
+				LastSwiftUpdateCheck = 1420;
 				LastUpgradeCheck = 1410;
 				TargetAttributes = {
 					C8184D3A25E7496B002B3100 = {
@@ -739,6 +795,9 @@
 					C830036028DEDDD100480F29 = {
 						CreatedOnToolsVersion = 14.0;
 						LastSwiftMigration = 1420;
+					};
+					C8B3A9B9295535F3009C1770 = {
+						CreatedOnToolsVersion = 14.2;
 					};
 					C8B88AA32906277800B7CB23 = {
 						CreatedOnToolsVersion = 14.0.1;
@@ -766,6 +825,7 @@
 				C8B88AA32906277800B7CB23 /* Lib */,
 				C820E6BB25A9759A006A7AB1 /* Dev */,
 				C8184D3A25E7496B002B3100 /* Tests */,
+				C8B3A9B9295535F3009C1770 /* AldoStudio */,
 			);
 		};
 /* End PBXProject section */
@@ -783,6 +843,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				C830036728DEDDD200480F29 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C8B3A9B8295535F3009C1770 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C8B3A9C4295535F4009C1770 /* Preview Assets.xcassets in Resources */,
+				C8B3A9C1295535F4009C1770 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -888,6 +957,15 @@
 				C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */,
 				C854873A28E685D00045BA42 /* imgui.cpp in Sources */,
 				C882854829403C2100BAC249 /* error.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C8B3A9B6295535F3009C1770 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C8B3A9BF295535F3009C1770 /* ContentView.swift in Sources */,
+				C8B3A9BD295535F3009C1770 /* AldoStudioApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1246,6 +1324,76 @@
 			};
 			name = Release;
 		};
+		C8B3A9C6295535F4009C1770 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_ENTITLEMENTS = AldoStudio/AldoStudio.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"AldoStudio/Preview Content\"";
+				DEVELOPMENT_TEAM = PC9FS9P8R2;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.AldoStudio;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		C8B3A9C7295535F4009C1770 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_ENTITLEMENTS = AldoStudio/AldoStudio.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"AldoStudio/Preview Content\"";
+				DEVELOPMENT_TEAM = PC9FS9P8R2;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.AldoStudio;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		C8B88AA62906277800B7CB23 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1375,6 +1523,15 @@
 			buildConfigurations = (
 				C85E8ADE25A9747800FF0025 /* Debug */,
 				C85E8ADF25A9747800FF0025 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C8B3A9C8295535F4009C1770 /* Build configuration list for PBXNativeTarget "AldoStudio" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C8B3A9C6295535F4009C1770 /* Debug */,
+				C8B3A9C7295535F4009C1770 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

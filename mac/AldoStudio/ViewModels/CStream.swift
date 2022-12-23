@@ -46,7 +46,7 @@ func readCStream(binary: Bool = false,
     } catch {
         return .error(.systemError(error.localizedDescription))
     }
-    if let err = cleanupError { return err }
+    if let cleanupError { return cleanupError }
 
     var streamData = Data()
     for await d in asyncStream { streamData.append(d) }

@@ -119,9 +119,9 @@ fileprivate struct PrgLineBackground: View {
     let line: PrgLine
 
     var body: some View {
-        if let c = bgColor {
+        if let bgColor {
             RoundedRectangle(cornerRadius: 5)
-                .fill(c)
+                .fill(bgColor)
                 .opacity(0.3)
         }
     }

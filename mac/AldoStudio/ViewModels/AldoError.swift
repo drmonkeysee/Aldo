@@ -33,7 +33,7 @@ enum AldoError: Error {
         case let .disErr(code, sysErr):
             var msg = String(format: Self.errCodeFormat, dis_errstr(code),
                              code)
-            if let se = sysErr { msg.append(": \(se)") }
+            if let sysErr { msg.append(": \(sysErr)") }
             return msg
         }
     }

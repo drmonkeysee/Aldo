@@ -28,8 +28,8 @@ final class ProgramListing: ObservableObject {
     private let store: PrgStore
 
     var currentLine: PrgLine? {
-        if let line = selectedLine, let block = store.cache[index] {
-            return block[line]
+        if let selectedLine, let block = store.cache[index] {
+            return block[selectedLine]
         }
         return nil
     }
@@ -204,8 +204,8 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
     private var skip = false
 
     init?(_ prgblock: blockview?) {
-        guard let pb = prgblock, pb.size > 0 else { return nil }
-        bv = pb
+        guard let prgblock, prgblock.size > 0 else { return nil }
+        bv = prgblock
         // NOTE: by convention, count backwards from CPU vector locations
         addr = .init(MEMBLOCK_64KB - bv.size)
     }

@@ -58,9 +58,9 @@ fileprivate actor ChrStore {
         switch result {
         case let .success(data):
             let chrSheet = NSImage(data: data)
-            if let img = chrSheet, img.isValid {
-                cache[at] = img
-                return .loaded(img)
+            if let chrSheet, chrSheet.isValid {
+                cache[at] = chrSheet
+                return .loaded(chrSheet)
             }
             let reason = chrSheet == nil
                             ? "Image init failed"

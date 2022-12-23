@@ -75,7 +75,7 @@ fileprivate func launchStudio() {
     aldoLog.debug("Studio bundle located at \(studioUrl)")
     NSWorkspace.shared.openApplication(at: studioUrl,
                                        configuration: .init()) { _, err in
-        if let err = err {
+        if let err {
             aldoLog.error(
                 "Error opening Aldo Studio: \(err.localizedDescription)")
         }

@@ -45,13 +45,13 @@ final class ChrExport: TimedFeedbackCommand {
 
     @MainActor
     func export(to: URL?) async {
-        guard let folder = to else { return }
+        guard let to else { return }
 
         inProgress = true
         folderAvailable = false
         currentError = nil
-        selectedFolder = folder
-        let result = await cart.exportChrRom(scale: scale, folder: folder)
+        selectedFolder = to
+        let result = await cart.exportChrRom(scale: scale, folder: to)
         switch result {
         case let .success(data):
             if let text = String(data: data, encoding: .utf8) {

@@ -86,7 +86,7 @@ fileprivate struct InstructionDefinitionView: View {
     }
 
     private func displayByte(_ byte: UInt8?) -> String {
-        if let b = byte { return .init(format: "(%02X)", b) }
+        if let byte { return .init(format: "(%02X)", byte) }
         return ""
     }
 }

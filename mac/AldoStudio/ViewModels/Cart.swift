@@ -21,47 +21,48 @@ final class Cart: ObservableObject {
 
     func load(from: URL?) -> Bool {
         currentError = nil
-        guard let filePath = from else {
+        guard let from else {
             currentError = .ioError("No file selected")
             return false
         }
-        guard let h = loadCart(filePath) else { return false }
+        guard let h = loadCart(from) else { return false }
         handle = h
-        file = filePath
+        file = from
         info = h.cartInfo
         resetCaches()
         return true
     }
 
     func readInfoText() async -> CStreamResult {
-        guard let h = handle else { return noCart }
+        guard let handle else { return noCart }
 
         return await readCStream {
-            cart_write_info(h.unwrapped, name, true, $0)
+            cart_write_info(handle.unwrapped, name, true, $0)
         }
     }
 
     func getPrgBlock(_ at: Int) -> blockview? {
-        guard let h = handle else { return nil }
-        return cart_prgblock(h.unwrapped, at)
+        guard let handle else { return nil }
+        return cart_prgblock(handle.unwrapped, at)
     }
 
     func readPrgRom() async -> CStreamResult {
-        guard let n = fileName, let h = handle else { return noCart }
+        guard let fileName, let handle else { return noCart }
 
         return await readCStream { stream in
-            try n.withCString { cartFile in
-                let err = dis_cart_prg(h.unwrapped, name, false, true, stream)
+            try fileName.withCString { cartFile in
+                let err = dis_cart_prg(handle.unwrapped, name, false, true,
+                                       stream)
                 if err < 0 { throw AldoError.wrapDisError(code: err) }
             }
         }
     }
 
     func readChrBlock(at: Int, scale: Int) async -> CStreamResult {
-        guard let h = handle else { return noCart }
+        guard let handle else { return noCart }
 
         return await readCStream(binary: true) { stream in
-            let bv = cart_chrblock(h.unwrapped, at)
+            let bv = cart_chrblock(handle.unwrapped, at)
             let err = withUnsafePointer(to: bv) {
                 dis_cart_chrbank($0, .init(scale), stream)
             }
@@ -70,14 +71,14 @@ final class Cart: ObservableObject {
     }
 
     func exportChrRom(scale: Int, folder: URL) async -> CStreamResult {
-        guard let n = name, let h = handle else { return noCart }
+        guard let name, let handle else { return noCart }
 
         return await readCStream { stream in
-            let prefix = "\(folder.appendingPathComponent(n).path)-chr"
+            let prefix = "\(folder.appendingPathComponent(name).path)-chr"
             try prefix.withCString { chrprefix in
                 errno = 0
-                let err = dis_cart_chr(h.unwrapped, Int32(scale), chrprefix,
-                                       stream)
+                let err = dis_cart_chr(handle.unwrapped, Int32(scale),
+                                       chrprefix, stream)
                 if err < 0 {
                     if err == DIS_ERR_ERNO { throw AldoError.ioErrno }
                     throw AldoError.wrapDisError(code: err)

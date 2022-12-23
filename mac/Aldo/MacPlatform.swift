@@ -84,10 +84,16 @@ fileprivate func launchStudio() {
 
 fileprivate func displayError(title: CString?, message: CString?) -> Bool {
     let modal = NSAlert()
-    modal.messageText = title == nil ? "INVALID TITLE" : .init(cString: title!)
-    modal.informativeText = message == nil
-                            ? "INVALID MESSAGE"
-                            : .init(cString: message!)
+    if let title {
+        modal.messageText = .init(cString: title)
+    } else {
+        modal.messageText = "INVALID TITLE"
+    }
+    if let message {
+        modal.informativeText = .init(cString: message)
+    } else {
+        modal.informativeText = "INVALID MESSAGE"
+    }
     modal.alertStyle = .warning
     return modal.runModal() == .OK
 }

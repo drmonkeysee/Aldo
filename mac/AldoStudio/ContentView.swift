@@ -35,11 +35,9 @@ struct ContentView: View {
     }
 
     private var appTitle: String {
-        let appName = bundleAppName() ?? "CFBundleFailure"
-        if let name = cart.name {
-            return "\(appName): \(name)"
-        }
-        return appName
+        var title = bundleAppName() ?? "CFBundleFailure"
+        if let name = cart.name { title.append(": \(name)") }
+        return title
     }
 
     private func pickFile() {

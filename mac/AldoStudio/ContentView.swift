@@ -14,7 +14,7 @@ struct ContentView: View {
     @StateObject private var cart = Cart()
 
     var body: some View {
-        CartView()
+        CartInspectorView()
             .environmentObject(cart)
             .navigationTitle(appTitle)
             .toolbar {

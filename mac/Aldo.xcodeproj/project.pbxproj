@@ -52,7 +52,7 @@
 		C8B3A9C929553A55009C1770 /* CartFocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B5303A2801300C00576D9F /* CartFocusView.swift */; };
 		C8B3A9CA29553A55009C1770 /* CartInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B427D5DA4400468FDB /* CartInfoView.swift */; };
 		C8B3A9CB29553A55009C1770 /* CartChrView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B627D5DB0300468FDB /* CartChrView.swift */; };
-		C8B3A9CC29553A59009C1770 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88A5E8427F6A1750039382D /* CartView.swift */; };
+		C8B3A9CC29553A59009C1770 /* CartInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88A5E8427F6A1750039382D /* CartInspectorView.swift */; };
 		C8B3A9CD29553A59009C1770 /* CommandViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B87D46285E82BD000E0D2E /* CommandViews.swift */; };
 		C8B3A9CE29553A59009C1770 /* CartPrgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89D714F27D4758900C9177A /* CartPrgView.swift */; };
 		C8B3A9CF29553BC0009C1770 /* Disassembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8497E3F2822015100F4952E /* Disassembly.swift */; };
@@ -282,7 +282,7 @@
 		C882854629403C2100BAC249 /* error.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = error.cpp; sourceTree = "<group>"; };
 		C882854729403C2100BAC249 /* error.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = error.hpp; sourceTree = "<group>"; };
 		C88949B02813B2DB00795CC0 /* ChrSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChrSheet.swift; sourceTree = "<group>"; };
-		C88A5E8427F6A1750039382D /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
+		C88A5E8427F6A1750039382D /* CartInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartInspectorView.swift; sourceTree = "<group>"; };
 		C88CABDC28FA4DDD00551C65 /* uisdl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = uisdl.cpp; sourceTree = "<group>"; };
 		C88CABDD28FA4DDD00551C65 /* uisdl.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = uisdl.hpp; sourceTree = "<group>"; };
 		C88CABE328FA63DD00551C65 /* bridgeopen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bridgeopen.h; sourceTree = "<group>"; };
@@ -646,7 +646,7 @@
 				C8B5303A2801300C00576D9F /* CartFocusView.swift */,
 				C838D3B427D5DA4400468FDB /* CartInfoView.swift */,
 				C89D714F27D4758900C9177A /* CartPrgView.swift */,
-				C88A5E8427F6A1750039382D /* CartView.swift */,
+				C88A5E8427F6A1750039382D /* CartInspectorView.swift */,
 				C8B87D46285E82BD000E0D2E /* CommandViews.swift */,
 				C8B3A9D829553D23009C1770 /* Common.swift */,
 				C8B3A9BE295535F3009C1770 /* ContentView.swift */,
@@ -954,7 +954,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8B3A9CF29553BC0009C1770 /* Disassembly.swift in Sources */,
-				C8B3A9CC29553A59009C1770 /* CartView.swift in Sources */,
+				C8B3A9CC29553A59009C1770 /* CartInspectorView.swift in Sources */,
 				C8B3A9BF295535F3009C1770 /* ContentView.swift in Sources */,
 				C8B3A9D329553BCD009C1770 /* Cart.swift in Sources */,
 				C8B3A9D429553BD0009C1770 /* AldoError.swift in Sources */,

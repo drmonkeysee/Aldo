@@ -1,6 +1,6 @@
 //
 //  CartView.swift
-//  Aldo-Gui
+//  Aldo-Studio
 //
 //  Created by Brandon Stansbury on 3/31/22.
 //

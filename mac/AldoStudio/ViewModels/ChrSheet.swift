@@ -1,6 +1,6 @@
 //
 //  ChrSheet.swift
-//  Aldo-Gui
+//  Aldo-Studio
 //
 //  Created by Brandon Stansbury on 4/22/22.
 //

@@ -1,6 +1,6 @@
 //
 //  AldoError.swift
-//  Aldo-Gui
+//  Aldo-Studio
 //
 //  Created by Brandon Stansbury on 4/10/22.
 //

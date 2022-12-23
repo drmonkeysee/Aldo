@@ -1,6 +1,6 @@
 //
 //  CStream.swift
-//  Aldo-Gui
+//  Aldo-Studio
 //
 //  Created by Brandon Stansbury on 4/20/22.
 //

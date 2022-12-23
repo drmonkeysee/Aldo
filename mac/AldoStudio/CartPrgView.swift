@@ -31,7 +31,7 @@ fileprivate struct ProgramView: View {
                 }
             }
             .frame(width: 255)
-            .padding(5)
+            .padding(EdgeInsets(top: 5, leading: 10, bottom: 10, trailing: 5))
             Divider()
             CartFocusView()
                 .frame(maxHeight: .infinity, alignment: .top)

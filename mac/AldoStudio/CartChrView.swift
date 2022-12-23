@@ -59,7 +59,11 @@ fileprivate struct ChrBlocksView: View {
                     ChrSheetView(sheet: blocks.sheet(at: $0))
                 }
             }
-            .padding(Constraints.sheetPadding)
+            .padding(EdgeInsets(
+                top: Constraints.sheetPadding,
+                leading: 1,
+                bottom: Constraints.sheetPadding,
+                trailing: Constraints.sheetPadding))
         }
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: Constraints.outerWidth)
@@ -124,7 +128,6 @@ fileprivate struct NoChrView: View {
                        height: Constraints.sheetSize.h
                                 - Constraints.groupboxPadding)
         }
-        .padding(.leading, Constraints.sheetPadding)
         .padding(.trailing, Constraints.groupboxPadding)
     }
 }

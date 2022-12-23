@@ -16,7 +16,7 @@ struct ContentView: View {
     var body: some View {
         CartView()
             .environmentObject(cart)
-            .navigationTitle(cart.name ?? appName)
+            .navigationTitle(appTitle)
             .toolbar {
                 ToolbarItem {
                     Button(action: pickFile) {
@@ -34,9 +34,12 @@ struct ContentView: View {
             }
     }
 
-    private var appName: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
-            ?? "CFBundleFailure"
+    private var appTitle: String {
+        let appName = bundleAppName() ?? "CFBundleFailure"
+        if let name = cart.name {
+            return "\(appName): \(name)"
+        }
+        return appName
     }
 
     private func pickFile() {

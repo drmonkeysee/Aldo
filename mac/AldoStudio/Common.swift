@@ -14,3 +14,7 @@ typealias CStream = UnsafeMutablePointer<FILE>
 typealias CStreamOp = (CStream) throws -> Void
 
 let aldoLog = Logger()
+
+func bundleAppName() -> String? {
+    Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
+}

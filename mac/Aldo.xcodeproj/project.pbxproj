@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C80265122957B5060040CE17 /* version.c in Sources */ = {isa = PBXBuildFile; fileRef = C83A30792904A2B000749A17 /* version.c */; };
 		C8041C3728EE6EC000A3695F /* gui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8041C3628EE6EC000A3695F /* gui.c */; };
 		C808BA6827893976001FDE39 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C80C9E1C277D648F000F2D8B /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
@@ -70,7 +71,6 @@
 		C8B88A8C29061C3C00B7CB23 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6D325A97FB5006A7AB1 /* main.c */; };
 		C8B88A8D29061C3F00B7CB23 /* uibatch.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186496277EB45900CA4AC0 /* uibatch.c */; };
 		C8B88A8E29061C4100B7CB23 /* uicurses.c in Sources */ = {isa = PBXBuildFile; fileRef = C8186494277EB0F700CA4AC0 /* uicurses.c */; };
-		C8B88A9729061CAA00B7CB23 /* version.c in Sources */ = {isa = PBXBuildFile; fileRef = C83A30792904A2B000749A17 /* version.c */; };
 		C8B88A9E29061D1500B7CB23 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C820E6DE25A982A5006A7AB1 /* libncurses.tbd */; };
 		C8B88A9F29061D2000B7CB23 /* libpanel.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */; };
 		C8B88AA829062ADC00B7CB23 /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706852751EEBA00B45785 /* bus.c */; };
@@ -975,6 +975,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C80265122957B5060040CE17 /* version.c in Sources */,
 				C8B88AB029062B0200B7CB23 /* mappers.c in Sources */,
 				C8B88AB429062B1300B7CB23 /* tsutil.c in Sources */,
 				C8B88AA829062ADC00B7CB23 /* bus.c in Sources */,
@@ -998,7 +999,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8B88A8B29061C3800B7CB23 /* cli.c in Sources */,
-				C8B88A9729061CAA00B7CB23 /* version.c in Sources */,
 				C8B88A8A29061C3500B7CB23 /* argparse.c in Sources */,
 				C8B88A8D29061C3F00B7CB23 /* uibatch.c in Sources */,
 				C8B88A8E29061C4100B7CB23 /* uicurses.c in Sources */,

@@ -8,6 +8,9 @@
 #ifndef Aldo_version_h
 #define Aldo_version_h
 
-extern const char *const restrict AldoVersion;
+#include "bridgeopen.h"
+br_libexport
+extern const char *const br_noalias AldoVersion;
+#include "bridgeclose.h"
 
 #endif

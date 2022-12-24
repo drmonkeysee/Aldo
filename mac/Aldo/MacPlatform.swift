@@ -38,9 +38,7 @@ final class MacPlatform: NSObject {
 
 fileprivate func appName() -> CBuffer? {
     guard let displayName = bundleName(),
-          let cstring = displayName.cString(using: .utf8) else {
-        return nil
-    }
+          let cstring = displayName.cString(using: .utf8) else { return nil }
     let buffer = CBuffer.allocate(capacity: cstring.count)
     strcpy(buffer, cstring)
     return buffer
@@ -95,12 +93,8 @@ fileprivate func launchStudio() {
 fileprivate func displayError(title: CString?, message: CString?) -> Bool {
     var titleStr: String? = nil
     var msgStr: String? = nil
-    if let title {
-        titleStr = .init(cString: title)
-    }
-    if let message {
-        msgStr = .init(cString: message)
-    }
+    if let title { titleStr = .init(cString: title) }
+    if let message { msgStr = .init(cString: message) }
     return aldoAlert(title: titleStr ?? "INVALID TITLE",
                      message: msgStr ?? "INVALID MESSAGE")
 }

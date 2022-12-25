@@ -29,6 +29,9 @@
 #include <cstdint>
 #include <cstdio>
 
+// TODO: temporary haltexpr
+#include <variant>
+
 namespace
 {
 
@@ -309,6 +312,155 @@ protected:
     }
 };
 
+class Debugger final : public aldo::View {
+public:
+    Debugger(aldo::viewstate s, const aldo::EmuController& c,
+             const aldo::MediaRuntime& r) noexcept
+    : View{"Debugger", s, c, r} {}
+
+protected:
+    void renderContents() const override
+    {
+        if (ImGui::CollapsingHeader("Reset Vector",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+            static bool resetOverride;
+            static std::uint16_t addr;
+            ImGui::Checkbox("Override", &resetOverride);
+            if (!resetOverride) {
+                ImGui::BeginDisabled();
+                // NOTE: +2 = start of reset vector
+                addr = batowr(c.snapshot().mem.vectors + 2);
+            }
+            ImGui::SetNextItemWidth(glyph_size().x * 6);
+            ImGui::InputScalar("Address", ImGuiDataType_U16, &addr, nullptr,
+                               nullptr, "%04X");
+            if (!resetOverride) {
+                ImGui::EndDisabled();
+            }
+        }
+
+        if (ImGui::CollapsingHeader("Breakpoints",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+            static constexpr std::array haltConditions{
+                "Address", "Cycles", "Jammed", "Time",
+            };
+            using halt_idx = decltype(haltConditions)::size_type;
+            static halt_idx selected;
+            ImGui::AlignTextToFramePadding();
+            ImGui::TextUnformatted("Halt on");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(glyph_size().x * 12);
+            if (ImGui::BeginCombo("##haltconditions",
+                                  haltConditions[selected])) {
+                for (halt_idx i = 0; i < haltConditions.size(); ++i) {
+                    const auto current = i == selected;
+                    if (ImGui::Selectable(haltConditions[i], current)) {
+                        selected = i;
+                    }
+                    if (current) {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::Separator();
+            static std::uint16_t addr;
+            static std::uint64_t cycles;
+            static float seconds;
+            static std::vector<breakpoint> breakpoints{
+                breakpoint{2},
+                breakpoint{3, 34.678},
+                breakpoint{0, static_cast<std::uint16_t>(0xa432)},
+                breakpoint{1, 30000ul},
+            };
+            switch (selected) {
+            case 0:
+                // TODO: common widget
+                ImGui::SetNextItemWidth(glyph_size().x * 6);
+                ImGui::InputScalar("Address", ImGuiDataType_U16, &addr, nullptr,
+                                   nullptr, "%04X");
+                break;
+            case 1:
+                ImGui::SetNextItemWidth(glyph_size().x * 22);
+                ImGui::InputScalar("Count", ImGuiDataType_U64, &cycles);
+                break;
+            case 2:
+                // NOTE: nothing to show for JAMMED
+                break;
+            case 3:
+                ImGui::SetNextItemWidth(glyph_size().x * 22);
+                ImGui::InputFloat("Seconds", &seconds);
+                break;
+            default:
+                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                            "Invalid halt condition selection: %zu",
+                            selected);
+                break;
+            }
+            ImGui::Button("Add");
+            ImGui::Separator();
+            const ImVec2 dims{
+                -FLT_MIN,
+                8 * ImGui::GetTextLineHeightWithSpacing(),
+            };
+            using bp_index = decltype(breakpoints)::size_type;
+            static bp_index selected_bp;
+            if (ImGui::BeginListBox("##breakpoints", dims)) {
+                for (bp_index i = 0; i < breakpoints.size(); ++i) {
+                    const auto& bp = breakpoints[i];
+                    const auto current = i == selected_bp;
+                    if (ImGui::Selectable(bp.description.c_str(), current)) {
+                        selected_bp = i;
+                    }
+                    if (current) {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+                ImGui::EndListBox();
+            }
+        }
+    }
+
+private:
+    struct breakpoint {
+        std::size_t type;
+        std::variant<std::monostate, std::uint16_t, std::uint64_t, double> value;
+        std::string description;
+
+        template<typename T = std::monostate>
+        breakpoint(std::size_t type, T v = {}) : type{type}, value{v}
+        {
+            std::array<char, 32> buf;
+            switch (type) {
+            case 0:
+                description += "PC @ $";
+                std::snprintf(buf.data(), buf.size(), "%04X",
+                              std::get<uint16_t>(value));
+                description += buf.data();
+                break;
+            case 1:
+                std::snprintf(buf.data(), buf.size(), "%" PRIu64,
+                              std::get<uint64_t>(value));
+                description += buf.data();
+                description += " cycles";
+                break;
+            case 2:
+                description += "JAMMED";
+                break;
+            case 3:
+                std::snprintf(buf.data(), buf.size(), "%f",
+                              std::get<double>(value));
+                description += buf.data();
+                description += " seconds";
+                break;
+            default:
+                description += "INVALID";
+                break;
+            }
+        }
+    };
+};
+
 class PrgAtPc final : public aldo::View {
 public:
     PrgAtPc(aldo::viewstate& s, const aldo::EmuController& c,
@@ -499,7 +651,8 @@ private:
                             xOffset = fontSz / 4,
                             yOffset = fontSz / 2;
         const auto drawList = ImGui::GetWindowDrawList();
-        for (std::size_t i = 0; i < flags.size(); ++i) {
+        using flag_idx = decltype(flags)::size_type;
+        for (flag_idx i = 0; i < flags.size(); ++i) {
             ImU32 fillColor, textColor;
             if (c.snapshot().cpu.status & (1 << (flags.size() - 1 - i))) {
                 fillColor = flagOn;
@@ -675,6 +828,7 @@ aldo::Layout::Layout(aldo::viewstate& s, const aldo::EmuController& c,
     add_views<
         HardwareTraits,
         CartInfo,
+        Debugger,
         PrgAtPc,
         Bouncer,
         Cpu,

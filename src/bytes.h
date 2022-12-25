@@ -65,15 +65,16 @@ inline uint16_t bytowr(uint8_t lo, uint8_t hi)
     return (uint16_t)(lo | (hi << 8));
 }
 
-//
-// Internal
-//
-
 // Byte Array to Word
+br_libexport
 inline uint16_t batowr(const uint8_t bytes[br_csz(2)])
 {
     return bytowr(bytes[0], bytes[1]);
 }
+
+//
+// Internal
+//
 
 // Word to Bytes
 inline void wrtoby(uint16_t word, uint8_t *br_noalias lo,

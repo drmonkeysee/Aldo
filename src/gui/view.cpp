@@ -120,6 +120,12 @@ public:
     HardwareTraits(aldo::viewstate& s, const aldo::EmuController& c,
                    const aldo::MediaRuntime& r) noexcept
     : View{"Hardware Traits", s, c, r} {}
+    HardwareTraits(aldo::viewstate&, aldo::EmuController&&,
+                   const aldo::MediaRuntime&) = delete;
+    HardwareTraits(aldo::viewstate&, const aldo::EmuController&,
+                   aldo::MediaRuntime&&) = delete;
+    HardwareTraits(aldo::viewstate&, aldo::EmuController&&,
+                   aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() const override
@@ -221,6 +227,12 @@ public:
     CartInfo(aldo::viewstate& s, const aldo::EmuController& c,
              const aldo::MediaRuntime& r) noexcept
     : View{"Cart Info", s, c, r} {}
+    CartInfo(aldo::viewstate&, aldo::EmuController&&,
+             const aldo::MediaRuntime&) = delete;
+    CartInfo(aldo::viewstate&, const aldo::EmuController&,
+             aldo::MediaRuntime&&) = delete;
+    CartInfo(aldo::viewstate&, aldo::EmuController&&,
+             aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() const override
@@ -317,6 +329,12 @@ public:
     Debugger(aldo::viewstate s, const aldo::EmuController& c,
              const aldo::MediaRuntime& r) noexcept
     : View{"Debugger", s, c, r} {}
+    Debugger(aldo::viewstate&, aldo::EmuController&&,
+             const aldo::MediaRuntime&) = delete;
+    Debugger(aldo::viewstate&, const aldo::EmuController&,
+             aldo::MediaRuntime&&) = delete;
+    Debugger(aldo::viewstate&, aldo::EmuController&&,
+             aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() const override
@@ -466,6 +484,12 @@ public:
     PrgAtPc(aldo::viewstate& s, const aldo::EmuController& c,
             const aldo::MediaRuntime& r) noexcept
     : View{"PRG @ PC", s, c, r} {}
+    PrgAtPc(aldo::viewstate&, aldo::EmuController&&,
+            const aldo::MediaRuntime&) = delete;
+    PrgAtPc(aldo::viewstate&, const aldo::EmuController&,
+            aldo::MediaRuntime&&) = delete;
+    PrgAtPc(aldo::viewstate&, aldo::EmuController&&,
+            aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() const override
@@ -547,6 +571,12 @@ public:
     Bouncer(aldo::viewstate& s, const aldo::EmuController& c,
             const aldo::MediaRuntime& r) noexcept
     : View{"Bouncer", s, c, r, &s.showBouncer} {}
+    Bouncer(aldo::viewstate&, aldo::EmuController&&,
+            const aldo::MediaRuntime&) = delete;
+    Bouncer(aldo::viewstate&, const aldo::EmuController&,
+            aldo::MediaRuntime&&) = delete;
+    Bouncer(aldo::viewstate&, aldo::EmuController&&,
+            aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() const override
@@ -586,6 +616,12 @@ public:
     Cpu(aldo::viewstate& s, const aldo::EmuController& c,
         const aldo::MediaRuntime& r) noexcept
     : View{"CPU", s, c, r, &s.showCpu} {}
+    Cpu(aldo::viewstate&, aldo::EmuController&&,
+        const aldo::MediaRuntime&) = delete;
+    Cpu(aldo::viewstate&, const aldo::EmuController&,
+        aldo::MediaRuntime&&) = delete;
+    Cpu(aldo::viewstate&, aldo::EmuController&&,
+        aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() const override
@@ -731,6 +767,12 @@ public:
     Ram(aldo::viewstate& s, const aldo::EmuController& c,
         const aldo::MediaRuntime& r) noexcept
     : View{"RAM", s, c, r} {}
+    Ram(aldo::viewstate&, aldo::EmuController&&,
+        const aldo::MediaRuntime&) = delete;
+    Ram(aldo::viewstate&, const aldo::EmuController&,
+        aldo::MediaRuntime&&) = delete;
+    Ram(aldo::viewstate&, aldo::EmuController&&,
+        aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() const override

@@ -1,8 +1,8 @@
-SDL_VERSION := 2.24.0
+SDL_VERSION := 2.26.0
 SDL_DMG := SDL2-$(SDL_VERSION).dmg
 SDL_HTTP := https://github.com/libsdl-org/SDL/releases/download/release-$(SDL_VERSION)
 
-IMGUI_VERSION := 1.88
+IMGUI_VERSION := 1.89.1
 IMGUI_TARGET := imgui
 IMGUI_HTTP := https://github.com/ocornut/imgui/archive/refs/tags/v$(IMGUI_VERSION).tar.gz
 IMGUI_SRC := $(IMGUI_TARGET)-$(IMGUI_VERSION)

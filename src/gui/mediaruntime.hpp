@@ -43,6 +43,7 @@ public:
 
 class MediaRuntime final {
 public:
+    [[nodiscard("check error")]]
     static int initStatus() noexcept { return InitStatus; }
 
     MediaRuntime(SDL_Point windowSize, SDL_Point screenResolution,

@@ -77,13 +77,17 @@ struct runclock {
         cycleclock_start(&cyclock);
     }
 
+    [[nodiscard("raii result")]]
     RunTick startTick(bool resetBudget) noexcept
     {
         return RunTick(cyclock, resetBudget);
     }
 
+    [[nodiscard("raii result")]]
     RunTimer timeInput() noexcept { return RunTimer{dtInputMs}; }
+    [[nodiscard("raii result")]]
     RunTimer timeUpdate() noexcept { return RunTimer{dtUpdateMs}; }
+    [[nodiscard("raii result")]]
     RunTimer timeRender() noexcept { return RunTimer{dtRenderMs}; }
 
     cycleclock cyclock{.cycles_per_sec = 4};

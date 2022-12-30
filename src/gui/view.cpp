@@ -11,6 +11,7 @@
 #include "cart.h"
 #include "ctrlsignal.h"
 #include "cycleclock.h"
+#include "debug.h"
 #include "dis.h"
 #include "emulator.hpp"
 #include "mediaruntime.hpp"
@@ -113,8 +114,11 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
 auto input_address(std::uint16_t* addr) noexcept
 {
     ImGui::SetNextItemWidth(glyph_size().x * 6);
-    ImGui::InputScalar("Address", ImGuiDataType_U16, addr, nullptr, nullptr,
-                       "%04X");
+    ImGui::PushID(addr);
+    const auto result = ImGui::InputScalar("Address", ImGuiDataType_U16, addr,
+                                           nullptr, nullptr, "%04X");
+    ImGui::PopID();
+    return result;
 }
 
 //
@@ -418,7 +422,7 @@ private:
 
 class Debugger final : public aldo::View {
 public:
-    Debugger(aldo::viewstate s, const aldo::EmuController& c,
+    Debugger(aldo::viewstate& s, const aldo::EmuController& c,
              const aldo::MediaRuntime& r) noexcept
     : View{"Debugger", s, c, r} {}
     Debugger(aldo::viewstate&, aldo::EmuController&&,
@@ -448,13 +452,23 @@ private:
         static bool resetOverride;
         static std::uint16_t addr;
 
-        ImGui::Checkbox("Override", &resetOverride);
+        if (ImGui::Checkbox("Override", &resetOverride)) {
+            if (resetOverride) {
+                s.events.emplace(aldo::Command::overrideReset,
+                                 static_cast<int>(addr));
+            } else {
+                s.events.emplace(aldo::Command::overrideReset, NoResetVector);
+            }
+        }
         if (!resetOverride) {
             ImGui::BeginDisabled();
             // NOTE: +2 = start of reset vector
             addr = batowr(c.snapshot().mem.vectors + 2);
         }
-        input_address(&addr);
+        if (input_address(&addr)) {
+            s.events.emplace(aldo::Command::overrideReset,
+                             static_cast<int>(addr));
+        }
         if (!resetOverride) {
             ImGui::EndDisabled();
         }
@@ -487,7 +501,7 @@ private:
         static std::uint16_t addr;
         static std::uint64_t cycles;
         static float seconds;
-        static std::vector<breakpoint> breakpoints{
+        static std::vector breakpoints{
             breakpoint{2},
             breakpoint{3, 34.678},
             breakpoint{0, static_cast<std::uint16_t>(0xa432)},

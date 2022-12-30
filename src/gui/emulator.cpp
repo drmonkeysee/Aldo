@@ -166,6 +166,9 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
     case aldo::Command::openFile:
         openCartFile(p);
         break;
+    case aldo::Command::overrideReset:
+        debug_set_reset(hdebug.get(), std::get<int>(ev.value));
+        break;
     case aldo::Command::quit:
         s.running = false;
         break;

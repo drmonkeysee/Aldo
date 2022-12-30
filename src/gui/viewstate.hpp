@@ -26,21 +26,22 @@ enum class Command {
     mode,
     launchStudio,
     openFile,
+    overrideReset,
     quit,
 };
 
 using interrupt_event = std::pair<csig_interrupt, bool>;
 
 struct event {
-    constexpr event(Command c) noexcept : cmd{c} {}
-    template<typename T>
-    constexpr event(Command c, T v) noexcept : cmd{c}, value{v} {}
+    template<typename T = std::monostate>
+    constexpr event(Command c, T v = {}) noexcept : cmd{c}, value{v} {}
 
     Command cmd;
     std::variant<
         std::monostate,
         bool,
         csig_excmode,
+        int,
         interrupt_event
     > value;
 };

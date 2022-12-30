@@ -98,10 +98,7 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
             }
             ImGui::EndMenu();
         }
-        if (ImGui::BeginMenu("Window")) {
-            ImGui::MenuItem("Bouncer", nullptr, &s.showBouncer);
-            ImGui::MenuItem("CPU", nullptr, &s.showCpu);
-            ImGui::Separator();
+        if (ImGui::BeginMenu("Tools")) {
             ImGui::MenuItem("ImGui Demo", nullptr, &s.showDemo);
             if (ImGui::MenuItem("Aldo Studio")) {
                 s.events.emplace(aldo::Command::launchStudio);
@@ -120,7 +117,7 @@ class Bouncer final : public aldo::View {
 public:
     Bouncer(aldo::viewstate& s, const aldo::EmuController& c,
             const aldo::MediaRuntime& r) noexcept
-    : View{"Bouncer", s, c, r, &s.showBouncer} {}
+    : View{"Bouncer", s, c, r} {}
     Bouncer(aldo::viewstate&, aldo::EmuController&&,
             const aldo::MediaRuntime&) = delete;
     Bouncer(aldo::viewstate&, const aldo::EmuController&,
@@ -267,7 +264,7 @@ class Cpu final : public aldo::View {
 public:
     Cpu(aldo::viewstate& s, const aldo::EmuController& c,
         const aldo::MediaRuntime& r) noexcept
-    : View{"CPU", s, c, r, &s.showCpu} {}
+    : View{"CPU", s, c, r} {}
     Cpu(aldo::viewstate&, aldo::EmuController&&,
         const aldo::MediaRuntime&) = delete;
     Cpu(aldo::viewstate&, const aldo::EmuController&,

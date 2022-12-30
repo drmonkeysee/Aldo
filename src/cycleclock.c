@@ -8,6 +8,8 @@
 #include "cycleclock.h"
 #include "tsutil.h"
 
+const int MinCps = 1, MaxCps = 1000;
+
 void cycleclock_start(struct cycleclock *self)
 {
     clock_gettime(CLOCK_MONOTONIC, &self->start);

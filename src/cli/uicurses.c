@@ -36,7 +36,7 @@
 // NOTE: Approximate 60 FPS for application event loop;
 // this will be enforced by actual vsync when ported to true GUI
 // and is *distinct* from emulator frequency which can be modified by the user.
-static const int Fps = 60, MinCps = 1, MaxCps = 1000, RamSheets = 4;
+static const int Fps = 60, RamSheets = 4;
 static const struct timespec VSync = {.tv_nsec = TSU_NS_PER_S / Fps};
 
 struct viewstate {

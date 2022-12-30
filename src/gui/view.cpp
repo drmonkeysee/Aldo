@@ -10,6 +10,7 @@
 #include "bytes.h"
 #include "cart.h"
 #include "ctrlsignal.h"
+#include "cycleclock.h"
 #include "dis.h"
 #include "emulator.hpp"
 #include "mediaruntime.hpp"
@@ -630,7 +631,8 @@ private:
         ImGui::SameLine();
         ImGui::SetNextItemWidth(40);
         ImGui::DragInt("##cyclesPerSecond", &s.clock.cyclock.cycles_per_sec,
-                       1.0f, 1, 100, "%d", ImGuiSliderFlags_AlwaysClamp);
+                       1.0f, MinCps, MaxCps, "%d",
+                       ImGuiSliderFlags_AlwaysClamp);
     }
 
     void renderRunControls() const

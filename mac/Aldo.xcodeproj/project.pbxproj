@@ -278,6 +278,7 @@
 		C85C8DC525BD29AC00611D19 /* dis.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dis.c; sourceTree = "<group>"; };
 		C85CC20827ED6BF30063276D /* snapshot.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = snapshot.c; sourceTree = "<group>"; };
 		C86030772761A51100F1B27D /* cpupeek.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpupeek.c; sourceTree = "<group>"; };
+		C867F802295E9BA700ABEB3B /* style.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = style.hpp; sourceTree = "<group>"; };
 		C8702CF8278A58C900725690 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
 		C882854629403C2100BAC249 /* error.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = error.cpp; sourceTree = "<group>"; };
 		C882854729403C2100BAC249 /* error.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = error.hpp; sourceTree = "<group>"; };
@@ -627,6 +628,7 @@
 				C8EC721F2916150700DF750A /* render.hpp */,
 				C8EC721E2916150700DF750A /* render.cpp */,
 				C8D388D72952B9A700DF230D /* runclock.hpp */,
+				C867F802295E9BA700ABEB3B /* style.hpp */,
 				C88CABDD28FA4DDD00551C65 /* uisdl.hpp */,
 				C88CABDC28FA4DDD00551C65 /* uisdl.cpp */,
 				C894F0EE2945850E00C6575F /* view.hpp */,

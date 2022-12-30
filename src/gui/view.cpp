@@ -13,6 +13,7 @@
 #include "dis.h"
 #include "emulator.hpp"
 #include "mediaruntime.hpp"
+#include "style.hpp"
 #include "viewstate.hpp"
 
 #include "imgui.h"
@@ -418,13 +419,11 @@ protected:
             ImGui::Button("Add");
             ImGui::SameLine();
             ImGui::PushStyleColor(ImGuiCol_Button,
-                                  IM_COL32(0x8b, 0x0, 0x0, SDL_ALPHA_OPAQUE));
+                                  aldo::colors::DestructiveButton);
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-                                  IM_COL32(0xdc, 0x14, 0x3c,
-                                           SDL_ALPHA_OPAQUE));
+                                  aldo::colors::DestructiveButtonHover);
             ImGui::PushStyleColor(ImGuiCol_ButtonActive,
-                                  IM_COL32(0xb2, 0x22, 0x22,
-                                           SDL_ALPHA_OPAQUE));
+                                  aldo::colors::DestructiveButtonActive);
             ImGui::Button("Remove");
             ImGui::PopStyleColor(3);
             ImGui::Separator();
@@ -684,28 +683,25 @@ private:
         static constexpr std::array flags{
             'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
         };
-        static constexpr auto
-            flagOn = IM_COL32(0xff, 0xfc, 0x53, SDL_ALPHA_OPAQUE),
-            flagOff = IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE),
-            textOn = IM_COL32_BLACK,
-            textOff = IM_COL32_WHITE;
+        static constexpr auto textOn = IM_COL32_BLACK,
+                                textOff = IM_COL32_WHITE;
 
         const auto textSz = glyph_size();
         const auto radius = (textSz.x + textSz.y) / 2.0f;
         const auto pos = ImGui::GetCursorScreenPos();
         ImVec2 center{pos.x + radius, pos.y + radius};
         const auto fontSz = ImGui::GetFontSize(),
-                            xOffset = fontSz / 4,
-                            yOffset = fontSz / 2;
+                    xOffset = fontSz / 4,
+                    yOffset = fontSz / 2;
         const auto drawList = ImGui::GetWindowDrawList();
         using flag_idx = decltype(flags)::size_type;
         for (flag_idx i = 0; i < flags.size(); ++i) {
             ImU32 fillColor, textColor;
             if (c.snapshot().cpu.status & (1 << (flags.size() - 1 - i))) {
-                fillColor = flagOn;
+                fillColor = aldo::colors::LedOn;
                 textColor = textOn;
             } else {
-                fillColor = flagOff;
+                fillColor = aldo::colors::LedOff;
                 textColor = textOff;
             }
             drawList->AddCircleFilled(center, radius, fillColor);
@@ -799,8 +795,6 @@ protected:
         const ImVec2 tableSize{
             0, ImGui::GetTextLineHeightWithSpacing() * 2 * (pageDim + 1),
         };
-        const auto spHighlightText =
-            ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
         if (ImGui::BeginTable("ram", cols, tableConfig, tableSize)) {
             std::array<char, 3> col;
             ImGui::TableSetupScrollFreeze(0, 1);
@@ -812,6 +806,8 @@ protected:
             ImGui::TableSetupColumn("ASCII");
             ImGui::TableHeadersRow();
 
+            const auto spHighlightText =
+                ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
             const auto& snp = c.snapshot();
             const auto sp = snp.cpu.stack_pointer;
             std::uint16_t addr = 0;
@@ -837,8 +833,7 @@ protected:
                                                    + 1);
                         if (page == 1 && ramIdx % pageSize == sp) {
                             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
-                                                   IM_COL32(0xff, 0xfc, 0x53,
-                                                            SDL_ALPHA_OPAQUE));
+                                                   aldo::colors::LedOn);
                             ImGui::TextColored(spHighlightText, "%02X", val);
                         } else {
                             ImGui::Text("%02X", val);

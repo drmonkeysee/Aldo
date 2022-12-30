@@ -8,6 +8,7 @@
 #include "render.hpp"
 
 #include "mediaruntime.hpp"
+#include "style.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -29,7 +30,9 @@ aldo::RenderFrame::~RenderFrame()
 {
     const auto ren = r.renderer();
     ImGui::Render();
-    SDL_SetRenderDrawColor(ren, 0x1e, 0x1e, 0x1e, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(ren, aldo::colors::ScreenFill,
+                           aldo::colors::ScreenFill, aldo::colors::ScreenFill,
+                           SDL_ALPHA_OPAQUE);
     SDL_RenderClear(ren);
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
     // NOTE: record render timing here, otherwise we're just measuring VSYNC

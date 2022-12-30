@@ -34,7 +34,7 @@ auto handle_input(aldo::EmuController& c, aldo::viewstate& s,
     c.handleInput(s, p);
 }
 
-auto emu_update(aldo::EmuController& c, aldo::viewstate& s) noexcept
+auto update_emu(aldo::EmuController& c, aldo::viewstate& s) noexcept
 {
     const auto timer = s.clock.timeUpdate();
     c.update(s);
@@ -63,7 +63,7 @@ auto runloop(const gui_platform& platform, debugctx* debug, nes* console)
         const auto tick = state.clock.startTick(reset);
         handle_input(controller, state, platform);
         if (state.running) {
-            emu_update(controller, state);
+            update_emu(controller, state);
             render_ui(layout, runtime, state);
         }
     } while (state.running);

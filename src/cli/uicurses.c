@@ -37,7 +37,6 @@
 // this will be enforced by actual vsync when ported to true GUI
 // and is *distinct* from emulator frequency which can be modified by the user.
 static const int Fps = 60, RamSheets = 4;
-static const struct timespec VSync = {.tv_nsec = TSU_NS_PER_S / Fps};
 
 struct viewstate {
     struct runclock {
@@ -50,20 +49,22 @@ struct viewstate {
 
 static void tick_sleep(struct runclock *c)
 {
+    static const struct timespec vsync = {.tv_nsec = TSU_NS_PER_S / Fps};
+
     const struct timespec elapsed = timespec_elapsed(&c->cyclock.current);
 
     // NOTE: if elapsed nanoseconds is greater than vsync we're over
     // our time budget; if elapsed *seconds* is greater than vsync
     // we've BLOWN AWAY our time budget; either way don't sleep.
-    if (elapsed.tv_nsec > VSync.tv_nsec || elapsed.tv_sec > VSync.tv_sec) {
+    if (elapsed.tv_nsec > vsync.tv_nsec || elapsed.tv_sec > vsync.tv_sec) {
         // NOTE: we've already blown the frame time so convert everything
         // to milliseconds to make the math easier.
-        c->frameleft_ms = timespec_to_ms(&VSync) - timespec_to_ms(&elapsed);
+        c->frameleft_ms = timespec_to_ms(&vsync) - timespec_to_ms(&elapsed);
         return;
     }
 
     const struct timespec tick_left = {
-        .tv_nsec = VSync.tv_nsec - elapsed.tv_nsec,
+        .tv_nsec = vsync.tv_nsec - elapsed.tv_nsec,
     };
     c->frameleft_ms = timespec_to_ms(&tick_left);
 

@@ -12,9 +12,6 @@
 #include <assert.h>
 #include <stddef.h>
 
-// NOTE: sentinel value for cycle count denoting an imminent opcode fetch
-static const int8_t PreFetch = -1;
-
 //
 // State Management
 //
@@ -1680,6 +1677,9 @@ void cpu_powerup(struct mos6502 *self)
 
 int cpu_cycle(struct mos6502 *self)
 {
+    // NOTE: sentinel value for cycle count denoting an imminent opcode fetch
+    static const int8_t prefetch = -1;
+
     assert(self != NULL);
 
     if (!self->signal.rdy) return 0;
@@ -1688,7 +1688,7 @@ int cpu_cycle(struct mos6502 *self)
 
     if (self->presync) {
         self->presync = false;
-        self->t = PreFetch;
+        self->t = prefetch;
     }
     if (self->bflt) {
         self->bflt = false;

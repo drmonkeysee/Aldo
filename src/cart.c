@@ -14,10 +14,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char
-    *const restrict NesMagic = "NES\x1a",
-    *const restrict NsfMagic = "NESM\x1a";
-
 struct cartridge {
     struct mapper *mapper;
     struct cartinfo info;
@@ -25,6 +21,10 @@ struct cartridge {
 
 static int detect_format(struct cartridge *self, FILE *f)
 {
+    static const char
+        *const restrict nesmagic = "NES\x1a",
+        *const restrict nsfmagic = "NESM\x1a";
+
     // NOTE: grab first 8 bytes as a string to check file format
     char format[9];
 
@@ -34,9 +34,9 @@ static int detect_format(struct cartridge *self, FILE *f)
         return CART_ERR_UNKNOWN;
     }
 
-    if (strncmp(NsfMagic, format, strlen(NsfMagic)) == 0) {
+    if (strncmp(nsfmagic, format, strlen(nsfmagic)) == 0) {
         self->info.format = CRTF_NSF;
-    } else if (strncmp(NesMagic, format, strlen(NesMagic)) == 0) {
+    } else if (strncmp(nesmagic, format, strlen(nesmagic)) == 0) {
         // NOTE: NES 2.0 byte 7 matches pattern 0bxxxx10xx
         self->info.format = ((unsigned char)format[7] & 0xc) == 0x8
                                 ? CRTF_NES20

@@ -428,114 +428,122 @@ protected:
     {
         if (ImGui::CollapsingHeader("Reset Vector",
                                     ImGuiTreeNodeFlags_DefaultOpen)) {
-            static bool resetOverride;
-            static std::uint16_t addr;
-            ImGui::Checkbox("Override", &resetOverride);
-            if (!resetOverride) {
-                ImGui::BeginDisabled();
-                // NOTE: +2 = start of reset vector
-                addr = batowr(c.snapshot().mem.vectors + 2);
-            }
-            ImGui::SetNextItemWidth(glyph_size().x * 6);
-            ImGui::InputScalar("Address", ImGuiDataType_U16, &addr, nullptr,
-                               nullptr, "%04X");
-            if (!resetOverride) {
-                ImGui::EndDisabled();
-            }
+            renderVectorOverride();
         }
 
         if (ImGui::CollapsingHeader("Breakpoints",
                                     ImGuiTreeNodeFlags_DefaultOpen)) {
-            static constexpr std::array haltConditions{
-                "Address", "Cycles", "Jammed", "Time",
-            };
-            using halt_idx = decltype(haltConditions)::size_type;
-            static halt_idx selected;
-            ImGui::AlignTextToFramePadding();
-            ImGui::TextUnformatted("Halt on");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(glyph_size().x * 12);
-            if (ImGui::BeginCombo("##haltconditions",
-                                  haltConditions[selected])) {
-                for (halt_idx i = 0; i < haltConditions.size(); ++i) {
-                    const auto current = i == selected;
-                    if (ImGui::Selectable(haltConditions[i], current)) {
-                        selected = i;
-                    }
-                    if (current) {
-                        ImGui::SetItemDefaultFocus();
-                    }
-                }
-                ImGui::EndCombo();
-            }
-            ImGui::Separator();
-            static std::uint16_t addr;
-            static std::uint64_t cycles;
-            static float seconds;
-            static std::vector<breakpoint> breakpoints{
-                breakpoint{2},
-                breakpoint{3, 34.678},
-                breakpoint{0, static_cast<std::uint16_t>(0xa432)},
-                breakpoint{1, 30000ul},
-            };
-            switch (selected) {
-            case 0:
-                // TODO: common widget
-                ImGui::SetNextItemWidth(glyph_size().x * 6);
-                ImGui::InputScalar("Address", ImGuiDataType_U16, &addr, nullptr,
-                                   nullptr, "%04X");
-                break;
-            case 1:
-                ImGui::SetNextItemWidth(glyph_size().x * 18);
-                ImGui::InputScalar("Count", ImGuiDataType_U64, &cycles);
-                break;
-            case 2:
-                ImGui::Dummy({0, ImGui::GetFrameHeight()});
-                break;
-            case 3:
-                ImGui::SetNextItemWidth(glyph_size().x * 18);
-                ImGui::InputFloat("Seconds", &seconds);
-                break;
-            default:
-                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-                            "Invalid halt condition selection: %zu",
-                            selected);
-                break;
-            }
-            ImGui::Button("Add");
-            ImGui::SameLine();
-            ImGui::PushStyleColor(ImGuiCol_Button,
-                                  aldo::colors::DestructiveButton);
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-                                  aldo::colors::DestructiveButtonHover);
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive,
-                                  aldo::colors::DestructiveButtonActive);
-            ImGui::Button("Remove");
-            ImGui::PopStyleColor(3);
-            ImGui::Separator();
-            const ImVec2 dims{
-                -FLT_MIN,
-                8 * ImGui::GetTextLineHeightWithSpacing(),
-            };
-            using bp_index = decltype(breakpoints)::size_type;
-            static bp_index selected_bp;
-            if (ImGui::BeginListBox("##breakpoints", dims)) {
-                for (bp_index i = 0; i < breakpoints.size(); ++i) {
-                    const auto& bp = breakpoints[i];
-                    const auto current = i == selected_bp;
-                    if (ImGui::Selectable(bp.description.c_str(), current)) {
-                        selected_bp = i;
-                    }
-                    if (current) {
-                        ImGui::SetItemDefaultFocus();
-                    }
-                }
-                ImGui::EndListBox();
-            }
+            renderBreakpoints();
         }
     }
 
 private:
+    void renderVectorOverride() const noexcept
+    {
+        static bool resetOverride;
+        static std::uint16_t addr;
+        ImGui::Checkbox("Override", &resetOverride);
+        if (!resetOverride) {
+            ImGui::BeginDisabled();
+            // NOTE: +2 = start of reset vector
+            addr = batowr(c.snapshot().mem.vectors + 2);
+        }
+        ImGui::SetNextItemWidth(glyph_size().x * 6);
+        ImGui::InputScalar("Address", ImGuiDataType_U16, &addr, nullptr,
+                           nullptr, "%04X");
+        if (!resetOverride) {
+            ImGui::EndDisabled();
+        }
+    }
+
+    void renderBreakpoints() const noexcept
+    {
+        static constexpr std::array haltConditions{
+            "Address", "Cycles", "Jammed", "Time",
+        };
+        using halt_idx = decltype(haltConditions)::size_type;
+        static halt_idx selected;
+        ImGui::AlignTextToFramePadding();
+        ImGui::TextUnformatted("Halt on");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(glyph_size().x * 12);
+        if (ImGui::BeginCombo("##haltconditions", haltConditions[selected])) {
+            for (halt_idx i = 0; i < haltConditions.size(); ++i) {
+                const auto current = i == selected;
+                if (ImGui::Selectable(haltConditions[i], current)) {
+                    selected = i;
+                }
+                if (current) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::Separator();
+        static std::uint16_t addr;
+        static std::uint64_t cycles;
+        static float seconds;
+        static std::vector<breakpoint> breakpoints{
+            breakpoint{2},
+            breakpoint{3, 34.678},
+            breakpoint{0, static_cast<std::uint16_t>(0xa432)},
+            breakpoint{1, 30000ul},
+        };
+        switch (selected) {
+        case 0:
+            // TODO: common widget
+            ImGui::SetNextItemWidth(glyph_size().x * 6);
+            ImGui::InputScalar("Address", ImGuiDataType_U16, &addr, nullptr,
+                               nullptr, "%04X");
+            break;
+        case 1:
+            ImGui::SetNextItemWidth(glyph_size().x * 18);
+            ImGui::InputScalar("Count", ImGuiDataType_U64, &cycles);
+            break;
+        case 2:
+            ImGui::Dummy({0, ImGui::GetFrameHeight()});
+            break;
+        case 3:
+            ImGui::SetNextItemWidth(glyph_size().x * 18);
+            ImGui::InputFloat("Seconds", &seconds);
+            break;
+        default:
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                        "Invalid halt condition selection: %zu", selected);
+            break;
+        }
+        ImGui::Button("Add");
+        ImGui::SameLine();
+        ImGui::PushStyleColor(ImGuiCol_Button,
+                              aldo::colors::DestructiveButton);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                              aldo::colors::DestructiveButtonHover);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive,
+                              aldo::colors::DestructiveButtonActive);
+        ImGui::Button("Remove");
+        ImGui::PopStyleColor(3);
+        ImGui::Separator();
+        const ImVec2 dims{
+            -FLT_MIN,
+            8 * ImGui::GetTextLineHeightWithSpacing(),
+        };
+        using bp_index = decltype(breakpoints)::size_type;
+        static bp_index selected_bp;
+        if (ImGui::BeginListBox("##breakpoints", dims)) {
+            for (bp_index i = 0; i < breakpoints.size(); ++i) {
+                const auto& bp = breakpoints[i];
+                const auto current = i == selected_bp;
+                if (ImGui::Selectable(bp.description.c_str(), current)) {
+                    selected_bp = i;
+                }
+                if (current) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndListBox();
+        }
+    }
+
     struct breakpoint {
         std::size_t type;
         std::variant<std::monostate, std::uint16_t, std::uint64_t, double> value;
@@ -751,13 +759,13 @@ private:
         const auto& debugger = snp.debugger;
         const char* indicator;
         std::uint16_t resVector;
-        if (debugger.resvector_override >= 0) {
+        if (debugger.resvector_override < 0) {
+            indicator = "";
+            resVector = bytowr(lo, hi);
+        } else {
             indicator = "!";
             resVector =
                 static_cast<std::uint16_t>(debugger.resvector_override);
-        } else {
-            indicator = "";
-            resVector = bytowr(lo, hi);
         }
         ImGui::Text("%04X: %02X %02X     RES %s$%04X", CPU_VECTOR_RES, lo, hi,
                     indicator, resVector);

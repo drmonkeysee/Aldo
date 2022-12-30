@@ -180,11 +180,11 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
     mvwprintw(v->content, cursor_y++, 0, "Tracing: %s",
               emu->args->tron ? "On" : "Off");
     mvwaddstr(v->content, cursor_y++, 0, "Reset Override: ");
-    if (emu->snapshot.debugger.resvector_override >= 0) {
+    if (emu->snapshot.debugger.resvector_override < 0) {
+        waddstr(v->content, "None");
+    } else {
         wprintw(v->content, "$%04X",
                 emu->snapshot.debugger.resvector_override);
-    } else {
-        waddstr(v->content, "None");
     }
     char break_desc[HEXPR_FMT_SIZE];
     const int err = haltexpr_fmt(&emu->snapshot.debugger.break_condition,
@@ -256,11 +256,11 @@ static void drawvecs(const struct view *v, int h, int w, int y,
     hi = emu->snapshot.mem.vectors[3];
     mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     RES",
               CPU_VECTOR_RES, lo, hi);
-    if (emu->snapshot.debugger.resvector_override >= 0) {
+    if (emu->snapshot.debugger.resvector_override < 0) {
+        wprintw(v->content, " $%04X", bytowr(lo, hi));
+    } else {
         wprintw(v->content, " !$%04X",
                 emu->snapshot.debugger.resvector_override);
-    } else {
-        wprintw(v->content, " $%04X", bytowr(lo, hi));
     }
 
     lo = emu->snapshot.mem.vectors[4];

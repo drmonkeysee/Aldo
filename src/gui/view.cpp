@@ -116,110 +116,48 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
 // Concrete Views
 //
 
-class HardwareTraits final : public aldo::View {
+class Bouncer final : public aldo::View {
 public:
-    HardwareTraits(aldo::viewstate& s, const aldo::EmuController& c,
-                   const aldo::MediaRuntime& r) noexcept
-    : View{"Hardware Traits", s, c, r} {}
-    HardwareTraits(aldo::viewstate&, aldo::EmuController&&,
-                   const aldo::MediaRuntime&) = delete;
-    HardwareTraits(aldo::viewstate&, const aldo::EmuController&,
-                   aldo::MediaRuntime&&) = delete;
-    HardwareTraits(aldo::viewstate&, aldo::EmuController&&,
-                   aldo::MediaRuntime&&) = delete;
+    Bouncer(aldo::viewstate& s, const aldo::EmuController& c,
+            const aldo::MediaRuntime& r) noexcept
+    : View{"Bouncer", s, c, r, &s.showBouncer} {}
+    Bouncer(aldo::viewstate&, aldo::EmuController&&,
+            const aldo::MediaRuntime&) = delete;
+    Bouncer(aldo::viewstate&, const aldo::EmuController&,
+            aldo::MediaRuntime&&) = delete;
+    Bouncer(aldo::viewstate&, aldo::EmuController&&,
+            aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() const override
     {
-        renderStats();
-        ImGui::Separator();
-        renderSpeedControls();
-        ImGui::Separator();
-        renderRunControls();
-    }
+        const auto ren = r.renderer();
+        const auto tex = r.bouncerTexture();
+        SDL_SetRenderTarget(ren, tex);
+        SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
+        SDL_RenderClear(ren);
 
-private:
-    void renderStats() const noexcept
-    {
-        static constexpr auto refreshIntervalMs = 250;
-        static double dispDtInput, dispDtUpdate, dispDtRender, refreshDt;
+        SDL_SetRenderDrawColor(ren, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
+        SDL_RenderDrawLine(ren, 30, 7, 50, 200);
 
-        const auto& cyclock = s.clock.cyclock;
-        if ((refreshDt += cyclock.frametime_ms) >= refreshIntervalMs) {
-            dispDtInput = s.clock.dtInputMs;
-            dispDtUpdate = s.clock.dtUpdateMs;
-            dispDtRender = s.clock.dtRenderMs;
-            refreshDt = 0;
-        }
-        ImGui::Text("Input dT: %.3f", dispDtInput);
-        ImGui::Text("Update dT: %.3f", dispDtUpdate);
-        ImGui::Text("Render dT: %.3f", dispDtRender);
-        ImGui::Text("Frames: %" PRIu64, cyclock.frames);
-        ImGui::Text("Runtime: %.3f", cyclock.runtime);
-        ImGui::Text("Cycles: %" PRIu64, cyclock.total_cycles);
-    }
+        SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
 
-    void renderSpeedControls() const noexcept
-    {
-        ImGui::AlignTextToFramePadding();
-        ImGui::TextUnformatted("Cycles/Second");
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(40);
-        ImGui::DragInt("##cyclesPerSecond", &s.clock.cyclock.cycles_per_sec,
-                       1.0f, 1, 100, "%d", ImGuiSliderFlags_AlwaysClamp);
-    }
-
-    void renderRunControls() const
-    {
-        const auto& snp = c.snapshot();
-        auto halt = !snp.lines.ready;
-        if (ImGui::Checkbox("HALT", &halt)) {
-            s.events.emplace(aldo::Command::halt, halt);
+        const auto& bouncer = s.bouncer;
+        const auto fulldim = bouncer.halfdim * 2;
+        const SDL_Rect pos{
+            bouncer.pos.x - bouncer.halfdim,
+            bouncer.pos.y - bouncer.halfdim,
+            fulldim,
+            fulldim,
         };
+        SDL_RenderFillRect(ren, &pos);
+        SDL_SetRenderTarget(ren, nullptr);
 
-        ImGui::TextUnformatted("Mode");
-        if (ImGui::RadioButton("Cycle", snp.mode == CSGM_CYCLE)
-            && snp.mode != CSGM_CYCLE) {
-            s.events.emplace(aldo::Command::mode, CSGM_CYCLE);
-        }
-        ImGui::SameLine();
-        if (ImGui::RadioButton("Step", snp.mode == CSGM_STEP)
-            && snp.mode != CSGM_STEP) {
-            s.events.emplace(aldo::Command::mode, CSGM_STEP);
-        }
-        ImGui::SameLine();
-        if (ImGui::RadioButton("Run", snp.mode == CSGM_RUN)
-            && snp.mode != CSGM_RUN) {
-            s.events.emplace(aldo::Command::mode, CSGM_RUN);
-        }
-
-        // TODO: fake toggle button by using on/off flags to adjust colors
-        ImGui::TextUnformatted("Signal");
-        /*ImGui::PushStyleColor(ImGuiCol_Button,
-         IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE));
-         ImGui::Button("IRQ");
-         ImGui::SameLine();
-         ImGui::Button("NMI");
-         ImGui::SameLine();
-         ImGui::Button("RES");
-         ImGui::PopStyleColor();*/
-        // NOTE: interrupt signals are all low-active
-        auto
-        irq = !snp.lines.irq, nmi = !snp.lines.nmi, res = !snp.lines.reset;
-        if (ImGui::Checkbox("IRQ", &irq)) {
-            s.events.emplace(aldo::Command::interrupt,
-                             aldo::interrupt_event{CSGI_IRQ, irq});
-        }
-        ImGui::SameLine();
-        if (ImGui::Checkbox("NMI", &nmi)) {
-            s.events.emplace(aldo::Command::interrupt,
-                             aldo::interrupt_event{CSGI_NMI, nmi});
-        }
-        ImGui::SameLine();
-        if (ImGui::Checkbox("RES", &res)) {
-            s.events.emplace(aldo::Command::interrupt,
-                             aldo::interrupt_event{CSGI_RES, res});
-        }
+        const ImVec2 sz{
+            static_cast<float>(bouncer.bounds.x),
+            static_cast<float>(bouncer.bounds.y),
+        };
+        ImGui::Image(tex, sz);
     }
 };
 
@@ -322,6 +260,154 @@ protected:
     {
         // TODO: assume 32KB size for now
         ImGui::TextUnformatted("PRG ROM: 1 x 32KB");
+    }
+};
+
+class Cpu final : public aldo::View {
+public:
+    Cpu(aldo::viewstate& s, const aldo::EmuController& c,
+        const aldo::MediaRuntime& r) noexcept
+    : View{"CPU", s, c, r, &s.showCpu} {}
+    Cpu(aldo::viewstate&, aldo::EmuController&&,
+        const aldo::MediaRuntime&) = delete;
+    Cpu(aldo::viewstate&, const aldo::EmuController&,
+        aldo::MediaRuntime&&) = delete;
+    Cpu(aldo::viewstate&, aldo::EmuController&&,
+        aldo::MediaRuntime&&) = delete;
+
+protected:
+    void renderContents() const override
+    {
+        if (ImGui::BeginChild("CpuLeft", {200, 0})) {
+            if (ImGui::CollapsingHeader("Registers",
+                                        ImGuiTreeNodeFlags_DefaultOpen)) {
+                renderRegisters();
+            }
+            if (ImGui::CollapsingHeader("Flags",
+                                        ImGuiTreeNodeFlags_DefaultOpen)) {
+                renderFlags();
+            }
+        }
+        ImGui::EndChild();
+        ImGui::SameLine();
+        if (ImGui::BeginChild("CpuRight")) {
+            if (ImGui::CollapsingHeader("Datapath",
+                                        ImGuiTreeNodeFlags_DefaultOpen)) {
+                renderDatapath();
+            }
+        }
+        ImGui::EndChild();
+    }
+
+private:
+    void renderRegisters() const noexcept
+    {
+        const auto& cpu = c.snapshot().cpu;
+        ImGui::BeginGroup();
+        {
+            ImGui::Text("A: %02X", cpu.accumulator);
+            ImGui::Text("X: %02X", cpu.xindex);
+            ImGui::Text("Y: %02X", cpu.yindex);
+        }
+        ImGui::EndGroup();
+        ImGui::SameLine(0, 90);
+        ImGui::BeginGroup();
+        {
+            ImGui::Text("PC: %04X", cpu.program_counter);
+            ImGui::Text(" S: %02X", cpu.stack_pointer);
+            ImGui::Text(" P: %02X", cpu.status);
+        }
+        ImGui::EndGroup();
+    }
+
+    void renderFlags() const noexcept
+    {
+        static constexpr std::array flags{
+            'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
+        };
+        static constexpr auto textOn = IM_COL32_BLACK,
+                                textOff = IM_COL32_WHITE;
+
+        const auto textSz = glyph_size();
+        const auto radius = (textSz.x + textSz.y) / 2.0f;
+        const auto pos = ImGui::GetCursorScreenPos();
+        ImVec2 center{pos.x + radius, pos.y + radius};
+        const auto fontSz = ImGui::GetFontSize(),
+                    xOffset = fontSz / 4,
+                    yOffset = fontSz / 2;
+        const auto drawList = ImGui::GetWindowDrawList();
+        using flag_idx = decltype(flags)::size_type;
+        for (flag_idx i = 0; i < flags.size(); ++i) {
+            ImU32 fillColor, textColor;
+            if (c.snapshot().cpu.status & (1 << (flags.size() - 1 - i))) {
+                fillColor = aldo::colors::LedOn;
+                textColor = textOn;
+            } else {
+                fillColor = aldo::colors::LedOff;
+                textColor = textOff;
+            }
+            drawList->AddCircleFilled(center, radius, fillColor);
+            drawList->AddText({center.x - xOffset, center.y - yOffset},
+                              textColor, flags.data() + i,
+                              flags.data() + i + 1);
+            center.x += 25;
+        }
+        ImGui::Dummy({0, radius * 2});
+    }
+
+    void renderDatapath() const noexcept
+    {
+        const auto& datapath = c.snapshot().datapath;
+        const auto& lines = c.snapshot().lines;
+
+        ImGui::Text("Address Bus: %04X", datapath.addressbus);
+        if (datapath.busfault) {
+            ImGui::TextUnformatted("Data Bus: FLT");
+        } else {
+            std::array<char, 3> dataHex;
+            std::snprintf(dataHex.data(), dataHex.size(), "%02X",
+                          datapath.databus);
+            ImGui::Text("Data Bus: %s", dataHex.data());
+        }
+        ImGui::SameLine();
+        ImGui::TextUnformatted(lines.readwrite ? "R" : "W");
+
+        ImGui::Separator();
+
+        if (datapath.jammed) {
+            ImGui::TextUnformatted("Decode: JAMMED");
+        } else {
+            char buf[DIS_DATAP_SIZE];
+            const auto err = dis_datapath(c.snapshotp(), buf);
+            ImGui::Text("Decode: %s", err < 0 ? dis_errstr(err) : buf);
+        }
+        ImGui::Text("adl: %02X", datapath.addrlow_latch);
+        ImGui::Text("adh: %02X", datapath.addrhigh_latch);
+        ImGui::Text("adc: %02X", datapath.addrcarry_latch);
+        ImGui::Text("t: %u", datapath.exec_cycle);
+
+        ImGui::Separator();
+
+        ImGui::BeginGroup();
+        {
+            ImGui::Text("RDY:  %s", display_linestate(lines.ready));
+            ImGui::Text("SYNC: %s", display_linestate(lines.sync));
+            ImGui::Text("R/W:  %s", display_linestate(lines.readwrite));
+        }
+        ImGui::EndGroup();
+
+        ImGui::SameLine(0, 40);
+
+        ImGui::BeginGroup();
+        {
+            ImGui::Text("IRQ: %s%s", display_linestate(lines.irq),
+                        display_signalstate(datapath.irq));
+            ImGui::Text("NMI: %s%s", display_linestate(lines.nmi),
+                        display_signalstate(datapath.nmi));
+            ImGui::Text("RES: %s%s", display_linestate(lines.reset),
+                        display_signalstate(datapath.res));
+        }
+        ImGui::EndGroup();
     }
 };
 
@@ -489,6 +575,113 @@ private:
     };
 };
 
+class HardwareTraits final : public aldo::View {
+public:
+    HardwareTraits(aldo::viewstate& s, const aldo::EmuController& c,
+                   const aldo::MediaRuntime& r) noexcept
+    : View{"Hardware Traits", s, c, r} {}
+    HardwareTraits(aldo::viewstate&, aldo::EmuController&&,
+                   const aldo::MediaRuntime&) = delete;
+    HardwareTraits(aldo::viewstate&, const aldo::EmuController&,
+                   aldo::MediaRuntime&&) = delete;
+    HardwareTraits(aldo::viewstate&, aldo::EmuController&&,
+                   aldo::MediaRuntime&&) = delete;
+
+protected:
+    void renderContents() const override
+    {
+        renderStats();
+        ImGui::Separator();
+        renderSpeedControls();
+        ImGui::Separator();
+        renderRunControls();
+    }
+
+private:
+    void renderStats() const noexcept
+    {
+        static constexpr auto refreshIntervalMs = 250;
+        static double dispDtInput, dispDtUpdate, dispDtRender, refreshDt;
+
+        const auto& cyclock = s.clock.cyclock;
+        if ((refreshDt += cyclock.frametime_ms) >= refreshIntervalMs) {
+            dispDtInput = s.clock.dtInputMs;
+            dispDtUpdate = s.clock.dtUpdateMs;
+            dispDtRender = s.clock.dtRenderMs;
+            refreshDt = 0;
+        }
+        ImGui::Text("Input dT: %.3f", dispDtInput);
+        ImGui::Text("Update dT: %.3f", dispDtUpdate);
+        ImGui::Text("Render dT: %.3f", dispDtRender);
+        ImGui::Text("Frames: %" PRIu64, cyclock.frames);
+        ImGui::Text("Runtime: %.3f", cyclock.runtime);
+        ImGui::Text("Cycles: %" PRIu64, cyclock.total_cycles);
+    }
+
+    void renderSpeedControls() const noexcept
+    {
+        ImGui::AlignTextToFramePadding();
+        ImGui::TextUnformatted("Cycles/Second");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(40);
+        ImGui::DragInt("##cyclesPerSecond", &s.clock.cyclock.cycles_per_sec,
+                       1.0f, 1, 100, "%d", ImGuiSliderFlags_AlwaysClamp);
+    }
+
+    void renderRunControls() const
+    {
+        const auto& snp = c.snapshot();
+        auto halt = !snp.lines.ready;
+        if (ImGui::Checkbox("HALT", &halt)) {
+            s.events.emplace(aldo::Command::halt, halt);
+        };
+
+        ImGui::TextUnformatted("Mode");
+        if (ImGui::RadioButton("Cycle", snp.mode == CSGM_CYCLE)
+            && snp.mode != CSGM_CYCLE) {
+            s.events.emplace(aldo::Command::mode, CSGM_CYCLE);
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Step", snp.mode == CSGM_STEP)
+            && snp.mode != CSGM_STEP) {
+            s.events.emplace(aldo::Command::mode, CSGM_STEP);
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Run", snp.mode == CSGM_RUN)
+            && snp.mode != CSGM_RUN) {
+            s.events.emplace(aldo::Command::mode, CSGM_RUN);
+        }
+
+        // TODO: fake toggle button by using on/off flags to adjust colors
+        ImGui::TextUnformatted("Signal");
+        /*ImGui::PushStyleColor(ImGuiCol_Button,
+         IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE));
+         ImGui::Button("IRQ");
+         ImGui::SameLine();
+         ImGui::Button("NMI");
+         ImGui::SameLine();
+         ImGui::Button("RES");
+         ImGui::PopStyleColor();*/
+        // NOTE: interrupt signals are all low-active
+        auto
+        irq = !snp.lines.irq, nmi = !snp.lines.nmi, res = !snp.lines.reset;
+        if (ImGui::Checkbox("IRQ", &irq)) {
+            s.events.emplace(aldo::Command::interrupt,
+                             aldo::interrupt_event{CSGI_IRQ, irq});
+        }
+        ImGui::SameLine();
+        if (ImGui::Checkbox("NMI", &nmi)) {
+            s.events.emplace(aldo::Command::interrupt,
+                             aldo::interrupt_event{CSGI_NMI, nmi});
+        }
+        ImGui::SameLine();
+        if (ImGui::Checkbox("RES", &res)) {
+            s.events.emplace(aldo::Command::interrupt,
+                             aldo::interrupt_event{CSGI_RES, res});
+        }
+    }
+};
+
 class PrgAtPc final : public aldo::View {
 public:
     PrgAtPc(aldo::viewstate& s, const aldo::EmuController& c,
@@ -573,199 +766,6 @@ private:
         hi = prgMem.vectors[5];
         ImGui::Text("%04X: %02X %02X     IRQ $%04X", CPU_VECTOR_IRQ, lo, hi,
                     bytowr(lo, hi));
-    }
-};
-
-class Bouncer final : public aldo::View {
-public:
-    Bouncer(aldo::viewstate& s, const aldo::EmuController& c,
-            const aldo::MediaRuntime& r) noexcept
-    : View{"Bouncer", s, c, r, &s.showBouncer} {}
-    Bouncer(aldo::viewstate&, aldo::EmuController&&,
-            const aldo::MediaRuntime&) = delete;
-    Bouncer(aldo::viewstate&, const aldo::EmuController&,
-            aldo::MediaRuntime&&) = delete;
-    Bouncer(aldo::viewstate&, aldo::EmuController&&,
-            aldo::MediaRuntime&&) = delete;
-
-protected:
-    void renderContents() const override
-    {
-        const auto ren = r.renderer();
-        const auto tex = r.bouncerTexture();
-        SDL_SetRenderTarget(ren, tex);
-        SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
-        SDL_RenderClear(ren);
-
-        SDL_SetRenderDrawColor(ren, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
-        SDL_RenderDrawLine(ren, 30, 7, 50, 200);
-
-        SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
-
-        const auto& bouncer = s.bouncer;
-        const auto fulldim = bouncer.halfdim * 2;
-        const SDL_Rect pos{
-            bouncer.pos.x - bouncer.halfdim,
-            bouncer.pos.y - bouncer.halfdim,
-            fulldim,
-            fulldim,
-        };
-        SDL_RenderFillRect(ren, &pos);
-        SDL_SetRenderTarget(ren, nullptr);
-
-        const ImVec2 sz{
-            static_cast<float>(bouncer.bounds.x),
-            static_cast<float>(bouncer.bounds.y),
-        };
-        ImGui::Image(tex, sz);
-    }
-};
-
-class Cpu final : public aldo::View {
-public:
-    Cpu(aldo::viewstate& s, const aldo::EmuController& c,
-        const aldo::MediaRuntime& r) noexcept
-    : View{"CPU", s, c, r, &s.showCpu} {}
-    Cpu(aldo::viewstate&, aldo::EmuController&&,
-        const aldo::MediaRuntime&) = delete;
-    Cpu(aldo::viewstate&, const aldo::EmuController&,
-        aldo::MediaRuntime&&) = delete;
-    Cpu(aldo::viewstate&, aldo::EmuController&&,
-        aldo::MediaRuntime&&) = delete;
-
-protected:
-    void renderContents() const override
-    {
-        if (ImGui::BeginChild("CpuLeft", {200, 0})) {
-            if (ImGui::CollapsingHeader("Registers",
-                                        ImGuiTreeNodeFlags_DefaultOpen)) {
-                renderRegisters();
-            }
-            if (ImGui::CollapsingHeader("Flags",
-                                        ImGuiTreeNodeFlags_DefaultOpen)) {
-                renderFlags();
-            }
-        }
-        ImGui::EndChild();
-        ImGui::SameLine();
-        if (ImGui::BeginChild("CpuRight")) {
-            if (ImGui::CollapsingHeader("Datapath",
-                                        ImGuiTreeNodeFlags_DefaultOpen)) {
-                renderDatapath();
-            }
-        }
-        ImGui::EndChild();
-    }
-
-private:
-    void renderRegisters() const noexcept
-    {
-        const auto& cpu = c.snapshot().cpu;
-        ImGui::BeginGroup();
-        {
-            ImGui::Text("A: %02X", cpu.accumulator);
-            ImGui::Text("X: %02X", cpu.xindex);
-            ImGui::Text("Y: %02X", cpu.yindex);
-        }
-        ImGui::EndGroup();
-        ImGui::SameLine(0, 90);
-        ImGui::BeginGroup();
-        {
-            ImGui::Text("PC: %04X", cpu.program_counter);
-            ImGui::Text(" S: %02X", cpu.stack_pointer);
-            ImGui::Text(" P: %02X", cpu.status);
-        }
-        ImGui::EndGroup();
-    }
-
-    void renderFlags() const noexcept
-    {
-        static constexpr std::array flags{
-            'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
-        };
-        static constexpr auto textOn = IM_COL32_BLACK,
-                                textOff = IM_COL32_WHITE;
-
-        const auto textSz = glyph_size();
-        const auto radius = (textSz.x + textSz.y) / 2.0f;
-        const auto pos = ImGui::GetCursorScreenPos();
-        ImVec2 center{pos.x + radius, pos.y + radius};
-        const auto fontSz = ImGui::GetFontSize(),
-                    xOffset = fontSz / 4,
-                    yOffset = fontSz / 2;
-        const auto drawList = ImGui::GetWindowDrawList();
-        using flag_idx = decltype(flags)::size_type;
-        for (flag_idx i = 0; i < flags.size(); ++i) {
-            ImU32 fillColor, textColor;
-            if (c.snapshot().cpu.status & (1 << (flags.size() - 1 - i))) {
-                fillColor = aldo::colors::LedOn;
-                textColor = textOn;
-            } else {
-                fillColor = aldo::colors::LedOff;
-                textColor = textOff;
-            }
-            drawList->AddCircleFilled(center, radius, fillColor);
-            drawList->AddText({center.x - xOffset, center.y - yOffset},
-                              textColor, flags.data() + i,
-                              flags.data() + i + 1);
-            center.x += 25;
-        }
-        ImGui::Dummy({0, radius * 2});
-    }
-
-    void renderDatapath() const noexcept
-    {
-        const auto& datapath = c.snapshot().datapath;
-        const auto& lines = c.snapshot().lines;
-
-        ImGui::Text("Address Bus: %04X", datapath.addressbus);
-        if (datapath.busfault) {
-            ImGui::TextUnformatted("Data Bus: FLT");
-        } else {
-            std::array<char, 3> dataHex;
-            std::snprintf(dataHex.data(), dataHex.size(), "%02X",
-                          datapath.databus);
-            ImGui::Text("Data Bus: %s", dataHex.data());
-        }
-        ImGui::SameLine();
-        ImGui::TextUnformatted(lines.readwrite ? "R" : "W");
-
-        ImGui::Separator();
-
-        if (datapath.jammed) {
-            ImGui::TextUnformatted("Decode: JAMMED");
-        } else {
-            char buf[DIS_DATAP_SIZE];
-            const auto err = dis_datapath(c.snapshotp(), buf);
-            ImGui::Text("Decode: %s", err < 0 ? dis_errstr(err) : buf);
-        }
-        ImGui::Text("adl: %02X", datapath.addrlow_latch);
-        ImGui::Text("adh: %02X", datapath.addrhigh_latch);
-        ImGui::Text("adc: %02X", datapath.addrcarry_latch);
-        ImGui::Text("t: %u", datapath.exec_cycle);
-
-        ImGui::Separator();
-
-        ImGui::BeginGroup();
-        {
-            ImGui::Text("RDY:  %s", display_linestate(lines.ready));
-            ImGui::Text("SYNC: %s", display_linestate(lines.sync));
-            ImGui::Text("R/W:  %s", display_linestate(lines.readwrite));
-        }
-        ImGui::EndGroup();
-
-        ImGui::SameLine(0, 40);
-
-        ImGui::BeginGroup();
-        {
-            ImGui::Text("IRQ: %s%s", display_linestate(lines.irq),
-                        display_signalstate(datapath.irq));
-            ImGui::Text("NMI: %s%s", display_linestate(lines.nmi),
-                        display_signalstate(datapath.nmi));
-            ImGui::Text("RES: %s%s", display_linestate(lines.reset),
-                        display_signalstate(datapath.res));
-        }
-        ImGui::EndGroup();
     }
 };
 
@@ -874,12 +874,12 @@ aldo::Layout::Layout(aldo::viewstate& s, const aldo::EmuController& c,
 : s{s}, r{r}
 {
     add_views<
-        HardwareTraits,
-        CartInfo,
-        Debugger,
-        PrgAtPc,
         Bouncer,
+        CartInfo,
         Cpu,
+        Debugger,
+        HardwareTraits,
+        PrgAtPc,
         Ram
     >(views, s, c, r);
 }

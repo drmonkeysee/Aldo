@@ -110,6 +110,13 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
     }
 }
 
+auto input_address(std::uint16_t* addr) noexcept
+{
+    ImGui::SetNextItemWidth(glyph_size().x * 6);
+    ImGui::InputScalar("Address", ImGuiDataType_U16, addr, nullptr, nullptr,
+                       "%04X");
+}
+
 //
 // Concrete Views
 //
@@ -440,15 +447,14 @@ private:
     {
         static bool resetOverride;
         static std::uint16_t addr;
+
         ImGui::Checkbox("Override", &resetOverride);
         if (!resetOverride) {
             ImGui::BeginDisabled();
             // NOTE: +2 = start of reset vector
             addr = batowr(c.snapshot().mem.vectors + 2);
         }
-        ImGui::SetNextItemWidth(glyph_size().x * 6);
-        ImGui::InputScalar("Address", ImGuiDataType_U16, &addr, nullptr,
-                           nullptr, "%04X");
+        input_address(&addr);
         if (!resetOverride) {
             ImGui::EndDisabled();
         }
@@ -489,10 +495,7 @@ private:
         };
         switch (selected) {
         case 0:
-            // TODO: common widget
-            ImGui::SetNextItemWidth(glyph_size().x * 6);
-            ImGui::InputScalar("Address", ImGuiDataType_U16, &addr, nullptr,
-                               nullptr, "%04X");
+            input_address(&addr);
             break;
         case 1:
             ImGui::SetNextItemWidth(glyph_size().x * 18);

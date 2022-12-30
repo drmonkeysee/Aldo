@@ -504,7 +504,7 @@ protected:
 private:
     void renderPrg() const noexcept
     {
-        static constexpr auto instCount = 20;
+        static constexpr auto instCount = 16;
         static constinit auto selected = -1;
 
         const auto& snp = c.snapshot();

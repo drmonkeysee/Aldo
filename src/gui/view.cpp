@@ -399,14 +399,14 @@ protected:
                                    nullptr, "%04X");
                 break;
             case 1:
-                ImGui::SetNextItemWidth(glyph_size().x * 22);
+                ImGui::SetNextItemWidth(glyph_size().x * 18);
                 ImGui::InputScalar("Count", ImGuiDataType_U64, &cycles);
                 break;
             case 2:
-                // NOTE: nothing to show for JAMMED
+                ImGui::Dummy({0, ImGui::GetFrameHeight()});
                 break;
             case 3:
-                ImGui::SetNextItemWidth(glyph_size().x * 22);
+                ImGui::SetNextItemWidth(glyph_size().x * 18);
                 ImGui::InputFloat("Seconds", &seconds);
                 break;
             default:
@@ -416,6 +416,17 @@ protected:
                 break;
             }
             ImGui::Button("Add");
+            ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_Button,
+                                  IM_COL32(0x8b, 0x0, 0x0, SDL_ALPHA_OPAQUE));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                                  IM_COL32(0xdc, 0x14, 0x3c,
+                                           SDL_ALPHA_OPAQUE));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive,
+                                  IM_COL32(0xb2, 0x22, 0x22,
+                                           SDL_ALPHA_OPAQUE));
+            ImGui::Button("Remove");
+            ImGui::PopStyleColor(3);
             ImGui::Separator();
             const ImVec2 dims{
                 -FLT_MIN,

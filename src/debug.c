@@ -43,6 +43,15 @@ struct debugger_context {
     int resetvector;
 };
 
+static void update_reset_override(struct debugger_context *self)
+{
+    if (self->resetvector == NoResetVector) {
+        debug_remove_reset_override(self);
+    } else {
+        debug_add_reset_override(self);
+    }
+}
+
 //
 // Bus Interception
 //
@@ -218,11 +227,12 @@ void debug_free(debugctx *self)
     free(self);
 }
 
-void debug_set_reset(debugctx *self, int resetvector)
+void debug_set_resetvector(debugctx *self, int resetvector)
 {
     assert(self != NULL);
 
     self->resetvector = resetvector;
+    update_reset_override(self);
 }
 
 void debug_cpu_connect(debugctx *self, struct mos6502 *cpu)
@@ -240,11 +250,16 @@ void debug_cpu_disconnect(debugctx *self)
     self->cpu = NULL;
 }
 
-void debug_override_reset(debugctx *self)
+void debug_add_reset_override(debugctx *self)
 {
     assert(self != NULL);
 
     if (self->resetvector == NoResetVector || !self->cpu) return;
+
+    if (self->dec.active) {
+        self->dec.vector = (uint16_t)self->resetvector;
+        return;
+    }
 
     self->dec = (struct resdecorator){.vector = (uint16_t)self->resetvector};
     struct busdevice resetaddr_device = {
@@ -254,7 +269,7 @@ void debug_override_reset(debugctx *self)
                                 resetaddr_device, &self->dec.inner);
 }
 
-void debug_remove_reset(debugctx *self)
+void debug_remove_reset_override(debugctx *self)
 {
     assert(self != NULL);
 

@@ -9,6 +9,7 @@
 #include "emulator.hpp"
 #include "error.hpp"
 #include "guiplatform.h"
+#include "haltexpr.h"
 #include "viewstate.hpp"
 
 #include "imgui_impl_sdl.h"
@@ -150,8 +151,8 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
                                        const gui_platform& p)
 {
     switch (ev.cmd) {
-    case aldo::Command::launchStudio:
-        p.launch_studio();
+    case aldo::Command::breakpointAdd:
+        debug_addbreakpoint(hdebug.get(), std::get<haltexpr>(ev.value));
         break;
     case aldo::Command::halt:
         if (std::get<bool>(ev.value)) {
@@ -159,6 +160,20 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
         } else {
             nes_ready(hconsole.get());
         }
+        break;
+    case aldo::Command::interrupt:
+        {
+            const auto [signal, active] =
+                std::get<aldo::interrupt_event>(ev.value);
+            if (active) {
+                nes_interrupt(hconsole.get(), signal);
+            } else {
+                nes_clear(hconsole.get(), signal);
+            }
+        }
+        break;
+    case aldo::Command::launchStudio:
+        p.launch_studio();
         break;
     case aldo::Command::mode:
         nes_mode(hconsole.get(), std::get<csig_excmode>(ev.value));
@@ -171,17 +186,6 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
         break;
     case aldo::Command::quit:
         s.running = false;
-        break;
-    case aldo::Command::interrupt:
-        {
-            const auto [signal, active] =
-                std::get<aldo::interrupt_event>(ev.value);
-            if (active) {
-                nes_interrupt(hconsole.get(), signal);
-            } else {
-                nes_clear(hconsole.get(), signal);
-            }
-        }
         break;
     default:
         throw std::domain_error{invalid_command(ev.cmd)};

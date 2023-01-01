@@ -33,10 +33,10 @@ public:
          bool*) = delete;
     virtual ~View() = default;
 
-    void render() const;
+    void render();
 
 protected:
-    virtual void renderContents() const = 0;
+    virtual void renderContents() = 0;
 
     std::string title;
     viewstate& s;

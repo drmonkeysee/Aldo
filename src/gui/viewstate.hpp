@@ -9,6 +9,7 @@
 #define Aldo_gui_viewstate_hpp
 
 #include "ctrlsignal.h"
+#include "haltexpr.h"
 #include "runclock.hpp"
 
 #include <SDL2/SDL.h>
@@ -21,6 +22,7 @@ namespace aldo
 {
 
 enum class Command {
+    breakpointAdd,
     halt,
     interrupt,
     mode,
@@ -41,6 +43,7 @@ struct event {
         std::monostate,
         bool,
         csig_excmode,
+        haltexpr,
         int,
         interrupt_event
     > value;

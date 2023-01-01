@@ -10,19 +10,25 @@
 
 #include <stdint.h>
 
+// X(symbol, description)
+#define HEXPR_COND_X \
+X(HLT_NONE, "None") \
+X(HLT_ADDR, "Address") \
+X(HLT_TIME, "Time") \
+X(HLT_CYCLES, "Cycles") \
+X(HLT_JAM, "Jammed")
+
 enum haltcondition {
-    HLT_NONE,
-    HLT_ADDR,
-    HLT_TIME,
-    HLT_CYCLES,
-    HLT_JAM,
+#define X(s, d) s,
+    HEXPR_COND_X
+#undef X
     HLT_CONDCOUNT,
 };
 
 struct haltexpr {
     union {
         uint64_t cycles;
-        double runtime;
+        float runtime;
         uint16_t address;
     };
     enum haltcondition cond;
@@ -48,6 +54,8 @@ enum {
 #include "bridgeopen.h"
 br_libexport
 const char *haltexpr_errstr(int err) br_nothrow;
+br_libexport
+const char *haltcond_description(enum haltcondition cond) br_nothrow;
 
 // NOTE: if returns non-zero error code, *expr is unmodified
 br_libexport br_checkerror

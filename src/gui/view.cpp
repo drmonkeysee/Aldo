@@ -14,6 +14,7 @@
 #include "debug.h"
 #include "dis.h"
 #include "emulator.hpp"
+#include "haltexpr.h"
 #include "mediaruntime.hpp"
 #include "style.hpp"
 #include "viewstate.hpp"
@@ -138,7 +139,7 @@ public:
             aldo::MediaRuntime&&) = delete;
 
 protected:
-    void renderContents() const override
+    void renderContents() override
     {
         const auto ren = r.renderer();
         const auto tex = r.bouncerTexture();
@@ -183,7 +184,7 @@ public:
              aldo::MediaRuntime&&) = delete;
 
 protected:
-    void renderContents() const override
+    void renderContents() override
     {
         using namespace std::literals::string_view_literals;
         static constexpr auto label = "Name: "sv;
@@ -285,7 +286,7 @@ public:
         aldo::MediaRuntime&&) = delete;
 
 protected:
-    void renderContents() const override
+    void renderContents() override
     {
         if (ImGui::BeginChild("CpuLeft", {200, 0})) {
             if (ImGui::CollapsingHeader("Registers",
@@ -424,7 +425,14 @@ class Debugger final : public aldo::View {
 public:
     Debugger(aldo::viewstate& s, const aldo::EmuController& c,
              const aldo::MediaRuntime& r) noexcept
-    : View{"Debugger", s, c, r} {}
+    : View{"Debugger", s, c, r}
+    {
+        auto cond = static_cast<int>(HLT_NONE);
+        for (auto& d : haltConditions) {
+            const auto c = static_cast<haltcondition>(++cond);
+            d = {c, haltcond_description(c)};
+        }
+    }
     Debugger(aldo::viewstate&, aldo::EmuController&&,
              const aldo::MediaRuntime&) = delete;
     Debugger(aldo::viewstate&, const aldo::EmuController&,
@@ -433,7 +441,7 @@ public:
              aldo::MediaRuntime&&) = delete;
 
 protected:
-    void renderContents() const override
+    void renderContents() override
     {
         if (ImGui::CollapsingHeader("Reset Vector",
                                     ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -474,61 +482,62 @@ private:
         }
     }
 
-    void renderBreakpoints() const noexcept
+    void renderBreakpoints() noexcept
     {
-        static constexpr std::array haltConditions{
-            "Address", "Cycles", "Jammed", "Time",
+        renderConditionCombo();
+
+        ImGui::Separator();
+
+        currentHaltExpression.cond = haltConditions[selectedCondition].first;
+        switch (currentHaltExpression.cond) {
+        case HLT_ADDR:
+            input_address(&currentHaltExpression.address);
+            break;
+        case HLT_TIME:
+            ImGui::SetNextItemWidth(glyph_size().x * 18);
+            ImGui::InputFloat("Seconds", &currentHaltExpression.runtime);
+            break;
+        case HLT_CYCLES:
+            ImGui::SetNextItemWidth(glyph_size().x * 18);
+            ImGui::InputScalar("Count", ImGuiDataType_U64,
+                               &currentHaltExpression.cycles);
+            break;
+        case HLT_JAM:
+            ImGui::Dummy({0, ImGui::GetFrameHeight()});
+            break;
+        default:
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                        "Invalid halt condition selection: %zu",
+                        selectedCondition);
+            break;
+        }
+        if (ImGui::Button("Add")) {
+            s.events.emplace(aldo::Command::breakpointAdd,
+                             currentHaltExpression);
+        }
+        ImGui::Separator();
+        const ImVec2 dims{
+            -FLT_MIN,
+            8 * ImGui::GetTextLineHeightWithSpacing(),
         };
-        using halt_idx = decltype(haltConditions)::size_type;
-        static halt_idx selected;
-        ImGui::AlignTextToFramePadding();
-        ImGui::TextUnformatted("Halt on");
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(glyph_size().x * 12);
-        if (ImGui::BeginCombo("##haltconditions", haltConditions[selected])) {
-            for (halt_idx i = 0; i < haltConditions.size(); ++i) {
-                const auto current = i == selected;
-                if (ImGui::Selectable(haltConditions[i], current)) {
-                    selected = i;
+        static std::vector<breakpoint> breakpoints;
+        using bp_index = decltype(breakpoints)::size_type;
+        using bp_selection = decltype(breakpoints)::difference_type;
+        static constinit bp_selection selected_bp = -1;
+        if (ImGui::BeginListBox("##breakpoints", dims)) {
+            for (bp_index i = 0; i < breakpoints.size(); ++i) {
+                const auto& bp = breakpoints[i];
+                const bp_selection idx = static_cast<bp_selection>(i);
+                const auto current = idx == selected_bp;
+                if (ImGui::Selectable(bp.description.c_str(), current)) {
+                    selected_bp = idx;
                 }
                 if (current) {
                     ImGui::SetItemDefaultFocus();
                 }
             }
-            ImGui::EndCombo();
+            ImGui::EndListBox();
         }
-        ImGui::Separator();
-        static std::uint16_t addr;
-        static std::uint64_t cycles;
-        static float seconds;
-        static std::vector breakpoints{
-            breakpoint{2},
-            breakpoint{3, 34.678},
-            breakpoint{0, static_cast<std::uint16_t>(0xa432)},
-            breakpoint{1, 30000ul},
-        };
-        switch (selected) {
-        case 0:
-            input_address(&addr);
-            break;
-        case 1:
-            ImGui::SetNextItemWidth(glyph_size().x * 18);
-            ImGui::InputScalar("Count", ImGuiDataType_U64, &cycles);
-            break;
-        case 2:
-            ImGui::Dummy({0, ImGui::GetFrameHeight()});
-            break;
-        case 3:
-            ImGui::SetNextItemWidth(glyph_size().x * 18);
-            ImGui::InputFloat("Seconds", &seconds);
-            break;
-        default:
-            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-                        "Invalid halt condition selection: %zu", selected);
-            break;
-        }
-        ImGui::Button("Add");
-        ImGui::SameLine();
         ImGui::PushStyleColor(ImGuiCol_Button,
                               aldo::colors::DestructiveButton);
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
@@ -537,27 +546,36 @@ private:
                               aldo::colors::DestructiveButtonActive);
         ImGui::Button("Remove");
         ImGui::PopStyleColor(3);
-        ImGui::Separator();
-        const ImVec2 dims{
-            -FLT_MIN,
-            8 * ImGui::GetTextLineHeightWithSpacing(),
-        };
-        using bp_index = decltype(breakpoints)::size_type;
-        static bp_index selected_bp;
-        if (ImGui::BeginListBox("##breakpoints", dims)) {
-            for (bp_index i = 0; i < breakpoints.size(); ++i) {
-                const auto& bp = breakpoints[i];
-                const auto current = i == selected_bp;
-                if (ImGui::Selectable(bp.description.c_str(), current)) {
-                    selected_bp = i;
+    }
+
+    void renderConditionCombo() noexcept
+    {
+        ImGui::AlignTextToFramePadding();
+        ImGui::TextUnformatted("Halt on");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(glyph_size().x * 12);
+        if (ImGui::BeginCombo("##haltconditions",
+                              haltConditions[selectedCondition].second)) {
+            for (halt_idx i = 0; i < haltConditions.size(); ++i) {
+                const auto current = i == selectedCondition;
+                if (ImGui::Selectable(haltConditions[i].second, current)) {
+                    selectedCondition = i;
                 }
                 if (current) {
                     ImGui::SetItemDefaultFocus();
                 }
             }
-            ImGui::EndListBox();
+            ImGui::EndCombo();
         }
     }
+
+    // NOTE: does not include first enum value HLT_NONE
+    std::array<
+        std::pair<haltcondition, const char*>,
+        HLT_CONDCOUNT - 1> haltConditions;
+    using halt_idx = decltype(haltConditions)::size_type;
+    halt_idx selectedCondition;
+    haltexpr currentHaltExpression{.cond = HLT_NONE};
 
     struct breakpoint {
         std::size_t type;
@@ -611,7 +629,7 @@ public:
                    aldo::MediaRuntime&&) = delete;
 
 protected:
-    void renderContents() const override
+    void renderContents() override
     {
         renderStats();
         ImGui::Separator();
@@ -719,7 +737,7 @@ public:
             aldo::MediaRuntime&&) = delete;
 
 protected:
-    void renderContents() const override
+    void renderContents() override
     {
         renderPrg();
         if (ImGui::CollapsingHeader("Vectors",
@@ -806,7 +824,7 @@ public:
         aldo::MediaRuntime&&) = delete;
 
 protected:
-    void renderContents() const override
+    void renderContents() override
     {
         static constexpr auto pageSize = 0x100, pageDim = 0x10,
                                 cols = pageDim + 2, pageCount = 8;
@@ -883,7 +901,7 @@ protected:
 // Public Interface
 //
 
-void aldo::View::View::render() const
+void aldo::View::View::render()
 {
     if (visible && !*visible) return;
 

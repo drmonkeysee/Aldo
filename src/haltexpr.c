@@ -27,6 +27,17 @@ const char *haltexpr_errstr(int err)
     }
 }
 
+const char *haltcond_description(enum haltcondition cond)
+{
+    switch (cond) {
+#define X(s, d) case s: return d;
+        HEXPR_COND_X
+#undef X
+    default:
+        return "INVALID CONDITION";
+    }
+}
+
 int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
 {
     assert(expr != NULL);
@@ -51,8 +62,8 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
             break;
         case HLT_TIME:
             {
-                double time;
-                parsed = sscanf(str, "%lf %1[Ss]", &time, u) == 2;
+                float time;
+                parsed = sscanf(str, "%f %1[Ss]", &time, u) == 2;
                 valid = time > 0.0;
                 e = (struct haltexpr){
                     .runtime = time,

@@ -282,6 +282,7 @@ void debug_remove_reset_override(debugctx *self)
 void debug_addbreakpoint(debugctx *self, struct haltexpr expr)
 {
     assert(self != NULL);
+    assert(HLT_NONE < expr.cond && expr.cond < HLT_CONDCOUNT);
 
     bpvector_insert(&self->breakpoints, expr);
 }

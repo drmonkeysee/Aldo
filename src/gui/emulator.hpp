@@ -14,7 +14,6 @@
 #include "nes.h"
 #include "snapshot.h"
 
-#include <iterator>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -49,98 +48,10 @@ private:
     console_state snapshot;
 };
 
-class BreakpointIterator final {
-public:
-    using difference_type = std::ptrdiff_t;
-    using value_type = breakpoint;
-    using reference = const value_type&;
-    using pointer = const value_type*;
-    using iterator_category = std::forward_iterator_tag;
-    using iterator_concept = iterator_category;
-
-    BreakpointIterator() noexcept {}
-    explicit BreakpointIterator(debugctx* db) noexcept : debugger{db} {}
-
-    void swap(BreakpointIterator& that) noexcept
-    {
-        std::swap(this->debugger, that.debugger);
-        std::swap(this->idx, that.idx);
-    }
-
-    reference operator*() const noexcept { return *get_breakpoint(); }
-    pointer operator->() const noexcept { return get_breakpoint(); }
-    BreakpointIterator& operator++() noexcept { ++idx; return *this; }
-    BreakpointIterator operator++(int) noexcept
-    {
-        auto tmp{*this};
-        ++*this;
-        return tmp;
-    }
-    friend bool operator==(const BreakpointIterator& a,
-                           const BreakpointIterator& b)
-    {
-        // NOTE: default ctor represents "end" so either iterators are:
-        //  both default
-        //  one default and one at the actual end (index == count)
-        //  memberwise equal
-        return (!a.debugger && !b.debugger)
-                || a.equals_end(b)
-                || b.equals_end(a)
-                || (a.debugger == b.debugger && a.idx == b.idx);
-    }
-    friend bool operator!=(const BreakpointIterator& a,
-                           const BreakpointIterator& b)
-    {
-        return !(a == b);
-    }
-
-private:
-    pointer get_breakpoint() const noexcept
-    {
-        if (!debugger) return nullptr;
-        return debug_bp_at(debugger, idx);
-    }
-
-    std::size_t count() const noexcept
-    {
-        if (!debugger) return 0;
-        return debug_bp_count(debugger);
-    }
-
-    bool equals_end(const BreakpointIterator& that) const noexcept
-    {
-        return debugger && !that.debugger
-                && idx == static_cast<difference_type>(count());
-    }
-
-    debugctx* debugger = nullptr;
-    difference_type idx = 0;
-};
-
-inline void swap(BreakpointIterator& a, BreakpointIterator& b) noexcept
-{
-    a.swap(b);
-}
-
-class BreakpointsProxy final {
-public:
-    using const_iterator = BreakpointIterator;
-
-    explicit BreakpointsProxy(debugctx* db) noexcept : debugger{db} {}
-
-    const_iterator cbegin() const noexcept { return const_iterator{debugger}; }
-    const_iterator cend() const noexcept { return const_iterator{}; }
-    const_iterator begin() noexcept { return cbegin(); }
-    const_iterator end() noexcept { return cend(); }
-
-private:
-    static_assert(std::forward_iterator<BreakpointIterator>,
-                  "Breakpoint Iterator definition incomplete");
-    debugctx* debugger;
-};
-
 class EmuController final {
 public:
+    using bpindex = std::ptrdiff_t;
+
     EmuController(debug_handle d, console_handle n) noexcept
     : hdebug{std::move(d)}, hconsole{std::move(n)},
         lsnapshot{consolep()} {}
@@ -152,9 +63,13 @@ public:
     {
         return lsnapshot.getp();
     }
-    BreakpointsProxy breakpoints() const noexcept
+    std::size_t breakpointCount() const noexcept
     {
-        return BreakpointsProxy{debugp()};
+        return debug_bp_count(debugp());
+    }
+    const breakpoint* breakpointAt(bpindex at) const noexcept
+    {
+        return debug_bp_at(debugp(), at);
     }
 
     void handleInput(viewstate& state, const gui_platform& platform);

@@ -28,6 +28,7 @@
 #include <locale>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <cinttypes>
 #include <cstddef>
 #include <cstdint>
@@ -544,20 +545,23 @@ private:
             -FLT_MIN,
             8 * ImGui::GetTextLineHeightWithSpacing(),
         };
+        const auto bpCount = c.breakpointCount();
+        ImGui::Text("%zu breakpoint%s", bpCount, bpCount == 1 ? "" : "s");
         if (ImGui::BeginListBox("##breakpoints", dims)) {
-            bp_selection idx = 0;
             char fmt[HEXPR_FMT_SIZE];
-            for (auto& bp : c.breakpoints()) {
-                const auto current = idx == selectedBreakpoint;
-                const int err = haltexpr_fmt(&bp.expr, fmt);
+            bpindex i = 0;
+            for (auto bp = c.breakpointAt(i); bp; bp = c.breakpointAt(++i)) {
+                const auto current = i == selectedBreakpoint;
+                const int err = haltexpr_fmt(&bp->expr, fmt);
+                ImGui::PushID(static_cast<int>(i));
                 if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt,
                                       current)) {
-                    selectedBreakpoint = idx;
+                    selectedBreakpoint = i;
                 }
+                ImGui::PopID();
                 if (current) {
                     ImGui::SetItemDefaultFocus();
                 }
-                ++idx;
             }
             ImGui::EndListBox();
         }
@@ -590,9 +594,8 @@ private:
     halt_idx selectedCondition;
     haltexpr currentHaltExpression;
 
-    using bp_selection = decltype(c.breakpoints())::const_iterator
-                            ::difference_type;
-    bp_selection selectedBreakpoint = -1;
+    using bpindex = std::remove_reference_t<decltype(c)>::bpindex;
+    bpindex selectedBreakpoint = -1;
 };
 
 class HardwareTraits final : public aldo::View {

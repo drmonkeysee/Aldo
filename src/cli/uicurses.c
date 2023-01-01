@@ -10,6 +10,7 @@
 #include "cart.h"
 #include "ctrlsignal.h"
 #include "cycleclock.h"
+#include "debug.h"
 #include "dis.h"
 #include "emu.h"
 #include "haltexpr.h"
@@ -181,7 +182,7 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
     mvwprintw(v->content, cursor_y++, 0, "Tracing: %s",
               emu->args->tron ? "On" : "Off");
     mvwaddstr(v->content, cursor_y++, 0, "Reset Override: ");
-    if (emu->snapshot.debugger.resvector_override < 0) {
+    if (emu->snapshot.debugger.resvector_override == NoResetVector) {
         waddstr(v->content, "None");
     } else {
         wprintw(v->content, "$%04X",
@@ -257,7 +258,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
     hi = emu->snapshot.mem.vectors[3];
     mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     RES",
               CPU_VECTOR_RES, lo, hi);
-    if (emu->snapshot.debugger.resvector_override < 0) {
+    if (emu->snapshot.debugger.resvector_override == NoResetVector) {
         wprintw(v->content, " $%04X", bytowr(lo, hi));
     } else {
         wprintw(v->content, " !$%04X",

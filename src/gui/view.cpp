@@ -771,7 +771,7 @@ private:
         const auto& debugger = snp.debugger;
         const char* indicator;
         std::uint16_t resVector;
-        if (debugger.resvector_override < 0) {
+        if (debugger.resvector_override == NoResetVector) {
             indicator = "";
             resVector = bytowr(lo, hi);
         } else {

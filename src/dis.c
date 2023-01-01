@@ -9,6 +9,7 @@
 
 #include "bytes.h"
 #include "ctrlsignal.h"
+#include "debug.h"
 
 #include <assert.h>
 #include <math.h>
@@ -622,7 +623,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
         const char *fmt;
         uint16_t vector;
         if (snapshot->datapath.res == CSGS_COMMITTED
-            && snapshot->debugger.resvector_override >= 0) {
+            && snapshot->debugger.resvector_override != NoResetVector) {
             fmt = "!%04X";
             vector = (uint16_t)snapshot->debugger.resvector_override;
         } else {

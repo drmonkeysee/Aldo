@@ -23,7 +23,7 @@ struct console_state {
                 vectors[6];
     } mem;
     struct {
-        int resvector_override; // RESET Vector Override (<0 if not set)
+        int resvector_override;
         struct haltexpr break_condition;
     } debugger;
     enum csig_excmode mode;

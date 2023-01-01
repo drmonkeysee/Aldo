@@ -148,7 +148,8 @@ public:
     std::string_view cartName() const;
     std::optional<cartinfo> cartInfo() const;
     const console_state& snapshot() const noexcept { return lsnapshot.get(); }
-    const console_state* snapshotp() const noexcept {
+    const console_state* snapshotp() const noexcept
+    {
         return lsnapshot.getp();
     }
     BreakpointsProxy breakpoints() const noexcept

@@ -33,9 +33,6 @@
 #include <cstdint>
 #include <cstdio>
 
-// TODO: temporary haltexpr
-#include <variant>
-
 namespace
 {
 
@@ -432,6 +429,7 @@ public:
             const auto c = static_cast<haltcondition>(++cond);
             d = {c, haltcond_description(c)};
         }
+        resetHaltExpression();
     }
     Debugger(aldo::viewstate&, aldo::EmuController&&,
              const aldo::MediaRuntime&) = delete;
@@ -488,7 +486,6 @@ private:
 
         ImGui::Separator();
 
-        currentHaltExpression.cond = haltConditions[selectedCondition].first;
         switch (currentHaltExpression.cond) {
         case HLT_ADDR:
             input_address(&currentHaltExpression.address);
@@ -525,9 +522,12 @@ private:
         static constinit bp_selection selected_bp = -1;
         if (ImGui::BeginListBox("##breakpoints", dims)) {
             bp_selection idx = 0;
+            char fmt[HEXPR_FMT_SIZE];
             for (auto& bp : c.breakpoints()) {
                 const auto current = idx == selected_bp;
-                if (ImGui::Selectable(bp_description(bp).c_str(), current)) {
+                const int err = haltexpr_fmt(&bp.expr, fmt);
+                if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt,
+                                      current)) {
                     selected_bp = idx;
                 }
                 if (current) {
@@ -559,6 +559,7 @@ private:
                 const auto current = i == selectedCondition;
                 if (ImGui::Selectable(haltConditions[i].second, current)) {
                     selectedCondition = i;
+                    resetHaltExpression();
                 }
                 if (current) {
                     ImGui::SetItemDefaultFocus();
@@ -568,34 +569,11 @@ private:
         }
     }
 
-    std::string bp_description(const breakpoint& bp)
+    void resetHaltExpression() noexcept
     {
-        std::string description;
-        std::array<char, 32> buf;
-        switch (bp.expr.cond) {
-        case HLT_ADDR:
-            description += "PC @ $";
-            std::snprintf(buf.data(), buf.size(), "%04X", bp.expr.address);
-            description += buf.data();
-            break;
-        case HLT_CYCLES:
-            std::snprintf(buf.data(), buf.size(), "%" PRIu64, bp.expr.cycles);
-            description += buf.data();
-            description += " cycles";
-            break;
-        case HLT_JAM:
-            description += "JAMMED";
-            break;
-        case HLT_TIME:
-            std::snprintf(buf.data(), buf.size(), "%f", bp.expr.runtime);
-            description += buf.data();
-            description += " seconds";
-            break;
-        default:
-            description += "INVALID";
-            break;
-        }
-        return description;
+        currentHaltExpression = {
+            .cond = haltConditions[selectedCondition].first,
+        };
     }
 
     // NOTE: does not include first enum value HLT_NONE
@@ -604,45 +582,7 @@ private:
         HLT_CONDCOUNT - 1> haltConditions;
     using halt_idx = decltype(haltConditions)::size_type;
     halt_idx selectedCondition;
-    haltexpr currentHaltExpression{.cond = HLT_NONE};
-
-    struct breakpoint {
-        std::size_t type;
-        std::variant<std::monostate, std::uint16_t, std::uint64_t, double> value;
-        std::string description;
-
-        template<typename T = std::monostate>
-        breakpoint(std::size_t type, T v = {}) : type{type}, value{v}
-        {
-            std::array<char, 32> buf;
-            switch (type) {
-            case 0:
-                description += "PC @ $";
-                std::snprintf(buf.data(), buf.size(), "%04X",
-                              std::get<uint16_t>(value));
-                description += buf.data();
-                break;
-            case 1:
-                std::snprintf(buf.data(), buf.size(), "%" PRIu64,
-                              std::get<uint64_t>(value));
-                description += buf.data();
-                description += " cycles";
-                break;
-            case 2:
-                description += "JAMMED";
-                break;
-            case 3:
-                std::snprintf(buf.data(), buf.size(), "%f",
-                              std::get<double>(value));
-                description += buf.data();
-                description += " seconds";
-                break;
-            default:
-                description += "INVALID";
-                break;
-            }
-        }
-    };
+    haltexpr currentHaltExpression;
 };
 
 class HardwareTraits final : public aldo::View {

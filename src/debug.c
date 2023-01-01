@@ -127,14 +127,10 @@ static struct breakpoint *bpvector_at(const struct breakpoint_vector *vec,
 
 static void bpvector_resize(struct breakpoint_vector *vec)
 {
-    const size_t oldcap = vec->capacity;
     // NOTE: growth factor K = 1.5
     vec->capacity += vec->capacity / 2;
     vec->items = realloc(vec->items, vec->capacity * sizeof *vec->items);
     assert(vec->items != NULL);
-    for (size_t i = oldcap; i < vec->capacity; ++i) {
-        vec->items[i] = (struct breakpoint){.status = BPS_FREE};
-    }
 }
 
 static void bpvector_insert(struct breakpoint_vector *vec,
@@ -144,7 +140,7 @@ static void bpvector_insert(struct breakpoint_vector *vec,
         bpvector_resize(vec);
     }
     struct breakpoint *const slot = vec->items + vec->size;
-    *slot = (struct breakpoint){expr, BPS_ENABLED};
+    *slot = (struct breakpoint){expr, true};
     ++vec->size;
 }
 
@@ -154,7 +150,7 @@ static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
 {
     for (ptrdiff_t i = 0; i < (ptrdiff_t)vec->size; ++i) {
         const struct breakpoint *const bp = vec->items + i;
-        if (bp->status != BPS_ENABLED) continue;
+        if (!bp->enabled) continue;
         switch (bp->expr.cond) {
         case HLT_ADDR:
             if (halt_address(bp, cpu)) return i;

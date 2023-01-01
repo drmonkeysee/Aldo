@@ -460,7 +460,7 @@ static void print_addr(void *ctx)
 
 static void print_runtime(void *ctx)
 {
-    struct haltexpr expr = {.cond = HLT_TIME, .runtime = 4.36532245};
+    struct haltexpr expr = {.cond = HLT_TIME, .runtime = 4.36532245f};
     char buf[HEXPR_FMT_SIZE];
 
     const int result = haltexpr_fmt(&expr, buf);

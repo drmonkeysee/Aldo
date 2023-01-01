@@ -13,17 +13,12 @@
 #include "haltexpr.h"
 #include "snapshot.h"
 
+#include <stdbool.h>
 #include <stddef.h>
-
-enum breakpointstatus {
-    BPS_FREE,
-    BPS_DISABLED,
-    BPS_ENABLED,
-};
 
 struct breakpoint {
     struct haltexpr expr;
-    enum breakpointstatus status;
+    bool enabled;
 };
 
 typedef struct debugger_context debugctx;

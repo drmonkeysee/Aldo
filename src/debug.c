@@ -20,7 +20,7 @@ static const ptrdiff_t NoBreakpoint = -1;
 
 struct debugger_context {
     struct breakpoint_vector {
-        size_t capacity;
+        size_t capacity, size;
         struct breakpoint *items;
     } breakpoints;
     struct mos6502 *cpu;    // Non-owning Pointer
@@ -118,21 +118,11 @@ static void bpvector_init(struct breakpoint_vector *vec)
     };
 }
 
-static struct breakpoint *
-bpvector_find_slot(const struct breakpoint_vector *vec)
-{
-    for (size_t i = 0; i < vec->capacity; ++i) {
-        if (vec->items[i].status == BPS_FREE) return vec->items + i;
-    }
-    return NULL;
-}
-
 static struct breakpoint *bpvector_at(const struct breakpoint_vector *vec,
-                                      ptrdiff_t h)
+                                      ptrdiff_t at)
 {
-    assert(0 <= h && h < (ptrdiff_t)vec->capacity);
-
-    return vec->items + h;
+    if (at < 0 || at >= (ptrdiff_t)vec->size) return NULL;
+    return vec->items + at;
 }
 
 static void bpvector_resize(struct breakpoint_vector *vec)
@@ -150,20 +140,19 @@ static void bpvector_resize(struct breakpoint_vector *vec)
 static void bpvector_insert(struct breakpoint_vector *vec,
                             struct haltexpr expr)
 {
-    struct breakpoint *slot = bpvector_find_slot(vec);
-    if (!slot) {
+    if (vec->size == vec->capacity) {
         bpvector_resize(vec);
-        slot = bpvector_find_slot(vec);
     }
-    assert(slot != NULL);
+    struct breakpoint *const slot = vec->items + vec->size;
     *slot = (struct breakpoint){expr, BPS_ENABLED};
+    ++vec->size;
 }
 
 static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
                                 const struct cycleclock *clk,
                                 const struct mos6502 *cpu)
 {
-    for (ptrdiff_t i = 0; i < (ptrdiff_t)vec->capacity; ++i) {
+    for (ptrdiff_t i = 0; i < (ptrdiff_t)vec->size; ++i) {
         const struct breakpoint *const bp = vec->items + i;
         if (bp->status != BPS_ENABLED) continue;
         switch (bp->expr.cond) {
@@ -275,6 +264,18 @@ void debug_bp_add(debugctx *self, struct haltexpr expr)
     assert(HLT_NONE < expr.cond && expr.cond < HLT_CONDCOUNT);
 
     bpvector_insert(&self->breakpoints, expr);
+}
+
+const struct breakpoint *debug_bp_at(debugctx *self, ptrdiff_t at)
+{
+    assert(self != NULL);
+
+    return bpvector_at(&self->breakpoints, at);
+}
+
+size_t debug_bp_count(debugctx *self)
+{
+    return self->breakpoints.size;
 }
 
 void debug_check(debugctx *self, const struct cycleclock *clk)

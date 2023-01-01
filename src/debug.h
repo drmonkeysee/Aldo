@@ -47,6 +47,8 @@ br_libexport
 void debug_bp_add(debugctx *self, struct haltexpr expr) br_nothrow;
 br_libexport
 const struct breakpoint *debug_bp_at(debugctx *self, ptrdiff_t at) br_nothrow;
+br_libexport
+size_t debug_bp_count(debugctx *self) br_nothrow;
 
 //
 // Internal

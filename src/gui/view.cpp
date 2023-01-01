@@ -520,21 +520,20 @@ private:
             -FLT_MIN,
             8 * ImGui::GetTextLineHeightWithSpacing(),
         };
-        static std::vector<breakpoint> breakpoints;
-        using bp_index = decltype(breakpoints)::size_type;
-        using bp_selection = decltype(breakpoints)::difference_type;
+        using bp_sequence = decltype(c.breakpoints());
+        using bp_selection = bp_sequence::iterator::difference_type;
         static constinit bp_selection selected_bp = -1;
         if (ImGui::BeginListBox("##breakpoints", dims)) {
-            for (bp_index i = 0; i < breakpoints.size(); ++i) {
-                const auto& bp = breakpoints[i];
-                const bp_selection idx = static_cast<bp_selection>(i);
+            bp_selection idx = 0;
+            for (auto& bp : c.breakpoints()) {
                 const auto current = idx == selected_bp;
-                if (ImGui::Selectable(bp.description.c_str(), current)) {
+                if (ImGui::Selectable(bp_description(bp).c_str(), current)) {
                     selected_bp = idx;
                 }
                 if (current) {
                     ImGui::SetItemDefaultFocus();
                 }
+                ++idx;
             }
             ImGui::EndListBox();
         }
@@ -567,6 +566,36 @@ private:
             }
             ImGui::EndCombo();
         }
+    }
+
+    std::string bp_description(const breakpoint& bp)
+    {
+        std::string description;
+        std::array<char, 32> buf;
+        switch (bp.expr.cond) {
+        case HLT_ADDR:
+            description += "PC @ $";
+            std::snprintf(buf.data(), buf.size(), "%04X", bp.expr.address);
+            description += buf.data();
+            break;
+        case HLT_CYCLES:
+            std::snprintf(buf.data(), buf.size(), "%" PRIu64, bp.expr.cycles);
+            description += buf.data();
+            description += " cycles";
+            break;
+        case HLT_JAM:
+            description += "JAMMED";
+            break;
+        case HLT_TIME:
+            std::snprintf(buf.data(), buf.size(), "%f", bp.expr.runtime);
+            description += buf.data();
+            description += " seconds";
+            break;
+        default:
+            description += "INVALID";
+            break;
+        }
+        return description;
     }
 
     // NOTE: does not include first enum value HLT_NONE

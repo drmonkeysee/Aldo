@@ -518,7 +518,7 @@ private:
             8 * ImGui::GetTextLineHeightWithSpacing(),
         };
         using bp_sequence = decltype(c.breakpoints());
-        using bp_selection = bp_sequence::iterator::difference_type;
+        using bp_selection = bp_sequence::const_iterator::difference_type;
         static constinit bp_selection selected_bp = -1;
         if (ImGui::BeginListBox("##breakpoints", dims)) {
             bp_selection idx = 0;

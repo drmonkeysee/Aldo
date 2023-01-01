@@ -12,7 +12,6 @@
 
 #include <assert.h>
 #include <math.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -271,6 +270,8 @@ const struct breakpoint *debug_bp_at(debugctx *self, ptrdiff_t at)
 
 size_t debug_bp_count(debugctx *self)
 {
+    assert(self != NULL);
+
     return self->breakpoints.size;
 }
 

@@ -63,9 +63,8 @@ public:
 
     void swap(BreakpointIterator& that) noexcept
     {
-        auto tmp{that};
-        that = *this;
-        *this = tmp;
+        std::swap(this->debugger, that.debugger);
+        std::swap(this->idx, that.idx);
     }
 
     reference operator*() const noexcept { return *get_breakpoint(); }
@@ -80,12 +79,14 @@ public:
     friend bool operator==(const BreakpointIterator& a,
                            const BreakpointIterator& b)
     {
-        // NOTE: default ctor iterator is equivalent to end()
-        if (!a.debugger) return b.idx
-                            == static_cast<difference_type>(b.count());
-        if (!b.debugger) return a.idx
-                            == static_cast<difference_type>(a.count());
-        return a.debugger == b.debugger && a.idx == b.idx;
+        // NOTE: default ctor represents "end" so either iterators are:
+        //  both default
+        //  one default and one at the actual end (index == count)
+        //  memberwise equal
+        return (!a.debugger && !b.debugger)
+                || a.equals_end(b)
+                || b.equals_end(a)
+                || (a.debugger == b.debugger && a.idx == b.idx);
     }
     friend bool operator!=(const BreakpointIterator& a,
                            const BreakpointIterator& b)
@@ -106,8 +107,14 @@ private:
         return debug_bp_count(debugger);
     }
 
+    bool equals_end(const BreakpointIterator& that) const noexcept
+    {
+        return debugger && !that.debugger
+                && idx == static_cast<difference_type>(count());
+    }
+
     debugctx* debugger = nullptr;
-    mutable difference_type idx = 0;
+    difference_type idx = 0;
 };
 
 inline void swap(BreakpointIterator& a, BreakpointIterator& b) noexcept
@@ -117,15 +124,14 @@ inline void swap(BreakpointIterator& a, BreakpointIterator& b) noexcept
 
 class BreakpointsProxy final {
 public:
-    using iterator = BreakpointIterator;
-    using const_iterator = const iterator;
+    using const_iterator = BreakpointIterator;
 
     explicit BreakpointsProxy(debugctx* db) noexcept : debugger{db} {}
 
-    iterator begin() noexcept { return iterator{debugger}; }
-    iterator end() noexcept { return iterator{}; }
     const_iterator cbegin() const noexcept { return const_iterator{debugger}; }
     const_iterator cend() const noexcept { return const_iterator{}; }
+    const_iterator begin() noexcept { return cbegin(); }
+    const_iterator end() noexcept { return cend(); }
 
 private:
     static_assert(std::forward_iterator<BreakpointIterator>,

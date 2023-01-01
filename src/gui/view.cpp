@@ -483,9 +483,36 @@ private:
     void renderBreakpoints() noexcept
     {
         renderConditionCombo();
-
         ImGui::Separator();
+        renderBreakpointAdd();
+        ImGui::Separator();
+        renderBreakpointList();
+    }
 
+    void renderConditionCombo() noexcept
+    {
+        ImGui::AlignTextToFramePadding();
+        ImGui::TextUnformatted("Halt on");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(glyph_size().x * 12);
+        if (ImGui::BeginCombo("##haltconditions",
+                              haltConditions[selectedCondition].second)) {
+            for (halt_idx i = 0; i < haltConditions.size(); ++i) {
+                const auto current = i == selectedCondition;
+                if (ImGui::Selectable(haltConditions[i].second, current)) {
+                    selectedCondition = i;
+                    resetHaltExpression();
+                }
+                if (current) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+    }
+
+    void renderBreakpointAdd() noexcept
+    {
         switch (currentHaltExpression.cond) {
         case HLT_ADDR:
             input_address(&currentHaltExpression.address);
@@ -512,23 +539,23 @@ private:
             s.events.emplace(aldo::Command::breakpointAdd,
                              currentHaltExpression);
         }
-        ImGui::Separator();
+    }
+
+    void renderBreakpointList() noexcept
+    {
         const ImVec2 dims{
             -FLT_MIN,
             8 * ImGui::GetTextLineHeightWithSpacing(),
         };
-        using bp_sequence = decltype(c.breakpoints());
-        using bp_selection = bp_sequence::const_iterator::difference_type;
-        static constinit bp_selection selected_bp = -1;
         if (ImGui::BeginListBox("##breakpoints", dims)) {
             bp_selection idx = 0;
             char fmt[HEXPR_FMT_SIZE];
             for (auto& bp : c.breakpoints()) {
-                const auto current = idx == selected_bp;
+                const auto current = idx == selectedBreakpoint;
                 const int err = haltexpr_fmt(&bp.expr, fmt);
                 if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt,
                                       current)) {
-                    selected_bp = idx;
+                    selectedBreakpoint = idx;
                 }
                 if (current) {
                     ImGui::SetItemDefaultFocus();
@@ -537,6 +564,7 @@ private:
             }
             ImGui::EndListBox();
         }
+
         ImGui::PushStyleColor(ImGuiCol_Button,
                               aldo::colors::DestructiveButton);
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
@@ -545,28 +573,6 @@ private:
                               aldo::colors::DestructiveButtonActive);
         ImGui::Button("Remove");
         ImGui::PopStyleColor(3);
-    }
-
-    void renderConditionCombo() noexcept
-    {
-        ImGui::AlignTextToFramePadding();
-        ImGui::TextUnformatted("Halt on");
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(glyph_size().x * 12);
-        if (ImGui::BeginCombo("##haltconditions",
-                              haltConditions[selectedCondition].second)) {
-            for (halt_idx i = 0; i < haltConditions.size(); ++i) {
-                const auto current = i == selectedCondition;
-                if (ImGui::Selectable(haltConditions[i].second, current)) {
-                    selectedCondition = i;
-                    resetHaltExpression();
-                }
-                if (current) {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-            ImGui::EndCombo();
-        }
     }
 
     void resetHaltExpression() noexcept
@@ -583,6 +589,10 @@ private:
     using halt_idx = decltype(haltConditions)::size_type;
     halt_idx selectedCondition;
     haltexpr currentHaltExpression;
+
+    using bp_selection = decltype(c.breakpoints())::const_iterator
+                            ::difference_type;
+    bp_selection selectedBreakpoint = -1;
 };
 
 class HardwareTraits final : public aldo::View {

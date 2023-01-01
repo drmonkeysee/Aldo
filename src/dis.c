@@ -763,9 +763,10 @@ int dis_cart_chr(cart *cart, int chrscale,
     assert(cart != NULL);
     assert(output != NULL);
 
+    if (chrscale <= 0 || chrscale > ScaleGuard) return DIS_ERR_CHRSCL;
+
     struct blockview bv = cart_chrblock(cart, 0);
     if (!bv.mem) return DIS_ERR_CHRROM;
-    if (chrscale <= 0 || chrscale > ScaleGuard) return DIS_ERR_CHRSCL;
 
     const char *const prefix = chrdecode_prefix && chrdecode_prefix[0] != '\0'
                                 ? chrdecode_prefix

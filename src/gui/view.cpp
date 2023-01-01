@@ -453,15 +453,12 @@ protected:
     }
 
 private:
-    void renderVectorOverride() const noexcept
+    void renderVectorOverride() noexcept
     {
-        static bool resetOverride;
-        static std::uint16_t addr;
-
         if (ImGui::Checkbox("Override", &resetOverride)) {
             if (resetOverride) {
                 s.events.emplace(aldo::Command::overrideReset,
-                                 static_cast<int>(addr));
+                                 static_cast<int>(resetAddr));
             } else {
                 s.events.emplace(aldo::Command::overrideReset, NoResetVector);
             }
@@ -469,11 +466,11 @@ private:
         if (!resetOverride) {
             ImGui::BeginDisabled();
             // NOTE: +2 = start of reset vector
-            addr = batowr(c.snapshot().mem.vectors + 2);
+            resetAddr = batowr(c.snapshot().mem.vectors + 2);
         }
-        if (input_address(&addr)) {
+        if (input_address(&resetAddr)) {
             s.events.emplace(aldo::Command::overrideReset,
-                             static_cast<int>(addr));
+                             static_cast<int>(resetAddr));
         }
         if (!resetOverride) {
             ImGui::EndDisabled();
@@ -582,6 +579,9 @@ private:
         };
     }
 
+    bool resetOverride = false;
+    std::uint16_t resetAddr = 0x0;
+
     // NOTE: does not include first enum value HLT_NONE
     std::array<
         std::pair<haltcondition, const char*>,
@@ -618,11 +618,9 @@ protected:
     }
 
 private:
-    void renderStats() const noexcept
+    void renderStats() noexcept
     {
         static constexpr auto refreshIntervalMs = 250;
-        static double dispDtInput, dispDtUpdate, dispDtRender, refreshDt;
-
         const auto& cyclock = s.clock.cyclock;
         if ((refreshDt += cyclock.frametime_ms) >= refreshIntervalMs) {
             dispDtInput = s.clock.dtInputMs;
@@ -701,6 +699,8 @@ private:
                              aldo::interrupt_event{CSGI_RES, res});
         }
     }
+
+    double dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0, refreshDt = 0;
 };
 
 class PrgAtPc final : public aldo::View {
@@ -726,10 +726,9 @@ protected:
     }
 
 private:
-    void renderPrg() const noexcept
+    void renderPrg() noexcept
     {
         static constexpr auto instCount = 16;
-        static constinit auto selected = -1;
 
         const auto& snp = c.snapshot();
         const auto& prgMem = snp.mem;
@@ -788,6 +787,8 @@ private:
         ImGui::Text("%04X: %02X %02X     IRQ $%04X", CPU_VECTOR_IRQ, lo, hi,
                     bytowr(lo, hi));
     }
+
+    int selected = -1;
 };
 
 class Ram final : public aldo::View {

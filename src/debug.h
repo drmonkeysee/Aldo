@@ -13,6 +13,19 @@
 #include "haltexpr.h"
 #include "snapshot.h"
 
+#include <stddef.h>
+
+enum breakpointstatus {
+    BPS_FREE,
+    BPS_DISABLED,
+    BPS_ENABLED,
+};
+
+struct breakpoint {
+    struct haltexpr expr;
+    enum breakpointstatus status;
+};
+
 typedef struct debugger_context debugctx;
 
 #include "bridgeopen.h"
@@ -29,9 +42,11 @@ br_libexport
 void debug_free(debugctx *self) br_nothrow;
 
 br_libexport
-void debug_addbreakpoint(debugctx *self, struct haltexpr expr) br_nothrow;
-br_libexport
 void debug_set_resetvector(debugctx *self, int resetvector) br_nothrow;
+br_libexport
+void debug_bp_add(debugctx *self, struct haltexpr expr) br_nothrow;
+br_libexport
+const struct breakpoint *debug_bp_at(debugctx *self, ptrdiff_t at) br_nothrow;
 
 //
 // Internal

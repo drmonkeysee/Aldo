@@ -64,7 +64,9 @@ public:
     void update(viewstate& state) noexcept;
 
 private:
+    debugctx* debugp() const noexcept { return hdebug.get(); }
     cart* cartp() const noexcept { return hcart.get(); }
+    nes* consolep() const noexcept { return hconsole.get(); }
     console_state* snapshotp() noexcept { return lsnapshot.getp(); }
 
     void loadCartFrom(const char*);

@@ -112,7 +112,7 @@ static debugctx *create_debugger(const struct cliargs *args)
             debug_free(dbg);
             return NULL;
         } else {
-            debug_addbreakpoint(dbg, expr);
+            debug_bp_add(dbg, expr);
             if (args->verbose) {
                 char buf[HEXPR_FMT_SIZE];
                 err = haltexpr_fmt(&expr, buf);

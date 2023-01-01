@@ -13,25 +13,15 @@
 #include <assert.h>
 #include <math.h>
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
-
-enum breakpointstatus {
-    BPS_FREE,
-    BPS_DISABLED,
-    BPS_ENABLED,
-};
 
 static const ptrdiff_t NoBreakpoint = -1;
 
 struct debugger_context {
     struct breakpoint_vector {
         size_t capacity;
-        struct breakpoint {
-            struct haltexpr expr;
-            enum breakpointstatus status;
-        } *items;
+        struct breakpoint *items;
     } breakpoints;
     struct mos6502 *cpu;    // Non-owning Pointer
     struct resdecorator {
@@ -279,7 +269,7 @@ void debug_remove_reset_override(debugctx *self)
     self->dec = (struct resdecorator){0};
 }
 
-void debug_addbreakpoint(debugctx *self, struct haltexpr expr)
+void debug_bp_add(debugctx *self, struct haltexpr expr)
 {
     assert(self != NULL);
     assert(HLT_NONE < expr.cond && expr.cond < HLT_CONDCOUNT);

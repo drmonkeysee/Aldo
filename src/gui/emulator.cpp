@@ -101,8 +101,8 @@ void aldo::EmuController::handleInput(aldo::viewstate& state,
 
 void aldo::EmuController::update(aldo::viewstate& state) noexcept
 {
-    nes_cycle(hconsole.get(), &state.clock.cyclock);
-    nes_snapshot(hconsole.get(), snapshotp());
+    nes_cycle(consolep(), &state.clock.cyclock);
+    nes_snapshot(consolep(), snapshotp());
     updateBouncer(state);
 }
 
@@ -123,9 +123,9 @@ void aldo::EmuController::loadCartFrom(const char* filepath)
     } else {
         throw aldo::AldoError{"Cannot open cart file", filepath, errno};
     }
-    nes_powerdown(hconsole.get());
+    nes_powerdown(consolep());
     hcart.reset(c);
-    nes_powerup(hconsole.get(), hcart.get(), false);
+    nes_powerup(consolep(), cartp(), false);
     cartFilepath = filepath;
 }
 
@@ -133,7 +133,7 @@ void aldo::EmuController::openCartFile(const gui_platform& p)
 {
     // NOTE: halt console to prevent time-jump from modal delay
     // TODO: does this make sense long-term?
-    nes_halt(hconsole.get());
+    nes_halt(consolep());
 
     const aldo::platform_buffer filepath{p.open_file(), p.free_buffer};
     if (!filepath) return;
@@ -152,13 +152,13 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
 {
     switch (ev.cmd) {
     case aldo::Command::breakpointAdd:
-        debug_addbreakpoint(hdebug.get(), std::get<haltexpr>(ev.value));
+        debug_bp_add(debugp(), std::get<haltexpr>(ev.value));
         break;
     case aldo::Command::halt:
         if (std::get<bool>(ev.value)) {
-            nes_halt(hconsole.get());
+            nes_halt(consolep());
         } else {
-            nes_ready(hconsole.get());
+            nes_ready(consolep());
         }
         break;
     case aldo::Command::interrupt:
@@ -166,9 +166,9 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
             const auto [signal, active] =
                 std::get<aldo::interrupt_event>(ev.value);
             if (active) {
-                nes_interrupt(hconsole.get(), signal);
+                nes_interrupt(consolep(), signal);
             } else {
-                nes_clear(hconsole.get(), signal);
+                nes_clear(consolep(), signal);
             }
         }
         break;
@@ -176,13 +176,13 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
         p.launch_studio();
         break;
     case aldo::Command::mode:
-        nes_mode(hconsole.get(), std::get<csig_excmode>(ev.value));
+        nes_mode(consolep(), std::get<csig_excmode>(ev.value));
         break;
     case aldo::Command::openFile:
         openCartFile(p);
         break;
     case aldo::Command::overrideReset:
-        debug_set_resetvector(hdebug.get(), std::get<int>(ev.value));
+        debug_set_resetvector(debugp(), std::get<int>(ev.value));
         break;
     case aldo::Command::quit:
         s.running = false;

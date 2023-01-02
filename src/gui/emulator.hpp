@@ -50,6 +50,7 @@ private:
 
 class EmuController final {
 public:
+    using bpsize = std::size_t;
     using bpindex = std::ptrdiff_t;
 
     EmuController(debug_handle d, console_handle n) noexcept
@@ -63,7 +64,7 @@ public:
     {
         return lsnapshot.getp();
     }
-    std::size_t breakpointCount() const noexcept
+    bpsize breakpointCount() const noexcept
     {
         return debug_bp_count(debugp());
     }

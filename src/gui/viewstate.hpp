@@ -17,12 +17,16 @@
 #include <queue>
 #include <utility>
 #include <variant>
+#include <cstddef>
 
 namespace aldo
 {
 
 enum class Command {
     breakpointAdd,
+    breakpointsClear,
+    breakpointRemove,
+    breakpointToggle,
     halt,
     interrupt,
     mode,
@@ -45,7 +49,8 @@ struct event {
         csig_excmode,
         haltexpr,
         int,
-        interrupt_event
+        interrupt_event,
+        std::ptrdiff_t
     > value;
 };
 

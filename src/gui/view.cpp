@@ -41,7 +41,7 @@ namespace
 // Helpers
 //
 
-constexpr auto NotSelected = -1;
+constexpr auto NoSelection = -1;
 
 constexpr auto display_linestate(bool v) noexcept
 {
@@ -582,7 +582,7 @@ private:
 
     void renderListControls(bpsize bpCount) noexcept
     {
-        if (selectedBreakpoint == NotSelected) {
+        if (selectedBreakpoint == NoSelection) {
             ImGui::BeginDisabled();
         }
         auto bp = c.breakpointAt(selectedBreakpoint);
@@ -603,7 +603,7 @@ private:
                              selectedBreakpoint);
             resetSelection = true;
         }
-        if (selectedBreakpoint == NotSelected) {
+        if (selectedBreakpoint == NoSelection) {
             ImGui::EndDisabled();
         }
         ImGui::SameLine();
@@ -619,7 +619,7 @@ private:
         }
         ImGui::PopStyleColor(3);
         if (resetSelection) {
-            selectedBreakpoint = NotSelected;
+            selectedBreakpoint = NoSelection;
         }
     }
 
@@ -639,7 +639,7 @@ private:
     using haltindex = decltype(haltConditions)::size_type;
     haltindex selectedCondition;
     haltexpr currentHaltExpression;
-    bpindex selectedBreakpoint = NotSelected;
+    bpindex selectedBreakpoint = NoSelection;
 };
 
 class HardwareTraits final : public aldo::View {
@@ -835,7 +835,7 @@ private:
                     bytowr(lo, hi));
     }
 
-    int selected = NotSelected;
+    int selected = NoSelection;
 };
 
 class Ram final : public aldo::View {

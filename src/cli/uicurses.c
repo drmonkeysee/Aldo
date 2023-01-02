@@ -177,6 +177,8 @@ static void drawcontrols(const struct view *v, const struct emulator *emu)
 
 static void drawdebugger(const struct view *v, const struct emulator *emu)
 {
+    static const struct haltexpr empty = {.cond = HLT_NONE};
+
     int cursor_y = 0;
     werase(v->content);
     mvwprintw(v->content, cursor_y++, 0, "Tracing: %s",
@@ -188,9 +190,10 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
         wprintw(v->content, "$%04X",
                 emu->snapshot.debugger.resvector_override);
     }
+    const struct breakpoint *const bp
+        = debug_bp_at(emu->dbg, emu->snapshot.debugger.halted);
     char break_desc[HEXPR_FMT_SIZE];
-    const int err = haltexpr_fmt(&emu->snapshot.debugger.break_condition,
-                                 break_desc);
+    const int err = haltexpr_fmt(bp ? &bp->expr : &empty, break_desc);
     mvwprintw(v->content, cursor_y, 0, "Break: %s",
               err < 0 ? haltexpr_errstr(err) : break_desc);
 }

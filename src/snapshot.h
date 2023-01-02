@@ -23,8 +23,8 @@ struct console_state {
                 vectors[6];
     } mem;
     struct {
+        ptrdiff_t halted;
         int resvector_override;
-        struct haltexpr break_condition;
     } debugger;
     enum csig_excmode mode;
     struct {

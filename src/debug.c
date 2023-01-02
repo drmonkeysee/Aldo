@@ -16,8 +16,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const ptrdiff_t NoBreakpoint = -1;
-
 struct debugger_context {
     struct breakpoint_vector {
         size_t capacity, size;
@@ -209,6 +207,7 @@ static void bpvector_free(struct breakpoint_vector *vec)
 //
 
 const int NoResetVector = -1;
+const ptrdiff_t NoBreakpoint = -1;
 
 debugctx *debug_new(void)
 {
@@ -358,9 +357,6 @@ void debug_snapshot(debugctx *self, struct console_state *snapshot)
     assert(self != NULL);
     assert(snapshot != NULL);
 
-    static const struct haltexpr empty = {.cond = HLT_NONE};
-
-    const struct breakpoint *const bp = debug_bp_at(self, self->halted);
-    snapshot->debugger.break_condition = bp ? bp->expr : empty;
+    snapshot->debugger.halted = self->halted;
     snapshot->debugger.resvector_override = self->resetvector;
 }

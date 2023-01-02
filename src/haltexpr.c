@@ -112,16 +112,16 @@ int haltexpr_fmt(const struct haltexpr *expr,
         count = sprintf(buf, "None");
         break;
     case HLT_ADDR:
-        count = sprintf(buf, "@ $%04X", expr->address);
+        count = sprintf(buf, "PC @ $%04X", expr->address);
         break;
     case HLT_TIME:
-        count = sprintf(buf, "%.3f sec", expr->runtime);
+        count = sprintf(buf, "%.8g sec", expr->runtime);
         break;
     case HLT_CYCLES:
         count = sprintf(buf, "%" PRIu64 " cyc", expr->cycles);
         break;
     case HLT_JAM:
-        count = sprintf(buf, "JAM");
+        count = sprintf(buf, "CPU JAMMED");
         break;
     default:
         assert(((void)"INVALID HALT CONDITION", false));

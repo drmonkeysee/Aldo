@@ -496,27 +496,31 @@ private:
 
     void renderBreakpoints() noexcept
     {
-        renderConditionCombo();
+        const auto setFocus = renderConditionCombo();
         ImGui::Separator();
-        renderBreakpointAdd();
+        renderBreakpointAdd(setFocus);
         ImGui::Separator();
         renderBreakpointList();
         detectedHalt = c.snapshot().debugger.halted != NoBreakpoint;
     }
 
-    void renderConditionCombo() noexcept
+    bool renderConditionCombo() noexcept
     {
         ImGui::AlignTextToFramePadding();
         ImGui::TextUnformatted("Halt on");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(glyph_size().x * 12);
+        bool setFocus = false;
         if (ImGui::BeginCombo("##haltconditions",
                               haltConditions[selectedCondition].second)) {
             for (haltindex i = 0; i < haltConditions.size(); ++i) {
                 const auto current = i == selectedCondition;
                 if (ImGui::Selectable(haltConditions[i].second, current)) {
-                    selectedCondition = i;
-                    resetHaltExpression();
+                    setFocus = true;
+                    if (!current) {
+                        selectedCondition = i;
+                        resetHaltExpression();
+                    }
                 }
                 if (current) {
                     ImGui::SetItemDefaultFocus();
@@ -524,9 +528,10 @@ private:
             }
             ImGui::EndCombo();
         }
+        return setFocus;
     }
 
-    void renderBreakpointAdd() noexcept
+    void renderBreakpointAdd(bool setFocus) noexcept
     {
         switch (currentHaltExpression.cond) {
         case HLT_ADDR:
@@ -549,6 +554,9 @@ private:
                         "Invalid halt condition selection: %zu",
                         selectedCondition);
             break;
+        }
+        if (setFocus) {
+            ImGui::SetKeyboardFocusHere(-1);
         }
         const auto submitted = ImGui::IsItemDeactivated() && pressed_enter();
         if (ImGui::Button("Add") || submitted) {

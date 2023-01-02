@@ -74,6 +74,17 @@ auto glyph_size() noexcept
     return ImGui::CalcTextSize("A");
 }
 
+template<ImGuiKey... keys>
+auto pressed_keys() noexcept
+{
+    return (ImGui::IsKeyPressed(keys, false) || ...);
+}
+
+auto pressed_enter() noexcept
+{
+    return pressed_keys<ImGuiKey_Enter, ImGuiKey_KeypadEnter>();
+}
+
 template<std::derived_from<aldo::View>... Vs>
 auto add_views(std::vector<std::unique_ptr<aldo::View>>& v, aldo::viewstate& s,
                const aldo::EmuController& c, const aldo::MediaRuntime& r)
@@ -538,7 +549,8 @@ private:
                         selectedCondition);
             break;
         }
-        if (ImGui::Button("Add")) {
+        const auto submitted = ImGui::IsItemDeactivated() && pressed_enter();
+        if (ImGui::Button("Add") || submitted) {
             s.events.emplace(aldo::Command::breakpointAdd,
                              currentHaltExpression);
         }

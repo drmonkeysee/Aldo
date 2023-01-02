@@ -10,7 +10,6 @@
 #include "emulator.hpp"
 #include "mediaruntime.hpp"
 #include "render.hpp"
-#include "snapshot.h"
 #include "ui.h"
 #include "view.hpp"
 #include "viewstate.hpp"
@@ -47,21 +46,21 @@ auto render_ui(const aldo::Layout& l, const aldo::MediaRuntime& r,
     l.render();
 }
 
-auto runloop(const gui_platform& platform, debugctx* debug, nes* console)
+auto runloop(const gui_platform& p, debugctx* debug, nes* console)
 {
     aldo::EmuController controller{
         aldo::debug_handle{debug}, aldo::console_handle{console},
     };
     aldo::viewstate state;
     const aldo::MediaRuntime runtime{
-        {1280, 800}, state.bouncer.bounds, platform,
+        {1280, 800}, state.bouncer.bounds, p,
     };
     const aldo::Layout layout{state, controller, runtime};
     state.clock.start();
     do {
         const auto reset = !controller.snapshot().lines.ready;
         const auto tick = state.clock.startTick(reset);
-        handle_input(controller, state, platform);
+        handle_input(controller, state, p);
         if (state.running) {
             update_emu(controller, state);
             render_ui(layout, runtime, state);

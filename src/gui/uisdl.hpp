@@ -9,8 +9,9 @@
 #define Aldo_gui_uisdl_hpp
 
 #include "debug.h"
-#include "guiplatform.h"
 #include "nes.h"
+
+struct gui_platform;
 
 #ifdef __cplusplus
 namespace aldo

@@ -501,6 +501,7 @@ private:
         renderBreakpointAdd();
         ImGui::Separator();
         renderBreakpointList();
+        detectedHalt = c.snapshot().debugger.halted != NoBreakpoint;
     }
 
     void renderConditionCombo() noexcept
@@ -565,31 +566,47 @@ private:
         const auto bpCount = c.breakpointCount();
         ImGui::Text("%zu breakpoint%s", bpCount, bpCount == 1 ? "" : "s");
         if (ImGui::BeginListBox("##breakpoints", dims)) {
-            char fmt[HEXPR_FMT_SIZE];
             bpindex i = 0;
             for (auto bp = c.breakpointAt(i); bp; bp = c.breakpointAt(++i)) {
-                const auto current = i == selectedBreakpoint;
-                const int err = haltexpr_fmt(&bp->expr, fmt);
-                if (!bp->enabled) {
-                    ImGui::PushStyleVar(ImGuiStyleVar_Alpha,
-                                        ImGui::GetStyle().DisabledAlpha);
-                }
-                ImGui::PushID(static_cast<int>(i));
-                if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt,
-                                      current)) {
-                    selectedBreakpoint = i;
-                }
-                ImGui::PopID();
-                if (!bp->enabled) {
-                    ImGui::PopStyleVar();
-                }
-                if (current) {
-                    ImGui::SetItemDefaultFocus();
-                }
+                renderBreakpoint(i, *bp);
             }
             ImGui::EndListBox();
         }
         renderListControls(bpCount);
+    }
+
+    void renderBreakpoint(bpindex idx, const breakpoint& bp) noexcept
+    {
+        const auto bpBreak = idx == c.snapshot().debugger.halted;
+        if (bpBreak && !detectedHalt) {
+            selectedBreakpoint = idx;
+        }
+        const auto current = idx == selectedBreakpoint;
+        char fmt[HEXPR_FMT_SIZE];
+        const int err = haltexpr_fmt(&bp.expr, fmt);
+
+        if (!bp.enabled) {
+            ImGui::PushStyleVar(ImGuiStyleVar_Alpha,
+                                ImGui::GetStyle().DisabledAlpha);
+        }
+        if (bpBreak) {
+            ImGui::PushStyleColor(ImGuiCol_Text, aldo::colors::Attention);
+        }
+        ImGui::PushID(static_cast<int>(idx));
+        if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt, current)) {
+            selectedBreakpoint = idx;
+        }
+        ImGui::PopID();
+        if (bpBreak) {
+            ImGui::PopStyleColor();
+        }
+        if (!bp.enabled) {
+            ImGui::PopStyleVar();
+        }
+
+        if (current) {
+            ImGui::SetItemDefaultFocus();
+        }
     }
 
     void renderListControls(bpsize bpCount) noexcept
@@ -603,12 +620,11 @@ private:
                              selectedBreakpoint);
         }
         ImGui::SameLine();
-        ImGui::PushStyleColor(ImGuiCol_Button,
-                              aldo::colors::DestructiveButton);
+        ImGui::PushStyleColor(ImGuiCol_Button, aldo::colors::Destructive);
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-                              aldo::colors::DestructiveButtonHover);
+                              aldo::colors::DestructiveHover);
         ImGui::PushStyleColor(ImGuiCol_ButtonActive,
-                              aldo::colors::DestructiveButtonActive);
+                              aldo::colors::DestructiveActive);
         auto resetSelection = false;
         if (ImGui::Button("Remove")) {
             s.events.emplace(aldo::Command::breakpointRemove,
@@ -642,12 +658,11 @@ private:
         };
     }
 
-    bool resetOverride = false;
+    bool detectedHalt = false, resetOverride = false;
     std::uint16_t resetAddr = 0x0;
-
     // NOTE: does not include first enum value HLT_NONE
     std::array<std::pair<haltcondition, const char*>, HLT_CONDCOUNT - 1>
-    haltConditions;
+        haltConditions;
     using haltindex = decltype(haltConditions)::size_type;
     haltindex selectedCondition;
     haltexpr currentHaltExpression;

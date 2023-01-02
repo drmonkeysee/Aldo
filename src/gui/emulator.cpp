@@ -154,6 +154,19 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
     case aldo::Command::breakpointAdd:
         debug_bp_add(debugp(), std::get<haltexpr>(ev.value));
         break;
+    case aldo::Command::breakpointsClear:
+        debug_bp_clear(debugp());
+        break;
+    case aldo::Command::breakpointRemove:
+        debug_bp_remove(debugp(), std::get<bpindex>(ev.value));
+        break;
+    case aldo::Command::breakpointToggle:
+        {
+            const auto idx = std::get<bpindex>(ev.value);
+            const auto bp = breakpointAt(idx);
+            debug_bp_enabled(debugp(), idx, bp && !bp->enabled);
+        }
+        break;
     case aldo::Command::halt:
         if (std::get<bool>(ev.value)) {
             nes_halt(consolep());

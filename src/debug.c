@@ -14,6 +14,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 static const ptrdiff_t NoBreakpoint = -1;
 
@@ -108,6 +109,12 @@ static bool halt_jammed(const struct mos6502 *cpu)
 // Breakpoint Vector
 //
 
+static bool bpvector_valid_index(const struct breakpoint_vector *vec,
+                                 ptrdiff_t at)
+{
+    return 0 <= at && at < (ptrdiff_t)vec->size;
+}
+
 static void bpvector_init(struct breakpoint_vector *vec)
 {
     static const size_t initial_capacity = 2;
@@ -120,8 +127,8 @@ static void bpvector_init(struct breakpoint_vector *vec)
 static struct breakpoint *bpvector_at(const struct breakpoint_vector *vec,
                                       ptrdiff_t at)
 {
-    if (at < 0 || at >= (ptrdiff_t)vec->size) return NULL;
-    return vec->items + at;
+    if (bpvector_valid_index(vec, at)) return vec->items + at;
+    return NULL;
 }
 
 static void bpvector_resize(struct breakpoint_vector *vec)
@@ -168,6 +175,27 @@ static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
         }
     }
     return NoBreakpoint;
+}
+
+static bool bpvector_remove(struct breakpoint_vector *vec, ptrdiff_t at)
+{
+    if (!bpvector_valid_index(vec, at)) return false;
+
+    if (at < (ptrdiff_t)vec->size - 1) {
+        const struct breakpoint
+            *const rest = vec->items + at + 1,
+            *const end = vec->items + vec->size;
+        const ptrdiff_t count = end - rest;
+        assert(count > 0);
+        memmove(vec->items + at, rest, sizeof *vec->items * (size_t)count);
+    }
+    --vec->size;
+    return true;
+}
+
+static void bpvector_clear(struct breakpoint_vector *vec)
+{
+    vec->size = 0;
 }
 
 static void bpvector_free(struct breakpoint_vector *vec)
@@ -268,6 +296,40 @@ const struct breakpoint *debug_bp_at(debugctx *self, ptrdiff_t at)
     return bpvector_at(&self->breakpoints, at);
 }
 
+void debug_bp_enabled(debugctx *self, ptrdiff_t at, bool enabled)
+{
+    assert(self != NULL);
+
+    struct breakpoint *const bp = bpvector_at(&self->breakpoints, at);
+    if (bp) {
+        bp->enabled = enabled;
+    }
+}
+
+void debug_bp_remove(debugctx *self, ptrdiff_t at)
+{
+    assert(self != NULL);
+
+    if (!bpvector_remove(&self->breakpoints, at)) return;
+
+    // NOTE: if we removed the currently halted breakpoint we need to clear
+    // the halt flag; if we removed a breakpoint before the currently halted
+    // breakpoint we need to adjust the flag back one.
+    if (self->halted == at) {
+        self->halted = NoBreakpoint;
+    } else if (self->halted > at) {
+        --self->halted;
+    }
+}
+
+void debug_bp_clear(debugctx *self)
+{
+    assert(self != NULL);
+
+    bpvector_clear(&self->breakpoints);
+    self->halted = NoBreakpoint;
+}
+
 size_t debug_bp_count(debugctx *self)
 {
     assert(self != NULL);
@@ -296,11 +358,9 @@ void debug_snapshot(debugctx *self, struct console_state *snapshot)
     assert(self != NULL);
     assert(snapshot != NULL);
 
-    snapshot->debugger.break_condition = self->halted == NoBreakpoint
-                                            ? (struct haltexpr){
-                                                .cond = HLT_NONE,
-                                            }
-                                            : bpvector_at(&self->breakpoints,
-                                                          self->halted)->expr;
+    static const struct haltexpr empty = {.cond = HLT_NONE};
+
+    const struct breakpoint *const bp = debug_bp_at(self, self->halted);
+    snapshot->debugger.break_condition = bp ? bp->expr : empty;
     snapshot->debugger.resvector_override = self->resetvector;
 }

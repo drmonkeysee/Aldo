@@ -41,6 +41,8 @@ namespace
 // Helpers
 //
 
+constexpr auto NotSelected = -1;
+
 constexpr auto display_linestate(bool v) noexcept
 {
     return v ? "HI" : "LO";
@@ -578,14 +580,15 @@ private:
         renderListControls(bpCount);
     }
 
-    void renderListControls(bpsize bpCount) const noexcept
+    void renderListControls(bpsize bpCount) noexcept
     {
-        if (selectedBreakpoint == -1) {
+        if (selectedBreakpoint == NotSelected) {
             ImGui::BeginDisabled();
         }
         auto bp = c.breakpointAt(selectedBreakpoint);
-        if (ImGui::Button(!bp || bp->enabled ? "Disable" : "Enable") && bp) {
-            s.events.emplace(aldo::Command::breakpointToggle, !bp->enabled);
+        if (ImGui::Button(!bp || bp->enabled ? "Disable" : "Enable ")) {
+            s.events.emplace(aldo::Command::breakpointToggle,
+                             selectedBreakpoint);
         }
         ImGui::SameLine();
         ImGui::PushStyleColor(ImGuiCol_Button,
@@ -594,11 +597,13 @@ private:
                               aldo::colors::DestructiveButtonHover);
         ImGui::PushStyleColor(ImGuiCol_ButtonActive,
                               aldo::colors::DestructiveButtonActive);
+        auto resetSelection = false;
         if (ImGui::Button("Remove")) {
             s.events.emplace(aldo::Command::breakpointRemove,
                              selectedBreakpoint);
+            resetSelection = true;
         }
-        if (selectedBreakpoint == -1) {
+        if (selectedBreakpoint == NotSelected) {
             ImGui::EndDisabled();
         }
         ImGui::SameLine();
@@ -607,11 +612,15 @@ private:
         }
         if (ImGui::Button("Clear")) {
             s.events.emplace(aldo::Command::breakpointsClear);
+            resetSelection = true;
         }
         if (bpCount == 0) {
             ImGui::EndDisabled();
         }
         ImGui::PopStyleColor(3);
+        if (resetSelection) {
+            selectedBreakpoint = NotSelected;
+        }
     }
 
     void resetHaltExpression() noexcept
@@ -630,7 +639,7 @@ private:
     using haltindex = decltype(haltConditions)::size_type;
     haltindex selectedCondition;
     haltexpr currentHaltExpression;
-    bpindex selectedBreakpoint = -1;
+    bpindex selectedBreakpoint = NotSelected;
 };
 
 class HardwareTraits final : public aldo::View {
@@ -826,7 +835,7 @@ private:
                     bytowr(lo, hi));
     }
 
-    int selected = -1;
+    int selected = NotSelected;
 };
 
 class Ram final : public aldo::View {

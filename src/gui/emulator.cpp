@@ -35,7 +35,7 @@ auto invalid_command(aldo::Command c)
     return s;
 }
 
-auto is_guikey_shortcut(SDL_Event* ev) noexcept
+auto is_guikey_mod(SDL_Event* ev) noexcept
 {
     return ev->key.keysym.mod == KMOD_LGUI || ev->key.keysym.mod == KMOD_RGUI;
 }
@@ -82,7 +82,7 @@ void aldo::EmuController::handleInput(aldo::viewstate& state,
         ImGui_ImplSDL2_ProcessEvent(&ev);
         switch (ev.type) {
         case SDL_KEYDOWN:
-            if (is_guikey_shortcut(&ev) && !ev.key.repeat
+            if (is_guikey_mod(&ev) && !ev.key.repeat
                 && ev.key.keysym.sym == SDLK_o) {
                 state.events.emplace(aldo::Command::openFile);
             }

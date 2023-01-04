@@ -243,7 +243,7 @@ protected:
         }
     }
 
-    void renderiNesInfo(const cartinfo& info) const noexcept
+    static void renderiNesInfo(const cartinfo& info) noexcept
     {
         ImGui::Text("Mapper: %03u%s", info.ines_hdr.mapper_id,
                     info.ines_hdr.mapper_implemented
@@ -277,7 +277,7 @@ protected:
         ImGui::Text("Bus Conflicts: %s", boolstr(info.ines_hdr.bus_conflicts));
     }
 
-    void renderRawInfo() const noexcept
+    static void renderRawInfo() noexcept
     {
         // TODO: assume 32KB size for now
         ImGui::TextUnformatted("PRG ROM: 1 x 32KB");
@@ -311,11 +311,10 @@ protected:
         }
         ImGui::EndChild();
         ImGui::SameLine();
-        if (ImGui::BeginChild("CpuRight")) {
-            if (ImGui::CollapsingHeader("Datapath",
-                                        ImGuiTreeNodeFlags_DefaultOpen)) {
-                renderDatapath();
-            }
+        if (ImGui::BeginChild("CpuRight")
+            && ImGui::CollapsingHeader("Datapath",
+                                       ImGuiTreeNodeFlags_DefaultOpen)) {
+            renderDatapath();
         }
         ImGui::EndChild();
     }
@@ -323,7 +322,7 @@ protected:
 private:
     void renderRegisters() const noexcept
     {
-        const auto& cpu = c.snapshot().cpu;
+        auto& cpu = c.snapshot().cpu;
         ImGui::BeginGroup();
         {
             ImGui::Text("A: %02X", cpu.accumulator);
@@ -378,8 +377,8 @@ private:
 
     void renderDatapath() const noexcept
     {
-        const auto& datapath = c.snapshot().datapath;
-        const auto& lines = c.snapshot().lines;
+        auto& datapath = c.snapshot().datapath;
+        auto& lines = c.snapshot().lines;
 
         ImGui::Text("Address Bus: %04X", datapath.addressbus);
         if (datapath.busfault) {
@@ -731,7 +730,7 @@ private:
 
     void renderRunControls() const
     {
-        const auto& snp = c.snapshot();
+        auto& snp = c.snapshot();
         auto halt = !snp.lines.ready;
         if (ImGui::Checkbox("HALT", &halt)) {
             s.events.emplace(aldo::Command::halt, halt);
@@ -812,8 +811,8 @@ private:
     {
         static constexpr auto instCount = 16;
 
-        const auto& snp = c.snapshot();
-        const auto& prgMem = snp.mem;
+        auto& snp = c.snapshot();
+        auto& prgMem = snp.mem;
         auto addr = snp.datapath.current_instruction;
         dis_instruction inst{};
         char disasm[DIS_INST_SIZE];
@@ -841,8 +840,8 @@ private:
 
     void renderVectors() const noexcept
     {
-        const auto& snp = c.snapshot();
-        const auto& prgMem = snp.mem;
+        auto& snp = c.snapshot();
+        auto& prgMem = snp.mem;
 
         auto lo = prgMem.vectors[0], hi = prgMem.vectors[1];
         ImGui::Text("%04X: %02X %02X     NMI $%04X", CPU_VECTOR_NMI, lo, hi,
@@ -850,7 +849,7 @@ private:
 
         lo = prgMem.vectors[2];
         hi = prgMem.vectors[3];
-        const auto& debugger = snp.debugger;
+        auto& debugger = snp.debugger;
         const char* indicator;
         std::uint16_t resVector;
         if (debugger.resvector_override == NoResetVector) {
@@ -912,7 +911,7 @@ protected:
 
             const auto spHighlightText =
                 ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
-            const auto& snp = c.snapshot();
+            auto& snp = c.snapshot();
             const auto sp = snp.cpu.stack_pointer;
             std::uint16_t addr = 0;
             for (std::size_t page = 0; page < pageCount; ++page) {

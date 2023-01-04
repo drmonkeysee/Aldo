@@ -69,11 +69,6 @@ constexpr auto boolstr(bool v) noexcept
     return v ? "yes" : "no";
 }
 
-auto glyph_size() noexcept
-{
-    return ImGui::CalcTextSize("A");
-}
-
 template<ImGuiKey... keys>
 auto pressed_keys() noexcept
 {
@@ -125,7 +120,7 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
 
 auto input_address(std::uint16_t* addr) noexcept
 {
-    ImGui::SetNextItemWidth(glyph_size().x * 6);
+    ImGui::SetNextItemWidth(aldo::glyph_size().x * 6);
     ImGui::PushID(addr);
     const auto result = ImGui::InputScalar("Address", ImGuiDataType_U16, addr,
                                            nullptr, nullptr, "%04X");
@@ -200,7 +195,7 @@ protected:
         using namespace std::literals::string_view_literals;
         static constexpr auto label = "Name: "sv;
 
-        const auto textSz = glyph_size(),
+        const auto textSz = aldo::glyph_size(),
                     availSpace = ImGui::GetContentRegionAvail();
         const auto nameFit =
             static_cast<int>((availSpace.x / textSz.x) - label.length());
@@ -348,7 +343,7 @@ private:
         static constexpr auto textOn = IM_COL32_BLACK,
                                 textOff = IM_COL32_WHITE;
 
-        const auto textSz = glyph_size();
+        const auto textSz = aldo::glyph_size();
         const auto radius = (textSz.x + textSz.y) / 2.0f;
         const auto pos = ImGui::GetCursorScreenPos();
         ImVec2 center{pos.x + radius, pos.y + radius};
@@ -508,7 +503,7 @@ private:
         ImGui::AlignTextToFramePadding();
         ImGui::TextUnformatted("Halt on");
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(glyph_size().x * 12);
+        ImGui::SetNextItemWidth(aldo::glyph_size().x * 12);
         bool setFocus = false;
         if (ImGui::BeginCombo("##haltconditions",
                               haltConditions[selectedCondition].second)) {
@@ -537,11 +532,11 @@ private:
             input_address(&currentHaltExpression.address);
             break;
         case HLT_TIME:
-            ImGui::SetNextItemWidth(glyph_size().x * 18);
+            ImGui::SetNextItemWidth(aldo::glyph_size().x * 18);
             ImGui::InputFloat("Seconds", &currentHaltExpression.runtime);
             break;
         case HLT_CYCLES:
-            ImGui::SetNextItemWidth(glyph_size().x * 18);
+            ImGui::SetNextItemWidth(aldo::glyph_size().x * 18);
             ImGui::InputScalar("Count", ImGuiDataType_U64,
                                &currentHaltExpression.cycles);
             break;

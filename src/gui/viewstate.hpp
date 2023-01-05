@@ -14,6 +14,7 @@
 
 #include <SDL2/SDL.h>
 
+#include <concepts>
 #include <queue>
 #include <utility>
 #include <variant>
@@ -36,22 +37,23 @@ enum class Command {
     quit,
 };
 
-using interrupt_event = std::pair<csig_interrupt, bool>;
-
 struct event {
-    template<typename T = std::monostate>
+    using interrupt = std::pair<csig_interrupt, bool>;
+    using payload =
+        std::variant<
+            std::monostate,
+            bool,
+            csig_excmode,
+            haltexpr,
+            int,
+            interrupt,
+            std::ptrdiff_t>;
+
+    template<std::convertible_to<payload> T = std::monostate>
     constexpr event(Command c, T v = {}) noexcept : cmd{c}, value{v} {}
 
     Command cmd;
-    std::variant<
-        std::monostate,
-        bool,
-        csig_excmode,
-        haltexpr,
-        int,
-        interrupt_event,
-        std::ptrdiff_t
-    > value;
+    payload value;
 };
 
 struct viewstate {

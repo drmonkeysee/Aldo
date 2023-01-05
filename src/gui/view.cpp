@@ -69,15 +69,14 @@ constexpr auto boolstr(bool v) noexcept
     return v ? "yes" : "no";
 }
 
-template<ImGuiKey... keys>
-auto pressed_keys() noexcept
+auto pressed_keys(std::same_as<ImGuiKey> auto... keys) noexcept
 {
     return (ImGui::IsKeyPressed(keys, false) || ...);
 }
 
 auto pressed_enter() noexcept
 {
-    return pressed_keys<ImGuiKey_Enter, ImGuiKey_KeypadEnter>();
+    return pressed_keys(ImGuiKey_Enter, ImGuiKey_KeypadEnter);
 }
 
 template<std::derived_from<aldo::View>... Vs>
@@ -762,17 +761,17 @@ private:
         irq = !snp.lines.irq, nmi = !snp.lines.nmi, res = !snp.lines.reset;
         if (ImGui::Checkbox("IRQ", &irq)) {
             s.events.emplace(aldo::Command::interrupt,
-                             aldo::interrupt_event{CSGI_IRQ, irq});
+                             aldo::event::interrupt{CSGI_IRQ, irq});
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("NMI", &nmi)) {
             s.events.emplace(aldo::Command::interrupt,
-                             aldo::interrupt_event{CSGI_NMI, nmi});
+                             aldo::event::interrupt{CSGI_NMI, nmi});
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("RES", &res)) {
             s.events.emplace(aldo::Command::interrupt,
-                             aldo::interrupt_event{CSGI_RES, res});
+                             aldo::event::interrupt{CSGI_RES, res});
         }
     }
 
@@ -978,8 +977,7 @@ aldo::Layout::Layout(aldo::viewstate& s, const aldo::EmuController& c,
         Debugger,
         HardwareTraits,
         PrgAtPc,
-        Ram
-    >(views, s, c, r);
+        Ram>(views, s, c, r);
 }
 
 void aldo::Layout::render() const

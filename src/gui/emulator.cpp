@@ -177,7 +177,7 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
     case aldo::Command::interrupt:
         {
             const auto [signal, active] =
-                std::get<aldo::interrupt_event>(ev.value);
+                std::get<aldo::event::interrupt>(ev.value);
             if (active) {
                 nes_interrupt(consolep(), signal);
             } else {

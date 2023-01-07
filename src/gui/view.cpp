@@ -943,7 +943,7 @@ protected:
                         }
                         if (std::isprint(static_cast<char>(val), lcl)) {
                             ascii[ramCol] =
-                                static_cast<std::string::value_type>(val);
+                                static_cast<decltype(ascii)::value_type>(val);
                         }
                     }
                     ImGui::TableSetColumnIndex(cols - 1);

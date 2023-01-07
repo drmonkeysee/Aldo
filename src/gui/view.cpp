@@ -336,7 +336,7 @@ private:
         ImGui::EndGroup();
     }
 
-    void renderFlags() const noexcept
+    void renderFlags() const
     {
         static constexpr std::array flags{
             'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
@@ -429,7 +429,7 @@ private:
 class Debugger final : public aldo::View {
 public:
     Debugger(aldo::viewstate& s, const aldo::EmuController& c,
-             const aldo::MediaRuntime& r) noexcept
+             const aldo::MediaRuntime& r)
     : View{"Debugger", s, c, r}
     {
         using haltval = decltype(haltConditions)::value_type;

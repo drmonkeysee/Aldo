@@ -16,10 +16,11 @@ typedef struct addressbus bus;
 
 #include "bridgeopen.h"
 struct busdevice {
-    bool (*read)(const void *br_noalias, uint16_t, uint8_t *br_noalias);
-    bool (*write)(void *, uint16_t, uint8_t);
+    bool (*read)(const void *br_noalias, uint16_t,
+                 uint8_t *br_noalias) br_nothrow;
+    bool (*write)(void *, uint16_t, uint8_t) br_nothrow;
     size_t (*dma)(const void *br_noalias, uint16_t, size_t,
-                  uint8_t[br_noalias]);
+                  uint8_t[br_noalias]) br_nothrow;
     void *ctx;  // Non-owning Pointer
 };
 

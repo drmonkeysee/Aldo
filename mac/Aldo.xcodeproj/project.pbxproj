@@ -340,6 +340,7 @@
 		C8C706BD2751F55C00B45785 /* trace.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = trace.c; sourceTree = "<group>"; };
 		C8D388D72952B9A700DF230D /* runclock.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = runclock.hpp; sourceTree = "<group>"; };
 		C8D3CA002904E1BD0087316F /* aldoc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = aldoc; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8D428E8296A15E500824248 /* emutypes.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = emutypes.hpp; sourceTree = "<group>"; };
 		C8D44BDC2786B571005AB586 /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8D8FDA72792691B0073639B /* tsutil.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tsutil.c; sourceTree = "<group>"; };
 		C8DC9CB228DFD57B000D8D97 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../ext/SDL2.framework; sourceTree = "<group>"; };
@@ -617,6 +618,7 @@
 			children = (
 				C8283E73293D44CB00CDB572 /* emulator.hpp */,
 				C8283E72293D44CB00CDB572 /* emulator.cpp */,
+				C8D428E8296A15E500824248 /* emutypes.hpp */,
 				C882854729403C2100BAC249 /* error.hpp */,
 				C882854629403C2100BAC249 /* error.cpp */,
 				C8041C3528EE6EC000A3695F /* gui.h */,

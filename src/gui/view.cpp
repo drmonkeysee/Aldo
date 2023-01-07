@@ -14,6 +14,7 @@
 #include "debug.h"
 #include "dis.h"
 #include "emulator.hpp"
+#include "emutypes.hpp"
 #include "haltexpr.h"
 #include "mediaruntime.hpp"
 #include "style.hpp"
@@ -31,8 +32,6 @@
 #include <string_view>
 #include <type_traits>
 #include <cinttypes>
-#include <cstddef>
-#include <cstdint>
 #include <cstdio>
 
 namespace
@@ -118,7 +117,7 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
     }
 }
 
-auto input_address(std::uint16_t* addr) noexcept
+auto input_address(aldo::et::word* addr) noexcept
 {
     ImGui::SetNextItemWidth(aldo::glyph_size().x * 6);
     ImGui::PushID(addr);
@@ -251,7 +250,7 @@ protected:
 
         if (info.ines_hdr.wram) {
             ImGui::Text("WRAM: %u x 8KB",
-                        std::max(static_cast<std::uint8_t>(1),
+                        std::max(static_cast<aldo::et::byte>(1),
                                  info.ines_hdr.wram_blocks));
         } else {
             ImGui::TextUnformatted("WRAM: no");
@@ -465,8 +464,6 @@ protected:
     }
 
 private:
-    using bpsize = std::remove_reference_t<decltype(c)>::bpsize;
-    using bpindex = std::remove_reference_t<decltype(c)>::bpindex;
     // NOTE: does not include first enum value HLT_NONE
     using halt_array
         = std::array<std::pair<haltcondition, const char*>, HLT_CONDCOUNT - 1>;
@@ -576,7 +573,7 @@ private:
         const auto bpCount = c.breakpointCount();
         ImGui::Text("%zu breakpoint%s", bpCount, bpCount == 1 ? "" : "s");
         if (ImGui::BeginListBox("##breakpoints", dims)) {
-            bpindex i = 0;
+            aldo::et::diff i = 0;
             for (auto bp = c.breakpointAt(i); bp; bp = c.breakpointAt(++i)) {
                 renderBreakpoint(i, *bp);
             }
@@ -585,7 +582,7 @@ private:
         renderListControls(bpCount);
     }
 
-    void renderBreakpoint(bpindex idx, const breakpoint& bp) noexcept
+    void renderBreakpoint(aldo::et::diff idx, const breakpoint& bp) noexcept
     {
         const auto bpBreak = idx == c.snapshot().debugger.halted;
         if (bpBreak && !detectedHalt) {
@@ -619,7 +616,7 @@ private:
         }
     }
 
-    void renderListControls(bpsize bpCount) noexcept
+    void renderListControls(aldo::et::size bpCount) noexcept
     {
         if (selectedBreakpoint == NoSelection) {
             ImGui::BeginDisabled();
@@ -668,13 +665,13 @@ private:
     }
 
     bool detectedHalt = false, resetOverride = false;
-    std::uint16_t resetAddr = 0x0;
+    aldo::et::word resetAddr = 0x0;
     halt_array haltConditions;
     // NOTE: storing iterator is safe as haltConditions
     // is immutable for the life of this instance.
     halt_it selectedCondition;
     haltexpr currentHaltExpression;
-    bpindex selectedBreakpoint = NoSelection;
+    aldo::et::diff selectedBreakpoint = NoSelection;
 };
 
 class HardwareTraits final : public aldo::View {
@@ -852,14 +849,14 @@ private:
         hi = prgMem.vectors[3];
         const auto& debugger = snp.debugger;
         const char* indicator;
-        std::uint16_t resVector;
+        aldo::et::word resVector;
         if (debugger.resvector_override == NoResetVector) {
             indicator = "";
             resVector = bytowr(lo, hi);
         } else {
             indicator = "!";
             resVector =
-                static_cast<std::uint16_t>(debugger.resvector_override);
+                static_cast<aldo::et::word>(debugger.resvector_override);
         }
         ImGui::Text("%04X: %02X %02X     RES %s$%04X", CPU_VECTOR_RES, lo, hi,
                     indicator, resVector);
@@ -888,6 +885,8 @@ public:
 protected:
     void renderContents() override
     {
+        using ram_sz = aldo::et::size;
+
         static constexpr auto pageSize = 0x100, pageDim = 0x10,
                                 cols = pageDim + 2, pageCount = 8;
         static constexpr auto tableConfig = ImGuiTableFlags_BordersOuter
@@ -914,9 +913,9 @@ protected:
                 ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
             const auto& snp = c.snapshot();
             const auto sp = snp.cpu.stack_pointer;
-            std::uint16_t addr = 0;
-            for (std::size_t page = 0; page < pageCount; ++page) {
-                for (std::size_t pageRow = 0; pageRow < pageDim; ++pageRow) {
+            aldo::et::word addr = 0;
+            for (ram_sz page = 0; page < pageCount; ++page) {
+                for (ram_sz pageRow = 0; pageRow < pageDim; ++pageRow) {
                     if (page > 0 && pageRow == 0) {
                         ImGui::TableNextRow();
                         for (auto col = 0; col < cols; ++col) {
@@ -929,7 +928,7 @@ protected:
                     ImGui::Text("%04X", addr);
                     const auto& lcl = std::locale::classic();
                     std::string ascii(pageDim, '.');
-                    for (std::size_t ramCol = 0; ramCol < pageDim; ++ramCol) {
+                    for (ram_sz ramCol = 0; ramCol < pageDim; ++ramCol) {
                         const auto ramIdx = (page * pageSize)
                                             + (pageRow * pageDim) + ramCol;
                         const auto val = snp.mem.ram[ramIdx];

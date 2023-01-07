@@ -9,6 +9,7 @@
 #define Aldo_gui_viewstate_hpp
 
 #include "ctrlsignal.h"
+#include "emutypes.hpp"
 #include "haltexpr.h"
 #include "runclock.hpp"
 
@@ -18,7 +19,6 @@
 #include <queue>
 #include <utility>
 #include <variant>
-#include <cstddef>
 
 namespace aldo
 {
@@ -44,10 +44,10 @@ struct event {
             std::monostate,
             bool,
             csig_excmode,
+            et::diff,
             haltexpr,
             int,
-            interrupt,
-            std::ptrdiff_t>;
+            interrupt>;
 
     template<std::convertible_to<payload> T = std::monostate>
     constexpr event(Command c, T v = {}) noexcept : cmd{c}, value{v} {}

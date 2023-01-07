@@ -10,6 +10,7 @@
 
 #include "cart.h"
 #include "debug.h"
+#include "emutypes.hpp"
 #include "handle.hpp"
 #include "nes.h"
 #include "snapshot.h"
@@ -18,7 +19,6 @@
 #include <string>
 #include <string_view>
 #include <utility>
-#include <cstddef>
 
 struct gui_platform;
 
@@ -50,9 +50,6 @@ private:
 
 class EmuController final {
 public:
-    using bpsize = std::size_t;
-    using bpindex = std::ptrdiff_t;
-
     EmuController(debug_handle d, console_handle n) noexcept
     : hdebug{std::move(d)}, hconsole{std::move(n)},
         lsnapshot{consolep()} {}
@@ -64,11 +61,11 @@ public:
     {
         return lsnapshot.getp();
     }
-    bpsize breakpointCount() const noexcept
+    et::size breakpointCount() const noexcept
     {
         return debug_bp_count(debugp());
     }
-    const breakpoint* breakpointAt(bpindex at) const noexcept
+    const breakpoint* breakpointAt(et::diff at) const noexcept
     {
         return debug_bp_at(debugp(), at);
     }

@@ -158,11 +158,11 @@ void aldo::EmuController::processEvent(const event& ev, viewstate& s,
         debug_bp_clear(debugp());
         break;
     case aldo::Command::breakpointRemove:
-        debug_bp_remove(debugp(), std::get<bpindex>(ev.value));
+        debug_bp_remove(debugp(), std::get<aldo::et::diff>(ev.value));
         break;
     case aldo::Command::breakpointToggle:
         {
-            const auto idx = std::get<bpindex>(ev.value);
+            const auto idx = std::get<aldo::et::diff>(ev.value);
             const auto bp = breakpointAt(idx);
             debug_bp_enabled(debugp(), idx, bp && !bp->enabled);
         }

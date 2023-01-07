@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <array>
 #include <concepts>
+#include <iterator>
 #include <locale>
 #include <string>
 #include <string_view>
@@ -351,10 +352,10 @@ private:
                     xOffset = fontSz / 4,
                     yOffset = fontSz / 2;
         const auto drawList = ImGui::GetWindowDrawList();
-        using flag_idx = decltype(flags)::size_type;
-        for (flag_idx i = 0; i < flags.size(); ++i) {
+        for (auto it = flags.cbegin(); it != flags.cend(); ++it) {
+            const auto bitpos = std::distance(it, flags.cend()) - 1;
             ImU32 fillColor, textColor;
-            if (c.snapshot().cpu.status & (1 << (flags.size() - 1 - i))) {
+            if (c.snapshot().cpu.status & (1 << bitpos)) {
                 fillColor = aldo::colors::LedOn;
                 textColor = textOn;
             } else {
@@ -363,8 +364,7 @@ private:
             }
             drawList->AddCircleFilled(center, radius, fillColor);
             drawList->AddText({center.x - xOffset, center.y - yOffset},
-                              textColor, flags.data() + i,
-                              flags.data() + i + 1);
+                              textColor, it, it + 1);
             center.x += 25;
         }
         ImGui::Dummy({0, radius * 2});
@@ -432,11 +432,15 @@ public:
              const aldo::MediaRuntime& r) noexcept
     : View{"Debugger", s, c, r}
     {
-        auto cond = static_cast<int>(HLT_NONE);
-        for (auto& d : haltConditions) {
-            const auto c = static_cast<haltcondition>(++cond);
-            d = {c, haltcond_description(c)};
-        }
+        using haltval = decltype(haltConditions)::value_type;
+
+        // TODO: drop parens and use ranges in C++23?
+        std::generate(haltConditions.begin(), haltConditions.end(),
+            [h = static_cast<int>(HLT_NONE)]() mutable -> haltval {
+                const auto cond = static_cast<haltcondition>(++h);
+                return {cond, haltcond_description(cond)};
+            });
+        selectedCondition = haltConditions.cbegin();
         resetHaltExpression();
     }
     Debugger(aldo::viewstate&, aldo::EmuController&&,
@@ -504,15 +508,16 @@ private:
         ImGui::TextUnformatted("Halt on");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(aldo::glyph_size().x * 12);
-        bool setFocus = false;
-        if (ImGui::BeginCombo("##haltconditions",
-                              haltConditions[selectedCondition].second)) {
-            for (haltindex i = 0; i < haltConditions.size(); ++i) {
-                const auto current = i == selectedCondition;
-                if (ImGui::Selectable(haltConditions[i].second, current)) {
+        auto setFocus = false;
+        if (ImGui::BeginCombo("##haltconditions", selectedCondition->second)) {
+            for (auto it = haltConditions.cbegin();
+                 it != haltConditions.cend();
+                 ++it) {
+                const auto current = it == selectedCondition;
+                if (ImGui::Selectable(it->second, current)) {
                     setFocus = true;
                     if (!current) {
-                        selectedCondition = i;
+                        selectedCondition = it;
                         resetHaltExpression();
                     }
                 }
@@ -545,8 +550,8 @@ private:
             break;
         default:
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-                        "Invalid halt condition selection: %zu",
-                        selectedCondition);
+                        "Invalid halt condition selection: %d",
+                        selectedCondition->first);
             break;
         }
         if (setFocus) {
@@ -655,9 +660,7 @@ private:
 
     void resetHaltExpression() noexcept
     {
-        currentHaltExpression = {
-            .cond = haltConditions[selectedCondition].first,
-        };
+        currentHaltExpression = {.cond = selectedCondition->first};
     }
 
     bool detectedHalt = false, resetOverride = false;
@@ -665,8 +668,10 @@ private:
     // NOTE: does not include first enum value HLT_NONE
     std::array<std::pair<haltcondition, const char*>, HLT_CONDCOUNT - 1>
         haltConditions;
-    using haltindex = decltype(haltConditions)::size_type;
-    haltindex selectedCondition;
+    using halt_it = decltype(haltConditions)::const_iterator;
+    // NOTE: storing iterator is safe as haltConditions
+    // is immutable for the life of this instance.
+    halt_it selectedCondition;
     haltexpr currentHaltExpression;
     bpindex selectedBreakpoint = NoSelection;
 };

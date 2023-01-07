@@ -239,10 +239,11 @@ protected:
 
     static void renderiNesInfo(const cartinfo& info) noexcept
     {
-        ImGui::Text("Mapper: %03u%s", info.ines_hdr.mapper_id,
-                    info.ines_hdr.mapper_implemented
-                        ? ""
-                        : " (Not Implemented)");
+        ImGui::Text("Mapper: %03u", info.ines_hdr.mapper_id);
+        if (!info.ines_hdr.mapper_implemented) {
+            ImGui::SameLine();
+            ImGui::TextUnformatted("(Not Implemented)");
+        }
         ImGui::TextUnformatted("Boards: <Board Names>");
         ImGui::Separator();
         ImGui::Text("PRG ROM: %u x 16KB", info.ines_hdr.prg_blocks);

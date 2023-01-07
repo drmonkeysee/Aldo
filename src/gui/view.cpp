@@ -433,15 +433,15 @@ public:
     : View{"Debugger", s, c, r}
     {
         using haltval = decltype(haltConditions)::value_type;
+        using haltintegral = std::underlying_type_t<haltval::first_type>;
 
         // TODO: drop parens and use ranges in C++23?
         std::generate(haltConditions.begin(), haltConditions.end(),
-            [h = static_cast<int>(HLT_NONE)]() mutable -> haltval {
-                const auto cond = static_cast<haltcondition>(++h);
+            [h = static_cast<haltintegral>(HLT_NONE)]() mutable -> haltval {
+                const auto cond = static_cast<haltval::first_type>(++h);
                 return {cond, haltcond_description(cond)};
             });
-        selectedCondition = haltConditions.cbegin();
-        resetHaltExpression();
+        resetHaltExpression(haltConditions.cbegin());
     }
     Debugger(aldo::viewstate&, aldo::EmuController&&,
              const aldo::MediaRuntime&) = delete;
@@ -467,6 +467,10 @@ protected:
 private:
     using bpsize = std::remove_reference_t<decltype(c)>::bpsize;
     using bpindex = std::remove_reference_t<decltype(c)>::bpindex;
+    // NOTE: does not include first enum value HLT_NONE
+    std::array<std::pair<haltcondition, const char*>, HLT_CONDCOUNT - 1>
+        haltConditions;
+    using halt_it = decltype(haltConditions)::const_iterator;
 
     void renderVectorOverride() noexcept
     {
@@ -517,8 +521,7 @@ private:
                 if (ImGui::Selectable(it->second, current)) {
                     setFocus = true;
                     if (!current) {
-                        selectedCondition = it;
-                        resetHaltExpression();
+                        resetHaltExpression(it);
                     }
                 }
                 if (current) {
@@ -658,17 +661,14 @@ private:
         }
     }
 
-    void resetHaltExpression() noexcept
+    void resetHaltExpression(halt_it selection) noexcept
     {
+        selectedCondition = selection;
         currentHaltExpression = {.cond = selectedCondition->first};
     }
 
     bool detectedHalt = false, resetOverride = false;
     std::uint16_t resetAddr = 0x0;
-    // NOTE: does not include first enum value HLT_NONE
-    std::array<std::pair<haltcondition, const char*>, HLT_CONDCOUNT - 1>
-        haltConditions;
-    using halt_it = decltype(haltConditions)::const_iterator;
     // NOTE: storing iterator is safe as haltConditions
     // is immutable for the life of this instance.
     halt_it selectedCondition;

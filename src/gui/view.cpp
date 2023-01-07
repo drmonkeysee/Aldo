@@ -432,7 +432,7 @@ public:
              const aldo::MediaRuntime& r)
     : View{"Debugger", s, c, r}
     {
-        using haltval = decltype(haltConditions)::value_type;
+        using haltval = halt_array::value_type;
         using haltintegral = std::underlying_type_t<haltval::first_type>;
 
         // TODO: drop parens and use ranges in C++23?
@@ -468,9 +468,9 @@ private:
     using bpsize = std::remove_reference_t<decltype(c)>::bpsize;
     using bpindex = std::remove_reference_t<decltype(c)>::bpindex;
     // NOTE: does not include first enum value HLT_NONE
-    std::array<std::pair<haltcondition, const char*>, HLT_CONDCOUNT - 1>
-        haltConditions;
-    using halt_it = decltype(haltConditions)::const_iterator;
+    using halt_array
+        = std::array<std::pair<haltcondition, const char*>, HLT_CONDCOUNT - 1>;
+    using halt_it = halt_array::const_iterator;
 
     void renderVectorOverride() noexcept
     {
@@ -669,6 +669,7 @@ private:
 
     bool detectedHalt = false, resetOverride = false;
     std::uint16_t resetAddr = 0x0;
+    halt_array haltConditions;
     // NOTE: storing iterator is safe as haltConditions
     // is immutable for the life of this instance.
     halt_it selectedCondition;

@@ -70,6 +70,16 @@ constexpr auto boolstr(bool v) noexcept
     return v ? "yes" : "no";
 }
 
+constexpr ImVec2 operator+(ImVec2 v, float f) noexcept
+{
+    return {v.x + f, v.y + f};
+}
+
+constexpr ImVec2 operator-(ImVec2 a, const ImVec2& b) noexcept
+{
+    return {a.x - b.x, a.y - b.y};
+}
+
 auto pressed_keys(std::same_as<ImGuiKey> auto... keys) noexcept
 {
     return (ImGui::IsKeyPressed(keys, false) || ...);
@@ -137,10 +147,10 @@ auto about_overlay(aldo::viewstate& s) noexcept
                                     | ImGuiWindowFlags_NoMove
                                     | ImGuiWindowFlags_NoNav
                                     | ImGuiWindowFlags_NoSavedSettings;
-    static constexpr auto offset = 25;
+    static constexpr auto offset = 25.0f;
 
     const auto workArea = ImGui::GetMainViewport()->WorkPos;
-    ImGui::SetNextWindowPos({workArea.x + offset, workArea.y + offset});
+    ImGui::SetNextWindowPos(workArea + offset);
     ImGui::SetNextWindowBgAlpha(0.75f);
 
     if (ImGui::Begin("About Aldo", nullptr, flags)) {
@@ -386,11 +396,12 @@ private:
         const auto textSz = aldo::glyph_size();
         const auto radius = (textSz.x + textSz.y) / 2.0f;
         const auto pos = ImGui::GetCursorScreenPos();
-        ImVec2 center{pos.x + radius, pos.y + radius};
-        const auto fontSz = ImGui::GetFontSize(),
-                    xOffset = fontSz / 4,
-                    yOffset = fontSz / 2;
+        ImVec2 center = pos + radius;
+
+        const auto fontSz = ImGui::GetFontSize();
+        const ImVec2 offset{fontSz / 4, fontSz / 2};
         const auto drawList = ImGui::GetWindowDrawList();
+
         for (auto it = flags.cbegin(); it != flags.cend(); ++it) {
             const auto bitpos = std::distance(it, flags.cend()) - 1;
             ImU32 fillColor, textColor;
@@ -402,8 +413,7 @@ private:
                 textColor = textOff;
             }
             drawList->AddCircleFilled(center, radius, fillColor);
-            drawList->AddText({center.x - xOffset, center.y - yOffset},
-                              textColor, it, it + 1);
+            drawList->AddText(center - offset, textColor, it, it + 1);
             center.x += 25;
         }
         ImGui::Dummy({0, radius * 2});

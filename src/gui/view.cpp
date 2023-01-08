@@ -80,14 +80,14 @@ constexpr auto operator-(ImVec2 a, const ImVec2& b) noexcept
     return ImVec2{a.x - b.x, a.y - b.y};
 }
 
-auto pressed_keys(std::same_as<ImGuiKey> auto... keys) noexcept
+auto keys_pressed(std::same_as<ImGuiKey> auto... keys) noexcept
 {
     return (ImGui::IsKeyPressed(keys, false) || ...);
 }
 
-auto pressed_enter() noexcept
+auto enter_pressed() noexcept
 {
-    return pressed_keys(ImGuiKey_Enter, ImGuiKey_KeypadEnter);
+    return keys_pressed(ImGuiKey_Enter, ImGuiKey_KeypadEnter);
 }
 
 template<std::derived_from<aldo::View>... Vs>
@@ -168,7 +168,7 @@ auto about_overlay(aldo::viewstate& s) noexcept
         ImGui::Separator();
         ImGui::TextUnformatted("Text has been copied to clipboard");
 
-        if (pressed_keys(ImGuiKey_Escape)
+        if (keys_pressed(ImGuiKey_Escape)
             || (ImGui::IsMouseClicked(ImGuiMouseButton_Left)
                 && !ImGui::IsWindowHovered())) {
             s.showAbout = false;
@@ -607,7 +607,7 @@ private:
         if (setFocus) {
             ImGui::SetKeyboardFocusHere(-1);
         }
-        const auto submitted = ImGui::IsItemDeactivated() && pressed_enter();
+        const auto submitted = ImGui::IsItemDeactivated() && enter_pressed();
         if (ImGui::Button("Add") || submitted) {
             s.events.emplace(aldo::Command::breakpointAdd,
                              currentHaltExpression);

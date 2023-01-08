@@ -35,9 +35,25 @@ auto invalid_command(aldo::Command c)
     return s;
 }
 
-auto is_guikey_mod(SDL_Event* ev) noexcept
+auto is_guikey_mod(const SDL_Event& ev) noexcept
 {
-    return ev->key.keysym.mod == KMOD_LGUI || ev->key.keysym.mod == KMOD_RGUI;
+    return ev.key.keysym.mod == KMOD_LGUI || ev.key.keysym.mod == KMOD_RGUI;
+}
+
+auto handle_keydown(const SDL_Event& ev, aldo::viewstate& state)
+{
+    switch (ev.key.keysym.sym) {
+    case SDLK_d:
+        if (is_guikey_mod(ev) && !ev.key.repeat) {
+            state.showDemo = !state.showDemo;
+        }
+        break;
+    case SDLK_o:
+        if (is_guikey_mod(ev) && !ev.key.repeat) {
+            state.events.emplace(aldo::Command::openFile);
+        }
+        break;
+    }
 }
 
 }
@@ -82,10 +98,7 @@ void aldo::EmuController::handleInput(aldo::viewstate& state,
         ImGui_ImplSDL2_ProcessEvent(&ev);
         switch (ev.type) {
         case SDL_KEYDOWN:
-            if (is_guikey_mod(&ev) && !ev.key.repeat
-                && ev.key.keysym.sym == SDLK_o) {
-                state.events.emplace(aldo::Command::openFile);
-            }
+            handle_keydown(ev, state);
             break;
         case SDL_QUIT:
             state.events.emplace(aldo::Command::quit);

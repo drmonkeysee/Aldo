@@ -118,7 +118,7 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Tools")) {
-            ImGui::MenuItem("ImGui Demo", nullptr, &s.showDemo);
+            ImGui::MenuItem("ImGui Demo", "Cmd+D", &s.showDemo);
             if (ImGui::MenuItem("Aldo Studio")) {
                 s.events.emplace(aldo::Command::launchStudio);
             }

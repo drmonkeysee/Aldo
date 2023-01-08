@@ -160,7 +160,8 @@ void aldo::EmuController::openCartFile(const gui_platform& p)
     }
 }
 
-void aldo::EmuController::processEvent(const event& ev, viewstate& s,
+void aldo::EmuController::processEvent(const aldo::event& ev,
+                                       aldo::viewstate& s,
                                        const gui_platform& p)
 {
     switch (ev.cmd) {

@@ -18,6 +18,7 @@
 #include "haltexpr.h"
 #include "mediaruntime.hpp"
 #include "style.hpp"
+#include "version.h"
 #include "viewstate.hpp"
 
 #include "imgui.h"
@@ -94,7 +95,7 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
 {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu(SDL_GetWindowTitle(r.window()))) {
-            ImGui::MenuItem("About");
+            ImGui::MenuItem("About", nullptr, &s.showAbout);
             if (ImGui::MenuItem("Quit", "Cmd+Q")) {
                 s.events.emplace(aldo::Command::quit);
             };
@@ -125,6 +126,45 @@ auto input_address(aldo::et::word* addr) noexcept
                                            nullptr, nullptr, "%04X");
     ImGui::PopID();
     return result;
+}
+
+auto about_overlay(aldo::viewstate& s) noexcept
+{
+    if (!s.showAbout) return;
+
+    static constexpr auto flags = ImGuiWindowFlags_AlwaysAutoResize
+                                    | ImGuiWindowFlags_NoDecoration
+                                    | ImGuiWindowFlags_NoMove
+                                    | ImGuiWindowFlags_NoNav
+                                    | ImGuiWindowFlags_NoSavedSettings;
+    static constexpr auto offset = 25;
+
+    const auto workArea = ImGui::GetMainViewport()->WorkPos;
+    ImGui::SetNextWindowPos({workArea.x + offset, workArea.y + offset});
+    ImGui::SetNextWindowBgAlpha(0.75f);
+
+    if (ImGui::Begin("About Aldo", nullptr, flags)) {
+        ImGui::LogToClipboard();
+        ImGui::Text("Aldo %s", AldoVersion);
+    #ifdef __VERSION__
+        ImGui::TextUnformatted(__VERSION__);
+    #endif
+        SDL_version v;
+        SDL_VERSION(&v);
+        ImGui::Text("SDL %u.%u.%u", v.major, v.minor, v.patch);
+        ImGui::Text("Dear ImGui %s", ImGui::GetVersion());
+        ImGui::LogFinish();
+
+        ImGui::Separator();
+        ImGui::TextUnformatted("Text has been copied to clipboard");
+
+        if (pressed_keys(ImGuiKey_Escape)
+            || (ImGui::IsMouseClicked(ImGuiMouseButton_Left)
+                && !ImGui::IsWindowHovered())) {
+            s.showAbout = false;
+        }
+    }
+    ImGui::End();
 }
 
 //
@@ -992,6 +1032,7 @@ void aldo::Layout::render() const
     for (const auto& v : views) {
         v->render();
     }
+    about_overlay(s);
     if (s.showDemo) {
         ImGui::ShowDemoWindow();
     }

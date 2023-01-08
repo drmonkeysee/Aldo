@@ -147,10 +147,9 @@ auto about_overlay(aldo::viewstate& s) noexcept
                                     | ImGuiWindowFlags_NoMove
                                     | ImGuiWindowFlags_NoNav
                                     | ImGuiWindowFlags_NoSavedSettings;
-    static constexpr auto offset = 25.0f;
 
     const auto workArea = ImGui::GetMainViewport()->WorkPos;
-    ImGui::SetNextWindowPos(workArea + offset);
+    ImGui::SetNextWindowPos(workArea + 25.0f);
     ImGui::SetNextWindowBgAlpha(0.75f);
 
     if (ImGui::Begin("About Aldo", nullptr, flags)) {

@@ -70,14 +70,14 @@ constexpr auto boolstr(bool v) noexcept
     return v ? "yes" : "no";
 }
 
-constexpr ImVec2 operator+(ImVec2 v, float f) noexcept
+constexpr auto operator+(ImVec2 v, float f) noexcept
 {
-    return {v.x + f, v.y + f};
+    return ImVec2{v.x + f, v.y + f};
 }
 
-constexpr ImVec2 operator-(ImVec2 a, const ImVec2& b) noexcept
+constexpr auto operator-(ImVec2 a, const ImVec2& b) noexcept
 {
-    return {a.x - b.x, a.y - b.y};
+    return ImVec2{a.x - b.x, a.y - b.y};
 }
 
 auto pressed_keys(std::same_as<ImGuiKey> auto... keys) noexcept

@@ -32,6 +32,7 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 #include <cinttypes>
 #include <cstdio>
 
@@ -41,6 +42,89 @@ namespace
 //
 // Helpers
 //
+
+template<typename T>
+concept ScopedIDVal
+    = std::convertible_to<T, void*> || std::convertible_to<T, int>;
+
+class ScopedID {
+public:
+    template<ScopedIDVal T>
+    ScopedID(T id) noexcept { ImGui::PushID(id); }
+
+    ScopedID(const ScopedID&) = delete;
+    ScopedID& operator=(const ScopedID&) = delete;
+    ScopedID(ScopedID&&) = delete;
+    ScopedID& operator=(ScopedID&&) = delete;
+
+    ~ScopedID() { ImGui::PopID(); }
+};
+
+using ScopedStyleVal = std::pair<ImGuiStyleVar, float>;
+using ScopedColorVal = std::pair<ImGuiCol, ImU32>;
+template<typename T>
+concept ScopedVal
+    = std::same_as<T, ScopedStyleVal> || std::same_as<T, ScopedColorVal>;
+
+struct style_stack {
+    static void push(const ScopedStyleVal& style) noexcept
+    {
+        ImGui::PushStyleVar(style.first, style.second);
+    }
+
+    static void pop(int count) noexcept
+    {
+        ImGui::PopStyleVar(count);
+    }
+};
+
+struct color_stack {
+    static void push(const ScopedColorVal& color) noexcept
+    {
+        ImGui::PushStyleColor(color.first, color.second);
+    }
+
+    static void pop(int count) noexcept
+    {
+        ImGui::PopStyleColor(count);
+    }
+};
+
+template<typename T>
+concept StackPolicy
+    = std::same_as<T, style_stack> || std::same_as<T, color_stack>;
+template<typename T>
+using DefaultPolicy = std::conditional_t<std::same_as<T, ScopedStyleVal>,
+                        style_stack,
+                        color_stack>;
+
+template<ScopedVal V, StackPolicy P = DefaultPolicy<V>>
+class ScopedStyle {
+public:
+    ScopedStyle(std::initializer_list<V> vals, bool condition = true) noexcept
+    : condition{condition}, count{vals.size()}
+    {
+        if (!this->condition) return;
+        for (const auto& v : vals) {
+            P::push(v);
+        }
+    }
+
+    ScopedStyle(const ScopedStyle&) = delete;
+    ScopedStyle& operator=(const ScopedStyle&) = delete;
+    ScopedStyle(ScopedStyle&&) = delete;
+    ScopedStyle& operator=(ScopedStyle&&) = delete;
+
+    ~ScopedStyle()
+    {
+        if (!condition) return;
+        P::pop(static_cast<int>(count));
+    }
+
+private:
+    bool condition;
+    typename std::initializer_list<V>::size_type count;
+};
 
 constexpr auto NoSelection = -1;
 
@@ -131,10 +215,9 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
 auto input_address(aldo::et::word* addr) noexcept
 {
     ImGui::SetNextItemWidth(aldo::glyph_size().x * 6);
-    ImGui::PushID(addr);
+    const ScopedID id{addr};
     const auto result = ImGui::InputScalar("Address", ImGuiDataType_U16, addr,
                                            nullptr, nullptr, "%04X");
-    ImGui::PopID();
     return result;
 }
 
@@ -638,28 +721,25 @@ private:
             selectedBreakpoint = idx;
         }
         const auto current = idx == selectedBreakpoint;
-        char fmt[HEXPR_FMT_SIZE];
-        const int err = haltexpr_fmt(&bp.expr, fmt);
-
-        if (!bp.enabled) {
-            ImGui::PushStyleVar(ImGuiStyleVar_Alpha,
-                                ImGui::GetStyle().DisabledAlpha);
+        {
+            char fmt[HEXPR_FMT_SIZE];
+            const int err = haltexpr_fmt(&bp.expr, fmt);
+            const ScopedStyle style{
+                {ScopedStyleVal{
+                    ImGuiStyleVar_Alpha, ImGui::GetStyle().DisabledAlpha,
+                }},
+                !bp.enabled,
+            };
+            const ScopedStyle color{
+                {ScopedColorVal{ImGuiCol_Text, aldo::colors::Attention}},
+                bpBreak,
+            };
+            const ScopedID id{static_cast<int>(idx)};
+            if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt,
+                                  current)) {
+                selectedBreakpoint = idx;
+            }
         }
-        if (bpBreak) {
-            ImGui::PushStyleColor(ImGuiCol_Text, aldo::colors::Attention);
-        }
-        ImGui::PushID(static_cast<int>(idx));
-        if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt, current)) {
-            selectedBreakpoint = idx;
-        }
-        ImGui::PopID();
-        if (bpBreak) {
-            ImGui::PopStyleColor();
-        }
-        if (!bp.enabled) {
-            ImGui::PopStyleVar();
-        }
-
         if (current) {
             ImGui::SetItemDefaultFocus();
         }
@@ -676,34 +756,39 @@ private:
                              selectedBreakpoint);
         }
         ImGui::SameLine();
-        ImGui::PushStyleColor(ImGuiCol_Button, aldo::colors::Destructive);
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-                              aldo::colors::DestructiveHover);
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive,
-                              aldo::colors::DestructiveActive);
-        auto resetSelection = false;
-        if (ImGui::Button("Remove")) {
-            s.events.emplace(aldo::Command::breakpointRemove,
-                             selectedBreakpoint);
-            resetSelection = true;
-        }
-        if (selectedBreakpoint == NoSelection) {
-            ImGui::EndDisabled();
-        }
-        ImGui::SameLine();
-        if (bpCount == 0) {
-            ImGui::BeginDisabled();
-        }
-        if (ImGui::Button("Clear")) {
-            s.events.emplace(aldo::Command::breakpointsClear);
-            resetSelection = true;
-        }
-        if (bpCount == 0) {
-            ImGui::EndDisabled();
-        }
-        ImGui::PopStyleColor(3);
-        if (resetSelection) {
-            selectedBreakpoint = NoSelection;
+        {
+            const ScopedStyle colors{{
+                ScopedColorVal{ImGuiCol_Button, aldo::colors::Destructive},
+                ScopedColorVal{
+                    ImGuiCol_ButtonHovered, aldo::colors::DestructiveHover,
+                },
+                ScopedColorVal{
+                    ImGuiCol_ButtonActive, aldo::colors::DestructiveActive,
+                },
+            }};
+            auto resetSelection = false;
+            if (ImGui::Button("Remove")) {
+                s.events.emplace(aldo::Command::breakpointRemove,
+                                 selectedBreakpoint);
+                resetSelection = true;
+            }
+            if (selectedBreakpoint == NoSelection) {
+                ImGui::EndDisabled();
+            }
+            ImGui::SameLine();
+            if (bpCount == 0) {
+                ImGui::BeginDisabled();
+            }
+            if (ImGui::Button("Clear")) {
+                s.events.emplace(aldo::Command::breakpointsClear);
+                resetSelection = true;
+            }
+            if (bpCount == 0) {
+                ImGui::EndDisabled();
+            }
+            if (resetSelection) {
+                selectedBreakpoint = NoSelection;
+            }
         }
     }
 

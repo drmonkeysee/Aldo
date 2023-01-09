@@ -873,6 +873,16 @@ private:
                 if (result > 0) {
                     if (ImGui::Selectable(disasm, selected == i)) {
                         selected = i;
+                    } else if (ImGui::BeginPopupContextItem()) {
+                        selected = i;
+                        if (ImGui::Selectable("Add breakpoint...")) {
+                            s.events.emplace(aldo::Command::breakpointAdd,
+                                             haltexpr{
+                                                 .address = addr,
+                                                 .cond = HLT_ADDR,
+                                             });
+                        }
+                        ImGui::EndPopup();
                     }
                     addr += inst.bv.size;
                     continue;

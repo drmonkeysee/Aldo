@@ -94,13 +94,15 @@ template<typename T>
 concept StackPolicy
     = std::same_as<T, style_stack> || std::same_as<T, color_stack>;
 template<typename T>
-using DefaultPolicy = std::conditional_t<std::same_as<T, ScopedStyleVal>,
-                        style_stack,
-                        color_stack>;
+using DefaultStackPolicy = std::conditional_t<std::same_as<T, ScopedStyleVal>,
+                            style_stack,
+                            color_stack>;
 
-template<ScopedVal V, StackPolicy P = DefaultPolicy<V>>
+template<ScopedVal V, StackPolicy P = DefaultStackPolicy<V>>
 class ScopedStyle {
 public:
+    ScopedStyle(V val, bool condition = true) noexcept
+    : ScopedStyle{{val}, condition} {}
     ScopedStyle(std::initializer_list<V> vals, bool condition = true) noexcept
     : condition{condition}, count{vals.size()}
     {
@@ -215,7 +217,7 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
 auto input_address(aldo::et::word* addr) noexcept
 {
     ImGui::SetNextItemWidth(aldo::glyph_size().x * 6);
-    const ScopedID id{addr};
+    const ScopedID id = addr;
     const auto result = ImGui::InputScalar("Address", ImGuiDataType_U16, addr,
                                            nullptr, nullptr, "%04X");
     return result;
@@ -725,16 +727,16 @@ private:
             char fmt[HEXPR_FMT_SIZE];
             const int err = haltexpr_fmt(&bp.expr, fmt);
             const ScopedStyle style{
-                {ScopedStyleVal{
+                ScopedStyleVal{
                     ImGuiStyleVar_Alpha, ImGui::GetStyle().DisabledAlpha,
-                }},
+                },
                 !bp.enabled,
             };
             const ScopedStyle color{
-                {ScopedColorVal{ImGuiCol_Text, aldo::colors::Attention}},
+                ScopedColorVal{ImGuiCol_Text, aldo::colors::Attention},
                 bpBreak,
             };
-            const ScopedID id{static_cast<int>(idx)};
+            const ScopedID id = static_cast<int>(idx);
             if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt,
                                   current)) {
                 selectedBreakpoint = idx;
@@ -757,7 +759,7 @@ private:
         }
         ImGui::SameLine();
         {
-            const ScopedStyle colors{{
+            const ScopedStyle colors = {
                 ScopedColorVal{ImGuiCol_Button, aldo::colors::Destructive},
                 ScopedColorVal{
                     ImGuiCol_ButtonHovered, aldo::colors::DestructiveHover,
@@ -765,7 +767,7 @@ private:
                 ScopedColorVal{
                     ImGuiCol_ButtonActive, aldo::colors::DestructiveActive,
                 },
-            }};
+            };
             auto resetSelection = false;
             if (ImGui::Button("Remove")) {
                 s.events.emplace(aldo::Command::breakpointRemove,

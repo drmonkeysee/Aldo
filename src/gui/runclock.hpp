@@ -16,7 +16,7 @@
 namespace aldo
 {
 
-class RunTimer final {
+class RunTimer {
 public:
     using clock_type = std::chrono::steady_clock;
     using duration_type = std::chrono::duration<double, std::milli>;
@@ -55,7 +55,7 @@ private:
     double& result;
 };
 
-class RunTick final {
+class RunTick {
 public:
     RunTick(cycleclock& c, bool resetBudget) noexcept : cyclock{c}
     {

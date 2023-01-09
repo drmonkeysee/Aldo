@@ -32,7 +32,7 @@ using cart_handle = handle<cart, cart_free>;
 using console_handle = handle<nes, nes_free>;
 using debug_handle = handle<debugctx, debug_free>;
 
-class SnapshotScope final {
+class SnapshotScope {
 public:
     explicit SnapshotScope(nes* console) noexcept
     {
@@ -48,7 +48,7 @@ private:
     console_state snapshot;
 };
 
-class EmuController final {
+class EmuController {
 public:
     EmuController(debug_handle d, console_handle n) noexcept
     : hdebug{std::move(d)}, hconsole{std::move(n)},

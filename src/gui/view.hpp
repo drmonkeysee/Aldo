@@ -45,7 +45,7 @@ protected:
     bool* visible;
 };
 
-class Layout final {
+class Layout {
 public:
     Layout(viewstate& s, const EmuController& c, const MediaRuntime& r);
     Layout(viewstate&, EmuController&&, const MediaRuntime&) = delete;

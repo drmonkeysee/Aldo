@@ -46,87 +46,79 @@ namespace
 template<typename T>
 concept ScopedIDVal
     = std::convertible_to<T, void*> || std::convertible_to<T, int>;
-
-class ScopedID {
-public:
-    template<ScopedIDVal T>
-    ScopedID(T id) noexcept { ImGui::PushID(id); }
-
-    ScopedID(const ScopedID&) = delete;
-    ScopedID& operator=(const ScopedID&) = delete;
-    ScopedID(ScopedID&&) = delete;
-    ScopedID& operator=(ScopedID&&) = delete;
-
-    ~ScopedID() { ImGui::PopID(); }
-};
-
 using ScopedStyleVal = std::pair<ImGuiStyleVar, float>;
 using ScopedColorVal = std::pair<ImGuiCol, ImU32>;
 template<typename T>
-concept ScopedVal
+concept ScopedMultiVal
     = std::same_as<T, ScopedStyleVal> || std::same_as<T, ScopedColorVal>;
-
-struct style_stack {
-    static void push(const ScopedStyleVal& style) noexcept
-    {
-        ImGui::PushStyleVar(style.first, style.second);
-    }
-
-    static void pop(int count) noexcept
-    {
-        ImGui::PopStyleVar(count);
-    }
-};
-
-struct color_stack {
-    static void push(const ScopedColorVal& color) noexcept
-    {
-        ImGui::PushStyleColor(color.first, color.second);
-    }
-
-    static void pop(int count) noexcept
-    {
-        ImGui::PopStyleColor(count);
-    }
-};
-
 template<typename T>
-concept StackPolicy
-    = std::same_as<T, style_stack> || std::same_as<T, color_stack>;
-template<typename T>
-using DefaultStackPolicy = std::conditional_t<std::same_as<T, ScopedStyleVal>,
-                            style_stack,
-                            color_stack>;
+concept ScopedVal = ScopedIDVal<T> || ScopedMultiVal<T>;
 
-template<ScopedVal V, StackPolicy P = DefaultStackPolicy<V>>
-class ScopedStyle {
+template<ScopedVal V>
+class ImGuiScoped {
 public:
-    ScopedStyle(V val, bool condition = true) noexcept
-    : ScopedStyle{{val}, condition} {}
-    ScopedStyle(std::initializer_list<V> vals, bool condition = true) noexcept
+    ImGuiScoped(V val, bool condition = true) noexcept
+    : condition{condition}, count{1}
+    {
+        if (!this->condition) return;
+        Policy::push(val);
+    }
+    ImGuiScoped(std::initializer_list<V> vals,
+                bool condition = true) noexcept requires ScopedMultiVal<V>
     : condition{condition}, count{vals.size()}
     {
         if (!this->condition) return;
-        for (const auto& v : vals) {
-            P::push(v);
+        for (auto&& v : vals) {
+            Policy::push(v);
         }
     }
 
-    ScopedStyle(const ScopedStyle&) = delete;
-    ScopedStyle& operator=(const ScopedStyle&) = delete;
-    ScopedStyle(ScopedStyle&&) = delete;
-    ScopedStyle& operator=(ScopedStyle&&) = delete;
+    ImGuiScoped(const ImGuiScoped&) = delete;
+    ImGuiScoped& operator=(const ImGuiScoped&) = delete;
+    ImGuiScoped(ImGuiScoped&&) = delete;
+    ImGuiScoped& operator=(ImGuiScoped&&) = delete;
 
-    ~ScopedStyle()
+    ~ImGuiScoped()
     {
         if (!condition) return;
-        P::pop(static_cast<int>(count));
+        Policy::pop(static_cast<int>(count));
     }
 
 private:
+    struct id_stack {
+        static void push(ScopedIDVal auto id) noexcept { ImGui::PushID(id); }
+        static void pop(int) noexcept { ImGui::PopID(); }
+    };
+    struct style_stack {
+        static void push(const ScopedStyleVal& style) noexcept
+        {
+            ImGui::PushStyleVar(style.first, style.second);
+        }
+        static void pop(int count) noexcept { ImGui::PopStyleVar(count); }
+    };
+    struct color_stack {
+        static void push(const ScopedColorVal& color) noexcept
+        {
+            ImGui::PushStyleColor(color.first, color.second);
+        }
+        static void pop(int count) noexcept { ImGui::PopStyleColor(count); }
+    };
+    using Policy = std::conditional_t<ScopedIDVal<V>,
+                    id_stack,
+                    std::conditional_t<std::same_as<V, ScopedStyleVal>,
+                        style_stack,
+                        color_stack>>;
+
     bool condition;
     typename std::initializer_list<V>::size_type count;
 };
+using ScopedStyle = ImGuiScoped<ScopedStyleVal>;
+using ScopedColor = ImGuiScoped<ScopedColorVal>;
+
+auto scopedID(ScopedIDVal auto v) noexcept
+{
+    return ImGuiScoped{v};
+}
 
 constexpr auto NoSelection = -1;
 
@@ -217,7 +209,7 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
 auto input_address(aldo::et::word* addr) noexcept
 {
     ImGui::SetNextItemWidth(aldo::glyph_size().x * 6);
-    const ScopedID id = addr;
+    const auto id = scopedID(addr);
     const auto result = ImGui::InputScalar("Address", ImGuiDataType_U16, addr,
                                            nullptr, nullptr, "%04X");
     return result;
@@ -727,16 +719,14 @@ private:
             char fmt[HEXPR_FMT_SIZE];
             const int err = haltexpr_fmt(&bp.expr, fmt);
             const ScopedStyle style{
-                ScopedStyleVal{
-                    ImGuiStyleVar_Alpha, ImGui::GetStyle().DisabledAlpha,
-                },
+                {ImGuiStyleVar_Alpha, ImGui::GetStyle().DisabledAlpha},
                 !bp.enabled,
             };
-            const ScopedStyle color{
-                ScopedColorVal{ImGuiCol_Text, aldo::colors::Attention},
+            const ScopedColor color{
+                {ImGuiCol_Text, aldo::colors::Attention},
                 bpBreak,
             };
-            const ScopedID id = static_cast<int>(idx);
+            const auto id = scopedID(static_cast<int>(idx));
             if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt,
                                   current)) {
                 selectedBreakpoint = idx;
@@ -759,14 +749,10 @@ private:
         }
         ImGui::SameLine();
         {
-            const ScopedStyle colors = {
-                ScopedColorVal{ImGuiCol_Button, aldo::colors::Destructive},
-                ScopedColorVal{
-                    ImGuiCol_ButtonHovered, aldo::colors::DestructiveHover,
-                },
-                ScopedColorVal{
-                    ImGuiCol_ButtonActive, aldo::colors::DestructiveActive,
-                },
+            const ScopedColor colors = {
+                {ImGuiCol_Button, aldo::colors::Destructive},
+                {ImGuiCol_ButtonHovered, aldo::colors::DestructiveHover},
+                {ImGuiCol_ButtonActive, aldo::colors::DestructiveActive},
             };
             auto resetSelection = false;
             if (ImGui::Button("Remove")) {

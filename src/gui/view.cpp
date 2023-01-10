@@ -158,6 +158,14 @@ constexpr auto operator-(ImVec2 a, const ImVec2& b) noexcept
     return ImVec2{a.x - b.x, a.y - b.y};
 }
 
+template<std::invocable F>
+auto widget_group(F f)
+{
+    ImGui::BeginGroup();
+    f();
+    ImGui::EndGroup();
+}
+
 auto keys_pressed(std::same_as<ImGuiKey> auto... keys) noexcept
 {
     return (ImGui::IsKeyPressed(keys, false) || ...);
@@ -444,21 +452,17 @@ private:
     void renderRegisters() const noexcept
     {
         const auto& cpu = c.snapshot().cpu;
-        ImGui::BeginGroup();
-        {
+        widget_group([&cpu]() {
             ImGui::Text("A: %02X", cpu.accumulator);
             ImGui::Text("X: %02X", cpu.xindex);
             ImGui::Text("Y: %02X", cpu.yindex);
-        }
-        ImGui::EndGroup();
+        });
         ImGui::SameLine(0, 90);
-        ImGui::BeginGroup();
-        {
+        widget_group([&cpu]() {
             ImGui::Text("PC: %04X", cpu.program_counter);
             ImGui::Text(" S: %02X", cpu.stack_pointer);
             ImGui::Text(" P: %02X", cpu.status);
-        }
-        ImGui::EndGroup();
+        });
     }
 
     void renderFlags() const
@@ -528,26 +532,20 @@ private:
 
         ImGui::Separator();
 
-        ImGui::BeginGroup();
-        {
+        widget_group([&lines]() {
             ImGui::Text("RDY:  %s", display_linestate(lines.ready));
             ImGui::Text("SYNC: %s", display_linestate(lines.sync));
             ImGui::Text("R/W:  %s", display_linestate(lines.readwrite));
-        }
-        ImGui::EndGroup();
-
+        });
         ImGui::SameLine(0, 40);
-
-        ImGui::BeginGroup();
-        {
+        widget_group([&lines, &datapath]() {
             ImGui::Text("IRQ: %s%s", display_linestate(lines.irq),
                         display_signalstate(datapath.irq));
             ImGui::Text("NMI: %s%s", display_linestate(lines.nmi),
                         display_signalstate(datapath.nmi));
             ImGui::Text("RES: %s%s", display_linestate(lines.reset),
                         display_signalstate(datapath.res));
-        }
-        ImGui::EndGroup();
+        });
     }
 };
 

@@ -46,49 +46,56 @@ namespace
 template<typename T>
 concept ScopedIDVal
     = std::convertible_to<T, void*> || std::convertible_to<T, int>;
+
+class ScopedID {
+public:
+    ScopedID(ScopedIDVal auto id) noexcept { ImGui::PushID(id); }
+    ScopedID(const ScopedID&) = delete;
+    ScopedID& operator=(const ScopedID&) = delete;
+    ScopedID(ScopedID&&) = delete;
+    ScopedID& operator=(ScopedID&&) = delete;
+    ~ScopedID() { ImGui::PopID(); }
+};
+
 using ScopedStyleVal = std::pair<ImGuiStyleVar, float>;
 using ScopedColorVal = std::pair<ImGuiCol, ImU32>;
 template<typename T>
-concept ScopedMultiVal
+concept ScopedVal
     = std::same_as<T, ScopedStyleVal> || std::same_as<T, ScopedColorVal>;
-template<typename T>
-concept ScopedVal = ScopedIDVal<T> || ScopedMultiVal<T>;
 
 template<ScopedVal V>
-class ImGuiScoped {
+class ConditionalScoped {
 public:
-    ImGuiScoped(V val, bool condition = true) noexcept
+    ConditionalScoped(V val, bool condition = true) noexcept
     : condition{condition}, count{1}
     {
-        if (!this->condition) return;
-        Policy::push(val);
+        pushVars({val});
     }
-    ImGuiScoped(std::initializer_list<V> vals,
-                bool condition = true) noexcept requires ScopedMultiVal<V>
+    ConditionalScoped(std::initializer_list<V> vals,
+                      bool condition = true) noexcept
     : condition{condition}, count{vals.size()}
     {
-        if (!this->condition) return;
-        for (auto&& v : vals) {
-            Policy::push(v);
-        }
+        pushVars(vals);
     }
-
-    ImGuiScoped(const ImGuiScoped&) = delete;
-    ImGuiScoped& operator=(const ImGuiScoped&) = delete;
-    ImGuiScoped(ImGuiScoped&&) = delete;
-    ImGuiScoped& operator=(ImGuiScoped&&) = delete;
-
-    ~ImGuiScoped()
+    ConditionalScoped(const ConditionalScoped&) = delete;
+    ConditionalScoped& operator=(const ConditionalScoped&) = delete;
+    ConditionalScoped(ConditionalScoped&&) = delete;
+    ConditionalScoped& operator=(ConditionalScoped&&) = delete;
+    ~ConditionalScoped()
     {
         if (!condition) return;
         Policy::pop(static_cast<int>(count));
     }
 
 private:
-    struct id_stack {
-        static void push(ScopedIDVal auto id) noexcept { ImGui::PushID(id); }
-        static void pop(int) noexcept { ImGui::PopID(); }
-    };
+    void pushVars(std::initializer_list<V> vals) const noexcept
+    {
+        if (!condition) return;
+        for (auto&& v : vals) {
+            Policy::push(v);
+        }
+    }
+
     struct style_stack {
         static void push(const ScopedStyleVal& style) noexcept
         {
@@ -103,22 +110,15 @@ private:
         }
         static void pop(int count) noexcept { ImGui::PopStyleColor(count); }
     };
-    using Policy = std::conditional_t<ScopedIDVal<V>,
-                    id_stack,
-                    std::conditional_t<std::same_as<V, ScopedStyleVal>,
-                        style_stack,
-                        color_stack>>;
+    using Policy = std::conditional_t<std::same_as<V, ScopedStyleVal>,
+                    style_stack,
+                    color_stack>;
 
     bool condition;
     typename std::initializer_list<V>::size_type count;
 };
-using ScopedStyle = ImGuiScoped<ScopedStyleVal>;
-using ScopedColor = ImGuiScoped<ScopedColorVal>;
-
-auto scopedID(ScopedIDVal auto v) noexcept
-{
-    return ImGuiScoped{v};
-}
+using ScopedStyle = ConditionalScoped<ScopedStyleVal>;
+using ScopedColor = ConditionalScoped<ScopedColorVal>;
 
 constexpr auto NoSelection = -1;
 
@@ -209,7 +209,7 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
 auto input_address(aldo::et::word* addr) noexcept
 {
     ImGui::SetNextItemWidth(aldo::glyph_size().x * 6);
-    const auto id = scopedID(addr);
+    const ScopedID id = addr;
     const auto result = ImGui::InputScalar("Address", ImGuiDataType_U16, addr,
                                            nullptr, nullptr, "%04X");
     return result;
@@ -726,7 +726,7 @@ private:
                 {ImGuiCol_Text, aldo::colors::Attention},
                 bpBreak,
             };
-            const auto id = scopedID(static_cast<int>(idx));
+            const ScopedID id = static_cast<int>(idx);
             if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt,
                                   current)) {
                 selectedBreakpoint = idx;

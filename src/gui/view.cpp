@@ -64,24 +64,24 @@ concept ScopedVal
     = std::same_as<T, ScopedStyleVal> || std::same_as<T, ScopedColorVal>;
 
 template<ScopedVal V>
-class ConditionalScoped {
+class ConditionalScopedVars {
 public:
-    ConditionalScoped(V val, bool condition = true) noexcept
+    ConditionalScopedVars(V val, bool condition = true) noexcept
     : condition{condition}, count{1}
     {
         pushVars({val});
     }
-    ConditionalScoped(std::initializer_list<V> vals,
-                      bool condition = true) noexcept
+    ConditionalScopedVars(std::initializer_list<V> vals,
+                          bool condition = true) noexcept
     : condition{condition}, count{vals.size()}
     {
         pushVars(vals);
     }
-    ConditionalScoped(const ConditionalScoped&) = delete;
-    ConditionalScoped& operator=(const ConditionalScoped&) = delete;
-    ConditionalScoped(ConditionalScoped&&) = delete;
-    ConditionalScoped& operator=(ConditionalScoped&&) = delete;
-    ~ConditionalScoped()
+    ConditionalScopedVars(const ConditionalScopedVars&) = delete;
+    ConditionalScopedVars& operator=(const ConditionalScopedVars&) = delete;
+    ConditionalScopedVars(ConditionalScopedVars&&) = delete;
+    ConditionalScopedVars& operator=(ConditionalScopedVars&&) = delete;
+    ~ConditionalScopedVars()
     {
         if (!condition) return;
         Policy::pop(static_cast<int>(count));
@@ -117,8 +117,8 @@ private:
     bool condition;
     typename std::initializer_list<V>::size_type count;
 };
-using ScopedStyle = ConditionalScoped<ScopedStyleVal>;
-using ScopedColor = ConditionalScoped<ScopedColorVal>;
+using ScopedStyle = ConditionalScopedVars<ScopedStyleVal>;
+using ScopedColor = ConditionalScopedVars<ScopedColorVal>;
 
 constexpr auto NoSelection = -1;
 

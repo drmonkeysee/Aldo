@@ -158,14 +158,6 @@ constexpr auto operator-(ImVec2 a, const ImVec2& b) noexcept
     return ImVec2{a.x - b.x, a.y - b.y};
 }
 
-template<std::invocable F>
-auto widget_group(F f)
-{
-    ImGui::BeginGroup();
-    f();
-    ImGui::EndGroup();
-}
-
 auto keys_pressed(std::same_as<ImGuiKey> auto... keys) noexcept
 {
     return (ImGui::IsKeyPressed(keys, false) || ...);
@@ -186,6 +178,13 @@ auto add_views(std::vector<std::unique_ptr<aldo::View>>& v, aldo::viewstate& s,
 //
 // Widgets
 //
+
+auto widget_group(std::invocable auto f)
+{
+    ImGui::BeginGroup();
+    f();
+    ImGui::EndGroup();
+}
 
 auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
 {

@@ -14,16 +14,17 @@
 namespace aldo
 {
 
-struct emulator_types {
-    using byte = std::uint8_t;
-    using word = std::uint16_t;
-    using size = std::size_t;
-    using diff = std::ptrdiff_t;
+namespace emulator_types
+{
 
-    emulator_types() = delete;
-};
+using byte = std::uint8_t;
+using word = std::uint16_t;
+using size = std::size_t;
+using diff = std::ptrdiff_t;
 
-using et = emulator_types;
+}
+
+namespace et = emulator_types;
 
 }
 

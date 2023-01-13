@@ -66,10 +66,9 @@ concept ScopedVal
 template<ScopedVal V>
 class ScopedWidgetVars {
 public:
-    ScopedWidgetVars(V val, bool condition = true) noexcept
+    ScopedWidgetVars(V val, bool condition = true)
     : condition{condition}, count{1} { pushVars({val}); }
-    ScopedWidgetVars(std::initializer_list<V> vals,
-                     bool condition = true) noexcept
+    ScopedWidgetVars(std::initializer_list<V> vals, bool condition = true)
     : condition{condition}, count{vals.size()} { pushVars(vals); }
     ScopedWidgetVars(const ScopedWidgetVars&) = delete;
     ScopedWidgetVars& operator=(const ScopedWidgetVars&) = delete;
@@ -82,7 +81,7 @@ public:
     }
 
 private:
-    void pushVars(std::initializer_list<V> vals) const noexcept
+    void pushVars(std::initializer_list<V> vals) const
     {
         if (!condition) return;
         std::for_each(vals.begin(), vals.end(), Policy::push);
@@ -93,14 +92,20 @@ private:
         {
             ImGui::PushStyleVar(style.first, style.second);
         }
-        static void pop(int count) noexcept { ImGui::PopStyleVar(count); }
+        static void pop(int count) noexcept
+        {
+            ImGui::PopStyleVar(count);
+        }
     };
     struct color_stack {
         static void push(const ScopedColorVal& color) noexcept
         {
             ImGui::PushStyleColor(color.first, color.second);
         }
-        static void pop(int count) noexcept { ImGui::PopStyleColor(count); }
+        static void pop(int count) noexcept
+        {
+            ImGui::PopStyleColor(count);
+        }
     };
     using Policy = std::conditional_t<std::same_as<V, ScopedStyleVal>,
                     style_stack,
@@ -608,7 +613,7 @@ private:
         }
     }
 
-    void renderBreakpoints() noexcept
+    void renderBreakpoints()
     {
         const auto setFocus = renderConditionCombo();
         ImGui::Separator();
@@ -679,7 +684,7 @@ private:
         }
     }
 
-    void renderBreakpointList() noexcept
+    void renderBreakpointList()
     {
         const ImVec2 dims{
             -FLT_MIN,
@@ -697,7 +702,7 @@ private:
         renderListControls(bpCount);
     }
 
-    void renderBreakpoint(aldo::et::diff idx, const breakpoint& bp) noexcept
+    void renderBreakpoint(aldo::et::diff idx, const breakpoint& bp)
     {
         const auto bpBreak = idx == c.snapshot().debugger.halted;
         if (bpBreak && !detectedHalt) {
@@ -724,7 +729,7 @@ private:
         }
     }
 
-    void renderListControls(aldo::et::size bpCount) noexcept
+    void renderListControls(aldo::et::size bpCount)
     {
         if (selectedBreakpoint == NoSelection) {
             ImGui::BeginDisabled();

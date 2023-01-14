@@ -50,7 +50,7 @@ struct event {
             interrupt>;
 
     template<std::convertible_to<payload> T = std::monostate>
-    constexpr event(Command c, T v = T{}) noexcept : cmd{c}, value{v} {}
+    constexpr event(Command c, T v = {}) noexcept : cmd{c}, value{v} {}
 
     Command cmd;
     payload value;

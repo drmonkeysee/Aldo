@@ -31,6 +31,10 @@ public:
          MediaRuntime&&, bool*) = delete;
     View(std::string, viewstate&, EmuController&&, MediaRuntime&&,
          bool*) = delete;
+    View(const View&) = delete;
+    View& operator=(const View&) = delete;
+    View(View&&) = delete;
+    View& operator=(View&&) = delete;
     virtual ~View() = default;
 
     void render();

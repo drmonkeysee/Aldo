@@ -38,6 +38,10 @@ public:
     {
         nes_snapshot(console, getp());
     }
+    SnapshotScope(const SnapshotScope&) = default;
+    SnapshotScope& operator=(const SnapshotScope&) = default;
+    SnapshotScope(SnapshotScope&&) = default;
+    SnapshotScope& operator=(SnapshotScope&&) = default;
     ~SnapshotScope() { snapshot_clear(getp()); }
 
     const console_state& get() const noexcept { return snapshot; }

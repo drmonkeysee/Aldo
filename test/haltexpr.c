@@ -431,6 +431,142 @@ static void expr_missing_unit(void *ctx)
 }
 
 //
+// Reset Vector Parse
+//
+
+static void null_resetvector_string(void *ctx)
+{
+    const char *const str = NULL;
+    int vector;
+
+    const int result = haltexpr_parse_resetvector(str, &vector);
+
+    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(NoResetVector, vector);
+}
+
+static void empty_resetvector_string(void *ctx)
+{
+    const char *const str = "";
+    int vector;
+
+    const int result = haltexpr_parse_resetvector(str, &vector);
+
+    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(NoResetVector, vector);
+}
+
+static void resetvector(void *ctx)
+{
+    const char *const str = "!ab12";
+    int vector;
+
+    const int result = haltexpr_parse_resetvector(str, &vector);
+
+    ct_assertequal(0, result);
+    ct_assertequal(0xab12, vector);
+}
+
+static void resetvector_with_space(void *ctx)
+{
+    const char *const str = "!   ab12";
+    int vector;
+
+    const int result = haltexpr_parse_resetvector(str, &vector);
+
+    ct_assertequal(0, result);
+    ct_assertequal(0xab12, vector);
+}
+
+static void resetvector_with_leading_space(void *ctx)
+{
+    const char *const str = "   !ab12";
+    int vector;
+
+    const int result = haltexpr_parse_resetvector(str, &vector);
+
+    ct_assertequal(0, result);
+    ct_assertequal(0xab12, vector);
+}
+
+static void resetvector_with_trailing_space(void *ctx)
+{
+    const char *const str = "!ab12   ";
+    int vector;
+
+    const int result = haltexpr_parse_resetvector(str, &vector);
+
+    ct_assertequal(0, result);
+    ct_assertequal(0xab12, vector);
+}
+
+static void resetvector_caps(void *ctx)
+{
+    const char *const str = "!AB12";
+    int vector;
+
+    const int result = haltexpr_parse_resetvector(str, &vector);
+
+    ct_assertequal(0, result);
+    ct_assertequal(0xab12, vector);
+}
+
+static void resetvector_with_prefix(void *ctx)
+{
+    const char *const str = "!0xab12";
+    int vector;
+
+    const int result = haltexpr_parse_resetvector(str, &vector);
+
+    ct_assertequal(0, result);
+    ct_assertequal(0xab12, vector);
+}
+
+static void resetvector_short(void *ctx)
+{
+    const char *const str = "!1f";
+    int vector;
+
+    const int result = haltexpr_parse_resetvector(str, &vector);
+
+    ct_assertequal(0, result);
+    ct_assertequal(0x001f, vector);
+}
+
+static void resetvector_too_large(void *ctx)
+{
+    const char *const str = "!12345";
+    int vector;
+
+    const int result = haltexpr_parse_resetvector(str, &vector);
+
+    ct_assertequal(HEXPR_ERR_VALUE, result);
+    ct_assertequal(NoResetVector, vector);
+}
+
+static void resetvector_negative_overflow(void *ctx)
+{
+    const char *const str = "!-asdf";
+    int vector;
+
+    const int result = haltexpr_parse_resetvector(str, &vector);
+
+    ct_assertequal(HEXPR_ERR_VALUE, result);
+    ct_assertequal(NoResetVector, vector);
+}
+
+static void resetvector_malformed(void *ctx)
+{
+    const char *const str = "!hjkl";
+    int vector;
+
+    const int result = haltexpr_parse_resetvector(str, &vector);
+
+    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(NoResetVector, vector);
+}
+
+//
 // Expression Print
 //
 
@@ -453,7 +589,7 @@ static void print_addr(void *ctx)
 
     const int result = haltexpr_fmt(&expr, buf);
 
-    const char *const expected = "@ $1234";
+    const char *const expected = "PC @ $1234";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
@@ -465,7 +601,19 @@ static void print_runtime(void *ctx)
 
     const int result = haltexpr_fmt(&expr, buf);
 
-    const char *const expected = "4.365 sec";
+    const char *const expected = "4.3653226 sec";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
+static void print_long_runtime(void *ctx)
+{
+    struct haltexpr expr = {.cond = HLT_TIME, .runtime = 12312423242344.234f};
+    char buf[HEXPR_FMT_SIZE];
+
+    const int result = haltexpr_fmt(&expr, buf);
+
+    const char *const expected = "1.2312423e+13 sec";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
@@ -489,7 +637,7 @@ static void print_jam(void *ctx)
 
     const int result = haltexpr_fmt(&expr, buf);
 
-    const char *const expected = "JAM";
+    const char *const expected = "CPU JAMMED";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
@@ -514,7 +662,6 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(address_condition_caps),
         ct_maketest(address_condition_with_prefix),
         ct_maketest(address_condition_short),
-        ct_maketest(address_condition_with_prefix),
         ct_maketest(address_condition_too_large),
         ct_maketest(address_condition_negative_overflow),
         ct_maketest(address_condition_malformed),
@@ -546,9 +693,23 @@ struct ct_testsuite haltexpr_tests(void)
 
         ct_maketest(expr_missing_unit),
 
+        ct_maketest(null_resetvector_string),
+        ct_maketest(empty_resetvector_string),
+        ct_maketest(resetvector),
+        ct_maketest(resetvector_with_space),
+        ct_maketest(resetvector_with_leading_space),
+        ct_maketest(resetvector_with_trailing_space),
+        ct_maketest(resetvector_caps),
+        ct_maketest(resetvector_with_prefix),
+        ct_maketest(resetvector_short),
+        ct_maketest(resetvector_too_large),
+        ct_maketest(resetvector_negative_overflow),
+        ct_maketest(resetvector_malformed),
+
         ct_maketest(print_none),
         ct_maketest(print_addr),
         ct_maketest(print_runtime),
+        ct_maketest(print_long_runtime),
         ct_maketest(print_cycles),
         ct_maketest(print_jam),
     };

@@ -65,6 +65,9 @@ br_libexport br_checkerror
 int haltexpr_parse(const char *br_noalias str,
                    struct haltexpr *expr) br_nothrow;
 br_libexport br_checkerror
+int haltexpr_parse_resetvector(const char *br_noalias str,
+                               int *resetvector) br_nothrow;
+br_libexport br_checkerror
 int haltexpr_fmt(const struct haltexpr *expr,
                  char buf[br_noalias_csz(HEXPR_FMT_SIZE)]) br_nothrow;
 #include "bridgeclose.h"

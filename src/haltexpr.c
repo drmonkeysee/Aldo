@@ -102,6 +102,25 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
     return HEXPR_ERR_SCAN;
 }
 
+int haltexpr_parse_resetvector(const char *restrict str, int *resetvector)
+{
+    assert(resetvector != NULL);
+
+    *resetvector = NoResetVector;
+    if (str == NULL) return HEXPR_ERR_SCAN;
+
+    char u[2];
+    unsigned int addr;
+    const bool parsed = sscanf(str, " %1[!]%X", u, &addr) == 2,
+                valid = addr < MEMBLOCK_64KB;
+    if (parsed) {
+        if (!valid) return HEXPR_ERR_VALUE;
+        *resetvector = (int)addr;
+        return 0;
+    }
+    return HEXPR_ERR_SCAN;
+}
+
 int haltexpr_fmt(const struct haltexpr *expr,
                  char buf[restrict static HEXPR_FMT_SIZE])
 {

@@ -11,6 +11,7 @@
 #include "cart.h"
 #include "ctrlsignal.h"
 #include "cycleclock.h"
+#include "debug.h"
 #include "dis.h"
 #include "emulator.hpp"
 #include "emutypes.hpp"

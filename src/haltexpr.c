@@ -16,6 +16,26 @@
 #include <stdio.h>
 #include <string.h>
 
+static int parse_resetvector(const char *restrict str, int *resetvector)
+{
+    if (!str) return HEXPR_ERR_SCAN;
+
+    char u[2];
+    unsigned int addr;
+    const bool parsed = sscanf(str, " %1[!]%X", u, &addr) == 2,
+                valid = addr < MEMBLOCK_64KB;
+    if (parsed) {
+        if (!valid) return HEXPR_ERR_VALUE;
+        *resetvector = (int)addr;
+        return 0;
+    }
+    return HEXPR_ERR_SCAN;
+}
+
+//
+// Public Interface
+//
+
 const int NoResetVector = -1;
 
 const char *haltexpr_errstr(int err)
@@ -44,7 +64,7 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
 {
     assert(expr != NULL);
 
-    if (str == NULL) return HEXPR_ERR_SCAN;
+    if (!str) return HEXPR_ERR_SCAN;
 
     bool parsed = false, valid = false;
     char u[2];
@@ -102,23 +122,24 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
     return HEXPR_ERR_SCAN;
 }
 
-int haltexpr_parse_resetvector(const char *restrict str, int *resetvector)
+int haltexpr_parse_dbgexpr(const char *restrict str, struct debugexpr *expr)
 {
-    assert(resetvector != NULL);
+    assert(expr != NULL);
 
-    *resetvector = NoResetVector;
-    if (str == NULL) return HEXPR_ERR_SCAN;
-
-    char u[2];
-    unsigned int addr;
-    const bool parsed = sscanf(str, " %1[!]%X", u, &addr) == 2,
-                valid = addr < MEMBLOCK_64KB;
-    if (parsed) {
-        if (!valid) return HEXPR_ERR_VALUE;
-        *resetvector = (int)addr;
-        return 0;
+    struct haltexpr hexpr;
+    int err = haltexpr_parse(str, &hexpr);
+    if (err == 0) {
+        *expr = (struct debugexpr){.hexpr = hexpr, .type = DBG_EXPR_HALT};
+    } else {
+        int resetvector;
+        err = parse_resetvector(str, &resetvector);
+        if (err < 0) return err;
+        *expr = (struct debugexpr){
+            .resetvector = resetvector,
+            .type = DBG_EXPR_RESET,
+        };
     }
-    return HEXPR_ERR_SCAN;
+    return 0;
 }
 
 int haltexpr_fmt(const struct haltexpr *expr,

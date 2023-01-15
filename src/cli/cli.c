@@ -97,28 +97,53 @@ static int decode_cart_chr(const struct cliargs *args, cart *c)
     return EXIT_SUCCESS;
 }
 
-static bool parse_breakpoint(debugctx *dbg, const char *restrict exprstr,
-                             bool verbose)
+static bool parse_dbg_expression(debugctx *dbg, const char *restrict exprstr,
+                                 bool verbose)
 {
-    struct haltexpr expr;
-    int err = haltexpr_parse(exprstr, &expr);
+    struct debugexpr expr;
+    int err = haltexpr_parse_dbgexpr(exprstr, &expr);
     if (err < 0) {
         fprintf(stderr,
-                "Halt expression parse failure (%d): %s > \"%s\"\n", err,
+                "Debug expression parse failure (%d): %s > \"%s\"\n", err,
                 haltexpr_errstr(err), exprstr);
         return false;
     } else {
-        debug_bp_add(dbg, expr);
-        if (verbose) {
-            char buf[HEXPR_FMT_SIZE];
-            err = haltexpr_fmt(&expr, buf);
-            if (err < 0) {
-                fprintf(stderr, "Halt expr display error (%d): %s\n", err,
-                        haltexpr_errstr(err));
-            } else {
-                printf("Halt Condition: %s\n", buf);
+        if (expr.type == DBG_EXPR_HALT) {
+            debug_bp_add(dbg, expr.hexpr);
+            if (verbose) {
+                char buf[HEXPR_FMT_SIZE];
+                err = haltexpr_fmt(&expr.hexpr, buf);
+                if (err < 0) {
+                    fprintf(stderr, "Halt expr display error (%d): %s\n", err,
+                            haltexpr_errstr(err));
+                } else {
+                    printf("Halt Condition: %s\n", buf);
+                }
+            }
+        } else {
+            debug_set_resetvector(dbg, expr.resetvector);
+            if (verbose) {
+                printf("RESET Override: !%04X\n", expr.resetvector);
             }
         }
+    }
+    return true;
+}
+
+static bool parse_debug_file(debugctx *dbg, FILE *f,
+                             const struct cliargs *args)
+{
+    char buf[HEXPR_FMT_SIZE];
+    errno = 0;
+    while (fgets(buf, sizeof buf, f)) {
+        if (!parse_dbg_expression(dbg, buf, args->verbose)) {
+            return false;
+        }
+    }
+    if (ferror(f)) {
+        fprintf(stderr, "%s: ", args->dbgfilepath);
+        perror("Debug file read failure");
+        return false;
     }
     return true;
 }
@@ -126,16 +151,34 @@ static bool parse_breakpoint(debugctx *dbg, const char *restrict exprstr,
 static debugctx *create_debugger(const struct cliargs *args)
 {
     debugctx *const dbg = debug_new();
-    debug_set_resetvector(dbg, args->resetvector);
-    for (const struct haltarg *arg = args->haltlist;
-         arg;
-         arg = arg->next) {
-        if (!parse_breakpoint(dbg, arg->expr, args->verbose)) {
-            debug_free(dbg);
-            return NULL;
+    if (args->dbgfilepath) {
+        errno = 0;
+        FILE *const f = fopen(args->dbgfilepath, "r");
+        if (f) {
+            const bool success = parse_debug_file(dbg, f, args);
+            fclose(f);
+            if (!success) goto exit_dbg;
+        } else {
+            fprintf(stderr, "%s: ", args->dbgfilepath);
+            perror("Cannot open debug file");
+            goto exit_dbg;
+        }
+    } else {
+        for (const struct haltarg *arg = args->haltlist;
+             arg;
+             arg = arg->next) {
+            if (!parse_dbg_expression(dbg, arg->expr, args->verbose))
+                goto exit_dbg;
         }
     }
+    if (args->resetvector != NoResetVector) {
+        debug_set_resetvector(dbg, args->resetvector);
+        printf("RESET Override: !%04X\n", args->resetvector);
+    }
     return dbg;
+exit_dbg:
+    debug_free(dbg);
+    return NULL;
 }
 
 static ui_loop *setup_ui(struct emulator *emu)
@@ -173,20 +216,23 @@ static int run_emu(const struct cliargs *args, cart *c)
 {
     static const char *const restrict tracefile = "trace.log";
 
-    struct emulator emu = {.args = args, .cart = c};
-    if (emu.args->batch && emu.args->tron && !emu.args->haltlist) {
+    struct emulator emu = {
+        .args = args,
+        .cart = c,
+        .dbg = create_debugger(args),
+    };
+    if (!emu.dbg) {
+        fputs("Unable to initialize debugger!\n", stderr);
+        return EXIT_FAILURE;
+    }
+
+    if (emu.args->batch && emu.args->tron && debug_bp_count(emu.dbg) == 0) {
         fputs("*** WARNING ***\nYou have turned on trace-logging"
               " with batch mode but specified no halt conditions;\n"
               "this can result in a very large trace file very quickly!\n"
               "Continue? [yN] ", stderr);
         const int input = getchar();
         if (input != 'y' && input != 'Y') return EXIT_FAILURE;
-    }
-
-    emu.dbg = create_debugger(args);
-    if (!emu.dbg) {
-        fputs("Unable to initialize debugger!\n", stderr);
-        return EXIT_FAILURE;
     }
 
     int result = EXIT_SUCCESS;

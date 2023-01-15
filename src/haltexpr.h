@@ -34,6 +34,17 @@ struct haltexpr {
     enum haltcondition cond;
 };
 
+struct debugexpr {
+    union {
+        struct haltexpr hexpr;
+        int resetvector;
+    };
+    enum {
+        DBG_EXPR_HALT,
+        DBG_EXPR_RESET,
+    } type;
+};
+
 enum {
     HEXPR_FMT_SIZE = 25,    // Halt expr description is at most 24 chars
 };
@@ -64,10 +75,9 @@ const char *haltcond_description(enum haltcondition cond) br_nothrow;
 br_libexport br_checkerror
 int haltexpr_parse(const char *br_noalias str,
                    struct haltexpr *expr) br_nothrow;
-// NOTE: if returns non-zero error code *resetvector is set to NoResetVector
 br_libexport br_checkerror
-int haltexpr_parse_resetvector(const char *br_noalias str,
-                               int *resetvector) br_nothrow;
+int haltexpr_parse_dbgexpr(const char *br_noalias str,
+                           struct debugexpr *expr) br_nothrow;
 br_libexport br_checkerror
 int haltexpr_fmt(const struct haltexpr *expr,
                  char buf[br_noalias_csz(HEXPR_FMT_SIZE)]) br_nothrow;

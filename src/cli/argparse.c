@@ -65,7 +65,7 @@ static bool parse_flag(const char *arg, char shrt, bool exact, const char *lng)
     return (strlen(arg) > 1
                 && exact
                     ? arg[1] == shrt
-                    : arg[1] != '-' && strchr(arg, shrt) != NULL)
+                    : arg[1] != '-' && strchr(arg, shrt))
             || (lnglen > 0 && strncmp(arg, lng, lnglen) == 0
                 && (arg[lnglen] == '\0' || arg[lnglen] == '='));
 }

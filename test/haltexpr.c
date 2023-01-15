@@ -437,133 +437,148 @@ static void expr_missing_unit(void *ctx)
 static void null_resetvector_string(void *ctx)
 {
     const char *const str = NULL;
-    int vector;
+    struct debugexpr vector;
 
-    const int result = haltexpr_parse_resetvector(str, &vector);
+    const int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
-    ct_assertequal(NoResetVector, vector);
 }
 
 static void empty_resetvector_string(void *ctx)
 {
     const char *const str = "";
-    int vector;
+    struct debugexpr vector;
 
-    const int result = haltexpr_parse_resetvector(str, &vector);
+    const int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
-    ct_assertequal(NoResetVector, vector);
 }
 
 static void resetvector(void *ctx)
 {
     const char *const str = "!ab12";
-    int vector;
+    struct debugexpr vector;
 
-    const int result = haltexpr_parse_resetvector(str, &vector);
+    const int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(0xab12, vector);
+    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(0xab12, vector.resetvector);
 }
 
 static void resetvector_with_space(void *ctx)
 {
     const char *const str = "!   ab12";
-    int vector;
+    struct debugexpr vector;
 
-    const int result = haltexpr_parse_resetvector(str, &vector);
+    const int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(0xab12, vector);
+    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(0xab12, vector.resetvector);
 }
 
 static void resetvector_with_leading_space(void *ctx)
 {
     const char *const str = "   !ab12";
-    int vector;
+    struct debugexpr vector;
 
-    const int result = haltexpr_parse_resetvector(str, &vector);
+    const int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(0xab12, vector);
+    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(0xab12, vector.resetvector);
 }
 
 static void resetvector_with_trailing_space(void *ctx)
 {
     const char *const str = "!ab12   ";
-    int vector;
+    struct debugexpr vector;
 
-    const int result = haltexpr_parse_resetvector(str, &vector);
+    const int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(0xab12, vector);
+    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(0xab12, vector.resetvector);
 }
 
 static void resetvector_caps(void *ctx)
 {
     const char *const str = "!AB12";
-    int vector;
+    struct debugexpr vector;
 
-    const int result = haltexpr_parse_resetvector(str, &vector);
+    const int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(0xab12, vector);
+    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(0xab12, vector.resetvector);
 }
 
 static void resetvector_with_prefix(void *ctx)
 {
     const char *const str = "!0xab12";
-    int vector;
+    struct debugexpr vector;
 
-    const int result = haltexpr_parse_resetvector(str, &vector);
+    const int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(0xab12, vector);
+    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(0xab12, vector.resetvector);
 }
 
 static void resetvector_short(void *ctx)
 {
     const char *const str = "!1f";
-    int vector;
+    struct debugexpr vector;
 
-    const int result = haltexpr_parse_resetvector(str, &vector);
+    const int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(0x001f, vector);
+    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(0x001f, vector.resetvector);
 }
 
 static void resetvector_too_large(void *ctx)
 {
     const char *const str = "!12345";
-    int vector;
+    struct debugexpr vector;
 
-    const int result = haltexpr_parse_resetvector(str, &vector);
+    const int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(HEXPR_ERR_VALUE, result);
-    ct_assertequal(NoResetVector, vector);
 }
 
 static void resetvector_negative_overflow(void *ctx)
 {
     const char *const str = "!-asdf";
-    int vector;
+    struct debugexpr vector;
 
-    const int result = haltexpr_parse_resetvector(str, &vector);
+    const int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(HEXPR_ERR_VALUE, result);
-    ct_assertequal(NoResetVector, vector);
 }
 
 static void resetvector_malformed(void *ctx)
 {
     const char *const str = "!hjkl";
-    int vector;
+    struct debugexpr vector;
 
-    const int result = haltexpr_parse_resetvector(str, &vector);
+    const int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
-    ct_assertequal(NoResetVector, vector);
+}
+
+static void dbgexpr_parses_halt_condition(void *ctx)
+{
+    const char *const str = "@ab12";
+    struct debugexpr expr;
+
+    const int result = haltexpr_parse_dbgexpr(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(HLT_ADDR, (int)expr.hexpr.cond);
+    ct_assertequal(0xab12u, expr.hexpr.address);
 }
 
 //
@@ -705,6 +720,7 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(resetvector_too_large),
         ct_maketest(resetvector_negative_overflow),
         ct_maketest(resetvector_malformed),
+        ct_maketest(dbgexpr_parses_halt_condition),
 
         ct_maketest(print_none),
         ct_maketest(print_addr),

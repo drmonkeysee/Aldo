@@ -206,7 +206,6 @@ static void bpvector_free(struct breakpoint_vector *vec)
 // Public Interface
 //
 
-const int NoResetVector = -1;
 const ptrdiff_t NoBreakpoint = -1;
 
 debugctx *debug_new(void)

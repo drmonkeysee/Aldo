@@ -16,6 +16,8 @@
 #include <stdio.h>
 #include <string.h>
 
+const int NoResetVector = -1;
+
 const char *haltexpr_errstr(int err)
 {
     switch (err) {

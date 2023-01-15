@@ -29,8 +29,6 @@ typedef struct debugger_context debugctx;
 //
 
 br_libexport
-extern const int NoResetVector;
-br_libexport
 extern const ptrdiff_t NoBreakpoint;
 
 br_libexport br_ownresult

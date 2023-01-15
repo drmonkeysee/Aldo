@@ -9,7 +9,7 @@
 
 #include "bytes.h"
 #include "ctrlsignal.h"
-#include "debug.h"
+#include "haltexpr.h"
 
 #include <assert.h>
 #include <math.h>

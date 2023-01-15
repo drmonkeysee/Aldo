@@ -97,6 +97,32 @@ static int decode_cart_chr(const struct cliargs *args, cart *c)
     return EXIT_SUCCESS;
 }
 
+static bool parse_breakpoint(debugctx *dbg, const char *restrict exprstr,
+                             bool verbose)
+{
+    struct haltexpr expr;
+    int err = haltexpr_parse(exprstr, &expr);
+    if (err < 0) {
+        fprintf(stderr,
+                "Halt expression parse failure (%d): %s > \"%s\"\n", err,
+                haltexpr_errstr(err), exprstr);
+        return false;
+    } else {
+        debug_bp_add(dbg, expr);
+        if (verbose) {
+            char buf[HEXPR_FMT_SIZE];
+            err = haltexpr_fmt(&expr, buf);
+            if (err < 0) {
+                fprintf(stderr, "Halt expr display error (%d): %s\n", err,
+                        haltexpr_errstr(err));
+            } else {
+                printf("Halt Condition: %s\n", buf);
+            }
+        }
+    }
+    return true;
+}
+
 static debugctx *create_debugger(const struct cliargs *args)
 {
     debugctx *const dbg = debug_new();
@@ -104,25 +130,9 @@ static debugctx *create_debugger(const struct cliargs *args)
     for (const struct haltarg *arg = args->haltlist;
          arg;
          arg = arg->next) {
-        struct haltexpr expr;
-        int err = haltexpr_parse(arg->expr, &expr);
-        if (err < 0) {
-            fprintf(stderr, "Halt expression parse failure (%d): %s"
-                    " > \"%s\"\n", err, haltexpr_errstr(err), arg->expr);
+        if (!parse_breakpoint(dbg, arg->expr, args->verbose)) {
             debug_free(dbg);
             return NULL;
-        } else {
-            debug_bp_add(dbg, expr);
-            if (args->verbose) {
-                char buf[HEXPR_FMT_SIZE];
-                err = haltexpr_fmt(&expr, buf);
-                if (err < 0) {
-                    fprintf(stderr, "Halt expr display error (%d): %s\n", err,
-                            haltexpr_errstr(err));
-                } else {
-                    printf("Halt Condition: %s\n", buf);
-                }
-            }
         }
     }
     return dbg;

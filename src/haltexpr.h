@@ -64,6 +64,7 @@ const char *haltcond_description(enum haltcondition cond) br_nothrow;
 br_libexport br_checkerror
 int haltexpr_parse(const char *br_noalias str,
                    struct haltexpr *expr) br_nothrow;
+// NOTE: if returns non-zero error code *resetvector is set to NoResetVector
 br_libexport br_checkerror
 int haltexpr_parse_resetvector(const char *br_noalias str,
                                int *resetvector) br_nothrow;

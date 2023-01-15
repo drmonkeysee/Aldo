@@ -44,6 +44,7 @@ static void init_control_zero_args(void *ctx)
     ct_assertnull(argparse_filename(args->filepath));
     ct_assertnull(args->chrdecode_prefix);
     ct_assertnull(args->haltlist);
+    ct_assertnull(args->dbgfilepath);
     ct_assertfalse(args->batch);
     ct_assertfalse(args->chrdecode);
     ct_assertfalse(args->disassemble);
@@ -710,6 +711,101 @@ static void halt_long_does_not_overparse(void *ctx)
     ct_assertnull(args->haltlist);
 }
 
+static void debug_file_short(void *ctx)
+{
+    struct cliargs *const args = ctx;
+    char *argv[] = {"testaldo", "-g", "my/debug/file", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(args, argc, argv);
+
+    ct_asserttrue(result);
+
+    ct_assertnotnull(args->dbgfilepath);
+    ct_assertequalstr("my/debug/file", args->dbgfilepath);
+}
+
+static void debug_file_short_no_space(void *ctx)
+{
+    struct cliargs *const args = ctx;
+    char *argv[] = {"testaldo", "-gmy/debug/file", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(args, argc, argv);
+
+    ct_asserttrue(result);
+
+    ct_assertnotnull(args->dbgfilepath);
+    ct_assertequalstr("my/debug/file", args->dbgfilepath);
+}
+
+static void debug_file_short_missing(void *ctx)
+{
+    struct cliargs *const args = ctx;
+    char *argv[] = {"testaldo", "-g", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(args, argc, argv);
+
+    ct_assertfalse(result);
+
+    ct_assertnull(args->dbgfilepath);
+}
+
+static void debug_file_long(void *ctx)
+{
+    struct cliargs *const args = ctx;
+    char *argv[] = {"testaldo", "--dbg-file", "my/debug/file", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(args, argc, argv);
+
+    ct_asserttrue(result);
+
+    ct_assertnotnull(args->dbgfilepath);
+    ct_assertequalstr("my/debug/file", args->dbgfilepath);
+}
+
+static void debug_file_long_with_equals(void *ctx)
+{
+    struct cliargs *const args = ctx;
+    char *argv[] = {"testaldo", "--dbg-file=my/debug/file", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(args, argc, argv);
+
+    ct_asserttrue(result);
+
+    ct_assertnotnull(args->dbgfilepath);
+    ct_assertequalstr("my/debug/file", args->dbgfilepath);
+}
+
+static void debug_file_long_missing(void *ctx)
+{
+    struct cliargs *const args = ctx;
+    char *argv[] = {"testaldo", "--dbg-file", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(args, argc, argv);
+
+    ct_assertfalse(result);
+
+    ct_assertnull(args->dbgfilepath);
+}
+
+static void debug_file_long_does_not_overparse(void *ctx)
+{
+    struct cliargs *const args = ctx;
+    char *argv[] = {"testaldo", "--dbg-filemy/debug/file", NULL};
+    const int argc = (sizeof argv / sizeof argv[0]) - 1;
+
+    const bool result = argparse_parse(args, argc, argv);
+
+    ct_asserttrue(result);
+
+    ct_assertnull(args->dbgfilepath);
+}
+
 static void option_does_not_trigger_flag(void *ctx)
 {
     struct cliargs *const args = ctx;
@@ -834,6 +930,14 @@ struct ct_testsuite argparse_tests(void)
         ct_maketest(halt_long_multiple),
         ct_maketest(halt_long_missing),
         ct_maketest(halt_long_does_not_overparse),
+
+        ct_maketest(debug_file_short),
+        ct_maketest(debug_file_short_no_space),
+        ct_maketest(debug_file_short_missing),
+        ct_maketest(debug_file_long),
+        ct_maketest(debug_file_long_with_equals),
+        ct_maketest(debug_file_long_missing),
+        ct_maketest(debug_file_long_does_not_overparse),
 
         ct_maketest(option_does_not_trigger_flag),
         ct_maketest(double_dash_ends_option_parsing),

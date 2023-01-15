@@ -23,6 +23,7 @@ static const char
     *const restrict BcdLong = "--bcd",
     *const restrict ChrDecodeLong = "--chr-decode",
     *const restrict ChrScaleLong = "--chr-scale",
+    *const restrict DebugFileLong = "--dbg-file",
     *const restrict DisassembleLong = "--disassemble",
     *const restrict HaltLong = "--halt",
     *const restrict HelpLong = "--help",
@@ -37,6 +38,7 @@ static const char
     BcdShort = 'D',
     ChrDecodeShort = 'c',
     ChrScaleShort = 's',
+    DebugFileShort = 'g',
     DisassembleShort = 'd',
     HaltShort = 'H',
     HelpShort = 'h',
@@ -149,6 +151,24 @@ static bool parse_halt(const char *arg, int *restrict argi, int argc,
     return false;
 }
 
+static bool parse_dbgfile(const char *arg, int *restrict argi, int argc,
+                          char *argv[argc+1], struct cliargs *restrict args)
+{
+    const size_t optlen = strlen(DebugFileLong);
+    if (arg[1] == DebugFileShort && arg[2] != '\0') {
+        args->dbgfilepath = arg + 2;
+    } else if (strncmp(arg, DebugFileLong, optlen) == 0) {
+        const char *const opt = strchr(arg, '=');
+        if (opt && opt - arg == (ptrdiff_t)optlen) {
+            args->dbgfilepath = opt + 1;
+        }
+    }
+    if (!args->dbgfilepath && ++*argi < argc) {
+        args->dbgfilepath = argv[*argi];
+    }
+    return args->dbgfilepath;
+}
+
 static bool parse_arg(const char *arg, int *restrict argi, int argc,
                       char *argv[argc+1], struct cliargs *restrict args)
 {
@@ -169,8 +189,12 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
                              &args->resetvector);
     }
 
-    if (parse_flag(arg, HaltShort, false, HaltLong)) {
+    if (parse_flag(arg, HaltShort, true, HaltLong)) {
         return parse_halt(arg, argi, argc, argv, args);
+    }
+
+    if (parse_flag(arg, DebugFileShort, true, DebugFileLong)) {
+        return parse_dbgfile(arg, argi, argc, argv, args);
     }
 
     SETFLAG(args->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);
@@ -247,6 +271,9 @@ void argparse_usage(const char *me)
            BatchLong);
     printf("  -%c\t: enable BCD (binary-coded decimal) support (alt %s)\n",
            BcdShort, BcdLong);
+    printf("  -%c f\t: debug file containing halt conditions"
+           "\n\t  and/or RESET vector override (alt %s f)\n", DebugFileShort,
+           DebugFileLong);
     printf("  -%c e\t: halt condition expression (alt %s e),"
            "\n\t  multiple -H options can be specified;"
            "\n\t  see below usage section for syntax\n", HaltShort, HaltLong);

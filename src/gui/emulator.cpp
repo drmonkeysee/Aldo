@@ -145,7 +145,7 @@ void aldo::EmuController::loadCartFrom(const char* filepath)
 
 void aldo::EmuController::loadBreakpointsFrom(const char* filepath)
 {
-    static_assert(std::same_as<std::ifstream::char_type, aldo::et::text>,
+    static_assert(std::same_as<std::ifstream::char_type, aldo::et::tchar>,
                   "Text stream type does not match emulator text type");
 
     std::ifstream f{filepath};

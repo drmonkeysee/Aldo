@@ -66,6 +66,7 @@
 		C8B3A9DD295540B4009C1770 /* libaldo.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B88AA42906277800B7CB23 /* libaldo.dylib */; };
 		C8B3A9E3295561DB009C1770 /* AldoStudio.app in Embed Aldo Studio */ = {isa = PBXBuildFile; fileRef = C8B3A9BA295535F3009C1770 /* AldoStudio.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
+		C8B77FA72975FD7A0020692C /* emutypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8B77FA62975FD7A0020692C /* emutypes.cpp */; };
 		C8B88A8A29061C3500B7CB23 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8B88A8B29061C3800B7CB23 /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* cli.c */; };
 		C8B88A8C29061C3C00B7CB23 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6D325A97FB5006A7AB1 /* main.c */; };
@@ -303,6 +304,7 @@
 		C8B4664327755790000576EE /* argparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = argparse.h; sourceTree = "<group>"; };
 		C8B4664427755790000576EE /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8B5303A2801300C00576D9F /* CartFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartFocusView.swift; sourceTree = "<group>"; };
+		C8B77FA62975FD7A0020692C /* emutypes.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = emutypes.cpp; sourceTree = "<group>"; };
 		C8B87D46285E82BD000E0D2E /* CommandViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandViews.swift; sourceTree = "<group>"; };
 		C8B88AA42906277800B7CB23 /* libaldo.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libaldo.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpanel.tbd; path = usr/lib/libpanel.tbd; sourceTree = SDKROOT; };
@@ -619,6 +621,7 @@
 				C8283E73293D44CB00CDB572 /* emulator.hpp */,
 				C8283E72293D44CB00CDB572 /* emulator.cpp */,
 				C8D428E8296A15E500824248 /* emutypes.hpp */,
+				C8B77FA62975FD7A0020692C /* emutypes.cpp */,
 				C882854729403C2100BAC249 /* error.hpp */,
 				C882854629403C2100BAC249 /* error.cpp */,
 				C8041C3528EE6EC000A3695F /* gui.h */,
@@ -938,6 +941,7 @@
 				C8561A0C29149EA600290B53 /* mediaruntime.cpp in Sources */,
 				C854873828E685D00045BA42 /* imgui_impl_sdlrenderer.cpp in Sources */,
 				C8264C56294EDF5C004CD6A5 /* MacPlatform.swift in Sources */,
+				C8B77FA72975FD7A0020692C /* emutypes.cpp in Sources */,
 				C830036C28DEDDD200480F29 /* main.m in Sources */,
 				C894F0EF2945850E00C6575F /* view.cpp in Sources */,
 				C8283E74293D44CB00CDB572 /* emulator.cpp in Sources */,

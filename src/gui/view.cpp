@@ -693,10 +693,7 @@ private:
 
     void renderBreakpointList()
     {
-        const ImVec2 dims{
-            -FLT_MIN,
-            8 * ImGui::GetTextLineHeightWithSpacing(),
-        };
+        const ImVec2 dims{-FLT_MIN, 8 * ImGui::GetTextLineHeightWithSpacing()};
         const auto bpCount = c.breakpointCount();
         ImGui::Text("%zu breakpoint%s", bpCount, bpCount == 1 ? "" : "s");
         if (ImGui::BeginListBox("##breakpoints", dims)) {
@@ -723,8 +720,7 @@ private:
             !bp.enabled,
         };
         const ScopedColor color{
-            {ImGuiCol_Text, aldo::colors::Attention},
-            bpBreak,
+            {ImGuiCol_Text, aldo::colors::Attention}, bpBreak,
         };
         const ScopedID id = static_cast<int>(idx);
         if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt,

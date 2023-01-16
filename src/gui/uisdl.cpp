@@ -52,9 +52,7 @@ auto runloop(const gui_platform& p, debugctx* debug, nes* console)
         aldo::debug_handle{debug}, aldo::console_handle{console},
     };
     aldo::viewstate state;
-    const aldo::MediaRuntime runtime{
-        {1280, 800}, state.bouncer.bounds, p,
-    };
+    const aldo::MediaRuntime runtime{{1280, 800}, state.bouncer.bounds, p};
     const aldo::Layout layout{state, controller, runtime};
     state.clock.start();
     do {

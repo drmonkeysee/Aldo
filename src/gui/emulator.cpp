@@ -161,9 +161,9 @@ void aldo::EmuController::loadCartFrom(const char* filepath)
     file_handle f{std::fopen(filepath, "rb")};
     if (f) {
         const int err = cart_create(&c, f.get());
-        if (err < 0) {
-            throw aldo::AldoError{"Cart load failure", err, cart_errstr};
-        }
+        if (err < 0) throw aldo::AldoError{
+            "Cart load failure", err, cart_errstr,
+        };
     } else {
         throw aldo::AldoError{"Cannot open cart file", filepath, errno};
     }
@@ -188,9 +188,7 @@ void aldo::EmuController::loadBreakpointsFrom(const char* filepath)
         debugexpr expr;
         const auto err = haltexpr_parse_dbgexpr(buf.data(), &expr);
         if (err < 0) throw aldo::AldoError{
-            "Breakpoints parse failure",
-            err,
-            haltexpr_errstr,
+            "Breakpoints parse failure", err, haltexpr_errstr,
         };
         exprs.push_back(expr);
     }
@@ -206,8 +204,7 @@ void aldo::EmuController::openFile(const gui_platform& p,
     nes_halt(consolep());
 
     const aldo::platform_buffer filepath{
-        p.open_file(a.title, std::data(a.filter)),
-        p.free_buffer,
+        p.open_file(a.title, std::data(a.filter)), p.free_buffer,
     };
     if (!filepath) return;
 

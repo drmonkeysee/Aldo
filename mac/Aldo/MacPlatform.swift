@@ -113,13 +113,11 @@ fileprivate func launchStudio() {
     config.promptsUserIfNeeded = false
     NSWorkspace.shared.openApplication(at: studioUrl,
                                        configuration: config) { _, err in
-        if let err {
-            aldoLog.error(
-                "Aldo Studio Launch Error: \(err.localizedDescription)")
-            Task { @MainActor in
-                let _ = aldoAlert(title: openStudioErrorTitle,
-                                  message: err.localizedDescription)
-            }
+        guard let err else { return }
+        aldoLog.error("Aldo Studio Launch Error: \(err.localizedDescription)")
+        Task { @MainActor in
+            let _ = aldoAlert(title: openStudioErrorTitle,
+                              message: err.localizedDescription)
         }
     }
 }

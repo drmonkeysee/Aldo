@@ -581,6 +581,16 @@ static void dbgexpr_parses_halt_condition(void *ctx)
     ct_assertequal(0xab12u, expr.hexpr.address);
 }
 
+static void dbgexpr_malformed(void *ctx)
+{
+    const char *const str = "badexpr";
+    struct debugexpr expr;
+
+    const int result = haltexpr_parse_dbgexpr(str, &expr);
+
+    ct_assertequal(HEXPR_ERR_SCAN, result);
+}
+
 //
 // Expression Print
 //
@@ -721,6 +731,7 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(resetvector_negative_overflow),
         ct_maketest(resetvector_malformed),
         ct_maketest(dbgexpr_parses_halt_condition),
+        ct_maketest(dbgexpr_malformed),
 
         ct_maketest(print_none),
         ct_maketest(print_addr),

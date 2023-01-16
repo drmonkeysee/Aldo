@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <variant>
 #include <cerrno>
@@ -62,23 +63,12 @@ auto handle_keydown(const SDL_Event& ev, aldo::viewstate& state)
 // Public Interface
 //
 
-std::string_view aldo::EmuController::cartName() const
+std::string_view aldo::EmuController::cartName() const noexcept
 {
-    if (cartFilepath.empty()) return cart_errstr(CART_ERR_NOCART);
-
-    const std::string_view v = cartFilepath;
-    auto slash = v.rfind('/');
-    const auto dot = v.rfind('.');
-    if (slash == std::string_view::npos) {
-        slash = 0;
-    } else {
-        ++slash;    // NOTE: one-past the last slash
-    }
-    if (dot < slash) return v;
-
-    // NOTE: if not found dot will be npos which will work for end-of-string,
-    // even with slash subtracted.
-    return v.substr(slash, dot - slash);
+    // NOTE: not a ternary because the expression must evaluate to type
+    // const std::string& which converts cart_errstr to a dangling temporary.
+    if (cartFilestem.empty()) return cart_errstr(CART_ERR_NOCART);
+    return cartFilestem.native();
 }
 
 std::optional<cartinfo> aldo::EmuController::cartInfo() const
@@ -140,6 +130,7 @@ void aldo::EmuController::loadCartFrom(const char* filepath)
     hcart.reset(c);
     nes_powerup(consolep(), cartp(), false);
     cartFilepath = filepath;
+    cartFilestem = cartFilepath.stem();
 }
 
 void aldo::EmuController::openCartFile(const gui_platform& p)

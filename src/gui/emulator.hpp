@@ -15,8 +15,8 @@
 #include "nes.h"
 #include "snapshot.h"
 
+#include <filesystem>
 #include <optional>
-#include <string>
 #include <string_view>
 #include <utility>
 
@@ -58,7 +58,7 @@ public:
     : hdebug{std::move(d)}, hconsole{std::move(n)},
         lsnapshot{consolep()} {}
 
-    std::string_view cartName() const;
+    std::string_view cartName() const noexcept;
     std::optional<cartinfo> cartInfo() const;
     const console_state& snapshot() const noexcept { return lsnapshot.get(); }
     const console_state* snapshotp() const noexcept
@@ -88,7 +88,8 @@ private:
     void processEvent(const event&, viewstate&, const gui_platform&);
     void updateBouncer(viewstate&) const noexcept;
 
-    std::string cartFilepath;
+    std::filesystem::path cartFilepath;
+    std::filesystem::path cartFilestem;
     debug_handle hdebug;
     cart_handle hcart;
     console_handle hconsole;

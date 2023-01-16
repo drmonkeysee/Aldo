@@ -56,8 +56,8 @@ fileprivate struct FilterSequence: Sequence, IteratorProtocol {
     func makeIterator() -> some IteratorProtocol { self }
 
     mutating func next() -> String? {
-        defer { current += 1 }
         guard let cstr = current.pointee else { return nil }
+        defer { current += 1 }
         return .init(cString: cstr).lowercased()
     }
 }

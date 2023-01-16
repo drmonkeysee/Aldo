@@ -18,6 +18,7 @@
 #include <array>
 #include <concepts>
 #include <fstream>
+#include <initializer_list>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -116,6 +117,12 @@ void aldo::EmuController::update(aldo::viewstate& state) noexcept
 // Private Interface
 //
 
+struct aldo::EmuController::file_action {
+    void (aldo::EmuController::* op)(const char*);
+    const char* title;
+    std::initializer_list<const char*> filter = {nullptr};
+};
+
 void aldo::EmuController::loadCartFrom(const char* filepath)
 {
     cart* c;
@@ -161,21 +168,22 @@ void aldo::EmuController::loadBreakpointsFrom(const char* filepath)
     }
 }
 
-void aldo::EmuController::openFile(const gui_platform& p, file_action action)
+void aldo::EmuController::openFile(const gui_platform& p,
+                                   const aldo::EmuController::file_action& a)
 {
     // NOTE: halt console to prevent time-jump from modal delay
     // TODO: does this make sense long-term?
     nes_halt(consolep());
 
     const aldo::platform_buffer filepath{
-        p.open_file(action.title, std::data(action.filter)),
+        p.open_file(a.title, std::data(a.filter)),
         p.free_buffer,
     };
     if (!filepath) return;
 
     SDL_Log("File selected: %s", filepath.get());
     try {
-        (this->*action.op)(filepath.get());
+        (this->*a.op)(filepath.get());
     } catch (const aldo::AldoError& err) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s", err.what());
         p.display_error(err.title(), err.message());

@@ -16,6 +16,7 @@
 #include "snapshot.h"
 
 #include <filesystem>
+#include <initializer_list>
 #include <optional>
 #include <string_view>
 #include <utility>
@@ -78,13 +79,20 @@ public:
     void update(viewstate& state) noexcept;
 
 private:
+    struct file_action {
+        void (EmuController::* op)(const char*);
+        const char* title;
+        std::initializer_list<const char*> filter = {nullptr};
+    };
+
     debugctx* debugp() const noexcept { return hdebug.get(); }
     cart* cartp() const noexcept { return hcart.get(); }
     nes* consolep() const noexcept { return hconsole.get(); }
     console_state* snapshotp() noexcept { return lsnapshot.getp(); }
 
     void loadCartFrom(const char*);
-    void openCartFile(const gui_platform&);
+    void loadBreakpointsFrom(const char*);
+    void openFile(const gui_platform&, file_action);
     void processEvent(const event&, viewstate&, const gui_platform&);
     void updateBouncer(viewstate&) const noexcept;
 

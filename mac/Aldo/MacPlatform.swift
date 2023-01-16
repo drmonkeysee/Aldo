@@ -10,6 +10,7 @@ import os
 
 typealias CBuffer = UnsafeMutablePointer<CChar>
 typealias CString = UnsafePointer<CChar>
+typealias CStringArray = UnsafePointer<CString?>
 
 typealias PlatformHandle = UnsafeMutablePointer<gui_platform>
 typealias PlatformRenderFunc =
@@ -32,6 +33,35 @@ final class MacPlatform: NSObject {
     }
 }
 
+fileprivate final class OpenFileFilter: NSObject, NSOpenSavePanelDelegate {
+    private let filter: Set<String>
+
+    init(_ rawArray: CStringArray?) {
+        if let rawArray {
+            filter = .init(FilterSequence(current: rawArray))
+        } else {
+            filter = .init()
+        }
+    }
+
+    func panel(_ sender: Any, shouldEnable url: URL) -> Bool {
+        if filter.isEmpty { return true }
+        return filter.contains(url.pathExtension.lowercased())
+    }
+}
+
+fileprivate struct FilterSequence: Sequence, IteratorProtocol {
+    var current: CStringArray
+
+    func makeIterator() -> some IteratorProtocol { self }
+
+    mutating func next() -> String? {
+        defer { current += 1 }
+        guard let cstr = current.pointee else { return nil }
+        return .init(cString: cstr).lowercased()
+    }
+}
+
 //
 // Platform Implementation
 //
@@ -49,9 +79,13 @@ fileprivate func isHiDPI() -> Bool {
     return hidpi
 }
 
-fileprivate func openFile() -> CBuffer? {
+fileprivate func openFile(title: CString?, filter: CStringArray?) -> CBuffer? {
     let panel = NSOpenPanel()
-    panel.message = "Choose a ROM file"
+    if let title {
+        panel.message = .init(cString: title)
+    }
+    let fileFilter = OpenFileFilter(filter)
+    panel.delegate = fileFilter
     guard panel.runModal() == .OK, let path = panel.url else { return nil }
     return path.withUnsafeFileSystemRepresentation {
         guard let filepath = $0 else {

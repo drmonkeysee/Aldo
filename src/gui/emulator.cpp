@@ -15,6 +15,9 @@
 #include "imgui_impl_sdl.h"
 #include <SDL2/SDL.h>
 
+#include <array>
+#include <concepts>
+#include <fstream>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -51,7 +54,7 @@ auto handle_keydown(const SDL_Event& ev, aldo::viewstate& state)
         break;
     case SDLK_o:
         if (is_guikey_mod(ev) && !ev.key.repeat) {
-            state.events.emplace(aldo::Command::openFile);
+            state.events.emplace(aldo::Command::openROM);
         }
         break;
     }
@@ -133,18 +136,46 @@ void aldo::EmuController::loadCartFrom(const char* filepath)
     cartFilestem = cartFilepath.stem();
 }
 
-void aldo::EmuController::openCartFile(const gui_platform& p)
+void aldo::EmuController::loadBreakpointsFrom(const char* filepath)
+{
+    static_assert(std::same_as<std::ifstream::char_type, aldo::et::text>,
+                  "Text stream type does not match emulator text type");
+
+    std::ifstream f{filepath};
+    if (!f) throw aldo::AldoError{"Cannot open breakpoints file", filepath};
+
+    std::array<decltype(f)::char_type, HEXPR_FMT_SIZE> buf;
+    while (f.getline(buf.data(), buf.size())) {
+        debugexpr expr;
+        const auto err = haltexpr_parse_dbgexpr(buf.data(), &expr);
+        if (err < 0) throw aldo::AldoError{
+            "Breakpoints parse failure",
+            err,
+            haltexpr_errstr,
+        };
+        if (expr.type == debugexpr::DBG_EXPR_HALT) {
+            debug_bp_add(debugp(), expr.hexpr);
+        } else {
+            debug_set_resetvector(debugp(), expr.resetvector);
+        }
+    }
+}
+
+void aldo::EmuController::openFile(const gui_platform& p, file_action action)
 {
     // NOTE: halt console to prevent time-jump from modal delay
     // TODO: does this make sense long-term?
     nes_halt(consolep());
 
-    const aldo::platform_buffer filepath{p.open_file(), p.free_buffer};
+    const aldo::platform_buffer filepath{
+        p.open_file(action.title, std::data(action.filter)),
+        p.free_buffer,
+    };
     if (!filepath) return;
 
     SDL_Log("File selected: %s", filepath.get());
     try {
-        loadCartFrom(filepath.get());
+        (this->*action.op)(filepath.get());
     } catch (const aldo::AldoError& err) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s", err.what());
         p.display_error(err.title(), err.message());
@@ -161,6 +192,13 @@ void aldo::EmuController::processEvent(const aldo::event& ev,
         break;
     case aldo::Command::breakpointsClear:
         debug_bp_clear(debugp());
+        break;
+    case aldo::Command::breakpointsOpen:
+        openFile(p, {
+            &aldo::EmuController::loadBreakpointsFrom,
+            "Choose a Breakpoints file",
+            {"brk", nullptr},
+        });
         break;
     case aldo::Command::breakpointRemove:
         debug_bp_remove(debugp(), std::get<aldo::et::diff>(ev.value));
@@ -196,8 +234,8 @@ void aldo::EmuController::processEvent(const aldo::event& ev,
     case aldo::Command::mode:
         nes_mode(consolep(), std::get<csig_excmode>(ev.value));
         break;
-    case aldo::Command::openFile:
-        openCartFile(p);
+    case aldo::Command::openROM:
+        openFile(p, {&aldo::EmuController::loadCartFrom, "Choose a ROM file"});
         break;
     case aldo::Command::overrideReset:
         debug_set_resetvector(debugp(), std::get<int>(ev.value));

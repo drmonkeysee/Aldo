@@ -194,8 +194,15 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Open", "Cmd+O")) {
-                s.events.emplace(aldo::Command::openFile);
+            if (ImGui::MenuItem("Open ROM", "Cmd+O")) {
+                s.events.emplace(aldo::Command::openROM);
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Open Breakpoints", "Cmd+B")) {
+                s.events.emplace(aldo::Command::breakpointsOpen);
+            }
+            if (ImGui::MenuItem("Export Breakpoints", "Opt+Cmd+B")) {
+                s.events.emplace(aldo::Command::breakpointsExport);
             }
             ImGui::EndMenu();
         }

@@ -26,13 +26,15 @@ namespace aldo
 enum class Command {
     breakpointAdd,
     breakpointsClear,
+    breakpointsExport,
+    breakpointsOpen,
     breakpointRemove,
     breakpointToggle,
     halt,
     interrupt,
     mode,
     launchStudio,
-    openFile,
+    openROM,
     overrideReset,
     quit,
 };

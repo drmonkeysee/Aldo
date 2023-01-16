@@ -46,16 +46,26 @@ auto is_guikey_mod(const SDL_Event& ev) noexcept
     return ev.key.keysym.mod == KMOD_LGUI || ev.key.keysym.mod == KMOD_RGUI;
 }
 
+auto is_menu_shortcut(const SDL_Event& ev) noexcept
+{
+    return is_guikey_mod(ev) && !ev.key.repeat;
+}
+
 auto handle_keydown(const SDL_Event& ev, aldo::viewstate& state)
 {
     switch (ev.key.keysym.sym) {
+    case SDLK_b:
+        if (is_menu_shortcut(ev)) {
+            state.events.emplace(aldo::Command::breakpointsOpen);
+        }
+        break;
     case SDLK_d:
-        if (is_guikey_mod(ev) && !ev.key.repeat) {
+        if (is_menu_shortcut(ev)) {
             state.showDemo = !state.showDemo;
         }
         break;
     case SDLK_o:
-        if (is_guikey_mod(ev) && !ev.key.repeat) {
+        if (is_menu_shortcut(ev)) {
             state.events.emplace(aldo::Command::openROM);
         }
         break;

@@ -92,7 +92,7 @@ nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
 	exit $$DIFF_RESULT
 
 bcdtest: $(BCDTEST_ROM) debug
-	$(TARGET) -bDv -H@864b $<
+	$(TARGET) -bDv -g$(TEST_DIR)/bcdtest.brk $<
 	hexdump -C system.ram | head -n1 | awk '{ print "ERROR =",$$2; \
 	if ($$2 == 0) print "BCD Pass!"; else { print "BCD Fail :("; exit 1 }}'
 

@@ -20,10 +20,12 @@
 #include <fstream>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <variant>
+#include <vector>
 #include <cerrno>
 #include <cstdio>
 
@@ -61,6 +63,35 @@ auto handle_keydown(const SDL_Event& ev, aldo::viewstate& state)
     }
 }
 
+auto update_debugger(debugctx* dbg, std::span<debugexpr> exprs) noexcept
+{
+    debug_bp_clear(dbg);
+    debug_set_resetvector(dbg, NoResetVector);
+    for (const auto& expr : exprs) {
+        if (expr.type == debugexpr::DBG_EXPR_HALT) {
+            debug_bp_add(dbg, expr.hexpr);
+        } else {
+            debug_set_resetvector(dbg, expr.resetvector);
+        }
+    }
+}
+
+auto update_bouncer(aldo::viewstate& s, const console_state& snapshot) noexcept
+{
+    if (!snapshot.lines.ready) return;
+
+    if (s.bouncer.pos.x - s.bouncer.halfdim < 0
+        || s.bouncer.pos.x + s.bouncer.halfdim > s.bouncer.bounds.x) {
+        s.bouncer.velocity.x *= -1;
+    }
+    if (s.bouncer.pos.y - s.bouncer.halfdim < 0
+        || s.bouncer.pos.y + s.bouncer.halfdim > s.bouncer.bounds.y) {
+        s.bouncer.velocity.y *= -1;
+    }
+    s.bouncer.pos.x += s.bouncer.velocity.x;
+    s.bouncer.pos.y += s.bouncer.velocity.y;
+}
+
 }
 
 //
@@ -71,8 +102,8 @@ std::string_view aldo::EmuController::cartName() const noexcept
 {
     // NOTE: not a ternary because the expression must evaluate to type
     // const std::string& which converts cart_errstr to a dangling temporary.
-    if (cartFilestem.empty()) return cart_errstr(CART_ERR_NOCART);
-    return cartFilestem.native();
+    if (cartname.empty()) return cart_errstr(CART_ERR_NOCART);
+    return cartname.native();
 }
 
 std::optional<cartinfo> aldo::EmuController::cartInfo() const
@@ -110,7 +141,7 @@ void aldo::EmuController::update(aldo::viewstate& state) noexcept
 {
     nes_cycle(consolep(), &state.clock.cyclock);
     nes_snapshot(consolep(), snapshotp());
-    updateBouncer(state);
+    update_bouncer(state, snapshot());
 }
 
 //
@@ -140,7 +171,7 @@ void aldo::EmuController::loadCartFrom(const char* filepath)
     hcart.reset(c);
     nes_powerup(consolep(), cartp(), false);
     cartFilepath = filepath;
-    cartFilestem = cartFilepath.stem();
+    cartname = cartFilepath.stem();
 }
 
 void aldo::EmuController::loadBreakpointsFrom(const char* filepath)
@@ -152,6 +183,7 @@ void aldo::EmuController::loadBreakpointsFrom(const char* filepath)
     if (!f) throw aldo::AldoError{"Cannot open breakpoints file", filepath};
 
     std::array<decltype(f)::char_type, HEXPR_FMT_SIZE> buf;
+    std::vector<debugexpr> exprs;
     while (f.getline(buf.data(), buf.size())) {
         debugexpr expr;
         const auto err = haltexpr_parse_dbgexpr(buf.data(), &expr);
@@ -160,12 +192,10 @@ void aldo::EmuController::loadBreakpointsFrom(const char* filepath)
             err,
             haltexpr_errstr,
         };
-        if (expr.type == debugexpr::DBG_EXPR_HALT) {
-            debug_bp_add(debugp(), expr.hexpr);
-        } else {
-            debug_set_resetvector(debugp(), expr.resetvector);
-        }
+        exprs.push_back(expr);
     }
+    // NOTE: defer modifying debug state in case expr parsing throws
+    update_debugger(debugp(), exprs);
 }
 
 void aldo::EmuController::openFile(const gui_platform& p,
@@ -254,20 +284,4 @@ void aldo::EmuController::processEvent(const aldo::event& ev,
     default:
         throw std::domain_error{invalid_command(ev.cmd)};
     }
-}
-
-void aldo::EmuController::updateBouncer(aldo::viewstate& s) const noexcept
-{
-    if (!snapshot().lines.ready) return;
-
-    if (s.bouncer.pos.x - s.bouncer.halfdim < 0
-        || s.bouncer.pos.x + s.bouncer.halfdim > s.bouncer.bounds.x) {
-        s.bouncer.velocity.x *= -1;
-    }
-    if (s.bouncer.pos.y - s.bouncer.halfdim < 0
-        || s.bouncer.pos.y + s.bouncer.halfdim > s.bouncer.bounds.y) {
-        s.bouncer.velocity.y *= -1;
-    }
-    s.bouncer.pos.x += s.bouncer.velocity.x;
-    s.bouncer.pos.y += s.bouncer.velocity.y;
 }

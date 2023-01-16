@@ -89,10 +89,9 @@ private:
     void loadBreakpointsFrom(const char*);
     void openFile(const gui_platform&, const file_action&);
     void processEvent(const event&, viewstate&, const gui_platform&);
-    void updateBouncer(viewstate&) const noexcept;
 
     std::filesystem::path cartFilepath;
-    std::filesystem::path cartFilestem;
+    std::filesystem::path cartname;
     debug_handle hdebug;
     cart_handle hcart;
     console_handle hconsole;

@@ -198,6 +198,9 @@ void aldo::EmuController::processEvent(const aldo::event& ev,
     case aldo::Command::breakpointAdd:
         debug_bp_add(debugp(), std::get<haltexpr>(ev.value));
         break;
+    case aldo::Command::breakpointRemove:
+        debug_bp_remove(debugp(), std::get<aldo::et::diff>(ev.value));
+        break;
     case aldo::Command::breakpointsClear:
         debug_bp_clear(debugp());
         break;
@@ -207,9 +210,6 @@ void aldo::EmuController::processEvent(const aldo::event& ev,
             "Choose a Breakpoints file",
             {"brk", nullptr},
         });
-        break;
-    case aldo::Command::breakpointRemove:
-        debug_bp_remove(debugp(), std::get<aldo::et::diff>(ev.value));
         break;
     case aldo::Command::breakpointToggle:
         {

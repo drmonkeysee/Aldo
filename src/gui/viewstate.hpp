@@ -25,10 +25,10 @@ namespace aldo
 
 enum class Command {
     breakpointAdd,
+    breakpointRemove,
     breakpointsClear,
     breakpointsExport,
     breakpointsOpen,
-    breakpointRemove,
     breakpointToggle,
     halt,
     interrupt,

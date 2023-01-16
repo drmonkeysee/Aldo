@@ -20,6 +20,7 @@ namespace emulator_types
 using byte = std::uint8_t;
 using word = std::uint16_t;
 using tchar = char;
+using str = const tchar*;
 using size = std::size_t;
 using diff = std::ptrdiff_t;
 

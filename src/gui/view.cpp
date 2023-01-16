@@ -524,9 +524,9 @@ private:
         if (datapath.jammed) {
             ImGui::TextUnformatted("Decode: JAMMED");
         } else {
-            char buf[DIS_DATAP_SIZE];
-            const auto err = dis_datapath(c.snapshotp(), buf);
-            ImGui::Text("Decode: %s", err < 0 ? dis_errstr(err) : buf);
+            std::array<aldo::et::tchar, DIS_DATAP_SIZE> buf;
+            const auto err = dis_datapath(c.snapshotp(), buf.data());
+            ImGui::Text("Decode: %s", err < 0 ? dis_errstr(err) : buf.data());
         }
         ImGui::Text("adl: %02X", datapath.addrlow_latch);
         ImGui::Text("adh: %02X", datapath.addrhigh_latch);
@@ -593,7 +593,8 @@ protected:
 private:
     // NOTE: does not include first enum value HLT_NONE
     using halt_array
-        = std::array<std::pair<haltcondition, const char*>, HLT_CONDCOUNT - 1>;
+        = std::array<
+            std::pair<haltcondition, aldo::et::str>, HLT_CONDCOUNT - 1>;
     using halt_it = halt_array::const_iterator;
 
     void renderVectorOverride() noexcept
@@ -713,8 +714,8 @@ private:
             selectedBreakpoint = idx;
         }
         const auto current = idx == selectedBreakpoint;
-        char fmt[HEXPR_FMT_SIZE];
-        const int err = haltexpr_fmt(&bp.expr, fmt);
+        std::array<aldo::et::tchar, HEXPR_FMT_SIZE> fmt;
+        const int err = haltexpr_fmt(&bp.expr, fmt.data());
         const ScopedStyle style{
             {ImGuiStyleVar_Alpha, ImGui::GetStyle().DisabledAlpha},
             !bp.enabled,
@@ -723,7 +724,7 @@ private:
             {ImGuiCol_Text, aldo::colors::Attention}, bpBreak,
         };
         const ScopedID id = static_cast<int>(idx);
-        if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt,
+        if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt.data(),
                               current)) {
             selectedBreakpoint = idx;
         }
@@ -928,16 +929,16 @@ private:
         const auto& prgMem = snp.mem;
         auto addr = snp.datapath.current_instruction;
         dis_instruction inst{};
-        char disasm[DIS_INST_SIZE];
+        std::array<aldo::et::tchar, DIS_INST_SIZE> disasm;
         for (int i = 0; i < instCount; ++i) {
             auto result = dis_parsemem_inst(prgMem.prglength,
                                             prgMem.currprg,
                                             inst.offset + inst.bv.size,
                                             &inst);
             if (result > 0) {
-                result = dis_inst(addr, &inst, disasm);
+                result = dis_inst(addr, &inst, disasm.data());
                 if (result > 0) {
-                    if (ImGui::Selectable(disasm, selected == i)) {
+                    if (ImGui::Selectable(disasm.data(), selected == i)) {
                         selected = i;
                     } else if (ImGui::BeginPopupContextItem()) {
                         selected = i;

@@ -25,6 +25,8 @@ enum haltcondition {
     HLT_CONDCOUNT,
 };
 
+#define HEXPR_RESET_OVRD "!"
+
 struct haltexpr {
     union {
         uint64_t cycles;

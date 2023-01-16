@@ -31,6 +31,9 @@ ui_loop ui_batch_loop;
 ui_loop ui_curses_loop;
 const char *ui_curses_version(void);
 
+static const char *const restrict ResetOverrideFmt =
+    "RESET Override: " HEXPR_RESET_OVRD "%04X\n";
+
 static void print_version(void)
 {
     printf("Aldo %s", AldoVersion);
@@ -123,7 +126,7 @@ static bool parse_dbg_expression(debugctx *dbg, const char *restrict exprstr,
         } else {
             debug_set_resetvector(dbg, expr.resetvector);
             if (verbose) {
-                printf("RESET Override: !%04X\n", expr.resetvector);
+                printf(ResetOverrideFmt, expr.resetvector);
             }
         }
     }
@@ -173,7 +176,7 @@ static debugctx *create_debugger(const struct cliargs *args)
     }
     if (args->resetvector != NoResetVector) {
         debug_set_resetvector(dbg, args->resetvector);
-        printf("RESET Override: !%04X\n", args->resetvector);
+        printf(ResetOverrideFmt, args->resetvector);
     }
     return dbg;
 exit_dbg:

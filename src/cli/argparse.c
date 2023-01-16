@@ -310,7 +310,7 @@ void argparse_usage(const char *me)
     puts("  Nc\t: halt after executing N cycles");
     puts("  jam\t: halt when the CPU enters a jammed state");
     puts("\nRESET vector override expression");
-    puts("  !XXXX\t: set RESET vector to address XXXX;"
+    puts("  " HEXPR_RESET_OVRD "XXXX\t: set RESET vector to address XXXX;"
          "\n\t  address is a 1- or 2-byte hexadecimal number");
 }
 

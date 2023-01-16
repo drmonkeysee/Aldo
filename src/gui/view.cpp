@@ -976,7 +976,7 @@ private:
             indicator = "";
             resVector = bytowr(lo, hi);
         } else {
-            indicator = "!";
+            indicator = HEXPR_RESET_OVRD;
             resVector =
                 static_cast<aldo::et::word>(debugger.resvector_override);
         }

@@ -112,6 +112,7 @@ std::string_view aldo::EmuController::cartName() const noexcept
     // NOTE: not a ternary because the expression must evaluate to type
     // const std::string& which converts cart_errstr to a dangling temporary.
     if (cartname.empty()) return cart_errstr(CART_ERR_NOCART);
+
     return cartname.native();
 }
 

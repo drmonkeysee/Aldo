@@ -25,7 +25,7 @@ enum haltcondition {
     HLT_CONDCOUNT,
 };
 
-#define HEXPR_RESET_OVRD "!"
+#define HEXPR_RES_IND "!"
 
 struct haltexpr {
     union {

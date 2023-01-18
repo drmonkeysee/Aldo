@@ -32,7 +32,7 @@ ui_loop ui_curses_loop;
 const char *ui_curses_version(void);
 
 static const char *const restrict ResetOverrideFmt =
-    "RESET Override: " HEXPR_RESET_OVRD "%04X\n";
+    "RESET Override: " HEXPR_RES_IND "%04X\n";
 
 static void print_version(void)
 {

@@ -980,7 +980,7 @@ private:
             indicator = "";
             resVector = bytowr(lo, hi);
         } else {
-            indicator = HEXPR_RESET_OVRD;
+            indicator = HEXPR_RES_IND;
             resVector =
                 static_cast<aldo::et::word>(debugger.resvector_override);
         }

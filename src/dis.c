@@ -624,7 +624,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
         uint16_t vector;
         if (snapshot->datapath.res == CSGS_COMMITTED
             && snapshot->debugger.resvector_override != NoResetVector) {
-            fmt = HEXPR_RESET_OVRD "%04X";
+            fmt = HEXPR_RES_IND "%04X";
             vector = (uint16_t)snapshot->debugger.resvector_override;
         } else {
             fmt = "%04X";

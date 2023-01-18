@@ -23,7 +23,7 @@ static int parse_resetvector(const char *restrict str, int *resetvector)
     char u[2];
     unsigned int addr;
     const bool
-        parsed = sscanf(str, " %1[" HEXPR_RESET_OVRD "]%X", u, &addr) == 2,
+        parsed = sscanf(str, " %1[" HEXPR_RES_IND "]%X", u, &addr) == 2,
         valid = addr < MEMBLOCK_64KB;
     if (parsed) {
         if (!valid) return HEXPR_ERR_VALUE;

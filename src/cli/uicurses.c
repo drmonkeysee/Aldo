@@ -264,7 +264,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
     if (emu->snapshot.debugger.resvector_override == NoResetVector) {
         wprintw(v->content, " $%04X", bytowr(lo, hi));
     } else {
-        wprintw(v->content, " " HEXPR_RESET_OVRD "$%04X",
+        wprintw(v->content, " " HEXPR_RES_IND "$%04X",
                 emu->snapshot.debugger.resvector_override);
     }
 

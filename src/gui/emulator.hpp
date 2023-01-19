@@ -32,7 +32,7 @@ using cart_handle = handle<cart, cart_free>;
 using console_handle = handle<nes, nes_free>;
 using debug_handle = handle<debugctx, debug_free>;
 
-class SnapshotScope {
+class [[nodiscard("raii type")]] SnapshotScope {
 public:
     explicit SnapshotScope(nes* console) noexcept
     {

@@ -21,7 +21,7 @@ using win_handle = handle<SDL_Window, SDL_DestroyWindow>;
 using ren_handle = handle<SDL_Renderer, SDL_DestroyRenderer>;
 using tex_handle = handle<SDL_Texture, SDL_DestroyTexture>;
 
-class SdlLib {
+class [[nodiscard("raii type")]] SdlLib {
 public:
     SdlLib();
     SdlLib(const SdlLib&) = delete;
@@ -31,7 +31,7 @@ public:
     ~SdlLib();
 };
 
-class DearImGuiLib {
+class [[nodiscard("raii type")]] DearImGuiLib {
 public:
     DearImGuiLib(const win_handle& hwin, const ren_handle& hren);
     DearImGuiLib(const DearImGuiLib&) = delete;
@@ -41,7 +41,7 @@ public:
     ~DearImGuiLib();
 };
 
-class MediaRuntime {
+class [[nodiscard("raii type")]] MediaRuntime {
 public:
     [[nodiscard("check error")]]
     static int initStatus() noexcept { return InitStatus; }

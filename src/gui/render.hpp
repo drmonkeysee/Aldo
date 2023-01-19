@@ -15,7 +15,7 @@ namespace aldo
 
 class MediaRuntime;
 
-class RenderFrame {
+class [[nodiscard("raii type")]] RenderFrame {
 public:
     RenderFrame(const MediaRuntime& r, RunTimer t) noexcept;
     RenderFrame(MediaRuntime&&, RunTimer) = delete;

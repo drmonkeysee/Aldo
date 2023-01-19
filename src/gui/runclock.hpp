@@ -17,7 +17,7 @@
 namespace aldo
 {
 
-class RunTimer {
+class [[nodiscard("raii type")]] RunTimer {
 public:
     using clock_type = std::chrono::steady_clock;
     using duration_type = std::chrono::duration<double, std::milli>;
@@ -70,7 +70,7 @@ inline void swap(RunTimer& a, RunTimer& b) noexcept
     a.swap(b);
 }
 
-class RunTick {
+class [[nodiscard("raii type")]] RunTick {
 public:
     RunTick(cycleclock& c, bool resetBudget) noexcept : cyclock{c}
     {
@@ -98,11 +98,8 @@ struct runclock {
         return RunTick(cyclock, resetBudget);
     }
 
-    [[nodiscard("raii result")]]
     RunTimer timeInput() noexcept { return RunTimer{dtInputMs}; }
-    [[nodiscard("raii result")]]
     RunTimer timeUpdate() noexcept { return RunTimer{dtUpdateMs}; }
-    [[nodiscard("raii result")]]
     RunTimer timeRender() noexcept { return RunTimer{dtRenderMs}; }
 
     cycleclock cyclock{.cycles_per_sec = 4};

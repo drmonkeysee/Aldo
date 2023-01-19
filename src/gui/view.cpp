@@ -599,6 +599,8 @@ private:
 
     void renderVectorOverride() noexcept
     {
+        syncWithOverrideState();
+
         if (ImGui::Checkbox("Override", &resetOverride)) {
             if (resetOverride) {
                 s.events.emplace(aldo::Command::overrideReset,
@@ -778,6 +780,19 @@ private:
     {
         selectedCondition = selection;
         currentHaltExpression = {.cond = selectedCondition->first};
+    }
+
+    void syncWithOverrideState() noexcept
+    {
+        // NOTE: if view flag doesn't match debugger state then debugger
+        // state was changed under the hood (e.g. by loading a brk file).
+        // NOTE: if another case like this comes up it may be worth coming up
+        // with a model -> view notification system.
+        const auto resetVector = c.resetVectorOverride();
+        resetOverride = resetVector != NoResetVector;
+        if (resetOverride) {
+            resetAddr = static_cast<aldo::et::word>(resetVector);
+        }
     }
 
     bool detectedHalt = false, resetOverride = false;

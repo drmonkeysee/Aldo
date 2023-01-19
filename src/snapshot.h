@@ -9,7 +9,6 @@
 #define Aldo_snapshot_h
 
 #include "ctrlsignal.h"
-#include "haltexpr.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -24,9 +23,7 @@ struct console_state {
     } mem;
     struct {
         ptrdiff_t halted;
-        int resvector_override;
     } debugger;
-    enum csig_excmode mode;
     struct {
         enum csig_state irq, nmi, res;
         uint16_t addressbus, current_instruction;

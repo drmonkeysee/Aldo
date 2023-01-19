@@ -154,10 +154,11 @@ static void drawcontrols(const struct view *v, const struct emulator *emu)
     drawtoggle(v, halt_label, !emu->snapshot.lines.ready);
 
     cursor_y += 2;
+    const enum csig_excmode mode = nes_mode(emu->console);
     mvwaddstr(v->content, cursor_y, 0, "Mode: ");
-    drawtoggle(v, " Cycle ", emu->snapshot.mode == CSGM_CYCLE);
-    drawtoggle(v, " Step ", emu->snapshot.mode == CSGM_STEP);
-    drawtoggle(v, " Run ", emu->snapshot.mode == CSGM_RUN);
+    drawtoggle(v, " Cycle ", mode == CSGM_CYCLE);
+    drawtoggle(v, " Step ", mode == CSGM_STEP);
+    drawtoggle(v, " Run ", mode == CSGM_RUN);
 
     cursor_y += 2;
     mvwaddstr(v->content, cursor_y, 0, "Signal: ");
@@ -184,11 +185,11 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
     mvwprintw(v->content, cursor_y++, 0, "Tracing: %s",
               emu->args->tron ? "On" : "Off");
     mvwaddstr(v->content, cursor_y++, 0, "Reset Override: ");
-    if (emu->snapshot.debugger.resvector_override == NoResetVector) {
+    const int resetvector = debug_resetvector(emu->dbg);
+    if (resetvector == NoResetVector) {
         waddstr(v->content, "None");
     } else {
-        wprintw(v->content, "$%04X",
-                emu->snapshot.debugger.resvector_override);
+        wprintw(v->content, "$%04X", resetvector);
     }
     const struct breakpoint *const bp
         = debug_bp_at(emu->dbg, emu->snapshot.debugger.halted);
@@ -261,11 +262,11 @@ static void drawvecs(const struct view *v, int h, int w, int y,
     hi = emu->snapshot.mem.vectors[3];
     mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     RES",
               CPU_VECTOR_RES, lo, hi);
-    if (emu->snapshot.debugger.resvector_override == NoResetVector) {
+    const int resetvector = debug_resetvector(emu->dbg);
+    if (resetvector == NoResetVector) {
         wprintw(v->content, " $%04X", bytowr(lo, hi));
     } else {
-        wprintw(v->content, " " HEXPR_RES_IND "$%04X",
-                emu->snapshot.debugger.resvector_override);
+        wprintw(v->content, " " HEXPR_RES_IND "$%04X", resetvector);
     }
 
     lo = emu->snapshot.mem.vectors[4];
@@ -616,10 +617,10 @@ static void handle_input(struct viewstate *s, const struct emulator *emu)
         }
         break;
     case 'm':
-        nes_mode(emu->console, emu->snapshot.mode + 1);
+        nes_set_mode(emu->console, nes_mode(emu->console) + 1);
         break;
     case 'M':
-        nes_mode(emu->console, emu->snapshot.mode - 1);
+        nes_set_mode(emu->console, nes_mode(emu->console) - 1);
         break;
     case 'n':
         if (emu->snapshot.lines.nmi) {

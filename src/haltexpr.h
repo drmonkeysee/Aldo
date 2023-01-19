@@ -66,9 +66,6 @@ enum {
 
 #include "bridgeopen.h"
 br_libexport
-extern const int NoResetVector;
-
-br_libexport
 const char *haltexpr_errstr(int err) br_nothrow;
 br_libexport
 const char *haltcond_description(enum haltcondition cond) br_nothrow;

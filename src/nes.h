@@ -31,7 +31,9 @@ br_libexport
 void nes_powerdown(nes *self) br_nothrow;
 
 br_libexport
-void nes_mode(nes *self, enum csig_excmode mode) br_nothrow;
+enum csig_excmode nes_mode(nes *self) br_nothrow;
+br_libexport
+void nes_set_mode(nes *self, enum csig_excmode mode) br_nothrow;
 br_libexport
 void nes_ready(nes *self) br_nothrow;
 br_libexport

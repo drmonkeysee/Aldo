@@ -206,6 +206,7 @@ static void bpvector_free(struct breakpoint_vector *vec)
 // Public Interface
 //
 
+const int NoResetVector = -1;
 const ptrdiff_t NoBreakpoint = -1;
 
 debugctx *debug_new(void)
@@ -225,6 +226,13 @@ void debug_free(debugctx *self)
 
     bpvector_free(&self->breakpoints);
     free(self);
+}
+
+int debug_resetvector(debugctx *self)
+{
+    assert(self != NULL);
+
+    return self->resetvector;
 }
 
 void debug_set_resetvector(debugctx *self, int resetvector)
@@ -357,5 +365,4 @@ void debug_snapshot(debugctx *self, struct console_state *snapshot)
     assert(snapshot != NULL);
 
     snapshot->debugger.halted = self->halted;
-    snapshot->debugger.resvector_override = self->resetvector;
 }

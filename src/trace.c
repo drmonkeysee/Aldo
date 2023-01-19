@@ -35,11 +35,12 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
 }
 
 static int trace_instruction_peek(FILE *tracelog, struct mos6502 *cpu,
+                                  debugctx *dbg,
                                   const struct console_state *snapshot)
 {
     char peek[DIS_PEEK_SIZE];
     const int result = dis_peek(snapshot->datapath.current_instruction, cpu,
-                                snapshot, peek);
+                                dbg, snapshot, peek);
     return fprintf(tracelog, " %s", result < 0 ? dis_errstr(result) : peek);
 }
 
@@ -67,9 +68,10 @@ static void trace_registers(FILE *tracelog,
 //
 
 void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu,
-                const struct console_state *snapshot)
+                debugctx *dbg, const struct console_state *snapshot)
 {
     assert(cpu != NULL);
+    assert(dbg != NULL);
     assert(snapshot != NULL);
 
     if (!tracelog) return;
@@ -79,7 +81,7 @@ void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu,
 
     const int
         written = trace_instruction(tracelog, cpu, snapshot)
-                    + trace_instruction_peek(tracelog, cpu, snapshot),
+                    + trace_instruction_peek(tracelog, cpu, dbg, snapshot),
         width = written < 0 ? instw : (written > instw ? 0 : instw - written);
     assert(written <= instw);
     fprintf(tracelog, "%*s", width, "");

@@ -9,7 +9,6 @@
 
 #include "bytes.h"
 #include "ctrlsignal.h"
-#include "haltexpr.h"
 
 #include <assert.h>
 #include <math.h>
@@ -607,11 +606,12 @@ int dis_inst(uint16_t addr, const struct dis_instruction *inst,
     return total;
 }
 
-int dis_peek(uint16_t addr, struct mos6502 *cpu,
+int dis_peek(uint16_t addr, struct mos6502 *cpu, debugctx *dbg,
              const struct console_state *snapshot,
              char dis[restrict static DIS_PEEK_SIZE])
 {
     assert(cpu != NULL);
+    assert(dbg != NULL);
     assert(snapshot != NULL);
     assert(dis != NULL);
 
@@ -622,10 +622,11 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu,
         if (count < 0) return DIS_ERR_FMT;
         const char *fmt;
         uint16_t vector;
+        int resetvector;
         if (snapshot->datapath.res == CSGS_COMMITTED
-            && snapshot->debugger.resvector_override != NoResetVector) {
+            && (resetvector = debug_resetvector(dbg)) != NoResetVector) {
             fmt = HEXPR_RES_IND "%04X";
-            vector = (uint16_t)snapshot->debugger.resvector_override;
+            vector = (uint16_t)resetvector;
         } else {
             fmt = "%04X";
             vector = interrupt_vector(snapshot);

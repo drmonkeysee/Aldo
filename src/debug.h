@@ -29,6 +29,8 @@ typedef struct debugger_context debugctx;
 //
 
 br_libexport
+extern const int NoResetVector;
+br_libexport
 extern const ptrdiff_t NoBreakpoint;
 
 br_libexport br_ownresult
@@ -36,6 +38,8 @@ debugctx *debug_new(void) br_nothrow;
 br_libexport
 void debug_free(debugctx *self) br_nothrow;
 
+br_libexport
+int debug_resetvector(debugctx *self) br_nothrow;
 br_libexport
 void debug_set_resetvector(debugctx *self, int resetvector) br_nothrow;
 br_libexport

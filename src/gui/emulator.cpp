@@ -274,7 +274,7 @@ void aldo::EmuController::processEvent(const aldo::event& ev,
         p.launch_studio();
         break;
     case aldo::Command::mode:
-        nes_mode(consolep(), std::get<csig_excmode>(ev.value));
+        nes_set_mode(consolep(), std::get<csig_excmode>(ev.value));
         break;
     case aldo::Command::openROM:
         openFile(p, {&aldo::EmuController::loadCartFrom, "Choose a ROM file"});

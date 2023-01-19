@@ -65,6 +65,10 @@ public:
     {
         return lsnapshot.getp();
     }
+    int resetVectorOverride() const noexcept
+    {
+        return debug_resetvector(debugp());
+    }
     et::size breakpointCount() const noexcept
     {
         return debug_bp_count(debugp());
@@ -73,6 +77,7 @@ public:
     {
         return debug_bp_at(debugp(), at);
     }
+    csig_excmode runMode() const noexcept { return nes_mode(consolep()); }
 
     void handleInput(viewstate& state, const gui_platform& platform);
     void update(viewstate& state) noexcept;

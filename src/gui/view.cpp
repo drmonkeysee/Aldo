@@ -850,19 +850,19 @@ private:
             s.events.emplace(aldo::Command::halt, halt);
         };
 
+        const auto mode = c.runMode();
         ImGui::TextUnformatted("Mode");
-        if (ImGui::RadioButton("Cycle", snp.mode == CSGM_CYCLE)
-            && snp.mode != CSGM_CYCLE) {
+        if (ImGui::RadioButton("Cycle", mode == CSGM_CYCLE)
+            && mode != CSGM_CYCLE) {
             s.events.emplace(aldo::Command::mode, CSGM_CYCLE);
         }
         ImGui::SameLine();
-        if (ImGui::RadioButton("Step", snp.mode == CSGM_STEP)
-            && snp.mode != CSGM_STEP) {
+        if (ImGui::RadioButton("Step", mode == CSGM_STEP)
+            && mode != CSGM_STEP) {
             s.events.emplace(aldo::Command::mode, CSGM_STEP);
         }
         ImGui::SameLine();
-        if (ImGui::RadioButton("Run", snp.mode == CSGM_RUN)
-            && snp.mode != CSGM_RUN) {
+        if (ImGui::RadioButton("Run", mode == CSGM_RUN) && mode != CSGM_RUN) {
             s.events.emplace(aldo::Command::mode, CSGM_RUN);
         }
 
@@ -973,16 +973,15 @@ private:
 
         lo = prgMem.vectors[2];
         hi = prgMem.vectors[3];
-        const auto& debugger = snp.debugger;
         const char* indicator;
         aldo::et::word resVector;
-        if (debugger.resvector_override == NoResetVector) {
+        const auto resetVector = c.resetVectorOverride();
+        if (resetVector == NoResetVector) {
             indicator = "";
             resVector = bytowr(lo, hi);
         } else {
             indicator = HEXPR_RES_IND;
-            resVector =
-                static_cast<aldo::et::word>(debugger.resvector_override);
+            resVector = static_cast<aldo::et::word>(resetVector);
         }
         ImGui::Text("%04X: %02X %02X     RES %s$%04X", CPU_VECTOR_RES, lo, hi,
                     indicator, resVector);

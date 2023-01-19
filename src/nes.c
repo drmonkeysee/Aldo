@@ -111,7 +111,8 @@ static void instruction_trace(struct nes_console *self,
     nes_snapshot(self, &snapshot);
     // NOTE: trace the cycle count up to the current instruction so do not
     // count the just-executed instruction fetch cycle.
-    trace_line(self->tracelog, clock->total_cycles - 1, &self->cpu, &snapshot);
+    trace_line(self->tracelog, clock->total_cycles - 1, &self->cpu, self->dbg,
+               &snapshot);
 }
 
 //
@@ -165,7 +166,14 @@ void nes_powerdown(nes *self)
     disconnect_cart(self);
 }
 
-void nes_mode(nes *self, enum csig_excmode mode)
+enum csig_excmode nes_mode(nes *self)
+{
+    assert(self != NULL);
+
+    return self->mode;
+}
+
+void nes_set_mode(nes *self, enum csig_excmode mode)
 {
     assert(self != NULL);
 
@@ -237,7 +245,6 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
 
     cpu_snapshot(&self->cpu, snapshot);
     debug_snapshot(self->dbg, snapshot);
-    snapshot->mode = self->mode;
     snapshot->mem.ram = self->ram;
     snapshot->mem.prglength = bus_dma(self->cpu.bus,
                                       snapshot->datapath.current_instruction,

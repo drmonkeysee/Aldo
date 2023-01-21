@@ -10,6 +10,7 @@
 #include "bytes.h"
 #include "debug.h"
 #include "dis.h"
+#include "haltexpr.h"
 
 #include <assert.h>
 #include <errno.h>

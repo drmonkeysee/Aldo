@@ -41,22 +41,24 @@ auto invalid_command(aldo::Command c)
     return s;
 }
 
-auto is_guikey_mod(const SDL_Event& ev) noexcept
-{
-    return ev.key.keysym.mod == KMOD_LGUI || ev.key.keysym.mod == KMOD_RGUI;
-}
-
 auto is_menu_shortcut(const SDL_Event& ev) noexcept
 {
-    return is_guikey_mod(ev) && !ev.key.repeat;
+    return (ev.key.keysym.mod & KMOD_GUI) && !ev.key.repeat;
 }
 
-auto handle_keydown(const SDL_Event& ev, aldo::viewstate& state)
+auto handle_keydown(const SDL_Event& ev, aldo::viewstate& state,
+                    const aldo::EmuController& c)
 {
     switch (ev.key.keysym.sym) {
     case SDLK_b:
         if (is_menu_shortcut(ev)) {
-            state.events.emplace(aldo::Command::breakpointsOpen);
+            if (ev.key.keysym.mod & KMOD_ALT) {
+                if (c.hasDebugState()) {
+                    state.events.emplace(aldo::Command::breakpointsExport);
+                }
+            } else {
+                state.events.emplace(aldo::Command::breakpointsOpen);
+            }
         }
         break;
     case SDLK_d:
@@ -133,7 +135,7 @@ void aldo::EmuController::handleInput(aldo::viewstate& state,
         ImGui_ImplSDL2_ProcessEvent(&ev);
         switch (ev.type) {
         case SDL_KEYDOWN:
-            handle_keydown(ev, state);
+            handle_keydown(ev, state, *this);
             break;
         case SDL_QUIT:
             state.events.emplace(aldo::Command::quit);
@@ -237,6 +239,9 @@ void aldo::EmuController::processEvent(const aldo::event& ev,
         break;
     case aldo::Command::breakpointsClear:
         debug_bp_clear(debugp());
+        break;
+    case aldo::Command::breakpointsExport:
+        SDL_Log("export breakpoints");
         break;
     case aldo::Command::breakpointsOpen:
         openFile(p, {

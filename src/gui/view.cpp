@@ -183,7 +183,8 @@ auto widget_group(std::invocable auto f)
     ImGui::EndGroup();
 }
 
-auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
+auto main_menu(aldo::viewstate& s, const aldo::EmuController& c,
+               const aldo::MediaRuntime& r)
 {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu(SDL_GetWindowTitle(r.window()))) {
@@ -201,8 +202,14 @@ auto main_menu(aldo::viewstate& s, const aldo::MediaRuntime& r)
             if (ImGui::MenuItem("Open Breakpoints", "Cmd+B")) {
                 s.events.emplace(aldo::Command::breakpointsOpen);
             }
+            if (!c.hasDebugState()) {
+                ImGui::BeginDisabled();
+            }
             if (ImGui::MenuItem("Export Breakpoints", "Opt+Cmd+B")) {
                 s.events.emplace(aldo::Command::breakpointsExport);
+            }
+            if (!c.hasDebugState()) {
+                ImGui::EndDisabled();
             }
             ImGui::EndMenu();
         }
@@ -1114,7 +1121,7 @@ void aldo::View::View::render()
 
 aldo::Layout::Layout(aldo::viewstate& s, const aldo::EmuController& c,
                      const aldo::MediaRuntime& r)
-: s{s}, r{r}
+: s{s}, c{c}, r{r}
 {
     add_views<
         Bouncer,
@@ -1128,7 +1135,7 @@ aldo::Layout::Layout(aldo::viewstate& s, const aldo::EmuController& c,
 
 void aldo::Layout::render() const
 {
-    main_menu(s, r);
+    main_menu(s, c, r);
     for (const auto& v : views) {
         v->render();
     }

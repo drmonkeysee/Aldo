@@ -65,6 +65,7 @@ public:
     {
         return lsnapshot.getp();
     }
+
     int resetVectorOverride() const noexcept
     {
         return debug_resetvector(debugp());
@@ -77,6 +78,11 @@ public:
     {
         return debug_bp_at(debugp(), at);
     }
+    bool hasDebugState() const noexcept
+    {
+        return resetVectorOverride() != NoResetVector || breakpointCount() > 0;
+    }
+
     csig_excmode runMode() const noexcept { return nes_mode(consolep()); }
 
     void handleInput(viewstate& state, const gui_platform& platform);

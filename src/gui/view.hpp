@@ -60,6 +60,7 @@ public:
 
 private:
     viewstate& s;
+    const EmuController& c;
     const MediaRuntime& r;
     std::vector<std::unique_ptr<View>> views;
 };

@@ -26,6 +26,7 @@ final class MacPlatform: NSObject {
                                  is_hidpi: isHiDPI,
                                  render_scale_factor: withScaleFunc,
                                  open_file: openFile,
+                                 save_file: saveFile,
                                  launch_studio: launchStudio,
                                  display_error: displayError,
                                  free_buffer: freeBuffer)
@@ -87,15 +88,20 @@ fileprivate func openFile(title: CString?, filter: CStringArray?) -> CBuffer? {
     let fileFilter = OpenFileFilter(filter)
     panel.delegate = fileFilter
     guard panel.runModal() == .OK, let path = panel.url else { return nil }
-    return path.withUnsafeFileSystemRepresentation {
-        guard let filepath = $0 else {
-            aldoLog.error("Unable to represent file selection as system path")
-            return nil
-        }
-        let buffer = CBuffer.allocate(capacity: strlen(filepath) + 1)
-        strcpy(buffer, filepath)
-        return buffer
+    return urlToCBuffer(path)
+}
+
+fileprivate func saveFile(title: CString?,
+                          suggestedName: CString?) -> CBuffer? {
+    let panel = NSSavePanel()
+    if let title {
+        panel.title = .init(cString: title)
     }
+    if let suggestedName {
+        panel.nameFieldStringValue = .init(cString: suggestedName)
+    }
+    guard panel.runModal() == .OK, let path = panel.url else { return nil }
+    return urlToCBuffer(path)
 }
 
 fileprivate let openStudioErrorTitle = "Open Studio Error"
@@ -152,4 +158,16 @@ fileprivate func bundleName() -> String? {
 fileprivate func bundleHighRes() -> Bool? {
     Bundle.main.object(forInfoDictionaryKey: "NSHighResolutionCapable")
         as? Bool
+}
+
+fileprivate func urlToCBuffer(_ url: URL) -> CBuffer? {
+    url.withUnsafeFileSystemRepresentation {
+        guard let filepath = $0 else {
+            aldoLog.error("Unable to represent file selection as system path")
+            return nil
+        }
+        let buffer = CBuffer.allocate(capacity: strlen(filepath) + 1)
+        strcpy(buffer, filepath)
+        return buffer
+    }
 }

@@ -18,6 +18,8 @@ struct gui_platform {
     float (*render_scale_factor)(void *) br_nothrow;
     br_ownresult
     char *(*open_file)(const char*, const char* const[]) br_nothrow;
+    br_ownresult
+    char *(*save_file)(const char*, const char*) br_nothrow;
     void (*launch_studio)(void) br_nothrow;
     bool (*display_error)(const char *, const char *) br_nothrow;
     void (*free_buffer)(char *) br_nothrow;

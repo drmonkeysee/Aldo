@@ -7,6 +7,7 @@
 
 import AppKit
 import os
+import UniformTypeIdentifiers
 
 typealias CBuffer = UnsafeMutablePointer<CChar>
 typealias CString = UnsafePointer<CChar>
@@ -99,6 +100,13 @@ fileprivate func saveFile(title: CString?,
     }
     if let suggestedName {
         panel.nameFieldStringValue = .init(cString: suggestedName)
+        if let url = URL(string: panel.nameFieldStringValue),
+           let ext = UTType(filenameExtension: url.pathExtension,
+                            conformingTo: .text) {
+            panel.allowedContentTypes = [ext]
+            panel.allowsOtherFileTypes = true
+            panel.isExtensionHidden = false
+        }
     }
     guard panel.runModal() == .OK, let path = panel.url else { return nil }
     return urlToCBuffer(path)

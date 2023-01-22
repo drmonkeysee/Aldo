@@ -29,6 +29,8 @@
 #include <cerrno>
 #include <cstdio>
 
+#define EXT_BRK "brk"
+
 namespace
 {
 
@@ -79,8 +81,8 @@ auto handle_keydown(const SDL_Event& ev, aldo::viewstate& state,
 auto brkfile_name(std::filesystem::path cartname)
 {
     return cartname.empty()
-            ? "breakpoints.brk"
-            : cartname.replace_extension("brk");
+            ? "breakpoints." EXT_BRK
+            : cartname.replace_extension(EXT_BRK);
 }
 
 auto open_file(const gui_platform& p, const char* title,
@@ -306,7 +308,7 @@ void aldo::EmuController::processEvent(const aldo::event& ev,
             const auto open =
                 [](const gui_platform& p) -> aldo::platform_buffer {
                     return open_file(p, "Choose a Breakpoints file",
-                                     {"brk", nullptr});
+                                     {EXT_BRK, nullptr});
                 };
             openModal(p, {open, &aldo::EmuController::loadBreakpointsFrom});
         }

@@ -126,7 +126,7 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
             = debug_bp_at(emu->dbg, emu->snapshot.debugger.halted);
         assert(bp != NULL);
         char break_desc[HEXPR_FMT_SIZE];
-        const int err = haltexpr_fmt(&bp->expr, break_desc);
+        const int err = haltexpr_desc(&bp->expr, break_desc);
         printf("Break: %s\n", err < 0 ? haltexpr_errstr(err) : break_desc);
     }
 }

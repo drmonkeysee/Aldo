@@ -85,7 +85,7 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
             {
                 float time;
                 parsed = sscanf(str, "%f %1[Ss]", &time, u) == 2;
-                valid = time > 0.0;
+                valid = time >= 0.0;
                 e = (struct haltexpr){
                     .runtime = time,
                     .cond = (enum haltcondition)i,
@@ -141,8 +141,8 @@ int haltexpr_parse_dbgexpr(const char *restrict str, struct debugexpr *expr)
     return 0;
 }
 
-int haltexpr_fmt(const struct haltexpr *expr,
-                 char buf[restrict static HEXPR_FMT_SIZE])
+int haltexpr_desc(const struct haltexpr *expr,
+                  char buf[restrict static HEXPR_FMT_SIZE])
 {
     assert(expr != NULL);
     assert(buf != NULL);
@@ -174,3 +174,40 @@ int haltexpr_fmt(const struct haltexpr *expr,
     assert(count < HEXPR_FMT_SIZE);
     return count;
 }
+
+int haltexpr_fmt_dbgexpr(const struct debugexpr *expr,
+                         char buf[restrict static HEXPR_FMT_SIZE])
+{
+    assert(expr != NULL);
+    assert(buf != NULL);
+
+    int count;
+    if (expr->type == DBG_EXPR_RESET) {
+        count = sprintf(buf, HEXPR_RES_IND "%04X", expr->resetvector);
+    } else {
+        const struct haltexpr *const hexpr = &expr->hexpr;
+        switch (hexpr->cond) {
+        case HLT_ADDR:
+            count = sprintf(buf, "@%04X", hexpr->address);
+            break;
+        case HLT_TIME:
+            count = sprintf(buf, "%.8gs", hexpr->runtime);
+            break;
+        case HLT_CYCLES:
+            count = sprintf(buf, "%" PRIu64 "c", hexpr->cycles);
+            break;
+        case HLT_JAM:
+            count = sprintf(buf, "JAM");
+            break;
+        default:
+            assert(((void)"INVALID HALT CONDITION", false));
+            return HEXPR_ERR_COND;
+        }
+    }
+
+    if (count < 0) return HEXPR_ERR_FMT;
+
+    assert(count < HEXPR_FMT_SIZE);
+    return count;
+}
+

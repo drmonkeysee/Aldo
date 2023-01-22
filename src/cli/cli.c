@@ -115,7 +115,7 @@ static bool parse_dbg_expression(debugctx *dbg, const char *restrict exprstr,
             debug_bp_add(dbg, expr.hexpr);
             if (verbose) {
                 char buf[HEXPR_FMT_SIZE];
-                err = haltexpr_fmt(&expr.hexpr, buf);
+                err = haltexpr_desc(&expr.hexpr, buf);
                 if (err < 0) {
                     fprintf(stderr, "Halt expr display error (%d): %s\n", err,
                             haltexpr_errstr(err));

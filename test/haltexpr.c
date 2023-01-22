@@ -181,6 +181,18 @@ static void runtime_condition(void *ctx)
     ct_assertaboutequal(1.2f, expr.runtime, 0.001);
 }
 
+static void runtime_condition_zero(void *ctx)
+{
+    const char *const str = "0s";
+    struct haltexpr expr;
+
+    const int result = haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertaboutequal(0.0f, expr.runtime, 0.001);
+}
+
 static void runtime_condition_case_insensitive(void *ctx)
 {
     const char *const str = "1.2S";
@@ -592,15 +604,15 @@ static void dbgexpr_malformed(void *ctx)
 }
 
 //
-// Expression Print
+// Expression Description
 //
 
 static void print_none(void *ctx)
 {
-    struct haltexpr expr = {0};
+    const struct haltexpr expr = {0};
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_fmt(&expr, buf);
+    const int result = haltexpr_desc(&expr, buf);
 
     const char *const expected = "None";
     ct_assertequal((int)strlen(expected), result);
@@ -609,10 +621,10 @@ static void print_none(void *ctx)
 
 static void print_addr(void *ctx)
 {
-    struct haltexpr expr = {.cond = HLT_ADDR, .address = 0x1234};
+    const struct haltexpr expr = {.cond = HLT_ADDR, .address = 0x1234};
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_fmt(&expr, buf);
+    const int result = haltexpr_desc(&expr, buf);
 
     const char *const expected = "PC @ $1234";
     ct_assertequal((int)strlen(expected), result);
@@ -621,10 +633,10 @@ static void print_addr(void *ctx)
 
 static void print_runtime(void *ctx)
 {
-    struct haltexpr expr = {.cond = HLT_TIME, .runtime = 4.36532245f};
+    const struct haltexpr expr = {.cond = HLT_TIME, .runtime = 4.36532245f};
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_fmt(&expr, buf);
+    const int result = haltexpr_desc(&expr, buf);
 
     const char *const expected = "4.3653226 sec";
     ct_assertequal((int)strlen(expected), result);
@@ -633,10 +645,12 @@ static void print_runtime(void *ctx)
 
 static void print_long_runtime(void *ctx)
 {
-    struct haltexpr expr = {.cond = HLT_TIME, .runtime = 12312423242344.234f};
+    const struct haltexpr expr = {
+        .cond = HLT_TIME, .runtime = 12312423242344.234f,
+    };
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_fmt(&expr, buf);
+    const int result = haltexpr_desc(&expr, buf);
 
     const char *const expected = "1.2312423e+13 sec";
     ct_assertequal((int)strlen(expected), result);
@@ -645,10 +659,10 @@ static void print_long_runtime(void *ctx)
 
 static void print_cycles(void *ctx)
 {
-    struct haltexpr expr = {.cond = HLT_CYCLES, .cycles = 982423};
+    const struct haltexpr expr = {.cond = HLT_CYCLES, .cycles = 982423};
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_fmt(&expr, buf);
+    const int result = haltexpr_desc(&expr, buf);
 
     const char *const expected = "982423 cyc";
     ct_assertequal((int)strlen(expected), result);
@@ -657,12 +671,104 @@ static void print_cycles(void *ctx)
 
 static void print_jam(void *ctx)
 {
-    struct haltexpr expr = {.cond = HLT_JAM};
+    const struct haltexpr expr = {.cond = HLT_JAM};
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_fmt(&expr, buf);
+    const int result = haltexpr_desc(&expr, buf);
 
     const char *const expected = "CPU JAMMED";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
+//
+// Debug Expression Serialization
+//
+
+static void format_reset(void *ctx)
+{
+    const struct debugexpr expr = {
+        .type = DBG_EXPR_RESET, .resetvector = 0x1234,
+    };
+    char buf[HEXPR_FMT_SIZE];
+
+    const int result = haltexpr_fmt_dbgexpr(&expr, buf);
+
+    const char *const expected = "!1234";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
+static void format_addr(void *ctx)
+{
+    const struct debugexpr expr = {
+        .type = DBG_EXPR_HALT,
+        .hexpr = {.cond = HLT_ADDR, .address = 0x1234},
+    };
+    char buf[HEXPR_FMT_SIZE];
+
+    const int result = haltexpr_fmt_dbgexpr(&expr, buf);
+
+    const char *const expected = "@1234";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
+static void format_runtime(void *ctx)
+{
+    const struct debugexpr expr = {
+        .type = DBG_EXPR_HALT,
+        .hexpr = {.cond = HLT_TIME, .runtime = 4.36532245f},
+    };
+    char buf[HEXPR_FMT_SIZE];
+
+    const int result = haltexpr_fmt_dbgexpr(&expr, buf);
+
+    const char *const expected = "4.3653226s";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
+static void format_long_runtime(void *ctx)
+{
+    const struct debugexpr expr = {
+        .type = DBG_EXPR_HALT,
+        .hexpr = {.cond = HLT_TIME, .runtime = 12312423242344.234f},
+    };
+    char buf[HEXPR_FMT_SIZE];
+
+    const int result = haltexpr_fmt_dbgexpr(&expr, buf);
+
+    const char *const expected = "1.2312423e+13s";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
+static void format_cycles(void *ctx)
+{
+    const struct debugexpr expr = {
+        .type = DBG_EXPR_HALT,
+        .hexpr = {.cond = HLT_CYCLES, .cycles = 982423},
+    };
+    char buf[HEXPR_FMT_SIZE];
+
+    const int result = haltexpr_fmt_dbgexpr(&expr, buf);
+
+    const char *const expected = "982423c";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
+static void format_jam(void *ctx)
+{
+    const struct debugexpr expr = {
+        .type = DBG_EXPR_HALT, .hexpr = {.cond = HLT_JAM},
+    };
+    char buf[HEXPR_FMT_SIZE];
+
+    const int result = haltexpr_fmt_dbgexpr(&expr, buf);
+
+    const char *const expected = "JAM";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
@@ -692,6 +798,7 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(address_condition_malformed),
 
         ct_maketest(runtime_condition),
+        ct_maketest(runtime_condition_zero),
         ct_maketest(runtime_condition_case_insensitive),
         ct_maketest(runtime_condition_with_space),
         ct_maketest(runtime_condition_with_leading_space),
@@ -739,6 +846,13 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(print_long_runtime),
         ct_maketest(print_cycles),
         ct_maketest(print_jam),
+
+        ct_maketest(format_reset),
+        ct_maketest(format_addr),
+        ct_maketest(format_runtime),
+        ct_maketest(format_long_runtime),
+        ct_maketest(format_cycles),
+        ct_maketest(format_jam),
     };
 
     return ct_makesuite(tests);

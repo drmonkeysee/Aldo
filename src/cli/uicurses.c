@@ -194,7 +194,7 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
     const struct breakpoint *const bp
         = debug_bp_at(emu->dbg, emu->snapshot.debugger.halted);
     char break_desc[HEXPR_FMT_SIZE];
-    const int err = haltexpr_fmt(bp ? &bp->expr : &empty, break_desc);
+    const int err = haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
     mvwprintw(v->content, cursor_y, 0, "Break: %s",
               err < 0 ? haltexpr_errstr(err) : break_desc);
 }

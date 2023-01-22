@@ -78,8 +78,11 @@ br_libexport br_checkerror
 int haltexpr_parse_dbgexpr(const char *br_noalias str,
                            struct debugexpr *expr) br_nothrow;
 br_libexport br_checkerror
-int haltexpr_fmt(const struct haltexpr *expr,
-                 char buf[br_noalias_csz(HEXPR_FMT_SIZE)]) br_nothrow;
+int haltexpr_desc(const struct haltexpr *expr,
+                  char buf[br_noalias_csz(HEXPR_FMT_SIZE)]) br_nothrow;
+br_libexport br_checkerror
+int haltexpr_fmt_dbgexpr(const struct debugexpr *expr,
+                         char buf[br_noalias_csz(HEXPR_FMT_SIZE)]) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

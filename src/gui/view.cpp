@@ -724,7 +724,7 @@ private:
         }
         const auto current = idx == selectedBreakpoint;
         std::array<aldo::et::tchar, HEXPR_FMT_SIZE> fmt;
-        const int err = haltexpr_fmt(&bp.expr, fmt.data());
+        const auto err = haltexpr_desc(&bp.expr, fmt.data());
         const ScopedStyle style{
             {ImGuiStyleVar_Alpha, ImGui::GetStyle().DisabledAlpha},
             !bp.enabled,

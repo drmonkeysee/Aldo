@@ -11,7 +11,7 @@
 #include <fstream>
 #include <string>
 
-static_assert(std::same_as<std::ifstream::char_type, aldo::et::tchar>,
+static_assert(std::same_as<std::fstream::char_type, aldo::et::tchar>,
               "Text stream type does not match emulator text type");
 
 static_assert(std::same_as<std::string::value_type, aldo::et::tchar>,

@@ -17,6 +17,7 @@
 
 #include <array>
 #include <fstream>
+#include <functional>
 #include <initializer_list>
 #include <memory>
 #include <span>
@@ -32,6 +33,7 @@ namespace
 {
 
 using file_handle = aldo::handle<std::FILE, std::fclose>;
+using hexpr_buffer = std::array<aldo::et::tchar, HEXPR_FMT_SIZE>;
 
 auto invalid_command(aldo::Command c)
 {
@@ -74,7 +76,30 @@ auto handle_keydown(const SDL_Event& ev, aldo::viewstate& state,
     }
 }
 
-auto update_debugger(debugctx* dbg, std::span<debugexpr> exprs) noexcept
+auto brkfile_name(std::filesystem::path cartname)
+{
+    return cartname.empty()
+            ? "breakpoints.brk"
+            : cartname.replace_extension("brk");
+}
+
+auto open_file(const gui_platform& p, const char* title,
+               std::initializer_list<const char*> filter = {nullptr}) noexcept
+{
+    return aldo::platform_buffer{
+        p.open_file(title, std::data(filter)), p.free_buffer,
+    };
+}
+
+auto save_file(const gui_platform& p, const char* title,
+               const std::filesystem::path& suggestedName) noexcept
+{
+    return aldo::platform_buffer{
+        p.save_file(title, suggestedName.c_str()), p.free_buffer,
+    };
+}
+
+auto load_debug_state(debugctx* dbg, std::span<debugexpr> exprs) noexcept
 {
     debug_bp_clear(dbg);
     debug_set_resetvector(dbg, NoResetVector);
@@ -85,6 +110,18 @@ auto update_debugger(debugctx* dbg, std::span<debugexpr> exprs) noexcept
             debug_set_resetvector(dbg, expr.resetvector);
         }
     }
+}
+
+auto write_debug_line(std::ofstream& f, const debugexpr& expr,
+                      hexpr_buffer& buf)
+{
+    const auto err = haltexpr_fmt_dbgexpr(&expr, buf.data());
+    if (err < 0) throw aldo::AldoError{
+        "Breakpoint format failure", err, haltexpr_errstr,
+    };
+    const std::string_view str{buf.data()};
+    f.write(str.data(), static_cast<std::streamsize>(str.length()));
+    f.put('\n');
 }
 
 auto update_bouncer(aldo::viewstate& s, const console_state& snapshot) noexcept
@@ -111,8 +148,9 @@ auto update_bouncer(aldo::viewstate& s, const console_state& snapshot) noexcept
 
 std::string_view aldo::EmuController::cartName() const noexcept
 {
-    // NOTE: not a ternary because the expression must evaluate to type
-    // const std::string& which converts cart_errstr to a dangling temporary.
+    // NOTE: not a ternary because the expression would resolve to
+    // const std::string& which would create a dangling temporary out of
+    // cart_errstr's const char*.
     if (cartname.empty()) return cart_errstr(CART_ERR_NOCART);
 
     return cartname.native();
@@ -160,10 +198,9 @@ void aldo::EmuController::update(aldo::viewstate& state) noexcept
 // Private Interface
 //
 
-struct aldo::EmuController::file_action {
-    void (aldo::EmuController::* op)(const char*);
-    const char* title;
-    std::initializer_list<const char*> filter = {nullptr};
+struct aldo::EmuController::file_modal {
+    std::function<aldo::platform_buffer(const gui_platform&)> open;
+    void (aldo::EmuController::* handle)(const char*);
 };
 
 void aldo::EmuController::loadCartFrom(const char* filepath)
@@ -171,14 +208,11 @@ void aldo::EmuController::loadCartFrom(const char* filepath)
     cart* c;
     errno = 0;
     file_handle f{std::fopen(filepath, "rb")};
-    if (f) {
-        const int err = cart_create(&c, f.get());
-        if (err < 0) throw aldo::AldoError{
-            "Cart load failure", err, cart_errstr,
-        };
-    } else {
-        throw aldo::AldoError{"Cannot open cart file", filepath, errno};
-    }
+    if (!f) throw aldo::AldoError{"Cannot open cart file", filepath, errno};
+
+    const int err = cart_create(&c, f.get());
+    if (err < 0) throw aldo::AldoError{"Cart load failure", err, cart_errstr};
+
     nes_powerdown(consolep());
     hcart.reset(c);
     nes_powerup(consolep(), cartp(), false);
@@ -191,7 +225,7 @@ void aldo::EmuController::loadBreakpointsFrom(const char* filepath)
     std::ifstream f{filepath};
     if (!f) throw aldo::AldoError{"Cannot open breakpoints file", filepath};
 
-    std::array<decltype(f)::char_type, HEXPR_FMT_SIZE> buf;
+    hexpr_buffer buf;
     std::vector<debugexpr> exprs;
     while (f.getline(buf.data(), buf.size())) {
         debugexpr expr;
@@ -202,24 +236,41 @@ void aldo::EmuController::loadBreakpointsFrom(const char* filepath)
         exprs.push_back(expr);
     }
     // NOTE: defer modifying debug state in case expr parsing throws
-    update_debugger(debugp(), exprs);
+    load_debug_state(debugp(), exprs);
 }
 
-void aldo::EmuController::openFile(const gui_platform& p,
-                                   const aldo::EmuController::file_action& a)
+void aldo::EmuController::exportBreakpointsTo(const char* filepath)
+{
+    std::ofstream f{filepath};
+    if (!f) throw aldo::AldoError{"Cannot create breakpoints file", filepath};
+
+    hexpr_buffer buf;
+    debugexpr expr;
+    const auto resetvector = resetVectorOverride();
+    if (resetvector != NoResetVector) {
+        expr = {.resetvector = resetvector, .type = debugexpr::DBG_EXPR_RESET};
+        write_debug_line(f, expr, buf);
+    }
+    aldo::et::diff i = 0;
+    for (auto bp = breakpointAt(i); bp; bp = breakpointAt(++i)) {
+        expr = {.hexpr = bp->expr, .type = debugexpr::DBG_EXPR_HALT};
+        write_debug_line(f, expr, buf);
+    }
+}
+
+void aldo::EmuController::openModal(const gui_platform& p,
+                                    const aldo::EmuController::file_modal& fm)
 {
     // NOTE: halt console to prevent time-jump from modal delay
     // TODO: does this make sense long-term?
     nes_halt(consolep());
 
-    const aldo::platform_buffer filepath{
-        p.open_file(a.title, std::data(a.filter)), p.free_buffer,
-    };
+    const aldo::platform_buffer filepath = fm.open(p);
     if (!filepath) return;
 
     SDL_Log("File selected: %s", filepath.get());
     try {
-        (this->*a.op)(filepath.get());
+        (this->*fm.handle)(filepath.get());
     } catch (const aldo::AldoError& err) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s", err.what());
         p.display_error(err.title(), err.message());
@@ -241,14 +292,24 @@ void aldo::EmuController::processEvent(const aldo::event& ev,
         debug_bp_clear(debugp());
         break;
     case aldo::Command::breakpointsExport:
-        SDL_Log("export breakpoints");
+        {
+            const auto open =
+                [this](const gui_platform& p) -> aldo::platform_buffer {
+                    return save_file(p, "Export Breakpoints",
+                                     brkfile_name(this->cartname));
+                };
+            openModal(p, {open, &aldo::EmuController::exportBreakpointsTo});
+        }
         break;
     case aldo::Command::breakpointsOpen:
-        openFile(p, {
-            &aldo::EmuController::loadBreakpointsFrom,
-            "Choose a Breakpoints file",
-            {"brk", nullptr},
-        });
+        {
+            const auto open =
+                [](const gui_platform& p) -> aldo::platform_buffer {
+                    return open_file(p, "Choose a Breakpoints file",
+                                     {"brk", nullptr});
+                };
+            openModal(p, {open, &aldo::EmuController::loadBreakpointsFrom});
+        }
         break;
     case aldo::Command::breakpointToggle:
         {
@@ -282,7 +343,13 @@ void aldo::EmuController::processEvent(const aldo::event& ev,
         nes_set_mode(consolep(), std::get<csig_excmode>(ev.value));
         break;
     case aldo::Command::openROM:
-        openFile(p, {&aldo::EmuController::loadCartFrom, "Choose a ROM file"});
+        {
+            const auto open =
+                [](const gui_platform& p) -> aldo::platform_buffer {
+                    return open_file(p, "Choose a ROM file");
+                };
+            openModal(p, {open, &aldo::EmuController::loadCartFrom});
+        }
         break;
     case aldo::Command::overrideReset:
         debug_set_resetvector(debugp(), std::get<int>(ev.value));

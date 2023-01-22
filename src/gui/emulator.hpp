@@ -89,7 +89,7 @@ public:
     void update(viewstate& state) noexcept;
 
 private:
-    struct file_action;
+    struct file_modal;
 
     debugctx* debugp() const noexcept { return hdebug.get(); }
     cart* cartp() const noexcept { return hcart.get(); }
@@ -98,7 +98,8 @@ private:
 
     void loadCartFrom(const char*);
     void loadBreakpointsFrom(const char*);
-    void openFile(const gui_platform&, const file_action&);
+    void exportBreakpointsTo(const char*);
+    void openModal(const gui_platform&, const file_modal&);
     void processEvent(const event&, viewstate&, const gui_platform&);
 
     std::filesystem::path cartFilepath;

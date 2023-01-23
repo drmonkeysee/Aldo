@@ -212,7 +212,7 @@ void aldo::EmuController::loadCartFrom(const char* filepath)
 {
     cart* c;
     errno = 0;
-    file_handle f{std::fopen(filepath, "rb")};
+    const file_handle f{std::fopen(filepath, "rb")};
     if (!f) throw aldo::AldoError{"Cannot open cart file", filepath, errno};
 
     const int err = cart_create(&c, f.get());

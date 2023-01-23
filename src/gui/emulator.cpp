@@ -114,13 +114,16 @@ auto load_debug_state(debugctx* dbg, std::span<debugexpr> exprs) noexcept
     }
 }
 
-auto write_debug_line(std::ofstream& f, const debugexpr& expr,
-                      hexpr_buffer& buf)
+auto format_debug_expr(const debugexpr& expr, hexpr_buffer& buf)
 {
     const auto err = haltexpr_fmt_dbgexpr(&expr, buf.data());
     if (err < 0) throw aldo::AldoError{
         "Breakpoint format failure", err, haltexpr_errstr,
     };
+}
+
+auto write_debug_line(const hexpr_buffer& buf, std::ofstream& f)
+{
     const std::string_view str{buf.data()};
     f.write(str.data(), static_cast<std::streamsize>(str.length()));
     f.put('\n');
@@ -243,20 +246,29 @@ void aldo::EmuController::loadBreakpointsFrom(const char* filepath)
 
 void aldo::EmuController::exportBreakpointsTo(const char* filepath)
 {
-    std::ofstream f{filepath};
-    if (!f) throw aldo::AldoError{"Cannot create breakpoints file", filepath};
-
-    hexpr_buffer buf;
-    debugexpr expr;
     const auto resetvector = resetVectorOverride();
-    if (resetvector != NoResetVector) {
-        expr = {.resetvector = resetvector, .type = debugexpr::DBG_EXPR_RESET};
-        write_debug_line(f, expr, buf);
-    }
+    const auto resOverride = resetvector != NoResetVector;
+    const auto exprCount = breakpointCount()
+                            + static_cast<aldo::et::size>(resOverride);
+    if (exprCount == 0) return;
+
+    std::vector<hexpr_buffer> bufs(exprCount);
+    debugexpr expr;
     aldo::et::diff i = 0;
     for (auto bp = breakpointAt(i); bp; bp = breakpointAt(++i)) {
         expr = {.hexpr = bp->expr, .type = debugexpr::DBG_EXPR_HALT};
-        write_debug_line(f, expr, buf);
+        format_debug_expr(expr,
+                          bufs[static_cast<decltype(bufs)::size_type>(i)]);
+    }
+    if (resOverride) {
+        expr = {.resetvector = resetvector, .type = debugexpr::DBG_EXPR_RESET};
+        format_debug_expr(expr, bufs.back());
+    }
+
+    std::ofstream f{filepath};
+    if (!f) throw aldo::AldoError{"Cannot create breakpoints file", filepath};
+    for (const auto& buf : bufs) {
+        write_debug_line(buf, f);
     }
 }
 

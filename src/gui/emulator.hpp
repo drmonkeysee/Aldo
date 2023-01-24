@@ -87,6 +87,7 @@ public:
 
     void handleInput(viewstate& state, const gui_platform& platform);
     void update(viewstate& state) noexcept;
+    void shutdown(const gui_platform& platform);
 
 private:
     struct file_modal;
@@ -96,9 +97,11 @@ private:
     nes* consolep() const noexcept { return hconsole.get(); }
     console_state* snapshotp() noexcept { return lsnapshot.getp(); }
 
-    void loadCartFrom(const char*);
-    void loadBreakpointsFrom(const char*);
-    void exportBreakpointsTo(const char*);
+    void saveCartState(const gui_platform&);
+    void loadCartState(const gui_platform&);
+    void loadCartFrom(const char*, const gui_platform&);
+    void loadBreakpointsFrom(const char*, const gui_platform&);
+    void exportBreakpointsTo(const char*, const gui_platform&);
     void openModal(const gui_platform&, const file_modal&);
     void processEvent(const event&, viewstate&, const gui_platform&);
 

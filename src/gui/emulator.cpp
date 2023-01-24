@@ -36,6 +36,19 @@ namespace
 
 using file_handle = aldo::handle<std::FILE, std::fclose>;
 using hexpr_buffer = std::array<aldo::et::tchar, HEXPR_FMT_SIZE>;
+using sdl_buffer = aldo::handle<char, SDL_free>;
+
+auto prefs_path(const gui_platform& p)
+{
+    const aldo::platform_buffer
+        org{p.orgname(), p.free_buffer},
+        name{p.appname(), p.free_buffer};
+    const sdl_buffer path{SDL_GetPrefPath(org.get(), name.get())};
+    if (!path) throw aldo::AldoError{
+        "Failed to get preferences path", SDL_GetError(),
+    };
+    return std::filesystem::path{path.get()};
+}
 
 auto invalid_command(aldo::Command c)
 {
@@ -83,6 +96,11 @@ auto brkfile_name(std::filesystem::path cartname)
     return cartname.empty()
             ? "breakpoints." EXT_BRK
             : cartname.replace_extension(EXT_BRK);
+}
+
+auto prefs_brkpath(const gui_platform& p, std::filesystem::path cartname)
+{
+    return prefs_path(p) / brkfile_name(std::move(cartname));
 }
 
 auto open_file(const gui_platform& p, const char* title,
@@ -199,16 +217,47 @@ void aldo::EmuController::update(aldo::viewstate& state) noexcept
     update_bouncer(state, snapshot());
 }
 
+void aldo::EmuController::shutdown(const gui_platform& platform)
+{
+    saveCartState(platform);
+}
+
 //
 // Private Interface
 //
 
 struct aldo::EmuController::file_modal {
     std::function<aldo::platform_buffer(const gui_platform&)> open;
-    void (aldo::EmuController::* handle)(const char*);
+    void (aldo::EmuController::* handle)(const char*, const gui_platform&);
 };
 
-void aldo::EmuController::loadCartFrom(const char* filepath)
+void aldo::EmuController::saveCartState(const gui_platform& p)
+{
+    if (!hcart) return;
+
+    const auto brkPath = prefs_brkpath(p, cartname);
+    if (hasDebugState()) {
+        exportBreakpointsTo(brkPath.c_str(), p);
+    } else {
+        try {
+            std::filesystem::remove(brkPath);
+        } catch (const std::filesystem::filesystem_error& ex) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                        "Failed to delete breakpoint file: (%d) %s",
+                        ex.code().value(), ex.what());
+        }
+    }
+}
+
+void aldo::EmuController::loadCartState(const gui_platform &p)
+{
+    const auto brkPath = prefs_brkpath(p, cartname);
+    if (!std::filesystem::exists(brkPath)) return;
+    loadBreakpointsFrom(brkPath.c_str(), p);
+}
+
+void aldo::EmuController::loadCartFrom(const char* filepath,
+                                       const gui_platform& p)
 {
     cart* c;
     errno = 0;
@@ -218,14 +267,17 @@ void aldo::EmuController::loadCartFrom(const char* filepath)
     const int err = cart_create(&c, f.get());
     if (err < 0) throw aldo::AldoError{"Cart load failure", err, cart_errstr};
 
+    saveCartState(p);
     nes_powerdown(consolep());
     hcart.reset(c);
     nes_powerup(consolep(), cartp(), false);
     cartFilepath = filepath;
     cartname = cartFilepath.stem();
+    loadCartState(p);
 }
 
-void aldo::EmuController::loadBreakpointsFrom(const char* filepath)
+void aldo::EmuController::loadBreakpointsFrom(const char* filepath,
+                                              const gui_platform&)
 {
     std::ifstream f{filepath};
     if (!f) throw aldo::AldoError{"Cannot open breakpoints file", filepath};
@@ -244,7 +296,8 @@ void aldo::EmuController::loadBreakpointsFrom(const char* filepath)
     load_debug_state(debugp(), exprs);
 }
 
-void aldo::EmuController::exportBreakpointsTo(const char* filepath)
+void aldo::EmuController::exportBreakpointsTo(const char* filepath,
+                                              const gui_platform&)
 {
     const auto resetvector = resetVectorOverride();
     const auto resOverride = resetvector != NoResetVector;
@@ -284,7 +337,7 @@ void aldo::EmuController::openModal(const gui_platform& p,
 
     SDL_Log("File selected: %s", filepath.get());
     try {
-        (this->*fm.handle)(filepath.get());
+        (this->*fm.handle)(filepath.get(), p);
     } catch (const aldo::AldoError& err) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s", err.what());
         p.display_error(err.title(), err.message());

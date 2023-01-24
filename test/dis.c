@@ -2670,7 +2670,7 @@ static void peek_interrupt(void *ctx)
     cpu.irq = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snapshot);
     debugctx *const dbg = ctx;
-    debug_set_resetvector(dbg, NoResetVector);
+    debug_set_vector_override(dbg, NoResetVector);
     snapshot.mem.vectors[4] = 0xbb;
     snapshot.mem.vectors[5] = 0xaa;
 
@@ -2694,7 +2694,7 @@ static void peek_overridden_reset(void *ctx)
     cpu.res = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snapshot);
     debugctx *const dbg = ctx;
-    debug_set_resetvector(dbg, 0xccdd);
+    debug_set_vector_override(dbg, 0xccdd);
     snapshot.mem.vectors[2] = 0xbb;
     snapshot.mem.vectors[3] = 0xaa;
 
@@ -2718,7 +2718,7 @@ static void peek_overridden_non_reset(void *ctx)
     cpu.nmi = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snapshot);
     debugctx *const dbg = ctx;
-    debug_set_resetvector(dbg, 0xccdd);
+    debug_set_vector_override(dbg, 0xccdd);
     snapshot.mem.vectors[0] = 0xff;
     snapshot.mem.vectors[1] = 0xee;
     snapshot.mem.vectors[2] = 0xbb;

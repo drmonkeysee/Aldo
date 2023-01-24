@@ -68,7 +68,7 @@ public:
 
     int resetVectorOverride() const noexcept
     {
-        return debug_resetvector(debugp());
+        return debug_vector_override(debugp());
     }
     et::size breakpointCount() const noexcept
     {

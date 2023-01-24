@@ -121,13 +121,12 @@ auto save_file(const gui_platform& p, const char* title,
 
 auto load_debug_state(debugctx* dbg, std::span<debugexpr> exprs) noexcept
 {
-    debug_bp_clear(dbg);
-    debug_set_resetvector(dbg, NoResetVector);
+    debug_reset(dbg);
     for (const auto& expr : exprs) {
         if (expr.type == debugexpr::DBG_EXPR_HALT) {
             debug_bp_add(dbg, expr.hexpr);
         } else {
-            debug_set_resetvector(dbg, expr.resetvector);
+            debug_set_vector_override(dbg, expr.resetvector);
         }
     }
 }
@@ -419,7 +418,7 @@ void aldo::EmuController::processEvent(const aldo::event& ev,
         }
         break;
     case aldo::Command::overrideReset:
-        debug_set_resetvector(debugp(), std::get<int>(ev.value));
+        debug_set_vector_override(debugp(), std::get<int>(ev.value));
         break;
     case aldo::Command::quit:
         s.running = false;

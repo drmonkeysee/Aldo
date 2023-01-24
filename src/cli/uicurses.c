@@ -185,7 +185,7 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
     mvwprintw(v->content, cursor_y++, 0, "Tracing: %s",
               emu->args->tron ? "On" : "Off");
     mvwaddstr(v->content, cursor_y++, 0, "Reset Override: ");
-    const int resetvector = debug_resetvector(emu->dbg);
+    const int resetvector = debug_vector_override(emu->dbg);
     if (resetvector == NoResetVector) {
         waddstr(v->content, "None");
     } else {
@@ -262,7 +262,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
     hi = emu->snapshot.mem.vectors[3];
     mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     RES",
               CPU_VECTOR_RES, lo, hi);
-    const int resetvector = debug_resetvector(emu->dbg);
+    const int resetvector = debug_vector_override(emu->dbg);
     if (resetvector == NoResetVector) {
         wprintw(v->content, " $%04X", bytowr(lo, hi));
     } else {

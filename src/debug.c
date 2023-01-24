@@ -31,12 +31,20 @@ struct debugger_context {
     int resetvector;
 };
 
+static void remove_reset_override(struct debugger_context *self)
+{
+    if (!self->dec.active) return;
+
+    bus_set(self->cpu->bus, CPU_VECTOR_RES, self->dec.inner);
+    self->dec = (struct resdecorator){0};
+}
+
 static void update_reset_override(struct debugger_context *self)
 {
     if (self->resetvector == NoResetVector) {
-        debug_remove_reset_override(self);
+        remove_reset_override(self);
     } else {
-        debug_add_reset_override(self);
+        debug_sync_bus(self);
     }
 }
 
@@ -228,14 +236,14 @@ void debug_free(debugctx *self)
     free(self);
 }
 
-int debug_resetvector(debugctx *self)
+int debug_vector_override(debugctx *self)
 {
     assert(self != NULL);
 
     return self->resetvector;
 }
 
-void debug_set_resetvector(debugctx *self, int resetvector)
+void debug_set_vector_override(debugctx *self, int resetvector)
 {
     assert(self != NULL);
 
@@ -258,7 +266,7 @@ void debug_cpu_disconnect(debugctx *self)
     self->cpu = NULL;
 }
 
-void debug_add_reset_override(debugctx *self)
+void debug_sync_bus(debugctx *self)
 {
     assert(self != NULL);
 
@@ -275,16 +283,6 @@ void debug_add_reset_override(debugctx *self)
     };
     self->dec.active = bus_swap(self->cpu->bus, CPU_VECTOR_RES,
                                 resetaddr_device, &self->dec.inner);
-}
-
-void debug_remove_reset_override(debugctx *self)
-{
-    assert(self != NULL);
-
-    if (!self->dec.active) return;
-
-    bus_set(self->cpu->bus, CPU_VECTOR_RES, self->dec.inner);
-    self->dec = (struct resdecorator){0};
 }
 
 void debug_bp_add(debugctx *self, struct haltexpr expr)
@@ -341,6 +339,14 @@ size_t debug_bp_count(debugctx *self)
     assert(self != NULL);
 
     return self->breakpoints.size;
+}
+
+void debug_reset(debugctx *self)
+{
+    assert(self != NULL);
+
+    debug_set_vector_override(self, NoResetVector);
+    debug_bp_clear(self);
 }
 
 void debug_check(debugctx *self, const struct cycleclock *clk)

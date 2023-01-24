@@ -39,9 +39,9 @@ br_libexport
 void debug_free(debugctx *self) br_nothrow;
 
 br_libexport
-int debug_resetvector(debugctx *self) br_nothrow;
+int debug_vector_override(debugctx *self) br_nothrow;
 br_libexport
-void debug_set_resetvector(debugctx *self, int resetvector) br_nothrow;
+void debug_set_vector_override(debugctx *self, int resetvector) br_nothrow;
 br_libexport
 void debug_bp_add(debugctx *self, struct haltexpr expr) br_nothrow;
 br_libexport
@@ -54,6 +54,8 @@ br_libexport
 void debug_bp_clear(debugctx *self) br_nothrow;
 br_libexport
 size_t debug_bp_count(debugctx *self) br_nothrow;
+br_libexport
+void debug_reset(debugctx *self) br_nothrow;
 
 //
 // Internal
@@ -61,8 +63,7 @@ size_t debug_bp_count(debugctx *self) br_nothrow;
 
 void debug_cpu_connect(debugctx *self, struct mos6502 *cpu) br_nothrow;
 void debug_cpu_disconnect(debugctx *self) br_nothrow;
-void debug_add_reset_override(debugctx *self) br_nothrow;
-void debug_remove_reset_override(debugctx *self) br_nothrow;
+void debug_sync_bus(debugctx *self) br_nothrow;
 void debug_check(debugctx *self, const struct cycleclock *clk) br_nothrow;
 void debug_snapshot(debugctx *self, struct console_state *snapshot) br_nothrow;
 #include "bridgeclose.h"

@@ -124,7 +124,7 @@ static bool parse_dbg_expression(debugctx *dbg, const char *restrict exprstr,
                 }
             }
         } else {
-            debug_set_resetvector(dbg, expr.resetvector);
+            debug_set_vector_override(dbg, expr.resetvector);
             if (verbose) {
                 printf(ResetOverrideFmt, expr.resetvector);
             }
@@ -175,7 +175,7 @@ static debugctx *create_debugger(const struct cliargs *args)
         }
     }
     if (args->resetvector != NoResetVector) {
-        debug_set_resetvector(dbg, args->resetvector);
+        debug_set_vector_override(dbg, args->resetvector);
         printf(ResetOverrideFmt, args->resetvector);
     }
     return dbg;

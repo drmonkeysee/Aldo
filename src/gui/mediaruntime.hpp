@@ -8,6 +8,7 @@
 #ifndef Aldo_gui_mediaruntime_hpp
 #define Aldo_gui_mediaruntime_hpp
 
+#include "attr.hpp"
 #include "handle.hpp"
 
 #include <SDL2/SDL.h>
@@ -21,7 +22,7 @@ using win_handle = handle<SDL_Window, SDL_DestroyWindow>;
 using ren_handle = handle<SDL_Renderer, SDL_DestroyRenderer>;
 using tex_handle = handle<SDL_Texture, SDL_DestroyTexture>;
 
-class [[nodiscard("raii type")]] SdlLib {
+class ALDO_SIDEFX SdlLib {
 public:
     SdlLib();
     SdlLib(const SdlLib&) = delete;
@@ -31,7 +32,7 @@ public:
     ~SdlLib();
 };
 
-class [[nodiscard("raii type")]] DearImGuiLib {
+class ALDO_SIDEFX DearImGuiLib {
 public:
     DearImGuiLib(const win_handle& hwin, const ren_handle& hren);
     DearImGuiLib(const DearImGuiLib&) = delete;
@@ -41,7 +42,7 @@ public:
     ~DearImGuiLib();
 };
 
-class [[nodiscard("raii type")]] MediaRuntime {
+class ALDO_SIDEFX MediaRuntime {
 public:
     [[nodiscard("check error")]]
     static int initStatus() noexcept { return InitStatus; }

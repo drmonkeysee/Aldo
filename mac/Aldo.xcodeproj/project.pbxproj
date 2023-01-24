@@ -352,6 +352,7 @@
 		C8EC721E2916150700DF750A /* render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = render.cpp; sourceTree = "<group>"; };
 		C8EC721F2916150700DF750A /* render.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = render.hpp; sourceTree = "<group>"; };
 		C8EC7222291615AB00DF750A /* viewstate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = viewstate.hpp; sourceTree = "<group>"; };
+		C8F1A38B297FA3860005EB8B /* attr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = attr.hpp; sourceTree = "<group>"; };
 		C8F2985A2810ECEF00ECFD7E /* CStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CStream.swift; sourceTree = "<group>"; };
 		C8FB31D02803D6EC00E6B0EF /* AldoError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -618,6 +619,7 @@
 		C8B0E66728E01B3E0054547D /* gui */ = {
 			isa = PBXGroup;
 			children = (
+				C8F1A38B297FA3860005EB8B /* attr.hpp */,
 				C8283E73293D44CB00CDB572 /* emulator.hpp */,
 				C8283E72293D44CB00CDB572 /* emulator.cpp */,
 				C8D428E8296A15E500824248 /* emutypes.hpp */,

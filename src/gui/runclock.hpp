@@ -8,6 +8,7 @@
 #ifndef Aldo_gui_runclock_hpp
 #define Aldo_gui_runclock_hpp
 
+#include "attr.hpp"
 #include "cycleclock.h"
 
 #include <chrono>
@@ -17,7 +18,7 @@
 namespace aldo
 {
 
-class [[nodiscard("raii type")]] RunTimer {
+class ALDO_SIDEFX RunTimer {
 public:
     using clock_type = std::chrono::steady_clock;
     using duration_type = std::chrono::duration<double, std::milli>;
@@ -70,7 +71,7 @@ inline void swap(RunTimer& a, RunTimer& b) noexcept
     a.swap(b);
 }
 
-class [[nodiscard("raii type")]] RunTick {
+class ALDO_SIDEFX RunTick {
 public:
     RunTick(cycleclock& c, bool resetBudget) noexcept : cyclock{c}
     {
@@ -92,7 +93,6 @@ struct runclock {
         cycleclock_start(&cyclock);
     }
 
-    [[nodiscard("raii result")]]
     RunTick startTick(bool resetBudget) noexcept
     {
         return RunTick(cyclock, resetBudget);

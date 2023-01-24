@@ -7,6 +7,7 @@
 
 #include "view.hpp"
 
+#include "attr.hpp"
 #include "bytes.h"
 #include "cart.h"
 #include "ctrlsignal.h"
@@ -47,7 +48,7 @@ template<typename T>
 concept ScopedIDVal
     = std::convertible_to<T, void*> || std::convertible_to<T, int>;
 
-class [[nodiscard("raii type")]] ScopedID {
+class ALDO_SIDEFX ScopedID {
 public:
     ScopedID(ScopedIDVal auto id) noexcept { ImGui::PushID(id); }
     ScopedID(const ScopedID&) = delete;
@@ -64,7 +65,7 @@ concept ScopedVal
     = std::same_as<T, ScopedStyleVal> || std::same_as<T, ScopedColorVal>;
 
 template<ScopedVal V>
-class [[nodiscard("raii type")]] ScopedWidgetVars {
+class ALDO_SIDEFX ScopedWidgetVars {
 public:
     ScopedWidgetVars(V val, bool condition = true)
     : condition{condition}, count{1} { pushVars({val}); }

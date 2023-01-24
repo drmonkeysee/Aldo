@@ -9,7 +9,7 @@
 #ifdef __cplusplus
 #define br_libexport [[gnu::visibility("default")]]
 #define br_checkerror [[nodiscard("check error")]]
-#define br_ownresult [[nodiscard("take ownership of result")]]
+#define br_ownresult [[nodiscard("take ownership")]]
 #define br_noalias
 #define br_csz(val)
 #define br_noalias_sz(var)

@@ -7,6 +7,7 @@
 
 #include "mediaruntime.hpp"
 
+#include "attr.hpp"
 #include "error.hpp"
 #include "guiplatform.h"
 #include "ui.h"
@@ -20,7 +21,7 @@
 namespace
 {
 
-[[nodiscard("take ownership")]]
+ALDO_OWN
 auto create_window(SDL_Point windowSize, const gui_platform& p)
 {
     const auto hidpi = p.is_hidpi();
@@ -35,7 +36,7 @@ auto create_window(SDL_Point windowSize, const gui_platform& p)
     return win;
 }
 
-[[nodiscard("take ownership")]]
+ALDO_OWN
 auto create_renderer(const aldo::win_handle& hwin, const gui_platform& p)
 {
     const auto ren = SDL_CreateRenderer(hwin.get(), -1,
@@ -53,7 +54,7 @@ auto create_renderer(const aldo::win_handle& hwin, const gui_platform& p)
     return ren;
 }
 
-[[nodiscard("take ownership")]]
+ALDO_OWN
 auto create_bouncer_texture(SDL_Point screenResolution,
                             const aldo::ren_handle& hren)
 {

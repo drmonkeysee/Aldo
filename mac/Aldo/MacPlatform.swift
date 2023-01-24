@@ -24,6 +24,7 @@ final class MacPlatform: NSObject {
                             withScaleFunc: @escaping PlatformRenderFunc)
                             -> Bool {
         platform.pointee = .init(appname: appName,
+                                 orgname: orgName,
                                  is_hidpi: isHiDPI,
                                  render_scale_factor: withScaleFunc,
                                  open_file: openFile,
@@ -69,11 +70,15 @@ fileprivate struct FilterSequence: Sequence, IteratorProtocol {
 //
 
 fileprivate func appName() -> CBuffer? {
-    guard let displayName = bundleName(),
-          let cstring = displayName.cString(using: .utf8) else { return nil }
-    let buffer = CBuffer.allocate(capacity: cstring.count)
-    strcpy(buffer, cstring)
-    return buffer
+    guard let displayName = bundleName() else { return nil }
+    return strToCBuffer(displayName)
+}
+
+fileprivate func orgName() -> CBuffer? {
+    guard let bundleID = bundleIdentifier(),
+          let appIdx = bundleID.lastIndex(of: ".") else { return nil }
+    let org = bundleID.prefix(upTo: appIdx)
+    return strToCBuffer(org)
 }
 
 fileprivate func isHiDPI() -> Bool {
@@ -163,6 +168,10 @@ fileprivate func bundleName() -> String? {
     Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
 }
 
+fileprivate func bundleIdentifier() -> String? {
+    Bundle.main.object(forInfoDictionaryKey: "CFBundleIdentifier") as? String
+}
+
 fileprivate func bundleHighRes() -> Bool? {
     Bundle.main.object(forInfoDictionaryKey: "NSHighResolutionCapable")
         as? Bool
@@ -178,4 +187,11 @@ fileprivate func urlToCBuffer(_ url: URL) -> CBuffer? {
         strcpy(buffer, filepath)
         return buffer
     }
+}
+
+fileprivate func strToCBuffer(_ str: any StringProtocol) -> CBuffer? {
+    guard let cstring = str.cString(using: .utf8) else { return nil }
+    let buffer = CBuffer.allocate(capacity: cstring.count)
+    strcpy(buffer, cstring)
+    return buffer
 }

@@ -14,6 +14,8 @@
 struct gui_platform {
     br_ownresult
     char *(*appname)(void) br_nothrow;
+    br_ownresult
+    char *(*orgname)(void) br_nothrow;
     bool (*is_hidpi)(void) br_nothrow;
     float (*render_scale_factor)(void *) br_nothrow;
     br_ownresult

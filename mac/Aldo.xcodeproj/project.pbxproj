@@ -126,6 +126,8 @@
 		C8DC9CB428DFD5BA000D8D97 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; };
 		C8DC9CB528DFD5BA000D8D97 /* SDL2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C8EC72202916150700DF750A /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8EC721E2916150700DF750A /* render.cpp */; };
+		C8F1A38E297FA5400005EB8B /* emu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8F1A38C297FA5400005EB8B /* emu.cpp */; };
+		C8F1A391297FA8AA0005EB8B /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8F1A38F297FA8AA0005EB8B /* input.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -353,6 +355,10 @@
 		C8EC721F2916150700DF750A /* render.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = render.hpp; sourceTree = "<group>"; };
 		C8EC7222291615AB00DF750A /* viewstate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = viewstate.hpp; sourceTree = "<group>"; };
 		C8F1A38B297FA3860005EB8B /* attr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = attr.hpp; sourceTree = "<group>"; };
+		C8F1A38C297FA5400005EB8B /* emu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = emu.cpp; sourceTree = "<group>"; };
+		C8F1A38D297FA5400005EB8B /* emu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = emu.hpp; sourceTree = "<group>"; };
+		C8F1A38F297FA8AA0005EB8B /* input.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = input.cpp; sourceTree = "<group>"; };
+		C8F1A390297FA8AA0005EB8B /* input.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = input.hpp; sourceTree = "<group>"; };
 		C8F2985A2810ECEF00ECFD7E /* CStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CStream.swift; sourceTree = "<group>"; };
 		C8FB31D02803D6EC00E6B0EF /* AldoError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -620,6 +626,8 @@
 			isa = PBXGroup;
 			children = (
 				C8F1A38B297FA3860005EB8B /* attr.hpp */,
+				C8F1A38D297FA5400005EB8B /* emu.hpp */,
+				C8F1A38C297FA5400005EB8B /* emu.cpp */,
 				C8283E73293D44CB00CDB572 /* emulator.hpp */,
 				C8283E72293D44CB00CDB572 /* emulator.cpp */,
 				C8D428E8296A15E500824248 /* emutypes.hpp */,
@@ -630,6 +638,8 @@
 				C8041C3628EE6EC000A3695F /* gui.c */,
 				C8041C3828EE72E600A3695F /* guiplatform.h */,
 				C80902DB293C04C500DF31F2 /* handle.hpp */,
+				C8F1A390297FA8AA0005EB8B /* input.hpp */,
+				C8F1A38F297FA8AA0005EB8B /* input.cpp */,
 				C8561A0B29149EA600290B53 /* mediaruntime.hpp */,
 				C8561A0A29149EA600290B53 /* mediaruntime.cpp */,
 				C8EC721F2916150700DF750A /* render.hpp */,
@@ -948,9 +958,11 @@
 				C894F0EF2945850E00C6575F /* view.cpp in Sources */,
 				C8283E74293D44CB00CDB572 /* emulator.cpp in Sources */,
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,
+				C8F1A38E297FA5400005EB8B /* emu.cpp in Sources */,
 				C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */,
 				C8EC72202916150700DF750A /* render.cpp in Sources */,
 				C854873D28E685D00045BA42 /* imgui_impl_sdl.cpp in Sources */,
+				C8F1A391297FA8AA0005EB8B /* input.cpp in Sources */,
 				C854873B28E685D00045BA42 /* imgui_tables.cpp in Sources */,
 				C854873C28E685D00045BA42 /* imgui_demo.cpp in Sources */,
 				C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */,

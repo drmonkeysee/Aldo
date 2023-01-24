@@ -69,6 +69,7 @@ static void disconnect_cart(struct nes_console *self)
 {
     // NOTE: debugger may have been attached to a cart-less CPU bus
     debug_remove_reset_override(self->dbg);
+    debug_set_resetvector(self->dbg, NoResetVector);
     debug_bp_clear(self->dbg);
     if (!self->cart) return;
     cart_cpu_disconnect(self->cart, self->cpu.bus, MEMBLOCK_32KB);

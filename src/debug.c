@@ -251,40 +251,6 @@ void debug_set_vector_override(debugctx *self, int resetvector)
     update_reset_override(self);
 }
 
-void debug_cpu_connect(debugctx *self, struct mos6502 *cpu)
-{
-    assert(self != NULL);
-    assert(cpu != NULL);
-
-    self->cpu = cpu;
-}
-
-void debug_cpu_disconnect(debugctx *self)
-{
-    assert(self != NULL);
-
-    self->cpu = NULL;
-}
-
-void debug_sync_bus(debugctx *self)
-{
-    assert(self != NULL);
-
-    if (self->resetvector == NoResetVector || !self->cpu) return;
-
-    if (self->dec.active) {
-        self->dec.vector = (uint16_t)self->resetvector;
-        return;
-    }
-
-    self->dec = (struct resdecorator){.vector = (uint16_t)self->resetvector};
-    struct busdevice resetaddr_device = {
-        resetaddr_read, resetaddr_write, resetaddr_dma, &self->dec,
-    };
-    self->dec.active = bus_swap(self->cpu->bus, CPU_VECTOR_RES,
-                                resetaddr_device, &self->dec.inner);
-}
-
 void debug_bp_add(debugctx *self, struct haltexpr expr)
 {
     assert(self != NULL);
@@ -347,6 +313,44 @@ void debug_reset(debugctx *self)
 
     debug_set_vector_override(self, NoResetVector);
     debug_bp_clear(self);
+}
+
+//
+// Internal Interface
+//
+
+void debug_cpu_connect(debugctx *self, struct mos6502 *cpu)
+{
+    assert(self != NULL);
+    assert(cpu != NULL);
+
+    self->cpu = cpu;
+}
+
+void debug_cpu_disconnect(debugctx *self)
+{
+    assert(self != NULL);
+
+    self->cpu = NULL;
+}
+
+void debug_sync_bus(debugctx *self)
+{
+    assert(self != NULL);
+
+    if (self->resetvector == NoResetVector || !self->cpu) return;
+
+    if (self->dec.active) {
+        self->dec.vector = (uint16_t)self->resetvector;
+        return;
+    }
+
+    self->dec = (struct resdecorator){.vector = (uint16_t)self->resetvector};
+    struct busdevice resetaddr_device = {
+        resetaddr_read, resetaddr_write, resetaddr_dma, &self->dec,
+    };
+    self->dec.active = bus_swap(self->cpu->bus, CPU_VECTOR_RES,
+                                resetaddr_device, &self->dec.inner);
 }
 
 void debug_check(debugctx *self, const struct cycleclock *clk)

@@ -191,28 +191,6 @@ const char *cart_errstr(int err)
     }
 }
 
-const char *cart_formatname(enum cartformat format)
-{
-    switch (format) {
-#define X(s, n) case s: return n;
-        CART_FORMAT_X
-#undef X
-    default:
-        return "UNKNOWN CART FORMAT";
-    }
-}
-
-const char *cart_mirrorname(enum nt_mirroring mirror)
-{
-    switch (mirror) {
-#define X(s, n) case s: return n;
-        CART_INES_NTMIRROR_X
-#undef X
-    default:
-        return "UNKNOWN INES NT MIRROR";
-    }
-}
-
 int cart_create(cart **c, FILE *f)
 {
     assert(c != NULL);
@@ -253,6 +231,70 @@ void cart_free(cart *self)
         self->mapper->dtor(self->mapper);
     }
     free(self);
+}
+
+const char *cart_formatname(enum cartformat format)
+{
+    switch (format) {
+#define X(s, n) case s: return n;
+        CART_FORMAT_X
+#undef X
+    default:
+        return "UNKNOWN CART FORMAT";
+    }
+}
+
+const char *cart_mirrorname(enum nt_mirroring mirror)
+{
+    switch (mirror) {
+#define X(s, n) case s: return n;
+        CART_INES_NTMIRROR_X
+#undef X
+    default:
+        return "UNKNOWN INES NT MIRROR";
+    }
+}
+
+int cart_format_extname(cart *self, char buf[restrict static CART_FMT_SIZE])
+{
+    assert(buf != NULL);
+
+    if (!self) return CART_ERR_NOCART;
+
+    int count, total;
+    total = count = sprintf(buf, "%s", cart_formatname(self->info.format));
+    if (count < 0) return CART_ERR_FMT;
+
+    if (self->info.format == CRTF_INES) {
+        count = sprintf(buf + total, " (%03d)", self->info.ines_hdr.mapper_id);
+        if (count < 0) return CART_ERR_FMT;
+        total += count;
+    }
+
+    assert(total < CART_FMT_SIZE);
+    return total;
+}
+
+void cart_write_info(cart *self, const char *restrict name, bool verbose,
+                     FILE *f)
+{
+    assert(self != NULL);
+    assert(name != NULL);
+    assert(f != NULL);
+
+    fprintf(f, "File\t\t: %s\n", name);
+    fprintf(f, "Format\t\t: %s\n", cart_formatname(self->info.format));
+    if (verbose) {
+        hr(f);
+    }
+    switch (self->info.format) {
+    case CRTF_INES:
+        write_ines_info(&self->info, f, verbose);
+        break;
+    default:
+        write_raw_info(f);
+        break;
+    }
 }
 
 void cart_getinfo(cart *self, struct cartinfo *info)
@@ -304,6 +346,10 @@ struct blockview cart_chrblock(cart *self, size_t i)
     return bv;
 }
 
+//
+// Internal Interface
+//
+
 int cart_cpu_connect(cart *self, bus *b, uint16_t addr)
 {
     assert(self != NULL);
@@ -324,28 +370,6 @@ void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr)
     self->mapper->cpu_disconnect(self->mapper, b, addr);
 }
 
-void cart_write_info(cart *self, const char *restrict name, bool verbose,
-                     FILE *f)
-{
-    assert(self != NULL);
-    assert(name != NULL);
-    assert(f != NULL);
-
-    fprintf(f, "File\t\t: %s\n", name);
-    fprintf(f, "Format\t\t: %s\n", cart_formatname(self->info.format));
-    if (verbose) {
-        hr(f);
-    }
-    switch (self->info.format) {
-    case CRTF_INES:
-        write_ines_info(&self->info, f, verbose);
-        break;
-    default:
-        write_raw_info(f);
-        break;
-    }
-}
-
 void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)
 {
     assert(self != NULL);
@@ -360,24 +384,4 @@ void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)
     if (self->info.format != CRTF_ALDO) {
         fputs("(NOTE: approximate for non-Aldo formats)\n", f);
     }
-}
-
-int cart_format_extname(cart *self, char buf[restrict static CART_FMT_SIZE])
-{
-    assert(buf != NULL);
-
-    if (!self) return CART_ERR_NOCART;
-
-    int count, total;
-    total = count = sprintf(buf, "%s", cart_formatname(self->info.format));
-    if (count < 0) return CART_ERR_FMT;
-
-    if (self->info.format == CRTF_INES) {
-        count = sprintf(buf + total, " (%03d)", self->info.ines_hdr.mapper_id);
-        if (count < 0) return CART_ERR_FMT;
-        total += count;
-    }
-
-    assert(total < CART_FMT_SIZE);
-    return total;
 }

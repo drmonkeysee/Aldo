@@ -523,58 +523,6 @@ int dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
     return dis_parse_inst(&bv, at, parsed);
 }
 
-const char *dis_inst_mnemonic(const struct dis_instruction *inst)
-{
-    assert(inst != NULL);
-
-    return mnemonic(inst->d.instruction);
-}
-
-const char *dis_inst_description(const struct dis_instruction *inst)
-{
-    assert(inst != NULL);
-
-    return description(inst->d.instruction);
-}
-
-const char *dis_inst_addrmode(const struct dis_instruction *inst)
-{
-    assert(inst != NULL);
-
-    return modename(inst->d.mode);
-}
-
-uint8_t dis_inst_flags(const struct dis_instruction *inst)
-{
-    assert(inst != NULL);
-
-    return flags(inst->d.instruction);
-}
-
-int dis_inst_operand(const struct dis_instruction *inst,
-                     char dis[restrict static DIS_OPERAND_SIZE])
-{
-    assert(inst != NULL);
-    assert(dis != NULL);
-
-    if (!inst->bv.mem) {
-        dis[0] = '\0';
-        return 0;
-    }
-
-    const int count = print_operand(inst, dis);
-
-    assert((unsigned int)count < DIS_OPERAND_SIZE);
-    return count;
-}
-
-bool dis_inst_equal(const struct dis_instruction *lhs,
-                    const struct dis_instruction *rhs)
-{
-    return lhs && rhs && lhs->bv.size == rhs->bv.size
-            && memcmp(lhs->bv.mem, rhs->bv.mem, lhs->bv.size) == 0;
-}
-
 int dis_inst(uint16_t addr, const struct dis_instruction *inst,
              char dis[restrict static DIS_INST_SIZE])
 {
@@ -604,65 +552,6 @@ int dis_inst(uint16_t addr, const struct dis_instruction *inst,
     total += count;
 
     assert((unsigned int)total < DIS_INST_SIZE);
-    return total;
-}
-
-int dis_peek(uint16_t addr, struct mos6502 *cpu, debugctx *dbg,
-             const struct console_state *snapshot,
-             char dis[restrict static DIS_PEEK_SIZE])
-{
-    assert(cpu != NULL);
-    assert(dbg != NULL);
-    assert(snapshot != NULL);
-    assert(dis != NULL);
-
-    int total = 0;
-    const char *const interrupt = interrupt_display(snapshot);
-    if (strlen(interrupt) > 0) {
-        int count = total = sprintf(dis, "%s > ", interrupt);
-        if (count < 0) return DIS_ERR_FMT;
-        const char *fmt;
-        uint16_t vector;
-        int resetvector;
-        if (snapshot->datapath.res == CSGS_COMMITTED
-            && (resetvector = debug_vector_override(dbg)) != NoResetVector) {
-            fmt = HEXPR_RES_IND "%04X";
-            vector = (uint16_t)resetvector;
-        } else {
-            fmt = "%04X";
-            vector = interrupt_vector(snapshot);
-        }
-        count = sprintf(dis + total, fmt, vector);
-        if (count < 0) return DIS_ERR_FMT;
-        total += count;
-    } else {
-        struct mos6502 restore_point;
-        cpu_peek_start(cpu, &restore_point);
-        const struct peekresult peek = cpu_peek(cpu, addr);
-        cpu_peek_end(cpu, &restore_point);
-        switch (peek.mode) {
-#define XPEEK(...) sprintf(dis, __VA_ARGS__)
-#define X(s, b, n, p, ...) case AM_ENUM(s): total = p; break;
-            DEC_ADDRMODE_X
-#undef X
-#undef XPEEK
-        default:
-            assert(((void)"BAD ADDRMODE PEEK", false));
-            return DIS_ERR_INV_ADDRMD;
-        }
-        if (total < 0) return DIS_ERR_FMT;
-        if (peek.busfault) {
-            char *const data = strrchr(dis, '=');
-            if (data) {
-                // NOTE: verify last '=' leaves enough space for "FLT"
-                assert(dis + DIS_PEEK_SIZE - data >= 6);
-                strcpy(data + 2, "FLT");
-                ++total;
-            }
-        }
-    }
-
-    assert((unsigned int)total < DIS_PEEK_SIZE);
     return total;
 }
 
@@ -744,21 +633,6 @@ int dis_cart_prg(cart *cart, const char *restrict name, bool verbose,
     return 0;
 }
 
-int dis_cart_chrbank(const struct blockview *bv, int scale, FILE *f)
-{
-    assert(bv != NULL);
-    assert(f != NULL);
-
-    if (!bv->mem) return DIS_ERR_CHRROM;
-    if (scale <= 0 || scale > ScaleGuard) return DIS_ERR_CHRSCL;
-
-    uint32_t tilesdim, tile_sections;
-    const int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
-    if (err < 0) return err;
-
-    return write_chrtiles(bv, tilesdim, tile_sections, (uint32_t)scale, f);
-}
-
 int dis_cart_chr(cart *cart, int chrscale,
                  const char *restrict chrdecode_prefix, FILE *output)
 {
@@ -791,4 +665,134 @@ int dis_cart_chr(cart *cart, int chrscale,
 
     free(bmpfilename);
     return err;
+}
+
+int dis_cart_chrbank(const struct blockview *bv, int scale, FILE *f)
+{
+    assert(bv != NULL);
+    assert(f != NULL);
+
+    if (!bv->mem) return DIS_ERR_CHRROM;
+    if (scale <= 0 || scale > ScaleGuard) return DIS_ERR_CHRSCL;
+
+    uint32_t tilesdim, tile_sections;
+    const int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
+    if (err < 0) return err;
+
+    return write_chrtiles(bv, tilesdim, tile_sections, (uint32_t)scale, f);
+}
+
+const char *dis_inst_mnemonic(const struct dis_instruction *inst)
+{
+    assert(inst != NULL);
+
+    return mnemonic(inst->d.instruction);
+}
+
+const char *dis_inst_description(const struct dis_instruction *inst)
+{
+    assert(inst != NULL);
+
+    return description(inst->d.instruction);
+}
+
+const char *dis_inst_addrmode(const struct dis_instruction *inst)
+{
+    assert(inst != NULL);
+
+    return modename(inst->d.mode);
+}
+
+uint8_t dis_inst_flags(const struct dis_instruction *inst)
+{
+    assert(inst != NULL);
+
+    return flags(inst->d.instruction);
+}
+
+int dis_inst_operand(const struct dis_instruction *inst,
+                     char dis[restrict static DIS_OPERAND_SIZE])
+{
+    assert(inst != NULL);
+    assert(dis != NULL);
+
+    if (!inst->bv.mem) {
+        dis[0] = '\0';
+        return 0;
+    }
+
+    const int count = print_operand(inst, dis);
+
+    assert((unsigned int)count < DIS_OPERAND_SIZE);
+    return count;
+}
+
+bool dis_inst_equal(const struct dis_instruction *lhs,
+                    const struct dis_instruction *rhs)
+{
+    return lhs && rhs && lhs->bv.size == rhs->bv.size
+            && memcmp(lhs->bv.mem, rhs->bv.mem, lhs->bv.size) == 0;
+}
+
+//
+// Internal Interface
+//
+
+int dis_peek(uint16_t addr, struct mos6502 *cpu, debugctx *dbg,
+             const struct console_state *snapshot,
+             char dis[restrict static DIS_PEEK_SIZE])
+{
+    assert(cpu != NULL);
+    assert(dbg != NULL);
+    assert(snapshot != NULL);
+    assert(dis != NULL);
+
+    int total = 0;
+    const char *const interrupt = interrupt_display(snapshot);
+    if (strlen(interrupt) > 0) {
+        int count = total = sprintf(dis, "%s > ", interrupt);
+        if (count < 0) return DIS_ERR_FMT;
+        const char *fmt;
+        uint16_t vector;
+        int resetvector;
+        if (snapshot->datapath.res == CSGS_COMMITTED
+            && (resetvector = debug_vector_override(dbg)) != NoResetVector) {
+            fmt = HEXPR_RES_IND "%04X";
+            vector = (uint16_t)resetvector;
+        } else {
+            fmt = "%04X";
+            vector = interrupt_vector(snapshot);
+        }
+        count = sprintf(dis + total, fmt, vector);
+        if (count < 0) return DIS_ERR_FMT;
+        total += count;
+    } else {
+        struct mos6502 restore_point;
+        cpu_peek_start(cpu, &restore_point);
+        const struct peekresult peek = cpu_peek(cpu, addr);
+        cpu_peek_end(cpu, &restore_point);
+        switch (peek.mode) {
+#define XPEEK(...) sprintf(dis, __VA_ARGS__)
+#define X(s, b, n, p, ...) case AM_ENUM(s): total = p; break;
+            DEC_ADDRMODE_X
+#undef X
+#undef XPEEK
+        default:
+            assert(((void)"BAD ADDRMODE PEEK", false));
+            return DIS_ERR_INV_ADDRMD;
+        }
+        if (total < 0) return DIS_ERR_FMT;
+        if (peek.busfault) {
+            char *const data = strrchr(dis, '=');
+            if (data) {
+                // NOTE: verify last '=' leaves enough space for "FLT"
+                assert(dis + DIS_PEEK_SIZE - data >= 6);
+                strcpy(data + 2, "FLT");
+                ++total;
+            }
+        }
+    }
+
+    assert((unsigned int)total < DIS_PEEK_SIZE);
+    return total;
 }

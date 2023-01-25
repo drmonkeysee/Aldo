@@ -42,10 +42,20 @@ private:
     console_state snapshot;
 };
 
+// TODO: can this be moved to prefs module?
+class Preferences {
+public:
+    explicit Preferences(const gui_platform& p);
+
+private:
+    std::filesystem::path prefspath;
+};
+
 class Emulator {
 public:
-    Emulator(debug_handle d, console_handle n) noexcept
-    : hdebug{std::move(d)}, hconsole{std::move(n)}, hsnapshot{consolep()} {}
+    Emulator(debug_handle d, console_handle n, const gui_platform& p)
+    : hdebug{std::move(d)}, hconsole{std::move(n)}, hsnapshot{consolep()},
+        prefs{p} {}
 
     //
     // Debugger
@@ -123,6 +133,7 @@ private:
     debug_handle hdebug;
     console_handle hconsole;
     Snapshot hsnapshot;
+    Preferences prefs;
 };
 
 }

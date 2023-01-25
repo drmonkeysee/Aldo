@@ -125,6 +125,7 @@
 		C8D8FDA82792691B0073639B /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
 		C8DC9CB428DFD5BA000D8D97 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; };
 		C8DC9CB528DFD5BA000D8D97 /* SDL2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C8E7A29C2980F46D00AAB2A4 /* modal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8E7A29A2980F32400AAB2A4 /* modal.cpp */; };
 		C8EC72202916150700DF750A /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8EC721E2916150700DF750A /* render.cpp */; };
 		C8F1A38E297FA5400005EB8B /* emu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8F1A38C297FA5400005EB8B /* emu.cpp */; };
 		C8F1A391297FA8AA0005EB8B /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8F1A38F297FA8AA0005EB8B /* input.cpp */; };
@@ -350,6 +351,8 @@
 		C8DC9CB228DFD57B000D8D97 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../ext/SDL2.framework; sourceTree = "<group>"; };
 		C8DC9CB828DFE5B4000D8D97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C8E76BA9285985CE004C1479 /* Commands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Commands.swift; sourceTree = "<group>"; };
+		C8E7A29A2980F32400AAB2A4 /* modal.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = modal.cpp; sourceTree = "<group>"; };
+		C8E7A29B2980F32400AAB2A4 /* modal.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = modal.hpp; sourceTree = "<group>"; };
 		C8E9478128FE45EA0073D1AA /* ctrlsignal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ctrlsignal.h; sourceTree = "<group>"; };
 		C8EC721E2916150700DF750A /* render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = render.cpp; sourceTree = "<group>"; };
 		C8EC721F2916150700DF750A /* render.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = render.hpp; sourceTree = "<group>"; };
@@ -642,6 +645,8 @@
 				C8F1A38F297FA8AA0005EB8B /* input.cpp */,
 				C8561A0B29149EA600290B53 /* mediaruntime.hpp */,
 				C8561A0A29149EA600290B53 /* mediaruntime.cpp */,
+				C8E7A29B2980F32400AAB2A4 /* modal.hpp */,
+				C8E7A29A2980F32400AAB2A4 /* modal.cpp */,
 				C8EC721F2916150700DF750A /* render.hpp */,
 				C8EC721E2916150700DF750A /* render.cpp */,
 				C8D388D72952B9A700DF230D /* runclock.hpp */,
@@ -964,6 +969,7 @@
 				C854873D28E685D00045BA42 /* imgui_impl_sdl.cpp in Sources */,
 				C8F1A391297FA8AA0005EB8B /* input.cpp in Sources */,
 				C854873B28E685D00045BA42 /* imgui_tables.cpp in Sources */,
+				C8E7A29C2980F46D00AAB2A4 /* modal.cpp in Sources */,
 				C854873C28E685D00045BA42 /* imgui_demo.cpp in Sources */,
 				C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */,
 				C854873A28E685D00045BA42 /* imgui.cpp in Sources */,

@@ -8,7 +8,7 @@
 #ifndef Aldo_gui_input_hpp
 #define Aldo_gui_input_hpp
 
-struct guiplatform;
+struct gui_platform;
 
 namespace aldo
 {
@@ -19,7 +19,7 @@ struct viewstate;
 namespace input
 {
 
-void handle(Emulator& emu, viewstate& vs, const guiplatform& p);
+void handle(Emulator& emu, viewstate& vs, const gui_platform& p);
 
 }
 

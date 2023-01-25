@@ -9,6 +9,7 @@
 
 #include "emu.hpp"
 #include "guiplatform.h"
+#include "modal.hpp"
 #include "viewstate.hpp"
 
 #include "imgui_impl_sdl.h"
@@ -17,6 +18,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <variant>
 
 namespace
 {
@@ -62,7 +64,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
     }
 }
 
-void process_event(const aldo::event& ev, const aldo::Emulator& emu,
+auto process_event(const aldo::event& ev, aldo::Emulator& emu,
                    aldo::viewstate& s, const gui_platform& p)
 {
     switch (ev.cmd) {
@@ -76,24 +78,10 @@ void process_event(const aldo::event& ev, const aldo::Emulator& emu,
         emu.clearBreakpoints();
         break;
     case aldo::Command::breakpointsExport:
-        {
-            const auto open =
-                [this](const gui_platform& p) -> aldo::platform_buffer {
-                    return save_file(p, "Export Breakpoints",
-                                     brkfile_name(this->cartname));
-                };
-            openModal(p, {open, &aldo::EmuController::exportBreakpointsTo});
-        }
+        aldo::modal::exportBreakpoints(emu, p);
         break;
     case aldo::Command::breakpointsOpen:
-        {
-            const auto open =
-                [](const gui_platform& p) -> aldo::platform_buffer {
-                    return open_file(p, "Choose a Breakpoints file",
-                                     {EXT_BRK, nullptr});
-                };
-            openModal(p, {open, &aldo::EmuController::loadBreakpointsFrom});
-        }
+        aldo::modal::loadBreakpoints(emu, p);
         break;
     case aldo::Command::breakpointToggle:
         emu.toggleBreakpointEnabled(std::get<aldo::et::diff>(ev.value));
@@ -119,13 +107,7 @@ void process_event(const aldo::event& ev, const aldo::Emulator& emu,
         emu.runMode(std::get<csig_excmode>(ev.value));
         break;
     case aldo::Command::openROM:
-        {
-            const auto open =
-                [](const gui_platform& p) -> aldo::platform_buffer {
-                    return open_file(p, "Choose a ROM file");
-                };
-            openModal(p, {open, &aldo::EmuController::loadCartFrom});
-        }
+        aldo::modal::loadROM(emu, p);
         break;
     case aldo::Command::overrideReset:
         emu.vectorOverride(std::get<int>(ev.value));
@@ -141,7 +123,7 @@ void process_event(const aldo::event& ev, const aldo::Emulator& emu,
 }
 
 void aldo::input::handle(aldo::Emulator& emu, aldo::viewstate& vs,
-                         const guiplatform& p)
+                         const gui_platform& p)
 {
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {

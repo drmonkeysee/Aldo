@@ -93,6 +93,12 @@ public:
         nes_set_mode(consolep(), mode);
     }
 
+    //
+    // Cart
+    //
+
+    void loadCart(const std::filesystem::path& filepath);
+
 private:
     int vectorOverride() const noexcept
     {
@@ -107,6 +113,7 @@ private:
         return debug_bp_at(debugp(), at);
     }
 
+    cart* cartp() const noexcept { return hcart.get(); }
     debugctx* debugp() const noexcept { return hdebug.get(); }
     nes* consolep() const noexcept { return hconsole.get(); }
 

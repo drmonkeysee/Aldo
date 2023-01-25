@@ -11,8 +11,153 @@
 #include "guiplatform.h"
 #include "viewstate.hpp"
 
+#include "imgui_impl_sdl.h"
+#include <SDL2/SDL.h>
+
+#include <stdexcept>
+#include <string>
+#include <type_traits>
+
+namespace
+{
+
+auto invalid_command(aldo::Command c)
+{
+    std::string s = "Invalid gui event command (";
+    s += std::to_string(static_cast<std::underlying_type_t<aldo::Command>>(c));
+    s += ')';
+    return s;
+}
+
+auto is_menu_shortcut(const SDL_Event& ev) noexcept
+{
+    return (ev.key.keysym.mod & KMOD_GUI) && !ev.key.repeat;
+}
+
+auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
+                    aldo::viewstate& vs)
+{
+    switch (ev.key.keysym.sym) {
+    case SDLK_b:
+        if (is_menu_shortcut(ev)) {
+            if (ev.key.keysym.mod & KMOD_ALT) {
+                if (emu.hasDebugState()) {
+                    vs.events.emplace(aldo::Command::breakpointsExport);
+                }
+            } else {
+                vs.events.emplace(aldo::Command::breakpointsOpen);
+            }
+        }
+        break;
+    case SDLK_d:
+        if (is_menu_shortcut(ev)) {
+            vs.showDemo = !vs.showDemo;
+        }
+        break;
+    case SDLK_o:
+        if (is_menu_shortcut(ev)) {
+            vs.events.emplace(aldo::Command::openROM);
+        }
+        break;
+    }
+}
+
+void process_event(const aldo::event& ev, const aldo::Emulator& emu,
+                   aldo::viewstate& s, const gui_platform& p)
+{
+    switch (ev.cmd) {
+    case aldo::Command::breakpointAdd:
+        emu.addBreakpoint(std::get<haltexpr>(ev.value));
+        break;
+    case aldo::Command::breakpointRemove:
+        emu.removeBreakpoint(std::get<aldo::et::diff>(ev.value));
+        break;
+    case aldo::Command::breakpointsClear:
+        emu.clearBreakpoints();
+        break;
+    case aldo::Command::breakpointsExport:
+        {
+            const auto open =
+                [this](const gui_platform& p) -> aldo::platform_buffer {
+                    return save_file(p, "Export Breakpoints",
+                                     brkfile_name(this->cartname));
+                };
+            openModal(p, {open, &aldo::EmuController::exportBreakpointsTo});
+        }
+        break;
+    case aldo::Command::breakpointsOpen:
+        {
+            const auto open =
+                [](const gui_platform& p) -> aldo::platform_buffer {
+                    return open_file(p, "Choose a Breakpoints file",
+                                     {EXT_BRK, nullptr});
+                };
+            openModal(p, {open, &aldo::EmuController::loadBreakpointsFrom});
+        }
+        break;
+    case aldo::Command::breakpointToggle:
+        emu.toggleBreakpointEnabled(std::get<aldo::et::diff>(ev.value));
+        break;
+    case aldo::Command::halt:
+        if (std::get<bool>(ev.value)) {
+            emu.halt();
+        } else {
+            emu.ready();
+        }
+        break;
+    case aldo::Command::interrupt:
+        {
+            const auto [signal, active] =
+                std::get<aldo::event::interrupt>(ev.value);
+            emu.interrupt(signal, active);
+        }
+        break;
+    case aldo::Command::launchStudio:
+        p.launch_studio();
+        break;
+    case aldo::Command::mode:
+        emu.runMode(std::get<csig_excmode>(ev.value));
+        break;
+    case aldo::Command::openROM:
+        {
+            const auto open =
+                [](const gui_platform& p) -> aldo::platform_buffer {
+                    return open_file(p, "Choose a ROM file");
+                };
+            openModal(p, {open, &aldo::EmuController::loadCartFrom});
+        }
+        break;
+    case aldo::Command::overrideReset:
+        emu.vectorOverride(std::get<int>(ev.value));
+        break;
+    case aldo::Command::quit:
+        s.running = false;
+        break;
+    default:
+        throw std::domain_error{invalid_command(ev.cmd)};
+    }
+}
+
+}
+
 void aldo::input::handle(aldo::Emulator& emu, aldo::viewstate& vs,
                          const guiplatform& p)
 {
-    // TODO
+    SDL_Event ev;
+    while (SDL_PollEvent(&ev)) {
+        ImGui_ImplSDL2_ProcessEvent(&ev);
+        switch (ev.type) {
+        case SDL_KEYDOWN:
+            handle_keydown(ev, emu, vs);
+            break;
+        case SDL_QUIT:
+            vs.events.emplace(aldo::Command::quit);
+            break;
+        }
+    }
+    while (!vs.events.empty()) {
+        const auto& ev = vs.events.front();
+        process_event(ev, emu, vs, p);
+        vs.events.pop();
+    }
 }

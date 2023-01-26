@@ -24,7 +24,7 @@ namespace
 {
 
 using modal_launch = std::function<std::filesystem::path(const gui_platform&)>;
-using modal_handler =
+using modal_operation =
     std::function<void(const std::filesystem::path&, aldo::Emulator&)>;
 
 auto open_file(const gui_platform& p, const char* title,
@@ -45,7 +45,7 @@ auto save_file(const gui_platform& p, const char* title,
     return std::filesystem::path{buf.get()};
 }
 
-auto file_modal(modal_launch open, modal_handler handler, aldo::Emulator& emu,
+auto file_modal(modal_launch open, modal_operation op, aldo::Emulator& emu,
                 const gui_platform& p)
 {
     // NOTE: halt emulator to prevent time-jump from modal delay
@@ -57,7 +57,7 @@ auto file_modal(modal_launch open, modal_handler handler, aldo::Emulator& emu,
 
     SDL_Log("File selected: %s", filepath.c_str());
     try {
-        handler(filepath, emu);
+        op(filepath, emu);
     } catch (const aldo::AldoError& err) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s", err.what());
         p.display_error(err.title(), err.message());

@@ -71,7 +71,7 @@ public:
     }
     void toggleBreakpointEnabled(et::diff at) const noexcept
     {
-        const auto bp = breakpoint(at);
+        const auto bp = getBreakpoint(at);
         debug_bp_enabled(debugp(), at, bp && !bp->enabled);
     }
     void removeBreakpoint(et::diff at) const noexcept
@@ -118,7 +118,7 @@ private:
     {
         return debug_bp_count(debugp());
     }
-    const breakpoint* breakpoint(et::diff at) const noexcept
+    const breakpoint* getBreakpoint(et::diff at) const noexcept
     {
         return debug_bp_at(debugp(), at);
     }

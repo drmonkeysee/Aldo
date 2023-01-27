@@ -18,6 +18,7 @@
 #include "emutypes.hpp"
 #include "haltexpr.h"
 #include "mediaruntime.hpp"
+#include "snapshot.h"
 #include "style.hpp"
 #include "version.h"
 #include "viewstate.hpp"

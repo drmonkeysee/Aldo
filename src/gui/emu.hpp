@@ -20,6 +20,8 @@
 #include <filesystem>
 #include <utility>
 
+struct gui_platform;
+
 namespace aldo
 {
 
@@ -27,39 +29,9 @@ using cart_handle = handle<cart, cart_free>;
 using console_handle = handle<nes, nes_free>;
 using debug_handle = handle<debugctx, debug_free>;
 
-class Snapshot {
+class Debugger {
 public:
-    explicit Snapshot(nes* console) noexcept { nes_snapshot(console, getp()); }
-    Snapshot(const Snapshot&) = default;
-    Snapshot& operator=(const Snapshot&) = default;
-    Snapshot(Snapshot&&) = default;
-    Snapshot& operator=(Snapshot&&) = default;
-    ~Snapshot() { snapshot_clear(getp()); }
-
-private:
-    console_state* getp() noexcept { return &snapshot; }
-
-    console_state snapshot;
-};
-
-// TODO: can this be moved to prefs module?
-class Preferences {
-public:
-    explicit Preferences(const gui_platform& p);
-
-private:
-    std::filesystem::path prefspath;
-};
-
-class Emulator {
-public:
-    Emulator(debug_handle d, console_handle n, const gui_platform& p)
-    : hdebug{std::move(d)}, hconsole{std::move(n)}, hsnapshot{consolep()},
-        prefs{p} {}
-
-    //
-    // Debugger
-    //
+    explicit Debugger(debug_handle d) noexcept : hdebug{std::move(d)} {}
 
     void vectorOverride(int resetvector) const noexcept
     {
@@ -79,14 +51,48 @@ public:
         debug_bp_remove(debugp(), at);
     }
     void clearBreakpoints() const noexcept { debug_bp_clear(debugp()); }
-    bool hasDebugState() const noexcept
+    bool isActive() const noexcept
     {
         return vectorOverride() != NoResetVector || breakpointCount() > 0;
     }
 
-    //
-    // Console
-    //
+private:
+    int vectorOverride() const noexcept
+    {
+        return debug_vector_override(debugp());
+    }
+    et::size breakpointCount() const noexcept
+    {
+        return debug_bp_count(debugp());
+    }
+    const breakpoint* getBreakpoint(et::diff at) const noexcept
+    {
+        return debug_bp_at(debugp(), at);
+    }
+
+    debugctx* debugp() const noexcept { return hdebug.get(); }
+
+    debug_handle hdebug;
+};
+
+class Snapshot {
+public:
+    explicit Snapshot(nes* console) noexcept { nes_snapshot(console, getp()); }
+    Snapshot(const Snapshot&) = default;
+    Snapshot& operator=(const Snapshot&) = default;
+    Snapshot(Snapshot&&) = default;
+    Snapshot& operator=(Snapshot&&) = default;
+    ~Snapshot() { snapshot_clear(getp()); }
+
+private:
+    console_state* getp() noexcept { return &snapshot; }
+
+    console_state snapshot;
+};
+
+class Emulator {
+public:
+    Emulator(debug_handle d, console_handle n, const gui_platform& p);
 
     void halt() const noexcept { nes_halt(consolep()); }
     void ready() const noexcept { nes_ready(consolep()); }
@@ -103,37 +109,21 @@ public:
         nes_set_mode(consolep(), mode);
     }
 
-    //
-    // Cart
-    //
-
     void loadCart(const std::filesystem::path& filepath);
 
-private:
-    int vectorOverride() const noexcept
-    {
-        return debug_vector_override(debugp());
-    }
-    et::size breakpointCount() const noexcept
-    {
-        return debug_bp_count(debugp());
-    }
-    const breakpoint* getBreakpoint(et::diff at) const noexcept
-    {
-        return debug_bp_at(debugp(), at);
-    }
+    const Debugger& debugger() const noexcept { return hdebug; }
 
+private:
     cart* cartp() const noexcept { return hcart.get(); }
-    debugctx* debugp() const noexcept { return hdebug.get(); }
     nes* consolep() const noexcept { return hconsole.get(); }
 
     std::filesystem::path cartpath;
     std::filesystem::path cartname;
+    std::filesystem::path prefspath;
+    Debugger hdebug;
     cart_handle hcart;
-    debug_handle hdebug;
     console_handle hconsole;
     Snapshot hsnapshot;
-    Preferences prefs;
 };
 
 }

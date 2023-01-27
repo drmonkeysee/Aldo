@@ -8,6 +8,9 @@
 #include "emu.hpp"
 
 #include "error.hpp"
+#include "guiplatform.h"
+
+#include <SDL2/SDL.h>
 
 #include <cerrno>
 #include <cstdio>
@@ -16,8 +19,26 @@ namespace
 {
 
 using file_handle = aldo::handle<std::FILE, std::fclose>;
+using sdl_buffer = aldo::handle<char, SDL_free>;
+
+auto get_prefspath(const gui_platform& p)
+{
+    const aldo::platform_buffer
+        org{p.orgname(), p.free_buffer},
+        name{p.appname(), p.free_buffer};
+    const sdl_buffer path{SDL_GetPrefPath(org.get(), name.get())};
+    if (!path) throw aldo::AldoError{
+        "Failed to get preferences path", SDL_GetError(),
+    };
+    return std::filesystem::path{path.get()};
+}
 
 }
+
+aldo::Emulator::Emulator(debug_handle d, console_handle n,
+                         const gui_platform& p)
+: prefspath{get_prefspath(p)}, hdebug{std::move(d)}, hconsole{std::move(n)},
+    hsnapshot{consolep()} {}
 
 void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
 {

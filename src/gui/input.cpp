@@ -43,7 +43,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
     case SDLK_b:
         if (is_menu_shortcut(ev)) {
             if (ev.key.keysym.mod & KMOD_ALT) {
-                if (emu.hasDebugState()) {
+                if (emu.debugger().isActive()) {
                     vs.events.emplace(aldo::Command::breakpointsExport);
                 }
             } else {
@@ -67,15 +67,16 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
 auto process_event(const aldo::event& ev, aldo::Emulator& emu,
                    aldo::viewstate& s, const gui_platform& p)
 {
+    const auto& debugger = emu.debugger();
     switch (ev.cmd) {
     case aldo::Command::breakpointAdd:
-        emu.addBreakpoint(std::get<haltexpr>(ev.value));
+        debugger.addBreakpoint(std::get<haltexpr>(ev.value));
         break;
     case aldo::Command::breakpointRemove:
-        emu.removeBreakpoint(std::get<aldo::et::diff>(ev.value));
+        debugger.removeBreakpoint(std::get<aldo::et::diff>(ev.value));
         break;
     case aldo::Command::breakpointsClear:
-        emu.clearBreakpoints();
+        debugger.clearBreakpoints();
         break;
     case aldo::Command::breakpointsExport:
         aldo::modal::exportBreakpoints(emu, p);
@@ -84,7 +85,7 @@ auto process_event(const aldo::event& ev, aldo::Emulator& emu,
         aldo::modal::loadBreakpoints(emu, p);
         break;
     case aldo::Command::breakpointToggle:
-        emu.toggleBreakpointEnabled(std::get<aldo::et::diff>(ev.value));
+        debugger.toggleBreakpointEnabled(std::get<aldo::et::diff>(ev.value));
         break;
     case aldo::Command::halt:
         if (std::get<bool>(ev.value)) {
@@ -110,7 +111,7 @@ auto process_event(const aldo::event& ev, aldo::Emulator& emu,
         aldo::modal::loadROM(emu, p);
         break;
     case aldo::Command::overrideReset:
-        emu.vectorOverride(std::get<int>(ev.value));
+        debugger.vectorOverride(std::get<int>(ev.value));
         break;
     case aldo::Command::quit:
         s.running = false;

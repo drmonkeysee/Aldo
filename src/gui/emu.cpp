@@ -33,14 +33,7 @@ auto get_prefspath(const gui_platform& p)
     return std::filesystem::path{path.get()};
 }
 
-}
-
-aldo::Emulator::Emulator(debug_handle d, console_handle n,
-                         const gui_platform& p)
-: prefspath{get_prefspath(p)}, hdebug{std::move(d)}, hconsole{std::move(n)},
-    hsnapshot{consolep()} {}
-
-void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
+auto load_cart(const std::filesystem::path& filepath)
 {
     cart* c;
     errno = 0;
@@ -50,6 +43,19 @@ void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
     const int err = cart_create(&c, f.get());
     if (err < 0) throw aldo::AldoError{"Cart load failure", err, cart_errstr};
 
+    return c;
+}
+
+}
+
+aldo::Emulator::Emulator(debug_handle d, console_handle n,
+                         const gui_platform& p)
+: prefspath{get_prefspath(p)}, hdebug{std::move(d)}, hconsole{std::move(n)},
+    hsnapshot{consolep()} {}
+
+void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
+{
+    const auto c = load_cart(filepath);
     //saveCartState(p);
     nes_powerdown(consolep());
     hcart.reset(c);

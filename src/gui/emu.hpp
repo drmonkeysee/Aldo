@@ -56,6 +56,9 @@ public:
         return vectorOverride() != NoResetVector || breakpointCount() > 0;
     }
 
+    void loadBreakpoints(const std::filesystem::path& filepath) const;
+    void exportBreakpoints(const std::filesystem::path& filepath) const;
+
 private:
     int vectorOverride() const noexcept
     {
@@ -111,6 +114,7 @@ public:
 
     void loadCart(const std::filesystem::path& filepath);
 
+    const std::filesystem::path& cartName() const noexcept { return cartname; }
     const Debugger& debugger() const noexcept { return hdebug; }
 
 private:

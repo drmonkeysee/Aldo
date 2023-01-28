@@ -23,6 +23,8 @@
 namespace
 {
 
+constexpr const char* FileErrorTitle = "File Error";
+
 using file_handle = aldo::handle<std::FILE, std::fclose>;
 using hexpr_buffer = std::array<aldo::et::tchar, HEXPR_FMT_SIZE>;
 using sdl_buffer = aldo::handle<char, SDL_free>;
@@ -33,9 +35,7 @@ auto get_prefspath(const gui_platform& p)
         org{p.orgname(), p.free_buffer},
         name{p.appname(), p.free_buffer};
     const sdl_buffer path{SDL_GetPrefPath(org.get(), name.get())};
-    if (!path) throw aldo::AldoError{
-        "Failed to get preferences path", SDL_GetError(),
-    };
+    if (!path) throw aldo::SdlError{"Failed to get preferences path"};
     return std::filesystem::path{path.get()};
 }
 
@@ -54,6 +54,9 @@ auto read_brkfile(const std::filesystem::path& filepath)
         };
         exprs.push_back(expr);
     }
+    if (f.bad() || (f.fail() && !f.eof())) throw aldo::AldoError{
+        FileErrorTitle, "Error reading breakpoints file"
+    };
     return exprs;
 }
 
@@ -82,6 +85,9 @@ auto write_brkline(const hexpr_buffer& buf, std::ofstream& f)
     const std::string_view str{buf.data()};
     f.write(str.data(), static_cast<std::streamsize>(str.length()));
     f.put('\n');
+    if (f.bad()) throw aldo::AldoError{
+        FileErrorTitle, "Error writing breakpoints file",
+    };
 }
 
 auto write_brkfile(const std::filesystem::path& filepath,

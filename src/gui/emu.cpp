@@ -7,6 +7,7 @@
 
 #include "emu.hpp"
 
+#include "attr.hpp"
 #include "error.hpp"
 #include "guiplatform.h"
 
@@ -100,6 +101,7 @@ auto write_brkfile(const std::filesystem::path& filepath,
     }
 }
 
+ALDO_OWN
 auto load_cart(const std::filesystem::path& filepath)
 {
     cart* c;

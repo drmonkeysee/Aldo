@@ -129,6 +129,7 @@
 		C8EC72202916150700DF750A /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8EC721E2916150700DF750A /* render.cpp */; };
 		C8F1A38E297FA5400005EB8B /* emu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8F1A38C297FA5400005EB8B /* emu.cpp */; };
 		C8F1A391297FA8AA0005EB8B /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8F1A38F297FA8AA0005EB8B /* input.cpp */; };
+		C8F87DBC2984D64F00B8FAFD /* debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8F87DBA2984D64F00B8FAFD /* debug.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -363,6 +364,8 @@
 		C8F1A38F297FA8AA0005EB8B /* input.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = input.cpp; sourceTree = "<group>"; };
 		C8F1A390297FA8AA0005EB8B /* input.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = input.hpp; sourceTree = "<group>"; };
 		C8F2985A2810ECEF00ECFD7E /* CStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CStream.swift; sourceTree = "<group>"; };
+		C8F87DBA2984D64F00B8FAFD /* debug.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = debug.cpp; sourceTree = "<group>"; };
+		C8F87DBB2984D64F00B8FAFD /* debug.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = debug.hpp; sourceTree = "<group>"; };
 		C8FB31D02803D6EC00E6B0EF /* AldoError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -629,6 +632,8 @@
 			isa = PBXGroup;
 			children = (
 				C8F1A38B297FA3860005EB8B /* attr.hpp */,
+				C8F87DBB2984D64F00B8FAFD /* debug.hpp */,
+				C8F87DBA2984D64F00B8FAFD /* debug.cpp */,
 				C8F1A38D297FA5400005EB8B /* emu.hpp */,
 				C8F1A38C297FA5400005EB8B /* emu.cpp */,
 				C8283E73293D44CB00CDB572 /* emulator.hpp */,
@@ -967,6 +972,7 @@
 				C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */,
 				C8EC72202916150700DF750A /* render.cpp in Sources */,
 				C854873D28E685D00045BA42 /* imgui_impl_sdl.cpp in Sources */,
+				C8F87DBC2984D64F00B8FAFD /* debug.cpp in Sources */,
 				C8F1A391297FA8AA0005EB8B /* input.cpp in Sources */,
 				C854873B28E685D00045BA42 /* imgui_tables.cpp in Sources */,
 				C8E7A29C2980F46D00AAB2A4 /* modal.cpp in Sources */,

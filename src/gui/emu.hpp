@@ -124,8 +124,8 @@ private:
     std::filesystem::path cartpath;
     std::filesystem::path cartname;
     std::filesystem::path prefspath;
-    Debugger hdebug;
     cart_handle hcart;
+    Debugger hdebug;
     console_handle hconsole;
     Snapshot hsnapshot;
 };

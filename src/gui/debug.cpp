@@ -91,20 +91,24 @@ void aldo::Debugger::loadBreakpoints(const std::filesystem::path& filepath)
     set_debug_state(debugp(), exprs);
 }
 
-void aldo::Debugger::exportBreakpoints(const std::filesystem::path& filepath)
+void
+aldo::Debugger::exportBreakpoints(const std::filesystem::path& filepath) const
 {
+    using bpsize = bp_collection::size_type;
+    using bpidx = bp_collection::difference_type;
+
+    const auto& bpColl = breakpoints();
     const auto resetvector = vectorOverride();
     const auto resOverride = resetvector != NoResetVector;
-    const auto exprCount = breakpointCount()
-                            + static_cast<aldo::et::size>(resOverride);
+    const auto exprCount = bpColl.size() + static_cast<bpsize>(resOverride);
     if (exprCount == 0) return;
 
     std::vector<hexpr_buffer> bufs(exprCount);
     debugexpr expr;
-    aldo::et::diff i = 0;
-    // TODO: factor into helper function when getBreakpoint moved to public
+    bpidx i = 0;
+    // TODO: factor into helper function when bpview has iterator support
     auto it = bufs.begin();
-    for (auto bp = getBreakpoint(i); bp; bp = getBreakpoint(++i), ++it) {
+    for (auto bp = bpColl.at(i); bp; bp = bpColl.at(++i), ++it) {
         expr = {.hexpr = bp->expr, .type = debugexpr::DBG_EXPR_HALT};
         format_debug_expr(expr, *it);
     }

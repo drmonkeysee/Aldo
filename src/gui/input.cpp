@@ -68,15 +68,16 @@ auto process_event(const aldo::event& ev, aldo::Emulator& emu,
                    aldo::viewstate& s, const gui_platform& p)
 {
     auto& debugger = emu.debugger();
+    auto& breakpoints = debugger.breakpoints();
     switch (ev.cmd) {
     case aldo::Command::breakpointAdd:
-        debugger.addBreakpoint(std::get<haltexpr>(ev.value));
+        breakpoints.append(std::get<haltexpr>(ev.value));
         break;
     case aldo::Command::breakpointRemove:
-        debugger.removeBreakpoint(std::get<aldo::et::diff>(ev.value));
+        breakpoints.remove(std::get<aldo::et::diff>(ev.value));
         break;
     case aldo::Command::breakpointsClear:
-        debugger.clearBreakpoints();
+        breakpoints.clear();
         break;
     case aldo::Command::breakpointsExport:
         aldo::modal::exportBreakpoints(emu, p);
@@ -85,7 +86,7 @@ auto process_event(const aldo::event& ev, aldo::Emulator& emu,
         aldo::modal::loadBreakpoints(emu, p);
         break;
     case aldo::Command::breakpointToggle:
-        debugger.toggleBreakpointEnabled(std::get<aldo::et::diff>(ev.value));
+        breakpoints.toggleEnabled(std::get<aldo::et::diff>(ev.value));
         break;
     case aldo::Command::halt:
         if (std::get<bool>(ev.value)) {

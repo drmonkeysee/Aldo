@@ -66,6 +66,16 @@ public:
             return debug_bp_at(debugp, i);
         }
 
+        const_iterator cbegin() const noexcept
+        {
+            return const_iterator{debugp, size()};
+        }
+        const_iterator cend() const noexcept { return const_iterator{}; }
+        const_iterator begin() const noexcept { return cbegin(); }
+        const_iterator end() const noexcept { return cend(); }
+        const_iterator begin() noexcept { return cbegin(); }
+        const_iterator end() noexcept { return cend(); }
+
         void append(haltexpr expr) noexcept { debug_bp_add(debugp, expr); }
         void toggleEnabled(difference_type i) noexcept
         {
@@ -90,9 +100,11 @@ public:
 
             reference operator*() const noexcept
             {
-                // NOTE: always guard with end() iterator
-                // to avoid dereferencing null.
-                return *debug_bp_at(debugp, idx);
+                return *operator->();
+            }
+            pointer operator->() const noexcept
+            {
+                return debug_bp_at(debugp, idx);
             }
 
             BreakpointIterator& operator++() noexcept { ++idx; return *this; }

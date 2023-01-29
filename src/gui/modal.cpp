@@ -52,8 +52,8 @@ auto save_file(const gui_platform& p, const char* title,
     return std::filesystem::path{buf.get()};
 }
 
-auto file_modal(modal_launch open, modal_operation op,
-                const aldo::Emulator& emu, const gui_platform& p)
+auto file_modal(modal_launch open, modal_operation op, aldo::Emulator& emu,
+                const gui_platform& p)
 {
     // NOTE: halt emulator to prevent time-jump from modal delay
     // TODO: does this make sense long-term?
@@ -80,8 +80,7 @@ void aldo::modal::loadROM(aldo::Emulator& emu, const gui_platform& p)
     }, [&emu](const std::filesystem::path& p) { emu.loadCart(p); }, emu, p);
 }
 
-void aldo::modal::loadBreakpoints(const aldo::Emulator& emu,
-                                  const gui_platform& p)
+void aldo::modal::loadBreakpoints(aldo::Emulator& emu, const gui_platform& p)
 {
     file_modal([](const gui_platform& p) {
         return open_file(p, "Choose a Breakpoints file", {EXT_BRK, nullptr});
@@ -90,8 +89,7 @@ void aldo::modal::loadBreakpoints(const aldo::Emulator& emu,
     }, emu, p);
 }
 
-void aldo::modal::exportBreakpoints(const aldo::Emulator& emu,
-                                    const gui_platform& p)
+void aldo::modal::exportBreakpoints(aldo::Emulator& emu, const gui_platform& p)
 {
     file_modal([n = brkfile_name(emu.cartName())](const gui_platform& p) {
         return save_file(p, "Export Breakpoints", n);

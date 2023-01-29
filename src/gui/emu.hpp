@@ -44,9 +44,9 @@ class Emulator {
 public:
     Emulator(Debugger d, console_handle n, const gui_platform& p);
 
-    void halt() const noexcept { nes_halt(consolep()); }
-    void ready() const noexcept { nes_ready(consolep()); }
-    void interrupt(csig_interrupt signal, bool active) const noexcept
+    void halt() noexcept { nes_halt(consolep()); }
+    void ready() noexcept { nes_ready(consolep()); }
+    void interrupt(csig_interrupt signal, bool active) noexcept
     {
         if (active) {
             nes_interrupt(consolep(), signal);
@@ -54,7 +54,7 @@ public:
             nes_clear(consolep(), signal);
         }
     }
-    void runMode(csig_excmode mode) const noexcept
+    void runMode(csig_excmode mode) noexcept
     {
         nes_set_mode(consolep(), mode);
     }
@@ -63,6 +63,7 @@ public:
 
     const std::filesystem::path& cartName() const noexcept { return cartname; }
     const Debugger& debugger() const noexcept { return hdebug; }
+    Debugger& debugger() noexcept { return hdebug; }
 
 private:
     cart* cartp() const noexcept { return hcart.get(); }

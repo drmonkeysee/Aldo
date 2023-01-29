@@ -67,7 +67,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
 auto process_event(const aldo::event& ev, aldo::Emulator& emu,
                    aldo::viewstate& s, const gui_platform& p)
 {
-    const auto& debugger = emu.debugger();
+    auto& debugger = emu.debugger();
     switch (ev.cmd) {
     case aldo::Command::breakpointAdd:
         debugger.addBreakpoint(std::get<haltexpr>(ev.value));

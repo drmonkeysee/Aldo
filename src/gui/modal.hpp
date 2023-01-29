@@ -19,8 +19,8 @@ namespace modal
 {
 
 void loadROM(Emulator& emu, const gui_platform& p);
-void loadBreakpoints(const Emulator& emu, const gui_platform& p);
-void exportBreakpoints(const Emulator& emu, const gui_platform& p);
+void loadBreakpoints(Emulator& emu, const gui_platform& p);
+void exportBreakpoints(Emulator& emu, const gui_platform& p);
 
 }
 

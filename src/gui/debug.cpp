@@ -85,15 +85,13 @@ auto write_brkfile(const std::filesystem::path& filepath,
 
 }
 
-void
-aldo::Debugger::loadBreakpoints(const std::filesystem::path& filepath) const
+void aldo::Debugger::loadBreakpoints(const std::filesystem::path& filepath)
 {
     const auto exprs = read_brkfile(filepath);
     set_debug_state(debugp(), exprs);
 }
 
-void
-aldo::Debugger::exportBreakpoints(const std::filesystem::path& filepath) const
+void aldo::Debugger::exportBreakpoints(const std::filesystem::path& filepath)
 {
     const auto resetvector = vectorOverride();
     const auto resOverride = resetvector != NoResetVector;

@@ -68,7 +68,7 @@ public:
 
         const_iterator cbegin() const noexcept
         {
-            return const_iterator{debugp, size()};
+            return const_iterator{debugp, std::ssize(*this)};
         }
         const_iterator cend() const noexcept { return const_iterator{}; }
         const_iterator begin() const noexcept { return cbegin(); }
@@ -94,9 +94,8 @@ public:
             using iterator_concept = std::forward_iterator_tag;
 
             BreakpointIterator() noexcept {}
-            BreakpointIterator(debugctx* d,
-                               BreakpointsView::size_type sz) noexcept
-            : debugp{d}, count{sz} {}
+            BreakpointIterator(debugctx* d, difference_type count) noexcept
+            : debugp{d}, count{count} {}
 
             reference operator*() const noexcept
             {
@@ -124,24 +123,19 @@ public:
             friend bool operator==(const BreakpointIterator& a,
                                    const BreakpointIterator& b) noexcept
             {
-                return (a.end_sentinel() && b.end_sentinel())
-                        || (b.end_sentinel() && a.exhausted())
-                        || (a.end_sentinel() && b.exhausted())
+                return (a.sentinel() && b.sentinel())
+                        || (b.sentinel() && a.exhausted())
+                        || (a.sentinel() && b.exhausted())
                         || (a.debugp == b.debugp && a.idx == b.idx
                             && a.count == b.count);
             }
 
         private:
-            bool end_sentinel() const noexcept { return !debugp; }
-            bool exhausted() const noexcept
-            {
-                return count == 0
-                        || idx == static_cast<difference_type>(count) - 1;
-            }
+            bool sentinel() const noexcept { return !debugp; }
+            bool exhausted() const noexcept { return idx == count; }
 
             debugctx* debugp = nullptr;
-            difference_type idx = 0;
-            BreakpointsView::size_type count = 0;
+            difference_type idx = 0, count = 0;
         };
 
     private:

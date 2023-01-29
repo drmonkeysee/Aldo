@@ -85,6 +85,8 @@ public:
         void remove(difference_type i) noexcept { debug_bp_remove(debugp, i); }
         void clear() noexcept { debug_bp_clear(debugp); }
 
+        // NOTE: as usual an iterator is invalidated
+        // if the underlying collection is modified.
         class BreakpointIterator {
         public:
             using difference_type = BreakpointsView::difference_type;

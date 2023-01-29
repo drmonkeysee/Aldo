@@ -21,6 +21,8 @@ namespace
 constexpr const char* DebugFileErrorTitle = "Debug File Error";
 
 using hexpr_buffer = std::array<aldo::et::tchar, HEXPR_FMT_SIZE>;
+using bp_size = aldo::Debugger::bp_collection::size_type;
+using bp_it = aldo::Debugger::bp_collection::const_iterator;
 
 auto read_brkfile(const std::filesystem::path& filepath)
 {
@@ -63,6 +65,22 @@ auto format_debug_expr(const debugexpr& expr, hexpr_buffer& buf)
     };
 }
 
+auto fill_expr_buffers(bp_size exprCount, int resetvector, bool resOverride,
+                       bp_it start, bp_it end)
+{
+    std::vector<hexpr_buffer> bufs(exprCount);
+    debugexpr expr;
+    for (auto it = bufs.begin(); start != end; ++start, ++it) {
+        expr = {.hexpr = start->expr, .type = debugexpr::DBG_EXPR_HALT};
+        format_debug_expr(expr, *it);
+    }
+    if (resOverride) {
+        expr = {.resetvector = resetvector, .type = debugexpr::DBG_EXPR_RESET};
+        format_debug_expr(expr, bufs.back());
+    }
+    return bufs;
+}
+
 auto write_brkline(const hexpr_buffer& buf, std::ofstream& f)
 {
     const std::string_view str{buf.data()};
@@ -94,29 +112,13 @@ void aldo::Debugger::loadBreakpoints(const std::filesystem::path& filepath)
 void
 aldo::Debugger::exportBreakpoints(const std::filesystem::path& filepath) const
 {
-    using bp_size = bp_collection::size_type;
-    using bp_it = bp_collection::const_iterator;
-
     const auto& bpColl = breakpoints();
     const auto resetvector = vectorOverride();
     const auto resOverride = resetvector != NoResetVector;
     const auto exprCount = bpColl.size() + static_cast<bp_size>(resOverride);
     if (exprCount == 0) return;
 
-    std::vector<hexpr_buffer> bufs(exprCount);
-    debugexpr expr;
-    bp_it bp;
-    decltype(bufs)::iterator it;
-    for (bp = bpColl.cbegin(), it = bufs.begin();
-         bp != bpColl.cend();
-         ++bp, ++it) {
-        expr = {.hexpr = bp->expr, .type = debugexpr::DBG_EXPR_HALT};
-        format_debug_expr(expr, *it);
-    }
-    if (resOverride) {
-        expr = {.resetvector = resetvector, .type = debugexpr::DBG_EXPR_RESET};
-        format_debug_expr(expr, bufs.back());
-    }
-
+    const auto bufs = fill_expr_buffers(exprCount, resetvector, resOverride,
+                                        bpColl.cbegin(), bpColl.cend());
     write_brkfile(filepath, bufs);
 }

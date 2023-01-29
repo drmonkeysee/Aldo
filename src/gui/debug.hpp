@@ -118,6 +118,7 @@ public:
                 using std::swap;
                 swap(debugp, that.debugp);
                 swap(idx, that.idx);
+                swap(count, that.count);
             }
 
             friend bool operator==(const BreakpointIterator& a,

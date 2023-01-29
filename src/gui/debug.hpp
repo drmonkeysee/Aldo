@@ -81,7 +81,7 @@ public:
             using value_type = BreakpointsView::value_type;
             using pointer = BreakpointsView::const_pointer;
             using reference = BreakpointsView::const_reference;
-            //using iterator_concept = TODO
+            using iterator_concept = std::input_iterator_tag;
 
             explicit BreakpointIterator(debugctx* d) noexcept : debugp{d} {}
 
@@ -112,7 +112,7 @@ public:
         };
 
     private:
-        static_assert(std::input_or_output_iterator<const_iterator>,
+        static_assert(std::input_iterator<const_iterator>,
                       "Incomplete breakpoint iterator definition");
 
         debugctx* debugp;

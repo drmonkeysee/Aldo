@@ -59,11 +59,11 @@ public:
     ~ScopedID() { ImGui::PopID(); }
 };
 
-using ScopedStyleVal = std::pair<ImGuiStyleVar, float>;
-using ScopedColorVal = std::pair<ImGuiCol, ImU32>;
+using scoped_style_val = std::pair<ImGuiStyleVar, float>;
+using scoped_color_val = std::pair<ImGuiCol, ImU32>;
 template<typename T>
 concept ScopedVal
-    = std::same_as<T, ScopedStyleVal> || std::same_as<T, ScopedColorVal>;
+    = std::same_as<T, scoped_style_val> || std::same_as<T, scoped_color_val>;
 
 template<ScopedVal V>
 class ALDO_SIDEFX ScopedWidgetVars {
@@ -90,7 +90,7 @@ private:
     }
 
     struct style_stack {
-        static void push(const ScopedStyleVal& style) noexcept
+        static void push(const scoped_style_val& style) noexcept
         {
             ImGui::PushStyleVar(style.first, style.second);
         }
@@ -100,7 +100,7 @@ private:
         }
     };
     struct color_stack {
-        static void push(const ScopedColorVal& color) noexcept
+        static void push(const scoped_color_val& color) noexcept
         {
             ImGui::PushStyleColor(color.first, color.second);
         }
@@ -109,15 +109,15 @@ private:
             ImGui::PopStyleColor(count);
         }
     };
-    using Policy = std::conditional_t<std::same_as<V, ScopedStyleVal>,
+    using Policy = std::conditional_t<std::same_as<V, scoped_style_val>,
                     style_stack,
                     color_stack>;
 
     bool condition;
     typename std::initializer_list<V>::size_type count;
 };
-using ScopedStyle = ScopedWidgetVars<ScopedStyleVal>;
-using ScopedColor = ScopedWidgetVars<ScopedColorVal>;
+using ScopedStyle = ScopedWidgetVars<scoped_style_val>;
+using ScopedColor = ScopedWidgetVars<scoped_color_val>;
 
 constexpr auto NoSelection = -1;
 
@@ -567,13 +567,13 @@ public:
              const aldo::MediaRuntime& r)
     : View{"Debugger", s, c, r}
     {
-        using haltval = halt_array::value_type;
-        using haltintegral = std::underlying_type_t<haltval::first_type>;
+        using halt_val = halt_array::value_type;
+        using halt_integral = std::underlying_type_t<halt_val::first_type>;
 
         // TODO: drop parens and use ranges in C++23?
         std::generate(haltConditions.begin(), haltConditions.end(),
-            [h = static_cast<haltintegral>(HLT_NONE)]() mutable -> haltval {
-                const auto cond = static_cast<haltval::first_type>(++h);
+            [h = static_cast<halt_integral>(HLT_NONE)]() mutable -> halt_val {
+                const auto cond = static_cast<halt_val::first_type>(++h);
                 return {cond, haltcond_description(cond)};
             });
         resetHaltExpression(haltConditions.cbegin());

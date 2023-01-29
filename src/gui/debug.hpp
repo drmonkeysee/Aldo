@@ -81,9 +81,12 @@ public:
             using value_type = BreakpointsView::value_type;
             using pointer = BreakpointsView::const_pointer;
             using reference = BreakpointsView::const_reference;
-            using iterator_concept = std::input_iterator_tag;
+            using iterator_concept = std::forward_iterator_tag;
 
-            explicit BreakpointIterator(debugctx* d) noexcept : debugp{d} {}
+            BreakpointIterator() noexcept {}
+            BreakpointIterator(debugctx* d,
+                               BreakpointsView::size_type sz) noexcept
+            : debugp{d}, count{sz} {}
 
             reference operator*() const noexcept
             {
@@ -106,13 +109,31 @@ public:
                 swap(idx, that.idx);
             }
 
+            friend bool operator==(const BreakpointIterator& a,
+                                   const BreakpointIterator& b) noexcept
+            {
+                return (a.end_sentinel() && b.end_sentinel())
+                        || (b.end_sentinel() && a.exhausted())
+                        || (a.end_sentinel() && b.exhausted())
+                        || (a.debugp == b.debugp && a.idx == b.idx
+                            && a.count == b.count);
+            }
+
         private:
-            debugctx* debugp;
+            bool end_sentinel() const noexcept { return !debugp; }
+            bool exhausted() const noexcept
+            {
+                return count == 0
+                        || idx == static_cast<difference_type>(count) - 1;
+            }
+
+            debugctx* debugp = nullptr;
             difference_type idx = 0;
+            BreakpointsView::size_type count = 0;
         };
 
     private:
-        static_assert(std::input_iterator<const_iterator>,
+        static_assert(std::forward_iterator<const_iterator>,
                       "Incomplete breakpoint iterator definition");
 
         debugctx* debugp;

@@ -77,15 +77,6 @@ public:
             ++*this;
             return tmp;
         }
-        void swap(BreakpointIterator& that) noexcept
-        {
-            using std::swap;
-
-            if (this == &that) return;
-            swap(debugp, that.debugp);
-            swap(idx, that.idx);
-            swap(count, that.count);
-        }
 
         friend bool operator==(const BreakpointIterator& a,
                                const BreakpointIterator& b) noexcept
@@ -167,12 +158,6 @@ private:
 
     debug_handle hdebug;
 };
-
-inline void swap(Debugger::BreakpointIterator& a,
-                 Debugger::BreakpointIterator& b) noexcept
-{
-    a.swap(b);
-}
 
 }
 

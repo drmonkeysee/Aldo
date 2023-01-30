@@ -56,7 +56,6 @@ public:
     {
         using std::swap;
 
-        if (this == &that) return;
         swap(recorded, that.recorded);
         swap(start, that.start);
         swap(result, that.result);

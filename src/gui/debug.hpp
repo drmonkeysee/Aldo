@@ -73,8 +73,6 @@ public:
         const_iterator cend() const noexcept { return const_iterator{}; }
         const_iterator begin() const noexcept { return cbegin(); }
         const_iterator end() const noexcept { return cend(); }
-        const_iterator begin() noexcept { return cbegin(); }
-        const_iterator end() noexcept { return cend(); }
 
         void append(haltexpr expr) noexcept { debug_bp_add(debugp, expr); }
         void toggleEnabled(difference_type i) noexcept

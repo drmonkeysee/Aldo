@@ -11,7 +11,6 @@
 
 #include <array>
 #include <fstream>
-#include <span>
 #include <string_view>
 #include <vector>
 
@@ -45,7 +44,8 @@ auto read_brkfile(const std::filesystem::path& filepath)
     return exprs;
 }
 
-auto set_debug_state(debugctx* dbg, std::span<const debugexpr> exprs) noexcept
+auto set_debug_state(debugctx* dbg,
+                     const std::vector<debugexpr>& exprs) noexcept
 {
     debug_reset(dbg);
     for (const auto& expr : exprs) {
@@ -66,12 +66,12 @@ auto format_debug_expr(const debugexpr& expr, hexpr_buffer& buf)
 }
 
 auto fill_expr_buffers(bp_size exprCount, int resetvector, bool resOverride,
-                       bp_it start, bp_it end)
+                       bp_it first, bp_it last)
 {
     std::vector<hexpr_buffer> bufs(exprCount);
     debugexpr expr;
-    for (auto it = bufs.begin(); start != end; ++start, ++it) {
-        expr = {.hexpr = start->expr, .type = debugexpr::DBG_EXPR_HALT};
+    for (auto it = bufs.begin(); first != last; ++first, ++it) {
+        expr = {.hexpr = first->expr, .type = debugexpr::DBG_EXPR_HALT};
         format_debug_expr(expr, *it);
     }
     if (resOverride) {
@@ -92,7 +92,7 @@ auto write_brkline(const hexpr_buffer& buf, std::ofstream& f)
 }
 
 auto write_brkfile(const std::filesystem::path& filepath,
-                   std::span<const hexpr_buffer> bufs)
+                   const std::vector<hexpr_buffer>& bufs)
 {
     std::ofstream f{filepath};
     if (!f) throw aldo::AldoError{"Cannot create breakpoints file", filepath};
@@ -105,8 +105,7 @@ auto write_brkfile(const std::filesystem::path& filepath,
 
 void aldo::Debugger::loadBreakpoints(const std::filesystem::path& filepath)
 {
-    const auto exprs = read_brkfile(filepath);
-    set_debug_state(debugp(), exprs);
+    set_debug_state(debugp(), read_brkfile(filepath));
 }
 
 void

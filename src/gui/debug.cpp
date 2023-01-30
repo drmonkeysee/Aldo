@@ -18,11 +18,11 @@
 namespace
 {
 
-constexpr const char* DebugFileErrorTitle = "Debug File Error";
-
 using hexpr_buffer = std::array<aldo::et::tchar, HEXPR_FMT_SIZE>;
 using bp_size = aldo::Debugger::bp_collection::size_type;
 using bp_it = aldo::Debugger::bp_collection::const_iterator;
+
+constexpr const char* DebugFileErrorTitle = "Debug File Error";
 
 auto read_brkfile(const std::filesystem::path& filepath)
 {

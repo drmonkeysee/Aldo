@@ -118,6 +118,8 @@ public:
             void swap(BreakpointIterator& that) noexcept
             {
                 using std::swap;
+
+                if (this == &that) return;
                 swap(debugp, that.debugp);
                 swap(idx, that.idx);
                 swap(count, that.count);
@@ -138,7 +140,7 @@ public:
             bool exhausted() const noexcept { return idx == count; }
 
             debugctx* debugp = nullptr;
-            difference_type idx = 0, count = 0;
+            difference_type count = 0, idx = 0;
         };
 
     private:

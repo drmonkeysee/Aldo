@@ -55,6 +55,8 @@ public:
     void swap(RunTimer& that) noexcept
     {
         using std::swap;
+
+        if (this == &that) return;
         swap(recorded, that.recorded);
         swap(start, that.start);
         swap(result, that.result);

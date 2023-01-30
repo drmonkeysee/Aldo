@@ -18,6 +18,7 @@
 #include <functional>
 #include <initializer_list>
 #include <iterator> // for std::data(); weird this isn't in <initializer_list>
+#include <utility>
 
 #define EXT_BRK "brk"
 
@@ -93,7 +94,7 @@ void aldo::modal::exportBreakpoints(aldo::Emulator& emu, const gui_platform& p)
 {
     file_modal([n = brkfile_name(emu.cartName())](const gui_platform& p) {
         return save_file(p, "Export Breakpoints", n);
-    }, [&d = emu.debugger()](const std::filesystem::path& p) {
+    }, [&d = std::as_const(emu.debugger())](const std::filesystem::path& p) {
         d.exportBreakpoints(p);
     }, emu, p);
 }

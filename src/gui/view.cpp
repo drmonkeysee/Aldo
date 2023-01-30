@@ -349,7 +349,7 @@ protected:
         std::string_view trail;
         int nameLen;
         bool truncated;
-        if (nameFit < static_cast<int>(name.length())) {
+        if (nameFit < std::ssize(name)) {
             trail = "..."sv;
             nameLen = std::max(0, nameFit - static_cast<int>(trail.length()));
             truncated = true;

@@ -34,7 +34,6 @@ public:
     {
         debug_set_vector_override(debugp(), resetvector);
     }
-
     BreakpointsView<false> breakpoints() const noexcept { return {debugp()}; }
     BreakpointsView<true> breakpoints() noexcept { return {debugp()}; }
 

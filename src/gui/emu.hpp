@@ -44,6 +44,10 @@ class Emulator {
 public:
     Emulator(Debugger d, console_handle n, const gui_platform& p);
 
+    const std::filesystem::path& cartName() const noexcept { return cartname; }
+    const Debugger& debugger() const noexcept { return hdebug; }
+    Debugger& debugger() noexcept { return hdebug; }
+
     void halt() noexcept { nes_halt(consolep()); }
     void ready() noexcept { nes_ready(consolep()); }
     void interrupt(csig_interrupt signal, bool active) noexcept
@@ -60,10 +64,6 @@ public:
     }
 
     void loadCart(const std::filesystem::path& filepath);
-
-    const std::filesystem::path& cartName() const noexcept { return cartname; }
-    const Debugger& debugger() const noexcept { return hdebug; }
-    Debugger& debugger() noexcept { return hdebug; }
 
 private:
     cart* cartp() const noexcept { return hcart.get(); }

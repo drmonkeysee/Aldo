@@ -68,7 +68,7 @@ auto process_event(const aldo::event& ev, aldo::Emulator& emu,
                    aldo::viewstate& s, const gui_platform& p)
 {
     auto& debugger = emu.debugger();
-    auto& breakpoints = debugger.breakpoints();
+    auto breakpoints = debugger.breakpoints();
     switch (ev.cmd) {
     case aldo::Command::breakpointAdd:
         breakpoints.append(std::get<haltexpr>(ev.value));

@@ -18,8 +18,8 @@ namespace
 {
 
 using hexpr_buffer = std::array<aldo::et::tchar, HEXPR_FMT_SIZE>;
-using bp_size = aldo::Debugger::bp_collection::size_type;
-using bp_it = aldo::Debugger::bp_collection::const_iterator;
+using bp_it = aldo::Debugger::bp_iterator;
+using bp_size = bp_it::size_type;
 
 constexpr const char* DebugFileErrorTitle = "Debug File Error";
 

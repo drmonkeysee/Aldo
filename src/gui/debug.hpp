@@ -27,7 +27,7 @@ public:
     class BreakpointsView;
     using bp_collection = BreakpointsView;
 
-    explicit Debugger(debug_handle d) noexcept
+    Debugger(debug_handle d) noexcept
     : hdebug{std::move(d)}, bpview{debugp()} {}
 
     void vectorOverride(int resetvector) noexcept

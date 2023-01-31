@@ -27,6 +27,8 @@ public:
     class BreakpointIterator;
     template<bool> class BreakpointsView;
     using bp_iterator = BreakpointIterator;
+    using BpView = BreakpointsView<false>;
+    using MutableBpView = BreakpointsView<true>;
 
     Debugger(debug_handle d) noexcept : hdebug{std::move(d)} {}
 
@@ -34,8 +36,8 @@ public:
     {
         debug_set_vector_override(debugp(), resetvector);
     }
-    BreakpointsView<false> breakpoints() const noexcept { return {debugp()}; }
-    BreakpointsView<true> breakpoints() noexcept { return {debugp()}; }
+    BpView breakpoints() const noexcept { return {debugp()}; }
+    MutableBpView breakpoints() noexcept { return {debugp()}; }
 
     bool isActive() const noexcept
     {
@@ -54,9 +56,8 @@ public:
         using pointer = const value_type*;
         using reference = const value_type&;
         using iterator_concept = std::forward_iterator_tag;
-        using size_type = et::size;
 
-        BreakpointIterator() noexcept {}
+        BreakpointIterator() = default;
         BreakpointIterator(debugctx* d, difference_type count) noexcept
         : debugp{d}, count{count} {}
 
@@ -102,7 +103,7 @@ public:
     class BreakpointsView {
     public:
         using value_type = BreakpointIterator::value_type;
-        using size_type = BreakpointIterator::size_type;
+        using size_type = et::size;
         using difference_type = BreakpointIterator::difference_type;
         using const_reference = BreakpointIterator::reference;
         using const_pointer = BreakpointIterator::pointer;

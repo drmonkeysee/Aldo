@@ -57,7 +57,7 @@ public:
         using reference = const value_type&;
         using iterator_concept = std::forward_iterator_tag;
 
-        BreakpointIterator() = default;
+        BreakpointIterator() noexcept = default;
         BreakpointIterator(debugctx* d, difference_type count) noexcept
         : debugp{d}, count{count} {}
 

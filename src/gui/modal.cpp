@@ -7,6 +7,7 @@
 
 #include "modal.hpp"
 
+#include "debug.hpp"
 #include "emu.hpp"
 #include "error.hpp"
 #include "guiplatform.h"
@@ -20,20 +21,11 @@
 #include <iterator> // for std::data(); weird this isn't in <initializer_list>
 #include <utility>
 
-#define EXT_BRK "brk"
-
 namespace
 {
 
 using modal_launch = std::function<std::filesystem::path(const gui_platform&)>;
 using modal_operation = std::function<void(const std::filesystem::path&)>;
-
-auto brkfile_name(std::filesystem::path cartname)
-{
-    return cartname.empty()
-            ? "breakpoints." EXT_BRK
-            : cartname.replace_extension(EXT_BRK);
-}
 
 auto open_file(const gui_platform& p, const char* title,
                std::initializer_list<const char*> filter = {nullptr})
@@ -84,7 +76,8 @@ void aldo::modal::loadROM(aldo::Emulator& emu, const gui_platform& p)
 void aldo::modal::loadBreakpoints(aldo::Emulator& emu, const gui_platform& p)
 {
     file_modal([](const gui_platform& p) {
-        return open_file(p, "Choose a Breakpoints file", {EXT_BRK, nullptr});
+        return open_file(p, "Choose a Breakpoints file",
+                         {aldo::debug::BreakFileExtension.c_str(), nullptr});
     }, [&d = emu.debugger()](const std::filesystem::path& p) {
         d.loadBreakpoints(p);
     }, emu, p);
@@ -92,7 +85,8 @@ void aldo::modal::loadBreakpoints(aldo::Emulator& emu, const gui_platform& p)
 
 void aldo::modal::exportBreakpoints(aldo::Emulator& emu, const gui_platform& p)
 {
-    file_modal([n = brkfile_name(emu.cartName())](const gui_platform& p) {
+    file_modal([n = aldo::debug::breakfile_path_from(emu.cartName())]
+               (const gui_platform& p) {
         return save_file(p, "Export Breakpoints", n);
     }, [&d = std::as_const(emu.debugger())](const std::filesystem::path& p) {
         d.exportBreakpoints(p);

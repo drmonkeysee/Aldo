@@ -9,6 +9,8 @@
 
 #include "error.hpp"
 
+#include <SDL2/SDL.h>
+
 #include <array>
 #include <fstream>
 #include <string_view>
@@ -111,13 +113,37 @@ void aldo::Debugger::loadBreakpoints(const std::filesystem::path& filepath)
 void
 aldo::Debugger::exportBreakpoints(const std::filesystem::path& filepath) const
 {
-    const auto& bpColl = breakpoints();
-    const auto resetvector = vectorOverride();
-    const auto resOverride = resetvector != NoResetVector;
-    const auto exprCount = bpColl.size() + static_cast<bp_size>(resOverride);
+    const auto bpView = breakpoints();
+    const auto resOverride = isVectorOverridden();
+    const auto exprCount = bpView.size() + static_cast<bp_size>(resOverride);
     if (exprCount == 0) return;
 
-    const auto bufs = fill_expr_buffers(exprCount, resetvector, resOverride,
-                                        bpColl.cbegin(), bpColl.cend());
+    const auto bufs = fill_expr_buffers(exprCount, vectorOverride(),
+                                        resOverride, bpView.cbegin(),
+                                        bpView.cend());
     write_brkfile(filepath, bufs);
+}
+
+void aldo::Debugger::loadCartState(const std::filesystem::path& prefCartPath)
+{
+    const auto brkpath = aldo::debug::breakfile_path_from(prefCartPath);
+    if (!std::filesystem::exists(brkpath)) return;
+    loadBreakpoints(brkpath);
+}
+
+void
+aldo::Debugger::saveCartState(const std::filesystem::path& prefCartPath) const
+{
+    const auto brkpath = aldo::debug::breakfile_path_from(prefCartPath);
+    if (isActive()) {
+        exportBreakpoints(brkpath);
+    } else {
+        try {
+            std::filesystem::remove(brkpath);
+        } catch (const std::filesystem::filesystem_error& ex) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                        "Failed to delete breakpoint file: (%d) %s",
+                        ex.code().value(), ex.what());
+        }
+    }
 }

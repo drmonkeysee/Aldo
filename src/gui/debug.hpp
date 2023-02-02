@@ -15,10 +15,26 @@
 
 #include <filesystem>
 #include <iterator>
+#include <string>
 #include <utility>
 
 namespace aldo
 {
+
+namespace debug
+{
+
+inline const std::string BreakFileExtension = "brk";
+
+inline std::filesystem::path breakfile_path_from(std::filesystem::path path)
+{
+    if (path.empty()) {
+        path = "breakpoints";
+    }
+    return path.replace_extension(BreakFileExtension);
+}
+
+}
 
 using debug_handle = handle<debugctx, debug_free>;
 
@@ -40,11 +56,13 @@ public:
 
     bool isActive() const noexcept
     {
-        return vectorOverride() != NoResetVector || !breakpoints().empty();
+        return isVectorOverridden() || !breakpoints().empty();
     }
 
     void loadBreakpoints(const std::filesystem::path& filepath);
     void exportBreakpoints(const std::filesystem::path& filepath) const;
+    void loadCartState(const std::filesystem::path& prefCartPath);
+    void saveCartState(const std::filesystem::path& prefCartPath) const;
 
     // NOTE: as usual an iterator is invalidated if the underlying
     // collection is modified.
@@ -151,6 +169,11 @@ private:
     int vectorOverride() const noexcept
     {
         return debug_vector_override(debugp());
+    }
+
+    bool isVectorOverridden() const noexcept
+    {
+        return vectorOverride() != NoResetVector;
     }
 
     debugctx* debugp() const noexcept { return hdebug.get(); }

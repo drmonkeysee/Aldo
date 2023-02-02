@@ -69,6 +69,9 @@ private:
     cart* cartp() const noexcept { return hcart.get(); }
     nes* consolep() const noexcept { return hconsole.get(); }
 
+    void loadCartState();
+    void saveCartState() const;
+
     std::filesystem::path cartpath;
     std::filesystem::path cartname;
     std::filesystem::path prefspath;

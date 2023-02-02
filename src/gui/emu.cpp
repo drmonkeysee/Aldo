@@ -49,6 +49,10 @@ auto load_cart(const std::filesystem::path& filepath)
 
 }
 
+//
+// Public Interface
+//
+
 aldo::Emulator::Emulator(Debugger d, console_handle n, const gui_platform& p)
 : prefspath{get_prefspath(p)}, hdebug{std::move(d)}, hconsole{std::move(n)},
     hsnapshot{consolep()} {}
@@ -56,11 +60,28 @@ aldo::Emulator::Emulator(Debugger d, console_handle n, const gui_platform& p)
 void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
 {
     const auto c = load_cart(filepath);
-    //saveCartState(p);
+    saveCartState();
     nes_powerdown(consolep());
     hcart.reset(c);
     nes_powerup(consolep(), cartp(), false);
     cartpath = filepath;
     cartname = cartpath.stem();
-    //loadCartState(p);
+    loadCartState();
+}
+
+//
+// Private Interface
+//
+
+void aldo::Emulator::loadCartState()
+{
+    debugger().loadCartState(prefspath / cartName());
+}
+
+
+void aldo::Emulator::saveCartState() const
+{
+    if (!hcart) return;
+
+    debugger().saveCartState(prefspath / cartName());
 }

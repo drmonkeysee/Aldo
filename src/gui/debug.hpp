@@ -26,7 +26,6 @@ class Debugger {
 public:
     class BreakpointIterator;
     template<bool> class BreakpointsView;
-    using bp_iterator = BreakpointIterator;
     using BpView = BreakpointsView<false>;
     using MutableBpView = BreakpointsView<true>;
 
@@ -102,12 +101,12 @@ public:
     template<bool Mutable = false>
     class BreakpointsView {
     public:
-        using value_type = BreakpointIterator::value_type;
+        using const_iterator = BreakpointIterator;
+        using value_type = const_iterator::value_type;
         using size_type = et::size;
-        using difference_type = BreakpointIterator::difference_type;
-        using const_reference = BreakpointIterator::reference;
-        using const_pointer = BreakpointIterator::pointer;
-        using const_iterator = bp_iterator;
+        using difference_type = const_iterator::difference_type;
+        using const_reference = const_iterator::reference;
+        using const_pointer = const_iterator::pointer;
 
         BreakpointsView(debugctx* d) noexcept : debugp{d} {}
 

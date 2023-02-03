@@ -60,6 +60,10 @@ public:
     {
         return hsnapshot.getp();
     }
+    bool haltedByDebugger() const noexcept
+    {
+        return debugger().hasBreak(snapshot());
+    }
 
     void halt() noexcept { nes_halt(consolep()); }
     void ready() noexcept { nes_ready(consolep()); }

@@ -12,6 +12,7 @@
 #include "emutypes.hpp"
 #include "haltexpr.h"
 #include "handle.hpp"
+#include "snapshot.h"
 
 #include <filesystem>
 #include <iterator>
@@ -55,6 +56,10 @@ public:
     {
         debug_set_vector_override(debugp(), resetvector);
     }
+    void vectorClear() noexcept
+    {
+        vectorOverride(NoResetVector);
+    }
     bool isVectorOverridden() const noexcept
     {
         return vectorOverride() != NoResetVector;
@@ -64,6 +69,10 @@ public:
     bool isActive() const noexcept
     {
         return isVectorOverridden() || !breakpoints().empty();
+    }
+    bool hasBreak(const console_state& snapshot) const noexcept
+    {
+        return snapshot.debugger.halted != NoBreakpoint;
     }
 
     void loadBreakpoints(const std::filesystem::path& filepath);

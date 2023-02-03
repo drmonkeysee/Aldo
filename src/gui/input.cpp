@@ -111,7 +111,10 @@ auto process_event(const aldo::event& ev, aldo::Emulator& emu,
     case aldo::Command::openROM:
         aldo::modal::loadROM(emu, p);
         break;
-    case aldo::Command::overrideReset:
+    case aldo::Command::resetVectorClear:
+        debugger.vectorClear();
+        break;
+    case aldo::Command::resetVectorOverride:
         debugger.vectorOverride(std::get<int>(ev.value));
         break;
     case aldo::Command::quit:

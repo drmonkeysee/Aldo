@@ -12,7 +12,6 @@
 #include "cart.h"
 #include "ctrlsignal.h"
 #include "cycleclock.h"
-#include "debug.h"
 #include "debug.hpp"
 #include "dis.h"
 #include "emu.hpp"
@@ -615,10 +614,10 @@ private:
 
         if (ImGui::Checkbox("Override", &resetOverride)) {
             if (resetOverride) {
-                vs.events.emplace(aldo::Command::overrideReset,
+                vs.events.emplace(aldo::Command::resetVectorOverride,
                                   static_cast<int>(resetAddr));
             } else {
-                vs.events.emplace(aldo::Command::overrideReset, NoResetVector);
+                vs.events.emplace(aldo::Command::resetVectorClear);
             }
         }
         if (!resetOverride) {
@@ -627,7 +626,7 @@ private:
             resetAddr = batowr(emu.snapshot().mem.vectors + 2);
         }
         if (input_address(&resetAddr)) {
-            vs.events.emplace(aldo::Command::overrideReset,
+            vs.events.emplace(aldo::Command::resetVectorOverride,
                               static_cast<int>(resetAddr));
         }
         if (!resetOverride) {
@@ -642,7 +641,7 @@ private:
         renderBreakpointAdd(setFocus);
         ImGui::Separator();
         renderBreakpointList();
-        detectedHalt = emu.snapshot().debugger.halted != NoBreakpoint;
+        detectedHalt = emu.haltedByDebugger();
     }
 
     bool renderConditionCombo() noexcept

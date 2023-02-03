@@ -35,7 +35,8 @@ enum class Command {
     mode,
     launchStudio,
     openROM,
-    overrideReset,
+    resetVectorClear,
+    resetVectorOverride,
     quit,
 };
 

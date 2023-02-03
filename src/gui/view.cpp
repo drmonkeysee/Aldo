@@ -279,17 +279,17 @@ auto about_overlay(aldo::viewstate& vs) noexcept
 // Concrete Views
 //
 
-class Bouncer final : public aldo::View {
+class BouncerView final : public aldo::View {
 public:
-    Bouncer(aldo::viewstate& vs, const aldo::Emulator& emu,
-            const aldo::MediaRuntime& mr) noexcept
+    BouncerView(aldo::viewstate& vs, const aldo::Emulator& emu,
+                const aldo::MediaRuntime& mr) noexcept
     : View{"Bouncer", vs, emu, mr} {}
-    Bouncer(aldo::viewstate&, aldo::Emulator&&,
-            const aldo::MediaRuntime&) = delete;
-    Bouncer(aldo::viewstate&, const aldo::Emulator&,
-            aldo::MediaRuntime&&) = delete;
-    Bouncer(aldo::viewstate&, aldo::Emulator&&,
-            aldo::MediaRuntime&&) = delete;
+    BouncerView(aldo::viewstate&, aldo::Emulator&&,
+                const aldo::MediaRuntime&) = delete;
+    BouncerView(aldo::viewstate&, const aldo::Emulator&,
+                aldo::MediaRuntime&&) = delete;
+    BouncerView(aldo::viewstate&, aldo::Emulator&&,
+                aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() override
@@ -324,17 +324,17 @@ protected:
     }
 };
 
-class CartInfo final : public aldo::View {
+class CartInfoView final : public aldo::View {
 public:
-    CartInfo(aldo::viewstate& vs, const aldo::Emulator& emu,
-             const aldo::MediaRuntime& mr) noexcept
+    CartInfoView(aldo::viewstate& vs, const aldo::Emulator& emu,
+                 const aldo::MediaRuntime& mr) noexcept
     : View{"Cart Info", vs, emu, mr} {}
-    CartInfo(aldo::viewstate&, aldo::Emulator&&,
-             const aldo::MediaRuntime&) = delete;
-    CartInfo(aldo::viewstate&, const aldo::Emulator&,
-             aldo::MediaRuntime&&) = delete;
-    CartInfo(aldo::viewstate&, aldo::Emulator&&,
-             aldo::MediaRuntime&&) = delete;
+    CartInfoView(aldo::viewstate&, aldo::Emulator&&,
+                 const aldo::MediaRuntime&) = delete;
+    CartInfoView(aldo::viewstate&, const aldo::Emulator&,
+                 aldo::MediaRuntime&&) = delete;
+    CartInfoView(aldo::viewstate&, aldo::Emulator&&,
+                 aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() override
@@ -427,17 +427,16 @@ protected:
     }
 };
 
-class Cpu final : public aldo::View {
+class CpuView final : public aldo::View {
 public:
-    Cpu(aldo::viewstate& vs, const aldo::Emulator& emu,
-        const aldo::MediaRuntime& mr) noexcept
+    CpuView(aldo::viewstate& vs, const aldo::Emulator& emu,
+            const aldo::MediaRuntime& mr) noexcept
     : View{"CPU", vs, emu, mr} {}
-    Cpu(aldo::viewstate&, aldo::Emulator&&,
-        const aldo::MediaRuntime&) = delete;
-    Cpu(aldo::viewstate&, const aldo::Emulator&,
-        aldo::MediaRuntime&&) = delete;
-    Cpu(aldo::viewstate&, aldo::Emulator&&,
-        aldo::MediaRuntime&&) = delete;
+    CpuView(aldo::viewstate&, aldo::Emulator&&,
+            const aldo::MediaRuntime&) = delete;
+    CpuView(aldo::viewstate&, const aldo::Emulator&,
+            aldo::MediaRuntime&&) = delete;
+    CpuView(aldo::viewstate&, aldo::Emulator&&, aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() override
@@ -818,17 +817,17 @@ private:
     bp_diff selectedBreakpoint = NoSelection;
 };
 
-class HardwareTraits final : public aldo::View {
+class HardwareTraitsView final : public aldo::View {
 public:
-    HardwareTraits(aldo::viewstate& vs, const aldo::Emulator& emu,
-                   const aldo::MediaRuntime& mr) noexcept
+    HardwareTraitsView(aldo::viewstate& vs, const aldo::Emulator& emu,
+                       const aldo::MediaRuntime& mr) noexcept
     : View{"Hardware Traits", vs, emu, mr} {}
-    HardwareTraits(aldo::viewstate&, aldo::Emulator&&,
-                   const aldo::MediaRuntime&) = delete;
-    HardwareTraits(aldo::viewstate&, const aldo::Emulator&,
-                   aldo::MediaRuntime&&) = delete;
-    HardwareTraits(aldo::viewstate&, aldo::Emulator&&,
-                   aldo::MediaRuntime&&) = delete;
+    HardwareTraitsView(aldo::viewstate&, aldo::Emulator&&,
+                       const aldo::MediaRuntime&) = delete;
+    HardwareTraitsView(aldo::viewstate&, const aldo::Emulator&,
+                       aldo::MediaRuntime&&) = delete;
+    HardwareTraitsView(aldo::viewstate&, aldo::Emulator&&,
+                       aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() override
@@ -926,17 +925,17 @@ private:
     double dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0, refreshDt = 0;
 };
 
-class PrgAtPc final : public aldo::View {
+class PrgAtPcView final : public aldo::View {
 public:
-    PrgAtPc(aldo::viewstate& vs, const aldo::Emulator& emu,
-            const aldo::MediaRuntime& mr) noexcept
+    PrgAtPcView(aldo::viewstate& vs, const aldo::Emulator& emu,
+                const aldo::MediaRuntime& mr) noexcept
     : View{"PRG @ PC", vs, emu, mr} {}
-    PrgAtPc(aldo::viewstate&, aldo::Emulator&&,
-            const aldo::MediaRuntime&) = delete;
-    PrgAtPc(aldo::viewstate&, const aldo::Emulator&,
-            aldo::MediaRuntime&&) = delete;
-    PrgAtPc(aldo::viewstate&, aldo::Emulator&&,
-            aldo::MediaRuntime&&) = delete;
+    PrgAtPcView(aldo::viewstate&, aldo::Emulator&&,
+                const aldo::MediaRuntime&) = delete;
+    PrgAtPcView(aldo::viewstate&, const aldo::Emulator&,
+                aldo::MediaRuntime&&) = delete;
+    PrgAtPcView(aldo::viewstate&, aldo::Emulator&&,
+                aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() override
@@ -1023,17 +1022,16 @@ private:
     int selected = NoSelection;
 };
 
-class Ram final : public aldo::View {
+class RamView final : public aldo::View {
 public:
-    Ram(aldo::viewstate& vs, const aldo::Emulator& emu,
-        const aldo::MediaRuntime& mr) noexcept
+    RamView(aldo::viewstate& vs, const aldo::Emulator& emu,
+            const aldo::MediaRuntime& mr) noexcept
     : View{"RAM", vs, emu, mr} {}
-    Ram(aldo::viewstate&, aldo::Emulator&&,
-        const aldo::MediaRuntime&) = delete;
-    Ram(aldo::viewstate&, const aldo::Emulator&,
-        aldo::MediaRuntime&&) = delete;
-    Ram(aldo::viewstate&, aldo::Emulator&&,
-        aldo::MediaRuntime&&) = delete;
+    RamView(aldo::viewstate&, aldo::Emulator&&,
+            const aldo::MediaRuntime&) = delete;
+    RamView(aldo::viewstate&, const aldo::Emulator&,
+            aldo::MediaRuntime&&) = delete;
+    RamView(aldo::viewstate&, aldo::Emulator&&, aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() override
@@ -1130,13 +1128,13 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
 : vs{vs}, emu{emu}, mr{mr}
 {
     add_views<
-        Bouncer,
-        CartInfo,
-        Cpu,
+        BouncerView,
+        CartInfoView,
+        CpuView,
         DebuggerView,
-        HardwareTraits,
-        PrgAtPc,
-        Ram>(views, vs, emu, mr);
+        HardwareTraitsView,
+        PrgAtPcView,
+        RamView>(views, vs, emu, mr);
 }
 
 void aldo::Layout::render() const

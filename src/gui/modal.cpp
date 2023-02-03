@@ -33,7 +33,7 @@ auto open_file(const gui_platform& p, const char* title,
     const aldo::platform_buffer buf{
         p.open_file(title, std::data(filter)), p.free_buffer,
     };
-    return std::filesystem::path{buf.get()};
+    return buf ? std::filesystem::path{buf.get()} : std::filesystem::path{};
 }
 
 auto save_file(const gui_platform& p, const char* title,
@@ -42,7 +42,7 @@ auto save_file(const gui_platform& p, const char* title,
     const aldo::platform_buffer buf{
         p.save_file(title, suggestedName.c_str()), p.free_buffer,
     };
-    return std::filesystem::path{buf.get()};
+    return buf ? std::filesystem::path{buf.get()} : std::filesystem::path{};
 }
 
 auto file_modal(modal_launch open, modal_operation op, aldo::Emulator& emu,

@@ -802,7 +802,7 @@ private:
         // NOTE: if another case like this comes up it may be worth coming up
         // with a model -> view notification system.
         const auto& dbg = emu.debugger();
-        if (dbg.isVectorOverridden()) {
+        if ((resetOverride = dbg.isVectorOverridden())) {
             resetAddr = static_cast<aldo::et::word>(dbg.vectorOverride());
         }
     }

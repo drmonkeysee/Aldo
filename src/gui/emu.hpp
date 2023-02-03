@@ -16,6 +16,8 @@
 #include "snapshot.h"
 
 #include <filesystem>
+#include <optional>
+#include <string_view>
 
 struct gui_platform;
 
@@ -37,6 +39,7 @@ public:
     ~Snapshot() { snapshot_clear(getp()); }
 
     const console_state& get() const noexcept { return snapshot; }
+    const console_state* getp() const noexcept { return &snapshot; }
     console_state* getp() noexcept { return &snapshot; }
 
 private:
@@ -48,9 +51,15 @@ public:
     Emulator(Debugger d, console_handle n, const gui_platform& p);
 
     const std::filesystem::path& cartName() const noexcept { return cartname; }
+    std::string_view displayCartName() const noexcept;
+    std::optional<cartinfo> cartInfo() const;
     const Debugger& debugger() const noexcept { return hdebug; }
     Debugger& debugger() noexcept { return hdebug; }
     const console_state& snapshot() const noexcept { return hsnapshot.get(); }
+    const console_state* snapshotp() const noexcept
+    {
+        return hsnapshot.getp();
+    }
 
     void halt() noexcept { nes_halt(consolep()); }
     void ready() noexcept { nes_ready(consolep()); }
@@ -62,6 +71,7 @@ public:
             nes_clear(consolep(), signal);
         }
     }
+    enum csig_excmode runMode() const noexcept { return nes_mode(consolep()); }
     void runMode(csig_excmode mode) noexcept
     {
         nes_set_mode(consolep(), mode);

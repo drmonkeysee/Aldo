@@ -13,8 +13,9 @@
 #include "ctrlsignal.h"
 #include "cycleclock.h"
 #include "debug.h"
+#include "debug.hpp"
 #include "dis.h"
-#include "emulator.hpp"
+#include "emu.hpp"
 #include "emutypes.hpp"
 #include "haltexpr.h"
 #include "mediaruntime.hpp"
@@ -168,10 +169,11 @@ auto enter_pressed() noexcept
 }
 
 template<std::derived_from<aldo::View>... Vs>
-auto add_views(std::vector<std::unique_ptr<aldo::View>>& v, aldo::viewstate& s,
-               const aldo::EmuController& c, const aldo::MediaRuntime& r)
+auto add_views(std::vector<std::unique_ptr<aldo::View>>& v,
+               aldo::viewstate& vs, const aldo::Emulator& emu,
+               const aldo::MediaRuntime& mr)
 {
-    (v.push_back(std::make_unique<Vs>(s, c, r)), ...);
+    (v.push_back(std::make_unique<Vs>(vs, emu, mr)), ...);
 }
 
 //
@@ -185,40 +187,40 @@ auto widget_group(std::invocable auto f)
     ImGui::EndGroup();
 }
 
-auto main_menu(aldo::viewstate& s, const aldo::EmuController& c,
-               const aldo::MediaRuntime& r)
+auto main_menu(aldo::viewstate& vs, const aldo::Emulator& emu,
+               const aldo::MediaRuntime& mr)
 {
     if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu(SDL_GetWindowTitle(r.window()))) {
-            ImGui::MenuItem("About", nullptr, &s.showAbout);
+        if (ImGui::BeginMenu(SDL_GetWindowTitle(mr.window()))) {
+            ImGui::MenuItem("About", nullptr, &vs.showAbout);
             if (ImGui::MenuItem("Quit", "Cmd+Q")) {
-                s.events.emplace(aldo::Command::quit);
+                vs.events.emplace(aldo::Command::quit);
             };
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Open ROM", "Cmd+O")) {
-                s.events.emplace(aldo::Command::openROM);
+                vs.events.emplace(aldo::Command::openROM);
             }
             ImGui::Separator();
             if (ImGui::MenuItem("Open Breakpoints", "Cmd+B")) {
-                s.events.emplace(aldo::Command::breakpointsOpen);
+                vs.events.emplace(aldo::Command::breakpointsOpen);
             }
-            if (!c.hasDebugState()) {
+            if (!emu.debugger().isActive()) {
                 ImGui::BeginDisabled();
             }
             if (ImGui::MenuItem("Export Breakpoints", "Opt+Cmd+B")) {
-                s.events.emplace(aldo::Command::breakpointsExport);
+                vs.events.emplace(aldo::Command::breakpointsExport);
             }
-            if (!c.hasDebugState()) {
+            if (!emu.debugger().isActive()) {
                 ImGui::EndDisabled();
             }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Tools")) {
-            ImGui::MenuItem("ImGui Demo", "Cmd+D", &s.showDemo);
+            ImGui::MenuItem("ImGui Demo", "Cmd+D", &vs.showDemo);
             if (ImGui::MenuItem("Aldo Studio")) {
-                s.events.emplace(aldo::Command::launchStudio);
+                vs.events.emplace(aldo::Command::launchStudio);
             }
             ImGui::EndMenu();
         }
@@ -235,9 +237,9 @@ auto input_address(aldo::et::word* addr) noexcept
     return result;
 }
 
-auto about_overlay(aldo::viewstate& s) noexcept
+auto about_overlay(aldo::viewstate& vs) noexcept
 {
-    if (!s.showAbout) return;
+    if (!vs.showAbout) return;
 
     static constexpr auto flags = ImGuiWindowFlags_AlwaysAutoResize
                                     | ImGuiWindowFlags_NoDecoration
@@ -267,7 +269,7 @@ auto about_overlay(aldo::viewstate& s) noexcept
         if (keys_pressed(ImGuiKey_Escape)
             || (ImGui::IsMouseClicked(ImGuiMouseButton_Left)
                 && !ImGui::IsWindowHovered())) {
-            s.showAbout = false;
+            vs.showAbout = false;
         }
     }
     ImGui::End();
@@ -279,21 +281,21 @@ auto about_overlay(aldo::viewstate& s) noexcept
 
 class Bouncer final : public aldo::View {
 public:
-    Bouncer(aldo::viewstate& s, const aldo::EmuController& c,
-            const aldo::MediaRuntime& r) noexcept
-    : View{"Bouncer", s, c, r} {}
-    Bouncer(aldo::viewstate&, aldo::EmuController&&,
+    Bouncer(aldo::viewstate& vs, const aldo::Emulator& emu,
+            const aldo::MediaRuntime& mr) noexcept
+    : View{"Bouncer", vs, emu, mr} {}
+    Bouncer(aldo::viewstate&, aldo::Emulator&&,
             const aldo::MediaRuntime&) = delete;
-    Bouncer(aldo::viewstate&, const aldo::EmuController&,
+    Bouncer(aldo::viewstate&, const aldo::Emulator&,
             aldo::MediaRuntime&&) = delete;
-    Bouncer(aldo::viewstate&, aldo::EmuController&&,
+    Bouncer(aldo::viewstate&, aldo::Emulator&&,
             aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() override
     {
-        const auto ren = r.renderer();
-        const auto tex = r.bouncerTexture();
+        const auto ren = mr.renderer();
+        const auto tex = mr.bouncerTexture();
         SDL_SetRenderTarget(ren, tex);
         SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(ren);
@@ -303,7 +305,7 @@ protected:
 
         SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
 
-        const auto& bouncer = s.bouncer;
+        const auto& bouncer = vs.bouncer;
         const auto fulldim = bouncer.halfdim * 2;
         const SDL_Rect pos{
             bouncer.pos.x - bouncer.halfdim,
@@ -324,14 +326,14 @@ protected:
 
 class CartInfo final : public aldo::View {
 public:
-    CartInfo(aldo::viewstate& s, const aldo::EmuController& c,
-             const aldo::MediaRuntime& r) noexcept
-    : View{"Cart Info", s, c, r} {}
-    CartInfo(aldo::viewstate&, aldo::EmuController&&,
+    CartInfo(aldo::viewstate& vs, const aldo::Emulator& emu,
+             const aldo::MediaRuntime& mr) noexcept
+    : View{"Cart Info", vs, emu, mr} {}
+    CartInfo(aldo::viewstate&, aldo::Emulator&&,
              const aldo::MediaRuntime&) = delete;
-    CartInfo(aldo::viewstate&, const aldo::EmuController&,
+    CartInfo(aldo::viewstate&, const aldo::Emulator&,
              aldo::MediaRuntime&&) = delete;
-    CartInfo(aldo::viewstate&, aldo::EmuController&&,
+    CartInfo(aldo::viewstate&, aldo::Emulator&&,
              aldo::MediaRuntime&&) = delete;
 
 protected:
@@ -344,7 +346,7 @@ protected:
                     availSpace = ImGui::GetContentRegionAvail();
         const auto nameFit =
             static_cast<int>((availSpace.x / textSz.x) - label.length());
-        const auto name = c.cartName();
+        const auto name = emu.displayCartName();
 
         std::string_view trail;
         int nameLen;
@@ -366,7 +368,7 @@ protected:
                               name.data());
         }
 
-        const auto info = c.cartInfo();
+        const auto info = emu.cartInfo();
         if (info) {
             ImGui::Text("Format: %s", cart_formatname(info->format));
             ImGui::Separator();
@@ -427,14 +429,14 @@ protected:
 
 class Cpu final : public aldo::View {
 public:
-    Cpu(aldo::viewstate& s, const aldo::EmuController& c,
-        const aldo::MediaRuntime& r) noexcept
-    : View{"CPU", s, c, r} {}
-    Cpu(aldo::viewstate&, aldo::EmuController&&,
+    Cpu(aldo::viewstate& vs, const aldo::Emulator& emu,
+        const aldo::MediaRuntime& mr) noexcept
+    : View{"CPU", vs, emu, mr} {}
+    Cpu(aldo::viewstate&, aldo::Emulator&&,
         const aldo::MediaRuntime&) = delete;
-    Cpu(aldo::viewstate&, const aldo::EmuController&,
+    Cpu(aldo::viewstate&, const aldo::Emulator&,
         aldo::MediaRuntime&&) = delete;
-    Cpu(aldo::viewstate&, aldo::EmuController&&,
+    Cpu(aldo::viewstate&, aldo::Emulator&&,
         aldo::MediaRuntime&&) = delete;
 
 protected:
@@ -463,7 +465,7 @@ protected:
 private:
     void renderRegisters() const noexcept
     {
-        const auto& cpu = c.snapshot().cpu;
+        const auto& cpu = emu.snapshot().cpu;
         widget_group([&cpu]() {
             ImGui::Text("A: %02X", cpu.accumulator);
             ImGui::Text("X: %02X", cpu.xindex);
@@ -497,7 +499,7 @@ private:
         for (auto it = flags.cbegin(); it != flags.cend(); ++it) {
             const auto bitpos = std::distance(it, flags.cend()) - 1;
             ImU32 fillColor, textColor;
-            if (c.snapshot().cpu.status & (1 << bitpos)) {
+            if (emu.snapshot().cpu.status & (1 << bitpos)) {
                 fillColor = aldo::colors::LedOn;
                 textColor = textOn;
             } else {
@@ -513,8 +515,8 @@ private:
 
     void renderDatapath() const noexcept
     {
-        const auto& datapath = c.snapshot().datapath;
-        const auto& lines = c.snapshot().lines;
+        const auto& datapath = emu.snapshot().datapath;
+        const auto& lines = emu.snapshot().lines;
 
         ImGui::Text("Address Bus: %04X", datapath.addressbus);
         if (datapath.busfault) {
@@ -534,7 +536,7 @@ private:
             ImGui::TextUnformatted("Decode: JAMMED");
         } else {
             std::array<aldo::et::tchar, DIS_DATAP_SIZE> buf;
-            const auto err = dis_datapath(c.snapshotp(), buf.data());
+            const auto err = dis_datapath(emu.snapshotp(), buf.data());
             ImGui::Text("Decode: %s", err < 0 ? dis_errstr(err) : buf.data());
         }
         ImGui::Text("adl: %02X", datapath.addrlow_latch);
@@ -561,11 +563,11 @@ private:
     }
 };
 
-class Debugger final : public aldo::View {
+class DebuggerView final : public aldo::View {
 public:
-    Debugger(aldo::viewstate& s, const aldo::EmuController& c,
-             const aldo::MediaRuntime& r)
-    : View{"Debugger", s, c, r}
+    DebuggerView(aldo::viewstate& vs, const aldo::Emulator& emu,
+                 const aldo::MediaRuntime& mr)
+    : View{"Debugger", vs, emu, mr}
     {
         using halt_val = halt_array::value_type;
         using halt_integral = std::underlying_type_t<halt_val::first_type>;
@@ -578,12 +580,12 @@ public:
             });
         resetHaltExpression(haltConditions.cbegin());
     }
-    Debugger(aldo::viewstate&, aldo::EmuController&&,
-             const aldo::MediaRuntime&) = delete;
-    Debugger(aldo::viewstate&, const aldo::EmuController&,
-             aldo::MediaRuntime&&) = delete;
-    Debugger(aldo::viewstate&, aldo::EmuController&&,
-             aldo::MediaRuntime&&) = delete;
+    DebuggerView(aldo::viewstate&, aldo::Emulator&&,
+                 const aldo::MediaRuntime&) = delete;
+    DebuggerView(aldo::viewstate&, const aldo::Emulator&,
+                 aldo::MediaRuntime&&) = delete;
+    DebuggerView(aldo::viewstate&, aldo::Emulator&&,
+                 aldo::MediaRuntime&&) = delete;
 
 protected:
     void renderContents() override
@@ -605,6 +607,8 @@ private:
         = std::array<
             std::pair<haltcondition, aldo::et::str>, HLT_CONDCOUNT - 1>;
     using halt_it = halt_array::const_iterator;
+    using bp_sz = aldo::Debugger::BpView::size_type;
+    using bp_diff = aldo::Debugger::BreakpointIterator::difference_type;
 
     void renderVectorOverride() noexcept
     {
@@ -612,20 +616,20 @@ private:
 
         if (ImGui::Checkbox("Override", &resetOverride)) {
             if (resetOverride) {
-                s.events.emplace(aldo::Command::overrideReset,
-                                 static_cast<int>(resetAddr));
+                vs.events.emplace(aldo::Command::overrideReset,
+                                  static_cast<int>(resetAddr));
             } else {
-                s.events.emplace(aldo::Command::overrideReset, NoResetVector);
+                vs.events.emplace(aldo::Command::overrideReset, NoResetVector);
             }
         }
         if (!resetOverride) {
             ImGui::BeginDisabled();
             // NOTE: +2 = start of reset vector
-            resetAddr = batowr(c.snapshot().mem.vectors + 2);
+            resetAddr = batowr(emu.snapshot().mem.vectors + 2);
         }
         if (input_address(&resetAddr)) {
-            s.events.emplace(aldo::Command::overrideReset,
-                             static_cast<int>(resetAddr));
+            vs.events.emplace(aldo::Command::overrideReset,
+                              static_cast<int>(resetAddr));
         }
         if (!resetOverride) {
             ImGui::EndDisabled();
@@ -639,7 +643,7 @@ private:
         renderBreakpointAdd(setFocus);
         ImGui::Separator();
         renderBreakpointList();
-        detectedHalt = c.snapshot().debugger.halted != NoBreakpoint;
+        detectedHalt = emu.snapshot().debugger.halted != NoBreakpoint;
     }
 
     bool renderConditionCombo() noexcept
@@ -698,29 +702,30 @@ private:
         }
         const auto submitted = ImGui::IsItemDeactivated() && enter_pressed();
         if (ImGui::Button("Add") || submitted) {
-            s.events.emplace(aldo::Command::breakpointAdd,
-                             currentHaltExpression);
+            vs.events.emplace(aldo::Command::breakpointAdd,
+                              currentHaltExpression);
         }
     }
 
     void renderBreakpointList()
     {
         const ImVec2 dims{-FLT_MIN, 8 * ImGui::GetTextLineHeightWithSpacing()};
-        const auto bpCount = c.breakpointCount();
+        const auto bpView = emu.debugger().breakpoints();
+        const auto bpCount = bpView.size();
         ImGui::Text("%zu breakpoint%s", bpCount, bpCount == 1 ? "" : "s");
         if (ImGui::BeginListBox("##breakpoints", dims)) {
-            aldo::et::diff i = 0;
-            for (auto bp = c.breakpointAt(i); bp; bp = c.breakpointAt(++i)) {
-                renderBreakpoint(i, *bp);
+            bp_diff i = 0;
+            for (const auto& bp : bpView) {
+                renderBreakpoint(i++, bp);
             }
             ImGui::EndListBox();
         }
         renderListControls(bpCount);
     }
 
-    void renderBreakpoint(aldo::et::diff idx, const breakpoint& bp)
+    void renderBreakpoint(bp_diff idx, const breakpoint& bp)
     {
-        const auto bpBreak = idx == c.snapshot().debugger.halted;
+        const auto bpBreak = idx == emu.snapshot().debugger.halted;
         if (bpBreak && !detectedHalt) {
             selectedBreakpoint = idx;
         }
@@ -744,15 +749,15 @@ private:
         }
     }
 
-    void renderListControls(aldo::et::size bpCount)
+    void renderListControls(bp_sz bpCount)
     {
         if (selectedBreakpoint == NoSelection) {
             ImGui::BeginDisabled();
         }
-        const auto bp = c.breakpointAt(selectedBreakpoint);
+        const auto bp = emu.debugger().breakpoints().at(selectedBreakpoint);
         if (ImGui::Button(!bp || bp->enabled ? "Disable" : "Enable ")) {
-            s.events.emplace(aldo::Command::breakpointToggle,
-                             selectedBreakpoint);
+            vs.events.emplace(aldo::Command::breakpointToggle,
+                              selectedBreakpoint);
         }
         ImGui::SameLine();
         const ScopedColor colors = {
@@ -762,8 +767,8 @@ private:
         };
         auto resetSelection = false;
         if (ImGui::Button("Remove")) {
-            s.events.emplace(aldo::Command::breakpointRemove,
-                             selectedBreakpoint);
+            vs.events.emplace(aldo::Command::breakpointRemove,
+                              selectedBreakpoint);
             resetSelection = true;
         }
         if (selectedBreakpoint == NoSelection) {
@@ -774,7 +779,7 @@ private:
             ImGui::BeginDisabled();
         }
         if (ImGui::Button("Clear")) {
-            s.events.emplace(aldo::Command::breakpointsClear);
+            vs.events.emplace(aldo::Command::breakpointsClear);
             resetSelection = true;
         }
         if (bpCount == 0) {
@@ -797,10 +802,9 @@ private:
         // state was changed under the hood (e.g. by loading a brk file).
         // NOTE: if another case like this comes up it may be worth coming up
         // with a model -> view notification system.
-        const auto resetVector = c.resetVectorOverride();
-        resetOverride = resetVector != NoResetVector;
-        if (resetOverride) {
-            resetAddr = static_cast<aldo::et::word>(resetVector);
+        const auto& dbg = emu.debugger();
+        if (dbg.isVectorOverridden()) {
+            resetAddr = static_cast<aldo::et::word>(dbg.vectorOverride());
         }
     }
 
@@ -811,19 +815,19 @@ private:
     // is immutable for the life of this instance.
     halt_it selectedCondition;
     haltexpr currentHaltExpression;
-    aldo::et::diff selectedBreakpoint = NoSelection;
+    bp_diff selectedBreakpoint = NoSelection;
 };
 
 class HardwareTraits final : public aldo::View {
 public:
-    HardwareTraits(aldo::viewstate& s, const aldo::EmuController& c,
-                   const aldo::MediaRuntime& r) noexcept
-    : View{"Hardware Traits", s, c, r} {}
-    HardwareTraits(aldo::viewstate&, aldo::EmuController&&,
+    HardwareTraits(aldo::viewstate& vs, const aldo::Emulator& emu,
+                   const aldo::MediaRuntime& mr) noexcept
+    : View{"Hardware Traits", vs, emu, mr} {}
+    HardwareTraits(aldo::viewstate&, aldo::Emulator&&,
                    const aldo::MediaRuntime&) = delete;
-    HardwareTraits(aldo::viewstate&, const aldo::EmuController&,
+    HardwareTraits(aldo::viewstate&, const aldo::Emulator&,
                    aldo::MediaRuntime&&) = delete;
-    HardwareTraits(aldo::viewstate&, aldo::EmuController&&,
+    HardwareTraits(aldo::viewstate&, aldo::Emulator&&,
                    aldo::MediaRuntime&&) = delete;
 
 protected:
@@ -840,11 +844,11 @@ private:
     void renderStats() noexcept
     {
         static constexpr auto refreshIntervalMs = 250;
-        const auto& cyclock = s.clock.cyclock;
+        const auto& cyclock = vs.clock.cyclock;
         if ((refreshDt += cyclock.frametime_ms) >= refreshIntervalMs) {
-            dispDtInput = s.clock.dtInputMs;
-            dispDtUpdate = s.clock.dtUpdateMs;
-            dispDtRender = s.clock.dtRenderMs;
+            dispDtInput = vs.clock.dtInputMs;
+            dispDtUpdate = vs.clock.dtUpdateMs;
+            dispDtRender = vs.clock.dtRenderMs;
             refreshDt = 0;
         }
         ImGui::Text("Input dT: %.3f", dispDtInput);
@@ -861,33 +865,33 @@ private:
         ImGui::TextUnformatted("Cycles/Second");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(40);
-        ImGui::DragInt("##cyclesPerSecond", &s.clock.cyclock.cycles_per_sec,
+        ImGui::DragInt("##cyclesPerSecond", &vs.clock.cyclock.cycles_per_sec,
                        1.0f, MinCps, MaxCps, "%d",
                        ImGuiSliderFlags_AlwaysClamp);
     }
 
     void renderRunControls() const
     {
-        const auto& snp = c.snapshot();
+        const auto& snp = emu.snapshot();
         auto halt = !snp.lines.ready;
         if (ImGui::Checkbox("HALT", &halt)) {
-            s.events.emplace(aldo::Command::halt, halt);
+            vs.events.emplace(aldo::Command::halt, halt);
         };
 
-        const auto mode = c.runMode();
+        const auto mode = emu.runMode();
         ImGui::TextUnformatted("Mode");
         if (ImGui::RadioButton("Cycle", mode == CSGM_CYCLE)
             && mode != CSGM_CYCLE) {
-            s.events.emplace(aldo::Command::mode, CSGM_CYCLE);
+            vs.events.emplace(aldo::Command::mode, CSGM_CYCLE);
         }
         ImGui::SameLine();
         if (ImGui::RadioButton("Step", mode == CSGM_STEP)
             && mode != CSGM_STEP) {
-            s.events.emplace(aldo::Command::mode, CSGM_STEP);
+            vs.events.emplace(aldo::Command::mode, CSGM_STEP);
         }
         ImGui::SameLine();
         if (ImGui::RadioButton("Run", mode == CSGM_RUN) && mode != CSGM_RUN) {
-            s.events.emplace(aldo::Command::mode, CSGM_RUN);
+            vs.events.emplace(aldo::Command::mode, CSGM_RUN);
         }
 
         // TODO: fake toggle button by using on/off flags to adjust colors
@@ -904,18 +908,18 @@ private:
         auto
         irq = !snp.lines.irq, nmi = !snp.lines.nmi, res = !snp.lines.reset;
         if (ImGui::Checkbox("IRQ", &irq)) {
-            s.events.emplace(aldo::Command::interrupt,
-                             aldo::event::interrupt{CSGI_IRQ, irq});
+            vs.events.emplace(aldo::Command::interrupt,
+                              aldo::event::interrupt{CSGI_IRQ, irq});
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("NMI", &nmi)) {
-            s.events.emplace(aldo::Command::interrupt,
-                             aldo::event::interrupt{CSGI_NMI, nmi});
+            vs.events.emplace(aldo::Command::interrupt,
+                              aldo::event::interrupt{CSGI_NMI, nmi});
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("RES", &res)) {
-            s.events.emplace(aldo::Command::interrupt,
-                             aldo::event::interrupt{CSGI_RES, res});
+            vs.events.emplace(aldo::Command::interrupt,
+                              aldo::event::interrupt{CSGI_RES, res});
         }
     }
 
@@ -924,14 +928,14 @@ private:
 
 class PrgAtPc final : public aldo::View {
 public:
-    PrgAtPc(aldo::viewstate& s, const aldo::EmuController& c,
-            const aldo::MediaRuntime& r) noexcept
-    : View{"PRG @ PC", s, c, r} {}
-    PrgAtPc(aldo::viewstate&, aldo::EmuController&&,
+    PrgAtPc(aldo::viewstate& vs, const aldo::Emulator& emu,
+            const aldo::MediaRuntime& mr) noexcept
+    : View{"PRG @ PC", vs, emu, mr} {}
+    PrgAtPc(aldo::viewstate&, aldo::Emulator&&,
             const aldo::MediaRuntime&) = delete;
-    PrgAtPc(aldo::viewstate&, const aldo::EmuController&,
+    PrgAtPc(aldo::viewstate&, const aldo::Emulator&,
             aldo::MediaRuntime&&) = delete;
-    PrgAtPc(aldo::viewstate&, aldo::EmuController&&,
+    PrgAtPc(aldo::viewstate&, aldo::Emulator&&,
             aldo::MediaRuntime&&) = delete;
 
 protected:
@@ -949,7 +953,7 @@ private:
     {
         static constexpr auto instCount = 16;
 
-        const auto& snp = c.snapshot();
+        const auto& snp = emu.snapshot();
         const auto& prgMem = snp.mem;
         auto addr = snp.datapath.current_instruction;
         dis_instruction inst{};
@@ -967,11 +971,11 @@ private:
                     } else if (ImGui::BeginPopupContextItem()) {
                         selected = i;
                         if (ImGui::Selectable("Add breakpoint...")) {
-                            s.events.emplace(aldo::Command::breakpointAdd,
-                                             haltexpr{
-                                                 .address = addr,
-                                                 .cond = HLT_ADDR,
-                                             });
+                            const auto expr = haltexpr{
+                                .address = addr, .cond = HLT_ADDR,
+                            };
+                            vs.events.emplace(aldo::Command::breakpointAdd,
+                                              expr);
                         }
                         ImGui::EndPopup();
                     }
@@ -988,7 +992,7 @@ private:
 
     void renderVectors() const noexcept
     {
-        const auto& snp = c.snapshot();
+        const auto& snp = emu.snapshot();
         const auto& prgMem = snp.mem;
 
         auto lo = prgMem.vectors[0], hi = prgMem.vectors[1];
@@ -999,13 +1003,13 @@ private:
         hi = prgMem.vectors[3];
         const char* indicator;
         aldo::et::word resVector;
-        const auto resetVector = c.resetVectorOverride();
-        if (resetVector == NoResetVector) {
+        const auto& dbg = emu.debugger();
+        if (dbg.isVectorOverridden()) {
+            indicator = HEXPR_RES_IND;
+            resVector = static_cast<aldo::et::word>(dbg.vectorOverride());
+        } else {
             indicator = "";
             resVector = bytowr(lo, hi);
-        } else {
-            indicator = HEXPR_RES_IND;
-            resVector = static_cast<aldo::et::word>(resetVector);
         }
         ImGui::Text("%04X: %02X %02X     RES %s$%04X", CPU_VECTOR_RES, lo, hi,
                     indicator, resVector);
@@ -1021,14 +1025,14 @@ private:
 
 class Ram final : public aldo::View {
 public:
-    Ram(aldo::viewstate& s, const aldo::EmuController& c,
-        const aldo::MediaRuntime& r) noexcept
-    : View{"RAM", s, c, r} {}
-    Ram(aldo::viewstate&, aldo::EmuController&&,
+    Ram(aldo::viewstate& vs, const aldo::Emulator& emu,
+        const aldo::MediaRuntime& mr) noexcept
+    : View{"RAM", vs, emu, mr} {}
+    Ram(aldo::viewstate&, aldo::Emulator&&,
         const aldo::MediaRuntime&) = delete;
-    Ram(aldo::viewstate&, const aldo::EmuController&,
+    Ram(aldo::viewstate&, const aldo::Emulator&,
         aldo::MediaRuntime&&) = delete;
-    Ram(aldo::viewstate&, aldo::EmuController&&,
+    Ram(aldo::viewstate&, aldo::Emulator&&,
         aldo::MediaRuntime&&) = delete;
 
 protected:
@@ -1060,7 +1064,7 @@ protected:
 
             const auto spHighlightText =
                 ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
-            const auto& snp = c.snapshot();
+            const auto& snp = emu.snapshot();
             const auto sp = snp.cpu.stack_pointer;
             aldo::et::word addr = 0;
             for (ram_sz page = 0; page < pageCount; ++page) {
@@ -1121,28 +1125,28 @@ void aldo::View::View::render()
     ImGui::End();
 }
 
-aldo::Layout::Layout(aldo::viewstate& s, const aldo::EmuController& c,
-                     const aldo::MediaRuntime& r)
-: s{s}, c{c}, r{r}
+aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
+                     const aldo::MediaRuntime& mr)
+: vs{vs}, emu{emu}, mr{mr}
 {
     add_views<
         Bouncer,
         CartInfo,
         Cpu,
-        Debugger,
+        DebuggerView,
         HardwareTraits,
         PrgAtPc,
-        Ram>(views, s, c, r);
+        Ram>(views, vs, emu, mr);
 }
 
 void aldo::Layout::render() const
 {
-    main_menu(s, c, r);
+    main_menu(vs, emu, mr);
     for (const auto& v : views) {
         v->render();
     }
-    about_overlay(s);
-    if (s.showDemo) {
+    about_overlay(vs);
+    if (vs.showDemo) {
         ImGui::ShowDemoWindow();
     }
 }

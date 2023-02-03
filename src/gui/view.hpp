@@ -16,20 +16,20 @@
 namespace aldo
 {
 
-class EmuController;
+class Emulator;
 class MediaRuntime;
 struct viewstate;
 
 class View {
 public:
-    View(std::string title, viewstate& s, const EmuController& c,
-         const MediaRuntime& r, bool* v = nullptr) noexcept
-    : title{std::move(title)}, s{s}, c{c}, r{r}, visible{v} {}
-    View(std::string, viewstate&, EmuController&&,
+    View(std::string title, viewstate& vs, const Emulator& emu,
+         const MediaRuntime& mr, bool* v = nullptr) noexcept
+    : title{std::move(title)}, vs{vs}, emu{emu}, mr{mr}, visible{v} {}
+    View(std::string, viewstate&, Emulator&&,
          const MediaRuntime&, bool*) = delete;
-    View(std::string, viewstate&, const EmuController&&,
+    View(std::string, viewstate&, const Emulator&&,
          MediaRuntime&&, bool*) = delete;
-    View(std::string, viewstate&, EmuController&&, MediaRuntime&&,
+    View(std::string, viewstate&, Emulator&&, MediaRuntime&&,
          bool*) = delete;
     View(const View&) = delete;
     View& operator=(const View&) = delete;
@@ -43,25 +43,25 @@ protected:
     virtual void renderContents() = 0;
 
     std::string title;
-    viewstate& s;
-    const EmuController& c;
-    const MediaRuntime& r;
+    viewstate& vs;
+    const Emulator& emu;
+    const MediaRuntime& mr;
     bool* visible;
 };
 
 class Layout {
 public:
-    Layout(viewstate& s, const EmuController& c, const MediaRuntime& r);
-    Layout(viewstate&, EmuController&&, const MediaRuntime&) = delete;
-    Layout(viewstate&, const EmuController&, MediaRuntime&&) = delete;
-    Layout(viewstate&, EmuController&&, MediaRuntime&&) = delete;
+    Layout(viewstate& vs, const Emulator& emu, const MediaRuntime& mr);
+    Layout(viewstate&, Emulator&&, const MediaRuntime&) = delete;
+    Layout(viewstate&, const Emulator&, MediaRuntime&&) = delete;
+    Layout(viewstate&, Emulator&&, MediaRuntime&&) = delete;
 
     void render() const;
 
 private:
-    viewstate& s;
-    const EmuController& c;
-    const MediaRuntime& r;
+    viewstate& vs;
+    const Emulator& emu;
+    const MediaRuntime& mr;
     std::vector<std::unique_ptr<View>> views;
 };
 

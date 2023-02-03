@@ -47,13 +47,20 @@ public:
 
     Debugger(debug_handle d) noexcept : hdebug{std::move(d)} {}
 
+    int vectorOverride() const noexcept
+    {
+        return debug_vector_override(debugp());
+    }
     void vectorOverride(int resetvector) noexcept
     {
         debug_set_vector_override(debugp(), resetvector);
     }
+    bool isVectorOverridden() const noexcept
+    {
+        return vectorOverride() != NoResetVector;
+    }
     BpView breakpoints() const noexcept { return {debugp()}; }
     MutableBpView breakpoints() noexcept { return {debugp()}; }
-
     bool isActive() const noexcept
     {
         return isVectorOverridden() || !breakpoints().empty();
@@ -166,16 +173,6 @@ public:
     };
 
 private:
-    int vectorOverride() const noexcept
-    {
-        return debug_vector_override(debugp());
-    }
-
-    bool isVectorOverridden() const noexcept
-    {
-        return vectorOverride() != NoResetVector;
-    }
-
     debugctx* debugp() const noexcept { return hdebug.get(); }
 
     debug_handle hdebug;

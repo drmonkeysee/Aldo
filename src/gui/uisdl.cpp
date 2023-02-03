@@ -7,7 +7,9 @@
 
 #include "uisdl.hpp"
 
-#include "emulator.hpp"
+#include "debug.hpp"
+#include "emu.hpp"
+#include "input.hpp"
 #include "mediaruntime.hpp"
 #include "render.hpp"
 #include "ui.h"
@@ -26,45 +28,45 @@ namespace
 // UI Loop Implementation
 //
 
-auto handle_input(aldo::EmuController& c, aldo::viewstate& s,
+auto handle_input(aldo::Emulator& emu, aldo::viewstate& vs,
                   const gui_platform& p)
 {
-    const auto timer = s.clock.timeInput();
-    c.handleInput(s, p);
+    const auto timer = vs.clock.timeInput();
+    aldo::input::handle(emu, vs, p);
 }
 
-auto update_emu(aldo::EmuController& c, aldo::viewstate& s) noexcept
+auto update_emu(aldo::Emulator& emu, aldo::viewstate& vs) noexcept
 {
-    const auto timer = s.clock.timeUpdate();
-    c.update(s);
+    const auto timer = vs.clock.timeUpdate();
+    emu.update(vs);
 }
 
-auto render_ui(const aldo::Layout& l, const aldo::MediaRuntime& r,
-               aldo::viewstate& s)
+auto render_ui(const aldo::Layout& l, const aldo::MediaRuntime& mr,
+               aldo::viewstate& vs)
 {
-    const aldo::RenderFrame frame{r, s.clock.timeRender()};
+    const aldo::RenderFrame frame{mr, vs.clock.timeRender()};
     l.render();
 }
 
 auto runloop(const gui_platform& p, debugctx* debug, nes* console)
 {
-    aldo::EmuController controller{
-        aldo::debug_handle{debug}, aldo::console_handle{console},
+    aldo::Emulator emu{
+        aldo::debug_handle{debug}, aldo::console_handle{console}, p,
     };
     aldo::viewstate state;
     const aldo::MediaRuntime runtime{{1280, 800}, state.bouncer.bounds, p};
-    const aldo::Layout layout{state, controller, runtime};
+    const aldo::Layout layout{state, emu, runtime};
     state.clock.start();
     do {
-        const auto reset = !controller.snapshot().lines.ready;
+        const auto reset = !emu.snapshot().lines.ready;
         const auto tick = state.clock.startTick(reset);
-        handle_input(controller, state, p);
+        handle_input(emu, state, p);
         if (state.running) {
-            update_emu(controller, state);
+            update_emu(emu, state);
             render_ui(layout, runtime, state);
         }
     } while (state.running);
-    controller.shutdown(p);
+    emu.shutdown();
 }
 
 }

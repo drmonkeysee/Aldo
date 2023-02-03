@@ -24,7 +24,6 @@
 		C820E6CB25A97A4E006A7AB1 /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* cli.c */; };
 		C820E6E025A98557006A7AB1 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C820E6DE25A982A5006A7AB1 /* libncurses.tbd */; };
 		C8264C56294EDF5C004CD6A5 /* MacPlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8264C55294EDF5C004CD6A5 /* MacPlatform.swift */; };
-		C8283E74293D44CB00CDB572 /* emulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8283E72293D44CB00CDB572 /* emulator.cpp */; };
 		C830036728DEDDD200480F29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C830036628DEDDD200480F29 /* Assets.xcassets */; };
 		C830036C28DEDDD200480F29 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C830036B28DEDDD200480F29 /* main.m */; };
 		C838F8572936FC9800D52004 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
@@ -247,8 +246,6 @@
 		C820E6DE25A982A5006A7AB1 /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
 		C8264C54294EDF5C004CD6A5 /* Aldo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Aldo-Bridging-Header.h"; sourceTree = "<group>"; };
 		C8264C55294EDF5C004CD6A5 /* MacPlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPlatform.swift; sourceTree = "<group>"; };
-		C8283E72293D44CB00CDB572 /* emulator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = emulator.cpp; sourceTree = "<group>"; };
-		C8283E73293D44CB00CDB572 /* emulator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = emulator.hpp; sourceTree = "<group>"; };
 		C830036128DEDDD100480F29 /* Aldo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Aldo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C830036628DEDDD200480F29 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C830036B28DEDDD200480F29 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -636,8 +633,6 @@
 				C8F87DBA2984D64F00B8FAFD /* debug.cpp */,
 				C8F1A38D297FA5400005EB8B /* emu.hpp */,
 				C8F1A38C297FA5400005EB8B /* emu.cpp */,
-				C8283E73293D44CB00CDB572 /* emulator.hpp */,
-				C8283E72293D44CB00CDB572 /* emulator.cpp */,
 				C8D428E8296A15E500824248 /* emutypes.hpp */,
 				C8B77FA62975FD7A0020692C /* emutypes.cpp */,
 				C882854729403C2100BAC249 /* error.hpp */,
@@ -966,7 +961,6 @@
 				C8B77FA72975FD7A0020692C /* emutypes.cpp in Sources */,
 				C830036C28DEDDD200480F29 /* main.m in Sources */,
 				C894F0EF2945850E00C6575F /* view.cpp in Sources */,
-				C8283E74293D44CB00CDB572 /* emulator.cpp in Sources */,
 				C854873E28E685D00045BA42 /* imgui_draw.cpp in Sources */,
 				C8F1A38E297FA5400005EB8B /* emu.cpp in Sources */,
 				C854873728E685D00045BA42 /* imgui_widgets.cpp in Sources */,

@@ -75,6 +75,22 @@ aldo::Emulator::Emulator(Debugger d, console_handle n, const gui_platform& p)
 : prefspath{get_prefspath(p)}, hdebug{std::move(d)}, hconsole{std::move(n)},
     hsnapshot{consolep()} {}
 
+std::string_view aldo::Emulator::displayCartName() const noexcept
+{
+    if (cartName().empty()) return cart_errstr(CART_ERR_NOCART);
+
+    return cartName().native();
+}
+
+std::optional<cartinfo> aldo::Emulator::cartInfo() const
+{
+    if (!hcart) return {};
+
+    cartinfo info;
+    cart_getinfo(cartp(), &info);
+    return info;
+}
+
 void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
 {
     const auto c = load_cart(filepath);

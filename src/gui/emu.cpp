@@ -10,6 +10,7 @@
 #include "attr.hpp"
 #include "error.hpp"
 #include "guiplatform.h"
+#include "viewstate.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -47,6 +48,23 @@ auto load_cart(const std::filesystem::path& filepath)
     return c;
 }
 
+auto update_bouncer(aldo::viewstate& vs,
+                    const console_state& snapshot) noexcept
+{
+    if (!snapshot.lines.ready) return;
+
+    if (vs.bouncer.pos.x - vs.bouncer.halfdim < 0
+        || vs.bouncer.pos.x + vs.bouncer.halfdim > vs.bouncer.bounds.x) {
+        vs.bouncer.velocity.x *= -1;
+    }
+    if (vs.bouncer.pos.y - vs.bouncer.halfdim < 0
+        || vs.bouncer.pos.y + vs.bouncer.halfdim > vs.bouncer.bounds.y) {
+        vs.bouncer.velocity.y *= -1;
+    }
+    vs.bouncer.pos.x += vs.bouncer.velocity.x;
+    vs.bouncer.pos.y += vs.bouncer.velocity.y;
+}
+
 }
 
 //
@@ -67,6 +85,18 @@ void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
     cartpath = filepath;
     cartname = cartpath.stem();
     loadCartState();
+}
+
+void aldo::Emulator::update(aldo::viewstate& vs) noexcept
+{
+    nes_cycle(consolep(), &vs.clock.cyclock);
+    nes_snapshot(consolep(), snapshotp());
+    update_bouncer(vs, snapshot());
+}
+
+void aldo::Emulator::shutdown() const
+{
+    saveCartState();
 }
 
 //

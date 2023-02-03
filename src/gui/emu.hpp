@@ -22,6 +22,8 @@ struct gui_platform;
 namespace aldo
 {
 
+struct viewstate;
+
 using cart_handle = handle<cart, cart_free>;
 using console_handle = handle<nes, nes_free>;
 
@@ -34,9 +36,10 @@ public:
     Snapshot& operator=(Snapshot&&) = default;
     ~Snapshot() { snapshot_clear(getp()); }
 
-private:
+    const console_state& get() const noexcept { return snapshot; }
     console_state* getp() noexcept { return &snapshot; }
 
+private:
     console_state snapshot;
 };
 
@@ -47,6 +50,7 @@ public:
     const std::filesystem::path& cartName() const noexcept { return cartname; }
     const Debugger& debugger() const noexcept { return hdebug; }
     Debugger& debugger() noexcept { return hdebug; }
+    const console_state& snapshot() const noexcept { return hsnapshot.get(); }
 
     void halt() noexcept { nes_halt(consolep()); }
     void ready() noexcept { nes_ready(consolep()); }
@@ -64,10 +68,13 @@ public:
     }
 
     void loadCart(const std::filesystem::path& filepath);
+    void update(viewstate& vs) noexcept;
+    void shutdown() const;
 
 private:
     cart* cartp() const noexcept { return hcart.get(); }
     nes* consolep() const noexcept { return hconsole.get(); }
+    console_state* snapshotp() noexcept { return hsnapshot.getp(); }
 
     void loadCartState();
     void saveCartState() const;

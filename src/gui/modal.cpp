@@ -77,7 +77,7 @@ void aldo::modal::loadBreakpoints(aldo::Emulator& emu, const gui_platform& p)
 {
     file_modal([](const gui_platform& p) {
         return open_file(p, "Choose a Breakpoints file",
-                         {aldo::debug::BreakFileExtension.c_str(), nullptr});
+                         {aldo::debug::BreakFileExtension, nullptr});
     }, [&d = emu.debugger()](const std::filesystem::path& p) {
         d.loadBreakpoints(p);
     }, emu, p);

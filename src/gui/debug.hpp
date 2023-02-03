@@ -24,7 +24,7 @@ namespace aldo
 namespace debug
 {
 
-inline const std::string BreakFileExtension = "brk";
+inline constexpr const char* BreakFileExtension = "brk";
 
 inline std::filesystem::path breakfile_path_from(std::filesystem::path path)
 {

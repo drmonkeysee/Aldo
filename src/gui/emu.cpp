@@ -21,11 +21,10 @@
 namespace
 {
 
-using file_handle = aldo::handle<std::FILE, std::fclose>;
-using sdl_buffer = aldo::handle<char, SDL_free>;
-
 auto get_prefspath(const gui_platform& p)
 {
+    using sdl_buffer = aldo::handle<char, SDL_free>;
+
     const aldo::platform_buffer
         org{p.orgname(), p.free_buffer},
         name{p.appname(), p.free_buffer};
@@ -37,6 +36,8 @@ auto get_prefspath(const gui_platform& p)
 ALDO_OWN
 auto load_cart(const std::filesystem::path& filepath)
 {
+    using file_handle = aldo::handle<std::FILE, std::fclose>;
+
     cart* c;
     errno = 0;
     const file_handle f{std::fopen(filepath.c_str(), "rb")};

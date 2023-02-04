@@ -41,7 +41,6 @@ using debug_handle = handle<debugctx, debug_free>;
 
 class Debugger {
 public:
-    class BreakpointIterator;
     template<bool> class BreakpointsView;
     using BpView = BreakpointsView<false>;
     using MutableBpView = BreakpointsView<true>;

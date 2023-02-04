@@ -157,12 +157,12 @@ constexpr auto operator-(ImVec2 a, const ImVec2& b) noexcept
     return ImVec2{a.x - b.x, a.y - b.y};
 }
 
-auto keys_pressed(std::same_as<ImGuiKey> auto... keys) noexcept
+constexpr auto keys_pressed(std::same_as<ImGuiKey> auto... keys) noexcept
 {
     return (ImGui::IsKeyPressed(keys, false) || ...);
 }
 
-auto enter_pressed() noexcept
+constexpr auto enter_pressed() noexcept
 {
     return keys_pressed(ImGuiKey_Enter, ImGuiKey_KeypadEnter);
 }

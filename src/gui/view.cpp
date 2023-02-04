@@ -535,11 +535,11 @@ protected:
         ImGui::Separator();
 
         if (datapath.jammed) {
-            ImGui::TextUnformatted("Decode: JAMMED");
+            ImGui::TextUnformatted("JAMMED");
         } else {
             std::array<aldo::et::tchar, DIS_DATAP_SIZE> buf;
             const auto err = dis_datapath(emu.snapshotp(), buf.data());
-            ImGui::Text("Decode: %s", err < 0 ? dis_errstr(err) : buf.data());
+            ImGui::TextUnformatted(err < 0 ? dis_errstr(err) : buf.data());
         }
         ImGui::Text("adl: %02X", datapath.addrlow_latch);
         ImGui::Text("adh: %02X", datapath.addrhigh_latch);

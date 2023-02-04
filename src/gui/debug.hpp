@@ -141,8 +141,6 @@ public:
         using const_reference = const_iterator::reference;
         using const_pointer = const_iterator::pointer;
 
-        BreakpointsView(debugctx* d) noexcept : debugp{d} {}
-
         size_type size() const noexcept { return debug_bp_count(debugp); }
         bool empty() const noexcept { return size() == 0; }
         const_pointer at(difference_type i) const noexcept
@@ -176,6 +174,9 @@ public:
     private:
         static_assert(std::forward_iterator<const_iterator>,
                       "Incomplete breakpoint iterator definition");
+        friend Debugger;
+
+        BreakpointsView(debugctx* d) noexcept : debugp{d} {}
 
         debugctx* debugp;
     };

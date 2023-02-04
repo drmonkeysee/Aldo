@@ -44,10 +44,10 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         if (is_menu_shortcut(ev)) {
             if (ev.key.keysym.mod & KMOD_ALT) {
                 if (emu.debugger().isActive()) {
-                    vs.events.emplace(aldo::Command::breakpointsExport);
+                    vs.commands.emplace(aldo::Command::breakpointsExport);
                 }
             } else {
-                vs.events.emplace(aldo::Command::breakpointsOpen);
+                vs.commands.emplace(aldo::Command::breakpointsOpen);
             }
         }
         break;
@@ -58,23 +58,23 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_o:
         if (is_menu_shortcut(ev)) {
-            vs.events.emplace(aldo::Command::openROM);
+            vs.commands.emplace(aldo::Command::openROM);
         }
         break;
     }
 }
 
-auto process_event(const aldo::event& ev, aldo::Emulator& emu,
+auto process_event(const aldo::command_state& cs, aldo::Emulator& emu,
                    aldo::viewstate& s, const gui_platform& p)
 {
     auto& debugger = emu.debugger();
     auto breakpoints = debugger.breakpoints();
-    switch (ev.cmd) {
+    switch (cs.cmd) {
     case aldo::Command::breakpointAdd:
-        breakpoints.append(std::get<haltexpr>(ev.value));
+        breakpoints.append(std::get<haltexpr>(cs.value));
         break;
     case aldo::Command::breakpointRemove:
-        breakpoints.remove(std::get<aldo::et::diff>(ev.value));
+        breakpoints.remove(std::get<aldo::et::diff>(cs.value));
         break;
     case aldo::Command::breakpointsClear:
         breakpoints.clear();
@@ -86,10 +86,10 @@ auto process_event(const aldo::event& ev, aldo::Emulator& emu,
         aldo::modal::loadBreakpoints(emu, p);
         break;
     case aldo::Command::breakpointToggle:
-        breakpoints.toggleEnabled(std::get<aldo::et::diff>(ev.value));
+        breakpoints.toggleEnabled(std::get<aldo::et::diff>(cs.value));
         break;
     case aldo::Command::halt:
-        if (std::get<bool>(ev.value)) {
+        if (std::get<bool>(cs.value)) {
             emu.halt();
         } else {
             emu.ready();
@@ -98,7 +98,7 @@ auto process_event(const aldo::event& ev, aldo::Emulator& emu,
     case aldo::Command::interrupt:
         {
             const auto [signal, active] =
-                std::get<aldo::event::interrupt>(ev.value);
+                std::get<aldo::command_state::interrupt>(cs.value);
             emu.interrupt(signal, active);
         }
         break;
@@ -106,7 +106,7 @@ auto process_event(const aldo::event& ev, aldo::Emulator& emu,
         p.launch_studio();
         break;
     case aldo::Command::mode:
-        emu.runMode(std::get<csig_excmode>(ev.value));
+        emu.runMode(std::get<csig_excmode>(cs.value));
         break;
     case aldo::Command::openROM:
         aldo::modal::loadROM(emu, p);
@@ -115,13 +115,13 @@ auto process_event(const aldo::event& ev, aldo::Emulator& emu,
         debugger.vectorClear();
         break;
     case aldo::Command::resetVectorOverride:
-        debugger.vectorOverride(std::get<int>(ev.value));
+        debugger.vectorOverride(std::get<int>(cs.value));
         break;
     case aldo::Command::quit:
         s.running = false;
         break;
     default:
-        throw std::domain_error{invalid_command(ev.cmd)};
+        throw std::domain_error{invalid_command(cs.cmd)};
     }
 }
 
@@ -138,13 +138,13 @@ void aldo::input::handle(aldo::Emulator& emu, aldo::viewstate& vs,
             handle_keydown(ev, emu, vs);
             break;
         case SDL_QUIT:
-            vs.events.emplace(aldo::Command::quit);
+            vs.commands.emplace(aldo::Command::quit);
             break;
         }
     }
-    while (!vs.events.empty()) {
-        const auto& ev = vs.events.front();
-        process_event(ev, emu, vs, p);
-        vs.events.pop();
+    while (!vs.commands.empty()) {
+        const auto& cs = vs.commands.front();
+        process_event(cs, emu, vs, p);
+        vs.commands.pop();
     }
 }

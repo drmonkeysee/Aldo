@@ -40,7 +40,7 @@ enum class Command {
     quit,
 };
 
-struct event {
+struct command_state {
     using interrupt = std::pair<csig_interrupt, bool>;
     using payload =
         std::variant<
@@ -53,14 +53,14 @@ struct event {
             interrupt>;
 
     template<std::convertible_to<payload> T = std::monostate>
-    constexpr event(Command c, T v = {}) noexcept : cmd{c}, value{v} {}
+    constexpr command_state(Command c, T v = {}) noexcept : cmd{c}, value{v} {}
 
     Command cmd;
     payload value;
 };
 
 struct viewstate {
-    std::queue<event> events;
+    std::queue<command_state> commands;
     runclock clock;
     struct {
         SDL_Point

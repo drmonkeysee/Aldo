@@ -193,23 +193,23 @@ auto main_menu(aldo::viewstate& vs, const aldo::Emulator& emu,
         if (ImGui::BeginMenu(SDL_GetWindowTitle(mr.window()))) {
             ImGui::MenuItem("About", nullptr, &vs.showAbout);
             if (ImGui::MenuItem("Quit", "Cmd+Q")) {
-                vs.events.emplace(aldo::Command::quit);
+                vs.commands.emplace(aldo::Command::quit);
             };
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Open ROM", "Cmd+O")) {
-                vs.events.emplace(aldo::Command::openROM);
+                vs.commands.emplace(aldo::Command::openROM);
             }
             ImGui::Separator();
             if (ImGui::MenuItem("Open Breakpoints", "Cmd+B")) {
-                vs.events.emplace(aldo::Command::breakpointsOpen);
+                vs.commands.emplace(aldo::Command::breakpointsOpen);
             }
             if (!emu.debugger().isActive()) {
                 ImGui::BeginDisabled();
             }
             if (ImGui::MenuItem("Export Breakpoints", "Opt+Cmd+B")) {
-                vs.events.emplace(aldo::Command::breakpointsExport);
+                vs.commands.emplace(aldo::Command::breakpointsExport);
             }
             if (!emu.debugger().isActive()) {
                 ImGui::EndDisabled();
@@ -219,7 +219,7 @@ auto main_menu(aldo::viewstate& vs, const aldo::Emulator& emu,
         if (ImGui::BeginMenu("Tools")) {
             ImGui::MenuItem("ImGui Demo", "Cmd+D", &vs.showDemo);
             if (ImGui::MenuItem("Aldo Studio")) {
-                vs.events.emplace(aldo::Command::launchStudio);
+                vs.commands.emplace(aldo::Command::launchStudio);
             }
             ImGui::EndMenu();
         }
@@ -614,10 +614,10 @@ private:
 
         if (ImGui::Checkbox("Override", &resetOverride)) {
             if (resetOverride) {
-                vs.events.emplace(aldo::Command::resetVectorOverride,
-                                  static_cast<int>(resetAddr));
+                vs.commands.emplace(aldo::Command::resetVectorOverride,
+                                    static_cast<int>(resetAddr));
             } else {
-                vs.events.emplace(aldo::Command::resetVectorClear);
+                vs.commands.emplace(aldo::Command::resetVectorClear);
             }
         }
         if (!resetOverride) {
@@ -626,8 +626,8 @@ private:
             resetAddr = batowr(emu.snapshot().mem.vectors + 2);
         }
         if (input_address(&resetAddr)) {
-            vs.events.emplace(aldo::Command::resetVectorOverride,
-                              static_cast<int>(resetAddr));
+            vs.commands.emplace(aldo::Command::resetVectorOverride,
+                                static_cast<int>(resetAddr));
         }
         if (!resetOverride) {
             ImGui::EndDisabled();
@@ -700,8 +700,8 @@ private:
         }
         const auto submitted = ImGui::IsItemDeactivated() && enter_pressed();
         if (ImGui::Button("Add") || submitted) {
-            vs.events.emplace(aldo::Command::breakpointAdd,
-                              currentHaltExpression);
+            vs.commands.emplace(aldo::Command::breakpointAdd,
+                                currentHaltExpression);
         }
     }
 
@@ -754,8 +754,8 @@ private:
         }
         const auto bp = emu.debugger().breakpoints().at(selectedBreakpoint);
         if (ImGui::Button(!bp || bp->enabled ? "Disable" : "Enable ")) {
-            vs.events.emplace(aldo::Command::breakpointToggle,
-                              selectedBreakpoint);
+            vs.commands.emplace(aldo::Command::breakpointToggle,
+                                selectedBreakpoint);
         }
         ImGui::SameLine();
         const ScopedColor colors = {
@@ -765,8 +765,8 @@ private:
         };
         auto resetSelection = false;
         if (ImGui::Button("Remove")) {
-            vs.events.emplace(aldo::Command::breakpointRemove,
-                              selectedBreakpoint);
+            vs.commands.emplace(aldo::Command::breakpointRemove,
+                                selectedBreakpoint);
             resetSelection = true;
         }
         if (selectedBreakpoint == NoSelection) {
@@ -777,7 +777,7 @@ private:
             ImGui::BeginDisabled();
         }
         if (ImGui::Button("Clear")) {
-            vs.events.emplace(aldo::Command::breakpointsClear);
+            vs.commands.emplace(aldo::Command::breakpointsClear);
             resetSelection = true;
         }
         if (bpCount == 0) {
@@ -873,23 +873,23 @@ private:
         const auto& snp = emu.snapshot();
         auto halt = !snp.lines.ready;
         if (ImGui::Checkbox("HALT", &halt)) {
-            vs.events.emplace(aldo::Command::halt, halt);
+            vs.commands.emplace(aldo::Command::halt, halt);
         };
 
         const auto mode = emu.runMode();
         ImGui::TextUnformatted("Mode");
         if (ImGui::RadioButton("Cycle", mode == CSGM_CYCLE)
             && mode != CSGM_CYCLE) {
-            vs.events.emplace(aldo::Command::mode, CSGM_CYCLE);
+            vs.commands.emplace(aldo::Command::mode, CSGM_CYCLE);
         }
         ImGui::SameLine();
         if (ImGui::RadioButton("Step", mode == CSGM_STEP)
             && mode != CSGM_STEP) {
-            vs.events.emplace(aldo::Command::mode, CSGM_STEP);
+            vs.commands.emplace(aldo::Command::mode, CSGM_STEP);
         }
         ImGui::SameLine();
         if (ImGui::RadioButton("Run", mode == CSGM_RUN) && mode != CSGM_RUN) {
-            vs.events.emplace(aldo::Command::mode, CSGM_RUN);
+            vs.commands.emplace(aldo::Command::mode, CSGM_RUN);
         }
 
         // TODO: fake toggle button by using on/off flags to adjust colors
@@ -906,18 +906,18 @@ private:
         auto
         irq = !snp.lines.irq, nmi = !snp.lines.nmi, res = !snp.lines.reset;
         if (ImGui::Checkbox("IRQ", &irq)) {
-            vs.events.emplace(aldo::Command::interrupt,
-                              aldo::event::interrupt{CSGI_IRQ, irq});
+            vs.commands.emplace(aldo::Command::interrupt,
+                                aldo::command_state::interrupt{CSGI_IRQ, irq});
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("NMI", &nmi)) {
-            vs.events.emplace(aldo::Command::interrupt,
-                              aldo::event::interrupt{CSGI_NMI, nmi});
+            vs.commands.emplace(aldo::Command::interrupt,
+                                aldo::command_state::interrupt{CSGI_NMI, nmi});
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("RES", &res)) {
-            vs.events.emplace(aldo::Command::interrupt,
-                              aldo::event::interrupt{CSGI_RES, res});
+            vs.commands.emplace(aldo::Command::interrupt,
+                                aldo::command_state::interrupt{CSGI_RES, res});
         }
     }
 
@@ -972,8 +972,8 @@ private:
                             const auto expr = haltexpr{
                                 .address = addr, .cond = HLT_ADDR,
                             };
-                            vs.events.emplace(aldo::Command::breakpointAdd,
-                                              expr);
+                            vs.commands.emplace(aldo::Command::breakpointAdd,
+                                                expr);
                         }
                         ImGui::EndPopup();
                     }

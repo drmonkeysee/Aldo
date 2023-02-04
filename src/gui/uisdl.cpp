@@ -66,7 +66,6 @@ auto runloop(const gui_platform& p, debugctx* debug, nes* console)
             render_ui(layout, runtime, state);
         }
     } while (state.running);
-    emu.shutdown();
 }
 
 }

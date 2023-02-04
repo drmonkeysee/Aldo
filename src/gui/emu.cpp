@@ -14,6 +14,7 @@
 
 #include <SDL2/SDL.h>
 
+#include <exception>
 #include <utility>
 #include <cerrno>
 #include <cstdio>
@@ -111,11 +112,6 @@ void aldo::Emulator::update(aldo::viewstate& vs) noexcept
     update_bouncer(vs, snapshot());
 }
 
-void aldo::Emulator::shutdown() const
-{
-    saveCartState();
-}
-
 //
 // Private Interface
 //
@@ -131,4 +127,16 @@ void aldo::Emulator::saveCartState() const
     if (!hcart) return;
 
     debugger().saveCartState(prefspath / cartName());
+}
+
+void aldo::Emulator::cleanup() const noexcept
+{
+    try {
+        saveCartState();
+    } catch (const std::exception& ex) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Emu dtor exception: %s",
+                     ex.what());
+    } catch (...) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unknown Emu dtor error!");
+    }
 }

@@ -8,6 +8,7 @@
 #ifndef Aldo_gui_emu_hpp
 #define Aldo_gui_emu_hpp
 
+#include "attr.hpp"
 #include "cart.h"
 #include "ctrlsignal.h"
 #include "debug.hpp"
@@ -46,9 +47,14 @@ private:
     console_state snapshot;
 };
 
-class Emulator {
+class ALDO_SIDEFX Emulator {
 public:
     Emulator(Debugger d, console_handle n, const gui_platform& p);
+    Emulator(const Emulator&) = delete;
+    Emulator& operator=(const Emulator&) = delete;
+    Emulator(Emulator&&) = delete;
+    Emulator& operator=(Emulator&&) = delete;
+    ~Emulator() { cleanup(); }
 
     const std::filesystem::path& cartName() const noexcept { return cartname; }
     std::string_view displayCartName() const noexcept;
@@ -83,7 +89,6 @@ public:
 
     void loadCart(const std::filesystem::path& filepath);
     void update(viewstate& vs) noexcept;
-    void shutdown() const;
 
 private:
     cart* cartp() const noexcept { return hcart.get(); }
@@ -92,6 +97,7 @@ private:
 
     void loadCartState();
     void saveCartState() const;
+    void cleanup() const noexcept;
 
     std::filesystem::path cartpath;
     std::filesystem::path cartname;

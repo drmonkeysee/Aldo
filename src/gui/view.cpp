@@ -440,24 +440,13 @@ public:
 protected:
     void renderContents() override
     {
-        if (ImGui::BeginChild("CpuLeft", {200, 0})) {
-            if (ImGui::CollapsingHeader("Registers",
-                                        ImGuiTreeNodeFlags_DefaultOpen)) {
-                renderRegisters();
-            }
-            if (ImGui::CollapsingHeader("Flags",
-                                        ImGuiTreeNodeFlags_DefaultOpen)) {
-                renderFlags();
-            }
+        if (ImGui::CollapsingHeader("Registers",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+            renderRegisters();
         }
-        ImGui::EndChild();
-        ImGui::SameLine();
-        if (ImGui::BeginChild("CpuRight")
-            && ImGui::CollapsingHeader("Datapath",
-                                       ImGuiTreeNodeFlags_DefaultOpen)) {
-            renderDatapath();
+        if (ImGui::CollapsingHeader("Flags", ImGuiTreeNodeFlags_DefaultOpen)) {
+            renderFlags();
         }
-        ImGui::EndChild();
     }
 
 private:
@@ -482,8 +471,9 @@ private:
         static constexpr std::array flags{
             'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
         };
-        static constexpr auto textOn = IM_COL32_BLACK,
-                                textOff = IM_COL32_WHITE;
+        static constexpr auto
+            textOn = IM_COL32_BLACK,
+            textOff = IM_COL32_WHITE;
 
         const auto textSz = aldo::glyph_size();
         const auto radius = (textSz.x + textSz.y) / 2.0f;
@@ -510,8 +500,22 @@ private:
         }
         ImGui::Dummy({0, radius * 2});
     }
+};
 
-    void renderDatapath() const noexcept
+class DatapathView final : public aldo::View {
+public:
+    DatapathView(aldo::viewstate& vs, const aldo::Emulator& emu,
+                 const aldo::MediaRuntime& mr) noexcept
+    : View{"Datapath", vs, emu, mr} {}
+    DatapathView(aldo::viewstate&, aldo::Emulator&&,
+                 const aldo::MediaRuntime&) = delete;
+    DatapathView(aldo::viewstate&, const aldo::Emulator&,
+                 aldo::MediaRuntime&&) = delete;
+    DatapathView(aldo::viewstate&, aldo::Emulator&&,
+                 aldo::MediaRuntime&&) = delete;
+
+protected:
+    void renderContents() override
     {
         const auto& datapath = emu.snapshot().datapath;
         const auto& lines = emu.snapshot().lines;
@@ -1130,6 +1134,7 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
         BouncerView,
         CartInfoView,
         CpuView,
+        DatapathView,
         DebuggerView,
         HardwareTraitsView,
         PrgAtPcView,

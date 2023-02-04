@@ -496,7 +496,7 @@ private:
             }
             drawList->AddCircleFilled(center, radius, fillColor);
             drawList->AddText(center - offset, textColor, it, it + 1);
-            center.x += 25;
+            center.x += radius * 2.5f;
         }
         ImGui::Dummy({0, radius * 2});
     }
@@ -544,7 +544,7 @@ protected:
         ImGui::Text("adl: %02X", datapath.addrlow_latch);
         ImGui::Text("adh: %02X", datapath.addrhigh_latch);
         ImGui::Text("adc: %02X", datapath.addrcarry_latch);
-        ImGui::Text("t: %u", datapath.exec_cycle);
+        renderCycleIndicator(emu.snapshot().datapath.exec_cycle);
 
         ImGui::Separator();
 
@@ -562,6 +562,23 @@ protected:
             ImGui::Text("RES: %s%s", display_linestate(lines.reset),
                         display_signalstate(datapath.res));
         });
+    }
+
+    void renderCycleIndicator(aldo::et::byte cycle) const noexcept
+    {
+        static constexpr auto radius = 5;
+
+        const auto pos = ImGui::GetCursorScreenPos();
+        ImVec2 center = pos + radius;
+        const auto drawList = ImGui::GetWindowDrawList();
+        for (auto i = 0; i < emu.MaxCpuTCycle; ++i) {
+            drawList->AddCircleFilled(center, radius,
+                                      i == cycle
+                                      ? aldo::colors::LedOn
+                                      : aldo::colors::LedOff);
+            center.x += radius * 3;
+        }
+        ImGui::Dummy({0, radius * 2});
     }
 };
 

@@ -98,7 +98,7 @@ int clock_cpu(struct mos6502 *cpu)
     do {
         cycles += cpu_cycle(cpu);
         // NOTE: catch instructions that run longer than possible
-        ct_asserttrue(cycles <= MaxCycleCount);
+        ct_asserttrue(cycles <= MaxTCycle);
     } while (!cpu->presync);
     return cycles;
 }

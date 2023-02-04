@@ -1635,7 +1635,7 @@ static void JAM_sequence(struct mos6502 *self, struct decoded dec)
 
 static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
 {
-    assert(0 < self->t && self->t < MaxCycleCount);
+    assert(0 < self->t && self->t < MaxTCycle);
 
     switch (dec.mode) {
 #define X(s, b, n, p, ...) case AM_ENUM(s): s##_sequence(self, dec); break;
@@ -1652,8 +1652,10 @@ static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
 //
 
 // NOTE: all official opcodes max out at 7 cycles but a handful of
-// unofficial RMW opcodes have 8 cycles when using indirect-addressing modes.
-const int MaxCycleCount = 8;
+// unofficial RMW opcodes have 8 cycles when using indirect-addressing modes;
+// a full breakdown of official instruction timing states can be found at:
+// http://visual6502.org/wiki/index.php?title=6502_Timing_States
+const int MaxTCycle = 8;
 
 void cpu_powerup(struct mos6502 *self)
 {

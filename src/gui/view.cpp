@@ -611,8 +611,8 @@ private:
         for (auto i = 0; i < MaxTCycle; ++i) {
             drawList->AddCircleFilled(center, radius,
                                       i == cycle
-                                      ? aldo::colors::LedOn
-                                      : aldo::colors::LedOff);
+                                        ? aldo::colors::LedOn
+                                        : aldo::colors::LedOff);
             center.x += radius * 3;
         }
         ImGui::Spacing();
@@ -949,11 +949,13 @@ private:
             dispDtInput = vs.clock.dtInputMs;
             dispDtUpdate = vs.clock.dtUpdateMs;
             dispDtRender = vs.clock.dtRenderMs;
+            dispDtTotal = dispDtInput + dispDtUpdate + dispDtRender;
             refreshDt = 0;
         }
         ImGui::Text("Input dT: %.3f", dispDtInput);
         ImGui::Text("Update dT: %.3f", dispDtUpdate);
         ImGui::Text("Render dT: %.3f", dispDtRender);
+        ImGui::Text("Total dT: %.3f", dispDtTotal);
         ImGui::Text("Frames: %" PRIu64, cyclock.frames);
         ImGui::Text("Runtime: %.3f", cyclock.runtime);
         ImGui::Text("Cycles: %" PRIu64, cyclock.total_cycles);
@@ -1005,8 +1007,8 @@ private:
          ImGui::Button("RES");
          ImGui::PopStyleColor();*/
         // NOTE: interrupt signals are all low-active
-        auto
-        irq = !snp.lines.irq, nmi = !snp.lines.nmi, res = !snp.lines.reset;
+        auto irq = !snp.lines.irq, nmi = !snp.lines.nmi,
+                res = !snp.lines.reset;
         if (ImGui::Checkbox("IRQ", &irq)) {
             vs.commands.emplace(aldo::Command::interrupt,
                                 aldo::command_state::interrupt{CSGI_IRQ, irq});
@@ -1023,7 +1025,8 @@ private:
         }
     }
 
-    double dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0, refreshDt = 0;
+    double dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0,
+            dispDtTotal = 0, refreshDt = 0;
 };
 
 class PrgAtPcView final : public aldo::View {

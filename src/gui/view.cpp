@@ -380,6 +380,7 @@ protected:
         }
     }
 
+private:
     static void renderiNesInfo(const cartinfo& info) noexcept
     {
         ImGui::Text("Mapper: %03u", info.ines_hdr.mapper_id);
@@ -523,6 +524,7 @@ protected:
         renderInterruptLines(lineSpacer);
     }
 
+private:
     void renderControlLines(float spacer, float adjustW) const noexcept
     {
         const auto& lines = emu.snapshot().lines;

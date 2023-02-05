@@ -564,14 +564,14 @@ protected:
         });
     }
 
-    void renderCycleIndicator(aldo::et::byte cycle) const noexcept
+    static void renderCycleIndicator(aldo::et::byte cycle) noexcept
     {
         static constexpr auto radius = 5;
 
         const auto pos = ImGui::GetCursorScreenPos();
         ImVec2 center = pos + radius;
         const auto drawList = ImGui::GetWindowDrawList();
-        for (auto i = 0; i < emu.MaxCpuTCycle; ++i) {
+        for (auto i = 0; i < aldo::Emulator::MaxCpuTCycle; ++i) {
             drawList->AddCircleFilled(center, radius,
                                       i == cycle
                                       ? aldo::colors::LedOn

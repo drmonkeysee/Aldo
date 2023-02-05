@@ -10,7 +10,6 @@
 
 #include "attr.hpp"
 #include "cart.h"
-#include "cpu.h"
 #include "ctrlsignal.h"
 #include "debug.hpp"
 #include "handle.hpp"
@@ -50,8 +49,6 @@ private:
 
 class ALDO_SIDEFX Emulator {
 public:
-    inline static const int MaxCpuTCycle = MaxTCycle;
-
     Emulator(Debugger d, console_handle n, const gui_platform& p);
     Emulator(const Emulator&) = delete;
     Emulator& operator=(const Emulator&) = delete;

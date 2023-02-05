@@ -10,6 +10,7 @@
 #include "attr.hpp"
 #include "bytes.h"
 #include "cart.h"
+#include "cpu.h"
 #include "ctrlsignal.h"
 #include "cycleclock.h"
 #include "debug.hpp"
@@ -571,7 +572,7 @@ protected:
         const auto pos = ImGui::GetCursorScreenPos();
         ImVec2 center = pos + radius;
         const auto drawList = ImGui::GetWindowDrawList();
-        for (auto i = 0; i < aldo::Emulator::MaxCpuTCycle; ++i) {
+        for (auto i = 0; i < MaxTCycle; ++i) {
             drawList->AddCircleFilled(center, radius,
                                       i == cycle
                                       ? aldo::colors::LedOn

@@ -613,7 +613,7 @@ protected:
                                       : aldo::colors::LedOff);
             center.x += radius * 3;
         }
-        ImGui::Dummy({0, 0});
+        ImGui::Spacing();
     }
 
     static void renderControlLine(const char* label, bool active) noexcept

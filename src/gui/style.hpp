@@ -31,8 +31,10 @@ inline constexpr ImU32
     LineIn = IM_COL32(0x87, 0xce, 0xfa, SDL_ALPHA_OPAQUE),
     LineOut = IM_COL32(0x90, 0xee, 0x90, SDL_ALPHA_OPAQUE);
 
-inline ImU32 white_disabled() noexcept
+inline ImU32 white(bool enabled) noexcept
 {
+    if (enabled) return IM_COL32_WHITE;
+
     ImColor white{IM_COL32_WHITE};
     white.Value.w = ImGui::GetStyle().DisabledAlpha;
     return white;

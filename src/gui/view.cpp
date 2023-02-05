@@ -513,9 +513,8 @@ public:
 protected:
     void renderContents() override
     {
-        static const auto lineSpacer = aldo::glyph_size().x * 6;
-
-        renderControlLines(lineSpacer);
+        const auto glyphW = aldo::glyph_size().x, lineSpacer = glyphW * 6;
+        renderControlLines(lineSpacer, glyphW);
         ImGui::Separator();
         renderBusLines();
         ImGui::Separator();
@@ -524,79 +523,47 @@ protected:
         renderInterruptLines(lineSpacer);
     }
 
-    void renderControlLines(float spacer) const noexcept
+    void renderControlLines(float spacer, float adjustW) const noexcept
     {
         const auto& lines = emu.snapshot().lines;
-
-        if (!lines.ready) {
-            ImGui::BeginDisabled();
-        }
-        ImGui::TextUnformatted("RDY");
-        if (!lines.ready) {
-            ImGui::EndDisabled();
-        }
-
+        renderControlLine("RDY", lines.ready);
         ImGui::SameLine(0, spacer);
-
-        if (!lines.sync) {
-            ImGui::BeginDisabled();
-        }
-        ImGui::TextUnformatted("SYNC");
-        if (!lines.sync) {
-            ImGui::EndDisabled();
-        }
-
-        ImGui::SameLine(0, spacer - aldo::glyph_size().x);
-
-        if (!lines.readwrite) {
-            ImGui::BeginDisabled();
-        }
-        ImGui::TextUnformatted("R/W");
-        const ImVec2
-            end{ImGui::GetItemRectMax().x, ImGui::GetItemRectMin().y},
-            start{end.x - aldo::glyph_size().x, end.y};
-        const auto drawList = ImGui::GetWindowDrawList();
-        drawList->AddLine(start, end,
-                          lines.readwrite
-                            ? IM_COL32_WHITE
-                            : aldo::colors::white_disabled());
-        if (!lines.readwrite) {
-            ImGui::EndDisabled();
-        }
+        renderControlLine("SYNC", lines.sync);
+        // NOTE: adjust spacer width for SYNC's extra letter
+        ImGui::SameLine(0, spacer - adjustW);
+        renderRWLine(lines.readwrite, adjustW);
     }
 
     void renderBusLines() const noexcept
     {
         const auto& datapath = emu.snapshot().datapath;
-
-        widget_group([addr = datapath.addressbus] {
-            ScopedColor color{{ImGuiCol_Text, aldo::colors::LineOut}};
-            ImGui::Text("Addr: %04X", addr);
-        });
+        {
+            const ScopedColor color{{ImGuiCol_Text, aldo::colors::LineOut}};
+            ImGui::Text("Addr: %04X", datapath.addressbus);
+        };
         ImGui::SameLine(0, 20);
-        widget_group([&datapath, read = emu.snapshot().lines.readwrite] {
-            if (datapath.busfault) {
-                ScopedColor color{
-                    {ImGuiCol_Text, aldo::colors::DestructiveHover},
-                };
-                ImGui::TextUnformatted("Data: FLT");
-            } else {
-                std::array<char, 3> dataHex;
-                std::snprintf(dataHex.data(), dataHex.size(), "%02X",
-                              datapath.databus);
-                ScopedColor color{{
-                    ImGuiCol_Text,
-                    read ? aldo::colors::LineIn : aldo::colors::LineOut,
-                }};
-                ImGui::Text("Data: %s", dataHex.data());
-            }
-        });
+        if (datapath.busfault) {
+            const ScopedColor color{
+                {ImGuiCol_Text, aldo::colors::DestructiveHover},
+            };
+            ImGui::TextUnformatted("Data: FLT");
+        } else {
+            std::array<char, 3> dataHex;
+            std::snprintf(dataHex.data(), dataHex.size(), "%02X",
+                          datapath.databus);
+            const ScopedColor color{{
+                ImGuiCol_Text,
+                emu.snapshot().lines.readwrite
+                    ? aldo::colors::LineIn
+                    : aldo::colors::LineOut,
+            }};
+            ImGui::Text("Data: %s", dataHex.data());
+        }
     }
 
     void renderInstructionDecode() const noexcept
     {
         const auto& datapath = emu.snapshot().datapath;
-
         if (datapath.jammed) {
             ScopedColor color{{ImGuiCol_Text, aldo::colors::DestructiveHover}};
             ImGui::TextUnformatted("Decode: JAMMED");
@@ -616,66 +583,11 @@ protected:
         ImGui::Spacing();
 
         const auto& lines = emu.snapshot().lines;
-        if (!lines.irq) {
-            ImGui::BeginDisabled();
-        }
-        ImGui::TextUnformatted("IRQ");
-        {
-            const auto start = ImGui::GetItemRectMin();
-            const ImVec2 end{
-                start.x + ImGui::GetItemRectSize().x, start.y,
-            };
-            const auto drawlist = ImGui::GetWindowDrawList();
-            drawlist->AddLine(start, end,
-                              lines.irq
-                                ? IM_COL32_WHITE
-                                : aldo::colors::white_disabled());
-        }
-        if (!lines.irq) {
-            ImGui::EndDisabled();
-        }
-
+        renderInterruptLine("IRQ", lines.irq);
         ImGui::SameLine(0, spacer);
-
-        if (!lines.nmi) {
-            ImGui::BeginDisabled();
-        }
-        ImGui::TextUnformatted("NMI");
-        {
-            const auto start = ImGui::GetItemRectMin();
-            const ImVec2 end{
-                start.x + ImGui::GetItemRectSize().x, start.y,
-            };
-            const auto drawlist = ImGui::GetWindowDrawList();
-            drawlist->AddLine(start, end,
-                              lines.nmi
-                                ? IM_COL32_WHITE
-                                : aldo::colors::white_disabled());
-        }
-        if (!lines.nmi) {
-            ImGui::EndDisabled();
-        }
-
+        renderInterruptLine("NMI", lines.nmi);
         ImGui::SameLine(0, spacer);
-
-        if (!lines.reset) {
-            ImGui::BeginDisabled();
-        }
-        ImGui::TextUnformatted("RES");
-        {
-            const auto start = ImGui::GetItemRectMin();
-            const ImVec2 end{
-                start.x + ImGui::GetItemRectSize().x, start.y,
-            };
-            const auto drawlist = ImGui::GetWindowDrawList();
-            drawlist->AddLine(start, end,
-                              lines.reset
-                                ? IM_COL32_WHITE
-                                : aldo::colors::white_disabled());
-        }
-        if (!lines.reset) {
-            ImGui::EndDisabled();
-        }
+        renderInterruptLine("RES", lines.reset);
 
         const auto& datapath = emu.snapshot().datapath;
         ImGui::TextUnformatted(display_signalstate(datapath.irq));
@@ -702,6 +614,50 @@ protected:
             center.x += radius * 3;
         }
         ImGui::Dummy({0, 0});
+    }
+
+    static void renderControlLine(const char* label, bool active) noexcept
+    {
+        if (!active) {
+            ImGui::BeginDisabled();
+        }
+        ImGui::TextUnformatted(label);
+        if (!active) {
+            ImGui::EndDisabled();
+        }
+    }
+
+    static void renderRWLine(bool active, float adjustW) noexcept
+    {
+        if (!active) {
+            ImGui::BeginDisabled();
+        }
+        ImGui::TextUnformatted("R/W");
+        const ImVec2
+            end{ImGui::GetItemRectMax().x, ImGui::GetItemRectMin().y},
+            start{end.x - adjustW, end.y};
+        const auto drawList = ImGui::GetWindowDrawList();
+        drawList->AddLine(start, end, aldo::colors::white(active));
+        if (!active) {
+            ImGui::EndDisabled();
+        }
+    }
+
+    static void renderInterruptLine(const char* label, bool active) noexcept
+    {
+        if (!active) {
+            ImGui::BeginDisabled();
+        }
+        ImGui::TextUnformatted(label);
+        const auto start = ImGui::GetItemRectMin();
+        const ImVec2 end{
+            start.x + ImGui::GetItemRectSize().x, start.y,
+        };
+        const auto drawlist = ImGui::GetWindowDrawList();
+        drawlist->AddLine(start, end, aldo::colors::white(active));
+        if (!active) {
+            ImGui::EndDisabled();
+        }
     }
 };
 

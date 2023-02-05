@@ -122,24 +122,19 @@ using ScopedColor = ScopedWidgetVars<scoped_color_val>;
 
 constexpr auto NoSelection = -1;
 
-constexpr auto display_linestate(bool v) noexcept
-{
-    return v ? "HI" : "LO";
-}
-
 constexpr auto display_signalstate(csig_state s) noexcept
 {
     switch (s) {
     case CSGS_PENDING:
-        return " (P)";
+        return "(P)";
     case CSGS_DETECTED:
-        return " (D)";
+        return "(D)";
     case CSGS_COMMITTED:
-        return " (C)";
+        return "(C)";
     case CSGS_SERVICED:
-        return " (S)";
+        return "(S)";
     default:
-        return "";
+        return "(O)";
     }
 }
 
@@ -518,59 +513,186 @@ public:
 protected:
     void renderContents() override
     {
-        const auto& datapath = emu.snapshot().datapath;
+        static const auto lineSpacer = aldo::glyph_size().x * 6;
+
+        renderControlLines(lineSpacer);
+        ImGui::Separator();
+        renderBusLines();
+        ImGui::Separator();
+        renderInstructionDecode();
+        ImGui::Separator();
+        renderInterruptLines(lineSpacer);
+    }
+
+    void renderControlLines(float spacer) const noexcept
+    {
         const auto& lines = emu.snapshot().lines;
 
-        ImGui::Text("Address Bus: %04X", datapath.addressbus);
-        if (datapath.busfault) {
-            ImGui::TextUnformatted("Data Bus: FLT");
-        } else {
-            std::array<char, 3> dataHex;
-            std::snprintf(dataHex.data(), dataHex.size(), "%02X",
-                          datapath.databus);
-            ImGui::Text("Data Bus: %s", dataHex.data());
+        if (!lines.ready) {
+            ImGui::BeginDisabled();
         }
-        ImGui::SameLine();
-        ImGui::TextUnformatted(lines.readwrite ? "R" : "W");
+        ImGui::TextUnformatted("RDY");
+        if (!lines.ready) {
+            ImGui::EndDisabled();
+        }
 
-        ImGui::Separator();
+        ImGui::SameLine(0, spacer);
+
+        if (!lines.sync) {
+            ImGui::BeginDisabled();
+        }
+        ImGui::TextUnformatted("SYNC");
+        if (!lines.sync) {
+            ImGui::EndDisabled();
+        }
+
+        ImGui::SameLine(0, spacer - aldo::glyph_size().x);
+
+        if (!lines.readwrite) {
+            ImGui::BeginDisabled();
+        }
+        ImGui::TextUnformatted("R/W");
+        const ImVec2
+            end{ImGui::GetItemRectMax().x, ImGui::GetItemRectMin().y},
+            start{end.x - aldo::glyph_size().x, end.y};
+        const auto drawList = ImGui::GetWindowDrawList();
+        drawList->AddLine(start, end,
+                          lines.readwrite
+                            ? IM_COL32_WHITE
+                            : aldo::colors::white_disabled());
+        if (!lines.readwrite) {
+            ImGui::EndDisabled();
+        }
+    }
+
+    void renderBusLines() const noexcept
+    {
+        const auto& datapath = emu.snapshot().datapath;
+
+        widget_group([addr = datapath.addressbus] {
+            ScopedColor color{{ImGuiCol_Text, aldo::colors::LineOut}};
+            ImGui::Text("Addr: %04X", addr);
+        });
+        ImGui::SameLine(0, 20);
+        widget_group([&datapath, read = emu.snapshot().lines.readwrite] {
+            if (datapath.busfault) {
+                ScopedColor color{
+                    {ImGuiCol_Text, aldo::colors::DestructiveHover},
+                };
+                ImGui::TextUnformatted("Data: FLT");
+            } else {
+                std::array<char, 3> dataHex;
+                std::snprintf(dataHex.data(), dataHex.size(), "%02X",
+                              datapath.databus);
+                ScopedColor color{{
+                    ImGuiCol_Text,
+                    read ? aldo::colors::LineIn : aldo::colors::LineOut,
+                }};
+                ImGui::Text("Data: %s", dataHex.data());
+            }
+        });
+    }
+
+    void renderInstructionDecode() const noexcept
+    {
+        const auto& datapath = emu.snapshot().datapath;
 
         if (datapath.jammed) {
-            ImGui::TextUnformatted("JAMMED");
+            ScopedColor color{{ImGuiCol_Text, aldo::colors::DestructiveHover}};
+            ImGui::TextUnformatted("Decode: JAMMED");
         } else {
             std::array<aldo::et::tchar, DIS_DATAP_SIZE> buf;
             const auto err = dis_datapath(emu.snapshotp(), buf.data());
-            ImGui::TextUnformatted(err < 0 ? dis_errstr(err) : buf.data());
+            ImGui::Text("Decode: %s", err < 0 ? dis_errstr(err) : buf.data());
         }
         ImGui::Text("adl: %02X", datapath.addrlow_latch);
         ImGui::Text("adh: %02X", datapath.addrhigh_latch);
         ImGui::Text("adc: %02X", datapath.addrcarry_latch);
         renderCycleIndicator(emu.snapshot().datapath.exec_cycle);
+    }
 
-        ImGui::Separator();
+    void renderInterruptLines(float spacer) const noexcept
+    {
+        ImGui::Spacing();
 
-        widget_group([&lines]() {
-            ImGui::Text("RDY:  %s", display_linestate(lines.ready));
-            ImGui::Text("SYNC: %s", display_linestate(lines.sync));
-            ImGui::Text("R/W:  %s", display_linestate(lines.readwrite));
-        });
-        ImGui::SameLine(0, 40);
-        widget_group([&lines, &datapath]() {
-            ImGui::Text("IRQ: %s%s", display_linestate(lines.irq),
-                        display_signalstate(datapath.irq));
-            ImGui::Text("NMI: %s%s", display_linestate(lines.nmi),
-                        display_signalstate(datapath.nmi));
-            ImGui::Text("RES: %s%s", display_linestate(lines.reset),
-                        display_signalstate(datapath.res));
-        });
+        const auto& lines = emu.snapshot().lines;
+        if (!lines.irq) {
+            ImGui::BeginDisabled();
+        }
+        ImGui::TextUnformatted("IRQ");
+        {
+            const auto start = ImGui::GetItemRectMin();
+            const ImVec2 end{
+                start.x + ImGui::GetItemRectSize().x, start.y,
+            };
+            const auto drawlist = ImGui::GetWindowDrawList();
+            drawlist->AddLine(start, end,
+                              lines.irq
+                                ? IM_COL32_WHITE
+                                : aldo::colors::white_disabled());
+        }
+        if (!lines.irq) {
+            ImGui::EndDisabled();
+        }
+
+        ImGui::SameLine(0, spacer);
+
+        if (!lines.nmi) {
+            ImGui::BeginDisabled();
+        }
+        ImGui::TextUnformatted("NMI");
+        {
+            const auto start = ImGui::GetItemRectMin();
+            const ImVec2 end{
+                start.x + ImGui::GetItemRectSize().x, start.y,
+            };
+            const auto drawlist = ImGui::GetWindowDrawList();
+            drawlist->AddLine(start, end,
+                              lines.nmi
+                                ? IM_COL32_WHITE
+                                : aldo::colors::white_disabled());
+        }
+        if (!lines.nmi) {
+            ImGui::EndDisabled();
+        }
+
+        ImGui::SameLine(0, spacer);
+
+        if (!lines.reset) {
+            ImGui::BeginDisabled();
+        }
+        ImGui::TextUnformatted("RES");
+        {
+            const auto start = ImGui::GetItemRectMin();
+            const ImVec2 end{
+                start.x + ImGui::GetItemRectSize().x, start.y,
+            };
+            const auto drawlist = ImGui::GetWindowDrawList();
+            drawlist->AddLine(start, end,
+                              lines.reset
+                                ? IM_COL32_WHITE
+                                : aldo::colors::white_disabled());
+        }
+        if (!lines.reset) {
+            ImGui::EndDisabled();
+        }
+
+        const auto& datapath = emu.snapshot().datapath;
+        ImGui::TextUnformatted(display_signalstate(datapath.irq));
+        ImGui::SameLine(0, spacer);
+        ImGui::TextUnformatted(display_signalstate(datapath.nmi));
+        ImGui::SameLine(0, spacer);
+        ImGui::TextUnformatted(display_signalstate(datapath.res));
     }
 
     static void renderCycleIndicator(aldo::et::byte cycle) noexcept
     {
         static constexpr auto radius = 5;
 
+        ImGui::TextUnformatted("t:");
+        ImGui::SameLine();
         const auto pos = ImGui::GetCursorScreenPos();
-        ImVec2 center = pos + radius;
+        ImVec2 center = {pos.x, pos.y + (ImGui::GetTextLineHeight() / 2) + 1};
         const auto drawList = ImGui::GetWindowDrawList();
         for (auto i = 0; i < MaxTCycle; ++i) {
             drawList->AddCircleFilled(center, radius,
@@ -579,7 +701,7 @@ protected:
                                       : aldo::colors::LedOff);
             center.x += radius * 3;
         }
-        ImGui::Dummy({0, radius * 2});
+        ImGui::Dummy({0, 0});
     }
 };
 

@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <array>
 #include <concepts>
+#include <functional>
 #include <iterator>
 #include <locale>
 #include <string>
@@ -90,8 +91,8 @@ private:
 }
 
 template<typename T>
-concept ScopedIDVal
-    = std::convertible_to<T, void*> || std::convertible_to<T, int>;
+concept ScopedIDVal =
+    std::convertible_to<T, void*> || std::convertible_to<T, int>;
 
 class ALDO_SIDEFX ScopedID {
 public:
@@ -106,8 +107,8 @@ public:
 using scoped_style_val = std::pair<ImGuiStyleVar, float>;
 using scoped_color_val = std::pair<ImGuiCol, ImU32>;
 template<typename T>
-concept ScopedVal
-    = std::same_as<T, scoped_style_val> || std::same_as<T, scoped_color_val>;
+concept ScopedVal =
+    std::same_as<T, scoped_style_val> || std::same_as<T, scoped_color_val>;
 
 template<ScopedVal V>
 class ALDO_SIDEFX ScopedWidgetVars {
@@ -196,12 +197,12 @@ constexpr auto operator-(ImVec2 a, const ImVec2& b) noexcept
     return ImVec2{a.x - b.x, a.y - b.y};
 }
 
-constexpr auto keys_pressed(std::same_as<ImGuiKey> auto... keys) noexcept
+auto keys_pressed(std::same_as<ImGuiKey> auto... keys) noexcept
 {
     return (ImGui::IsKeyPressed(keys, false) || ...);
 }
 
-constexpr auto enter_pressed() noexcept
+auto enter_pressed() noexcept
 {
     return keys_pressed(ImGuiKey_Enter, ImGuiKey_KeypadEnter);
 }
@@ -225,40 +226,121 @@ auto widget_group(std::invocable auto f)
     ImGui::EndGroup();
 }
 
+auto about_submenu(aldo::viewstate& vs, const aldo::MediaRuntime& mr)
+{
+    if (ImGui::BeginMenu(SDL_GetWindowTitle(mr.window()))) {
+        ImGui::MenuItem("About", nullptr, &vs.showAbout);
+        if (ImGui::MenuItem("Quit", "Cmd+Q")) {
+            vs.commands.emplace(aldo::Command::quit);
+        };
+        ImGui::EndMenu();
+    }
+}
+
+auto file_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
+{
+    if (ImGui::BeginMenu("File")) {
+        if (ImGui::MenuItem("Open ROM", "Cmd+O")) {
+            vs.commands.emplace(aldo::Command::openROM);
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Open Breakpoints", "Cmd+B")) {
+            vs.commands.emplace(aldo::Command::breakpointsOpen);
+        }
+        {
+            const DisabledIf dif = !emu.debugger().isActive();
+            if (ImGui::MenuItem("Export Breakpoints", "Opt+Cmd+B")) {
+                vs.commands.emplace(aldo::Command::breakpointsExport);
+            }
+        }
+        ImGui::EndMenu();
+    }
+}
+
+#define CYCLE_RATE_PLBL "Cycle Rate +"
+#define CYCLE_RATE_MLBL "Cycle Rate -"
+auto speed_menu_items(aldo::viewstate& vs) noexcept
+{
+    const auto cyclamp =
+        [&cps = vs.clock.cyclock.cycles_per_sec]
+        (std::derived_from<std::binary_function<int, int, int>> auto op,
+         int operand) {
+            cps = std::min(std::max(MinCps, op(cps, operand)), MaxCps);
+        };
+    const auto shiftDown = ImGui::IsKeyDown(ImGuiKey_ModShift);
+    const auto val = shiftDown ? 10 : 1;
+    if (ImGui::MenuItem(shiftDown ? CYCLE_RATE_PLBL " 10x" : CYCLE_RATE_PLBL,
+                        shiftDown ? "+" : "=")) {
+        cyclamp(std::plus<int>{}, val);
+    }
+    if (ImGui::MenuItem(shiftDown ? CYCLE_RATE_MLBL " 10x" : CYCLE_RATE_MLBL,
+                        shiftDown ? "_" : "-")) {
+        cyclamp(std::minus<int>{}, val);
+    }
+}
+
+#define SWITCH_MODE_LBL "Switch Mode"
+auto mode_menu_item(aldo::viewstate& vs, const aldo::Emulator& emu)
+{
+    if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
+        if (ImGui::MenuItem(SWITCH_MODE_LBL " (R)", "M")) {
+            const auto val = static_cast<csig_excmode>(emu.runMode() - 1);
+            vs.commands.emplace(aldo::Command::mode, val);
+        }
+    } else {
+        if (ImGui::MenuItem(SWITCH_MODE_LBL, "m")) {
+            const auto val = static_cast<csig_excmode>(emu.runMode() + 1);
+            vs.commands.emplace(aldo::Command::mode, val);
+        }
+    }
+}
+
+auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
+{
+    if (ImGui::BeginMenu("Controls")) {
+        speed_menu_items(vs);
+        const auto& lines = emu.snapshot().lines;
+        auto halt = !lines.ready;
+        if (ImGui::MenuItem("Halt Emulator", "<Space>", &halt)) {
+            vs.commands.emplace(aldo::Command::halt, halt);
+        }
+        mode_menu_item(vs, emu);
+        auto irq = !lines.irq, nmi = !lines.nmi, res = !lines.reset;
+        if (ImGui::MenuItem("Send IRQ", "i", &irq)) {
+            vs.commands.emplace(aldo::Command::interrupt,
+                                aldo::command_state::interrupt{CSGI_IRQ, irq});
+        }
+        if (ImGui::MenuItem("Send NMI", "n", &nmi)) {
+            vs.commands.emplace(aldo::Command::interrupt,
+                                aldo::command_state::interrupt{CSGI_NMI, nmi});
+        }
+        if (ImGui::MenuItem("Send RES", "s", &res)) {
+            vs.commands.emplace(aldo::Command::interrupt,
+                                aldo::command_state::interrupt{CSGI_RES, res});
+        }
+        ImGui::EndMenu();
+    }
+}
+
+auto tools_menu(aldo::viewstate& vs)
+{
+    if (ImGui::BeginMenu("Tools")) {
+        ImGui::MenuItem("ImGui Demo", "Cmd+D", &vs.showDemo);
+        if (ImGui::MenuItem("Aldo Studio")) {
+            vs.commands.emplace(aldo::Command::launchStudio);
+        }
+        ImGui::EndMenu();
+    }
+}
+
 auto main_menu(aldo::viewstate& vs, const aldo::Emulator& emu,
                const aldo::MediaRuntime& mr)
 {
     if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu(SDL_GetWindowTitle(mr.window()))) {
-            ImGui::MenuItem("About", nullptr, &vs.showAbout);
-            if (ImGui::MenuItem("Quit", "Cmd+Q")) {
-                vs.commands.emplace(aldo::Command::quit);
-            };
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Open ROM", "Cmd+O")) {
-                vs.commands.emplace(aldo::Command::openROM);
-            }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Open Breakpoints", "Cmd+B")) {
-                vs.commands.emplace(aldo::Command::breakpointsOpen);
-            }
-            {
-                const DisabledIf dif = !emu.debugger().isActive();
-                if (ImGui::MenuItem("Export Breakpoints", "Opt+Cmd+B")) {
-                    vs.commands.emplace(aldo::Command::breakpointsExport);
-                }
-            }
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Tools")) {
-            ImGui::MenuItem("ImGui Demo", "Cmd+D", &vs.showDemo);
-            if (ImGui::MenuItem("Aldo Studio")) {
-                vs.commands.emplace(aldo::Command::launchStudio);
-            }
-            ImGui::EndMenu();
-        }
+        about_submenu(vs, mr);
+        file_menu(vs, emu);
+        controls_menu(vs, emu);
+        tools_menu(vs);
         ImGui::EndMainMenuBar();
     }
 }

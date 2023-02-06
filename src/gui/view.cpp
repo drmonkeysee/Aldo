@@ -582,13 +582,13 @@ private:
     void renderRegisters() const noexcept
     {
         const auto& cpu = emu.snapshot().cpu;
-        widget_group([&cpu]() {
+        widget_group([&cpu] {
             ImGui::Text("A: %02X", cpu.accumulator);
             ImGui::Text("X: %02X", cpu.xindex);
             ImGui::Text("Y: %02X", cpu.yindex);
         });
         ImGui::SameLine(0, 90);
-        widget_group([&cpu]() {
+        widget_group([&cpu] {
             ImGui::Text("PC: %04X", cpu.program_counter);
             ImGui::Text(" S: %02X", cpu.stack_pointer);
             ImGui::Text(" P: %02X", cpu.status);
@@ -839,7 +839,7 @@ private:
                 vs.commands.emplace(aldo::Command::resetVectorClear);
             }
         }
-        const DisabledIf dif = [this]() {
+        const DisabledIf dif = [this] {
             if (this->resetOverride) return false;
             // NOTE: +2 = start of reset vector
             this->resetAddr = batowr(this->emu.snapshot().mem.vectors + 2);
@@ -966,11 +966,12 @@ private:
 
     void renderListControls(bp_sz bpCount)
     {
-        static const auto disabled_if_noselection =
-            [](bp_diff s) -> DisabledIf { return s == NoSelection; };
-
+        const auto disabled_if_noselection =
+            [s = selectedBreakpoint]() -> DisabledIf {
+                return s == NoSelection;
+            };
         {
-            const auto dif = disabled_if_noselection(selectedBreakpoint);
+            const auto dif = disabled_if_noselection();
             const auto& dbg = emu.debugger();
             const auto bp = dbg.breakpoints().at(selectedBreakpoint);
             if (ImGui::Button(!bp || bp->enabled ? "Disable" : "Enable ")) {
@@ -986,7 +987,7 @@ private:
         };
         auto resetSelection = false;
         {
-            const auto dif = disabled_if_noselection(selectedBreakpoint);
+            const auto dif = disabled_if_noselection();
             if (ImGui::Button("Remove")) {
                 vs.commands.emplace(aldo::Command::breakpointRemove,
                                     selectedBreakpoint);

@@ -874,13 +874,17 @@ private:
 
     void renderListControls(bp_sz bpCount)
     {
-        if (selectedBreakpoint == NoSelection) {
-            ImGui::BeginDisabled();
-        }
-        const auto bp = emu.debugger().breakpoints().at(selectedBreakpoint);
-        if (ImGui::Button(!bp || bp->enabled ? "Disable" : "Enable ")) {
-            vs.commands.emplace(aldo::Command::breakpointToggle,
-                                selectedBreakpoint);
+        static const auto disabled_if_noselection =
+            [](bp_diff s) -> DisabledIf { return s == NoSelection; };
+
+        {
+            const auto dif = disabled_if_noselection(selectedBreakpoint);
+            const auto& dbg = emu.debugger();
+            const auto bp = dbg.breakpoints().at(selectedBreakpoint);
+            if (ImGui::Button(!bp || bp->enabled ? "Disable" : "Enable ")) {
+                vs.commands.emplace(aldo::Command::breakpointToggle,
+                                    selectedBreakpoint);
+            }
         }
         ImGui::SameLine();
         const ScopedColor colors = {
@@ -889,13 +893,13 @@ private:
             {ImGuiCol_ButtonActive, aldo::colors::DestructiveActive},
         };
         auto resetSelection = false;
-        if (ImGui::Button("Remove")) {
-            vs.commands.emplace(aldo::Command::breakpointRemove,
-                                selectedBreakpoint);
-            resetSelection = true;
-        }
-        if (selectedBreakpoint == NoSelection) {
-            ImGui::EndDisabled();
+        {
+            const auto dif = disabled_if_noselection(selectedBreakpoint);
+            if (ImGui::Button("Remove")) {
+                vs.commands.emplace(aldo::Command::breakpointRemove,
+                                    selectedBreakpoint);
+                resetSelection = true;
+            }
         }
         ImGui::SameLine();
         const DisabledIf dif = bpCount == 0;

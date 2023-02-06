@@ -261,10 +261,12 @@ auto file_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
 #define CYCLE_RATE_MLBL "Cycle Rate -"
 auto speed_menu_items(aldo::viewstate& vs) noexcept
 {
+    using cps_type = decltype(vs.clock.cyclock.cycles_per_sec);
+    using cps_binop = std::binary_function<cps_type, cps_type, cps_type>;
+
     const auto cyclamp =
         [&cps = vs.clock.cyclock.cycles_per_sec]
-        (std::derived_from<std::binary_function<int, int, int>> auto op,
-         int operand) {
+        (std::derived_from<cps_binop> auto op, cps_type operand) {
             cps = std::min(std::max(MinCps, op(cps, operand)), MaxCps);
         };
     const auto shiftDown = ImGui::IsKeyDown(ImGuiKey_ModShift);

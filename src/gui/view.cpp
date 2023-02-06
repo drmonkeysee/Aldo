@@ -278,14 +278,10 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
             cyclamp(std::plus<int>{}, val);
         }
     }
-    {
-        const DisabledIf dif = vs.clock.cyclock.cycles_per_sec == MinCps;
-        if (ImGui::MenuItem(shiftDown
-                                ? CYCLE_RATE_MLBL " 10x"
-                                : CYCLE_RATE_MLBL,
-                            shiftDown ? "_" : "-")) {
-            cyclamp(std::minus<int>{}, val);
-        }
+    const DisabledIf dif = vs.clock.cyclock.cycles_per_sec == MinCps;
+    if (ImGui::MenuItem(shiftDown ? CYCLE_RATE_MLBL " 10x" : CYCLE_RATE_MLBL,
+                        shiftDown ? "_" : "-")) {
+        cyclamp(std::minus<int>{}, val);
     }
 }
 

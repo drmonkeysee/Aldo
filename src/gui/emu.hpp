@@ -41,9 +41,12 @@ public:
 
     const console_state& get() const noexcept { return snapshot; }
     const console_state* getp() const noexcept { return &snapshot; }
-    console_state* getp() noexcept { return &snapshot; }
 
 private:
+    friend class Emulator;
+
+    console_state* getp() noexcept { return &snapshot; }
+
     console_state snapshot;
 };
 

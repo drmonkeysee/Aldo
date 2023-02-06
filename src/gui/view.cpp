@@ -46,6 +46,49 @@ namespace
 // Helpers
 //
 
+class ALDO_SIDEFX DisabledIf {
+public:
+    DisabledIf(bool condition) noexcept : condition{condition}
+    {
+        if (!condition) return;
+        ImGui::BeginDisabled();
+    };
+    DisabledIf(const DisabledIf&) = delete;
+    DisabledIf& operator=(const DisabledIf&) = delete;
+    DisabledIf(DisabledIf&& that) noexcept : condition{that.condition}
+    {
+        that.condition = false;
+    }
+    DisabledIf& operator=(DisabledIf&& that) noexcept
+    {
+        if (this == &that) return *this;
+
+        swap(that);
+        that.condition = false;
+        return *this;
+    }
+    ~DisabledIf()
+    {
+        if (!condition) return;
+        ImGui::EndDisabled();
+    }
+
+    void swap(DisabledIf& that) noexcept
+    {
+        using std::swap;
+
+        swap(condition, that.condition);
+    }
+
+private:
+    bool condition;
+};
+
+[[maybe_unused]] void swap(DisabledIf& a, DisabledIf& b) noexcept
+{
+    a.swap(b);
+}
+
 template<typename T>
 concept ScopedIDVal
     = std::convertible_to<T, void*> || std::convertible_to<T, int>;
@@ -201,14 +244,11 @@ auto main_menu(aldo::viewstate& vs, const aldo::Emulator& emu,
             if (ImGui::MenuItem("Open Breakpoints", "Cmd+B")) {
                 vs.commands.emplace(aldo::Command::breakpointsOpen);
             }
-            if (!emu.debugger().isActive()) {
-                ImGui::BeginDisabled();
-            }
-            if (ImGui::MenuItem("Export Breakpoints", "Opt+Cmd+B")) {
-                vs.commands.emplace(aldo::Command::breakpointsExport);
-            }
-            if (!emu.debugger().isActive()) {
-                ImGui::EndDisabled();
+            {
+                const DisabledIf dif = !emu.debugger().isActive();
+                if (ImGui::MenuItem("Export Breakpoints", "Opt+Cmd+B")) {
+                    vs.commands.emplace(aldo::Command::breakpointsExport);
+                }
             }
             ImGui::EndMenu();
         }
@@ -620,36 +660,24 @@ private:
 
     static void renderControlLine(const char* label, bool active) noexcept
     {
-        if (!active) {
-            ImGui::BeginDisabled();
-        }
+        const DisabledIf dif = !active;
         ImGui::TextUnformatted(label);
-        if (!active) {
-            ImGui::EndDisabled();
-        }
     }
 
     static void renderRWLine(bool active, float adjustW) noexcept
     {
-        if (!active) {
-            ImGui::BeginDisabled();
-        }
+        const DisabledIf dif = !active;
         ImGui::TextUnformatted("R/W");
         const ImVec2
             end{ImGui::GetItemRectMax().x, ImGui::GetItemRectMin().y},
             start{end.x - adjustW, end.y};
         const auto drawList = ImGui::GetWindowDrawList();
         drawList->AddLine(start, end, aldo::colors::white(active));
-        if (!active) {
-            ImGui::EndDisabled();
-        }
     }
 
     static void renderInterruptLine(const char* label, bool active) noexcept
     {
-        if (!active) {
-            ImGui::BeginDisabled();
-        }
+        const DisabledIf dif = !active;
         ImGui::TextUnformatted(label);
         const auto start = ImGui::GetItemRectMin();
         const ImVec2 end{
@@ -657,9 +685,6 @@ private:
         };
         const auto drawlist = ImGui::GetWindowDrawList();
         drawlist->AddLine(start, end, aldo::colors::white(active));
-        if (!active) {
-            ImGui::EndDisabled();
-        }
     }
 };
 
@@ -722,17 +747,15 @@ private:
                 vs.commands.emplace(aldo::Command::resetVectorClear);
             }
         }
-        if (!resetOverride) {
-            ImGui::BeginDisabled();
+        const DisabledIf dif = [this]() {
+            if (this->resetOverride) return false;
             // NOTE: +2 = start of reset vector
-            resetAddr = batowr(emu.snapshot().mem.vectors + 2);
-        }
+            this->resetAddr = batowr(this->emu.snapshot().mem.vectors + 2);
+            return true;
+        }();
         if (input_address(&resetAddr)) {
             vs.commands.emplace(aldo::Command::resetVectorOverride,
                                 static_cast<int>(resetAddr));
-        }
-        if (!resetOverride) {
-            ImGui::EndDisabled();
         }
     }
 
@@ -875,15 +898,10 @@ private:
             ImGui::EndDisabled();
         }
         ImGui::SameLine();
-        if (bpCount == 0) {
-            ImGui::BeginDisabled();
-        }
+        const DisabledIf dif = bpCount == 0;
         if (ImGui::Button("Clear")) {
             vs.commands.emplace(aldo::Command::breakpointsClear);
             resetSelection = true;
-        }
-        if (bpCount == 0) {
-            ImGui::EndDisabled();
         }
         if (resetSelection) {
             selectedBreakpoint = NoSelection;

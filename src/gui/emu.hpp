@@ -84,7 +84,7 @@ public:
             nes_clear(consolep(), signal);
         }
     }
-    enum csig_excmode runMode() const noexcept { return nes_mode(consolep()); }
+    csig_excmode runMode() const noexcept { return nes_mode(consolep()); }
     void runMode(csig_excmode mode) noexcept
     {
         nes_set_mode(consolep(), mode);

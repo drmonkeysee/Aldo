@@ -257,8 +257,6 @@ auto file_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
     }
 }
 
-#define CYCLE_RATE_PLBL "Cycle Rate +"
-#define CYCLE_RATE_MLBL "Cycle Rate -"
 auto speed_menu_items(aldo::viewstate& vs) noexcept
 {
     using cps_type = decltype(vs.clock.cyclock.cycles_per_sec);
@@ -269,34 +267,42 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
         (std::derived_from<cps_binop> auto op, cps_type operand) {
             cps = std::min(std::max(MinCps, op(cps, operand)), MaxCps);
         };
-    const auto shiftDown = ImGui::IsKeyDown(ImGuiKey_ModShift);
-    const auto val = shiftDown ? 10 : 1;
+    const char* incLabel, *incKey, *decLabel, *decKey;
+    int val;
+    if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
+        incLabel = "Cycle Rate + 10x";
+        decLabel = "Cycle Rate - 10x";
+        incKey = "+";
+        decKey = "_";
+        val = 10;
+    } else {
+        incLabel = "Cycle Rate +";
+        decLabel = "Cycle Rate -";
+        incKey = "=";
+        decKey = "-";
+        val = 1;
+    }
     {
         const DisabledIf dif = vs.clock.cyclock.cycles_per_sec == MaxCps;
-        if (ImGui::MenuItem(shiftDown
-                                ? CYCLE_RATE_PLBL " 10x"
-                                : CYCLE_RATE_PLBL,
-                            shiftDown ? "+" : "=")) {
-            cyclamp(std::plus<int>{}, val);
+        if (ImGui::MenuItem(incLabel, incKey)) {
+            cyclamp(std::plus<cps_type>{}, val);
         }
     }
     const DisabledIf dif = vs.clock.cyclock.cycles_per_sec == MinCps;
-    if (ImGui::MenuItem(shiftDown ? CYCLE_RATE_MLBL " 10x" : CYCLE_RATE_MLBL,
-                        shiftDown ? "_" : "-")) {
-        cyclamp(std::minus<int>{}, val);
+    if (ImGui::MenuItem(decLabel, decKey)) {
+        cyclamp(std::minus<cps_type>{}, val);
     }
 }
 
-#define SWITCH_MODE_LBL "Switch Mode"
 auto mode_menu_item(aldo::viewstate& vs, const aldo::Emulator& emu)
 {
     if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
-        if (ImGui::MenuItem(SWITCH_MODE_LBL " (R)", "M")) {
+        if (ImGui::MenuItem("Switch Mode (R)", "M")) {
             const auto val = static_cast<csig_excmode>(emu.runMode() - 1);
             vs.commands.emplace(aldo::Command::mode, val);
         }
     } else {
-        if (ImGui::MenuItem(SWITCH_MODE_LBL, "m")) {
+        if (ImGui::MenuItem("Switch Mode", "m")) {
             const auto val = static_cast<csig_excmode>(emu.runMode() + 1);
             vs.commands.emplace(aldo::Command::mode, val);
         }
@@ -355,7 +361,7 @@ auto main_menu(aldo::viewstate& vs, const aldo::Emulator& emu,
 
 auto input_address(aldo::et::word* addr) noexcept
 {
-    ImGui::SetNextItemWidth(aldo::glyph_size().x * 6);
+    ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 6);
     const ScopedID id = addr;
     const auto result = ImGui::InputScalar("Address", ImGuiDataType_U16, addr,
                                            nullptr, nullptr, "%04X");
@@ -467,7 +473,7 @@ protected:
         using namespace std::literals::string_view_literals;
         static constexpr auto label = "Name: "sv;
 
-        const auto textSz = aldo::glyph_size(),
+        const auto textSz = aldo::style::glyph_size(),
                     availSpace = ImGui::GetContentRegionAvail();
         const auto nameFit =
             static_cast<int>((availSpace.x / textSz.x) - label.length());
@@ -602,7 +608,7 @@ private:
             textOn = IM_COL32_BLACK,
             textOff = IM_COL32_WHITE;
 
-        const auto textSz = aldo::glyph_size();
+        const auto textSz = aldo::style::glyph_size();
         const auto radius = (textSz.x + textSz.y) / 2.0f;
         const auto pos = ImGui::GetCursorScreenPos();
         ImVec2 center = pos + radius;
@@ -644,7 +650,8 @@ public:
 protected:
     void renderContents() override
     {
-        const auto glyphW = aldo::glyph_size().x, lineSpacer = glyphW * 6;
+        const auto glyphW = aldo::style::glyph_size().x,
+                    lineSpacer = glyphW * 6;
         renderControlLines(lineSpacer, glyphW);
         ImGui::Separator();
         renderBusLines();
@@ -736,7 +743,7 @@ private:
         ImGui::TextUnformatted("t:");
         ImGui::SameLine();
         const auto pos = ImGui::GetCursorScreenPos();
-        ImVec2 center = {pos.x, pos.y + (ImGui::GetTextLineHeight() / 2) + 1};
+        ImVec2 center{pos.x, pos.y + (ImGui::GetTextLineHeight() / 2) + 1};
         const auto drawList = ImGui::GetWindowDrawList();
         for (auto i = 0; i < MaxTCycle; ++i) {
             drawList->AddCircleFilled(center, radius,
@@ -864,7 +871,7 @@ private:
         ImGui::AlignTextToFramePadding();
         ImGui::TextUnformatted("Halt on");
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(aldo::glyph_size().x * 12);
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 12);
         auto setFocus = false;
         if (ImGui::BeginCombo("##haltconditions", selectedCondition->second)) {
             for (auto it = haltConditions.cbegin();
@@ -893,11 +900,11 @@ private:
             input_address(&currentHaltExpression.address);
             break;
         case HLT_TIME:
-            ImGui::SetNextItemWidth(aldo::glyph_size().x * 18);
+            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 18);
             ImGui::InputFloat("Seconds", &currentHaltExpression.runtime);
             break;
         case HLT_CYCLES:
-            ImGui::SetNextItemWidth(aldo::glyph_size().x * 18);
+            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 18);
             ImGui::InputScalar("Count", ImGuiDataType_U64,
                                &currentHaltExpression.cycles);
             break;
@@ -1087,8 +1094,8 @@ private:
 
     void renderRunControls() const
     {
-        const auto& snp = emu.snapshot();
-        auto halt = !snp.lines.ready;
+        const auto& lines = emu.snapshot().lines;
+        auto halt = !lines.ready;
         if (ImGui::Checkbox("HALT", &halt)) {
             vs.commands.emplace(aldo::Command::halt, halt);
         };
@@ -1109,19 +1116,9 @@ private:
             vs.commands.emplace(aldo::Command::mode, CSGM_RUN);
         }
 
-        // TODO: fake toggle button by using on/off flags to adjust colors
         ImGui::TextUnformatted("Signal");
-        /*ImGui::PushStyleColor(ImGuiCol_Button,
-         IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE));
-         ImGui::Button("IRQ");
-         ImGui::SameLine();
-         ImGui::Button("NMI");
-         ImGui::SameLine();
-         ImGui::Button("RES");
-         ImGui::PopStyleColor();*/
         // NOTE: interrupt signals are all low-active
-        auto irq = !snp.lines.irq, nmi = !snp.lines.nmi,
-                res = !snp.lines.reset;
+        auto irq = !lines.irq, nmi = !lines.nmi, res = !lines.reset;
         if (ImGui::Checkbox("IRQ", &irq)) {
             vs.commands.emplace(aldo::Command::interrupt,
                                 aldo::command_state::interrupt{CSGI_IRQ, irq});
@@ -1255,8 +1252,9 @@ protected:
     {
         using ram_sz = aldo::et::size;
 
-        static constexpr auto pageSize = 0x100, pageDim = 0x10,
-                                cols = pageDim + 2, pageCount = 8;
+        static constexpr auto
+            pageSize = 0x100, pageDim = 0x10, cols = pageDim + 2,
+            pageCount = 8;
         static constexpr auto tableConfig = ImGuiTableFlags_BordersOuter
                                             | ImGuiTableFlags_BordersV
                                             | ImGuiTableFlags_RowBg

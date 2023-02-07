@@ -42,9 +42,14 @@ inline ImU32 white(bool enabled) noexcept
 
 }
 
+namespace style
+{
+
 inline ImVec2 glyph_size() noexcept
 {
     return ImGui::CalcTextSize("A");
+}
+
 }
 
 }

@@ -268,7 +268,7 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
             cps = std::min(std::max(MinCps, op(cps, operand)), MaxCps);
         };
     const char* incLabel, *incKey, *decLabel, *decKey;
-    int val;
+    cps_type val;
     if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
         incLabel = "Cycle Rate + 10x";
         decLabel = "Cycle Rate - 10x";
@@ -825,9 +825,8 @@ protected:
 
 private:
     // NOTE: does not include first enum value HLT_NONE
-    using halt_array
-        = std::array<
-            std::pair<haltcondition, aldo::et::str>, HLT_CONDCOUNT - 1>;
+    using halt_array =
+        std::array<std::pair<haltcondition, aldo::et::str>, HLT_CONDCOUNT - 1>;
     using halt_it = halt_array::const_iterator;
     using bp_sz = aldo::Debugger::BpView::size_type;
     using bp_diff = aldo::Debugger::BreakpointIterator::difference_type;

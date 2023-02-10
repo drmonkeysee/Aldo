@@ -31,12 +31,11 @@ public:
     {
         that.recorded = true;
     }
-    RunTimer& operator=(RunTimer&& that)
+    RunTimer& operator=(RunTimer&& that) noexcept
     {
         if (this == &that) return *this;
 
         swap(that);
-        that.recorded = true;
         return *this;
     }
     ~RunTimer() { record(); }

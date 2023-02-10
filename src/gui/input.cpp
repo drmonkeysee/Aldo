@@ -12,6 +12,7 @@
 #include "modal.hpp"
 #include "viewstate.hpp"
 
+#include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include <SDL2/SDL.h>
 
@@ -31,15 +32,46 @@ auto invalid_command(aldo::Command c)
     return s;
 }
 
-auto is_menu_shortcut(const SDL_Event& ev) noexcept
+constexpr auto is_menu_shortcut(const SDL_Event& ev) noexcept
 {
     return (ev.key.keysym.mod & KMOD_GUI) && !ev.key.repeat;
+}
+
+constexpr auto cyclerate_adjust(const SDL_Event& ev) noexcept
+{
+    return ev.key.keysym.mod & KMOD_SHIFT ? 10 : 1;
+}
+
+constexpr auto mode_change(const SDL_Event& ev) noexcept
+{
+    return ev.key.keysym.mod & KMOD_SHIFT ? -1 : 1;
+}
+
+auto imgui_has_keyboard() noexcept
+{
+    return ImGui::GetIO().WantCaptureKeyboard;
 }
 
 auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
                     aldo::viewstate& vs)
 {
     switch (ev.key.keysym.sym) {
+    case SDLK_SPACE:
+        if (!imgui_has_keyboard() && !ev.key.repeat) {
+            vs.commands.emplace(aldo::Command::halt,
+                                emu.snapshot().lines.ready);
+        }
+        break;
+    case SDLK_EQUALS:
+        if (!imgui_has_keyboard()) {
+            vs.clock.adjustCycleRate(cyclerate_adjust(ev));
+        }
+        break;
+    case SDLK_MINUS:
+        if (!imgui_has_keyboard()) {
+            vs.clock.adjustCycleRate(-cyclerate_adjust(ev));
+        }
+        break;
     case SDLK_b:
         if (is_menu_shortcut(ev)) {
             if (ev.key.keysym.mod & KMOD_ALT) {
@@ -56,9 +88,40 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
             vs.showDemo = !vs.showDemo;
         }
         break;
+    case SDLK_i:
+        if (!imgui_has_keyboard() && !ev.key.repeat) {
+            vs.commands.emplace(aldo::Command::interrupt,
+                                aldo::command_state::interrupt{
+                                    CSGI_IRQ, emu.snapshot().lines.irq,
+                                });
+        }
+        break;
+    case SDLK_m:
+        if (!imgui_has_keyboard() && !ev.key.repeat) {
+            const auto mode = emu.runMode() + mode_change(ev);
+            vs.commands.emplace(aldo::Command::mode,
+                                static_cast<csig_excmode>(mode));
+        }
+        break;
+    case SDLK_n:
+        if (!imgui_has_keyboard() && !ev.key.repeat) {
+            vs.commands.emplace(aldo::Command::interrupt,
+                                aldo::command_state::interrupt{
+                                    CSGI_NMI, emu.snapshot().lines.nmi,
+                                });
+        }
+        break;
     case SDLK_o:
         if (is_menu_shortcut(ev)) {
             vs.commands.emplace(aldo::Command::openROM);
+        }
+        break;
+    case SDLK_s:
+        if (!imgui_has_keyboard() && !ev.key.repeat) {
+            vs.commands.emplace(aldo::Command::interrupt,
+                                aldo::command_state::interrupt{
+                                    CSGI_RES, emu.snapshot().lines.reset,
+                                });
         }
         break;
     }

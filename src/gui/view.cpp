@@ -30,13 +30,10 @@
 #include <algorithm>
 #include <array>
 #include <concepts>
-#include <functional>
 #include <iterator>
 #include <locale>
-#include <string>
 #include <string_view>
 #include <type_traits>
-#include <utility>
 #include <cinttypes>
 #include <cstdio>
 
@@ -267,19 +264,11 @@ auto file_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
 
 auto speed_menu_items(aldo::viewstate& vs) noexcept
 {
-    using cps_type = decltype(vs.clock.cyclock.cycles_per_sec);
-    using cps_binop = std::binary_function<cps_type, cps_type, cps_type>;
-
     static constexpr auto multiplierLabel = " 10x";
 
-    const auto cyclamp =
-        [&cps = vs.clock.cyclock.cycles_per_sec]
-        (std::derived_from<cps_binop> auto op, cps_type operand) {
-            cps = std::min(std::max(MinCps, op(cps, operand)), MaxCps);
-        };
     std::string incLabel = "Cycle Rate +", decLabel = "Cycle Rate -";
     const char* incKey, *decKey;
-    cps_type val;
+    int val;
     if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
         incLabel += multiplierLabel;
         decLabel += multiplierLabel;
@@ -293,28 +282,30 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
     }
     DisabledIf dif = vs.clock.cyclock.cycles_per_sec == MaxCps;
     if (ImGui::MenuItem(incLabel.c_str(), incKey)) {
-        cyclamp(std::plus<cps_type>{}, val);
+        vs.clock.adjustCycleRate(val);
     }
     dif = vs.clock.cyclock.cycles_per_sec == MinCps;
     if (ImGui::MenuItem(decLabel.c_str(), decKey)) {
-        cyclamp(std::minus<cps_type>{}, val);
+        vs.clock.adjustCycleRate(-val);
     }
 }
 
 auto mode_menu_item(aldo::viewstate& vs, const aldo::Emulator& emu)
 {
     std::string label = "Switch Mode";
+    const char* mnemonic;
+    int modeAdjust;
     if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
         label += " (R)";
-        if (ImGui::MenuItem(label.c_str(), "M")) {
-            const auto val = static_cast<csig_excmode>(emu.runMode() - 1);
-            vs.commands.emplace(aldo::Command::mode, val);
-        }
+        mnemonic = "M";
+        modeAdjust = -1;
     } else {
-        if (ImGui::MenuItem(label.c_str(), "m")) {
-            const auto val = static_cast<csig_excmode>(emu.runMode() + 1);
-            vs.commands.emplace(aldo::Command::mode, val);
-        }
+        mnemonic = "m";
+        modeAdjust = 1;
+    }
+    if (ImGui::MenuItem(label.c_str(), mnemonic)) {
+        const auto val = static_cast<csig_excmode>(emu.runMode() + modeAdjust);
+        vs.commands.emplace(aldo::Command::mode, val);
     }
 }
 

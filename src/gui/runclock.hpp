@@ -11,6 +11,7 @@
 #include "attr.hpp"
 #include "cycleclock.h"
 
+#include <algorithm>
 #include <chrono>
 #include <ratio>
 #include <utility>
@@ -101,6 +102,12 @@ struct runclock {
     RunTimer timeInput() noexcept { return RunTimer{dtInputMs}; }
     RunTimer timeUpdate() noexcept { return RunTimer{dtUpdateMs}; }
     RunTimer timeRender() noexcept { return RunTimer{dtRenderMs}; }
+
+    void adjustCycleRate(int adjustment) noexcept
+    {
+        const auto adjusted = cyclock.cycles_per_sec + adjustment;
+        cyclock.cycles_per_sec = std::max(MinCps, std::min(adjusted, MaxCps));
+    }
 
     cycleclock cyclock{.cycles_per_sec = 4};
     double dtInputMs = 0, dtUpdateMs = 0, dtRenderMs = 0;

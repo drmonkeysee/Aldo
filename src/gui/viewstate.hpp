@@ -70,6 +70,13 @@ struct viewstate {
     bool running = true, showAbout = false, showDemo = false;
 };
 
+inline void interrupt_command(viewstate& vs, csig_interrupt signal,
+                              bool active)
+{
+    vs.commands.emplace(Command::interrupt,
+                        command_state::interrupt{signal, active});
+}
+
 }
 
 #endif

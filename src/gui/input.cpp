@@ -37,6 +37,11 @@ constexpr auto is_menu_shortcut(const SDL_Event& ev) noexcept
     return (ev.key.keysym.mod & KMOD_GUI) && !ev.key.repeat;
 }
 
+auto is_free_key(const SDL_Event& ev, bool repeat = false) noexcept
+{
+    return ev.key.repeat == repeat && !ImGui::GetIO().WantCaptureKeyboard;
+}
+
 constexpr auto cyclerate_adjust(const SDL_Event& ev) noexcept
 {
     return ev.key.keysym.mod & KMOD_SHIFT ? 10 : 1;
@@ -47,28 +52,23 @@ constexpr auto mode_change(const SDL_Event& ev) noexcept
     return ev.key.keysym.mod & KMOD_SHIFT ? -1 : 1;
 }
 
-auto imgui_has_keyboard() noexcept
-{
-    return ImGui::GetIO().WantCaptureKeyboard;
-}
-
 auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
                     aldo::viewstate& vs)
 {
+    const auto& lines = emu.snapshot().lines;
     switch (ev.key.keysym.sym) {
     case SDLK_SPACE:
-        if (!imgui_has_keyboard() && !ev.key.repeat) {
-            vs.commands.emplace(aldo::Command::halt,
-                                emu.snapshot().lines.ready);
+        if (is_free_key(ev)) {
+            vs.commands.emplace(aldo::Command::halt, lines.ready);
         }
         break;
     case SDLK_EQUALS:
-        if (!imgui_has_keyboard()) {
+        if (is_free_key(ev, true)) {
             vs.clock.adjustCycleRate(cyclerate_adjust(ev));
         }
         break;
     case SDLK_MINUS:
-        if (!imgui_has_keyboard()) {
+        if (is_free_key(ev, true)) {
             vs.clock.adjustCycleRate(-cyclerate_adjust(ev));
         }
         break;
@@ -89,26 +89,20 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         }
         break;
     case SDLK_i:
-        if (!imgui_has_keyboard() && !ev.key.repeat) {
-            vs.commands.emplace(aldo::Command::interrupt,
-                                aldo::command_state::interrupt{
-                                    CSGI_IRQ, emu.snapshot().lines.irq,
-                                });
+        if (is_free_key(ev)) {
+            aldo::interrupt_command(vs, CSGI_IRQ, lines.irq);
         }
         break;
     case SDLK_m:
-        if (!imgui_has_keyboard() && !ev.key.repeat) {
+        if (is_free_key(ev)) {
             const auto mode = emu.runMode() + mode_change(ev);
             vs.commands.emplace(aldo::Command::mode,
                                 static_cast<csig_excmode>(mode));
         }
         break;
     case SDLK_n:
-        if (!imgui_has_keyboard() && !ev.key.repeat) {
-            vs.commands.emplace(aldo::Command::interrupt,
-                                aldo::command_state::interrupt{
-                                    CSGI_NMI, emu.snapshot().lines.nmi,
-                                });
+        if (is_free_key(ev)) {
+            aldo::interrupt_command(vs, CSGI_NMI, lines.nmi);
         }
         break;
     case SDLK_o:
@@ -117,18 +111,15 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         }
         break;
     case SDLK_s:
-        if (!imgui_has_keyboard() && !ev.key.repeat) {
-            vs.commands.emplace(aldo::Command::interrupt,
-                                aldo::command_state::interrupt{
-                                    CSGI_RES, emu.snapshot().lines.reset,
-                                });
+        if (is_free_key(ev)) {
+            aldo::interrupt_command(vs, CSGI_RES, lines.reset);
         }
         break;
     }
 }
 
-auto process_event(const aldo::command_state& cs, aldo::Emulator& emu,
-                   aldo::viewstate& s, const gui_platform& p)
+auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
+                     aldo::viewstate& s, const gui_platform& p)
 {
     auto& debugger = emu.debugger();
     auto breakpoints = debugger.breakpoints();
@@ -207,7 +198,7 @@ void aldo::input::handle(aldo::Emulator& emu, aldo::viewstate& vs,
     }
     while (!vs.commands.empty()) {
         const auto& cs = vs.commands.front();
-        process_event(cs, emu, vs, p);
+        process_command(cs, emu, vs, p);
         vs.commands.pop();
     }
 }

@@ -206,12 +206,6 @@ auto enter_pressed() noexcept
     return keys_pressed(ImGuiKey_Enter, ImGuiKey_KeypadEnter);
 }
 
-auto interrupt_command(aldo::viewstate& vs, csig_interrupt signal, bool active)
-{
-    vs.commands.emplace(aldo::Command::interrupt,
-                        aldo::command_state::interrupt{signal, active});
-}
-
 template<std::derived_from<aldo::View>... Vs>
 auto add_views(std::vector<std::unique_ptr<aldo::View>>& v,
                aldo::viewstate& vs, const aldo::Emulator& emu,
@@ -324,13 +318,13 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
         // NOTE: interrupt signals are all low-active
         auto irq = !lines.irq, nmi = !lines.nmi, res = !lines.reset;
         if (ImGui::MenuItem("Send IRQ", "i", &irq)) {
-            interrupt_command(vs, CSGI_IRQ, irq);
+            aldo::interrupt_command(vs, CSGI_IRQ, irq);
         }
         if (ImGui::MenuItem("Send NMI", "n", &nmi)) {
-            interrupt_command(vs, CSGI_NMI, nmi);
+            aldo::interrupt_command(vs, CSGI_NMI, nmi);
         }
         if (ImGui::MenuItem("Send RES", "s", &res)) {
-            interrupt_command(vs, CSGI_RES, res);
+            aldo::interrupt_command(vs, CSGI_RES, res);
         }
         ImGui::EndMenu();
     }
@@ -1110,15 +1104,15 @@ private:
         // NOTE: interrupt signals are all low-active
         auto irq = !lines.irq, nmi = !lines.nmi, res = !lines.reset;
         if (ImGui::Checkbox("IRQ", &irq)) {
-            interrupt_command(vs, CSGI_IRQ, irq);
+            aldo::interrupt_command(vs, CSGI_IRQ, irq);
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("NMI", &nmi)) {
-            interrupt_command(vs, CSGI_NMI, nmi);
+            aldo::interrupt_command(vs, CSGI_NMI, nmi);
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("RES", &res)) {
-            interrupt_command(vs, CSGI_RES, res);
+            aldo::interrupt_command(vs, CSGI_RES, res);
         }
     }
 

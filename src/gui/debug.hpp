@@ -69,10 +69,6 @@ public:
     {
         return isVectorOverridden() || !breakpoints().empty();
     }
-    bool hasBreak(const console_state& snapshot) const noexcept
-    {
-        return snapshot.debugger.halted != NoBreakpoint;
-    }
 
     void loadBreakpoints(const std::filesystem::path& filepath);
     void exportBreakpoints(const std::filesystem::path& filepath) const;
@@ -182,7 +178,14 @@ public:
     };
 
 private:
+    friend class Emulator;
+
     debugctx* debugp() const noexcept { return hdebug.get(); }
+
+    bool hasBreak(const console_state& snapshot) const noexcept
+    {
+        return snapshot.debugger.halted != NoBreakpoint;
+    }
 
     debug_handle hdebug;
 };

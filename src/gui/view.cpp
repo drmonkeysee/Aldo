@@ -60,6 +60,9 @@ public:
     {
         that.condition = false;
     }
+    // NOTE: this works because internally ImGui::Disabled is a stack, so the
+    // order of Begin/End pairs doesn't matter as long as the stack is empty
+    // at the end of an ImGui window scope.
     DisabledIf& operator=(DisabledIf&& that) noexcept
     {
         if (this == &that) return *this;

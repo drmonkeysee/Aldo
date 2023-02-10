@@ -270,45 +270,48 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
     using cps_type = decltype(vs.clock.cyclock.cycles_per_sec);
     using cps_binop = std::binary_function<cps_type, cps_type, cps_type>;
 
+    static constexpr auto multiplierLabel = " 10x";
+
     const auto cyclamp =
         [&cps = vs.clock.cyclock.cycles_per_sec]
         (std::derived_from<cps_binop> auto op, cps_type operand) {
             cps = std::min(std::max(MinCps, op(cps, operand)), MaxCps);
         };
-    const char* incLabel, *incKey, *decLabel, *decKey;
+    std::string incLabel = "Cycle Rate +", decLabel = "Cycle Rate -";
+    const char* incKey, *decKey;
     cps_type val;
     if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
-        incLabel = "Cycle Rate + 10x";
-        decLabel = "Cycle Rate - 10x";
+        incLabel += multiplierLabel;
+        decLabel += multiplierLabel;
         incKey = "+";
         decKey = "_";
         val = 10;
     } else {
-        incLabel = "Cycle Rate +";
-        decLabel = "Cycle Rate -";
         incKey = "=";
         decKey = "-";
         val = 1;
     }
     DisabledIf dif = vs.clock.cyclock.cycles_per_sec == MaxCps;
-    if (ImGui::MenuItem(incLabel, incKey)) {
+    if (ImGui::MenuItem(incLabel.c_str(), incKey)) {
         cyclamp(std::plus<cps_type>{}, val);
     }
     dif = vs.clock.cyclock.cycles_per_sec == MinCps;
-    if (ImGui::MenuItem(decLabel, decKey)) {
+    if (ImGui::MenuItem(decLabel.c_str(), decKey)) {
         cyclamp(std::minus<cps_type>{}, val);
     }
 }
 
 auto mode_menu_item(aldo::viewstate& vs, const aldo::Emulator& emu)
 {
+    std::string label = "Switch Mode";
     if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
-        if (ImGui::MenuItem("Switch Mode (R)", "M")) {
+        label += " (R)";
+        if (ImGui::MenuItem(label.c_str(), "M")) {
             const auto val = static_cast<csig_excmode>(emu.runMode() - 1);
             vs.commands.emplace(aldo::Command::mode, val);
         }
     } else {
-        if (ImGui::MenuItem("Switch Mode", "m")) {
+        if (ImGui::MenuItem(label.c_str(), "m")) {
             const auto val = static_cast<csig_excmode>(emu.runMode() + 1);
             vs.commands.emplace(aldo::Command::mode, val);
         }
@@ -317,12 +320,14 @@ auto mode_menu_item(aldo::viewstate& vs, const aldo::Emulator& emu)
 
 auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
 {
+    using namespace std::literals::string_literals;
+
     if (ImGui::BeginMenu("Controls")) {
         speed_menu_items(vs);
         const auto& lines = emu.snapshot().lines;
-        auto halt = !lines.ready;
-        if (ImGui::MenuItem("Halt Emulator", "<Space>", &halt)) {
-            vs.commands.emplace(aldo::Command::halt, halt);
+        std::string haltLbl = (lines.ready ? "Halt"s : "Run"s) + " Emulator";
+        if (ImGui::MenuItem(haltLbl.c_str(), "<Space>")) {
+            vs.commands.emplace(aldo::Command::halt, lines.ready);
         }
         mode_menu_item(vs, emu);
         // NOTE: interrupt signals are all low-active

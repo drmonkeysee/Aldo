@@ -23,7 +23,7 @@ using hexpr_buffer = std::array<aldo::et::tchar, HEXPR_FMT_SIZE>;
 using bp_it = aldo::Debugger::BreakpointIterator;
 using bp_size = aldo::Debugger::BpView::size_type;
 
-constexpr const char* DebugFileErrorTitle = "Debug File Error";
+constexpr auto DebugFileErrorTitle = "Debug File Error";
 
 auto read_brkfile(const std::filesystem::path& filepath)
 {

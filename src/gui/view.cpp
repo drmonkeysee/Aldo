@@ -65,7 +65,6 @@ public:
         if (this == &that) return *this;
 
         swap(that);
-        that.condition = false;
         return *this;
     }
     ~DisabledIf()
@@ -288,13 +287,11 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
         decKey = "-";
         val = 1;
     }
-    {
-        const DisabledIf dif = vs.clock.cyclock.cycles_per_sec == MaxCps;
-        if (ImGui::MenuItem(incLabel, incKey)) {
-            cyclamp(std::plus<cps_type>{}, val);
-        }
+    DisabledIf dif = vs.clock.cyclock.cycles_per_sec == MaxCps;
+    if (ImGui::MenuItem(incLabel, incKey)) {
+        cyclamp(std::plus<cps_type>{}, val);
     }
-    const DisabledIf dif = vs.clock.cyclock.cycles_per_sec == MinCps;
+    dif = vs.clock.cyclock.cycles_per_sec == MinCps;
     if (ImGui::MenuItem(decLabel, decKey)) {
         cyclamp(std::minus<cps_type>{}, val);
     }
@@ -974,18 +971,12 @@ private:
 
     void renderListControls(bp_sz bpCount)
     {
-        const auto disabled_if_noselection =
-            [s = selectedBreakpoint]() -> DisabledIf {
-                return s == NoSelection;
-            };
-        {
-            const auto dif = disabled_if_noselection();
-            const auto& dbg = emu.debugger();
-            const auto bp = dbg.breakpoints().at(selectedBreakpoint);
-            if (ImGui::Button(!bp || bp->enabled ? "Disable" : "Enable ")) {
-                vs.commands.emplace(aldo::Command::breakpointToggle,
-                                    selectedBreakpoint);
-            }
+        DisabledIf dif = selectedBreakpoint == NoSelection;
+        const auto& dbg = emu.debugger();
+        const auto bp = dbg.breakpoints().at(selectedBreakpoint);
+        if (ImGui::Button(!bp || bp->enabled ? "Disable" : "Enable ")) {
+            vs.commands.emplace(aldo::Command::breakpointToggle,
+                                selectedBreakpoint);
         }
         ImGui::SameLine();
         const ScopedColor colors = {
@@ -994,16 +985,13 @@ private:
             {ImGuiCol_ButtonActive, aldo::colors::DestructiveActive},
         };
         auto resetSelection = false;
-        {
-            const auto dif = disabled_if_noselection();
-            if (ImGui::Button("Remove")) {
-                vs.commands.emplace(aldo::Command::breakpointRemove,
-                                    selectedBreakpoint);
-                resetSelection = true;
-            }
+        if (ImGui::Button("Remove")) {
+            vs.commands.emplace(aldo::Command::breakpointRemove,
+                                selectedBreakpoint);
+            resetSelection = true;
         }
         ImGui::SameLine();
-        const DisabledIf dif = bpCount == 0;
+        dif = bpCount == 0;
         if (ImGui::Button("Clear")) {
             vs.commands.emplace(aldo::Command::breakpointsClear);
             resetSelection = true;

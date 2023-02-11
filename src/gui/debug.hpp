@@ -45,8 +45,6 @@ public:
     using BpView = BreakpointsView<false>;
     using MutableBpView = BreakpointsView<true>;
 
-    Debugger(debug_handle d) noexcept : hdebug{std::move(d)} {}
-
     int vectorOverride() const noexcept
     {
         return debug_vector_override(debugp());
@@ -179,6 +177,8 @@ public:
 
 private:
     friend class Emulator;
+
+    explicit Debugger(debug_handle d) noexcept : hdebug{std::move(d)} {}
 
     debugctx* debugp() const noexcept { return hdebug.get(); }
 

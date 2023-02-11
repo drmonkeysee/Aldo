@@ -52,7 +52,7 @@ private:
 
 class ALDO_SIDEFX Emulator {
 public:
-    Emulator(Debugger d, console_handle n, const gui_platform& p);
+    Emulator(debug_handle d, console_handle n, const gui_platform& p);
     Emulator(const Emulator&) = delete;
     Emulator& operator=(const Emulator&) = delete;
     Emulator(Emulator&&) = delete;

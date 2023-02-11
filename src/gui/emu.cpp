@@ -73,7 +73,8 @@ auto update_bouncer(aldo::viewstate& vs,
 // Public Interface
 //
 
-aldo::Emulator::Emulator(Debugger d, console_handle n, const gui_platform& p)
+aldo::Emulator::Emulator(debug_handle d, console_handle n,
+                         const gui_platform& p)
 : prefspath{get_prefspath(p)}, hdebug{std::move(d)}, hconsole{std::move(n)},
     hsnapshot{consolep()} {}
 

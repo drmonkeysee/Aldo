@@ -318,13 +318,13 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
         // NOTE: interrupt signals are all low-active
         auto irq = !lines.irq, nmi = !lines.nmi, res = !lines.reset;
         if (ImGui::MenuItem("Send IRQ", "i", &irq)) {
-            aldo::interrupt_command(vs, CSGI_IRQ, irq);
+            vs.addInterruptCommand(CSGI_IRQ, irq);
         }
         if (ImGui::MenuItem("Send NMI", "n", &nmi)) {
-            aldo::interrupt_command(vs, CSGI_NMI, nmi);
+            vs.addInterruptCommand(CSGI_NMI, nmi);
         }
         if (ImGui::MenuItem("Send RES", "s", &res)) {
-            aldo::interrupt_command(vs, CSGI_RES, res);
+            vs.addInterruptCommand(CSGI_RES, res);
         }
         ImGui::EndMenu();
     }
@@ -1104,15 +1104,15 @@ private:
         // NOTE: interrupt signals are all low-active
         auto irq = !lines.irq, nmi = !lines.nmi, res = !lines.reset;
         if (ImGui::Checkbox("IRQ", &irq)) {
-            aldo::interrupt_command(vs, CSGI_IRQ, irq);
+            vs.addInterruptCommand(CSGI_IRQ, irq);
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("NMI", &nmi)) {
-            aldo::interrupt_command(vs, CSGI_NMI, nmi);
+            vs.addInterruptCommand(CSGI_NMI, nmi);
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("RES", &res)) {
-            aldo::interrupt_command(vs, CSGI_RES, res);
+            vs.addInterruptCommand(CSGI_RES, res);
         }
     }
 

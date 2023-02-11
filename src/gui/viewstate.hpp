@@ -60,6 +60,12 @@ struct command_state {
 };
 
 struct viewstate {
+    void addInterruptCommand(csig_interrupt signal, bool active)
+    {
+        commands.emplace(Command::interrupt,
+                         command_state::interrupt{signal, active});
+    }
+
     std::queue<command_state> commands;
     runclock clock;
     struct {
@@ -69,13 +75,6 @@ struct viewstate {
     } bouncer;
     bool running = true, showAbout = false, showDemo = false;
 };
-
-inline void interrupt_command(viewstate& vs, csig_interrupt signal,
-                              bool active)
-{
-    vs.commands.emplace(Command::interrupt,
-                        command_state::interrupt{signal, active});
-}
 
 }
 

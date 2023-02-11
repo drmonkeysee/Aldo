@@ -90,7 +90,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_i:
         if (is_free_key(ev)) {
-            aldo::interrupt_command(vs, CSGI_IRQ, lines.irq);
+            vs.addInterruptCommand(CSGI_IRQ, lines.irq);
         }
         break;
     case SDLK_m:
@@ -102,7 +102,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_n:
         if (is_free_key(ev)) {
-            aldo::interrupt_command(vs, CSGI_NMI, lines.nmi);
+            vs.addInterruptCommand(CSGI_NMI, lines.nmi);
         }
         break;
     case SDLK_o:
@@ -112,7 +112,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_s:
         if (is_free_key(ev)) {
-            aldo::interrupt_command(vs, CSGI_RES, lines.reset);
+            vs.addInterruptCommand(CSGI_RES, lines.reset);
         }
         break;
     }

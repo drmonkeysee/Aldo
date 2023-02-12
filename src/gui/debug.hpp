@@ -61,8 +61,8 @@ public:
     {
         return vectorOverride() != NoResetVector;
     }
-    BpView breakpoints() const noexcept { return {debugp()}; }
-    MutableBpView breakpoints() noexcept { return {debugp()}; }
+    BpView breakpoints() const noexcept { return debugp(); }
+    MutableBpView breakpoints() noexcept { return debugp(); }
     bool isActive() const noexcept
     {
         return isVectorOverridden() || !breakpoints().empty();
@@ -144,9 +144,9 @@ public:
 
         const_iterator cbegin() const noexcept
         {
-            return const_iterator{debugp, std::ssize(*this)};
+            return {debugp, std::ssize(*this)};
         }
-        const_iterator cend() const noexcept { return const_iterator{}; }
+        const_iterator cend() const noexcept { return {}; }
         const_iterator begin() const noexcept { return cbegin(); }
         const_iterator end() const noexcept { return cend(); }
 

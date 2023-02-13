@@ -1235,7 +1235,8 @@ protected:
 
         static constexpr auto
             pageSize = 256, pageDim = 16, cols = pageDim + 2,
-            pageCount = MEMBLOCK_64KB / pageSize,
+            // TODO: get ram size from emulator
+            pageCount = MEMBLOCK_2KB / pageSize,
             rowCount = pageCount * pageDim;
         static constexpr auto tableConfig = ImGuiTableFlags_BordersOuter
                                             | ImGuiTableFlags_BordersV
@@ -1247,10 +1248,6 @@ protected:
             0, ImGui::GetTextLineHeightWithSpacing() * 2 * (pageDim + 1),
         };
         if (ImGui::BeginTable("ram", cols, tableConfig, tableSize)) {
-            std::array<aldo::et::byte, MEMBLOCK_64KB> testRam;
-            std::generate(testRam.begin(), testRam.end(), [n = 0]() mutable {
-                return n++ / pageSize;
-            });
             std::array<char, 3> col;
             ImGui::TableSetupScrollFreeze(0, 1);
             ImGui::TableSetupColumn("Addr");
@@ -1293,7 +1290,7 @@ protected:
                     for (ram_sz ramCol = 0; ramCol < pageDim; ++ramCol) {
                         const auto ramIdx = static_cast<ram_sz>(row * pageDim)
                                             + ramCol;
-                        const auto val = testRam[ramIdx];
+                        const auto val = snp.mem.ram[ramIdx];
                         ImGui::TableSetColumnIndex(static_cast<int>(ramCol)
                                                    + 1);
                         if (page == 1 && ramIdx % pageSize == sp) {

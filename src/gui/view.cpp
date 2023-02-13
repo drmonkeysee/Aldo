@@ -1231,8 +1231,6 @@ public:
 protected:
     void renderContents() override
     {
-        using ram_sz = aldo::et::size;
-
         static constexpr auto
             pageSize = 256, pageDim = 16, cols = pageDim + 2,
             // TODO: get ram size from emulator
@@ -1281,18 +1279,17 @@ protected:
                     // page-breaks, it's possible row can go past the end of
                     // ram, so guard that here.
                     if (row >= rowCount) break;
+
                     ImGui::TableNextRow();
                     ImGui::TableSetColumnIndex(0);
-                    ImGui::Text("%04X",
-                                static_cast<aldo::et::word>(row * pageDim));
+                    const auto rowOffset = row * pageDim;
+                    ImGui::Text("%04X", rowOffset);
                     const auto& lcl = std::locale::classic();
                     std::string ascii(pageDim, '.');
-                    for (ram_sz ramCol = 0; ramCol < pageDim; ++ramCol) {
-                        const auto ramIdx = static_cast<ram_sz>(row * pageDim)
-                                            + ramCol;
+                    for (auto ramCol = 0; ramCol < pageDim; ++ramCol) {
+                        const auto ramIdx = rowOffset + ramCol;
                         const auto val = snp.mem.ram[ramIdx];
-                        ImGui::TableSetColumnIndex(static_cast<int>(ramCol)
-                                                   + 1);
+                        ImGui::TableSetColumnIndex(ramCol + 1);
                         if (page == 1 && ramIdx % pageSize == sp) {
                             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
                                                    aldo::colors::LedOn);
@@ -1301,7 +1298,7 @@ protected:
                             ImGui::Text("%02X", val);
                         }
                         if (std::isprint(static_cast<char>(val), lcl)) {
-                            ascii[ramCol] =
+                            ascii[static_cast<decltype(ascii)::size_type>(ramCol)] =
                                 static_cast<decltype(ascii)::value_type>(val);
                         }
                     }

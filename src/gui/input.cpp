@@ -32,7 +32,12 @@ auto invalid_command(aldo::Command c)
     return s;
 }
 
-constexpr auto is_menu_shortcut(const SDL_Event& ev) noexcept
+constexpr auto shift_pressed(const SDL_Event& ev) noexcept
+{
+    return ev.key.keysym.mod & KMOD_SHIFT;
+}
+
+constexpr auto is_menu_command(const SDL_Event& ev) noexcept
 {
     return (ev.key.keysym.mod & KMOD_GUI) && !ev.key.repeat;
 }
@@ -44,12 +49,12 @@ auto is_free_key(const SDL_Event& ev, bool repeat = false) noexcept
 
 constexpr auto cyclerate_adjust(const SDL_Event& ev) noexcept
 {
-    return ev.key.keysym.mod & KMOD_SHIFT ? 10 : 1;
+    return shift_pressed(ev) ? 10 : 1;
 }
 
 constexpr auto mode_change(const SDL_Event& ev) noexcept
 {
-    return ev.key.keysym.mod & KMOD_SHIFT ? -1 : 1;
+    return shift_pressed(ev) ? -1 : 1;
 }
 
 auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
@@ -73,7 +78,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         }
         break;
     case SDLK_b:
-        if (is_menu_shortcut(ev)) {
+        if (is_menu_command(ev)) {
             if (ev.key.keysym.mod & KMOD_ALT) {
                 if (emu.debugger().isActive()) {
                     vs.commands.emplace(aldo::Command::breakpointsExport);
@@ -84,7 +89,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         }
         break;
     case SDLK_d:
-        if (is_menu_shortcut(ev)) {
+        if (is_menu_command(ev)) {
             vs.showDemo = !vs.showDemo;
         }
         break;
@@ -106,7 +111,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         }
         break;
     case SDLK_o:
-        if (is_menu_shortcut(ev)) {
+        if (is_menu_command(ev)) {
             vs.commands.emplace(aldo::Command::openROM);
         }
         break;

@@ -1234,8 +1234,7 @@ protected:
         using ram_sz = aldo::et::size;
 
         static constexpr auto
-            pageSize = 0x100, pageDim = 0x10, cols = pageDim + 2,
-            pageCount = 8;
+            pageSize = 256, pageDim = 16, cols = pageDim + 2, pageCount = 8;
         static constexpr auto tableConfig = ImGuiTableFlags_BordersOuter
                                             | ImGuiTableFlags_BordersV
                                             | ImGuiTableFlags_RowBg

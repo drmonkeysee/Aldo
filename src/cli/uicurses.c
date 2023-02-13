@@ -444,7 +444,7 @@ static void drawram(const struct view *v, const struct emulator *emu)
 {
     static const int
         start_x = 5, col_width = 3, toprail_start = start_x + col_width,
-        page_size = 0x100, page_dim = 0x10;
+        page_size = 256, page_dim = 16;
 
     for (int col = 0; col < page_dim; ++col) {
         mvwprintw(v->win, 1, toprail_start + (col * col_width), "%X", col);

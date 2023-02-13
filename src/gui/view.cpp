@@ -1234,7 +1234,9 @@ protected:
         using ram_sz = aldo::et::size;
 
         static constexpr auto
-            pageSize = 256, pageDim = 16, cols = pageDim + 2, pageCount = 8;
+            pageSize = 256, pageDim = 16, cols = pageDim + 2,
+            pageCount = MEMBLOCK_64KB / pageSize,
+            rowCount = pageCount * pageDim;
         static constexpr auto tableConfig = ImGuiTableFlags_BordersOuter
                                             | ImGuiTableFlags_BordersV
                                             | ImGuiTableFlags_RowBg
@@ -1245,6 +1247,10 @@ protected:
             0, ImGui::GetTextLineHeightWithSpacing() * 2 * (pageDim + 1),
         };
         if (ImGui::BeginTable("ram", cols, tableConfig, tableSize)) {
+            std::array<aldo::et::byte, MEMBLOCK_64KB> testRam;
+            std::generate(testRam.begin(), testRam.end(), [n = 0]() mutable {
+                return n++ / pageSize;
+            });
             std::array<char, 3> col;
             ImGui::TableSetupScrollFreeze(0, 1);
             ImGui::TableSetupColumn("Addr");
@@ -1259,43 +1265,40 @@ protected:
                 ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
             const auto& snp = emu.snapshot();
             const auto sp = snp.cpu.stack_pointer;
-            aldo::et::word addr = 0;
-            for (ram_sz page = 0; page < pageCount; ++page) {
-                for (ram_sz pageRow = 0; pageRow < pageDim; ++pageRow) {
-                    if (page > 0 && pageRow == 0) {
-                        ImGui::TableNextRow();
-                        for (auto col = 0; col < cols; ++col) {
-                            ImGui::TableSetColumnIndex(col);
-                            ImGui::Dummy({0, ImGui::GetTextLineHeight()});
-                        }
-                    }
+            for (ram_sz row = 0; row < rowCount; ++row) {
+                const auto page = row / pageDim, pageRow = row % pageDim;
+                if (page > 0 && pageRow == 0) {
                     ImGui::TableNextRow();
-                    ImGui::TableSetColumnIndex(0);
-                    ImGui::Text("%04X", addr);
-                    const auto& lcl = std::locale::classic();
-                    std::string ascii(pageDim, '.');
-                    for (ram_sz ramCol = 0; ramCol < pageDim; ++ramCol) {
-                        const auto ramIdx = (page * pageSize)
-                                            + (pageRow * pageDim) + ramCol;
-                        const auto val = snp.mem.ram[ramIdx];
-                        ImGui::TableSetColumnIndex(static_cast<int>(ramCol)
-                                                   + 1);
-                        if (page == 1 && ramIdx % pageSize == sp) {
-                            ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
-                                                   aldo::colors::LedOn);
-                            ImGui::TextColored(spHighlightText, "%02X", val);
-                        } else {
-                            ImGui::Text("%02X", val);
-                        }
-                        if (std::isprint(static_cast<char>(val), lcl)) {
-                            ascii[ramCol] =
-                                static_cast<decltype(ascii)::value_type>(val);
-                        }
+                    for (auto col = 0; col < cols; ++col) {
+                        ImGui::TableSetColumnIndex(col);
+                        ImGui::Dummy({0, ImGui::GetTextLineHeight()});
                     }
-                    ImGui::TableSetColumnIndex(cols - 1);
-                    ImGui::TextUnformatted(ascii.c_str());
-                    addr += pageDim;
                 }
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("%04X",
+                            static_cast<aldo::et::word>(row * pageDim));
+                const auto& lcl = std::locale::classic();
+                std::string ascii(pageDim, '.');
+                for (ram_sz ramCol = 0; ramCol < pageDim; ++ramCol) {
+                    const auto ramIdx = (row * pageDim) + ramCol;
+                    const auto val = testRam[ramIdx];
+                    ImGui::TableSetColumnIndex(static_cast<int>(ramCol)
+                                               + 1);
+                    if (page == 1 && ramIdx % pageSize == sp) {
+                        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
+                                               aldo::colors::LedOn);
+                        ImGui::TextColored(spHighlightText, "%02X", val);
+                    } else {
+                        ImGui::Text("%02X", val);
+                    }
+                    if (std::isprint(static_cast<char>(val), lcl)) {
+                        ascii[ramCol] =
+                            static_cast<decltype(ascii)::value_type>(val);
+                    }
+                }
+                ImGui::TableSetColumnIndex(cols - 1);
+                ImGui::TextUnformatted(ascii.c_str());
             }
             ImGui::EndTable();
         }

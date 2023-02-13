@@ -1246,69 +1246,103 @@ protected:
             0, ImGui::GetTextLineHeightWithSpacing() * 2 * (pageDim + 1),
         };
         if (ImGui::BeginTable("ram", cols, tableConfig, tableSize)) {
-            std::array<char, 3> col;
-            ImGui::TableSetupScrollFreeze(0, 1);
-            ImGui::TableSetupColumn("Addr");
-            for (auto i = 0; i < pageDim; ++i) {
-                std::snprintf(col.data(), col.size(), " %01X", i);
-                ImGui::TableSetupColumn(col.data());
-            }
-            ImGui::TableSetupColumn("ASCII");
-            ImGui::TableHeadersRow();
-
-            const auto spHighlightText =
-                ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
-            const auto& snp = emu.snapshot();
-            const auto sp = snp.cpu.stack_pointer;
+            renderHeader(pageDim);
             ImGuiListClipper clip;
             // NOTE: account for up to 2 page-break rows per screen
             clip.Begin(rowCount + 2);
+            RamRenderer ram{emu, pageSize, pageDim, cols, rowCount};
             while(clip.Step()) {
-                for (auto row = clip.DisplayStart;
-                     row < clip.DisplayEnd;
-                     ++row) {
-                    const auto page = row / pageDim, pageRow = row % pageDim;
-                    if (0 < page && pageRow == 0) {
-                        ImGui::TableNextRow();
-                        for (auto col = 0; col < cols; ++col) {
-                            ImGui::TableSetColumnIndex(col);
-                            ImGui::Dummy({0, ImGui::GetTextLineHeight()});
-                        }
-                    }
-                    // NOTE: since the clipper has some extra padding for the
-                    // page-breaks, it's possible row can go past the end of
-                    // ram, so guard that here.
-                    if (row >= rowCount) break;
-
-                    ImGui::TableNextRow();
-                    ImGui::TableSetColumnIndex(0);
-                    const auto rowOffset = row * pageDim;
-                    ImGui::Text("%04X", rowOffset);
-                    const auto& lcl = std::locale::classic();
-                    std::string ascii(pageDim, '.');
-                    for (auto ramCol = 0; ramCol < pageDim; ++ramCol) {
-                        const auto ramIdx = rowOffset + ramCol;
-                        const auto val = snp.mem.ram[ramIdx];
-                        ImGui::TableSetColumnIndex(ramCol + 1);
-                        if (page == 1 && ramIdx % pageSize == sp) {
-                            ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
-                                                   aldo::colors::LedOn);
-                            ImGui::TextColored(spHighlightText, "%02X", val);
-                        } else {
-                            ImGui::Text("%02X", val);
-                        }
-                        if (std::isprint(static_cast<char>(val), lcl)) {
-                            ascii[static_cast<decltype(ascii)::size_type>(ramCol)] =
-                                static_cast<decltype(ascii)::value_type>(val);
-                        }
-                    }
-                    ImGui::TableSetColumnIndex(cols - 1);
-                    ImGui::TextUnformatted(ascii.c_str());
-                }
+                ram.renderRows(clip.DisplayStart, clip.DisplayEnd);
             }
             ImGui::EndTable();
         }
     }
+
+private:
+    static void renderHeader(int pageDim) noexcept
+    {
+        std::array<char, 3> col;
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("Addr");
+        for (auto i = 0; i < pageDim; ++i) {
+            std::snprintf(col.data(), col.size(), " %01X", i);
+            ImGui::TableSetupColumn(col.data());
+        }
+        ImGui::TableSetupColumn("ASCII");
+        ImGui::TableHeadersRow();
+    }
+
+    class RamRenderer {
+    public:
+        RamRenderer(const aldo::Emulator& emu, int pageSize, int pageDim,
+                    int cols, int rowCount)
+        : ascii(static_cast<ascii_sz>(pageDim), Placeholder), cols{cols},
+            pageDim{pageDim}, pageSize{pageSize}, totalRows{rowCount},
+            ram{emu.snapshot().mem.ram}, sp{emu.snapshot().cpu.stack_pointer}
+            {}
+        RamRenderer(aldo::Emulator&& emu, int pageSize, int pageDim, int cols,
+                    int rowCount) = delete;
+
+        void renderRows(int start, int end)
+        {
+            for (auto row = start; row < end; ++row) {
+                const auto page = row / pageDim, pageRow = row % pageDim;
+                if (0 < page && pageRow == 0) {
+                    ImGui::TableNextRow();
+                    for (auto col = 0; col < cols; ++col) {
+                        ImGui::TableSetColumnIndex(col);
+                        ImGui::Dummy({0, ImGui::GetTextLineHeight()});
+                    }
+                }
+                // NOTE: since the clipper has some extra padding for the
+                // page-breaks, it's possible row can go past the end of
+                // ram, so guard that here.
+                if (row >= totalRows) break;
+
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                const auto rowOffset = row * pageDim;
+                ImGui::Text("%04X", rowOffset);
+                for (auto ramCol = 0; ramCol < pageDim; ++ramCol) {
+                    renderColumn(ramCol, rowOffset, page);
+                }
+                ImGui::TableSetColumnIndex(cols - 1);
+                ImGui::TextUnformatted(ascii.c_str());
+                std::fill(ascii.begin(), ascii.end(), Placeholder);
+            }
+        }
+
+    private:
+        void renderColumn(int ramCol, int rowOffset, int page)
+        {
+            const auto ramIdx = rowOffset + ramCol;
+            const auto val = ram[ramIdx];
+            ImGui::TableSetColumnIndex(ramCol + 1);
+            if (page == 1 && ramIdx % pageSize == sp) {
+                ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
+                                       aldo::colors::LedOn);
+                ImGui::TextColored(SpHighlight, "%02X", val);
+            } else {
+                ImGui::Text("%02X", val);
+            }
+            if (std::isprint(static_cast<char>(val), lcl)) {
+                ascii[static_cast<ascii_sz>(ramCol)]
+                    = static_cast<ascii_val>(val);
+            }
+        }
+
+        const std::locale& lcl = std::locale::classic();
+        std::string ascii;
+        int cols, pageDim, pageSize, totalRows;
+        const aldo::et::byte* ram;
+        aldo::et::byte sp;
+
+        using ascii_sz = decltype(ascii)::size_type;
+        using ascii_val = decltype(ascii)::value_type;
+        static constexpr ascii_val Placeholder = '.';
+        inline static const ImVec4 SpHighlight
+            = ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
+    };
 };
 
 }

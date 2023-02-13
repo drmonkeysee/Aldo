@@ -1250,9 +1250,9 @@ protected:
             ImGuiListClipper clip;
             // NOTE: account for up to 2 page-break rows per screen
             clip.Begin(rowCount + 2);
-            RamRenderer ram{emu, pageSize, pageDim, cols, rowCount};
+            RamTable tbl{emu, pageSize, pageDim, cols, rowCount};
             while(clip.Step()) {
-                ram.renderRows(clip.DisplayStart, clip.DisplayEnd);
+                tbl.renderRows(clip.DisplayStart, clip.DisplayEnd);
             }
             ImGui::EndTable();
         }
@@ -1272,16 +1272,16 @@ private:
         ImGui::TableHeadersRow();
     }
 
-    class RamRenderer {
+    class RamTable {
     public:
-        RamRenderer(const aldo::Emulator& emu, int pageSize, int pageDim,
-                    int cols, int rowCount)
+        RamTable(const aldo::Emulator& emu, int pageSize, int pageDim,
+                 int cols, int rowCount)
         : ascii(static_cast<ascii_sz>(pageDim), Placeholder), cols{cols},
             pageDim{pageDim}, pageSize{pageSize}, totalRows{rowCount},
             ram{emu.snapshot().mem.ram}, sp{emu.snapshot().cpu.stack_pointer}
             {}
-        RamRenderer(aldo::Emulator&& emu, int pageSize, int pageDim, int cols,
-                    int rowCount) = delete;
+        RamTable(aldo::Emulator&& emu, int pageSize, int pageDim, int cols,
+                 int rowCount) = delete;
 
         void renderRows(int start, int end)
         {

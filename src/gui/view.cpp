@@ -1265,40 +1265,52 @@ protected:
                 ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
             const auto& snp = emu.snapshot();
             const auto sp = snp.cpu.stack_pointer;
-            for (ram_sz row = 0; row < rowCount; ++row) {
-                const auto page = row / pageDim, pageRow = row % pageDim;
-                if (page > 0 && pageRow == 0) {
+            ImGuiListClipper clip;
+            // NOTE: account for up to 2 page-break rows per screen
+            clip.Begin(rowCount + 2);
+            while(clip.Step()) {
+                for (auto row = clip.DisplayStart;
+                     row < clip.DisplayEnd;
+                     ++row) {
+                    const auto page = row / pageDim, pageRow = row % pageDim;
+                    if (0 < page && pageRow == 0) {
+                        ImGui::TableNextRow();
+                        for (auto col = 0; col < cols; ++col) {
+                            ImGui::TableSetColumnIndex(col);
+                            ImGui::Dummy({0, ImGui::GetTextLineHeight()});
+                        }
+                    }
+                    // NOTE: since the clipper has some extra padding for the
+                    // page-breaks, it's possible row can go past the end of
+                    // ram, so guard that here.
+                    if (row >= rowCount) break;
                     ImGui::TableNextRow();
-                    for (auto col = 0; col < cols; ++col) {
-                        ImGui::TableSetColumnIndex(col);
-                        ImGui::Dummy({0, ImGui::GetTextLineHeight()});
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text("%04X",
+                                static_cast<aldo::et::word>(row * pageDim));
+                    const auto& lcl = std::locale::classic();
+                    std::string ascii(pageDim, '.');
+                    for (ram_sz ramCol = 0; ramCol < pageDim; ++ramCol) {
+                        const auto ramIdx = static_cast<ram_sz>(row * pageDim)
+                                            + ramCol;
+                        const auto val = testRam[ramIdx];
+                        ImGui::TableSetColumnIndex(static_cast<int>(ramCol)
+                                                   + 1);
+                        if (page == 1 && ramIdx % pageSize == sp) {
+                            ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
+                                                   aldo::colors::LedOn);
+                            ImGui::TextColored(spHighlightText, "%02X", val);
+                        } else {
+                            ImGui::Text("%02X", val);
+                        }
+                        if (std::isprint(static_cast<char>(val), lcl)) {
+                            ascii[ramCol] =
+                                static_cast<decltype(ascii)::value_type>(val);
+                        }
                     }
+                    ImGui::TableSetColumnIndex(cols - 1);
+                    ImGui::TextUnformatted(ascii.c_str());
                 }
-                ImGui::TableNextRow();
-                ImGui::TableSetColumnIndex(0);
-                ImGui::Text("%04X",
-                            static_cast<aldo::et::word>(row * pageDim));
-                const auto& lcl = std::locale::classic();
-                std::string ascii(pageDim, '.');
-                for (ram_sz ramCol = 0; ramCol < pageDim; ++ramCol) {
-                    const auto ramIdx = (row * pageDim) + ramCol;
-                    const auto val = testRam[ramIdx];
-                    ImGui::TableSetColumnIndex(static_cast<int>(ramCol)
-                                               + 1);
-                    if (page == 1 && ramIdx % pageSize == sp) {
-                        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
-                                               aldo::colors::LedOn);
-                        ImGui::TextColored(spHighlightText, "%02X", val);
-                    } else {
-                        ImGui::Text("%02X", val);
-                    }
-                    if (std::isprint(static_cast<char>(val), lcl)) {
-                        ascii[ramCol] =
-                            static_cast<decltype(ascii)::value_type>(val);
-                    }
-                }
-                ImGui::TableSetColumnIndex(cols - 1);
-                ImGui::TextUnformatted(ascii.c_str());
             }
             ImGui::EndTable();
         }

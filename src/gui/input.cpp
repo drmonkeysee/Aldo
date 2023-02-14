@@ -42,9 +42,10 @@ constexpr auto is_menu_command(const SDL_Event& ev) noexcept
     return (ev.key.keysym.mod & KMOD_GUI) && !ev.key.repeat;
 }
 
-auto is_free_key(const SDL_Event& ev, bool repeat = false) noexcept
+auto is_free_key(const SDL_Event& ev, bool allowRepeat = false) noexcept
 {
-    return ev.key.repeat == repeat && !ImGui::GetIO().WantCaptureKeyboard;
+    return (allowRepeat || !ev.key.repeat)
+            && !ImGui::GetIO().WantCaptureKeyboard;
 }
 
 constexpr auto cyclerate_adjust(const SDL_Event& ev) noexcept

@@ -15,6 +15,7 @@
 #include "snapshot.h"
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 
 typedef struct nes_console nes;
@@ -30,6 +31,8 @@ void nes_powerup(nes *self, cart *c, bool zeroram) br_nothrow;
 br_libexport
 void nes_powerdown(nes *self) br_nothrow;
 
+br_libexport
+size_t nes_ram_size(nes *self) br_nothrow;
 br_libexport
 enum csig_excmode nes_mode(nes *self) br_nothrow;
 br_libexport

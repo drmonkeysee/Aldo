@@ -13,7 +13,6 @@
 #include "trace.h"
 
 #include <assert.h>
-#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -164,6 +163,13 @@ void nes_powerdown(nes *self)
 
     nes_halt(self);
     disconnect_cart(self);
+}
+
+size_t nes_ram_size(nes *self)
+{
+    assert(self != NULL);
+
+    return sizeof self->ram / sizeof self->ram[0];
 }
 
 enum csig_excmode nes_mode(nes *self)

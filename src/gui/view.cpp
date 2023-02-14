@@ -1309,8 +1309,8 @@ private:
     private:
         void renderColumn(int ramCol, int rowAddr, int page)
         {
-            const auto ramIdx = rowAddr + ramCol;
-            const auto val = ram[static_cast<aldo::et::size>(ramIdx)];
+            const auto ramIdx = static_cast<aldo::et::size>(rowAddr + ramCol);
+            const auto val = ram[ramIdx];
             ImGui::TableSetColumnIndex(ramCol + 1);
             if (page == 1 && ramIdx % PageSize == sp) {
                 ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,

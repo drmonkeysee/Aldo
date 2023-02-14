@@ -1232,10 +1232,9 @@ protected:
     void renderContents() override
     {
         static constexpr auto
-            pageSize = 256, pageDim = 16, cols = pageDim + 2,
             // TODO: get ram size from emulator
-            pageCount = MEMBLOCK_2KB / pageSize,
-            rowCount = pageCount * pageDim;
+            pageCount = MEMBLOCK_2KB / PageSize,
+            rowCount = pageCount * PageDim;
         static constexpr auto tableConfig = ImGuiTableFlags_BordersOuter
                                             | ImGuiTableFlags_BordersV
                                             | ImGuiTableFlags_RowBg
@@ -1243,14 +1242,14 @@ protected:
                                             | ImGuiTableFlags_ScrollY;
 
         const ImVec2 tableSize{
-            0, ImGui::GetTextLineHeightWithSpacing() * 2 * (pageDim + 1),
+            0, ImGui::GetTextLineHeightWithSpacing() * 2 * (PageDim + 1),
         };
-        if (ImGui::BeginTable("ram", cols, tableConfig, tableSize)) {
-            renderHeader(pageDim);
+        if (ImGui::BeginTable("ram", Cols, tableConfig, tableSize)) {
+            renderHeader();
             ImGuiListClipper clip;
             // NOTE: account for up to 2 page-break rows per screen
             clip.Begin(rowCount + 2);
-            RamTable tbl{emu, pageSize, pageDim, cols, rowCount};
+            RamTable tbl{emu, rowCount};
             while(clip.Step()) {
                 tbl.renderRows(clip.DisplayStart, clip.DisplayEnd);
             }
@@ -1259,12 +1258,12 @@ protected:
     }
 
 private:
-    static void renderHeader(int pageDim) noexcept
+    static void renderHeader() noexcept
     {
         std::array<char, 3> col;
         ImGui::TableSetupScrollFreeze(0, 1);
         ImGui::TableSetupColumn("Addr");
-        for (auto i = 0; i < pageDim; ++i) {
+        for (auto i = 0; i < PageDim; ++i) {
             std::snprintf(col.data(), col.size(), " %01X", i);
             ImGui::TableSetupColumn(col.data());
         }
@@ -1274,22 +1273,19 @@ private:
 
     class RamTable {
     public:
-        RamTable(const aldo::Emulator& emu, int pageSize, int pageDim,
-                 int cols, int rowCount)
-        : ascii(static_cast<ascii_sz>(pageDim), Placeholder), cols{cols},
-            pageDim{pageDim}, pageSize{pageSize}, totalRows{rowCount},
-            ram{emu.snapshot().mem.ram}, sp{emu.snapshot().cpu.stack_pointer}
-            {}
-        RamTable(aldo::Emulator&& emu, int pageSize, int pageDim, int cols,
-                 int rowCount) = delete;
+        RamTable(const aldo::Emulator& emu, int rowCount)
+        : ascii(static_cast<ascii_sz>(PageDim), Placeholder),
+            totalRows{rowCount}, ram{emu.snapshot().mem.ram},
+            sp{emu.snapshot().cpu.stack_pointer} {}
+        RamTable(aldo::Emulator&& emu, int rowCount) = delete;
 
         void renderRows(int start, int end)
         {
             for (auto row = start; row < end; ++row) {
-                const auto page = row / pageDim, pageRow = row % pageDim;
+                const auto page = row / PageDim, pageRow = row % PageDim;
                 if (0 < page && pageRow == 0) {
                     ImGui::TableNextRow();
-                    for (auto col = 0; col < cols; ++col) {
+                    for (auto col = 0; col < Cols; ++col) {
                         ImGui::TableSetColumnIndex(col);
                         ImGui::Dummy({0, ImGui::GetTextLineHeight()});
                     }
@@ -1301,24 +1297,24 @@ private:
 
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                const auto rowOffset = row * pageDim;
-                ImGui::Text("%04X", rowOffset);
-                for (auto ramCol = 0; ramCol < pageDim; ++ramCol) {
-                    renderColumn(ramCol, rowOffset, page);
+                const auto rowAddr = row * PageDim;
+                ImGui::Text("%04X", rowAddr);
+                for (auto ramCol = 0; ramCol < PageDim; ++ramCol) {
+                    renderColumn(ramCol, rowAddr, page);
                 }
-                ImGui::TableSetColumnIndex(cols - 1);
+                ImGui::TableSetColumnIndex(Cols - 1);
                 ImGui::TextUnformatted(ascii.c_str());
                 std::fill(ascii.begin(), ascii.end(), Placeholder);
             }
         }
 
     private:
-        void renderColumn(int ramCol, int rowOffset, int page)
+        void renderColumn(int ramCol, int rowAddr, int page)
         {
-            const auto ramIdx = rowOffset + ramCol;
+            const auto ramIdx = rowAddr + ramCol;
             const auto val = ram[ramIdx];
             ImGui::TableSetColumnIndex(ramCol + 1);
-            if (page == 1 && ramIdx % pageSize == sp) {
+            if (page == 1 && ramIdx % PageSize == sp) {
                 ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
                                        aldo::colors::LedOn);
                 ImGui::TextColored(SpHighlight, "%02X", val);
@@ -1333,7 +1329,7 @@ private:
 
         const std::locale& lcl = std::locale::classic();
         std::string ascii;
-        int cols, pageDim, pageSize, totalRows;
+        int totalRows;
         const aldo::et::byte* ram;
         aldo::et::byte sp;
 
@@ -1343,6 +1339,8 @@ private:
         inline static const ImVec4 SpHighlight
             = ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
     };
+
+    static constexpr int PageSize = 256, PageDim = 16, Cols = PageDim + 2;
 };
 
 }

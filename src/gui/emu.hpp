@@ -84,6 +84,7 @@ public:
             nes_clear(consolep(), signal);
         }
     }
+    et::size ramSize() const noexcept { return nes_ram_size(consolep()); }
     csig_excmode runMode() const noexcept { return nes_mode(consolep()); }
     void runMode(csig_excmode mode) noexcept
     {

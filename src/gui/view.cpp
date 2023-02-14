@@ -1231,10 +1231,8 @@ public:
 protected:
     void renderContents() override
     {
-        static constexpr auto
-            // TODO: get ram size from emulator
-            pageCount = MEMBLOCK_2KB / PageSize,
-            rowCount = pageCount * PageDim;
+        const auto pageCount = static_cast<int>(emu.ramSize()) / PageSize,
+                    rowCount = pageCount * PageDim;
         static constexpr auto tableConfig = ImGuiTableFlags_BordersOuter
                                             | ImGuiTableFlags_BordersV
                                             | ImGuiTableFlags_RowBg
@@ -1312,7 +1310,7 @@ private:
         void renderColumn(int ramCol, int rowAddr, int page)
         {
             const auto ramIdx = rowAddr + ramCol;
-            const auto val = ram[ramIdx];
+            const auto val = ram[static_cast<aldo::et::size>(ramIdx)];
             ImGui::TableSetColumnIndex(ramCol + 1);
             if (page == 1 && ramIdx % PageSize == sp) {
                 ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,

@@ -37,7 +37,7 @@
 // NOTE: Approximate 60 FPS for application event loop;
 // this will be enforced by actual vsync when ported to true GUI
 // and is *distinct* from emulator frequency which can be modified by the user.
-static const int Fps = 60;
+static const int Fps = 60, RamPageSize = 256, RamSheetSize = RamPageSize * 2;
 
 struct viewstate {
     struct runclock {
@@ -444,7 +444,7 @@ static void drawram(const struct view *v, const struct emulator *emu)
 {
     static const int
         start_x = 5, col_width = 3, toprail_start = start_x + col_width,
-        page_size = 256, page_dim = 16;
+        page_dim = 16;
 
     for (int col = 0; col < page_dim; ++col) {
         mvwprintw(v->win, 1, toprail_start + (col * col_width), "%X", col);
@@ -456,16 +456,16 @@ static void drawram(const struct view *v, const struct emulator *emu)
     int cursor_x = start_x, cursor_y = 0;
     mvwvline(v->content, 0, start_x - 2, 0, h);
     mvwvline(v->content, 0, getmaxx(v->content) - 3, 0, h);
-    const int page_count = (int)nes_ram_size(emu->console) / page_size;
+    const int page_count = (int)nes_ram_size(emu->console) / RamPageSize;
     for (int page = 0; page < page_count; ++page) {
         for (int page_row = 0; page_row < page_dim; ++page_row) {
             mvwprintw(v->content, cursor_y, 0, "%02X", page);
             for (int page_col = 0; page_col < page_dim; ++page_col) {
-                const size_t ramidx = (size_t)((page * page_size)
+                const size_t ramidx = (size_t)((page * RamPageSize)
                                                + (page_row * page_dim)
                                                + page_col);
                 const bool sp = page == 1
-                                && ramidx % (size_t)page_size
+                                && ramidx % (size_t)RamPageSize
                                     == emu->snapshot.cpu.stack_pointer;
                 if (sp) {
                     wattron(v->content, A_STANDOUT);
@@ -703,7 +703,7 @@ int ui_curses_loop(struct emulator *emu)
     struct viewstate state = {
         .clock = {.cyclock = {.cycles_per_sec = 4}},
         .running = true,
-        .total_ramsheets = (int)nes_ram_size(emu->console) / 512,
+        .total_ramsheets = (int)nes_ram_size(emu->console) / RamSheetSize,
     };
     struct layout layout;
     init_ui(&layout, state.total_ramsheets);

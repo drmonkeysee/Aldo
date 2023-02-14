@@ -37,14 +37,14 @@
 // NOTE: Approximate 60 FPS for application event loop;
 // this will be enforced by actual vsync when ported to true GUI
 // and is *distinct* from emulator frequency which can be modified by the user.
-static const int Fps = 60, RamSheets = 4;
+static const int Fps = 60;
 
 struct viewstate {
     struct runclock {
         struct cycleclock cyclock;
         double frameleft_ms;
     } clock;
-    int ramsheet;
+    int ramsheet, total_ramsheets;
     bool running;
 };
 
@@ -92,34 +92,34 @@ struct layout {
         ram;
 };
 
-static void drawhwtraits(const struct view *v, const struct viewstate *s,
+static void drawhwtraits(const struct view *v, const struct viewstate *vs,
                          const struct emulator *emu)
 {
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
     static double display_frameleft, display_frametime, refreshdt;
-    if ((refreshdt += s->clock.cyclock.frametime_ms) >= refresh_interval_ms) {
-        display_frameleft = s->clock.frameleft_ms;
-        display_frametime = s->clock.cyclock.frametime_ms;
+    if ((refreshdt += vs->clock.cyclock.frametime_ms) >= refresh_interval_ms) {
+        display_frameleft = vs->clock.frameleft_ms;
+        display_frametime = vs->clock.cyclock.frametime_ms;
         refreshdt = 0;
     }
 
     int cursor_y = 0;
     werase(v->content);
     mvwprintw(v->content, cursor_y++, 0, "FPS: %d (%.2f)", Fps,
-              (double)s->clock.cyclock.frames / s->clock.cyclock.runtime);
+              (double)vs->clock.cyclock.frames / vs->clock.cyclock.runtime);
     mvwprintw(v->content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_frametime, display_frameleft);
     mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64,
-              s->clock.cyclock.frames);
+              vs->clock.cyclock.frames);
     mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f",
-              s->clock.cyclock.runtime);
+              vs->clock.cyclock.runtime);
     mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
-              s->clock.cyclock.total_cycles);
+              vs->clock.cyclock.total_cycles);
     mvwaddstr(v->content, cursor_y++, 0, "Master Clock: INF Hz");
     mvwaddstr(v->content, cursor_y++, 0, "CPU/PPU Clock: INF/INF Hz");
     mvwprintw(v->content, cursor_y++, 0, "Cycles per Second: %d",
-              s->clock.cyclock.cycles_per_sec);
+              vs->clock.cyclock.cycles_per_sec);
     mvwaddstr(v->content, cursor_y++, 0, "Cycles per Frame: N/A");
     mvwprintw(v->content, cursor_y, 0, "BCD Supported: %s",
               emu->args->bcdsupport ? "Yes" : "No");
@@ -456,7 +456,8 @@ static void drawram(const struct view *v, const struct emulator *emu)
     int cursor_x = start_x, cursor_y = 0;
     mvwvline(v->content, 0, start_x - 2, 0, h);
     mvwvline(v->content, 0, getmaxx(v->content) - 3, 0, h);
-    for (int page = 0; page < 8; ++page) {
+    const int page_count = (int)nes_ram_size(emu->console) / page_size;
+    for (int page = 0; page < page_count; ++page) {
         for (int page_row = 0; page_row < page_dim; ++page_row) {
             mvwprintw(v->content, cursor_y, 0, "%02X", page);
             for (int page_col = 0; page_col < page_dim; ++page_col) {
@@ -503,10 +504,10 @@ static void vinit(struct view *v, int h, int w, int y, int x, int vpad,
     v->inner = new_panel(v->content);
 }
 
-static void raminit(struct view *v, int h, int w, int y, int x)
+static void raminit(struct view *v, int h, int w, int y, int x, int ramsheets)
 {
     createwin(v, h, w, y, x, "RAM");
-    v->content = newpad((h - 4) * RamSheets, w - 4);
+    v->content = newpad((h - 4) * ramsheets, w - 4);
     v->inner = NULL;
 }
 
@@ -519,12 +520,12 @@ static void vcleanup(struct view *v)
     *v = (struct view){0};
 }
 
-static void ramrefresh(const struct view *v, const struct viewstate *state)
+static void ramrefresh(const struct view *v, const struct viewstate *vs)
 {
     int ram_x, ram_y, ram_w, ram_h;
     getbegyx(v->win, ram_y, ram_x);
     getmaxyx(v->win, ram_h, ram_w);
-    pnoutrefresh(v->content, (ram_h - 4) * state->ramsheet, 0, ram_y + 3,
+    pnoutrefresh(v->content, (ram_h - 4) * vs->ramsheet, 0, ram_y + 3,
                  ram_x + 2, ram_y + ram_h - 2, ram_x + ram_w - 2);
 }
 
@@ -532,7 +533,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *state)
 // UI Loop Implementation
 //
 
-static void init_ui(struct layout *l)
+static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
         col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 14, ctrlh = 16,
@@ -564,12 +565,13 @@ static void init_ui(struct layout *l)
           xoffset + col1w + col2w, 2, "Flags");
     vinit(&l->datapath, 13, col3w, yoffset + cpuh + flagsh,
           xoffset + col1w + col2w, 1, "Datapath");
-    raminit(&l->ram, ramh, col4w, yoffset, xoffset + col1w + col2w + col3w);
+    raminit(&l->ram, ramh, col4w, yoffset, xoffset + col1w + col2w + col3w,
+            ramsheets);
 }
 
-static void tick_start(struct viewstate *s, const struct emulator *emu)
+static void tick_start(struct viewstate *vs, const struct emulator *emu)
 {
-    cycleclock_tickstart(&s->clock.cyclock, !emu->snapshot.lines.ready);
+    cycleclock_tickstart(&vs->clock.cyclock, !emu->snapshot.lines.ready);
 }
 
 static void tick_end(struct runclock *c)
@@ -578,7 +580,7 @@ static void tick_end(struct runclock *c)
     tick_sleep(c);
 }
 
-static void handle_input(struct viewstate *s, const struct emulator *emu)
+static void handle_input(struct viewstate *vs, const struct emulator *emu)
 {
     const int input = getch();
     switch (input) {
@@ -590,23 +592,23 @@ static void handle_input(struct viewstate *s, const struct emulator *emu)
         }
         break;
     case '=':   // "Lowercase" +
-        ++s->clock.cyclock.cycles_per_sec;
+        ++vs->clock.cyclock.cycles_per_sec;
         goto pclamp_cps;
     case '+':
-        s->clock.cyclock.cycles_per_sec += 10;
+        vs->clock.cyclock.cycles_per_sec += 10;
     pclamp_cps:
-        if (s->clock.cyclock.cycles_per_sec > MaxCps) {
-            s->clock.cyclock.cycles_per_sec = MaxCps;
+        if (vs->clock.cyclock.cycles_per_sec > MaxCps) {
+            vs->clock.cyclock.cycles_per_sec = MaxCps;
         }
         break;
     case '-':
-        --s->clock.cyclock.cycles_per_sec;
+        --vs->clock.cyclock.cycles_per_sec;
         goto nclamp_cps;
     case '_':   // "Uppercase" -
-        s->clock.cyclock.cycles_per_sec -= 10;
+        vs->clock.cyclock.cycles_per_sec -= 10;
     nclamp_cps:
-        if (s->clock.cyclock.cycles_per_sec < MinCps) {
-            s->clock.cyclock.cycles_per_sec = MinCps;
+        if (vs->clock.cyclock.cycles_per_sec < MinCps) {
+            vs->clock.cyclock.cycles_per_sec = MinCps;
         }
         break;
     case 'i':
@@ -630,15 +632,15 @@ static void handle_input(struct viewstate *s, const struct emulator *emu)
         }
         break;
     case 'q':
-        s->running = false;
+        vs->running = false;
         break;
     case 'r':
-        s->ramsheet = (s->ramsheet + 1) % RamSheets;
+        vs->ramsheet = (vs->ramsheet + 1) % vs->total_ramsheets;
         break;
     case 'R':
-        --s->ramsheet;
-        if (s->ramsheet < 0) {
-            s->ramsheet = RamSheets - 1;
+        --vs->ramsheet;
+        if (vs->ramsheet < 0) {
+            vs->ramsheet = vs->total_ramsheets - 1;
         }
         break;
     case 's':
@@ -651,16 +653,16 @@ static void handle_input(struct viewstate *s, const struct emulator *emu)
     }
 }
 
-static void emu_update(struct emulator *emu, struct viewstate *s)
+static void emu_update(struct emulator *emu, struct viewstate *vs)
 {
-    nes_cycle(emu->console, &s->clock.cyclock);
+    nes_cycle(emu->console, &vs->clock.cyclock);
     nes_snapshot(emu->console, &emu->snapshot);
 }
 
-static void refresh_ui(const struct layout *l, const struct viewstate *s,
+static void refresh_ui(const struct layout *l, const struct viewstate *vs,
                        const struct emulator *emu)
 {
-    drawhwtraits(&l->hwtraits, s, emu);
+    drawhwtraits(&l->hwtraits, vs, emu);
     drawcontrols(&l->controls, emu);
     drawdebugger(&l->debugger, emu);
     drawcart(&l->cart, emu);
@@ -671,7 +673,7 @@ static void refresh_ui(const struct layout *l, const struct viewstate *s,
     drawram(&l->ram, emu);
 
     update_panels();
-    ramrefresh(&l->ram, s);
+    ramrefresh(&l->ram, vs);
     doupdate();
 }
 
@@ -701,9 +703,10 @@ int ui_curses_loop(struct emulator *emu)
     struct viewstate state = {
         .clock = {.cyclock = {.cycles_per_sec = 4}},
         .running = true,
+        .total_ramsheets = (int)nes_ram_size(emu->console) / 512,
     };
     struct layout layout;
-    init_ui(&layout);
+    init_ui(&layout, state.total_ramsheets);
     cycleclock_start(&state.clock.cyclock);
     do {
         tick_start(&state, emu);

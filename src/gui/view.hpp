@@ -25,12 +25,11 @@ public:
     View(std::string title, viewstate& vs, const Emulator& emu,
          const MediaRuntime& mr, bool* v = nullptr) noexcept
     : title{std::move(title)}, vs{vs}, emu{emu}, mr{mr}, visible{v} {}
-    View(std::string, viewstate&, Emulator&&,
-         const MediaRuntime&, bool*) = delete;
-    View(std::string, viewstate&, const Emulator&&,
-         MediaRuntime&&, bool*) = delete;
-    View(std::string, viewstate&, Emulator&&, MediaRuntime&&,
+    View(std::string, viewstate&, Emulator&&, const MediaRuntime&,
          bool*) = delete;
+    View(std::string, viewstate&, const Emulator&&, MediaRuntime&&,
+         bool*) = delete;
+    View(std::string, viewstate&, Emulator&&, MediaRuntime&&, bool*) = delete;
     View(const View&) = delete;
     View& operator=(const View&) = delete;
     View(View&&) = delete;

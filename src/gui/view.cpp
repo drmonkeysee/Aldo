@@ -1231,14 +1231,14 @@ public:
 protected:
     void renderContents() override
     {
-        const auto pageCount = static_cast<int>(emu.ramSize()) / PageSize,
-                    rowCount = pageCount * PageDim;
         static constexpr auto tableConfig = ImGuiTableFlags_BordersOuter
                                             | ImGuiTableFlags_BordersV
                                             | ImGuiTableFlags_RowBg
                                             | ImGuiTableFlags_SizingFixedFit
                                             | ImGuiTableFlags_ScrollY;
 
+        const auto pageCount = static_cast<int>(emu.ramSize()) / PageSize,
+                    rowCount = pageCount * PageDim;
         const ImVec2 tableSize{
             0, ImGui::GetTextLineHeightWithSpacing() * 2 * (PageDim + 1),
         };

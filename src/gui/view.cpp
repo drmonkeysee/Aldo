@@ -238,16 +238,16 @@ auto about_submenu(aldo::viewstate& vs, const aldo::MediaRuntime& mr)
 auto file_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
 {
     if (ImGui::BeginMenu("File")) {
-        if (ImGui::MenuItem("Open ROM", "Cmd+O")) {
+        if (ImGui::MenuItem("Open ROM...", "Cmd+O")) {
             vs.commands.emplace(aldo::Command::openROM);
         }
         ImGui::Separator();
-        if (ImGui::MenuItem("Open Breakpoints", "Cmd+B")) {
+        if (ImGui::MenuItem("Open Breakpoints...", "Cmd+B")) {
             vs.commands.emplace(aldo::Command::breakpointsOpen);
         }
         {
             const DisabledIf dif = !emu.debugger().isActive();
-            if (ImGui::MenuItem("Export Breakpoints", "Opt+Cmd+B")) {
+            if (ImGui::MenuItem("Export Breakpoints...", "Opt+Cmd+B")) {
                 vs.commands.emplace(aldo::Command::breakpointsExport);
             }
         }
@@ -344,7 +344,7 @@ auto tools_menu(aldo::viewstate& vs)
 {
     if (ImGui::BeginMenu("Tools")) {
         ImGui::MenuItem("ImGui Demo", "Cmd+D", &vs.showDemo);
-        if (ImGui::MenuItem("Aldo Studio")) {
+        if (ImGui::MenuItem("Aldo Studio...")) {
             vs.commands.emplace(aldo::Command::launchStudio);
         }
         ImGui::EndMenu();

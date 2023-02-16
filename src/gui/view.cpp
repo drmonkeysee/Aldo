@@ -207,11 +207,10 @@ auto enter_pressed() noexcept
 }
 
 template<std::derived_from<aldo::View>... Vs>
-auto add_views(std::vector<std::unique_ptr<aldo::View>>& v,
-               aldo::viewstate& vs, const aldo::Emulator& emu,
-               const aldo::MediaRuntime& mr)
+auto add_views(aldo::Layout::view_list& vl, aldo::viewstate& vs,
+               const aldo::Emulator& emu, const aldo::MediaRuntime& mr)
 {
-    (v.push_back(std::make_unique<Vs>(vs, emu, mr)), ...);
+    (vl.push_back(std::make_unique<Vs>(vs, emu, mr)), ...);
 }
 
 //
@@ -330,6 +329,17 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
     }
 }
 
+auto windows_menu(const aldo::Layout::view_list& vl)
+{
+    if (ImGui::BeginMenu("Windows")) {
+        for (const auto& v : vl) {
+            ImGui::MenuItem(v->windowTitle().c_str(), nullptr,
+                            v->visibility());
+        }
+        ImGui::EndMenu();
+    }
+}
+
 auto tools_menu(aldo::viewstate& vs)
 {
     if (ImGui::BeginMenu("Tools")) {
@@ -342,12 +352,13 @@ auto tools_menu(aldo::viewstate& vs)
 }
 
 auto main_menu(aldo::viewstate& vs, const aldo::Emulator& emu,
-               const aldo::MediaRuntime& mr)
+               const aldo::MediaRuntime& mr, const aldo::Layout::view_list& vl)
 {
     if (ImGui::BeginMainMenuBar()) {
         about_submenu(vs, mr);
         file_menu(vs, emu);
         controls_menu(vs, emu);
+        windows_menu(vl);
         tools_menu(vs);
         ImGui::EndMainMenuBar();
     }
@@ -1349,9 +1360,9 @@ private:
 
 void aldo::View::View::render()
 {
-    if (visible && !*visible) return;
+    if (!visible) return;
 
-    if (ImGui::Begin(title.c_str(), visible)) {
+    if (ImGui::Begin(title.c_str(), visibility())) {
         renderContents();
     }
     ImGui::End();
@@ -1374,7 +1385,7 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
 
 void aldo::Layout::render() const
 {
-    main_menu(vs, emu, mr);
+    main_menu(vs, emu, mr, views);
     for (const auto& v : views) {
         v->render();
     }

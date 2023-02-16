@@ -23,18 +23,19 @@ struct viewstate;
 class View {
 public:
     View(std::string title, viewstate& vs, const Emulator& emu,
-         const MediaRuntime& mr, bool* v = nullptr) noexcept
-    : title{std::move(title)}, vs{vs}, emu{emu}, mr{mr}, visible{v} {}
-    View(std::string, viewstate&, Emulator&&, const MediaRuntime&,
-         bool*) = delete;
-    View(std::string, viewstate&, const Emulator&&, MediaRuntime&&,
-         bool*) = delete;
-    View(std::string, viewstate&, Emulator&&, MediaRuntime&&, bool*) = delete;
+         const MediaRuntime& mr) noexcept
+    : title{std::move(title)}, vs{vs}, emu{emu}, mr{mr} {}
+    View(std::string, viewstate&, Emulator&&, const MediaRuntime&) = delete;
+    View(std::string, viewstate&, const Emulator&&, MediaRuntime&&) = delete;
+    View(std::string, viewstate&, Emulator&&, MediaRuntime&&) = delete;
     View(const View&) = delete;
     View& operator=(const View&) = delete;
     View(View&&) = delete;
     View& operator=(View&&) = delete;
     virtual ~View() = default;
+
+    const std::string& windowTitle() const noexcept { return title; }
+    bool* visibility() noexcept { return &visible; }
 
     void render();
 
@@ -45,11 +46,13 @@ protected:
     viewstate& vs;
     const Emulator& emu;
     const MediaRuntime& mr;
-    bool* visible;
+    bool visible = true;    // TODO: get this from imgui settings
 };
 
 class Layout {
 public:
+    using view_list = std::vector<std::unique_ptr<View>>;
+
     Layout(viewstate& vs, const Emulator& emu, const MediaRuntime& mr);
     Layout(viewstate&, Emulator&&, const MediaRuntime&) = delete;
     Layout(viewstate&, const Emulator&, MediaRuntime&&) = delete;
@@ -61,7 +64,7 @@ private:
     viewstate& vs;
     const Emulator& emu;
     const MediaRuntime& mr;
-    std::vector<std::unique_ptr<View>> views;
+    view_list views;
 };
 
 }

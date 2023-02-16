@@ -39,6 +39,8 @@ final class MacPlatform: NSObject {
 fileprivate final class OpenFileFilter: NSObject, NSOpenSavePanelDelegate {
     private let filter: Set<String>
 
+    var isEmpty: Bool { filter.isEmpty }
+
     init(_ rawArray: CStringArray?) {
         if let rawArray {
             filter = .init(FilterSequence(current: rawArray))
@@ -48,7 +50,7 @@ fileprivate final class OpenFileFilter: NSObject, NSOpenSavePanelDelegate {
     }
 
     func panel(_ sender: Any, shouldEnable url: URL) -> Bool {
-        if filter.isEmpty { return true }
+        if isEmpty { return true }
         return filter.contains(url.pathExtension.lowercased())
     }
 }
@@ -92,7 +94,9 @@ fileprivate func openFile(title: CString?, filter: CStringArray?) -> CBuffer? {
         panel.message = .init(cString: title)
     }
     let fileFilter = OpenFileFilter(filter)
-    panel.delegate = fileFilter
+    if !fileFilter.isEmpty {
+        panel.delegate = fileFilter
+    }
     guard panel.runModal() == .OK, let path = panel.url else { return nil }
     return urlToCBuffer(path)
 }

@@ -331,12 +331,31 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
 
 auto windows_menu(const aldo::Layout::view_list& vl)
 {
+    auto viewTransition = aldo::View::Transition::None;
     if (ImGui::BeginMenu("Windows")) {
         for (const auto& v : vl) {
             ImGui::MenuItem(v->windowTitle().c_str(), nullptr,
                             v->visibility());
         }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Open all windows")) {
+            viewTransition = aldo::View::Transition::Open;
+        }
+        if (ImGui::MenuItem("Close all windows")) {
+            viewTransition = aldo::View::Transition::Close;
+        }
+        if (ImGui::MenuItem("Expand all windows")) {
+            viewTransition = aldo::View::Transition::Expand;
+        }
+        if (ImGui::MenuItem("Collapse all windows")) {
+            viewTransition = aldo::View::Transition::Collapse;
+        }
         ImGui::EndMenu();
+    }
+    if (viewTransition != aldo::View::Transition::None) {
+        for (const auto& v : vl) {
+            v->transition = viewTransition;
+        }
     }
 }
 
@@ -1360,6 +1379,7 @@ private:
 
 void aldo::View::View::render()
 {
+    handleTransition();
     if (!visible) return;
 
     if (ImGui::Begin(title.c_str(), visibility())) {
@@ -1392,5 +1412,34 @@ void aldo::Layout::render() const
     about_overlay(vs);
     if (vs.showDemo) {
         ImGui::ShowDemoWindow();
+    }
+}
+
+//
+// Private Interface
+//
+
+void aldo::View::handleTransition() noexcept
+{
+    const auto t = transition.reset();
+    switch (t) {
+    case aldo::View::Transition::Open:
+        visible = true;
+        break;
+    case aldo::View::Transition::Close:
+        visible = false;
+        break;
+    case aldo::View::Transition::Expand:
+        if (visible) {
+            ImGui::SetNextWindowCollapsed(false);
+        }
+        break;
+    case aldo::View::Transition::Collapse:
+        if (visible) {
+            ImGui::SetNextWindowCollapsed(true);
+        }
+        break;
+    default:
+        break;
     }
 }

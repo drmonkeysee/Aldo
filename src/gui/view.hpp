@@ -22,6 +22,30 @@ struct viewstate;
 
 class View {
 public:
+    enum class Transition {
+        None,
+        Open,
+        Close,
+        Expand,
+        Collapse,
+    };
+
+    class TransitionLatch {
+    public:
+        TransitionLatch() noexcept {}
+        TransitionLatch(Transition t) noexcept : transition{t} {}
+
+        // NOTE: exchange is becoming noexcept in C++23
+        // but exchanging an enum won't throw anyway.
+        Transition reset() noexcept
+        {
+            return std::exchange(transition, Transition::None);
+        }
+
+    private:
+        Transition transition = Transition::None;
+    };
+
     View(std::string title, viewstate& vs, const Emulator& emu,
          const MediaRuntime& mr) noexcept
     : title{std::move(title)}, vs{vs}, emu{emu}, mr{mr} {}
@@ -39,6 +63,8 @@ public:
 
     void render();
 
+    TransitionLatch transition;
+
 protected:
     virtual void renderContents() = 0;
 
@@ -47,6 +73,9 @@ protected:
     const Emulator& emu;
     const MediaRuntime& mr;
     bool visible = true;    // TODO: get this from imgui settings
+
+private:
+    void handleTransition() noexcept;
 };
 
 class Layout {

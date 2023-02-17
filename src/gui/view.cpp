@@ -1377,7 +1377,7 @@ private:
 // Public Interface
 //
 
-void aldo::View::View::render()
+void aldo::View::render()
 {
     handleTransition();
     if (!visible) return;

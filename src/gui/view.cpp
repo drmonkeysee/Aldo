@@ -338,16 +338,16 @@ auto windows_menu(const aldo::Layout::view_list& vl)
                             v->visibility());
         }
         ImGui::Separator();
-        if (ImGui::MenuItem("Open all windows")) {
+        if (ImGui::MenuItem("Open all")) {
             viewTransition = aldo::View::Transition::Open;
         }
-        if (ImGui::MenuItem("Close all windows")) {
+        if (ImGui::MenuItem("Close all")) {
             viewTransition = aldo::View::Transition::Close;
         }
-        if (ImGui::MenuItem("Expand all windows")) {
+        if (ImGui::MenuItem("Expand all")) {
             viewTransition = aldo::View::Transition::Expand;
         }
-        if (ImGui::MenuItem("Collapse all windows")) {
+        if (ImGui::MenuItem("Collapse all")) {
             viewTransition = aldo::View::Transition::Collapse;
         }
         ImGui::EndMenu();

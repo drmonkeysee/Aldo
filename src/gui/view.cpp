@@ -32,9 +32,9 @@
 #include <concepts>
 #include <iterator>
 #include <locale>
-#include <set>
 #include <string_view>
 #include <type_traits>
+#include <unordered_set>
 #include <cinttypes>
 #include <cstdio>
 
@@ -1043,7 +1043,7 @@ private:
             decltype(bpSelections) sorted(bpSelections.size());
             std::partial_sort_copy(bpSelections.cbegin(), bpSelections.cend(),
                                    sorted.rbegin(), sorted.rend());
-            std::set<bp_diff> removed;
+            std::unordered_set<bp_diff> removed(sorted.size());
             for (const auto idx : sorted) {
                 // NOTE: here's where duplicate selections bite us
                 if (removed.contains(idx)) continue;

@@ -861,6 +861,83 @@ private:
     using bp_sz = aldo::Debugger::BpView::size_type;
     using bp_diff = aldo::Debugger::BreakpointIterator::difference_type;
 
+    class SelectedBreakpoints {
+    public:
+        bool empty() const noexcept { return selections.empty(); }
+        bp_diff mostRecent() const
+        {
+            return empty() ? NoSelection : selections.back();
+        }
+        bool selected(bp_diff idx) const
+        {
+            return std::any_of(selections.cbegin(), selections.cend(),
+                               [idx](bp_diff i) { return i == idx; });
+        }
+
+        void select(bp_diff idx)
+        {
+            clear();
+            selections.push_back(idx);
+        }
+        void multiSelect(bp_diff idx)
+        {
+            if (selected(idx)) {
+                std::erase(selections, idx);
+            } else {
+                selections.push_back(idx);
+            }
+        }
+        void rangeSelect(bp_diff idx)
+        {
+            const auto lastSelection = mostRecent();
+            if (lastSelection == NoSelection) {
+                select(idx);
+            } else {
+                const auto [low, high] = std::minmax(idx, lastSelection);
+                for (auto i = low; i <= high; ++i) {
+                    selections.push_back(i);
+                }
+                // NOTE: add current idx last to mark it as the
+                // most recent selection.
+                selections.push_back(idx);
+            }
+        }
+        void clear() noexcept { selections.clear(); }
+
+        void queueEnableToggles(aldo::viewstate& vs, bool enabled) const
+        {
+            for (const auto idx : selections) {
+                const auto cmd = enabled
+                                    ? aldo::Command::breakpointDisable
+                                    : aldo::Command::breakpointEnable;
+                vs.commands.emplace(cmd, idx);
+            }
+        }
+        void queueRemovals(aldo::viewstate& vs) const
+        {
+            // NOTE: queue remove commands in reverse order to avoid
+            // invalidating bp indices during removal.
+            // TODO: would ranges be better here when apple clang adds them?
+            decltype(selections) sorted(selections.size());
+            std::partial_sort_copy(selections.cbegin(), selections.cend(),
+                                   sorted.rbegin(), sorted.rend());
+            std::unordered_set<bp_diff> removed(sorted.size());
+            for (const auto idx : sorted) {
+                // NOTE: here's where duplicate selections bite us
+                if (removed.contains(idx)) continue;
+                vs.commands.emplace(aldo::Command::breakpointRemove, idx);
+                removed.insert(idx);
+            }
+        }
+
+    private:
+        // NOTE: arguably this should be a set but the ordered property of
+        // vector gives saner multi-select behavior when mixing shift and cmd
+        // clicks where the last element can be treated as the most recent
+        // selection; duplicates are handled properly with std::erase.
+        std::vector<bp_diff> selections;
+    };
+
     void renderVectorOverride() noexcept
     {
         syncWithOverrideState();
@@ -976,7 +1053,7 @@ private:
     {
         const auto bpBreak = idx == emu.snapshot().debugger.halted;
         if (bpBreak && !detectedHalt) {
-            selectBreakpoint(idx);
+            bpSelections.select(idx);
         }
         std::array<aldo::et::tchar, HEXPR_FMT_SIZE> fmt;
         const auto err = haltexpr_desc(&bp.expr, fmt.data());
@@ -988,30 +1065,14 @@ private:
             {ImGuiCol_Text, aldo::colors::Attention}, bpBreak,
         };
         const ScopedID id = static_cast<int>(idx);
-        const auto selected = bpSelected(idx);
         if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt.data(),
-                              selected)) {
+                              bpSelections.selected(idx))) {
             if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
-                const auto lastSelection = lastBpSelection();
-                if (lastSelection == NoSelection) {
-                    selectBreakpoint(idx);
-                } else {
-                    const auto [low, high] = std::minmax(idx, lastSelection);
-                    for (auto i = low; i <= high; ++i) {
-                        bpSelections.push_back(i);
-                    }
-                    // NOTE: add current idx last to mark it as the
-                    // most recent selection.
-                    bpSelections.push_back(idx);
-                }
+                bpSelections.rangeSelect(idx);
             } else if (ImGui::IsKeyDown(ImGuiKey_ModSuper)) {
-                if (selected) {
-                    std::erase(bpSelections, idx);
-                } else {
-                    bpSelections.push_back(idx);
-                }
+                bpSelections.multiSelect(idx);
             } else {
-                selectBreakpoint(idx);
+                bpSelections.select(idx);
             }
         }
     }
@@ -1020,14 +1081,9 @@ private:
     {
         DisabledIf dif = bpSelections.empty();
         const auto& dbg = emu.debugger();
-        const auto bp = dbg.breakpoints().at(firstBpSelection());
+        const auto bp = dbg.breakpoints().at(bpSelections.mostRecent());
         if (ImGui::Button(!bp || bp->enabled ? "Disable" : "Enable ")) {
-            for (const auto idx : bpSelections) {
-                const auto cmd = bp->enabled
-                                    ? aldo::Command::breakpointDisable
-                                    : aldo::Command::breakpointEnable;
-                vs.commands.emplace(cmd, idx);
-            }
+            bpSelections.queueEnableToggles(vs, bp->enabled);
         }
         ImGui::SameLine();
         const ScopedColor colors = {
@@ -1037,19 +1093,7 @@ private:
         };
         auto resetSelection = false;
         if (ImGui::Button("Remove")) {
-            // NOTE: queue remove commands in reverse order to avoid
-            // invalidating bp indices during removal.
-            // TODO: would ranges be better here when apple clang adds them?
-            decltype(bpSelections) sorted(bpSelections.size());
-            std::partial_sort_copy(bpSelections.cbegin(), bpSelections.cend(),
-                                   sorted.rbegin(), sorted.rend());
-            std::unordered_set<bp_diff> removed(sorted.size());
-            for (const auto idx : sorted) {
-                // NOTE: here's where duplicate selections bite us
-                if (removed.contains(idx)) continue;
-                vs.commands.emplace(aldo::Command::breakpointRemove, idx);
-                removed.insert(idx);
-            }
+            bpSelections.queueRemovals(vs);
             resetSelection = true;
         }
         ImGui::SameLine();
@@ -1081,33 +1125,6 @@ private:
         }
     }
 
-    void selectBreakpoint(bp_diff idx)
-    {
-        bpSelections.clear();
-        bpSelections.push_back(idx);
-    }
-
-    bool bpSelected(bp_diff idx) const
-    {
-        return std::any_of(bpSelections.cbegin(),
-                           bpSelections.cend(),
-                           [idx](bp_diff i) { return i == idx; });
-    }
-
-    bp_diff firstBpSelection() const
-    {
-        return bpSelections.empty()
-                ? NoSelection
-                : bpSelections.front();
-    }
-
-    bp_diff lastBpSelection() const
-    {
-        return bpSelections.empty()
-                ? NoSelection
-                : bpSelections.back();
-    }
-
     bool detectedHalt = false, resetOverride = false;
     aldo::et::word resetAddr = 0x0;
     halt_array haltConditions;
@@ -1115,11 +1132,7 @@ private:
     // is immutable for the life of this instance.
     halt_it selectedCondition;
     haltexpr currentHaltExpression;
-    // NOTE: arguably this should be a set but the ordered property of vector
-    // gives saner multi-select behavior when mixing shift and cmd clicks where
-    // the last element can be treated as the most recent selection; duplicates
-    // are handled properly with std::erase.
-    std::vector<bp_diff> bpSelections;
+    SelectedBreakpoints bpSelections;
 };
 
 class HardwareTraitsView final : public aldo::View {

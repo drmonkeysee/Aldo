@@ -150,8 +150,11 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
     case aldo::Command::breakpointsOpen:
         aldo::modal::loadBreakpoints(emu, p);
         break;
-    case aldo::Command::breakpointToggle:
-        breakpoints.toggleEnabled(std::get<aldo::et::diff>(cs.value));
+    case aldo::Command::breakpointDisable:
+        breakpoints.disable(std::get<aldo::et::diff>(cs.value));
+        break;
+    case aldo::Command::breakpointEnable:
+        breakpoints.enable(std::get<aldo::et::diff>(cs.value));
         break;
     case aldo::Command::halt:
         if (std::get<bool>(cs.value)) {

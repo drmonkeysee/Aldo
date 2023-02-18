@@ -154,10 +154,13 @@ public:
         {
             debug_bp_add(debugp, expr);
         }
-        void toggleEnabled(difference_type i) noexcept requires Mutable
+        void enable(difference_type i) noexcept requires Mutable
         {
-            const auto bp = at(i);
-            debug_bp_enabled(debugp, i, bp && !bp->enabled);
+            debug_bp_enabled(debugp, i, true);
+        }
+        void disable(difference_type i) noexcept requires Mutable
+        {
+            debug_bp_enabled(debugp, i, false);
         }
         void remove(difference_type i) noexcept requires Mutable
         {

@@ -32,6 +32,7 @@
 #include <concepts>
 #include <iterator>
 #include <locale>
+#include <set>
 #include <string_view>
 #include <type_traits>
 #include <cinttypes>
@@ -975,9 +976,8 @@ private:
     {
         const auto bpBreak = idx == emu.snapshot().debugger.halted;
         if (bpBreak && !detectedHalt) {
-            selectedBreakpoint = idx;
+            selectBreakpoint(idx);
         }
-        const auto current = idx == selectedBreakpoint;
         std::array<aldo::et::tchar, HEXPR_FMT_SIZE> fmt;
         const auto err = haltexpr_desc(&bp.expr, fmt.data());
         const ScopedStyle style{
@@ -989,22 +989,27 @@ private:
         };
         const ScopedID id = static_cast<int>(idx);
         if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt.data(),
-                              current)) {
-            selectedBreakpoint = idx;
-        }
-        if (current) {
-            ImGui::SetItemDefaultFocus();
+                              bpSelections.contains(idx))) {
+            if (ImGui::GetIO().KeyMods) {
+                bpSelections.insert(idx);
+            } else {
+                selectBreakpoint(idx);
+            }
         }
     }
 
     void renderListControls(bp_sz bpCount)
     {
-        DisabledIf dif = selectedBreakpoint == NoSelection;
+        DisabledIf dif = bpSelections.empty();
         const auto& dbg = emu.debugger();
-        const auto bp = dbg.breakpoints().at(selectedBreakpoint);
+        const auto bp = dbg.breakpoints().at(firstBpSelection());
         if (ImGui::Button(!bp || bp->enabled ? "Disable" : "Enable ")) {
-            vs.commands.emplace(aldo::Command::breakpointToggle,
-                                selectedBreakpoint);
+            for (const auto idx : bpSelections) {
+                const auto cmd = bp->enabled
+                                    ? aldo::Command::breakpointDisable
+                                    : aldo::Command::breakpointEnable;
+                vs.commands.emplace(cmd, idx);
+            }
         }
         ImGui::SameLine();
         const ScopedColor colors = {
@@ -1014,8 +1019,14 @@ private:
         };
         auto resetSelection = false;
         if (ImGui::Button("Remove")) {
-            vs.commands.emplace(aldo::Command::breakpointRemove,
-                                selectedBreakpoint);
+            // NOTE: queue remove commands in reverse order to avoid
+            // invalidating bp indices during removal.
+            // TODO: when apple clang gets ranges use those
+            for (auto it = bpSelections.crbegin();
+                 it != bpSelections.crend();
+                 ++it) {
+                vs.commands.emplace(aldo::Command::breakpointRemove, *it);
+            }
             resetSelection = true;
         }
         ImGui::SameLine();
@@ -1025,7 +1036,7 @@ private:
             resetSelection = true;
         }
         if (resetSelection) {
-            selectedBreakpoint = NoSelection;
+            bpSelections.clear();
         }
     }
 
@@ -1047,6 +1058,19 @@ private:
         }
     }
 
+    void selectBreakpoint(bp_diff idx)
+    {
+        bpSelections.clear();
+        bpSelections.insert(idx);
+    }
+
+    bp_diff firstBpSelection() const noexcept
+    {
+        return bpSelections.empty()
+                ? NoSelection
+                : *bpSelections.cbegin();
+    }
+
     bool detectedHalt = false, resetOverride = false;
     aldo::et::word resetAddr = 0x0;
     halt_array haltConditions;
@@ -1054,7 +1078,7 @@ private:
     // is immutable for the life of this instance.
     halt_it selectedCondition;
     haltexpr currentHaltExpression;
-    bp_diff selectedBreakpoint = NoSelection;
+    std::set<bp_diff> bpSelections;
 };
 
 class HardwareTraitsView final : public aldo::View {

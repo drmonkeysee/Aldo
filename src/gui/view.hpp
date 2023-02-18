@@ -48,7 +48,7 @@ public:
 
     View(std::string title, viewstate& vs, const Emulator& emu,
          const MediaRuntime& mr) noexcept
-    : title{std::move(title)}, vs{vs}, emu{emu}, mr{mr} {}
+    : vs{vs}, emu{emu}, mr{mr}, title{std::move(title)} {}
     View(std::string, viewstate&, Emulator&&, const MediaRuntime&) = delete;
     View(std::string, viewstate&, const Emulator&&, MediaRuntime&&) = delete;
     View(std::string, viewstate&, Emulator&&, MediaRuntime&&) = delete;
@@ -68,14 +68,15 @@ public:
 protected:
     virtual void renderContents() = 0;
 
-    std::string title;
     viewstate& vs;
     const Emulator& emu;
     const MediaRuntime& mr;
-    bool visible = true;    // TODO: get this from imgui settings
 
 private:
     void handleTransition() noexcept;
+
+    std::string title;
+    bool visible = true;    // TODO: get this from imgui settings
 };
 
 class Layout {

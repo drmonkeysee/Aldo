@@ -991,7 +991,7 @@ private:
         const auto selected = bpSelected(idx);
         if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt.data(),
                               selected)) {
-            if (ImGui::GetIO().KeyShift) {
+            if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
                 const auto lastSelection = lastBpSelection();
                 if (lastSelection == NoSelection) {
                     selectBreakpoint(idx);
@@ -1004,7 +1004,7 @@ private:
                     // most recent selection.
                     bpSelections.push_back(idx);
                 }
-            } else if (ImGui::GetIO().KeyMods) {
+            } else if (ImGui::IsKeyDown(ImGuiKey_ModSuper)) {
                 if (selected) {
                     std::erase(bpSelections, idx);
                 } else {

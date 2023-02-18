@@ -138,6 +138,12 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
     case aldo::Command::breakpointAdd:
         breakpoints.append(std::get<haltexpr>(cs.value));
         break;
+    case aldo::Command::breakpointDisable:
+        breakpoints.disable(std::get<aldo::et::diff>(cs.value));
+        break;
+    case aldo::Command::breakpointEnable:
+        breakpoints.enable(std::get<aldo::et::diff>(cs.value));
+        break;
     case aldo::Command::breakpointRemove:
         breakpoints.remove(std::get<aldo::et::diff>(cs.value));
         break;
@@ -149,12 +155,6 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
         break;
     case aldo::Command::breakpointsOpen:
         aldo::modal::loadBreakpoints(emu, p);
-        break;
-    case aldo::Command::breakpointDisable:
-        breakpoints.disable(std::get<aldo::et::diff>(cs.value));
-        break;
-    case aldo::Command::breakpointEnable:
-        breakpoints.enable(std::get<aldo::et::diff>(cs.value));
         break;
     case aldo::Command::halt:
         if (std::get<bool>(cs.value)) {
@@ -179,9 +179,6 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
     case aldo::Command::openROM:
         aldo::modal::loadROM(emu, p);
         break;
-    case aldo::Command::zeroRamOnPowerup:
-        emu.zeroRam = std::get<bool>(cs.value);
-        break;
     case aldo::Command::resetVectorClear:
         debugger.vectorClear();
         break;
@@ -190,6 +187,9 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
         break;
     case aldo::Command::quit:
         s.running = false;
+        break;
+    case aldo::Command::zeroRamOnPowerup:
+        emu.zeroRam = std::get<bool>(cs.value);
         break;
     default:
         throw std::domain_error{invalid_command(cs.cmd)};

@@ -172,6 +172,13 @@ size_t nes_ram_size(nes *self)
     return sizeof self->ram / sizeof self->ram[0];
 }
 
+bool nes_bcd_support(nes *self)
+{
+    assert(self != NULL);
+
+    return self->cpu.bcd;
+}
+
 enum csig_excmode nes_mode(nes *self)
 {
     assert(self != NULL);

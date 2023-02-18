@@ -34,6 +34,8 @@ void nes_powerdown(nes *self) br_nothrow;
 br_libexport
 size_t nes_ram_size(nes *self) br_nothrow;
 br_libexport
+bool nes_bcd_support(nes *self) br_nothrow;
+br_libexport
 enum csig_excmode nes_mode(nes *self) br_nothrow;
 br_libexport
 void nes_set_mode(nes *self, enum csig_excmode mode) br_nothrow;

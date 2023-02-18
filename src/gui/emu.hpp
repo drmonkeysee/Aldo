@@ -85,6 +85,7 @@ public:
         }
     }
     et::size ramSize() const noexcept { return nes_ram_size(consolep()); }
+    bool bcdSupport() const noexcept { return nes_bcd_support(consolep()); }
     csig_excmode runMode() const noexcept { return nes_mode(consolep()); }
     void runMode(csig_excmode mode) noexcept
     {

@@ -1098,6 +1098,7 @@ private:
         ImGui::Text("Frames: %" PRIu64, cyclock.frames);
         ImGui::Text("Runtime: %.3f", cyclock.runtime);
         ImGui::Text("Cycles: %" PRIu64, cyclock.total_cycles);
+        ImGui::Text("BCD Support: %s", boolstr(emu.bcdSupport()));
     }
 
     void renderSpeedControls() const noexcept

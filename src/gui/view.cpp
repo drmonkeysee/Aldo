@@ -988,10 +988,15 @@ private:
             {ImGuiCol_Text, aldo::colors::Attention}, bpBreak,
         };
         const ScopedID id = static_cast<int>(idx);
+        const auto selected = bpSelections.contains(idx);
         if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt.data(),
-                              bpSelections.contains(idx))) {
+                              selected)) {
             if (ImGui::GetIO().KeyMods) {
-                bpSelections.insert(idx);
+                if (selected) {
+                    bpSelections.erase(idx);
+                } else {
+                    bpSelections.insert(idx);
+                }
             } else {
                 selectBreakpoint(idx);
             }

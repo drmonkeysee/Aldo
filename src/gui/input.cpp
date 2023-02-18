@@ -78,6 +78,11 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
             vs.clock.adjustCycleRate(-cyclerate_adjust(ev));
         }
         break;
+    case SDLK_0:
+        if (is_menu_command(ev)) {
+            vs.commands.emplace(aldo::Command::zeroRamOnPowerup, !emu.zeroRam);
+        }
+        break;
     case SDLK_b:
         if (is_menu_command(ev)) {
             if (ev.key.keysym.mod & KMOD_ALT) {
@@ -170,6 +175,9 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
         break;
     case aldo::Command::openROM:
         aldo::modal::loadROM(emu, p);
+        break;
+    case aldo::Command::zeroRamOnPowerup:
+        emu.zeroRam = std::get<bool>(cs.value);
         break;
     case aldo::Command::resetVectorClear:
         debugger.vectorClear();

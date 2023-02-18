@@ -94,6 +94,8 @@ public:
     void loadCart(const std::filesystem::path& filepath);
     void update(viewstate& vs) noexcept;
 
+    bool zeroRam = false;
+
 private:
     cart* cartp() const noexcept { return hcart.get(); }
     nes* consolep() const noexcept { return hconsole.get(); }

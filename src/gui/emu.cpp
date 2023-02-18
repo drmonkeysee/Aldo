@@ -100,7 +100,7 @@ void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
     saveCartState();
     nes_powerdown(consolep());
     hcart.reset(c);
-    nes_powerup(consolep(), cartp(), false);
+    nes_powerup(consolep(), cartp(), zeroRam);
     cartpath = filepath;
     cartname = cartpath.stem();
     loadCartState();

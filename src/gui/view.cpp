@@ -314,6 +314,7 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
             vs.commands.emplace(aldo::Command::halt, lines.ready);
         }
         mode_menu_item(vs, emu);
+        ImGui::Separator();
         // NOTE: interrupt signals are all low-active
         auto irq = !lines.irq, nmi = !lines.nmi, res = !lines.reset;
         if (ImGui::MenuItem("Send IRQ", "i", &irq)) {
@@ -324,6 +325,10 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
         }
         if (ImGui::MenuItem("Send RES", "s", &res)) {
             vs.addInterruptCommand(CSGI_RES, res);
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Clear RAM on Power-up", "Cmd+0", emu.zeroRam)) {
+            vs.commands.emplace(aldo::Command::zeroRamOnPowerup, !emu.zeroRam);
         }
         ImGui::EndMenu();
     }

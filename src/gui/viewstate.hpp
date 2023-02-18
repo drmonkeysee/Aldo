@@ -38,6 +38,7 @@ enum class Command {
     resetVectorClear,
     resetVectorOverride,
     quit,
+    zeroRamOnPowerup,
 };
 
 struct command_state {

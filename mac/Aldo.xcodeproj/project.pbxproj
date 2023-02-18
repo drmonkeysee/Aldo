@@ -43,6 +43,7 @@
 		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
 		C8702CF9278A58C900725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C8702CF8278A58C900725690 /* haltexpr.c */; };
 		C8702CFA278A598A00725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
+		C879D27A29A1740000FCD963 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C879D27929A1740000FCD963 /* debug.c */; };
 		C882854829403C2100BAC249 /* error.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C882854629403C2100BAC249 /* error.cpp */; };
 		C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C88CABDC28FA4DDD00551C65 /* uisdl.cpp */; };
 		C894F0EF2945850E00C6575F /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C894F0ED2945850E00C6575F /* view.cpp */; };
@@ -282,6 +283,7 @@
 		C86030772761A51100F1B27D /* cpupeek.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpupeek.c; sourceTree = "<group>"; };
 		C867F802295E9BA700ABEB3B /* style.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = style.hpp; sourceTree = "<group>"; };
 		C8702CF8278A58C900725690 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
+		C879D27929A1740000FCD963 /* debug.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = debug.c; sourceTree = "<group>"; };
 		C882854629403C2100BAC249 /* error.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = error.cpp; sourceTree = "<group>"; };
 		C882854729403C2100BAC249 /* error.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = error.hpp; sourceTree = "<group>"; };
 		C88949B02813B2DB00795CC0 /* ChrSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChrSheet.swift; sourceTree = "<group>"; };
@@ -451,6 +453,7 @@
 				C8C706A72751EF8D00B45785 /* cpustack.c */,
 				C8C706A42751EF8D00B45785 /* cpusubroutine.c */,
 				C8C706A52751EF8D00B45785 /* cpuzeropage.c */,
+				C879D27929A1740000FCD963 /* debug.c */,
 				C8184D5225E74B75002B3100 /* dis.c */,
 				C8702CF8278A58C900725690 /* haltexpr.c */,
 				C8184D5025E74AC5002B3100 /* main.c */,
@@ -913,6 +916,7 @@
 				C838F8572936FC9800D52004 /* debug.c in Sources */,
 				C8184D5325E74B75002B3100 /* dis.c in Sources */,
 				C8C706BB2751F0CE00B45785 /* mappers.c in Sources */,
+				C879D27A29A1740000FCD963 /* debug.c in Sources */,
 				C8C706B52751EF8D00B45785 /* cpustack.c in Sources */,
 				C8184D7725E753BB002B3100 /* main.c in Sources */,
 				C8184D7C25E76541002B3100 /* dis.c in Sources */,

@@ -110,11 +110,13 @@ purge: clean
 $(LIB_TARGET): $(LIB_OBJ)
 	$(AR) $(ARFLAGS) $@ $(LIB_OBJ)
 
+$(CLI_TARGET): LDFLAGS := -L$(BUILD_DIR)
+$(CLI_TARGET): LDLIBS := -laldo
 ifeq ($(OS), Darwin)
-$(CLI_TARGET): LDFLAGS := -L/opt/homebrew/opt/ncurses/lib -L$(BUILD_DIR)
-$(CLI_TARGET): LDLIBS := -lpanel -lncurses -laldo
+$(CLI_TARGET): LDFLAGS += -L/opt/homebrew/opt/ncurses/lib
+$(CLI_TARGET): LDLIBS += -lpanel -lncurses
 else
-$(CLI_TARGET): LDLIBS := -lm -lpanelw -lncursesw -laldo
+$(CLI_TARGET): LDLIBS += -lm -lpanelw -lncursesw
 endif
 $(CLI_TARGET): $(LIB_TARGET) $(CLI_OBJ)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
@@ -137,8 +139,6 @@ $(TEST_OBJ_DIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_DIR)
 
 ifeq ($(OS), Darwin)
 $(CLI_OBJ_DIR)/%.o: SRC_CFLAGS += -I/opt/homebrew/opt/ncurses/include
-else
-$(CLI_OBJ_DIR)/%.o: SRC_CFLAGS += -D_POSIX_C_SOURCE=200112L
 endif
 $(CLI_OBJ_DIR)/%.o: $(SRC_DIR)/$(CLI_DIR)/%.c | $(CLI_OBJ_DIR)
 	$(CC) $(CFLAGS) $(SRC_CFLAGS) -MMD -c $< -o $@

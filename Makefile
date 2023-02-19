@@ -108,7 +108,7 @@ purge: clean
 	$(RM) $(PURGE_ASSETS)
 
 $(LIB_TARGET): $(LIB_OBJ)
-	$(AR) $(ARFLAGS) $@ $(LIB_OBJ)
+	$(AR) $(ARFLAGS) $@ $?
 
 $(CLI_TARGET): LDFLAGS := -L$(BUILD_DIR)
 $(CLI_TARGET): LDLIBS := -laldo
@@ -118,7 +118,7 @@ $(CLI_TARGET): LDLIBS += -lpanel -lncurses
 else
 $(CLI_TARGET): LDLIBS += -lm -lpanelw -lncursesw
 endif
-$(CLI_TARGET): $(LIB_TARGET) $(CLI_OBJ)
+$(CLI_TARGET): $(CLI_OBJ) | $(LIB_TARGET)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 $(TESTS_TARGET): LDLIBS := -lcinytest

@@ -4,22 +4,26 @@ CLI_DIR := cli
 TEST_DIR := test
 BUILD_DIR := build
 OBJ_DIR := $(BUILD_DIR)/obj
-
-SRC_FILES := $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/$(CLI_DIR)/*.c)
-TEST_FILES := $(wildcard $(TEST_DIR)/*.c)
-
-OBJ_FILES := $(subst $(SRC_DIR),$(OBJ_DIR),$(SRC_FILES:.c=.o))
-TEST_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(TEST_FILES:.c=.o))
-DEP_FILES := $(OBJ_FILES:.o=.d)
-
-OBJ_DIRS := $(OBJ_DIR) $(OBJ_DIR)/$(CLI_DIR)
+CLI_OBJ_DIR := $(OBJ_DIR)/$(CLI_DIR)
 TEST_OBJ_DIR := $(OBJ_DIR)/$(TEST_DIR)
+OBJ_DIRS := $(OBJ_DIR) $(CLI_OBJ_DIR) $(TEST_OBJ_DIR)
+
+LIB_SRC := $(wildcard $(SRC_DIR)/*.c)
+CLI_SRC := $(wildcard $(SRC_DIR)/$(CLI_DIR)/*.c)
+TEST_SRC := $(wildcard $(TEST_DIR)/*.c)
+
+LIB_OBJ := $(subst $(SRC_DIR),$(OBJ_DIR),$(LIB_SRC:.c=.o))
+CLI_OBJ := $(subst $(SRC_DIR),$(OBJ_DIR),$(CLI_SRC:.c=.o))
+TEST_OBJ := $(addprefix $(OBJ_DIR)/,$(TEST_SRC:.c=.o))
+
+DEP_FILES := $(LIB_OBJ:.o=.d) $(CLI_OBJ:.o=.d)
 TEST_DEPS := $(addprefix $(OBJ_DIR)/,$(CLI_DIR)/argparse.o bus.o bytes.o cart.o \
 		 cpu.o debug.o decode.o dis.o haltexpr.o mappers.o)
 
 PRODUCT := aldoc
 TESTS := $(PRODUCT)tests
-TARGET := $(BUILD_DIR)/$(PRODUCT)
+LIB_TARGET := $(BUILD_DIR)/libaldo.a
+CLI_TARGET := $(BUILD_DIR)/$(PRODUCT)
 TESTS_TARGET := $(BUILD_DIR)/$(TESTS)
 
 NESTEST_HTTP := https://raw.githubusercontent.com/christopherpow/nes-test-roms/master/other
@@ -41,6 +45,7 @@ endif
 SRC_CFLAGS := -pedantic
 TEST_CFLAGS := -Wno-unused-parameter -iquote$(SRC_DIR)/$(CLI_DIR)
 SP := strip
+ARFLAGS := -rsv
 
 ifdef XCF
 CFLAGS += $(XCF)
@@ -66,14 +71,14 @@ release: CFLAGS += -Werror -Os -flto -DNDEBUG
 ifneq ($(OS), Darwin)
 release: SPFLAGS := -s
 endif
-release: $(TARGET)
-	$(SP) $(SPFLAGS) $(TARGET)
+release: $(CLI_TARGET)
+	$(SP) $(SPFLAGS) $(CLI_TARGET)
 
 debug: CFLAGS += -g -O0 -DDEBUG
-debug: $(TARGET)
+debug: $(CLI_TARGET)
 
 run: debug
-	$(TARGET) $(FILE)
+	$(CLI_TARGET) $(FILE)
 
 check: test nestest nesdiff bcdtest
 
@@ -83,7 +88,7 @@ test: $(TESTS_TARGET)
 
 nestest: $(NESTEST_ROM) debug
 	$(RM) $(TRACE_CMP)
-	$(TARGET) -btvz -H@c66e -Hjam -H3s -rc000 $<
+	$(CLI_TARGET) -btvz -H@c66e -Hjam -H3s -rc000 $<
 
 nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
 	diff -y --suppress-common-lines $^ > $(NESTEST_DIFF); \
@@ -92,7 +97,7 @@ nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
 	exit $$DIFF_RESULT
 
 bcdtest: $(BCDTEST_ROM) debug
-	$(TARGET) -bDv -g$(TEST_DIR)/bcdtest.brk $<
+	$(CLI_TARGET) -bDv -g$(TEST_DIR)/bcdtest.brk $<
 	hexdump -C system.ram | head -n1 | awk '{ print "ERROR =",$$2; \
 	if ($$2 == 0) print "BCD Pass!"; else { print "BCD Fail :("; exit 1 }}'
 
@@ -102,13 +107,16 @@ clean:
 purge: clean
 	$(RM) $(PURGE_ASSETS)
 
+$(LIB_TARGET): $(LIB_OBJ)
+	$(AR) $(ARFLAGS) $@ $(LIB_OBJ)
+
 ifeq ($(OS), Darwin)
-$(TARGET): LDFLAGS := -L/opt/homebrew/opt/ncurses/lib
-$(TARGET): LDLIBS := -lpanel -lncurses
+$(CLI_TARGET): LDFLAGS := -L/opt/homebrew/opt/ncurses/lib -L$(BUILD_DIR)
+$(CLI_TARGET): LDLIBS := -lpanel -lncurses -laldo
 else
-$(TARGET): LDLIBS := -lm -lpanelw -lncursesw
+$(CLI_TARGET): LDLIBS := -lm -lpanelw -lncursesw -laldo
 endif
-$(TARGET): $(OBJ_FILES)
+$(CLI_TARGET): $(LIB_TARGET) $(CLI_OBJ)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 $(TESTS_TARGET): LDLIBS := -lcinytest
@@ -116,18 +124,10 @@ ifneq ($(OS), Darwin)
 $(TESTS_TARGET): LDFLAGS := -L/usr/local/lib -Wl,-rpath,/usr/local/lib
 $(TESTS_TARGET): LDLIBS += -lm
 endif
-$(TESTS_TARGET): $(TEST_OBJ_FILES) $(TEST_DEPS)
+$(TESTS_TARGET): $(TEST_OBJ) $(TEST_DEPS)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 -include $(DEP_FILES)
-
-ifeq ($(OS), Darwin)
-$(OBJ_DIR)/%.o: SRC_CFLAGS += -I/opt/homebrew/opt/ncurses/include
-else
-$(OBJ_DIR)/%.o: SRC_CFLAGS += -D_POSIX_C_SOURCE=200112L
-endif
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIRS)
-	$(CC) $(CFLAGS) $(SRC_CFLAGS) -MMD -c $< -o $@
 
 ifeq ($(OS), Darwin)
 $(TEST_OBJ_DIR)/%.o: TEST_CFLAGS += -pedantic -Wno-gnu-zero-variadic-macro-arguments
@@ -135,7 +135,21 @@ endif
 $(TEST_OBJ_DIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_DIR)
 	$(CC) $(CFLAGS) $(TEST_CFLAGS) -MMD -c $< -o $@
 
-$(OBJ_DIRS) $(TEST_OBJ_DIR):
+ifeq ($(OS), Darwin)
+$(CLI_OBJ_DIR)/%.o: SRC_CFLAGS += -I/opt/homebrew/opt/ncurses/include
+else
+$(CLI_OBJ_DIR)/%.o: SRC_CFLAGS += -D_POSIX_C_SOURCE=200112L
+endif
+$(CLI_OBJ_DIR)/%.o: $(SRC_DIR)/$(CLI_DIR)/%.c | $(CLI_OBJ_DIR)
+	$(CC) $(CFLAGS) $(SRC_CFLAGS) -MMD -c $< -o $@
+
+ifneq ($(OS), Darwin)
+$(OBJ_DIR)/%.o: SRC_CFLAGS += -D_POSIX_C_SOURCE=200112L
+endif
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(SRC_CFLAGS) -MMD -c $< -o $@
+
+$(OBJ_DIRS):
 	mkdir -p $@
 
 $(NESTEST_ROM) $(NESTEST_LOG):

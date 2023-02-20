@@ -118,11 +118,8 @@ static void drawhwtraits(const struct view *v, const struct viewstate *vs,
               vs->clock.cyclock.runtime);
     mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
               vs->clock.cyclock.total_cycles);
-    mvwaddstr(v->content, cursor_y++, 0, "Master Clock: INF Hz");
-    mvwaddstr(v->content, cursor_y++, 0, "CPU/PPU Clock: INF/INF Hz");
     mvwprintw(v->content, cursor_y++, 0, "Cycles per Second: %d",
               vs->clock.cyclock.cycles_per_sec);
-    mvwaddstr(v->content, cursor_y++, 0, "Cycles per Frame: N/A");
     mvwprintw(v->content, cursor_y, 0, "BCD Supported: %s",
               emu->args->bcdsupport ? "Yes" : "No");
 }
@@ -538,7 +535,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
-        col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 15, ctrlh = 16,
+        col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 12, ctrlh = 16,
         crth = 6, cpuh = 11, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");

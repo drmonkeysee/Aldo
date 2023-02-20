@@ -1170,6 +1170,7 @@ private:
         ImGui::Text("Render dT: %.3f", dispDtRender);
         ImGui::Text("Total dT: %.3f", dispDtTotal);
         ImGui::Text("Frames: %" PRIu64, cyclock.frames);
+        ImGui::Text("Emutime: %.3f", cyclock.emutime);
         ImGui::Text("Runtime: %.3f", cyclock.runtime);
         ImGui::Text("Cycles: %" PRIu64, cyclock.total_cycles);
         ImGui::Text("BCD Support: %s", boolstr(emu.bcdSupport()));

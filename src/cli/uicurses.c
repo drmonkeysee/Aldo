@@ -112,6 +112,8 @@ static void drawhwtraits(const struct view *v, const struct viewstate *vs,
               display_frametime, display_frameleft);
     mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64,
               vs->clock.cyclock.frames);
+    mvwprintw(v->content, cursor_y++, 0, "Emutime: %.3f",
+              vs->clock.cyclock.emutime);
     mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f",
               vs->clock.cyclock.runtime);
     mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
@@ -536,7 +538,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
-        col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 14, ctrlh = 16,
+        col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 15, ctrlh = 16,
         crth = 6, cpuh = 11, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");

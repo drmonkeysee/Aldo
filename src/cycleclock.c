@@ -28,6 +28,7 @@ void cycleclock_tickstart(struct cycleclock *self, bool reset_budget)
         return;
     }
 
+    self->emutime += self->frametime_ms / TSU_MS_PER_S;
     self->timebudget_ms += self->frametime_ms;
     // NOTE: accumulate at most a second of banked cycle time
     if (self->timebudget_ms >= TSU_MS_PER_S) {

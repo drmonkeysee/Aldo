@@ -153,7 +153,7 @@ $(OBJ_DIRS):
 	mkdir -p $@
 
 $(NESTEST_ROM) $(NESTEST_LOG):
-	cd $(TEST_DIR) && curl -O '$(NESTEST_HTTP)/$(notdir $@)'
+	cd $(TEST_DIR) && curl -O '$(NESTEST_HTTP)/$(@F)'
 
 $(NESTEST_CMP): $(NESTEST_LOG)
 	# NOTE: strip out PPU column (unimplemented) and Accumulator cue (implied)

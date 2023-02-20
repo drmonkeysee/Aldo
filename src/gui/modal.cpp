@@ -70,27 +70,37 @@ auto file_modal(modal_launch open, modal_operation op, aldo::Emulator& emu,
 
 bool aldo::modal::loadROM(aldo::Emulator& emu, const gui_platform& p)
 {
-    return file_modal([](const gui_platform& p) {
+    const auto open = [](const gui_platform& p) {
         return open_file(p, "Choose a ROM file");
-    }, [&emu](const std::filesystem::path& fp) { emu.loadCart(fp); }, emu, p);
+    };
+    const auto op = [&emu](const std::filesystem::path& fp) {
+        emu.loadCart(fp);
+    };
+    return file_modal(open, op, emu, p);
 }
 
 bool aldo::modal::loadBreakpoints(aldo::Emulator& emu, const gui_platform& p)
 {
-    return file_modal([](const gui_platform& p) {
+    const auto open = [](const gui_platform& p) {
         return open_file(p, "Choose a Breakpoints file",
                          {aldo::debug::BreakFileExtension, nullptr});
-    }, [&d = emu.debugger()](const std::filesystem::path& fp) {
+    };
+    const auto op = [&d = emu.debugger()](const std::filesystem::path& fp) {
         d.loadBreakpoints(fp);
-    }, emu, p);
+    };
+    return file_modal(open, op, emu, p);
 }
 
 bool aldo::modal::exportBreakpoints(aldo::Emulator& emu, const gui_platform& p)
 {
-    return file_modal([n = aldo::debug::breakfile_path_from(emu.cartName())]
-    (const gui_platform& p) {
-        return save_file(p, "Export Breakpoints", n);
-    }, [&d = std::as_const(emu.debugger())](const std::filesystem::path& fp) {
-        d.exportBreakpoints(fp);
-    }, emu, p);
+    const auto open =
+        [n = aldo::debug::breakfile_path_from(emu.cartName())]
+        (const gui_platform& p) {
+            return save_file(p, "Export Breakpoints", n);
+        };
+    const auto op =
+        [&d = std::as_const(emu.debugger())](const std::filesystem::path& fp) {
+            d.exportBreakpoints(fp);
+        };
+    return file_modal(open, op, emu, p);
 }

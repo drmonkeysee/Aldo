@@ -110,7 +110,7 @@ $(LIB_TARGET): $(LIB_OBJ)
 	$(AR) $(ARFLAGS) $@ $?
 
 $(CLI_TARGET): LDFLAGS := -L$(BUILD_DIR)
-$(CLI_TARGET): LDLIBS := -laldo
+$(CLI_TARGET): LDLIBS := -l$(PRODUCT)
 ifeq ($(OS), Darwin)
 $(CLI_TARGET): LDFLAGS += -L/opt/homebrew/opt/ncurses/lib
 $(CLI_TARGET): LDLIBS += -lpanel -lncurses

@@ -65,7 +65,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
     switch (ev.key.keysym.sym) {
     case SDLK_SPACE:
         if (is_free_key(ev)) {
-            vs.commands.emplace(aldo::Command::halt, lines.ready);
+            vs.commands.emplace(aldo::Command::ready, !lines.ready);
         }
         break;
     case SDLK_EQUALS:
@@ -156,13 +156,6 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
     case aldo::Command::breakpointsOpen:
         aldo::modal::loadBreakpoints(emu, p);
         break;
-    case aldo::Command::halt:
-        if (std::get<bool>(cs.value)) {
-            emu.halt();
-        } else {
-            emu.ready();
-        }
-        break;
     case aldo::Command::interrupt:
         {
             const auto [signal, active] =
@@ -178,6 +171,9 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
         break;
     case aldo::Command::openROM:
         aldo::modal::loadROM(emu, p);
+        break;
+    case aldo::Command::ready:
+        emu.ready(std::get<bool>(cs.value));
         break;
     case aldo::Command::resetVectorClear:
         debugger.vectorClear();

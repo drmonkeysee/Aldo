@@ -259,7 +259,7 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
 {
     static constexpr auto multiplierLabel = " 10x";
 
-    std::string incLabel = "Cycle Rate +", decLabel = "Cycle Rate -";
+    std::string incLabel = "Cycles +", decLabel = "Cycles -";
     const char* incKey, *decKey;
     int val;
     if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
@@ -285,7 +285,7 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
 
 auto mode_menu_item(aldo::viewstate& vs, const aldo::Emulator& emu)
 {
-    std::string label = "Switch Mode";
+    std::string label = "Run Mode";
     const char* mnemonic;
     int modeAdjust;
     if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
@@ -304,30 +304,27 @@ auto mode_menu_item(aldo::viewstate& vs, const aldo::Emulator& emu)
 
 auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
 {
-    using namespace std::literals::string_literals;
-
     if (ImGui::BeginMenu("Controls")) {
         speed_menu_items(vs);
         const auto& lines = emu.snapshot().lines;
-        std::string haltLbl = (lines.ready ? "Halt"s : "Run"s) + " Emulator";
-        if (ImGui::MenuItem(haltLbl.c_str(), "<Space>")) {
-            vs.commands.emplace(aldo::Command::halt, lines.ready);
+        if (ImGui::MenuItem(lines.ready ? "Halt" : "Run", "<Space>")) {
+            vs.commands.emplace(aldo::Command::ready, !lines.ready);
         }
         mode_menu_item(vs, emu);
         ImGui::Separator();
         // NOTE: interrupt signals are all low-active
         auto irq = !lines.irq, nmi = !lines.nmi, res = !lines.reset;
-        if (ImGui::MenuItem("Send IRQ", "i", &irq)) {
+        if (ImGui::MenuItem("IRQ", "i", &irq)) {
             vs.addInterruptCommand(CSGI_IRQ, irq);
         }
-        if (ImGui::MenuItem("Send NMI", "n", &nmi)) {
+        if (ImGui::MenuItem("NMI", "n", &nmi)) {
             vs.addInterruptCommand(CSGI_NMI, nmi);
         }
-        if (ImGui::MenuItem("Send RES", "s", &res)) {
+        if (ImGui::MenuItem("RES", "s", &res)) {
             vs.addInterruptCommand(CSGI_RES, res);
         }
         ImGui::Separator();
-        if (ImGui::MenuItem("Clear RAM on Power-up", "Cmd+0", emu.zeroRam)) {
+        if (ImGui::MenuItem("Clear RAM", "Cmd+0", emu.zeroRam)) {
             vs.commands.emplace(aldo::Command::zeroRamOnPowerup, !emu.zeroRam);
         }
         ImGui::EndMenu();
@@ -1194,7 +1191,7 @@ private:
         const auto& lines = emu.snapshot().lines;
         auto halt = !lines.ready;
         if (ImGui::Checkbox("HALT", &halt)) {
-            vs.commands.emplace(aldo::Command::halt, halt);
+            vs.commands.emplace(aldo::Command::ready, !halt);
         };
 
         const auto mode = emu.runMode();

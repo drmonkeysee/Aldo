@@ -74,15 +74,10 @@ public:
         return debugger().hasBreak(snapshot());
     }
 
-    void halt() noexcept { nes_halt(consolep()); }
-    void ready() noexcept { nes_ready(consolep()); }
+    void ready(bool ready) noexcept { nes_ready(consolep(), ready); }
     void interrupt(csig_interrupt signal, bool active) noexcept
     {
-        if (active) {
-            nes_interrupt(consolep(), signal);
-        } else {
-            nes_clear(consolep(), signal);
-        }
+        nes_interrupt(consolep(), signal, active);
     }
     et::size ramSize() const noexcept { return nes_ram_size(consolep()); }
     bool bcdSupport() const noexcept { return nes_bcd_support(consolep()); }

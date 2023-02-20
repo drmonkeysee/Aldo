@@ -50,7 +50,7 @@ auto file_modal(modal_launch open, modal_operation op, aldo::Emulator& emu,
 {
     // NOTE: halt emulator to prevent time-jump from modal delay
     // TODO: does this make sense long-term?
-    emu.halt();
+    emu.ready(false);
 
     const auto filepath = open(p);
     if (filepath.empty()) return;

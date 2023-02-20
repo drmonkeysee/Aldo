@@ -585,11 +585,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
     const int input = getch();
     switch (input) {
     case ' ':
-        if (emu->snapshot.lines.ready) {
-            nes_halt(emu->console);
-        } else {
-            nes_ready(emu->console);
-        }
+        nes_ready(emu->console, !emu->snapshot.lines.ready);
         break;
     case '=':   // "Lowercase" +
         ++vs->clock.cyclock.cycles_per_sec;
@@ -612,11 +608,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 'i':
-        if (emu->snapshot.lines.irq) {
-            nes_interrupt(emu->console, CSGI_IRQ);
-        } else {
-            nes_clear(emu->console, CSGI_IRQ);
-        }
+        nes_interrupt(emu->console, CSGI_IRQ, emu->snapshot.lines.irq);
         break;
     case 'm':
         nes_set_mode(emu->console, nes_mode(emu->console) + 1);
@@ -625,11 +617,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         nes_set_mode(emu->console, nes_mode(emu->console) - 1);
         break;
     case 'n':
-        if (emu->snapshot.lines.nmi) {
-            nes_interrupt(emu->console, CSGI_NMI);
-        } else {
-            nes_clear(emu->console, CSGI_NMI);
-        }
+        nes_interrupt(emu->console, CSGI_NMI, emu->snapshot.lines.nmi);
         break;
     case 'q':
         vs->running = false;
@@ -644,11 +632,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 's':
-        if (emu->snapshot.lines.reset) {
-            nes_interrupt(emu->console, CSGI_RES);
-        } else {
-            nes_clear(emu->console, CSGI_RES);
-        }
+        nes_interrupt(emu->console, CSGI_RES, emu->snapshot.lines.reset);
         break;
     }
 }

@@ -161,7 +161,7 @@ void nes_powerdown(nes *self)
 {
     assert(self != NULL);
 
-    nes_halt(self);
+    nes_ready(self, false);
     disconnect_cart(self);
 }
 
@@ -194,33 +194,19 @@ void nes_set_mode(nes *self, enum csig_excmode mode)
     self->mode = (int)mode < 0 ? CSGM_MODECOUNT - 1 : mode % CSGM_MODECOUNT;
 }
 
-void nes_ready(nes *self)
+void nes_ready(nes *self, bool ready)
 {
     assert(self != NULL);
 
-    self->cpu.signal.rdy = true;
+    self->cpu.signal.rdy = ready;
 }
 
-void nes_halt(nes *self)
+void nes_interrupt(nes *self, enum csig_interrupt signal, bool active)
 {
     assert(self != NULL);
 
-    self->cpu.signal.rdy = false;
-}
-
-// NOTE: interrupt lines are active low
-void nes_interrupt(nes *self, enum csig_interrupt signal)
-{
-    assert(self != NULL);
-
-    set_interrupt(self, signal, false);
-}
-
-void nes_clear(nes *self, enum csig_interrupt signal)
-{
-    assert(self != NULL);
-
-    set_interrupt(self, signal, true);
+    // NOTE: interrupt lines are active low
+    set_interrupt(self, signal, !active);
 }
 
 void nes_cycle(nes *self, struct cycleclock *clock)
@@ -239,10 +225,10 @@ void nes_cycle(nes *self, struct cycleclock *clock)
             assert(((void)"INVALID EXC MODE", false));
             // NOTE: release build fallthrough to single-cycle
         case CSGM_CYCLE:
-            nes_halt(self);
+            nes_ready(self, false);
             break;
         case CSGM_STEP:
-            self->cpu.signal.rdy = !self->cpu.signal.sync;
+            nes_ready(self, !self->cpu.signal.sync);
             break;
         case CSGM_RUN:
             break;

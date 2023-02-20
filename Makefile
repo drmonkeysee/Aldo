@@ -71,7 +71,7 @@ ifneq ($(OS), Darwin)
 release: SPFLAGS := -s
 endif
 release: $(CLI_TARGET)
-	$(SP) $(SPFLAGS) $(CLI_TARGET)
+	$(SP) $(SPFLAGS) $<
 
 debug: CFLAGS += -g -O0 -DDEBUG
 debug: $(CLI_TARGET)
@@ -83,7 +83,7 @@ check: test nestest nesdiff bcdtest
 
 test: CFLAGS += -g -O0 -DDEBUG
 test: $(TESTS_TARGET)
-	$(TESTS_TARGET)
+	$<
 
 nestest: $(NESTEST_ROM) debug
 	$(RM) $(TRACE_CMP)

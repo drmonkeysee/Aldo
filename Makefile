@@ -3,28 +3,28 @@ SRC_DIR := src
 CLI_DIR := cli
 TEST_DIR := test
 BUILD_DIR := build
-OBJ_DIR := $(BUILD_DIR)/obj
-CLI_OBJ_DIR := $(OBJ_DIR)/$(CLI_DIR)
-TEST_OBJ_DIR := $(OBJ_DIR)/$(TEST_DIR)
-OBJ_DIRS := $(OBJ_DIR) $(CLI_OBJ_DIR) $(TEST_OBJ_DIR)
+CLI_PATH := $(SRC_DIR)/$(CLI_DIR)
+OBJ_PATH := $(BUILD_DIR)/obj
+CLI_OBJ_PATH := $(OBJ_PATH)/$(CLI_DIR)
+TEST_OBJ_PATH := $(OBJ_PATH)/$(TEST_DIR)
+OBJ_PATHS := $(OBJ_PATH) $(CLI_OBJ_PATH) $(TEST_OBJ_PATH)
 
 LIB_SRC := $(wildcard $(SRC_DIR)/*.c)
-CLI_SRC := $(wildcard $(SRC_DIR)/$(CLI_DIR)/*.c)
+CLI_SRC := $(wildcard $(CLI_PATH)/*.c)
 TEST_SRC := $(wildcard $(TEST_DIR)/*.c)
 
-LIB_OBJ := $(subst $(SRC_DIR),$(OBJ_DIR),$(LIB_SRC:.c=.o))
-CLI_OBJ := $(subst $(SRC_DIR),$(OBJ_DIR),$(CLI_SRC:.c=.o))
-TEST_OBJ := $(addprefix $(OBJ_DIR)/,$(TEST_SRC:.c=.o))
+LIB_OBJ := $(subst $(SRC_DIR),$(OBJ_PATH),$(LIB_SRC:.c=.o))
+CLI_OBJ := $(subst $(SRC_DIR),$(OBJ_PATH),$(CLI_SRC:.c=.o))
+TEST_OBJ := $(addprefix $(OBJ_PATH)/,$(TEST_SRC:.c=.o))
 
 DEP_FILES := $(LIB_OBJ:.o=.d) $(CLI_OBJ:.o=.d)
-TEST_DEPS := $(addprefix $(OBJ_DIR)/,$(CLI_DIR)/argparse.o bus.o bytes.o cart.o \
-		 cpu.o debug.o decode.o dis.o haltexpr.o mappers.o)
+TEST_DEPS := $(addprefix $(OBJ_PATH)/,$(CLI_DIR)/argparse.o bus.o bytes.o cart.o \
+		cpu.o debug.o decode.o dis.o haltexpr.o mappers.o)
 
-PRODUCT := aldoc
-TESTS := $(PRODUCT)tests
-LIB_TARGET := $(BUILD_DIR)/libaldo.a
-CLI_TARGET := $(BUILD_DIR)/$(PRODUCT)
-TESTS_TARGET := $(BUILD_DIR)/$(TESTS)
+PRODUCT := aldo
+LIB_TARGET := $(BUILD_DIR)/lib$(PRODUCT).a
+CLI_TARGET := $(BUILD_DIR)/$(PRODUCT)c
+TESTS_TARGET := $(BUILD_DIR)/$(PRODUCT)tests
 
 NESTEST_HTTP := https://raw.githubusercontent.com/christopherpow/nes-test-roms/master/other
 NESTEST_ROM := $(TEST_DIR)/nestest.nes
@@ -43,9 +43,8 @@ CFLAGS += -Wno-format-zero-length
 endif
 
 SRC_CFLAGS := -pedantic
-TEST_CFLAGS := -Wno-unused-parameter -iquote$(SRC_DIR)/$(CLI_DIR)
+TEST_CFLAGS := -Wno-unused-parameter -iquote$(CLI_PATH)
 SP := strip
-ARFLAGS := -rsv
 
 ifdef XCF
 CFLAGS += $(XCF)
@@ -132,24 +131,20 @@ $(TESTS_TARGET): $(TEST_OBJ) $(TEST_DEPS)
 -include $(DEP_FILES)
 
 ifeq ($(OS), Darwin)
-$(TEST_OBJ_DIR)/%.o: TEST_CFLAGS += -pedantic -Wno-gnu-zero-variadic-macro-arguments
+$(OBJ_PATH)/%.o: SRC_CFLAGS += -I/opt/homebrew/opt/ncurses/include
+else
+$(OBJ_PATH)/%.o: SRC_CFLAGS += -D_POSIX_C_SOURCE=200112L
 endif
-$(TEST_OBJ_DIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_DIR)
-	$(CC) $(CFLAGS) $(TEST_CFLAGS) -MMD -c $< -o $@
+$(OBJ_PATH)/%.o: $(SRC_DIR)/%.c | $(OBJ_PATH) $(CLI_OBJ_PATH)
+	$(CC) $(CFLAGS) $(SRC_CFLAGS) -MMD -c $< -o $@
 
 ifeq ($(OS), Darwin)
-$(CLI_OBJ_DIR)/%.o: SRC_CFLAGS += -I/opt/homebrew/opt/ncurses/include
+$(TEST_OBJ_PATH)/%.o: TEST_CFLAGS += -pedantic -Wno-gnu-zero-variadic-macro-arguments
 endif
-$(CLI_OBJ_DIR)/%.o: $(SRC_DIR)/$(CLI_DIR)/%.c | $(CLI_OBJ_DIR)
-	$(CC) $(CFLAGS) $(SRC_CFLAGS) -MMD -c $< -o $@
+$(TEST_OBJ_PATH)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_PATH)
+	$(CC) $(CFLAGS) $(TEST_CFLAGS) -MMD -c $< -o $@
 
-ifneq ($(OS), Darwin)
-$(OBJ_DIR)/%.o: SRC_CFLAGS += -D_POSIX_C_SOURCE=200112L
-endif
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(SRC_CFLAGS) -MMD -c $< -o $@
-
-$(OBJ_DIRS):
+$(OBJ_PATHS):
 	mkdir -p $@
 
 $(NESTEST_ROM) $(NESTEST_LOG):

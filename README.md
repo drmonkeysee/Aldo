@@ -42,6 +42,8 @@ ln -s /Applications/Aldo.app/Contents/MacOS/Cli/aldoc /usr/local/bin/aldoc
 4. `make run` to print usage
 5. `make run FILE=<file>` to load a program ROM
 
+A GUI build is not yet supported for Debian/Ubuntu. At the moment Clang and GCC have some... differing opinions on valid C++20 concept expressions.
+
 ## Test
 
 The Makefile also provides a verification target.

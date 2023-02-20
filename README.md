@@ -38,7 +38,7 @@ ln -s /Applications/Aldo.app/Contents/MacOS/Cli/aldoc /usr/local/bin/aldoc
 
 1. Run `locale` to verify your terminal is using a UTF-8 locale (`C.UTF-8` will work)
 2. `[sudo] apt update`
-3. `[sudo] apt install -y bsdmainutils build-essential git libncurses-dev`
+3. `[sudo] apt install -y build-essential git libncurses-dev`
 4. `make run` to print usage
 5. `make run FILE=<file>` to load a program ROM
 

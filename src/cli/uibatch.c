@@ -72,6 +72,8 @@ static void tick_start(const struct emulator *emu, struct runclock *c)
     // NOTE: arbitrary per-tick budget, 6502s often ran at 1 MHz so a million
     // cycles per tick seems as good a number as any.
     c->cyclock.budget = 1e6;
+    // NOTE: app runtime and emulator time are equivalent in batch mode
+    c->cyclock.emutime = c->cyclock.runtime;
 
     // NOTE: exit batch mode if cpu is not running
     if (!emu->snapshot.lines.ready) {

@@ -130,7 +130,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
 }
 
 auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
-                     aldo::viewstate& s, const gui_platform& p)
+                     aldo::viewstate& vs, const gui_platform& p)
 {
     auto& debugger = emu.debugger();
     auto breakpoints = debugger.breakpoints();
@@ -170,7 +170,9 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
         emu.runMode(std::get<csig_excmode>(cs.value));
         break;
     case aldo::Command::openROM:
-        aldo::modal::loadROM(emu, p);
+        if (aldo::modal::loadROM(emu, p)) {
+            vs.clock.cyclock.emutime = 0;
+        }
         break;
     case aldo::Command::ready:
         emu.ready(std::get<bool>(cs.value));
@@ -182,7 +184,7 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
         debugger.vectorOverride(std::get<int>(cs.value));
         break;
     case aldo::Command::quit:
-        s.running = false;
+        vs.running = false;
         break;
     case aldo::Command::zeroRamOnPowerup:
         emu.zeroRam = std::get<bool>(cs.value);

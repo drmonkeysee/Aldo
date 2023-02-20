@@ -18,8 +18,7 @@ CLI_OBJ := $(subst $(SRC_DIR),$(OBJ_PATH),$(CLI_SRC:.c=.o))
 TEST_OBJ := $(addprefix $(OBJ_PATH)/,$(TEST_SRC:.c=.o))
 
 DEP_FILES := $(LIB_OBJ:.o=.d) $(CLI_OBJ:.o=.d)
-TEST_DEPS := $(addprefix $(OBJ_PATH)/,$(CLI_DIR)/argparse.o bus.o bytes.o cart.o \
-		cpu.o debug.o decode.o dis.o haltexpr.o mappers.o)
+TEST_DEPS := $(CLI_OBJ_PATH)/argparse.o
 
 PRODUCT := aldo
 LIB_TARGET := $(BUILD_DIR)/lib$(PRODUCT).a
@@ -44,6 +43,8 @@ endif
 
 SRC_CFLAGS := -pedantic
 TEST_CFLAGS := -Wno-unused-parameter -iquote$(CLI_PATH)
+LDFLAGS := -L$(BUILD_DIR)
+LDLIBS := -l$(PRODUCT)
 SP := strip
 
 ifdef XCF
@@ -109,8 +110,6 @@ purge: clean
 $(LIB_TARGET): $(LIB_OBJ)
 	$(AR) $(ARFLAGS) $@ $?
 
-$(CLI_TARGET): LDFLAGS := -L$(BUILD_DIR)
-$(CLI_TARGET): LDLIBS := -l$(PRODUCT)
 ifeq ($(OS), Darwin)
 $(CLI_TARGET): LDFLAGS += -L/opt/homebrew/opt/ncurses/lib
 $(CLI_TARGET): LDLIBS += -lpanel -lncurses
@@ -120,12 +119,12 @@ endif
 $(CLI_TARGET): $(CLI_OBJ) | $(LIB_TARGET)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
-$(TESTS_TARGET): LDLIBS := -lcinytest
+$(TESTS_TARGET): LDLIBS += -lcinytest
 ifneq ($(OS), Darwin)
 $(TESTS_TARGET): LDFLAGS := -L/usr/local/lib -Wl,-rpath,/usr/local/lib
 $(TESTS_TARGET): LDLIBS += -lm
 endif
-$(TESTS_TARGET): $(TEST_OBJ) $(TEST_DEPS)
+$(TESTS_TARGET): $(TEST_OBJ) $(TEST_DEPS) | $(LIB_TARGET)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 -include $(DEP_FILES)

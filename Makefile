@@ -41,6 +41,9 @@ ifneq ($(OS), Darwin)
 CFLAGS += -D_POSIX_C_SOURCE=200112L -Wno-format-zero-length
 endif
 
+DEBUG_COMPILE := -g -O0 -DDEBUG
+RELEASE_COMPILE := -Werror -Os -flto -DNDEBUG
+
 LDFLAGS := -L$(BUILD_DIR)
 LDLIBS := -l$(PRODUCT)
 SP := strip
@@ -65,20 +68,20 @@ ext:
 extclean:
 	$(MAKE) clean -C ext
 
-release: CFLAGS += -Werror -Os -flto -DNDEBUG
+release: CFLAGS += $(RELEASE_COMPILE)
 ifneq ($(OS), Darwin)
 release: SPFLAGS := -s
 endif
 release: $(CLI_TARGET)
 	$(SP) $(SPFLAGS) $<
 
-release-lib: CFLAGS += -Werror -Os -flto -DNDEBUG
+release-lib: CFLAGS += $(RELEASE_COMPILE)
 release-lib: $(LIB_TARGET)
 
-debug: CFLAGS += -g -O0 -DDEBUG
+debug: CFLAGS += $(DEBUG_COMPILE)
 debug: $(CLI_TARGET)
 
-debug-lib: CFLAGS += -g -O0 -DDEBUG
+debug-lib: CFLAGS += $(DEBUG_COMPILE)
 debug-lib: $(LIB_TARGET)
 
 run: debug
@@ -86,7 +89,7 @@ run: debug
 
 check: test nestest nesdiff bcdtest
 
-test: CFLAGS += -g -O0 -DDEBUG
+test: CFLAGS += $(DEBUG_COMPILE)
 test: $(TESTS_TARGET)
 	$<
 

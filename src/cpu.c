@@ -34,21 +34,21 @@ static void attach(struct mos6502 *self)
 
 static void read(struct mos6502 *self)
 {
-    assert(self->bus != NULL);
+    assert(self->mbus != NULL);
 
     self->signal.rw = true;
-    self->bflt = !bus_read(self->bus, self->addrbus, &self->databus);
+    self->bflt = !bus_read(self->mbus, self->addrbus, &self->databus);
 }
 
 static void write(struct mos6502 *self)
 {
-    assert(self->bus != NULL);
+    assert(self->mbus != NULL);
 
     if (self->detached) {
         read(self);
     } else {
         self->signal.rw = false;
-        self->bflt = !bus_write(self->bus, self->addrbus, self->databus);
+        self->bflt = !bus_write(self->mbus, self->addrbus, self->databus);
     }
 }
 

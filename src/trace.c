@@ -18,7 +18,7 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
                              const struct console_state *snapshot)
 {
     uint8_t bytes[3];
-    const size_t instlen = bus_dma(cpu->bus,
+    const size_t instlen = bus_dma(cpu->mbus,
                                    snapshot->datapath.current_instruction,
                                    sizeof bytes / sizeof bytes[0], bytes);
     struct dis_instruction inst;

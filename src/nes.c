@@ -51,8 +51,8 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
 static void create_cpubus(struct nes_console *self)
 {
     // TODO: 3 partitions only for now, 8KB ram, 32KB rom, nothing in between
-    self->cpu.bus = bus_new(16, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
-    bus_set(self->cpu.bus, 0,
+    self->cpu.mbus = bus_new(16, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
+    bus_set(self->cpu.mbus, 0,
             (struct busdevice){ram_read, ram_write, ram_dma, self->ram});
     debug_cpu_connect(self->dbg, &self->cpu);
 }
@@ -60,7 +60,7 @@ static void create_cpubus(struct nes_console *self)
 static void connect_cart(struct nes_console *self, cart *c)
 {
     self->cart = c;
-    cart_cpu_connect(self->cart, self->cpu.bus, MEMBLOCK_32KB);
+    cart_cpu_connect(self->cart, self->cpu.mbus, MEMBLOCK_32KB);
     debug_sync_bus(self->dbg);
 }
 
@@ -70,15 +70,15 @@ static void disconnect_cart(struct nes_console *self)
     // debugger even if there is no existing cart.
     debug_reset(self->dbg);
     if (!self->cart) return;
-    cart_cpu_disconnect(self->cart, self->cpu.bus, MEMBLOCK_32KB);
+    cart_cpu_disconnect(self->cart, self->cpu.mbus, MEMBLOCK_32KB);
     self->cart = NULL;
 }
 
 static void free_cpubus(struct nes_console *self)
 {
     debug_cpu_disconnect(self->dbg);
-    bus_free(self->cpu.bus);
-    self->cpu.bus = NULL;
+    bus_free(self->cpu.mbus);
+    self->cpu.mbus = NULL;
 }
 
 static void set_interrupt(struct nes_console *self, enum csig_interrupt signal,
@@ -245,12 +245,12 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
     cpu_snapshot(&self->cpu, snapshot);
     debug_snapshot(self->dbg, snapshot);
     snapshot->mem.ram = self->ram;
-    snapshot->mem.prglength = bus_dma(self->cpu.bus,
+    snapshot->mem.prglength = bus_dma(self->cpu.mbus,
                                       snapshot->datapath.current_instruction,
                                       sizeof snapshot->mem.currprg
                                         / sizeof snapshot->mem.currprg[0],
                                       snapshot->mem.currprg);
-    bus_dma(self->cpu.bus, CPU_VECTOR_NMI,
+    bus_dma(self->cpu.mbus, CPU_VECTOR_NMI,
             sizeof snapshot->mem.vectors / sizeof snapshot->mem.vectors[0],
             snapshot->mem.vectors);
 }

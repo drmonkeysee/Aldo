@@ -35,7 +35,7 @@ static void remove_reset_override(struct debugger_context *self)
 {
     if (!self->dec.active) return;
 
-    bus_set(self->cpu->bus, CPU_VECTOR_RES, self->dec.inner);
+    bus_set(self->cpu->mbus, CPU_VECTOR_RES, self->dec.inner);
     self->dec = (struct resdecorator){0};
 }
 
@@ -349,7 +349,7 @@ void debug_sync_bus(debugctx *self)
     struct busdevice resetaddr_device = {
         resetaddr_read, resetaddr_write, resetaddr_dma, &self->dec,
     };
-    self->dec.active = bus_swap(self->cpu->bus, CPU_VECTOR_RES,
+    self->dec.active = bus_swap(self->cpu->mbus, CPU_VECTOR_RES,
                                 resetaddr_device, &self->dec.inner);
 }
 

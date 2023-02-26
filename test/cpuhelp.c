@@ -77,7 +77,7 @@ void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
         cpu->bflt = cpu->detached = false;
     cpu->p.i = cpu->signal.rdy = cpu->presync = true;
     cpu->res = CSGS_CLEAR;
-    cpu->bus = TestBus;
+    cpu->mbus = TestBus;
     Ram.ctx = ram;
     bus_set(TestBus, 0x0, ram ? Ram : (struct busdevice){0});
     Rom.ctx = rom;

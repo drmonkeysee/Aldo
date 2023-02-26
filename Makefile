@@ -1,28 +1,35 @@
 OS := $(shell uname)
 SRC_DIR := src
 CLI_DIR := cli
+GUI_DIR := gui
 TEST_DIR := test
 BUILD_DIR := build
 CLI_PATH := $(SRC_DIR)/$(CLI_DIR)
+GUI_PATH := $(SRC_DIR)/$(GUI_DIR)
 OBJ_PATH := $(BUILD_DIR)/obj
 CLI_OBJ_PATH := $(OBJ_PATH)/$(CLI_DIR)
+GUI_OBJ_PATH := $(OBJ_PATH)/$(GUI_DIR)
 TEST_OBJ_PATH := $(OBJ_PATH)/$(TEST_DIR)
-OBJ_PATHS := $(OBJ_PATH) $(CLI_OBJ_PATH) $(TEST_OBJ_PATH)
+OBJ_PATHS := $(OBJ_PATH) $(CLI_OBJ_PATH) $(GUI_OBJ_PATH) $(TEST_OBJ_PATH)
 
 LIB_SRC := $(wildcard $(SRC_DIR)/*.c)
 CLI_SRC := $(wildcard $(CLI_PATH)/*.c)
+GUI_SRC := $(wildcard $(GUI_PATH)/*.c) $(wildcard $(GUI_PATH)/*.cpp)
 TEST_SRC := $(wildcard $(TEST_DIR)/*.c)
 
 LIB_OBJ := $(subst $(SRC_DIR),$(OBJ_PATH),$(LIB_SRC:.c=.o))
 CLI_OBJ := $(subst $(SRC_DIR),$(OBJ_PATH),$(CLI_SRC:.c=.o))
+GUI_OBJ := $(subst $(SRC_DIR),$(OBJ_PATH),$(GUI_SRC:.c=.o)) \
+		$(subst $(SRC_DIR),$(OBJ_PATH),$(GUI_SRC:.cpp=.o))
 TEST_OBJ := $(addprefix $(OBJ_PATH)/,$(TEST_SRC:.c=.o))
 
-DEP_FILES := $(LIB_OBJ:.o=.d) $(CLI_OBJ:.o=.d)
+DEP_FILES := $(LIB_OBJ:.o=.d) $(CLI_OBJ:.o=.d) $(GUI_OBJ:.o=.d)
 TEST_DEPS := $(CLI_OBJ_PATH)/argparse.o
 
 PRODUCT := aldo
 LIB_TARGET := $(BUILD_DIR)/lib$(PRODUCT).a
 CLI_TARGET := $(BUILD_DIR)/$(PRODUCT)c
+GUI_TARGET := $(BUILD_DIR)/$(PRODUCT)gui
 TESTS_TARGET := $(BUILD_DIR)/$(PRODUCT)tests
 
 NESTEST_HTTP := https://raw.githubusercontent.com/christopherpow/nes-test-roms/master/other
@@ -37,6 +44,7 @@ PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) $(NESTEST_DIFF) \
 		$(TRACE_CMP) $(BCDTEST_ROM) $(TRACE_LOG) system.ram
 
 CFLAGS := -Wall -Wextra -Wconversion -std=c17 -iquote$(SRC_DIR)
+CXXFLAGS := -Wall -Wextra -Wconversion -std=c++20 -iquote$(SRC_DIR)
 ifneq ($(OS), Darwin)
 CFLAGS += -D_POSIX_C_SOURCE=200112L -Wno-format-zero-length
 endif
@@ -137,8 +145,14 @@ $(TESTS_TARGET): $(TEST_OBJ) $(TEST_DEPS) | $(LIB_TARGET)
 
 -include $(DEP_FILES)
 
-$(OBJ_PATH)/%.o: $(SRC_DIR)/%.c | $(OBJ_PATH) $(CLI_OBJ_PATH)
+$(OBJ_PATH)/%.o: $(SRC_DIR)/%.c | $(OBJ_PATH) $(CLI_OBJ_PATH) $(GUI_OBJ_PATH)
 	$(CC) $(CFLAGS) -pedantic -MMD -c $< -o $@
+
+ifneq ($(OS), Darwin)
+$(OBJ_PATH)/%.o: CXXFLAGS += -Wno-missing-field-initializers
+endif
+$(OBJ_PATH)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_PATH) $(GUI_OBJ_PATH)
+	$(CXX) $(CXXFLAGS) -pedantic -MMD -c $< -o $@
 
 ifeq ($(OS), Darwin)
 $(TEST_OBJ_PATH)/%.o: CFLAGS += -pedantic -Wno-gnu-zero-variadic-macro-arguments

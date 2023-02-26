@@ -38,11 +38,9 @@ PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) $(NESTEST_DIFF) \
 
 CFLAGS := -Wall -Wextra -Wconversion -std=c17 -iquote$(SRC_DIR)
 ifneq ($(OS), Darwin)
-CFLAGS += -Wno-format-zero-length
+CFLAGS += -D_POSIX_C_SOURCE=200112L -Wno-format-zero-length
 endif
 
-SRC_CFLAGS := -pedantic
-TEST_CFLAGS := -Wno-unused-parameter -iquote$(CLI_PATH)
 LDFLAGS := -L$(BUILD_DIR)
 LDLIBS := -l$(PRODUCT)
 SP := strip
@@ -55,8 +53,8 @@ ifdef XLF
 LDFLAGS += $(XLF)
 endif
 
-.PHONY: bcdtest check clean debug empty ext extclean nesdiff nestest purge \
-	release run test version
+.PHONY: bcdtest check clean debug debug-lib empty ext extclean nesdiff nestest purge \
+	release release-lib run test version
 
 empty:
 	$(info Please specify a make target)
@@ -74,8 +72,14 @@ endif
 release: $(CLI_TARGET)
 	$(SP) $(SPFLAGS) $<
 
+release-lib: CFLAGS += -Werror -Os -flto -DNDEBUG
+release-lib: $(LIB_TARGET)
+
 debug: CFLAGS += -g -O0 -DDEBUG
 debug: $(CLI_TARGET)
+
+debug-lib: CFLAGS += -g -O0 -DDEBUG
+debug-lib: $(LIB_TARGET)
 
 run: debug
 	$(CLI_TARGET) $(FILE)
@@ -111,6 +115,7 @@ $(LIB_TARGET): $(LIB_OBJ)
 	$(AR) $(ARFLAGS) $@ $?
 
 ifeq ($(OS), Darwin)
+$(CLI_TARGET): CFLAGS += -I/opt/homebrew/opt/ncurses/include
 $(CLI_TARGET): LDFLAGS += -L/opt/homebrew/opt/ncurses/lib
 $(CLI_TARGET): LDLIBS += -lpanel -lncurses
 else
@@ -121,7 +126,7 @@ $(CLI_TARGET): $(CLI_OBJ) | $(LIB_TARGET)
 
 $(TESTS_TARGET): LDLIBS += -lcinytest
 ifneq ($(OS), Darwin)
-$(TESTS_TARGET): LDFLAGS := -L/usr/local/lib -Wl,-rpath,/usr/local/lib
+$(TESTS_TARGET): LDFLAGS += -L/usr/local/lib -Wl,-rpath,/usr/local/lib
 $(TESTS_TARGET): LDLIBS += -lm
 endif
 $(TESTS_TARGET): $(TEST_OBJ) $(TEST_DEPS) | $(LIB_TARGET)
@@ -129,19 +134,14 @@ $(TESTS_TARGET): $(TEST_OBJ) $(TEST_DEPS) | $(LIB_TARGET)
 
 -include $(DEP_FILES)
 
-ifeq ($(OS), Darwin)
-$(OBJ_PATH)/%.o: SRC_CFLAGS += -I/opt/homebrew/opt/ncurses/include
-else
-$(OBJ_PATH)/%.o: SRC_CFLAGS += -D_POSIX_C_SOURCE=200112L
-endif
 $(OBJ_PATH)/%.o: $(SRC_DIR)/%.c | $(OBJ_PATH) $(CLI_OBJ_PATH)
-	$(CC) $(CFLAGS) $(SRC_CFLAGS) -MMD -c $< -o $@
+	$(CC) $(CFLAGS) -pedantic -MMD -c $< -o $@
 
 ifeq ($(OS), Darwin)
-$(TEST_OBJ_PATH)/%.o: TEST_CFLAGS += -pedantic -Wno-gnu-zero-variadic-macro-arguments
+$(TEST_OBJ_PATH)/%.o: CFLAGS += -pedantic -Wno-gnu-zero-variadic-macro-arguments
 endif
 $(TEST_OBJ_PATH)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_PATH)
-	$(CC) $(CFLAGS) $(TEST_CFLAGS) -MMD -c $< -o $@
+	$(CC) $(CFLAGS) -Wno-unused-parameter -iquote$(CLI_PATH) -MMD -c $< -o $@
 
 $(OBJ_PATHS):
 	mkdir -p $@

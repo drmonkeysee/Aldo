@@ -10,6 +10,9 @@
 
 #include "guiplatform.h"
 
-int gui_run(const struct gui_platform *platform);
+#include "bridgeopen.h"
+br_checkerror
+int gui_run(const struct gui_platform *platform) br_nothrow;
+#include "bridgeclose.h"
 
 #endif

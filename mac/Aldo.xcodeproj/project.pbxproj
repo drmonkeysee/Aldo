@@ -297,6 +297,7 @@
 		C894F0EE2945850E00C6575F /* view.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = view.hpp; sourceTree = "<group>"; };
 		C89D714F27D4758900C9177A /* CartPrgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartPrgView.swift; sourceTree = "<group>"; };
 		C8A5B77A27DD79AE00A4DD5E /* Cart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cart.swift; sourceTree = "<group>"; };
+		C8ACDEA629AC492E0058A6F8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		C8B3A9BA295535F3009C1770 /* AldoStudio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AldoStudio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8B3A9BC295535F3009C1770 /* AldoStudioApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoStudioApp.swift; sourceTree = "<group>"; };
 		C8B3A9BE295535F3009C1770 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -646,6 +647,7 @@
 				C80902DB293C04C500DF31F2 /* handle.hpp */,
 				C8F1A390297FA8AA0005EB8B /* input.hpp */,
 				C8F1A38F297FA8AA0005EB8B /* input.cpp */,
+				C8ACDEA629AC492E0058A6F8 /* main.cpp */,
 				C8561A0B29149EA600290B53 /* mediaruntime.hpp */,
 				C8561A0A29149EA600290B53 /* mediaruntime.cpp */,
 				C8E7A29B2980F32400AAB2A4 /* modal.hpp */,

@@ -1284,7 +1284,7 @@ private:
                         }
                         ImGui::EndPopup();
                     }
-                    addr += inst.bv.size;
+                    addr += static_cast<aldo::et::word>(inst.bv.size);
                     continue;
                 }
             }

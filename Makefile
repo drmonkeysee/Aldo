@@ -2,28 +2,33 @@ OS := $(shell uname)
 SRC_DIR := src
 CLI_DIR := cli
 GUI_DIR := gui
+EXT_DIR := ext
+IMGUI_DIR := imgui
 TEST_DIR := test
 BUILD_DIR := build
 CLI_PATH := $(SRC_DIR)/$(CLI_DIR)
 GUI_PATH := $(SRC_DIR)/$(GUI_DIR)
+IMGUI_PATH := $(EXT_DIR)/$(IMGUI_DIR)
 OBJ_PATH := $(BUILD_DIR)/obj
 CLI_OBJ_PATH := $(OBJ_PATH)/$(CLI_DIR)
 GUI_OBJ_PATH := $(OBJ_PATH)/$(GUI_DIR)
+IMGUI_OBJ_PATH := $(OBJ_PATH)/$(IMGUI_DIR)
 TEST_OBJ_PATH := $(OBJ_PATH)/$(TEST_DIR)
-OBJ_PATHS := $(OBJ_PATH) $(CLI_OBJ_PATH) $(GUI_OBJ_PATH) $(TEST_OBJ_PATH)
+OBJ_PATHS := $(OBJ_PATH) $(CLI_OBJ_PATH) $(GUI_OBJ_PATH) $(IMGUI_OBJ_PATH) $(TEST_OBJ_PATH)
 
 LIB_SRC := $(wildcard $(SRC_DIR)/*.c)
 CLI_SRC := $(wildcard $(CLI_PATH)/*.c)
 GUI_SRC := $(wildcard $(GUI_PATH)/*.c) $(wildcard $(GUI_PATH)/*.cpp)
+IMGUI_SRC := $(wildcard $(IMGUI_PATH)/*.cpp)
 TEST_SRC := $(wildcard $(TEST_DIR)/*.c)
 
 LIB_OBJ := $(subst $(SRC_DIR),$(OBJ_PATH),$(LIB_SRC:.c=.o))
 CLI_OBJ := $(subst $(SRC_DIR),$(OBJ_PATH),$(CLI_SRC:.c=.o))
-GUI_OBJ := $(subst $(SRC_DIR),$(OBJ_PATH),$(GUI_SRC:.c=.o)) \
-		$(subst $(SRC_DIR),$(OBJ_PATH),$(GUI_SRC:.cpp=.o))
+GUI_OBJ := $(subst $(SRC_DIR),$(OBJ_PATH),$(addsuffix .o,$(basename $(GUI_SRC))))
+IMGUI_OBJ := $(subst $(EXT_DIR),$(OBJ_PATH),$(IMGUI_SRC:.cpp=.o))
 TEST_OBJ := $(addprefix $(OBJ_PATH)/,$(TEST_SRC:.c=.o))
 
-DEP_FILES := $(LIB_OBJ:.o=.d) $(CLI_OBJ:.o=.d) $(GUI_OBJ:.o=.d)
+DEP_FILES := $(LIB_OBJ:.o=.d) $(CLI_OBJ:.o=.d) $(GUI_OBJ:.o=.d) $(IMGUI_OBJ:.o=.d)
 TEST_DEPS := $(CLI_OBJ_PATH)/argparse.o
 
 PRODUCT := aldo
@@ -44,7 +49,7 @@ PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) $(NESTEST_DIFF) \
 		$(TRACE_CMP) $(BCDTEST_ROM) $(TRACE_LOG) system.ram
 
 CFLAGS := -Wall -Wextra -Wconversion -std=c17 -iquote$(SRC_DIR)
-CXXFLAGS := -Wall -Wextra -Wconversion -std=c++20 -iquote$(SRC_DIR)
+CXXFLAGS := -Wall -Wextra -pedantic -std=c++20
 ifneq ($(OS), Darwin)
 CFLAGS += -D_POSIX_C_SOURCE=200112L -Wno-format-zero-length
 endif
@@ -64,8 +69,8 @@ ifdef XLF
 LDFLAGS += $(XLF)
 endif
 
-.PHONY: bcdtest check clean debug debug-lib empty ext extclean nesdiff nestest purge \
-	release release-lib run test version
+.PHONY: bcdtest check clean debug debug-gui debug-lib empty ext extclean nesdiff nestest \
+	purge release release-gui release-lib run test version
 
 empty:
 	$(info Please specify a make target)
@@ -83,11 +88,23 @@ endif
 release: $(CLI_TARGET)
 	$(SP) $(SPFLAGS) $<
 
+release-gui: CFLAGS += $(RELEASE_COMPILE)
+release-gui: CXXFLAGS += $(RELEASE_COMPILE)
+ifneq ($(OS), Darwin)
+release: SPFLAGS := -s
+endif
+release-gui: $(GUI_TARGET)
+	$(SP) $(SPFLAGS) $<
+
 release-lib: CFLAGS += $(RELEASE_COMPILE)
 release-lib: $(LIB_TARGET)
 
 debug: CFLAGS += $(DEBUG_COMPILE)
 debug: $(CLI_TARGET)
+
+debug-gui: CFLAGS += $(DEBUG_COMPILE)
+debug-gui: CXXFLAGS += $(DEBUG_COMPILE)
+debug-gui: $(GUI_TARGET)
 
 debug-lib: CFLAGS += $(DEBUG_COMPILE)
 debug-lib: $(LIB_TARGET)
@@ -135,6 +152,14 @@ endif
 $(CLI_TARGET): $(CLI_OBJ) | $(LIB_TARGET)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
+ifeq ($(OS), Darwin)
+$(GUI_TARGET):
+	$(error Make target not supported on macOS; use Xcode project instead)
+else
+$(GUI_TARGET): $(GUI_OBJ) $(IMGUI_OBJ) | $(LIB_TARGET)
+	$(CXX) $^ -o $@ $(LDFLAGS) $(LDLIBS)
+endif
+
 $(TESTS_TARGET): LDLIBS += -lcinytest
 ifneq ($(OS), Darwin)
 $(TESTS_TARGET): LDFLAGS += -L/usr/local/lib -Wl,-rpath,/usr/local/lib
@@ -151,8 +176,11 @@ $(OBJ_PATH)/%.o: $(SRC_DIR)/%.c | $(OBJ_PATH) $(CLI_OBJ_PATH) $(GUI_OBJ_PATH)
 ifneq ($(OS), Darwin)
 $(OBJ_PATH)/%.o: CXXFLAGS += -Wno-missing-field-initializers
 endif
-$(OBJ_PATH)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_PATH) $(GUI_OBJ_PATH)
-	$(CXX) $(CXXFLAGS) -pedantic -MMD -c $< -o $@
+$(OBJ_PATH)/%.o: $(SRC_DIR)/%.cpp | $(GUI_OBJ_PATH)
+	$(CXX) $(CXXFLAGS) -Wconversion -iquote$(SRC_DIR) -iquote$(IMGUI_PATH) -MMD -c $< -o $@
+
+$(OBJ_PATH)/%.o: $(EXT_DIR)/%.cpp | $(IMGUI_OBJ_PATH)
+	$(CXX) $(CXXFLAGS) -MMD -c $< -o $@
 
 ifeq ($(OS), Darwin)
 $(TEST_OBJ_PATH)/%.o: CFLAGS += -pedantic -Wno-gnu-zero-variadic-macro-arguments

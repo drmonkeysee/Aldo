@@ -42,7 +42,15 @@ ln -s /Applications/Aldo.app/Contents/MacOS/Cli/aldoc /usr/local/bin/aldoc
 4. `make run` to print usage
 5. `make run FILE=<file>` to load a program ROM
 
-A GUI build is not yet supported for Debian/Ubuntu. At the moment Clang and GCC have some... differing opinions on valid C++20 concept expressions.
+### Debian/Ubuntu GUI
+
+This build is best done with GCC-12+ as earlier versions have some bugs around how C++ concepts are applied. Follow steps 1-3 of the CLI build above. Then:
+
+4. `[sudo] apt install -y libsdl2-dev`
+5. Run `make ext`
+6. `make debug-gui`
+
+This will _build_ a binary but the platform layer is not yet implemented, so running it will print a diagnostic and exit immediately. At the moment this build is only good for cross-checking compilation between Clang and GCC.
 
 ## Test
 

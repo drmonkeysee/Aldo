@@ -1,3 +1,8 @@
+OS := $(shell uname)
+ifneq ($(OS), Darwin)
+SHELL := $(shell which bash)
+endif
+
 SDL_VERSION := 2.26.2
 SDL_DMG := SDL2-$(SDL_VERSION).dmg
 SDL_HTTP := https://github.com/libsdl-org/SDL/releases/download/release-$(SDL_VERSION)
@@ -9,10 +14,13 @@ IMGUI_SRC := $(IMGUI_TARGET)-$(IMGUI_VERSION)
 
 .PHONY: clean fetch
 
-fetch: $(SDL_DMG) $(IMGUI_TARGET)
+ifeq ($(OS), Darwin)
+fetch: $(SDL_DMG)
+endif
+fetch: $(IMGUI_TARGET)
 
 clean:
-	find . -not -name Makefile -and -not -name '.*' -maxdepth 1 -exec $(RM) -rv {} +
+	find . -maxdepth 1 -not -name Makefile -and -not -name '.*' -exec $(RM) -rv {} +
 
 $(SDL_DMG):
 	curl -L -O '$(SDL_HTTP)/$@'

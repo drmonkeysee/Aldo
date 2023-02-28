@@ -7,4 +7,4 @@
 
 #include "version.h"
 
-const char *const restrict AldoVersion = "0.5.0 (2023.051)";
+const char *const restrict AldoVersion = "0.5.1 (2023.058)";

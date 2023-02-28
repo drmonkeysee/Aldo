@@ -91,7 +91,7 @@ release: $(CLI_TARGET)
 release-gui: CFLAGS += $(RELEASE_COMPILE)
 release-gui: CXXFLAGS += $(RELEASE_COMPILE)
 ifneq ($(OS), Darwin)
-release: SPFLAGS := -s
+release-gui: SPFLAGS := -s
 endif
 release-gui: $(GUI_TARGET)
 	$(SP) $(SPFLAGS) $<

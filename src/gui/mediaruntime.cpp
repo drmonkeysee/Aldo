@@ -13,7 +13,7 @@
 #include "ui.h"
 
 #include "imgui.h"
-#include "imgui_impl_sdl.h"
+#include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer.h"
 
 #include <memory>

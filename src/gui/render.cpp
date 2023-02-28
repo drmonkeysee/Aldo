@@ -11,7 +11,7 @@
 #include "style.hpp"
 
 #include "imgui.h"
-#include "imgui_impl_sdl.h"
+#include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer.h"
 #include <SDL2/SDL.h>
 

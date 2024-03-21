@@ -58,8 +58,6 @@ fileprivate final class OpenFileFilter: NSObject, NSOpenSavePanelDelegate {
 fileprivate struct FilterSequence: Sequence, IteratorProtocol {
     var current: CStringArray
 
-    func makeIterator() -> some IteratorProtocol { self }
-
     mutating func next() -> String? {
         guard let cstr = current.pointee else { return nil }
         defer { current += 1 }

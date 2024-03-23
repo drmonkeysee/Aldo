@@ -60,7 +60,6 @@
 		C8B3A9E3295561DB009C1770 /* AldoStudio.app in Embed Aldo Studio */ = {isa = PBXBuildFile; fileRef = C8B3A9BA295535F3009C1770 /* AldoStudio.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8B4E7F029ADA78C00B5033C /* imgui_widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8B4E7E329ADA78C00B5033C /* imgui_widgets.cpp */; };
-		C8B4E7F129ADA78C00B5033C /* imgui_impl_sdlrenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8B4E7E729ADA78C00B5033C /* imgui_impl_sdlrenderer.cpp */; settings = {COMPILER_FLAGS = "-Wno-conversion"; }; };
 		C8B4E7F229ADA78C00B5033C /* imgui_impl_sdl2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8B4E7E829ADA78C00B5033C /* imgui_impl_sdl2.cpp */; };
 		C8B4E7F429ADA78C00B5033C /* imgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8B4E7EA29ADA78C00B5033C /* imgui.cpp */; };
 		C8B4E7F529ADA78C00B5033C /* imgui_tables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8B4E7ED29ADA78C00B5033C /* imgui_tables.cpp */; };
@@ -120,6 +119,7 @@
 		C8C706BA2751F0CB00B45785 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C7068D2751EEBA00B45785 /* decode.c */; };
 		C8C706BB2751F0CE00B45785 /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
 		C8C706BE2751F55C00B45785 /* trace.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706BD2751F55C00B45785 /* trace.c */; };
+		C8CF5FC22BAF9E27004F1A99 /* imgui_impl_sdlrenderer2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8CF5FC02BAF9E27004F1A99 /* imgui_impl_sdlrenderer2.cpp */; };
 		C8D3CA0A2904E50F0087316F /* aldoc in Embed Cli */ = {isa = PBXBuildFile; fileRef = C8D3CA002904E1BD0087316F /* aldoc */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		C8D44BDD2786B571005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D44BDC2786B571005AB586 /* argparse.c */; };
 		C8D8FDA82792691B0073639B /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
@@ -298,8 +298,6 @@
 		C8B4E7E329ADA78C00B5033C /* imgui_widgets.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imgui_widgets.cpp; sourceTree = "<group>"; };
 		C8B4E7E429ADA78C00B5033C /* imstb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imstb_truetype.h; sourceTree = "<group>"; };
 		C8B4E7E529ADA78C00B5033C /* imgui_impl_sdl2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imgui_impl_sdl2.h; sourceTree = "<group>"; };
-		C8B4E7E629ADA78C00B5033C /* imgui_impl_sdlrenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imgui_impl_sdlrenderer.h; sourceTree = "<group>"; };
-		C8B4E7E729ADA78C00B5033C /* imgui_impl_sdlrenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imgui_impl_sdlrenderer.cpp; sourceTree = "<group>"; };
 		C8B4E7E829ADA78C00B5033C /* imgui_impl_sdl2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imgui_impl_sdl2.cpp; sourceTree = "<group>"; };
 		C8B4E7EA29ADA78C00B5033C /* imgui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imgui.cpp; sourceTree = "<group>"; };
 		C8B4E7EB29ADA78C00B5033C /* imgui_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imgui_internal.h; sourceTree = "<group>"; };
@@ -344,6 +342,8 @@
 		C8C706A72751EF8D00B45785 /* cpustack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpustack.c; sourceTree = "<group>"; };
 		C8C706BC2751F55C00B45785 /* trace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = trace.h; sourceTree = "<group>"; };
 		C8C706BD2751F55C00B45785 /* trace.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = trace.c; sourceTree = "<group>"; };
+		C8CF5FC02BAF9E27004F1A99 /* imgui_impl_sdlrenderer2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imgui_impl_sdlrenderer2.cpp; sourceTree = "<group>"; };
+		C8CF5FC12BAF9E27004F1A99 /* imgui_impl_sdlrenderer2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imgui_impl_sdlrenderer2.h; sourceTree = "<group>"; };
 		C8D388D72952B9A700DF230D /* runclock.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = runclock.hpp; sourceTree = "<group>"; };
 		C8D3CA002904E1BD0087316F /* aldoc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = aldoc; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8D428E8296A15E500824248 /* emutypes.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = emutypes.hpp; sourceTree = "<group>"; };
@@ -672,9 +672,9 @@
 				C8B4E7E329ADA78C00B5033C /* imgui_widgets.cpp */,
 				C8B4E7E429ADA78C00B5033C /* imstb_truetype.h */,
 				C8B4E7E529ADA78C00B5033C /* imgui_impl_sdl2.h */,
-				C8B4E7E629ADA78C00B5033C /* imgui_impl_sdlrenderer.h */,
-				C8B4E7E729ADA78C00B5033C /* imgui_impl_sdlrenderer.cpp */,
 				C8B4E7E829ADA78C00B5033C /* imgui_impl_sdl2.cpp */,
+				C8CF5FC12BAF9E27004F1A99 /* imgui_impl_sdlrenderer2.h */,
+				C8CF5FC02BAF9E27004F1A99 /* imgui_impl_sdlrenderer2.cpp */,
 				C8B4E7EA29ADA78C00B5033C /* imgui.cpp */,
 				C8B4E7EB29ADA78C00B5033C /* imgui_internal.h */,
 				C8B4E7EC29ADA78C00B5033C /* imstb_rectpack.h */,
@@ -976,11 +976,11 @@
 				C8F87DBC2984D64F00B8FAFD /* debug.cpp in Sources */,
 				C8B4E7F429ADA78C00B5033C /* imgui.cpp in Sources */,
 				C8F1A391297FA8AA0005EB8B /* input.cpp in Sources */,
-				C8B4E7F129ADA78C00B5033C /* imgui_impl_sdlrenderer.cpp in Sources */,
 				C8E7A29C2980F46D00AAB2A4 /* modal.cpp in Sources */,
 				C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */,
 				C882854829403C2100BAC249 /* error.cpp in Sources */,
 				C8B4E7F029ADA78C00B5033C /* imgui_widgets.cpp in Sources */,
+				C8CF5FC22BAF9E27004F1A99 /* imgui_impl_sdlrenderer2.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

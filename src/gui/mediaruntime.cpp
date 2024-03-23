@@ -14,7 +14,7 @@
 
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
-#include "imgui_impl_sdlrenderer.h"
+#include "imgui_impl_sdlrenderer2.h"
 
 #include <memory>
 
@@ -90,14 +90,14 @@ aldo::DearImGuiLib::DearImGuiLib(const aldo::win_handle& hwin,
 
     ImGui::CreateContext();
     ImGui_ImplSDL2_InitForSDLRenderer(hwin.get(), hren.get());
-    ImGui_ImplSDLRenderer_Init(hren.get());
+    ImGui_ImplSDLRenderer2_Init(hren.get());
 
     ImGui::StyleColorsDark();
 }
 
 aldo::DearImGuiLib::~DearImGuiLib()
 {
-    ImGui_ImplSDLRenderer_Shutdown();
+    ImGui_ImplSDLRenderer2_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
 }

@@ -30,7 +30,6 @@ final class MacPlatform: NSObject {
                                  open_file: openFile,
                                  save_file: saveFile,
                                  launch_studio: launchStudio,
-                                 display_error: displayError,
                                  free_buffer: freeBuffer)
         return true
     }
@@ -145,15 +144,6 @@ fileprivate func launchStudio() {
     }
 }
 
-fileprivate func displayError(title: CString?, message: CString?) -> Bool {
-    var titleStr: String? = nil
-    var msgStr: String? = nil
-    if let title { titleStr = .init(cString: title) }
-    if let message { msgStr = .init(cString: message) }
-    return aldoAlert(title: titleStr ?? "INVALID TITLE",
-                     message: msgStr ?? "INVALID MESSAGE")
-}
-
 fileprivate func freeBuffer(_ buffer: CBuffer?) { buffer?.deallocate() }
 
 //
@@ -164,7 +154,7 @@ fileprivate func aldoAlert(title: String, message: String) -> Bool {
     let modal = NSAlert()
     modal.messageText = title
     modal.informativeText = message
-    modal.alertStyle = .warning
+    modal.alertStyle = .critical
     return modal.runModal() == .OK
 }
 

@@ -61,7 +61,8 @@ auto file_modal(modal_launch open, modal_operation op, aldo::Emulator& emu,
         return true;
     } catch (const aldo::AldoError& err) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s", err.what());
-        p.display_error(err.title(), err.message());
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, err.title(),
+                                 err.message(), nullptr);
     }
     return false;
 }

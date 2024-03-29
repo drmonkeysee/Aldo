@@ -534,7 +534,7 @@ static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
         col1w = 32, col2w = 31, col3w = 31, col4w = 60, hwh = 12, ctrlh = 16,
-        crth = 6, cpuh = 11, flagsh = 8, flagsw = 19, ramh = 37;
+        crth = 6, cpuh = 11, flagsh = 8, maxh = 37;
 
     setlocale(LC_ALL, "");
     initscr();
@@ -547,22 +547,22 @@ static void init_ui(struct layout *l, int ramsheets)
     int scrh, scrw;
     getmaxyx(stdscr, scrh, scrw);
     const int
-        yoffset = (scrh - ramh) / 2,
+        yoffset = (scrh - maxh) / 2,
         xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
     vinit(&l->hwtraits, hwh, col1w, yoffset, xoffset, 2, "Hardware Traits");
     vinit(&l->controls, ctrlh, col1w, yoffset + hwh, xoffset, 2, "Controls");
-    vinit(&l->debugger, 7, col1w, yoffset + hwh + ctrlh, xoffset, 2,
-          "Debugger");
+    vinit(&l->debugger, maxh - (hwh + ctrlh), col1w, yoffset + hwh + ctrlh,
+          xoffset, 2, "Debugger");
     vinit(&l->cart, crth, col2w, yoffset, xoffset + col1w, 2, "Cart");
-    vinit(&l->prg, ramh - crth, col2w, yoffset + crth, xoffset + col1w, 1,
+    vinit(&l->prg, maxh - crth, col2w, yoffset + crth, xoffset + col1w, 1,
           "PRG");
-    vinit(&l->registers, cpuh, flagsw, yoffset, xoffset + col1w + col2w, 2,
+    vinit(&l->registers, cpuh, col3w, yoffset, xoffset + col1w + col2w, 2,
           "Registers");
-    vinit(&l->flags, flagsh, flagsw, yoffset + cpuh,
-          xoffset + col1w + col2w, 2, "Flags");
-    vinit(&l->datapath, 13, col3w, yoffset + cpuh + flagsh,
+    vinit(&l->flags, flagsh, col3w, yoffset + cpuh, xoffset + col1w + col2w, 2,
+          "Flags");
+    vinit(&l->datapath, maxh - (cpuh + flagsh), col3w, yoffset + cpuh + flagsh,
           xoffset + col1w + col2w, 1, "Datapath");
-    raminit(&l->ram, ramh, col4w, yoffset, xoffset + col1w + col2w + col3w,
+    raminit(&l->ram, maxh, col4w, yoffset, xoffset + col1w + col2w + col3w,
             ramsheets);
 }
 

@@ -364,13 +364,13 @@ static void draw_interrupt_latch(const struct view *v,
 static void drawdatapath(const struct view *v, const struct emulator *emu)
 {
     static const char
-        *const restrict left = "\u2190",
-        *const restrict right = "\u2192",
+        *const restrict left = "\u21e6",
+        *const restrict right = "\u21e8",
         *const restrict up = "\u2191",
         *const restrict down = "\u2193";
-    static const int vsep1 = 1, vsep2 = 8, vsep3 = 22, vsep4 = 27, seph = 5;
+    static const int vsep1 = 7, vsep2 = 21, seph = 5;
 
-    const int w = getmaxx(v->content), line_x = w / 4;
+    const int w = getmaxx(v->content), line_x = (w / 4) + 1;
     int cursor_y = 0;
     werase(v->content);
 
@@ -385,42 +385,40 @@ static void drawdatapath(const struct view *v, const struct emulator *emu)
 
     mvwvline(v->content, ++cursor_y, vsep1, 0, seph);
     mvwvline(v->content, cursor_y, vsep2, 0, seph);
-    mvwvline(v->content, cursor_y, vsep3, 0, seph);
-    mvwvline(v->content, cursor_y, vsep4, 0, seph);
 
     if (emu->snapshot.datapath.jammed) {
         wattron(v->content, A_STANDOUT);
-        mvwaddstr(v->content, cursor_y, vsep2 + 2, " JAMMED ");
+        mvwaddstr(v->content, cursor_y, vsep1 + 2, " JAMMED ");
         wattroff(v->content, A_STANDOUT);
     } else {
         char buf[DIS_DATAP_SIZE];
         const int wlen = dis_datapath(&emu->snapshot, buf);
         const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
-        mvwaddstr(v->content, cursor_y, vsep2 + 2, mnemonic);
+        mvwaddstr(v->content, cursor_y, vsep1 + 2, mnemonic);
     }
 
-    mvwprintw(v->content, ++cursor_y, vsep2 + 2, "adl: %02X",
+    mvwprintw(v->content, ++cursor_y, vsep1 + 2, "adl: %02X",
               emu->snapshot.datapath.addrlow_latch);
 
     mvwaddstr(v->content, ++cursor_y, 0, left);
-    mvwprintw(v->content, cursor_y, vsep1 + 2, "%04X",
+    mvwprintw(v->content, cursor_y, 2, "%04X",
               emu->snapshot.datapath.addressbus);
-    mvwprintw(v->content, cursor_y, vsep2 + 2, "adh: %02X",
+    mvwprintw(v->content, cursor_y, vsep1 + 2, "adh: %02X",
               emu->snapshot.datapath.addrhigh_latch);
-    const int dbus_x = vsep3 + 2;
+    const int dbus_x = vsep2 + 2;
     if (emu->snapshot.datapath.busfault) {
         mvwaddstr(v->content, cursor_y, dbus_x, "FLT");
     } else {
         mvwprintw(v->content, cursor_y, dbus_x, "%02X",
                   emu->snapshot.datapath.databus);
     }
-    mvwaddstr(v->content, cursor_y, vsep4 + 1,
+    mvwaddstr(v->content, cursor_y, w - 1,
               emu->snapshot.lines.readwrite ? left : right);
 
-    mvwprintw(v->content, ++cursor_y, vsep2 + 2, "adc: %02X",
+    mvwprintw(v->content, ++cursor_y, vsep1 + 2, "adc: %02X",
               emu->snapshot.datapath.addrcarry_latch);
 
-    mvwprintw(v->content, ++cursor_y, vsep2 + 2, "%*sT%u",
+    mvwprintw(v->content, ++cursor_y, vsep1 + 2, "%*sT%u",
               emu->snapshot.datapath.exec_cycle, "",
               emu->snapshot.datapath.exec_cycle);
 
@@ -535,7 +533,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
-        col1w = 32, col2w = 31, col3w = 33, col4w = 60, hwh = 12, ctrlh = 16,
+        col1w = 32, col2w = 31, col3w = 31, col4w = 60, hwh = 12, ctrlh = 16,
         crth = 6, cpuh = 11, flagsh = 8, flagsw = 19, ramh = 37;
 
     setlocale(LC_ALL, "");

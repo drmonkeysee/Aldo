@@ -37,7 +37,9 @@
 // NOTE: Approximate 60 FPS for application event loop;
 // this will be enforced by actual vsync when ported to true GUI
 // and is *distinct* from emulator frequency which can be modified by the user.
-static const int Fps = 60, RamPageSize = 256, RamSheetSize = RamPageSize * 2;
+static const int
+    Fps = 60, RamColWidth = 3, RamDim = 16, RamPageSize = RamDim * RamDim,
+    RamSheetSize = RamPageSize * 2;
 
 struct viewstate {
     struct runclock {
@@ -439,27 +441,18 @@ static void drawdatapath(const struct view *v, const struct emulator *emu)
 
 static void drawram(const struct view *v, const struct emulator *emu)
 {
-    static const int
-        start_x = 5, col_width = 3, toprail_start = start_x + col_width,
-        page_dim = 16;
-
-    for (int col = 0; col < page_dim; ++col) {
-        mvwprintw(v->win, 1, toprail_start + (col * col_width), "%X", col);
-    }
-    mvwhline(v->win, 2, toprail_start - 1, 0,
-             getmaxx(v->win) - toprail_start - 5);
+    static const int start_x = 5;
 
     const int h = getmaxy(v->content);
     int cursor_x = start_x, cursor_y = 0;
-    mvwvline(v->content, 0, start_x - 2, 0, h);
-    mvwvline(v->content, 0, getmaxx(v->content) - 3, 0, h);
+    mvwvline(v->content, 0, start_x - 1, 0, h);
     const int page_count = (int)nes_ram_size(emu->console) / RamPageSize;
     for (int page = 0; page < page_count; ++page) {
-        for (int page_row = 0; page_row < page_dim; ++page_row) {
-            mvwprintw(v->content, cursor_y, 0, "%02X", page);
-            for (int page_col = 0; page_col < page_dim; ++page_col) {
+        for (int page_row = 0; page_row < RamDim; ++page_row) {
+            mvwprintw(v->content, cursor_y, 0, "%02X%X0", page, page_row);
+            for (int page_col = 0; page_col < RamDim; ++page_col) {
                 const size_t ramidx = (size_t)((page * RamPageSize)
-                                               + (page_row * page_dim)
+                                               + (page_row * RamDim)
                                                + page_col);
                 const bool sp = page == 1
                                 && ramidx % (size_t)RamPageSize
@@ -472,9 +465,8 @@ static void drawram(const struct view *v, const struct emulator *emu)
                 if (sp) {
                     wattroff(v->content, A_STANDOUT);
                 }
-                cursor_x += col_width;
+                cursor_x += RamColWidth;
             }
-            mvwprintw(v->content, cursor_y, cursor_x + 2, "%X", page_row);
             cursor_x = start_x;
             ++cursor_y;
         }
@@ -503,9 +495,16 @@ static void vinit(struct view *v, int h, int w, int y, int x, int vpad,
 
 static void raminit(struct view *v, int h, int w, int y, int x, int ramsheets)
 {
+    static const int toprail_start = 7;
+
     createwin(v, h, w, y, x, "RAM");
-    v->content = newpad((h - 4) * ramsheets, w - 4);
+    v->content = newpad((h - 4) * ramsheets, w - 2);
     v->inner = NULL;
+
+    for (int col = 0; col < RamDim; ++col) {
+        mvwprintw(v->win, 1, toprail_start + (col * RamColWidth), "%X", col);
+    }
+    mvwhline(v->win, 2, toprail_start - 1, 0, getmaxx(v->win) - toprail_start);
 }
 
 static void vcleanup(struct view *v)
@@ -523,7 +522,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
     getbegyx(v->win, ram_y, ram_x);
     getmaxyx(v->win, ram_h, ram_w);
     pnoutrefresh(v->content, (ram_h - 4) * vs->ramsheet, 0, ram_y + 3,
-                 ram_x + 2, ram_y + ram_h - 2, ram_x + ram_w - 2);
+                 ram_x + 1, ram_y + ram_h - 2, ram_x + ram_w - 1);
 }
 
 //
@@ -533,7 +532,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
-        col1w = 32, col2w = 31, col3w = 31, col4w = 60, hwh = 12, ctrlh = 16,
+        col1w = 32, col2w = 31, col3w = 31, col4w = 54, hwh = 12, ctrlh = 16,
         crth = 6, cpuh = 11, flagsh = 8, maxh = 37;
 
     setlocale(LC_ALL, "");

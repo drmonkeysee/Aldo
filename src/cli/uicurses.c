@@ -89,6 +89,7 @@ struct layout {
         cart,
         prg,
         cpu,
+        ppu,
         ram;
 };
 
@@ -444,6 +445,12 @@ static void drawcpu(const struct view *v, const struct emulator *emu)
     drawdatapath(v, emu, ++cursor_y, w);
 }
 
+static void drawppu(const struct view *v, const struct emulator *emu)
+{
+    // TODO: implement this
+    (void)v, (void)emu;
+}
+
 static void drawram(const struct view *v, const struct emulator *emu)
 {
     static const int start_x = 5;
@@ -538,7 +545,7 @@ static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
         col1w = 30, col2w = 29, col3w = 29, col4w = 54, hwh = 10, ctrlh = 14,
-        crth = 4, maxh = 37;
+        crth = 4, cpuh = 21, maxh = 37;
 
     setlocale(LC_ALL, "");
     initscr();
@@ -559,7 +566,9 @@ static void init_ui(struct layout *l, int ramsheets)
           xoffset, "Debugger");
     vinit(&l->cart, crth, col2w, yoffset, xoffset + col1w, "Cart");
     vinit(&l->prg, maxh - crth, col2w, yoffset + crth, xoffset + col1w, "PRG");
-    vinit(&l->cpu, maxh, col3w, yoffset, xoffset + col1w + col2w, "CPU");
+    vinit(&l->cpu, cpuh, col3w, yoffset, xoffset + col1w + col2w, "CPU");
+    vinit(&l->ppu, maxh - cpuh, col3w, yoffset + cpuh, xoffset + col1w + col2w,
+          "PPU");
     raminit(&l->ram, maxh, col4w, yoffset, xoffset + col1w + col2w + col3w,
             ramsheets);
 }
@@ -647,6 +656,7 @@ static void refresh_ui(const struct layout *l, const struct viewstate *vs,
     drawcart(&l->cart, emu);
     drawprg(&l->prg, emu);
     drawcpu(&l->cpu, emu);
+    drawppu(&l->ppu, emu);
     drawram(&l->ram, emu);
 
     update_panels();
@@ -657,6 +667,7 @@ static void refresh_ui(const struct layout *l, const struct viewstate *vs,
 static void cleanup_ui(struct layout *l)
 {
     vcleanup(&l->ram);
+    vcleanup(&l->ppu);
     vcleanup(&l->cpu);
     vcleanup(&l->prg);
     vcleanup(&l->cart);

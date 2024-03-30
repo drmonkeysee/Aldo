@@ -89,7 +89,6 @@ struct layout {
         cart,
         prg,
         cpu,
-        datapath,
         ram;
 };
 
@@ -301,24 +300,16 @@ static void drawregister(const struct view *v, const struct emulator *emu,
 }
 
 static void drawflags(const struct view *v, const struct emulator *emu,
-                      int cursor_y)
+                      int *cursor_y)
 {
     int cursor_x = 0;
-    mvwaddstr(v->content, cursor_y++, cursor_x, "7 6 5 4 3 2 1 0");
-    mvwaddstr(v->content, cursor_y++, cursor_x, "N V - B D I Z C");
+    mvwaddstr(v->content, (*cursor_y)++, cursor_x, "7 6 5 4 3 2 1 0");
+    mvwaddstr(v->content, (*cursor_y)++, cursor_x, "N V - B D I Z C");
     for (size_t i = sizeof emu->snapshot.cpu.status * 8; i > 0; --i) {
-        mvwprintw(v->content, cursor_y, cursor_x, "%u",
+        mvwprintw(v->content, *cursor_y, cursor_x, "%u",
                   (emu->snapshot.cpu.status >> (i - 1)) & 1);
         cursor_x += 2;
     }
-}
-
-static void drawcpu(const struct view *v, const struct emulator *emu)
-{
-    int cursor_y = 0;
-    drawregister(v, emu, &cursor_y);
-    mvwhline(v->content, cursor_y++, 0, 0, getmaxx(v->content));
-    drawflags(v, emu, cursor_y);
 }
 
 static void draw_cpu_line(const struct view *v, bool signal, int y, int x,
@@ -367,7 +358,8 @@ static void draw_interrupt_latch(const struct view *v,
     }
 }
 
-static void drawdatapath(const struct view *v, const struct emulator *emu)
+static void drawdatapath(const struct view *v, const struct emulator *emu,
+                         int cursor_y, int w)
 {
     static const char
         *const restrict left = "\u21e6",
@@ -376,10 +368,7 @@ static void drawdatapath(const struct view *v, const struct emulator *emu)
         *const restrict down = "\u2193";
     static const int vsep1 = 7, vsep2 = 21, seph = 5;
 
-    const int w = getmaxx(v->content), line_x = (w / 4) + 1;
-    int cursor_y = 0;
-    werase(v->content);
-
+    const int line_x = (w / 4) + 1;
     draw_cpu_line(v, emu->snapshot.lines.ready, cursor_y, line_x, 1, down,
                   "RDY");
     draw_cpu_line(v, emu->snapshot.lines.sync, cursor_y, line_x * 2, 1, up,
@@ -441,6 +430,18 @@ static void drawdatapath(const struct view *v, const struct emulator *emu)
                   "N\u0305M\u0305I\u0305");
     draw_cpu_line(v, emu->snapshot.lines.reset, cursor_y, line_x * 3, -1, up,
                   "R\u0305E\u0305S\u0305");
+}
+
+static void drawcpu(const struct view *v, const struct emulator *emu)
+{
+    const int w = getmaxx(v->content);
+    int cursor_y = 0;
+    werase(v->content);
+    drawregister(v, emu, &cursor_y);
+    mvwhline(v->content, cursor_y++, 0, 0, w);
+    drawflags(v, emu, &cursor_y);
+    mvwhline(v->content, ++cursor_y, 0, 0, w);
+    drawdatapath(v, emu, ++cursor_y, w);
 }
 
 static void drawram(const struct view *v, const struct emulator *emu)
@@ -537,7 +538,7 @@ static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
         col1w = 30, col2w = 29, col3w = 29, col4w = 54, hwh = 10, ctrlh = 14,
-        crth = 4, cpuh = 9, maxh = 37;
+        crth = 4, maxh = 37;
 
     setlocale(LC_ALL, "");
     initscr();
@@ -558,9 +559,7 @@ static void init_ui(struct layout *l, int ramsheets)
           xoffset, "Debugger");
     vinit(&l->cart, crth, col2w, yoffset, xoffset + col1w, "Cart");
     vinit(&l->prg, maxh - crth, col2w, yoffset + crth, xoffset + col1w, "PRG");
-    vinit(&l->cpu, cpuh, col3w, yoffset, xoffset + col1w + col2w, "CPU");
-    vinit(&l->datapath, maxh - cpuh, col3w, yoffset + cpuh,
-          xoffset + col1w + col2w, "Datapath");
+    vinit(&l->cpu, maxh, col3w, yoffset, xoffset + col1w + col2w, "CPU");
     raminit(&l->ram, maxh, col4w, yoffset, xoffset + col1w + col2w + col3w,
             ramsheets);
 }
@@ -648,7 +647,6 @@ static void refresh_ui(const struct layout *l, const struct viewstate *vs,
     drawcart(&l->cart, emu);
     drawprg(&l->prg, emu);
     drawcpu(&l->cpu, emu);
-    drawdatapath(&l->datapath, emu);
     drawram(&l->ram, emu);
 
     update_panels();
@@ -659,7 +657,6 @@ static void refresh_ui(const struct layout *l, const struct viewstate *vs,
 static void cleanup_ui(struct layout *l)
 {
     vcleanup(&l->ram);
-    vcleanup(&l->datapath);
     vcleanup(&l->cpu);
     vcleanup(&l->prg);
     vcleanup(&l->cart);

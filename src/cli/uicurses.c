@@ -88,8 +88,7 @@ struct layout {
         debugger,
         cart,
         prg,
-        registers,
-        flags,
+        cpu,
         datapath,
         ram;
 };
@@ -289,32 +288,37 @@ static void drawprg(const struct view *v, const struct emulator *emu)
     drawvecs(v, h, w, vector_offset, emu);
 }
 
-static void drawregister(const struct view *v, const struct emulator *emu)
+static void drawregister(const struct view *v, const struct emulator *emu,
+                         int *cursor_y)
 {
-    int cursor_y = 0;
-    mvwprintw(v->content, cursor_y++, 0, "PC: %04X",
-              emu->snapshot.cpu.program_counter);
-    mvwprintw(v->content, cursor_y++, 0, "S:  %02X",
-              emu->snapshot.cpu.stack_pointer);
-    mvwprintw(v->content, cursor_y++, 0, "P:  %02X", emu->snapshot.cpu.status);
-    mvwhline(v->content, cursor_y++, 0, 0, getmaxx(v->content));
-    mvwprintw(v->content, cursor_y++, 0, "A:  %02X",
+    mvwprintw(v->content, (*cursor_y)++, 0, "PC: %04X  A: %02X",
+              emu->snapshot.cpu.program_counter,
               emu->snapshot.cpu.accumulator);
-    mvwprintw(v->content, cursor_y++, 0, "X:  %02X", emu->snapshot.cpu.xindex);
-    mvwprintw(v->content, cursor_y, 0, "Y:  %02X", emu->snapshot.cpu.yindex);
+    mvwprintw(v->content, (*cursor_y)++, 0, "S:  %02X    X: %02X",
+              emu->snapshot.cpu.stack_pointer, emu->snapshot.cpu.xindex);
+    mvwprintw(v->content, (*cursor_y)++, 0, "P:  %02X    Y: %02X",
+              emu->snapshot.cpu.status, emu->snapshot.cpu.yindex);
 }
 
-static void drawflags(const struct view *v, const struct emulator *emu)
+static void drawflags(const struct view *v, const struct emulator *emu,
+                      int cursor_y)
 {
-    int cursor_x = 0, cursor_y = 0;
+    int cursor_x = 0;
     mvwaddstr(v->content, cursor_y++, cursor_x, "7 6 5 4 3 2 1 0");
     mvwaddstr(v->content, cursor_y++, cursor_x, "N V - B D I Z C");
-    mvwhline(v->content, cursor_y++, cursor_x, 0, getmaxx(v->content));
     for (size_t i = sizeof emu->snapshot.cpu.status * 8; i > 0; --i) {
         mvwprintw(v->content, cursor_y, cursor_x, "%u",
                   (emu->snapshot.cpu.status >> (i - 1)) & 1);
         cursor_x += 2;
     }
+}
+
+static void drawcpu(const struct view *v, const struct emulator *emu)
+{
+    int cursor_y = 0;
+    drawregister(v, emu, &cursor_y);
+    mvwhline(v->content, cursor_y++, 0, 0, getmaxx(v->content));
+    drawflags(v, emu, cursor_y);
 }
 
 static void draw_cpu_line(const struct view *v, bool signal, int y, int x,
@@ -533,7 +537,7 @@ static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
         col1w = 30, col2w = 29, col3w = 29, col4w = 54, hwh = 10, ctrlh = 14,
-        crth = 4, cpuh = 9, flagsh = 6, maxh = 37;
+        crth = 4, cpuh = 9, maxh = 37;
 
     setlocale(LC_ALL, "");
     initscr();
@@ -554,11 +558,8 @@ static void init_ui(struct layout *l, int ramsheets)
           xoffset, "Debugger");
     vinit(&l->cart, crth, col2w, yoffset, xoffset + col1w, "Cart");
     vinit(&l->prg, maxh - crth, col2w, yoffset + crth, xoffset + col1w, "PRG");
-    vinit(&l->registers, cpuh, col3w, yoffset, xoffset + col1w + col2w,
-          "Registers");
-    vinit(&l->flags, flagsh, col3w, yoffset + cpuh, xoffset + col1w + col2w,
-          "Flags");
-    vinit(&l->datapath, maxh - (cpuh + flagsh), col3w, yoffset + cpuh + flagsh,
+    vinit(&l->cpu, cpuh, col3w, yoffset, xoffset + col1w + col2w, "CPU");
+    vinit(&l->datapath, maxh - cpuh, col3w, yoffset + cpuh,
           xoffset + col1w + col2w, "Datapath");
     raminit(&l->ram, maxh, col4w, yoffset, xoffset + col1w + col2w + col3w,
             ramsheets);
@@ -646,8 +647,7 @@ static void refresh_ui(const struct layout *l, const struct viewstate *vs,
     drawdebugger(&l->debugger, emu);
     drawcart(&l->cart, emu);
     drawprg(&l->prg, emu);
-    drawregister(&l->registers, emu);
-    drawflags(&l->flags, emu);
+    drawcpu(&l->cpu, emu);
     drawdatapath(&l->datapath, emu);
     drawram(&l->ram, emu);
 
@@ -660,8 +660,7 @@ static void cleanup_ui(struct layout *l)
 {
     vcleanup(&l->ram);
     vcleanup(&l->datapath);
-    vcleanup(&l->flags);
-    vcleanup(&l->registers);
+    vcleanup(&l->cpu);
     vcleanup(&l->prg);
     vcleanup(&l->cart);
     vcleanup(&l->debugger);

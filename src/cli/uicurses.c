@@ -485,11 +485,11 @@ static void createwin(struct view *v, int h, int w, int y, int x,
     mvwaddstr(v->win, 0, 1, title);
 }
 
-static void vinit(struct view *v, int h, int w, int y, int x, int vpad,
+static void vinit(struct view *v, int h, int w, int y, int x,
                   const char *restrict title)
 {
     createwin(v, h, w, y, x, title);
-    v->content = derwin(v->win, h - (vpad * 2), w - 4, vpad, 2);
+    v->content = derwin(v->win, h - 2, w - 2, 1, 1);
     v->inner = new_panel(v->content);
 }
 
@@ -532,8 +532,8 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
-        col1w = 32, col2w = 31, col3w = 31, col4w = 54, hwh = 12, ctrlh = 16,
-        crth = 6, cpuh = 11, flagsh = 8, maxh = 37;
+        col1w = 30, col2w = 29, col3w = 29, col4w = 54, hwh = 10, ctrlh = 14,
+        crth = 4, cpuh = 9, flagsh = 6, maxh = 37;
 
     setlocale(LC_ALL, "");
     initscr();
@@ -548,19 +548,18 @@ static void init_ui(struct layout *l, int ramsheets)
     const int
         yoffset = (scrh - maxh) / 2,
         xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
-    vinit(&l->hwtraits, hwh, col1w, yoffset, xoffset, 2, "Hardware Traits");
-    vinit(&l->controls, ctrlh, col1w, yoffset + hwh, xoffset, 2, "Controls");
+    vinit(&l->hwtraits, hwh, col1w, yoffset, xoffset, "Hardware Traits");
+    vinit(&l->controls, ctrlh, col1w, yoffset + hwh, xoffset, "Controls");
     vinit(&l->debugger, maxh - (hwh + ctrlh), col1w, yoffset + hwh + ctrlh,
-          xoffset, 2, "Debugger");
-    vinit(&l->cart, crth, col2w, yoffset, xoffset + col1w, 2, "Cart");
-    vinit(&l->prg, maxh - crth, col2w, yoffset + crth, xoffset + col1w, 1,
-          "PRG");
-    vinit(&l->registers, cpuh, col3w, yoffset, xoffset + col1w + col2w, 2,
+          xoffset, "Debugger");
+    vinit(&l->cart, crth, col2w, yoffset, xoffset + col1w, "Cart");
+    vinit(&l->prg, maxh - crth, col2w, yoffset + crth, xoffset + col1w, "PRG");
+    vinit(&l->registers, cpuh, col3w, yoffset, xoffset + col1w + col2w,
           "Registers");
-    vinit(&l->flags, flagsh, col3w, yoffset + cpuh, xoffset + col1w + col2w, 2,
+    vinit(&l->flags, flagsh, col3w, yoffset + cpuh, xoffset + col1w + col2w,
           "Flags");
     vinit(&l->datapath, maxh - (cpuh + flagsh), col3w, yoffset + cpuh + flagsh,
-          xoffset + col1w + col2w, 1, "Datapath");
+          xoffset + col1w + col2w, "Datapath");
     raminit(&l->ram, maxh, col4w, yoffset, xoffset + col1w + col2w + col3w,
             ramsheets);
 }

@@ -304,7 +304,6 @@ static void drawflags(const struct view *v, const struct emulator *emu,
                       int *cursor_y)
 {
     int cursor_x = 0;
-    mvwaddstr(v->content, (*cursor_y)++, cursor_x, "7 6 5 4 3 2 1 0");
     mvwaddstr(v->content, (*cursor_y)++, cursor_x, "N V - B D I Z C");
     for (size_t i = sizeof emu->snapshot.cpu.status * 8; i > 0; --i) {
         mvwprintw(v->content, *cursor_y, cursor_x, "%u",
@@ -545,7 +544,7 @@ static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
         col1w = 30, col2w = 29, col3w = 29, col4w = 54, hwh = 10, ctrlh = 14,
-        crth = 4, cpuh = 21, maxh = 37;
+        crth = 4, cpuh = 20, maxh = 37;
 
     setlocale(LC_ALL, "");
     initscr();

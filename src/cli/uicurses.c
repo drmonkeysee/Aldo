@@ -544,7 +544,7 @@ static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
         col1w = 30, col2w = 29, col3w = 29, col4w = 54, hwh = 10, ctrlh = 14,
-        crth = 4, cpuh = 20, maxh = 37;
+        crth = 4, cpuh = 20, maxh = 37, maxw = col1w + col2w + col3w + col4w;
 
     setlocale(LC_ALL, "");
     initscr();
@@ -558,7 +558,7 @@ static void init_ui(struct layout *l, int ramsheets)
     getmaxyx(stdscr, scrh, scrw);
     const int
         yoffset = (scrh - maxh) / 2,
-        xoffset = (scrw - (col1w + col2w + col3w + col4w)) / 2;
+        xoffset = (scrw - maxw) / 2;
     vinit(&l->hwtraits, hwh, col1w, yoffset, xoffset, "Hardware Traits");
     vinit(&l->controls, ctrlh, col1w, yoffset + hwh, xoffset, "Controls");
     vinit(&l->debugger, maxh - (hwh + ctrlh), col1w, yoffset + hwh + ctrlh,

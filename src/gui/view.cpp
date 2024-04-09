@@ -1431,8 +1431,8 @@ private:
                 ImGui::Text("%02X", val);
             }
             if (std::isprint(static_cast<char>(val), lcl)) {
-                ascii[static_cast<ascii_sz>(ramCol)]
-                    = static_cast<ascii_val>(val);
+                ascii[static_cast<ascii_sz>(ramCol)] =
+                    static_cast<ascii_val>(val);
             }
         }
 
@@ -1445,8 +1445,8 @@ private:
         using ascii_sz = decltype(ascii)::size_type;
         using ascii_val = decltype(ascii)::value_type;
         static constexpr ascii_val Placeholder = '.';
-        inline static const ImVec4 SpHighlight
-            = ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
+        inline static const ImVec4 SpHighlight =
+            ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
     };
 
     static constexpr int PageSize = 256, PageDim = 16, Cols = PageDim + 2;

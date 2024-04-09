@@ -20,7 +20,6 @@
 #include "ui.h"
 #include "version.h"
 
-#include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -46,7 +45,6 @@ static void print_version(void)
 static cart *load_cart(const char *filename)
 {
     cart *c = NULL;
-    errno = 0;
     FILE *const f = fopen(filename, "rb");
     if (f) {
         const int err = cart_create(&c, f);
@@ -87,7 +85,6 @@ static int disassemble_cart_prg(const struct cliargs *args, cart *c)
 
 static int decode_cart_chr(const struct cliargs *args, cart *c)
 {
-    errno = 0;
     const int err = dis_cart_chr(c, args->chrscale, args->chrdecode_prefix,
                                  stdout);
     if (err < 0) {
@@ -137,7 +134,6 @@ static bool parse_debug_file(debugctx *dbg, FILE *f,
                              const struct cliargs *args)
 {
     char buf[HEXPR_FMT_SIZE];
-    errno = 0;
     while (fgets(buf, sizeof buf, f)) {
         if (!parse_dbg_expression(dbg, buf, args->verbose)) {
             return false;
@@ -155,7 +151,6 @@ static debugctx *create_debugger(const struct cliargs *args)
 {
     debugctx *const dbg = debug_new();
     if (args->dbgfilepath) {
-        errno = 0;
         FILE *const f = fopen(args->dbgfilepath, "r");
         if (f) {
             const bool success = parse_debug_file(dbg, f, args);
@@ -204,7 +199,6 @@ static void dump_ram(const struct emulator *emu)
 
     if (!emu->args->tron && !emu->args->batch) return;
 
-    errno = 0;
     FILE *const f = fopen(ramfile, "wb");
     if (f) {
         nes_dumpram(emu->console, f);
@@ -241,7 +235,6 @@ static int run_emu(const struct cliargs *args, cart *c)
     int result = EXIT_SUCCESS;
     FILE *tracelog = NULL;
     if (emu.args->tron) {
-        errno = 0;
         if (!(tracelog = fopen(tracefile, "w"))) {
             fprintf(stderr, "%s: ", tracefile);
             perror("Cannot open trace file");
@@ -258,7 +251,6 @@ static int run_emu(const struct cliargs *args, cart *c)
     nes_powerup(emu.console, c, emu.args->zeroram);
 
     ui_loop *const run_loop = setup_ui(&emu);
-    errno = 0;
     const int err = run_loop(&emu);
     if (err < 0) {
         fprintf(stderr, "UI run failure (%d): %s\n", err, ui_errstr(err));

@@ -38,7 +38,6 @@ void timespec_sleep(struct timespec duration)
     int result;
     do {
 #ifdef __APPLE__
-        errno = 0;
         result = nanosleep(&duration, &ts_left) ? errno : 0;
 #else
         result = clock_nanosleep(CLOCK_MONOTONIC, 0, &duration, &ts_left);

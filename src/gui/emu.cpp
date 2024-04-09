@@ -40,7 +40,6 @@ auto load_cart(const std::filesystem::path& filepath)
     using file_handle = aldo::handle<std::FILE, std::fclose>;
 
     cart* c;
-    errno = 0;
     const file_handle f{std::fopen(filepath.c_str(), "rb")};
     if (!f) throw aldo::AldoError{"Cannot open cart file", filepath, errno};
 

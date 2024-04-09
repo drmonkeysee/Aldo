@@ -14,6 +14,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,9 +75,8 @@ static bool parse_flag(const char *arg, char shrt, bool exact, const char *lng)
 static bool convert_num(const char *restrict arg, int base, long *result)
 {
     char *end;
-    errno = 0;
     *result = strtol(arg, &end, base);
-    if (errno == ERANGE) {
+    if ((*result == LONG_MIN || *result == LONG_MAX) && errno == ERANGE) {
         perror("Number parse failed");
         return false;
     }

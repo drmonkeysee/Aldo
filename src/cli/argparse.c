@@ -71,8 +71,6 @@ static bool parse_flag(const char *arg, char shrt, bool exact, const char *lng)
                 && (arg[lnglen] == '\0' || arg[lnglen] == '='));
 }
 
-#define SETFLAG(f, a, s, l) (f) = (f) || parse_flag(a, s, false, l)
-
 static bool convert_num(const char *restrict arg, int base, long *result)
 {
     char *end;
@@ -173,6 +171,8 @@ static bool parse_dbgfile(const char *arg, int *restrict argi, int argc,
 static bool parse_arg(const char *arg, int *restrict argi, int argc,
                       char *argv[argc+1], struct cliargs *restrict args)
 {
+#define SETFLAG(f, a, s, l) (f) = (f) || parse_flag(a, s, false, l)
+
     if (parse_flag(arg, ChrScaleShort, true, ChrScaleLong)) {
         long scale;
         const bool result = parse_number(arg, argi, argc, argv, 10, &scale);
@@ -218,6 +218,8 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
     SETFLAG(args->zeroram, arg, ZeroRamShort, ZeroRamLong);
 
     return true;
+
+#undef SETFLAG
 }
 
 //
@@ -265,54 +267,77 @@ const char *argparse_filename(const char *filepath)
 
 void argparse_usage(const char *me)
 {
-    puts("---=== Aldo Usage ===---");
-    printf("%s [options...] [command] file\n", me ? me : "MISSING NAME");
-    puts("\noptions");
-    printf("  -%c\t: run program in batch mode (alt %s)\n", BatchShort,
+    static const char
+        *const restrict main_arg = "file",
+        *const restrict program = "Aldo",
+        *const restrict addr_desc =
+            "address is a 1- or 2-byte hexadecimal number";
+
+    char buf[7];
+#define ARGSW (int)(sizeof buf - 1)
+#define ARGCW (int)(sizeof buf - 2)
+
+    printf("---=== %s Usage ===---\n", program);
+    printf("%s [options...] [command] %s\n", me ? me : program, main_arg);
+
+    puts("\noptions (--alt)");
+    printf("  -%-*c: run program in batch mode (%s)\n", ARGCW, BatchShort,
            BatchLong);
-    printf("  -%c\t: enable BCD (binary-coded decimal) support (alt %s)\n",
+    printf("  -%-*c: enable BCD (binary-coded decimal) support (%s)\n", ARGCW,
            BcdShort, BcdLong);
-    printf("  -%c f\t: debug file containing halt conditions"
-           "\n\t  and/or RESET vector override (alt %s f)\n", DebugFileShort,
-           DebugFileLong);
-    printf("  -%c e\t: halt condition expression (alt %s e),"
-           "\n\t  multiple -H options can be specified;"
-           "\n\t  see below usage section for syntax\n", HaltShort, HaltLong);
-    printf("  -%c x\t: override RESET vector [0x%X, 0x%X]"
-           " (alt %s x)\n", ResVectorShort, MinAddress, MaxAddress,
-           ResVectorLong);
-    printf("  -%c n\t: CHR ROM BMP scaling factor [%d, %d]"
-           " (alt %s n)\n", ChrScaleShort, MinChrScale, MaxChrScale,
-           ChrScaleLong);
-    printf("  -%c\t: turn on trace-logging and ram dumps (alt %s)\n",
+    sprintf(buf, "-%c f", DebugFileShort);
+    printf("  %-*s: line-delimited debugger file containing halt conditions\n"
+           "  %-*s  and/or RESET vector override (%s f)\n", ARGSW, buf, ARGSW,
+           "", DebugFileLong);
+    sprintf(buf, "-%c e", HaltShort);
+    printf("  %-*s: halt condition expression (%s e);\n"
+           "  %-*s  multiple -%c options can be specified,\n"
+           "  %-*s  see below usage section for syntax\n", ARGSW, buf,
+           HaltLong, ARGSW, "", HaltShort, ARGSW, "");
+    sprintf(buf, "-%c x", ResVectorShort);
+    printf("  %-*s: override RESET vector [0x%X, 0x%X] (%s x)\n", ARGSW, buf,
+           MinAddress, MaxAddress, ResVectorLong);
+    sprintf(buf, "-%c n", ChrScaleShort);
+    printf("  %-*s: CHR ROM BMP scaling factor [%d, %d] (%s n)\n", ARGSW, buf,
+           MinChrScale, MaxChrScale, ChrScaleLong);
+    printf("  -%-*c: turn on trace-logging and ram dumps (%s)\n", ARGCW,
            TraceShort, TraceLong);
-    printf("  -%c\t: verbose output\n", VerboseShort);
-    printf("  -%c\t: zero-out RAM on startup (alt %s)\n", ZeroRamShort,
+    printf("  -%-*c: verbose output\n", ARGCW, VerboseShort);
+    printf("  -%-*c: zero-out RAM on startup (%s)\n", ARGCW, ZeroRamShort,
            ZeroRamLong);
+
     puts("\ncommands");
-    printf("  -%c\t: decode CHR ROM into BMP files (alt %s[=prefix]);"
-           "\n\t  prefix default for alt option is 'chr'\n", ChrDecodeShort,
-           ChrDecodeLong);
-    printf("  -%c\t: disassemble file (alt %s);"
-           "\n\t  with verbose prints duplicate lines\n", DisassembleShort,
-           DisassembleLong);
-    printf("  -%c\t: print usage (alt %s)\n", HelpShort, HelpLong);
-    printf("  -%c\t: print file cartridge info (alt %s);"
-           "\n\t  with verbose prints more details\n", InfoShort, InfoLong);
-    printf("  -%c\t: print version (alt %s)\n", VersionShort, VersionLong);
+    printf("  -%-*c: decode CHR ROM into BMP files (%s[=prefix]);\n"
+           "  %-*s  prefix default is 'chr'\n", ARGCW, ChrDecodeShort,
+           ChrDecodeLong, ARGSW, "");
+    printf("  -%-*c: disassemble file (%s);\n"
+           "  %-*s  with -%c for duplicate lines\n", ARGCW, DisassembleShort,
+           DisassembleLong, ARGSW, "", VerboseShort);
+    printf("  -%-*c: print usage (%s)\n", ARGCW, HelpShort, HelpLong);
+    printf("  -%-*c: print cartridge info (%s);\n"
+           "  %-*s  with -%c for more detail\n", ARGCW, InfoShort, InfoLong,
+           ARGSW, "", VerboseShort);
+    printf("  -%-*c: print version (%s)\n",  ARGCW, VersionShort, VersionLong);
+
     puts("\narguments");
-    puts("  file\t: input file containing cartridge or program contents");
+    printf("  %-*s: input file containing cartridge or program contents\n",
+           ARGSW, main_arg);
+
     puts("\nhalt condition expressions");
-    puts("  @XXXX\t: halt on instruction at address XXXX;"
-         "\n\t  address is a 1- or 2-byte hexadecimal number");
-    puts("  N.Ns\t: halt after running for N.N seconds;"
-         "\n\t  non-resumable, useful in batch mode"
-         " as a fail-safe halt condition");
-    puts("  Nc\t: halt after executing N cycles");
-    puts("  jam\t: halt when the CPU enters a jammed state");
+    printf("  %-*s: halt on instruction at address XXXX;\n"
+           "  %-*s  %s\n", ARGSW, "@XXXX", ARGSW, "", addr_desc);
+    printf("  %-*s: halt after running for N.N seconds; non-resumable,\n"
+           "  %-*s  useful in batch mode as a fail-safe halt condition\n",
+           ARGSW, "N.Ns", ARGSW, "");
+    printf("  %-*s: halt after executing N cycles\n", ARGSW, "Nc");
+    printf("  %-*s: halt when the CPU enters a jammed state\n", ARGSW, "jam");
+
     puts("\nRESET vector override expression");
-    puts("  " HEXPR_RES_IND "XXXX\t: set RESET vector to address XXXX;"
-         "\n\t  address is a 1- or 2-byte hexadecimal number");
+    printf("  %-*s: set RESET vector to address XXXX;\n"
+           "  %-*s  %s\n", ARGSW, HEXPR_RES_IND "XXXX", ARGSW, "", addr_desc);
+
+#undef ARGCW
+#undef ARGSW
 }
 
 void argparse_cleanup(struct cliargs *args)

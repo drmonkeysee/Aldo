@@ -273,71 +273,67 @@ void argparse_usage(const char *me)
         *const restrict addr_desc =
             "address is a 1- or 2-byte hexadecimal number";
 
-    char buf[7];
-#define ARGSW (int)(sizeof buf - 1)
-#define ARGCW (int)(sizeof buf - 2)
+    char buf[5];
+    const int cpad = sizeof buf, spad = cpad + 1;
 
     printf("---=== %s Usage ===---\n", program);
     printf("%s [options...] [command] %s\n", me ? me : program, main_arg);
 
     puts("\noptions (--alt)");
-    printf("  -%-*c: run program in batch mode (%s)\n", ARGCW, BatchShort,
+    printf("  -%-*c: run program in batch mode (%s)\n", cpad, BatchShort,
            BatchLong);
-    printf("  -%-*c: enable BCD (binary-coded decimal) support (%s)\n", ARGCW,
+    printf("  -%-*c: enable BCD (binary-coded decimal) support (%s)\n", cpad,
            BcdShort, BcdLong);
     sprintf(buf, "-%c f", DebugFileShort);
     printf("  %-*s: line-delimited debugger file containing halt conditions\n"
-           "  %-*s  and/or RESET vector override (%s f)\n", ARGSW, buf, ARGSW,
+           "  %-*s  and/or RESET vector override (%s f)\n", spad, buf, spad,
            "", DebugFileLong);
     sprintf(buf, "-%c e", HaltShort);
     printf("  %-*s: halt condition expression (%s e);\n"
            "  %-*s  multiple -%c options can be specified,\n"
-           "  %-*s  see below usage section for syntax\n", ARGSW, buf,
-           HaltLong, ARGSW, "", HaltShort, ARGSW, "");
+           "  %-*s  see below usage section for syntax\n", spad, buf,
+           HaltLong, spad, "", HaltShort, spad, "");
     sprintf(buf, "-%c x", ResVectorShort);
-    printf("  %-*s: override RESET vector [0x%X, 0x%X] (%s x)\n", ARGSW, buf,
+    printf("  %-*s: override RESET vector [0x%X, 0x%X] (%s x)\n", spad, buf,
            MinAddress, MaxAddress, ResVectorLong);
     sprintf(buf, "-%c n", ChrScaleShort);
-    printf("  %-*s: CHR ROM BMP scaling factor [%d, %d] (%s n)\n", ARGSW, buf,
+    printf("  %-*s: CHR ROM BMP scaling factor [%d, %d] (%s n)\n", spad, buf,
            MinChrScale, MaxChrScale, ChrScaleLong);
-    printf("  -%-*c: turn on trace-logging and ram dumps (%s)\n", ARGCW,
+    printf("  -%-*c: turn on trace-logging and ram dumps (%s)\n", cpad,
            TraceShort, TraceLong);
-    printf("  -%-*c: verbose output\n", ARGCW, VerboseShort);
-    printf("  -%-*c: zero-out RAM on startup (%s)\n", ARGCW, ZeroRamShort,
+    printf("  -%-*c: verbose output\n", cpad, VerboseShort);
+    printf("  -%-*c: zero-out RAM on startup (%s)\n", cpad, ZeroRamShort,
            ZeroRamLong);
 
-    puts("\ncommands");
+    puts("\ncommands (--alt)");
     printf("  -%-*c: decode CHR ROM into BMP files (%s[=prefix]);\n"
-           "  %-*s  prefix default is 'chr'\n", ARGCW, ChrDecodeShort,
-           ChrDecodeLong, ARGSW, "");
+           "  %-*s  prefix default is 'chr'\n", cpad, ChrDecodeShort,
+           ChrDecodeLong, spad, "");
     printf("  -%-*c: disassemble file (%s);\n"
-           "  %-*s  with -%c for duplicate lines\n", ARGCW, DisassembleShort,
-           DisassembleLong, ARGSW, "", VerboseShort);
-    printf("  -%-*c: print usage (%s)\n", ARGCW, HelpShort, HelpLong);
+           "  %-*s  with -%c for duplicate lines\n", cpad, DisassembleShort,
+           DisassembleLong, spad, "", VerboseShort);
+    printf("  -%-*c: print usage (%s)\n", cpad, HelpShort, HelpLong);
     printf("  -%-*c: print cartridge info (%s);\n"
-           "  %-*s  with -%c for more detail\n", ARGCW, InfoShort, InfoLong,
-           ARGSW, "", VerboseShort);
-    printf("  -%-*c: print version (%s)\n",  ARGCW, VersionShort, VersionLong);
+           "  %-*s  with -%c for more detail\n", cpad, InfoShort, InfoLong,
+           spad, "", VerboseShort);
+    printf("  -%-*c: print version (%s)\n",  cpad, VersionShort, VersionLong);
 
     puts("\narguments");
     printf("  %-*s: input file containing cartridge or program contents\n",
-           ARGSW, main_arg);
+           spad, main_arg);
 
     puts("\nhalt condition expressions");
     printf("  %-*s: halt on instruction at address XXXX;\n"
-           "  %-*s  %s\n", ARGSW, "@XXXX", ARGSW, "", addr_desc);
+           "  %-*s  %s\n", spad, "@XXXX", spad, "", addr_desc);
     printf("  %-*s: halt after running for N.N seconds; non-resumable,\n"
            "  %-*s  useful in batch mode as a fail-safe halt condition\n",
-           ARGSW, "N.Ns", ARGSW, "");
-    printf("  %-*s: halt after executing N cycles\n", ARGSW, "Nc");
-    printf("  %-*s: halt when the CPU enters a jammed state\n", ARGSW, "jam");
+           spad, "N.Ns", spad, "");
+    printf("  %-*s: halt after executing N cycles\n", spad, "Nc");
+    printf("  %-*s: halt when the CPU enters a jammed state\n", spad, "jam");
 
     puts("\nRESET vector override expression");
     printf("  %-*s: set RESET vector to address XXXX;\n"
-           "  %-*s  %s\n", ARGSW, HEXPR_RES_IND "XXXX", ARGSW, "", addr_desc);
-
-#undef ARGCW
-#undef ARGSW
+           "  %-*s  %s\n", spad, HEXPR_RES_IND "XXXX", spad, "", addr_desc);
 }
 
 void argparse_cleanup(struct cliargs *args)

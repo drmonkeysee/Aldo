@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <array>
 #include <concepts>
+#include <functional>
 #include <iterator>
 #include <locale>
 #include <string_view>
@@ -130,7 +131,7 @@ private:
     void pushVars(std::initializer_list<V> vals) const
     {
         if (!condition) return;
-        std::for_each(vals.begin(), vals.end(), Policy::push);
+        std::ranges::for_each(vals, Policy::push);
     }
 
     struct style_stack {
@@ -820,9 +821,8 @@ public:
         using halt_val = halt_array::value_type;
         using halt_integral = std::underlying_type_t<halt_val::first_type>;
 
-        // TODO: drop parens and use ranges in C++23?
-        std::generate(haltConditions.begin(), haltConditions.end(),
-            [h = static_cast<halt_integral>(HLT_NONE)]() mutable -> halt_val {
+        std::ranges::generate(haltConditions,
+            [h = static_cast<halt_integral>(HLT_NONE)] mutable -> halt_val {
                 const auto cond = static_cast<halt_val::first_type>(++h);
                 return {cond, haltcond_description(cond)};
             });
@@ -866,8 +866,8 @@ private:
         }
         bool selected(bp_diff idx) const
         {
-            return std::any_of(selections.cbegin(), selections.cend(),
-                               [idx](bp_diff i) { return i == idx; });
+            return std::ranges::any_of(selections,
+                                       [idx](bp_diff i) { return i == idx; });
         }
 
         void select(bp_diff idx)
@@ -911,12 +911,11 @@ private:
         }
         void queueRemovals(aldo::viewstate& vs) const
         {
-            // NOTE: queue remove commands in reverse order to avoid
+            // NOTE: queue remove commands in descending order to avoid
             // invalidating bp indices during removal.
-            // TODO: would ranges be better here when apple clang adds them?
             decltype(selections) sorted(selections.size());
-            std::partial_sort_copy(selections.cbegin(), selections.cend(),
-                                   sorted.rbegin(), sorted.rend());
+            std::ranges::partial_sort_copy(selections, sorted,
+                                           std::ranges::greater{});
             std::unordered_set<bp_diff> removed(sorted.size());
             for (const auto idx : sorted) {
                 // NOTE: here's where duplicate selections bite us
@@ -1413,7 +1412,7 @@ private:
                 }
                 ImGui::TableSetColumnIndex(Cols - 1);
                 ImGui::TextUnformatted(ascii.c_str());
-                std::fill(ascii.begin(), ascii.end(), Placeholder);
+                std::ranges::fill(ascii, Placeholder);
             }
         }
 

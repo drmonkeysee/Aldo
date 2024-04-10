@@ -13,6 +13,7 @@
 
 #include <array>
 #include <fstream>
+#include <span>
 #include <string_view>
 #include <vector>
 
@@ -46,11 +47,10 @@ auto read_brkfile(const std::filesystem::path& filepath)
     return exprs;
 }
 
-auto set_debug_state(debugctx* dbg,
-                     const std::vector<debugexpr>& exprs) noexcept
+auto set_debug_state(debugctx* dbg, std::span<const debugexpr> exprs) noexcept
 {
     debug_reset(dbg);
-    for (const auto& expr : exprs) {
+    for (auto& expr : exprs) {
         if (expr.type == debugexpr::DBG_EXPR_HALT) {
             debug_bp_add(dbg, expr.hexpr);
         } else {
@@ -94,11 +94,11 @@ auto write_brkline(const hexpr_buffer& buf, std::ofstream& f)
 }
 
 auto write_brkfile(const std::filesystem::path& filepath,
-                   const std::vector<hexpr_buffer>& bufs)
+                   std::span<const hexpr_buffer> bufs)
 {
     std::ofstream f{filepath};
     if (!f) throw aldo::AldoError{"Cannot create breakpoints file", filepath};
-    for (const auto& buf : bufs) {
+    for (auto& buf : bufs) {
         write_brkline(buf, f);
     }
 }

@@ -307,7 +307,7 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
 {
     if (ImGui::BeginMenu("Controls")) {
         speed_menu_items(vs);
-        const auto& lines = emu.snapshot().lines;
+        auto& lines = emu.snapshot().lines;
         if (ImGui::MenuItem(lines.ready ? "Halt" : "Run", "<Space>")) {
             vs.commands.emplace(aldo::Command::ready, !lines.ready);
         }
@@ -336,7 +336,7 @@ auto windows_menu(const aldo::Layout::view_list& vl)
 {
     auto viewTransition = aldo::View::Transition::None;
     if (ImGui::BeginMenu("Windows")) {
-        for (const auto& v : vl) {
+        for (auto& v : vl) {
             ImGui::MenuItem(v->windowTitle().c_str(), nullptr,
                             v->visibility());
         }
@@ -356,7 +356,7 @@ auto windows_menu(const aldo::Layout::view_list& vl)
         ImGui::EndMenu();
     }
     if (viewTransition != aldo::View::Transition::None) {
-        for (const auto& v : vl) {
+        for (auto& v : vl) {
             v->transition = viewTransition;
         }
     }
@@ -612,7 +612,7 @@ protected:
 private:
     void renderRegisters() const noexcept
     {
-        const auto& cpu = emu.snapshot().cpu;
+        auto& cpu = emu.snapshot().cpu;
         widget_group([&cpu] {
             ImGui::Text("A: %02X", cpu.accumulator);
             ImGui::Text("X: %02X", cpu.xindex);
@@ -691,7 +691,7 @@ protected:
 private:
     void renderControlLines(float spacer, float adjustW) const noexcept
     {
-        const auto& lines = emu.snapshot().lines;
+        auto& lines = emu.snapshot().lines;
         renderControlLine("RDY", lines.ready);
         ImGui::SameLine(0, spacer);
         renderControlLine("SYNC", lines.sync);
@@ -702,7 +702,7 @@ private:
 
     void renderBusLines() const noexcept
     {
-        const auto& datapath = emu.snapshot().datapath;
+        auto& datapath = emu.snapshot().datapath;
         {
             const ScopedColor color{{ImGuiCol_Text, aldo::colors::LineOut}};
             ImGui::Text("Addr: %04X", datapath.addressbus);
@@ -729,7 +729,7 @@ private:
 
     void renderInstructionDecode() const noexcept
     {
-        const auto& datapath = emu.snapshot().datapath;
+        auto& datapath = emu.snapshot().datapath;
         if (datapath.jammed) {
             ScopedColor color{{ImGuiCol_Text, aldo::colors::DestructiveHover}};
             ImGui::TextUnformatted("Decode: JAMMED");
@@ -748,14 +748,14 @@ private:
     {
         ImGui::Spacing();
 
-        const auto& lines = emu.snapshot().lines;
+        auto& lines = emu.snapshot().lines;
         renderInterruptLine("IRQ", lines.irq);
         ImGui::SameLine(0, spacer);
         renderInterruptLine("NMI", lines.nmi);
         ImGui::SameLine(0, spacer);
         renderInterruptLine("RES", lines.reset);
 
-        const auto& datapath = emu.snapshot().datapath;
+        auto& datapath = emu.snapshot().datapath;
         ImGui::TextUnformatted(display_signalstate(datapath.irq));
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted(display_signalstate(datapath.nmi));
@@ -1036,7 +1036,7 @@ private:
         ImGui::Text("%zu breakpoint%s", bpCount, bpCount == 1 ? "" : "s");
         if (ImGui::BeginListBox("##breakpoints", dims)) {
             bp_diff i = 0;
-            for (const auto& bp : bpView) {
+            for (auto& bp : bpView) {
                 renderBreakpoint(i++, bp);
             }
             ImGui::EndListBox();
@@ -1075,7 +1075,7 @@ private:
     void renderListControls(bp_sz bpCount)
     {
         DisabledIf dif = bpSelections.empty();
-        const auto& dbg = emu.debugger();
+        auto& dbg = emu.debugger();
         const auto bp = dbg.breakpoints().at(bpSelections.mostRecent());
         if (ImGui::Button(!bp || bp->enabled ? "Disable" : "Enable ")) {
             bpSelections.queueEnableToggles(vs, bp->enabled);
@@ -1114,7 +1114,7 @@ private:
         // state was changed under the hood (e.g. by loading a brk file).
         // NOTE: if another case like this comes up it may be worth coming up
         // with a model -> view notification system.
-        const auto& dbg = emu.debugger();
+        auto& dbg = emu.debugger();
         if ((resetOverride = dbg.isVectorOverridden())) {
             resetAddr = static_cast<aldo::et::word>(dbg.vectorOverride());
         }
@@ -1188,7 +1188,7 @@ private:
 
     void renderRunControls() const
     {
-        const auto& lines = emu.snapshot().lines;
+        auto& lines = emu.snapshot().lines;
         auto halt = !lines.ready;
         if (ImGui::Checkbox("HALT", &halt)) {
             vs.commands.emplace(aldo::Command::ready, !halt);
@@ -1257,8 +1257,8 @@ private:
     {
         static constexpr auto instCount = 16;
 
-        const auto& snp = emu.snapshot();
-        const auto& prgMem = snp.mem;
+        auto& snp = emu.snapshot();
+        auto& prgMem = snp.mem;
         auto addr = snp.datapath.current_instruction;
         dis_instruction inst{};
         std::array<aldo::et::tchar, DIS_INST_SIZE> disasm;
@@ -1296,8 +1296,8 @@ private:
 
     void renderVectors() const noexcept
     {
-        const auto& snp = emu.snapshot();
-        const auto& prgMem = snp.mem;
+        auto& snp = emu.snapshot();
+        auto& prgMem = snp.mem;
 
         auto lo = prgMem.vectors[0], hi = prgMem.vectors[1];
         ImGui::Text("%04X: %02X %02X     NMI $%04X", CPU_VECTOR_NMI, lo, hi,
@@ -1307,7 +1307,7 @@ private:
         hi = prgMem.vectors[3];
         const char* indicator;
         aldo::et::word resVector;
-        const auto& dbg = emu.debugger();
+        auto& dbg = emu.debugger();
         if (dbg.isVectorOverridden()) {
             indicator = HEXPR_RES_IND;
             resVector = static_cast<aldo::et::word>(dbg.vectorOverride());
@@ -1486,7 +1486,7 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
 void aldo::Layout::render() const
 {
     main_menu(vs, emu, mr, views);
-    for (const auto& v : views) {
+    for (auto& v : views) {
         v->render();
     }
     about_overlay(vs);

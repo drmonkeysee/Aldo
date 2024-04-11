@@ -32,6 +32,7 @@
 #include <functional>
 #include <iterator>
 #include <locale>
+#include <span>
 #include <string_view>
 #include <type_traits>
 #include <unordered_set>
@@ -218,6 +219,8 @@ auto add_views(aldo::Layout::view_list& vl, aldo::viewstate& vs,
 // Widgets
 //
 
+using view_span = std::span<const std::unique_ptr<aldo::View>>;
+
 auto widget_group(std::invocable auto f)
 {
     ImGui::BeginGroup();
@@ -332,11 +335,11 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
     }
 }
 
-auto windows_menu(const aldo::Layout::view_list& vl)
+auto windows_menu(view_span views)
 {
     auto viewTransition = aldo::View::Transition::None;
     if (ImGui::BeginMenu("Windows")) {
-        for (auto& v : vl) {
+        for (auto& v : views) {
             ImGui::MenuItem(v->windowTitle().c_str(), nullptr,
                             v->visibility());
         }
@@ -356,7 +359,7 @@ auto windows_menu(const aldo::Layout::view_list& vl)
         ImGui::EndMenu();
     }
     if (viewTransition != aldo::View::Transition::None) {
-        for (auto& v : vl) {
+        for (auto& v : views) {
             v->transition = viewTransition;
         }
     }
@@ -374,13 +377,13 @@ auto tools_menu(aldo::viewstate& vs)
 }
 
 auto main_menu(aldo::viewstate& vs, const aldo::Emulator& emu,
-               const aldo::MediaRuntime& mr, const aldo::Layout::view_list& vl)
+               const aldo::MediaRuntime& mr, view_span views)
 {
     if (ImGui::BeginMainMenuBar()) {
         about_submenu(vs, mr);
         file_menu(vs, emu);
         controls_menu(vs, emu);
-        windows_menu(vl);
+        windows_menu(views);
         tools_menu(vs);
         ImGui::EndMainMenuBar();
     }

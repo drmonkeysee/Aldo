@@ -610,6 +610,10 @@ protected:
         if (ImGui::CollapsingHeader("Flags", ImGuiTreeNodeFlags_DefaultOpen)) {
             renderFlags();
         }
+        if (ImGui::CollapsingHeader("Datapath",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+            renderDatapath();
+        }
     }
 
 private:
@@ -663,25 +667,11 @@ private:
         }
         ImGui::Dummy({0, radius * 2});
     }
-};
 
-class DatapathView final : public aldo::View {
-public:
-    DatapathView(aldo::viewstate& vs, const aldo::Emulator& emu,
-                 const aldo::MediaRuntime& mr) noexcept
-    : View{"Datapath", vs, emu, mr} {}
-    DatapathView(aldo::viewstate&, aldo::Emulator&&,
-                 const aldo::MediaRuntime&) = delete;
-    DatapathView(aldo::viewstate&, const aldo::Emulator&,
-                 aldo::MediaRuntime&&) = delete;
-    DatapathView(aldo::viewstate&, aldo::Emulator&&,
-                 aldo::MediaRuntime&&) = delete;
-
-protected:
-    void renderContents() override
+    void renderDatapath() const noexcept
     {
         const auto glyphW = aldo::style::glyph_size().x,
-                    lineSpacer = glyphW * 6;
+                    lineSpacer = glyphW * 8;
         renderControlLines(lineSpacer, glyphW);
         ImGui::Separator();
         renderBusLines();
@@ -691,7 +681,6 @@ protected:
         renderInterruptLines(lineSpacer);
     }
 
-private:
     void renderControlLines(float spacer, float adjustW) const noexcept
     {
         auto& lines = emu.snapshot().lines;
@@ -1479,7 +1468,6 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
         BouncerView,
         CartInfoView,
         CpuView,
-        DatapathView,
         DebuggerView,
         HardwareTraitsView,
         PrgAtPcView,

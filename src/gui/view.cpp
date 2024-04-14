@@ -1122,6 +1122,40 @@ private:
     SelectedBreakpoints bpSelections;
 };
 
+class PaletteView final : public aldo::View {
+public:
+    PaletteView(aldo::viewstate& vs, const aldo::Emulator& emu,
+                const aldo::MediaRuntime& mr) noexcept
+    : View{"Palette", vs, emu, mr} {}
+    PaletteView(aldo::viewstate&, aldo::Emulator&&,
+                const aldo::MediaRuntime&) = delete;
+    PaletteView(aldo::viewstate&, const aldo::Emulator&,
+                aldo::MediaRuntime&&) = delete;
+    PaletteView(aldo::viewstate&, aldo::Emulator&&,
+                aldo::MediaRuntime&&) = delete;
+
+protected:
+    void renderContents() override
+    {
+        static constexpr auto style = ImGuiTableFlags_Borders | ImGuiTableFlags_SizingStretchSame;
+        if (ImGui::BeginTable("palette", Cols, style)) {
+            /*const ScopedStyle cellPadding{
+                {ImGuiStyleVar_CellPadding, {10.0f, 10.0f}}
+            };*/
+            ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {ImGui::GetStyle().CellPadding.x, 10.0f});
+            for (auto cell = 0; cell < Cells; ++cell) {
+                ImGui::TableNextColumn();
+                ImGui::Text("%02X", cell);
+            }
+            ImGui::PopStyleVar();
+            ImGui::EndTable();
+        }
+    }
+
+private:
+    static constexpr int Cols = 16, Cells = Cols * 4;
+};
+
 class PrgAtPcView final : public aldo::View {
 public:
     PrgAtPcView(aldo::viewstate& vs, const aldo::Emulator& emu,
@@ -1340,7 +1374,8 @@ private:
             ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
     };
 
-    static constexpr int PageSize = 256, PageDim = 16, Cols = PageDim + 2;
+    static constexpr int
+        PageDim = 16, PageSize = PageDim * PageDim, Cols = PageDim + 2;
 };
 
 class SystemView final : public aldo::View {
@@ -1469,6 +1504,7 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
         CartInfoView,
         CpuView,
         DebuggerView,
+        PaletteView,
         PrgAtPcView,
         RamView,
         SystemView>(views, vs, emu, mr);

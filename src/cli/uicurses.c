@@ -83,8 +83,7 @@ struct layout {
         WINDOW *win, *content;
         PANEL *outer, *inner;
     }
-        hwtraits,
-        controls,
+        system,
         debugger,
         cart,
         prg,
@@ -93,8 +92,8 @@ struct layout {
         ram;
 };
 
-static void drawhwtraits(const struct view *v, const struct viewstate *vs,
-                         const struct emulator *emu)
+static void drawstats(const struct view *v, const struct viewstate *vs,
+                      const struct emulator *emu, int *cursor_y)
 {
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
@@ -105,23 +104,21 @@ static void drawhwtraits(const struct view *v, const struct viewstate *vs,
         refreshdt = 0;
     }
 
-    int cursor_y = 0;
-    werase(v->content);
-    mvwprintw(v->content, cursor_y++, 0, "FPS: %d (%.2f)", Fps,
+    mvwprintw(v->content, (*cursor_y)++, 0, "FPS: %d (%.2f)", Fps,
               (double)vs->clock.cyclock.frames / vs->clock.cyclock.runtime);
-    mvwprintw(v->content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
+    mvwprintw(v->content, (*cursor_y)++, 0, "\u0394T: %.3f (%+.3f)",
               display_frametime, display_frameleft);
-    mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64,
+    mvwprintw(v->content, (*cursor_y)++, 0, "Frames: %" PRIu64,
               vs->clock.cyclock.frames);
-    mvwprintw(v->content, cursor_y++, 0, "Emutime: %.3f",
+    mvwprintw(v->content, (*cursor_y)++, 0, "Emutime: %.3f",
               vs->clock.cyclock.emutime);
-    mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f",
+    mvwprintw(v->content, (*cursor_y)++, 0, "Runtime: %.3f",
               vs->clock.cyclock.runtime);
-    mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
+    mvwprintw(v->content, (*cursor_y)++, 0, "Cycles: %" PRIu64,
               vs->clock.cyclock.total_cycles);
-    mvwprintw(v->content, cursor_y++, 0, "Cycles per Second: %d",
+    mvwprintw(v->content, (*cursor_y)++, 0, "Cycles per Second: %d",
               vs->clock.cyclock.cycles_per_sec);
-    mvwprintw(v->content, cursor_y, 0, "BCD Supported: %s",
+    mvwprintw(v->content, (*cursor_y)++, 0, "BCD Supported: %s",
               emu->args->bcdsupport ? "Yes" : "No");
 }
 
@@ -136,13 +133,11 @@ static void drawtoggle(const struct view *v, const char *label, bool selected)
     }
 }
 
-static void drawcontrols(const struct view *v, const struct emulator *emu)
+static void drawcontrols(const struct view *v, const struct emulator *emu,
+                         int w, int cursor_y)
 {
     static const char *const restrict halt = "HALT";
 
-    const int w = getmaxx(v->content);
-    int cursor_y = 0;
-    werase(v->content);
     wmove(v->content, cursor_y, 0);
 
     const double center_offset = (w - (int)strlen(halt)) / 2.0;
@@ -174,6 +169,17 @@ static void drawcontrols(const struct view *v, const struct emulator *emu)
               "Speed \u00b11 (\u00b110): -/= (_/+)");
     mvwaddstr(v->content, ++cursor_y, 0, "Ram F/B: r/R");
     mvwaddstr(v->content, ++cursor_y, 0, "Quit: q");
+}
+
+static void drawsystem(const struct view *v, const struct viewstate *vs,
+                       const struct emulator *emu)
+{
+    const int w = getmaxx(v->content);
+    int cursor_y = 0;
+    werase(v->content);
+    drawstats(v, vs, emu, &cursor_y);
+    mvwhline(v->content, cursor_y++, 0, 0, w);
+    drawcontrols(v, emu, w, cursor_y);
 }
 
 static void drawdebugger(const struct view *v, const struct emulator *emu)
@@ -543,8 +549,8 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
-        col1w = 30, col2w = 29, col3w = 29, col4w = 54, hwh = 10, ctrlh = 14,
-        crth = 4, cpuh = 20, maxh = 37, maxw = col1w + col2w + col3w + col4w;
+        col1w = 30, col2w = 29, col3w = 29, col4w = 54, sysh = 23, crth = 4,
+        cpuh = 20, maxh = 37, maxw = col1w + col2w + col3w + col4w;
 
     setlocale(LC_ALL, "");
     initscr();
@@ -559,10 +565,9 @@ static void init_ui(struct layout *l, int ramsheets)
     const int
         yoffset = (scrh - maxh) / 2,
         xoffset = (scrw - maxw) / 2;
-    vinit(&l->hwtraits, hwh, col1w, yoffset, xoffset, "Hardware Traits");
-    vinit(&l->controls, ctrlh, col1w, yoffset + hwh, xoffset, "Controls");
-    vinit(&l->debugger, maxh - (hwh + ctrlh), col1w, yoffset + hwh + ctrlh,
-          xoffset, "Debugger");
+    vinit(&l->system, sysh, col1w, yoffset, xoffset, "System");
+    vinit(&l->debugger, maxh - sysh, col1w, yoffset + sysh, xoffset,
+          "Debugger");
     vinit(&l->cart, crth, col2w, yoffset, xoffset + col1w, "Cart");
     vinit(&l->prg, maxh - crth, col2w, yoffset + crth, xoffset + col1w, "PRG");
     vinit(&l->cpu, cpuh, col3w, yoffset, xoffset + col1w + col2w, "CPU");
@@ -649,8 +654,7 @@ static void emu_update(struct emulator *emu, struct viewstate *vs)
 static void refresh_ui(const struct layout *l, const struct viewstate *vs,
                        const struct emulator *emu)
 {
-    drawhwtraits(&l->hwtraits, vs, emu);
-    drawcontrols(&l->controls, emu);
+    drawsystem(&l->system, vs, emu);
     drawdebugger(&l->debugger, emu);
     drawcart(&l->cart, emu);
     drawprg(&l->prg, emu);
@@ -671,8 +675,7 @@ static void cleanup_ui(struct layout *l)
     vcleanup(&l->prg);
     vcleanup(&l->cart);
     vcleanup(&l->debugger);
-    vcleanup(&l->controls);
-    vcleanup(&l->hwtraits);
+    vcleanup(&l->system);
 
     endwin();
 }

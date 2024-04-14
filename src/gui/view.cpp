@@ -1122,106 +1122,6 @@ private:
     SelectedBreakpoints bpSelections;
 };
 
-class HardwareTraitsView final : public aldo::View {
-public:
-    HardwareTraitsView(aldo::viewstate& vs, const aldo::Emulator& emu,
-                       const aldo::MediaRuntime& mr) noexcept
-    : View{"Hardware Traits", vs, emu, mr} {}
-    HardwareTraitsView(aldo::viewstate&, aldo::Emulator&&,
-                       const aldo::MediaRuntime&) = delete;
-    HardwareTraitsView(aldo::viewstate&, const aldo::Emulator&,
-                       aldo::MediaRuntime&&) = delete;
-    HardwareTraitsView(aldo::viewstate&, aldo::Emulator&&,
-                       aldo::MediaRuntime&&) = delete;
-
-protected:
-    void renderContents() override
-    {
-        renderStats();
-        ImGui::Separator();
-        renderSpeedControls();
-        ImGui::Separator();
-        renderRunControls();
-    }
-
-private:
-    void renderStats() noexcept
-    {
-        static constexpr auto refreshIntervalMs = 250;
-        const auto& cyclock = vs.clock.cyclock;
-        if ((refreshDt += cyclock.frametime_ms) >= refreshIntervalMs) {
-            dispDtInput = vs.clock.dtInputMs;
-            dispDtUpdate = vs.clock.dtUpdateMs;
-            dispDtRender = vs.clock.dtRenderMs;
-            dispDtTotal = dispDtInput + dispDtUpdate + dispDtRender;
-            refreshDt = 0;
-        }
-        ImGui::Text("Input dT: %.3f", dispDtInput);
-        ImGui::Text("Update dT: %.3f", dispDtUpdate);
-        ImGui::Text("Render dT: %.3f", dispDtRender);
-        ImGui::Text("Total dT: %.3f", dispDtTotal);
-        ImGui::Text("Frames: %" PRIu64, cyclock.frames);
-        ImGui::Text("Emutime: %.3f", cyclock.emutime);
-        ImGui::Text("Runtime: %.3f", cyclock.runtime);
-        ImGui::Text("Cycles: %" PRIu64, cyclock.total_cycles);
-        ImGui::Text("BCD Support: %s", boolstr(emu.bcdSupport()));
-    }
-
-    void renderSpeedControls() const noexcept
-    {
-        ImGui::AlignTextToFramePadding();
-        ImGui::TextUnformatted("Cycles/Second");
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(40);
-        ImGui::DragInt("##cyclesPerSecond", &vs.clock.cyclock.cycles_per_sec,
-                       1.0f, MinCps, MaxCps, "%d",
-                       ImGuiSliderFlags_AlwaysClamp);
-    }
-
-    void renderRunControls() const
-    {
-        auto& lines = emu.snapshot().lines;
-        auto halt = !lines.ready;
-        if (ImGui::Checkbox("HALT", &halt)) {
-            vs.commands.emplace(aldo::Command::ready, !halt);
-        };
-
-        const auto mode = emu.runMode();
-        ImGui::TextUnformatted("Mode");
-        if (ImGui::RadioButton("Cycle", mode == CSGM_CYCLE)
-            && mode != CSGM_CYCLE) {
-            vs.commands.emplace(aldo::Command::mode, CSGM_CYCLE);
-        }
-        ImGui::SameLine();
-        if (ImGui::RadioButton("Step", mode == CSGM_STEP)
-            && mode != CSGM_STEP) {
-            vs.commands.emplace(aldo::Command::mode, CSGM_STEP);
-        }
-        ImGui::SameLine();
-        if (ImGui::RadioButton("Run", mode == CSGM_RUN) && mode != CSGM_RUN) {
-            vs.commands.emplace(aldo::Command::mode, CSGM_RUN);
-        }
-
-        ImGui::TextUnformatted("Signal");
-        // NOTE: interrupt signals are all low-active
-        auto irq = !lines.irq, nmi = !lines.nmi, res = !lines.reset;
-        if (ImGui::Checkbox("IRQ", &irq)) {
-            vs.addInterruptCommand(CSGI_IRQ, irq);
-        }
-        ImGui::SameLine();
-        if (ImGui::Checkbox("NMI", &nmi)) {
-            vs.addInterruptCommand(CSGI_NMI, nmi);
-        }
-        ImGui::SameLine();
-        if (ImGui::Checkbox("RES", &res)) {
-            vs.addInterruptCommand(CSGI_RES, res);
-        }
-    }
-
-    double dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0,
-            dispDtTotal = 0, refreshDt = 0;
-};
-
 class PrgAtPcView final : public aldo::View {
 public:
     PrgAtPcView(aldo::viewstate& vs, const aldo::Emulator& emu,
@@ -1443,6 +1343,106 @@ private:
     static constexpr int PageSize = 256, PageDim = 16, Cols = PageDim + 2;
 };
 
+class SystemView final : public aldo::View {
+public:
+    SystemView(aldo::viewstate& vs, const aldo::Emulator& emu,
+               const aldo::MediaRuntime& mr) noexcept
+    : View{"System", vs, emu, mr} {}
+    SystemView(aldo::viewstate&, aldo::Emulator&&,
+               const aldo::MediaRuntime&) = delete;
+    SystemView(aldo::viewstate&, const aldo::Emulator&,
+               aldo::MediaRuntime&&) = delete;
+    SystemView(aldo::viewstate&, aldo::Emulator&&,
+               aldo::MediaRuntime&&) = delete;
+
+protected:
+    void renderContents() override
+    {
+        renderStats();
+        ImGui::Separator();
+        renderSpeedControls();
+        ImGui::Separator();
+        renderRunControls();
+    }
+
+private:
+    void renderStats() noexcept
+    {
+        static constexpr auto refreshIntervalMs = 250;
+        const auto& cyclock = vs.clock.cyclock;
+        if ((refreshDt += cyclock.frametime_ms) >= refreshIntervalMs) {
+            dispDtInput = vs.clock.dtInputMs;
+            dispDtUpdate = vs.clock.dtUpdateMs;
+            dispDtRender = vs.clock.dtRenderMs;
+            dispDtTotal = dispDtInput + dispDtUpdate + dispDtRender;
+            refreshDt = 0;
+        }
+        ImGui::Text("Input dT: %.3f", dispDtInput);
+        ImGui::Text("Update dT: %.3f", dispDtUpdate);
+        ImGui::Text("Render dT: %.3f", dispDtRender);
+        ImGui::Text("Total dT: %.3f", dispDtTotal);
+        ImGui::Text("Frames: %" PRIu64, cyclock.frames);
+        ImGui::Text("Emutime: %.3f", cyclock.emutime);
+        ImGui::Text("Runtime: %.3f", cyclock.runtime);
+        ImGui::Text("Cycles: %" PRIu64, cyclock.total_cycles);
+        ImGui::Text("BCD Support: %s", boolstr(emu.bcdSupport()));
+    }
+
+    void renderSpeedControls() const noexcept
+    {
+        ImGui::AlignTextToFramePadding();
+        ImGui::TextUnformatted("Cycles/Second");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(40);
+        ImGui::DragInt("##cyclesPerSecond", &vs.clock.cyclock.cycles_per_sec,
+                       1.0f, MinCps, MaxCps, "%d",
+                       ImGuiSliderFlags_AlwaysClamp);
+    }
+
+    void renderRunControls() const
+    {
+        auto& lines = emu.snapshot().lines;
+        auto halt = !lines.ready;
+        if (ImGui::Checkbox("HALT", &halt)) {
+            vs.commands.emplace(aldo::Command::ready, !halt);
+        };
+
+        const auto mode = emu.runMode();
+        ImGui::TextUnformatted("Mode");
+        if (ImGui::RadioButton("Cycle", mode == CSGM_CYCLE)
+            && mode != CSGM_CYCLE) {
+            vs.commands.emplace(aldo::Command::mode, CSGM_CYCLE);
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Step", mode == CSGM_STEP)
+            && mode != CSGM_STEP) {
+            vs.commands.emplace(aldo::Command::mode, CSGM_STEP);
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Run", mode == CSGM_RUN) && mode != CSGM_RUN) {
+            vs.commands.emplace(aldo::Command::mode, CSGM_RUN);
+        }
+
+        ImGui::TextUnformatted("Signal");
+        // NOTE: interrupt signals are all low-active
+        auto irq = !lines.irq, nmi = !lines.nmi, res = !lines.reset;
+        if (ImGui::Checkbox("IRQ", &irq)) {
+            vs.addInterruptCommand(CSGI_IRQ, irq);
+        }
+        ImGui::SameLine();
+        if (ImGui::Checkbox("NMI", &nmi)) {
+            vs.addInterruptCommand(CSGI_NMI, nmi);
+        }
+        ImGui::SameLine();
+        if (ImGui::Checkbox("RES", &res)) {
+            vs.addInterruptCommand(CSGI_RES, res);
+        }
+    }
+
+    double dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0,
+            dispDtTotal = 0, refreshDt = 0;
+};
+
 }
 
 //
@@ -1469,9 +1469,9 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
         CartInfoView,
         CpuView,
         DebuggerView,
-        HardwareTraitsView,
         PrgAtPcView,
-        RamView>(views, vs, emu, mr);
+        RamView,
+        SystemView>(views, vs, emu, mr);
 }
 
 void aldo::Layout::render() const

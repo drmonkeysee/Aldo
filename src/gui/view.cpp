@@ -1137,23 +1137,27 @@ public:
 protected:
     void renderContents() override
     {
-        static constexpr auto style = ImGuiTableFlags_Borders | ImGuiTableFlags_SizingStretchSame;
-        if (ImGui::BeginTable("palette", Cols, style)) {
-            /*const ScopedStyle cellPadding{
-                {ImGuiStyleVar_CellPadding, {10.0f, 10.0f}}
-            };*/
-            ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {ImGui::GetStyle().CellPadding.x, 10.0f});
-            for (auto cell = 0; cell < Cells; ++cell) {
-                ImGui::TableNextColumn();
-                ImGui::Text("%02X", cell);
+        static constexpr auto cols = 16, rows = 4;
+        std::array<char, 3> buf;
+        ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, {0.5f, 0.5f});
+        for (int row = 0; row < rows; ++row) {
+            for (int col = 0; col < cols; ++col) {
+                if (col > 0) {
+                    ImGui::SameLine();
+                }
+                const auto idx = col + (cols * row);
+                std::snprintf(buf.data(), buf.size(), "%02X", idx);
+                if (ImGui::Selectable(buf.data(), idx == selected,
+                                      ImGuiSelectableFlags_None, {30, 30})) {
+                    selected = idx;
+                }
             }
-            ImGui::PopStyleVar();
-            ImGui::EndTable();
         }
+        ImGui::PopStyleVar();
     }
 
 private:
-    static constexpr int Cols = 16, Cells = Cols * 4;
+    int selected = NoSelection;
 };
 
 class PrgAtPcView final : public aldo::View {

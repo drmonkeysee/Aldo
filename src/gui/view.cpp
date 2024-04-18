@@ -1137,21 +1137,23 @@ public:
 protected:
     void renderContents() override
     {
-        static constexpr auto cols = 16, rows = 4;
+        static constexpr auto cols = 16, cells = cols * 4;
+        static constexpr auto style = ImGuiTableFlags_Borders;
         std::array<char, 3> buf;
         ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, {0.5f, 0.5f});
-        for (int row = 0; row < rows; ++row) {
-            for (int col = 0; col < cols; ++col) {
-                if (col > 0) {
-                    ImGui::SameLine();
+        if (ImGui::BeginTable("palette", cols, style)) {
+            for (auto cell = 0; cell < cells; ++cell) {
+                ImGui::TableNextColumn();
+                if (cell == 18) {
+                    ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, aldo::colors::LedOn);
                 }
-                const auto idx = col + (cols * row);
-                std::snprintf(buf.data(), buf.size(), "%02X", idx);
-                if (ImGui::Selectable(buf.data(), idx == selected,
+                std::snprintf(buf.data(), buf.size(), "%02X", cell);
+                if (ImGui::Selectable(buf.data(), cell == selected,
                                       ImGuiSelectableFlags_None, {30, 30})) {
-                    selected = idx;
+                    selected = cell;
                 }
             }
+            ImGui::EndTable();
         }
         ImGui::PopStyleVar();
     }

@@ -1243,8 +1243,8 @@ private:
         std::array<char, 5> buf;
         for (auto row = 0; row < rows; ++row) {
             for (auto col = 0; col < Cols; ++col) {
-                ImGui::TableNextColumn();
                 const auto rowStart = paletteDim * row;
+                ImGui::TableNextColumn();
                 if (col == 0) {
                     ImGui::Text(" %02X", rowStart);
                 } else {

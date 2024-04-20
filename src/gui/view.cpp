@@ -1143,11 +1143,13 @@ protected:
     {
         static constexpr auto style = ImGuiTableFlags_Borders
                                         | ImGuiTableFlags_SizingFixedFit;
+        ImGui::TextUnformatted("Default");
         if (ImGui::BeginTable("palette", Cols, style)) {
             renderHeader();
             renderBody();
             ImGui::EndTable();
         }
+        renderColorSelection();
     }
 
 private:
@@ -1166,7 +1168,7 @@ private:
     {
         static constexpr auto rows = 4, paletteDim = Cols - 1, cellDim = 15;
         // NOTE: 2C02 palette from https://www.nesdev.org/wiki/PPU_palettes
-        static constexpr std::array<ImU32, paletteDim * rows> defaultPalette {
+        static constexpr std::array defaultPalette {
             // 0x00
             IM_COL32(0x62, 0x62, 0x62, 0xff),   // #626262
             IM_COL32(0x0, 0x1f, 0xb2, 0xff),    // #001FB2
@@ -1262,6 +1264,30 @@ private:
                 }
             }
         }
+    }
+
+    void renderColorSelection() const noexcept
+    {
+        // TODO: base this on actual selection
+        static constexpr auto testColor = IM_COL32(0x73, 0x0b, 0x00, 0xff);
+        static constexpr auto selectedColorDim = 70;
+        ImGui::ColorButton("Selected Color",
+                           ImGui::ColorConvertU32ToFloat4(testColor),
+                           ImGuiColorEditFlags_NoAlpha,
+                           {selectedColorDim, selectedColorDim});
+        ImGui::SameLine();
+        widget_group([] {
+            ImGui::TextUnformatted("Index: 06");
+            ImGui::Text("RGBd:  %d %d %d", aldo::colors::red(testColor),
+                        aldo::colors::green(testColor),
+                        aldo::colors::blue(testColor));
+            ImGui::Text("RGBx:  %02X %02X %02X", aldo::colors::red(testColor),
+                        aldo::colors::green(testColor),
+                        aldo::colors::blue(testColor));
+            ImGui::Text("Hex:   #%02x%02x%02x", aldo::colors::red(testColor),
+                        aldo::colors::green(testColor),
+                        aldo::colors::blue(testColor));
+        });
     }
 
     static constexpr int Cols = 17;

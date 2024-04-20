@@ -1431,9 +1431,8 @@ private:
             for (auto row = start; row < end; ++row) {
                 const auto page = row / PageDim, pageRow = row % PageDim;
                 if (0 < page && pageRow == 0) {
-                    ImGui::TableNextRow();
                     for (auto col = 0; col < Cols; ++col) {
-                        ImGui::TableSetColumnIndex(col);
+                        ImGui::TableNextColumn();
                         ImGui::Dummy({0, ImGui::GetTextLineHeight()});
                     }
                 }
@@ -1442,14 +1441,13 @@ private:
                 // ram, so guard that here.
                 if (row >= totalRows) break;
 
-                ImGui::TableNextRow();
-                ImGui::TableSetColumnIndex(0);
                 const auto rowAddr = row * PageDim;
+                ImGui::TableNextColumn();
                 ImGui::Text("%04X", rowAddr);
                 for (auto ramCol = 0; ramCol < PageDim; ++ramCol) {
                     renderColumn(ramCol, rowAddr, page);
                 }
-                ImGui::TableSetColumnIndex(Cols - 1);
+                ImGui::TableNextColumn();
                 ImGui::TextUnformatted(ascii.c_str());
                 std::ranges::fill(ascii, Placeholder);
             }
@@ -1460,7 +1458,7 @@ private:
         {
             const auto ramIdx = static_cast<aldo::et::size>(rowAddr + ramCol);
             const auto val = ram[ramIdx];
-            ImGui::TableSetColumnIndex(ramCol + 1);
+            ImGui::TableNextColumn();
             if (page == 1 && ramIdx % PageSize == sp) {
                 ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
                                        aldo::colors::LedOn);

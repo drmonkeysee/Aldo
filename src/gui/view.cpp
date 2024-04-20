@@ -1137,28 +1137,52 @@ public:
 protected:
     void renderContents() override
     {
-        static constexpr auto cols = 16, cells = cols * 4;
-        static constexpr auto style = ImGuiTableFlags_Borders;
-        std::array<char, 3> buf;
-        ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, {0.5f, 0.5f});
-        if (ImGui::BeginTable("palette", cols, style)) {
-            for (auto cell = 0; cell < cells; ++cell) {
-                ImGui::TableNextColumn();
-                if (cell == 18) {
-                    ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, aldo::colors::LedOn);
-                }
-                std::snprintf(buf.data(), buf.size(), "%02X", cell);
-                if (ImGui::Selectable(buf.data(), cell == selected,
-                                      ImGuiSelectableFlags_None, {30, 30})) {
-                    selected = cell;
-                }
-            }
+        static constexpr auto style = ImGuiTableFlags_Borders
+                                        | ImGuiTableFlags_SizingFixedFit;
+        if (ImGui::BeginTable("palette", Cols, style)) {
+            renderHeader();
+            renderBody();
             ImGui::EndTable();
         }
-        ImGui::PopStyleVar();
     }
 
 private:
+    static void renderHeader() noexcept
+    {
+        std::array<char, 3> buf;
+        ImGui::TableSetupColumn("Idx", ImGuiTableColumnFlags_WidthStretch);
+        for (auto col = 1; col < Cols; ++col) {
+            std::snprintf(buf.data(), buf.size(), " %01X", col - 1);
+            ImGui::TableSetupColumn(buf.data());
+        }
+        ImGui::TableHeadersRow();
+    }
+
+    void renderBody() noexcept
+    {
+        static constexpr auto cells = Cols * 4;
+        static constexpr ImVec2 cellSize{15, 15};
+        std::array<char, 3> buf;
+        for (auto cell = 0; cell < cells; ++cell) {
+            ImGui::TableNextColumn();
+            if (cell % Cols == 0) {
+                ImGui::Text(" %02X", cell - (cell / Cols));
+            } else {
+                if (cell == 18) {
+                    ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
+                                           aldo::colors::LedOn);
+                }
+                std::snprintf(buf.data(), buf.size(), "##%02X", cell);
+                if (ImGui::Selectable(buf.data(), cell == selected,
+                                      ImGuiSelectableFlags_None, cellSize)) {
+                    selected = cell;
+                }
+            }
+        }
+    }
+
+    static constexpr int Cols = 17;
+
     int selected = NoSelection;
 };
 

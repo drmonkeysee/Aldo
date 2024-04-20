@@ -1164,22 +1164,101 @@ private:
 
     void renderBody() noexcept
     {
-        static constexpr auto cells = Cols * 4;
-        static constexpr ImVec2 cellSize{15, 15};
-        std::array<char, 3> buf;
-        for (auto cell = 0; cell < cells; ++cell) {
-            ImGui::TableNextColumn();
-            if (cell % Cols == 0) {
-                ImGui::Text(" %02X", cell - (cell / Cols));
-            } else {
-                if (cell == 18) {
+        static constexpr auto rows = 4, paletteDim = Cols - 1;
+        // NOTE: 2C02 palette from https://www.nesdev.org/wiki/PPU_palettes
+        static constexpr std::array<ImU32, paletteDim * rows> defaultPalette {
+            // 0x00
+            IM_COL32(0x62, 0x62, 0x62, 0xff),   // #626262
+            IM_COL32(0x0, 0x1f, 0xb2, 0xff),    // #001FB2
+            IM_COL32(0x24, 0x4, 0xc8, 0xff),    // #2404C8
+            IM_COL32(0x52, 0x0, 0xb2, 0xff),    // #5200B2
+            IM_COL32(0x73, 0x0, 0x76, 0xff),    // #730076
+            IM_COL32(0x80, 0x0, 0x24, 0xff),    // #800024
+            IM_COL32(0x73, 0xb, 0x0, 0xff),     // #730B00
+            IM_COL32(0x52, 0x28, 0x0, 0xff),    // #522800
+            IM_COL32(0x24, 0x44, 0x0, 0xff),    // #244400
+            IM_COL32(0x0, 0x57, 0x0, 0xff),     // #005700
+            IM_COL32(0x0, 0x5c, 0x0, 0xff),     // #005C00
+            IM_COL32(0x0, 0x53, 0x24, 0xff),    // #005324
+            IM_COL32(0x0, 0x3c, 0x76, 0xff),    // #003C76
+            IM_COL32_BLACK,                     // #000000
+            IM_COL32_BLACK,                     // #000000
+            IM_COL32_BLACK,                     // #000000
+
+            // 0x10
+            IM_COL32(0xab, 0xab, 0xab, 0xff),   // #ABABAB
+            IM_COL32(0xd, 0x57, 0xff, 0xff),    // #0D57FF
+            IM_COL32(0x4b, 0x30, 0xff, 0xff),   // #4B30FF
+            IM_COL32(0x8a, 0x13, 0xff, 0xff),   // #8A13FF
+            IM_COL32(0xbc, 0x8, 0xd6, 0xff),    // #BC08D6
+            IM_COL32(0xd2, 0x12, 0x69, 0xff),   // #D21269
+            IM_COL32(0xc7, 0x2e, 0x0, 0xff),    // #C72E00
+            IM_COL32(0x9d, 0x54, 0x0, 0xff),    // #9D5400
+            IM_COL32(0x60, 0x7b, 0x0, 0xff),    // #607B00
+            IM_COL32(0x20, 0x98, 0x0, 0xff),    // #209800
+            IM_COL32(0x0, 0xa3, 0x0, 0xff),     // #00A300
+            IM_COL32(0x0, 0x99, 0x42, 0xff),    // #009942
+            IM_COL32(0x0, 0x7d, 0xb4, 0xff),    // #007DB4
+            IM_COL32_BLACK,                     // #000000
+            IM_COL32_BLACK,                     // #000000
+            IM_COL32_BLACK,                     // #000000
+
+            // 0x20
+            IM_COL32_WHITE,                     // #FFFFFF
+            IM_COL32(0x53, 0xae, 0xff, 0xff),   // #53AEFF
+            IM_COL32(0x90, 0x85, 0xff, 0xff),   // #9085FF
+            IM_COL32(0xd3, 0x65, 0xff, 0xff),   // #D365FF
+            IM_COL32(0xff, 0x57, 0xff, 0xff),   // #FF57FF
+            IM_COL32(0xff, 0x5d, 0xcf, 0xff),   // #FF5DCF
+            IM_COL32(0xff, 0x77, 0x57, 0xff),   // #FF7757
+            IM_COL32(0xfa, 0x9e, 0x0, 0xff),    // #FA9E00
+            IM_COL32(0xbd, 0xc7, 0x0, 0xff),    // #BDC700
+            IM_COL32(0x7a, 0xe7, 0x0, 0xff),    // #7AE700
+            IM_COL32(0x43, 0xf6, 0x11, 0xff),   // #43F611
+            IM_COL32(0x26, 0xef, 0x7e, 0xff),   // #26EF7E
+            IM_COL32(0x2c, 0xd5, 0xf6, 0xff),   // #2CD5F6
+            IM_COL32(0x4e, 0x4e, 0x4e, 0xff),   // #4E4E4E
+            IM_COL32_BLACK,                     // #000000
+            IM_COL32_BLACK,                     // #000000
+
+            // 0x30
+            IM_COL32_WHITE,                     // #FFFFFF
+            IM_COL32(0xb6, 0xe1, 0xff, 0xff),   // #B6E1FF
+            IM_COL32(0xce, 0xd1, 0xff, 0xff),   // #CED1FF
+            IM_COL32(0xe9, 0xc3, 0xff, 0xff),   // #E9C3FF
+            IM_COL32(0xff, 0xbc, 0xff, 0xff),   // #FFBCFF
+            IM_COL32(0xff, 0xbd, 0xf4, 0xff),   // #FFBDF4
+            IM_COL32(0xff, 0xc6, 0xc3, 0xff),   // #FFC6C3
+            IM_COL32(0xff, 0xd5, 0x9a, 0xff),   // #FFD59A
+            IM_COL32(0xe9, 0xe6, 0x81, 0xff),   // #E9E681
+            IM_COL32(0xce, 0xf4, 0x81, 0xff),   // #CEF481
+            IM_COL32(0xb6, 0xfb, 0x9a, 0xff),   // #B6FB9A
+            IM_COL32(0xa9, 0xfa, 0xc3, 0xff),   // #A9FAC3
+            IM_COL32(0xa9, 0xf0, 0xf4, 0xff),   // #A9F0F4
+            IM_COL32(0xb8, 0xb8, 0xb8, 0xff),   // #B8B8B8
+            IM_COL32_BLACK,                     // #000000
+            IM_COL32_BLACK,                     // #000000
+        };
+
+        std::array<char, 5> buf;
+        for (auto row = 0; row < rows; ++row) {
+            for (auto col = 0; col < Cols; ++col) {
+                ImGui::TableNextColumn();
+                const auto rowStart = paletteDim * row;
+                if (col == 0) {
+                    ImGui::Text(" %02X", rowStart);
+                } else {
+                    const auto cell = rowStart + (col - 1);
+                    const auto idx =
+                        static_cast<decltype(defaultPalette)::size_type>(cell);
                     ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
-                                           aldo::colors::LedOn);
-                }
-                std::snprintf(buf.data(), buf.size(), "##%02X", cell);
-                if (ImGui::Selectable(buf.data(), cell == selected,
-                                      ImGuiSelectableFlags_None, cellSize)) {
-                    selected = cell;
+                                           defaultPalette[idx]);
+                    std::snprintf(buf.data(), buf.size(), "##%02X", cell);
+                    if (ImGui::Selectable(buf.data(), cell == selected,
+                                          ImGuiSelectableFlags_None,
+                                          {15, 15})) {
+                        selected = cell;
+                    }
                 }
             }
         }

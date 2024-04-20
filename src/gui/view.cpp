@@ -1164,7 +1164,7 @@ private:
 
     void renderBody() noexcept
     {
-        static constexpr auto rows = 4, paletteDim = Cols - 1;
+        static constexpr auto rows = 4, paletteDim = Cols - 1, cellDim = 15;
         // NOTE: 2C02 palette from https://www.nesdev.org/wiki/PPU_palettes
         static constexpr std::array<ImU32, paletteDim * rows> defaultPalette {
             // 0x00
@@ -1256,7 +1256,7 @@ private:
                     std::snprintf(buf.data(), buf.size(), "##%02X", cell);
                     if (ImGui::Selectable(buf.data(), cell == selected,
                                           ImGuiSelectableFlags_None,
-                                          {15, 15})) {
+                                          {cellDim, cellDim})) {
                         selected = cell;
                     }
                 }

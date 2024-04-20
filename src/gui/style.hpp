@@ -45,17 +45,17 @@ inline constexpr ImU32 color_channel(ImU32 color, ImU32 shift) noexcept
     return (color >> shift) & 0xff;
 }
 
-inline constexpr ImU32 red(ImU32 color) noexcept
+inline constexpr ImU32 rch(ImU32 color) noexcept
 {
     return color_channel(color, IM_COL32_R_SHIFT);
 }
 
-inline constexpr ImU32 green(ImU32 color) noexcept
+inline constexpr ImU32 gch(ImU32 color) noexcept
 {
     return color_channel(color, IM_COL32_G_SHIFT);
 }
 
-inline constexpr ImU32 blue(ImU32 color) noexcept
+inline constexpr ImU32 bch(ImU32 color) noexcept
 {
     return color_channel(color, IM_COL32_B_SHIFT);
 }

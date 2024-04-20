@@ -129,6 +129,7 @@ void aldo::Debugger::loadCartState(const std::filesystem::path& prefCartPath)
     const auto brkpath = aldo::debug::breakfile_path_from(prefCartPath);
     if (!std::filesystem::exists(brkpath)) return;
     loadBreakpoints(brkpath);
+    SDL_Log("Breakpoints file loaded: %s", brkpath.c_str());
 }
 
 void
@@ -137,6 +138,7 @@ aldo::Debugger::saveCartState(const std::filesystem::path& prefCartPath) const
     const auto brkpath = aldo::debug::breakfile_path_from(prefCartPath);
     if (isActive()) {
         exportBreakpoints(brkpath);
+        SDL_Log("Breakpoints file saved: %s", brkpath.c_str());
     } else {
         try {
             std::filesystem::remove(brkpath);
@@ -145,5 +147,6 @@ aldo::Debugger::saveCartState(const std::filesystem::path& prefCartPath) const
                         "Failed to delete breakpoint file: (%d) %s",
                         ex.code().value(), ex.what());
         }
+        SDL_Log("Empty breakpoints file removed: %s", brkpath.c_str());
     }
 }

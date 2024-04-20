@@ -85,7 +85,7 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
             {
                 float time;
                 parsed = sscanf(str, "%f %1[Ss]", &time, u) == 2;
-                valid = time >= 0.0;
+                valid = time >= 0;
                 e = (struct haltexpr){
                     .runtime = time,
                     .cond = (enum haltcondition)i,

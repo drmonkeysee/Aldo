@@ -113,7 +113,7 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
     clearline();
     if (!emu->args->verbose) return;
 
-    const bool scale_ms = c->cyclock.runtime < 1.0;
+    const bool scale_ms = c->cyclock.runtime < 1;
     printf("---=== %s ===---\n", argparse_filename(emu->args->filepath));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
            scale_ms

@@ -31,6 +31,7 @@
 #include <concepts>
 #include <functional>
 #include <iterator>
+#include <limits>
 #include <locale>
 #include <span>
 #include <string_view>
@@ -409,7 +410,7 @@ auto about_overlay(aldo::viewstate& vs) noexcept
                                     | ImGuiWindowFlags_NoSavedSettings;
 
     const auto workArea = ImGui::GetMainViewport()->WorkPos;
-    ImGui::SetNextWindowPos(workArea + 25.0f);
+    ImGui::SetNextWindowPos(workArea + 25);
     ImGui::SetNextWindowBgAlpha(0.75f);
 
     if (ImGui::Begin("About Aldo", nullptr, flags)) {
@@ -643,7 +644,7 @@ private:
             textOff = IM_COL32_WHITE;
 
         const auto textSz = aldo::style::glyph_size();
-        const auto radius = (textSz.x + textSz.y) / 2.0f;
+        const auto radius = (textSz.x + textSz.y) / 2;
         const auto pos = ImGui::GetCursorScreenPos();
         ImVec2 center = pos + radius;
 
@@ -1022,7 +1023,10 @@ private:
 
     void renderBreakpointList()
     {
-        const ImVec2 dims{-FLT_MIN, 8 * ImGui::GetTextLineHeightWithSpacing()};
+        const ImVec2 dims{
+            -std::numeric_limits<float>::min(),
+            8 * ImGui::GetTextLineHeightWithSpacing(),
+        };
         const auto bpView = emu.debugger().breakpoints();
         const auto bpCount = bpView.size();
         ImGui::Text("%zu breakpoint%s", bpCount, bpCount == 1 ? "" : "s");
@@ -1460,8 +1464,7 @@ private:
         ImGui::SameLine();
         ImGui::SetNextItemWidth(40);
         ImGui::DragInt("##cyclesPerSecond", &vs.clock.cyclock.cycles_per_sec,
-                       1.0f, MinCps, MaxCps, "%d",
-                       ImGuiSliderFlags_AlwaysClamp);
+                       1, MinCps, MaxCps, "%d", ImGuiSliderFlags_AlwaysClamp);
     }
 
     void renderRunControls() const

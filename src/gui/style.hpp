@@ -11,6 +11,7 @@
 #include "imgui.h"
 #include <SDL2/SDL.h>
 
+#include <tuple>
 #include <cstdint>
 
 namespace aldo
@@ -58,6 +59,11 @@ inline constexpr ImU32 gch(ImU32 color) noexcept
 inline constexpr ImU32 bch(ImU32 color) noexcept
 {
     return color_channel(color, IM_COL32_B_SHIFT);
+}
+
+inline constexpr std::tuple<ImU32, ImU32, ImU32> rgb(ImU32 color)
+{
+    return {rch(color), gch(color), bch(color)};
 }
 
 }

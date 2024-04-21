@@ -1278,16 +1278,11 @@ private:
                            {selectedColorDim, selectedColorDim});
         ImGui::SameLine();
         widget_group([] {
+            const auto [r, g, b] = aldo::colors::rgb(testColor);
             ImGui::TextUnformatted("Index: 06");
-            ImGui::Text("RGBd:  %d %d %d", aldo::colors::rch(testColor),
-                        aldo::colors::gch(testColor),
-                        aldo::colors::bch(testColor));
-            ImGui::Text("RGBx:  %02X %02X %02X", aldo::colors::rch(testColor),
-                        aldo::colors::gch(testColor),
-                        aldo::colors::bch(testColor));
-            ImGui::Text("Hex:   #%02x%02x%02x", aldo::colors::rch(testColor),
-                        aldo::colors::gch(testColor),
-                        aldo::colors::bch(testColor));
+            ImGui::Text("RGBd:  %d %d %d", r, g, b);
+            ImGui::Text("RGBx:  %02X %02X %02X", r, g, b);
+            ImGui::Text("Hex:   #%02x%02x%02x", r, g, b);
         });
     }
 

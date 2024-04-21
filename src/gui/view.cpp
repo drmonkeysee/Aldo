@@ -260,7 +260,7 @@ auto file_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
     }
 }
 
-auto speed_menu_items(aldo::viewstate& vs) noexcept
+auto speed_menu_items(aldo::viewstate& vs)
 {
     static constexpr auto multiplierLabel = " 10x";
 
@@ -548,7 +548,7 @@ protected:
     }
 
 private:
-    static void renderiNesInfo(const cartinfo& info) noexcept
+    static void renderiNesInfo(const cartinfo& info)
     {
         ImGui::Text("Mapper: %03u", info.ines_hdr.mapper_id);
         if (!info.ines_hdr.mapper_implemented) {
@@ -618,7 +618,7 @@ protected:
     }
 
 private:
-    void renderRegisters() const noexcept
+    void renderRegisters() const
     {
         auto& cpu = emu.snapshot().cpu;
         widget_group([&cpu] {

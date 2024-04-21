@@ -103,7 +103,7 @@ struct runclock {
     RunTimer timeUpdate() noexcept { return RunTimer{dtUpdateMs}; }
     RunTimer timeRender() noexcept { return RunTimer{dtRenderMs}; }
 
-    void adjustCycleRate(int adjustment) noexcept
+    void adjustCycleRate(int adjustment)
     {
         const auto adjusted = cyclock.cycles_per_sec + adjustment;
         cyclock.cycles_per_sec = std::max(MinCps, std::min(adjusted, MaxCps));

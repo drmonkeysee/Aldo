@@ -66,6 +66,14 @@ inline constexpr std::tuple<ImU32, ImU32, ImU32> rgb(ImU32 color)
     return {rch(color), gch(color), bch(color)};
 }
 
+// NOTE: relative luminance function
+// https://en.wikipedia.org/wiki/Relative_luminance
+inline constexpr ImU32 luminance(ImU32 color)
+{
+    const auto [r, g, b] = rgb(color);
+    return static_cast<ImU32>((0.2126f * r) + (0.7152f * g) + (0.0722f * b));
+}
+
 }
 
 namespace style

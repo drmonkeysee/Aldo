@@ -1242,7 +1242,9 @@ private:
             IM_COL32_BLACK,                                 // #000000
         };
 
-        std::array<char, 5> buf;
+        std::array<char, 6> buf;
+        // TODO: use ScopedStyle
+        ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, {0.5f, 0.5f});
         for (auto row = 0; row < rows; ++row) {
             for (auto col = 0; col < Cols; ++col) {
                 const auto rowStart = paletteDim * row;
@@ -1253,10 +1255,17 @@ private:
                     const auto cell = rowStart + (col - 1);
                     const auto idx =
                         static_cast<decltype(defaultPalette)::size_type>(cell);
-                    ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
-                                           defaultPalette[idx]);
-                    std::snprintf(buf.data(), buf.size(), "##%02X", cell);
-                    if (ImGui::Selectable(buf.data(), cell == selected,
+                    const auto color = defaultPalette[idx];
+                    ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color);
+                    const ScopedColor indicatorColor{
+                        {ImGuiCol_Text, aldo::colors::luminance(color) < 0x80
+                                        ? IM_COL32_WHITE
+                                        : IM_COL32_BLACK},
+                        cell == selected,
+                    };
+                    std::snprintf(buf.data(), buf.size(), "%s##%02X",
+                                  cell == selected ? "x" : "", cell);
+                    if (ImGui::Selectable(buf.data(), false,
                                           ImGuiSelectableFlags_None,
                                           {cellDim, cellDim})) {
                         selected = cell;
@@ -1264,6 +1273,7 @@ private:
                 }
             }
         }
+        ImGui::PopStyleVar();
     }
 
     void renderColorSelection() const noexcept

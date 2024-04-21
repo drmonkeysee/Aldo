@@ -106,11 +106,14 @@ public:
     ~ScopedID() { ImGui::PopID(); }
 };
 
-using scoped_style_val = std::pair<ImGuiStyleVar, float>;
 using scoped_color_val = std::pair<ImGuiCol, ImU32>;
+using scoped_style_val = std::pair<ImGuiStyleVar, float>;
+using scoped_style_val2 = std::pair<ImGuiStyleVar, ImVec2>;
 template<typename T>
-concept ScopedVal =
-    std::same_as<T, scoped_style_val> || std::same_as<T, scoped_color_val>;
+concept StyleVal = std::same_as<T, scoped_style_val>
+                    || std::same_as<T, scoped_style_val2>;
+template<typename T>
+concept ScopedVal = StyleVal<T> || std::same_as<T, scoped_color_val>;
 
 template<ScopedVal V>
 class ALDO_SIDEFX ScopedWidgetVars {
@@ -136,16 +139,6 @@ private:
         std::ranges::for_each(vals, Policy::push);
     }
 
-    struct style_stack {
-        static void push(const scoped_style_val& style) noexcept
-        {
-            ImGui::PushStyleVar(style.first, style.second);
-        }
-        static void pop(int count) noexcept
-        {
-            ImGui::PopStyleVar(count);
-        }
-    };
     struct color_stack {
         static void push(const scoped_color_val& color) noexcept
         {
@@ -156,15 +149,33 @@ private:
             ImGui::PopStyleColor(count);
         }
     };
-    using Policy = std::conditional_t<std::same_as<V, scoped_style_val>,
-                    style_stack,
-                    color_stack>;
+    template<StyleVal T>
+    struct style_stack {
+        static void push(const T& style) noexcept
+        {
+            ImGui::PushStyleVar(style.first, style.second);
+        }
+        static void pop(int count) noexcept
+        {
+            ImGui::PopStyleVar(count);
+        }
+    };
+    using style_stackf = style_stack<scoped_style_val>;
+    using style_stackv = style_stack<scoped_style_val2>;
+    using Policy = std::conditional_t<
+                    std::same_as<V, scoped_color_val>,
+                    color_stack,
+                    std::conditional_t<
+                        std::same_as<V, scoped_style_val>,
+                        style_stackf,
+                        style_stackv>>;
 
     bool condition;
     typename std::initializer_list<V>::size_type count;
 };
-using ScopedStyle = ScopedWidgetVars<scoped_style_val>;
 using ScopedColor = ScopedWidgetVars<scoped_color_val>;
+using ScopedStyle = ScopedWidgetVars<scoped_style_val>;
+using ScopedStyle2 = ScopedWidgetVars<scoped_style_val2>;
 
 constexpr auto NoSelection = -1;
 
@@ -1167,10 +1178,12 @@ private:
     void renderBody()
     {
         static constexpr auto rows = 4, paletteDim = Cols - 1, cellDim = 15;
+        static constexpr auto center = 0.5f;
 
-        std::array<char, 6> buf;
-        // TODO: use ScopedStyle
-        ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, {0.5f, 0.5f});
+        const ScopedStyle2 textAlign{{
+            ImGuiStyleVar_SelectableTextAlign,
+            {center, center},
+        }};
         for (auto row = 0; row < rows; ++row) {
             for (auto col = 0; col < Cols; ++col) {
                 const auto rowStart = paletteDim * row;
@@ -1188,9 +1201,8 @@ private:
                                         : IM_COL32_BLACK},
                         cell == selected,
                     };
-                    std::snprintf(buf.data(), buf.size(), "%s##%02X",
-                                  cell == selected ? "x" : "", cell);
-                    if (ImGui::Selectable(buf.data(), false,
+                    const ScopedID id = cell;
+                    if (ImGui::Selectable(cell == selected ? "x" : "", false,
                                           ImGuiSelectableFlags_None,
                                           {cellDim, cellDim})) {
                         selected = cell;
@@ -1198,7 +1210,6 @@ private:
                 }
             }
         }
-        ImGui::PopStyleVar();
     }
 
     void renderColorSelection() const

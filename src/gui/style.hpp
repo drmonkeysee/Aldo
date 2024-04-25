@@ -20,7 +20,7 @@ namespace aldo
 namespace colors
 {
 
-inline constexpr std::uint8_t ScreenFill = 0x1e;
+inline constexpr Uint8 ScreenFill = 0x1e;
 
 inline constexpr ImU32
     Attention = IM_COL32(0xff, 0xa5, 0x0, SDL_ALPHA_OPAQUE),

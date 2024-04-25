@@ -937,7 +937,7 @@ private:
         std::vector<bp_diff> selections;
     };
 
-    void renderVectorOverride() noexcept
+    void renderVectorOverride()
     {
         syncWithOverrideState();
 
@@ -998,7 +998,7 @@ private:
         return setFocus;
     }
 
-    void renderBreakpointAdd(bool setFocus) noexcept
+    void renderBreakpointAdd(bool setFocus)
     {
         switch (currentHaltExpression.cond) {
         case HLT_ADDR:

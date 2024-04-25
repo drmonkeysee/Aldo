@@ -106,14 +106,14 @@ public:
     ~ScopedID() { ImGui::PopID(); }
 };
 
-using scoped_color_val = std::pair<ImGuiCol, ImU32>;
-using scoped_style_val = std::pair<ImGuiStyleVar, float>;
-using scoped_style_val2 = std::pair<ImGuiStyleVar, ImVec2>;
+using scoped_color_int = std::pair<ImGuiCol, ImU32>;
+using scoped_style_flt = std::pair<ImGuiStyleVar, float>;
+using scoped_style_vec = std::pair<ImGuiStyleVar, ImVec2>;
 template<typename T>
-concept StyleVal = std::same_as<T, scoped_style_val>
-                    || std::same_as<T, scoped_style_val2>;
+concept StyleVal = std::same_as<T, scoped_style_flt>
+                    || std::same_as<T, scoped_style_vec>;
 template<typename T>
-concept ScopedVal = StyleVal<T> || std::same_as<T, scoped_color_val>;
+concept ScopedVal = StyleVal<T> || std::same_as<T, scoped_color_int>;
 
 template<ScopedVal V>
 class ALDO_SIDEFX ScopedWidgetVars {
@@ -140,7 +140,7 @@ private:
     }
 
     struct color_stack {
-        static void push(const scoped_color_val& color) noexcept
+        static void push(const scoped_color_int& color) noexcept
         {
             ImGui::PushStyleColor(color.first, color.second);
         }
@@ -160,22 +160,22 @@ private:
             ImGui::PopStyleVar(count);
         }
     };
-    using style_stackf = style_stack<scoped_style_val>;
-    using style_stackv = style_stack<scoped_style_val2>;
+    using style_stackf = style_stack<scoped_style_flt>;
+    using style_stackv = style_stack<scoped_style_vec>;
     using Policy = std::conditional_t<
-                    std::same_as<V, scoped_color_val>,
+                    std::same_as<V, scoped_color_int>,
                     color_stack,
                     std::conditional_t<
-                        std::same_as<V, scoped_style_val>,
+                        std::same_as<V, scoped_style_flt>,
                         style_stackf,
                         style_stackv>>;
 
     bool condition;
     typename std::initializer_list<V>::size_type count;
 };
-using ScopedColor = ScopedWidgetVars<scoped_color_val>;
-using ScopedStyle = ScopedWidgetVars<scoped_style_val>;
-using ScopedStyle2 = ScopedWidgetVars<scoped_style_val2>;
+using ScopedColor = ScopedWidgetVars<scoped_color_int>;
+using ScopedStyleFlt = ScopedWidgetVars<scoped_style_flt>;
+using ScopedStyleVec = ScopedWidgetVars<scoped_style_vec>;
 
 constexpr auto NoSelection = -1;
 
@@ -1059,7 +1059,7 @@ private:
         }
         std::array<aldo::et::tchar, HEXPR_FMT_SIZE> fmt;
         const auto err = haltexpr_desc(&bp.expr, fmt.data());
-        const ScopedStyle style{
+        const ScopedStyleFlt style{
             {ImGuiStyleVar_Alpha, ImGui::GetStyle().DisabledAlpha},
             !bp.enabled,
         };
@@ -1180,7 +1180,7 @@ private:
         static constexpr auto rows = 4, paletteDim = Cols - 1, cellDim = 15;
         static constexpr auto center = 0.5f;
 
-        const ScopedStyle2 textAlign{{
+        const ScopedStyleVec textAlign{{
             ImGuiStyleVar_SelectableTextAlign,
             {center, center},
         }};

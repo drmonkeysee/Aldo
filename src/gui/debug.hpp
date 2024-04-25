@@ -144,6 +144,8 @@ public:
 
         const_iterator cbegin() const noexcept
         {
+            // NOTE: ssize is not noexcept but all it does is delegate to
+            // this->size() which in this case is noexcept.
             return {debugp, std::ssize(*this)};
         }
         const_iterator cend() const noexcept { return {}; }

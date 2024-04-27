@@ -121,7 +121,7 @@ private:
 
     std::variant<
         palette::datap,
-        const std::unique_ptr<palette::datav[]>
+        std::unique_ptr<const palette::datav[]>
     > colors;
 };
 

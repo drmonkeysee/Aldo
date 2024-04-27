@@ -14,9 +14,11 @@
 #include "debug.hpp"
 #include "handle.hpp"
 #include "nes.h"
+#include "palette.hpp"
 #include "snapshot.h"
 
 #include <filesystem>
+#include <memory>
 #include <optional>
 #include <string_view>
 
@@ -101,13 +103,12 @@ private:
     void saveCartState() const;
     void cleanup() const noexcept;
 
-    std::filesystem::path cartpath;
-    std::filesystem::path cartname;
-    std::filesystem::path prefspath;
+    std::filesystem::path cartname, cartpath, palettepath, prefspath;
     cart_handle hcart;
     Debugger hdebug;
     console_handle hconsole;
     Snapshot hsnapshot;
+    std::unique_ptr<Palette> hpalette;
 };
 
 }

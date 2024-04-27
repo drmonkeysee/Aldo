@@ -7,7 +7,6 @@
 
 #include "palette.hpp"
 
-#include "imgui.h"
 #include <SDL2/SDL.h>
 
 #include <array>
@@ -105,4 +104,11 @@ aldo::Palette::Palette(const std::filesystem::path&)
 {
     // TODO: not implemented
     throw new std::runtime_error{"not implemented"};
+}
+
+ImU32 aldo::Palette::getColor(aldo::Palette::size idx) const noexcept
+{
+    const auto pidx = static_cast<palette_sz>(idx);
+    if (pidx >= PaletteSize) return IM_COL32_BLACK;
+    return DefaultPalette[pidx];
 }

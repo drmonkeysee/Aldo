@@ -71,6 +71,7 @@ public:
     {
         return hsnapshot.getp();
     }
+    const Palette& palette() const noexcept { return *hpalette; }
     bool haltedByDebugger() const noexcept
     {
         return debugger().hasBreak(snapshot());

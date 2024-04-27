@@ -13,13 +13,13 @@
 // Public Interface
 //
 
+aldo::palette::datav aldo::Palette::getColor(aldo::palette::size idx) const
+{
+    return std::visit([idx](auto&& c) { return c[idx]; }, colors);
+}
+
 void aldo::Palette::load(const std::filesystem::path&)
 {
     // TODO: not implemented
     throw new std::runtime_error{"not implemented"};
-}
-
-aldo::palette::datav aldo::Palette::getColor(aldo::palette::size idx) const
-{
-    return std::visit([idx](auto&& c) { return c[idx]; }, colors);
 }

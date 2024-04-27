@@ -115,10 +115,10 @@ public:
         return std::holds_alternative<palette::datap>(colors);
     }
 
+    palette::datav getColor(palette::size idx) const;
+
     void load(const std::filesystem::path& filepath);
     void unload() noexcept { colors = getDefault(); }
-
-    palette::datav getColor(palette::size idx) const;
 
 private:
     static constexpr palette::datap getDefault() noexcept

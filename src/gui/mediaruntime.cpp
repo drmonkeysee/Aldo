@@ -58,7 +58,7 @@ ALDO_OWN
 auto create_bouncer_texture(SDL_Point screenResolution,
                             const aldo::ren_handle& hren)
 {
-    const auto tex = SDL_CreateTexture(hren.get(), SDL_PIXELFORMAT_RGBA8888,
+    const auto tex = SDL_CreateTexture(hren.get(), SDL_PIXELFORMAT_RGBA32,
                                        SDL_TEXTUREACCESS_TARGET,
                                        screenResolution.x, screenResolution.y);
     if (!tex) throw aldo::SdlError{"Bouncer texture creation failure"};

@@ -21,5 +21,5 @@ aldo::palette::datav aldo::Palette::getColor(aldo::palette::sz idx) const
 void aldo::Palette::load(const std::filesystem::path&)
 {
     // TODO: not implemented
-    throw new std::runtime_error{"not implemented"};
+    throw std::runtime_error{"not implemented"};
 }

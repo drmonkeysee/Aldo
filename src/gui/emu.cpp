@@ -75,7 +75,7 @@ auto update_bouncer(aldo::viewstate& vs,
 aldo::Emulator::Emulator(aldo::debug_handle d, aldo::console_handle n,
                          const gui_platform& p)
 : prefspath{get_prefspath(p)}, hdebug{std::move(d)}, hconsole{std::move(n)},
-    hsnapshot{consolep()}, hpalette{std::make_unique<aldo::Palette>()} {}
+    hsnapshot{consolep()} {}
 
 std::string_view aldo::Emulator::displayCartName() const noexcept
 {

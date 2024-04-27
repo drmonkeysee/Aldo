@@ -1168,8 +1168,8 @@ private:
     {
         std::array<char, 3> buf;
         ImGui::TableSetupColumn("Idx", ImGuiTableColumnFlags_WidthStretch);
-        for (auto col = 1; col < Cols; ++col) {
-            std::snprintf(buf.data(), buf.size(), " %01X", col - 1);
+        for (aldo::palette::size col = 1; col < Cols; ++col) {
+            std::snprintf(buf.data(), buf.size(), " %01zX", col - 1);
             ImGui::TableSetupColumn(buf.data());
         }
         ImGui::TableHeadersRow();
@@ -1177,23 +1177,24 @@ private:
 
     void renderBody()
     {
-        static constexpr auto rows = 4, paletteDim = Cols - 1, cellDim = 15;
+        static constexpr auto cellDim = 15;
+        static constexpr aldo::palette::size
+            rows = 4, paletteDim = aldo::palette::Size / rows;
         static constexpr auto center = 0.5f;
 
         const ScopedStyleVec textAlign{{
             ImGuiStyleVar_SelectableTextAlign,
             {center, center},
         }};
-        for (auto row = 0; row < rows; ++row) {
-            for (auto col = 0; col < Cols; ++col) {
+        for (aldo::palette::size row = 0; row < rows; ++row) {
+            for (aldo::palette::size col = 0; col < Cols; ++col) {
                 const auto rowStart = paletteDim * row;
                 ImGui::TableNextColumn();
                 if (col == 0) {
-                    ImGui::Text(" %02X", rowStart);
+                    ImGui::Text(" %02zX", rowStart);
                 } else {
                     const auto cell = rowStart + (col - 1);
-                    const auto cidx = static_cast<aldo::Palette::size>(cell);
-                    const auto color = emu.palette().getColor(cidx);
+                    const auto color = emu.palette().getColor(cell);
                     ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color);
                     const ScopedColor indicatorColor{
                         {ImGuiCol_Text, aldo::colors::luminance(color) < 0x80
@@ -1201,7 +1202,7 @@ private:
                                         : IM_COL32_BLACK},
                         cell == selected,
                     };
-                    const ScopedID id = cell;
+                    const ScopedID id = static_cast<int>(cell);
                     if (ImGui::Selectable(cell == selected ? "x" : "", false,
                                           ImGuiSelectableFlags_None,
                                           {cellDim, cellDim})) {
@@ -1215,8 +1216,7 @@ private:
     void renderColorSelection() const
     {
         static constexpr auto selectedColorDim = 70;
-        const auto cidx = static_cast<aldo::Palette::size>(selected);
-        const auto color = emu.palette().getColor(cidx);
+        const auto color = emu.palette().getColor(selected);
         ImGui::ColorButton("Selected Color",
                            ImGui::ColorConvertU32ToFloat4(color),
                            ImGuiColorEditFlags_NoAlpha,
@@ -1224,7 +1224,7 @@ private:
         ImGui::SameLine();
         widget_group([color, this] {
             const auto [r, g, b] = aldo::colors::rgb(color);
-            ImGui::Text("Index: %02X", this->selected);
+            ImGui::Text("Index: %02zX", this->selected);
             if (this->selected == 0xd) {
                 ImGui::SameLine();
                 ImGui::TextUnformatted("(forbidden black)");
@@ -1235,9 +1235,9 @@ private:
         });
     }
 
-    int selected = 0;
+    aldo::palette::size selected = 0;
 
-    static constexpr int Cols = 17;
+    static constexpr aldo::palette::size Cols = 17;
 };
 
 class PrgAtPcView final : public aldo::View {

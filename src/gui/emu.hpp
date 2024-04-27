@@ -18,7 +18,6 @@
 #include "snapshot.h"
 
 #include <filesystem>
-#include <memory>
 #include <optional>
 #include <string_view>
 
@@ -71,7 +70,7 @@ public:
     {
         return hsnapshot.getp();
     }
-    const Palette& palette() const noexcept { return *hpalette; }
+    const Palette& palette() const noexcept { return hpalette; }
     bool haltedByDebugger() const noexcept
     {
         return debugger().hasBreak(snapshot());
@@ -109,7 +108,7 @@ private:
     Debugger hdebug;
     console_handle hconsole;
     Snapshot hsnapshot;
-    std::unique_ptr<Palette> hpalette;
+    Palette hpalette;
 };
 
 }

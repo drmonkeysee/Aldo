@@ -120,6 +120,7 @@
 		C8C706BB2751F0CE00B45785 /* mappers.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706912751EEBA00B45785 /* mappers.c */; };
 		C8C706BE2751F55C00B45785 /* trace.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C706BD2751F55C00B45785 /* trace.c */; };
 		C8CF5FC22BAF9E27004F1A99 /* imgui_impl_sdlrenderer2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8CF5FC02BAF9E27004F1A99 /* imgui_impl_sdlrenderer2.cpp */; };
+		C8D391B02BDC8BE800CED12B /* palette.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8D391AE2BDC8BE800CED12B /* palette.cpp */; };
 		C8D3CA0A2904E50F0087316F /* aldoc in Embed Cli */ = {isa = PBXBuildFile; fileRef = C8D3CA002904E1BD0087316F /* aldoc */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		C8D44BDD2786B571005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D44BDC2786B571005AB586 /* argparse.c */; };
 		C8D8FDA82792691B0073639B /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
@@ -345,6 +346,8 @@
 		C8CF5FC02BAF9E27004F1A99 /* imgui_impl_sdlrenderer2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imgui_impl_sdlrenderer2.cpp; sourceTree = "<group>"; };
 		C8CF5FC12BAF9E27004F1A99 /* imgui_impl_sdlrenderer2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imgui_impl_sdlrenderer2.h; sourceTree = "<group>"; };
 		C8D388D72952B9A700DF230D /* runclock.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = runclock.hpp; sourceTree = "<group>"; };
+		C8D391AE2BDC8BE800CED12B /* palette.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = palette.cpp; sourceTree = "<group>"; };
+		C8D391AF2BDC8BE800CED12B /* palette.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = palette.hpp; sourceTree = "<group>"; };
 		C8D3CA002904E1BD0087316F /* aldoc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = aldoc; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8D428E8296A15E500824248 /* emutypes.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = emutypes.hpp; sourceTree = "<group>"; };
 		C8D44BDC2786B571005AB586 /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
@@ -630,6 +633,8 @@
 				C8561A0A29149EA600290B53 /* mediaruntime.cpp */,
 				C8E7A29B2980F32400AAB2A4 /* modal.hpp */,
 				C8E7A29A2980F32400AAB2A4 /* modal.cpp */,
+				C8D391AF2BDC8BE800CED12B /* palette.hpp */,
+				C8D391AE2BDC8BE800CED12B /* palette.cpp */,
 				C8EC721F2916150700DF750A /* render.hpp */,
 				C8EC721E2916150700DF750A /* render.cpp */,
 				C8D388D72952B9A700DF230D /* runclock.hpp */,
@@ -971,6 +976,7 @@
 				C8B4E7F229ADA78C00B5033C /* imgui_impl_sdl2.cpp in Sources */,
 				C830036C28DEDDD200480F29 /* main.m in Sources */,
 				C894F0EF2945850E00C6575F /* view.cpp in Sources */,
+				C8D391B02BDC8BE800CED12B /* palette.cpp in Sources */,
 				C8F1A38E297FA5400005EB8B /* emu.cpp in Sources */,
 				C8EC72202916150700DF750A /* render.cpp in Sources */,
 				C8F87DBC2984D64F00B8FAFD /* debug.cpp in Sources */,

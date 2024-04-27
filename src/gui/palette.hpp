@@ -99,10 +99,10 @@ inline constexpr std::array Default {
     IM_COL32_BLACK,                                 // #000000
     IM_COL32_BLACK,                                 // #000000
 };
-using size = decltype(Default)::size_type;
+using sz = decltype(Default)::size_type;
 using datav = decltype(Default)::value_type;
 using datap = decltype(Default)::const_pointer;
-inline constexpr size Size = Default.size();
+inline constexpr sz Size = Default.size();
 
 }
 
@@ -115,7 +115,7 @@ public:
         return std::holds_alternative<palette::datap>(colors);
     }
 
-    palette::datav getColor(palette::size idx) const;
+    palette::datav getColor(palette::sz idx) const;
 
     void load(const std::filesystem::path& filepath);
     void unload() noexcept { colors = getDefault(); }

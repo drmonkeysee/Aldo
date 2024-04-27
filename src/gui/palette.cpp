@@ -13,7 +13,7 @@
 // Public Interface
 //
 
-aldo::palette::datav aldo::Palette::getColor(aldo::palette::size idx) const
+aldo::palette::datav aldo::Palette::getColor(aldo::palette::sz idx) const
 {
     return std::visit([idx](auto&& c) { return c[idx]; }, colors);
 }

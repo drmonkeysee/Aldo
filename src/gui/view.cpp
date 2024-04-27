@@ -1174,11 +1174,13 @@ protected:
     }
 
 private:
+    using pal_sz = aldo::palette::sz;
+
     static void renderHeader() noexcept
     {
         std::array<char, 3> buf;
         ImGui::TableSetupColumn("Idx", ImGuiTableColumnFlags_WidthStretch);
-        for (aldo::palette::size col = 1; col < Cols; ++col) {
+        for (pal_sz col = 1; col < Cols; ++col) {
             std::snprintf(buf.data(), buf.size(), " %01zX", col - 1);
             ImGui::TableSetupColumn(buf.data());
         }
@@ -1188,16 +1190,16 @@ private:
     void renderBody()
     {
         static constexpr auto cellDim = 15;
-        static constexpr aldo::palette::size
-            rows = 4, paletteDim = aldo::palette::Size / rows;
+        static constexpr pal_sz rows = 4,
+                                paletteDim = aldo::palette::Size / rows;
         static constexpr auto center = 0.5f;
 
         const ScopedStyleVec textAlign{{
             ImGuiStyleVar_SelectableTextAlign,
             {center, center},
         }};
-        for (aldo::palette::size row = 0; row < rows; ++row) {
-            for (aldo::palette::size col = 0; col < Cols; ++col) {
+        for (pal_sz row = 0; row < rows; ++row) {
+            for (pal_sz col = 0; col < Cols; ++col) {
                 const auto rowStart = paletteDim * row;
                 ImGui::TableNextColumn();
                 if (col == 0) {
@@ -1245,9 +1247,9 @@ private:
         });
     }
 
-    aldo::palette::size selected = 0;
+    pal_sz selected = 0;
 
-    static constexpr aldo::palette::size Cols = 17;
+    static constexpr pal_sz Cols = 17;
 };
 
 class PrgAtPcView final : public aldo::View {

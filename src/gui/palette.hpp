@@ -23,6 +23,8 @@ namespace aldo
 namespace palette
 {
 
+inline constexpr const char* FileExtension = "pal";
+
 // NOTE: 2C02 palette from https://www.nesdev.org/wiki/PPU_palettes
 inline constexpr std::array Default {
     // 0x00
@@ -107,6 +109,11 @@ inline constexpr size Size = Default.size();
 class Palette {
 public:
     Palette() noexcept : colors{getDefault()} {}
+
+    bool isDefault() const noexcept
+    {
+        return std::holds_alternative<palette::datap>(colors);
+    }
 
     void load(const std::filesystem::path& filepath);
     void unload() noexcept { colors = getDefault(); }

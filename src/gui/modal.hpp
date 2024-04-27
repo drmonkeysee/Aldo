@@ -21,6 +21,7 @@ namespace modal
 bool loadROM(Emulator& emu, const gui_platform& p);
 bool loadBreakpoints(Emulator& emu, const gui_platform& p);
 bool exportBreakpoints(Emulator& emu, const gui_platform& p);
+bool loadPalette(Emulator& emu, const gui_platform& p);
 
 }
 

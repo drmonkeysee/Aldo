@@ -105,3 +105,15 @@ bool aldo::modal::exportBreakpoints(aldo::Emulator& emu, const gui_platform& p)
         };
     return file_modal(open, op, emu, p);
 }
+
+bool aldo::modal::loadPalette(aldo::Emulator& emu, const gui_platform& p)
+{
+    const auto open = [](const gui_platform& p) {
+        return open_file(p, "Choose a Palette",
+                         {aldo::palette::FileExtension, nullptr});
+    };
+    const auto op = [&p = emu.palette()](const std::filesystem::path& fp) {
+        p.load(fp);
+    };
+    return file_modal(open, op, emu, p);
+}

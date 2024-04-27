@@ -267,6 +267,16 @@ auto file_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
                 vs.commands.emplace(aldo::Command::breakpointsExport);
             }
         }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Load Palette...", "Cmd+P")) {
+            vs.commands.emplace(aldo::Command::paletteLoad);
+        }
+        {
+            const DisabledIf pif = emu.palette().isDefault();
+            if (ImGui::MenuItem("Unload Palette", "Opt+Cmd+P")) {
+                vs.commands.emplace(aldo::Command::paletteUnload);
+            }
+        }
         ImGui::EndMenu();
     }
 }

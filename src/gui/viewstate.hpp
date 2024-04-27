@@ -35,6 +35,8 @@ enum class Command {
     launchStudio,
     mode,
     openROM,
+    paletteLoad,
+    paletteUnload,
     ready,
     resetVectorClear,
     resetVectorOverride,

@@ -121,6 +121,16 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
             vs.commands.emplace(aldo::Command::openROM);
         }
         break;
+    case SDLK_p:
+        if (is_menu_command(ev)) {
+            if (ev.key.keysym.mod & KMOD_ALT) {
+                if (!emu.palette().isDefault()) {
+                    vs.commands.emplace(aldo::Command::paletteUnload);
+                }
+            } else {
+                vs.commands.emplace(aldo::Command::paletteLoad);
+            }
+        }
     case SDLK_s:
         if (is_free_key(ev)) {
             vs.addInterruptCommand(CSGI_RES, lines.reset);
@@ -173,6 +183,12 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
         if (aldo::modal::loadROM(emu, p)) {
             vs.clock.cyclock.emutime = 0;
         }
+        break;
+    case aldo::Command::paletteLoad:
+        aldo::modal::loadPalette(emu, p);
+        break;
+    case aldo::Command::paletteUnload:
+        emu.palette().unload();
         break;
     case aldo::Command::ready:
         emu.ready(std::get<bool>(cs.value));

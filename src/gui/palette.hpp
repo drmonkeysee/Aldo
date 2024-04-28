@@ -15,7 +15,6 @@
 #include <filesystem>
 #include <memory>
 #include <variant>
-#include <cstddef>
 
 namespace aldo
 {

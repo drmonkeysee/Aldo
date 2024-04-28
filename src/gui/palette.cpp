@@ -7,15 +7,20 @@
 
 #include "palette.hpp"
 
+#include "emutypes.hpp"
 #include "error.hpp"
 
 #include <fstream>
 #include <ios>
+#include <iterator>
+#include <ranges>
+#include <tuple>
 
 namespace
 {
 
-constexpr aldo::palette::sz PalFileLength = aldo::palette::Size * 3;
+constexpr aldo::palette::sz ByteFactor = 3;
+constexpr aldo::palette::sz PalFileLength = aldo::palette::Size * ByteFactor;
 
 }
 
@@ -43,5 +48,23 @@ void aldo::Palette::load(const std::filesystem::path& filepath)
                     "Palette file too short;"
                     " expected %zu bytes, read %zu bytes",
                     buf.size(), f.gcount());
+    }
+    // TODO: replace this with views::chunk in c++23
+    std::array<aldo::palette::datav, aldo::palette::Size> newColors;
+    decltype(newColors)::size_type idx = 0;
+    const auto end = buf.cend();
+    for (auto it = buf.cbegin();
+         it != end;
+         std::advance(it, ByteFactor)) {
+        const auto t = std::views::take(std::ranges::subrange{it, end},
+                                        ByteFactor);
+        // NOTE: t yields possibly signed chars; cast to byte, because int
+        // auto-promotion in IM_COL32 will sign-extend and mess up the shifts.
+        const auto [r, g, b] = std::tuple{
+            static_cast<aldo::et::byte>(t[0]),
+            static_cast<aldo::et::byte>(t[1]),
+            static_cast<aldo::et::byte>(t[2]),
+        };
+        newColors[idx++] = IM_COL32(r, g, b, SDL_ALPHA_OPAQUE);
     }
 }

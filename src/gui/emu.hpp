@@ -104,7 +104,7 @@ private:
     void saveCartState() const;
     void cleanup() const noexcept;
 
-    std::filesystem::path cartname, cartpath, palettepath, prefspath;
+    std::filesystem::path cartname, cartpath, prefspath;
     cart_handle hcart;
     Debugger hdebug;
     console_handle hconsole;

@@ -79,4 +79,5 @@ void aldo::Palette::load(const std::filesystem::path& filepath)
     }
 
     colors = parse_colors(buf);
+    filename = filepath.filename();
 }

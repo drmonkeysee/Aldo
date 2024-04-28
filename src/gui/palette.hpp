@@ -14,6 +14,7 @@
 #include <array>
 #include <filesystem>
 #include <memory>
+#include <string_view>
 #include <variant>
 
 namespace aldo
@@ -22,7 +23,9 @@ namespace aldo
 namespace palette
 {
 
-inline constexpr const char* FileExtension = "pal";
+inline constexpr const char
+    * FileExtension = "pal",
+    * Name = "Default";
 
 // NOTE: 2C02 palette from https://www.nesdev.org/wiki/PPU_palettes
 inline constexpr std::array Default {
@@ -109,6 +112,11 @@ class Palette {
 public:
     Palette() noexcept : colors{getDefault()} {}
 
+    std::string_view name() const noexcept
+    {
+        if (filename.empty()) return palette::Name;
+        return filename.native();
+    }
     bool isDefault() const noexcept
     {
         return std::holds_alternative<palette::datap>(colors);
@@ -117,7 +125,11 @@ public:
     palette::datav getColor(palette::sz idx) const;
 
     void load(const std::filesystem::path& filepath);
-    void unload() noexcept { colors = getDefault(); }
+    void unload() noexcept
+    {
+        colors = getDefault();
+        filename.clear();
+    }
 
 private:
     static constexpr palette::datap getDefault() noexcept
@@ -125,6 +137,7 @@ private:
         return palette::Default.data();
     }
 
+    std::filesystem::path filename;
     std::variant<
         palette::datap,
         std::unique_ptr<const palette::datav[]>

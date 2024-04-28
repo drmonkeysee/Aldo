@@ -1164,7 +1164,8 @@ protected:
     {
         static constexpr auto style = ImGuiTableFlags_Borders
                                         | ImGuiTableFlags_SizingFixedFit;
-        ImGui::TextUnformatted("Default");
+        const auto name = emu.palette().name();
+        ImGui::Text("%.*s", static_cast<int>(name.length()), name.data());
         if (ImGui::BeginTable("palette", Cols, style)) {
             renderHeader();
             renderBody();

@@ -15,6 +15,7 @@
 #include <iterator>
 #include <ranges>
 #include <tuple>
+#include <utility>
 
 namespace
 {
@@ -49,9 +50,10 @@ void aldo::Palette::load(const std::filesystem::path& filepath)
                     " expected %zu bytes, read %zu bytes",
                     buf.size(), f.gcount());
     }
+    auto newColors =
+        std::make_unique<aldo::palette::datav[]>(aldo::palette::Size);
+    aldo::palette::sz idx = 0;
     // TODO: replace this with views::chunk in c++23
-    std::array<aldo::palette::datav, aldo::palette::Size> newColors;
-    decltype(newColors)::size_type idx = 0;
     const auto end = buf.cend();
     for (auto it = buf.cbegin();
          it != end;
@@ -67,4 +69,5 @@ void aldo::Palette::load(const std::filesystem::path& filepath)
         };
         newColors[idx++] = IM_COL32(r, g, b, SDL_ALPHA_OPAQUE);
     }
+    colors = std::move(newColors);
 }

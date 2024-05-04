@@ -13,6 +13,8 @@
 		C80C9E1C277D648F000F2D8B /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
 		C80CCE062930495300664730 /* cycleclock.c in Sources */ = {isa = PBXBuildFile; fileRef = C80CCE052930495300664730 /* cycleclock.c */; };
 		C80CCE0729306D8A00664730 /* cycleclock.c in Sources */ = {isa = PBXBuildFile; fileRef = C80CCE052930495300664730 /* cycleclock.c */; };
+		C81680032BE6EEAB005A7905 /* ppu.c in Sources */ = {isa = PBXBuildFile; fileRef = C81680012BE6EEAB005A7905 /* ppu.c */; };
+		C81680042BE6EEAB005A7905 /* ppu.c in Sources */ = {isa = PBXBuildFile; fileRef = C81680012BE6EEAB005A7905 /* ppu.c */; };
 		C8184D3E25E7496B002B3100 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8184D3D25E7496B002B3100 /* Tests.swift */; };
 		C8184D5325E74B75002B3100 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C8184D5225E74B75002B3100 /* dis.c */; };
 		C8184D7025E750E0002B3100 /* libcinytest.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8184D6F25E750E0002B3100 /* libcinytest.dylib */; };
@@ -229,6 +231,8 @@
 		C80C9E1A277D648F000F2D8B /* debug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
 		C80C9E1B277D648F000F2D8B /* debug.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = debug.c; sourceTree = "<group>"; };
 		C80CCE052930495300664730 /* cycleclock.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cycleclock.c; sourceTree = "<group>"; };
+		C81680002BE6EEAB005A7905 /* ppu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ppu.h; sourceTree = "<group>"; };
+		C81680012BE6EEAB005A7905 /* ppu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ppu.c; sourceTree = "<group>"; };
 		C8184D3B25E7496B002B3100 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8184D3D25E7496B002B3100 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		C8184D3F25E7496B002B3100 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -518,6 +522,8 @@
 				C8C706912751EEBA00B45785 /* mappers.c */,
 				C8C706872751EEBA00B45785 /* nes.h */,
 				C8C706832751EEBA00B45785 /* nes.c */,
+				C81680002BE6EEAB005A7905 /* ppu.h */,
+				C81680012BE6EEAB005A7905 /* ppu.c */,
 				C8C7068B2751EEBA00B45785 /* snapshot.h */,
 				C85CC20827ED6BF30063276D /* snapshot.c */,
 				C8C706BC2751F55C00B45785 /* trace.h */,
@@ -949,6 +955,7 @@
 				C85CC20927ED6BF30063276D /* snapshot.c in Sources */,
 				C80C9E1C277D648F000F2D8B /* debug.c in Sources */,
 				C80CCE062930495300664730 /* cycleclock.c in Sources */,
+				C81680042BE6EEAB005A7905 /* ppu.c in Sources */,
 				C8C706972751EEBA00B45785 /* bytes.c in Sources */,
 				C8C706982751EEBA00B45785 /* mappers.c in Sources */,
 				C8B4664527755790000576EE /* argparse.c in Sources */,
@@ -1021,6 +1028,7 @@
 				C8B88AB429062B1300B7CB23 /* tsutil.c in Sources */,
 				C8B88AA829062ADC00B7CB23 /* bus.c in Sources */,
 				C8B88AB529062B1800B7CB23 /* ui.c in Sources */,
+				C81680032BE6EEAB005A7905 /* ppu.c in Sources */,
 				C8B88AB129062B0600B7CB23 /* nes.c in Sources */,
 				C8B88AB329062B0F00B7CB23 /* trace.c in Sources */,
 				C8B88AAD29062AF500B7CB23 /* decode.c in Sources */,

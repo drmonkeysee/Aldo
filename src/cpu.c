@@ -920,7 +920,7 @@ static void ARR_exec(struct mos6502 *self, struct decoded dec)
     //      setting carry to held value from ADD/ADC step
     const uint8_t and_result = self->a & self->databus;
     load_register(self, &self->a, and_result);
-    self->p.v = (self->a >> 7) ^ ((self->a >> 6) & 0x1);
+    self->p.v = byte_getbit(self->a, 7) ^ byte_getbit(self->a, 6);
     const bool c = self->a & 0x80;
     bitoperation(self, dec, BIT_RIGHT, (uint8_t)(self->p.c << 7));
     self->p.c = c;

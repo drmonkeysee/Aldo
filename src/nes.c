@@ -10,6 +10,7 @@
 #include "bus.h"
 #include "bytes.h"
 #include "cpu.h"
+#include "ppu.h"
 #include "trace.h"
 
 #include <assert.h>
@@ -24,8 +25,10 @@ struct nes_console {
     debugctx *dbg;              // Debugger Context; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
+    struct rp2c02 ppu;          // RP2C02 PPU
     enum csig_excmode mode;     // NES execution mode
-    uint8_t ram[MEMBLOCK_2KB];  // CPU Internal RAM
+    uint8_t ram[MEMBLOCK_2KB],  // CPU Internal RAM
+            vram[MEMBLOCK_2KB]; // PPU Internal RAM
 };
 
 static bool ram_read(const void *restrict ctx, uint16_t addr,

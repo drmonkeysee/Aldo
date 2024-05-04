@@ -313,7 +313,7 @@ static void drawflags(const struct view *v, const struct emulator *emu,
     mvwaddstr(v->content, (*cursor_y)++, cursor_x, "N V - B D I Z C");
     for (size_t i = sizeof emu->snapshot.cpu.status * 8; i > 0; --i) {
         mvwprintw(v->content, *cursor_y, cursor_x, "%u",
-                  (emu->snapshot.cpu.status >> (i - 1)) & 1);
+                  byte_getbit(emu->snapshot.cpu.status, i - 1));
         cursor_x += 2;
     }
 }

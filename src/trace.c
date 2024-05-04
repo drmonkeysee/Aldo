@@ -7,6 +7,7 @@
 
 #include "trace.h"
 
+#include "bytes.h"
 #include "dis.h"
 
 #include <assert.h>
@@ -57,7 +58,7 @@ static void trace_registers(FILE *tracelog,
             snapshot->cpu.yindex, snapshot->cpu.status);
     for (size_t i = sizeof snapshot->cpu.status * 8; i > 0; --i) {
         const size_t idx = i - 1;
-        const bool bit = (snapshot->cpu.status >> idx) & 1;
+        const bool bit = byte_getbit(snapshot->cpu.status, idx);
         fputc(flags[(idx * 2) + bit], tracelog);
     }
     fprintf(tracelog, ") S:%02X", snapshot->cpu.stack_pointer);

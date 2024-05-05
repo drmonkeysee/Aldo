@@ -5,17 +5,45 @@
 //  Created by Brandon Stansbury on 5/4/24.
 //
 
+#include "bus.h"
 #include "ciny.h"
 #include "ppu.h"
 
+#include <stdint.h>
+#include <stdlib.h>
+
+#define get_ppu(ctx) &((struct test_context *)(ctx))->ppu
+
+static uint8_t VRam[256] = {0};
+
+struct test_context {
+    struct rp2c02 ppu;
+    bus *mbus;
+};
+
+static void setup(void **ctx)
+{
+    struct test_context *const c = malloc(sizeof *c);
+    c->mbus = bus_new(1, 1);
+    ppu_connect(&c->ppu, VRam, c->mbus);
+    ppu_powerup(&c->ppu);
+    *ctx = c;
+}
+
+static void teardown(void **ctx)
+{
+    struct test_context *const c = (struct test_context *)*ctx;
+    ppu_disconnect(&c->ppu);
+    bus_free(c->mbus);
+    free(c);
+}
+
 static void powerup_initializes_ppu(void *ctx)
 {
-    struct rp2c02 ppu;
+    const struct rp2c02 *const ppu = get_ppu(ctx);
 
-    ppu_powerup(&ppu);
-
-    ct_assertfalse(ppu.odd);
-    ct_assertfalse(ppu.w);
+    ct_assertfalse(ppu->odd);
+    ct_assertfalse(ppu->w);
 }
 
 //
@@ -28,5 +56,5 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(powerup_initializes_ppu),
     };
 
-    return ct_makesuite(tests);
+    return ct_makesuite_setup_teardown(tests, setup, teardown);
 }

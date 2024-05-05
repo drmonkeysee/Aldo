@@ -36,7 +36,8 @@ struct ct_testsuite argparse_tests(void),
                     debug_tests(void),
                     dis_tests(void),
                     dis_peek_tests(void),
-                    haltexpr_tests(void);
+                    haltexpr_tests(void),
+                    ppu_tests(void);
 
 static size_t testrunner(int argc, char *argv[argc+1])
 {
@@ -61,6 +62,7 @@ static size_t testrunner(int argc, char *argv[argc+1])
         dis_tests(),
         dis_peek_tests(),
         haltexpr_tests(),
+        ppu_tests(),
     };
     setup_testbus();
     const size_t result = ct_run_withargs(suites, argc, argv);

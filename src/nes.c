@@ -158,6 +158,7 @@ void nes_powerup(nes *self, cart *c, bool zeroram)
         memset(self->ram, 0, sizeof self->ram / sizeof self->ram[0]);
     }
     cpu_powerup(&self->cpu);
+    ppu_powerup(&self->ppu);
 }
 
 void nes_powerdown(nes *self)

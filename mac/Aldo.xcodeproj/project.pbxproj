@@ -15,6 +15,8 @@
 		C80CCE0729306D8A00664730 /* cycleclock.c in Sources */ = {isa = PBXBuildFile; fileRef = C80CCE052930495300664730 /* cycleclock.c */; };
 		C81680032BE6EEAB005A7905 /* ppu.c in Sources */ = {isa = PBXBuildFile; fileRef = C81680012BE6EEAB005A7905 /* ppu.c */; };
 		C81680042BE6EEAB005A7905 /* ppu.c in Sources */ = {isa = PBXBuildFile; fileRef = C81680012BE6EEAB005A7905 /* ppu.c */; };
+		C81680072BE70556005A7905 /* ppu.c in Sources */ = {isa = PBXBuildFile; fileRef = C81680062BE70556005A7905 /* ppu.c */; };
+		C81680082BE70626005A7905 /* ppu.c in Sources */ = {isa = PBXBuildFile; fileRef = C81680012BE6EEAB005A7905 /* ppu.c */; };
 		C8184D3E25E7496B002B3100 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8184D3D25E7496B002B3100 /* Tests.swift */; };
 		C8184D5325E74B75002B3100 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C8184D5225E74B75002B3100 /* dis.c */; };
 		C8184D7025E750E0002B3100 /* libcinytest.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8184D6F25E750E0002B3100 /* libcinytest.dylib */; };
@@ -233,6 +235,7 @@
 		C80CCE052930495300664730 /* cycleclock.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cycleclock.c; sourceTree = "<group>"; };
 		C81680002BE6EEAB005A7905 /* ppu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ppu.h; sourceTree = "<group>"; };
 		C81680012BE6EEAB005A7905 /* ppu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ppu.c; sourceTree = "<group>"; };
+		C81680062BE70556005A7905 /* ppu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ppu.c; sourceTree = "<group>"; };
 		C8184D3B25E7496B002B3100 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8184D3D25E7496B002B3100 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		C8184D3F25E7496B002B3100 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -465,6 +468,7 @@
 				C8184D5225E74B75002B3100 /* dis.c */,
 				C8702CF8278A58C900725690 /* haltexpr.c */,
 				C8184D5025E74AC5002B3100 /* main.c */,
+				C81680062BE70556005A7905 /* ppu.c */,
 			);
 			name = test;
 			path = ../test;
@@ -906,6 +910,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C81680082BE70626005A7905 /* ppu.c in Sources */,
 				C8C706B92751F0C700B45785 /* cpu.c in Sources */,
 				C8C706AE2751EF8D00B45785 /* bus.c in Sources */,
 				C8C706B42751EF8D00B45785 /* cpuinterrupt.c in Sources */,
@@ -917,6 +922,7 @@
 				C8C706AB2751EF8D00B45785 /* cpuindirect.c in Sources */,
 				C8184D3E25E7496B002B3100 /* Tests.swift in Sources */,
 				C8702CF9278A58C900725690 /* haltexpr.c in Sources */,
+				C81680072BE70556005A7905 /* ppu.c in Sources */,
 				C8C706B62751F0BA00B45785 /* bus.c in Sources */,
 				C8C706B12751EF8D00B45785 /* cpuimplied.c in Sources */,
 				C8C706A82751EF8D00B45785 /* bytes.c in Sources */,

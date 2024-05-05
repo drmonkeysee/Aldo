@@ -15,6 +15,7 @@ static void powerup_initializes_ppu(void *ctx)
     ppu_powerup(&ppu);
 
     ct_assertfalse(ppu.odd);
+    ct_assertfalse(ppu.w);
 }
 
 //

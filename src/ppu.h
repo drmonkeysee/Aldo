@@ -24,8 +24,9 @@ struct rp2c02 {
                                 // Non-owning Pointer.
 
     // Internal Registers
-    bool odd;                   // Current frame is even or odd,
-                                // measured from last reset.
+    bool
+        odd,                    // Current frame is even or odd
+        w;                      // Write latch for x2 registers
 
     // Internal Memory
     uint8_t oam[MEMBLOCK_256B], // Object Attribute Memory: internal storage

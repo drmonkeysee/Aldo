@@ -18,5 +18,5 @@ void ppu_powerup(struct rp2c02 *self)
 {
     assert(self != NULL);
 
-    self->odd = false;
+    self->odd = self->w = false;
 }

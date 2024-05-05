@@ -63,7 +63,8 @@ static void create_mbus(struct nes_console *self)
 static void connect_cart(struct nes_console *self, cart *c)
 {
     self->cart = c;
-    cart_mbus_connect(self->cart, self->cpu.mbus, MEMBLOCK_32KB);
+    const int r = cart_mbus_connect(self->cart, self->cpu.mbus, MEMBLOCK_32KB);
+    assert(r == 0);
     debug_sync_bus(self->dbg);
 }
 

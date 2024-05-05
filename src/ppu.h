@@ -18,10 +18,8 @@
 // fixed-function IC that generates the NES video signal.
 struct rp2c02 {
     // Buses
-    bus *mbus,                  // Main Bus: connected to the CPU;
-                                // Non-owning Pointer.
-        *vbus;                  // Video Bus: video component connections;
-                                // Non-owning Pointer.
+    bus *mbus,                  // Main Bus: to/from CPU; Non-owning Pointer
+        *vbus;                  // Video Bus: video component connections
 
     // Internal Registers
     bool
@@ -36,6 +34,10 @@ struct rp2c02 {
 };
 
 #include "bridgeopen.h"
+void ppu_connect(struct rp2c02 *self, void *restrict vram,
+                 bus *mbus) br_nothrow;
+void ppu_disconnect(struct rp2c02 *self) br_nothrow;
+
 void ppu_powerup(struct rp2c02 *self) br_nothrow;
 #include "bridgeclose.h"
 

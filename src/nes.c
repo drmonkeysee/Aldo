@@ -60,6 +60,16 @@ static void create_mbus(struct nes_console *self)
     debug_cpu_connect(self->dbg, &self->cpu);
 }
 
+static void connect_ppu(struct nes_console *self)
+{
+    ppu_connect(&self->ppu, self->vram, self->cpu.mbus);
+}
+
+static void disconnect_ppu(struct nes_console *self)
+{
+    ppu_disconnect(&self->ppu);
+}
+
 static void connect_cart(struct nes_console *self, cart *c)
 {
     self->cart = c;
@@ -133,6 +143,7 @@ nes *nes_new(debugctx *dbg, bool bcdsupport, FILE *tracelog)
     // TODO: ditch this option when aldo can emulate more than just NES
     self->cpu.bcd = bcdsupport;
     create_mbus(self);
+    connect_ppu(self);
     return self;
 }
 
@@ -141,6 +152,7 @@ void nes_free(nes *self)
     assert(self != NULL);
 
     disconnect_cart(self);
+    disconnect_ppu(self);
     free_mbus(self);
     free(self);
 }

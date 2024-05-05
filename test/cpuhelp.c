@@ -72,17 +72,17 @@ void teardown_testbus(void)
 void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
                uint8_t *restrict rom)
 {
-    cpu_powerup(cpu);
-    cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bcd =
-        cpu->bflt = cpu->detached = false;
-    cpu->p.i = cpu->signal.rdy = cpu->presync = true;
-    cpu->res = CSGS_CLEAR;
     cpu->mbus = TestBus;
     Ram.ctx = ram;
     bus_set(TestBus, 0x0, ram ? Ram : (struct busdevice){0});
     Rom.ctx = rom;
     bus_set(TestBus, MEMBLOCK_32KB, rom ? Rom : (struct busdevice){0});
     RomWriteCapture = -1;
+    cpu_powerup(cpu);
+    cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bcd =
+        cpu->bflt = cpu->detached = false;
+    cpu->p.i = cpu->signal.rdy = cpu->presync = true;
+    cpu->res = CSGS_CLEAR;
 }
 
 void enable_rom_wcapture(void)

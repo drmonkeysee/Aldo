@@ -34,16 +34,12 @@ static void attach(struct mos6502 *self)
 
 static void read(struct mos6502 *self)
 {
-    assert(self->mbus != NULL);
-
     self->signal.rw = true;
     self->bflt = !bus_read(self->mbus, self->addrbus, &self->databus);
 }
 
 static void write(struct mos6502 *self)
 {
-    assert(self->mbus != NULL);
-
     if (self->detached) {
         read(self);
     } else {
@@ -1660,6 +1656,7 @@ const int MaxTCycle = 8;
 void cpu_powerup(struct mos6502 *self)
 {
     assert(self != NULL);
+    assert(self->mbus != NULL);
 
     // NOTE: Initialize physical lines and control flags to known state
     self->signal.irq = self->signal.nmi = self->signal.res =

@@ -51,7 +51,7 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
                                  dest);
 }
 
-static void create_cpubus(struct nes_console *self)
+static void create_mbus(struct nes_console *self)
 {
     // TODO: 3 partitions only for now, 8KB ram, 32KB rom, nothing in between
     self->cpu.mbus = bus_new(16, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
@@ -63,7 +63,7 @@ static void create_cpubus(struct nes_console *self)
 static void connect_cart(struct nes_console *self, cart *c)
 {
     self->cart = c;
-    cart_cpu_connect(self->cart, self->cpu.mbus, MEMBLOCK_32KB);
+    cart_mbus_connect(self->cart, self->cpu.mbus, MEMBLOCK_32KB);
     debug_sync_bus(self->dbg);
 }
 
@@ -73,11 +73,11 @@ static void disconnect_cart(struct nes_console *self)
     // debugger even if there is no existing cart.
     debug_reset(self->dbg);
     if (!self->cart) return;
-    cart_cpu_disconnect(self->cart, self->cpu.mbus, MEMBLOCK_32KB);
+    cart_mbus_disconnect(self->cart, self->cpu.mbus, MEMBLOCK_32KB);
     self->cart = NULL;
 }
 
-static void free_cpubus(struct nes_console *self)
+static void free_mbus(struct nes_console *self)
 {
     debug_cpu_disconnect(self->dbg);
     bus_free(self->cpu.mbus);
@@ -131,7 +131,7 @@ nes *nes_new(debugctx *dbg, bool bcdsupport, FILE *tracelog)
     self->tracelog = tracelog;
     // TODO: ditch this option when aldo can emulate more than just NES
     self->cpu.bcd = bcdsupport;
-    create_cpubus(self);
+    create_mbus(self);
     return self;
 }
 
@@ -140,7 +140,7 @@ void nes_free(nes *self)
     assert(self != NULL);
 
     disconnect_cart(self);
-    free_cpubus(self);
+    free_mbus(self);
     free(self);
 }
 

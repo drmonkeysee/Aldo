@@ -350,24 +350,24 @@ struct blockview cart_chrblock(cart *self, size_t i)
 // Internal Interface
 //
 
-int cart_cpu_connect(cart *self, bus *b, uint16_t addr)
+int cart_mbus_connect(cart *self, bus *b, uint16_t addr)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
     assert(b != NULL);
 
-    return self->mapper->cpu_connect(self->mapper, b, addr)
+    return self->mapper->mbus_connect(self->mapper, b, addr)
             ? 0
             : CART_ERR_ADDR_UNAVAILABLE;
 }
 
-void cart_cpu_disconnect(cart *self, bus *b, uint16_t addr)
+void cart_mbus_disconnect(cart *self, bus *b, uint16_t addr)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
     assert(b != NULL);
 
-    self->mapper->cpu_disconnect(self->mapper, b, addr);
+    self->mapper->mbus_disconnect(self->mapper, b, addr);
 }
 
 void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)

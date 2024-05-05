@@ -87,7 +87,7 @@ static const uint8_t *raw_prgrom(const struct mapper *self)
     return ((const struct raw_mapper *)self)->rom;
 }
 
-static bool raw_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
+static bool raw_mbus_connect(struct mapper *self, bus *b, uint16_t addr)
 {
     return bus_set(b, addr, (struct busdevice){
         .read = raw_read,
@@ -125,8 +125,8 @@ static const uint8_t *ines_chrrom(const struct mapper *self)
     return ((const struct ines_mapper *)self)->chr;
 }
 
-static bool ines_unimplemented_cpu_connect(struct mapper *self, bus *b,
-                                           uint16_t addr)
+static bool ines_unimplemented_mbus_connect(struct mapper *self, bus *b,
+                                            uint16_t addr)
 {
     (void)self;
     return bus_clear(b, addr);
@@ -159,7 +159,7 @@ static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
                                 BITWIDTH_64KB, count, dest);
 }
 
-static bool ines_000_cpu_connect(struct mapper *self, bus *b, uint16_t addr)
+static bool ines_000_mbus_connect(struct mapper *self, bus *b, uint16_t addr)
 {
     return bus_set(b, addr, (struct busdevice){
         .read = ines_000_read,
@@ -182,8 +182,8 @@ int mapper_raw_create(struct mapper **m, FILE *f)
         .vtable = {
             .dtor = raw_dtor,
             .prgrom = raw_prgrom,
-            .cpu_connect = raw_cpu_connect,
-            .cpu_disconnect = clear_bus_device,
+            .mbus_connect = raw_mbus_connect,
+            .mbus_disconnect = clear_bus_device,
         },
     };
 
@@ -210,7 +210,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
         self = malloc(sizeof(struct ines_000_mapper));
         *self = (struct ines_mapper){
             .vtable = {
-                .cpu_connect = ines_000_cpu_connect,
+                .mbus_connect = ines_000_mbus_connect,
             },
         };
         assert(header->prg_blocks <= 2);
@@ -221,7 +221,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
         self = malloc(sizeof *self);
         *self = (struct ines_mapper){
             .vtable = {
-                .cpu_connect = ines_unimplemented_cpu_connect,
+                .mbus_connect = ines_unimplemented_mbus_connect,
             },
         };
         header->mapper_implemented = false;
@@ -229,7 +229,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     }
     self->vtable.dtor = ines_dtor;
     self->vtable.prgrom = ines_prgrom;
-    self->vtable.cpu_disconnect = clear_bus_device;
+    self->vtable.mbus_disconnect = clear_bus_device;
     if (header->chr_blocks > 0) {
         self->vtable.chrrom = ines_chrrom;
     }

@@ -18,8 +18,8 @@
 struct mapper {
     void (*dtor)(struct mapper *);
     const uint8_t *(*prgrom)(const struct mapper *);
-    bool (*cpu_connect)(struct mapper *, bus *, uint16_t);
-    void (*cpu_disconnect)(const struct mapper *, bus *, uint16_t);
+    bool (*mbus_connect)(struct mapper *, bus *, uint16_t);
+    void (*mbus_disconnect)(const struct mapper *, bus *, uint16_t);
 
     // NOTE: optional protocol
     const uint8_t *(*chrrom)(const struct mapper *);

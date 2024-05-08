@@ -53,8 +53,13 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
 
 static void create_mbus(struct nes_console *self)
 {
-    // TODO: 3 partitions only for now, 8KB ram, 32KB rom, nothing in between
-    self->cpu.mbus = bus_new(16, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
+    // TODO: partitions so far:
+    // * $0000 - $1FFF: 8KB RAM
+    // * $2000 - $3FFF: 8KB PPU registers
+    // * $4000 - $7FFF: unmapped
+    // * $8000 - $FFFF: 32KB Cart
+    self->cpu.mbus = bus_new(BITWIDTH_64KB, 4, MEMBLOCK_8KB, MEMBLOCK_16KB,
+                             MEMBLOCK_32KB);
     bus_set(self->cpu.mbus, 0,
             (struct busdevice){ram_read, ram_write, ram_dma, self->ram});
     debug_cpu_connect(self->dbg, &self->cpu);

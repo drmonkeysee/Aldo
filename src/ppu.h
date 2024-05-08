@@ -21,6 +21,8 @@ struct rp2c02 {
     bus *mbus,                  // Main Bus: to/from CPU; Non-owning Pointer
         *vbus;                  // Video Bus: video component connections
 
+    uint8_t regd;               // Register Data Latch
+
     // Internal Registers
     bool
         odd,                    // Current frame is even or odd

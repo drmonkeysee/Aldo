@@ -57,8 +57,6 @@ static void clear_bus_device(const struct mapper *self, bus *b, uint16_t addr)
 static bool raw_read(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)
 {
-    // TODO: will raw ever ask for < $8000?
-    if (addr < MEMBLOCK_32KB) return false;
     *d = ((const uint8_t *)ctx)[addr & ADDRMASK_32KB];
     return true;
 }
@@ -66,8 +64,6 @@ static bool raw_read(const void *restrict ctx, uint16_t addr,
 static size_t raw_dma(const void *restrict ctx, uint16_t addr, size_t count,
                       uint8_t dest[restrict count])
 {
-    // TODO: will raw ever ask for < $8000?
-    if (addr < MEMBLOCK_32KB) return 0;
     return bytecopy_bank(ctx, BITWIDTH_32KB, addr, count, dest);
 }
 
@@ -139,8 +135,6 @@ static bool ines_unimplemented_mbus_connect(struct mapper *self, bus *b,
 static bool ines_000_read(const void *restrict ctx, uint16_t addr,
                           uint8_t *restrict d)
 {
-    // TODO: no wram support, did 000 ever have wram?
-    if (addr < MEMBLOCK_32KB) return false;
     const struct ines_000_mapper *const m = ctx;
     const uint16_t mask = m->bankcount == 2 ? ADDRMASK_32KB : ADDRMASK_16KB;
     *d = m->super.prg[addr & mask];
@@ -150,8 +144,6 @@ static bool ines_000_read(const void *restrict ctx, uint16_t addr,
 static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
                            size_t count, uint8_t dest[restrict count])
 {
-    // TODO: no wram support, did 000 ever have wram?
-    if (addr < MEMBLOCK_32KB) return 0;
     const struct ines_000_mapper *const m = ctx;
     return m->bankcount == 2
         ? bytecopy_bank(m->super.prg, BITWIDTH_32KB, addr, count, dest)

@@ -78,6 +78,10 @@ static void disconnect_ppu(struct nes_console *self)
 static void connect_cart(struct nes_console *self, cart *c)
 {
     self->cart = c;
+    // TODO: binding to $8000 is too simple; WRAM needs at least $6000, and the
+    // CPU memory map defines start of cart mapping at $4020; the most complex
+    // mappers need access to entire 64KB address space in order to snoop on
+    // all CPU activity. Similar rules hold for PPU.
     const int r = cart_mbus_connect(self->cart, self->cpu.mbus, MEMBLOCK_32KB);
     assert(r == 0);
     debug_sync_bus(self->dbg);

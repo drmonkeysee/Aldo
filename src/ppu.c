@@ -17,16 +17,16 @@
 static bool reg_read(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)
 {
-    if (addr < MEMBLOCK_8KB) return false;
     // TODO: get correct register
+    (void)addr;
     *d = ((struct rp2c02 *)ctx)->regd;
     return true;
 }
 
 static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    if (addr < MEMBLOCK_8KB) return false;
     // TODO: get correct register
+    (void)addr;
     ((struct rp2c02 *)ctx)->regd = d;
     return true;
 }

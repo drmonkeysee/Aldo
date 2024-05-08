@@ -33,12 +33,9 @@ struct rp2c02 {
                                 // 12 background, 12 sprite.
 };
 
-#include "bridgeopen.h"
-void ppu_connect(struct rp2c02 *self, void *restrict vram,
-                 bus *mbus) br_nothrow;
-void ppu_disconnect(struct rp2c02 *self) br_nothrow;
+void ppu_connect(struct rp2c02 *self, void *restrict vram, bus *mbus);
+void ppu_disconnect(struct rp2c02 *self);
 
-void ppu_powerup(struct rp2c02 *self) br_nothrow;
-#include "bridgeclose.h"
+void ppu_powerup(struct rp2c02 *self);
 
 #endif

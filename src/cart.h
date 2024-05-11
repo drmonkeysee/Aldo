@@ -79,10 +79,9 @@ X(CART_ERR_IO, -2, "FILE READ ERROR") \
 X(CART_ERR_IMG_SIZE, -3, "ROM IMAGE TOO LARGE") \
 X(CART_ERR_EOF, -4, "UNEXPECTED EOF") \
 X(CART_ERR_OBSOLETE, -5, "OBSOLETE FORMAT") \
-X(CART_ERR_ADDR_UNAVAILABLE, -6, "BUS ADDRESS UNAVAILABLE") \
-X(CART_ERR_FORMAT, -7, "FORMAT UNSUPPORTED") \
-X(CART_ERR_FMT, -8, "FORMATTED OUTPUT FAILURE") \
-X(CART_ERR_NOCART, -9, "NO CART")
+X(CART_ERR_FORMAT, -6, "FORMAT UNSUPPORTED") \
+X(CART_ERR_FMT, -7, "FORMATTED OUTPUT FAILURE") \
+X(CART_ERR_NOCART, -8, "NO CART")
 
 enum {
 #define X(s, v, e) s = v,
@@ -137,7 +136,7 @@ struct blockview cart_chrblock(cart *self, size_t i) br_nothrow;
 // Internal
 //
 
-int cart_mbus_connect(cart *self, bus *b, uint16_t addr) br_nothrow;
+bool cart_mbus_connect(cart *self, bus *b, uint16_t addr) br_nothrow;
 void cart_mbus_disconnect(cart *self, bus *b, uint16_t addr) br_nothrow;
 
 void cart_write_dis_header(cart *self, const char *br_noalias name,

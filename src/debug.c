@@ -35,7 +35,8 @@ static void remove_reset_override(struct debugger_context *self)
 {
     if (!self->dec.active) return;
 
-    bus_set(self->cpu->mbus, CPU_VECTOR_RES, self->dec.inner);
+    const bool r = bus_set(self->cpu->mbus, CPU_VECTOR_RES, self->dec.inner);
+    assert(r);
     self->dec = (struct resdecorator){0};
 }
 

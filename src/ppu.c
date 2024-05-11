@@ -42,12 +42,12 @@ void ppu_connect(struct rp2c02 *self, void *restrict vram, bus *mbus)
     assert(mbus != NULL);
 
     self->mbus = mbus;
-    bus_set(self->mbus, MEMBLOCK_8KB, (struct busdevice){
+    const bool r = bus_set(self->mbus, MEMBLOCK_8KB, (struct busdevice){
         .read = reg_read,
         .write = reg_write,
         .ctx = self,
     });
-    // TODO: add mbus device
+    assert(r);
     // TODO: partition this properly
     self->vbus = bus_new(BITWIDTH_16KB, 1);
     // TODO: add vbus device

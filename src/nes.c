@@ -18,6 +18,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+// NOTE: NSTC CPU:PPU cycle ratio
+static const int PpuFactor = 3;
+
 // The NES-001 Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
 struct nes_console {
@@ -240,6 +243,9 @@ void nes_cycle(nes *self, struct cycleclock *clock)
 
     while (self->cpu.signal.rdy && clock->budget > 0) {
         const int cycles = cpu_cycle(&self->cpu);
+        for (int i = 0; i < PpuFactor; ++i) {
+            ppu_cycle(&self->ppu);
+        }
         clock->budget -= cycles;
         clock->total_cycles += (uint64_t)cycles;
         instruction_trace(self, clock);

@@ -70,3 +70,10 @@ void ppu_powerup(struct rp2c02 *self)
     self->regd = 0;
     self->odd = self->w = false;
 }
+
+int ppu_cycle(struct rp2c02 *self)
+{
+    assert(self != NULL);
+
+    return 0;
+}

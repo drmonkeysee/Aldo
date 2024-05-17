@@ -149,7 +149,7 @@ $(CLI_TARGET): LDLIBS += -lpanel -lncurses
 else
 $(CLI_TARGET): LDLIBS += -lm -lpanelw -lncursesw
 endif
-$(CLI_TARGET): $(CLI_OBJ) | $(LIB_TARGET)
+$(CLI_TARGET): $(CLI_OBJ) $(LIB_TARGET)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 ifeq ($(OS), Darwin)
@@ -157,7 +157,7 @@ $(GUI_TARGET):
 	$(error Make target not supported on macOS; use Xcode project instead)
 else
 $(GUI_TARGET): LDLIBS += -lSDL2
-$(GUI_TARGET): $(GUI_OBJ) $(IMGUI_OBJ) | $(LIB_TARGET)
+$(GUI_TARGET): $(GUI_OBJ) $(IMGUI_OBJ) $(LIB_TARGET)
 	$(CXX) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 endif
 
@@ -166,7 +166,7 @@ ifneq ($(OS), Darwin)
 $(TESTS_TARGET): LDFLAGS += -L/usr/local/lib -Wl,-rpath,/usr/local/lib
 $(TESTS_TARGET): LDLIBS += -lm
 endif
-$(TESTS_TARGET): $(TEST_OBJ) $(TEST_DEPS) | $(LIB_TARGET)
+$(TESTS_TARGET): $(TEST_OBJ) $(TEST_DEPS) $(LIB_TARGET)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 -include $(DEP_FILES)

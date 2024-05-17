@@ -273,6 +273,7 @@ void nes_snapshot(nes *self, struct console_state *snapshot)
     assert(snapshot != NULL);
 
     cpu_snapshot(&self->cpu, snapshot);
+    ppu_snapshot(&self->ppu, snapshot);
     debug_snapshot(self->dbg, snapshot);
     snapshot->mem.ram = self->ram;
     snapshot->mem.prglength = bus_dma(self->cpu.mbus,

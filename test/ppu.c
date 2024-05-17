@@ -6,6 +6,7 @@
 //
 
 #include "bus.h"
+#include "bytes.h"
 #include "ciny.h"
 #include "ppu.h"
 
@@ -24,7 +25,8 @@ struct test_context {
 static void setup(void **ctx)
 {
     struct test_context *const c = malloc(sizeof *c);
-    c->mbus = bus_new(1, 1);
+    // NOTE: enough main bus to map $2000 - $3FFF for ppu registers
+    c->mbus = bus_new(14, 2, MEMBLOCK_8KB);
     ppu_connect(&c->ppu, VRam, c->mbus);
     ppu_powerup(&c->ppu);
     *ctx = c;

@@ -452,8 +452,13 @@ static void drawcpu(const struct view *v, const struct emulator *emu)
 
 static void drawppu(const struct view *v, const struct emulator *emu)
 {
-    // TODO: implement this
-    (void)v, (void)emu;
+    const int w = getmaxx(v->content);
+    werase(v->content);
+    mvwaddstr(v->content, 0, w / 2, "\u21d1");
+    mvwprintw(v->content, 1, (w / 2) - 1, "%02X",
+              emu->snapshot.ppu.register_databus);
+    mvwprintw(v->content, 4, 0, "Pixel: (%d, %d)", emu->snapshot.ppu.line,
+              emu->snapshot.ppu.dot);
 }
 
 static void drawram(const struct view *v, const struct emulator *emu)

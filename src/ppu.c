@@ -67,7 +67,7 @@ void ppu_powerup(struct rp2c02 *self)
     assert(self->mbus != NULL);
     assert(self->vbus != NULL);
 
-    self->regd = 0;
+    self->dot = self->line = self->regd = 0;
     self->odd = self->w = false;
 }
 
@@ -75,5 +75,26 @@ int ppu_cycle(struct rp2c02 *self)
 {
     assert(self != NULL);
 
-    return 0;
+    // NOTE: a single frame is 262 scanlines of 341 dots,
+    // counting h-blank, v-blank, overscan, etc.
+    static const int dots = 341, lines = 262;
+
+    if (++self->dot >= dots) {
+        self->dot = 0;
+        if (++self->line >= lines) {
+            self->line = 0;
+        }
+    }
+
+    return 1;
+}
+
+void ppu_snapshot(const struct rp2c02 *self, struct console_state *snapshot)
+{
+    assert(self != NULL);
+    assert(snapshot != NULL);
+
+    snapshot->ppu.dot = self->dot;
+    snapshot->ppu.line = self->line;
+    snapshot->ppu.register_databus = self->regd;
 }

@@ -38,6 +38,10 @@ struct console_state {
     struct {
         bool irq, nmi, readwrite, ready, reset, sync;
     } lines;
+    struct {
+        int dot, line;
+        uint8_t register_databus;
+    } ppu;
 };
 
 #include "bridgeopen.h"

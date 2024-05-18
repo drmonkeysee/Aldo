@@ -123,7 +123,7 @@ nestest: $(NESTEST_ROM) debug
 	$(CLI_TARGET) -btvz -H@c66e -Hjam -H3s -rc000 $<
 
 nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
-	diff -y --suppress-common-lines $^ > $(NESTEST_DIFF); \
+	diff -y --suppress-common-lines -W200 $^ > $(NESTEST_DIFF); \
 	DIFF_RESULT=$$?; \
 	echo "$$(wc -l < $(NESTEST_DIFF)) lines differ"; \
 	exit $$DIFF_RESULT
@@ -196,8 +196,8 @@ $(NESTEST_ROM) $(NESTEST_LOG):
 	cd $(TEST_DIR) && curl -O '$(NESTEST_HTTP)/$(@F)'
 
 $(NESTEST_CMP): $(NESTEST_LOG)
-	# NOTE: strip out PPU column (unimplemented) and Accumulator cue (implied)
-	sed -e 's/PPU:.\{3\},.\{3\} //' -e 's/ A /   /' $< > $@
+	# NOTE: strip out Accumulator cue (implied)
+	sed 's/ A /   /' $< > $@
 
 $(TRACE_CMP):
 	# NOTE: convert aldo trace log format to nestest format

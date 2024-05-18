@@ -44,6 +44,13 @@ static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
     return true;
 }
 
+static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
+                      uint8_t dest[restrict count])
+{
+    return bytecopy_bankmirrored(ctx, BITWIDTH_2KB, addr, BITWIDTH_8KB, count,
+                                 dest);
+}
+
 static void create_mbus(struct nes_console *self)
 {
     // TODO: partitions so far:
@@ -54,9 +61,10 @@ static void create_mbus(struct nes_console *self)
     self->cpu.mbus = bus_new(BITWIDTH_64KB, 4, MEMBLOCK_8KB, MEMBLOCK_16KB,
                              MEMBLOCK_32KB);
     const bool r = bus_set(self->cpu.mbus, 0, (struct busdevice){
-        .read = ram_read,
-        .write = ram_write,
-        .ctx = self->ram,
+        ram_read,
+        ram_write,
+        ram_dma,
+        self->ram,
     });
     assert(r);
     debug_cpu_connect(self->dbg, &self->cpu);

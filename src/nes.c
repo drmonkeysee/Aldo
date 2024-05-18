@@ -18,9 +18,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// NOTE: NSTC CPU:PPU cycle ratio
-static const int PpuFactor = 3;
-
 // The NES-001 Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
 struct nes_console {
@@ -128,13 +125,14 @@ static void set_interrupt(struct nes_console *self, enum csig_interrupt signal,
 static void instruction_trace(struct nes_console *self,
                               const struct cycleclock *clock)
 {
-    if (!self->cpu.signal.sync) return;
+    if (!self->tracelog || !self->cpu.signal.sync) return;
 
     struct console_state snapshot;
     nes_snapshot(self, &snapshot);
-    // NOTE: trace the cycle count up to the current instruction so do not
-    // count the just-executed instruction fetch cycle.
-    trace_line(self->tracelog, clock->total_cycles - 1, &self->cpu, self->dbg,
+    // NOTE: trace the cycle/pixel count up to the current instruction so
+    // do NOT count the just-executed instruction fetch cycle.
+    trace_line(self->tracelog, clock->total_cycles - 1,
+               ppu_pixel_trace(&self->ppu, -1), &self->cpu, self->dbg,
                &snapshot);
 }
 
@@ -243,9 +241,7 @@ void nes_cycle(nes *self, struct cycleclock *clock)
 
     while (self->cpu.signal.rdy && clock->budget > 0) {
         const int cycles = cpu_cycle(&self->cpu);
-        for (int i = 0; i < PpuFactor; ++i) {
-            ppu_cycle(&self->ppu);
-        }
+        ppu_cycle(&self->ppu, cycles);
         clock->budget -= cycles;
         clock->total_cycles += (uint64_t)cycles;
         instruction_trace(self, clock);

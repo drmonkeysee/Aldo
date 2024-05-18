@@ -51,6 +51,61 @@ static void powerup_initializes_ppu(void *ctx)
     ct_assertfalse(ppu->w);
 }
 
+static void trace_pixel_no_adjustment(void *ctx)
+{
+    const struct rp2c02 *const ppu = get_ppu(ctx);
+
+    const struct ppu_coord pixel = ppu_pixel_trace(ppu, 0);
+
+    ct_assertequal(0, pixel.dot);
+    ct_assertequal(0, pixel.line);
+}
+
+static void trace_pixel_zero_with_adjustment(void *ctx)
+{
+    const struct rp2c02 *const ppu = get_ppu(ctx);
+
+    const struct ppu_coord pixel = ppu_pixel_trace(ppu, -1);
+
+    ct_assertequal(338, pixel.dot);
+    ct_assertequal(261, pixel.line);
+}
+
+static void trace_pixel(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->dot = 223;
+    ppu->line = 120;
+
+    const struct ppu_coord pixel = ppu_pixel_trace(ppu, -1);
+
+    ct_assertequal(220, pixel.dot);
+    ct_assertequal(120, pixel.line);
+}
+
+static void trace_pixel_at_one_cycle(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->dot = 3;
+
+    const struct ppu_coord pixel = ppu_pixel_trace(ppu, -1);
+
+    ct_assertequal(0, pixel.dot);
+    ct_assertequal(0, pixel.line);
+}
+
+static void trace_pixel_at_line_boundary(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->dot = 1;
+    ppu->line = 120;
+
+    const struct ppu_coord pixel = ppu_pixel_trace(ppu, -1);
+
+    ct_assertequal(339, pixel.dot);
+    ct_assertequal(119, pixel.line);
+}
+
 //
 // Test List
 //
@@ -59,6 +114,11 @@ struct ct_testsuite ppu_tests(void)
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(powerup_initializes_ppu),
+        ct_maketest(trace_pixel_no_adjustment),
+        ct_maketest(trace_pixel_zero_with_adjustment),
+        ct_maketest(trace_pixel),
+        ct_maketest(trace_pixel_at_one_cycle),
+        ct_maketest(trace_pixel_at_line_boundary),
     };
 
     return ct_makesuite_setup_teardown(tests, setup, teardown);

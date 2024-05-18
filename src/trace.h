@@ -10,12 +10,14 @@
 
 #include "cpu.h"
 #include "debug.h"
+#include "ppu.h"
 #include "snapshot.h"
 
 #include <stdint.h>
 #include <stdio.h>
 
-void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu,
-                debugctx *dbg, const struct console_state *snapshot);
+void trace_line(FILE *tracelog, uint64_t cycles, struct ppu_coord pixel,
+                struct mos6502 *cpu, debugctx *dbg,
+                const struct console_state *snapshot);
 
 #endif

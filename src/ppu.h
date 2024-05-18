@@ -40,13 +40,16 @@ struct rp2c02 {
                                 // 12 background, 12 sprite.
 };
 
+struct ppu_coord { int dot, line; };
+
 void ppu_connect(struct rp2c02 *self, void *restrict vram, bus *mbus);
 void ppu_disconnect(struct rp2c02 *self);
 
 void ppu_powerup(struct rp2c02 *self);
 
-int ppu_cycle(struct rp2c02 *self);
+int ppu_cycle(struct rp2c02 *self, int cpu_cycles);
 
 void ppu_snapshot(const struct rp2c02 *self, struct console_state *snapshot);
+struct ppu_coord ppu_pixel_trace(const struct rp2c02 *self, int adjustment);
 
 #endif

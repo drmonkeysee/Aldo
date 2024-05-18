@@ -68,14 +68,14 @@ static void trace_registers(FILE *tracelog,
 // Public Interface
 //
 
-void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu,
-                debugctx *dbg, const struct console_state *snapshot)
+void trace_line(FILE *tracelog, uint64_t cycles, struct ppu_coord pixel,
+                struct mos6502 *cpu, debugctx *dbg,
+                const struct console_state *snapshot)
 {
+    assert(tracelog != NULL);
     assert(cpu != NULL);
     assert(dbg != NULL);
     assert(snapshot != NULL);
-
-    if (!tracelog) return;
 
     // NOTE: does not include leading space in trace_registers
     static const int instw = 47;
@@ -87,5 +87,6 @@ void trace_line(FILE *tracelog, uint64_t cycles, struct mos6502 *cpu,
     assert(written <= instw);
     fprintf(tracelog, "%*s", width, "");
     trace_registers(tracelog, snapshot);
-    fprintf(tracelog, " CPU:%" PRIu64 "\n", cycles);
+    fprintf(tracelog, " PPU:%3d,%3d CPU:%" PRIu64 "\n", pixel.line, pixel.dot,
+            cycles);
 }

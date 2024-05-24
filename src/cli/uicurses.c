@@ -38,8 +38,7 @@
 // this will be enforced by actual vsync when ported to true GUI
 // and is *distinct* from emulator frequency which can be modified by the user.
 static const int
-    Fps = 60, RamColWidth = 3, RamDim = 16, RamPageSize = RamDim * RamDim,
-    RamSheetSize = RamPageSize * 2;
+    Fps = 60, RamColWidth = 3, RamDim = 16, RamPageSize = RamDim * RamDim;
 
 struct viewstate {
     struct runclock {
@@ -693,10 +692,12 @@ int ui_curses_loop(struct emulator *emu)
 {
     assert(emu != NULL);
 
+    static const int sheet_size = RamPageSize * 2;
+
     struct viewstate state = {
         .clock = {.cyclock = {.cycles_per_sec = 4}},
         .running = true,
-        .total_ramsheets = (int)nes_ram_size(emu->console) / RamSheetSize,
+        .total_ramsheets = (int)nes_ram_size(emu->console) / sheet_size,
     };
     struct layout layout;
     init_ui(&layout, state.total_ramsheets);

@@ -37,7 +37,7 @@ CLI_TARGET := $(BUILD_DIR)/$(PRODUCT)c
 GUI_TARGET := $(BUILD_DIR)/$(PRODUCT)gui
 TESTS_TARGET := $(BUILD_DIR)/$(PRODUCT)tests
 
-NESTEST_HTTP := https://raw.githubusercontent.com/christopherpow/nes-test-roms/master/other
+NESTEST_HTTP := https://raw.githubusercontent.com/drmonkeysee/nes-test-roms/master/other
 NESTEST_ROM := $(TEST_DIR)/nestest.nes
 NESTEST_LOG := $(TEST_DIR)/nestest.log
 NESTEST_CMP := $(TEST_DIR)/nestest-cmp.log

@@ -1668,7 +1668,7 @@ void cpu_powerup(struct mos6502 *self)
         self->t = self->opc = self->adl = self->adh = self->adc = 0;
     set_p(self, 0x34);
 
-    // TODO: simulate res held low on startup to engage reset sequence.
+    // TODO: simulate res held low on startup to engage reset sequence
     self->irq = self->nmi = CSGS_CLEAR;
     self->res = CSGS_PENDING;
 }

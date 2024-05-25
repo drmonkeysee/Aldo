@@ -13,6 +13,7 @@
 
 #include "bus.h"
 #include "bytes.h"
+#include "ctrlsignal.h"
 #include "snapshot.h"
 
 // The Ricoh RP2C02 Picture Processing Unit (PPU) is a
@@ -27,6 +28,11 @@ struct rp2c02 {
 
     // Datapath
     uint8_t regd;               // Register Data Latch
+    enum csig_state res;        // RESET detection latch
+
+    struct {
+        bool res: 1;            // Reset Signal (input, inverted)
+    } signal;
 
     // Internal Registers
     bool

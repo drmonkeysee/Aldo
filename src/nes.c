@@ -121,7 +121,7 @@ static void set_interrupt(struct nes_console *self, enum csig_interrupt signal,
         self->cpu.signal.nmi = value;
         break;
     case CSGI_RES:
-        self->cpu.signal.res = value;
+        self->ppu.signal.res = self->cpu.signal.res = value;
         break;
     default:
         assert(((void)"INVALID NES INTERRUPT", false));

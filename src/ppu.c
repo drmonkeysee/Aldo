@@ -40,8 +40,58 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
     return true;
 }
 
+//
+// Internal Operations
+//
+
+static void reset(struct rp2c02 *self)
+{
+    self->dot = self->line = 0;
+    self->odd = self->w = false;
+    // TODO: clear this later when vblank and sprite 0 are cleared
+    // (use SERVICED?)
+    self->res = CSGS_CLEAR;
+}
+
+// NOTE: this follows the same sequence as CPU reset sequence and is checked
+// only on CPU-cycle boundaries rather than each PPU cycle; this keeps the two
+// chips in sync when handling the RESET signal.
+static void handle_reset(struct rp2c02 *self)
+{
+    // NOTE: reset should never be in serviced state
+    assert(self->res != CSGS_SERVICED);
+
+    if (self->res == CSGS_PENDING) {
+        self->res = CSGS_COMMITTED;
+    }
+
+    if (self->signal.res) {
+        if (self->res == CSGS_DETECTED) {
+            self->res = CSGS_CLEAR;
+        } else if (self->res == CSGS_COMMITTED) {
+            // NOTE: reset is committed and signal is no longer pulled low
+            reset(self);
+        }
+    } else {
+        switch (self->res) {
+        case CSGS_CLEAR:
+            self->res = CSGS_DETECTED;
+            break;
+        case CSGS_DETECTED:
+            self->res = CSGS_PENDING;
+            break;
+        default:
+            // NOTE: as long as reset line is held low there is no further
+            // effect on PPU execution.
+            break;
+        }
+    }
+}
+
 static int cycle(struct rp2c02 *self)
 {
+    // TODO: do dot advancement last, leave PPU on next dot to be drawn;
+    // analogous to stack pointer always pointing at next byte to be written.
     if (++self->dot >= Dots) {
         self->dot = 0;
         if (++self->line >= Lines) {
@@ -87,13 +137,22 @@ void ppu_powerup(struct rp2c02 *self)
     assert(self->mbus != NULL);
     assert(self->vbus != NULL);
 
-    self->dot = self->line = self->regd = 0;
-    self->odd = self->w = false;
+    self->signal.res = true;
+
+    // NOTE: initialize ppu to known startup state; anything affected by the
+    // reset sequence is deferred until that phase.
+    self->regd = 0;
+
+    // NOTE: simulate res set on startup to engage reset sequence
+    self->res = CSGS_PENDING;
 }
 
 int ppu_cycle(struct rp2c02 *self, int cpu_cycles)
 {
     assert(self != NULL);
+
+    // NOTE: for simplicity, handle RESET signal on CPU cycle boundaries
+    handle_reset(self);
 
     const int total = cpu_cycles * CycleRatio;
     int cycles = 0;

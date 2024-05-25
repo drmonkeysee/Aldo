@@ -1658,7 +1658,7 @@ void cpu_powerup(struct mos6502 *self)
     assert(self != NULL);
     assert(self->mbus != NULL);
 
-    // NOTE: Initialize physical lines and control flags to known state
+    // NOTE: initialize physical lines and control flags to known state
     self->signal.irq = self->signal.nmi = self->signal.res =
         self->signal.rw = self->detached = true;
     self->signal.rdy = self->signal.sync = self->bflt = self->presync = false;

@@ -137,10 +137,11 @@ void ppu_powerup(struct rp2c02 *self)
     assert(self->mbus != NULL);
     assert(self->vbus != NULL);
 
+    // NOTE: initialize physical lines to known state
     self->signal.res = true;
 
-    // NOTE: initialize ppu to known startup state; anything affected by the
-    // reset sequence is deferred until that phase.
+    // NOTE: initialize ppu to known state; anything affected by the reset
+    // sequence is deferred until that phase.
     self->regd = 0;
 
     // NOTE: simulate res set on startup to engage reset sequence

@@ -45,13 +45,13 @@ static void powerup_initializes_ppu(void *ctx)
 {
     const struct rp2c02 *const ppu = get_ppu(ctx);
 
-    ct_assertequal(0, ppu->dot);
-    ct_assertequal(0, ppu->line);
-    ct_assertequal(0u, ppu->regd);
     ct_assertequal(CSGS_PENDING, (int)ppu->res);
+    ct_assertequal(0u, ppu->signal.reg);
+    ct_assertequal(0u, ppu->ppuaddr);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_asserttrue(ppu->signal.intr);
     ct_asserttrue(ppu->signal.res);
-    ct_assertfalse(ppu->odd);
-    ct_assertfalse(ppu->w);
+    ct_assertfalse(ppu->ppustatus.s);
 }
 
 static void trace_pixel_no_adjustment(void *ctx)

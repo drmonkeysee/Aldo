@@ -42,8 +42,8 @@ struct rp2c02 {
             g: 1,               // Greyscale
             bm: 1,              // Background Left-Column Enabled
             sm: 1,              // Sprite Left-Column Enabled
-            b: 1,               // Background Rendering Enabled
-            s: 1;               // Sprite Rendering Enabled
+            b: 1,               // Background Rendering
+            s: 1;               // Sprite Rendering
         unsigned int bgr: 3;    // Blue/Green/Red Emphasis
     } ppumask;                  // PPUMASK, write-only
     struct {
@@ -77,7 +77,7 @@ struct rp2c02 {
         unsigned int reg: 3;    // Register Select Signal;
                                 // wired to lowest 3 bits of CPU address bus
         bool
-            inr: 1,             // Interrupt Signal (output, inverted);
+            intr: 1,            // Interrupt Signal (output, inverted);
                                 // wired to CPU NMI.
             res: 1;             // Reset Signal (input, inverted)
     } signal;

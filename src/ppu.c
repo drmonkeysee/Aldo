@@ -16,7 +16,7 @@
 // average cycle count of 89341.5 per frame.
 static const int
     Dots = 341, Lines = 262,
-// NOTE: NTSC CPU:PPU cycle ratio
+// NOTE: NTSC PPU:CPU cycle ratio
     CycleRatio = 3;
 
 //
@@ -46,28 +46,31 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
 
 static void set_ctrl(struct rp2c02 *self, uint8_t v)
 {
-    self->ppuctrl.nn = v & 0x3;
-    self->ppuctrl.i = v & 0x4;
-    self->ppuctrl.s = v & 0x8;
-    self->ppuctrl.b = v & 0x10;
-    self->ppuctrl.h = v & 0x20;
-    self->ppuctrl.p = v & 0x40;
-    self->ppuctrl.v = v & 0x80;
+    self->ctrl.nl = v & 0x1;
+    self->ctrl.nh = v & 0x2;
+    self->ctrl.i = v & 0x4;
+    self->ctrl.s = v & 0x8;
+    self->ctrl.b = v & 0x10;
+    self->ctrl.h = v & 0x20;
+    self->ctrl.p = v & 0x40;
+    self->ctrl.v = v & 0x80;
 }
 
 static void set_mask(struct rp2c02 *self, uint8_t v)
 {
-    self->ppumask.g = v & 0x1;
-    self->ppumask.bm = v & 0x2;
-    self->ppumask.sm = v & 0x4;
-    self->ppumask.b = v & 0x8;
-    self->ppumask.s = v & 0x10;
-    self->ppumask.bgr = v & 0xe0;
+    self->mask.g = v & 0x1;
+    self->mask.bm = v & 0x2;
+    self->mask.sm = v & 0x4;
+    self->mask.b = v & 0x8;
+    self->mask.s = v & 0x10;
+    self->mask.re = v & 0x20;
+    self->mask.ge = v & 0x40;
+    self->mask.be = v & 0x80;
 }
 
 static void reset(struct rp2c02 *self)
 {
-    self->dot = self->line = self->ppuscroll = self->rbuf = 0;
+    self->dot = self->line = self->scroll = self->rbuf = 0;
     self->odd = self->w = false;
     set_ctrl(self, 0);
     set_mask(self, 0);
@@ -162,9 +165,9 @@ void ppu_powerup(struct rp2c02 *self)
 
     // NOTE: initialize ppu to known state; anything affected by the reset
     // sequence is deferred until that phase.
-    self->signal.reg = self->oamaddr = self->ppuaddr = 0;
+    self->signal.reg = self->oamaddr = self->addr = 0;
     self->signal.intr = self->signal.res = true;
-    self->ppustatus.s = false;
+    self->status.s = false;
 
     // NOTE: simulate res set on startup to engage reset sequence
     self->res = CSGS_PENDING;

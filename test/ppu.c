@@ -47,11 +47,11 @@ static void powerup_initializes_ppu(void *ctx)
 
     ct_assertequal(CSGS_PENDING, (int)ppu->res);
     ct_assertequal(0u, ppu->signal.reg);
-    ct_assertequal(0u, ppu->ppuaddr);
+    ct_assertequal(0u, ppu->addr);
     ct_assertequal(0u, ppu->oamaddr);
     ct_asserttrue(ppu->signal.intr);
     ct_asserttrue(ppu->signal.res);
-    ct_assertfalse(ppu->ppustatus.s);
+    ct_assertfalse(ppu->status.s);
 }
 
 static void trace_pixel_no_adjustment(void *ctx)

@@ -72,11 +72,11 @@ struct rp2c02 {
     int dot,                    // Current Dot
         line;                   // Current Scanline
     struct {
-        uint8_t reg;            // Register Select Signal;
+        unsigned int reg: 3;    // Register Select Signal;
         bool                    // wired to lowest 3 bits of CPU address bus.
-            intr,               // Interrupt Signal (output, inverted);
+            intr: 1,            // Interrupt Signal (output, inverted);
                                 // wired to CPU NMI.
-            res;                // Reset Signal (input, inverted)
+            res: 1;             // Reset Signal (input, inverted)
     } signal;
     uint16_t vaddrbus;          // VRAM Address Bus (14 bits)
     uint8_t regbus,             // Register Data Bus

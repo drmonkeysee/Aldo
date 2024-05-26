@@ -87,10 +87,10 @@ struct rp2c02 {
     uint16_t
         t,                      // Temp VRAM Address (15 bits)
         v;                      // Current VRAM Address (15 bits)
-    uint8_t rbuf,               // PPUDATA Read Buffer
+    uint8_t cyr,                // PPU:CPU Cycle Ratio; 3 = live, 1 = debug
+            rbuf,               // PPUDATA Read Buffer
             x;                  // Fine X Scroll (3 bits)
     bool
-        cyr,                    // Enable PPU:CPU Cycle Ratio Multiplier
         odd,                    // Current frame is even or odd
         w;                      // Write latch for x2 registers
 

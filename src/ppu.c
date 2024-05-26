@@ -14,10 +14,7 @@
 // v-blank, overscan, etc; nominally 1 frame is 262 * 341 = 89342 ppu cycles;
 // however with rendering enabled the odd frames skip a dot for an overall
 // average cycle count of 89341.5 per frame.
-static const int
-    Dots = 341, Lines = 262,
-// NOTE: NTSC PPU:CPU cycle ratio
-    CycleRatio = 3;
+static const int Dots = 341, Lines = 262;
 
 //
 // Main Bus Device (PPU registers)
@@ -163,6 +160,9 @@ void ppu_powerup(struct rp2c02 *self)
     assert(self->mbus != NULL);
     assert(self->vbus != NULL);
 
+    // NOTE: NTSC PPU:CPU cycle ratio
+    self->cyr = 3;
+
     // NOTE: initialize ppu to known state; anything affected by the reset
     // sequence is deferred until that phase.
     self->signal.reg = self->oamaddr = self->addr = 0;
@@ -173,15 +173,15 @@ void ppu_powerup(struct rp2c02 *self)
     self->res = CSGS_PENDING;
 }
 
-int ppu_cycle(struct rp2c02 *self, int cpu_cycles)
+int ppu_cycle(struct rp2c02 *self, int cycles)
 {
     assert(self != NULL);
 
     // NOTE: for simplicity, handle RESET signal on CPU cycle boundaries
     handle_reset(self);
 
-    const int total = cpu_cycles * CycleRatio;
-    int cycles = 0;
+    const int total = cycles * self->cyr;
+    cycles = 0;
     for (int i = 0; i < total; ++i, cycles += cycle(self));
     return cycles;
 }
@@ -199,7 +199,7 @@ void ppu_snapshot(const struct rp2c02 *self, struct console_state *snapshot)
 struct ppu_coord ppu_pixel_trace(const struct rp2c02 *self, int adjustment)
 {
     struct ppu_coord pixel = {
-        self->dot + (adjustment * CycleRatio),
+        self->dot + (adjustment * self->cyr),
         self->line,
     };
     if (pixel.dot < 0) {

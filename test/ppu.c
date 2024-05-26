@@ -45,6 +45,7 @@ static void powerup_initializes_ppu(void *ctx)
 {
     const struct rp2c02 *const ppu = get_ppu(ctx);
 
+    ct_assertequal(3u, ppu->cyr);
     ct_assertequal(CSGS_PENDING, (int)ppu->res);
     ct_assertequal(0u, ppu->signal.reg);
     ct_assertequal(0u, ppu->addr);

@@ -28,7 +28,7 @@ static bool reg_read(const void *restrict ctx, uint16_t addr,
 {
     // TODO: get correct register
     (void)addr;
-    *d = ((struct rp2c02 *)ctx)->regd;
+    *d = ((struct rp2c02 *)ctx)->regbus;
     return true;
 }
 
@@ -36,7 +36,7 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
 {
     // TODO: get correct register
     (void)addr;
-    ((struct rp2c02 *)ctx)->regd = d;
+    ((struct rp2c02 *)ctx)->regbus = d;
     return true;
 }
 
@@ -142,7 +142,7 @@ void ppu_powerup(struct rp2c02 *self)
 
     // NOTE: initialize ppu to known state; anything affected by the reset
     // sequence is deferred until that phase.
-    self->regd = 0;
+    self->regbus = 0;
 
     // NOTE: simulate res set on startup to engage reset sequence
     self->res = CSGS_PENDING;
@@ -168,7 +168,7 @@ void ppu_snapshot(const struct rp2c02 *self, struct console_state *snapshot)
 
     snapshot->ppu.dot = self->dot;
     snapshot->ppu.line = self->line;
-    snapshot->ppu.register_databus = self->regd;
+    snapshot->ppu.register_databus = self->regbus;
 }
 
 struct ppu_coord ppu_pixel_trace(const struct rp2c02 *self, int adjustment)

@@ -67,7 +67,7 @@ static void set_mask(struct rp2c02 *self, uint8_t v)
 
 static void reset(struct rp2c02 *self)
 {
-    self->dot = self->line = self->scroll = self->rbuf = 0;
+    self->dot = self->line = self->scroll = self->dbuf = 0;
     self->odd = self->w = false;
     set_ctrl(self, 0);
     set_mask(self, 0);

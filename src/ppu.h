@@ -69,22 +69,29 @@ struct rp2c02 {
                                 // must be read twice to prime read-buffer.
     // Datapath
     enum csig_state res;        // RESET detection latch
-    int dot,                    // Current Dot
-        line;                   // Current Scanline
-    struct {
-        unsigned int reg: 3;    // Register Select Signal;
-        bool                    // wired to lowest 3 bits of CPU address bus.
+    uint16_t vaddrbus;          // VRAM Address Bus (14 bits)
+    uint8_t regsel,             // Register Selection (3 bits);
+                                // wired to lowest 3 bits of CPU address bus.
+            regbus,             // Register Data Bus
+            vdatabus;           // VRAM Data Bus (actually shared with lower
+    struct {                    // 8-bits of vaddrbus but this is not modeled
+        bool                    // to avoid storing an extra latch).
             intr: 1,            // Interrupt Signal (output, inverted);
                                 // wired to CPU NMI.
-            res: 1;             // Reset Signal (input, inverted)
+            res: 1,             // Reset Signal (input, inverted)
+            rw: 1,              // CPU Read/Write (input, read high)
+            vr: 1,              // VRAM Read (output, inverted)
+            vw: 1,              // VRAM Write (output, inverted); not signaled
+                                // for palette writes.
+            vout: 1;            // Video Out (output); actual pin is tied to
+                                // analog video output but used here to show
+                                // when PPU is outputting a visible pixel.
     } signal;
-    uint16_t vaddrbus;          // VRAM Address Bus (14 bits)
-    uint8_t regbus,             // Register Data Bus
-            vdatabus;           // VRAM Data Bus (actually shared with lower
-                                // 8-bits of vaddrbus but this is not modeled
-                                // to avoid storing an extra latch).
+
     // Internal Registers and Control Flags
     uint16_t
+        dot,                    // Current Dot
+        line,                   // Current Scanline
         t,                      // Temp VRAM Address (15 bits)
         v;                      // Current VRAM Address (15 bits)
     uint8_t cyr,                // PPU:CPU Cycle Ratio; 3 = live, 1 = debug

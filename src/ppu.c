@@ -68,7 +68,8 @@ static void set_mask(struct rp2c02 *self, uint8_t v)
 static void reset(struct rp2c02 *self)
 {
     self->dot = self->line = self->scroll = self->dbuf = 0;
-    self->odd = self->w = false;
+    self->signal.intr = true;
+    self->signal.vout = self->odd = self->w = false;
     set_ctrl(self, 0);
     set_mask(self, 0);
     // TODO: clear this later when vblank and sprite 0 are cleared
@@ -165,8 +166,9 @@ void ppu_powerup(struct rp2c02 *self)
 
     // NOTE: initialize ppu to known state; anything affected by the reset
     // sequence is deferred until that phase.
-    self->signal.reg = self->oamaddr = self->addr = 0;
-    self->signal.intr = self->signal.res = true;
+    self->regsel = self->oamaddr = self->addr = 0;
+    self->signal.res = self->signal.rw = self->signal.vr =
+        self->signal.vw = true;
     self->status.s = false;
 
     // NOTE: simulate res set on startup to engage reset sequence

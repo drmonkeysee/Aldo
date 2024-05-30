@@ -47,11 +47,13 @@ static void powerup_initializes_ppu(void *ctx)
 
     ct_assertequal(3u, ppu->cyr);
     ct_assertequal(CSGS_PENDING, (int)ppu->res);
-    ct_assertequal(0u, ppu->signal.reg);
+    ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->addr);
     ct_assertequal(0u, ppu->oamaddr);
-    ct_asserttrue(ppu->signal.intr);
     ct_asserttrue(ppu->signal.res);
+    ct_asserttrue(ppu->signal.rw);
+    ct_asserttrue(ppu->signal.vr);
+    ct_asserttrue(ppu->signal.vw);
     ct_assertfalse(ppu->status.s);
 }
 

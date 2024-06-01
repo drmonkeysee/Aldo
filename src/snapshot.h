@@ -32,16 +32,24 @@ struct console_state {
         bool busfault, instdone, jammed;
     } datapath;
     struct {
+        enum csig_state res;
+        uint16_t addressbus, curraddr, tempaddr, dot, line;
+        uint8_t databus, readbuffer, register_databus, register_select, xfine;
+        bool oddframe, writelatch;
+    } pdatapath;
+    struct {
         uint16_t program_counter;
         uint8_t accumulator, stack_pointer, status, xindex, yindex;
     } cpu;
     struct {
+        uint8_t addr, ctrl, data, mask, oamaddr, oamdata, scroll, status;
+    } ppu;
+    struct {
         bool irq, nmi, readwrite, ready, reset, sync;
     } lines;
     struct {
-        int dot, line;
-        uint8_t register_databus;
-    } ppu;
+        bool cpu_readwrite, interrupt, read, reset, video_out, write;
+    } plines;
 };
 
 #include "bridgeopen.h"

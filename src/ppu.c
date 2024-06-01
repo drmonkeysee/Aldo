@@ -41,6 +41,19 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
 // Internal Operations
 //
 
+static uint8_t get_ctrl(const struct rp2c02 *self)
+{
+    return (uint8_t)
+        (self->ctrl.nl
+         | self->ctrl.nh << 1
+         | self->ctrl.i << 2
+         | self->ctrl.s << 3
+         | self->ctrl.b << 4
+         | self->ctrl.h << 5
+         | self->ctrl.p << 6
+         | self->ctrl.v << 7);
+}
+
 static void set_ctrl(struct rp2c02 *self, uint8_t v)
 {
     self->ctrl.nl = v & 0x1;
@@ -51,6 +64,19 @@ static void set_ctrl(struct rp2c02 *self, uint8_t v)
     self->ctrl.h = v & 0x20;
     self->ctrl.p = v & 0x40;
     self->ctrl.v = v & 0x80;
+}
+
+static uint8_t get_mask(const struct rp2c02 *self)
+{
+    return (uint8_t)
+        (self->mask.g
+         | self->mask.bm << 1
+         | self->mask.sm << 2
+         | self->mask.b << 3
+         | self->mask.s << 4
+         | self->mask.re << 5
+         | self->mask.ge << 6
+         | self->mask.be << 7);
 }
 
 static void set_mask(struct rp2c02 *self, uint8_t v)
@@ -65,9 +91,15 @@ static void set_mask(struct rp2c02 *self, uint8_t v)
     self->mask.be = v & 0x80;
 }
 
+static uint8_t get_status(const struct rp2c02 *self)
+{
+    return (uint8_t)
+        (self->status.o << 5 | self->status.s << 6 | self->status.v << 7);
+}
+
 static void reset(struct rp2c02 *self)
 {
-    self->dot = self->line = self->scroll = self->dbuf = 0;
+    self->dot = self->line = self->scroll = self->rbuf = 0;
     self->signal.intr = true;
     self->signal.vout = self->odd = self->w = false;
     set_ctrl(self, 0);
@@ -193,9 +225,35 @@ void ppu_snapshot(const struct rp2c02 *self, struct console_state *snapshot)
     assert(self != NULL);
     assert(snapshot != NULL);
 
-    snapshot->ppu.dot = self->dot;
-    snapshot->ppu.line = self->line;
-    snapshot->ppu.register_databus = self->regbus;
+    snapshot->ppu.addr = self->addr;
+    snapshot->ppu.ctrl = get_ctrl(self);
+    snapshot->ppu.data = self->data;
+    snapshot->ppu.mask = get_mask(self);
+    snapshot->ppu.oamaddr = self->oamaddr;
+    snapshot->ppu.oamdata = self->oamdata;
+    snapshot->ppu.scroll = self->scroll;
+    snapshot->ppu.status = get_status(self);
+
+    snapshot->pdatapath.res = self->res;
+    snapshot->pdatapath.addressbus = self->vaddrbus;
+    snapshot->pdatapath.curraddr = self->v;
+    snapshot->pdatapath.tempaddr = self->t;
+    snapshot->pdatapath.dot = self->dot;
+    snapshot->pdatapath.line = self->line;
+    snapshot->pdatapath.databus = self->vdatabus;
+    snapshot->pdatapath.readbuffer = self->rbuf;
+    snapshot->pdatapath.register_databus = self->regbus;
+    snapshot->pdatapath.register_select = self->regsel;
+    snapshot->pdatapath.xfine = self->x;
+    snapshot->pdatapath.oddframe = self->odd;
+    snapshot->pdatapath.writelatch = self->w;
+
+    snapshot->plines.cpu_readwrite = self->signal.rw;
+    snapshot->plines.interrupt = self->signal.intr;
+    snapshot->plines.read = self->signal.vr;
+    snapshot->plines.reset = self->signal.res;
+    snapshot->plines.video_out = self->signal.vout;
+    snapshot->plines.write = self->signal.vw;
 }
 
 struct ppu_coord ppu_pixel_trace(const struct rp2c02 *self, int adjustment)

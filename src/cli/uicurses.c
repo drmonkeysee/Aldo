@@ -455,9 +455,9 @@ static void drawppu(const struct view *v, const struct emulator *emu)
     werase(v->content);
     mvwaddstr(v->content, 0, w / 2, "\u21d1");
     mvwprintw(v->content, 1, (w / 2) - 1, "%02X",
-              emu->snapshot.ppu.register_databus);
-    mvwprintw(v->content, 4, 0, "Pixel: (%d, %d)", emu->snapshot.ppu.line,
-              emu->snapshot.ppu.dot);
+              emu->snapshot.pdatapath.register_databus);
+    mvwprintw(v->content, 4, 0, "Pixel: (%d, %d)",
+              emu->snapshot.pdatapath.line, emu->snapshot.pdatapath.dot);
 }
 
 static void drawram(const struct view *v, const struct emulator *emu)

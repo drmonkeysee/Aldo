@@ -59,7 +59,8 @@ static int init_ui(void)
     return sigaction(SIGINT, &act, NULL) == 0 ? 0 : UI_ERR_ERNO;
 }
 
-static void tick_start(const struct emulator *emu, struct runclock *c)
+static void tick_start(struct runclock *c,
+                       const struct console_state *snapshot)
 {
     cycleclock_tickstart(&c->cyclock, true);
 
@@ -76,7 +77,7 @@ static void tick_start(const struct emulator *emu, struct runclock *c)
     c->cyclock.emutime = c->cyclock.runtime;
 
     // NOTE: exit batch mode if cpu is not running
-    if (!emu->snapshot.lines.ready) {
+    if (!snapshot->lines.ready) {
         QuitSignal = 1;
     }
 }
@@ -147,7 +148,7 @@ int ui_batch_loop(struct emulator *emu)
     struct runclock clock = {0};
     cycleclock_start(&clock.cyclock);
     do {
-        tick_start(emu, &clock);
+        tick_start(&clock, &emu->snapshot);
         emu_update(emu, &clock);
         update_progress(&clock);
         tick_end(&clock);

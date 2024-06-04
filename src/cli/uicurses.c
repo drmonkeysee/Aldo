@@ -105,8 +105,8 @@ struct layout {
         ram;
 };
 
-static void drawstats(const struct view *v, const struct viewstate *vs,
-                      const struct cliargs *args, int *cursor_y)
+static int drawstats(const struct view *v, int cursor_y,
+                     const struct viewstate *vs, const struct cliargs *args)
 {
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
@@ -117,22 +117,23 @@ static void drawstats(const struct view *v, const struct viewstate *vs,
         refreshdt = 0;
     }
 
-    mvwprintw(v->content, (*cursor_y)++, 0, "FPS: %d (%.2f)", Fps,
+    mvwprintw(v->content, cursor_y++, 0, "FPS: %d (%.2f)", Fps,
               (double)vs->clock.cyclock.frames / vs->clock.cyclock.runtime);
-    mvwprintw(v->content, (*cursor_y)++, 0, "\u0394T: %.3f (%+.3f)",
+    mvwprintw(v->content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_frametime, display_frameleft);
-    mvwprintw(v->content, (*cursor_y)++, 0, "Frames: %" PRIu64,
+    mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64,
               vs->clock.cyclock.frames);
-    mvwprintw(v->content, (*cursor_y)++, 0, "Emutime: %.3f",
+    mvwprintw(v->content, cursor_y++, 0, "Emutime: %.3f",
               vs->clock.cyclock.emutime);
-    mvwprintw(v->content, (*cursor_y)++, 0, "Runtime: %.3f",
+    mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f",
               vs->clock.cyclock.runtime);
-    mvwprintw(v->content, (*cursor_y)++, 0, "Cycles: %" PRIu64,
+    mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
               vs->clock.cyclock.total_cycles);
-    mvwprintw(v->content, (*cursor_y)++, 0, "Cycles per Second: %d",
+    mvwprintw(v->content, cursor_y++, 0, "Cycles per Second: %d",
               vs->clock.cyclock.cycles_per_sec);
-    mvwprintw(v->content, (*cursor_y)++, 0, "BCD Supported: %s",
+    mvwprintw(v->content, cursor_y++, 0, "BCD Supported: %s",
               args->bcdsupport ? "Yes" : "No");
+    return cursor_y;
 }
 
 static void drawtoggle(const struct view *v, const char *label, bool selected)
@@ -188,9 +189,8 @@ static void drawsystem(const struct view *v, const struct viewstate *vs,
                        const struct emulator *emu)
 {
     const int w = getmaxx(v->content);
-    int cursor_y = 0;
     werase(v->content);
-    drawstats(v, vs, emu->args, &cursor_y);
+    int cursor_y = drawstats(v, 0, vs, emu->args);
     mvwhline(v->content, cursor_y++, 0, 0, w);
     drawcontrols(v, emu, w, cursor_y);
 }
@@ -307,27 +307,29 @@ static void drawprg(const struct view *v, const struct emulator *emu)
     drawvecs(v, h, w, vector_offset, emu);
 }
 
-static void drawregisters(const struct view *v, int *cursor_y,
-                          const struct console_state *snapshot)
+static int drawregisters(const struct view *v, int cursor_y,
+                         const struct console_state *snapshot)
 {
-    mvwprintw(v->content, (*cursor_y)++, 0, "PC: %04X  A: %02X",
+    mvwprintw(v->content, cursor_y++, 0, "PC: %04X  A: %02X",
               snapshot->cpu.program_counter, snapshot->cpu.accumulator);
-    mvwprintw(v->content, (*cursor_y)++, 0, "S:  %02X    X: %02X",
+    mvwprintw(v->content, cursor_y++, 0, "S:  %02X    X: %02X",
               snapshot->cpu.stack_pointer, snapshot->cpu.xindex);
-    mvwprintw(v->content, (*cursor_y)++, 0, "P:  %02X    Y: %02X",
+    mvwprintw(v->content, cursor_y++, 0, "P:  %02X    Y: %02X",
               snapshot->cpu.status, snapshot->cpu.yindex);
+    return cursor_y;
 }
 
-static void drawflags(const struct view *v, int *cursor_y,
-                      const struct console_state *snapshot)
+static int drawflags(const struct view *v, int cursor_y,
+                     const struct console_state *snapshot)
 {
     int cursor_x = 0;
-    mvwaddstr(v->content, (*cursor_y)++, cursor_x, "N V - B D I Z C");
+    mvwaddstr(v->content, cursor_y++, cursor_x, "N V - B D I Z C");
     for (size_t i = sizeof snapshot->cpu.status * 8; i > 0; --i) {
-        mvwprintw(v->content, *cursor_y, cursor_x, "%u",
+        mvwprintw(v->content, cursor_y, cursor_x, "%u",
                   byte_getbit(snapshot->cpu.status, i - 1));
         cursor_x += 2;
     }
+    return cursor_y;
 }
 
 static void draw_chip_line(const struct view *v, bool signal, int y, int x,
@@ -446,81 +448,83 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
 static void drawcpu(const struct view *v, const struct console_state *snapshot)
 {
     const int w = getmaxx(v->content);
-    int cursor_y = 0;
     werase(v->content);
-    drawregisters(v, &cursor_y, snapshot);
+    int cursor_y = drawregisters(v, 0, snapshot);
     mvwhline(v->content, cursor_y++, 0, 0, w);
-    drawflags(v, &cursor_y, snapshot);
+    cursor_y = drawflags(v, cursor_y, snapshot);
     mvwhline(v->content, ++cursor_y, 0, 0, w);
     drawdatapath(v, ++cursor_y, w, snapshot);
 }
 
-static void drawtop_plines(const struct view *v, int *cursor_y, int line_x,
-                           int w, const struct console_state *snapshot)
+static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
+                          int w, const struct console_state *snapshot)
 {
     const uint8_t sel = snapshot->pdatapath.register_select;
     char sel_buf[4];
     sprintf(sel_buf, "%1d%1d%1d", sel >> 2 & 0x1, sel >> 1 & 0x1, sel & 0x1);
-    draw_chip_line(v, snapshot->plines.cpu_readwrite, *cursor_y, line_x, 1,
+    draw_chip_line(v, snapshot->plines.cpu_readwrite, cursor_y, line_x, 1,
                    ArrowDown, -1, sel_buf);
-    draw_chip_line(v, snapshot->plines.interrupt, (*cursor_y)++, line_x * 3,
-                   1, ArrowUp, -1, "I\u0305N\u0305T\u0305");
+    draw_chip_line(v, snapshot->plines.interrupt, cursor_y++, line_x * 3, 1,
+                   ArrowUp, -1, "I\u0305N\u0305T\u0305");
 
-    mvwhline(v->content, ++*cursor_y, 0, 0, w);
+    mvwhline(v->content, ++cursor_y, 0, 0, w);
 
-    mvwprintw(v->content, *cursor_y, line_x - 2, "[%s%02X]",
+    mvwprintw(v->content, cursor_y, line_x - 2, "[%s%02X]",
               snapshot->plines.cpu_readwrite ? DArrowUp : DArrowDown,
               snapshot->pdatapath.register_databus);
+    return cursor_y;
 }
 
-static void draw_pregisters(const struct view *v, int *cursor_y,
-                            const struct console_state *snapshot)
+static int draw_pregisters(const struct view *v, int cursor_y,
+                           const struct console_state *snapshot)
 {
-    mvwprintw(v->content, ++*cursor_y, 0, "CTRL:    %02X   SCROLL:  %02X",
+    mvwprintw(v->content, ++cursor_y, 0, "CTRL:    %02X   SCROLL:  %02X",
               snapshot->ppu.ctrl, snapshot->ppu.scroll);
-    mvwprintw(v->content, ++*cursor_y, 0, "MASK:    %02X   ADDR:    %02X",
+    mvwprintw(v->content, ++cursor_y, 0, "MASK:    %02X   ADDR:    %02X",
               snapshot->ppu.mask, snapshot->ppu.addr);
     const uint8_t status = snapshot->ppu.status;
-    mvwprintw(v->content, ++*cursor_y, 0, "STAT:    %d%d%d  DATA:    %02X",
+    mvwprintw(v->content, ++cursor_y, 0, "STAT:    %d%d%d  DATA:    %02X",
               status >> 7 & 0x1, status >> 6 & 0x1, status >> 5 & 0x1,
               snapshot->ppu.data);
-    mvwprintw(v->content, ++*cursor_y, 0, "OAMADDR: %02X   OAMDATA: %02X",
+    mvwprintw(v->content, ++cursor_y, 0, "OAMADDR: %02X   OAMDATA: %02X",
               snapshot->ppu.oamaddr, snapshot->ppu.oamdata);
+    return cursor_y;
 }
 
-static void draw_pdatapath(const struct view *v, int *cursor_y, int w,
-                           const struct console_state *snapshot)
+static int draw_pdatapath(const struct view *v, int cursor_y, int w,
+                          const struct console_state *snapshot)
 {
     static const int seph = 4;
 
-    mvwvline(v->content, ++*cursor_y, ChipVSep1, 0, seph);
-    mvwvline(v->content, *cursor_y, ChipVSep2, 0, seph);
+    mvwvline(v->content, ++cursor_y, ChipVSep1, 0, seph);
+    mvwvline(v->content, cursor_y, ChipVSep2, 0, seph);
 
-    mvwprintw(v->content, *cursor_y, ChipCol1, "t: %04X",
+    mvwprintw(v->content, cursor_y, ChipCol1, "t: %04X",
               snapshot->pdatapath.tempaddr);
-    mvwprintw(v->content, *cursor_y, ChipCol2, "%02X",
+    mvwprintw(v->content, cursor_y, ChipCol2, "%02X",
               snapshot->pdatapath.databus);
     // NOTE: write line does not signal when writing to palette ram so use the
     // read signal to determine direction of databus flow.
-    mvwaddstr(v->content, *cursor_y, w - 1,
+    mvwaddstr(v->content, cursor_y, w - 1,
               snapshot->plines.read ? DArrowRight : DArrowLeft);
 
-    mvwaddstr(v->content, ++*cursor_y, 0, DArrowLeft);
-    mvwprintw(v->content, *cursor_y, 2, "%04X", snapshot->pdatapath.addressbus);
-    mvwprintw(v->content, *cursor_y, ChipCol1, "v: %04X",
+    mvwaddstr(v->content, ++cursor_y, 0, DArrowLeft);
+    mvwprintw(v->content, cursor_y, 2, "%04X", snapshot->pdatapath.addressbus);
+    mvwprintw(v->content, cursor_y, ChipCol1, "v: %04X",
               snapshot->pdatapath.curraddr);
 
-    mvwprintw(v->content, ++*cursor_y, ChipCol1, "x: %02X r: %02X",
+    mvwprintw(v->content, ++cursor_y, ChipCol1, "x: %02X r: %02X",
               snapshot->pdatapath.xfine,
               snapshot->pdatapath.readbuffer);
-    mvwaddstr(v->content, *cursor_y, ChipCol2 + 1, "R\u0305");
-    mvwaddstr(v->content, *cursor_y, w - 1, ArrowRight);
+    mvwaddstr(v->content, cursor_y, ChipCol2 + 1, "R\u0305");
+    mvwaddstr(v->content, cursor_y, w - 1, ArrowRight);
 
-    mvwprintw(v->content, ++*cursor_y, ChipCol1, "w: %1d o: %1d",
+    mvwprintw(v->content, ++cursor_y, ChipCol1, "w: %1d o: %1d",
               snapshot->pdatapath.writelatch,
               snapshot->pdatapath.oddframe);
-    mvwaddstr(v->content, *cursor_y, ChipCol2 + 1, "W\u0305");
-    mvwaddstr(v->content, *cursor_y, w - 1, ArrowRight);
+    mvwaddstr(v->content, cursor_y, ChipCol2 + 1, "W\u0305");
+    mvwaddstr(v->content, cursor_y, w - 1, ArrowRight);
+    return cursor_y;
 }
 
 static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
@@ -544,11 +548,10 @@ static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
 static void drawppu(const struct view *v, const struct console_state *snapshot)
 {
     const int w = getmaxx(v->content), line_x = (w / 4) + 1;
-    int cursor_y = 0;
-    drawtop_plines(v, &cursor_y, line_x, w, snapshot);
-    draw_pregisters(v, &cursor_y, snapshot);
+    int cursor_y = drawtop_plines(v, 0, line_x, w, snapshot);
+    cursor_y = draw_pregisters(v, cursor_y, snapshot);
     mvwhline(v->content, ++cursor_y, 0, 0, w);
-    draw_pdatapath(v, &cursor_y, w, snapshot);
+    cursor_y = draw_pdatapath(v, cursor_y, w, snapshot);
     mvwhline(v->content, ++cursor_y, 0, 0, w);
     drawbottom_plines(v, cursor_y, line_x, snapshot);
 }

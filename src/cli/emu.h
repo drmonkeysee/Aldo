@@ -17,7 +17,7 @@
 struct emulator {
     const struct cliargs *args; // Non-owning Pointer
     cart *cart;                 // Non-owning Pointer
-    debugctx *dbg;
+    debugger *dbg;
     nes *console;
     struct console_state snapshot;
 };

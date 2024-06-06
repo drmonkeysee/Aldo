@@ -36,7 +36,7 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
 }
 
 static int trace_instruction_peek(FILE *tracelog, struct mos6502 *cpu,
-                                  debugctx *dbg,
+                                  debugger *dbg,
                                   const struct console_state *snapshot)
 {
     char peek[DIS_PEEK_SIZE];
@@ -69,7 +69,7 @@ static void trace_registers(FILE *tracelog,
 //
 
 void trace_line(FILE *tracelog, uint64_t cycles, struct ppu_coord pixel,
-                struct mos6502 *cpu, debugctx *dbg,
+                struct mos6502 *cpu, debugger *dbg,
                 const struct console_state *snapshot)
 {
     assert(tracelog != NULL);

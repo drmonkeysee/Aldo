@@ -48,7 +48,7 @@ auto render_ui(const aldo::Layout& l, const aldo::MediaRuntime& mr,
     l.render();
 }
 
-auto runloop(const gui_platform& p, debugctx* debug, nes* console)
+auto runloop(const gui_platform& p, debugger* debug, nes* console)
 {
     aldo::Emulator emu{
         aldo::debug_handle{debug}, aldo::console_handle{console}, p,
@@ -74,7 +74,7 @@ auto runloop(const gui_platform& p, debugctx* debug, nes* console)
 // Public Interface
 //
 
-int aldo::ui_sdl_runloop(const gui_platform* platform, debugctx* debug,
+int aldo::ui_sdl_runloop(const gui_platform* platform, debugger* debug,
                          nes* console) noexcept
 {
     assert(platform != nullptr);

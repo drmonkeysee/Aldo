@@ -43,7 +43,7 @@ static void verify_haltexpr(const struct haltexpr *expr,
 
 static void new_debugger(void *ctx)
 {
-    debugctx *const dbg = ctx;
+    debugger *const dbg = ctx;
 
     ct_assertequal(NoResetVector, debug_vector_override(dbg));
     ct_assertequal(0u, debug_bp_count(dbg));
@@ -52,7 +52,7 @@ static void new_debugger(void *ctx)
 
 static void set_reset_vector(void *ctx)
 {
-    debugctx *const dbg = ctx;
+    debugger *const dbg = ctx;
 
     debug_set_vector_override(dbg, 0x1234);
 
@@ -61,14 +61,14 @@ static void set_reset_vector(void *ctx)
 
 static void negative_bp_index(void *ctx)
 {
-    debugctx *const dbg = ctx;
+    debugger *const dbg = ctx;
 
     ct_assertnull(debug_bp_at(dbg, -1));
 }
 
 static void add_breakpoint(void *ctx)
 {
-    debugctx *const dbg = ctx;
+    debugger *const dbg = ctx;
     const struct haltexpr expr = {.cond = HLT_ADDR, .address = 0x4321};
 
     debug_bp_add(dbg, expr);
@@ -83,7 +83,7 @@ static void add_breakpoint(void *ctx)
 
 static void enable_disable_breakpoint(void *ctx)
 {
-    debugctx *const dbg = ctx;
+    debugger *const dbg = ctx;
     const struct haltexpr expr = {.cond = HLT_ADDR, .address = 0x4321};
 
     debug_bp_add(dbg, expr);
@@ -101,7 +101,7 @@ static void enable_disable_breakpoint(void *ctx)
 
 static void multiple_breakpoints(void *ctx)
 {
-    debugctx *const dbg = ctx;
+    debugger *const dbg = ctx;
     const struct haltexpr exprs[] = {
         {.cond = HLT_ADDR, .address = 0x4321},
         {.cond = HLT_TIME, .runtime = 34.5},
@@ -124,7 +124,7 @@ static void multiple_breakpoints(void *ctx)
 
 static void out_of_range(void *ctx)
 {
-    debugctx *const dbg = ctx;
+    debugger *const dbg = ctx;
     const struct haltexpr exprs[] = {
         {.cond = HLT_ADDR, .address = 0x4321},
         {.cond = HLT_TIME, .runtime = 34.5},
@@ -142,7 +142,7 @@ static void out_of_range(void *ctx)
 
 static void delete_breakpoint(void *ctx)
 {
-    debugctx *const dbg = ctx;
+    debugger *const dbg = ctx;
     const struct haltexpr exprs[] = {
         {.cond = HLT_ADDR, .address = 0x4321},
         {.cond = HLT_TIME, .runtime = 34.5},
@@ -172,7 +172,7 @@ static void delete_breakpoint(void *ctx)
 
 static void clear_breakpoints(void *ctx)
 {
-    debugctx *const dbg = ctx;
+    debugger *const dbg = ctx;
     const struct haltexpr exprs[] = {
         {.cond = HLT_ADDR, .address = 0x4321},
         {.cond = HLT_TIME, .runtime = 34.5},
@@ -196,7 +196,7 @@ static void clear_breakpoints(void *ctx)
 
 static void reset_debugger(void *ctx)
 {
-    debugctx *const dbg = ctx;
+    debugger *const dbg = ctx;
     const struct haltexpr exprs[] = {
         {.cond = HLT_ADDR, .address = 0x4321},
         {.cond = HLT_TIME, .runtime = 34.5},

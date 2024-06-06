@@ -97,7 +97,7 @@ static int decode_cart_chr(const struct cliargs *args, cart *c)
     return EXIT_SUCCESS;
 }
 
-static bool parse_dbg_expression(debugctx *dbg, const char *restrict exprstr,
+static bool parse_dbg_expression(debugger *dbg, const char *restrict exprstr,
                                  bool verbose)
 {
     struct debugexpr expr;
@@ -130,7 +130,7 @@ static bool parse_dbg_expression(debugctx *dbg, const char *restrict exprstr,
     return true;
 }
 
-static bool parse_debug_file(debugctx *dbg, FILE *f,
+static bool parse_debug_file(debugger *dbg, FILE *f,
                              const struct cliargs *args)
 {
     char buf[HEXPR_FMT_SIZE];
@@ -147,9 +147,9 @@ static bool parse_debug_file(debugctx *dbg, FILE *f,
     return true;
 }
 
-static debugctx *create_debugger(const struct cliargs *args)
+static debugger *create_debugger(const struct cliargs *args)
 {
-    debugctx *const dbg = debug_new();
+    debugger *const dbg = debug_new();
     if (args->dbgfilepath) {
         FILE *const f = fopen(args->dbgfilepath, "r");
         if (f) {

@@ -218,7 +218,7 @@ static void bpvector_free(struct breakpoint_vector *vec)
 const int NoResetVector = -1;
 const ptrdiff_t NoBreakpoint = -1;
 
-debugctx *debug_new(void)
+debugger *debug_new(void)
 {
     struct debugger_context *const self = malloc(sizeof *self);
     *self = (struct debugger_context){
@@ -229,7 +229,7 @@ debugctx *debug_new(void)
     return self;
 }
 
-void debug_free(debugctx *self)
+void debug_free(debugger *self)
 {
     assert(self != NULL);
 
@@ -237,14 +237,14 @@ void debug_free(debugctx *self)
     free(self);
 }
 
-int debug_vector_override(debugctx *self)
+int debug_vector_override(debugger *self)
 {
     assert(self != NULL);
 
     return self->resetvector;
 }
 
-void debug_set_vector_override(debugctx *self, int resetvector)
+void debug_set_vector_override(debugger *self, int resetvector)
 {
     assert(self != NULL);
 
@@ -252,7 +252,7 @@ void debug_set_vector_override(debugctx *self, int resetvector)
     update_reset_override(self);
 }
 
-void debug_bp_add(debugctx *self, struct haltexpr expr)
+void debug_bp_add(debugger *self, struct haltexpr expr)
 {
     assert(self != NULL);
     assert(HLT_NONE < expr.cond && expr.cond < HLT_CONDCOUNT);
@@ -260,14 +260,14 @@ void debug_bp_add(debugctx *self, struct haltexpr expr)
     bpvector_insert(&self->breakpoints, expr);
 }
 
-const struct breakpoint *debug_bp_at(debugctx *self, ptrdiff_t at)
+const struct breakpoint *debug_bp_at(debugger *self, ptrdiff_t at)
 {
     assert(self != NULL);
 
     return bpvector_at(&self->breakpoints, at);
 }
 
-void debug_bp_enabled(debugctx *self, ptrdiff_t at, bool enabled)
+void debug_bp_enabled(debugger *self, ptrdiff_t at, bool enabled)
 {
     assert(self != NULL);
 
@@ -277,7 +277,7 @@ void debug_bp_enabled(debugctx *self, ptrdiff_t at, bool enabled)
     }
 }
 
-void debug_bp_remove(debugctx *self, ptrdiff_t at)
+void debug_bp_remove(debugger *self, ptrdiff_t at)
 {
     assert(self != NULL);
 
@@ -293,7 +293,7 @@ void debug_bp_remove(debugctx *self, ptrdiff_t at)
     }
 }
 
-void debug_bp_clear(debugctx *self)
+void debug_bp_clear(debugger *self)
 {
     assert(self != NULL);
 
@@ -301,14 +301,14 @@ void debug_bp_clear(debugctx *self)
     self->halted = NoBreakpoint;
 }
 
-size_t debug_bp_count(debugctx *self)
+size_t debug_bp_count(debugger *self)
 {
     assert(self != NULL);
 
     return self->breakpoints.size;
 }
 
-void debug_reset(debugctx *self)
+void debug_reset(debugger *self)
 {
     assert(self != NULL);
 
@@ -320,7 +320,7 @@ void debug_reset(debugctx *self)
 // Internal Interface
 //
 
-void debug_cpu_connect(debugctx *self, struct mos6502 *cpu)
+void debug_cpu_connect(debugger *self, struct mos6502 *cpu)
 {
     assert(self != NULL);
     assert(cpu != NULL);
@@ -328,14 +328,14 @@ void debug_cpu_connect(debugctx *self, struct mos6502 *cpu)
     self->cpu = cpu;
 }
 
-void debug_cpu_disconnect(debugctx *self)
+void debug_cpu_disconnect(debugger *self)
 {
     assert(self != NULL);
 
     self->cpu = NULL;
 }
 
-void debug_sync_bus(debugctx *self)
+void debug_sync_bus(debugger *self)
 {
     assert(self != NULL);
 
@@ -354,7 +354,7 @@ void debug_sync_bus(debugctx *self)
                                 resetaddr_device, &self->dec.inner);
 }
 
-void debug_check(debugctx *self, const struct cycleclock *clk)
+void debug_check(debugger *self, const struct cycleclock *clk)
 {
     assert(self != NULL);
     assert(clk != NULL);
@@ -370,7 +370,7 @@ void debug_check(debugctx *self, const struct cycleclock *clk)
     }
 }
 
-void debug_snapshot(debugctx *self, struct console_state *snapshot)
+void debug_snapshot(debugger *self, struct console_state *snapshot)
 {
     assert(self != NULL);
     assert(snapshot != NULL);

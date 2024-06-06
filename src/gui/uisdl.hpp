@@ -20,7 +20,7 @@ namespace aldo
 
 #include "bridgeopen.h"
 br_checkerror
-int ui_sdl_runloop(const struct gui_platform* platform, debugctx* debug,
+int ui_sdl_runloop(const struct gui_platform* platform, debugger* debug,
                    nes* console) br_nothrow;
 #include "bridgeclose.h"
 

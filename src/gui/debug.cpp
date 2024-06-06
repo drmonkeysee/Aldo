@@ -47,7 +47,7 @@ auto read_brkfile(const std::filesystem::path& filepath)
     return exprs;
 }
 
-auto set_debug_state(debugctx* dbg, std::span<const debugexpr> exprs) noexcept
+auto set_debug_state(debugger* dbg, std::span<const debugexpr> exprs) noexcept
 {
     debug_reset(dbg);
     for (auto& expr : exprs) {

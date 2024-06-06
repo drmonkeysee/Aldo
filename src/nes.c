@@ -22,7 +22,7 @@
 // Cartridge RAM/ROM and Controller Input.
 struct nes_console {
     cart *cart;                 // Game Cartridge; Non-owning Pointer
-    debugctx *dbg;              // Debugger Context; Non-owning Pointer
+    debugger *dbg;              // Debugger Context; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
     struct rp2c02 ppu;          // RP2C02 PPU
@@ -148,7 +148,7 @@ static void instruction_trace(struct nes_console *self,
 // Public Interface
 //
 
-nes *nes_new(debugctx *dbg, bool bcdsupport, FILE *tracelog)
+nes *nes_new(debugger *dbg, bool bcdsupport, FILE *tracelog)
 {
     assert(dbg != NULL);
 

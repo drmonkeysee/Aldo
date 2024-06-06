@@ -103,7 +103,7 @@ bool dis_inst_equal(const struct dis_instruction *lhs,
 // Internal
 //
 
-int dis_peek(uint16_t addr, struct mos6502 *cpu, debugctx *dbg,
+int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
              const struct console_state *snapshot,
              char dis[br_noalias_csz(DIS_PEEK_SIZE)]);
 #include "bridgeclose.h"

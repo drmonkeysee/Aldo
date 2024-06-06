@@ -37,7 +37,7 @@ inline std::filesystem::path breakfile_path_from(std::filesystem::path path)
 
 }
 
-using debug_handle = handle<debugctx, debug_free>;
+using debug_handle = handle<debugger, debug_free>;
 
 class Debugger {
 public:
@@ -84,7 +84,7 @@ public:
         using iterator_concept = std::forward_iterator_tag;
 
         BreakpointIterator() noexcept = default;
-        BreakpointIterator(debugctx* d, difference_type count) noexcept
+        BreakpointIterator(debugger* d, difference_type count) noexcept
         : debugp{d}, count{count} {}
 
         reference operator*() const noexcept
@@ -118,7 +118,7 @@ public:
         bool sentinel() const noexcept { return !debugp; }
         bool exhausted() const noexcept { return idx == count; }
 
-        debugctx* debugp = nullptr;
+        debugger* debugp = nullptr;
         difference_type count = 0, idx = 0;
     };
 
@@ -175,9 +175,9 @@ public:
                       "Incomplete breakpoint iterator definition");
         friend Debugger;
 
-        BreakpointsView(debugctx* d) noexcept : debugp{d} {}
+        BreakpointsView(debugger* d) noexcept : debugp{d} {}
 
-        debugctx* debugp;
+        debugger* debugp;
     };
 
 private:
@@ -185,7 +185,7 @@ private:
 
     explicit Debugger(debug_handle d) noexcept : hdebug{std::move(d)} {}
 
-    debugctx* debugp() const noexcept { return hdebug.get(); }
+    debugger* debugp() const noexcept { return hdebug.get(); }
 
     bool hasBreak(const console_state& snapshot) const noexcept
     {

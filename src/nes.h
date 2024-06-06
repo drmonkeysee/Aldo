@@ -22,7 +22,7 @@ typedef struct nes_console nes;
 
 #include "bridgeopen.h"
 br_libexport br_ownresult
-nes *nes_new(debugctx *dbg, bool bcdsupport, FILE *tracelog) br_nothrow;
+nes *nes_new(debugger *dbg, bool bcdsupport, FILE *tracelog) br_nothrow;
 br_libexport
 void nes_free(nes *self) br_nothrow;
 

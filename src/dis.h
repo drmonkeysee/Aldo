@@ -72,7 +72,7 @@ br_libexport br_checkerror
 int dis_inst(uint16_t addr, const struct dis_instruction *inst,
              char dis[br_noalias_csz(DIS_INST_SIZE)]);
 br_libexport br_checkerror
-int dis_datapath(const struct console_state *snp,
+int dis_datapath(const struct snapshot *snp,
                  char dis[br_noalias_csz(DIS_DATAP_SIZE)]);
 
 br_libexport br_checkerror
@@ -104,7 +104,7 @@ bool dis_inst_equal(const struct dis_instruction *lhs,
 //
 
 int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
-             const struct console_state *snp,
+             const struct snapshot *snp,
              char dis[br_noalias_csz(DIS_PEEK_SIZE)]);
 #include "bridgeclose.h"
 

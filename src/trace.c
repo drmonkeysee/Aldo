@@ -16,7 +16,7 @@
 #include <stddef.h>
 
 static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
-                             const struct console_state *snp)
+                             const struct snapshot *snp)
 {
     uint8_t bytes[3];
     const size_t instlen = bus_dma(cpu->mbus,
@@ -35,8 +35,7 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
 }
 
 static int trace_instruction_peek(FILE *tracelog, struct mos6502 *cpu,
-                                  debugger *dbg,
-                                  const struct console_state *snp)
+                                  debugger *dbg, const struct snapshot *snp)
 {
     char peek[DIS_PEEK_SIZE];
     const int result = dis_peek(snp->datapath.current_instruction, cpu, dbg,
@@ -44,7 +43,7 @@ static int trace_instruction_peek(FILE *tracelog, struct mos6502 *cpu,
     return fprintf(tracelog, " %s", result < 0 ? dis_errstr(result) : peek);
 }
 
-static void trace_registers(FILE *tracelog, const struct console_state *snp)
+static void trace_registers(FILE *tracelog, const struct snapshot *snp)
 {
     static const char flags[] = {
         'c', 'C', 'z', 'Z', 'i', 'I', 'd', 'D',
@@ -66,8 +65,7 @@ static void trace_registers(FILE *tracelog, const struct console_state *snp)
 //
 
 void trace_line(FILE *tracelog, uint64_t cycles, struct ppu_coord pixel,
-                struct mos6502 *cpu, debugger *dbg,
-                const struct console_state *snp)
+                struct mos6502 *cpu, debugger *dbg, const struct snapshot *snp)
 {
     assert(tracelog != NULL);
     assert(cpu != NULL);

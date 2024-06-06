@@ -1718,7 +1718,7 @@ bool cpu_jammed(const struct mos6502 *self)
     return self->t == 4 && Decode[self->opc].mode == AM_JAM;
 }
 
-void cpu_snapshot(const struct mos6502 *self, struct console_state *snp)
+void cpu_snapshot(const struct mos6502 *self, struct snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);

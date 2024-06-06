@@ -9,7 +9,7 @@
 
 #include <assert.h>
 
-void snapshot_clear(struct console_state *snp)
+void snapshot_clear(struct snapshot *snp)
 {
     assert(snp != NULL);
 

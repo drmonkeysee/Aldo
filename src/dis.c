@@ -84,7 +84,7 @@ static uint8_t flags(enum inst in)
     return 0 <= in && in < sz ? Flags[in] : Flags[IN_UDF];
 }
 
-static const char *interrupt_display(const struct console_state *snp)
+static const char *interrupt_display(const struct snapshot *snp)
 {
     if (snp->datapath.opcode != BrkOpcode) return "";
     if (snp->datapath.exec_cycle == 6) return "CLR";
@@ -94,7 +94,7 @@ static const char *interrupt_display(const struct console_state *snp)
     return "";
 }
 
-static uint16_t interrupt_vector(const struct console_state *snp)
+static uint16_t interrupt_vector(const struct snapshot *snp)
 {
     if (snp->datapath.nmi == CSGS_COMMITTED)
         return batowr(snp->mem.vectors);
@@ -555,7 +555,7 @@ int dis_inst(uint16_t addr, const struct dis_instruction *inst,
     return total;
 }
 
-int dis_datapath(const struct console_state *snp,
+int dis_datapath(const struct snapshot *snp,
                  char dis[restrict static DIS_DATAP_SIZE])
 {
     assert(snp != NULL);
@@ -738,7 +738,7 @@ bool dis_inst_equal(const struct dis_instruction *lhs,
 //
 
 int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
-             const struct console_state *snp,
+             const struct snapshot *snp,
              char dis[restrict static DIS_PEEK_SIZE])
 {
     assert(cpu != NULL);

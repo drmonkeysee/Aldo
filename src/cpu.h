@@ -95,8 +95,7 @@ void cpu_powerup(struct mos6502 *self) br_nothrow;
 int cpu_cycle(struct mos6502 *self) br_nothrow;
 
 bool cpu_jammed(const struct mos6502 *self) br_nothrow;
-void cpu_snapshot(const struct mos6502 *self,
-                  struct console_state *snp) br_nothrow;
+void cpu_snapshot(const struct mos6502 *self, struct snapshot *snp) br_nothrow;
 
 void cpu_peek_start(struct mos6502 *br_noalias self,
                     struct mos6502 *br_noalias restore) br_nothrow;

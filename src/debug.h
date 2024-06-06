@@ -65,7 +65,7 @@ void debug_cpu_connect(debugger *self, struct mos6502 *cpu) br_nothrow;
 void debug_cpu_disconnect(debugger *self) br_nothrow;
 void debug_sync_bus(debugger *self) br_nothrow;
 void debug_check(debugger *self, const struct cycleclock *clk) br_nothrow;
-void debug_snapshot(debugger *self, struct console_state *snp) br_nothrow;
+void debug_snapshot(debugger *self, struct snapshot *snp) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

@@ -30,6 +30,7 @@ struct viewstate;
 
 using cart_handle = handle<cart, cart_free>;
 using console_handle = handle<nes, nes_free>;
+using console_snapshot = snapshot;
 
 class Snapshot {
 public:
@@ -40,15 +41,15 @@ public:
     Snapshot& operator=(Snapshot&&) = default;
     ~Snapshot() { snapshot_clear(getp()); }
 
-    const console_state& get() const noexcept { return snp; }
-    const console_state* getp() const noexcept { return &snp; }
+    const snapshot& get() const noexcept { return snp; }
+    const snapshot* getp() const noexcept { return &snp; }
 
 private:
     friend class Emulator;
 
-    console_state* getp() noexcept { return &snp; }
+    snapshot* getp() noexcept { return &snp; }
 
-    console_state snp;
+    snapshot snp;
 };
 
 class ALDO_SIDEFX Emulator {
@@ -65,8 +66,8 @@ public:
     std::optional<cartinfo> cartInfo() const;
     const Debugger& debugger() const noexcept { return hdbg; }
     Debugger& debugger() noexcept { return hdbg; }
-    const console_state& snapshot() const noexcept { return hsnp.get(); }
-    const console_state* snapshotp() const noexcept
+    const console_snapshot& snapshot() const noexcept { return hsnp.get(); }
+    const console_snapshot* snapshotp() const noexcept
     {
         return hsnp.getp();
     }
@@ -98,7 +99,7 @@ public:
 private:
     cart* cartp() const noexcept { return hcart.get(); }
     nes* consolep() const noexcept { return hconsole.get(); }
-    console_state* snapshotp() noexcept { return hsnp.getp(); }
+    console_snapshot* snapshotp() noexcept { return hsnp.getp(); }
 
     void loadCartState();
     void saveCartState() const;

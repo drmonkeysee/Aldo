@@ -243,7 +243,7 @@ static void drawcart(const struct view *v, const struct emulator *emu)
 }
 
 static void drawinstructions(const struct view *v, int h, int y,
-                             const struct console_state *snp)
+                             const struct snapshot *snp)
 {
     struct dis_instruction inst = {0};
     uint16_t addr = snp->datapath.current_instruction;
@@ -308,7 +308,7 @@ static void drawprg(const struct view *v, const struct emulator *emu)
 }
 
 static int drawregisters(const struct view *v, int cursor_y,
-                         const struct console_state *snp)
+                         const struct snapshot *snp)
 {
     mvwprintw(v->content, cursor_y++, 0, "PC: %04X  A: %02X",
               snp->cpu.program_counter, snp->cpu.accumulator);
@@ -320,7 +320,7 @@ static int drawregisters(const struct view *v, int cursor_y,
 }
 
 static int drawflags(const struct view *v, int cursor_y,
-                     const struct console_state *snp)
+                     const struct snapshot *snp)
 {
     int cursor_x = 0;
     mvwaddstr(v->content, cursor_y++, cursor_x, "N V - B D I Z C");
@@ -379,7 +379,7 @@ static void draw_interrupt_latch(const struct view *v,
 }
 
 static void drawdatapath(const struct view *v, int cursor_y, int w,
-                         const struct console_state *snp)
+                         const struct snapshot *snp)
 {
     static const int seph = 5;
 
@@ -444,7 +444,7 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
                    -1, "R\u0305E\u0305S\u0305");
 }
 
-static void drawcpu(const struct view *v, const struct console_state *snp)
+static void drawcpu(const struct view *v, const struct snapshot *snp)
 {
     const int w = getmaxx(v->content);
     werase(v->content);
@@ -456,7 +456,7 @@ static void drawcpu(const struct view *v, const struct console_state *snp)
 }
 
 static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
-                          int w, const struct console_state *snp)
+                          int w, const struct snapshot *snp)
 {
     const uint8_t sel = snp->pdatapath.register_select;
     char sel_buf[4];
@@ -475,7 +475,7 @@ static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
 }
 
 static int draw_pregisters(const struct view *v, int cursor_y,
-                           const struct console_state *snp)
+                           const struct snapshot *snp)
 {
     mvwprintw(v->content, ++cursor_y, 0, "CTRL:    %02X   SCROLL:  %02X",
               snp->ppu.ctrl, snp->ppu.scroll);
@@ -491,7 +491,7 @@ static int draw_pregisters(const struct view *v, int cursor_y,
 }
 
 static int draw_pdatapath(const struct view *v, int cursor_y, int w,
-                          const struct console_state *snp)
+                          const struct snapshot *snp)
 {
     static const int seph = 4;
 
@@ -524,7 +524,7 @@ static int draw_pdatapath(const struct view *v, int cursor_y, int w,
 }
 
 static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
-                             const struct console_state *snp)
+                             const struct snapshot *snp)
 {
     mvwprintw(v->content, cursor_y, line_x - 2, "[%s%02X]", DArrowDown, 0);
     draw_interrupt_latch(v, snp->pdatapath.res, cursor_y, line_x * 3);
@@ -540,7 +540,7 @@ static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
                    "R\u0305E\u0305S\u0305");
 }
 
-static void drawppu(const struct view *v, const struct console_state *snp)
+static void drawppu(const struct view *v, const struct snapshot *snp)
 {
     const int w = getmaxx(v->content), line_x = (w / 4) + 1;
     int cursor_y = drawtop_plines(v, 0, line_x, w, snp);

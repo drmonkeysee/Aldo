@@ -18,6 +18,6 @@
 
 void trace_line(FILE *tracelog, uint64_t cycles, struct ppu_coord pixel,
                 struct mos6502 *cpu, debugger *dbg,
-                const struct console_state *snp);
+                const struct snapshot *snp);
 
 #endif

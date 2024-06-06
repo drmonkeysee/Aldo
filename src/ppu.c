@@ -220,7 +220,7 @@ int ppu_cycle(struct rp2c02 *self, int cycles)
     return cycles;
 }
 
-void ppu_snapshot(const struct rp2c02 *self, struct console_state *snp)
+void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);

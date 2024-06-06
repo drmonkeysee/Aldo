@@ -14,7 +14,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-struct console_state {
+struct snapshot {
     struct {
         const uint8_t *ram;     // Non-owning Pointer
         size_t prglength;       // Number of bytes copied to currprg
@@ -54,7 +54,7 @@ struct console_state {
 
 #include "bridgeopen.h"
 br_libexport
-void snapshot_clear(struct console_state *snp) br_nothrow;
+void snapshot_clear(struct snapshot *snp) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

@@ -135,7 +135,7 @@ static void instruction_trace(struct nes001 *self,
 {
     if (!self->tracelog || !self->cpu.signal.sync) return;
 
-    struct console_state snp;
+    struct snapshot snp;
     nes_snapshot(self, &snp);
     // NOTE: trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
@@ -270,7 +270,7 @@ void nes_cycle(nes *self, struct cycleclock *clock)
     }
 }
 
-void nes_snapshot(nes *self, struct console_state *snp)
+void nes_snapshot(nes *self, struct snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);

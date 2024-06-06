@@ -19,7 +19,7 @@ struct emulator {
     cart *cart;                 // Non-owning Pointer
     debugger *debugger;
     nes *console;
-    struct console_state snapshot;
+    struct snapshot snapshot;
 };
 
 #endif

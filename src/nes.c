@@ -18,9 +18,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-// The NES-001 Motherboard including the CPU/APU, PPU, RAM, VRAM,
+// The NES-001 NTSC Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
-struct nes_console {
+struct nes001 {
     cart *cart;                 // Game Cartridge; Non-owning Pointer
     debugger *dbg;              // Debugger Context; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
@@ -51,7 +51,7 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
                                  dest);
 }
 
-static void create_mbus(struct nes_console *self)
+static void create_mbus(struct nes001 *self)
 {
     // TODO: partitions so far:
     // * $0000 - $1FFF: 8KB RAM
@@ -70,17 +70,17 @@ static void create_mbus(struct nes_console *self)
     debug_cpu_connect(self->dbg, &self->cpu);
 }
 
-static void connect_ppu(struct nes_console *self)
+static void connect_ppu(struct nes001 *self)
 {
     ppu_connect(&self->ppu, self->vram, self->cpu.mbus);
 }
 
-static void disconnect_ppu(struct nes_console *self)
+static void disconnect_ppu(struct nes001 *self)
 {
     ppu_disconnect(&self->ppu);
 }
 
-static void connect_cart(struct nes_console *self, cart *c)
+static void connect_cart(struct nes001 *self, cart *c)
 {
     self->cart = c;
     // TODO: binding to $8000 is too simple; WRAM needs at least $6000, and the
@@ -93,7 +93,7 @@ static void connect_cart(struct nes_console *self, cart *c)
     debug_sync_bus(self->dbg);
 }
 
-static void disconnect_cart(struct nes_console *self)
+static void disconnect_cart(struct nes001 *self)
 {
     // NOTE: debugger may have been attached to a cart-less CPU bus so reset
     // debugger even if there is no existing cart.
@@ -103,14 +103,14 @@ static void disconnect_cart(struct nes_console *self)
     self->cart = NULL;
 }
 
-static void free_mbus(struct nes_console *self)
+static void free_mbus(struct nes001 *self)
 {
     debug_cpu_disconnect(self->dbg);
     bus_free(self->cpu.mbus);
     self->cpu.mbus = NULL;
 }
 
-static void set_interrupt(struct nes_console *self, enum csig_interrupt signal,
+static void set_interrupt(struct nes001 *self, enum csig_interrupt signal,
                           bool value)
 {
     switch (signal) {
@@ -130,7 +130,7 @@ static void set_interrupt(struct nes_console *self, enum csig_interrupt signal,
 }
 
 // NOTE: trace the just-fetched instruction
-static void instruction_trace(struct nes_console *self,
+static void instruction_trace(struct nes001 *self,
                               const struct cycleclock *clock)
 {
     if (!self->tracelog || !self->cpu.signal.sync) return;
@@ -152,7 +152,7 @@ nes *nes_new(debugger *dbg, bool bcdsupport, FILE *tracelog)
 {
     assert(dbg != NULL);
 
-    struct nes_console *const self = malloc(sizeof *self);
+    struct nes001 *const self = malloc(sizeof *self);
     self->cart = NULL;
     self->dbg = dbg;
     self->tracelog = tracelog;

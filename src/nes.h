@@ -18,7 +18,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-typedef struct nes_console nes;
+typedef struct nes001 nes;
 
 #include "bridgeopen.h"
 br_libexport br_ownresult

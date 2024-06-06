@@ -370,10 +370,10 @@ void debug_check(debugger *self, const struct cycleclock *clk)
     }
 }
 
-void debug_snapshot(debugger *self, struct console_state *snapshot)
+void debug_snapshot(debugger *self, struct console_state *snp)
 {
     assert(self != NULL);
-    assert(snapshot != NULL);
+    assert(snp != NULL);
 
-    snapshot->debugger.halted = self->halted;
+    snp->debugger.halted = self->halted;
 }

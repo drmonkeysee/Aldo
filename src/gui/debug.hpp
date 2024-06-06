@@ -187,9 +187,9 @@ private:
 
     debugger* dbgp() const noexcept { return hdebug.get(); }
 
-    bool hasBreak(const console_state& snapshot) const noexcept
+    bool hasBreak(const console_state& snp) const noexcept
     {
-        return snapshot.debugger.halted != NoBreakpoint;
+        return snp.debugger.halted != NoBreakpoint;
     }
 
     debug_handle hdebug;

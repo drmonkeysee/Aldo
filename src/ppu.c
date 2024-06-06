@@ -220,40 +220,40 @@ int ppu_cycle(struct rp2c02 *self, int cycles)
     return cycles;
 }
 
-void ppu_snapshot(const struct rp2c02 *self, struct console_state *snapshot)
+void ppu_snapshot(const struct rp2c02 *self, struct console_state *snp)
 {
     assert(self != NULL);
-    assert(snapshot != NULL);
+    assert(snp != NULL);
 
-    snapshot->ppu.addr = self->addr;
-    snapshot->ppu.ctrl = get_ctrl(self);
-    snapshot->ppu.data = self->data;
-    snapshot->ppu.mask = get_mask(self);
-    snapshot->ppu.oamaddr = self->oamaddr;
-    snapshot->ppu.oamdata = self->oamdata;
-    snapshot->ppu.scroll = self->scroll;
-    snapshot->ppu.status = get_status(self);
+    snp->ppu.addr = self->addr;
+    snp->ppu.ctrl = get_ctrl(self);
+    snp->ppu.data = self->data;
+    snp->ppu.mask = get_mask(self);
+    snp->ppu.oamaddr = self->oamaddr;
+    snp->ppu.oamdata = self->oamdata;
+    snp->ppu.scroll = self->scroll;
+    snp->ppu.status = get_status(self);
 
-    snapshot->pdatapath.res = self->res;
-    snapshot->pdatapath.addressbus = self->vaddrbus;
-    snapshot->pdatapath.curraddr = self->v;
-    snapshot->pdatapath.tempaddr = self->t;
-    snapshot->pdatapath.dot = self->dot;
-    snapshot->pdatapath.line = self->line;
-    snapshot->pdatapath.databus = self->vdatabus;
-    snapshot->pdatapath.readbuffer = self->rbuf;
-    snapshot->pdatapath.register_databus = self->regbus;
-    snapshot->pdatapath.register_select = self->regsel;
-    snapshot->pdatapath.xfine = self->x;
-    snapshot->pdatapath.oddframe = self->odd;
-    snapshot->pdatapath.writelatch = self->w;
+    snp->pdatapath.res = self->res;
+    snp->pdatapath.addressbus = self->vaddrbus;
+    snp->pdatapath.curraddr = self->v;
+    snp->pdatapath.tempaddr = self->t;
+    snp->pdatapath.dot = self->dot;
+    snp->pdatapath.line = self->line;
+    snp->pdatapath.databus = self->vdatabus;
+    snp->pdatapath.readbuffer = self->rbuf;
+    snp->pdatapath.register_databus = self->regbus;
+    snp->pdatapath.register_select = self->regsel;
+    snp->pdatapath.xfine = self->x;
+    snp->pdatapath.oddframe = self->odd;
+    snp->pdatapath.writelatch = self->w;
 
-    snapshot->plines.cpu_readwrite = self->signal.rw;
-    snapshot->plines.interrupt = self->signal.intr;
-    snapshot->plines.read = self->signal.vr;
-    snapshot->plines.reset = self->signal.res;
-    snapshot->plines.video_out = self->signal.vout;
-    snapshot->plines.write = self->signal.vw;
+    snp->plines.cpu_readwrite = self->signal.rw;
+    snp->plines.interrupt = self->signal.intr;
+    snp->plines.read = self->signal.vr;
+    snp->plines.reset = self->signal.res;
+    snp->plines.video_out = self->signal.vout;
+    snp->plines.write = self->signal.vw;
 }
 
 struct ppu_coord ppu_pixel_trace(const struct rp2c02 *self, int adjustment)

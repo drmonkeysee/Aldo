@@ -9,10 +9,10 @@
 
 #include <assert.h>
 
-void snapshot_clear(struct console_state *snapshot)
+void snapshot_clear(struct console_state *snp)
 {
-    assert(snapshot != NULL);
+    assert(snp != NULL);
 
-    snapshot->mem.prglength = 0;
-    snapshot->mem.ram = NULL;
+    snp->mem.prglength = 0;
+    snp->mem.ram = NULL;
 }

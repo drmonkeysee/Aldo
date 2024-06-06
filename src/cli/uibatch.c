@@ -59,8 +59,7 @@ static int init_ui(void)
     return sigaction(SIGINT, &act, NULL) == 0 ? 0 : UI_ERR_ERNO;
 }
 
-static void tick_start(struct runclock *c,
-                       const struct console_state *snapshot)
+static void tick_start(struct runclock *c, const struct console_state *snp)
 {
     cycleclock_tickstart(&c->cyclock, true);
 
@@ -77,7 +76,7 @@ static void tick_start(struct runclock *c,
     c->cyclock.emutime = c->cyclock.runtime;
 
     // NOTE: exit batch mode if cpu is not running
-    if (!snapshot->lines.ready) {
+    if (!snp->lines.ready) {
         QuitSignal = 1;
     }
 }

@@ -49,7 +49,7 @@ br_libexport
 void nes_cycle(nes *self, struct cycleclock *clock) br_nothrow;
 
 br_libexport
-void nes_snapshot(nes *self, struct console_state *snapshot) br_nothrow;
+void nes_snapshot(nes *self, struct console_state *snp) br_nothrow;
 br_libexport
 void nes_dumpram(nes *self, FILE *f) br_nothrow;
 #include "bridgeclose.h"

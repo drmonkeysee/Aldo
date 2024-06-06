@@ -40,15 +40,15 @@ public:
     Snapshot& operator=(Snapshot&&) = default;
     ~Snapshot() { snapshot_clear(getp()); }
 
-    const console_state& get() const noexcept { return snapshot; }
-    const console_state* getp() const noexcept { return &snapshot; }
+    const console_state& get() const noexcept { return snp; }
+    const console_state* getp() const noexcept { return &snp; }
 
 private:
     friend class Emulator;
 
-    console_state* getp() noexcept { return &snapshot; }
+    console_state* getp() noexcept { return &snp; }
 
-    console_state snapshot;
+    console_state snp;
 };
 
 class ALDO_SIDEFX Emulator {

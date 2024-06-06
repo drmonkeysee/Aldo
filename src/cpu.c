@@ -1718,40 +1718,40 @@ bool cpu_jammed(const struct mos6502 *self)
     return self->t == 4 && Decode[self->opc].mode == AM_JAM;
 }
 
-void cpu_snapshot(const struct mos6502 *self, struct console_state *snapshot)
+void cpu_snapshot(const struct mos6502 *self, struct console_state *snp)
 {
     assert(self != NULL);
-    assert(snapshot != NULL);
+    assert(snp != NULL);
 
-    snapshot->cpu.program_counter = self->pc;
-    snapshot->cpu.accumulator = self->a;
-    snapshot->cpu.stack_pointer = self->s;
-    snapshot->cpu.status = get_p(self, false);
-    snapshot->cpu.xindex = self->x;
-    snapshot->cpu.yindex = self->y;
+    snp->cpu.program_counter = self->pc;
+    snp->cpu.accumulator = self->a;
+    snp->cpu.stack_pointer = self->s;
+    snp->cpu.status = get_p(self, false);
+    snp->cpu.xindex = self->x;
+    snp->cpu.yindex = self->y;
 
-    snapshot->datapath.addressbus = self->addrbus;
-    snapshot->datapath.addrlow_latch = self->adl;
-    snapshot->datapath.addrhigh_latch = self->adh;
-    snapshot->datapath.addrcarry_latch = self->adc;
-    snapshot->datapath.busfault = self->bflt;
-    snapshot->datapath.current_instruction = self->addrinst;
-    snapshot->datapath.databus = self->databus;
+    snp->datapath.addressbus = self->addrbus;
+    snp->datapath.addrlow_latch = self->adl;
+    snp->datapath.addrhigh_latch = self->adh;
+    snp->datapath.addrcarry_latch = self->adc;
+    snp->datapath.busfault = self->bflt;
+    snp->datapath.current_instruction = self->addrinst;
+    snp->datapath.databus = self->databus;
     assert(self->t >= 0);
-    snapshot->datapath.exec_cycle = (uint8_t)self->t;
-    snapshot->datapath.instdone = self->presync;
-    snapshot->datapath.irq = self->irq;
-    snapshot->datapath.jammed = cpu_jammed(self);
-    snapshot->datapath.nmi = self->nmi;
-    snapshot->datapath.opcode = self->opc;
-    snapshot->datapath.res = self->res;
+    snp->datapath.exec_cycle = (uint8_t)self->t;
+    snp->datapath.instdone = self->presync;
+    snp->datapath.irq = self->irq;
+    snp->datapath.jammed = cpu_jammed(self);
+    snp->datapath.nmi = self->nmi;
+    snp->datapath.opcode = self->opc;
+    snp->datapath.res = self->res;
 
-    snapshot->lines.irq = self->signal.irq;
-    snapshot->lines.nmi = self->signal.nmi;
-    snapshot->lines.readwrite = self->signal.rw;
-    snapshot->lines.ready = self->signal.rdy;
-    snapshot->lines.reset = self->signal.res;
-    snapshot->lines.sync = self->signal.sync;
+    snp->lines.irq = self->signal.irq;
+    snp->lines.nmi = self->signal.nmi;
+    snp->lines.readwrite = self->signal.rw;
+    snp->lines.ready = self->signal.rdy;
+    snp->lines.reset = self->signal.res;
+    snp->lines.sync = self->signal.sync;
 }
 
 void cpu_peek_start(struct mos6502 *restrict self,

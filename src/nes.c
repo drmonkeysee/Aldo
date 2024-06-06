@@ -135,13 +135,12 @@ static void instruction_trace(struct nes001 *self,
 {
     if (!self->tracelog || !self->cpu.signal.sync) return;
 
-    struct console_state snapshot;
-    nes_snapshot(self, &snapshot);
+    struct console_state snp;
+    nes_snapshot(self, &snp);
     // NOTE: trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
     trace_line(self->tracelog, clock->total_cycles - 1,
-               ppu_pixel_trace(&self->ppu, -1), &self->cpu, self->dbg,
-               &snapshot);
+               ppu_pixel_trace(&self->ppu, -1), &self->cpu, self->dbg, &snp);
 }
 
 //
@@ -271,23 +270,23 @@ void nes_cycle(nes *self, struct cycleclock *clock)
     }
 }
 
-void nes_snapshot(nes *self, struct console_state *snapshot)
+void nes_snapshot(nes *self, struct console_state *snp)
 {
     assert(self != NULL);
-    assert(snapshot != NULL);
+    assert(snp != NULL);
 
-    cpu_snapshot(&self->cpu, snapshot);
-    ppu_snapshot(&self->ppu, snapshot);
-    debug_snapshot(self->dbg, snapshot);
-    snapshot->mem.ram = self->ram;
-    snapshot->mem.prglength = bus_dma(self->cpu.mbus,
-                                      snapshot->datapath.current_instruction,
-                                      sizeof snapshot->mem.currprg
-                                        / sizeof snapshot->mem.currprg[0],
-                                      snapshot->mem.currprg);
+    cpu_snapshot(&self->cpu, snp);
+    ppu_snapshot(&self->ppu, snp);
+    debug_snapshot(self->dbg, snp);
+    snp->mem.ram = self->ram;
+    snp->mem.prglength = bus_dma(self->cpu.mbus,
+                                 snp->datapath.current_instruction,
+                                 sizeof snp->mem.currprg
+                                    / sizeof snp->mem.currprg[0],
+                                 snp->mem.currprg);
     bus_dma(self->cpu.mbus, CPU_VECTOR_NMI,
-            sizeof snapshot->mem.vectors / sizeof snapshot->mem.vectors[0],
-            snapshot->mem.vectors);
+            sizeof snp->mem.vectors / sizeof snp->mem.vectors[0],
+            snp->mem.vectors);
 }
 
 void nes_dumpram(nes *self, FILE *f)

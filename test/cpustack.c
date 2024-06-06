@@ -172,9 +172,9 @@ static void plp(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(1u, cpu.pc);
 
-    struct console_state sn;
-    cpu_snapshot(&cpu, &sn);
-    ct_assertequal(0xbau, sn.cpu.status);
+    struct console_state snp;
+    cpu_snapshot(&cpu, &snp);
+    ct_assertequal(0xbau, snp.cpu.status);
     ct_assertequal(4u, cpu.s);
 }
 
@@ -190,9 +190,9 @@ static void plp_zero(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(1u, cpu.pc);
 
-    struct console_state sn;
-    cpu_snapshot(&cpu, &sn);
-    ct_assertequal(0x30u, sn.cpu.status);
+    struct console_state snp;
+    cpu_snapshot(&cpu, &snp);
+    ct_assertequal(0x30u, snp.cpu.status);
     ct_assertequal(4u, cpu.s);
 }
 
@@ -208,9 +208,9 @@ static void plp_ones(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(1u, cpu.pc);
 
-    struct console_state sn;
-    cpu_snapshot(&cpu, &sn);
-    ct_assertequal(0xffu, sn.cpu.status);
+    struct console_state snp;
+    cpu_snapshot(&cpu, &snp);
+    ct_assertequal(0xffu, snp.cpu.status);
     ct_assertequal(4u, cpu.s);
 }
 
@@ -226,9 +226,9 @@ static void plp_wraparound(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(1u, cpu.pc);
 
-    struct console_state sn;
-    cpu_snapshot(&cpu, &sn);
-    ct_assertequal(0x35u, sn.cpu.status);
+    struct console_state snp;
+    cpu_snapshot(&cpu, &snp);
+    ct_assertequal(0x35u, snp.cpu.status);
     ct_assertequal(0u, cpu.s);
 }
 

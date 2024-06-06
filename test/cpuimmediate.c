@@ -2906,13 +2906,13 @@ static void nop(void *ctx)
         ct_assertequal(0x10u, cpu.databus, "Failed on opcode %02x", opc);
 
         // NOTE: verify NOP did nothing
-        struct console_state sn;
-        cpu_snapshot(&cpu, &sn);
+        struct console_state snp;
+        cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.x, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.y, "Failed on opcode %02x", opc);
-        ct_assertequal(0x34u, sn.cpu.status, "Failed on opcode %02x", opc);
+        ct_assertequal(0x34u, snp.cpu.status, "Failed on opcode %02x", opc);
     }
 }
 

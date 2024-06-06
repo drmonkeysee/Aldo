@@ -882,7 +882,7 @@ static void inst_disassembles_unofficial(void *ctx)
 
 static void datapath_end_of_rom(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -891,10 +891,10 @@ static void datapath_end_of_rom(void *ctx)
             .prglength = 1,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "NOP ";
     ct_assertequal((int)strlen(exp), written);
@@ -904,7 +904,7 @@ static void datapath_end_of_rom(void *ctx)
 static void datapath_unexpected_end_of_rom(void *ctx)
 {
     // NOTE: LDA imm with missing 2nd byte
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -913,10 +913,10 @@ static void datapath_unexpected_end_of_rom(void *ctx)
             .prglength = 1,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE] = {'\0'};
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "";
     ct_assertequal(DIS_ERR_EOF, written);
@@ -925,7 +925,7 @@ static void datapath_unexpected_end_of_rom(void *ctx)
 
 static void datapath_implied_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -934,10 +934,10 @@ static void datapath_implied_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "NOP imp";
     ct_assertequal((int)strlen(exp), written);
@@ -946,7 +946,7 @@ static void datapath_implied_cycle_zero(void *ctx)
 
 static void datapath_implied_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -955,10 +955,10 @@ static void datapath_implied_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "NOP ";
     ct_assertequal((int)strlen(exp), written);
@@ -967,7 +967,7 @@ static void datapath_implied_cycle_one(void *ctx)
 
 static void datapath_implied_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -976,10 +976,10 @@ static void datapath_implied_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "NOP ";
     ct_assertequal((int)strlen(exp), written);
@@ -988,7 +988,7 @@ static void datapath_implied_cycle_n(void *ctx)
 
 static void datapath_immediate_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -997,10 +997,10 @@ static void datapath_immediate_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA imm";
     ct_assertequal((int)strlen(exp), written);
@@ -1009,7 +1009,7 @@ static void datapath_immediate_cycle_zero(void *ctx)
 
 static void datapath_immediate_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1018,10 +1018,10 @@ static void datapath_immediate_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA #$43";
     ct_assertequal((int)strlen(exp), written);
@@ -1030,7 +1030,7 @@ static void datapath_immediate_cycle_one(void *ctx)
 
 static void datapath_immediate_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1039,10 +1039,10 @@ static void datapath_immediate_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA #$43";
     ct_assertequal((int)strlen(exp), written);
@@ -1051,7 +1051,7 @@ static void datapath_immediate_cycle_n(void *ctx)
 
 static void datapath_zeropage_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1060,10 +1060,10 @@ static void datapath_zeropage_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA zp";
     ct_assertequal((int)strlen(exp), written);
@@ -1072,7 +1072,7 @@ static void datapath_zeropage_cycle_zero(void *ctx)
 
 static void datapath_zeropage_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1081,10 +1081,10 @@ static void datapath_zeropage_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA $43";
     ct_assertequal((int)strlen(exp), written);
@@ -1093,7 +1093,7 @@ static void datapath_zeropage_cycle_one(void *ctx)
 
 static void datapath_zeropage_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1102,10 +1102,10 @@ static void datapath_zeropage_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA $43";
     ct_assertequal((int)strlen(exp), written);
@@ -1114,7 +1114,7 @@ static void datapath_zeropage_cycle_n(void *ctx)
 
 static void datapath_zeropage_x_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1123,10 +1123,10 @@ static void datapath_zeropage_x_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA zp,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1135,7 +1135,7 @@ static void datapath_zeropage_x_cycle_zero(void *ctx)
 
 static void datapath_zeropage_x_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1144,10 +1144,10 @@ static void datapath_zeropage_x_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA $43,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1156,7 +1156,7 @@ static void datapath_zeropage_x_cycle_one(void *ctx)
 
 static void datapath_zeropage_x_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1165,10 +1165,10 @@ static void datapath_zeropage_x_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA $43,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1177,7 +1177,7 @@ static void datapath_zeropage_x_cycle_n(void *ctx)
 
 static void datapath_zeropage_y_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1186,10 +1186,10 @@ static void datapath_zeropage_y_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDX zp,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1198,7 +1198,7 @@ static void datapath_zeropage_y_cycle_zero(void *ctx)
 
 static void datapath_zeropage_y_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1207,10 +1207,10 @@ static void datapath_zeropage_y_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDX $43,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1219,7 +1219,7 @@ static void datapath_zeropage_y_cycle_one(void *ctx)
 
 static void datapath_zeropage_y_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1228,10 +1228,10 @@ static void datapath_zeropage_y_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDX $43,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1240,7 +1240,7 @@ static void datapath_zeropage_y_cycle_n(void *ctx)
 
 static void datapath_indirect_x_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1249,10 +1249,10 @@ static void datapath_indirect_x_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA (zp,X)";
     ct_assertequal((int)strlen(exp), written);
@@ -1261,7 +1261,7 @@ static void datapath_indirect_x_cycle_zero(void *ctx)
 
 static void datapath_indirect_x_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1270,10 +1270,10 @@ static void datapath_indirect_x_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA ($43,X)";
     ct_assertequal((int)strlen(exp), written);
@@ -1282,7 +1282,7 @@ static void datapath_indirect_x_cycle_one(void *ctx)
 
 static void datapath_indirect_x_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1291,10 +1291,10 @@ static void datapath_indirect_x_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA ($43,X)";
     ct_assertequal((int)strlen(exp), written);
@@ -1303,7 +1303,7 @@ static void datapath_indirect_x_cycle_n(void *ctx)
 
 static void datapath_indirect_y_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1312,10 +1312,10 @@ static void datapath_indirect_y_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA (zp),Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1324,7 +1324,7 @@ static void datapath_indirect_y_cycle_zero(void *ctx)
 
 static void datapath_indirect_y_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1333,10 +1333,10 @@ static void datapath_indirect_y_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA ($43),Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1345,7 +1345,7 @@ static void datapath_indirect_y_cycle_one(void *ctx)
 
 static void datapath_indirect_y_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1354,10 +1354,10 @@ static void datapath_indirect_y_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA ($43),Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1366,7 +1366,7 @@ static void datapath_indirect_y_cycle_n(void *ctx)
 
 static void datapath_absolute_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1375,10 +1375,10 @@ static void datapath_absolute_cycle_zero(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA abs";
     ct_assertequal((int)strlen(exp), written);
@@ -1387,7 +1387,7 @@ static void datapath_absolute_cycle_zero(void *ctx)
 
 static void datapath_absolute_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1396,10 +1396,10 @@ static void datapath_absolute_cycle_one(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA $??43";
     ct_assertequal((int)strlen(exp), written);
@@ -1408,7 +1408,7 @@ static void datapath_absolute_cycle_one(void *ctx)
 
 static void datapath_absolute_cycle_two(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1417,10 +1417,10 @@ static void datapath_absolute_cycle_two(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA $2143";
     ct_assertequal((int)strlen(exp), written);
@@ -1429,7 +1429,7 @@ static void datapath_absolute_cycle_two(void *ctx)
 
 static void datapath_absolute_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 3,
         },
@@ -1438,10 +1438,10 @@ static void datapath_absolute_cycle_n(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA $2143";
     ct_assertequal((int)strlen(exp), written);
@@ -1450,7 +1450,7 @@ static void datapath_absolute_cycle_n(void *ctx)
 
 static void datapath_absolute_x_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1459,10 +1459,10 @@ static void datapath_absolute_x_cycle_zero(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA abs,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1471,7 +1471,7 @@ static void datapath_absolute_x_cycle_zero(void *ctx)
 
 static void datapath_absolute_x_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1480,10 +1480,10 @@ static void datapath_absolute_x_cycle_one(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA $??43,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1492,7 +1492,7 @@ static void datapath_absolute_x_cycle_one(void *ctx)
 
 static void datapath_absolute_x_cycle_two(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1501,10 +1501,10 @@ static void datapath_absolute_x_cycle_two(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA $2143,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1513,7 +1513,7 @@ static void datapath_absolute_x_cycle_two(void *ctx)
 
 static void datapath_absolute_x_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 3,
         },
@@ -1522,10 +1522,10 @@ static void datapath_absolute_x_cycle_n(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA $2143,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1534,7 +1534,7 @@ static void datapath_absolute_x_cycle_n(void *ctx)
 
 static void datapath_absolute_y_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1543,10 +1543,10 @@ static void datapath_absolute_y_cycle_zero(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA abs,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1555,7 +1555,7 @@ static void datapath_absolute_y_cycle_zero(void *ctx)
 
 static void datapath_absolute_y_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1564,10 +1564,10 @@ static void datapath_absolute_y_cycle_one(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA $??43,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1576,7 +1576,7 @@ static void datapath_absolute_y_cycle_one(void *ctx)
 
 static void datapath_absolute_y_cycle_two(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1585,10 +1585,10 @@ static void datapath_absolute_y_cycle_two(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA $2143,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1597,7 +1597,7 @@ static void datapath_absolute_y_cycle_two(void *ctx)
 
 static void datapath_absolute_y_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 3,
         },
@@ -1606,10 +1606,10 @@ static void datapath_absolute_y_cycle_n(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "LDA $2143,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1618,7 +1618,7 @@ static void datapath_absolute_y_cycle_n(void *ctx)
 
 static void datapath_jmp_absolute_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1627,10 +1627,10 @@ static void datapath_jmp_absolute_cycle_zero(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "JMP abs";
     ct_assertequal((int)strlen(exp), written);
@@ -1639,7 +1639,7 @@ static void datapath_jmp_absolute_cycle_zero(void *ctx)
 
 static void datapath_jmp_absolute_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1648,10 +1648,10 @@ static void datapath_jmp_absolute_cycle_one(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "JMP $??43";
     ct_assertequal((int)strlen(exp), written);
@@ -1660,7 +1660,7 @@ static void datapath_jmp_absolute_cycle_one(void *ctx)
 
 static void datapath_jmp_absolute_cycle_two(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1669,10 +1669,10 @@ static void datapath_jmp_absolute_cycle_two(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "JMP $2143";
     ct_assertequal((int)strlen(exp), written);
@@ -1681,7 +1681,7 @@ static void datapath_jmp_absolute_cycle_two(void *ctx)
 
 static void datapath_jmp_absolute_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 3,
         },
@@ -1690,10 +1690,10 @@ static void datapath_jmp_absolute_cycle_n(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "JMP $2143";
     ct_assertequal((int)strlen(exp), written);
@@ -1702,7 +1702,7 @@ static void datapath_jmp_absolute_cycle_n(void *ctx)
 
 static void datapath_jmp_indirect_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1711,10 +1711,10 @@ static void datapath_jmp_indirect_cycle_zero(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "JMP (abs)";
     ct_assertequal((int)strlen(exp), written);
@@ -1723,7 +1723,7 @@ static void datapath_jmp_indirect_cycle_zero(void *ctx)
 
 static void datapath_jmp_indirect_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1732,10 +1732,10 @@ static void datapath_jmp_indirect_cycle_one(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "JMP ($??43)";
     ct_assertequal((int)strlen(exp), written);
@@ -1744,7 +1744,7 @@ static void datapath_jmp_indirect_cycle_one(void *ctx)
 
 static void datapath_jmp_indirect_cycle_two(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1753,10 +1753,10 @@ static void datapath_jmp_indirect_cycle_two(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "JMP ($2143)";
     ct_assertequal((int)strlen(exp), written);
@@ -1765,7 +1765,7 @@ static void datapath_jmp_indirect_cycle_two(void *ctx)
 
 static void datapath_jmp_indirect_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 3,
         },
@@ -1774,10 +1774,10 @@ static void datapath_jmp_indirect_cycle_n(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "JMP ($2143)";
     ct_assertequal((int)strlen(exp), written);
@@ -1786,7 +1786,7 @@ static void datapath_jmp_indirect_cycle_n(void *ctx)
 
 static void datapath_bch_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1795,10 +1795,10 @@ static void datapath_bch_cycle_zero(void *ctx)
             .prglength = 5,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BCC rel";
     ct_assertequal((int)strlen(exp), written);
@@ -1807,7 +1807,7 @@ static void datapath_bch_cycle_zero(void *ctx)
 
 static void datapath_bch_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1816,10 +1816,10 @@ static void datapath_bch_cycle_one(void *ctx)
             .prglength = 5,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BCC +2";
     ct_assertequal((int)strlen(exp), written);
@@ -1828,7 +1828,7 @@ static void datapath_bch_cycle_one(void *ctx)
 
 static void datapath_bch_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1837,10 +1837,10 @@ static void datapath_bch_cycle_n(void *ctx)
             .prglength = 5,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BCC +2";
     ct_assertequal((int)strlen(exp), written);
@@ -1849,7 +1849,7 @@ static void datapath_bch_cycle_n(void *ctx)
 
 static void datapath_push_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1858,10 +1858,10 @@ static void datapath_push_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "PHA imp";
     ct_assertequal((int)strlen(exp), written);
@@ -1870,7 +1870,7 @@ static void datapath_push_cycle_zero(void *ctx)
 
 static void datapath_push_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1879,10 +1879,10 @@ static void datapath_push_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "PHA ";
     ct_assertequal((int)strlen(exp), written);
@@ -1891,7 +1891,7 @@ static void datapath_push_cycle_one(void *ctx)
 
 static void datapath_push_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1900,10 +1900,10 @@ static void datapath_push_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "PHA ";
     ct_assertequal((int)strlen(exp), written);
@@ -1912,7 +1912,7 @@ static void datapath_push_cycle_n(void *ctx)
 
 static void datapath_pull_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1921,10 +1921,10 @@ static void datapath_pull_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "PLA imp";
     ct_assertequal((int)strlen(exp), written);
@@ -1933,7 +1933,7 @@ static void datapath_pull_cycle_zero(void *ctx)
 
 static void datapath_pull_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -1942,10 +1942,10 @@ static void datapath_pull_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "PLA ";
     ct_assertequal((int)strlen(exp), written);
@@ -1954,7 +1954,7 @@ static void datapath_pull_cycle_one(void *ctx)
 
 static void datapath_pull_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -1963,10 +1963,10 @@ static void datapath_pull_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "PLA ";
     ct_assertequal((int)strlen(exp), written);
@@ -1975,7 +1975,7 @@ static void datapath_pull_cycle_n(void *ctx)
 
 static void datapath_jsr_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -1984,10 +1984,10 @@ static void datapath_jsr_cycle_zero(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "JSR abs";
     ct_assertequal((int)strlen(exp), written);
@@ -1996,7 +1996,7 @@ static void datapath_jsr_cycle_zero(void *ctx)
 
 static void datapath_jsr_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -2005,10 +2005,10 @@ static void datapath_jsr_cycle_one(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "JSR $??43";
     ct_assertequal((int)strlen(exp), written);
@@ -2017,7 +2017,7 @@ static void datapath_jsr_cycle_one(void *ctx)
 
 static void datapath_jsr_cycle_two(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -2026,10 +2026,10 @@ static void datapath_jsr_cycle_two(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "JSR $2143";
     ct_assertequal((int)strlen(exp), written);
@@ -2038,7 +2038,7 @@ static void datapath_jsr_cycle_two(void *ctx)
 
 static void datapath_jsr_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 3,
         },
@@ -2047,10 +2047,10 @@ static void datapath_jsr_cycle_n(void *ctx)
             .prglength = 3,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "JSR $2143";
     ct_assertequal((int)strlen(exp), written);
@@ -2059,7 +2059,7 @@ static void datapath_jsr_cycle_n(void *ctx)
 
 static void datapath_rts_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -2068,10 +2068,10 @@ static void datapath_rts_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "RTS imp";
     ct_assertequal((int)strlen(exp), written);
@@ -2080,7 +2080,7 @@ static void datapath_rts_cycle_zero(void *ctx)
 
 static void datapath_rts_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -2089,10 +2089,10 @@ static void datapath_rts_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "RTS ";
     ct_assertequal((int)strlen(exp), written);
@@ -2101,7 +2101,7 @@ static void datapath_rts_cycle_one(void *ctx)
 
 static void datapath_rts_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -2110,10 +2110,10 @@ static void datapath_rts_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "RTS ";
     ct_assertequal((int)strlen(exp), written);
@@ -2122,7 +2122,7 @@ static void datapath_rts_cycle_n(void *ctx)
 
 static void datapath_brk_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
         },
@@ -2131,10 +2131,10 @@ static void datapath_brk_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK imp";
     ct_assertequal((int)strlen(exp), written);
@@ -2143,7 +2143,7 @@ static void datapath_brk_cycle_zero(void *ctx)
 
 static void datapath_brk_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
         },
@@ -2152,10 +2152,10 @@ static void datapath_brk_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK ";
     ct_assertequal((int)strlen(exp), written);
@@ -2164,7 +2164,7 @@ static void datapath_brk_cycle_one(void *ctx)
 
 static void datapath_brk_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
         },
@@ -2173,10 +2173,10 @@ static void datapath_brk_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK ";
     ct_assertequal((int)strlen(exp), written);
@@ -2185,7 +2185,7 @@ static void datapath_brk_cycle_n(void *ctx)
 
 static void datapath_brk_cycle_six(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 6,
         },
@@ -2194,10 +2194,10 @@ static void datapath_brk_cycle_six(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = sn.mem.currprg[0];
+    snp.datapath.opcode = snp.mem.currprg[0];
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK CLR";
     ct_assertequal((int)strlen(exp), written);
@@ -2206,7 +2206,7 @@ static void datapath_brk_cycle_six(void *ctx)
 
 static void datapath_irq_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
             .irq = CSGS_COMMITTED,
@@ -2216,10 +2216,10 @@ static void datapath_irq_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = BrkOpcode;
+    snp.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK imp";
     ct_assertequal((int)strlen(exp), written);
@@ -2228,7 +2228,7 @@ static void datapath_irq_cycle_zero(void *ctx)
 
 static void datapath_irq_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
             .irq = CSGS_COMMITTED,
@@ -2238,10 +2238,10 @@ static void datapath_irq_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = BrkOpcode;
+    snp.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK (IRQ)";
     ct_assertequal((int)strlen(exp), written);
@@ -2250,7 +2250,7 @@ static void datapath_irq_cycle_one(void *ctx)
 
 static void datapath_irq_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
             .irq = CSGS_COMMITTED,
@@ -2260,10 +2260,10 @@ static void datapath_irq_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = BrkOpcode;
+    snp.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK (IRQ)";
     ct_assertequal((int)strlen(exp), written);
@@ -2272,7 +2272,7 @@ static void datapath_irq_cycle_n(void *ctx)
 
 static void datapath_irq_cycle_six(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 6,
             .irq = CSGS_COMMITTED,
@@ -2282,10 +2282,10 @@ static void datapath_irq_cycle_six(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = BrkOpcode;
+    snp.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK CLR";
     ct_assertequal((int)strlen(exp), written);
@@ -2294,7 +2294,7 @@ static void datapath_irq_cycle_six(void *ctx)
 
 static void datapath_nmi_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
             .nmi = CSGS_COMMITTED,
@@ -2304,10 +2304,10 @@ static void datapath_nmi_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = BrkOpcode;
+    snp.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK imp";
     ct_assertequal((int)strlen(exp), written);
@@ -2316,7 +2316,7 @@ static void datapath_nmi_cycle_zero(void *ctx)
 
 static void datapath_nmi_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
             .nmi = CSGS_COMMITTED,
@@ -2326,10 +2326,10 @@ static void datapath_nmi_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = BrkOpcode;
+    snp.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK (NMI)";
     ct_assertequal((int)strlen(exp), written);
@@ -2338,7 +2338,7 @@ static void datapath_nmi_cycle_one(void *ctx)
 
 static void datapath_nmi_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
             .nmi = CSGS_COMMITTED,
@@ -2348,10 +2348,10 @@ static void datapath_nmi_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = BrkOpcode;
+    snp.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK (NMI)";
     ct_assertequal((int)strlen(exp), written);
@@ -2360,7 +2360,7 @@ static void datapath_nmi_cycle_n(void *ctx)
 
 static void datapath_nmi_cycle_six(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 6,
             .nmi = CSGS_COMMITTED,
@@ -2370,10 +2370,10 @@ static void datapath_nmi_cycle_six(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = BrkOpcode;
+    snp.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK CLR";
     ct_assertequal((int)strlen(exp), written);
@@ -2382,7 +2382,7 @@ static void datapath_nmi_cycle_six(void *ctx)
 
 static void datapath_res_cycle_zero(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 0,
             .res = CSGS_COMMITTED,
@@ -2392,10 +2392,10 @@ static void datapath_res_cycle_zero(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = BrkOpcode;
+    snp.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK imp";
     ct_assertequal((int)strlen(exp), written);
@@ -2404,7 +2404,7 @@ static void datapath_res_cycle_zero(void *ctx)
 
 static void datapath_res_cycle_one(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 1,
             .res = CSGS_COMMITTED,
@@ -2414,10 +2414,10 @@ static void datapath_res_cycle_one(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = BrkOpcode;
+    snp.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK (RES)";
     ct_assertequal((int)strlen(exp), written);
@@ -2426,7 +2426,7 @@ static void datapath_res_cycle_one(void *ctx)
 
 static void datapath_res_cycle_n(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 2,
             .res = CSGS_COMMITTED,
@@ -2436,10 +2436,10 @@ static void datapath_res_cycle_n(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = BrkOpcode;
+    snp.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK (RES)";
     ct_assertequal((int)strlen(exp), written);
@@ -2448,7 +2448,7 @@ static void datapath_res_cycle_n(void *ctx)
 
 static void datapath_res_cycle_six(void *ctx)
 {
-    struct console_state sn = {
+    struct console_state snp = {
         .datapath = {
             .exec_cycle = 6,
             .res = CSGS_COMMITTED,
@@ -2458,10 +2458,10 @@ static void datapath_res_cycle_six(void *ctx)
             .prglength = 2,
         },
     };
-    sn.datapath.opcode = BrkOpcode;
+    snp.datapath.opcode = BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
-    const int written = dis_datapath(&sn, buf);
+    const int written = dis_datapath(&snp, buf);
 
     const char *const exp = "BRK CLR";
     ct_assertequal((int)strlen(exp), written);
@@ -2489,11 +2489,11 @@ static void peek_immediate(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
-    struct console_state snapshot;
+    struct console_state snp;
     cpu.a = 0x10;
-    cpu_snapshot(&cpu, &snapshot);
+    cpu_snapshot(&cpu, &snp);
 
-    const int written = dis_peek(0x0, &cpu, ctx, &snapshot, buf);
+    const int written = dis_peek(0x0, &cpu, ctx, &snp, buf);
 
     const char *const exp = "";
     ct_assertequal((int)strlen(exp), written);
@@ -2508,11 +2508,11 @@ static void peek_zeropage(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
-    struct console_state snapshot;
+    struct console_state snp;
     cpu.a = 0x10;
-    cpu_snapshot(&cpu, &snapshot);
+    cpu_snapshot(&cpu, &snp);
 
-    const int written = dis_peek(0x0, &cpu, ctx, &snapshot, buf);
+    const int written = dis_peek(0x0, &cpu, ctx, &snp, buf);
 
     const char *const exp = "= 20";
     ct_assertequal((int)strlen(exp), written);
@@ -2526,13 +2526,13 @@ static void peek_zp_indexed(void *ctx)
     uint8_t mem[] = {0xb5, 0x3, 0x0, 0x0, 0x0, 0x30};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct console_state snapshot;
+    struct console_state snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 2;
-    cpu_snapshot(&cpu, &snapshot);
+    cpu_snapshot(&cpu, &snp);
 
-    const int written = dis_peek(0x0, &cpu, ctx, &snapshot, buf);
+    const int written = dis_peek(0x0, &cpu, ctx, &snp, buf);
 
     const char *const exp = "@ 05 = 30";
     ct_assertequal((int)strlen(exp), written);
@@ -2546,13 +2546,13 @@ static void peek_indexed_indirect(void *ctx)
     uint8_t mem[] = {0xa1, 0x2, 0x0, 0x0, 0x2, 0x1, [258] = 0x40};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct console_state snapshot;
+    struct console_state snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 2;
-    cpu_snapshot(&cpu, &snapshot);
+    cpu_snapshot(&cpu, &snp);
 
-    const int written = dis_peek(0x0, &cpu, ctx, &snapshot, buf);
+    const int written = dis_peek(0x0, &cpu, ctx, &snp, buf);
 
     const char *const exp = "@ 04 > 0102 = 40";
     ct_assertequal((int)strlen(exp), written);
@@ -2566,13 +2566,13 @@ static void peek_indirect_indexed(void *ctx)
     uint8_t mem[] = {0xb1, 0x2, 0x2, 0x1, [263] = 0x60};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct console_state snapshot;
+    struct console_state snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.y = 5;
-    cpu_snapshot(&cpu, &snapshot);
+    cpu_snapshot(&cpu, &snp);
 
-    const int written = dis_peek(0x0, &cpu, ctx, &snapshot, buf);
+    const int written = dis_peek(0x0, &cpu, ctx, &snp, buf);
 
     const char *const exp = "> 0102 @ 0107 = 60";
     ct_assertequal((int)strlen(exp), written);
@@ -2586,13 +2586,13 @@ static void peek_absolute_indexed(void *ctx)
     uint8_t mem[] = {0xbd, 0x2, 0x1, [268] = 0x70};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct console_state snapshot;
+    struct console_state snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 0xa;
-    cpu_snapshot(&cpu, &snapshot);
+    cpu_snapshot(&cpu, &snp);
 
-    const int written = dis_peek(0x0, &cpu, ctx, &snapshot, buf);
+    const int written = dis_peek(0x0, &cpu, ctx, &snp, buf);
 
     const char *const exp = "@ 010C = 70";
     ct_assertequal((int)strlen(exp), written);
@@ -2606,12 +2606,12 @@ static void peek_branch(void *ctx)
     uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct console_state snapshot;
+    struct console_state snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
-    cpu_snapshot(&cpu, &snapshot);
+    cpu_snapshot(&cpu, &snp);
 
-    const int written = dis_peek(0x0, &cpu, ctx, &snapshot, buf);
+    const int written = dis_peek(0x0, &cpu, ctx, &snp, buf);
 
     const char *const exp = "@ 0007";
     ct_assertequal((int)strlen(exp), written);
@@ -2625,12 +2625,12 @@ static void peek_branch_forced(void *ctx)
     uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct console_state snapshot;
+    struct console_state snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.z = false;
-    cpu_snapshot(&cpu, &snapshot);
+    cpu_snapshot(&cpu, &snp);
 
-    const int written = dis_peek(0x0, &cpu, ctx, &snapshot, buf);
+    const int written = dis_peek(0x0, &cpu, ctx, &snp, buf);
 
     const char *const exp = "@ 0007";
     ct_assertequal((int)strlen(exp), written);
@@ -2644,13 +2644,13 @@ static void peek_absolute_indirect(void *ctx)
     uint8_t mem[] = {0x6c, 0x2, 0x1, [258] = 0x5, 0x2, [517] = 80};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct console_state snapshot;
+    struct console_state snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 0xa;
-    cpu_snapshot(&cpu, &snapshot);
+    cpu_snapshot(&cpu, &snp);
 
-    const int written = dis_peek(0x0, &cpu, ctx, &snapshot, buf);
+    const int written = dis_peek(0x0, &cpu, ctx, &snp, buf);
 
     const char *const exp = "> 0205";
     ct_assertequal((int)strlen(exp), written);
@@ -2665,16 +2665,16 @@ static void peek_interrupt(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
-    struct console_state snapshot;
+    struct console_state snp;
     cpu.a = 0x10;
     cpu.irq = CSGS_COMMITTED;
-    cpu_snapshot(&cpu, &snapshot);
+    cpu_snapshot(&cpu, &snp);
     debugger *const dbg = ctx;
     debug_set_vector_override(dbg, NoResetVector);
-    snapshot.mem.vectors[4] = 0xbb;
-    snapshot.mem.vectors[5] = 0xaa;
+    snp.mem.vectors[4] = 0xbb;
+    snp.mem.vectors[5] = 0xaa;
 
-    const int written = dis_peek(0x0, &cpu, dbg, &snapshot, buf);
+    const int written = dis_peek(0x0, &cpu, dbg, &snp, buf);
 
     const char *const exp = "(IRQ) > AABB";
     ct_assertequal((int)strlen(exp), written);
@@ -2689,16 +2689,16 @@ static void peek_overridden_reset(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
-    struct console_state snapshot;
+    struct console_state snp;
     cpu.a = 0x10;
     cpu.res = CSGS_COMMITTED;
-    cpu_snapshot(&cpu, &snapshot);
+    cpu_snapshot(&cpu, &snp);
     debugger *const dbg = ctx;
     debug_set_vector_override(dbg, 0xccdd);
-    snapshot.mem.vectors[2] = 0xbb;
-    snapshot.mem.vectors[3] = 0xaa;
+    snp.mem.vectors[2] = 0xbb;
+    snp.mem.vectors[3] = 0xaa;
 
-    const int written = dis_peek(0x0, &cpu, dbg, &snapshot, buf);
+    const int written = dis_peek(0x0, &cpu, dbg, &snp, buf);
 
     const char *const exp = "(RES) > !CCDD";
     ct_assertequal((int)strlen(exp), written);
@@ -2713,18 +2713,18 @@ static void peek_overridden_non_reset(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
-    struct console_state snapshot;
+    struct console_state snp;
     cpu.a = 0x10;
     cpu.nmi = CSGS_COMMITTED;
-    cpu_snapshot(&cpu, &snapshot);
+    cpu_snapshot(&cpu, &snp);
     debugger *const dbg = ctx;
     debug_set_vector_override(dbg, 0xccdd);
-    snapshot.mem.vectors[0] = 0xff;
-    snapshot.mem.vectors[1] = 0xee;
-    snapshot.mem.vectors[2] = 0xbb;
-    snapshot.mem.vectors[3] = 0xaa;
+    snp.mem.vectors[0] = 0xff;
+    snp.mem.vectors[1] = 0xee;
+    snp.mem.vectors[2] = 0xbb;
+    snp.mem.vectors[3] = 0xaa;
 
-    const int written = dis_peek(0x0, &cpu, dbg, &snapshot, buf);
+    const int written = dis_peek(0x0, &cpu, dbg, &snp, buf);
 
     const char *const exp = "(NMI) > EEFF";
     ct_assertequal((int)strlen(exp), written);
@@ -2738,13 +2738,13 @@ static void peek_busfault(void *ctx)
     uint8_t mem[] = {0xb1, 0x2, 0x2, 0x40};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct console_state snapshot;
+    struct console_state snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.y = 5;
-    cpu_snapshot(&cpu, &snapshot);
+    cpu_snapshot(&cpu, &snp);
 
-    const int written = dis_peek(0x0, &cpu, ctx, &snapshot, buf);
+    const int written = dis_peek(0x0, &cpu, ctx, &snp, buf);
 
     const char *const exp = "> 4002 @ 4007 = FLT";
     ct_assertequal((int)strlen(exp), written);

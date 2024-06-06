@@ -2377,13 +2377,13 @@ static void nop_zp(void *ctx)
         ct_assertequal(0xcu, cpu.databus, "Failed on opcode %02x", opc);
 
         // NOTE: verify NOP did nothing
-        struct console_state sn;
-        cpu_snapshot(&cpu, &sn);
+        struct console_state snp;
+        cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.x, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.y, "Failed on opcode %02x", opc);
-        ct_assertequal(0x34u, sn.cpu.status, "Failed on opcode %02x", opc);
+        ct_assertequal(0x34u, snp.cpu.status, "Failed on opcode %02x", opc);
     }
 }
 
@@ -2404,13 +2404,13 @@ static void nop_zpx(void *ctx)
         ct_assertequal(0xbu, cpu.databus, "Failed on opcode %02x", opc);
 
         // NOTE: verify NOP did nothing
-        struct console_state sn;
-        cpu_snapshot(&cpu, &sn);
+        struct console_state snp;
+        cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
         ct_assertequal(4u, cpu.x, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.y, "Failed on opcode %02x", opc);
-        ct_assertequal(0x34u, sn.cpu.status, "Failed on opcode %02x", opc);
+        ct_assertequal(0x34u, snp.cpu.status, "Failed on opcode %02x", opc);
     }
 }
 
@@ -2431,13 +2431,13 @@ static void nop_zpx_pageoverflow(void *ctx)
         ct_assertequal(0x6u, cpu.databus, "Failed on opcode %02x", opc);
 
         // NOTE: verify NOP did nothing
-        struct console_state sn;
-        cpu_snapshot(&cpu, &sn);
+        struct console_state snp;
+        cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
         ct_assertequal(0xffu, cpu.x, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.y, "Failed on opcode %02x", opc);
-        ct_assertequal(0x34u, sn.cpu.status, "Failed on opcode %02x", opc);
+        ct_assertequal(0x34u, snp.cpu.status, "Failed on opcode %02x", opc);
     }
 }
 

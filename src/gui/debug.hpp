@@ -47,11 +47,11 @@ public:
 
     int vectorOverride() const noexcept
     {
-        return debug_vector_override(debugp());
+        return debug_vector_override(dbgp());
     }
     void vectorOverride(int resetvector) noexcept
     {
-        debug_set_vector_override(debugp(), resetvector);
+        debug_set_vector_override(dbgp(), resetvector);
     }
     void vectorClear() noexcept
     {
@@ -61,8 +61,8 @@ public:
     {
         return vectorOverride() != NoResetVector;
     }
-    BpView breakpoints() const noexcept { return debugp(); }
-    MutableBpView breakpoints() noexcept { return debugp(); }
+    BpView breakpoints() const noexcept { return dbgp(); }
+    MutableBpView breakpoints() noexcept { return dbgp(); }
     bool isActive() const noexcept
     {
         return isVectorOverridden() || !breakpoints().empty();
@@ -85,7 +85,7 @@ public:
 
         BreakpointIterator() noexcept = default;
         BreakpointIterator(debugger* d, difference_type count) noexcept
-        : debugp{d}, count{count} {}
+        : dbgp{d}, count{count} {}
 
         reference operator*() const noexcept
         {
@@ -93,7 +93,7 @@ public:
         }
         pointer operator->() const noexcept
         {
-            return debug_bp_at(debugp, idx);
+            return debug_bp_at(dbgp, idx);
         }
 
         BreakpointIterator& operator++() noexcept { ++idx; return *this; }
@@ -110,15 +110,15 @@ public:
             return (a.sentinel() && b.sentinel())
                     || (b.sentinel() && a.exhausted())
                     || (a.sentinel() && b.exhausted())
-                    || (a.debugp == b.debugp && a.idx == b.idx
+                    || (a.dbgp == b.dbgp && a.idx == b.idx
                         && a.count == b.count);
         }
 
     private:
-        bool sentinel() const noexcept { return !debugp; }
+        bool sentinel() const noexcept { return !dbgp; }
         bool exhausted() const noexcept { return idx == count; }
 
-        debugger* debugp = nullptr;
+        debugger* dbgp = nullptr;
         difference_type count = 0, idx = 0;
     };
 
@@ -135,18 +135,18 @@ public:
         using const_reference = const_iterator::reference;
         using const_pointer = const_iterator::pointer;
 
-        size_type size() const noexcept { return debug_bp_count(debugp); }
+        size_type size() const noexcept { return debug_bp_count(dbgp); }
         bool empty() const noexcept { return size() == 0; }
         const_pointer at(difference_type i) const noexcept
         {
-            return debug_bp_at(debugp, i);
+            return debug_bp_at(dbgp, i);
         }
 
         const_iterator cbegin() const noexcept
         {
             // NOTE: ssize is not noexcept but all it does is delegate to
             // this->size() which in this case is noexcept.
-            return {debugp, std::ssize(*this)};
+            return {dbgp, std::ssize(*this)};
         }
         const_iterator cend() const noexcept { return {}; }
         const_iterator begin() const noexcept { return cbegin(); }
@@ -154,30 +154,30 @@ public:
 
         void append(haltexpr expr) noexcept requires Mutable
         {
-            debug_bp_add(debugp, expr);
+            debug_bp_add(dbgp, expr);
         }
         void enable(difference_type i) noexcept requires Mutable
         {
-            debug_bp_enabled(debugp, i, true);
+            debug_bp_enabled(dbgp, i, true);
         }
         void disable(difference_type i) noexcept requires Mutable
         {
-            debug_bp_enabled(debugp, i, false);
+            debug_bp_enabled(dbgp, i, false);
         }
         void remove(difference_type i) noexcept requires Mutable
         {
-            debug_bp_remove(debugp, i);
+            debug_bp_remove(dbgp, i);
         }
-        void clear() noexcept requires Mutable { debug_bp_clear(debugp); }
+        void clear() noexcept requires Mutable { debug_bp_clear(dbgp); }
 
     private:
         static_assert(std::forward_iterator<const_iterator>,
                       "Incomplete breakpoint iterator definition");
         friend Debugger;
 
-        BreakpointsView(debugger* d) noexcept : debugp{d} {}
+        BreakpointsView(debugger* d) noexcept : dbgp{d} {}
 
-        debugger* debugp;
+        debugger* dbgp;
     };
 
 private:
@@ -185,7 +185,7 @@ private:
 
     explicit Debugger(debug_handle d) noexcept : hdebug{std::move(d)} {}
 
-    debugger* debugp() const noexcept { return hdebug.get(); }
+    debugger* dbgp() const noexcept { return hdebug.get(); }
 
     bool hasBreak(const console_state& snapshot) const noexcept
     {

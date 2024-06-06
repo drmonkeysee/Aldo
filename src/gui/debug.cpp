@@ -107,7 +107,7 @@ auto write_brkfile(const std::filesystem::path& filepath,
 
 void aldo::Debugger::loadBreakpoints(const std::filesystem::path& filepath)
 {
-    set_debug_state(debugp(), read_brkfile(filepath));
+    set_debug_state(dbgp(), read_brkfile(filepath));
 }
 
 void

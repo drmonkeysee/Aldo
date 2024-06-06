@@ -12,7 +12,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct addressbus bus;
+typedef struct hardwarebus bus;
 
 #include "bridgeopen.h"
 struct busdevice {

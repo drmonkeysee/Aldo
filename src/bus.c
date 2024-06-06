@@ -13,7 +13,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-struct addressbus {
+struct hardwarebus {
     size_t count;
     uint16_t maxaddr;
     struct partition {
@@ -22,7 +22,7 @@ struct addressbus {
     } partitions[];
 };
 
-static struct partition *find(struct addressbus *self, uint16_t addr)
+static struct partition *find(struct hardwarebus *self, uint16_t addr)
 {
     for (size_t i = self->count - 1; i > 0; --i) {
         if (addr >= self->partitions[i].start) return self->partitions + i;
@@ -41,8 +41,8 @@ bus *bus_new(int bitwidth, size_t n, ...)
     assert(0 < n);
 
     const size_t psize = sizeof(struct partition) * n;
-    struct addressbus *const self = malloc(sizeof *self + psize);
-    *self = (struct addressbus){
+    struct hardwarebus *const self = malloc(sizeof *self + psize);
+    *self = (struct hardwarebus){
         .count = n,
         .maxaddr = (uint16_t)(1 << bitwidth) - 1,
     };

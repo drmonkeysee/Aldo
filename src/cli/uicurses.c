@@ -204,14 +204,14 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
     mvwprintw(v->content, cursor_y++, 0, "Tracing: %s",
               emu->args->tron ? "On" : "Off");
     mvwaddstr(v->content, cursor_y++, 0, "Reset Override: ");
-    const int resetvector = debug_vector_override(emu->dbg);
+    const int resetvector = debug_vector_override(emu->debugger);
     if (resetvector == NoResetVector) {
         waddstr(v->content, "None");
     } else {
         wprintw(v->content, "$%04X", resetvector);
     }
     const struct breakpoint *const bp =
-        debug_bp_at(emu->dbg, emu->snapshot.debugger.halted);
+        debug_bp_at(emu->debugger, emu->snapshot.debugger.halted);
     char break_desc[HEXPR_FMT_SIZE];
     const int err = haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
     mvwprintw(v->content, cursor_y, 0, "Break: %s",
@@ -282,7 +282,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
     hi = emu->snapshot.mem.vectors[3];
     mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     RES",
               CPU_VECTOR_RES, lo, hi);
-    const int resetvector = debug_vector_override(emu->dbg);
+    const int resetvector = debug_vector_override(emu->debugger);
     if (resetvector == NoResetVector) {
         wprintw(v->content, " $%04X", bytowr(lo, hi));
     } else {

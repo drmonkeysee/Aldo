@@ -73,8 +73,8 @@ auto update_bouncer(aldo::viewstate& vs, const console_state& snp) noexcept
 
 aldo::Emulator::Emulator(aldo::debug_handle d, aldo::console_handle n,
                          const gui_platform& p)
-: prefspath{get_prefspath(p)}, hdebug{std::move(d)}, hconsole{std::move(n)},
-    hsnapshot{consolep()} {}
+: prefspath{get_prefspath(p)}, hdbg{std::move(d)}, hconsole{std::move(n)},
+    hsnp{consolep()} {}
 
 std::string_view aldo::Emulator::displayCartName() const noexcept
 {

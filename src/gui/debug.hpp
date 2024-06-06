@@ -183,16 +183,16 @@ public:
 private:
     friend class Emulator;
 
-    explicit Debugger(debug_handle d) noexcept : hdebug{std::move(d)} {}
+    explicit Debugger(debug_handle d) noexcept : hdbg{std::move(d)} {}
 
-    debugger* dbgp() const noexcept { return hdebug.get(); }
+    debugger* dbgp() const noexcept { return hdbg.get(); }
 
     bool hasBreak(const console_state& snp) const noexcept
     {
         return snp.debugger.halted != NoBreakpoint;
     }
 
-    debug_handle hdebug;
+    debug_handle hdbg;
 };
 
 }

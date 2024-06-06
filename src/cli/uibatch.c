@@ -125,7 +125,7 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
            (double)c->cyclock.total_cycles / c->cyclock.runtime);
     if (emu->snapshot.debugger.halted != NoBreakpoint) {
         const struct breakpoint *const bp =
-            debug_bp_at(emu->dbg, emu->snapshot.debugger.halted);
+            debug_bp_at(emu->debugger, emu->snapshot.debugger.halted);
         assert(bp != NULL);
         char break_desc[HEXPR_FMT_SIZE];
         const int err = haltexpr_desc(&bp->expr, break_desc);

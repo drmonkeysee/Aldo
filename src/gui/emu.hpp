@@ -63,12 +63,12 @@ public:
     const std::filesystem::path& cartName() const noexcept { return cartname; }
     std::string_view displayCartName() const noexcept;
     std::optional<cartinfo> cartInfo() const;
-    const Debugger& debugger() const noexcept { return hdebug; }
-    Debugger& debugger() noexcept { return hdebug; }
-    const console_state& snapshot() const noexcept { return hsnapshot.get(); }
+    const Debugger& debugger() const noexcept { return hdbg; }
+    Debugger& debugger() noexcept { return hdbg; }
+    const console_state& snapshot() const noexcept { return hsnp.get(); }
     const console_state* snapshotp() const noexcept
     {
-        return hsnapshot.getp();
+        return hsnp.getp();
     }
     const Palette& palette() const noexcept { return hpalette; }
     Palette& palette() noexcept { return hpalette; }
@@ -98,7 +98,7 @@ public:
 private:
     cart* cartp() const noexcept { return hcart.get(); }
     nes* consolep() const noexcept { return hconsole.get(); }
-    console_state* snapshotp() noexcept { return hsnapshot.getp(); }
+    console_state* snapshotp() noexcept { return hsnp.getp(); }
 
     void loadCartState();
     void saveCartState() const;
@@ -106,9 +106,9 @@ private:
 
     std::filesystem::path cartname, cartpath, prefspath;
     cart_handle hcart;
-    Debugger hdebug;
+    Debugger hdbg;
     console_handle hconsole;
-    Snapshot hsnapshot;
+    Snapshot hsnp;
     Palette hpalette;
 };
 

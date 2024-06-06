@@ -216,14 +216,15 @@ static int run_emu(const struct cliargs *args, cart *c)
     struct emulator emu = {
         .args = args,
         .cart = c,
-        .dbg = create_debugger(args),
+        .debugger = create_debugger(args),
     };
-    if (!emu.dbg) {
+    if (!emu.debugger) {
         fputs("Unable to initialize debugger!\n", stderr);
         return EXIT_FAILURE;
     }
 
-    if (emu.args->batch && emu.args->tron && debug_bp_count(emu.dbg) == 0) {
+    if (emu.args->batch && emu.args->tron
+        && debug_bp_count(emu.debugger) == 0) {
         fputs("*** WARNING ***\nYou have turned on trace-logging"
               " with batch mode but specified no halt conditions;\n"
               "this can result in a very large trace file very quickly!\n"
@@ -242,7 +243,7 @@ static int run_emu(const struct cliargs *args, cart *c)
             goto exit_debug;
         }
     }
-    emu.console = nes_new(emu.dbg, emu.args->bcdsupport, tracelog);
+    emu.console = nes_new(emu.debugger, emu.args->bcdsupport, tracelog);
     if (!emu.console) {
         fputs("Unable to initialize console!\n", stderr);
         result = EXIT_FAILURE;
@@ -267,7 +268,7 @@ exit_trace:
         fclose(tracelog);
     }
 exit_debug:
-    debug_free(emu.dbg);
+    debug_free(emu.debugger);
     return result;
 }
 

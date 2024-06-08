@@ -30,7 +30,6 @@ struct viewstate;
 
 using cart_handle = handle<cart, cart_free>;
 using console_handle = handle<nes, nes_free>;
-using console_snapshot = snapshot;
 
 class Snapshot {
 public:
@@ -54,6 +53,8 @@ private:
 
 class ALDO_SIDEFX Emulator {
 public:
+    using console_snapshot = snapshot;
+
     Emulator(debug_handle d, console_handle n, const gui_platform& p);
     Emulator(const Emulator&) = delete;
     Emulator& operator=(const Emulator&) = delete;

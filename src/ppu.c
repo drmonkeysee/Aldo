@@ -117,6 +117,7 @@ static void handle_reset(struct rp2c02 *self)
     // NOTE: reset should never be in serviced state
     assert(self->res != CSGS_SERVICED);
 
+    // NOTE: pending always proceeds to committed just like the CPU sequence
     if (self->res == CSGS_PENDING) {
         self->res = CSGS_COMMITTED;
     }

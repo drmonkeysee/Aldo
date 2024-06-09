@@ -57,6 +57,163 @@ static void powerup_initializes_ppu(void *ctx)
     ct_assertfalse(ppu->status.s);
 }
 
+static void reset_sequence(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->line = 42;
+    ppu->dot = 24;
+    ppu->signal.intr = false;
+    ppu->mask.b = ppu->ctrl.b = ppu->signal.vout = ppu->odd = ppu->w = true;
+    ppu->scroll = 0x45;
+    ppu->rbuf = 0x56;
+    ppu->res = CSGS_CLEAR;
+
+    // NOTE: reset cadence is on cpu cycle so ppu cycle ratio doesn't matter
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(42u, ppu->line);
+    ct_assertequal(27u, ppu->dot);
+    ct_assertfalse(ppu->signal.intr);
+    ct_asserttrue(ppu->mask.b);
+    ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->signal.vout);
+    ct_asserttrue(ppu->odd);
+    ct_asserttrue(ppu->w);
+    ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(CSGS_CLEAR, (int)ppu->res);
+
+    ppu->signal.res = false;
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(42u, ppu->line);
+    ct_assertequal(30u, ppu->dot);
+    ct_assertfalse(ppu->signal.intr);
+    ct_asserttrue(ppu->mask.b);
+    ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->signal.vout);
+    ct_asserttrue(ppu->odd);
+    ct_asserttrue(ppu->w);
+    ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(CSGS_DETECTED, (int)ppu->res);
+
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(42u, ppu->line);
+    ct_assertequal(33u, ppu->dot);
+    ct_assertfalse(ppu->signal.intr);
+    ct_asserttrue(ppu->mask.b);
+    ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->signal.vout);
+    ct_asserttrue(ppu->odd);
+    ct_asserttrue(ppu->w);
+    ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(CSGS_PENDING, (int)ppu->res);
+
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(42u, ppu->line);
+    ct_assertequal(36u, ppu->dot);
+    ct_assertfalse(ppu->signal.intr);
+    ct_asserttrue(ppu->mask.b);
+    ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->signal.vout);
+    ct_asserttrue(ppu->odd);
+    ct_asserttrue(ppu->w);
+    ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(CSGS_COMMITTED, (int)ppu->res);
+
+    // NOTE: reset line held
+    ppu_cycle(ppu, 5);
+
+    ct_assertequal(42u, ppu->line);
+    ct_assertequal(51u, ppu->dot);
+    ct_assertfalse(ppu->signal.intr);
+    ct_asserttrue(ppu->mask.b);
+    ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->signal.vout);
+    ct_asserttrue(ppu->odd);
+    ct_asserttrue(ppu->w);
+    ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(CSGS_COMMITTED, (int)ppu->res);
+
+    ppu->signal.res = true;
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(3u, ppu->dot);
+    ct_asserttrue(ppu->signal.intr);
+    ct_assertfalse(ppu->mask.b);
+    ct_assertfalse(ppu->ctrl.b);
+    ct_assertfalse(ppu->signal.vout);
+    ct_assertfalse(ppu->odd);
+    ct_assertfalse(ppu->w);
+    ct_assertequal(0x0u, ppu->scroll);
+    ct_assertequal(0x0u, ppu->rbuf);
+    ct_assertequal(CSGS_CLEAR, (int)ppu->res);
+}
+
+static void reset_too_short(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->line = 42;
+    ppu->dot = 24;
+    ppu->signal.intr = false;
+    ppu->mask.b = ppu->ctrl.b = ppu->signal.vout = ppu->odd = ppu->w = true;
+    ppu->scroll = 0x45;
+    ppu->rbuf = 0x56;
+    ppu->res = CSGS_CLEAR;
+
+    // NOTE: reset cadence is on cpu cycle so ppu cycle ratio doesn't matter
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(42u, ppu->line);
+    ct_assertequal(27u, ppu->dot);
+    ct_assertfalse(ppu->signal.intr);
+    ct_asserttrue(ppu->mask.b);
+    ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->signal.vout);
+    ct_asserttrue(ppu->odd);
+    ct_asserttrue(ppu->w);
+    ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(CSGS_CLEAR, (int)ppu->res);
+
+    ppu->signal.res = false;
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(42u, ppu->line);
+    ct_assertequal(30u, ppu->dot);
+    ct_assertfalse(ppu->signal.intr);
+    ct_asserttrue(ppu->mask.b);
+    ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->signal.vout);
+    ct_asserttrue(ppu->odd);
+    ct_asserttrue(ppu->w);
+    ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(CSGS_DETECTED, (int)ppu->res);
+
+    ppu->signal.res = true;
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(42u, ppu->line);
+    ct_assertequal(33u, ppu->dot);
+    ct_assertfalse(ppu->signal.intr);
+    ct_asserttrue(ppu->mask.b);
+    ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->signal.vout);
+    ct_asserttrue(ppu->odd);
+    ct_asserttrue(ppu->w);
+    ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(CSGS_CLEAR, (int)ppu->res);
+}
+
 static void trace_pixel_no_adjustment(void *ctx)
 {
     const struct rp2c02 *const ppu = get_ppu(ctx);
@@ -120,6 +277,8 @@ struct ct_testsuite ppu_tests(void)
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(powerup_initializes_ppu),
+        ct_maketest(reset_sequence),
+        ct_maketest(reset_too_short),
         ct_maketest(trace_pixel_no_adjustment),
         ct_maketest(trace_pixel_zero_with_adjustment),
         ct_maketest(trace_pixel),

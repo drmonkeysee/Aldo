@@ -526,7 +526,7 @@ static int draw_pdatapath(const struct view *v, int cursor_y, int w,
 static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
                              const struct snapshot *snp)
 {
-    mvwprintw(v->content, cursor_y, line_x - 2, "[%s%02X]", DArrowDown, 0);
+    mvwprintw(v->content, cursor_y, line_x - 2, "[%sXX]", DArrowDown);
     draw_interrupt_latch(v, snp->pdatapath.res, cursor_y, line_x * 3);
 
     // NOTE: jump 2 rows as interrupts are drawn direction first

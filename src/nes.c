@@ -34,12 +34,18 @@ struct nes001 {
 static bool ram_read(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)
 {
+    // NOTE: addr=[$0000-$1FFF]
+    assert(addr < MEMBLOCK_8KB);
+
     *d = ((const uint8_t *)ctx)[addr & ADDRMASK_2KB];
     return true;
 }
 
 static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
 {
+    // NOTE: addr=[$0000-$1FFF]
+    assert(addr < MEMBLOCK_8KB);
+
     ((uint8_t *)ctx)[addr & ADDRMASK_2KB] = d;
     return true;
 }
@@ -47,6 +53,9 @@ static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
 static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
                       uint8_t dest[restrict count])
 {
+    // NOTE: addr=[$0000-$1FFF]
+    assert(addr < MEMBLOCK_8KB);
+
     return bytecopy_bankmirrored(ctx, BITWIDTH_2KB, addr, BITWIDTH_8KB, count,
                                  dest);
 }

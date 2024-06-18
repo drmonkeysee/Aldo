@@ -31,11 +31,16 @@ struct nes001 {
             vram[MEMBLOCK_2KB]; // PPU Internal RAM
 };
 
-#define ram_load(d, ctx, addr) \
-(*(d) = ((const uint8_t *)(ctx))[(addr) & ADDRMASK_2KB])
+static void ram_load(uint8_t *restrict d, const uint8_t *restrict mem,
+                     uint16_t addr)
+{
+    *d = mem[addr & ADDRMASK_2KB];
+}
 
-#define ram_store(ctx, addr, d) \
-(((uint8_t *)(ctx))[(addr) & ADDRMASK_2KB] = (d))
+static void ram_store(uint8_t *mem, uint16_t addr, uint8_t d)
+{
+    mem[addr & ADDRMASK_2KB] = d;
+}
 
 static bool ram_read(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)
@@ -167,7 +172,6 @@ static void teardown(struct nes001 *self)
     debug_cpu_disconnect(self->dbg);
     bus_free(self->ppu.vbus);
     bus_free(self->cpu.mbus);
-    self->cpu.mbus = self->ppu.vbus = NULL;
 }
 
 static void set_interrupt(struct nes001 *self, enum csig_interrupt signal,

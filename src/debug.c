@@ -208,7 +208,6 @@ static void bpvector_clear(struct breakpoint_vector *vec)
 static void bpvector_free(struct breakpoint_vector *vec)
 {
     free(vec->items);
-    vec->items = NULL;
 }
 
 //

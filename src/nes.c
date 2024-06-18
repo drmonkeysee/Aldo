@@ -60,11 +60,42 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
                                  dest);
 }
 
+static bool vram_read(const void *restrict ctx, uint16_t addr,
+                      uint8_t *restrict d)
+{
+    // NOTE: addr=[$2000-$3EFF]
+    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB - MEMBLOCK_256B);
+
+    *d = ((const uint8_t *)ctx)[addr & ADDRMASK_2KB];
+    return true;
+}
+
+static bool vram_write(void *ctx, uint16_t addr, uint8_t d)
+{
+    // NOTE: addr=[$2000-$3EFF]
+    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB - MEMBLOCK_256B);
+
+    ((uint8_t *)ctx)[addr & ADDRMASK_2KB] = d;
+    return true;
+}
+
+static size_t vram_dma(const void *restrict ctx, uint16_t addr, size_t count,
+                       uint8_t dest[restrict count])
+{
+    // NOTE: addr=[$2000-$3EFF]
+    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB - MEMBLOCK_256B);
+
+    // TODO: bug here if addr + count > $3EFF this will read up to 256B out of
+    // bounds instead of wrapping around.
+    return bytecopy_bankmirrored(ctx, BITWIDTH_2KB, addr, BITWIDTH_8KB, count,
+                                 dest);
+}
+
 static void create_mbus(struct nes001 *self)
 {
     // TODO: partitions so far:
-    // * $0000 - $1FFF: 8KB RAM
-    // * $2000 - $3FFF: 8KB PPU registers
+    // * $0000 - $1FFF: 2KB RAM mirrored to 8KB
+    // * $2000 - $3FFF: 8 PPU registers mirrored to 8KB
     // * $4000 - $7FFF: unmapped
     // * $8000 - $FFFF: 32KB Cart
     self->cpu.mbus = bus_new(BITWIDTH_64KB, 4, MEMBLOCK_8KB, MEMBLOCK_16KB,
@@ -76,20 +107,23 @@ static void create_mbus(struct nes001 *self)
         self->ram,
     });
     assert(r);
-    debug_cpu_connect(self->dbg, &self->cpu);
 }
 
 static void create_vbus(struct nes001 *self)
 {
     // TODO: partitions so far:
-    // * $0000 - $3FFF: unmapped
-    self->ppu.vbus = bus_new(BITWIDTH_16KB, 1);
-    // TODO: add vram device
-}
-
-static void connect_ppu(struct nes001 *self)
-{
-    ppu_connect(&self->ppu, self->vram, self->cpu.mbus);
+    // * $0000 - $1FFF: unmapped
+    // * $2000 - $2EFF: 2KB RAM mirrored incompletely to 8K - 256 = 7936B
+    // * $3F00 - $3FFF: unmapped
+    self->ppu.vbus = bus_new(BITWIDTH_16KB, 3, MEMBLOCK_8KB,
+                             MEMBLOCK_8KB - MEMBLOCK_256B);
+    const bool r = bus_set(self->ppu.vbus, 1, (struct busdevice){
+        vram_read,
+        vram_write,
+        vram_dma,
+        self->vram,
+    });
+    assert(r);
 }
 
 static void connect_cart(struct nes001 *self, cart *c)
@@ -115,17 +149,21 @@ static void disconnect_cart(struct nes001 *self)
     self->cart = NULL;
 }
 
-static void free_vbus(struct nes001 *self)
+static void setup(struct nes001 *self)
 {
-    bus_free(self->ppu.vbus);
-    self->ppu.vbus = NULL;
+    create_mbus(self);
+    create_vbus(self);
+    ppu_connect(&self->ppu, self->vram, self->cpu.mbus);
+    debug_cpu_connect(self->dbg, &self->cpu);
 }
 
-static void free_mbus(struct nes001 *self)
+static void teardown(struct nes001 *self)
 {
+    disconnect_cart(self);
     debug_cpu_disconnect(self->dbg);
+    bus_free(self->ppu.vbus);
     bus_free(self->cpu.mbus);
-    self->cpu.mbus = NULL;
+    self->cpu.mbus = self->ppu.vbus = NULL;
 }
 
 static void set_interrupt(struct nes001 *self, enum csig_interrupt signal,
@@ -175,9 +213,7 @@ nes *nes_new(debugger *dbg, bool bcdsupport, FILE *tracelog)
     self->tracelog = tracelog;
     // TODO: ditch this option when aldo can emulate more than just NES
     self->cpu.bcd = bcdsupport;
-    create_mbus(self);
-    create_vbus(self);
-    connect_ppu(self);
+    setup(self);
     return self;
 }
 
@@ -185,9 +221,7 @@ void nes_free(nes *self)
 {
     assert(self != NULL);
 
-    disconnect_cart(self);
-    free_vbus(self);
-    free_mbus(self);
+    teardown(self);
     free(self);
 }
 

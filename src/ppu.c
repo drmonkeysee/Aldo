@@ -24,8 +24,7 @@ static bool reg_read(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)
 {
     // NOTE: addr=[$2000-$3FFF]
-    assert(addr >= MEMBLOCK_8KB);
-    assert(addr < MEMBLOCK_16KB);
+    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
     // TODO: get correct register
     (void)addr;
@@ -36,8 +35,7 @@ static bool reg_read(const void *restrict ctx, uint16_t addr,
 static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
 {
     // NOTE: addr=[$2000-$3FFF]
-    assert(addr >= MEMBLOCK_8KB);
-    assert(addr < MEMBLOCK_16KB);
+    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
     // TODO: get correct register
     (void)addr;

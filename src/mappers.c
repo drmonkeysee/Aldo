@@ -157,10 +157,8 @@ static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
     assert(addr > ADDRMASK_32KB);
 
     const struct ines_000_mapper *const m = ctx;
-    return m->bankcount == 2
-        ? bytecopy_bank(m->super.prg, BITWIDTH_32KB, addr, count, dest)
-        : bytecopy_bankmirrored(m->super.prg, BITWIDTH_16KB, addr,
-                                BITWIDTH_64KB, count, dest);
+    const uint16_t width = m->bankcount == 2 ? BITWIDTH_32KB : BITWIDTH_16KB;
+    return bytecopy_bank(m->super.prg, width, addr, count, dest);
 }
 
 static bool ines_000_mbus_connect(struct mapper *self, bus *b, uint16_t addr)

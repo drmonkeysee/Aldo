@@ -31,13 +31,19 @@ struct nes001 {
             vram[MEMBLOCK_2KB]; // PPU Internal RAM
 };
 
+#define ram_load(d, ctx, addr) \
+(*(d) = ((const uint8_t *)(ctx))[(addr) & ADDRMASK_2KB])
+
+#define ram_store(ctx, addr, d) \
+(((uint8_t *)(ctx))[(addr) & ADDRMASK_2KB] = (d))
+
 static bool ram_read(const void *restrict ctx, uint16_t addr,
                      uint8_t *restrict d)
 {
     // NOTE: addr=[$0000-$1FFF]
     assert(addr < MEMBLOCK_8KB);
 
-    *d = ((const uint8_t *)ctx)[addr & ADDRMASK_2KB];
+    ram_load(d, ctx, addr);
     return true;
 }
 
@@ -46,7 +52,7 @@ static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
     // NOTE: addr=[$0000-$1FFF]
     assert(addr < MEMBLOCK_8KB);
 
-    ((uint8_t *)ctx)[addr & ADDRMASK_2KB] = d;
+    ram_store(ctx, addr, d);
     return true;
 }
 
@@ -56,8 +62,8 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
     // NOTE: addr=[$0000-$1FFF]
     assert(addr < MEMBLOCK_8KB);
 
-    return bytecopy_bankmirrored(ctx, BITWIDTH_2KB, addr, BITWIDTH_8KB, count,
-                                 dest);
+    // NOTE: only 2KB of actual mem to copy
+    return bytecopy_bank(ctx, BITWIDTH_2KB, addr, count, dest);
 }
 
 static bool vram_read(const void *restrict ctx, uint16_t addr,
@@ -66,7 +72,7 @@ static bool vram_read(const void *restrict ctx, uint16_t addr,
     // NOTE: addr=[$2000-$3EFF]
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB - MEMBLOCK_256B);
 
-    *d = ((const uint8_t *)ctx)[addr & ADDRMASK_2KB];
+    ram_load(d, ctx, addr);
     return true;
 }
 
@@ -75,7 +81,7 @@ static bool vram_write(void *ctx, uint16_t addr, uint8_t d)
     // NOTE: addr=[$2000-$3EFF]
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB - MEMBLOCK_256B);
 
-    ((uint8_t *)ctx)[addr & ADDRMASK_2KB] = d;
+    ram_store(ctx, addr, d);
     return true;
 }
 
@@ -85,10 +91,8 @@ static size_t vram_dma(const void *restrict ctx, uint16_t addr, size_t count,
     // NOTE: addr=[$2000-$3EFF]
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB - MEMBLOCK_256B);
 
-    // TODO: bug here if addr + count > $3EFF this will read up to 256B out of
-    // bounds instead of wrapping around.
-    return bytecopy_bankmirrored(ctx, BITWIDTH_2KB, addr, BITWIDTH_8KB, count,
-                                 dest);
+    // NOTE: only 2KB of actual mem to copy
+    return bytecopy_bank(ctx, BITWIDTH_2KB, addr, count, dest);
 }
 
 static void create_mbus(struct nes001 *self)

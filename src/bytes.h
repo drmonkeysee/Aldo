@@ -111,13 +111,6 @@ inline void dwtoba(uint32_t dword, uint8_t bytes[br_csz(4)])
 size_t bytecopy_bank(const uint8_t *br_noalias bankmem, int bankwidth,
                      uint16_t addr, size_t count,
                      uint8_t dest[br_noalias_sz(count)]);
-
-// Copy mirrored banks @addr into destination buffer where address space of
-// bank is larger than bank memory; assumes banks and address spaces are sized
-// to power-of-2 KB boundaries between [1, 64].
-size_t bytecopy_bankmirrored(const uint8_t *br_noalias bankmem, int bankwidth,
-                             uint16_t addr, int addrspace, size_t count,
-                             uint8_t dest[br_noalias_sz(count)]);
 #include "bridgeclose.h"
 
 #endif

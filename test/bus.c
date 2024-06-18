@@ -6,6 +6,7 @@
 //
 
 #include "bus.h"
+#include "bytes.h"
 #include "ciny.h"
 
 #include <stdbool.h>
@@ -325,7 +326,7 @@ static void largest_bus(void *ctx)
 {
     struct test_context *const c = ctx;
     bus_free(c->b);
-    bus *const b = c->b = bus_new(16, 2, 0x8000);
+    bus *const b = c->b = bus_new(BITWIDTH_64KB, 2, 0x8000);
     uint8_t memlow[] = {0xa, 0xb, 0xc, 0xd},
             memhigh[] = {0x9, 0x8, 0x7, 0x6};
     struct busdevice bd = {

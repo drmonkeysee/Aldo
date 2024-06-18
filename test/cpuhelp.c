@@ -61,7 +61,7 @@ int RomWriteCapture = -1;
 
 void setup_testbus(void)
 {
-    TestBus = bus_new(16, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
+    TestBus = bus_new(BITWIDTH_64KB, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
 }
 
 void teardown_testbus(void)

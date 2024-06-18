@@ -176,30 +176,17 @@ void ppu_connect(struct rp2c02 *self, void *restrict vram, bus *mbus)
     assert(vram != NULL);
     assert(mbus != NULL);
 
-    self->mbus = mbus;
-    const bool r = bus_set(self->mbus, MEMBLOCK_8KB, (struct busdevice){
+    const bool r = bus_set(mbus, MEMBLOCK_8KB, (struct busdevice){
         .read = reg_read,
         .write = reg_write,
         .ctx = self,
     });
     assert(r);
-    // TODO: partition this properly
-    self->vbus = bus_new(BITWIDTH_16KB, 1);
-    // TODO: add vbus device
-}
-
-void ppu_disconnect(struct rp2c02 *self)
-{
-    assert(self != NULL);
-
-    bus_free(self->vbus);
-    self->mbus = self->vbus = NULL;
 }
 
 void ppu_powerup(struct rp2c02 *self)
 {
     assert(self != NULL);
-    assert(self->mbus != NULL);
     assert(self->vbus != NULL);
 
     // NOTE: NTSC PPU:CPU cycle ratio

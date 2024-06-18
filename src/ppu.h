@@ -19,9 +19,8 @@
 // The Ricoh RP2C02 Picture Processing Unit (PPU) is a
 // fixed-function IC that generates the NES video signal.
 struct rp2c02 {
-    // Buses
-    bus *mbus,                  // Main Bus: to/from CPU; Non-owning Pointer
-        *vbus;                  // Video Bus: video component connections
+    // Video Bus: video component connections
+    bus *vbus;                  // Non-owning Pointer
 
     // PPU Registers
     struct {
@@ -111,7 +110,6 @@ struct rp2c02 {
 struct ppu_coord { int dot, line; };
 
 void ppu_connect(struct rp2c02 *self, void *restrict vram, bus *mbus);
-void ppu_disconnect(struct rp2c02 *self);
 
 void ppu_powerup(struct rp2c02 *self);
 

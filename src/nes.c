@@ -79,14 +79,17 @@ static void create_mbus(struct nes001 *self)
     debug_cpu_connect(self->dbg, &self->cpu);
 }
 
+static void create_vbus(struct nes001 *self)
+{
+    // TODO: partitions so far:
+    // * $0000 - $3FFF: unmapped
+    self->ppu.vbus = bus_new(BITWIDTH_16KB, 1);
+    // TODO: add vram device
+}
+
 static void connect_ppu(struct nes001 *self)
 {
     ppu_connect(&self->ppu, self->vram, self->cpu.mbus);
-}
-
-static void disconnect_ppu(struct nes001 *self)
-{
-    ppu_disconnect(&self->ppu);
 }
 
 static void connect_cart(struct nes001 *self, cart *c)
@@ -110,6 +113,12 @@ static void disconnect_cart(struct nes001 *self)
     if (!self->cart) return;
     cart_mbus_disconnect(self->cart, self->cpu.mbus, MEMBLOCK_32KB);
     self->cart = NULL;
+}
+
+static void free_vbus(struct nes001 *self)
+{
+    bus_free(self->ppu.vbus);
+    self->ppu.vbus = NULL;
 }
 
 static void free_mbus(struct nes001 *self)
@@ -167,6 +176,7 @@ nes *nes_new(debugger *dbg, bool bcdsupport, FILE *tracelog)
     // TODO: ditch this option when aldo can emulate more than just NES
     self->cpu.bcd = bcdsupport;
     create_mbus(self);
+    create_vbus(self);
     connect_ppu(self);
     return self;
 }
@@ -176,7 +186,7 @@ void nes_free(nes *self)
     assert(self != NULL);
 
     disconnect_cart(self);
-    disconnect_ppu(self);
+    free_vbus(self);
     free_mbus(self);
     free(self);
 }

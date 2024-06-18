@@ -20,14 +20,15 @@ static uint8_t VRam[256] = {0};
 
 struct test_context {
     struct rp2c02 ppu;
-    bus *mbus;
+    bus *mbus, *vbus;
 };
 
 static void setup(void **ctx)
 {
     struct test_context *const c = malloc(sizeof *c);
     // NOTE: enough main bus to map $2000 - $3FFF for ppu registers
-    c->mbus = bus_new(14, 2, MEMBLOCK_8KB);
+    c->mbus = bus_new(BITWIDTH_16KB, 2, MEMBLOCK_8KB);
+    c->ppu.vbus = c->vbus = bus_new(BITWIDTH_16KB, 1);
     ppu_connect(&c->ppu, VRam, c->mbus);
     ppu_powerup(&c->ppu);
     *ctx = c;
@@ -36,7 +37,7 @@ static void setup(void **ctx)
 static void teardown(void **ctx)
 {
     struct test_context *const c = (struct test_context *)*ctx;
-    ppu_disconnect(&c->ppu);
+    bus_free(c->vbus);
     bus_free(c->mbus);
     free(c);
 }

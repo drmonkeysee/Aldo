@@ -110,9 +110,7 @@ static void reset(struct rp2c02 *self)
     self->signal.vout = self->odd = self->w = false;
     set_ctrl(self, 0);
     set_mask(self, 0);
-    // TODO: clear this later when vblank and sprite 0 are cleared
-    // (use SERVICED?)
-    self->res = CSGS_CLEAR;
+    self->res = CSGS_SERVICED;
 }
 
 // NOTE: this follows the same sequence as CPU reset sequence and is checked
@@ -120,24 +118,26 @@ static void reset(struct rp2c02 *self)
 // chips in sync when handling the RESET signal.
 static void handle_reset(struct rp2c02 *self)
 {
-    // NOTE: reset should never be in serviced state
-    assert(self->res != CSGS_SERVICED);
-
     // NOTE: pending always proceeds to committed just like the CPU sequence
     if (self->res == CSGS_PENDING) {
         self->res = CSGS_COMMITTED;
     }
 
     if (self->signal.res) {
-        if (self->res == CSGS_DETECTED) {
+        switch (self->res) {
+        case CSGS_DETECTED:
             self->res = CSGS_CLEAR;
-        } else if (self->res == CSGS_COMMITTED) {
-            // NOTE: reset is committed and signal is no longer pulled low
+            break;
+        case CSGS_COMMITTED:
             reset(self);
+            break;
+        default:
+            break;
         }
     } else {
         switch (self->res) {
         case CSGS_CLEAR:
+        case CSGS_SERVICED:
             self->res = CSGS_DETECTED;
             break;
         case CSGS_DETECTED:

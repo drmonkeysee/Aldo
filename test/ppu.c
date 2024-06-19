@@ -155,7 +155,7 @@ static void reset_sequence(void *ctx)
     ct_assertfalse(ppu->w);
     ct_assertequal(0x0u, ppu->scroll);
     ct_assertequal(0x0u, ppu->rbuf);
-    ct_assertequal(CSGS_CLEAR, (int)ppu->res);
+    ct_assertequal(CSGS_SERVICED, (int)ppu->res);
 }
 
 static void reset_too_short(void *ctx)

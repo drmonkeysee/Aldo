@@ -464,10 +464,13 @@ static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
             byte_getbit(sel, 0));
     draw_chip_line(v, snp->plines.cpu_readwrite, cursor_y, line_x, 1,
                    ArrowDown, -1, sel_buf);
-    draw_chip_line(v, snp->plines.interrupt, cursor_y++, line_x * 3, 1,
+    draw_chip_line(v, snp->plines.interrupt, cursor_y, line_x * 2, 1,
                    ArrowUp, -1, "I\u0305N\u0305T\u0305");
+    draw_chip_line(v, snp->plines.reset, cursor_y++, line_x * 3, 1, ArrowDown,
+                   -1, "R\u0305E\u0305S\u0305");
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
+    draw_interrupt_latch(v, snp->pdatapath.res, cursor_y, line_x * 3);
 
     mvwprintw(v->content, cursor_y, line_x - 2, "[%s%02X]",
               snp->plines.cpu_readwrite ? DArrowUp : DArrowDown,
@@ -528,17 +531,13 @@ static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
                              const struct snapshot *snp)
 {
     mvwprintw(v->content, cursor_y, line_x - 2, "[%sXX]", DArrowDown);
-    draw_interrupt_latch(v, snp->pdatapath.res, cursor_y, line_x * 3);
 
-    // NOTE: jump 2 rows as interrupts are drawn direction first
-    cursor_y += 2;
     char vbuf[10];
     sprintf(vbuf, "(%3d,%3d)", snp->pdatapath.line, snp->pdatapath.dot);
-
+    // NOTE: jump 2 rows as interrupts are drawn direction first
+    cursor_y += 2;
     draw_chip_line(v, snp->plines.video_out, cursor_y, line_x, -1, ArrowDown,
                    -4, vbuf);
-    draw_chip_line(v, snp->plines.reset, cursor_y, line_x * 3, -1,ArrowUp, -1,
-                   "R\u0305E\u0305S\u0305");
 }
 
 static void drawppu(const struct view *v, const struct snapshot *snp)

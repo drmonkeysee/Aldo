@@ -460,7 +460,8 @@ static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
 {
     const uint8_t sel = snp->pdatapath.register_select;
     char sel_buf[4];
-    sprintf(sel_buf, "%1d%1d%1d", sel >> 2 & 0x1, sel >> 1 & 0x1, sel & 0x1);
+    sprintf(sel_buf, "%1d%1d%1d", byte_getbit(sel, 2), byte_getbit(sel, 1),
+            byte_getbit(sel, 0));
     draw_chip_line(v, snp->plines.cpu_readwrite, cursor_y, line_x, 1,
                    ArrowDown, -1, sel_buf);
     draw_chip_line(v, snp->plines.interrupt, cursor_y++, line_x * 3, 1,
@@ -483,8 +484,8 @@ static int draw_pregisters(const struct view *v, int cursor_y,
               snp->ppu.mask, snp->ppu.addr);
     const uint8_t status = snp->ppu.status;
     mvwprintw(v->content, ++cursor_y, 0, "STAT:    %d%d%d  DATA:    %02X",
-              status >> 7 & 0x1, status >> 6 & 0x1, status >> 5 & 0x1,
-              snp->ppu.data);
+              byte_getbit(status, 7), byte_getbit(status, 6),
+              byte_getbit(status, 5), snp->ppu.data);
     mvwprintw(v->content, ++cursor_y, 0, "OAMADDR: %02X   OAMDATA: %02X",
               snp->ppu.oamaddr, snp->ppu.oamdata);
     return cursor_y;

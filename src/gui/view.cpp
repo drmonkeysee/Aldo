@@ -338,16 +338,16 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
         }
         mode_menu_item(vs, emu);
         ImGui::Separator();
-        // NOTE: interrupt signals are all low-active
-        auto irq = !lines.irq, nmi = !lines.nmi, res = !lines.reset;
+        auto irq = emu.probe(CSGI_IRQ), nmi = emu.probe(CSGI_NMI),
+                res = emu.probe(CSGI_RES);
         if (ImGui::MenuItem("IRQ", "i", &irq)) {
-            vs.addInterruptCommand(CSGI_IRQ, irq);
+            vs.addProbeCommand(CSGI_IRQ, irq);
         }
         if (ImGui::MenuItem("NMI", "n", &nmi)) {
-            vs.addInterruptCommand(CSGI_NMI, nmi);
+            vs.addProbeCommand(CSGI_NMI, nmi);
         }
         if (ImGui::MenuItem("RES", "s", &res)) {
-            vs.addInterruptCommand(CSGI_RES, res);
+            vs.addProbeCommand(CSGI_RES, res);
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Clear RAM", "Cmd+0", emu.zeroRam)) {
@@ -1553,18 +1553,18 @@ private:
         }
 
         ImGui::TextUnformatted("Signal");
-        // NOTE: interrupt signals are all low-active
-        auto irq = !lines.irq, nmi = !lines.nmi, res = !lines.reset;
+        auto irq = emu.probe(CSGI_IRQ), nmi = emu.probe(CSGI_NMI),
+                res = emu.probe(CSGI_RES);
         if (ImGui::Checkbox("IRQ", &irq)) {
-            vs.addInterruptCommand(CSGI_IRQ, irq);
+            vs.addProbeCommand(CSGI_IRQ, irq);
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("NMI", &nmi)) {
-            vs.addInterruptCommand(CSGI_NMI, nmi);
+            vs.addProbeCommand(CSGI_NMI, nmi);
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("RES", &res)) {
-            vs.addInterruptCommand(CSGI_RES, res);
+            vs.addProbeCommand(CSGI_RES, res);
         }
     }
 

@@ -101,7 +101,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_i:
         if (is_free_key(ev)) {
-            vs.addInterruptCommand(CSGI_IRQ, lines.irq);
+            vs.addProbeCommand(CSGI_IRQ, !emu.probe(CSGI_IRQ));
         }
         break;
     case SDLK_m:
@@ -113,7 +113,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_n:
         if (is_free_key(ev)) {
-            vs.addInterruptCommand(CSGI_NMI, lines.nmi);
+            vs.addProbeCommand(CSGI_NMI, !emu.probe(CSGI_NMI));
         }
         break;
     case SDLK_o:
@@ -133,7 +133,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         }
     case SDLK_s:
         if (is_free_key(ev)) {
-            vs.addInterruptCommand(CSGI_RES, lines.reset);
+            vs.addProbeCommand(CSGI_RES, !emu.probe(CSGI_RES));
         }
         break;
     }
@@ -166,13 +166,6 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
     case aldo::Command::breakpointsOpen:
         aldo::modal::loadBreakpoints(emu, p);
         break;
-    case aldo::Command::interrupt:
-        {
-            const auto [signal, active] =
-                std::get<aldo::command_state::interrupt>(cs.value);
-            emu.interrupt(signal, active);
-        }
-        break;
     case aldo::Command::launchStudio:
         p.launch_studio();
         break;
@@ -189,6 +182,13 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
         break;
     case aldo::Command::paletteUnload:
         emu.palette().unload();
+        break;
+    case aldo::Command::probe:
+        {
+            const auto [signal, active] =
+                std::get<aldo::command_state::probe>(cs.value);
+            emu.probe(signal, active);
+        }
         break;
     case aldo::Command::ready:
         emu.ready(std::get<bool>(cs.value));

@@ -171,9 +171,9 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
 
     cursor_y += 2;
     mvwaddstr(v->content, cursor_y, 0, "Signal: ");
-    drawtoggle(v, " IRQ ", !emu->snapshot.lines.irq);
-    drawtoggle(v, " NMI ", !emu->snapshot.lines.nmi);
-    drawtoggle(v, " RES ", !emu->snapshot.lines.reset);
+    drawtoggle(v, " IRQ ", nes_probe(emu->console, CSGI_IRQ));
+    drawtoggle(v, " NMI ", nes_probe(emu->console, CSGI_NMI));
+    drawtoggle(v, " RES ", nes_probe(emu->console, CSGI_RES));
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
     mvwaddstr(v->content, ++cursor_y, 0, "Halt/Run: <Space>");
@@ -711,7 +711,8 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 'i':
-        nes_interrupt(emu->console, CSGI_IRQ, emu->snapshot.lines.irq);
+        nes_set_probe(emu->console, CSGI_IRQ,
+                      !nes_probe(emu->console, CSGI_IRQ));
         break;
     case 'm':
         nes_set_mode(emu->console, nes_mode(emu->console) + 1);
@@ -720,7 +721,8 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         nes_set_mode(emu->console, nes_mode(emu->console) - 1);
         break;
     case 'n':
-        nes_interrupt(emu->console, CSGI_NMI, emu->snapshot.lines.nmi);
+        nes_set_probe(emu->console, CSGI_NMI,
+                      !nes_probe(emu->console, CSGI_NMI));
         break;
     case 'q':
         vs->running = false;
@@ -735,7 +737,8 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 's':
-        nes_interrupt(emu->console, CSGI_RES, emu->snapshot.lines.reset);
+        nes_set_probe(emu->console, CSGI_RES,
+                      !nes_probe(emu->console, CSGI_RES));
         break;
     }
 }

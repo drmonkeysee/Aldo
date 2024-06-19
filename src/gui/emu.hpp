@@ -80,16 +80,20 @@ public:
     }
 
     void ready(bool ready) noexcept { nes_ready(consolep(), ready); }
-    void interrupt(csig_interrupt signal, bool active) noexcept
-    {
-        nes_interrupt(consolep(), signal, active);
-    }
     et::size ramSize() const noexcept { return nes_ram_size(consolep()); }
     bool bcdSupport() const noexcept { return nes_bcd_support(consolep()); }
     csig_excmode runMode() const noexcept { return nes_mode(consolep()); }
     void runMode(csig_excmode mode) noexcept
     {
         nes_set_mode(consolep(), mode);
+    }
+    bool probe(csig_interrupt signal) const noexcept
+    {
+        return nes_probe(consolep(), signal);
+    }
+    void probe(csig_interrupt signal, bool active) noexcept
+    {
+        nes_set_probe(consolep(), signal, active);
     }
 
     void loadCart(const std::filesystem::path& filepath);

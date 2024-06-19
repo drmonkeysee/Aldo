@@ -42,7 +42,9 @@ void nes_set_mode(nes *self, enum csig_excmode mode) br_nothrow;
 br_libexport
 void nes_ready(nes *self, bool ready) br_nothrow;
 br_libexport
-void nes_interrupt(nes *self, enum csig_interrupt signal,
+bool nes_probe(nes *self, enum csig_interrupt signal) br_nothrow;
+br_libexport
+void nes_set_probe(nes *self, enum csig_interrupt signal,
                    bool active) br_nothrow;
 
 br_libexport

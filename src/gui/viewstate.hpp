@@ -31,12 +31,12 @@ enum class Command {
     breakpointsClear,
     breakpointsExport,
     breakpointsOpen,
-    interrupt,
     launchStudio,
     mode,
     openROM,
     paletteLoad,
     paletteUnload,
+    probe,
     ready,
     resetVectorClear,
     resetVectorOverride,
@@ -45,7 +45,7 @@ enum class Command {
 };
 
 struct command_state {
-    using interrupt = std::pair<csig_interrupt, bool>;
+    using probe = std::pair<csig_interrupt, bool>;
     using payload =
         std::variant<
             std::monostate,
@@ -54,7 +54,7 @@ struct command_state {
             et::diff,
             haltexpr,
             int,
-            interrupt>;
+            probe>;
 
     template<std::convertible_to<payload> T = std::monostate>
     constexpr command_state(Command c, T v = {}) noexcept : cmd{c}, value{v} {}
@@ -64,10 +64,9 @@ struct command_state {
 };
 
 struct viewstate {
-    void addInterruptCommand(csig_interrupt signal, bool active)
+    void addProbeCommand(csig_interrupt signal, bool active)
     {
-        commands.emplace(Command::interrupt,
-                         command_state::interrupt{signal, active});
+        commands.emplace(Command::probe, command_state::probe{signal, active});
     }
 
     std::queue<command_state> commands;

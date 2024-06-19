@@ -190,12 +190,12 @@ void ppu_powerup(struct rp2c02 *self)
     // NOTE: NTSC PPU:CPU cycle ratio
     self->cyr = 3;
 
-    // NOTE: initialize ppu to known state; anything affected by the reset
-    // sequence is deferred until that phase.
+    // NOTE: initialize ppu to known state; some components affected by the
+    // reset sequence are deferred until that phase.
     self->regsel = self->oamaddr = self->addr = 0;
-    self->signal.res = self->signal.rw = self->signal.vr =
+    self->signal.intr = self->signal.res = self->signal.rw = self->signal.vr =
         self->signal.vw = true;
-    self->status.s = false;
+    self->signal.vout = self->status.s = false;
 
     // NOTE: simulate res set on startup to engage reset sequence
     self->res = CSGS_PENDING;

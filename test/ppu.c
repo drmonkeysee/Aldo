@@ -369,61 +369,61 @@ static void vblank_end(void *ctx)
     ct_assertequal(CSGS_CLEAR, (int)ppu->res);
 }
 
-static void trace_pixel_no_adjustment(void *ctx)
+static void trace_no_adjustment(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->line = 0;
     ppu->dot = 0;
 
-    const struct ppu_coord pixel = ppu_pixel_trace(ppu, 0);
+    const struct ppu_coord pixel = ppu_trace(ppu, 0);
 
     ct_assertequal(0, pixel.dot);
     ct_assertequal(0, pixel.line);
 }
 
-static void trace_pixel_zero_with_adjustment(void *ctx)
+static void trace_zero_with_adjustment(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->line = 0;
     ppu->dot = 0;
 
-    const struct ppu_coord pixel = ppu_pixel_trace(ppu, -1);
+    const struct ppu_coord pixel = ppu_trace(ppu, -1);
 
     ct_assertequal(338, pixel.dot);
     ct_assertequal(261, pixel.line);
 }
 
-static void trace_pixel(void *ctx)
+static void trace(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->line = 120;
     ppu->dot = 223;
 
-    const struct ppu_coord pixel = ppu_pixel_trace(ppu, -1);
+    const struct ppu_coord pixel = ppu_trace(ppu, -1);
 
     ct_assertequal(220, pixel.dot);
     ct_assertequal(120, pixel.line);
 }
 
-static void trace_pixel_at_one_cycle(void *ctx)
+static void trace_at_one_cycle(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->line = 0;
     ppu->dot = 3;
 
-    const struct ppu_coord pixel = ppu_pixel_trace(ppu, -1);
+    const struct ppu_coord pixel = ppu_trace(ppu, -1);
 
     ct_assertequal(0, pixel.dot);
     ct_assertequal(0, pixel.line);
 }
 
-static void trace_pixel_at_line_boundary(void *ctx)
+static void trace_at_line_boundary(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->line = 120;
     ppu->dot = 1;
 
-    const struct ppu_coord pixel = ppu_pixel_trace(ppu, -1);
+    const struct ppu_coord pixel = ppu_trace(ppu, -1);
 
     ct_assertequal(339, pixel.dot);
     ct_assertequal(119, pixel.line);
@@ -449,11 +449,11 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(vblank_nmi_clear),
         ct_maketest(vblank_end),
 
-        ct_maketest(trace_pixel_no_adjustment),
-        ct_maketest(trace_pixel_zero_with_adjustment),
-        ct_maketest(trace_pixel),
-        ct_maketest(trace_pixel_at_one_cycle),
-        ct_maketest(trace_pixel_at_line_boundary),
+        ct_maketest(trace_no_adjustment),
+        ct_maketest(trace_zero_with_adjustment),
+        ct_maketest(trace),
+        ct_maketest(trace_at_one_cycle),
+        ct_maketest(trace_at_line_boundary),
     };
 
     return ct_makesuite_setup_teardown(tests, setup, teardown);

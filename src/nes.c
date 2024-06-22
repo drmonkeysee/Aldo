@@ -199,7 +199,7 @@ static void instruction_trace(struct nes001 *self,
     // NOTE: trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
     trace_line(self->tracelog, clock->total_cycles - 1,
-               ppu_pixel_trace(&self->ppu, -1), &self->cpu, self->dbg, &snp);
+               ppu_trace(&self->ppu, -1), &self->cpu, self->dbg, &snp);
 }
 
 //

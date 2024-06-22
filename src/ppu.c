@@ -249,17 +249,17 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
     snp->plines.write = self->signal.vw;
 }
 
-struct ppu_coord ppu_pixel_trace(const struct rp2c02 *self, int adjustment)
+struct ppu_coord ppu_trace(const struct rp2c02 *self, int adjustment)
 {
-    struct ppu_coord pixel = {
+    struct ppu_coord c = {
         self->dot + (adjustment * self->cyr),
         self->line,
     };
-    if (pixel.dot < 0) {
-        pixel.dot += Dots;
-        if (--pixel.line < 0) {
-            pixel.line += Lines;
+    if (c.dot < 0) {
+        c.dot += Dots;
+        if (--c.line < 0) {
+            c.line += Lines;
         }
     }
-    return pixel;
+    return c;
 }

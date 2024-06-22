@@ -168,10 +168,9 @@ static int cycle(struct rp2c02 *self)
 // Public Interface
 //
 
-void ppu_connect(struct rp2c02 *self, void *restrict vram, bus *mbus)
+void ppu_connect(struct rp2c02 *self, bus *mbus)
 {
     assert(self != NULL);
-    assert(vram != NULL);
     assert(mbus != NULL);
 
     const bool r = bus_set(mbus, MEMBLOCK_8KB, (struct busdevice){

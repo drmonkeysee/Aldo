@@ -168,7 +168,7 @@ static void setup(struct nes001 *self)
 {
     create_mbus(self);
     create_vbus(self);
-    ppu_connect(&self->ppu, self->vram, self->cpu.mbus);
+    ppu_connect(&self->ppu, self->cpu.mbus);
     debug_cpu_connect(self->dbg, &self->cpu);
 }
 

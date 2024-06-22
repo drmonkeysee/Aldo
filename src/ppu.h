@@ -109,8 +109,7 @@ struct rp2c02 {
 
 struct ppu_coord { int dot, line; };
 
-void ppu_connect(struct rp2c02 *self, void *restrict vram, bus *mbus);
-
+void ppu_connect(struct rp2c02 *self, bus *mbus);
 void ppu_powerup(struct rp2c02 *self);
 
 int ppu_cycle(struct rp2c02 *self, int cpu_cycles);

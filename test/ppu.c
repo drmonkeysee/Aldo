@@ -221,28 +221,12 @@ static void reset_too_short(void *ctx)
     ct_assertequal(CSGS_CLEAR, (int)ppu->res);
 }
 
-static void vblank_start(void *ctx)
+static void vblank_prep(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 1;   // NOTE: one dot at a time
+    ppu->cyr = 1;
     ppu->status.v = false;
     ppu->ctrl.v = true;
-    ppu->line = 241;
-    ppu->dot = 0;
-
-    ppu_cycle(ppu, 1);
-
-    ct_assertequal(1u, ppu->dot);
-    ct_asserttrue(ppu->status.v);
-    ct_assertfalse(ppu->signal.intr);
-}
-
-static void vblank_start_nmi_disabled(void *ctx)
-{
-    struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 1;   // NOTE: one dot at a time
-    ppu->status.v = false;
-    ppu->ctrl.v = false;
     ppu->line = 241;
     ppu->dot = 0;
 
@@ -253,16 +237,125 @@ static void vblank_start_nmi_disabled(void *ctx)
     ct_asserttrue(ppu->signal.intr);
 }
 
+static void vblank_start(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->cyr = 1;
+    ppu->status.v = true;
+    ppu->ctrl.v = true;
+    ppu->line = 241;
+    ppu->dot = 1;
+
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(2u, ppu->dot);
+    ct_asserttrue(ppu->status.v);
+    ct_assertfalse(ppu->signal.intr);
+}
+
+static void vblank_start_nmi_disabled(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->cyr = 1;
+    ppu->status.v = true;
+    ppu->ctrl.v = false;
+    ppu->line = 241;
+    ppu->dot = 1;
+
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(2u, ppu->dot);
+    ct_asserttrue(ppu->status.v);
+    ct_asserttrue(ppu->signal.intr);
+}
+
+static void vblank_start_nmi_missed(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->cyr = 1;
+    ppu->status.v = false;
+    ppu->ctrl.v = true;
+    ppu->line = 241;
+    ppu->dot = 1;
+
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(2u, ppu->dot);
+    ct_assertfalse(ppu->status.v);
+    ct_asserttrue(ppu->signal.intr);
+}
+
+static void vblank_nmi_toggle(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->cyr = 1;
+    ppu->status.v = true;
+    ppu->ctrl.v = true;
+    ppu->line = 241;
+    ppu->dot = 40;
+    ppu->signal.intr = false;
+
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(41u, ppu->dot);
+    ct_asserttrue(ppu->status.v);
+    ct_assertfalse(ppu->signal.intr);
+
+    ppu->ctrl.v = false;
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(42u, ppu->dot);
+    ct_asserttrue(ppu->status.v);
+    ct_asserttrue(ppu->signal.intr);
+
+    ppu->ctrl.v = true;
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(43u, ppu->dot);
+    ct_asserttrue(ppu->status.v);
+    ct_assertfalse(ppu->signal.intr);
+}
+
+static void vblank_nmi_clear(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->cyr = 1;
+    ppu->status.v = true;
+    ppu->ctrl.v = true;
+    ppu->line = 241;
+    ppu->dot = 40;
+    ppu->signal.intr = false;
+
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(41u, ppu->dot);
+    ct_asserttrue(ppu->status.v);
+    ct_assertfalse(ppu->signal.intr);
+
+    ppu->status.v = false;
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(42u, ppu->dot);
+    ct_assertfalse(ppu->status.v);
+    ct_asserttrue(ppu->signal.intr);
+
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(43u, ppu->dot);
+    ct_assertfalse(ppu->status.v);
+    ct_asserttrue(ppu->signal.intr);
+}
+
 static void vblank_end(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 1;   // NOTE: one dot at a time
+    ppu->cyr = 1;
     ppu->status.v = true;
     ppu->status.s = true;
     ppu->status.o = true;
     ppu->ctrl.v = true;
     ppu->line = 261;
-    ppu->dot = 0;
+    ppu->dot = 1;
     ppu->res = CSGS_SERVICED;
     ppu->signal.intr = false;
 
@@ -348,11 +441,13 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(reset_sequence),
         ct_maketest(reset_too_short),
 
+        ct_maketest(vblank_prep),
         ct_maketest(vblank_start),
         ct_maketest(vblank_start_nmi_disabled),
+        ct_maketest(vblank_start_nmi_missed),
+        ct_maketest(vblank_nmi_toggle),
+        ct_maketest(vblank_nmi_clear),
         ct_maketest(vblank_end),
-        // TODO: nmi ctrl up/down during vblank
-        // race condition of status.v during vblank
 
         ct_maketest(trace_pixel_no_adjustment),
         ct_maketest(trace_pixel_zero_with_adjustment),

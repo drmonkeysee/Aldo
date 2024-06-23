@@ -116,6 +116,7 @@ static void nextdot(struct rp2c02 *self)
         self->dot = 0;
         if (++self->line >= Lines) {
             self->line = 0;
+            self->odd = !self->odd;
         }
     }
 }
@@ -195,6 +196,7 @@ static int cycle(struct rp2c02 *self)
         self->signal.intr = true;
         set_status(self, 0);
         self->res = CSGS_CLEAR;
+        // TODO: add odd dot skip when rendering enabled
     }
 
     // NOTE: dot advancement happens last, leaving PPU on next dot to be drawn;

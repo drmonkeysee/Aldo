@@ -410,6 +410,30 @@ static void vblank_end(void *ctx)
     ct_assertequal(CSGS_CLEAR, (int)ppu->res);
 }
 
+static void frame_toggle(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->cyr = 1;
+    ppu->line = 261;
+    ppu->dot = 340;
+
+    ct_assertfalse(ppu->odd);
+
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(0u, ppu->dot);
+    ct_asserttrue(ppu->odd);
+
+    ppu->line = 261;
+    ppu->dot = 340;
+    ppu_cycle(ppu, 1);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(0u, ppu->dot);
+    ct_assertfalse(ppu->odd);
+}
+
 static void trace_no_adjustment(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
@@ -489,6 +513,7 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(vblank_nmi_toggle),
         ct_maketest(vblank_nmi_clear),
         ct_maketest(vblank_end),
+        ct_maketest(frame_toggle),
 
         ct_maketest(trace_no_adjustment),
         ct_maketest(trace_zero_with_adjustment),

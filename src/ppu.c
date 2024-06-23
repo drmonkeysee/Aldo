@@ -110,6 +110,16 @@ static void set_status(struct rp2c02 *self, uint8_t v)
     self->status.v = v & 0x80;
 }
 
+static void nextdot(struct rp2c02 *self)
+{
+    if (++self->dot >= Dots) {
+        self->dot = 0;
+        if (++self->line >= Lines) {
+            self->line = 0;
+        }
+    }
+}
+
 static void reset(struct rp2c02 *self)
 {
     // NOTE: t is cleared but NOT v; also NesDev wiki table says PPUADDR is not
@@ -189,12 +199,8 @@ static int cycle(struct rp2c02 *self)
 
     // NOTE: dot advancement happens last, leaving PPU on next dot to be drawn;
     // analogous to stack pointer always pointing at next byte to be written.
-    if (++self->dot >= Dots) {
-        self->dot = 0;
-        if (++self->line >= Lines) {
-            self->line = 0;
-        }
-    }
+    nextdot(self);
+
     return 1;
 }
 

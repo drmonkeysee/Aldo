@@ -103,9 +103,24 @@ static uint8_t get_status(const struct rp2c02 *self)
         (self->status.o << 5 | self->status.s << 6 | self->status.v << 7);
 }
 
+static void set_status(struct rp2c02 *self, uint8_t v)
+{
+    self->status.o = v & 0x20;
+    self->status.s = v & 0x40;
+    self->status.v = v & 0x80;
+}
+
 static void reset(struct rp2c02 *self)
 {
-    self->dot = self->line = self->scroll = self->rbuf = 0;
+    // NOTE: t is cleared but NOT v; also NesDev wiki table says PPUADDR is not
+    // cleared on reset but the explanatory text says it is; in addition
+    // PPUADDR is non-writable until reset signal is cleared at end of vblank,
+    // just like the other registers that are cleared, and the clearing of
+    // PPUADDR and PPUSCROLL is what clears t and x; so the bulk of the text is
+    // consistent that PPUADDR is cleared and the table is likely wrong; see:
+    // https://www.nesdev.org/wiki/PPU_power_up_state
+    self->dot = self->line = self->scroll = self->addr = self->t = self->rbuf =
+        self->x = 0;
     self->signal.intr = true;
     self->signal.vout = self->odd = self->w = false;
     set_ctrl(self, 0);
@@ -153,7 +168,26 @@ static void handle_reset(struct rp2c02 *self)
 
 static int cycle(struct rp2c02 *self)
 {
-    // TODO: do dot advancement last, leave PPU on next dot to be drawn;
+    // NOTE: vblank
+    if (self->line == 241 && self->dot == 0) {
+        // NOTE: set vblank status 1 dot early to account for race-condition
+        // that will suppress NMI if status.v is read (and cleared) right
+        // before NMI is signaled on 241,1.
+        // TODO: status.v should return false if read on 241,1 despite being "prepped" to true here
+        self->status.v = true;
+    } else if ((self->line == 241 && self->dot >= 1)
+               || (241 < self->line && self->line < 261)
+               || (self->line == 261 && self->dot == 0)) {
+        // NOTE: NMI active within vblank if ctrl.v and status.v are set
+        self->signal.intr = !self->ctrl.v || !self->status.v;
+    } else if (self->line == 261 && self->dot == 1) {
+        // TODO: this is also pre-render line
+        self->signal.intr = true;
+        set_status(self, 0);
+        self->res = CSGS_CLEAR;
+    }
+
+    // NOTE: dot advancement happens last, leaving PPU on next dot to be drawn;
     // analogous to stack pointer always pointing at next byte to be written.
     if (++self->dot >= Dots) {
         self->dot = 0;
@@ -189,9 +223,9 @@ void ppu_powerup(struct rp2c02 *self)
     // NOTE: NTSC PPU:CPU cycle ratio
     self->cyr = 3;
 
-    // NOTE: initialize ppu to known state; some components affected by the
+    // NOTE: initialize ppu to known state; internal components affected by the
     // reset sequence are deferred until that phase.
-    self->regsel = self->oamaddr = self->addr = 0;
+    self->regsel = self->oamaddr = 0;
     self->signal.intr = self->signal.res = self->signal.rw = self->signal.vr =
         self->signal.vw = true;
     self->signal.vout = self->status.s = false;

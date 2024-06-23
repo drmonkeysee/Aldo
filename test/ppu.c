@@ -55,7 +55,6 @@ static void powerup_initializes_ppu(void *ctx)
     ct_assertequal(3u, ppu->cyr);
     ct_assertequal(CSGS_PENDING, (int)ppu->res);
     ct_assertequal(0u, ppu->regsel);
-    ct_assertequal(0u, ppu->addr);
     ct_assertequal(0u, ppu->oamaddr);
     ct_asserttrue(ppu->signal.intr);
     ct_asserttrue(ppu->signal.res);
@@ -74,7 +73,10 @@ static void reset_sequence(void *ctx)
     ppu->signal.intr = false;
     ppu->mask.b = ppu->ctrl.b = ppu->signal.vout = ppu->odd = ppu->w = true;
     ppu->scroll = 0x45;
+    ppu->addr = 0x9a;
     ppu->rbuf = 0x56;
+    ppu->x = 0x78;
+    ppu->t = ppu->v = 0x1234;
 
     // NOTE: reset cadence is on cpu cycle so ppu cycle ratio doesn't matter
     ppu_cycle(ppu, 1);
@@ -88,7 +90,11 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x9au, ppu->addr);
     ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(0x78u, ppu->x);
+    ct_assertequal(0x1234u, ppu->t);
+    ct_assertequal(0x1234u, ppu->v);
     ct_assertequal(CSGS_CLEAR, (int)ppu->res);
 
     ppu->signal.res = false;
@@ -103,7 +109,11 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x9au, ppu->addr);
     ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(0x78u, ppu->x);
+    ct_assertequal(0x1234u, ppu->t);
+    ct_assertequal(0x1234u, ppu->v);
     ct_assertequal(CSGS_DETECTED, (int)ppu->res);
 
     ppu_cycle(ppu, 1);
@@ -117,7 +127,11 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x9au, ppu->addr);
     ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(0x78u, ppu->x);
+    ct_assertequal(0x1234u, ppu->t);
+    ct_assertequal(0x1234u, ppu->v);
     ct_assertequal(CSGS_PENDING, (int)ppu->res);
 
     ppu_cycle(ppu, 1);
@@ -131,7 +145,11 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x9au, ppu->addr);
     ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(0x78u, ppu->x);
+    ct_assertequal(0x1234u, ppu->t);
+    ct_assertequal(0x1234u, ppu->v);
     ct_assertequal(CSGS_COMMITTED, (int)ppu->res);
 
     // NOTE: reset line held
@@ -146,7 +164,11 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x9au, ppu->addr);
     ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(0x78u, ppu->x);
+    ct_assertequal(0x1234u, ppu->t);
+    ct_assertequal(0x1234u, ppu->v);
     ct_assertequal(CSGS_COMMITTED, (int)ppu->res);
 
     ppu->signal.res = true;
@@ -161,7 +183,11 @@ static void reset_sequence(void *ctx)
     ct_assertfalse(ppu->odd);
     ct_assertfalse(ppu->w);
     ct_assertequal(0x0u, ppu->scroll);
+    ct_assertequal(0x0u, ppu->addr);
     ct_assertequal(0x0u, ppu->rbuf);
+    ct_assertequal(0x0u, ppu->x);
+    ct_assertequal(0x0u, ppu->t);
+    ct_assertequal(0x1234u, ppu->v);
     ct_assertequal(CSGS_SERVICED, (int)ppu->res);
 }
 
@@ -173,7 +199,10 @@ static void reset_too_short(void *ctx)
     ppu->signal.intr = false;
     ppu->mask.b = ppu->ctrl.b = ppu->signal.vout = ppu->odd = ppu->w = true;
     ppu->scroll = 0x45;
+    ppu->addr = 0x9a;
     ppu->rbuf = 0x56;
+    ppu->x = 0x78;
+    ppu->t = ppu->v = 0x1234;
 
     // NOTE: reset cadence is on cpu cycle so ppu cycle ratio doesn't matter
     ppu_cycle(ppu, 1);
@@ -187,7 +216,11 @@ static void reset_too_short(void *ctx)
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x9au, ppu->addr);
     ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(0x78u, ppu->x);
+    ct_assertequal(0x1234u, ppu->t);
+    ct_assertequal(0x1234u, ppu->v);
     ct_assertequal(CSGS_CLEAR, (int)ppu->res);
 
     ppu->signal.res = false;
@@ -202,7 +235,11 @@ static void reset_too_short(void *ctx)
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x9au, ppu->addr);
     ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(0x78u, ppu->x);
+    ct_assertequal(0x1234u, ppu->t);
+    ct_assertequal(0x1234u, ppu->v);
     ct_assertequal(CSGS_DETECTED, (int)ppu->res);
 
     ppu->signal.res = true;
@@ -217,7 +254,11 @@ static void reset_too_short(void *ctx)
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x45u, ppu->scroll);
+    ct_assertequal(0x9au, ppu->addr);
     ct_assertequal(0x56u, ppu->rbuf);
+    ct_assertequal(0x78u, ppu->x);
+    ct_assertequal(0x1234u, ppu->t);
+    ct_assertequal(0x1234u, ppu->v);
     ct_assertequal(CSGS_CLEAR, (int)ppu->res);
 }
 
@@ -291,7 +332,7 @@ static void vblank_nmi_toggle(void *ctx)
     ppu->cyr = 1;
     ppu->status.v = true;
     ppu->ctrl.v = true;
-    ppu->line = 241;
+    ppu->line = 250;
     ppu->dot = 40;
     ppu->signal.intr = false;
 
@@ -322,7 +363,7 @@ static void vblank_nmi_clear(void *ctx)
     ppu->cyr = 1;
     ppu->status.v = true;
     ppu->ctrl.v = true;
-    ppu->line = 241;
+    ppu->line = 250;
     ppu->dot = 40;
     ppu->signal.intr = false;
 
@@ -361,7 +402,7 @@ static void vblank_end(void *ctx)
 
     ppu_cycle(ppu, 1);
 
-    ct_assertequal(1u, ppu->dot);
+    ct_assertequal(2u, ppu->dot);
     ct_assertfalse(ppu->status.v);
     ct_assertfalse(ppu->status.s);
     ct_assertfalse(ppu->status.o);

@@ -31,9 +31,12 @@ static void setup(void **ctx)
     c->mbus = bus_new(BITWIDTH_16KB, 2, MEMBLOCK_8KB);
     c->ppu.vbus = c->vbus = bus_new(BITWIDTH_16KB, 1);
     ppu_connect(&c->ppu, c->mbus);
+    // NOTE: run powerup and reset sequence and then force internal state to a
+    // known zero-value.
     ppu_powerup(&c->ppu);
-    // NOTE: suppress powerup reset on first cycle so every test doesn't have
-    // to anticipate this.
+    c->ppu.cyr = 1;
+    ppu_cycle(&c->ppu, 1);
+    c->ppu.line = c->ppu.dot = 0;
     c->ppu.res = CSGS_CLEAR;
     *ctx = c;
 }
@@ -68,6 +71,8 @@ static void powerup_initializes_ppu(void *ctx)
 static void reset_sequence(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    // NOTE: reset cadence is on cpu cycle so ppu cycle ratio doesn't matter
+    ppu->cyr = 3;
     ppu->line = 42;
     ppu->dot = 24;
     ppu->signal.intr = false;
@@ -78,7 +83,6 @@ static void reset_sequence(void *ctx)
     ppu->x = 0x78;
     ppu->t = ppu->v = 0x1234;
 
-    // NOTE: reset cadence is on cpu cycle so ppu cycle ratio doesn't matter
     ppu_cycle(ppu, 1);
 
     ct_assertequal(42u, ppu->line);
@@ -194,6 +198,8 @@ static void reset_sequence(void *ctx)
 static void reset_too_short(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    // NOTE: reset cadence is on cpu cycle so ppu cycle ratio doesn't matter
+    ppu->cyr = 3;
     ppu->line = 42;
     ppu->dot = 24;
     ppu->signal.intr = false;
@@ -204,7 +210,6 @@ static void reset_too_short(void *ctx)
     ppu->x = 0x78;
     ppu->t = ppu->v = 0x1234;
 
-    // NOTE: reset cadence is on cpu cycle so ppu cycle ratio doesn't matter
     ppu_cycle(ppu, 1);
 
     ct_assertequal(42u, ppu->line);
@@ -265,11 +270,9 @@ static void reset_too_short(void *ctx)
 static void vblank_prep(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 1;
     ppu->status.v = false;
     ppu->ctrl.v = true;
     ppu->line = 241;
-    ppu->dot = 0;
 
     ppu_cycle(ppu, 1);
 
@@ -281,7 +284,6 @@ static void vblank_prep(void *ctx)
 static void vblank_start(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 1;
     ppu->status.v = true;
     ppu->ctrl.v = true;
     ppu->line = 241;
@@ -297,9 +299,7 @@ static void vblank_start(void *ctx)
 static void vblank_start_nmi_disabled(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 1;
     ppu->status.v = true;
-    ppu->ctrl.v = false;
     ppu->line = 241;
     ppu->dot = 1;
 
@@ -313,7 +313,6 @@ static void vblank_start_nmi_disabled(void *ctx)
 static void vblank_start_nmi_missed(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 1;
     ppu->status.v = false;
     ppu->ctrl.v = true;
     ppu->line = 241;
@@ -329,7 +328,6 @@ static void vblank_start_nmi_missed(void *ctx)
 static void vblank_nmi_toggle(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 1;
     ppu->status.v = true;
     ppu->ctrl.v = true;
     ppu->line = 250;
@@ -360,7 +358,6 @@ static void vblank_nmi_toggle(void *ctx)
 static void vblank_nmi_clear(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 1;
     ppu->status.v = true;
     ppu->ctrl.v = true;
     ppu->line = 250;
@@ -390,7 +387,6 @@ static void vblank_nmi_clear(void *ctx)
 static void vblank_end(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 1;
     ppu->status.v = true;
     ppu->status.s = true;
     ppu->status.o = true;
@@ -413,7 +409,6 @@ static void vblank_end(void *ctx)
 static void frame_toggle(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 1;
     ppu->line = 261;
     ppu->dot = 340;
 
@@ -437,8 +432,7 @@ static void frame_toggle(void *ctx)
 static void trace_no_adjustment(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->line = 0;
-    ppu->dot = 0;
+    ppu->cyr = 3;
 
     const struct ppu_coord pixel = ppu_trace(ppu, 0);
 
@@ -449,8 +443,7 @@ static void trace_no_adjustment(void *ctx)
 static void trace_zero_with_adjustment(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->line = 0;
-    ppu->dot = 0;
+    ppu->cyr = 3;
 
     const struct ppu_coord pixel = ppu_trace(ppu, -1);
 
@@ -461,6 +454,7 @@ static void trace_zero_with_adjustment(void *ctx)
 static void trace(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->cyr = 3;
     ppu->line = 120;
     ppu->dot = 223;
 
@@ -473,7 +467,7 @@ static void trace(void *ctx)
 static void trace_at_one_cycle(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->line = 0;
+    ppu->cyr = 3;
     ppu->dot = 3;
 
     const struct ppu_coord pixel = ppu_trace(ppu, -1);
@@ -485,6 +479,7 @@ static void trace_at_one_cycle(void *ctx)
 static void trace_at_line_boundary(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->cyr = 3;
     ppu->line = 120;
     ppu->dot = 1;
 

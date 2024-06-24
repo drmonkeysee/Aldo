@@ -123,12 +123,13 @@ static void nextdot(struct rp2c02 *self)
 
 static void reset(struct rp2c02 *self)
 {
-    // NOTE: t is cleared but NOT v; also NesDev wiki table says PPUADDR is not
-    // cleared on reset but the explanatory text says it is; in addition
-    // PPUADDR is non-writable until reset signal is cleared at end of vblank,
-    // just like the other registers that are cleared, and the clearing of
-    // PPUADDR and PPUSCROLL is what clears t and x; so the bulk of the text is
-    // consistent that PPUADDR is cleared and the table is likely wrong; see:
+    // NOTE: t is cleared but NOT v
+    // NOTE: NesDev wiki table says PPUADDR is not cleared on reset but the
+    // explanatory text says it is; in addition PPUADDR is non-writable until
+    // reset signal is cleared at end of vblank, just like the other registers
+    // that are cleared; finally the clearing of PPUADDR and PPUSCROLL is what
+    // clears t and x; so the bulk of the text is consistent that PPUADDR is
+    // cleared and the table is likely wrong:
     // https://www.nesdev.org/wiki/PPU_power_up_state
     self->dot = self->line = self->scroll = self->addr = self->t = self->rbuf =
         self->x = 0;

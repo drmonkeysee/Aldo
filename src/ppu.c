@@ -17,34 +17,7 @@
 static const int Dots = 341, Lines = 262;
 
 //
-// Main Bus Device (PPU registers)
-//
-
-static bool reg_read(const void *restrict ctx, uint16_t addr,
-                     uint8_t *restrict d)
-{
-    // NOTE: addr=[$2000-$3FFF]
-    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
-
-    // TODO: get correct register
-    (void)addr;
-    *d = ((struct rp2c02 *)ctx)->regbus;
-    return true;
-}
-
-static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
-{
-    // NOTE: addr=[$2000-$3FFF]
-    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
-
-    // TODO: get correct register
-    (void)addr;
-    ((struct rp2c02 *)ctx)->regbus = d;
-    return true;
-}
-
-//
-// Internal Operations
+// Registers
 //
 
 static uint8_t get_ctrl(const struct rp2c02 *self)
@@ -68,7 +41,7 @@ static void set_ctrl(struct rp2c02 *self, uint8_t v)
     self->ctrl.s = v & 0x8;
     self->ctrl.b = v & 0x10;
     self->ctrl.h = v & 0x20;
-    self->ctrl.p = v & 0x40;
+    self->ctrl.p = 0;           // NOTE: p is always grounded
     self->ctrl.v = v & 0x80;
 }
 
@@ -109,6 +82,47 @@ static void set_status(struct rp2c02 *self, uint8_t v)
     self->status.s = v & 0x40;
     self->status.v = v & 0x80;
 }
+
+//
+// Main Bus Device (PPU registers)
+//
+
+static bool reg_read(const void *restrict ctx, uint16_t addr,
+                     uint8_t *restrict d)
+{
+    // NOTE: addr=[$2000-$3FFF]
+    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
+
+    // TODO: this casts away const...
+    struct rp2c02 *const ppu = (struct rp2c02 *)ctx;
+    ppu->regsel = addr & 0x7;
+    *d = ppu->regbus;
+    return true;
+}
+
+static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
+{
+    // NOTE: addr=[$2000-$3FFF]
+    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
+
+    struct rp2c02 *const ppu = ctx;
+    ppu->regsel = addr & 0x7;
+    ppu->regbus = d;
+    switch (ppu->regsel) {
+    case 0:
+        if (ppu->res != CSGS_SERVICED) {
+            set_ctrl(ppu, d);
+            ppu->t |= (uint16_t)((d & 0x3) << 10);
+        }
+        return true;
+    default:
+        return false;
+    }
+}
+
+//
+// Internal Operations
+//
 
 static void nextdot(struct rp2c02 *self)
 {

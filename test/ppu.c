@@ -15,6 +15,7 @@
 #include <stdlib.h>
 
 #define get_ppu(ctx) &((struct test_context *)(ctx))->ppu
+#define get_mbus(ctx) ((struct test_context *)(ctx))->mbus
 
 // TODO: not used yet
 static uint8_t VRam[256] = {0};
@@ -68,6 +69,112 @@ static void powerup_initializes_ppu(void *ctx)
     ct_assertfalse(ppu->status.s);
 }
 
+static void ppuctrl_write(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+
+    ct_assertfalse(ppu->ctrl.nl);
+    ct_assertfalse(ppu->ctrl.nh);
+    ct_assertfalse(ppu->ctrl.i);
+    ct_assertfalse(ppu->ctrl.s);
+    ct_assertfalse(ppu->ctrl.b);
+    ct_assertfalse(ppu->ctrl.h);
+    ct_assertfalse(ppu->ctrl.p);
+    ct_assertfalse(ppu->ctrl.v);
+    ct_assertequal(0u, ppu->t);
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x2000, 0xff);
+
+    ct_asserttrue(ppu->ctrl.nl);
+    ct_asserttrue(ppu->ctrl.nh);
+    ct_asserttrue(ppu->ctrl.i);
+    ct_asserttrue(ppu->ctrl.s);
+    ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->ctrl.h);
+    ct_assertfalse(ppu->ctrl.p);
+    ct_asserttrue(ppu->ctrl.v);
+    ct_assertequal(0xc00u, ppu->t);
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0xffu, ppu->regbus);
+}
+
+static void ppuctrl_write_mirrored(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+
+    ct_assertfalse(ppu->ctrl.nl);
+    ct_assertfalse(ppu->ctrl.nh);
+    ct_assertfalse(ppu->ctrl.i);
+    ct_assertfalse(ppu->ctrl.s);
+    ct_assertfalse(ppu->ctrl.b);
+    ct_assertfalse(ppu->ctrl.h);
+    ct_assertfalse(ppu->ctrl.p);
+    ct_assertfalse(ppu->ctrl.v);
+    ct_assertequal(0u, ppu->t);
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x3210, 0xff);
+
+    ct_asserttrue(ppu->ctrl.nl);
+    ct_asserttrue(ppu->ctrl.nh);
+    ct_asserttrue(ppu->ctrl.i);
+    ct_asserttrue(ppu->ctrl.s);
+    ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->ctrl.h);
+    ct_assertfalse(ppu->ctrl.p);
+    ct_asserttrue(ppu->ctrl.v);
+    ct_assertequal(0xc00u, ppu->t);
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0xffu, ppu->regbus);
+}
+
+static void ppuctrl_write_during_reset(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->res = CSGS_SERVICED;
+
+    ct_assertfalse(ppu->ctrl.nl);
+    ct_assertfalse(ppu->ctrl.nh);
+    ct_assertfalse(ppu->ctrl.i);
+    ct_assertfalse(ppu->ctrl.s);
+    ct_assertfalse(ppu->ctrl.b);
+    ct_assertfalse(ppu->ctrl.h);
+    ct_assertfalse(ppu->ctrl.p);
+    ct_assertfalse(ppu->ctrl.v);
+    ct_assertequal(0u, ppu->t);
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x2000, 0xff);
+
+    ct_assertfalse(ppu->ctrl.nl);
+    ct_assertfalse(ppu->ctrl.nh);
+    ct_assertfalse(ppu->ctrl.i);
+    ct_assertfalse(ppu->ctrl.s);
+    ct_assertfalse(ppu->ctrl.b);
+    ct_assertfalse(ppu->ctrl.h);
+    ct_assertfalse(ppu->ctrl.p);
+    ct_assertfalse(ppu->ctrl.v);
+    ct_assertequal(0u, ppu->t);
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0xffu, ppu->regbus);
+}
+
+static void ppuctrl_read(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->regbus = 0x5a;
+
+    uint8_t d;
+    bus_read(get_mbus(ctx), 0x2000, &d);
+
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0x5au, d);
+}
+
 static void reset_sequence(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
@@ -76,7 +183,7 @@ static void reset_sequence(void *ctx)
     ppu->line = 42;
     ppu->dot = 24;
     ppu->signal.intr = false;
-    ppu->mask.b = ppu->ctrl.b = ppu->signal.vout = ppu->odd = ppu->w = true;
+    ppu->ctrl.b = ppu->mask.b = ppu->signal.vout = ppu->odd = ppu->w = true;
     ppu->scroll = 0x45;
     ppu->addr = 0x9a;
     ppu->rbuf = 0x56;
@@ -88,8 +195,8 @@ static void reset_sequence(void *ctx)
     ct_assertequal(42u, ppu->line);
     ct_assertequal(27u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
-    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
@@ -107,8 +214,8 @@ static void reset_sequence(void *ctx)
     ct_assertequal(42u, ppu->line);
     ct_assertequal(30u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
-    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
@@ -125,8 +232,8 @@ static void reset_sequence(void *ctx)
     ct_assertequal(42u, ppu->line);
     ct_assertequal(33u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
-    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
@@ -143,8 +250,8 @@ static void reset_sequence(void *ctx)
     ct_assertequal(42u, ppu->line);
     ct_assertequal(36u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
-    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
@@ -162,8 +269,8 @@ static void reset_sequence(void *ctx)
     ct_assertequal(42u, ppu->line);
     ct_assertequal(51u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
-    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
@@ -181,8 +288,8 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0u, ppu->line);
     ct_assertequal(3u, ppu->dot);
     ct_asserttrue(ppu->signal.intr);
-    ct_assertfalse(ppu->mask.b);
     ct_assertfalse(ppu->ctrl.b);
+    ct_assertfalse(ppu->mask.b);
     ct_assertfalse(ppu->signal.vout);
     ct_assertfalse(ppu->odd);
     ct_assertfalse(ppu->w);
@@ -203,7 +310,7 @@ static void reset_too_short(void *ctx)
     ppu->line = 42;
     ppu->dot = 24;
     ppu->signal.intr = false;
-    ppu->mask.b = ppu->ctrl.b = ppu->signal.vout = ppu->odd = ppu->w = true;
+    ppu->ctrl.b = ppu->mask.b = ppu->signal.vout = ppu->odd = ppu->w = true;
     ppu->scroll = 0x45;
     ppu->addr = 0x9a;
     ppu->rbuf = 0x56;
@@ -215,8 +322,8 @@ static void reset_too_short(void *ctx)
     ct_assertequal(42u, ppu->line);
     ct_assertequal(27u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
-    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
@@ -234,8 +341,8 @@ static void reset_too_short(void *ctx)
     ct_assertequal(42u, ppu->line);
     ct_assertequal(30u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
-    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
@@ -253,8 +360,8 @@ static void reset_too_short(void *ctx)
     ct_assertequal(42u, ppu->line);
     ct_assertequal(33u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
-    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->ctrl.b);
+    ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
@@ -497,6 +604,11 @@ struct ct_testsuite ppu_tests(void)
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(powerup_initializes_ppu),
+
+        ct_maketest(ppuctrl_write),
+        ct_maketest(ppuctrl_write_mirrored),
+        ct_maketest(ppuctrl_write_during_reset),
+        ct_maketest(ppuctrl_read),
 
         ct_maketest(reset_sequence),
         ct_maketest(reset_too_short),

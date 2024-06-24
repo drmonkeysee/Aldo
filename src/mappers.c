@@ -54,8 +54,7 @@ static void clear_bus_device(const struct mapper *self, bus *b, uint16_t addr)
 // Raw ROM Image Implementation
 //
 
-static bool raw_read(const void *restrict ctx, uint16_t addr,
-                     uint8_t *restrict d)
+static bool raw_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     // NOTE: addr=[$8000-$FFFF]
     assert(addr > ADDRMASK_32KB);
@@ -138,7 +137,7 @@ static bool ines_unimplemented_mbus_connect(struct mapper *self, bus *b,
 // iNES 000
 //
 
-static bool ines_000_read(const void *restrict ctx, uint16_t addr,
+static bool ines_000_read(void *restrict ctx, uint16_t addr,
                           uint8_t *restrict d)
 {
     // NOTE: addr=[$8000-$FFFF]

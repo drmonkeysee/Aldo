@@ -48,8 +48,7 @@ static void ram_store(uint8_t *mem, uint16_t addr, uint8_t d)
     mem[addr & ADDRMASK_2KB] = d;
 }
 
-static bool ram_read(const void *restrict ctx, uint16_t addr,
-                     uint8_t *restrict d)
+static bool ram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     // NOTE: addr=[$0000-$1FFF]
     assert(addr < MEMBLOCK_8KB);
@@ -77,8 +76,7 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
     return bytecopy_bank(ctx, BITWIDTH_2KB, addr, count, dest);
 }
 
-static bool vram_read(const void *restrict ctx, uint16_t addr,
-                      uint8_t *restrict d)
+static bool vram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     // NOTE: addr=[$2000-$3EFF]
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB - MEMBLOCK_256B);

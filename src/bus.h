@@ -16,8 +16,7 @@ typedef struct hardwarebus bus;
 
 #include "bridgeopen.h"
 struct busdevice {
-    bool (*read)(const void *br_noalias, uint16_t,
-                 uint8_t *br_noalias) br_nothrow;
+    bool (*read)(void *br_noalias, uint16_t, uint8_t *br_noalias) br_nothrow;
     bool (*write)(void *, uint16_t, uint8_t) br_nothrow;
     size_t (*dma)(const void *br_noalias, uint16_t, size_t,
                   uint8_t[br_noalias]) br_nothrow;

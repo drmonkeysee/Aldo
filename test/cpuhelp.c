@@ -14,8 +14,7 @@
 
 #include <stdbool.h>
 
-static bool TestRead(const void *restrict ctx, uint16_t addr,
-                     uint8_t *restrict d)
+static bool test_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     if (addr < MEMBLOCK_8KB) {
         *d = ((const uint8_t *)ctx)[addr & ADDRMASK_2KB];
@@ -28,7 +27,7 @@ static bool TestRead(const void *restrict ctx, uint16_t addr,
     return false;
 }
 
-static bool TestWrite(void *ctx, uint16_t addr, uint8_t d)
+static bool test_write(void *ctx, uint16_t addr, uint8_t d)
 {
     if (addr < MEMBLOCK_8KB) {
         ((uint8_t *)ctx)[addr & ADDRMASK_2KB] = d;
@@ -37,7 +36,7 @@ static bool TestWrite(void *ctx, uint16_t addr, uint8_t d)
     return false;
 }
 
-static bool CaptureRomWrite(void *ctx, uint16_t addr, uint8_t d)
+static bool capture_rom_write(void *ctx, uint16_t addr, uint8_t d)
 {
     (void)ctx, (void)addr;
     RomWriteCapture = d;
@@ -45,8 +44,8 @@ static bool CaptureRomWrite(void *ctx, uint16_t addr, uint8_t d)
 }
 
 static bus *restrict TestBus;
-static struct busdevice Ram = {.read = TestRead, .write = TestWrite},
-                        Rom = {.read = TestRead};
+static struct busdevice Ram = {.read = test_read, .write = test_write},
+                        Rom = {.read = test_read};
 
 //
 // Public Interface
@@ -88,7 +87,7 @@ void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
 void enable_rom_wcapture(void)
 {
     struct busdevice dv = Rom;
-    dv.write = CaptureRomWrite;
+    dv.write = capture_rom_write;
     bus_set(TestBus, MEMBLOCK_32KB, dv);
 }
 

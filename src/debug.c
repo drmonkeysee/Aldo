@@ -53,7 +53,7 @@ static void update_reset_override(struct debugger_context *self)
 // Bus Interception
 //
 
-static bool resetaddr_read(const void *restrict ctx, uint16_t addr,
+static bool resetaddr_read(void *restrict ctx, uint16_t addr,
                            uint8_t *restrict d)
 {
     const struct resdecorator *const dec = ctx;

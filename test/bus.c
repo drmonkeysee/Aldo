@@ -21,8 +21,7 @@ struct test_context {
     bus *b;
 };
 
-static bool test_read(const void *restrict ctx, uint16_t addr,
-                      uint8_t *restrict d)
+static bool test_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     const uint8_t *const mem = ctx;
     if (addr > 3) return false;
@@ -30,7 +29,7 @@ static bool test_read(const void *restrict ctx, uint16_t addr,
     return true;
 }
 
-static bool test_high_read(const void *restrict ctx, uint16_t addr,
+static bool test_high_read(void *restrict ctx, uint16_t addr,
                            uint8_t *restrict d)
 {
     const uint8_t *const mem = ctx;
@@ -38,7 +37,7 @@ static bool test_high_read(const void *restrict ctx, uint16_t addr,
     return true;
 }
 
-static bool test_highest_read(const void *restrict ctx, uint16_t addr,
+static bool test_highest_read(void *restrict ctx, uint16_t addr,
                               uint8_t *restrict d)
 {
     const uint8_t *const mem = ctx;

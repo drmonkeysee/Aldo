@@ -87,14 +87,12 @@ static void set_status(struct rp2c02 *self, uint8_t v)
 // Main Bus Device (PPU registers)
 //
 
-static bool reg_read(const void *restrict ctx, uint16_t addr,
-                     uint8_t *restrict d)
+static bool reg_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     // NOTE: addr=[$2000-$3FFF]
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
-    // TODO: this casts away const...
-    struct rp2c02 *const ppu = (struct rp2c02 *)ctx;
+    struct rp2c02 *const ppu = ctx;
     ppu->regsel = addr & 0x7;
     *d = ppu->regbus;
     return true;

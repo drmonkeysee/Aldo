@@ -110,7 +110,13 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
     case 0:
         if (ppu->res != CSGS_SERVICED) {
             set_ctrl(ppu, d);
+            // NOTE: set t's nametable-select bits
             ppu->t |= (uint16_t)((d & 0x3) << 10);
+        }
+        return true;
+    case 1:
+        if (ppu->res != CSGS_SERVICED) {
+            set_mask(ppu, d);
         }
         return true;
     default:

@@ -175,6 +175,106 @@ static void ppuctrl_read(void *ctx)
     ct_assertequal(0x5au, d);
 }
 
+static void ppumask_write(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+
+    ct_assertfalse(ppu->mask.g);
+    ct_assertfalse(ppu->mask.bm);
+    ct_assertfalse(ppu->mask.sm);
+    ct_assertfalse(ppu->mask.b);
+    ct_assertfalse(ppu->mask.s);
+    ct_assertfalse(ppu->mask.re);
+    ct_assertfalse(ppu->mask.ge);
+    ct_assertfalse(ppu->mask.be);
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x2001, 0xff);
+
+    ct_asserttrue(ppu->mask.g);
+    ct_asserttrue(ppu->mask.bm);
+    ct_asserttrue(ppu->mask.sm);
+    ct_asserttrue(ppu->mask.b);
+    ct_asserttrue(ppu->mask.s);
+    ct_asserttrue(ppu->mask.re);
+    ct_asserttrue(ppu->mask.ge);
+    ct_asserttrue(ppu->mask.be);
+    ct_assertequal(1u, ppu->regsel);
+    ct_assertequal(0xffu, ppu->regbus);
+}
+
+static void ppumask_write_mirrored(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+
+    ct_assertfalse(ppu->mask.g);
+    ct_assertfalse(ppu->mask.bm);
+    ct_assertfalse(ppu->mask.sm);
+    ct_assertfalse(ppu->mask.b);
+    ct_assertfalse(ppu->mask.s);
+    ct_assertfalse(ppu->mask.re);
+    ct_assertfalse(ppu->mask.ge);
+    ct_assertfalse(ppu->mask.be);
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x3211, 0xff);
+
+    ct_asserttrue(ppu->mask.g);
+    ct_asserttrue(ppu->mask.bm);
+    ct_asserttrue(ppu->mask.sm);
+    ct_asserttrue(ppu->mask.b);
+    ct_asserttrue(ppu->mask.s);
+    ct_asserttrue(ppu->mask.re);
+    ct_asserttrue(ppu->mask.ge);
+    ct_asserttrue(ppu->mask.be);
+    ct_assertequal(1u, ppu->regsel);
+    ct_assertequal(0xffu, ppu->regbus);
+}
+
+static void ppumask_write_during_reset(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->res = CSGS_SERVICED;
+
+    ct_assertfalse(ppu->mask.g);
+    ct_assertfalse(ppu->mask.bm);
+    ct_assertfalse(ppu->mask.sm);
+    ct_assertfalse(ppu->mask.b);
+    ct_assertfalse(ppu->mask.s);
+    ct_assertfalse(ppu->mask.re);
+    ct_assertfalse(ppu->mask.ge);
+    ct_assertfalse(ppu->mask.be);
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x2001, 0xff);
+
+    ct_assertfalse(ppu->mask.g);
+    ct_assertfalse(ppu->mask.bm);
+    ct_assertfalse(ppu->mask.sm);
+    ct_assertfalse(ppu->mask.b);
+    ct_assertfalse(ppu->mask.s);
+    ct_assertfalse(ppu->mask.re);
+    ct_assertfalse(ppu->mask.ge);
+    ct_assertfalse(ppu->mask.be);
+    ct_assertequal(1u, ppu->regsel);
+    ct_assertequal(0xffu, ppu->regbus);
+}
+
+static void ppumask_read(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->regbus = 0x5a;
+
+    uint8_t d;
+    bus_read(get_mbus(ctx), 0x2001, &d);
+
+    ct_assertequal(1u, ppu->regsel);
+    ct_assertequal(0x5au, d);
+}
+
 static void reset_sequence(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
@@ -609,6 +709,10 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(ppuctrl_write_mirrored),
         ct_maketest(ppuctrl_write_during_reset),
         ct_maketest(ppuctrl_read),
+        ct_maketest(ppumask_write),
+        ct_maketest(ppumask_write_mirrored),
+        ct_maketest(ppumask_write_during_reset),
+        ct_maketest(ppumask_read),
 
         ct_maketest(reset_sequence),
         ct_maketest(reset_too_short),

@@ -275,6 +275,92 @@ static void ppumask_read(void *ctx)
     ct_assertequal(0x5au, d);
 }
 
+static void ppustatus_read_when_clear(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->regbus = 0x5a;
+    ppu->status.v = ppu->status.s = ppu->status.o = false;
+
+    uint8_t d;
+    bus_read(get_mbus(ctx), 0x2002, &d);
+
+    ct_assertequal(2u, ppu->regsel);
+    ct_assertequal(0x1au, d);
+    ct_assertfalse(ppu->status.o);
+    ct_assertfalse(ppu->status.s);
+    ct_assertfalse(ppu->status.v);
+    ct_assertfalse(ppu->w);
+}
+
+static void ppustatus_read_when_set(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->regbus = 0x5a;
+    ppu->w = ppu->status.v = ppu->status.s = ppu->status.o = true;
+
+    uint8_t d;
+    bus_read(get_mbus(ctx), 0x2002, &d);
+
+    ct_assertequal(2u, ppu->regsel);
+    ct_assertequal(0xfau, d);
+    ct_asserttrue(ppu->status.o);
+    ct_asserttrue(ppu->status.s);
+    ct_assertfalse(ppu->status.v);
+    ct_assertfalse(ppu->w);
+}
+
+static void ppustatus_read_on_nmi_race_condition(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->regbus = 0x5a;
+    ppu->status.v = ppu->status.s = ppu->status.o = true;
+    ppu->line = 241;
+    ppu->dot = 1;
+
+    uint8_t d;
+    bus_read(get_mbus(ctx), 0x2002, &d);
+
+    ct_assertequal(2u, ppu->regsel);
+    ct_assertequal(0x7au, d);
+    ct_asserttrue(ppu->status.o);
+    ct_asserttrue(ppu->status.s);
+    ct_assertfalse(ppu->status.v);
+}
+
+static void ppustatus_read_during_reset(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->regbus = 0x5a;
+    ppu->w = ppu->status.v = ppu->status.s = ppu->status.o = true;
+    ppu->res = CSGS_SERVICED;
+
+    uint8_t d;
+    bus_read(get_mbus(ctx), 0x2002, &d);
+
+    ct_assertequal(2u, ppu->regsel);
+    ct_assertequal(0xfau, d);
+    ct_asserttrue(ppu->status.o);
+    ct_asserttrue(ppu->status.s);
+    ct_assertfalse(ppu->status.v);
+    ct_assertfalse(ppu->w);
+}
+
+static void ppustatus_write(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->w = true;
+    ppu->status.v = ppu->status.s = ppu->status.o = false;
+
+    bus_write(get_mbus(ctx), 0x2002, 0xff);
+
+    ct_assertequal(2u, ppu->regsel);
+    ct_assertequal(0xffu, ppu->regbus);
+    ct_assertfalse(ppu->status.o);
+    ct_assertfalse(ppu->status.s);
+    ct_assertfalse(ppu->status.v);
+    ct_asserttrue(ppu->w);
+}
+
 static void reset_sequence(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
@@ -713,6 +799,11 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(ppumask_write_mirrored),
         ct_maketest(ppumask_write_during_reset),
         ct_maketest(ppumask_read),
+        ct_maketest(ppustatus_read_when_clear),
+        ct_maketest(ppustatus_read_when_set),
+        ct_maketest(ppustatus_read_on_nmi_race_condition),
+        ct_maketest(ppustatus_read_during_reset),
+        ct_maketest(ppustatus_write),
 
         ct_maketest(reset_sequence),
         ct_maketest(reset_too_short),

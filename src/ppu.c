@@ -95,7 +95,7 @@ static bool reg_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     struct rp2c02 *const ppu = ctx;
     ppu->regsel = addr & 0x7;
     switch (ppu->regsel) {
-    case 2:
+    case 2: // PPUSTATUS
         // TODO: should this be an enum state instead
         // NOTE: NMI race condition; if status is read just before NMI is
         // fired, then vblank is cleared but returns false and NMI is missed.
@@ -121,17 +121,22 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
     ppu->regsel = addr & 0x7;
     ppu->regbus = d;
     switch (ppu->regsel) {
-    case 0:
+    case 0: // PPUCTRL
         if (ppu->res != CSGS_SERVICED) {
             set_ctrl(ppu, d);
             // NOTE: set t's nametable-select bits
-            ppu->t |= (uint16_t)((d & 0x3) << 10);
+            ppu->t |= ppu->ctrl.nh << 11 | ppu->ctrl.nl << 10;
         }
         break;
-    case 1:
+    case 1: // PPUMASK
         if (ppu->res != CSGS_SERVICED) {
             set_mask(ppu, d);
         }
+        break;
+    case 3: // OAMADDR
+        ppu->oamaddr = d;
+        // TODO: there are some OAM corruption effects here that I don't
+        // understand yet.
         break;
     default:
         break;

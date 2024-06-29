@@ -126,6 +126,7 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
             set_ctrl(ppu, d);
             // NOTE: set t's nametable-select bits
             ppu->t |= ppu->ctrl.nh << 11 | ppu->ctrl.nl << 10;
+            // TODO: bit 0 race condition on dot 257
         }
         break;
     case 1: // PPUMASK

@@ -286,6 +286,7 @@ static void ppustatus_read_when_clear(void *ctx)
 
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0x1au, d);
+    ct_assertequal(0x1au, ppu->regbus);
     ct_assertfalse(ppu->status.o);
     ct_assertfalse(ppu->status.s);
     ct_assertfalse(ppu->status.v);
@@ -303,6 +304,7 @@ static void ppustatus_read_when_set(void *ctx)
 
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0xfau, d);
+    ct_assertequal(0xfau, ppu->regbus);
     ct_asserttrue(ppu->status.o);
     ct_asserttrue(ppu->status.s);
     ct_assertfalse(ppu->status.v);
@@ -322,6 +324,7 @@ static void ppustatus_read_on_nmi_race_condition(void *ctx)
 
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0x7au, d);
+    ct_assertequal(0x7au, ppu->regbus);
     ct_asserttrue(ppu->status.o);
     ct_asserttrue(ppu->status.s);
     ct_assertfalse(ppu->status.v);
@@ -339,8 +342,27 @@ static void ppustatus_read_during_reset(void *ctx)
 
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0xfau, d);
+    ct_assertequal(0xfau, ppu->regbus);
     ct_asserttrue(ppu->status.o);
     ct_asserttrue(ppu->status.s);
+    ct_assertfalse(ppu->status.v);
+    ct_assertfalse(ppu->w);
+}
+
+static void ppustatus_read_mirrored(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->regbus = 0x5a;
+    ppu->status.v = ppu->status.s = ppu->status.o = false;
+
+    uint8_t d;
+    bus_read(get_mbus(ctx), 0x3212, &d);
+
+    ct_assertequal(2u, ppu->regsel);
+    ct_assertequal(0x1au, d);
+    ct_assertequal(0x1au, ppu->regbus);
+    ct_assertfalse(ppu->status.o);
+    ct_assertfalse(ppu->status.s);
     ct_assertfalse(ppu->status.v);
     ct_assertfalse(ppu->w);
 }
@@ -417,6 +439,275 @@ static void oamaddr_read(void *ctx)
 
     ct_assertequal(3u, ppu->regsel);
     ct_assertequal(0x5au, d);
+}
+
+static void oamdata_write(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->line = 240;
+    ppu->dot = 5;
+    ppu->ctrl.s = true;
+    ppu->oamaddr = ppu->oamdata = 0;
+    ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
+
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x11);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x11u, ppu->regbus);
+    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(0x11u, ppu->oamdata);
+    ct_assertequal(0x11u, ppu->oam[0]);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x22);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x22u, ppu->regbus);
+    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(0x22u, ppu->oamdata);
+    ct_assertequal(0x22u, ppu->oam[1]);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x33);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x33u, ppu->regbus);
+    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(0x33u, ppu->oamdata);
+    ct_assertequal(0x33u, ppu->oam[2]);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x44);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x44u, ppu->regbus);
+    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(0x44u, ppu->oamdata);
+    ct_assertequal(0x44u, ppu->oam[3]);
+}
+
+static void oamdata_write_during_rendering(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->line = 24;
+    ppu->dot = 5;
+    ppu->ctrl.s = true;
+    ppu->oamaddr = ppu->oamdata = 0;
+    ppu->oam[0] = ppu->oam[4] = ppu->oam[8] = ppu->oam[12] = 0xff;
+
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x11);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x11u, ppu->regbus);
+    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(0x11u, ppu->oamdata);
+    ct_assertequal(0xffu, ppu->oam[0]);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x22);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x22u, ppu->regbus);
+    ct_assertequal(0x8u, ppu->oamaddr);
+    ct_assertequal(0x22u, ppu->oamdata);
+    ct_assertequal(0xffu, ppu->oam[4]);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x33);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x33u, ppu->regbus);
+    ct_assertequal(0xcu, ppu->oamaddr);
+    ct_assertequal(0x33u, ppu->oamdata);
+    ct_assertequal(0xffu, ppu->oam[8]);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x44);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x44u, ppu->regbus);
+    ct_assertequal(0x10u, ppu->oamaddr);
+    ct_assertequal(0x44u, ppu->oamdata);
+    ct_assertequal(0xffu, ppu->oam[12]);
+}
+
+static void oamdata_write_during_rendering_disabled(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->line = 24;
+    ppu->dot = 5;
+    ppu->oamaddr = ppu->oamdata = 0;
+    ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
+
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x11);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x11u, ppu->regbus);
+    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(0x11u, ppu->oamdata);
+    ct_assertequal(0x11u, ppu->oam[0]);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x22);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x22u, ppu->regbus);
+    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(0x22u, ppu->oamdata);
+    ct_assertequal(0x22u, ppu->oam[1]);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x33);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x33u, ppu->regbus);
+    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(0x33u, ppu->oamdata);
+    ct_assertequal(0x33u, ppu->oam[2]);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x44);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x44u, ppu->regbus);
+    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(0x44u, ppu->oamdata);
+    ct_assertequal(0x44u, ppu->oam[3]);
+}
+
+static void oamdata_write_mirrored(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->line = 240;
+    ppu->dot = 5;
+    ppu->ctrl.s = true;
+    ppu->oamaddr = ppu->oamdata = 0;
+    ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
+
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x3214, 0x11);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x11u, ppu->regbus);
+    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(0x11u, ppu->oamdata);
+    ct_assertequal(0x11u, ppu->oam[0]);
+
+    bus_write(get_mbus(ctx), 0x3214, 0x22);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x22u, ppu->regbus);
+    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(0x22u, ppu->oamdata);
+    ct_assertequal(0x22u, ppu->oam[1]);
+
+    bus_write(get_mbus(ctx), 0x3214, 0x33);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x33u, ppu->regbus);
+    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(0x33u, ppu->oamdata);
+    ct_assertequal(0x33u, ppu->oam[2]);
+
+    bus_write(get_mbus(ctx), 0x3214, 0x44);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x44u, ppu->regbus);
+    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(0x44u, ppu->oamdata);
+    ct_assertequal(0x44u, ppu->oam[3]);
+}
+
+static void oamdata_write_during_reset(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->line = 240;
+    ppu->dot = 5;
+    ppu->ctrl.s = true;
+    ppu->oamaddr = ppu->oamdata = 0;
+    ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
+    ppu->res = CSGS_SERVICED;
+
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x11);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x11u, ppu->regbus);
+    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(0x11u, ppu->oamdata);
+    ct_assertequal(0x11u, ppu->oam[0]);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x22);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x22u, ppu->regbus);
+    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(0x22u, ppu->oamdata);
+    ct_assertequal(0x22u, ppu->oam[1]);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x33);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x33u, ppu->regbus);
+    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(0x33u, ppu->oamdata);
+    ct_assertequal(0x33u, ppu->oam[2]);
+
+    bus_write(get_mbus(ctx), 0x2004, 0x44);
+
+    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(0x44u, ppu->regbus);
+    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(0x44u, ppu->oamdata);
+    ct_assertequal(0x44u, ppu->oam[3]);
+}
+
+static void oamdata_read(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->line = 240;
+    ppu->dot = 5;
+    ppu->ctrl.s = true;
+    ppu->oamaddr = ppu->oamdata = 0;
+    ppu->oam[0] = 0x11;
+    ppu->oam[1] = 0x22;
+    ppu->oam[2] = 0x33;
+    ppu->oam[3] = 0x44;
+
+    uint8_t d;
+    bus_read(get_mbus(ctx), 0x2004, &d);
+
+    ct_assertequal(4u, ppu->regsel);
+    ct_assertequal(0x11u, d);
+    ct_assertequal(0x11u, ppu->oamdata);
+    ct_assertequal(0x11u, ppu->regbus);
+    ct_assertequal(0u, ppu->oamaddr);
+}
+
+static void oamdata_read_mirrored(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->line = 240;
+    ppu->dot = 5;
+    ppu->ctrl.s = true;
+    ppu->oamaddr = ppu->oamdata = 0;
+    ppu->oam[0] = 0x11;
+    ppu->oam[1] = 0x22;
+    ppu->oam[2] = 0x33;
+    ppu->oam[3] = 0x44;
+
+    uint8_t d;
+    bus_read(get_mbus(ctx), 0x3214, &d);
+
+    ct_assertequal(4u, ppu->regsel);
+    ct_assertequal(0x11u, d);
+    ct_assertequal(0x11u, ppu->oamdata);
+    ct_assertequal(0x11u, ppu->regbus);
+    ct_assertequal(0u, ppu->oamaddr);
 }
 
 static void reset_sequence(void *ctx)
@@ -861,11 +1152,19 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(ppustatus_read_when_set),
         ct_maketest(ppustatus_read_on_nmi_race_condition),
         ct_maketest(ppustatus_read_during_reset),
+        ct_maketest(ppustatus_read_mirrored),
         ct_maketest(ppustatus_write),
         ct_maketest(oamaddr_write),
         ct_maketest(oamaddr_write_mirrored),
         ct_maketest(oamaddr_write_during_reset),
         ct_maketest(oamaddr_read),
+        ct_maketest(oamdata_write),
+        ct_maketest(oamdata_write_during_rendering),
+        ct_maketest(oamdata_write_during_rendering_disabled),
+        ct_maketest(oamdata_write_mirrored),
+        ct_maketest(oamdata_write_during_reset),
+        ct_maketest(oamdata_read),
+        ct_maketest(oamdata_read_mirrored),
 
         ct_maketest(reset_sequence),
         ct_maketest(reset_too_short),

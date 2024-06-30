@@ -14,7 +14,9 @@
 // v-blank, overscan, etc; nominally 1 frame is 262 * 341 = 89342 ppu cycles;
 // however with rendering enabled the odd frames skip a dot for an overall
 // average cycle count of 89341.5 per frame.
-static const int Dots = 341, Lines = 262;
+static const int
+    Dots = 341, Lines = 262,
+    LinePostRender = 240, LineVBlank = 241, LinePreRender = 261;
 
 //
 // Registers
@@ -83,6 +85,23 @@ static void set_status(struct rp2c02 *self, uint8_t v)
     self->status.v = v & 0x80;
 }
 
+static bool rendering_enabled(struct rp2c02 *self)
+{
+    return self->ctrl.b || self->ctrl.s;
+}
+
+static bool in_post_render(struct rp2c02 *self)
+{
+    return LinePostRender <= self->line && self->line < LinePreRender;
+}
+
+static bool in_vblank(struct rp2c02 *self)
+{
+    return (self->line == LineVBlank && self->dot >= 1)
+            || (LineVBlank < self->line && self->line < LinePreRender)
+            || (self->line == LinePreRender && self->dot == 0);
+}
+
 //
 // Main Bus Device (PPU registers)
 //
@@ -99,11 +118,14 @@ static bool reg_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
         // TODO: should this be an enum state instead
         // NOTE: NMI race condition; if status is read just before NMI is
         // fired, then vblank is cleared but returns false and NMI is missed.
-        if (ppu->line == 241 && ppu->dot == 1) {
+        if (ppu->line == LineVBlank && ppu->dot == 1) {
             ppu->status.v = false;
         }
         ppu->regbus = get_status(ppu) | (ppu->regbus & 0x1f);
         ppu->w = ppu->status.v = false;
+        break;
+    case 4: // OAMDATA
+        ppu->regbus = ppu->oamdata = ppu->oam[ppu->oamaddr];
         break;
     default:
         break;
@@ -138,6 +160,18 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
         ppu->oamaddr = d;
         // TODO: there are some OAM corruption effects here that I don't
         // understand yet.
+        break;
+    case 4: // OAMDATA
+        // TODO: this logic is shared by OAMDMA
+        ppu->oamdata = d;
+        if (in_post_render(ppu) || !rendering_enabled(ppu)) {
+            ppu->oam[ppu->oamaddr++] = d;
+        } else {
+            // NOTE: during rendering, writing to OAMDATA does not change OAM
+            // but it does increment oamaddr by one object attribute (4-bytes),
+            // corrupting sprite evaluation.
+            ppu->oamaddr += 0x4;
+        }
         break;
     default:
         break;
@@ -220,18 +254,16 @@ static void handle_reset(struct rp2c02 *self)
 static int cycle(struct rp2c02 *self)
 {
     // NOTE: vblank
-    if (self->line == 241 && self->dot == 0) {
+    if (self->line == LineVBlank && self->dot == 0) {
         // NOTE: set vblank status 1 dot early to account for race-condition
         // that will suppress NMI if status.v is read (and cleared) right
         // before NMI is signaled on 241,1.
         // TODO: status.v should return false if read on 241,1 despite being "prepped" to true here
         self->status.v = true;
-    } else if ((self->line == 241 && self->dot >= 1)
-               || (241 < self->line && self->line < 261)
-               || (self->line == 261 && self->dot == 0)) {
+    } else if (in_vblank(self)) {
         // NOTE: NMI active within vblank if ctrl.v and status.v are set
         self->signal.intr = !self->ctrl.v || !self->status.v;
-    } else if (self->line == 261 && self->dot == 1) {
+    } else if (self->line == LinePreRender && self->dot == 1) {
         // TODO: this is also pre-render line
         self->signal.intr = true;
         set_status(self, 0);

@@ -17,9 +17,6 @@
 #define get_ppu(ctx) &((struct test_context *)(ctx))->ppu
 #define get_mbus(ctx) ((struct test_context *)(ctx))->mbus
 
-// TODO: not used yet
-static uint8_t VRam[256] = {0};
-
 struct test_context {
     struct rp2c02 ppu;
     bus *mbus, *vbus;

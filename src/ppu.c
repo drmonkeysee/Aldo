@@ -139,32 +139,34 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
     // NOTE: addr=[$2000-$3FFF]
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
+    static const uint8_t course = 0xf8, fine = 0x7;
+
     struct rp2c02 *const ppu = ctx;
-    ppu->regsel = addr & 0x7;
+    ppu->regsel = addr & fine;
     ppu->regbus = d;
     switch (ppu->regsel) {
     case 0: // PPUCTRL
         if (ppu->res != CSGS_SERVICED) {
-            set_ctrl(ppu, d);
-            // NOTE: set t's nametable-select bits
+            set_ctrl(ppu, ppu->regbus);
+            // NOTE: set nametable-select
             ppu->t |= ppu->ctrl.nh << 11 | ppu->ctrl.nl << 10;
             // TODO: bit 0 race condition on dot 257
         }
         break;
     case 1: // PPUMASK
         if (ppu->res != CSGS_SERVICED) {
-            set_mask(ppu, d);
+            set_mask(ppu, ppu->regbus);
         }
         break;
     case 3: // OAMADDR
-        ppu->oamaddr = d;
+        ppu->oamaddr = ppu->regbus;
         // TODO: there are some OAM corruption effects here that I don't
         // understand yet.
         break;
     case 4: // OAMDATA
         // TODO: this logic is shared by OAMDMA
         if (in_postrender(ppu) || !rendering_enabled(ppu)) {
-            ppu->oam[ppu->oamaddr++] = d;
+            ppu->oam[ppu->oamaddr++] = ppu->regbus;
         } else {
             // NOTE: during rendering, writing to OAMDATA does not change OAM
             // but it does increment oamaddr by one object attribute (4-bytes),
@@ -172,6 +174,19 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
             ppu->oamaddr += 0x4;
         }
         break;
+    case 5: // PPUSCROLL
+        if (ppu->res != CSGS_SERVICED) {
+            if (ppu->w) {
+                // NOTE: set course and fine y
+                ppu->t |= (ppu->regbus & course) << 2;
+                ppu->t |= (ppu->regbus & fine) << 12;
+            } else {
+                // NOTE: set course and fine x
+                ppu->t |= (ppu->regbus & course) >> 3;
+                ppu->x |= ppu->regbus & fine;
+            }
+            ppu->w = !ppu->w;
+        }
     default:
         break;
     }

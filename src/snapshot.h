@@ -42,7 +42,7 @@ struct snapshot {
         uint8_t accumulator, stack_pointer, status, xindex, yindex;
     } cpu;
     struct {
-        uint8_t addr, ctrl, data, mask, oamaddr, oamdata, scroll, status;
+        uint8_t ctrl, mask, oamaddr, status;
     } ppu;
     struct {
         bool irq, nmi, readwrite, ready, reset, sync;

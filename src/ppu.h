@@ -58,14 +58,10 @@ struct rp2c02 {
             s: 1,               // (6) Sprite 0 Hit
             v: 1;               // (7) VBlank
     } status;                   // PPUSTATUS, read-only
-    uint8_t oamaddr,            // OAMADDR: OAM Data Address, write-only
-            oamdata,            // OAMDATA: OAM Data, read/write
-            scroll,             // PPUSCROLL: Fine Scroll Position, write-only;
-                                // 1st write = X scroll, 2nd write = Y scroll.
-            addr,               // PPUADDR: VRAM Address, write-only;
-                                // 1st write = MSB, 2nd write = LSB
-            data;               // PPUDATA: VRAM Data, read/write;
-                                // must be read twice to prime read-buffer.
+    // NOTE: OAMDATA, PPUSCROLL, PPUADDR, and PPUDATA are ports to internal
+    // components like OAM, t, and x, so are not modelled as storage locations.
+    uint8_t oamaddr;            // OAMADDR: OAM Data Address, write-only
+
     // Datapath
     enum csig_state res;        // RESET detection latch
     uint16_t vaddrbus;          // VRAM Address Bus (14 bits)

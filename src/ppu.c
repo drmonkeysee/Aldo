@@ -90,7 +90,7 @@ static bool rendering_enabled(struct rp2c02 *self)
     return self->ctrl.b || self->ctrl.s;
 }
 
-static bool in_post_render(struct rp2c02 *self)
+static bool in_postrender(struct rp2c02 *self)
 {
     return LinePostRender <= self->line && self->line < LinePreRender;
 }
@@ -125,7 +125,7 @@ static bool reg_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
         ppu->w = ppu->status.v = false;
         break;
     case 4: // OAMDATA
-        ppu->regbus = ppu->oamdata = ppu->oam[ppu->oamaddr];
+        ppu->regbus = ppu->oam[ppu->oamaddr];
         break;
     default:
         break;
@@ -163,8 +163,7 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
         break;
     case 4: // OAMDATA
         // TODO: this logic is shared by OAMDMA
-        ppu->oamdata = d;
-        if (in_post_render(ppu) || !rendering_enabled(ppu)) {
+        if (in_postrender(ppu) || !rendering_enabled(ppu)) {
             ppu->oam[ppu->oamaddr++] = d;
         } else {
             // NOTE: during rendering, writing to OAMDATA does not change OAM
@@ -197,15 +196,7 @@ static void nextdot(struct rp2c02 *self)
 static void reset(struct rp2c02 *self)
 {
     // NOTE: t is cleared but NOT v
-    // NOTE: NesDev wiki table says PPUADDR is not cleared on reset but the
-    // explanatory text says it is; in addition PPUADDR is non-writable until
-    // reset signal is cleared at end of vblank, just like the other registers
-    // that are cleared; finally the clearing of PPUADDR and PPUSCROLL is what
-    // clears t and x; so the bulk of the text is consistent that PPUADDR is
-    // cleared and the table is likely wrong:
-    // https://www.nesdev.org/wiki/PPU_power_up_state
-    self->dot = self->line = self->scroll = self->addr = self->t = self->rbuf =
-        self->x = 0;
+    self->dot = self->line = self->t = self->rbuf = self->x = 0;
     self->signal.intr = true;
     self->signal.vout = self->odd = self->w = false;
     set_ctrl(self, 0);
@@ -332,13 +323,9 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
     assert(self != NULL);
     assert(snp != NULL);
 
-    snp->ppu.addr = self->addr;
     snp->ppu.ctrl = get_ctrl(self);
-    snp->ppu.data = self->data;
     snp->ppu.mask = get_mask(self);
     snp->ppu.oamaddr = self->oamaddr;
-    snp->ppu.oamdata = self->oamdata;
-    snp->ppu.scroll = self->scroll;
     snp->ppu.status = get_status(self);
 
     snp->pdatapath.res = self->res;

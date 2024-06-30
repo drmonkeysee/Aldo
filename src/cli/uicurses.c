@@ -481,17 +481,13 @@ static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
 static int draw_pregisters(const struct view *v, int cursor_y,
                            const struct snapshot *snp)
 {
-    mvwprintw(v->content, ++cursor_y, 0, "CTRL:    %02X   SCROLL:  %02X",
-              snp->ppu.ctrl, snp->ppu.scroll);
-    mvwprintw(v->content, ++cursor_y, 0, "MASK:    %02X   ADDR:    %02X",
-              snp->ppu.mask, snp->ppu.addr);
     const uint8_t status = snp->ppu.status;
-    mvwprintw(v->content, ++cursor_y, 0, "STAT:    %d%d%d  DATA:    %02X",
-              byte_getbit(status, 7), byte_getbit(status, 6),
-              byte_getbit(status, 5), snp->ppu.data);
-    mvwprintw(v->content, ++cursor_y, 0, "OAMADDR: %02X   OAMDATA: %02X",
-              snp->ppu.oamaddr, snp->ppu.oamdata);
-    return cursor_y;
+    mvwprintw(v->content, ++cursor_y, 0, "CONTROL: %02X  STATUS:  %d%d%d",
+              snp->ppu.ctrl, byte_getbit(status, 7), byte_getbit(status, 6),
+              byte_getbit(status, 5));
+    mvwprintw(v->content, ++cursor_y, 0, "MASK:    %02X  OAMADDR: %02X",
+              snp->ppu.mask, snp->ppu.oamaddr);
+    return cursor_y + 2;
 }
 
 static int draw_pdatapath(const struct view *v, int cursor_y, int w,

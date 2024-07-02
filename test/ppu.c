@@ -787,6 +787,7 @@ static void ppuaddr_write(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->t = 0x4000;
+    ppu->v = 0;
 
     ct_assertequal(0x4000u, ppu->t);
     ct_assertequal(0u, ppu->v);
@@ -815,6 +816,7 @@ static void ppuaddr_write_mirrored(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->t = 0x4fff;
+    ppu->v = 0;
 
     ct_assertequal(0x4fffu, ppu->t);
     ct_assertequal(0u, ppu->v);
@@ -843,6 +845,7 @@ static void ppuaddr_write_during_reset(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->t = 0x4fff;
+    ppu->v = 0;
     ppu->res = CSGS_SERVICED;
 
     ct_assertequal(0x4fffu, ppu->t);
@@ -878,6 +881,43 @@ static void ppuaddr_read(void *ctx)
 
     ct_assertequal(6u, ppu->regsel);
     ct_assertequal(0x5au, d);
+}
+
+// NOTE: recreates example from
+// https://www.nesdev.org/wiki/PPU_scrolling#Details
+static void ppu_addr_scroll_interleave(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->t = 0x4000;
+    ppu->v = 0;
+
+    bus_write(get_mbus(ctx), 0x2006, 0x4);
+
+    ct_assertequal(0u, ppu->x);
+    ct_assertequal(0x400u, ppu->t);
+    ct_assertequal(0u, ppu->v);
+    ct_asserttrue(ppu->w);
+
+    bus_write(get_mbus(ctx), 0x2005, 0x3e);
+
+    ct_assertequal(0u, ppu->x);
+    ct_assertequal(0x64e0u, ppu->t);
+    ct_assertequal(0u, ppu->v);
+    ct_assertfalse(ppu->w);
+
+    bus_write(get_mbus(ctx), 0x2005, 0x7d);
+
+    ct_assertequal(5u, ppu->x);
+    ct_assertequal(0x64efu, ppu->t);
+    ct_assertequal(0u, ppu->v);
+    ct_asserttrue(ppu->w);
+
+    bus_write(get_mbus(ctx), 0x2006, 0xef);
+
+    ct_assertequal(5u, ppu->x);
+    ct_assertequal(0x64efu, ppu->t);
+    ct_assertequal(0x64efu, ppu->v);
+    ct_assertfalse(ppu->w);
 }
 
 static void reset_sequence(void *ctx)
@@ -1321,6 +1361,7 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(ppuaddr_write_mirrored),
         ct_maketest(ppuaddr_write_during_reset),
         ct_maketest(ppuaddr_read),
+        ct_maketest(ppu_addr_scroll_interleave),
 
         ct_maketest(reset_sequence),
         ct_maketest(reset_too_short),

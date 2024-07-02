@@ -100,32 +100,34 @@ static void ppuctrl_write(void *ctx)
 static void ppuctrl_write_mirrored(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->t = 0x7fff;
+    ppu->ctrl.nh = ppu->ctrl.nl = true;
 
-    ct_assertfalse(ppu->ctrl.nl);
-    ct_assertfalse(ppu->ctrl.nh);
+    ct_asserttrue(ppu->ctrl.nl);
+    ct_asserttrue(ppu->ctrl.nh);
     ct_assertfalse(ppu->ctrl.i);
     ct_assertfalse(ppu->ctrl.s);
     ct_assertfalse(ppu->ctrl.b);
     ct_assertfalse(ppu->ctrl.h);
     ct_assertfalse(ppu->ctrl.p);
     ct_assertfalse(ppu->ctrl.v);
-    ct_assertequal(0u, ppu->t);
+    ct_assertequal(0x7fffu, ppu->t);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x3210, 0xff);
+    bus_write(get_mbus(ctx), 0x3210, 0xfc);
 
-    ct_asserttrue(ppu->ctrl.nl);
-    ct_asserttrue(ppu->ctrl.nh);
+    ct_assertfalse(ppu->ctrl.nl);
+    ct_assertfalse(ppu->ctrl.nh);
     ct_asserttrue(ppu->ctrl.i);
     ct_asserttrue(ppu->ctrl.s);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->ctrl.h);
     ct_assertfalse(ppu->ctrl.p);
     ct_asserttrue(ppu->ctrl.v);
-    ct_assertequal(0xc00u, ppu->t);
+    ct_assertequal(0x73ffu, ppu->t);
     ct_assertequal(0u, ppu->regsel);
-    ct_assertequal(0xffu, ppu->regbus);
+    ct_assertequal(0xfcu, ppu->regbus);
 }
 
 static void ppuctrl_write_during_reset(void *ctx)
@@ -715,25 +717,27 @@ static void ppuscroll_write(void *ctx)
 static void ppuscroll_write_mirrored(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->t = 0x7fff;
+    ppu->x = 0xff;
 
-    ct_assertequal(0u, ppu->t);
-    ct_assertequal(0u, ppu->x);
+    ct_assertequal(0x7fffu, ppu->t);
+    ct_assertequal(0xffu, ppu->x);
     ct_assertfalse(ppu->w);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x3215, 0xaf); // 0b1010'1111
+    bus_write(get_mbus(ctx), 0x3215, 0xaa); // 0b1010'1010
 
-    ct_assertequal(0x15u, ppu->t);          // 0b000'0000'0001'0101
-    ct_assertequal(7u, ppu->x);             // 0b111
+    ct_assertequal(0x7ff5u, ppu->t);        // 0b111'1111'1111'0101
+    ct_assertequal(2u, ppu->x);             // 0b010
     ct_asserttrue(ppu->w);
     ct_assertequal(5u, ppu->regsel);
-    ct_assertequal(0xafu, ppu->regbus);
+    ct_assertequal(0xaau, ppu->regbus);
 
     bus_write(get_mbus(ctx), 0x3215, 0xab); // 0b1010'1011
 
-    ct_assertequal(0x32b5u, ppu->t);        // 0b011'0010'1011'0101
-    ct_assertequal(7u, ppu->x);             // 0b111
+    ct_assertequal(0x3eb5u, ppu->t);        // 0b011'1110'1011'0101
+    ct_assertequal(2u, ppu->x);             // 0b010
     ct_assertfalse(ppu->w);
     ct_assertequal(5u, ppu->regsel);
     ct_assertequal(0xabu, ppu->regbus);
@@ -776,6 +780,103 @@ static void ppuscroll_read(void *ctx)
     bus_read(get_mbus(ctx), 0x2005, &d);
 
     ct_assertequal(5u, ppu->regsel);
+    ct_assertequal(0x5au, d);
+}
+
+static void ppuaddr_write(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->t = 0x4000;
+
+    ct_assertequal(0x4000u, ppu->t);
+    ct_assertequal(0u, ppu->v);
+    ct_assertfalse(ppu->w);
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x2006, 0xa5); // 0b1010'0101
+
+    ct_assertequal(0x2500u, ppu->t);        // 0b010'0101'0000'0000
+    ct_assertequal(0u, ppu->v);
+    ct_asserttrue(ppu->w);
+    ct_assertequal(6u, ppu->regsel);
+    ct_assertequal(0xa5u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x2006, 0xab); // 0b1010'1011
+
+    ct_assertequal(0x25abu, ppu->t);        // 0b010'0101'1010'1011
+    ct_assertequal(0x25abu, ppu->v);
+    ct_assertfalse(ppu->w);
+    ct_assertequal(6u, ppu->regsel);
+    ct_assertequal(0xabu, ppu->regbus);
+}
+
+static void ppuaddr_write_mirrored(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->t = 0x4fff;
+
+    ct_assertequal(0x4fffu, ppu->t);
+    ct_assertequal(0u, ppu->v);
+    ct_assertfalse(ppu->w);
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x3216, 0xa5); // 0b1010'0101
+
+    ct_assertequal(0x25ffu, ppu->t);        // 0b010'0101'1111'1111
+    ct_assertequal(0u, ppu->v);
+    ct_asserttrue(ppu->w);
+    ct_assertequal(6u, ppu->regsel);
+    ct_assertequal(0xa5u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x3216, 0xab); // 0b1010'1011
+
+    ct_assertequal(0x25abu, ppu->t);        // 0b010'0101'1010'1011
+    ct_assertequal(0x25abu, ppu->v);
+    ct_assertfalse(ppu->w);
+    ct_assertequal(6u, ppu->regsel);
+    ct_assertequal(0xabu, ppu->regbus);
+}
+
+static void ppuaddr_write_during_reset(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->t = 0x4fff;
+    ppu->res = CSGS_SERVICED;
+
+    ct_assertequal(0x4fffu, ppu->t);
+    ct_assertequal(0u, ppu->v);
+    ct_assertfalse(ppu->w);
+    ct_assertequal(0u, ppu->regsel);
+    ct_assertequal(0u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x3216, 0xa5);
+
+    ct_assertequal(0x4fffu, ppu->t);
+    ct_assertequal(0u, ppu->v);
+    ct_assertfalse(ppu->w);
+    ct_assertequal(6u, ppu->regsel);
+    ct_assertequal(0xa5u, ppu->regbus);
+
+    bus_write(get_mbus(ctx), 0x3216, 0xab);
+
+    ct_assertequal(0x4fffu, ppu->t);
+    ct_assertequal(0u, ppu->v);
+    ct_assertfalse(ppu->w);
+    ct_assertequal(6u, ppu->regsel);
+    ct_assertequal(0xabu, ppu->regbus);
+}
+
+static void ppuaddr_read(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->regbus = 0x5a;
+
+    uint8_t d;
+    bus_read(get_mbus(ctx), 0x2006, &d);
+
+    ct_assertequal(6u, ppu->regsel);
     ct_assertequal(0x5au, d);
 }
 
@@ -1216,6 +1317,10 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(ppuscroll_write_mirrored),
         ct_maketest(ppuscroll_write_during_reset),
         ct_maketest(ppuscroll_read),
+        ct_maketest(ppuaddr_write),
+        ct_maketest(ppuaddr_write_mirrored),
+        ct_maketest(ppuaddr_write_during_reset),
+        ct_maketest(ppuaddr_read),
 
         ct_maketest(reset_sequence),
         ct_maketest(reset_too_short),

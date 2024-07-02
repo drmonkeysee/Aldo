@@ -121,7 +121,7 @@ static bool reg_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
         if (ppu->line == LineVBlank && ppu->dot == 1) {
             ppu->status.v = false;
         }
-        ppu->regbus = get_status(ppu) | (ppu->regbus & 0x1f);
+        ppu->regbus = (ppu->regbus & 0x1f) | get_status(ppu);
         ppu->w = ppu->status.v = false;
         break;
     case 4: // OAMDATA
@@ -149,7 +149,8 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
         if (ppu->res != CSGS_SERVICED) {
             set_ctrl(ppu, ppu->regbus);
             // NOTE: set nametable-select
-            ppu->t |= ppu->ctrl.nh << 11 | ppu->ctrl.nl << 10;
+            ppu->t = (uint16_t)((ppu->t & 0x73ff) | ppu->ctrl.nh << 11
+                                | ppu->ctrl.nl << 10);
             // TODO: bit 0 race condition on dot 257
         }
         break;
@@ -178,15 +179,31 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
         if (ppu->res != CSGS_SERVICED) {
             if (ppu->w) {
                 // NOTE: set course and fine y
-                ppu->t |= (ppu->regbus & course) << 2;
-                ppu->t |= (ppu->regbus & fine) << 12;
+                ppu->t = (uint16_t)((ppu->t & 0xc1f)
+                                    | (ppu->regbus & fine) << 12
+                                    | (ppu->regbus & course) << 2);
             } else {
                 // NOTE: set course and fine x
-                ppu->t |= (ppu->regbus & course) >> 3;
-                ppu->x |= ppu->regbus & fine;
+                ppu->t = (ppu->t & 0x7fe0) | (ppu->regbus & course) >> 3;
+                ppu->x = ppu->regbus & fine;
             }
             ppu->w = !ppu->w;
         }
+        break;
+    case 6: // PPUADDR
+        if (ppu->res != CSGS_SERVICED) {
+            if (ppu->w) {
+                ppu->t = (ppu->t & 0x7f00) | ppu->regbus;
+                ppu->v = ppu->t;
+            } else {
+                ppu->t = (uint16_t)((ppu->t & 0xff)
+                                    | (ppu->regbus & 0x3f) << 8);
+            }
+            ppu->w = !ppu->w;
+            // TODO: there is some kind of bus conflict behavior i don't
+            // understand yet, as well as palette corruption.
+        }
+        break;
     default:
         break;
     }

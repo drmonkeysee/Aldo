@@ -112,6 +112,7 @@ static bool reg_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
     struct rp2c02 *const ppu = ctx;
+    ppu->signal.rw = true;
     ppu->regsel = addr & 0x7;
     switch (ppu->regsel) {
     case 2: // PPUSTATUS
@@ -140,6 +141,7 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
     struct rp2c02 *const ppu = ctx;
+    ppu->signal.rw = false;
     ppu->regsel = addr & 0x7;
     ppu->regbus = d;
     switch (ppu->regsel) {

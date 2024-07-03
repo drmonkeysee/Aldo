@@ -275,7 +275,7 @@ static void decode_tiles(const struct blockview *bv, size_t tilecount,
                                                     + (row * ChrPlaneSize));
                 assert(pixel >= 0);
                 tile[pixel] = (uint8_t)((byte_getbit(plane0, bit)
-                                         | (byte_getbit(plane1, bit) << 1)));
+                                         | byte_getbit(plane1, bit) << 1));
             }
         }
         // NOTE: did we process the entire CHR ROM?

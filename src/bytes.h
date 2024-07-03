@@ -70,7 +70,7 @@ enum {
 br_libexport
 inline uint16_t bytowr(uint8_t lo, uint8_t hi)
 {
-    return (uint16_t)(lo | (hi << 8));
+    return (uint16_t)(lo | hi << 8);
 }
 
 // Byte Array to Word

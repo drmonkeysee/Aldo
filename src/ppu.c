@@ -139,10 +139,8 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
     // NOTE: addr=[$2000-$3FFF]
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
-    static const uint8_t course = 0xf8, fine = 0x7;
-
     struct rp2c02 *const ppu = ctx;
-    ppu->regsel = addr & fine;
+    ppu->regsel = addr & 0x7;
     ppu->regbus = d;
     switch (ppu->regsel) {
     case 0: // PPUCTRL
@@ -180,12 +178,12 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
             if (ppu->w) {
                 // NOTE: set course and fine y
                 ppu->t = (uint16_t)((ppu->t & 0xc1f)
-                                    | (ppu->regbus & fine) << 12
-                                    | (ppu->regbus & course) << 2);
+                                    | (ppu->regbus & 0x7) << 12
+                                    | (ppu->regbus & 0xf8) << 2);
             } else {
                 // NOTE: set course and fine x
-                ppu->t = (ppu->t & 0x7fe0) | (ppu->regbus & course) >> 3;
-                ppu->x = ppu->regbus & fine;
+                ppu->t = (ppu->t & 0x7fe0) | (ppu->regbus & 0xf8) >> 3;
+                ppu->x = ppu->regbus & 0x7;
             }
             ppu->w = !ppu->w;
         }

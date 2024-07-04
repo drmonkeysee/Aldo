@@ -126,11 +126,11 @@ static void create_vbus(struct nes001 *self)
 {
     // TODO: partitions so far:
     // * $0000 - $1FFF: unmapped
-    // * $2000 - $2EFF: 2KB RAM mirrored incompletely to 8K - 256 = 7936B
+    // * $2000 - $3EFF: 2KB RAM mirrored incompletely to 8K - 256 = 7936B
     // * $3F00 - $3FFF: unmapped
     self->ppu.vbus = bus_new(BITWIDTH_16KB, 3, MEMBLOCK_8KB,
-                             MEMBLOCK_8KB - MEMBLOCK_256B);
-    const bool r = bus_set(self->ppu.vbus, 1, (struct busdevice){
+                             MEMBLOCK_16KB - MEMBLOCK_256B);
+    const bool r = bus_set(self->ppu.vbus, MEMBLOCK_8KB, (struct busdevice){
         vram_read,
         vram_write,
         vram_dma,

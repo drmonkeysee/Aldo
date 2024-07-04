@@ -22,12 +22,41 @@ struct test_context {
     bus *mbus, *vbus;
 };
 
+static uint8_t VRam[4];
+
+static bool test_vread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
+{
+    if (addr > 0x4) {
+        return false;
+    }
+    *d = ((uint8_t *)ctx)[addr];
+    return true;
+}
+
+static bool test_vwrite(void *ctx, uint16_t addr, uint8_t d)
+{
+    if (addr > 0x4) {
+        return false;
+    }
+    ((uint8_t *)ctx)[addr] = d;
+    return true;
+}
+
 static void setup(void **ctx)
 {
     struct test_context *const c = malloc(sizeof *c);
     // NOTE: enough main bus to map $2000 - $3FFF for ppu registers
     c->mbus = bus_new(BITWIDTH_16KB, 2, MEMBLOCK_8KB);
-    c->ppu.vbus = c->vbus = bus_new(BITWIDTH_16KB, 1);
+    VRam[0] = 0x11;
+    VRam[1] = 0x22;
+    VRam[2] = 0x33;
+    VRam[3] = 0x44;
+    c->ppu.vbus = c->vbus = bus_new(BITWIDTH_16KB, 2, 0x3f00);
+    bus_set(c->vbus, 0, (struct busdevice){
+        .read = test_vread,
+        .write = test_vwrite,
+        .ctx = VRam,
+    });
     ppu_connect(&c->ppu, c->mbus);
     // NOTE: run powerup and reset sequence and then force internal state to a
     // known zero-value.
@@ -918,6 +947,36 @@ static void ppu_addr_scroll_interleave(void *ctx)
     ct_assertequal(0x64efu, ppu->t);
     ct_assertequal(0x64efu, ppu->v);
     ct_assertfalse(ppu->w);
+}
+
+static void ppudata_write(void *ctx)
+{
+    ct_assertfail("implement test");
+}
+
+static void ppudata_write_ignore_high_bits(void *ctx)
+{
+    ct_assertfail("implement test");
+}
+
+static void ppudata_write_palette(void *ctx)
+{
+    ct_assertfail("implement test");
+}
+
+static void ppudata_read(void *ctx)
+{
+    ct_assertfail("implement test");
+}
+
+static void ppudata_read_ignore_high_bits(void *ctx)
+{
+    ct_assertfail("implement test");
+}
+
+static void ppudata_read_palette(void *ctx)
+{
+    ct_assertfail("implement test");
 }
 
 static void reset_sequence(void *ctx)

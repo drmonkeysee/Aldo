@@ -954,6 +954,11 @@ static void ppudata_write(void *ctx)
     ct_assertfail("implement test");
 }
 
+static void ppudata_write_during_rendering(void *ctx)
+{
+    ct_assertfail("implement test");
+}
+
 static void ppudata_write_ignore_high_bits(void *ctx)
 {
     ct_assertfail("implement test");
@@ -965,6 +970,11 @@ static void ppudata_write_palette(void *ctx)
 }
 
 static void ppudata_read(void *ctx)
+{
+    ct_assertfail("implement test");
+}
+
+static void ppudata_read_during_rendering(void *ctx)
 {
     ct_assertfail("implement test");
 }
@@ -1421,6 +1431,14 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(ppuaddr_write_during_reset),
         ct_maketest(ppuaddr_read),
         ct_maketest(ppu_addr_scroll_interleave),
+        ct_maketest(ppudata_write),
+        ct_maketest(ppudata_write_during_rendering),
+        ct_maketest(ppudata_write_ignore_high_bits),
+        ct_maketest(ppudata_write_palette),
+        ct_maketest(ppudata_read),
+        ct_maketest(ppudata_read_during_rendering),
+        ct_maketest(ppudata_read_ignore_high_bits),
+        ct_maketest(ppudata_read_palette),
 
         ct_maketest(reset_sequence),
         ct_maketest(reset_too_short),

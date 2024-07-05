@@ -230,7 +230,7 @@ static void reset(struct rp2c02 *self)
     // NOTE: t is cleared but NOT v
     self->dot = self->line = self->t = self->rbuf = self->x = 0;
     self->signal.intr = true;
-    self->signal.vout = self->odd = self->w = false;
+    self->signal.vout = self->cvop = self->odd = self->w = false;
     set_ctrl(self, 0);
     set_mask(self, 0);
     self->res = CSGS_SERVICED;
@@ -327,9 +327,9 @@ void ppu_powerup(struct rp2c02 *self)
     // NOTE: initialize ppu to known state; internal components affected by the
     // reset sequence are deferred until that phase.
     self->regsel = self->oamaddr = 0;
-    self->signal.intr = self->signal.res = self->signal.rw = self->signal.vr =
-        self->signal.vw = true;
-    self->signal.vout = self->status.s = false;
+    self->signal.intr = self->signal.res = self->signal.rw = self->signal.rd =
+        self->signal.wr = true;
+    self->signal.ale = self->signal.vout = self->status.s = false;
 
     // NOTE: simulate res set on startup to engage reset sequence
     self->res = CSGS_PENDING;
@@ -371,10 +371,10 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
 
     snp->plines.cpu_readwrite = self->signal.rw;
     snp->plines.interrupt = self->signal.intr;
-    snp->plines.read = self->signal.vr;
+    snp->plines.read = self->signal.rd;
     snp->plines.reset = self->signal.res;
     snp->plines.video_out = self->signal.vout;
-    snp->plines.write = self->signal.vw;
+    snp->plines.write = self->signal.wr;
 }
 
 struct ppu_coord ppu_trace(const struct rp2c02 *self, int adjustment)

@@ -71,12 +71,13 @@ struct rp2c02 {
             vdatabus;           // VRAM Data Bus (actually shared with lower
     struct {                    // 8-bits of vaddrbus but this is not modeled
         bool                    // to avoid storing an extra latch).
+            ale: 1,             // Address Latch Signal (output)
             intr: 1,            // Interrupt Signal (output, inverted);
                                 // wired to CPU NMI.
             res: 1,             // Reset Signal (input, inverted)
             rw: 1,              // CPU Read/Write (input, read high)
-            vr: 1,              // VRAM Read (output, inverted)
-            vw: 1,              // VRAM Write (output, inverted); not signaled
+            rd: 1,              // VRAM Read (output, inverted)
+            wr: 1,              // VRAM Write (output, inverted); not signaled
                                 // for palette writes.
             vout: 1;            // Video Out (output); actual pin is tied to
                                 // analog video output but used here to show
@@ -93,6 +94,7 @@ struct rp2c02 {
             rbuf,               // PPUDATA Read Buffer
             x;                  // Fine X Scroll (3 bits)
     bool
+        cvop,                   // Pending CPU VRAM Operation
         odd,                    // Current frame is even or odd
         w;                      // Write latch for x2 registers
 

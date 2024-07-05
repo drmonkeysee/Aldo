@@ -274,7 +274,7 @@ static void handle_reset(struct rp2c02 *self)
     }
 }
 
-static int cycle(struct rp2c02 *self)
+static void cycle(struct rp2c02 *self)
 {
     // NOTE: vblank
     if (self->line == LineVBlank && self->dot == 0) {
@@ -297,8 +297,6 @@ static int cycle(struct rp2c02 *self)
     // NOTE: dot advancement happens last, leaving PPU on next dot to be drawn;
     // analogous to stack pointer always pointing at next byte to be written.
     nextdot(self);
-
-    return 1;
 }
 
 //
@@ -337,17 +335,14 @@ void ppu_powerup(struct rp2c02 *self)
     self->res = CSGS_PENDING;
 }
 
-int ppu_cycle(struct rp2c02 *self, int cycles)
+void ppu_cycle(struct rp2c02 *self)
 {
     assert(self != NULL);
 
     // NOTE: for simplicity, handle RESET signal on CPU cycle boundaries
     handle_reset(self);
 
-    const int total = cycles * self->cyr;
-    cycles = 0;
-    for (int i = 0; i < total; ++i, cycles += cycle(self));
-    return cycles;
+    for (int i = 0; i < self->cyr; ++i, cycle(self));
 }
 
 void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)

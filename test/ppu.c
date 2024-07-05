@@ -62,7 +62,7 @@ static void setup(void **ctx)
     // known zero-value.
     ppu_powerup(&c->ppu);
     c->ppu.cyr = 1;
-    ppu_cycle(&c->ppu, 1);
+    ppu_cycle(&c->ppu);
     c->ppu.line = c->ppu.dot = 0;
     c->ppu.res = CSGS_CLEAR;
     *ctx = c;
@@ -1002,7 +1002,7 @@ static void reset_sequence(void *ctx)
     ppu->x = 0x78;
     ppu->t = ppu->v = 0x1234;
 
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
     ct_assertequal(27u, ppu->dot);
@@ -1019,7 +1019,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(CSGS_CLEAR, (int)ppu->res);
 
     ppu->signal.res = false;
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
     ct_assertequal(30u, ppu->dot);
@@ -1035,7 +1035,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0x1234u, ppu->v);
     ct_assertequal(CSGS_DETECTED, (int)ppu->res);
 
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
     ct_assertequal(33u, ppu->dot);
@@ -1051,7 +1051,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0x1234u, ppu->v);
     ct_assertequal(CSGS_PENDING, (int)ppu->res);
 
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
     ct_assertequal(36u, ppu->dot);
@@ -1068,7 +1068,9 @@ static void reset_sequence(void *ctx)
     ct_assertequal(CSGS_COMMITTED, (int)ppu->res);
 
     // NOTE: reset line held
-    ppu_cycle(ppu, 5);
+    for (int i = 0; i < 5; ++i) {
+        ppu_cycle(ppu);
+    }
 
     ct_assertequal(42u, ppu->line);
     ct_assertequal(51u, ppu->dot);
@@ -1085,7 +1087,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(CSGS_COMMITTED, (int)ppu->res);
 
     ppu->signal.res = true;
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(0u, ppu->line);
     ct_assertequal(3u, ppu->dot);
@@ -1115,7 +1117,7 @@ static void reset_too_short(void *ctx)
     ppu->x = 0x78;
     ppu->t = ppu->v = 0x1234;
 
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
     ct_assertequal(27u, ppu->dot);
@@ -1132,7 +1134,7 @@ static void reset_too_short(void *ctx)
     ct_assertequal(CSGS_CLEAR, (int)ppu->res);
 
     ppu->signal.res = false;
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
     ct_assertequal(30u, ppu->dot);
@@ -1149,7 +1151,7 @@ static void reset_too_short(void *ctx)
     ct_assertequal(CSGS_DETECTED, (int)ppu->res);
 
     ppu->signal.res = true;
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
     ct_assertequal(33u, ppu->dot);
@@ -1173,7 +1175,7 @@ static void vblank_prep(void *ctx)
     ppu->ctrl.v = true;
     ppu->line = 241;
 
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(1u, ppu->dot);
     ct_asserttrue(ppu->status.v);
@@ -1188,7 +1190,7 @@ static void vblank_start(void *ctx)
     ppu->line = 241;
     ppu->dot = 1;
 
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(2u, ppu->dot);
     ct_asserttrue(ppu->status.v);
@@ -1202,7 +1204,7 @@ static void vblank_start_nmi_disabled(void *ctx)
     ppu->line = 241;
     ppu->dot = 1;
 
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(2u, ppu->dot);
     ct_asserttrue(ppu->status.v);
@@ -1217,7 +1219,7 @@ static void vblank_start_nmi_missed(void *ctx)
     ppu->line = 241;
     ppu->dot = 1;
 
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(2u, ppu->dot);
     ct_assertfalse(ppu->status.v);
@@ -1233,21 +1235,21 @@ static void vblank_nmi_toggle(void *ctx)
     ppu->dot = 40;
     ppu->signal.intr = false;
 
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(41u, ppu->dot);
     ct_asserttrue(ppu->status.v);
     ct_assertfalse(ppu->signal.intr);
 
     ppu->ctrl.v = false;
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->dot);
     ct_asserttrue(ppu->status.v);
     ct_asserttrue(ppu->signal.intr);
 
     ppu->ctrl.v = true;
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(43u, ppu->dot);
     ct_asserttrue(ppu->status.v);
@@ -1263,20 +1265,20 @@ static void vblank_nmi_clear(void *ctx)
     ppu->dot = 40;
     ppu->signal.intr = false;
 
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(41u, ppu->dot);
     ct_asserttrue(ppu->status.v);
     ct_assertfalse(ppu->signal.intr);
 
     ppu->status.v = false;
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->dot);
     ct_assertfalse(ppu->status.v);
     ct_asserttrue(ppu->signal.intr);
 
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(43u, ppu->dot);
     ct_assertfalse(ppu->status.v);
@@ -1295,7 +1297,7 @@ static void vblank_end(void *ctx)
     ppu->res = CSGS_SERVICED;
     ppu->signal.intr = false;
 
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(2u, ppu->dot);
     ct_assertfalse(ppu->status.v);
@@ -1313,7 +1315,7 @@ static void frame_toggle(void *ctx)
 
     ct_assertfalse(ppu->odd);
 
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(0u, ppu->line);
     ct_assertequal(0u, ppu->dot);
@@ -1321,7 +1323,7 @@ static void frame_toggle(void *ctx)
 
     ppu->line = 261;
     ppu->dot = 340;
-    ppu_cycle(ppu, 1);
+    ppu_cycle(ppu);
 
     ct_assertequal(0u, ppu->line);
     ct_assertequal(0u, ppu->dot);

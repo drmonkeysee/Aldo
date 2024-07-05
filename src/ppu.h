@@ -108,7 +108,7 @@ struct ppu_coord { int dot, line; };
 void ppu_connect(struct rp2c02 *self, bus *mbus);
 void ppu_powerup(struct rp2c02 *self);
 
-int ppu_cycle(struct rp2c02 *self, int cpu_cycles);
+void ppu_cycle(struct rp2c02 *self);
 
 void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp);
 struct ppu_coord ppu_trace(const struct rp2c02 *self, int adjustment);

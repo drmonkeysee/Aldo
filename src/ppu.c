@@ -324,9 +324,6 @@ void ppu_powerup(struct rp2c02 *self)
     assert(self != NULL);
     assert(self->vbus != NULL);
 
-    // NOTE: NTSC PPU:CPU cycle ratio
-    self->cyr = 3;
-
     // NOTE: initialize ppu to known state; internal components affected by the
     // reset sequence are deferred until that phase.
     self->regsel = self->oamaddr = 0;
@@ -342,12 +339,8 @@ int ppu_cycle(struct rp2c02 *self)
 {
     assert(self != NULL);
 
-    // NOTE: for simplicity, handle RESET signal on CPU cycle boundaries
     handle_reset(self);
-
-    int frames = 0;
-    for (int i = 0; i < self->cyr; ++i, frames += cycle(self));
-    return frames;
+    return cycle(self);
 }
 
 void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
@@ -387,7 +380,7 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
 struct ppu_coord ppu_trace(const struct rp2c02 *self, int adjustment)
 {
     struct ppu_coord c = {
-        self->dot + (adjustment * self->cyr),
+        self->dot + adjustment,
         self->line,
     };
     if (c.dot < 0) {

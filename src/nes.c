@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+static const int PpuRatio = 3;
+
 // The NES-001 NTSC Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
 struct nes001 {
@@ -200,7 +202,8 @@ static void instruction_trace(struct nes001 *self,
     // NOTE: trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
     trace_line(self->tracelog, clock->cycles + (uint64_t)adjustment,
-               ppu_trace(&self->ppu, adjustment), &self->cpu, self->dbg, &snp);
+               ppu_trace(&self->ppu, adjustment * PpuRatio), &self->cpu,
+               self->dbg, &snp);
 }
 
 //
@@ -334,7 +337,9 @@ void nes_cycle(nes *self, struct cycleclock *clock)
     assert(clock != NULL);
 
     while (self->cpu.signal.rdy && clock->budget > 0) {
-        clock->frames += (uint64_t)ppu_cycle(&self->ppu);
+        for (int i = 0; i < PpuRatio; ++i) {
+            clock->frames += (uint64_t)ppu_cycle(&self->ppu);
+        }
         const int cycles = cpu_cycle(&self->cpu);
         set_pins(self);
         clock->budget -= cycles;

@@ -61,7 +61,6 @@ static void setup(void **ctx)
     // NOTE: run powerup and reset sequence and then force internal state to a
     // known zero-value.
     ppu_powerup(&c->ppu);
-    c->ppu.cyr = 1;
     ppu_cycle(&c->ppu);
     c->ppu.line = c->ppu.dot = 0;
     c->ppu.rst = CSGS_CLEAR;
@@ -82,7 +81,6 @@ static void powerup_initializes_ppu(void *ctx)
 
     ppu_powerup(ppu);
 
-    ct_assertequal(3u, ppu->cyr);
     ct_assertequal(CSGS_PENDING, (int)ppu->rst);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->oamaddr);
@@ -993,8 +991,6 @@ static void ppudata_read_palette(void *ctx)
 static void reset_sequence(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    // NOTE: reset cadence is on cpu cycle so ppu cycle ratio doesn't matter
-    ppu->cyr = 3;
     ppu->line = 42;
     ppu->dot = 24;
     ppu->signal.intr = false;
@@ -1007,7 +1003,7 @@ static void reset_sequence(void *ctx)
     ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
-    ct_assertequal(27u, ppu->dot);
+    ct_assertequal(25u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -1025,7 +1021,7 @@ static void reset_sequence(void *ctx)
     ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
-    ct_assertequal(30u, ppu->dot);
+    ct_assertequal(26u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -1042,7 +1038,7 @@ static void reset_sequence(void *ctx)
     ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
-    ct_assertequal(33u, ppu->dot);
+    ct_assertequal(27u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -1059,7 +1055,7 @@ static void reset_sequence(void *ctx)
     ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
-    ct_assertequal(36u, ppu->dot);
+    ct_assertequal(28u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -1079,7 +1075,7 @@ static void reset_sequence(void *ctx)
     }
 
     ct_assertequal(42u, ppu->line);
-    ct_assertequal(51u, ppu->dot);
+    ct_assertequal(33u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -1097,7 +1093,7 @@ static void reset_sequence(void *ctx)
     ppu_cycle(ppu);
 
     ct_assertequal(0u, ppu->line);
-    ct_assertequal(3u, ppu->dot);
+    ct_assertequal(1u, ppu->dot);
     ct_asserttrue(ppu->signal.intr);
     ct_assertfalse(ppu->ctrl.b);
     ct_assertfalse(ppu->mask.b);
@@ -1115,8 +1111,6 @@ static void reset_sequence(void *ctx)
 static void reset_too_short(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    // NOTE: reset cadence is on cpu cycle so ppu cycle ratio doesn't matter
-    ppu->cyr = 3;
     ppu->line = 42;
     ppu->dot = 24;
     ppu->signal.intr = false;
@@ -1129,7 +1123,7 @@ static void reset_too_short(void *ctx)
     ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
-    ct_assertequal(27u, ppu->dot);
+    ct_assertequal(25u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -1147,7 +1141,7 @@ static void reset_too_short(void *ctx)
     ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
-    ct_assertequal(30u, ppu->dot);
+    ct_assertequal(26u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -1165,7 +1159,7 @@ static void reset_too_short(void *ctx)
     ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
-    ct_assertequal(33u, ppu->dot);
+    ct_assertequal(27u, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -1345,7 +1339,6 @@ static void frame_toggle(void *ctx)
 static void trace_no_adjustment(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 3;
 
     const struct ppu_coord pixel = ppu_trace(ppu, 0);
 
@@ -1356,9 +1349,8 @@ static void trace_no_adjustment(void *ctx)
 static void trace_zero_with_adjustment(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 3;
 
-    const struct ppu_coord pixel = ppu_trace(ppu, -1);
+    const struct ppu_coord pixel = ppu_trace(ppu, -3);
 
     ct_assertequal(338, pixel.dot);
     ct_assertequal(261, pixel.line);
@@ -1367,36 +1359,45 @@ static void trace_zero_with_adjustment(void *ctx)
 static void trace(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 3;
     ppu->line = 120;
     ppu->dot = 223;
 
-    const struct ppu_coord pixel = ppu_trace(ppu, -1);
+    const struct ppu_coord pixel = ppu_trace(ppu, -3);
 
     ct_assertequal(220, pixel.dot);
     ct_assertequal(120, pixel.line);
 }
 
-static void trace_at_one_cycle(void *ctx)
+static void trace_at_one_cpu_cycle(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 3;
     ppu->dot = 3;
 
-    const struct ppu_coord pixel = ppu_trace(ppu, -1);
+    const struct ppu_coord pixel = ppu_trace(ppu, -3);
 
     ct_assertequal(0, pixel.dot);
     ct_assertequal(0, pixel.line);
 }
 
+static void trace_at_one_ppu_cycle(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->line = 120;
+    ppu->dot = 223;
+
+    const struct ppu_coord pixel = ppu_trace(ppu, -1);
+
+    ct_assertequal(222, pixel.dot);
+    ct_assertequal(120, pixel.line);
+}
+
 static void trace_at_line_boundary(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->cyr = 3;
     ppu->line = 120;
     ppu->dot = 1;
 
-    const struct ppu_coord pixel = ppu_trace(ppu, -1);
+    const struct ppu_coord pixel = ppu_trace(ppu, -3);
 
     ct_assertequal(339, pixel.dot);
     ct_assertequal(119, pixel.line);
@@ -1469,7 +1470,8 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(trace_no_adjustment),
         ct_maketest(trace_zero_with_adjustment),
         ct_maketest(trace),
-        ct_maketest(trace_at_one_cycle),
+        ct_maketest(trace_at_one_cpu_cycle),
+        ct_maketest(trace_at_one_ppu_cycle),
         ct_maketest(trace_at_line_boundary),
     };
 

@@ -33,7 +33,7 @@ struct snapshot {
     } datapath;
     struct {
         enum csig_state rst;
-        uint16_t addressbus, curraddr, tempaddr, dot, line;
+        uint16_t addressbus, scrolladdr, tempaddr, dot, line;
         uint8_t databus, readbuffer, register_databus, register_select, xfine;
         bool cv_pending, oddframe, writelatch;
     } pdatapath;

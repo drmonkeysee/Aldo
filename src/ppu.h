@@ -88,8 +88,8 @@ struct rp2c02 {
     uint16_t
         dot,                    // Current Dot
         line,                   // Current Scanline
-        t,                      // Temp VRAM Address (15 bits)
-        v;                      // Current VRAM Address (15 bits)
+        t,                      // Temp VRAM/Scrolling Address (15 bits)
+        v;                      // Current VRAM/Scrolling Address (15 bits)
     uint8_t rbuf,               // PPUDATA Read Buffer
             x;                  // Fine X Scroll (3 bits)
     bool

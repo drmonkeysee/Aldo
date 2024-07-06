@@ -358,7 +358,7 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
 
     snp->pdatapath.rst = self->rst;
     snp->pdatapath.addressbus = self->vaddrbus;
-    snp->pdatapath.curraddr = self->v;
+    snp->pdatapath.scrolladdr = self->v;
     snp->pdatapath.tempaddr = self->t;
     snp->pdatapath.dot = self->dot;
     snp->pdatapath.line = self->line;

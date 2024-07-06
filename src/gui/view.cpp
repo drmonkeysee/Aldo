@@ -338,8 +338,10 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
         }
         mode_menu_item(vs, emu);
         ImGui::Separator();
-        auto irq = emu.probe(CSGI_IRQ), nmi = emu.probe(CSGI_NMI),
-                rst = emu.probe(CSGI_RST);
+        auto
+            irq = emu.probe(CSGI_IRQ),
+            nmi = emu.probe(CSGI_NMI),
+            rst = emu.probe(CSGI_RST);
         if (ImGui::MenuItem("IRQ", "i", &irq)) {
             vs.addProbeCommand(CSGI_IRQ, irq);
         }
@@ -1554,8 +1556,10 @@ private:
         }
 
         ImGui::TextUnformatted("Signal");
-        auto irq = emu.probe(CSGI_IRQ), nmi = emu.probe(CSGI_NMI),
-                rst = emu.probe(CSGI_RST);
+        auto
+            irq = emu.probe(CSGI_IRQ),
+            nmi = emu.probe(CSGI_NMI),
+            rst = emu.probe(CSGI_RST);
         if (ImGui::Checkbox("IRQ", &irq)) {
             vs.addProbeCommand(CSGI_IRQ, irq);
         }

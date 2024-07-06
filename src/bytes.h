@@ -56,7 +56,7 @@ enum {
 };
 
 // Extract bit @pos from byte
-#define byte_getbit(byte, pos) (((byte) >> (pos)) & 1)
+#define byte_getbit(byte, pos) (((byte) >> (pos)) & 0x1)
 
 #include "bridgeopen.h"
 // NOTE: convert unsigned values into little-endian byte representations;

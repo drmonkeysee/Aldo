@@ -1500,7 +1500,7 @@ private:
     {
         static constexpr auto refreshIntervalMs = 250;
         const auto& cyclock = vs.clock.cyclock;
-        if ((refreshDt += cyclock.frametime_ms) >= refreshIntervalMs) {
+        if ((refreshDt += cyclock.ticktime_ms) >= refreshIntervalMs) {
             dispDtInput = vs.clock.dtInputMs;
             dispDtUpdate = vs.clock.dtUpdateMs;
             dispDtRender = vs.clock.dtRenderMs;
@@ -1511,10 +1511,11 @@ private:
         ImGui::Text("Update dT: %.3f", dispDtUpdate);
         ImGui::Text("Render dT: %.3f", dispDtRender);
         ImGui::Text("Total dT: %.3f", dispDtTotal);
-        ImGui::Text("Frames: %" PRIu64, cyclock.frames);
+        ImGui::Text("Ticks: %" PRIu64, cyclock.ticks);
         ImGui::Text("Emutime: %.3f", cyclock.emutime);
         ImGui::Text("Runtime: %.3f", cyclock.runtime);
-        ImGui::Text("Cycles: %" PRIu64, cyclock.total_cycles);
+        ImGui::Text("Cycles: %" PRIu64, cyclock.cycles);
+        ImGui::Text("Frames: %" PRIu64, cyclock.frames);
         ImGui::Text("BCD Support: %s", boolstr(emu.bcdSupport()));
     }
 

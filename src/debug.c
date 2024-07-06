@@ -104,7 +104,7 @@ static bool halt_runtime(const struct breakpoint *bp,
 static bool halt_cycles(const struct breakpoint *bp,
                         const struct cycleclock *clk)
 {
-    return clk->total_cycles == bp->expr.cycles;
+    return clk->cycles == bp->expr.cycles;
 }
 
 static bool halt_jammed(const struct mos6502 *cpu)

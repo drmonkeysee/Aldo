@@ -44,7 +44,7 @@ static const int
 struct viewstate {
     struct runclock {
         struct cycleclock cyclock;
-        double frameleft_ms;
+        double tickleft_ms;
     } clock;
     int ramsheet, total_ramsheets;
     bool running;
@@ -60,16 +60,16 @@ static void tick_sleep(struct runclock *c)
     // our time budget; if elapsed *seconds* is greater than vsync
     // we've BLOWN AWAY our time budget; either way don't sleep.
     if (elapsed.tv_nsec > vsync.tv_nsec || elapsed.tv_sec > vsync.tv_sec) {
-        // NOTE: we've already blown the frame time so convert everything
+        // NOTE: we've already blown the tick time, so convert everything
         // to milliseconds to make the math easier.
-        c->frameleft_ms = timespec_to_ms(&vsync) - timespec_to_ms(&elapsed);
+        c->tickleft_ms = timespec_to_ms(&vsync) - timespec_to_ms(&elapsed);
         return;
     }
 
     const struct timespec tick_left = {
         .tv_nsec = vsync.tv_nsec - elapsed.tv_nsec,
     };
-    c->frameleft_ms = timespec_to_ms(&tick_left);
+    c->tickleft_ms = timespec_to_ms(&tick_left);
 
     timespec_sleep(tick_left);
 }
@@ -110,25 +110,27 @@ static int drawstats(const struct view *v, int cursor_y,
 {
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
-    static double display_frameleft, display_frametime, refreshdt;
-    if ((refreshdt += vs->clock.cyclock.frametime_ms) >= refresh_interval_ms) {
-        display_frameleft = vs->clock.frameleft_ms;
-        display_frametime = vs->clock.cyclock.frametime_ms;
+    static double display_tickleft, display_ticktime, refreshdt;
+    if ((refreshdt += vs->clock.cyclock.ticktime_ms) >= refresh_interval_ms) {
+        display_tickleft = vs->clock.tickleft_ms;
+        display_ticktime = vs->clock.cyclock.ticktime_ms;
         refreshdt = 0;
     }
 
     mvwprintw(v->content, cursor_y++, 0, "FPS: %d (%.2f)", Fps,
-              (double)vs->clock.cyclock.frames / vs->clock.cyclock.runtime);
+              (double)vs->clock.cyclock.ticks / vs->clock.cyclock.runtime);
     mvwprintw(v->content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
-              display_frametime, display_frameleft);
-    mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64,
-              vs->clock.cyclock.frames);
+              display_ticktime, display_tickleft);
+    mvwprintw(v->content, cursor_y++, 0, "Ticks: %" PRIu64,
+              vs->clock.cyclock.ticks);
     mvwprintw(v->content, cursor_y++, 0, "Emutime: %.3f",
               vs->clock.cyclock.emutime);
     mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f",
               vs->clock.cyclock.runtime);
     mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
-              vs->clock.cyclock.total_cycles);
+              vs->clock.cyclock.cycles);
+    mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64,
+              vs->clock.cyclock.frames);
     mvwprintw(v->content, cursor_y++, 0, "Cycles per Second: %d",
               vs->clock.cyclock.cycles_per_sec);
     mvwprintw(v->content, cursor_y++, 0, "BCD Supported: %s",

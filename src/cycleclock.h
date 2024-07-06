@@ -14,8 +14,8 @@
 
 struct cycleclock {
     struct timespec current, previous, start;
-    uint64_t frames, total_cycles;
-    double emutime, frametime_ms, runtime, timebudget_ms;
+    uint64_t cycles, frames, ticks;
+    double emutime, runtime, ticktime_ms, timebudget_ms;
     int budget, cycles_per_sec;
 };
 

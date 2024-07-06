@@ -27,7 +27,7 @@ static const char *const restrict DistractorFormat = "%c Running\u2026";
 
 struct runclock {
     struct cycleclock cyclock;
-    double avgframetime_ms;
+    double avg_ticktime_ms;
 };
 
 static void clearline(void)
@@ -65,9 +65,9 @@ static void tick_start(struct runclock *c, const struct snapshot *snp)
 
     // NOTE: cumulative moving average:
     // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-    const double ticks = (double)c->cyclock.frames;
-    c->avgframetime_ms = (c->cyclock.frametime_ms
-                          + (ticks * c->avgframetime_ms)) / (ticks + 1);
+    const double ticks = (double)c->cyclock.ticks;
+    c->avg_ticktime_ms = (c->cyclock.ticktime_ms
+                          + (ticks * c->avg_ticktime_ms)) / (ticks + 1);
 
     // NOTE: arbitrary per-tick budget, 6502s often ran at 1 MHz so a million
     // cycles per tick seems as good a number as any.
@@ -95,7 +95,7 @@ static void update_progress(const struct runclock *c)
     static double refreshdt;
     static size_t distractor_frame;
 
-    if ((refreshdt += c->cyclock.frametime_ms) >= refresh_interval_ms) {
+    if ((refreshdt += c->cyclock.ticktime_ms) >= refresh_interval_ms) {
         refreshdt = display_wait;
         clearline();
         fprintf(stderr, DistractorFormat, distractor[distractor_frame++]);
@@ -119,10 +119,10 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
            scale_ms
             ? c->cyclock.runtime * TSU_MS_PER_S
             : c->cyclock.runtime);
-    printf("Avg Frame Time (msec): %.3f\n", c->avgframetime_ms);
-    printf("Total Cycles: %" PRIu64 "\n", c->cyclock.total_cycles);
+    printf("Avg Tick Time (msec): %.3f\n", c->avg_ticktime_ms);
+    printf("Total Cycles: %" PRIu64 "\n", c->cyclock.cycles);
     printf("Avg Cycles/sec: %.2f\n",
-           (double)c->cyclock.total_cycles / c->cyclock.runtime);
+           (double)c->cyclock.cycles / c->cyclock.runtime);
     if (emu->snapshot.debugger.halted != NoBreakpoint) {
         const struct breakpoint *const bp =
             debug_bp_at(emu->debugger, emu->snapshot.debugger.halted);

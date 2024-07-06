@@ -199,7 +199,7 @@ static void instruction_trace(struct nes001 *self,
     nes_snapshot(self, &snp);
     // NOTE: trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
-    trace_line(self->tracelog, clock->total_cycles + (uint64_t)adjustment,
+    trace_line(self->tracelog, clock->cycles + (uint64_t)adjustment,
                ppu_trace(&self->ppu, adjustment), &self->cpu, self->dbg, &snp);
 }
 
@@ -334,11 +334,11 @@ void nes_cycle(nes *self, struct cycleclock *clock)
     assert(clock != NULL);
 
     while (self->cpu.signal.rdy && clock->budget > 0) {
-        ppu_cycle(&self->ppu);
+        clock->frames += (uint64_t)ppu_cycle(&self->ppu);
         const int cycles = cpu_cycle(&self->cpu);
         set_pins(self);
         clock->budget -= cycles;
-        clock->total_cycles += (uint64_t)cycles;
+        clock->cycles += (uint64_t)cycles;
         instruction_trace(self, clock, -cycles);
 
         switch (self->mode) {

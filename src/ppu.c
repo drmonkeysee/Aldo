@@ -214,15 +214,17 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
 // Internal Operations
 //
 
-static void nextdot(struct rp2c02 *self)
+static int nextdot(struct rp2c02 *self)
 {
     if (++self->dot >= Dots) {
         self->dot = 0;
         if (++self->line >= Lines) {
             self->line = 0;
             self->odd = !self->odd;
+            return 1;
         }
     }
+    return 0;
 }
 
 static void reset(struct rp2c02 *self)
@@ -274,7 +276,7 @@ static void handle_reset(struct rp2c02 *self)
     }
 }
 
-static void cycle(struct rp2c02 *self)
+static int cycle(struct rp2c02 *self)
 {
     // NOTE: vblank
     if (self->line == LineVBlank && self->dot == 0) {
@@ -296,7 +298,7 @@ static void cycle(struct rp2c02 *self)
 
     // NOTE: dot advancement happens last, leaving PPU on next dot to be drawn;
     // analogous to stack pointer always pointing at next byte to be written.
-    nextdot(self);
+    return nextdot(self);
 }
 
 //
@@ -335,14 +337,16 @@ void ppu_powerup(struct rp2c02 *self)
     self->res = CSGS_PENDING;
 }
 
-void ppu_cycle(struct rp2c02 *self)
+int ppu_cycle(struct rp2c02 *self)
 {
     assert(self != NULL);
 
     // NOTE: for simplicity, handle RESET signal on CPU cycle boundaries
     handle_reset(self);
 
-    for (int i = 0; i < self->cyr; ++i, cycle(self));
+    int frames = 0;
+    for (int i = 0; i < self->cyr; ++i, frames += cycle(self));
+    return frames;
 }
 
 void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)

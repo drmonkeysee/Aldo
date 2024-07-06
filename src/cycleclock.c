@@ -20,7 +20,7 @@ void cycleclock_tickstart(struct cycleclock *self, bool reset_budget)
 {
     clock_gettime(CLOCK_MONOTONIC, &self->current);
     const double currentms = timespec_to_ms(&self->current);
-    self->frametime_ms = currentms - timespec_to_ms(&self->previous);
+    self->ticktime_ms = currentms - timespec_to_ms(&self->previous);
     self->runtime = (currentms - timespec_to_ms(&self->start)) / TSU_MS_PER_S;
 
     if (reset_budget) {
@@ -28,8 +28,8 @@ void cycleclock_tickstart(struct cycleclock *self, bool reset_budget)
         return;
     }
 
-    self->emutime += self->frametime_ms / TSU_MS_PER_S;
-    self->timebudget_ms += self->frametime_ms;
+    self->emutime += self->ticktime_ms / TSU_MS_PER_S;
+    self->timebudget_ms += self->ticktime_ms;
     // NOTE: accumulate at most a second of banked cycle time
     if (self->timebudget_ms >= TSU_MS_PER_S) {
         self->timebudget_ms = TSU_MS_PER_S;
@@ -44,5 +44,5 @@ void cycleclock_tickstart(struct cycleclock *self, bool reset_budget)
 void cycleclock_tickend(struct cycleclock *self)
 {
     self->previous = self->current;
-    ++self->frames;
+    ++self->ticks;
 }

@@ -642,7 +642,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
-        col1w = 30, col2w = 29, col3w = 29, col4w = 54, sysh = 23, crth = 4,
+        col1w = 30, col2w = 29, col3w = 29, col4w = 54, sysh = 24, crth = 4,
         cpuh = 20, maxh = 37, maxw = col1w + col2w + col3w + col4w;
 
     setlocale(LC_ALL, "");

@@ -35,7 +35,7 @@ struct snapshot {
         enum csig_state res;
         uint16_t addressbus, curraddr, tempaddr, dot, line;
         uint8_t databus, readbuffer, register_databus, register_select, xfine;
-        bool oddframe, writelatch;
+        bool cv_pending, oddframe, writelatch;
     } pdatapath;
     struct {
         uint16_t program_counter;
@@ -48,7 +48,9 @@ struct snapshot {
         bool irq, nmi, readwrite, ready, reset, sync;
     } lines;
     struct {
-        bool cpu_readwrite, interrupt, read, reset, video_out, write;
+        bool
+            address_enable, cpu_readwrite, interrupt, read, reset, video_out,
+            write;
     } plines;
 };
 

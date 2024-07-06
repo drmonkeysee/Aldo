@@ -370,9 +370,11 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
     snp->pdatapath.register_databus = self->regbus;
     snp->pdatapath.register_select = self->regsel;
     snp->pdatapath.xfine = self->x;
+    snp->pdatapath.cv_pending = self->cvp;
     snp->pdatapath.oddframe = self->odd;
     snp->pdatapath.writelatch = self->w;
 
+    snp->plines.address_enable = self->signal.ale;
     snp->plines.cpu_readwrite = self->signal.rw;
     snp->plines.interrupt = self->signal.intr;
     snp->plines.read = self->signal.rd;

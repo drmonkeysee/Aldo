@@ -94,7 +94,7 @@ struct rp2c02 {
             rbuf,               // PPUDATA Read Buffer
             x;                  // Fine X Scroll (3 bits)
     bool
-        cvop,                   // Pending CPU VRAM Operation
+        cvp,                    // Pending CPU VRAM Operation
         odd,                    // Current frame is even or odd
         w;                      // Write latch for x2 registers
 

@@ -80,8 +80,11 @@ static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
 
 static bool vram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
-    // NOTE: addr=[$2000-$3EFF]
-    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB - MEMBLOCK_256B);
+    // NOTE: addr=[$2000-$3FFF]
+    // NOTE: palette reads still hit the VRAM bus and affect internal PPU
+    // buffers, so the full 8KB range is valid input.
+    // TODO: implement this for ppu reads
+    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
     ram_load(d, ctx, addr);
     return true;
@@ -99,8 +102,9 @@ static bool vram_write(void *ctx, uint16_t addr, uint8_t d)
 static size_t vram_dma(const void *restrict ctx, uint16_t addr, size_t count,
                        uint8_t dest[restrict count])
 {
-    // NOTE: addr=[$2000-$3EFF]
-    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB - MEMBLOCK_256B);
+    // NOTE: addr=[$2000-$3FFF]
+    // NOTE: full 8KB range is valid input, see vram_read for reasons
+    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
     // NOTE: only 2KB of actual mem to copy
     return bytecopy_bank(ctx, BITWIDTH_2KB, addr, count, dest);
@@ -128,7 +132,7 @@ static void create_vbus(struct nes001 *self)
 {
     // TODO: partitions so far:
     // * $0000 - $1FFF: unmapped
-    // * $2000 - $3EFF: 2KB RAM mirrored incompletely to 8K - 256 = 7936B
+    // * $2000 - $3EFF: 2KB RAM mirrored incompletely to 8KB - 256 = 7936B
     // * $3F00 - $3FFF: unmapped
     self->ppu.vbus = bus_new(BITWIDTH_16KB, 3, MEMBLOCK_8KB,
                              MEMBLOCK_16KB - MEMBLOCK_256B);

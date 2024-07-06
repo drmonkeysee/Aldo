@@ -10,6 +10,7 @@
 #include "ciny.h"
 #include "ctrlsignal.h"
 #include "ppu.h"
+#include "snapshot.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -97,29 +98,18 @@ static void powerup_initializes_ppu(void *ctx)
 static void ppuctrl_write(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    struct snapshot snp;
 
-    ct_assertfalse(ppu->ctrl.nl);
-    ct_assertfalse(ppu->ctrl.nh);
-    ct_assertfalse(ppu->ctrl.i);
-    ct_assertfalse(ppu->ctrl.s);
-    ct_assertfalse(ppu->ctrl.b);
-    ct_assertfalse(ppu->ctrl.h);
-    ct_assertfalse(ppu->ctrl.p);
-    ct_assertfalse(ppu->ctrl.v);
+    ppu_snapshot(ppu, &snp);
+    ct_assertequal(0u, snp.ppu.ctrl);
     ct_assertequal(0u, ppu->t);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
     bus_write(get_mbus(ctx), 0x2000, 0xff);
 
-    ct_asserttrue(ppu->ctrl.nl);
-    ct_asserttrue(ppu->ctrl.nh);
-    ct_asserttrue(ppu->ctrl.i);
-    ct_asserttrue(ppu->ctrl.s);
-    ct_asserttrue(ppu->ctrl.b);
-    ct_asserttrue(ppu->ctrl.h);
-    ct_assertfalse(ppu->ctrl.p);
-    ct_asserttrue(ppu->ctrl.v);
+    ppu_snapshot(ppu, &snp);
+    ct_assertequal(0xbfu, snp.ppu.ctrl);
     ct_assertequal(0xc00u, ppu->t);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0xffu, ppu->regbus);
@@ -128,31 +118,20 @@ static void ppuctrl_write(void *ctx)
 static void ppuctrl_write_mirrored(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    struct snapshot snp;
     ppu->t = 0x7fff;
     ppu->ctrl.nh = ppu->ctrl.nl = true;
 
-    ct_asserttrue(ppu->ctrl.nl);
-    ct_asserttrue(ppu->ctrl.nh);
-    ct_assertfalse(ppu->ctrl.i);
-    ct_assertfalse(ppu->ctrl.s);
-    ct_assertfalse(ppu->ctrl.b);
-    ct_assertfalse(ppu->ctrl.h);
-    ct_assertfalse(ppu->ctrl.p);
-    ct_assertfalse(ppu->ctrl.v);
+    ppu_snapshot(ppu, &snp);
+    ct_assertequal(3u, snp.ppu.ctrl);
     ct_assertequal(0x7fffu, ppu->t);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
     bus_write(get_mbus(ctx), 0x3210, 0xfc);
 
-    ct_assertfalse(ppu->ctrl.nl);
-    ct_assertfalse(ppu->ctrl.nh);
-    ct_asserttrue(ppu->ctrl.i);
-    ct_asserttrue(ppu->ctrl.s);
-    ct_asserttrue(ppu->ctrl.b);
-    ct_asserttrue(ppu->ctrl.h);
-    ct_assertfalse(ppu->ctrl.p);
-    ct_asserttrue(ppu->ctrl.v);
+    ppu_snapshot(ppu, &snp);
+    ct_assertequal(0xbcu, snp.ppu.ctrl);
     ct_assertequal(0x73ffu, ppu->t);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0xfcu, ppu->regbus);
@@ -161,30 +140,19 @@ static void ppuctrl_write_mirrored(void *ctx)
 static void ppuctrl_write_during_reset(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    struct snapshot snp;
     ppu->rst = CSGS_SERVICED;
 
-    ct_assertfalse(ppu->ctrl.nl);
-    ct_assertfalse(ppu->ctrl.nh);
-    ct_assertfalse(ppu->ctrl.i);
-    ct_assertfalse(ppu->ctrl.s);
-    ct_assertfalse(ppu->ctrl.b);
-    ct_assertfalse(ppu->ctrl.h);
-    ct_assertfalse(ppu->ctrl.p);
-    ct_assertfalse(ppu->ctrl.v);
+    ppu_snapshot(ppu, &snp);
+    ct_assertequal(0u, snp.ppu.ctrl);
     ct_assertequal(0u, ppu->t);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
     bus_write(get_mbus(ctx), 0x2000, 0xff);
 
-    ct_assertfalse(ppu->ctrl.nl);
-    ct_assertfalse(ppu->ctrl.nh);
-    ct_assertfalse(ppu->ctrl.i);
-    ct_assertfalse(ppu->ctrl.s);
-    ct_assertfalse(ppu->ctrl.b);
-    ct_assertfalse(ppu->ctrl.h);
-    ct_assertfalse(ppu->ctrl.p);
-    ct_assertfalse(ppu->ctrl.v);
+    ppu_snapshot(ppu, &snp);
+    ct_assertequal(0u, snp.ppu.ctrl);
     ct_assertequal(0u, ppu->t);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0xffu, ppu->regbus);
@@ -205,28 +173,17 @@ static void ppuctrl_read(void *ctx)
 static void ppumask_write(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    struct snapshot snp;
 
-    ct_assertfalse(ppu->mask.g);
-    ct_assertfalse(ppu->mask.bm);
-    ct_assertfalse(ppu->mask.sm);
-    ct_assertfalse(ppu->mask.b);
-    ct_assertfalse(ppu->mask.s);
-    ct_assertfalse(ppu->mask.re);
-    ct_assertfalse(ppu->mask.ge);
-    ct_assertfalse(ppu->mask.be);
+    ppu_snapshot(ppu, &snp);
+    ct_assertequal(0u, snp.ppu.mask);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
     bus_write(get_mbus(ctx), 0x2001, 0xff);
 
-    ct_asserttrue(ppu->mask.g);
-    ct_asserttrue(ppu->mask.bm);
-    ct_asserttrue(ppu->mask.sm);
-    ct_asserttrue(ppu->mask.b);
-    ct_asserttrue(ppu->mask.s);
-    ct_asserttrue(ppu->mask.re);
-    ct_asserttrue(ppu->mask.ge);
-    ct_asserttrue(ppu->mask.be);
+    ppu_snapshot(ppu, &snp);
+    ct_assertequal(0xffu, snp.ppu.mask);
     ct_assertequal(1u, ppu->regsel);
     ct_assertequal(0xffu, ppu->regbus);
 }
@@ -234,28 +191,17 @@ static void ppumask_write(void *ctx)
 static void ppumask_write_mirrored(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    struct snapshot snp;
 
-    ct_assertfalse(ppu->mask.g);
-    ct_assertfalse(ppu->mask.bm);
-    ct_assertfalse(ppu->mask.sm);
-    ct_assertfalse(ppu->mask.b);
-    ct_assertfalse(ppu->mask.s);
-    ct_assertfalse(ppu->mask.re);
-    ct_assertfalse(ppu->mask.ge);
-    ct_assertfalse(ppu->mask.be);
+    ppu_snapshot(ppu, &snp);
+    ct_assertequal(0u, snp.ppu.mask);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
     bus_write(get_mbus(ctx), 0x3211, 0xff);
 
-    ct_asserttrue(ppu->mask.g);
-    ct_asserttrue(ppu->mask.bm);
-    ct_asserttrue(ppu->mask.sm);
-    ct_asserttrue(ppu->mask.b);
-    ct_asserttrue(ppu->mask.s);
-    ct_asserttrue(ppu->mask.re);
-    ct_asserttrue(ppu->mask.ge);
-    ct_asserttrue(ppu->mask.be);
+    ppu_snapshot(ppu, &snp);
+    ct_assertequal(0xffu, snp.ppu.mask);
     ct_assertequal(1u, ppu->regsel);
     ct_assertequal(0xffu, ppu->regbus);
 }
@@ -263,29 +209,18 @@ static void ppumask_write_mirrored(void *ctx)
 static void ppumask_write_during_reset(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    struct snapshot snp;
     ppu->rst = CSGS_SERVICED;
 
-    ct_assertfalse(ppu->mask.g);
-    ct_assertfalse(ppu->mask.bm);
-    ct_assertfalse(ppu->mask.sm);
-    ct_assertfalse(ppu->mask.b);
-    ct_assertfalse(ppu->mask.s);
-    ct_assertfalse(ppu->mask.re);
-    ct_assertfalse(ppu->mask.ge);
-    ct_assertfalse(ppu->mask.be);
+    ppu_snapshot(ppu, &snp);
+    ct_assertequal(0u, snp.ppu.mask);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
     bus_write(get_mbus(ctx), 0x2001, 0xff);
 
-    ct_assertfalse(ppu->mask.g);
-    ct_assertfalse(ppu->mask.bm);
-    ct_assertfalse(ppu->mask.sm);
-    ct_assertfalse(ppu->mask.b);
-    ct_assertfalse(ppu->mask.s);
-    ct_assertfalse(ppu->mask.re);
-    ct_assertfalse(ppu->mask.ge);
-    ct_assertfalse(ppu->mask.be);
+    ppu_snapshot(ppu, &snp);
+    ct_assertequal(0u, snp.ppu.mask);
     ct_assertequal(1u, ppu->regsel);
     ct_assertequal(0xffu, ppu->regbus);
 }
@@ -305,42 +240,43 @@ static void ppumask_read(void *ctx)
 static void ppustatus_read_when_clear(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    struct snapshot snp;
     ppu->regbus = 0x5a;
     ppu->status.v = ppu->status.s = ppu->status.o = false;
 
     uint8_t d;
     bus_read(get_mbus(ctx), 0x2002, &d);
 
+    ppu_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0x1au, d);
     ct_assertequal(0x1au, ppu->regbus);
-    ct_assertfalse(ppu->status.o);
-    ct_assertfalse(ppu->status.s);
-    ct_assertfalse(ppu->status.v);
+    ct_assertequal(0u, snp.ppu.status);
     ct_assertfalse(ppu->w);
 }
 
 static void ppustatus_read_when_set(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    struct snapshot snp;
     ppu->regbus = 0x5a;
     ppu->w = ppu->status.v = ppu->status.s = ppu->status.o = true;
 
     uint8_t d;
     bus_read(get_mbus(ctx), 0x2002, &d);
 
+    ppu_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0xfau, d);
     ct_assertequal(0xfau, ppu->regbus);
-    ct_asserttrue(ppu->status.o);
-    ct_asserttrue(ppu->status.s);
-    ct_assertfalse(ppu->status.v);
+    ct_assertequal(0x60u, snp.ppu.status);
     ct_assertfalse(ppu->w);
 }
 
 static void ppustatus_read_on_nmi_race_condition(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    struct snapshot snp;
     ppu->regbus = 0x5a;
     ppu->status.v = ppu->status.s = ppu->status.o = true;
     ppu->line = 241;
@@ -349,17 +285,17 @@ static void ppustatus_read_on_nmi_race_condition(void *ctx)
     uint8_t d;
     bus_read(get_mbus(ctx), 0x2002, &d);
 
+    ppu_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0x7au, d);
     ct_assertequal(0x7au, ppu->regbus);
-    ct_asserttrue(ppu->status.o);
-    ct_asserttrue(ppu->status.s);
-    ct_assertfalse(ppu->status.v);
+    ct_assertequal(0x60u, snp.ppu.status);
 }
 
 static void ppustatus_read_during_reset(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    struct snapshot snp;
     ppu->regbus = 0x5a;
     ppu->w = ppu->status.v = ppu->status.s = ppu->status.o = true;
     ppu->rst = CSGS_SERVICED;
@@ -367,46 +303,45 @@ static void ppustatus_read_during_reset(void *ctx)
     uint8_t d;
     bus_read(get_mbus(ctx), 0x2002, &d);
 
+    ppu_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0xfau, d);
     ct_assertequal(0xfau, ppu->regbus);
-    ct_asserttrue(ppu->status.o);
-    ct_asserttrue(ppu->status.s);
-    ct_assertfalse(ppu->status.v);
+    ct_assertequal(0x60u, snp.ppu.status);
     ct_assertfalse(ppu->w);
 }
 
 static void ppustatus_read_mirrored(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    struct snapshot snp;
     ppu->regbus = 0x5a;
     ppu->status.v = ppu->status.s = ppu->status.o = false;
 
     uint8_t d;
     bus_read(get_mbus(ctx), 0x3212, &d);
 
+    ppu_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0x1au, d);
     ct_assertequal(0x1au, ppu->regbus);
-    ct_assertfalse(ppu->status.o);
-    ct_assertfalse(ppu->status.s);
-    ct_assertfalse(ppu->status.v);
+    ct_assertequal(0u, snp.ppu.status);
     ct_assertfalse(ppu->w);
 }
 
 static void ppustatus_write(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
+    struct snapshot snp;
     ppu->w = true;
     ppu->status.v = ppu->status.s = ppu->status.o = false;
 
     bus_write(get_mbus(ctx), 0x2002, 0xff);
 
+    ppu_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0xffu, ppu->regbus);
-    ct_assertfalse(ppu->status.o);
-    ct_assertfalse(ppu->status.s);
-    ct_assertfalse(ppu->status.v);
+    ct_assertequal(0u, snp.ppu.status);
     ct_asserttrue(ppu->w);
 }
 

@@ -339,15 +339,15 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
         mode_menu_item(vs, emu);
         ImGui::Separator();
         auto irq = emu.probe(CSGI_IRQ), nmi = emu.probe(CSGI_NMI),
-                res = emu.probe(CSGI_RES);
+                rst = emu.probe(CSGI_RST);
         if (ImGui::MenuItem("IRQ", "i", &irq)) {
             vs.addProbeCommand(CSGI_IRQ, irq);
         }
         if (ImGui::MenuItem("NMI", "n", &nmi)) {
             vs.addProbeCommand(CSGI_NMI, nmi);
         }
-        if (ImGui::MenuItem("RES", "s", &res)) {
-            vs.addProbeCommand(CSGI_RES, res);
+        if (ImGui::MenuItem("RST", "s", &rst)) {
+            vs.addProbeCommand(CSGI_RST, rst);
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Clear RAM", "Cmd+0", emu.zeroRam)) {
@@ -767,14 +767,14 @@ private:
         ImGui::SameLine(0, spacer);
         renderInterruptLine("NMI", lines.nmi);
         ImGui::SameLine(0, spacer);
-        renderInterruptLine("RES", lines.reset);
+        renderInterruptLine("RST", lines.reset);
 
         auto& datapath = emu.snapshot().datapath;
         ImGui::TextUnformatted(display_signalstate(datapath.irq));
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted(display_signalstate(datapath.nmi));
         ImGui::SameLine(0, spacer);
-        ImGui::TextUnformatted(display_signalstate(datapath.res));
+        ImGui::TextUnformatted(display_signalstate(datapath.rst));
     }
 
     static void renderCycleIndicator(aldo::et::byte cycle) noexcept
@@ -1332,13 +1332,13 @@ private:
         aldo::et::word resVector;
         auto& dbg = emu.debugger();
         if (dbg.isVectorOverridden()) {
-            indicator = HEXPR_RES_IND;
+            indicator = HEXPR_RST_IND;
             resVector = static_cast<aldo::et::word>(dbg.vectorOverride());
         } else {
             indicator = "";
             resVector = bytowr(lo, hi);
         }
-        ImGui::Text("%04X: %02X %02X     RES %s$%04X", CPU_VECTOR_RES, lo, hi,
+        ImGui::Text("%04X: %02X %02X     RST %s$%04X", CPU_VECTOR_RST, lo, hi,
                     indicator, resVector);
 
         lo = prgMem.vectors[4];
@@ -1555,7 +1555,7 @@ private:
 
         ImGui::TextUnformatted("Signal");
         auto irq = emu.probe(CSGI_IRQ), nmi = emu.probe(CSGI_NMI),
-                res = emu.probe(CSGI_RES);
+                rst = emu.probe(CSGI_RST);
         if (ImGui::Checkbox("IRQ", &irq)) {
             vs.addProbeCommand(CSGI_IRQ, irq);
         }
@@ -1564,8 +1564,8 @@ private:
             vs.addProbeCommand(CSGI_NMI, nmi);
         }
         ImGui::SameLine();
-        if (ImGui::Checkbox("RES", &res)) {
-            vs.addProbeCommand(CSGI_RES, res);
+        if (ImGui::Checkbox("RST", &rst)) {
+            vs.addProbeCommand(CSGI_RST, rst);
         }
     }
 

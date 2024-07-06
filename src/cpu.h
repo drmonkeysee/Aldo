@@ -46,7 +46,7 @@ struct mos6502 {
     enum csig_state
         irq,            // IRQ detection latch
         nmi,            // NMI detection latch
-        res;            // RESET detection latch
+        rst;            // RESET detection latch
     uint16_t
         addrbus,        // Word put on the address pins on clock phase ϕ1
         addrinst;       // Address of current instruction
@@ -59,7 +59,7 @@ struct mos6502 {
         bool
             irq: 1,     // Maskable Interrupt Signal (input, inverted)
             nmi: 1,     // Nonmaskable Interrupt Signal (input, inverted)
-            res: 1,     // Reset Signal (input, inverted)
+            rst: 1,     // Reset Signal (input, inverted)
             rdy: 1,     // Ready Signal (input, low to halt cpu)
             rw: 1,      // Read/Write Signal (output, read high)
             sync: 1;    // Sync (instruction fetch) Signal (output)
@@ -73,7 +73,7 @@ struct mos6502 {
         detached,       // Run CPU in detached mode, used mostly for peek-mode:
                         // - memory-writes disabled (includes the stack!)
                         // - bus side-effects suppressed
-                        // - interrupts never serviced (except RES)
+                        // - interrupts never serviced (except RST)
                         // - branches forced
         presync;        // Pre-sync cycle; primes the CPU to treat
                         // the following cycle as an opcode fetch (T0).

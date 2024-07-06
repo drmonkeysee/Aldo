@@ -133,7 +133,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         }
     case SDLK_s:
         if (is_free_key(ev)) {
-            vs.addProbeCommand(CSGI_RES, !emu.probe(CSGI_RES));
+            vs.addProbeCommand(CSGI_RST, !emu.probe(CSGI_RST));
         }
         break;
     }

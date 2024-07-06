@@ -31,7 +31,7 @@ struct nes001 {
         bool
             irq: 1,             // IRQ Probe
             nmi: 1,             // NMI Probe
-            res: 1;             // RESET Probe
+            rst: 1;             // RESET Probe
     } probe;                    // Interrupt Input Probes (active high)
     uint8_t ram[MEMBLOCK_2KB],  // CPU Internal RAM
             vram[MEMBLOCK_2KB]; // PPU Internal RAM
@@ -183,7 +183,7 @@ static void set_pins(struct nes001 *self)
     // NOTE: interrupt lines are active low
     self->cpu.signal.irq = !self->probe.irq;
     self->cpu.signal.nmi = !self->probe.nmi && self->ppu.signal.intr;
-    self->ppu.signal.res = self->cpu.signal.res = !self->probe.res;
+    self->ppu.signal.rst = self->cpu.signal.rst = !self->probe.rst;
     // NOTE: pull PPU's CPU R/W signal back up if CPU is no longer pulling it
     // low (set when any PPU register is written to).
     self->ppu.signal.rw |= self->cpu.signal.rw;
@@ -217,7 +217,7 @@ nes *nes_new(debugger *dbg, bool bcdsupport, FILE *tracelog)
     self->tracelog = tracelog;
     // TODO: ditch this option when aldo can emulate more than just NES
     self->cpu.bcd = bcdsupport;
-    self->probe.irq = self->probe.nmi = self->probe.res = false;
+    self->probe.irq = self->probe.nmi = self->probe.rst = false;
     setup(self);
     return self;
 }
@@ -300,8 +300,8 @@ bool nes_probe(nes *self, enum csig_interrupt signal)
         return self->probe.irq;
     case CSGI_NMI:
         return self->probe.nmi;
-    case CSGI_RES:
-        return self->probe.res;
+    case CSGI_RST:
+        return self->probe.rst;
     default:
         assert(((void)"INVALID NES PROBE", false));
         return false;
@@ -319,8 +319,8 @@ void nes_set_probe(nes *self, enum csig_interrupt signal, bool active)
     case CSGI_NMI:
         self->probe.nmi = active;
         break;
-    case CSGI_RES:
-        self->probe.res = active;
+    case CSGI_RST:
+        self->probe.rst = active;
         break;
     default:
         assert(((void)"INVALID NES PROBE", false));

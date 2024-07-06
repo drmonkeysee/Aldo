@@ -88,7 +88,7 @@ static const char *interrupt_display(const struct snapshot *snp)
 {
     if (snp->datapath.opcode != BrkOpcode) return "";
     if (snp->datapath.exec_cycle == 6) return "CLR";
-    if (snp->datapath.res == CSGS_COMMITTED) return "(RES)";
+    if (snp->datapath.rst == CSGS_COMMITTED) return "(RST)";
     if (snp->datapath.nmi == CSGS_COMMITTED) return "(NMI)";
     if (snp->datapath.irq == CSGS_COMMITTED) return "(IRQ)";
     return "";
@@ -98,7 +98,7 @@ static uint16_t interrupt_vector(const struct snapshot *snp)
 {
     if (snp->datapath.nmi == CSGS_COMMITTED)
         return batowr(snp->mem.vectors);
-    if (snp->datapath.res == CSGS_COMMITTED)
+    if (snp->datapath.rst == CSGS_COMMITTED)
         return batowr(snp->mem.vectors + 2);
     return batowr(snp->mem.vectors + 4);
 }
@@ -754,9 +754,9 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
         const char *fmt;
         uint16_t vector;
         int resetvector;
-        if (snp->datapath.res == CSGS_COMMITTED
+        if (snp->datapath.rst == CSGS_COMMITTED
             && (resetvector = debug_vector_override(dbg)) != NoResetVector) {
-            fmt = HEXPR_RES_IND "%04X";
+            fmt = HEXPR_RST_IND "%04X";
             vector = (uint16_t)resetvector;
         } else {
             fmt = "%04X";

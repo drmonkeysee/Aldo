@@ -146,7 +146,7 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
     ppu->regbus = d;
     switch (ppu->regsel) {
     case 0: // PPUCTRL
-        if (ppu->res != CSGS_SERVICED) {
+        if (ppu->rst != CSGS_SERVICED) {
             set_ctrl(ppu, ppu->regbus);
             // NOTE: set nametable-select
             ppu->t = (uint16_t)((ppu->t & 0x73ff) | ppu->ctrl.nh << 11
@@ -155,7 +155,7 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
         }
         break;
     case 1: // PPUMASK
-        if (ppu->res != CSGS_SERVICED) {
+        if (ppu->rst != CSGS_SERVICED) {
             set_mask(ppu, ppu->regbus);
         }
         break;
@@ -176,7 +176,7 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
         }
         break;
     case 5: // PPUSCROLL
-        if (ppu->res != CSGS_SERVICED) {
+        if (ppu->rst != CSGS_SERVICED) {
             if (ppu->w) {
                 // NOTE: set course and fine y
                 ppu->t = (uint16_t)((ppu->t & 0xc1f)
@@ -191,7 +191,7 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
         }
         break;
     case 6: // PPUADDR
-        if (ppu->res != CSGS_SERVICED) {
+        if (ppu->rst != CSGS_SERVICED) {
             if (ppu->w) {
                 ppu->t = (ppu->t & 0x7f00) | ppu->regbus;
                 ppu->v = ppu->t;
@@ -232,10 +232,10 @@ static void reset(struct rp2c02 *self)
     // NOTE: t is cleared but NOT v
     self->dot = self->line = self->t = self->rbuf = self->x = 0;
     self->signal.intr = true;
-    self->signal.vout = self->cvop = self->odd = self->w = false;
+    self->signal.vout = self->cvp = self->odd = self->w = false;
     set_ctrl(self, 0);
     set_mask(self, 0);
-    self->res = CSGS_SERVICED;
+    self->rst = CSGS_SERVICED;
 }
 
 // NOTE: this follows the same sequence as CPU reset sequence and is checked
@@ -244,14 +244,14 @@ static void reset(struct rp2c02 *self)
 static void handle_reset(struct rp2c02 *self)
 {
     // NOTE: pending always proceeds to committed just like the CPU sequence
-    if (self->res == CSGS_PENDING) {
-        self->res = CSGS_COMMITTED;
+    if (self->rst == CSGS_PENDING) {
+        self->rst = CSGS_COMMITTED;
     }
 
-    if (self->signal.res) {
-        switch (self->res) {
+    if (self->signal.rst) {
+        switch (self->rst) {
         case CSGS_DETECTED:
-            self->res = CSGS_CLEAR;
+            self->rst = CSGS_CLEAR;
             break;
         case CSGS_COMMITTED:
             reset(self);
@@ -260,13 +260,13 @@ static void handle_reset(struct rp2c02 *self)
             break;
         }
     } else {
-        switch (self->res) {
+        switch (self->rst) {
         case CSGS_CLEAR:
         case CSGS_SERVICED:
-            self->res = CSGS_DETECTED;
+            self->rst = CSGS_DETECTED;
             break;
         case CSGS_DETECTED:
-            self->res = CSGS_PENDING;
+            self->rst = CSGS_PENDING;
             break;
         default:
             // NOTE: as long as reset line is held low there is no further
@@ -292,7 +292,7 @@ static int cycle(struct rp2c02 *self)
         // TODO: this is also pre-render line
         self->signal.intr = true;
         set_status(self, 0);
-        self->res = CSGS_CLEAR;
+        self->rst = CSGS_CLEAR;
         // TODO: add odd dot skip when rendering enabled
     }
 
@@ -329,12 +329,12 @@ void ppu_powerup(struct rp2c02 *self)
     // NOTE: initialize ppu to known state; internal components affected by the
     // reset sequence are deferred until that phase.
     self->regsel = self->oamaddr = 0;
-    self->signal.intr = self->signal.res = self->signal.rw = self->signal.rd =
+    self->signal.intr = self->signal.rst = self->signal.rw = self->signal.rd =
         self->signal.wr = true;
     self->signal.ale = self->signal.vout = self->status.s = false;
 
-    // NOTE: simulate res set on startup to engage reset sequence
-    self->res = CSGS_PENDING;
+    // NOTE: simulate rst set on startup to engage reset sequence
+    self->rst = CSGS_PENDING;
 }
 
 int ppu_cycle(struct rp2c02 *self)
@@ -359,7 +359,7 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
     snp->ppu.oamaddr = self->oamaddr;
     snp->ppu.status = get_status(self);
 
-    snp->pdatapath.res = self->res;
+    snp->pdatapath.rst = self->rst;
     snp->pdatapath.addressbus = self->vaddrbus;
     snp->pdatapath.curraddr = self->v;
     snp->pdatapath.tempaddr = self->t;
@@ -378,7 +378,7 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
     snp->plines.cpu_readwrite = self->signal.rw;
     snp->plines.interrupt = self->signal.intr;
     snp->plines.read = self->signal.rd;
-    snp->plines.reset = self->signal.res;
+    snp->plines.reset = self->signal.rst;
     snp->plines.video_out = self->signal.vout;
     snp->plines.write = self->signal.wr;
 }

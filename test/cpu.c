@@ -20,7 +20,7 @@ static void powerup_initializes_cpu(void *ctx)
 
     ct_asserttrue(cpu.signal.irq);
     ct_asserttrue(cpu.signal.nmi);
-    ct_asserttrue(cpu.signal.res);
+    ct_asserttrue(cpu.signal.rst);
     ct_asserttrue(cpu.signal.rw);
     ct_asserttrue(cpu.detached);
     ct_assertfalse(cpu.signal.rdy);

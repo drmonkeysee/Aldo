@@ -18,7 +18,7 @@ enum csig_excmode {
 enum csig_interrupt {
     CSGI_IRQ,
     CSGI_NMI,
-    CSGI_RES,
+    CSGI_RST,
 };
 
 enum csig_state {

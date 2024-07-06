@@ -2380,12 +2380,12 @@ static void datapath_nmi_cycle_six(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void datapath_res_cycle_zero(void *ctx)
+static void datapath_rst_cycle_zero(void *ctx)
 {
     struct snapshot snp = {
         .datapath = {
             .exec_cycle = 0,
-            .res = CSGS_COMMITTED,
+            .rst = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2402,12 +2402,12 @@ static void datapath_res_cycle_zero(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void datapath_res_cycle_one(void *ctx)
+static void datapath_rst_cycle_one(void *ctx)
 {
     struct snapshot snp = {
         .datapath = {
             .exec_cycle = 1,
-            .res = CSGS_COMMITTED,
+            .rst = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2419,17 +2419,17 @@ static void datapath_res_cycle_one(void *ctx)
 
     const int written = dis_datapath(&snp, buf);
 
-    const char *const exp = "BRK (RES)";
+    const char *const exp = "BRK (RST)";
     ct_assertequal((int)strlen(exp), written);
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void datapath_res_cycle_n(void *ctx)
+static void datapath_rst_cycle_n(void *ctx)
 {
     struct snapshot snp = {
         .datapath = {
             .exec_cycle = 2,
-            .res = CSGS_COMMITTED,
+            .rst = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2441,17 +2441,17 @@ static void datapath_res_cycle_n(void *ctx)
 
     const int written = dis_datapath(&snp, buf);
 
-    const char *const exp = "BRK (RES)";
+    const char *const exp = "BRK (RST)";
     ct_assertequal((int)strlen(exp), written);
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-static void datapath_res_cycle_six(void *ctx)
+static void datapath_rst_cycle_six(void *ctx)
 {
     struct snapshot snp = {
         .datapath = {
             .exec_cycle = 6,
-            .res = CSGS_COMMITTED,
+            .rst = CSGS_COMMITTED,
         },
         .mem = {
             .currprg = {0xea, 0xff},
@@ -2691,7 +2691,7 @@ static void peek_overridden_reset(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     struct snapshot snp;
     cpu.a = 0x10;
-    cpu.res = CSGS_COMMITTED;
+    cpu.rst = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snp);
     debugger *const dbg = ctx;
     debug_set_vector_override(dbg, 0xccdd);
@@ -2700,7 +2700,7 @@ static void peek_overridden_reset(void *ctx)
 
     const int written = dis_peek(0x0, &cpu, dbg, &snp, buf);
 
-    const char *const exp = "(RES) > !CCDD";
+    const char *const exp = "(RST) > !CCDD";
     ct_assertequal((int)strlen(exp), written);
     ct_assertequalstrn(exp, buf, sizeof exp);
     ct_assertfalse(cpu.detached);
@@ -2919,10 +2919,10 @@ struct ct_testsuite dis_tests(void)
         ct_maketest(datapath_nmi_cycle_n),
         ct_maketest(datapath_nmi_cycle_six),
 
-        ct_maketest(datapath_res_cycle_zero),
-        ct_maketest(datapath_res_cycle_one),
-        ct_maketest(datapath_res_cycle_n),
-        ct_maketest(datapath_res_cycle_six),
+        ct_maketest(datapath_rst_cycle_zero),
+        ct_maketest(datapath_rst_cycle_one),
+        ct_maketest(datapath_rst_cycle_n),
+        ct_maketest(datapath_rst_cycle_six),
     };
 
     return ct_makesuite(tests);

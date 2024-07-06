@@ -81,7 +81,7 @@ void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
     cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bcd =
         cpu->bflt = cpu->detached = false;
     cpu->p.i = cpu->signal.rdy = cpu->presync = true;
-    cpu->res = CSGS_CLEAR;
+    cpu->rst = CSGS_CLEAR;
 }
 
 void enable_rom_wcapture(void)

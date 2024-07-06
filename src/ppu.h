@@ -63,7 +63,7 @@ struct rp2c02 {
     uint8_t oamaddr;            // OAMADDR: OAM Data Address, write-only
 
     // Datapath
-    enum csig_state res;        // RESET detection latch
+    enum csig_state rst;        // RESET detection latch
     uint16_t vaddrbus;          // VRAM Address Bus (14 bits)
     uint8_t regsel,             // Register Selection (3 bits);
                                 // wired to lowest 3 bits of CPU address bus.
@@ -74,7 +74,7 @@ struct rp2c02 {
             ale: 1,             // Address Latch Signal (output)
             intr: 1,            // Interrupt Signal (output, inverted);
                                 // wired to CPU NMI.
-            res: 1,             // Reset Signal (input, inverted)
+            rst: 1,             // Reset Signal (input, inverted)
             rw: 1,              // CPU Read/Write (input, read high)
             rd: 1,              // VRAM Read (output, inverted)
             wr: 1,              // VRAM Write (output, inverted); not signaled

@@ -106,16 +106,16 @@ static void update_n(struct mos6502 *self, uint8_t d)
 static void check_interrupts(struct mos6502 *self)
 {
     // NOTE: serviced state is only for assisting in nmi edge detection
-    assert(self->res != CSGS_SERVICED);
+    assert(self->rst != CSGS_SERVICED);
     assert(self->irq != CSGS_SERVICED);
 
-    if (!self->signal.res && self->res == CSGS_CLEAR) {
-        self->res = CSGS_DETECTED;
+    if (!self->signal.rst && self->rst == CSGS_CLEAR) {
+        self->rst = CSGS_DETECTED;
     }
 
     // NOTE: final cycle of BRK sequence holds interrupt latching low,
     // delaying detection of any still-active interrupt signals by one cycle
-    // (except RES which is all-powerful).
+    // (except RST which is all-powerful).
     if (self->opc == BrkOpcode && self->t == 6) return;
 
     if (self->signal.nmi) {
@@ -135,15 +135,15 @@ static void check_interrupts(struct mos6502 *self)
 // of following cycle to latch interrupt detection and make polling possible.
 static void latch_interrupts(struct mos6502 *self)
 {
-    // NOTE: res is level-detected but unlike irq it takes effect at
+    // NOTE: rst is level-detected but unlike irq it takes effect at
     // end of this cycle's ϕ2 so it moves directly from pending in this cycle
     // to committed in the next cycle.
-    if (self->signal.res) {
-        if (self->res == CSGS_DETECTED) {
-            self->res = CSGS_CLEAR;
+    if (self->signal.rst) {
+        if (self->rst == CSGS_DETECTED) {
+            self->rst = CSGS_CLEAR;
         }
-    } else if (self->res == CSGS_DETECTED) {
-        self->res = CSGS_PENDING;
+    } else if (self->rst == CSGS_DETECTED) {
+        self->rst = CSGS_PENDING;
     }
 
     // NOTE: nmi is edge-detected so once it has latched in it remains
@@ -182,29 +182,29 @@ static void poll_interrupts(struct mos6502 *self)
 
 static bool service_interrupt(struct mos6502 *self)
 {
-    return self->res == CSGS_COMMITTED
+    return self->rst == CSGS_COMMITTED
             || self->nmi == CSGS_COMMITTED
             || self->irq == CSGS_COMMITTED;
 }
 
 static uint16_t interrupt_vector(struct mos6502 *self)
 {
-    if (self->res == CSGS_COMMITTED) return CPU_VECTOR_RES;
+    if (self->rst == CSGS_COMMITTED) return CPU_VECTOR_RST;
     if (self->nmi == CSGS_COMMITTED) return CPU_VECTOR_NMI;
     return CPU_VECTOR_IRQ;
 }
 
-// NOTE: res takes effect after two cycles and immediately resets/halts
-// the cpu until the res line goes high again (this isn't strictly true
+// NOTE: rst takes effect after two cycles and immediately resets/halts
+// the cpu until the rst line goes high again (this isn't strictly true
 // but the real cpu complexity isn't necessary here).
 static bool reset_held(struct mos6502 *self)
 {
-    if (self->res == CSGS_PENDING) {
-        self->res = CSGS_COMMITTED;
+    if (self->rst == CSGS_PENDING) {
+        self->rst = CSGS_COMMITTED;
         detach(self);
         self->presync = true;
     }
-    return self->res == CSGS_COMMITTED && !self->signal.res;
+    return self->rst == CSGS_COMMITTED && !self->signal.rst;
 }
 
 //
@@ -535,13 +535,13 @@ static void BPL_exec(struct mos6502 *self)
 
 static void BRK_exec(struct mos6502 *self)
 {
-    // NOTE: res is only cleared by its own handler;
+    // NOTE: rst is only cleared by its own handler;
     // nmi is serviced by its own handler (for edge detection)
     // but cleared by all others;
     // irq is cleared by all handlers.
-    if (self->res == CSGS_COMMITTED) {
+    if (self->rst == CSGS_COMMITTED) {
         attach(self);
-        self->res = CSGS_CLEAR;
+        self->rst = CSGS_CLEAR;
     }
     self->nmi = self->nmi == CSGS_COMMITTED ? CSGS_SERVICED : CSGS_CLEAR;
     self->irq = CSGS_CLEAR;
@@ -1659,7 +1659,7 @@ void cpu_powerup(struct mos6502 *self)
     assert(self->mbus != NULL);
 
     // NOTE: initialize physical lines and control flags to known state
-    self->signal.irq = self->signal.nmi = self->signal.res =
+    self->signal.irq = self->signal.nmi = self->signal.rst =
         self->signal.rw = self->detached = true;
     self->signal.rdy = self->signal.sync = self->bflt = self->presync = false;
 
@@ -1668,9 +1668,9 @@ void cpu_powerup(struct mos6502 *self)
         self->t = self->opc = self->adl = self->adh = self->adc = 0;
     set_p(self, 0x34);
 
-    // TODO: simulate res held low on startup to engage reset sequence
+    // TODO: simulate rst held low on startup to engage reset sequence
     self->irq = self->nmi = CSGS_CLEAR;
-    self->res = CSGS_PENDING;
+    self->rst = CSGS_PENDING;
 }
 
 int cpu_cycle(struct mos6502 *self)
@@ -1744,13 +1744,13 @@ void cpu_snapshot(const struct mos6502 *self, struct snapshot *snp)
     snp->datapath.jammed = cpu_jammed(self);
     snp->datapath.nmi = self->nmi;
     snp->datapath.opcode = self->opc;
-    snp->datapath.res = self->res;
+    snp->datapath.rst = self->rst;
 
     snp->lines.irq = self->signal.irq;
     snp->lines.nmi = self->signal.nmi;
     snp->lines.readwrite = self->signal.rw;
     snp->lines.ready = self->signal.rdy;
-    snp->lines.reset = self->signal.res;
+    snp->lines.reset = self->signal.rst;
     snp->lines.sync = self->signal.sync;
 }
 
@@ -1766,8 +1766,8 @@ void cpu_peek_start(struct mos6502 *restrict self,
     if (!self->detached) {
         detach(self);
     }
-    self->irq = self->nmi = self->res = CSGS_CLEAR;
-    self->signal.irq = self->signal.nmi = self->signal.res =
+    self->irq = self->nmi = self->rst = CSGS_CLEAR;
+    self->signal.irq = self->signal.nmi = self->signal.rst =
         self->signal.rdy = true;
 }
 

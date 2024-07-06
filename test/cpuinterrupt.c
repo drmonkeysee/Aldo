@@ -27,8 +27,8 @@ static void interrupt_handler_setup(void **ctx)
     rom[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0xbb;
     rom[CPU_VECTOR_NMI & ADDRMASK_32KB] = 0x77;
     rom[(CPU_VECTOR_NMI + 1) & ADDRMASK_32KB] = 0x99;
-    rom[CPU_VECTOR_RES & ADDRMASK_32KB] = 0x22;
-    rom[(CPU_VECTOR_RES + 1) & ADDRMASK_32KB] = 0x88;
+    rom[CPU_VECTOR_RST & ADDRMASK_32KB] = 0x22;
+    rom[(CPU_VECTOR_RST + 1) & ADDRMASK_32KB] = 0x88;
     *ctx = rom;
 }
 
@@ -56,7 +56,7 @@ static void brk_handler(void *ctx)
     ct_assertequal(0u, mem[511]);
     ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
     ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
 }
 
 static void irq_handler(void *ctx)
@@ -87,7 +87,7 @@ static void irq_handler(void *ctx)
     ct_assertequal(0u, mem[511]);
     ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
     ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
 }
 
 static void nmi_handler(void *ctx)
@@ -118,10 +118,10 @@ static void nmi_handler(void *ctx)
     ct_assertequal(0u, mem[511]);
     ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
     ct_assertequal(CSGS_SERVICED, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
 }
 
-static void res_handler(void *ctx)
+static void rst_handler(void *ctx)
 {
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {
@@ -130,24 +130,24 @@ static void res_handler(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
-    cpu.signal.res = false;
+    cpu.signal.rst = false;
 
     cpu_cycle(&cpu);
 
     ct_assertequal(1u, cpu.pc);
-    ct_assertequal(CSGS_DETECTED, (int)cpu.res);
+    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(2u, cpu.pc);
-    ct_assertequal(CSGS_PENDING, (int)cpu.res);
+    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(2u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
 
-    cpu.signal.res = true;
+    cpu.signal.rst = true;
     const int cycles = clock_cpu(&cpu);
 
     ct_assertequal(7, cycles);
@@ -160,7 +160,7 @@ static void res_handler(void *ctx)
     ct_assertequal(0xffu, mem[511]);
     ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
     ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
 }
 
 static void rti_clear_irq_mask(void *ctx)
@@ -283,7 +283,7 @@ static void irq_ghost(void *ctx)
     ct_assertequal(0u, mem[511]);
     ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
     ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
 }
 
 // NOTE: NMI triggered and handler called but line never goes inactive
@@ -317,7 +317,7 @@ static void nmi_line_never_cleared(void *ctx)
     ct_assertequal(0u, mem[511]);
     ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
     ct_assertequal(CSGS_SERVICED, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
 
     cpu_cycle(&cpu);
     ct_assertequal(CSGS_SERVICED, (int)cpu.nmi);
@@ -737,8 +737,8 @@ static void nmi_lost_during_irq(void *ctx)
 // essentially impossible to recreate these conditions on functioning consumer
 // hardware, it's easier to implement simpler logic that behaves consistently.
 
-// NOTE: set RES on T4 prevents IRQ from finishing
-static void res_hijacks_irq(void *ctx)
+// NOTE: set RST on T4 prevents IRQ from finishing
+static void rst_hijacks_irq(void *ctx)
 {
     ((uint8_t *)ctx)[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xfa;
     ((uint8_t *)ctx)[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0x0;
@@ -757,21 +757,21 @@ static void res_hijacks_irq(void *ctx)
 
     for (int i = 0; i < 4; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+        ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
     }
 
-    cpu.signal.res = false;
+    cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.res);
-
-    cpu_cycle(&cpu);
-
-    ct_assertequal(CSGS_PENDING, (int)cpu.res);
+    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(3u, cpu.pc);
     ct_assertfalse(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -782,21 +782,21 @@ static void res_hijacks_irq(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(3u, cpu.pc);
     ct_asserttrue(cpu.presync);
 
-    cpu.signal.res = true;
+    cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(3u, cpu.pc);
     ct_assertfalse(cpu.presync);
     ct_assertequal(0u, cpu.opc);
 }
 
-// NOTE: set RES on T5 triggers RES sequence immediately after IRQ sequence
-static void res_following_irq(void *ctx)
+// NOTE: set RST on T5 triggers RST sequence immediately after IRQ sequence
+static void rst_following_irq(void *ctx)
 {
     ((uint8_t *)ctx)[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xfa;
     ((uint8_t *)ctx)[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0x0;
@@ -817,17 +817,17 @@ static void res_following_irq(void *ctx)
 
     for (int i = 0; i < 5; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+        ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
     }
 
-    cpu.signal.res = false;
+    cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.res);
+    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.res);
+    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -837,23 +837,23 @@ static void res_following_irq(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
 
-    cpu.signal.res = true;
+    cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
 }
 
-// NOTE: set RES on T6 still triggers reset immediately after IRQ sequence
-static void res_late_on_irq(void *ctx)
+// NOTE: set RST on T6 still triggers reset immediately after IRQ sequence
+static void rst_late_on_irq(void *ctx)
 {
     ((uint8_t *)ctx)[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xfa;
     ((uint8_t *)ctx)[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0x0;
@@ -874,13 +874,13 @@ static void res_late_on_irq(void *ctx)
 
     for (int i = 0; i < 6; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+        ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
     }
 
-    cpu.signal.res = false;
+    cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.res);
+    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -890,23 +890,23 @@ static void res_late_on_irq(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.res);
+    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
     ct_assertequal(251u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(251u, cpu.pc);
 
-    cpu.signal.res = true;
+    cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: set RES on T4 prevents NMI from finishing
-static void res_hijacks_nmi(void *ctx)
+// NOTE: set RST on T4 prevents NMI from finishing
+static void rst_hijacks_nmi(void *ctx)
 {
     ((uint8_t *)ctx)[CPU_VECTOR_NMI & ADDRMASK_32KB] = 0xfa;
     ((uint8_t *)ctx)[(CPU_VECTOR_NMI + 1) & ADDRMASK_32KB] = 0x0;
@@ -924,21 +924,21 @@ static void res_hijacks_nmi(void *ctx)
 
     for (int i = 0; i < 4; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+        ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
     }
 
-    cpu.signal.res = false;
+    cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.res);
-
-    cpu_cycle(&cpu);
-
-    ct_assertequal(CSGS_PENDING, (int)cpu.res);
+    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
+
+    cpu_cycle(&cpu);
+
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(3u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -949,21 +949,21 @@ static void res_hijacks_nmi(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(3u, cpu.pc);
     ct_asserttrue(cpu.presync);
 
-    cpu.signal.res = true;
+    cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(3u, cpu.pc);
     ct_assertfalse(cpu.presync);
     ct_assertequal(0u, cpu.opc);
 }
 
-// NOTE: set RES on T5 triggers RES sequence immediately after NMI sequence
-static void res_following_nmi(void *ctx)
+// NOTE: set RST on T5 triggers RST sequence immediately after NMI sequence
+static void rst_following_nmi(void *ctx)
 {
     ((uint8_t *)ctx)[CPU_VECTOR_NMI & ADDRMASK_32KB] = 0xfa;
     ((uint8_t *)ctx)[(CPU_VECTOR_NMI + 1) & ADDRMASK_32KB] = 0x0;
@@ -983,17 +983,17 @@ static void res_following_nmi(void *ctx)
 
     for (int i = 0; i < 5; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+        ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
     }
 
-    cpu.signal.res = false;
+    cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.res);
+    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.res);
+    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -1003,23 +1003,23 @@ static void res_following_nmi(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
 
-    cpu.signal.res = true;
+    cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
 }
 
-// NOTE: set RES on T6 still triggers reset immediately after NMI sequence
-static void res_late_on_nmi(void *ctx)
+// NOTE: set RST on T6 still triggers reset immediately after NMI sequence
+static void rst_late_on_nmi(void *ctx)
 {
     ((uint8_t *)ctx)[CPU_VECTOR_NMI & ADDRMASK_32KB] = 0xfa;
     ((uint8_t *)ctx)[(CPU_VECTOR_NMI + 1) & ADDRMASK_32KB] = 0x0;
@@ -1039,13 +1039,13 @@ static void res_late_on_nmi(void *ctx)
 
     for (int i = 0; i < 6; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+        ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
     }
 
-    cpu.signal.res = false;
+    cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.res);
+    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -1055,18 +1055,18 @@ static void res_late_on_nmi(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.res);
+    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
     ct_assertequal(251u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(251u, cpu.pc);
 
-    cpu.signal.res = true;
+    cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(251u, cpu.pc);
 }
 
@@ -1082,7 +1082,7 @@ static void clear_on_startup(void *ctx)
 
     ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
     ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
 }
 
 static void irq_poll_sequence(void *ctx)
@@ -2111,50 +2111,50 @@ static void nmi_serviced_only_clears_on_inactive(void *ctx)
     ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
 }
 
-static void res_detected_and_cpu_held(void *ctx)
+static void rst_detected_and_cpu_held(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    cpu.signal.res = false;
+    cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.res);
+    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.res);
+    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.res);
+    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
     ct_assertequal(2u, cpu.pc);
 }
 
-static void res_too_short(void *ctx)
+static void rst_too_short(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    cpu.signal.res = false;
+    cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.res);
+    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
     ct_assertequal(1u, cpu.pc);
 
-    cpu.signal.res = true;
+    cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.res);
+    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
     ct_assertequal(2u, cpu.pc);
 }
 
@@ -2168,7 +2168,7 @@ struct ct_testsuite cpu_interrupt_handler_tests(void)
         ct_maketest(brk_handler),
         ct_maketest(irq_handler),
         ct_maketest(nmi_handler),
-        ct_maketest(res_handler),
+        ct_maketest(rst_handler),
         ct_maketest(rti_clear_irq_mask),
         ct_maketest(rti_set_irq_mask),
 
@@ -2186,12 +2186,12 @@ struct ct_testsuite cpu_interrupt_handler_tests(void)
         ct_maketest(nmi_late_delayed_by_irq),
         ct_maketest(nmi_lost_during_irq),
 
-        ct_maketest(res_hijacks_irq),
-        ct_maketest(res_following_irq),
-        ct_maketest(res_late_on_irq),
-        ct_maketest(res_hijacks_nmi),
-        ct_maketest(res_following_nmi),
-        ct_maketest(res_late_on_nmi),
+        ct_maketest(rst_hijacks_irq),
+        ct_maketest(rst_following_irq),
+        ct_maketest(rst_late_on_irq),
+        ct_maketest(rst_hijacks_nmi),
+        ct_maketest(rst_following_nmi),
+        ct_maketest(rst_late_on_nmi),
     };
 
     return ct_makesuite_setup_teardown(tests, interrupt_handler_setup,
@@ -2238,8 +2238,8 @@ struct ct_testsuite cpu_interrupt_signal_tests(void)
         ct_maketest(nmi_edge_persist),
         ct_maketest(nmi_serviced_only_clears_on_inactive),
 
-        ct_maketest(res_detected_and_cpu_held),
-        ct_maketest(res_too_short),
+        ct_maketest(rst_detected_and_cpu_held),
+        ct_maketest(rst_too_short),
     };
 
     return ct_makesuite(tests);

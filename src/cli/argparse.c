@@ -333,7 +333,7 @@ void argparse_usage(const char *me)
 
     puts("\nRESET vector override expression");
     printf("  %-*s: set RESET vector to address XXXX;\n"
-           "  %-*s  %s\n", spad, HEXPR_RES_IND "XXXX", spad, "", addr_desc);
+           "  %-*s  %s\n", spad, HEXPR_RST_IND "XXXX", spad, "", addr_desc);
 }
 
 void argparse_cleanup(struct cliargs *args)

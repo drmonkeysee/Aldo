@@ -64,7 +64,7 @@ static void setup(void **ctx)
     c->ppu.cyr = 1;
     ppu_cycle(&c->ppu);
     c->ppu.line = c->ppu.dot = 0;
-    c->ppu.res = CSGS_CLEAR;
+    c->ppu.rst = CSGS_CLEAR;
     *ctx = c;
 }
 
@@ -83,12 +83,12 @@ static void powerup_initializes_ppu(void *ctx)
     ppu_powerup(ppu);
 
     ct_assertequal(3u, ppu->cyr);
-    ct_assertequal(CSGS_PENDING, (int)ppu->res);
+    ct_assertequal(CSGS_PENDING, (int)ppu->rst);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->oamaddr);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.intr);
-    ct_asserttrue(ppu->signal.res);
+    ct_asserttrue(ppu->signal.rst);
     ct_asserttrue(ppu->signal.rw);
     ct_asserttrue(ppu->signal.rd);
     ct_asserttrue(ppu->signal.wr);
@@ -163,7 +163,7 @@ static void ppuctrl_write_mirrored(void *ctx)
 static void ppuctrl_write_during_reset(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->res = CSGS_SERVICED;
+    ppu->rst = CSGS_SERVICED;
 
     ct_assertfalse(ppu->ctrl.nl);
     ct_assertfalse(ppu->ctrl.nh);
@@ -265,7 +265,7 @@ static void ppumask_write_mirrored(void *ctx)
 static void ppumask_write_during_reset(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->res = CSGS_SERVICED;
+    ppu->rst = CSGS_SERVICED;
 
     ct_assertfalse(ppu->mask.g);
     ct_assertfalse(ppu->mask.bm);
@@ -364,7 +364,7 @@ static void ppustatus_read_during_reset(void *ctx)
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->regbus = 0x5a;
     ppu->w = ppu->status.v = ppu->status.s = ppu->status.o = true;
-    ppu->res = CSGS_SERVICED;
+    ppu->rst = CSGS_SERVICED;
 
     uint8_t d;
     bus_read(get_mbus(ctx), 0x2002, &d);
@@ -445,7 +445,7 @@ static void oamaddr_write_mirrored(void *ctx)
 static void oamaddr_write_during_reset(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->res = CSGS_SERVICED;
+    ppu->rst = CSGS_SERVICED;
 
     ct_assertequal(0u, ppu->oamaddr);
     ct_assertequal(0u, ppu->regsel);
@@ -641,7 +641,7 @@ static void oamdata_write_during_reset(void *ctx)
     ppu->ctrl.s = true;
     ppu->oamaddr = 0;
     ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
-    ppu->res = CSGS_SERVICED;
+    ppu->rst = CSGS_SERVICED;
 
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
@@ -776,7 +776,7 @@ static void ppuscroll_write_mirrored(void *ctx)
 static void ppuscroll_write_during_reset(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
-    ppu->res = CSGS_SERVICED;
+    ppu->rst = CSGS_SERVICED;
 
     ct_assertequal(0u, ppu->t);
     ct_assertequal(0u, ppu->x);
@@ -876,7 +876,7 @@ static void ppuaddr_write_during_reset(void *ctx)
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->t = 0x4fff;
     ppu->v = 0;
-    ppu->res = CSGS_SERVICED;
+    ppu->rst = CSGS_SERVICED;
 
     ct_assertequal(0x4fffu, ppu->t);
     ct_assertequal(0u, ppu->v);
@@ -998,7 +998,7 @@ static void reset_sequence(void *ctx)
     ppu->line = 42;
     ppu->dot = 24;
     ppu->signal.intr = false;
-    ppu->ctrl.b = ppu->mask.b = ppu->signal.vout = ppu->cvop = ppu->odd =
+    ppu->ctrl.b = ppu->mask.b = ppu->signal.vout = ppu->cvp = ppu->odd =
         ppu->w = true;
     ppu->rbuf = 0x56;
     ppu->x = 0x78;
@@ -1012,16 +1012,16 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvop);
+    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
     ct_assertequal(0x1234u, ppu->v);
-    ct_assertequal(CSGS_CLEAR, (int)ppu->res);
+    ct_assertequal(CSGS_CLEAR, (int)ppu->rst);
 
-    ppu->signal.res = false;
+    ppu->signal.rst = false;
     ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
@@ -1030,14 +1030,14 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvop);
+    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
     ct_assertequal(0x1234u, ppu->v);
-    ct_assertequal(CSGS_DETECTED, (int)ppu->res);
+    ct_assertequal(CSGS_DETECTED, (int)ppu->rst);
 
     ppu_cycle(ppu);
 
@@ -1047,14 +1047,14 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvop);
+    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
     ct_assertequal(0x1234u, ppu->v);
-    ct_assertequal(CSGS_PENDING, (int)ppu->res);
+    ct_assertequal(CSGS_PENDING, (int)ppu->rst);
 
     ppu_cycle(ppu);
 
@@ -1064,14 +1064,14 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvop);
+    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
     ct_assertequal(0x1234u, ppu->v);
-    ct_assertequal(CSGS_COMMITTED, (int)ppu->res);
+    ct_assertequal(CSGS_COMMITTED, (int)ppu->rst);
 
     // NOTE: reset line held
     for (int i = 0; i < 5; ++i) {
@@ -1084,16 +1084,16 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvop);
+    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
     ct_assertequal(0x1234u, ppu->v);
-    ct_assertequal(CSGS_COMMITTED, (int)ppu->res);
+    ct_assertequal(CSGS_COMMITTED, (int)ppu->rst);
 
-    ppu->signal.res = true;
+    ppu->signal.rst = true;
     ppu_cycle(ppu);
 
     ct_assertequal(0u, ppu->line);
@@ -1102,14 +1102,14 @@ static void reset_sequence(void *ctx)
     ct_assertfalse(ppu->ctrl.b);
     ct_assertfalse(ppu->mask.b);
     ct_assertfalse(ppu->signal.vout);
-    ct_assertfalse(ppu->cvop);
+    ct_assertfalse(ppu->cvp);
     ct_assertfalse(ppu->odd);
     ct_assertfalse(ppu->w);
     ct_assertequal(0x0u, ppu->rbuf);
     ct_assertequal(0x0u, ppu->x);
     ct_assertequal(0x0u, ppu->t);
     ct_assertequal(0x1234u, ppu->v);
-    ct_assertequal(CSGS_SERVICED, (int)ppu->res);
+    ct_assertequal(CSGS_SERVICED, (int)ppu->rst);
 }
 
 static void reset_too_short(void *ctx)
@@ -1120,7 +1120,7 @@ static void reset_too_short(void *ctx)
     ppu->line = 42;
     ppu->dot = 24;
     ppu->signal.intr = false;
-    ppu->ctrl.b = ppu->mask.b = ppu->signal.vout = ppu->cvop = ppu->odd =
+    ppu->ctrl.b = ppu->mask.b = ppu->signal.vout = ppu->cvp = ppu->odd =
         ppu->w = true;
     ppu->rbuf = 0x56;
     ppu->x = 0x78;
@@ -1134,16 +1134,16 @@ static void reset_too_short(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvop);
+    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
     ct_assertequal(0x1234u, ppu->v);
-    ct_assertequal(CSGS_CLEAR, (int)ppu->res);
+    ct_assertequal(CSGS_CLEAR, (int)ppu->rst);
 
-    ppu->signal.res = false;
+    ppu->signal.rst = false;
     ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
@@ -1152,16 +1152,16 @@ static void reset_too_short(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvop);
+    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
     ct_assertequal(0x1234u, ppu->v);
-    ct_assertequal(CSGS_DETECTED, (int)ppu->res);
+    ct_assertequal(CSGS_DETECTED, (int)ppu->rst);
 
-    ppu->signal.res = true;
+    ppu->signal.rst = true;
     ppu_cycle(ppu);
 
     ct_assertequal(42u, ppu->line);
@@ -1170,14 +1170,14 @@ static void reset_too_short(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvop);
+    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
     ct_assertequal(0x1234u, ppu->v);
-    ct_assertequal(CSGS_CLEAR, (int)ppu->res);
+    ct_assertequal(CSGS_CLEAR, (int)ppu->rst);
 }
 
 static void vblank_prep(void *ctx)
@@ -1306,7 +1306,7 @@ static void vblank_end(void *ctx)
     ppu->ctrl.v = true;
     ppu->line = 261;
     ppu->dot = 1;
-    ppu->res = CSGS_SERVICED;
+    ppu->rst = CSGS_SERVICED;
     ppu->signal.intr = false;
 
     ppu_cycle(ppu);
@@ -1316,7 +1316,7 @@ static void vblank_end(void *ctx)
     ct_assertfalse(ppu->status.s);
     ct_assertfalse(ppu->status.o);
     ct_asserttrue(ppu->signal.intr);
-    ct_assertequal(CSGS_CLEAR, (int)ppu->res);
+    ct_assertequal(CSGS_CLEAR, (int)ppu->rst);
 }
 
 static void frame_toggle(void *ctx)

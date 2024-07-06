@@ -51,7 +51,7 @@ enum {
     ADDRMASK_64KB = MEMBLOCK_64KB - 1,
 
     CPU_VECTOR_NMI = 0xfffa,
-    CPU_VECTOR_RES = 0xfffc,
+    CPU_VECTOR_RST = 0xfffc,
     CPU_VECTOR_IRQ = 0xfffe,
 };
 

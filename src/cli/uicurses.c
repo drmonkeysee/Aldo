@@ -175,7 +175,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     mvwaddstr(v->content, cursor_y, 0, "Signal: ");
     drawtoggle(v, " IRQ ", nes_probe(emu->console, CSGI_IRQ));
     drawtoggle(v, " NMI ", nes_probe(emu->console, CSGI_NMI));
-    drawtoggle(v, " RES ", nes_probe(emu->console, CSGI_RES));
+    drawtoggle(v, " RST ", nes_probe(emu->console, CSGI_RST));
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
     mvwaddstr(v->content, ++cursor_y, 0, "Halt/Run: <Space>");
@@ -282,13 +282,13 @@ static void drawvecs(const struct view *v, int h, int w, int y,
 
     lo = emu->snapshot.mem.vectors[2];
     hi = emu->snapshot.mem.vectors[3];
-    mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     RES",
-              CPU_VECTOR_RES, lo, hi);
+    mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     RST",
+              CPU_VECTOR_RST, lo, hi);
     const int resetvector = debug_vector_override(emu->debugger);
     if (resetvector == NoResetVector) {
         wprintw(v->content, " $%04X", bytowr(lo, hi));
     } else {
-        wprintw(v->content, " " HEXPR_RES_IND "$%04X", resetvector);
+        wprintw(v->content, " " HEXPR_RST_IND "$%04X", resetvector);
     }
 
     lo = emu->snapshot.mem.vectors[4];
@@ -435,7 +435,7 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
 
     draw_interrupt_latch(v, snp->datapath.irq, cursor_y, line_x);
     draw_interrupt_latch(v, snp->datapath.nmi, cursor_y, line_x * 2);
-    draw_interrupt_latch(v, snp->datapath.res, cursor_y, line_x * 3);
+    draw_interrupt_latch(v, snp->datapath.rst, cursor_y, line_x * 3);
     // NOTE: jump 2 rows as interrupts are drawn direction first
     cursor_y += 2;
     draw_chip_line(v, snp->lines.irq, cursor_y, line_x, -1, ArrowUp, -1,
@@ -472,7 +472,7 @@ static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
                    -1, "R\u0305E\u0305S\u0305");
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
-    draw_interrupt_latch(v, snp->pdatapath.res, cursor_y, line_x * 3);
+    draw_interrupt_latch(v, snp->pdatapath.rst, cursor_y, line_x * 3);
 
     mvwprintw(v->content, cursor_y, line_x - 2, "[%s%02X]",
               snp->plines.cpu_readwrite ? DArrowUp : DArrowDown,
@@ -735,8 +735,8 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 's':
-        nes_set_probe(emu->console, CSGI_RES,
-                      !nes_probe(emu->console, CSGI_RES));
+        nes_set_probe(emu->console, CSGI_RST,
+                      !nes_probe(emu->console, CSGI_RST));
         break;
     }
 }

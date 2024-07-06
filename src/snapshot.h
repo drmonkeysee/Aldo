@@ -25,14 +25,14 @@ struct snapshot {
         ptrdiff_t halted;
     } debugger;
     struct {
-        enum csig_state irq, nmi, res;
+        enum csig_state irq, nmi, rst;
         uint16_t addressbus, current_instruction;
         uint8_t addrlow_latch, addrhigh_latch, addrcarry_latch, databus,
                 exec_cycle, opcode;
         bool busfault, instdone, jammed;
     } datapath;
     struct {
-        enum csig_state res;
+        enum csig_state rst;
         uint16_t addressbus, curraddr, tempaddr, dot, line;
         uint8_t databus, readbuffer, register_databus, register_select, xfine;
         bool cv_pending, oddframe, writelatch;

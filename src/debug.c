@@ -35,7 +35,7 @@ static void remove_reset_override(struct debugger_context *self)
 {
     if (!self->dec.active) return;
 
-    const bool r = bus_set(self->cpu->mbus, CPU_VECTOR_RES, self->dec.inner);
+    const bool r = bus_set(self->cpu->mbus, CPU_VECTOR_RST, self->dec.inner);
     assert(r);
     self->dec = (struct resdecorator){0};
 }
@@ -59,10 +59,10 @@ static bool resetaddr_read(void *restrict ctx, uint16_t addr,
     const struct resdecorator *const dec = ctx;
     if (!dec->inner.read) return false;
 
-    if (CPU_VECTOR_RES <= addr && addr < CPU_VECTOR_IRQ) {
+    if (CPU_VECTOR_RST <= addr && addr < CPU_VECTOR_IRQ) {
         uint8_t vector[2];
         wrtoba(dec->vector, vector);
-        *d = vector[addr - CPU_VECTOR_RES];
+        *d = vector[addr - CPU_VECTOR_RST];
         return true;
     }
     return dec->inner.read(dec->inner.ctx, addr, d);
@@ -349,7 +349,7 @@ void debug_sync_bus(debugger *self)
     struct busdevice resetaddr_device = {
         resetaddr_read, resetaddr_write, resetaddr_dma, &self->dec,
     };
-    self->dec.active = bus_swap(self->cpu->mbus, CPU_VECTOR_RES,
+    self->dec.active = bus_swap(self->cpu->mbus, CPU_VECTOR_RST,
                                 resetaddr_device, &self->dec.inner);
 }
 

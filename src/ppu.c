@@ -177,15 +177,16 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
         break;
     case 5: // PPUSCROLL
         if (ppu->rst != CSGS_SERVICED) {
+            static const uint8_t course = 0xf8, fine = 0x7;
             if (ppu->w) {
                 // NOTE: set course and fine y
                 ppu->t = (uint16_t)((ppu->t & 0xc1f)
-                                    | (ppu->regbus & 0x7) << 12
-                                    | (ppu->regbus & 0xf8) << 2);
+                                    | (ppu->regbus & fine) << 12
+                                    | (ppu->regbus & course) << 2);
             } else {
                 // NOTE: set course and fine x
-                ppu->t = (ppu->t & 0x7fe0) | (ppu->regbus & 0xf8) >> 3;
-                ppu->x = ppu->regbus & 0x7;
+                ppu->t = (ppu->t & 0x7fe0) | (ppu->regbus & course) >> 3;
+                ppu->x = ppu->regbus & fine;
             }
             ppu->w = !ppu->w;
         }

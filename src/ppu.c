@@ -16,7 +16,7 @@
 // average cycle count of 89341.5 per frame.
 static const int
     Dots = 341, Lines = 262,
-    LinePostRender = 240, LineVBlank = 241, LinePreRender = 261;
+    LineVBlank = 241, LinePreRender = 261;
 
 //
 // Registers
@@ -92,7 +92,9 @@ static bool rendering_enabled(struct rp2c02 *self)
 
 static bool in_postrender(struct rp2c02 *self)
 {
-    return LinePostRender <= self->line && self->line < LinePreRender;
+    static const int line_post_render = 240;
+
+    return line_post_render <= self->line && self->line < LinePreRender;
 }
 
 static bool in_vblank(struct rp2c02 *self)

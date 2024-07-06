@@ -187,7 +187,7 @@ static void set_pins(struct nes001 *self)
     self->cpu.signal.nmi = !self->probe.nmi && self->ppu.signal.intr;
     self->ppu.signal.rst = self->cpu.signal.rst = !self->probe.rst;
     // NOTE: pull PPU's CPU R/W signal back up if CPU is no longer pulling it
-    // low (set when any PPU register is written to).
+    // low (pulled low by PPU register writes).
     self->ppu.signal.rw |= self->cpu.signal.rw;
 }
 

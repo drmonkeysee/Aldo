@@ -283,7 +283,8 @@ static int cycle(struct rp2c02 *self)
         // NOTE: set vblank status 1 dot early to account for race-condition
         // that will suppress NMI if status.v is read (and cleared) right
         // before NMI is signaled on 241,1.
-        // TODO: status.v should return false if read on 241,1 despite being "prepped" to true here
+        // TODO: status.v should return false if read on 241,1 despite being
+        // "prepped" to true here.
         self->status.v = true;
     } else if (in_vblank(self)) {
         // NOTE: NMI active within vblank if ctrl.v and status.v are set

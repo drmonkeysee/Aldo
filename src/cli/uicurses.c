@@ -443,7 +443,7 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
     draw_chip_line(v, snp->lines.nmi, cursor_y, line_x * 2, -1, ArrowUp,
                    -1, "N\u0305M\u0305I\u0305");
     draw_chip_line(v, snp->lines.reset, cursor_y, line_x * 3, -1, ArrowUp,
-                   -1, "R\u0305E\u0305S\u0305");
+                   -1, "R\u0305S\u0305T\u0305");
 }
 
 static void drawcpu(const struct view *v, const struct snapshot *snp)
@@ -469,7 +469,7 @@ static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
     draw_chip_line(v, snp->plines.interrupt, cursor_y, line_x * 2, 1,
                    ArrowUp, -1, "I\u0305N\u0305T\u0305");
     draw_chip_line(v, snp->plines.reset, cursor_y++, line_x * 3, 1, ArrowDown,
-                   -1, "R\u0305E\u0305S\u0305");
+                   -1, "R\u0305S\u0305T\u0305");
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
     draw_interrupt_latch(v, snp->pdatapath.rst, cursor_y, line_x * 3);

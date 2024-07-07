@@ -332,7 +332,8 @@ static void cpu_rw(struct rp2c02 *self)
         self->cvp = false;
         self->v += self->ctrl.i ? 32 : 1;
     } else {
-        self->vaddrbus = self->v;
+        // NOTE: address bus is 14 bits wide
+        self->vaddrbus = self->v & 0x3fff;
         self->signal.ale = true;
     }
 }

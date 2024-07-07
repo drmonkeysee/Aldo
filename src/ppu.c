@@ -97,11 +97,20 @@ static void palette_read(struct rp2c02 *self)
 
 static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
 {
-    // NOTE: 32 addressable slots, including mirrors
+    // NOTE: 32 addressable bytes, including mirrors
     addr &= 0x1f;
-    // NOTE: sprite backdrop and unused slots are mirrors of background slots
-    if (addr & 0x10 && (addr & 0x3) == 0) {
-        addr &= 0xf;
+    // NOTE: background has 16 allocated slots while sprites have 12, making
+    // palette RAM only 28 bytes long; if the address points at a mirrored slot
+    // then mask it down to the actual slots in the lower 16, otherwise adjust
+    // the palette address down to the "real" sprite slot, accounting for the
+    // 4 missing entries at $3F10, $3F14, $3F18, and $3F1C.
+    if (addr & 0x10) {
+        if ((addr & 0x3) == 0) {
+            addr &= 0xf;
+        } else {
+            // NOTE: 0x1-0x3 adjust down 1, 0x5-0x7 adjust down 2, etc...
+            addr -= ((addr & 0xc) >> 2) + 1;
+        }
     }
     self->palette[addr] = d;
 }
@@ -254,12 +263,13 @@ static void write(struct rp2c02 *self)
 {
     // TODO: can this be pulled out into vram-access function
     self->signal.ale = false;
-    // TODO: do not pull this down for palette writes
-    self->signal.wr = false;
     self->vdatabus = self->regbus;
-    // TODO: model bus fault?
-    const bool r = bus_write(self->vbus, self->vaddrbus, self->vdatabus);
-    assert(r);
+    if (!palette_addr(self->vaddrbus)) {
+        self->signal.wr = false;
+        // TODO: model bus fault?
+        const bool r = bus_write(self->vbus, self->vaddrbus, self->vdatabus);
+        assert(r);
+    }
 }
 
 //

@@ -98,11 +98,12 @@ static void palette_read(struct rp2c02 *self)
 static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
 {
     // NOTE: 32 addressable slots, including mirrors
-    /*
     addr &= 0x1f;
-    if (addr )
-    self->palette[addr & 0xff] = d;
-     */
+    // NOTE: sprite backdrop and unused slots are mirrors of background slots
+    if (addr & 0x10 && (addr & 0x3) == 0) {
+        addr &= 0xf;
+    }
+    self->palette[addr] = d;
 }
 
 static bool rendering_disabled(struct rp2c02 *self)

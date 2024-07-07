@@ -1147,7 +1147,7 @@ static void ppudata_write_ignores_high_v_bits(void *ctx)
     ct_assertequal(0xf003u, ppu->v);
 }
 
-static void ppudata_write_palette(void *ctx)
+static void ppudata_write_palette_backdrop(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
@@ -1184,7 +1184,7 @@ static void ppudata_write_palette(void *ctx)
     ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x2002u, ppu->vaddrbus);
+    ct_assertequal(0x3f00u, ppu->vaddrbus);
     ct_assertequal(0x77u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
@@ -1195,13 +1195,355 @@ static void ppudata_write_palette(void *ctx)
     ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x2002u, ppu->vaddrbus);
+    ct_assertequal(0x3f00u, ppu->vaddrbus);
     ct_assertequal(0x77u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
     ct_assertequal(0x11u, VRam[0]);
     ct_assertequal(0x77u, ppu->palette[0]);
     ct_assertequal(0x3f00u, ppu->v);
+}
+
+static void ppudata_write_palette_background(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 242;
+    ppu->dot = 24;
+    ppu->v = 0x3f06;
+    ppu->vaddrbus = ppu->vdatabus = ppu->palette[6] = 0;
+
+    bus_write(get_mbus(ctx), 0x2007, 0x77);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x77u, ppu->regbus);
+    ct_assertfalse(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[6]);
+    ct_assertequal(0x3f06u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x3f06u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[6]);
+    ct_assertequal(0x3f06u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x3f06u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[6]);
+    ct_assertequal(0x3f06u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x3f06u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[6]);
+    ct_assertequal(0x3f06u, ppu->v);
+}
+
+static void ppudata_write_palette_unused(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 242;
+    ppu->dot = 24;
+    ppu->v = 0x3f0c;
+    ppu->vaddrbus = ppu->vdatabus = ppu->palette[12] = 0;
+
+    bus_write(get_mbus(ctx), 0x2007, 0x77);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x77u, ppu->regbus);
+    ct_assertfalse(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[12]);
+    ct_assertequal(0x3f0cu, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x3f0cu, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[12]);
+    ct_assertequal(0x3f0cu, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x3f0cu, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[12]);
+    ct_assertequal(0x3f0cu, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x3f0cu, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[12]);
+    ct_assertequal(0x3f0cu, ppu->v);
+}
+
+static void ppudata_write_palette_backdrop_mirror(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 242;
+    ppu->dot = 24;
+    ppu->v = 0x3f10;
+    ppu->vaddrbus = ppu->vdatabus = ppu->palette[0] = 0;
+
+    bus_write(get_mbus(ctx), 0x2007, 0x77);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x77u, ppu->regbus);
+    ct_assertfalse(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[0]);
+    ct_assertequal(0x3f10u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x3f10u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[0]);
+    ct_assertequal(0x3f10u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x3f10u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[0]);
+    ct_assertequal(0x3f10u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x3f10u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[0]);
+    ct_assertequal(0x3f10u, ppu->v);
+}
+
+static void ppudata_write_palette_backdrop_high_mirror(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 242;
+    ppu->dot = 24;
+    ppu->v = 0x3ff0;
+    ppu->vaddrbus = ppu->vdatabus = ppu->palette[0] = 0;
+
+    bus_write(get_mbus(ctx), 0x2007, 0x77);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x77u, ppu->regbus);
+    ct_assertfalse(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[0]);
+    ct_assertequal(0x3ff0u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x3ff0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[0]);
+    ct_assertequal(0x3ff0u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x3ff0u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[0]);
+    ct_assertequal(0x3ff0u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x3ff0u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[0]);
+    ct_assertequal(0x3ff0u, ppu->v);
+}
+
+static void ppudata_write_palette_sprite(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 242;
+    ppu->dot = 24;
+    ppu->v = 0x3f16;
+    ppu->vaddrbus = ppu->vdatabus = ppu->palette[21] = 0;
+
+    bus_write(get_mbus(ctx), 0x2007, 0x77);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x77u, ppu->regbus);
+    ct_assertfalse(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[21]);
+    ct_assertequal(0x3f16u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x3f16u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[21]);
+    ct_assertequal(0x3f16u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x3f16u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[21]);
+    ct_assertequal(0x3f16u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x3f16u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[21]);
+    ct_assertequal(0x3f16u, ppu->v);
+}
+
+static void ppudata_write_palette_unused_mirrored(void *ctx)
+{
+    struct rp2c02 *const ppu = get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 242;
+    ppu->dot = 24;
+    ppu->v = 0x3f1c;
+    ppu->vaddrbus = ppu->vdatabus = ppu->palette[12] = 0;
+
+    bus_write(get_mbus(ctx), 0x2007, 0x77);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x77u, ppu->regbus);
+    ct_assertfalse(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[12]);
+    ct_assertequal(0x3f1cu, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x3f1cu, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[12]);
+    ct_assertequal(0x3f1cu, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x3f1cu, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[12]);
+    ct_assertequal(0x3f1cu, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x3f1cu, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x11u, VRam[0]);
+    ct_assertequal(0x77u, ppu->palette[12]);
+    ct_assertequal(0x3f1cu, ppu->v);
 }
 
 static void ppudata_write_during_rendering(void *ctx)
@@ -1672,20 +2014,24 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(ppuctrl_write_mirrored),
         ct_maketest(ppuctrl_write_during_reset),
         ct_maketest(ppuctrl_read),
+
         ct_maketest(ppumask_write),
         ct_maketest(ppumask_write_mirrored),
         ct_maketest(ppumask_write_during_reset),
         ct_maketest(ppumask_read),
+
         ct_maketest(ppustatus_read_when_clear),
         ct_maketest(ppustatus_read_when_set),
         ct_maketest(ppustatus_read_on_nmi_race_condition),
         ct_maketest(ppustatus_read_during_reset),
         ct_maketest(ppustatus_read_mirrored),
         ct_maketest(ppustatus_write),
+
         ct_maketest(oamaddr_write),
         ct_maketest(oamaddr_write_mirrored),
         ct_maketest(oamaddr_write_during_reset),
         ct_maketest(oamaddr_read),
+
         ct_maketest(oamdata_write),
         ct_maketest(oamdata_write_during_rendering),
         ct_maketest(oamdata_write_during_rendering_disabled),
@@ -1693,21 +2039,30 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(oamdata_write_during_reset),
         ct_maketest(oamdata_read),
         ct_maketest(oamdata_read_mirrored),
+
         ct_maketest(ppuscroll_write),
         ct_maketest(ppuscroll_write_mirrored),
         ct_maketest(ppuscroll_write_during_reset),
         ct_maketest(ppuscroll_read),
+
         ct_maketest(ppuaddr_write),
         ct_maketest(ppuaddr_write_mirrored),
         ct_maketest(ppuaddr_write_during_reset),
         ct_maketest(ppuaddr_read),
         ct_maketest(ppu_addr_scroll_interleave),
+
         ct_maketest(ppudata_write_in_vblank),
         ct_maketest(ppudata_write_with_row_increment),
         ct_maketest(ppudata_write_rendering_disabled),
         ct_maketest(ppudata_write_mirrored),
         ct_maketest(ppudata_write_ignores_high_v_bits),
-        ct_maketest(ppudata_write_palette),
+        ct_maketest(ppudata_write_palette_backdrop),
+        ct_maketest(ppudata_write_palette_background),
+        ct_maketest(ppudata_write_palette_unused),
+        ct_maketest(ppudata_write_palette_backdrop_mirror),
+        ct_maketest(ppudata_write_palette_backdrop_high_mirror),
+        ct_maketest(ppudata_write_palette_sprite),
+        ct_maketest(ppudata_write_palette_unused_mirrored),
         ct_maketest(ppudata_write_during_rendering),
         ct_maketest(ppudata_read_in_vblank),
         ct_maketest(ppudata_read_with_row_increment),

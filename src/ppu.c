@@ -85,6 +85,26 @@ static void set_status(struct rp2c02 *self, uint8_t v)
     self->status.v = v & 0x80;
 }
 
+static bool palette_addr(uint16_t addr)
+{
+    return MEMBLOCK_16KB - MEMBLOCK_256B <= addr && addr < MEMBLOCK_16KB;
+}
+
+static void palette_read(struct rp2c02 *self)
+{
+    // TODO: implement
+}
+
+static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
+{
+    // NOTE: 32 addressable slots, including mirrors
+    /*
+    addr &= 0x1f;
+    if (addr )
+    self->palette[addr & 0xff] = d;
+     */
+}
+
 static bool rendering_disabled(struct rp2c02 *self)
 {
     return !self->ctrl.b && !self->ctrl.s;
@@ -209,6 +229,10 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
         break;
     case 7: // PPUDATA
         ppu->cvp = true;
+        const uint16_t addr = ppu->v & ADDRMASK_16KB;
+        if (palette_addr(addr)) {
+            palette_write(ppu, addr, ppu->regbus);
+        }
         break;
     default:
         break;
@@ -233,8 +257,8 @@ static void write(struct rp2c02 *self)
     self->signal.wr = false;
     self->vdatabus = self->regbus;
     // TODO: model bus fault?
-    const bool result = bus_write(self->vbus, self->vaddrbus, self->vdatabus);
-    assert(result);
+    const bool r = bus_write(self->vbus, self->vaddrbus, self->vdatabus);
+    assert(r);
 }
 
 //
@@ -333,7 +357,7 @@ static void cpu_rw(struct rp2c02 *self)
         self->v += self->ctrl.i ? 32 : 1;
     } else {
         // NOTE: address bus is 14 bits wide
-        self->vaddrbus = self->v & 0x3fff;
+        self->vaddrbus = self->v & ADDRMASK_16KB;
         self->signal.ale = true;
     }
 }

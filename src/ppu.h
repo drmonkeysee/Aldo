@@ -100,8 +100,8 @@ struct rp2c02 {
     // Internal Memory
     uint8_t oam[MEMBLOCK_256B], // Object Attribute Memory: internal storage
                                 // for sprite attributes.
-            palette[25];        // Palette indices: 1 backdrop, 12 background,
-                                // 12 sprite.
+            palette[28];        // Palette indices: 1 backdrop, 3 unused,
+                                // 12 background, 12 sprite.
 };
 
 struct ppu_coord { int dot, line; };

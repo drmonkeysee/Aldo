@@ -85,9 +85,9 @@ static void set_status(struct rp2c02 *self, uint8_t v)
     self->status.v = v & 0x80;
 }
 
-static bool rendering_enabled(struct rp2c02 *self)
+static bool rendering_disabled(struct rp2c02 *self)
 {
-    return self->ctrl.b || self->ctrl.s;
+    return !self->ctrl.b && !self->ctrl.s;
 }
 
 static bool in_postrender(struct rp2c02 *self)
@@ -168,7 +168,7 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
         break;
     case 4: // OAMDATA
         // TODO: this logic is shared by OAMDMA
-        if (in_postrender(ppu) || !rendering_enabled(ppu)) {
+        if (in_postrender(ppu) || rendering_disabled(ppu)) {
             ppu->oam[ppu->oamaddr++] = ppu->regbus;
         } else {
             // NOTE: during rendering, writing to OAMDATA does not change OAM
@@ -207,10 +207,34 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
             // understand yet, as well as palette corruption.
         }
         break;
+    case 7: // PPUDATA
+        ppu->cvp = true;
+        break;
     default:
         break;
     }
     return true;
+}
+
+//
+// PPU Bus Device (Pattern Tables, Nametables, Palette)
+//
+
+static void read(struct rp2c02 *self)
+{
+    // TODO: implement
+}
+
+static void write(struct rp2c02 *self)
+{
+    // TODO: can this be pulled out into vram-access function
+    self->signal.ale = false;
+    // TODO: do not pull this down for palette writes
+    self->signal.wr = false;
+    self->vdatabus = self->regbus;
+    // TODO: model bus fault?
+    const bool result = bus_write(self->vbus, self->vaddrbus, self->vdatabus);
+    assert(result);
 }
 
 //
@@ -279,25 +303,60 @@ static void handle_reset(struct rp2c02 *self)
     }
 }
 
-static int cycle(struct rp2c02 *self)
+static void vblank(struct rp2c02 *self)
 {
-    // NOTE: vblank
     if (self->line == LineVBlank && self->dot == 0) {
         // NOTE: set vblank status 1 dot early to account for race-condition
         // that will suppress NMI if status.v is read (and cleared) right
         // before NMI is signaled on 241,1.
-        // TODO: status.v should return false if read on 241,1 despite being
-        // "prepped" to true here.
         self->status.v = true;
     } else if (in_vblank(self)) {
         // NOTE: NMI active within vblank if ctrl.v and status.v are set
         self->signal.intr = !self->ctrl.v || !self->status.v;
     } else if (self->line == LinePreRender && self->dot == 1) {
-        // TODO: this is also pre-render line
         self->signal.intr = true;
         set_status(self, 0);
         self->rst = CSGS_CLEAR;
+    }
+}
+
+// TODO: can this be generalized to internal r/w as well?
+static void cpu_rw(struct rp2c02 *self)
+{
+    if (self->signal.ale) {
+        if (self->signal.rw) {
+            // bus_read()
+        } else {
+            write(self);
+        }
+        self->cvp = false;
+        self->v += self->ctrl.i ? 32 : 1;
+    } else {
+        self->vaddrbus = self->v;
+        self->signal.ale = true;
+    }
+}
+
+static int cycle(struct rp2c02 *self)
+{
+    // NOTE: clear any databus signals from previous cycle; unlike the CPU,
+    // the PPU does not read/write on every cycle so these lines must be
+    // managed explicitly.
+    // TODO: does ale need clearing or is it enough to be handled on every
+    // read/write?
+    self->signal.rd = self->signal.wr = true;
+
+    vblank(self);
+
+    if (in_postrender(self) || rendering_disabled(self)) {
+        if (self->cvp) {
+            cpu_rw(self);
+        }
+    } else if (self->line == LinePreRender) {
+        // TODO: prerender line
         // TODO: add odd dot skip when rendering enabled
+    } else {
+        // TODO: rendering
     }
 
     // NOTE: dot advancement happens last, leaving PPU on next dot to be drawn;

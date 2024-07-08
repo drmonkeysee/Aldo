@@ -45,7 +45,7 @@ static bool test_vwrite(void *ctx, uint16_t addr, uint8_t d)
 
 static void setup(void **ctx)
 {
-    struct test_context *const c = malloc(sizeof *c);
+    struct test_context *const c = calloc(sizeof *c, 1);
     // NOTE: enough main bus to map $2000 - $3FFF for ppu registers
     c->mbus = bus_new(BITWIDTH_16KB, 2, MEMBLOCK_8KB);
     VRam[0] = 0x11;
@@ -316,7 +316,6 @@ static void ppustatus_read_mirrored(void *ctx)
     struct rp2c02 *const ppu = get_ppu(ctx);
     struct snapshot snp;
     ppu->regbus = 0x5a;
-    ppu->status.v = ppu->status.s = ppu->status.o = false;
 
     uint8_t d;
     bus_read(get_mbus(ctx), 0x3212, &d);
@@ -334,7 +333,6 @@ static void ppustatus_write(void *ctx)
     struct rp2c02 *const ppu = get_ppu(ctx);
     struct snapshot snp;
     ppu->w = true;
-    ppu->status.v = ppu->status.s = ppu->status.o = false;
 
     bus_write(get_mbus(ctx), 0x2002, 0xff);
 
@@ -409,7 +407,6 @@ static void oamdata_write(void *ctx)
     ppu->line = 240;
     ppu->dot = 5;
     ppu->ctrl.s = true;
-    ppu->oamaddr = 0;
     ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
@@ -450,7 +447,6 @@ static void oamdata_write_during_rendering(void *ctx)
     ppu->line = 24;
     ppu->dot = 5;
     ppu->ctrl.s = true;
-    ppu->oamaddr = 0;
     ppu->oam[0] = ppu->oam[4] = ppu->oam[8] = ppu->oam[12] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
@@ -490,7 +486,6 @@ static void oamdata_write_during_rendering_disabled(void *ctx)
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->line = 24;
     ppu->dot = 5;
-    ppu->oamaddr = 0;
     ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
@@ -531,7 +526,6 @@ static void oamdata_write_mirrored(void *ctx)
     ppu->line = 240;
     ppu->dot = 5;
     ppu->ctrl.s = true;
-    ppu->oamaddr = 0;
     ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
@@ -572,7 +566,6 @@ static void oamdata_write_during_reset(void *ctx)
     ppu->line = 240;
     ppu->dot = 5;
     ppu->ctrl.s = true;
-    ppu->oamaddr = 0;
     ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
     ppu->rst = CSGS_SERVICED;
 
@@ -614,7 +607,6 @@ static void oamdata_read(void *ctx)
     ppu->line = 240;
     ppu->dot = 5;
     ppu->ctrl.s = true;
-    ppu->oamaddr = 0;
     ppu->oam[0] = 0x11;
     ppu->oam[1] = 0x22;
     ppu->oam[2] = 0x33;
@@ -635,7 +627,6 @@ static void oamdata_read_mirrored(void *ctx)
     ppu->line = 240;
     ppu->dot = 5;
     ppu->ctrl.s = true;
-    ppu->oamaddr = 0;
     ppu->oam[0] = 0x11;
     ppu->oam[1] = 0x22;
     ppu->oam[2] = 0x33;
@@ -750,7 +741,6 @@ static void ppuaddr_write(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->t = 0x4000;
-    ppu->v = 0;
 
     ct_assertequal(0x4000u, ppu->t);
     ct_assertequal(0u, ppu->v);
@@ -779,7 +769,6 @@ static void ppuaddr_write_mirrored(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->t = 0x4fff;
-    ppu->v = 0;
 
     ct_assertequal(0x4fffu, ppu->t);
     ct_assertequal(0u, ppu->v);
@@ -808,7 +797,6 @@ static void ppuaddr_write_during_reset(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->t = 0x4fff;
-    ppu->v = 0;
     ppu->rst = CSGS_SERVICED;
 
     ct_assertequal(0x4fffu, ppu->t);
@@ -852,7 +840,6 @@ static void ppu_addr_scroll_interleave(void *ctx)
 {
     struct rp2c02 *const ppu = get_ppu(ctx);
     ppu->t = 0x4000;
-    ppu->v = 0;
 
     bus_write(get_mbus(ctx), 0x2006, 0x4);
 
@@ -890,7 +877,6 @@ static void ppudata_write_in_vblank(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x2002;
-    ppu->vaddrbus = ppu->vdatabus = 0;
 
     bus_write(get_mbus(ctx), 0x2007, 0x77);
 
@@ -943,7 +929,6 @@ static void ppudata_write_with_row_increment(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x2002;
-    ppu->vaddrbus = ppu->vdatabus = 0;
 
     bus_write(get_mbus(ctx), 0x2007, 0x77);
 
@@ -995,7 +980,6 @@ static void ppudata_write_rendering_disabled(void *ctx)
     ppu->line = 42;
     ppu->dot = 24;
     ppu->v = 0x2002;
-    ppu->vaddrbus = ppu->vdatabus = 0;
 
     bus_write(get_mbus(ctx), 0x2007, 0x77);
 
@@ -1048,7 +1032,6 @@ static void ppudata_write_mirrored(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x2002;
-    ppu->vaddrbus = ppu->vdatabus = 0;
 
     bus_write(get_mbus(ctx), 0x3217, 0x77);
 
@@ -1101,7 +1084,6 @@ static void ppudata_write_ignores_high_v_bits(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0xf002;
-    ppu->vaddrbus = ppu->vdatabus = 0;
 
     bus_write(get_mbus(ctx), 0x2007, 0x77);
 
@@ -1154,7 +1136,6 @@ static void ppudata_write_palette_backdrop(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f00;
-    ppu->vaddrbus = ppu->vdatabus = ppu->palette[0] = 0;
 
     bus_write(get_mbus(ctx), 0x2007, 0x77);
 
@@ -1211,7 +1192,6 @@ static void ppudata_write_palette_background(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f06;
-    ppu->vaddrbus = ppu->vdatabus = ppu->palette[6] = 0;
 
     bus_write(get_mbus(ctx), 0x2007, 0x77);
 
@@ -1268,7 +1248,6 @@ static void ppudata_write_palette_last_background(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f0f;
-    ppu->vaddrbus = ppu->vdatabus = ppu->palette[15] = 0;
 
     bus_write(get_mbus(ctx), 0x2007, 0x77);
 
@@ -1325,7 +1304,6 @@ static void ppudata_write_palette_unused(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f0c;
-    ppu->vaddrbus = ppu->vdatabus = ppu->palette[12] = 0;
 
     bus_write(get_mbus(ctx), 0x2007, 0x77);
 
@@ -1382,7 +1360,6 @@ static void ppudata_write_palette_backdrop_mirror(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f10;
-    ppu->vaddrbus = ppu->vdatabus = ppu->palette[0] = 0;
 
     bus_write(get_mbus(ctx), 0x2007, 0x77);
 
@@ -1439,7 +1416,6 @@ static void ppudata_write_palette_backdrop_high_mirror(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3ff0;
-    ppu->vaddrbus = ppu->vdatabus = ppu->palette[0] = 0;
 
     bus_write(get_mbus(ctx), 0x2007, 0x77);
 
@@ -1496,7 +1472,6 @@ static void ppudata_write_palette_sprite(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f16;
-    ppu->vaddrbus = ppu->vdatabus = ppu->palette[20] = 0;
 
     bus_write(get_mbus(ctx), 0x2007, 0x77);
 
@@ -1553,7 +1528,6 @@ static void ppudata_write_palette_last_sprite(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f1f;
-    ppu->vaddrbus = ppu->vdatabus = ppu->palette[27] = 0;
 
     bus_write(get_mbus(ctx), 0x2007, 0x77);
 
@@ -1610,7 +1584,6 @@ static void ppudata_write_palette_unused_mirrored(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f1c;
-    ppu->vaddrbus = ppu->vdatabus = ppu->palette[12] = 0;
 
     bus_write(get_mbus(ctx), 0x2007, 0x77);
 
@@ -1672,7 +1645,6 @@ static void ppudata_read_in_vblank(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x2002;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->rbuf = 0xaa;
 
     uint8_t d;
@@ -1734,7 +1706,6 @@ static void ppudata_read_with_row_increment(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x2002;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->rbuf = 0xaa;
 
     uint8_t d;
@@ -1795,7 +1766,6 @@ static void ppudata_read_rendering_disabled(void *ctx)
     ppu->line = 42;
     ppu->dot = 24;
     ppu->v = 0x2002;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->rbuf = 0xaa;
 
     uint8_t d;
@@ -1857,7 +1827,6 @@ static void ppudata_read_mirrored(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x2002;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->rbuf = 0xaa;
 
     uint8_t d;
@@ -1919,7 +1888,6 @@ static void ppudata_read_ignores_high_v_bits(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0xf002;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->rbuf = 0xaa;
 
     uint8_t d;
@@ -1981,7 +1949,6 @@ static void ppudata_read_palette_backdrop(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f00;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->palette[0] = 0xcc;
     ppu->rbuf = 0xaa;
 
@@ -2044,7 +2011,6 @@ static void ppudata_read_palette_background(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f06;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->palette[6] = 0xcc;
     ppu->rbuf = 0xaa;
 
@@ -2107,7 +2073,6 @@ static void ppudata_read_palette_last_background(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f0f;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->palette[15] = 0xcc;
     ppu->rbuf = 0xaa;
 
@@ -2170,7 +2135,6 @@ static void ppudata_read_palette_unused(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f0c;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->palette[12] = 0xcc;
     ppu->rbuf = 0xaa;
 
@@ -2233,7 +2197,6 @@ static void ppudata_read_palette_backdrop_mirror(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f10;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->palette[0] = 0xcc;
     ppu->rbuf = 0xaa;
 
@@ -2296,7 +2259,6 @@ static void ppudata_read_palette_backdrop_high_mirror(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3ff0;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->palette[0] = 0xcc;
     ppu->rbuf = 0xaa;
 
@@ -2359,7 +2321,6 @@ static void ppudata_read_palette_sprite(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f16;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->palette[20] = 0xcc;
     ppu->rbuf = 0xaa;
 
@@ -2422,7 +2383,6 @@ static void ppudata_read_palette_last_sprite(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f1f;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->palette[27] = 0xcc;
     ppu->rbuf = 0xaa;
 
@@ -2485,7 +2445,6 @@ static void ppudata_read_palette_unused_mirrored(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f1c;
-    ppu->vaddrbus = ppu->vdatabus = 0;
     ppu->palette[12] = 0xcc;
     ppu->rbuf = 0xaa;
 

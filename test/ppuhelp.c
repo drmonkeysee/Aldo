@@ -31,6 +31,11 @@ static bool test_vwrite(void *ctx, uint16_t addr, uint8_t d)
     return false;
 }
 
+#pragma mark - Public Interface
+//
+// Public Interface
+//
+
 uint8_t VRam[4];
 
 void ppu_setup(void **ctx)

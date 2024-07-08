@@ -29,6 +29,7 @@ static void powerup_initializes_ppu(void *ctx)
     ct_assertfalse(ppu->status.s);
 }
 
+#pragma mark - Reset
 //
 // Reset
 //
@@ -219,6 +220,7 @@ static void reset_too_short(void *ctx)
     ct_assertequal(CSGS_CLEAR, (int)ppu->rst);
 }
 
+#pragma mark - VBlank
 //
 // VBlank
 //
@@ -385,6 +387,7 @@ static void frame_toggle(void *ctx)
     ct_assertfalse(ppu->odd);
 }
 
+#pragma mark - Trace
 //
 // Trace
 //
@@ -456,6 +459,7 @@ static void trace_at_line_boundary(void *ctx)
     ct_assertequal(119, pixel.line);
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

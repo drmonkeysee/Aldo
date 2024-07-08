@@ -59,6 +59,7 @@ static void ram_mirroring(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

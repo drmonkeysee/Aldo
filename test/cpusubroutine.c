@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#pragma mark - Subroutine Instructions
 //
 // Subroutine Instructions
 //
@@ -48,6 +49,7 @@ static void rts(void *ctx)
     ct_assertequal(4u, cpu.s);
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

@@ -30,6 +30,7 @@ static struct dis_instruction create_instruction(size_t sz,
     return inst;
 }
 
+#pragma mark - Error Strings
 //
 // Error Strings
 //
@@ -48,6 +49,7 @@ static void errstr_returns_unknown_err(void *ctx)
     ct_assertequalstr("UNKNOWN ERR", err);
 }
 
+#pragma mark - Parse Instructions
 //
 // Parse Instructions
 //
@@ -291,6 +293,7 @@ static void parsemem_inst_out_of_bounds(void *ctx)
     ct_assertfalse(inst.d.unofficial);
 }
 
+#pragma mark - Mnemonics
 //
 // Mnemonics
 //
@@ -328,6 +331,7 @@ static void mnemonic_invalid(void *ctx)
     ct_assertequalstr("UDF", result);
 }
 
+#pragma mark - Descriptions
 //
 // Descriptions
 //
@@ -365,6 +369,7 @@ static void description_invalid(void *ctx)
     ct_assertequalstr("Undefined", result);
 }
 
+#pragma mark - Address Mode Names
 //
 // Address Mode Names
 //
@@ -402,6 +407,7 @@ static void modename_invalid(void *ctx)
     ct_assertequalstr("Implied", result);
 }
 
+#pragma mark - Flags
 //
 // Flags
 //
@@ -439,6 +445,7 @@ static void flags_invalid(void *ctx)
     ct_assertequal(0x20u, result);
 }
 
+#pragma mark - Instruction Operand
 //
 // Instruction Operand
 //
@@ -494,6 +501,7 @@ static void inst_operand_two_byte_operand(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
+#pragma mark - Instruction Equality
 //
 // Instruction Equality
 //
@@ -565,6 +573,7 @@ static void inst_eq_same_object(void *ctx)
     ct_asserttrue(result);
 }
 
+#pragma mark - Disassemble Instruction
 //
 // Disassemble Instruction
 //
@@ -876,6 +885,7 @@ static void inst_disassembles_unofficial(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
+#pragma mark - Disassemble Datapath
 //
 // Disassemble Datapath
 //
@@ -2468,6 +2478,7 @@ static void datapath_rst_cycle_six(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
+#pragma mark - Disassemble Peek
 //
 // Disassemble Peek
 //
@@ -2752,6 +2763,7 @@ static void peek_busfault(void *ctx)
     ct_assertfalse(cpu.detached);
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

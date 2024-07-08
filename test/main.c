@@ -9,6 +9,7 @@
 
 #include <stddef.h>
 
+#pragma mark - Test Suites
 //
 // Test Suites
 //
@@ -72,6 +73,7 @@ static size_t testrunner(int argc, char *argv[argc+1])
     return result;
 }
 
+#pragma mark - Public Interface
 //
 // Public Interface
 //

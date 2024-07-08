@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#pragma mark - Zero-Page Instructions
 //
 // Zero-Page Instructions
 //
@@ -1013,6 +1014,7 @@ static void sty_zp(void *ctx)
     ct_assertequal(0x84u, mem[4]);
 }
 
+#pragma mark - Zero-Page,X Instructions
 //
 // Zero-Page,X Instructions
 //
@@ -1591,6 +1593,7 @@ static void sty_zpx_pageoverflow(void *ctx)
     ct_assertequal(0x84u, mem[2]);
 }
 
+#pragma mark - Zero-Page,Y Instructions
 //
 // Zero-Page,Y Instructions
 //
@@ -1661,6 +1664,7 @@ static void stx_zpy_pageoverflow(void *ctx)
     ct_assertequal(0xf1u, mem[2]);
 }
 
+#pragma mark - Unofficial Opcodes
 //
 // Unofficial Opcodes
 //
@@ -3423,6 +3427,7 @@ static void sre_zpx_pageoverflow(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

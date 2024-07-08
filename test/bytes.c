@@ -98,6 +98,7 @@ static void bank_copy_address_beyond_range(void *ctx)
     ct_assertequal(0x55u, dest[4]);
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#pragma mark - Jump Instructions
 //
 // Jump Instructions
 //
@@ -56,6 +57,7 @@ static void jmp_indirect_pageboundary_bug(void *ctx)
     ct_assertequal(0xcafeu, cpu.pc);
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#pragma mark - Immediate Instructions
 //
 // Immediate Instructions
 //
@@ -2381,6 +2382,7 @@ static void sbc_bcd_visual6502_cases(void *ctx)
     }
 }
 
+#pragma mark - Unofficial Opcodes
 //
 // Unofficial Opcodes
 //
@@ -3463,6 +3465,7 @@ static void usbc_bcd_not_supported(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

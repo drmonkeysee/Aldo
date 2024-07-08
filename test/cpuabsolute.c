@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#pragma mark - Absolute Instructions
 //
 // Absolute Instructions
 //
@@ -412,6 +413,7 @@ static void sty_abs(void *ctx)
     ct_assertequal(0x84u, mem[516]);
 }
 
+#pragma mark - Absolute,X Instructions
 //
 // Absolute,X Instructions
 //
@@ -1010,6 +1012,7 @@ static void sta_absx_pagecross(void *ctx)
     ct_assertequal(0xau, mem[514]);
 }
 
+#pragma mark - Absolute,Y Instructions
 //
 // Absolute,Y Instructions
 //
@@ -1356,6 +1359,7 @@ static void sta_absy_pagecross(void *ctx)
     ct_assertequal(0xau, mem[514]);
 }
 
+#pragma mark - Unofficial Opcodes
 //
 // Unofficial Opcodes
 //
@@ -2444,6 +2448,7 @@ static void tas_absy_pagecross(void *ctx)
     ct_asserttrue(cpu.bflt);
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#pragma mark - Branch Instructions
 //
 // Branch Instructions
 //
@@ -301,6 +302,7 @@ static void bvs_branch(void *ctx)
     ct_assertequal(7u, cpu.pc);
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

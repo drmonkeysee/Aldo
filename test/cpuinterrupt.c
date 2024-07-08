@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#pragma mark - Interrupt Handling
 //
 // Interrupt Handling
 //
@@ -1070,6 +1071,7 @@ static void rst_late_on_nmi(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
+#pragma mark - Interrupt Signal Detection
 //
 // Interrupt Signal Detection
 //
@@ -2158,6 +2160,7 @@ static void rst_too_short(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
+#pragma mark - Test Lists
 //
 // Test Lists
 //

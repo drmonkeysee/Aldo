@@ -464,6 +464,7 @@ static void dma_zero_count(void *ctx)
     ct_assertequal(0xffu, dest[0]);
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

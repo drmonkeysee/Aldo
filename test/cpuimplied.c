@@ -13,6 +13,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#pragma mark - Implied Instructions
 //
 // Implied Instructions
 //
@@ -1243,6 +1244,7 @@ static void tya_to_negative(void *ctx)
     ct_asserttrue(cpu.p.n);
 }
 
+#pragma mark - Unofficial Opcodes
 //
 // Unofficial Opcodes
 //
@@ -1273,6 +1275,7 @@ static void jam(void *ctx)
     }
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

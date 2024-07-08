@@ -218,6 +218,7 @@ static void reset_debugger(void *ctx)
     ct_assertequal(NoResetVector, debug_vector_override(dbg));
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

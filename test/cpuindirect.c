@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#pragma mark - (Indirect,X) Instructions
 //
 // (Indirect,X) Instructions
 //
@@ -352,6 +353,7 @@ static void sta_indx_pageoverflow(void *ctx)
     ct_assertequal(0xau, mem[10]);
 }
 
+#pragma mark - (Indirect),Y Instructions
 //
 // (Indirect),Y Instructions
 //
@@ -685,6 +687,7 @@ static void sta_indy_pagecross(void *ctx)
     ct_assertequal(0xau, mem[258]);
 }
 
+#pragma mark - Unofficial Opcodes
 //
 // Unofficial Opcodes
 //
@@ -1383,6 +1386,7 @@ static void sre_indy_pagecross(void *ctx)
     ct_assertequal(0x59, RomWriteCapture);
 }
 
+#pragma mark - Test List
 //
 // Test List
 //

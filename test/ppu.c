@@ -1,84 +1,22 @@
 //
 //  ppu.c
-//  Tests
+//  Aldo-Tests
 //
 //  Created by Brandon Stansbury on 5/4/24.
 //
 
 #include "bus.h"
-#include "bytes.h"
 #include "ciny.h"
 #include "ctrlsignal.h"
 #include "ppu.h"
+#include "ppuhelp.h"
 #include "snapshot.h"
 
 #include <stdint.h>
-#include <stdlib.h>
-
-#define get_ppu(ctx) &((struct test_context *)(ctx))->ppu
-#define get_mbus(ctx) ((struct test_context *)(ctx))->mbus
-
-struct test_context {
-    struct rp2c02 ppu;
-    bus *mbus, *vbus;
-};
-
-static uint8_t VRam[4];
-
-static bool test_vread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
-{
-    if (0x2000 <= addr && addr < 0x3fff) {
-        *d = ((uint8_t *)ctx)[addr & 0x3];
-        return true;
-    }
-    return false;
-}
-
-static bool test_vwrite(void *ctx, uint16_t addr, uint8_t d)
-{
-    if (0x2000 <= addr && addr < 0x3f00) {
-        ((uint8_t *)ctx)[addr & 0x3] = d;
-        return true;
-    }
-    return false;
-}
-
-static void setup(void **ctx)
-{
-    struct test_context *const c = calloc(sizeof *c, 1);
-    // NOTE: enough main bus to map $2000 - $3FFF for ppu registers
-    c->mbus = bus_new(BITWIDTH_16KB, 2, MEMBLOCK_8KB);
-    VRam[0] = 0x11;
-    VRam[1] = 0x22;
-    VRam[2] = 0x33;
-    VRam[3] = 0x44;
-    c->ppu.vbus = c->vbus = bus_new(BITWIDTH_16KB, 2, 0x3f00);
-    bus_set(c->vbus, 0, (struct busdevice){
-        .read = test_vread,
-        .write = test_vwrite,
-        .ctx = VRam,
-    });
-    ppu_connect(&c->ppu, c->mbus);
-    // NOTE: run powerup and reset sequence and then force internal state to a
-    // known zero-value.
-    ppu_powerup(&c->ppu);
-    ppu_cycle(&c->ppu);
-    c->ppu.line = c->ppu.dot = 0;
-    c->ppu.rst = CSGS_CLEAR;
-    *ctx = c;
-}
-
-static void teardown(void **ctx)
-{
-    struct test_context *const c = (struct test_context *)*ctx;
-    bus_free(c->vbus);
-    bus_free(c->mbus);
-    free(c);
-}
 
 static void powerup_initializes_ppu(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
 
     ppu_powerup(ppu);
 
@@ -97,7 +35,7 @@ static void powerup_initializes_ppu(void *ctx)
 
 static void ppuctrl_write(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
 
     ppu_snapshot(ppu, &snp);
@@ -106,7 +44,7 @@ static void ppuctrl_write(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2000, 0xff);
+    bus_write(ppt_get_mbus(ctx), 0x2000, 0xff);
 
     ppu_snapshot(ppu, &snp);
     ct_assertequal(0xbfu, snp.ppu.ctrl);
@@ -117,7 +55,7 @@ static void ppuctrl_write(void *ctx)
 
 static void ppuctrl_write_mirrored(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
     ppu->t = 0x7fff;
     ppu->ctrl.nh = ppu->ctrl.nl = true;
@@ -128,7 +66,7 @@ static void ppuctrl_write_mirrored(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x3210, 0xfc);
+    bus_write(ppt_get_mbus(ctx), 0x3210, 0xfc);
 
     ppu_snapshot(ppu, &snp);
     ct_assertequal(0xbcu, snp.ppu.ctrl);
@@ -139,7 +77,7 @@ static void ppuctrl_write_mirrored(void *ctx)
 
 static void ppuctrl_write_during_reset(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
     ppu->rst = CSGS_SERVICED;
 
@@ -149,7 +87,7 @@ static void ppuctrl_write_during_reset(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2000, 0xff);
+    bus_write(ppt_get_mbus(ctx), 0x2000, 0xff);
 
     ppu_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.ctrl);
@@ -160,11 +98,11 @@ static void ppuctrl_write_during_reset(void *ctx)
 
 static void ppuctrl_read(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->regbus = 0x5a;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2000, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2000, &d);
 
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0x5au, d);
@@ -172,7 +110,7 @@ static void ppuctrl_read(void *ctx)
 
 static void ppumask_write(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
 
     ppu_snapshot(ppu, &snp);
@@ -180,7 +118,7 @@ static void ppumask_write(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2001, 0xff);
+    bus_write(ppt_get_mbus(ctx), 0x2001, 0xff);
 
     ppu_snapshot(ppu, &snp);
     ct_assertequal(0xffu, snp.ppu.mask);
@@ -190,7 +128,7 @@ static void ppumask_write(void *ctx)
 
 static void ppumask_write_mirrored(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
 
     ppu_snapshot(ppu, &snp);
@@ -198,7 +136,7 @@ static void ppumask_write_mirrored(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x3211, 0xff);
+    bus_write(ppt_get_mbus(ctx), 0x3211, 0xff);
 
     ppu_snapshot(ppu, &snp);
     ct_assertequal(0xffu, snp.ppu.mask);
@@ -208,7 +146,7 @@ static void ppumask_write_mirrored(void *ctx)
 
 static void ppumask_write_during_reset(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
     ppu->rst = CSGS_SERVICED;
 
@@ -217,7 +155,7 @@ static void ppumask_write_during_reset(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2001, 0xff);
+    bus_write(ppt_get_mbus(ctx), 0x2001, 0xff);
 
     ppu_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.mask);
@@ -227,11 +165,11 @@ static void ppumask_write_during_reset(void *ctx)
 
 static void ppumask_read(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->regbus = 0x5a;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2001, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2001, &d);
 
     ct_assertequal(1u, ppu->regsel);
     ct_assertequal(0x5au, d);
@@ -239,13 +177,13 @@ static void ppumask_read(void *ctx)
 
 static void ppustatus_read_when_clear(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
     ppu->regbus = 0x5a;
     ppu->status.v = ppu->status.s = ppu->status.o = false;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2002, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2002, &d);
 
     ppu_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
@@ -257,13 +195,13 @@ static void ppustatus_read_when_clear(void *ctx)
 
 static void ppustatus_read_when_set(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
     ppu->regbus = 0x5a;
     ppu->w = ppu->status.v = ppu->status.s = ppu->status.o = true;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2002, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2002, &d);
 
     ppu_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
@@ -275,7 +213,7 @@ static void ppustatus_read_when_set(void *ctx)
 
 static void ppustatus_read_on_nmi_race_condition(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
     ppu->regbus = 0x5a;
     ppu->status.v = ppu->status.s = ppu->status.o = true;
@@ -283,7 +221,7 @@ static void ppustatus_read_on_nmi_race_condition(void *ctx)
     ppu->dot = 1;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2002, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2002, &d);
 
     ppu_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
@@ -294,14 +232,14 @@ static void ppustatus_read_on_nmi_race_condition(void *ctx)
 
 static void ppustatus_read_during_reset(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
     ppu->regbus = 0x5a;
     ppu->w = ppu->status.v = ppu->status.s = ppu->status.o = true;
     ppu->rst = CSGS_SERVICED;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2002, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2002, &d);
 
     ppu_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
@@ -313,12 +251,12 @@ static void ppustatus_read_during_reset(void *ctx)
 
 static void ppustatus_read_mirrored(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
     ppu->regbus = 0x5a;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x3212, &d);
+    bus_read(ppt_get_mbus(ctx), 0x3212, &d);
 
     ppu_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
@@ -330,11 +268,11 @@ static void ppustatus_read_mirrored(void *ctx)
 
 static void ppustatus_write(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
     ppu->w = true;
 
-    bus_write(get_mbus(ctx), 0x2002, 0xff);
+    bus_write(ppt_get_mbus(ctx), 0x2002, 0xff);
 
     ppu_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
@@ -345,13 +283,13 @@ static void ppustatus_write(void *ctx)
 
 static void oamaddr_write(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
 
     ct_assertequal(0u, ppu->oamaddr);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2003, 0xc3);
+    bus_write(ppt_get_mbus(ctx), 0x2003, 0xc3);
 
     ct_assertequal(0xc3u, ppu->oamaddr);
     ct_assertequal(3u, ppu->regsel);
@@ -360,13 +298,13 @@ static void oamaddr_write(void *ctx)
 
 static void oamaddr_write_mirrored(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
 
     ct_assertequal(0u, ppu->oamaddr);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x3213, 0xc3);
+    bus_write(ppt_get_mbus(ctx), 0x3213, 0xc3);
 
     ct_assertequal(0xc3u, ppu->oamaddr);
     ct_assertequal(3u, ppu->regsel);
@@ -375,14 +313,14 @@ static void oamaddr_write_mirrored(void *ctx)
 
 static void oamaddr_write_during_reset(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->rst = CSGS_SERVICED;
 
     ct_assertequal(0u, ppu->oamaddr);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2003, 0xc3);
+    bus_write(ppt_get_mbus(ctx), 0x2003, 0xc3);
 
     ct_assertequal(0xc3u, ppu->oamaddr);
     ct_assertequal(3u, ppu->regsel);
@@ -391,11 +329,11 @@ static void oamaddr_write_during_reset(void *ctx)
 
 static void oamaddr_read(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->regbus = 0x5a;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2003, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2003, &d);
 
     ct_assertequal(3u, ppu->regsel);
     ct_assertequal(0x5au, d);
@@ -403,7 +341,7 @@ static void oamaddr_read(void *ctx)
 
 static void oamdata_write(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
     ppu->ctrl.s = true;
@@ -412,28 +350,28 @@ static void oamdata_write(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x11);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x11);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
     ct_assertequal(0x1u, ppu->oamaddr);
     ct_assertequal(0x11u, ppu->oam[0]);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x22);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x22);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
     ct_assertequal(0x2u, ppu->oamaddr);
     ct_assertequal(0x22u, ppu->oam[1]);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x33);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x33);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
     ct_assertequal(0x3u, ppu->oamaddr);
     ct_assertequal(0x33u, ppu->oam[2]);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x44);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x44);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
@@ -443,7 +381,7 @@ static void oamdata_write(void *ctx)
 
 static void oamdata_write_during_rendering(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 24;
     ppu->dot = 5;
     ppu->ctrl.s = true;
@@ -452,28 +390,28 @@ static void oamdata_write_during_rendering(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x11);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x11);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
     ct_assertequal(0x4u, ppu->oamaddr);
     ct_assertequal(0xffu, ppu->oam[0]);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x22);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x22);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
     ct_assertequal(0x8u, ppu->oamaddr);
     ct_assertequal(0xffu, ppu->oam[4]);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x33);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x33);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
     ct_assertequal(0xcu, ppu->oamaddr);
     ct_assertequal(0xffu, ppu->oam[8]);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x44);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x44);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
@@ -483,7 +421,7 @@ static void oamdata_write_during_rendering(void *ctx)
 
 static void oamdata_write_during_rendering_disabled(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 24;
     ppu->dot = 5;
     ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
@@ -491,28 +429,28 @@ static void oamdata_write_during_rendering_disabled(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x11);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x11);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
     ct_assertequal(0x1u, ppu->oamaddr);
     ct_assertequal(0x11u, ppu->oam[0]);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x22);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x22);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
     ct_assertequal(0x2u, ppu->oamaddr);
     ct_assertequal(0x22u, ppu->oam[1]);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x33);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x33);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
     ct_assertequal(0x3u, ppu->oamaddr);
     ct_assertequal(0x33u, ppu->oam[2]);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x44);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x44);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
@@ -522,7 +460,7 @@ static void oamdata_write_during_rendering_disabled(void *ctx)
 
 static void oamdata_write_mirrored(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
     ppu->ctrl.s = true;
@@ -531,28 +469,28 @@ static void oamdata_write_mirrored(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x3214, 0x11);
+    bus_write(ppt_get_mbus(ctx), 0x3214, 0x11);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
     ct_assertequal(0x1u, ppu->oamaddr);
     ct_assertequal(0x11u, ppu->oam[0]);
 
-    bus_write(get_mbus(ctx), 0x3214, 0x22);
+    bus_write(ppt_get_mbus(ctx), 0x3214, 0x22);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
     ct_assertequal(0x2u, ppu->oamaddr);
     ct_assertequal(0x22u, ppu->oam[1]);
 
-    bus_write(get_mbus(ctx), 0x3214, 0x33);
+    bus_write(ppt_get_mbus(ctx), 0x3214, 0x33);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
     ct_assertequal(0x3u, ppu->oamaddr);
     ct_assertequal(0x33u, ppu->oam[2]);
 
-    bus_write(get_mbus(ctx), 0x3214, 0x44);
+    bus_write(ppt_get_mbus(ctx), 0x3214, 0x44);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
@@ -562,7 +500,7 @@ static void oamdata_write_mirrored(void *ctx)
 
 static void oamdata_write_during_reset(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
     ppu->ctrl.s = true;
@@ -572,28 +510,28 @@ static void oamdata_write_during_reset(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x11);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x11);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
     ct_assertequal(0x1u, ppu->oamaddr);
     ct_assertequal(0x11u, ppu->oam[0]);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x22);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x22);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
     ct_assertequal(0x2u, ppu->oamaddr);
     ct_assertequal(0x22u, ppu->oam[1]);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x33);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x33);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
     ct_assertequal(0x3u, ppu->oamaddr);
     ct_assertequal(0x33u, ppu->oam[2]);
 
-    bus_write(get_mbus(ctx), 0x2004, 0x44);
+    bus_write(ppt_get_mbus(ctx), 0x2004, 0x44);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
@@ -603,7 +541,7 @@ static void oamdata_write_during_reset(void *ctx)
 
 static void oamdata_read(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
     ppu->ctrl.s = true;
@@ -613,7 +551,7 @@ static void oamdata_read(void *ctx)
     ppu->oam[3] = 0x44;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2004, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2004, &d);
 
     ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x11u, d);
@@ -623,7 +561,7 @@ static void oamdata_read(void *ctx)
 
 static void oamdata_read_mirrored(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
     ppu->ctrl.s = true;
@@ -633,7 +571,7 @@ static void oamdata_read_mirrored(void *ctx)
     ppu->oam[3] = 0x44;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x3214, &d);
+    bus_read(ppt_get_mbus(ctx), 0x3214, &d);
 
     ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x11u, d);
@@ -643,7 +581,7 @@ static void oamdata_read_mirrored(void *ctx)
 
 static void ppuscroll_write(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
 
     ct_assertequal(0u, ppu->t);
     ct_assertequal(0u, ppu->x);
@@ -651,18 +589,18 @@ static void ppuscroll_write(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2005, 0xaf); // 0b1010'1111
+    bus_write(ppt_get_mbus(ctx), 0x2005, 0xaf); // 0b1010'1111
 
-    ct_assertequal(0x15u, ppu->t);          // 0b000'0000'0001'0101
-    ct_assertequal(7u, ppu->x);             // 0b111
+    ct_assertequal(0x15u, ppu->t);              // 0b000'0000'0001'0101
+    ct_assertequal(7u, ppu->x);                 // 0b111
     ct_asserttrue(ppu->w);
     ct_assertequal(5u, ppu->regsel);
     ct_assertequal(0xafu, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2005, 0xab); // 0b1010'1011
+    bus_write(ppt_get_mbus(ctx), 0x2005, 0xab); // 0b1010'1011
 
-    ct_assertequal(0x32b5u, ppu->t);        // 0b011'0010'1011'0101
-    ct_assertequal(7u, ppu->x);             // 0b111
+    ct_assertequal(0x32b5u, ppu->t);            // 0b011'0010'1011'0101
+    ct_assertequal(7u, ppu->x);                 // 0b111
     ct_assertfalse(ppu->w);
     ct_assertequal(5u, ppu->regsel);
     ct_assertequal(0xabu, ppu->regbus);
@@ -670,7 +608,7 @@ static void ppuscroll_write(void *ctx)
 
 static void ppuscroll_write_mirrored(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->t = 0x7fff;
     ppu->x = 0xff;
 
@@ -680,18 +618,18 @@ static void ppuscroll_write_mirrored(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x3215, 0xaa); // 0b1010'1010
+    bus_write(ppt_get_mbus(ctx), 0x3215, 0xaa); // 0b1010'1010
 
-    ct_assertequal(0x7ff5u, ppu->t);        // 0b111'1111'1111'0101
-    ct_assertequal(2u, ppu->x);             // 0b010
+    ct_assertequal(0x7ff5u, ppu->t);            // 0b111'1111'1111'0101
+    ct_assertequal(2u, ppu->x);                 // 0b010
     ct_asserttrue(ppu->w);
     ct_assertequal(5u, ppu->regsel);
     ct_assertequal(0xaau, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x3215, 0xab); // 0b1010'1011
+    bus_write(ppt_get_mbus(ctx), 0x3215, 0xab); // 0b1010'1011
 
-    ct_assertequal(0x3eb5u, ppu->t);        // 0b011'1110'1011'0101
-    ct_assertequal(2u, ppu->x);             // 0b010
+    ct_assertequal(0x3eb5u, ppu->t);            // 0b011'1110'1011'0101
+    ct_assertequal(2u, ppu->x);                 // 0b010
     ct_assertfalse(ppu->w);
     ct_assertequal(5u, ppu->regsel);
     ct_assertequal(0xabu, ppu->regbus);
@@ -699,7 +637,7 @@ static void ppuscroll_write_mirrored(void *ctx)
 
 static void ppuscroll_write_during_reset(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->rst = CSGS_SERVICED;
 
     ct_assertequal(0u, ppu->t);
@@ -708,7 +646,7 @@ static void ppuscroll_write_during_reset(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2005, 0xaf);
+    bus_write(ppt_get_mbus(ctx), 0x2005, 0xaf);
 
     ct_assertequal(0x0u, ppu->t);
     ct_assertequal(0u, ppu->x);
@@ -716,7 +654,7 @@ static void ppuscroll_write_during_reset(void *ctx)
     ct_assertequal(5u, ppu->regsel);
     ct_assertequal(0xafu, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2005, 0xab);
+    bus_write(ppt_get_mbus(ctx), 0x2005, 0xab);
 
     ct_assertequal(0x0u, ppu->t);
     ct_assertequal(0u, ppu->x);
@@ -727,11 +665,11 @@ static void ppuscroll_write_during_reset(void *ctx)
 
 static void ppuscroll_read(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->regbus = 0x5a;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2005, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2005, &d);
 
     ct_assertequal(5u, ppu->regsel);
     ct_assertequal(0x5au, d);
@@ -739,7 +677,7 @@ static void ppuscroll_read(void *ctx)
 
 static void ppuaddr_write(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->t = 0x4000;
 
     ct_assertequal(0x4000u, ppu->t);
@@ -748,17 +686,17 @@ static void ppuaddr_write(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2006, 0xa5); // 0b1010'0101
+    bus_write(ppt_get_mbus(ctx), 0x2006, 0xa5); // 0b1010'0101
 
-    ct_assertequal(0x2500u, ppu->t);        // 0b010'0101'0000'0000
+    ct_assertequal(0x2500u, ppu->t);            // 0b010'0101'0000'0000
     ct_assertequal(0u, ppu->v);
     ct_asserttrue(ppu->w);
     ct_assertequal(6u, ppu->regsel);
     ct_assertequal(0xa5u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x2006, 0xab); // 0b1010'1011
+    bus_write(ppt_get_mbus(ctx), 0x2006, 0xab); // 0b1010'1011
 
-    ct_assertequal(0x25abu, ppu->t);        // 0b010'0101'1010'1011
+    ct_assertequal(0x25abu, ppu->t);            // 0b010'0101'1010'1011
     ct_assertequal(0x25abu, ppu->v);
     ct_assertfalse(ppu->w);
     ct_assertequal(6u, ppu->regsel);
@@ -767,7 +705,7 @@ static void ppuaddr_write(void *ctx)
 
 static void ppuaddr_write_mirrored(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->t = 0x4fff;
 
     ct_assertequal(0x4fffu, ppu->t);
@@ -776,17 +714,17 @@ static void ppuaddr_write_mirrored(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x3216, 0xa5); // 0b1010'0101
+    bus_write(ppt_get_mbus(ctx), 0x3216, 0xa5); // 0b1010'0101
 
-    ct_assertequal(0x25ffu, ppu->t);        // 0b010'0101'1111'1111
+    ct_assertequal(0x25ffu, ppu->t);            // 0b010'0101'1111'1111
     ct_assertequal(0u, ppu->v);
     ct_asserttrue(ppu->w);
     ct_assertequal(6u, ppu->regsel);
     ct_assertequal(0xa5u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x3216, 0xab); // 0b1010'1011
+    bus_write(ppt_get_mbus(ctx), 0x3216, 0xab); // 0b1010'1011
 
-    ct_assertequal(0x25abu, ppu->t);        // 0b010'0101'1010'1011
+    ct_assertequal(0x25abu, ppu->t);            // 0b010'0101'1010'1011
     ct_assertequal(0x25abu, ppu->v);
     ct_assertfalse(ppu->w);
     ct_assertequal(6u, ppu->regsel);
@@ -795,7 +733,7 @@ static void ppuaddr_write_mirrored(void *ctx)
 
 static void ppuaddr_write_during_reset(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->t = 0x4fff;
     ppu->rst = CSGS_SERVICED;
 
@@ -805,7 +743,7 @@ static void ppuaddr_write_during_reset(void *ctx)
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x3216, 0xa5);
+    bus_write(ppt_get_mbus(ctx), 0x3216, 0xa5);
 
     ct_assertequal(0x4fffu, ppu->t);
     ct_assertequal(0u, ppu->v);
@@ -813,7 +751,7 @@ static void ppuaddr_write_during_reset(void *ctx)
     ct_assertequal(6u, ppu->regsel);
     ct_assertequal(0xa5u, ppu->regbus);
 
-    bus_write(get_mbus(ctx), 0x3216, 0xab);
+    bus_write(ppt_get_mbus(ctx), 0x3216, 0xab);
 
     ct_assertequal(0x4fffu, ppu->t);
     ct_assertequal(0u, ppu->v);
@@ -824,11 +762,11 @@ static void ppuaddr_write_during_reset(void *ctx)
 
 static void ppuaddr_read(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->regbus = 0x5a;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2006, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2006, &d);
 
     ct_assertequal(6u, ppu->regsel);
     ct_assertequal(0x5au, d);
@@ -838,31 +776,31 @@ static void ppuaddr_read(void *ctx)
 // https://www.nesdev.org/wiki/PPU_scrolling#Details
 static void ppu_addr_scroll_interleave(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->t = 0x4000;
 
-    bus_write(get_mbus(ctx), 0x2006, 0x4);
+    bus_write(ppt_get_mbus(ctx), 0x2006, 0x4);
 
     ct_assertequal(0u, ppu->x);
     ct_assertequal(0x400u, ppu->t);
     ct_assertequal(0u, ppu->v);
     ct_asserttrue(ppu->w);
 
-    bus_write(get_mbus(ctx), 0x2005, 0x3e);
+    bus_write(ppt_get_mbus(ctx), 0x2005, 0x3e);
 
     ct_assertequal(0u, ppu->x);
     ct_assertequal(0x64e0u, ppu->t);
     ct_assertequal(0u, ppu->v);
     ct_assertfalse(ppu->w);
 
-    bus_write(get_mbus(ctx), 0x2005, 0x7d);
+    bus_write(ppt_get_mbus(ctx), 0x2005, 0x7d);
 
     ct_assertequal(5u, ppu->x);
     ct_assertequal(0x64efu, ppu->t);
     ct_assertequal(0u, ppu->v);
     ct_asserttrue(ppu->w);
 
-    bus_write(get_mbus(ctx), 0x2006, 0xef);
+    bus_write(ppt_get_mbus(ctx), 0x2006, 0xef);
 
     ct_assertequal(5u, ppu->x);
     ct_assertequal(0x64efu, ppu->t);
@@ -872,13 +810,13 @@ static void ppu_addr_scroll_interleave(void *ctx)
 
 static void ppudata_write_in_vblank(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x2002;
 
-    bus_write(get_mbus(ctx), 0x2007, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -924,13 +862,13 @@ static void ppudata_write_in_vblank(void *ctx)
 
 static void ppudata_write_with_row_increment(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = ppu->ctrl.i = true;
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x2002;
 
-    bus_write(get_mbus(ctx), 0x2007, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -976,12 +914,12 @@ static void ppudata_write_with_row_increment(void *ctx)
 
 static void ppudata_write_rendering_disabled(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 42;
     ppu->dot = 24;
     ppu->v = 0x2002;
 
-    bus_write(get_mbus(ctx), 0x2007, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -1027,13 +965,13 @@ static void ppudata_write_rendering_disabled(void *ctx)
 
 static void ppudata_write_mirrored(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x2002;
 
-    bus_write(get_mbus(ctx), 0x3217, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x3217, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -1079,13 +1017,13 @@ static void ppudata_write_mirrored(void *ctx)
 
 static void ppudata_write_ignores_high_v_bits(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0xf002;
 
-    bus_write(get_mbus(ctx), 0x2007, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -1131,13 +1069,13 @@ static void ppudata_write_ignores_high_v_bits(void *ctx)
 
 static void ppudata_write_palette_backdrop(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f00;
 
-    bus_write(get_mbus(ctx), 0x2007, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -1187,13 +1125,13 @@ static void ppudata_write_palette_backdrop(void *ctx)
 
 static void ppudata_write_palette_background(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f06;
 
-    bus_write(get_mbus(ctx), 0x2007, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -1243,13 +1181,13 @@ static void ppudata_write_palette_background(void *ctx)
 
 static void ppudata_write_palette_last_background(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f0f;
 
-    bus_write(get_mbus(ctx), 0x2007, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -1299,13 +1237,13 @@ static void ppudata_write_palette_last_background(void *ctx)
 
 static void ppudata_write_palette_unused(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f0c;
 
-    bus_write(get_mbus(ctx), 0x2007, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -1355,13 +1293,13 @@ static void ppudata_write_palette_unused(void *ctx)
 
 static void ppudata_write_palette_backdrop_mirror(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f10;
 
-    bus_write(get_mbus(ctx), 0x2007, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -1411,13 +1349,13 @@ static void ppudata_write_palette_backdrop_mirror(void *ctx)
 
 static void ppudata_write_palette_backdrop_high_mirror(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3ff0;
 
-    bus_write(get_mbus(ctx), 0x2007, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -1467,13 +1405,13 @@ static void ppudata_write_palette_backdrop_high_mirror(void *ctx)
 
 static void ppudata_write_palette_sprite(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f16;
 
-    bus_write(get_mbus(ctx), 0x2007, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -1523,13 +1461,13 @@ static void ppudata_write_palette_sprite(void *ctx)
 
 static void ppudata_write_palette_last_sprite(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f1f;
 
-    bus_write(get_mbus(ctx), 0x2007, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -1579,13 +1517,13 @@ static void ppudata_write_palette_last_sprite(void *ctx)
 
 static void ppudata_write_palette_unused_mirrored(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x3f1c;
 
-    bus_write(get_mbus(ctx), 0x2007, 0x77);
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x77u, ppu->regbus);
@@ -1640,7 +1578,7 @@ static void ppudata_write_during_rendering(void *ctx)
 
 static void ppudata_read_in_vblank(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1648,7 +1586,7 @@ static void ppudata_read_in_vblank(void *ctx)
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xaau, ppu->regbus);
@@ -1692,7 +1630,7 @@ static void ppudata_read_in_vblank(void *ctx)
     ct_assertequal(0x33u, ppu->rbuf);
     ct_assertequal(0x2003u, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
@@ -1701,7 +1639,7 @@ static void ppudata_read_in_vblank(void *ctx)
 
 static void ppudata_read_with_row_increment(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = ppu->ctrl.i = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1709,7 +1647,7 @@ static void ppudata_read_with_row_increment(void *ctx)
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xaau, ppu->regbus);
@@ -1753,7 +1691,7 @@ static void ppudata_read_with_row_increment(void *ctx)
     ct_assertequal(0x33u, ppu->rbuf);
     ct_assertequal(0x2022u, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
@@ -1762,14 +1700,14 @@ static void ppudata_read_with_row_increment(void *ctx)
 
 static void ppudata_read_rendering_disabled(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 42;
     ppu->dot = 24;
     ppu->v = 0x2002;
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xaau, ppu->regbus);
@@ -1813,7 +1751,7 @@ static void ppudata_read_rendering_disabled(void *ctx)
     ct_assertequal(0x33u, ppu->rbuf);
     ct_assertequal(0x2003u, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
@@ -1822,7 +1760,7 @@ static void ppudata_read_rendering_disabled(void *ctx)
 
 static void ppudata_read_mirrored(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1830,7 +1768,7 @@ static void ppudata_read_mirrored(void *ctx)
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x3217, &d);
+    bus_read(ppt_get_mbus(ctx), 0x3217, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xaau, ppu->regbus);
@@ -1874,7 +1812,7 @@ static void ppudata_read_mirrored(void *ctx)
     ct_assertequal(0x33u, ppu->rbuf);
     ct_assertequal(0x2003u, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x3217, &d);
+    bus_read(ppt_get_mbus(ctx), 0x3217, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
@@ -1883,7 +1821,7 @@ static void ppudata_read_mirrored(void *ctx)
 
 static void ppudata_read_ignores_high_v_bits(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1891,7 +1829,7 @@ static void ppudata_read_ignores_high_v_bits(void *ctx)
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xaau, ppu->regbus);
@@ -1935,7 +1873,7 @@ static void ppudata_read_ignores_high_v_bits(void *ctx)
     ct_assertequal(0x33u, ppu->rbuf);
     ct_assertequal(0xf003u, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
@@ -1944,7 +1882,7 @@ static void ppudata_read_ignores_high_v_bits(void *ctx)
 
 static void ppudata_read_palette_backdrop(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1953,7 +1891,7 @@ static void ppudata_read_palette_backdrop(void *ctx)
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xccu, ppu->regbus);
@@ -1997,7 +1935,7 @@ static void ppudata_read_palette_backdrop(void *ctx)
     ct_assertequal(0x11u, ppu->rbuf);
     ct_assertequal(0x3f01u, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
@@ -2006,7 +1944,7 @@ static void ppudata_read_palette_backdrop(void *ctx)
 
 static void ppudata_read_palette_background(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2015,7 +1953,7 @@ static void ppudata_read_palette_background(void *ctx)
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xccu, ppu->regbus);
@@ -2059,7 +1997,7 @@ static void ppudata_read_palette_background(void *ctx)
     ct_assertequal(0x22u, ppu->rbuf);
     ct_assertequal(0x3f07u, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
@@ -2068,7 +2006,7 @@ static void ppudata_read_palette_background(void *ctx)
 
 static void ppudata_read_palette_last_background(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2077,7 +2015,7 @@ static void ppudata_read_palette_last_background(void *ctx)
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xccu, ppu->regbus);
@@ -2121,7 +2059,7 @@ static void ppudata_read_palette_last_background(void *ctx)
     ct_assertequal(0x44u, ppu->rbuf);
     ct_assertequal(0x2003u, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
@@ -2130,7 +2068,7 @@ static void ppudata_read_palette_last_background(void *ctx)
 
 static void ppudata_read_palette_unused(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2139,7 +2077,7 @@ static void ppudata_read_palette_unused(void *ctx)
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xccu, ppu->regbus);
@@ -2183,7 +2121,7 @@ static void ppudata_read_palette_unused(void *ctx)
     ct_assertequal(0x11u, ppu->rbuf);
     ct_assertequal(0x3f0du, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
@@ -2192,7 +2130,7 @@ static void ppudata_read_palette_unused(void *ctx)
 
 static void ppudata_read_palette_backdrop_mirror(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2201,7 +2139,7 @@ static void ppudata_read_palette_backdrop_mirror(void *ctx)
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xccu, ppu->regbus);
@@ -2245,7 +2183,7 @@ static void ppudata_read_palette_backdrop_mirror(void *ctx)
     ct_assertequal(0x11u, ppu->rbuf);
     ct_assertequal(0x3f11u, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
@@ -2254,7 +2192,7 @@ static void ppudata_read_palette_backdrop_mirror(void *ctx)
 
 static void ppudata_read_palette_backdrop_high_mirror(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2263,7 +2201,7 @@ static void ppudata_read_palette_backdrop_high_mirror(void *ctx)
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xccu, ppu->regbus);
@@ -2307,7 +2245,7 @@ static void ppudata_read_palette_backdrop_high_mirror(void *ctx)
     ct_assertequal(0x11u, ppu->rbuf);
     ct_assertequal(0x3ff1u, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
@@ -2316,7 +2254,7 @@ static void ppudata_read_palette_backdrop_high_mirror(void *ctx)
 
 static void ppudata_read_palette_sprite(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2325,7 +2263,7 @@ static void ppudata_read_palette_sprite(void *ctx)
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xccu, ppu->regbus);
@@ -2369,7 +2307,7 @@ static void ppudata_read_palette_sprite(void *ctx)
     ct_assertequal(0x22u, ppu->rbuf);
     ct_assertequal(0x3f17u, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
@@ -2378,7 +2316,7 @@ static void ppudata_read_palette_sprite(void *ctx)
 
 static void ppudata_read_palette_last_sprite(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2387,7 +2325,7 @@ static void ppudata_read_palette_last_sprite(void *ctx)
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xccu, ppu->regbus);
@@ -2431,7 +2369,7 @@ static void ppudata_read_palette_last_sprite(void *ctx)
     ct_assertequal(0x44u, ppu->rbuf);
     ct_assertequal(0x3f20u, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
@@ -2440,7 +2378,7 @@ static void ppudata_read_palette_last_sprite(void *ctx)
 
 static void ppudata_read_palette_unused_mirrored(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2449,7 +2387,7 @@ static void ppudata_read_palette_unused_mirrored(void *ctx)
     ppu->rbuf = 0xaa;
 
     uint8_t d;
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0xccu, ppu->regbus);
@@ -2493,7 +2431,7 @@ static void ppudata_read_palette_unused_mirrored(void *ctx)
     ct_assertequal(0x11u, ppu->rbuf);
     ct_assertequal(0x3f1du, ppu->v);
 
-    bus_read(get_mbus(ctx), 0x2007, &d);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
@@ -2507,7 +2445,7 @@ static void ppudata_read_during_rendering(void *ctx)
 
 static void reset_sequence(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 42;
     ppu->dot = 24;
     ppu->signal.intr = false;
@@ -2627,7 +2565,7 @@ static void reset_sequence(void *ctx)
 
 static void reset_too_short(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 42;
     ppu->dot = 24;
     ppu->signal.intr = false;
@@ -2693,7 +2631,7 @@ static void reset_too_short(void *ctx)
 
 static void vblank_prep(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->status.v = false;
     ppu->ctrl.v = true;
     ppu->line = 241;
@@ -2707,7 +2645,7 @@ static void vblank_prep(void *ctx)
 
 static void vblank_start(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->status.v = true;
     ppu->ctrl.v = true;
     ppu->line = 241;
@@ -2722,7 +2660,7 @@ static void vblank_start(void *ctx)
 
 static void vblank_start_nmi_disabled(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->status.v = true;
     ppu->line = 241;
     ppu->dot = 1;
@@ -2736,7 +2674,7 @@ static void vblank_start_nmi_disabled(void *ctx)
 
 static void vblank_start_nmi_missed(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->status.v = false;
     ppu->ctrl.v = true;
     ppu->line = 241;
@@ -2751,7 +2689,7 @@ static void vblank_start_nmi_missed(void *ctx)
 
 static void vblank_nmi_toggle(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->status.v = true;
     ppu->ctrl.v = true;
     ppu->line = 250;
@@ -2781,7 +2719,7 @@ static void vblank_nmi_toggle(void *ctx)
 
 static void vblank_nmi_clear(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->status.v = true;
     ppu->ctrl.v = true;
     ppu->line = 250;
@@ -2810,7 +2748,7 @@ static void vblank_nmi_clear(void *ctx)
 
 static void vblank_end(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->status.v = true;
     ppu->status.s = true;
     ppu->status.o = true;
@@ -2832,7 +2770,7 @@ static void vblank_end(void *ctx)
 
 static void frame_toggle(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 261;
     ppu->dot = 340;
 
@@ -2855,7 +2793,7 @@ static void frame_toggle(void *ctx)
 
 static void trace_no_adjustment(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
 
     const struct ppu_coord pixel = ppu_trace(ppu, 0);
 
@@ -2865,7 +2803,7 @@ static void trace_no_adjustment(void *ctx)
 
 static void trace_zero_with_adjustment(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
 
     const struct ppu_coord pixel = ppu_trace(ppu, -3);
 
@@ -2875,7 +2813,7 @@ static void trace_zero_with_adjustment(void *ctx)
 
 static void trace(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 120;
     ppu->dot = 223;
 
@@ -2887,7 +2825,7 @@ static void trace(void *ctx)
 
 static void trace_at_one_cpu_cycle(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->dot = 3;
 
     const struct ppu_coord pixel = ppu_trace(ppu, -3);
@@ -2898,7 +2836,7 @@ static void trace_at_one_cpu_cycle(void *ctx)
 
 static void trace_at_one_ppu_cycle(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 120;
     ppu->dot = 223;
 
@@ -2910,7 +2848,7 @@ static void trace_at_one_ppu_cycle(void *ctx)
 
 static void trace_at_line_boundary(void *ctx)
 {
-    struct rp2c02 *const ppu = get_ppu(ctx);
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
     ppu->line = 120;
     ppu->dot = 1;
 
@@ -3021,5 +2959,5 @@ struct ct_testsuite ppu_tests(void)
         ct_maketest(trace_at_line_boundary),
     };
 
-    return ct_makesuite_setup_teardown(tests, setup, teardown);
+    return ct_makesuite_setup_teardown(tests, ppu_setup, ppu_teardown);
 }

@@ -133,6 +133,7 @@
 		C8E7A29C2980F46D00AAB2A4 /* modal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8E7A29A2980F32400AAB2A4 /* modal.cpp */; };
 		C8EC72202916150700DF750A /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8EC721E2916150700DF750A /* render.cpp */; };
 		C8ED81B52C3B88EB00C8F518 /* ppuhelp.c in Sources */ = {isa = PBXBuildFile; fileRef = C8ED81B42C3B88EB00C8F518 /* ppuhelp.c */; };
+		C8ED81B72C3B8ED100C8F518 /* ppuregister.c in Sources */ = {isa = PBXBuildFile; fileRef = C8ED81B62C3B8ED100C8F518 /* ppuregister.c */; };
 		C8F1A38E297FA5400005EB8B /* emu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8F1A38C297FA5400005EB8B /* emu.cpp */; };
 		C8F1A391297FA8AA0005EB8B /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8F1A38F297FA8AA0005EB8B /* input.cpp */; };
 		C8F87DBC2984D64F00B8FAFD /* debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8F87DBA2984D64F00B8FAFD /* debug.cpp */; };
@@ -371,6 +372,7 @@
 		C8EC7222291615AB00DF750A /* viewstate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = viewstate.hpp; sourceTree = "<group>"; };
 		C8ED81B32C3B88EB00C8F518 /* ppuhelp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ppuhelp.h; sourceTree = "<group>"; };
 		C8ED81B42C3B88EB00C8F518 /* ppuhelp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ppuhelp.c; sourceTree = "<group>"; };
+		C8ED81B62C3B8ED100C8F518 /* ppuregister.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ppuregister.c; sourceTree = "<group>"; };
 		C8F1A38B297FA3860005EB8B /* attr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = attr.hpp; sourceTree = "<group>"; };
 		C8F1A38C297FA5400005EB8B /* emu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = emu.cpp; sourceTree = "<group>"; };
 		C8F1A38D297FA5400005EB8B /* emu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = emu.hpp; sourceTree = "<group>"; };
@@ -474,6 +476,7 @@
 				C81680062BE70556005A7905 /* ppu.c */,
 				C8ED81B32C3B88EB00C8F518 /* ppuhelp.h */,
 				C8ED81B42C3B88EB00C8F518 /* ppuhelp.c */,
+				C8ED81B62C3B8ED100C8F518 /* ppuregister.c */,
 			);
 			name = test;
 			path = ../test;
@@ -928,6 +931,7 @@
 				C8C706AB2751EF8D00B45785 /* cpuindirect.c in Sources */,
 				C8184D3E25E7496B002B3100 /* Tests.swift in Sources */,
 				C8702CF9278A58C900725690 /* haltexpr.c in Sources */,
+				C8ED81B72C3B8ED100C8F518 /* ppuregister.c in Sources */,
 				C81680072BE70556005A7905 /* ppu.c in Sources */,
 				C8C706B62751F0BA00B45785 /* bus.c in Sources */,
 				C8C706B12751EF8D00B45785 /* cpuimplied.c in Sources */,

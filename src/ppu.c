@@ -85,6 +85,12 @@ static void set_status(struct rp2c02 *self, uint8_t v)
     self->status.v = v & 0x80;
 }
 
+// NOTE: address bus is 14 bits wide
+static uint16_t addrbusmask(uint16_t addr)
+{
+    return addr & ADDRMASK_16KB;
+}
+
 static bool palette_addr(uint16_t addr)
 {
     return MEMBLOCK_16KB - MEMBLOCK_256B <= addr && addr < MEMBLOCK_16KB;
@@ -245,7 +251,7 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
         break;
     case 7: // PPUDATA
         ppu->cvp = true;
-        const uint16_t addr = ppu->v & ADDRMASK_16KB;
+        const uint16_t addr = addrbusmask(ppu->v);
         if (palette_addr(addr)) {
             palette_write(ppu, addr, ppu->regbus);
         }
@@ -373,8 +379,7 @@ static void cpu_rw(struct rp2c02 *self)
         self->cvp = false;
         self->v += self->ctrl.i ? 32 : 1;
     } else {
-        // NOTE: address bus is 14 bits wide
-        self->vaddrbus = self->v & ADDRMASK_16KB;
+        self->vaddrbus = addrbusmask(self->v);
         self->signal.ale = true;
     }
 }

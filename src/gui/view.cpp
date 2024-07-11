@@ -44,7 +44,7 @@ namespace
 {
 
 //
-// Helpers
+// MARK: - Helpers
 //
 
 class ALDO_SIDEFX DisabledIf {
@@ -228,7 +228,7 @@ auto add_views(aldo::Layout::view_list& vl, aldo::viewstate& vs,
 }
 
 //
-// Widgets
+// MARK: - Widgets
 //
 
 using view_span = std::span<const std::unique_ptr<aldo::View>>;
@@ -461,7 +461,7 @@ auto about_overlay(aldo::viewstate& vs) noexcept
 }
 
 //
-// Concrete Views
+// MARK: - Concrete Views
 //
 
 class BouncerView final : public aldo::View {
@@ -1580,7 +1580,7 @@ private:
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 void aldo::View::render()
@@ -1622,7 +1622,7 @@ void aldo::Layout::render() const
 }
 
 //
-// Private Interface
+// MARK: - Private Interface
 //
 
 void aldo::View::handleTransition() noexcept

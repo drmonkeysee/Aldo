@@ -52,7 +52,7 @@ static int run_app(void)
 }
 
 //
-// App Entrypoint
+// MARK: - App Entrypoint
 //
 
 int main(int argc, char *argv[argc+1])

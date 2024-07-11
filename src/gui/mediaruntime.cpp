@@ -68,7 +68,7 @@ auto create_bouncer_texture(SDL_Point screenResolution,
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 aldo::SdlLib::SdlLib()

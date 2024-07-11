@@ -51,7 +51,7 @@ struct dis_instruction {
 
 #include "bridgeopen.h"
 //
-// Export
+// MARK: - Export
 //
 
 br_libexport
@@ -100,7 +100,7 @@ bool dis_inst_equal(const struct dis_instruction *lhs,
                     const struct dis_instruction *rhs);
 
 //
-// Internal
+// MARK: - Internal
 //
 
 int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,

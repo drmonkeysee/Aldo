@@ -102,7 +102,7 @@ typedef struct cartridge cart;
 
 #include "bridgeopen.h"
 //
-// Export
+// MARK: - Export
 //
 
 br_libexport
@@ -133,7 +133,7 @@ br_libexport
 struct blockview cart_chrblock(cart *self, size_t i) br_nothrow;
 
 //
-// Internal
+// MARK: - Internal
 //
 
 bool cart_mbus_connect(cart *self, bus *b, uint16_t addr) br_nothrow;

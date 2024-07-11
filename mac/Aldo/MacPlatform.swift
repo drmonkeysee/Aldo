@@ -65,7 +65,7 @@ fileprivate struct FilterSequence: Sequence, IteratorProtocol {
 }
 
 //
-// Platform Implementation
+// MARK: - Platform Implementation
 //
 
 fileprivate func appName() -> CBuffer? {
@@ -147,7 +147,7 @@ fileprivate func launchStudio() {
 fileprivate func freeBuffer(_ buffer: CBuffer?) { buffer?.deallocate() }
 
 //
-// Helpers
+// MARK: - Helpers
 //
 
 fileprivate func aldoAlert(title: String, message: String) -> Bool {

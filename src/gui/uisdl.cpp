@@ -25,7 +25,7 @@ namespace
 {
 
 //
-// UI Loop Implementation
+// MARK: - UI Loop Implementation
 //
 
 auto handle_input(aldo::Emulator& emu, aldo::viewstate& vs,
@@ -71,7 +71,7 @@ auto runloop(const gui_platform& p, debugger* debug, nes* console)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 int aldo::ui_sdl_runloop(const gui_platform* platform, debugger* debug,

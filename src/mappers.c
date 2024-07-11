@@ -41,7 +41,7 @@ static int load_blocks(uint8_t *restrict *mem, size_t size, FILE *f)
 }
 
 //
-// Common Implementation
+// MARK: - Common Implementation
 //
 
 static void clear_bus_device(const struct mapper *self, bus *b, uint16_t addr)
@@ -51,7 +51,7 @@ static void clear_bus_device(const struct mapper *self, bus *b, uint16_t addr)
 }
 
 //
-// Raw ROM Image Implementation
+// MARK: - Raw ROM Image Implementation
 //
 
 static bool raw_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
@@ -98,7 +98,7 @@ static bool raw_mbus_connect(struct mapper *self, bus *b, uint16_t addr)
 }
 
 //
-// iNES Implementation
+// MARK: - iNES Implementation
 //
 
 static void ines_dtor(struct mapper *self)
@@ -134,7 +134,7 @@ static bool ines_unimplemented_mbus_connect(struct mapper *self, bus *b,
 }
 
 //
-// iNES 000
+// MARK: - iNES 000
 //
 
 static bool ines_000_read(void *restrict ctx, uint16_t addr,
@@ -170,7 +170,7 @@ static bool ines_000_mbus_connect(struct mapper *self, bus *b, uint16_t addr)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 int mapper_raw_create(struct mapper **m, FILE *f)

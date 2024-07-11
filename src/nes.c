@@ -215,7 +215,7 @@ static void instruction_trace(struct nes001 *self,
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 nes *nes_new(debugger *dbg, bool bcdsupport, FILE *tracelog)

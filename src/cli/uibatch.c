@@ -47,7 +47,7 @@ static void handle_sigint(int sig, siginfo_t *info, void *uap)
 }
 
 //
-// UI Loop Implementation
+// MARK: - UI Loop Implementation
 //
 
 static int init_ui(void)
@@ -134,7 +134,7 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 int ui_batch_loop(struct emulator *emu)

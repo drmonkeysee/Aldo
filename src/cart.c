@@ -177,7 +177,7 @@ static void write_raw_info(FILE *f)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 const char *cart_errstr(int err)
@@ -347,7 +347,7 @@ struct blockview cart_chrblock(cart *self, size_t i)
 }
 
 //
-// Internal Interface
+// MARK: - Internal Interface
 //
 
 bool cart_mbus_connect(cart *self, bus *b, uint16_t addr)

@@ -53,7 +53,7 @@ auto parse_colors(const pal_buf& buf)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 aldo::palette::datav aldo::Palette::getColor(aldo::palette::sz idx) const

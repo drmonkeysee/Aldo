@@ -13,7 +13,7 @@
 #include <stddef.h>
 
 //
-// State Management
+// MARK: - State Management
 //
 
 static void detach(struct mos6502 *self)
@@ -29,7 +29,7 @@ static void attach(struct mos6502 *self)
 }
 
 //
-// Internal Operations
+// MARK: - Internal Operations
 //
 
 static void read(struct mos6502 *self)
@@ -98,7 +98,7 @@ static void update_n(struct mos6502 *self, uint8_t d)
 }
 
 //
-// Interrupt Detection
+// MARK: - Interrupt Detection
 //
 
 // NOTE: check interrupt lines (active low) on ϕ2 to
@@ -208,7 +208,7 @@ static bool reset_held(struct mos6502 *self)
 }
 
 //
-// Instruction Execution
+// MARK: - Instruction Execution
 //
 
 // NOTE: finish an instruction by polling for interrupts and signaling the
@@ -851,7 +851,7 @@ static void TYA_exec(struct mos6502 *self)
 }
 
 //
-// Unofficial Instructions
+// MARK: - Unofficial Instructions
 //
 
 // NOTE: magic constant that interferes with accumulator varies based on
@@ -1068,7 +1068,7 @@ static void TAS_exec(struct mos6502 *self, struct decoded dec)
 }
 
 //
-// Instruction Dispatch
+// MARK: - Instruction Dispatch
 //
 
 static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
@@ -1084,7 +1084,7 @@ static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 }
 
 //
-// Addressing Mode Sequences
+// MARK: - Addressing Mode Sequences
 //
 
 // NOTE: addressing sequences approximate the cycle-by-cycle behavior of the
@@ -1597,7 +1597,7 @@ static void RTI_sequence(struct mos6502 *self, struct decoded dec)
 }
 
 //
-// Unofficial Addressing Modes
+// MARK: - Unofficial Addressing Modes
 //
 
 static void JAM_sequence(struct mos6502 *self, struct decoded dec)
@@ -1626,7 +1626,7 @@ static void JAM_sequence(struct mos6502 *self, struct decoded dec)
 }
 
 //
-// Address Mode Dispatch
+// MARK: - Address Mode Dispatch
 //
 
 static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
@@ -1644,7 +1644,7 @@ static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 // NOTE: all official opcodes max out at 7 cycles but a handful of

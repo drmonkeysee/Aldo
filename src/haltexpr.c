@@ -34,7 +34,7 @@ static int parse_resetvector(const char *restrict str, int *resetvector)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 const char *haltexpr_errstr(int err)

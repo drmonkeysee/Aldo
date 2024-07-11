@@ -19,7 +19,7 @@ static const int
     LineVBlank = 241, LinePreRender = 261;
 
 //
-// Registers
+// MARK: - Registers
 //
 
 static uint8_t get_ctrl(const struct rp2c02 *self)
@@ -135,7 +135,7 @@ static bool in_vblank(struct rp2c02 *self)
 }
 
 //
-// Main Bus Device (PPU registers)
+// MARK: - Main Bus Device (PPU registers)
 //
 
 static bool reg_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
@@ -251,7 +251,7 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
 }
 
 //
-// PPU Bus Device (Pattern Tables, Nametables, Palette)
+// MARK: - PPU Bus Device (Pattern Tables, Nametables, Palette)
 //
 
 static void read(struct rp2c02 *self)
@@ -273,7 +273,7 @@ static void write(struct rp2c02 *self)
 }
 
 //
-// Internal Operations
+// MARK: - Internal Operations
 //
 
 static int nextdot(struct rp2c02 *self)
@@ -401,7 +401,7 @@ static int cycle(struct rp2c02 *self)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 void ppu_connect(struct rp2c02 *self, bus *mbus)

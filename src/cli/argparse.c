@@ -223,7 +223,7 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 bool argparse_parse(struct cliargs *restrict args, int argc,

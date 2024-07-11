@@ -25,7 +25,7 @@ typedef struct debugger_context debugger;
 
 #include "bridgeopen.h"
 //
-// Export
+// MARK: - Export
 //
 
 br_libexport
@@ -58,7 +58,7 @@ br_libexport
 void debug_reset(debugger *self) br_nothrow;
 
 //
-// Internal
+// MARK: - Internal
 //
 
 void debug_cpu_connect(debugger *self, struct mos6502 *cpu) br_nothrow;

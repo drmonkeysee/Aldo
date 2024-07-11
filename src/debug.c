@@ -50,7 +50,7 @@ static void update_reset_override(struct debugger_context *self)
 }
 
 //
-// Bus Interception
+// MARK: - Bus Interception
 //
 
 static bool resetaddr_read(void *restrict ctx, uint16_t addr,
@@ -86,7 +86,7 @@ static size_t resetaddr_dma(const void *restrict ctx, uint16_t addr,
 }
 
 //
-// Breakpoints
+// MARK: - Breakpoints
 //
 
 static bool halt_address(const struct breakpoint *bp,
@@ -113,7 +113,7 @@ static bool halt_jammed(const struct mos6502 *cpu)
 }
 
 //
-// Breakpoint Vector
+// MARK: - Breakpoint Vector
 //
 
 static bool bpvector_valid_index(const struct breakpoint_vector *vec,
@@ -211,7 +211,7 @@ static void bpvector_free(struct breakpoint_vector *vec)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 const int NoResetVector = -1;
@@ -316,7 +316,7 @@ void debug_reset(debugger *self)
 }
 
 //
-// Internal Interface
+// MARK: - Internal Interface
 //
 
 void debug_cpu_connect(debugger *self, struct mos6502 *cpu)

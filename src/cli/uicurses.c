@@ -32,7 +32,7 @@
 #include <time.h>
 
 //
-// Run Loop Clock
+// MARK: - Run Loop Clock
 //
 
 // NOTE: Approximate 60 FPS for application event loop;
@@ -75,7 +75,7 @@ static void tick_sleep(struct runclock *c)
 }
 
 //
-// UI Widgets
+// MARK: - UI Widgets
 //
 
 static const char
@@ -655,7 +655,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 }
 
 //
-// UI Loop Implementation
+// MARK: - UI Loop Implementation
 //
 
 static void init_ui(struct layout *l, int ramsheets)
@@ -796,7 +796,7 @@ static void cleanup_ui(struct layout *l)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 int ui_curses_loop(struct emulator *emu)

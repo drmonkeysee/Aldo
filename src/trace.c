@@ -61,7 +61,7 @@ static void trace_registers(FILE *tracelog, const struct snapshot *snp)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 void trace_line(FILE *tracelog, uint64_t cycles, struct ppu_coord pixel,

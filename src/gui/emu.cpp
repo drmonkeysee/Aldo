@@ -68,7 +68,7 @@ auto update_bouncer(aldo::viewstate& vs, const snapshot& snp) noexcept
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 aldo::Emulator::Emulator(aldo::debug_handle d, aldo::console_handle n,
@@ -112,7 +112,7 @@ void aldo::Emulator::update(aldo::viewstate& vs) noexcept
 }
 
 //
-// Private Interface
+// MARK: - Private Interface
 //
 
 void aldo::Emulator::loadCartState()

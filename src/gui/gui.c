@@ -52,7 +52,7 @@ static int run_emu(const struct gui_platform *platform)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 int gui_run(const struct gui_platform *platform)

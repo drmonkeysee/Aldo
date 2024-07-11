@@ -309,7 +309,7 @@ static int run_with_args(const struct cliargs *args)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 int cli_run(int argc, char *argv[argc+1])

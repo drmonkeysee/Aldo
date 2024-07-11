@@ -474,7 +474,7 @@ static int write_chrblock(const struct blockview *bv, uint32_t scale,
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 const int MinChrScale = 1, MaxChrScale = 10;
@@ -734,7 +734,7 @@ bool dis_inst_equal(const struct dis_instruction *lhs,
 }
 
 //
-// Internal Interface
+// MARK: - Internal Interface
 //
 
 int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,

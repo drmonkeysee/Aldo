@@ -32,7 +32,7 @@ static struct partition *find(struct hardwarebus *self, uint16_t addr)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 bus *bus_new(int bitwidth, size_t n, ...)

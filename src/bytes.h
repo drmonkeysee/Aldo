@@ -63,7 +63,7 @@ enum {
 // undefined behavior if any pointer/array arguments are null.
 
 //
-// Export
+// MARK: - Export
 //
 
 // Bytes to Word
@@ -81,7 +81,7 @@ inline uint16_t batowr(const uint8_t bytes[br_csz(2)])
 }
 
 //
-// Internal
+// MARK: - Internal
 //
 
 // Word to Bytes

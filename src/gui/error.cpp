@@ -44,7 +44,7 @@ auto errno_message(std::string& label, int err)
 }
 
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 aldo::SdlError::SdlError(std::string message)
@@ -58,7 +58,7 @@ aldo::AldoError::AldoError(std::string title, std::string label, int errnoVal)
 : AldoError{std::move(title), errno_message(label, errnoVal)} {}
 
 //
-// Private Interface
+// MARK: - Private Interface
 //
 
 std::string aldo::AldoError::errMessage(int err, std::string&& errstr)

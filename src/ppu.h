@@ -106,6 +106,8 @@ struct rp2c02 {
 
 struct ppu_coord { int dot, line; };
 
+extern const uint16_t PaletteStartAddr;
+
 void ppu_connect(struct rp2c02 *self, bus *mbus);
 void ppu_powerup(struct rp2c02 *self);
 

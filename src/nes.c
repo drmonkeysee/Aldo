@@ -83,7 +83,6 @@ static bool vram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     // NOTE: addr=[$2000-$3FFF]
     // NOTE: palette reads still hit the VRAM bus and affect internal PPU
     // buffers, so the full 8KB range is valid input.
-    // TODO: implement this for ppu reads
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
     ram_load(d, ctx, addr);
@@ -94,10 +93,8 @@ static bool vram_write(void *ctx, uint16_t addr, uint8_t d)
 {
     // NOTE: addr=[$2000-$3EFF]
     // NOTE: writes to palette RAM should never hit the video bus
-    static const uint16_t palette_start = MEMBLOCK_16KB - MEMBLOCK_256B;
-    assert(MEMBLOCK_8KB <= addr && addr < palette_start);
+    assert(MEMBLOCK_8KB <= addr && addr < PaletteStartAddr);
 
-    if (addr >= palette_start) return false;
     ram_store(ctx, addr, d);
     return true;
 }
@@ -116,6 +113,7 @@ static size_t vram_dma(const void *restrict ctx, uint16_t addr, size_t count,
 static void create_mbus(struct nes001 *self)
 {
     // TODO: partitions so far:
+    // 16-bit Address Space = 64KB
     // * $0000 - $1FFF: 2KB RAM mirrored to 8KB
     // * $2000 - $3FFF: 8 PPU registers mirrored to 8KB
     // * $4000 - $7FFF: unmapped
@@ -134,12 +132,13 @@ static void create_mbus(struct nes001 *self)
 static void create_vbus(struct nes001 *self)
 {
     // TODO: partitions so far:
+    // 14-bit Address Space = 16KB
     // * $0000 - $1FFF: unmapped
     // * $2000 - $3FFF: 2KB RAM mirrored to 8KB; never writes to $3F00 - $3FFF
     // * $3F00 - $3FFF: 256B Palette RAM; internal to the PPU and thus not on
     //                  the video bus, but reads do leak through to the
     //                  underlying VRAM.
-    self->ppu.vbus = bus_new(BITWIDTH_16KB, 3, MEMBLOCK_8KB, MEMBLOCK_16KB);
+    self->ppu.vbus = bus_new(BITWIDTH_16KB, 2, MEMBLOCK_8KB);
     const bool r = bus_set(self->ppu.vbus, MEMBLOCK_8KB, (struct busdevice){
         vram_read,
         vram_write,

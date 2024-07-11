@@ -90,31 +90,6 @@ static bool palette_addr(uint16_t addr)
     return MEMBLOCK_16KB - MEMBLOCK_256B <= addr && addr < MEMBLOCK_16KB;
 }
 
-static void palette_read(struct rp2c02 *self)
-{
-    // TODO: implement
-}
-
-static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
-{
-    // NOTE: 32 addressable bytes, including mirrors
-    addr &= 0x1f;
-    // NOTE: background has 16 allocated slots while sprites have 12, making
-    // palette RAM only 28 bytes long; if the address points at a mirrored slot
-    // then mask it down to the actual slots in the lower 16, otherwise adjust
-    // the palette address down to the "real" sprite slot, accounting for the
-    // 4 missing entries at $3F10, $3F14, $3F18, and $3F1C.
-    if (addr & 0x10) {
-        if ((addr & 0x3) == 0) {
-            addr &= 0xf;
-        } else {
-            // NOTE: 0x1-0x3 adjust down 1, 0x5-0x7 adjust down 2, etc...
-            addr -= ((addr & 0xc) >> 2) + 1;
-        }
-    }
-    self->palette[addr] = d;
-}
-
 static bool rendering_disabled(struct rp2c02 *self)
 {
     return !self->ctrl.b && !self->ctrl.s;
@@ -137,6 +112,37 @@ static bool in_vblank(struct rp2c02 *self)
 //
 // MARK: - Main Bus Device (PPU registers)
 //
+
+static uint8_t palette_read(struct rp2c02 *self, uint16_t addr)
+{
+    // NOTE: addr=[$3F00-$3FFF]
+    assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
+
+    return 0;
+}
+
+static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
+{
+    // NOTE: addr=[$3F00-$3FFF]
+    assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
+
+    // NOTE: 32 addressable bytes, including mirrors
+    addr &= 0x1f;
+    // NOTE: background has 16 allocated slots while sprites have 12, making
+    // palette RAM only 28 bytes long; if the address points at a mirrored slot
+    // then mask it down to the actual slots in the lower 16, otherwise adjust
+    // the palette address down to the "real" sprite slot, accounting for the
+    // 4 missing entries at $3F10, $3F14, $3F18, and $3F1C.
+    if (addr & 0x10) {
+        if ((addr & 0x3) == 0) {
+            addr &= 0xf;
+        } else {
+            // NOTE: 0x1-0x3 adjust down 1, 0x5-0x7 adjust down 2, etc...
+            addr -= ((addr & 0xc) >> 2) + 1;
+        }
+    }
+    self->palette[addr] = d;
+}
 
 static bool reg_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
@@ -403,6 +409,8 @@ static int cycle(struct rp2c02 *self)
 //
 // MARK: - Public Interface
 //
+
+const uint16_t PaletteStartAddr = MEMBLOCK_16KB - MEMBLOCK_256B;
 
 void ppu_connect(struct rp2c02 *self, bus *mbus)
 {

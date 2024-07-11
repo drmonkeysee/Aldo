@@ -9,6 +9,7 @@
 #define Aldo_ctrlsignal_h
 
 enum csig_excmode {
+    CSGM_DOT,
     CSGM_CYCLE,
     CSGM_STEP,
     CSGM_RUN,

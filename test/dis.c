@@ -30,9 +30,8 @@ static struct dis_instruction create_instruction(size_t sz,
     return inst;
 }
 
-#pragma mark - Error Strings
 //
-// Error Strings
+// MARK: - Error Strings
 //
 
 static void errstr_returns_known_err(void *ctx)
@@ -49,9 +48,8 @@ static void errstr_returns_unknown_err(void *ctx)
     ct_assertequalstr("UNKNOWN ERR", err);
 }
 
-#pragma mark - Parse Instructions
 //
-// Parse Instructions
+// MARK: - Parse Instructions
 //
 
 static void parse_inst_empty_bankview(void *ctx)
@@ -293,9 +291,8 @@ static void parsemem_inst_out_of_bounds(void *ctx)
     ct_assertfalse(inst.d.unofficial);
 }
 
-#pragma mark - Mnemonics
 //
-// Mnemonics
+// MARK: - Mnemonics
 //
 
 static void mnemonic_valid(void *ctx)
@@ -331,9 +328,8 @@ static void mnemonic_invalid(void *ctx)
     ct_assertequalstr("UDF", result);
 }
 
-#pragma mark - Descriptions
 //
-// Descriptions
+// MARK: - Descriptions
 //
 
 static void description_valid(void *ctx)
@@ -369,9 +365,8 @@ static void description_invalid(void *ctx)
     ct_assertequalstr("Undefined", result);
 }
 
-#pragma mark - Address Mode Names
 //
-// Address Mode Names
+// MARK: - Address Mode Names
 //
 
 static void modename_valid(void *ctx)
@@ -407,9 +402,8 @@ static void modename_invalid(void *ctx)
     ct_assertequalstr("Implied", result);
 }
 
-#pragma mark - Flags
 //
-// Flags
+// MARK: - Flags
 //
 
 static void flags_valid(void *ctx)
@@ -445,9 +439,8 @@ static void flags_invalid(void *ctx)
     ct_assertequal(0x20u, result);
 }
 
-#pragma mark - Instruction Operand
 //
-// Instruction Operand
+// MARK: - Instruction Operand
 //
 
 static void inst_operand_empty_instruction(void *ctx)
@@ -501,9 +494,8 @@ static void inst_operand_two_byte_operand(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-#pragma mark - Instruction Equality
 //
-// Instruction Equality
+// MARK: - Instruction Equality
 //
 
 static void inst_eq_both_are_null(void *ctx)
@@ -573,9 +565,8 @@ static void inst_eq_same_object(void *ctx)
     ct_asserttrue(result);
 }
 
-#pragma mark - Disassemble Instruction
 //
-// Disassemble Instruction
+// MARK: - Disassemble Instruction
 //
 
 static void inst_does_nothing_if_no_bytes(void *ctx)
@@ -885,9 +876,8 @@ static void inst_disassembles_unofficial(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-#pragma mark - Disassemble Datapath
 //
-// Disassemble Datapath
+// MARK: - Disassemble Datapath
 //
 
 static void datapath_end_of_rom(void *ctx)
@@ -2478,9 +2468,8 @@ static void datapath_rst_cycle_six(void *ctx)
     ct_assertequalstrn(exp, buf, sizeof exp);
 }
 
-#pragma mark - Disassemble Peek
 //
-// Disassemble Peek
+// MARK: - Disassemble Peek
 //
 
 static void setup_peek(void **ctx)
@@ -2763,9 +2752,8 @@ static void peek_busfault(void *ctx)
     ct_assertfalse(cpu.detached);
 }
 
-#pragma mark - Test List
 //
-// Test List
+// MARK: - Test List
 //
 
 struct ct_testsuite dis_tests(void)

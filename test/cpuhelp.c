@@ -47,9 +47,8 @@ static bus *restrict TestBus;
 static struct busdevice Ram = {.read = test_read, .write = test_write},
                         Rom = {.read = test_read};
 
-#pragma mark - Public Interface
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 // NOTE: one page of rom + extra to test page boundary addressing

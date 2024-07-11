@@ -12,9 +12,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#pragma mark - Immediate Instructions
 //
-// Immediate Instructions
+// MARK: - Immediate Instructions
 //
 
 static void adc(void *ctx)
@@ -2382,9 +2381,8 @@ static void sbc_bcd_visual6502_cases(void *ctx)
     }
 }
 
-#pragma mark - Unofficial Opcodes
 //
-// Unofficial Opcodes
+// MARK: - Unofficial Opcodes
 //
 
 static void alr(void *ctx)
@@ -3465,9 +3463,8 @@ static void usbc_bcd_not_supported(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-#pragma mark - Test List
 //
-// Test List
+// MARK: - Test List
 //
 
 struct ct_testsuite cpu_immediate_tests(void)

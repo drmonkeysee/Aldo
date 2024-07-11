@@ -371,9 +371,8 @@ static void peek_busfault(void *ctx)
     ct_asserttrue(result.busfault);
 }
 
-#pragma mark - Test List
 //
-// Test List
+// MARK: - Test List
 //
 
 struct ct_testsuite cpu_peek_tests(void)

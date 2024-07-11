@@ -869,9 +869,8 @@ static void double_dash_ends_option_parsing_unordered(void *ctx)
     ct_assertequalstr("test.rom", argparse_filename(args->filepath));
 }
 
-#pragma mark - Test List
 //
-// Test List
+// MARK: - Test List
 //
 
 struct ct_testsuite argparse_tests(void)

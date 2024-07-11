@@ -12,9 +12,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#pragma mark - Absolute Instructions
 //
-// Absolute Instructions
+// MARK: - Absolute Instructions
 //
 
 static void adc_abs(void *ctx)
@@ -413,9 +412,8 @@ static void sty_abs(void *ctx)
     ct_assertequal(0x84u, mem[516]);
 }
 
-#pragma mark - Absolute,X Instructions
 //
-// Absolute,X Instructions
+// MARK: - Absolute,X Instructions
 //
 
 static void adc_absx(void *ctx)
@@ -1012,9 +1010,8 @@ static void sta_absx_pagecross(void *ctx)
     ct_assertequal(0xau, mem[514]);
 }
 
-#pragma mark - Absolute,Y Instructions
 //
-// Absolute,Y Instructions
+// MARK: - Absolute,Y Instructions
 //
 
 static void adc_absy(void *ctx)
@@ -1359,9 +1356,8 @@ static void sta_absy_pagecross(void *ctx)
     ct_assertequal(0xau, mem[514]);
 }
 
-#pragma mark - Unofficial Opcodes
 //
-// Unofficial Opcodes
+// MARK: - Unofficial Opcodes
 //
 
 static void dcp_abs(void *ctx)
@@ -2448,9 +2444,8 @@ static void tas_absy_pagecross(void *ctx)
     ct_asserttrue(cpu.bflt);
 }
 
-#pragma mark - Test List
 //
-// Test List
+// MARK: - Test List
 //
 
 struct ct_testsuite cpu_absolute_tests(void)

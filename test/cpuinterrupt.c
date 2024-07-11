@@ -15,9 +15,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#pragma mark - Interrupt Handling
 //
-// Interrupt Handling
+// MARK: - Interrupt Handling
 //
 
 static void interrupt_handler_setup(void **ctx)
@@ -1071,9 +1070,8 @@ static void rst_late_on_nmi(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-#pragma mark - Interrupt Signal Detection
 //
-// Interrupt Signal Detection
+// MARK: - Interrupt Signal Detection
 //
 
 static void clear_on_startup(void *ctx)
@@ -2160,9 +2158,8 @@ static void rst_too_short(void *ctx)
     ct_assertequal(2u, cpu.pc);
 }
 
-#pragma mark - Test Lists
 //
-// Test Lists
+// MARK: - Test Lists
 //
 
 struct ct_testsuite cpu_interrupt_handler_tests(void)

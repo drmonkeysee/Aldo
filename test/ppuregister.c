@@ -14,9 +14,8 @@
 
 #include <stdint.h>
 
-#pragma mark - PPUCTRL
 //
-// PPUCTRL
+// MARK: - PPUCTRL
 //
 
 static void ppuctrl_write(void *ctx)
@@ -94,9 +93,8 @@ static void ppuctrl_read(void *ctx)
     ct_assertequal(0x5au, d);
 }
 
-#pragma mark - PPUMASK
 //
-// PPUMASK
+// MARK: - PPUMASK
 //
 
 static void ppumask_write(void *ctx)
@@ -166,9 +164,8 @@ static void ppumask_read(void *ctx)
     ct_assertequal(0x5au, d);
 }
 
-#pragma mark - PPUSTATUS
 //
-// PPUSTATUS
+// MARK: - PPUSTATUS
 //
 
 static void ppustatus_read_when_clear(void *ctx)
@@ -277,9 +274,8 @@ static void ppustatus_write(void *ctx)
     ct_asserttrue(ppu->w);
 }
 
-#pragma mark - OAMADDR
 //
-// OAMADDR
+// MARK: - OAMADDR
 //
 
 static void oamaddr_write(void *ctx)
@@ -340,9 +336,8 @@ static void oamaddr_read(void *ctx)
     ct_assertequal(0x5au, d);
 }
 
-#pragma mark - OAMDATA
 //
-// OAMDATA
+// MARK: - OAMDATA
 //
 
 static void oamdata_write(void *ctx)
@@ -585,9 +580,8 @@ static void oamdata_read_mirrored(void *ctx)
     ct_assertequal(0u, ppu->oamaddr);
 }
 
-#pragma mark - PPUSCROLL
 //
-// PPUSCROLL
+// MARK: - PPUSCROLL
 //
 
 static void ppuscroll_write(void *ctx)
@@ -686,9 +680,8 @@ static void ppuscroll_read(void *ctx)
     ct_assertequal(0x5au, d);
 }
 
-#pragma mark - PPUADDR
 //
-// PPUADDR
+// MARK: - PPUADDR
 //
 
 static void ppuaddr_write(void *ctx)
@@ -824,9 +817,8 @@ static void ppu_addr_scroll_interleave(void *ctx)
     ct_assertfalse(ppu->w);
 }
 
-#pragma mark - PPUDATA
 //
-// PPUDATA
+// MARK: - PPUDATA
 //
 
 static void ppudata_write_in_vblank(void *ctx)
@@ -2464,9 +2456,8 @@ static void ppudata_read_during_rendering(void *ctx)
     ct_assertfail("implement test");
 }
 
-#pragma mark - Test List
 //
-// Test List
+// MARK: - Test List
 //
 
 struct ct_testsuite ppu_register_tests(void)

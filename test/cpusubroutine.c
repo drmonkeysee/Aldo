@@ -12,9 +12,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#pragma mark - Subroutine Instructions
 //
-// Subroutine Instructions
+// MARK: - Subroutine Instructions
 //
 
 static void jsr(void *ctx)
@@ -49,9 +48,8 @@ static void rts(void *ctx)
     ct_assertequal(4u, cpu.s);
 }
 
-#pragma mark - Test List
 //
-// Test List
+// MARK: - Test List
 //
 
 struct ct_testsuite cpu_subroutine_tests(void)

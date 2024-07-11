@@ -9,9 +9,8 @@
 
 #include <stddef.h>
 
-#pragma mark - Test Suites
 //
-// Test Suites
+// MARK: - Test Suites
 //
 
 void
@@ -73,9 +72,8 @@ static size_t testrunner(int argc, char *argv[argc+1])
     return result;
 }
 
-#pragma mark - Public Interface
 //
-// Public Interface
+// MARK: - Public Interface
 //
 
 size_t swift_runner(void)

@@ -11,9 +11,8 @@
 #include <stddef.h>
 #include <string.h>
 
-#pragma mark - Error Strings
 //
-// Error Strings
+// MARK: - Error Strings
 //
 
 static void errstr_returns_known_err(void *ctx)
@@ -30,9 +29,8 @@ static void errstr_returns_unknown_err(void *ctx)
     ct_assertequalstr("UNKNOWN ERR", err);
 }
 
-#pragma mark - Expression Parse
 //
-// Expression Parse
+// MARK: - Expression Parse
 //
 
 static void null_string(void *ctx)
@@ -444,9 +442,8 @@ static void expr_missing_unit(void *ctx)
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
-#pragma mark - Reset Vector Parse
 //
-// Reset Vector Parse
+// MARK: - Reset Vector Parse
 //
 
 static void null_resetvector_string(void *ctx)
@@ -606,9 +603,8 @@ static void dbgexpr_malformed(void *ctx)
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
-#pragma mark - Expression Description
 //
-// Expression Description
+// MARK: - Expression Description
 //
 
 static void print_none(void *ctx)
@@ -685,9 +681,8 @@ static void print_jam(void *ctx)
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
-#pragma mark - Debug Expression Serialization
 //
-// Debug Expression Serialization
+// MARK: - Debug Expression Serialization
 //
 
 static void format_reset(void *ctx)
@@ -778,9 +773,8 @@ static void format_jam(void *ctx)
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
-#pragma mark - Test List
 //
-// Test List
+// MARK: - Test List
 //
 
 struct ct_testsuite haltexpr_tests(void)

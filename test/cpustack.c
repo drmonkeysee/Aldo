@@ -13,9 +13,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#pragma mark - Stack Instructions
 //
-// Stack Instructions
+// MARK: - Stack Instructions
 //
 
 static void pha(void *ctx)
@@ -233,9 +232,8 @@ static void plp_wraparound(void *ctx)
     ct_assertequal(0u, cpu.s);
 }
 
-#pragma mark - Test List
 //
-// Test List
+// MARK: - Test List
 //
 
 struct ct_testsuite cpu_stack_tests(void)

@@ -14,9 +14,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#pragma mark - Branch Instructions
 //
-// Branch Instructions
+// MARK: - Branch Instructions
 //
 
 static void bcc_nobranch(void *ctx)
@@ -302,9 +301,8 @@ static void bvs_branch(void *ctx)
     ct_assertequal(7u, cpu.pc);
 }
 
-#pragma mark - Test List
 //
-// Test List
+// MARK: - Test List
 //
 
 struct ct_testsuite cpu_branch_tests(void)

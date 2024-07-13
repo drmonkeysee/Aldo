@@ -162,14 +162,14 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
 
     cursor_y += 2;
     const enum csig_excmode mode = nes_mode(emu->console);
-    mvwaddstr(v->content, cursor_y, 0, "Mode: ");
+    mvwaddstr(v->content, cursor_y, 0, "Mode:");
     drawtoggle(v, " Dot ", mode == CSGM_DOT);
-    drawtoggle(v, " Cyc ", mode == CSGM_CYCLE);
-    drawtoggle(v, " Stp ", mode == CSGM_STEP);
+    drawtoggle(v, " Cycle ", mode == CSGM_CYCLE);
+    drawtoggle(v, " Step ", mode == CSGM_STEP);
     drawtoggle(v, " Run ", mode == CSGM_RUN);
 
     cursor_y += 2;
-    mvwaddstr(v->content, cursor_y, 0, "Signal: ");
+    mvwaddstr(v->content, cursor_y, 0, "Signal:");
     drawtoggle(v, " IRQ ", nes_probe(emu->console, CSGI_IRQ));
     drawtoggle(v, " NMI ", nes_probe(emu->console, CSGI_NMI));
     drawtoggle(v, " RST ", nes_probe(emu->console, CSGI_RST));

@@ -237,5 +237,6 @@ cython_debug/
 *.diff
 *.nes
 *.out
+*.pal
 *.r[ao]m
 ext/

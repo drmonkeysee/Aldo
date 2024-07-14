@@ -187,14 +187,6 @@ static void teardown(struct nes001 *self)
     bus_free(self->cpu.mbus);
 }
 
-static void set_cpu_pins(struct nes001 *self)
-{
-    // NOTE: interrupt lines are active low
-    self->cpu.signal.irq = !self->probe.irq;
-    self->cpu.signal.nmi = !self->probe.nmi && self->ppu.signal.intr;
-    self->cpu.signal.rst = !self->probe.rst;
-}
-
 static void set_ppu_pins(struct nes001 *self)
 {
     // NOTE: interrupt lines are active low
@@ -204,13 +196,22 @@ static void set_ppu_pins(struct nes001 *self)
     self->ppu.signal.rw |= self->cpu.signal.rw;
 }
 
+static void set_pins(struct nes001 *self)
+{
+    // NOTE: interrupt lines are active low
+    self->cpu.signal.irq = !self->probe.irq;
+    self->cpu.signal.nmi = !self->probe.nmi && self->ppu.signal.intr;
+    self->cpu.signal.rst = !self->probe.rst;
+    set_ppu_pins(self);
+}
+
 static bool clock_subcycles(struct nes001 *self, struct cycleclock *clock)
 {
     while (clock->subcycle++ < PpuRatio) {
         clock->frames += (uint64_t)ppu_cycle(&self->ppu);
-        set_ppu_pins(self);
         // TODO: ppu debug hook goes here
         if (self->mode == CSGM_SUBCYCLE && clock->subcycle < PpuRatio) {
+            set_ppu_pins(self);
             nes_ready(self, false);
             return false;
         }
@@ -367,7 +368,7 @@ void nes_cycle(nes *self, struct cycleclock *clock)
     while (self->cpu.signal.rdy && clock->budget > 0) {
         if (!clock_subcycles(self, clock)) continue;
         const int cycles = cpu_cycle(&self->cpu);
-        set_cpu_pins(self);
+        set_pins(self);
         clock->budget -= cycles;
         clock->cycles += (uint64_t)cycles;
         instruction_trace(self, clock, -cycles);

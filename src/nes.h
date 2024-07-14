@@ -48,7 +48,7 @@ void nes_set_probe(nes *self, enum csig_interrupt signal,
                    bool active) br_nothrow;
 
 br_libexport
-void nes_cycle(nes *self, struct cycleclock *clock) br_nothrow;
+void nes_clock(nes *self, struct cycleclock *clock) br_nothrow;
 
 br_libexport
 void nes_snapshot(nes *self, struct snapshot *snp) br_nothrow;

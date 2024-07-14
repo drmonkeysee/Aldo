@@ -83,7 +83,7 @@ static void tick_start(struct runclock *c, const struct snapshot *snp)
 
 static void emu_update(struct emulator *emu, struct runclock *c)
 {
-    nes_cycle(emu->console, &c->cyclock);
+    nes_clock(emu->console, &c->cyclock);
     nes_snapshot(emu->console, &emu->snapshot);
 }
 

@@ -763,7 +763,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
 
 static void emu_update(struct emulator *emu, struct viewstate *vs)
 {
-    nes_cycle(emu->console, &vs->clock.cyclock);
+    nes_clock(emu->console, &vs->clock.cyclock);
     nes_snapshot(emu->console, &emu->snapshot);
 }
 

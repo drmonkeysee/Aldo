@@ -360,7 +360,7 @@ void nes_set_probe(nes *self, enum csig_interrupt signal, bool active)
     }
 }
 
-void nes_cycle(nes *self, struct cycleclock *clock)
+void nes_clock(nes *self, struct cycleclock *clock)
 {
     assert(self != NULL);
     assert(clock != NULL);

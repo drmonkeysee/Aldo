@@ -17,6 +17,7 @@ struct cycleclock {
     uint64_t cycles, frames, ticks;
     double emutime, runtime, ticktime_ms, timebudget_ms;
     int budget, cycles_per_sec;
+    uint8_t subcycle;
 };
 
 #include "bridgeopen.h"

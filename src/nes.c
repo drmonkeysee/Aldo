@@ -187,15 +187,35 @@ static void teardown(struct nes001 *self)
     bus_free(self->cpu.mbus);
 }
 
-static void set_pins(struct nes001 *self)
+static void set_cpu_pins(struct nes001 *self)
 {
     // NOTE: interrupt lines are active low
     self->cpu.signal.irq = !self->probe.irq;
     self->cpu.signal.nmi = !self->probe.nmi && self->ppu.signal.intr;
-    self->ppu.signal.rst = self->cpu.signal.rst = !self->probe.rst;
+    self->cpu.signal.rst = !self->probe.rst;
+}
+
+static void set_ppu_pins(struct nes001 *self)
+{
+    // NOTE: interrupt lines are active low
+    self->ppu.signal.rst = !self->probe.rst;
     // NOTE: pull PPU's CPU R/W signal back up if CPU is no longer pulling it
     // low (pulled low by PPU register writes).
     self->ppu.signal.rw |= self->cpu.signal.rw;
+}
+
+static bool clock_subcycles(struct nes001 *self, struct cycleclock *clock)
+{
+    while (clock->subcycle++ < PpuRatio) {
+        clock->frames += (uint64_t)ppu_cycle(&self->ppu);
+        set_ppu_pins(self);
+        if (self->mode == CSGM_DOT && clock->subcycle < PpuRatio) {
+            nes_ready(self, false);
+            return false;
+        }
+    }
+    clock->subcycle = 0;
+    return true;
 }
 
 // NOTE: trace the just-fetched instruction
@@ -344,19 +364,16 @@ void nes_cycle(nes *self, struct cycleclock *clock)
     assert(clock != NULL);
 
     while (self->cpu.signal.rdy && clock->budget > 0) {
-        for (int i = 0; i < PpuRatio; ++i) {
-            clock->frames += (uint64_t)ppu_cycle(&self->ppu);
-        }
+        if (!clock_subcycles(self, clock)) continue;
         const int cycles = cpu_cycle(&self->cpu);
-        set_pins(self);
+        set_cpu_pins(self);
         clock->budget -= cycles;
         clock->cycles += (uint64_t)cycles;
         instruction_trace(self, clock, -cycles);
 
         switch (self->mode) {
-        default:
-            assert(((void)"INVALID EXC MODE", false));
-            // NOTE: release build fallthrough to single-cycle
+        // NOTE: both DOT and CYCLE hit this case on cycle-boundary
+        case CSGM_DOT:
         case CSGM_CYCLE:
             nes_ready(self, false);
             break;
@@ -364,6 +381,7 @@ void nes_cycle(nes *self, struct cycleclock *clock)
             nes_ready(self, !self->cpu.signal.sync);
             break;
         case CSGM_RUN:
+        default:
             break;
         }
         debug_check(self->dbg, clock);

@@ -93,6 +93,7 @@ struct rp2c02 {
     uint8_t rbuf,               // PPUDATA Read Buffer
             x;                  // Fine X Scroll (3 bits)
     bool
+        bflt,                   // Bus fault
         cvp,                    // Pending CPU VRAM Operation
         odd,                    // Current frame is even or odd
         w;                      // Write latch for x2 registers

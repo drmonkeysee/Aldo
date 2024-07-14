@@ -27,6 +27,7 @@ static void powerup_initializes_ppu(void *ctx)
     ct_asserttrue(ppu->signal.wr);
     ct_assertfalse(ppu->signal.vout);
     ct_assertfalse(ppu->status.s);
+    ct_assertfalse(ppu->bflt);
 }
 
 //

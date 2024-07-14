@@ -35,7 +35,7 @@ struct snapshot {
         enum csig_state rst;
         uint16_t addressbus, scrolladdr, tempaddr, dot, line;
         uint8_t databus, readbuffer, register_databus, register_select, xfine;
-        bool cv_pending, oddframe, writelatch;
+        bool busfault, cv_pending, oddframe, writelatch;
     } pdatapath;
     struct {
         uint16_t program_counter;

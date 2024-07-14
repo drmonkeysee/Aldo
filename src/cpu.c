@@ -1688,9 +1688,6 @@ int cpu_cycle(struct mos6502 *self)
         self->presync = false;
         self->t = prefetch;
     }
-    if (self->bflt) {
-        self->bflt = false;
-    }
 
     latch_interrupts(self);
     if (++self->t == 0) {

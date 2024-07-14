@@ -536,8 +536,12 @@ static int draw_pdatapath(const struct view *v, int cursor_y, int w,
                     ArrowRight);
 
     mvwprintw(v->content, ++cursor_y, 0, "r: %02X", snp->pdatapath.readbuffer);
-    mvwprintw(v->content, cursor_y, buscol + 2, "%02X",
-              snp->pdatapath.databus);
+    if (snp->pdatapath.busfault) {
+        mvwaddstr(v->content, cursor_y, buscol + 1, "FLT");
+    } else {
+        mvwprintw(v->content, cursor_y, buscol + 1, " %02X",
+                  snp->pdatapath.databus);
+    }
     // NOTE: write line does not signal when writing to palette ram so use the
     // read signal to determine direction of databus flow.
     mvwaddstr(v->content, cursor_y, w - 1,

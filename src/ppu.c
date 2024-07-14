@@ -241,8 +241,7 @@ static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
                 ppu->t = (ppu->t & 0x7f00) | ppu->regbus;
                 ppu->v = ppu->t;
             } else {
-                ppu->t = (uint16_t)((ppu->t & 0xff)
-                                    | (ppu->regbus & 0x3f) << 8);
+                ppu->t = bytowr(ppu->t & 0xff, ppu->regbus & 0x3f);
             }
             ppu->w = !ppu->w;
             // TODO: there is some kind of bus conflict behavior i don't
@@ -278,9 +277,7 @@ static void write(struct rp2c02 *self)
     self->vdatabus = self->regbus;
     if (!palette_addr(self->vaddrbus)) {
         self->signal.wr = false;
-        // TODO: model bus fault?
-        const bool r = bus_write(self->vbus, self->vaddrbus, self->vdatabus);
-        assert(r);
+        self->bflt = !bus_write(self->vbus, self->vaddrbus, self->vdatabus);
     }
 }
 
@@ -440,7 +437,7 @@ void ppu_powerup(struct rp2c02 *self)
     self->regsel = self->oamaddr = 0;
     self->signal.intr = self->signal.rst = self->signal.rw = self->signal.rd =
         self->signal.wr = true;
-    self->signal.ale = self->signal.vout = self->status.s = false;
+    self->status.s = self->signal.ale = self->signal.vout = self->bflt = false;
 
     // NOTE: simulate rst set on startup to engage reset sequence
     self->rst = CSGS_PENDING;
@@ -475,6 +472,7 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
     snp->pdatapath.register_databus = self->regbus;
     snp->pdatapath.register_select = self->regsel;
     snp->pdatapath.xfine = self->x;
+    snp->pdatapath.busfault = self->bflt;
     snp->pdatapath.cv_pending = self->cvp;
     snp->pdatapath.oddframe = self->odd;
     snp->pdatapath.writelatch = self->w;

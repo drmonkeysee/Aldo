@@ -209,6 +209,7 @@ static bool clock_subcycles(struct nes001 *self, struct cycleclock *clock)
     while (clock->subcycle++ < PpuRatio) {
         clock->frames += (uint64_t)ppu_cycle(&self->ppu);
         set_ppu_pins(self);
+        // TODO: ppu debug hook goes here
         if (self->mode == CSGM_DOT && clock->subcycle < PpuRatio) {
             nes_ready(self, false);
             return false;

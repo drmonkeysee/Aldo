@@ -180,7 +180,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     mvwaddstr(v->content, ++cursor_y, 0, "Signal: i, n, s");
     mvwaddstr(v->content, ++cursor_y, 0,
               "Speed \u00b11 (\u00b110): -/= (_/+)");
-    mvwaddstr(v->content, ++cursor_y, 0, "Ram F/B: r/R");
+    mvwaddstr(v->content, ++cursor_y, 0, "Ram: r/R  Fwd/Bck: f/b");
     mvwaddstr(v->content, ++cursor_y, 0, "Quit: q");
 }
 
@@ -732,6 +732,15 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
             vs->clock.cyclock.cycles_per_sec = MinCps;
         }
         break;
+    case 'b':
+        --vs->ramsheet;
+        if (vs->ramsheet < 0) {
+            vs->ramsheet = vs->total_ramsheets - 1;
+        }
+        break;
+    case 'f':
+        vs->ramsheet = (vs->ramsheet + 1) % vs->total_ramsheets;
+        break;
     case 'i':
         nes_set_probe(emu->console, CSGI_IRQ,
                       !nes_probe(emu->console, CSGI_IRQ));
@@ -748,15 +757,6 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         break;
     case 'q':
         vs->running = false;
-        break;
-    case 'r':
-        vs->ramsheet = (vs->ramsheet + 1) % vs->total_ramsheets;
-        break;
-    case 'R':
-        --vs->ramsheet;
-        if (vs->ramsheet < 0) {
-            vs->ramsheet = vs->total_ramsheets - 1;
-        }
         break;
     case 's':
         nes_set_probe(emu->console, CSGI_RST,

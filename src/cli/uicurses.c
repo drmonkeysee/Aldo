@@ -471,7 +471,7 @@ static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
 {
     const uint8_t sel = snp->pdatapath.register_select;
     char sel_buf[4];
-    sprintf(sel_buf, "%1d%1d%1d", byte_getbit(sel, 2), byte_getbit(sel, 1),
+    sprintf(sel_buf, "%d%d%d", byte_getbit(sel, 2), byte_getbit(sel, 1),
             byte_getbit(sel, 0));
     draw_chip_vline(v, snp->plines.cpu_readwrite, cursor_y, line_x, 1,
                     ArrowDown, -1, sel_buf);

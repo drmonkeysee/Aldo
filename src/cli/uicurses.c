@@ -41,11 +41,19 @@
 static const int
     Fps = 60, RamColWidth = 3, RamDim = 16, RamPageSize = RamDim * RamDim;
 
+enum ram_selection {
+    RSEL_RAM,
+    RSEL_VRAM,
+    RSEL_OAM,
+    RSEL_COUNT,
+};
+
 struct viewstate {
     struct runclock {
         struct cycleclock cyclock;
         double tickleft_ms;
     } clock;
+    enum ram_selection ramselect;
     int ramsheet, total_ramsheets;
     bool running;
 };
@@ -573,9 +581,43 @@ static void drawppu(const struct view *v, const struct snapshot *snp)
     drawbottom_plines(v, cursor_y, line_x, snp);
 }
 
-static void drawram(const struct view *v, const struct emulator *emu)
+static void drawramtitle(const struct view *v, const struct viewstate *vs)
+{
+    static const int titlew = 16, tab1 = 2, tab2 = 7, tab3 = 13;
+    static const char
+        *const restrict ram = "RAM",
+        *const restrict vram = "VRAM",
+        *const restrict oam = "OAM",
+        *const restrict sel = "[%s]";
+
+    mvwhline(v->win, 0, 1, 0, titlew);
+    switch (vs->ramselect) {
+    case RSEL_RAM:
+        mvwprintw(v->win, 0, tab1 - 1, sel, ram);
+        mvwaddstr(v->win, 0, tab2, vram);
+        mvwaddstr(v->win, 0, tab3, oam);
+        break;
+    case RSEL_VRAM:
+        mvwaddstr(v->win, 0, tab1, ram);
+        mvwprintw(v->win, 0, tab2 - 1, sel, vram);
+        mvwaddstr(v->win, 0, tab3, oam);
+        break;
+    case RSEL_OAM:
+        mvwaddstr(v->win, 0, tab1, ram);
+        mvwaddstr(v->win, 0, tab2, vram);
+        mvwprintw(v->win, 0, tab3 - 1, sel, oam);
+        break;
+    default:
+        break;
+    }
+}
+
+static void drawram(const struct view *v, const struct viewstate *vs,
+                    const struct emulator *emu)
 {
     static const int start_x = 5;
+
+    drawramtitle(v, vs);
 
     const int h = getmaxy(v->content);
     int cursor_x = start_x, cursor_y = 0;
@@ -616,7 +658,9 @@ static void createwin(struct view *v, int h, int w, int y, int x,
     v->win = newwin(h, w, y, x);
     v->outer = new_panel(v->win);
     box(v->win, 0, 0);
-    mvwaddstr(v->win, 0, 1, title);
+    if (title) {
+        mvwaddstr(v->win, 0, 1, title);
+    }
 }
 
 static void vinit(struct view *v, int h, int w, int y, int x,
@@ -631,7 +675,7 @@ static void raminit(struct view *v, int h, int w, int y, int x, int ramsheets)
 {
     static const int toprail_start = 7;
 
-    createwin(v, h, w, y, x, "RAM");
+    createwin(v, h, w, y, x, NULL);
     v->content = newpad((h - 4) * ramsheets, w - 2);
     v->inner = NULL;
 
@@ -758,6 +802,15 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
     case 'q':
         vs->running = false;
         break;
+    case 'r':
+        vs->ramselect = (vs->ramselect + 1) % RSEL_COUNT;
+        break;
+    case 'R':
+        --vs->ramselect;
+        if ((int)vs->ramselect < 0) {
+            vs->ramselect = RSEL_COUNT - 1;
+        }
+        break;
     case 's':
         nes_set_probe(emu->console, CSGI_RST,
                       !nes_probe(emu->console, CSGI_RST));
@@ -780,7 +833,7 @@ static void refresh_ui(const struct layout *l, const struct viewstate *vs,
     drawprg(&l->prg, emu);
     drawcpu(&l->cpu, &emu->snapshot);
     drawppu(&l->ppu, &emu->snapshot);
-    drawram(&l->ram, emu);
+    drawram(&l->ram, vs, emu);
 
     update_panels();
     ramrefresh(&l->ram, vs);

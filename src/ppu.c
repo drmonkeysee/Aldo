@@ -150,7 +150,7 @@ static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
     self->palette[addr] = d;
 }
 
-static bool reg_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
+static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     // NOTE: addr=[$2000-$3FFF]
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
@@ -179,7 +179,7 @@ static bool reg_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     return true;
 }
 
-static bool reg_write(void *ctx, uint16_t addr, uint8_t d)
+static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
 {
     // NOTE: addr=[$2000-$3FFF]
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
@@ -420,8 +420,8 @@ void ppu_connect(struct rp2c02 *self, bus *mbus)
     assert(mbus != NULL);
 
     const bool r = bus_set(mbus, MEMBLOCK_8KB, (struct busdevice){
-        .read = reg_read,
-        .write = reg_write,
+        .read = regread,
+        .write = regwrite,
         .ctx = self,
     });
     assert(r);

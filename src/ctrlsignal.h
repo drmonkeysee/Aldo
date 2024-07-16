@@ -13,7 +13,7 @@ enum csig_excmode {
     CSGM_CYCLE,
     CSGM_STEP,
     CSGM_RUN,
-    CSGM_MODECOUNT,
+    CSGM_COUNT,
 };
 
 enum csig_interrupt {

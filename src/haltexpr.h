@@ -22,7 +22,7 @@ enum haltcondition {
 #define X(s, d) s,
     HEXPR_COND_X
 #undef X
-    HLT_CONDCOUNT,
+    HLT_COUNT,
 };
 
 #define HEXPR_RST_IND "!"

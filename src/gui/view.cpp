@@ -868,7 +868,7 @@ protected:
 private:
     // NOTE: does not include first enum value HLT_NONE
     using halt_array =
-        std::array<std::pair<haltcondition, aldo::et::str>, HLT_CONDCOUNT - 1>;
+        std::array<std::pair<haltcondition, aldo::et::str>, HLT_COUNT - 1>;
     using halt_it = halt_array::const_iterator;
     using bp_sz = aldo::Debugger::BpView::size_type;
     using bp_diff = aldo::Debugger::BreakpointIterator::difference_type;

@@ -68,7 +68,7 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
     bool parsed = false, valid = false;
     char u[2];
     struct haltexpr e;
-    for (int i = HLT_NONE + 1; i < HLT_CONDCOUNT; ++i) {
+    for (int i = HLT_NONE + 1; i < HLT_COUNT; ++i) {
         switch (i) {
         case HLT_ADDR:
             {

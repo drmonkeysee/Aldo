@@ -254,7 +254,7 @@ void debug_set_vector_override(debugger *self, int resetvector)
 void debug_bp_add(debugger *self, struct haltexpr expr)
 {
     assert(self != NULL);
-    assert(HLT_NONE < expr.cond && expr.cond < HLT_CONDCOUNT);
+    assert(HLT_NONE < expr.cond && expr.cond < HLT_COUNT);
 
     bpvector_insert(&self->breakpoints, expr);
 }

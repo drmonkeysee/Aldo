@@ -313,7 +313,7 @@ void nes_set_mode(nes *self, enum csig_excmode mode)
     assert(self != NULL);
 
     // NOTE: force signed to check < 0 (underlying type may be uint)
-    self->mode = (int)mode < 0 ? CSGM_MODECOUNT - 1 : mode % CSGM_MODECOUNT;
+    self->mode = (int)mode < 0 ? CSGM_COUNT - 1 : mode % CSGM_COUNT;
 }
 
 void nes_ready(nes *self, bool ready)

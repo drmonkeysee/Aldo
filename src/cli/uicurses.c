@@ -606,25 +606,35 @@ static void drawram(const struct view *v, const struct viewstate *vs,
 
     drawramtitle(v, vs);
 
-    const int h = getmaxy(v->content);
-    int cursor_x = start_x, cursor_y = 0;
+    const int
+        h = getmaxy(v->content),
+        page_count = (int)nes_ram_size(emu->console) / RamPageSize;
+    int cursor_x = start_x, cursor_y = 0, page_offset;
+    const uint8_t *mem;
+    if (vs->ramselect == RSEL_VRAM) {
+        page_offset = 0x20;
+        mem = emu->snapshot.mem.vram;
+    } else {
+        page_offset = 0;
+        mem = emu->snapshot.mem.ram;
+    }
     mvwvline(v->content, 0, start_x - 1, 0, h);
-    const int page_count = (int)nes_ram_size(emu->console) / RamPageSize;
     for (int page = 0; page < page_count; ++page) {
         for (int page_row = 0; page_row < RamDim; ++page_row) {
-            mvwprintw(v->content, cursor_y, 0, "%02X%X0", page, page_row);
+            mvwprintw(v->content, cursor_y, 0, "%02X%X0", page + page_offset,
+                      page_row);
             for (int page_col = 0; page_col < RamDim; ++page_col) {
                 const size_t ramidx = (size_t)((page * RamPageSize)
                                                + (page_row * RamDim)
                                                + page_col);
-                const bool sp = page == 1
+                const bool sp = vs->ramselect == RSEL_RAM
+                                && page == 1
                                 && ramidx % (size_t)RamPageSize
                                     == emu->snapshot.cpu.stack_pointer;
                 if (sp) {
                     wattron(v->content, A_STANDOUT);
                 }
-                mvwprintw(v->content, cursor_y, cursor_x, "%02X",
-                          emu->snapshot.mem.ram[ramidx]);
+                mvwprintw(v->content, cursor_y, cursor_x, "%02X", mem[ramidx]);
                 if (sp) {
                     wattroff(v->content, A_STANDOUT);
                 }

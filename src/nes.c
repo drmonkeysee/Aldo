@@ -134,7 +134,8 @@ static void create_vbus(struct nes001 *self)
     // TODO: partitions so far:
     // 14-bit Address Space = 16KB
     // * $0000 - $1FFF: unmapped
-    // * $2000 - $3FFF: 2KB RAM mirrored to 8KB; never writes to $3F00 - $3FFF
+    // * $2000 - $3FFF: 2KB RAM mirrored to 8KB, nametable-mirroring uses 4KB
+    //                  of address space; never writes to $3F00 - $3FFF
     // * $3F00 - $3FFF: 256B Palette RAM; internal to the PPU and thus not on
     //                  the video bus, but reads do leak through to the
     //                  underlying VRAM.
@@ -399,6 +400,7 @@ void nes_snapshot(nes *self, struct snapshot *snp)
     ppu_snapshot(&self->ppu, snp);
     debug_snapshot(self->dbg, snp);
     snp->mem.ram = self->ram;
+    snp->mem.vram = self->vram;
     snp->mem.prglength = bus_dma(self->cpu.mbus,
                                  snp->datapath.current_instruction,
                                  sizeof snp->mem.currprg

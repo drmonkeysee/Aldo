@@ -39,7 +39,8 @@
 // this will be enforced by actual vsync when ported to true GUI
 // and is *distinct* from emulator frequency which can be modified by the user.
 static const int
-    Fps = 60, RamColWidth = 3, RamDim = 16, RamPageSize = RamDim * RamDim;
+    Fps = 60,
+    RamColWidth = 3, RamDim = 16, RamPageSize = RamDim * RamDim;
 
 enum ram_selection {
     RSEL_RAM,

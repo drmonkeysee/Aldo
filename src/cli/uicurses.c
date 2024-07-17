@@ -763,8 +763,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 'b':
-        --vs->ramsheet;
-        if (vs->ramsheet < 0) {
+        if (--vs->ramsheet < 0) {
             vs->ramsheet = vs->total_ramsheets - 1;
         }
         break;
@@ -792,8 +791,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         vs->ramselect = (vs->ramselect + 1) % RSEL_COUNT;
         break;
     case 'R':
-        --vs->ramselect;
-        if ((int)vs->ramselect < 0) {
+        if ((int)--vs->ramselect < 0) {
             vs->ramselect = RSEL_COUNT - 1;
         }
         break;

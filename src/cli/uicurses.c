@@ -585,14 +585,12 @@ static void drawppu(const struct view *v, const struct snapshot *snp)
 static void drawramtitle(const struct view *v, const struct viewstate *vs)
 {
     static const int titlew = 16, offsets[] = {2, 7, 13};
-    static const char
-        *const restrict labels[] = {"RAM", "VRAM", "OAM"},
-        *const restrict sel = "[%s]";
+    static const char *const restrict labels[] = {"RAM", "VRAM", "OAM"};
 
     mvwhline(v->win, 0, 1, 0, titlew);
     for (size_t i = 0; i < RSEL_COUNT; ++i) {
         if (i == vs->ramselect) {
-            mvwprintw(v->win, 0, offsets[i] - 1, sel, labels[i]);
+            mvwprintw(v->win, 0, offsets[i] - 1, "[%s]", labels[i]);
         } else {
             mvwaddstr(v->win, 0, offsets[i], labels[i]);
         }

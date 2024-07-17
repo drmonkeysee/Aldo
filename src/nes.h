@@ -31,8 +31,8 @@ void nes_powerup(nes *self, cart *c, bool zeroram) br_nothrow;
 br_libexport
 void nes_powerdown(nes *self) br_nothrow;
 
+// NOTE: RAM and VRAM are the same size so one accessor for both
 br_libexport
-// NOTE: internal RAM and VRAM are same size so one accessor for both
 size_t nes_ram_size(nes *self) br_nothrow;
 br_libexport
 bool nes_bcd_support(nes *self) br_nothrow;

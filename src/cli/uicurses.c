@@ -583,32 +583,18 @@ static void drawppu(const struct view *v, const struct snapshot *snp)
 
 static void drawramtitle(const struct view *v, const struct viewstate *vs)
 {
-    static const int titlew = 16, tab1 = 2, tab2 = 7, tab3 = 13;
+    static const int titlew = 16, offsets[] = {2, 7, 13};
     static const char
-        *const restrict ram = "RAM",
-        *const restrict vram = "VRAM",
-        *const restrict oam = "OAM",
+        *const restrict labels[] = {"RAM", "VRAM", "OAM"},
         *const restrict sel = "[%s]";
 
     mvwhline(v->win, 0, 1, 0, titlew);
-    switch (vs->ramselect) {
-    case RSEL_RAM:
-        mvwprintw(v->win, 0, tab1 - 1, sel, ram);
-        mvwaddstr(v->win, 0, tab2, vram);
-        mvwaddstr(v->win, 0, tab3, oam);
-        break;
-    case RSEL_VRAM:
-        mvwaddstr(v->win, 0, tab1, ram);
-        mvwprintw(v->win, 0, tab2 - 1, sel, vram);
-        mvwaddstr(v->win, 0, tab3, oam);
-        break;
-    case RSEL_OAM:
-        mvwaddstr(v->win, 0, tab1, ram);
-        mvwaddstr(v->win, 0, tab2, vram);
-        mvwprintw(v->win, 0, tab3 - 1, sel, oam);
-        break;
-    default:
-        break;
+    for (size_t i = 0; i < RSEL_COUNT; ++i) {
+        if (i == vs->ramselect) {
+            mvwprintw(v->win, 0, offsets[i] - 1, sel, labels[i]);
+        } else {
+            mvwaddstr(v->win, 0, offsets[i], labels[i]);
+        }
     }
 }
 

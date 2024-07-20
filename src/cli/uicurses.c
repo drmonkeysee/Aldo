@@ -667,7 +667,7 @@ static void draw_membanks(const struct view *v, const struct emulator *emu,
 static void draw_ppumem(const struct view *v, const struct emulator *emu,
                         int start_x)
 {
-    static const int page2h = 6;
+    static const int sheeth = (RamDim * 2) + 1;
 
     int cursor_y = 0;
     const uint8_t oam[256] = {0x11, 0x22, 0x33};
@@ -684,10 +684,10 @@ static void draw_ppumem(const struct view *v, const struct emulator *emu,
     cursor_y = draw_mempage(v, emu, palette, RSEL_PPU, start_x, cursor_y, 0,
                             0x3f, 2);
     mvwhline(v->content, cursor_y - 1, 0, 0, getmaxx(v->content));
-    for (int i = 0; i < RamDim - page2h; ++i) {
-        wmove(v->content, cursor_y++, 0);
+    do {
+        wmove(v->content, cursor_y, 0);
         wclrtoeol(v->content);
-    }
+    } while (++cursor_y < sheeth);
 }
 
 static void drawram(const struct view *v, const struct viewstate *vs,

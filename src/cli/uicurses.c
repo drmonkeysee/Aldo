@@ -603,22 +603,35 @@ static int draw_mempage(const struct view *v, const struct emulator *emu,
                         int page_rows)
 {
     int cursor_x = start_x;
+    size_t skipped = 0;
     for (int page_row = 0; page_row < page_rows; ++page_row) {
+        if (sel != RSEL_PPU && page == 1) {
+            // NOTE: clear any leftover PPU diagrams
+            wclrtoeol(v->content);
+        }
         mvwprintw(v->content, cursor_y, 0, "%02X%X0", page + page_offset,
                   page_row);
         for (int page_col = 0; page_col < RamDim; ++page_col) {
             const size_t ramidx = (size_t)((page * RamPageSize)
                                            + (page_row * RamDim)
                                            + page_col);
-            const bool sp = sel == RSEL_RAM && page == 1
-                            && ramidx % (size_t)RamPageSize
-                                == emu->snapshot.cpu.stack_pointer;
-            if (sp) {
-                wattron(v->content, A_STANDOUT);
-            }
-            mvwprintw(v->content, cursor_y, cursor_x, "%02X", mem[ramidx]);
-            if (sp) {
-                wattroff(v->content, A_STANDOUT);
+            // NOTE: skip over palette's mirrored addresses
+            if (sel == RSEL_PPU && page_offset == 0x3f
+                && (ramidx & 0x13) == 0x10) {
+                mvwaddstr(v->content, cursor_y, cursor_x, "--");
+                ++skipped;
+            } else {
+                const bool sp = sel == RSEL_RAM && page == 1
+                                && ramidx % (size_t)RamPageSize
+                                    == emu->snapshot.cpu.stack_pointer;
+                if (sp) {
+                    wattron(v->content, A_STANDOUT);
+                }
+                mvwprintw(v->content, cursor_y, cursor_x, "%02X",
+                          mem[ramidx - skipped]);
+                if (sp) {
+                    wattroff(v->content, A_STANDOUT);
+                }
             }
             cursor_x += RamColWidth;
         }
@@ -634,9 +647,6 @@ static int draw_mempage(const struct view *v, const struct emulator *emu,
 static void draw_membanks(const struct view *v, const struct emulator *emu,
                           enum ram_selection sel, int start_x)
 {
-    const int
-        h = getmaxy(v->content),
-        page_count = (int)nes_ram_size(emu->console) / RamPageSize;
     int cursor_y = 0, page_offset;
     const uint8_t *mem;
     if (sel == RSEL_VRAM) {
@@ -646,11 +656,12 @@ static void draw_membanks(const struct view *v, const struct emulator *emu,
         page_offset = 0;
         mem = emu->snapshot.mem.ram;
     }
-    mvwvline(v->content, 0, start_x - 1, 0, h);
+    const int page_count = (int)nes_ram_size(emu->console) / RamPageSize;
     for (int page = 0; page < page_count; ++page) {
         cursor_y = draw_mempage(v, emu, mem, sel, start_x, cursor_y, page,
                                 page_offset, RamDim);
     }
+    mvwvline(v->content, 0, start_x - 1, 0, getmaxy(v->content));
 }
 
 static void draw_ppumem(const struct view *v, const struct emulator *emu,
@@ -659,7 +670,9 @@ static void draw_ppumem(const struct view *v, const struct emulator *emu,
     int cursor_y = 0;
     const uint8_t oam[256] = {0x11, 0x22, 0x33};
     const uint8_t roam[32] = {0xaa, 0xbb, 0xcc};
-    const uint8_t palette[32] = {0x99, 0x88, 0x77};
+    uint8_t palette[28] = {0x99, 0x88, 0x77};
+    palette[16] = 0x11;
+    palette[27] = 0xff;
     cursor_y = draw_mempage(v, emu, oam, RSEL_PPU, start_x, cursor_y, 0, 0,
                             RamDim);
     wclrtoeol(v->content);
@@ -668,7 +681,7 @@ static void draw_ppumem(const struct view *v, const struct emulator *emu,
     wclrtoeol(v->content);
     cursor_y = draw_mempage(v, emu, palette, RSEL_PPU, start_x, cursor_y, 0,
                             0x3f, 2);
-    wclrtoeol(v->content);
+    mvwhline(v->content, cursor_y - 1, 0, 0, getmaxx(v->content));
 }
 
 static void drawram(const struct view *v, const struct viewstate *vs,

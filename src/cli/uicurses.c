@@ -824,12 +824,16 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 'b':
-        if (--vs->ramsheet < 0) {
-            vs->ramsheet = vs->total_ramsheets - 1;
+        if (vs->ramselect != RSEL_PPU) {
+            if (--vs->ramsheet < 0) {
+                vs->ramsheet = vs->total_ramsheets - 1;
+            }
         }
         break;
     case 'f':
-        vs->ramsheet = (vs->ramsheet + 1) % vs->total_ramsheets;
+        if (vs->ramselect != RSEL_PPU) {
+            vs->ramsheet = (vs->ramsheet + 1) % vs->total_ramsheets;
+        }
         break;
     case 'i':
         nes_set_probe(emu->console, CSGI_IRQ,

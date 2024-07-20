@@ -484,6 +484,10 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
     snp->plines.reset = self->signal.rst;
     snp->plines.video_out = self->signal.vout;
     snp->plines.write = self->signal.wr;
+
+    snp->mem.oam = self->oam;
+    snp->mem.secondary_oam = self->soam;
+    snp->mem.palette = self->palette;
 }
 
 struct ppu_coord ppu_trace(const struct rp2c02 *self, int adjustment)

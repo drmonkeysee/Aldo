@@ -16,7 +16,10 @@
 
 struct snapshot {
     struct {
-        const uint8_t *ram, *vram;  // Non-owning Pointers
+        const uint8_t               // Non-owning Pointers
+            *ram, *vram,
+            *oam, *secondary_oam,
+            *palette;
         size_t prglength;           // Number of bytes copied to currprg
         uint8_t currprg[192],       // 64 lines @ max 3-byte instructions
                 vectors[6];

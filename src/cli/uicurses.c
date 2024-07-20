@@ -669,20 +669,14 @@ static void draw_ppumem(const struct view *v, const struct emulator *emu,
 {
     static const int sheeth = (RamDim * 2) + 1;
 
-    int cursor_y = 0;
-    const uint8_t oam[256] = {0x11, 0x22, 0x33};
-    const uint8_t roam[32] = {0xaa, 0xbb, 0xcc};
-    uint8_t palette[28] = {0x99, 0x88, 0x77};
-    palette[16] = 0x11;
-    palette[27] = 0xff;
-    cursor_y = draw_mempage(v, emu, oam, RSEL_PPU, start_x, cursor_y, 0, 0,
-                            RamDim);
+    int cursor_y = draw_mempage(v, emu, emu->snapshot.mem.oam, RSEL_PPU,
+                                start_x, 0, 0, 0, RamDim);
     wclrtoeol(v->content);
-    cursor_y = draw_mempage(v, emu, roam, RSEL_PPU, start_x, cursor_y, 0, 0,
-                            2);
+    cursor_y = draw_mempage(v, emu, emu->snapshot.mem.secondary_oam, RSEL_PPU,
+                            start_x, cursor_y, 0, 0, 2);
     wclrtoeol(v->content);
-    cursor_y = draw_mempage(v, emu, palette, RSEL_PPU, start_x, cursor_y, 0,
-                            0x3f, 2);
+    cursor_y = draw_mempage(v, emu, emu->snapshot.mem.palette, RSEL_PPU,
+                            start_x, cursor_y, 0, 0x3f, 2);
     mvwhline(v->content, cursor_y - 1, 0, 0, getmaxx(v->content));
     do {
         wmove(v->content, cursor_y, 0);

@@ -597,15 +597,47 @@ static void drawramtitle(const struct view *v, const struct viewstate *vs)
     }
 }
 
-static void draw_membanks(const struct view *v, const struct emulator *emu,
-                          enum ram_selection sel)
+static int draw_mempage(const struct view *v, const struct emulator *emu,
+                        const uint8_t *mem, enum ram_selection sel,
+                        int start_x, int cursor_y, int page, int page_offset,
+                        int page_rows)
 {
-    static const int start_x = 5;
+    int cursor_x = start_x;
+    for (int page_row = 0; page_row < page_rows; ++page_row) {
+        mvwprintw(v->content, cursor_y, 0, "%02X%X0", page + page_offset,
+                  page_row);
+        for (int page_col = 0; page_col < RamDim; ++page_col) {
+            const size_t ramidx = (size_t)((page * RamPageSize)
+                                           + (page_row * RamDim)
+                                           + page_col);
+            const bool sp = sel == RSEL_RAM && page == 1
+                            && ramidx % (size_t)RamPageSize
+                                == emu->snapshot.cpu.stack_pointer;
+            if (sp) {
+                wattron(v->content, A_STANDOUT);
+            }
+            mvwprintw(v->content, cursor_y, cursor_x, "%02X", mem[ramidx]);
+            if (sp) {
+                wattroff(v->content, A_STANDOUT);
+            }
+            cursor_x += RamColWidth;
+        }
+        cursor_x = start_x;
+        ++cursor_y;
+    }
+    if (page % 2 == 0) {
+        ++cursor_y;
+    }
+    return cursor_y;
+}
 
+static void draw_membanks(const struct view *v, const struct emulator *emu,
+                          enum ram_selection sel, int start_x)
+{
     const int
         h = getmaxy(v->content),
         page_count = (int)nes_ram_size(emu->console) / RamPageSize;
-    int cursor_x = start_x, cursor_y = 0, page_offset;
+    int cursor_y = 0, page_offset;
     const uint8_t *mem;
     if (sel == RSEL_VRAM) {
         page_offset = 0x20;
@@ -616,49 +648,40 @@ static void draw_membanks(const struct view *v, const struct emulator *emu,
     }
     mvwvline(v->content, 0, start_x - 1, 0, h);
     for (int page = 0; page < page_count; ++page) {
-        for (int page_row = 0; page_row < RamDim; ++page_row) {
-            mvwprintw(v->content, cursor_y, 0, "%02X%X0", page + page_offset,
-                      page_row);
-            for (int page_col = 0; page_col < RamDim; ++page_col) {
-                const size_t ramidx = (size_t)((page * RamPageSize)
-                                               + (page_row * RamDim)
-                                               + page_col);
-                const bool sp = sel == RSEL_RAM
-                                && page == 1
-                                && ramidx % (size_t)RamPageSize
-                                    == emu->snapshot.cpu.stack_pointer;
-                if (sp) {
-                    wattron(v->content, A_STANDOUT);
-                }
-                mvwprintw(v->content, cursor_y, cursor_x, "%02X", mem[ramidx]);
-                if (sp) {
-                    wattroff(v->content, A_STANDOUT);
-                }
-                cursor_x += RamColWidth;
-            }
-            cursor_x = start_x;
-            ++cursor_y;
-        }
-        if (page % 2 == 0) {
-            ++cursor_y;
-        }
+        cursor_y = draw_mempage(v, emu, mem, sel, start_x, cursor_y, page,
+                                page_offset, RamDim);
     }
 }
 
-static void draw_ppumem(const struct view *v, const struct emulator *emu)
+static void draw_ppumem(const struct view *v, const struct emulator *emu,
+                        int start_x)
 {
-    mvwaddstr(v->content, 0, 0, "PPU STUFF");
+    int cursor_y = 0;
+    const uint8_t oam[256] = {0x11, 0x22, 0x33};
+    const uint8_t roam[32] = {0xaa, 0xbb, 0xcc};
+    const uint8_t palette[32] = {0x99, 0x88, 0x77};
+    cursor_y = draw_mempage(v, emu, oam, RSEL_PPU, start_x, cursor_y, 0, 0,
+                            RamDim);
+    wclrtoeol(v->content);
+    cursor_y = draw_mempage(v, emu, roam, RSEL_PPU, start_x, cursor_y, 0, 0,
+                            2);
+    wclrtoeol(v->content);
+    cursor_y = draw_mempage(v, emu, palette, RSEL_PPU, start_x, cursor_y, 0,
+                            0x3f, 2);
+    wclrtoeol(v->content);
 }
 
 static void drawram(const struct view *v, const struct viewstate *vs,
                     const struct emulator *emu)
 {
+    static const int start_x = 5;
+
     drawramtitle(v, vs);
 
     if (vs->ramselect == RSEL_PPU) {
-        draw_ppumem(v, emu);
+        draw_ppumem(v, emu, start_x);
     } else {
-        draw_membanks(v, emu, vs->ramselect);
+        draw_membanks(v, emu, vs->ramselect, start_x);
     }
 }
 

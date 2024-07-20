@@ -45,7 +45,7 @@ static const int
 enum ram_selection {
     RSEL_RAM,
     RSEL_VRAM,
-    RSEL_OAM,
+    RSEL_PPU,
     RSEL_COUNT,
 };
 
@@ -585,7 +585,7 @@ static void drawppu(const struct view *v, const struct snapshot *snp)
 static void drawramtitle(const struct view *v, const struct viewstate *vs)
 {
     static const int titlew = 16, offsets[] = {2, 7, 13};
-    static const char *const restrict labels[] = {"RAM", "VRAM", "OAM"};
+    static const char *const restrict labels[] = {"RAM", "VRAM", "PPU"};
 
     mvwhline(v->win, 0, 1, 0, titlew);
     for (size_t i = 0; i < RSEL_COUNT; ++i) {
@@ -597,19 +597,17 @@ static void drawramtitle(const struct view *v, const struct viewstate *vs)
     }
 }
 
-static void drawram(const struct view *v, const struct viewstate *vs,
-                    const struct emulator *emu)
+static void draw_membanks(const struct view *v, const struct emulator *emu,
+                          enum ram_selection sel)
 {
     static const int start_x = 5;
-
-    drawramtitle(v, vs);
 
     const int
         h = getmaxy(v->content),
         page_count = (int)nes_ram_size(emu->console) / RamPageSize;
     int cursor_x = start_x, cursor_y = 0, page_offset;
     const uint8_t *mem;
-    if (vs->ramselect == RSEL_VRAM) {
+    if (sel == RSEL_VRAM) {
         page_offset = 0x20;
         mem = emu->snapshot.mem.vram;
     } else {
@@ -625,7 +623,7 @@ static void drawram(const struct view *v, const struct viewstate *vs,
                 const size_t ramidx = (size_t)((page * RamPageSize)
                                                + (page_row * RamDim)
                                                + page_col);
-                const bool sp = vs->ramselect == RSEL_RAM
+                const bool sp = sel == RSEL_RAM
                                 && page == 1
                                 && ramidx % (size_t)RamPageSize
                                     == emu->snapshot.cpu.stack_pointer;
@@ -644,6 +642,23 @@ static void drawram(const struct view *v, const struct viewstate *vs,
         if (page % 2 == 0) {
             ++cursor_y;
         }
+    }
+}
+
+static void draw_ppumem(const struct view *v, const struct emulator *emu)
+{
+    mvwaddstr(v->content, 0, 0, "PPU STUFF");
+}
+
+static void drawram(const struct view *v, const struct viewstate *vs,
+                    const struct emulator *emu)
+{
+    drawramtitle(v, vs);
+
+    if (vs->ramselect == RSEL_PPU) {
+        draw_ppumem(v, emu);
+    } else {
+        draw_membanks(v, emu, vs->ramselect);
     }
 }
 
@@ -694,8 +709,9 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
     int ram_x, ram_y, ram_w, ram_h;
     getbegyx(v->win, ram_y, ram_x);
     getmaxyx(v->win, ram_h, ram_w);
-    pnoutrefresh(v->content, (ram_h - 4) * vs->ramsheet, 0, ram_y + 3,
-                 ram_x + 1, ram_y + ram_h - 2, ram_x + ram_w - 1);
+    const int sheet = vs->ramselect == RSEL_PPU ? 0 : vs->ramsheet;
+    pnoutrefresh(v->content, (ram_h - 4) * sheet, 0, ram_y + 3, ram_x + 1,
+                 ram_y + ram_h - 2, ram_x + ram_w - 1);
 }
 
 //

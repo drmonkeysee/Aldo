@@ -136,9 +136,9 @@ static void create_vbus(struct nes001 *self)
     // * $0000 - $1FFF: unmapped
     // * $2000 - $3FFF: 2KB RAM mirrored to 8KB, nametable-mirroring uses 4KB
     //                  of address space; never writes to $3F00 - $3FFF
-    // * $3F00 - $3FFF: 256B Palette RAM; internal to the PPU and thus not on
-    //                  the video bus, but reads do leak through to the
-    //                  underlying VRAM.
+    // * $3F00 - $3FFF: 32B Palette RAM mirrored to 256B; internal to the PPU
+    //                  and thus not on the video bus, but reads do leak
+    //                  through to the underlying VRAM.
     self->ppu.vbus = bus_new(BITWIDTH_16KB, 2, MEMBLOCK_8KB);
     const bool r = bus_set(self->ppu.vbus, MEMBLOCK_8KB, (struct busdevice){
         vram_read,

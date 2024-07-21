@@ -538,7 +538,7 @@ static int draw_pdatapath(const struct view *v, int cursor_y, int w,
     draw_chip_hline(v, snp->plines.read, cursor_y, buscol + 3, "R\u0305",
                     ArrowRight);
 
-    mvwprintw(v->content, ++cursor_y, 0, "p: %1d o: %1d w: %1d",
+    mvwprintw(v->content, ++cursor_y, 0, "c: %1d o: %1d w: %1d",
               snp->pdatapath.cv_pending, snp->pdatapath.oddframe,
               snp->pdatapath.writelatch);
     draw_chip_hline(v, snp->plines.write, cursor_y, buscol + 3, "W\u0305",

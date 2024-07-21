@@ -91,11 +91,6 @@ static uint16_t addrbusmask(uint16_t addr)
     return addr & ADDRMASK_16KB;
 }
 
-static bool palette_addr(uint16_t addr)
-{
-    return MEMBLOCK_16KB - MEMBLOCK_256B <= addr && addr < MEMBLOCK_16KB;
-}
-
 static bool rendering_disabled(struct rp2c02 *self)
 {
     return !self->ctrl.b && !self->ctrl.s;
@@ -116,22 +111,16 @@ static bool in_vblank(struct rp2c02 *self)
 }
 
 //
-// MARK: - Main Bus Device (PPU registers)
+// MARK: - Palette
 //
 
-static uint8_t palette_read(struct rp2c02 *self, uint16_t addr)
+static bool palette_addr(uint16_t addr)
 {
-    // NOTE: addr=[$3F00-$3FFF]
-    assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
-
-    return 0;
+    return MEMBLOCK_16KB - MEMBLOCK_256B <= addr && addr < MEMBLOCK_16KB;
 }
 
-static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
+static uint16_t mask_palette(uint16_t addr)
 {
-    // NOTE: addr=[$3F00-$3FFF]
-    assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
-
     // NOTE: 32 addressable bytes, including mirrors
     addr &= 0x1f;
     // NOTE: background has 16 allocated slots while sprites have 12, making
@@ -147,8 +136,28 @@ static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
             addr -= ((addr & 0xc) >> 2) + 1;
         }
     }
-    self->palette[addr] = d;
+    return addr;
 }
+
+static uint8_t palette_read(struct rp2c02 *self, uint16_t addr)
+{
+    // NOTE: addr=[$3F00-$3FFF]
+    assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
+
+    return self->palette[mask_palette(addr)];
+}
+
+static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
+{
+    // NOTE: addr=[$3F00-$3FFF]
+    assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
+
+    self->palette[mask_palette(addr)] = d;
+}
+
+//
+// MARK: - Main Bus Device (PPU registers)
+//
 
 static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
@@ -171,6 +180,11 @@ static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
         break;
     case 4: // OAMDATA
         ppu->regbus = ppu->oam[ppu->oamaddr];
+        break;
+    case 7: // PPUDATA
+        ppu->cvp = true;
+        const uint16_t addr = addrbusmask(ppu->v);
+        ppu->regbus = palette_addr(addr) ? palette_read(ppu, addr) : ppu->rbuf;
         break;
     default:
         break;
@@ -267,12 +281,13 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
 
 static void read(struct rp2c02 *self)
 {
-    // TODO: implement
+    self->signal.ale = self->signal.rd = false;
+    self->bflt = !bus_read(self->vbus, self->vaddrbus, &self->vdatabus);
+    self->rbuf = self->vdatabus;
 }
 
 static void write(struct rp2c02 *self)
 {
-    // TODO: can this be pulled out into vram-access function
     self->signal.ale = false;
     self->vdatabus = self->regbus;
     if (palette_addr(self->vaddrbus)) {
@@ -371,7 +386,7 @@ static void cpu_rw(struct rp2c02 *self)
 {
     if (self->signal.ale) {
         if (self->signal.rw) {
-            // bus_read()
+            read(self);
         } else {
             write(self);
         }

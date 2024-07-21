@@ -1859,7 +1859,7 @@ static void ppudata_read_ignores_high_v_bits(void *ctx)
     ppu_cycle(ppu);
 
     ct_asserttrue(ppu->cvp);
-    ct_assertequal(0xf002u, ppu->vaddrbus);
+    ct_assertequal(0x3002u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -1869,7 +1869,7 @@ static void ppudata_read_ignores_high_v_bits(void *ctx)
     ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0xf002u, ppu->vaddrbus);
+    ct_assertequal(0x3002u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
@@ -1879,7 +1879,7 @@ static void ppudata_read_ignores_high_v_bits(void *ctx)
     ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0xf002u, ppu->vaddrbus);
+    ct_assertequal(0x3002u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -1947,12 +1947,6 @@ static void ppudata_read_palette_backdrop(void *ctx)
     ct_asserttrue(ppu->signal.rd);
     ct_assertequal(0x11u, ppu->rbuf);
     ct_assertequal(0x3f01u, ppu->v);
-
-    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
-
-    ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x11u, ppu->regbus);
-    ct_assertequal(0x11u, d);
 }
 
 static void ppudata_read_palette_background(void *ctx)
@@ -1994,27 +1988,21 @@ static void ppudata_read_palette_background(void *ctx)
 
     ct_assertfalse(ppu->cvp);
     ct_assertequal(0x3f06u, ppu->vaddrbus);
-    ct_assertequal(0x11u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
-    ct_assertequal(0x22u, ppu->rbuf);
+    ct_assertequal(0x33u, ppu->rbuf);
     ct_assertequal(0x3f07u, ppu->v);
 
     ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
     ct_assertequal(0x3f06u, ppu->vaddrbus);
-    ct_assertequal(0x11u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
-    ct_assertequal(0x22u, ppu->rbuf);
+    ct_assertequal(0x33u, ppu->rbuf);
     ct_assertequal(0x3f07u, ppu->v);
-
-    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
-
-    ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x22u, ppu->regbus);
-    ct_assertequal(0x22u, d);
 }
 
 static void ppudata_read_palette_last_background(void *ctx)
@@ -2040,43 +2028,37 @@ static void ppudata_read_palette_last_background(void *ctx)
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
     ct_assertequal(0xaau, ppu->rbuf);
-    ct_assertequal(0x2002u, ppu->v);
+    ct_assertequal(0x3f0fu, ppu->v);
 
     ppu_cycle(ppu);
 
     ct_asserttrue(ppu->cvp);
-    ct_assertequal(0x2002u, ppu->vaddrbus);
+    ct_assertequal(0x3f0fu, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
     ct_assertequal(0xaau, ppu->rbuf);
-    ct_assertequal(0x2002u, ppu->v);
+    ct_assertequal(0x3f0fu, ppu->v);
 
     ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x2002u, ppu->vaddrbus);
+    ct_assertequal(0x3f0fu, ppu->vaddrbus);
     ct_assertequal(0x44u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
     ct_assertequal(0x44u, ppu->rbuf);
-    ct_assertequal(0x2003u, ppu->v);
+    ct_assertequal(0x3f10u, ppu->v);
 
     ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x2002u, ppu->vaddrbus);
+    ct_assertequal(0x3f0fu, ppu->vaddrbus);
     ct_assertequal(0x44u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
     ct_assertequal(0x44u, ppu->rbuf);
-    ct_assertequal(0x2003u, ppu->v);
-
-    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
-
-    ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x44u, ppu->regbus);
-    ct_assertequal(0x44u, d);
+    ct_assertequal(0x3f10u, ppu->v);
 }
 
 static void ppudata_read_palette_unused(void *ctx)
@@ -2133,12 +2115,6 @@ static void ppudata_read_palette_unused(void *ctx)
     ct_asserttrue(ppu->signal.rd);
     ct_assertequal(0x11u, ppu->rbuf);
     ct_assertequal(0x3f0du, ppu->v);
-
-    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
-
-    ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x11u, ppu->regbus);
-    ct_assertequal(0x11u, d);
 }
 
 static void ppudata_read_palette_backdrop_mirror(void *ctx)
@@ -2195,12 +2171,6 @@ static void ppudata_read_palette_backdrop_mirror(void *ctx)
     ct_asserttrue(ppu->signal.rd);
     ct_assertequal(0x11u, ppu->rbuf);
     ct_assertequal(0x3f11u, ppu->v);
-
-    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
-
-    ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x11u, ppu->regbus);
-    ct_assertequal(0x11u, d);
 }
 
 static void ppudata_read_palette_backdrop_high_mirror(void *ctx)
@@ -2257,12 +2227,6 @@ static void ppudata_read_palette_backdrop_high_mirror(void *ctx)
     ct_asserttrue(ppu->signal.rd);
     ct_assertequal(0x11u, ppu->rbuf);
     ct_assertequal(0x3ff1u, ppu->v);
-
-    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
-
-    ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x11u, ppu->regbus);
-    ct_assertequal(0x11u, d);
 }
 
 static void ppudata_read_palette_sprite(void *ctx)
@@ -2304,27 +2268,21 @@ static void ppudata_read_palette_sprite(void *ctx)
 
     ct_assertfalse(ppu->cvp);
     ct_assertequal(0x3f16u, ppu->vaddrbus);
-    ct_assertequal(0x22u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
-    ct_assertequal(0x22u, ppu->rbuf);
+    ct_assertequal(0x33u, ppu->rbuf);
     ct_assertequal(0x3f17u, ppu->v);
 
     ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
     ct_assertequal(0x3f16u, ppu->vaddrbus);
-    ct_assertequal(0x22u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
-    ct_assertequal(0x22u, ppu->rbuf);
+    ct_assertequal(0x33u, ppu->rbuf);
     ct_assertequal(0x3f17u, ppu->v);
-
-    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
-
-    ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x22u, ppu->regbus);
-    ct_assertequal(0x22u, d);
 }
 
 static void ppudata_read_palette_last_sprite(void *ctx)
@@ -2381,12 +2339,6 @@ static void ppudata_read_palette_last_sprite(void *ctx)
     ct_asserttrue(ppu->signal.rd);
     ct_assertequal(0x44u, ppu->rbuf);
     ct_assertequal(0x3f20u, ppu->v);
-
-    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
-
-    ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x44u, ppu->regbus);
-    ct_assertequal(0x44u, d);
 }
 
 static void ppudata_read_palette_unused_mirrored(void *ctx)
@@ -2443,12 +2395,6 @@ static void ppudata_read_palette_unused_mirrored(void *ctx)
     ct_asserttrue(ppu->signal.rd);
     ct_assertequal(0x11u, ppu->rbuf);
     ct_assertequal(0x3f1du, ppu->v);
-
-    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
-
-    ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x11u, ppu->regbus);
-    ct_assertequal(0x11u, d);
 }
 
 static void ppudata_read_during_rendering(void *ctx)

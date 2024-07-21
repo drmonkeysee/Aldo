@@ -148,7 +148,6 @@ static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
         }
     }
     self->palette[addr] = d;
-    self->bflt = false;
 }
 
 static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
@@ -276,7 +275,9 @@ static void write(struct rp2c02 *self)
     // TODO: can this be pulled out into vram-access function
     self->signal.ale = false;
     self->vdatabus = self->regbus;
-    if (!palette_addr(self->vaddrbus)) {
+    if (palette_addr(self->vaddrbus)) {
+        self->bflt = false;
+    } else {
         self->signal.wr = false;
         self->bflt = !bus_write(self->vbus, self->vaddrbus, self->vdatabus);
     }

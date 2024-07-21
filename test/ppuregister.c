@@ -2402,6 +2402,46 @@ static void ppudata_read_during_rendering(void *ctx)
     ct_assertfail("implement test");
 }
 
+static void ppudata_read_vram_behind_palette(void *ctx)
+{
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 242;
+    ppu->dot = 24;
+    ppu->v = 0x3f00;
+    ppu->palette[0] = 0xcc;
+    ppu->rbuf = 0xaa;
+
+    uint8_t d;
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
+    ppu_cycle(ppu);
+    ppu_cycle(ppu);
+    ppu_cycle(ppu);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0xccu, ppu->regbus);
+    ct_assertequal(0xccu, d);
+    ct_assertequal(0x3f00u, ppu->vaddrbus);
+    ct_assertequal(0x11u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->rbuf);
+    ct_assertequal(0x3f01u, ppu->v);
+
+    bus_write(ppt_get_mbus(ctx), 0x2006, 0x20);
+    bus_write(ppt_get_mbus(ctx), 0x2006, 0x2);
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
+    ppu_cycle(ppu);
+    ppu_cycle(ppu);
+    ppu_cycle(ppu);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x11u, ppu->regbus);
+    ct_assertequal(0x11u, d);
+    ct_assertequal(0x2002u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x2003u, ppu->v);
+}
+
 //
 // MARK: - Test List
 //
@@ -2480,6 +2520,7 @@ struct ct_testsuite ppu_register_tests(void)
         ct_maketest(ppudata_read_palette_last_sprite),
         ct_maketest(ppudata_read_palette_unused_mirrored),
         ct_maketest(ppudata_read_during_rendering),
+        ct_maketest(ppudata_read_vram_behind_palette),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_setup, ppu_teardown);

@@ -86,7 +86,7 @@ static void set_status(struct rp2c02 *self, uint8_t v)
 }
 
 // NOTE: address bus is 14 bits wide
-static uint16_t addrbusmask(uint16_t addr)
+static uint16_t maskaddr(uint16_t addr)
 {
     return addr & ADDRMASK_16KB;
 }
@@ -183,7 +183,7 @@ static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
         break;
     case 7: // PPUDATA
         ppu->cvp = true;
-        const uint16_t addr = addrbusmask(ppu->v);
+        const uint16_t addr = maskaddr(ppu->v);
         ppu->regbus = palette_addr(addr) ? palette_read(ppu, addr) : ppu->rbuf;
         break;
     default:
@@ -264,7 +264,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
         break;
     case 7: // PPUDATA
         ppu->cvp = true;
-        const uint16_t addr = addrbusmask(ppu->v);
+        const uint16_t addr = maskaddr(ppu->v);
         if (palette_addr(addr)) {
             palette_write(ppu, addr, ppu->regbus);
         }
@@ -393,7 +393,7 @@ static void cpu_rw(struct rp2c02 *self)
         self->cvp = false;
         self->v += self->ctrl.i ? 32 : 1;
     } else {
-        self->vaddrbus = addrbusmask(self->v);
+        self->vaddrbus = maskaddr(self->v);
         self->signal.ale = true;
     }
 }
@@ -509,6 +509,8 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
 
 struct ppu_coord ppu_trace(const struct rp2c02 *self, int adjustment)
 {
+    assert(self != NULL);
+
     struct ppu_coord c = {
         self->dot + adjustment,
         self->line,

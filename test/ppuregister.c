@@ -1028,6 +1028,59 @@ static void ppudata_write_mirrored(void *ctx)
     ct_assertequal(0x2003u, ppu->v);
 }
 
+static void ppudata_write_during_reset(void *ctx)
+{
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 242;
+    ppu->dot = 24;
+    ppu->v = 0x2002;
+    ppu->rst = CSGS_SERVICED;
+
+    bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x77u, ppu->regbus);
+    ct_assertfalse(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x2002u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x2002u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x2002u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x2002u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.wr);
+    ct_assertequal(0x77u, VRam[2]);
+    ct_assertequal(0x2003u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x2002u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x77u, VRam[2]);
+    ct_assertequal(0x2003u, ppu->v);
+}
+
 static void ppudata_write_ignores_high_v_bits(void *ctx)
 {
     struct rp2c02 *const ppu = ppt_get_ppu(ctx);
@@ -1832,6 +1885,68 @@ static void ppudata_read_mirrored(void *ctx)
     ct_assertequal(0x33u, d);
 }
 
+static void ppudata_read_during_reset(void *ctx)
+{
+    struct rp2c02 *const ppu = ppt_get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 242;
+    ppu->dot = 24;
+    ppu->v = 0x2002;
+    ppu->rbuf = 0xaa;
+    ppu->rst = CSGS_SERVICED;
+
+    uint8_t d;
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0xaau, ppu->regbus);
+    ct_assertequal(0xaau, d);
+    ct_asserttrue(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertequal(0xaau, ppu->rbuf);
+    ct_assertequal(0x2002u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x2002u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertequal(0xaau, ppu->rbuf);
+    ct_assertequal(0x2002u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x2002u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x2003u, ppu->v);
+
+    ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x2002u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x2003u, ppu->v);
+
+    bus_read(ppt_get_mbus(ctx), 0x2007, &d);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x33u, ppu->regbus);
+    ct_assertequal(0x33u, d);
+}
+
 static void ppudata_read_ignores_high_v_bits(void *ctx)
 {
     struct rp2c02 *const ppu = ppt_get_ppu(ctx);
@@ -2494,6 +2609,7 @@ struct ct_testsuite ppu_register_tests(void)
         ct_maketest(ppudata_write_with_row_increment),
         ct_maketest(ppudata_write_rendering_disabled),
         ct_maketest(ppudata_write_mirrored),
+        ct_maketest(ppudata_write_during_reset),
         ct_maketest(ppudata_write_ignores_high_v_bits),
         ct_maketest(ppudata_write_palette_backdrop),
         ct_maketest(ppudata_write_palette_background),
@@ -2509,6 +2625,7 @@ struct ct_testsuite ppu_register_tests(void)
         ct_maketest(ppudata_read_with_row_increment),
         ct_maketest(ppudata_read_rendering_disabled),
         ct_maketest(ppudata_read_mirrored),
+        ct_maketest(ppudata_read_during_reset),
         ct_maketest(ppudata_read_ignores_high_v_bits),
         ct_maketest(ppudata_read_palette_backdrop),
         ct_maketest(ppudata_read_palette_background),

@@ -144,7 +144,8 @@ static uint8_t palette_read(struct rp2c02 *self, uint16_t addr)
     // NOTE: addr=[$3F00-$3FFF]
     assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
 
-    return self->palette[mask_palette(addr)];
+    const uint8_t v = self->palette[mask_palette(addr)];
+    return self->mask.g ? v & 0x30 : v;
 }
 
 static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
@@ -152,7 +153,8 @@ static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
     // NOTE: addr=[$3F00-$3FFF]
     assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
 
-    self->palette[mask_palette(addr)] = d;
+    // NOTE: palette values are 6 bits wide
+    self->palette[mask_palette(addr)] = d & 0x3f;
 }
 
 //

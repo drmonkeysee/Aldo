@@ -91,19 +91,19 @@ static uint16_t maskaddr(uint16_t addr)
     return addr & ADDRMASK_16KB;
 }
 
-static bool rendering_disabled(struct rp2c02 *self)
+static bool rendering_disabled(const struct rp2c02 *self)
 {
     return !self->ctrl.b && !self->ctrl.s;
 }
 
-static bool in_postrender(struct rp2c02 *self)
+static bool in_postrender(const struct rp2c02 *self)
 {
     static const int line_post_render = 240;
 
     return line_post_render <= self->line && self->line < LinePreRender;
 }
 
-static bool in_vblank(struct rp2c02 *self)
+static bool in_vblank(const struct rp2c02 *self)
 {
     return (self->line == LineVBlank && self->dot >= 1)
             || (LineVBlank < self->line && self->line < LinePreRender)
@@ -139,7 +139,7 @@ static uint16_t mask_palette(uint16_t addr)
     return addr;
 }
 
-static uint8_t palette_read(struct rp2c02 *self, uint16_t addr)
+static uint8_t palette_read(const struct rp2c02 *self, uint16_t addr)
 {
     // NOTE: addr=[$3F00-$3FFF]
     assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);

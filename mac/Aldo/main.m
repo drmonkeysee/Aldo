@@ -25,8 +25,7 @@ static float render_scale_factor(void *sdlwindow)
     SDL_VERSION(&winfo.version);
     if (SDL_GetWindowWMInfo(sdlwindow, &winfo)) {
         if (winfo.subsystem == SDL_SYSWM_COCOA) {
-            NSWindow *const native = winfo.info.cocoa.window;
-            return (float)native.backingScaleFactor;
+            return (float)winfo.info.cocoa.window.backingScaleFactor;
         } else {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                          "Unexpected window subsystem found: %d",
@@ -47,8 +46,7 @@ static int run_app(void)
                         "Failed to create platform interface!");
         return EXIT_FAILURE;
     }
-    const int result = gui_run(&platform);
-    return result;
+    return gui_run(&platform);
 }
 
 //

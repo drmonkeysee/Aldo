@@ -417,9 +417,8 @@ auto input_address(aldo::et::word* addr) noexcept
 {
     ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 6);
     ScopedID id = addr;
-    auto result = ImGui::InputScalar("Address", ImGuiDataType_U16, addr,
-                                     nullptr, nullptr, "%04X");
-    return result;
+    return ImGui::InputScalar("Address", ImGuiDataType_U16, addr, nullptr,
+                              nullptr, "%04X");
 }
 
 auto about_overlay(aldo::viewstate& vs) noexcept

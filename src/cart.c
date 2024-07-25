@@ -62,7 +62,7 @@ static int parse_ines(struct cartridge *self, FILE *f)
     memcpy(&tail, header + 12, sizeof tail);
     if (tail != 0) return CART_ERR_OBSOLETE;
 
-    struct cartinfo *const info = &self->info;
+    struct cartinfo *info = &self->info;
     info->ines_hdr.prg_blocks = header[4];
     info->ines_hdr.chr_blocks = header[5];
     info->ines_hdr.wram = header[6] & 0x2;
@@ -81,7 +81,7 @@ static int parse_ines(struct cartridge *self, FILE *f)
     info->ines_hdr.wram_blocks = header[8];
     info->ines_hdr.bus_conflicts = header[10] & 0x20;
 
-    const int err = mapper_ines_create(&self->mapper, &info->ines_hdr, f);
+    int err = mapper_ines_create(&self->mapper, &info->ines_hdr, f);
     if (err == 0) {
         // TODO: we've found a ROM with extra bytes after CHR data
         assert(fgetc(f) == EOF && feof(f));
@@ -196,7 +196,7 @@ int cart_create(cart **c, FILE *f)
     assert(c != NULL);
     assert(f != NULL);
 
-    struct cartridge *const self = malloc(sizeof *self);
+    struct cartridge *self = malloc(sizeof *self);
 
     int err = detect_format(self, f);
     if (err == 0) {
@@ -311,7 +311,7 @@ struct blockview cart_prgblock(cart *self, size_t i)
     assert(self->mapper != NULL);
 
     struct blockview bv = {.ord = i};
-    const uint8_t *const prg = self->mapper->prgrom(self->mapper);
+    const uint8_t *prg = self->mapper->prgrom(self->mapper);
     switch (self->info.format) {
     case CRTF_INES:
         if (i < self->info.ines_hdr.prg_blocks) {
@@ -338,7 +338,7 @@ struct blockview cart_chrblock(cart *self, size_t i)
     if (!self->mapper->chrrom) return bv;
 
     // NOTE: only iNES carts have chr rom
-    const uint8_t *const chr = self->mapper->chrrom(self->mapper);
+    const uint8_t *chr = self->mapper->chrrom(self->mapper);
     if (i < self->info.ines_hdr.chr_blocks) {
         bv.size = MEMBLOCK_8KB;
         bv.mem = chr + (i * bv.size);
@@ -376,7 +376,7 @@ void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)
 
     fprintf(f, "%s\n", name);
     char fmtd[CART_FMT_SIZE];
-    const int err = cart_format_extname(self, fmtd);
+    int err = cart_format_extname(self, fmtd);
     fputs(err < 0 ? cart_errstr(err) : fmtd, f);
     fputs("\n\nDisassembly of PRG ROM\n", f);
     if (self->info.format != CRTF_ALDO) {

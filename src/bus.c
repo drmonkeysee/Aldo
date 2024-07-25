@@ -40,8 +40,8 @@ bus *bus_new(int bitwidth, size_t n, ...)
     assert(0 < bitwidth && bitwidth <= BITWIDTH_64KB);
     assert(0 < n);
 
-    const size_t psize = sizeof(struct partition) * n;
-    struct hardwarebus *const self = malloc(sizeof *self + psize);
+    size_t psize = sizeof(struct partition) * n;
+    struct hardwarebus *self = malloc(sizeof *self + psize);
     *self = (struct hardwarebus){
         .count = n,
         .maxaddr = (uint16_t)(1 << bitwidth) - 1,
@@ -73,7 +73,7 @@ bool bus_swap(bus *self, uint16_t addr, struct busdevice bd,
 
     if (addr > self->maxaddr) return false;
 
-    struct partition *const target = find(self, addr);
+    struct partition *target = find(self, addr);
     if (prev) {
         *prev = target->device;
     }
@@ -88,7 +88,7 @@ bool bus_read(bus *self, uint16_t addr, uint8_t *restrict d)
 
     if (addr > self->maxaddr) return false;
 
-    struct partition *const target = find(self, addr);
+    struct partition *target = find(self, addr);
     return target->device.read
             ? target->device.read(target->device.ctx, addr, d)
             : false;
@@ -100,7 +100,7 @@ bool bus_write(bus *self, uint16_t addr, uint8_t d)
 
     if (addr > self->maxaddr) return false;
 
-    struct partition *const target = find(self, addr);
+    struct partition *target = find(self, addr);
     return target->device.write
             ? target->device.write(target->device.ctx, addr, d)
             : false;
@@ -115,7 +115,7 @@ size_t bus_dma(bus *self, uint16_t addr, size_t count,
 
     if (addr > self->maxaddr || count == 0) return 0;
 
-    struct partition *const target = find(self, addr);
+    struct partition *target = find(self, addr);
     return target->device.dma
             ? target->device.dma(target->device.ctx, addr, count, dest)
             : 0;

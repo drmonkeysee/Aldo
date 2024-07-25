@@ -19,7 +19,7 @@ void cycleclock_start(struct cycleclock *self)
 void cycleclock_tickstart(struct cycleclock *self, bool reset_budget)
 {
     clock_gettime(CLOCK_MONOTONIC, &self->current);
-    const double currentms = timespec_to_ms(&self->current);
+    double currentms = timespec_to_ms(&self->current);
     self->ticktime_ms = currentms - timespec_to_ms(&self->previous);
     self->runtime = (currentms - timespec_to_ms(&self->start)) / TSU_MS_PER_S;
 
@@ -35,8 +35,8 @@ void cycleclock_tickstart(struct cycleclock *self, bool reset_budget)
         self->timebudget_ms = TSU_MS_PER_S;
     }
 
-    const double mspercycle = (double)TSU_MS_PER_S / self->cycles_per_sec;
-    const int new_cycles = (int)(self->timebudget_ms / mspercycle);
+    double mspercycle = (double)TSU_MS_PER_S / self->cycles_per_sec;
+    int new_cycles = (int)(self->timebudget_ms / mspercycle);
     self->budget += new_cycles;
     self->timebudget_ms -= new_cycles * mspercycle;
 }

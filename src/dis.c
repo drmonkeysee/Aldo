@@ -122,7 +122,7 @@ static int print_raw(uint16_t addr, const struct dis_instruction *inst,
 static int print_operand(const struct dis_instruction *inst,
                          char dis[restrict])
 {
-    const char *const restrict *const strtable = StringTables[inst->d.mode];
+    const char *const restrict *strtable = StringTables[inst->d.mode];
     int count;
     switch (inst->bv.size) {
     case 1:
@@ -150,7 +150,7 @@ static int print_instruction(const struct dis_instruction *inst,
     int operation = sprintf(dis, "%s ", mnemonic(inst->d.instruction));
     if (operation < 0) return DIS_ERR_FMT;
 
-    const int operand = print_operand(inst, dis + operation);
+    int operand = print_operand(inst, dis + operation);
     if (operand < 0) return DIS_ERR_FMT;
     if (operand == 0) {
         // NOTE: no operand to print, trim the trailing space
@@ -261,18 +261,18 @@ static void decode_tiles(const struct blockview *bv, size_t tilecount,
                          uint8_t *restrict tiles)
 {
     for (size_t tileidx = 0; tileidx < tilecount; ++tileidx) {
-        uint8_t *const tile = tiles + (tileidx * ChrTileSize);
-        const uint8_t *const planes = bv->mem + (tileidx * ChrTileSpan);
+        uint8_t *tile = tiles + (tileidx * ChrTileSize);
+        const uint8_t *planes = bv->mem + (tileidx * ChrTileSpan);
         for (size_t row = 0; row < ChrPlaneSize; ++row) {
-            const uint8_t
+            uint8_t
                 plane0 = planes[row],
                 plane1 = planes[row + ChrPlaneSize];
             for (size_t bit = 0; bit < ChrPlaneSize; ++bit) {
                 // NOTE: tile origins are top-left so in order to pack pixels
                 // left-to-right we need to decode each bit-plane row
                 // least-significant bit last.
-                const ptrdiff_t pixel = (ptrdiff_t)((ChrPlaneSize - bit - 1)
-                                                    + (row * ChrPlaneSize));
+                ptrdiff_t pixel = (ptrdiff_t)((ChrPlaneSize - bit - 1)
+                                              + (row * ChrPlaneSize));
                 assert(pixel >= 0);
                 tile[pixel] = (uint8_t)((byte_getbit(plane0, bit)
                                          | byte_getbit(plane1, bit) << 1));
@@ -295,19 +295,19 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
         for (uint32_t tilex = 0; tilex < tilesdim; ++tilex) {
             // NOTE: tile_start is index of the first pixel
             // in the current tile.
-            const size_t tile_start = (tilex + (tiley * tilesdim)
-                                       + (section * tilesdim * tilesdim))
-                                        * ChrTileSize;
+            size_t tile_start = (tilex + (tiley * tilesdim)
+                                 + (section * tilesdim * tilesdim))
+                                * ChrTileSize;
             for (size_t pixelx = 0; pixelx < ChrPlaneSize; ++pixelx) {
                 // NOTE: pixeloffset is the pixel index in tile space,
                 // packedpixel is the pixel in (prescaled) bmp-row space.
-                const size_t
+                size_t
                     pixeloffset = pixelx + (pixely * ChrPlaneSize),
                     packedpixel = pixelx + (tilex * ChrPlaneSize)
                                     + (section * section_pxldim);
-                const uint8_t pixel = tiles[tile_start + pixeloffset];
+                uint8_t pixel = tiles[tile_start + pixeloffset];
                 for (uint32_t scalex = 0; scalex < scale; ++scalex) {
-                    const size_t scaledpixel = scalex + (packedpixel * scale);
+                    size_t scaledpixel = scalex + (packedpixel * scale);
                     if (scaledpixel % 2 == 0) {
                         packedrow[scaledpixel / 2] = (uint8_t)(pixel << 4);
                     } else {
@@ -340,7 +340,7 @@ static int write_tile_sheet(uint32_t tilesdim, uint32_t tile_sections,
                             uint32_t scale, const uint8_t *restrict tiles,
                             FILE *bmpfile)
 {
-    const uint32_t
+    uint32_t
         section_pxldim = tilesdim * ChrPlaneSize,
         bmph = section_pxldim * scale,
         bmpw = section_pxldim * tile_sections * scale,
@@ -405,7 +405,7 @@ static int write_tile_sheet(uint32_t tilesdim, uint32_t tile_sections,
      */
     // NOTE: no fixed palette for tiles so use grayscale;
     // fun fact, this is the original Gameboy palette.
-    const uint8_t palettes[BMP_PALETTE_SIZE] = {
+    uint8_t palettes[BMP_PALETTE_SIZE] = {
         0, 0, 0, 0,         // #000000
         103, 103, 103, 0,   // #676767
         182, 182, 182, 0,   // #b6b6b6
@@ -415,7 +415,7 @@ static int write_tile_sheet(uint32_t tilesdim, uint32_t tile_sections,
            bmpfile);
 
     // NOTE: BMP pixels are written bottom-row first
-    uint8_t *const packedrow = calloc(packedrow_size, sizeof *packedrow);
+    uint8_t *packedrow = calloc(packedrow_size, sizeof *packedrow);
     for (int32_t tiley = (int32_t)(tilesdim - 1); tiley >= 0; --tiley) {
         for (int32_t pixely = (int32_t)(ChrPlaneSize - 1);
              pixely >= 0;
@@ -438,11 +438,10 @@ static int write_chrtiles(const struct blockview *bv, uint32_t tilesdim,
                           uint32_t tile_sections, uint32_t scale,
                           FILE *bmpfile)
 {
-    const size_t tilecount = bv->size / ChrTileSpan;
-    uint8_t *const tiles = calloc(tilecount * ChrTileSize, sizeof *tiles);
+    size_t tilecount = bv->size / ChrTileSpan;
+    uint8_t *tiles = calloc(tilecount * ChrTileSize, sizeof *tiles);
     decode_tiles(bv, tilecount, tiles);
-    const int err = write_tile_sheet(tilesdim, tile_sections, scale, tiles,
-                                     bmpfile);
+    int err = write_tile_sheet(tilesdim, tile_sections, scale, tiles, bmpfile);
     free(tiles);
     return err;
 }
@@ -454,7 +453,7 @@ static int write_chrblock(const struct blockview *bv, uint32_t scale,
     int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
     if (err < 0) return err;
 
-    FILE *const bmpfile = fopen(bmpfilename, "wb");
+    FILE *bmpfile = fopen(bmpfilename, "wb");
     if (!bmpfile) return DIS_ERR_ERNO;
 
     err = write_chrtiles(bv, tilesdim, tile_sections, scale, bmpfile);
@@ -500,9 +499,9 @@ int dis_parse_inst(const struct blockview *bv, size_t at,
     if (!bv->mem) return DIS_ERR_PRGROM;
     if (at >= bv->size) return 0;
 
-    const uint8_t opcode = bv->mem[at];
-    const struct decoded dec = Decode[opcode];
-    const int instlen = InstLens[dec.mode];
+    uint8_t opcode = bv->mem[at];
+    struct decoded dec = Decode[opcode];
+    int instlen = InstLens[dec.mode];
     if ((size_t)instlen > bv->size - at) return DIS_ERR_EOF;
 
     *parsed = (struct dis_instruction){
@@ -516,7 +515,7 @@ int dis_parse_inst(const struct blockview *bv, size_t at,
 int dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
                       size_t at, struct dis_instruction *parsed)
 {
-    const struct blockview bv = {
+    struct blockview bv = {
         .mem = mem,
         .size = size,
     };
@@ -562,8 +561,8 @@ int dis_datapath(const struct snapshot *snp,
     assert(dis != NULL);
 
     struct dis_instruction inst;
-    const int err = dis_parsemem_inst(snp->mem.prglength, snp->mem.currprg, 0,
-                                      &inst);
+    int err = dis_parsemem_inst(snp->mem.prglength, snp->mem.currprg, 0,
+                                &inst);
     if (err < 0) return err;
 
     // NOTE: we're in an interrupt state so adjust the instruction to render
@@ -578,12 +577,12 @@ int dis_datapath(const struct snapshot *snp,
     total = count = sprintf(dis, "%s ", mnemonic(inst.d.instruction));
     if (count < 0) return DIS_ERR_FMT;
 
-    const size_t
+    size_t
         max_offset = 1 + (inst.bv.size / 3),
         displayidx = snp->datapath.exec_cycle < max_offset
                         ? snp->datapath.exec_cycle
                         : max_offset;
-    const char *const displaystr = StringTables[inst.d.mode][displayidx];
+    const char *displaystr = StringTables[inst.d.mode][displayidx];
     switch (displayidx) {
     case 0:
         count = sprintf(dis + total, "%s", displaystr);
@@ -619,7 +618,7 @@ int dis_cart_prg(cart *cart, const char *restrict name, bool verbose,
     cart_write_dis_header(cart, name, f);
     do {
         fputc('\n', f);
-        const int err = print_prgblock(&bv, verbose, f);
+        int err = print_prgblock(&bv, verbose, f);
         // NOTE: disassembly errors may occur normally if data bytes are
         // interpreted as instructions so note the result and continue.
         if (err < 0) {
@@ -643,12 +642,13 @@ int dis_cart_chr(cart *cart, int chrscale,
     struct blockview bv = cart_chrblock(cart, 0);
     if (!bv.mem) return DIS_ERR_CHRROM;
 
-    const char *const prefix = chrdecode_prefix && chrdecode_prefix[0] != '\0'
-                                ? chrdecode_prefix
-                                : "chr";
-    const size_t prefixlen = strlen(prefix),
-                    namesize = prefixlen + 8;   // NOTE: prefix + nnn.bmp + nul
-    char *const bmpfilename = malloc(namesize);
+    const char *prefix = chrdecode_prefix && chrdecode_prefix[0] != '\0'
+                            ? chrdecode_prefix
+                            : "chr";
+    size_t
+        prefixlen = strlen(prefix),
+        namesize = prefixlen + 8;   // NOTE: prefix + nnn.bmp + nul
+    char *bmpfilename = malloc(namesize);
 
     int err;
     do {
@@ -675,7 +675,7 @@ int dis_cart_chrbank(const struct blockview *bv, int scale, FILE *f)
     if (scale <= 0 || scale > ScaleGuard) return DIS_ERR_CHRSCL;
 
     uint32_t tilesdim, tile_sections;
-    const int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
+    int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
     if (err < 0) return err;
 
     return write_chrtiles(bv, tilesdim, tile_sections, (uint32_t)scale, f);
@@ -720,7 +720,7 @@ int dis_inst_operand(const struct dis_instruction *inst,
         return 0;
     }
 
-    const int count = print_operand(inst, dis);
+    int count = print_operand(inst, dis);
 
     assert((unsigned int)count < DIS_OPERAND_SIZE);
     return count;
@@ -747,7 +747,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
     assert(dis != NULL);
 
     int total = 0;
-    const char *const interrupt = interrupt_display(snp);
+    const char *interrupt = interrupt_display(snp);
     if (strlen(interrupt) > 0) {
         int count = total = sprintf(dis, "%s > ", interrupt);
         if (count < 0) return DIS_ERR_FMT;
@@ -768,7 +768,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
     } else {
         struct mos6502 restore_point;
         cpu_peek_start(cpu, &restore_point);
-        const struct peekresult peek = cpu_peek(cpu, addr);
+        struct peekresult peek = cpu_peek(cpu, addr);
         cpu_peek_end(cpu, &restore_point);
         switch (peek.mode) {
 #define XPEEK(...) sprintf(dis, __VA_ARGS__)
@@ -782,7 +782,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
         }
         if (total < 0) return DIS_ERR_FMT;
         if (peek.busfault) {
-            char *const data = strrchr(dis, '=');
+            char *data = strrchr(dis, '=');
             if (data) {
                 // NOTE: verify last '=' leaves enough space for "FLT"
                 assert(dis + DIS_PEEK_SIZE - data >= 6);

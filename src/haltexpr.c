@@ -22,7 +22,7 @@ static int parse_resetvector(const char *restrict str, int *resetvector)
 
     char u[2];
     unsigned int addr;
-    const bool
+    bool
         parsed = sscanf(str, " %1[" HEXPR_RST_IND "]%X", u, &addr) == 2,
         valid = addr < MEMBLOCK_64KB;
     if (parsed) {
@@ -185,7 +185,7 @@ int haltexpr_fmt_dbgexpr(const struct debugexpr *expr,
     if (expr->type == DBG_EXPR_RESET) {
         count = sprintf(buf, HEXPR_RST_IND "%04X", expr->resetvector);
     } else {
-        const struct haltexpr *const hexpr = &expr->hexpr;
+        const struct haltexpr *hexpr = &expr->hexpr;
         switch (hexpr->cond) {
         case HLT_ADDR:
             count = sprintf(buf, "@%04X", hexpr->address);

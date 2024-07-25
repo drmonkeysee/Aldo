@@ -76,7 +76,7 @@ static void raw_dtor(struct mapper *self)
 {
     assert(self != NULL);
 
-    struct raw_mapper *const m = (struct raw_mapper *)self;
+    struct raw_mapper *m = (struct raw_mapper *)self;
     free(m->rom);
     free(m);
 }
@@ -105,7 +105,7 @@ static void ines_dtor(struct mapper *self)
 {
     assert(self != NULL);
 
-    struct ines_mapper *const m = (struct ines_mapper *)self;
+    struct ines_mapper *m = (struct ines_mapper *)self;
     free(m->chr);
     free(m->prg);
     free(m->wram);
@@ -143,8 +143,8 @@ static bool ines_000_read(void *restrict ctx, uint16_t addr,
     // NOTE: addr=[$8000-$FFFF]
     assert(addr > ADDRMASK_32KB);
 
-    const struct ines_000_mapper *const m = ctx;
-    const uint16_t mask = m->bankcount == 2 ? ADDRMASK_32KB : ADDRMASK_16KB;
+    const struct ines_000_mapper *m = ctx;
+    uint16_t mask = m->bankcount == 2 ? ADDRMASK_32KB : ADDRMASK_16KB;
     *d = m->super.prg[addr & mask];
     return true;
 }
@@ -155,8 +155,8 @@ static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
     // NOTE: addr=[$8000-$FFFF]
     assert(addr > ADDRMASK_32KB);
 
-    const struct ines_000_mapper *const m = ctx;
-    const uint16_t width = m->bankcount == 2 ? BITWIDTH_32KB : BITWIDTH_16KB;
+    const struct ines_000_mapper *m = ctx;
+    uint16_t width = m->bankcount == 2 ? BITWIDTH_32KB : BITWIDTH_16KB;
     return bytecopy_bank(m->super.prg, width, addr, count, dest);
 }
 
@@ -178,7 +178,7 @@ int mapper_raw_create(struct mapper **m, FILE *f)
     assert(m != NULL);
     assert(f != NULL);
 
-    struct raw_mapper *const self = malloc(sizeof *self);
+    struct raw_mapper *self = malloc(sizeof *self);
     *self = (struct raw_mapper){
         .vtable = {
             .dtor = raw_dtor,
@@ -189,7 +189,7 @@ int mapper_raw_create(struct mapper **m, FILE *f)
     };
 
     // TODO: assume a 32KB ROM file (can i do mirroring later?)
-    const int err = load_blocks(&self->rom, MEMBLOCK_32KB, f);
+    int err = load_blocks(&self->rom, MEMBLOCK_32KB, f);
     if (err == 0) {
         *m = (struct mapper *)self;
         return 0;
@@ -244,9 +244,9 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     }
 
     if (header->wram) {
-        const size_t sz = (header->wram_blocks == 0
-                           ? 1
-                           : header->wram_blocks) * MEMBLOCK_8KB;
+        size_t sz = (header->wram_blocks == 0
+                     ? 1
+                     : header->wram_blocks) * MEMBLOCK_8KB;
         self->wram = calloc(sz, sizeof *self->wram);
     }
 

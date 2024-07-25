@@ -258,9 +258,9 @@ static void store_data(struct mos6502 *self, uint8_t d)
 //  C = 0 is thus a borrow-out; A + (~B + 0) => A + ~B => A - B - 1.
 static void binary_add(struct mos6502 *self, uint8_t a, uint8_t b, uint8_t c)
 {
-    const uint16_t sum = (uint16_t)(a + b + c);
+    uint16_t sum = (uint16_t)(a + b + c);
     self->p.c = sum & 0x100;
-    const uint8_t result = (uint8_t)sum;
+    uint8_t result = (uint8_t)sum;
     update_v(self, result, a, b);
     load_register(self, &self->a, result);
 }
@@ -269,7 +269,7 @@ static void decimal_add(struct mos6502 *self, uint8_t alo, uint8_t blo,
                         uint8_t ahi, uint8_t bhi, bool c)
 {
     uint8_t slo = (uint8_t)(alo + blo + c);
-    const bool chi = slo > 0x9;
+    bool chi = slo > 0x9;
     if (chi) {
         slo += 0x6;
         slo &= 0xf;
@@ -292,7 +292,7 @@ static void decimal_subtract(struct mos6502 *self, uint8_t alo, uint8_t blo,
                              uint8_t ahi, uint8_t bhi, uint8_t brw)
 {
     uint8_t dlo = (uint8_t)(alo - blo + brw);   // borrow is either 0 or -1
-    const bool brwhi = dlo >= 0x80; // dlo < 0
+    bool brwhi = dlo >= 0x80; // dlo < 0
     if (brwhi) {
         dlo -= 0x6;
         dlo &= 0xf;
@@ -314,8 +314,8 @@ enum arithmetic_operator {
 static void arithmetic_operation(struct mos6502 *self,
                                  enum arithmetic_operator op, uint8_t b)
 {
-    const uint8_t a = self->a;
-    const bool c = self->p.c;
+    uint8_t a = self->a;
+    bool c = self->p.c;
     // NOTE: even in BCD mode some flags are set as if in binary mode
     // so always do binary op regardless of BCD flag.
     binary_add(self, a, op == AOP_SUB ? ~b : b, c);
@@ -323,13 +323,13 @@ static void arithmetic_operation(struct mos6502 *self,
     if (!bcd_mode(self)) return;
 
     // NOTE: decimal mode is 4-bit nibble arithmetic with carry/borrow
-    const uint8_t
+    uint8_t
         alo = a & 0xf,
         blo = b & 0xf,
         ahi = (a >> 4) & 0xf,
         bhi = (b >> 4) & 0xf;
     if (op == AOP_SUB) {
-        const uint8_t borrow = c - 1;
+        uint8_t borrow = c - 1;
         decimal_subtract(self, alo, blo, ahi, bhi, borrow);
     } else {
         decimal_add(self, alo, blo, ahi, bhi, c);
@@ -341,9 +341,9 @@ static void arithmetic_operation(struct mos6502 *self,
 // see binary_add for why this works.
 static uint8_t compare_register(struct mos6502 *self, uint8_t r, uint8_t d)
 {
-    const uint16_t cmp = (uint16_t)(r + (uint8_t)~d + 1);
+    uint16_t cmp = (uint16_t)(r + (uint8_t)~d + 1);
     self->p.c = cmp & 0x100;
-    const uint8_t result = (uint8_t)cmp;
+    uint8_t result = (uint8_t)cmp;
     update_z(self, result);
     update_n(self, result);
     return result;
@@ -366,7 +366,7 @@ static uint8_t bitoperation(struct mos6502 *self, struct decoded dec,
 {
     // NOTE: some unofficial shift/rotate opcodes use immediate mode
     // to operate on the accumulator.
-    const bool acc_operand = dec.mode == AM_IMP || dec.mode == AM_IMM;
+    bool acc_operand = dec.mode == AM_IMP || dec.mode == AM_IMM;
     uint8_t d = acc_operand ? self->a : self->databus;
     if (bd == BIT_LEFT) {
         self->p.c = d & 0x80;
@@ -863,7 +863,7 @@ static const uint8_t Magic = 0xee;
 static void store_unstable_addresshigh(struct mos6502 *self, uint8_t d)
 {
     // NOTE: if addr carry, +1 has already been stored into adh
-    const uint8_t adrhi = self->adc ? self->adh : self->adh + 1;
+    uint8_t adrhi = self->adc ? self->adh : self->adh + 1;
     d &= adrhi;
     // NOTE: on page-cross boundary this *occasionally* throws the calculated
     // value into ADDR_HI; emulate that behavior consistently to emphasize the
@@ -914,10 +914,10 @@ static void ARR_exec(struct mos6502 *self, struct decoded dec)
     //  rotate A right but leave carry unaffected
     //      implemented as a standard ROR and then
     //      setting carry to held value from ADD/ADC step
-    const uint8_t and_result = self->a & self->databus;
+    uint8_t and_result = self->a & self->databus;
     load_register(self, &self->a, and_result);
     self->p.v = byte_getbit(self->a, 7) ^ byte_getbit(self->a, 6);
-    const bool c = self->a & 0x80;
+    bool c = self->a & 0x80;
     bitoperation(self, dec, BIT_RIGHT, (uint8_t)(self->p.c << 7));
     self->p.c = c;
 
@@ -942,7 +942,7 @@ static void DCP_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
-    const uint8_t d = self->databus - 1;
+    uint8_t d = self->databus - 1;
     modify_mem(self, d);
     compare_register(self, self->a, d);
 }
@@ -951,7 +951,7 @@ static void ISC_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
-    const uint8_t d = self->databus + 1;
+    uint8_t d = self->databus + 1;
     modify_mem(self, d);
     arithmetic_operation(self, AOP_SUB, d);
 }
@@ -985,7 +985,7 @@ static void LXA_exec(struct mos6502 *self)
 {
     read(self);
     commit_operation(self);
-    const uint8_t d = (self->a | Magic) & self->databus;
+    uint8_t d = (self->a | Magic) & self->databus;
     load_register(self, &self->a, d);
     load_register(self, &self->x, d);
 }
@@ -994,7 +994,7 @@ static void RLA_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
-    const uint8_t d = bitoperation(self, dec, BIT_LEFT, self->p.c);
+    uint8_t d = bitoperation(self, dec, BIT_LEFT, self->p.c);
     load_register(self, &self->a, self->a & d);
 }
 
@@ -1002,8 +1002,7 @@ static void RRA_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
-    const uint8_t d = bitoperation(self, dec, BIT_RIGHT,
-                                   (uint8_t)(self->p.c << 7));
+    uint8_t d = bitoperation(self, dec, BIT_RIGHT, (uint8_t)(self->p.c << 7));
     arithmetic_operation(self, AOP_ADD, d);
 }
 
@@ -1017,8 +1016,7 @@ static void SBX_exec(struct mos6502 *self)
 {
     read(self);
     commit_operation(self);
-    const uint8_t cmp = compare_register(self, self->a & self->x,
-                                         self->databus);
+    uint8_t cmp = compare_register(self, self->a & self->x, self->databus);
     load_register(self, &self->x, cmp);
 }
 
@@ -1047,7 +1045,7 @@ static void SLO_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
-    const uint8_t d = bitoperation(self, dec, BIT_LEFT, 0x0);
+    uint8_t d = bitoperation(self, dec, BIT_LEFT, 0x0);
     load_register(self, &self->a, self->a | d);
 }
 
@@ -1055,7 +1053,7 @@ static void SRE_exec(struct mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
-    const uint8_t d = bitoperation(self, dec, BIT_RIGHT, 0x0);
+    uint8_t d = bitoperation(self, dec, BIT_RIGHT, 0x0);
     load_register(self, &self->a, self->a ^ d);
 }
 
@@ -1176,7 +1174,7 @@ static void branch_displacement(struct mos6502 *self)
     // no overflow = 0 - 0 => pch + 0,
     // +overflow = 1 - 0 => pch + 1,
     // -overflow = 0 - 1 => pch - 1 => pch + 2sComplement(1) => pch + 0xff.
-    const bool
+    bool
         negative_offset = self->databus & 0x80,
         positive_overflow = self->adl < self->databus && !negative_offset,
         negative_overflow = self->adl > self->databus && negative_offset;

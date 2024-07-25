@@ -120,7 +120,7 @@ static void create_mbus(struct nes001 *self)
     // * $8000 - $FFFF: 32KB Cart
     self->cpu.mbus = bus_new(BITWIDTH_64KB, 4, MEMBLOCK_8KB, MEMBLOCK_16KB,
                              MEMBLOCK_32KB);
-    const bool r = bus_set(self->cpu.mbus, 0, (struct busdevice){
+    bool r = bus_set(self->cpu.mbus, 0, (struct busdevice){
         ram_read,
         ram_write,
         ram_dma,
@@ -140,7 +140,7 @@ static void create_vbus(struct nes001 *self)
     //                  and thus not on the video bus, but reads do leak
     //                  through to the underlying VRAM.
     self->ppu.vbus = bus_new(BITWIDTH_16KB, 2, MEMBLOCK_8KB);
-    const bool r = bus_set(self->ppu.vbus, MEMBLOCK_8KB, (struct busdevice){
+    bool r = bus_set(self->ppu.vbus, MEMBLOCK_8KB, (struct busdevice){
         vram_read,
         vram_write,
         vram_dma,
@@ -156,8 +156,7 @@ static void connect_cart(struct nes001 *self, cart *c)
     // CPU memory map defines start of cart mapping at $4020; the most complex
     // mappers need access to entire 64KB address space in order to snoop on
     // all CPU activity. Similar rules hold for PPU.
-    const bool r = cart_mbus_connect(self->cart, self->cpu.mbus,
-                                     MEMBLOCK_32KB);
+    bool r = cart_mbus_connect(self->cart, self->cpu.mbus, MEMBLOCK_32KB);
     assert(r);
     debug_sync_bus(self->dbg);
 }
@@ -244,7 +243,7 @@ nes *nes_new(debugger *dbg, bool bcdsupport, FILE *tracelog)
 {
     assert(dbg != NULL);
 
-    struct nes001 *const self = malloc(sizeof *self);
+    struct nes001 *self = malloc(sizeof *self);
     self->cart = NULL;
     self->dbg = dbg;
     self->tracelog = tracelog;
@@ -368,7 +367,7 @@ void nes_clock(nes *self, struct cycleclock *clock)
 
     while (self->cpu.signal.rdy && clock->budget > 0) {
         if (!clock_subcycles(self, clock)) continue;
-        const int cycles = cpu_cycle(&self->cpu);
+        int cycles = cpu_cycle(&self->cpu);
         set_pins(self);
         clock->budget -= cycles;
         clock->cycles += (uint64_t)cycles;

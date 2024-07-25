@@ -23,11 +23,11 @@ size_t bytecopy_bank(const uint8_t *restrict bankmem, int bankwidth,
     assert(dest != NULL);
     assert(BITWIDTH_1KB <= bankwidth && bankwidth <= BITWIDTH_64KB);
 
-    const size_t banksize = 1 << bankwidth;
+    size_t banksize = 1 << bankwidth;
     // NOTE: addr -> index is always mask(banksize - 1)
     // iff banksize is a power of 2
-    const uint16_t start = addr & (uint16_t)(banksize - 1);
-    const size_t
+    uint16_t start = addr & (uint16_t)(banksize - 1);
+    size_t
         bytesleft = banksize - start,
         bytecount = count > bytesleft ? bytesleft : count;
     memcpy(dest, bankmem + start, bytecount * sizeof *dest);

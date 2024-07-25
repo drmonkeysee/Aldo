@@ -35,7 +35,7 @@ static void remove_reset_override(struct debugger_context *self)
 {
     if (!self->dec.active) return;
 
-    const bool r = bus_set(self->cpu->mbus, CPU_VECTOR_RST, self->dec.inner);
+    bool r = bus_set(self->cpu->mbus, CPU_VECTOR_RST, self->dec.inner);
     assert(r);
     self->dec = (struct resdecorator){0};
 }
@@ -56,7 +56,7 @@ static void update_reset_override(struct debugger_context *self)
 static bool resetaddr_read(void *restrict ctx, uint16_t addr,
                            uint8_t *restrict d)
 {
-    const struct resdecorator *const dec = ctx;
+    const struct resdecorator *dec = ctx;
     if (!dec->inner.read) return false;
 
     if (CPU_VECTOR_RST <= addr && addr < CPU_VECTOR_IRQ) {
@@ -70,7 +70,7 @@ static bool resetaddr_read(void *restrict ctx, uint16_t addr,
 
 static bool resetaddr_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    struct resdecorator *const dec = ctx;
+    struct resdecorator *dec = ctx;
     return dec->inner.write
             ? dec->inner.write(dec->inner.ctx, addr, d)
             : false;
@@ -79,7 +79,7 @@ static bool resetaddr_write(void *ctx, uint16_t addr, uint8_t d)
 static size_t resetaddr_dma(const void *restrict ctx, uint16_t addr,
                             size_t count, uint8_t dest[restrict count])
 {
-    const struct resdecorator *const dec = ctx;
+    const struct resdecorator *dec = ctx;
     return dec->inner.dma
             ? dec->inner.dma(dec->inner.ctx, addr, count, dest)
             : 0;
@@ -152,7 +152,7 @@ static void bpvector_insert(struct breakpoint_vector *vec,
     if (vec->size == vec->capacity) {
         bpvector_resize(vec);
     }
-    struct breakpoint *const slot = vec->items + vec->size;
+    struct breakpoint *slot = vec->items + vec->size;
     *slot = (struct breakpoint){expr, true};
     ++vec->size;
 }
@@ -162,7 +162,7 @@ static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
                                 const struct mos6502 *cpu)
 {
     for (ptrdiff_t i = 0; i < (ptrdiff_t)vec->size; ++i) {
-        const struct breakpoint *const bp = vec->items + i;
+        const struct breakpoint *bp = vec->items + i;
         if (!bp->enabled) continue;
         switch (bp->expr.cond) {
         case HLT_ADDR:
@@ -190,9 +190,9 @@ static bool bpvector_remove(struct breakpoint_vector *vec, ptrdiff_t at)
 
     if (at < (ptrdiff_t)vec->size - 1) {
         const struct breakpoint
-            *const rest = vec->items + at + 1,
-            *const end = vec->items + vec->size;
-        const ptrdiff_t count = end - rest;
+            *rest = vec->items + at + 1,
+            *end = vec->items + vec->size;
+        ptrdiff_t count = end - rest;
         assert(count > 0);
         memmove(vec->items + at, rest, sizeof *vec->items * (size_t)count);
     }
@@ -219,7 +219,7 @@ const ptrdiff_t NoBreakpoint = -1;
 
 debugger *debug_new(void)
 {
-    struct debugger_context *const self = malloc(sizeof *self);
+    struct debugger_context *self = malloc(sizeof *self);
     *self = (struct debugger_context){
         .halted = NoBreakpoint,
         .resetvector = NoResetVector,
@@ -270,7 +270,7 @@ void debug_bp_enabled(debugger *self, ptrdiff_t at, bool enabled)
 {
     assert(self != NULL);
 
-    struct breakpoint *const bp = bpvector_at(&self->breakpoints, at);
+    struct breakpoint *bp = bpvector_at(&self->breakpoints, at);
     if (bp) {
         bp->enabled = enabled;
     }

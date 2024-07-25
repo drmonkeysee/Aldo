@@ -144,7 +144,7 @@ static uint8_t palette_read(const struct rp2c02 *self, uint16_t addr)
     // NOTE: addr=[$3F00-$3FFF]
     assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
 
-    const uint8_t v = self->palette[mask_palette(addr)];
+    uint8_t v = self->palette[mask_palette(addr)];
     return self->mask.g ? v & 0x30 : v;
 }
 
@@ -166,7 +166,7 @@ static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     // NOTE: addr=[$2000-$3FFF]
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
-    struct rp2c02 *const ppu = ctx;
+    struct rp2c02 *ppu = ctx;
     ppu->signal.rw = true;
     ppu->regsel = addr & 0x7;
     switch (ppu->regsel) {
@@ -185,7 +185,7 @@ static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
         break;
     case 7: // PPUDATA
         ppu->cvp = true;
-        const uint16_t addr = maskaddr(ppu->v);
+        uint16_t addr = maskaddr(ppu->v);
         ppu->regbus = palette_addr(addr) ? palette_read(ppu, addr) : ppu->rbuf;
         break;
     default:
@@ -200,7 +200,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
     // NOTE: addr=[$2000-$3FFF]
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
-    struct rp2c02 *const ppu = ctx;
+    struct rp2c02 *ppu = ctx;
     ppu->signal.rw = false;
     ppu->regsel = addr & 0x7;
     ppu->regbus = d;
@@ -266,7 +266,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
         break;
     case 7: // PPUDATA
         ppu->cvp = true;
-        const uint16_t addr = maskaddr(ppu->v);
+        uint16_t addr = maskaddr(ppu->v);
         if (palette_addr(addr)) {
             palette_write(ppu, addr, ppu->regbus);
         }
@@ -438,7 +438,7 @@ void ppu_connect(struct rp2c02 *self, bus *mbus)
     assert(self != NULL);
     assert(mbus != NULL);
 
-    const bool r = bus_set(mbus, MEMBLOCK_8KB, (struct busdevice){
+    bool r = bus_set(mbus, MEMBLOCK_8KB, (struct busdevice){
         .read = regread,
         .write = regwrite,
         .ctx = self,

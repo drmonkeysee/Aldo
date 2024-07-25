@@ -63,7 +63,7 @@ static void init_cliargs(struct cliargs *args)
 
 static bool parse_flag(const char *arg, char shrt, bool exact, const char *lng)
 {
-    const size_t lnglen = lng ? strlen(lng) : 0;
+    size_t lnglen = lng ? strlen(lng) : 0;
     return (strlen(arg) > 1
                 && exact
                     ? arg[1] == shrt
@@ -94,7 +94,7 @@ static bool parse_number(const char *arg, int *restrict argi, int argc,
     bool result = convert_num(arg + 2, base, number);
     // NOTE: then try --long-name=N format
     if (!result && arg[1] == '-') {
-        const char *const opt = strchr(arg, '=');
+        const char *opt = strchr(arg, '=');
         if (opt) {
             result = convert_num(opt + 1, base, number);
         }
@@ -113,7 +113,7 @@ static bool parse_address(const char *arg, int *restrict argi, int argc,
                           int *restrict parsed)
 {
     long addr;
-    const bool result = parse_number(arg, argi, argc, argv, 16, &addr);
+    bool result = parse_number(arg, argi, argc, argv, 16, &addr);
     if (result && MinAddress <= addr && addr <= MaxAddress) {
         *parsed = (int)addr;
     } else {
@@ -127,12 +127,12 @@ static bool parse_address(const char *arg, int *restrict argi, int argc,
 static bool parse_halt(const char *arg, int *restrict argi, int argc,
                        char *argv[argc+1], struct cliargs *restrict args)
 {
-    const size_t optlen = strlen(HaltLong);
+    size_t optlen = strlen(HaltLong);
     const char *expr = NULL;
     if (arg[1] == HaltShort && arg[2] != '\0') {
         expr = arg + 2;
     } else if (strncmp(arg, HaltLong, optlen) == 0) {
-        const char *const opt = strchr(arg, '=');
+        const char *opt = strchr(arg, '=');
         if (opt && opt - arg == (ptrdiff_t)optlen) {
             expr = opt + 1;
         }
@@ -153,11 +153,11 @@ static bool parse_halt(const char *arg, int *restrict argi, int argc,
 static bool parse_dbgfile(const char *arg, int *restrict argi, int argc,
                           char *argv[argc+1], struct cliargs *restrict args)
 {
-    const size_t optlen = strlen(DebugFileLong);
+    size_t optlen = strlen(DebugFileLong);
     if (arg[1] == DebugFileShort && arg[2] != '\0') {
         args->dbgfilepath = arg + 2;
     } else if (strncmp(arg, DebugFileLong, optlen) == 0) {
-        const char *const opt = strchr(arg, '=');
+        const char *opt = strchr(arg, '=');
         if (opt && opt - arg == (ptrdiff_t)optlen) {
             args->dbgfilepath = opt + 1;
         }
@@ -175,7 +175,7 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
 
     if (parse_flag(arg, ChrScaleShort, true, ChrScaleLong)) {
         long scale;
-        const bool result = parse_number(arg, argi, argc, argv, 10, &scale);
+        bool result = parse_number(arg, argi, argc, argv, 10, &scale);
         if (result && MinChrScale <= scale && scale <= MaxChrScale) {
             args->chrscale = (int)scale;
             return true;
@@ -199,9 +199,9 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
     }
 
     SETFLAG(args->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);
-    const size_t chroptlen = strlen(ChrDecodeLong);
+    size_t chroptlen = strlen(ChrDecodeLong);
     if (strncmp(arg, ChrDecodeLong, chroptlen) == 0) {
-        const char *const opt = strchr(arg, '=');
+        const char *opt = strchr(arg, '=');
         if (opt && opt - arg == (ptrdiff_t)chroptlen) {
             args->chrdecode_prefix = opt + 1;
         }
@@ -237,7 +237,7 @@ bool argparse_parse(struct cliargs *restrict args, int argc,
     bool opt_parse = true;
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
-            const char *const arg = argv[i];
+            const char *arg = argv[i];
             if (arg[0] == '-') {
                 if (!opt_parse) {
                     continue;
@@ -261,7 +261,7 @@ const char *argparse_filename(const char *filepath)
 {
     if (!filepath) return NULL;
 
-    const char *const last_slash = strrchr(filepath, '/');
+    const char *last_slash = strrchr(filepath, '/');
     return last_slash ? last_slash + 1 : filepath;
 }
 
@@ -274,7 +274,7 @@ void argparse_usage(const char *me)
             "address is a 1- or 2-byte hexadecimal number";
 
     char buf[5];
-    const int cpad = sizeof buf, spad = cpad + 1;
+    int cpad = sizeof buf, spad = cpad + 1;
 
     printf("---=== %s Usage ===---\n", program);
     printf("%s [options...] [command] %s\n", me ? me : program, main_arg);

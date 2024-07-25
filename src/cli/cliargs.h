@@ -12,10 +12,10 @@
 
 struct cliargs {
     struct haltarg {
-        const char *expr;                           // Non-owning Pointer
+        const char *expr;       // Non-owning Pointer
         struct haltarg *next;
     } *haltlist;
-    const char                                      // Non-owning Pointers
+    const char                  // Non-owning Pointers
         *chrdecode_prefix, *dbgfilepath, *filepath, *me;
     int chrscale, resetvector;
     bool

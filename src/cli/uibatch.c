@@ -32,7 +32,7 @@ struct runclock {
 
 static void clearline(void)
 {
-    const size_t linelength = strlen(DistractorFormat) * 2;
+    size_t linelength = strlen(DistractorFormat) * 2;
     for (size_t i = 0; i < linelength; ++i) {
         fputc('\b', stderr);
     }
@@ -65,7 +65,7 @@ static void tick_start(struct runclock *c, const struct snapshot *snp)
 
     // NOTE: cumulative moving average:
     // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-    const double ticks = (double)c->cyclock.ticks;
+    double ticks = (double)c->cyclock.ticks;
     c->avg_ticktime_ms = (c->cyclock.ticktime_ms
                           + (ticks * c->avg_ticktime_ms)) / (ticks + 1);
 
@@ -113,7 +113,7 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
     clearline();
     if (!emu->args->verbose) return;
 
-    const bool scale_ms = c->cyclock.runtime < 1;
+    bool scale_ms = c->cyclock.runtime < 1;
     printf("---=== %s ===---\n", argparse_filename(emu->args->filepath));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
            scale_ms
@@ -124,11 +124,11 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
     printf("Avg Cycles/sec: %.2f\n",
            (double)c->cyclock.cycles / c->cyclock.runtime);
     if (emu->snapshot.debugger.halted != NoBreakpoint) {
-        const struct breakpoint *const bp =
+        const struct breakpoint *bp =
             debug_bp_at(emu->debugger, emu->snapshot.debugger.halted);
         assert(bp != NULL);
         char break_desc[HEXPR_FMT_SIZE];
-        const int err = haltexpr_desc(&bp->expr, break_desc);
+        int err = haltexpr_desc(&bp->expr, break_desc);
         printf("Break: %s\n", err < 0 ? haltexpr_errstr(err) : break_desc);
     }
 }
@@ -141,7 +141,7 @@ int ui_batch_loop(struct emulator *emu)
 {
     assert(emu != NULL);
 
-    const int err = init_ui();
+    int err = init_ui();
     if (err < 0) return err;
 
     struct runclock clock = {0};

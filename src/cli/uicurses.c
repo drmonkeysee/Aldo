@@ -63,7 +63,7 @@ static void tick_sleep(struct runclock *c)
 {
     static const struct timespec vsync = {.tv_nsec = TSU_NS_PER_S / Fps};
 
-    const struct timespec elapsed = timespec_elapsed(&c->cyclock.current);
+    struct timespec elapsed = timespec_elapsed(&c->cyclock.current);
 
     // NOTE: if elapsed nanoseconds is greater than vsync we're over
     // our time budget; if elapsed *seconds* is greater than vsync
@@ -75,7 +75,7 @@ static void tick_sleep(struct runclock *c)
         return;
     }
 
-    const struct timespec tick_left = {
+    struct timespec tick_left = {
         .tv_nsec = vsync.tv_nsec - elapsed.tv_nsec,
     };
     c->tickleft_ms = timespec_to_ms(&tick_left);
@@ -161,7 +161,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
 
     wmove(v->content, cursor_y, 0);
 
-    const double center_offset = (w - (int)strlen(halt)) / 2.0;
+    double center_offset = (w - (int)strlen(halt)) / 2.0;
     assert(center_offset > 0);
     char halt_label[w + 1];
     snprintf(halt_label, sizeof halt_label, "%*s%s%*s",
@@ -170,7 +170,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     drawtoggle(v, halt_label, !emu->snapshot.lines.ready);
 
     cursor_y += 2;
-    const enum csig_excmode mode = nes_mode(emu->console);
+    enum csig_excmode mode = nes_mode(emu->console);
     mvwaddstr(v->content, cursor_y, 0, "Mode:");
     drawtoggle(v, " Sub ", mode == CSGM_SUBCYCLE);
     drawtoggle(v, " Cycle ", mode == CSGM_CYCLE);
@@ -196,7 +196,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
 static void drawsystem(const struct view *v, const struct viewstate *vs,
                        const struct emulator *emu)
 {
-    const int w = getmaxx(v->content);
+    int w = getmaxx(v->content);
     werase(v->content);
     int cursor_y = drawstats(v, 0, vs, emu->args);
     mvwhline(v->content, cursor_y++, 0, 0, w);
@@ -212,16 +212,16 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
     mvwprintw(v->content, cursor_y++, 0, "Tracing: %s",
               emu->args->tron ? "On" : "Off");
     mvwaddstr(v->content, cursor_y++, 0, "Reset Override: ");
-    const int resetvector = debug_vector_override(emu->debugger);
+    int resetvector = debug_vector_override(emu->debugger);
     if (resetvector == NoResetVector) {
         waddstr(v->content, "None");
     } else {
         wprintw(v->content, "$%04X", resetvector);
     }
-    const struct breakpoint *const bp =
+    const struct breakpoint *bp =
         debug_bp_at(emu->debugger, emu->snapshot.debugger.halted);
     char break_desc[HEXPR_FMT_SIZE];
-    const int err = haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
+    int err = haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
     mvwprintw(v->content, cursor_y, 0, "Break: %s",
               err < 0 ? haltexpr_errstr(err) : break_desc);
 }
@@ -230,22 +230,21 @@ static void drawcart(const struct view *v, const struct emulator *emu)
 {
     static const char *const restrict namelabel = "Name: ";
 
-    const int maxwidth = getmaxx(v->content) - (int)strlen(namelabel);
-    int cursor_y = 0;
+    int maxwidth = getmaxx(v->content) - (int)strlen(namelabel), cursor_y = 0;
     mvwaddstr(v->content, cursor_y, 0, namelabel);
     const char
-        *const cn = argparse_filename(emu->args->filepath),
+        *cn = argparse_filename(emu->args->filepath),
         *endofname = strrchr(cn, '.');
     if (!endofname) {
         endofname = strrchr(cn, '\0');
     }
-    const ptrdiff_t namelen = endofname - cn;
-    const bool longname = namelen > maxwidth;
+    ptrdiff_t namelen = endofname - cn;
+    bool longname = namelen > maxwidth;
     // NOTE: ellipsis is one glyph wide despite being > 1 byte long
     wprintw(v->content, "%.*s%s", (int)(longname ? maxwidth - 1 : namelen),
             cn, longname ? "\u2026" : "");
     char fmtd[CART_FMT_SIZE];
-    const int err = cart_format_extname(emu->cart, fmtd);
+    int err = cart_format_extname(emu->cart, fmtd);
     mvwprintw(v->content, ++cursor_y, 0, "Format: %s",
               err < 0 ? cart_errstr(err) : fmtd);
 }
@@ -290,7 +289,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
     hi = emu->snapshot.mem.vectors[3];
     mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     RST",
               CPU_VECTOR_RST, lo, hi);
-    const int resetvector = debug_vector_override(emu->debugger);
+    int resetvector = debug_vector_override(emu->debugger);
     if (resetvector == NoResetVector) {
         wprintw(v->content, " $%04X", bytowr(lo, hi));
     } else {
@@ -404,7 +403,7 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
     static const int
         seph = 5, vsep1 = 7, vsep2 = 21, col1 = vsep1 + 2, col2 = vsep2 + 2;
 
-    const int line_x = (w / 4) + 1;
+    int line_x = (w / 4) + 1;
     draw_chip_vline(v, snp->lines.ready, cursor_y, line_x, 1, ArrowDown, -1,
                     "RDY");
     draw_chip_vline(v, snp->lines.sync, cursor_y, line_x * 2, 1, ArrowUp, -1,
@@ -423,8 +422,8 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
         wattroff(v->content, A_STANDOUT);
     } else {
         char buf[DIS_DATAP_SIZE];
-        const int wlen = dis_datapath(snp, buf);
-        const char *const mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
+        int wlen = dis_datapath(snp, buf);
+        const char *mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
         mvwaddstr(v->content, cursor_y, col1, mnemonic);
     }
 
@@ -466,7 +465,7 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
 
 static void drawcpu(const struct view *v, const struct snapshot *snp)
 {
-    const int w = getmaxx(v->content);
+    int w = getmaxx(v->content);
     werase(v->content);
     int cursor_y = drawregisters(v, 0, snp);
     mvwhline(v->content, cursor_y++, 0, 0, w);
@@ -478,7 +477,7 @@ static void drawcpu(const struct view *v, const struct snapshot *snp)
 static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
                           int w, const struct snapshot *snp)
 {
-    const uint8_t sel = snp->pdatapath.register_select;
+    uint8_t sel = snp->pdatapath.register_select;
     char sel_buf[4];
     sprintf(sel_buf, "%d%d%d", byte_getbit(sel, 2), byte_getbit(sel, 1),
             byte_getbit(sel, 0));
@@ -501,7 +500,7 @@ static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
 static int draw_pregisters(const struct view *v, int cursor_y,
                            const struct snapshot *snp)
 {
-    const uint8_t status = snp->ppu.status;
+    uint8_t status = snp->ppu.status;
     mvwprintw(v->content, ++cursor_y, 0, "CONTROL: %02X  STATUS:  %d%d%d",
               snp->ppu.ctrl, byte_getbit(status, 7), byte_getbit(status, 6),
               byte_getbit(status, 5));
@@ -573,7 +572,7 @@ static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
 
 static void drawppu(const struct view *v, const struct snapshot *snp)
 {
-    const int w = getmaxx(v->content), line_x = (w / 4) + 1;
+    int w = getmaxx(v->content), line_x = (w / 4) + 1;
     int cursor_y = drawtop_plines(v, 0, line_x, w, snp);
     cursor_y = draw_pregisters(v, cursor_y, snp);
     mvwhline(v->content, ++cursor_y, 0, 0, w);
@@ -612,18 +611,17 @@ static int draw_mempage(const struct view *v, const struct emulator *emu,
         mvwprintw(v->content, cursor_y, 0, "%02X%X0", page + page_offset,
                   page_row);
         for (int page_col = 0; page_col < RamDim; ++page_col) {
-            const size_t ramidx = (size_t)((page * RamPageSize)
-                                           + (page_row * RamDim)
-                                           + page_col);
+            size_t ramidx = (size_t)((page * RamPageSize) + (page_row * RamDim)
+                                     + page_col);
             // NOTE: skip over palette's mirrored addresses
             if (sel == RSEL_PPU && page_offset == 0x3f
                 && (ramidx & 0x13) == 0x10) {
                 mvwaddstr(v->content, cursor_y, cursor_x, "--");
                 ++skipped;
             } else {
-                const bool sp = sel == RSEL_RAM && page == 1
-                                && ramidx % (size_t)RamPageSize
-                                    == emu->snapshot.cpu.stack_pointer;
+                bool sp = sel == RSEL_RAM && page == 1
+                            && ramidx % (size_t)RamPageSize
+                                == emu->snapshot.cpu.stack_pointer;
                 if (sp) {
                     wattron(v->content, A_STANDOUT);
                 }
@@ -656,7 +654,7 @@ static void draw_membanks(const struct view *v, const struct emulator *emu,
         page_offset = 0;
         mem = emu->snapshot.mem.ram;
     }
-    const int page_count = (int)nes_ram_size(emu->console) / RamPageSize;
+    int page_count = (int)nes_ram_size(emu->console) / RamPageSize;
     for (int page = 0; page < page_count; ++page) {
         cursor_y = draw_mempage(v, emu, mem, sel, start_x, cursor_y, page,
                                 page_offset, RamDim);
@@ -745,7 +743,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
     int ram_x, ram_y, ram_w, ram_h;
     getbegyx(v->win, ram_y, ram_x);
     getmaxyx(v->win, ram_h, ram_w);
-    const int sheet = vs->ramselect == RSEL_PPU ? 0 : vs->ramsheet;
+    int sheet = vs->ramselect == RSEL_PPU ? 0 : vs->ramsheet;
     pnoutrefresh(v->content, (ram_h - 4) * sheet, 0, ram_y + 3, ram_x + 1,
                  ram_y + ram_h - 2, ram_x + ram_w - 1);
 }
@@ -770,9 +768,7 @@ static void init_ui(struct layout *l, int ramsheets)
 
     int scrh, scrw;
     getmaxyx(stdscr, scrh, scrw);
-    const int
-        yoffset = (scrh - maxh) / 2,
-        xoffset = (scrw - maxw) / 2;
+    int yoffset = (scrh - maxh) / 2, xoffset = (scrw - maxw) / 2;
     vinit(&l->system, sysh, col1w, yoffset, xoffset, "System");
     vinit(&l->debugger, maxh - sysh, col1w, yoffset + sysh, xoffset,
           "Debugger");
@@ -798,7 +794,7 @@ static void tick_end(struct runclock *c)
 
 static void handle_input(struct viewstate *vs, const struct emulator *emu)
 {
-    const int input = getch();
+    int input = getch();
     switch (input) {
     case ' ':
         nes_ready(emu->console, !emu->snapshot.lines.ready);

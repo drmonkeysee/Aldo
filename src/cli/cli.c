@@ -45,9 +45,9 @@ static void print_version(void)
 static cart *load_cart(const char *filename)
 {
     cart *c = NULL;
-    FILE *const f = fopen(filename, "rb");
+    FILE *f = fopen(filename, "rb");
     if (f) {
-        const int err = cart_create(&c, f);
+        int err = cart_create(&c, f);
         if (err < 0) {
             fprintf(stderr, "Cart load failure (%d): %s\n", err,
                     cart_errstr(err));
@@ -65,17 +65,17 @@ static int print_cart_info(const struct cliargs *args, cart *c)
     if (args->verbose) {
         puts("---=== Cart Info ===---");
     }
-    const char *const name = args->verbose
-                                ? args->filepath
-                                : argparse_filename(args->filepath);
+    const char *name = args->verbose
+                        ? args->filepath
+                        : argparse_filename(args->filepath);
     cart_write_info(c, name, args->verbose, stdout);
     return EXIT_SUCCESS;
 }
 
 static int disassemble_cart_prg(const struct cliargs *args, cart *c)
 {
-    const int err = dis_cart_prg(c, argparse_filename(args->filepath),
-                                 args->verbose, false, stdout);
+    int err = dis_cart_prg(c, argparse_filename(args->filepath), args->verbose,
+                           false, stdout);
     if (err < 0) {
         fprintf(stderr, "PRG decode error (%d): %s\n", err, dis_errstr(err));
         return EXIT_FAILURE;
@@ -85,8 +85,7 @@ static int disassemble_cart_prg(const struct cliargs *args, cart *c)
 
 static int decode_cart_chr(const struct cliargs *args, cart *c)
 {
-    const int err = dis_cart_chr(c, args->chrscale, args->chrdecode_prefix,
-                                 stdout);
+    int err = dis_cart_chr(c, args->chrscale, args->chrdecode_prefix, stdout);
     if (err < 0) {
         fprintf(stderr, "CHR decode error (%d): %s\n", err, dis_errstr(err));
         if (err == DIS_ERR_ERNO) {
@@ -149,11 +148,11 @@ static bool parse_debug_file(debugger *dbg, FILE *f,
 
 static debugger *create_debugger(const struct cliargs *args)
 {
-    debugger *const dbg = debug_new();
+    debugger *dbg = debug_new();
     if (args->dbgfilepath) {
-        FILE *const f = fopen(args->dbgfilepath, "r");
+        FILE *f = fopen(args->dbgfilepath, "r");
         if (f) {
-            const bool success = parse_debug_file(dbg, f, args);
+            bool success = parse_debug_file(dbg, f, args);
             fclose(f);
             if (!success) goto exit_dbg;
         } else {
@@ -199,7 +198,7 @@ static void dump_ram(const struct emulator *emu)
 
     if (!emu->args->tron && !emu->args->batch) return;
 
-    FILE *const f = fopen(ramfile, "wb");
+    FILE *f = fopen(ramfile, "wb");
     if (f) {
         nes_dumpram(emu->console, f);
         fclose(f);
@@ -229,7 +228,7 @@ static int run_emu(const struct cliargs *args, cart *c)
               " with batch mode but specified no halt conditions;\n"
               "this can result in a very large trace file very quickly!\n"
               "Continue? [yN] ", stderr);
-        const int input = getchar();
+        int input = getchar();
         if (input != 'y' && input != 'Y') return EXIT_FAILURE;
     }
 
@@ -251,8 +250,8 @@ static int run_emu(const struct cliargs *args, cart *c)
     }
     nes_powerup(emu.console, c, emu.args->zeroram);
 
-    ui_loop *const run_loop = setup_ui(&emu);
-    const int err = run_loop(&emu);
+    ui_loop *run_loop = setup_ui(&emu);
+    int err = run_loop(&emu);
     if (err < 0) {
         fprintf(stderr, "UI run failure (%d): %s\n", err, ui_errstr(err));
         if (err == UI_ERR_ERNO) {
@@ -298,12 +297,12 @@ static int run_with_args(const struct cliargs *args)
         return EXIT_FAILURE;
     }
 
-    cart *const cart = load_cart(args->filepath);
+    cart *cart = load_cart(args->filepath);
     if (!cart) {
         return EXIT_FAILURE;
     }
 
-    const int result = run_cart(args, cart);
+    int result = run_cart(args, cart);
     cart_free(cart);
     return result;
 }
@@ -317,7 +316,7 @@ int cli_run(int argc, char *argv[argc+1])
     struct cliargs args;
     if (!argparse_parse(&args, argc, argv)) return EXIT_FAILURE;
 
-    const int result = run_with_args(&args);
+    int result = run_with_args(&args);
     argparse_cleanup(&args);
     return result;
 }

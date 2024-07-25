@@ -26,10 +26,10 @@ auto get_prefspath(const gui_platform& p)
 {
     using sdl_buffer = aldo::handle<char, SDL_free>;
 
-    const aldo::platform_buffer
+    aldo::platform_buffer
         org{p.orgname(), p.free_buffer},
         name{p.appname(), p.free_buffer};
-    const sdl_buffer path{SDL_GetPrefPath(org.get(), name.get())};
+    sdl_buffer path{SDL_GetPrefPath(org.get(), name.get())};
     if (!path) throw aldo::SdlError{"Failed to get preferences path"};
     return std::filesystem::path{path.get()};
 }
@@ -40,10 +40,10 @@ auto load_cart(const std::filesystem::path& filepath)
     using file_handle = aldo::handle<std::FILE, std::fclose>;
 
     cart* c;
-    const file_handle f{std::fopen(filepath.c_str(), "rb")};
+    file_handle f{std::fopen(filepath.c_str(), "rb")};
     if (!f) throw aldo::AldoError{"Cannot open cart file", filepath, errno};
 
-    const int err = cart_create(&c, f.get());
+    int err = cart_create(&c, f.get());
     if (err < 0) throw aldo::AldoError{"Cart load failure", err, cart_errstr};
 
     return c;
@@ -94,7 +94,7 @@ std::optional<cartinfo> aldo::Emulator::cartInfo() const
 
 void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
 {
-    const auto c = load_cart(filepath);
+    auto c = load_cart(filepath);
     saveCartState();
     nes_powerdown(consolep());
     hcart.reset(c);

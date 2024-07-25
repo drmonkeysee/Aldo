@@ -106,7 +106,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_m:
         if (is_free_key(ev)) {
-            const auto mode = emu.runMode() + mode_change(ev);
+            auto mode = emu.runMode() + mode_change(ev);
             vs.commands.emplace(aldo::Command::mode,
                                 static_cast<csig_excmode>(mode));
         }
@@ -185,7 +185,7 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
         break;
     case aldo::Command::probe:
         {
-            const auto [signal, active] =
+            auto [signal, active] =
                 std::get<aldo::command_state::probe>(cs.value);
             emu.probe(signal, active);
         }

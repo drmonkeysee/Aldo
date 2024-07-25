@@ -24,14 +24,13 @@ namespace
 ALDO_OWN
 auto create_window(SDL_Point windowSize, const gui_platform& p)
 {
-    const auto hidpi = p.is_hidpi();
+    auto hidpi = p.is_hidpi();
     SDL_Log("HIDPI: %d", hidpi);
-    const aldo::platform_buffer name{p.appname(), p.free_buffer};
-    const auto win = SDL_CreateWindow(name ? name.get() : "DisplayNameErr",
-                                      SDL_WINDOWPOS_CENTERED,
-                                      SDL_WINDOWPOS_CENTERED,
-                                      windowSize.x, windowSize.y,
-                                      hidpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0);
+    aldo::platform_buffer name{p.appname(), p.free_buffer};
+    auto win = SDL_CreateWindow(name ? name.get() : "DisplayNameErr",
+                                SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                windowSize.x, windowSize.y,
+                                hidpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0);
     if (!win) throw aldo::SdlError{"SDL window creation failure"};
     return win;
 }
@@ -39,13 +38,13 @@ auto create_window(SDL_Point windowSize, const gui_platform& p)
 ALDO_OWN
 auto create_renderer(const aldo::win_handle& hwin, const gui_platform& p)
 {
-    const auto ren = SDL_CreateRenderer(hwin.get(), -1,
-                                        SDL_RENDERER_ACCELERATED
-                                        | SDL_RENDERER_PRESENTVSYNC
-                                        | SDL_RENDERER_TARGETTEXTURE);
+    auto ren = SDL_CreateRenderer(hwin.get(), -1,
+                                  SDL_RENDERER_ACCELERATED
+                                  | SDL_RENDERER_PRESENTVSYNC
+                                  | SDL_RENDERER_TARGETTEXTURE);
     if (!ren) throw aldo::SdlError{"SDL renderer creation failure"};
 
-    const auto render_scale_factor = p.render_scale_factor(hwin.get());
+    auto render_scale_factor = p.render_scale_factor(hwin.get());
     SDL_RenderSetScale(ren, render_scale_factor, render_scale_factor);
     SDL_RendererInfo info;
     SDL_GetRendererInfo(ren, &info);
@@ -58,9 +57,9 @@ ALDO_OWN
 auto create_bouncer_texture(SDL_Point screenResolution,
                             const aldo::ren_handle& hren)
 {
-    const auto tex = SDL_CreateTexture(hren.get(), SDL_PIXELFORMAT_RGBA32,
-                                       SDL_TEXTUREACCESS_TARGET,
-                                       screenResolution.x, screenResolution.y);
+    auto tex = SDL_CreateTexture(hren.get(), SDL_PIXELFORMAT_RGBA32,
+                                 SDL_TEXTUREACCESS_TARGET, screenResolution.x,
+                                 screenResolution.y);
     if (!tex) throw aldo::SdlError{"Bouncer texture creation failure"};
     return tex;
 }

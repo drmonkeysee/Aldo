@@ -45,11 +45,10 @@ public:
     {
         if (recorded) return;
 
-        const auto elapsed = clock_type::now() - start;
+        auto elapsed = clock_type::now() - start;
         // NOTE: duration_cast is not noexcept but i don't see how converting
         // to a double would ever throw; i'll assume it's noexcept in practice.
-        const auto converted =
-            std::chrono::duration_cast<duration_type>(elapsed);
+        auto converted = std::chrono::duration_cast<duration_type>(elapsed);
         result = converted.count();
         recorded = true;
     }
@@ -107,7 +106,7 @@ struct runclock {
 
     void adjustCycleRate(int adjustment) noexcept
     {
-        const auto adjusted = cyclock.cycles_per_sec + adjustment;
+        auto adjusted = cyclock.cycles_per_sec + adjustment;
         cyclock.cycles_per_sec = std::max(MinCps, std::min(adjusted, MaxCps));
     }
 

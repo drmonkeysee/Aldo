@@ -31,15 +31,14 @@ auto parse_colors(const pal_buf& buf)
     aldo::palette::sz idx = 0;
 
     // TODO: replace this with views::chunk in c++23
-    const auto end = buf.cend();
+    auto end = buf.cend();
     for (auto it = buf.cbegin();
          it != end;
          std::advance(it, Channels)) {
-        const auto t = std::views::take(std::ranges::subrange{it, end},
-                                        Channels);
+        auto t = std::views::take(std::ranges::subrange{it, end}, Channels);
         // NOTE: t yields possibly signed chars; cast to byte, because int
         // auto-promotion in IM_COL32 will sign-extend and mess up the shifts.
-        const auto [r, g, b] = std::tuple{
+        auto [r, g, b] = std::tuple{
             static_cast<aldo::et::byte>(t[0]),
             static_cast<aldo::et::byte>(t[1]),
             static_cast<aldo::et::byte>(t[2]),

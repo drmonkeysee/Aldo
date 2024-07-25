@@ -30,7 +30,7 @@ using modal_operation = std::function<void(const std::filesystem::path&)>;
 auto open_file(const gui_platform& p, const char* title,
                std::initializer_list<const char*> filter = {nullptr})
 {
-    const aldo::platform_buffer buf{
+    aldo::platform_buffer buf{
         p.open_file(title, std::data(filter)), p.free_buffer,
     };
     return buf ? std::filesystem::path{buf.get()} : std::filesystem::path{};
@@ -39,7 +39,7 @@ auto open_file(const gui_platform& p, const char* title,
 auto save_file(const gui_platform& p, const char* title,
                const std::filesystem::path& suggestedName)
 {
-    const aldo::platform_buffer buf{
+    aldo::platform_buffer buf{
         p.save_file(title, suggestedName.c_str()), p.free_buffer,
     };
     return buf ? std::filesystem::path{buf.get()} : std::filesystem::path{};
@@ -52,7 +52,7 @@ auto file_modal(modal_launch open, modal_operation op, aldo::Emulator& emu,
     // TODO: does this make sense long-term?
     emu.ready(false);
 
-    const auto filepath = open(p);
+    auto filepath = open(p);
     if (filepath.empty()) return false;
 
     SDL_Log("File selected: %s", filepath.c_str());
@@ -71,22 +71,20 @@ auto file_modal(modal_launch open, modal_operation op, aldo::Emulator& emu,
 
 bool aldo::modal::loadROM(aldo::Emulator& emu, const gui_platform& p)
 {
-    const auto open = [](const gui_platform& p) {
+    auto open = [](const gui_platform& p) {
         return open_file(p, "Choose a ROM file");
     };
-    const auto op = [&emu](const std::filesystem::path& fp) {
-        emu.loadCart(fp);
-    };
+    auto op = [&emu](const std::filesystem::path& fp) { emu.loadCart(fp); };
     return file_modal(open, op, emu, p);
 }
 
 bool aldo::modal::loadBreakpoints(aldo::Emulator& emu, const gui_platform& p)
 {
-    const auto open = [](const gui_platform& p) {
+    auto open = [](const gui_platform& p) {
         return open_file(p, "Choose a Breakpoints file",
                          {aldo::debug::BreakFileExtension, nullptr});
     };
-    const auto op = [&d = emu.debugger()](const std::filesystem::path& fp) {
+    auto op = [&d = emu.debugger()](const std::filesystem::path& fp) {
         d.loadBreakpoints(fp);
     };
     return file_modal(open, op, emu, p);
@@ -94,12 +92,12 @@ bool aldo::modal::loadBreakpoints(aldo::Emulator& emu, const gui_platform& p)
 
 bool aldo::modal::exportBreakpoints(aldo::Emulator& emu, const gui_platform& p)
 {
-    const auto open =
+    auto open =
         [n = aldo::debug::breakfile_path_from(emu.cartName())]
         (const gui_platform& p) {
             return save_file(p, "Export Breakpoints", n);
         };
-    const auto op =
+    auto op =
         [&d = std::as_const(emu.debugger())](const std::filesystem::path& fp) {
             d.exportBreakpoints(fp);
         };
@@ -108,11 +106,11 @@ bool aldo::modal::exportBreakpoints(aldo::Emulator& emu, const gui_platform& p)
 
 bool aldo::modal::loadPalette(aldo::Emulator& emu, const gui_platform& p)
 {
-    const auto open = [](const gui_platform& p) {
+    auto open = [](const gui_platform& p) {
         return open_file(p, "Choose a Palette",
                          {aldo::palette::FileExtension, nullptr});
     };
-    const auto op = [&p = emu.palette()](const std::filesystem::path& fp) {
+    auto op = [&p = emu.palette()](const std::filesystem::path& fp) {
         p.load(fp);
     };
     return file_modal(open, op, emu, p);

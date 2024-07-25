@@ -38,7 +38,7 @@ static int run_emu(const struct gui_platform *platform)
     }
     nes_powerup(console, NULL, false);
 
-    const int err = ui_sdl_runloop(platform, dbg, console);
+    int err = ui_sdl_runloop(platform, dbg, console);
     // NOTE: ui loop takes ownership of these two,
     // even in the event of UI init failure.
     console = NULL;

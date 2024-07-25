@@ -35,7 +35,7 @@ auto read_brkfile(const std::filesystem::path& filepath)
     std::vector<debugexpr> exprs;
     while (f.getline(buf.data(), buf.size())) {
         debugexpr expr;
-        const auto err = haltexpr_parse_dbgexpr(buf.data(), &expr);
+        auto err = haltexpr_parse_dbgexpr(buf.data(), &expr);
         if (err < 0) throw aldo::AldoError{
             "Breakpoints parse failure", err, haltexpr_errstr,
         };
@@ -61,7 +61,7 @@ auto set_debug_state(debugger* dbg, std::span<const debugexpr> exprs) noexcept
 
 auto format_debug_expr(const debugexpr& expr, hexpr_buffer& buf)
 {
-    const auto err = haltexpr_fmt_dbgexpr(&expr, buf.data());
+    auto err = haltexpr_fmt_dbgexpr(&expr, buf.data());
     if (err < 0) throw aldo::AldoError{
         "Breakpoint format failure", err, haltexpr_errstr,
     };
@@ -85,7 +85,7 @@ auto fill_expr_buffers(bp_size exprCount, int resetvector, bool resOverride,
 
 auto write_brkline(const hexpr_buffer& buf, std::ofstream& f)
 {
-    const std::string_view str{buf.data()};
+    std::string_view str{buf.data()};
     f.write(str.data(), static_cast<std::streamsize>(str.length()));
     f.put('\n');
     if (f.bad()) throw aldo::AldoError{
@@ -113,20 +113,19 @@ void aldo::Debugger::loadBreakpoints(const std::filesystem::path& filepath)
 void
 aldo::Debugger::exportBreakpoints(const std::filesystem::path& filepath) const
 {
-    const auto bpView = breakpoints();
-    const auto resOverride = isVectorOverridden();
-    const auto exprCount = bpView.size() + static_cast<bp_size>(resOverride);
+    auto bpView = breakpoints();
+    auto resOverride = isVectorOverridden();
+    auto exprCount = bpView.size() + static_cast<bp_size>(resOverride);
     if (exprCount == 0) return;
 
-    const auto bufs = fill_expr_buffers(exprCount, vectorOverride(),
-                                        resOverride, bpView.cbegin(),
-                                        bpView.cend());
+    auto bufs = fill_expr_buffers(exprCount, vectorOverride(), resOverride,
+                                  bpView.cbegin(), bpView.cend());
     write_brkfile(filepath, bufs);
 }
 
 void aldo::Debugger::loadCartState(const std::filesystem::path& prefCartPath)
 {
-    const auto brkpath = aldo::debug::breakfile_path_from(prefCartPath);
+    auto brkpath = aldo::debug::breakfile_path_from(prefCartPath);
     if (!std::filesystem::exists(brkpath)) return;
     loadBreakpoints(brkpath);
     SDL_Log("Breakpoints file loaded: %s", brkpath.c_str());
@@ -135,7 +134,7 @@ void aldo::Debugger::loadCartState(const std::filesystem::path& prefCartPath)
 void
 aldo::Debugger::saveCartState(const std::filesystem::path& prefCartPath) const
 {
-    const auto brkpath = aldo::debug::breakfile_path_from(prefCartPath);
+    auto brkpath = aldo::debug::breakfile_path_from(prefCartPath);
     if (isActive()) {
         exportBreakpoints(brkpath);
         SDL_Log("Breakpoints file saved: %s", brkpath.c_str());

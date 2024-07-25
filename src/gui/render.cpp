@@ -28,7 +28,7 @@ aldo::RenderFrame::RenderFrame(const aldo::MediaRuntime& r,
 
 aldo::RenderFrame::~RenderFrame()
 {
-    const auto ren = r.renderer();
+    auto ren = r.renderer();
     ImGui::Render();
     SDL_SetRenderDrawColor(ren, aldo::colors::ScreenFill,
                            aldo::colors::ScreenFill, aldo::colors::ScreenFill,

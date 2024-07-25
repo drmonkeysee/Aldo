@@ -17,7 +17,7 @@ namespace
 [[maybe_unused]] auto run_app() noexcept
 {
     // TODO: fill this out with Linux-specific platform functions
-    const gui_platform platform{};
+    gui_platform platform{};
     return gui_run(&platform);
 }
 

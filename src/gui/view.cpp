@@ -262,7 +262,7 @@ auto file_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
             vs.commands.emplace(aldo::Command::breakpointsOpen);
         }
         {
-            const DisabledIf dif = !emu.debugger().isActive();
+            DisabledIf dif = !emu.debugger().isActive();
             if (ImGui::MenuItem("Export Breakpoints...", "Opt+Cmd+B")) {
                 vs.commands.emplace(aldo::Command::breakpointsExport);
             }
@@ -272,7 +272,7 @@ auto file_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
             vs.commands.emplace(aldo::Command::paletteLoad);
         }
         {
-            const DisabledIf pif = emu.palette().isDefault();
+            DisabledIf pif = emu.palette().isDefault();
             if (ImGui::MenuItem("Unload Palette", "Opt+Cmd+P")) {
                 vs.commands.emplace(aldo::Command::paletteUnload);
             }
@@ -323,7 +323,7 @@ auto mode_menu_item(aldo::viewstate& vs, const aldo::Emulator& emu)
         modeAdjust = 1;
     }
     if (ImGui::MenuItem(label.c_str(), mnemonic)) {
-        const auto val = static_cast<csig_excmode>(emu.runMode() + modeAdjust);
+        auto val = static_cast<csig_excmode>(emu.runMode() + modeAdjust);
         vs.commands.emplace(aldo::Command::mode, val);
     }
 }
@@ -416,9 +416,9 @@ auto main_menu(aldo::viewstate& vs, const aldo::Emulator& emu,
 auto input_address(aldo::et::word* addr) noexcept
 {
     ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 6);
-    const ScopedID id = addr;
-    const auto result = ImGui::InputScalar("Address", ImGuiDataType_U16, addr,
-                                           nullptr, nullptr, "%04X");
+    ScopedID id = addr;
+    auto result = ImGui::InputScalar("Address", ImGuiDataType_U16, addr,
+                                     nullptr, nullptr, "%04X");
     return result;
 }
 
@@ -432,7 +432,7 @@ auto about_overlay(aldo::viewstate& vs) noexcept
                                     | ImGuiWindowFlags_NoNav
                                     | ImGuiWindowFlags_NoSavedSettings;
 
-    const auto workArea = ImGui::GetMainViewport()->WorkPos;
+    auto workArea = ImGui::GetMainViewport()->WorkPos;
     ImGui::SetNextWindowPos(workArea + 25);
     ImGui::SetNextWindowBgAlpha(0.75f);
 
@@ -479,8 +479,8 @@ public:
 protected:
     void renderContents() override
     {
-        const auto ren = mr.renderer();
-        const auto tex = mr.bouncerTexture();
+        auto ren = mr.renderer();
+        auto tex = mr.bouncerTexture();
         SDL_SetRenderTarget(ren, tex);
         SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(ren);
@@ -491,8 +491,8 @@ protected:
         SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
 
         const auto& bouncer = vs.bouncer;
-        const auto fulldim = bouncer.halfdim * 2;
-        const SDL_Rect pos{
+        auto fulldim = bouncer.halfdim * 2;
+        SDL_Rect pos{
             bouncer.pos.x - bouncer.halfdim,
             bouncer.pos.y - bouncer.halfdim,
             fulldim,
@@ -501,7 +501,7 @@ protected:
         SDL_RenderFillRect(ren, &pos);
         SDL_SetRenderTarget(ren, nullptr);
 
-        const ImVec2 sz{
+        ImVec2 sz{
             static_cast<float>(bouncer.bounds.x),
             static_cast<float>(bouncer.bounds.y),
         };
@@ -527,11 +527,12 @@ protected:
         using namespace std::literals::string_view_literals;
         static constexpr auto label = "Name: "sv;
 
-        const auto textSz = aldo::style::glyph_size(),
-                    availSpace = ImGui::GetContentRegionAvail();
-        const auto nameFit =
-            static_cast<int>((availSpace.x / textSz.x) - label.length());
-        const auto name = emu.displayCartName();
+        auto
+            textSz = aldo::style::glyph_size(),
+            availSpace = ImGui::GetContentRegionAvail();
+        auto nameFit = static_cast<int>((availSpace.x / textSz.x)
+                                        - label.length());
+        auto name = emu.displayCartName();
 
         std::string_view trail;
         int nameLen;
@@ -553,7 +554,7 @@ protected:
                               name.data());
         }
 
-        const auto info = emu.cartInfo();
+        auto info = emu.cartInfo();
         if (info) {
             ImGui::Text("Format: %s", cart_formatname(info->format));
             ImGui::Separator();
@@ -666,17 +667,17 @@ private:
             textOn = IM_COL32_BLACK,
             textOff = IM_COL32_WHITE;
 
-        const auto textSz = aldo::style::glyph_size();
-        const auto radius = (textSz.x + textSz.y) / 2;
-        const auto pos = ImGui::GetCursorScreenPos();
+        auto textSz = aldo::style::glyph_size();
+        auto radius = (textSz.x + textSz.y) / 2;
+        auto pos = ImGui::GetCursorScreenPos();
         ImVec2 center = pos + radius;
 
-        const auto fontSz = ImGui::GetFontSize();
-        const ImVec2 offset{fontSz / 4, fontSz / 2};
-        const auto drawList = ImGui::GetWindowDrawList();
+        auto fontSz = ImGui::GetFontSize();
+        ImVec2 offset{fontSz / 4, fontSz / 2};
+        auto drawList = ImGui::GetWindowDrawList();
 
         for (auto it = flags.cbegin(); it != flags.cend(); ++it) {
-            const auto bitpos = std::distance(it, flags.cend()) - 1;
+            auto bitpos = std::distance(it, flags.cend()) - 1;
             ImU32 fillColor, textColor;
             if (emu.snapshot().cpu.status & (1 << bitpos)) {
                 fillColor = aldo::colors::LedOn;
@@ -694,8 +695,7 @@ private:
 
     void renderDatapath() const noexcept
     {
-        const auto glyphW = aldo::style::glyph_size().x,
-                    lineSpacer = glyphW * 8;
+        auto glyphW = aldo::style::glyph_size().x, lineSpacer = glyphW * 8;
         renderControlLines(lineSpacer, glyphW);
         ImGui::Separator();
         renderBusLines();
@@ -720,12 +720,12 @@ private:
     {
         auto& datapath = emu.snapshot().datapath;
         {
-            const ScopedColor color{{ImGuiCol_Text, aldo::colors::LineOut}};
+            ScopedColor color{{ImGuiCol_Text, aldo::colors::LineOut}};
             ImGui::Text("Addr: %04X", datapath.addressbus);
         };
         ImGui::SameLine(0, 20);
         if (datapath.busfault) {
-            const ScopedColor color{
+            ScopedColor color{
                 {ImGuiCol_Text, aldo::colors::DestructiveHover},
             };
             ImGui::TextUnformatted("Data: FLT");
@@ -733,7 +733,7 @@ private:
             std::array<char, 3> dataHex;
             std::snprintf(dataHex.data(), dataHex.size(), "%02X",
                           datapath.databus);
-            const ScopedColor color{{
+            ScopedColor color{{
                 ImGuiCol_Text,
                 emu.snapshot().lines.readwrite
                     ? aldo::colors::LineIn
@@ -751,7 +751,7 @@ private:
             ImGui::TextUnformatted("Decode: JAMMED");
         } else {
             std::array<aldo::et::tchar, DIS_DATAP_SIZE> buf;
-            const auto err = dis_datapath(emu.snapshotp(), buf.data());
+            auto err = dis_datapath(emu.snapshotp(), buf.data());
             ImGui::Text("Decode: %s", err < 0 ? dis_errstr(err) : buf.data());
         }
         ImGui::Text("adl: %02X", datapath.addrlow_latch);
@@ -785,9 +785,9 @@ private:
 
         ImGui::TextUnformatted("t:");
         ImGui::SameLine();
-        const auto pos = ImGui::GetCursorScreenPos();
+        auto pos = ImGui::GetCursorScreenPos();
         ImVec2 center{pos.x, pos.y + (ImGui::GetTextLineHeight() / 2) + 1};
-        const auto drawList = ImGui::GetWindowDrawList();
+        auto drawList = ImGui::GetWindowDrawList();
         for (auto i = 0; i < MaxTCycle; ++i) {
             drawList->AddCircleFilled(center, radius,
                                       i == cycle
@@ -800,30 +800,30 @@ private:
 
     static void renderControlLine(const char* label, bool active) noexcept
     {
-        const DisabledIf dif = !active;
+        DisabledIf dif = !active;
         ImGui::TextUnformatted(label);
     }
 
     static void renderRWLine(bool active, float adjustW) noexcept
     {
-        const DisabledIf dif = !active;
+        DisabledIf dif = !active;
         ImGui::TextUnformatted("R/W");
-        const ImVec2
+        ImVec2
             end{ImGui::GetItemRectMax().x, ImGui::GetItemRectMin().y},
             start{end.x - adjustW, end.y};
-        const auto drawList = ImGui::GetWindowDrawList();
+        auto drawList = ImGui::GetWindowDrawList();
         drawList->AddLine(start, end, aldo::colors::white(active));
     }
 
     static void renderInterruptLine(const char* label, bool active) noexcept
     {
-        const DisabledIf dif = !active;
+        DisabledIf dif = !active;
         ImGui::TextUnformatted(label);
-        const auto start = ImGui::GetItemRectMin();
-        const ImVec2 end{
+        auto start = ImGui::GetItemRectMin();
+        ImVec2 end{
             start.x + ImGui::GetItemRectSize().x, start.y,
         };
-        const auto drawlist = ImGui::GetWindowDrawList();
+        auto drawlist = ImGui::GetWindowDrawList();
         drawlist->AddLine(start, end, aldo::colors::white(active));
     }
 };
@@ -839,7 +839,7 @@ public:
 
         std::ranges::generate(haltConditions,
             [h = static_cast<halt_integral>(HLT_NONE)] mutable -> halt_val {
-                const auto cond = static_cast<halt_val::first_type>(++h);
+                auto cond = static_cast<halt_val::first_type>(++h);
                 return {cond, haltcond_description(cond)};
             });
         resetHaltExpression(haltConditions.cbegin());
@@ -901,11 +901,11 @@ private:
         }
         void rangeSelect(bp_diff idx)
         {
-            const auto lastSelection = mostRecent();
+            auto lastSelection = mostRecent();
             if (lastSelection == NoSelection) {
                 select(idx);
             } else {
-                const auto [low, high] = std::minmax(idx, lastSelection);
+                auto [low, high] = std::minmax(idx, lastSelection);
                 for (auto i = low; i <= high; ++i) {
                     selections.push_back(i);
                 }
@@ -918,10 +918,10 @@ private:
 
         void queueEnableToggles(aldo::viewstate& vs, bool enabled) const
         {
-            for (const auto idx : selections) {
-                const auto cmd = enabled
-                                    ? aldo::Command::breakpointDisable
-                                    : aldo::Command::breakpointEnable;
+            for (auto idx : selections) {
+                auto cmd = enabled
+                            ? aldo::Command::breakpointDisable
+                            : aldo::Command::breakpointEnable;
                 vs.commands.emplace(cmd, idx);
             }
         }
@@ -933,7 +933,7 @@ private:
             std::ranges::partial_sort_copy(selections, sorted,
                                            std::ranges::greater{});
             std::unordered_set<bp_diff> removed(sorted.size());
-            for (const auto idx : sorted) {
+            for (auto idx : sorted) {
                 // NOTE: here's where duplicate selections bite us
                 if (removed.contains(idx)) continue;
                 vs.commands.emplace(aldo::Command::breakpointRemove, idx);
@@ -961,7 +961,7 @@ private:
                 vs.commands.emplace(aldo::Command::resetVectorClear);
             }
         }
-        const DisabledIf dif = [this] {
+        DisabledIf dif = [this] {
             if (this->resetOverride) return false;
             // NOTE: +2 = start of reset vector
             this->resetAddr = batowr(this->emu.snapshot().mem.vectors + 2);
@@ -975,7 +975,7 @@ private:
 
     void renderBreakpoints()
     {
-        const auto setFocus = renderConditionCombo();
+        auto setFocus = renderConditionCombo();
         ImGui::Separator();
         renderBreakpointAdd(setFocus);
         ImGui::Separator();
@@ -994,7 +994,7 @@ private:
             for (auto it = haltConditions.cbegin();
                  it != haltConditions.cend();
                  ++it) {
-                const auto current = it == selectedCondition;
+                auto current = it == selectedCondition;
                 if (ImGui::Selectable(it->second, current)) {
                     setFocus = true;
                     if (!current) {
@@ -1037,7 +1037,7 @@ private:
         if (setFocus) {
             ImGui::SetKeyboardFocusHere(-1);
         }
-        const auto submitted = ImGui::IsItemDeactivated() && enter_pressed();
+        auto submitted = ImGui::IsItemDeactivated() && enter_pressed();
         if (ImGui::Button("Add") || submitted) {
             vs.commands.emplace(aldo::Command::breakpointAdd,
                                 currentHaltExpression);
@@ -1046,12 +1046,12 @@ private:
 
     void renderBreakpointList()
     {
-        const ImVec2 dims{
+        ImVec2 dims{
             -std::numeric_limits<float>::min(),
             8 * ImGui::GetTextLineHeightWithSpacing(),
         };
-        const auto bpView = emu.debugger().breakpoints();
-        const auto bpCount = bpView.size();
+        auto bpView = emu.debugger().breakpoints();
+        auto bpCount = bpView.size();
         ImGui::Text("%zu breakpoint%s", bpCount, bpCount == 1 ? "" : "s");
         if (ImGui::BeginListBox("##breakpoints", dims)) {
             bp_diff i = 0;
@@ -1065,20 +1065,20 @@ private:
 
     void renderBreakpoint(bp_diff idx, const breakpoint& bp)
     {
-        const auto bpBreak = idx == emu.snapshot().debugger.halted;
+        auto bpBreak = idx == emu.snapshot().debugger.halted;
         if (bpBreak && !detectedHalt) {
             bpSelections.select(idx);
         }
         std::array<aldo::et::tchar, HEXPR_FMT_SIZE> fmt;
-        const auto err = haltexpr_desc(&bp.expr, fmt.data());
-        const ScopedStyleFlt style{
+        auto err = haltexpr_desc(&bp.expr, fmt.data());
+        ScopedStyleFlt style{
             {ImGuiStyleVar_Alpha, ImGui::GetStyle().DisabledAlpha},
             !bp.enabled,
         };
-        const ScopedColor color{
+        ScopedColor color{
             {ImGuiCol_Text, aldo::colors::Attention}, bpBreak,
         };
-        const ScopedID id = static_cast<int>(idx);
+        ScopedID id = static_cast<int>(idx);
         if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt.data(),
                               bpSelections.selected(idx))) {
             if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
@@ -1095,12 +1095,12 @@ private:
     {
         DisabledIf dif = bpSelections.empty();
         auto& dbg = emu.debugger();
-        const auto bp = dbg.breakpoints().at(bpSelections.mostRecent());
+        auto bp = dbg.breakpoints().at(bpSelections.mostRecent());
         if (ImGui::Button(!bp || bp->enabled ? "Disable" : "Enable ")) {
             bpSelections.queueEnableToggles(vs, bp->enabled);
         }
         ImGui::SameLine();
-        const ScopedColor colors = {
+        ScopedColor colors = {
             {ImGuiCol_Button, aldo::colors::Destructive},
             {ImGuiCol_ButtonHovered, aldo::colors::DestructiveHover},
             {ImGuiCol_ButtonActive, aldo::colors::DestructiveActive},
@@ -1166,7 +1166,7 @@ protected:
     {
         static constexpr auto style = ImGuiTableFlags_Borders
                                         | ImGuiTableFlags_SizingFixedFit;
-        const auto name = emu.palette().name();
+        auto name = emu.palette().name();
         ImGui::Text("%.*s", static_cast<int>(name.length()), name.data());
         if (ImGui::BeginTable("palette", Cols, style)) {
             renderHeader();
@@ -1197,27 +1197,27 @@ private:
                                 paletteDim = aldo::palette::Size / rows;
         static constexpr auto center = 0.5f;
 
-        const ScopedStyleVec textAlign{{
+        ScopedStyleVec textAlign{{
             ImGuiStyleVar_SelectableTextAlign,
             {center, center},
         }};
         for (pal_sz row = 0; row < rows; ++row) {
             for (pal_sz col = 0; col < Cols; ++col) {
-                const auto rowStart = paletteDim * row;
+                auto rowStart = paletteDim * row;
                 ImGui::TableNextColumn();
                 if (col == 0) {
                     ImGui::Text(" %02zX", rowStart);
                 } else {
-                    const auto cell = rowStart + (col - 1);
-                    const auto color = emu.palette().getColor(cell);
+                    auto cell = rowStart + (col - 1);
+                    auto color = emu.palette().getColor(cell);
                     ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color);
-                    const ScopedColor indicatorColor{
+                    ScopedColor indicatorColor{
                         {ImGuiCol_Text, aldo::colors::luminance(color) < 0x80
                                         ? IM_COL32_WHITE
                                         : IM_COL32_BLACK},
                         cell == selected,
                     };
-                    const ScopedID id = static_cast<int>(cell);
+                    ScopedID id = static_cast<int>(cell);
                     if (ImGui::Selectable(cell == selected ? "x" : "", false,
                                           ImGuiSelectableFlags_None,
                                           {cellDim, cellDim})) {
@@ -1231,14 +1231,14 @@ private:
     void renderColorSelection() const
     {
         static constexpr auto selectedColorDim = 70;
-        const auto color = emu.palette().getColor(selected);
+        auto color = emu.palette().getColor(selected);
         ImGui::ColorButton("Selected Color",
                            ImGui::ColorConvertU32ToFloat4(color),
                            ImGuiColorEditFlags_NoAlpha,
                            {selectedColorDim, selectedColorDim});
         ImGui::SameLine();
         widget_group([color, this] {
-            const auto [r, g, b] = aldo::colors::rgb(color);
+            auto [r, g, b] = aldo::colors::rgb(color);
             ImGui::Text("Index: %02zX", this->selected);
             if (this->selected == 0xd) {
                 ImGui::SameLine();
@@ -1300,7 +1300,7 @@ private:
                     } else if (ImGui::BeginPopupContextItem()) {
                         selected = i;
                         if (ImGui::Selectable("Add breakpoint...")) {
-                            const auto expr = haltexpr{
+                            auto expr = haltexpr{
                                 .address = addr, .cond = HLT_ADDR,
                             };
                             vs.commands.emplace(aldo::Command::breakpointAdd,
@@ -1372,9 +1372,10 @@ protected:
                                             | ImGuiTableFlags_SizingFixedFit
                                             | ImGuiTableFlags_ScrollY;
 
-        const auto pageCount = static_cast<int>(emu.ramSize()) / PageSize,
-                    rowCount = pageCount * PageDim;
-        const ImVec2 tableSize{
+        auto
+            pageCount = static_cast<int>(emu.ramSize()) / PageSize,
+            rowCount = pageCount * PageDim;
+        ImVec2 tableSize{
             0, ImGui::GetTextLineHeightWithSpacing() * 2 * (PageDim + 1),
         };
         if (ImGui::BeginTable("ram", Cols, tableConfig, tableSize)) {
@@ -1415,7 +1416,7 @@ private:
         void renderRows(int start, int end)
         {
             for (auto row = start; row < end; ++row) {
-                const auto page = row / PageDim, pageRow = row % PageDim;
+                auto page = row / PageDim, pageRow = row % PageDim;
                 if (0 < page && pageRow == 0) {
                     for (auto col = 0; col < Cols; ++col) {
                         ImGui::TableNextColumn();
@@ -1427,7 +1428,7 @@ private:
                 // ram, so guard that here.
                 if (row >= totalRows) break;
 
-                const auto rowAddr = row * PageDim;
+                auto rowAddr = row * PageDim;
                 ImGui::TableNextColumn();
                 ImGui::Text("%04X", rowAddr);
                 for (auto ramCol = 0; ramCol < PageDim; ++ramCol) {
@@ -1442,8 +1443,8 @@ private:
     private:
         void renderColumn(int ramCol, int rowAddr, int page)
         {
-            const auto ramIdx = static_cast<aldo::et::size>(rowAddr + ramCol);
-            const auto val = ram[ramIdx];
+            auto ramIdx = static_cast<aldo::et::size>(rowAddr + ramCol);
+            auto val = ram[ramIdx];
             ImGui::TableNextColumn();
             if (page == 1 && ramIdx % PageSize == sp) {
                 ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
@@ -1539,7 +1540,7 @@ private:
             vs.commands.emplace(aldo::Command::ready, !halt);
         };
 
-        const auto mode = emu.runMode();
+        auto mode = emu.runMode();
         ImGui::TextUnformatted("Mode");
         if (ImGui::RadioButton("Cycle", mode == CSGM_CYCLE)
             && mode != CSGM_CYCLE) {
@@ -1627,7 +1628,7 @@ void aldo::Layout::render() const
 
 void aldo::View::handleTransition() noexcept
 {
-    const auto t = transition.reset();
+    auto t = transition.reset();
     switch (t) {
     case aldo::View::Transition::Open:
         visible = true;

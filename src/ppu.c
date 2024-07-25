@@ -116,7 +116,7 @@ static bool in_vblank(const struct rp2c02 *self)
 
 static bool palette_addr(uint16_t addr)
 {
-    return MEMBLOCK_16KB - MEMBLOCK_256B <= addr && addr < MEMBLOCK_16KB;
+    return MEMBLOCK_16KB - 256 <= addr && addr < MEMBLOCK_16KB;
 }
 
 static uint16_t mask_palette(uint16_t addr)
@@ -431,7 +431,7 @@ static int cycle(struct rp2c02 *self)
 // MARK: - Public Interface
 //
 
-const uint16_t PaletteStartAddr = MEMBLOCK_16KB - MEMBLOCK_256B;
+const uint16_t PaletteStartAddr = MEMBLOCK_16KB - 256;
 
 void ppu_connect(struct rp2c02 *self, bus *mbus)
 {

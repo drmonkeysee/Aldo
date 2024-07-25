@@ -22,7 +22,7 @@
 static void interrupt_handler_setup(void **ctx)
 {
     // NOTE: 32k rom, starting at $8000, for interrupt vectors
-    uint8_t *const rom = calloc(MEMBLOCK_32KB, sizeof *rom);
+    uint8_t *rom = calloc(MEMBLOCK_32KB, sizeof *rom);
     rom[CPU_VECTOR_IRQ & ADDRMASK_32KB] = 0xaa;
     rom[(CPU_VECTOR_IRQ + 1) & ADDRMASK_32KB] = 0xbb;
     rom[CPU_VECTOR_NMI & ADDRMASK_32KB] = 0x77;
@@ -44,7 +44,7 @@ static void brk_handler(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(0xbbaau, cpu.pc);
@@ -148,7 +148,7 @@ static void rst_handler(void *ctx)
     ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
 
     cpu.signal.rst = true;
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(0x8822u, cpu.pc);
@@ -171,7 +171,7 @@ static void rti_clear_irq_mask(void *ctx)
     cpu.s = 1;
     cpu.p.i = true;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(5u, cpu.pc);
@@ -193,7 +193,7 @@ static void rti_set_irq_mask(void *ctx)
     cpu.s = 1;
     cpu.p.i = false;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(5u, cpu.pc);
@@ -493,7 +493,7 @@ static void nmi_hijacks_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -546,7 +546,7 @@ static void nmi_hijacks_and_loses_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -599,7 +599,7 @@ static void nmi_delayed_by_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -648,7 +648,7 @@ static void nmi_late_delayed_by_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -694,7 +694,7 @@ static void nmi_lost_during_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -749,7 +749,7 @@ static void rst_hijacks_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -809,7 +809,7 @@ static void rst_following_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -866,7 +866,7 @@ static void rst_late_on_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -916,7 +916,7 @@ static void rst_hijacks_nmi(void *ctx)
     cpu.s = 0xff;
 
     cpu.signal.nmi = false;
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -975,7 +975,7 @@ static void rst_following_nmi(void *ctx)
     cpu.s = 0xff;
 
     cpu.signal.nmi = false;
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1031,7 +1031,7 @@ static void rst_late_on_nmi(void *ctx)
     cpu.s = 0xff;
 
     cpu.signal.nmi = false;
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);

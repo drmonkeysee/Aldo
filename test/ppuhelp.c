@@ -39,7 +39,7 @@ uint8_t VRam[4];
 
 void ppu_setup(void **ctx)
 {
-    struct ppu_test_context *const c = calloc(sizeof *c, 1);
+    struct ppu_test_context *c = calloc(sizeof *c, 1);
     // NOTE: enough main bus to map $2000 - $3FFF for ppu registers
     c->mbus = bus_new(BITWIDTH_16KB, 2, MEMBLOCK_8KB);
     VRam[0] = 0x11;
@@ -64,7 +64,7 @@ void ppu_setup(void **ctx)
 
 void ppu_teardown(void **ctx)
 {
-    struct ppu_test_context *const c = *ctx;
+    struct ppu_test_context *c = *ctx;
     bus_free(c->vbus);
     bus_free(c->mbus);
     free(c);

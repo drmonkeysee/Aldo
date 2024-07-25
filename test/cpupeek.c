@@ -95,7 +95,7 @@ static void irq_ignored(void *ctx)
     cpu.p.i = false;
     cpu.signal.irq = false;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -113,7 +113,7 @@ static void nmi_ignored(void *ctx)
     cpu.s = 0xff;
     cpu.signal.nmi = false;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -131,7 +131,7 @@ static void rst_not_ignored(void *ctx)
     cpu.s = 0xff;
     cpu.signal.rst = false;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -147,7 +147,7 @@ static void writes_ignored(void *ctx)
     cpu.a = 0x10;
     cpu_peek_start(&cpu, NULL);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -165,7 +165,7 @@ static void peek_immediate(void *ctx)
     cpu.a = 0x10;
     cpu_peek_start(&cpu, NULL);
 
-    const struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct peekresult result = cpu_peek(&cpu, 0x0);
 
     ct_assertequal(AM_IMM, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -183,7 +183,7 @@ static void peek_zeropage(void *ctx)
     cpu.a = 0x10;
     cpu_peek_start(&cpu, NULL);
 
-    const struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct peekresult result = cpu_peek(&cpu, 0x0);
 
     ct_assertequal(AM_ZP, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -202,7 +202,7 @@ static void peek_zp_indexed(void *ctx)
     cpu.x = 2;
     cpu_peek_start(&cpu, NULL);
 
-    const struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct peekresult result = cpu_peek(&cpu, 0x0);
 
     ct_assertequal(AM_ZPX, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -221,7 +221,7 @@ static void peek_indexed_indirect(void *ctx)
     cpu.x = 2;
     cpu_peek_start(&cpu, NULL);
 
-    const struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct peekresult result = cpu_peek(&cpu, 0x0);
 
     ct_assertequal(AM_INDX, (int)result.mode);
     ct_assertequal(0x4u, result.interaddr);
@@ -240,7 +240,7 @@ static void peek_indirect_indexed(void *ctx)
     cpu.y = 5;
     cpu_peek_start(&cpu, NULL);
 
-    const struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct peekresult result = cpu_peek(&cpu, 0x0);
 
     ct_assertequal(AM_INDY, (int)result.mode);
     ct_assertequal(0x102u, result.interaddr);
@@ -258,7 +258,7 @@ static void peek_absolute(void *ctx)
     cpu.a = 0x10;
     cpu_peek_start(&cpu, NULL);
 
-    const struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct peekresult result = cpu_peek(&cpu, 0x0);
 
     ct_assertequal(AM_ABS, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -277,7 +277,7 @@ static void peek_absolute_indexed(void *ctx)
     cpu.x = 0xa;
     cpu_peek_start(&cpu, NULL);
 
-    const struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct peekresult result = cpu_peek(&cpu, 0x0);
 
     ct_assertequal(AM_ABSX, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -295,7 +295,7 @@ static void peek_branch(void *ctx)
     cpu.p.z = true;
     cpu_peek_start(&cpu, NULL);
 
-    const struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct peekresult result = cpu_peek(&cpu, 0x0);
 
     ct_assertequal(AM_BCH, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -313,7 +313,7 @@ static void peek_branch_forced(void *ctx)
     cpu.p.z = false;
     cpu_peek_start(&cpu, NULL);
 
-    const struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct peekresult result = cpu_peek(&cpu, 0x0);
 
     ct_assertequal(AM_BCH, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -332,7 +332,7 @@ static void peek_absolute_indirect(void *ctx)
     cpu.x = 0xa;
     cpu_peek_start(&cpu, NULL);
 
-    const struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct peekresult result = cpu_peek(&cpu, 0x0);
 
     ct_assertequal(AM_JIND, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -349,7 +349,7 @@ static void peek_jam(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu_peek_start(&cpu, NULL);
 
-    const struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct peekresult result = cpu_peek(&cpu, 0x0);
 
     ct_assertequal(AM_JAM, (int)result.mode);
 }
@@ -363,7 +363,7 @@ static void peek_busfault(void *ctx)
     cpu.a = 0x10;
     cpu_peek_start(&cpu, NULL);
 
-    const struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct peekresult result = cpu_peek(&cpu, 0x0);
 
     ct_assertequal(AM_ABS, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);

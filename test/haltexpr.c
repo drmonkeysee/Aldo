@@ -17,14 +17,14 @@
 
 static void errstr_returns_known_err(void *ctx)
 {
-    const char *const err = haltexpr_errstr(HEXPR_ERR_FMT);
+    const char *err = haltexpr_errstr(HEXPR_ERR_FMT);
 
     ct_assertequalstr("FORMATTED OUTPUT FAILURE", err);
 }
 
 static void errstr_returns_unknown_err(void *ctx)
 {
-    const char *const err = haltexpr_errstr(10);
+    const char *err = haltexpr_errstr(10);
 
     ct_assertequalstr("UNKNOWN ERR", err);
 }
@@ -35,30 +35,30 @@ static void errstr_returns_unknown_err(void *ctx)
 
 static void null_string(void *ctx)
 {
-    const char *const str = NULL;
+    const char *str = NULL;
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void empty_string(void *ctx)
 {
-    const char *const str = "";
+    const char *str = "";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void address_condition(void *ctx)
 {
-    const char *const str = "@ab12";
+    const char *str = "@ab12";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
@@ -67,10 +67,10 @@ static void address_condition(void *ctx)
 
 static void address_condition_with_space(void *ctx)
 {
-    const char *const str = "@   ab12";
+    const char *str = "@   ab12";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
@@ -79,10 +79,10 @@ static void address_condition_with_space(void *ctx)
 
 static void address_condition_with_leading_space(void *ctx)
 {
-    const char *const str = "   @ab12";
+    const char *str = "   @ab12";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
@@ -91,10 +91,10 @@ static void address_condition_with_leading_space(void *ctx)
 
 static void address_condition_with_trailing_space(void *ctx)
 {
-    const char *const str = "@ab12   ";
+    const char *str = "@ab12   ";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
@@ -103,10 +103,10 @@ static void address_condition_with_trailing_space(void *ctx)
 
 static void address_condition_caps(void *ctx)
 {
-    const char *const str = "@AB12";
+    const char *str = "@AB12";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
@@ -115,10 +115,10 @@ static void address_condition_caps(void *ctx)
 
 static void address_condition_with_prefix(void *ctx)
 {
-    const char *const str = "@0xab12";
+    const char *str = "@0xab12";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
@@ -127,10 +127,10 @@ static void address_condition_with_prefix(void *ctx)
 
 static void address_condition_short(void *ctx)
 {
-    const char *const str = "@1f";
+    const char *str = "@1f";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_ADDR, (int)expr.cond);
@@ -139,10 +139,10 @@ static void address_condition_short(void *ctx)
 
 static void address_condition_too_large(void *ctx)
 {
-    const char *const str = "@12345";
+    const char *str = "@12345";
     struct haltexpr expr = {0};
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(HEXPR_ERR_VALUE, result);
     ct_assertequal(HLT_NONE, (int)expr.cond);
@@ -150,10 +150,10 @@ static void address_condition_too_large(void *ctx)
 
 static void address_condition_negative_overflow(void *ctx)
 {
-    const char *const str = "@-asdf";
+    const char *str = "@-asdf";
     struct haltexpr expr = {0};
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(HEXPR_ERR_VALUE, result);
     ct_assertequal(HLT_NONE, (int)expr.cond);
@@ -161,20 +161,20 @@ static void address_condition_negative_overflow(void *ctx)
 
 static void address_condition_malformed(void *ctx)
 {
-    const char *const str = "@hjkl";
+    const char *str = "@hjkl";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void runtime_condition(void *ctx)
 {
-    const char *const str = "1.2s";
+    const char *str = "1.2s";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_TIME, (int)expr.cond);
@@ -183,10 +183,10 @@ static void runtime_condition(void *ctx)
 
 static void runtime_condition_zero(void *ctx)
 {
-    const char *const str = "0s";
+    const char *str = "0s";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_TIME, (int)expr.cond);
@@ -195,10 +195,10 @@ static void runtime_condition_zero(void *ctx)
 
 static void runtime_condition_case_insensitive(void *ctx)
 {
-    const char *const str = "1.2S";
+    const char *str = "1.2S";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_TIME, (int)expr.cond);
@@ -207,10 +207,10 @@ static void runtime_condition_case_insensitive(void *ctx)
 
 static void runtime_condition_with_space(void *ctx)
 {
-    const char *const str = "1.2   s";
+    const char *str = "1.2   s";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_TIME, (int)expr.cond);
@@ -219,10 +219,10 @@ static void runtime_condition_with_space(void *ctx)
 
 static void runtime_condition_with_leading_space(void *ctx)
 {
-    const char *const str = "   1.2s";
+    const char *str = "   1.2s";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_TIME, (int)expr.cond);
@@ -231,10 +231,10 @@ static void runtime_condition_with_leading_space(void *ctx)
 
 static void runtime_condition_with_trailing_space(void *ctx)
 {
-    const char *const str = "1.2s   ";
+    const char *str = "1.2s   ";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_TIME, (int)expr.cond);
@@ -243,10 +243,10 @@ static void runtime_condition_with_trailing_space(void *ctx)
 
 static void runtime_condition_no_decimal(void *ctx)
 {
-    const char *const str = "5s";
+    const char *str = "5s";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_TIME, (int)expr.cond);
@@ -255,10 +255,10 @@ static void runtime_condition_no_decimal(void *ctx)
 
 static void runtime_condition_negative(void *ctx)
 {
-    const char *const str = "-20.4s";
+    const char *str = "-20.4s";
     struct haltexpr expr = {0};
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(HEXPR_ERR_VALUE, result);
     ct_assertequal(HLT_NONE, (int)expr.cond);
@@ -266,20 +266,20 @@ static void runtime_condition_negative(void *ctx)
 
 static void runtime_condition_malformed(void *ctx)
 {
-    const char *const str = "hjkls";
+    const char *str = "hjkls";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void cycles_condition(void *ctx)
 {
-    const char *const str = "42c";
+    const char *str = "42c";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_CYCLES, (int)expr.cond);
@@ -288,10 +288,10 @@ static void cycles_condition(void *ctx)
 
 static void cycles_condition_case_insensitive(void *ctx)
 {
-    const char *const str = "42C";
+    const char *str = "42C";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_CYCLES, (int)expr.cond);
@@ -300,10 +300,10 @@ static void cycles_condition_case_insensitive(void *ctx)
 
 static void cycles_condition_with_space(void *ctx)
 {
-    const char *const str = "42   c";
+    const char *str = "42   c";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_CYCLES, (int)expr.cond);
@@ -312,10 +312,10 @@ static void cycles_condition_with_space(void *ctx)
 
 static void cycles_condition_with_leading_space(void *ctx)
 {
-    const char *const str = "   42c";
+    const char *str = "   42c";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_CYCLES, (int)expr.cond);
@@ -324,10 +324,10 @@ static void cycles_condition_with_leading_space(void *ctx)
 
 static void cycles_condition_with_trailing_space(void *ctx)
 {
-    const char *const str = "42c   ";
+    const char *str = "42c   ";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_CYCLES, (int)expr.cond);
@@ -336,10 +336,10 @@ static void cycles_condition_with_trailing_space(void *ctx)
 
 static void cycles_condition_negative(void *ctx)
 {
-    const char *const str = "-45c";
+    const char *str = "-45c";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_CYCLES, (int)expr.cond);
@@ -348,20 +348,20 @@ static void cycles_condition_negative(void *ctx)
 
 static void cycles_condition_malformed(void *ctx)
 {
-    const char *const str = "hjklc";
+    const char *str = "hjklc";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void jam_condition(void *ctx)
 {
-    const char *const str = "jam";
+    const char *str = "jam";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_JAM, (int)expr.cond);
@@ -369,10 +369,10 @@ static void jam_condition(void *ctx)
 
 static void jam_condition_uppercase(void *ctx)
 {
-    const char *const str = "JAM";
+    const char *str = "JAM";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_JAM, (int)expr.cond);
@@ -380,10 +380,10 @@ static void jam_condition_uppercase(void *ctx)
 
 static void jam_condition_mixedcase(void *ctx)
 {
-    const char *const str = "JaM";
+    const char *str = "JaM";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_JAM, (int)expr.cond);
@@ -391,10 +391,10 @@ static void jam_condition_mixedcase(void *ctx)
 
 static void jam_condition_with_leading_space(void *ctx)
 {
-    const char *const str = "   jam";
+    const char *str = "   jam";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_JAM, (int)expr.cond);
@@ -402,10 +402,10 @@ static void jam_condition_with_leading_space(void *ctx)
 
 static void jam_condition_with_trailing_space(void *ctx)
 {
-    const char *const str = "jam   ";
+    const char *str = "jam   ";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_JAM, (int)expr.cond);
@@ -413,10 +413,10 @@ static void jam_condition_with_trailing_space(void *ctx)
 
 static void jam_condition_underparse(void *ctx)
 {
-    const char *const str = "jamming";
+    const char *str = "jamming";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(HLT_JAM, (int)expr.cond);
@@ -424,20 +424,20 @@ static void jam_condition_underparse(void *ctx)
 
 static void jam_condition_malformed(void *ctx)
 {
-    const char *const str = "maj";
+    const char *str = "maj";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void expr_missing_unit(void *ctx)
 {
-    const char *const str = "1234";
+    const char *str = "1234";
     struct haltexpr expr;
 
-    const int result = haltexpr_parse(str, &expr);
+    int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
@@ -448,30 +448,30 @@ static void expr_missing_unit(void *ctx)
 
 static void null_resetvector_string(void *ctx)
 {
-    const char *const str = NULL;
+    const char *str = NULL;
     struct debugexpr vector;
 
-    const int result = haltexpr_parse_dbgexpr(str, &vector);
+    int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void empty_resetvector_string(void *ctx)
 {
-    const char *const str = "";
+    const char *str = "";
     struct debugexpr vector;
 
-    const int result = haltexpr_parse_dbgexpr(str, &vector);
+    int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void resetvector(void *ctx)
 {
-    const char *const str = "!ab12";
+    const char *str = "!ab12";
     struct debugexpr vector;
 
-    const int result = haltexpr_parse_dbgexpr(str, &vector);
+    int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
@@ -480,10 +480,10 @@ static void resetvector(void *ctx)
 
 static void resetvector_with_space(void *ctx)
 {
-    const char *const str = "!   ab12";
+    const char *str = "!   ab12";
     struct debugexpr vector;
 
-    const int result = haltexpr_parse_dbgexpr(str, &vector);
+    int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
@@ -492,10 +492,10 @@ static void resetvector_with_space(void *ctx)
 
 static void resetvector_with_leading_space(void *ctx)
 {
-    const char *const str = "   !ab12";
+    const char *str = "   !ab12";
     struct debugexpr vector;
 
-    const int result = haltexpr_parse_dbgexpr(str, &vector);
+    int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
@@ -504,10 +504,10 @@ static void resetvector_with_leading_space(void *ctx)
 
 static void resetvector_with_trailing_space(void *ctx)
 {
-    const char *const str = "!ab12   ";
+    const char *str = "!ab12   ";
     struct debugexpr vector;
 
-    const int result = haltexpr_parse_dbgexpr(str, &vector);
+    int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
@@ -516,10 +516,10 @@ static void resetvector_with_trailing_space(void *ctx)
 
 static void resetvector_caps(void *ctx)
 {
-    const char *const str = "!AB12";
+    const char *str = "!AB12";
     struct debugexpr vector;
 
-    const int result = haltexpr_parse_dbgexpr(str, &vector);
+    int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
@@ -528,10 +528,10 @@ static void resetvector_caps(void *ctx)
 
 static void resetvector_with_prefix(void *ctx)
 {
-    const char *const str = "!0xab12";
+    const char *str = "!0xab12";
     struct debugexpr vector;
 
-    const int result = haltexpr_parse_dbgexpr(str, &vector);
+    int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
@@ -540,10 +540,10 @@ static void resetvector_with_prefix(void *ctx)
 
 static void resetvector_short(void *ctx)
 {
-    const char *const str = "!1f";
+    const char *str = "!1f";
     struct debugexpr vector;
 
-    const int result = haltexpr_parse_dbgexpr(str, &vector);
+    int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
@@ -552,40 +552,40 @@ static void resetvector_short(void *ctx)
 
 static void resetvector_too_large(void *ctx)
 {
-    const char *const str = "!12345";
+    const char *str = "!12345";
     struct debugexpr vector;
 
-    const int result = haltexpr_parse_dbgexpr(str, &vector);
+    int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(HEXPR_ERR_VALUE, result);
 }
 
 static void resetvector_negative_overflow(void *ctx)
 {
-    const char *const str = "!-asdf";
+    const char *str = "!-asdf";
     struct debugexpr vector;
 
-    const int result = haltexpr_parse_dbgexpr(str, &vector);
+    int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(HEXPR_ERR_VALUE, result);
 }
 
 static void resetvector_malformed(void *ctx)
 {
-    const char *const str = "!hjkl";
+    const char *str = "!hjkl";
     struct debugexpr vector;
 
-    const int result = haltexpr_parse_dbgexpr(str, &vector);
+    int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
 
 static void dbgexpr_parses_halt_condition(void *ctx)
 {
-    const char *const str = "@ab12";
+    const char *str = "@ab12";
     struct debugexpr expr;
 
-    const int result = haltexpr_parse_dbgexpr(str, &expr);
+    int result = haltexpr_parse_dbgexpr(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(DBG_EXPR_HALT, (int)expr.type);
@@ -595,10 +595,10 @@ static void dbgexpr_parses_halt_condition(void *ctx)
 
 static void dbgexpr_malformed(void *ctx)
 {
-    const char *const str = "badexpr";
+    const char *str = "badexpr";
     struct debugexpr expr;
 
-    const int result = haltexpr_parse_dbgexpr(str, &expr);
+    int result = haltexpr_parse_dbgexpr(str, &expr);
 
     ct_assertequal(HEXPR_ERR_SCAN, result);
 }
@@ -609,74 +609,74 @@ static void dbgexpr_malformed(void *ctx)
 
 static void print_none(void *ctx)
 {
-    const struct haltexpr expr = {0};
+    struct haltexpr expr = {0};
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_desc(&expr, buf);
+    int result = haltexpr_desc(&expr, buf);
 
-    const char *const expected = "None";
+    const char *expected = "None";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
 static void print_addr(void *ctx)
 {
-    const struct haltexpr expr = {.cond = HLT_ADDR, .address = 0x1234};
+    struct haltexpr expr = {.cond = HLT_ADDR, .address = 0x1234};
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_desc(&expr, buf);
+    int result = haltexpr_desc(&expr, buf);
 
-    const char *const expected = "PC @ $1234";
+    const char *expected = "PC @ $1234";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
 static void print_runtime(void *ctx)
 {
-    const struct haltexpr expr = {.cond = HLT_TIME, .runtime = 4.36532245f};
+    struct haltexpr expr = {.cond = HLT_TIME, .runtime = 4.36532245f};
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_desc(&expr, buf);
+    int result = haltexpr_desc(&expr, buf);
 
-    const char *const expected = "4.3653226 sec";
+    const char *expected = "4.3653226 sec";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
 static void print_long_runtime(void *ctx)
 {
-    const struct haltexpr expr = {
+    struct haltexpr expr = {
         .cond = HLT_TIME, .runtime = 12312423242344.234f,
     };
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_desc(&expr, buf);
+    int result = haltexpr_desc(&expr, buf);
 
-    const char *const expected = "1.2312423e+13 sec";
+    const char *expected = "1.2312423e+13 sec";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
 static void print_cycles(void *ctx)
 {
-    const struct haltexpr expr = {.cond = HLT_CYCLES, .cycles = 982423};
+    struct haltexpr expr = {.cond = HLT_CYCLES, .cycles = 982423};
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_desc(&expr, buf);
+    int result = haltexpr_desc(&expr, buf);
 
-    const char *const expected = "982423 cyc";
+    const char *expected = "982423 cyc";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
 static void print_jam(void *ctx)
 {
-    const struct haltexpr expr = {.cond = HLT_JAM};
+    struct haltexpr expr = {.cond = HLT_JAM};
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_desc(&expr, buf);
+    int result = haltexpr_desc(&expr, buf);
 
-    const char *const expected = "CPU JAMMED";
+    const char *expected = "CPU JAMMED";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
@@ -687,88 +687,88 @@ static void print_jam(void *ctx)
 
 static void format_reset(void *ctx)
 {
-    const struct debugexpr expr = {
+    struct debugexpr expr = {
         .type = DBG_EXPR_RESET, .resetvector = 0x1234,
     };
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_fmt_dbgexpr(&expr, buf);
+    int result = haltexpr_fmt_dbgexpr(&expr, buf);
 
-    const char *const expected = "!1234";
+    const char *expected = "!1234";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
 static void format_addr(void *ctx)
 {
-    const struct debugexpr expr = {
+    struct debugexpr expr = {
         .type = DBG_EXPR_HALT,
         .hexpr = {.cond = HLT_ADDR, .address = 0x1234},
     };
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_fmt_dbgexpr(&expr, buf);
+    int result = haltexpr_fmt_dbgexpr(&expr, buf);
 
-    const char *const expected = "@1234";
+    const char *expected = "@1234";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
 static void format_runtime(void *ctx)
 {
-    const struct debugexpr expr = {
+    struct debugexpr expr = {
         .type = DBG_EXPR_HALT,
         .hexpr = {.cond = HLT_TIME, .runtime = 4.36532245f},
     };
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_fmt_dbgexpr(&expr, buf);
+    int result = haltexpr_fmt_dbgexpr(&expr, buf);
 
-    const char *const expected = "4.3653226s";
+    const char *expected = "4.3653226s";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
 static void format_long_runtime(void *ctx)
 {
-    const struct debugexpr expr = {
+    struct debugexpr expr = {
         .type = DBG_EXPR_HALT,
         .hexpr = {.cond = HLT_TIME, .runtime = 12312423242344.234f},
     };
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_fmt_dbgexpr(&expr, buf);
+    int result = haltexpr_fmt_dbgexpr(&expr, buf);
 
-    const char *const expected = "1.2312423e+13s";
+    const char *expected = "1.2312423e+13s";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
 static void format_cycles(void *ctx)
 {
-    const struct debugexpr expr = {
+    struct debugexpr expr = {
         .type = DBG_EXPR_HALT,
         .hexpr = {.cond = HLT_CYCLES, .cycles = 982423},
     };
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_fmt_dbgexpr(&expr, buf);
+    int result = haltexpr_fmt_dbgexpr(&expr, buf);
 
-    const char *const expected = "982423c";
+    const char *expected = "982423c";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
 static void format_jam(void *ctx)
 {
-    const struct debugexpr expr = {
+    struct debugexpr expr = {
         .type = DBG_EXPR_HALT, .hexpr = {.cond = HLT_JAM},
     };
     char buf[HEXPR_FMT_SIZE];
 
-    const int result = haltexpr_fmt_dbgexpr(&expr, buf);
+    int result = haltexpr_fmt_dbgexpr(&expr, buf);
 
-    const char *const expected = "JAM";
+    const char *expected = "JAM";
     ct_assertequal((int)strlen(expected), result);
     ct_assertequalstrn(expected, buf, sizeof expected);
 }

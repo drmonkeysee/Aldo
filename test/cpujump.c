@@ -22,7 +22,7 @@ static void jmp(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(0x8001u, cpu.pc);
@@ -35,7 +35,7 @@ static void jmp_indirect(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(0xbeefu, cpu.pc);
@@ -49,7 +49,7 @@ static void jmp_indirect_pageboundary_bug(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     // NOTE: pc ends up pointing at address built from $80FF, $8000

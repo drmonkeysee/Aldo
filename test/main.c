@@ -42,7 +42,7 @@ struct ct_testsuite argparse_tests(void),
 
 static size_t testrunner(int argc, char *argv[argc+1])
 {
-    const struct ct_testsuite suites[] = {
+    struct ct_testsuite suites[] = {
         argparse_tests(),
         bus_tests(),
         bytes_tests(),
@@ -67,7 +67,7 @@ static size_t testrunner(int argc, char *argv[argc+1])
         ppu_register_tests(),
     };
     setup_testbus();
-    const size_t result = ct_run_withargs(suites, argc, argv);
+    size_t result = ct_run_withargs(suites, argc, argv);
     teardown_testbus();
     return result;
 }
@@ -84,6 +84,6 @@ size_t swift_runner(void)
 
 int main(int argc, char *argv[argc+1])
 {
-    const size_t failed = testrunner(argc, argv);
+    size_t failed = testrunner(argc, argv);
     return failed != 0;
 }

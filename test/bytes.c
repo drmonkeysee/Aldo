@@ -13,13 +13,13 @@
 
 static void bank_copy_zero_count(void *ctx)
 {
-    const uint8_t bank[] = {
+    uint8_t bank[] = {
         0xaa, 0xaa, 0xaa,
         [1021] = 0xff, [1022] = 0xff, [1023] = 0xff,
     };
     uint8_t dest = 0x11;
 
-    const size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x0, 0, &dest);
+    size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x0, 0, &dest);
 
     ct_assertequal(0u, result);
     ct_assertequal(0x11u, dest);
@@ -27,14 +27,14 @@ static void bank_copy_zero_count(void *ctx)
 
 static void bank_copy(void *ctx)
 {
-    const uint8_t bank[] = {
+    uint8_t bank[] = {
         0xaa, 0x99, 0x88, 0x77, 0x66,
         [1021] = 0xff, [1022] = 0xff, [1023] = 0xff,
     };
     uint8_t dest[5];
 
-    const size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x0,
-                                        sizeof dest / sizeof dest[0], dest);
+    size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x0,
+                                  sizeof dest / sizeof dest[0], dest);
 
     ct_assertequal(5u, result);
     ct_assertequal(0xaau, dest[0]);
@@ -46,14 +46,14 @@ static void bank_copy(void *ctx)
 
 static void bank_copy_end_of_bank(void *ctx)
 {
-    const uint8_t bank[] = {
+    uint8_t bank[] = {
         0xaa, 0xaa, 0xaa,
         [1021] = 0xff, [1022] = 0xff, [1023] = 0xff,
     };
     uint8_t dest[5] = {[1] = 0x11};
 
-    const size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x3ff,
-                                        sizeof dest / sizeof dest[0], dest);
+    size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x3ff,
+                                  sizeof dest / sizeof dest[0], dest);
 
     ct_assertequal(1u, result);
     ct_assertequal(0xffu, dest[0]);
@@ -62,14 +62,14 @@ static void bank_copy_end_of_bank(void *ctx)
 
 static void bank_copy_fit_end_of_bank(void *ctx)
 {
-    const uint8_t bank[] = {
+    uint8_t bank[] = {
         0xaa, 0xaa, 0xaa,
         [1021] = 0xff, [1022] = 0xff, [1023] = 0xee,
     };
     uint8_t dest[] = {0x11, 0x11, 0x11, 0x11, 0x11};
 
-    const size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x3fb,
-                                        sizeof dest / sizeof dest[0], dest);
+    size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x3fb,
+                                  sizeof dest / sizeof dest[0], dest);
 
     ct_assertequal(5u, result);
     ct_assertequal(0x0u, dest[0]);
@@ -81,14 +81,14 @@ static void bank_copy_fit_end_of_bank(void *ctx)
 
 static void bank_copy_address_beyond_range(void *ctx)
 {
-    const uint8_t bank[] = {
+    uint8_t bank[] = {
         0xaa, 0x99, 0x88, 0x77, 0x66, 0x55,
         [1021] = 0xff, [1022] = 0xff, [1023] = 0xff,
     };
     uint8_t dest[5];
 
-    const size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x401,
-                                        sizeof dest / sizeof dest[0], dest);
+    size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x401,
+                                  sizeof dest / sizeof dest[0], dest);
 
     ct_assertequal(5u, result);
     ct_assertequal(0x99u, dest[0]);

@@ -25,7 +25,7 @@ static void bcc_nobranch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -37,7 +37,7 @@ static void bcc_positive(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -50,7 +50,7 @@ static void bcc_negative(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.pc = 4;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(1u, cpu.pc);
@@ -63,7 +63,7 @@ static void bcc_positive_overflow(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.pc = 250;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(262u, cpu.pc);
@@ -72,14 +72,14 @@ static void bcc_positive_overflow(void *ctx)
 static void bcc_positive_wraparound(void *ctx)
 {
     // NOTE: 32k rom, starting at $8000 to set up $FFFC + 10
-    uint8_t *const rom = calloc(0x8000, sizeof *rom);
+    uint8_t *rom = calloc(0x8000, sizeof *rom);
     rom[0xfffa & ADDRMASK_32KB] = 0x90;
     rom[0xfffb & ADDRMASK_32KB] = 0xa;
     struct mos6502 cpu;
     setup_cpu(&cpu, NULL, rom);
     cpu.pc = 0xfffa;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     free(rom);
     ct_assertequal(4, cycles);
@@ -93,7 +93,7 @@ static void bcc_negative_overflow(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.pc = 256;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(248u, cpu.pc);
@@ -103,11 +103,11 @@ static void bcc_negative_wraparound(void *ctx)
 {
     uint8_t mem[] = {0x90, 0xf6};   // $0002 - 10
     // NOTE: 32k rom, starting at $8000 to allow reads of wraparound addresses
-    uint8_t *const rom = calloc(0x8000, sizeof *rom);
+    uint8_t *rom = calloc(0x8000, sizeof *rom);
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, rom);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     free(rom);
     ct_assertequal(4, cycles);
@@ -120,7 +120,7 @@ static void bcc_zero(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -132,7 +132,7 @@ static void bcs_nobranch(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -145,7 +145,7 @@ static void bcs_branch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -157,7 +157,7 @@ static void beq_nobranch(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -170,7 +170,7 @@ static void beq_branch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -182,7 +182,7 @@ static void bmi_nobranch(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -195,7 +195,7 @@ static void bmi_branch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.n = true;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -208,7 +208,7 @@ static void bne_nobranch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -220,7 +220,7 @@ static void bne_branch(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -233,7 +233,7 @@ static void bpl_nobranch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.n = true;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -245,7 +245,7 @@ static void bpl_branch(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -258,7 +258,7 @@ static void bvc_nobranch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.v = true;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -270,7 +270,7 @@ static void bvc_branch(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -282,7 +282,7 @@ static void bvs_nobranch(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -295,7 +295,7 @@ static void bvs_branch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.v = true;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);

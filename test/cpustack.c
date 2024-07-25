@@ -25,7 +25,7 @@ static void pha(void *ctx)
     cpu.a = 0x20;
     cpu.s = 4;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(1u, cpu.pc);
@@ -42,7 +42,7 @@ static void pha_wraparound(void *ctx)
     cpu.a = 0x20;
     cpu.s = 0;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(1u, cpu.pc);
@@ -60,7 +60,7 @@ static void php(void *ctx)
     cpu.p.z = true;
     cpu.s = 4;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(1u, cpu.pc);
@@ -78,7 +78,7 @@ static void php_wraparound(void *ctx)
     cpu.p.z = true;
     cpu.s = 0;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(1u, cpu.pc);
@@ -94,7 +94,7 @@ static void pla(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.s = 3;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(1u, cpu.pc);
@@ -113,7 +113,7 @@ static void pla_zero(void *ctx)
     cpu.a = 0xa;
     cpu.s = 3;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(1u, cpu.pc);
@@ -131,7 +131,7 @@ static void pla_negative(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.s = 3;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(1u, cpu.pc);
@@ -149,7 +149,7 @@ static void pla_wraparound(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.s = 0xff;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(1u, cpu.pc);
@@ -167,7 +167,7 @@ static void plp(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.s = 3;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(1u, cpu.pc);
@@ -185,7 +185,7 @@ static void plp_zero(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.s = 3;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(1u, cpu.pc);
@@ -203,7 +203,7 @@ static void plp_ones(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.s = 3;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(1u, cpu.pc);
@@ -221,7 +221,7 @@ static void plp_wraparound(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.s = 0xff;
 
-    const int cycles = clock_cpu(&cpu);
+    int cycles = clock_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(1u, cpu.pc);

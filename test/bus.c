@@ -23,7 +23,7 @@ struct test_context {
 
 static bool test_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
-    const uint8_t *const mem = ctx;
+    const uint8_t *mem = ctx;
     if (addr > 3) return false;
     *d = mem[addr];
     return true;
@@ -32,7 +32,7 @@ static bool test_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 static bool test_high_read(void *restrict ctx, uint16_t addr,
                            uint8_t *restrict d)
 {
-    const uint8_t *const mem = ctx;
+    const uint8_t *mem = ctx;
     *d = mem[addr & 0x1f];
     return true;
 }
@@ -40,14 +40,14 @@ static bool test_high_read(void *restrict ctx, uint16_t addr,
 static bool test_highest_read(void *restrict ctx, uint16_t addr,
                               uint8_t *restrict d)
 {
-    const uint8_t *const mem = ctx;
+    const uint8_t *mem = ctx;
     *d = mem[addr % 4];
     return true;
 }
 
 static bool test_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    uint8_t *const mem = ctx;
+    uint8_t *mem = ctx;
     if (addr > 3) return false;
     mem[addr] = d;
     return true;
@@ -55,14 +55,14 @@ static bool test_write(void *ctx, uint16_t addr, uint8_t d)
 
 static bool test_high_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    uint8_t *const mem = ctx;
+    uint8_t *mem = ctx;
     mem[addr & 0x1f] = d;
     return true;
 }
 
 static bool test_highest_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    uint8_t *const mem = ctx;
+    uint8_t *mem = ctx;
     mem[addr % 4] = d;
     return true;
 }
@@ -71,15 +71,15 @@ static size_t test_dma(const void *restrict ctx, uint16_t addr, size_t count,
                        uint8_t dest[restrict count])
 {
     if (addr >= 4) return 0;
-    const uint8_t *const mem = ctx;
-    const size_t maxlength = 4 - addr;
+    const uint8_t *mem = ctx;
+    size_t maxlength = 4 - addr;
     memcpy(dest, mem + addr, maxlength * sizeof *dest);
     return maxlength;
 }
 
 static void setup(void **ctx)
 {
-    struct test_context *const c = malloc(sizeof *c);
+    struct test_context *c = malloc(sizeof *c);
     // 6-bit address space (64 bytes), 3 partitions,
     // [$00 - $0F, $10 - $1F, $20 - $3F]
     c->b = bus_new(6, 3, 0x10, 0x20);
@@ -94,7 +94,7 @@ static void teardown(void **ctx)
 
 static void empty_device(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
 
     uint8_t d = 0xa;
 
@@ -105,9 +105,9 @@ static void empty_device(void *ctx)
 
 static void read_device(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
-    const struct busdevice bd = {
+    struct busdevice bd = {
         .read = test_read,
         .ctx = mem,
     };
@@ -130,7 +130,7 @@ static void read_device(void *ctx)
 
 static void read_device_at_high_partition(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t memlow[] = {0x9, 0x8, 0x7, 0x6},
             memhigh[] = {0xa, 0xb, [30] = 0xc, [31] = 0xd};
     struct busdevice bd = {
@@ -159,9 +159,9 @@ static void read_device_at_high_partition(void *ctx)
 
 static void write_device(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t mem[] = {0xff, 0xff, 0xff, 0xff};
-    const struct busdevice bd = {
+    struct busdevice bd = {
         .write = test_write,
         .ctx = mem,
     };
@@ -181,7 +181,7 @@ static void write_device(void *ctx)
 
 static void write_device_at_high_partition(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t memlow[] = {0xff, 0xff, 0xff, 0xff},
             memhigh[] = {0xff, 0xff, [30] = 0xff, [31] = 0xff};
     struct busdevice bd = {
@@ -208,9 +208,9 @@ static void write_device_at_high_partition(void *ctx)
 
 static void set_device_within_partition_bounds(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t mem[] = {0xff, 0xff, 0xff, 0xff};
-    const struct busdevice bd = {
+    struct busdevice bd = {
         .read = test_high_read,
         .ctx = mem,
     };
@@ -223,9 +223,9 @@ static void set_device_within_partition_bounds(void *ctx)
 
 static void set_device_too_high(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t mem[] = {0xff, 0xff, 0xff, 0xff};
-    const struct busdevice bd = {
+    struct busdevice bd = {
         .read = test_read,
         .ctx = mem,
     };
@@ -237,7 +237,7 @@ static void set_device_too_high(void *ctx)
 
 static void device_swap(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t mem1[] = {0xff, 0xff, 0xff, 0xff},
             mem2[] = {0xff, 0xff, 0xff, 0xff};
     struct busdevice bd1 = {
@@ -266,7 +266,7 @@ static void device_swap(void *ctx)
 
 static void device_clear(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t mem[] = {0xff, 0xff, 0xff, 0xff};
     struct busdevice bd1 = {
         .read = test_read,
@@ -290,11 +290,11 @@ static void device_clear(void *ctx)
 
 static void smallest_bus(void *ctx)
 {
-    struct test_context *const c = ctx;
+    struct test_context *c = ctx;
     bus_free(c->b);
-    bus *const b = c->b = bus_new(1, 1);
+    bus *b = c->b = bus_new(1, 1);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
-    const struct busdevice bd = {
+    struct busdevice bd = {
         .read = test_read,
         .write = test_write,
         .ctx = mem,
@@ -323,9 +323,9 @@ static void smallest_bus(void *ctx)
 
 static void largest_bus(void *ctx)
 {
-    struct test_context *const c = ctx;
+    struct test_context *c = ctx;
     bus_free(c->b);
-    bus *const b = c->b = bus_new(BITWIDTH_64KB, 2, 0x8000);
+    bus *b = c->b = bus_new(BITWIDTH_64KB, 2, 0x8000);
     uint8_t memlow[] = {0xa, 0xb, 0xc, 0xd},
             memhigh[] = {0x9, 0x8, 0x7, 0x6};
     struct busdevice bd = {
@@ -359,9 +359,9 @@ static void largest_bus(void *ctx)
 
 static void dma(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
-    const struct busdevice bd = {
+    struct busdevice bd = {
         .dma = test_dma,
         .ctx = mem,
     };
@@ -369,7 +369,7 @@ static void dma(void *ctx)
     ct_asserttrue(bus_set(b, 0x0, bd));
 
     uint8_t dest[4];
-    const size_t count = bus_dma(b, 0x0, sizeof dest / sizeof dest[0], dest);
+    size_t count = bus_dma(b, 0x0, sizeof dest / sizeof dest[0], dest);
     ct_assertequal(4u, count);
     ct_assertequal(mem[0], dest[0]);
     ct_assertequal(mem[1], dest[1]);
@@ -379,9 +379,9 @@ static void dma(void *ctx)
 
 static void dma_partial_bank(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
-    const struct busdevice bd = {
+    struct busdevice bd = {
         .dma = test_dma,
         .ctx = mem,
     };
@@ -389,7 +389,7 @@ static void dma_partial_bank(void *ctx)
     ct_asserttrue(bus_set(b, 0x0, bd));
 
     uint8_t dest[4];
-    const size_t count = bus_dma(b, 0x1, sizeof dest / sizeof dest[0], dest);
+    size_t count = bus_dma(b, 0x1, sizeof dest / sizeof dest[0], dest);
     ct_assertequal(3u, count);
     ct_assertequal(mem[1], dest[0]);
     ct_assertequal(mem[2], dest[1]);
@@ -398,9 +398,9 @@ static void dma_partial_bank(void *ctx)
 
 static void dma_end_of_bank(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
-    const struct busdevice bd = {
+    struct busdevice bd = {
         .dma = test_dma,
         .ctx = mem,
     };
@@ -408,16 +408,16 @@ static void dma_end_of_bank(void *ctx)
     ct_asserttrue(bus_set(b, 0x0, bd));
 
     uint8_t dest[4];
-    const size_t count = bus_dma(b, 0x3, sizeof dest / sizeof dest[0], dest);
+    size_t count = bus_dma(b, 0x3, sizeof dest / sizeof dest[0], dest);
     ct_assertequal(1u, count);
     ct_assertequal(mem[3], dest[0]);
 }
 
 static void dma_past_bank(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
-    const struct busdevice bd = {
+    struct busdevice bd = {
         .dma = test_dma,
         .ctx = mem,
     };
@@ -425,16 +425,16 @@ static void dma_past_bank(void *ctx)
     ct_asserttrue(bus_set(b, 0x0, bd));
 
     uint8_t dest[] = {0xff, 0xff, 0xff, 0xff};
-    const size_t count = bus_dma(b, 0x4, sizeof dest / sizeof dest[0], dest);
+    size_t count = bus_dma(b, 0x4, sizeof dest / sizeof dest[0], dest);
     ct_assertequal(0u, count);
     ct_assertequal(0xffu, dest[0]);
 }
 
 static void dma_wrong_addr(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
-    const struct busdevice bd = {
+    struct busdevice bd = {
         .dma = test_dma,
         .ctx = mem,
     };
@@ -442,16 +442,16 @@ static void dma_wrong_addr(void *ctx)
     ct_asserttrue(bus_set(b, 0x0, bd));
 
     uint8_t dest[] = {0xff, 0xff, 0xff, 0xff};
-    const size_t count = bus_dma(b, 0x40, sizeof dest / sizeof dest[0], dest);
+    size_t count = bus_dma(b, 0x40, sizeof dest / sizeof dest[0], dest);
     ct_assertequal(0u, count);
     ct_assertequal(0xffu, dest[0]);
 }
 
 static void dma_zero_count(void *ctx)
 {
-    bus *const b = get_bus(ctx);
+    bus *b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
-    const struct busdevice bd = {
+    struct busdevice bd = {
         .dma = test_dma,
         .ctx = mem,
     };
@@ -459,7 +459,7 @@ static void dma_zero_count(void *ctx)
     ct_asserttrue(bus_set(b, 0x0, bd));
 
     uint8_t dest[] = {0xff, 0xff, 0xff, 0xff};
-    const size_t count = bus_dma(b, 0x0, 0, dest);
+    size_t count = bus_dma(b, 0x0, 0, dest);
     ct_assertequal(0u, count);
     ct_assertequal(0xffu, dest[0]);
 }

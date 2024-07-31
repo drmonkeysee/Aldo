@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define memsz(mem) (sizeof (mem) / sizeof (mem)[0])
+
 static const int PpuRatio = 3;
 
 // The NES-001 NTSC Motherboard including the CPU/APU, PPU, RAM, VRAM,
@@ -273,7 +275,9 @@ void nes_powerup(nes *self, cart *c, bool zeroram)
     // TODO: for now start in cycle-step mode
     self->mode = CSGM_CYCLE;
     if (zeroram) {
-        memset(self->ram, 0, sizeof self->ram / sizeof self->ram[0]);
+        memset(self->ram, 0, memsz(self->ram));
+        memset(self->vram, 0, memsz(self->vram));
+        ppu_zeroram(&self->ppu);
     }
     cpu_powerup(&self->cpu);
     ppu_powerup(&self->ppu);
@@ -291,7 +295,7 @@ size_t nes_ram_size(nes *self)
 {
     assert(self != NULL);
 
-    return sizeof self->ram / sizeof self->ram[0];
+    return memsz(self->ram);
 }
 
 bool nes_bcd_support(nes *self)
@@ -402,11 +406,8 @@ void nes_snapshot(nes *self, struct snapshot *snp)
     snp->mem.vram = self->vram;
     snp->mem.prglength = bus_dma(self->cpu.mbus,
                                  snp->datapath.current_instruction,
-                                 sizeof snp->mem.currprg
-                                    / sizeof snp->mem.currprg[0],
-                                 snp->mem.currprg);
-    bus_dma(self->cpu.mbus, CPU_VECTOR_NMI,
-            sizeof snp->mem.vectors / sizeof snp->mem.vectors[0],
+                                 memsz(snp->mem.currprg), snp->mem.currprg);
+    bus_dma(self->cpu.mbus, CPU_VECTOR_NMI, memsz(snp->mem.vectors),
             snp->mem.vectors);
 }
 
@@ -415,6 +416,5 @@ void nes_dumpram(nes *self, FILE *f)
     assert(self != NULL);
     assert(f != NULL);
 
-    fwrite(self->ram, sizeof self->ram[0],
-           sizeof self->ram / sizeof self->ram[0], f);
+    fwrite(self->ram, sizeof self->ram[0], memsz(self->ram), f);
 }

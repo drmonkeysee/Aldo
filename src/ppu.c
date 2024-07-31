@@ -9,6 +9,9 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <string.h>
+
+#define memclr(mem) memset(mem, 0, sizeof (mem) / sizeof (mem)[0]);
 
 // NOTE: a single NTSC frame is 262 scanlines of 341 dots, counting h-blank,
 // v-blank, overscan, etc; nominally 1 frame is 262 * 341 = 89342 ppu cycles;
@@ -460,6 +463,15 @@ void ppu_powerup(struct rp2c02 *self)
 
     // NOTE: simulate rst set on startup to engage reset sequence
     self->rst = CSGS_PENDING;
+}
+
+void ppu_zeroram(struct rp2c02 *self)
+{
+    assert(self != NULL);
+
+    memclr(self->oam);
+    memclr(self->soam);
+    memclr(self->palette);
 }
 
 int ppu_cycle(struct rp2c02 *self)

@@ -12,6 +12,8 @@
 #include <string.h>
 
 #define memclr(mem) memset(mem, 0, sizeof (mem) / sizeof (mem)[0]);
+#define memdump(mem, f) \
+fwrite(mem, sizeof (mem)[0], sizeof (mem) / sizeof (mem)[0], f);
 
 // NOTE: a single NTSC frame is 262 scanlines of 341 dots, counting h-blank,
 // v-blank, overscan, etc; nominally 1 frame is 262 * 341 = 89342 ppu cycles;
@@ -519,6 +521,16 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
     snp->mem.oam = self->oam;
     snp->mem.secondary_oam = self->soam;
     snp->mem.palette = self->palette;
+}
+
+void ppu_dumpram(const struct rp2c02 *self, FILE *f)
+{
+    assert(self != NULL);
+    assert(f != NULL);
+
+    memdump(self->oam, f);
+    memdump(self->soam, f);
+    memdump(self->palette, f);
 }
 
 struct ppu_coord ppu_trace(const struct rp2c02 *self, int adjustment)

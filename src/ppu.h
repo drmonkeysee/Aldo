@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "bus.h"
 #include "bytes.h"
@@ -118,6 +119,7 @@ void ppu_zeroram(struct rp2c02 *self);
 int ppu_cycle(struct rp2c02 *self);
 
 void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp);
+void ppu_dumpram(const struct rp2c02 *self, FILE *f);
 struct ppu_coord ppu_trace(const struct rp2c02 *self, int adjustment);
 
 #endif

@@ -411,10 +411,19 @@ void nes_snapshot(nes *self, struct snapshot *snp)
             snp->mem.vectors);
 }
 
-void nes_dumpram(nes *self, FILE *f)
+void nes_dumpram(nes *self, FILE *fs[static 3])
 {
     assert(self != NULL);
-    assert(f != NULL);
+    assert(fs != NULL);
 
-    fwrite(self->ram, sizeof self->ram[0], memsz(self->ram), f);
+    FILE *f;
+    if ((f = fs[0])) {
+        fwrite(self->ram, sizeof self->ram[0], memsz(self->ram), f);
+    }
+    if ((f = fs[1])) {
+        fwrite(self->vram, sizeof self->vram[0], memsz(self->vram), f);
+    }
+    if ((f = fs[2])) {
+        ppu_dumpram(&self->ppu, f);
+    }
 }

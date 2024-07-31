@@ -194,17 +194,29 @@ static ui_loop *setup_ui(struct emulator *emu)
 
 static void dump_ram(const struct emulator *emu)
 {
-    static const char *const restrict ramfile = "system.ram";
+    static const char *const restrict dmpfiles[] = {
+        "ram.bin",
+        "vram.bin",
+        "ppu.bin",
+    };
+    // TODO: constexpr in c23 can get rid of redundant sizeof exprs here
+    static const size_t dmpcount = sizeof dmpfiles / sizeof dmpfiles[0];
 
     if (!emu->args->tron && !emu->args->batch) return;
 
-    FILE *f = fopen(ramfile, "wb");
-    if (f) {
-        nes_dumpram(emu->console, f);
-        fclose(f);
-    } else {
-        fprintf(stderr, "%s: ", ramfile);
-        perror("Cannot open ramdump file");
+    FILE *fs[sizeof dmpfiles / sizeof dmpfiles[0]];
+    for (size_t i = 0; i < dmpcount; ++i) {
+        fs[i] = fopen(dmpfiles[i], "wb");
+        if (!fs[i]) {
+            fprintf(stderr, "%s: ", dmpfiles[i]);
+            perror("Cannot open ramdump file");
+        }
+    }
+    nes_dumpram(emu->console, fs);
+    for (size_t i = 0; i < dmpcount; ++i) {
+        if (fs[i]) {
+            fclose(fs[i]);
+        }
     }
 }
 

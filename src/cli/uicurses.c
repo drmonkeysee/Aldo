@@ -642,22 +642,22 @@ static int draw_mempage(const struct view *v, const struct emulator *emu,
     return cursor_y;
 }
 
-static void draw_membanks(const struct view *v, const struct emulator *emu,
-                          enum ram_selection sel, int start_x)
+static void draw_membanks(const struct view *v, const struct viewstate *vs,
+                          const struct emulator *emu, int start_x)
 {
     int cursor_y = 0, page_offset;
     const uint8_t *mem;
-    if (sel == RSEL_VRAM) {
+    if (vs->ramselect == RSEL_VRAM) {
         page_offset = 0x20;
         mem = emu->snapshot.mem.vram;
     } else {
         page_offset = 0;
         mem = emu->snapshot.mem.ram;
     }
-    int page_count = (int)nes_ram_size(emu->console) / RamPageSize;
+    int page_count = vs->total_ramsheets * 2;
     for (int page = 0; page < page_count; ++page) {
-        cursor_y = draw_mempage(v, emu, mem, sel, start_x, cursor_y, page,
-                                page_offset, RamDim);
+        cursor_y = draw_mempage(v, emu, mem, vs->ramselect, start_x, cursor_y,
+                                page, page_offset, RamDim);
     }
     mvwvline(v->content, 0, start_x - 1, 0, getmaxy(v->content));
 }
@@ -692,7 +692,7 @@ static void drawram(const struct view *v, const struct viewstate *vs,
     if (vs->ramselect == RSEL_PPU) {
         draw_ppumem(v, emu, start_x);
     } else {
-        draw_membanks(v, emu, vs->ramselect, start_x);
+        draw_membanks(v, vs, emu, start_x);
     }
 }
 

@@ -46,7 +46,7 @@ TRACE_LOG := trace.log
 TRACE_CMP := $(TEST_DIR)/trace-cmp.log
 BCDTEST_ROM := $(TEST_DIR)/bcdtest.rom
 PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) $(NESTEST_DIFF) \
-		$(TRACE_CMP) $(BCDTEST_ROM) $(TRACE_LOG) system.ram
+		$(TRACE_CMP) $(BCDTEST_ROM) *.bin *.log
 
 CFLAGS := -Wall -Wextra -Wconversion -std=c17 -iquote$(SRC_DIR)
 CXXFLAGS := -Wall -Wextra -pedantic -std=c++20
@@ -130,7 +130,7 @@ nesdiff: $(NESTEST_CMP) $(TRACE_CMP)
 
 bcdtest: $(BCDTEST_ROM) debug
 	$(CLI_TARGET) -bDv -g$(TEST_DIR)/bcdtest.brk $<
-	hexdump -C system.ram | head -n1 | awk '{ print "ERROR =",$$2; \
+	hexdump -C ram.bin | head -n1 | awk '{ print "ERROR =",$$2; \
 	if ($$2 == 0) print "BCD Pass!"; else { print "BCD Fail :("; exit 1 }}'
 
 clean:

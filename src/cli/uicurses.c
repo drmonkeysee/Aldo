@@ -35,12 +35,9 @@
 // MARK: - Run Loop Clock
 //
 
-// NOTE: Approximate 60 FPS for application event loop;
-// this will be enforced by actual vsync when ported to true GUI
-// and is *distinct* from emulator frequency which can be modified by the user.
 static const int
-    Fps = 60,
-    RamColWidth = 3, RamDim = 16, RamPageSize = RamDim * RamDim;
+    DisplayHz = 60, RamColWidth = 3, RamDim = 16,
+    RamPageSize = RamDim * RamDim;
 
 enum ram_selection {
     RSEL_RAM,
@@ -61,7 +58,7 @@ struct viewstate {
 
 static void tick_sleep(struct runclock *c)
 {
-    static const struct timespec vsync = {.tv_nsec = TSU_NS_PER_S / Fps};
+    static const struct timespec vsync = {.tv_nsec = TSU_NS_PER_S / DisplayHz};
 
     struct timespec elapsed = timespec_elapsed(&c->cyclock.current);
 
@@ -122,7 +119,7 @@ static int drawstats(const struct view *v, int cursor_y,
         refreshdt = 0;
     }
 
-    mvwprintw(v->content, cursor_y++, 0, "FPS: %d (%.2f)", Fps,
+    mvwprintw(v->content, cursor_y++, 0, "Display Hz: %d (%.2f)", DisplayHz,
               (double)vs->clock.cyclock.ticks / vs->clock.cyclock.runtime);
     mvwprintw(v->content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_ticktime, display_tickleft);
@@ -136,7 +133,9 @@ static int drawstats(const struct view *v, int cursor_y,
               vs->clock.cyclock.cycles);
     mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64,
               vs->clock.cyclock.frames);
-    mvwprintw(v->content, cursor_y++, 0, "Cycles per Second: %d",
+    mvwprintw(v->content, cursor_y++, 0, "Frames per Second: %d",
+              vs->clock.cyclock.fps);
+    mvwprintw(v->content, cursor_y++, 0, "Cycles per Frame: %d",
               vs->clock.cyclock.cpf);
     mvwprintw(v->content, cursor_y++, 0, "BCD Supported: %s",
               args->bcdsupport ? "Yes" : "No");
@@ -755,7 +754,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
-        col1w = 30, col2w = 29, col3w = 29, col4w = 54, sysh = 24, crth = 4,
+        col1w = 30, col2w = 29, col3w = 29, col4w = 54, sysh = 25, crth = 4,
         cpuh = 20, maxh = 37, maxw = col1w + col2w + col3w + col4w;
 
     setlocale(LC_ALL, "");

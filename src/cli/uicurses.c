@@ -58,7 +58,7 @@ struct viewstate {
     } clock;
     enum speed_selection speedselect;
     enum ram_selection ramselect;
-    int ramsheet, savespeed, total_ramsheets;
+    int oldspeed, ramsheet, total_ramsheets;
     bool running;
 };
 
@@ -819,20 +819,20 @@ static void adjust_speed(struct viewstate *vs, int adjustment)
     }
 }
 
-static void swap_speed(struct viewstate *vs)
+static void select_speed(struct viewstate *vs)
 {
-    int prev = vs->savespeed;
+    int prev = vs->oldspeed;
+    vs->speedselect = !vs->speedselect;
     if (vs->speedselect == SPD_CYCLE) {
-        vs->savespeed = vs->clock.cyclock.cpf;
+        vs->oldspeed = vs->clock.cyclock.fps;
+        vs->clock.cyclock.cpf = prev;
+        vs->clock.cyclock.fps = MinFps;
+    } else {
+        vs->oldspeed = vs->clock.cyclock.cpf;
         // TODO: placeholder cpf
         vs->clock.cyclock.cpf = (int)ceil((262 * 341) / 3.0);
         vs->clock.cyclock.fps = prev;
-    } else {
-        vs->savespeed = vs->clock.cyclock.fps;
-        vs->clock.cyclock.cpf = prev;
-        vs->clock.cyclock.fps = MinFps;
     }
-    vs->speedselect = !vs->speedselect;
 }
 
 static void handle_input(struct viewstate *vs, const struct emulator *emu)
@@ -881,7 +881,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
                       !nes_probe(emu->console, CSGI_NMI));
         break;
     case 'p':
-        swap_speed(vs);
+        select_speed(vs);
         break;
     case 'q':
         vs->running = false;
@@ -948,7 +948,7 @@ int ui_curses_loop(struct emulator *emu)
 
     struct viewstate state = {
         .clock = {.cyclock = {.cpf = 10, .fps = MinFps}},
-        .savespeed = MinFps,
+        .oldspeed = MinFps,
         .running = true,
         .total_ramsheets = (int)nes_ram_size(emu->console) / sheet_size,
     };

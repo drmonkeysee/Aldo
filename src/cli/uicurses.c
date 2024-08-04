@@ -137,7 +137,7 @@ static int drawstats(const struct view *v, int cursor_y,
     mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64,
               vs->clock.cyclock.frames);
     mvwprintw(v->content, cursor_y++, 0, "Cycles per Second: %d",
-              vs->clock.cyclock.cycles_per_sec);
+              vs->clock.cyclock.cpf);
     mvwprintw(v->content, cursor_y++, 0, "BCD Supported: %s",
               args->bcdsupport ? "Yes" : "No");
     return cursor_y;
@@ -800,23 +800,23 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         nes_ready(emu->console, !emu->snapshot.lines.ready);
         break;
     case '=':   // "Lowercase" +
-        ++vs->clock.cyclock.cycles_per_sec;
+        ++vs->clock.cyclock.cpf;
         goto pclamp_cps;
     case '+':
-        vs->clock.cyclock.cycles_per_sec += 10;
+        vs->clock.cyclock.cpf += 10;
     pclamp_cps:
-        if (vs->clock.cyclock.cycles_per_sec > MaxCps) {
-            vs->clock.cyclock.cycles_per_sec = MaxCps;
+        if (vs->clock.cyclock.cpf > MaxCpf) {
+            vs->clock.cyclock.cpf = MaxCpf;
         }
         break;
     case '-':
-        --vs->clock.cyclock.cycles_per_sec;
+        --vs->clock.cyclock.cpf;
         goto nclamp_cps;
     case '_':   // "Uppercase" -
-        vs->clock.cyclock.cycles_per_sec -= 10;
+        vs->clock.cyclock.cpf -= 10;
     nclamp_cps:
-        if (vs->clock.cyclock.cycles_per_sec < MinCps) {
-            vs->clock.cyclock.cycles_per_sec = MinCps;
+        if (vs->clock.cyclock.cpf < MinCpf) {
+            vs->clock.cyclock.cpf = MinCpf;
         }
         break;
     case 'b':
@@ -909,7 +909,7 @@ int ui_curses_loop(struct emulator *emu)
     static const int sheet_size = RamPageSize * 2;
 
     struct viewstate state = {
-        .clock = {.cyclock = {.cycles_per_sec = 4}},
+        .clock = {.cyclock = {.cpf = 4, .fps = 1}},
         .running = true,
         .total_ramsheets = (int)nes_ram_size(emu->console) / sheet_size,
     };

@@ -16,13 +16,13 @@ struct cycleclock {
     struct timespec current, previous, start;
     uint64_t cycles, frames, ticks;
     double emutime, runtime, ticktime_ms, timebudget_ms;
-    int budget, cycles_per_sec;
+    int budget, cpf, fps;
     uint8_t subcycle;
 };
 
 #include "bridgeopen.h"
 br_libexport
-extern const int MinCps, MaxCps;
+extern const int MinCpf, MaxCpf;
 
 br_libexport
 void cycleclock_start(struct cycleclock *self) br_nothrow;

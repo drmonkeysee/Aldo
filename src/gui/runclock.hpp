@@ -106,11 +106,11 @@ struct runclock {
 
     void adjustCycleRate(int adjustment) noexcept
     {
-        auto adjusted = cyclock.cycles_per_sec + adjustment;
-        cyclock.cycles_per_sec = std::max(MinCps, std::min(adjusted, MaxCps));
+        auto adjusted = cyclock.cpf + adjustment;
+        cyclock.cpf = std::max(MinCpf, std::min(adjusted, MaxCpf));
     }
 
-    cycleclock cyclock{.cycles_per_sec = 4};
+    cycleclock cyclock{.cpf = 4, .fps = 1};
     double dtInputMs = 0, dtUpdateMs = 0, dtRenderMs = 0;
 };
 

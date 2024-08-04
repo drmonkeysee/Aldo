@@ -8,7 +8,7 @@
 #include "cycleclock.h"
 #include "tsutil.h"
 
-const int MinCps = 1, MaxCps = 1000;
+const int MinCpf = 1, MaxCpf = 1000;
 
 void cycleclock_start(struct cycleclock *self)
 {
@@ -35,7 +35,7 @@ void cycleclock_tickstart(struct cycleclock *self, bool reset_budget)
         self->timebudget_ms = TSU_MS_PER_S;
     }
 
-    double cycles_per_ms = self->cycles_per_sec / (double)TSU_MS_PER_S;
+    double cycles_per_ms = (self->cpf * self->fps) / (double)TSU_MS_PER_S;
     int new_cycles = (int)(self->timebudget_ms * cycles_per_ms);
     self->budget += new_cycles;
     self->timebudget_ms -= new_cycles / cycles_per_ms;

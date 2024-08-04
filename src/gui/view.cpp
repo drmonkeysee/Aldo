@@ -299,11 +299,11 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
         decKey = "-";
         val = 1;
     }
-    DisabledIf dif = vs.clock.cyclock.cycles_per_sec == MaxCps;
+    DisabledIf dif = vs.clock.cyclock.cpf == MaxCpf;
     if (ImGui::MenuItem(incLabel.c_str(), incKey)) {
         vs.clock.adjustCycleRate(val);
     }
-    dif = vs.clock.cyclock.cycles_per_sec == MinCps;
+    dif = vs.clock.cyclock.cpf == MinCpf;
     if (ImGui::MenuItem(decLabel.c_str(), decKey)) {
         vs.clock.adjustCycleRate(-val);
     }
@@ -1527,8 +1527,8 @@ private:
         ImGui::TextUnformatted("Cycles/Second");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(40);
-        ImGui::DragInt("##cyclesPerSecond", &vs.clock.cyclock.cycles_per_sec,
-                       1, MinCps, MaxCps, "%d", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::DragInt("##cyclesPerSecond", &vs.clock.cyclock.cpf, 1, MinCpf,
+                       MaxCpf, "%d", ImGuiSliderFlags_AlwaysClamp);
     }
 
     void renderRunControls() const

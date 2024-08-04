@@ -110,7 +110,7 @@ struct runclock {
         cyclock.cpf = std::max(MinCpf, std::min(adjusted, MaxCpf));
     }
 
-    cycleclock cyclock{.cpf = 4, .fps = 1};
+    cycleclock cyclock{.cpf = 10, .fps = MinFps};
     double dtInputMs = 0, dtUpdateMs = 0, dtRenderMs = 0;
 };
 

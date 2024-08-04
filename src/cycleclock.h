@@ -22,7 +22,7 @@ struct cycleclock {
 
 #include "bridgeopen.h"
 br_libexport
-extern const int MinCpf, MaxCpf;
+extern const int MinCpf, MaxCpf, MinFps, MaxFps;
 
 br_libexport
 void cycleclock_start(struct cycleclock *self) br_nothrow;

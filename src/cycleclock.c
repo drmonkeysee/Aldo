@@ -8,7 +8,7 @@
 #include "cycleclock.h"
 #include "tsutil.h"
 
-const int MinCpf = 1, MaxCpf = 1000;
+const int MinCpf = 1, MaxCpf = 1000, MinFps = 1, MaxFps = 60;
 
 void cycleclock_start(struct cycleclock *self)
 {

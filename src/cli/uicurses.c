@@ -39,6 +39,11 @@ static const int
     DisplayHz = 60, RamColWidth = 3, RamDim = 16,
     RamPageSize = RamDim * RamDim;
 
+enum speed_selection {
+    SPD_CYCLE,
+    SPD_FRAME,
+};
+
 enum ram_selection {
     RSEL_RAM,
     RSEL_VRAM,
@@ -51,8 +56,9 @@ struct viewstate {
         struct cycleclock cyclock;
         double tickleft_ms;
     } clock;
+    enum speed_selection speedselect;
     enum ram_selection ramselect;
-    int ramsheet, total_ramsheets;
+    int ramsheet, savespeed, total_ramsheets;
     bool running;
 };
 
@@ -107,6 +113,17 @@ struct layout {
         ram;
 };
 
+static void drawtoggle(const struct view *v, const char *label, bool selected)
+{
+    if (selected) {
+        wattron(v->content, A_STANDOUT);
+    }
+    waddstr(v->content, label);
+    if (selected) {
+        wattroff(v->content, A_STANDOUT);
+    }
+}
+
 static int drawstats(const struct view *v, int cursor_y,
                      const struct viewstate *vs, const struct cliargs *args)
 {
@@ -133,24 +150,15 @@ static int drawstats(const struct view *v, int cursor_y,
               vs->clock.cyclock.frames);
     mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
               vs->clock.cyclock.cycles);
-    mvwprintw(v->content, cursor_y++, 0, "Frames per Second: %d",
-              vs->clock.cyclock.fps);
-    mvwprintw(v->content, cursor_y++, 0, "Cycles per Frame: %d",
-              vs->clock.cyclock.cpf);
+    wmove(v->content, cursor_y++, 0);
+    drawtoggle(v, "Frames per Second", vs->speedselect == SPD_FRAME);
+    wprintw(v->content, ": %d", vs->clock.cyclock.fps);
+    wmove(v->content, cursor_y++, 0);
+    drawtoggle(v, "Cycles per Frame", vs->speedselect == SPD_CYCLE);
+    wprintw(v->content, ": %d", vs->clock.cyclock.cpf);
     mvwprintw(v->content, cursor_y++, 0, "BCD Supported: %s",
               args->bcdsupport ? "Yes" : "No");
     return cursor_y;
-}
-
-static void drawtoggle(const struct view *v, const char *label, bool selected)
-{
-    if (selected) {
-        wattron(v->content, A_STANDOUT);
-    }
-    waddstr(v->content, label);
-    if (selected) {
-        wattroff(v->content, A_STANDOUT);
-    }
 }
 
 static void drawcontrols(const struct view *v, const struct emulator *emu,
@@ -184,10 +192,11 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
     mvwaddstr(v->content, ++cursor_y, 0, "Halt/Run: <Space>");
-    mvwaddstr(v->content, ++cursor_y, 0, "Mode: m/M");
+    mvwaddstr(v->content, ++cursor_y, 0, "Run Mode: m/M");
     mvwaddstr(v->content, ++cursor_y, 0, "Signal: i, n, s");
     mvwaddstr(v->content, ++cursor_y, 0,
               "Speed \u00b11 (\u00b110): -/= (_/+)");
+    mvwaddstr(v->content, ++cursor_y, 0, "Speed Mode: p");
     mvwaddstr(v->content, ++cursor_y, 0, "Ram: r/R  Fwd/Bck: f/b");
     mvwaddstr(v->content, ++cursor_y, 0, "Quit: q");
 }
@@ -754,7 +763,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
-        col1w = 30, col2w = 29, col3w = 29, col4w = 54, sysh = 25, crth = 4,
+        col1w = 30, col2w = 29, col3w = 29, col4w = 54, sysh = 26, crth = 4,
         cpuh = 20, maxh = 37, maxw = col1w + col2w + col3w + col4w;
 
     setlocale(LC_ALL, "");
@@ -791,6 +800,41 @@ static void tick_end(struct runclock *c)
     tick_sleep(c);
 }
 
+static void speedapply(int *spd, int adjustment, int min, int max)
+{
+    *spd += adjustment;
+    if (*spd < min) {
+        *spd = min;
+    } else if (*spd > max) {
+        *spd = max;
+    }
+}
+
+static void adjust_speed(struct viewstate *vs, int adjustment)
+{
+    if (vs->speedselect == SPD_CYCLE) {
+        speedapply(&vs->clock.cyclock.cpf, adjustment, MinCpf, MaxCpf);
+    } else {
+        speedapply(&vs->clock.cyclock.fps, adjustment, MinFps, MaxFps);
+    }
+}
+
+static void swap_speed(struct viewstate *vs)
+{
+    int prev = vs->savespeed;
+    if (vs->speedselect == SPD_CYCLE) {
+        vs->savespeed = vs->clock.cyclock.cpf;
+        // TODO: placeholder cpf
+        vs->clock.cyclock.cpf = (int)ceil((262 * 341) / 3.0);
+        vs->clock.cyclock.fps = prev;
+    } else {
+        vs->savespeed = vs->clock.cyclock.fps;
+        vs->clock.cyclock.cpf = prev;
+        vs->clock.cyclock.fps = MinFps;
+    }
+    vs->speedselect = !vs->speedselect;
+}
+
 static void handle_input(struct viewstate *vs, const struct emulator *emu)
 {
     int input = getch();
@@ -799,24 +843,16 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         nes_ready(emu->console, !emu->snapshot.lines.ready);
         break;
     case '=':   // "Lowercase" +
-        ++vs->clock.cyclock.cpf;
-        goto pclamp_cps;
+        adjust_speed(vs, 1);
+        break;
     case '+':
-        vs->clock.cyclock.cpf += 10;
-    pclamp_cps:
-        if (vs->clock.cyclock.cpf > MaxCpf) {
-            vs->clock.cyclock.cpf = MaxCpf;
-        }
+        adjust_speed(vs, 10);
         break;
     case '-':
-        --vs->clock.cyclock.cpf;
-        goto nclamp_cps;
+        adjust_speed(vs, -1);
+        break;
     case '_':   // "Uppercase" -
-        vs->clock.cyclock.cpf -= 10;
-    nclamp_cps:
-        if (vs->clock.cyclock.cpf < MinCpf) {
-            vs->clock.cyclock.cpf = MinCpf;
-        }
+        adjust_speed(vs, -10);
         break;
     case 'b':
         if (vs->ramselect != RSEL_PPU) {
@@ -843,6 +879,9 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
     case 'n':
         nes_set_probe(emu->console, CSGI_NMI,
                       !nes_probe(emu->console, CSGI_NMI));
+        break;
+    case 'p':
+        swap_speed(vs);
         break;
     case 'q':
         vs->running = false;
@@ -908,7 +947,8 @@ int ui_curses_loop(struct emulator *emu)
     static const int sheet_size = RamPageSize * 2;
 
     struct viewstate state = {
-        .clock = {.cyclock = {.cpf = 4, .fps = 1}},
+        .clock = {.cyclock = {.cpf = 10, .fps = MinFps}},
+        .savespeed = MinFps,
         .running = true,
         .total_ramsheets = (int)nes_ram_size(emu->console) / sheet_size,
     };

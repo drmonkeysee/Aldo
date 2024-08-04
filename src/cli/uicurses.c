@@ -125,14 +125,14 @@ static int drawstats(const struct view *v, int cursor_y,
               display_ticktime, display_tickleft);
     mvwprintw(v->content, cursor_y++, 0, "Ticks: %" PRIu64,
               vs->clock.cyclock.ticks);
-    mvwprintw(v->content, cursor_y++, 0, "Emutime: %.3f",
-              vs->clock.cyclock.emutime);
     mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f",
               vs->clock.cyclock.runtime);
-    mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
-              vs->clock.cyclock.cycles);
+    mvwprintw(v->content, cursor_y++, 0, "Emutime: %.3f",
+              vs->clock.cyclock.emutime);
     mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64,
               vs->clock.cyclock.frames);
+    mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
+              vs->clock.cyclock.cycles);
     mvwprintw(v->content, cursor_y++, 0, "Frames per Second: %d",
               vs->clock.cyclock.fps);
     mvwprintw(v->content, cursor_y++, 0, "Cycles per Frame: %d",

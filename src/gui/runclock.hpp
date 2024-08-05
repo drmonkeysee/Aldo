@@ -97,7 +97,7 @@ struct runclock {
 
     RunTick startTick(bool resetBudget) noexcept
     {
-        return RunTick(cyclock, resetBudget);
+        return {cyclock, resetBudget};
     }
 
     RunTimer timeInput() noexcept { return RunTimer{dtInputMs}; }

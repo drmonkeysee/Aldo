@@ -150,12 +150,15 @@ static int drawstats(const struct view *v, int cursor_y,
               vs->clock.cyclock.frames);
     mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
               vs->clock.cyclock.cycles);
-    wmove(v->content, cursor_y++, 0);
-    drawtoggle(v, "Frames per Second", vs->speedselect == SPD_FRAME);
-    wprintw(v->content, ": %d", vs->clock.cyclock.fps);
-    wmove(v->content, cursor_y++, 0);
-    drawtoggle(v, "Cycles per Frame", vs->speedselect == SPD_CYCLE);
-    wprintw(v->content, ": %d", vs->clock.cyclock.cpf);
+
+    char buf[10];    // NOTE: cpf * maxfps = 7 digits + 2 padding
+    mvwaddstr(v->content, cursor_y++, 0, "Frames per Second:");
+    sprintf(buf, " %d ", vs->clock.cyclock.fps);
+    drawtoggle(v, buf, vs->speedselect == SPD_FRAME);
+    mvwaddstr(v->content, cursor_y++, 0, "Cycles per Frame:");
+    sprintf(buf, " %d ", vs->clock.cyclock.cpf);
+    drawtoggle(v, buf, vs->speedselect == SPD_CYCLE);
+
     mvwprintw(v->content, cursor_y++, 0, "BCD Supported: %s",
               args->bcdsupport ? "Yes" : "No");
     return cursor_y;

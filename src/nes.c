@@ -198,28 +198,12 @@ static void set_ppu_pins(struct nes001 *self)
     self->ppu.signal.rw |= self->cpu.signal.rw;
 }
 
-static void set_pins(struct nes001 *self)
+static void set_cpu_pins(struct nes001 *self)
 {
     // NOTE: interrupt lines are active low
     self->cpu.signal.irq = !self->probe.irq;
     self->cpu.signal.nmi = !self->probe.nmi && self->ppu.signal.intr;
     self->cpu.signal.rst = !self->probe.rst;
-    set_ppu_pins(self);
-}
-
-static bool clock_subcycles(struct nes001 *self, struct cycleclock *clock)
-{
-    while (clock->subcycle++ < PpuRatio) {
-        clock->frames += (uint64_t)ppu_cycle(&self->ppu);
-        // TODO: ppu debug hook goes here
-        if (self->mode == CSGM_SUBCYCLE && clock->subcycle < PpuRatio) {
-            set_ppu_pins(self);
-            nes_ready(self, false);
-            return false;
-        }
-    }
-    clock->subcycle = 0;
-    return true;
 }
 
 // NOTE: trace the just-fetched instruction
@@ -370,10 +354,21 @@ void nes_clock(nes *self, struct cycleclock *clock)
     assert(clock != NULL);
 
     while (self->cpu.signal.rdy && clock->budget > 0) {
-        if (!clock_subcycles(self, clock)) continue;
+        clock->frames += (uint64_t)ppu_cycle(&self->ppu);
+        --clock->budget;
+        ++clock->subcycle;
+        set_ppu_pins(self);
+        // TODO: ppu debug hook goes here
+        if (clock->subcycle < PpuRatio) {
+            if (self->mode == CSGM_SUBCYCLE) {
+                nes_ready(self, false);
+            }
+            continue;
+        }
+        clock->subcycle = 0;
+
         int cycles = cpu_cycle(&self->cpu);
-        set_pins(self);
-        clock->budget -= cycles;
+        set_cpu_pins(self);
         clock->cycles += (uint64_t)cycles;
         instruction_trace(self, clock, -cycles);
 
@@ -396,7 +391,7 @@ void nes_clock(nes *self, struct cycleclock *clock)
 
 int nes_cycle_factor(void)
 {
-    return 1; //PpuRatio;
+    return PpuRatio;
 }
 
 int nes_frame_factor(void)

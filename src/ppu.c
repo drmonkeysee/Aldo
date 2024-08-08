@@ -437,6 +437,7 @@ static int cycle(struct rp2c02 *self)
 //
 
 const uint16_t PaletteStartAddr = MEMBLOCK_16KB - 256;
+const int DotsPerFrame = Dots * Lines;
 
 void ppu_connect(struct rp2c02 *self, bus *mbus)
 {
@@ -482,11 +483,6 @@ int ppu_cycle(struct rp2c02 *self)
 
     handle_reset(self);
     return cycle(self);
-}
-
-int ppu_frame_factor(void)
-{
-    return (Dots * Lines) / 3; // remove / 3
 }
 
 void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)

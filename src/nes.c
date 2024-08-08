@@ -405,7 +405,7 @@ int nes_cycle_factor(void)
 
 int nes_frame_factor(void)
 {
-    return ppu_frame_factor();
+    return DotsPerFrame;
 }
 
 void nes_snapshot(nes *self, struct snapshot *snp)

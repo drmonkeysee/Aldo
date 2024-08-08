@@ -35,7 +35,7 @@ void cycleclock_tickstart(struct cycleclock *self, bool reset_budget)
         self->timebudget_ms = TSU_MS_PER_S;
     }
 
-    double cycles_per_ms = (self->rate * self->cycle_factor)
+    double cycles_per_ms = (self->rate * self->rate_factor)
                             / (double)TSU_MS_PER_S;
     int new_cycles = (int)(self->timebudget_ms * cycles_per_ms);
     self->budget += new_cycles;

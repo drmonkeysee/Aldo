@@ -827,9 +827,9 @@ static void selectrate(struct viewstate *vs)
     vs->oldrate = vs->clock.cyclock.rate;
     vs->clock.cyclock.rate = prev;
     vs->scale = !vs->scale;
-    vs->clock.cyclock.cycle_factor = vs->scale == SCL_CYCLE
-                                        ? nes_cycle_factor()
-                                        : nes_frame_factor();
+    vs->clock.cyclock.rate_factor = vs->scale == SCL_CYCLE
+                                    ? nes_cycle_factor()
+                                    : nes_frame_factor();
 }
 
 static void handle_input(struct viewstate *vs, const struct emulator *emu)
@@ -944,7 +944,7 @@ int ui_curses_loop(struct emulator *emu)
     static const int sheet_size = RamPageSize * 2;
 
     struct viewstate state = {
-        .clock = {.cyclock = {.cycle_factor = nes_cycle_factor(), .rate = 10}},
+        .clock.cyclock = {.rate = 10, .rate_factor = nes_cycle_factor()},
         .oldrate = MinFps,
         .running = true,
         .total_ramsheets = (int)nes_ram_size(emu->console) / sheet_size,

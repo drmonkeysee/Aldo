@@ -10,7 +10,6 @@
 
 #include "attr.hpp"
 #include "cycleclock.h"
-#include "nes.h"
 
 #include <algorithm>
 #include <chrono>
@@ -111,7 +110,7 @@ struct runclock {
         cyclock.rate = std::max(MinCps, std::min(adjusted, MaxCps));
     }
 
-    cycleclock cyclock{.cycle_factor = nes_cycle_factor(), .rate = 10};
+    cycleclock cyclock;
     double dtInputMs = 0, dtUpdateMs = 0, dtRenderMs = 0;
 };
 

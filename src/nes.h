@@ -50,6 +50,10 @@ void nes_set_probe(nes *self, enum csig_interrupt signal,
 
 br_libexport
 void nes_clock(nes *self, struct cycleclock *clock) br_nothrow;
+br_libexport
+int nes_cycle_factor(void) br_nothrow;
+br_libexport
+int nes_frame_factor(void) br_nothrow;
 
 br_libexport
 void nes_snapshot(nes *self, struct snapshot *snp) br_nothrow;

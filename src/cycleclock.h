@@ -12,23 +12,17 @@
 #include <stdint.h>
 #include <time.h>
 
-enum clockscale {
-    CLKS_CYCLE,
-    CLKS_FRAME,
-};
-
 struct cycleclock {
     struct timespec current, previous, start;
     uint64_t cycles, frames, ticks;
     double emutime, runtime, ticktime_ms, timebudget_ms;
-    enum clockscale scale;
     int budget, cycle_factor, rate;
     uint8_t subcycle;
 };
 
 #include "bridgeopen.h"
 br_libexport
-extern const int MinCpf, MaxCpf, MinFps, MaxFps;
+extern const int MinCps, MaxCps, MinFps, MaxFps;
 
 br_libexport
 void cycleclock_start(struct cycleclock *self) br_nothrow;

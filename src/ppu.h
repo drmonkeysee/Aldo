@@ -117,6 +117,7 @@ void ppu_powerup(struct rp2c02 *self);
 void ppu_zeroram(struct rp2c02 *self);
 
 int ppu_cycle(struct rp2c02 *self);
+int ppu_frame_factor(void);
 
 void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp);
 void ppu_dumpram(const struct rp2c02 *self, FILE *f);

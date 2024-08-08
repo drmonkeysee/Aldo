@@ -39,9 +39,9 @@ static const int
     DisplayHz = 60, RamColWidth = 3, RamDim = 16,
     RamPageSize = RamDim * RamDim;
 
-enum speed_selection {
-    SPD_CYCLE,
-    SPD_FRAME,
+enum scale_selection {
+    SCL_CYCLE,
+    SCL_FRAME,
 };
 
 enum ram_selection {
@@ -56,9 +56,9 @@ struct viewstate {
         struct cycleclock cyclock;
         double tickleft_ms;
     } clock;
-    enum speed_selection speedselect;
+    enum scale_selection scale;
     enum ram_selection ramselect;
-    int oldspeed, ramsheet, total_ramsheets;
+    int oldrate, ramsheet, total_ramsheets;
     bool running;
 };
 
@@ -150,15 +150,10 @@ static int drawstats(const struct view *v, int cursor_y,
               vs->clock.cyclock.frames);
     mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
               vs->clock.cyclock.cycles);
-
-    char buf[10];    // NOTE: cpf * maxfps = 7 digits + 2 padding
-    mvwaddstr(v->content, cursor_y++, 0, "Frames per Second:");
-    sprintf(buf, " %d ", vs->clock.cyclock.fps);
-    drawtoggle(v, buf, vs->speedselect == SPD_FRAME);
-    mvwaddstr(v->content, cursor_y++, 0, "Cycles per Frame:");
-    sprintf(buf, " %d ", vs->clock.cyclock.cpf);
-    drawtoggle(v, buf, vs->speedselect == SPD_CYCLE);
-
+    mvwprintw(v->content, cursor_y++, 0, "%s: %d",
+              vs->scale == SCL_CYCLE
+                ? "Cycles per Second"
+                : "Frames per Second", vs->clock.cyclock.rate);
     mvwprintw(v->content, cursor_y++, 0, "BCD Supported: %s",
               args->bcdsupport ? "Yes" : "No");
     return cursor_y;
@@ -199,7 +194,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     mvwaddstr(v->content, ++cursor_y, 0, "Signal: i, n, s");
     mvwaddstr(v->content, ++cursor_y, 0,
               "Speed \u00b11 (\u00b110): -/= (_/+)");
-    mvwaddstr(v->content, ++cursor_y, 0, "Speed Mode: p");
+    mvwaddstr(v->content, ++cursor_y, 0, "Clock Scale: c");
     mvwaddstr(v->content, ++cursor_y, 0, "Ram: r/R  Fwd/Bck: f/b");
     mvwaddstr(v->content, ++cursor_y, 0, "Quit: q");
 }
@@ -766,7 +761,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 static void init_ui(struct layout *l, int ramsheets)
 {
     static const int
-        col1w = 30, col2w = 29, col3w = 29, col4w = 54, sysh = 26, crth = 4,
+        col1w = 30, col2w = 29, col3w = 29, col4w = 54, sysh = 25, crth = 4,
         cpuh = 20, maxh = 37, maxw = col1w + col2w + col3w + col4w;
 
     setlocale(LC_ALL, "");
@@ -803,7 +798,7 @@ static void tick_end(struct runclock *c)
     tick_sleep(c);
 }
 
-static void speedapply(int *spd, int adjustment, int min, int max)
+static void applyrate(int *spd, int adjustment, int min, int max)
 {
     *spd += adjustment;
     if (*spd < min) {
@@ -813,29 +808,28 @@ static void speedapply(int *spd, int adjustment, int min, int max)
     }
 }
 
-static void adjust_speed(struct viewstate *vs, int adjustment)
+static void adjustrate(struct viewstate *vs, int adjustment)
 {
-    if (vs->speedselect == SPD_CYCLE) {
-        speedapply(&vs->clock.cyclock.cpf, adjustment, MinCpf, MaxCpf);
+    int min, max;
+    if (vs->scale == SCL_CYCLE) {
+        min = MinCps;
+        max = MaxCps;
     } else {
-        speedapply(&vs->clock.cyclock.fps, adjustment, MinFps, MaxFps);
+        min = MinFps;
+        max = MaxFps;
     }
+    applyrate(&vs->clock.cyclock.rate, adjustment, min, max);
 }
 
-static void select_speed(struct viewstate *vs)
+static void selectrate(struct viewstate *vs)
 {
-    int prev = vs->oldspeed;
-    vs->speedselect = !vs->speedselect;
-    if (vs->speedselect == SPD_CYCLE) {
-        vs->oldspeed = vs->clock.cyclock.fps;
-        vs->clock.cyclock.cpf = prev;
-        vs->clock.cyclock.fps = MinFps;
-    } else {
-        vs->oldspeed = vs->clock.cyclock.cpf;
-        // TODO: placeholder cpf
-        vs->clock.cyclock.cpf = (int)ceil((262 * 341) / 3.0);
-        vs->clock.cyclock.fps = prev;
-    }
+    int prev = vs->oldrate;
+    vs->oldrate = vs->clock.cyclock.rate;
+    vs->clock.cyclock.rate = prev;
+    vs->scale = !vs->scale;
+    vs->clock.cyclock.cycle_factor = vs->scale == SCL_CYCLE
+                                        ? nes_cycle_factor()
+                                        : nes_frame_factor();
 }
 
 static void handle_input(struct viewstate *vs, const struct emulator *emu)
@@ -846,16 +840,16 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         nes_ready(emu->console, !emu->snapshot.lines.ready);
         break;
     case '=':   // "Lowercase" +
-        adjust_speed(vs, 1);
+        adjustrate(vs, 1);
         break;
     case '+':
-        adjust_speed(vs, 10);
+        adjustrate(vs, 10);
         break;
     case '-':
-        adjust_speed(vs, -1);
+        adjustrate(vs, -1);
         break;
     case '_':   // "Uppercase" -
-        adjust_speed(vs, -10);
+        adjustrate(vs, -10);
         break;
     case 'b':
         if (vs->ramselect != RSEL_PPU) {
@@ -863,6 +857,9 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
                 vs->ramsheet = vs->total_ramsheets - 1;
             }
         }
+        break;
+    case 'c':
+        selectrate(vs);
         break;
     case 'f':
         if (vs->ramselect != RSEL_PPU) {
@@ -882,9 +879,6 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
     case 'n':
         nes_set_probe(emu->console, CSGI_NMI,
                       !nes_probe(emu->console, CSGI_NMI));
-        break;
-    case 'p':
-        select_speed(vs);
         break;
     case 'q':
         vs->running = false;
@@ -950,8 +944,8 @@ int ui_curses_loop(struct emulator *emu)
     static const int sheet_size = RamPageSize * 2;
 
     struct viewstate state = {
-        .clock = {.cyclock = {.cpf = 10, .fps = MinFps}},
-        .oldspeed = MinFps,
+        .clock = {.cyclock = {.cycle_factor = nes_cycle_factor(), .rate = 10}},
+        .oldrate = MinFps,
         .running = true,
         .total_ramsheets = (int)nes_ram_size(emu->console) / sheet_size,
     };

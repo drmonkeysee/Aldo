@@ -484,6 +484,11 @@ int ppu_cycle(struct rp2c02 *self)
     return cycle(self);
 }
 
+int ppu_frame_factor(void)
+{
+    return (Dots * Lines) / 3; // remove / 3
+}
+
 void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
 {
     assert(self != NULL);

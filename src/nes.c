@@ -394,6 +394,16 @@ void nes_clock(nes *self, struct cycleclock *clock)
     }
 }
 
+int nes_cycle_factor(void)
+{
+    return 1; //PpuRatio;
+}
+
+int nes_frame_factor(void)
+{
+    return ppu_frame_factor();
+}
+
 void nes_snapshot(nes *self, struct snapshot *snp)
 {
     assert(self != NULL);

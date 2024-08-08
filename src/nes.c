@@ -221,6 +221,45 @@ static void instruction_trace(struct nes001 *self,
                self->dbg, &snp);
 }
 
+static bool clock_ppu(struct nes001 *self, struct cycleclock *clock)
+{
+    clock->frames += (uint64_t)ppu_cycle(&self->ppu);
+    --clock->budget;
+    set_ppu_pins(self);
+    // TODO: ppu debug hook goes here
+    if (++clock->subcycle < PpuRatio) {
+        if (self->mode == CSGM_SUBCYCLE) {
+            nes_ready(self, false);
+        }
+        return false;
+    }
+    return true;
+}
+
+static void clock_cpu(struct nes001 *self, struct cycleclock *clock)
+{
+    int cycles = cpu_cycle(&self->cpu);
+    set_cpu_pins(self);
+    clock->subcycle = 0;
+    clock->cycles += (uint64_t)cycles;
+    instruction_trace(self, clock, -cycles);
+
+    switch (self->mode) {
+    // NOTE: both cases are possible on cycle-boundary
+    case CSGM_SUBCYCLE:
+    case CSGM_CYCLE:
+        nes_ready(self, false);
+        break;
+    case CSGM_STEP:
+        nes_ready(self, !self->cpu.signal.sync);
+        break;
+    case CSGM_RUN:
+    default:
+        break;
+    }
+    debug_check(self->dbg, clock);
+}
+
 //
 // MARK: - Public Interface
 //
@@ -354,38 +393,8 @@ void nes_clock(nes *self, struct cycleclock *clock)
     assert(clock != NULL);
 
     while (self->cpu.signal.rdy && clock->budget > 0) {
-        clock->frames += (uint64_t)ppu_cycle(&self->ppu);
-        --clock->budget;
-        ++clock->subcycle;
-        set_ppu_pins(self);
-        // TODO: ppu debug hook goes here
-        if (clock->subcycle < PpuRatio) {
-            if (self->mode == CSGM_SUBCYCLE) {
-                nes_ready(self, false);
-            }
-            continue;
-        }
-        clock->subcycle = 0;
-
-        int cycles = cpu_cycle(&self->cpu);
-        set_cpu_pins(self);
-        clock->cycles += (uint64_t)cycles;
-        instruction_trace(self, clock, -cycles);
-
-        switch (self->mode) {
-        // NOTE: both cases are possible on cycle-boundary
-        case CSGM_SUBCYCLE:
-        case CSGM_CYCLE:
-            nes_ready(self, false);
-            break;
-        case CSGM_STEP:
-            nes_ready(self, !self->cpu.signal.sync);
-            break;
-        case CSGM_RUN:
-        default:
-            break;
-        }
-        debug_check(self->dbg, clock);
+        if (!clock_ppu(self, clock)) continue;
+        clock_cpu(self, clock);
     }
 }
 

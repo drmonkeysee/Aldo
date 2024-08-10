@@ -70,8 +70,8 @@ static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
     return true;
 }
 
-static size_t ram_dma(const void *restrict ctx, uint16_t addr, size_t count,
-                      uint8_t dest[restrict count])
+static size_t ram_copy(const void *restrict ctx, uint16_t addr, size_t count,
+                       uint8_t dest[restrict count])
 {
     // NOTE: addr=[$0000-$1FFF]
     assert(addr < MEMBLOCK_8KB);
@@ -101,8 +101,8 @@ static bool vram_write(void *ctx, uint16_t addr, uint8_t d)
     return true;
 }
 
-static size_t vram_dma(const void *restrict ctx, uint16_t addr, size_t count,
-                       uint8_t dest[restrict count])
+static size_t vram_copy(const void *restrict ctx, uint16_t addr, size_t count,
+                        uint8_t dest[restrict count])
 {
     // NOTE: addr=[$2000-$3FFF]
     // NOTE: full 8KB range is valid input, see vram_read for reasons
@@ -125,7 +125,7 @@ static void create_mbus(struct nes001 *self)
     bool r = bus_set(self->cpu.mbus, 0, (struct busdevice){
         ram_read,
         ram_write,
-        ram_dma,
+        ram_copy,
         self->ram,
     });
     assert(r);
@@ -145,7 +145,7 @@ static void create_vbus(struct nes001 *self)
     bool r = bus_set(self->ppu.vbus, MEMBLOCK_8KB, (struct busdevice){
         vram_read,
         vram_write,
-        vram_dma,
+        vram_copy,
         self->vram,
     });
     assert(r);
@@ -418,11 +418,11 @@ void nes_snapshot(nes *self, struct snapshot *snp)
     debug_snapshot(self->dbg, snp);
     snp->mem.ram = self->ram;
     snp->mem.vram = self->vram;
-    snp->mem.prglength = bus_dma(self->cpu.mbus,
-                                 snp->datapath.current_instruction,
-                                 memsz(snp->mem.currprg), snp->mem.currprg);
-    bus_dma(self->cpu.mbus, CPU_VECTOR_NMI, memsz(snp->mem.vectors),
-            snp->mem.vectors);
+    snp->mem.prglength = bus_copy(self->cpu.mbus,
+                                  snp->datapath.current_instruction,
+                                  memsz(snp->mem.currprg), snp->mem.currprg);
+    bus_copy(self->cpu.mbus, CPU_VECTOR_NMI, memsz(snp->mem.vectors),
+             snp->mem.vectors);
 }
 
 void nes_dumpram(nes *self, FILE *fs[static 3])

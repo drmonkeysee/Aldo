@@ -63,8 +63,8 @@ static bool raw_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     return true;
 }
 
-static size_t raw_dma(const void *restrict ctx, uint16_t addr, size_t count,
-                      uint8_t dest[restrict count])
+static size_t raw_copy(const void *restrict ctx, uint16_t addr, size_t count,
+                       uint8_t dest[restrict count])
 {
     // NOTE: addr=[$8000-$FFFF]
     assert(addr > ADDRMASK_32KB);
@@ -92,7 +92,7 @@ static bool raw_mbus_connect(struct mapper *self, bus *b, uint16_t addr)
 {
     return bus_set(b, addr, (struct busdevice){
         .read = raw_read,
-        .dma = raw_dma,
+        .copy = raw_copy,
         .ctx = ((struct raw_mapper *)self)->rom,
     });
 }
@@ -149,8 +149,8 @@ static bool ines_000_read(void *restrict ctx, uint16_t addr,
     return true;
 }
 
-static size_t ines_000_dma(const void *restrict ctx, uint16_t addr,
-                           size_t count, uint8_t dest[restrict count])
+static size_t ines_000_copy(const void *restrict ctx, uint16_t addr,
+                            size_t count, uint8_t dest[restrict count])
 {
     // NOTE: addr=[$8000-$FFFF]
     assert(addr > ADDRMASK_32KB);
@@ -164,7 +164,7 @@ static bool ines_000_mbus_connect(struct mapper *self, bus *b, uint16_t addr)
 {
     return bus_set(b, addr, (struct busdevice){
         .read = ines_000_read,
-        .dma = ines_000_dma,
+        .copy = ines_000_copy,
         .ctx = self,
     });
 }

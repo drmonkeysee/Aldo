@@ -76,12 +76,12 @@ static bool resetaddr_write(void *ctx, uint16_t addr, uint8_t d)
             : false;
 }
 
-static size_t resetaddr_dma(const void *restrict ctx, uint16_t addr,
-                            size_t count, uint8_t dest[restrict count])
+static size_t resetaddr_copy(const void *restrict ctx, uint16_t addr,
+                             size_t count, uint8_t dest[restrict count])
 {
     const struct resdecorator *dec = ctx;
-    return dec->inner.dma
-            ? dec->inner.dma(dec->inner.ctx, addr, count, dest)
+    return dec->inner.copy
+            ? dec->inner.copy(dec->inner.ctx, addr, count, dest)
             : 0;
 }
 
@@ -347,7 +347,7 @@ void debug_sync_bus(debugger *self)
 
     self->dec = (struct resdecorator){.vector = (uint16_t)self->resetvector};
     struct busdevice resetaddr_device = {
-        resetaddr_read, resetaddr_write, resetaddr_dma, &self->dec,
+        resetaddr_read, resetaddr_write, resetaddr_copy, &self->dec,
     };
     self->dec.active = bus_swap(self->cpu->mbus, CPU_VECTOR_RST,
                                 resetaddr_device, &self->dec.inner);

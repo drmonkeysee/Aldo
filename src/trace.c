@@ -19,8 +19,8 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
                              const struct snapshot *snp)
 {
     uint8_t bytes[3];
-    size_t instlen = bus_dma(cpu->mbus, snp->datapath.current_instruction,
-                             sizeof bytes / sizeof bytes[0], bytes);
+    size_t instlen = bus_copy(cpu->mbus, snp->datapath.current_instruction,
+                              sizeof bytes / sizeof bytes[0], bytes);
     struct dis_instruction inst;
     int result = dis_parsemem_inst(instlen, bytes, 0, &inst);
     char disinst[DIS_INST_SIZE];

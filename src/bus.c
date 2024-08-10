@@ -106,8 +106,8 @@ bool bus_write(bus *self, uint16_t addr, uint8_t d)
             : false;
 }
 
-size_t bus_dma(bus *self, uint16_t addr, size_t count,
-               uint8_t dest[restrict count])
+size_t bus_copy(bus *self, uint16_t addr, size_t count,
+                uint8_t dest[restrict count])
 {
     assert(self != NULL);
     assert(dest != NULL);
@@ -116,7 +116,7 @@ size_t bus_dma(bus *self, uint16_t addr, size_t count,
     if (addr > self->maxaddr || count == 0) return 0;
 
     struct partition *target = find(self, addr);
-    return target->device.dma
-            ? target->device.dma(target->device.ctx, addr, count, dest)
+    return target->device.copy
+            ? target->device.copy(target->device.ctx, addr, count, dest)
             : 0;
 }

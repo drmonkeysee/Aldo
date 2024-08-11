@@ -1172,7 +1172,7 @@ protected:
             renderBody();
             ImGui::EndTable();
         }
-        renderColorSelection();
+        renderDetails();
     }
 
 private:
@@ -1225,6 +1225,25 @@ private:
                 }
             }
         }
+    }
+
+    void renderDetails() const
+    {
+        renderColorMods();
+        ImGui::SameLine();
+        renderColorSelection();
+    }
+
+    void renderColorMods() const
+    {
+        bool grayscale = false, red = false, green = false, blue = false;
+        widget_group([&red, &green, &blue] {
+            ImGui::Checkbox("Red Emphasis", &red);
+            ImGui::Checkbox("Green Emphasis", &green);
+            ImGui::Checkbox("Blue Emphasis", &blue);
+        });
+        ImGui::SameLine();
+        ImGui::Checkbox("Grayscale", &grayscale);
     }
 
     void renderColorSelection() const

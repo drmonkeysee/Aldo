@@ -106,6 +106,11 @@ using datav = decltype(Default)::value_type;
 using datap = decltype(Default)::const_pointer;
 inline constexpr sz Size = Default.size();
 
+struct emphasis {
+    bool any() const noexcept { return r || g || b; }
+    bool r, g, b;
+};
+
 }
 
 class Palette {
@@ -122,7 +127,7 @@ public:
         return std::holds_alternative<palette::datap>(colors);
     }
 
-    palette::datav getColor(palette::sz idx) const;
+    palette::datav getColor(palette::sz idx, palette::emphasis em = {}) const;
 
     void load(const std::filesystem::path& filepath);
     void unload() noexcept

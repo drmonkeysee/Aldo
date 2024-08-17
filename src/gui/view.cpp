@@ -1208,7 +1208,8 @@ private:
                     ImGui::Text(" %02zX", rowStart);
                 } else {
                     auto cell = rowStart + (col - 1);
-                    auto color = emu.palette().getColor(cell);
+                    auto color = emu.palette().getColor(adjustIdx(cell),
+                                                        colorEmphasis);
                     ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color);
                     ScopedColor indicatorColor{
                         {ImGuiCol_Text, aldo::colors::luminance(color) < 0x80
@@ -1227,20 +1228,19 @@ private:
         }
     }
 
-    void renderDetails() const
+    void renderDetails()
     {
         renderColorMods();
         ImGui::SameLine();
         renderColorSelection();
     }
 
-    void renderColorMods() const
+    void renderColorMods()
     {
-        bool grayscale = false, red = false, green = false, blue = false;
-        widget_group([&red, &green, &blue] {
-            ImGui::Checkbox("Red Emphasis", &red);
-            ImGui::Checkbox("Green Emphasis", &green);
-            ImGui::Checkbox("Blue Emphasis", &blue);
+        widget_group([this] {
+            ImGui::Checkbox("Red Emphasis", &this->colorEmphasis.r);
+            ImGui::Checkbox("Green Emphasis", &this->colorEmphasis.g);
+            ImGui::Checkbox("Blue Emphasis", &this->colorEmphasis.b);
         });
         ImGui::SameLine();
         ImGui::Checkbox("Grayscale", &grayscale);
@@ -1249,7 +1249,8 @@ private:
     void renderColorSelection() const
     {
         static constexpr auto selectedColorDim = 70;
-        auto color = emu.palette().getColor(selected);
+        auto color = emu.palette().getColor(adjustIdx(selected),
+                                            colorEmphasis);
         ImGui::ColorButton("Selected Color",
                            ImGui::ColorConvertU32ToFloat4(color),
                            ImGuiColorEditFlags_NoAlpha,
@@ -1268,7 +1269,14 @@ private:
         });
     }
 
+    pal_sz adjustIdx(pal_sz idx) const noexcept
+    {
+        return grayscale ? idx & 0x30 : idx;
+    }
+
     pal_sz selected = 0;
+    bool grayscale = false;
+    aldo::palette::emphasis colorEmphasis = {};
 
     static constexpr pal_sz Cols = 17;
 };

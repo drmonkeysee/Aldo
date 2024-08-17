@@ -19,8 +19,10 @@
 namespace
 {
 
-constexpr aldo::palette::sz Channels = 3;
-constexpr aldo::palette::sz PalFileLength = aldo::palette::Size * Channels;
+constexpr aldo::palette::sz
+    Channels = 3, PalFileLength = aldo::palette::Size * Channels;
+constexpr float Attenuation = 0.816328f;
+constexpr uint8_t EmphasisBoost = 0x10;
 
 using pal_buf = std::array<std::ifstream::char_type, PalFileLength>;
 

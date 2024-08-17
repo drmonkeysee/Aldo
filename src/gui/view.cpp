@@ -1541,7 +1541,7 @@ private:
         ImGui::Text("Update dT: %.3f", dispDtUpdate);
         ImGui::Text("Render dT: %.3f", dispDtRender);
         ImGui::Text("Elapsed dT: %.3f", dispDtElapsed);
-        ImGui::Text("Tick dT: %.3f (%.3f)", dispDtTick,
+        ImGui::Text("Tick dT: %.3f (%+.3f)", dispDtTick,
                     dispDtTick - dispDtElapsed);
         ImGui::Text("Ticks: %" PRIu64, cyclock.ticks);
         ImGui::Text("Emutime: %.3f", cyclock.emutime);

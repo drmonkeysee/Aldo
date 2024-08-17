@@ -1533,13 +1533,16 @@ private:
             dispDtInput = vs.clock.dtInputMs;
             dispDtUpdate = vs.clock.dtUpdateMs;
             dispDtRender = vs.clock.dtRenderMs;
-            dispDtTotal = dispDtInput + dispDtUpdate + dispDtRender;
+            dispDtElapsed = dispDtInput + dispDtUpdate + dispDtRender;
+            dispDtTick = cyclock.ticktime_ms;
             refreshDt = 0;
         }
         ImGui::Text("Input dT: %.3f", dispDtInput);
         ImGui::Text("Update dT: %.3f", dispDtUpdate);
         ImGui::Text("Render dT: %.3f", dispDtRender);
-        ImGui::Text("Total dT: %.3f", dispDtTotal);
+        ImGui::Text("Elapsed dT: %.3f", dispDtElapsed);
+        ImGui::Text("Tick dT: %.3f (%.3f)", dispDtTick,
+                    dispDtTick - dispDtElapsed);
         ImGui::Text("Ticks: %" PRIu64, cyclock.ticks);
         ImGui::Text("Emutime: %.3f", cyclock.emutime);
         ImGui::Text("Runtime: %.3f", cyclock.runtime);
@@ -1600,8 +1603,9 @@ private:
         }
     }
 
-    double dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0,
-            dispDtTotal = 0, refreshDt = 0;
+    double
+        dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0, dispDtElapsed = 0,
+        dispDtTick = 0, refreshDt = 0;
 };
 
 }

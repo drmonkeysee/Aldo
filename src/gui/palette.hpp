@@ -108,6 +108,7 @@ inline constexpr sz Size = Default.size();
 
 struct emphasis {
     bool any() const noexcept { return r || g || b; }
+
     bool r, g, b;
 };
 

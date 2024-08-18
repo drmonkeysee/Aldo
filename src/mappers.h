@@ -16,20 +16,20 @@
 #include <stdio.h>
 
 struct mapper;
-typedef bool mapper_connect(struct mapper *, bus *);
-typedef void mapper_disconnect(const struct mapper *, bus *);
-typedef const uint8_t *mapper_mem(const struct mapper *);
+typedef bool busconn(struct mapper *, bus *);
+typedef void busdisconn(const struct mapper *, bus *);
+typedef const uint8_t *mapper_rom(const struct mapper *);
 
 struct mapper {
     void (*dtor)(struct mapper *);
-    mapper_connect *mbus_connect;
-    mapper_disconnect *mbus_disconnect;
-    mapper_mem *prgrom;
+    busconn *mbus_connect;
+    busdisconn *mbus_disconnect;
+    mapper_rom *prgrom;
 
     // NOTE: optional protocol
-    mapper_connect *vbus_connect;
-    mapper_disconnect *vbus_disconnect;
-    mapper_mem *chrrom;
+    busconn *vbus_connect;
+    busdisconn *vbus_disconnect;
+    mapper_rom *chrrom;
 };
 
 // NOTE: if create functions return non-zero error code, *m is unmodified

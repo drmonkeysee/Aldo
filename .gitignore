@@ -234,9 +234,10 @@ cython_debug/
 
 
 # Project
+*.bin
 *.diff
 *.nes
 *.out
 *.pal
-*.r[ao]m
+*.rom
 ext/

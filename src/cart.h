@@ -136,8 +136,10 @@ struct blockview cart_chrblock(cart *self, size_t i) br_nothrow;
 // MARK: - Internal
 //
 
-bool cart_mbus_connect(cart *self, bus *b, uint16_t addr) br_nothrow;
-void cart_mbus_disconnect(cart *self, bus *b, uint16_t addr) br_nothrow;
+bool cart_mbus_connect(cart *self, bus *b) br_nothrow;
+void cart_mbus_disconnect(cart *self, bus *b) br_nothrow;
+bool cart_vbus_connect(cart *self, bus *b) br_nothrow;
+void cart_vbus_disconnect(cart *self, bus *b) br_nothrow;
 
 void cart_write_dis_header(cart *self, const char *br_noalias name,
                            FILE *f) br_nothrow;

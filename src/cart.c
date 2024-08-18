@@ -350,22 +350,45 @@ struct blockview cart_chrblock(cart *self, size_t i)
 // MARK: - Internal Interface
 //
 
-bool cart_mbus_connect(cart *self, bus *b, uint16_t addr)
+bool cart_mbus_connect(cart *self, bus *b)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
     assert(b != NULL);
 
-    return self->mapper->mbus_connect(self->mapper, b, addr);
+    return self->mapper->mbus_connect(self->mapper, b);
 }
 
-void cart_mbus_disconnect(cart *self, bus *b, uint16_t addr)
+void cart_mbus_disconnect(cart *self, bus *b)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
     assert(b != NULL);
 
-    self->mapper->mbus_disconnect(self->mapper, b, addr);
+    self->mapper->mbus_disconnect(self->mapper, b);
+}
+
+bool cart_vbus_connect(cart *self, bus *b)
+{
+    assert(self != NULL);
+    assert(self->mapper != NULL);
+    assert(b != NULL);
+
+    if (self->mapper->vbus_connect) {
+        return self->mapper->vbus_connect(self->mapper, b);
+    }
+    return false;
+}
+
+void cart_vbus_disconnect(cart *self, bus *b)
+{
+    assert(self != NULL);
+    assert(self->mapper != NULL);
+    assert(b != NULL);
+
+    if (self->mapper->vbus_disconnect) {
+        self->mapper->vbus_disconnect(self->mapper, b);
+    }
 }
 
 void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)

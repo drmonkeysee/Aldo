@@ -44,10 +44,12 @@ static int load_blocks(uint8_t *restrict *mem, size_t size, FILE *f)
 // MARK: - Common Implementation
 //
 
-static void clear_bus_device(const struct mapper *self, bus *b, uint16_t addr)
+// TODO: once we introduce wram or additional mappers this implementation won't
+// be so common anymore.
+static void clear_bus_device(const struct mapper *self, bus *b)
 {
     (void)self;
-    bus_clear(b, addr);
+    bus_clear(b, MEMBLOCK_32KB);
 }
 
 //
@@ -88,9 +90,9 @@ static const uint8_t *raw_prgrom(const struct mapper *self)
     return ((const struct raw_mapper *)self)->rom;
 }
 
-static bool raw_mbus_connect(struct mapper *self, bus *b, uint16_t addr)
+static bool raw_mbus_connect(struct mapper *self, bus *b)
 {
-    return bus_set(b, addr, (struct busdevice){
+    return bus_set(b, MEMBLOCK_32KB, (struct busdevice){
         .read = raw_read,
         .copy = raw_copy,
         .ctx = ((struct raw_mapper *)self)->rom,
@@ -126,11 +128,10 @@ static const uint8_t *ines_chrrom(const struct mapper *self)
     return ((const struct ines_mapper *)self)->chr;
 }
 
-static bool ines_unimplemented_mbus_connect(struct mapper *self, bus *b,
-                                            uint16_t addr)
+static bool ines_unimplemented_mbus_connect(struct mapper *self, bus *b)
 {
     (void)self;
-    return bus_clear(b, addr);
+    return bus_clear(b, MEMBLOCK_32KB);
 }
 
 //
@@ -160,9 +161,13 @@ static size_t ines_000_copy(const void *restrict ctx, uint16_t addr,
     return bytecopy_bank(m->super.prg, width, addr, count, dest);
 }
 
-static bool ines_000_mbus_connect(struct mapper *self, bus *b, uint16_t addr)
+// TODO: binding to $8000 is too simple; WRAM needs at least $6000, and the
+// CPU memory map defines start of cart mapping at $4020; the most complex
+// mappers need access to entire 64KB address space in order to snoop on
+// all CPU activity. Similar rules hold for PPU.
+static bool ines_000_mbus_connect(struct mapper *self, bus *b)
 {
-    return bus_set(b, addr, (struct busdevice){
+    return bus_set(b, MEMBLOCK_32KB, (struct busdevice){
         .read = ines_000_read,
         .copy = ines_000_copy,
         .ctx = self,

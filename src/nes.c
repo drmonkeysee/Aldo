@@ -154,12 +154,9 @@ static void create_vbus(struct nes001 *self)
 static void connect_cart(struct nes001 *self, cart *c)
 {
     self->cart = c;
-    // TODO: binding to $8000 is too simple; WRAM needs at least $6000, and the
-    // CPU memory map defines start of cart mapping at $4020; the most complex
-    // mappers need access to entire 64KB address space in order to snoop on
-    // all CPU activity. Similar rules hold for PPU.
-    bool r = cart_mbus_connect(self->cart, self->cpu.mbus, MEMBLOCK_32KB);
+    bool r = cart_mbus_connect(self->cart, self->cpu.mbus);
     assert(r);
+    cart_vbus_connect(self->cart, self->ppu.vbus);
     debug_sync_bus(self->dbg);
 }
 
@@ -169,7 +166,8 @@ static void disconnect_cart(struct nes001 *self)
     // debugger even if there is no existing cart.
     debug_reset(self->dbg);
     if (!self->cart) return;
-    cart_mbus_disconnect(self->cart, self->cpu.mbus, MEMBLOCK_32KB);
+    cart_vbus_disconnect(self->cart, self->ppu.vbus);
+    cart_mbus_disconnect(self->cart, self->cpu.mbus);
     self->cart = NULL;
 }
 

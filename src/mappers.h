@@ -14,22 +14,26 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 struct mapper;
 typedef bool busconn(struct mapper *, bus *);
 typedef void busdisconn(const struct mapper *, bus *);
 typedef const uint8_t *mapper_rom(const struct mapper *);
+typedef size_t bankord(const struct mapper *);
 
 struct mapper {
     void (*dtor)(struct mapper *);
     busconn *mbus_connect;
     busdisconn *mbus_disconnect;
     mapper_rom *prgrom;
+    bankord *currprg;
 
     // NOTE: optional protocol
     busconn *vbus_connect;
     busdisconn *vbus_disconnect;
     mapper_rom *chrrom;
+    bankord *currchr;
 };
 
 // NOTE: if create functions return non-zero error code, *m is unmodified

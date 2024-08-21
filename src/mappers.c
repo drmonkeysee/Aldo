@@ -229,10 +229,10 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
         };
         header->mapper_implemented = false;
     }
-    struct mapper *extends = &self->vtable.extends;
-    extends->dtor = ines_dtor;
-    extends->prgrom = ines_prgrom;
-    extends->mbus_disconnect = clear_bus_device;
+    struct mapper *base = &self->vtable.extends;
+    base->dtor = ines_dtor;
+    base->prgrom = ines_prgrom;
+    base->mbus_disconnect = clear_bus_device;
     if (header->chr_blocks > 0) {
         self->vtable.chrrom = ines_chrrom;
     }
@@ -266,7 +266,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     if (err == 0) {
         *m = (struct mapper *)self;
     } else {
-        extends->dtor((struct mapper *)self);
+        base->dtor((struct mapper *)self);
     }
     return err;
 }

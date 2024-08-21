@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define asnes(mapper) ((const struct nesmapper *)(mapper))
+
 struct cartridge {
     struct mapper *mapper;
     struct cartinfo info;
@@ -176,6 +178,11 @@ static void write_raw_info(FILE *f)
     fputs("PRG ROM\t: 1 x 32KB\n", f);
 }
 
+static bool is_nes(const struct cartridge *self)
+{
+    return self->info.format == CRTF_INES;
+}
+
 //
 // MARK: - Public Interface
 //
@@ -265,7 +272,7 @@ int cart_format_extname(cart *self, char buf[restrict static CART_FMT_SIZE])
     total = count = sprintf(buf, "%s", cart_formatname(self->info.format));
     if (count < 0) return CART_ERR_FMT;
 
-    if (self->info.format == CRTF_INES) {
+    if (is_nes(self)) {
         count = sprintf(buf + total, " (%03d)", self->info.ines_hdr.mapper_id);
         if (count < 0) return CART_ERR_FMT;
         total += count;
@@ -335,10 +342,9 @@ struct blockview cart_chrblock(cart *self, size_t i)
     assert(self->mapper != NULL);
 
     struct blockview bv = {.ord = i};
-    if (!self->mapper->chrrom) return bv;
+    if (!is_nes(self)) return bv;
 
-    // NOTE: only iNES carts have chr rom
-    const uint8_t *chr = self->mapper->chrrom(self->mapper);
+    const uint8_t *chr = asnes(self->mapper)->chrrom(self->mapper);
     if (i < self->info.ines_hdr.chr_blocks) {
         bv.size = MEMBLOCK_8KB;
         bv.mem = chr + (i * bv.size);
@@ -374,8 +380,8 @@ bool cart_vbus_connect(cart *self, bus *b)
     assert(self->mapper != NULL);
     assert(b != NULL);
 
-    if (self->mapper->vbus_connect) {
-        return self->mapper->vbus_connect(self->mapper, b);
+    if (is_nes(self)) {
+        return asnes(self->mapper)->vbus_connect(self->mapper, b);
     }
     return false;
 }
@@ -386,8 +392,8 @@ void cart_vbus_disconnect(cart *self, bus *b)
     assert(self->mapper != NULL);
     assert(b != NULL);
 
-    if (self->mapper->vbus_disconnect) {
-        self->mapper->vbus_disconnect(self->mapper, b);
+    if (is_nes(self)) {
+        asnes(self->mapper)->vbus_disconnect(self->mapper, b);
     }
 }
 

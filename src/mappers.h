@@ -28,8 +28,10 @@ struct mapper {
     busdisconn *mbus_disconnect;
     mapper_rom *prgrom;
     bankord *currprg;
+};
 
-    // NOTE: optional protocol
+struct nesmapper {
+    struct mapper extends;
     busconn *vbus_connect;
     busdisconn *vbus_disconnect;
     mapper_rom *chrrom;

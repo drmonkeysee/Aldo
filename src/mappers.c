@@ -20,7 +20,7 @@ struct raw_mapper {
 };
 
 struct ines_mapper {
-    struct mapper vtable;
+    struct nesmapper vtable;
     uint8_t *prg, *chr, *wram, id;
     bool chrram;
 };
@@ -214,7 +214,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     case 0:
         self = malloc(sizeof(struct ines_000_mapper));
         *self = (struct ines_mapper){
-            .vtable = {
+            .vtable.extends = {
                 .mbus_connect = ines_000_mbus_connect,
             },
         };
@@ -225,16 +225,16 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     default:
         self = malloc(sizeof *self);
         *self = (struct ines_mapper){
-            .vtable = {
+            .vtable.extends = {
                 .mbus_connect = ines_unimplemented_mbus_connect,
             },
         };
         header->mapper_implemented = false;
         break;
     }
-    self->vtable.dtor = ines_dtor;
-    self->vtable.prgrom = ines_prgrom;
-    self->vtable.mbus_disconnect = clear_bus_device;
+    self->vtable.extends.dtor = ines_dtor;
+    self->vtable.extends.prgrom = ines_prgrom;
+    self->vtable.extends.mbus_disconnect = clear_bus_device;
     if (header->chr_blocks > 0) {
         self->vtable.chrrom = ines_chrrom;
     }
@@ -268,7 +268,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     if (err == 0) {
         *m = (struct mapper *)self;
     } else {
-        self->vtable.dtor((struct mapper *)self);
+        self->vtable.extends.dtor((struct mapper *)self);
     }
     return err;
 }

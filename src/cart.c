@@ -294,13 +294,10 @@ void cart_write_info(cart *self, const char *restrict name, bool verbose,
     if (verbose) {
         hr(f);
     }
-    switch (self->info.format) {
-    case CRTF_INES:
+    if (is_nes(self)) {
         write_ines_info(&self->info, f, verbose);
-        break;
-    default:
+    } else {
         write_raw_info(f);
-        break;
     }
 }
 
@@ -319,19 +316,14 @@ struct blockview cart_prgblock(cart *self, size_t i)
 
     struct blockview bv = {.ord = i};
     const uint8_t *prg = self->mapper->prgrom(self->mapper);
-    switch (self->info.format) {
-    case CRTF_INES:
+    if (is_nes(self)) {
         if (i < self->info.ines_hdr.prg_blocks) {
             bv.size = MEMBLOCK_16KB;
             bv.mem = prg + (i * bv.size);
         }
-        break;
-    default:
-        if (i == 0) {
-            bv.mem = prg;
-            bv.size = MEMBLOCK_32KB;
-        }
-        break;
+    } else if (i == 0) {
+        bv.mem = prg;
+        bv.size = MEMBLOCK_32KB;
     }
     return bv;
 }

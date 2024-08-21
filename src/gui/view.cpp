@@ -557,13 +557,10 @@ protected:
         if (info) {
             ImGui::Text("Format: %s", cart_formatname(info->format));
             ImGui::Separator();
-            switch (info->format) {
-            case CRTF_INES:
+            if (info->format == CRTF_INES) {
                 renderiNesInfo(info.value());
-                break;
-            default:
+            } else {
                 renderRawInfo();
-                break;
             }
         } else {
             ImGui::TextUnformatted("Format: None");

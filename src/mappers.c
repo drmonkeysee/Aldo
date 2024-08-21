@@ -210,8 +210,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     assert(f != NULL);
 
     struct ines_mapper *self;
-    switch (header->mapper_id) {
-    case 0:
+    if (header->mapper_id == 0) {
         self = malloc(sizeof(struct ines_000_mapper));
         *self = (struct ines_mapper){
             .vtable.extends = {
@@ -221,8 +220,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
         assert(header->prg_blocks <= 2);
         ((struct ines_000_mapper *)self)->bankcount = header->prg_blocks;
         header->mapper_implemented = true;
-        break;
-    default:
+    } else {
         self = malloc(sizeof *self);
         *self = (struct ines_mapper){
             .vtable.extends = {
@@ -230,11 +228,11 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
             },
         };
         header->mapper_implemented = false;
-        break;
     }
-    self->vtable.extends.dtor = ines_dtor;
-    self->vtable.extends.prgrom = ines_prgrom;
-    self->vtable.extends.mbus_disconnect = clear_bus_device;
+    struct mapper *extends = &self->vtable.extends;
+    extends->dtor = ines_dtor;
+    extends->prgrom = ines_prgrom;
+    extends->mbus_disconnect = clear_bus_device;
     if (header->chr_blocks > 0) {
         self->vtable.chrrom = ines_chrrom;
     }
@@ -268,7 +266,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     if (err == 0) {
         *m = (struct mapper *)self;
     } else {
-        self->vtable.extends.dtor((struct mapper *)self);
+        extends->dtor((struct mapper *)self);
     }
     return err;
 }

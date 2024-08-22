@@ -18,7 +18,7 @@
 
 struct mapper;
 typedef bool busconn(struct mapper *, bus *);
-typedef void busdisconn(const struct mapper *, bus *);
+typedef void busdisconn(bus *);
 typedef const uint8_t *mapper_rom(const struct mapper *);
 typedef size_t bankord(const struct mapper *);
 

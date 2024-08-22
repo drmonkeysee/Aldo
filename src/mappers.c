@@ -43,12 +43,22 @@ static int load_blocks(uint8_t *restrict *mem, size_t size, FILE *f)
 // MARK: - Common Implementation
 //
 
+static void mem_load(uint8_t *restrict d, const uint8_t *restrict mem,
+                     uint16_t addr, uint16_t mask)
+{
+    *d = mem[addr & mask];
+}
+
 // TODO: once we introduce wram or additional mappers this implementation won't
 // be so common anymore.
-static void clear_bus_device(const struct mapper *self, bus *b)
+static void clear_prg_device(bus *b)
 {
-    (void)self;
     bus_clear(b, MEMBLOCK_32KB);
+}
+
+static void clear_chr_device(bus *b)
+{
+    bus_clear(b, 0);
 }
 
 //
@@ -60,7 +70,7 @@ static bool raw_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     // NOTE: addr=[$8000-$FFFF]
     assert(addr > ADDRMASK_32KB);
 
-    *d = ((const uint8_t *)ctx)[addr & ADDRMASK_32KB];
+    mem_load(d, ctx, addr, ADDRMASK_32KB);
     return true;
 }
 
@@ -91,6 +101,8 @@ static const uint8_t *raw_prgrom(const struct mapper *self)
 
 static bool raw_mbus_connect(struct mapper *self, bus *b)
 {
+    assert(self != NULL);
+
     return bus_set(b, MEMBLOCK_32KB, (struct busdevice){
         .read = raw_read,
         .copy = raw_copy,
@@ -130,7 +142,15 @@ static const uint8_t *ines_chrrom(const struct mapper *self)
 static bool ines_unimplemented_mbus_connect(struct mapper *self, bus *b)
 {
     (void)self;
-    return bus_clear(b, MEMBLOCK_32KB);
+    clear_prg_device(b);
+    return true;
+}
+
+static bool ines_unimplemented_vbus_connect(struct mapper *self, bus *b)
+{
+    (void)self;
+    clear_chr_device(b);
+    return true;
 }
 
 //
@@ -160,16 +180,49 @@ static size_t ines_000_copy(const void *restrict ctx, uint16_t addr,
     return bytecopy_bank(m->super.prg, width, addr, count, dest);
 }
 
+static bool ines_000_vread(void *restrict ctx, uint16_t addr,
+                           uint8_t *restrict d)
+{
+    // NOTE: addr=[$0000-$1FFF]
+    assert(addr < MEMBLOCK_8KB);
+
+    mem_load(d, ctx, addr, ADDRMASK_8KB);
+    return true;
+}
+
+static bool ines_000_vwrite(void *ctx, uint16_t addr, uint8_t d)
+{
+    // NOTE: addr=[$0000-$1FFF]
+    assert(addr < MEMBLOCK_8KB);
+
+    ((uint8_t *)ctx)[addr & ADDRMASK_8KB] = d;
+    return true;
+}
+
 // TODO: binding to $8000 is too simple; WRAM needs at least $6000, and the
 // CPU memory map defines start of cart mapping at $4020; the most complex
 // mappers need access to entire 64KB address space in order to snoop on
 // all CPU activity. Similar rules hold for PPU.
 static bool ines_000_mbus_connect(struct mapper *self, bus *b)
 {
+    assert(self != NULL);
+
     return bus_set(b, MEMBLOCK_32KB, (struct busdevice){
         .read = ines_000_read,
         .copy = ines_000_copy,
         .ctx = self,
+    });
+}
+
+static bool ines_000_vbus_connect(struct mapper *self, bus *b)
+{
+    assert(self != NULL);
+
+    struct ines_mapper *me = (struct ines_mapper *)self;
+    return bus_set(b, 0, (struct busdevice){
+        .read = ines_000_vread,
+        .write = me->chrram ? ines_000_vwrite : NULL,
+        .ctx = me->chr,
     });
 }
 
@@ -188,7 +241,7 @@ int mapper_raw_create(struct mapper **m, FILE *f)
             .dtor = raw_dtor,
             .prgrom = raw_prgrom,
             .mbus_connect = raw_mbus_connect,
-            .mbus_disconnect = clear_bus_device,
+            .mbus_disconnect = clear_prg_device,
         },
     };
 
@@ -213,8 +266,9 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     if (header->mapper_id == 0) {
         self = malloc(sizeof(struct ines_000_mapper));
         *self = (struct ines_mapper){
-            .vtable.extends = {
-                .mbus_connect = ines_000_mbus_connect,
+            .vtable = {
+                .extends = {.mbus_connect = ines_000_mbus_connect},
+                .vbus_connect = ines_000_vbus_connect,
             },
         };
         assert(header->prg_blocks <= 2);
@@ -223,8 +277,9 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     } else {
         self = malloc(sizeof *self);
         *self = (struct ines_mapper){
-            .vtable.extends = {
-                .mbus_connect = ines_unimplemented_mbus_connect,
+            .vtable = {
+                .extends = {.mbus_connect = ines_unimplemented_mbus_connect},
+                .vbus_connect = ines_unimplemented_vbus_connect,
             },
         };
         header->mapper_implemented = false;
@@ -232,7 +287,8 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     struct mapper *base = &self->vtable.extends;
     base->dtor = ines_dtor;
     base->prgrom = ines_prgrom;
-    base->mbus_disconnect = clear_bus_device;
+    base->mbus_disconnect = clear_prg_device;
+    self->vtable.vbus_disconnect = clear_chr_device;
     if (header->chr_blocks > 0) {
         self->vtable.chrrom = ines_chrrom;
     }

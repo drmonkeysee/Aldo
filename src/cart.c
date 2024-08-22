@@ -363,7 +363,7 @@ void cart_mbus_disconnect(cart *self, bus *b)
     assert(self->mapper != NULL);
     assert(b != NULL);
 
-    self->mapper->mbus_disconnect(self->mapper, b);
+    self->mapper->mbus_disconnect(b);
 }
 
 bool cart_vbus_connect(cart *self, bus *b)
@@ -385,7 +385,7 @@ void cart_vbus_disconnect(cart *self, bus *b)
     assert(b != NULL);
 
     if (is_nes(self)) {
-        as_nesmap(self)->vbus_disconnect(self->mapper, b);
+        as_nesmap(self)->vbus_disconnect(b);
     }
 }
 

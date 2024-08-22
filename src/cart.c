@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define asnes(mapper) ((const struct nesmapper *)(mapper))
+#define as_nesmap(cart) ((const struct nesmapper *)((cart)->mapper))
 
 struct cartridge {
     struct mapper *mapper;
@@ -336,7 +336,7 @@ struct blockview cart_chrblock(cart *self, size_t i)
     struct blockview bv = {.ord = i};
     if (!is_nes(self)) return bv;
 
-    const uint8_t *chr = asnes(self->mapper)->chrrom(self->mapper);
+    const uint8_t *chr = as_nesmap(self)->chrrom(self->mapper);
     if (i < self->info.ines_hdr.chr_blocks) {
         bv.size = MEMBLOCK_8KB;
         bv.mem = chr + (i * bv.size);
@@ -373,7 +373,7 @@ bool cart_vbus_connect(cart *self, bus *b)
     assert(b != NULL);
 
     if (is_nes(self)) {
-        return asnes(self->mapper)->vbus_connect(self->mapper, b);
+        return as_nesmap(self)->vbus_connect(self->mapper, b);
     }
     return false;
 }
@@ -385,7 +385,7 @@ void cart_vbus_disconnect(cart *self, bus *b)
     assert(b != NULL);
 
     if (is_nes(self)) {
-        asnes(self->mapper)->vbus_disconnect(self->mapper, b);
+        as_nesmap(self)->vbus_disconnect(self->mapper, b);
     }
 }
 

@@ -38,17 +38,14 @@ auto create_window(SDL_Point windowSize, const gui_platform& p)
 ALDO_OWN
 auto create_renderer(const aldo::win_handle& hwin, const gui_platform& p)
 {
-    auto ren = SDL_CreateRenderer(hwin.get(), -1,
-                                  SDL_RENDERER_ACCELERATED
-                                  | SDL_RENDERER_PRESENTVSYNC
-                                  | SDL_RENDERER_TARGETTEXTURE);
+    auto ren = SDL_CreateRenderer(hwin.get(), -1, SDL_RENDERER_PRESENTVSYNC);
     if (!ren) throw aldo::SdlError{"SDL renderer creation failure"};
 
     auto render_scale_factor = p.render_scale_factor(hwin.get());
     SDL_RenderSetScale(ren, render_scale_factor, render_scale_factor);
     SDL_RendererInfo info;
     SDL_GetRendererInfo(ren, &info);
-    SDL_Log("Render info: %s (%04X) (x%.1f)", info.name, info.flags,
+    SDL_Log("Render info: %s (%#x) (x%.1f)", info.name, info.flags,
             render_scale_factor);
     return ren;
 }

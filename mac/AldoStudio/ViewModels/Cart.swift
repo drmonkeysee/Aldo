@@ -64,7 +64,7 @@ final class Cart: ObservableObject {
         return await readCStream(binary: true) { stream in
             let bv = cart_chrblock(handle.unwrapped, at)
             let err = withUnsafePointer(to: bv) {
-                dis_cart_chrbank($0, .init(scale), stream)
+                dis_cart_chrblock($0, .init(scale), stream)
             }
             if err < 0 { throw AldoError.wrapDisError(code: err) }
         }

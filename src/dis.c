@@ -666,7 +666,7 @@ int dis_cart_chr(cart *cart, int chrscale,
     return err;
 }
 
-int dis_cart_chrbank(const struct blockview *bv, int scale, FILE *f)
+int dis_cart_chrblock(const struct blockview *bv, int scale, FILE *f)
 {
     assert(bv != NULL);
     assert(f != NULL);

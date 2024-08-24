@@ -82,7 +82,7 @@ br_libexport br_checkerror
 int dis_cart_chr(cart *cart, int chrscale,
                  const char *br_noalias chrdecode_prefix, FILE *output);
 br_libexport br_checkerror
-int dis_cart_chrbank(const struct blockview *bv, int scale, FILE *f);
+int dis_cart_chrblock(const struct blockview *bv, int scale, FILE *f);
 
 br_libexport
 const char *dis_inst_mnemonic(const struct dis_instruction *inst);

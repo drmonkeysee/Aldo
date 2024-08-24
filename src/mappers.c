@@ -27,7 +27,7 @@ struct ines_mapper {
 
 struct ines_000_mapper {
     struct ines_mapper super;
-    size_t bankcount;
+    size_t blockcount;
 };
 
 static int load_blocks(uint8_t *restrict *mem, size_t size, FILE *f)
@@ -164,7 +164,7 @@ static bool ines_000_read(void *restrict ctx, uint16_t addr,
     assert(addr > ADDRMASK_32KB);
 
     const struct ines_000_mapper *m = ctx;
-    uint16_t mask = m->bankcount == 2 ? ADDRMASK_32KB : ADDRMASK_16KB;
+    uint16_t mask = m->blockcount == 2 ? ADDRMASK_32KB : ADDRMASK_16KB;
     *d = m->super.prg[addr & mask];
     return true;
 }
@@ -176,7 +176,7 @@ static size_t ines_000_copy(const void *restrict ctx, uint16_t addr,
     assert(addr > ADDRMASK_32KB);
 
     const struct ines_000_mapper *m = ctx;
-    uint16_t width = m->bankcount == 2 ? BITWIDTH_32KB : BITWIDTH_16KB;
+    uint16_t width = m->blockcount == 2 ? BITWIDTH_32KB : BITWIDTH_16KB;
     return bytecopy_bank(m->super.prg, width, addr, count, dest);
 }
 
@@ -218,11 +218,11 @@ static bool ines_000_vbus_connect(struct mapper *self, bus *b)
 {
     assert(self != NULL);
 
-    struct ines_mapper *me = (struct ines_mapper *)self;
+    struct ines_mapper *m = (struct ines_mapper *)self;
     return bus_set(b, 0, (struct busdevice){
         .read = ines_000_vread,
-        .write = me->chrram ? ines_000_vwrite : NULL,
-        .ctx = me->chr,
+        .write = m->chrram ? ines_000_vwrite : NULL,
+        .ctx = m->chr,
     });
 }
 
@@ -272,7 +272,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
             },
         };
         assert(header->prg_blocks <= 2);
-        ((struct ines_000_mapper *)self)->bankcount = header->prg_blocks;
+        ((struct ines_000_mapper *)self)->blockcount = header->prg_blocks;
         header->mapper_implemented = true;
     } else {
         self = malloc(sizeof *self);

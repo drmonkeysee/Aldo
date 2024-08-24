@@ -96,7 +96,7 @@ Dependencies needed to build and run Aldo components.
 
 ## Resources
 
-- [Nesdev Wiki](https://wiki.nesdev.org/w/index.php?title=Nesdev_Wiki)
+- [Nesdev Wiki](https://www.nesdev.org/wiki/Nesdev_Wiki)
 - [One Lone Coder](https://www.youtube.com/c/javidx9)
 - [6502.org](http://6502.org)
 - [Programming the 6502, 4th Edition](https://archive.org/details/Programming_the_6502_OCR)

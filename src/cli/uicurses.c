@@ -172,7 +172,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     snprintf(halt_label, sizeof halt_label, "%*s%s%*s",
              (int)round(center_offset), "", halt,
              (int)floor(center_offset), "");
-    drawtoggle(v, halt_label, !emu->snapshot.lines.ready);
+    drawtoggle(v, halt_label, !emu->snapshot->lines.ready);
 
     cursor_y += 2;
     enum csig_excmode mode = nes_mode(emu->console);
@@ -225,7 +225,7 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
         wprintw(v->content, "$%04X", resetvector);
     }
     const struct breakpoint *bp =
-        debug_bp_at(emu->debugger, emu->snapshot.debugger.halted);
+        debug_bp_at(emu->debugger, emu->snapshot->debugger.halted);
     char break_desc[HEXPR_FMT_SIZE];
     int err = haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
     mvwprintw(v->content, cursor_y, 0, "Break: %s",
@@ -286,13 +286,14 @@ static void drawvecs(const struct view *v, int h, int w, int y,
 {
     mvwhline(v->content, h - y--, 0, 0, w);
 
-    uint8_t lo = emu->snapshot.mem.vectors[0],
-            hi = emu->snapshot.mem.vectors[1];
+    const uint8_t *vectors = emu->snapshot->mem.vectors;
+    uint8_t lo = vectors[0],
+            hi = vectors[1];
     mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     NMI $%04X",
               CPU_VECTOR_NMI, lo, hi, bytowr(lo, hi));
 
-    lo = emu->snapshot.mem.vectors[2];
-    hi = emu->snapshot.mem.vectors[3];
+    lo = vectors[2];
+    hi = vectors[3];
     mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     RST",
               CPU_VECTOR_RST, lo, hi);
     int resetvector = debug_vector_override(emu->debugger);
@@ -302,8 +303,8 @@ static void drawvecs(const struct view *v, int h, int w, int y,
         wprintw(v->content, " " HEXPR_RST_IND "$%04X", resetvector);
     }
 
-    lo = emu->snapshot.mem.vectors[4];
-    hi = emu->snapshot.mem.vectors[5];
+    lo = vectors[4];
+    hi = vectors[5];
     mvwprintw(v->content, h - y, 0, "%04X: %02X %02X     IRQ $%04X",
               CPU_VECTOR_IRQ, lo, hi, bytowr(lo, hi));
 }
@@ -316,7 +317,7 @@ static void drawprg(const struct view *v, const struct emulator *emu)
     getmaxyx(v->content, h, w);
     werase(v->content);
 
-    drawinstructions(v, h, vector_offset, &emu->snapshot);
+    drawinstructions(v, h, vector_offset, emu->snapshot);
     drawvecs(v, h, w, vector_offset, emu);
 }
 
@@ -627,7 +628,7 @@ static int draw_mempage(const struct view *v, const struct emulator *emu,
             } else {
                 bool sp = sel == RSEL_RAM && page == 1
                             && ramidx % (size_t)RamPageSize
-                                == emu->snapshot.cpu.stack_pointer;
+                                == emu->snapshot->cpu.stack_pointer;
                 if (sp) {
                     wattron(v->content, A_STANDOUT);
                 }
@@ -655,10 +656,10 @@ static void draw_membanks(const struct view *v, const struct viewstate *vs,
     const uint8_t *mem;
     if (vs->ramselect == RSEL_VRAM) {
         page_offset = 0x20;
-        mem = emu->snapshot.mem.vram;
+        mem = emu->snapshot->mem.vram;
     } else {
         page_offset = 0;
-        mem = emu->snapshot.mem.ram;
+        mem = emu->snapshot->mem.ram;
     }
     int page_count = vs->total_ramsheets * 2;
     for (int page = 0; page < page_count; ++page) {
@@ -673,14 +674,15 @@ static void draw_ppumem(const struct view *v, const struct emulator *emu,
 {
     static const int sheeth = (RamDim * 2) + 1;
 
-    int cursor_y = draw_mempage(v, emu, emu->snapshot.mem.oam, RSEL_PPU,
-                                start_x, 0, 0, 0, RamDim);
+    const struct snapshot *snp = emu->snapshot;
+    int cursor_y = draw_mempage(v, emu, snp->mem.oam, RSEL_PPU, start_x, 0, 0,
+                                0, RamDim);
     wclrtoeol(v->content);
-    cursor_y = draw_mempage(v, emu, emu->snapshot.mem.secondary_oam, RSEL_PPU,
-                            start_x, cursor_y, 0, 0, 2);
+    cursor_y = draw_mempage(v, emu, snp->mem.secondary_oam, RSEL_PPU, start_x,
+                            cursor_y, 0, 0, 2);
     wclrtoeol(v->content);
-    cursor_y = draw_mempage(v, emu, emu->snapshot.mem.palette, RSEL_PPU,
-                            start_x, cursor_y, 0, 0x3f, 2);
+    cursor_y = draw_mempage(v, emu, snp->mem.palette, RSEL_PPU, start_x,
+                            cursor_y, 0, 0x3f, 2);
     mvwhline(v->content, cursor_y - 1, 0, 0, getmaxx(v->content));
     do {
         wmove(v->content, cursor_y, 0);
@@ -789,7 +791,7 @@ static void init_ui(struct layout *l, int ramsheets)
 
 static void tick_start(struct viewstate *vs, const struct emulator *emu)
 {
-    cycleclock_tickstart(&vs->clock.cyclock, !emu->snapshot.lines.ready);
+    cycleclock_tickstart(&vs->clock.cyclock, !emu->snapshot->lines.ready);
 }
 
 static void tick_end(struct runclock *c)
@@ -837,7 +839,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
     int input = getch();
     switch (input) {
     case ' ':
-        nes_ready(emu->console, !emu->snapshot.lines.ready);
+        nes_ready(emu->console, !emu->snapshot->lines.ready);
         break;
     case '=':   // "Lowercase" +
         adjustrate(vs, 1);
@@ -901,7 +903,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
 static void emu_update(struct emulator *emu, struct viewstate *vs)
 {
     nes_clock(emu->console, &vs->clock.cyclock);
-    nes_snapshot(emu->console, &emu->snapshot);
+    nes_snapshot(emu->console, emu->snapshot);
 }
 
 static void refresh_ui(const struct layout *l, const struct viewstate *vs,
@@ -911,8 +913,8 @@ static void refresh_ui(const struct layout *l, const struct viewstate *vs,
     drawdebugger(&l->debugger, emu);
     drawcart(&l->cart, emu);
     drawprg(&l->prg, emu);
-    drawcpu(&l->cpu, &emu->snapshot);
-    drawppu(&l->ppu, &emu->snapshot);
+    drawcpu(&l->cpu, emu->snapshot);
+    drawppu(&l->ppu, emu->snapshot);
     drawram(&l->ram, vs, emu);
 
     update_panels();

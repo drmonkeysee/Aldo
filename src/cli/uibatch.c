@@ -84,7 +84,7 @@ static void tick_start(struct runclock *c, const struct snapshot *snp)
 static void emu_update(struct emulator *emu, struct runclock *c)
 {
     nes_clock(emu->console, &c->cyclock);
-    nes_snapshot(emu->console, &emu->snapshot);
+    nes_snapshot(emu->console, emu->snapshot);
 }
 
 static void update_progress(const struct runclock *c)
@@ -123,9 +123,9 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
     printf("Total Cycles: %" PRIu64 "\n", c->cyclock.cycles);
     printf("Avg Cycles/sec: %.2f\n",
            (double)c->cyclock.cycles / c->cyclock.runtime);
-    if (emu->snapshot.debugger.halted != NoBreakpoint) {
+    if (emu->snapshot->debugger.halted != NoBreakpoint) {
         const struct breakpoint *bp =
-            debug_bp_at(emu->debugger, emu->snapshot.debugger.halted);
+            debug_bp_at(emu->debugger, emu->snapshot->debugger.halted);
         assert(bp != NULL);
         char break_desc[HEXPR_FMT_SIZE];
         int err = haltexpr_desc(&bp->expr, break_desc);
@@ -147,7 +147,7 @@ int ui_batch_loop(struct emulator *emu)
     struct runclock clock = {0};
     cycleclock_start(&clock.cyclock);
     do {
-        tick_start(&clock, &emu->snapshot);
+        tick_start(&clock, emu->snapshot);
         emu_update(emu, &clock);
         update_progress(&clock);
         tick_end(&clock);

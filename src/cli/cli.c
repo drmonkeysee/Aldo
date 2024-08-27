@@ -188,7 +188,7 @@ static ui_loop *setup_ui(struct emulator *emu)
         loop = ui_batch_loop;
     }
     // NOTE: initialize snapshot from console
-    nes_snapshot(emu->console, &emu->snapshot);
+    nes_snapshot(emu->console, emu->snapshot);
     return loop;
 }
 
@@ -260,6 +260,7 @@ static int run_emu(const struct cliargs *args, cart *c)
         result = EXIT_FAILURE;
         goto exit_trace;
     }
+    emu.snapshot = malloc(sizeof *emu.snapshot);
     nes_powerup(emu.console, c, emu.args->zeroram);
 
     ui_loop *run_loop = setup_ui(&emu);
@@ -272,7 +273,7 @@ static int run_emu(const struct cliargs *args, cart *c)
         result = EXIT_FAILURE;
     }
     dump_ram(&emu);
-    snapshot_clear(&emu.snapshot);
+    free(emu.snapshot);
     nes_free(emu.console);
 exit_trace:
     if (tracelog) {

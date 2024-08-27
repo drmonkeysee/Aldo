@@ -14,5 +14,6 @@ void snapshot_clear(struct snapshot *snp)
     assert(snp != NULL);
 
     snp->mem.prglength = 0;
-    snp->mem.ram = NULL;
+    snp->mem.ram = snp->mem.vram = snp->mem.oam = snp->mem.secondary_oam =
+        snp->mem.palette = NULL;
 }

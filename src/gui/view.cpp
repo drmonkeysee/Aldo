@@ -1278,6 +1278,25 @@ private:
     static constexpr pal_sz Cols = 17;
 };
 
+class PatternTablesView final : public aldo::View {
+public:
+    PatternTablesView(aldo::viewstate& vs, const aldo::Emulator& emu,
+                      const aldo::MediaRuntime& mr) noexcept
+    : View{"Pattern Tables", vs, emu, mr} {}
+    PatternTablesView(aldo::viewstate&, aldo::Emulator&&,
+                      const aldo::MediaRuntime&) = delete;
+    PatternTablesView(aldo::viewstate&, const aldo::Emulator&,
+                      aldo::MediaRuntime&&) = delete;
+    PatternTablesView(aldo::viewstate&, aldo::Emulator&&,
+                      aldo::MediaRuntime&&) = delete;
+
+protected:
+    void renderContents() override
+    {
+        ImGui::TextUnformatted("Pattern Tables");
+    }
+};
+
 class PrgAtPcView final : public aldo::View {
 public:
     PrgAtPcView(aldo::viewstate& vs, const aldo::Emulator& emu,
@@ -1632,6 +1651,7 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
         CpuView,
         DebuggerView,
         PaletteView,
+        PatternTablesView,
         PrgAtPcView,
         RamView,
         SystemView>(views, vs, emu, mr);

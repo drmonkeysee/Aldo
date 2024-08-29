@@ -16,6 +16,40 @@
 
 struct snapshot {
     struct {
+        ptrdiff_t halted;
+    } debugger;
+
+    struct {
+        uint16_t program_counter;
+        uint8_t accumulator, stack_pointer, status, xindex, yindex;
+    } cpu;
+    struct {
+        bool irq, nmi, readwrite, ready, reset, sync;
+    } lines;
+    struct {
+        enum csig_state irq, nmi, rst;
+        uint16_t addressbus, current_instruction;
+        uint8_t addrlow_latch, addrhigh_latch, addrcarry_latch, databus,
+                exec_cycle, opcode;
+        bool busfault, instdone, jammed;
+    } datapath;
+
+    struct {
+        uint8_t ctrl, mask, oamaddr, status;
+    } ppu;
+    struct {
+        bool
+            address_enable, cpu_readwrite, interrupt, read, reset, video_out,
+            write;
+    } plines;
+    struct {
+        enum csig_state rst;
+        uint16_t addressbus, scrolladdr, tempaddr, dot, line;
+        uint8_t databus, readbuffer, register_databus, register_select, xfine;
+        bool busfault, cv_pending, oddframe, writelatch;
+    } pdatapath;
+
+    struct {
         const uint8_t               // Non-owning Pointers
             *ram, *vram,
             *oam, *secondary_oam,
@@ -24,37 +58,14 @@ struct snapshot {
         uint8_t currprg[192],       // 64 lines @ max 3-byte instructions
                 vectors[6];
     } mem;
+
     struct {
-        ptrdiff_t halted;
-    } debugger;
-    struct {
-        enum csig_state irq, nmi, rst;
-        uint16_t addressbus, current_instruction;
-        uint8_t addrlow_latch, addrhigh_latch, addrcarry_latch, databus,
-                exec_cycle, opcode;
-        bool busfault, instdone, jammed;
-    } datapath;
-    struct {
-        enum csig_state rst;
-        uint16_t addressbus, scrolladdr, tempaddr, dot, line;
-        uint8_t databus, readbuffer, register_databus, register_select, xfine;
-        bool busfault, cv_pending, oddframe, writelatch;
-    } pdatapath;
-    struct {
-        uint16_t program_counter;
-        uint8_t accumulator, stack_pointer, status, xindex, yindex;
-    } cpu;
-    struct {
-        uint8_t ctrl, mask, oamaddr, status;
-    } ppu;
-    struct {
-        bool irq, nmi, readwrite, ready, reset, sync;
-    } lines;
-    struct {
-        bool
-            address_enable, cpu_readwrite, interrupt, read, reset, video_out,
-            write;
-    } plines;
+        // 2 Tables, 256 Tiles, 8 Rows, 16 Bits
+        // TODO: don't write this every update?
+        uint16_t pattern_tables[2][256][8];
+        // Foreground/Background, 4 Palettes, 4 Colors, 6 Bits
+        uint8_t bgpalettes[4][4], fgpalettes[4][4];
+    } video;
 };
 
 #endif

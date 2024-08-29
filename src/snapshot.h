@@ -63,7 +63,7 @@ struct snapshot {
         // 2 Tables, 256 Tiles, 8 Rows, 16 Bits
         // TODO: don't write this every update?
         uint16_t pattern_tables[2][256][8];
-        // Foreground/Background, 4 Palettes, 4 Colors, 6 Bits
+        // Background/Foreground, 4 Palettes, 4 Colors, 6 Bits
         uint8_t bgpalettes[4][4], fgpalettes[4][4];
     } video;
 };

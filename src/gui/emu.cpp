@@ -74,10 +74,7 @@ auto update_bouncer(aldo::viewstate& vs, const snapshot& snp) noexcept
 aldo::Emulator::Emulator(aldo::debug_handle d, aldo::console_handle n,
                          const gui_platform& p)
 : prefspath{get_prefspath(p)}, hdbg{std::move(d)}, hconsole{std::move(n)},
-    hsnp{std::make_unique<aldo::Emulator::console_snapshot>()}
-{
-    nes_snapshot(consolep(), snapshotp());
-}
+    hsnp{consolep()} {}
 
 std::string_view aldo::Emulator::displayCartName() const noexcept
 {

@@ -86,21 +86,21 @@ static uint8_t flags(enum inst in)
 
 static const char *interrupt_display(const struct snapshot *snp)
 {
-    if (snp->datapath.opcode != BrkOpcode) return "";
-    if (snp->datapath.exec_cycle == 6) return "CLR";
-    if (snp->datapath.rst == CSGS_COMMITTED) return "(RST)";
-    if (snp->datapath.nmi == CSGS_COMMITTED) return "(NMI)";
-    if (snp->datapath.irq == CSGS_COMMITTED) return "(IRQ)";
+    if (snp->cpu.datapath.opcode != BrkOpcode) return "";
+    if (snp->cpu.datapath.exec_cycle == 6) return "CLR";
+    if (snp->cpu.datapath.rst == CSGS_COMMITTED) return "(RST)";
+    if (snp->cpu.datapath.nmi == CSGS_COMMITTED) return "(NMI)";
+    if (snp->cpu.datapath.irq == CSGS_COMMITTED) return "(IRQ)";
     return "";
 }
 
 static uint16_t interrupt_vector(const struct snapshot *snp)
 {
-    if (snp->datapath.nmi == CSGS_COMMITTED)
-        return batowr(snp->mem.vectors);
-    if (snp->datapath.rst == CSGS_COMMITTED)
-        return batowr(snp->mem.vectors + 2);
-    return batowr(snp->mem.vectors + 4);
+    if (snp->cpu.datapath.nmi == CSGS_COMMITTED)
+        return batowr(snp->prg->vectors);
+    if (snp->cpu.datapath.rst == CSGS_COMMITTED)
+        return batowr(snp->prg->vectors + 2);
+    return batowr(snp->prg->vectors + 4);
 }
 
 static int print_raw(uint16_t addr, const struct dis_instruction *inst,
@@ -561,15 +561,14 @@ int dis_datapath(const struct snapshot *snp,
     assert(dis != NULL);
 
     struct dis_instruction inst;
-    int err = dis_parsemem_inst(snp->mem.prglength, snp->mem.currprg, 0,
-                                &inst);
+    int err = dis_parsemem_inst(snp->prg->length, snp->prg->curr, 0, &inst);
     if (err < 0) return err;
 
     // NOTE: we're in an interrupt state so adjust the instruction to render
     // the datapath correctly.
-    if (snp->datapath.opcode == BrkOpcode
+    if (snp->cpu.datapath.opcode == BrkOpcode
         && inst.d.instruction != IN_BRK) {
-        inst.d = Decode[snp->datapath.opcode];
+        inst.d = Decode[snp->cpu.datapath.opcode];
         inst.bv.size = (size_t)InstLens[inst.d.mode];
     }
 
@@ -579,8 +578,8 @@ int dis_datapath(const struct snapshot *snp,
 
     size_t
         max_offset = 1 + (inst.bv.size / 3),
-        displayidx = snp->datapath.exec_cycle < max_offset
-                        ? snp->datapath.exec_cycle
+        displayidx = snp->cpu.datapath.exec_cycle < max_offset
+                        ? snp->cpu.datapath.exec_cycle
                         : max_offset;
     const char *displaystr = StringTables[inst.d.mode][displayidx];
     switch (displayidx) {
@@ -588,7 +587,7 @@ int dis_datapath(const struct snapshot *snp,
         count = sprintf(dis + total, "%s", displaystr);
         break;
     case 1:
-        count = snp->datapath.opcode == BrkOpcode
+        count = snp->cpu.datapath.opcode == BrkOpcode
                     ? sprintf(dis + total, displaystr, interrupt_display(snp))
                     : sprintf(dis + total, displaystr,
                               strlen(displaystr) > 0 ? inst.bv.mem[1] : 0);
@@ -754,7 +753,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
         const char *fmt;
         uint16_t vector;
         int resetvector;
-        if (snp->datapath.rst == CSGS_COMMITTED
+        if (snp->cpu.datapath.rst == CSGS_COMMITTED
             && (resetvector = debug_vector_override(dbg)) != NoResetVector) {
             fmt = HEXPR_RST_IND "%04X";
             vector = (uint16_t)resetvector;

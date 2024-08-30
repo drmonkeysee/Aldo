@@ -76,7 +76,7 @@ static void tick_start(struct runclock *c, const struct snapshot *snp)
     c->cyclock.emutime = c->cyclock.runtime;
 
     // NOTE: exit batch mode if cpu is not running
-    if (!snp->lines.ready) {
+    if (!snp->cpu.lines.ready) {
         QuitSignal = 1;
     }
 }

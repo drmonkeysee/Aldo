@@ -1725,28 +1725,28 @@ void cpu_snapshot(const struct mos6502 *self, struct snapshot *snp)
     snp->cpu.xindex = self->x;
     snp->cpu.yindex = self->y;
 
-    snp->datapath.addressbus = self->addrbus;
-    snp->datapath.addrlow_latch = self->adl;
-    snp->datapath.addrhigh_latch = self->adh;
-    snp->datapath.addrcarry_latch = self->adc;
-    snp->datapath.busfault = self->bflt;
-    snp->datapath.current_instruction = self->addrinst;
-    snp->datapath.databus = self->databus;
+    snp->cpu.datapath.addressbus = self->addrbus;
+    snp->cpu.datapath.addrlow_latch = self->adl;
+    snp->cpu.datapath.addrhigh_latch = self->adh;
+    snp->cpu.datapath.addrcarry_latch = self->adc;
+    snp->cpu.datapath.busfault = self->bflt;
+    snp->cpu.datapath.current_instruction = self->addrinst;
+    snp->cpu.datapath.databus = self->databus;
     assert(self->t >= 0);
-    snp->datapath.exec_cycle = (uint8_t)self->t;
-    snp->datapath.instdone = self->presync;
-    snp->datapath.irq = self->irq;
-    snp->datapath.jammed = cpu_jammed(self);
-    snp->datapath.nmi = self->nmi;
-    snp->datapath.opcode = self->opc;
-    snp->datapath.rst = self->rst;
+    snp->cpu.datapath.exec_cycle = (uint8_t)self->t;
+    snp->cpu.datapath.instdone = self->presync;
+    snp->cpu.datapath.irq = self->irq;
+    snp->cpu.datapath.jammed = cpu_jammed(self);
+    snp->cpu.datapath.nmi = self->nmi;
+    snp->cpu.datapath.opcode = self->opc;
+    snp->cpu.datapath.rst = self->rst;
 
-    snp->lines.irq = self->signal.irq;
-    snp->lines.nmi = self->signal.nmi;
-    snp->lines.readwrite = self->signal.rw;
-    snp->lines.ready = self->signal.rdy;
-    snp->lines.reset = self->signal.rst;
-    snp->lines.sync = self->signal.sync;
+    snp->cpu.lines.irq = self->signal.irq;
+    snp->cpu.lines.nmi = self->signal.nmi;
+    snp->cpu.lines.readwrite = self->signal.rw;
+    snp->cpu.lines.ready = self->signal.rdy;
+    snp->cpu.lines.reset = self->signal.rst;
+    snp->cpu.lines.sync = self->signal.sync;
 }
 
 void cpu_peek_start(struct mos6502 *restrict self,

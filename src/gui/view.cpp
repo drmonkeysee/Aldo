@@ -332,7 +332,7 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
 {
     if (ImGui::BeginMenu("Controls")) {
         speed_menu_items(vs);
-        auto& lines = emu.snapshot().lines;
+        auto& lines = emu.snapshot().cpu.lines;
         if (ImGui::MenuItem(lines.ready ? "Halt" : "Run", "<Space>")) {
             vs.commands.emplace(aldo::Command::ready, !lines.ready);
         }
@@ -703,7 +703,7 @@ private:
 
     void renderControlLines(float spacer, float adjustW) const noexcept
     {
-        auto& lines = emu.snapshot().lines;
+        auto& lines = emu.snapshot().cpu.lines;
         renderControlLine("RDY", lines.ready);
         ImGui::SameLine(0, spacer);
         renderControlLine("SYNC", lines.sync);
@@ -714,7 +714,7 @@ private:
 
     void renderBusLines() const noexcept
     {
-        auto& datapath = emu.snapshot().datapath;
+        auto& datapath = emu.snapshot().cpu.datapath;
         {
             ScopedColor color{{ImGuiCol_Text, aldo::colors::LineOut}};
             ImGui::Text("Addr: %04X", datapath.addressbus);
@@ -731,7 +731,7 @@ private:
                           datapath.databus);
             ScopedColor color{{
                 ImGuiCol_Text,
-                emu.snapshot().lines.readwrite
+                emu.snapshot().cpu.lines.readwrite
                     ? aldo::colors::LineIn
                     : aldo::colors::LineOut,
             }};
@@ -741,7 +741,7 @@ private:
 
     void renderInstructionDecode() const noexcept
     {
-        auto& datapath = emu.snapshot().datapath;
+        auto& datapath = emu.snapshot().cpu.datapath;
         if (datapath.jammed) {
             ScopedColor color{{ImGuiCol_Text, aldo::colors::DestructiveHover}};
             ImGui::TextUnformatted("Decode: JAMMED");
@@ -753,21 +753,21 @@ private:
         ImGui::Text("adl: %02X", datapath.addrlow_latch);
         ImGui::Text("adh: %02X", datapath.addrhigh_latch);
         ImGui::Text("adc: %02X", datapath.addrcarry_latch);
-        renderCycleIndicator(emu.snapshot().datapath.exec_cycle);
+        renderCycleIndicator(datapath.exec_cycle);
     }
 
     void renderInterruptLines(float spacer) const noexcept
     {
         ImGui::Spacing();
 
-        auto& lines = emu.snapshot().lines;
+        auto& lines = emu.snapshot().cpu.lines;
         renderInterruptLine("IRQ", lines.irq);
         ImGui::SameLine(0, spacer);
         renderInterruptLine("NMI", lines.nmi);
         ImGui::SameLine(0, spacer);
         renderInterruptLine("RST", lines.reset);
 
-        auto& datapath = emu.snapshot().datapath;
+        auto& datapath = emu.snapshot().cpu.datapath;
         ImGui::TextUnformatted(display_signalstate(datapath.irq));
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted(display_signalstate(datapath.nmi));
@@ -960,7 +960,7 @@ private:
         DisabledIf dif = [this] {
             if (this->resetOverride) return false;
             // NOTE: +2 = start of reset vector
-            this->resetAddr = batowr(this->emu.snapshot().mem.vectors + 2);
+            this->resetAddr = batowr(this->emu.snapshot().prg->vectors + 2);
             return true;
         }();
         if (input_address(&resetAddr)) {
@@ -1325,15 +1325,13 @@ private:
         static constexpr auto instCount = 16;
 
         auto& snp = emu.snapshot();
-        auto& prgMem = snp.mem;
-        auto addr = snp.datapath.current_instruction;
+        auto prg = snp.prg;
+        auto addr = snp.cpu.datapath.current_instruction;
         dis_instruction inst{};
         std::array<aldo::et::tchar, DIS_INST_SIZE> disasm;
         for (int i = 0; i < instCount; ++i) {
-            auto result = dis_parsemem_inst(prgMem.prglength,
-                                            prgMem.currprg,
-                                            inst.offset + inst.bv.size,
-                                            &inst);
+            auto result = dis_parsemem_inst(prg->length, prg->curr,
+                                            inst.offset + inst.bv.size, &inst);
             if (result > 0) {
                 result = dis_inst(addr, &inst, disasm.data());
                 if (result > 0) {
@@ -1364,14 +1362,16 @@ private:
     void renderVectors() const noexcept
     {
         auto& snp = emu.snapshot();
-        auto& prgMem = snp.mem;
+        auto prg = snp.prg;
 
-        auto lo = prgMem.vectors[0], hi = prgMem.vectors[1];
+        auto
+            lo = prg->vectors[0],
+            hi = prg->vectors[1];
         ImGui::Text("%04X: %02X %02X     NMI $%04X", CPU_VECTOR_NMI, lo, hi,
                     bytowr(lo, hi));
 
-        lo = prgMem.vectors[2];
-        hi = prgMem.vectors[3];
+        lo = prg->vectors[2];
+        hi = prg->vectors[3];
         const char* indicator;
         aldo::et::word resVector;
         auto& dbg = emu.debugger();
@@ -1385,8 +1385,8 @@ private:
         ImGui::Text("%04X: %02X %02X     RST %s$%04X", CPU_VECTOR_RST, lo, hi,
                     indicator, resVector);
 
-        lo = prgMem.vectors[4];
-        hi = prgMem.vectors[5];
+        lo = prg->vectors[4];
+        hi = prg->vectors[5];
         ImGui::Text("%04X: %02X %02X     IRQ $%04X", CPU_VECTOR_IRQ, lo, hi,
                     bytowr(lo, hi));
     }
@@ -1579,7 +1579,7 @@ private:
 
     void renderRunControls() const
     {
-        auto& lines = emu.snapshot().lines;
+        auto& lines = emu.snapshot().cpu.lines;
         auto halt = !lines.ready;
         if (ImGui::Checkbox("HALT", &halt)) {
             vs.commands.emplace(aldo::Command::ready, !halt);

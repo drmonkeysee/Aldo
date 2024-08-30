@@ -61,7 +61,7 @@ constexpr auto mode_change(const SDL_Event& ev) noexcept
 auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
                     aldo::viewstate& vs)
 {
-    auto& lines = emu.snapshot().lines;
+    auto& lines = emu.snapshot().cpu.lines;
     switch (ev.key.keysym.sym) {
     case SDLK_SPACE:
         if (is_free_key(ev)) {

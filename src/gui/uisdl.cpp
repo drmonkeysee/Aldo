@@ -60,7 +60,7 @@ auto runloop(const gui_platform& p, debugger* debug, nes* console)
     aldo::Layout layout{state, emu, runtime};
     state.clock.start();
     do {
-        auto reset = !emu.snapshot().lines.ready;
+        auto reset = !emu.snapshot().cpu.lines.ready;
         auto tick = state.clock.startTick(reset);
         handle_input(emu, state, p);
         if (state.running) {

@@ -172,7 +172,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     snprintf(halt_label, sizeof halt_label, "%*s%s%*s",
              (int)round(center_offset), "", halt,
              (int)floor(center_offset), "");
-    drawtoggle(v, halt_label, !emu->snapshot.lines.ready);
+    drawtoggle(v, halt_label, !emu->snapshot.cpu.lines.ready);
 
     cursor_y += 2;
     enum csig_excmode mode = nes_mode(emu->console);
@@ -259,11 +259,10 @@ static void drawinstructions(const struct view *v, int h, int y,
                              const struct snapshot *snp)
 {
     struct dis_instruction inst = {0};
-    uint16_t addr = snp->datapath.current_instruction;
+    uint16_t addr = snp->cpu.datapath.current_instruction;
     char disassembly[DIS_INST_SIZE];
     for (int i = 0; i < h - y; ++i) {
-        int result = dis_parsemem_inst(snp->mem.prglength,
-                                       snp->mem.currprg,
+        int result = dis_parsemem_inst(snp->prg->length, snp->prg->curr,
                                        inst.offset + inst.bv.size,
                                        &inst);
         if (result > 0) {
@@ -286,7 +285,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
 {
     mvwhline(v->content, h - y--, 0, 0, w);
 
-    const uint8_t *vectors = emu->snapshot.mem.vectors;
+    const uint8_t *vectors = emu->snapshot.prg->vectors;
     uint8_t lo = vectors[0],
             hi = vectors[1];
     mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     NMI $%04X",
@@ -411,11 +410,11 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
         seph = 5, vsep1 = 7, vsep2 = 21, col1 = vsep1 + 2, col2 = vsep2 + 2;
 
     int line_x = (w / 4) + 1;
-    draw_chip_vline(v, snp->lines.ready, cursor_y, line_x, 1, ArrowDown, -1,
-                    "RDY");
-    draw_chip_vline(v, snp->lines.sync, cursor_y, line_x * 2, 1, ArrowUp, -1,
-                    "SYNC");
-    draw_chip_vline(v, snp->lines.readwrite, cursor_y++, line_x * 3, 1,
+    draw_chip_vline(v, snp->cpu.lines.ready, cursor_y, line_x, 1, ArrowDown,
+                    -1, "RDY");
+    draw_chip_vline(v, snp->cpu.lines.sync, cursor_y, line_x * 2, 1, ArrowUp,
+                    -1, "SYNC");
+    draw_chip_vline(v, snp->cpu.lines.readwrite, cursor_y++, line_x * 3, 1,
                     ArrowUp, -1, "R/W\u0305");
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
@@ -423,7 +422,7 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
     mvwvline(v->content, ++cursor_y, vsep1, 0, seph);
     mvwvline(v->content, cursor_y, vsep2, 0, seph);
 
-    if (snp->datapath.jammed) {
+    if (snp->cpu.datapath.jammed) {
         wattron(v->content, A_STANDOUT);
         mvwaddstr(v->content, cursor_y, col1, " JAMMED ");
         wattroff(v->content, A_STANDOUT);
@@ -435,39 +434,40 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
     }
 
     mvwprintw(v->content, ++cursor_y, col1, "adl: %02X",
-              snp->datapath.addrlow_latch);
+              snp->cpu.datapath.addrlow_latch);
 
     mvwaddstr(v->content, ++cursor_y, 0, DArrowLeft);
-    mvwprintw(v->content, cursor_y, 2, "%04X", snp->datapath.addressbus);
+    mvwprintw(v->content, cursor_y, 2, "%04X", snp->cpu.datapath.addressbus);
     mvwprintw(v->content, cursor_y, col1, "adh: %02X",
-              snp->datapath.addrhigh_latch);
-    if (snp->datapath.busfault) {
+              snp->cpu.datapath.addrhigh_latch);
+    if (snp->cpu.datapath.busfault) {
         mvwaddstr(v->content, cursor_y, col2, "FLT");
     } else {
-        mvwprintw(v->content, cursor_y, col2, "%02X", snp->datapath.databus);
+        mvwprintw(v->content, cursor_y, col2, "%02X",
+                  snp->cpu.datapath.databus);
     }
     mvwaddstr(v->content, cursor_y, w - 1,
-              snp->lines.readwrite ? DArrowLeft : DArrowRight);
+              snp->cpu.lines.readwrite ? DArrowLeft : DArrowRight);
 
     mvwprintw(v->content, ++cursor_y, col1, "adc: %02X",
-              snp->datapath.addrcarry_latch);
+              snp->cpu.datapath.addrcarry_latch);
 
-    mvwprintw(v->content, ++cursor_y, col1, "%*sT%u", snp->datapath.exec_cycle,
-              "", snp->datapath.exec_cycle);
+    mvwprintw(v->content, ++cursor_y, col1, "%*sT%u",
+              snp->cpu.datapath.exec_cycle, "", snp->cpu.datapath.exec_cycle);
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
 
-    draw_interrupt_latch(v, snp->datapath.irq, cursor_y, line_x);
-    draw_interrupt_latch(v, snp->datapath.nmi, cursor_y, line_x * 2);
-    draw_interrupt_latch(v, snp->datapath.rst, cursor_y, line_x * 3);
+    draw_interrupt_latch(v, snp->cpu.datapath.irq, cursor_y, line_x);
+    draw_interrupt_latch(v, snp->cpu.datapath.nmi, cursor_y, line_x * 2);
+    draw_interrupt_latch(v, snp->cpu.datapath.rst, cursor_y, line_x * 3);
     // NOTE: jump 2 rows as interrupts are drawn direction first
     cursor_y += 2;
-    draw_chip_vline(v, snp->lines.irq, cursor_y, line_x, -1, ArrowUp, -1,
+    draw_chip_vline(v, snp->cpu.lines.irq, cursor_y, line_x, -1, ArrowUp, -1,
                     "I\u0305R\u0305Q\u0305");
-    draw_chip_vline(v, snp->lines.nmi, cursor_y, line_x * 2, -1, ArrowUp, -1,
-                    "N\u0305M\u0305I\u0305");
-    draw_chip_vline(v, snp->lines.reset, cursor_y, line_x * 3, -1, ArrowUp, -1,
-                    "R\u0305S\u0305T\u0305");
+    draw_chip_vline(v, snp->cpu.lines.nmi, cursor_y, line_x * 2, -1, ArrowUp,
+                    -1, "N\u0305M\u0305I\u0305");
+    draw_chip_vline(v, snp->cpu.lines.reset, cursor_y, line_x * 3, -1, ArrowUp,
+                    -1, "R\u0305S\u0305T\u0305");
 }
 
 static void drawcpu(const struct view *v, const struct snapshot *snp)
@@ -484,23 +484,23 @@ static void drawcpu(const struct view *v, const struct snapshot *snp)
 static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
                           int w, const struct snapshot *snp)
 {
-    uint8_t sel = snp->pdatapath.register_select;
+    uint8_t sel = snp->ppu.datapath.register_select;
     char sel_buf[4];
     sprintf(sel_buf, "%d%d%d", byte_getbit(sel, 2), byte_getbit(sel, 1),
             byte_getbit(sel, 0));
-    draw_chip_vline(v, snp->plines.cpu_readwrite, cursor_y, line_x, 1,
+    draw_chip_vline(v, snp->ppu.lines.cpu_readwrite, cursor_y, line_x, 1,
                     ArrowDown, -1, sel_buf);
-    draw_chip_vline(v, snp->plines.interrupt, cursor_y, line_x * 2, 1,
+    draw_chip_vline(v, snp->ppu.lines.interrupt, cursor_y, line_x * 2, 1,
                     ArrowUp, -1, "I\u0305N\u0305T\u0305");
-    draw_chip_vline(v, snp->plines.reset, cursor_y++, line_x * 3, 1, ArrowDown,
-                    -1, "R\u0305S\u0305T\u0305");
+    draw_chip_vline(v, snp->ppu.lines.reset, cursor_y++, line_x * 3, 1,
+                    ArrowDown, -1, "R\u0305S\u0305T\u0305");
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
-    draw_interrupt_latch(v, snp->pdatapath.rst, cursor_y, line_x * 3);
+    draw_interrupt_latch(v, snp->ppu.datapath.rst, cursor_y, line_x * 3);
 
     mvwprintw(v->content, cursor_y, line_x - 2, "[%s%02X]",
-              snp->plines.cpu_readwrite ? DArrowUp : DArrowDown,
-              snp->pdatapath.register_databus);
+              snp->ppu.lines.cpu_readwrite ? DArrowUp : DArrowDown,
+              snp->ppu.datapath.register_databus);
     return cursor_y;
 }
 
@@ -531,36 +531,38 @@ static int draw_pdatapath(const struct view *v, int cursor_y, int w,
 
     mvwvline(v->content, ++cursor_y, vsep, 0, seph);
 
-    draw_scroll_addr(v, cursor_y, 0, 'v', snp->pdatapath.scrolladdr);
-    mvwprintw(v->content, cursor_y, buscol, "%04X", snp->pdatapath.addressbus);
+    draw_scroll_addr(v, cursor_y, 0, 'v', snp->ppu.datapath.scrolladdr);
+    mvwprintw(v->content, cursor_y, buscol, "%04X",
+              snp->ppu.datapath.addressbus);
     mvwaddstr(v->content, cursor_y, w - 1, DArrowRight);
 
-    draw_scroll_addr(v, ++cursor_y, 0, 't', snp->pdatapath.tempaddr);
-    draw_chip_hline(v, snp->plines.address_enable, cursor_y, buscol + 1, "ALE",
-                    ArrowRight);
+    draw_scroll_addr(v, ++cursor_y, 0, 't', snp->ppu.datapath.tempaddr);
+    draw_chip_hline(v, snp->ppu.lines.address_enable, cursor_y, buscol + 1,
+                    "ALE", ArrowRight);
 
     mvwprintw(v->content, ++cursor_y, 0, "x: %02X (%02d)",
-              snp->pdatapath.xfine, snp->pdatapath.xfine);
-    draw_chip_hline(v, snp->plines.read, cursor_y, buscol + 3, "R\u0305",
+              snp->ppu.datapath.xfine, snp->ppu.datapath.xfine);
+    draw_chip_hline(v, snp->ppu.lines.read, cursor_y, buscol + 3, "R\u0305",
                     ArrowRight);
 
     mvwprintw(v->content, ++cursor_y, 0, "c: %1d o: %1d w: %1d",
-              snp->pdatapath.cv_pending, snp->pdatapath.oddframe,
-              snp->pdatapath.writelatch);
-    draw_chip_hline(v, snp->plines.write, cursor_y, buscol + 3, "W\u0305",
+              snp->ppu.datapath.cv_pending, snp->ppu.datapath.oddframe,
+              snp->ppu.datapath.writelatch);
+    draw_chip_hline(v, snp->ppu.lines.write, cursor_y, buscol + 3, "W\u0305",
                     ArrowRight);
 
-    mvwprintw(v->content, ++cursor_y, 0, "r: %02X", snp->pdatapath.readbuffer);
-    if (snp->pdatapath.busfault) {
+    mvwprintw(v->content, ++cursor_y, 0, "r: %02X",
+              snp->ppu.datapath.readbuffer);
+    if (snp->ppu.datapath.busfault) {
         mvwaddstr(v->content, cursor_y, buscol + 1, "FLT");
     } else {
         mvwprintw(v->content, cursor_y, buscol + 1, " %02X",
-                  snp->pdatapath.databus);
+                  snp->ppu.datapath.databus);
     }
     // NOTE: write line does not signal when writing to palette ram so use the
     // read signal to determine direction of databus flow.
     mvwaddstr(v->content, cursor_y, w - 1,
-              snp->plines.read ? DArrowRight : DArrowLeft);
+              snp->ppu.lines.read ? DArrowRight : DArrowLeft);
     return cursor_y;
 }
 
@@ -570,11 +572,11 @@ static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
     mvwprintw(v->content, cursor_y, line_x - 2, "[%sXX]", DArrowDown);
 
     char vbuf[10];
-    sprintf(vbuf, "(%3d,%3d)", snp->pdatapath.line, snp->pdatapath.dot);
+    sprintf(vbuf, "(%3d,%3d)", snp->ppu.datapath.line, snp->ppu.datapath.dot);
     // NOTE: jump 2 rows as interrupts are drawn direction first
     cursor_y += 2;
-    draw_chip_vline(v, snp->plines.video_out, cursor_y, line_x, -1, ArrowDown,
-                    -4, vbuf);
+    draw_chip_vline(v, snp->ppu.lines.video_out, cursor_y, line_x, -1,
+                    ArrowDown, -4, vbuf);
 }
 
 static void drawppu(const struct view *v, const struct snapshot *snp)
@@ -791,7 +793,7 @@ static void init_ui(struct layout *l, int ramsheets)
 
 static void tick_start(struct viewstate *vs, const struct emulator *emu)
 {
-    cycleclock_tickstart(&vs->clock.cyclock, !emu->snapshot.lines.ready);
+    cycleclock_tickstart(&vs->clock.cyclock, !emu->snapshot.cpu.lines.ready);
 }
 
 static void tick_end(struct runclock *c)
@@ -839,7 +841,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
     int input = getch();
     switch (input) {
     case ' ':
-        nes_ready(emu->console, !emu->snapshot.lines.ready);
+        nes_ready(emu->console, !emu->snapshot.cpu.lines.ready);
         break;
     case '=':   // "Lowercase" +
         adjustrate(vs, 1);

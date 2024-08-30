@@ -19,13 +19,14 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
                              const struct snapshot *snp)
 {
     uint8_t bytes[3];
-    size_t instlen = bus_copy(cpu->mbus, snp->datapath.current_instruction,
+    size_t instlen = bus_copy(cpu->mbus, snp->cpu.datapath.current_instruction,
                               sizeof bytes / sizeof bytes[0], bytes);
     struct dis_instruction inst;
     int result = dis_parsemem_inst(instlen, bytes, 0, &inst);
     char disinst[DIS_INST_SIZE];
     if (result > 0) {
-        result = dis_inst(snp->datapath.current_instruction, &inst, disinst);
+        result = dis_inst(snp->cpu.datapath.current_instruction, &inst,
+                          disinst);
     }
     return fprintf(tracelog, "%s",
                    result > 0 ? disinst : (result < 0
@@ -37,7 +38,7 @@ static int trace_instruction_peek(FILE *tracelog, struct mos6502 *cpu,
                                   debugger *dbg, const struct snapshot *snp)
 {
     char peek[DIS_PEEK_SIZE];
-    int result = dis_peek(snp->datapath.current_instruction, cpu, dbg, snp,
+    int result = dis_peek(snp->cpu.datapath.current_instruction, cpu, dbg, snp,
                           peek);
     return fprintf(tracelog, " %s", result < 0 ? dis_errstr(result) : peek);
 }

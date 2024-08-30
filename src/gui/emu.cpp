@@ -51,7 +51,7 @@ auto load_cart(const std::filesystem::path& filepath)
 
 auto update_bouncer(aldo::viewstate& vs, const snapshot& snp) noexcept
 {
-    if (!snp.lines.ready) return;
+    if (!snp.cpu.lines.ready) return;
 
     if (vs.bouncer.pos.x - vs.bouncer.halfdim < 0
         || vs.bouncer.pos.x + vs.bouncer.halfdim > vs.bouncer.bounds.x) {

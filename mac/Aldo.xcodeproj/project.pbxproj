@@ -43,6 +43,8 @@
 		C882854829403C2100BAC249 /* error.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C882854629403C2100BAC249 /* error.cpp */; };
 		C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C88CABDC28FA4DDD00551C65 /* uisdl.cpp */; };
 		C894F0EF2945850E00C6575F /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C894F0ED2945850E00C6575F /* view.cpp */; };
+		C8A13C812C81559B00F61389 /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C8A13C802C81559B00F61389 /* snapshot.c */; };
+		C8A13C822C81559B00F61389 /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C8A13C802C81559B00F61389 /* snapshot.c */; };
 		C8B3A9BD295535F3009C1770 /* AldoStudioApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B3A9BC295535F3009C1770 /* AldoStudioApp.swift */; };
 		C8B3A9BF295535F3009C1770 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B3A9BE295535F3009C1770 /* ContentView.swift */; };
 		C8B3A9C1295535F4009C1770 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8B3A9C0295535F4009C1770 /* Assets.xcassets */; };
@@ -288,6 +290,7 @@
 		C894F0ED2945850E00C6575F /* view.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = view.cpp; sourceTree = "<group>"; };
 		C894F0EE2945850E00C6575F /* view.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = view.hpp; sourceTree = "<group>"; };
 		C89D714F27D4758900C9177A /* CartPrgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartPrgView.swift; sourceTree = "<group>"; };
+		C8A13C802C81559B00F61389 /* snapshot.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = snapshot.c; sourceTree = "<group>"; };
 		C8A5B77A27DD79AE00A4DD5E /* Cart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cart.swift; sourceTree = "<group>"; };
 		C8ACDEA629AC492E0058A6F8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		C8B3A9BA295535F3009C1770 /* AldoStudio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AldoStudio.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -534,6 +537,7 @@
 				C81680002BE6EEAB005A7905 /* ppu.h */,
 				C81680012BE6EEAB005A7905 /* ppu.c */,
 				C8C7068B2751EEBA00B45785 /* snapshot.h */,
+				C8A13C802C81559B00F61389 /* snapshot.c */,
 				C8C706BC2751F55C00B45785 /* trace.h */,
 				C8C706BD2751F55C00B45785 /* trace.c */,
 				C83965E927810D4300E1E28E /* tsutil.h */,
@@ -977,6 +981,7 @@
 				C8186495277EB0F700CA4AC0 /* uicurses.c in Sources */,
 				C8C706942751EEBA00B45785 /* cpu.c in Sources */,
 				C820E6CB25A97A4E006A7AB1 /* cli.c in Sources */,
+				C8A13C822C81559B00F61389 /* snapshot.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1049,6 +1054,7 @@
 				C80CCE0729306D8A00664730 /* cycleclock.c in Sources */,
 				C8B88AAB29062AEB00B7CB23 /* cpu.c in Sources */,
 				C8B88AAE29062AFA00B7CB23 /* dis.c in Sources */,
+				C8A13C812C81559B00F61389 /* snapshot.c in Sources */,
 				C8B88AA929062AE100B7CB23 /* bytes.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

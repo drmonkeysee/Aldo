@@ -1324,9 +1324,8 @@ private:
     {
         static constexpr auto instCount = 16;
 
-        auto& snp = emu.snapshot();
-        auto prg = snp.prg;
-        auto addr = snp.cpu.datapath.current_instruction;
+        const auto* prg = emu.snapshot().prg;
+        auto addr = emu.snapshot().cpu.datapath.current_instruction;
         dis_instruction inst{};
         std::array<aldo::et::tchar, DIS_INST_SIZE> disasm;
         for (int i = 0; i < instCount; ++i) {
@@ -1361,9 +1360,7 @@ private:
 
     void renderVectors() const noexcept
     {
-        auto& snp = emu.snapshot();
-        auto prg = snp.prg;
-
+        const auto* prg = emu.snapshot().prg;
         auto
             lo = prg->vectors[0],
             hi = prg->vectors[1];

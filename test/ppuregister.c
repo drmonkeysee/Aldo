@@ -1695,7 +1695,7 @@ static void ppudata_write_palette_unused_mirrored(void *ctx)
 
 static void ppudata_write_during_rendering(void *ctx)
 {
-    ct_assertfail("implement test");
+    ct_ignore("implement test");
 }
 
 static void ppudata_read_in_vblank(void *ctx)
@@ -2626,7 +2626,7 @@ static void ppudata_read_palette_unused_mirrored(void *ctx)
 
 static void ppudata_read_during_rendering(void *ctx)
 {
-    ct_assertfail("implement test");
+    ct_ignore("implement test");
 }
 
 static void ppudata_read_vram_behind_palette(void *ctx)

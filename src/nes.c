@@ -416,11 +416,11 @@ void nes_snapshot(nes *self, struct snapshot *snp)
     debug_snapshot(self->dbg, snp);
     snp->mem.ram = self->ram;
     snp->mem.vram = self->vram;
-    snp->prg->length = bus_copy(self->cpu.mbus,
-                                snp->cpu.datapath.current_instruction,
-                                memsz(snp->prg->curr), snp->prg->curr);
-    bus_copy(self->cpu.mbus, CPU_VECTOR_NMI, memsz(snp->prg->vectors),
-             snp->prg->vectors);
+    snp->prg.length = bus_copy(self->cpu.mbus,
+                               snp->cpu.datapath.current_instruction,
+                               memsz(snp->prg.curr), snp->prg.curr);
+    bus_copy(self->cpu.mbus, CPU_VECTOR_NMI, memsz(snp->prg.vectors),
+             snp->prg.vectors);
 }
 
 void nes_dumpram(nes *self, FILE *fs[static 3])

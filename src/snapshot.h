@@ -51,17 +51,17 @@ struct snapshot {
     } ppu;
 
     struct {
-        const uint8_t               // Non-owning Pointers
+        const uint8_t           // Non-owning Pointers
             *ram, *vram,
             *oam, *secondary_oam,
             *palette;
     } mem;
 
     struct {
-        size_t length;              // Number of bytes copied to currprg
-        uint8_t curr[192],          // 64 lines @ max 3-byte instructions
+        size_t length;          // Number of bytes copied to currprg
+        uint8_t curr[96],       // 32 lines @ max 3-byte instructions
                 vectors[6];
-    } *prg;
+    } prg;
 
     struct {
         // 2 Tables, 256 Tiles, 8 Rows, 16 Bits

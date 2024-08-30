@@ -262,7 +262,7 @@ static void drawinstructions(const struct view *v, int h, int y,
     uint16_t addr = snp->cpu.datapath.current_instruction;
     char disassembly[DIS_INST_SIZE];
     for (int i = 0; i < h - y; ++i) {
-        int result = dis_parsemem_inst(snp->prg->length, snp->prg->curr,
+        int result = dis_parsemem_inst(snp->prg.length, snp->prg.curr,
                                        inst.offset + inst.bv.size,
                                        &inst);
         if (result > 0) {
@@ -285,7 +285,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
 {
     mvwhline(v->content, h - y--, 0, 0, w);
 
-    const uint8_t *vectors = emu->snapshot.prg->vectors;
+    const uint8_t *vectors = emu->snapshot.prg.vectors;
     uint8_t lo = vectors[0],
             hi = vectors[1];
     mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     NMI $%04X",

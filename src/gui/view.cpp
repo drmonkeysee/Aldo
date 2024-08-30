@@ -960,7 +960,7 @@ private:
         DisabledIf dif = [this] {
             if (this->resetOverride) return false;
             // NOTE: +2 = start of reset vector
-            this->resetAddr = batowr(this->emu.snapshot().prg->vectors + 2);
+            this->resetAddr = batowr(this->emu.snapshot().prg.vectors + 2);
             return true;
         }();
         if (input_address(&resetAddr)) {
@@ -1324,12 +1324,12 @@ private:
     {
         static constexpr auto instCount = 16;
 
-        const auto* prg = emu.snapshot().prg;
+        auto& prg = emu.snapshot().prg;
         auto addr = emu.snapshot().cpu.datapath.current_instruction;
         dis_instruction inst{};
         std::array<aldo::et::tchar, DIS_INST_SIZE> disasm;
         for (int i = 0; i < instCount; ++i) {
-            auto result = dis_parsemem_inst(prg->length, prg->curr,
+            auto result = dis_parsemem_inst(prg.length, prg.curr,
                                             inst.offset + inst.bv.size, &inst);
             if (result > 0) {
                 result = dis_inst(addr, &inst, disasm.data());
@@ -1360,15 +1360,15 @@ private:
 
     void renderVectors() const noexcept
     {
-        const auto* prg = emu.snapshot().prg;
+        auto& prg = emu.snapshot().prg;
         auto
-            lo = prg->vectors[0],
-            hi = prg->vectors[1];
+            lo = prg.vectors[0],
+            hi = prg.vectors[1];
         ImGui::Text("%04X: %02X %02X     NMI $%04X", CPU_VECTOR_NMI, lo, hi,
                     bytowr(lo, hi));
 
-        lo = prg->vectors[2];
-        hi = prg->vectors[3];
+        lo = prg.vectors[2];
+        hi = prg.vectors[3];
         const char* indicator;
         aldo::et::word resVector;
         auto& dbg = emu.debugger();
@@ -1382,8 +1382,8 @@ private:
         ImGui::Text("%04X: %02X %02X     RST %s$%04X", CPU_VECTOR_RST, lo, hi,
                     indicator, resVector);
 
-        lo = prg->vectors[4];
-        hi = prg->vectors[5];
+        lo = prg.vectors[4];
+        hi = prg.vectors[5];
         ImGui::Text("%04X: %02X %02X     IRQ $%04X", CPU_VECTOR_IRQ, lo, hi,
                     bytowr(lo, hi));
     }

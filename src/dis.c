@@ -97,10 +97,10 @@ static const char *interrupt_display(const struct snapshot *snp)
 static uint16_t interrupt_vector(const struct snapshot *snp)
 {
     if (snp->cpu.datapath.nmi == CSGS_COMMITTED)
-        return batowr(snp->prg->vectors);
+        return batowr(snp->prg.vectors);
     if (snp->cpu.datapath.rst == CSGS_COMMITTED)
-        return batowr(snp->prg->vectors + 2);
-    return batowr(snp->prg->vectors + 4);
+        return batowr(snp->prg.vectors + 2);
+    return batowr(snp->prg.vectors + 4);
 }
 
 static int print_raw(uint16_t addr, const struct dis_instruction *inst,
@@ -561,7 +561,7 @@ int dis_datapath(const struct snapshot *snp,
     assert(dis != NULL);
 
     struct dis_instruction inst;
-    int err = dis_parsemem_inst(snp->prg->length, snp->prg->curr, 0, &inst);
+    int err = dis_parsemem_inst(snp->prg.length, snp->prg.curr, 0, &inst);
     if (err < 0) return err;
 
     // NOTE: we're in an interrupt state so adjust the instruction to render

@@ -58,6 +58,12 @@ auto runloop(const gui_platform& p, debugger* debug, nes* console)
     };
     aldo::MediaRuntime runtime{{1280, 800}, state.bouncer.bounds, p};
     aldo::Layout layout{state, emu, runtime};
+    SDL_Log("emu: %zu", sizeof emu);
+    SDL_Log("state: %zu", sizeof state);
+    SDL_Log("runtime: %zu", sizeof runtime);
+    SDL_Log("layout: %zu", sizeof layout);
+    SDL_Log("total: %zu",
+            sizeof emu + sizeof state + sizeof runtime + sizeof layout);
     state.clock.start();
     do {
         auto reset = !emu.snapshot().cpu.lines.ready;

@@ -954,6 +954,9 @@ int ui_curses_loop(struct emulator *emu)
         .total_ramsheets = (int)nes_ram_size(emu->console) / sheet_size,
     };
     struct layout layout;
+    printf("Stack Usage\nemu: %zu\nstate: %zu\nlayout: %zu\ntotal: %zu\n",
+           sizeof *emu, sizeof state, sizeof layout,
+           sizeof *emu + sizeof state + sizeof layout);
     init_ui(&layout, state.total_ramsheets);
     cycleclock_start(&state.clock.cyclock);
     do {

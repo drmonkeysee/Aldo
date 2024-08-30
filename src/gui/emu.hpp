@@ -33,12 +33,16 @@ using console_handle = handle<nes, nes_free>;
 
 class Snapshot {
 public:
-    explicit Snapshot(nes* console) noexcept { nes_snapshot(console, getp()); }
+    explicit Snapshot(nes* console) noexcept
+    {
+        snapshot_extsetup(getp());
+        nes_snapshot(console, getp());
+    }
     Snapshot(const Snapshot&) = default;
     Snapshot& operator=(const Snapshot&) = default;
     Snapshot(Snapshot&&) = default;
     Snapshot& operator=(Snapshot&&) = default;
-    ~Snapshot() { /*snapshot_clear(getp());*/ }
+    ~Snapshot() { snapshot_extcleanup(getp()); }
 
     const snapshot& get() const noexcept { return snp; }
     const snapshot* getp() const noexcept { return &snp; }

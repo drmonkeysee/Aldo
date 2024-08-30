@@ -72,7 +72,11 @@ struct snapshot {
     } *video;
 };
 
-void snapshot_extsetup(struct snapshot *snp);
-void snapshot_extcleanup(struct snapshot *snp);
+#include "bridgeopen.h"
+br_libexport
+void snapshot_extsetup(struct snapshot *snp) br_nothrow;
+br_libexport
+void snapshot_extcleanup(struct snapshot *snp) br_nothrow;
+#include "bridgeclose.h"
 
 #endif

@@ -432,6 +432,22 @@ static int cycle(struct rp2c02 *self)
     return nextdot(self);
 }
 
+#define PAL_SZ 4
+static void snapshot_palette(const struct rp2c02 *self,
+                             uint8_t palsnp[PAL_SZ][PAL_SZ], uint16_t offset)
+{
+    uint16_t base = PaletteStartAddr + offset;
+    for (size_t i = 0; i < PAL_SZ; ++i) {
+        uint8_t *p = palsnp[i];
+        uint16_t addr = base + (PAL_SZ * (uint16_t)i);
+        // NOTE: 1st color is always the backdrop
+        p[0] = palette_read(self, base);
+        p[1] = palette_read(self, addr + 1);
+        p[2] = palette_read(self, addr + 2);
+        p[3] = palette_read(self, addr + 3);
+    }
+}
+
 //
 // MARK: - Public Interface
 //
@@ -522,6 +538,11 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
     snp->mem.oam = self->oam;
     snp->mem.secondary_oam = self->soam;
     snp->mem.palette = self->palette;
+
+    if (snp->video) {
+        snapshot_palette(self, snp->video->bgpalettes, 0);
+        snapshot_palette(self, snp->video->fgpalettes, 0x10);
+    }
 }
 
 void ppu_dumpram(const struct rp2c02 *self, FILE *f)

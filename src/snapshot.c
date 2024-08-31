@@ -11,14 +11,14 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-void snapshot_setup(struct snapshot *snp)
+void snapshot_extend(struct snapshot *snp)
 {
     assert(snp != NULL);
 
     snp->video = malloc(sizeof *snp->video);
 }
 
-void snapshot_teardown(struct snapshot *snp)
+void snapshot_cleanup(struct snapshot *snp)
 {
     assert(snp != NULL);
 

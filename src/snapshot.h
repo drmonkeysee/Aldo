@@ -76,9 +76,9 @@ struct snapshot {
 
 #include "bridgeopen.h"
 br_libexport
-void snapshot_setup(struct snapshot *snp) br_nothrow;
+void snapshot_extend(struct snapshot *snp) br_nothrow;
 br_libexport
-void snapshot_teardown(struct snapshot *snp) br_nothrow;
+void snapshot_cleanup(struct snapshot *snp) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

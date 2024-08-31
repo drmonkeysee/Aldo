@@ -19,6 +19,7 @@
 #include "emutypes.hpp"
 #include "haltexpr.h"
 #include "mediaruntime.hpp"
+#include "snapshot.h"
 #include "style.hpp"
 #include "version.h"
 #include "viewstate.hpp"
@@ -1293,7 +1294,62 @@ public:
 protected:
     void renderContents() override
     {
-        ImGui::TextUnformatted("Pattern Tables");
+        widget_group([this] {
+            renderPalettes(this->emu.snapshot().video->bgpalettes,
+                           emu.palette(), "Background", "BgPalettes");
+        });
+        ImGui::SameLine(0, 30);
+        widget_group([this] {
+            renderPalettes(this->emu.snapshot().video->fgpalettes,
+                           emu.palette(), "Sprites", "FgPalettes");
+        });
+    }
+
+    static void
+    renderPalettes(const aldo::et::byte pals[SNP_PAL_SZ][SNP_PAL_SZ],
+                   const aldo::Palette& colors, const char* label,
+                   const char* tblId) noexcept
+    {
+        static constexpr auto cellDim = 15;
+        static constexpr auto cols = SNP_PAL_SZ + 1;
+        static constexpr auto center = 0.5f;
+        static constexpr auto style = ImGuiTableFlags_BordersInner
+                                        | ImGuiTableFlags_SizingFixedFit;
+
+        ImGui::TextUnformatted(label);
+        for (auto row = 0; row < SNP_PAL_SZ; ++row) {
+            if (ImGui::BeginTable(tblId, cols, style)) {
+                ScopedStyleVec textAlign{{
+                    ImGuiStyleVar_SelectableTextAlign, {center, center},
+                }};
+                auto pal = pals[row];
+                for (auto col = 0; col < cols; ++col) {
+                    ImGui::TableNextColumn();
+                    if (col == 0) {
+                        ImGui::Text("%d", row + 1);
+                    } else {
+                        auto idx = pal[col];
+                        auto color = colors.getColor(idx);
+                        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
+                                               color);
+                        std::array<char, 3> buf;
+                        std::snprintf(buf.data(), buf.size(), "%02X", idx);
+                        ScopedColor txtColor{
+                            {
+                                ImGuiCol_Text,
+                                aldo::colors::luminance(color) < 0x80
+                                    ? IM_COL32_WHITE
+                                    : IM_COL32_BLACK,
+                            }
+                        };
+                        ImGui::Selectable(buf.data(), false,
+                                          ImGuiSelectableFlags_None,
+                                          {cellDim, cellDim});
+                    }
+                }
+                ImGui::EndTable();
+            }
+        }
     }
 };
 

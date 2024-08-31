@@ -14,6 +14,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define SNP_PAL_SZ 4
+
 struct snapshot {
     struct {
         ptrdiff_t halted;
@@ -70,7 +72,8 @@ struct snapshot {
         // TODO: don't write this every update?
         uint16_t pattern_tables[2][256][8];
         // Background/Foreground, 4 Palettes, 4 Colors, 6 Bits
-        uint8_t bgpalettes[4][4], fgpalettes[4][4];
+        uint8_t bgpalettes[SNP_PAL_SZ][SNP_PAL_SZ],
+                fgpalettes[SNP_PAL_SZ][SNP_PAL_SZ];
     } *video;
 };
 

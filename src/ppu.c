@@ -149,8 +149,8 @@ static uint8_t palette_read(const struct rp2c02 *self, uint16_t addr)
     // NOTE: addr=[$3F00-$3FFF]
     assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
 
-    uint8_t v = self->palette[mask_palette(addr)];
-    return self->mask.g ? v & 0x30 : v;
+    // NOTE: palette values are 6 bits wide
+    return self->palette[mask_palette(addr)] & 0x3f;
 }
 
 static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
@@ -158,8 +158,7 @@ static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
     // NOTE: addr=[$3F00-$3FFF]
     assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
 
-    // NOTE: palette values are 6 bits wide
-    self->palette[mask_palette(addr)] = d & 0x3f;
+    self->palette[mask_palette(addr)] = d;
 }
 
 //
@@ -432,14 +431,14 @@ static int cycle(struct rp2c02 *self)
     return nextdot(self);
 }
 
-#define PAL_SZ 4
 static void snapshot_palette(const struct rp2c02 *self,
-                             uint8_t palsnp[PAL_SZ][PAL_SZ], uint16_t offset)
+                             uint8_t palsnp[SNP_PAL_SZ][SNP_PAL_SZ],
+                             uint16_t offset)
 {
     uint16_t base = PaletteStartAddr + offset;
-    for (size_t i = 0; i < PAL_SZ; ++i) {
+    for (size_t i = 0; i < SNP_PAL_SZ; ++i) {
         uint8_t *p = palsnp[i];
-        uint16_t addr = base + (PAL_SZ * (uint16_t)i);
+        uint16_t addr = base + (SNP_PAL_SZ * (uint16_t)i);
         // NOTE: 1st color is always the backdrop
         p[0] = palette_read(self, base);
         p[1] = palette_read(self, addr + 1);

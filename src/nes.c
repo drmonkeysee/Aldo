@@ -218,7 +218,7 @@ static void instruction_trace(struct nes001 *self,
 {
     if (!self->tracelog || !self->cpu.signal.sync) return;
 
-    struct snapshot snp;
+    struct snapshot snp = {0};
     bus_snapshot(self, &snp);
     // NOTE: trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
@@ -420,7 +420,9 @@ void nes_snapshot(nes *self, struct snapshot *snp)
     assert(snp != NULL);
 
     bus_snapshot(self, snp);
-    cart_snapshot(self->cart, snp);
+    if (self->cart) {
+        cart_snapshot(self->cart, snp);
+    }
     debug_snapshot(self->dbg, snp);
     snp->mem.ram = self->ram;
     snp->mem.vram = self->vram;

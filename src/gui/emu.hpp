@@ -52,7 +52,7 @@ private:
 
     snapshot* getp() noexcept { return &snp; }
 
-    snapshot snp;
+    snapshot snp{};
 };
 
 class ALDO_SIDEFX Emulator {

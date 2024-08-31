@@ -420,6 +420,7 @@ void nes_snapshot(nes *self, struct snapshot *snp)
     assert(snp != NULL);
 
     bus_snapshot(self, snp);
+    cart_snapshot(self->cart, snp);
     debug_snapshot(self->dbg, snp);
     snp->mem.ram = self->ram;
     snp->mem.vram = self->vram;

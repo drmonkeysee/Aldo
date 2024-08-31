@@ -10,6 +10,7 @@
 
 #include "bus.h"
 #include "cart.h"
+#include "snapshot.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -20,14 +21,12 @@ struct mapper;
 typedef bool busconn(struct mapper *, bus *);
 typedef void busdisconn(bus *);
 typedef const uint8_t *mapper_rom(const struct mapper *);
-typedef size_t bankord(const struct mapper *);
 
 struct mapper {
     void (*dtor)(struct mapper *);
     busconn *mbus_connect;
     busdisconn *mbus_disconnect;
     mapper_rom *prgrom;
-    bankord *currprg;
 };
 
 struct nesmapper {
@@ -35,7 +34,8 @@ struct nesmapper {
     busconn *vbus_connect;
     busdisconn *vbus_disconnect;
     mapper_rom *chrrom;
-    bankord *currchr;
+    // Optional Interface
+    void (*snapshot)(const struct mapper *, struct snapshot *);
 };
 
 // NOTE: if create functions return non-zero error code, *m is unmodified

@@ -226,6 +226,13 @@ static bool ines_000_vbus_connect(struct mapper *self, bus *b)
     });
 }
 
+static void ines_000_snapshot(const struct mapper *self, struct snapshot *snp)
+{
+    assert(self != NULL);
+    assert(snp != NULL);
+    assert(snp->video != NULL);
+}
+
 //
 // MARK: - Public Interface
 //
@@ -269,6 +276,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
             .vtable = {
                 .extends = {.mbus_connect = ines_000_mbus_connect},
                 .vbus_connect = ines_000_vbus_connect,
+                .snapshot = ines_000_snapshot,
             },
         };
         assert(header->prg_blocks <= 2);

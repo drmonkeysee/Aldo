@@ -404,3 +404,13 @@ void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)
         fputs("(NOTE: approximate for non-Aldo formats)\n", f);
     }
 }
+
+void cart_snapshot(cart *self, struct snapshot *snp)
+{
+    assert(self != NULL);
+    assert(snp != NULL);
+
+    if (is_nes(self) && as_nesmap(self)->snapshot) {
+        as_nesmap(self)->snapshot(self->mapper, snp);
+    }
+}

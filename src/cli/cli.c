@@ -260,7 +260,7 @@ static int run_emu(const struct cliargs *args, cart *c)
         result = EXIT_FAILURE;
         goto exit_trace;
     }
-    snapshot_extsetup(&emu.snapshot);
+    snapshot_setup(&emu.snapshot);
     nes_powerup(emu.console, c, emu.args->zeroram);
 
     ui_loop *run_loop = setup_ui(&emu);
@@ -273,7 +273,7 @@ static int run_emu(const struct cliargs *args, cart *c)
         result = EXIT_FAILURE;
     }
     dump_ram(&emu);
-    snapshot_extcleanup(&emu.snapshot);
+    snapshot_teardown(&emu.snapshot);
     nes_free(emu.console);
 exit_trace:
     if (tracelog) {

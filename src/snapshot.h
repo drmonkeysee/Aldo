@@ -63,6 +63,8 @@ struct snapshot {
                 vectors[6];
     } prg;
 
+    // NOTE: these fields are very large and require setup/teardown to avoid
+    // ending up on the stack.
     struct {
         // 2 Tables, 256 Tiles, 8 Rows, 16 Bits
         // TODO: don't write this every update?
@@ -74,9 +76,9 @@ struct snapshot {
 
 #include "bridgeopen.h"
 br_libexport
-void snapshot_extsetup(struct snapshot *snp) br_nothrow;
+void snapshot_setup(struct snapshot *snp) br_nothrow;
 br_libexport
-void snapshot_extcleanup(struct snapshot *snp) br_nothrow;
+void snapshot_teardown(struct snapshot *snp) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

@@ -204,6 +204,14 @@ static void set_cpu_pins(struct nes001 *self)
     self->cpu.signal.rst = !self->probe.rst;
 }
 
+static void bus_snapshot(const struct nes001 *self, struct snapshot *snp)
+{
+    ppu_snapshot(&self->ppu, snp);
+    cpu_snapshot(&self->cpu, snp);
+    bus_copy(self->cpu.mbus, CPU_VECTOR_NMI, memsz(snp->prg.vectors),
+             snp->prg.vectors);
+}
+
 // NOTE: trace the just-fetched instruction
 static void instruction_trace(struct nes001 *self,
                               const struct cycleclock *clock, int adjustment)
@@ -211,7 +219,7 @@ static void instruction_trace(struct nes001 *self,
     if (!self->tracelog || !self->cpu.signal.sync) return;
 
     struct snapshot snp;
-    nes_snapshot(self, &snp);
+    bus_snapshot(self, &snp);
     // NOTE: trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
     trace_line(self->tracelog, clock->cycles + (uint64_t)adjustment,
@@ -411,16 +419,13 @@ void nes_snapshot(nes *self, struct snapshot *snp)
     assert(self != NULL);
     assert(snp != NULL);
 
-    cpu_snapshot(&self->cpu, snp);
-    ppu_snapshot(&self->ppu, snp);
+    bus_snapshot(self, snp);
     debug_snapshot(self->dbg, snp);
     snp->mem.ram = self->ram;
     snp->mem.vram = self->vram;
     snp->prg.length = bus_copy(self->cpu.mbus,
                                snp->cpu.datapath.current_instruction,
                                memsz(snp->prg.curr), snp->prg.curr);
-    bus_copy(self->cpu.mbus, CPU_VECTOR_NMI, memsz(snp->prg.vectors),
-             snp->prg.vectors);
 }
 
 void nes_dumpram(nes *self, FILE *fs[static 3])

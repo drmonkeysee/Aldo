@@ -1294,9 +1294,20 @@ public:
 protected:
     void renderContents() override
     {
-        widget_group([this] { renderPalettes(false); });
-        ImGui::SameLine(0, 30);
-        widget_group([this] { renderPalettes(true); });
+        widget_group([] {
+            ImGui::TextUnformatted("Pattern Table $0000");
+            ImGui::ColorButton("pt1", ImColor(aldo::colors::LedOn), ImGuiColorEditFlags_None, {256, 256});
+        });
+        ImGui::SameLine(0, 10);
+        widget_group([] {
+            ImGui::TextUnformatted("Pattern Table $1000");
+            ImGui::ColorButton("pt2", ImColor(aldo::colors::LedOff), ImGuiColorEditFlags_None, {256, 256});
+        });
+        ImGui::SameLine(0, 10);
+        widget_group([this] {
+            renderPalettes(false);
+            renderPalettes(true);
+        });
     }
 
 private:
@@ -1324,7 +1335,7 @@ private:
                     if (col == 0) {
                         ImGui::Text("%d", row + 1);
                     } else {
-                        auto idx = pal[col];
+                        auto idx = pal[col - 1];
                         auto color = emu.palette().getColor(idx);
                         ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
                                                color);

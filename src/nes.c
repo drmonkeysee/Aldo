@@ -206,8 +206,8 @@ static void set_cpu_pins(struct nes001 *self)
 
 static void bus_snapshot(const struct nes001 *self, struct snapshot *snp)
 {
-    ppu_snapshot(&self->ppu, snp);
     cpu_snapshot(&self->cpu, snp);
+    ppu_snapshot(&self->ppu, snp);
     bus_copy(self->cpu.mbus, CPU_VECTOR_NMI, memsz(snp->prg.vectors),
              snp->prg.vectors);
 }

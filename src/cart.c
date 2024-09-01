@@ -410,6 +410,7 @@ void cart_snapshot(cart *self, struct snapshot *snp)
     assert(self != NULL);
     assert(snp != NULL);
 
+    // TODO: zero out pattern tables if not nes?
     if (is_nes(self) && as_nesmap(self)->snapshot) {
         as_nesmap(self)->snapshot(self->mapper, snp);
     }

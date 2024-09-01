@@ -1294,21 +1294,13 @@ public:
 protected:
     void renderContents() override
     {
-        widget_group([this] {
-            renderPalettes(this->emu.snapshot().video->bgpalettes,
-                           emu.palette(), "Background", "BgPalettes");
-        });
+        widget_group([this] { renderPalettes(false); });
         ImGui::SameLine(0, 30);
-        widget_group([this] {
-            renderPalettes(this->emu.snapshot().video->fgpalettes,
-                           emu.palette(), "Sprites", "FgPalettes");
-        });
+        widget_group([this] { renderPalettes(true); });
     }
 
-    static void
-    renderPalettes(const aldo::et::byte pals[SNP_PAL_SZ][SNP_PAL_SZ],
-                   const aldo::Palette& colors, const char* label,
-                   const char* tblId) noexcept
+private:
+    void renderPalettes(bool fg) noexcept
     {
         static constexpr auto cellDim = 15;
         static constexpr auto cols = SNP_PAL_SZ + 1;
@@ -1316,9 +1308,13 @@ protected:
         static constexpr auto style = ImGuiTableFlags_BordersInner
                                         | ImGuiTableFlags_SizingFixedFit;
 
-        ImGui::TextUnformatted(label);
+        ImGui::TextUnformatted(fg ? "Sprites" : "Background");
+        const auto* pals = fg
+                            ? emu.snapshot().video->fgpalettes
+                            : emu.snapshot().video->bgpalettes;
         for (auto row = 0; row < SNP_PAL_SZ; ++row) {
-            if (ImGui::BeginTable(tblId, cols, style)) {
+            if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols,
+                                  style)) {
                 ScopedStyleVec textAlign{{
                     ImGuiStyleVar_SelectableTextAlign, {center, center},
                 }};
@@ -1329,7 +1325,7 @@ protected:
                         ImGui::Text("%d", row + 1);
                     } else {
                         auto idx = pal[col];
-                        auto color = colors.getColor(idx);
+                        auto color = emu.palette().getColor(idx);
                         ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
                                                color);
                         std::array<char, 3> buf;
@@ -1342,6 +1338,7 @@ protected:
                                     : IM_COL32_BLACK,
                             }
                         };
+                        ScopedID id = row << 3 | col << 1 | fg;
                         ImGui::Selectable(buf.data(), false,
                                           ImGuiSelectableFlags_None,
                                           {cellDim, cellDim});

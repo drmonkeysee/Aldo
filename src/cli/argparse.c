@@ -171,7 +171,7 @@ static bool parse_dbgfile(const char *arg, int *restrict argi, int argc,
 static bool parse_arg(const char *arg, int *restrict argi, int argc,
                       char *argv[argc+1], struct cliargs *restrict args)
 {
-#define SETFLAG(f, a, s, l) (f) = (f) || parse_flag(a, s, false, l)
+#define SETFLAG(f, a, s, l) ((f) = (f) || parse_flag(a, s, false, l))
 
     if (parse_flag(arg, ChrScaleShort, true, ChrScaleLong)) {
         long scale;

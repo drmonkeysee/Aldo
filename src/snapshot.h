@@ -14,7 +14,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define SNP_PAL_SZ 4
+enum {
+    SNP_PAL_SIZE = 4,
+};
 
 struct snapshot {
     struct {
@@ -72,8 +74,8 @@ struct snapshot {
         // TODO: don't write this every update?
         uint16_t pattern_tables[2][256][8];
         // Background/Foreground, 4 Palettes, 4 Colors, 6 Bits
-        uint8_t bgpalettes[SNP_PAL_SZ][SNP_PAL_SZ],
-                fgpalettes[SNP_PAL_SZ][SNP_PAL_SZ];
+        uint8_t bgpalettes[SNP_PAL_SIZE][SNP_PAL_SIZE],
+                fgpalettes[SNP_PAL_SIZE][SNP_PAL_SIZE];
     } *video;
 };
 

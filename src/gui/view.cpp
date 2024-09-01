@@ -1097,7 +1097,7 @@ private:
             bpSelections.queueEnableToggles(vs, bp->enabled);
         }
         ImGui::SameLine();
-        ScopedColor colors = {
+        ScopedColor colors{
             {ImGuiCol_Button, aldo::colors::Destructive},
             {ImGuiCol_ButtonHovered, aldo::colors::DestructiveHover},
             {ImGuiCol_ButtonActive, aldo::colors::DestructiveActive},
@@ -1360,7 +1360,7 @@ private:
     void renderPalettes(bool fg) noexcept
     {
         static constexpr auto cellDim = 15;
-        static constexpr auto cols = SNP_PAL_SZ + 1;
+        static constexpr auto cols = SNP_PAL_SIZE + 1;
         static constexpr auto center = 0.5f;
         static constexpr auto flags = ImGuiTableFlags_BordersInner
                                         | ImGuiTableFlags_SizingFixedFit;
@@ -1369,7 +1369,7 @@ private:
         const auto* pals = fg
                             ? emu.snapshot().video->fgpalettes
                             : emu.snapshot().video->bgpalettes;
-        for (auto row = 0; row < SNP_PAL_SZ; ++row) {
+        for (auto row = 0; row < SNP_PAL_SIZE; ++row) {
             if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols,
                                   flags)) {
                 ScopedStyleVec textAlign{{

@@ -1161,11 +1161,11 @@ public:
 protected:
     void renderContents() override
     {
-        static constexpr auto style = ImGuiTableFlags_Borders
+        static constexpr auto flags = ImGuiTableFlags_Borders
                                         | ImGuiTableFlags_SizingFixedFit;
         auto name = emu.palette().name();
         ImGui::Text("%.*s", static_cast<int>(name.length()), name.data());
-        if (ImGui::BeginTable("palette", Cols, style)) {
+        if (ImGui::BeginTable("palette", Cols, flags)) {
             renderHeader();
             renderBody();
             ImGui::EndTable();
@@ -1283,7 +1283,52 @@ class PatternTablesView final : public aldo::View {
 public:
     PatternTablesView(aldo::viewstate& vs, const aldo::Emulator& emu,
                       const aldo::MediaRuntime& mr) noexcept
-    : View{"Pattern Tables", vs, emu, mr} {}
+    : View{"Pattern Tables", vs, emu, mr}
+    {
+        static constexpr std::array colors = {
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0e,
+            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d,
+            0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d,
+            0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d,
+        };
+        auto ren = mr.renderer();
+        SDL_Rect rect{
+            0, 0,
+            8, 8,
+        };
+        auto& pal = emu.palette();
+        aldo::palette::sz cidx = 0;
+
+        auto p1 = mr.patternTable1();
+        SDL_SetRenderTarget(ren, p1);
+        SDL_RenderClear(ren);
+        for (auto i = 0; i < 16; ++i) {
+            rect.y = i * rect.h;
+            for (auto j = 0; j < 16; ++j) {
+                rect.x = j * rect.w;
+                auto color = pal.getColor(static_cast<aldo::palette::datav>(colors[cidx++ % colors.size()]));
+                auto [r, g, b] = aldo::colors::rgb(color);
+                SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g), static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
+                SDL_RenderFillRect(ren, &rect);
+            }
+        }
+
+        auto p2 = mr.patternTable2();
+        SDL_SetRenderTarget(ren, p2);
+        SDL_RenderClear(ren);
+        for (auto i = 0; i < 16; ++i) {
+            rect.y = i * rect.h;
+            for (auto j = 0; j < 16; ++j) {
+                rect.x = j * rect.w;
+                auto color = pal.getColor(static_cast<aldo::palette::datav>(colors[cidx++ % colors.size()]));
+                auto [r, g, b] = aldo::colors::rgb(color);
+                SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g), static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
+                SDL_RenderFillRect(ren, &rect);
+            }
+        }
+
+        SDL_SetRenderTarget(ren, nullptr);
+    }
     PatternTablesView(aldo::viewstate&, aldo::Emulator&&,
                       const aldo::MediaRuntime&) = delete;
     PatternTablesView(aldo::viewstate&, const aldo::Emulator&,
@@ -1294,19 +1339,20 @@ public:
 protected:
     void renderContents() override
     {
-        widget_group([] {
+        static constexpr auto dim = 256;
+        widget_group([this] {
             ImGui::TextUnformatted("Pattern Table $0000");
-            ImGui::ColorButton("pt1", ImColor(aldo::colors::LedOn), ImGuiColorEditFlags_None, {256, 256});
-        });
-        ImGui::SameLine(0, 10);
-        widget_group([] {
-            ImGui::TextUnformatted("Pattern Table $1000");
-            ImGui::ColorButton("pt2", ImColor(aldo::colors::LedOff), ImGuiColorEditFlags_None, {256, 256});
+            ImGui::Image(this->mr.patternTable1(), {dim, dim});
         });
         ImGui::SameLine(0, 10);
         widget_group([this] {
-            renderPalettes(false);
-            renderPalettes(true);
+            ImGui::TextUnformatted("Pattern Table $1000");
+            ImGui::Image(this->mr.patternTable2(), {dim, dim});
+        });
+        ImGui::SameLine(0, 10);
+        widget_group([this] {
+            this->renderPalettes(false);
+            this->renderPalettes(true);
         });
     }
 
@@ -1316,7 +1362,7 @@ private:
         static constexpr auto cellDim = 15;
         static constexpr auto cols = SNP_PAL_SZ + 1;
         static constexpr auto center = 0.5f;
-        static constexpr auto style = ImGuiTableFlags_BordersInner
+        static constexpr auto flags = ImGuiTableFlags_BordersInner
                                         | ImGuiTableFlags_SizingFixedFit;
 
         ImGui::TextUnformatted(fg ? "Sprites" : "Background");
@@ -1325,7 +1371,7 @@ private:
                             : emu.snapshot().video->bgpalettes;
         for (auto row = 0; row < SNP_PAL_SZ; ++row) {
             if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols,
-                                  style)) {
+                                  flags)) {
                 ScopedStyleVec textAlign{{
                     ImGuiStyleVar_SelectableTextAlign, {center, center},
                 }};

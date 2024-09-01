@@ -51,13 +51,11 @@ auto create_renderer(const aldo::win_handle& hwin, const gui_platform& p)
 }
 
 ALDO_OWN
-auto create_bouncer_texture(SDL_Point screenResolution,
-                            const aldo::ren_handle& hren)
+auto create_target_texture(SDL_Point size, const aldo::ren_handle& hren)
 {
     auto tex = SDL_CreateTexture(hren.get(), SDL_PIXELFORMAT_RGBA32,
-                                 SDL_TEXTUREACCESS_TARGET, screenResolution.x,
-                                 screenResolution.y);
-    if (!tex) throw aldo::SdlError{"Bouncer texture creation failure"};
+                                 SDL_TEXTUREACCESS_TARGET, size.x, size.y);
+    if (!tex) throw aldo::SdlError{"SDL texture creation failure"};
     return tex;
 }
 
@@ -103,7 +101,9 @@ aldo::MediaRuntime::MediaRuntime(SDL_Point windowSize,
                                  const gui_platform& p)
 try : hwin{create_window(windowSize, p)},
         hren{create_renderer(hwin, p)},
-        htex{create_bouncer_texture(screenResolution, hren)},
+        htex{create_target_texture(screenResolution, hren)},
+        hpattern1{create_target_texture({128, 128}, hren)},
+        hpattern2{create_target_texture({128, 128}, hren)},
         imgui{hwin, hren} {}
 catch (...) {
     InitStatus = UI_ERR_LIBINIT;

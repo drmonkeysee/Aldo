@@ -53,6 +53,8 @@ public:
     SDL_Window* window() const noexcept { return hwin.get(); }
     SDL_Renderer* renderer() const noexcept { return hren.get(); }
     SDL_Texture* bouncerTexture() const noexcept { return htex.get(); }
+    SDL_Texture* patternTable1() const noexcept { return hpattern1.get(); }
+    SDL_Texture* patternTable2() const noexcept { return hpattern2.get(); }
 
 private:
     inline static int InitStatus;
@@ -60,7 +62,7 @@ private:
     SdlLib sdl;
     win_handle hwin;
     ren_handle hren;
-    tex_handle htex;
+    tex_handle htex, hpattern1, hpattern2;
     DearImGuiLib imgui;
 };
 

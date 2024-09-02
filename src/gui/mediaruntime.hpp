@@ -13,6 +13,8 @@
 
 #include <SDL2/SDL.h>
 
+#include <concepts>
+
 struct gui_platform;
 
 namespace aldo
@@ -42,6 +44,28 @@ public:
     ~DearImGuiLib();
 };
 
+// TODO: template parameterize with access flags for interface selection
+class ALDO_OWN Texture {
+public:
+    Texture(SDL_Point size, const ren_handle& hren);
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
+    Texture(Texture&&) = delete;
+    Texture& operator=(Texture&&) = delete;
+    ~Texture();
+
+    void draw(SDL_Renderer* ren, std::invocable<SDL_Renderer*> auto f) const
+    {
+        SDL_SetRenderTarget(ren, tex);
+        f(ren);
+        SDL_SetRenderTarget(ren, nullptr);
+    }
+    void render(float scale = 1.0f) const noexcept;
+
+private:
+    SDL_Texture* tex;
+};
+
 class ALDO_SIDEFX MediaRuntime {
 public:
     [[nodiscard("check error")]]
@@ -52,9 +76,9 @@ public:
 
     SDL_Window* window() const noexcept { return hwin.get(); }
     SDL_Renderer* renderer() const noexcept { return hren.get(); }
-    SDL_Texture* bouncerTexture() const noexcept { return htex.get(); }
-    SDL_Texture* patternTable1() const noexcept { return hpattern1.get(); }
-    SDL_Texture* patternTable2() const noexcept { return hpattern2.get(); }
+    const Texture& bouncerScreen() const noexcept { return bouncer; }
+    const Texture& patternTable1() const noexcept { return pattern1; }
+    const Texture& patternTable2() const noexcept { return pattern2; }
 
 private:
     inline static int InitStatus;
@@ -62,7 +86,7 @@ private:
     SdlLib sdl;
     win_handle hwin;
     ren_handle hren;
-    tex_handle htex, hpattern1, hpattern2;
+    Texture bouncer, pattern1, pattern2;
     DearImGuiLib imgui;
 };
 

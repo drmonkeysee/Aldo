@@ -96,14 +96,29 @@ aldo::DearImGuiLib::~DearImGuiLib()
     ImGui::DestroyContext();
 }
 
+aldo::Texture::Texture(SDL_Point size, const ren_handle& hren)
+: tex{create_target_texture(size, hren)} {}
+
+aldo::Texture::~Texture()
+{
+    SDL_DestroyTexture(tex);
+}
+
+void aldo::Texture::render(float scale) const noexcept
+{
+    int w, h;
+    SDL_QueryTexture(tex, nullptr, nullptr, &w, &h);
+    ImGui::Image(tex, {w * scale, h * scale});
+}
+
 aldo::MediaRuntime::MediaRuntime(SDL_Point windowSize,
                                  SDL_Point screenResolution,
                                  const gui_platform& p)
 try : hwin{create_window(windowSize, p)},
         hren{create_renderer(hwin, p)},
-        htex{create_target_texture(screenResolution, hren)},
-        hpattern1{create_target_texture({128, 128}, hren)},
-        hpattern2{create_target_texture({128, 128}, hren)},
+        bouncer{aldo::Texture{screenResolution, hren}},
+        pattern1{aldo::Texture{{128, 128}, hren}},
+        pattern2{aldo::Texture{{128, 128}, hren}},
         imgui{hwin, hren} {}
 catch (...) {
     InitStatus = UI_ERR_LIBINIT;

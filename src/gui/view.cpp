@@ -38,6 +38,7 @@
 #include <string_view>
 #include <type_traits>
 #include <unordered_set>
+#include <utility>
 #include <cinttypes>
 #include <cstdio>
 
@@ -480,32 +481,27 @@ protected:
     void renderContents() override
     {
         auto ren = mr.renderer();
-        auto tex = mr.bouncerTexture();
-        SDL_SetRenderTarget(ren, tex);
-        SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
-        SDL_RenderClear(ren);
+        auto& tex = mr.bouncerScreen();
+        tex.draw(ren,
+                 [&bouncer = std::as_const(vs.bouncer)](SDL_Renderer* ren) {
+            SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
+            SDL_RenderClear(ren);
 
-        SDL_SetRenderDrawColor(ren, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
-        SDL_RenderDrawLine(ren, 30, 7, 50, 200);
+            SDL_SetRenderDrawColor(ren, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
+            SDL_RenderDrawLine(ren, 30, 7, 50, 200);
 
-        SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
+            SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
 
-        const auto& bouncer = vs.bouncer;
-        auto fulldim = bouncer.halfdim * 2;
-        SDL_Rect pos{
-            bouncer.pos.x - bouncer.halfdim,
-            bouncer.pos.y - bouncer.halfdim,
-            fulldim,
-            fulldim,
-        };
-        SDL_RenderFillRect(ren, &pos);
-        SDL_SetRenderTarget(ren, nullptr);
-
-        ImVec2 sz{
-            static_cast<float>(bouncer.bounds.x),
-            static_cast<float>(bouncer.bounds.y),
-        };
-        ImGui::Image(tex, sz);
+            auto fulldim = bouncer.halfdim * 2;
+            SDL_Rect pos{
+                bouncer.pos.x - bouncer.halfdim,
+                bouncer.pos.y - bouncer.halfdim,
+                fulldim,
+                fulldim,
+            };
+            SDL_RenderFillRect(ren, &pos);
+        });
+        tex.render();
     }
 };
 
@@ -1291,43 +1287,27 @@ public:
             0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d,
             0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d,
         };
-        auto ren = mr.renderer();
-        SDL_Rect rect{
-            0, 0,
-            8, 8,
-        };
-        auto& pal = emu.palette();
         aldo::palette::sz cidx = 0;
+        auto& pal = emu.palette();
 
-        auto p1 = mr.patternTable1();
-        SDL_SetRenderTarget(ren, p1);
-        SDL_RenderClear(ren);
-        for (auto i = 0; i < 16; ++i) {
-            rect.y = i * rect.h;
-            for (auto j = 0; j < 16; ++j) {
-                rect.x = j * rect.w;
-                auto color = pal.getColor(static_cast<aldo::palette::datav>(colors[cidx++ % colors.size()]));
-                auto [r, g, b] = aldo::colors::rgb(color);
-                SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g), static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
-                SDL_RenderFillRect(ren, &rect);
+        auto draw = [&cidx, &pal](SDL_Renderer* ren) {
+            SDL_Rect rect{0, 0, 8, 8};
+            SDL_RenderClear(ren);
+            for (auto i = 0; i < 16; ++i) {
+                rect.y = i * rect.h;
+                for (auto j = 0; j < 16; ++j) {
+                    rect.x = j * rect.w;
+                    auto color = pal.getColor(static_cast<aldo::palette::sz>(colors[cidx++ % colors.size()]));
+                    auto [r, g, b] = aldo::colors::rgb(color);
+                    SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g), static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
+                    SDL_RenderFillRect(ren, &rect);
+                }
             }
-        }
+        };
 
-        auto p2 = mr.patternTable2();
-        SDL_SetRenderTarget(ren, p2);
-        SDL_RenderClear(ren);
-        for (auto i = 0; i < 16; ++i) {
-            rect.y = i * rect.h;
-            for (auto j = 0; j < 16; ++j) {
-                rect.x = j * rect.w;
-                auto color = pal.getColor(static_cast<aldo::palette::datav>(colors[cidx++ % colors.size()]));
-                auto [r, g, b] = aldo::colors::rgb(color);
-                SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g), static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
-                SDL_RenderFillRect(ren, &rect);
-            }
-        }
-
-        SDL_SetRenderTarget(ren, nullptr);
+        auto ren = mr.renderer();
+        mr.patternTable1().draw(ren, draw);
+        mr.patternTable2().draw(ren, draw);
     }
     PatternTablesView(aldo::viewstate&, aldo::Emulator&&,
                       const aldo::MediaRuntime&) = delete;
@@ -1339,15 +1319,15 @@ public:
 protected:
     void renderContents() override
     {
-        static constexpr auto dim = 256;
+        static constexpr auto scale = 2.0f;
         widget_group([this] {
             ImGui::TextUnformatted("Pattern Table $0000");
-            ImGui::Image(this->mr.patternTable1(), {dim, dim});
+            this->mr.patternTable1().render(scale);
         });
         ImGui::SameLine(0, 10);
         widget_group([this] {
             ImGui::TextUnformatted("Pattern Table $1000");
-            ImGui::Image(this->mr.patternTable2(), {dim, dim});
+            this->mr.patternTable2().render(scale);
         });
         ImGui::SameLine(0, 10);
         widget_group([this] {

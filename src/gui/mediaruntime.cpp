@@ -96,7 +96,7 @@ aldo::DearImGuiLib::~DearImGuiLib()
     ImGui::DestroyContext();
 }
 
-aldo::Texture::Texture(SDL_Point size, const ren_handle& hren)
+aldo::Texture::Texture(SDL_Point size, const aldo::ren_handle& hren)
 : tex{create_target_texture(size, hren)} {}
 
 aldo::Texture::~Texture()

@@ -22,7 +22,6 @@ namespace aldo
 
 using win_handle = handle<SDL_Window, SDL_DestroyWindow>;
 using ren_handle = handle<SDL_Renderer, SDL_DestroyRenderer>;
-using tex_handle = handle<SDL_Texture, SDL_DestroyTexture>;
 
 class ALDO_SIDEFX SdlLib {
 public:

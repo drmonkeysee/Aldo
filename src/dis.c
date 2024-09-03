@@ -285,6 +285,23 @@ static void decode_tiles(const struct blockview *bv, size_t tilecount,
     }
 }
 
+// NOTE: BMP details from:
+// https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-storage
+enum {
+    // NOTE: color depth and palette sizes; NES tiles are actually 2 bpp but
+    // the closest the standard BMP format gets is 4; BMP palette size is also
+    // 4, as are the number of colors representable at 2 bpp so conveniently
+    // all color constants collapse into one value.
+    BMP_BITS_PER_PIXEL = 4,
+    BMP_PALETTE_SIZE = BMP_BITS_PER_PIXEL * BMP_BITS_PER_PIXEL,
+
+    // NOTE: bmp header sizes
+    BMP_FILEHEADER_SIZE = 14,
+    BMP_INFOHEADER_SIZE = 40,
+    BMP_HEADER_SIZE = BMP_FILEHEADER_SIZE + BMP_INFOHEADER_SIZE
+                        + BMP_PALETTE_SIZE,
+};
+
 static void fill_tile_sheet_row(uint8_t *restrict packedrow,
                                 uint32_t tiley, uint32_t pixely,
                                 uint32_t tilesdim, uint32_t tile_sections,
@@ -309,7 +326,8 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
                 for (uint32_t scalex = 0; scalex < scale; ++scalex) {
                     size_t scaledpixel = scalex + (packedpixel * scale);
                     if (scaledpixel % 2 == 0) {
-                        packedrow[scaledpixel / 2] = (uint8_t)(pixel << 4);
+                        packedrow[scaledpixel / 2] =
+                            (uint8_t)(pixel << BMP_BITS_PER_PIXEL);
                     } else {
                         packedrow[scaledpixel / 2] |= pixel;
                     }
@@ -318,23 +336,6 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
         }
     }
 }
-
-// NOTE: BMP details from:
-// https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-storage
-enum {
-    // NOTE: color depth and palette sizes; NES tiles are actually 2 bpp but
-    // the closest the standard BMP format gets is 4; BMP palette size is also
-    // 4, as are the number of colors representable at 2 bpp so conveniently
-    // all color constants collapse into one value.
-    BMP_COLOR_SIZE = 4,
-    BMP_PALETTE_SIZE = BMP_COLOR_SIZE * BMP_COLOR_SIZE,
-
-    // NOTE: bmp header sizes
-    BMP_FILEHEADER_SIZE = 14,
-    BMP_INFOHEADER_SIZE = 40,
-    BMP_HEADER_SIZE = BMP_FILEHEADER_SIZE + BMP_INFOHEADER_SIZE
-                        + BMP_PALETTE_SIZE,
-};
 
 static int write_tile_sheet(uint32_t tilesdim, uint32_t tile_sections,
                             uint32_t scale, const uint8_t *restrict tiles,
@@ -386,8 +387,8 @@ static int write_tile_sheet(uint32_t tilesdim, uint32_t tile_sections,
     uint8_t infoheader[BMP_INFOHEADER_SIZE] = {
         BMP_INFOHEADER_SIZE,        // biSize
         [12] = 1,                   // biPlanes
-        [14] = BMP_COLOR_SIZE,      // biBitCount
-        [32] = BMP_COLOR_SIZE,      // biClrUsed
+        [14] = BMP_BITS_PER_PIXEL,  // biBitCount
+        [32] = BMP_BITS_PER_PIXEL,  // biClrUsed
     };
     dwtoba(bmpw, infoheader + 4);   // biWidth
     dwtoba(bmph, infoheader + 8);   // biHeight
@@ -401,7 +402,7 @@ static int write_tile_sheet(uint32_t tilesdim, uint32_t tile_sections,
         BYTE rgbGreen;
         BYTE rgbRed;
         BYTE rgbReserved;
-     }[BMP_COLOR_SIZE];
+     }[BMP_BITS_PER_PIXEL];
      */
     // NOTE: no fixed palette for tiles so use grayscale;
     // fun fact, this is the original Gameboy palette.

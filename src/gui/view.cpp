@@ -1209,13 +1209,13 @@ private:
                         {ImGuiCol_Text, aldo::colors::luminance(color) < 0x80
                                         ? IM_COL32_WHITE
                                         : IM_COL32_BLACK},
-                        cell == selected,
+                        cell == vs.colorSelection,
                     };
                     ScopedID id = static_cast<int>(cell);
-                    if (ImGui::Selectable(cell == selected ? "x" : "", false,
-                                          ImGuiSelectableFlags_None,
+                    if (ImGui::Selectable(cell == vs.colorSelection ? "x" : "",
+                                          false, ImGuiSelectableFlags_None,
                                           {cellDim, cellDim})) {
-                        selected = cell;
+                        vs.colorSelection = cell;
                     }
                 }
             }
@@ -1243,17 +1243,17 @@ private:
     void renderColorSelection() const
     {
         static constexpr auto selectedColorDim = 70;
-        auto color = emu.palette().getColor(adjustIdx(selected),
+        auto color = emu.palette().getColor(adjustIdx(vs.colorSelection),
                                             colorEmphasis);
         ImGui::ColorButton("Selected Color",
                            ImGui::ColorConvertU32ToFloat4(color),
                            ImGuiColorEditFlags_NoAlpha,
                            {selectedColorDim, selectedColorDim});
         ImGui::SameLine();
-        widget_group([color, this] {
+        widget_group([color, &vs = vs] {
             auto [r, g, b] = aldo::colors::rgb(color);
-            ImGui::Text("Index: %02zX", this->selected);
-            if (this->selected == 0xd) {
+            ImGui::Text("Index: %02zX", vs.colorSelection);
+            if (vs.colorSelection == 0xd) {
                 ImGui::SameLine();
                 ImGui::TextUnformatted("(forbidden black)");
             }
@@ -1268,7 +1268,6 @@ private:
         return grayscale ? idx & 0x30 : idx;
     }
 
-    pal_sz selected = 0;
     bool grayscale = false;
     aldo::palette::emphasis colorEmphasis = {};
 
@@ -1376,9 +1375,11 @@ private:
                             }
                         };
                         ScopedID id = row << 3 | col << 1 | fg;
-                        ImGui::Selectable(buf.data(), false,
-                                          ImGuiSelectableFlags_None,
-                                          {cellDim, cellDim});
+                        if (ImGui::Selectable(buf.data(), false,
+                                              ImGuiSelectableFlags_None,
+                                              {cellDim, cellDim})) {
+                            vs.colorSelection = idx;
+                        }
                     }
                 }
                 ImGui::EndTable();

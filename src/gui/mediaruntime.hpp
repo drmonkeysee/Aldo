@@ -59,6 +59,7 @@ public:
         f(ren);
         SDL_SetRenderTarget(ren, nullptr);
     }
+
     void render(float scale = 1.0f) const noexcept;
 
 private:

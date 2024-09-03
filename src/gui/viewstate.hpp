@@ -11,6 +11,7 @@
 #include "ctrlsignal.h"
 #include "emutypes.hpp"
 #include "haltexpr.h"
+#include "palette.hpp"
 #include "runclock.hpp"
 
 #include <SDL2/SDL.h>
@@ -71,6 +72,7 @@ struct viewstate {
 
     std::queue<command_state> commands;
     runclock clock;
+    palette::sz colorSelection = 0;
     struct {
         SDL_Point
             bounds{256, 240}, pos{bounds.x / 2, bounds.y / 2}, velocity{1, 1};

@@ -11,7 +11,8 @@
 #include <string.h>
 
 extern inline uint16_t bytowr(uint8_t, uint8_t),
-                       batowr(const uint8_t[static 2]);
+                       batowr(const uint8_t[static 2]),
+                       shuffle(uint8_t, uint8_t);
 extern inline void wrtoby(uint16_t, uint8_t *restrict, uint8_t *restrict),
                    wrtoba(uint16_t, uint8_t[static 2]),
                    dwtoba(uint32_t, uint8_t[static 4]);

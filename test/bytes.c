@@ -11,6 +11,66 @@
 #include <stddef.h>
 #include <stdint.h>
 
+static void shuffle_zeros(void *ctx)
+{
+    uint8_t lo = 0x0,
+            hi = 0x0;
+
+    uint16_t s = shuffle(lo, hi);
+
+    ct_assertequal(0u, s);
+}
+
+static void shuffle_ones(void *ctx)
+{
+    uint8_t lo = 0xff,
+            hi = 0xff;
+
+    uint16_t s = shuffle(lo, hi);
+
+    ct_assertequal(0xffffu, s);
+}
+
+static void shuffle_low_ones(void *ctx)
+{
+    uint8_t lo = 0xff,
+            hi = 0x0;
+
+    uint16_t s = shuffle(lo, hi);
+
+    ct_assertequal(0x5555u, s);
+}
+
+static void shuffle_high_ones(void *ctx)
+{
+    uint8_t lo = 0x0,
+            hi = 0xff;
+
+    uint16_t s = shuffle(lo, hi);
+
+    ct_assertequal(0xaaaau, s);
+}
+
+static void shuffle_mixed(void *ctx)
+{
+    uint8_t lo = 0x55,
+            hi = 0xaa;
+
+    uint16_t s = shuffle(lo, hi);
+
+    ct_assertequal(0x9999u, s);
+}
+
+static void shuffle_flip_mixed(void *ctx)
+{
+    uint8_t lo = 0xaa,
+            hi = 0x55;
+
+    uint16_t s = shuffle(lo, hi);
+
+    ct_assertequal(0x6666u, s);
+}
+
 static void bank_copy_zero_count(void *ctx)
 {
     uint8_t bank[] = {
@@ -105,6 +165,13 @@ static void bank_copy_address_beyond_range(void *ctx)
 struct ct_testsuite bytes_tests(void)
 {
     static const struct ct_testcase tests[] = {
+        ct_maketest(shuffle_zeros),
+        ct_maketest(shuffle_ones),
+        ct_maketest(shuffle_low_ones),
+        ct_maketest(shuffle_high_ones),
+        ct_maketest(shuffle_mixed),
+        ct_maketest(shuffle_flip_mixed),
+
         ct_maketest(bank_copy_zero_count),
         ct_maketest(bank_copy),
         ct_maketest(bank_copy_end_of_bank),

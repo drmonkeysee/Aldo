@@ -98,6 +98,23 @@ inline void dwtoba(uint32_t dword, uint8_t bytes[br_csz(4)])
     }
 }
 
+// Interleave the bits of lo and hi bytes together;
+// Outer Perfect Shuffle algorithm taken from Hacker's Delight 2nd Edition §7-2
+// and adapted to 16-bits; I *think* this is related to Morton Codes but
+// I'm not entirely sure: https://en.wikipedia.org/wiki/Z-order_curve
+inline uint16_t shuffle(uint8_t lo, uint8_t hi)
+{
+    // NOTE: magic shuffle numbers
+    static const uint16_t m[] = {
+        0x00f0, 0xf00f, 0x0c0c, 0xc3c3, 0x2222, 0x9999,
+    };
+    uint16_t x = bytowr(lo, hi);
+    x = (uint16_t)((x & m[0]) << 4 | ((x >> 4) & m[0]) | (x & m[1]));
+    x = (uint16_t)((x & m[2]) << 2 | ((x >> 2) & m[2]) | (x & m[3]));
+    x = (uint16_t)((x & m[4]) << 1 | ((x >> 1) & m[4]) | (x & m[5]));
+    return x;
+}
+
 // Copy single bank @addr into destination buffer, assumes bank is sized to
 // power-of-2 KB boundary between [1, 64].
 size_t bytecopy_bank(const uint8_t *br_noalias bankmem, int bankwidth,

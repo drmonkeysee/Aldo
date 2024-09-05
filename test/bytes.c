@@ -71,6 +71,16 @@ static void shuffle_flip_mixed(void *ctx)
     ct_assertequal(0x6666u, s);
 }
 
+static void shuffle_arbitrary(void *ctx)
+{
+    uint8_t lo = 0x1c,
+            hi = 0x74;
+
+    uint16_t s = shuffle(lo, hi);
+
+    ct_assertequal(0x2b70u, s);
+}
+
 static void bank_copy_zero_count(void *ctx)
 {
     uint8_t bank[] = {
@@ -171,6 +181,7 @@ struct ct_testsuite bytes_tests(void)
         ct_maketest(shuffle_high_ones),
         ct_maketest(shuffle_mixed),
         ct_maketest(shuffle_flip_mixed),
+        ct_maketest(shuffle_arbitrary),
 
         ct_maketest(bank_copy_zero_count),
         ct_maketest(bank_copy),

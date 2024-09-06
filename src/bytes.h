@@ -60,14 +60,14 @@ enum {
 
 // Bytes to Word
 br_libexport
-inline uint16_t bytowr(uint8_t lo, uint8_t hi)
+inline uint16_t bytowr(uint8_t lo, uint8_t hi) br_nothrow
 {
     return (uint16_t)(lo | hi << 8);
 }
 
 // Byte Array to Word
 br_libexport
-inline uint16_t batowr(const uint8_t bytes[br_csz(2)])
+inline uint16_t batowr(const uint8_t bytes[br_csz(2)]) br_nothrow
 {
     return bytowr(bytes[0], bytes[1]);
 }
@@ -78,20 +78,20 @@ inline uint16_t batowr(const uint8_t bytes[br_csz(2)])
 
 // Word to Bytes
 inline void wrtoby(uint16_t word, uint8_t *br_noalias lo,
-                   uint8_t *br_noalias hi)
+                   uint8_t *br_noalias hi) br_nothrow
 {
     *lo = (uint8_t)(word & 0xff);
     *hi = (uint8_t)(word >> 8);
 }
 
 // Word to Byte Array
-inline void wrtoba(uint16_t word, uint8_t bytes[br_csz(2)])
+inline void wrtoba(uint16_t word, uint8_t bytes[br_csz(2)]) br_nothrow
 {
     wrtoby(word, bytes, bytes + 1);
 }
 
 // DWord to Byte Array
-inline void dwtoba(uint32_t dword, uint8_t bytes[br_csz(4)])
+inline void dwtoba(uint32_t dword, uint8_t bytes[br_csz(4)]) br_nothrow
 {
     for (size_t i = 0; i < 4; ++i) {
         bytes[i] = (dword >> (8 * i)) & 0xff;
@@ -102,7 +102,7 @@ inline void dwtoba(uint32_t dword, uint8_t bytes[br_csz(4)])
 // Outer Perfect Shuffle algorithm taken from Hacker's Delight 2nd Edition §7-2
 // and adapted to 16-bits; I *think* this is related to Morton Codes but
 // I'm not entirely sure: https://en.wikipedia.org/wiki/Z-order_curve
-inline uint16_t shuffle(uint8_t lo, uint8_t hi)
+inline uint16_t shuffle(uint8_t lo, uint8_t hi) br_nothrow
 {
     // NOTE: magic shuffle numbers
     static const uint16_t m[] = {
@@ -119,7 +119,7 @@ inline uint16_t shuffle(uint8_t lo, uint8_t hi)
 // power-of-2 KB boundary between [1, 64].
 size_t bytecopy_bank(const uint8_t *br_noalias bankmem, int bankwidth,
                      uint16_t addr, size_t count,
-                     uint8_t dest[br_noalias_sz(count)]);
+                     uint8_t dest[br_noalias_sz(count)]) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

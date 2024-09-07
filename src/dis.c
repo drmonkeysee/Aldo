@@ -216,14 +216,11 @@ static int print_prgblock(const struct blockview *bv, bool verbose, FILE *f)
     return 0;
 }
 
-// NOTE: CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is an 8x8
-// byte array of 2-bit palette-indexed pixels composed of two bit-planes where
-// the first plane specifies the pixel low bit and the second plane specifies
-// the pixel high bit.
-static const uint32_t
-    ChrPlaneSize = 8,
-    ChrTileSpan = 2 * ChrPlaneSize,
-    ChrTileSize = ChrPlaneSize * ChrPlaneSize;
+// NOTE: CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is a
+// 16-byte array of 2-bit palette-indexed pixels composed of two bit-planes
+// where the first plane specifies the pixel low bit and the second plane
+// specifies the pixel high bit.
+static const uint32_t ChrPlaneSize = 8, ChrTileSpan = 2 * ChrPlaneSize;
 // NOTE: hardcode max scale to ~7MB bmp file size
 static const int ScaleGuard = 20;
 
@@ -257,34 +254,6 @@ static int measure_tile_sheet(size_t banksize, uint32_t *restrict dim,
     return 0;
 }
 
-static void decode_tiles(const struct blockview *bv, size_t tilecount,
-                         uint8_t *restrict tiles)
-{
-    for (size_t tileidx = 0; tileidx < tilecount; ++tileidx) {
-        uint8_t *tile = tiles + (tileidx * ChrTileSize);
-        const uint8_t *planes = bv->mem + (tileidx * ChrTileSpan);
-        for (size_t row = 0; row < ChrPlaneSize; ++row) {
-            uint8_t
-                plane0 = planes[row],
-                plane1 = planes[row + ChrPlaneSize];
-            for (size_t bit = 0; bit < ChrPlaneSize; ++bit) {
-                // NOTE: tile origins are top-left so in order to pack pixels
-                // left-to-right we need to decode each bit-plane row
-                // least-significant bit last.
-                ptrdiff_t pixel = (ptrdiff_t)((ChrPlaneSize - bit - 1)
-                                              + (row * ChrPlaneSize));
-                assert(pixel >= 0);
-                tile[pixel] = (uint8_t)((byte_getbit(plane0, bit)
-                                         | byte_getbit(plane1, bit) << 1));
-            }
-        }
-        // NOTE: did we process the entire CHR ROM?
-        if (tileidx == tilecount - 1) {
-            assert(planes + ChrTileSpan == bv->mem + bv->size);
-        }
-    }
-}
-
 // NOTE: BMP details from:
 // https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-storage
 enum {
@@ -306,23 +275,34 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
                                 uint32_t tiley, uint32_t pixely,
                                 uint32_t tilesdim, uint32_t tile_sections,
                                 uint32_t scale, uint32_t section_pxldim,
-                                const uint8_t *restrict tiles)
+                                const struct blockview *bv)
 {
     for (uint32_t section = 0; section < tile_sections; ++section) {
         for (uint32_t tilex = 0; tilex < tilesdim; ++tilex) {
-            // NOTE: tile_start is index of the first pixel
-            // in the current tile.
-            size_t tile_start = (tilex + (tiley * tilesdim)
-                                 + (section * tilesdim * tilesdim))
-                                * ChrTileSize;
+            // NOTE: get the index in tile space first, then calculate the
+            // byte index in CHR space for the given tile's current row.
+            size_t
+                tileidx = tilex + (tiley * tilesdim)
+                            + (section * tilesdim * tilesdim),
+                chr_row = (tileidx * ChrTileSpan) + pixely;
+            uint8_t
+                plane0 = bv->mem[chr_row],
+                plane1 = bv->mem[chr_row + ChrPlaneSize];
+            // NOTE: 8 2-bit pixels make a single CHR tile row; each 2-bit
+            // pixel will be expanded to 4-bits and packed 2 pixels per byte
+            // for a 4 bpp BMP.
+            uint16_t pixelrow = byteshuffle(plane0, plane1);
             for (size_t pixelx = 0; pixelx < ChrPlaneSize; ++pixelx) {
-                // NOTE: pixeloffset is the pixel index in tile space,
-                // packedpixel is the pixel in (prescaled) bmp-row space.
-                size_t
-                    pixeloffset = pixelx + (pixely * ChrPlaneSize),
-                    packedpixel = pixelx + (tilex * ChrPlaneSize)
-                                    + (section * section_pxldim);
-                uint8_t pixel = tiles[tile_start + pixeloffset];
+                // NOTE: packedpixel is the pixel in (prescaled) bmp-row space;
+                // pixelidx is the 2-bit slice of pixelrow that maps to the
+                // packedpixel; BMP layout goes from left-to-right so pixelidx
+                // goes "backwards" from MSBs to LSBs.
+                size_t packedpixel = pixelx + (tilex * ChrPlaneSize)
+                                        + (section * section_pxldim);
+                uint8_t pixelidx = (uint8_t)(ChrTileSpan - ((pixelx + 1) * 2)),
+                        pixel = (uint8_t)((pixelrow & (0x3 << pixelidx))
+                                          >> pixelidx);
+                assert(pixelidx < ChrTileSpan);
                 for (uint32_t scalex = 0; scalex < scale; ++scalex) {
                     size_t scaledpixel = scalex + (packedpixel * scale);
                     if (scaledpixel % 2 == 0) {
@@ -337,9 +317,9 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
     }
 }
 
-static int write_tile_sheet(uint32_t tilesdim, uint32_t tile_sections,
-                            uint32_t scale, const uint8_t *restrict tiles,
-                            FILE *bmpfile)
+static int write_chrtiles(const struct blockview *bv, uint32_t tilesdim,
+                          uint32_t tile_sections, uint32_t scale,
+                          FILE *bmpfile)
 {
     uint32_t
         section_pxldim = tilesdim * ChrPlaneSize,
@@ -424,7 +404,7 @@ static int write_tile_sheet(uint32_t tilesdim, uint32_t tile_sections,
             for (uint32_t scaley = 0; scaley < scale; ++scaley) {
                 fill_tile_sheet_row(packedrow, (uint32_t)tiley,
                                     (uint32_t)pixely, tilesdim, tile_sections,
-                                    scale, section_pxldim, tiles);
+                                    scale, section_pxldim, bv);
                 fwrite(packedrow, sizeof *packedrow,
                        packedrow_size / sizeof *packedrow, bmpfile);
             }
@@ -433,18 +413,6 @@ static int write_tile_sheet(uint32_t tilesdim, uint32_t tile_sections,
     free(packedrow);
 
     return 0;
-}
-
-static int write_chrtiles(const struct blockview *bv, uint32_t tilesdim,
-                          uint32_t tile_sections, uint32_t scale,
-                          FILE *bmpfile)
-{
-    size_t tilecount = bv->size / ChrTileSpan;
-    uint8_t *tiles = calloc(tilecount * ChrTileSize, sizeof *tiles);
-    decode_tiles(bv, tilecount, tiles);
-    int err = write_tile_sheet(tilesdim, tile_sections, scale, tiles, bmpfile);
-    free(tiles);
-    return err;
 }
 
 static int write_chrblock(const struct blockview *bv, uint32_t scale,

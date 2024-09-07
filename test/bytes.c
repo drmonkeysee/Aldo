@@ -16,7 +16,7 @@ static void shuffle_zeros(void *ctx)
     uint8_t lo = 0x0,
             hi = 0x0;
 
-    uint16_t s = shuffle(lo, hi);
+    uint16_t s = byteshuffle(lo, hi);
 
     ct_assertequal(0u, s);
 }
@@ -26,7 +26,7 @@ static void shuffle_ones(void *ctx)
     uint8_t lo = 0xff,
             hi = 0xff;
 
-    uint16_t s = shuffle(lo, hi);
+    uint16_t s = byteshuffle(lo, hi);
 
     ct_assertequal(0xffffu, s);
 }
@@ -36,7 +36,7 @@ static void shuffle_low_ones(void *ctx)
     uint8_t lo = 0xff,
             hi = 0x0;
 
-    uint16_t s = shuffle(lo, hi);
+    uint16_t s = byteshuffle(lo, hi);
 
     ct_assertequal(0x5555u, s);
 }
@@ -46,7 +46,7 @@ static void shuffle_high_ones(void *ctx)
     uint8_t lo = 0x0,
             hi = 0xff;
 
-    uint16_t s = shuffle(lo, hi);
+    uint16_t s = byteshuffle(lo, hi);
 
     ct_assertequal(0xaaaau, s);
 }
@@ -56,7 +56,7 @@ static void shuffle_mixed(void *ctx)
     uint8_t lo = 0x55,
             hi = 0xaa;
 
-    uint16_t s = shuffle(lo, hi);
+    uint16_t s = byteshuffle(lo, hi);
 
     ct_assertequal(0x9999u, s);
 }
@@ -66,7 +66,7 @@ static void shuffle_flip_mixed(void *ctx)
     uint8_t lo = 0xaa,
             hi = 0x55;
 
-    uint16_t s = shuffle(lo, hi);
+    uint16_t s = byteshuffle(lo, hi);
 
     ct_assertequal(0x6666u, s);
 }
@@ -76,7 +76,7 @@ static void shuffle_arbitrary(void *ctx)
     uint8_t lo = 0x1c,
             hi = 0x74;
 
-    uint16_t s = shuffle(lo, hi);
+    uint16_t s = byteshuffle(lo, hi);
 
     ct_assertequal(0x2b70u, s);
 }

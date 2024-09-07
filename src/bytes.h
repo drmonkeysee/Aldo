@@ -102,7 +102,7 @@ inline void dwtoba(uint32_t dword, uint8_t bytes[br_csz(4)]) br_nothrow
 // Outer Perfect Shuffle algorithm taken from Hacker's Delight 2nd Edition §7-2
 // and adapted to 16-bits; I *think* this is related to Morton Codes but
 // I'm not entirely sure: https://en.wikipedia.org/wiki/Z-order_curve
-inline uint16_t shuffle(uint8_t lo, uint8_t hi) br_nothrow
+inline uint16_t byteshuffle(uint8_t lo, uint8_t hi) br_nothrow
 {
     // NOTE: magic shuffle numbers
     static const uint16_t m[] = {

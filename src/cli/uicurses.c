@@ -262,9 +262,9 @@ static void drawinstructions(const struct view *v, int h, int y,
     uint16_t addr = snp->cpu.datapath.current_instruction;
     char disassembly[DIS_INST_SIZE];
     for (int i = 0; i < h - y; ++i) {
-        int result = dis_parsemem_inst(snp->prg.length, snp->prg.curr,
-                                       inst.offset + inst.bv.size,
-                                       &inst);
+        int result = dis_parsemem_inst(snp->prg.curr->length,
+                                       snp->prg.curr->pc,
+                                       inst.offset + inst.bv.size, &inst);
         if (result > 0) {
             result = dis_inst(addr, &inst, disassembly);
             if (result > 0) {

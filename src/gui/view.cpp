@@ -1415,12 +1415,12 @@ private:
     {
         static constexpr auto instCount = 16;
 
-        auto& prg = emu.snapshot().prg;
+        const auto* curr = emu.snapshot().prg.curr;
         auto addr = emu.snapshot().cpu.datapath.current_instruction;
         dis_instruction inst{};
         std::array<aldo::et::tchar, DIS_INST_SIZE> disasm;
         for (int i = 0; i < instCount; ++i) {
-            auto result = dis_parsemem_inst(prg.length, prg.curr,
+            auto result = dis_parsemem_inst(curr->length, curr->pc,
                                             inst.offset + inst.bv.size, &inst);
             if (result > 0) {
                 result = dis_inst(addr, &inst, disasm.data());

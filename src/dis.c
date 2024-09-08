@@ -530,7 +530,8 @@ int dis_datapath(const struct snapshot *snp,
     assert(dis != NULL);
 
     struct dis_instruction inst;
-    int err = dis_parsemem_inst(snp->prg.length, snp->prg.curr, 0, &inst);
+    int err = dis_parsemem_inst(snp->prg.curr->length, snp->prg.curr->pc, 0,
+                                &inst);
     if (err < 0) return err;
 
     // NOTE: we're in an interrupt state so adjust the instruction to render

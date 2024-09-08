@@ -61,14 +61,16 @@ struct snapshot {
             *palette;
     } mem;
 
+    // NOTE: large fields below this point are managed via setup/cleanup to
+    // avoid ending up on the stack.
     struct {
-        size_t length;          // Number of bytes copied to currprg
-        uint8_t curr[96],       // 32 lines @ max 3-byte instructions
-                vectors[6];
+        uint8_t vectors[6];
+        struct {
+            size_t length;      // Number of bytes copied to pc
+            uint8_t pc[96];     // 32 lines @ max 3-byte instructions
+        } *curr;
     } prg;
 
-    // NOTE: these fields are very large and require setup/teardown to avoid
-    // ending up on the stack.
     struct {
         // 2 Tables, 256 Tiles, 8 Rows, 16 Bits
         // TODO: don't write this every update?

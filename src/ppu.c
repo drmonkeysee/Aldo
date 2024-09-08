@@ -500,7 +500,7 @@ int ppu_cycle(struct rp2c02 *self)
     return cycle(self);
 }
 
-void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
+void ppu_bus_snapshot(const struct rp2c02 *self, struct snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);
@@ -537,11 +537,16 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
     snp->mem.oam = self->oam;
     snp->mem.secondary_oam = self->soam;
     snp->mem.palette = self->palette;
+}
 
-    if (snp->video) {
-        snapshot_palette(self, snp->video->bgpalettes, 0);
-        snapshot_palette(self, snp->video->fgpalettes, 0x10);
-    }
+void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
+{
+    ppu_bus_snapshot(self, snp);
+
+    assert(snp->video != NULL);
+
+    snapshot_palette(self, snp->video->bgpalettes, 0);
+    snapshot_palette(self, snp->video->fgpalettes, 0x10);
 }
 
 void ppu_dumpram(const struct rp2c02 *self, FILE *f)

@@ -15,6 +15,7 @@ void snapshot_extend(struct snapshot *snp)
 {
     assert(snp != NULL);
 
+    snp->prg.curr = malloc(sizeof *snp->prg.curr);
     snp->video = malloc(sizeof *snp->video);
 }
 
@@ -23,4 +24,5 @@ void snapshot_cleanup(struct snapshot *snp)
     assert(snp != NULL);
 
     free(snp->video);
+    free(snp->prg.curr);
 }

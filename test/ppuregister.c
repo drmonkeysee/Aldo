@@ -23,7 +23,7 @@ static void ppuctrl_write(void *ctx)
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.ctrl);
     ct_assertequal(0u, ppu->t);
     ct_assertequal(0u, ppu->regsel);
@@ -31,7 +31,7 @@ static void ppuctrl_write(void *ctx)
 
     bus_write(ppt_get_mbus(ctx), 0x2000, 0xff);
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0xbfu, snp.ppu.ctrl);
     ct_assertequal(0xc00u, ppu->t);
     ct_assertequal(0u, ppu->regsel);
@@ -45,7 +45,7 @@ static void ppuctrl_write_mirrored(void *ctx)
     ppu->t = 0x7fff;
     ppu->ctrl.nh = ppu->ctrl.nl = true;
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(3u, snp.ppu.ctrl);
     ct_assertequal(0x7fffu, ppu->t);
     ct_assertequal(0u, ppu->regsel);
@@ -53,7 +53,7 @@ static void ppuctrl_write_mirrored(void *ctx)
 
     bus_write(ppt_get_mbus(ctx), 0x3210, 0xfc);
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0xbcu, snp.ppu.ctrl);
     ct_assertequal(0x73ffu, ppu->t);
     ct_assertequal(0u, ppu->regsel);
@@ -66,7 +66,7 @@ static void ppuctrl_write_during_reset(void *ctx)
     struct snapshot snp;
     ppu->rst = CSGS_SERVICED;
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.ctrl);
     ct_assertequal(0u, ppu->t);
     ct_assertequal(0u, ppu->regsel);
@@ -74,7 +74,7 @@ static void ppuctrl_write_during_reset(void *ctx)
 
     bus_write(ppt_get_mbus(ctx), 0x2000, 0xff);
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.ctrl);
     ct_assertequal(0u, ppu->t);
     ct_assertequal(0u, ppu->regsel);
@@ -102,14 +102,14 @@ static void ppumask_write(void *ctx)
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.mask);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
     bus_write(ppt_get_mbus(ctx), 0x2001, 0xff);
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0xffu, snp.ppu.mask);
     ct_assertequal(1u, ppu->regsel);
     ct_assertequal(0xffu, ppu->regbus);
@@ -120,14 +120,14 @@ static void ppumask_write_mirrored(void *ctx)
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
     struct snapshot snp;
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.mask);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
     bus_write(ppt_get_mbus(ctx), 0x3211, 0xff);
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0xffu, snp.ppu.mask);
     ct_assertequal(1u, ppu->regsel);
     ct_assertequal(0xffu, ppu->regbus);
@@ -139,14 +139,14 @@ static void ppumask_write_during_reset(void *ctx)
     struct snapshot snp;
     ppu->rst = CSGS_SERVICED;
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.mask);
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
 
     bus_write(ppt_get_mbus(ctx), 0x2001, 0xff);
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.mask);
     ct_assertequal(1u, ppu->regsel);
     ct_assertequal(0xffu, ppu->regbus);
@@ -178,7 +178,7 @@ static void ppustatus_read_when_clear(void *ctx)
     uint8_t d;
     bus_read(ppt_get_mbus(ctx), 0x2002, &d);
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0x1au, d);
     ct_assertequal(0x1au, ppu->regbus);
@@ -196,7 +196,7 @@ static void ppustatus_read_when_set(void *ctx)
     uint8_t d;
     bus_read(ppt_get_mbus(ctx), 0x2002, &d);
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0xfau, d);
     ct_assertequal(0xfau, ppu->regbus);
@@ -216,7 +216,7 @@ static void ppustatus_read_on_nmi_race_condition(void *ctx)
     uint8_t d;
     bus_read(ppt_get_mbus(ctx), 0x2002, &d);
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0x7au, d);
     ct_assertequal(0x7au, ppu->regbus);
@@ -234,7 +234,7 @@ static void ppustatus_read_during_reset(void *ctx)
     uint8_t d;
     bus_read(ppt_get_mbus(ctx), 0x2002, &d);
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0xfau, d);
     ct_assertequal(0xfau, ppu->regbus);
@@ -251,7 +251,7 @@ static void ppustatus_read_mirrored(void *ctx)
     uint8_t d;
     bus_read(ppt_get_mbus(ctx), 0x3212, &d);
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0x1au, d);
     ct_assertequal(0x1au, ppu->regbus);
@@ -267,7 +267,7 @@ static void ppustatus_write(void *ctx)
 
     bus_write(ppt_get_mbus(ctx), 0x2002, 0xff);
 
-    ppu_snapshot(ppu, &snp);
+    ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(2u, ppu->regsel);
     ct_assertequal(0xffu, ppu->regbus);
     ct_assertequal(0u, snp.ppu.status);

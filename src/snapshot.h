@@ -65,7 +65,7 @@ struct snapshot {
     // avoid ending up on the stack.
     struct {
         uint8_t vectors[6];
-        struct {
+        struct snpprg {
             size_t length;      // Number of bytes copied to pc
             uint8_t pc[96];     // 32 lines @ max 3-byte instructions
         } *curr;

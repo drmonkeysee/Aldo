@@ -8,7 +8,6 @@
 #include "snapshot.h"
 
 #include <assert.h>
-#include <stddef.h>
 #include <stdlib.h>
 
 void snapshot_extend(struct snapshot *snp)

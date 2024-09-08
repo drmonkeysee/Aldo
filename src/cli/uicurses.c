@@ -224,8 +224,7 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
     } else {
         wprintw(v->content, "$%04X", resetvector);
     }
-    const struct breakpoint *bp =
-        debug_bp_at(emu->debugger, emu->snapshot.debugger.halted);
+    const struct breakpoint *bp = debug_halted(emu->debugger);
     char break_desc[HEXPR_FMT_SIZE];
     int err = haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
     mvwprintw(v->content, cursor_y, 0, "Break: %s",

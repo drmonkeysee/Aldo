@@ -87,7 +87,7 @@ static void enable_disable_breakpoint(void *ctx)
     struct haltexpr expr = {.cond = HLT_ADDR, .address = 0x4321};
 
     debug_bp_add(dbg, expr);
-    debug_bp_enabled(dbg, 0, false);
+    debug_bp_enable(dbg, 0, false);
 
     ct_assertequal(1u, debug_bp_count(dbg));
 
@@ -95,7 +95,7 @@ static void enable_disable_breakpoint(void *ctx)
     ct_assertnotnull(bp);
     ct_assertfalse(bp->enabled);
 
-    debug_bp_enabled(dbg, 0, true);
+    debug_bp_enable(dbg, 0, true);
     ct_asserttrue(bp->enabled);
 }
 
@@ -194,6 +194,14 @@ static void clear_breakpoints(void *ctx)
     ct_assertequal(0x1234, debug_vector_override(dbg));
 }
 
+static void halt_no_breakpoint(void *ctx)
+{
+    debugger *dbg = ctx;
+
+    ct_assertnull(debug_halted(dbg));
+    ct_assertequal(NoBreakpoint, debug_halted_at(dbg));
+}
+
 static void reset_debugger(void *ctx)
 {
     debugger *dbg = ctx;
@@ -235,6 +243,7 @@ struct ct_testsuite debug_tests(void)
         ct_maketest(out_of_range),
         ct_maketest(delete_breakpoint),
         ct_maketest(clear_breakpoints),
+        ct_maketest(halt_no_breakpoint),
 
         ct_maketest(reset_debugger),
     };

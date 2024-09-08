@@ -973,7 +973,7 @@ private:
         renderBreakpointAdd(setFocus);
         ImGui::Separator();
         renderBreakpointList();
-        detectedHalt = emu.haltedByDebugger();
+        detectedHalt = emu.debugger().halted();
     }
 
     bool renderConditionCombo() noexcept
@@ -1044,21 +1044,22 @@ private:
             8 * ImGui::GetTextLineHeightWithSpacing(),
         };
         auto bpView = emu.debugger().breakpoints();
+        auto breakIdx = bpView.halted_at();
         auto bpCount = bpView.size();
         ImGui::Text("%zu breakpoint%s", bpCount, bpCount == 1 ? "" : "s");
         if (ImGui::BeginListBox("##breakpoints", dims)) {
             bp_diff i = 0;
             for (auto& bp : bpView) {
-                renderBreakpoint(i++, bp);
+                renderBreakpoint(i++, breakIdx, bp);
             }
             ImGui::EndListBox();
         }
         renderListControls(bpCount);
     }
 
-    void renderBreakpoint(bp_diff idx, const breakpoint& bp)
+    void renderBreakpoint(bp_diff idx, bp_diff breakIdx, const breakpoint& bp)
     {
-        auto bpBreak = idx == emu.snapshot().debugger.halted;
+        auto bpBreak = idx == breakIdx;
         if (bpBreak && !detectedHalt) {
             bpSelections.select(idx);
         }

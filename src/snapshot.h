@@ -20,10 +20,6 @@ enum {
 
 struct snapshot {
     struct {
-        ptrdiff_t halted;
-    } debugger;
-
-    struct {
         uint16_t program_counter;
         uint8_t accumulator, stack_pointer, status, xindex, yindex;
         struct {

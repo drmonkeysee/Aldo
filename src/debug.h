@@ -11,7 +11,6 @@
 #include "cpu.h"
 #include "cycleclock.h"
 #include "haltexpr.h"
-#include "snapshot.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -47,7 +46,11 @@ void debug_bp_add(debugger *self, struct haltexpr expr) br_nothrow;
 br_libexport
 const struct breakpoint *debug_bp_at(debugger *self, ptrdiff_t at) br_nothrow;
 br_libexport
-void debug_bp_enabled(debugger *self, ptrdiff_t at, bool enabled) br_nothrow;
+void debug_bp_enable(debugger *self, ptrdiff_t at, bool enabled) br_nothrow;
+br_libexport
+const struct breakpoint *debug_halted(debugger *self) br_nothrow;
+br_libexport
+ptrdiff_t debug_halted_at(debugger *self) br_nothrow;
 br_libexport
 void debug_bp_remove(debugger *self, ptrdiff_t at) br_nothrow;
 br_libexport
@@ -65,7 +68,6 @@ void debug_cpu_connect(debugger *self, struct mos6502 *cpu) br_nothrow;
 void debug_cpu_disconnect(debugger *self) br_nothrow;
 void debug_sync_bus(debugger *self) br_nothrow;
 void debug_check(debugger *self, const struct cycleclock *clk) br_nothrow;
-void debug_snapshot(debugger *self, struct snapshot *snp) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

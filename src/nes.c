@@ -424,7 +424,6 @@ void nes_snapshot(nes *self, struct snapshot *snp)
     if (self->cart) {
         cart_snapshot(self->cart, snp);
     }
-    debug_snapshot(self->dbg, snp);
     snp->mem.ram = self->ram;
     snp->mem.vram = self->vram;
     snp->prg.curr->length = bus_copy(self->cpu.mbus,

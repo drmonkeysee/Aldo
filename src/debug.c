@@ -266,7 +266,7 @@ const struct breakpoint *debug_bp_at(debugger *self, ptrdiff_t at)
     return bpvector_at(&self->breakpoints, at);
 }
 
-void debug_bp_enabled(debugger *self, ptrdiff_t at, bool enabled)
+void debug_bp_enable(debugger *self, ptrdiff_t at, bool enabled)
 {
     assert(self != NULL);
 
@@ -274,6 +274,22 @@ void debug_bp_enabled(debugger *self, ptrdiff_t at, bool enabled)
     if (bp) {
         bp->enabled = enabled;
     }
+}
+
+const struct breakpoint *debug_halted(debugger *self)
+{
+    assert(self != NULL);
+
+    return self->halted == NoBreakpoint
+            ? NULL
+            : debug_bp_at(self, self->halted);
+}
+
+ptrdiff_t debug_halted_at(debugger *self)
+{
+    assert(self != NULL);
+
+    return self->halted;
 }
 
 void debug_bp_remove(debugger *self, ptrdiff_t at)
@@ -367,12 +383,4 @@ void debug_check(debugger *self, const struct cycleclock *clk)
     } else {
         self->halted = NoBreakpoint;
     }
-}
-
-void debug_snapshot(debugger *self, struct snapshot *snp)
-{
-    assert(self != NULL);
-    assert(snp != NULL);
-
-    snp->debugger.halted = self->halted;
 }

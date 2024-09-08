@@ -67,6 +67,10 @@ public:
     {
         return isVectorOverridden() || !breakpoints().empty();
     }
+    bool halted() const noexcept
+    {
+        return breakpoints().halted_at() != NoBreakpoint;
+    }
 
     void loadBreakpoints(const std::filesystem::path& filepath);
     void exportBreakpoints(const std::filesystem::path& filepath) const;
@@ -141,6 +145,10 @@ public:
         {
             return debug_bp_at(dbgp, i);
         }
+        difference_type halted_at() const noexcept
+        {
+            return debug_halted_at(dbgp);
+        }
 
         const_iterator cbegin() const noexcept
         {
@@ -158,11 +166,11 @@ public:
         }
         void enable(difference_type i) noexcept requires Mutable
         {
-            debug_bp_enabled(dbgp, i, true);
+            debug_bp_enable(dbgp, i, true);
         }
         void disable(difference_type i) noexcept requires Mutable
         {
-            debug_bp_enabled(dbgp, i, false);
+            debug_bp_enable(dbgp, i, false);
         }
         void remove(difference_type i) noexcept requires Mutable
         {
@@ -186,11 +194,6 @@ private:
     explicit Debugger(debug_handle d) noexcept : hdbg{std::move(d)} {}
 
     debugger* dbgp() const noexcept { return hdbg.get(); }
-
-    bool hasBreak(const snapshot& snp) const noexcept
-    {
-        return snp.debugger.halted != NoBreakpoint;
-    }
 
     debug_handle hdbg;
 };

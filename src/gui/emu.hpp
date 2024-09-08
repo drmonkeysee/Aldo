@@ -75,10 +75,6 @@ public:
     const console_snapshot* snapshotp() const noexcept { return hsnp.getp(); }
     const Palette& palette() const noexcept { return hpalette; }
     Palette& palette() noexcept { return hpalette; }
-    bool haltedByDebugger() const noexcept
-    {
-        return debugger().hasBreak(snapshot());
-    }
 
     void ready(bool ready) noexcept { nes_ready(consolep(), ready); }
     et::size ramSize() const noexcept { return nes_ram_size(consolep()); }

@@ -546,8 +546,8 @@ void ppu_snapshot(const struct rp2c02 *self, struct snapshot *snp)
     assert(snp->video != NULL);
 
     ppu_bus_snapshot(self, snp);
-    snapshot_palette(self, snp->video->bgpalettes, 0);
-    snapshot_palette(self, snp->video->fgpalettes, 0x10);
+    snapshot_palette(self, snp->video->palettes.bg, 0);
+    snapshot_palette(self, snp->video->palettes.fg, 0x10);
 }
 
 void ppu_dumpram(const struct rp2c02 *self, FILE *f)

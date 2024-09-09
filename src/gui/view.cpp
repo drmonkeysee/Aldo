@@ -1347,8 +1347,8 @@ private:
 
         ImGui::TextUnformatted(fg ? "Sprites" : "Background");
         const auto* pals = fg
-                            ? emu.snapshot().video->fgpalettes
-                            : emu.snapshot().video->bgpalettes;
+                            ? emu.snapshot().video->palettes.fg
+                            : emu.snapshot().video->palettes.bg;
         for (auto row = 0; row < SNP_PAL_SIZE; ++row) {
             if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols,
                                   flags)) {

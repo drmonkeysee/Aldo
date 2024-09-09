@@ -82,8 +82,10 @@ struct snapshot {
                 right[SNP_PAT_TILES][SNP_TILE_DIM];
         } pattern_tables;
         // Background/Foreground, 4 Palettes, 4 Colors, 6 Bits
-        uint8_t bgpalettes[SNP_PAL_SIZE][SNP_PAL_SIZE],
-                fgpalettes[SNP_PAL_SIZE][SNP_PAL_SIZE];
+        struct {
+            uint8_t bg[SNP_PAL_SIZE][SNP_PAL_SIZE],
+                    fg[SNP_PAL_SIZE][SNP_PAL_SIZE];
+        } palettes;
     } *video;
 };
 

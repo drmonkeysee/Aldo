@@ -16,6 +16,13 @@
 
 enum {
     SNP_PAL_SIZE = 4,
+    SNP_PAT_TILES = 256,
+    // NOTE: CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is a
+    // 16-byte array of 2-bit palette-indexed pixels composed of two bit-planes
+    // where the first plane specifies the pixel low bit and the second plane
+    // specifies the pixel high bit.
+    SNP_TILE_DIM = 8,
+    SNP_TILE_STRIDE = 2 * SNP_TILE_DIM,
 };
 
 struct snapshot {
@@ -68,9 +75,12 @@ struct snapshot {
     } prg;
 
     struct {
-        // 2 Tables, 256 Tiles, 8 Rows, 16 Bits
-        // TODO: don't write this every update?
-        uint16_t pattern_tables[2][256][8];
+        // A Pattern Table is 256 tiles x 8 rows x 8 pixels x 2 bits.
+        struct {
+            uint16_t
+                left[SNP_PAT_TILES][SNP_TILE_DIM],
+                right[SNP_PAT_TILES][SNP_TILE_DIM];
+        } pattern_tables;
         // Background/Foreground, 4 Palettes, 4 Colors, 6 Bits
         uint8_t bgpalettes[SNP_PAL_SIZE][SNP_PAL_SIZE],
                 fgpalettes[SNP_PAL_SIZE][SNP_PAL_SIZE];

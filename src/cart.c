@@ -408,6 +408,7 @@ void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)
 void cart_snapshot(cart *self, struct snapshot *snp)
 {
     assert(self != NULL);
+    assert(self->mapper != NULL);
     assert(snp != NULL);
 
     // TODO: zero out pattern tables if not nes?

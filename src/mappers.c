@@ -250,13 +250,14 @@ static void ines_000_snapshot(const struct mapper *self, struct snapshot *snp)
     assert(self != NULL);
     assert(snp != NULL);
     assert(snp->video != NULL);
+    assert(SNP_PAT_TILES * SNP_TILE_STRIDE == MEMBLOCK_4KB);
 
     struct blockview bv = {
         .mem = ((struct ines_mapper *)self)->chr,
         .size = MEMBLOCK_4KB,
     };
     fill_pattern_table(SNP_PAT_TILES, snp->video->pattern_tables.left, &bv);
-    bv.mem += SNP_PAT_TILES * SNP_TILE_STRIDE;
+    bv.mem += bv.size;
     ++bv.ord;
     fill_pattern_table(SNP_PAT_TILES, snp->video->pattern_tables.right, &bv);
 }

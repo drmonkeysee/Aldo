@@ -432,7 +432,7 @@ static int cycle(struct rp2c02 *self)
 }
 
 static void snapshot_palette(const struct rp2c02 *self,
-                             uint8_t palsnp[SNP_PAL_SIZE][SNP_PAL_SIZE],
+                             uint8_t palsnp[static SNP_PAL_SIZE][SNP_PAL_SIZE],
                              uint16_t offset)
 {
     uint16_t base = PaletteStartAddr + offset;

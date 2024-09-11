@@ -15,6 +15,7 @@
 #include "emu.h"
 #include "haltexpr.h"
 #include "nes.h"
+#include "snapshot.h"
 #include "tsutil.h"
 
 #include <ncurses.h>

@@ -279,26 +279,26 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
             size_t
                 tileidx = tilex + (tiley * tilesdim)
                             + (section * tilesdim * tilesdim),
-                chr_row = (tileidx * SNP_TILE_STRIDE) + pixely;
+                chr_row = (tileidx * CHR_TILE_STRIDE) + pixely;
             uint8_t
                 plane0 = bv->mem[chr_row],
-                plane1 = bv->mem[chr_row + SNP_TILE_DIM];
+                plane1 = bv->mem[chr_row + CHR_TILE_DIM];
             // NOTE: 8 2-bit pixels make a single CHR tile row; each 2-bit
             // pixel will be expanded to 4-bits and packed 2 pixels per byte
             // for a 4 bpp BMP.
             uint16_t pixelrow = byteshuffle(plane0, plane1);
-            for (size_t pixelx = 0; pixelx < SNP_TILE_DIM; ++pixelx) {
+            for (size_t pixelx = 0; pixelx < CHR_TILE_DIM; ++pixelx) {
                 // NOTE: packedpixel is the pixel in (prescaled) bmp-row space;
                 // pixelidx is the 2-bit slice of pixelrow that maps to the
                 // packedpixel; BMP layout goes from left-to-right so pixelidx
                 // goes "backwards" from MSBs to LSBs.
-                size_t packedpixel = pixelx + (tilex * SNP_TILE_DIM)
+                size_t packedpixel = pixelx + (tilex * CHR_TILE_DIM)
                                         + (section * section_pxldim);
-                uint8_t pixelidx = (uint8_t)(SNP_TILE_STRIDE
+                uint8_t pixelidx = (uint8_t)(CHR_TILE_STRIDE
                                              - ((pixelx + 1) * 2)),
                         pixel = (uint8_t)((pixelrow & (0x3 << pixelidx))
                                           >> pixelidx);
-                assert(pixelidx < SNP_TILE_STRIDE);
+                assert(pixelidx < CHR_TILE_STRIDE);
                 for (uint32_t scalex = 0; scalex < scale; ++scalex) {
                     size_t scaledpixel = scalex + (packedpixel * scale);
                     if (scaledpixel % 2 == 0) {
@@ -318,7 +318,7 @@ static int write_chrtiles(const struct blockview *bv, uint32_t tilesdim,
                           FILE *bmpfile)
 {
     uint32_t
-        section_pxldim = tilesdim * SNP_TILE_DIM,
+        section_pxldim = tilesdim * CHR_TILE_DIM,
         bmph = section_pxldim * scale,
         bmpw = section_pxldim * tile_sections * scale,
         // NOTE: 4 bpp equals 8 pixels per 4 bytes; bmp pixel rows must then
@@ -394,7 +394,7 @@ static int write_chrtiles(const struct blockview *bv, uint32_t tilesdim,
     // NOTE: BMP pixels are written bottom-row first
     uint8_t *packedrow = calloc(packedrow_size, sizeof *packedrow);
     for (int32_t tiley = (int32_t)(tilesdim - 1); tiley >= 0; --tiley) {
-        for (int32_t pixely = (int32_t)(SNP_TILE_DIM - 1);
+        for (int32_t pixely = (int32_t)(CHR_TILE_DIM - 1);
              pixely >= 0;
              --pixely) {
             for (uint32_t scaley = 0; scaley < scale; ++scaley) {

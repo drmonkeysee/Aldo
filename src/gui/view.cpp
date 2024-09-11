@@ -1340,7 +1340,7 @@ private:
     void renderPalettes(bool fg) noexcept
     {
         static constexpr auto cellDim = 15;
-        static constexpr auto cols = SNP_PAL_SIZE + 1;
+        static constexpr auto cols = CHR_PAL_SIZE + 1;
         static constexpr auto center = 0.5f;
         static constexpr auto flags = ImGuiTableFlags_BordersInner
                                         | ImGuiTableFlags_SizingFixedFit;
@@ -1349,7 +1349,7 @@ private:
         const auto* pals = fg
                             ? emu.snapshot().video->palettes.fg
                             : emu.snapshot().video->palettes.bg;
-        for (auto row = 0; row < SNP_PAL_SIZE; ++row) {
+        for (auto row = 0; row < CHR_PAL_SIZE; ++row) {
             if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols,
                                   flags)) {
                 ScopedStyleVec textAlign{{

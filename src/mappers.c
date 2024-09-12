@@ -250,7 +250,6 @@ static void ines_000_snapshot(const struct mapper *self, struct snapshot *snp)
     assert(self != NULL);
     assert(snp != NULL);
     assert(snp->video != NULL);
-    assert(CHR_PAT_TILES * CHR_TILE_STRIDE == MEMBLOCK_4KB);
 
     struct blockview bv = {
         .mem = ((struct ines_mapper *)self)->chr,

@@ -1278,7 +1278,7 @@ private:
 class PatternTablesView final : public aldo::View {
 public:
     PatternTablesView(aldo::viewstate& vs, const aldo::Emulator& emu,
-                      const aldo::MediaRuntime& mr) noexcept
+                      const aldo::MediaRuntime& mr)
     : View{"Pattern Tables", vs, emu, mr}
     {
         static constexpr std::array colors = {
@@ -1289,8 +1289,24 @@ public:
         };
         aldo::palette::sz cidx = 0;
         auto& pal = emu.palette();
+        auto ren = mr.renderer();
 
-        auto draw = [&cidx, &pal](SDL_Renderer* ren) {
+        {
+            auto texData = mr.patternTableLeft().lock();
+            for (auto row = 0; row < texData.stride; ++row) {
+                for (auto col = 0; col < 16; ++col) {
+                    for (auto pixel = 0; pixel < 8; ++pixel) {
+                        auto color = pal.getColor(static_cast<aldo::palette::sz>(colors[cidx % colors.size()]));
+                        texData.pixels[pixel + (col * 8) + (row * texData.stride)] = color;
+                    }
+                }
+                if (row % 2 == 1) {
+                    ++cidx;
+                }
+            }
+        }
+
+        mr.patternTableRight().draw(ren, [&cidx, &pal](SDL_Renderer* ren) {
             SDL_Rect rect{0, 0, 8, 8};
             SDL_RenderClear(ren);
             for (auto i = 0; i < 16; ++i) {
@@ -1303,11 +1319,7 @@ public:
                     SDL_RenderFillRect(ren, &rect);
                 }
             }
-        };
-
-        auto ren = mr.renderer();
-        mr.patternTableLeft().draw(ren, draw);
-        mr.patternTableRight().draw(ren, draw);
+        });
     }
     PatternTablesView(aldo::viewstate&, aldo::Emulator&&,
                       const aldo::MediaRuntime&) = delete;

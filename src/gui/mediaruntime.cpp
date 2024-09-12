@@ -117,8 +117,8 @@ aldo::MediaRuntime::MediaRuntime(SDL_Point windowSize,
 try : hwin{create_window(windowSize, p)},
         hren{create_renderer(hwin, p)},
         bouncer{aldo::Texture{screenResolution, hren}},
-        pattern1{aldo::Texture{{128, 128}, hren}},
-        pattern2{aldo::Texture{{128, 128}, hren}},
+        patternLeft{aldo::Texture{{128, 128}, hren}},
+        patternRight{aldo::Texture{{128, 128}, hren}},
         imgui{hwin, hren} {}
 catch (...) {
     InitStatus = UI_ERR_LIBINIT;

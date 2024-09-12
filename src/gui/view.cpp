@@ -1306,8 +1306,8 @@ public:
         };
 
         auto ren = mr.renderer();
-        mr.patternTable1().draw(ren, draw);
-        mr.patternTable2().draw(ren, draw);
+        mr.patternTableLeft().draw(ren, draw);
+        mr.patternTableRight().draw(ren, draw);
     }
     PatternTablesView(aldo::viewstate&, aldo::Emulator&&,
                       const aldo::MediaRuntime&) = delete;
@@ -1322,12 +1322,12 @@ protected:
         static constexpr auto scale = 2.0f;
         widget_group([this] {
             ImGui::TextUnformatted("Pattern Table $0000");
-            this->mr.patternTable1().render(scale);
+            this->mr.patternTableLeft().render(scale);
         });
         ImGui::SameLine(0, 10);
         widget_group([this] {
             ImGui::TextUnformatted("Pattern Table $1000");
-            this->mr.patternTable2().render(scale);
+            this->mr.patternTableRight().render(scale);
         });
         ImGui::SameLine(0, 10);
         widget_group([this] {

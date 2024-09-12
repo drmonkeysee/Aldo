@@ -77,8 +77,8 @@ public:
     SDL_Window* window() const noexcept { return hwin.get(); }
     SDL_Renderer* renderer() const noexcept { return hren.get(); }
     const Texture& bouncerScreen() const noexcept { return bouncer; }
-    const Texture& patternTable1() const noexcept { return pattern1; }
-    const Texture& patternTable2() const noexcept { return pattern2; }
+    const Texture& patternTableLeft() const noexcept { return patternLeft; }
+    const Texture& patternTableRight() const noexcept { return patternRight; }
 
 private:
     inline static int InitStatus;
@@ -86,7 +86,7 @@ private:
     SdlLib sdl;
     win_handle hwin;
     ren_handle hren;
-    Texture bouncer, pattern1, pattern2;
+    Texture bouncer, patternLeft, patternRight;
     DearImGuiLib imgui;
 };
 

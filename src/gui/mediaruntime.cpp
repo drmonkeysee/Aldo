@@ -8,6 +8,7 @@
 #include "mediaruntime.hpp"
 
 #include "attr.hpp"
+#include "error.hpp"
 #include "guiplatform.h"
 #include "ui.h"
 
@@ -15,10 +16,7 @@
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
 
-#include <memory>
-
-static_assert(std::same_as<Uint32, ImU32>,
-              "SDL u32 type does not match ImGui u32 type");
+#include <stdexcept>
 
 namespace
 {
@@ -50,16 +48,6 @@ auto create_renderer(const aldo::win_handle& hwin, const gui_platform& p)
     SDL_Log("Render info: %s (%#x) (x%.1f)", info.name, info.flags,
             render_scale_factor);
     return ren;
-}
-
-ALDO_OWN
-auto create_texture(SDL_Point size, SDL_TextureAccess access,
-                    const aldo::ren_handle& hren)
-{
-    auto tex = SDL_CreateTexture(hren.get(), SDL_PIXELFORMAT_RGBA32, access,
-                                 size.x, size.y);
-    if (!tex) throw aldo::SdlError{"SDL texture creation failure"};
-    return tex;
 }
 
 }
@@ -99,52 +87,9 @@ aldo::DearImGuiLib::~DearImGuiLib()
     ImGui::DestroyContext();
 }
 
-aldo::Texture::Texture(SDL_Point size, SDL_TextureAccess access,
-                       const aldo::ren_handle& hren)
-: tex{create_texture(size, access, hren)} {}
-
-aldo::Texture::~Texture()
-{
-    SDL_DestroyTexture(tex);
-}
-
-void aldo::Texture::render(float scale) const noexcept
-{
-    int w, h;
-    SDL_QueryTexture(tex, nullptr, nullptr, &w, &h);
-    ImGui::Image(tex, {w * scale, h * scale});
-}
-
-aldo::Texture::TextureData::TextureData(SDL_Texture& tex) : tex{tex}
-{
-    void* data;
-    int pitch;
-    if (SDL_LockTexture(&tex, nullptr, &data, &pitch) < 0) {
-        throw aldo::SdlError{"Texture is not streamable"};
-    }
-    pixels = static_cast<Uint32*>(data);
-    stride = pitch / static_cast<int>(sizeof *pixels);
-}
-
-aldo::Texture::TextureData::~TextureData()
-{
-    SDL_UnlockTexture(&tex);
-}
-
-aldo::MediaRuntime::MediaRuntime(SDL_Point windowSize,
-                                 SDL_Point screenResolution,
-                                 const gui_platform& p)
+aldo::MediaRuntime::MediaRuntime(SDL_Point windowSize, const gui_platform& p)
 try : hwin{create_window(windowSize, p)},
         hren{create_renderer(hwin, p)},
-        bouncer{aldo::Texture{
-            screenResolution, SDL_TEXTUREACCESS_TARGET, hren,
-        }},
-        patternLeft{aldo::Texture{
-            {128, 128}, SDL_TEXTUREACCESS_STREAMING, hren,
-        }},
-        patternRight{aldo::Texture{
-            {128, 128}, SDL_TEXTUREACCESS_TARGET, hren,
-        }},
         imgui{hwin, hren} {}
 catch (...) {
     InitStatus = UI_ERR_LIBINIT;

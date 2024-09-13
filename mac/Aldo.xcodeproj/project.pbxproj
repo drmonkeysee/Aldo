@@ -71,6 +71,7 @@
 		C8B4E7F629ADA78C00B5033C /* imgui_demo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8B4E7EE29ADA78C00B5033C /* imgui_demo.cpp */; };
 		C8B4E7F729ADA78C00B5033C /* imgui_draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8B4E7EF29ADA78C00B5033C /* imgui_draw.cpp */; };
 		C8B77FA72975FD7A0020692C /* emutypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8B77FA62975FD7A0020692C /* emutypes.cpp */; };
+		C8B79ED22C93D126003D5012 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8B79ED02C93D126003D5012 /* texture.cpp */; };
 		C8B88A8A29061C3500B7CB23 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8B88A8B29061C3800B7CB23 /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6CA25A97A4E006A7AB1 /* cli.c */; };
 		C8B88A8C29061C3C00B7CB23 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = C820E6D325A97FB5006A7AB1 /* main.c */; };
@@ -317,6 +318,8 @@
 		C8B4E7EF29ADA78C00B5033C /* imgui_draw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imgui_draw.cpp; sourceTree = "<group>"; };
 		C8B5303A2801300C00576D9F /* CartFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartFocusView.swift; sourceTree = "<group>"; };
 		C8B77FA62975FD7A0020692C /* emutypes.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = emutypes.cpp; sourceTree = "<group>"; };
+		C8B79ED02C93D126003D5012 /* texture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = texture.cpp; sourceTree = "<group>"; };
+		C8B79ED12C93D126003D5012 /* texture.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = texture.hpp; sourceTree = "<group>"; };
 		C8B87D46285E82BD000E0D2E /* CommandViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandViews.swift; sourceTree = "<group>"; };
 		C8B88AA42906277800B7CB23 /* libaldo.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libaldo.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpanel.tbd; path = usr/lib/libpanel.tbd; sourceTree = SDKROOT; };
@@ -657,6 +660,8 @@
 				C8EC721E2916150700DF750A /* render.cpp */,
 				C8D388D72952B9A700DF230D /* runclock.hpp */,
 				C867F802295E9BA700ABEB3B /* style.hpp */,
+				C8B79ED12C93D126003D5012 /* texture.hpp */,
+				C8B79ED02C93D126003D5012 /* texture.cpp */,
 				C88CABDD28FA4DDD00551C65 /* uisdl.hpp */,
 				C88CABDC28FA4DDD00551C65 /* uisdl.cpp */,
 				C894F0EE2945850E00C6575F /* view.hpp */,
@@ -1010,6 +1015,7 @@
 				C882854829403C2100BAC249 /* error.cpp in Sources */,
 				C8B4E7F029ADA78C00B5033C /* imgui_widgets.cpp in Sources */,
 				C8CF5FC22BAF9E27004F1A99 /* imgui_impl_sdlrenderer2.cpp in Sources */,
+				C8B79ED22C93D126003D5012 /* texture.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -21,6 +21,7 @@
 #include "mediaruntime.hpp"
 #include "snapshot.h"
 #include "style.hpp"
+#include "texture.hpp"
 #include "version.h"
 #include "viewstate.hpp"
 
@@ -469,7 +470,8 @@ class BouncerView final : public aldo::View {
 public:
     BouncerView(aldo::viewstate& vs, const aldo::Emulator& emu,
                 const aldo::MediaRuntime& mr) noexcept
-    : View{"Bouncer", vs, emu, mr} {}
+    : View{"Bouncer", vs, emu, mr}, bouncer{vs.bouncer.bounds, mr.renderer()}
+    {}
     BouncerView(aldo::viewstate&, aldo::Emulator&&,
                 const aldo::MediaRuntime&) = delete;
     BouncerView(aldo::viewstate&, const aldo::Emulator&,
@@ -480,29 +482,12 @@ public:
 protected:
     void renderContents() override
     {
-        auto ren = mr.renderer();
-        auto& tex = mr.bouncerScreen();
-        tex.draw(ren,
-                 [&bouncer = std::as_const(vs.bouncer)](SDL_Renderer* ren) {
-            SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
-            SDL_RenderClear(ren);
-
-            SDL_SetRenderDrawColor(ren, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
-            SDL_RenderDrawLine(ren, 30, 7, 50, 200);
-
-            SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
-
-            auto fulldim = bouncer.halfdim * 2;
-            SDL_Rect pos{
-                bouncer.pos.x - bouncer.halfdim,
-                bouncer.pos.y - bouncer.halfdim,
-                fulldim,
-                fulldim,
-            };
-            SDL_RenderFillRect(ren, &pos);
-        });
-        tex.render();
+        bouncer.draw(vs, mr.renderer());
+        bouncer.render();
     }
+
+private:
+    aldo::BouncerScreen bouncer;
 };
 
 class CartInfoView final : public aldo::View {
@@ -1279,7 +1264,13 @@ class PatternTablesView final : public aldo::View {
 public:
     PatternTablesView(aldo::viewstate& vs, const aldo::Emulator& emu,
                       const aldo::MediaRuntime& mr)
-    : View{"Pattern Tables", vs, emu, mr}
+    : View{"Pattern Tables", vs, emu, mr},
+        left{aldo::Texture{
+            {128, 128}, SDL_TEXTUREACCESS_STREAMING, mr.renderer(),
+        }},
+        right{aldo::Texture{
+            {128, 128}, SDL_TEXTUREACCESS_TARGET, mr.renderer(),
+        }}
     {
         static constexpr std::array colors = {
             0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0e,
@@ -1289,10 +1280,9 @@ public:
         };
         aldo::palette::sz cidx = 0;
         auto& pal = emu.palette();
-        auto ren = mr.renderer();
 
         {
-            auto texData = mr.patternTableLeft().lock();
+            auto texData = left.lock();
             for (auto row = 0; row < texData.stride; ++row) {
                 for (auto col = 0; col < 16; ++col) {
                     for (auto pixel = 0; pixel < 8; ++pixel) {
@@ -1306,20 +1296,22 @@ public:
             }
         }
 
-        mr.patternTableRight().draw(ren, [&cidx, &pal](SDL_Renderer* ren) {
-            SDL_Rect rect{0, 0, 8, 8};
-            SDL_RenderClear(ren);
-            for (auto i = 0; i < 16; ++i) {
-                rect.y = i * rect.h;
-                for (auto j = 0; j < 16; ++j) {
-                    rect.x = j * rect.w;
-                    auto color = pal.getColor(static_cast<aldo::palette::sz>(colors[cidx++ % colors.size()]));
-                    auto [r, g, b] = aldo::colors::rgb(color);
-                    SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g), static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
-                    SDL_RenderFillRect(ren, &rect);
-                }
+        auto ren = mr.renderer();
+        auto rraw = right.raw();
+        SDL_Rect rect{0, 0, 8, 8};
+        SDL_SetRenderTarget(ren, rraw);
+        SDL_RenderClear(ren);
+        for (auto i = 0; i < 16; ++i) {
+            rect.y = i * rect.h;
+            for (auto j = 0; j < 16; ++j) {
+                rect.x = j * rect.w;
+                auto color = pal.getColor(static_cast<aldo::palette::sz>(colors[cidx++ % colors.size()]));
+                auto [r, g, b] = aldo::colors::rgb(color);
+                SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g), static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
+                SDL_RenderFillRect(ren, &rect);
             }
-        });
+        }
+        SDL_SetRenderTarget(ren, nullptr);
     }
     PatternTablesView(aldo::viewstate&, aldo::Emulator&&,
                       const aldo::MediaRuntime&) = delete;
@@ -1334,12 +1326,12 @@ protected:
         static constexpr auto scale = 2.0f;
         widget_group([this] {
             ImGui::TextUnformatted("Pattern Table $0000");
-            this->mr.patternTableLeft().render(scale);
+            this->left.render(scale);
         });
         ImGui::SameLine(0, 10);
         widget_group([this] {
             ImGui::TextUnformatted("Pattern Table $1000");
-            this->mr.patternTableRight().render(scale);
+            this->right.render(scale);
         });
         ImGui::SameLine(0, 10);
         widget_group([this] {
@@ -1399,6 +1391,8 @@ private:
             }
         }
     }
+
+    aldo::Texture left, right;
 };
 
 class PrgAtPcView final : public aldo::View {

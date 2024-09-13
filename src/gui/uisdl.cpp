@@ -56,7 +56,7 @@ auto runloop(const gui_platform& p, debugger* debug, nes* console)
     aldo::viewstate state = {
         .clock.cyclock = {.rate = 10, .rate_factor = nes_cycle_factor()},
     };
-    aldo::MediaRuntime runtime{{1280, 800}, state.bouncer.bounds, p};
+    aldo::MediaRuntime runtime{{1280, 800}, p};
     aldo::Layout layout{state, emu, runtime};
     SDL_Log("emu: %zu", sizeof emu);
     SDL_Log("state: %zu", sizeof state);

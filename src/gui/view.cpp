@@ -1265,11 +1265,11 @@ public:
     PatternTablesView(aldo::viewstate& vs, const aldo::Emulator& emu,
                       const aldo::MediaRuntime& mr)
     : View{"Pattern Tables", vs, emu, mr},
-        left{aldo::Texture{
-            {128, 128}, SDL_TEXTUREACCESS_STREAMING, mr.renderer(),
+        left{aldo::Texture<SDL_TEXTUREACCESS_STREAMING>{
+            {128, 128}, mr.renderer(),
         }},
-        right{aldo::Texture{
-            {128, 128}, SDL_TEXTUREACCESS_TARGET, mr.renderer(),
+        right{aldo::Texture<SDL_TEXTUREACCESS_TARGET>{
+            {128, 128}, mr.renderer(),
         }}
     {
         static constexpr std::array colors = {
@@ -1297,9 +1297,8 @@ public:
         }
 
         auto ren = mr.renderer();
-        auto rraw = right.raw();
+        auto t = right.asTarget(ren);
         SDL_Rect rect{0, 0, 8, 8};
-        SDL_SetRenderTarget(ren, rraw);
         SDL_RenderClear(ren);
         for (auto i = 0; i < 16; ++i) {
             rect.y = i * rect.h;
@@ -1311,7 +1310,6 @@ public:
                 SDL_RenderFillRect(ren, &rect);
             }
         }
-        SDL_SetRenderTarget(ren, nullptr);
     }
     PatternTablesView(aldo::viewstate&, aldo::Emulator&&,
                       const aldo::MediaRuntime&) = delete;
@@ -1392,7 +1390,8 @@ private:
         }
     }
 
-    aldo::Texture left, right;
+    aldo::Texture<SDL_TEXTUREACCESS_STREAMING> left;
+    aldo::Texture<SDL_TEXTUREACCESS_TARGET> right;
 };
 
 class PrgAtPcView final : public aldo::View {

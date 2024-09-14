@@ -123,6 +123,10 @@ private:
     static_assert(TextureDim == TableDim * CHR_TILE_DIM,
                   "Texture size does not match tile pixel count");
 
+    static void drawTileRow(et::word tileRow, int tblx, int texy,
+                            const Palette& palette,
+                            const texture::TextureData& texData);
+
     Texture<SDL_TEXTUREACCESS_STREAMING> tex;
 };
 

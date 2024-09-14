@@ -10,6 +10,7 @@
 #include "error.hpp"
 #include "viewstate.hpp"
 
+#include <array>
 #include <concepts>
 
 static_assert(std::same_as<Uint32, ImU32>,
@@ -49,31 +50,18 @@ void aldo::BouncerScreen::draw(const aldo::viewstate& vs,
 aldo::PatternTable::PatternTable(SDL_Renderer* ren)
 : tex{{TextureDim, TextureDim}, ren} {}
 
-void
-aldo::PatternTable::draw(const aldo::et::word table[CHR_PAT_TILES][CHR_TILE_DIM],
-                         const Palette& palette) const noexcept
+void aldo::PatternTable
+::draw(const aldo::et::word table[CHR_PAT_TILES][CHR_TILE_DIM],
+       const Palette& palette) const noexcept
 {
-    static constexpr std::array colors = {0x1d, 0x0, 0x10, 0x20};
-
     auto texData = tex.lock();
     for (auto tblRow = 0; tblRow < TableDim; ++tblRow) {
         for (auto tblCol = 0; tblCol < TableDim; ++tblCol) {
             const auto* tile = table[tblCol + (tblRow * TableDim)];
             for (auto tileRow = 0; tileRow < CHR_TILE_DIM; ++tileRow) {
-                auto pixels = tile[tileRow];
-                for (auto px = 0; px < CHR_TILE_DIM; ++px) {
-                    auto
-                        pidx = CHR_TILE_STRIDE - ((px + 1) * 2),
-                        pixel = (pixels & (0x3 << pidx)) >> pidx;
-                    assert(0 <= pidx);
-                    auto
-                        texx = px + (tblCol * CHR_TILE_DIM),
-                        texy = (tileRow + (tblRow * CHR_TILE_DIM)) * texData.stride,
-                        texidx = texx + texy;
-                    assert(texidx < TextureDim * TextureDim);
-                    aldo::palette::sz palidx = static_cast<aldo::palette::sz>(colors[static_cast<decltype(colors)::size_type>(pixel)]);
-                    texData.pixels[texidx] = palette.getColor(palidx);
-                }
+                auto texy = (tileRow + (tblRow * CHR_TILE_DIM))
+                            * texData.stride;
+                drawTileRow(tile[tileRow], tblCol, texy, palette, texData);
             }
         }
     }
@@ -99,4 +87,30 @@ aldo::texture::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
     SDL_LockTexture(&tex, nullptr, &data, &pitch);
     pixels = static_cast<Uint32*>(data);
     stride = pitch / static_cast<int>(sizeof *pixels);
+}
+
+//
+// MARK: - Private Interface
+//
+
+void
+aldo::PatternTable::drawTileRow(aldo::et::word tileRow, int tblx, int texy,
+                                const aldo::Palette& palette,
+                                const aldo::texture::TextureData& texData)
+{
+    // TODO: replace this with real palette lookup
+    static constexpr std::array<aldo::palette::sz, 4> colors = {
+        0x1d, 0x0, 0x10, 0x20,
+    };
+
+    for (auto px = 0; px < CHR_TILE_DIM; ++px) {
+        auto pidx = CHR_TILE_STRIDE - ((px + 1) * 2);
+        assert(0 <= pidx);
+        decltype(colors)::size_type pixel = (tileRow & (0x3 << pidx)) >> pidx;
+        auto
+            texx = px + (tblx * CHR_TILE_DIM),
+            texidx = texx + texy;
+        assert(texidx < TextureDim * TextureDim);
+        texData.pixels[texidx] = palette.getColor(colors[pixel]);
+    }
 }

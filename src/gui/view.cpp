@@ -469,7 +469,7 @@ auto about_overlay(aldo::viewstate& vs) noexcept
 class BouncerView final : public aldo::View {
 public:
     BouncerView(aldo::viewstate& vs, const aldo::Emulator& emu,
-                const aldo::MediaRuntime& mr) noexcept
+                const aldo::MediaRuntime& mr)
     : View{"Bouncer", vs, emu, mr}, bouncer{vs.bouncer.bounds, mr.renderer()}
     {}
     BouncerView(aldo::viewstate&, aldo::Emulator&&,
@@ -1265,52 +1265,7 @@ public:
     PatternTablesView(aldo::viewstate& vs, const aldo::Emulator& emu,
                       const aldo::MediaRuntime& mr)
     : View{"Pattern Tables", vs, emu, mr},
-        left{aldo::Texture<SDL_TEXTUREACCESS_STREAMING>{
-            {128, 128}, mr.renderer(),
-        }},
-        right{aldo::Texture<SDL_TEXTUREACCESS_TARGET>{
-            {128, 128}, mr.renderer(),
-        }}
-    {
-        static constexpr std::array colors = {
-            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0e,
-            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d,
-            0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d,
-            0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d,
-        };
-        aldo::palette::sz cidx = 0;
-        auto& pal = emu.palette();
-
-        {
-            auto texData = left.lock();
-            for (auto row = 0; row < texData.stride; ++row) {
-                for (auto col = 0; col < 16; ++col) {
-                    for (auto pixel = 0; pixel < 8; ++pixel) {
-                        auto color = pal.getColor(static_cast<aldo::palette::sz>(colors[cidx % colors.size()]));
-                        texData.pixels[pixel + (col * 8) + (row * texData.stride)] = color;
-                    }
-                }
-                if (row % 2 == 1) {
-                    ++cidx;
-                }
-            }
-        }
-
-        auto ren = mr.renderer();
-        auto t = right.asTarget(ren);
-        SDL_Rect rect{0, 0, 8, 8};
-        SDL_RenderClear(ren);
-        for (auto i = 0; i < 16; ++i) {
-            rect.y = i * rect.h;
-            for (auto j = 0; j < 16; ++j) {
-                rect.x = j * rect.w;
-                auto color = pal.getColor(static_cast<aldo::palette::sz>(colors[cidx++ % colors.size()]));
-                auto [r, g, b] = aldo::colors::rgb(color);
-                SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g), static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
-                SDL_RenderFillRect(ren, &rect);
-            }
-        }
-    }
+        left{mr.renderer()}, right{mr.renderer()} {}
     PatternTablesView(aldo::viewstate&, aldo::Emulator&&,
                       const aldo::MediaRuntime&) = delete;
     PatternTablesView(aldo::viewstate&, const aldo::Emulator&,
@@ -1321,15 +1276,18 @@ public:
 protected:
     void renderContents() override
     {
-        static constexpr auto scale = 2.0f;
+        const auto* tables = &emu.snapshot().video->pattern_tables;
+        left.draw(tables->left, emu.palette());
+        right.draw(tables->right, emu.palette());
+
         widget_group([this] {
             ImGui::TextUnformatted("Pattern Table $0000");
-            this->left.render(scale);
+            this->left.render();
         });
         ImGui::SameLine(0, 10);
         widget_group([this] {
             ImGui::TextUnformatted("Pattern Table $1000");
-            this->right.render(scale);
+            this->right.render();
         });
         ImGui::SameLine(0, 10);
         widget_group([this] {
@@ -1390,8 +1348,7 @@ private:
         }
     }
 
-    aldo::Texture<SDL_TEXTUREACCESS_STREAMING> left;
-    aldo::Texture<SDL_TEXTUREACCESS_TARGET> right;
+    aldo::PatternTable left, right;
 };
 
 class PrgAtPcView final : public aldo::View {

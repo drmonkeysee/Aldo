@@ -112,9 +112,9 @@ class PatternTable {
 public:
     PatternTable(SDL_Renderer* ren);
 
-    void draw(et::word table[CHR_PAT_TILES][CHR_TILE_DIM],
+    void draw(const et::word table[CHR_PAT_TILES][CHR_TILE_DIM],
               const Palette& palette) const noexcept;
-    void render() const noexcept { tex.render(); }
+    void render() const noexcept { tex.render(2.0); }
 
 private:
     static constexpr int TableDim = 16, TextureDim = 128;

@@ -46,6 +46,39 @@ void aldo::BouncerScreen::draw(const aldo::viewstate& vs,
     SDL_RenderFillRect(ren, &pos);
 }
 
+aldo::PatternTable::PatternTable(SDL_Renderer* ren)
+: tex{{TextureDim, TextureDim}, ren} {}
+
+void
+aldo::PatternTable::draw(const aldo::et::word table[CHR_PAT_TILES][CHR_TILE_DIM],
+                         const Palette& palette) const noexcept
+{
+    static constexpr std::array colors = {0x1d, 0x0, 0x10, 0x20};
+
+    auto texData = tex.lock();
+    for (auto tblRow = 0; tblRow < TableDim; ++tblRow) {
+        for (auto tblCol = 0; tblCol < TableDim; ++tblCol) {
+            const auto* tile = table[tblCol + (tblRow * TableDim)];
+            for (auto tileRow = 0; tileRow < CHR_TILE_DIM; ++tileRow) {
+                auto pixels = tile[tileRow];
+                for (auto px = 0; px < CHR_TILE_DIM; ++px) {
+                    auto
+                        pidx = CHR_TILE_STRIDE - ((px + 1) * 2),
+                        pixel = (pixels & (0x3 << pidx)) >> pidx;
+                    assert(0 <= pidx);
+                    auto
+                        texx = px + (tblCol * CHR_TILE_DIM),
+                        texy = (tileRow + (tblRow * CHR_TILE_DIM)) * texData.stride,
+                        texidx = texx + texy;
+                    assert(texidx < TextureDim * TextureDim);
+                    aldo::palette::sz palidx = static_cast<aldo::palette::sz>(colors[static_cast<decltype(colors)::size_type>(pixel)]);
+                    texData.pixels[texidx] = palette.getColor(palidx);
+                }
+            }
+        }
+    }
+}
+
 //
 // MARK: - Internal Interface
 //

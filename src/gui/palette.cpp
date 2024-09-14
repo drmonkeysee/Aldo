@@ -7,7 +7,6 @@
 
 #include "palette.hpp"
 
-#include "emutypes.hpp"
 #include "error.hpp"
 #include "style.hpp"
 
@@ -41,12 +40,12 @@ auto parse_colors(const pal_buf& buf)
          it != end;
          std::advance(it, Channels)) {
         auto t = std::views::take(std::ranges::subrange{it, end}, Channels);
-        // NOTE: t yields possibly signed chars; cast to byte, because int
+        // NOTE: t yields possibly signed chars; cast to unsigned, because int
         // auto-promotion in IM_COL32 will sign-extend and mess up the shifts.
         auto [r, g, b] = std::tuple{
-            static_cast<aldo::et::byte>(t[0]),
-            static_cast<aldo::et::byte>(t[1]),
-            static_cast<aldo::et::byte>(t[2]),
+            static_cast<unsigned char>(t[0]),
+            static_cast<unsigned char>(t[1]),
+            static_cast<unsigned char>(t[2]),
         };
         newColors[idx++] = IM_COL32(r, g, b, SDL_ALPHA_OPAQUE);
     }

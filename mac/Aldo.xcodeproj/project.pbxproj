@@ -1435,6 +1435,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.AldoStudio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/AldoStudio-Bridging-Header.h";
 			};
@@ -1469,6 +1470,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.AldoStudio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/AldoStudio-Bridging-Header.h";
 			};

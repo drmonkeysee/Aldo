@@ -50,6 +50,24 @@ namespace
 // MARK: - Helpers
 //
 
+class RefreshInterval {
+public:
+    explicit RefreshInterval(double intervalMs) noexcept
+    : interval{intervalMs} {}
+
+    bool elapsed(const cycleclock& cyclock) noexcept
+    {
+        if ((dt += cyclock.ticktime_ms) >= interval) {
+            dt = 0;
+            return true;
+        }
+        return false;
+    }
+
+private:
+    double dt = 0, interval;
+};
+
 class ALDO_SIDEFX DisabledIf {
 public:
     DisabledIf(bool condition) noexcept : condition{condition}
@@ -1276,9 +1294,11 @@ public:
 protected:
     void renderContents() override
     {
-        const auto* tables = &emu.snapshot().video->pattern_tables;
-        left.draw(tables->left, emu.palette());
-        right.draw(tables->right, emu.palette());
+        if (drawInterval.elapsed(vs.clock.cyclock)) {
+            const auto* tables = &emu.snapshot().video->pattern_tables;
+            left.draw(tables->left, emu.palette());
+            right.draw(tables->right, emu.palette());
+        }
 
         widget_group([this] {
             ImGui::TextUnformatted("Pattern Table $0000");
@@ -1297,7 +1317,7 @@ protected:
     }
 
 private:
-    void renderPalettes(bool fg) noexcept
+    void renderPalettes(bool fg)
     {
         static constexpr auto cellDim = 15;
         static constexpr auto cols = CHR_PAL_SIZE + 1;
@@ -1327,14 +1347,12 @@ private:
                                                color);
                         std::array<char, 3> buf;
                         std::snprintf(buf.data(), buf.size(), "%02X", idx);
-                        ScopedColor txtColor{
-                            {
-                                ImGuiCol_Text,
-                                aldo::colors::luminance(color) < 0x80
-                                    ? IM_COL32_WHITE
-                                    : IM_COL32_BLACK,
-                            }
-                        };
+                        ScopedColor txtColor{{
+                            ImGuiCol_Text,
+                            aldo::colors::luminance(color) < 0x80
+                                ? IM_COL32_WHITE
+                                : IM_COL32_BLACK,
+                        }};
                         ScopedID id = row << 3 | col << 1 | fg;
                         if (ImGui::Selectable(buf.data(), false,
                                               ImGuiSelectableFlags_None,
@@ -1349,6 +1367,7 @@ private:
     }
 
     aldo::PatternTable left, right;
+    RefreshInterval drawInterval{250};
 };
 
 class PrgAtPcView final : public aldo::View {
@@ -1594,15 +1613,13 @@ protected:
 private:
     void renderStats() noexcept
     {
-        static constexpr auto refreshIntervalMs = 250;
         const auto& cyclock = vs.clock.cyclock;
-        if ((refreshDt += cyclock.ticktime_ms) >= refreshIntervalMs) {
+        if (statsInterval.elapsed(cyclock)) {
             dispDtInput = vs.clock.dtInputMs;
             dispDtUpdate = vs.clock.dtUpdateMs;
             dispDtRender = vs.clock.dtRenderMs;
             dispDtElapsed = dispDtInput + dispDtUpdate + dispDtRender;
             dispDtTick = cyclock.ticktime_ms;
-            refreshDt = 0;
         }
         ImGui::Text("Input dT: %.3f", dispDtInput);
         ImGui::Text("Update dT: %.3f", dispDtUpdate);
@@ -1672,7 +1689,8 @@ private:
 
     double
         dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0, dispDtElapsed = 0,
-        dispDtTick = 0, refreshDt = 0;
+        dispDtTick = 0;
+    RefreshInterval statsInterval{250};
 };
 
 }

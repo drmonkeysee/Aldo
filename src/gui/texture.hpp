@@ -113,7 +113,7 @@ public:
     PatternTable(SDL_Renderer* ren);
 
     void draw(const et::word table[CHR_PAT_TILES][CHR_TILE_DIM],
-              const Palette& palette) const noexcept;
+              const Palette& palette) const;
     void render() const noexcept { tex.render(2.0); }
 
 private:

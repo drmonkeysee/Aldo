@@ -52,7 +52,7 @@ aldo::PatternTable::PatternTable(SDL_Renderer* ren)
 
 void aldo::PatternTable
 ::draw(const aldo::et::word table[CHR_PAT_TILES][CHR_TILE_DIM],
-       const Palette& palette) const noexcept
+       const Palette& palette) const
 {
     auto texData = tex.lock();
     for (auto tblRow = 0; tblRow < TableDim; ++tblRow) {

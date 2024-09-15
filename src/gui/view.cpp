@@ -50,6 +50,7 @@ namespace
 // MARK: - Helpers
 //
 
+// TODO: make interval a double template parameter once Apple clang supports it
 class RefreshInterval {
 public:
     explicit RefreshInterval(double intervalMs) noexcept

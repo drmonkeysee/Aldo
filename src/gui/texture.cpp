@@ -54,14 +54,15 @@ void aldo::PatternTable
 ::draw(const aldo::et::word table[CHR_PAT_TILES][CHR_TILE_DIM],
        const Palette& palette) const
 {
-    auto texData = tex.lock();
+    auto data = tex.lock();
     for (auto tblRow = 0; tblRow < TableDim; ++tblRow) {
         for (auto tblCol = 0; tblCol < TableDim; ++tblCol) {
             const auto* tile = table[tblCol + (tblRow * TableDim)];
             for (auto tileRow = 0; tileRow < CHR_TILE_DIM; ++tileRow) {
-                auto texy = (tileRow + (tblRow * CHR_TILE_DIM))
-                            * texData.stride;
-                drawTileRow(tile[tileRow], tblCol, texy, palette, texData);
+                auto rowOffset = (tblCol * CHR_TILE_DIM)
+                                    + ((tileRow + (tblRow * CHR_TILE_DIM))
+                                       * data.stride);
+                drawTableRow(tile[tileRow], rowOffset, palette, data);
             }
         }
     }
@@ -93,10 +94,9 @@ aldo::texture::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 // MARK: - Private Interface
 //
 
-void
-aldo::PatternTable::drawTileRow(aldo::et::word tileRow, int tblx, int texy,
-                                const aldo::Palette& palette,
-                                const aldo::texture::TextureData& texData)
+void aldo::PatternTable::drawTableRow(aldo::et::word tileRow, int texOffset,
+                                      const aldo::Palette& p,
+                                      const aldo::texture::TextureData& data)
 {
     // TODO: replace this with real palette lookup
     static constexpr std::array<aldo::palette::sz, 4> colors = {
@@ -106,11 +106,9 @@ aldo::PatternTable::drawTileRow(aldo::et::word tileRow, int tblx, int texy,
     for (auto px = 0; px < CHR_TILE_DIM; ++px) {
         auto pidx = CHR_TILE_STRIDE - ((px + 1) * 2);
         assert(0 <= pidx);
-        decltype(colors)::size_type pixel = (tileRow & (0x3 << pidx)) >> pidx;
-        auto
-            texx = px + (tblx * CHR_TILE_DIM),
-            texidx = texx + texy;
+        decltype(colors)::size_type texel = (tileRow & (0x3 << pidx)) >> pidx;
+        auto texidx = px + texOffset;
         assert(texidx < TextureDim * TextureDim);
-        texData.pixels[texidx] = palette.getColor(colors[pixel]);
+        data.pixels[texidx] = p.getColor(colors[texel]);
     }
 }

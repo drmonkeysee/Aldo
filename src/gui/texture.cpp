@@ -10,7 +10,6 @@
 #include "error.hpp"
 #include "viewstate.hpp"
 
-#include <array>
 #include <concepts>
 
 static_assert(std::same_as<Uint32, ImU32>,
@@ -52,7 +51,7 @@ aldo::PatternTable::PatternTable(SDL_Renderer* ren)
 
 void aldo::PatternTable
 ::draw(const aldo::et::word table[CHR_PAT_TILES][CHR_TILE_DIM],
-       const Palette& palette) const
+       const aldo::et::byte colors[CHR_PAL_SIZE], const Palette& p) const
 {
     auto data = tex.lock();
     for (auto tblRow = 0; tblRow < TableDim; ++tblRow) {
@@ -62,7 +61,7 @@ void aldo::PatternTable
                 auto rowOffset = (tblCol * CHR_TILE_DIM)
                                     + ((tileRow + (tblRow * CHR_TILE_DIM))
                                        * data.stride);
-                drawTableRow(tile[tileRow], rowOffset, palette, data);
+                drawTableRow(tile[tileRow], colors, rowOffset, p, data);
             }
         }
     }
@@ -94,19 +93,17 @@ aldo::texture::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 // MARK: - Private Interface
 //
 
-void aldo::PatternTable::drawTableRow(aldo::et::word tileRow, int texOffset,
-                                      const aldo::Palette& p,
-                                      const aldo::texture::TextureData& data)
+void
+aldo::PatternTable::drawTableRow(aldo::et::word pixels,
+                                 const aldo::et::byte colors[CHR_PAL_SIZE],
+                                 int texOffset, const aldo::Palette& p,
+                                 const aldo::texture::TextureData& data)
 {
-    // TODO: replace this with real palette lookup
-    static constexpr std::array<aldo::palette::sz, 4> colors = {
-        0x1d, 0x0, 0x10, 0x20,
-    };
-
     for (auto px = 0; px < CHR_TILE_DIM; ++px) {
         auto pidx = CHR_TILE_STRIDE - ((px + 1) * 2);
         assert(0 <= pidx);
-        decltype(colors)::size_type texel = (tileRow & (0x3 << pidx)) >> pidx;
+        auto texel = (pixels & (0x3 << pidx)) >> pidx;
+        assert(texel < CHR_PAL_SIZE);
         auto texidx = px + texOffset;
         assert(texidx < TextureDim * TextureDim);
         data.pixels[texidx] = p.getColor(colors[texel]);

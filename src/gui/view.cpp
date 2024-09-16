@@ -1297,8 +1297,10 @@ protected:
     {
         if (drawInterval.elapsed(vs.clock.cyclock)) {
             const auto* tables = &emu.snapshot().video->pattern_tables;
-            left.draw(tables->left, emu.palette());
-            right.draw(tables->right, emu.palette());
+            // TODO: make this selectable
+            const auto* colors = emu.snapshot().video->palettes.bg[0];
+            left.draw(tables->left, colors, emu.palette());
+            right.draw(tables->right, colors, emu.palette());
         }
 
         widget_group([this] {

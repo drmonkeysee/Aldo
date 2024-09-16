@@ -113,7 +113,8 @@ public:
     PatternTable(SDL_Renderer* ren);
 
     void draw(const et::word table[CHR_PAT_TILES][CHR_TILE_DIM],
-              const Palette& palette) const;
+              const et::byte colors[CHR_PAL_SIZE],
+              const Palette& p) const;
     void render() const noexcept { tex.render(2.0); }
 
 private:
@@ -123,7 +124,9 @@ private:
     static_assert(TextureDim == TableDim * CHR_TILE_DIM,
                   "Texture size does not match tile pixel count");
 
-    static void drawTableRow(et::word tileRow, int texOffset, const Palette& p,
+    static void drawTableRow(et::word pixels,
+                             const et::byte colors[CHR_PAL_SIZE],
+                             int texOffset, const Palette& p,
                              const texture::TextureData& data);
 
     Texture<SDL_TEXTUREACCESS_STREAMING> tex;

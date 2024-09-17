@@ -80,7 +80,7 @@ public:
     Texture& operator=(Texture&&) = delete;
     ~Texture() { SDL_DestroyTexture(tex); }
 
-    texture::TextureTarget asTarget(SDL_Renderer *ren) const noexcept
+    texture::TextureTarget asTarget(SDL_Renderer* ren) const noexcept
     requires (Access == SDL_TEXTUREACCESS_TARGET) { return {*ren, *tex}; }
 
     texture::TextureData lock() const noexcept

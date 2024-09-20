@@ -5,6 +5,8 @@
 //  Created by Brandon Stansbury on 4/10/22.
 //
 
+import Foundation
+
 enum AldoError: Error {
     private static let errCodeFormat = "%s (%d)"
 

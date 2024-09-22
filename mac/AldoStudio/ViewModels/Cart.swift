@@ -10,10 +10,10 @@ import Observation
 
 @Observable
 final class Cart {
-    let prgCache = BlockCache<[PrgLine]>()
     let chrCache = BlockCache<NSImage>()
     private(set) var file: URL?
     private(set) var info = CartInfo.empty()
+    private(set) var prg = ProgramBlocks.empty()
     @ObservationIgnored private(set) var currentError: AldoError?
     private var handle: CartHandle?
 
@@ -29,6 +29,7 @@ final class Cart {
         handle = h
         file = from
         info = await parseInfo(from, handle: h)
+        prg = await ProgramBlocks.loadBlocks(from: self)
         resetCaches()
         return true
     }
@@ -40,7 +41,7 @@ final class Cart {
 
     @MainActor
     func readPrgRom() async -> CStreamResult {
-        guard let fileName = info.fileName, let handle else { return noCart() }
+        guard let fileName = info.fileName, let handle else { return .noCart }
 
         return await readCStream { stream in
             try fileName.withCString { cartFile in
@@ -53,7 +54,7 @@ final class Cart {
 
     @MainActor
     func readChrBlock(at: Int, scale: Int) async -> CStreamResult {
-        guard let handle else { return noCart() }
+        guard let handle else { return .noCart }
 
         return await readCStream(binary: true) { stream in
             let bv = cart_chrblock(handle.unwrapped, at)
@@ -66,7 +67,7 @@ final class Cart {
 
     @MainActor
     func exportChrRom(scale: Int, folder: URL) async -> CStreamResult {
-        guard let name = info.cartName, let handle else { return noCart() }
+        guard let name = info.cartName, let handle else { return .noCart }
 
         return await readCStream { stream in
             let prefix = "\(folder.appendingPathComponent(name).path)-chr"
@@ -105,7 +106,7 @@ final class Cart {
 
     @MainActor
     private func readInfoText(cartName: String) async -> CStreamResult {
-        guard let handle else { return noCart() }
+        guard let handle else { return .noCart }
 
         return await readCStream {
             cart_write_info(handle.unwrapped, cartName, true, $0)
@@ -113,15 +114,13 @@ final class Cart {
     }
 
     private func resetCaches() {
-        prgCache.reset()
         chrCache.reset()
     }
 }
 
 struct CartInfo {
     static func empty() -> CartInfo {
-        .init(fileName: nil, cartName: nil, format: .none,
-              formatText: noCart())
+        .init(fileName: nil, cartName: nil, format: .none, formatText: .noCart)
     }
 
     let fileName: String?
@@ -170,6 +169,24 @@ enum BlockLoadStatus<T> {
     case pending
     case loaded(T)
     case failed
+}
+
+final class BlockCacheReal<T> {
+    var capacity: Int { items.count }
+    private var items: [BlockLoadStatus<T>]
+
+    init(capacity: Int) { items = .init(repeating: .pending, count: capacity) }
+
+    subscript(index: Int) -> BlockLoadStatus<T> {
+        get { items.indices.contains(index) ? items[index] : .pending }
+        set(newValue) {
+            if items.indices.contains(index) {
+                items[index] = newValue
+            }
+        }
+    }
+
+    func reset() { items = [] }
 }
 
 final class BlockCache<T> {
@@ -231,5 +248,3 @@ fileprivate final class CartHandle {
         cartRef = nil
     }
 }
-
-fileprivate func noCart() -> CStreamResult { .error(.ioError("No cart set")) }

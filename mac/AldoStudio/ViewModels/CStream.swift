@@ -8,6 +8,8 @@
 import Foundation
 
 enum CStreamResult {
+    static var noCart: Self { .error(.ioError("No cart set")) }
+
     case success(Data)
     case error(AldoError)
 }

@@ -11,19 +11,20 @@ struct CartPrgView: View {
     @Environment(Cart.self) var cart: Cart
 
     var body: some View {
-        ProgramView(blocks: ProgramBlocks(cart))
+        ProgramView(blocks: cart.prg)
     }
 }
 
 fileprivate struct ProgramView: View {
-    @ObservedObject var blocks: ProgramBlocks
+    var blocks: ProgramBlocks
 
     var body: some View {
+        let listing = blocks.currentListing
         HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .leading) {
                 if blocks.count > 0 {
                     BlockSelectionView(blocks: blocks)
-                    ProgramListingView()
+                    ProgramListingView(listing: listing)
                 } else {
                     prgLabel()
                         .padding(.top, 2)
@@ -36,13 +37,13 @@ fileprivate struct ProgramView: View {
             CartFocusView()
                 .frame(maxHeight: .infinity, alignment: .top)
                 .padding(5)
+                .environment(listing)
         }
-        .environmentObject(blocks.currentListing)
     }
 }
 
 fileprivate struct BlockSelectionView: View {
-    @ObservedObject var blocks: ProgramBlocks
+    @Bindable var blocks: ProgramBlocks
 
     var body: some View {
         HStack {
@@ -59,7 +60,7 @@ fileprivate struct BlockSelectionView: View {
 }
 
 fileprivate struct ProgramListingView: View {
-    @EnvironmentObject var listing: ProgramListing
+    @Bindable var listing: ProgramListing
 
     var body: some View {
         switch listing.status {

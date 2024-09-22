@@ -6,41 +6,54 @@
 //
 
 import Foundation
+import Observation
 
-final class ProgramBlocks: ObservableObject {
-    let cart: Cart
-    @Published var selectedBlock = 0
-    //private let store: PrgStore
+typealias ProgramStore = BlockCacheReal<[PrgLine]>
+typealias ProgramItem = BlockLoadStatus<[PrgLine]>
 
-    var count: Int { prgBlocks(cart) }
-    var currentListing: ProgramListing { .init(/*store, */index: selectedBlock) }
+@Observable
+final class ProgramBlocks {
+    static func empty() -> Self { .init(.init(capacity: 0), .noCart) }
 
-    init(_ cart: Cart) {
-        self.cart = cart
-        //store = .init(cart)
+    @MainActor
+    static func loadBlocks(from: Cart) async -> Self {
+        let count = from.info.format.prgBlocks
+        let store = ProgramStore(capacity: count)
+        for at in 0..<count {
+            store[at] = loadBlock(from: from, at: at)
+        }
+        let txt = await from.readPrgRom()
+        return .init(store, txt)
+    }
+
+    var selectedBlock = 0
+    private let prgText: CStreamResult
+    private let store: ProgramStore
+
+    var count: Int { store.capacity }
+    var currentListing: ProgramListing { .init(listing: store[selectedBlock]) }
+
+    fileprivate init(_ store: ProgramStore, _ txt: CStreamResult) {
+        self.store = store
+        prgText = txt
     }
 }
 
-final class ProgramListing: ObservableObject {
-    let index: Int
-    @Published var selectedLine: Int?
-    @Published private(set) var status = BlockLoadStatus<[PrgLine]>.pending
-    //private let store: PrgStore
+@Observable
+final class ProgramListing {
+    var selectedLine: Int?
+    private(set) var status = ProgramItem.pending
 
     var currentLine: PrgLine? {
-        /*if let selectedLine, let block = store.cache[index] {
+        if let selectedLine, case let .loaded(block) = status {
             return block[selectedLine]
-        }*/
+        }
         return nil
     }
 
-    fileprivate init(/*_ store: PrgStore, */index: Int) {
-        //self.store = store
-        self.index = index
+    fileprivate init(listing: ProgramItem?) {
+        status = listing ?? .pending
     }
-
-    /*@MainActor
-    func load() async { status = await store.fetch(at: index) }*/
 }
 
 enum PrgLine {
@@ -178,30 +191,6 @@ struct DataCells {
     let memory: Bool
 }
 
-fileprivate func prgBlocks(_ cart: Cart) -> Int { cart.info.format.prgBlocks }
-
-fileprivate actor PrgStore {
-    let cart: Cart
-    let cache: BlockCache<[PrgLine]>
-
-    init(_ cart: Cart) {
-        self.cart = cart
-        cache = cart.prgCache
-        cache.ensure(slots: prgBlocks(cart))
-    }
-
-    func fetch(at: Int) -> BlockLoadStatus<[PrgLine]> {
-        if let listing = cache[at] { return .loaded(listing) }
-
-        guard let prgblock = PrgLines(cart.getPrgBlock(at)) else {
-            return .failed
-        }
-        let prgListing = Array(prgblock)
-        cache[at] = prgListing
-        return .loaded(prgListing)
-    }
-}
-
 fileprivate struct PrgLines: Sequence, IteratorProtocol {
     let bv: blockview
     private var addr: UInt16
@@ -260,4 +249,12 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
         }
         return nil
     }
+}
+
+fileprivate func loadBlock(from: Cart, at: Int) -> ProgramItem {
+    guard let prgblock = PrgLines(from.getPrgBlock(at)) else {
+        return .failed
+    }
+    let prgListing = Array(prgblock)
+    return .loaded(prgListing)
 }

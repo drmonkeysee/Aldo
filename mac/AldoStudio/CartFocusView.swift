@@ -32,7 +32,7 @@ struct CartFocusView: View {
 fileprivate struct InstructionDefinitionView: View {
     static private let blank = "--"
 
-    @EnvironmentObject var listing: ProgramListing
+    @Environment(ProgramListing.self) var listing: ProgramListing
 
     var body: some View {
         let inst = currentInstruction

@@ -53,7 +53,7 @@ fileprivate struct BlockSelectionView: View {
             } label: {
                 prgLabel()
             }
-            CopyToClipboardView(fromStream: blocks.cart.readPrgRom)
+            //CopyToClipboardView(fromStream: blocks.cart.readPrgRom)
         }
     }
 }
@@ -78,7 +78,7 @@ fileprivate struct PendingPrgView: View {
 
     var body: some View {
         NoPrgView(reason: "Loading PRG Block...")
-            .task { await listing.load() }
+            //.task { await listing.load() }
     }
 }
 

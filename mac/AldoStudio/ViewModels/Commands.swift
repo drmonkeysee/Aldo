@@ -51,7 +51,7 @@ final class ChrExport: TimedFeedbackCommand {
         folderAvailable = false
         currentError = nil
         selectedFolder = to
-        let result = await cart.exportChrRom(scale: scale, folder: to)
+        let result = CStreamResult.error(.unknown) //await cart.exportChrRom(scale: scale, folder: to)
         switch result {
         case let .success(data):
             if let text = String(data: data, encoding: .utf8) {
@@ -87,8 +87,8 @@ class TimedFeedbackCommand: ObservableObject {
         successIconOpacity = 1.0
         DispatchQueue.main.asyncAfter(deadline: .now()
                                       + Self.transitionDuration) {
-            self.actionIconOpacity = 1.0
-            self.inProgress = false
+            /*self.actionIconOpacity = 1.0
+            self.inProgress = false*/
         }
     }
 }

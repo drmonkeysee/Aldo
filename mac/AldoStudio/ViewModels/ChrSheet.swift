@@ -9,16 +9,16 @@ import Cocoa
 
 final class ChrBlocks {
     let cart: Cart
-    private let store: ChrStore
+    //private let store: ChrStore
 
     var count: Int { chrBlocks(cart) }
 
     init(_ cart: Cart) {
         self.cart = cart
-        store = .init(cart)
+        //store = .init(cart)
     }
 
-    func sheet(at: Int) -> ChrSheet { .init(store, index: at) }
+    func sheet(at: Int) -> ChrSheet { .init(/*store, */index: at) }
 }
 
 final class ChrSheet: ObservableObject {
@@ -26,17 +26,17 @@ final class ChrSheet: ObservableObject {
 
     let index: Int
     @Published private(set) var status = BlockLoadStatus<NSImage>.pending
-    private let store: ChrStore
+    //private let store: ChrStore
 
-    fileprivate init(_ store: ChrStore, index: Int) {
-        self.store = store
+    fileprivate init(/*_ store: ChrStore, */index: Int) {
+        //self.store = store
         self.index = index
     }
 
-    @MainActor
+    /*@MainActor
     func load() async {
         status = await store.fetch(at: index, scale: Self.scale)
-    }
+    }*/
 }
 
 fileprivate func chrBlocks(_ cart: Cart) -> Int { cart.info.chrBlocks }
@@ -54,7 +54,7 @@ fileprivate actor ChrStore {
     func fetch(at: Int, scale: Int) async -> BlockLoadStatus<NSImage> {
         if let img = cache[at] { return .loaded(img) }
 
-        let result = await cart.readChrBlock(at: at, scale: scale)
+        let result = CStreamResult.error(.unknown) //await cart.readChrBlock(at: at, scale: scale)
         switch result {
         case let .success(data):
             let chrSheet = NSImage(data: data)

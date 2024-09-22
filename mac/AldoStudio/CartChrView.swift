@@ -113,7 +113,7 @@ fileprivate struct PendingChrView: View {
                        height: Constraints.sheetSize.h)
             Text("Loading CHR Block...")
         }
-        .task { await sheet.load() }
+        //.task { await sheet.load() }
     }
 }
 

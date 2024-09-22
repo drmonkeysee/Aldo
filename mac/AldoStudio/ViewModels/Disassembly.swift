@@ -10,14 +10,14 @@ import Foundation
 final class ProgramBlocks: ObservableObject {
     let cart: Cart
     @Published var selectedBlock = 0
-    private let store: PrgStore
+    //private let store: PrgStore
 
     var count: Int { prgBlocks(cart) }
-    var currentListing: ProgramListing { .init(store, index: selectedBlock) }
+    var currentListing: ProgramListing { .init(/*store, */index: selectedBlock) }
 
     init(_ cart: Cart) {
         self.cart = cart
-        store = .init(cart)
+        //store = .init(cart)
     }
 }
 
@@ -25,22 +25,22 @@ final class ProgramListing: ObservableObject {
     let index: Int
     @Published var selectedLine: Int?
     @Published private(set) var status = BlockLoadStatus<[PrgLine]>.pending
-    private let store: PrgStore
+    //private let store: PrgStore
 
     var currentLine: PrgLine? {
-        if let selectedLine, let block = store.cache[index] {
+        /*if let selectedLine, let block = store.cache[index] {
             return block[selectedLine]
-        }
+        }*/
         return nil
     }
 
-    fileprivate init(_ store: PrgStore, index: Int) {
-        self.store = store
+    fileprivate init(/*_ store: PrgStore, */index: Int) {
+        //self.store = store
         self.index = index
     }
 
-    @MainActor
-    func load() async { status = await store.fetch(at: index) }
+    /*@MainActor
+    func load() async { status = await store.fetch(at: index) }*/
 }
 
 enum PrgLine {

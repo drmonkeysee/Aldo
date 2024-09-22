@@ -30,8 +30,8 @@ struct CartInfoView: View {
                         .textSelection(.enabled)
                 }
                 switch cart.info {
-                case .raw, .iNes:
-                    CopyToClipboardView(fromStream: cart.readInfoText)
+                /*case .raw, .iNes:
+                    CopyToClipboardView(fromStream: cart.readInfoText)*/
                 default:
                     EmptyView()
                 }

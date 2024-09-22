@@ -72,13 +72,13 @@ fileprivate struct ChrBlocksView: View {
 
 fileprivate struct ChrSheetView: View {
     let ordinal: Int
-    var sheet: ChrSheet
+    let sheet: ChrItem
 
     var body: some View {
         VStack {
             Text("Block \(ordinal)")
                 .font(.headline)
-            switch sheet.status {
+            switch sheet {
             case .none:
                 NoChrView(reason: "No CHR Data Loaded")
             case let .loaded(img):

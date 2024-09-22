@@ -6,7 +6,6 @@
 //
 
 import Cocoa
-import Observation
 
 typealias ChrStore = BlockCacheReal<NSImage>
 typealias ChrItem = BlockLoadStatus<NSImage>
@@ -29,16 +28,9 @@ final class ChrBlocks {
 
     var count: Int { store.capacity }
 
-    func sheet(at: Int) -> ChrSheet { .init(sheet: store[at]) }
+    func sheet(at: Int) -> ChrItem { store[at] }
 
     fileprivate init(_ store: ChrStore) { self.store = store }
-}
-
-@Observable
-final class ChrSheet {
-    private(set) var status = ChrItem.none
-
-    fileprivate init(sheet: ChrItem) { status = sheet }
 }
 
 @MainActor

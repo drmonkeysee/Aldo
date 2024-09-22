@@ -11,14 +11,7 @@ struct CartPrgView: View {
     @Environment(Cart.self) var cart: Cart
 
     var body: some View {
-        ProgramView(blocks: cart.prg)
-    }
-}
-
-fileprivate struct ProgramView: View {
-    var blocks: ProgramBlocks
-
-    var body: some View {
+        let blocks = cart.prg
         let listing = blocks.currentListing
         HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .leading) {

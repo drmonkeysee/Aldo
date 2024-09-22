@@ -13,7 +13,7 @@ struct CartChrView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                if case .iNes = cart.info, cart.info.chrBlocks > 0 {
+                if case .iNes = cart.info.format, cart.info.format.chrBlocks > 0 {
                     chrLabel()
                     ChrExportView(cart)
                 } else {
@@ -21,8 +21,8 @@ struct CartChrView: View {
                         .padding(.top, 2)
                 }
             }
-            switch cart.info {
-            case .iNes where cart.info.chrBlocks > 0:
+            switch cart.info.format {
+            case .iNes where cart.info.format.chrBlocks > 0:
                 ChrBlocksView(blocks: ChrBlocks(cart))
                 PaletteView()
             case .iNes:

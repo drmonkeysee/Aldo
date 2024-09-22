@@ -178,7 +178,7 @@ struct DataCells {
     let memory: Bool
 }
 
-fileprivate func prgBlocks(_ cart: Cart) -> Int { cart.info.prgBlocks }
+fileprivate func prgBlocks(_ cart: Cart) -> Int { cart.info.format.prgBlocks }
 
 fileprivate actor PrgStore {
     let cart: Cart

@@ -13,14 +13,11 @@ final class Cart {
     let prgCache = BlockCache<[PrgLine]>()
     let chrCache = BlockCache<NSImage>()
     private(set) var file: URL?
-    private(set) var info = CartInfo.none
+    private(set) var info = CartInfo.empty()
     @ObservationIgnored private(set) var currentError: AldoError?
     private var handle: CartHandle?
 
-    var fileName: String? { file?.lastPathComponent }
-    var name: String? { file?.deletingPathExtension().lastPathComponent }
-    private var noCart: CStreamResult { .error(.ioError("No cart set")) }
-
+    // TODO: make whole class MainActor
     @MainActor
     func load(from: URL?) async -> Bool {
         currentError = nil
@@ -31,17 +28,9 @@ final class Cart {
         guard let h = loadCart(from) else { return false }
         handle = h
         file = from
-        info = h.cartInfo
+        info = await parseInfo(from, handle: h)
         resetCaches()
         return true
-    }
-
-    func readInfoText() async -> CStreamResult {
-        guard let handle else { return noCart }
-
-        return await readCStream {
-            cart_write_info(handle.unwrapped, name, true, $0)
-        }
     }
 
     func getPrgBlock(_ at: Int) -> blockview? {
@@ -49,20 +38,22 @@ final class Cart {
         return cart_prgblock(handle.unwrapped, at)
     }
 
+    @MainActor
     func readPrgRom() async -> CStreamResult {
-        guard let fileName, let handle else { return noCart }
+        guard let fileName = info.fileName, let handle else { return noCart() }
 
         return await readCStream { stream in
             try fileName.withCString { cartFile in
-                let err = dis_cart_prg(handle.unwrapped, name, false, true,
+                let err = dis_cart_prg(handle.unwrapped, info.cartName, false, true,
                                        stream)
                 if err < 0 { throw AldoError.wrapDisError(code: err) }
             }
         }
     }
 
+    @MainActor
     func readChrBlock(at: Int, scale: Int) async -> CStreamResult {
-        guard let handle else { return noCart }
+        guard let handle else { return noCart() }
 
         return await readCStream(binary: true) { stream in
             let bv = cart_chrblock(handle.unwrapped, at)
@@ -73,8 +64,9 @@ final class Cart {
         }
     }
 
+    @MainActor
     func exportChrRom(scale: Int, folder: URL) async -> CStreamResult {
-        guard let name, let handle else { return noCart }
+        guard let name = info.cartName, let handle else { return noCart() }
 
         return await readCStream { stream in
             let prefix = "\(folder.appendingPathComponent(name).path)-chr"
@@ -102,13 +94,43 @@ final class Cart {
         return nil
     }
 
+    @MainActor
+    private func parseInfo(_ filePath: URL,
+                           handle: CartHandle) async -> CartInfo {
+        let cartName = filePath.deletingPathExtension().lastPathComponent
+        return .init(fileName: filePath.lastPathComponent,
+                     cartName: cartName, format: handle.cartFormat,
+                     formatText: await readInfoText(cartName: cartName))
+    }
+
+    @MainActor
+    private func readInfoText(cartName: String) async -> CStreamResult {
+        guard let handle else { return noCart() }
+
+        return await readCStream {
+            cart_write_info(handle.unwrapped, cartName, true, $0)
+        }
+    }
+
     private func resetCaches() {
         prgCache.reset()
         chrCache.reset()
     }
 }
 
-enum CartInfo {
+struct CartInfo {
+    static func empty() -> CartInfo {
+        .init(fileName: nil, cartName: nil, format: .none,
+              formatText: noCart())
+    }
+
+    let fileName: String?
+    let cartName: String?
+    let format: CartFormat
+    let formatText: CStreamResult
+}
+
+enum CartFormat {
     case none
     case unknown
     case raw(String)
@@ -176,7 +198,7 @@ fileprivate final class CartHandle {
     // NOTE: init won't let a live instance ever have a nil reference
     var unwrapped: OpaquePointer { cartRef! }
 
-    var cartInfo: CartInfo {
+    var cartFormat: CartFormat {
         var info = cartinfo()
         cart_getinfo(cartRef, &info)
         switch info.format {
@@ -209,3 +231,5 @@ fileprivate final class CartHandle {
         cartRef = nil
     }
 }
+
+fileprivate func noCart() -> CStreamResult { .error(.ioError("No cart set")) }

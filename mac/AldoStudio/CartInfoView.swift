@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CartInfoView: View {
-    @Environment(Cart.self) var cart: Cart
+    let info: CartInfo
 
     var body: some View {
         VStack {
@@ -16,20 +16,20 @@ struct CartInfoView: View {
                 VStack(alignment: .trailing) {
                     CommonInfoView(section: .labels)
                         .textSelection(.enabled)
-                    FormatView(section: .labels, info: cart.info)
+                    FormatView(section: .labels, info: info)
                         .textSelection(.enabled)
                 }
                 VStack {
                     CommonInfoView(section: .separators)
-                    FormatView(section: .separators, info: cart.info)
+                    FormatView(section: .separators, info: info)
                 }
                 VStack(alignment: .leading) {
                     CommonInfoView(section: .values)
                         .textSelection(.enabled)
-                    FormatView(section: .values, info: cart.info)
+                    FormatView(section: .values, info: info)
                         .textSelection(.enabled)
                 }
-                switch cart.info {
+                switch info {
                 /*case .raw, .iNes:
                     CopyToClipboardView(fromStream: cart.readInfoText)*/
                 default:
@@ -59,11 +59,11 @@ fileprivate struct CommonInfoView: View {
         case .separators:
             FormatSeparatorsView(count: Self.labels.count)
         case .values:
-            Text(cart.fileName ?? "No rom")
+            Text(cart.info.fileName ?? "No rom")
                 .lineLimit(1)
                 .truncationMode(.middle)
-                .help(cart.fileName ?? "")
-            Text(cart.info.name)
+                .help(cart.info.fileName ?? "")
+            Text(cart.info.format.name)
         }
     }
 }
@@ -84,7 +84,7 @@ fileprivate struct FormatView: View {
     }
 
     private var labels: [String]? {
-        switch info {
+        switch info.format {
         case .raw:
             return RawView.labels
         case .iNes:
@@ -123,7 +123,7 @@ fileprivate struct FormatValuesView: View {
     let info: CartInfo
 
     var body: some View {
-        switch info {
+        switch info.format {
         case .raw:
             RawView()
         case .iNes(_, let hdr, let mirrorName):

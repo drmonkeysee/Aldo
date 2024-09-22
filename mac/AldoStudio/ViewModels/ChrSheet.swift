@@ -39,7 +39,7 @@ final class ChrSheet: ObservableObject {
     }*/
 }
 
-fileprivate func chrBlocks(_ cart: Cart) -> Int { cart.info.chrBlocks }
+fileprivate func chrBlocks(_ cart: Cart) -> Int { cart.info.format.chrBlocks }
 
 fileprivate actor ChrStore {
     let cart: Cart

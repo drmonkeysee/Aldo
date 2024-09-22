@@ -12,6 +12,7 @@ enum CStreamResult {
     case error(AldoError)
 }
 
+@MainActor
 func readCStream(binary: Bool = false,
                  operation: CStreamOp) async -> CStreamResult {
     let p = Pipe()

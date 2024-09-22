@@ -36,7 +36,7 @@ struct ContentView: View {
 
     private var appTitle: String {
         var title = bundleAppName() ?? "CFBundleFailure"
-        if let name = cart.name { title.append(": \(name)") }
+        if let name = cart.info.cartName { title.append(": \(name)") }
         return title
     }
 

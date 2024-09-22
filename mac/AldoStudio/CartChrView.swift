@@ -79,8 +79,8 @@ fileprivate struct ChrSheetView: View {
             Text("Block \(ordinal)")
                 .font(.headline)
             switch sheet.status {
-            case .pending:
-                PendingChrView(sheet: sheet)
+            case .none:
+                NoChrView(reason: "No CHR Data Loaded")
             case let .loaded(img):
                 Image(nsImage: img)
                     .interpolation(.none)
@@ -99,21 +99,6 @@ fileprivate struct ChrSheetView: View {
                 }
             }
         }
-    }
-}
-
-fileprivate struct PendingChrView: View {
-    let sheet: ChrSheet
-
-    var body: some View {
-        ZStack {
-            Color.cyan
-                .cornerRadius(Constraints.cornerRadius)
-                .frame(width: Constraints.sheetSize.w,
-                       height: Constraints.sheetSize.h)
-            Text("Loading CHR Block...")
-        }
-        //.task { await sheet.load() }
     }
 }
 

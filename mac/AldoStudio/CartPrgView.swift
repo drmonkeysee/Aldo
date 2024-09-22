@@ -57,22 +57,13 @@ fileprivate struct ProgramListingView: View {
 
     var body: some View {
         switch listing.status {
-        case .pending:
-            PendingPrgView(listing: listing)
+        case .none:
+            NoPrgView(reason: "No PRG Block Loaded")
         case let .loaded(prg):
             LoadedPrgView(prgLines: prg, selectedLine: $listing.selectedLine)
         case .failed:
             NoPrgView(reason: "PRG Block Not Available")
         }
-    }
-}
-
-fileprivate struct PendingPrgView: View {
-    let listing: ProgramListing
-
-    var body: some View {
-        NoPrgView(reason: "Loading PRG Block...")
-            //.task { await listing.load() }
     }
 }
 

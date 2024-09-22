@@ -41,7 +41,7 @@ final class ProgramBlocks {
 @Observable
 final class ProgramListing {
     var selectedLine: Int?
-    private(set) var status = ProgramItem.pending
+    private(set) var status = ProgramItem.none
 
     var currentLine: PrgLine? {
         if let selectedLine, case let .loaded(block) = status {
@@ -51,7 +51,7 @@ final class ProgramListing {
     }
 
     fileprivate init(listing: ProgramItem?) {
-        status = listing ?? .pending
+        status = listing ?? .none
     }
 }
 

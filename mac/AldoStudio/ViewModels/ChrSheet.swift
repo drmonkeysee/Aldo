@@ -36,7 +36,7 @@ final class ChrBlocks {
 
 @Observable
 final class ChrSheet {
-    private(set) var status = ChrItem.pending
+    private(set) var status = ChrItem.none
 
     fileprivate init(sheet: ChrItem) { status = sheet }
 }

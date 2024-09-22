@@ -10,7 +10,6 @@ import Observation
 
 @Observable
 final class Cart {
-    let chrCache = BlockCache<NSImage>()
     private(set) var file: URL?
     private(set) var info = CartInfo.empty()
     private(set) var prg = ProgramBlocks.empty()
@@ -32,7 +31,6 @@ final class Cart {
         info = await parseInfo(from, handle: h)
         prg = await ProgramBlocks.loadBlocks(from: self)
         chr = await ChrBlocks.loadBlocks(from: self)
-        resetCaches()
         return true
     }
 
@@ -114,10 +112,6 @@ final class Cart {
             cart_write_info(handle.unwrapped, cartName, true, $0)
         }
     }
-
-    private func resetCaches() {
-        chrCache.reset()
-    }
 }
 
 struct CartInfo {
@@ -168,7 +162,7 @@ enum CartFormat {
 }
 
 enum BlockLoadStatus<T> {
-    case pending
+    case none
     case loaded(T)
     case failed
 }
@@ -177,10 +171,10 @@ final class BlockCacheReal<T> {
     var capacity: Int { items.count }
     private var items: [BlockLoadStatus<T>]
 
-    init(capacity: Int) { items = .init(repeating: .pending, count: capacity) }
+    init(capacity: Int) { items = .init(repeating: .none, count: capacity) }
 
     subscript(index: Int) -> BlockLoadStatus<T> {
-        get { items.indices.contains(index) ? items[index] : .pending }
+        get { items.indices.contains(index) ? items[index] : .none }
         set(newValue) {
             if items.indices.contains(index) {
                 items[index] = newValue

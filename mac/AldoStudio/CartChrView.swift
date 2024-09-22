@@ -23,7 +23,7 @@ struct CartChrView: View {
             }
             switch cart.info.format {
             case .iNes where cart.info.format.chrBlocks > 0:
-                ChrBlocksView(blocks: ChrBlocks(cart))
+                ChrBlocksView(blocks: cart.chr)
                 PaletteView()
             case .iNes:
                 NoChrView(reason: "Cart uses CHR RAM")
@@ -45,8 +45,8 @@ fileprivate struct Constraints {
     static let groupboxPadding = 10.0
     static let outerWidth = sheetSize.w + groupboxPadding
     static let sheetPadding = 5.0
-    static let sheetSize = (w: 256.0 * .init(ChrSheet.scale),
-                            h: 128.0 * .init(ChrSheet.scale))
+    static let sheetSize = (w: 256.0 * .init(ChrBlocks.scale),
+                            h: 128.0 * .init(ChrBlocks.scale))
 }
 
 fileprivate struct ChrBlocksView: View {
@@ -56,7 +56,7 @@ fileprivate struct ChrBlocksView: View {
         ScrollView(.horizontal) {
             LazyHStack {
                 ForEach(0..<blocks.count, id: \.self) {
-                    ChrSheetView(sheet: blocks.sheet(at: $0))
+                    ChrSheetView(ordinal: $0, sheet: blocks.sheet(at: $0))
                 }
             }
             .padding(EdgeInsets(
@@ -72,11 +72,12 @@ fileprivate struct ChrBlocksView: View {
 }
 
 fileprivate struct ChrSheetView: View {
-    @ObservedObject var sheet: ChrSheet
+    let ordinal: Int
+    var sheet: ChrSheet
 
     var body: some View {
         VStack {
-            Text("Block \(sheet.index)")
+            Text("Block \(ordinal)")
                 .font(.caption)
             switch sheet.status {
             case .pending:

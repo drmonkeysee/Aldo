@@ -6,70 +6,55 @@
 //
 
 import Cocoa
+import Observation
+
+typealias ChrStore = BlockCacheReal<NSImage>
+typealias ChrItem = BlockLoadStatus<NSImage>
 
 final class ChrBlocks {
-    let cart: Cart
-    //private let store: ChrStore
-
-    var count: Int { chrBlocks(cart) }
-
-    init(_ cart: Cart) {
-        self.cart = cart
-        //store = .init(cart)
-    }
-
-    func sheet(at: Int) -> ChrSheet { .init(/*store, */index: at) }
-}
-
-final class ChrSheet: ObservableObject {
     static let scale = 2
 
-    let index: Int
-    @Published private(set) var status = BlockLoadStatus<NSImage>.pending
-    //private let store: ChrStore
+    static func empty() -> Self { .init(.init(capacity: 0)) }
 
-    fileprivate init(/*_ store: ChrStore, */index: Int) {
-        //self.store = store
-        self.index = index
+    @MainActor
+    static func loadBlocks(from: Cart) async -> Self {
+        let store = ChrStore(capacity: from.info.format.chrBlocks)
+        for at in 0..<store.capacity {
+            store[at] = await loadBlock(from: from, at: at, scale: scale)
+        }
+        return .init(store)
     }
 
-    /*@MainActor
-    func load() async {
-        status = await store.fetch(at: index, scale: Self.scale)
-    }*/
+    private let store: ChrStore
+
+    var count: Int { store.capacity }
+
+    func sheet(at: Int) -> ChrSheet { .init(sheet: store[at]) }
+
+    fileprivate init(_ store: ChrStore) { self.store = store }
 }
 
-fileprivate func chrBlocks(_ cart: Cart) -> Int { cart.info.format.chrBlocks }
+@Observable
+final class ChrSheet {
+    private(set) var status = ChrItem.pending
 
-fileprivate actor ChrStore {
-    let cart: Cart
-    let cache: BlockCache<NSImage>
+    fileprivate init(sheet: ChrItem) { status = sheet }
+}
 
-    init(_ cart: Cart) {
-        self.cart = cart
-        cache = cart.chrCache
-        cache.ensure(slots: chrBlocks(cart))
-    }
-
-    func fetch(at: Int, scale: Int) async -> BlockLoadStatus<NSImage> {
-        if let img = cache[at] { return .loaded(img) }
-
-        let result = CStreamResult.error(.unknown) //await cart.readChrBlock(at: at, scale: scale)
-        switch result {
-        case let .success(data):
-            let chrSheet = NSImage(data: data)
-            if let chrSheet, chrSheet.isValid {
-                cache[at] = chrSheet
-                return .loaded(chrSheet)
-            }
-            let reason = chrSheet == nil
-                            ? "Image init failed"
-                            : "Image data invalid"
-            aldoLog.debug("CHR Decode Failure: \(reason)")
-            return .failed
-        case let .error(err):
-            aldoLog.debug("CHR Read Failure: \(err.message)")
-            return .failed
-        }
+@MainActor
+fileprivate func loadBlock(from: Cart, at: Int, scale: Int) async -> ChrItem {
+    let result = await from.readChrBlock(at: at, scale: scale)
+    switch result {
+    case let .success(data):
+        let chrSheet = NSImage(data: data)
+        if let chrSheet, chrSheet.isValid { return .loaded(chrSheet) }
+        let reason = chrSheet == nil
+                        ? "Image init failed"
+                        : "Image data invalid"
+        aldoLog.debug("CHR Decode Failure: \(reason)")
+        return .failed
+    case let .error(err):
+        aldoLog.debug("CHR Read Failure: \(err.message)")
+        return .failed
     }
 }

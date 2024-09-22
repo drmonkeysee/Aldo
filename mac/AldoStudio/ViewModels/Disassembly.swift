@@ -17,9 +17,8 @@ final class ProgramBlocks {
 
     @MainActor
     static func loadBlocks(from: Cart) async -> Self {
-        let count = from.info.format.prgBlocks
-        let store = ProgramStore(capacity: count)
-        for at in 0..<count {
+        let store = ProgramStore(capacity: from.info.format.prgBlocks)
+        for at in 0..<store.capacity {
             store[at] = loadBlock(from: from, at: at)
         }
         let txt = await from.readPrgRom()

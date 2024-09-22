@@ -37,7 +37,7 @@ final class ClipboardCopy: TimedFeedbackCommand {
 final class ChrExport: TimedFeedbackCommand {
     let cart: Cart
     let scales = Array(Int(MinChrScale)...Int(MaxChrScale))
-    @Published var scale = ChrSheet.scale
+    @Published var scale = ChrBlocks.scale
     @Published var folderAvailable = false
     private(set) var selectedFolder: URL?
 

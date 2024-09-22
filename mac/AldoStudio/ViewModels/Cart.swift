@@ -14,6 +14,7 @@ final class Cart {
     private(set) var file: URL?
     private(set) var info = CartInfo.empty()
     private(set) var prg = ProgramBlocks.empty()
+    private(set) var chr = ChrBlocks.empty()
     @ObservationIgnored private(set) var currentError: AldoError?
     private var handle: CartHandle?
 
@@ -30,6 +31,7 @@ final class Cart {
         file = from
         info = await parseInfo(from, handle: h)
         prg = await ProgramBlocks.loadBlocks(from: self)
+        chr = await ChrBlocks.loadBlocks(from: self)
         resetCaches()
         return true
     }

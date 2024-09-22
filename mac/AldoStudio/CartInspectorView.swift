@@ -12,7 +12,7 @@ struct CartInspectorView: View {
         HStack(alignment: .top, spacing: 0) {
             CartPrgView()
             Divider()
-            //CartChrView()
+            CartChrView()
         }
     }
 }

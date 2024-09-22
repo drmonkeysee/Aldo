@@ -17,7 +17,6 @@ final class Cart {
     @ObservationIgnored private(set) var currentError: AldoError?
     private var handle: CartHandle?
 
-    // TODO: make whole class MainActor
     @MainActor
     func load(from: URL?) async -> Bool {
         currentError = nil

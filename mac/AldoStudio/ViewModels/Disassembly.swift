@@ -50,9 +50,7 @@ final class ProgramListing {
         return nil
     }
 
-    fileprivate init(listing: ProgramItem?) {
-        status = listing ?? .none
-    }
+    fileprivate init(listing: ProgramItem) { status = listing }
 }
 
 enum PrgLine {

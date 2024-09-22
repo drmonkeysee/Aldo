@@ -7,8 +7,8 @@
 
 import Cocoa
 
-typealias ChrStore = BlockCache<NSImage>
-typealias ChrItem = BlockLoadStatus<NSImage>
+typealias ChrSheet = BlockLoadStatus<NSImage>
+fileprivate typealias ChrStore = BlockCache<NSImage>
 
 final class ChrBlocks {
     static let scale = 2
@@ -28,13 +28,13 @@ final class ChrBlocks {
 
     var count: Int { store.capacity }
 
-    func sheet(at: Int) -> ChrItem { store[at] }
+    func sheet(at: Int) -> ChrSheet { store[at] }
 
     fileprivate init(_ store: ChrStore) { self.store = store }
 }
 
 @MainActor
-fileprivate func loadBlock(from: Cart, at: Int, scale: Int) async -> ChrItem {
+fileprivate func loadBlock(from: Cart, at: Int, scale: Int) async -> ChrSheet {
     let result = await from.readChrBlock(at: at, scale: scale)
     switch result {
     case let .success(data):

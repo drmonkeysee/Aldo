@@ -8,8 +8,8 @@
 import Foundation
 import Observation
 
-typealias ProgramStore = BlockCache<[PrgLine]>
-typealias ProgramItem = BlockLoadStatus<[PrgLine]>
+fileprivate typealias ProgramStore = BlockCache<[PrgLine]>
+fileprivate typealias ProgramItem = BlockLoadStatus<[PrgLine]>
 
 @Observable
 final class ProgramBlocks {

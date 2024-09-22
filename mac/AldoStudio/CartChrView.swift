@@ -72,7 +72,7 @@ fileprivate struct ChrBlocksView: View {
 
 fileprivate struct ChrSheetView: View {
     let ordinal: Int
-    let sheet: ChrItem
+    let sheet: ChrSheet
 
     var body: some View {
         VStack {

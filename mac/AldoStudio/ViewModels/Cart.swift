@@ -6,20 +6,23 @@
 //
 
 import Cocoa
+import Observation
 
-final class Cart: ObservableObject {
+@Observable
+final class Cart {
     let prgCache = BlockCache<[PrgLine]>()
     let chrCache = BlockCache<NSImage>()
-    @Published private(set) var file: URL?
-    @Published private(set) var info = CartInfo.none
-    private(set) var currentError: AldoError?
+    private(set) var file: URL?
+    private(set) var info = CartInfo.none
+    @ObservationIgnored private(set) var currentError: AldoError?
     private var handle: CartHandle?
 
     var fileName: String? { file?.lastPathComponent }
     var name: String? { file?.deletingPathExtension().lastPathComponent }
     private var noCart: CStreamResult { .error(.ioError("No cart set")) }
 
-    func load(from: URL?) -> Bool {
+    @MainActor
+    func load(from: URL?) async -> Bool {
         currentError = nil
         guard let from else {
             currentError = .ioError("No file selected")

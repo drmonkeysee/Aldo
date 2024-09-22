@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CartInfoView: View {
-    @EnvironmentObject var cart: Cart
+    @Environment(Cart.self) var cart: Cart
 
     var body: some View {
         VStack {
@@ -50,7 +50,7 @@ fileprivate struct CommonInfoView: View {
     private static let labels = ["File", "Format"]
 
     let section: InfoSection
-    @EnvironmentObject var cart: Cart
+    @Environment(Cart.self) var cart: Cart
 
     var body: some View {
         switch section {

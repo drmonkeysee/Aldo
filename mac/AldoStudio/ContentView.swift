@@ -10,12 +10,12 @@ import SwiftUI
 struct ContentView: View {
     private static let fileLabel = "Open ROM File"
 
+    @State private var cart = Cart()
     @State private var cartLoadFailed = false
-    @StateObject private var cart = Cart()
 
     var body: some View {
         CartInspectorView()
-            .environmentObject(cart)
+            .environment(cart)
             .navigationTitle(appTitle)
             .toolbar {
                 ToolbarItem {
@@ -44,7 +44,9 @@ struct ContentView: View {
         let panel = NSOpenPanel()
         panel.message = "Choose a ROM file"
         if panel.runModal() == .OK {
-            cartLoadFailed = !cart.load(from: panel.url)
+            Task(priority: .userInitiated) {
+                cartLoadFailed = await !cart.load(from: panel.url)
+            }
         }
     }
 }

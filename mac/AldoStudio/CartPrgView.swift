@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CartPrgView: View {
-    @EnvironmentObject var cart: Cart
+    @Environment(Cart.self) var cart: Cart
 
     var body: some View {
         ProgramView(blocks: ProgramBlocks(cart))

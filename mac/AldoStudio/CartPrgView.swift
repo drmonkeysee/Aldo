@@ -47,7 +47,7 @@ fileprivate struct BlockSelectionView: View {
             } label: {
                 prgLabel()
             }
-            //CopyToClipboardView(fromStream: blocks.cart.readPrgRom)
+            CopyToClipboardView(stream: blocks.prgStream)
         }
     }
 }

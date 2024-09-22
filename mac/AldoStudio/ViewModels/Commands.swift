@@ -8,23 +8,19 @@
 import AppKit
 
 final class ClipboardCopy: TimedFeedbackCommand {
-    let textStream: () async -> CStreamResult
+    let textStream: CStreamResult
 
-    init(fromStream: @escaping () async -> CStreamResult) {
-        textStream = fromStream
-    }
+    init(stream: CStreamResult) { textStream = stream }
 
-    @MainActor
-    func copy() async {
+    func copy() {
         inProgress = true
         currentError = nil
-        let result = await textStream()
-        switch result {
+        switch textStream {
         case let .success(data):
             if let text = String(data: data, encoding: .utf8) {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(text, forType: .string)
-                finishTransition()
+                showSuccess()
             } else {
                 setError(.unknown)
             }
@@ -57,7 +53,7 @@ final class ChrExport: TimedFeedbackCommand {
             if let text = String(data: data, encoding: .utf8) {
                 aldoLog.debug("CHR Export:\n\(text)")
                 folderAvailable = true
-                finishTransition()
+                showSuccess()
             } else {
                 setError(.unknown)
             }
@@ -76,19 +72,19 @@ class TimedFeedbackCommand: ObservableObject {
     @Published var failed = false
     fileprivate(set) var currentError: AldoError?
 
+    func complete() {
+        self.actionIconOpacity = 1.0
+        self.inProgress = false
+    }
+
     fileprivate func setError(_ err: AldoError) {
         currentError = err
         failed = true
         inProgress = false
     }
 
-    fileprivate func finishTransition() {
+    fileprivate func showSuccess() {
         actionIconOpacity = 0.0
         successIconOpacity = 1.0
-        DispatchQueue.main.asyncAfter(deadline: .now()
-                                      + Self.transitionDuration) {
-            /*self.actionIconOpacity = 1.0
-            self.inProgress = false*/
-        }
     }
 }

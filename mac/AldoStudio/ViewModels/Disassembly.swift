@@ -25,8 +25,8 @@ final class ProgramBlocks {
         return .init(store, txt)
     }
 
+    let prgStream: CStreamResult
     var selectedBlock = 0
-    private let prgText: CStreamResult
     private let store: ProgramStore
 
     var count: Int { store.capacity }
@@ -34,7 +34,7 @@ final class ProgramBlocks {
 
     fileprivate init(_ store: ProgramStore, _ txt: CStreamResult) {
         self.store = store
-        prgText = txt
+        prgStream = txt
     }
 }
 

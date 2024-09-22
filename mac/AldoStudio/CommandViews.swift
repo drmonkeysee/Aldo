@@ -10,14 +10,12 @@ import SwiftUI
 struct CopyToClipboardView: TimedFeedbackCommandView {
     @ObservedObject var command: ClipboardCopy
 
-    init(fromStream: @escaping () async -> CStreamResult) {
-        command = .init(fromStream: fromStream)
-    }
+    init(stream: CStreamResult) { command = .init(stream: stream) }
 
     var body: some View {
         ZStack {
             Button {
-                Task(priority: .userInitiated) { await command.copy() }
+                command.copy()
             } label: {
                 Image(systemName: "arrow.up.doc.on.clipboard")
                     .opacity(command.actionIconOpacity)
@@ -119,6 +117,10 @@ extension TimedFeedbackCommandView {
             withAnimation(
                 .easeOut(duration: halfDuration).delay(halfDuration)) {
                     command.successIconOpacity = 0.0
+            }
+            withAnimation(
+                .snappy.speed(3.0).delay(Command.transitionDuration)) {
+                    command.complete()
             }
         }
     }

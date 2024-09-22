@@ -29,9 +29,9 @@ struct CartInfoView: View {
                     FormatView(section: .values, info: info)
                         .textSelection(.enabled)
                 }
-                switch info {
-                /*case .raw, .iNes:
-                    CopyToClipboardView(fromStream: cart.readInfoText)*/
+                switch info.format {
+                case .raw, .iNes:
+                    CopyToClipboardView(stream: info.txtStream)
                 default:
                     EmptyView()
                 }

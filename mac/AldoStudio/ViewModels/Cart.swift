@@ -101,7 +101,7 @@ final class Cart {
         let cartName = filePath.deletingPathExtension().lastPathComponent
         return .init(fileName: filePath.lastPathComponent,
                      cartName: cartName, format: handle.cartFormat,
-                     formatText: await readInfoText(cartName: cartName))
+                     txtStream: await readInfoText(cartName: cartName))
     }
 
     @MainActor
@@ -116,13 +116,13 @@ final class Cart {
 
 struct CartInfo {
     static func empty() -> CartInfo {
-        .init(fileName: nil, cartName: nil, format: .none, formatText: .noCart)
+        .init(fileName: nil, cartName: nil, format: .none, txtStream: .noCart)
     }
 
     let fileName: String?
     let cartName: String?
     let format: CartFormat
-    let formatText: CStreamResult
+    let txtStream: CStreamResult
 }
 
 enum CartFormat {

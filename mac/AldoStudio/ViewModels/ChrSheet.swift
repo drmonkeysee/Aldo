@@ -7,7 +7,7 @@
 
 import Cocoa
 
-typealias ChrStore = BlockCacheReal<NSImage>
+typealias ChrStore = BlockCache<NSImage>
 typealias ChrItem = BlockLoadStatus<NSImage>
 
 final class ChrBlocks {

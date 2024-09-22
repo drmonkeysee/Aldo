@@ -8,7 +8,7 @@
 import Foundation
 import Observation
 
-typealias ProgramStore = BlockCacheReal<[PrgLine]>
+typealias ProgramStore = BlockCache<[PrgLine]>
 typealias ProgramItem = BlockLoadStatus<[PrgLine]>
 
 @Observable

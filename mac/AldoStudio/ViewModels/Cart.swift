@@ -45,8 +45,8 @@ final class Cart {
 
         return await readCStream { stream in
             try fileName.withCString { cartFile in
-                let err = dis_cart_prg(handle.unwrapped, info.cartName, false, true,
-                                       stream)
+                let err = dis_cart_prg(handle.unwrapped, info.cartName, false,
+                                       true, stream)
                 if err < 0 { throw AldoError.wrapDisError(code: err) }
             }
         }
@@ -167,7 +167,7 @@ enum BlockLoadStatus<T> {
     case failed
 }
 
-final class BlockCacheReal<T> {
+final class BlockCache<T> {
     var capacity: Int { items.count }
     private var items: [BlockLoadStatus<T>]
 
@@ -181,28 +181,6 @@ final class BlockCacheReal<T> {
             }
         }
     }
-
-    func reset() { items = [] }
-}
-
-final class BlockCache<T> {
-    private var items = [T?]()
-
-    subscript(index: Int) -> T? {
-        get { items.indices.contains(index) ? items[index] : nil }
-        set(newValue) {
-            if items.indices.contains(index), let val = newValue {
-                items[index] = val
-            }
-        }
-    }
-
-    func ensure(slots: Int) {
-        guard items.isEmpty else { return }
-        items = .init(repeating: nil, count: slots)
-    }
-
-    func reset() { items = [] }
 }
 
 fileprivate final class CartHandle {

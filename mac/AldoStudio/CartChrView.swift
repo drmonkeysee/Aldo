@@ -24,7 +24,6 @@ struct CartChrView: View {
             switch cart.info.format {
             case .iNes where cart.info.format.chrBlocks > 0:
                 ChrBlocksView(blocks: cart.chr)
-                PaletteView()
             case .iNes:
                 NoChrView(reason: "Cart uses CHR RAM")
             default:
@@ -53,8 +52,8 @@ fileprivate struct ChrBlocksView: View {
     let blocks: ChrBlocks
 
     var body: some View {
-        ScrollView(.horizontal) {
-            LazyHStack {
+        ScrollView(.vertical) {
+            LazyVStack {
                 ForEach(0..<blocks.count, id: \.self) {
                     ChrSheetView(ordinal: $0, sheet: blocks.sheet(at: $0))
                 }
@@ -65,7 +64,7 @@ fileprivate struct ChrBlocksView: View {
                 bottom: Constraints.sheetPadding,
                 trailing: Constraints.sheetPadding))
         }
-        .fixedSize(horizontal: false, vertical: true)
+        .fixedSize(horizontal: true, vertical: false)
         .frame(width: Constraints.outerWidth)
         .padding(.trailing, Constraints.sheetPadding)
     }
@@ -78,7 +77,7 @@ fileprivate struct ChrSheetView: View {
     var body: some View {
         VStack {
             Text("Block \(ordinal)")
-                .font(.caption)
+                .font(.headline)
             switch sheet.status {
             case .pending:
                 PendingChrView(sheet: sheet)
@@ -130,16 +129,5 @@ fileprivate struct NoChrView: View {
                                 - Constraints.groupboxPadding)
         }
         .padding(.trailing, Constraints.groupboxPadding)
-    }
-}
-
-fileprivate struct PaletteView: View {
-    var body: some View {
-        Text("Palette")
-            .frame(width: Constraints.sheetSize.w / 2,
-                   height: Constraints.sheetSize.h / 2)
-            .background(.cyan)
-            .cornerRadius(Constraints.cornerRadius)
-            .padding(.trailing, Constraints.sheetPadding)
     }
 }

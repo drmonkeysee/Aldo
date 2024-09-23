@@ -20,18 +20,19 @@ typealias PlatformRenderFunc =
 let aldoLog = Logger()
 
 final class MacPlatform: NSObject {
-    @objc static func setup(_ platform: PlatformHandle,
-                            withScaleFunc: @escaping PlatformRenderFunc)
-                            -> Bool {
-        platform.pointee = .init(appname: appName,
-                                 orgname: orgName,
-                                 is_hidpi: isHiDPI,
-                                 render_scale_factor: withScaleFunc,
-                                 open_file: openFile,
-                                 save_file: saveFile,
-                                 launch_studio: launchStudio,
-                                 free_buffer: freeBuffer)
-        return true
+    @objc static func setup(
+        _ platform: PlatformHandle,
+        withScaleFunc: @escaping PlatformRenderFunc) -> Bool {
+            platform.pointee = .init(
+                appname: appName,
+                orgname: orgName,
+                is_hidpi: isHiDPI,
+                render_scale_factor: withScaleFunc,
+                open_file: openFile,
+                save_file: saveFile,
+                launch_studio: launchStudio,
+                free_buffer: freeBuffer)
+            return true
     }
 }
 

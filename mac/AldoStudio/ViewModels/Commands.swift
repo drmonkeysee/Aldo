@@ -67,6 +67,9 @@ final class ChrExport: TimedFeedbackCommand {
     }
 }
 
+// NOTE: @Observable doesn't seem to support inheritance properly; the
+// observable properties from this base class aren't visible for @Bindable in
+// the child classes.
 class TimedFeedbackCommand: ObservableObject {
     static let transitionDuration = 2.0
 

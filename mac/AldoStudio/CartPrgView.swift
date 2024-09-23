@@ -36,6 +36,7 @@ struct CartPrgView: View {
 }
 
 fileprivate struct BlockSelectionView: View {
+    @Environment(Cart.self) var cart: Cart
     @Bindable var blocks: ProgramBlocks
 
     var body: some View {
@@ -47,7 +48,7 @@ fileprivate struct BlockSelectionView: View {
             } label: {
                 prgLabel()
             }
-            CopyToClipboardView(stream: blocks.prgStream)
+            CopyToClipboardView(fromStream: cart.readPrgRom)
         }
     }
 }

@@ -16,6 +16,7 @@ final class Cart {
     private(set) var chr = ChrBlocks.empty()
     @ObservationIgnored private(set) var currentError: AldoError?
     private var handle: CartHandle?
+    private var noCart: CStreamResult { .error(.ioError("No cart set")) }
 
     @MainActor
     func load(from: URL?) async -> Bool {
@@ -39,8 +40,17 @@ final class Cart {
     }
 
     @MainActor
+    func readInfoText() async -> CStreamResult {
+        guard let handle else { return noCart }
+
+        return await readCStream {
+            cart_write_info(handle.unwrapped, info.cartName, true, $0)
+        }
+    }
+
+    @MainActor
     func readPrgRom() async -> CStreamResult {
-        guard let fileName = info.fileName, let handle else { return .noCart }
+        guard let fileName = info.fileName, let handle else { return noCart }
 
         return await readCStream { stream in
             try fileName.withCString { cartFile in
@@ -53,7 +63,7 @@ final class Cart {
 
     @MainActor
     func readChrBlock(at: Int, scale: Int) async -> CStreamResult {
-        guard let handle else { return .noCart }
+        guard let handle else { return noCart }
 
         return await readCStream(binary: true) { stream in
             let bv = cart_chrblock(handle.unwrapped, at)
@@ -66,7 +76,7 @@ final class Cart {
 
     @MainActor
     func exportChrRom(scale: Int, folder: URL) async -> CStreamResult {
-        guard let name = info.cartName, let handle else { return .noCart }
+        guard let name = info.cartName, let handle else { return noCart }
 
         return await readCStream { stream in
             let prefix = "\(folder.appendingPathComponent(name).path)-chr"
@@ -97,31 +107,21 @@ final class Cart {
     @MainActor
     private func parseInfo(_ filePath: URL,
                            handle: CartHandle) async -> CartInfo {
-        let cartName = filePath.deletingPathExtension().lastPathComponent
-        return .init(fileName: filePath.lastPathComponent,
-                     cartName: cartName, format: handle.cartFormat,
-                     txtStream: await readInfoText(cartName: cartName))
-    }
-
-    @MainActor
-    private func readInfoText(cartName: String) async -> CStreamResult {
-        guard let handle else { return .noCart }
-
-        return await readCStream {
-            cart_write_info(handle.unwrapped, cartName, true, $0)
-        }
+        return .init(
+            fileName: filePath.lastPathComponent,
+            cartName: filePath.deletingPathExtension().lastPathComponent,
+            format: handle.cartFormat)
     }
 }
 
 struct CartInfo {
     static func empty() -> CartInfo {
-        .init(fileName: nil, cartName: nil, format: .none, txtStream: .noCart)
+        .init(fileName: nil, cartName: nil, format: .none)
     }
 
     let fileName: String?
     let cartName: String?
     let format: CartFormat
-    let txtStream: CStreamResult
 }
 
 enum CartFormat {

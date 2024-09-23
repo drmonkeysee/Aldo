@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct CartFocusView: View {
-    @Environment(Cart.self) var cart
-
     var body: some View {
         VStack(alignment: .leading) {
             GroupBox {
@@ -19,7 +17,7 @@ struct CartFocusView: View {
                     .font(.headline)
             }
             GroupBox {
-                CartInfoView(info: cart.info)
+                CartInfoView()
                     .frame(minWidth: 270, maxWidth: .infinity)
             } label: {
                 Label("Cart Format", systemImage: "scribble")

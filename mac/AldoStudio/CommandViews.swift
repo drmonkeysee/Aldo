@@ -10,12 +10,14 @@ import SwiftUI
 struct CopyToClipboardView: TimedFeedbackCommandView {
     @ObservedObject var command: ClipboardCopy
 
-    init(stream: CStreamResult) { command = .init(stream: stream) }
+    init(fromStream: @escaping () async -> CStreamResult) {
+        command = .init(fromStream: fromStream)
+    }
 
     var body: some View {
         ZStack {
             Button {
-                command.copy()
+                Task(priority: .userInitiated) { await command.copy() }
             } label: {
                 Image(systemName: "arrow.up.doc.on.clipboard")
                     .opacity(command.actionIconOpacity)

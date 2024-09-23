@@ -13,7 +13,7 @@ fileprivate typealias ProgramItem = BlockLoadStatus<[PrgLine]>
 
 @Observable
 final class ProgramBlocks {
-    static func empty() -> Self { .init(.init(capacity: 0), .noCart) }
+    static func empty() -> Self { .init(.init(capacity: 0)) }
 
     @MainActor
     static func loadBlocks(from: Cart) async -> Self {
@@ -21,21 +21,16 @@ final class ProgramBlocks {
         for at in 0..<store.capacity {
             store[at] = loadBlock(from: from, at: at)
         }
-        let txt = await from.readPrgRom()
-        return .init(store, txt)
+        return .init(store)
     }
 
-    let prgStream: CStreamResult
     var selectedBlock = 0
     private let store: ProgramStore
 
     var count: Int { store.capacity }
     var currentListing: ProgramListing { .init(listing: store[selectedBlock]) }
 
-    fileprivate init(_ store: ProgramStore, _ txt: CStreamResult) {
-        self.store = store
-        prgStream = txt
-    }
+    fileprivate init(_ store: ProgramStore) { self.store = store }
 }
 
 @Observable

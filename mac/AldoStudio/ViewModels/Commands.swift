@@ -8,14 +8,18 @@
 import AppKit
 
 final class ClipboardCopy: TimedFeedbackCommand {
-    let textStream: CStreamResult
+    let textStream: () async -> CStreamResult
 
-    init(stream: CStreamResult) { textStream = stream }
+    init(fromStream: @escaping () async -> CStreamResult) {
+        textStream = fromStream
+    }
 
-    func copy() {
+    @MainActor
+    func copy() async {
         inProgress = true
         currentError = nil
-        switch textStream {
+        let result = await textStream()
+        switch result {
         case let .success(data):
             if let text = String(data: data, encoding: .utf8) {
                 NSPasteboard.general.clearContents()

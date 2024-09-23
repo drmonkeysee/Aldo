@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CartInfoView: View {
-    let info: CartInfo
+    @Environment(Cart.self) var cart: Cart
 
     var body: some View {
         VStack {
@@ -16,22 +16,22 @@ struct CartInfoView: View {
                 VStack(alignment: .trailing) {
                     CommonInfoView(section: .labels)
                         .textSelection(.enabled)
-                    FormatView(section: .labels, info: info)
+                    FormatView(section: .labels, info: cart.info)
                         .textSelection(.enabled)
                 }
                 VStack {
                     CommonInfoView(section: .separators)
-                    FormatView(section: .separators, info: info)
+                    FormatView(section: .separators, info: cart.info)
                 }
                 VStack(alignment: .leading) {
                     CommonInfoView(section: .values)
                         .textSelection(.enabled)
-                    FormatView(section: .values, info: info)
+                    FormatView(section: .values, info: cart.info)
                         .textSelection(.enabled)
                 }
-                switch info.format {
+                switch cart.info.format {
                 case .raw, .iNes:
-                    CopyToClipboardView(stream: info.txtStream)
+                    CopyToClipboardView(fromStream: cart.readInfoText)
                 default:
                     EmptyView()
                 }

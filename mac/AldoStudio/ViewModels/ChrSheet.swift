@@ -24,9 +24,8 @@ final class ChrBlocks {
         return .init(store)
     }
 
-    private let store: ChrStore
-
     var count: Int { store.capacity }
+    private let store: ChrStore
 
     func sheet(at: Int) -> ChrSheet { store[at] }
 

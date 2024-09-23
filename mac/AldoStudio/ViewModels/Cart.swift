@@ -183,8 +183,6 @@ final class BlockCache<T> {
 }
 
 fileprivate final class CartHandle {
-    private var cartRef: OpaquePointer?
-
     // NOTE: init won't let a live instance ever have a nil reference
     var unwrapped: OpaquePointer { cartRef! }
 
@@ -202,6 +200,8 @@ fileprivate final class CartHandle {
             return .unknown
         }
     }
+
+    private var cartRef: OpaquePointer?
 
     init(_ fromFile: URL) throws {
         errno = 0

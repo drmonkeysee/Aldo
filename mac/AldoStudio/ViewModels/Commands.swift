@@ -8,7 +8,7 @@
 import AppKit
 
 final class ClipboardCopy: TimedFeedbackCommand {
-    let textStream: () async -> CStreamResult
+    private let textStream: () async -> CStreamResult
 
     init(fromStream: @escaping () async -> CStreamResult) {
         textStream = fromStream

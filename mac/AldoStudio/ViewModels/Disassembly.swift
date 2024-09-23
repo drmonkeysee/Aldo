@@ -25,10 +25,9 @@ final class ProgramBlocks {
     }
 
     var selectedBlock = 0
-    private let store: ProgramStore
-
     var count: Int { store.capacity }
     var currentListing: ProgramListing { .init(listing: store[selectedBlock]) }
+    private let store: ProgramStore
 
     fileprivate init(_ store: ProgramStore) { self.store = store }
 }
@@ -70,8 +69,6 @@ enum PrgLine {
 }
 
 struct Instruction {
-    private static let errStr = "ERR"
-
     static func parse(_ instData: dis_instruction) -> Self {
         withUnsafePointer(to: instData) { p in
                 .init(addressMode: .init(cString: dis_inst_addrmode(p)),
@@ -95,6 +92,8 @@ struct Instruction {
                                    memory: p.pointee.d.datacells.m))
         }
     }
+
+    private static let errStr = "ERR"
 
     private static func getBytes(_ p: CInstPtr) -> [UInt8] {
         (0..<p.pointee.bv.size).map { p.pointee.bv.mem[$0] }

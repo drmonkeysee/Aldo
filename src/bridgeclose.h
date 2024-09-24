@@ -18,3 +18,5 @@
 #undef br_ownresult
 #undef br_checkerror
 #undef br_libexport
+
+#undef br_pcallc

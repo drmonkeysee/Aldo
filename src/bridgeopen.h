@@ -5,6 +5,14 @@
 //  Created by Brandon Stansbury on 10/14/22.
 //
 
+#ifdef __APPLE__
+// NOTE: Swift 6 calling convention for main UI thread platform calls;
+// [[...]] syntax not supported for swift_attr.
+#define br_pcallc __attribute__((swift_attr("@MainActor")))
+#else
+#define br_pcallc
+#endif
+
 // NOTE: open block for c/c++ bridge headers
 #ifdef __cplusplus
 #define br_libexport [[gnu::visibility("default")]]

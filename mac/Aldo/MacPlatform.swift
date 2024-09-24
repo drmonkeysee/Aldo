@@ -28,8 +28,8 @@ final class MacPlatform: NSObject {
                 orgname: orgName,
                 is_hidpi: isHiDPI,
                 render_scale_factor: withScaleFunc,
-                open_file: openFile,
-                save_file: saveFile,
+                open_file: { openFile(title: $0, filter: $1) },
+                save_file: { saveFile(title: $0, suggestedName: $1) },
                 launch_studio: launchStudio,
                 free_buffer: freeBuffer)
             return true
@@ -86,6 +86,7 @@ fileprivate func isHiDPI() -> Bool {
     return hidpi
 }
 
+@MainActor
 fileprivate func openFile(title: CString?, filter: CStringArray?) -> CBuffer? {
     let panel = NSOpenPanel()
     if let title {
@@ -101,6 +102,7 @@ fileprivate func openFile(title: CString?, filter: CStringArray?) -> CBuffer? {
     return urlToCBuffer(path)
 }
 
+@MainActor
 fileprivate func saveFile(title: CString?,
                           suggestedName: CString?) -> CBuffer? {
     let panel = NSSavePanel()

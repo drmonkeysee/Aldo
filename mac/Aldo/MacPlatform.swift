@@ -128,7 +128,9 @@ fileprivate func launchStudio() {
             forAuxiliaryExecutable: "AldoStudio.app") else {
         let msg = "Unable to find Aldo Studio app bundle"
         aldoLog.error("Studio URL Error: \(msg)")
-        let _ = aldoAlert(title: openStudioErrorTitle, message: msg)
+        Task { @MainActor in
+            let _ = aldoAlert(title: openStudioErrorTitle, message: msg)
+        }
         return
     }
     aldoLog.debug("Studio bundle located at \(studioUrl)")
@@ -151,6 +153,7 @@ fileprivate func freeBuffer(_ buffer: CBuffer?) { buffer?.deallocate() }
 // MARK: - Helpers
 //
 
+@MainActor
 fileprivate func aldoAlert(title: String, message: String) -> Bool {
     let modal = NSAlert()
     modal.messageText = title

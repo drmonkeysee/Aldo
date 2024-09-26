@@ -28,7 +28,7 @@ final class Cart {
         guard let h = loadCart(from) else { return false }
         handle = h
         file = from
-        info = await parseInfo(from, handle: h)
+        info = parseInfo(from, handle: h)
         prg = await ProgramBlocks.loadBlocks(from: self)
         chr = await ChrBlocks.loadBlocks(from: self)
         return true
@@ -104,9 +104,7 @@ final class Cart {
         return nil
     }
 
-    @MainActor
-    private func parseInfo(_ filePath: URL,
-                           handle: CartHandle) async -> CartInfo {
+    private func parseInfo(_ filePath: URL, handle: CartHandle) -> CartInfo {
         return .init(
             fileName: filePath.lastPathComponent,
             cartName: filePath.deletingPathExtension().lastPathComponent,

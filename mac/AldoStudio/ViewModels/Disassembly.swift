@@ -9,7 +9,7 @@ import Foundation
 import Observation
 
 fileprivate typealias ProgramStore = BlockCache<[PrgLine]>
-fileprivate typealias ProgramItem = BlockLoadStatus<[PrgLine]>
+fileprivate typealias ProgramBlock = BlockLoadStatus<[PrgLine]>
 
 @Observable
 final class ProgramBlocks {
@@ -35,7 +35,7 @@ final class ProgramBlocks {
 @Observable
 final class ProgramListing {
     var selectedLine: Int?
-    private(set) var status = ProgramItem.none
+    private(set) var status = ProgramBlock.none
 
     var currentLine: PrgLine? {
         if let selectedLine, case let .loaded(block) = status {
@@ -44,7 +44,7 @@ final class ProgramListing {
         return nil
     }
 
-    fileprivate init(listing: ProgramItem) { status = listing }
+    fileprivate init(listing: ProgramBlock) { status = listing }
 }
 
 enum PrgLine {
@@ -242,7 +242,7 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
     }
 }
 
-fileprivate func loadBlock(from: Cart, at: Int) -> ProgramItem {
+fileprivate func loadBlock(from: Cart, at: Int) -> ProgramBlock {
     guard let prgblock = PrgLines(from.getPrgBlock(at)) else {
         return .failed
     }

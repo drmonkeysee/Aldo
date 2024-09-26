@@ -89,15 +89,11 @@ fileprivate func isHiDPI() -> Bool {
 @MainActor
 fileprivate func openFile(title: CString?, filter: CStringArray?) -> CBuffer? {
     let panel = NSOpenPanel()
-    if let title {
-        panel.message = .init(cString: title)
-    }
+    if let title { panel.message = .init(cString: title) }
     let fileFilter = OpenFileFilter(filter)
     // NOTE: empty filter causes an ugly disable->enable flash of all files in
     // the dialog so only assign delegate if there's an actual filter.
-    if !fileFilter.isEmpty {
-        panel.delegate = fileFilter
-    }
+    if !fileFilter.isEmpty { panel.delegate = fileFilter }
     guard panel.runModal() == .OK, let path = panel.url else { return nil }
     return urlToCBuffer(path)
 }
@@ -106,9 +102,7 @@ fileprivate func openFile(title: CString?, filter: CStringArray?) -> CBuffer? {
 fileprivate func saveFile(title: CString?,
                           suggestedName: CString?) -> CBuffer? {
     let panel = NSSavePanel()
-    if let title {
-        panel.title = .init(cString: title)
-    }
+    if let title { panel.title = .init(cString: title) }
     if let suggestedName {
         panel.nameFieldStringValue = .init(cString: suggestedName)
         if let url = URL(string: panel.nameFieldStringValue),

@@ -56,10 +56,11 @@ struct viewstate {
     struct runclock {
         struct cycleclock cyclock;
         double tickleft_ms;
+        int oldrate;
+        enum scale_selection scale;
     } clock;
-    enum scale_selection scale;
     enum ram_selection ramselect;
-    int oldrate, ramsheet, total_ramsheets;
+    int ramsheet, total_ramsheets;
     bool running;
 };
 
@@ -131,30 +132,27 @@ static int drawstats(const struct view *v, int cursor_y,
     // NOTE: update timing metrics on a readable interval
     static const double refresh_interval_ms = 250;
     static double display_tickleft, display_ticktime, refreshdt;
-    if ((refreshdt += vs->clock.cyclock.ticktime_ms) >= refresh_interval_ms) {
+
+    const struct cycleclock *cyclock = &vs->clock.cyclock;
+    if ((refreshdt += cyclock->ticktime_ms) >= refresh_interval_ms) {
         display_tickleft = vs->clock.tickleft_ms;
-        display_ticktime = vs->clock.cyclock.ticktime_ms;
+        display_ticktime = cyclock->ticktime_ms;
         refreshdt = 0;
     }
 
     mvwprintw(v->content, cursor_y++, 0, "Display Hz: %d (%.2f)", DisplayHz,
-              (double)vs->clock.cyclock.ticks / vs->clock.cyclock.runtime);
+              (double)cyclock->ticks / cyclock->runtime);
     mvwprintw(v->content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_ticktime, display_tickleft);
-    mvwprintw(v->content, cursor_y++, 0, "Ticks: %" PRIu64,
-              vs->clock.cyclock.ticks);
-    mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f",
-              vs->clock.cyclock.runtime);
-    mvwprintw(v->content, cursor_y++, 0, "Emutime: %.3f",
-              vs->clock.cyclock.emutime);
-    mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64,
-              vs->clock.cyclock.frames);
-    mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64,
-              vs->clock.cyclock.cycles);
+    mvwprintw(v->content, cursor_y++, 0, "Ticks: %" PRIu64, cyclock->ticks);
+    mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f", cyclock->runtime);
+    mvwprintw(v->content, cursor_y++, 0, "Emutime: %.3f", cyclock->emutime);
+    mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64, cyclock->frames);
+    mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64, cyclock->cycles);
     mvwprintw(v->content, cursor_y++, 0, "%s: %d",
-              vs->scale == SCL_CYCLE
+              vs->clock.scale == SCL_CYCLE
                 ? "Cycles per Second"
-                : "Frames per Second", vs->clock.cyclock.rate);
+                : "Frames per Second", cyclock->rate);
     mvwprintw(v->content, cursor_y++, 0, "BCD Supported: %s",
               args->bcdsupport ? "Yes" : "No");
     return cursor_y;
@@ -815,7 +813,7 @@ static void applyrate(int *spd, int adjustment, int min, int max)
 static void adjustrate(struct viewstate *vs, int adjustment)
 {
     int min, max;
-    if (vs->scale == SCL_CYCLE) {
+    if (vs->clock.scale == SCL_CYCLE) {
         min = MinCps;
         max = MaxCps;
     } else {
@@ -825,13 +823,13 @@ static void adjustrate(struct viewstate *vs, int adjustment)
     applyrate(&vs->clock.cyclock.rate, adjustment, min, max);
 }
 
-static void selectrate(struct viewstate *vs)
+static void selectrate(struct runclock *clock)
 {
-    int prev = vs->oldrate;
-    vs->oldrate = vs->clock.cyclock.rate;
-    vs->clock.cyclock.rate = prev;
-    vs->scale = !vs->scale;
-    vs->clock.cyclock.rate_factor = vs->scale == SCL_CYCLE
+    int prev = clock->oldrate;
+    clock->oldrate = clock->cyclock.rate;
+    clock->cyclock.rate = prev;
+    clock->scale = !clock->scale;
+    clock->cyclock.rate_factor = clock->scale == SCL_CYCLE
                                     ? nes_cycle_factor()
                                     : nes_frame_factor();
 }
@@ -863,7 +861,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 'c':
-        selectrate(vs);
+        selectrate(&vs->clock);
         break;
     case 'f':
         if (vs->ramselect != RSEL_PPU) {
@@ -948,8 +946,10 @@ int ui_curses_loop(struct emulator *emu)
     static const int sheet_size = RamPageSize * 2;
 
     struct viewstate state = {
-        .clock.cyclock = {.rate = 10, .rate_factor = nes_cycle_factor()},
-        .oldrate = MinFps,
+        .clock = {
+            .cyclock = {.rate = 10, .rate_factor = nes_cycle_factor()},
+            .oldrate = MinFps,
+        },
         .running = true,
         .total_ramsheets = (int)nes_ram_size(emu->console) / sheet_size,
     };

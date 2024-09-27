@@ -94,6 +94,11 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
             }
         }
         break;
+    case SDLK_c:
+        if (is_free_key(ev)) {
+            SDL_Log("Adjust clock scale");
+        }
+        break;
     case SDLK_d:
         if (is_menu_command(ev)) {
             vs.showDemo = !vs.showDemo;

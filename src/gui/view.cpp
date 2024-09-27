@@ -320,13 +320,18 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
         decKey = "-";
         val = 1;
     }
-    DisabledIf dif = vs.clock.cyclock.rate == MaxCps;
-    if (ImGui::MenuItem(incLabel.c_str(), incKey)) {
-        vs.clock.adjustCycleRate(val);
+    {
+        DisabledIf dif = vs.clock.cyclock.rate == MaxCps;
+        if (ImGui::MenuItem(incLabel.c_str(), incKey)) {
+            vs.clock.adjustCycleRate(val);
+        }
+        dif = vs.clock.cyclock.rate == MinCps;
+        if (ImGui::MenuItem(decLabel.c_str(), decKey)) {
+            vs.clock.adjustCycleRate(-val);
+        }
     }
-    dif = vs.clock.cyclock.rate == MinCps;
-    if (ImGui::MenuItem(decLabel.c_str(), decKey)) {
-        vs.clock.adjustCycleRate(-val);
+    if (ImGui::MenuItem("Clock Scale", "c")) {
+        SDL_Log("Adjust clock scale");
     }
 }
 
@@ -1645,6 +1650,19 @@ private:
         ImGui::SetNextItemWidth(40);
         ImGui::DragInt("##cyclesPerSecond", &vs.clock.cyclock.rate, 1, MinCps,
                        MaxCps, "%d", ImGuiSliderFlags_AlwaysClamp);
+
+        auto scale = CYCS_CYCLE;
+        if (ImGui::RadioButton("Cycles", scale == CYCS_CYCLE)
+            && scale != CYCS_CYCLE) {
+            scale = CYCS_CYCLE;
+            SDL_Log("Adjust clock scale");
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Frames", scale == CYCS_FRAME)
+            && scale != CYCS_FRAME) {
+            scale = CYCS_FRAME;
+            SDL_Log("Adjust clock scale");
+        }
     }
 
     void renderRunControls() const
@@ -1656,7 +1674,6 @@ private:
         };
 
         auto mode = emu.runMode();
-        ImGui::TextUnformatted("Mode");
         if (ImGui::RadioButton("Cycle", mode == CSGM_CYCLE)
             && mode != CSGM_CYCLE) {
             vs.commands.emplace(aldo::Command::mode, CSGM_CYCLE);
@@ -1671,7 +1688,6 @@ private:
             vs.commands.emplace(aldo::Command::mode, CSGM_RUN);
         }
 
-        ImGui::TextUnformatted("Signal");
         auto
             irq = emu.probe(CSGI_IRQ),
             nmi = emu.probe(CSGI_NMI),

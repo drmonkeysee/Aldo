@@ -35,7 +35,7 @@ struct nesmapper {
     busdisconn *vbus_disconnect;
     mapper_rom *chrrom;
     // Optional Interface
-    void (*snapshot)(const struct mapper *, struct snapshot *);
+    void (*snapshot)(struct mapper *, struct snapshot *);
 };
 
 // NOTE: if create functions return non-zero error code, *m is unmodified

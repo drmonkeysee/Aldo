@@ -22,7 +22,7 @@ struct raw_mapper {
 struct ines_mapper {
     struct nesmapper vtable;
     uint8_t *prg, *chr, *wram, id;
-    bool chrram;
+    bool chrram, ptstale;
 };
 
 struct ines_000_mapper {
@@ -205,7 +205,7 @@ static bool ines_000_vread(void *restrict ctx, uint16_t addr,
     // NOTE: addr=[$0000-$1FFF]
     assert(addr < MEMBLOCK_8KB);
 
-    mem_load(d, ctx, addr, ADDRMASK_8KB);
+    mem_load(d, ((const struct ines_mapper *)ctx)->chr, addr, ADDRMASK_8KB);
     return true;
 }
 
@@ -214,7 +214,9 @@ static bool ines_000_vwrite(void *ctx, uint16_t addr, uint8_t d)
     // NOTE: addr=[$0000-$1FFF]
     assert(addr < MEMBLOCK_8KB);
 
-    ((uint8_t *)ctx)[addr & ADDRMASK_8KB] = d;
+    struct ines_mapper *m = ctx;
+    m->chr[addr & ADDRMASK_8KB] = d;
+    m->ptstale = true;
     return true;
 }
 
@@ -241,24 +243,28 @@ static bool ines_000_vbus_connect(struct mapper *self, bus *b)
     return bus_set(b, 0, (struct busdevice){
         .read = ines_000_vread,
         .write = m->chrram ? ines_000_vwrite : NULL,
-        .ctx = m->chr,
+        .ctx = m,
     });
 }
 
-static void ines_000_snapshot(const struct mapper *self, struct snapshot *snp)
+static void ines_000_snapshot(struct mapper *self, struct snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);
     assert(snp->video != NULL);
 
+    struct ines_mapper *m = (struct ines_mapper *)self;
+    if (!m->ptstale) return;
+
     struct blockview bv = {
-        .mem = ((struct ines_mapper *)self)->chr,
+        .mem = m->chr,
         .size = MEMBLOCK_4KB,
     };
     fill_pattern_table(CHR_PAT_TILES, snp->video->pattern_tables.left, &bv);
     bv.mem += bv.size;
     ++bv.ord;
     fill_pattern_table(CHR_PAT_TILES, snp->video->pattern_tables.right, &bv);
+    m->ptstale = false;
 }
 
 //
@@ -328,6 +334,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     if (header->chr_blocks > 0) {
         self->vtable.chrrom = ines_chrrom;
     }
+    self->ptstale = true;
     self->id = header->mapper_id;
 
     int err;

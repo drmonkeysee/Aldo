@@ -40,11 +40,6 @@ static const int
     DisplayHz = 60, RamColWidth = 3, RamDim = 16,
     RamPageSize = RamDim * RamDim;
 
-enum scale_selection {
-    SCL_CYCLE,
-    SCL_FRAME,
-};
-
 enum ram_selection {
     RSEL_RAM,
     RSEL_VRAM,
@@ -57,7 +52,7 @@ struct viewstate {
         struct cycleclock cyclock;
         double tickleft_ms;
         int oldrate;
-        enum scale_selection scale;
+        enum cyclkscale scale;
     } clock;
     enum ram_selection ramselect;
     int ramsheet, total_ramsheets;
@@ -150,7 +145,7 @@ static int drawstats(const struct view *v, int cursor_y,
     mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64, cyclock->frames);
     mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64, cyclock->cycles);
     mvwprintw(v->content, cursor_y++, 0, "%s: %d",
-              vs->clock.scale == SCL_CYCLE
+              vs->clock.scale == CYCS_CYCLE
                 ? "Cycles per Second"
                 : "Frames per Second", cyclock->rate);
     mvwprintw(v->content, cursor_y++, 0, "BCD Supported: %s",
@@ -813,7 +808,7 @@ static void applyrate(int *spd, int adjustment, int min, int max)
 static void adjustrate(struct viewstate *vs, int adjustment)
 {
     int min, max;
-    if (vs->clock.scale == SCL_CYCLE) {
+    if (vs->clock.scale == CYCS_CYCLE) {
         min = MinCps;
         max = MaxCps;
     } else {
@@ -829,7 +824,7 @@ static void selectrate(struct runclock *clock)
     clock->oldrate = clock->cyclock.rate;
     clock->cyclock.rate = prev;
     clock->scale = !clock->scale;
-    clock->cyclock.rate_factor = clock->scale == SCL_CYCLE
+    clock->cyclock.rate_factor = clock->scale == CYCS_CYCLE
                                     ? nes_cycle_factor()
                                     : nes_frame_factor();
 }

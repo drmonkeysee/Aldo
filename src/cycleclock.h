@@ -12,6 +12,11 @@
 #include <stdint.h>
 #include <time.h>
 
+enum cyclkscale {
+    CYCS_CYCLE,
+    CYCS_FRAME,
+};
+
 struct cycleclock {
     struct timespec current, previous, start;
     uint64_t cycles, frames, ticks;

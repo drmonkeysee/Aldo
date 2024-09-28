@@ -331,7 +331,7 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
         }
     }
     if (ImGui::MenuItem("Clock Scale", "c")) {
-        SDL_Log("Adjust clock scale");
+        vs.clock.toggleScale();
     }
 }
 
@@ -1645,23 +1645,20 @@ private:
     void renderSpeedControls() const noexcept
     {
         ImGui::AlignTextToFramePadding();
-        ImGui::TextUnformatted("Cycles/Second");
+        ImGui::TextUnformatted(vs.clock.scale() == CYCS_CYCLE
+                               ? "Cycles/Second"
+                               : "Frames/Second");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(40);
-        ImGui::DragInt("##cyclesPerSecond", &vs.clock.cyclock().rate, 1, MinCps,
+        ImGui::DragInt("##clockRate", &vs.clock.cyclock().rate, 1, MinCps,
                        MaxCps, "%d", ImGuiSliderFlags_AlwaysClamp);
 
-        auto scale = CYCS_CYCLE;
-        if (ImGui::RadioButton("Cycles", scale == CYCS_CYCLE)
-            && scale != CYCS_CYCLE) {
-            scale = CYCS_CYCLE;
-            SDL_Log("Adjust clock scale");
+        if (ImGui::RadioButton("Cycles", vs.clock.scale() == CYCS_CYCLE)) {
+            vs.clock.setScale(CYCS_CYCLE);
         }
         ImGui::SameLine();
-        if (ImGui::RadioButton("Frames", scale == CYCS_FRAME)
-            && scale != CYCS_FRAME) {
-            scale = CYCS_FRAME;
-            SDL_Log("Adjust clock scale");
+        if (ImGui::RadioButton("Frames", vs.clock.scale() == CYCS_FRAME)) {
+            vs.clock.setScale(CYCS_FRAME);
         }
     }
 

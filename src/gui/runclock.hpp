@@ -10,6 +10,7 @@
 
 #include "attr.hpp"
 #include "cycleclock.h"
+#include "nes.h"
 
 #include <algorithm>
 #include <chrono>
@@ -89,29 +90,39 @@ private:
     cycleclock& cyclock;
 };
 
-struct runclock {
+class RunClock {
+public:
+    double dtInputMs() noexcept { return dtInput; }
+    double dtUpdateMs() noexcept { return dtUpdate; }
+    double dtRenderMs() noexcept { return dtRender; }
+    cycleclock& cyclock() noexcept { return clock; }
+    cycleclock* cyclockp() noexcept { return &clock; }
+
     void start() noexcept
     {
-        cycleclock_start(&cyclock);
+        cycleclock_start(cyclockp());
     }
 
     RunTick startTick(bool resetBudget) noexcept
     {
-        return {cyclock, resetBudget};
+        return {cyclock(), resetBudget};
     }
 
-    RunTimer timeInput() noexcept { return RunTimer{dtInputMs}; }
-    RunTimer timeUpdate() noexcept { return RunTimer{dtUpdateMs}; }
-    RunTimer timeRender() noexcept { return RunTimer{dtRenderMs}; }
+    void resetEmu() noexcept { cyclock().emutime = 0; }
+
+    RunTimer timeInput() noexcept { return RunTimer{dtInput}; }
+    RunTimer timeUpdate() noexcept { return RunTimer{dtUpdate}; }
+    RunTimer timeRender() noexcept { return RunTimer{dtRender}; }
 
     void adjustCycleRate(int adjustment) noexcept
     {
-        auto adjusted = cyclock.rate + adjustment;
-        cyclock.rate = std::max(MinCps, std::min(adjusted, MaxCps));
+        auto adjusted = cyclock().rate + adjustment;
+        cyclock().rate = std::max(MinCps, std::min(adjusted, MaxCps));
     }
 
-    cycleclock cyclock;
-    double dtInputMs = 0, dtUpdateMs = 0, dtRenderMs = 0;
+private:
+    cycleclock clock{.rate = 10, .rate_factor = nes_cycle_factor()};
+    double dtInput = 0, dtUpdate = 0, dtRender = 0;
 };
 
 }

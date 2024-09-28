@@ -71,7 +71,7 @@ struct viewstate {
     }
 
     std::queue<command_state> commands;
-    runclock clock;
+    RunClock clock;
     palette::sz colorSelection = 0;
     struct {
         SDL_Point

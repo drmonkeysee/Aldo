@@ -321,11 +321,11 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
         val = 1;
     }
     {
-        DisabledIf dif = vs.clock.cyclock.rate == MaxCps;
+        DisabledIf dif = vs.clock.cyclock().rate == MaxCps;
         if (ImGui::MenuItem(incLabel.c_str(), incKey)) {
             vs.clock.adjustCycleRate(val);
         }
-        dif = vs.clock.cyclock.rate == MinCps;
+        dif = vs.clock.cyclock().rate == MinCps;
         if (ImGui::MenuItem(decLabel.c_str(), decKey)) {
             vs.clock.adjustCycleRate(-val);
         }
@@ -1299,7 +1299,7 @@ public:
 protected:
     void renderContents() override
     {
-        if (drawInterval.elapsed(vs.clock.cyclock)) {
+        if (drawInterval.elapsed(vs.clock.cyclock())) {
             const auto* tables = &emu.snapshot().video->pattern_tables;
             // TODO: make this selectable
             const auto* colors = emu.snapshot().video->palettes.bg[0];
@@ -1620,11 +1620,11 @@ protected:
 private:
     void renderStats() noexcept
     {
-        const auto& cyclock = vs.clock.cyclock;
+        const auto& cyclock = vs.clock.cyclock();
         if (statsInterval.elapsed(cyclock)) {
-            dispDtInput = vs.clock.dtInputMs;
-            dispDtUpdate = vs.clock.dtUpdateMs;
-            dispDtRender = vs.clock.dtRenderMs;
+            dispDtInput = vs.clock.dtInputMs();
+            dispDtUpdate = vs.clock.dtUpdateMs();
+            dispDtRender = vs.clock.dtRenderMs();
             dispDtElapsed = dispDtInput + dispDtUpdate + dispDtRender;
             dispDtTick = cyclock.ticktime_ms;
         }
@@ -1648,7 +1648,7 @@ private:
         ImGui::TextUnformatted("Cycles/Second");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(40);
-        ImGui::DragInt("##cyclesPerSecond", &vs.clock.cyclock.rate, 1, MinCps,
+        ImGui::DragInt("##cyclesPerSecond", &vs.clock.cyclock().rate, 1, MinCps,
                        MaxCps, "%d", ImGuiSliderFlags_AlwaysClamp);
 
         auto scale = CYCS_CYCLE;

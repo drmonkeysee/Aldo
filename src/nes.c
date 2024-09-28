@@ -421,6 +421,7 @@ void nes_snapshot(nes *self, struct snapshot *snp)
     assert(snp->prg.curr != NULL);
 
     bus_snapshot(self, snp);
+    ppu_vid_snapshot(&self->ppu, snp);
     if (self->cart) {
         cart_snapshot(self->cart, snp);
     }

@@ -95,6 +95,7 @@ public:
     double dtInputMs() noexcept { return dtInput; }
     double dtUpdateMs() noexcept { return dtUpdate; }
     double dtRenderMs() noexcept { return dtRender; }
+    cyclkscale scale() noexcept { return currentScale; }
     cycleclock& cyclock() noexcept { return clock; }
     cycleclock* cyclockp() noexcept { return &clock; }
 
@@ -120,9 +121,29 @@ public:
         cyclock().rate = std::max(MinCps, std::min(adjusted, MaxCps));
     }
 
+    void setScale(cyclkscale s) noexcept
+    {
+        if (s == scale()) return;
+
+        auto prev = oldRate;
+        oldRate = cyclock().rate;
+        cyclock().rate = prev;
+        currentScale = s;
+        cyclock().rate_factor = currentScale == CYCS_CYCLE
+                                ? nes_cycle_factor()
+                                : nes_frame_factor();
+    }
+
+    void toggleScale() noexcept
+    {
+        setScale(static_cast<cyclkscale>(!scale()));
+    }
+
 private:
     cycleclock clock{.rate = 10, .rate_factor = nes_cycle_factor()};
     double dtInput = 0, dtUpdate = 0, dtRender = 0;
+    cyclkscale currentScale = CYCS_CYCLE;
+    int oldRate = MinFps;
 };
 
 }

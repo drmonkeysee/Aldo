@@ -15,6 +15,7 @@
 static void powerup_initializes_cpu(void *ctx)
 {
     struct mos6502 cpu;
+    setup_cpu(&cpu, NULL, NULL);
 
     cpu_powerup(&cpu);
 

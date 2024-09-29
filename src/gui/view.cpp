@@ -1301,8 +1301,11 @@ protected:
     {
         if (drawInterval.elapsed(vs.clock.cyclock())) {
             const auto* tables = &emu.snapshot().video->pattern_tables;
-            // TODO: make this selectable
-            const auto* colors = emu.snapshot().video->palettes.bg[0];
+            assert(palSelect < CHR_PAL_SIZE * 2);
+            const auto* colors =
+                palSelect < CHR_PAL_SIZE
+                ? emu.snapshot().video->palettes.bg[palSelect]
+                : emu.snapshot().video->palettes.fg[palSelect - CHR_PAL_SIZE];
             left.draw(tables->left, colors, emu.palette());
             right.draw(tables->right, colors, emu.palette());
         }
@@ -1343,16 +1346,23 @@ private:
                     ImGuiStyleVar_SelectableTextAlign, {center, center},
                 }};
                 auto pal = pals[row];
+                std::array<char, 3> buf;
                 for (auto col = 0; col < cols; ++col) {
                     ImGui::TableNextColumn();
                     if (col == 0) {
-                        ImGui::Text("%d", row + 1);
+                        std::snprintf(buf.data(), buf.size(), "%d", row + 1);
+                        auto palIdx
+                            = static_cast<aldo::et::size>(row + (fg << 2));
+                        if (ImGui::Selectable(buf.data(), palSelect == palIdx,
+                                              ImGuiSelectableFlags_None,
+                                              {cellDim, cellDim})) {
+                            palSelect = palIdx;
+                        }
                     } else {
                         auto idx = pal[col - 1];
                         auto color = emu.palette().getColor(idx);
                         ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
                                                color);
-                        std::array<char, 3> buf;
                         std::snprintf(buf.data(), buf.size(), "%02X", idx);
                         ScopedColor txtColor{{
                             ImGuiCol_Text,
@@ -1374,6 +1384,7 @@ private:
     }
 
     aldo::PatternTable left, right;
+    aldo::et::size palSelect = 0;
     RefreshInterval drawInterval{250};
 };
 

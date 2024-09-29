@@ -11,7 +11,6 @@
 #include "emu.hpp"
 #include "input.hpp"
 #include "mediaruntime.hpp"
-#include "render.hpp"
 #include "ui.h"
 #include "view.hpp"
 #include "viewstate.hpp"
@@ -41,13 +40,6 @@ auto update_emu(aldo::Emulator& emu, aldo::viewstate& vs) noexcept
     emu.update(vs);
 }
 
-auto render_ui(const aldo::Layout& l, const aldo::MediaRuntime& mr,
-               aldo::viewstate& vs)
-{
-    aldo::RenderFrame frame{mr, vs.clock.timeRender()};
-    l.render();
-}
-
 auto runloop(const gui_platform& p, debugger* debug, nes* console)
 {
     aldo::Emulator emu{
@@ -69,7 +61,7 @@ auto runloop(const gui_platform& p, debugger* debug, nes* console)
         handle_input(emu, state, p);
         if (state.running) {
             update_emu(emu, state);
-            render_ui(layout, runtime, state);
+            layout.render();
         }
     } while (state.running);
 }

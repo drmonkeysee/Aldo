@@ -19,6 +19,7 @@
 #include "emutypes.hpp"
 #include "haltexpr.h"
 #include "mediaruntime.hpp"
+#include "render.hpp"
 #include "snapshot.h"
 #include "style.hpp"
 #include "texture.hpp"
@@ -1748,6 +1749,8 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
 
 void aldo::Layout::render() const
 {
+    aldo::RenderFrame frame{mr, vs.clock.timeRender()};
+
     main_menu(vs, emu, mr, views);
     for (auto& v : views) {
         v->render();

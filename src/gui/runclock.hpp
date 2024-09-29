@@ -109,7 +109,10 @@ public:
         return {cyclock(), resetBudget};
     }
 
-    void resetEmu() noexcept { cyclock().emutime = 0; }
+    void resetEmu() noexcept {
+        cyclock().emutime = cyclock().cycles = cyclock().frames =
+            cyclock().subcycle = 0;
+    }
 
     RunTimer timeInput() noexcept { return RunTimer{dtInput}; }
     RunTimer timeUpdate() noexcept { return RunTimer{dtUpdate}; }

@@ -138,7 +138,8 @@ static uint16_t mask_palette(uint16_t addr)
             addr &= 0xf;
         } else {
             // NOTE: 0x1-0x3 adjust down 1, 0x5-0x7 adjust down 2, etc...
-            addr -= ((addr & 0xc) >> 2) + 1;
+            uint16_t adj = ((addr & 0xc) >> 2) + 1;
+            addr -= adj;
         }
     }
     return addr;
@@ -261,7 +262,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
                 ppu->t = (ppu->t & 0x7f00) | ppu->regbus;
                 ppu->v = ppu->t;
             } else {
-                ppu->t = bytowr(ppu->t & 0xff, ppu->regbus & 0x3f);
+                ppu->t = bytowr((uint8_t)ppu->t, ppu->regbus & 0x3f);
             }
             ppu->w = !ppu->w;
             // TODO: there is some kind of bus conflict behavior i don't
@@ -397,7 +398,8 @@ static void cpu_rw(struct rp2c02 *self)
             write(self);
         }
         self->cvp = false;
-        self->v += self->ctrl.i ? 32 : 1;
+        uint16_t inc = self->ctrl.i ? 32 : 1;
+        self->v += inc;
     } else {
         self->vaddrbus = maskaddr(self->v);
         self->signal.ale = true;
@@ -438,7 +440,7 @@ static void snapshot_palette(const struct rp2c02 *self,
     uint16_t base = PaletteStartAddr + offset;
     for (size_t i = 0; i < CHR_PAL_SIZE; ++i) {
         uint8_t *p = palsnp[i];
-        uint16_t addr = base + (CHR_PAL_SIZE * (uint16_t)i);
+        uint16_t addr = base + (uint16_t)(CHR_PAL_SIZE * i);
         // NOTE: 1st color is always the backdrop
         p[0] = palette_read(self, base);
         p[1] = palette_read(self, addr + 1);

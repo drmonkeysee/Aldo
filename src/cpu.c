@@ -1663,7 +1663,9 @@ void cpu_powerup(struct mos6502 *self)
 
     // NOTE: initialize internal registers to known state
     self->pc = self->addrinst = self->a = self->s = self->x = self->y =
-        self->t = self->opc = self->adl = self->adh = self->adc = 0;
+        self->opc = self->adl = self->adh = self->adc = 0;
+    // NOTE: some compilers don't like mixing signed and unsigned assignment
+    self->t = 0;
     set_p(self, 0x34);
 
     // TODO: simulate rst held low on startup to engage reset sequence

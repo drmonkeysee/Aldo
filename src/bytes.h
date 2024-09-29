@@ -80,7 +80,7 @@ inline uint16_t batowr(const uint8_t bytes[br_csz(2)]) br_nothrow
 inline void wrtoby(uint16_t word, uint8_t *br_noalias lo,
                    uint8_t *br_noalias hi) br_nothrow
 {
-    *lo = (uint8_t)(word & 0xff);
+    *lo = (uint8_t)word;
     *hi = (uint8_t)(word >> 8);
 }
 

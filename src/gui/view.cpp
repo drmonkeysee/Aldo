@@ -1211,8 +1211,7 @@ private:
                     ImGui::Text(" %02zX", rowStart);
                 } else {
                     auto cell = rowStart + (col - 1);
-                    auto color = emu.palette().getColor(adjustIdx(cell),
-                                                        colorEmphasis);
+                    auto color = emu.palette().getColor(cell, colorEmphasis);
                     ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color);
                     ScopedColor indicatorColor{
                         {ImGuiCol_Text, aldo::colors::luminance(color) < 0x80
@@ -1246,14 +1245,13 @@ private:
             ImGui::Checkbox("Blue Emphasis", &this->colorEmphasis.b);
         });
         ImGui::SameLine();
-        ImGui::Checkbox("Grayscale", &grayscale);
+        ImGui::Checkbox("Grayscale", &colorEmphasis.gs);
     }
 
     void renderColorSelection() const
     {
         static constexpr auto selectedColorDim = 70;
-        auto color = emu.palette().getColor(adjustIdx(vs.colorSelection),
-                                            colorEmphasis);
+        auto color = emu.palette().getColor(vs.colorSelection, colorEmphasis);
         ImGui::ColorButton("Selected Color",
                            ImGui::ColorConvertU32ToFloat4(color),
                            ImGuiColorEditFlags_NoAlpha,
@@ -1272,13 +1270,7 @@ private:
         });
     }
 
-    pal_sz adjustIdx(pal_sz idx) const noexcept
-    {
-        return grayscale ? idx & 0x30 : idx;
-    }
-
-    bool grayscale = false;
-    aldo::palette::emphasis colorEmphasis = {};
+    aldo::palette::emphasis colorEmphasis{};
 
     static constexpr pal_sz Cols = 17;
 };

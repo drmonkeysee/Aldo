@@ -62,6 +62,9 @@ auto parse_colors(const pal_buf& buf)
 aldo::palette::datav aldo::Palette::getColor(aldo::palette::sz idx,
                                              aldo::palette::emphasis em) const
 {
+    if (em.gs) {
+        idx &= 0x30;
+    }
     auto color = std::visit([idx](auto&& c) { return c[idx]; }, colors);
     if (em.any() && ((idx & 0xe) < 0xe)) {
         auto [r, g, b] = aldo::colors::rgb_floor(color, EmphasisFloor);

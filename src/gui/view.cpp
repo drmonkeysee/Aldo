@@ -1260,13 +1260,12 @@ private:
         widget_group([color, &vs = vs] {
             auto [r, g, b] = aldo::colors::rgb(color);
             ImGui::Text("Index: %02zX", vs.colorSelection);
-            if (vs.colorSelection == 0xd) {
-                ImGui::SameLine();
-                ImGui::TextUnformatted("(forbidden black)");
-            }
             ImGui::Text("RGBd:  %d %d %d", r, g, b);
             ImGui::Text("RGBx:  %02X %02X %02X", r, g, b);
             ImGui::Text("Hex:   #%02x%02x%02x", r, g, b);
+            if (vs.colorSelection == 0xd) {
+                ImGui::TextUnformatted("(forbidden black)");
+            }
         });
     }
 
@@ -1674,11 +1673,15 @@ private:
         };
 
         auto mode = emu.runMode();
+        if (ImGui::RadioButton("Sub ", mode == CSGM_SUBCYCLE)
+            && mode != CSGM_SUBCYCLE) {
+            vs.commands.emplace(aldo::Command::mode, CSGM_SUBCYCLE);
+        }
+        ImGui::SameLine();
         if (ImGui::RadioButton("Cycle", mode == CSGM_CYCLE)
             && mode != CSGM_CYCLE) {
             vs.commands.emplace(aldo::Command::mode, CSGM_CYCLE);
         }
-        ImGui::SameLine();
         if (ImGui::RadioButton("Step", mode == CSGM_STEP)
             && mode != CSGM_STEP) {
             vs.commands.emplace(aldo::Command::mode, CSGM_STEP);

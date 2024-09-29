@@ -8,6 +8,7 @@
 #include "texture.hpp"
 
 #include "error.hpp"
+#include "mediaruntime.hpp"
 #include "viewstate.hpp"
 
 #include <concepts>
@@ -19,12 +20,14 @@ static_assert(std::same_as<Uint32, ImU32>,
 // MARK: - Public Interface
 //
 
-aldo::BouncerScreen::BouncerScreen(SDL_Point resolution, SDL_Renderer* ren)
-: tex{resolution, ren} {}
+aldo::BouncerScreen::BouncerScreen(SDL_Point resolution,
+                                   const aldo::MediaRuntime& mr)
+: tex{resolution, mr.renderer()} {}
 
 void aldo::BouncerScreen::draw(const aldo::viewstate& vs,
-                               SDL_Renderer* ren) const noexcept
+                               const aldo::MediaRuntime& mr) const noexcept
 {
+    auto ren = mr.renderer();
     auto target = tex.asTarget(ren);
 
     SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
@@ -46,8 +49,8 @@ void aldo::BouncerScreen::draw(const aldo::viewstate& vs,
     SDL_RenderFillRect(ren, &pos);
 }
 
-aldo::PatternTable::PatternTable(SDL_Renderer* ren)
-: tex{{TextureDim, TextureDim}, ren} {}
+aldo::PatternTable::PatternTable(const aldo::MediaRuntime& mr)
+: tex{{TextureDim, TextureDim}, mr.renderer()} {}
 
 void aldo::PatternTable
 ::draw(const aldo::et::word table[CHR_PAT_TILES][CHR_TILE_DIM],

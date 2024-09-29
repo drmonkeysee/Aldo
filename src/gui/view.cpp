@@ -493,7 +493,7 @@ class BouncerView final : public aldo::View {
 public:
     BouncerView(aldo::viewstate& vs, const aldo::Emulator& emu,
                 const aldo::MediaRuntime& mr)
-    : View{"Bouncer", vs, emu, mr}, bouncer{vs.bouncer.bounds, mr.renderer()}
+    : View{"Bouncer", vs, emu, mr}, bouncer{vs.bouncer.bounds, mr}
     {}
     BouncerView(aldo::viewstate&, aldo::Emulator&&,
                 const aldo::MediaRuntime&) = delete;
@@ -505,7 +505,7 @@ public:
 protected:
     void renderContents() override
     {
-        bouncer.draw(vs, mr.renderer());
+        bouncer.draw(vs, mr);
         bouncer.render();
     }
 
@@ -1278,8 +1278,7 @@ class PatternTablesView final : public aldo::View {
 public:
     PatternTablesView(aldo::viewstate& vs, const aldo::Emulator& emu,
                       const aldo::MediaRuntime& mr)
-    : View{"Pattern Tables", vs, emu, mr},
-        left{mr.renderer()}, right{mr.renderer()} {}
+    : View{"Pattern Tables", vs, emu, mr}, left{mr}, right{mr} {}
     PatternTablesView(aldo::viewstate&, aldo::Emulator&&,
                       const aldo::MediaRuntime&) = delete;
     PatternTablesView(aldo::viewstate&, const aldo::Emulator&,

@@ -18,9 +18,10 @@
 namespace aldo
 {
 
-struct viewstate;
+class MediaRuntime;
 class Palette;
 template<SDL_TextureAccess> class Texture;
+struct viewstate;
 
 namespace texture
 {
@@ -101,9 +102,9 @@ private:
 
 class BouncerScreen {
 public:
-    BouncerScreen(SDL_Point resolution, SDL_Renderer* ren);
+    BouncerScreen(SDL_Point resolution, const MediaRuntime& mr);
 
-    void draw(const viewstate& vs, SDL_Renderer* ren) const noexcept;
+    void draw(const viewstate& vs, const MediaRuntime& mr) const noexcept;
     void render() const noexcept { tex.render(); }
 
 private:
@@ -112,7 +113,7 @@ private:
 
 class PatternTable {
 public:
-    PatternTable(SDL_Renderer* ren);
+    PatternTable(const MediaRuntime& mr);
 
     void draw(const et::word table[CHR_PAT_TILES][CHR_TILE_DIM],
               const et::byte colors[CHR_PAL_SIZE],

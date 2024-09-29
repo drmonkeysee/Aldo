@@ -49,7 +49,7 @@ PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) $(NESTEST_DIFF) \
 		$(TRACE_CMP) $(BCDTEST_ROM) *.bin *.log
 
 CFLAGS := -Wall -Wextra -Wconversion -std=c17 -iquote$(SRC_DIR)
-CXXFLAGS := -Wall -Wextra -pedantic -std=c++20
+CXXFLAGS := -Wall -Wextra -pedantic -std=c++23
 ifneq ($(OS), Darwin)
 CFLAGS += -D_POSIX_C_SOURCE=200112L -Wno-format-zero-length
 endif

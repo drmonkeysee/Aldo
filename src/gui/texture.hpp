@@ -90,7 +90,9 @@ public:
     {
         int w, h;
         SDL_QueryTexture(tex, nullptr, nullptr, &w, &h);
-        ImGui::Image(tex, {w * scale, h * scale});
+        ImGui::Image(tex, {
+            static_cast<float>(w) * scale, static_cast<float>(h) * scale,
+        });
     }
 
 private:

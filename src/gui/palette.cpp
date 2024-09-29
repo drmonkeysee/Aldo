@@ -73,7 +73,10 @@ aldo::palette::datav aldo::Palette::getColor(aldo::palette::sz idx,
             em.r || em.b ? Attenuated : Full,
             em.r || em.g ? Attenuated : Full,
         };
-        color = IM_COL32(r * re, g * ge, b * be, SDL_ALPHA_OPAQUE);
+        color = IM_COL32(static_cast<float>(r) * re,
+                         static_cast<float>(g) * ge,
+                         static_cast<float>(b) * be,
+                         SDL_ALPHA_OPAQUE);
     }
     return color;
 }

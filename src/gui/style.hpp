@@ -82,7 +82,9 @@ inline constexpr std::tuple<ImU32, ImU32, ImU32> rgb_floor(ImU32 color,
 inline constexpr ImU32 luminance(ImU32 color)
 {
     auto [r, g, b] = rgb(color);
-    return static_cast<ImU32>((0.2126f * r) + (0.7152f * g) + (0.0722f * b));
+    return static_cast<ImU32>((0.2126f * static_cast<float>(r))
+                              + (0.7152f * static_cast<float>(g))
+                              + (0.0722f * static_cast<float>(b)));
 }
 
 }

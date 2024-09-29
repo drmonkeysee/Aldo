@@ -57,7 +57,7 @@ private:
 
 class ALDO_SIDEFX Emulator {
 public:
-    using console_snapshot = snapshot;
+    using console_snapshot = struct snapshot;
 
     Emulator(debug_handle d, console_handle n, const gui_platform& p);
     Emulator(const Emulator&) = delete;

@@ -110,8 +110,8 @@ public:
     }
 
     void resetEmu() noexcept {
-        cyclock().emutime = cyclock().cycles = cyclock().frames =
-            cyclock().subcycle = 0;
+        cyclock().emutime = 0;
+        cyclock().cycles = cyclock().frames = cyclock().subcycle = 0;
     }
 
     RunTimer timeInput() noexcept { return RunTimer{dtInput}; }

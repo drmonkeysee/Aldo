@@ -266,8 +266,8 @@ static int run_emu(const struct cliargs *args, cart *c)
     ui_loop *run_loop = setup_ui(&emu);
     int err = run_loop(&emu);
     if (err < 0) {
-        fprintf(stderr, "UI run failure (%d): %s\n", err, ui_errstr(err));
-        if (err == UI_ERR_ERNO) {
+        fprintf(stderr, "UI run failure (%d): %s\n", err, aldo_ui_errstr(err));
+        if (err == ALDO_UIERR_ERNO) {
             perror("UI System Error");
         }
         result = EXIT_FAILURE;

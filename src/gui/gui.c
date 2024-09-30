@@ -45,7 +45,7 @@ static int run_emu(const struct gui_platform *platform)
     dbg = NULL;
     if (err < 0) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-                        "UI run failure (%d): %s", err, ui_errstr(err));
+                        "UI run failure (%d): %s", err, aldo_ui_errstr(err));
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

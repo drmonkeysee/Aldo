@@ -9,20 +9,20 @@
 #define Aldo_ui_h
 
 // X(symbol, value, error string)
-#define UI_ERRCODE_X \
-X(UI_ERR_ERNO, -1, "SYSTEM ERROR") \
-X(UI_ERR_LIBINIT, -2, "LIBRARY INIT FAILURE") \
-X(UI_ERR_EXCEPTION, -3, "PROGRAM EXCEPTION")
+#define ALDO_UIERRCODE_X \
+X(UIERR_ERNO, -1, "SYSTEM ERROR") \
+X(UIERR_LIBINIT, -2, "LIBRARY INIT FAILURE") \
+X(UIERR_EXCEPTION, -3, "PROGRAM EXCEPTION")
 
 enum {
-#define X(s, v, e) s = v,
-    UI_ERRCODE_X
+#define X(s, v, e) ALDO_##s = v,
+    ALDO_UIERRCODE_X
 #undef X
 };
 
 #include "bridgeopen.h"
 br_libexport
-const char *ui_errstr(int err) br_nothrow;
+const char *aldo_ui_errstr(int err) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

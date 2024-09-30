@@ -90,5 +90,5 @@ int aldo::ui_sdl_runloop(const gui_platform* platform, debugger* debug,
     }
     auto err = aldo::MediaRuntime::initStatus();
     if (err < 0) return err;
-    return UI_ERR_EXCEPTION;
+    return ALDO_UIERR_EXCEPTION;
 }

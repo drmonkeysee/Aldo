@@ -7,11 +7,11 @@
 
 #include "ui.h"
 
-const char *ui_errstr(int err)
+const char *aldo_ui_errstr(int err)
 {
     switch (err) {
-#define X(s, v, e) case s: return e;
-        UI_ERRCODE_X
+#define X(s, v, e) case ALDO_##s: return e;
+        ALDO_UIERRCODE_X
 #undef X
     default:
         return "UNKNOWN ERR";

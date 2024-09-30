@@ -64,8 +64,9 @@ static void trace_registers(FILE *tracelog, const struct snapshot *snp)
 // MARK: - Public Interface
 //
 
-void trace_line(FILE *tracelog, uint64_t cycles, struct ppu_coord pixel,
-                struct mos6502 *cpu, debugger *dbg, const struct snapshot *snp)
+void aldo_trace_line(FILE *tracelog, uint64_t cycles, struct ppu_coord pixel,
+                     struct mos6502 *cpu, debugger *dbg,
+                     const struct snapshot *snp)
 {
     assert(tracelog != NULL);
     assert(cpu != NULL);

@@ -222,9 +222,9 @@ static void instruction_trace(struct nes001 *self,
     bus_snapshot(self, &snp);
     // NOTE: trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
-    trace_line(self->tracelog, clock->cycles + (uint64_t)adjustment,
-               ppu_trace(&self->ppu, adjustment * PpuRatio), &self->cpu,
-               self->dbg, &snp);
+    aldo_trace_line(self->tracelog, clock->cycles + (uint64_t)adjustment,
+                    ppu_trace(&self->ppu, adjustment * PpuRatio), &self->cpu,
+                    self->dbg, &snp);
 }
 
 static bool clock_ppu(struct nes001 *self, struct cycleclock *clock)

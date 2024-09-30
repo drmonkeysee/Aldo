@@ -117,7 +117,7 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
     printf("---=== %s ===---\n", argparse_filename(emu->args->filepath));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
            scale_ms
-            ? c->cyclock.runtime * TSU_MS_PER_S
+            ? c->cyclock.runtime * ALDO_MS_PER_S
             : c->cyclock.runtime);
     printf("Avg Tick Time (msec): %.3f\n", c->avg_ticktime_ms);
     printf("Total Cycles: %" PRIu64 "\n", c->cyclock.cycles);

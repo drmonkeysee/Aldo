@@ -98,7 +98,8 @@ static bool halt_address(const struct breakpoint *bp,
 static bool halt_runtime(const struct breakpoint *bp,
                          const struct cycleclock *clk)
 {
-    return isgreaterequal(clk->emutime - bp->expr.runtime, 1.0 / TSU_MS_PER_S);
+    return isgreaterequal(clk->emutime - bp->expr.runtime,
+                          1.0 / ALDO_MS_PER_S);
 }
 
 static bool halt_cycles(const struct breakpoint *bp,

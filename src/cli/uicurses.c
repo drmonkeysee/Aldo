@@ -61,9 +61,11 @@ struct viewstate {
 
 static void tick_sleep(struct runclock *c)
 {
-    static const struct timespec vsync = {.tv_nsec = TSU_NS_PER_S / DisplayHz};
+    static const struct timespec vsync = {
+        .tv_nsec = ALDO_NS_PER_S / DisplayHz,
+    };
 
-    struct timespec elapsed = timespec_elapsed(&c->cyclock.current);
+    struct timespec elapsed = aldo_elapsed(&c->cyclock.current);
 
     // NOTE: if elapsed nanoseconds is greater than vsync we're over
     // our time budget; if elapsed *seconds* is greater than vsync
@@ -71,16 +73,17 @@ static void tick_sleep(struct runclock *c)
     if (elapsed.tv_nsec > vsync.tv_nsec || elapsed.tv_sec > vsync.tv_sec) {
         // NOTE: we've already blown the tick time, so convert everything
         // to milliseconds to make the math easier.
-        c->tickleft_ms = timespec_to_ms(&vsync) - timespec_to_ms(&elapsed);
+        c->tickleft_ms = aldo_timespec_to_ms(&vsync)
+                            - aldo_timespec_to_ms(&elapsed);
         return;
     }
 
     struct timespec tick_left = {
         .tv_nsec = vsync.tv_nsec - elapsed.tv_nsec,
     };
-    c->tickleft_ms = timespec_to_ms(&tick_left);
+    c->tickleft_ms = aldo_timespec_to_ms(&tick_left);
 
-    timespec_sleep(tick_left);
+    aldo_sleep(tick_left);
 }
 
 //

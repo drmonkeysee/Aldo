@@ -20,24 +20,25 @@ void cycleclock_start(struct cycleclock *self)
 void cycleclock_tickstart(struct cycleclock *self, bool reset_budget)
 {
     clock_gettime(CLOCK_MONOTONIC, &self->current);
-    double currentms = timespec_to_ms(&self->current);
-    self->ticktime_ms = currentms - timespec_to_ms(&self->previous);
-    self->runtime = (currentms - timespec_to_ms(&self->start)) / TSU_MS_PER_S;
+    double currentms = aldo_timespec_to_ms(&self->current);
+    self->ticktime_ms = currentms - aldo_timespec_to_ms(&self->previous);
+    self->runtime = (currentms - aldo_timespec_to_ms(&self->start))
+                    / ALDO_MS_PER_S;
 
     if (reset_budget) {
         self->timebudget_ms = self->budget = 0;
         return;
     }
 
-    self->emutime += self->ticktime_ms / TSU_MS_PER_S;
+    self->emutime += self->ticktime_ms / ALDO_MS_PER_S;
     self->timebudget_ms += self->ticktime_ms;
     // NOTE: accumulate at most a second of banked cycle time
-    if (self->timebudget_ms >= TSU_MS_PER_S) {
-        self->timebudget_ms = TSU_MS_PER_S;
+    if (self->timebudget_ms >= ALDO_MS_PER_S) {
+        self->timebudget_ms = ALDO_MS_PER_S;
     }
 
     double cycles_per_ms = (self->rate * self->rate_factor)
-                            / (double)TSU_MS_PER_S;
+                            / (double)ALDO_MS_PER_S;
     int new_cycles = (int)(self->timebudget_ms * cycles_per_ms);
     self->budget += new_cycles;
     self->timebudget_ms -= new_cycles / cycles_per_ms;

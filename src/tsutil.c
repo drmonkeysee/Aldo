@@ -11,9 +11,9 @@
 #include <errno.h>
 #include <stddef.h>
 
-extern inline double timespec_to_ms(const struct timespec *);
+extern inline double aldo_timespec_to_ms(const struct timespec *);
 
-struct timespec timespec_elapsed(const struct timespec *from)
+struct timespec aldo_elapsed(const struct timespec *from)
 {
     assert(from != NULL);
 
@@ -25,14 +25,14 @@ struct timespec timespec_elapsed(const struct timespec *from)
     if (from->tv_nsec > now.tv_nsec) {
         // NOTE: subtract with borrow
         --elapsed.tv_sec;
-        elapsed.tv_nsec = TSU_NS_PER_S - (from->tv_nsec - now.tv_nsec);
+        elapsed.tv_nsec = ALDO_NS_PER_S - (from->tv_nsec - now.tv_nsec);
     } else {
         elapsed.tv_nsec = now.tv_nsec - from->tv_nsec;
     }
     return elapsed;
 }
 
-void timespec_sleep(struct timespec duration)
+void aldo_sleep(struct timespec duration)
 {
     struct timespec ts_left;
     int result;

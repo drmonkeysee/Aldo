@@ -12,7 +12,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static_assert(CHR_PAT_TILES * CHR_TILE_STRIDE == MEMBLOCK_4KB,
+static_assert(ALDO_PT_TILE_COUNT * ALDO_CHR_TILE_STRIDE == MEMBLOCK_4KB,
               "Pattern table size mismatch");
 
 void snapshot_extend(struct snapshot *snp)

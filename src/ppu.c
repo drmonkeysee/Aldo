@@ -433,14 +433,15 @@ static int cycle(struct rp2c02 *self)
     return nextdot(self);
 }
 
-static void snapshot_palette(const struct rp2c02 *self,
-                             uint8_t palsnp[static CHR_PAL_SIZE][CHR_PAL_SIZE],
-                             uint16_t offset)
+static void
+snapshot_palette(const struct rp2c02 *self,
+                 uint8_t palsnp[static ALDO_PAL_SIZE][ALDO_PAL_SIZE],
+                 uint16_t offset)
 {
     uint16_t base = Aldo_PaletteStartAddr + offset;
-    for (size_t i = 0; i < CHR_PAL_SIZE; ++i) {
+    for (size_t i = 0; i < ALDO_PAL_SIZE; ++i) {
         uint8_t *p = palsnp[i];
-        uint16_t addr = base + (uint16_t)(CHR_PAL_SIZE * i);
+        uint16_t addr = base + (uint16_t)(ALDO_PAL_SIZE * i);
         // NOTE: 1st color is always the backdrop
         p[0] = palette_read(self, base);
         p[1] = palette_read(self, addr + 1);

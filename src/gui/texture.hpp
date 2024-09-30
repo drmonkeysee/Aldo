@@ -115,20 +115,20 @@ class PatternTable {
 public:
     PatternTable(const MediaRuntime& mr);
 
-    void draw(const et::word table[CHR_PAT_TILES][CHR_TILE_DIM],
-              const et::byte colors[CHR_PAL_SIZE],
+    void draw(const et::word table[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM],
+              const et::byte colors[ALDO_PAL_SIZE],
               const Palette& p) const;
     void render() const noexcept { tex.render(2.0); }
 
 private:
     static constexpr int TableDim = 16, TextureDim = 128;
-    static_assert(TableDim * TableDim == CHR_PAT_TILES,
+    static_assert(TableDim * TableDim == ALDO_PT_TILE_COUNT,
                   "Table size does not match tile count");
-    static_assert(TextureDim == TableDim * CHR_TILE_DIM,
+    static_assert(TextureDim == TableDim * ALDO_CHR_TILE_DIM,
                   "Texture size does not match tile pixel count");
 
     static void drawTableRow(et::word pixels,
-                             const et::byte colors[CHR_PAL_SIZE],
+                             const et::byte colors[ALDO_PAL_SIZE],
                              int texOffset, const Palette& p,
                              const texture::TextureData& data);
 

@@ -15,14 +15,14 @@
 #include <stdint.h>
 
 enum {
-    CHR_PAL_SIZE = 4,
+    ALDO_PAL_SIZE = 4,
     // NOTE: CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is a
     // 16-byte array of 2-bit palette-indexed pixels composed of two bit-planes
     // where the first plane specifies the pixel low bit and the second plane
     // specifies the pixel high bit.
-    CHR_TILE_DIM = 8,
-    CHR_TILE_STRIDE = 2 * CHR_TILE_DIM,
-    CHR_PAT_TILES = 256,
+    ALDO_CHR_TILE_DIM = 8,
+    ALDO_CHR_TILE_STRIDE = 2 * ALDO_CHR_TILE_DIM,
+    ALDO_PT_TILE_COUNT = 256,
 };
 
 struct snapshot {
@@ -78,13 +78,13 @@ struct snapshot {
         // A Pattern Table is 256 tiles x 8 rows x 8 pixels x 2 bits.
         struct {
             uint16_t
-                left[CHR_PAT_TILES][CHR_TILE_DIM],
-                right[CHR_PAT_TILES][CHR_TILE_DIM];
+                left[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM],
+                right[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM];
         } pattern_tables;
         // Background/Foreground, 4 Palettes, 4 Colors, 6 Bits
         struct {
-            uint8_t bg[CHR_PAL_SIZE][CHR_PAL_SIZE],
-                    fg[CHR_PAL_SIZE][CHR_PAL_SIZE];
+            uint8_t bg[ALDO_PAL_SIZE][ALDO_PAL_SIZE],
+                    fg[ALDO_PAL_SIZE][ALDO_PAL_SIZE];
         } palettes;
     } *video;
 };

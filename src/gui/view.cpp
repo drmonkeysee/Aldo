@@ -1292,11 +1292,11 @@ protected:
     {
         if (drawInterval.elapsed(vs.clock.cyclock())) {
             const auto* tables = &emu.snapshot().video->pattern_tables;
-            assert(palSelect < CHR_PAL_SIZE * 2);
+            assert(palSelect < ALDO_PAL_SIZE * 2);
             const auto* colors =
-                palSelect < CHR_PAL_SIZE
+                palSelect < ALDO_PAL_SIZE
                 ? emu.snapshot().video->palettes.bg[palSelect]
-                : emu.snapshot().video->palettes.fg[palSelect - CHR_PAL_SIZE];
+                : emu.snapshot().video->palettes.fg[palSelect - ALDO_PAL_SIZE];
             left.draw(tables->left, colors, emu.palette());
             right.draw(tables->right, colors, emu.palette());
         }
@@ -1321,7 +1321,7 @@ private:
     void renderPalettes(bool fg)
     {
         static constexpr auto cellDim = 15;
-        static constexpr auto cols = CHR_PAL_SIZE + 1;
+        static constexpr auto cols = ALDO_PAL_SIZE + 1;
         static constexpr auto center = 0.5f;
         static constexpr auto flags = ImGuiTableFlags_BordersInner
                                         | ImGuiTableFlags_SizingFixedFit;
@@ -1330,7 +1330,7 @@ private:
         const auto* pals = fg
                             ? emu.snapshot().video->palettes.fg
                             : emu.snapshot().video->palettes.bg;
-        for (auto row = 0; row < CHR_PAL_SIZE; ++row) {
+        for (auto row = 0; row < ALDO_PAL_SIZE; ++row) {
             if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols,
                                   flags)) {
                 ScopedStyleVec textAlign{{

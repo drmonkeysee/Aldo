@@ -62,19 +62,19 @@ static void clear_chr_device(bus *b)
 }
 
 void fill_pattern_table(size_t tile_count,
-                        uint16_t table[tile_count][CHR_TILE_DIM],
+                        uint16_t table[tile_count][ALDO_CHR_TILE_DIM],
                         const struct blockview *bv)
 {
-    assert(tile_count <= CHR_PAT_TILES);
-    assert(bv->size >= tile_count * CHR_TILE_STRIDE);
+    assert(tile_count <= ALDO_PT_TILE_COUNT);
+    assert(bv->size >= tile_count * ALDO_CHR_TILE_STRIDE);
 
     for (size_t tile = 0; tile < tile_count; ++tile) {
-        for (size_t row = 0; row < CHR_TILE_DIM; ++row) {
-            size_t idx = row + (tile * CHR_TILE_STRIDE);
-            assert(idx < bv->size - CHR_TILE_DIM);
+        for (size_t row = 0; row < ALDO_CHR_TILE_DIM; ++row) {
+            size_t idx = row + (tile * ALDO_CHR_TILE_STRIDE);
+            assert(idx < bv->size - ALDO_CHR_TILE_DIM);
             uint8_t
                 plane0 = bv->mem[idx],
-                plane1 = bv->mem[idx + CHR_TILE_DIM];
+                plane1 = bv->mem[idx + ALDO_CHR_TILE_DIM];
             table[tile][row] = byteshuffle(plane0, plane1);
         }
     }
@@ -260,10 +260,12 @@ static void ines_000_snapshot(struct mapper *self, struct snapshot *snp)
         .mem = m->chr,
         .size = MEMBLOCK_4KB,
     };
-    fill_pattern_table(CHR_PAT_TILES, snp->video->pattern_tables.left, &bv);
+    fill_pattern_table(ALDO_PT_TILE_COUNT, snp->video->pattern_tables.left,
+                       &bv);
     bv.mem += bv.size;
     ++bv.ord;
-    fill_pattern_table(CHR_PAT_TILES, snp->video->pattern_tables.right, &bv);
+    fill_pattern_table(ALDO_PT_TILE_COUNT, snp->video->pattern_tables.right,
+                       &bv);
     m->ptstale = false;
 }
 

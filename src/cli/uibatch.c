@@ -59,7 +59,7 @@ static int init_ui(void)
     return sigaction(SIGINT, &act, NULL) == 0 ? 0 : ALDO_UIERR_ERNO;
 }
 
-static void tick_start(struct runclock *c, const struct snapshot *snp)
+static void tick_start(struct runclock *c, const struct aldo_snapshot *snp)
 {
     cycleclock_tickstart(&c->cyclock, true);
 

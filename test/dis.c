@@ -881,7 +881,7 @@ static void datapath_end_of_rom(void *ctx)
         .pc = {0xea},
         .length = 1,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -902,7 +902,7 @@ static void datapath_unexpected_end_of_rom(void *ctx)
         .pc = {0xa9},
         .length = 1,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -922,7 +922,7 @@ static void datapath_implied_cycle_zero(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -942,7 +942,7 @@ static void datapath_implied_cycle_one(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -962,7 +962,7 @@ static void datapath_implied_cycle_n(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -982,7 +982,7 @@ static void datapath_immediate_cycle_zero(void *ctx)
         .pc = {0xa9, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1002,7 +1002,7 @@ static void datapath_immediate_cycle_one(void *ctx)
         .pc = {0xa9, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1022,7 +1022,7 @@ static void datapath_immediate_cycle_n(void *ctx)
         .pc = {0xa9, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1042,7 +1042,7 @@ static void datapath_zeropage_cycle_zero(void *ctx)
         .pc = {0xa5, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1062,7 +1062,7 @@ static void datapath_zeropage_cycle_one(void *ctx)
         .pc = {0xa5, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1082,7 +1082,7 @@ static void datapath_zeropage_cycle_n(void *ctx)
         .pc = {0xa5, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1102,7 +1102,7 @@ static void datapath_zeropage_x_cycle_zero(void *ctx)
         .pc = {0xb5, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1122,7 +1122,7 @@ static void datapath_zeropage_x_cycle_one(void *ctx)
         .pc = {0xb5, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1142,7 +1142,7 @@ static void datapath_zeropage_x_cycle_n(void *ctx)
         .pc = {0xb5, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1162,7 +1162,7 @@ static void datapath_zeropage_y_cycle_zero(void *ctx)
         .pc = {0xb6, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1182,7 +1182,7 @@ static void datapath_zeropage_y_cycle_one(void *ctx)
         .pc = {0xb6, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1202,7 +1202,7 @@ static void datapath_zeropage_y_cycle_n(void *ctx)
         .pc = {0xb6, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1222,7 +1222,7 @@ static void datapath_indirect_x_cycle_zero(void *ctx)
         .pc = {0xa1, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1242,7 +1242,7 @@ static void datapath_indirect_x_cycle_one(void *ctx)
         .pc = {0xa1, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1262,7 +1262,7 @@ static void datapath_indirect_x_cycle_n(void *ctx)
         .pc = {0xa1, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1282,7 +1282,7 @@ static void datapath_indirect_y_cycle_zero(void *ctx)
         .pc = {0xb1, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1302,7 +1302,7 @@ static void datapath_indirect_y_cycle_one(void *ctx)
         .pc = {0xb1, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1322,7 +1322,7 @@ static void datapath_indirect_y_cycle_n(void *ctx)
         .pc = {0xb1, 0x43},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1342,7 +1342,7 @@ static void datapath_absolute_cycle_zero(void *ctx)
         .pc = {0xad, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1362,7 +1362,7 @@ static void datapath_absolute_cycle_one(void *ctx)
         .pc = {0xad, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1382,7 +1382,7 @@ static void datapath_absolute_cycle_two(void *ctx)
         .pc = {0xad, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1402,7 +1402,7 @@ static void datapath_absolute_cycle_n(void *ctx)
         .pc = {0xad, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 3,
         .prg.curr = &curr,
     };
@@ -1422,7 +1422,7 @@ static void datapath_absolute_x_cycle_zero(void *ctx)
         .pc = {0xbd, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1442,7 +1442,7 @@ static void datapath_absolute_x_cycle_one(void *ctx)
         .pc = {0xbd, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1462,7 +1462,7 @@ static void datapath_absolute_x_cycle_two(void *ctx)
         .pc = {0xbd, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1482,7 +1482,7 @@ static void datapath_absolute_x_cycle_n(void *ctx)
         .pc = {0xbd, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 3,
         .prg.curr = &curr,
     };
@@ -1502,7 +1502,7 @@ static void datapath_absolute_y_cycle_zero(void *ctx)
         .pc = {0xb9, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1522,7 +1522,7 @@ static void datapath_absolute_y_cycle_one(void *ctx)
         .pc = {0xb9, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1542,7 +1542,7 @@ static void datapath_absolute_y_cycle_two(void *ctx)
         .pc = {0xb9, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1562,7 +1562,7 @@ static void datapath_absolute_y_cycle_n(void *ctx)
         .pc = {0xb9, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 3,
         .prg.curr = &curr,
     };
@@ -1582,7 +1582,7 @@ static void datapath_jmp_absolute_cycle_zero(void *ctx)
         .pc = {0x4c, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1602,7 +1602,7 @@ static void datapath_jmp_absolute_cycle_one(void *ctx)
         .pc = {0x4c, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1622,7 +1622,7 @@ static void datapath_jmp_absolute_cycle_two(void *ctx)
         .pc = {0x4c, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1642,7 +1642,7 @@ static void datapath_jmp_absolute_cycle_n(void *ctx)
         .pc = {0x4c, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 3,
         .prg.curr = &curr,
     };
@@ -1662,7 +1662,7 @@ static void datapath_jmp_indirect_cycle_zero(void *ctx)
         .pc = {0x6c, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1682,7 +1682,7 @@ static void datapath_jmp_indirect_cycle_one(void *ctx)
         .pc = {0x6c, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1702,7 +1702,7 @@ static void datapath_jmp_indirect_cycle_two(void *ctx)
         .pc = {0x6c, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1722,7 +1722,7 @@ static void datapath_jmp_indirect_cycle_n(void *ctx)
         .pc = {0x6c, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 3,
         .prg.curr = &curr,
     };
@@ -1742,7 +1742,7 @@ static void datapath_bch_cycle_zero(void *ctx)
         .pc = {0x90, 0x2, 0xff, 0xff, 0xff},
         .length = 5,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1762,7 +1762,7 @@ static void datapath_bch_cycle_one(void *ctx)
         .pc = {0x90, 0x2, 0xff, 0xff, 0xff},
         .length = 5,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1782,7 +1782,7 @@ static void datapath_bch_cycle_n(void *ctx)
         .pc = {0x90, 0x2, 0xff, 0xff, 0xff},
         .length = 5,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1802,7 +1802,7 @@ static void datapath_push_cycle_zero(void *ctx)
         .pc = {0x48, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1822,7 +1822,7 @@ static void datapath_push_cycle_one(void *ctx)
         .pc = {0x48, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1842,7 +1842,7 @@ static void datapath_push_cycle_n(void *ctx)
         .pc = {0x48, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1862,7 +1862,7 @@ static void datapath_pull_cycle_zero(void *ctx)
         .pc = {0x68, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1882,7 +1882,7 @@ static void datapath_pull_cycle_one(void *ctx)
         .pc = {0x68, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1902,7 +1902,7 @@ static void datapath_pull_cycle_n(void *ctx)
         .pc = {0x68, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1922,7 +1922,7 @@ static void datapath_jsr_cycle_zero(void *ctx)
         .pc = {0x20, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -1942,7 +1942,7 @@ static void datapath_jsr_cycle_one(void *ctx)
         .pc = {0x20, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -1962,7 +1962,7 @@ static void datapath_jsr_cycle_two(void *ctx)
         .pc = {0x20, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -1982,7 +1982,7 @@ static void datapath_jsr_cycle_n(void *ctx)
         .pc = {0x20, 0x43, 0x21},
         .length = 3,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 3,
         .prg.curr = &curr,
     };
@@ -2002,7 +2002,7 @@ static void datapath_rts_cycle_zero(void *ctx)
         .pc = {0x60, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -2022,7 +2022,7 @@ static void datapath_rts_cycle_one(void *ctx)
         .pc = {0x60, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -2042,7 +2042,7 @@ static void datapath_rts_cycle_n(void *ctx)
         .pc = {0x60, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -2062,7 +2062,7 @@ static void datapath_brk_cycle_zero(void *ctx)
         .pc = {0x0, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 0,
         .prg.curr = &curr,
     };
@@ -2082,7 +2082,7 @@ static void datapath_brk_cycle_one(void *ctx)
         .pc = {0x0, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 1,
         .prg.curr = &curr,
     };
@@ -2102,7 +2102,7 @@ static void datapath_brk_cycle_n(void *ctx)
         .pc = {0x0, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 2,
         .prg.curr = &curr,
     };
@@ -2122,7 +2122,7 @@ static void datapath_brk_cycle_six(void *ctx)
         .pc = {0x0, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath.exec_cycle = 6,
         .prg.curr = &curr,
     };
@@ -2142,7 +2142,7 @@ static void datapath_irq_cycle_zero(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 0,
             .irq = CSGS_COMMITTED,
@@ -2165,7 +2165,7 @@ static void datapath_irq_cycle_one(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 1,
             .irq = CSGS_COMMITTED,
@@ -2188,7 +2188,7 @@ static void datapath_irq_cycle_n(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 2,
             .irq = CSGS_COMMITTED,
@@ -2211,7 +2211,7 @@ static void datapath_irq_cycle_six(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 6,
             .irq = CSGS_COMMITTED,
@@ -2234,7 +2234,7 @@ static void datapath_nmi_cycle_zero(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 0,
             .nmi = CSGS_COMMITTED,
@@ -2257,7 +2257,7 @@ static void datapath_nmi_cycle_one(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 1,
             .nmi = CSGS_COMMITTED,
@@ -2280,7 +2280,7 @@ static void datapath_nmi_cycle_n(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 2,
             .nmi = CSGS_COMMITTED,
@@ -2303,7 +2303,7 @@ static void datapath_nmi_cycle_six(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 6,
             .nmi = CSGS_COMMITTED,
@@ -2326,7 +2326,7 @@ static void datapath_rst_cycle_zero(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 0,
             .rst = CSGS_COMMITTED,
@@ -2349,7 +2349,7 @@ static void datapath_rst_cycle_one(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 1,
             .rst = CSGS_COMMITTED,
@@ -2372,7 +2372,7 @@ static void datapath_rst_cycle_n(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 2,
             .rst = CSGS_COMMITTED,
@@ -2395,7 +2395,7 @@ static void datapath_rst_cycle_six(void *ctx)
         .pc = {0xea, 0xff},
         .length = 2,
     };
-    struct snapshot snp = {
+    struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 6,
             .rst = CSGS_COMMITTED,
@@ -2433,7 +2433,7 @@ static void peek_immediate(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu_snapshot(&cpu, &snp);
 
@@ -2452,7 +2452,7 @@ static void peek_zeropage(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu_snapshot(&cpu, &snp);
 
@@ -2470,7 +2470,7 @@ static void peek_zp_indexed(void *ctx)
     uint8_t mem[] = {0xb5, 0x3, 0x0, 0x0, 0x0, 0x30};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 2;
@@ -2490,7 +2490,7 @@ static void peek_indexed_indirect(void *ctx)
     uint8_t mem[] = {0xa1, 0x2, 0x0, 0x0, 0x2, 0x1, [258] = 0x40};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 2;
@@ -2510,7 +2510,7 @@ static void peek_indirect_indexed(void *ctx)
     uint8_t mem[] = {0xb1, 0x2, 0x2, 0x1, [263] = 0x60};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.y = 5;
@@ -2530,7 +2530,7 @@ static void peek_absolute_indexed(void *ctx)
     uint8_t mem[] = {0xbd, 0x2, 0x1, [268] = 0x70};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 0xa;
@@ -2550,7 +2550,7 @@ static void peek_branch(void *ctx)
     uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
     cpu_snapshot(&cpu, &snp);
@@ -2569,7 +2569,7 @@ static void peek_branch_forced(void *ctx)
     uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.z = false;
     cpu_snapshot(&cpu, &snp);
@@ -2588,7 +2588,7 @@ static void peek_absolute_indirect(void *ctx)
     uint8_t mem[] = {0x6c, 0x2, 0x1, [258] = 0x5, 0x2, [517] = 80};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 0xa;
@@ -2609,7 +2609,7 @@ static void peek_interrupt(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu.irq = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snp);
@@ -2633,7 +2633,7 @@ static void peek_overridden_reset(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu.rst = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snp);
@@ -2657,7 +2657,7 @@ static void peek_overridden_non_reset(void *ctx)
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu.nmi = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snp);
@@ -2682,7 +2682,7 @@ static void peek_busfault(void *ctx)
     uint8_t mem[] = {0xb1, 0x2, 0x2, 0x40};
     struct mos6502 cpu;
     char buf[DIS_PEEK_SIZE];
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.y = 5;

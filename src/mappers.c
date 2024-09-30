@@ -247,7 +247,7 @@ static bool ines_000_vbus_connect(struct mapper *self, bus *b)
     });
 }
 
-static void ines_000_snapshot(struct mapper *self, struct snapshot *snp)
+static void ines_000_snapshot(struct mapper *self, struct aldo_snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);

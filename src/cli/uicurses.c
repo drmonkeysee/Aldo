@@ -252,7 +252,7 @@ static void drawcart(const struct view *v, const struct emulator *emu)
 }
 
 static void drawinstructions(const struct view *v, int h, int y,
-                             const struct snapshot *snp)
+                             const struct aldo_snapshot *snp)
 {
     struct dis_instruction inst = {0};
     uint16_t addr = snp->cpu.datapath.current_instruction;
@@ -317,7 +317,7 @@ static void drawprg(const struct view *v, const struct emulator *emu)
 }
 
 static int drawregisters(const struct view *v, int cursor_y,
-                         const struct snapshot *snp)
+                         const struct aldo_snapshot *snp)
 {
     mvwprintw(v->content, cursor_y++, 0, "PC: %04X  A: %02X",
               snp->cpu.program_counter, snp->cpu.accumulator);
@@ -329,7 +329,7 @@ static int drawregisters(const struct view *v, int cursor_y,
 }
 
 static int drawflags(const struct view *v, int cursor_y,
-                     const struct snapshot *snp)
+                     const struct aldo_snapshot *snp)
 {
     int cursor_x = 0;
     mvwaddstr(v->content, cursor_y++, cursor_x, "N V - B D I Z C");
@@ -400,7 +400,7 @@ static void draw_interrupt_latch(const struct view *v,
 }
 
 static void drawdatapath(const struct view *v, int cursor_y, int w,
-                         const struct snapshot *snp)
+                         const struct aldo_snapshot *snp)
 {
     static const int
         seph = 5, vsep1 = 7, vsep2 = 21, col1 = vsep1 + 2, col2 = vsep2 + 2;
@@ -466,7 +466,7 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
                     -1, "R\u0305S\u0305T\u0305");
 }
 
-static void drawcpu(const struct view *v, const struct snapshot *snp)
+static void drawcpu(const struct view *v, const struct aldo_snapshot *snp)
 {
     int w = getmaxx(v->content);
     werase(v->content);
@@ -478,7 +478,7 @@ static void drawcpu(const struct view *v, const struct snapshot *snp)
 }
 
 static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
-                          int w, const struct snapshot *snp)
+                          int w, const struct aldo_snapshot *snp)
 {
     uint8_t sel = snp->ppu.datapath.register_select;
     char sel_buf[4];
@@ -501,7 +501,7 @@ static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
 }
 
 static int draw_pregisters(const struct view *v, int cursor_y,
-                           const struct snapshot *snp)
+                           const struct aldo_snapshot *snp)
 {
     uint8_t status = snp->ppu.status;
     mvwprintw(v->content, ++cursor_y, 0, "CONTROL: %02X  STATUS:  %d%d%d",
@@ -521,7 +521,7 @@ static void draw_scroll_addr(const struct view *v, int y, int x, char label,
 }
 
 static int draw_pdatapath(const struct view *v, int cursor_y, int w,
-                          const struct snapshot *snp)
+                          const struct aldo_snapshot *snp)
 {
     static const int seph = 5, vsep = 19, buscol = vsep + 2;
 
@@ -563,7 +563,7 @@ static int draw_pdatapath(const struct view *v, int cursor_y, int w,
 }
 
 static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
-                              const struct snapshot *snp)
+                              const struct aldo_snapshot *snp)
 {
     mvwprintw(v->content, cursor_y, line_x - 2, "[%sXX]", DArrowDown);
 
@@ -578,7 +578,7 @@ static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
                     ArrowDown, -4, vbuf);
 }
 
-static void drawppu(const struct view *v, const struct snapshot *snp)
+static void drawppu(const struct view *v, const struct aldo_snapshot *snp)
 {
     int w = getmaxx(v->content), line_x = (w / 4) + 1;
     int cursor_y = drawtop_plines(v, 0, line_x, w, snp);
@@ -675,7 +675,7 @@ static void draw_ppumem(const struct view *v, const struct emulator *emu,
 {
     static const int sheeth = (RamDim * 2) + 1;
 
-    const struct snapshot *snp = &emu->snapshot;
+    const struct aldo_snapshot *snp = &emu->snapshot;
     int cursor_y = draw_mempage(v, emu, snp->mem.oam, RSEL_PPU, start_x, 0, 0,
                                 0, RamDim);
     wclrtoeol(v->content);

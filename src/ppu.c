@@ -503,7 +503,7 @@ int ppu_cycle(struct rp2c02 *self)
     return cycle(self);
 }
 
-void ppu_bus_snapshot(const struct rp2c02 *self, struct snapshot *snp)
+void ppu_bus_snapshot(const struct rp2c02 *self, struct aldo_snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);
@@ -542,7 +542,7 @@ void ppu_bus_snapshot(const struct rp2c02 *self, struct snapshot *snp)
     snp->mem.palette = self->palette;
 }
 
-void ppu_vid_snapshot(const struct rp2c02 *self, struct snapshot *snp)
+void ppu_vid_snapshot(const struct rp2c02 *self, struct aldo_snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);

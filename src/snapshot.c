@@ -15,7 +15,7 @@
 static_assert(ALDO_PT_TILE_COUNT * ALDO_CHR_TILE_STRIDE == MEMBLOCK_4KB,
               "Pattern table size mismatch");
 
-void aldo_snapshot_extend(struct snapshot *snp)
+void aldo_snapshot_extend(struct aldo_snapshot *snp)
 {
     assert(snp != NULL);
 
@@ -23,7 +23,7 @@ void aldo_snapshot_extend(struct snapshot *snp)
     snp->video = malloc(sizeof *snp->video);
 }
 
-void aldo_snapshot_cleanup(struct snapshot *snp)
+void aldo_snapshot_cleanup(struct aldo_snapshot *snp)
 {
     assert(snp != NULL);
 

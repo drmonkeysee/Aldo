@@ -84,7 +84,7 @@ static uint8_t flags(enum inst in)
     return 0 <= in && in < sz ? Flags[in] : Flags[IN_UDF];
 }
 
-static const char *interrupt_display(const struct snapshot *snp)
+static const char *interrupt_display(const struct aldo_snapshot *snp)
 {
     if (snp->cpu.datapath.opcode != Aldo_BrkOpcode) return "";
     if (snp->cpu.datapath.exec_cycle == 6) return "CLR";
@@ -94,7 +94,7 @@ static const char *interrupt_display(const struct snapshot *snp)
     return "";
 }
 
-static uint16_t interrupt_vector(const struct snapshot *snp)
+static uint16_t interrupt_vector(const struct aldo_snapshot *snp)
 {
     if (snp->cpu.datapath.nmi == CSGS_COMMITTED)
         return batowr(snp->prg.vectors);
@@ -519,7 +519,7 @@ int dis_inst(uint16_t addr, const struct dis_instruction *inst,
     return total;
 }
 
-int dis_datapath(const struct snapshot *snp,
+int dis_datapath(const struct aldo_snapshot *snp,
                  char dis[restrict static DIS_DATAP_SIZE])
 {
     assert(snp != NULL);
@@ -703,7 +703,7 @@ bool dis_inst_equal(const struct dis_instruction *lhs,
 //
 
 int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
-             const struct snapshot *snp,
+             const struct aldo_snapshot *snp,
              char dis[restrict static DIS_PEEK_SIZE])
 {
     assert(cpu != NULL);

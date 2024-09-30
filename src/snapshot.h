@@ -25,7 +25,7 @@ enum {
     ALDO_PT_TILE_COUNT = 256,
 };
 
-struct snapshot {
+struct aldo_snapshot {
     struct {
         uint16_t program_counter;
         uint8_t accumulator, stack_pointer, status, xindex, yindex;
@@ -91,9 +91,9 @@ struct snapshot {
 
 #include "bridgeopen.h"
 br_libexport
-void aldo_snapshot_extend(struct snapshot *snp) br_nothrow;
+void aldo_snapshot_extend(struct aldo_snapshot *snp) br_nothrow;
 br_libexport
-void aldo_snapshot_cleanup(struct snapshot *snp) br_nothrow;
+void aldo_snapshot_cleanup(struct aldo_snapshot *snp) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

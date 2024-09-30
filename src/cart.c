@@ -405,7 +405,7 @@ void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)
     }
 }
 
-void cart_snapshot(cart *self, struct snapshot *snp)
+void cart_snapshot(cart *self, struct aldo_snapshot *snp)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);

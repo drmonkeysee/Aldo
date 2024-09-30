@@ -56,7 +56,7 @@ br_libexport
 int nes_frame_factor(void) br_nothrow;
 
 br_libexport
-void nes_snapshot(nes *self, struct snapshot *snp) br_nothrow;
+void nes_snapshot(nes *self, struct aldo_snapshot *snp) br_nothrow;
 br_libexport
 void nes_dumpram(nes *self, FILE *fs[br_csz(3)]) br_nothrow;
 #include "bridgeclose.h"

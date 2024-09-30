@@ -18,6 +18,6 @@
 
 void aldo_trace_line(FILE *tracelog, uint64_t cycles, struct ppu_coord pixel,
                      struct mos6502 *cpu, debugger *dbg,
-                     const struct snapshot *snp);
+                     const struct aldo_snapshot *snp);
 
 #endif

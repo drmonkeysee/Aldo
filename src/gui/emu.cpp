@@ -49,7 +49,7 @@ auto load_cart(const std::filesystem::path& filepath)
     return c;
 }
 
-auto update_bouncer(aldo::viewstate& vs, const snapshot& snp) noexcept
+auto update_bouncer(aldo::viewstate& vs, const aldo_snapshot& snp) noexcept
 {
     if (!snp.cpu.lines.ready) return;
 

@@ -12,7 +12,6 @@
 #include "emutypes.hpp"
 #include "haltexpr.h"
 #include "handle.hpp"
-#include "snapshot.h"
 
 #include <filesystem>
 #include <iterator>

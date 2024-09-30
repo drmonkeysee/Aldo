@@ -20,7 +20,6 @@
 #include "haltexpr.h"
 #include "mediaruntime.hpp"
 #include "render.hpp"
-#include "snapshot.h"
 #include "style.hpp"
 #include "texture.hpp"
 #include "version.h"

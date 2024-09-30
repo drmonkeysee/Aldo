@@ -2377,7 +2377,7 @@ static void nop_zp(void *ctx)
         ct_assertequal(0xcu, cpu.databus, "Failed on opcode %02x", opc);
 
         // NOTE: verify NOP did nothing
-        struct snapshot snp;
+        struct aldo_snapshot snp;
         cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
@@ -2404,7 +2404,7 @@ static void nop_zpx(void *ctx)
         ct_assertequal(0xbu, cpu.databus, "Failed on opcode %02x", opc);
 
         // NOTE: verify NOP did nothing
-        struct snapshot snp;
+        struct aldo_snapshot snp;
         cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
@@ -2431,7 +2431,7 @@ static void nop_zpx_pageoverflow(void *ctx)
         ct_assertequal(0x6u, cpu.databus, "Failed on opcode %02x", opc);
 
         // NOTE: verify NOP did nothing
-        struct snapshot snp;
+        struct aldo_snapshot snp;
         cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);

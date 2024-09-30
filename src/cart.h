@@ -144,7 +144,7 @@ void cart_vbus_disconnect(cart *self, bus *b) br_nothrow;
 
 void cart_write_dis_header(cart *self, const char *br_noalias name,
                            FILE *f) br_nothrow;
-void cart_snapshot(cart *self, struct snapshot *snp) br_nothrow;
+void cart_snapshot(cart *self, struct aldo_snapshot *snp) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

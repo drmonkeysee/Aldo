@@ -2906,7 +2906,7 @@ static void nop(void *ctx)
         ct_assertequal(0x10u, cpu.databus, "Failed on opcode %02x", opc);
 
         // NOTE: verify NOP did nothing
-        struct snapshot snp;
+        struct aldo_snapshot snp;
         cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);

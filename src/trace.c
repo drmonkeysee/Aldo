@@ -16,7 +16,7 @@
 #include <stddef.h>
 
 static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
-                             const struct snapshot *snp)
+                             const struct aldo_snapshot *snp)
 {
     uint8_t bytes[3];
     size_t instlen = bus_copy(cpu->mbus, snp->cpu.datapath.current_instruction,
@@ -35,7 +35,8 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
 }
 
 static int trace_instruction_peek(FILE *tracelog, struct mos6502 *cpu,
-                                  debugger *dbg, const struct snapshot *snp)
+                                  debugger *dbg,
+                                  const struct aldo_snapshot *snp)
 {
     char peek[DIS_PEEK_SIZE];
     int result = dis_peek(snp->cpu.datapath.current_instruction, cpu, dbg, snp,
@@ -43,7 +44,7 @@ static int trace_instruction_peek(FILE *tracelog, struct mos6502 *cpu,
     return fprintf(tracelog, " %s", result < 0 ? dis_errstr(result) : peek);
 }
 
-static void trace_registers(FILE *tracelog, const struct snapshot *snp)
+static void trace_registers(FILE *tracelog, const struct aldo_snapshot *snp)
 {
     static const char flags[] = {
         'c', 'C', 'z', 'Z', 'i', 'I', 'd', 'D',
@@ -66,7 +67,7 @@ static void trace_registers(FILE *tracelog, const struct snapshot *snp)
 
 void aldo_trace_line(FILE *tracelog, uint64_t cycles, struct ppu_coord pixel,
                      struct mos6502 *cpu, debugger *dbg,
-                     const struct snapshot *snp)
+                     const struct aldo_snapshot *snp)
 {
     assert(tracelog != NULL);
     assert(cpu != NULL);

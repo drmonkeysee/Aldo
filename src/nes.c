@@ -204,7 +204,7 @@ static void set_cpu_pins(struct nes001 *self)
     self->cpu.signal.rst = !self->probe.rst;
 }
 
-static void bus_snapshot(const struct nes001 *self, struct snapshot *snp)
+static void bus_snapshot(const struct nes001 *self, struct aldo_snapshot *snp)
 {
     cpu_snapshot(&self->cpu, snp);
     ppu_bus_snapshot(&self->ppu, snp);
@@ -218,7 +218,7 @@ static void instruction_trace(struct nes001 *self,
 {
     if (!self->tracelog || !self->cpu.signal.sync) return;
 
-    struct snapshot snp = {0};
+    struct aldo_snapshot snp = {0};
     bus_snapshot(self, &snp);
     // NOTE: trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
@@ -414,7 +414,7 @@ int nes_frame_factor(void)
     return Aldo_DotsPerFrame;
 }
 
-void nes_snapshot(nes *self, struct snapshot *snp)
+void nes_snapshot(nes *self, struct aldo_snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);

@@ -21,7 +21,7 @@
 static void ppuctrl_write(void *ctx)
 {
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
 
     ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.ctrl);
@@ -41,7 +41,7 @@ static void ppuctrl_write(void *ctx)
 static void ppuctrl_write_mirrored(void *ctx)
 {
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     ppu->t = 0x7fff;
     ppu->ctrl.nh = ppu->ctrl.nl = true;
 
@@ -63,7 +63,7 @@ static void ppuctrl_write_mirrored(void *ctx)
 static void ppuctrl_write_during_reset(void *ctx)
 {
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     ppu->rst = CSGS_SERVICED;
 
     ppu_bus_snapshot(ppu, &snp);
@@ -100,7 +100,7 @@ static void ppuctrl_read(void *ctx)
 static void ppumask_write(void *ctx)
 {
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
 
     ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.mask);
@@ -118,7 +118,7 @@ static void ppumask_write(void *ctx)
 static void ppumask_write_mirrored(void *ctx)
 {
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
 
     ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.mask);
@@ -136,7 +136,7 @@ static void ppumask_write_mirrored(void *ctx)
 static void ppumask_write_during_reset(void *ctx)
 {
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     ppu->rst = CSGS_SERVICED;
 
     ppu_bus_snapshot(ppu, &snp);
@@ -171,7 +171,7 @@ static void ppumask_read(void *ctx)
 static void ppustatus_read_when_clear(void *ctx)
 {
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     ppu->regbus = 0x5a;
     ppu->status.v = ppu->status.s = ppu->status.o = false;
 
@@ -189,7 +189,7 @@ static void ppustatus_read_when_clear(void *ctx)
 static void ppustatus_read_when_set(void *ctx)
 {
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     ppu->regbus = 0x5a;
     ppu->w = ppu->status.v = ppu->status.s = ppu->status.o = true;
 
@@ -207,7 +207,7 @@ static void ppustatus_read_when_set(void *ctx)
 static void ppustatus_read_on_nmi_race_condition(void *ctx)
 {
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     ppu->regbus = 0x5a;
     ppu->status.v = ppu->status.s = ppu->status.o = true;
     ppu->line = 241;
@@ -226,7 +226,7 @@ static void ppustatus_read_on_nmi_race_condition(void *ctx)
 static void ppustatus_read_during_reset(void *ctx)
 {
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     ppu->regbus = 0x5a;
     ppu->w = ppu->status.v = ppu->status.s = ppu->status.o = true;
     ppu->rst = CSGS_SERVICED;
@@ -245,7 +245,7 @@ static void ppustatus_read_during_reset(void *ctx)
 static void ppustatus_read_mirrored(void *ctx)
 {
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     ppu->regbus = 0x5a;
 
     uint8_t d;
@@ -262,7 +262,7 @@ static void ppustatus_read_mirrored(void *ctx)
 static void ppustatus_write(void *ctx)
 {
     struct rp2c02 *ppu = ppt_get_ppu(ctx);
-    struct snapshot snp;
+    struct aldo_snapshot snp;
     ppu->w = true;
 
     bus_write(ppt_get_mbus(ctx), 0x2002, 0xff);

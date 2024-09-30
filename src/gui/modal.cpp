@@ -12,6 +12,7 @@
 #include "error.hpp"
 #include "guiplatform.h"
 #include "handle.hpp"
+#include "mediaruntime.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -46,13 +47,15 @@ auto save_file(const gui_platform& p, const char* title,
 }
 
 auto file_modal(modal_launch open, modal_operation op, aldo::Emulator& emu,
-                const gui_platform& p)
+                const aldo::MediaRuntime& mr)
 {
     // NOTE: halt emulator to prevent time-jump from modal delay
     // TODO: does this make sense long-term?
     emu.ready(false);
 
-    auto filepath = open(p);
+    auto filepath = open(mr.platform());
+    // NOTE: at least on macOS main window doesn't auto-focus back from modal
+    SDL_RaiseWindow(mr.window());
     if (filepath.empty()) return false;
 
     SDL_Log("File selected: %s", filepath.c_str());
@@ -69,16 +72,17 @@ auto file_modal(modal_launch open, modal_operation op, aldo::Emulator& emu,
 
 }
 
-bool aldo::modal::loadROM(aldo::Emulator& emu, const gui_platform& p)
+bool aldo::modal::loadROM(aldo::Emulator& emu, const aldo::MediaRuntime& mr)
 {
     auto open = [](const gui_platform& p) {
         return open_file(p, "Choose a ROM file");
     };
     auto op = [&emu](const std::filesystem::path& fp) { emu.loadCart(fp); };
-    return file_modal(open, op, emu, p);
+    return file_modal(open, op, emu, mr);
 }
 
-bool aldo::modal::loadBreakpoints(aldo::Emulator& emu, const gui_platform& p)
+bool aldo::modal::loadBreakpoints(aldo::Emulator& emu,
+                                  const aldo::MediaRuntime& mr)
 {
     auto open = [](const gui_platform& p) {
         return open_file(p, "Choose a Breakpoints file",
@@ -87,10 +91,11 @@ bool aldo::modal::loadBreakpoints(aldo::Emulator& emu, const gui_platform& p)
     auto op = [&d = emu.debugger()](const std::filesystem::path& fp) {
         d.loadBreakpoints(fp);
     };
-    return file_modal(open, op, emu, p);
+    return file_modal(open, op, emu, mr);
 }
 
-bool aldo::modal::exportBreakpoints(aldo::Emulator& emu, const gui_platform& p)
+bool aldo::modal::exportBreakpoints(aldo::Emulator& emu,
+                                    const aldo::MediaRuntime& mr)
 {
     auto open =
         [n = aldo::debug::breakfile_path_from(emu.cartName())]
@@ -101,10 +106,11 @@ bool aldo::modal::exportBreakpoints(aldo::Emulator& emu, const gui_platform& p)
         [&d = std::as_const(emu.debugger())](const std::filesystem::path& fp) {
             d.exportBreakpoints(fp);
         };
-    return file_modal(open, op, emu, p);
+    return file_modal(open, op, emu, mr);
 }
 
-bool aldo::modal::loadPalette(aldo::Emulator& emu, const gui_platform& p)
+bool aldo::modal::loadPalette(aldo::Emulator& emu,
+                              const aldo::MediaRuntime& mr)
 {
     auto open = [](const gui_platform& p) {
         return open_file(p, "Choose a Palette",
@@ -113,5 +119,5 @@ bool aldo::modal::loadPalette(aldo::Emulator& emu, const gui_platform& p)
     auto op = [&p = emu.palette()](const std::filesystem::path& fp) {
         p.load(fp);
     };
-    return file_modal(open, op, emu, p);
+    return file_modal(open, op, emu, mr);
 }

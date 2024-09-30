@@ -8,20 +8,19 @@
 #ifndef Aldo_gui_modal_hpp
 #define Aldo_gui_modal_hpp
 
-struct gui_platform;
-
 namespace aldo
 {
 
 class Emulator;
+class MediaRuntime;
 
 namespace modal
 {
 
-bool loadROM(Emulator& emu, const gui_platform& p);
-bool loadBreakpoints(Emulator& emu, const gui_platform& p);
-bool exportBreakpoints(Emulator& emu, const gui_platform& p);
-bool loadPalette(Emulator& emu, const gui_platform& p);
+bool loadROM(Emulator& emu, const MediaRuntime& mr);
+bool loadBreakpoints(Emulator& emu, const MediaRuntime& mr);
+bool exportBreakpoints(Emulator& emu, const MediaRuntime& mr);
+bool loadPalette(Emulator& emu, const MediaRuntime& mr);
 
 }
 

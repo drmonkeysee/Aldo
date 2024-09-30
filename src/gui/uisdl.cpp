@@ -28,10 +28,10 @@ namespace
 //
 
 auto handle_input(aldo::Emulator& emu, aldo::viewstate& vs,
-                  const gui_platform& p)
+                  const aldo::MediaRuntime& mr)
 {
     auto timer = vs.clock.timeInput();
-    aldo::input::handle(emu, vs, p);
+    aldo::input::handle(emu, vs, mr);
 }
 
 auto update_emu(aldo::Emulator& emu, aldo::viewstate& vs) noexcept
@@ -58,7 +58,7 @@ auto runloop(const gui_platform& p, debugger* debug, nes* console)
     do {
         auto reset = !emu.snapshot().cpu.lines.ready;
         auto tick = state.clock.startTick(reset);
-        handle_input(emu, state, p);
+        handle_input(emu, state, runtime);
         if (state.running) {
             update_emu(emu, state);
             layout.render();

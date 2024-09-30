@@ -8,7 +8,7 @@
 #include "input.hpp"
 
 #include "emu.hpp"
-#include "guiplatform.h"
+#include "mediaruntime.hpp"
 #include "modal.hpp"
 #include "viewstate.hpp"
 
@@ -146,7 +146,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
 }
 
 auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
-                     aldo::viewstate& vs, const gui_platform& p)
+                     aldo::viewstate& vs, const aldo::MediaRuntime& mr)
 {
     auto& debugger = emu.debugger();
     auto breakpoints = debugger.breakpoints();
@@ -167,24 +167,24 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
         breakpoints.clear();
         break;
     case aldo::Command::breakpointsExport:
-        aldo::modal::exportBreakpoints(emu, p);
+        aldo::modal::exportBreakpoints(emu, mr);
         break;
     case aldo::Command::breakpointsOpen:
-        aldo::modal::loadBreakpoints(emu, p);
+        aldo::modal::loadBreakpoints(emu, mr);
         break;
     case aldo::Command::launchStudio:
-        p.launch_studio();
+        mr.platform().launch_studio();
         break;
     case aldo::Command::mode:
         emu.runMode(std::get<csig_excmode>(cs.value));
         break;
     case aldo::Command::openROM:
-        if (aldo::modal::loadROM(emu, p)) {
+        if (aldo::modal::loadROM(emu, mr)) {
             vs.clock.resetEmu();
         }
         break;
     case aldo::Command::paletteLoad:
-        aldo::modal::loadPalette(emu, p);
+        aldo::modal::loadPalette(emu, mr);
         break;
     case aldo::Command::paletteUnload:
         emu.palette().unload();
@@ -219,7 +219,7 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
 }
 
 void aldo::input::handle(aldo::Emulator& emu, aldo::viewstate& vs,
-                         const gui_platform& p)
+                         const aldo::MediaRuntime& mr)
 {
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
@@ -235,7 +235,7 @@ void aldo::input::handle(aldo::Emulator& emu, aldo::viewstate& vs,
     }
     while (!vs.commands.empty()) {
         const auto& cs = vs.commands.front();
-        process_command(cs, emu, vs, p);
+        process_command(cs, emu, vs, mr);
         vs.commands.pop();
     }
 }

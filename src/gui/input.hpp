@@ -8,18 +8,17 @@
 #ifndef Aldo_gui_input_hpp
 #define Aldo_gui_input_hpp
 
-struct gui_platform;
-
 namespace aldo
 {
 
 class Emulator;
+class MediaRuntime;
 struct viewstate;
 
 namespace input
 {
 
-void handle(Emulator& emu, viewstate& vs, const gui_platform& p);
+void handle(Emulator& emu, viewstate& vs, const MediaRuntime& mr);
 
 }
 

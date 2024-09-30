@@ -47,13 +47,16 @@ public:
     static int initStatus() noexcept { return InitStatus; }
 
     MediaRuntime(SDL_Point windowSize, const gui_platform& p);
+    MediaRuntime(SDL_Point, gui_platform&&) = delete;
 
+    const gui_platform& platform() const noexcept { return p; }
     SDL_Window* window() const noexcept { return hwin.get(); }
     SDL_Renderer* renderer() const noexcept { return hren.get(); }
 
 private:
     inline static int InitStatus;
 
+    const gui_platform& p;
     SdlLib sdl;
     win_handle hwin;
     ren_handle hren;

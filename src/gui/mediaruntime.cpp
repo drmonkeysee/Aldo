@@ -88,8 +88,7 @@ aldo::DearImGuiLib::~DearImGuiLib()
 }
 
 aldo::MediaRuntime::MediaRuntime(SDL_Point windowSize, const gui_platform& p)
-try : hwin{create_window(windowSize, p)},
-        hren{create_renderer(hwin, p)},
+try : p{p}, hwin{create_window(windowSize, p)}, hren{create_renderer(hwin, p)},
         imgui{hwin, hren} {}
 catch (...) {
     InitStatus = UI_ERR_LIBINIT;

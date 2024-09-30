@@ -35,14 +35,14 @@ class Snapshot {
 public:
     explicit Snapshot(nes* console) noexcept
     {
-        snapshot_extend(getp());
+        aldo_snapshot_extend(getp());
         nes_snapshot(console, getp());
     }
     Snapshot(const Snapshot&) = default;
     Snapshot& operator=(const Snapshot&) = default;
     Snapshot(Snapshot&&) = default;
     Snapshot& operator=(Snapshot&&) = default;
-    ~Snapshot() { snapshot_cleanup(getp()); }
+    ~Snapshot() { aldo_snapshot_cleanup(getp()); }
 
     const snapshot& get() const noexcept { return snp; }
     const snapshot* getp() const noexcept { return &snp; }

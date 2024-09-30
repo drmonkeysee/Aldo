@@ -68,7 +68,7 @@ struct snapshot {
     // avoid ending up on the stack.
     struct {
         uint8_t vectors[6];
-        struct snpprg {
+        struct aldo_snpprg {
             size_t length;      // Number of bytes copied to pc
             uint8_t pc[96];     // 32 lines @ max 3-byte instructions
         } *curr;
@@ -91,9 +91,9 @@ struct snapshot {
 
 #include "bridgeopen.h"
 br_libexport
-void snapshot_extend(struct snapshot *snp) br_nothrow;
+void aldo_snapshot_extend(struct snapshot *snp) br_nothrow;
 br_libexport
-void snapshot_cleanup(struct snapshot *snp) br_nothrow;
+void aldo_snapshot_cleanup(struct snapshot *snp) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

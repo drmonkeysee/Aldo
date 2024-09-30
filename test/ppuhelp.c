@@ -52,11 +52,11 @@ void ppu_setup(void **ctx)
         .write = test_vwrite,
         .ctx = VRam,
     });
-    ppu_connect(&c->ppu, c->mbus);
+    aldo_ppu_connect(&c->ppu, c->mbus);
     // NOTE: run powerup and reset sequence and then force internal state to a
     // known zero-value.
-    ppu_powerup(&c->ppu);
-    ppu_cycle(&c->ppu);
+    aldo_ppu_powerup(&c->ppu);
+    aldo_ppu_cycle(&c->ppu);
     c->ppu.line = c->ppu.dot = 0;
     c->ppu.rst = CSGS_CLEAR;
     *ctx = c;

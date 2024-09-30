@@ -29,7 +29,7 @@ struct nes001 {
     debugger *dbg;              // Debugger Context; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
-    struct rp2c02 ppu;          // RP2C02 PPU
+    struct aldo_rp2c02 ppu;     // RP2C02 PPU
     enum csig_excmode mode;     // NES execution mode
     struct {
         bool
@@ -175,7 +175,7 @@ static void setup(struct nes001 *self)
 {
     create_mbus(self);
     create_vbus(self);
-    ppu_connect(&self->ppu, self->cpu.mbus);
+    aldo_ppu_connect(&self->ppu, self->cpu.mbus);
     debug_cpu_connect(self->dbg, &self->cpu);
 }
 
@@ -207,7 +207,7 @@ static void set_cpu_pins(struct nes001 *self)
 static void bus_snapshot(const struct nes001 *self, struct aldo_snapshot *snp)
 {
     cpu_snapshot(&self->cpu, snp);
-    ppu_bus_snapshot(&self->ppu, snp);
+    aldo_ppu_bus_snapshot(&self->ppu, snp);
     bus_copy(self->cpu.mbus, CPU_VECTOR_NMI, memsz(snp->prg.vectors),
              snp->prg.vectors);
 }
@@ -223,13 +223,13 @@ static void instruction_trace(struct nes001 *self,
     // NOTE: trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
     aldo_trace_line(self->tracelog, clock->cycles + (uint64_t)adjustment,
-                    ppu_trace(&self->ppu, adjustment * PpuRatio), &self->cpu,
-                    self->dbg, &snp);
+                    aldo_ppu_trace(&self->ppu, adjustment * PpuRatio),
+                    &self->cpu, self->dbg, &snp);
 }
 
 static bool clock_ppu(struct nes001 *self, struct cycleclock *clock)
 {
-    clock->frames += (uint64_t)ppu_cycle(&self->ppu);
+    clock->frames += (uint64_t)aldo_ppu_cycle(&self->ppu);
     --clock->budget;
     set_ppu_pins(self);
     // TODO: ppu debug hook goes here
@@ -306,10 +306,10 @@ void nes_powerup(nes *self, cart *c, bool zeroram)
     if (zeroram) {
         memset(self->ram, 0, memsz(self->ram));
         memset(self->vram, 0, memsz(self->vram));
-        ppu_zeroram(&self->ppu);
+        aldo_ppu_zeroram(&self->ppu);
     }
     cpu_powerup(&self->cpu);
-    ppu_powerup(&self->ppu);
+    aldo_ppu_powerup(&self->ppu);
 }
 
 void nes_powerdown(nes *self)
@@ -421,7 +421,7 @@ void nes_snapshot(nes *self, struct aldo_snapshot *snp)
     assert(snp->prg.curr != NULL);
 
     bus_snapshot(self, snp);
-    ppu_vid_snapshot(&self->ppu, snp);
+    aldo_ppu_vid_snapshot(&self->ppu, snp);
     if (self->cart) {
         cart_snapshot(self->cart, snp);
     }
@@ -446,6 +446,6 @@ void nes_dumpram(nes *self, FILE *fs[static 3])
         fwrite(self->vram, sizeof self->vram[0], memsz(self->vram), f);
     }
     if ((f = fs[2])) {
-        ppu_dumpram(&self->ppu, f);
+        aldo_ppu_dumpram(&self->ppu, f);
     }
 }

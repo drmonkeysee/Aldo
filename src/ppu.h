@@ -19,9 +19,9 @@
 
 // The Ricoh RP2C02 Picture Processing Unit (PPU) is a
 // fixed-function IC that generates the NES video signal.
-struct rp2c02 {
+struct aldo_rp2c02 {
     // Video Bus: video component connections
-    bus *vbus;                  // Non-owning Pointer
+    bus *vbus;              // Non-owning Pointer
 
     // PPU Registers
     struct {
@@ -108,20 +108,23 @@ struct rp2c02 {
                             // 12 background, 12 sprite.
 };
 
-struct ppu_coord { int dot, line; };
+struct aldo_ppu_coord { int dot, line; };
 
 extern const uint16_t Aldo_PaletteStartAddr;
 extern const int Aldo_DotsPerFrame;
 
-void ppu_connect(struct rp2c02 *self, bus *mbus);
-void ppu_powerup(struct rp2c02 *self);
-void ppu_zeroram(struct rp2c02 *self);
+void aldo_ppu_connect(struct aldo_rp2c02 *self, bus *mbus);
+void aldo_ppu_powerup(struct aldo_rp2c02 *self);
+void aldo_ppu_zeroram(struct aldo_rp2c02 *self);
 
-int ppu_cycle(struct rp2c02 *self);
+int aldo_ppu_cycle(struct aldo_rp2c02 *self);
 
-void ppu_bus_snapshot(const struct rp2c02 *self, struct aldo_snapshot *snp);
-void ppu_vid_snapshot(const struct rp2c02 *self, struct aldo_snapshot *snp);
-void ppu_dumpram(const struct rp2c02 *self, FILE *f);
-struct ppu_coord ppu_trace(const struct rp2c02 *self, int adjustment);
+void aldo_ppu_bus_snapshot(const struct aldo_rp2c02 *self,
+                           struct aldo_snapshot *snp);
+void aldo_ppu_vid_snapshot(const struct aldo_rp2c02 *self,
+                           struct aldo_snapshot *snp);
+void aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f);
+struct aldo_ppu_coord aldo_ppu_trace(const struct aldo_rp2c02 *self,
+                                     int adjustment);
 
 #endif

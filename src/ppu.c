@@ -27,7 +27,7 @@ static const int
 // MARK: - Registers
 //
 
-static uint8_t get_ctrl(const struct rp2c02 *self)
+static uint8_t get_ctrl(const struct aldo_rp2c02 *self)
 {
     return (uint8_t)
         (self->ctrl.nl
@@ -40,7 +40,7 @@ static uint8_t get_ctrl(const struct rp2c02 *self)
          | self->ctrl.v << 7);
 }
 
-static void set_ctrl(struct rp2c02 *self, uint8_t v)
+static void set_ctrl(struct aldo_rp2c02 *self, uint8_t v)
 {
     self->ctrl.nl = v & 0x1;
     self->ctrl.nh = v & 0x2;
@@ -52,7 +52,7 @@ static void set_ctrl(struct rp2c02 *self, uint8_t v)
     self->ctrl.v = v & 0x80;
 }
 
-static uint8_t get_mask(const struct rp2c02 *self)
+static uint8_t get_mask(const struct aldo_rp2c02 *self)
 {
     return (uint8_t)
         (self->mask.g
@@ -65,7 +65,7 @@ static uint8_t get_mask(const struct rp2c02 *self)
          | self->mask.be << 7);
 }
 
-static void set_mask(struct rp2c02 *self, uint8_t v)
+static void set_mask(struct aldo_rp2c02 *self, uint8_t v)
 {
     self->mask.g = v & 0x1;
     self->mask.bm = v & 0x2;
@@ -77,13 +77,13 @@ static void set_mask(struct rp2c02 *self, uint8_t v)
     self->mask.be = v & 0x80;
 }
 
-static uint8_t get_status(const struct rp2c02 *self)
+static uint8_t get_status(const struct aldo_rp2c02 *self)
 {
     return (uint8_t)
         (self->status.o << 5 | self->status.s << 6 | self->status.v << 7);
 }
 
-static void set_status(struct rp2c02 *self, uint8_t v)
+static void set_status(struct aldo_rp2c02 *self, uint8_t v)
 {
     self->status.o = v & 0x20;
     self->status.s = v & 0x40;
@@ -96,19 +96,19 @@ static uint16_t maskaddr(uint16_t addr)
     return addr & ADDRMASK_16KB;
 }
 
-static bool rendering_disabled(const struct rp2c02 *self)
+static bool rendering_disabled(const struct aldo_rp2c02 *self)
 {
     return !self->ctrl.b && !self->ctrl.s;
 }
 
-static bool in_postrender(const struct rp2c02 *self)
+static bool in_postrender(const struct aldo_rp2c02 *self)
 {
     static const int line_post_render = 240;
 
     return line_post_render <= self->line && self->line < LinePreRender;
 }
 
-static bool in_vblank(const struct rp2c02 *self)
+static bool in_vblank(const struct aldo_rp2c02 *self)
 {
     return (self->line == LineVBlank && self->dot >= 1)
             || (LineVBlank < self->line && self->line < LinePreRender)
@@ -145,7 +145,7 @@ static uint16_t mask_palette(uint16_t addr)
     return addr;
 }
 
-static uint8_t palette_read(const struct rp2c02 *self, uint16_t addr)
+static uint8_t palette_read(const struct aldo_rp2c02 *self, uint16_t addr)
 {
     // NOTE: addr=[$3F00-$3FFF]
     assert(Aldo_PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
@@ -154,7 +154,7 @@ static uint8_t palette_read(const struct rp2c02 *self, uint16_t addr)
     return self->palette[mask_palette(addr)] & 0x3f;
 }
 
-static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
+static void palette_write(struct aldo_rp2c02 *self, uint16_t addr, uint8_t d)
 {
     // NOTE: addr=[$3F00-$3FFF]
     assert(Aldo_PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
@@ -171,7 +171,7 @@ static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     // NOTE: addr=[$2000-$3FFF]
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
-    struct rp2c02 *ppu = ctx;
+    struct aldo_rp2c02 *ppu = ctx;
     ppu->signal.rw = true;
     ppu->regsel = addr & 0x7;
     switch (ppu->regsel) {
@@ -205,7 +205,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
     // NOTE: addr=[$2000-$3FFF]
     assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
 
-    struct rp2c02 *ppu = ctx;
+    struct aldo_rp2c02 *ppu = ctx;
     ppu->signal.rw = false;
     ppu->regsel = addr & 0x7;
     ppu->regbus = d;
@@ -286,14 +286,14 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
 // MARK: - PPU Bus Device (Pattern Tables, Nametables, Palette)
 //
 
-static void read(struct rp2c02 *self)
+static void read(struct aldo_rp2c02 *self)
 {
     self->signal.ale = self->signal.rd = false;
     self->bflt = !bus_read(self->vbus, self->vaddrbus, &self->vdatabus);
     self->rbuf = self->vdatabus;
 }
 
-static void write(struct rp2c02 *self)
+static void write(struct aldo_rp2c02 *self)
 {
     self->signal.ale = false;
     self->vdatabus = self->regbus;
@@ -309,7 +309,7 @@ static void write(struct rp2c02 *self)
 // MARK: - Internal Operations
 //
 
-static int nextdot(struct rp2c02 *self)
+static int nextdot(struct aldo_rp2c02 *self)
 {
     if (++self->dot >= Dots) {
         self->dot = 0;
@@ -322,7 +322,7 @@ static int nextdot(struct rp2c02 *self)
     return 0;
 }
 
-static void reset(struct rp2c02 *self)
+static void reset(struct aldo_rp2c02 *self)
 {
     // NOTE: t is cleared but NOT v
     self->dot = self->line = self->t = self->rbuf = self->x = 0;
@@ -336,7 +336,7 @@ static void reset(struct rp2c02 *self)
 // NOTE: this follows the same sequence as CPU reset sequence and is checked
 // only on CPU-cycle boundaries rather than each PPU cycle; this keeps the two
 // chips in sync when handling the RESET signal.
-static void handle_reset(struct rp2c02 *self)
+static void handle_reset(struct aldo_rp2c02 *self)
 {
     // NOTE: pending always proceeds to committed just like the CPU sequence
     if (self->rst == CSGS_PENDING) {
@@ -371,7 +371,7 @@ static void handle_reset(struct rp2c02 *self)
     }
 }
 
-static void vblank(struct rp2c02 *self)
+static void vblank(struct aldo_rp2c02 *self)
 {
     if (self->line == LineVBlank && self->dot == 0) {
         // NOTE: set vblank status 1 dot early to account for race-condition
@@ -389,7 +389,7 @@ static void vblank(struct rp2c02 *self)
 }
 
 // TODO: can this be generalized to internal r/w as well?
-static void cpu_rw(struct rp2c02 *self)
+static void cpu_rw(struct aldo_rp2c02 *self)
 {
     if (self->signal.ale) {
         if (self->signal.rw) {
@@ -406,7 +406,7 @@ static void cpu_rw(struct rp2c02 *self)
     }
 }
 
-static int cycle(struct rp2c02 *self)
+static int cycle(struct aldo_rp2c02 *self)
 {
     // NOTE: clear any databus signals from previous cycle; unlike the CPU,
     // the PPU does not read/write on every cycle so these lines must be
@@ -434,7 +434,7 @@ static int cycle(struct rp2c02 *self)
 }
 
 static void
-snapshot_palette(const struct rp2c02 *self,
+snapshot_palette(const struct aldo_rp2c02 *self,
                  uint8_t palsnp[static ALDO_PAL_SIZE][ALDO_PAL_SIZE],
                  uint16_t offset)
 {
@@ -457,7 +457,7 @@ snapshot_palette(const struct rp2c02 *self,
 const uint16_t Aldo_PaletteStartAddr = MEMBLOCK_16KB - 256;
 const int Aldo_DotsPerFrame = Dots * Lines;
 
-void ppu_connect(struct rp2c02 *self, bus *mbus)
+void aldo_ppu_connect(struct aldo_rp2c02 *self, bus *mbus)
 {
     assert(self != NULL);
     assert(mbus != NULL);
@@ -470,7 +470,7 @@ void ppu_connect(struct rp2c02 *self, bus *mbus)
     assert(r);
 }
 
-void ppu_powerup(struct rp2c02 *self)
+void aldo_ppu_powerup(struct aldo_rp2c02 *self)
 {
     assert(self != NULL);
     assert(self->vbus != NULL);
@@ -486,7 +486,7 @@ void ppu_powerup(struct rp2c02 *self)
     self->rst = CSGS_PENDING;
 }
 
-void ppu_zeroram(struct rp2c02 *self)
+void aldo_ppu_zeroram(struct aldo_rp2c02 *self)
 {
     assert(self != NULL);
 
@@ -495,7 +495,7 @@ void ppu_zeroram(struct rp2c02 *self)
     memclr(self->palette);
 }
 
-int ppu_cycle(struct rp2c02 *self)
+int aldo_ppu_cycle(struct aldo_rp2c02 *self)
 {
     assert(self != NULL);
 
@@ -503,7 +503,8 @@ int ppu_cycle(struct rp2c02 *self)
     return cycle(self);
 }
 
-void ppu_bus_snapshot(const struct rp2c02 *self, struct aldo_snapshot *snp)
+void aldo_ppu_bus_snapshot(const struct aldo_rp2c02 *self,
+                           struct aldo_snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);
@@ -542,7 +543,8 @@ void ppu_bus_snapshot(const struct rp2c02 *self, struct aldo_snapshot *snp)
     snp->mem.palette = self->palette;
 }
 
-void ppu_vid_snapshot(const struct rp2c02 *self, struct aldo_snapshot *snp)
+void aldo_ppu_vid_snapshot(const struct aldo_rp2c02 *self,
+                           struct aldo_snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);
@@ -552,7 +554,7 @@ void ppu_vid_snapshot(const struct rp2c02 *self, struct aldo_snapshot *snp)
     snapshot_palette(self, snp->video->palettes.fg, 0x10);
 }
 
-void ppu_dumpram(const struct rp2c02 *self, FILE *f)
+void aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f)
 {
     assert(self != NULL);
     assert(f != NULL);
@@ -562,11 +564,12 @@ void ppu_dumpram(const struct rp2c02 *self, FILE *f)
     memdump(self->palette, f);
 }
 
-struct ppu_coord ppu_trace(const struct rp2c02 *self, int adjustment)
+struct aldo_ppu_coord aldo_ppu_trace(const struct aldo_rp2c02 *self,
+                                     int adjustment)
 {
     assert(self != NULL);
 
-    struct ppu_coord c = {
+    struct aldo_ppu_coord c = {
         self->dot + adjustment,
         self->line,
     };

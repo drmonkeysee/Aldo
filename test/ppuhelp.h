@@ -17,7 +17,7 @@
 #define ppt_get_mbus(ctx) ((struct ppu_test_context *)(ctx))->mbus
 
 struct ppu_test_context {
-    struct rp2c02 ppu;
+    struct aldo_rp2c02 ppu;
     bus *mbus, *vbus;
 };
 

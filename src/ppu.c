@@ -148,7 +148,7 @@ static uint16_t mask_palette(uint16_t addr)
 static uint8_t palette_read(const struct rp2c02 *self, uint16_t addr)
 {
     // NOTE: addr=[$3F00-$3FFF]
-    assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
+    assert(Aldo_PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
 
     // NOTE: palette values are 6 bits wide
     return self->palette[mask_palette(addr)] & 0x3f;
@@ -157,7 +157,7 @@ static uint8_t palette_read(const struct rp2c02 *self, uint16_t addr)
 static void palette_write(struct rp2c02 *self, uint16_t addr, uint8_t d)
 {
     // NOTE: addr=[$3F00-$3FFF]
-    assert(PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
+    assert(Aldo_PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
 
     self->palette[mask_palette(addr)] = d;
 }
@@ -437,7 +437,7 @@ static void snapshot_palette(const struct rp2c02 *self,
                              uint8_t palsnp[static CHR_PAL_SIZE][CHR_PAL_SIZE],
                              uint16_t offset)
 {
-    uint16_t base = PaletteStartAddr + offset;
+    uint16_t base = Aldo_PaletteStartAddr + offset;
     for (size_t i = 0; i < CHR_PAL_SIZE; ++i) {
         uint8_t *p = palsnp[i];
         uint16_t addr = base + (uint16_t)(CHR_PAL_SIZE * i);
@@ -453,8 +453,8 @@ static void snapshot_palette(const struct rp2c02 *self,
 // MARK: - Public Interface
 //
 
-const uint16_t PaletteStartAddr = MEMBLOCK_16KB - 256;
-const int DotsPerFrame = Dots * Lines;
+const uint16_t Aldo_PaletteStartAddr = MEMBLOCK_16KB - 256;
+const int Aldo_DotsPerFrame = Dots * Lines;
 
 void ppu_connect(struct rp2c02 *self, bus *mbus)
 {

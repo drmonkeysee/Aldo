@@ -213,7 +213,7 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
               emu->args->tron ? "On" : "Off");
     mvwaddstr(v->content, cursor_y++, 0, "Reset Override: ");
     int resetvector = debug_vector_override(emu->debugger);
-    if (resetvector == NoResetVector) {
+    if (resetvector == Aldo_NoResetVector) {
         waddstr(v->content, "None");
     } else {
         wprintw(v->content, "$%04X", resetvector);
@@ -289,7 +289,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
     mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     RST",
               CPU_VECTOR_RST, lo, hi);
     int resetvector = debug_vector_override(emu->debugger);
-    if (resetvector == NoResetVector) {
+    if (resetvector == Aldo_NoResetVector) {
         wprintw(v->content, " $%04X", bytowr(lo, hi));
     } else {
         wprintw(v->content, " " HEXPR_RST_IND "$%04X", resetvector);
@@ -812,11 +812,11 @@ static void adjustrate(struct viewstate *vs, int adjustment)
 {
     int min, max;
     if (vs->clock.scale == CYCS_CYCLE) {
-        min = MinCps;
-        max = MaxCps;
+        min = Aldo_MinCps;
+        max = Aldo_MaxCps;
     } else {
-        min = MinFps;
-        max = MaxFps;
+        min = Aldo_MinFps;
+        max = Aldo_MaxFps;
     }
     applyrate(&vs->clock.cyclock.rate, adjustment, min, max);
 }
@@ -946,7 +946,7 @@ int ui_curses_loop(struct emulator *emu)
     struct viewstate state = {
         .clock = {
             .cyclock = {.rate = 10, .rate_factor = nes_cycle_factor()},
-            .oldrate = MinFps,
+            .oldrate = Aldo_MinFps,
         },
         .running = true,
         .total_ramsheets = (int)nes_ram_size(emu->console) / sheet_size,

@@ -394,7 +394,7 @@ struct decoded {
     bool unofficial;
 };
 
-extern const uint8_t BrkOpcode;
-extern const struct decoded Decode[];
+extern const uint8_t Aldo_BrkOpcode;
+extern const struct decoded Aldo_Decode[];
 
 #endif

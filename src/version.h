@@ -10,7 +10,7 @@
 
 #include "bridgeopen.h"
 br_libexport
-extern const char *const br_noalias AldoVersion;
+extern const char *const br_noalias Aldo_Version;
 #include "bridgeclose.h"
 
 #endif

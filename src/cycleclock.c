@@ -8,7 +8,8 @@
 #include "cycleclock.h"
 #include "tsutil.h"
 
-const int MinCps = 1, MaxCps = 1000, MinFps = 1, MaxFps = 60;
+const int
+    Aldo_MinCps = 1, Aldo_MaxCps = 1000, Aldo_MinFps = 1, Aldo_MaxFps = 60;
 
 void cycleclock_start(struct cycleclock *self)
 {

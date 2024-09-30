@@ -36,7 +36,7 @@
 #define UP(op, am, d, c) {op, am, d, c, true}
 #define JAM {IN_JAM, AM_JAM, N, CY(-1), true}
 
-const uint8_t BrkOpcode = 0x0;
+const uint8_t Aldo_BrkOpcode = 0x0;
 
 // Decoding table for all official and
 // unofficial (undocumented, illegal) MOS6502 opcodes.
@@ -53,7 +53,7 @@ const uint8_t BrkOpcode = 0x0;
 // (!) = unstable
 // (!!) = extremely unstable
 
-const struct decoded Decode[] = {
+const struct decoded Aldo_Decode[] = {
     OP(IN_BRK, AM_BRK, SI, CY(7)),      // 00 - BRK
     OP(IN_ORA, AM_INDX, AP, CY(6)),     // 01 - ORA (zp,X)
     JAM,                                // 02 - *JAM (KIL, HLT, CIM, CRP)
@@ -312,5 +312,5 @@ const struct decoded Decode[] = {
     UP(IN_ISC, AM_ABSX, APM, CY(7)),    // FF - *ISC (ISB, INS) abs,X
 };
 
-static_assert(sizeof Decode / sizeof Decode[0] == 256,
+static_assert(sizeof Aldo_Decode / sizeof Aldo_Decode[0] == 256,
               "Incorrect decode table size!");

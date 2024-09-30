@@ -2149,7 +2149,7 @@ static void datapath_irq_cycle_zero(void *ctx)
         },
         .prg.curr = &curr,
     };
-    snp.cpu.datapath.opcode = BrkOpcode;
+    snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     int written = dis_datapath(&snp, buf);
@@ -2172,7 +2172,7 @@ static void datapath_irq_cycle_one(void *ctx)
         },
         .prg.curr = &curr,
     };
-    snp.cpu.datapath.opcode = BrkOpcode;
+    snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     int written = dis_datapath(&snp, buf);
@@ -2195,7 +2195,7 @@ static void datapath_irq_cycle_n(void *ctx)
         },
         .prg.curr = &curr,
     };
-    snp.cpu.datapath.opcode = BrkOpcode;
+    snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     int written = dis_datapath(&snp, buf);
@@ -2218,7 +2218,7 @@ static void datapath_irq_cycle_six(void *ctx)
         },
         .prg.curr = &curr,
     };
-    snp.cpu.datapath.opcode = BrkOpcode;
+    snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     int written = dis_datapath(&snp, buf);
@@ -2241,7 +2241,7 @@ static void datapath_nmi_cycle_zero(void *ctx)
         },
         .prg.curr = &curr,
     };
-    snp.cpu.datapath.opcode = BrkOpcode;
+    snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     int written = dis_datapath(&snp, buf);
@@ -2264,7 +2264,7 @@ static void datapath_nmi_cycle_one(void *ctx)
         },
         .prg.curr = &curr,
     };
-    snp.cpu.datapath.opcode = BrkOpcode;
+    snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     int written = dis_datapath(&snp, buf);
@@ -2287,7 +2287,7 @@ static void datapath_nmi_cycle_n(void *ctx)
         },
         .prg.curr = &curr,
     };
-    snp.cpu.datapath.opcode = BrkOpcode;
+    snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     int written = dis_datapath(&snp, buf);
@@ -2310,7 +2310,7 @@ static void datapath_nmi_cycle_six(void *ctx)
         },
         .prg.curr = &curr,
     };
-    snp.cpu.datapath.opcode = BrkOpcode;
+    snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     int written = dis_datapath(&snp, buf);
@@ -2333,7 +2333,7 @@ static void datapath_rst_cycle_zero(void *ctx)
         },
         .prg.curr = &curr,
     };
-    snp.cpu.datapath.opcode = BrkOpcode;
+    snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     int written = dis_datapath(&snp, buf);
@@ -2356,7 +2356,7 @@ static void datapath_rst_cycle_one(void *ctx)
         },
         .prg.curr = &curr,
     };
-    snp.cpu.datapath.opcode = BrkOpcode;
+    snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     int written = dis_datapath(&snp, buf);
@@ -2379,7 +2379,7 @@ static void datapath_rst_cycle_n(void *ctx)
         },
         .prg.curr = &curr,
     };
-    snp.cpu.datapath.opcode = BrkOpcode;
+    snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     int written = dis_datapath(&snp, buf);
@@ -2402,7 +2402,7 @@ static void datapath_rst_cycle_six(void *ctx)
         },
         .prg.curr = &curr,
     };
-    snp.cpu.datapath.opcode = BrkOpcode;
+    snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[DIS_DATAP_SIZE];
 
     int written = dis_datapath(&snp, buf);
@@ -2614,7 +2614,7 @@ static void peek_interrupt(void *ctx)
     cpu.irq = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snp);
     debugger *dbg = ctx;
-    debug_set_vector_override(dbg, NoResetVector);
+    debug_set_vector_override(dbg, Aldo_NoResetVector);
     snp.prg.vectors[4] = 0xbb;
     snp.prg.vectors[5] = 0xaa;
 

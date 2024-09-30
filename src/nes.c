@@ -95,7 +95,7 @@ static bool vram_write(void *ctx, uint16_t addr, uint8_t d)
 {
     // NOTE: addr=[$2000-$3EFF]
     // NOTE: writes to palette RAM should never hit the video bus
-    assert(MEMBLOCK_8KB <= addr && addr < PaletteStartAddr);
+    assert(MEMBLOCK_8KB <= addr && addr < Aldo_PaletteStartAddr);
 
     ram_store(ctx, addr, d);
     return true;
@@ -411,7 +411,7 @@ int nes_cycle_factor(void)
 
 int nes_frame_factor(void)
 {
-    return DotsPerFrame;
+    return Aldo_DotsPerFrame;
 }
 
 void nes_snapshot(nes *self, struct snapshot *snp)

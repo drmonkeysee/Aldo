@@ -45,7 +45,7 @@ static void new_debugger(void *ctx)
 {
     debugger *dbg = ctx;
 
-    ct_assertequal(NoResetVector, debug_vector_override(dbg));
+    ct_assertequal(Aldo_NoResetVector, debug_vector_override(dbg));
     ct_assertequal(0u, debug_bp_count(dbg));
     ct_assertnull(debug_bp_at(dbg, 1));
 }
@@ -199,7 +199,7 @@ static void halt_no_breakpoint(void *ctx)
     debugger *dbg = ctx;
 
     ct_assertnull(debug_halted(dbg));
-    ct_assertequal(NoBreakpoint, debug_halted_at(dbg));
+    ct_assertequal(Aldo_NoBreakpoint, debug_halted_at(dbg));
 }
 
 static void reset_debugger(void *ctx)
@@ -223,7 +223,7 @@ static void reset_debugger(void *ctx)
     debug_reset(dbg);
 
     ct_assertequal(0u, debug_bp_count(dbg));
-    ct_assertequal(NoResetVector, debug_vector_override(dbg));
+    ct_assertequal(Aldo_NoResetVector, debug_vector_override(dbg));
 }
 
 //

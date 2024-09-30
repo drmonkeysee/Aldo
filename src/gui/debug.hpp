@@ -55,11 +55,11 @@ public:
     }
     void vectorClear() noexcept
     {
-        vectorOverride(NoResetVector);
+        vectorOverride(Aldo_NoResetVector);
     }
     bool isVectorOverridden() const noexcept
     {
-        return vectorOverride() != NoResetVector;
+        return vectorOverride() != Aldo_NoResetVector;
     }
     BpView breakpoints() const noexcept { return dbgp(); }
     MutableBpView breakpoints() noexcept { return dbgp(); }
@@ -69,7 +69,7 @@ public:
     }
     bool halted() const noexcept
     {
-        return breakpoints().halted_at() != NoBreakpoint;
+        return breakpoints().halted_at() != Aldo_NoBreakpoint;
     }
 
     void loadBreakpoints(const std::filesystem::path& filepath);

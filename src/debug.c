@@ -42,7 +42,7 @@ static void remove_reset_override(struct debugger_context *self)
 
 static void update_reset_override(struct debugger_context *self)
 {
-    if (self->resetvector == NoResetVector) {
+    if (self->resetvector == Aldo_NoResetVector) {
         remove_reset_override(self);
     } else {
         debug_sync_bus(self);
@@ -181,7 +181,7 @@ static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
             break;
         }
     }
-    return NoBreakpoint;
+    return Aldo_NoBreakpoint;
 }
 
 static bool bpvector_remove(struct breakpoint_vector *vec, ptrdiff_t at)
@@ -214,15 +214,15 @@ static void bpvector_free(struct breakpoint_vector *vec)
 // MARK: - Public Interface
 //
 
-const int NoResetVector = -1;
-const ptrdiff_t NoBreakpoint = -1;
+const int Aldo_NoResetVector = -1;
+const ptrdiff_t Aldo_NoBreakpoint = -1;
 
 debugger *debug_new(void)
 {
     struct debugger_context *self = malloc(sizeof *self);
     *self = (struct debugger_context){
-        .halted = NoBreakpoint,
-        .resetvector = NoResetVector,
+        .halted = Aldo_NoBreakpoint,
+        .resetvector = Aldo_NoResetVector,
     };
     bpvector_init(&self->breakpoints);
     return self;
@@ -280,7 +280,7 @@ const struct breakpoint *debug_halted(debugger *self)
 {
     assert(self != NULL);
 
-    return self->halted == NoBreakpoint
+    return self->halted == Aldo_NoBreakpoint
             ? NULL
             : debug_bp_at(self, self->halted);
 }
@@ -302,7 +302,7 @@ void debug_bp_remove(debugger *self, ptrdiff_t at)
     // the halt flag; if we removed a breakpoint before the currently halted
     // breakpoint we need to adjust the flag back one.
     if (self->halted == at) {
-        self->halted = NoBreakpoint;
+        self->halted = Aldo_NoBreakpoint;
     } else if (self->halted > at) {
         --self->halted;
     }
@@ -313,7 +313,7 @@ void debug_bp_clear(debugger *self)
     assert(self != NULL);
 
     bpvector_clear(&self->breakpoints);
-    self->halted = NoBreakpoint;
+    self->halted = Aldo_NoBreakpoint;
 }
 
 size_t debug_bp_count(debugger *self)
@@ -327,7 +327,7 @@ void debug_reset(debugger *self)
 {
     assert(self != NULL);
 
-    debug_set_vector_override(self, NoResetVector);
+    debug_set_vector_override(self, Aldo_NoResetVector);
     debug_bp_clear(self);
 }
 
@@ -354,7 +354,7 @@ void debug_sync_bus(debugger *self)
 {
     assert(self != NULL);
 
-    if (self->resetvector == NoResetVector || !self->cpu) return;
+    if (self->resetvector == Aldo_NoResetVector || !self->cpu) return;
 
     if (self->dec.active) {
         self->dec.vector = (uint16_t)self->resetvector;
@@ -376,11 +376,11 @@ void debug_check(debugger *self, const struct cycleclock *clk)
 
     if (!self->cpu) return;
 
-    if (self->halted == NoBreakpoint
+    if (self->halted == Aldo_NoBreakpoint
         && (self->halted = bpvector_break(&self->breakpoints, clk, self->cpu))
-            != NoBreakpoint) {
+            != Aldo_NoBreakpoint) {
         self->cpu->signal.rdy = false;
     } else {
-        self->halted = NoBreakpoint;
+        self->halted = Aldo_NoBreakpoint;
     }
 }

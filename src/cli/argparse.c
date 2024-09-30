@@ -56,8 +56,8 @@ static const int MinAddress = 0, MaxAddress = ADDRMASK_64KB;
 static void init_cliargs(struct cliargs *args)
 {
     *args = (struct cliargs){
-        .chrscale = MinChrScale,
-        .resetvector = NoResetVector,
+        .chrscale = Aldo_MinChrScale,
+        .resetvector = Aldo_NoResetVector,
     };
 }
 
@@ -176,12 +176,12 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
     if (parse_flag(arg, ChrScaleShort, true, ChrScaleLong)) {
         long scale;
         bool result = parse_number(arg, argi, argc, argv, 10, &scale);
-        if (result && MinChrScale <= scale && scale <= MaxChrScale) {
+        if (result && Aldo_MinChrScale <= scale && scale <= Aldo_MaxChrScale) {
             args->chrscale = (int)scale;
             return true;
         }
         fprintf(stderr, "Invalid scale format: expected [%d, %d]\n",
-                MinChrScale, MaxChrScale);
+                Aldo_MinChrScale, Aldo_MaxChrScale);
         return false;
     }
 
@@ -298,7 +298,7 @@ void argparse_usage(const char *me)
            MinAddress, MaxAddress, ResVectorLong);
     sprintf(buf, "-%c n", ChrScaleShort);
     printf("  %-*s: CHR ROM BMP scaling factor [%d, %d] (%s n)\n", spad, buf,
-           MinChrScale, MaxChrScale, ChrScaleLong);
+           Aldo_MinChrScale, Aldo_MaxChrScale, ChrScaleLong);
     printf("  -%-*c: turn on trace-logging and ram dumps (%s)\n", cpad,
            TraceShort, TraceLong);
     printf("  -%-*c: verbose output\n", cpad, VerboseShort);

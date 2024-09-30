@@ -322,11 +322,11 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
         val = 1;
     }
     {
-        DisabledIf dif = vs.clock.cyclock().rate == MaxCps;
+        DisabledIf dif = vs.clock.cyclock().rate == Aldo_MaxCps;
         if (ImGui::MenuItem(incLabel.c_str(), incKey)) {
             vs.clock.adjustCycleRate(val);
         }
-        dif = vs.clock.cyclock().rate == MinCps;
+        dif = vs.clock.cyclock().rate == Aldo_MinCps;
         if (ImGui::MenuItem(decLabel.c_str(), decKey)) {
             vs.clock.adjustCycleRate(-val);
         }
@@ -464,7 +464,7 @@ auto about_overlay(aldo::viewstate& vs) noexcept
 
     if (ImGui::Begin("About Aldo", nullptr, flags)) {
         ImGui::LogToClipboard();
-        ImGui::Text("Aldo %s", AldoVersion);
+        ImGui::Text("Aldo %s", Aldo_Version);
     #ifdef __VERSION__
         ImGui::TextUnformatted(__VERSION__);
     #endif
@@ -790,7 +790,7 @@ private:
         auto pos = ImGui::GetCursorScreenPos();
         ImVec2 center{pos.x, pos.y + (ImGui::GetTextLineHeight() / 2) + 1};
         auto drawList = ImGui::GetWindowDrawList();
-        for (auto i = 0; i < MaxTCycle; ++i) {
+        for (auto i = 0; i < Aldo_MaxTCycle; ++i) {
             drawList->AddCircleFilled(center, radius,
                                       i == cycle
                                         ? aldo::colors::LedOn
@@ -1652,8 +1652,8 @@ private:
                                : "Frames/Second");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(40);
-        ImGui::DragInt("##clockRate", &vs.clock.cyclock().rate, 1, MinCps,
-                       MaxCps, "%d", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::DragInt("##clockRate", &vs.clock.cyclock().rate, 1, Aldo_MinCps,
+                       Aldo_MaxCps, "%d", ImGuiSliderFlags_AlwaysClamp);
 
         if (ImGui::RadioButton("Cycles", vs.clock.scale() == CYCS_CYCLE)) {
             vs.clock.setScale(CYCS_CYCLE);

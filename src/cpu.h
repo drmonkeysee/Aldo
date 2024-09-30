@@ -88,7 +88,7 @@ struct peekresult {
 
 #include "bridgeopen.h"
 br_libexport
-extern const int MaxTCycle;
+extern const int Aldo_MaxTCycle;
 
 void cpu_powerup(struct mos6502 *self) br_nothrow;
 

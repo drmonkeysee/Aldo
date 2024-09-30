@@ -28,9 +28,9 @@ typedef struct debugger_context debugger;
 //
 
 br_libexport
-extern const int NoResetVector;
+extern const int Aldo_NoResetVector;
 br_libexport
-extern const ptrdiff_t NoBreakpoint;
+extern const ptrdiff_t Aldo_NoBreakpoint;
 
 br_libexport br_ownresult
 debugger *debug_new(void) br_nothrow;

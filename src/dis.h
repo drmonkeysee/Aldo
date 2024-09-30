@@ -55,7 +55,7 @@ struct dis_instruction {
 //
 
 br_libexport
-extern const int MinChrScale, MaxChrScale;
+extern const int Aldo_MinChrScale, Aldo_MaxChrScale;
 
 br_libexport
 const char *dis_errstr(int err);

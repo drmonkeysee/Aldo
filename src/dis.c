@@ -86,7 +86,7 @@ static uint8_t flags(enum inst in)
 
 static const char *interrupt_display(const struct snapshot *snp)
 {
-    if (snp->cpu.datapath.opcode != BrkOpcode) return "";
+    if (snp->cpu.datapath.opcode != Aldo_BrkOpcode) return "";
     if (snp->cpu.datapath.exec_cycle == 6) return "CLR";
     if (snp->cpu.datapath.rst == CSGS_COMMITTED) return "(RST)";
     if (snp->cpu.datapath.nmi == CSGS_COMMITTED) return "(NMI)";
@@ -441,7 +441,7 @@ static int write_chrblock(const struct blockview *bv, uint32_t scale,
 // MARK: - Public Interface
 //
 
-const int MinChrScale = 1, MaxChrScale = 10;
+const int Aldo_MinChrScale = 1, Aldo_MaxChrScale = 10;
 
 const char *dis_errstr(int err)
 {
@@ -465,7 +465,7 @@ int dis_parse_inst(const struct blockview *bv, size_t at,
     if (at >= bv->size) return 0;
 
     uint8_t opcode = bv->mem[at];
-    struct decoded dec = Decode[opcode];
+    struct decoded dec = Aldo_Decode[opcode];
     int instlen = InstLens[dec.mode];
     if ((size_t)instlen > bv->size - at) return DIS_ERR_EOF;
 
@@ -532,9 +532,9 @@ int dis_datapath(const struct snapshot *snp,
 
     // NOTE: we're in an interrupt state so adjust the instruction to render
     // the datapath correctly.
-    if (snp->cpu.datapath.opcode == BrkOpcode
+    if (snp->cpu.datapath.opcode == Aldo_BrkOpcode
         && inst.d.instruction != IN_BRK) {
-        inst.d = Decode[snp->cpu.datapath.opcode];
+        inst.d = Aldo_Decode[snp->cpu.datapath.opcode];
         inst.bv.size = (size_t)InstLens[inst.d.mode];
     }
 
@@ -553,7 +553,7 @@ int dis_datapath(const struct snapshot *snp,
         count = sprintf(dis + total, "%s", displaystr);
         break;
     case 1:
-        count = snp->cpu.datapath.opcode == BrkOpcode
+        count = snp->cpu.datapath.opcode == Aldo_BrkOpcode
                     ? sprintf(dis + total, displaystr, interrupt_display(snp))
                     : sprintf(dis + total, displaystr,
                               strlen(displaystr) > 0 ? inst.bv.mem[1] : 0);
@@ -720,7 +720,8 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
         uint16_t vector;
         int resetvector;
         if (snp->cpu.datapath.rst == CSGS_COMMITTED
-            && (resetvector = debug_vector_override(dbg)) != NoResetVector) {
+            && (resetvector = debug_vector_override(dbg))
+                != Aldo_NoResetVector) {
             fmt = HEXPR_RST_IND "%04X";
             vector = (uint16_t)resetvector;
         } else {

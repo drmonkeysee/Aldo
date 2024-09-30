@@ -121,7 +121,8 @@ public:
     void adjustCycleRate(int adjustment) noexcept
     {
         auto adjusted = cyclock().rate + adjustment;
-        cyclock().rate = std::max(MinCps, std::min(adjusted, MaxCps));
+        cyclock().rate = std::max(Aldo_MinCps,
+                                  std::min(adjusted, Aldo_MaxCps));
     }
 
     void setScale(cyclkscale s) noexcept
@@ -146,7 +147,7 @@ private:
     cycleclock clock{.rate = 10, .rate_factor = nes_cycle_factor()};
     double dtInput = 0, dtUpdate = 0, dtRender = 0;
     cyclkscale currentScale = CYCS_CYCLE;
-    int oldRate = MinFps;
+    int oldRate = Aldo_MinFps;
 };
 
 }

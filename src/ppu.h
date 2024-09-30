@@ -110,8 +110,8 @@ struct rp2c02 {
 
 struct ppu_coord { int dot, line; };
 
-extern const uint16_t PaletteStartAddr;
-extern const int DotsPerFrame;
+extern const uint16_t Aldo_PaletteStartAddr;
+extern const int Aldo_DotsPerFrame;
 
 void ppu_connect(struct rp2c02 *self, bus *mbus);
 void ppu_powerup(struct rp2c02 *self);

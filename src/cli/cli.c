@@ -35,7 +35,7 @@ static const char *const restrict ResetOverrideFmt =
 
 static void print_version(void)
 {
-    printf("Aldo %s", AldoVersion);
+    printf("Aldo %s", Aldo_Version);
 #ifdef __VERSION__
     fputs(" (" __VERSION__ ")", stdout);
 #endif
@@ -168,7 +168,7 @@ static debugger *create_debugger(const struct cliargs *args)
                 goto exit_dbg;
         }
     }
-    if (args->resetvector != NoResetVector) {
+    if (args->resetvector != Aldo_NoResetVector) {
         debug_set_vector_override(dbg, args->resetvector);
         printf(ResetOverrideFmt, args->resetvector);
     }

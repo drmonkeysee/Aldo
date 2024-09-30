@@ -116,7 +116,7 @@ static void check_interrupts(struct mos6502 *self)
     // NOTE: final cycle of BRK sequence holds interrupt latching low,
     // delaying detection of any still-active interrupt signals by one cycle
     // (except RST which is all-powerful).
-    if (self->opc == BrkOpcode && self->t == 6) return;
+    if (self->opc == Aldo_BrkOpcode && self->t == 6) return;
 
     if (self->signal.nmi) {
         if (self->nmi == CSGS_SERVICED) {
@@ -1629,7 +1629,7 @@ static void JAM_sequence(struct mos6502 *self, struct decoded dec)
 
 static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
 {
-    assert(0 < self->t && self->t < MaxTCycle);
+    assert(0 < self->t && self->t < Aldo_MaxTCycle);
 
     switch (dec.mode) {
 #define X(s, b, n, p, ...) case AM_ENUM(s): s##_sequence(self, dec); break;
@@ -1649,7 +1649,7 @@ static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
 // unofficial RMW opcodes have 8 cycles when using indirect-addressing modes;
 // a full breakdown of official instruction timing states can be found at:
 // http://visual6502.org/wiki/index.php?title=6502_Timing_States
-const int MaxTCycle = 8;
+const int Aldo_MaxTCycle = 8;
 
 void cpu_powerup(struct mos6502 *self)
 {
@@ -1696,7 +1696,7 @@ int cpu_cycle(struct mos6502 *self)
         self->addrbus = self->pc;
         read(self);
         if (service_interrupt(self)) {
-            self->opc = BrkOpcode;
+            self->opc = Aldo_BrkOpcode;
         } else {
             self->opc = self->databus;
             ++self->pc;
@@ -1704,7 +1704,7 @@ int cpu_cycle(struct mos6502 *self)
         self->addrinst = self->addrbus;
     } else {
         self->signal.sync = false;
-        dispatch_addrmode(self, Decode[self->opc]);
+        dispatch_addrmode(self, Aldo_Decode[self->opc]);
     }
     check_interrupts(self);
     return 1;
@@ -1712,7 +1712,7 @@ int cpu_cycle(struct mos6502 *self)
 
 bool cpu_jammed(const struct mos6502 *self)
 {
-    return self->t == 4 && Decode[self->opc].mode == AM_JAM;
+    return self->t == 4 && Aldo_Decode[self->opc].mode == AM_JAM;
 }
 
 void cpu_snapshot(const struct mos6502 *self, struct snapshot *snp)
@@ -1775,7 +1775,7 @@ struct peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
     self->presync = true;
     self->pc = addr;
     cpu_cycle(self);
-    struct peekresult result = {.mode = Decode[self->opc].mode};
+    struct peekresult result = {.mode = Aldo_Decode[self->opc].mode};
     // NOTE: can't run the cpu to peek JAM or it'll jam the cpu!
     // Fortunately all we need is the addressing mode so return that.
     if (result.mode == AM_JAM) return result;

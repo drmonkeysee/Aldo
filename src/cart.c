@@ -14,10 +14,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define as_nesmap(cart) ((const struct nesmapper *)((cart)->mapper))
+#define as_nesmap(cart) ((const struct aldo_nesmapper *)((cart)->mapper))
 
 struct cartridge {
-    struct mapper *mapper;
+    struct aldo_mapper *mapper;
     struct cartinfo info;
 };
 
@@ -83,7 +83,7 @@ static int parse_ines(struct cartridge *self, FILE *f)
     info->ines_hdr.wram_blocks = header[8];
     info->ines_hdr.bus_conflicts = header[10] & 0x20;
 
-    int err = mapper_ines_create(&self->mapper, &info->ines_hdr, f);
+    int err = aldo_mapper_ines_create(&self->mapper, &info->ines_hdr, f);
     if (err == 0) {
         // TODO: we've found a ROM with extra bytes after CHR data
         assert(fgetc(f) == EOF && feof(f));
@@ -95,7 +95,7 @@ static int parse_ines(struct cartridge *self, FILE *f)
 // header; if format cannot be determined, this is the default.
 static int parse_raw(struct cartridge *self, FILE *f)
 {
-    int err = mapper_raw_create(&self->mapper, f);
+    int err = aldo_mapper_raw_create(&self->mapper, f);
     // NOTE: ROM file is too big for prg address space (no bank-switching)
     if (err == 0 && !(fgetc(f) == EOF && feof(f))) {
         err = CART_ERR_IMG_SIZE;

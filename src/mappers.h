@@ -17,29 +17,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct mapper;
-typedef bool busconn(struct mapper *, bus *);
-typedef void busdisconn(bus *);
-typedef const uint8_t *mapper_rom(const struct mapper *);
+struct aldo_mapper;
+typedef bool aldo_busconn(struct aldo_mapper *, bus *);
+typedef void aldo_busdisconn(bus *);
+typedef const uint8_t *aldo_mapper_rom(const struct aldo_mapper *);
 
-struct mapper {
-    void (*dtor)(struct mapper *);
-    busconn *mbus_connect;
-    busdisconn *mbus_disconnect;
-    mapper_rom *prgrom;
+struct aldo_mapper {
+    void (*dtor)(struct aldo_mapper *);
+    aldo_busconn *mbus_connect;
+    aldo_busdisconn *mbus_disconnect;
+    aldo_mapper_rom *prgrom;
 };
 
-struct nesmapper {
-    struct mapper extends;
-    busconn *vbus_connect;
-    busdisconn *vbus_disconnect;
-    mapper_rom *chrrom;
+struct aldo_nesmapper {
+    struct aldo_mapper extends;
+    aldo_busconn *vbus_connect;
+    aldo_busdisconn *vbus_disconnect;
+    aldo_mapper_rom *chrrom;
     // Optional Interface
-    void (*snapshot)(struct mapper *, struct aldo_snapshot *);
+    void (*snapshot)(struct aldo_mapper *, struct aldo_snapshot *);
 };
 
 // NOTE: if create functions return non-zero error code, *m is unmodified
-int mapper_raw_create(struct mapper **m, FILE *f);
-int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f);
+int aldo_mapper_raw_create(struct aldo_mapper **m, FILE *f);
+int aldo_mapper_ines_create(struct aldo_mapper **m, struct ines_header *header,
+                            FILE *f);
 
 #endif

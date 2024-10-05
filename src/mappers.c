@@ -15,12 +15,12 @@
 #include <string.h>
 
 struct raw_mapper {
-    struct mapper vtable;
+    struct aldo_mapper vtable;
     uint8_t *rom;
 };
 
 struct ines_mapper {
-    struct nesmapper vtable;
+    struct aldo_nesmapper vtable;
     uint8_t *prg, *chr, *wram, id;
     bool chrram, ptstale;
 };
@@ -102,7 +102,7 @@ static size_t raw_copy(const void *restrict ctx, uint16_t addr, size_t count,
     return bytecopy_bank(ctx, BITWIDTH_32KB, addr, count, dest);
 }
 
-static void raw_dtor(struct mapper *self)
+static void raw_dtor(struct aldo_mapper *self)
 {
     assert(self != NULL);
 
@@ -111,14 +111,14 @@ static void raw_dtor(struct mapper *self)
     free(m);
 }
 
-static const uint8_t *raw_prgrom(const struct mapper *self)
+static const uint8_t *raw_prgrom(const struct aldo_mapper *self)
 {
     assert(self != NULL);
 
     return ((const struct raw_mapper *)self)->rom;
 }
 
-static bool raw_mbus_connect(struct mapper *self, bus *b)
+static bool raw_mbus_connect(struct aldo_mapper *self, bus *b)
 {
     assert(self != NULL);
 
@@ -133,7 +133,7 @@ static bool raw_mbus_connect(struct mapper *self, bus *b)
 // MARK: - iNES Implementation
 //
 
-static void ines_dtor(struct mapper *self)
+static void ines_dtor(struct aldo_mapper *self)
 {
     assert(self != NULL);
 
@@ -144,28 +144,28 @@ static void ines_dtor(struct mapper *self)
     free(m);
 }
 
-static const uint8_t *ines_prgrom(const struct mapper *self)
+static const uint8_t *ines_prgrom(const struct aldo_mapper *self)
 {
     assert(self != NULL);
 
     return ((const struct ines_mapper *)self)->prg;
 }
 
-static const uint8_t *ines_chrrom(const struct mapper *self)
+static const uint8_t *ines_chrrom(const struct aldo_mapper *self)
 {
     assert(self != NULL);
 
     return ((const struct ines_mapper *)self)->chr;
 }
 
-static bool ines_unimplemented_mbus_connect(struct mapper *self, bus *b)
+static bool ines_unimplemented_mbus_connect(struct aldo_mapper *self, bus *b)
 {
     (void)self;
     clear_prg_device(b);
     return true;
 }
 
-static bool ines_unimplemented_vbus_connect(struct mapper *self, bus *b)
+static bool ines_unimplemented_vbus_connect(struct aldo_mapper *self, bus *b)
 {
     (void)self;
     clear_chr_device(b);
@@ -224,7 +224,7 @@ static bool ines_000_vwrite(void *ctx, uint16_t addr, uint8_t d)
 // CPU memory map defines start of cart mapping at $4020; the most complex
 // mappers need access to entire 64KB address space in order to snoop on
 // all CPU activity. Similar rules hold for PPU.
-static bool ines_000_mbus_connect(struct mapper *self, bus *b)
+static bool ines_000_mbus_connect(struct aldo_mapper *self, bus *b)
 {
     assert(self != NULL);
 
@@ -235,7 +235,7 @@ static bool ines_000_mbus_connect(struct mapper *self, bus *b)
     });
 }
 
-static bool ines_000_vbus_connect(struct mapper *self, bus *b)
+static bool ines_000_vbus_connect(struct aldo_mapper *self, bus *b)
 {
     assert(self != NULL);
 
@@ -247,7 +247,7 @@ static bool ines_000_vbus_connect(struct mapper *self, bus *b)
     });
 }
 
-static void ines_000_snapshot(struct mapper *self, struct aldo_snapshot *snp)
+static void ines_000_snapshot(struct aldo_mapper *self, struct aldo_snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);
@@ -273,7 +273,7 @@ static void ines_000_snapshot(struct mapper *self, struct aldo_snapshot *snp)
 // MARK: - Public Interface
 //
 
-int mapper_raw_create(struct mapper **m, FILE *f)
+int aldo_mapper_raw_create(struct aldo_mapper **m, FILE *f)
 {
     assert(m != NULL);
     assert(f != NULL);
@@ -291,15 +291,16 @@ int mapper_raw_create(struct mapper **m, FILE *f)
     // TODO: assume a 32KB ROM file (can i do mirroring later?)
     int err = load_blocks(&self->rom, MEMBLOCK_32KB, f);
     if (err == 0) {
-        *m = (struct mapper *)self;
+        *m = (struct aldo_mapper *)self;
         return 0;
     } else {
-        self->vtable.dtor((struct mapper *)self);
+        self->vtable.dtor((struct aldo_mapper *)self);
     }
     return err;
 }
 
-int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
+int aldo_mapper_ines_create(struct aldo_mapper **m, struct ines_header *header,
+                            FILE *f)
 {
     assert(m != NULL);
     assert(header != NULL);
@@ -328,7 +329,7 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
         };
         header->mapper_implemented = false;
     }
-    struct mapper *base = &self->vtable.extends;
+    struct aldo_mapper *base = &self->vtable.extends;
     base->dtor = ines_dtor;
     base->prgrom = ines_prgrom;
     base->mbus_disconnect = clear_prg_device;
@@ -365,9 +366,9 @@ int mapper_ines_create(struct mapper **m, struct ines_header *header, FILE *f)
     }
 
     if (err == 0) {
-        *m = (struct mapper *)self;
+        *m = (struct aldo_mapper *)self;
     } else {
-        base->dtor((struct mapper *)self);
+        base->dtor((struct aldo_mapper *)self);
     }
     return err;
 }

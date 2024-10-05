@@ -174,16 +174,16 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     cursor_y += 2;
     enum aldo_execmode mode = aldo_nes_mode(emu->console);
     mvwaddstr(v->content, cursor_y, 0, "Mode:");
-    drawtoggle(v, " Sub ", mode == CSGM_SUBCYCLE);
-    drawtoggle(v, " Cycle ", mode == CSGM_CYCLE);
-    drawtoggle(v, " Step ", mode == CSGM_STEP);
-    drawtoggle(v, " Run ", mode == CSGM_RUN);
+    drawtoggle(v, " Sub ", mode == ALDO_EXC_SUBCYCLE);
+    drawtoggle(v, " Cycle ", mode == ALDO_EXC_CYCLE);
+    drawtoggle(v, " Step ", mode == ALDO_EXC_STEP);
+    drawtoggle(v, " Run ", mode == ALDO_EXC_RUN);
 
     cursor_y += 2;
     mvwaddstr(v->content, cursor_y, 0, "Signal:");
-    drawtoggle(v, " IRQ ", aldo_nes_probe(emu->console, CSGI_IRQ));
-    drawtoggle(v, " NMI ", aldo_nes_probe(emu->console, CSGI_NMI));
-    drawtoggle(v, " RST ", aldo_nes_probe(emu->console, CSGI_RST));
+    drawtoggle(v, " IRQ ", aldo_nes_probe(emu->console, ALDO_INT_IRQ));
+    drawtoggle(v, " NMI ", aldo_nes_probe(emu->console, ALDO_INT_NMI));
+    drawtoggle(v, " RST ", aldo_nes_probe(emu->console, ALDO_INT_RST));
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
     mvwaddstr(v->content, ++cursor_y, 0, "Halt/Run: <Space>");
@@ -373,17 +373,17 @@ static void draw_interrupt_latch(const struct view *v,
     const char *modifier = "";
     attr_t style = A_NORMAL;
     switch (interrupt) {
-    case CSGS_CLEAR:
+    case ALDO_SIG_CLEAR:
         // NOTE: draw nothing for CLEAR state
         return;
-    case CSGS_DETECTED:
+    case ALDO_SIG_DETECTED:
         style = A_DIM;
         break;
-    case CSGS_COMMITTED:
+    case ALDO_SIG_COMMITTED:
         style = A_UNDERLINE;
         modifier = "\u0305";
         break;
-    case CSGS_SERVICED:
+    case ALDO_SIG_SERVICED:
         modifier = "\u0338";
         break;
     default:
@@ -870,8 +870,8 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 'i':
-        aldo_nes_set_probe(emu->console, CSGI_IRQ,
-                           !aldo_nes_probe(emu->console, CSGI_IRQ));
+        aldo_nes_set_probe(emu->console, ALDO_INT_IRQ,
+                           !aldo_nes_probe(emu->console, ALDO_INT_IRQ));
         break;
     case 'm':
         aldo_nes_set_mode(emu->console, aldo_nes_mode(emu->console) + 1);
@@ -880,8 +880,8 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         aldo_nes_set_mode(emu->console, aldo_nes_mode(emu->console) - 1);
         break;
     case 'n':
-        aldo_nes_set_probe(emu->console, CSGI_NMI,
-                           !aldo_nes_probe(emu->console, CSGI_NMI));
+        aldo_nes_set_probe(emu->console, ALDO_INT_NMI,
+                           !aldo_nes_probe(emu->console, ALDO_INT_NMI));
         break;
     case 'q':
         vs->running = false;
@@ -895,8 +895,8 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 's':
-        aldo_nes_set_probe(emu->console, CSGI_RST,
-                           !aldo_nes_probe(emu->console, CSGI_RST));
+        aldo_nes_set_probe(emu->console, ALDO_INT_RST,
+                           !aldo_nes_probe(emu->console, ALDO_INT_RST));
         break;
     }
 }

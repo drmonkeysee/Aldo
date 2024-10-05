@@ -106,11 +106,11 @@ static void update_n(struct mos6502 *self, uint8_t d)
 static void check_interrupts(struct mos6502 *self)
 {
     // NOTE: serviced state is only for assisting in nmi edge detection
-    assert(self->rst != CSGS_SERVICED);
-    assert(self->irq != CSGS_SERVICED);
+    assert(self->rst != ALDO_SIG_SERVICED);
+    assert(self->irq != ALDO_SIG_SERVICED);
 
-    if (!self->signal.rst && self->rst == CSGS_CLEAR) {
-        self->rst = CSGS_DETECTED;
+    if (!self->signal.rst && self->rst == ALDO_SIG_CLEAR) {
+        self->rst = ALDO_SIG_DETECTED;
     }
 
     // NOTE: final cycle of BRK sequence holds interrupt latching low,
@@ -119,15 +119,15 @@ static void check_interrupts(struct mos6502 *self)
     if (self->opc == Aldo_BrkOpcode && self->t == 6) return;
 
     if (self->signal.nmi) {
-        if (self->nmi == CSGS_SERVICED) {
-            self->nmi = CSGS_CLEAR;
+        if (self->nmi == ALDO_SIG_SERVICED) {
+            self->nmi = ALDO_SIG_CLEAR;
         }
-    } else if (self->nmi == CSGS_CLEAR) {
-        self->nmi = CSGS_DETECTED;
+    } else if (self->nmi == ALDO_SIG_CLEAR) {
+        self->nmi = ALDO_SIG_DETECTED;
     }
 
-    if (!self->signal.irq && self->irq == CSGS_CLEAR) {
-        self->irq = CSGS_DETECTED;
+    if (!self->signal.irq && self->irq == ALDO_SIG_CLEAR) {
+        self->irq = ALDO_SIG_DETECTED;
     }
 }
 
@@ -139,31 +139,31 @@ static void latch_interrupts(struct mos6502 *self)
     // end of this cycle's ϕ2 so it moves directly from pending in this cycle
     // to committed in the next cycle.
     if (self->signal.rst) {
-        if (self->rst == CSGS_DETECTED) {
-            self->rst = CSGS_CLEAR;
+        if (self->rst == ALDO_SIG_DETECTED) {
+            self->rst = ALDO_SIG_CLEAR;
         }
-    } else if (self->rst == CSGS_DETECTED) {
-        self->rst = CSGS_PENDING;
+    } else if (self->rst == ALDO_SIG_DETECTED) {
+        self->rst = ALDO_SIG_PENDING;
     }
 
     // NOTE: nmi is edge-detected so once it has latched in it remains
     // set until serviced by a handler or reset.
     if (self->signal.nmi) {
-        if (self->nmi == CSGS_DETECTED) {
-            self->nmi = CSGS_CLEAR;
+        if (self->nmi == ALDO_SIG_DETECTED) {
+            self->nmi = ALDO_SIG_CLEAR;
         }
-    } else if (self->nmi == CSGS_DETECTED) {
-        self->nmi = CSGS_PENDING;
+    } else if (self->nmi == ALDO_SIG_DETECTED) {
+        self->nmi = ALDO_SIG_PENDING;
     }
 
     // NOTE: irq is level-detected so must remain low until polled
     // or the interrupt is lost.
     if (self->signal.irq) {
-        if (self->irq == CSGS_DETECTED || self->irq == CSGS_PENDING) {
-            self->irq = CSGS_CLEAR;
+        if (self->irq == ALDO_SIG_DETECTED || self->irq == ALDO_SIG_PENDING) {
+            self->irq = ALDO_SIG_CLEAR;
         }
-    } else if (self->irq == CSGS_DETECTED) {
-        self->irq = CSGS_PENDING;
+    } else if (self->irq == ALDO_SIG_DETECTED) {
+        self->irq = ALDO_SIG_PENDING;
     }
 }
 
@@ -171,26 +171,26 @@ static void poll_interrupts(struct mos6502 *self)
 {
     if (self->detached) return;
 
-    if (self->nmi == CSGS_PENDING) {
-        self->nmi = CSGS_COMMITTED;
+    if (self->nmi == ALDO_SIG_PENDING) {
+        self->nmi = ALDO_SIG_COMMITTED;
     }
 
-    if (self->irq == CSGS_PENDING && !self->p.i) {
-        self->irq = CSGS_COMMITTED;
+    if (self->irq == ALDO_SIG_PENDING && !self->p.i) {
+        self->irq = ALDO_SIG_COMMITTED;
     }
 }
 
 static bool service_interrupt(struct mos6502 *self)
 {
-    return self->rst == CSGS_COMMITTED
-            || self->nmi == CSGS_COMMITTED
-            || self->irq == CSGS_COMMITTED;
+    return self->rst == ALDO_SIG_COMMITTED
+            || self->nmi == ALDO_SIG_COMMITTED
+            || self->irq == ALDO_SIG_COMMITTED;
 }
 
 static uint16_t interrupt_vector(struct mos6502 *self)
 {
-    if (self->rst == CSGS_COMMITTED) return CPU_VECTOR_RST;
-    if (self->nmi == CSGS_COMMITTED) return CPU_VECTOR_NMI;
+    if (self->rst == ALDO_SIG_COMMITTED) return CPU_VECTOR_RST;
+    if (self->nmi == ALDO_SIG_COMMITTED) return CPU_VECTOR_NMI;
     return CPU_VECTOR_IRQ;
 }
 
@@ -199,12 +199,12 @@ static uint16_t interrupt_vector(struct mos6502 *self)
 // but the real cpu complexity isn't necessary here).
 static bool reset_held(struct mos6502 *self)
 {
-    if (self->rst == CSGS_PENDING) {
-        self->rst = CSGS_COMMITTED;
+    if (self->rst == ALDO_SIG_PENDING) {
+        self->rst = ALDO_SIG_COMMITTED;
         detach(self);
         self->presync = true;
     }
-    return self->rst == CSGS_COMMITTED && !self->signal.rst;
+    return self->rst == ALDO_SIG_COMMITTED && !self->signal.rst;
 }
 
 //
@@ -539,12 +539,14 @@ static void BRK_exec(struct mos6502 *self)
     // nmi is serviced by its own handler (for edge detection)
     // but cleared by all others;
     // irq is cleared by all handlers.
-    if (self->rst == CSGS_COMMITTED) {
+    if (self->rst == ALDO_SIG_COMMITTED) {
         attach(self);
-        self->rst = CSGS_CLEAR;
+        self->rst = ALDO_SIG_CLEAR;
     }
-    self->nmi = self->nmi == CSGS_COMMITTED ? CSGS_SERVICED : CSGS_CLEAR;
-    self->irq = CSGS_CLEAR;
+    self->nmi = self->nmi == ALDO_SIG_COMMITTED
+                ? ALDO_SIG_SERVICED
+                : ALDO_SIG_CLEAR;
+    self->irq = ALDO_SIG_CLEAR;
     self->p.i = true;
     self->pc = bytowr(self->adl, self->databus);
     commit_operation(self);
@@ -1669,8 +1671,8 @@ void cpu_powerup(struct mos6502 *self)
     set_p(self, 0x34);
 
     // TODO: simulate rst held low on startup to engage reset sequence
-    self->irq = self->nmi = CSGS_CLEAR;
-    self->rst = CSGS_PENDING;
+    self->irq = self->nmi = ALDO_SIG_CLEAR;
+    self->rst = ALDO_SIG_PENDING;
 }
 
 int cpu_cycle(struct mos6502 *self)
@@ -1763,7 +1765,7 @@ void cpu_peek_start(struct mos6502 *restrict self,
     if (!self->detached) {
         detach(self);
     }
-    self->irq = self->nmi = self->rst = CSGS_CLEAR;
+    self->irq = self->nmi = self->rst = ALDO_SIG_CLEAR;
     self->signal.irq = self->signal.nmi = self->signal.rst =
         self->signal.rdy = true;
 }

@@ -211,7 +211,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
     ppu->regbus = d;
     switch (ppu->regsel) {
     case 0: // PPUCTRL
-        if (ppu->rst != CSGS_SERVICED) {
+        if (ppu->rst != ALDO_SIG_SERVICED) {
             set_ctrl(ppu, ppu->regbus);
             // NOTE: set nametable-select
             ppu->t = (uint16_t)((ppu->t & 0x73ff) | ppu->ctrl.nh << 11
@@ -220,7 +220,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
         }
         break;
     case 1: // PPUMASK
-        if (ppu->rst != CSGS_SERVICED) {
+        if (ppu->rst != ALDO_SIG_SERVICED) {
             set_mask(ppu, ppu->regbus);
         }
         break;
@@ -241,7 +241,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
         }
         break;
     case 5: // PPUSCROLL
-        if (ppu->rst != CSGS_SERVICED) {
+        if (ppu->rst != ALDO_SIG_SERVICED) {
             static const uint8_t course = 0xf8, fine = 0x7;
             if (ppu->w) {
                 // NOTE: set course and fine y
@@ -257,7 +257,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
         }
         break;
     case 6: // PPUADDR
-        if (ppu->rst != CSGS_SERVICED) {
+        if (ppu->rst != ALDO_SIG_SERVICED) {
             if (ppu->w) {
                 ppu->t = (ppu->t & 0x7f00) | ppu->regbus;
                 ppu->v = ppu->t;
@@ -330,7 +330,7 @@ static void reset(struct aldo_rp2c02 *self)
     self->signal.vout = self->cvp = self->odd = self->w = false;
     set_ctrl(self, 0);
     set_mask(self, 0);
-    self->rst = CSGS_SERVICED;
+    self->rst = ALDO_SIG_SERVICED;
 }
 
 // NOTE: this follows the same sequence as CPU reset sequence and is checked
@@ -339,16 +339,16 @@ static void reset(struct aldo_rp2c02 *self)
 static void handle_reset(struct aldo_rp2c02 *self)
 {
     // NOTE: pending always proceeds to committed just like the CPU sequence
-    if (self->rst == CSGS_PENDING) {
-        self->rst = CSGS_COMMITTED;
+    if (self->rst == ALDO_SIG_PENDING) {
+        self->rst = ALDO_SIG_COMMITTED;
     }
 
     if (self->signal.rst) {
         switch (self->rst) {
-        case CSGS_DETECTED:
-            self->rst = CSGS_CLEAR;
+        case ALDO_SIG_DETECTED:
+            self->rst = ALDO_SIG_CLEAR;
             break;
-        case CSGS_COMMITTED:
+        case ALDO_SIG_COMMITTED:
             reset(self);
             break;
         default:
@@ -356,12 +356,12 @@ static void handle_reset(struct aldo_rp2c02 *self)
         }
     } else {
         switch (self->rst) {
-        case CSGS_CLEAR:
-        case CSGS_SERVICED:
-            self->rst = CSGS_DETECTED;
+        case ALDO_SIG_CLEAR:
+        case ALDO_SIG_SERVICED:
+            self->rst = ALDO_SIG_DETECTED;
             break;
-        case CSGS_DETECTED:
-            self->rst = CSGS_PENDING;
+        case ALDO_SIG_DETECTED:
+            self->rst = ALDO_SIG_PENDING;
             break;
         default:
             // NOTE: as long as reset line is held low there is no further
@@ -384,7 +384,7 @@ static void vblank(struct aldo_rp2c02 *self)
     } else if (self->line == LinePreRender && self->dot == 1) {
         self->signal.intr = true;
         set_status(self, 0);
-        self->rst = CSGS_CLEAR;
+        self->rst = ALDO_SIG_CLEAR;
     }
 }
 
@@ -483,7 +483,7 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
     self->status.s = self->signal.ale = self->signal.vout = self->bflt = false;
 
     // NOTE: simulate rst set on startup to engage reset sequence
-    self->rst = CSGS_PENDING;
+    self->rst = ALDO_SIG_PENDING;
 }
 
 void aldo_ppu_zeroram(struct aldo_rp2c02 *self)

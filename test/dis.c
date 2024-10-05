@@ -2150,7 +2150,7 @@ static void datapath_irq_cycle_zero(void *ctx)
     struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 0,
-            .irq = CSGS_COMMITTED,
+            .irq = ALDO_SIG_COMMITTED,
         },
         .prg.curr = &curr,
     };
@@ -2173,7 +2173,7 @@ static void datapath_irq_cycle_one(void *ctx)
     struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 1,
-            .irq = CSGS_COMMITTED,
+            .irq = ALDO_SIG_COMMITTED,
         },
         .prg.curr = &curr,
     };
@@ -2196,7 +2196,7 @@ static void datapath_irq_cycle_n(void *ctx)
     struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 2,
-            .irq = CSGS_COMMITTED,
+            .irq = ALDO_SIG_COMMITTED,
         },
         .prg.curr = &curr,
     };
@@ -2219,7 +2219,7 @@ static void datapath_irq_cycle_six(void *ctx)
     struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 6,
-            .irq = CSGS_COMMITTED,
+            .irq = ALDO_SIG_COMMITTED,
         },
         .prg.curr = &curr,
     };
@@ -2242,7 +2242,7 @@ static void datapath_nmi_cycle_zero(void *ctx)
     struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 0,
-            .nmi = CSGS_COMMITTED,
+            .nmi = ALDO_SIG_COMMITTED,
         },
         .prg.curr = &curr,
     };
@@ -2265,7 +2265,7 @@ static void datapath_nmi_cycle_one(void *ctx)
     struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 1,
-            .nmi = CSGS_COMMITTED,
+            .nmi = ALDO_SIG_COMMITTED,
         },
         .prg.curr = &curr,
     };
@@ -2288,7 +2288,7 @@ static void datapath_nmi_cycle_n(void *ctx)
     struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 2,
-            .nmi = CSGS_COMMITTED,
+            .nmi = ALDO_SIG_COMMITTED,
         },
         .prg.curr = &curr,
     };
@@ -2311,7 +2311,7 @@ static void datapath_nmi_cycle_six(void *ctx)
     struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 6,
-            .nmi = CSGS_COMMITTED,
+            .nmi = ALDO_SIG_COMMITTED,
         },
         .prg.curr = &curr,
     };
@@ -2334,7 +2334,7 @@ static void datapath_rst_cycle_zero(void *ctx)
     struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 0,
-            .rst = CSGS_COMMITTED,
+            .rst = ALDO_SIG_COMMITTED,
         },
         .prg.curr = &curr,
     };
@@ -2357,7 +2357,7 @@ static void datapath_rst_cycle_one(void *ctx)
     struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 1,
-            .rst = CSGS_COMMITTED,
+            .rst = ALDO_SIG_COMMITTED,
         },
         .prg.curr = &curr,
     };
@@ -2380,7 +2380,7 @@ static void datapath_rst_cycle_n(void *ctx)
     struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 2,
-            .rst = CSGS_COMMITTED,
+            .rst = ALDO_SIG_COMMITTED,
         },
         .prg.curr = &curr,
     };
@@ -2403,7 +2403,7 @@ static void datapath_rst_cycle_six(void *ctx)
     struct aldo_snapshot snp = {
         .cpu.datapath = {
             .exec_cycle = 6,
-            .rst = CSGS_COMMITTED,
+            .rst = ALDO_SIG_COMMITTED,
         },
         .prg.curr = &curr,
     };
@@ -2616,7 +2616,7 @@ static void peek_interrupt(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     struct aldo_snapshot snp;
     cpu.a = 0x10;
-    cpu.irq = CSGS_COMMITTED;
+    cpu.irq = ALDO_SIG_COMMITTED;
     cpu_snapshot(&cpu, &snp);
     aldo_debugger *dbg = ctx;
     aldo_debug_set_vector_override(dbg, Aldo_NoResetVector);
@@ -2640,7 +2640,7 @@ static void peek_overridden_reset(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     struct aldo_snapshot snp;
     cpu.a = 0x10;
-    cpu.rst = CSGS_COMMITTED;
+    cpu.rst = ALDO_SIG_COMMITTED;
     cpu_snapshot(&cpu, &snp);
     aldo_debugger *dbg = ctx;
     aldo_debug_set_vector_override(dbg, 0xccdd);
@@ -2664,7 +2664,7 @@ static void peek_overridden_non_reset(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     struct aldo_snapshot snp;
     cpu.a = 0x10;
-    cpu.nmi = CSGS_COMMITTED;
+    cpu.nmi = ALDO_SIG_COMMITTED;
     cpu_snapshot(&cpu, &snp);
     aldo_debugger *dbg = ctx;
     aldo_debug_set_vector_override(dbg, 0xccdd);

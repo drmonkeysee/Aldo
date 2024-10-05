@@ -58,7 +58,7 @@ void ppu_setup(void **ctx)
     aldo_ppu_powerup(&c->ppu);
     aldo_ppu_cycle(&c->ppu);
     c->ppu.line = c->ppu.dot = 0;
-    c->ppu.rst = CSGS_CLEAR;
+    c->ppu.rst = ALDO_SIG_CLEAR;
     *ctx = c;
 }
 

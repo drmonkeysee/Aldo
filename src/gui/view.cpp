@@ -203,13 +203,13 @@ constexpr auto NoSelection = -1;
 constexpr auto display_signalstate(aldo_sigstate s) noexcept
 {
     switch (s) {
-    case CSGS_PENDING:
+    case ALDO_SIG_PENDING:
         return "(P)";
-    case CSGS_DETECTED:
+    case ALDO_SIG_DETECTED:
         return "(D)";
-    case CSGS_COMMITTED:
+    case ALDO_SIG_COMMITTED:
         return "(C)";
-    case CSGS_SERVICED:
+    case ALDO_SIG_SERVICED:
         return "(S)";
     default:
         return "(O)";
@@ -365,17 +365,17 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
         mode_menu_item(vs, emu);
         ImGui::Separator();
         auto
-            irq = emu.probe(CSGI_IRQ),
-            nmi = emu.probe(CSGI_NMI),
-            rst = emu.probe(CSGI_RST);
+            irq = emu.probe(ALDO_INT_IRQ),
+            nmi = emu.probe(ALDO_INT_NMI),
+            rst = emu.probe(ALDO_INT_RST);
         if (ImGui::MenuItem("IRQ", "i", &irq)) {
-            vs.addProbeCommand(CSGI_IRQ, irq);
+            vs.addProbeCommand(ALDO_INT_IRQ, irq);
         }
         if (ImGui::MenuItem("NMI", "n", &nmi)) {
-            vs.addProbeCommand(CSGI_NMI, nmi);
+            vs.addProbeCommand(ALDO_INT_NMI, nmi);
         }
         if (ImGui::MenuItem("RST", "s", &rst)) {
-            vs.addProbeCommand(CSGI_RST, rst);
+            vs.addProbeCommand(ALDO_INT_RST, rst);
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Clear RAM", "Cmd+0", emu.zeroRam)) {
@@ -1677,38 +1677,39 @@ private:
         };
 
         auto mode = emu.runMode();
-        if (ImGui::RadioButton("Sub ", mode == CSGM_SUBCYCLE)
-            && mode != CSGM_SUBCYCLE) {
-            vs.commands.emplace(aldo::Command::mode, CSGM_SUBCYCLE);
+        if (ImGui::RadioButton("Sub ", mode == ALDO_EXC_SUBCYCLE)
+            && mode != ALDO_EXC_SUBCYCLE) {
+            vs.commands.emplace(aldo::Command::mode, ALDO_EXC_SUBCYCLE);
         }
         ImGui::SameLine();
-        if (ImGui::RadioButton("Cycle", mode == CSGM_CYCLE)
-            && mode != CSGM_CYCLE) {
-            vs.commands.emplace(aldo::Command::mode, CSGM_CYCLE);
+        if (ImGui::RadioButton("Cycle", mode == ALDO_EXC_CYCLE)
+            && mode != ALDO_EXC_CYCLE) {
+            vs.commands.emplace(aldo::Command::mode, ALDO_EXC_CYCLE);
         }
-        if (ImGui::RadioButton("Step", mode == CSGM_STEP)
-            && mode != CSGM_STEP) {
-            vs.commands.emplace(aldo::Command::mode, CSGM_STEP);
+        if (ImGui::RadioButton("Step", mode == ALDO_EXC_STEP)
+            && mode != ALDO_EXC_STEP) {
+            vs.commands.emplace(aldo::Command::mode, ALDO_EXC_STEP);
         }
         ImGui::SameLine();
-        if (ImGui::RadioButton("Run", mode == CSGM_RUN) && mode != CSGM_RUN) {
-            vs.commands.emplace(aldo::Command::mode, CSGM_RUN);
+        if (ImGui::RadioButton("Run", mode == ALDO_EXC_RUN)
+            && mode != ALDO_EXC_RUN) {
+            vs.commands.emplace(aldo::Command::mode, ALDO_EXC_RUN);
         }
 
         auto
-            irq = emu.probe(CSGI_IRQ),
-            nmi = emu.probe(CSGI_NMI),
-            rst = emu.probe(CSGI_RST);
+            irq = emu.probe(ALDO_INT_IRQ),
+            nmi = emu.probe(ALDO_INT_NMI),
+            rst = emu.probe(ALDO_INT_RST);
         if (ImGui::Checkbox("IRQ", &irq)) {
-            vs.addProbeCommand(CSGI_IRQ, irq);
+            vs.addProbeCommand(ALDO_INT_IRQ, irq);
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("NMI", &nmi)) {
-            vs.addProbeCommand(CSGI_NMI, nmi);
+            vs.addProbeCommand(ALDO_INT_NMI, nmi);
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("RST", &rst)) {
-            vs.addProbeCommand(CSGI_RST, rst);
+            vs.addProbeCommand(ALDO_INT_RST, rst);
         }
     }
 

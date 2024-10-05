@@ -106,7 +106,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_i:
         if (is_free_key(ev)) {
-            vs.addProbeCommand(CSGI_IRQ, !emu.probe(CSGI_IRQ));
+            vs.addProbeCommand(ALDO_INT_IRQ, !emu.probe(ALDO_INT_IRQ));
         }
         break;
     case SDLK_m:
@@ -118,7 +118,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_n:
         if (is_free_key(ev)) {
-            vs.addProbeCommand(CSGI_NMI, !emu.probe(CSGI_NMI));
+            vs.addProbeCommand(ALDO_INT_NMI, !emu.probe(ALDO_INT_NMI));
         }
         break;
     case SDLK_o:
@@ -139,7 +139,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_s:
         if (is_free_key(ev)) {
-            vs.addProbeCommand(CSGI_RST, !emu.probe(CSGI_RST));
+            vs.addProbeCommand(ALDO_INT_RST, !emu.probe(ALDO_INT_RST));
         }
         break;
     }

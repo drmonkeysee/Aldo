@@ -235,7 +235,7 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
     set_ppu_pins(self);
     // TODO: ppu debug hook goes here
     if (++clock->subcycle < PpuRatio) {
-        if (self->mode == CSGM_SUBCYCLE) {
+        if (self->mode == ALDO_EXC_SUBCYCLE) {
             aldo_nes_ready(self, false);
         }
         return false;
@@ -253,14 +253,14 @@ static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
 
     switch (self->mode) {
     // NOTE: both cases are possible on cycle-boundary
-    case CSGM_SUBCYCLE:
-    case CSGM_CYCLE:
+    case ALDO_EXC_SUBCYCLE:
+    case ALDO_EXC_CYCLE:
         aldo_nes_ready(self, false);
         break;
-    case CSGM_STEP:
+    case ALDO_EXC_STEP:
         aldo_nes_ready(self, !self->cpu.signal.sync);
         break;
-    case CSGM_RUN:
+    case ALDO_EXC_RUN:
     default:
         break;
     }
@@ -303,7 +303,7 @@ void aldo_nes_powerup(aldo_nes *self, cart *c, bool zeroram)
         connect_cart(self, c);
     }
     // TODO: for now start in cycle-step mode
-    self->mode = CSGM_CYCLE;
+    self->mode = ALDO_EXC_CYCLE;
     if (zeroram) {
         memset(self->ram, 0, memsz(self->ram));
         memset(self->vram, 0, memsz(self->vram));
@@ -347,7 +347,7 @@ void aldo_nes_set_mode(aldo_nes *self, enum aldo_execmode mode)
     assert(self != NULL);
 
     // NOTE: force signed to check < 0 (underlying type may be uint)
-    self->mode = (int)mode < 0 ? CSGM_COUNT - 1 : mode % CSGM_COUNT;
+    self->mode = (int)mode < 0 ? ALDO_EXC_COUNT - 1 : mode % ALDO_EXC_COUNT;
 }
 
 void aldo_nes_ready(aldo_nes *self, bool ready)
@@ -362,11 +362,11 @@ bool aldo_nes_probe(aldo_nes *self, enum aldo_interrupt signal)
     assert(self != NULL);
 
     switch (signal) {
-    case CSGI_IRQ:
+    case ALDO_INT_IRQ:
         return self->probe.irq;
-    case CSGI_NMI:
+    case ALDO_INT_NMI:
         return self->probe.nmi;
-    case CSGI_RST:
+    case ALDO_INT_RST:
         return self->probe.rst;
     default:
         assert(((void)"INVALID NES PROBE", false));
@@ -380,13 +380,13 @@ void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal,
     assert(self != NULL);
 
     switch (signal) {
-    case CSGI_IRQ:
+    case ALDO_INT_IRQ:
         self->probe.irq = active;
         break;
-    case CSGI_NMI:
+    case ALDO_INT_NMI:
         self->probe.nmi = active;
         break;
-    case CSGI_RST:
+    case ALDO_INT_RST:
         self->probe.rst = active;
         break;
     default:

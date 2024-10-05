@@ -88,17 +88,17 @@ static const char *interrupt_display(const struct aldo_snapshot *snp)
 {
     if (snp->cpu.datapath.opcode != Aldo_BrkOpcode) return "";
     if (snp->cpu.datapath.exec_cycle == 6) return "CLR";
-    if (snp->cpu.datapath.rst == CSGS_COMMITTED) return "(RST)";
-    if (snp->cpu.datapath.nmi == CSGS_COMMITTED) return "(NMI)";
-    if (snp->cpu.datapath.irq == CSGS_COMMITTED) return "(IRQ)";
+    if (snp->cpu.datapath.rst == ALDO_SIG_COMMITTED) return "(RST)";
+    if (snp->cpu.datapath.nmi == ALDO_SIG_COMMITTED) return "(NMI)";
+    if (snp->cpu.datapath.irq == ALDO_SIG_COMMITTED) return "(IRQ)";
     return "";
 }
 
 static uint16_t interrupt_vector(const struct aldo_snapshot *snp)
 {
-    if (snp->cpu.datapath.nmi == CSGS_COMMITTED)
+    if (snp->cpu.datapath.nmi == ALDO_SIG_COMMITTED)
         return batowr(snp->prg.vectors);
-    if (snp->cpu.datapath.rst == CSGS_COMMITTED)
+    if (snp->cpu.datapath.rst == ALDO_SIG_COMMITTED)
         return batowr(snp->prg.vectors + 2);
     return batowr(snp->prg.vectors + 4);
 }
@@ -719,7 +719,7 @@ int aldo_dis_peek(uint16_t addr, struct mos6502 *cpu, aldo_debugger *dbg,
         const char *fmt;
         uint16_t vector;
         int resetvector;
-        if (snp->cpu.datapath.rst == CSGS_COMMITTED
+        if (snp->cpu.datapath.rst == ALDO_SIG_COMMITTED
             && (resetvector = aldo_debug_vector_override(dbg))
                 != Aldo_NoResetVector) {
             fmt = ALDO_HEXPR_RST_IND "%04X";

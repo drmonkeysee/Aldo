@@ -64,7 +64,7 @@ static void ppuctrl_write_during_reset(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
-    ppu->rst = CSGS_SERVICED;
+    ppu->rst = ALDO_SIG_SERVICED;
 
     aldo_ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.ctrl);
@@ -137,7 +137,7 @@ static void ppumask_write_during_reset(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
-    ppu->rst = CSGS_SERVICED;
+    ppu->rst = ALDO_SIG_SERVICED;
 
     aldo_ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0u, snp.ppu.mask);
@@ -229,7 +229,7 @@ static void ppustatus_read_during_reset(void *ctx)
     struct aldo_snapshot snp;
     ppu->regbus = 0x5a;
     ppu->w = ppu->status.v = ppu->status.s = ppu->status.o = true;
-    ppu->rst = CSGS_SERVICED;
+    ppu->rst = ALDO_SIG_SERVICED;
 
     uint8_t d;
     bus_read(ppt_get_mbus(ctx), 0x2002, &d);
@@ -311,7 +311,7 @@ static void oamaddr_write_mirrored(void *ctx)
 static void oamaddr_write_during_reset(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
-    ppu->rst = CSGS_SERVICED;
+    ppu->rst = ALDO_SIG_SERVICED;
 
     ct_assertequal(0u, ppu->oamaddr);
     ct_assertequal(0u, ppu->regsel);
@@ -506,7 +506,7 @@ static void oamdata_write_during_reset(void *ctx)
     ppu->dot = 5;
     ppu->ctrl.s = true;
     ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
-    ppu->rst = CSGS_SERVICED;
+    ppu->rst = ALDO_SIG_SERVICED;
 
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
@@ -643,7 +643,7 @@ static void ppuscroll_write_mirrored(void *ctx)
 static void ppuscroll_write_during_reset(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
-    ppu->rst = CSGS_SERVICED;
+    ppu->rst = ALDO_SIG_SERVICED;
 
     ct_assertequal(0u, ppu->t);
     ct_assertequal(0u, ppu->x);
@@ -744,7 +744,7 @@ static void ppuaddr_write_during_reset(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->t = 0x4fff;
-    ppu->rst = CSGS_SERVICED;
+    ppu->rst = ALDO_SIG_SERVICED;
 
     ct_assertequal(0x4fffu, ppu->t);
     ct_assertequal(0u, ppu->v);
@@ -1035,7 +1035,7 @@ static void ppudata_write_during_reset(void *ctx)
     ppu->line = 242;
     ppu->dot = 24;
     ppu->v = 0x2002;
-    ppu->rst = CSGS_SERVICED;
+    ppu->rst = ALDO_SIG_SERVICED;
 
     bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
@@ -1949,7 +1949,7 @@ static void ppudata_read_during_reset(void *ctx)
     ppu->dot = 24;
     ppu->v = 0x2002;
     ppu->rbuf = 0xaa;
-    ppu->rst = CSGS_SERVICED;
+    ppu->rst = ALDO_SIG_SERVICED;
 
     uint8_t d;
     bus_read(ppt_get_mbus(ctx), 0x2007, &d);

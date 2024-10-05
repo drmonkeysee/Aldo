@@ -54,9 +54,9 @@ static void brk_handler(void *ctx)
     ct_assertequal(0x34u, mem[509]);
     ct_assertequal(2u, mem[510]);
     ct_assertequal(0u, mem[511]);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
 }
 
 static void irq_handler(void *ctx)
@@ -73,7 +73,7 @@ static void irq_handler(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
     cycles = clock_cpu(&cpu);
 
@@ -85,9 +85,9 @@ static void irq_handler(void *ctx)
     ct_assertequal(0x20u, mem[509]);
     ct_assertequal(3u, mem[510]);
     ct_assertequal(0u, mem[511]);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
 }
 
 static void nmi_handler(void *ctx)
@@ -103,7 +103,7 @@ static void nmi_handler(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
 
     cpu.signal.nmi = true;
     cycles = clock_cpu(&cpu);
@@ -116,9 +116,9 @@ static void nmi_handler(void *ctx)
     ct_assertequal(0x24u, mem[509]);
     ct_assertequal(3u, mem[510]);
     ct_assertequal(0u, mem[511]);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
-    ct_assertequal(CSGS_SERVICED, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_SERVICED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
 }
 
 static void rst_handler(void *ctx)
@@ -135,17 +135,17 @@ static void rst_handler(void *ctx)
     cpu_cycle(&cpu);
 
     ct_assertequal(1u, cpu.pc);
-    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(2u, cpu.pc);
-    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
     ct_assertequal(2u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
 
     cpu.signal.rst = true;
     int cycles = clock_cpu(&cpu);
@@ -158,9 +158,9 @@ static void rst_handler(void *ctx)
     ct_assertequal(0xddu, mem[509]);
     ct_assertequal(0xeeu, mem[510]);
     ct_assertequal(0xffu, mem[511]);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
 }
 
 static void rti_clear_irq_mask(void *ctx)
@@ -222,20 +222,20 @@ static void brk_masks_irq(void *ctx)
 
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
 
     for (int i = 0; i < 4; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+        ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     }
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -245,10 +245,10 @@ static void brk_masks_irq(void *ctx)
 
     // NOTE: IRQ seen active again after first instruction
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
 
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(251u, cpu.pc);
 }
 
@@ -268,7 +268,7 @@ static void irq_ghost(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
     cpu.signal.irq = true;
     cycles = clock_cpu(&cpu);
@@ -281,9 +281,9 @@ static void irq_ghost(void *ctx)
     ct_assertequal(0x20u, mem[509]);
     ct_assertequal(3u, mem[510]);
     ct_assertequal(0u, mem[511]);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
 }
 
 // NOTE: NMI triggered and handler called but line never goes inactive
@@ -303,7 +303,7 @@ static void nmi_line_never_cleared(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
 
     cycles = clock_cpu(&cpu);
 
@@ -315,15 +315,15 @@ static void nmi_line_never_cleared(void *ctx)
     ct_assertequal(0x24u, mem[509]);
     ct_assertequal(3u, mem[510]);
     ct_assertequal(0u, mem[511]);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
-    ct_assertequal(CSGS_SERVICED, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_SERVICED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
 
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_SERVICED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_SERVICED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_SERVICED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_SERVICED, (int)cpu.nmi);
     ct_assertequal(251u, cpu.pc);
 }
 
@@ -340,21 +340,21 @@ static void nmi_hijacks_brk(void *ctx)
 
     for (int i = 0; i < 4; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     }
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_SERVICED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_SERVICED, (int)cpu.nmi);
     ct_assertequal(0x9977u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -376,17 +376,17 @@ static void nmi_delayed_by_brk(void *ctx)
 
     for (int i = 0; i < 5; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     }
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -396,10 +396,10 @@ static void nmi_delayed_by_brk(void *ctx)
 
     // NOTE: NMI detected and handled after first instruction of BRK handler
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(251u, cpu.pc);
 }
 
@@ -416,13 +416,13 @@ static void nmi_late_delayed_by_brk(void *ctx)
 
     for (int i = 0; i < 6; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     }
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -432,10 +432,10 @@ static void nmi_late_delayed_by_brk(void *ctx)
 
     // NOTE: NMI detected and handled after first instruction of BRK handler
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(251u, cpu.pc);
 }
 
@@ -453,17 +453,17 @@ static void nmi_lost_during_brk(void *ctx)
 
     for (int i = 0; i < 5; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     }
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -472,11 +472,11 @@ static void nmi_lost_during_brk(void *ctx)
     ct_assertequal(0x0u, mem[511]);
 
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
     cpu.signal.nmi = true;
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(251u, cpu.pc);
 }
 
@@ -497,26 +497,26 @@ static void nmi_hijacks_irq(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
     for (int i = 0; i < 4; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     }
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
-    ct_assertequal(CSGS_SERVICED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_SERVICED, (int)cpu.nmi);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -525,10 +525,10 @@ static void nmi_hijacks_irq(void *ctx)
     ct_assertequal(0x0u, mem[511]);
 
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
 
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(251u, cpu.pc);
 }
 
@@ -550,26 +550,26 @@ static void nmi_hijacks_and_loses_irq(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
     for (int i = 0; i < 4; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     }
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
-    ct_assertequal(CSGS_SERVICED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_SERVICED, (int)cpu.nmi);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -578,11 +578,11 @@ static void nmi_hijacks_and_loses_irq(void *ctx)
     ct_assertequal(0x0u, mem[511]);
 
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
 
     cpu.signal.irq = true;
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
     ct_assertequal(251u, cpu.pc);
 }
 
@@ -603,22 +603,22 @@ static void nmi_delayed_by_irq(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
     for (int i = 0; i < 5; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     }
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -628,10 +628,10 @@ static void nmi_delayed_by_irq(void *ctx)
 
     // NOTE: NMI detected and handled after first instruction of BRK handler
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(251u, cpu.pc);
 }
 
@@ -652,18 +652,18 @@ static void nmi_late_delayed_by_irq(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
     for (int i = 0; i < 6; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     }
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -673,10 +673,10 @@ static void nmi_late_delayed_by_irq(void *ctx)
 
     // NOTE: NMI detected and handled after first instruction of BRK handler
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(251u, cpu.pc);
 }
 
@@ -698,22 +698,22 @@ static void nmi_lost_during_irq(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
     for (int i = 0; i < 5; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     }
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -723,11 +723,11 @@ static void nmi_lost_during_irq(void *ctx)
 
     // NOTE: NMI detected and handled after first instruction of BRK handler
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
     cpu.signal.nmi = true;
     cpu_cycle(&cpu);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(251u, cpu.pc);
 }
 
@@ -753,25 +753,25 @@ static void rst_hijacks_irq(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
     for (int i = 0; i < 4; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
     }
 
     cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(3u, cpu.pc);
     ct_assertfalse(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -782,14 +782,14 @@ static void rst_hijacks_irq(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(3u, cpu.pc);
     ct_asserttrue(cpu.presync);
 
     cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(3u, cpu.pc);
     ct_assertfalse(cpu.presync);
     ct_assertequal(0u, cpu.opc);
@@ -813,21 +813,21 @@ static void rst_following_irq(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
     for (int i = 0; i < 5; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
     }
 
     cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -837,18 +837,18 @@ static void rst_following_irq(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
 
     cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
 }
 
@@ -870,17 +870,17 @@ static void rst_late_on_irq(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
     for (int i = 0; i < 6; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
     }
 
     cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -890,18 +890,18 @@ static void rst_late_on_irq(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.rst);
     ct_assertequal(251u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(251u, cpu.pc);
 
     cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(251u, cpu.pc);
 }
 
@@ -920,25 +920,25 @@ static void rst_hijacks_nmi(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
 
     for (int i = 0; i < 4; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
     }
 
     cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(3u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -949,14 +949,14 @@ static void rst_hijacks_nmi(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(3u, cpu.pc);
     ct_asserttrue(cpu.presync);
 
     cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(3u, cpu.pc);
     ct_assertfalse(cpu.presync);
     ct_assertequal(0u, cpu.opc);
@@ -979,21 +979,21 @@ static void rst_following_nmi(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
 
     for (int i = 0; i < 5; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
     }
 
     cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.rst);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -1003,18 +1003,18 @@ static void rst_following_nmi(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
 
     cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
 }
 
@@ -1035,17 +1035,17 @@ static void rst_late_on_nmi(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
 
     for (int i = 0; i < 6; ++i) {
         cpu_cycle(&cpu);
-        ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+        ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
     }
 
     cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.rst);
     ct_assertequal(250u, cpu.pc);
     ct_asserttrue(cpu.p.i);
     ct_assertequal(0xfcu, cpu.s);
@@ -1055,18 +1055,18 @@ static void rst_late_on_nmi(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.rst);
     ct_assertequal(251u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(251u, cpu.pc);
 
     cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(251u, cpu.pc);
 }
 
@@ -1080,9 +1080,9 @@ static void clear_on_startup(void *ctx)
     struct mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
-    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
 }
 
 static void irq_poll_sequence(void *ctx)
@@ -1096,22 +1096,22 @@ static void irq_poll_sequence(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 }
 
@@ -1126,12 +1126,12 @@ static void irq_short_sequence(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
 }
 
@@ -1146,32 +1146,32 @@ static void irq_long_sequence(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 }
 
@@ -1187,12 +1187,12 @@ static void irq_branch_not_taken(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
 }
 
@@ -1208,17 +1208,17 @@ static void irq_on_branch_taken_if_early_signal(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(5u, cpu.pc);
 }
 
@@ -1233,28 +1233,28 @@ static void irq_delayed_on_branch_taken_if_late_signal(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(5u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(6u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(6u, cpu.pc);
 }
 
@@ -1269,33 +1269,33 @@ static void irq_delayed_on_infinite_branch(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(0u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(0u, cpu.pc);
 }
 
@@ -1311,23 +1311,23 @@ static void irq_on_branch_page_boundary(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
     ct_assertequal(251u, cpu.pc);
 
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(252u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(257u, cpu.pc);
 }
 
@@ -1340,23 +1340,23 @@ static void irq_just_in_time(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
 
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 }
 
@@ -1370,33 +1370,33 @@ static void irq_too_late(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(4u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(5u, cpu.pc);
 }
 
@@ -1409,13 +1409,13 @@ static void irq_too_short(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu.signal.irq = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
 }
 
@@ -1428,18 +1428,18 @@ static void irq_level_dependent(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
 
     cpu.signal.irq = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 }
 
@@ -1452,22 +1452,22 @@ static void irq_masked(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
 }
 
@@ -1482,13 +1482,13 @@ static void irq_missed_by_sei(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 }
@@ -1504,25 +1504,25 @@ static void irq_missed_by_plp_set_mask(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 }
@@ -1540,37 +1540,37 @@ static void irq_stopped_by_rti_set_mask(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(5u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 }
@@ -1586,25 +1586,25 @@ static void irq_missed_by_cli(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 }
@@ -1620,37 +1620,37 @@ static void irq_missed_by_plp_clear_mask(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(3u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 }
@@ -1668,37 +1668,37 @@ static void irq_allowed_by_rti_clear_mask(void *ctx)
     cpu.signal.irq = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
     ct_assertequal(1u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
     ct_asserttrue(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
     ct_assertequal(2u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
     ct_assertequal(5u, cpu.pc);
     ct_assertfalse(cpu.p.i);
 }
@@ -1711,24 +1711,24 @@ static void irq_detect_duplicate(void *ctx)
 
     // NOTE: simulate irq held active during and after servicing interrupt
     cpu.signal.irq = false;
-    cpu.irq = CSGS_COMMITTED;
+    cpu.irq = ALDO_SIG_COMMITTED;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
     // NOTE: reset cpu to simulate interrupt has been serviced
-    cpu.irq = CSGS_CLEAR;
+    cpu.irq = ALDO_SIG_CLEAR;
     cpu.pc = 0;
     cpu.presync = true;
     cpu_cycle(&cpu);
 
     // NOTE: if irq is still held active after servicing it'll
     // be detected again.
-    ct_assertequal(CSGS_DETECTED, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.irq);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.irq);
 }
 
 static void nmi_poll_sequence(void *ctx)
@@ -1741,22 +1741,22 @@ static void nmi_poll_sequence(void *ctx)
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(3u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(3u, cpu.pc);
 }
 
@@ -1770,12 +1770,12 @@ static void nmi_short_sequence(void *ctx)
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(2u, cpu.pc);
 }
 
@@ -1789,32 +1789,32 @@ static void nmi_long_sequence(void *ctx)
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(3u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(3u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(3u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(3u, cpu.pc);
 }
 
@@ -1829,12 +1829,12 @@ static void nmi_branch_not_taken(void *ctx)
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(2u, cpu.pc);
 }
 
@@ -1849,17 +1849,17 @@ static void nmi_on_branch_taken_if_early_signal(void *ctx)
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(5u, cpu.pc);
 }
 
@@ -1873,28 +1873,28 @@ static void nmi_delayed_on_branch_taken_if_late_signal(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(1u, cpu.pc);
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(5u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(6u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(6u, cpu.pc);
 }
 
@@ -1908,33 +1908,33 @@ static void nmi_delayed_on_infinite_branch(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(1u, cpu.pc);
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(0u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(0u, cpu.pc);
 }
 
@@ -1949,23 +1949,23 @@ static void nmi_on_branch_page_boundary(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(251u, cpu.pc);
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
     ct_assertequal(252u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(257u, cpu.pc);
 }
 
@@ -1977,23 +1977,23 @@ static void nmi_just_in_time(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(2u, cpu.pc);
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
     ct_assertequal(3u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(3u, cpu.pc);
 }
 
@@ -2006,33 +2006,33 @@ static void nmi_too_late(void *ctx)
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(3u, cpu.pc);
 
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
     ct_assertequal(3u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(4u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
     ct_assertequal(5u, cpu.pc);
 }
 
@@ -2045,13 +2045,13 @@ static void nmi_too_short(void *ctx)
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
     ct_assertequal(1u, cpu.pc);
 
     cpu.signal.nmi = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
     ct_assertequal(2u, cpu.pc);
 }
 
@@ -2064,18 +2064,18 @@ static void nmi_edge_persist(void *ctx)
     cpu.signal.nmi = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(2u, cpu.pc);
 
     cpu.signal.nmi = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.nmi);
     ct_assertequal(3u, cpu.pc);
 }
 
@@ -2087,28 +2087,28 @@ static void nmi_serviced_only_clears_on_inactive(void *ctx)
 
     // NOTE: simulate nmi held active during and after servicing interrupt
     cpu.signal.nmi = false;
-    cpu.nmi = CSGS_COMMITTED;
+    cpu.nmi = ALDO_SIG_COMMITTED;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
 
     // NOTE: reset cpu to simulate interrupt has been serviced
-    cpu.nmi = CSGS_SERVICED;
+    cpu.nmi = ALDO_SIG_SERVICED;
     cpu.pc = 0;
     cpu.presync = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_SERVICED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_SERVICED, (int)cpu.nmi);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_SERVICED, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_SERVICED, (int)cpu.nmi);
 
     // NOTE: nmi cannot be detected again until line goes inactive
     cpu.signal.nmi = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.nmi);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
 }
 
 static void rst_detected_and_cpu_held(void *ctx)
@@ -2120,22 +2120,22 @@ static void rst_detected_and_cpu_held(void *ctx)
     cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.rst);
     ct_assertequal(1u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_PENDING, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_PENDING, (int)cpu.rst);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(2u, cpu.pc);
 
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_COMMITTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
     ct_assertequal(2u, cpu.pc);
 }
 
@@ -2148,13 +2148,13 @@ static void rst_too_short(void *ctx)
     cpu.signal.rst = false;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_DETECTED, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.rst);
     ct_assertequal(1u, cpu.pc);
 
     cpu.signal.rst = true;
     cpu_cycle(&cpu);
 
-    ct_assertequal(CSGS_CLEAR, (int)cpu.rst);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
     ct_assertequal(2u, cpu.pc);
 }
 

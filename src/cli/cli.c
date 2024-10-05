@@ -186,7 +186,7 @@ static ui_loop *setup_ui(struct emulator *emu)
     ui_loop *loop = ui_curses_loop;
     if (emu->args->batch) {
         // NOTE: when in batch mode set NES to run immediately
-        aldo_nes_set_mode(emu->console, CSGM_RUN);
+        aldo_nes_set_mode(emu->console, ALDO_EXC_RUN);
         aldo_nes_ready(emu->console, true);
         loop = ui_batch_loop;
     }

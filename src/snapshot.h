@@ -33,7 +33,7 @@ struct aldo_snapshot {
             bool irq, nmi, readwrite, ready, reset, sync;
         } lines;
         struct {
-            enum csig_state irq, nmi, rst;
+            enum aldo_sigstate irq, nmi, rst;
             uint16_t addressbus, current_instruction;
             uint8_t addrlow_latch, addrhigh_latch, addrcarry_latch, databus,
                     exec_cycle, opcode;
@@ -49,7 +49,7 @@ struct aldo_snapshot {
                 video_out, write;
         } lines;
         struct {
-            enum csig_state rst;
+            enum aldo_sigstate rst;
             uint16_t addressbus, scrolladdr, tempaddr, dot, line;
             uint8_t databus, readbuffer, register_databus, register_select,
                     xfine;

@@ -80,16 +80,19 @@ public:
     {
         return aldo_nes_bcd_support(consolep());
     }
-    csig_excmode runMode() const noexcept { return aldo_nes_mode(consolep()); }
-    void runMode(csig_excmode mode) noexcept
+    aldo_execmode runMode() const noexcept
+    {
+        return aldo_nes_mode(consolep());
+    }
+    void runMode(aldo_execmode mode) noexcept
     {
         aldo_nes_set_mode(consolep(), mode);
     }
-    bool probe(csig_interrupt signal) const noexcept
+    bool probe(aldo_interrupt signal) const noexcept
     {
         return aldo_nes_probe(consolep(), signal);
     }
-    void probe(csig_interrupt signal, bool active) noexcept
+    void probe(aldo_interrupt signal, bool active) noexcept
     {
         aldo_nes_set_probe(consolep(), signal, active);
     }

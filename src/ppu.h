@@ -64,7 +64,7 @@ struct aldo_rp2c02 {
     uint8_t oamaddr;        // OAMADDR: OAM Data Address, write-only
 
     // Datapath
-    enum csig_state rst;    // RESET detection latch
+    enum aldo_sigstate rst; // RESET detection latch
     uint16_t vaddrbus;      // VRAM Address Bus (14 bits)
     uint8_t regsel,         // Register Selection (3 bits);
                             // wired to lowest 3 bits of CPU address bus.

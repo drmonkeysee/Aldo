@@ -200,7 +200,7 @@ using ScopedStyleVec = ScopedWidgetVars<scoped_style_vec>;
 
 constexpr auto NoSelection = -1;
 
-constexpr auto display_signalstate(csig_state s) noexcept
+constexpr auto display_signalstate(aldo_sigstate s) noexcept
 {
     switch (s) {
     case CSGS_PENDING:
@@ -349,7 +349,7 @@ auto mode_menu_item(aldo::viewstate& vs, const aldo::Emulator& emu)
         modeAdjust = 1;
     }
     if (ImGui::MenuItem(label.c_str(), mnemonic)) {
-        auto val = static_cast<csig_excmode>(emu.runMode() + modeAdjust);
+        auto val = static_cast<aldo_execmode>(emu.runMode() + modeAdjust);
         vs.commands.emplace(aldo::Command::mode, val);
     }
 }

@@ -38,15 +38,15 @@ size_t aldo_nes_ram_size(aldo_nes *self) br_nothrow;
 br_libexport
 bool aldo_nes_bcd_support(aldo_nes *self) br_nothrow;
 br_libexport
-enum csig_excmode aldo_nes_mode(aldo_nes *self) br_nothrow;
+enum aldo_execmode aldo_nes_mode(aldo_nes *self) br_nothrow;
 br_libexport
-void aldo_nes_set_mode(aldo_nes *self, enum csig_excmode mode) br_nothrow;
+void aldo_nes_set_mode(aldo_nes *self, enum aldo_execmode mode) br_nothrow;
 br_libexport
 void aldo_nes_ready(aldo_nes *self, bool ready) br_nothrow;
 br_libexport
-bool aldo_nes_probe(aldo_nes *self, enum csig_interrupt signal) br_nothrow;
+bool aldo_nes_probe(aldo_nes *self, enum aldo_interrupt signal) br_nothrow;
 br_libexport
-void aldo_nes_set_probe(aldo_nes *self, enum csig_interrupt signal,
+void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal,
                         bool active) br_nothrow;
 
 br_libexport

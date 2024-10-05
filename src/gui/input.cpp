@@ -113,7 +113,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         if (is_free_key(ev)) {
             auto mode = emu.runMode() + mode_change(ev);
             vs.commands.emplace(aldo::Command::mode,
-                                static_cast<csig_excmode>(mode));
+                                static_cast<aldo_execmode>(mode));
         }
         break;
     case SDLK_n:
@@ -176,7 +176,7 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
         mr.platform().launch_studio();
         break;
     case aldo::Command::mode:
-        emu.runMode(std::get<csig_excmode>(cs.value));
+        emu.runMode(std::get<aldo_execmode>(cs.value));
         break;
     case aldo::Command::openROM:
         if (aldo::modal::loadROM(emu, mr)) {

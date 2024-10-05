@@ -8,7 +8,7 @@
 #ifndef Aldo_ctrlsignal_h
 #define Aldo_ctrlsignal_h
 
-enum csig_excmode {
+enum aldo_execmode {
     CSGM_SUBCYCLE,
     CSGM_CYCLE,
     CSGM_STEP,
@@ -16,13 +16,13 @@ enum csig_excmode {
     CSGM_COUNT,
 };
 
-enum csig_interrupt {
+enum aldo_interrupt {
     CSGI_IRQ,
     CSGI_NMI,
     CSGI_RST,
 };
 
-enum csig_state {
+enum aldo_sigstate {
     CSGS_CLEAR,
     CSGS_DETECTED,
     CSGS_PENDING,

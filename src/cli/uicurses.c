@@ -172,7 +172,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     drawtoggle(v, halt_label, !emu->snapshot.cpu.lines.ready);
 
     cursor_y += 2;
-    enum csig_excmode mode = aldo_nes_mode(emu->console);
+    enum aldo_execmode mode = aldo_nes_mode(emu->console);
     mvwaddstr(v->content, cursor_y, 0, "Mode:");
     drawtoggle(v, " Sub ", mode == CSGM_SUBCYCLE);
     drawtoggle(v, " Cycle ", mode == CSGM_CYCLE);
@@ -368,7 +368,7 @@ static void draw_chip_hline(const struct view *v, bool signal, int y, int x,
 }
 
 static void draw_interrupt_latch(const struct view *v,
-                                 enum csig_state interrupt, int y, int x)
+                                 enum aldo_sigstate interrupt, int y, int x)
 {
     const char *modifier = "";
     attr_t style = A_NORMAL;

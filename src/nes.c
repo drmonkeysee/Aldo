@@ -26,11 +26,11 @@ static const int PpuRatio = 3;
 // Cartridge RAM/ROM and Controller Input.
 struct aldo_nes001 {
     cart *cart;                 // Game Cartridge; Non-owning Pointer
-    aldo_debugger *dbg;              // Debugger Context; Non-owning Pointer
+    aldo_debugger *dbg;         // Debugger Context; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
     struct aldo_rp2c02 ppu;     // RP2C02 PPU
-    enum csig_excmode mode;     // NES execution mode
+    enum aldo_execmode mode;    // NES execution mode
     struct {
         bool
             irq: 1,             // IRQ Probe
@@ -335,14 +335,14 @@ bool aldo_nes_bcd_support(aldo_nes *self)
     return self->cpu.bcd;
 }
 
-enum csig_excmode aldo_nes_mode(aldo_nes *self)
+enum aldo_execmode aldo_nes_mode(aldo_nes *self)
 {
     assert(self != NULL);
 
     return self->mode;
 }
 
-void aldo_nes_set_mode(aldo_nes *self, enum csig_excmode mode)
+void aldo_nes_set_mode(aldo_nes *self, enum aldo_execmode mode)
 {
     assert(self != NULL);
 
@@ -357,7 +357,7 @@ void aldo_nes_ready(aldo_nes *self, bool ready)
     self->cpu.signal.rdy = ready;
 }
 
-bool aldo_nes_probe(aldo_nes *self, enum csig_interrupt signal)
+bool aldo_nes_probe(aldo_nes *self, enum aldo_interrupt signal)
 {
     assert(self != NULL);
 
@@ -374,7 +374,7 @@ bool aldo_nes_probe(aldo_nes *self, enum csig_interrupt signal)
     }
 }
 
-void aldo_nes_set_probe(aldo_nes *self, enum csig_interrupt signal,
+void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal,
                         bool active)
 {
     assert(self != NULL);

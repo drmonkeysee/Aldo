@@ -46,7 +46,7 @@ enum {
 struct aldo_dis_instruction {
     size_t offset;
     struct blockview bv;
-    struct decoded d;
+    struct aldo_decoded d;
 };
 
 #include "bridgeopen.h"

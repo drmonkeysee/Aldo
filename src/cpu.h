@@ -80,7 +80,7 @@ struct aldo_mos6502 {
 };
 
 struct aldo_peekresult {
-    enum addrmode mode;
+    enum aldo_addrmode mode;
     uint16_t interaddr, finaladdr;
     uint8_t data;
     bool busfault;

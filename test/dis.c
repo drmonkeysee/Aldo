@@ -320,7 +320,7 @@ static void mnemonic_unofficial(void *ctx)
 static void mnemonic_invalid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {(enum inst)-4, ALDO_AM_IMM, {0}, {0}, false},
+        .d = {(enum aldo_inst)-4, ALDO_AM_IMM, {0}, {0}, false},
     };
 
     const char *result = aldo_dis_inst_mnemonic(&inst);
@@ -357,7 +357,7 @@ static void description_unofficial(void *ctx)
 static void description_invalid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {(enum inst)-4, ALDO_AM_IMM, {0}, {0}, false},
+        .d = {(enum aldo_inst)-4, ALDO_AM_IMM, {0}, {0}, false},
     };
 
     const char *result = aldo_dis_inst_description(&inst);
@@ -394,7 +394,7 @@ static void modename_unofficial(void *ctx)
 static void modename_invalid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {ALDO_IN_ADC, (enum addrmode)-4, {0}, {0}, false},
+        .d = {ALDO_IN_ADC, (enum aldo_addrmode)-4, {0}, {0}, false},
     };
 
     const char *result = aldo_dis_inst_addrmode(&inst);
@@ -431,7 +431,7 @@ static void flags_unofficial(void *ctx)
 static void flags_invalid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {(enum inst)-4, ALDO_AM_IMM, {0}, {0}, false},
+        .d = {(enum aldo_inst)-4, ALDO_AM_IMM, {0}, {0}, false},
     };
 
     uint8_t result = aldo_dis_inst_flags(&inst);

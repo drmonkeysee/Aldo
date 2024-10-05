@@ -60,25 +60,25 @@ static const char *const restrict *const StringTables[] = {
 #undef X
 };
 
-static const char *mnemonic(enum inst in)
+static const char *mnemonic(enum aldo_inst in)
 {
     static const size_t sz = sizeof Mnemonics / sizeof Mnemonics[0];
     return 0 <= in && in < sz ? Mnemonics[in] : Mnemonics[ALDO_IN_UDF];
 }
 
-static const char *description(enum inst in)
+static const char *description(enum aldo_inst in)
 {
     static const size_t sz = sizeof Descriptions / sizeof Descriptions[0];
     return 0 <= in && in < sz ? Descriptions[in] : Descriptions[ALDO_IN_UDF];
 }
 
-static const char *modename(enum addrmode am)
+static const char *modename(enum aldo_addrmode am)
 {
     static const size_t sz = sizeof ModeNames / sizeof ModeNames[0];
     return 0 <= am && am < sz ? ModeNames[am] : ModeNames[ALDO_AM_IMP];
 }
 
-static uint8_t flags(enum inst in)
+static uint8_t flags(enum aldo_inst in)
 {
     static const size_t sz = sizeof Flags / sizeof Flags[0];
     return 0 <= in && in < sz ? Flags[in] : Flags[ALDO_IN_UDF];
@@ -465,7 +465,7 @@ int aldo_dis_parse_inst(const struct blockview *bv, size_t at,
     if (at >= bv->size) return 0;
 
     uint8_t opcode = bv->mem[at];
-    struct decoded dec = Aldo_Decode[opcode];
+    struct aldo_decoded dec = Aldo_Decode[opcode];
     int instlen = InstLens[dec.mode];
     if ((size_t)instlen > bv->size - at) return ALDO_DIS_ERR_EOF;
 

@@ -53,7 +53,7 @@ const uint8_t Aldo_BrkOpcode = 0x0;
 // (!) = unstable
 // (!!) = extremely unstable
 
-const struct decoded Aldo_Decode[] = {
+const struct aldo_decoded Aldo_Decode[] = {
     OP(IN_BRK, AM_BRK, SI, CY(7)),      // 00 - BRK
     OP(IN_ORA, AM_INDX, AP, CY(6)),     // 01 - ORA (zp,X)
     JAM,                                // 02 - *JAM (KIL, HLT, CIM, CRP)

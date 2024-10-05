@@ -360,7 +360,7 @@ X(JAM, 1, "Implied",                /* Jammed instruction */ \
 
 #define ALDO_IN_LBL(s) ALDO_IN_##s
 
-enum inst {
+enum aldo_inst {
 #define X(s, d, f, ...) ALDO_IN_LBL(s),
     ALDO_DEC_INST_X
 #undef X
@@ -368,15 +368,15 @@ enum inst {
 
 #define ALDO_AM_LBL(s) ALDO_AM_##s
 
-enum addrmode {
+enum aldo_addrmode {
 #define X(s, b, p, ...) ALDO_AM_LBL(s),
     ALDO_DEC_ADDRMODE_X
 #undef X
 };
 
-struct decoded {
-    enum inst instruction;
-    enum addrmode mode;
+struct aldo_decoded {
+    enum aldo_inst instruction;
+    enum aldo_addrmode mode;
     struct {
         bool
             a: 1,   // Accumulator
@@ -395,6 +395,6 @@ struct decoded {
 };
 
 extern const uint8_t Aldo_BrkOpcode;
-extern const struct decoded Aldo_Decode[];
+extern const struct aldo_decoded Aldo_Decode[];
 
 #endif

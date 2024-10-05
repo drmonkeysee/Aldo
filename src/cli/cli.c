@@ -74,10 +74,11 @@ static int print_cart_info(const struct cliargs *args, cart *c)
 
 static int disassemble_cart_prg(const struct cliargs *args, cart *c)
 {
-    int err = dis_cart_prg(c, argparse_filename(args->filepath), args->verbose,
-                           false, stdout);
+    int err = aldo_dis_cart_prg(c, argparse_filename(args->filepath),
+                                args->verbose, false, stdout);
     if (err < 0) {
-        fprintf(stderr, "PRG decode error (%d): %s\n", err, dis_errstr(err));
+        fprintf(stderr, "PRG decode error (%d): %s\n", err,
+                aldo_dis_errstr(err));
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
@@ -85,9 +86,11 @@ static int disassemble_cart_prg(const struct cliargs *args, cart *c)
 
 static int decode_cart_chr(const struct cliargs *args, cart *c)
 {
-    int err = dis_cart_chr(c, args->chrscale, args->chrdecode_prefix, stdout);
+    int err = aldo_dis_cart_chr(c, args->chrscale, args->chrdecode_prefix,
+                                stdout);
     if (err < 0) {
-        fprintf(stderr, "CHR decode error (%d): %s\n", err, dis_errstr(err));
+        fprintf(stderr, "CHR decode error (%d): %s\n", err,
+                aldo_dis_errstr(err));
         if (err == ALDO_DIS_ERR_ERNO) {
             perror("CHR decode file error");
         }

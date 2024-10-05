@@ -752,8 +752,9 @@ private:
             ImGui::TextUnformatted("Decode: JAMMED");
         } else {
             std::array<aldo::et::tchar, ALDO_DIS_DATAP_SIZE> buf;
-            auto err = dis_datapath(emu.snapshotp(), buf.data());
-            ImGui::Text("Decode: %s", err < 0 ? dis_errstr(err) : buf.data());
+            auto err = aldo_dis_datapath(emu.snapshotp(), buf.data());
+            ImGui::Text("Decode: %s",
+                        err < 0 ? aldo_dis_errstr(err) : buf.data());
         }
         ImGui::Text("adl: %02X", datapath.addrlow_latch);
         ImGui::Text("adh: %02X", datapath.addrhigh_latch);
@@ -1409,13 +1410,14 @@ private:
 
         const auto* curr = emu.snapshot().prg.curr;
         auto addr = emu.snapshot().cpu.datapath.current_instruction;
-        dis_instruction inst{};
+        aldo_dis_instruction inst{};
         std::array<aldo::et::tchar, ALDO_DIS_INST_SIZE> disasm;
         for (int i = 0; i < instCount; ++i) {
-            auto result = dis_parsemem_inst(curr->length, curr->pc,
-                                            inst.offset + inst.bv.size, &inst);
+            auto result = aldo_dis_parsemem_inst(curr->length, curr->pc,
+                                                 inst.offset + inst.bv.size,
+                                                 &inst);
             if (result > 0) {
-                result = dis_inst(addr, &inst, disasm.data());
+                result = aldo_dis_inst(addr, &inst, disasm.data());
                 if (result > 0) {
                     if (ImGui::Selectable(disasm.data(), selected == i)) {
                         selected = i;
@@ -1435,7 +1437,7 @@ private:
                 }
             }
             if (result < 0) {
-                ImGui::TextUnformatted(dis_errstr(result));
+                ImGui::TextUnformatted(aldo_dis_errstr(result));
             }
             break;
         }

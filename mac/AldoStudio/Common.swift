@@ -8,7 +8,7 @@
 import Foundation
 import os
 
-typealias CInstPtr = UnsafePointer<dis_instruction>
+typealias CInstPtr = UnsafePointer<aldo_dis_instruction>
 typealias CStream = UnsafeMutablePointer<FILE>
 typealias CStreamOp = (CStream) throws -> Void
 

@@ -43,7 +43,7 @@ enum {
     ALDO_DIS_PEEK_SIZE = 20,
 };
 
-struct dis_instruction {
+struct aldo_dis_instruction {
     size_t offset;
     struct blockview bv;
     struct decoded d;
@@ -58,54 +58,63 @@ br_libexport
 extern const int Aldo_MinChrScale, Aldo_MaxChrScale;
 
 br_libexport
-const char *dis_errstr(int err);
+const char *aldo_dis_errstr(int err) br_nothrow;
 
 // NOTE: parsed will be zeroed-out if return value is <= 0
 br_libexport br_checkerror
-int dis_parse_inst(const struct blockview *bv, size_t at,
-                   struct dis_instruction *parsed);
+int aldo_dis_parse_inst(const struct blockview *bv, size_t at,
+                        struct aldo_dis_instruction *parsed) br_nothrow;
 br_libexport br_checkerror
-int dis_parsemem_inst(size_t size, const uint8_t mem[br_noalias_sz(size)],
-                      size_t at, struct dis_instruction *parsed);
+int aldo_dis_parsemem_inst(size_t size, const uint8_t mem[br_noalias_sz(size)],
+                           size_t at,
+                           struct aldo_dis_instruction *parsed) br_nothrow;
 // NOTE: functions w/buffer params leave buffer untouched when returning <= 0
 br_libexport br_checkerror
-int dis_inst(uint16_t addr, const struct dis_instruction *inst,
-             char dis[br_noalias_csz(ALDO_DIS_INST_SIZE)]);
+int aldo_dis_inst(uint16_t addr, const struct aldo_dis_instruction *inst,
+                  char dis[br_noalias_csz(ALDO_DIS_INST_SIZE)]) br_nothrow;
 br_libexport br_checkerror
-int dis_datapath(const struct aldo_snapshot *snp,
-                 char dis[br_noalias_csz(ALDO_DIS_DATAP_SIZE)]);
+int
+aldo_dis_datapath(const struct aldo_snapshot *snp,
+                  char dis[br_noalias_csz(ALDO_DIS_DATAP_SIZE)]) br_nothrow;
 
 br_libexport br_checkerror
-int dis_cart_prg(cart *cart, const char *br_noalias name, bool verbose,
-                 bool unified_output, FILE *f);
+int aldo_dis_cart_prg(cart *cart, const char *br_noalias name, bool verbose,
+                      bool unified_output, FILE *f) br_nothrow;
 br_libexport br_checkerror
-int dis_cart_chr(cart *cart, int chrscale,
-                 const char *br_noalias chrdecode_prefix, FILE *output);
+int aldo_dis_cart_chr(cart *cart, int chrscale,
+                      const char *br_noalias chrdecode_prefix,
+                      FILE *output) br_nothrow;
 br_libexport br_checkerror
-int dis_cart_chrblock(const struct blockview *bv, int scale, FILE *f);
+int aldo_dis_cart_chrblock(const struct blockview *bv, int scale,
+                           FILE *f) br_nothrow;
 
 br_libexport
-const char *dis_inst_mnemonic(const struct dis_instruction *inst);
+const char *
+aldo_dis_inst_mnemonic(const struct aldo_dis_instruction *inst) br_nothrow;
 br_libexport
-const char *dis_inst_description(const struct dis_instruction *inst);
+const char *
+aldo_dis_inst_description(const struct aldo_dis_instruction *inst) br_nothrow;
 br_libexport
-const char *dis_inst_addrmode(const struct dis_instruction *inst);
+const char *
+aldo_dis_inst_addrmode(const struct aldo_dis_instruction *inst) br_nothrow;
 br_libexport
-uint8_t dis_inst_flags(const struct dis_instruction *inst);
+uint8_t
+aldo_dis_inst_flags(const struct aldo_dis_instruction *inst) br_nothrow;
 br_libexport br_checkerror
-int dis_inst_operand(const struct dis_instruction *inst,
-                     char dis[br_noalias_csz(ALDO_DIS_OPERAND_SIZE)]);
+int
+aldo_dis_inst_operand(const struct aldo_dis_instruction *inst,
+                      char dis[br_noalias_csz(ALDO_DIS_OPERAND_SIZE)]) br_nothrow;
 br_libexport
-bool dis_inst_equal(const struct dis_instruction *lhs,
-                    const struct dis_instruction *rhs);
+bool aldo_dis_inst_equal(const struct aldo_dis_instruction *lhs,
+                         const struct aldo_dis_instruction *rhs) br_nothrow;
 
 //
 // MARK: - Internal
 //
 
-int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
-             const struct aldo_snapshot *snp,
-             char dis[br_noalias_csz(ALDO_DIS_PEEK_SIZE)]);
+int aldo_dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
+                  const struct aldo_snapshot *snp,
+                  char dis[br_noalias_csz(ALDO_DIS_PEEK_SIZE)]) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

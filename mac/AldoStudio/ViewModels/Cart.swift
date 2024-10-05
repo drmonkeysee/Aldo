@@ -54,8 +54,8 @@ final class Cart {
 
         return await readCStream { stream in
             try fileName.withCString { cartFile in
-                let err = dis_cart_prg(handle.unwrapped, info.cartName, false,
-                                       true, stream)
+                let err = aldo_dis_cart_prg(handle.unwrapped, info.cartName,
+                                            false, true, stream)
                 if err < 0 { throw AldoError.wrapDisError(code: err) }
             }
         }
@@ -68,7 +68,7 @@ final class Cart {
         return await readCStream(binary: true) { stream in
             let bv = cart_chrblock(handle.unwrapped, at)
             let err = withUnsafePointer(to: bv) {
-                dis_cart_chrblock($0, .init(scale), stream)
+                aldo_dis_cart_chrblock($0, .init(scale), stream)
             }
             if err < 0 { throw AldoError.wrapDisError(code: err) }
         }
@@ -82,8 +82,8 @@ final class Cart {
             let prefix = "\(folder.appendingPathComponent(name).path)-chr"
             try prefix.withCString { chrprefix in
                 errno = 0
-                let err = dis_cart_chr(handle.unwrapped, Int32(scale),
-                                       chrprefix, stream)
+                let err = aldo_dis_cart_chr(handle.unwrapped, Int32(scale),
+                                            chrprefix, stream)
                 if err < 0 {
                     if err == ALDO_DIS_ERR_ERNO { throw AldoError.ioErrno }
                     throw AldoError.wrapDisError(code: err)

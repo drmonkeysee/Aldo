@@ -69,12 +69,13 @@ enum PrgLine {
 }
 
 struct Instruction {
-    static func parse(_ instData: dis_instruction) -> Self {
+    static func parse(_ instData: aldo_dis_instruction) -> Self {
         withUnsafePointer(to: instData) { p in
-                .init(addressMode: .init(cString: dis_inst_addrmode(p)),
+                .init(addressMode: .init(cString: aldo_dis_inst_addrmode(p)),
                       bytes: getBytes(p),
-                      mnemonic: .init(cString: dis_inst_mnemonic(p)),
-                      description: .init(cString: dis_inst_description(p)),
+                      mnemonic: .init(cString: aldo_dis_inst_mnemonic(p)),
+                      description: .init(
+                        cString: aldo_dis_inst_description(p)),
                       operand: getOperand(p),
                       unofficial: p.pointee.d.unofficial,
                       cycles: Cycles(count: p.pointee.d.cycles.count,
@@ -82,7 +83,7 @@ struct Instruction {
                                                     .cycles.page_boundary,
                                      branchTaken: p.pointee.d
                                                     .cycles.branch_taken),
-                      flags: .init(dis_inst_flags(p)),
+                      flags: .init(aldo_dis_inst_flags(p)),
                       cells: .init(accumulator: p.pointee.d.datacells.a,
                                    xIndex: p.pointee.d.datacells.x,
                                    yIndex: p.pointee.d.datacells.y,
@@ -106,7 +107,7 @@ struct Instruction {
                     aldoLog.debug("Invalid buffer pointer")
                     return Self.errStr
                 }
-                let err = dis_inst_operand(p, bufferp)
+                let err = aldo_dis_inst_operand(p, bufferp)
                 if err < 0 {
                     let msg = AldoError.wrapDisError(code: err).message
                     aldoLog.debug("Operand Parse Error: \(msg)")
@@ -187,7 +188,7 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
     private var addr: UInt16
     private var cursor = 0
     private var done = false
-    private var prevInstruction = dis_instruction()
+    private var prevInstruction = aldo_dis_instruction()
     private var skip = false
 
     init?(_ prgblock: blockview?) {
@@ -205,9 +206,9 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
     }
 
     private mutating func nextLine() -> PrgLine? {
-        var inst = dis_instruction()
+        var inst = aldo_dis_instruction()
         let err = withUnsafePointer(to: bv) {
-            dis_parse_inst($0, cursor, &inst)
+            aldo_dis_parse_inst($0, cursor, &inst)
         }
 
         if err < 0 {
@@ -227,7 +228,7 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
                 cursor += inst.bv.size
                 addr &+= .init(inst.bv.size)
             }
-            if dis_inst_equal(&inst, &prevInstruction) {
+            if aldo_dis_inst_equal(&inst, &prevInstruction) {
                 if !skip {
                     skip = true
                     return .elision

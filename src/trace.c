@@ -21,16 +21,16 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
     uint8_t bytes[3];
     size_t instlen = bus_copy(cpu->mbus, snp->cpu.datapath.current_instruction,
                               sizeof bytes / sizeof bytes[0], bytes);
-    struct dis_instruction inst;
-    int result = dis_parsemem_inst(instlen, bytes, 0, &inst);
+    struct aldo_dis_instruction inst;
+    int result = aldo_dis_parsemem_inst(instlen, bytes, 0, &inst);
     char disinst[ALDO_DIS_INST_SIZE];
     if (result > 0) {
-        result = dis_inst(snp->cpu.datapath.current_instruction, &inst,
-                          disinst);
+        result = aldo_dis_inst(snp->cpu.datapath.current_instruction, &inst,
+                               disinst);
     }
     return fprintf(tracelog, "%s",
                    result > 0 ? disinst : (result < 0
-                                           ? dis_errstr(result)
+                                           ? aldo_dis_errstr(result)
                                            : "No inst"));
 }
 
@@ -39,9 +39,10 @@ static int trace_instruction_peek(FILE *tracelog, struct mos6502 *cpu,
                                   const struct aldo_snapshot *snp)
 {
     char peek[ALDO_DIS_PEEK_SIZE];
-    int result = dis_peek(snp->cpu.datapath.current_instruction, cpu, dbg, snp,
-                          peek);
-    return fprintf(tracelog, " %s", result < 0 ? dis_errstr(result) : peek);
+    int result = aldo_dis_peek(snp->cpu.datapath.current_instruction, cpu, dbg,
+                               snp, peek);
+    return fprintf(tracelog, " %s",
+                   result < 0 ? aldo_dis_errstr(result) : peek);
 }
 
 static void trace_registers(FILE *tracelog, const struct aldo_snapshot *snp)

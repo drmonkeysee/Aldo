@@ -254,15 +254,15 @@ static void drawcart(const struct view *v, const struct emulator *emu)
 static void drawinstructions(const struct view *v, int h, int y,
                              const struct aldo_snapshot *snp)
 {
-    struct dis_instruction inst = {0};
+    struct aldo_dis_instruction inst = {0};
     uint16_t addr = snp->cpu.datapath.current_instruction;
     char disassembly[ALDO_DIS_INST_SIZE];
     for (int i = 0; i < h - y; ++i) {
-        int result = dis_parsemem_inst(snp->prg.curr->length,
-                                       snp->prg.curr->pc,
-                                       inst.offset + inst.bv.size, &inst);
+        int result = aldo_dis_parsemem_inst(snp->prg.curr->length,
+                                            snp->prg.curr->pc,
+                                            inst.offset + inst.bv.size, &inst);
         if (result > 0) {
-            result = dis_inst(addr, &inst, disassembly);
+            result = aldo_dis_inst(addr, &inst, disassembly);
             if (result > 0) {
                 mvwaddstr(v->content, i, 0, disassembly);
                 addr += (uint16_t)inst.bv.size;
@@ -270,7 +270,7 @@ static void drawinstructions(const struct view *v, int h, int y,
             }
         }
         if (result < 0) {
-            mvwaddstr(v->content, i, 0, dis_errstr(result));
+            mvwaddstr(v->content, i, 0, aldo_dis_errstr(result));
         }
         break;
     }
@@ -424,8 +424,8 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
         wattroff(v->content, A_STANDOUT);
     } else {
         char buf[ALDO_DIS_DATAP_SIZE];
-        int wlen = dis_datapath(snp, buf);
-        const char *mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
+        int wlen = aldo_dis_datapath(snp, buf);
+        const char *mnemonic = wlen < 0 ? aldo_dis_errstr(wlen) : buf;
         mvwaddstr(v->content, cursor_y, col1, mnemonic);
     }
 

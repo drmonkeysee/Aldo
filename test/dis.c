@@ -64,8 +64,8 @@ static void parse_inst_empty_bankview(void *ctx)
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
     ct_assertequal(0u, inst.offset);
-    ct_assertequal(IN_UDF, (int)inst.d.instruction);
-    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertequal(ALDO_IN_UDF, (int)inst.d.instruction);
+    ct_assertequal(ALDO_AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
 }
 
@@ -86,8 +86,8 @@ static void parse_inst_at_start(void *ctx)
     ct_assertequal(0xeau, inst.bv.mem[0]);
     ct_assertequal(1u, inst.bv.size);
     ct_assertequal(0u, inst.offset);
-    ct_assertequal(IN_NOP, (int)inst.d.instruction);
-    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertequal(ALDO_IN_NOP, (int)inst.d.instruction);
+    ct_assertequal(ALDO_AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
 }
 
@@ -110,8 +110,8 @@ static void parse_inst_in_middle(void *ctx)
     ct_assertequal(0x6u, inst.bv.mem[2]);
     ct_assertequal(3u, inst.bv.size);
     ct_assertequal(3u, inst.offset);
-    ct_assertequal(IN_JMP, (int)inst.d.instruction);
-    ct_assertequal(AM_JABS, (int)inst.d.mode);
+    ct_assertequal(ALDO_IN_JMP, (int)inst.d.instruction);
+    ct_assertequal(ALDO_AM_JABS, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
 }
 
@@ -133,8 +133,8 @@ static void parse_inst_unofficial(void *ctx)
     ct_assertequal(0x4cu, inst.bv.mem[1]);
     ct_assertequal(2u, inst.bv.size);
     ct_assertequal(2u, inst.offset);
-    ct_assertequal(IN_NOP, (int)inst.d.instruction);
-    ct_assertequal(AM_ZPX, (int)inst.d.mode);
+    ct_assertequal(ALDO_IN_NOP, (int)inst.d.instruction);
+    ct_assertequal(ALDO_AM_ZPX, (int)inst.d.mode);
     ct_asserttrue(inst.d.unofficial);
 }
 
@@ -155,8 +155,8 @@ static void parse_inst_eof(void *ctx)
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
     ct_assertequal(0u, inst.offset);
-    ct_assertequal(IN_UDF, (int)inst.d.instruction);
-    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertequal(ALDO_IN_UDF, (int)inst.d.instruction);
+    ct_assertequal(ALDO_AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
 }
 
@@ -177,8 +177,8 @@ static void parse_inst_out_of_bounds(void *ctx)
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
     ct_assertequal(0u, inst.offset);
-    ct_assertequal(IN_UDF, (int)inst.d.instruction);
-    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertequal(ALDO_IN_UDF, (int)inst.d.instruction);
+    ct_assertequal(ALDO_AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
 }
 
@@ -193,8 +193,8 @@ static void parsemem_inst_empty_blockview(void *ctx)
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
     ct_assertequal(0u, inst.offset);
-    ct_assertequal(IN_UDF, (int)inst.d.instruction);
-    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertequal(ALDO_IN_UDF, (int)inst.d.instruction);
+    ct_assertequal(ALDO_AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
 }
 
@@ -211,8 +211,8 @@ static void parsemem_inst_at_start(void *ctx)
     ct_assertequal(0xeau, inst.bv.mem[0]);
     ct_assertequal(1u, inst.bv.size);
     ct_assertequal(0u, inst.offset);
-    ct_assertequal(IN_NOP, (int)inst.d.instruction);
-    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertequal(ALDO_IN_NOP, (int)inst.d.instruction);
+    ct_assertequal(ALDO_AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
 }
 
@@ -231,8 +231,8 @@ static void parsemem_inst_in_middle(void *ctx)
     ct_assertequal(0x6u, inst.bv.mem[2]);
     ct_assertequal(3u, inst.bv.size);
     ct_assertequal(3u, inst.offset);
-    ct_assertequal(IN_JMP, (int)inst.d.instruction);
-    ct_assertequal(AM_JABS, (int)inst.d.mode);
+    ct_assertequal(ALDO_IN_JMP, (int)inst.d.instruction);
+    ct_assertequal(ALDO_AM_JABS, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
 }
 
@@ -250,8 +250,8 @@ static void parsemem_inst_unofficial(void *ctx)
     ct_assertequal(0x4cu, inst.bv.mem[1]);
     ct_assertequal(2u, inst.bv.size);
     ct_assertequal(2u, inst.offset);
-    ct_assertequal(IN_NOP, (int)inst.d.instruction);
-    ct_assertequal(AM_ZPX, (int)inst.d.mode);
+    ct_assertequal(ALDO_IN_NOP, (int)inst.d.instruction);
+    ct_assertequal(ALDO_AM_ZPX, (int)inst.d.mode);
     ct_asserttrue(inst.d.unofficial);
 }
 
@@ -268,8 +268,8 @@ static void parsemem_inst_eof(void *ctx)
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
     ct_assertequal(0u, inst.offset);
-    ct_assertequal(IN_UDF, (int)inst.d.instruction);
-    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertequal(ALDO_IN_UDF, (int)inst.d.instruction);
+    ct_assertequal(ALDO_AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
 }
 
@@ -286,8 +286,8 @@ static void parsemem_inst_out_of_bounds(void *ctx)
     ct_assertnull(inst.bv.mem);
     ct_assertequal(0u, inst.bv.size);
     ct_assertequal(0u, inst.offset);
-    ct_assertequal(IN_UDF, (int)inst.d.instruction);
-    ct_assertequal(AM_IMP, (int)inst.d.mode);
+    ct_assertequal(ALDO_IN_UDF, (int)inst.d.instruction);
+    ct_assertequal(ALDO_AM_IMP, (int)inst.d.mode);
     ct_assertfalse(inst.d.unofficial);
 }
 
@@ -298,7 +298,7 @@ static void parsemem_inst_out_of_bounds(void *ctx)
 static void mnemonic_valid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {IN_ADC, AM_IMM, {0}, {0}, false},
+        .d = {ALDO_IN_ADC, ALDO_AM_IMM, {0}, {0}, false},
     };
 
     const char *result = aldo_dis_inst_mnemonic(&inst);
@@ -309,7 +309,7 @@ static void mnemonic_valid(void *ctx)
 static void mnemonic_unofficial(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {IN_ANC, AM_IMM, {0}, {0}, true},
+        .d = {ALDO_IN_ANC, ALDO_AM_IMM, {0}, {0}, true},
     };
 
     const char *result = aldo_dis_inst_mnemonic(&inst);
@@ -320,7 +320,7 @@ static void mnemonic_unofficial(void *ctx)
 static void mnemonic_invalid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {(enum inst)-4, AM_IMM, {0}, {0}, false},
+        .d = {(enum inst)-4, ALDO_AM_IMM, {0}, {0}, false},
     };
 
     const char *result = aldo_dis_inst_mnemonic(&inst);
@@ -335,7 +335,7 @@ static void mnemonic_invalid(void *ctx)
 static void description_valid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {IN_ADC, AM_IMM, {0}, {0}, false},
+        .d = {ALDO_IN_ADC, ALDO_AM_IMM, {0}, {0}, false},
     };
 
     const char *result = aldo_dis_inst_description(&inst);
@@ -346,7 +346,7 @@ static void description_valid(void *ctx)
 static void description_unofficial(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {IN_ANC, AM_IMM, {0}, {0}, true},
+        .d = {ALDO_IN_ANC, ALDO_AM_IMM, {0}, {0}, true},
     };
 
     const char *result = aldo_dis_inst_description(&inst);
@@ -357,7 +357,7 @@ static void description_unofficial(void *ctx)
 static void description_invalid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {(enum inst)-4, AM_IMM, {0}, {0}, false},
+        .d = {(enum inst)-4, ALDO_AM_IMM, {0}, {0}, false},
     };
 
     const char *result = aldo_dis_inst_description(&inst);
@@ -372,7 +372,7 @@ static void description_invalid(void *ctx)
 static void modename_valid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {IN_ADC, AM_ZP, {0}, {0}, false},
+        .d = {ALDO_IN_ADC, ALDO_AM_ZP, {0}, {0}, false},
     };
 
     const char *result = aldo_dis_inst_addrmode(&inst);
@@ -383,7 +383,7 @@ static void modename_valid(void *ctx)
 static void modename_unofficial(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {IN_ADC, AM_JAM, {0}, {0}, true},
+        .d = {ALDO_IN_ADC, ALDO_AM_JAM, {0}, {0}, true},
     };
 
     const char *result = aldo_dis_inst_addrmode(&inst);
@@ -394,7 +394,7 @@ static void modename_unofficial(void *ctx)
 static void modename_invalid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {IN_ADC, (enum addrmode)-4, {0}, {0}, false},
+        .d = {ALDO_IN_ADC, (enum addrmode)-4, {0}, {0}, false},
     };
 
     const char *result = aldo_dis_inst_addrmode(&inst);
@@ -409,7 +409,7 @@ static void modename_invalid(void *ctx)
 static void flags_valid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {IN_ADC, AM_IMM, {0}, {0}, false},
+        .d = {ALDO_IN_ADC, ALDO_AM_IMM, {0}, {0}, false},
     };
 
     uint8_t result = aldo_dis_inst_flags(&inst);
@@ -420,7 +420,7 @@ static void flags_valid(void *ctx)
 static void flags_unofficial(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {IN_ANC, AM_IMM, {0}, {0}, true},
+        .d = {ALDO_IN_ANC, ALDO_AM_IMM, {0}, {0}, true},
     };
 
     uint8_t result = aldo_dis_inst_flags(&inst);
@@ -431,7 +431,7 @@ static void flags_unofficial(void *ctx)
 static void flags_invalid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {(enum inst)-4, AM_IMM, {0}, {0}, false},
+        .d = {(enum inst)-4, ALDO_AM_IMM, {0}, {0}, false},
     };
 
     uint8_t result = aldo_dis_inst_flags(&inst);

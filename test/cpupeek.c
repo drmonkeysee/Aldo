@@ -167,7 +167,7 @@ static void peek_immediate(void *ctx)
 
     struct peekresult result = cpu_peek(&cpu, 0x0);
 
-    ct_assertequal(AM_IMM, (int)result.mode);
+    ct_assertequal(ALDO_AM_IMM, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x1u, result.finaladdr);
     ct_assertequal(0x10u, result.data);
@@ -185,7 +185,7 @@ static void peek_zeropage(void *ctx)
 
     struct peekresult result = cpu_peek(&cpu, 0x0);
 
-    ct_assertequal(AM_ZP, (int)result.mode);
+    ct_assertequal(ALDO_AM_ZP, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x4u, result.finaladdr);
     ct_assertequal(0x20u, result.data);
@@ -204,7 +204,7 @@ static void peek_zp_indexed(void *ctx)
 
     struct peekresult result = cpu_peek(&cpu, 0x0);
 
-    ct_assertequal(AM_ZPX, (int)result.mode);
+    ct_assertequal(ALDO_AM_ZPX, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x5u, result.finaladdr);
     ct_assertequal(0x30u, result.data);
@@ -223,7 +223,7 @@ static void peek_indexed_indirect(void *ctx)
 
     struct peekresult result = cpu_peek(&cpu, 0x0);
 
-    ct_assertequal(AM_INDX, (int)result.mode);
+    ct_assertequal(ALDO_AM_INDX, (int)result.mode);
     ct_assertequal(0x4u, result.interaddr);
     ct_assertequal(0x102u, result.finaladdr);
     ct_assertequal(0x40u, result.data);
@@ -242,7 +242,7 @@ static void peek_indirect_indexed(void *ctx)
 
     struct peekresult result = cpu_peek(&cpu, 0x0);
 
-    ct_assertequal(AM_INDY, (int)result.mode);
+    ct_assertequal(ALDO_AM_INDY, (int)result.mode);
     ct_assertequal(0x102u, result.interaddr);
     ct_assertequal(0x107u, result.finaladdr);
     ct_assertequal(0x60u, result.data);
@@ -260,7 +260,7 @@ static void peek_absolute(void *ctx)
 
     struct peekresult result = cpu_peek(&cpu, 0x0);
 
-    ct_assertequal(AM_ABS, (int)result.mode);
+    ct_assertequal(ALDO_AM_ABS, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x102u, result.finaladdr);
     ct_assertequal(0x70u, result.data);
@@ -279,7 +279,7 @@ static void peek_absolute_indexed(void *ctx)
 
     struct peekresult result = cpu_peek(&cpu, 0x0);
 
-    ct_assertequal(AM_ABSX, (int)result.mode);
+    ct_assertequal(ALDO_AM_ABSX, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x10cu, result.finaladdr);
     ct_assertequal(0x70u, result.data);
@@ -297,7 +297,7 @@ static void peek_branch(void *ctx)
 
     struct peekresult result = cpu_peek(&cpu, 0x0);
 
-    ct_assertequal(AM_BCH, (int)result.mode);
+    ct_assertequal(ALDO_AM_BCH, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x7u, result.finaladdr);
     ct_assertequal(0x0u, result.data);
@@ -315,7 +315,7 @@ static void peek_branch_forced(void *ctx)
 
     struct peekresult result = cpu_peek(&cpu, 0x0);
 
-    ct_assertequal(AM_BCH, (int)result.mode);
+    ct_assertequal(ALDO_AM_BCH, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x7u, result.finaladdr);
     ct_assertequal(0x0u, result.data);
@@ -334,7 +334,7 @@ static void peek_absolute_indirect(void *ctx)
 
     struct peekresult result = cpu_peek(&cpu, 0x0);
 
-    ct_assertequal(AM_JIND, (int)result.mode);
+    ct_assertequal(ALDO_AM_JIND, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x205u, result.finaladdr);
     ct_assertequal(0x2u, result.data);
@@ -351,7 +351,7 @@ static void peek_jam(void *ctx)
 
     struct peekresult result = cpu_peek(&cpu, 0x0);
 
-    ct_assertequal(AM_JAM, (int)result.mode);
+    ct_assertequal(ALDO_AM_JAM, (int)result.mode);
 }
 
 static void peek_busfault(void *ctx)
@@ -365,7 +365,7 @@ static void peek_busfault(void *ctx)
 
     struct peekresult result = cpu_peek(&cpu, 0x0);
 
-    ct_assertequal(AM_ABS, (int)result.mode);
+    ct_assertequal(ALDO_AM_ABS, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
     ct_assertequal(0x4002u, result.finaladdr);
     ct_asserttrue(result.busfault);

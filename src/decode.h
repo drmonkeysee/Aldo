@@ -13,7 +13,7 @@
 
 // 6502 Instructions
 // X(symbol, description, affected flags, instruction dispatch arguments...)
-#define DEC_INST_X \
+#define ALDO_DEC_INST_X \
 X(UDF,                              /* Undefined */ \
   "Undefined", \
   0x20, self) \
@@ -286,7 +286,7 @@ X(TAS,                              /* Load logical AND accumulator and x-index
 
 // Addressing Modes
 // X(symbol, byte count, name, peek template, display strings...)
-#define DEC_ADDRMODE_X \
+#define ALDO_DEC_ADDRMODE_X \
 X(IMP, 1, "Implied",                /* Implied */ \
   XPEEK(""), \
   "imp", "") \
@@ -358,19 +358,19 @@ X(JAM, 1, "Implied",                /* Jammed instruction */ \
   XPEEK(""), \
   "imp", "")
 
-#define IN_ENUM(s) IN_##s
+#define ALDO_IN_LBL(s) ALDO_IN_##s
 
 enum inst {
-#define X(s, d, f, ...) IN_ENUM(s),
-    DEC_INST_X
+#define X(s, d, f, ...) ALDO_IN_LBL(s),
+    ALDO_DEC_INST_X
 #undef X
 };
 
-#define AM_ENUM(s) AM_##s
+#define ALDO_AM_LBL(s) ALDO_AM_##s
 
 enum addrmode {
-#define X(s, b, p, ...) AM_ENUM(s),
-    DEC_ADDRMODE_X
+#define X(s, b, p, ...) ALDO_AM_LBL(s),
+    ALDO_DEC_ADDRMODE_X
 #undef X
 };
 

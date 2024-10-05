@@ -31,10 +31,10 @@
 #define PG(n) {.count = n, .page_boundary = true}
 #define BR(n) {n, true, true}
 
-#define UNDEF {IN_UDF, AM_IMP, N, CY(2), false}
-#define OP(op, am, d, c) {op, am, d, c, false}
-#define UP(op, am, d, c) {op, am, d, c, true}
-#define JAM {IN_JAM, AM_JAM, N, CY(-1), true}
+#define UNDEF {ALDO_IN_UDF, ALDO_AM_IMP, N, CY(2), false}
+#define OP(op, am, d, c) {ALDO_##op, ALDO_##am, d, c, false}
+#define UP(op, am, d, c) {ALDO_##op, ALDO_##am, d, c, true}
+#define JAM {ALDO_IN_JAM, ALDO_AM_JAM, N, CY(-1), true}
 
 const uint8_t Aldo_BrkOpcode = 0x0;
 

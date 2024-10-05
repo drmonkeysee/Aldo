@@ -18,31 +18,31 @@
 
 static const char *const restrict Mnemonics[] = {
 #define X(s, d, f, ...) #s,
-    DEC_INST_X
+    ALDO_DEC_INST_X
 #undef X
 };
 
 static const char *const restrict Descriptions[] = {
 #define X(s, d, f, ...) d,
-    DEC_INST_X
+    ALDO_DEC_INST_X
 #undef X
 };
 
 static const uint8_t Flags[] = {
 #define X(s, d, f, ...) f,
-    DEC_INST_X
+    ALDO_DEC_INST_X
 #undef X
 };
 
 static const int InstLens[] = {
 #define X(s, b, n, p, ...) b,
-    DEC_ADDRMODE_X
+    ALDO_DEC_ADDRMODE_X
 #undef X
 };
 
 static const char *const restrict ModeNames[] = {
 #define X(s, b, n, p, ...) n,
-    DEC_ADDRMODE_X
+    ALDO_DEC_ADDRMODE_X
 #undef X
 };
 
@@ -51,37 +51,37 @@ static const char *const restrict ModeNames[] = {
 #define X(s, b, n, p, ...) static const char *const restrict STRTABLE(s)[] = { \
     __VA_ARGS__ \
 };
-    DEC_ADDRMODE_X
+    ALDO_DEC_ADDRMODE_X
 #undef X
 
 static const char *const restrict *const StringTables[] = {
 #define X(s, b, n, p, ...) STRTABLE(s),
-    DEC_ADDRMODE_X
+    ALDO_DEC_ADDRMODE_X
 #undef X
 };
 
 static const char *mnemonic(enum inst in)
 {
     static const size_t sz = sizeof Mnemonics / sizeof Mnemonics[0];
-    return 0 <= in && in < sz ? Mnemonics[in] : Mnemonics[IN_UDF];
+    return 0 <= in && in < sz ? Mnemonics[in] : Mnemonics[ALDO_IN_UDF];
 }
 
 static const char *description(enum inst in)
 {
     static const size_t sz = sizeof Descriptions / sizeof Descriptions[0];
-    return 0 <= in && in < sz ? Descriptions[in] : Descriptions[IN_UDF];
+    return 0 <= in && in < sz ? Descriptions[in] : Descriptions[ALDO_IN_UDF];
 }
 
 static const char *modename(enum addrmode am)
 {
     static const size_t sz = sizeof ModeNames / sizeof ModeNames[0];
-    return 0 <= am && am < sz ? ModeNames[am] : ModeNames[AM_IMP];
+    return 0 <= am && am < sz ? ModeNames[am] : ModeNames[ALDO_AM_IMP];
 }
 
 static uint8_t flags(enum inst in)
 {
     static const size_t sz = sizeof Flags / sizeof Flags[0];
-    return 0 <= in && in < sz ? Flags[in] : Flags[IN_UDF];
+    return 0 <= in && in < sz ? Flags[in] : Flags[ALDO_IN_UDF];
 }
 
 static const char *interrupt_display(const struct aldo_snapshot *snp)
@@ -533,7 +533,7 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
     // NOTE: we're in an interrupt state so adjust the instruction to render
     // the datapath correctly.
     if (snp->cpu.datapath.opcode == Aldo_BrkOpcode
-        && inst.d.instruction != IN_BRK) {
+        && inst.d.instruction != ALDO_IN_BRK) {
         inst.d = Aldo_Decode[snp->cpu.datapath.opcode];
         inst.bv.size = (size_t)InstLens[inst.d.mode];
     }
@@ -738,8 +738,8 @@ int aldo_dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
         cpu_peek_end(cpu, &restore_point);
         switch (peek.mode) {
 #define XPEEK(...) sprintf(dis, __VA_ARGS__)
-#define X(s, b, n, p, ...) case AM_ENUM(s): total = p; break;
-            DEC_ADDRMODE_X
+#define X(s, b, n, p, ...) case ALDO_AM_LBL(s): total = p; break;
+            ALDO_DEC_ADDRMODE_X
 #undef X
 #undef XPEEK
         default:

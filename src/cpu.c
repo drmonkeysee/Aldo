@@ -366,7 +366,7 @@ static uint8_t bitoperation(struct mos6502 *self, struct decoded dec,
 {
     // NOTE: some unofficial shift/rotate opcodes use immediate mode
     // to operate on the accumulator.
-    bool acc_operand = dec.mode == AM_IMP || dec.mode == AM_IMM;
+    bool acc_operand = dec.mode == ALDO_AM_IMP || dec.mode == ALDO_AM_IMM;
     uint8_t d = acc_operand ? self->a : self->databus;
     if (bd == BIT_LEFT) {
         self->p.c = d & 0x80;
@@ -414,11 +414,11 @@ static bool read_delayed(struct mos6502 *self, struct decoded dec,
 
     bool delayed;
     switch (dec.mode) {
-    case AM_INDY:
+    case ALDO_AM_INDY:
         delayed = self->t == 4;
         break;
-    case AM_ABSX:
-    case AM_ABSY:
+    case ALDO_AM_ABSX:
+    case ALDO_AM_ABSY:
         delayed = self->t == 3;
         break;
     default:
@@ -435,20 +435,20 @@ static bool write_delayed(struct mos6502 *self, struct decoded dec)
 {
     bool delayed;
     switch (dec.mode) {
-    case AM_ZP:
+    case ALDO_AM_ZP:
         delayed = self->t == 2;
         break;
-    case AM_ZPX:
-    case AM_ZPY:
-    case AM_ABS:
+    case ALDO_AM_ZPX:
+    case ALDO_AM_ZPY:
+    case ALDO_AM_ABS:
         delayed = self->t == 3;
         break;
-    case AM_ABSX:
-    case AM_ABSY:
+    case ALDO_AM_ABSX:
+    case ALDO_AM_ABSY:
         delayed = self->t == 4;
         break;
-    case AM_INDX:
-    case AM_INDY:
+    case ALDO_AM_INDX:
+    case ALDO_AM_INDY:
         delayed = self->t == 5;
         break;
     default:
@@ -702,7 +702,7 @@ static void NOP_exec(struct mos6502 *self, struct decoded dec)
     // NOTE: unofficial NOPs have reads triggered by
     // non-implied addressing modes.
     if (read_delayed(self, dec, self->adc)) return;
-    if (dec.mode != AM_IMP) {
+    if (dec.mode != ALDO_AM_IMP) {
         read(self);
     }
     commit_operation(self);
@@ -1072,8 +1072,8 @@ static void TAS_exec(struct mos6502 *self, struct decoded dec)
 static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 {
     switch (dec.instruction) {
-#define X(s, d, f, ...) case IN_ENUM(s): s##_exec(__VA_ARGS__); break;
-        DEC_INST_X
+#define X(s, d, f, ...) case ALDO_IN_LBL(s): s##_exec(__VA_ARGS__); break;
+        ALDO_DEC_INST_X
 #undef X
     default:
         assert(((void)"BAD INSTRUCTION DISPATCH", false));
@@ -1632,8 +1632,8 @@ static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
     assert(0 < self->t && self->t < Aldo_MaxTCycle);
 
     switch (dec.mode) {
-#define X(s, b, n, p, ...) case AM_ENUM(s): s##_sequence(self, dec); break;
-        DEC_ADDRMODE_X
+#define X(s, b, n, p, ...) case ALDO_AM_LBL(s): s##_sequence(self, dec); break;
+        ALDO_DEC_ADDRMODE_X
 #undef X
     default:
         assert(((void)"BAD ADDRMODE DISPATCH", false));
@@ -1712,7 +1712,7 @@ int cpu_cycle(struct mos6502 *self)
 
 bool cpu_jammed(const struct mos6502 *self)
 {
-    return self->t == 4 && Aldo_Decode[self->opc].mode == AM_JAM;
+    return self->t == 4 && Aldo_Decode[self->opc].mode == ALDO_AM_JAM;
 }
 
 void cpu_snapshot(const struct mos6502 *self, struct aldo_snapshot *snp)
@@ -1778,23 +1778,24 @@ struct peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
     struct peekresult result = {.mode = Aldo_Decode[self->opc].mode};
     // NOTE: can't run the cpu to peek JAM or it'll jam the cpu!
     // Fortunately all we need is the addressing mode so return that.
-    if (result.mode == AM_JAM) return result;
+    if (result.mode == ALDO_AM_JAM) return result;
 
     do {
         cpu_cycle(self);
-        if (self->t == 2 && result.mode == AM_INDY) {
+        if (self->t == 2 && result.mode == ALDO_AM_INDY) {
             result.interaddr = bytowr(self->databus, 0x0);
         }
         else if (self->t == 3) {
-            if (result.mode == AM_INDX) {
+            if (result.mode == ALDO_AM_INDX) {
                 result.interaddr = self->addrbus;
-            } else if (result.mode == AM_INDY) {
+            } else if (result.mode == ALDO_AM_INDY) {
                 result.interaddr = bytowr((uint8_t)result.interaddr,
                                           self->databus);
             }
         }
     } while (!self->presync);
-    result.finaladdr = result.mode == AM_BCH || result.mode == AM_JIND
+    result.finaladdr = result.mode == ALDO_AM_BCH
+                        || result.mode == ALDO_AM_JIND
                         ? self->pc
                         : self->addrbus;
     result.data = self->databus;

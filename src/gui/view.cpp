@@ -842,7 +842,7 @@ public:
             [h = static_cast<halt_integral>(ALDO_HLT_NONE)] mutable
                               -> halt_val {
                 auto cond = static_cast<halt_val::first_type>(++h);
-                return {cond, haltcond_description(cond)};
+                return {cond, aldo_haltcond_description(cond)};
             });
         resetHaltExpression(haltConditions.cbegin());
     }
@@ -870,7 +870,7 @@ protected:
 private:
     // NOTE: does not include first enum value HLT_NONE
     using halt_array = std::array<
-                        std::pair<haltcondition, aldo::et::str>,
+                        std::pair<aldo_haltcondition, aldo::et::str>,
                         ALDO_HLT_COUNT - 1>;
     using halt_it = halt_array::const_iterator;
     using bp_sz = aldo::Debugger::BpView::size_type;
@@ -1074,7 +1074,7 @@ private:
             bpSelections.select(idx);
         }
         std::array<aldo::et::tchar, ALDO_HEXPR_FMT_SIZE> fmt;
-        auto err = haltexpr_desc(&bp.expr, fmt.data());
+        auto err = aldo_haltexpr_desc(&bp.expr, fmt.data());
         ScopedStyleFlt style{
             {ImGuiStyleVar_Alpha, ImGui::GetStyle().DisabledAlpha},
             !bp.enabled,
@@ -1083,7 +1083,7 @@ private:
             {ImGuiCol_Text, aldo::colors::Attention}, bpBreak,
         };
         ScopedID id = static_cast<int>(idx);
-        if (ImGui::Selectable(err < 0 ? haltexpr_errstr(err) : fmt.data(),
+        if (ImGui::Selectable(err < 0 ? aldo_haltexpr_errstr(err) : fmt.data(),
                               bpSelections.selected(idx))) {
             if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
                 bpSelections.rangeSelect(idx);
@@ -1149,7 +1149,7 @@ private:
     // NOTE: storing iterator is safe as haltConditions
     // is immutable for the life of this instance.
     halt_it selectedCondition;
-    haltexpr currentHaltExpression;
+    aldo_haltexpr currentHaltExpression;
     SelectedBreakpoints bpSelections;
 };
 
@@ -1422,7 +1422,7 @@ private:
                     } else if (ImGui::BeginPopupContextItem()) {
                         selected = i;
                         if (ImGui::Selectable("Add breakpoint...")) {
-                            auto expr = haltexpr{
+                            auto expr = aldo_haltexpr{
                                 .address = addr, .cond = ALDO_HLT_ADDR,
                             };
                             vs.commands.emplace(aldo::Command::breakpointAdd,

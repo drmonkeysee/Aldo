@@ -53,7 +53,7 @@ struct command_state {
             bool,
             csig_excmode,
             et::diff,
-            haltexpr,
+            aldo_haltexpr,
             int,
             probe>;
 

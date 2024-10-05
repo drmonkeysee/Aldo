@@ -21,7 +21,7 @@ static void teardown(void **ctx)
     debug_free(*ctx);
 }
 
-static void verify_haltexpr(const struct haltexpr *expr,
+static void verify_haltexpr(const struct aldo_haltexpr *expr,
                             const struct breakpoint *bp)
 {
     ct_assertequal(expr->cond, bp->expr.cond);
@@ -69,7 +69,7 @@ static void negative_bp_index(void *ctx)
 static void add_breakpoint(void *ctx)
 {
     debugger *dbg = ctx;
-    struct haltexpr expr = {.cond = ALDO_HLT_ADDR, .address = 0x4321};
+    struct aldo_haltexpr expr = {.cond = ALDO_HLT_ADDR, .address = 0x4321};
 
     debug_bp_add(dbg, expr);
 
@@ -84,7 +84,7 @@ static void add_breakpoint(void *ctx)
 static void enable_disable_breakpoint(void *ctx)
 {
     debugger *dbg = ctx;
-    struct haltexpr expr = {.cond = ALDO_HLT_ADDR, .address = 0x4321};
+    struct aldo_haltexpr expr = {.cond = ALDO_HLT_ADDR, .address = 0x4321};
 
     debug_bp_add(dbg, expr);
     debug_bp_enable(dbg, 0, false);
@@ -102,7 +102,7 @@ static void enable_disable_breakpoint(void *ctx)
 static void multiple_breakpoints(void *ctx)
 {
     debugger *dbg = ctx;
-    struct haltexpr exprs[] = {
+    struct aldo_haltexpr exprs[] = {
         {.cond = ALDO_HLT_ADDR, .address = 0x4321},
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
         {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
@@ -125,7 +125,7 @@ static void multiple_breakpoints(void *ctx)
 static void out_of_range(void *ctx)
 {
     debugger *dbg = ctx;
-    struct haltexpr exprs[] = {
+    struct aldo_haltexpr exprs[] = {
         {.cond = ALDO_HLT_ADDR, .address = 0x4321},
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
         {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
@@ -143,7 +143,7 @@ static void out_of_range(void *ctx)
 static void delete_breakpoint(void *ctx)
 {
     debugger *dbg = ctx;
-    struct haltexpr exprs[] = {
+    struct aldo_haltexpr exprs[] = {
         {.cond = ALDO_HLT_ADDR, .address = 0x4321},
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
         {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
@@ -173,7 +173,7 @@ static void delete_breakpoint(void *ctx)
 static void clear_breakpoints(void *ctx)
 {
     debugger *dbg = ctx;
-    struct haltexpr exprs[] = {
+    struct aldo_haltexpr exprs[] = {
         {.cond = ALDO_HLT_ADDR, .address = 0x4321},
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
         {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
@@ -205,7 +205,7 @@ static void halt_no_breakpoint(void *ctx)
 static void reset_debugger(void *ctx)
 {
     debugger *dbg = ctx;
-    struct haltexpr exprs[] = {
+    struct aldo_haltexpr exprs[] = {
         {.cond = ALDO_HLT_ADDR, .address = 0x4321},
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
         {.cond = ALDO_HLT_CYCLES, .cycles = 3000},

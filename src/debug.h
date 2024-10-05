@@ -16,7 +16,7 @@
 #include <stddef.h>
 
 struct breakpoint {
-    struct haltexpr expr;
+    struct aldo_haltexpr expr;
     bool enabled;
 };
 
@@ -42,7 +42,7 @@ int debug_vector_override(debugger *self) br_nothrow;
 br_libexport
 void debug_set_vector_override(debugger *self, int resetvector) br_nothrow;
 br_libexport
-void debug_bp_add(debugger *self, struct haltexpr expr) br_nothrow;
+void debug_bp_add(debugger *self, struct aldo_haltexpr expr) br_nothrow;
 br_libexport
 const struct breakpoint *debug_bp_at(debugger *self, ptrdiff_t at) br_nothrow;
 br_libexport

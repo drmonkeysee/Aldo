@@ -37,7 +37,7 @@ static int parse_resetvector(const char *restrict str, int *resetvector)
 // MARK: - Public Interface
 //
 
-const char *haltexpr_errstr(int err)
+const char *aldo_haltexpr_errstr(int err)
 {
     switch (err) {
 #define X(s, v, e) case ALDO_##s: return e;
@@ -48,7 +48,7 @@ const char *haltexpr_errstr(int err)
     }
 }
 
-const char *haltcond_description(enum haltcondition cond)
+const char *aldo_haltcond_description(enum aldo_haltcondition cond)
 {
     switch (cond) {
 #define X(s, d) case ALDO_##s: return d;
@@ -59,7 +59,7 @@ const char *haltcond_description(enum haltcondition cond)
     }
 }
 
-int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
+int aldo_haltexpr_parse(const char *restrict str, struct aldo_haltexpr *expr)
 {
     assert(expr != NULL);
 
@@ -67,7 +67,7 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
 
     bool parsed = false, valid = false;
     char u[2];
-    struct haltexpr e;
+    struct aldo_haltexpr e;
     for (int i = ALDO_HLT_NONE + 1; i < ALDO_HLT_COUNT; ++i) {
         switch (i) {
         case ALDO_HLT_ADDR:
@@ -75,9 +75,9 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
                 unsigned int addr;
                 parsed = sscanf(str, " %1[@]%X", u, &addr) == 2;
                 valid = addr < MEMBLOCK_64KB;
-                e = (struct haltexpr){
+                e = (struct aldo_haltexpr){
                     .address = (uint16_t)addr,
-                    .cond = (enum haltcondition)i,
+                    .cond = (enum aldo_haltcondition)i,
                 };
             }
             break;
@@ -86,9 +86,9 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
                 float time;
                 parsed = sscanf(str, "%f %1[Ss]", &time, u) == 2;
                 valid = time >= 0;
-                e = (struct haltexpr){
+                e = (struct aldo_haltexpr){
                     .runtime = time,
-                    .cond = (enum haltcondition)i,
+                    .cond = (enum aldo_haltcondition)i,
                 };
             }
             break;
@@ -97,16 +97,16 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
                 uint64_t cycles;
                 parsed = sscanf(str, "%" SCNu64 " %1[Cc]", &cycles, u) == 2;
                 valid = true;
-                e = (struct haltexpr){
+                e = (struct aldo_haltexpr){
                     .cycles = cycles,
-                    .cond = (enum haltcondition)i,
+                    .cond = (enum aldo_haltcondition)i,
                 };
             }
             break;
         case ALDO_HLT_JAM:
             parsed = sscanf(str, " %1[Jj]%1[Aa]%1[Mm]", u, u, u) == 3;
             valid = true;
-            e = (struct haltexpr){.cond = (enum haltcondition)i};
+            e = (struct aldo_haltexpr){.cond = (enum aldo_haltcondition)i};
             break;
         default:
             assert(((void)"INVALID HALT CONDITION", false));
@@ -121,19 +121,23 @@ int haltexpr_parse(const char *restrict str, struct haltexpr *expr)
     return ALDO_HEXPR_ERR_SCAN;
 }
 
-int haltexpr_parse_dbgexpr(const char *restrict str, struct debugexpr *expr)
+int aldo_haltexpr_parse_dbg(const char *restrict str,
+                            struct aldo_debugexpr *expr)
 {
     assert(expr != NULL);
 
-    struct haltexpr hexpr;
-    int err = haltexpr_parse(str, &hexpr);
+    struct aldo_haltexpr hexpr;
+    int err = aldo_haltexpr_parse(str, &hexpr);
     if (err == 0) {
-        *expr = (struct debugexpr){.hexpr = hexpr, .type = ALDO_DBG_EXPR_HALT};
+        *expr = (struct aldo_debugexpr){
+            .hexpr = hexpr,
+            .type = ALDO_DBG_EXPR_HALT,
+        };
     } else {
         int resetvector;
         err = parse_resetvector(str, &resetvector);
         if (err < 0) return err;
-        *expr = (struct debugexpr){
+        *expr = (struct aldo_debugexpr){
             .resetvector = resetvector,
             .type = ALDO_DBG_EXPR_RESET,
         };
@@ -141,8 +145,8 @@ int haltexpr_parse_dbgexpr(const char *restrict str, struct debugexpr *expr)
     return 0;
 }
 
-int haltexpr_desc(const struct haltexpr *expr,
-                  char buf[restrict static ALDO_HEXPR_FMT_SIZE])
+int aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
+                       char buf[restrict static ALDO_HEXPR_FMT_SIZE])
 {
     assert(expr != NULL);
     assert(buf != NULL);
@@ -175,7 +179,7 @@ int haltexpr_desc(const struct haltexpr *expr,
     return count;
 }
 
-int haltexpr_fmt_dbgexpr(const struct debugexpr *expr,
+int aldo_haltexpr_fmtdbg(const struct aldo_debugexpr *expr,
                          char buf[restrict static ALDO_HEXPR_FMT_SIZE])
 {
     assert(expr != NULL);
@@ -185,7 +189,7 @@ int haltexpr_fmt_dbgexpr(const struct debugexpr *expr,
     if (expr->type == ALDO_DBG_EXPR_RESET) {
         count = sprintf(buf, ALDO_HEXPR_RST_IND "%04X", expr->resetvector);
     } else {
-        const struct haltexpr *hexpr = &expr->hexpr;
+        const struct aldo_haltexpr *hexpr = &expr->hexpr;
         switch (hexpr->cond) {
         case ALDO_HLT_ADDR:
             count = sprintf(buf, "@%04X", hexpr->address);

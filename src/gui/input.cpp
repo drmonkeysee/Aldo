@@ -152,7 +152,7 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
     auto breakpoints = debugger.breakpoints();
     switch (cs.cmd) {
     case aldo::Command::breakpointAdd:
-        breakpoints.append(std::get<haltexpr>(cs.value));
+        breakpoints.append(std::get<aldo_haltexpr>(cs.value));
         break;
     case aldo::Command::breakpointDisable:
         breakpoints.disable(std::get<aldo::et::diff>(cs.value));

@@ -148,7 +148,7 @@ static void bpvector_resize(struct breakpoint_vector *vec)
 }
 
 static void bpvector_insert(struct breakpoint_vector *vec,
-                            struct haltexpr expr)
+                            struct aldo_haltexpr expr)
 {
     if (vec->size == vec->capacity) {
         bpvector_resize(vec);
@@ -252,7 +252,7 @@ void debug_set_vector_override(debugger *self, int resetvector)
     update_reset_override(self);
 }
 
-void debug_bp_add(debugger *self, struct haltexpr expr)
+void debug_bp_add(debugger *self, struct aldo_haltexpr expr)
 {
     assert(self != NULL);
     assert(ALDO_HLT_NONE < expr.cond && expr.cond < ALDO_HLT_COUNT);

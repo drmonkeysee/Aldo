@@ -99,22 +99,22 @@ static int decode_cart_chr(const struct cliargs *args, cart *c)
 static bool parse_dbg_expression(debugger *dbg, const char *restrict exprstr,
                                  bool verbose)
 {
-    struct debugexpr expr;
-    int err = haltexpr_parse_dbgexpr(exprstr, &expr);
+    struct aldo_debugexpr expr;
+    int err = aldo_haltexpr_parse_dbg(exprstr, &expr);
     if (err < 0) {
         fprintf(stderr,
                 "Debug expression parse failure (%d): %s > \"%s\"\n", err,
-                haltexpr_errstr(err), exprstr);
+                aldo_haltexpr_errstr(err), exprstr);
         return false;
     } else {
         if (expr.type == ALDO_DBG_EXPR_HALT) {
             debug_bp_add(dbg, expr.hexpr);
             if (verbose) {
                 char buf[ALDO_HEXPR_FMT_SIZE];
-                err = haltexpr_desc(&expr.hexpr, buf);
+                err = aldo_haltexpr_desc(&expr.hexpr, buf);
                 if (err < 0) {
                     fprintf(stderr, "Halt expr display error (%d): %s\n", err,
-                            haltexpr_errstr(err));
+                            aldo_haltexpr_errstr(err));
                 } else {
                     printf("Halt Condition: %s\n", buf);
                 }

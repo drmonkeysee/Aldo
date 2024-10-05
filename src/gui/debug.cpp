@@ -32,12 +32,12 @@ auto read_brkfile(const std::filesystem::path& filepath)
     if (!f) throw aldo::AldoError{"Cannot open breakpoints file", filepath};
 
     hexpr_buffer buf;
-    std::vector<debugexpr> exprs;
+    std::vector<aldo_debugexpr> exprs;
     while (f.getline(buf.data(), buf.size())) {
-        debugexpr expr;
-        auto err = haltexpr_parse_dbgexpr(buf.data(), &expr);
+        aldo_debugexpr expr;
+        auto err = aldo_haltexpr_parse_dbg(buf.data(), &expr);
         if (err < 0) throw aldo::AldoError{
-            "Breakpoints parse failure", err, haltexpr_errstr,
+            "Breakpoints parse failure", err, aldo_haltexpr_errstr,
         };
         exprs.push_back(expr);
     }
@@ -47,11 +47,12 @@ auto read_brkfile(const std::filesystem::path& filepath)
     return exprs;
 }
 
-auto set_debug_state(debugger* dbg, std::span<const debugexpr> exprs) noexcept
+auto set_debug_state(debugger* dbg,
+                     std::span<const aldo_debugexpr> exprs) noexcept
 {
     debug_reset(dbg);
     for (auto& expr : exprs) {
-        if (expr.type == debugexpr::ALDO_DBG_EXPR_HALT) {
+        if (expr.type == aldo_debugexpr::ALDO_DBG_EXPR_HALT) {
             debug_bp_add(dbg, expr.hexpr);
         } else {
             debug_set_vector_override(dbg, expr.resetvector);
@@ -59,11 +60,11 @@ auto set_debug_state(debugger* dbg, std::span<const debugexpr> exprs) noexcept
     }
 }
 
-auto format_debug_expr(const debugexpr& expr, hexpr_buffer& buf)
+auto format_debug_expr(const aldo_debugexpr& expr, hexpr_buffer& buf)
 {
-    auto err = haltexpr_fmt_dbgexpr(&expr, buf.data());
+    auto err = aldo_haltexpr_fmtdbg(&expr, buf.data());
     if (err < 0) throw aldo::AldoError{
-        "Breakpoint format failure", err, haltexpr_errstr,
+        "Breakpoint format failure", err, aldo_haltexpr_errstr,
     };
 }
 
@@ -71,15 +72,18 @@ auto fill_expr_buffers(bp_size exprCount, int resetvector, bool resOverride,
                        bp_it first, bp_it last)
 {
     std::vector<hexpr_buffer> bufs(exprCount);
-    debugexpr expr;
+    aldo_debugexpr expr;
     for (auto it = bufs.begin(); first != last; ++first, ++it) {
-        expr = {.hexpr = first->expr, .type = debugexpr::ALDO_DBG_EXPR_HALT};
+        expr = {
+            .hexpr = first->expr,
+            .type = aldo_debugexpr::ALDO_DBG_EXPR_HALT,
+        };
         format_debug_expr(expr, *it);
     }
     if (resOverride) {
         expr = {
             .resetvector = resetvector,
-            .type = debugexpr::ALDO_DBG_EXPR_RESET,
+            .type = aldo_debugexpr::ALDO_DBG_EXPR_RESET,
         };
         format_debug_expr(expr, bufs.back());
     }

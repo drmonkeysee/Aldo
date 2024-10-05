@@ -159,7 +159,7 @@ public:
         const_iterator begin() const noexcept { return cbegin(); }
         const_iterator end() const noexcept { return cend(); }
 
-        void append(haltexpr expr) noexcept requires Mutable
+        void append(aldo_haltexpr expr) noexcept requires Mutable
         {
             debug_bp_add(dbgp, expr);
         }

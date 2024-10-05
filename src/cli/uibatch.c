@@ -126,8 +126,9 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
     const struct breakpoint *bp;
     if ((bp = debug_halted(emu->debugger))) {
         char break_desc[ALDO_HEXPR_FMT_SIZE];
-        int err = haltexpr_desc(&bp->expr, break_desc);
-        printf("Break: %s\n", err < 0 ? haltexpr_errstr(err) : break_desc);
+        int err = aldo_haltexpr_desc(&bp->expr, break_desc);
+        printf("Break: %s\n",
+               err < 0 ? aldo_haltexpr_errstr(err) : break_desc);
     }
 }
 

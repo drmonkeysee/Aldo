@@ -18,7 +18,7 @@ X(HLT_TIME, "Time") \
 X(HLT_CYCLES, "Cycles") \
 X(HLT_JAM, "Jammed")
 
-enum haltcondition {
+enum aldo_haltcondition {
 #define X(s, d) ALDO_##s,
     ALDO_HEXPR_COND_X
 #undef X
@@ -27,18 +27,18 @@ enum haltcondition {
 
 #define ALDO_HEXPR_RST_IND "!"
 
-struct haltexpr {
+struct aldo_haltexpr {
     union {
         uint64_t cycles;
         float runtime;
         uint16_t address;
     };
-    enum haltcondition cond;
+    enum aldo_haltcondition cond;
 };
 
-struct debugexpr {
+struct aldo_debugexpr {
     union {
-        struct haltexpr hexpr;
+        struct aldo_haltexpr hexpr;
         int resetvector;
     };
     enum {
@@ -66,23 +66,24 @@ enum {
 
 #include "bridgeopen.h"
 br_libexport
-const char *haltexpr_errstr(int err) br_nothrow;
+const char *aldo_haltexpr_errstr(int err) br_nothrow;
 br_libexport
-const char *haltcond_description(enum haltcondition cond) br_nothrow;
+const char *aldo_haltcond_description(enum aldo_haltcondition cond) br_nothrow;
 
 // NOTE: if returns non-zero error code, *expr is unmodified
 br_libexport br_checkerror
-int haltexpr_parse(const char *br_noalias str,
-                   struct haltexpr *expr) br_nothrow;
+int aldo_haltexpr_parse(const char *br_noalias str,
+                        struct aldo_haltexpr *expr) br_nothrow;
 br_libexport br_checkerror
-int haltexpr_parse_dbgexpr(const char *br_noalias str,
-                           struct debugexpr *expr) br_nothrow;
-br_libexport br_checkerror
-int haltexpr_desc(const struct haltexpr *expr,
-                  char buf[br_noalias_csz(ALDO_HEXPR_FMT_SIZE)]) br_nothrow;
+int aldo_haltexpr_parse_dbg(const char *br_noalias str,
+                            struct aldo_debugexpr *expr) br_nothrow;
 br_libexport br_checkerror
 int
-haltexpr_fmt_dbgexpr(const struct debugexpr *expr,
+aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
+                   char buf[br_noalias_csz(ALDO_HEXPR_FMT_SIZE)]) br_nothrow;
+br_libexport br_checkerror
+int
+aldo_haltexpr_fmtdbg(const struct aldo_debugexpr *expr,
                      char buf[br_noalias_csz(ALDO_HEXPR_FMT_SIZE)]) br_nothrow;
 #include "bridgeclose.h"
 

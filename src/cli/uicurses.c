@@ -208,7 +208,7 @@ static void drawsystem(const struct view *v, const struct viewstate *vs,
 
 static void drawdebugger(const struct view *v, const struct emulator *emu)
 {
-    static const struct haltexpr empty = {.cond = ALDO_HLT_NONE};
+    static const struct aldo_haltexpr empty = {.cond = ALDO_HLT_NONE};
 
     int cursor_y = 0;
     werase(v->content);
@@ -223,9 +223,9 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
     }
     const struct breakpoint *bp = debug_halted(emu->debugger);
     char break_desc[ALDO_HEXPR_FMT_SIZE];
-    int err = haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
+    int err = aldo_haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
     mvwprintw(v->content, cursor_y, 0, "Break: %s",
-              err < 0 ? haltexpr_errstr(err) : break_desc);
+              err < 0 ? aldo_haltexpr_errstr(err) : break_desc);
 }
 
 static void drawcart(const struct view *v, const struct emulator *emu)

@@ -166,16 +166,16 @@ static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
         const struct breakpoint *bp = vec->items + i;
         if (!bp->enabled) continue;
         switch (bp->expr.cond) {
-        case HLT_ADDR:
+        case ALDO_HLT_ADDR:
             if (halt_address(bp, cpu)) return i;
             break;
-        case HLT_TIME:
+        case ALDO_HLT_TIME:
             if (halt_runtime(bp, clk)) return i;
             break;
-        case HLT_CYCLES:
+        case ALDO_HLT_CYCLES:
             if (halt_cycles(bp, clk)) return i;
             break;
-        case HLT_JAM:
+        case ALDO_HLT_JAM:
             if (halt_jammed(cpu)) return i;
             break;
         default:
@@ -255,7 +255,7 @@ void debug_set_vector_override(debugger *self, int resetvector)
 void debug_bp_add(debugger *self, struct haltexpr expr)
 {
     assert(self != NULL);
-    assert(HLT_NONE < expr.cond && expr.cond < HLT_COUNT);
+    assert(ALDO_HLT_NONE < expr.cond && expr.cond < ALDO_HLT_COUNT);
 
     bpvector_insert(&self->breakpoints, expr);
 }

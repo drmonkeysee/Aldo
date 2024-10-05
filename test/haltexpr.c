@@ -17,7 +17,7 @@
 
 static void errstr_returns_known_err(void *ctx)
 {
-    const char *err = haltexpr_errstr(HEXPR_ERR_FMT);
+    const char *err = haltexpr_errstr(ALDO_HEXPR_ERR_FMT);
 
     ct_assertequalstr("FORMATTED OUTPUT FAILURE", err);
 }
@@ -40,7 +40,7 @@ static void null_string(void *ctx)
 
     int result = haltexpr_parse(str, &expr);
 
-    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
 
 static void empty_string(void *ctx)
@@ -50,7 +50,7 @@ static void empty_string(void *ctx)
 
     int result = haltexpr_parse(str, &expr);
 
-    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
 
 static void address_condition(void *ctx)
@@ -61,7 +61,7 @@ static void address_condition(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
     ct_assertequal(0xab12u, expr.address);
 }
 
@@ -73,7 +73,7 @@ static void address_condition_with_space(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
     ct_assertequal(0xab12u, expr.address);
 }
 
@@ -85,7 +85,7 @@ static void address_condition_with_leading_space(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
     ct_assertequal(0xab12u, expr.address);
 }
 
@@ -97,7 +97,7 @@ static void address_condition_with_trailing_space(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
     ct_assertequal(0xab12u, expr.address);
 }
 
@@ -109,7 +109,7 @@ static void address_condition_caps(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
     ct_assertequal(0xab12u, expr.address);
 }
 
@@ -121,7 +121,7 @@ static void address_condition_with_prefix(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
     ct_assertequal(0xab12u, expr.address);
 }
 
@@ -133,7 +133,7 @@ static void address_condition_short(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_ADDR, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
     ct_assertequal(0x001fu, expr.address);
 }
 
@@ -144,8 +144,8 @@ static void address_condition_too_large(void *ctx)
 
     int result = haltexpr_parse(str, &expr);
 
-    ct_assertequal(HEXPR_ERR_VALUE, result);
-    ct_assertequal(HLT_NONE, (int)expr.cond);
+    ct_assertequal(ALDO_HEXPR_ERR_VALUE, result);
+    ct_assertequal(ALDO_HLT_NONE, (int)expr.cond);
 }
 
 static void address_condition_negative_overflow(void *ctx)
@@ -155,8 +155,8 @@ static void address_condition_negative_overflow(void *ctx)
 
     int result = haltexpr_parse(str, &expr);
 
-    ct_assertequal(HEXPR_ERR_VALUE, result);
-    ct_assertequal(HLT_NONE, (int)expr.cond);
+    ct_assertequal(ALDO_HEXPR_ERR_VALUE, result);
+    ct_assertequal(ALDO_HLT_NONE, (int)expr.cond);
 }
 
 static void address_condition_malformed(void *ctx)
@@ -166,7 +166,7 @@ static void address_condition_malformed(void *ctx)
 
     int result = haltexpr_parse(str, &expr);
 
-    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
 
 static void runtime_condition(void *ctx)
@@ -177,7 +177,7 @@ static void runtime_condition(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
     ct_assertaboutequal(1.2f, expr.runtime, 0.001);
 }
 
@@ -189,7 +189,7 @@ static void runtime_condition_zero(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
     ct_assertaboutequal(0.0f, expr.runtime, 0.001);
 }
 
@@ -201,7 +201,7 @@ static void runtime_condition_case_insensitive(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
     ct_assertaboutequal(1.2f, expr.runtime, 0.001);
 }
 
@@ -213,7 +213,7 @@ static void runtime_condition_with_space(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
     ct_assertaboutequal(1.2f, expr.runtime, 0.001);
 }
 
@@ -225,7 +225,7 @@ static void runtime_condition_with_leading_space(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
     ct_assertaboutequal(1.2f, expr.runtime, 0.001);
 }
 
@@ -237,7 +237,7 @@ static void runtime_condition_with_trailing_space(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
     ct_assertaboutequal(1.2f, expr.runtime, 0.001);
 }
 
@@ -249,7 +249,7 @@ static void runtime_condition_no_decimal(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_TIME, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
     ct_assertaboutequal(5.0f, expr.runtime, 0.001);
 }
 
@@ -260,8 +260,8 @@ static void runtime_condition_negative(void *ctx)
 
     int result = haltexpr_parse(str, &expr);
 
-    ct_assertequal(HEXPR_ERR_VALUE, result);
-    ct_assertequal(HLT_NONE, (int)expr.cond);
+    ct_assertequal(ALDO_HEXPR_ERR_VALUE, result);
+    ct_assertequal(ALDO_HLT_NONE, (int)expr.cond);
 }
 
 static void runtime_condition_malformed(void *ctx)
@@ -271,7 +271,7 @@ static void runtime_condition_malformed(void *ctx)
 
     int result = haltexpr_parse(str, &expr);
 
-    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
 
 static void cycles_condition(void *ctx)
@@ -282,7 +282,7 @@ static void cycles_condition(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.cond);
     ct_assertequal(42u, expr.cycles);
 }
 
@@ -294,7 +294,7 @@ static void cycles_condition_case_insensitive(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.cond);
     ct_assertequal(42u, expr.cycles);
 }
 
@@ -306,7 +306,7 @@ static void cycles_condition_with_space(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.cond);
     ct_assertequal(42u, expr.cycles);
 }
 
@@ -318,7 +318,7 @@ static void cycles_condition_with_leading_space(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.cond);
     ct_assertequal(42u, expr.cycles);
 }
 
@@ -330,7 +330,7 @@ static void cycles_condition_with_trailing_space(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.cond);
     ct_assertequal(42u, expr.cycles);
 }
 
@@ -342,7 +342,7 @@ static void cycles_condition_negative(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_CYCLES, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.cond);
     ct_assertequal(18446744073709551571u, expr.cycles);
 }
 
@@ -353,7 +353,7 @@ static void cycles_condition_malformed(void *ctx)
 
     int result = haltexpr_parse(str, &expr);
 
-    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
 
 static void jam_condition(void *ctx)
@@ -364,7 +364,7 @@ static void jam_condition(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_JAM, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_JAM, (int)expr.cond);
 }
 
 static void jam_condition_uppercase(void *ctx)
@@ -375,7 +375,7 @@ static void jam_condition_uppercase(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_JAM, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_JAM, (int)expr.cond);
 }
 
 static void jam_condition_mixedcase(void *ctx)
@@ -386,7 +386,7 @@ static void jam_condition_mixedcase(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_JAM, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_JAM, (int)expr.cond);
 }
 
 static void jam_condition_with_leading_space(void *ctx)
@@ -397,7 +397,7 @@ static void jam_condition_with_leading_space(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_JAM, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_JAM, (int)expr.cond);
 }
 
 static void jam_condition_with_trailing_space(void *ctx)
@@ -408,7 +408,7 @@ static void jam_condition_with_trailing_space(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_JAM, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_JAM, (int)expr.cond);
 }
 
 static void jam_condition_underparse(void *ctx)
@@ -419,7 +419,7 @@ static void jam_condition_underparse(void *ctx)
     int result = haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(HLT_JAM, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_JAM, (int)expr.cond);
 }
 
 static void jam_condition_malformed(void *ctx)
@@ -429,7 +429,7 @@ static void jam_condition_malformed(void *ctx)
 
     int result = haltexpr_parse(str, &expr);
 
-    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
 
 static void expr_missing_unit(void *ctx)
@@ -439,7 +439,7 @@ static void expr_missing_unit(void *ctx)
 
     int result = haltexpr_parse(str, &expr);
 
-    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
 
 //
@@ -453,7 +453,7 @@ static void null_resetvector_string(void *ctx)
 
     int result = haltexpr_parse_dbgexpr(str, &vector);
 
-    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
 
 static void empty_resetvector_string(void *ctx)
@@ -463,7 +463,7 @@ static void empty_resetvector_string(void *ctx)
 
     int result = haltexpr_parse_dbgexpr(str, &vector);
 
-    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
 
 static void resetvector(void *ctx)
@@ -474,7 +474,7 @@ static void resetvector(void *ctx)
     int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
     ct_assertequal(0xab12, vector.resetvector);
 }
 
@@ -486,7 +486,7 @@ static void resetvector_with_space(void *ctx)
     int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
     ct_assertequal(0xab12, vector.resetvector);
 }
 
@@ -498,7 +498,7 @@ static void resetvector_with_leading_space(void *ctx)
     int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
     ct_assertequal(0xab12, vector.resetvector);
 }
 
@@ -510,7 +510,7 @@ static void resetvector_with_trailing_space(void *ctx)
     int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
     ct_assertequal(0xab12, vector.resetvector);
 }
 
@@ -522,7 +522,7 @@ static void resetvector_caps(void *ctx)
     int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
     ct_assertequal(0xab12, vector.resetvector);
 }
 
@@ -534,7 +534,7 @@ static void resetvector_with_prefix(void *ctx)
     int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
     ct_assertequal(0xab12, vector.resetvector);
 }
 
@@ -546,7 +546,7 @@ static void resetvector_short(void *ctx)
     int result = haltexpr_parse_dbgexpr(str, &vector);
 
     ct_assertequal(0, result);
-    ct_assertequal(DBG_EXPR_RESET, (int)vector.type);
+    ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
     ct_assertequal(0x001f, vector.resetvector);
 }
 
@@ -557,7 +557,7 @@ static void resetvector_too_large(void *ctx)
 
     int result = haltexpr_parse_dbgexpr(str, &vector);
 
-    ct_assertequal(HEXPR_ERR_VALUE, result);
+    ct_assertequal(ALDO_HEXPR_ERR_VALUE, result);
 }
 
 static void resetvector_negative_overflow(void *ctx)
@@ -567,7 +567,7 @@ static void resetvector_negative_overflow(void *ctx)
 
     int result = haltexpr_parse_dbgexpr(str, &vector);
 
-    ct_assertequal(HEXPR_ERR_VALUE, result);
+    ct_assertequal(ALDO_HEXPR_ERR_VALUE, result);
 }
 
 static void resetvector_malformed(void *ctx)
@@ -577,7 +577,7 @@ static void resetvector_malformed(void *ctx)
 
     int result = haltexpr_parse_dbgexpr(str, &vector);
 
-    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
 
 static void dbgexpr_parses_halt_condition(void *ctx)
@@ -588,8 +588,8 @@ static void dbgexpr_parses_halt_condition(void *ctx)
     int result = haltexpr_parse_dbgexpr(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(DBG_EXPR_HALT, (int)expr.type);
-    ct_assertequal(HLT_ADDR, (int)expr.hexpr.cond);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.hexpr.cond);
     ct_assertequal(0xab12u, expr.hexpr.address);
 }
 
@@ -600,7 +600,7 @@ static void dbgexpr_malformed(void *ctx)
 
     int result = haltexpr_parse_dbgexpr(str, &expr);
 
-    ct_assertequal(HEXPR_ERR_SCAN, result);
+    ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
 
 //
@@ -610,7 +610,7 @@ static void dbgexpr_malformed(void *ctx)
 static void print_none(void *ctx)
 {
     struct haltexpr expr = {0};
-    char buf[HEXPR_FMT_SIZE];
+    char buf[ALDO_HEXPR_FMT_SIZE];
 
     int result = haltexpr_desc(&expr, buf);
 
@@ -621,8 +621,8 @@ static void print_none(void *ctx)
 
 static void print_addr(void *ctx)
 {
-    struct haltexpr expr = {.cond = HLT_ADDR, .address = 0x1234};
-    char buf[HEXPR_FMT_SIZE];
+    struct haltexpr expr = {.cond = ALDO_HLT_ADDR, .address = 0x1234};
+    char buf[ALDO_HEXPR_FMT_SIZE];
 
     int result = haltexpr_desc(&expr, buf);
 
@@ -633,8 +633,8 @@ static void print_addr(void *ctx)
 
 static void print_runtime(void *ctx)
 {
-    struct haltexpr expr = {.cond = HLT_TIME, .runtime = 4.36532245f};
-    char buf[HEXPR_FMT_SIZE];
+    struct haltexpr expr = {.cond = ALDO_HLT_TIME, .runtime = 4.36532245f};
+    char buf[ALDO_HEXPR_FMT_SIZE];
 
     int result = haltexpr_desc(&expr, buf);
 
@@ -646,9 +646,9 @@ static void print_runtime(void *ctx)
 static void print_long_runtime(void *ctx)
 {
     struct haltexpr expr = {
-        .cond = HLT_TIME, .runtime = 12312423242344.234f,
+        .cond = ALDO_HLT_TIME, .runtime = 12312423242344.234f,
     };
-    char buf[HEXPR_FMT_SIZE];
+    char buf[ALDO_HEXPR_FMT_SIZE];
 
     int result = haltexpr_desc(&expr, buf);
 
@@ -659,8 +659,8 @@ static void print_long_runtime(void *ctx)
 
 static void print_cycles(void *ctx)
 {
-    struct haltexpr expr = {.cond = HLT_CYCLES, .cycles = 982423};
-    char buf[HEXPR_FMT_SIZE];
+    struct haltexpr expr = {.cond = ALDO_HLT_CYCLES, .cycles = 982423};
+    char buf[ALDO_HEXPR_FMT_SIZE];
 
     int result = haltexpr_desc(&expr, buf);
 
@@ -671,8 +671,8 @@ static void print_cycles(void *ctx)
 
 static void print_jam(void *ctx)
 {
-    struct haltexpr expr = {.cond = HLT_JAM};
-    char buf[HEXPR_FMT_SIZE];
+    struct haltexpr expr = {.cond = ALDO_HLT_JAM};
+    char buf[ALDO_HEXPR_FMT_SIZE];
 
     int result = haltexpr_desc(&expr, buf);
 
@@ -688,9 +688,9 @@ static void print_jam(void *ctx)
 static void format_reset(void *ctx)
 {
     struct debugexpr expr = {
-        .type = DBG_EXPR_RESET, .resetvector = 0x1234,
+        .type = ALDO_DBG_EXPR_RESET, .resetvector = 0x1234,
     };
-    char buf[HEXPR_FMT_SIZE];
+    char buf[ALDO_HEXPR_FMT_SIZE];
 
     int result = haltexpr_fmt_dbgexpr(&expr, buf);
 
@@ -702,10 +702,10 @@ static void format_reset(void *ctx)
 static void format_addr(void *ctx)
 {
     struct debugexpr expr = {
-        .type = DBG_EXPR_HALT,
-        .hexpr = {.cond = HLT_ADDR, .address = 0x1234},
+        .type = ALDO_DBG_EXPR_HALT,
+        .hexpr = {.cond = ALDO_HLT_ADDR, .address = 0x1234},
     };
-    char buf[HEXPR_FMT_SIZE];
+    char buf[ALDO_HEXPR_FMT_SIZE];
 
     int result = haltexpr_fmt_dbgexpr(&expr, buf);
 
@@ -717,10 +717,10 @@ static void format_addr(void *ctx)
 static void format_runtime(void *ctx)
 {
     struct debugexpr expr = {
-        .type = DBG_EXPR_HALT,
-        .hexpr = {.cond = HLT_TIME, .runtime = 4.36532245f},
+        .type = ALDO_DBG_EXPR_HALT,
+        .hexpr = {.cond = ALDO_HLT_TIME, .runtime = 4.36532245f},
     };
-    char buf[HEXPR_FMT_SIZE];
+    char buf[ALDO_HEXPR_FMT_SIZE];
 
     int result = haltexpr_fmt_dbgexpr(&expr, buf);
 
@@ -732,10 +732,10 @@ static void format_runtime(void *ctx)
 static void format_long_runtime(void *ctx)
 {
     struct debugexpr expr = {
-        .type = DBG_EXPR_HALT,
-        .hexpr = {.cond = HLT_TIME, .runtime = 12312423242344.234f},
+        .type = ALDO_DBG_EXPR_HALT,
+        .hexpr = {.cond = ALDO_HLT_TIME, .runtime = 12312423242344.234f},
     };
-    char buf[HEXPR_FMT_SIZE];
+    char buf[ALDO_HEXPR_FMT_SIZE];
 
     int result = haltexpr_fmt_dbgexpr(&expr, buf);
 
@@ -747,10 +747,10 @@ static void format_long_runtime(void *ctx)
 static void format_cycles(void *ctx)
 {
     struct debugexpr expr = {
-        .type = DBG_EXPR_HALT,
-        .hexpr = {.cond = HLT_CYCLES, .cycles = 982423},
+        .type = ALDO_DBG_EXPR_HALT,
+        .hexpr = {.cond = ALDO_HLT_CYCLES, .cycles = 982423},
     };
-    char buf[HEXPR_FMT_SIZE];
+    char buf[ALDO_HEXPR_FMT_SIZE];
 
     int result = haltexpr_fmt_dbgexpr(&expr, buf);
 
@@ -762,9 +762,9 @@ static void format_cycles(void *ctx)
 static void format_jam(void *ctx)
 {
     struct debugexpr expr = {
-        .type = DBG_EXPR_HALT, .hexpr = {.cond = HLT_JAM},
+        .type = ALDO_DBG_EXPR_HALT, .hexpr = {.cond = ALDO_HLT_JAM},
     };
-    char buf[HEXPR_FMT_SIZE];
+    char buf[ALDO_HEXPR_FMT_SIZE];
 
     int result = haltexpr_fmt_dbgexpr(&expr, buf);
 

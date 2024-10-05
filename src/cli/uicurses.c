@@ -208,7 +208,7 @@ static void drawsystem(const struct view *v, const struct viewstate *vs,
 
 static void drawdebugger(const struct view *v, const struct emulator *emu)
 {
-    static const struct haltexpr empty = {.cond = HLT_NONE};
+    static const struct haltexpr empty = {.cond = ALDO_HLT_NONE};
 
     int cursor_y = 0;
     werase(v->content);
@@ -222,7 +222,7 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
         wprintw(v->content, "$%04X", resetvector);
     }
     const struct breakpoint *bp = debug_halted(emu->debugger);
-    char break_desc[HEXPR_FMT_SIZE];
+    char break_desc[ALDO_HEXPR_FMT_SIZE];
     int err = haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
     mvwprintw(v->content, cursor_y, 0, "Break: %s",
               err < 0 ? haltexpr_errstr(err) : break_desc);
@@ -295,7 +295,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
     if (resetvector == Aldo_NoResetVector) {
         wprintw(v->content, " $%04X", bytowr(lo, hi));
     } else {
-        wprintw(v->content, " " HEXPR_RST_IND "$%04X", resetvector);
+        wprintw(v->content, " " ALDO_HEXPR_RST_IND "$%04X", resetvector);
     }
 
     lo = vectors[4];

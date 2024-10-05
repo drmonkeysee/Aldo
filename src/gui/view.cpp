@@ -839,7 +839,8 @@ public:
         using halt_integral = std::underlying_type_t<halt_val::first_type>;
 
         std::ranges::generate(haltConditions,
-            [h = static_cast<halt_integral>(HLT_NONE)] mutable -> halt_val {
+            [h = static_cast<halt_integral>(ALDO_HLT_NONE)] mutable
+                              -> halt_val {
                 auto cond = static_cast<halt_val::first_type>(++h);
                 return {cond, haltcond_description(cond)};
             });
@@ -868,8 +869,9 @@ protected:
 
 private:
     // NOTE: does not include first enum value HLT_NONE
-    using halt_array =
-        std::array<std::pair<haltcondition, aldo::et::str>, HLT_COUNT - 1>;
+    using halt_array = std::array<
+                        std::pair<haltcondition, aldo::et::str>,
+                        ALDO_HLT_COUNT - 1>;
     using halt_it = halt_array::const_iterator;
     using bp_sz = aldo::Debugger::BpView::size_type;
     using bp_diff = aldo::Debugger::BreakpointIterator::difference_type;
@@ -1014,19 +1016,19 @@ private:
     void renderBreakpointAdd(bool setFocus)
     {
         switch (currentHaltExpression.cond) {
-        case HLT_ADDR:
+        case ALDO_HLT_ADDR:
             input_address(&currentHaltExpression.address);
             break;
-        case HLT_TIME:
+        case ALDO_HLT_TIME:
             ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 18);
             ImGui::InputFloat("Seconds", &currentHaltExpression.runtime);
             break;
-        case HLT_CYCLES:
+        case ALDO_HLT_CYCLES:
             ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 18);
             ImGui::InputScalar("Count", ImGuiDataType_U64,
                                &currentHaltExpression.cycles);
             break;
-        case HLT_JAM:
+        case ALDO_HLT_JAM:
             ImGui::Dummy({0, ImGui::GetFrameHeight()});
             break;
         default:
@@ -1071,7 +1073,7 @@ private:
         if (bpBreak && !detectedHalt) {
             bpSelections.select(idx);
         }
-        std::array<aldo::et::tchar, HEXPR_FMT_SIZE> fmt;
+        std::array<aldo::et::tchar, ALDO_HEXPR_FMT_SIZE> fmt;
         auto err = haltexpr_desc(&bp.expr, fmt.data());
         ScopedStyleFlt style{
             {ImGuiStyleVar_Alpha, ImGui::GetStyle().DisabledAlpha},
@@ -1421,7 +1423,7 @@ private:
                         selected = i;
                         if (ImGui::Selectable("Add breakpoint...")) {
                             auto expr = haltexpr{
-                                .address = addr, .cond = HLT_ADDR,
+                                .address = addr, .cond = ALDO_HLT_ADDR,
                             };
                             vs.commands.emplace(aldo::Command::breakpointAdd,
                                                 expr);
@@ -1454,7 +1456,7 @@ private:
         aldo::et::word resVector;
         auto& dbg = emu.debugger();
         if (dbg.isVectorOverridden()) {
-            indicator = HEXPR_RST_IND;
+            indicator = ALDO_HEXPR_RST_IND;
             resVector = static_cast<aldo::et::word>(dbg.vectorOverride());
         } else {
             indicator = "";

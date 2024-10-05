@@ -11,7 +11,7 @@
 #include <stdint.h>
 
 // X(symbol, description)
-#define HEXPR_COND_X \
+#define ALDO_HEXPR_COND_X \
 X(HLT_NONE, "None") \
 X(HLT_ADDR, "Address") \
 X(HLT_TIME, "Time") \
@@ -19,13 +19,13 @@ X(HLT_CYCLES, "Cycles") \
 X(HLT_JAM, "Jammed")
 
 enum haltcondition {
-#define X(s, d) s,
-    HEXPR_COND_X
+#define X(s, d) ALDO_##s,
+    ALDO_HEXPR_COND_X
 #undef X
-    HLT_COUNT,
+    ALDO_HLT_COUNT,
 };
 
-#define HEXPR_RST_IND "!"
+#define ALDO_HEXPR_RST_IND "!"
 
 struct haltexpr {
     union {
@@ -42,25 +42,25 @@ struct debugexpr {
         int resetvector;
     };
     enum {
-        DBG_EXPR_HALT,
-        DBG_EXPR_RESET,
+        ALDO_DBG_EXPR_HALT,
+        ALDO_DBG_EXPR_RESET,
     } type;
 };
 
 enum {
-    HEXPR_FMT_SIZE = 25,    // Halt expr description is at most 24 chars
+    ALDO_HEXPR_FMT_SIZE = 25,    // Halt expr description is at most 24 chars
 };
 
 // X(symbol, value, error string)
-#define HEXPR_ERRCODE_X \
+#define ALDO_HEXPR_ERRCODE_X \
 X(HEXPR_ERR_SCAN, -1, "FORMATTED INPUT FAILURE") \
 X(HEXPR_ERR_VALUE, -2, "INVALID PARSED VALUE") \
 X(HEXPR_ERR_FMT, -3, "FORMATTED OUTPUT FAILURE") \
 X(HEXPR_ERR_COND, -4, "INVALID HALT CONDITION")
 
 enum {
-#define X(s, v, e) s = v,
-    HEXPR_ERRCODE_X
+#define X(s, v, e) ALDO_##s = v,
+    ALDO_HEXPR_ERRCODE_X
 #undef X
 };
 
@@ -79,10 +79,11 @@ int haltexpr_parse_dbgexpr(const char *br_noalias str,
                            struct debugexpr *expr) br_nothrow;
 br_libexport br_checkerror
 int haltexpr_desc(const struct haltexpr *expr,
-                  char buf[br_noalias_csz(HEXPR_FMT_SIZE)]) br_nothrow;
+                  char buf[br_noalias_csz(ALDO_HEXPR_FMT_SIZE)]) br_nothrow;
 br_libexport br_checkerror
-int haltexpr_fmt_dbgexpr(const struct debugexpr *expr,
-                         char buf[br_noalias_csz(HEXPR_FMT_SIZE)]) br_nothrow;
+int
+haltexpr_fmt_dbgexpr(const struct debugexpr *expr,
+                     char buf[br_noalias_csz(ALDO_HEXPR_FMT_SIZE)]) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

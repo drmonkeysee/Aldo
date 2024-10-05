@@ -26,13 +26,13 @@ static void verify_haltexpr(const struct haltexpr *expr,
 {
     ct_assertequal(expr->cond, bp->expr.cond);
     switch (bp->expr.cond) {
-    case HLT_ADDR:
+    case ALDO_HLT_ADDR:
         ct_assertequal(expr->address, bp->expr.address);
         break;
-    case HLT_TIME:
+    case ALDO_HLT_TIME:
         ct_assertequal(expr->runtime, bp->expr.runtime);
         break;
-    case HLT_CYCLES:
+    case ALDO_HLT_CYCLES:
         ct_assertequal(expr->cycles, bp->expr.cycles);
         break;
     default:
@@ -69,7 +69,7 @@ static void negative_bp_index(void *ctx)
 static void add_breakpoint(void *ctx)
 {
     debugger *dbg = ctx;
-    struct haltexpr expr = {.cond = HLT_ADDR, .address = 0x4321};
+    struct haltexpr expr = {.cond = ALDO_HLT_ADDR, .address = 0x4321};
 
     debug_bp_add(dbg, expr);
 
@@ -84,7 +84,7 @@ static void add_breakpoint(void *ctx)
 static void enable_disable_breakpoint(void *ctx)
 {
     debugger *dbg = ctx;
-    struct haltexpr expr = {.cond = HLT_ADDR, .address = 0x4321};
+    struct haltexpr expr = {.cond = ALDO_HLT_ADDR, .address = 0x4321};
 
     debug_bp_add(dbg, expr);
     debug_bp_enable(dbg, 0, false);
@@ -103,9 +103,9 @@ static void multiple_breakpoints(void *ctx)
 {
     debugger *dbg = ctx;
     struct haltexpr exprs[] = {
-        {.cond = HLT_ADDR, .address = 0x4321},
-        {.cond = HLT_TIME, .runtime = 34.5},
-        {.cond = HLT_CYCLES, .cycles = 3000},
+        {.cond = ALDO_HLT_ADDR, .address = 0x4321},
+        {.cond = ALDO_HLT_TIME, .runtime = 34.5},
+        {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
     };
     size_t len = sizeof exprs / sizeof exprs[0];
 
@@ -126,9 +126,9 @@ static void out_of_range(void *ctx)
 {
     debugger *dbg = ctx;
     struct haltexpr exprs[] = {
-        {.cond = HLT_ADDR, .address = 0x4321},
-        {.cond = HLT_TIME, .runtime = 34.5},
-        {.cond = HLT_CYCLES, .cycles = 3000},
+        {.cond = ALDO_HLT_ADDR, .address = 0x4321},
+        {.cond = ALDO_HLT_TIME, .runtime = 34.5},
+        {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
     };
     size_t len = sizeof exprs / sizeof exprs[0];
 
@@ -144,9 +144,9 @@ static void delete_breakpoint(void *ctx)
 {
     debugger *dbg = ctx;
     struct haltexpr exprs[] = {
-        {.cond = HLT_ADDR, .address = 0x4321},
-        {.cond = HLT_TIME, .runtime = 34.5},
-        {.cond = HLT_CYCLES, .cycles = 3000},
+        {.cond = ALDO_HLT_ADDR, .address = 0x4321},
+        {.cond = ALDO_HLT_TIME, .runtime = 34.5},
+        {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
     };
     size_t len = sizeof exprs / sizeof exprs[0];
 
@@ -174,9 +174,9 @@ static void clear_breakpoints(void *ctx)
 {
     debugger *dbg = ctx;
     struct haltexpr exprs[] = {
-        {.cond = HLT_ADDR, .address = 0x4321},
-        {.cond = HLT_TIME, .runtime = 34.5},
-        {.cond = HLT_CYCLES, .cycles = 3000},
+        {.cond = ALDO_HLT_ADDR, .address = 0x4321},
+        {.cond = ALDO_HLT_TIME, .runtime = 34.5},
+        {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
     };
     size_t len = sizeof exprs / sizeof exprs[0];
 
@@ -206,9 +206,9 @@ static void reset_debugger(void *ctx)
 {
     debugger *dbg = ctx;
     struct haltexpr exprs[] = {
-        {.cond = HLT_ADDR, .address = 0x4321},
-        {.cond = HLT_TIME, .runtime = 34.5},
-        {.cond = HLT_CYCLES, .cycles = 3000},
+        {.cond = ALDO_HLT_ADDR, .address = 0x4321},
+        {.cond = ALDO_HLT_TIME, .runtime = 34.5},
+        {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
     };
     size_t len = sizeof exprs / sizeof exprs[0];
 

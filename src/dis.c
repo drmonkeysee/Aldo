@@ -722,7 +722,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
         if (snp->cpu.datapath.rst == CSGS_COMMITTED
             && (resetvector = debug_vector_override(dbg))
                 != Aldo_NoResetVector) {
-            fmt = HEXPR_RST_IND "%04X";
+            fmt = ALDO_HEXPR_RST_IND "%04X";
             vector = (uint16_t)resetvector;
         } else {
             fmt = "%04X";

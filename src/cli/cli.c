@@ -31,7 +31,7 @@ ui_loop ui_curses_loop;
 const char *ui_curses_version(void);
 
 static const char *const restrict ResetOverrideFmt =
-    "RESET Override: " HEXPR_RST_IND "%04X\n";
+    "RESET Override: " ALDO_HEXPR_RST_IND "%04X\n";
 
 static void print_version(void)
 {
@@ -107,10 +107,10 @@ static bool parse_dbg_expression(debugger *dbg, const char *restrict exprstr,
                 haltexpr_errstr(err), exprstr);
         return false;
     } else {
-        if (expr.type == DBG_EXPR_HALT) {
+        if (expr.type == ALDO_DBG_EXPR_HALT) {
             debug_bp_add(dbg, expr.hexpr);
             if (verbose) {
-                char buf[HEXPR_FMT_SIZE];
+                char buf[ALDO_HEXPR_FMT_SIZE];
                 err = haltexpr_desc(&expr.hexpr, buf);
                 if (err < 0) {
                     fprintf(stderr, "Halt expr display error (%d): %s\n", err,
@@ -132,7 +132,7 @@ static bool parse_dbg_expression(debugger *dbg, const char *restrict exprstr,
 static bool parse_debug_file(debugger *dbg, FILE *f,
                              const struct cliargs *args)
 {
-    char buf[HEXPR_FMT_SIZE];
+    char buf[ALDO_HEXPR_FMT_SIZE];
     while (fgets(buf, sizeof buf, f)) {
         if (!parse_dbg_expression(dbg, buf, args->verbose)) {
             return false;

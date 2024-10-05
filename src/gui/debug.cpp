@@ -20,7 +20,7 @@
 namespace
 {
 
-using hexpr_buffer = std::array<aldo::et::tchar, HEXPR_FMT_SIZE>;
+using hexpr_buffer = std::array<aldo::et::tchar, ALDO_HEXPR_FMT_SIZE>;
 using bp_it = aldo::Debugger::BreakpointIterator;
 using bp_size = aldo::Debugger::BpView::size_type;
 
@@ -51,7 +51,7 @@ auto set_debug_state(debugger* dbg, std::span<const debugexpr> exprs) noexcept
 {
     debug_reset(dbg);
     for (auto& expr : exprs) {
-        if (expr.type == debugexpr::DBG_EXPR_HALT) {
+        if (expr.type == debugexpr::ALDO_DBG_EXPR_HALT) {
             debug_bp_add(dbg, expr.hexpr);
         } else {
             debug_set_vector_override(dbg, expr.resetvector);
@@ -73,11 +73,14 @@ auto fill_expr_buffers(bp_size exprCount, int resetvector, bool resOverride,
     std::vector<hexpr_buffer> bufs(exprCount);
     debugexpr expr;
     for (auto it = bufs.begin(); first != last; ++first, ++it) {
-        expr = {.hexpr = first->expr, .type = debugexpr::DBG_EXPR_HALT};
+        expr = {.hexpr = first->expr, .type = debugexpr::ALDO_DBG_EXPR_HALT};
         format_debug_expr(expr, *it);
     }
     if (resOverride) {
-        expr = {.resetvector = resetvector, .type = debugexpr::DBG_EXPR_RESET};
+        expr = {
+            .resetvector = resetvector,
+            .type = debugexpr::ALDO_DBG_EXPR_RESET,
+        };
         format_debug_expr(expr, bufs.back());
     }
     return bufs;

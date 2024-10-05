@@ -26,7 +26,7 @@
 static const char *const restrict DistractorFormat = "%c Running\u2026";
 
 struct runclock {
-    struct cycleclock cyclock;
+    struct aldo_clock clock;
     double avg_ticktime_ms;
 };
 
@@ -61,19 +61,19 @@ static int init_ui(void)
 
 static void tick_start(struct runclock *c, const struct aldo_snapshot *snp)
 {
-    cycleclock_tickstart(&c->cyclock, true);
+    aldo_clock_tickstart(&c->clock, true);
 
     // NOTE: cumulative moving average:
     // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-    double ticks = (double)c->cyclock.ticks;
-    c->avg_ticktime_ms = (c->cyclock.ticktime_ms
-                          + (ticks * c->avg_ticktime_ms)) / (ticks + 1);
+    double ticks = (double)c->clock.ticks;
+    c->avg_ticktime_ms = (c->clock.ticktime_ms + (ticks * c->avg_ticktime_ms))
+                            / (ticks + 1);
 
     // NOTE: arbitrary per-tick budget, 6502s often ran at 1 MHz so a million
     // cycles per tick seems as good a number as any.
-    c->cyclock.budget = 1e6;
+    c->clock.budget = 1e6;
     // NOTE: app runtime and emulator time are equivalent in batch mode
-    c->cyclock.emutime = c->cyclock.runtime;
+    c->clock.emutime = c->clock.runtime;
 
     // NOTE: exit batch mode if cpu is not running
     if (!snp->cpu.lines.ready) {
@@ -83,7 +83,7 @@ static void tick_start(struct runclock *c, const struct aldo_snapshot *snp)
 
 static void emu_update(struct emulator *emu, struct runclock *c)
 {
-    aldo_nes_clock(emu->console, &c->cyclock);
+    aldo_nes_clock(emu->console, &c->clock);
     aldo_nes_snapshot(emu->console, &emu->snapshot);
 }
 
@@ -95,7 +95,7 @@ static void update_progress(const struct runclock *c)
     static double refreshdt;
     static size_t distractor_frame;
 
-    if ((refreshdt += c->cyclock.ticktime_ms) >= refresh_interval_ms) {
+    if ((refreshdt += c->clock.ticktime_ms) >= refresh_interval_ms) {
         refreshdt = display_wait;
         clearline();
         fprintf(stderr, DistractorFormat, distractor[distractor_frame++]);
@@ -105,7 +105,7 @@ static void update_progress(const struct runclock *c)
 
 static void tick_end(struct runclock *c)
 {
-    cycleclock_tickend(&c->cyclock);
+    aldo_clock_tickend(&c->clock);
 }
 
 static void write_summary(const struct emulator *emu, const struct runclock *c)
@@ -113,16 +113,14 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
     clearline();
     if (!emu->args->verbose) return;
 
-    bool scale_ms = c->cyclock.runtime < 1;
+    bool scale_ms = c->clock.runtime < 1;
     printf("---=== %s ===---\n", argparse_filename(emu->args->filepath));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
-           scale_ms
-            ? c->cyclock.runtime * ALDO_MS_PER_S
-            : c->cyclock.runtime);
+           scale_ms ? c->clock.runtime * ALDO_MS_PER_S : c->clock.runtime);
     printf("Avg Tick Time (msec): %.3f\n", c->avg_ticktime_ms);
-    printf("Total Cycles: %" PRIu64 "\n", c->cyclock.cycles);
+    printf("Total Cycles: %" PRIu64 "\n", c->clock.cycles);
     printf("Avg Cycles/sec: %.2f\n",
-           (double)c->cyclock.cycles / c->cyclock.runtime);
+           (double)c->clock.cycles / c->clock.runtime);
     const struct aldo_breakpoint *bp;
     if ((bp = aldo_debug_halted(emu->debugger))) {
         char break_desc[ALDO_HEXPR_FMT_SIZE];
@@ -144,7 +142,7 @@ int ui_batch_loop(struct emulator *emu)
     if (err < 0) return err;
 
     struct runclock clock = {0};
-    cycleclock_start(&clock.cyclock);
+    aldo_clock_start(&clock.clock);
     do {
         tick_start(&clock, &emu->snapshot);
         emu_update(emu, &clock);

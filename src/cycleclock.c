@@ -11,13 +11,13 @@
 const int
     Aldo_MinCps = 1, Aldo_MaxCps = 1000, Aldo_MinFps = 1, Aldo_MaxFps = 60;
 
-void cycleclock_start(struct cycleclock *self)
+void aldo_clock_start(struct aldo_clock *self)
 {
     clock_gettime(CLOCK_MONOTONIC, &self->start);
     self->previous = self->start;
 }
 
-void cycleclock_tickstart(struct cycleclock *self, bool reset_budget)
+void aldo_clock_tickstart(struct aldo_clock *self, bool reset_budget)
 {
     clock_gettime(CLOCK_MONOTONIC, &self->current);
     double currentms = aldo_timespec_to_ms(&self->current);
@@ -44,7 +44,7 @@ void cycleclock_tickstart(struct cycleclock *self, bool reset_budget)
     self->timebudget_ms -= new_cycles / cycles_per_ms;
 }
 
-void cycleclock_tickend(struct cycleclock *self)
+void aldo_clock_tickend(struct aldo_clock *self)
 {
     self->previous = self->current;
     ++self->ticks;

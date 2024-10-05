@@ -96,14 +96,14 @@ static bool halt_address(const struct aldo_breakpoint *bp,
 }
 
 static bool halt_runtime(const struct aldo_breakpoint *bp,
-                         const struct cycleclock *clk)
+                         const struct aldo_clock *clk)
 {
     return isgreaterequal(clk->emutime - bp->expr.runtime,
                           1.0 / ALDO_MS_PER_S);
 }
 
 static bool halt_cycles(const struct aldo_breakpoint *bp,
-                        const struct cycleclock *clk)
+                        const struct aldo_clock *clk)
 {
     return clk->cycles == bp->expr.cycles;
 }
@@ -159,7 +159,7 @@ static void bpvector_insert(struct breakpoint_vector *vec,
 }
 
 static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
-                                const struct cycleclock *clk,
+                                const struct aldo_clock *clk,
                                 const struct mos6502 *cpu)
 {
     for (ptrdiff_t i = 0; i < (ptrdiff_t)vec->size; ++i) {
@@ -371,7 +371,7 @@ void aldo_debug_sync_bus(aldo_debugger *self)
                                 resetaddr_device, &self->dec.inner);
 }
 
-void aldo_debug_check(aldo_debugger *self, const struct cycleclock *clk)
+void aldo_debug_check(aldo_debugger *self, const struct aldo_clock *clk)
 {
     assert(self != NULL);
     assert(clk != NULL);

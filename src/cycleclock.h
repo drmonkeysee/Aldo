@@ -12,12 +12,12 @@
 #include <stdint.h>
 #include <time.h>
 
-enum cyclkscale {
-    CYCS_CYCLE,
-    CYCS_FRAME,
+enum aldo_clockscale {
+    ALDO_CS_CYCLE,
+    ALDO_CS_FRAME,
 };
 
-struct cycleclock {
+struct aldo_clock {
     struct timespec current, previous, start;
     uint64_t cycles, frames, ticks;
     double emutime, runtime, ticktime_ms, timebudget_ms;
@@ -30,12 +30,12 @@ br_libexport
 extern const int Aldo_MinCps, Aldo_MaxCps, Aldo_MinFps, Aldo_MaxFps;
 
 br_libexport
-void cycleclock_start(struct cycleclock *self) br_nothrow;
+void aldo_clock_start(struct aldo_clock *self) br_nothrow;
 br_libexport
-void cycleclock_tickstart(struct cycleclock *self,
+void aldo_clock_tickstart(struct aldo_clock *self,
                           bool reset_budget) br_nothrow;
 br_libexport
-void cycleclock_tickend(struct cycleclock *self) br_nothrow;
+void aldo_clock_tickend(struct aldo_clock *self) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

@@ -55,9 +55,9 @@ public:
     explicit RefreshInterval(double intervalMs) noexcept
     : interval{intervalMs} {}
 
-    bool elapsed(const cycleclock& cyclock) noexcept
+    bool elapsed(const aldo_clock& clock) noexcept
     {
-        if ((dt += cyclock.ticktime_ms) >= interval) {
+        if ((dt += clock.ticktime_ms) >= interval) {
             dt = 0;
             return true;
         }
@@ -321,11 +321,11 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
         val = 1;
     }
     {
-        DisabledIf dif = vs.clock.cyclock().rate == Aldo_MaxCps;
+        DisabledIf dif = vs.clock.clock().rate == Aldo_MaxCps;
         if (ImGui::MenuItem(incLabel.c_str(), incKey)) {
             vs.clock.adjustCycleRate(val);
         }
-        dif = vs.clock.cyclock().rate == Aldo_MinCps;
+        dif = vs.clock.clock().rate == Aldo_MinCps;
         if (ImGui::MenuItem(decLabel.c_str(), decKey)) {
             vs.clock.adjustCycleRate(-val);
         }
@@ -1293,7 +1293,7 @@ public:
 protected:
     void renderContents() override
     {
-        if (drawInterval.elapsed(vs.clock.cyclock())) {
+        if (drawInterval.elapsed(vs.clock.clock())) {
             const auto* tables = &emu.snapshot().video->pattern_tables;
             assert(palSelect < ALDO_PAL_SIZE * 2);
             const auto* colors =
@@ -1626,13 +1626,13 @@ protected:
 private:
     void renderStats() noexcept
     {
-        const auto& cyclock = vs.clock.cyclock();
-        if (statsInterval.elapsed(cyclock)) {
+        const auto& clock = vs.clock.clock();
+        if (statsInterval.elapsed(clock)) {
             dispDtInput = vs.clock.dtInputMs();
             dispDtUpdate = vs.clock.dtUpdateMs();
             dispDtRender = vs.clock.dtRenderMs();
             dispDtElapsed = dispDtInput + dispDtUpdate + dispDtRender;
-            dispDtTick = cyclock.ticktime_ms;
+            dispDtTick = clock.ticktime_ms;
         }
         ImGui::Text("Input dT: %.3f", dispDtInput);
         ImGui::Text("Update dT: %.3f", dispDtUpdate);
@@ -1640,31 +1640,31 @@ private:
         ImGui::Text("Elapsed dT: %.3f", dispDtElapsed);
         ImGui::Text("Tick dT: %.3f (%+.3f)", dispDtTick,
                     dispDtTick - dispDtElapsed);
-        ImGui::Text("Ticks: %" PRIu64, cyclock.ticks);
-        ImGui::Text("Emutime: %.3f", cyclock.emutime);
-        ImGui::Text("Runtime: %.3f", cyclock.runtime);
-        ImGui::Text("Cycles: %" PRIu64, cyclock.cycles);
-        ImGui::Text("Frames: %" PRIu64, cyclock.frames);
+        ImGui::Text("Ticks: %" PRIu64, clock.ticks);
+        ImGui::Text("Emutime: %.3f", clock.emutime);
+        ImGui::Text("Runtime: %.3f", clock.runtime);
+        ImGui::Text("Cycles: %" PRIu64, clock.cycles);
+        ImGui::Text("Frames: %" PRIu64, clock.frames);
         ImGui::Text("BCD Support: %s", boolstr(emu.bcdSupport()));
     }
 
     void renderSpeedControls() const noexcept
     {
         ImGui::AlignTextToFramePadding();
-        ImGui::TextUnformatted(vs.clock.scale() == CYCS_CYCLE
+        ImGui::TextUnformatted(vs.clock.scale() == ALDO_CS_CYCLE
                                ? "Cycles/Second"
                                : "Frames/Second");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(40);
-        ImGui::DragInt("##clockRate", &vs.clock.cyclock().rate, 1, Aldo_MinCps,
+        ImGui::DragInt("##clockRate", &vs.clock.clock().rate, 1, Aldo_MinCps,
                        Aldo_MaxCps, "%d", ImGuiSliderFlags_AlwaysClamp);
 
-        if (ImGui::RadioButton("Cycles", vs.clock.scale() == CYCS_CYCLE)) {
-            vs.clock.setScale(CYCS_CYCLE);
+        if (ImGui::RadioButton("Cycles", vs.clock.scale() == ALDO_CS_CYCLE)) {
+            vs.clock.setScale(ALDO_CS_CYCLE);
         }
         ImGui::SameLine();
-        if (ImGui::RadioButton("Frames", vs.clock.scale() == CYCS_FRAME)) {
-            vs.clock.setScale(CYCS_FRAME);
+        if (ImGui::RadioButton("Frames", vs.clock.scale() == ALDO_CS_FRAME)) {
+            vs.clock.setScale(ALDO_CS_FRAME);
         }
     }
 

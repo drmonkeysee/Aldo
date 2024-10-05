@@ -50,7 +50,7 @@ void aldo_nes_set_probe(aldo_nes *self, enum csig_interrupt signal,
                         bool active) br_nothrow;
 
 br_libexport
-void aldo_nes_clock(aldo_nes *self, struct cycleclock *clock) br_nothrow;
+void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock) br_nothrow;
 br_libexport
 int aldo_nes_cycle_factor(void) br_nothrow;
 br_libexport

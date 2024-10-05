@@ -76,18 +76,18 @@ inline void swap(RunTimer& a, RunTimer& b) noexcept
 
 class ALDO_SIDEFX RunTick {
 public:
-    RunTick(cycleclock& c, bool resetBudget) noexcept : cyclock{c}
+    RunTick(aldo_clock& c, bool resetBudget) noexcept : clock{c}
     {
-        cycleclock_tickstart(&cyclock, resetBudget);
+        aldo_clock_tickstart(&clock, resetBudget);
     }
     RunTick(const RunTick&) = delete;
     RunTick& operator=(const RunTick&) = delete;
     RunTick(RunTick&&) = delete;
     RunTick& operator=(RunTick&&) = delete;
-    ~RunTick() { cycleclock_tickend(&cyclock); }
+    ~RunTick() { aldo_clock_tickend(&clock); }
 
 private:
-    cycleclock& cyclock;
+    aldo_clock& clock;
 };
 
 class RunClock {
@@ -95,23 +95,20 @@ public:
     double dtInputMs() noexcept { return dtInput; }
     double dtUpdateMs() noexcept { return dtUpdate; }
     double dtRenderMs() noexcept { return dtRender; }
-    cyclkscale scale() noexcept { return currentScale; }
-    cycleclock& cyclock() noexcept { return clock; }
-    cycleclock* cyclockp() noexcept { return &clock; }
+    aldo_clockscale scale() noexcept { return currentScale; }
+    aldo_clock& clock() noexcept { return clk; }
+    aldo_clock* clockp() noexcept { return &clk; }
 
-    void start() noexcept
-    {
-        cycleclock_start(cyclockp());
-    }
+    void start() noexcept { aldo_clock_start(clockp()); }
 
     RunTick startTick(bool resetBudget) noexcept
     {
-        return {cyclock(), resetBudget};
+        return {clock(), resetBudget};
     }
 
     void resetEmu() noexcept {
-        cyclock().emutime = 0;
-        cyclock().cycles = cyclock().frames = cyclock().subcycle = 0;
+        clock().emutime = 0;
+        clock().cycles = clock().frames = clock().subcycle = 0;
     }
 
     RunTimer timeInput() noexcept { return RunTimer{dtInput}; }
@@ -120,33 +117,33 @@ public:
 
     void adjustCycleRate(int adjustment) noexcept
     {
-        auto adjusted = cyclock().rate + adjustment;
-        cyclock().rate = std::max(Aldo_MinCps,
+        auto adjusted = clock().rate + adjustment;
+        clock().rate = std::max(Aldo_MinCps,
                                   std::min(adjusted, Aldo_MaxCps));
     }
 
-    void setScale(cyclkscale s) noexcept
+    void setScale(aldo_clockscale s) noexcept
     {
         if (s == scale()) return;
 
         auto prev = oldRate;
-        oldRate = cyclock().rate;
-        cyclock().rate = prev;
+        oldRate = clock().rate;
+        clock().rate = prev;
         currentScale = s;
-        cyclock().rate_factor = currentScale == CYCS_CYCLE
+        clock().rate_factor = currentScale == ALDO_CS_CYCLE
                                 ? aldo_nes_cycle_factor()
                                 : aldo_nes_frame_factor();
     }
 
     void toggleScale() noexcept
     {
-        setScale(static_cast<cyclkscale>(!scale()));
+        setScale(static_cast<aldo_clockscale>(!scale()));
     }
 
 private:
-    cycleclock clock{.rate = 10, .rate_factor = aldo_nes_cycle_factor()};
+    aldo_clock clk{.rate = 10, .rate_factor = aldo_nes_cycle_factor()};
     double dtInput = 0, dtUpdate = 0, dtRender = 0;
-    cyclkscale currentScale = CYCS_CYCLE;
+    aldo_clockscale currentScale = ALDO_CS_CYCLE;
     int oldRate = Aldo_MinFps;
 };
 

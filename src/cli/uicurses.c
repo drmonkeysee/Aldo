@@ -49,10 +49,10 @@ enum ram_selection {
 
 struct viewstate {
     struct runclock {
-        struct cycleclock cyclock;
+        struct aldo_clock clock;
         double tickleft_ms;
         int oldrate;
-        enum cyclkscale scale;
+        enum aldo_clockscale scale;
     } clock;
     enum ram_selection ramselect;
     int ramsheet, total_ramsheets;
@@ -65,7 +65,7 @@ static void tick_sleep(struct runclock *c)
         .tv_nsec = ALDO_NS_PER_S / DisplayHz,
     };
 
-    struct timespec elapsed = aldo_elapsed(&c->cyclock.current);
+    struct timespec elapsed = aldo_elapsed(&c->clock.current);
 
     // NOTE: if elapsed nanoseconds is greater than vsync we're over
     // our time budget; if elapsed *seconds* is greater than vsync
@@ -131,26 +131,26 @@ static int drawstats(const struct view *v, int cursor_y,
     static const double refresh_interval_ms = 250;
     static double display_tickleft, display_ticktime, refreshdt;
 
-    const struct cycleclock *cyclock = &vs->clock.cyclock;
-    if ((refreshdt += cyclock->ticktime_ms) >= refresh_interval_ms) {
+    const struct aldo_clock *clock = &vs->clock.clock;
+    if ((refreshdt += clock->ticktime_ms) >= refresh_interval_ms) {
         display_tickleft = vs->clock.tickleft_ms;
-        display_ticktime = cyclock->ticktime_ms;
+        display_ticktime = clock->ticktime_ms;
         refreshdt = 0;
     }
 
     mvwprintw(v->content, cursor_y++, 0, "Display Hz: %d (%.2f)", DisplayHz,
-              (double)cyclock->ticks / cyclock->runtime);
+              (double)clock->ticks / clock->runtime);
     mvwprintw(v->content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_ticktime, display_tickleft);
-    mvwprintw(v->content, cursor_y++, 0, "Ticks: %" PRIu64, cyclock->ticks);
-    mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f", cyclock->runtime);
-    mvwprintw(v->content, cursor_y++, 0, "Emutime: %.3f", cyclock->emutime);
-    mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64, cyclock->frames);
-    mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64, cyclock->cycles);
+    mvwprintw(v->content, cursor_y++, 0, "Ticks: %" PRIu64, clock->ticks);
+    mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f", clock->runtime);
+    mvwprintw(v->content, cursor_y++, 0, "Emutime: %.3f", clock->emutime);
+    mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64, clock->frames);
+    mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64, clock->cycles);
     mvwprintw(v->content, cursor_y++, 0, "%s: %d",
-              vs->clock.scale == CYCS_CYCLE
+              vs->clock.scale == ALDO_CS_CYCLE
                 ? "Cycles per Second"
-                : "Frames per Second", cyclock->rate);
+                : "Frames per Second", clock->rate);
     mvwprintw(v->content, cursor_y++, 0, "BCD Supported: %s",
               args->bcdsupport ? "Yes" : "No");
     return cursor_y;
@@ -792,12 +792,12 @@ static void init_ui(struct layout *l, int ramsheets)
 
 static void tick_start(struct viewstate *vs, const struct emulator *emu)
 {
-    cycleclock_tickstart(&vs->clock.cyclock, !emu->snapshot.cpu.lines.ready);
+    aldo_clock_tickstart(&vs->clock.clock, !emu->snapshot.cpu.lines.ready);
 }
 
 static void tick_end(struct runclock *c)
 {
-    cycleclock_tickend(&c->cyclock);
+    aldo_clock_tickend(&c->clock);
     tick_sleep(c);
 }
 
@@ -814,25 +814,25 @@ static void applyrate(int *spd, int adjustment, int min, int max)
 static void adjustrate(struct viewstate *vs, int adjustment)
 {
     int min, max;
-    if (vs->clock.scale == CYCS_CYCLE) {
+    if (vs->clock.scale == ALDO_CS_CYCLE) {
         min = Aldo_MinCps;
         max = Aldo_MaxCps;
     } else {
         min = Aldo_MinFps;
         max = Aldo_MaxFps;
     }
-    applyrate(&vs->clock.cyclock.rate, adjustment, min, max);
+    applyrate(&vs->clock.clock.rate, adjustment, min, max);
 }
 
 static void selectrate(struct runclock *clock)
 {
     int prev = clock->oldrate;
-    clock->oldrate = clock->cyclock.rate;
-    clock->cyclock.rate = prev;
+    clock->oldrate = clock->clock.rate;
+    clock->clock.rate = prev;
     clock->scale = !clock->scale;
-    clock->cyclock.rate_factor = clock->scale == CYCS_CYCLE
-                                    ? aldo_nes_cycle_factor()
-                                    : aldo_nes_frame_factor();
+    clock->clock.rate_factor = clock->scale == ALDO_CS_CYCLE
+                                ? aldo_nes_cycle_factor()
+                                : aldo_nes_frame_factor();
 }
 
 static void handle_input(struct viewstate *vs, const struct emulator *emu)
@@ -903,7 +903,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
 
 static void emu_update(struct emulator *emu, struct viewstate *vs)
 {
-    aldo_nes_clock(emu->console, &vs->clock.cyclock);
+    aldo_nes_clock(emu->console, &vs->clock.clock);
     aldo_nes_snapshot(emu->console, &emu->snapshot);
 }
 
@@ -948,7 +948,7 @@ int ui_curses_loop(struct emulator *emu)
 
     struct viewstate state = {
         .clock = {
-            .cyclock = {.rate = 10, .rate_factor = aldo_nes_cycle_factor()},
+            .clock = {.rate = 10, .rate_factor = aldo_nes_cycle_factor()},
             .oldrate = Aldo_MinFps,
         },
         .running = true,
@@ -959,7 +959,7 @@ int ui_curses_loop(struct emulator *emu)
            sizeof *emu, sizeof state, sizeof layout,
            sizeof *emu + sizeof state + sizeof layout);
     init_ui(&layout, state.total_ramsheets);
-    cycleclock_start(&state.clock.cyclock);
+    aldo_clock_start(&state.clock.clock);
     do {
         tick_start(&state, emu);
         handle_input(&state, emu);

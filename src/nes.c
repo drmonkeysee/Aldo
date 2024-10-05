@@ -215,7 +215,7 @@ static void bus_snapshot(const struct aldo_nes001 *self,
 
 // NOTE: trace the just-fetched instruction
 static void instruction_trace(struct aldo_nes001 *self,
-                              const struct cycleclock *clock, int adjustment)
+                              const struct aldo_clock *clock, int adjustment)
 {
     if (!self->tracelog || !self->cpu.signal.sync) return;
 
@@ -228,7 +228,7 @@ static void instruction_trace(struct aldo_nes001 *self,
                     &self->cpu, self->dbg, &snp);
 }
 
-static bool clock_ppu(struct aldo_nes001 *self, struct cycleclock *clock)
+static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
 {
     clock->frames += (uint64_t)aldo_ppu_cycle(&self->ppu);
     --clock->budget;
@@ -243,7 +243,7 @@ static bool clock_ppu(struct aldo_nes001 *self, struct cycleclock *clock)
     return true;
 }
 
-static void clock_cpu(struct aldo_nes001 *self, struct cycleclock *clock)
+static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
 {
     int cycles = cpu_cycle(&self->cpu);
     set_cpu_pins(self);
@@ -395,7 +395,7 @@ void aldo_nes_set_probe(aldo_nes *self, enum csig_interrupt signal,
     }
 }
 
-void aldo_nes_clock(aldo_nes *self, struct cycleclock *clock)
+void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
 {
     assert(self != NULL);
     assert(clock != NULL);

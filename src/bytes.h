@@ -119,7 +119,7 @@ inline uint16_t byteshuffle(uint8_t lo, uint8_t hi) br_nothrow
 // power-of-2 KB boundary between [1, 64].
 size_t bytecopy_bank(const uint8_t *br_noalias bankmem, int bankwidth,
                      uint16_t addr, size_t count,
-                     uint8_t dest[br_noalias_sz(count)]) br_nothrow;
+                     uint8_t dest[br_nasz(count)]) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

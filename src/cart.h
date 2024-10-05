@@ -121,7 +121,7 @@ br_libexport
 const char *cart_mirrorname(enum nt_mirroring mirror) br_nothrow;
 br_libexport br_checkerror
 int cart_format_extname(cart *self,
-                        char buf[br_noalias_csz(CART_FMT_SIZE)]) br_nothrow;
+                        char buf[br_nacsz(CART_FMT_SIZE)]) br_nothrow;
 br_libexport
 void cart_write_info(cart *self, const char *br_noalias name, bool verbose,
                      FILE *f) br_nothrow;

@@ -20,8 +20,8 @@
 #define br_ownresult [[nodiscard("take ownership")]]
 #define br_noalias
 #define br_csz(val)
-#define br_noalias_sz(var)
-#define br_noalias_csz(val)
+#define br_nasz(var)
+#define br_nacsz(val)
 #define br_nothrow noexcept
 #define br_empty(T) {}
 extern "C"
@@ -32,8 +32,8 @@ extern "C"
 #define br_ownresult
 #define br_noalias restrict
 #define br_csz(val) static val
-#define br_noalias_sz(var) restrict var
-#define br_noalias_csz(val) restrict static val
+#define br_nasz(var) restrict var
+#define br_nacsz(val) restrict static val
 #define br_nothrow
 #define br_empty(T) (T){0}
 #endif

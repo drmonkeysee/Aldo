@@ -78,13 +78,11 @@ br_libexport br_checkerror
 int aldo_haltexpr_parse_dbg(const char *br_noalias str,
                             struct aldo_debugexpr *expr) br_nothrow;
 br_libexport br_checkerror
-int
-aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
-                   char buf[br_noalias_csz(ALDO_HEXPR_FMT_SIZE)]) br_nothrow;
+int aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
+                       char buf[br_nacsz(ALDO_HEXPR_FMT_SIZE)]) br_nothrow;
 br_libexport br_checkerror
-int
-aldo_haltexpr_fmtdbg(const struct aldo_debugexpr *expr,
-                     char buf[br_noalias_csz(ALDO_HEXPR_FMT_SIZE)]) br_nothrow;
+int aldo_haltexpr_fmtdbg(const struct aldo_debugexpr *expr,
+                         char buf[br_nacsz(ALDO_HEXPR_FMT_SIZE)]) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

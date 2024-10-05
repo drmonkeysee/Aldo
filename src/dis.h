@@ -65,17 +65,16 @@ br_libexport br_checkerror
 int aldo_dis_parse_inst(const struct blockview *bv, size_t at,
                         struct aldo_dis_instruction *parsed) br_nothrow;
 br_libexport br_checkerror
-int aldo_dis_parsemem_inst(size_t size, const uint8_t mem[br_noalias_sz(size)],
+int aldo_dis_parsemem_inst(size_t size, const uint8_t mem[br_nasz(size)],
                            size_t at,
                            struct aldo_dis_instruction *parsed) br_nothrow;
 // NOTE: functions w/buffer params leave buffer untouched when returning <= 0
 br_libexport br_checkerror
 int aldo_dis_inst(uint16_t addr, const struct aldo_dis_instruction *inst,
-                  char dis[br_noalias_csz(ALDO_DIS_INST_SIZE)]) br_nothrow;
+                  char dis[br_nacsz(ALDO_DIS_INST_SIZE)]) br_nothrow;
 br_libexport br_checkerror
-int
-aldo_dis_datapath(const struct aldo_snapshot *snp,
-                  char dis[br_noalias_csz(ALDO_DIS_DATAP_SIZE)]) br_nothrow;
+int aldo_dis_datapath(const struct aldo_snapshot *snp,
+                      char dis[br_nacsz(ALDO_DIS_DATAP_SIZE)]) br_nothrow;
 
 br_libexport br_checkerror
 int aldo_dis_cart_prg(cart *cart, const char *br_noalias name, bool verbose,
@@ -103,7 +102,7 @@ aldo_dis_inst_flags(const struct aldo_dis_instruction *inst) br_nothrow;
 br_libexport br_checkerror
 int
 aldo_dis_inst_operand(const struct aldo_dis_instruction *inst,
-                      char dis[br_noalias_csz(ALDO_DIS_OPERAND_SIZE)]) br_nothrow;
+                      char dis[br_nacsz(ALDO_DIS_OPERAND_SIZE)]) br_nothrow;
 br_libexport
 bool aldo_dis_inst_equal(const struct aldo_dis_instruction *lhs,
                          const struct aldo_dis_instruction *rhs) br_nothrow;
@@ -114,7 +113,7 @@ bool aldo_dis_inst_equal(const struct aldo_dis_instruction *lhs,
 
 int aldo_dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
                   const struct aldo_snapshot *snp,
-                  char dis[br_noalias_csz(ALDO_DIS_PEEK_SIZE)]) br_nothrow;
+                  char dis[br_nacsz(ALDO_DIS_PEEK_SIZE)]) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

@@ -48,7 +48,7 @@ inline bool bus_clear(bus *self, uint16_t addr) br_nothrow
 bool bus_read(bus *self, uint16_t addr, uint8_t *br_noalias d) br_nothrow;
 bool bus_write(bus *self, uint16_t addr, uint8_t d) br_nothrow;
 size_t bus_copy(bus *self, uint16_t addr, size_t count,
-                uint8_t dest[br_noalias_sz(count)]) br_nothrow;
+                uint8_t dest[br_nasz(count)]) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

@@ -11,8 +11,8 @@
 #endif
 #undef br_empty
 #undef br_nothrow
-#undef br_noalias_csz
-#undef br_noalias_sz
+#undef br_nacsz
+#undef br_nasz
 #undef br_csz
 #undef br_noalias
 #undef br_ownresult

@@ -702,7 +702,7 @@ bool aldo_dis_inst_equal(const struct aldo_dis_instruction *lhs,
 // MARK: - Internal Interface
 //
 
-int aldo_dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
+int aldo_dis_peek(uint16_t addr, struct mos6502 *cpu, aldo_debugger *dbg,
                   const struct aldo_snapshot *snp,
                   char dis[restrict static ALDO_DIS_PEEK_SIZE])
 {
@@ -720,7 +720,7 @@ int aldo_dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
         uint16_t vector;
         int resetvector;
         if (snp->cpu.datapath.rst == CSGS_COMMITTED
-            && (resetvector = debug_vector_override(dbg))
+            && (resetvector = aldo_debug_vector_override(dbg))
                 != Aldo_NoResetVector) {
             fmt = ALDO_HEXPR_RST_IND "%04X";
             vector = (uint16_t)resetvector;

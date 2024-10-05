@@ -36,7 +36,7 @@ inline std::filesystem::path breakfile_path_from(std::filesystem::path path)
 
 }
 
-using debug_handle = handle<debugger, debug_free>;
+using debug_handle = handle<aldo_debugger, aldo_debug_free>;
 
 class Debugger {
 public:
@@ -46,11 +46,11 @@ public:
 
     int vectorOverride() const noexcept
     {
-        return debug_vector_override(dbgp());
+        return aldo_debug_vector_override(dbgp());
     }
     void vectorOverride(int resetvector) noexcept
     {
-        debug_set_vector_override(dbgp(), resetvector);
+        aldo_debug_set_vector_override(dbgp(), resetvector);
     }
     void vectorClear() noexcept
     {
@@ -81,13 +81,13 @@ public:
     class BreakpointIterator {
     public:
         using difference_type = et::diff;
-        using value_type = breakpoint;
+        using value_type = aldo_breakpoint;
         using pointer = const value_type*;
         using reference = const value_type&;
         using iterator_concept = std::forward_iterator_tag;
 
         BreakpointIterator() noexcept = default;
-        BreakpointIterator(debugger* d, difference_type count) noexcept
+        BreakpointIterator(aldo_debugger* d, difference_type count) noexcept
         : dbgp{d}, count{count} {}
 
         reference operator*() const noexcept
@@ -96,7 +96,7 @@ public:
         }
         pointer operator->() const noexcept
         {
-            return debug_bp_at(dbgp, idx);
+            return aldo_debug_bp_at(dbgp, idx);
         }
 
         BreakpointIterator& operator++() noexcept { ++idx; return *this; }
@@ -121,7 +121,7 @@ public:
         bool sentinel() const noexcept { return !dbgp; }
         bool exhausted() const noexcept { return idx == count; }
 
-        debugger* dbgp = nullptr;
+        aldo_debugger* dbgp = nullptr;
         difference_type count = 0, idx = 0;
     };
 
@@ -138,15 +138,15 @@ public:
         using const_reference = const_iterator::reference;
         using const_pointer = const_iterator::pointer;
 
-        size_type size() const noexcept { return debug_bp_count(dbgp); }
+        size_type size() const noexcept { return aldo_debug_bp_count(dbgp); }
         bool empty() const noexcept { return size() == 0; }
         const_pointer at(difference_type i) const noexcept
         {
-            return debug_bp_at(dbgp, i);
+            return aldo_debug_bp_at(dbgp, i);
         }
         difference_type halted_at() const noexcept
         {
-            return debug_halted_at(dbgp);
+            return aldo_debug_halted_at(dbgp);
         }
 
         const_iterator cbegin() const noexcept
@@ -161,30 +161,30 @@ public:
 
         void append(aldo_haltexpr expr) noexcept requires Mutable
         {
-            debug_bp_add(dbgp, expr);
+            aldo_debug_bp_add(dbgp, expr);
         }
         void enable(difference_type i) noexcept requires Mutable
         {
-            debug_bp_enable(dbgp, i, true);
+            aldo_debug_bp_enable(dbgp, i, true);
         }
         void disable(difference_type i) noexcept requires Mutable
         {
-            debug_bp_enable(dbgp, i, false);
+            aldo_debug_bp_enable(dbgp, i, false);
         }
         void remove(difference_type i) noexcept requires Mutable
         {
-            debug_bp_remove(dbgp, i);
+            aldo_debug_bp_remove(dbgp, i);
         }
-        void clear() noexcept requires Mutable { debug_bp_clear(dbgp); }
+        void clear() noexcept requires Mutable { aldo_debug_bp_clear(dbgp); }
 
     private:
         static_assert(std::forward_iterator<const_iterator>,
                       "Incomplete breakpoint iterator definition");
         friend Debugger;
 
-        BreakpointsView(debugger* d) noexcept : dbgp{d} {}
+        BreakpointsView(aldo_debugger* d) noexcept : dbgp{d} {}
 
-        debugger* dbgp;
+        aldo_debugger* dbgp;
     };
 
 private:
@@ -192,7 +192,7 @@ private:
 
     explicit Debugger(debug_handle d) noexcept : hdbg{std::move(d)} {}
 
-    debugger* dbgp() const noexcept { return hdbg.get(); }
+    aldo_debugger* dbgp() const noexcept { return hdbg.get(); }
 
     debug_handle hdbg;
 };

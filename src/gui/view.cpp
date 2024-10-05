@@ -1068,7 +1068,8 @@ private:
         renderListControls(bpCount);
     }
 
-    void renderBreakpoint(bp_diff idx, bp_diff breakIdx, const breakpoint& bp)
+    void renderBreakpoint(bp_diff idx, bp_diff breakIdx,
+                          const aldo_breakpoint& bp)
     {
         auto bpBreak = idx == breakIdx;
         if (bpBreak && !detectedHalt) {

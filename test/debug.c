@@ -13,16 +13,16 @@
 
 static void setup(void **ctx)
 {
-    *ctx = debug_new();
+    *ctx = aldo_debug_new();
 }
 
 static void teardown(void **ctx)
 {
-    debug_free(*ctx);
+    aldo_debug_free(*ctx);
 }
 
 static void verify_haltexpr(const struct aldo_haltexpr *expr,
-                            const struct breakpoint *bp)
+                            const struct aldo_breakpoint *bp)
 {
     ct_assertequal(expr->cond, bp->expr.cond);
     switch (bp->expr.cond) {
@@ -43,38 +43,38 @@ static void verify_haltexpr(const struct aldo_haltexpr *expr,
 
 static void new_debugger(void *ctx)
 {
-    debugger *dbg = ctx;
+    aldo_debugger *dbg = ctx;
 
-    ct_assertequal(Aldo_NoResetVector, debug_vector_override(dbg));
-    ct_assertequal(0u, debug_bp_count(dbg));
-    ct_assertnull(debug_bp_at(dbg, 1));
+    ct_assertequal(Aldo_NoResetVector, aldo_debug_vector_override(dbg));
+    ct_assertequal(0u, aldo_debug_bp_count(dbg));
+    ct_assertnull(aldo_debug_bp_at(dbg, 1));
 }
 
 static void set_reset_vector(void *ctx)
 {
-    debugger *dbg = ctx;
+    aldo_debugger *dbg = ctx;
 
-    debug_set_vector_override(dbg, 0x1234);
+    aldo_debug_set_vector_override(dbg, 0x1234);
 
-    ct_assertequal(0x1234, debug_vector_override(dbg));
+    ct_assertequal(0x1234, aldo_debug_vector_override(dbg));
 }
 
 static void negative_bp_index(void *ctx)
 {
-    debugger *dbg = ctx;
+    aldo_debugger *dbg = ctx;
 
-    ct_assertnull(debug_bp_at(dbg, -1));
+    ct_assertnull(aldo_debug_bp_at(dbg, -1));
 }
 
 static void add_breakpoint(void *ctx)
 {
-    debugger *dbg = ctx;
+    aldo_debugger *dbg = ctx;
     struct aldo_haltexpr expr = {.cond = ALDO_HLT_ADDR, .address = 0x4321};
 
-    debug_bp_add(dbg, expr);
+    aldo_debug_bp_add(dbg, expr);
 
-    ct_assertequal(1u, debug_bp_count(dbg));
-    const struct breakpoint *bp = debug_bp_at(dbg, 0);
+    ct_assertequal(1u, aldo_debug_bp_count(dbg));
+    const struct aldo_breakpoint *bp = aldo_debug_bp_at(dbg, 0);
     ct_assertnotnull(bp);
     ct_asserttrue(bp->enabled);
     ct_assertequal(expr.cond, bp->expr.cond);
@@ -83,25 +83,25 @@ static void add_breakpoint(void *ctx)
 
 static void enable_disable_breakpoint(void *ctx)
 {
-    debugger *dbg = ctx;
+    aldo_debugger *dbg = ctx;
     struct aldo_haltexpr expr = {.cond = ALDO_HLT_ADDR, .address = 0x4321};
 
-    debug_bp_add(dbg, expr);
-    debug_bp_enable(dbg, 0, false);
+    aldo_debug_bp_add(dbg, expr);
+    aldo_debug_bp_enable(dbg, 0, false);
 
-    ct_assertequal(1u, debug_bp_count(dbg));
+    ct_assertequal(1u, aldo_debug_bp_count(dbg));
 
-    const struct breakpoint *bp = debug_bp_at(dbg, 0);
+    const struct aldo_breakpoint *bp = aldo_debug_bp_at(dbg, 0);
     ct_assertnotnull(bp);
     ct_assertfalse(bp->enabled);
 
-    debug_bp_enable(dbg, 0, true);
+    aldo_debug_bp_enable(dbg, 0, true);
     ct_asserttrue(bp->enabled);
 }
 
 static void multiple_breakpoints(void *ctx)
 {
-    debugger *dbg = ctx;
+    aldo_debugger *dbg = ctx;
     struct aldo_haltexpr exprs[] = {
         {.cond = ALDO_HLT_ADDR, .address = 0x4321},
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
@@ -110,12 +110,12 @@ static void multiple_breakpoints(void *ctx)
     size_t len = sizeof exprs / sizeof exprs[0];
 
     for (size_t i = 0; i < len; ++i) {
-        debug_bp_add(dbg, exprs[i]);
+        aldo_debug_bp_add(dbg, exprs[i]);
     }
 
-    ct_assertequal(3u, debug_bp_count(dbg));
+    ct_assertequal(3u, aldo_debug_bp_count(dbg));
     for (size_t i = 0; i < len; ++i) {
-        const struct breakpoint *bp = debug_bp_at(dbg, (ptrdiff_t)i);
+        const struct aldo_breakpoint *bp = aldo_debug_bp_at(dbg, (ptrdiff_t)i);
         ct_assertnotnull(bp);
         ct_asserttrue(bp->enabled);
         verify_haltexpr(exprs + i, bp);
@@ -124,7 +124,7 @@ static void multiple_breakpoints(void *ctx)
 
 static void out_of_range(void *ctx)
 {
-    debugger *dbg = ctx;
+    aldo_debugger *dbg = ctx;
     struct aldo_haltexpr exprs[] = {
         {.cond = ALDO_HLT_ADDR, .address = 0x4321},
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
@@ -133,16 +133,16 @@ static void out_of_range(void *ctx)
     size_t len = sizeof exprs / sizeof exprs[0];
 
     for (size_t i = 0; i < len; ++i) {
-        debug_bp_add(dbg, exprs[i]);
+        aldo_debug_bp_add(dbg, exprs[i]);
     }
 
-    ct_assertequal(3u, debug_bp_count(dbg));
-    ct_assertnull(debug_bp_at(dbg, 5));
+    ct_assertequal(3u, aldo_debug_bp_count(dbg));
+    ct_assertnull(aldo_debug_bp_at(dbg, 5));
 }
 
 static void delete_breakpoint(void *ctx)
 {
-    debugger *dbg = ctx;
+    aldo_debugger *dbg = ctx;
     struct aldo_haltexpr exprs[] = {
         {.cond = ALDO_HLT_ADDR, .address = 0x4321},
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
@@ -151,20 +151,20 @@ static void delete_breakpoint(void *ctx)
     size_t len = sizeof exprs / sizeof exprs[0];
 
     for (size_t i = 0; i < len; ++i) {
-        debug_bp_add(dbg, exprs[i]);
+        aldo_debug_bp_add(dbg, exprs[i]);
     }
 
-    ct_assertequal(3u, debug_bp_count(dbg));
+    ct_assertequal(3u, aldo_debug_bp_count(dbg));
 
-    debug_bp_remove(dbg, 1);
-    ct_assertequal(2u, debug_bp_count(dbg));
+    aldo_debug_bp_remove(dbg, 1);
+    ct_assertequal(2u, aldo_debug_bp_count(dbg));
 
-    const struct breakpoint *bp = debug_bp_at(dbg, 0);
+    const struct aldo_breakpoint *bp = aldo_debug_bp_at(dbg, 0);
     ct_assertnotnull(bp);
     ct_asserttrue(bp->enabled);
     verify_haltexpr(exprs, bp);
 
-    bp = debug_bp_at(dbg, 1);
+    bp = aldo_debug_bp_at(dbg, 1);
     ct_assertnotnull(bp);
     ct_asserttrue(bp->enabled);
     verify_haltexpr(exprs + 2, bp);
@@ -172,7 +172,7 @@ static void delete_breakpoint(void *ctx)
 
 static void clear_breakpoints(void *ctx)
 {
-    debugger *dbg = ctx;
+    aldo_debugger *dbg = ctx;
     struct aldo_haltexpr exprs[] = {
         {.cond = ALDO_HLT_ADDR, .address = 0x4321},
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
@@ -181,30 +181,30 @@ static void clear_breakpoints(void *ctx)
     size_t len = sizeof exprs / sizeof exprs[0];
 
     for (size_t i = 0; i < len; ++i) {
-        debug_bp_add(dbg, exprs[i]);
+        aldo_debug_bp_add(dbg, exprs[i]);
     }
-    debug_set_vector_override(dbg, 0x1234);
+    aldo_debug_set_vector_override(dbg, 0x1234);
 
-    ct_assertequal(3u, debug_bp_count(dbg));
-    ct_assertequal(0x1234, debug_vector_override(dbg));
+    ct_assertequal(3u, aldo_debug_bp_count(dbg));
+    ct_assertequal(0x1234, aldo_debug_vector_override(dbg));
 
-    debug_bp_clear(dbg);
+    aldo_debug_bp_clear(dbg);
 
-    ct_assertequal(0u, debug_bp_count(dbg));
-    ct_assertequal(0x1234, debug_vector_override(dbg));
+    ct_assertequal(0u, aldo_debug_bp_count(dbg));
+    ct_assertequal(0x1234, aldo_debug_vector_override(dbg));
 }
 
 static void halt_no_breakpoint(void *ctx)
 {
-    debugger *dbg = ctx;
+    aldo_debugger *dbg = ctx;
 
-    ct_assertnull(debug_halted(dbg));
-    ct_assertequal(Aldo_NoBreakpoint, debug_halted_at(dbg));
+    ct_assertnull(aldo_debug_halted(dbg));
+    ct_assertequal(Aldo_NoBreakpoint, aldo_debug_halted_at(dbg));
 }
 
 static void reset_debugger(void *ctx)
 {
-    debugger *dbg = ctx;
+    aldo_debugger *dbg = ctx;
     struct aldo_haltexpr exprs[] = {
         {.cond = ALDO_HLT_ADDR, .address = 0x4321},
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
@@ -213,17 +213,17 @@ static void reset_debugger(void *ctx)
     size_t len = sizeof exprs / sizeof exprs[0];
 
     for (size_t i = 0; i < len; ++i) {
-        debug_bp_add(dbg, exprs[i]);
+        aldo_debug_bp_add(dbg, exprs[i]);
     }
-    debug_set_vector_override(dbg, 0x1234);
+    aldo_debug_set_vector_override(dbg, 0x1234);
 
-    ct_assertequal(3u, debug_bp_count(dbg));
-    ct_assertequal(0x1234, debug_vector_override(dbg));
+    ct_assertequal(3u, aldo_debug_bp_count(dbg));
+    ct_assertequal(0x1234, aldo_debug_vector_override(dbg));
 
-    debug_reset(dbg);
+    aldo_debug_reset(dbg);
 
-    ct_assertequal(0u, debug_bp_count(dbg));
-    ct_assertequal(Aldo_NoResetVector, debug_vector_override(dbg));
+    ct_assertequal(0u, aldo_debug_bp_count(dbg));
+    ct_assertequal(Aldo_NoResetVector, aldo_debug_vector_override(dbg));
 }
 
 //

@@ -15,12 +15,12 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-struct breakpoint {
+struct aldo_breakpoint {
     struct aldo_haltexpr expr;
     bool enabled;
 };
 
-typedef struct debugger_context debugger;
+typedef struct aldo_debugger_context aldo_debugger;
 
 #include "bridgeopen.h"
 //
@@ -33,41 +33,48 @@ br_libexport
 extern const ptrdiff_t Aldo_NoBreakpoint;
 
 br_libexport br_ownresult
-debugger *debug_new(void) br_nothrow;
+aldo_debugger *aldo_debug_new(void) br_nothrow;
 br_libexport
-void debug_free(debugger *self) br_nothrow;
+void aldo_debug_free(aldo_debugger *self) br_nothrow;
 
 br_libexport
-int debug_vector_override(debugger *self) br_nothrow;
+int aldo_debug_vector_override(aldo_debugger *self) br_nothrow;
 br_libexport
-void debug_set_vector_override(debugger *self, int resetvector) br_nothrow;
+void aldo_debug_set_vector_override(aldo_debugger *self,
+                                    int resetvector) br_nothrow;
 br_libexport
-void debug_bp_add(debugger *self, struct aldo_haltexpr expr) br_nothrow;
+void aldo_debug_bp_add(aldo_debugger *self,
+                       struct aldo_haltexpr expr) br_nothrow;
 br_libexport
-const struct breakpoint *debug_bp_at(debugger *self, ptrdiff_t at) br_nothrow;
+const struct aldo_breakpoint *aldo_debug_bp_at(aldo_debugger *self,
+                                               ptrdiff_t at) br_nothrow;
 br_libexport
-void debug_bp_enable(debugger *self, ptrdiff_t at, bool enabled) br_nothrow;
+void aldo_debug_bp_enable(aldo_debugger *self, ptrdiff_t at,
+                          bool enabled) br_nothrow;
 br_libexport
-const struct breakpoint *debug_halted(debugger *self) br_nothrow;
+const struct aldo_breakpoint *
+aldo_debug_halted(aldo_debugger *self) br_nothrow;
 br_libexport
-ptrdiff_t debug_halted_at(debugger *self) br_nothrow;
+ptrdiff_t aldo_debug_halted_at(aldo_debugger *self) br_nothrow;
 br_libexport
-void debug_bp_remove(debugger *self, ptrdiff_t at) br_nothrow;
+void aldo_debug_bp_remove(aldo_debugger *self, ptrdiff_t at) br_nothrow;
 br_libexport
-void debug_bp_clear(debugger *self) br_nothrow;
+void aldo_debug_bp_clear(aldo_debugger *self) br_nothrow;
 br_libexport
-size_t debug_bp_count(debugger *self) br_nothrow;
+size_t aldo_debug_bp_count(aldo_debugger *self) br_nothrow;
 br_libexport
-void debug_reset(debugger *self) br_nothrow;
+void aldo_debug_reset(aldo_debugger *self) br_nothrow;
 
 //
 // MARK: - Internal
 //
 
-void debug_cpu_connect(debugger *self, struct mos6502 *cpu) br_nothrow;
-void debug_cpu_disconnect(debugger *self) br_nothrow;
-void debug_sync_bus(debugger *self) br_nothrow;
-void debug_check(debugger *self, const struct cycleclock *clk) br_nothrow;
+void aldo_debug_cpu_connect(aldo_debugger *self,
+                            struct mos6502 *cpu) br_nothrow;
+void aldo_debug_cpu_disconnect(aldo_debugger *self) br_nothrow;
+void aldo_debug_sync_bus(aldo_debugger *self) br_nothrow;
+void aldo_debug_check(aldo_debugger *self,
+                      const struct cycleclock *clk) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

@@ -99,8 +99,8 @@ static int decode_cart_chr(const struct cliargs *args, cart *c)
     return EXIT_SUCCESS;
 }
 
-static bool parse_dbg_expression(debugger *dbg, const char *restrict exprstr,
-                                 bool verbose)
+static bool parse_dbg_expression(aldo_debugger *dbg,
+                                 const char *restrict exprstr, bool verbose)
 {
     struct aldo_debugexpr expr;
     int err = aldo_haltexpr_parse_dbg(exprstr, &expr);
@@ -111,7 +111,7 @@ static bool parse_dbg_expression(debugger *dbg, const char *restrict exprstr,
         return false;
     } else {
         if (expr.type == ALDO_DBG_EXPR_HALT) {
-            debug_bp_add(dbg, expr.hexpr);
+            aldo_debug_bp_add(dbg, expr.hexpr);
             if (verbose) {
                 char buf[ALDO_HEXPR_FMT_SIZE];
                 err = aldo_haltexpr_desc(&expr.hexpr, buf);
@@ -123,7 +123,7 @@ static bool parse_dbg_expression(debugger *dbg, const char *restrict exprstr,
                 }
             }
         } else {
-            debug_set_vector_override(dbg, expr.resetvector);
+            aldo_debug_set_vector_override(dbg, expr.resetvector);
             if (verbose) {
                 printf(ResetOverrideFmt, expr.resetvector);
             }
@@ -132,7 +132,7 @@ static bool parse_dbg_expression(debugger *dbg, const char *restrict exprstr,
     return true;
 }
 
-static bool parse_debug_file(debugger *dbg, FILE *f,
+static bool parse_debug_file(aldo_debugger *dbg, FILE *f,
                              const struct cliargs *args)
 {
     char buf[ALDO_HEXPR_FMT_SIZE];
@@ -149,9 +149,9 @@ static bool parse_debug_file(debugger *dbg, FILE *f,
     return true;
 }
 
-static debugger *create_debugger(const struct cliargs *args)
+static aldo_debugger *create_debugger(const struct cliargs *args)
 {
-    debugger *dbg = debug_new();
+    aldo_debugger *dbg = aldo_debug_new();
     if (args->dbgfilepath) {
         FILE *f = fopen(args->dbgfilepath, "r");
         if (f) {
@@ -172,12 +172,12 @@ static debugger *create_debugger(const struct cliargs *args)
         }
     }
     if (args->resetvector != Aldo_NoResetVector) {
-        debug_set_vector_override(dbg, args->resetvector);
+        aldo_debug_set_vector_override(dbg, args->resetvector);
         printf(ResetOverrideFmt, args->resetvector);
     }
     return dbg;
 exit_dbg:
-    debug_free(dbg);
+    aldo_debug_free(dbg);
     return NULL;
 }
 
@@ -238,7 +238,7 @@ static int run_emu(const struct cliargs *args, cart *c)
     }
 
     if (emu.args->batch && emu.args->tron
-        && debug_bp_count(emu.debugger) == 0) {
+        && aldo_debug_bp_count(emu.debugger) == 0) {
         fputs("*** WARNING ***\nYou have turned on trace-logging"
               " with batch mode but specified no halt conditions;\n"
               "this can result in a very large trace file very quickly!\n"
@@ -283,7 +283,7 @@ exit_trace:
         fclose(tracelog);
     }
 exit_debug:
-    debug_free(emu.debugger);
+    aldo_debug_free(emu.debugger);
     return result;
 }
 

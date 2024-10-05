@@ -22,7 +22,7 @@ typedef struct aldo_nes001 aldo_nes;
 
 #include "bridgeopen.h"
 br_libexport br_ownresult
-aldo_nes *aldo_nes_new(debugger *dbg, bool bcdsupport,
+aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport,
                        FILE *tracelog) br_nothrow;
 br_libexport
 void aldo_nes_free(aldo_nes *self) br_nothrow;

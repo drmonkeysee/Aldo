@@ -215,13 +215,13 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
     mvwprintw(v->content, cursor_y++, 0, "Tracing: %s",
               emu->args->tron ? "On" : "Off");
     mvwaddstr(v->content, cursor_y++, 0, "Reset Override: ");
-    int resetvector = debug_vector_override(emu->debugger);
+    int resetvector = aldo_debug_vector_override(emu->debugger);
     if (resetvector == Aldo_NoResetVector) {
         waddstr(v->content, "None");
     } else {
         wprintw(v->content, "$%04X", resetvector);
     }
-    const struct breakpoint *bp = debug_halted(emu->debugger);
+    const struct aldo_breakpoint *bp = aldo_debug_halted(emu->debugger);
     char break_desc[ALDO_HEXPR_FMT_SIZE];
     int err = aldo_haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
     mvwprintw(v->content, cursor_y, 0, "Break: %s",
@@ -291,7 +291,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
     hi = vectors[3];
     mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     RST",
               CPU_VECTOR_RST, lo, hi);
-    int resetvector = debug_vector_override(emu->debugger);
+    int resetvector = aldo_debug_vector_override(emu->debugger);
     if (resetvector == Aldo_NoResetVector) {
         wprintw(v->content, " $%04X", bytowr(lo, hi));
     } else {

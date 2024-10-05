@@ -26,7 +26,7 @@ static const int PpuRatio = 3;
 // Cartridge RAM/ROM and Controller Input.
 struct aldo_nes001 {
     cart *cart;                 // Game Cartridge; Non-owning Pointer
-    debugger *dbg;              // Debugger Context; Non-owning Pointer
+    aldo_debugger *dbg;              // Debugger Context; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
     struct mos6502 cpu;         // CPU Core of RP2A03 Chip
     struct aldo_rp2c02 ppu;     // RP2C02 PPU
@@ -157,14 +157,14 @@ static void connect_cart(struct aldo_nes001 *self, cart *c)
     bool r = cart_mbus_connect(self->cart, self->cpu.mbus);
     assert(r);
     cart_vbus_connect(self->cart, self->ppu.vbus);
-    debug_sync_bus(self->dbg);
+    aldo_debug_sync_bus(self->dbg);
 }
 
 static void disconnect_cart(struct aldo_nes001 *self)
 {
     // NOTE: debugger may have been attached to a cart-less CPU bus so reset
     // debugger even if there is no existing cart.
-    debug_reset(self->dbg);
+    aldo_debug_reset(self->dbg);
     if (!self->cart) return;
     cart_vbus_disconnect(self->cart, self->ppu.vbus);
     cart_mbus_disconnect(self->cart, self->cpu.mbus);
@@ -176,13 +176,13 @@ static void setup(struct aldo_nes001 *self)
     create_mbus(self);
     create_vbus(self);
     aldo_ppu_connect(&self->ppu, self->cpu.mbus);
-    debug_cpu_connect(self->dbg, &self->cpu);
+    aldo_debug_cpu_connect(self->dbg, &self->cpu);
 }
 
 static void teardown(struct aldo_nes001 *self)
 {
     disconnect_cart(self);
-    debug_cpu_disconnect(self->dbg);
+    aldo_debug_cpu_disconnect(self->dbg);
     bus_free(self->ppu.vbus);
     bus_free(self->cpu.mbus);
 }
@@ -264,14 +264,14 @@ static void clock_cpu(struct aldo_nes001 *self, struct cycleclock *clock)
     default:
         break;
     }
-    debug_check(self->dbg, clock);
+    aldo_debug_check(self->dbg, clock);
 }
 
 //
 // MARK: - Public Interface
 //
 
-aldo_nes *aldo_nes_new(debugger *dbg, bool bcdsupport, FILE *tracelog)
+aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
 {
     assert(dbg != NULL);
 

@@ -123,8 +123,8 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
     printf("Total Cycles: %" PRIu64 "\n", c->cyclock.cycles);
     printf("Avg Cycles/sec: %.2f\n",
            (double)c->cyclock.cycles / c->cyclock.runtime);
-    const struct breakpoint *bp;
-    if ((bp = debug_halted(emu->debugger))) {
+    const struct aldo_breakpoint *bp;
+    if ((bp = aldo_debug_halted(emu->debugger))) {
         char break_desc[ALDO_HEXPR_FMT_SIZE];
         int err = aldo_haltexpr_desc(&bp->expr, break_desc);
         printf("Break: %s\n",

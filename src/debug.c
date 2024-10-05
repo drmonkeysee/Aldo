@@ -16,10 +16,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct debugger_context {
+struct aldo_debugger_context {
     struct breakpoint_vector {
         size_t capacity, size;
-        struct breakpoint *items;
+        struct aldo_breakpoint *items;
     } breakpoints;
     struct mos6502 *cpu;    // Non-owning Pointer
     struct resdecorator {
@@ -31,7 +31,7 @@ struct debugger_context {
     int resetvector;
 };
 
-static void remove_reset_override(struct debugger_context *self)
+static void remove_reset_override(struct aldo_debugger_context *self)
 {
     if (!self->dec.active) return;
 
@@ -40,12 +40,12 @@ static void remove_reset_override(struct debugger_context *self)
     self->dec = (struct resdecorator){0};
 }
 
-static void update_reset_override(struct debugger_context *self)
+static void update_reset_override(struct aldo_debugger_context *self)
 {
     if (self->resetvector == Aldo_NoResetVector) {
         remove_reset_override(self);
     } else {
-        debug_sync_bus(self);
+        aldo_debug_sync_bus(self);
     }
 }
 
@@ -89,20 +89,20 @@ static size_t resetaddr_copy(const void *restrict ctx, uint16_t addr,
 // MARK: - Breakpoints
 //
 
-static bool halt_address(const struct breakpoint *bp,
+static bool halt_address(const struct aldo_breakpoint *bp,
                          const struct mos6502 *cpu)
 {
     return cpu->signal.sync && cpu->addrinst == bp->expr.address;
 }
 
-static bool halt_runtime(const struct breakpoint *bp,
+static bool halt_runtime(const struct aldo_breakpoint *bp,
                          const struct cycleclock *clk)
 {
     return isgreaterequal(clk->emutime - bp->expr.runtime,
                           1.0 / ALDO_MS_PER_S);
 }
 
-static bool halt_cycles(const struct breakpoint *bp,
+static bool halt_cycles(const struct aldo_breakpoint *bp,
                         const struct cycleclock *clk)
 {
     return clk->cycles == bp->expr.cycles;
@@ -132,8 +132,8 @@ static void bpvector_init(struct breakpoint_vector *vec)
     };
 }
 
-static struct breakpoint *bpvector_at(const struct breakpoint_vector *vec,
-                                      ptrdiff_t at)
+static struct aldo_breakpoint *bpvector_at(const struct breakpoint_vector *vec,
+                                           ptrdiff_t at)
 {
     if (bpvector_valid_index(vec, at)) return vec->items + at;
     return NULL;
@@ -153,8 +153,8 @@ static void bpvector_insert(struct breakpoint_vector *vec,
     if (vec->size == vec->capacity) {
         bpvector_resize(vec);
     }
-    struct breakpoint *slot = vec->items + vec->size;
-    *slot = (struct breakpoint){expr, true};
+    struct aldo_breakpoint *slot = vec->items + vec->size;
+    *slot = (struct aldo_breakpoint){expr, true};
     ++vec->size;
 }
 
@@ -163,7 +163,7 @@ static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
                                 const struct mos6502 *cpu)
 {
     for (ptrdiff_t i = 0; i < (ptrdiff_t)vec->size; ++i) {
-        const struct breakpoint *bp = vec->items + i;
+        const struct aldo_breakpoint *bp = vec->items + i;
         if (!bp->enabled) continue;
         switch (bp->expr.cond) {
         case ALDO_HLT_ADDR:
@@ -190,7 +190,7 @@ static bool bpvector_remove(struct breakpoint_vector *vec, ptrdiff_t at)
     if (!bpvector_valid_index(vec, at)) return false;
 
     if (at < (ptrdiff_t)vec->size - 1) {
-        const struct breakpoint
+        const struct aldo_breakpoint
             *rest = vec->items + at + 1,
             *end = vec->items + vec->size;
         ptrdiff_t count = end - rest;
@@ -218,10 +218,10 @@ static void bpvector_free(struct breakpoint_vector *vec)
 const int Aldo_NoResetVector = -1;
 const ptrdiff_t Aldo_NoBreakpoint = -1;
 
-debugger *debug_new(void)
+aldo_debugger *aldo_debug_new(void)
 {
-    struct debugger_context *self = malloc(sizeof *self);
-    *self = (struct debugger_context){
+    struct aldo_debugger_context *self = malloc(sizeof *self);
+    *self = (struct aldo_debugger_context){
         .halted = Aldo_NoBreakpoint,
         .resetvector = Aldo_NoResetVector,
     };
@@ -229,7 +229,7 @@ debugger *debug_new(void)
     return self;
 }
 
-void debug_free(debugger *self)
+void aldo_debug_free(aldo_debugger *self)
 {
     assert(self != NULL);
 
@@ -237,14 +237,14 @@ void debug_free(debugger *self)
     free(self);
 }
 
-int debug_vector_override(debugger *self)
+int aldo_debug_vector_override(aldo_debugger *self)
 {
     assert(self != NULL);
 
     return self->resetvector;
 }
 
-void debug_set_vector_override(debugger *self, int resetvector)
+void aldo_debug_set_vector_override(aldo_debugger *self, int resetvector)
 {
     assert(self != NULL);
 
@@ -252,7 +252,7 @@ void debug_set_vector_override(debugger *self, int resetvector)
     update_reset_override(self);
 }
 
-void debug_bp_add(debugger *self, struct aldo_haltexpr expr)
+void aldo_debug_bp_add(aldo_debugger *self, struct aldo_haltexpr expr)
 {
     assert(self != NULL);
     assert(ALDO_HLT_NONE < expr.cond && expr.cond < ALDO_HLT_COUNT);
@@ -260,40 +260,41 @@ void debug_bp_add(debugger *self, struct aldo_haltexpr expr)
     bpvector_insert(&self->breakpoints, expr);
 }
 
-const struct breakpoint *debug_bp_at(debugger *self, ptrdiff_t at)
+const struct aldo_breakpoint *aldo_debug_bp_at(aldo_debugger *self,
+                                               ptrdiff_t at)
 {
     assert(self != NULL);
 
     return bpvector_at(&self->breakpoints, at);
 }
 
-void debug_bp_enable(debugger *self, ptrdiff_t at, bool enabled)
+void aldo_debug_bp_enable(aldo_debugger *self, ptrdiff_t at, bool enabled)
 {
     assert(self != NULL);
 
-    struct breakpoint *bp = bpvector_at(&self->breakpoints, at);
+    struct aldo_breakpoint *bp = bpvector_at(&self->breakpoints, at);
     if (bp) {
         bp->enabled = enabled;
     }
 }
 
-const struct breakpoint *debug_halted(debugger *self)
+const struct aldo_breakpoint *aldo_debug_halted(aldo_debugger *self)
 {
     assert(self != NULL);
 
     return self->halted == Aldo_NoBreakpoint
             ? NULL
-            : debug_bp_at(self, self->halted);
+            : aldo_debug_bp_at(self, self->halted);
 }
 
-ptrdiff_t debug_halted_at(debugger *self)
+ptrdiff_t aldo_debug_halted_at(aldo_debugger *self)
 {
     assert(self != NULL);
 
     return self->halted;
 }
 
-void debug_bp_remove(debugger *self, ptrdiff_t at)
+void aldo_debug_bp_remove(aldo_debugger *self, ptrdiff_t at)
 {
     assert(self != NULL);
 
@@ -309,7 +310,7 @@ void debug_bp_remove(debugger *self, ptrdiff_t at)
     }
 }
 
-void debug_bp_clear(debugger *self)
+void aldo_debug_bp_clear(aldo_debugger *self)
 {
     assert(self != NULL);
 
@@ -317,26 +318,26 @@ void debug_bp_clear(debugger *self)
     self->halted = Aldo_NoBreakpoint;
 }
 
-size_t debug_bp_count(debugger *self)
+size_t aldo_debug_bp_count(aldo_debugger *self)
 {
     assert(self != NULL);
 
     return self->breakpoints.size;
 }
 
-void debug_reset(debugger *self)
+void aldo_debug_reset(aldo_debugger *self)
 {
     assert(self != NULL);
 
-    debug_set_vector_override(self, Aldo_NoResetVector);
-    debug_bp_clear(self);
+    aldo_debug_set_vector_override(self, Aldo_NoResetVector);
+    aldo_debug_bp_clear(self);
 }
 
 //
 // MARK: - Internal Interface
 //
 
-void debug_cpu_connect(debugger *self, struct mos6502 *cpu)
+void aldo_debug_cpu_connect(aldo_debugger *self, struct mos6502 *cpu)
 {
     assert(self != NULL);
     assert(cpu != NULL);
@@ -344,14 +345,14 @@ void debug_cpu_connect(debugger *self, struct mos6502 *cpu)
     self->cpu = cpu;
 }
 
-void debug_cpu_disconnect(debugger *self)
+void aldo_debug_cpu_disconnect(aldo_debugger *self)
 {
     assert(self != NULL);
 
     self->cpu = NULL;
 }
 
-void debug_sync_bus(debugger *self)
+void aldo_debug_sync_bus(aldo_debugger *self)
 {
     assert(self != NULL);
 
@@ -370,7 +371,7 @@ void debug_sync_bus(debugger *self)
                                 resetaddr_device, &self->dec.inner);
 }
 
-void debug_check(debugger *self, const struct cycleclock *clk)
+void aldo_debug_check(aldo_debugger *self, const struct cycleclock *clk)
 {
     assert(self != NULL);
     assert(clk != NULL);

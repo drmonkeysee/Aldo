@@ -40,7 +40,7 @@ auto update_emu(aldo::Emulator& emu, aldo::viewstate& vs) noexcept
     emu.update(vs);
 }
 
-auto runloop(const gui_platform& p, debugger* debug, aldo_nes* console)
+auto runloop(const gui_platform& p, aldo_debugger* debug, aldo_nes* console)
 {
     aldo::Emulator emu{
         aldo::debug_handle{debug}, aldo::console_handle{console}, p,
@@ -72,7 +72,7 @@ auto runloop(const gui_platform& p, debugger* debug, aldo_nes* console)
 // MARK: - Public Interface
 //
 
-int aldo::ui_sdl_runloop(const gui_platform* platform, debugger* debug,
+int aldo::ui_sdl_runloop(const gui_platform* platform, aldo_debugger* debug,
                          aldo_nes* console) noexcept
 {
     assert(platform != nullptr);

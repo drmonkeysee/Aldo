@@ -2423,12 +2423,12 @@ static void datapath_rst_cycle_six(void *ctx)
 
 static void setup_peek(void **ctx)
 {
-    *ctx = debug_new();
+    *ctx = aldo_debug_new();
 }
 
 static void teardown_peek(void **ctx)
 {
-    debug_free(*ctx);
+    aldo_debug_free(*ctx);
 }
 
 static void peek_immediate(void *ctx)
@@ -2618,8 +2618,8 @@ static void peek_interrupt(void *ctx)
     cpu.a = 0x10;
     cpu.irq = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snp);
-    debugger *dbg = ctx;
-    debug_set_vector_override(dbg, Aldo_NoResetVector);
+    aldo_debugger *dbg = ctx;
+    aldo_debug_set_vector_override(dbg, Aldo_NoResetVector);
     snp.prg.vectors[4] = 0xbb;
     snp.prg.vectors[5] = 0xaa;
 
@@ -2642,8 +2642,8 @@ static void peek_overridden_reset(void *ctx)
     cpu.a = 0x10;
     cpu.rst = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snp);
-    debugger *dbg = ctx;
-    debug_set_vector_override(dbg, 0xccdd);
+    aldo_debugger *dbg = ctx;
+    aldo_debug_set_vector_override(dbg, 0xccdd);
     snp.prg.vectors[2] = 0xbb;
     snp.prg.vectors[3] = 0xaa;
 
@@ -2666,8 +2666,8 @@ static void peek_overridden_non_reset(void *ctx)
     cpu.a = 0x10;
     cpu.nmi = CSGS_COMMITTED;
     cpu_snapshot(&cpu, &snp);
-    debugger *dbg = ctx;
-    debug_set_vector_override(dbg, 0xccdd);
+    aldo_debugger *dbg = ctx;
+    aldo_debug_set_vector_override(dbg, 0xccdd);
     snp.prg.vectors[0] = 0xff;
     snp.prg.vectors[1] = 0xee;
     snp.prg.vectors[2] = 0xbb;

@@ -22,7 +22,7 @@ static int run_emu(const struct gui_platform *platform)
 {
     // NOTE: create initial debugger and console objects before launching
     // UI loop cuz if we can't get this far then bail immediately.
-    debugger *dbg = debug_new();
+    aldo_debugger *dbg = aldo_debug_new();
     if (!dbg) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "Unable to initialize debugger!");
@@ -33,7 +33,7 @@ static int run_emu(const struct gui_platform *platform)
     if (!console) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "Unable to initialize console!");
-        debug_free(dbg);
+        aldo_debug_free(dbg);
         return EXIT_FAILURE;
     }
     aldo_nes_powerup(console, NULL, false);

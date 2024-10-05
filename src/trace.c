@@ -35,7 +35,7 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
 }
 
 static int trace_instruction_peek(FILE *tracelog, struct mos6502 *cpu,
-                                  debugger *dbg,
+                                  aldo_debugger *dbg,
                                   const struct aldo_snapshot *snp)
 {
     char peek[ALDO_DIS_PEEK_SIZE];
@@ -68,7 +68,7 @@ static void trace_registers(FILE *tracelog, const struct aldo_snapshot *snp)
 
 void aldo_trace_line(FILE *tracelog, uint64_t cycles,
                      struct aldo_ppu_coord pixel, struct mos6502 *cpu,
-                     debugger *dbg, const struct aldo_snapshot *snp)
+                     aldo_debugger *dbg, const struct aldo_snapshot *snp)
 {
     assert(tracelog != NULL);
     assert(cpu != NULL);

@@ -19,7 +19,7 @@
 static void adc(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;    // 10 + 6
 
@@ -38,7 +38,7 @@ static void adc(void *ctx)
 static void adc_carryin(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 + (6 + C)
@@ -58,7 +58,7 @@ static void adc_carryin(void *ctx)
 static void adc_carry(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;   // (-1) + 6
 
@@ -77,7 +77,7 @@ static void adc_carry(void *ctx)
 static void adc_zero(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
 
@@ -96,7 +96,7 @@ static void adc_zero(void *ctx)
 static void adc_negative(void *ctx)
 {
     uint8_t mem[] = {0x69, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;  // 0 + (-1)
 
@@ -115,7 +115,7 @@ static void adc_negative(void *ctx)
 static void adc_carry_zero(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x7f};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x81;   // (-127) + 127
 
@@ -134,7 +134,7 @@ static void adc_carry_zero(void *ctx)
 static void adc_carry_negative(void *ctx)
 {
     uint8_t mem[] = {0x69, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;   // (-1) + (-1)
 
@@ -153,7 +153,7 @@ static void adc_carry_negative(void *ctx)
 static void adc_overflow_to_negative(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x7f;   // 127 + 1
 
@@ -172,7 +172,7 @@ static void adc_overflow_to_negative(void *ctx)
 static void adc_overflow_to_positive(void *ctx)
 {
     uint8_t mem[] = {0x69, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x80;   // (-128) + (-1)
 
@@ -191,7 +191,7 @@ static void adc_overflow_to_positive(void *ctx)
 static void adc_carryin_causes_overflow(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0x7f;   // 127 + (0 + C)
@@ -211,7 +211,7 @@ static void adc_carryin_causes_overflow(void *ctx)
 static void adc_carryin_avoids_overflow(void *ctx)
 {
     uint8_t mem[] = {0x69, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0x80;   // (-128) + (-1 + C)
@@ -232,7 +232,7 @@ static void adc_carryin_avoids_overflow(void *ctx)
 static void adc_overflow_does_not_include_carry(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x7f};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = false;
     cpu.pc = 0;
@@ -285,7 +285,7 @@ static void adc_overflow_does_not_include_carry(void *ctx)
 static void adc_bcd(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -306,7 +306,7 @@ static void adc_bcd(void *ctx)
 static void adc_bcd_digit_rollover(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -327,7 +327,7 @@ static void adc_bcd_digit_rollover(void *ctx)
 static void adc_bcd_not_supported(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = false;
     cpu.p.d = true;
@@ -348,7 +348,7 @@ static void adc_bcd_not_supported(void *ctx)
 static void adc_bcd_carryin(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.c = true;
@@ -370,7 +370,7 @@ static void adc_bcd_carryin(void *ctx)
 static void adc_bcd_carry(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -391,7 +391,7 @@ static void adc_bcd_carry(void *ctx)
 static void adc_bcd_zero(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -412,7 +412,7 @@ static void adc_bcd_zero(void *ctx)
 static void adc_bcd_missed_zero(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -433,7 +433,7 @@ static void adc_bcd_missed_zero(void *ctx)
 static void adc_bcd_negative(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -454,7 +454,7 @@ static void adc_bcd_negative(void *ctx)
 static void adc_bcd_overflow_to_negative(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x30};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -475,7 +475,7 @@ static void adc_bcd_overflow_to_negative(void *ctx)
 static void adc_bcd_overflow_to_positive(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x90};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -496,7 +496,7 @@ static void adc_bcd_overflow_to_positive(void *ctx)
 static void adc_bcd_carry_overflow(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x90};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -517,7 +517,7 @@ static void adc_bcd_carry_overflow(void *ctx)
 static void adc_bcd_carryin_causes_overflow(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x29};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.c = true;
@@ -539,7 +539,7 @@ static void adc_bcd_carryin_causes_overflow(void *ctx)
 static void adc_bcd_overflow_does_not_include_carry(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x79};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -594,7 +594,7 @@ static void adc_bcd_overflow_does_not_include_carry(void *ctx)
 static void adc_bcd_max(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x99};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -615,7 +615,7 @@ static void adc_bcd_max(void *ctx)
 static void adc_bcd_hex(void *ctx)
 {
     uint8_t mem[] = {0x69, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -636,7 +636,7 @@ static void adc_bcd_hex(void *ctx)
 static void adc_bcd_high_hex(void *ctx)
 {
     uint8_t mem[] = {0x69, 0xf};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -657,7 +657,7 @@ static void adc_bcd_high_hex(void *ctx)
 static void adc_bcd_max_hex(void *ctx)
 {
     uint8_t mem[] = {0x69, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -680,7 +680,7 @@ static void adc_bcd_max_hex(void *ctx)
 static void adc_bcd_visual6502_cases(void *ctx)
 {
     uint8_t mem[] = {0x69, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -721,7 +721,7 @@ static void adc_bcd_visual6502_cases(void *ctx)
 static void and(void *ctx)
 {
     uint8_t mem[] = {0x29, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
 
@@ -738,7 +738,7 @@ static void and(void *ctx)
 static void and_zero(void *ctx)
 {
     uint8_t mem[] = {0x29, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xaa;
 
@@ -755,7 +755,7 @@ static void and_zero(void *ctx)
 static void and_negative(void *ctx)
 {
     uint8_t mem[] = {0x29, 0xfc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xfa;
 
@@ -772,7 +772,7 @@ static void and_negative(void *ctx)
 static void cmp_equal(void *ctx)
 {
     uint8_t mem[] = {0xc9, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
 
@@ -790,7 +790,7 @@ static void cmp_equal(void *ctx)
 static void cmp_lt(void *ctx)
 {
     uint8_t mem[] = {0xc9, 0x40};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
 
@@ -808,7 +808,7 @@ static void cmp_lt(void *ctx)
 static void cmp_gt(void *ctx)
 {
     uint8_t mem[] = {0xc9, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
 
@@ -826,7 +826,7 @@ static void cmp_gt(void *ctx)
 static void cmp_max_to_min(void *ctx)
 {
     uint8_t mem[] = {0xc9, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
 
@@ -844,7 +844,7 @@ static void cmp_max_to_min(void *ctx)
 static void cmp_max_to_max(void *ctx)
 {
     uint8_t mem[] = {0xc9, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
 
@@ -862,7 +862,7 @@ static void cmp_max_to_max(void *ctx)
 static void cmp_min_to_max(void *ctx)
 {
     uint8_t mem[] = {0xc9, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
 
@@ -880,7 +880,7 @@ static void cmp_min_to_max(void *ctx)
 static void cmp_min_to_min(void *ctx)
 {
     uint8_t mem[] = {0xc9, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
 
@@ -898,7 +898,7 @@ static void cmp_min_to_min(void *ctx)
 static void cmp_neg_equal(void *ctx)
 {
     uint8_t mem[] = {0xc9, 0xa0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa0;
 
@@ -916,7 +916,7 @@ static void cmp_neg_equal(void *ctx)
 static void cmp_neg_lt(void *ctx)
 {
     uint8_t mem[] = {0xc9, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa0;
 
@@ -934,7 +934,7 @@ static void cmp_neg_lt(void *ctx)
 static void cmp_neg_gt(void *ctx)
 {
     uint8_t mem[] = {0xc9, 0x90};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa0;
 
@@ -952,7 +952,7 @@ static void cmp_neg_gt(void *ctx)
 static void cmp_negative_to_positive(void *ctx)
 {
     uint8_t mem[] = {0xc9, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x80;    // Effectively -128 - 1 = 127
 
@@ -971,7 +971,7 @@ static void cmp_negative_to_positive(void *ctx)
 static void cmp_positive_to_negative(void *ctx)
 {
     uint8_t mem[] = {0xc9, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;  // Effectively 0 - 1 = -1
 
@@ -990,7 +990,7 @@ static void cmp_positive_to_negative(void *ctx)
 static void cpx_equal(void *ctx)
 {
     uint8_t mem[] = {0xe0, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0x10;
 
@@ -1008,7 +1008,7 @@ static void cpx_equal(void *ctx)
 static void cpx_lt(void *ctx)
 {
     uint8_t mem[] = {0xe0, 0x40};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0x10;
 
@@ -1026,7 +1026,7 @@ static void cpx_lt(void *ctx)
 static void cpx_gt(void *ctx)
 {
     uint8_t mem[] = {0xe0, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0x10;
 
@@ -1044,7 +1044,7 @@ static void cpx_gt(void *ctx)
 static void cpx_max_to_min(void *ctx)
 {
     uint8_t mem[] = {0xe0, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0xff;
 
@@ -1062,7 +1062,7 @@ static void cpx_max_to_min(void *ctx)
 static void cpx_max_to_max(void *ctx)
 {
     uint8_t mem[] = {0xe0, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0xff;
 
@@ -1080,7 +1080,7 @@ static void cpx_max_to_max(void *ctx)
 static void cpx_min_to_max(void *ctx)
 {
     uint8_t mem[] = {0xe0, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0;
 
@@ -1098,7 +1098,7 @@ static void cpx_min_to_max(void *ctx)
 static void cpx_min_to_min(void *ctx)
 {
     uint8_t mem[] = {0xe0, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0;
 
@@ -1116,7 +1116,7 @@ static void cpx_min_to_min(void *ctx)
 static void cpx_neg_equal(void *ctx)
 {
     uint8_t mem[] = {0xe0, 0xa0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0xa0;
 
@@ -1134,7 +1134,7 @@ static void cpx_neg_equal(void *ctx)
 static void cpx_neg_lt(void *ctx)
 {
     uint8_t mem[] = {0xe0, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0xa0;
 
@@ -1152,7 +1152,7 @@ static void cpx_neg_lt(void *ctx)
 static void cpx_neg_gt(void *ctx)
 {
     uint8_t mem[] = {0xe0, 0x90};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0xa0;
 
@@ -1170,7 +1170,7 @@ static void cpx_neg_gt(void *ctx)
 static void cpx_negative_to_positive(void *ctx)
 {
     uint8_t mem[] = {0xe0, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0x80;    // Effectively -128 - 1 = 127
 
@@ -1189,7 +1189,7 @@ static void cpx_negative_to_positive(void *ctx)
 static void cpx_positive_to_negative(void *ctx)
 {
     uint8_t mem[] = {0xe0, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0;  // Effectively 0 - 1 = -1
 
@@ -1208,7 +1208,7 @@ static void cpx_positive_to_negative(void *ctx)
 static void cpy_equal(void *ctx)
 {
     uint8_t mem[] = {0xc0, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.y = 0x10;
 
@@ -1226,7 +1226,7 @@ static void cpy_equal(void *ctx)
 static void cpy_lt(void *ctx)
 {
     uint8_t mem[] = {0xc0, 0x40};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.y = 0x10;
 
@@ -1244,7 +1244,7 @@ static void cpy_lt(void *ctx)
 static void cpy_gt(void *ctx)
 {
     uint8_t mem[] = {0xc0, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.y = 0x10;
 
@@ -1262,7 +1262,7 @@ static void cpy_gt(void *ctx)
 static void cpy_max_to_min(void *ctx)
 {
     uint8_t mem[] = {0xc0, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.y = 0xff;
 
@@ -1280,7 +1280,7 @@ static void cpy_max_to_min(void *ctx)
 static void cpy_max_to_max(void *ctx)
 {
     uint8_t mem[] = {0xc0, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.y = 0xff;
 
@@ -1298,7 +1298,7 @@ static void cpy_max_to_max(void *ctx)
 static void cpy_min_to_max(void *ctx)
 {
     uint8_t mem[] = {0xc0, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.y = 0;
 
@@ -1316,7 +1316,7 @@ static void cpy_min_to_max(void *ctx)
 static void cpy_min_to_min(void *ctx)
 {
     uint8_t mem[] = {0xc0, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.y = 0;
 
@@ -1334,7 +1334,7 @@ static void cpy_min_to_min(void *ctx)
 static void cpy_neg_equal(void *ctx)
 {
     uint8_t mem[] = {0xc0, 0xa0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.y = 0xa0;
 
@@ -1352,7 +1352,7 @@ static void cpy_neg_equal(void *ctx)
 static void cpy_neg_lt(void *ctx)
 {
     uint8_t mem[] = {0xc0, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.y = 0xa0;
 
@@ -1370,7 +1370,7 @@ static void cpy_neg_lt(void *ctx)
 static void cpy_neg_gt(void *ctx)
 {
     uint8_t mem[] = {0xc0, 0x90};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.y = 0xa0;
 
@@ -1388,7 +1388,7 @@ static void cpy_neg_gt(void *ctx)
 static void cpy_negative_to_positive(void *ctx)
 {
     uint8_t mem[] = {0xc0, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.y = 0x80;    // Effectively -128 - 1 = 127
 
@@ -1407,7 +1407,7 @@ static void cpy_negative_to_positive(void *ctx)
 static void cpy_positive_to_negative(void *ctx)
 {
     uint8_t mem[] = {0xc0, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.y = 0;  // Effectively 0 - 1 = -1
 
@@ -1426,7 +1426,7 @@ static void cpy_positive_to_negative(void *ctx)
 static void eor(void *ctx)
 {
     uint8_t mem[] = {0x49, 0xfc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xfa;
 
@@ -1443,7 +1443,7 @@ static void eor(void *ctx)
 static void eor_zero(void *ctx)
 {
     uint8_t mem[] = {0x49, 0xaa};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xaa;
 
@@ -1460,7 +1460,7 @@ static void eor_zero(void *ctx)
 static void eor_negative(void *ctx)
 {
     uint8_t mem[] = {0x49, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xfa;
 
@@ -1477,7 +1477,7 @@ static void eor_negative(void *ctx)
 static void lda(void *ctx)
 {
     uint8_t mem[] = {0xa9, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -1493,7 +1493,7 @@ static void lda(void *ctx)
 static void lda_zero(void *ctx)
 {
     uint8_t mem[] = {0xa9, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -1509,7 +1509,7 @@ static void lda_zero(void *ctx)
 static void lda_negative(void *ctx)
 {
     uint8_t mem[] = {0xa9, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -1525,7 +1525,7 @@ static void lda_negative(void *ctx)
 static void ldx(void *ctx)
 {
     uint8_t mem[] = {0xa2, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -1541,7 +1541,7 @@ static void ldx(void *ctx)
 static void ldx_zero(void *ctx)
 {
     uint8_t mem[] = {0xa2, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -1557,7 +1557,7 @@ static void ldx_zero(void *ctx)
 static void ldx_negative(void *ctx)
 {
     uint8_t mem[] = {0xa2, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -1573,7 +1573,7 @@ static void ldx_negative(void *ctx)
 static void ldy(void *ctx)
 {
     uint8_t mem[] = {0xa0, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -1589,7 +1589,7 @@ static void ldy(void *ctx)
 static void ldy_zero(void *ctx)
 {
     uint8_t mem[] = {0xa0, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -1605,7 +1605,7 @@ static void ldy_zero(void *ctx)
 static void ldy_negative(void *ctx)
 {
     uint8_t mem[] = {0xa0, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -1621,7 +1621,7 @@ static void ldy_negative(void *ctx)
 static void ora(void *ctx)
 {
     uint8_t mem[] = {0x9, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
 
@@ -1638,7 +1638,7 @@ static void ora(void *ctx)
 static void ora_zero(void *ctx)
 {
     uint8_t mem[] = {0x9, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0;
 
@@ -1655,7 +1655,7 @@ static void ora_zero(void *ctx)
 static void ora_negative(void *ctx)
 {
     uint8_t mem[] = {0x9, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x45;
 
@@ -1672,7 +1672,7 @@ static void ora_negative(void *ctx)
 static void sbc(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
@@ -1692,7 +1692,7 @@ static void sbc(void *ctx)
 static void sbc_borrowout(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;    // 10 - 6 - B
 
@@ -1711,7 +1711,7 @@ static void sbc_borrowout(void *ctx)
 static void sbc_borrow(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0xfe};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0xa;   // 10 - (-2)
@@ -1731,7 +1731,7 @@ static void sbc_borrow(void *ctx)
 static void sbc_zero(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0;
@@ -1751,7 +1751,7 @@ static void sbc_zero(void *ctx)
 static void sbc_negative(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0xff;    // -1 - 1
@@ -1771,7 +1771,7 @@ static void sbc_negative(void *ctx)
 static void sbc_borrow_negative(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0;  // 0 - 1
@@ -1791,7 +1791,7 @@ static void sbc_borrow_negative(void *ctx)
 static void sbc_overflow_to_negative(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0x7f;   // 127 - (-1)
@@ -1811,7 +1811,7 @@ static void sbc_overflow_to_negative(void *ctx)
 static void sbc_overflow_to_positive(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0x80;   // (-128) - 1
@@ -1831,7 +1831,7 @@ static void sbc_overflow_to_positive(void *ctx)
 static void sbc_borrowout_causes_overflow(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x80;   // (-128) - 0 - B
 
@@ -1850,7 +1850,7 @@ static void sbc_borrowout_causes_overflow(void *ctx)
 static void sbc_borrowout_avoids_overflow(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x7f;   // 127 - (-1) - B
 
@@ -1870,7 +1870,7 @@ static void sbc_borrowout_avoids_overflow(void *ctx)
 static void sbc_overflow_does_not_include_borrow(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.pc = 0;
@@ -1923,7 +1923,7 @@ static void sbc_overflow_does_not_include_borrow(void *ctx)
 static void sbc_bcd(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x2};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -1945,7 +1945,7 @@ static void sbc_bcd(void *ctx)
 static void sbc_bcd_digit_rollover(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -1967,7 +1967,7 @@ static void sbc_bcd_digit_rollover(void *ctx)
 static void sbc_bcd_not_supported(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = false;
     cpu.p.d = true;
@@ -1989,7 +1989,7 @@ static void sbc_bcd_not_supported(void *ctx)
 static void sbc_bcd_borrowout(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2010,7 +2010,7 @@ static void sbc_bcd_borrowout(void *ctx)
 static void sbc_bcd_borrow(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x79};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2032,7 +2032,7 @@ static void sbc_bcd_borrow(void *ctx)
 static void sbc_bcd_zero(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2054,7 +2054,7 @@ static void sbc_bcd_zero(void *ctx)
 static void sbc_bcd_negative(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2076,7 +2076,7 @@ static void sbc_bcd_negative(void *ctx)
 static void sbc_bcd_borrow_negative(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2098,7 +2098,7 @@ static void sbc_bcd_borrow_negative(void *ctx)
 static void sbc_bcd_overflow_to_negative(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x90};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2120,7 +2120,7 @@ static void sbc_bcd_overflow_to_negative(void *ctx)
 static void sbc_bcd_overflow_to_positive(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2142,7 +2142,7 @@ static void sbc_bcd_overflow_to_positive(void *ctx)
 static void sbc_bcd_borrowout_causes_overflow(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2164,7 +2164,7 @@ static void sbc_bcd_borrowout_causes_overflow(void *ctx)
 static void sbc_bcd_overflow_does_not_include_borrow(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2219,7 +2219,7 @@ static void sbc_bcd_overflow_does_not_include_borrow(void *ctx)
 static void sbc_bcd_min(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2241,7 +2241,7 @@ static void sbc_bcd_min(void *ctx)
 static void sbc_bcd_max(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x99};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2263,7 +2263,7 @@ static void sbc_bcd_max(void *ctx)
 static void sbc_bcd_hex(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2285,7 +2285,7 @@ static void sbc_bcd_hex(void *ctx)
 static void sbc_bcd_high_hex(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2307,7 +2307,7 @@ static void sbc_bcd_high_hex(void *ctx)
 static void sbc_bcd_max_hex(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0x99};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2346,7 +2346,7 @@ static void sbc_bcd_max_hex(void *ctx)
 static void sbc_bcd_visual6502_cases(void *ctx)
 {
     uint8_t mem[] = {0xe9, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2388,7 +2388,7 @@ static void sbc_bcd_visual6502_cases(void *ctx)
 static void alr(void *ctx)
 {
     uint8_t mem[] = {0x4b, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa4;
 
@@ -2406,7 +2406,7 @@ static void alr(void *ctx)
 static void alr_carry(void *ctx)
 {
     uint8_t mem[] = {0x4b, 0xf1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
 
@@ -2424,7 +2424,7 @@ static void alr_carry(void *ctx)
 static void alr_zero(void *ctx)
 {
     uint8_t mem[] = {0x4b, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
 
@@ -2442,7 +2442,7 @@ static void alr_zero(void *ctx)
 static void alr_carryzero(void *ctx)
 {
     uint8_t mem[] = {0x4b, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
 
@@ -2460,7 +2460,7 @@ static void alr_carryzero(void *ctx)
 static void alr_negative_to_positive(void *ctx)
 {
     uint8_t mem[] = {0x4b, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x80;
 
@@ -2478,7 +2478,7 @@ static void alr_negative_to_positive(void *ctx)
 static void alr_all_ones(void *ctx)
 {
     uint8_t mem[] = {0x4b, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
     cpu.p.c = true;
@@ -2500,7 +2500,7 @@ static void anc(void *ctx)
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
         uint8_t opc = nopcodes[c];
         uint8_t mem[] = {opc, 0xc};
-        struct mos6502 cpu;
+        struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, NULL);
         cpu.a = 0xa;
 
@@ -2522,7 +2522,7 @@ static void anc_zero(void *ctx)
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
         uint8_t opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x0};
-        struct mos6502 cpu;
+        struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, NULL);
         cpu.a = 0xaa;
 
@@ -2544,7 +2544,7 @@ static void anc_negative(void *ctx)
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
         uint8_t opc = nopcodes[c];
         uint8_t mem[] = {opc, 0xfc};
-        struct mos6502 cpu;
+        struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, NULL);
         cpu.a = 0xfa;
 
@@ -2563,7 +2563,7 @@ static void anc_negative(void *ctx)
 static void ane(void *ctx)
 {
     uint8_t mem[] = {0x8b, 0xfc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x5a;
     cpu.x = 0x3f;
@@ -2581,7 +2581,7 @@ static void ane(void *ctx)
 static void ane_zero(void *ctx)
 {
     uint8_t mem[] = {0x8b, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x5a;
     cpu.x = 0x3f;
@@ -2599,7 +2599,7 @@ static void ane_zero(void *ctx)
 static void ane_negative(void *ctx)
 {
     uint8_t mem[] = {0x8b, 0xcf};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa5;
     cpu.x = 0xf3;
@@ -2617,7 +2617,7 @@ static void ane_negative(void *ctx)
 static void arr(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
 
@@ -2636,7 +2636,7 @@ static void arr(void *ctx)
 static void arr_zero(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
 
@@ -2655,7 +2655,7 @@ static void arr_zero(void *ctx)
 static void arr_negative_exchanges_with_carry(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0xf6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xfa;
 
@@ -2674,7 +2674,7 @@ static void arr_negative_exchanges_with_carry(void *ctx)
 static void arr_overflow(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0x40};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x40;
 
@@ -2693,7 +2693,7 @@ static void arr_overflow(void *ctx)
 static void arr_loses_carry(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0x20};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x20;
     cpu.p.c = true;
@@ -2713,7 +2713,7 @@ static void arr_loses_carry(void *ctx)
 static void arr_negative_overflow_and_carry(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0xf0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0x80;
@@ -2733,7 +2733,7 @@ static void arr_negative_overflow_and_carry(void *ctx)
 static void arr_bcd(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2754,7 +2754,7 @@ static void arr_bcd(void *ctx)
 static void arr_bcd_low_adjustment(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0x5};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2775,7 +2775,7 @@ static void arr_bcd_low_adjustment(void *ctx)
 static void arr_bcd_low_adjustment_lost_carry(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0x1f};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2796,7 +2796,7 @@ static void arr_bcd_low_adjustment_lost_carry(void *ctx)
 static void arr_bcd_high_adjustment(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0x50};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -2817,7 +2817,7 @@ static void arr_bcd_high_adjustment(void *ctx)
 static void arr_bcd_not_supported(void *ctx)
 {
     uint8_t mem[] = {0x6b, 0x50};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = false;
     cpu.p.d = true;
@@ -2838,7 +2838,7 @@ static void arr_bcd_not_supported(void *ctx)
 static void lxa(void *ctx)
 {
     uint8_t mem[] = {0xab, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
 
@@ -2856,7 +2856,7 @@ static void lxa(void *ctx)
 static void lxa_zero(void *ctx)
 {
     uint8_t mem[] = {0xab, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x5a;
     cpu.x = 1;
@@ -2875,7 +2875,7 @@ static void lxa_zero(void *ctx)
 static void lxa_negative(void *ctx)
 {
     uint8_t mem[] = {0xab, 0xcf};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa4;
 
@@ -2896,7 +2896,7 @@ static void nop(void *ctx)
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
         uint8_t opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x10};
-        struct mos6502 cpu;
+        struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, NULL);
 
         int cycles = clock_cpu(&cpu);
@@ -2907,7 +2907,7 @@ static void nop(void *ctx)
 
         // NOTE: verify NOP did nothing
         struct aldo_snapshot snp;
-        cpu_snapshot(&cpu, &snp);
+        aldo_cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.x, "Failed on opcode %02x", opc);
@@ -2919,7 +2919,7 @@ static void nop(void *ctx)
 static void sbx_equal(void *ctx)
 {
     uint8_t mem[] = {0xcb, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x11;
     cpu.x = 0x10;
@@ -2938,7 +2938,7 @@ static void sbx_equal(void *ctx)
 static void sbx_lt(void *ctx)
 {
     uint8_t mem[] = {0xcb, 0x40};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x11;
     cpu.x = 0x10;
@@ -2957,7 +2957,7 @@ static void sbx_lt(void *ctx)
 static void sbx_gt(void *ctx)
 {
     uint8_t mem[] = {0xcb, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x11;
     cpu.x = 0x10;
@@ -2976,7 +2976,7 @@ static void sbx_gt(void *ctx)
 static void sbx_max_to_min(void *ctx)
 {
     uint8_t mem[] = {0xcb, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
     cpu.x = 0xff;
@@ -2995,7 +2995,7 @@ static void sbx_max_to_min(void *ctx)
 static void sbx_max_to_max(void *ctx)
 {
     uint8_t mem[] = {0xcb, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xff;
     cpu.x = 0xff;
@@ -3014,7 +3014,7 @@ static void sbx_max_to_max(void *ctx)
 static void sbx_min_to_max(void *ctx)
 {
     uint8_t mem[] = {0xcb, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.x = 0;
@@ -3033,7 +3033,7 @@ static void sbx_min_to_max(void *ctx)
 static void sbx_min_to_min(void *ctx)
 {
     uint8_t mem[] = {0xcb, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.x = 0;
@@ -3052,7 +3052,7 @@ static void sbx_min_to_min(void *ctx)
 static void sbx_neg_equal(void *ctx)
 {
     uint8_t mem[] = {0xcb, 0xa0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xaf;
     cpu.x = 0xa0;
@@ -3071,7 +3071,7 @@ static void sbx_neg_equal(void *ctx)
 static void sbx_neg_lt(void *ctx)
 {
     uint8_t mem[] = {0xcb, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xaf;
     cpu.x = 0xa0;
@@ -3090,7 +3090,7 @@ static void sbx_neg_lt(void *ctx)
 static void sbx_neg_gt(void *ctx)
 {
     uint8_t mem[] = {0xcb, 0x90};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xaf;
     cpu.x = 0xa0;
@@ -3109,7 +3109,7 @@ static void sbx_neg_gt(void *ctx)
 static void sbx_negative_to_positive(void *ctx)
 {
     uint8_t mem[] = {0xcb, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x8f;
     cpu.x = 0x80;    // Effectively -128 - 1 = 127
@@ -3129,7 +3129,7 @@ static void sbx_negative_to_positive(void *ctx)
 static void sbx_positive_to_negative(void *ctx)
 {
     uint8_t mem[] = {0xcb, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.x = 0;  // Effectively 0 - 1 = -1
@@ -3149,7 +3149,7 @@ static void sbx_positive_to_negative(void *ctx)
 static void usbc(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
@@ -3169,7 +3169,7 @@ static void usbc(void *ctx)
 static void usbc_borrowout(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;    // 10 - 6 - B
 
@@ -3188,7 +3188,7 @@ static void usbc_borrowout(void *ctx)
 static void usbc_borrow(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0xfe};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0xa;   // 10 - (-2)
@@ -3208,7 +3208,7 @@ static void usbc_borrow(void *ctx)
 static void usbc_zero(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0;
@@ -3228,7 +3228,7 @@ static void usbc_zero(void *ctx)
 static void usbc_negative(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0xff;    // -1 - 1
@@ -3248,7 +3248,7 @@ static void usbc_negative(void *ctx)
 static void usbc_borrow_negative(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0;  // 0 - 1
@@ -3268,7 +3268,7 @@ static void usbc_borrow_negative(void *ctx)
 static void usbc_overflow_to_negative(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0x7f;   // 127 - (-1)
@@ -3288,7 +3288,7 @@ static void usbc_overflow_to_negative(void *ctx)
 static void usbc_overflow_to_positive(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0x1};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
     cpu.a = 0x80;   // (-128) - 1
@@ -3308,7 +3308,7 @@ static void usbc_overflow_to_positive(void *ctx)
 static void usbc_borrowout_causes_overflow(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x80;   // (-128) - 0 - B
 
@@ -3327,7 +3327,7 @@ static void usbc_borrowout_causes_overflow(void *ctx)
 static void usbc_borrowout_avoids_overflow(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x7f;   // 127 - (-1) - B
 
@@ -3347,7 +3347,7 @@ static void usbc_borrowout_avoids_overflow(void *ctx)
 static void usbc_overflow_does_not_include_borrow(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = false;
     cpu.pc = 0;
@@ -3400,7 +3400,7 @@ static void usbc_overflow_does_not_include_borrow(void *ctx)
 static void usbc_bcd(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0x2};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -3422,7 +3422,7 @@ static void usbc_bcd(void *ctx)
 static void usbc_bcd_digit_rollover(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = true;
     cpu.p.d = true;
@@ -3444,7 +3444,7 @@ static void usbc_bcd_digit_rollover(void *ctx)
 static void usbc_bcd_not_supported(void *ctx)
 {
     uint8_t mem[] = {0xeb, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.bcd = false;
     cpu.p.d = true;

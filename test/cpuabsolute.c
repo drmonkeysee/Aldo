@@ -20,7 +20,7 @@ static void adc_abs(void *ctx)
 {
     uint8_t mem[] = {0x6d, 0x1, 0x80},
             abs[] = {0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;    // 10 + 6
 
@@ -40,7 +40,7 @@ static void and_abs(void *ctx)
 {
     uint8_t mem[] = {0x2d, 0x1, 0x80},
             abs[] = {0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
 
@@ -60,7 +60,7 @@ static void asl_abs(void *ctx)
         0xe, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x1,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -78,7 +78,7 @@ static void bit_abs(void *ctx)
 {
     uint8_t mem[] = {0x2c, 0x1, 0x80},
             abs[] = {0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 2;
 
@@ -97,7 +97,7 @@ static void cmp_abs(void *ctx)
 {
     uint8_t mem[] = {0xcd, 0x1, 0x80},
             abs[] = {0xff, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
 
@@ -116,7 +116,7 @@ static void cpx_abs(void *ctx)
 {
     uint8_t mem[] = {0xec, 0x1, 0x80},
             abs[] = {0xff, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.x = 0x10;
 
@@ -135,7 +135,7 @@ static void cpy_abs(void *ctx)
 {
     uint8_t mem[] = {0xcc, 0x1, 0x80},
             abs[] = {0xff, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.y = 0x10;
 
@@ -156,7 +156,7 @@ static void dec_abs(void *ctx)
         0xce, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -173,7 +173,7 @@ static void eor_abs(void *ctx)
 {
     uint8_t mem[] = {0x4d, 0x1, 0x80},
             abs[] = {0xff, 0xfc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
 
@@ -193,7 +193,7 @@ static void inc_abs(void *ctx)
         0xee, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -210,7 +210,7 @@ static void lda_abs(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x1, 0x80},
             abs[] = {0xff, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
 
     int cycles = clock_cpu(&cpu);
@@ -227,7 +227,7 @@ static void ldx_abs(void *ctx)
 {
     uint8_t mem[] = {0xae, 0x1, 0x80},
             abs[] = {0xff, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
 
     int cycles = clock_cpu(&cpu);
@@ -244,7 +244,7 @@ static void ldy_abs(void *ctx)
 {
     uint8_t mem[] = {0xac, 0x1, 0x80},
             abs[] = {0xff, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
 
     int cycles = clock_cpu(&cpu);
@@ -263,7 +263,7 @@ static void lsr_abs(void *ctx)
         0x4e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x2,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -281,7 +281,7 @@ static void ora_abs(void *ctx)
 {
     uint8_t mem[] = {0xd, 0x1, 0x80},
             abs[] = {0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
 
@@ -301,7 +301,7 @@ static void rol_abs(void *ctx)
         0x2e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
 
@@ -322,7 +322,7 @@ static void ror_abs(void *ctx)
         0x6e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
 
@@ -341,7 +341,7 @@ static void sbc_abs(void *ctx)
 {
     uint8_t mem[] = {0xed, 0x1, 0x80},
             abs[] = {0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
@@ -364,7 +364,7 @@ static void sta_abs(void *ctx)
         0x8d, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
 
@@ -382,7 +382,7 @@ static void stx_abs(void *ctx)
         0x8e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0xf1;
 
@@ -400,7 +400,7 @@ static void sty_abs(void *ctx)
         0x8c, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.y = 0x84;
 
@@ -420,7 +420,7 @@ static void adc_absx(void *ctx)
 {
     uint8_t mem[] = {0x7d, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;    // 10 + 6
     cpu.x = 3;
@@ -440,7 +440,7 @@ static void adc_absx(void *ctx)
 static void adc_absx_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x7d, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xa;    // 10 + 178
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
@@ -461,7 +461,7 @@ static void and_absx(void *ctx)
 {
     uint8_t mem[] = {0x3d, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
     cpu.x = 3;
@@ -479,7 +479,7 @@ static void and_absx(void *ctx)
 static void and_absx_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x3d, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
@@ -500,7 +500,7 @@ static void asl_absx(void *ctx)
         0x1e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;
 
@@ -521,7 +521,7 @@ static void asl_absx_pagecross(void *ctx)
         0x1e, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x1, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
@@ -540,7 +540,7 @@ static void cmp_absx(void *ctx)
 {
     uint8_t mem[] = {0xdd, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
     cpu.x = 3;
@@ -559,7 +559,7 @@ static void cmp_absx(void *ctx)
 static void cmp_absx_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xdd, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0x10;
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
@@ -581,7 +581,7 @@ static void dec_absx(void *ctx)
         0xde, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;
 
@@ -601,7 +601,7 @@ static void dec_absx_pagecross(void *ctx)
         0xde, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
@@ -619,7 +619,7 @@ static void eor_absx(void *ctx)
 {
     uint8_t mem[] = {0x5d, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
     cpu.x = 3;
@@ -637,7 +637,7 @@ static void eor_absx(void *ctx)
 static void eor_absx_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x5d, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
@@ -658,7 +658,7 @@ static void inc_absx(void *ctx)
         0xfe, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;
 
@@ -678,7 +678,7 @@ static void inc_absx_pagecross(void *ctx)
         0xfe, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
@@ -696,7 +696,7 @@ static void lda_absx(void *ctx)
 {
     uint8_t mem[] = {0xbd, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.x = 3;
 
@@ -713,7 +713,7 @@ static void lda_absx(void *ctx)
 static void lda_absx_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xbd, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
@@ -731,7 +731,7 @@ static void ldy_absx(void *ctx)
 {
     uint8_t mem[] = {0xbc, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.x = 3;
 
@@ -748,7 +748,7 @@ static void ldy_absx(void *ctx)
 static void ldy_absx_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xbc, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
@@ -768,7 +768,7 @@ static void lsr_absx(void *ctx)
         0x5e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;
 
@@ -789,7 +789,7 @@ static void lsr_absx_pagecross(void *ctx)
         0x5e, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x2, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
@@ -808,7 +808,7 @@ static void ora_absx(void *ctx)
 {
     uint8_t mem[] = {0x1d, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
     cpu.x = 3;
@@ -826,7 +826,7 @@ static void ora_absx(void *ctx)
 static void ora_absx_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x1d, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
@@ -847,7 +847,7 @@ static void rol_absx(void *ctx)
         0x3e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;
     cpu.p.c = true;
@@ -869,7 +869,7 @@ static void rol_absx_pagecross(void *ctx)
         0x3e, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
     cpu.p.c = true;
@@ -891,7 +891,7 @@ static void ror_absx(void *ctx)
         0x7e, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;
     cpu.p.c = true;
@@ -913,7 +913,7 @@ static void ror_absx_pagecross(void *ctx)
         0x7e, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
     cpu.p.c = true;
@@ -933,7 +933,7 @@ static void sbc_absx(void *ctx)
 {
     uint8_t mem[] = {0xfd, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
@@ -954,7 +954,7 @@ static void sbc_absx(void *ctx)
 static void sbc_absx_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xfd, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - (-78)
@@ -978,7 +978,7 @@ static void sta_absx(void *ctx)
         0x9d, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.x = 3;
@@ -997,7 +997,7 @@ static void sta_absx_pagecross(void *ctx)
         0x9d, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
@@ -1018,7 +1018,7 @@ static void adc_absy(void *ctx)
 {
     uint8_t mem[] = {0x79, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;    // 10 + 6
     cpu.y = 3;
@@ -1038,7 +1038,7 @@ static void adc_absy(void *ctx)
 static void adc_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x79, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xa;    // 10 + 178
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
@@ -1059,7 +1059,7 @@ static void and_absy(void *ctx)
 {
     uint8_t mem[] = {0x39, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
     cpu.y = 3;
@@ -1077,7 +1077,7 @@ static void and_absy(void *ctx)
 static void and_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x39, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
@@ -1096,7 +1096,7 @@ static void cmp_absy(void *ctx)
 {
     uint8_t mem[] = {0xd9, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
     cpu.y = 3;
@@ -1115,7 +1115,7 @@ static void cmp_absy(void *ctx)
 static void cmp_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xd9, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0x10;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
@@ -1135,7 +1135,7 @@ static void eor_absy(void *ctx)
 {
     uint8_t mem[] = {0x59, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
     cpu.y = 3;
@@ -1153,7 +1153,7 @@ static void eor_absy(void *ctx)
 static void eor_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x59, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
@@ -1172,7 +1172,7 @@ static void lda_absy(void *ctx)
 {
     uint8_t mem[] = {0xb9, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.y = 3;
 
@@ -1189,7 +1189,7 @@ static void lda_absy(void *ctx)
 static void lda_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xb9, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
@@ -1207,7 +1207,7 @@ static void ldx_absy(void *ctx)
 {
     uint8_t mem[] = {0xbe, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.y = 3;
 
@@ -1224,7 +1224,7 @@ static void ldx_absy(void *ctx)
 static void ldx_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xbe, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
@@ -1242,7 +1242,7 @@ static void ora_absy(void *ctx)
 {
     uint8_t mem[] = {0x19, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
     cpu.y = 3;
@@ -1260,7 +1260,7 @@ static void ora_absy(void *ctx)
 static void ora_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x19, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
@@ -1279,7 +1279,7 @@ static void sbc_absy(void *ctx)
 {
     uint8_t mem[] = {0xf9, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
@@ -1300,7 +1300,7 @@ static void sbc_absy(void *ctx)
 static void sbc_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xf9, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - (-78)
@@ -1324,7 +1324,7 @@ static void sta_absy(void *ctx)
         0x99, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.y = 3;
@@ -1343,7 +1343,7 @@ static void sta_absy_pagecross(void *ctx)
         0x99, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.y = 3;  // Cross boundary from $01FF -> $0202
@@ -1364,7 +1364,7 @@ static void dcp_abs(void *ctx)
 {
     uint8_t mem[] = {0xcf, 0x1, 0x80},
             abs[] = {0xff, 0x11};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0x10;
@@ -1385,7 +1385,7 @@ static void dcp_absx(void *ctx)
 {
     uint8_t mem[] = {0xdf, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x11};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0x10;
@@ -1406,7 +1406,7 @@ static void dcp_absx(void *ctx)
 static void dcp_absx_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xdf, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     enable_rom_wcapture();
     cpu.a = 0x10;
@@ -1428,7 +1428,7 @@ static void dcp_absy(void *ctx)
 {
     uint8_t mem[] = {0xdb, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x11};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0x10;
@@ -1449,7 +1449,7 @@ static void dcp_absy(void *ctx)
 static void dcp_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xdb, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     enable_rom_wcapture();
     cpu.a = 0x10;
@@ -1471,7 +1471,7 @@ static void isc_abs(void *ctx)
 {
     uint8_t mem[] = {0xef, 0x1, 0x80},
             abs[] = {0xff, 0x5};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.p.c = true;
@@ -1494,7 +1494,7 @@ static void isc_absx(void *ctx)
 {
     uint8_t mem[] = {0xff, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x5};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.p.c = true;
@@ -1517,7 +1517,7 @@ static void isc_absx(void *ctx)
 static void isc_absx_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xff, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     enable_rom_wcapture();
     cpu.p.c = true;
@@ -1541,7 +1541,7 @@ static void isc_absy(void *ctx)
 {
     uint8_t mem[] = {0xfb, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x5};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.p.c = true;
@@ -1564,7 +1564,7 @@ static void isc_absy(void *ctx)
 static void isc_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xfb, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     enable_rom_wcapture();
     cpu.p.c = true;
@@ -1588,7 +1588,7 @@ static void las_absy(void *ctx)
 {
     uint8_t mem[] = {0xbb, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.s = 0xa;
     cpu.y = 3;
@@ -1609,7 +1609,7 @@ static void las_absy_zero(void *ctx)
 {
     uint8_t mem[] = {0xbb, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.s = 0xa;
     cpu.y = 3;
@@ -1630,7 +1630,7 @@ static void las_absy_negative(void *ctx)
 {
     uint8_t mem[] = {0xbb, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.s = 0xfa;
     cpu.y = 3;
@@ -1650,7 +1650,7 @@ static void las_absy_negative(void *ctx)
 static void las_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xbb, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.s = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
@@ -1671,7 +1671,7 @@ static void lax_abs(void *ctx)
 {
     uint8_t mem[] = {0xaf, 0x1, 0x80},
             abs[] = {0xff, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
 
     int cycles = clock_cpu(&cpu);
@@ -1689,7 +1689,7 @@ static void lax_absy(void *ctx)
 {
     uint8_t mem[] = {0xbf, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.y = 3;
 
@@ -1707,7 +1707,7 @@ static void lax_absy(void *ctx)
 static void lax_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xbf, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
@@ -1726,7 +1726,7 @@ static void nop_abs(void *ctx)
 {
     uint8_t mem[] = {0xc, 0x1, 0x80},
             abs[] = {0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
 
     int cycles = clock_cpu(&cpu);
@@ -1737,7 +1737,7 @@ static void nop_abs(void *ctx)
 
     // NOTE: verify NOP did nothing
     struct aldo_snapshot snp;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
     ct_assertequal(0u, cpu.a);
     ct_assertequal(0u, cpu.s);
     ct_assertequal(0u, cpu.x);
@@ -1752,7 +1752,7 @@ static void nop_absx(void *ctx)
         uint8_t opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x1, 0x80},
                 abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
-        struct mos6502 cpu;
+        struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, abs);
         cpu.x = 3;
 
@@ -1764,7 +1764,7 @@ static void nop_absx(void *ctx)
 
         // NOTE: verify NOP did nothing
         struct aldo_snapshot snp;
-        cpu_snapshot(&cpu, &snp);
+        aldo_cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
         ct_assertequal(3u, cpu.x, "Failed on opcode %02x", opc);
@@ -1779,7 +1779,7 @@ static void nop_absx_pagecross(void *ctx)
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
         uint8_t opc = nopcodes[c];
         uint8_t mem[] = {opc, 0xff, 0x80};
-        struct mos6502 cpu;
+        struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, BigRom);
         cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
@@ -1791,7 +1791,7 @@ static void nop_absx_pagecross(void *ctx)
 
         // NOTE: verify NOP did nothing
         struct aldo_snapshot snp;
-        cpu_snapshot(&cpu, &snp);
+        aldo_cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertequal(0u, cpu.s, "Failed on opcode %02x", opc);
         ct_assertequal(3u, cpu.x, "Failed on opcode %02x", opc);
@@ -1806,7 +1806,7 @@ static void rla_abs(void *ctx)
         0x2f, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 3;
     cpu.p.c = true;
@@ -1829,7 +1829,7 @@ static void rla_absx(void *ctx)
         0x3f, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 3;
     cpu.x = 3;
@@ -1853,7 +1853,7 @@ static void rla_absx_pagecross(void *ctx)
         0x3f, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 3;
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
@@ -1877,7 +1877,7 @@ static void rla_absy(void *ctx)
         0x3b, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 3;
     cpu.y = 3;
@@ -1901,7 +1901,7 @@ static void rla_absy_pagecross(void *ctx)
         0x3b, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 3;
     cpu.y = 3;  // Cross boundary from $01FF -> $0202
@@ -1923,7 +1923,7 @@ static void rra_abs(void *ctx)
 {
     uint8_t mem[] = {0x6f, 0x1, 0x80},
             abs[] = {0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xa;    // 10 + 6
@@ -1945,7 +1945,7 @@ static void rra_absx(void *ctx)
 {
     uint8_t mem[] = {0x7f, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xa;    // 10 + 6
@@ -1967,7 +1967,7 @@ static void rra_absx(void *ctx)
 static void rra_absx_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x7f, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     enable_rom_wcapture();
     cpu.a = 0xa;    // 10 + 178
@@ -1990,7 +1990,7 @@ static void rra_absy(void *ctx)
 {
     uint8_t mem[] = {0x7b, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xa;    // 10 + 6
@@ -2012,7 +2012,7 @@ static void rra_absy(void *ctx)
 static void rra_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x7b, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     enable_rom_wcapture();
     cpu.a = 0xa;    // 10 + 178
@@ -2037,7 +2037,7 @@ static void sax_abs(void *ctx)
         0x8f, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa5;
     cpu.x = 0x3c;
@@ -2056,7 +2056,7 @@ static void sha_absy(void *ctx)
         0x9f, 0x0, 0x1,
         [256] = 0xff, 0xff, 0xff, 0xee,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.x = 0xe;
@@ -2075,7 +2075,7 @@ static void sha_absy(void *ctx)
 static void sha_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x9f, 0xff, 0xfe};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xea;
     cpu.x = 0xf8;
@@ -2099,7 +2099,7 @@ static void shx_absy(void *ctx)
         0x9e, 0x0, 0x1,
         [256] = 0xff, 0xff, 0xff, 0xee,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0xe;
     cpu.y = 3;
@@ -2116,7 +2116,7 @@ static void shx_absy(void *ctx)
 static void shx_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x9e, 0xff, 0xfe};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 0xe1;
     cpu.y = 3;  // Cross boundary from $FEFF -> $FF02
@@ -2138,7 +2138,7 @@ static void shy_absx(void *ctx)
         0x9c, 0x0, 0x1,
         [256] = 0xff, 0xff, 0xff, 0xee,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;
     cpu.y = 0xe;
@@ -2155,7 +2155,7 @@ static void shy_absx(void *ctx)
 static void shy_absx_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x9c, 0xff, 0xfe};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.x = 3;  // Cross boundary from $FEFF -> $FF02
     cpu.y = 0xe1;
@@ -2177,7 +2177,7 @@ static void slo_abs(void *ctx)
         0xf, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x1,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 1;
 
@@ -2199,7 +2199,7 @@ static void slo_absx(void *ctx)
         0x1f, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 1;
     cpu.x = 3;
@@ -2222,7 +2222,7 @@ static void slo_absx_pagecross(void *ctx)
         0x1f, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x1, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 1;
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
@@ -2245,7 +2245,7 @@ static void slo_absy(void *ctx)
         0x1b, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 1;
     cpu.y = 3;
@@ -2268,7 +2268,7 @@ static void slo_absy_pagecross(void *ctx)
         0x1b, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x1, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 1;
     cpu.y = 3;  // Cross boundary from $01FF -> $0202
@@ -2291,7 +2291,7 @@ static void sre_abs(void *ctx)
         0x4f, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x2,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 3;
 
@@ -2313,7 +2313,7 @@ static void sre_absx(void *ctx)
         0x5f, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 3;
     cpu.x = 3;
@@ -2336,7 +2336,7 @@ static void sre_absx_pagecross(void *ctx)
         0x5f, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x2, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 3;
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
@@ -2359,7 +2359,7 @@ static void sre_absy(void *ctx)
         0x5b, 0x4, 0x2,
         [512] = 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 3;
     cpu.y = 3;
@@ -2382,7 +2382,7 @@ static void sre_absy_pagecross(void *ctx)
         0x5b, 0xff, 0x1,
         [512] = 0x0, 0x0, 0x2, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 3;
     cpu.y = 3;  // Cross boundary from $01FF -> $0202
@@ -2405,7 +2405,7 @@ static void tas_absy(void *ctx)
         0x9b, 0x0, 0x1,
         [256] = 0xff, 0xff, 0xff, 0xee,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x5a;
     cpu.x = 0xee;
@@ -2425,7 +2425,7 @@ static void tas_absy(void *ctx)
 static void tas_absy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x9b, 0xff, 0xce};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xea;
     cpu.x = 0xf8;

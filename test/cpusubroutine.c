@@ -19,7 +19,7 @@
 static void jsr(void *ctx)
 {
     uint8_t mem[] = {0x20, 0x5, 0x80, [259] = 0xff, [260] = 0xff};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.s = 4;
 
@@ -36,7 +36,7 @@ static void jsr(void *ctx)
 static void rts(void *ctx)
 {
     uint8_t mem[] = {0x60, 0xff, 0xff, [259] = 0x2, [260] = 0x0};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.s = 2;
 

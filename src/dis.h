@@ -111,7 +111,7 @@ bool aldo_dis_inst_equal(const struct aldo_dis_instruction *lhs,
 // MARK: - Internal
 //
 
-int aldo_dis_peek(uint16_t addr, struct mos6502 *cpu, aldo_debugger *dbg,
+int aldo_dis_peek(uint16_t addr, struct aldo_mos6502 *cpu, aldo_debugger *dbg,
                   const struct aldo_snapshot *snp,
                   char dis[br_nacsz(ALDO_DIS_PEEK_SIZE)]) br_nothrow;
 #include "bridgeclose.h"

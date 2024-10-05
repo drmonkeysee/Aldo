@@ -2435,12 +2435,12 @@ static void peek_immediate(void *ctx)
 {
     // NOTE: LDA #$10
     uint8_t mem[] = {0xa9, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     char buf[ALDO_DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
     struct aldo_snapshot snp;
     cpu.a = 0x10;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
 
     int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
 
@@ -2454,12 +2454,12 @@ static void peek_zeropage(void *ctx)
 {
     // NOTE: LDA $04
     uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     char buf[ALDO_DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
     struct aldo_snapshot snp;
     cpu.a = 0x10;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
 
     int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
 
@@ -2473,13 +2473,13 @@ static void peek_zp_indexed(void *ctx)
 {
     // NOTE: LDA $03,X
     uint8_t mem[] = {0xb5, 0x3, 0x0, 0x0, 0x0, 0x30};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     char buf[ALDO_DIS_PEEK_SIZE];
     struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 2;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
 
     int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
 
@@ -2493,13 +2493,13 @@ static void peek_indexed_indirect(void *ctx)
 {
     // NOTE: LDA ($02,X)
     uint8_t mem[] = {0xa1, 0x2, 0x0, 0x0, 0x2, 0x1, [258] = 0x40};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     char buf[ALDO_DIS_PEEK_SIZE];
     struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 2;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
 
     int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
 
@@ -2513,13 +2513,13 @@ static void peek_indirect_indexed(void *ctx)
 {
     // NOTE: LDA ($02),Y
     uint8_t mem[] = {0xb1, 0x2, 0x2, 0x1, [263] = 0x60};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     char buf[ALDO_DIS_PEEK_SIZE];
     struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.y = 5;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
 
     int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
 
@@ -2533,13 +2533,13 @@ static void peek_absolute_indexed(void *ctx)
 {
     // NOTE: LDA $0102,X
     uint8_t mem[] = {0xbd, 0x2, 0x1, [268] = 0x70};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     char buf[ALDO_DIS_PEEK_SIZE];
     struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 0xa;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
 
     int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
 
@@ -2553,12 +2553,12 @@ static void peek_branch(void *ctx)
 {
     // NOTE: BEQ +5
     uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     char buf[ALDO_DIS_PEEK_SIZE];
     struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
 
     int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
 
@@ -2572,12 +2572,12 @@ static void peek_branch_forced(void *ctx)
 {
     // NOTE: BEQ +5
     uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     char buf[ALDO_DIS_PEEK_SIZE];
     struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.z = false;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
 
     int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
 
@@ -2591,13 +2591,13 @@ static void peek_absolute_indirect(void *ctx)
 {
     // NOTE: LDA ($0102)
     uint8_t mem[] = {0x6c, 0x2, 0x1, [258] = 0x5, 0x2, [517] = 80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     char buf[ALDO_DIS_PEEK_SIZE];
     struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 0xa;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
 
     int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
 
@@ -2611,13 +2611,13 @@ static void peek_interrupt(void *ctx)
 {
     // NOTE: LDA $04
     uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     char buf[ALDO_DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
     struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu.irq = ALDO_SIG_COMMITTED;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
     aldo_debugger *dbg = ctx;
     aldo_debug_set_vector_override(dbg, Aldo_NoResetVector);
     snp.prg.vectors[4] = 0xbb;
@@ -2635,13 +2635,13 @@ static void peek_overridden_reset(void *ctx)
 {
     // NOTE: LDA $04
     uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     char buf[ALDO_DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
     struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu.rst = ALDO_SIG_COMMITTED;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
     aldo_debugger *dbg = ctx;
     aldo_debug_set_vector_override(dbg, 0xccdd);
     snp.prg.vectors[2] = 0xbb;
@@ -2659,13 +2659,13 @@ static void peek_overridden_non_reset(void *ctx)
 {
     // NOTE: LDA $04
     uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     char buf[ALDO_DIS_PEEK_SIZE];
     setup_cpu(&cpu, mem, NULL);
     struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu.nmi = ALDO_SIG_COMMITTED;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
     aldo_debugger *dbg = ctx;
     aldo_debug_set_vector_override(dbg, 0xccdd);
     snp.prg.vectors[0] = 0xff;
@@ -2685,13 +2685,13 @@ static void peek_busfault(void *ctx)
 {
     // NOTE: LDA ($02),Y
     uint8_t mem[] = {0xb1, 0x2, 0x2, 0x40};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     char buf[ALDO_DIS_PEEK_SIZE];
     struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.y = 5;
-    cpu_snapshot(&cpu, &snp);
+    aldo_cpu_snapshot(&cpu, &snp);
 
     int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
 

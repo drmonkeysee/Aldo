@@ -702,7 +702,7 @@ bool aldo_dis_inst_equal(const struct aldo_dis_instruction *lhs,
 // MARK: - Internal Interface
 //
 
-int aldo_dis_peek(uint16_t addr, struct mos6502 *cpu, aldo_debugger *dbg,
+int aldo_dis_peek(uint16_t addr, struct aldo_mos6502 *cpu, aldo_debugger *dbg,
                   const struct aldo_snapshot *snp,
                   char dis[restrict static ALDO_DIS_PEEK_SIZE])
 {
@@ -732,10 +732,10 @@ int aldo_dis_peek(uint16_t addr, struct mos6502 *cpu, aldo_debugger *dbg,
         if (count < 0) return ALDO_DIS_ERR_FMT;
         total += count;
     } else {
-        struct mos6502 restore_point;
-        cpu_peek_start(cpu, &restore_point);
-        struct peekresult peek = cpu_peek(cpu, addr);
-        cpu_peek_end(cpu, &restore_point);
+        struct aldo_mos6502 restore_point;
+        aldo_cpu_peek_start(cpu, &restore_point);
+        struct aldo_peekresult peek = aldo_cpu_peek(cpu, addr);
+        aldo_cpu_peek_end(cpu, &restore_point);
         switch (peek.mode) {
 #define XPEEK(...) sprintf(dis, __VA_ARGS__)
 #define X(s, b, n, p, ...) case ALDO_AM_LBL(s): total = p; break;

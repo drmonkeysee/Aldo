@@ -68,7 +68,7 @@ void teardown_testbus(void)
     bus_free(TestBus);
 }
 
-void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
+void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
                uint8_t *restrict rom)
 {
     cpu->mbus = TestBus;
@@ -77,7 +77,7 @@ void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
     Rom.ctx = rom;
     bus_set(TestBus, MEMBLOCK_32KB, rom ? Rom : (struct busdevice){0});
     RomWriteCapture = -1;
-    cpu_powerup(cpu);
+    aldo_cpu_powerup(cpu);
     cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bcd =
         cpu->bflt = cpu->detached = false;
     cpu->p.i = cpu->signal.rdy = cpu->presync = true;
@@ -91,11 +91,11 @@ void enable_rom_wcapture(void)
     bus_set(TestBus, MEMBLOCK_32KB, dv);
 }
 
-int clock_cpu(struct mos6502 *cpu)
+int clock_cpu(struct aldo_mos6502 *cpu)
 {
     int cycles = 0;
     do {
-        cycles += cpu_cycle(cpu);
+        cycles += aldo_cpu_cycle(cpu);
         // NOTE: catch instructions that run longer than possible
         ct_asserttrue(cycles <= Aldo_MaxTCycle);
     } while (!cpu->presync);

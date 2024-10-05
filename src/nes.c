@@ -28,7 +28,7 @@ struct aldo_nes001 {
     cart *cart;                 // Game Cartridge; Non-owning Pointer
     aldo_debugger *dbg;         // Debugger Context; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
-    struct mos6502 cpu;         // CPU Core of RP2A03 Chip
+    struct aldo_mos6502 cpu;    // CPU Core of RP2A03 Chip
     struct aldo_rp2c02 ppu;     // RP2C02 PPU
     enum aldo_execmode mode;    // NES execution mode
     struct {
@@ -207,7 +207,7 @@ static void set_cpu_pins(struct aldo_nes001 *self)
 static void bus_snapshot(const struct aldo_nes001 *self,
                          struct aldo_snapshot *snp)
 {
-    cpu_snapshot(&self->cpu, snp);
+    aldo_cpu_snapshot(&self->cpu, snp);
     aldo_ppu_bus_snapshot(&self->ppu, snp);
     bus_copy(self->cpu.mbus, CPU_VECTOR_NMI, memsz(snp->prg.vectors),
              snp->prg.vectors);
@@ -245,7 +245,7 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
 
 static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
 {
-    int cycles = cpu_cycle(&self->cpu);
+    int cycles = aldo_cpu_cycle(&self->cpu);
     set_cpu_pins(self);
     clock->subcycle = 0;
     clock->cycles += (uint64_t)cycles;
@@ -309,7 +309,7 @@ void aldo_nes_powerup(aldo_nes *self, cart *c, bool zeroram)
         memset(self->vram, 0, memsz(self->vram));
         aldo_ppu_zeroram(&self->ppu);
     }
-    cpu_powerup(&self->cpu);
+    aldo_cpu_powerup(&self->cpu);
     aldo_ppu_powerup(&self->ppu);
 }
 

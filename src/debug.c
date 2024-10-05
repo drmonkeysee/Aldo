@@ -21,7 +21,7 @@ struct aldo_debugger_context {
         size_t capacity, size;
         struct aldo_breakpoint *items;
     } breakpoints;
-    struct mos6502 *cpu;    // Non-owning Pointer
+    struct aldo_mos6502 *cpu;   // Non-owning Pointer
     struct resdecorator {
         struct busdevice inner;
         uint16_t vector;
@@ -90,7 +90,7 @@ static size_t resetaddr_copy(const void *restrict ctx, uint16_t addr,
 //
 
 static bool halt_address(const struct aldo_breakpoint *bp,
-                         const struct mos6502 *cpu)
+                         const struct aldo_mos6502 *cpu)
 {
     return cpu->signal.sync && cpu->addrinst == bp->expr.address;
 }
@@ -108,9 +108,9 @@ static bool halt_cycles(const struct aldo_breakpoint *bp,
     return clk->cycles == bp->expr.cycles;
 }
 
-static bool halt_jammed(const struct mos6502 *cpu)
+static bool halt_jammed(const struct aldo_mos6502 *cpu)
 {
-    return cpu_jammed(cpu);
+    return aldo_cpu_jammed(cpu);
 }
 
 //
@@ -160,7 +160,7 @@ static void bpvector_insert(struct breakpoint_vector *vec,
 
 static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
                                 const struct aldo_clock *clk,
-                                const struct mos6502 *cpu)
+                                const struct aldo_mos6502 *cpu)
 {
     for (ptrdiff_t i = 0; i < (ptrdiff_t)vec->size; ++i) {
         const struct aldo_breakpoint *bp = vec->items + i;
@@ -337,7 +337,7 @@ void aldo_debug_reset(aldo_debugger *self)
 // MARK: - Internal Interface
 //
 
-void aldo_debug_cpu_connect(aldo_debugger *self, struct mos6502 *cpu)
+void aldo_debug_cpu_connect(aldo_debugger *self, struct aldo_mos6502 *cpu)
 {
     assert(self != NULL);
     assert(cpu != NULL);

@@ -20,7 +20,7 @@ static void adc_indx(void *ctx)
 {
     uint8_t mem[] = {0x61, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;    // 10 + 6
     cpu.x = 4;
@@ -41,7 +41,7 @@ static void adc_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x61, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0x22};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;    // 10 + 34
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
@@ -62,7 +62,7 @@ static void adc_indx_zp_wraparound(void *ctx)
 {
     uint8_t mem[] = {0x80, 0x61, 0x2, [255] = 0x2},
             abs[] = {0xff, 0x80, 0x11};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.pc = 1;
     cpu.a = 0xa;    // 10 + 17
@@ -84,7 +84,7 @@ static void and_indx(void *ctx)
 {
     uint8_t mem[] = {0x21, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
     cpu.x = 4;
@@ -103,7 +103,7 @@ static void and_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x21, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0x22};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
@@ -122,7 +122,7 @@ static void cmp_indx(void *ctx)
 {
     uint8_t mem[] = {0xc1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
     cpu.x = 4;
@@ -142,7 +142,7 @@ static void cmp_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xc1, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0x22};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
@@ -162,7 +162,7 @@ static void eor_indx(void *ctx)
 {
     uint8_t mem[] = {0x41, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0xfc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
     cpu.x = 4;
@@ -181,7 +181,7 @@ static void eor_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x41, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0xfc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
@@ -200,7 +200,7 @@ static void lda_indx(void *ctx)
 {
     uint8_t mem[] = {0xa1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.x = 4;
 
@@ -218,7 +218,7 @@ static void lda_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xa1, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0x22};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
@@ -236,7 +236,7 @@ static void ora_indx(void *ctx)
 {
     uint8_t mem[] = {0x1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
     cpu.x = 4;
@@ -255,7 +255,7 @@ static void ora_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x1, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0xfc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
@@ -274,7 +274,7 @@ static void sbc_indx(void *ctx)
 {
     uint8_t mem[] = {0xe1, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
@@ -296,7 +296,7 @@ static void sbc_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xe1, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
@@ -320,7 +320,7 @@ static void sta_indx(void *ctx)
         0x81, 0x2, 0xff, 0xff, 0xff, 0xff, 0xb, 0x0,
         0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.x = 4;
@@ -339,7 +339,7 @@ static void sta_indx_pageoverflow(void *ctx)
         0x81, 0x8, 0x0, 0xff, 0xff, 0xff, 0xff, 0xa,
         0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.x = 0xff;   // Wrap around from $0008 -> $0007
@@ -360,7 +360,7 @@ static void adc_indy(void *ctx)
 {
     uint8_t mem[] = {0x71, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;    // 10 + 6
     cpu.y = 3;
@@ -380,7 +380,7 @@ static void adc_indy(void *ctx)
 static void adc_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x71, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xa;    // 10 + 178
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
@@ -401,7 +401,7 @@ static void adc_indy_zp_wraparound(void *ctx)
 {
     uint8_t mem[] = {0x80, 0x71, 0xff, [255] = 0x1},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x8};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.pc = 1;
     cpu.a = 0xa;    // 10 + 8
@@ -423,7 +423,7 @@ static void and_indy(void *ctx)
 {
     uint8_t mem[] = {0x31, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
     cpu.y = 3;
@@ -441,7 +441,7 @@ static void and_indy(void *ctx)
 static void and_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x31, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
@@ -460,7 +460,7 @@ static void cmp_indy(void *ctx)
 {
     uint8_t mem[] = {0xd1, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
     cpu.y = 3;
@@ -479,7 +479,7 @@ static void cmp_indy(void *ctx)
 static void cmp_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xd1, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0x10;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
@@ -499,7 +499,7 @@ static void eor_indy(void *ctx)
 {
     uint8_t mem[] = {0x51, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xfc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
     cpu.y = 3;
@@ -517,7 +517,7 @@ static void eor_indy(void *ctx)
 static void eor_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x51, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
@@ -536,7 +536,7 @@ static void lda_indy(void *ctx)
 {
     uint8_t mem[] = {0xb1, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.y = 3;
 
@@ -553,7 +553,7 @@ static void lda_indy(void *ctx)
 static void lda_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xb1, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
@@ -571,7 +571,7 @@ static void ora_indy(void *ctx)
 {
     uint8_t mem[] = {0x11, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
     cpu.y = 3;
@@ -589,7 +589,7 @@ static void ora_indy(void *ctx)
 static void ora_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x11, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
@@ -608,7 +608,7 @@ static void sbc_indy(void *ctx)
 {
     uint8_t mem[] = {0xf1, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
@@ -629,7 +629,7 @@ static void sbc_indy(void *ctx)
 static void sbc_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xf1, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - (-78)
@@ -653,7 +653,7 @@ static void sta_indy(void *ctx)
         0x91, 0x2, 0x4, 0x0,
         0x0, 0x0, 0x0, 0x0, 0x0
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.y = 3;
@@ -672,7 +672,7 @@ static void sta_indy_pagecross(void *ctx)
         0x91, 0x2, 0xff, 0x0,
         [256] = 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.a = 0xa;
     cpu.y = 3;  // Cross boundary from $00FF -> $0102
@@ -693,7 +693,7 @@ static void dcp_indx(void *ctx)
 {
     uint8_t mem[] = {0xc3, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x11};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0x10;
@@ -715,7 +715,7 @@ static void dcp_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xc3, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0x23};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0x10;
@@ -737,7 +737,7 @@ static void dcp_indy(void *ctx)
 {
     uint8_t mem[] = {0xd3, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x11};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0x10;
@@ -758,7 +758,7 @@ static void dcp_indy(void *ctx)
 static void dcp_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xd3, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     enable_rom_wcapture();
     cpu.a = 0x10;
@@ -780,7 +780,7 @@ static void isc_indx(void *ctx)
 {
     uint8_t mem[] = {0xe3, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x5};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.p.c = true;
@@ -804,7 +804,7 @@ static void isc_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xe3, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0x5};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.p.c = true;
@@ -828,7 +828,7 @@ static void isc_indy(void *ctx)
 {
     uint8_t mem[] = {0xf3, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x5};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.p.c = true;
@@ -851,7 +851,7 @@ static void isc_indy(void *ctx)
 static void isc_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xf3, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     enable_rom_wcapture();
     cpu.p.c = true;
@@ -875,7 +875,7 @@ static void lax_indx(void *ctx)
 {
     uint8_t mem[] = {0xa3, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.x = 4;
 
@@ -894,7 +894,7 @@ static void lax_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xa3, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0x22};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
@@ -913,7 +913,7 @@ static void lax_indy(void *ctx)
 {
     uint8_t mem[] = {0xb3, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x45};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     cpu.y = 3;
 
@@ -931,7 +931,7 @@ static void lax_indy(void *ctx)
 static void lax_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0xb3, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
@@ -950,7 +950,7 @@ static void rla_indx(void *ctx)
 {
     uint8_t mem[] = {0x23, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xa;
@@ -973,7 +973,7 @@ static void rla_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x23, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0xfe};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xfa;
@@ -996,7 +996,7 @@ static void rla_indy(void *ctx)
 {
     uint8_t mem[] = {0x33, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xa;
@@ -1018,7 +1018,7 @@ static void rla_indy(void *ctx)
 static void rla_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x33, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     enable_rom_wcapture();
     cpu.a = 0xea;
@@ -1041,7 +1041,7 @@ static void rra_indx(void *ctx)
 {
     uint8_t mem[] = {0x63, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xa;    // 10 + 6
@@ -1064,7 +1064,7 @@ static void rra_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x63, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0x44};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xa;    // 10 + 34
@@ -1087,7 +1087,7 @@ static void rra_indy(void *ctx)
 {
     uint8_t mem[] = {0x73, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0xc};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xa;    // 10 + 6
@@ -1109,7 +1109,7 @@ static void rra_indy(void *ctx)
 static void rra_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x73, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     enable_rom_wcapture();
     cpu.a = 0xa;    // 10 + 178
@@ -1134,7 +1134,7 @@ static void sax_indx(void *ctx)
         0x83, 0x2, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0,
         0xb, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.x = 6;
@@ -1153,7 +1153,7 @@ static void sax_indx_pageoverflow(void *ctx)
         0x83, 0x8, 0x0, 0xa, 0x0, 0xff, 0xff, 0x0,
         0x0, 0x0, 0x0, 0x0, 0x0,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 7;
     cpu.x = 0xfb;   // Wrap around from $0008 -> $0003
@@ -1172,7 +1172,7 @@ static void sha_indy(void *ctx)
         0x93, 0x2, 0x0, 0x1,
         [256] = 0xff, 0xff, 0xff, 0xee,
     };
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xa;
     cpu.x = 0xe;
@@ -1191,7 +1191,7 @@ static void sha_indy(void *ctx)
 static void sha_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x93, 0x2, 0xff, 0xfe};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0xea;
     cpu.x = 0xf8;
@@ -1213,7 +1213,7 @@ static void slo_indx(void *ctx)
 {
     uint8_t mem[] = {0x3, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xa;
@@ -1235,7 +1235,7 @@ static void slo_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x3, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0xfe};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xfa;
@@ -1257,7 +1257,7 @@ static void slo_indy(void *ctx)
 {
     uint8_t mem[] = {0x13, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xa;
@@ -1278,7 +1278,7 @@ static void slo_indy(void *ctx)
 static void slo_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x13, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     enable_rom_wcapture();
     cpu.a = 0xea;
@@ -1300,7 +1300,7 @@ static void sre_indx(void *ctx)
 {
     uint8_t mem[] = {0x43, 0x2, 0xff, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xa;
@@ -1322,7 +1322,7 @@ static void sre_indx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x43, 0x2, 0x80, 0xff, 0xff, 0xff, 0x1, 0x80},
             abs[] = {0xff, 0x80, 0xfe};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xfa;
@@ -1344,7 +1344,7 @@ static void sre_indy(void *ctx)
 {
     uint8_t mem[] = {0x53, 0x2, 0x1, 0x80},
             abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
     enable_rom_wcapture();
     cpu.a = 0xa;
@@ -1365,7 +1365,7 @@ static void sre_indy(void *ctx)
 static void sre_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x53, 0x2, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
     enable_rom_wcapture();
     cpu.a = 0xea;

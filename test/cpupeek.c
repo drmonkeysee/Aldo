@@ -15,7 +15,7 @@
 
 static void end_restores_state(void *ctx)
 {
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, NULL, NULL);
     cpu.pc = 0x8000;
     cpu.a = 5;
@@ -31,8 +31,8 @@ static void end_restores_state(void *ctx)
 
     ct_assertfalse(cpu.detached);
 
-    struct mos6502 bak;
-    cpu_peek_start(&cpu, &bak);
+    struct aldo_mos6502 bak;
+    aldo_cpu_peek_start(&cpu, &bak);
 
     ct_asserttrue(cpu.signal.irq);
     ct_asserttrue(cpu.signal.nmi);
@@ -48,7 +48,7 @@ static void end_restores_state(void *ctx)
     cpu.x = 4;
     cpu.y = 0xc;
 
-    cpu_peek_end(&cpu, &bak);
+    aldo_cpu_peek_end(&cpu, &bak);
 
     ct_asserttrue(cpu.signal.irq);
     ct_assertfalse(cpu.signal.nmi);
@@ -67,18 +67,18 @@ static void end_restores_state(void *ctx)
 
 static void end_retains_detached_state(void *ctx)
 {
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, NULL, NULL);
     cpu.detached = true;
 
     ct_asserttrue(cpu.detached);
 
-    struct mos6502 bak;
-    cpu_peek_start(&cpu, &bak);
+    struct aldo_mos6502 bak;
+    aldo_cpu_peek_start(&cpu, &bak);
 
     ct_asserttrue(cpu.detached);
 
-    cpu_peek_end(&cpu, &bak);
+    aldo_cpu_peek_end(&cpu, &bak);
 
     ct_asserttrue(cpu.detached);
 }
@@ -87,10 +87,10 @@ static void irq_ignored(void *ctx)
 {
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
 
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
     cpu.s = 0xff;
     cpu.p.i = false;
     cpu.signal.irq = false;
@@ -106,10 +106,10 @@ static void nmi_ignored(void *ctx)
 {
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
 
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
     cpu.s = 0xff;
     cpu.signal.nmi = false;
 
@@ -124,10 +124,10 @@ static void rst_not_ignored(void *ctx)
 {
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
 
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
     cpu.s = 0xff;
     cpu.signal.rst = false;
 
@@ -142,10 +142,10 @@ static void writes_ignored(void *ctx)
 {
     // NOTE: STA $04 (0x20)
     uint8_t mem[] = {0x85, 0x4, 0x0, 0xff, 0x20};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
 
     int cycles = clock_cpu(&cpu);
 
@@ -160,12 +160,12 @@ static void peek_immediate(void *ctx)
 {
     // NOTE: LDA #$10
     uint8_t mem[] = {0xa9, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
 
-    struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct aldo_peekresult result = aldo_cpu_peek(&cpu, 0x0);
 
     ct_assertequal(ALDO_AM_IMM, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -178,12 +178,12 @@ static void peek_zeropage(void *ctx)
 {
     // NOTE: LDA $04
     uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
 
-    struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct aldo_peekresult result = aldo_cpu_peek(&cpu, 0x0);
 
     ct_assertequal(ALDO_AM_ZP, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -196,13 +196,13 @@ static void peek_zp_indexed(void *ctx)
 {
     // NOTE: LDA $03,X
     uint8_t mem[] = {0xb5, 0x3, 0x0, 0x0, 0x0, 0x30};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
     cpu.x = 2;
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
 
-    struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct aldo_peekresult result = aldo_cpu_peek(&cpu, 0x0);
 
     ct_assertequal(ALDO_AM_ZPX, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -215,13 +215,13 @@ static void peek_indexed_indirect(void *ctx)
 {
     // NOTE: LDA ($02,X)
     uint8_t mem[] = {0xa1, 0x2, 0x0, 0x0, 0x2, 0x1, [258] = 0x40};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
     cpu.x = 2;
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
 
-    struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct aldo_peekresult result = aldo_cpu_peek(&cpu, 0x0);
 
     ct_assertequal(ALDO_AM_INDX, (int)result.mode);
     ct_assertequal(0x4u, result.interaddr);
@@ -234,13 +234,13 @@ static void peek_indirect_indexed(void *ctx)
 {
     // NOTE: LDA ($02),Y
     uint8_t mem[] = {0xb1, 0x2, 0x2, 0x1, [263] = 0x60};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
     cpu.y = 5;
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
 
-    struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct aldo_peekresult result = aldo_cpu_peek(&cpu, 0x0);
 
     ct_assertequal(ALDO_AM_INDY, (int)result.mode);
     ct_assertequal(0x102u, result.interaddr);
@@ -253,12 +253,12 @@ static void peek_absolute(void *ctx)
 {
     // NOTE: LDA $0102
     uint8_t mem[] = {0xad, 0x2, 0x1, [258] = 0x70};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
 
-    struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct aldo_peekresult result = aldo_cpu_peek(&cpu, 0x0);
 
     ct_assertequal(ALDO_AM_ABS, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -271,13 +271,13 @@ static void peek_absolute_indexed(void *ctx)
 {
     // NOTE: LDA $0102,X
     uint8_t mem[] = {0xbd, 0x2, 0x1, [268] = 0x70};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
     cpu.x = 0xa;
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
 
-    struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct aldo_peekresult result = aldo_cpu_peek(&cpu, 0x0);
 
     ct_assertequal(ALDO_AM_ABSX, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -290,12 +290,12 @@ static void peek_branch(void *ctx)
 {
     // NOTE: BEQ +5
     uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.p.z = true;
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
 
-    struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct aldo_peekresult result = aldo_cpu_peek(&cpu, 0x0);
 
     ct_assertequal(ALDO_AM_BCH, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -308,12 +308,12 @@ static void peek_branch_forced(void *ctx)
 {
     // NOTE: BEQ +5
     uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.p.z = false;
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
 
-    struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct aldo_peekresult result = aldo_cpu_peek(&cpu, 0x0);
 
     ct_assertequal(ALDO_AM_BCH, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -326,13 +326,13 @@ static void peek_absolute_indirect(void *ctx)
 {
     // NOTE: LDA ($0102)
     uint8_t mem[] = {0x6c, 0x2, 0x1, [258] = 0x5, 0x2, [517] = 80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
     cpu.x = 0xa;
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
 
-    struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct aldo_peekresult result = aldo_cpu_peek(&cpu, 0x0);
 
     ct_assertequal(ALDO_AM_JIND, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -345,11 +345,11 @@ static void peek_jam(void *ctx)
 {
     // NOTE: JAM
     uint8_t mem[] = {0x02, 0x10};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
 
-    struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct aldo_peekresult result = aldo_cpu_peek(&cpu, 0x0);
 
     ct_assertequal(ALDO_AM_JAM, (int)result.mode);
 }
@@ -358,12 +358,12 @@ static void peek_busfault(void *ctx)
 {
     // NOTE: LDA $4002
     uint8_t mem[] = {0xad, 0x2, 0x40};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, NULL);
 
-    struct peekresult result = cpu_peek(&cpu, 0x0);
+    struct aldo_peekresult result = aldo_cpu_peek(&cpu, 0x0);
 
     ct_assertequal(ALDO_AM_ABS, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);

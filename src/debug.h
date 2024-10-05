@@ -70,7 +70,7 @@ void aldo_debug_reset(aldo_debugger *self) br_nothrow;
 //
 
 void aldo_debug_cpu_connect(aldo_debugger *self,
-                            struct mos6502 *cpu) br_nothrow;
+                            struct aldo_mos6502 *cpu) br_nothrow;
 void aldo_debug_cpu_disconnect(aldo_debugger *self) br_nothrow;
 void aldo_debug_sync_bus(aldo_debugger *self) br_nothrow;
 void aldo_debug_check(aldo_debugger *self,

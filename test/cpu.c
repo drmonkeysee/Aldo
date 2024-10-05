@@ -14,10 +14,10 @@
 
 static void powerup_initializes_cpu(void *ctx)
 {
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, NULL, NULL);
 
-    cpu_powerup(&cpu);
+    aldo_cpu_powerup(&cpu);
 
     ct_asserttrue(cpu.signal.irq);
     ct_asserttrue(cpu.signal.nmi);
@@ -33,7 +33,7 @@ static void powerup_initializes_cpu(void *ctx)
 static void data_fault(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x1f, 0x40};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -47,7 +47,7 @@ static void data_fault(void *ctx)
 static void ram_mirroring(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x3, 0x8, 0x45}; // $0803 -> $0003
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);

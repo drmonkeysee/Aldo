@@ -18,7 +18,7 @@
 
 // The MOS6502 processor is a little-endian
 // 8-bit CPU with a 16-bit addressing space.
-struct mos6502 {
+struct aldo_mos6502 {
     // Main Bus: external components connected to the CPU pins
     bus *mbus;          // Non-owning Pointer
 
@@ -79,7 +79,7 @@ struct mos6502 {
                         // the following cycle as an opcode fetch (T0).
 };
 
-struct peekresult {
+struct aldo_peekresult {
     enum addrmode mode;
     uint16_t interaddr, finaladdr;
     uint8_t data;
@@ -90,19 +90,20 @@ struct peekresult {
 br_libexport
 extern const int Aldo_MaxTCycle;
 
-void cpu_powerup(struct mos6502 *self) br_nothrow;
+void aldo_cpu_powerup(struct aldo_mos6502 *self) br_nothrow;
 
-int cpu_cycle(struct mos6502 *self) br_nothrow;
+int aldo_cpu_cycle(struct aldo_mos6502 *self) br_nothrow;
 
-bool cpu_jammed(const struct mos6502 *self) br_nothrow;
-void cpu_snapshot(const struct mos6502 *self,
-                  struct aldo_snapshot *snp) br_nothrow;
+bool aldo_cpu_jammed(const struct aldo_mos6502 *self) br_nothrow;
+void aldo_cpu_snapshot(const struct aldo_mos6502 *self,
+                       struct aldo_snapshot *snp) br_nothrow;
 
-void cpu_peek_start(struct mos6502 *br_noalias self,
-                    struct mos6502 *br_noalias restore) br_nothrow;
-struct peekresult cpu_peek(struct mos6502 *self, uint16_t addr) br_nothrow;
-void cpu_peek_end(struct mos6502 *br_noalias self,
-                  struct mos6502 *br_noalias restore) br_nothrow;
+void aldo_cpu_peek_start(struct aldo_mos6502 *br_noalias self,
+                         struct aldo_mos6502 *br_noalias restore) br_nothrow;
+struct aldo_peekresult aldo_cpu_peek(struct aldo_mos6502 *self,
+                                     uint16_t addr) br_nothrow;
+void aldo_cpu_peek_end(struct aldo_mos6502 *br_noalias self,
+                       struct aldo_mos6502 *br_noalias restore) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

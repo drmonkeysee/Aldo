@@ -15,9 +15,9 @@
 extern uint8_t BigRom[];
 extern int RomWriteCapture;
 
-void setup_cpu(struct mos6502 *cpu, uint8_t *restrict ram,
+void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
                uint8_t *restrict rom);
 void enable_rom_wcapture(void);
-int clock_cpu(struct mos6502 *cpu);
+int clock_cpu(struct aldo_mos6502 *cpu);
 
 #endif

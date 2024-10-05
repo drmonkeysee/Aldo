@@ -15,7 +15,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
+static int trace_instruction(FILE *tracelog, const struct aldo_mos6502 *cpu,
                              const struct aldo_snapshot *snp)
 {
     uint8_t bytes[3];
@@ -34,7 +34,7 @@ static int trace_instruction(FILE *tracelog, const struct mos6502 *cpu,
                                            : "No inst"));
 }
 
-static int trace_instruction_peek(FILE *tracelog, struct mos6502 *cpu,
+static int trace_instruction_peek(FILE *tracelog, struct aldo_mos6502 *cpu,
                                   aldo_debugger *dbg,
                                   const struct aldo_snapshot *snp)
 {
@@ -67,7 +67,7 @@ static void trace_registers(FILE *tracelog, const struct aldo_snapshot *snp)
 //
 
 void aldo_trace_line(FILE *tracelog, uint64_t cycles,
-                     struct aldo_ppu_coord pixel, struct mos6502 *cpu,
+                     struct aldo_ppu_coord pixel, struct aldo_mos6502 *cpu,
                      aldo_debugger *dbg, const struct aldo_snapshot *snp)
 {
     assert(tracelog != NULL);

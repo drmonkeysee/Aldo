@@ -19,7 +19,7 @@
 static void jmp(void *ctx)
 {
     uint8_t mem[] = {0x4c, 0x1, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
     int cycles = clock_cpu(&cpu);
@@ -32,7 +32,7 @@ static void jmp_indirect(void *ctx)
 {
     uint8_t mem[] = {0x6c, 0x1, 0x80},
             abs[] = {0xff, 0xef, 0xbe};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
 
     int cycles = clock_cpu(&cpu);
@@ -46,7 +46,7 @@ static void jmp_indirect_pageboundary_bug(void *ctx)
     // NOTE: *supposed* to read from $80FF, $8100
     // but actually ignores the carry and reads from $80FF, $8000.
     uint8_t mem[] = {0x6c, 0xff, 0x80};
-    struct mos6502 cpu;
+    struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, BigRom);
 
     int cycles = clock_cpu(&cpu);

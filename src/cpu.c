@@ -16,13 +16,13 @@
 // MARK: - State Management
 //
 
-static void detach(struct mos6502 *self)
+static void detach(struct aldo_mos6502 *self)
 {
     // TODO: adjust any bus devices with side-effect reads
     self->detached = true;
 }
 
-static void attach(struct mos6502 *self)
+static void attach(struct aldo_mos6502 *self)
 {
     // TODO: adjust any bus devices with side-effect reads
     self->detached = false;
@@ -32,13 +32,13 @@ static void attach(struct mos6502 *self)
 // MARK: - Internal Operations
 //
 
-static void read(struct mos6502 *self)
+static void read(struct aldo_mos6502 *self)
 {
     self->signal.rw = true;
     self->bflt = !bus_read(self->mbus, self->addrbus, &self->databus);
 }
 
-static void write(struct mos6502 *self)
+static void write(struct aldo_mos6502 *self)
 {
     if (self->detached) {
         read(self);
@@ -48,7 +48,7 @@ static void write(struct mos6502 *self)
     }
 }
 
-static uint8_t get_p(const struct mos6502 *self, bool interrupt)
+static uint8_t get_p(const struct aldo_mos6502 *self, bool interrupt)
 {
     return (uint8_t)
         (self->p.c
@@ -61,7 +61,7 @@ static uint8_t get_p(const struct mos6502 *self, bool interrupt)
          | self->p.n << 7);
 }
 
-static void set_p(struct mos6502 *self, uint8_t p)
+static void set_p(struct aldo_mos6502 *self, uint8_t p)
 {
     self->p.c = p & 0x1;
     self->p.z = p & 0x2;
@@ -72,12 +72,12 @@ static void set_p(struct mos6502 *self, uint8_t p)
     self->p.n = p & 0x80;
 }
 
-static void update_z(struct mos6502 *self, uint8_t d)
+static void update_z(struct aldo_mos6502 *self, uint8_t d)
 {
     self->p.z = d == 0;
 }
 
-static bool bcd_mode(struct mos6502 *self)
+static bool bcd_mode(struct aldo_mos6502 *self)
 {
     return self->bcd && self->p.d;
 }
@@ -87,12 +87,13 @@ static bool bcd_mode(struct mos6502 *self)
 // the sign of S and the sign of B does not match the sign of S:
 // (Sign A ^ Sign S) & (Sign B ^ Sign S) or
 // (A ^ S) & (B ^ S) & SignMask
-static void update_v(struct mos6502 *self, uint8_t s, uint8_t a, uint8_t b)
+static void update_v(struct aldo_mos6502 *self, uint8_t s, uint8_t a,
+                     uint8_t b)
 {
     self->p.v = (a ^ s) & (b ^ s) & 0x80;
 }
 
-static void update_n(struct mos6502 *self, uint8_t d)
+static void update_n(struct aldo_mos6502 *self, uint8_t d)
 {
     self->p.n = d & 0x80;
 }
@@ -103,7 +104,7 @@ static void update_n(struct mos6502 *self, uint8_t d)
 
 // NOTE: check interrupt lines (active low) on ϕ2 to
 // initiate interrupt detection.
-static void check_interrupts(struct mos6502 *self)
+static void check_interrupts(struct aldo_mos6502 *self)
 {
     // NOTE: serviced state is only for assisting in nmi edge detection
     assert(self->rst != ALDO_SIG_SERVICED);
@@ -133,7 +134,7 @@ static void check_interrupts(struct mos6502 *self)
 
 // NOTE: check persistence of interrupt lines (active low) on ϕ1
 // of following cycle to latch interrupt detection and make polling possible.
-static void latch_interrupts(struct mos6502 *self)
+static void latch_interrupts(struct aldo_mos6502 *self)
 {
     // NOTE: rst is level-detected but unlike irq it takes effect at
     // end of this cycle's ϕ2 so it moves directly from pending in this cycle
@@ -167,7 +168,7 @@ static void latch_interrupts(struct mos6502 *self)
     }
 }
 
-static void poll_interrupts(struct mos6502 *self)
+static void poll_interrupts(struct aldo_mos6502 *self)
 {
     if (self->detached) return;
 
@@ -180,14 +181,14 @@ static void poll_interrupts(struct mos6502 *self)
     }
 }
 
-static bool service_interrupt(struct mos6502 *self)
+static bool service_interrupt(struct aldo_mos6502 *self)
 {
     return self->rst == ALDO_SIG_COMMITTED
             || self->nmi == ALDO_SIG_COMMITTED
             || self->irq == ALDO_SIG_COMMITTED;
 }
 
-static uint16_t interrupt_vector(struct mos6502 *self)
+static uint16_t interrupt_vector(struct aldo_mos6502 *self)
 {
     if (self->rst == ALDO_SIG_COMMITTED) return CPU_VECTOR_RST;
     if (self->nmi == ALDO_SIG_COMMITTED) return CPU_VECTOR_NMI;
@@ -197,7 +198,7 @@ static uint16_t interrupt_vector(struct mos6502 *self)
 // NOTE: rst takes effect after two cycles and immediately resets/halts
 // the cpu until the rst line goes high again (this isn't strictly true
 // but the real cpu complexity isn't necessary here).
-static bool reset_held(struct mos6502 *self)
+static bool reset_held(struct aldo_mos6502 *self)
 {
     if (self->rst == ALDO_SIG_PENDING) {
         self->rst = ALDO_SIG_COMMITTED;
@@ -227,26 +228,26 @@ static bool reset_held(struct mos6502 *self)
 // committing the operation before executing the register side-effects will
 // emulate this pipeline timing with respect to interrupts without modelling
 // the actual cycle-delay of internal CPU operations.
-static void conditional_commit(struct mos6502 *self, bool c)
+static void conditional_commit(struct aldo_mos6502 *self, bool c)
 {
     // NOTE: interrupts are polled regardless of commit condition
     poll_interrupts(self);
     self->presync = c;
 }
 
-static void commit_operation(struct mos6502 *self)
+static void commit_operation(struct aldo_mos6502 *self)
 {
     conditional_commit(self, true);
 }
 
-static void load_register(struct mos6502 *self, uint8_t *r, uint8_t d)
+static void load_register(struct aldo_mos6502 *self, uint8_t *r, uint8_t d)
 {
     *r = d;
     update_z(self, *r);
     update_n(self, *r);
 }
 
-static void store_data(struct mos6502 *self, uint8_t d)
+static void store_data(struct aldo_mos6502 *self, uint8_t d)
 {
     self->databus = d;
     write(self);
@@ -256,7 +257,8 @@ static void store_data(struct mos6502 *self, uint8_t d)
 // where ~carry indicates borrow-out, are equivalent in binary mode:
 //  A - B => A + (-B) => A + 2sComplement(B) => A + (~B + 1) when C = 1;
 //  C = 0 is thus a borrow-out; A + (~B + 0) => A + ~B => A - B - 1.
-static void binary_add(struct mos6502 *self, uint8_t a, uint8_t b, uint8_t c)
+static void binary_add(struct aldo_mos6502 *self, uint8_t a, uint8_t b,
+                       uint8_t c)
 {
     uint16_t sum = (uint16_t)(a + b + c);
     self->p.c = sum & 0x100;
@@ -265,7 +267,7 @@ static void binary_add(struct mos6502 *self, uint8_t a, uint8_t b, uint8_t c)
     load_register(self, &self->a, result);
 }
 
-static void decimal_add(struct mos6502 *self, uint8_t alo, uint8_t blo,
+static void decimal_add(struct aldo_mos6502 *self, uint8_t alo, uint8_t blo,
                         uint8_t ahi, uint8_t bhi, bool c)
 {
     uint8_t slo = (uint8_t)(alo + blo + c);
@@ -288,8 +290,9 @@ static void decimal_add(struct mos6502 *self, uint8_t alo, uint8_t blo,
     self->a = shinib | slo;
 }
 
-static void decimal_subtract(struct mos6502 *self, uint8_t alo, uint8_t blo,
-                             uint8_t ahi, uint8_t bhi, uint8_t brw)
+static void decimal_subtract(struct aldo_mos6502 *self, uint8_t alo,
+                             uint8_t blo, uint8_t ahi, uint8_t bhi,
+                             uint8_t brw)
 {
     uint8_t dlo = (uint8_t)(alo - blo + brw);   // borrow is either 0 or -1
     bool brwhi = dlo >= 0x80; // dlo < 0
@@ -311,7 +314,7 @@ enum arithmetic_operator {
     AOP_SUB,
 };
 
-static void arithmetic_operation(struct mos6502 *self,
+static void arithmetic_operation(struct aldo_mos6502 *self,
                                  enum arithmetic_operator op, uint8_t b)
 {
     uint8_t a = self->a;
@@ -339,7 +342,8 @@ static void arithmetic_operation(struct mos6502 *self,
 // NOTE: compare is effectively R - D; modeling the subtraction as
 // R + 2sComplement(D) gets us all the flags for free;
 // see binary_add for why this works.
-static uint8_t compare_register(struct mos6502 *self, uint8_t r, uint8_t d)
+static uint8_t compare_register(struct aldo_mos6502 *self, uint8_t r,
+                                uint8_t d)
 {
     uint16_t cmp = (uint16_t)(r + (uint8_t)~d + 1);
     self->p.c = cmp & 0x100;
@@ -349,7 +353,7 @@ static uint8_t compare_register(struct mos6502 *self, uint8_t r, uint8_t d)
     return result;
 }
 
-static void modify_mem(struct mos6502 *self, uint8_t d)
+static void modify_mem(struct aldo_mos6502 *self, uint8_t d)
 {
     store_data(self, d);
     update_z(self, d);
@@ -361,7 +365,7 @@ enum bitdirection {
     BIT_RIGHT,
 };
 
-static uint8_t bitoperation(struct mos6502 *self, struct decoded dec,
+static uint8_t bitoperation(struct aldo_mos6502 *self, struct decoded dec,
                             enum bitdirection bd, uint8_t carryin_mask)
 {
     // NOTE: some unofficial shift/rotate opcodes use immediate mode
@@ -385,19 +389,19 @@ static uint8_t bitoperation(struct mos6502 *self, struct decoded dec,
     return d;
 }
 
-static void stack_top(struct mos6502 *self)
+static void stack_top(struct aldo_mos6502 *self)
 {
     self->addrbus = bytowr(self->s, 0x1);
     read(self);
 }
 
-static void stack_pop(struct mos6502 *self)
+static void stack_pop(struct aldo_mos6502 *self)
 {
     ++self->s;
     stack_top(self);
 }
 
-static void stack_push(struct mos6502 *self, uint8_t d)
+static void stack_push(struct aldo_mos6502 *self, uint8_t d)
 {
     self->addrbus = bytowr(self->s--, 0x1);
     store_data(self, d);
@@ -407,7 +411,7 @@ static void stack_push(struct mos6502 *self, uint8_t d)
 // depending on the instruction and addressing-mode timing; these extra reads
 // and writes are all modeled below to help verify cycle-accurate behavior.
 
-static bool read_delayed(struct mos6502 *self, struct decoded dec,
+static bool read_delayed(struct aldo_mos6502 *self, struct decoded dec,
                          bool delay_condition)
 {
     if (!delay_condition) return false;
@@ -431,7 +435,7 @@ static bool read_delayed(struct mos6502 *self, struct decoded dec,
     return delayed;
 }
 
-static bool write_delayed(struct mos6502 *self, struct decoded dec)
+static bool write_delayed(struct aldo_mos6502 *self, struct decoded dec)
 {
     bool delayed;
     switch (dec.mode) {
@@ -461,12 +465,12 @@ static bool write_delayed(struct mos6502 *self, struct decoded dec)
     return delayed;
 }
 
-static void UDF_exec(struct mos6502 *self)
+static void UDF_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
 }
 
-static void ADC_exec(struct mos6502 *self, struct decoded dec)
+static void ADC_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -474,7 +478,7 @@ static void ADC_exec(struct mos6502 *self, struct decoded dec)
     arithmetic_operation(self, AOP_ADD, self->databus);
 }
 
-static void AND_exec(struct mos6502 *self, struct decoded dec)
+static void AND_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -482,7 +486,7 @@ static void AND_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->a, self->a & self->databus);
 }
 
-static void ASL_exec(struct mos6502 *self, struct decoded dec)
+static void ASL_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
@@ -493,22 +497,22 @@ static void ASL_exec(struct mos6502 *self, struct decoded dec)
 // e.g. BCC (branch on carry clear) will NOT branch if carry is SET;
 // i.e. NOT(Condition) => commit instruction.
 
-static void BCC_exec(struct mos6502 *self)
+static void BCC_exec(struct aldo_mos6502 *self)
 {
     conditional_commit(self, self->p.c);
 }
 
-static void BCS_exec(struct mos6502 *self)
+static void BCS_exec(struct aldo_mos6502 *self)
 {
     conditional_commit(self, !self->p.c);
 }
 
-static void BEQ_exec(struct mos6502 *self)
+static void BEQ_exec(struct aldo_mos6502 *self)
 {
     conditional_commit(self, !self->p.z);
 }
 
-static void BIT_exec(struct mos6502 *self, struct decoded dec)
+static void BIT_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -518,22 +522,22 @@ static void BIT_exec(struct mos6502 *self, struct decoded dec)
     update_n(self, self->databus);
 }
 
-static void BMI_exec(struct mos6502 *self)
+static void BMI_exec(struct aldo_mos6502 *self)
 {
     conditional_commit(self, !self->p.n);
 }
 
-static void BNE_exec(struct mos6502 *self)
+static void BNE_exec(struct aldo_mos6502 *self)
 {
     conditional_commit(self, self->p.z);
 }
 
-static void BPL_exec(struct mos6502 *self)
+static void BPL_exec(struct aldo_mos6502 *self)
 {
     conditional_commit(self, self->p.n);
 }
 
-static void BRK_exec(struct mos6502 *self)
+static void BRK_exec(struct aldo_mos6502 *self)
 {
     // NOTE: rst is only cleared by its own handler;
     // nmi is serviced by its own handler (for edge detection)
@@ -552,41 +556,41 @@ static void BRK_exec(struct mos6502 *self)
     commit_operation(self);
 }
 
-static void BVC_exec(struct mos6502 *self)
+static void BVC_exec(struct aldo_mos6502 *self)
 {
     conditional_commit(self, self->p.v);
 }
 
-static void BVS_exec(struct mos6502 *self)
+static void BVS_exec(struct aldo_mos6502 *self)
 {
     conditional_commit(self, !self->p.v);
 }
 
-static void CLC_exec(struct mos6502 *self)
+static void CLC_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     self->p.c = false;
 }
 
-static void CLD_exec(struct mos6502 *self)
+static void CLD_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     self->p.d = false;
 }
 
-static void CLI_exec(struct mos6502 *self)
+static void CLI_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     self->p.i = false;
 }
 
-static void CLV_exec(struct mos6502 *self)
+static void CLV_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     self->p.v = false;
 }
 
-static void CMP_exec(struct mos6502 *self, struct decoded dec)
+static void CMP_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -594,7 +598,7 @@ static void CMP_exec(struct mos6502 *self, struct decoded dec)
     compare_register(self, self->a, self->databus);
 }
 
-static void CPX_exec(struct mos6502 *self, struct decoded dec)
+static void CPX_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -602,7 +606,7 @@ static void CPX_exec(struct mos6502 *self, struct decoded dec)
     compare_register(self, self->x, self->databus);
 }
 
-static void CPY_exec(struct mos6502 *self, struct decoded dec)
+static void CPY_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -610,26 +614,26 @@ static void CPY_exec(struct mos6502 *self, struct decoded dec)
     compare_register(self, self->y, self->databus);
 }
 
-static void DEC_exec(struct mos6502 *self, struct decoded dec)
+static void DEC_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
     modify_mem(self, self->databus - 1);
 }
 
-static void DEX_exec(struct mos6502 *self)
+static void DEX_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     load_register(self, &self->x, self->x - 1);
 }
 
-static void DEY_exec(struct mos6502 *self)
+static void DEY_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     load_register(self, &self->y, self->y - 1);
 }
 
-static void EOR_exec(struct mos6502 *self, struct decoded dec)
+static void EOR_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -637,38 +641,38 @@ static void EOR_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->a, self->a ^ self->databus);
 }
 
-static void INC_exec(struct mos6502 *self, struct decoded dec)
+static void INC_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
     modify_mem(self, self->databus + 1);
 }
 
-static void INX_exec(struct mos6502 *self)
+static void INX_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     load_register(self, &self->x, self->x + 1);
 }
 
-static void INY_exec(struct mos6502 *self)
+static void INY_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     load_register(self, &self->y, self->y + 1);
 }
 
-static void JMP_exec(struct mos6502 *self)
+static void JMP_exec(struct aldo_mos6502 *self)
 {
     self->pc = bytowr(self->adl, self->databus);
     commit_operation(self);
 }
 
-static void JSR_exec(struct mos6502 *self)
+static void JSR_exec(struct aldo_mos6502 *self)
 {
     self->pc = bytowr(self->adl, self->databus);
     commit_operation(self);
 }
 
-static void LDA_exec(struct mos6502 *self, struct decoded dec)
+static void LDA_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -676,7 +680,7 @@ static void LDA_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->a, self->databus);
 }
 
-static void LDX_exec(struct mos6502 *self, struct decoded dec)
+static void LDX_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -684,7 +688,7 @@ static void LDX_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->x, self->databus);
 }
 
-static void LDY_exec(struct mos6502 *self, struct decoded dec)
+static void LDY_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -692,14 +696,14 @@ static void LDY_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->y, self->databus);
 }
 
-static void LSR_exec(struct mos6502 *self, struct decoded dec)
+static void LSR_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
     bitoperation(self, dec, BIT_RIGHT, 0x0);
 }
 
-static void NOP_exec(struct mos6502 *self, struct decoded dec)
+static void NOP_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     // NOTE: unofficial NOPs have reads triggered by
     // non-implied addressing modes.
@@ -710,7 +714,7 @@ static void NOP_exec(struct mos6502 *self, struct decoded dec)
     commit_operation(self);
 }
 
-static void ORA_exec(struct mos6502 *self, struct decoded dec)
+static void ORA_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -718,58 +722,58 @@ static void ORA_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->a, self->a | self->databus);
 }
 
-static void PHA_exec(struct mos6502 *self)
+static void PHA_exec(struct aldo_mos6502 *self)
 {
     stack_push(self, self->a);
     commit_operation(self);
 }
 
-static void PHP_exec(struct mos6502 *self)
+static void PHP_exec(struct aldo_mos6502 *self)
 {
     stack_push(self, get_p(self, false));
     commit_operation(self);
 }
 
-static void PLA_exec(struct mos6502 *self)
+static void PLA_exec(struct aldo_mos6502 *self)
 {
     stack_pop(self);
     commit_operation(self);
     load_register(self, &self->a, self->databus);
 }
 
-static void PLP_exec(struct mos6502 *self)
+static void PLP_exec(struct aldo_mos6502 *self)
 {
     stack_pop(self);
     commit_operation(self);
     set_p(self, self->databus);
 }
 
-static void ROL_exec(struct mos6502 *self, struct decoded dec)
+static void ROL_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
     bitoperation(self, dec, BIT_LEFT, self->p.c);
 }
 
-static void ROR_exec(struct mos6502 *self, struct decoded dec)
+static void ROR_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
     bitoperation(self, dec, BIT_RIGHT, (uint8_t)(self->p.c << 7));
 }
 
-static void RTI_exec(struct mos6502 *self)
+static void RTI_exec(struct aldo_mos6502 *self)
 {
     self->pc = bytowr(self->adl, self->databus);
     commit_operation(self);
 }
 
-static void RTS_exec(struct mos6502 *self)
+static void RTS_exec(struct aldo_mos6502 *self)
 {
     self->pc = bytowr(self->adl, self->databus);
 }
 
-static void SBC_exec(struct mos6502 *self, struct decoded dec)
+static void SBC_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -777,76 +781,76 @@ static void SBC_exec(struct mos6502 *self, struct decoded dec)
     arithmetic_operation(self, AOP_SUB, self->databus);
 }
 
-static void SEC_exec(struct mos6502 *self)
+static void SEC_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     self->p.c = true;
 }
 
-static void SED_exec(struct mos6502 *self)
+static void SED_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     self->p.d = true;
 }
 
-static void SEI_exec(struct mos6502 *self)
+static void SEI_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     self->p.i = true;
 }
 
-static void STA_exec(struct mos6502 *self, struct decoded dec)
+static void STA_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true)) return;
     store_data(self, self->a);
     commit_operation(self);
 }
 
-static void STX_exec(struct mos6502 *self, struct decoded dec)
+static void STX_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true)) return;
     store_data(self, self->x);
     commit_operation(self);
 }
 
-static void STY_exec(struct mos6502 *self, struct decoded dec)
+static void STY_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true)) return;
     store_data(self, self->y);
     commit_operation(self);
 }
 
-static void TAX_exec(struct mos6502 *self)
+static void TAX_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     load_register(self, &self->x, self->a);
 }
 
-static void TAY_exec(struct mos6502 *self)
+static void TAY_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     load_register(self, &self->y, self->a);
 }
 
-static void TSX_exec(struct mos6502 *self)
+static void TSX_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     load_register(self, &self->x, self->s);
 }
 
-static void TXA_exec(struct mos6502 *self)
+static void TXA_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     load_register(self, &self->a, self->x);
 }
 
-static void TXS_exec(struct mos6502 *self)
+static void TXS_exec(struct aldo_mos6502 *self)
 {
     self->s = self->x;
     commit_operation(self);
 }
 
-static void TYA_exec(struct mos6502 *self)
+static void TYA_exec(struct aldo_mos6502 *self)
 {
     commit_operation(self);
     load_register(self, &self->a, self->y);
@@ -862,7 +866,7 @@ static void TYA_exec(struct mos6502 *self)
 // https://csdb.dk/release/?id=212346 recommends using EE.
 static const uint8_t Magic = 0xee;
 
-static void store_unstable_addresshigh(struct mos6502 *self, uint8_t d)
+static void store_unstable_addresshigh(struct aldo_mos6502 *self, uint8_t d)
 {
     // NOTE: if addr carry, +1 has already been stored into adh
     uint8_t adrhi = self->adc ? self->adh : self->adh + 1;
@@ -877,7 +881,7 @@ static void store_unstable_addresshigh(struct mos6502 *self, uint8_t d)
     store_data(self, d);
 }
 
-static void ALR_exec(struct mos6502 *self, struct decoded dec)
+static void ALR_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     read(self);
     commit_operation(self);
@@ -885,7 +889,7 @@ static void ALR_exec(struct mos6502 *self, struct decoded dec)
     bitoperation(self, dec, BIT_RIGHT, 0x0);
 }
 
-static void ANC_exec(struct mos6502 *self)
+static void ANC_exec(struct aldo_mos6502 *self)
 {
     read(self);
     commit_operation(self);
@@ -893,14 +897,14 @@ static void ANC_exec(struct mos6502 *self)
     self->p.c = self->a & 0x80;
 }
 
-static void ANE_exec(struct mos6502 *self)
+static void ANE_exec(struct aldo_mos6502 *self)
 {
     read(self);
     commit_operation(self);
     load_register(self, &self->a, (self->a | Magic) & self->x & self->databus);
 }
 
-static void ARR_exec(struct mos6502 *self, struct decoded dec)
+static void ARR_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     read(self);
     commit_operation(self);
@@ -940,7 +944,7 @@ static void ARR_exec(struct mos6502 *self, struct decoded dec)
     }
 }
 
-static void DCP_exec(struct mos6502 *self, struct decoded dec)
+static void DCP_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
@@ -949,7 +953,7 @@ static void DCP_exec(struct mos6502 *self, struct decoded dec)
     compare_register(self, self->a, d);
 }
 
-static void ISC_exec(struct mos6502 *self, struct decoded dec)
+static void ISC_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
@@ -958,13 +962,13 @@ static void ISC_exec(struct mos6502 *self, struct decoded dec)
     arithmetic_operation(self, AOP_SUB, d);
 }
 
-static void JAM_exec(struct mos6502 *self)
+static void JAM_exec(struct aldo_mos6502 *self)
 {
     self->databus = 0xff;
     self->addrbus = bytowr(0xff, 0xff);
 }
 
-static void LAS_exec(struct mos6502 *self, struct decoded dec)
+static void LAS_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -974,7 +978,7 @@ static void LAS_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->x, self->s);
 }
 
-static void LAX_exec(struct mos6502 *self, struct decoded dec)
+static void LAX_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, self->adc)) return;
     read(self);
@@ -983,7 +987,7 @@ static void LAX_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->x, self->databus);
 }
 
-static void LXA_exec(struct mos6502 *self)
+static void LXA_exec(struct aldo_mos6502 *self)
 {
     read(self);
     commit_operation(self);
@@ -992,7 +996,7 @@ static void LXA_exec(struct mos6502 *self)
     load_register(self, &self->x, d);
 }
 
-static void RLA_exec(struct mos6502 *self, struct decoded dec)
+static void RLA_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
@@ -1000,7 +1004,7 @@ static void RLA_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->a, self->a & d);
 }
 
-static void RRA_exec(struct mos6502 *self, struct decoded dec)
+static void RRA_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
@@ -1008,13 +1012,13 @@ static void RRA_exec(struct mos6502 *self, struct decoded dec)
     arithmetic_operation(self, AOP_ADD, d);
 }
 
-static void SAX_exec(struct mos6502 *self)
+static void SAX_exec(struct aldo_mos6502 *self)
 {
     store_data(self, self->a & self->x);
     commit_operation(self);
 }
 
-static void SBX_exec(struct mos6502 *self)
+static void SBX_exec(struct aldo_mos6502 *self)
 {
     read(self);
     commit_operation(self);
@@ -1022,28 +1026,28 @@ static void SBX_exec(struct mos6502 *self)
     load_register(self, &self->x, cmp);
 }
 
-static void SHA_exec(struct mos6502 *self, struct decoded dec)
+static void SHA_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true)) return;
     store_unstable_addresshigh(self, self->a & self->x);
     commit_operation(self);
 }
 
-static void SHX_exec(struct mos6502 *self, struct decoded dec)
+static void SHX_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true)) return;
     store_unstable_addresshigh(self, self->x);
     commit_operation(self);
 }
 
-static void SHY_exec(struct mos6502 *self, struct decoded dec)
+static void SHY_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true)) return;
     store_unstable_addresshigh(self, self->y);
     commit_operation(self);
 }
 
-static void SLO_exec(struct mos6502 *self, struct decoded dec)
+static void SLO_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
@@ -1051,7 +1055,7 @@ static void SLO_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->a, self->a | d);
 }
 
-static void SRE_exec(struct mos6502 *self, struct decoded dec)
+static void SRE_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
@@ -1059,7 +1063,7 @@ static void SRE_exec(struct mos6502 *self, struct decoded dec)
     load_register(self, &self->a, self->a ^ d);
 }
 
-static void TAS_exec(struct mos6502 *self, struct decoded dec)
+static void TAS_exec(struct aldo_mos6502 *self, struct decoded dec)
 {
     if (read_delayed(self, dec, true)) return;
     self->s = self->a & self->x;
@@ -1071,7 +1075,7 @@ static void TAS_exec(struct mos6502 *self, struct decoded dec)
 // MARK: - Instruction Dispatch
 //
 
-static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
+static void dispatch_instruction(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (dec.instruction) {
 #define X(s, d, f, ...) case ALDO_IN_LBL(s): s##_exec(__VA_ARGS__); break;
@@ -1101,7 +1105,7 @@ static void dispatch_instruction(struct mos6502 *self, struct decoded dec)
 
 #define BAD_ADDR_SEQ assert(((void)"BAD ADDRMODE SEQUENCE", false))
 
-static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
+static void zeropage_indexed(struct aldo_mos6502 *self, struct decoded dec,
                              uint8_t index)
 {
     switch (self->t) {
@@ -1130,7 +1134,7 @@ static void zeropage_indexed(struct mos6502 *self, struct decoded dec,
     }
 }
 
-static void absolute_indexed(struct mos6502 *self, struct decoded dec,
+static void absolute_indexed(struct aldo_mos6502 *self, struct decoded dec,
                              uint8_t index)
 {
     switch (self->t) {
@@ -1165,7 +1169,7 @@ static void absolute_indexed(struct mos6502 *self, struct decoded dec,
     }
 }
 
-static void branch_displacement(struct mos6502 *self)
+static void branch_displacement(struct aldo_mos6502 *self)
 {
     self->adl = (uint8_t)self->pc + self->databus;
     // NOTE: branch uses signed displacement so there are three overflow cases:
@@ -1184,12 +1188,12 @@ static void branch_displacement(struct mos6502 *self)
     self->pc = bytowr(self->adl, (uint8_t)(self->pc >> 8));
 }
 
-static void branch_carry(struct mos6502 *self)
+static void branch_carry(struct aldo_mos6502 *self)
 {
     self->pc = bytowr(self->adl, (uint8_t)((self->pc >> 8) + self->adc));
 }
 
-static void IMP_sequence(struct mos6502 *self, struct decoded dec)
+static void IMP_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     assert(self->t == 1);
 
@@ -1198,7 +1202,7 @@ static void IMP_sequence(struct mos6502 *self, struct decoded dec)
     dispatch_instruction(self, dec);
 }
 
-static void IMM_sequence(struct mos6502 *self, struct decoded dec)
+static void IMM_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     assert(self->t == 1);
 
@@ -1206,7 +1210,7 @@ static void IMM_sequence(struct mos6502 *self, struct decoded dec)
     dispatch_instruction(self, dec);
 }
 
-static void ZP_sequence(struct mos6502 *self, struct decoded dec)
+static void ZP_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1229,17 +1233,17 @@ static void ZP_sequence(struct mos6502 *self, struct decoded dec)
     }
 }
 
-static void ZPX_sequence(struct mos6502 *self, struct decoded dec)
+static void ZPX_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     zeropage_indexed(self, dec, self->x);
 }
 
-static void ZPY_sequence(struct mos6502 *self, struct decoded dec)
+static void ZPY_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     zeropage_indexed(self, dec, self->y);
 }
 
-static void INDX_sequence(struct mos6502 *self, struct decoded dec)
+static void INDX_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1279,7 +1283,7 @@ static void INDX_sequence(struct mos6502 *self, struct decoded dec)
     }
 }
 
-static void INDY_sequence(struct mos6502 *self, struct decoded dec)
+static void INDY_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1321,7 +1325,7 @@ static void INDY_sequence(struct mos6502 *self, struct decoded dec)
     }
 }
 
-static void ABS_sequence(struct mos6502 *self, struct decoded dec)
+static void ABS_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1349,17 +1353,17 @@ static void ABS_sequence(struct mos6502 *self, struct decoded dec)
     }
 }
 
-static void ABSX_sequence(struct mos6502 *self, struct decoded dec)
+static void ABSX_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     absolute_indexed(self, dec, self->x);
 }
 
-static void ABSY_sequence(struct mos6502 *self, struct decoded dec)
+static void ABSY_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     absolute_indexed(self, dec, self->y);
 }
 
-static void PSH_sequence(struct mos6502 *self, struct decoded dec)
+static void PSH_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1375,7 +1379,7 @@ static void PSH_sequence(struct mos6502 *self, struct decoded dec)
     }
 }
 
-static void PLL_sequence(struct mos6502 *self, struct decoded dec)
+static void PLL_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1394,7 +1398,7 @@ static void PLL_sequence(struct mos6502 *self, struct decoded dec)
     }
 }
 
-static void BCH_sequence(struct mos6502 *self, struct decoded dec)
+static void BCH_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1425,7 +1429,7 @@ static void BCH_sequence(struct mos6502 *self, struct decoded dec)
     }
 }
 
-static void JSR_sequence(struct mos6502 *self, struct decoded dec)
+static void JSR_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1453,7 +1457,7 @@ static void JSR_sequence(struct mos6502 *self, struct decoded dec)
     }
 }
 
-static void RTS_sequence(struct mos6502 *self, struct decoded dec)
+static void RTS_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1482,7 +1486,7 @@ static void RTS_sequence(struct mos6502 *self, struct decoded dec)
     }
 }
 
-static void JABS_sequence(struct mos6502 *self, struct decoded dec)
+static void JABS_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1501,7 +1505,7 @@ static void JABS_sequence(struct mos6502 *self, struct decoded dec)
     }
 }
 
-static void JIND_sequence(struct mos6502 *self, struct decoded dec)
+static void JIND_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1530,7 +1534,7 @@ static void JIND_sequence(struct mos6502 *self, struct decoded dec)
     }
 }
 
-static void BRK_sequence(struct mos6502 *self, struct decoded dec)
+static void BRK_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1568,7 +1572,7 @@ static void BRK_sequence(struct mos6502 *self, struct decoded dec)
     }
 }
 
-static void RTI_sequence(struct mos6502 *self, struct decoded dec)
+static void RTI_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1600,7 +1604,7 @@ static void RTI_sequence(struct mos6502 *self, struct decoded dec)
 // MARK: - Unofficial Addressing Modes
 //
 
-static void JAM_sequence(struct mos6502 *self, struct decoded dec)
+static void JAM_sequence(struct aldo_mos6502 *self, struct decoded dec)
 {
     switch (self->t) {
     case 1:
@@ -1629,7 +1633,7 @@ static void JAM_sequence(struct mos6502 *self, struct decoded dec)
 // MARK: - Address Mode Dispatch
 //
 
-static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
+static void dispatch_addrmode(struct aldo_mos6502 *self, struct decoded dec)
 {
     assert(0 < self->t && self->t < Aldo_MaxTCycle);
 
@@ -1653,7 +1657,7 @@ static void dispatch_addrmode(struct mos6502 *self, struct decoded dec)
 // http://visual6502.org/wiki/index.php?title=6502_Timing_States
 const int Aldo_MaxTCycle = 8;
 
-void cpu_powerup(struct mos6502 *self)
+void aldo_cpu_powerup(struct aldo_mos6502 *self)
 {
     assert(self != NULL);
     assert(self->mbus != NULL);
@@ -1675,7 +1679,7 @@ void cpu_powerup(struct mos6502 *self)
     self->rst = ALDO_SIG_PENDING;
 }
 
-int cpu_cycle(struct mos6502 *self)
+int aldo_cpu_cycle(struct aldo_mos6502 *self)
 {
     assert(self != NULL);
 
@@ -1712,12 +1716,13 @@ int cpu_cycle(struct mos6502 *self)
     return 1;
 }
 
-bool cpu_jammed(const struct mos6502 *self)
+bool aldo_cpu_jammed(const struct aldo_mos6502 *self)
 {
     return self->t == 4 && Aldo_Decode[self->opc].mode == ALDO_AM_JAM;
 }
 
-void cpu_snapshot(const struct mos6502 *self, struct aldo_snapshot *snp)
+void aldo_cpu_snapshot(const struct aldo_mos6502 *self,
+                       struct aldo_snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);
@@ -1740,7 +1745,7 @@ void cpu_snapshot(const struct mos6502 *self, struct aldo_snapshot *snp)
     snp->cpu.datapath.exec_cycle = (uint8_t)self->t;
     snp->cpu.datapath.instdone = self->presync;
     snp->cpu.datapath.irq = self->irq;
-    snp->cpu.datapath.jammed = cpu_jammed(self);
+    snp->cpu.datapath.jammed = aldo_cpu_jammed(self);
     snp->cpu.datapath.nmi = self->nmi;
     snp->cpu.datapath.opcode = self->opc;
     snp->cpu.datapath.rst = self->rst;
@@ -1753,8 +1758,8 @@ void cpu_snapshot(const struct mos6502 *self, struct aldo_snapshot *snp)
     snp->cpu.lines.sync = self->signal.sync;
 }
 
-void cpu_peek_start(struct mos6502 *restrict self,
-                    struct mos6502 *restrict restore)
+void aldo_cpu_peek_start(struct aldo_mos6502 *restrict self,
+                         struct aldo_mos6502 *restrict restore)
 {
     assert(self != NULL);
 
@@ -1770,20 +1775,20 @@ void cpu_peek_start(struct mos6502 *restrict self,
         self->signal.rdy = true;
 }
 
-struct peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
+struct aldo_peekresult aldo_cpu_peek(struct aldo_mos6502 *self, uint16_t addr)
 {
     assert(self != NULL);
 
     self->presync = true;
     self->pc = addr;
-    cpu_cycle(self);
-    struct peekresult result = {.mode = Aldo_Decode[self->opc].mode};
+    aldo_cpu_cycle(self);
+    struct aldo_peekresult result = {.mode = Aldo_Decode[self->opc].mode};
     // NOTE: can't run the cpu to peek JAM or it'll jam the cpu!
     // Fortunately all we need is the addressing mode so return that.
     if (result.mode == ALDO_AM_JAM) return result;
 
     do {
-        cpu_cycle(self);
+        aldo_cpu_cycle(self);
         if (self->t == 2 && result.mode == ALDO_AM_INDY) {
             result.interaddr = bytowr(self->databus, 0x0);
         }
@@ -1805,8 +1810,8 @@ struct peekresult cpu_peek(struct mos6502 *self, uint16_t addr)
     return result;
 }
 
-void cpu_peek_end(struct mos6502 *restrict self,
-                  struct mos6502 *restrict restore)
+void aldo_cpu_peek_end(struct aldo_mos6502 *restrict self,
+                       struct aldo_mos6502 *restrict restore)
 {
     assert(self != NULL);
 

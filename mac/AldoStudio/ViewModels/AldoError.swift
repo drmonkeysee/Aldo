@@ -12,7 +12,7 @@ enum AldoError: Error {
     private static let errCodeFormat = "%s (%d)"
 
     static func wrapDisError(code: Int32) -> Self {
-        .disErr(code, code == DIS_ERR_ERNO
+        .disErr(code, code == ALDO_DIS_ERR_ERNO
                         ? .init(cString: strerror(errno))
                         : nil)
     }

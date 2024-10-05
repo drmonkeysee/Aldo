@@ -104,15 +104,15 @@ static uint16_t interrupt_vector(const struct aldo_snapshot *snp)
 }
 
 static int print_raw(uint16_t addr, const struct dis_instruction *inst,
-                     char dis[restrict static DIS_INST_SIZE])
+                     char dis[restrict static ALDO_DIS_INST_SIZE])
 {
     int total, count;
     total = count = sprintf(dis, "%04X: ", addr);
-    if (count < 0) return DIS_ERR_FMT;
+    if (count < 0) return ALDO_DIS_ERR_FMT;
 
     for (size_t i = 0; i < inst->bv.size; ++i) {
         count = sprintf(dis + total, "%02X ", inst->bv.mem[i]);
-        if (count < 0) return DIS_ERR_FMT;
+        if (count < 0) return ALDO_DIS_ERR_FMT;
         total += count;
     }
 
@@ -138,9 +138,9 @@ static int print_operand(const struct dis_instruction *inst,
         break;
     default:
         assert(((void)"INVALID ADDR MODE LENGTH", false));
-        return DIS_ERR_INV_ADDRMD;
+        return ALDO_DIS_ERR_INV_ADDRMD;
     }
-    if (count < 0) return DIS_ERR_FMT;
+    if (count < 0) return ALDO_DIS_ERR_FMT;
     return count;
 }
 
@@ -148,10 +148,10 @@ static int print_instruction(const struct dis_instruction *inst,
                              char dis[restrict])
 {
     int operation = sprintf(dis, "%s ", mnemonic(inst->d.instruction));
-    if (operation < 0) return DIS_ERR_FMT;
+    if (operation < 0) return ALDO_DIS_ERR_FMT;
 
     int operand = print_operand(inst, dis + operation);
-    if (operand < 0) return DIS_ERR_FMT;
+    if (operand < 0) return ALDO_DIS_ERR_FMT;
     if (operand == 0) {
         // NOTE: no operand to print, trim the trailing space
         dis[--operation] = '\0';
@@ -193,7 +193,7 @@ static int print_prgblock(const struct blockview *bv, bool verbose, FILE *f)
 
     struct repeat_condition repeat = {0};
     struct dis_instruction inst;
-    char dis[DIS_INST_SIZE];
+    char dis[ALDO_DIS_INST_SIZE];
     // NOTE: by convention, count backwards from CPU vector locations
     assert(bv->size <= MEMBLOCK_64KB);
     uint16_t addr = (uint16_t)(MEMBLOCK_64KB - bv->size);
@@ -244,7 +244,7 @@ static int measure_tile_sheet(size_t banksize, uint32_t *restrict dim,
         break;
     default:
         assert(((void)"INVALID CHR BANK SIZE", false));
-        return DIS_ERR_CHRSZ;
+        return ALDO_DIS_ERR_CHRSZ;
     }
     return 0;
 }
@@ -419,7 +419,7 @@ static int write_chrblock(const struct blockview *bv, uint32_t scale,
     if (err < 0) return err;
 
     FILE *bmpfile = fopen(bmpfilename, "wb");
-    if (!bmpfile) return DIS_ERR_ERNO;
+    if (!bmpfile) return ALDO_DIS_ERR_ERNO;
 
     err = write_chrtiles(bv, tilesdim, tile_sections, scale, bmpfile);
     fclose(bmpfile);
@@ -446,8 +446,8 @@ const int Aldo_MinChrScale = 1, Aldo_MaxChrScale = 10;
 const char *dis_errstr(int err)
 {
     switch (err) {
-#define X(s, v, e) case s: return e;
-        DIS_ERRCODE_X
+#define X(s, v, e) case ALDO_##s: return e;
+        ALDO_DIS_ERRCODE_X
 #undef X
     default:
         return "UNKNOWN ERR";
@@ -461,13 +461,13 @@ int dis_parse_inst(const struct blockview *bv, size_t at,
     assert(parsed != NULL);
 
     *parsed = (struct dis_instruction){0};
-    if (!bv->mem) return DIS_ERR_PRGROM;
+    if (!bv->mem) return ALDO_DIS_ERR_PRGROM;
     if (at >= bv->size) return 0;
 
     uint8_t opcode = bv->mem[at];
     struct decoded dec = Aldo_Decode[opcode];
     int instlen = InstLens[dec.mode];
-    if ((size_t)instlen > bv->size - at) return DIS_ERR_EOF;
+    if ((size_t)instlen > bv->size - at) return ALDO_DIS_ERR_EOF;
 
     *parsed = (struct dis_instruction){
         at,
@@ -488,7 +488,7 @@ int dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
 }
 
 int dis_inst(uint16_t addr, const struct dis_instruction *inst,
-             char dis[restrict static DIS_INST_SIZE])
+             char dis[restrict static ALDO_DIS_INST_SIZE])
 {
     assert(inst != NULL);
     assert(dis != NULL);
@@ -505,7 +505,7 @@ int dis_inst(uint16_t addr, const struct dis_instruction *inst,
     // NOTE: padding between raw bytes and disassembled instruction
     count = sprintf(dis + total, "%*s", ((3 - (int)inst->bv.size) * 3) + 1,
                     "");
-    if (count < 0) return DIS_ERR_FMT;
+    if (count < 0) return ALDO_DIS_ERR_FMT;
     total += count;
 
     count = print_instruction(inst, dis + total);
@@ -515,12 +515,12 @@ int dis_inst(uint16_t addr, const struct dis_instruction *inst,
     }
     total += count;
 
-    assert((unsigned int)total < DIS_INST_SIZE);
+    assert((unsigned int)total < ALDO_DIS_INST_SIZE);
     return total;
 }
 
 int dis_datapath(const struct aldo_snapshot *snp,
-                 char dis[restrict static DIS_DATAP_SIZE])
+                 char dis[restrict static ALDO_DIS_DATAP_SIZE])
 {
     assert(snp != NULL);
     assert(dis != NULL);
@@ -540,7 +540,7 @@ int dis_datapath(const struct aldo_snapshot *snp,
 
     int count, total;
     total = count = sprintf(dis, "%s ", mnemonic(inst.d.instruction));
-    if (count < 0) return DIS_ERR_FMT;
+    if (count < 0) return ALDO_DIS_ERR_FMT;
 
     size_t
         max_offset = 1 + (inst.bv.size / 3),
@@ -563,10 +563,10 @@ int dis_datapath(const struct aldo_snapshot *snp,
                         strlen(displaystr) > 0 ? batowr(inst.bv.mem + 1) : 0);
         break;
     }
-    if (count < 0) return DIS_ERR_FMT;
+    if (count < 0) return ALDO_DIS_ERR_FMT;
     total += count;
 
-    assert((unsigned int)total < DIS_DATAP_SIZE);
+    assert((unsigned int)total < ALDO_DIS_DATAP_SIZE);
     return total;
 }
 
@@ -578,7 +578,7 @@ int dis_cart_prg(cart *cart, const char *restrict name, bool verbose,
     assert(f != NULL);
 
     struct blockview bv = cart_prgblock(cart, 0);
-    if (!bv.mem) return DIS_ERR_PRGROM;
+    if (!bv.mem) return ALDO_DIS_ERR_PRGROM;
 
     cart_write_dis_header(cart, name, f);
     do {
@@ -602,10 +602,10 @@ int dis_cart_chr(cart *cart, int chrscale,
     assert(cart != NULL);
     assert(output != NULL);
 
-    if (chrscale <= 0 || chrscale > ScaleGuard) return DIS_ERR_CHRSCL;
+    if (chrscale <= 0 || chrscale > ScaleGuard) return ALDO_DIS_ERR_CHRSCL;
 
     struct blockview bv = cart_chrblock(cart, 0);
-    if (!bv.mem) return DIS_ERR_CHRROM;
+    if (!bv.mem) return ALDO_DIS_ERR_CHRROM;
 
     const char *prefix = chrdecode_prefix && chrdecode_prefix[0] != '\0'
                             ? chrdecode_prefix
@@ -619,7 +619,7 @@ int dis_cart_chr(cart *cart, int chrscale,
     do {
         err = snprintf(bmpfilename, namesize, "%s%03zu.bmp", prefix, bv.ord);
         if (err < 0) {
-            err = DIS_ERR_FMT;
+            err = ALDO_DIS_ERR_FMT;
             break;
         }
         err = write_chrblock(&bv, (uint32_t)chrscale, bmpfilename, output);
@@ -636,8 +636,8 @@ int dis_cart_chrblock(const struct blockview *bv, int scale, FILE *f)
     assert(bv != NULL);
     assert(f != NULL);
 
-    if (!bv->mem) return DIS_ERR_CHRROM;
-    if (scale <= 0 || scale > ScaleGuard) return DIS_ERR_CHRSCL;
+    if (!bv->mem) return ALDO_DIS_ERR_CHRROM;
+    if (scale <= 0 || scale > ScaleGuard) return ALDO_DIS_ERR_CHRSCL;
 
     uint32_t tilesdim, tile_sections;
     int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
@@ -675,7 +675,7 @@ uint8_t dis_inst_flags(const struct dis_instruction *inst)
 }
 
 int dis_inst_operand(const struct dis_instruction *inst,
-                     char dis[restrict static DIS_OPERAND_SIZE])
+                     char dis[restrict static ALDO_DIS_OPERAND_SIZE])
 {
     assert(inst != NULL);
     assert(dis != NULL);
@@ -687,7 +687,7 @@ int dis_inst_operand(const struct dis_instruction *inst,
 
     int count = print_operand(inst, dis);
 
-    assert((unsigned int)count < DIS_OPERAND_SIZE);
+    assert((unsigned int)count < ALDO_DIS_OPERAND_SIZE);
     return count;
 }
 
@@ -704,7 +704,7 @@ bool dis_inst_equal(const struct dis_instruction *lhs,
 
 int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
              const struct aldo_snapshot *snp,
-             char dis[restrict static DIS_PEEK_SIZE])
+             char dis[restrict static ALDO_DIS_PEEK_SIZE])
 {
     assert(cpu != NULL);
     assert(dbg != NULL);
@@ -715,7 +715,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
     const char *interrupt = interrupt_display(snp);
     if (strlen(interrupt) > 0) {
         int count = total = sprintf(dis, "%s > ", interrupt);
-        if (count < 0) return DIS_ERR_FMT;
+        if (count < 0) return ALDO_DIS_ERR_FMT;
         const char *fmt;
         uint16_t vector;
         int resetvector;
@@ -729,7 +729,7 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
             vector = interrupt_vector(snp);
         }
         count = sprintf(dis + total, fmt, vector);
-        if (count < 0) return DIS_ERR_FMT;
+        if (count < 0) return ALDO_DIS_ERR_FMT;
         total += count;
     } else {
         struct mos6502 restore_point;
@@ -744,20 +744,20 @@ int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
 #undef XPEEK
         default:
             assert(((void)"BAD ADDRMODE PEEK", false));
-            return DIS_ERR_INV_ADDRMD;
+            return ALDO_DIS_ERR_INV_ADDRMD;
         }
-        if (total < 0) return DIS_ERR_FMT;
+        if (total < 0) return ALDO_DIS_ERR_FMT;
         if (peek.busfault) {
             char *data = strrchr(dis, '=');
             if (data) {
                 // NOTE: verify last '=' leaves enough space for "FLT"
-                assert(dis + DIS_PEEK_SIZE - data >= 6);
+                assert(dis + ALDO_DIS_PEEK_SIZE - data >= 6);
                 strcpy(data + 2, "FLT");
                 ++total;
             }
         }
     }
 
-    assert((unsigned int)total < DIS_PEEK_SIZE);
+    assert((unsigned int)total < ALDO_DIS_PEEK_SIZE);
     return total;
 }

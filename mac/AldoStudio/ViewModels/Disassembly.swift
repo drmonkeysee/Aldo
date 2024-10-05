@@ -101,7 +101,7 @@ struct Instruction {
 
     private static func getOperand(_ p: CInstPtr)-> String {
         return withUnsafeTemporaryAllocation(
-            of: CChar.self, capacity: DIS_OPERAND_SIZE) { buffer in
+            of: CChar.self, capacity: ALDO_DIS_OPERAND_SIZE) { buffer in
                 guard let bufferp = buffer.baseAddress else {
                     aldoLog.debug("Invalid buffer pointer")
                     return Self.errStr

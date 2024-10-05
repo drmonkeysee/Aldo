@@ -91,7 +91,7 @@ enum {
 };
 
 enum {
-    CART_FMT_SIZE = 17, // Format extended name is at most 16 chars
+    CART_FMT_SIZE = 17,
 };
 
 struct blockview {

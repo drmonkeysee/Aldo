@@ -48,7 +48,7 @@ struct aldo_debugexpr {
 };
 
 enum {
-    ALDO_HEXPR_FMT_SIZE = 25,    // Halt expr description is at most 24 chars
+    ALDO_HEXPR_FMT_SIZE = 25,
 };
 
 // X(symbol, value, error string)

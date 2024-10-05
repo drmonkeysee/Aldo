@@ -88,7 +88,7 @@ static int decode_cart_chr(const struct cliargs *args, cart *c)
     int err = dis_cart_chr(c, args->chrscale, args->chrdecode_prefix, stdout);
     if (err < 0) {
         fprintf(stderr, "CHR decode error (%d): %s\n", err, dis_errstr(err));
-        if (err == DIS_ERR_ERNO) {
+        if (err == ALDO_DIS_ERR_ERNO) {
             perror("CHR decode file error");
         }
         return EXIT_FAILURE;

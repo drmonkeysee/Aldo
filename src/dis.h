@@ -20,7 +20,7 @@
 #include <stdio.h>
 
 // X(symbol, value, error string)
-#define DIS_ERRCODE_X \
+#define ALDO_DIS_ERRCODE_X \
 X(DIS_ERR_FMT, -1, "FORMATTED OUTPUT FAILURE") \
 X(DIS_ERR_EOF, -2, "UNEXPECTED EOF") \
 X(DIS_ERR_INV_ADDRMD, -3, "INVALID ADDRMODE") \
@@ -31,16 +31,16 @@ X(DIS_ERR_CHRSCL, -7, "INVALID CHR ROM SCALE") \
 X(DIS_ERR_PRGROM, -8, "NO PRG ROM FOUND")
 
 enum {
-#define X(s, v, e) s = v,
-    DIS_ERRCODE_X
+#define X(s, v, e) ALDO_##s = v,
+    ALDO_DIS_ERRCODE_X
 #undef X
 };
 
 enum {
-    DIS_OPERAND_SIZE = 8,   // Disassembled operand is at most 7 chars
-    DIS_DATAP_SIZE = 12,    // Disassembled datapath is at most 11 chars
-    DIS_INST_SIZE = 28,     // Disassembled instruction is at most 27 chars
-    DIS_PEEK_SIZE = 20,     // Peek expression is at most 19 chars
+    ALDO_DIS_OPERAND_SIZE = 8,
+    ALDO_DIS_DATAP_SIZE = 12,
+    ALDO_DIS_INST_SIZE = 28,
+    ALDO_DIS_PEEK_SIZE = 20,
 };
 
 struct dis_instruction {
@@ -70,10 +70,10 @@ int dis_parsemem_inst(size_t size, const uint8_t mem[br_noalias_sz(size)],
 // NOTE: functions w/buffer params leave buffer untouched when returning <= 0
 br_libexport br_checkerror
 int dis_inst(uint16_t addr, const struct dis_instruction *inst,
-             char dis[br_noalias_csz(DIS_INST_SIZE)]);
+             char dis[br_noalias_csz(ALDO_DIS_INST_SIZE)]);
 br_libexport br_checkerror
 int dis_datapath(const struct aldo_snapshot *snp,
-                 char dis[br_noalias_csz(DIS_DATAP_SIZE)]);
+                 char dis[br_noalias_csz(ALDO_DIS_DATAP_SIZE)]);
 
 br_libexport br_checkerror
 int dis_cart_prg(cart *cart, const char *br_noalias name, bool verbose,
@@ -94,7 +94,7 @@ br_libexport
 uint8_t dis_inst_flags(const struct dis_instruction *inst);
 br_libexport br_checkerror
 int dis_inst_operand(const struct dis_instruction *inst,
-                     char dis[br_noalias_csz(DIS_OPERAND_SIZE)]);
+                     char dis[br_noalias_csz(ALDO_DIS_OPERAND_SIZE)]);
 br_libexport
 bool dis_inst_equal(const struct dis_instruction *lhs,
                     const struct dis_instruction *rhs);
@@ -105,7 +105,7 @@ bool dis_inst_equal(const struct dis_instruction *lhs,
 
 int dis_peek(uint16_t addr, struct mos6502 *cpu, debugger *dbg,
              const struct aldo_snapshot *snp,
-             char dis[br_noalias_csz(DIS_PEEK_SIZE)]);
+             char dis[br_noalias_csz(ALDO_DIS_PEEK_SIZE)]);
 #include "bridgeclose.h"
 
 #endif

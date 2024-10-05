@@ -256,7 +256,7 @@ static void drawinstructions(const struct view *v, int h, int y,
 {
     struct dis_instruction inst = {0};
     uint16_t addr = snp->cpu.datapath.current_instruction;
-    char disassembly[DIS_INST_SIZE];
+    char disassembly[ALDO_DIS_INST_SIZE];
     for (int i = 0; i < h - y; ++i) {
         int result = dis_parsemem_inst(snp->prg.curr->length,
                                        snp->prg.curr->pc,
@@ -423,7 +423,7 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
         mvwaddstr(v->content, cursor_y, col1, " JAMMED ");
         wattroff(v->content, A_STANDOUT);
     } else {
-        char buf[DIS_DATAP_SIZE];
+        char buf[ALDO_DIS_DATAP_SIZE];
         int wlen = dis_datapath(snp, buf);
         const char *mnemonic = wlen < 0 ? dis_errstr(wlen) : buf;
         mvwaddstr(v->content, cursor_y, col1, mnemonic);

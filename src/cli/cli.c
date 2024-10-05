@@ -183,12 +183,12 @@ static ui_loop *setup_ui(struct emulator *emu)
     ui_loop *loop = ui_curses_loop;
     if (emu->args->batch) {
         // NOTE: when in batch mode set NES to run immediately
-        nes_set_mode(emu->console, CSGM_RUN);
-        nes_ready(emu->console, true);
+        aldo_nes_set_mode(emu->console, CSGM_RUN);
+        aldo_nes_ready(emu->console, true);
         loop = ui_batch_loop;
     }
     // NOTE: initialize snapshot from console
-    nes_snapshot(emu->console, &emu->snapshot);
+    aldo_nes_snapshot(emu->console, &emu->snapshot);
     return loop;
 }
 
@@ -212,7 +212,7 @@ static void dump_ram(const struct emulator *emu)
             perror("Cannot open ramdump file");
         }
     }
-    nes_dumpram(emu->console, fs);
+    aldo_nes_dumpram(emu->console, fs);
     for (size_t i = 0; i < dmpcount; ++i) {
         if (fs[i]) {
             fclose(fs[i]);
@@ -254,14 +254,14 @@ static int run_emu(const struct cliargs *args, cart *c)
             goto exit_debug;
         }
     }
-    emu.console = nes_new(emu.debugger, emu.args->bcdsupport, tracelog);
+    emu.console = aldo_nes_new(emu.debugger, emu.args->bcdsupport, tracelog);
     if (!emu.console) {
         fputs("Unable to initialize console!\n", stderr);
         result = EXIT_FAILURE;
         goto exit_trace;
     }
     aldo_snapshot_extend(&emu.snapshot);
-    nes_powerup(emu.console, c, emu.args->zeroram);
+    aldo_nes_powerup(emu.console, c, emu.args->zeroram);
 
     ui_loop *run_loop = setup_ui(&emu);
     int err = run_loop(&emu);
@@ -274,7 +274,7 @@ static int run_emu(const struct cliargs *args, cart *c)
     }
     dump_ram(&emu);
     aldo_snapshot_cleanup(&emu.snapshot);
-    nes_free(emu.console);
+    aldo_nes_free(emu.console);
 exit_trace:
     if (tracelog) {
         fclose(tracelog);

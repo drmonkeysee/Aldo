@@ -24,7 +24,7 @@ static const int PpuRatio = 3;
 
 // The NES-001 NTSC Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
-struct nes001 {
+struct aldo_nes001 {
     cart *cart;                 // Game Cartridge; Non-owning Pointer
     debugger *dbg;              // Debugger Context; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
@@ -112,7 +112,7 @@ static size_t vram_copy(const void *restrict ctx, uint16_t addr, size_t count,
     return bytecopy_bank(ctx, BITWIDTH_2KB, addr, count, dest);
 }
 
-static void create_mbus(struct nes001 *self)
+static void create_mbus(struct aldo_nes001 *self)
 {
     // TODO: partitions so far:
     // 16-bit Address Space = 64KB
@@ -131,7 +131,7 @@ static void create_mbus(struct nes001 *self)
     assert(r);
 }
 
-static void create_vbus(struct nes001 *self)
+static void create_vbus(struct aldo_nes001 *self)
 {
     // TODO: partitions so far:
     // 14-bit Address Space = 16KB
@@ -151,7 +151,7 @@ static void create_vbus(struct nes001 *self)
     assert(r);
 }
 
-static void connect_cart(struct nes001 *self, cart *c)
+static void connect_cart(struct aldo_nes001 *self, cart *c)
 {
     self->cart = c;
     bool r = cart_mbus_connect(self->cart, self->cpu.mbus);
@@ -160,7 +160,7 @@ static void connect_cart(struct nes001 *self, cart *c)
     debug_sync_bus(self->dbg);
 }
 
-static void disconnect_cart(struct nes001 *self)
+static void disconnect_cart(struct aldo_nes001 *self)
 {
     // NOTE: debugger may have been attached to a cart-less CPU bus so reset
     // debugger even if there is no existing cart.
@@ -171,7 +171,7 @@ static void disconnect_cart(struct nes001 *self)
     self->cart = NULL;
 }
 
-static void setup(struct nes001 *self)
+static void setup(struct aldo_nes001 *self)
 {
     create_mbus(self);
     create_vbus(self);
@@ -179,7 +179,7 @@ static void setup(struct nes001 *self)
     debug_cpu_connect(self->dbg, &self->cpu);
 }
 
-static void teardown(struct nes001 *self)
+static void teardown(struct aldo_nes001 *self)
 {
     disconnect_cart(self);
     debug_cpu_disconnect(self->dbg);
@@ -187,7 +187,7 @@ static void teardown(struct nes001 *self)
     bus_free(self->cpu.mbus);
 }
 
-static void set_ppu_pins(struct nes001 *self)
+static void set_ppu_pins(struct aldo_nes001 *self)
 {
     // NOTE: interrupt lines are active low
     self->ppu.signal.rst = !self->probe.rst;
@@ -196,7 +196,7 @@ static void set_ppu_pins(struct nes001 *self)
     self->ppu.signal.rw |= self->cpu.signal.rw;
 }
 
-static void set_cpu_pins(struct nes001 *self)
+static void set_cpu_pins(struct aldo_nes001 *self)
 {
     // NOTE: interrupt lines are active low
     self->cpu.signal.irq = !self->probe.irq;
@@ -204,7 +204,8 @@ static void set_cpu_pins(struct nes001 *self)
     self->cpu.signal.rst = !self->probe.rst;
 }
 
-static void bus_snapshot(const struct nes001 *self, struct aldo_snapshot *snp)
+static void bus_snapshot(const struct aldo_nes001 *self,
+                         struct aldo_snapshot *snp)
 {
     cpu_snapshot(&self->cpu, snp);
     aldo_ppu_bus_snapshot(&self->ppu, snp);
@@ -213,7 +214,7 @@ static void bus_snapshot(const struct nes001 *self, struct aldo_snapshot *snp)
 }
 
 // NOTE: trace the just-fetched instruction
-static void instruction_trace(struct nes001 *self,
+static void instruction_trace(struct aldo_nes001 *self,
                               const struct cycleclock *clock, int adjustment)
 {
     if (!self->tracelog || !self->cpu.signal.sync) return;
@@ -227,7 +228,7 @@ static void instruction_trace(struct nes001 *self,
                     &self->cpu, self->dbg, &snp);
 }
 
-static bool clock_ppu(struct nes001 *self, struct cycleclock *clock)
+static bool clock_ppu(struct aldo_nes001 *self, struct cycleclock *clock)
 {
     clock->frames += (uint64_t)aldo_ppu_cycle(&self->ppu);
     --clock->budget;
@@ -235,14 +236,14 @@ static bool clock_ppu(struct nes001 *self, struct cycleclock *clock)
     // TODO: ppu debug hook goes here
     if (++clock->subcycle < PpuRatio) {
         if (self->mode == CSGM_SUBCYCLE) {
-            nes_ready(self, false);
+            aldo_nes_ready(self, false);
         }
         return false;
     }
     return true;
 }
 
-static void clock_cpu(struct nes001 *self, struct cycleclock *clock)
+static void clock_cpu(struct aldo_nes001 *self, struct cycleclock *clock)
 {
     int cycles = cpu_cycle(&self->cpu);
     set_cpu_pins(self);
@@ -254,10 +255,10 @@ static void clock_cpu(struct nes001 *self, struct cycleclock *clock)
     // NOTE: both cases are possible on cycle-boundary
     case CSGM_SUBCYCLE:
     case CSGM_CYCLE:
-        nes_ready(self, false);
+        aldo_nes_ready(self, false);
         break;
     case CSGM_STEP:
-        nes_ready(self, !self->cpu.signal.sync);
+        aldo_nes_ready(self, !self->cpu.signal.sync);
         break;
     case CSGM_RUN:
     default:
@@ -270,11 +271,11 @@ static void clock_cpu(struct nes001 *self, struct cycleclock *clock)
 // MARK: - Public Interface
 //
 
-nes *nes_new(debugger *dbg, bool bcdsupport, FILE *tracelog)
+aldo_nes *aldo_nes_new(debugger *dbg, bool bcdsupport, FILE *tracelog)
 {
     assert(dbg != NULL);
 
-    struct nes001 *self = malloc(sizeof *self);
+    struct aldo_nes001 *self = malloc(sizeof *self);
     self->cart = NULL;
     self->dbg = dbg;
     self->tracelog = tracelog;
@@ -285,7 +286,7 @@ nes *nes_new(debugger *dbg, bool bcdsupport, FILE *tracelog)
     return self;
 }
 
-void nes_free(nes *self)
+void aldo_nes_free(aldo_nes *self)
 {
     assert(self != NULL);
 
@@ -293,7 +294,7 @@ void nes_free(nes *self)
     free(self);
 }
 
-void nes_powerup(nes *self, cart *c, bool zeroram)
+void aldo_nes_powerup(aldo_nes *self, cart *c, bool zeroram)
 {
     assert(self != NULL);
     assert(self->cart == NULL);
@@ -312,36 +313,36 @@ void nes_powerup(nes *self, cart *c, bool zeroram)
     aldo_ppu_powerup(&self->ppu);
 }
 
-void nes_powerdown(nes *self)
+void aldo_nes_powerdown(aldo_nes *self)
 {
     assert(self != NULL);
 
-    nes_ready(self, false);
+    aldo_nes_ready(self, false);
     disconnect_cart(self);
 }
 
-size_t nes_ram_size(nes *self)
+size_t aldo_nes_ram_size(aldo_nes *self)
 {
     assert(self != NULL);
 
     return memsz(self->ram);
 }
 
-bool nes_bcd_support(nes *self)
+bool aldo_nes_bcd_support(aldo_nes *self)
 {
     assert(self != NULL);
 
     return self->cpu.bcd;
 }
 
-enum csig_excmode nes_mode(nes *self)
+enum csig_excmode aldo_nes_mode(aldo_nes *self)
 {
     assert(self != NULL);
 
     return self->mode;
 }
 
-void nes_set_mode(nes *self, enum csig_excmode mode)
+void aldo_nes_set_mode(aldo_nes *self, enum csig_excmode mode)
 {
     assert(self != NULL);
 
@@ -349,14 +350,14 @@ void nes_set_mode(nes *self, enum csig_excmode mode)
     self->mode = (int)mode < 0 ? CSGM_COUNT - 1 : mode % CSGM_COUNT;
 }
 
-void nes_ready(nes *self, bool ready)
+void aldo_nes_ready(aldo_nes *self, bool ready)
 {
     assert(self != NULL);
 
     self->cpu.signal.rdy = ready;
 }
 
-bool nes_probe(nes *self, enum csig_interrupt signal)
+bool aldo_nes_probe(aldo_nes *self, enum csig_interrupt signal)
 {
     assert(self != NULL);
 
@@ -373,7 +374,8 @@ bool nes_probe(nes *self, enum csig_interrupt signal)
     }
 }
 
-void nes_set_probe(nes *self, enum csig_interrupt signal, bool active)
+void aldo_nes_set_probe(aldo_nes *self, enum csig_interrupt signal,
+                        bool active)
 {
     assert(self != NULL);
 
@@ -393,7 +395,7 @@ void nes_set_probe(nes *self, enum csig_interrupt signal, bool active)
     }
 }
 
-void nes_clock(nes *self, struct cycleclock *clock)
+void aldo_nes_clock(aldo_nes *self, struct cycleclock *clock)
 {
     assert(self != NULL);
     assert(clock != NULL);
@@ -404,17 +406,17 @@ void nes_clock(nes *self, struct cycleclock *clock)
     }
 }
 
-int nes_cycle_factor(void)
+int aldo_nes_cycle_factor(void)
 {
     return PpuRatio;
 }
 
-int nes_frame_factor(void)
+int aldo_nes_frame_factor(void)
 {
     return Aldo_DotsPerFrame;
 }
 
-void nes_snapshot(nes *self, struct aldo_snapshot *snp)
+void aldo_nes_snapshot(aldo_nes *self, struct aldo_snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);
@@ -433,7 +435,7 @@ void nes_snapshot(nes *self, struct aldo_snapshot *snp)
                                      snp->prg.curr->pc);
 }
 
-void nes_dumpram(nes *self, FILE *fs[static 3])
+void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3])
 {
     assert(self != NULL);
     assert(fs != NULL);

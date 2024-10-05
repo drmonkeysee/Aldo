@@ -29,14 +29,14 @@ namespace aldo
 struct viewstate;
 
 using cart_handle = handle<cart, cart_free>;
-using console_handle = handle<nes, nes_free>;
+using console_handle = handle<aldo_nes, aldo_nes_free>;
 
 class Snapshot {
 public:
-    explicit Snapshot(nes* console) noexcept
+    explicit Snapshot(aldo_nes* console) noexcept
     {
         aldo_snapshot_extend(getp());
-        nes_snapshot(console, getp());
+        aldo_nes_snapshot(console, getp());
     }
     Snapshot(const Snapshot&) = default;
     Snapshot& operator=(const Snapshot&) = default;
@@ -74,21 +74,24 @@ public:
     const Palette& palette() const noexcept { return hpalette; }
     Palette& palette() noexcept { return hpalette; }
 
-    void ready(bool ready) noexcept { nes_ready(consolep(), ready); }
-    et::size ramSize() const noexcept { return nes_ram_size(consolep()); }
-    bool bcdSupport() const noexcept { return nes_bcd_support(consolep()); }
-    csig_excmode runMode() const noexcept { return nes_mode(consolep()); }
+    void ready(bool ready) noexcept { aldo_nes_ready(consolep(), ready); }
+    et::size ramSize() const noexcept { return aldo_nes_ram_size(consolep()); }
+    bool bcdSupport() const noexcept
+    {
+        return aldo_nes_bcd_support(consolep());
+    }
+    csig_excmode runMode() const noexcept { return aldo_nes_mode(consolep()); }
     void runMode(csig_excmode mode) noexcept
     {
-        nes_set_mode(consolep(), mode);
+        aldo_nes_set_mode(consolep(), mode);
     }
     bool probe(csig_interrupt signal) const noexcept
     {
-        return nes_probe(consolep(), signal);
+        return aldo_nes_probe(consolep(), signal);
     }
     void probe(csig_interrupt signal, bool active) noexcept
     {
-        nes_set_probe(consolep(), signal, active);
+        aldo_nes_set_probe(consolep(), signal, active);
     }
 
     void loadCart(const std::filesystem::path& filepath);
@@ -98,7 +101,7 @@ public:
 
 private:
     cart* cartp() const noexcept { return hcart.get(); }
-    nes* consolep() const noexcept { return hconsole.get(); }
+    aldo_nes* consolep() const noexcept { return hconsole.get(); }
     aldo_snapshot* snapshotp() noexcept { return hsnp.getp(); }
 
     void loadCartState();

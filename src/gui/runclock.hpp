@@ -134,8 +134,8 @@ public:
         cyclock().rate = prev;
         currentScale = s;
         cyclock().rate_factor = currentScale == CYCS_CYCLE
-                                ? nes_cycle_factor()
-                                : nes_frame_factor();
+                                ? aldo_nes_cycle_factor()
+                                : aldo_nes_frame_factor();
     }
 
     void toggleScale() noexcept
@@ -144,7 +144,7 @@ public:
     }
 
 private:
-    cycleclock clock{.rate = 10, .rate_factor = nes_cycle_factor()};
+    cycleclock clock{.rate = 10, .rate_factor = aldo_nes_cycle_factor()};
     double dtInput = 0, dtUpdate = 0, dtRender = 0;
     cyclkscale currentScale = CYCS_CYCLE;
     int oldRate = Aldo_MinFps;

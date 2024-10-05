@@ -96,9 +96,9 @@ void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
 {
     auto c = load_cart(filepath);
     saveCartState();
-    nes_powerdown(consolep());
+    aldo_nes_powerdown(consolep());
     hcart.reset(c);
-    nes_powerup(consolep(), cartp(), zeroRam);
+    aldo_nes_powerup(consolep(), cartp(), zeroRam);
     cartpath = filepath;
     cartname = cartpath.stem();
     loadCartState();
@@ -106,8 +106,8 @@ void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
 
 void aldo::Emulator::update(aldo::viewstate& vs) noexcept
 {
-    nes_clock(consolep(), vs.clock.cyclockp());
-    nes_snapshot(consolep(), snapshotp());
+    aldo_nes_clock(consolep(), vs.clock.cyclockp());
+    aldo_nes_snapshot(consolep(), snapshotp());
     update_bouncer(vs, snapshot());
 }
 

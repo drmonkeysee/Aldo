@@ -172,7 +172,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     drawtoggle(v, halt_label, !emu->snapshot.cpu.lines.ready);
 
     cursor_y += 2;
-    enum csig_excmode mode = nes_mode(emu->console);
+    enum csig_excmode mode = aldo_nes_mode(emu->console);
     mvwaddstr(v->content, cursor_y, 0, "Mode:");
     drawtoggle(v, " Sub ", mode == CSGM_SUBCYCLE);
     drawtoggle(v, " Cycle ", mode == CSGM_CYCLE);
@@ -181,9 +181,9 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
 
     cursor_y += 2;
     mvwaddstr(v->content, cursor_y, 0, "Signal:");
-    drawtoggle(v, " IRQ ", nes_probe(emu->console, CSGI_IRQ));
-    drawtoggle(v, " NMI ", nes_probe(emu->console, CSGI_NMI));
-    drawtoggle(v, " RST ", nes_probe(emu->console, CSGI_RST));
+    drawtoggle(v, " IRQ ", aldo_nes_probe(emu->console, CSGI_IRQ));
+    drawtoggle(v, " NMI ", aldo_nes_probe(emu->console, CSGI_NMI));
+    drawtoggle(v, " RST ", aldo_nes_probe(emu->console, CSGI_RST));
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
     mvwaddstr(v->content, ++cursor_y, 0, "Halt/Run: <Space>");
@@ -831,8 +831,8 @@ static void selectrate(struct runclock *clock)
     clock->cyclock.rate = prev;
     clock->scale = !clock->scale;
     clock->cyclock.rate_factor = clock->scale == CYCS_CYCLE
-                                    ? nes_cycle_factor()
-                                    : nes_frame_factor();
+                                    ? aldo_nes_cycle_factor()
+                                    : aldo_nes_frame_factor();
 }
 
 static void handle_input(struct viewstate *vs, const struct emulator *emu)
@@ -840,7 +840,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
     int input = getch();
     switch (input) {
     case ' ':
-        nes_ready(emu->console, !emu->snapshot.cpu.lines.ready);
+        aldo_nes_ready(emu->console, !emu->snapshot.cpu.lines.ready);
         break;
     case '=':   // "Lowercase" +
         adjustrate(vs, 1);
@@ -870,18 +870,18 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 'i':
-        nes_set_probe(emu->console, CSGI_IRQ,
-                      !nes_probe(emu->console, CSGI_IRQ));
+        aldo_nes_set_probe(emu->console, CSGI_IRQ,
+                           !aldo_nes_probe(emu->console, CSGI_IRQ));
         break;
     case 'm':
-        nes_set_mode(emu->console, nes_mode(emu->console) + 1);
+        aldo_nes_set_mode(emu->console, aldo_nes_mode(emu->console) + 1);
         break;
     case 'M':
-        nes_set_mode(emu->console, nes_mode(emu->console) - 1);
+        aldo_nes_set_mode(emu->console, aldo_nes_mode(emu->console) - 1);
         break;
     case 'n':
-        nes_set_probe(emu->console, CSGI_NMI,
-                      !nes_probe(emu->console, CSGI_NMI));
+        aldo_nes_set_probe(emu->console, CSGI_NMI,
+                           !aldo_nes_probe(emu->console, CSGI_NMI));
         break;
     case 'q':
         vs->running = false;
@@ -895,16 +895,16 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 's':
-        nes_set_probe(emu->console, CSGI_RST,
-                      !nes_probe(emu->console, CSGI_RST));
+        aldo_nes_set_probe(emu->console, CSGI_RST,
+                           !aldo_nes_probe(emu->console, CSGI_RST));
         break;
     }
 }
 
 static void emu_update(struct emulator *emu, struct viewstate *vs)
 {
-    nes_clock(emu->console, &vs->clock.cyclock);
-    nes_snapshot(emu->console, &emu->snapshot);
+    aldo_nes_clock(emu->console, &vs->clock.cyclock);
+    aldo_nes_snapshot(emu->console, &emu->snapshot);
 }
 
 static void refresh_ui(const struct layout *l, const struct viewstate *vs,
@@ -948,11 +948,11 @@ int ui_curses_loop(struct emulator *emu)
 
     struct viewstate state = {
         .clock = {
-            .cyclock = {.rate = 10, .rate_factor = nes_cycle_factor()},
+            .cyclock = {.rate = 10, .rate_factor = aldo_nes_cycle_factor()},
             .oldrate = Aldo_MinFps,
         },
         .running = true,
-        .total_ramsheets = (int)nes_ram_size(emu->console) / sheet_size,
+        .total_ramsheets = (int)aldo_nes_ram_size(emu->console) / sheet_size,
     };
     struct layout layout;
     printf("Stack Usage\nemu: %zu\nstate: %zu\nlayout: %zu\ntotal: %zu\n",

@@ -29,14 +29,14 @@ static int run_emu(const struct gui_platform *platform)
         return EXIT_FAILURE;
     }
 
-    nes *console = nes_new(dbg, false, NULL);
+    aldo_nes *console = aldo_nes_new(dbg, false, NULL);
     if (!console) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "Unable to initialize console!");
         debug_free(dbg);
         return EXIT_FAILURE;
     }
-    nes_powerup(console, NULL, false);
+    aldo_nes_powerup(console, NULL, false);
 
     int err = ui_sdl_runloop(platform, dbg, console);
     // NOTE: ui loop takes ownership of these two,

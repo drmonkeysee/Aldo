@@ -42,15 +42,15 @@ static void print_version(void)
     printf("\n%s\n", ui_curses_version());
 }
 
-static cart *load_cart(const char *filename)
+static aldo_cart *load_cart(const char *filename)
 {
-    cart *c = NULL;
+    aldo_cart *c = NULL;
     FILE *f = fopen(filename, "rb");
     if (f) {
-        int err = cart_create(&c, f);
+        int err = aldo_cart_create(&c, f);
         if (err < 0) {
             fprintf(stderr, "Cart load failure (%d): %s\n", err,
-                    cart_errstr(err));
+                    aldo_cart_errstr(err));
         }
         fclose(f);
     } else {
@@ -60,7 +60,7 @@ static cart *load_cart(const char *filename)
     return c;
 }
 
-static int print_cart_info(const struct cliargs *args, cart *c)
+static int print_cart_info(const struct cliargs *args, aldo_cart *c)
 {
     if (args->verbose) {
         puts("---=== Cart Info ===---");
@@ -68,11 +68,11 @@ static int print_cart_info(const struct cliargs *args, cart *c)
     const char *name = args->verbose
                         ? args->filepath
                         : argparse_filename(args->filepath);
-    cart_write_info(c, name, args->verbose, stdout);
+    aldo_cart_write_info(c, name, args->verbose, stdout);
     return EXIT_SUCCESS;
 }
 
-static int disassemble_cart_prg(const struct cliargs *args, cart *c)
+static int disassemble_cart_prg(const struct cliargs *args, aldo_cart *c)
 {
     int err = aldo_dis_cart_prg(c, argparse_filename(args->filepath),
                                 args->verbose, false, stdout);
@@ -84,7 +84,7 @@ static int disassemble_cart_prg(const struct cliargs *args, cart *c)
     return EXIT_SUCCESS;
 }
 
-static int decode_cart_chr(const struct cliargs *args, cart *c)
+static int decode_cart_chr(const struct cliargs *args, aldo_cart *c)
 {
     int err = aldo_dis_cart_chr(c, args->chrscale, args->chrdecode_prefix,
                                 stdout);
@@ -223,7 +223,7 @@ static void dump_ram(const struct emulator *emu)
     }
 }
 
-static int run_emu(const struct cliargs *args, cart *c)
+static int run_emu(const struct cliargs *args, aldo_cart *c)
 {
     static const char *const restrict tracefile = "trace.log";
 
@@ -287,7 +287,7 @@ exit_debug:
     return result;
 }
 
-static int run_cart(const struct cliargs *args, cart *c)
+static int run_cart(const struct cliargs *args, aldo_cart *c)
 {
     if (args->info) return print_cart_info(args, c);
     if (args->disassemble) return disassemble_cart_prg(args, c);
@@ -313,13 +313,13 @@ static int run_with_args(const struct cliargs *args)
         return EXIT_FAILURE;
     }
 
-    cart *cart = load_cart(args->filepath);
+    aldo_cart *cart = load_cart(args->filepath);
     if (!cart) {
         return EXIT_FAILURE;
     }
 
     int result = run_cart(args, cart);
-    cart_free(cart);
+    aldo_cart_free(cart);
     return result;
 }
 

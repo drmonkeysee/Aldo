@@ -23,7 +23,7 @@
 static struct aldo_dis_instruction create_instruction(size_t sz,
                                                       const uint8_t bytes[sz])
 {
-    struct blockview bv = {.mem = bytes, .size = sz};
+    struct aldo_blockview bv = {.mem = bytes, .size = sz};
     struct aldo_dis_instruction inst;
     int err = aldo_dis_parse_inst(&bv, 0, &inst);
     ct_asserttrue(err > 0);
@@ -54,7 +54,7 @@ static void errstr_returns_unknown_err(void *ctx)
 
 static void parse_inst_empty_bankview(void *ctx)
 {
-    struct blockview bv = {.size = 0};
+    struct aldo_blockview bv = {.size = 0};
     struct aldo_dis_instruction inst;
 
     int result = aldo_dis_parse_inst(&bv, 0, &inst);
@@ -72,7 +72,7 @@ static void parse_inst_empty_bankview(void *ctx)
 static void parse_inst_at_start(void *ctx)
 {
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct blockview bv = {
+    struct aldo_blockview bv = {
         .mem = mem,
         .size = sizeof mem / sizeof mem[0],
         .ord = 1,
@@ -94,7 +94,7 @@ static void parse_inst_at_start(void *ctx)
 static void parse_inst_in_middle(void *ctx)
 {
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct blockview bv = {
+    struct aldo_blockview bv = {
         .mem = mem,
         .size = sizeof mem / sizeof mem[0],
         .ord = 1,
@@ -118,7 +118,7 @@ static void parse_inst_in_middle(void *ctx)
 static void parse_inst_unofficial(void *ctx)
 {
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct blockview bv = {
+    struct aldo_blockview bv = {
         .mem = mem,
         .size = sizeof mem / sizeof mem[0],
         .ord = 1,
@@ -141,7 +141,7 @@ static void parse_inst_unofficial(void *ctx)
 static void parse_inst_eof(void *ctx)
 {
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct blockview bv = {
+    struct aldo_blockview bv = {
         .mem = mem,
         .size = sizeof mem / sizeof mem[0],
         .ord = 1,
@@ -163,7 +163,7 @@ static void parse_inst_eof(void *ctx)
 static void parse_inst_out_of_bounds(void *ctx)
 {
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct blockview bv = {
+    struct aldo_blockview bv = {
         .mem = mem,
         .size = sizeof mem / sizeof mem[0],
         .ord = 1,

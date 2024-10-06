@@ -560,7 +560,7 @@ protected:
 
         auto info = emu.cartInfo();
         if (info) {
-            ImGui::Text("Format: %s", cart_formatname(info->format));
+            ImGui::Text("Format: %s", aldo_cart_formatname(info->format));
             ImGui::Separator();
             if (info->format == ALDO_CRTF_INES) {
                 renderiNesInfo(info.value());
@@ -573,7 +573,7 @@ protected:
     }
 
 private:
-    static void renderiNesInfo(const cartinfo& info) noexcept
+    static void renderiNesInfo(const aldo_cartinfo& info) noexcept
     {
         ImGui::Text("Mapper: %03u", info.ines_hdr.mapper_id);
         if (!info.ines_hdr.mapper_implemented) {
@@ -600,7 +600,8 @@ private:
             ImGui::TextUnformatted("CHR RAM: 1 x 8KB");
         }
 
-        ImGui::Text("NT-Mirroring: %s", cart_mirrorname(info.ines_hdr.mirror));
+        ImGui::Text("NT-Mirroring: %s",
+                    aldo_cart_mirrorname(info.ines_hdr.mirror));
         ImGui::Text("Mapper-Ctrl: %s",
                     boolstr(info.ines_hdr.mapper_controlled));
         ImGui::Separator();

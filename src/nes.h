@@ -28,7 +28,7 @@ br_libexport
 void aldo_nes_free(aldo_nes *self) br_nothrow;
 
 br_libexport
-void aldo_nes_powerup(aldo_nes *self, cart *c, bool zeroram) br_nothrow;
+void aldo_nes_powerup(aldo_nes *self, aldo_cart *c, bool zeroram) br_nothrow;
 br_libexport
 void aldo_nes_powerdown(aldo_nes *self) br_nothrow;
 

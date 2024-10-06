@@ -63,7 +63,7 @@ static void clear_chr_device(bus *b)
 
 void fill_pattern_table(size_t tile_count,
                         uint16_t table[tile_count][ALDO_CHR_TILE_DIM],
-                        const struct blockview *bv)
+                        const struct aldo_blockview *bv)
 {
     assert(tile_count <= ALDO_PT_TILE_COUNT);
     assert(bv->size >= tile_count * ALDO_CHR_TILE_STRIDE);
@@ -247,7 +247,8 @@ static bool ines_000_vbus_connect(struct aldo_mapper *self, bus *b)
     });
 }
 
-static void ines_000_snapshot(struct aldo_mapper *self, struct aldo_snapshot *snp)
+static void ines_000_snapshot(struct aldo_mapper *self,
+                              struct aldo_snapshot *snp)
 {
     assert(self != NULL);
     assert(snp != NULL);
@@ -256,7 +257,7 @@ static void ines_000_snapshot(struct aldo_mapper *self, struct aldo_snapshot *sn
     struct ines_mapper *m = (struct ines_mapper *)self;
     if (!m->ptstale) return;
 
-    struct blockview bv = {
+    struct aldo_blockview bv = {
         .mem = m->chr,
         .size = MEMBLOCK_4KB,
     };
@@ -299,8 +300,8 @@ int aldo_mapper_raw_create(struct aldo_mapper **m, FILE *f)
     return err;
 }
 
-int aldo_mapper_ines_create(struct aldo_mapper **m, struct ines_header *header,
-                            FILE *f)
+int aldo_mapper_ines_create(struct aldo_mapper **m,
+                            struct aldo_ines_header *header, FILE *f)
 {
     assert(m != NULL);
     assert(header != NULL);

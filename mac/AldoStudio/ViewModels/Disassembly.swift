@@ -184,14 +184,14 @@ struct DataCells {
 }
 
 fileprivate struct PrgLines: Sequence, IteratorProtocol {
-    let bv: blockview
+    let bv: aldo_blockview
     private var addr: UInt16
     private var cursor = 0
     private var done = false
     private var prevInstruction = aldo_dis_instruction()
     private var skip = false
 
-    init?(_ prgblock: blockview?) {
+    init?(_ prgblock: aldo_blockview?) {
         guard let prgblock, prgblock.size > 0 else { return nil }
         bv = prgblock
         // NOTE: by convention, count backwards from CPU vector locations

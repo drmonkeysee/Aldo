@@ -28,7 +28,7 @@ namespace aldo
 
 struct viewstate;
 
-using cart_handle = handle<cart, cart_free>;
+using cart_handle = handle<aldo_cart, aldo_cart_free>;
 using console_handle = handle<aldo_nes, aldo_nes_free>;
 
 class Snapshot {
@@ -66,7 +66,7 @@ public:
 
     const std::filesystem::path& cartName() const noexcept { return cartname; }
     std::string_view displayCartName() const noexcept;
-    std::optional<cartinfo> cartInfo() const;
+    std::optional<aldo_cartinfo> cartInfo() const;
     const Debugger& debugger() const noexcept { return hdbg; }
     Debugger& debugger() noexcept { return hdbg; }
     const aldo_snapshot& snapshot() const noexcept { return hsnp.get(); }
@@ -103,7 +103,7 @@ public:
     bool zeroRam = false;
 
 private:
-    cart* cartp() const noexcept { return hcart.get(); }
+    aldo_cart* cartp() const noexcept { return hcart.get(); }
     aldo_nes* consolep() const noexcept { return hconsole.get(); }
     aldo_snapshot* snapshotp() noexcept { return hsnp.getp(); }
 

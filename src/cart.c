@@ -16,12 +16,12 @@
 
 #define as_nesmap(cart) ((const struct aldo_nesmapper *)((cart)->mapper))
 
-struct cartridge {
+struct aldo_cartridge {
     struct aldo_mapper *mapper;
-    struct cartinfo info;
+    struct aldo_cartinfo info;
 };
 
-static int detect_format(struct cartridge *self, FILE *f)
+static int detect_format(struct aldo_cartridge *self, FILE *f)
 {
     static const char
         *const restrict nesmagic = "NES\x1a",
@@ -51,7 +51,7 @@ static int detect_format(struct cartridge *self, FILE *f)
     return fseek(f, 0, SEEK_SET) == 0 ? 0 : ALDO_CART_ERR_IO;
 }
 
-static int parse_ines(struct cartridge *self, FILE *f)
+static int parse_ines(struct aldo_cartridge *self, FILE *f)
 {
     unsigned char header[16];
 
@@ -64,7 +64,7 @@ static int parse_ines(struct cartridge *self, FILE *f)
     memcpy(&tail, header + 12, sizeof tail);
     if (tail != 0) return ALDO_CART_ERR_OBSOLETE;
 
-    struct cartinfo *info = &self->info;
+    struct aldo_cartinfo *info = &self->info;
     info->ines_hdr.prg_blocks = header[4];
     info->ines_hdr.chr_blocks = header[5];
     info->ines_hdr.wram = header[6] & 0x2;
@@ -93,7 +93,7 @@ static int parse_ines(struct cartridge *self, FILE *f)
 
 // NOTE: a raw ROM image is just a stream of bytes and has no identifying
 // header; if format cannot be determined, this is the default.
-static int parse_raw(struct cartridge *self, FILE *f)
+static int parse_raw(struct aldo_cartridge *self, FILE *f)
 {
     int err = aldo_mapper_raw_create(&self->mapper, f);
     // NOTE: ROM file is too big for prg address space (no bank-switching)
@@ -113,7 +113,8 @@ static const char *boolstr(bool value)
     return value ? "yes" : "no";
 }
 
-static void write_ines_info(const struct cartinfo *info, FILE *f, bool verbose)
+static void write_ines_info(const struct aldo_cartinfo *info, FILE *f,
+                            bool verbose)
 {
     static const char
         *const restrict fullsize = " x 16KB",
@@ -154,7 +155,8 @@ static void write_ines_info(const struct cartinfo *info, FILE *f, bool verbose)
         }
         fprintf(f, "%s1%s\n", chrramlbl, verbose ? halfsize : "");
     }
-    fprintf(f, "NT-Mirroring\t: %s\n", cart_mirrorname(info->ines_hdr.mirror));
+    fprintf(f, "NT-Mirroring\t: %s\n",
+            aldo_cart_mirrorname(info->ines_hdr.mirror));
     if (verbose || info->ines_hdr.mapper_controlled) {
         fprintf(f, "Mapper-Ctrl\t: %s\n",
                 boolstr(info->ines_hdr.mapper_controlled));
@@ -178,7 +180,7 @@ static void write_raw_info(FILE *f)
     fputs("PRG ROM\t: 1 x 32KB\n", f);
 }
 
-static bool is_nes(const struct cartridge *self)
+static bool is_nes(const struct aldo_cartridge *self)
 {
     return self->info.format == ALDO_CRTF_INES;
 }
@@ -187,7 +189,7 @@ static bool is_nes(const struct cartridge *self)
 // MARK: - Public Interface
 //
 
-const char *cart_errstr(int err)
+const char *aldo_cart_errstr(int err)
 {
     switch (err) {
 #define X(s, v, e) case ALDO_##s: return e;
@@ -198,12 +200,12 @@ const char *cart_errstr(int err)
     }
 }
 
-int cart_create(cart **c, FILE *f)
+int aldo_cart_create(aldo_cart **c, FILE *f)
 {
     assert(c != NULL);
     assert(f != NULL);
 
-    struct cartridge *self = malloc(sizeof *self);
+    struct aldo_cartridge *self = malloc(sizeof *self);
 
     int err = detect_format(self, f);
     if (err == 0) {
@@ -225,12 +227,12 @@ int cart_create(cart **c, FILE *f)
     if (err == 0) {
         *c = self;
     } else {
-        cart_free(self);
+        aldo_cart_free(self);
     }
     return err;
 }
 
-void cart_free(cart *self)
+void aldo_cart_free(aldo_cart *self)
 {
     assert(self != NULL);
 
@@ -240,7 +242,7 @@ void cart_free(cart *self)
     free(self);
 }
 
-const char *cart_formatname(enum cartformat format)
+const char *aldo_cart_formatname(enum aldo_cartformat format)
 {
     switch (format) {
 #define X(s, n) case ALDO_##s: return n;
@@ -251,7 +253,7 @@ const char *cart_formatname(enum cartformat format)
     }
 }
 
-const char *cart_mirrorname(enum nt_mirroring mirror)
+const char *aldo_cart_mirrorname(enum aldo_nt_mirroring mirror)
 {
     switch (mirror) {
 #define X(s, n) case ALDO_##s: return n;
@@ -262,15 +264,16 @@ const char *cart_mirrorname(enum nt_mirroring mirror)
     }
 }
 
-int cart_format_extname(cart *self,
-                        char buf[restrict static ALDO_CART_FMT_SIZE])
+int aldo_cart_format_extname(aldo_cart *self,
+                             char buf[restrict static ALDO_CART_FMT_SIZE])
 {
     assert(buf != NULL);
 
     if (!self) return ALDO_CART_ERR_NOCART;
 
     int count, total;
-    total = count = sprintf(buf, "%s", cart_formatname(self->info.format));
+    total = count = sprintf(buf, "%s",
+                            aldo_cart_formatname(self->info.format));
     if (count < 0) return ALDO_CART_ERR_FMT;
 
     if (is_nes(self)) {
@@ -283,15 +286,15 @@ int cart_format_extname(cart *self,
     return total;
 }
 
-void cart_write_info(cart *self, const char *restrict name, bool verbose,
-                     FILE *f)
+void aldo_cart_write_info(aldo_cart *self, const char *restrict name,
+                          bool verbose, FILE *f)
 {
     assert(self != NULL);
     assert(name != NULL);
     assert(f != NULL);
 
     fprintf(f, "File\t\t: %s\n", name);
-    fprintf(f, "Format\t\t: %s\n", cart_formatname(self->info.format));
+    fprintf(f, "Format\t\t: %s\n", aldo_cart_formatname(self->info.format));
     if (verbose) {
         hr(f);
     }
@@ -302,7 +305,7 @@ void cart_write_info(cart *self, const char *restrict name, bool verbose,
     }
 }
 
-void cart_getinfo(cart *self, struct cartinfo *info)
+void aldo_cart_getinfo(aldo_cart *self, struct aldo_cartinfo *info)
 {
     assert(self != NULL);
     assert(info != NULL);
@@ -310,12 +313,12 @@ void cart_getinfo(cart *self, struct cartinfo *info)
     *info = self->info;
 }
 
-struct blockview cart_prgblock(cart *self, size_t i)
+struct aldo_blockview aldo_cart_prgblock(aldo_cart *self, size_t i)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
 
-    struct blockview bv = {.ord = i};
+    struct aldo_blockview bv = {.ord = i};
     const uint8_t *prg = self->mapper->prgrom(self->mapper);
     if (is_nes(self)) {
         if (i < self->info.ines_hdr.prg_blocks) {
@@ -329,12 +332,12 @@ struct blockview cart_prgblock(cart *self, size_t i)
     return bv;
 }
 
-struct blockview cart_chrblock(cart *self, size_t i)
+struct aldo_blockview aldo_cart_chrblock(aldo_cart *self, size_t i)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
 
-    struct blockview bv = {.ord = i};
+    struct aldo_blockview bv = {.ord = i};
     if (!is_nes(self)) return bv;
 
     const uint8_t *chr = as_nesmap(self)->chrrom(self->mapper);
@@ -349,7 +352,7 @@ struct blockview cart_chrblock(cart *self, size_t i)
 // MARK: - Internal Interface
 //
 
-bool cart_mbus_connect(cart *self, bus *b)
+bool aldo_cart_mbus_connect(aldo_cart *self, bus *b)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
@@ -358,7 +361,7 @@ bool cart_mbus_connect(cart *self, bus *b)
     return self->mapper->mbus_connect(self->mapper, b);
 }
 
-void cart_mbus_disconnect(cart *self, bus *b)
+void aldo_cart_mbus_disconnect(aldo_cart *self, bus *b)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
@@ -367,7 +370,7 @@ void cart_mbus_disconnect(cart *self, bus *b)
     self->mapper->mbus_disconnect(b);
 }
 
-bool cart_vbus_connect(cart *self, bus *b)
+bool aldo_cart_vbus_connect(aldo_cart *self, bus *b)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
@@ -379,7 +382,7 @@ bool cart_vbus_connect(cart *self, bus *b)
     return false;
 }
 
-void cart_vbus_disconnect(cart *self, bus *b)
+void aldo_cart_vbus_disconnect(aldo_cart *self, bus *b)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
@@ -390,7 +393,8 @@ void cart_vbus_disconnect(cart *self, bus *b)
     }
 }
 
-void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)
+void aldo_cart_write_dis_header(aldo_cart *self, const char *restrict name,
+                                FILE *f)
 {
     assert(self != NULL);
     assert(name != NULL);
@@ -398,15 +402,15 @@ void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)
 
     fprintf(f, "%s\n", name);
     char fmtd[ALDO_CART_FMT_SIZE];
-    int err = cart_format_extname(self, fmtd);
-    fputs(err < 0 ? cart_errstr(err) : fmtd, f);
+    int err = aldo_cart_format_extname(self, fmtd);
+    fputs(err < 0 ? aldo_cart_errstr(err) : fmtd, f);
     fputs("\n\nDisassembly of PRG ROM\n", f);
     if (self->info.format != ALDO_CRTF_ALDO) {
         fputs("(NOTE: approximate for non-Aldo formats)\n", f);
     }
 }
 
-void cart_snapshot(cart *self, struct aldo_snapshot *snp)
+void aldo_cart_snapshot(aldo_cart *self, struct aldo_snapshot *snp)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);

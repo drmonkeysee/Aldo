@@ -39,12 +39,14 @@ auto load_cart(const std::filesystem::path& filepath)
 {
     using file_handle = aldo::handle<std::FILE, std::fclose>;
 
-    cart* c;
+    aldo_cart* c;
     file_handle f{std::fopen(filepath.c_str(), "rb")};
     if (!f) throw aldo::AldoError{"Cannot open cart file", filepath, errno};
 
-    int err = cart_create(&c, f.get());
-    if (err < 0) throw aldo::AldoError{"Cart load failure", err, cart_errstr};
+    int err = aldo_cart_create(&c, f.get());
+    if (err < 0) throw aldo::AldoError{
+        "Cart load failure", err, aldo_cart_errstr,
+    };
 
     return c;
 }
@@ -78,17 +80,17 @@ aldo::Emulator::Emulator(aldo::debug_handle d, aldo::console_handle n,
 
 std::string_view aldo::Emulator::displayCartName() const noexcept
 {
-    if (cartName().empty()) return cart_errstr(ALDO_CART_ERR_NOCART);
+    if (cartName().empty()) return aldo_cart_errstr(ALDO_CART_ERR_NOCART);
 
     return cartName().native();
 }
 
-std::optional<cartinfo> aldo::Emulator::cartInfo() const
+std::optional<aldo_cartinfo> aldo::Emulator::cartInfo() const
 {
     if (!hcart) return {};
 
-    cartinfo info;
-    cart_getinfo(cartp(), &info);
+    aldo_cartinfo info;
+    aldo_cart_getinfo(cartp(), &info);
     return info;
 }
 

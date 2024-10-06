@@ -34,9 +34,9 @@ final class Cart {
         return true
     }
 
-    func getPrgBlock(_ at: Int) -> blockview? {
+    func getPrgBlock(_ at: Int) -> aldo_blockview? {
         guard let handle else { return nil }
-        return cart_prgblock(handle.unwrapped, at)
+        return aldo_cart_prgblock(handle.unwrapped, at)
     }
 
     @MainActor
@@ -44,7 +44,7 @@ final class Cart {
         guard let handle else { return noCart }
 
         return await readCStream {
-            cart_write_info(handle.unwrapped, info.cartName, true, $0)
+            aldo_cart_write_info(handle.unwrapped, info.cartName, true, $0)
         }
     }
 
@@ -66,7 +66,7 @@ final class Cart {
         guard let handle else { return noCart }
 
         return await readCStream(binary: true) { stream in
-            let bv = cart_chrblock(handle.unwrapped, at)
+            let bv = aldo_cart_chrblock(handle.unwrapped, at)
             let err = withUnsafePointer(to: bv) {
                 aldo_dis_cart_chrblock($0, .init(scale), stream)
             }
@@ -126,7 +126,7 @@ enum CartFormat {
     case none
     case unknown
     case raw(String)
-    case iNes(String, ines_header, String)
+    case iNes(String, aldo_ines_header, String)
 
     var name: String {
         switch self {
@@ -185,15 +185,16 @@ fileprivate final class CartHandle {
     var unwrapped: OpaquePointer { cartRef! }
 
     var cartFormat: CartFormat {
-        var info = cartinfo()
-        cart_getinfo(cartRef, &info)
+        var info = aldo_cartinfo()
+        aldo_cart_getinfo(cartRef, &info)
         switch info.format {
         case ALDO_CRTF_RAW:
-            return .raw(.init(cString: cart_formatname(info.format)))
+            return .raw(.init(cString: aldo_cart_formatname(info.format)))
         case ALDO_CRTF_INES:
-            return .iNes(.init(cString: cart_formatname(info.format)),
-                         info.ines_hdr,
-                         .init(cString: cart_mirrorname(info.ines_hdr.mirror)))
+            return .iNes(
+                .init(cString: aldo_cart_formatname(info.format)),
+                info.ines_hdr,
+                .init(cString: aldo_cart_mirrorname(info.ines_hdr.mirror)))
         default:
             return .unknown
         }
@@ -209,13 +210,13 @@ fileprivate final class CartHandle {
         guard cFile != nil else { throw AldoError.ioErrno }
         defer { fclose(cFile) }
 
-        let err = cart_create(&cartRef, cFile)
+        let err = aldo_cart_create(&cartRef, cFile)
         if err < 0 { throw AldoError.cartErr(err) }
     }
 
     deinit {
         guard cartRef != nil else { return }
-        cart_free(cartRef)
+        aldo_cart_free(cartRef)
         cartRef = nil
     }
 }

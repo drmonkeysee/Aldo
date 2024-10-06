@@ -45,7 +45,7 @@ enum {
 
 struct aldo_dis_instruction {
     size_t offset;
-    struct blockview bv;
+    struct aldo_blockview bv;
     struct aldo_decoded d;
 };
 
@@ -62,7 +62,7 @@ const char *aldo_dis_errstr(int err) br_nothrow;
 
 // NOTE: parsed will be zeroed-out if return value is <= 0
 br_libexport br_checkerror
-int aldo_dis_parse_inst(const struct blockview *bv, size_t at,
+int aldo_dis_parse_inst(const struct aldo_blockview *bv, size_t at,
                         struct aldo_dis_instruction *parsed) br_nothrow;
 br_libexport br_checkerror
 int aldo_dis_parsemem_inst(size_t size, const uint8_t mem[br_nasz(size)],
@@ -77,14 +77,14 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
                       char dis[br_nacsz(ALDO_DIS_DATAP_SIZE)]) br_nothrow;
 
 br_libexport br_checkerror
-int aldo_dis_cart_prg(cart *cart, const char *br_noalias name, bool verbose,
-                      bool unified_output, FILE *f) br_nothrow;
+int aldo_dis_cart_prg(aldo_cart *cart, const char *br_noalias name,
+                      bool verbose, bool unified_output, FILE *f) br_nothrow;
 br_libexport br_checkerror
-int aldo_dis_cart_chr(cart *cart, int chrscale,
+int aldo_dis_cart_chr(aldo_cart *cart, int chrscale,
                       const char *br_noalias chrdecode_prefix,
                       FILE *output) br_nothrow;
 br_libexport br_checkerror
-int aldo_dis_cart_chrblock(const struct blockview *bv, int scale,
+int aldo_dis_cart_chrblock(const struct aldo_blockview *bv, int scale,
                            FILE *f) br_nothrow;
 
 br_libexport

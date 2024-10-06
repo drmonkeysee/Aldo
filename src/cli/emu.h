@@ -16,7 +16,7 @@
 
 struct emulator {
     const struct cliargs *args; // Non-owning Pointer
-    cart *cart;                 // Non-owning Pointer
+    aldo_cart *cart;            // Non-owning Pointer
     aldo_debugger *debugger;
     aldo_nes *console;
     struct aldo_snapshot snapshot;

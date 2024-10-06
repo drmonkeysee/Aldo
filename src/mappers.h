@@ -40,7 +40,7 @@ struct aldo_nesmapper {
 
 // NOTE: if create functions return non-zero error code, *m is unmodified
 int aldo_mapper_raw_create(struct aldo_mapper **m, FILE *f);
-int aldo_mapper_ines_create(struct aldo_mapper **m, struct ines_header *header,
-                            FILE *f);
+int aldo_mapper_ines_create(struct aldo_mapper **m,
+                            struct aldo_ines_header *header, FILE *f);
 
 #endif

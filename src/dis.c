@@ -186,7 +186,8 @@ static void print_prg_line(const char *restrict dis, bool verbose,
     }
 }
 
-static int print_prgblock(const struct blockview *bv, bool verbose, FILE *f)
+static int print_prgblock(const struct aldo_blockview *bv, bool verbose,
+                          FILE *f)
 {
     fprintf(f, "Block %zu (%zuKB)\n", bv->ord, bv->size >> BITWIDTH_1KB);
     fputs("--------\n", f);
@@ -270,7 +271,7 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
                                 uint32_t tiley, uint32_t pixely,
                                 uint32_t tilesdim, uint32_t tile_sections,
                                 uint32_t scale, uint32_t section_pxldim,
-                                const struct blockview *bv)
+                                const struct aldo_blockview *bv)
 {
     for (uint32_t section = 0; section < tile_sections; ++section) {
         for (uint32_t tilex = 0; tilex < tilesdim; ++tilex) {
@@ -313,7 +314,7 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
     }
 }
 
-static int write_chrtiles(const struct blockview *bv, uint32_t tilesdim,
+static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
                           uint32_t tile_sections, uint32_t scale,
                           FILE *bmpfile)
 {
@@ -411,7 +412,7 @@ static int write_chrtiles(const struct blockview *bv, uint32_t tilesdim,
     return 0;
 }
 
-static int write_chrblock(const struct blockview *bv, uint32_t scale,
+static int write_chrblock(const struct aldo_blockview *bv, uint32_t scale,
                           const char *restrict bmpfilename, FILE *output)
 {
     uint32_t tilesdim, tile_sections;
@@ -454,7 +455,7 @@ const char *aldo_dis_errstr(int err)
     }
 }
 
-int aldo_dis_parse_inst(const struct blockview *bv, size_t at,
+int aldo_dis_parse_inst(const struct aldo_blockview *bv, size_t at,
                         struct aldo_dis_instruction *parsed)
 {
     assert(bv != NULL);
@@ -480,7 +481,7 @@ int aldo_dis_parse_inst(const struct blockview *bv, size_t at,
 int aldo_dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
                            size_t at, struct aldo_dis_instruction *parsed)
 {
-    struct blockview bv = {
+    struct aldo_blockview bv = {
         .mem = mem,
         .size = size,
     };
@@ -570,17 +571,17 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
     return total;
 }
 
-int aldo_dis_cart_prg(cart *cart, const char *restrict name, bool verbose,
+int aldo_dis_cart_prg(aldo_cart *cart, const char *restrict name, bool verbose,
                       bool unified_output, FILE *f)
 {
     assert(cart != NULL);
     assert(name != NULL);
     assert(f != NULL);
 
-    struct blockview bv = cart_prgblock(cart, 0);
+    struct aldo_blockview bv = aldo_cart_prgblock(cart, 0);
     if (!bv.mem) return ALDO_DIS_ERR_PRGROM;
 
-    cart_write_dis_header(cart, name, f);
+    aldo_cart_write_dis_header(cart, name, f);
     do {
         fputc('\n', f);
         int err = print_prgblock(&bv, verbose, f);
@@ -590,13 +591,13 @@ int aldo_dis_cart_prg(cart *cart, const char *restrict name, bool verbose,
             fprintf(unified_output ? f : stderr,
                     "Dis err (%d): %s\n", err, aldo_dis_errstr(err));
         }
-        bv = cart_prgblock(cart, bv.ord + 1);
+        bv = aldo_cart_prgblock(cart, bv.ord + 1);
     } while (bv.mem);
 
     return 0;
 }
 
-int aldo_dis_cart_chr(cart *cart, int chrscale,
+int aldo_dis_cart_chr(aldo_cart *cart, int chrscale,
                       const char *restrict chrdecode_prefix, FILE *output)
 {
     assert(cart != NULL);
@@ -604,7 +605,7 @@ int aldo_dis_cart_chr(cart *cart, int chrscale,
 
     if (chrscale <= 0 || chrscale > ScaleGuard) return ALDO_DIS_ERR_CHRSCL;
 
-    struct blockview bv = cart_chrblock(cart, 0);
+    struct aldo_blockview bv = aldo_cart_chrblock(cart, 0);
     if (!bv.mem) return ALDO_DIS_ERR_CHRROM;
 
     const char *prefix = chrdecode_prefix && chrdecode_prefix[0] != '\0'
@@ -624,14 +625,14 @@ int aldo_dis_cart_chr(cart *cart, int chrscale,
         }
         err = write_chrblock(&bv, (uint32_t)chrscale, bmpfilename, output);
         if (err < 0) break;
-        bv = cart_chrblock(cart, bv.ord + 1);
+        bv = aldo_cart_chrblock(cart, bv.ord + 1);
     } while (bv.mem);
 
     free(bmpfilename);
     return err;
 }
 
-int aldo_dis_cart_chrblock(const struct blockview *bv, int scale, FILE *f)
+int aldo_dis_cart_chrblock(const struct aldo_blockview *bv, int scale, FILE *f)
 {
     assert(bv != NULL);
     assert(f != NULL);

@@ -24,7 +24,7 @@ X(CRTF_INES, "iNES") \
 X(CRTF_NES20, "NES 2.0") \
 X(CRTF_NSF, "NES Sound Format")
 
-enum cartformat {
+enum aldo_cartformat {
 #define X(s, n) ALDO_##s,
     ALDO_CART_FORMAT_X
 #undef X
@@ -38,7 +38,7 @@ X(NTM_1SCREEN, "Single-Screen") \
 X(NTM_4SCREEN, "4-Screen VRAM") \
 X(NTM_OTHER, "Mapper-Specific")
 
-enum nt_mirroring {
+enum aldo_nt_mirroring {
 #define X(s, n) ALDO_##s,
     ALDO_CART_NTMIRROR_X
 #undef X
@@ -49,27 +49,27 @@ enum nt_mirroring {
 //  - VS/Playchoice system indicator (does anyone care?)
 //  - TV System (PAL ROMs don't seem to set the flags so again who cares)
 //  - redundant indicators in byte 10
-struct ines_header {
-    enum nt_mirroring mirror;   // Nametable Mirroring
-    uint8_t chr_blocks,         // CHR ROM block count; 0 indicates CHR RAM
-                                //      1 block = 8KB
-            mapper_id,          // Mapper ID
-            prg_blocks,         // PRG double-block count
-                                //      1 block = 16KB
-            wram_blocks;        // WRAM block count; may be set by mapper
-                                //      1 block = 8KB
+struct aldo_ines_header {
+    enum aldo_nt_mirroring mirror;  // Nametable Mirroring
+    uint8_t chr_blocks,             // CHR ROM block count; 0 indicates CHR RAM
+                                    //      1 block = 8KB
+            mapper_id,              // Mapper ID
+            prg_blocks,             // PRG double-block count
+                                    //      1 block = 16KB
+            wram_blocks;            // WRAM block count; may be set by mapper
+                                    //      1 block = 8KB
     bool
-        bus_conflicts,          // Cart has bus conflicts
-        mapper_controlled,      // Mapper-controlled Nametable Mirroring
-        mapper_implemented,     // Mapper is implemented
-        trainer,                // Trainer data present
-        wram;                   // PRG RAM banks present
+        bus_conflicts,              // Cart has bus conflicts
+        mapper_controlled,          // Mapper-controlled Nametable Mirroring
+        mapper_implemented,         // Mapper is implemented
+        trainer,                    // Trainer data present
+        wram;                       // PRG RAM banks present
 };
 
-struct cartinfo {
-    enum cartformat format;
+struct aldo_cartinfo {
+    enum aldo_cartformat format;
     union {
-        struct ines_header ines_hdr;
+        struct aldo_ines_header ines_hdr;
     };
 };
 
@@ -94,12 +94,12 @@ enum {
     ALDO_CART_FMT_SIZE = 17,
 };
 
-struct blockview {
+struct aldo_blockview {
     size_t ord, size;
     const uint8_t *mem; // Non-owning Pointer
 };
 
-typedef struct cartridge cart;
+typedef struct aldo_cartridge aldo_cart;
 
 #include "bridgeopen.h"
 //
@@ -107,44 +107,45 @@ typedef struct cartridge cart;
 //
 
 br_libexport
-const char *cart_errstr(int err) br_nothrow;
+const char *aldo_cart_errstr(int err) br_nothrow;
 
 // NOTE: if returns non-zero error code, *c is unmodified
 br_libexport br_checkerror
-int cart_create(cart **c, FILE *f) br_nothrow;
+int aldo_cart_create(aldo_cart **c, FILE *f) br_nothrow;
 br_libexport
-void cart_free(cart *self) br_nothrow;
+void aldo_cart_free(aldo_cart *self) br_nothrow;
 
 br_libexport
-const char *cart_formatname(enum cartformat format) br_nothrow;
+const char *aldo_cart_formatname(enum aldo_cartformat format) br_nothrow;
 br_libexport
-const char *cart_mirrorname(enum nt_mirroring mirror) br_nothrow;
+const char *aldo_cart_mirrorname(enum aldo_nt_mirroring mirror) br_nothrow;
 br_libexport br_checkerror
-int cart_format_extname(cart *self,
-                        char buf[br_nacsz(ALDO_CART_FMT_SIZE)]) br_nothrow;
+int
+aldo_cart_format_extname(aldo_cart *self,
+                         char buf[br_nacsz(ALDO_CART_FMT_SIZE)]) br_nothrow;
 br_libexport
-void cart_write_info(cart *self, const char *br_noalias name, bool verbose,
-                     FILE *f) br_nothrow;
+void aldo_cart_write_info(aldo_cart *self, const char *br_noalias name,
+                          bool verbose, FILE *f) br_nothrow;
 br_libexport
-void cart_getinfo(cart *self, struct cartinfo *info) br_nothrow;
+void aldo_cart_getinfo(aldo_cart *self, struct aldo_cartinfo *info) br_nothrow;
 
 br_libexport
-struct blockview cart_prgblock(cart *self, size_t i) br_nothrow;
+struct aldo_blockview aldo_cart_prgblock(aldo_cart *self, size_t i) br_nothrow;
 br_libexport
-struct blockview cart_chrblock(cart *self, size_t i) br_nothrow;
+struct aldo_blockview aldo_cart_chrblock(aldo_cart *self, size_t i) br_nothrow;
 
 //
 // MARK: - Internal
 //
 
-bool cart_mbus_connect(cart *self, bus *b) br_nothrow;
-void cart_mbus_disconnect(cart *self, bus *b) br_nothrow;
-bool cart_vbus_connect(cart *self, bus *b) br_nothrow;
-void cart_vbus_disconnect(cart *self, bus *b) br_nothrow;
+bool aldo_cart_mbus_connect(aldo_cart *self, bus *b) br_nothrow;
+void aldo_cart_mbus_disconnect(aldo_cart *self, bus *b) br_nothrow;
+bool aldo_cart_vbus_connect(aldo_cart *self, bus *b) br_nothrow;
+void aldo_cart_vbus_disconnect(aldo_cart *self, bus *b) br_nothrow;
 
-void cart_write_dis_header(cart *self, const char *br_noalias name,
-                           FILE *f) br_nothrow;
-void cart_snapshot(cart *self, struct aldo_snapshot *snp) br_nothrow;
+void aldo_cart_write_dis_header(aldo_cart *self, const char *br_noalias name,
+                                FILE *f) br_nothrow;
+void aldo_cart_snapshot(aldo_cart *self, struct aldo_snapshot *snp) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

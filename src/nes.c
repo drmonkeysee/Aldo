@@ -25,7 +25,7 @@ static const int PpuRatio = 3;
 // The NES-001 NTSC Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
 struct aldo_nes001 {
-    cart *cart;                 // Game Cartridge; Non-owning Pointer
+    aldo_cart *cart;            // Game Cartridge; Non-owning Pointer
     aldo_debugger *dbg;         // Debugger Context; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
     struct aldo_mos6502 cpu;    // CPU Core of RP2A03 Chip
@@ -151,12 +151,12 @@ static void create_vbus(struct aldo_nes001 *self)
     assert(r);
 }
 
-static void connect_cart(struct aldo_nes001 *self, cart *c)
+static void connect_cart(struct aldo_nes001 *self, aldo_cart *c)
 {
     self->cart = c;
-    bool r = cart_mbus_connect(self->cart, self->cpu.mbus);
+    bool r = aldo_cart_mbus_connect(self->cart, self->cpu.mbus);
     assert(r);
-    cart_vbus_connect(self->cart, self->ppu.vbus);
+    aldo_cart_vbus_connect(self->cart, self->ppu.vbus);
     aldo_debug_sync_bus(self->dbg);
 }
 
@@ -166,8 +166,8 @@ static void disconnect_cart(struct aldo_nes001 *self)
     // debugger even if there is no existing cart.
     aldo_debug_reset(self->dbg);
     if (!self->cart) return;
-    cart_vbus_disconnect(self->cart, self->ppu.vbus);
-    cart_mbus_disconnect(self->cart, self->cpu.mbus);
+    aldo_cart_vbus_disconnect(self->cart, self->ppu.vbus);
+    aldo_cart_mbus_disconnect(self->cart, self->cpu.mbus);
     self->cart = NULL;
 }
 
@@ -294,7 +294,7 @@ void aldo_nes_free(aldo_nes *self)
     free(self);
 }
 
-void aldo_nes_powerup(aldo_nes *self, cart *c, bool zeroram)
+void aldo_nes_powerup(aldo_nes *self, aldo_cart *c, bool zeroram)
 {
     assert(self != NULL);
     assert(self->cart == NULL);
@@ -425,7 +425,7 @@ void aldo_nes_snapshot(aldo_nes *self, struct aldo_snapshot *snp)
     bus_snapshot(self, snp);
     aldo_ppu_vid_snapshot(&self->ppu, snp);
     if (self->cart) {
-        cart_snapshot(self->cart, snp);
+        aldo_cart_snapshot(self->cart, snp);
     }
     snp->mem.ram = self->ram;
     snp->mem.vram = self->vram;

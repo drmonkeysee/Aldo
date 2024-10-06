@@ -158,7 +158,7 @@ fileprivate struct iNesView: View {
     private static let fullSize = "x 16KB"
     private static let halfSize = "x 8KB"
 
-    let header: ines_header
+    let header: aldo_ines_header
     let mirrorName: String
 
     var body: some View {

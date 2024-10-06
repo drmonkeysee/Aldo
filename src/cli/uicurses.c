@@ -246,9 +246,9 @@ static void drawcart(const struct view *v, const struct emulator *emu)
     wprintw(v->content, "%.*s%s", (int)(longname ? maxwidth - 1 : namelen),
             cn, longname ? "\u2026" : "");
     char fmtd[ALDO_CART_FMT_SIZE];
-    int err = cart_format_extname(emu->cart, fmtd);
+    int err = aldo_cart_format_extname(emu->cart, fmtd);
     mvwprintw(v->content, ++cursor_y, 0, "Format: %s",
-              err < 0 ? cart_errstr(err) : fmtd);
+              err < 0 ? aldo_cart_errstr(err) : fmtd);
 }
 
 static void drawinstructions(const struct view *v, int h, int y,

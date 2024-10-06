@@ -245,7 +245,7 @@ static void drawcart(const struct view *v, const struct emulator *emu)
     // NOTE: ellipsis is one glyph wide despite being > 1 byte long
     wprintw(v->content, "%.*s%s", (int)(longname ? maxwidth - 1 : namelen),
             cn, longname ? "\u2026" : "");
-    char fmtd[CART_FMT_SIZE];
+    char fmtd[ALDO_CART_FMT_SIZE];
     int err = cart_format_extname(emu->cart, fmtd);
     mvwprintw(v->content, ++cursor_y, 0, "Format: %s",
               err < 0 ? cart_errstr(err) : fmtd);

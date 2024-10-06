@@ -31,24 +31,24 @@ static int detect_format(struct cartridge *self, FILE *f)
     char format[9];
 
     if (!fgets(format, sizeof format, f)) {
-        if (feof(f)) return CART_ERR_EOF;
-        if (ferror(f)) return CART_ERR_IO;
-        return CART_ERR_UNKNOWN;
+        if (feof(f)) return ALDO_CART_ERR_EOF;
+        if (ferror(f)) return ALDO_CART_ERR_IO;
+        return ALDO_CART_ERR_UNKNOWN;
     }
 
     if (strncmp(nsfmagic, format, strlen(nsfmagic)) == 0) {
-        self->info.format = CRTF_NSF;
+        self->info.format = ALDO_CRTF_NSF;
     } else if (strncmp(nesmagic, format, strlen(nesmagic)) == 0) {
         // NOTE: NES 2.0 byte 7 matches pattern 0bxxxx10xx
         self->info.format = ((unsigned char)format[7] & 0xc) == 0x8
-                                ? CRTF_NES20
-                                : CRTF_INES;
+                                ? ALDO_CRTF_NES20
+                                : ALDO_CRTF_INES;
     } else {
-        self->info.format = CRTF_RAW;
+        self->info.format = ALDO_CRTF_RAW;
     }
 
     // NOTE: reset back to beginning of file to fully parse detected format
-    return fseek(f, 0, SEEK_SET) == 0 ? 0 : CART_ERR_IO;
+    return fseek(f, 0, SEEK_SET) == 0 ? 0 : ALDO_CART_ERR_IO;
 }
 
 static int parse_ines(struct cartridge *self, FILE *f)
@@ -56,13 +56,13 @@ static int parse_ines(struct cartridge *self, FILE *f)
     unsigned char header[16];
 
     fread(header, sizeof header[0], sizeof header, f);
-    if (feof(f)) return CART_ERR_EOF;
-    if (ferror(f)) return CART_ERR_IO;
+    if (feof(f)) return ALDO_CART_ERR_EOF;
+    if (ferror(f)) return ALDO_CART_ERR_IO;
 
     // NOTE: if last 4 bytes of header aren't 0 this is a very old format
     uint32_t tail;
     memcpy(&tail, header + 12, sizeof tail);
-    if (tail != 0) return CART_ERR_OBSOLETE;
+    if (tail != 0) return ALDO_CART_ERR_OBSOLETE;
 
     struct cartinfo *info = &self->info;
     info->ines_hdr.prg_blocks = header[4];
@@ -71,10 +71,10 @@ static int parse_ines(struct cartridge *self, FILE *f)
 
     // NOTE: mapper may override these two fields
     info->ines_hdr.mirror = header[6] & 0x8
-                                ? NTM_4SCREEN
+                                ? ALDO_NTM_4SCREEN
                                 : (header[6] & 0x1
-                                   ? NTM_VERTICAL
-                                   : NTM_HORIZONTAL);
+                                   ? ALDO_NTM_VERTICAL
+                                   : ALDO_NTM_HORIZONTAL);
     info->ines_hdr.mapper_controlled = false;
 
     info->ines_hdr.trainer = header[6] & 0x4;
@@ -98,7 +98,7 @@ static int parse_raw(struct cartridge *self, FILE *f)
     int err = aldo_mapper_raw_create(&self->mapper, f);
     // NOTE: ROM file is too big for prg address space (no bank-switching)
     if (err == 0 && !(fgetc(f) == EOF && feof(f))) {
-        err = CART_ERR_IMG_SIZE;
+        err = ALDO_CART_ERR_IMG_SIZE;
     }
     return err;
 }
@@ -180,7 +180,7 @@ static void write_raw_info(FILE *f)
 
 static bool is_nes(const struct cartridge *self)
 {
-    return self->info.format == CRTF_INES;
+    return self->info.format == ALDO_CRTF_INES;
 }
 
 //
@@ -190,8 +190,8 @@ static bool is_nes(const struct cartridge *self)
 const char *cart_errstr(int err)
 {
     switch (err) {
-#define X(s, v, e) case s: return e;
-        CART_ERRCODE_X
+#define X(s, v, e) case ALDO_##s: return e;
+        ALDO_CART_ERRCODE_X
 #undef X
     default:
         return "UNKNOWN ERR";
@@ -208,13 +208,13 @@ int cart_create(cart **c, FILE *f)
     int err = detect_format(self, f);
     if (err == 0) {
         switch (self->info.format) {
-        case CRTF_INES:
+        case ALDO_CRTF_INES:
             err = parse_ines(self, f);
             break;
-        case CRTF_ALDO:
-        case CRTF_NES20:
-        case CRTF_NSF:
-            err = CART_ERR_FORMAT;
+        case ALDO_CRTF_ALDO:
+        case ALDO_CRTF_NES20:
+        case ALDO_CRTF_NSF:
+            err = ALDO_CART_ERR_FORMAT;
             break;
         default:
             err = parse_raw(self, f);
@@ -243,8 +243,8 @@ void cart_free(cart *self)
 const char *cart_formatname(enum cartformat format)
 {
     switch (format) {
-#define X(s, n) case s: return n;
-        CART_FORMAT_X
+#define X(s, n) case ALDO_##s: return n;
+        ALDO_CART_FORMAT_X
 #undef X
     default:
         return "UNKNOWN CART FORMAT";
@@ -254,31 +254,32 @@ const char *cart_formatname(enum cartformat format)
 const char *cart_mirrorname(enum nt_mirroring mirror)
 {
     switch (mirror) {
-#define X(s, n) case s: return n;
-        CART_INES_NTMIRROR_X
+#define X(s, n) case ALDO_##s: return n;
+        ALDO_CART_NTMIRROR_X
 #undef X
     default:
         return "UNKNOWN INES NT MIRROR";
     }
 }
 
-int cart_format_extname(cart *self, char buf[restrict static CART_FMT_SIZE])
+int cart_format_extname(cart *self,
+                        char buf[restrict static ALDO_CART_FMT_SIZE])
 {
     assert(buf != NULL);
 
-    if (!self) return CART_ERR_NOCART;
+    if (!self) return ALDO_CART_ERR_NOCART;
 
     int count, total;
     total = count = sprintf(buf, "%s", cart_formatname(self->info.format));
-    if (count < 0) return CART_ERR_FMT;
+    if (count < 0) return ALDO_CART_ERR_FMT;
 
     if (is_nes(self)) {
         count = sprintf(buf + total, " (%03d)", self->info.ines_hdr.mapper_id);
-        if (count < 0) return CART_ERR_FMT;
+        if (count < 0) return ALDO_CART_ERR_FMT;
         total += count;
     }
 
-    assert(total < CART_FMT_SIZE);
+    assert(total < ALDO_CART_FMT_SIZE);
     return total;
 }
 
@@ -396,11 +397,11 @@ void cart_write_dis_header(cart *self, const char *restrict name, FILE *f)
     assert(f != NULL);
 
     fprintf(f, "%s\n", name);
-    char fmtd[CART_FMT_SIZE];
+    char fmtd[ALDO_CART_FMT_SIZE];
     int err = cart_format_extname(self, fmtd);
     fputs(err < 0 ? cart_errstr(err) : fmtd, f);
     fputs("\n\nDisassembly of PRG ROM\n", f);
-    if (self->info.format != CRTF_ALDO) {
+    if (self->info.format != ALDO_CRTF_ALDO) {
         fputs("(NOTE: approximate for non-Aldo formats)\n", f);
     }
 }

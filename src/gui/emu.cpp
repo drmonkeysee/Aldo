@@ -78,7 +78,7 @@ aldo::Emulator::Emulator(aldo::debug_handle d, aldo::console_handle n,
 
 std::string_view aldo::Emulator::displayCartName() const noexcept
 {
-    if (cartName().empty()) return cart_errstr(CART_ERR_NOCART);
+    if (cartName().empty()) return cart_errstr(ALDO_CART_ERR_NOCART);
 
     return cartName().native();
 }

@@ -188,9 +188,9 @@ fileprivate final class CartHandle {
         var info = cartinfo()
         cart_getinfo(cartRef, &info)
         switch info.format {
-        case CRTF_RAW:
+        case ALDO_CRTF_RAW:
             return .raw(.init(cString: cart_formatname(info.format)))
-        case CRTF_INES:
+        case ALDO_CRTF_INES:
             return .iNes(.init(cString: cart_formatname(info.format)),
                          info.ines_hdr,
                          .init(cString: cart_mirrorname(info.ines_hdr.mirror)))

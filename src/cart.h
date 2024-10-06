@@ -17,7 +17,7 @@
 #include <stdio.h>
 
 // X(symbol, name)
-#define CART_FORMAT_X \
+#define ALDO_CART_FORMAT_X \
 X(CRTF_RAW, "Raw ROM Image?") \
 X(CRTF_ALDO, "Aldo") \
 X(CRTF_INES, "iNES") \
@@ -25,13 +25,13 @@ X(CRTF_NES20, "NES 2.0") \
 X(CRTF_NSF, "NES Sound Format")
 
 enum cartformat {
-#define X(s, n) s,
-    CART_FORMAT_X
+#define X(s, n) ALDO_##s,
+    ALDO_CART_FORMAT_X
 #undef X
 };
 
 // X(symbol, name)
-#define CART_INES_NTMIRROR_X \
+#define ALDO_CART_NTMIRROR_X \
 X(NTM_HORIZONTAL, "Horizontal") \
 X(NTM_VERTICAL, "Vertical") \
 X(NTM_1SCREEN, "Single-Screen") \
@@ -39,8 +39,8 @@ X(NTM_4SCREEN, "4-Screen VRAM") \
 X(NTM_OTHER, "Mapper-Specific")
 
 enum nt_mirroring {
-#define X(s, n) s,
-    CART_INES_NTMIRROR_X
+#define X(s, n) ALDO_##s,
+    ALDO_CART_NTMIRROR_X
 #undef X
 };
 
@@ -74,7 +74,7 @@ struct cartinfo {
 };
 
 // X(symbol, value, error string)
-#define CART_ERRCODE_X \
+#define ALDO_CART_ERRCODE_X \
 X(CART_ERR_UNKNOWN, -1, "UNKNOWN CART LOAD ERROR") \
 X(CART_ERR_IO, -2, "FILE READ ERROR") \
 X(CART_ERR_IMG_SIZE, -3, "ROM IMAGE TOO LARGE") \
@@ -85,13 +85,13 @@ X(CART_ERR_FMT, -7, "FORMATTED OUTPUT FAILURE") \
 X(CART_ERR_NOCART, -8, "NO CART")
 
 enum {
-#define X(s, v, e) s = v,
-    CART_ERRCODE_X
+#define X(s, v, e) ALDO_##s = v,
+    ALDO_CART_ERRCODE_X
 #undef X
 };
 
 enum {
-    CART_FMT_SIZE = 17,
+    ALDO_CART_FMT_SIZE = 17,
 };
 
 struct blockview {
@@ -121,7 +121,7 @@ br_libexport
 const char *cart_mirrorname(enum nt_mirroring mirror) br_nothrow;
 br_libexport br_checkerror
 int cart_format_extname(cart *self,
-                        char buf[br_nacsz(CART_FMT_SIZE)]) br_nothrow;
+                        char buf[br_nacsz(ALDO_CART_FMT_SIZE)]) br_nothrow;
 br_libexport
 void cart_write_info(cart *self, const char *br_noalias name, bool verbose,
                      FILE *f) br_nothrow;

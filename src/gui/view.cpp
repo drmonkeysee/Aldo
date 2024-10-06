@@ -562,7 +562,7 @@ protected:
         if (info) {
             ImGui::Text("Format: %s", cart_formatname(info->format));
             ImGui::Separator();
-            if (info->format == CRTF_INES) {
+            if (info->format == ALDO_CRTF_INES) {
                 renderiNesInfo(info.value());
             } else {
                 renderRawInfo();

@@ -12,7 +12,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static_assert(ALDO_PT_TILE_COUNT * ALDO_CHR_TILE_STRIDE == MEMBLOCK_4KB,
+static_assert(ALDO_PT_TILE_COUNT * ALDO_CHR_TILE_STRIDE == ALDO_MEMBLOCK_4KB,
               "Pattern table size mismatch");
 
 void aldo_snapshot_extend(struct aldo_snapshot *snp)

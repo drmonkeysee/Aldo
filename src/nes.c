@@ -33,29 +33,29 @@ struct aldo_nes001 {
     enum aldo_execmode mode;    // NES execution mode
     struct {
         bool
-            irq: 1,             // IRQ Probe
-            nmi: 1,             // NMI Probe
-            rst: 1;             // RESET Probe
-    } probe;                    // Interrupt Input Probes (active high)
-    uint8_t ram[MEMBLOCK_2KB],  // CPU Internal RAM
-            vram[MEMBLOCK_2KB]; // PPU Internal RAM
+            irq: 1,                     // IRQ Probe
+            nmi: 1,                     // NMI Probe
+            rst: 1;                     // RESET Probe
+    } probe;                            // Interrupt Input Probes (active high)
+    uint8_t ram[ALDO_MEMBLOCK_2KB],     // CPU Internal RAM
+            vram[ALDO_MEMBLOCK_2KB];    // PPU Internal RAM
 };
 
 static void ram_load(uint8_t *restrict d, const uint8_t *restrict mem,
                      uint16_t addr)
 {
-    *d = mem[addr & ADDRMASK_2KB];
+    *d = mem[addr & ALDO_ADDRMASK_2KB];
 }
 
 static void ram_store(uint8_t *mem, uint16_t addr, uint8_t d)
 {
-    mem[addr & ADDRMASK_2KB] = d;
+    mem[addr & ALDO_ADDRMASK_2KB] = d;
 }
 
 static bool ram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     // NOTE: addr=[$0000-$1FFF]
-    assert(addr < MEMBLOCK_8KB);
+    assert(addr < ALDO_MEMBLOCK_8KB);
 
     ram_load(d, ctx, addr);
     return true;
@@ -64,7 +64,7 @@ static bool ram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
 {
     // NOTE: addr=[$0000-$1FFF]
-    assert(addr < MEMBLOCK_8KB);
+    assert(addr < ALDO_MEMBLOCK_8KB);
 
     ram_store(ctx, addr, d);
     return true;
@@ -74,10 +74,10 @@ static size_t ram_copy(const void *restrict ctx, uint16_t addr, size_t count,
                        uint8_t dest[restrict count])
 {
     // NOTE: addr=[$0000-$1FFF]
-    assert(addr < MEMBLOCK_8KB);
+    assert(addr < ALDO_MEMBLOCK_8KB);
 
     // NOTE: only 2KB of actual mem to copy
-    return bytecopy_bank(ctx, BITWIDTH_2KB, addr, count, dest);
+    return aldo_bytecopy_bank(ctx, ALDO_BITWIDTH_2KB, addr, count, dest);
 }
 
 static bool vram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
@@ -85,7 +85,7 @@ static bool vram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     // NOTE: addr=[$2000-$3FFF]
     // NOTE: palette reads still hit the VRAM bus and affect internal PPU
     // buffers, so the full 8KB range is valid input.
-    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
+    assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
 
     ram_load(d, ctx, addr);
     return true;
@@ -95,7 +95,7 @@ static bool vram_write(void *ctx, uint16_t addr, uint8_t d)
 {
     // NOTE: addr=[$2000-$3EFF]
     // NOTE: writes to palette RAM should never hit the video bus
-    assert(MEMBLOCK_8KB <= addr && addr < Aldo_PaletteStartAddr);
+    assert(ALDO_MEMBLOCK_8KB <= addr && addr < Aldo_PaletteStartAddr);
 
     ram_store(ctx, addr, d);
     return true;
@@ -106,10 +106,10 @@ static size_t vram_copy(const void *restrict ctx, uint16_t addr, size_t count,
 {
     // NOTE: addr=[$2000-$3FFF]
     // NOTE: full 8KB range is valid input, see vram_read for reasons
-    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
+    assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
 
     // NOTE: only 2KB of actual mem to copy
-    return bytecopy_bank(ctx, BITWIDTH_2KB, addr, count, dest);
+    return aldo_bytecopy_bank(ctx, ALDO_BITWIDTH_2KB, addr, count, dest);
 }
 
 static void create_mbus(struct aldo_nes001 *self)
@@ -120,8 +120,8 @@ static void create_mbus(struct aldo_nes001 *self)
     // * $2000 - $3FFF: 8 PPU registers mirrored to 8KB
     // * $4000 - $7FFF: unmapped
     // * $8000 - $FFFF: 32KB Cart
-    self->cpu.mbus = bus_new(BITWIDTH_64KB, 4, MEMBLOCK_8KB, MEMBLOCK_16KB,
-                             MEMBLOCK_32KB);
+    self->cpu.mbus = bus_new(ALDO_BITWIDTH_64KB, 4, ALDO_MEMBLOCK_8KB,
+                             ALDO_MEMBLOCK_16KB, ALDO_MEMBLOCK_32KB);
     bool r = bus_set(self->cpu.mbus, 0, (struct busdevice){
         ram_read,
         ram_write,
@@ -141,8 +141,8 @@ static void create_vbus(struct aldo_nes001 *self)
     // * $3F00 - $3FFF: 32B Palette RAM mirrored to 256B; internal to the PPU
     //                  and thus not on the video bus, but reads do leak
     //                  through to the underlying VRAM.
-    self->ppu.vbus = bus_new(BITWIDTH_16KB, 2, MEMBLOCK_8KB);
-    bool r = bus_set(self->ppu.vbus, MEMBLOCK_8KB, (struct busdevice){
+    self->ppu.vbus = bus_new(ALDO_BITWIDTH_16KB, 2, ALDO_MEMBLOCK_8KB);
+    bool r = bus_set(self->ppu.vbus, ALDO_MEMBLOCK_8KB, (struct busdevice){
         vram_read,
         vram_write,
         vram_copy,
@@ -209,7 +209,7 @@ static void bus_snapshot(const struct aldo_nes001 *self,
 {
     aldo_cpu_snapshot(&self->cpu, snp);
     aldo_ppu_bus_snapshot(&self->ppu, snp);
-    bus_copy(self->cpu.mbus, CPU_VECTOR_NMI, memsz(snp->prg.vectors),
+    bus_copy(self->cpu.mbus, ALDO_CPU_VECTOR_NMI, memsz(snp->prg.vectors),
              snp->prg.vectors);
 }
 

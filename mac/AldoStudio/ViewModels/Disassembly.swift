@@ -195,7 +195,7 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
         guard let prgblock, prgblock.size > 0 else { return nil }
         bv = prgblock
         // NOTE: by convention, count backwards from CPU vector locations
-        addr = .init(MEMBLOCK_64KB - bv.size)
+        addr = .init(ALDO_MEMBLOCK_64KB - bv.size)
     }
 
     mutating func next() -> PrgLine? {

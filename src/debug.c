@@ -35,7 +35,7 @@ static void remove_reset_override(struct aldo_debugger_context *self)
 {
     if (!self->dec.active) return;
 
-    bool r = bus_set(self->cpu->mbus, CPU_VECTOR_RST, self->dec.inner);
+    bool r = bus_set(self->cpu->mbus, ALDO_CPU_VECTOR_RST, self->dec.inner);
     assert(r);
     self->dec = (struct resdecorator){0};
 }
@@ -59,10 +59,10 @@ static bool resetaddr_read(void *restrict ctx, uint16_t addr,
     const struct resdecorator *dec = ctx;
     if (!dec->inner.read) return false;
 
-    if (CPU_VECTOR_RST <= addr && addr < CPU_VECTOR_IRQ) {
+    if (ALDO_CPU_VECTOR_RST <= addr && addr < ALDO_CPU_VECTOR_IRQ) {
         uint8_t vector[2];
-        wrtoba(dec->vector, vector);
-        *d = vector[addr - CPU_VECTOR_RST];
+        aldo_wrtoba(dec->vector, vector);
+        *d = vector[addr - ALDO_CPU_VECTOR_RST];
         return true;
     }
     return dec->inner.read(dec->inner.ctx, addr, d);
@@ -367,7 +367,7 @@ void aldo_debug_sync_bus(aldo_debugger *self)
     struct busdevice resetaddr_device = {
         resetaddr_read, resetaddr_write, resetaddr_copy, &self->dec,
     };
-    self->dec.active = bus_swap(self->cpu->mbus, CPU_VECTOR_RST,
+    self->dec.active = bus_swap(self->cpu->mbus, ALDO_CPU_VECTOR_RST,
                                 resetaddr_device, &self->dec.inner);
 }
 

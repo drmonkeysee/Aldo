@@ -16,7 +16,7 @@ static void shuffle_zeros(void *ctx)
     uint8_t lo = 0x0,
             hi = 0x0;
 
-    uint16_t s = byteshuffle(lo, hi);
+    uint16_t s = aldo_byteshuffle(lo, hi);
 
     ct_assertequal(0u, s);
 }
@@ -26,7 +26,7 @@ static void shuffle_ones(void *ctx)
     uint8_t lo = 0xff,
             hi = 0xff;
 
-    uint16_t s = byteshuffle(lo, hi);
+    uint16_t s = aldo_byteshuffle(lo, hi);
 
     ct_assertequal(0xffffu, s);
 }
@@ -36,7 +36,7 @@ static void shuffle_low_ones(void *ctx)
     uint8_t lo = 0xff,
             hi = 0x0;
 
-    uint16_t s = byteshuffle(lo, hi);
+    uint16_t s = aldo_byteshuffle(lo, hi);
 
     ct_assertequal(0x5555u, s);
 }
@@ -46,7 +46,7 @@ static void shuffle_high_ones(void *ctx)
     uint8_t lo = 0x0,
             hi = 0xff;
 
-    uint16_t s = byteshuffle(lo, hi);
+    uint16_t s = aldo_byteshuffle(lo, hi);
 
     ct_assertequal(0xaaaau, s);
 }
@@ -56,7 +56,7 @@ static void shuffle_mixed(void *ctx)
     uint8_t lo = 0x55,
             hi = 0xaa;
 
-    uint16_t s = byteshuffle(lo, hi);
+    uint16_t s = aldo_byteshuffle(lo, hi);
 
     ct_assertequal(0x9999u, s);
 }
@@ -66,7 +66,7 @@ static void shuffle_flip_mixed(void *ctx)
     uint8_t lo = 0xaa,
             hi = 0x55;
 
-    uint16_t s = byteshuffle(lo, hi);
+    uint16_t s = aldo_byteshuffle(lo, hi);
 
     ct_assertequal(0x6666u, s);
 }
@@ -76,7 +76,7 @@ static void shuffle_arbitrary(void *ctx)
     uint8_t lo = 0x1c,
             hi = 0x74;
 
-    uint16_t s = byteshuffle(lo, hi);
+    uint16_t s = aldo_byteshuffle(lo, hi);
 
     ct_assertequal(0x2b70u, s);
 }
@@ -89,7 +89,7 @@ static void bank_copy_zero_count(void *ctx)
     };
     uint8_t dest = 0x11;
 
-    size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x0, 0, &dest);
+    size_t result = aldo_bytecopy_bank(bank, ALDO_BITWIDTH_1KB, 0x0, 0, &dest);
 
     ct_assertequal(0u, result);
     ct_assertequal(0x11u, dest);
@@ -103,8 +103,8 @@ static void bank_copy(void *ctx)
     };
     uint8_t dest[5];
 
-    size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x0,
-                                  sizeof dest / sizeof dest[0], dest);
+    size_t result = aldo_bytecopy_bank(bank, ALDO_BITWIDTH_1KB, 0x0,
+                                       sizeof dest / sizeof dest[0], dest);
 
     ct_assertequal(5u, result);
     ct_assertequal(0xaau, dest[0]);
@@ -122,8 +122,8 @@ static void bank_copy_end_of_bank(void *ctx)
     };
     uint8_t dest[5] = {[1] = 0x11};
 
-    size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x3ff,
-                                  sizeof dest / sizeof dest[0], dest);
+    size_t result = aldo_bytecopy_bank(bank, ALDO_BITWIDTH_1KB, 0x3ff,
+                                       sizeof dest / sizeof dest[0], dest);
 
     ct_assertequal(1u, result);
     ct_assertequal(0xffu, dest[0]);
@@ -138,8 +138,8 @@ static void bank_copy_fit_end_of_bank(void *ctx)
     };
     uint8_t dest[] = {0x11, 0x11, 0x11, 0x11, 0x11};
 
-    size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x3fb,
-                                  sizeof dest / sizeof dest[0], dest);
+    size_t result = aldo_bytecopy_bank(bank, ALDO_BITWIDTH_1KB, 0x3fb,
+                                       sizeof dest / sizeof dest[0], dest);
 
     ct_assertequal(5u, result);
     ct_assertequal(0x0u, dest[0]);
@@ -157,8 +157,8 @@ static void bank_copy_address_beyond_range(void *ctx)
     };
     uint8_t dest[5];
 
-    size_t result = bytecopy_bank(bank, BITWIDTH_1KB, 0x401,
-                                  sizeof dest / sizeof dest[0], dest);
+    size_t result = aldo_bytecopy_bank(bank, ALDO_BITWIDTH_1KB, 0x401,
+                                       sizeof dest / sizeof dest[0], dest);
 
     ct_assertequal(5u, result);
     ct_assertequal(0x99u, dest[0]);

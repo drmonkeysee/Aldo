@@ -37,7 +37,7 @@ static struct partition *find(struct hardwarebus *self, uint16_t addr)
 
 bus *bus_new(int bitwidth, size_t n, ...)
 {
-    assert(0 < bitwidth && bitwidth <= BITWIDTH_64KB);
+    assert(0 < bitwidth && bitwidth <= ALDO_BITWIDTH_64KB);
     assert(0 < n);
 
     size_t psize = sizeof(struct partition) * n;
@@ -111,7 +111,7 @@ size_t bus_copy(bus *self, uint16_t addr, size_t count,
 {
     assert(self != NULL);
     assert(dest != NULL);
-    assert(count < MEMBLOCK_64KB);
+    assert(count < ALDO_MEMBLOCK_64KB);
 
     if (addr > self->maxaddr || count == 0) return 0;
 

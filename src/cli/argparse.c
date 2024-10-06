@@ -51,7 +51,7 @@ static const char
     VersionShort = 'V',
     ZeroRamShort = 'z';
 
-static const int MinAddress = 0, MaxAddress = ADDRMASK_64KB;
+static const int MinAddress = 0, MaxAddress = ALDO_ADDRMASK_64KB;
 
 static void init_cliargs(struct cliargs *args)
 {

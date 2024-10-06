@@ -969,7 +969,8 @@ private:
         DisabledIf dif = [this] {
             if (this->resetOverride) return false;
             // NOTE: +2 = start of reset vector
-            this->resetAddr = batowr(this->emu.snapshot().prg.vectors + 2);
+            this->resetAddr = aldo_batowr(this->emu.snapshot().prg.vectors
+                                          + 2);
             return true;
         }();
         if (input_address(&resetAddr)) {
@@ -1451,8 +1452,8 @@ private:
         auto
             lo = prg.vectors[0],
             hi = prg.vectors[1];
-        ImGui::Text("%04X: %02X %02X     NMI $%04X", CPU_VECTOR_NMI, lo, hi,
-                    bytowr(lo, hi));
+        ImGui::Text("%04X: %02X %02X     NMI $%04X", ALDO_CPU_VECTOR_NMI, lo,
+                    hi, aldo_bytowr(lo, hi));
 
         lo = prg.vectors[2];
         hi = prg.vectors[3];
@@ -1464,15 +1465,15 @@ private:
             resVector = static_cast<aldo::et::word>(dbg.vectorOverride());
         } else {
             indicator = "";
-            resVector = bytowr(lo, hi);
+            resVector = aldo_bytowr(lo, hi);
         }
-        ImGui::Text("%04X: %02X %02X     RST %s$%04X", CPU_VECTOR_RST, lo, hi,
-                    indicator, resVector);
+        ImGui::Text("%04X: %02X %02X     RST %s$%04X", ALDO_CPU_VECTOR_RST, lo,
+                    hi, indicator, resVector);
 
         lo = prg.vectors[4];
         hi = prg.vectors[5];
-        ImGui::Text("%04X: %02X %02X     IRQ $%04X", CPU_VECTOR_IRQ, lo, hi,
-                    bytowr(lo, hi));
+        ImGui::Text("%04X: %02X %02X     IRQ $%04X", ALDO_CPU_VECTOR_IRQ, lo,
+                    hi, aldo_bytowr(lo, hi));
     }
 
     int selected = NoSelection;

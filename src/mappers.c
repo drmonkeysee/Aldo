@@ -53,7 +53,7 @@ static void mem_load(uint8_t *restrict d, const uint8_t *restrict mem,
 // be so common anymore.
 static void clear_prg_device(bus *b)
 {
-    bus_clear(b, MEMBLOCK_32KB);
+    bus_clear(b, ALDO_MEMBLOCK_32KB);
 }
 
 static void clear_chr_device(bus *b)
@@ -75,7 +75,7 @@ void fill_pattern_table(size_t tile_count,
             uint8_t
                 plane0 = bv->mem[idx],
                 plane1 = bv->mem[idx + ALDO_CHR_TILE_DIM];
-            table[tile][row] = byteshuffle(plane0, plane1);
+            table[tile][row] = aldo_byteshuffle(plane0, plane1);
         }
     }
 }
@@ -87,9 +87,9 @@ void fill_pattern_table(size_t tile_count,
 static bool raw_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     // NOTE: addr=[$8000-$FFFF]
-    assert(addr > ADDRMASK_32KB);
+    assert(addr > ALDO_ADDRMASK_32KB);
 
-    mem_load(d, ctx, addr, ADDRMASK_32KB);
+    mem_load(d, ctx, addr, ALDO_ADDRMASK_32KB);
     return true;
 }
 
@@ -97,9 +97,9 @@ static size_t raw_copy(const void *restrict ctx, uint16_t addr, size_t count,
                        uint8_t dest[restrict count])
 {
     // NOTE: addr=[$8000-$FFFF]
-    assert(addr > ADDRMASK_32KB);
+    assert(addr > ALDO_ADDRMASK_32KB);
 
-    return bytecopy_bank(ctx, BITWIDTH_32KB, addr, count, dest);
+    return aldo_bytecopy_bank(ctx, ALDO_BITWIDTH_32KB, addr, count, dest);
 }
 
 static void raw_dtor(struct aldo_mapper *self)
@@ -122,7 +122,7 @@ static bool raw_mbus_connect(struct aldo_mapper *self, bus *b)
 {
     assert(self != NULL);
 
-    return bus_set(b, MEMBLOCK_32KB, (struct busdevice){
+    return bus_set(b, ALDO_MEMBLOCK_32KB, (struct busdevice){
         .read = raw_read,
         .copy = raw_copy,
         .ctx = ((struct raw_mapper *)self)->rom,
@@ -180,10 +180,12 @@ static bool ines_000_read(void *restrict ctx, uint16_t addr,
                           uint8_t *restrict d)
 {
     // NOTE: addr=[$8000-$FFFF]
-    assert(addr > ADDRMASK_32KB);
+    assert(addr > ALDO_ADDRMASK_32KB);
 
     const struct ines_000_mapper *m = ctx;
-    uint16_t mask = m->blockcount == 2 ? ADDRMASK_32KB : ADDRMASK_16KB;
+    uint16_t mask = m->blockcount == 2
+                    ? ALDO_ADDRMASK_32KB
+                    : ALDO_ADDRMASK_16KB;
     *d = m->super.prg[addr & mask];
     return true;
 }
@@ -192,30 +194,33 @@ static size_t ines_000_copy(const void *restrict ctx, uint16_t addr,
                             size_t count, uint8_t dest[restrict count])
 {
     // NOTE: addr=[$8000-$FFFF]
-    assert(addr > ADDRMASK_32KB);
+    assert(addr > ALDO_ADDRMASK_32KB);
 
     const struct ines_000_mapper *m = ctx;
-    uint16_t width = m->blockcount == 2 ? BITWIDTH_32KB : BITWIDTH_16KB;
-    return bytecopy_bank(m->super.prg, width, addr, count, dest);
+    uint16_t width = m->blockcount == 2
+                        ? ALDO_BITWIDTH_32KB
+                        : ALDO_BITWIDTH_16KB;
+    return aldo_bytecopy_bank(m->super.prg, width, addr, count, dest);
 }
 
 static bool ines_000_vread(void *restrict ctx, uint16_t addr,
                            uint8_t *restrict d)
 {
     // NOTE: addr=[$0000-$1FFF]
-    assert(addr < MEMBLOCK_8KB);
+    assert(addr < ALDO_MEMBLOCK_8KB);
 
-    mem_load(d, ((const struct ines_mapper *)ctx)->chr, addr, ADDRMASK_8KB);
+    mem_load(d, ((const struct ines_mapper *)ctx)->chr, addr,
+             ALDO_ADDRMASK_8KB);
     return true;
 }
 
 static bool ines_000_vwrite(void *ctx, uint16_t addr, uint8_t d)
 {
     // NOTE: addr=[$0000-$1FFF]
-    assert(addr < MEMBLOCK_8KB);
+    assert(addr < ALDO_MEMBLOCK_8KB);
 
     struct ines_mapper *m = ctx;
-    m->chr[addr & ADDRMASK_8KB] = d;
+    m->chr[addr & ALDO_ADDRMASK_8KB] = d;
     m->ptstale = true;
     return true;
 }
@@ -228,7 +233,7 @@ static bool ines_000_mbus_connect(struct aldo_mapper *self, bus *b)
 {
     assert(self != NULL);
 
-    return bus_set(b, MEMBLOCK_32KB, (struct busdevice){
+    return bus_set(b, ALDO_MEMBLOCK_32KB, (struct busdevice){
         .read = ines_000_read,
         .copy = ines_000_copy,
         .ctx = self,
@@ -259,7 +264,7 @@ static void ines_000_snapshot(struct aldo_mapper *self,
 
     struct aldo_blockview bv = {
         .mem = m->chr,
-        .size = MEMBLOCK_4KB,
+        .size = ALDO_MEMBLOCK_4KB,
     };
     fill_pattern_table(ALDO_PT_TILE_COUNT, snp->video->pattern_tables.left,
                        &bv);
@@ -290,7 +295,7 @@ int aldo_mapper_raw_create(struct aldo_mapper **m, FILE *f)
     };
 
     // TODO: assume a 32KB ROM file (can i do mirroring later?)
-    int err = load_blocks(&self->rom, MEMBLOCK_32KB, f);
+    int err = load_blocks(&self->rom, ALDO_MEMBLOCK_32KB, f);
     if (err == 0) {
         *m = (struct aldo_mapper *)self;
         return 0;
@@ -351,19 +356,20 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
     if (header->wram) {
         size_t sz = (header->wram_blocks == 0
                      ? 1
-                     : header->wram_blocks) * MEMBLOCK_8KB;
+                     : header->wram_blocks) * ALDO_MEMBLOCK_8KB;
         self->wram = calloc(sz, sizeof *self->wram);
     }
 
-    err = load_blocks(&self->prg, header->prg_blocks * MEMBLOCK_16KB, f);
+    err = load_blocks(&self->prg, header->prg_blocks * ALDO_MEMBLOCK_16KB, f);
     if (err != 0) return err;
 
     if (header->chr_blocks == 0) {
         // TODO: this size is controlled by the mapper in many cases
-        self->chr = calloc(MEMBLOCK_8KB, sizeof *self->chr);
+        self->chr = calloc(ALDO_MEMBLOCK_8KB, sizeof *self->chr);
         self->chrram = true;
     } else {
-        err = load_blocks(&self->chr, header->chr_blocks * MEMBLOCK_8KB, f);
+        err = load_blocks(&self->chr, header->chr_blocks * ALDO_MEMBLOCK_8KB,
+                          f);
     }
 
     if (err == 0) {

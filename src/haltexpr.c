@@ -24,7 +24,7 @@ static int parse_resetvector(const char *restrict str, int *resetvector)
     unsigned int addr;
     bool
         parsed = sscanf(str, " %1[" ALDO_HEXPR_RST_IND "]%X", u, &addr) == 2,
-        valid = addr < MEMBLOCK_64KB;
+        valid = addr < ALDO_MEMBLOCK_64KB;
     if (parsed) {
         if (!valid) return ALDO_HEXPR_ERR_VALUE;
         *resetvector = (int)addr;
@@ -74,7 +74,7 @@ int aldo_haltexpr_parse(const char *restrict str, struct aldo_haltexpr *expr)
             {
                 unsigned int addr;
                 parsed = sscanf(str, " %1[@]%X", u, &addr) == 2;
-                valid = addr < MEMBLOCK_64KB;
+                valid = addr < ALDO_MEMBLOCK_64KB;
                 e = (struct aldo_haltexpr){
                     .address = (uint16_t)addr,
                     .cond = (enum aldo_haltcondition)i,

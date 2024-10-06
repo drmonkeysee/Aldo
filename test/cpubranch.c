@@ -73,8 +73,8 @@ static void bcc_positive_wraparound(void *ctx)
 {
     // NOTE: 32k rom, starting at $8000 to set up $FFFC + 10
     uint8_t *rom = calloc(0x8000, sizeof *rom);
-    rom[0xfffa & ADDRMASK_32KB] = 0x90;
-    rom[0xfffb & ADDRMASK_32KB] = 0xa;
+    rom[0xfffa & ALDO_ADDRMASK_32KB] = 0x90;
+    rom[0xfffb & ALDO_ADDRMASK_32KB] = 0xa;
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, NULL, rom);
     cpu.pc = 0xfffa;

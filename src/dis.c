@@ -97,10 +97,10 @@ static const char *interrupt_display(const struct aldo_snapshot *snp)
 static uint16_t interrupt_vector(const struct aldo_snapshot *snp)
 {
     if (snp->cpu.datapath.nmi == ALDO_SIG_COMMITTED)
-        return batowr(snp->prg.vectors);
+        return aldo_batowr(snp->prg.vectors);
     if (snp->cpu.datapath.rst == ALDO_SIG_COMMITTED)
-        return batowr(snp->prg.vectors + 2);
-    return batowr(snp->prg.vectors + 4);
+        return aldo_batowr(snp->prg.vectors + 2);
+    return aldo_batowr(snp->prg.vectors + 4);
 }
 
 static int print_raw(uint16_t addr, const struct aldo_dis_instruction *inst,
@@ -134,7 +134,7 @@ static int print_operand(const struct aldo_dis_instruction *inst,
         break;
     case 3:
         count = sprintf(dis, strtable[inst->bv.size - 1],
-                        batowr(inst->bv.mem + 1));
+                        aldo_batowr(inst->bv.mem + 1));
         break;
     default:
         assert(((void)"INVALID ADDR MODE LENGTH", false));
@@ -189,15 +189,15 @@ static void print_prg_line(const char *restrict dis, bool verbose,
 static int print_prgblock(const struct aldo_blockview *bv, bool verbose,
                           FILE *f)
 {
-    fprintf(f, "Block %zu (%zuKB)\n", bv->ord, bv->size >> BITWIDTH_1KB);
+    fprintf(f, "Block %zu (%zuKB)\n", bv->ord, bv->size >> ALDO_BITWIDTH_1KB);
     fputs("--------\n", f);
 
     struct repeat_condition repeat = {0};
     struct aldo_dis_instruction inst;
     char dis[ALDO_DIS_INST_SIZE];
     // NOTE: by convention, count backwards from CPU vector locations
-    assert(bv->size <= MEMBLOCK_64KB);
-    uint16_t addr = (uint16_t)(MEMBLOCK_64KB - bv->size);
+    assert(bv->size <= ALDO_MEMBLOCK_64KB);
+    uint16_t addr = (uint16_t)(ALDO_MEMBLOCK_64KB - bv->size);
 
     int result;
     for (result = aldo_dis_parse_inst(bv, 0, &inst);
@@ -231,16 +231,16 @@ static int measure_tile_sheet(size_t banksize, uint32_t *restrict dim,
     // pattern tables $0000-$0FFF, $1000-$1FFF.
     *sections = 1;
     switch (banksize) {
-    case MEMBLOCK_2KB:
+    case ALDO_MEMBLOCK_2KB:
         *sections = 2;
         // Fallthrough
-    case MEMBLOCK_1KB:
+    case ALDO_MEMBLOCK_1KB:
         *dim = 8;
         break;
-    case MEMBLOCK_8KB:
+    case ALDO_MEMBLOCK_8KB:
         *sections = 2;
         // Fallthrough
-    case MEMBLOCK_4KB:
+    case ALDO_MEMBLOCK_4KB:
         *dim = 16;
         break;
     default:
@@ -287,7 +287,7 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
             // NOTE: 8 2-bit pixels make a single CHR tile row; each 2-bit
             // pixel will be expanded to 4-bits and packed 2 pixels per byte
             // for a 4 bpp BMP.
-            uint16_t pixelrow = byteshuffle(plane0, plane1);
+            uint16_t pixelrow = aldo_byteshuffle(plane0, plane1);
             for (size_t pixelx = 0; pixelx < ALDO_CHR_TILE_DIM; ++pixelx) {
                 // NOTE: packedpixel is the pixel in (prescaled) bmp-row space;
                 // pixelidx is the 2-bit slice of pixelrow that maps to the
@@ -339,9 +339,9 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
      };
      */
     uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};   // bfType
-    dwtoba(BMP_HEADER_SIZE + (bmph * packedrow_size),       // bfSize
-           fileheader + 2);
-    dwtoba(BMP_HEADER_SIZE, fileheader + 10);               // bfOffBits
+    aldo_dwtoba(BMP_HEADER_SIZE + (bmph * packedrow_size),  // bfSize
+                fileheader + 2);
+    aldo_dwtoba(BMP_HEADER_SIZE, fileheader + 10);          // bfOffBits
     fwrite(fileheader, sizeof fileheader[0],
            sizeof fileheader / sizeof fileheader[0], bmpfile);
 
@@ -367,8 +367,8 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
         [14] = BMP_BITS_PER_PIXEL,  // biBitCount
         [32] = BMP_BITS_PER_PIXEL,  // biClrUsed
     };
-    dwtoba(bmpw, infoheader + 4);   // biWidth
-    dwtoba(bmph, infoheader + 8);   // biHeight
+    aldo_dwtoba(bmpw, infoheader + 4);   // biWidth
+    aldo_dwtoba(bmph, infoheader + 8);   // biHeight
     fwrite(infoheader, sizeof infoheader[0],
            sizeof infoheader / sizeof infoheader[0], bmpfile);
 
@@ -427,7 +427,7 @@ static int write_chrblock(const struct aldo_blockview *bv, uint32_t scale,
 
     if (err == 0) {
         fprintf(output, "Block %zu (%zuKB), %u x %u tiles (%u section%s)",
-                bv->ord, bv->size >> BITWIDTH_1KB, tilesdim, tilesdim,
+                bv->ord, bv->size >> ALDO_BITWIDTH_1KB, tilesdim, tilesdim,
                 tile_sections, tile_sections == 1 ? "" : "s");
         if (scale > 1) {
             fprintf(output, " (%ux scale)", scale);
@@ -561,7 +561,9 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
         break;
     default:
         count = sprintf(dis + total, displaystr,
-                        strlen(displaystr) > 0 ? batowr(inst.bv.mem + 1) : 0);
+                        strlen(displaystr) > 0
+                        ? aldo_batowr(inst.bv.mem + 1)
+                        : 0);
         break;
     }
     if (count < 0) return ALDO_DIS_ERR_FMT;

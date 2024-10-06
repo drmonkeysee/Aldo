@@ -190,9 +190,9 @@ static bool service_interrupt(struct aldo_mos6502 *self)
 
 static uint16_t interrupt_vector(struct aldo_mos6502 *self)
 {
-    if (self->rst == ALDO_SIG_COMMITTED) return CPU_VECTOR_RST;
-    if (self->nmi == ALDO_SIG_COMMITTED) return CPU_VECTOR_NMI;
-    return CPU_VECTOR_IRQ;
+    if (self->rst == ALDO_SIG_COMMITTED) return ALDO_CPU_VECTOR_RST;
+    if (self->nmi == ALDO_SIG_COMMITTED) return ALDO_CPU_VECTOR_NMI;
+    return ALDO_CPU_VECTOR_IRQ;
 }
 
 // NOTE: rst takes effect after two cycles and immediately resets/halts
@@ -391,7 +391,7 @@ static uint8_t bitoperation(struct aldo_mos6502 *self, struct aldo_decoded dec,
 
 static void stack_top(struct aldo_mos6502 *self)
 {
-    self->addrbus = bytowr(self->s, 0x1);
+    self->addrbus = aldo_bytowr(self->s, 0x1);
     read(self);
 }
 
@@ -403,7 +403,7 @@ static void stack_pop(struct aldo_mos6502 *self)
 
 static void stack_push(struct aldo_mos6502 *self, uint8_t d)
 {
-    self->addrbus = bytowr(self->s--, 0x1);
+    self->addrbus = aldo_bytowr(self->s--, 0x1);
     store_data(self, d);
 }
 
@@ -552,7 +552,7 @@ static void BRK_exec(struct aldo_mos6502 *self)
                 : ALDO_SIG_CLEAR;
     self->irq = ALDO_SIG_CLEAR;
     self->p.i = true;
-    self->pc = bytowr(self->adl, self->databus);
+    self->pc = aldo_bytowr(self->adl, self->databus);
     commit_operation(self);
 }
 
@@ -662,13 +662,13 @@ static void INY_exec(struct aldo_mos6502 *self)
 
 static void JMP_exec(struct aldo_mos6502 *self)
 {
-    self->pc = bytowr(self->adl, self->databus);
+    self->pc = aldo_bytowr(self->adl, self->databus);
     commit_operation(self);
 }
 
 static void JSR_exec(struct aldo_mos6502 *self)
 {
-    self->pc = bytowr(self->adl, self->databus);
+    self->pc = aldo_bytowr(self->adl, self->databus);
     commit_operation(self);
 }
 
@@ -764,13 +764,13 @@ static void ROR_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
 
 static void RTI_exec(struct aldo_mos6502 *self)
 {
-    self->pc = bytowr(self->adl, self->databus);
+    self->pc = aldo_bytowr(self->adl, self->databus);
     commit_operation(self);
 }
 
 static void RTS_exec(struct aldo_mos6502 *self)
 {
-    self->pc = bytowr(self->adl, self->databus);
+    self->pc = aldo_bytowr(self->adl, self->databus);
 }
 
 static void SBC_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
@@ -876,7 +876,7 @@ static void store_unstable_addresshigh(struct aldo_mos6502 *self, uint8_t d)
     // instability of these instructions.
     if (self->adc) {
         self->adh = d;
-        self->addrbus = bytowr(self->adl, self->adh);
+        self->addrbus = aldo_bytowr(self->adl, self->adh);
     }
     store_data(self, d);
 }
@@ -922,7 +922,7 @@ static void ARR_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
     //      setting carry to held value from ADD/ADC step
     uint8_t and_result = self->a & self->databus;
     load_register(self, &self->a, and_result);
-    self->p.v = byte_getbit(self->a, 7) ^ byte_getbit(self->a, 6);
+    self->p.v = aldo_byte_getbit(self->a, 7) ^ aldo_byte_getbit(self->a, 6);
     bool c = self->a & 0x80;
     bitoperation(self, dec, BIT_RIGHT, (uint8_t)(self->p.c << 7));
     self->p.c = c;
@@ -965,7 +965,7 @@ static void ISC_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
 static void JAM_exec(struct aldo_mos6502 *self)
 {
     self->databus = 0xff;
-    self->addrbus = bytowr(0xff, 0xff);
+    self->addrbus = aldo_bytowr(0xff, 0xff);
 }
 
 static void LAS_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
@@ -1115,12 +1115,12 @@ static void zeropage_indexed(struct aldo_mos6502 *self,
         read(self);
         break;
     case 2:
-        self->addrbus = bytowr(self->databus, 0x0);
+        self->addrbus = aldo_bytowr(self->databus, 0x0);
         self->adl = self->databus + index;
         read(self);
         break;
     case 3:
-        self->addrbus = bytowr(self->adl, 0x0);
+        self->addrbus = aldo_bytowr(self->adl, 0x0);
         dispatch_instruction(self, dec);
         break;
     case 4:
@@ -1135,8 +1135,8 @@ static void zeropage_indexed(struct aldo_mos6502 *self,
     }
 }
 
-static void absolute_indexed(struct aldo_mos6502 *self, struct aldo_decoded dec,
-                             uint8_t index)
+static void absolute_indexed(struct aldo_mos6502 *self,
+                             struct aldo_decoded dec, uint8_t index)
 {
     switch (self->t) {
     case 1:
@@ -1150,12 +1150,12 @@ static void absolute_indexed(struct aldo_mos6502 *self, struct aldo_decoded dec,
         read(self);
         break;
     case 3:
-        self->addrbus = bytowr(self->adl, self->databus);
+        self->addrbus = aldo_bytowr(self->adl, self->databus);
         self->adh = self->databus + self->adc;
         dispatch_instruction(self, dec);
         break;
     case 4:
-        self->addrbus = bytowr(self->adl, self->adh);
+        self->addrbus = aldo_bytowr(self->adl, self->adh);
         dispatch_instruction(self, dec);
         break;
     case 5:
@@ -1186,12 +1186,12 @@ static void branch_displacement(struct aldo_mos6502 *self)
         positive_overflow = self->adl < self->databus && !negative_offset,
         negative_overflow = self->adl > self->databus && negative_offset;
     self->adc = positive_overflow - negative_overflow;
-    self->pc = bytowr(self->adl, (uint8_t)(self->pc >> 8));
+    self->pc = aldo_bytowr(self->adl, (uint8_t)(self->pc >> 8));
 }
 
 static void branch_carry(struct aldo_mos6502 *self)
 {
-    self->pc = bytowr(self->adl, (uint8_t)((self->pc >> 8) + self->adc));
+    self->pc = aldo_bytowr(self->adl, (uint8_t)((self->pc >> 8) + self->adc));
 }
 
 static void IMP_sequence(struct aldo_mos6502 *self, struct aldo_decoded dec)
@@ -1219,7 +1219,7 @@ static void ZP_sequence(struct aldo_mos6502 *self, struct aldo_decoded dec)
         read(self);
         break;
     case 2:
-        self->addrbus = bytowr(self->databus, 0x0);
+        self->addrbus = aldo_bytowr(self->databus, 0x0);
         dispatch_instruction(self, dec);
         break;
     case 3:
@@ -1252,21 +1252,21 @@ static void INDX_sequence(struct aldo_mos6502 *self, struct aldo_decoded dec)
         read(self);
         break;
     case 2:
-        self->addrbus = bytowr(self->databus, 0x0);
+        self->addrbus = aldo_bytowr(self->databus, 0x0);
         self->adl = self->databus + self->x;
         read(self);
         break;
     case 3:
-        self->addrbus = bytowr(self->adl++, 0x0);
+        self->addrbus = aldo_bytowr(self->adl++, 0x0);
         read(self);
         break;
     case 4:
-        self->addrbus = bytowr(self->adl, 0x0);
+        self->addrbus = aldo_bytowr(self->adl, 0x0);
         self->adl = self->databus;
         read(self);
         break;
     case 5:
-        self->addrbus = bytowr(self->adl, self->databus);
+        self->addrbus = aldo_bytowr(self->adl, self->databus);
         dispatch_instruction(self, dec);
         break;
     case 6:
@@ -1292,23 +1292,23 @@ static void INDY_sequence(struct aldo_mos6502 *self, struct aldo_decoded dec)
         read(self);
         break;
     case 2:
-        self->addrbus = bytowr(self->databus, 0x0);
+        self->addrbus = aldo_bytowr(self->databus, 0x0);
         self->adl = self->databus + 1;
         read(self);
         break;
     case 3:
-        self->addrbus = bytowr(self->adl, 0x0);
+        self->addrbus = aldo_bytowr(self->adl, 0x0);
         self->adl = self->databus + self->y;
         self->adc = self->adl < self->y;
         read(self);
         break;
     case 4:
-        self->addrbus = bytowr(self->adl, self->databus);
+        self->addrbus = aldo_bytowr(self->adl, self->databus);
         self->adh = self->databus + self->adc;
         dispatch_instruction(self, dec);
         break;
     case 5:
-        self->addrbus = bytowr(self->adl, self->adh);
+        self->addrbus = aldo_bytowr(self->adl, self->adh);
         dispatch_instruction(self, dec);
         break;
     case 6:
@@ -1339,7 +1339,7 @@ static void ABS_sequence(struct aldo_mos6502 *self, struct aldo_decoded dec)
         read(self);
         break;
     case 3:
-        self->addrbus = bytowr(self->adl, self->databus);
+        self->addrbus = aldo_bytowr(self->adl, self->databus);
         dispatch_instruction(self, dec);
         break;
     case 4:
@@ -1519,12 +1519,12 @@ static void JIND_sequence(struct aldo_mos6502 *self, struct aldo_decoded dec)
         read(self);
         break;
     case 3:
-        self->addrbus = bytowr(self->adl++, self->databus);
+        self->addrbus = aldo_bytowr(self->adl++, self->databus);
         self->adh = self->databus;
         read(self);
         break;
     case 4:
-        self->addrbus = bytowr(self->adl, self->adh);
+        self->addrbus = aldo_bytowr(self->adl, self->adh);
         self->adl = self->databus;
         read(self);
         dispatch_instruction(self, dec);
@@ -1792,14 +1792,14 @@ struct aldo_peekresult aldo_cpu_peek(struct aldo_mos6502 *self, uint16_t addr)
     do {
         aldo_cpu_cycle(self);
         if (self->t == 2 && result.mode == ALDO_AM_INDY) {
-            result.interaddr = bytowr(self->databus, 0x0);
+            result.interaddr = aldo_bytowr(self->databus, 0x0);
         }
         else if (self->t == 3) {
             if (result.mode == ALDO_AM_INDX) {
                 result.interaddr = self->addrbus;
             } else if (result.mode == ALDO_AM_INDY) {
-                result.interaddr = bytowr((uint8_t)result.interaddr,
-                                          self->databus);
+                result.interaddr = aldo_bytowr((uint8_t)result.interaddr,
+                                               self->databus);
             }
         }
     } while (!self->presync);

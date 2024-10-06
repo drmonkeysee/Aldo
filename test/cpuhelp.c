@@ -16,12 +16,12 @@
 
 static bool test_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
-    if (addr < MEMBLOCK_8KB) {
-        *d = ((const uint8_t *)ctx)[addr & ADDRMASK_2KB];
+    if (addr < ALDO_MEMBLOCK_8KB) {
+        *d = ((const uint8_t *)ctx)[addr & ALDO_ADDRMASK_2KB];
         return true;
     }
-    if (MEMBLOCK_32KB <= addr) {
-        *d = ((const uint8_t *)ctx)[addr & ADDRMASK_32KB];
+    if (ALDO_MEMBLOCK_32KB <= addr) {
+        *d = ((const uint8_t *)ctx)[addr & ALDO_ADDRMASK_32KB];
         return true;
     }
     return false;
@@ -29,8 +29,8 @@ static bool test_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 
 static bool test_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    if (addr < MEMBLOCK_8KB) {
-        ((uint8_t *)ctx)[addr & ADDRMASK_2KB] = d;
+    if (addr < ALDO_MEMBLOCK_8KB) {
+        ((uint8_t *)ctx)[addr & ALDO_ADDRMASK_2KB] = d;
         return true;
     }
     return false;
@@ -60,7 +60,8 @@ int RomWriteCapture = -1;
 
 void setup_testbus(void)
 {
-    TestBus = bus_new(BITWIDTH_64KB, 3, MEMBLOCK_8KB, MEMBLOCK_32KB);
+    TestBus = bus_new(ALDO_BITWIDTH_64KB, 3, ALDO_MEMBLOCK_8KB,
+                      ALDO_MEMBLOCK_32KB);
 }
 
 void teardown_testbus(void)
@@ -75,7 +76,7 @@ void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
     Ram.ctx = ram;
     bus_set(TestBus, 0x0, ram ? Ram : (struct busdevice){0});
     Rom.ctx = rom;
-    bus_set(TestBus, MEMBLOCK_32KB, rom ? Rom : (struct busdevice){0});
+    bus_set(TestBus, ALDO_MEMBLOCK_32KB, rom ? Rom : (struct busdevice){0});
     RomWriteCapture = -1;
     aldo_cpu_powerup(cpu);
     cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bcd =
@@ -88,7 +89,7 @@ void enable_rom_wcapture(void)
 {
     struct busdevice dv = Rom;
     dv.write = capture_rom_write;
-    bus_set(TestBus, MEMBLOCK_32KB, dv);
+    bus_set(TestBus, ALDO_MEMBLOCK_32KB, dv);
 }
 
 int clock_cpu(struct aldo_mos6502 *cpu)

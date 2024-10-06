@@ -15,7 +15,7 @@
 
 static bool test_vread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
-    if (MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB) {
+    if (ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB) {
         *d = ((uint8_t *)ctx)[addr & 0x3];
         return true;
     }
@@ -24,7 +24,7 @@ static bool test_vread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 
 static bool test_vwrite(void *ctx, uint16_t addr, uint8_t d)
 {
-    if (MEMBLOCK_8KB <= addr && addr < 0x3f00) {
+    if (ALDO_MEMBLOCK_8KB <= addr && addr < 0x3f00) {
         ((uint8_t *)ctx)[addr & 0x3] = d;
         return true;
     }
@@ -41,12 +41,12 @@ void ppu_setup(void **ctx)
 {
     struct ppu_test_context *c = calloc(sizeof *c, 1);
     // NOTE: enough main bus to map $2000 - $3FFF for ppu registers
-    c->mbus = bus_new(BITWIDTH_16KB, 2, MEMBLOCK_8KB);
+    c->mbus = bus_new(ALDO_BITWIDTH_16KB, 2, ALDO_MEMBLOCK_8KB);
     VRam[0] = 0x11;
     VRam[1] = 0x22;
     VRam[2] = 0x33;
     VRam[3] = 0x44;
-    c->ppu.vbus = c->vbus = bus_new(BITWIDTH_16KB, 1);
+    c->ppu.vbus = c->vbus = bus_new(ALDO_BITWIDTH_16KB, 1);
     bus_set(c->vbus, 0, (struct busdevice){
         .read = test_vread,
         .write = test_vwrite,

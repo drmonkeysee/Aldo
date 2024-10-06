@@ -93,7 +93,7 @@ static void set_status(struct aldo_rp2c02 *self, uint8_t v)
 // NOTE: address bus is 14 bits wide
 static uint16_t maskaddr(uint16_t addr)
 {
-    return addr & ADDRMASK_16KB;
+    return addr & ALDO_ADDRMASK_16KB;
 }
 
 static bool rendering_disabled(const struct aldo_rp2c02 *self)
@@ -121,7 +121,7 @@ static bool in_vblank(const struct aldo_rp2c02 *self)
 
 static bool palette_addr(uint16_t addr)
 {
-    return MEMBLOCK_16KB - 256 <= addr && addr < MEMBLOCK_16KB;
+    return ALDO_MEMBLOCK_16KB - 256 <= addr && addr < ALDO_MEMBLOCK_16KB;
 }
 
 static uint16_t mask_palette(uint16_t addr)
@@ -148,7 +148,7 @@ static uint16_t mask_palette(uint16_t addr)
 static uint8_t palette_read(const struct aldo_rp2c02 *self, uint16_t addr)
 {
     // NOTE: addr=[$3F00-$3FFF]
-    assert(Aldo_PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
+    assert(Aldo_PaletteStartAddr <= addr && addr < ALDO_MEMBLOCK_16KB);
 
     // NOTE: palette values are 6 bits wide
     return self->palette[mask_palette(addr)] & 0x3f;
@@ -157,7 +157,7 @@ static uint8_t palette_read(const struct aldo_rp2c02 *self, uint16_t addr)
 static void palette_write(struct aldo_rp2c02 *self, uint16_t addr, uint8_t d)
 {
     // NOTE: addr=[$3F00-$3FFF]
-    assert(Aldo_PaletteStartAddr <= addr && addr < MEMBLOCK_16KB);
+    assert(Aldo_PaletteStartAddr <= addr && addr < ALDO_MEMBLOCK_16KB);
 
     self->palette[mask_palette(addr)] = d;
 }
@@ -169,7 +169,7 @@ static void palette_write(struct aldo_rp2c02 *self, uint16_t addr, uint8_t d)
 static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     // NOTE: addr=[$2000-$3FFF]
-    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
+    assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
 
     struct aldo_rp2c02 *ppu = ctx;
     ppu->signal.rw = true;
@@ -203,7 +203,7 @@ static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
 {
     // NOTE: addr=[$2000-$3FFF]
-    assert(MEMBLOCK_8KB <= addr && addr < MEMBLOCK_16KB);
+    assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
 
     struct aldo_rp2c02 *ppu = ctx;
     ppu->signal.rw = false;
@@ -262,7 +262,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
                 ppu->t = (ppu->t & 0x7f00) | ppu->regbus;
                 ppu->v = ppu->t;
             } else {
-                ppu->t = bytowr((uint8_t)ppu->t, ppu->regbus & 0x3f);
+                ppu->t = aldo_bytowr((uint8_t)ppu->t, ppu->regbus & 0x3f);
             }
             ppu->w = !ppu->w;
             // TODO: there is some kind of bus conflict behavior i don't
@@ -454,7 +454,7 @@ snapshot_palette(const struct aldo_rp2c02 *self,
 // MARK: - Public Interface
 //
 
-const uint16_t Aldo_PaletteStartAddr = MEMBLOCK_16KB - 256;
+const uint16_t Aldo_PaletteStartAddr = ALDO_MEMBLOCK_16KB - 256;
 const int Aldo_DotsPerFrame = Dots * Lines;
 
 void aldo_ppu_connect(struct aldo_rp2c02 *self, bus *mbus)
@@ -462,7 +462,7 @@ void aldo_ppu_connect(struct aldo_rp2c02 *self, bus *mbus)
     assert(self != NULL);
     assert(mbus != NULL);
 
-    bool r = bus_set(mbus, MEMBLOCK_8KB, (struct busdevice){
+    bool r = bus_set(mbus, ALDO_MEMBLOCK_8KB, (struct busdevice){
         .read = regread,
         .write = regwrite,
         .ctx = self,

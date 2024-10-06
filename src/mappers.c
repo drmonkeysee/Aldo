@@ -61,9 +61,9 @@ static void clear_chr_device(aldo_bus *b)
     aldo_bus_clear(b, 0);
 }
 
-void fill_pattern_table(size_t tile_count,
-                        uint16_t table[tile_count][ALDO_CHR_TILE_DIM],
-                        const struct aldo_blockview *bv)
+static void fill_pattern_table(size_t tile_count,
+                               uint16_t table[tile_count][ALDO_CHR_TILE_DIM],
+                               const struct aldo_blockview *bv)
 {
     assert(tile_count <= ALDO_PT_TILE_COUNT);
     assert(bv->size >= tile_count * ALDO_CHR_TILE_STRIDE);

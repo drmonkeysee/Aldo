@@ -23,7 +23,7 @@ struct aldo_debugger_context {
     } breakpoints;
     struct aldo_mos6502 *cpu;   // Non-owning Pointer
     struct resdecorator {
-        struct busdevice inner;
+        struct aldo_busdevice inner;
         uint16_t vector;
         bool active;
     } dec;
@@ -35,7 +35,8 @@ static void remove_reset_override(struct aldo_debugger_context *self)
 {
     if (!self->dec.active) return;
 
-    bool r = bus_set(self->cpu->mbus, ALDO_CPU_VECTOR_RST, self->dec.inner);
+    bool r = aldo_bus_set(self->cpu->mbus, ALDO_CPU_VECTOR_RST,
+                          self->dec.inner);
     assert(r);
     self->dec = (struct resdecorator){0};
 }
@@ -364,11 +365,11 @@ void aldo_debug_sync_bus(aldo_debugger *self)
     }
 
     self->dec = (struct resdecorator){.vector = (uint16_t)self->resetvector};
-    struct busdevice resetaddr_device = {
+    struct aldo_busdevice resetaddr_device = {
         resetaddr_read, resetaddr_write, resetaddr_copy, &self->dec,
     };
-    self->dec.active = bus_swap(self->cpu->mbus, ALDO_CPU_VECTOR_RST,
-                                resetaddr_device, &self->dec.inner);
+    self->dec.active = aldo_bus_swap(self->cpu->mbus, ALDO_CPU_VECTOR_RST,
+                                     resetaddr_device, &self->dec.inner);
 }
 
 void aldo_debug_check(aldo_debugger *self, const struct aldo_clock *clk)

@@ -352,7 +352,7 @@ struct aldo_blockview aldo_cart_chrblock(aldo_cart *self, size_t i)
 // MARK: - Internal Interface
 //
 
-bool aldo_cart_mbus_connect(aldo_cart *self, bus *b)
+bool aldo_cart_mbus_connect(aldo_cart *self, aldo_bus *b)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
@@ -361,7 +361,7 @@ bool aldo_cart_mbus_connect(aldo_cart *self, bus *b)
     return self->mapper->mbus_connect(self->mapper, b);
 }
 
-void aldo_cart_mbus_disconnect(aldo_cart *self, bus *b)
+void aldo_cart_mbus_disconnect(aldo_cart *self, aldo_bus *b)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
@@ -370,7 +370,7 @@ void aldo_cart_mbus_disconnect(aldo_cart *self, bus *b)
     self->mapper->mbus_disconnect(b);
 }
 
-bool aldo_cart_vbus_connect(aldo_cart *self, bus *b)
+bool aldo_cart_vbus_connect(aldo_cart *self, aldo_bus *b)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);
@@ -382,7 +382,7 @@ bool aldo_cart_vbus_connect(aldo_cart *self, bus *b)
     return false;
 }
 
-void aldo_cart_vbus_disconnect(aldo_cart *self, bus *b)
+void aldo_cart_vbus_disconnect(aldo_cart *self, aldo_bus *b)
 {
     assert(self != NULL);
     assert(self->mapper != NULL);

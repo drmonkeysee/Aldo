@@ -138,10 +138,10 @@ struct aldo_blockview aldo_cart_chrblock(aldo_cart *self, size_t i) br_nothrow;
 // MARK: - Internal
 //
 
-bool aldo_cart_mbus_connect(aldo_cart *self, bus *b) br_nothrow;
-void aldo_cart_mbus_disconnect(aldo_cart *self, bus *b) br_nothrow;
-bool aldo_cart_vbus_connect(aldo_cart *self, bus *b) br_nothrow;
-void aldo_cart_vbus_disconnect(aldo_cart *self, bus *b) br_nothrow;
+bool aldo_cart_mbus_connect(aldo_cart *self, aldo_bus *b) br_nothrow;
+void aldo_cart_mbus_disconnect(aldo_cart *self, aldo_bus *b) br_nothrow;
+bool aldo_cart_vbus_connect(aldo_cart *self, aldo_bus *b) br_nothrow;
+void aldo_cart_vbus_disconnect(aldo_cart *self, aldo_bus *b) br_nothrow;
 
 void aldo_cart_write_dis_header(aldo_cart *self, const char *br_noalias name,
                                 FILE *f) br_nothrow;

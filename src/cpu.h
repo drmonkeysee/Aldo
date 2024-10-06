@@ -20,7 +20,7 @@
 // 8-bit CPU with a 16-bit addressing space.
 struct aldo_mos6502 {
     // Main Bus: external components connected to the CPU pins
-    bus *mbus;          // Non-owning Pointer
+    aldo_bus *mbus;     // Non-owning Pointer
 
     // CPU registers and flags
     uint16_t pc;        // Program Counter

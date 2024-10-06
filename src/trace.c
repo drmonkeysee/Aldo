@@ -19,8 +19,9 @@ static int trace_instruction(FILE *tracelog, const struct aldo_mos6502 *cpu,
                              const struct aldo_snapshot *snp)
 {
     uint8_t bytes[3];
-    size_t instlen = bus_copy(cpu->mbus, snp->cpu.datapath.current_instruction,
-                              sizeof bytes / sizeof bytes[0], bytes);
+    size_t instlen = aldo_bus_copy(cpu->mbus,
+                                   snp->cpu.datapath.current_instruction,
+                                   sizeof bytes / sizeof bytes[0], bytes);
     struct aldo_dis_instruction inst;
     int result = aldo_dis_parsemem_inst(instlen, bytes, 0, &inst);
     char disinst[ALDO_DIS_INST_SIZE];

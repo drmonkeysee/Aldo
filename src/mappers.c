@@ -51,14 +51,14 @@ static void mem_load(uint8_t *restrict d, const uint8_t *restrict mem,
 
 // TODO: once we introduce wram or additional mappers this implementation won't
 // be so common anymore.
-static void clear_prg_device(bus *b)
+static void clear_prg_device(aldo_bus *b)
 {
-    bus_clear(b, ALDO_MEMBLOCK_32KB);
+    aldo_bus_clear(b, ALDO_MEMBLOCK_32KB);
 }
 
-static void clear_chr_device(bus *b)
+static void clear_chr_device(aldo_bus *b)
 {
-    bus_clear(b, 0);
+    aldo_bus_clear(b, 0);
 }
 
 void fill_pattern_table(size_t tile_count,
@@ -118,11 +118,11 @@ static const uint8_t *raw_prgrom(const struct aldo_mapper *self)
     return ((const struct raw_mapper *)self)->rom;
 }
 
-static bool raw_mbus_connect(struct aldo_mapper *self, bus *b)
+static bool raw_mbus_connect(struct aldo_mapper *self, aldo_bus *b)
 {
     assert(self != NULL);
 
-    return bus_set(b, ALDO_MEMBLOCK_32KB, (struct busdevice){
+    return aldo_bus_set(b, ALDO_MEMBLOCK_32KB, (struct aldo_busdevice){
         .read = raw_read,
         .copy = raw_copy,
         .ctx = ((struct raw_mapper *)self)->rom,
@@ -158,14 +158,16 @@ static const uint8_t *ines_chrrom(const struct aldo_mapper *self)
     return ((const struct ines_mapper *)self)->chr;
 }
 
-static bool ines_unimplemented_mbus_connect(struct aldo_mapper *self, bus *b)
+static bool ines_unimplemented_mbus_connect(struct aldo_mapper *self,
+                                            aldo_bus *b)
 {
     (void)self;
     clear_prg_device(b);
     return true;
 }
 
-static bool ines_unimplemented_vbus_connect(struct aldo_mapper *self, bus *b)
+static bool ines_unimplemented_vbus_connect(struct aldo_mapper *self,
+                                            aldo_bus *b)
 {
     (void)self;
     clear_chr_device(b);
@@ -229,23 +231,23 @@ static bool ines_000_vwrite(void *ctx, uint16_t addr, uint8_t d)
 // CPU memory map defines start of cart mapping at $4020; the most complex
 // mappers need access to entire 64KB address space in order to snoop on
 // all CPU activity. Similar rules hold for PPU.
-static bool ines_000_mbus_connect(struct aldo_mapper *self, bus *b)
+static bool ines_000_mbus_connect(struct aldo_mapper *self, aldo_bus *b)
 {
     assert(self != NULL);
 
-    return bus_set(b, ALDO_MEMBLOCK_32KB, (struct busdevice){
+    return aldo_bus_set(b, ALDO_MEMBLOCK_32KB, (struct aldo_busdevice){
         .read = ines_000_read,
         .copy = ines_000_copy,
         .ctx = self,
     });
 }
 
-static bool ines_000_vbus_connect(struct aldo_mapper *self, bus *b)
+static bool ines_000_vbus_connect(struct aldo_mapper *self, aldo_bus *b)
 {
     assert(self != NULL);
 
     struct ines_mapper *m = (struct ines_mapper *)self;
-    return bus_set(b, 0, (struct busdevice){
+    return aldo_bus_set(b, 0, (struct aldo_busdevice){
         .read = ines_000_vread,
         .write = m->chrram ? ines_000_vwrite : NULL,
         .ctx = m,

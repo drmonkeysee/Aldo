@@ -21,7 +21,7 @@
 // fixed-function IC that generates the NES video signal.
 struct aldo_rp2c02 {
     // Video Bus: video component connections
-    bus *vbus;              // Non-owning Pointer
+    aldo_bus *vbus;         // Non-owning Pointer
 
     // PPU Registers
     struct {
@@ -113,7 +113,7 @@ struct aldo_ppu_coord { int dot, line; };
 extern const uint16_t Aldo_PaletteStartAddr;
 extern const int Aldo_DotsPerFrame;
 
-void aldo_ppu_connect(struct aldo_rp2c02 *self, bus *mbus);
+void aldo_ppu_connect(struct aldo_rp2c02 *self, aldo_bus *mbus);
 void aldo_ppu_powerup(struct aldo_rp2c02 *self);
 void aldo_ppu_zeroram(struct aldo_rp2c02 *self);
 

@@ -41,13 +41,13 @@ void ppu_setup(void **ctx)
 {
     struct ppu_test_context *c = calloc(sizeof *c, 1);
     // NOTE: enough main bus to map $2000 - $3FFF for ppu registers
-    c->mbus = bus_new(ALDO_BITWIDTH_16KB, 2, ALDO_MEMBLOCK_8KB);
+    c->mbus = aldo_bus_new(ALDO_BITWIDTH_16KB, 2, ALDO_MEMBLOCK_8KB);
     VRam[0] = 0x11;
     VRam[1] = 0x22;
     VRam[2] = 0x33;
     VRam[3] = 0x44;
-    c->ppu.vbus = c->vbus = bus_new(ALDO_BITWIDTH_16KB, 1);
-    bus_set(c->vbus, 0, (struct busdevice){
+    c->ppu.vbus = c->vbus = aldo_bus_new(ALDO_BITWIDTH_16KB, 1);
+    aldo_bus_set(c->vbus, 0, (struct aldo_busdevice){
         .read = test_vread,
         .write = test_vwrite,
         .ctx = VRam,
@@ -65,7 +65,7 @@ void ppu_setup(void **ctx)
 void ppu_teardown(void **ctx)
 {
     struct ppu_test_context *c = *ctx;
-    bus_free(c->vbus);
-    bus_free(c->mbus);
+    aldo_bus_free(c->vbus);
+    aldo_bus_free(c->mbus);
     free(c);
 }

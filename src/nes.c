@@ -120,9 +120,9 @@ static void create_mbus(struct aldo_nes001 *self)
     // * $2000 - $3FFF: 8 PPU registers mirrored to 8KB
     // * $4000 - $7FFF: unmapped
     // * $8000 - $FFFF: 32KB Cart
-    self->cpu.mbus = bus_new(ALDO_BITWIDTH_64KB, 4, ALDO_MEMBLOCK_8KB,
-                             ALDO_MEMBLOCK_16KB, ALDO_MEMBLOCK_32KB);
-    bool r = bus_set(self->cpu.mbus, 0, (struct busdevice){
+    self->cpu.mbus = aldo_bus_new(ALDO_BITWIDTH_64KB, 4, ALDO_MEMBLOCK_8KB,
+                                  ALDO_MEMBLOCK_16KB, ALDO_MEMBLOCK_32KB);
+    bool r = aldo_bus_set(self->cpu.mbus, 0, (struct aldo_busdevice){
         ram_read,
         ram_write,
         ram_copy,
@@ -141,8 +141,9 @@ static void create_vbus(struct aldo_nes001 *self)
     // * $3F00 - $3FFF: 32B Palette RAM mirrored to 256B; internal to the PPU
     //                  and thus not on the video bus, but reads do leak
     //                  through to the underlying VRAM.
-    self->ppu.vbus = bus_new(ALDO_BITWIDTH_16KB, 2, ALDO_MEMBLOCK_8KB);
-    bool r = bus_set(self->ppu.vbus, ALDO_MEMBLOCK_8KB, (struct busdevice){
+    self->ppu.vbus = aldo_bus_new(ALDO_BITWIDTH_16KB, 2, ALDO_MEMBLOCK_8KB);
+    bool r = aldo_bus_set(self->ppu.vbus, ALDO_MEMBLOCK_8KB,
+                          (struct aldo_busdevice){
         vram_read,
         vram_write,
         vram_copy,
@@ -183,8 +184,8 @@ static void teardown(struct aldo_nes001 *self)
 {
     disconnect_cart(self);
     aldo_debug_cpu_disconnect(self->dbg);
-    bus_free(self->ppu.vbus);
-    bus_free(self->cpu.mbus);
+    aldo_bus_free(self->ppu.vbus);
+    aldo_bus_free(self->cpu.mbus);
 }
 
 static void set_ppu_pins(struct aldo_nes001 *self)
@@ -209,8 +210,8 @@ static void bus_snapshot(const struct aldo_nes001 *self,
 {
     aldo_cpu_snapshot(&self->cpu, snp);
     aldo_ppu_bus_snapshot(&self->ppu, snp);
-    bus_copy(self->cpu.mbus, ALDO_CPU_VECTOR_NMI, memsz(snp->prg.vectors),
-             snp->prg.vectors);
+    aldo_bus_copy(self->cpu.mbus, ALDO_CPU_VECTOR_NMI, memsz(snp->prg.vectors),
+                  snp->prg.vectors);
 }
 
 // NOTE: trace the just-fetched instruction
@@ -429,10 +430,9 @@ void aldo_nes_snapshot(aldo_nes *self, struct aldo_snapshot *snp)
     }
     snp->mem.ram = self->ram;
     snp->mem.vram = self->vram;
-    snp->prg.curr->length = bus_copy(self->cpu.mbus,
-                                     snp->cpu.datapath.current_instruction,
-                                     memsz(snp->prg.curr->pc),
-                                     snp->prg.curr->pc);
+    snp->prg.curr->length =
+        aldo_bus_copy(self->cpu.mbus, snp->cpu.datapath.current_instruction,
+                      memsz(snp->prg.curr->pc), snp->prg.curr->pc);
 }
 
 void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3])

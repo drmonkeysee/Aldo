@@ -43,9 +43,9 @@ static bool capture_rom_write(void *ctx, uint16_t addr, uint8_t d)
     return false;
 }
 
-static bus *restrict TestBus;
-static struct busdevice Ram = {.read = test_read, .write = test_write},
-                        Rom = {.read = test_read};
+static aldo_bus *restrict TestBus;
+static struct aldo_busdevice
+    Ram = {.read = test_read, .write = test_write}, Rom = {.read = test_read};
 
 //
 // MARK: - Public Interface
@@ -60,13 +60,13 @@ int RomWriteCapture = -1;
 
 void setup_testbus(void)
 {
-    TestBus = bus_new(ALDO_BITWIDTH_64KB, 3, ALDO_MEMBLOCK_8KB,
-                      ALDO_MEMBLOCK_32KB);
+    TestBus = aldo_bus_new(ALDO_BITWIDTH_64KB, 3, ALDO_MEMBLOCK_8KB,
+                           ALDO_MEMBLOCK_32KB);
 }
 
 void teardown_testbus(void)
 {
-    bus_free(TestBus);
+    aldo_bus_free(TestBus);
 }
 
 void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
@@ -74,9 +74,10 @@ void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
 {
     cpu->mbus = TestBus;
     Ram.ctx = ram;
-    bus_set(TestBus, 0x0, ram ? Ram : (struct busdevice){0});
+    aldo_bus_set(TestBus, 0x0, ram ? Ram : (struct aldo_busdevice){0});
     Rom.ctx = rom;
-    bus_set(TestBus, ALDO_MEMBLOCK_32KB, rom ? Rom : (struct busdevice){0});
+    aldo_bus_set(TestBus, ALDO_MEMBLOCK_32KB,
+                 rom ? Rom : (struct aldo_busdevice){0});
     RomWriteCapture = -1;
     aldo_cpu_powerup(cpu);
     cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bcd =
@@ -87,9 +88,9 @@ void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
 
 void enable_rom_wcapture(void)
 {
-    struct busdevice dv = Rom;
+    struct aldo_busdevice dv = Rom;
     dv.write = capture_rom_write;
-    bus_set(TestBus, ALDO_MEMBLOCK_32KB, dv);
+    aldo_bus_set(TestBus, ALDO_MEMBLOCK_32KB, dv);
 }
 
 int clock_cpu(struct aldo_mos6502 *cpu)

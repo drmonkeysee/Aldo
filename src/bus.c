@@ -13,16 +13,16 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-struct hardwarebus {
+struct aldo_hardwarebus {
     size_t count;
     uint16_t maxaddr;
     struct partition {
-        struct busdevice device;
+        struct aldo_busdevice device;
         uint16_t start;
     } partitions[];
 };
 
-static struct partition *find(struct hardwarebus *self, uint16_t addr)
+static struct partition *find(struct aldo_hardwarebus *self, uint16_t addr)
 {
     for (size_t i = self->count - 1; i > 0; --i) {
         if (addr >= self->partitions[i].start) return self->partitions + i;
@@ -35,14 +35,14 @@ static struct partition *find(struct hardwarebus *self, uint16_t addr)
 // MARK: - Public Interface
 //
 
-bus *bus_new(int bitwidth, size_t n, ...)
+aldo_bus *aldo_bus_new(int bitwidth, size_t n, ...)
 {
     assert(0 < bitwidth && bitwidth <= ALDO_BITWIDTH_64KB);
     assert(0 < n);
 
     size_t psize = sizeof(struct partition) * n;
-    struct hardwarebus *self = malloc(sizeof *self + psize);
-    *self = (struct hardwarebus){
+    struct aldo_hardwarebus *self = malloc(sizeof *self + psize);
+    *self = (struct aldo_hardwarebus){
         .count = n,
         .maxaddr = (uint16_t)(1 << bitwidth) - 1,
     };
@@ -59,15 +59,15 @@ bus *bus_new(int bitwidth, size_t n, ...)
     return self;
 }
 
-void bus_free(bus *self)
+void aldo_bus_free(aldo_bus *self)
 {
     free(self);
 }
 
-extern inline bool bus_set(bus *, uint16_t, struct busdevice);
-extern inline bool bus_clear(bus *, uint16_t);
-bool bus_swap(bus *self, uint16_t addr, struct busdevice bd,
-              struct busdevice *prev)
+extern inline bool aldo_bus_set(aldo_bus *, uint16_t, struct aldo_busdevice);
+extern inline bool aldo_bus_clear(aldo_bus *, uint16_t);
+bool aldo_bus_swap(aldo_bus *self, uint16_t addr, struct aldo_busdevice bd,
+                   struct aldo_busdevice *prev)
 {
     assert(self != NULL);
 
@@ -81,7 +81,7 @@ bool bus_swap(bus *self, uint16_t addr, struct busdevice bd,
     return true;
 }
 
-bool bus_read(bus *self, uint16_t addr, uint8_t *restrict d)
+bool aldo_bus_read(aldo_bus *self, uint16_t addr, uint8_t *restrict d)
 {
     assert(self != NULL);
     assert(d != NULL);
@@ -94,7 +94,7 @@ bool bus_read(bus *self, uint16_t addr, uint8_t *restrict d)
             : false;
 }
 
-bool bus_write(bus *self, uint16_t addr, uint8_t d)
+bool aldo_bus_write(aldo_bus *self, uint16_t addr, uint8_t d)
 {
     assert(self != NULL);
 
@@ -106,8 +106,8 @@ bool bus_write(bus *self, uint16_t addr, uint8_t d)
             : false;
 }
 
-size_t bus_copy(bus *self, uint16_t addr, size_t count,
-                uint8_t dest[restrict count])
+size_t aldo_bus_copy(aldo_bus *self, uint16_t addr, size_t count,
+                     uint8_t dest[restrict count])
 {
     assert(self != NULL);
     assert(dest != NULL);

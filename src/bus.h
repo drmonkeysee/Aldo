@@ -12,10 +12,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct hardwarebus bus;
+typedef struct aldo_hardwarebus aldo_bus;
 
 #include "bridgeopen.h"
-struct busdevice {
+struct aldo_busdevice {
     bool (*read)(void *br_noalias, uint16_t, uint8_t *br_noalias) br_nothrow;
     bool (*write)(void *, uint16_t, uint8_t) br_nothrow;
     size_t (*copy)(const void *br_noalias, uint16_t, size_t,
@@ -30,25 +30,27 @@ struct busdevice {
 // - 4 partitions
 // - mapped as [$0000 - $1FFF, $2000 - $3FFF, $4000 - $7FFF, $8000 - $FFFF]
 br_ownresult
-bus *bus_new(int bitwidth, size_t n, ...) br_nothrow;
-void bus_free(bus *self) br_nothrow;
+aldo_bus *aldo_bus_new(int bitwidth, size_t n, ...) br_nothrow;
+void aldo_bus_free(aldo_bus *self) br_nothrow;
 
 // NOTE: addr can be anywhere in the range of the target device's partition
-bool bus_swap(bus *self, uint16_t addr, struct busdevice bd,
-              struct busdevice *prev) br_nothrow;
-inline bool bus_set(bus *self, uint16_t addr, struct busdevice bd) br_nothrow
+bool aldo_bus_swap(aldo_bus *self, uint16_t addr, struct aldo_busdevice bd,
+                   struct aldo_busdevice *prev) br_nothrow;
+inline bool aldo_bus_set(aldo_bus *self, uint16_t addr,
+                         struct aldo_busdevice bd) br_nothrow
 {
-    return bus_swap(self, addr, bd, NULL);
+    return aldo_bus_swap(self, addr, bd, NULL);
 }
-inline bool bus_clear(bus *self, uint16_t addr) br_nothrow
+inline bool aldo_bus_clear(aldo_bus *self, uint16_t addr) br_nothrow
 {
-    return bus_set(self, addr, br_empty(struct busdevice));
+    return aldo_bus_set(self, addr, br_empty(struct aldo_busdevice));
 }
 
-bool bus_read(bus *self, uint16_t addr, uint8_t *br_noalias d) br_nothrow;
-bool bus_write(bus *self, uint16_t addr, uint8_t d) br_nothrow;
-size_t bus_copy(bus *self, uint16_t addr, size_t count,
-                uint8_t dest[br_nasz(count)]) br_nothrow;
+bool aldo_bus_read(aldo_bus *self, uint16_t addr,
+                   uint8_t *br_noalias d) br_nothrow;
+bool aldo_bus_write(aldo_bus *self, uint16_t addr, uint8_t d) br_nothrow;
+size_t aldo_bus_copy(aldo_bus *self, uint16_t addr, size_t count,
+                     uint8_t dest[br_nasz(count)]) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

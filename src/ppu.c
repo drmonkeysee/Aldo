@@ -289,7 +289,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
 static void read(struct aldo_rp2c02 *self)
 {
     self->signal.ale = self->signal.rd = false;
-    self->bflt = !bus_read(self->vbus, self->vaddrbus, &self->vdatabus);
+    self->bflt = !aldo_bus_read(self->vbus, self->vaddrbus, &self->vdatabus);
     self->rbuf = self->vdatabus;
 }
 
@@ -301,7 +301,8 @@ static void write(struct aldo_rp2c02 *self)
         self->bflt = false;
     } else {
         self->signal.wr = false;
-        self->bflt = !bus_write(self->vbus, self->vaddrbus, self->vdatabus);
+        self->bflt = !aldo_bus_write(self->vbus, self->vaddrbus,
+                                     self->vdatabus);
     }
 }
 
@@ -457,12 +458,12 @@ snapshot_palette(const struct aldo_rp2c02 *self,
 const uint16_t Aldo_PaletteStartAddr = ALDO_MEMBLOCK_16KB - 256;
 const int Aldo_DotsPerFrame = Dots * Lines;
 
-void aldo_ppu_connect(struct aldo_rp2c02 *self, bus *mbus)
+void aldo_ppu_connect(struct aldo_rp2c02 *self, aldo_bus *mbus)
 {
     assert(self != NULL);
     assert(mbus != NULL);
 
-    bool r = bus_set(mbus, ALDO_MEMBLOCK_8KB, (struct busdevice){
+    bool r = aldo_bus_set(mbus, ALDO_MEMBLOCK_8KB, (struct aldo_busdevice){
         .read = regread,
         .write = regwrite,
         .ctx = self,

@@ -35,7 +35,7 @@ static void attach(struct aldo_mos6502 *self)
 static void read(struct aldo_mos6502 *self)
 {
     self->signal.rw = true;
-    self->bflt = !bus_read(self->mbus, self->addrbus, &self->databus);
+    self->bflt = !aldo_bus_read(self->mbus, self->addrbus, &self->databus);
 }
 
 static void write(struct aldo_mos6502 *self)
@@ -44,7 +44,7 @@ static void write(struct aldo_mos6502 *self)
         read(self);
     } else {
         self->signal.rw = false;
-        self->bflt = !bus_write(self->mbus, self->addrbus, self->databus);
+        self->bflt = !aldo_bus_write(self->mbus, self->addrbus, self->databus);
     }
 }
 

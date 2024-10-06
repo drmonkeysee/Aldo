@@ -18,7 +18,7 @@
 
 struct ppu_test_context {
     struct aldo_rp2c02 ppu;
-    bus *mbus, *vbus;
+    aldo_bus *mbus, *vbus;
 };
 
 extern uint8_t VRam[];

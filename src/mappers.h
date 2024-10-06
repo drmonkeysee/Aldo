@@ -18,8 +18,8 @@
 #include <stdlib.h>
 
 struct aldo_mapper;
-typedef bool aldo_busconn(struct aldo_mapper *, bus *);
-typedef void aldo_busdisconn(bus *);
+typedef bool aldo_busconn(struct aldo_mapper *, aldo_bus *);
+typedef void aldo_busdisconn(aldo_bus *);
 typedef const uint8_t *aldo_mapper_rom(const struct aldo_mapper *);
 
 struct aldo_mapper {

@@ -23,23 +23,6 @@
 namespace
 {
 
-//
-// MARK: - UI Loop Implementation
-//
-
-auto handle_input(aldo::Emulator& emu, aldo::viewstate& vs,
-                  const aldo::MediaRuntime& mr)
-{
-    auto timer = vs.clock.timeInput();
-    aldo::input::handle(emu, vs, mr);
-}
-
-auto update_emu(aldo::Emulator& emu, aldo::viewstate& vs) noexcept
-{
-    auto timer = vs.clock.timeUpdate();
-    emu.update(vs);
-}
-
 auto runloop(const gui_platform& p, aldo_debugger* debug, aldo_nes* console)
 {
     aldo::Emulator emu{
@@ -58,9 +41,9 @@ auto runloop(const gui_platform& p, aldo_debugger* debug, aldo_nes* console)
     do {
         auto reset = !emu.snapshot().cpu.lines.ready;
         auto tick = state.clock.startTick(reset);
-        handle_input(emu, state, runtime);
+        aldo::input::handle(emu, state, runtime);
         if (state.running) {
-            update_emu(emu, state);
+            emu.update(state);
             layout.render();
         }
     } while (state.running);
@@ -90,5 +73,5 @@ int aldo::ui_sdl_runloop(const gui_platform* platform, aldo_debugger* debug,
     }
     auto err = aldo::MediaRuntime::initStatus();
     if (err < 0) return err;
-    return ALDO_UIERR_EXCEPTION;
+    return ALDO_UI_ERR_EXCEPTION;
 }

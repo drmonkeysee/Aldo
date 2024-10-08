@@ -108,6 +108,7 @@ void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
 
 void aldo::Emulator::update(aldo::viewstate& vs) noexcept
 {
+    auto timer = vs.clock.timeUpdate();
     aldo_nes_clock(consolep(), vs.clock.clockp());
     aldo_nes_snapshot(consolep(), snapshotp());
     update_bouncer(vs, snapshot());

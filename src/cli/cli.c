@@ -270,7 +270,7 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
     int err = run_loop(&emu);
     if (err < 0) {
         fprintf(stderr, "UI run failure (%d): %s\n", err, aldo_ui_errstr(err));
-        if (err == ALDO_UIERR_ERNO) {
+        if (err == ALDO_UI_ERR_ERNO) {
             perror("UI System Error");
         }
         result = EXIT_FAILURE;

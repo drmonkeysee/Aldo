@@ -221,6 +221,7 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
 void aldo::input::handle(aldo::Emulator& emu, aldo::viewstate& vs,
                          const aldo::MediaRuntime& mr)
 {
+    auto timer = vs.clock.timeInput();
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
         ImGui_ImplSDL2_ProcessEvent(&ev);

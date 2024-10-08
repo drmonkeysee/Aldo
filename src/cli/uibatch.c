@@ -56,7 +56,7 @@ static int init_ui(void)
         .sa_sigaction = handle_sigint,
         .sa_flags = SA_SIGINFO,
     };
-    return sigaction(SIGINT, &act, NULL) == 0 ? 0 : ALDO_UIERR_ERNO;
+    return sigaction(SIGINT, &act, NULL) == 0 ? 0 : ALDO_UI_ERR_ERNO;
 }
 
 static void tick_start(struct runclock *c, const struct aldo_snapshot *snp)

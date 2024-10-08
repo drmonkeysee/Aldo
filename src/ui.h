@@ -9,14 +9,14 @@
 #define Aldo_ui_h
 
 // X(symbol, value, error string)
-#define ALDO_UIERRCODE_X \
-X(UIERR_ERNO, -1, "SYSTEM ERROR") \
-X(UIERR_LIBINIT, -2, "LIBRARY INIT FAILURE") \
-X(UIERR_EXCEPTION, -3, "PROGRAM EXCEPTION")
+#define ALDO_UI_ERRCODE_X \
+X(UI_ERR_ERNO, -1, "SYSTEM ERROR") \
+X(UI_ERR_LIBINIT, -2, "LIBRARY INIT FAILURE") \
+X(UI_ERR_EXCEPTION, -3, "PROGRAM EXCEPTION")
 
 enum {
 #define X(s, v, e) ALDO_##s = v,
-    ALDO_UIERRCODE_X
+    ALDO_UI_ERRCODE_X
 #undef X
 };
 

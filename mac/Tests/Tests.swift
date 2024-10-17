@@ -5,12 +5,13 @@
 //  Created by Brandon Stansbury on 2/24/21.
 //
 
-import XCTest
+import Testing
 
-final class Tests: XCTestCase {
-    func testRunner() throws {
+struct Tests {
+    @Test
+    func testRunner() {
         let failed = swift_runner()
 
-        XCTAssertEqual(0, failed)
+        #expect(failed == 0)
     }
 }

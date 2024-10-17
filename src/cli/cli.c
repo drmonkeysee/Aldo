@@ -314,9 +314,7 @@ static int run_with_args(const struct cliargs *args)
     }
 
     aldo_cart *cart = load_cart(args->filepath);
-    if (!cart) {
-        return EXIT_FAILURE;
-    }
+    if (!cart) return EXIT_FAILURE;
 
     int result = run_cart(args, cart);
     aldo_cart_free(cart);

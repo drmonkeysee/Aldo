@@ -145,8 +145,11 @@ static bool parse_halt(const char *arg, int *restrict argi, int argc,
         struct haltarg **tail;
         for (tail = &args->haltlist; *tail; tail = &(*tail)->next);
         *tail = malloc(sizeof **tail);
-        **tail = (struct haltarg){.expr = expr};
-        return true;
+        if (tail) {
+            **tail = (struct haltarg){.expr = expr};
+            return true;
+        }
+        perror("Halt expression parse failed");
     }
     return false;
 }

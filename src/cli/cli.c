@@ -51,6 +51,9 @@ static aldo_cart *load_cart(const char *filename)
         if (err < 0) {
             fprintf(stderr, "Cart load failure (%d): %s\n", err,
                     aldo_cart_errstr(err));
+            if (err == ALDO_CART_ERR_ERNO) {
+                perror("Cart system error");
+            }
         }
         fclose(f);
     } else {
@@ -92,7 +95,7 @@ static int decode_cart_chr(const struct cliargs *args, aldo_cart *c)
         fprintf(stderr, "CHR decode error (%d): %s\n", err,
                 aldo_dis_errstr(err));
         if (err == ALDO_DIS_ERR_ERNO) {
-            perror("CHR decode file error");
+            perror("CHR decode system error");
         }
         return EXIT_FAILURE;
     }
@@ -271,7 +274,7 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
     if (err < 0) {
         fprintf(stderr, "UI run failure (%d): %s\n", err, aldo_ui_errstr(err));
         if (err == ALDO_UI_ERR_ERNO) {
-            perror("UI System Error");
+            perror("UI system error");
         }
         result = EXIT_FAILURE;
     }

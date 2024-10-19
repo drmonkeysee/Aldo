@@ -206,6 +206,7 @@ int aldo_cart_create(aldo_cart **c, FILE *f)
     assert(f != NULL);
 
     struct aldo_cartridge *self = malloc(sizeof *self);
+    if (!self) return ALDO_CART_ERR_ERNO;
 
     int err = detect_format(self, f);
     if (err == 0) {

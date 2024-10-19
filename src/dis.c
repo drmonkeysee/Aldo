@@ -617,6 +617,7 @@ int aldo_dis_cart_chr(aldo_cart *cart, int chrscale,
         prefixlen = strlen(prefix),
         namesize = prefixlen + 8;   // NOTE: prefix + nnn.bmp + nul
     char *bmpfilename = malloc(namesize);
+    if (!bmpfilename) return ALDO_DIS_ERR_ERNO;
 
     int err;
     do {

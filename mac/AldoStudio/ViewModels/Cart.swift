@@ -84,10 +84,7 @@ final class Cart {
                 errno = 0
                 let err = aldo_dis_cart_chr(handle.unwrapped, Int32(scale),
                                             chrprefix, stream)
-                if err < 0 {
-                    if err == ALDO_DIS_ERR_ERNO { throw AldoError.ioErrno }
-                    throw AldoError.wrapDisError(code: err)
-                }
+                if err < 0 { throw AldoError.wrapDisError(code: err) }
             }
         }
     }
@@ -211,7 +208,7 @@ fileprivate final class CartHandle {
         defer { fclose(cFile) }
 
         let err = aldo_cart_create(&cartRef, cFile)
-        if err < 0 { throw AldoError.cartErr(err) }
+        if err < 0 { throw AldoError.wrapCartError(code: err) }
     }
 
     deinit {

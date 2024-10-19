@@ -11,7 +11,6 @@ struct Tests {
     @Test
     func testRunner() {
         let failed = swift_runner()
-
         #expect(failed == 0)
     }
 }

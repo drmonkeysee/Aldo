@@ -32,7 +32,7 @@ struct ines_000_mapper {
 
 static int load_blocks(uint8_t *restrict *mem, size_t size, FILE *f)
 {
-    *mem = calloc(size, sizeof **mem);
+    if (!(*mem = calloc(size, sizeof **mem))) return ALDO_CART_ERR_ERNO;
     fread(*mem, sizeof **mem, size, f);
     if (feof(f)) return ALDO_CART_ERR_EOF;
     if (ferror(f)) return ALDO_CART_ERR_IO;
@@ -302,7 +302,6 @@ int aldo_mapper_raw_create(struct aldo_mapper **m, FILE *f)
     int err = load_blocks(&self->rom, ALDO_MEMBLOCK_32KB, f);
     if (err == 0) {
         *m = (struct aldo_mapper *)self;
-        return 0;
     } else {
         self->vtable.dtor((struct aldo_mapper *)self);
     }
@@ -318,8 +317,8 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
 
     struct ines_mapper *self;
     if (header->mapper_id == 0) {
-        self = malloc(sizeof(struct ines_000_mapper));
-        if (!self) return ALDO_CART_ERR_ERNO;
+        if (!(self = malloc(sizeof(struct ines_000_mapper))))
+            return ALDO_CART_ERR_ERNO;
 
         *self = (struct ines_mapper){
             .vtable = {
@@ -332,8 +331,7 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
         ((struct ines_000_mapper *)self)->blockcount = header->prg_blocks;
         header->mapper_implemented = true;
     } else {
-        self = malloc(sizeof *self);
-        if (!self) return ALDO_CART_ERR_ERNO;
+        if (!(self = malloc(sizeof *self))) return ALDO_CART_ERR_ERNO;
 
         *self = (struct ines_mapper){
             .vtable = {
@@ -358,28 +356,35 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
     if (header->trainer) {
         // NOTE: skip 512 bytes of trainer data
         err = fseek(f, 512, SEEK_CUR);
-        if (err != 0) return err;
+        if (err != 0) goto cleanup;
     }
 
     if (header->wram) {
         size_t sz = (header->wram_blocks == 0
                      ? 1
                      : header->wram_blocks) * ALDO_MEMBLOCK_8KB;
-        self->wram = calloc(sz, sizeof *self->wram);
+        if (!(self->wram = calloc(sz, sizeof *self->wram))) {
+            err = ALDO_CART_ERR_ERNO;
+            goto cleanup;
+        }
     }
 
     err = load_blocks(&self->prg, header->prg_blocks * ALDO_MEMBLOCK_16KB, f);
-    if (err != 0) return err;
+    if (err != 0) goto cleanup;
 
     if (header->chr_blocks == 0) {
         // TODO: this size is controlled by the mapper in many cases
-        self->chr = calloc(ALDO_MEMBLOCK_8KB, sizeof *self->chr);
+        if (!(self->chr = calloc(ALDO_MEMBLOCK_8KB, sizeof *self->chr))) {
+            err = ALDO_CART_ERR_ERNO;
+            goto cleanup;
+        }
         self->chrram = true;
     } else {
         err = load_blocks(&self->chr, header->chr_blocks * ALDO_MEMBLOCK_8KB,
                           f);
     }
 
+cleanup:
     if (err == 0) {
         *m = (struct aldo_mapper *)self;
     } else {

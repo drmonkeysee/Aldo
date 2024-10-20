@@ -394,6 +394,8 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
 
     // NOTE: BMP pixels are written bottom-row first
     uint8_t *packedrow = calloc(packedrow_size, sizeof *packedrow);
+    if (!packedrow) return ALDO_DIS_ERR_ERNO;
+
     for (int32_t tiley = (int32_t)(tilesdim - 1); tiley >= 0; --tiley) {
         for (int32_t pixely = (int32_t)(ALDO_CHR_TILE_DIM - 1);
              pixely >= 0;

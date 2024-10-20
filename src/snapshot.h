@@ -91,7 +91,7 @@ struct aldo_snapshot {
 
 #include "bridgeopen.h"
 // NOTE: if returns false then errno is set due to failed allocation
-br_libexport
+br_libexport br_checkerror
 bool aldo_snapshot_extend(struct aldo_snapshot *snp) br_nothrow;
 br_libexport
 void aldo_snapshot_cleanup(struct aldo_snapshot *snp) br_nothrow;

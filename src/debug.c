@@ -124,13 +124,14 @@ static bool bpvector_valid_index(const struct breakpoint_vector *vec,
     return 0 <= at && at < (ptrdiff_t)vec->size;
 }
 
-static void bpvector_init(struct breakpoint_vector *vec)
+static bool bpvector_init(struct breakpoint_vector *vec)
 {
     static const size_t initial_capacity = 2;
     *vec = (struct breakpoint_vector){
         .capacity = initial_capacity,
         .items = calloc(initial_capacity, sizeof *vec->items),
     };
+    return vec->items;
 }
 
 static struct aldo_breakpoint *bpvector_at(const struct breakpoint_vector *vec,
@@ -228,7 +229,10 @@ aldo_debugger *aldo_debug_new(void)
         .halted = Aldo_NoBreakpoint,
         .resetvector = Aldo_NoResetVector,
     };
-    bpvector_init(&self->breakpoints);
+    if (!bpvector_init(&self->breakpoints)) {
+        aldo_debug_free(self);
+        return NULL;
+    }
     return self;
 }
 

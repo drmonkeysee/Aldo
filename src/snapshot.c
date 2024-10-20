@@ -19,11 +19,8 @@ bool aldo_snapshot_extend(struct aldo_snapshot *snp)
 {
     assert(snp != NULL);
 
-    snp->prg.curr = malloc(sizeof *snp->prg.curr);
-    if (!snp->prg.curr) return false;
-
-    snp->video = malloc(sizeof *snp->video);
-    if (!snp->video) {
+    if (!(snp->prg.curr = malloc(sizeof *snp->prg.curr))) return false;
+    if (!(snp->video = malloc(sizeof *snp->video))) {
         aldo_snapshot_cleanup(snp);
         return false;
     }

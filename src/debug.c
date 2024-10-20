@@ -131,7 +131,7 @@ static bool bpvector_init(struct breakpoint_vector *vec)
         .capacity = initial_capacity,
         .items = calloc(initial_capacity, sizeof *vec->items),
     };
-    return vec->items;
+    return vec->items != NULL;
 }
 
 static struct aldo_breakpoint *bpvector_at(const struct breakpoint_vector *vec,
@@ -141,23 +141,28 @@ static struct aldo_breakpoint *bpvector_at(const struct breakpoint_vector *vec,
     return NULL;
 }
 
-static void bpvector_resize(struct breakpoint_vector *vec)
+static bool bpvector_resize(struct breakpoint_vector *vec)
 {
     // NOTE: growth factor K = 1.5
     vec->capacity += vec->capacity / 2;
-    vec->items = realloc(vec->items, vec->capacity * sizeof *vec->items);
-    assert(vec->items != NULL);
+    struct aldo_breakpoint *bpv = realloc(vec->items,
+                                          vec->capacity * sizeof *vec->items);
+    if (bpv) {
+        vec->items = bpv;
+    }
+    return bpv != NULL;
 }
 
-static void bpvector_insert(struct breakpoint_vector *vec,
+static bool bpvector_insert(struct breakpoint_vector *vec,
                             struct aldo_haltexpr expr)
 {
     if (vec->size == vec->capacity) {
-        bpvector_resize(vec);
+        if (!bpvector_resize(vec)) return false;
     }
     struct aldo_breakpoint *slot = vec->items + vec->size;
     *slot = (struct aldo_breakpoint){expr, true};
     ++vec->size;
+    return true;
 }
 
 static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
@@ -259,12 +264,12 @@ void aldo_debug_set_vector_override(aldo_debugger *self, int resetvector)
     update_reset_override(self);
 }
 
-void aldo_debug_bp_add(aldo_debugger *self, struct aldo_haltexpr expr)
+bool aldo_debug_bp_add(aldo_debugger *self, struct aldo_haltexpr expr)
 {
     assert(self != NULL);
     assert(ALDO_HLT_NONE < expr.cond && expr.cond < ALDO_HLT_COUNT);
 
-    bpvector_insert(&self->breakpoints, expr);
+    return bpvector_insert(&self->breakpoints, expr);
 }
 
 const struct aldo_breakpoint *aldo_debug_bp_at(aldo_debugger *self,

@@ -159,9 +159,9 @@ public:
         const_iterator begin() const noexcept { return cbegin(); }
         const_iterator end() const noexcept { return cend(); }
 
-        void append(aldo_haltexpr expr) noexcept requires Mutable
+        bool append(aldo_haltexpr expr) noexcept requires Mutable
         {
-            aldo_debug_bp_add(dbgp, expr);
+            return aldo_debug_bp_add(dbgp, expr);
         }
         void enable(difference_type i) noexcept requires Mutable
         {

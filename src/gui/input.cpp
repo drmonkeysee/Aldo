@@ -21,6 +21,9 @@
 #include <type_traits>
 #include <variant>
 
+#include <cerrno>
+#include <cstring>
+
 namespace
 {
 
@@ -56,6 +59,19 @@ constexpr auto cyclerate_adjust(const SDL_Event& ev) noexcept
 constexpr auto mode_change(const SDL_Event& ev) noexcept
 {
     return shift_pressed(ev) ? -1 : 1;
+}
+
+auto breakpoint_add_failed()
+{
+    const auto* errMsg = std::strerror(errno);
+    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                 "Add breakpoint error (%d): (%s)", errno, errMsg);
+    std::string msg = "Unable to add breakpoint (";
+    msg += std::to_string(errno);
+    msg += "): ";
+    msg += errMsg;
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Add Breakpoint Failure",
+                             msg.c_str(), nullptr);
 }
 
 auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
@@ -152,7 +168,10 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
     auto breakpoints = debugger.breakpoints();
     switch (cs.cmd) {
     case aldo::Command::breakpointAdd:
-        breakpoints.append(std::get<aldo_haltexpr>(cs.value));
+        if (!breakpoints.append(std::get<aldo_haltexpr>(cs.value))) {
+            // NOTE: breakpoint append can fail to allocate new memory
+            breakpoint_add_failed();
+        }
         break;
     case aldo::Command::breakpointDisable:
         breakpoints.disable(std::get<aldo::et::diff>(cs.value));

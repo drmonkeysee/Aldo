@@ -17,6 +17,8 @@
 #include <string_view>
 #include <vector>
 
+#include <cerrno>
+
 namespace
 {
 
@@ -47,13 +49,14 @@ auto read_brkfile(const std::filesystem::path& filepath)
     return exprs;
 }
 
-auto set_debug_state(aldo_debugger* dbg,
-                     std::span<const aldo_debugexpr> exprs) noexcept
+auto set_debug_state(aldo_debugger* dbg, std::span<const aldo_debugexpr> exprs)
 {
     aldo_debug_reset(dbg);
     for (auto& expr : exprs) {
         if (expr.type == aldo_debugexpr::ALDO_DBG_EXPR_HALT) {
-            aldo_debug_bp_add(dbg, expr.hexpr);
+            if (!aldo_debug_bp_add(dbg, expr.hexpr)) throw aldo::AldoError{
+                "Cannot add breakpoint", "System error", errno,
+            };
         } else {
             aldo_debug_set_vector_override(dbg, expr.resetvector);
         }

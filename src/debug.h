@@ -43,8 +43,9 @@ int aldo_debug_vector_override(aldo_debugger *self) br_nothrow;
 br_libexport
 void aldo_debug_set_vector_override(aldo_debugger *self,
                                     int resetvector) br_nothrow;
-br_libexport
-void aldo_debug_bp_add(aldo_debugger *self,
+// NOTE: if returns false then errno is set due to failed allocation
+br_libexport br_checkerror
+bool aldo_debug_bp_add(aldo_debugger *self,
                        struct aldo_haltexpr expr) br_nothrow;
 br_libexport
 const struct aldo_breakpoint *aldo_debug_bp_at(aldo_debugger *self,

@@ -38,11 +38,9 @@ class Snapshot {
 public:
     explicit Snapshot(aldo_nes* console)
     {
-        if (!aldo_snapshot_extend(getp())) {
-            throw AldoError{
-                "Unable to extend snapshot", "System error", errno,
-            };
-        }
+        if (!aldo_snapshot_extend(getp())) throw AldoError{
+            "Unable to extend snapshot", "System error", errno,
+        };
         aldo_nes_snapshot(console, getp());
     }
     Snapshot(const Snapshot&) = default;

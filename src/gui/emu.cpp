@@ -45,9 +45,9 @@ auto load_cart(const std::filesystem::path& filepath)
 
     int err = aldo_cart_create(&c, f.get());
     if (err < 0) {
-        if (err == ALDO_CART_ERR_ERNO) {
-            throw aldo::AldoError{CartLoadFailure, "System error", errno};
-        }
+        if (err == ALDO_CART_ERR_ERNO) throw aldo::AldoError{
+            CartLoadFailure, "System error", errno,
+        };
         throw aldo::AldoError{CartLoadFailure, err, aldo_cart_errstr};
     };
 

@@ -114,7 +114,10 @@ static bool parse_dbg_expression(aldo_debugger *dbg,
         return false;
     } else {
         if (expr.type == ALDO_DBG_EXPR_HALT) {
-            aldo_debug_bp_add(dbg, expr.hexpr);
+            if (!aldo_debug_bp_add(dbg, expr.hexpr)) {
+                perror("Unable to add debug expression");
+                return false;
+            }
             if (verbose) {
                 char buf[ALDO_HEXPR_FMT_SIZE];
                 err = aldo_haltexpr_desc(&expr.hexpr, buf);

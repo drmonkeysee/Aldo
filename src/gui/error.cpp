@@ -34,7 +34,7 @@ auto build_display_what(std::string_view title, std::string_view message)
 auto errno_message(std::string& label, int err)
 {
     label += " [";
-    label += strerror(err);
+    label += std::strerror(err);
     label += " (";
     label += std::to_string(err);
     label += ")]";

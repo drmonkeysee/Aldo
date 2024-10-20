@@ -112,7 +112,7 @@ static size_t vram_copy(const void *restrict ctx, uint16_t addr, size_t count,
     return aldo_bytecopy_bank(ctx, ALDO_BITWIDTH_2KB, addr, count, dest);
 }
 
-static void create_mbus(struct aldo_nes001 *self)
+static bool create_mbus(struct aldo_nes001 *self)
 {
     // TODO: partitions so far:
     // 16-bit Address Space = 64KB
@@ -122,6 +122,8 @@ static void create_mbus(struct aldo_nes001 *self)
     // * $8000 - $FFFF: 32KB Cart
     self->cpu.mbus = aldo_bus_new(ALDO_BITWIDTH_64KB, 4, ALDO_MEMBLOCK_8KB,
                                   ALDO_MEMBLOCK_16KB, ALDO_MEMBLOCK_32KB);
+    if (!self->cpu.mbus) return false;
+
     bool r = aldo_bus_set(self->cpu.mbus, 0, (struct aldo_busdevice){
         ram_read,
         ram_write,
@@ -129,9 +131,10 @@ static void create_mbus(struct aldo_nes001 *self)
         self->ram,
     });
     assert(r);
+    return true;
 }
 
-static void create_vbus(struct aldo_nes001 *self)
+static bool create_vbus(struct aldo_nes001 *self)
 {
     // TODO: partitions so far:
     // 14-bit Address Space = 16KB
@@ -142,6 +145,8 @@ static void create_vbus(struct aldo_nes001 *self)
     //                  and thus not on the video bus, but reads do leak
     //                  through to the underlying VRAM.
     self->ppu.vbus = aldo_bus_new(ALDO_BITWIDTH_16KB, 2, ALDO_MEMBLOCK_8KB);
+    if (!self->ppu.vbus) return false;
+
     bool r = aldo_bus_set(self->ppu.vbus, ALDO_MEMBLOCK_8KB,
                           (struct aldo_busdevice){
         vram_read,
@@ -150,6 +155,7 @@ static void create_vbus(struct aldo_nes001 *self)
         self->vram,
     });
     assert(r);
+    return true;
 }
 
 static void connect_cart(struct aldo_nes001 *self, aldo_cart *c)
@@ -172,12 +178,13 @@ static void disconnect_cart(struct aldo_nes001 *self)
     self->cart = NULL;
 }
 
-static void setup(struct aldo_nes001 *self)
+static bool setup(struct aldo_nes001 *self)
 {
-    create_mbus(self);
-    create_vbus(self);
+    if (!create_mbus(self)) return false;
+    if (!create_vbus(self)) return false;
     aldo_ppu_connect(&self->ppu, self->cpu.mbus);
     aldo_debug_cpu_connect(self->dbg, &self->cpu);
+    return true;
 }
 
 static void teardown(struct aldo_nes001 *self)
@@ -277,13 +284,18 @@ aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
     assert(dbg != NULL);
 
     struct aldo_nes001 *self = malloc(sizeof *self);
+    if (!self) return self;
+
     self->cart = NULL;
     self->dbg = dbg;
     self->tracelog = tracelog;
     // TODO: ditch this option when aldo can emulate more than just NES
     self->cpu.bcd = bcdsupport;
     self->probe.irq = self->probe.nmi = self->probe.rst = false;
-    setup(self);
+    if (!setup(self)) {
+        aldo_nes_free(self);
+        return NULL;
+    }
     return self;
 }
 

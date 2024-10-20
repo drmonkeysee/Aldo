@@ -15,8 +15,10 @@
 #include <SDL2/SDL.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 static int run_emu(const struct gui_platform *platform)
 {
@@ -25,14 +27,16 @@ static int run_emu(const struct gui_platform *platform)
     aldo_debugger *dbg = aldo_debug_new();
     if (!dbg) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-                        "Unable to initialize debugger!");
+                        "Unable to initialize debugger (%d): %s", errno,
+                        strerror(errno));
         return EXIT_FAILURE;
     }
 
     aldo_nes *console = aldo_nes_new(dbg, false, NULL);
     if (!console) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-                        "Unable to initialize console!");
+                        "Unable to initialize console (%d): %s", errno,
+                        strerror(errno));
         aldo_debug_free(dbg);
         return EXIT_FAILURE;
     }

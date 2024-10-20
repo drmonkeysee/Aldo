@@ -21,6 +21,7 @@
 typedef struct aldo_nes001 aldo_nes;
 
 #include "bridgeopen.h"
+// NOTE: if returns NULL then errno is set due to failed allocation
 br_libexport br_ownresult
 aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport,
                        FILE *tracelog) br_nothrow;

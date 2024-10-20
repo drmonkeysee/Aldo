@@ -155,6 +155,10 @@ static bool parse_debug_file(aldo_debugger *dbg, FILE *f,
 static aldo_debugger *create_debugger(const struct cliargs *args)
 {
     aldo_debugger *dbg = aldo_debug_new();
+    if (!dbg) {
+        perror("Unable to initialize debugger");
+        return dbg;
+    }
     if (args->dbgfilepath) {
         FILE *f = fopen(args->dbgfilepath, "r");
         if (f) {
@@ -235,10 +239,7 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
         .cart = c,
         .debugger = create_debugger(args),
     };
-    if (!emu.debugger) {
-        fputs("Unable to initialize debugger!\n", stderr);
-        return EXIT_FAILURE;
-    }
+    if (!emu.debugger) return EXIT_FAILURE;
 
     if (emu.args->batch && emu.args->tron
         && aldo_debug_bp_count(emu.debugger) == 0) {
@@ -262,11 +263,15 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
     }
     emu.console = aldo_nes_new(emu.debugger, emu.args->bcdsupport, tracelog);
     if (!emu.console) {
-        fputs("Unable to initialize console!\n", stderr);
+        perror("Unable to initialize console");
         result = EXIT_FAILURE;
         goto exit_trace;
     }
-    aldo_snapshot_extend(&emu.snapshot);
+    if (!aldo_snapshot_extend(&emu.snapshot)) {
+        perror("Unable to extend snapshot");
+        result = EXIT_FAILURE;
+        goto exit_console;
+    }
     aldo_nes_powerup(emu.console, c, emu.args->zeroram);
 
     ui_loop *run_loop = setup_ui(&emu);
@@ -280,6 +285,7 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
     }
     dump_ram(&emu);
     aldo_snapshot_cleanup(&emu.snapshot);
+exit_console:
     aldo_nes_free(emu.console);
 exit_trace:
     if (tracelog) {

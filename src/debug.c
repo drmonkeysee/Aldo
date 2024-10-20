@@ -222,6 +222,8 @@ const ptrdiff_t Aldo_NoBreakpoint = -1;
 aldo_debugger *aldo_debug_new(void)
 {
     struct aldo_debugger_context *self = malloc(sizeof *self);
+    if (!self) return self;
+
     *self = (struct aldo_debugger_context){
         .halted = Aldo_NoBreakpoint,
         .resetvector = Aldo_NoResetVector,

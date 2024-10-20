@@ -42,6 +42,8 @@ aldo_bus *aldo_bus_new(int bitwidth, size_t n, ...)
 
     size_t psize = sizeof(struct partition) * n;
     struct aldo_hardwarebus *self = malloc(sizeof *self + psize);
+    if (!self) return self;
+
     *self = (struct aldo_hardwarebus){
         .count = n,
         .maxaddr = (uint16_t)(1 << bitwidth) - 1,

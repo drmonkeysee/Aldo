@@ -12,6 +12,7 @@
 #include "cart.h"
 #include "ctrlsignal.h"
 #include "debug.hpp"
+#include "error.hpp"
 #include "handle.hpp"
 #include "nes.h"
 #include "palette.hpp"
@@ -20,6 +21,8 @@
 #include <filesystem>
 #include <optional>
 #include <string_view>
+
+#include <cerrno>
 
 struct gui_platform;
 
@@ -33,9 +36,13 @@ using console_handle = handle<aldo_nes, aldo_nes_free>;
 
 class Snapshot {
 public:
-    explicit Snapshot(aldo_nes* console) noexcept
+    explicit Snapshot(aldo_nes* console)
     {
-        aldo_snapshot_extend(getp());
+        if (!aldo_snapshot_extend(getp())) {
+            throw AldoError{
+                "Unable to extend snapshot", "System error", errno,
+            };
+        }
         aldo_nes_snapshot(console, getp());
     }
     Snapshot(const Snapshot&) = default;

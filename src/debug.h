@@ -32,6 +32,7 @@ extern const int Aldo_NoResetVector;
 br_libexport
 extern const ptrdiff_t Aldo_NoBreakpoint;
 
+// NOTE: if returns NULL then errno is set due to failed allocation
 br_libexport br_ownresult
 aldo_debugger *aldo_debug_new(void) br_nothrow;
 br_libexport

@@ -8,7 +8,6 @@
 #include "emu.hpp"
 
 #include "attr.hpp"
-#include "error.hpp"
 #include "guiplatform.h"
 #include "viewstate.hpp"
 
@@ -16,7 +15,6 @@
 
 #include <exception>
 #include <utility>
-#include <cerrno>
 #include <cstdio>
 
 namespace

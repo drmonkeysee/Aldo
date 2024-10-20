@@ -355,8 +355,10 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
     int err;
     if (header->trainer) {
         // NOTE: skip 512 bytes of trainer data
-        err = fseek(f, 512, SEEK_CUR);
-        if (err != 0) goto cleanup;
+        if (fseek(f, 512, SEEK_CUR) != 0) {
+            err = ALDO_CART_ERR_ERNO;
+            goto cleanup;
+        }
     }
 
     if (header->wram) {

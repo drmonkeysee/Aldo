@@ -33,9 +33,11 @@ struct ines_000_mapper {
 static int load_blocks(uint8_t *restrict *mem, size_t size, FILE *f)
 {
     if (!(*mem = calloc(size, sizeof **mem))) return ALDO_CART_ERR_ERNO;
-    fread(*mem, sizeof **mem, size, f);
-    if (feof(f)) return ALDO_CART_ERR_EOF;
-    if (ferror(f)) return ALDO_CART_ERR_IO;
+    if (fread(*mem, sizeof **mem, size, f) < size) {
+        if (feof(f)) return ALDO_CART_ERR_EOF;
+        if (ferror(f)) return ALDO_CART_ERR_IO;
+        return ALDO_CART_ERR_UNKNOWN;
+    }
     return 0;
 }
 

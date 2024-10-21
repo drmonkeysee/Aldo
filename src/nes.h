@@ -60,7 +60,8 @@ int aldo_nes_frame_factor(void) br_nothrow;
 br_libexport
 void aldo_nes_snapshot(aldo_nes *self, struct aldo_snapshot *snp) br_nothrow;
 br_libexport
-void aldo_nes_dumpram(aldo_nes *self, FILE *fs[br_csz(3)]) br_nothrow;
+void aldo_nes_dumpram(aldo_nes *self, FILE *fs[br_csz(3)],
+                      bool errs[br_csz(3])) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

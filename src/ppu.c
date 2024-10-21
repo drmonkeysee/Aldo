@@ -11,9 +11,10 @@
 #include <stddef.h>
 #include <string.h>
 
-#define memclr(mem) memset(mem, 0, sizeof (mem) / sizeof (mem)[0]);
+#define memclr(mem) memset(mem, 0, sizeof (mem) / sizeof (mem)[0])
 #define memdump(mem, f) \
-fwrite(mem, sizeof (mem)[0], sizeof (mem) / sizeof (mem)[0], f);
+(fwrite(mem, sizeof (mem)[0], sizeof (mem) / sizeof (mem)[0], f) \
+== sizeof (mem) / sizeof (mem)[0])
 
 // NOTE: a single NTSC frame is 262 scanlines of 341 dots, counting h-blank,
 // v-blank, overscan, etc; nominally 1 frame is 262 * 341 = 89342 ppu cycles;
@@ -555,14 +556,14 @@ void aldo_ppu_vid_snapshot(const struct aldo_rp2c02 *self,
     snapshot_palette(self, snp->video->palettes.fg, 0x10);
 }
 
-void aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f)
+bool aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f)
 {
     assert(self != NULL);
     assert(f != NULL);
 
-    memdump(self->oam, f);
-    memdump(self->soam, f);
-    memdump(self->palette, f);
+    return memdump(self->oam, f)
+            && memdump(self->soam, f)
+            && memdump(self->palette, f);
 }
 
 struct aldo_ppu_coord aldo_ppu_trace(const struct aldo_rp2c02 *self,

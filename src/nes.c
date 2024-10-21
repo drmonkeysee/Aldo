@@ -447,19 +447,25 @@ void aldo_nes_snapshot(aldo_nes *self, struct aldo_snapshot *snp)
                       memsz(snp->prg.curr->pc), snp->prg.curr->pc);
 }
 
-void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3])
+void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3], bool errs[static 3])
 {
     assert(self != NULL);
     assert(fs != NULL);
+    assert(errs != NULL);
 
     FILE *f;
+    size_t witems, wcount;
     if ((f = fs[0])) {
-        fwrite(self->ram, sizeof self->ram[0], memsz(self->ram), f);
+        witems = memsz(self->ram);
+        wcount = fwrite(self->ram, sizeof self->ram[0], witems, f);
+        errs[0] = wcount < witems;
     }
     if ((f = fs[1])) {
-        fwrite(self->vram, sizeof self->vram[0], memsz(self->vram), f);
+        witems = memsz(self->vram);
+        wcount = fwrite(self->vram, sizeof self->vram[0], witems, f);
+        errs[1] = wcount < witems;
     }
     if ((f = fs[2])) {
-        aldo_ppu_dumpram(&self->ppu, f);
+        errs[2] = !aldo_ppu_dumpram(&self->ppu, f);
     }
 }

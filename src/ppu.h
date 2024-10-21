@@ -8,14 +8,14 @@
 #ifndef Aldo_ppu_h
 #define Aldo_ppu_h
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-
 #include "bus.h"
 #include "bytes.h"
 #include "ctrlsignal.h"
 #include "snapshot.h"
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
 
 // The Ricoh RP2C02 Picture Processing Unit (PPU) is a
 // fixed-function IC that generates the NES video signal.
@@ -123,7 +123,7 @@ void aldo_ppu_bus_snapshot(const struct aldo_rp2c02 *self,
                            struct aldo_snapshot *snp);
 void aldo_ppu_vid_snapshot(const struct aldo_rp2c02 *self,
                            struct aldo_snapshot *snp);
-void aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f);
+bool aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f);
 struct aldo_ppu_coord aldo_ppu_trace(const struct aldo_rp2c02 *self,
                                      int adjustment);
 

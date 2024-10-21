@@ -230,9 +230,13 @@ static void dump_ram(const struct emulator *emu)
             perror("Cannot open ramdump file");
         }
     }
-    aldo_nes_dumpram(emu->console, fs);
+    bool errs[sizeof dmpfiles / sizeof dmpfiles[0]];
+    aldo_nes_dumpram(emu->console, fs, errs);
     for (size_t i = 0; i < dmpcount; ++i) {
         if (fs[i]) {
+            if (errs[i]) {
+                fprintf(stderr, "Write ramdump failure %s: ", dmpfiles[i]);
+            }
             fclose(fs[i]);
         }
     }

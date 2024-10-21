@@ -49,6 +49,8 @@ bool aldo_nes_probe(aldo_nes *self, enum aldo_interrupt signal) br_nothrow;
 br_libexport
 void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal,
                         bool active) br_nothrow;
+br_libexport
+bool aldo_nes_tracefailed(aldo_nes *self) br_nothrow;
 
 br_libexport
 void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock) br_nothrow;

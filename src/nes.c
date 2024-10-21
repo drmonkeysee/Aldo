@@ -37,6 +37,7 @@ struct aldo_nes001 {
             nmi: 1,                     // NMI Probe
             rst: 1;                     // RESET Probe
     } probe;                            // Interrupt Input Probes (active high)
+    bool tracefailed;                   // Trace log I/O failed during run
     uint8_t ram[ALDO_MEMBLOCK_2KB],     // CPU Internal RAM
             vram[ALDO_MEMBLOCK_2KB];    // PPU Internal RAM
 };
@@ -225,15 +226,17 @@ static void bus_snapshot(const struct aldo_nes001 *self,
 static void instruction_trace(struct aldo_nes001 *self,
                               const struct aldo_clock *clock, int adjustment)
 {
-    if (!self->tracelog || !self->cpu.signal.sync) return;
+    if (!self->tracelog || self->tracefailed || !self->cpu.signal.sync) return;
 
     struct aldo_snapshot snp = {0};
     bus_snapshot(self, &snp);
+    struct aldo_ppu_coord c = aldo_ppu_trace(&self->ppu,
+                                             adjustment * PpuRatio);
     // NOTE: trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
-    aldo_trace_line(self->tracelog, clock->cycles + (uint64_t)adjustment,
-                    aldo_ppu_trace(&self->ppu, adjustment * PpuRatio),
-                    &self->cpu, self->dbg, &snp);
+    self->tracefailed = !aldo_trace_line(self->tracelog,
+                                         clock->cycles + (uint64_t)adjustment,
+                                         c, &self->cpu, self->dbg, &snp);
 }
 
 static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
@@ -289,6 +292,7 @@ aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
     self->cart = NULL;
     self->dbg = dbg;
     self->tracelog = tracelog;
+    self->tracefailed = false;
     // TODO: ditch this option when aldo can emulate more than just NES
     self->cpu.bcd = bcdsupport;
     self->probe.irq = self->probe.nmi = self->probe.rst = false;
@@ -406,6 +410,13 @@ void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal,
         assert(((void)"INVALID NES PROBE", false));
         break;
     }
+}
+
+bool aldo_nes_tracefailed(aldo_nes *self)
+{
+    assert(self != NULL);
+
+    return self->tracefailed;
 }
 
 void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)

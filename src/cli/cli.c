@@ -298,6 +298,10 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
     dump_ram(&emu);
     aldo_snapshot_cleanup(&emu.snapshot);
 exit_console:
+    if (aldo_nes_tracefailed(emu.console)) {
+        fputs("Trace file I/O failure\n", stderr);
+        result = EXIT_FAILURE;
+    }
     aldo_nes_free(emu.console);
 exit_trace:
     if (tracelog) {

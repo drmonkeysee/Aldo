@@ -12,7 +12,6 @@
 
 #include <assert.h>
 #include <inttypes.h>
-#include <stdbool.h>
 #include <stddef.h>
 
 static int trace_instruction(FILE *tracelog, const struct aldo_mos6502 *cpu,
@@ -46,28 +45,30 @@ static int trace_instruction_peek(FILE *tracelog, struct aldo_mos6502 *cpu,
                    result < 0 ? aldo_dis_errstr(result) : peek);
 }
 
-static void trace_registers(FILE *tracelog, const struct aldo_snapshot *snp)
+static bool trace_registers(FILE *tracelog, const struct aldo_snapshot *snp)
 {
     static const char flags[] = {
         'c', 'C', 'z', 'Z', 'i', 'I', 'd', 'D',
         'b', 'B', '-', '-', 'v', 'V', 'n', 'N',
     };
 
-    fprintf(tracelog, " A:%02X X:%02X Y:%02X P:%02X (", snp->cpu.accumulator,
-            snp->cpu.xindex, snp->cpu.yindex, snp->cpu.status);
+    int err = fprintf(tracelog, " A:%02X X:%02X Y:%02X P:%02X (",
+                      snp->cpu.accumulator, snp->cpu.xindex, snp->cpu.yindex,
+                      snp->cpu.status);
+    if (err < 0) return false;
     for (size_t i = sizeof snp->cpu.status * 8; i > 0; --i) {
         size_t idx = i - 1;
         bool bit = aldo_byte_getbit(snp->cpu.status, idx);
-        fputc(flags[(idx * 2) + bit], tracelog);
+        if (fputc(flags[(idx * 2) + bit], tracelog) == EOF) return false;
     }
-    fprintf(tracelog, ") S:%02X", snp->cpu.stack_pointer);
+    return fprintf(tracelog, ") S:%02X", snp->cpu.stack_pointer) > 0;
 }
 
 //
 // MARK: - Public Interface
 //
 
-void aldo_trace_line(FILE *tracelog, uint64_t cycles,
+bool aldo_trace_line(FILE *tracelog, uint64_t cycles,
                      struct aldo_ppu_coord pixel, struct aldo_mos6502 *cpu,
                      aldo_debugger *dbg, const struct aldo_snapshot *snp)
 {
@@ -79,12 +80,18 @@ void aldo_trace_line(FILE *tracelog, uint64_t cycles,
     // NOTE: does not include leading space in trace_registers
     static const int instw = 47;
 
-    int written = trace_instruction(tracelog, cpu, snp)
-                    + trace_instruction_peek(tracelog, cpu, dbg, snp),
-        width = written < 0 ? instw : (written > instw ? 0 : instw - written);
+    int written = trace_instruction(tracelog, cpu, snp);
+    if (written < 0) return false;
+    int peek = trace_instruction_peek(tracelog, cpu, dbg, snp);
+    if (peek < 0) {
+        return false;
+    } else {
+        written += peek;
+    }
+    int width = written <= instw ? instw - written : 0;
     assert(written <= instw);
-    fprintf(tracelog, "%*s", width, "");
-    trace_registers(tracelog, snp);
-    fprintf(tracelog, " PPU:%3d,%3d CPU:%" PRIu64 "\n", pixel.line, pixel.dot,
-            cycles);
+    if (fprintf(tracelog, "%*s", width, "") < 0) return false;
+    if (!trace_registers(tracelog, snp)) return false;
+    return fprintf(tracelog, " PPU:%3d,%3d CPU:%" PRIu64 "\n", pixel.line,
+                   pixel.dot, cycles) > 0;
 }

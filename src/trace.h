@@ -13,10 +13,11 @@
 #include "ppu.h"
 #include "snapshot.h"
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
-void aldo_trace_line(FILE *tracelog, uint64_t cycles,
+bool aldo_trace_line(FILE *tracelog, uint64_t cycles,
                      struct aldo_ppu_coord pixel, struct aldo_mos6502 *cpu,
                      aldo_debugger *dbg, const struct aldo_snapshot *snp);
 

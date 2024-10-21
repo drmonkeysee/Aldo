@@ -164,33 +164,36 @@ struct repeat_condition {
     bool skip;
 };
 
-static void print_prg_line(const char *restrict dis, bool verbose,
-                           const struct aldo_dis_instruction *curr_inst,
-                           struct repeat_condition *repeat, FILE *f)
+static int print_prg_line(const char *restrict dis, bool verbose,
+                          const struct aldo_dis_instruction *curr_inst,
+                          struct repeat_condition *repeat, FILE *f)
 {
-    if (verbose) {
-        fprintf(f, "%s\n", dis);
-        return;
-    }
+    if (verbose && fprintf(f, "%s\n", dis) < 0) goto io_failure;
 
     if (aldo_dis_inst_equal(curr_inst, &repeat->prev_inst)) {
         // NOTE: only print placeholder on first duplicate seen
         if (!repeat->skip) {
             repeat->skip = true;
-            fputs("*\n", f);
+            if (fputs("*\n", f) == EOF) goto io_failure;
         }
     } else {
-        fprintf(f, "%s\n", dis);
+        if (fprintf(f, "%s\n", dis) < 0) goto io_failure;
         repeat->prev_inst = *curr_inst;
         repeat->skip = false;
     }
+    return 0;
+
+io_failure:
+    return ALDO_DIS_ERR_IO;
 }
 
 static int print_prgblock(const struct aldo_blockview *bv, bool verbose,
                           FILE *f)
 {
-    fprintf(f, "Block %zu (%zuKB)\n", bv->ord, bv->size >> ALDO_BITWIDTH_1KB);
-    fputs("--------\n", f);
+    int io_err = fprintf(f, "Block %zu (%zuKB)\n", bv->ord,
+                         bv->size >> ALDO_BITWIDTH_1KB);
+    if (io_err < 0) return ALDO_DIS_ERR_IO;
+    if (fputs("--------\n", f) == EOF) return ALDO_DIS_ERR_IO;
 
     struct repeat_condition repeat = {0};
     struct aldo_dis_instruction inst;
@@ -205,15 +208,15 @@ static int print_prgblock(const struct aldo_blockview *bv, bool verbose,
          result = aldo_dis_parse_inst(bv, inst.offset + inst.bv.size, &inst)) {
         result = aldo_dis_inst(addr, &inst, dis);
         if (result <= 0) break;
-        print_prg_line(dis, verbose, &inst, &repeat, f);
+        io_err = print_prg_line(dis, verbose, &inst, &repeat, f);
+        if (io_err < 0) break;
         addr += (uint16_t)inst.bv.size;
     }
     if (result < 0) return result;
+    if (io_err < 0) return io_err;
 
     // NOTE: always print the last line even if it would normally be skipped
-    if (repeat.skip) {
-        fprintf(f, "%s\n", dis);
-    }
+    if (repeat.skip && fprintf(f, "%s\n", dis) < 0) return ALDO_DIS_ERR_IO;
     return 0;
 }
 
@@ -342,8 +345,10 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
     aldo_dwtoba(BMP_HEADER_SIZE + (bmph * packedrow_size),  // bfSize
                 fileheader + 2);
     aldo_dwtoba(BMP_HEADER_SIZE, fileheader + 10);          // bfOffBits
-    fwrite(fileheader, sizeof fileheader[0],
-           sizeof fileheader / sizeof fileheader[0], bmpfile);
+    size_t
+        witems = sizeof fileheader / sizeof fileheader[0],
+        wcount = fwrite(fileheader, sizeof fileheader[0], witems, bmpfile);
+    if (wcount < witems) return ALDO_DIS_ERR_IO;
 
     /*
      Info Header
@@ -369,8 +374,9 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
     };
     aldo_dwtoba(bmpw, infoheader + 4);   // biWidth
     aldo_dwtoba(bmph, infoheader + 8);   // biHeight
-    fwrite(infoheader, sizeof infoheader[0],
-           sizeof infoheader / sizeof infoheader[0], bmpfile);
+    witems = sizeof infoheader / sizeof infoheader[0];
+    wcount = fwrite(infoheader, sizeof infoheader[0], witems, bmpfile);
+    if (wcount < witems) return ALDO_DIS_ERR_IO;
 
     /*
      Palettes
@@ -389,8 +395,9 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
         182, 182, 182, 0,   // #b6b6b6
         255, 255, 255, 0,   // #ffffff
     };
-    fwrite(palettes, sizeof palettes[0], sizeof palettes / sizeof palettes[0],
-           bmpfile);
+    witems = sizeof palettes / sizeof palettes[0];
+    wcount = fwrite(palettes, sizeof palettes[0], witems, bmpfile);
+    if (wcount < witems) return ALDO_DIS_ERR_IO;
 
     // NOTE: BMP pixels are written bottom-row first
     uint8_t *packedrow = calloc(packedrow_size, sizeof *packedrow);
@@ -404,14 +411,15 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
                 fill_tile_sheet_row(packedrow, (uint32_t)tiley,
                                     (uint32_t)pixely, tilesdim, tile_sections,
                                     scale, section_pxldim, bv);
-                fwrite(packedrow, sizeof *packedrow,
-                       packedrow_size / sizeof *packedrow, bmpfile);
+                witems = packedrow_size / sizeof *packedrow;
+                wcount = fwrite(packedrow, sizeof *packedrow, witems, bmpfile);
+                if (wcount < witems) goto cleanup;
             }
         }
     }
+cleanup:
     free(packedrow);
-
-    return 0;
+    return wcount < witems ? ALDO_DIS_ERR_ERNO : 0;
 }
 
 static int write_chrblock(const struct aldo_blockview *bv, uint32_t scale,
@@ -428,13 +436,14 @@ static int write_chrblock(const struct aldo_blockview *bv, uint32_t scale,
     fclose(bmpfile);
 
     if (err == 0) {
-        fprintf(output, "Block %zu (%zuKB), %u x %u tiles (%u section%s)",
-                bv->ord, bv->size >> ALDO_BITWIDTH_1KB, tilesdim, tilesdim,
-                tile_sections, tile_sections == 1 ? "" : "s");
-        if (scale > 1) {
-            fprintf(output, " (%ux scale)", scale);
-        }
-        fprintf(output, ": %s\n", bmpfilename);
+        err = fprintf(output,
+                      "Block %zu (%zuKB), %u x %u tiles (%u section%s)",
+                      bv->ord, bv->size >> ALDO_BITWIDTH_1KB, tilesdim,
+                      tilesdim, tile_sections, tile_sections == 1 ? "" : "s");
+        if (err < 0) return ALDO_DIS_ERR_IO;
+        if (scale > 1 && fprintf(output, " (%ux scale)", scale) < 0)
+            return ALDO_DIS_ERR_IO;
+        if (fprintf(output, ": %s\n", bmpfilename) < 0) return ALDO_DIS_ERR_IO;
     }
 
     return err;
@@ -588,13 +597,14 @@ int aldo_dis_cart_prg(aldo_cart *cart, const char *restrict name, bool verbose,
     if (aldo_cart_write_dis_header(cart, name, f) < 0) return ALDO_DIS_ERR_IO;
 
     do {
-        fputc('\n', f);
+        if (fputc('\n', f) == EOF) return ALDO_DIS_ERR_IO;
         int err = print_prgblock(&bv, verbose, f);
         // NOTE: disassembly errors may occur normally if data bytes are
         // interpreted as instructions so note the result and continue.
         if (err < 0) {
-            fprintf(unified_output ? f : stderr,
-                    "Dis err (%d): %s\n", err, aldo_dis_errstr(err));
+            err = fprintf(unified_output ? f : stderr,
+                          "Dis err (%d): %s\n", err, aldo_dis_errstr(err));
+            if (err < 0) return ALDO_DIS_ERR_IO;
         }
         bv = aldo_cart_prgblock(cart, bv.ord + 1);
     } while (bv.mem);

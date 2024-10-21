@@ -71,7 +71,12 @@ static int print_cart_info(const struct cliargs *args, aldo_cart *c)
     const char *name = args->verbose
                         ? args->filepath
                         : argparse_filename(args->filepath);
-    aldo_cart_write_info(c, name, args->verbose, stdout);
+    int err = aldo_cart_write_info(c, name, args->verbose, stdout);
+    if (err < 0) {
+        fprintf(stderr, "Cart info print failure (%d): %s\n", err,
+                aldo_cart_errstr(err));
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }
 

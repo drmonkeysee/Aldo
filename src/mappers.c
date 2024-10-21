@@ -372,7 +372,7 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
     }
 
     err = load_blocks(&self->prg, header->prg_blocks * ALDO_MEMBLOCK_16KB, f);
-    if (err != 0) goto cleanup;
+    if (err < 0) goto cleanup;
 
     if (header->chr_blocks == 0) {
         // TODO: this size is controlled by the mapper in many cases

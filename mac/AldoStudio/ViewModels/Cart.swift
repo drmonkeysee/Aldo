@@ -44,7 +44,9 @@ final class Cart {
         guard let handle else { return noCart }
 
         return await readCStream {
-            aldo_cart_write_info(handle.unwrapped, info.cartName, true, $0)
+            let err = aldo_cart_write_info(handle.unwrapped, info.cartName,
+                                           true, $0)
+            if err < 0 { throw AldoError.wrapCartError(code: err) }
         }
     }
 
@@ -81,7 +83,6 @@ final class Cart {
         return await readCStream { stream in
             let prefix = "\(folder.appendingPathComponent(name).path)-chr"
             try prefix.withCString { chrprefix in
-                errno = 0
                 let err = aldo_dis_cart_chr(handle.unwrapped, Int32(scale),
                                             chrprefix, stream)
                 if err < 0 { throw AldoError.wrapDisError(code: err) }
@@ -200,7 +201,6 @@ fileprivate final class CartHandle {
     private var cartRef: OpaquePointer?
 
     init(_ fromFile: URL) throws {
-        errno = 0
         let cFile = fromFile.withUnsafeFileSystemRepresentation {
             fopen($0, "rb")
         }

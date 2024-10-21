@@ -16,7 +16,6 @@ enum CStreamResult {
 func readCStream(binary: Bool = false,
                  operation: CStreamOp) async -> CStreamResult {
     let p = Pipe()
-    errno = 0
     // NOTE: when reading multiple async cstreams Swift and C don't seem to
     // agree on when a file descriptor is available and FDs will be recycled
     // for new Pipes before fclose frees them, causing a read-after-close
@@ -59,7 +58,6 @@ fileprivate func cleanup(_ stream: CStream,
     // fclose the cstream first to flush the buffer and clean up the
     // FILE structure, then close the FileHandle so its readability
     // handler gets EOF and completes the buffered read.
-    errno = 0
     if fclose(stream) == 0 {
         do {
             try file.close()

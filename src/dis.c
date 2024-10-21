@@ -585,7 +585,8 @@ int aldo_dis_cart_prg(aldo_cart *cart, const char *restrict name, bool verbose,
     struct aldo_blockview bv = aldo_cart_prgblock(cart, 0);
     if (!bv.mem) return ALDO_DIS_ERR_PRGROM;
 
-    aldo_cart_write_dis_header(cart, name, f);
+    if (aldo_cart_write_dis_header(cart, name, f) < 0) return ALDO_DIS_ERR_IO;
+
     do {
         fputc('\n', f);
         int err = print_prgblock(&bv, verbose, f);

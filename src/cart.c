@@ -55,9 +55,11 @@ static int parse_ines(struct aldo_cartridge *self, FILE *f)
 {
     unsigned char header[16];
 
-    fread(header, sizeof header[0], sizeof header, f);
-    if (feof(f)) return ALDO_CART_ERR_EOF;
-    if (ferror(f)) return ALDO_CART_ERR_IO;
+    if (fread(header, sizeof header[0], sizeof header, f) < sizeof header) {
+        if (feof(f)) return ALDO_CART_ERR_EOF;
+        if (ferror(f)) return ALDO_CART_ERR_IO;
+        return ALDO_CART_ERR_UNKNOWN;
+    }
 
     // NOTE: if last 4 bytes of header aren't 0 this is a very old format
     uint32_t tail;
@@ -103,9 +105,9 @@ static int parse_raw(struct aldo_cartridge *self, FILE *f)
     return err;
 }
 
-static void hr(FILE *f)
+static bool hr(FILE *f)
 {
-    fputs("-----------------------\n", f);
+    return fputs("-----------------------\n", f) != EOF;
 }
 
 static const char *boolstr(bool value)
@@ -113,8 +115,8 @@ static const char *boolstr(bool value)
     return value ? "yes" : "no";
 }
 
-static void write_ines_info(const struct aldo_cartinfo *info, FILE *f,
-                            bool verbose)
+static int write_ines_info(const struct aldo_cartinfo *info, FILE *f,
+                           bool verbose)
 {
     static const char
         *const restrict fullsize = " x 16KB",
@@ -123,61 +125,71 @@ static void write_ines_info(const struct aldo_cartinfo *info, FILE *f,
         *const restrict chrromlbl = "CHR ROM\t\t: ",
         *const restrict chrramlbl = "CHR RAM\t\t: ";
 
-    fprintf(f, "Mapper\t\t: %03u%s\n", info->ines_hdr.mapper_id,
-            info->ines_hdr.mapper_implemented ? "" : " (Not Implemented)");
+
+    int err = fprintf(f, "Mapper\t\t: %03u%s\n", info->ines_hdr.mapper_id,
+                      info->ines_hdr.mapper_implemented
+                          ? ""
+                          : " (Not Implemented)");
+    if (err < 0) goto io_failure;
     if (verbose) {
         // TODO: add board names
-        fputs("Boards\t\t: <Board Names>\n", f);
-        hr(f);
+        if (fputs("Boards\t\t: <Board Names>\n", f) == EOF || !hr(f))
+            goto io_failure;
     }
 
-    fprintf(f, "PRG ROM\t\t: %u%s\n", info->ines_hdr.prg_blocks,
-            verbose ? fullsize : "");
+    err = fprintf(f, "PRG ROM\t\t: %u%s\n", info->ines_hdr.prg_blocks,
+                  verbose ? fullsize : "");
+    if (err < 0) goto io_failure;
     if (info->ines_hdr.wram) {
-        fprintf(f, "%s%u%s\n", wramlbl,
-                info->ines_hdr.wram_blocks > 0
-                    ? info->ines_hdr.wram_blocks
-                    : 1u,
-                verbose ? halfsize : "");
-    } else if (verbose) {
-        fprintf(f, "%sno\n", wramlbl);
+        err = fprintf(f, "%s%u%s\n", wramlbl,
+                      info->ines_hdr.wram_blocks > 0
+                          ? info->ines_hdr.wram_blocks
+                          : 1u,
+                      verbose ? halfsize : "");
+        if (err < 0) goto io_failure;
+    } else if (verbose && fprintf(f, "%sno\n", wramlbl) < 0) {
+        goto io_failure;
     }
 
     if (info->ines_hdr.chr_blocks > 0) {
-        fprintf(f, "%s%u%s\n", chrromlbl, info->ines_hdr.chr_blocks,
-                verbose ? halfsize : "");
-        if (verbose) {
-            fprintf(f, "%sno\n", chrramlbl);
-        }
+        err = fprintf(f, "%s%u%s\n", chrromlbl, info->ines_hdr.chr_blocks,
+                      verbose ? halfsize : "");
+        if (err < 0) goto io_failure;
+        if (verbose && fprintf(f, "%sno\n", chrramlbl) < 0) goto io_failure;
     } else {
-        if (verbose) {
-            fprintf(f, "%sno\n", chrromlbl);
-        }
-        fprintf(f, "%s1%s\n", chrramlbl, verbose ? halfsize : "");
+        if (verbose && fprintf(f, "%sno\n", chrromlbl) < 0) goto io_failure;
+        err = fprintf(f, "%s1%s\n", chrramlbl, verbose ? halfsize : "");
+        if (err < 0) goto io_failure;
     }
-    fprintf(f, "NT-Mirroring\t: %s\n",
-            aldo_cart_mirrorname(info->ines_hdr.mirror));
+    err = fprintf(f, "NT-Mirroring\t: %s\n",
+                  aldo_cart_mirrorname(info->ines_hdr.mirror));
+    if (err < 0) goto io_failure;
     if (verbose || info->ines_hdr.mapper_controlled) {
-        fprintf(f, "Mapper-Ctrl\t: %s\n",
-                boolstr(info->ines_hdr.mapper_controlled));
+        err = fprintf(f, "Mapper-Ctrl\t: %s\n",
+                      boolstr(info->ines_hdr.mapper_controlled));
+        if (err < 0) goto io_failure;
     }
 
-    if (verbose) {
-        hr(f);
-    }
+    if (verbose && !hr(f)) goto io_failure;
     if (verbose || info->ines_hdr.trainer) {
-        fprintf(f, "Trainer\t\t: %s\n", boolstr(info->ines_hdr.trainer));
+        err = fprintf(f, "Trainer\t\t: %s\n", boolstr(info->ines_hdr.trainer));
+        if (err < 0) goto io_failure;
     }
     if (verbose || info->ines_hdr.bus_conflicts) {
-        fprintf(f, "Bus Conflicts\t: %s\n",
-                boolstr(info->ines_hdr.bus_conflicts));
+        err = fprintf(f, "Bus Conflicts\t: %s\n",
+                      boolstr(info->ines_hdr.bus_conflicts));
+        if (err < 0) goto io_failure;
     }
+    return 0;
+
+io_failure:
+    return ALDO_CART_ERR_IO;
 }
 
-static void write_raw_info(FILE *f)
+static int write_raw_info(FILE *f)
 {
     // TODO: assume 32KB size for now
-    fputs("PRG ROM\t: 1 x 32KB\n", f);
+    return fputs("PRG ROM\t: 1 x 32KB\n", f) == EOF ? ALDO_CART_ERR_IO : 0;
 }
 
 static bool is_nes(const struct aldo_cartridge *self)
@@ -287,23 +299,23 @@ int aldo_cart_format_extname(aldo_cart *self,
     return total;
 }
 
-void aldo_cart_write_info(aldo_cart *self, const char *restrict name,
-                          bool verbose, FILE *f)
+int aldo_cart_write_info(aldo_cart *self, const char *restrict name,
+                         bool verbose, FILE *f)
 {
     assert(self != NULL);
     assert(name != NULL);
     assert(f != NULL);
 
-    fprintf(f, "File\t\t: %s\n", name);
-    fprintf(f, "Format\t\t: %s\n", aldo_cart_formatname(self->info.format));
-    if (verbose) {
-        hr(f);
-    }
-    if (is_nes(self)) {
-        write_ines_info(&self->info, f, verbose);
-    } else {
-        write_raw_info(f);
-    }
+    int err = fprintf(f, "File\t\t: %s\n", name);
+    if (err < 0) return ALDO_CART_ERR_IO;
+    err = fprintf(f, "Format\t\t: %s\n",
+                  aldo_cart_formatname(self->info.format));
+    if (err < 0) return ALDO_CART_ERR_IO;
+    if (verbose && !hr(f)) return ALDO_CART_ERR_IO;
+
+    return is_nes(self)
+            ? write_ines_info(&self->info, f, verbose)
+            : write_raw_info(f);
 }
 
 void aldo_cart_getinfo(aldo_cart *self, struct aldo_cartinfo *info)
@@ -394,21 +406,26 @@ void aldo_cart_vbus_disconnect(aldo_cart *self, aldo_bus *b)
     }
 }
 
-void aldo_cart_write_dis_header(aldo_cart *self, const char *restrict name,
-                                FILE *f)
+int aldo_cart_write_dis_header(aldo_cart *self, const char *restrict name,
+                               FILE *f)
 {
     assert(self != NULL);
     assert(name != NULL);
     assert(f != NULL);
 
-    fprintf(f, "%s\n", name);
+    int err = fprintf(f, "%s\n", name);
+    if (err < 0) return ALDO_CART_ERR_IO;
+
     char fmtd[ALDO_CART_FMT_SIZE];
-    int err = aldo_cart_format_extname(self, fmtd);
-    fputs(err < 0 ? aldo_cart_errstr(err) : fmtd, f);
-    fputs("\n\nDisassembly of PRG ROM\n", f);
-    if (self->info.format != ALDO_CRTF_ALDO) {
-        fputs("(NOTE: approximate for non-Aldo formats)\n", f);
-    }
+    err = aldo_cart_format_extname(self, fmtd);
+    if (fputs(err < 0 ? aldo_cart_errstr(err) : fmtd, f) == EOF)
+        return ALDO_CART_ERR_IO;
+    if (fputs("\n\nDisassembly of PRG ROM\n", f) == EOF)
+        return ALDO_CART_ERR_IO;
+    if (self->info.format != ALDO_CRTF_ALDO
+        && fputs("(NOTE: approximate for non-Aldo formats)\n", f) == EOF)
+        return ALDO_CART_ERR_IO;
+    return 0;
 }
 
 void aldo_cart_snapshot(aldo_cart *self, struct aldo_snapshot *snp)

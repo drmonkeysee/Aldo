@@ -76,7 +76,7 @@ struct aldo_cartinfo {
 // X(symbol, value, error string)
 #define ALDO_CART_ERRCODE_X \
 X(CART_ERR_UNKNOWN, -1, "UNKNOWN CART LOAD ERROR") \
-X(CART_ERR_IO, -2, "FILE READ ERROR") \
+X(CART_ERR_IO, -2, "FILE I/O ERROR") \
 X(CART_ERR_IMG_SIZE, -3, "ROM IMAGE TOO LARGE") \
 X(CART_ERR_EOF, -4, "UNEXPECTED EOF") \
 X(CART_ERR_OBSOLETE, -5, "OBSOLETE FORMAT") \
@@ -125,8 +125,8 @@ int
 aldo_cart_format_extname(aldo_cart *self,
                          char buf[br_nacsz(ALDO_CART_FMT_SIZE)]) br_nothrow;
 br_libexport
-void aldo_cart_write_info(aldo_cart *self, const char *br_noalias name,
-                          bool verbose, FILE *f) br_nothrow;
+int aldo_cart_write_info(aldo_cart *self, const char *br_noalias name,
+                         bool verbose, FILE *f) br_nothrow;
 br_libexport
 void aldo_cart_getinfo(aldo_cart *self, struct aldo_cartinfo *info) br_nothrow;
 
@@ -144,8 +144,8 @@ void aldo_cart_mbus_disconnect(aldo_cart *self, aldo_bus *b) br_nothrow;
 bool aldo_cart_vbus_connect(aldo_cart *self, aldo_bus *b) br_nothrow;
 void aldo_cart_vbus_disconnect(aldo_cart *self, aldo_bus *b) br_nothrow;
 
-void aldo_cart_write_dis_header(aldo_cart *self, const char *br_noalias name,
-                                FILE *f) br_nothrow;
+int aldo_cart_write_dis_header(aldo_cart *self, const char *br_noalias name,
+                               FILE *f) br_nothrow;
 void aldo_cart_snapshot(aldo_cart *self, struct aldo_snapshot *snp) br_nothrow;
 #include "bridgeclose.h"
 

@@ -99,6 +99,17 @@ struct aldo_rp2c02 {
         odd,                // Current frame is even or odd
         w;                  // Write latch for x2 registers
 
+    // Rendering Pipeline
+    uint8_t nt,             // Nametable Fetch
+            at,             // Attribute Table Fetch
+            ats[2],         // Attribute Table Select/Shift
+            bg[2],          // Background Tile Fetch
+            bgl[2],         // Background Tile Latch
+            bgs[2];         // Background Tile Select/Shift
+    bool atl[2];            // Attribute Table Latch (2 bits)
+    // TODO: 8 sprite select/shifts
+
+
     // Internal Memory
     uint8_t oam[256],       // Object Attribute Memory: internal storage
                             // for sprite attributes.

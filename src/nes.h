@@ -37,7 +37,11 @@ void aldo_nes_powerdown(aldo_nes *self) br_nothrow;
 br_libexport
 size_t aldo_nes_ram_size(aldo_nes *self) br_nothrow;
 br_libexport
+void aldo_nes_screen_size(int *width, int *height) br_nothrow;
+br_libexport
 bool aldo_nes_bcd_support(aldo_nes *self) br_nothrow;
+br_libexport
+bool aldo_nes_tracefailed(aldo_nes *self) br_nothrow;
 br_libexport
 enum aldo_execmode aldo_nes_mode(aldo_nes *self) br_nothrow;
 br_libexport
@@ -49,8 +53,6 @@ bool aldo_nes_probe(aldo_nes *self, enum aldo_interrupt signal) br_nothrow;
 br_libexport
 void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal,
                         bool active) br_nothrow;
-br_libexport
-bool aldo_nes_tracefailed(aldo_nes *self) br_nothrow;
 
 br_libexport
 void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock) br_nothrow;
@@ -63,7 +65,7 @@ br_libexport
 void aldo_nes_snapshot(aldo_nes *self, struct aldo_snapshot *snp) br_nothrow;
 br_libexport
 void aldo_nes_dumpram(aldo_nes *self, FILE *fs[br_csz(3)],
-                      bool errs[br_csz(3])) br_nothrow;
+                      bool errs[br_csz(3)]) br_nothrow;
 #include "bridgeclose.h"
 
 #endif

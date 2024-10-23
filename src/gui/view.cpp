@@ -493,7 +493,7 @@ class BouncerView final : public aldo::View {
 public:
     BouncerView(aldo::viewstate& vs, const aldo::Emulator& emu,
                 const aldo::MediaRuntime& mr)
-    : View{"Bouncer", vs, emu, mr}, bouncer{vs.bouncer.bounds, mr}
+    : View{"Bouncer", vs, emu, mr}, bouncer{emu.screenSize(), mr}
     {}
     BouncerView(aldo::viewstate&, aldo::Emulator&&,
                 const aldo::MediaRuntime&) = delete;

@@ -22,6 +22,11 @@
 
 static const int PpuRatio = 3;
 
+enum {
+    SCREEN_WIDTH = 256,
+    SCREEN_HEIGHT = 240,
+};
+
 // The NES-001 NTSC Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
 struct aldo_nes001 {
@@ -39,7 +44,8 @@ struct aldo_nes001 {
     } probe;                            // Interrupt Input Probes (active high)
     bool tracefailed;                   // Trace log I/O failed during run
     uint8_t ram[ALDO_MEMBLOCK_2KB],     // CPU Internal RAM
-            vram[ALDO_MEMBLOCK_2KB];    // PPU Internal RAM
+            vram[ALDO_MEMBLOCK_2KB],    // PPU Internal RAM
+            screen[SCREEN_WIDTH * SCREEN_HEIGHT];   // Video Buffer
 };
 
 static void ram_load(uint8_t *restrict d, const uint8_t *restrict mem,
@@ -345,11 +351,27 @@ size_t aldo_nes_ram_size(aldo_nes *self)
     return memsz(self->ram);
 }
 
+void aldo_nes_screen_size(int *width, int *height)
+{
+    assert(width != NULL);
+    assert(height != NULL);
+
+    *width = SCREEN_WIDTH;
+    *height = SCREEN_HEIGHT;
+}
+
 bool aldo_nes_bcd_support(aldo_nes *self)
 {
     assert(self != NULL);
 
     return self->cpu.bcd;
+}
+
+bool aldo_nes_tracefailed(aldo_nes *self)
+{
+    assert(self != NULL);
+
+    return self->tracefailed;
 }
 
 enum aldo_execmode aldo_nes_mode(aldo_nes *self)
@@ -410,13 +432,6 @@ void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal,
         assert(((void)"INVALID NES PROBE", false));
         break;
     }
-}
-
-bool aldo_nes_tracefailed(aldo_nes *self)
-{
-    assert(self != NULL);
-
-    return self->tracefailed;
 }
 
 void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)

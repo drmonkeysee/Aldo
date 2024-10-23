@@ -89,6 +89,7 @@ struct aldo_rp2c02 {
     uint16_t
         dot,                // Current Dot
         line,               // Current Scanline
+        pixel,              // Current Pixel (visible dot in 256x240 region)
         t,                  // Temp VRAM/Scrolling Address (15 bits)
         v;                  // Current VRAM/Scrolling Address (15 bits)
     uint8_t rbuf,           // PPUDATA Read Buffer
@@ -100,12 +101,12 @@ struct aldo_rp2c02 {
         w;                  // Write latch for x2 registers
 
     // Rendering Pipeline
-    uint8_t nt,             // Nametable Fetch
-            at,             // Attribute Table Fetch
+    uint8_t at,             // Attribute Table Fetch
             ats[2],         // Attribute Table Select/Shift
             bg[2],          // Background Tile Fetch
             bgl[2],         // Background Tile Latch
-            bgs[2];         // Background Tile Select/Shift
+            bgs[2],         // Background Tile Select/Shift
+            nt;             // Nametable Fetch
     bool atl[2];            // Attribute Table Latch (2 bits)
     // TODO: 8 sprite select/shifts
 

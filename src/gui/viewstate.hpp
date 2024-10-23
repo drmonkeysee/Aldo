@@ -74,9 +74,8 @@ struct viewstate {
     RunClock clock;
     palette::sz colorSelection = 0;
     struct {
-        SDL_Point
-            bounds{256, 240}, pos{bounds.x / 2, bounds.y / 2}, velocity{1, 1};
         int halfdim = 25;
+        SDL_Point pos{halfdim, halfdim}, velocity{1, 1};
     } bouncer;
     bool running = true, showAbout = false, showDemo = false;
 };

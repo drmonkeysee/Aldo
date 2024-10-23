@@ -18,6 +18,8 @@
 #include "palette.hpp"
 #include "snapshot.h"
 
+#include <SDL2/SDL.h>
+
 #include <filesystem>
 #include <optional>
 #include <string_view>
@@ -81,6 +83,12 @@ public:
 
     void ready(bool ready) noexcept { aldo_nes_ready(consolep(), ready); }
     et::size ramSize() const noexcept { return aldo_nes_ram_size(consolep()); }
+    SDL_Point screenSize() const noexcept
+    {
+        SDL_Point res;
+        aldo_nes_screen_size(&res.x, &res.y);
+        return res;
+    }
     bool bcdSupport() const noexcept
     {
         return aldo_nes_bcd_support(consolep());

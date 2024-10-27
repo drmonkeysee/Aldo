@@ -60,7 +60,7 @@ struct aldo_rp2c02 {
             v: 1;           // (7) VBlank
     } status;               // PPUSTATUS, read-only
     // NOTE: OAMDATA, PPUSCROLL, PPUADDR, and PPUDATA are ports to internal
-    // components like OAM, t, and x, so are not modelled as storage locations.
+    // components like OAM, t, and x, so are not modeled as storage locations.
     uint8_t oamaddr;        // OAMADDR: OAM Data Address, write-only
 
     // Datapath
@@ -69,7 +69,8 @@ struct aldo_rp2c02 {
     uint8_t regsel,         // Register Selection (3 bits);
                             // wired to lowest 3 bits of CPU address bus.
             regbus,         // Register Data Bus
-            vdatabus;       // VRAM Data Bus (actually shared with lower
+            vdatabus,       // VRAM Data Bus (actually shared with lower
+            video;          // Video Signal (6 bits)
     struct {                // 8-bits of vaddrbus but this is not modeled
         bool                // to avoid storing an extra latch).
             ale: 1,         // Address Latch Signal (output)
@@ -90,7 +91,6 @@ struct aldo_rp2c02 {
         bgs[2],             // Background Tile Select/Shift
         dot,                // Current Dot
         line,               // Current Scanline
-        pixel,              // Current Pixel (visible dot in 256x240 region)
         t,                  // Temp VRAM/Scrolling Address (15 bits)
         v;                  // Current VRAM/Scrolling Address (15 bits)
     uint8_t at,             // Attribute Table Fetch

@@ -143,9 +143,8 @@ static bool create_mbus(struct aldo_nes001 *self)
 
 static bool create_vbus(struct aldo_nes001 *self)
 {
-    // TODO: partitions so far:
     // 14-bit Address Space = 16KB
-    // * $0000 - $1FFF: unmapped
+    // * $0000 - $1FFF: 8KB CHR ROM/RAM, 2 pattern tables mapped to cartridge
     // * $2000 - $3FFF: 2KB RAM mirrored to 8KB, nametable-mirroring uses 4KB
     //                  of address space; never writes to $3F00 - $3FFF
     // * $3F00 - $3FFF: 32B Palette RAM mirrored to 256B; internal to the PPU

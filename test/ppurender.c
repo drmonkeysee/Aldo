@@ -5,17 +5,110 @@
 //  Created by Brandon Stansbury on 10/22/24.
 //
 
+#include "bus.h"
+#include "bytes.h"
 #include "ciny.h"
 #include "ppuhelp.h"
 
-void ppu_render_setup(void **ctx)
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
+static uint8_t
+        NameTables[2][8],
+        AttributeTables[2][8],
+        PatternTables[2][16];
+
+static bool chrread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
+{
+    if (addr < ALDO_MEMBLOCK_8KB) {
+        uint8_t *ptable = addr < 0x1000 ? PatternTables[0] : PatternTables[1];
+        *d = ptable[addr & 0x10];
+        return true;
+    }
+    return false;
+}
+
+static bool vramread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
+{
+    if (ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB) {
+        // TODO: assume horizontal mirroring for now (Donkey Kong setting)
+        size_t select = addr < 0x2800 ? 0 : 1;
+        uint8_t *ntable = NameTables[select],
+                *atable = AttributeTables[select];
+        *d = (addr & 0xff) < 0xc0 ? ntable[addr & 0x8] : atable[addr & 0x8];
+        return true;
+    }
+    return false;
+}
+
+static void init_palette(struct aldo_rp2c02 *ppu)
+{
+    // BG 1
+    ppu->palette[0] = 0x24; // Magenta (almost) as backdrop
+    ppu->palette[1] = 0x0;
+    ppu->palette[2] = 0x1;
+    ppu->palette[3] = 0x2;
+
+    // BG 2
+    ppu->palette[4] = 0xd;  // Unused slot, this should always output backdrop
+    ppu->palette[5] = 0x10;
+    ppu->palette[6] = 0x11;
+    ppu->palette[7] = 0x12;
+
+    // BG 3
+    ppu->palette[8] = 0xd;  // Unused slot, this should always output backdrop
+    ppu->palette[9] = 0x5;
+    ppu->palette[10] = 0x6;
+    ppu->palette[11] = 0x7;
+
+    // BG 4
+    ppu->palette[12] = 0xd;  // Unused slot, this should always output backdrop
+    ppu->palette[13] = 0x15;
+    ppu->palette[14] = 0x16;
+    ppu->palette[15] = 0x17;
+
+    // FG 1
+    ppu->palette[16] = 0x20;
+    ppu->palette[17] = 0x21;
+    ppu->palette[18] = 0x22;
+
+    // FG 2
+    ppu->palette[19] = 0x29;
+    ppu->palette[20] = 0x2a;
+    ppu->palette[21] = 0x2b;
+
+    // FG 3
+    ppu->palette[22] = 0x33;
+    ppu->palette[23] = 0x34;
+    ppu->palette[24] = 0x35;
+
+    // FG 4
+    ppu->palette[25] = 0x38;
+    ppu->palette[26] = 0x39;
+    ppu->palette[27] = 0x3a;
+}
+
+static void ppu_render_setup(void **ctx)
 {
     void *v;
     ppu_setup(&v);
+    struct ppu_test_context *c = v;
+    aldo_bus_set(c->vbus, 0, (struct aldo_busdevice){.read = chrread});
+    aldo_bus_set(c->vbus, ALDO_MEMBLOCK_8KB, (struct aldo_busdevice){
+        .read = vramread,
+    });
+    init_palette(&c->ppu);
+    // NOTE: turn on rendering and turn left-column mask off
+    c->ppu.mask.b = c->ppu.mask.s = c->ppu.mask.bm = c->ppu.mask.sm = true;
     *ctx = v;
 }
 
-void placeholder(void *ctx)
+//
+// MARK: - Tests
+//
+
+static void first_three_tiles(void *ctx)
 {
     ct_assertfail("NOT IMPLEMENTED");
 }
@@ -27,7 +120,7 @@ void placeholder(void *ctx)
 struct ct_testsuite ppu_render_tests(void)
 {
     static const struct ct_testcase tests[] = {
-        ct_maketest(placeholder),
+        ct_maketest(first_three_tiles),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

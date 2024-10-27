@@ -345,7 +345,7 @@ static void oamdata_write(void *ctx)
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
-    ppu->ctrl.s = true;
+    ppu->mask.s = true;
     ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
@@ -385,7 +385,7 @@ static void oamdata_write_during_rendering(void *ctx)
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->line = 24;
     ppu->dot = 5;
-    ppu->ctrl.s = true;
+    ppu->mask.s = true;
     ppu->oam[0] = ppu->oam[4] = ppu->oam[8] = ppu->oam[12] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
@@ -464,7 +464,7 @@ static void oamdata_write_mirrored(void *ctx)
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
-    ppu->ctrl.s = true;
+    ppu->mask.s = true;
     ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
@@ -504,7 +504,7 @@ static void oamdata_write_during_reset(void *ctx)
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
-    ppu->ctrl.s = true;
+    ppu->mask.s = true;
     ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
     ppu->rst = ALDO_SIG_SERVICED;
 
@@ -545,7 +545,7 @@ static void oamdata_read(void *ctx)
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
-    ppu->ctrl.s = true;
+    ppu->mask.s = true;
     ppu->oam[0] = 0x11;
     ppu->oam[1] = 0x22;
     ppu->oam[2] = 0x33;
@@ -565,7 +565,7 @@ static void oamdata_read_mirrored(void *ctx)
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
-    ppu->ctrl.s = true;
+    ppu->mask.s = true;
     ppu->oam[0] = 0x11;
     ppu->oam[1] = 0x22;
     ppu->oam[2] = 0x33;

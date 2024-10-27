@@ -99,7 +99,7 @@ static uint16_t maskaddr(uint16_t addr)
 
 static bool rendering_disabled(const struct aldo_rp2c02 *self)
 {
-    return !self->ctrl.b && !self->ctrl.s;
+    return !self->mask.b && !self->mask.s;
 }
 
 static bool in_postrender(const struct aldo_rp2c02 *self)

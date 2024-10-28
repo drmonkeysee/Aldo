@@ -108,12 +108,11 @@ static void ppu_render_setup(void **ctx)
 // MARK: - Tests
 //
 
-static void first_three_pixel_rounds(void *ctx)
+static void nametable_fetch(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
-    // NOTE: beginning of pre-fetch round for first rendering line
-    ppu->line = 261;
-    ppu->dot = 321;
+
+    ct_assertfail("NOT IMPLEMENTED");
 }
 
 //
@@ -123,7 +122,7 @@ static void first_three_pixel_rounds(void *ctx)
 struct ct_testsuite ppu_render_tests(void)
 {
     static const struct ct_testcase tests[] = {
-        ct_maketest(first_three_pixel_rounds),
+        ct_maketest(nametable_fetch),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

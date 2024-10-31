@@ -111,8 +111,41 @@ static void ppu_render_setup(void **ctx)
 static void nametable_fetch(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    NameTables[0][5] = 0x11;
+    ppu->v = 0x5;
 
-    ct_assertfail("NOT IMPLEMENTED");
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(1u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertfalse(ppu->signal.vout);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(2u, ppu->dot);
+    ct_assertequal(0x5u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertfalse(ppu->signal.vout);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(3u, ppu->dot);
+    ct_assertequal(0x5u, ppu->vaddrbus);
+    ct_assertequal(0x11u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->nt);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+    ct_assertfalse(ppu->signal.vout);
 }
 
 //

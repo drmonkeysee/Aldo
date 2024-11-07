@@ -22,7 +22,9 @@
 // average cycle count of 89341.5 per frame.
 static const int
     Dots = 341, Lines = 262,
-    LineVBlank = 241, LinePreRender = 261;
+    LineVBlank = 241, LinePreRender = 261,
+    DotSpriteFetch = 257, DotTilePrefetch = 321;
+
 
 //
 // MARK: - Registers
@@ -100,6 +102,17 @@ static uint16_t maskaddr(uint16_t addr)
 static bool rendering_disabled(const struct aldo_rp2c02 *self)
 {
     return !self->mask.b && !self->mask.s;
+}
+
+static bool tile_rendering(const struct aldo_rp2c02 *self)
+{
+    return (0 < self->dot && self->dot < DotSpriteFetch)
+            || (DotTilePrefetch <= self->dot && self->dot < 337);
+}
+
+static bool sprite_fetch(const struct aldo_rp2c02 *self)
+{
+    return DotSpriteFetch <= self->dot && self->dot < DotTilePrefetch;
 }
 
 static bool in_postrender(const struct aldo_rp2c02 *self)
@@ -426,8 +439,77 @@ static int cycle(struct aldo_rp2c02 *self)
     } else if (self->line == LinePreRender) {
         // TODO: prerender line
         // TODO: add odd dot skip when rendering enabled
+    } else if (self->dot == 0) {
+        // TODO: idle or skipped dot
+    } else if (tile_rendering(self)) {
+        switch (self->dot % 8) {
+        case 1:
+            // NT addr
+            break;
+        case 2:
+            // NT data
+            break;
+        case 3:
+            // AT addr
+            break;
+        case 4:
+            // AT data
+            break;
+        case 5:
+            // BG low addr
+            break;
+        case 6:
+            // BG low data
+            break;
+        case 7:
+            // BG high addr
+            break;
+        case 0:
+            // BG high data
+            // inc horizontal (v)
+            if (self->dot == DotSpriteFetch - 1) {
+                // inc vertical(v)
+            }
+            break;
+        default:
+            assert(((void)"TILE RENDER UNREACHABLE CASE", false));
+            break;
+        }
+    } else if (sprite_fetch(self)) {
+        switch (self->dot % 8) {
+        case 1:
+            // garbage NT addr
+            if (self->dot == DotSpriteFetch) {
+                // horizontal(v) = horizontal(t)
+            }
+            break;
+        case 2:
+            // garbage NT data
+            break;
+        case 3:
+            // garbage NT addr
+            break;
+        case 4:
+            // garbage NT data
+            break;
+        case 5:
+            // FG low addr
+            break;
+        case 6:
+            // FG low data
+            break;
+        case 7:
+            // FG high addr
+            break;
+        case 0:
+            // FG high data
+            break;
+        default:
+            assert(((void)"SPRITE RENDER UNREACHABLE CASE", false));
+            break;
+        }
     } else {
-        // TODO: rendering
+        // TODO: garbage fetches
     }
 
     // NOTE: dot advancement happens last, leaving PPU on next dot to be drawn;

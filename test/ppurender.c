@@ -23,7 +23,7 @@ static bool chrread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     if (addr < ALDO_MEMBLOCK_8KB) {
         uint8_t *ptable = addr < 0x1000 ? PatternTables[0] : PatternTables[1];
-        *d = ptable[addr & 0x10];
+        *d = ptable[addr % 0x10];
         return true;
     }
     return false;
@@ -34,9 +34,9 @@ static bool vramread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     if (ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB) {
         // TODO: assume horizontal mirroring for now (Donkey Kong setting)
         size_t select = addr < 0x2800 ? 0 : 1;
-        uint8_t *ntable = NameTables[select],
-                *atable = AttributeTables[select];
-        *d = (addr & 0xff) < 0xc0 ? ntable[addr & 0x8] : atable[addr & 0x8];
+        *d = (addr & 0xff) < 0xc0
+                ? NameTables[select][addr % 0x8]
+                : AttributeTables[select][addr % 0x8];
         return true;
     }
     return false;
@@ -121,6 +121,7 @@ static void nametable_fetch(void *ctx)
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
     ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
     ct_assertfalse(ppu->signal.vout);
@@ -129,9 +130,10 @@ static void nametable_fetch(void *ctx)
 
     ct_assertequal(0u, ppu->line);
     ct_assertequal(2u, ppu->dot);
-    ct_assertequal(0x5u, ppu->vaddrbus);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
     ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
     ct_assertfalse(ppu->signal.vout);
@@ -140,9 +142,10 @@ static void nametable_fetch(void *ctx)
 
     ct_assertequal(0u, ppu->line);
     ct_assertequal(3u, ppu->dot);
-    ct_assertequal(0x5u, ppu->vaddrbus);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
     ct_assertequal(0x11u, ppu->vdatabus);
     ct_assertequal(0x11u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
     ct_assertfalse(ppu->signal.vout);

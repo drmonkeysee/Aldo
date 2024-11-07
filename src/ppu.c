@@ -304,7 +304,6 @@ static void read(struct aldo_rp2c02 *self)
 {
     self->signal.ale = self->signal.rd = false;
     self->bflt = !aldo_bus_read(self->vbus, self->vaddrbus, &self->vdatabus);
-    self->rbuf = self->vdatabus;
 }
 
 static void write(struct aldo_rp2c02 *self)
@@ -403,12 +402,12 @@ static void vblank(struct aldo_rp2c02 *self)
     }
 }
 
-// TODO: can this be generalized to internal r/w as well?
 static void cpu_rw(struct aldo_rp2c02 *self)
 {
     if (self->signal.ale) {
         if (self->signal.rw) {
             read(self);
+            self->rbuf = self->vdatabus;
         } else {
             write(self);
         }
@@ -418,6 +417,84 @@ static void cpu_rw(struct aldo_rp2c02 *self)
     } else {
         self->vaddrbus = maskaddr(self->v);
         self->signal.ale = true;
+    }
+}
+
+/*
+ * v register composition for background tile fetches, based mostly on:
+ *  https://www.nesdev.org/wiki/PPU_scrolling
+ *  https://www.nesdev.org/wiki/PPU_pattern_tables
+
+ * v composition during rendering
+ * yyy NN YYYYY XXXXX
+ * ||| || ||||| +++++-- coarse X scroll (32 tiles)
+ * ||| || +++++-------- coarse Y scroll (30 rows + attributes)
+ * ||| ++-------------- nametable select (4 nametables)
+ * +++----------------- fine Y scroll (ignored)
+
+ * Fetch address definitions
+ * tile address = 0x2000 | (v & 0x0FFF)
+ * attribute address = 0x23C0 | (v & 0x0C00) | ((v >> 4) & 0x38) | ((v >> 2) & 0x07)
+
+ * Attribute Fetch
+ *  NN 1111 YYY XXX
+ *  || |||| ||| +++-- high 3 bits of coarse X (x/4) (shifted and masked)
+ *  || |||| +++------ high 3 bits of coarse Y (y/4) (shifted and masked)
+ *  || ++++---------- attribute offset (960 bytes) (23C0)
+ *  ++--------------- nametable select (masked)
+
+ * Pattern Fetch
+ * DCBA98 76543210
+ * ---------------
+ * 0HNNNN NNNNPyyy
+ * |||||| |||||+++- T: Fine Y offset, the row number within a tile
+ * |||||| ||||+---- P: Bit plane (0: less significant bit; 1: more significant bit)
+ * ||++++-++++----- N: Tile number from name table
+ * |+-------------- H: Half of pattern table (0: "left"; 1: "right")
+ * +--------------- 0: Pattern table is at $0000-$1FFF
+ */
+
+static void tile_read(struct aldo_rp2c02 *self)
+{
+    switch (self->dot % 8) {
+    case 1:
+        // NT addr
+        {
+            uint16_t addr = 0x2000 | (self->v & 0xfff);
+            self->vaddrbus = maskaddr(addr);
+            self->signal.ale = true;
+        }
+        break;
+    case 2:
+        // NT data
+        read(self);
+        self->nt = self->vdatabus;
+        break;
+    case 3:
+        // AT addr
+        break;
+    case 4:
+        // AT data
+        break;
+    case 5:
+        // BG low addr
+        break;
+    case 6:
+        // BG low data
+        break;
+    case 7:
+        // BG high addr
+        break;
+    case 0:
+        // BG high data
+        // inc horizontal (v)
+        if (self->dot == DotSpriteFetch - 1) {
+            // inc vertical(v)
+        }
+        break;
+    default:
+        assert(((void)"TILE RENDER UNREACHABLE CASE", false));
+        break;
     }
 }
 
@@ -442,39 +519,7 @@ static int cycle(struct aldo_rp2c02 *self)
     } else if (self->dot == 0) {
         // TODO: idle or skipped dot
     } else if (tile_rendering(self)) {
-        switch (self->dot % 8) {
-        case 1:
-            // NT addr
-            break;
-        case 2:
-            // NT data
-            break;
-        case 3:
-            // AT addr
-            break;
-        case 4:
-            // AT data
-            break;
-        case 5:
-            // BG low addr
-            break;
-        case 6:
-            // BG low data
-            break;
-        case 7:
-            // BG high addr
-            break;
-        case 0:
-            // BG high data
-            // inc horizontal (v)
-            if (self->dot == DotSpriteFetch - 1) {
-                // inc vertical(v)
-            }
-            break;
-        default:
-            assert(((void)"TILE RENDER UNREACHABLE CASE", false));
-            break;
-        }
+        tile_read(self);
     } else if (sprite_fetch(self)) {
         switch (self->dot % 8) {
         case 1:

@@ -344,7 +344,7 @@ static void peek_absolute_indirect(void *ctx)
 static void peek_jam(void *ctx)
 {
     // NOTE: JAM
-    uint8_t mem[] = {0x02, 0x10};
+    uint8_t mem[] = {0x2, 0x10};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     aldo_cpu_peek_start(&cpu, NULL);

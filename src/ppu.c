@@ -300,6 +300,12 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
 // MARK: - PPU Bus Device (Pattern Tables, Nametables, Palette)
 //
 
+static void addrbus(struct aldo_rp2c02 *self, uint16_t addr)
+{
+    self->vaddrbus = maskaddr(addr);
+    self->signal.ale = true;
+}
+
 static void read(struct aldo_rp2c02 *self)
 {
     self->signal.ale = self->signal.rd = false;
@@ -415,8 +421,7 @@ static void cpu_rw(struct aldo_rp2c02 *self)
         uint16_t inc = self->ctrl.i ? 32 : 1;
         self->v += inc;
     } else {
-        self->vaddrbus = maskaddr(self->v);
-        self->signal.ale = true;
+        addrbus(self, self->v);
     }
 }
 
@@ -454,16 +459,21 @@ static void cpu_rw(struct aldo_rp2c02 *self)
  * +--------------- 0: Pattern table is at $0000-$1FFF
  */
 
+static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
+                             bool plane)
+{
+    uint16_t
+        tileidx = (uint16_t)(self->nt << 4),
+        pxrow = (self->v & 0x7000) >> 12;
+    return (uint16_t)((table << 13) | tileidx | (plane << 3) | pxrow);
+}
+
 static void tile_read(struct aldo_rp2c02 *self)
 {
     switch (self->dot % 8) {
     case 1:
         // NT addr
-        {
-            uint16_t addr = 0x2000 | (self->v & 0xfff);
-            self->vaddrbus = maskaddr(addr);
-            self->signal.ale = true;
-        }
+        addrbus(self, 0x2000 | (self->v & 0xfff));
         break;
     case 2:
         // NT data
@@ -472,21 +482,36 @@ static void tile_read(struct aldo_rp2c02 *self)
         break;
     case 3:
         // AT addr
+        {
+            uint16_t
+                ntselect = self->v & 0xc00,
+                metatiley = (self->v & 0x380) >> 4,
+                metatilex = (self->v & 0x1c) >> 2;
+            addrbus(self, 0x23c0 | ntselect | metatiley | metatilex);
+        }
         break;
     case 4:
         // AT data
+        read(self);
+        self->at = self->vdatabus;
         break;
     case 5:
         // BG low addr
+        addrbus(self, pattern_addr(self, self->ctrl.b, 0));
         break;
     case 6:
         // BG low data
+        read(self);
+        self->bg[0] = self->vdatabus;
         break;
     case 7:
         // BG high addr
+        addrbus(self, pattern_addr(self, self->ctrl.b, 1));
         break;
     case 0:
         // BG high data
+        read(self);
+        self->bg[1] = self->vdatabus;
         // inc horizontal (v)
         if (self->dot == DotSpriteFetch - 1) {
             // inc vertical(v)

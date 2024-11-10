@@ -865,7 +865,7 @@ static void inst_disassembles_brk(void *ctx)
 static void inst_disassembles_unofficial(void *ctx)
 {
     uint16_t a = 0x1234;
-    uint8_t bytes[] = {0x02};
+    uint8_t bytes[] = {0x2};
     struct aldo_dis_instruction inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 

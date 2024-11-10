@@ -124,7 +124,6 @@ static void nametable_fetch(void *ctx)
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
-    ct_assertfalse(ppu->signal.vout);
 
     aldo_ppu_cycle(ppu);
 
@@ -136,7 +135,6 @@ static void nametable_fetch(void *ctx)
     ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
-    ct_assertfalse(ppu->signal.vout);
 
     aldo_ppu_cycle(ppu);
 
@@ -148,7 +146,94 @@ static void nametable_fetch(void *ctx)
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
-    ct_assertfalse(ppu->signal.vout);
+}
+
+static void attributetable_fetch(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    AttributeTables[0][1] = 0x22;
+    ppu->v = 0x5;
+    ppu->dot = 3;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(4u, ppu->dot);
+    ct_assertequal(0x23c1u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->at);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(5u, ppu->dot);
+    ct_assertequal(0x23c1u, ppu->vaddrbus);
+    ct_assertequal(0x22u, ppu->vdatabus);
+    ct_assertequal(0x22u, ppu->at);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+}
+
+static void tile_fetch(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    PatternTables[0][0] = 0x33;
+    PatternTables[0][8] = 0x44;
+    ppu->v = 0x5;
+    ppu->dot = 5;
+    ppu->nt = 0x11;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(6u, ppu->dot);
+    ct_assertequal(0x0110u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->bg[0]);
+    ct_assertequal(0u, ppu->bg[1]);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(7u, ppu->dot);
+    ct_assertequal(0x0110u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->bg[0]);
+    ct_assertequal(0u, ppu->bg[1]);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(8u, ppu->dot);
+    ct_assertequal(0x0118u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->bg[0]);
+    ct_assertequal(0u, ppu->bg[1]);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(9u, ppu->dot);
+    ct_assertequal(0x0118u, ppu->vaddrbus);
+    ct_assertequal(0x44u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->bg[0]);
+    ct_assertequal(0x44u, ppu->bg[1]);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
 }
 
 //
@@ -159,6 +244,8 @@ struct ct_testsuite ppu_render_tests(void)
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(nametable_fetch),
+        ct_maketest(attributetable_fetch),
+        ct_maketest(tile_fetch),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

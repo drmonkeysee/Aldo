@@ -362,6 +362,28 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
     ct_assertfalse(ppu->signal.rd);
 }
 
+static void course_x_wraparound(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->v = 0x1f;
+    ppu->dot = 8;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(9u, ppu->dot);
+    ct_assertequal(0x400u, ppu->v);
+
+    ppu->v = 0x41f;
+    ppu->dot = 8;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(9u, ppu->dot);
+    ct_assertequal(0x0u, ppu->v);
+}
+
 //
 // MARK: - Test List
 //
@@ -373,6 +395,7 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(attributetable_fetch),
         ct_maketest(tile_fetch),
         ct_maketest(tile_fetch_higher_bits_sequence),
+        ct_maketest(course_x_wraparound),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

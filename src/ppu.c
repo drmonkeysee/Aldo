@@ -474,6 +474,19 @@ static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
     return (uint16_t)((table << 12) | tileidx | (plane << 3) | pxrow);
 }
 
+static void incr_course_x(struct aldo_rp2c02 *self)
+{
+    static const uint8_t max_course_x = 31;
+
+    // NOTE: wraparound at x = 32, overflow to horizontal nametable bit
+    if ((self->v & max_course_x) == max_course_x) {
+        self->v &= ~max_course_x;
+        self->v ^= 0x400;
+    } else {
+        self->v += 1;
+    }
+}
+
 static void tile_read(struct aldo_rp2c02 *self)
 {
     switch (self->dot % 8) {
@@ -518,7 +531,7 @@ static void tile_read(struct aldo_rp2c02 *self)
         // BG high data
         read(self);
         self->bg[1] = self->vdatabus;
-        self->v += 1;
+        incr_course_x(self);
         if (self->dot == DotSpriteFetch - 1) {
             // inc vertical(v)
         }

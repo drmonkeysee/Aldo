@@ -176,6 +176,23 @@ static void palette_write(struct aldo_rp2c02 *self, uint16_t addr, uint8_t d)
     self->palette[mask_palette(addr)] = d;
 }
 
+static void
+snapshot_palette(const struct aldo_rp2c02 *self,
+                 uint8_t palsnp[static ALDO_PAL_SIZE][ALDO_PAL_SIZE],
+                 uint16_t offset)
+{
+    uint16_t base = Aldo_PaletteStartAddr + offset;
+    for (size_t i = 0; i < ALDO_PAL_SIZE; ++i) {
+        uint8_t *p = palsnp[i];
+        uint16_t addr = base + (uint16_t)(ALDO_PAL_SIZE * i);
+        // NOTE: 1st color is always the backdrop
+        p[0] = palette_read(self, base);
+        p[1] = palette_read(self, addr + 1);
+        p[2] = palette_read(self, addr + 2);
+        p[3] = palette_read(self, addr + 3);
+    }
+}
+
 //
 // MARK: - Main Bus Device (PPU registers)
 //
@@ -332,104 +349,8 @@ static void write(struct aldo_rp2c02 *self)
 }
 
 //
-// MARK: - Internal Operations
+// MARK: - Rendering
 //
-
-static int nextdot(struct aldo_rp2c02 *self)
-{
-    if (++self->dot >= Dots) {
-        self->dot = 0;
-        if (++self->line >= Lines) {
-            self->line = 0;
-            self->odd = !self->odd;
-            return 1;
-        }
-    }
-    return 0;
-}
-
-static void reset(struct aldo_rp2c02 *self)
-{
-    // NOTE: t is cleared but NOT v
-    self->dot = self->line = self->t = self->rbuf = self->x = 0;
-    self->signal.intr = true;
-    self->signal.vout = self->cvp = self->odd = self->w = false;
-    set_ctrl(self, 0);
-    set_mask(self, 0);
-    self->rst = ALDO_SIG_SERVICED;
-}
-
-// NOTE: this follows the same sequence as CPU reset sequence and is checked
-// only on CPU-cycle boundaries rather than each PPU cycle; this keeps the two
-// chips in sync when handling the RESET signal.
-static void handle_reset(struct aldo_rp2c02 *self)
-{
-    // NOTE: pending always proceeds to committed just like the CPU sequence
-    if (self->rst == ALDO_SIG_PENDING) {
-        self->rst = ALDO_SIG_COMMITTED;
-    }
-
-    if (self->signal.rst) {
-        switch (self->rst) {
-        case ALDO_SIG_DETECTED:
-            self->rst = ALDO_SIG_CLEAR;
-            break;
-        case ALDO_SIG_COMMITTED:
-            reset(self);
-            break;
-        default:
-            break;
-        }
-    } else {
-        switch (self->rst) {
-        case ALDO_SIG_CLEAR:
-        case ALDO_SIG_SERVICED:
-            self->rst = ALDO_SIG_DETECTED;
-            break;
-        case ALDO_SIG_DETECTED:
-            self->rst = ALDO_SIG_PENDING;
-            break;
-        default:
-            // NOTE: as long as reset line is held low there is no further
-            // effect on PPU execution.
-            break;
-        }
-    }
-}
-
-static void vblank(struct aldo_rp2c02 *self)
-{
-    if (self->line == LineVBlank && self->dot == 0) {
-        // NOTE: set vblank status 1 dot early to account for race-condition
-        // that will suppress NMI if status.v is read (and cleared) right
-        // before NMI is signaled on 241,1.
-        self->status.v = true;
-    } else if (in_vblank(self)) {
-        // NOTE: NMI active within vblank if ctrl.v and status.v are set
-        self->signal.intr = !self->ctrl.v || !self->status.v;
-    } else if (self->line == LinePreRender && self->dot == 1) {
-        self->signal.intr = true;
-        set_status(self, 0);
-        self->rst = ALDO_SIG_CLEAR;
-    }
-}
-
-static void cpu_rw(struct aldo_rp2c02 *self)
-{
-    if (self->signal.ale) {
-        if (self->signal.rw) {
-            read(self);
-            self->rbuf = self->vdatabus;
-        } else {
-            write(self);
-        }
-        self->cvp = false;
-        uint16_t inc = self->ctrl.i ? 32 : 1;
-        self->v += inc;
-    } else {
-        addrbus(self, self->v);
-    }
-}
 
 /*
  * v register composition for background tile fetches, based mostly on:
@@ -580,6 +501,106 @@ static void sprite_read(struct aldo_rp2c02 *self)
     }
 }
 
+//
+// MARK: - Other Internal Operations
+//
+
+static int nextdot(struct aldo_rp2c02 *self)
+{
+    if (++self->dot >= Dots) {
+        self->dot = 0;
+        if (++self->line >= Lines) {
+            self->line = 0;
+            self->odd = !self->odd;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static void reset(struct aldo_rp2c02 *self)
+{
+    // NOTE: t is cleared but NOT v
+    self->dot = self->line = self->t = self->rbuf = self->x = 0;
+    self->signal.intr = true;
+    self->signal.vout = self->cvp = self->odd = self->w = false;
+    set_ctrl(self, 0);
+    set_mask(self, 0);
+    self->rst = ALDO_SIG_SERVICED;
+}
+
+// NOTE: this follows the same sequence as CPU reset sequence and is checked
+// only on CPU-cycle boundaries rather than each PPU cycle; this keeps the two
+// chips in sync when handling the RESET signal.
+static void handle_reset(struct aldo_rp2c02 *self)
+{
+    // NOTE: pending always proceeds to committed just like the CPU sequence
+    if (self->rst == ALDO_SIG_PENDING) {
+        self->rst = ALDO_SIG_COMMITTED;
+    }
+
+    if (self->signal.rst) {
+        switch (self->rst) {
+        case ALDO_SIG_DETECTED:
+            self->rst = ALDO_SIG_CLEAR;
+            break;
+        case ALDO_SIG_COMMITTED:
+            reset(self);
+            break;
+        default:
+            break;
+        }
+    } else {
+        switch (self->rst) {
+        case ALDO_SIG_CLEAR:
+        case ALDO_SIG_SERVICED:
+            self->rst = ALDO_SIG_DETECTED;
+            break;
+        case ALDO_SIG_DETECTED:
+            self->rst = ALDO_SIG_PENDING;
+            break;
+        default:
+            // NOTE: as long as reset line is held low there is no further
+            // effect on PPU execution.
+            break;
+        }
+    }
+}
+
+static void vblank(struct aldo_rp2c02 *self)
+{
+    if (self->line == LineVBlank && self->dot == 0) {
+        // NOTE: set vblank status 1 dot early to account for race-condition
+        // that will suppress NMI if status.v is read (and cleared) right
+        // before NMI is signaled on 241,1.
+        self->status.v = true;
+    } else if (in_vblank(self)) {
+        // NOTE: NMI active within vblank if ctrl.v and status.v are set
+        self->signal.intr = !self->ctrl.v || !self->status.v;
+    } else if (self->line == LinePreRender && self->dot == 1) {
+        self->signal.intr = true;
+        set_status(self, 0);
+        self->rst = ALDO_SIG_CLEAR;
+    }
+}
+
+static void cpu_rw(struct aldo_rp2c02 *self)
+{
+    if (self->signal.ale) {
+        if (self->signal.rw) {
+            read(self);
+            self->rbuf = self->vdatabus;
+        } else {
+            write(self);
+        }
+        self->cvp = false;
+        uint16_t inc = self->ctrl.i ? 32 : 1;
+        self->v += inc;
+    } else {
+        addrbus(self, self->v);
+    }
+}
+
 static int cycle(struct aldo_rp2c02 *self)
 {
     // NOTE: clear any databus signals from previous cycle; unlike the CPU,
@@ -611,23 +632,6 @@ static int cycle(struct aldo_rp2c02 *self)
     // NOTE: dot advancement happens last, leaving PPU on next dot to be drawn;
     // analogous to stack pointer always pointing at next byte to be written.
     return nextdot(self);
-}
-
-static void
-snapshot_palette(const struct aldo_rp2c02 *self,
-                 uint8_t palsnp[static ALDO_PAL_SIZE][ALDO_PAL_SIZE],
-                 uint16_t offset)
-{
-    uint16_t base = Aldo_PaletteStartAddr + offset;
-    for (size_t i = 0; i < ALDO_PAL_SIZE; ++i) {
-        uint8_t *p = palsnp[i];
-        uint16_t addr = base + (uint16_t)(ALDO_PAL_SIZE * i);
-        // NOTE: 1st color is always the backdrop
-        p[0] = palette_read(self, base);
-        p[1] = palette_read(self, addr + 1);
-        p[2] = palette_read(self, addr + 2);
-        p[3] = palette_read(self, addr + 3);
-    }
 }
 
 //

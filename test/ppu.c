@@ -60,7 +60,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
-    ct_assertequal(0x1234u, ppu->v);
+    ct_assertequal(0x1235u, ppu->v);
     ct_assertequal(ALDO_SIG_CLEAR, (int)ppu->rst);
 
     ppu->signal.rst = false;
@@ -78,7 +78,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
-    ct_assertequal(0x1234u, ppu->v);
+    ct_assertequal(0x1235u, ppu->v);
     ct_assertequal(ALDO_SIG_DETECTED, (int)ppu->rst);
 
     aldo_ppu_cycle(ppu);
@@ -95,7 +95,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
-    ct_assertequal(0x1234u, ppu->v);
+    ct_assertequal(0x1235u, ppu->v);
     ct_assertequal(ALDO_SIG_PENDING, (int)ppu->rst);
 
     aldo_ppu_cycle(ppu);
@@ -112,7 +112,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
-    ct_assertequal(0x1234u, ppu->v);
+    ct_assertequal(0x1235u, ppu->v);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)ppu->rst);
 
     // NOTE: reset line held
@@ -132,7 +132,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
-    ct_assertequal(0x1234u, ppu->v);
+    ct_assertequal(0x1236u, ppu->v);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)ppu->rst);
 
     ppu->signal.rst = true;
@@ -150,7 +150,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0x0u, ppu->rbuf);
     ct_assertequal(0x0u, ppu->x);
     ct_assertequal(0x0u, ppu->t);
-    ct_assertequal(0x1234u, ppu->v);
+    ct_assertequal(0x1236u, ppu->v);
     ct_assertequal(ALDO_SIG_SERVICED, (int)ppu->rst);
 }
 
@@ -180,7 +180,7 @@ static void reset_too_short(void *ctx)
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
-    ct_assertequal(0x1234u, ppu->v);
+    ct_assertequal(0x1235u, ppu->v);
     ct_assertequal(ALDO_SIG_CLEAR, (int)ppu->rst);
 
     ppu->signal.rst = false;
@@ -198,7 +198,7 @@ static void reset_too_short(void *ctx)
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
-    ct_assertequal(0x1234u, ppu->v);
+    ct_assertequal(0x1235u, ppu->v);
     ct_assertequal(ALDO_SIG_DETECTED, (int)ppu->rst);
 
     ppu->signal.rst = true;
@@ -216,7 +216,7 @@ static void reset_too_short(void *ctx)
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
-    ct_assertequal(0x1234u, ppu->v);
+    ct_assertequal(0x1235u, ppu->v);
     ct_assertequal(ALDO_SIG_CLEAR, (int)ppu->rst);
 }
 

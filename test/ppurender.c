@@ -191,6 +191,7 @@ static void tile_fetch(void *ctx)
 
     ct_assertequal(0u, ppu->line);
     ct_assertequal(6u, ppu->dot);
+    ct_assertequal(0x5u, ppu->v);
     ct_assertequal(0x0110u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
     ct_assertequal(0u, ppu->bg[0]);
@@ -203,6 +204,7 @@ static void tile_fetch(void *ctx)
 
     ct_assertequal(0u, ppu->line);
     ct_assertequal(7u, ppu->dot);
+    ct_assertequal(0x5u, ppu->v);
     ct_assertequal(0x0110u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
     ct_assertequal(0x33u, ppu->bg[0]);
@@ -215,6 +217,7 @@ static void tile_fetch(void *ctx)
 
     ct_assertequal(0u, ppu->line);
     ct_assertequal(8u, ppu->dot);
+    ct_assertequal(0x5u, ppu->v);
     ct_assertequal(0x0118u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
     ct_assertequal(0x33u, ppu->bg[0]);
@@ -227,6 +230,7 @@ static void tile_fetch(void *ctx)
 
     ct_assertequal(0u, ppu->line);
     ct_assertequal(9u, ppu->dot);
+    ct_assertequal(0x6u, ppu->v);
     ct_assertequal(0x0118u, ppu->vaddrbus);
     ct_assertequal(0x44u, ppu->vdatabus);
     ct_assertequal(0x33u, ppu->bg[0]);

@@ -308,12 +308,18 @@ static void addrbus(struct aldo_rp2c02 *self, uint16_t addr)
 
 static void read(struct aldo_rp2c02 *self)
 {
+    // NOTE: assert address bus is only 14-bits
+    assert((self->vaddrbus & 0xc000) == 0);
+
     self->signal.ale = self->signal.rd = false;
     self->bflt = !aldo_bus_read(self->vbus, self->vaddrbus, &self->vdatabus);
 }
 
 static void write(struct aldo_rp2c02 *self)
 {
+    // NOTE: assert address bus is only 14-bits
+    assert((self->vaddrbus & 0xc000) == 0);
+
     self->signal.ale = false;
     self->vdatabus = self->regbus;
     if (palette_addr(self->vaddrbus)) {
@@ -473,7 +479,7 @@ static void tile_read(struct aldo_rp2c02 *self)
     switch (self->dot % 8) {
     case 1:
         // NT addr
-        addrbus(self, 0x2000 | (self->v & 0xfff));
+        addrbus(self, 0x2000 | (self->v & ALDO_ADDRMASK_4KB));
         break;
     case 2:
         // NT data
@@ -512,13 +518,49 @@ static void tile_read(struct aldo_rp2c02 *self)
         // BG high data
         read(self);
         self->bg[1] = self->vdatabus;
-        // inc horizontal (v)
+        self->v += 1;
         if (self->dot == DotSpriteFetch - 1) {
             // inc vertical(v)
         }
         break;
     default:
         assert(((void)"TILE RENDER UNREACHABLE CASE", false));
+        break;
+    }
+}
+
+static void sprite_read(struct aldo_rp2c02 *self)
+{
+    switch (self->dot % 8) {
+    case 1:
+        // garbage NT addr
+        if (self->dot == DotSpriteFetch) {
+            // horizontal(v) = horizontal(t)
+        }
+        break;
+    case 2:
+        // garbage NT data
+        break;
+    case 3:
+        // garbage NT addr
+        break;
+    case 4:
+        // garbage NT data
+        break;
+    case 5:
+        // FG low addr
+        break;
+    case 6:
+        // FG low data
+        break;
+    case 7:
+        // FG high addr
+        break;
+    case 0:
+        // FG high data
+        break;
+    default:
+        assert(((void)"SPRITE RENDER UNREACHABLE CASE", false));
         break;
     }
 }
@@ -546,38 +588,7 @@ static int cycle(struct aldo_rp2c02 *self)
     } else if (tile_rendering(self)) {
         tile_read(self);
     } else if (sprite_fetch(self)) {
-        switch (self->dot % 8) {
-        case 1:
-            // garbage NT addr
-            if (self->dot == DotSpriteFetch) {
-                // horizontal(v) = horizontal(t)
-            }
-            break;
-        case 2:
-            // garbage NT data
-            break;
-        case 3:
-            // garbage NT addr
-            break;
-        case 4:
-            // garbage NT data
-            break;
-        case 5:
-            // FG low addr
-            break;
-        case 6:
-            // FG low data
-            break;
-        case 7:
-            // FG high addr
-            break;
-        case 0:
-            // FG high data
-            break;
-        default:
-            assert(((void)"SPRITE RENDER UNREACHABLE CASE", false));
-            break;
-        }
+        sprite_read(self);
     } else {
         // TODO: garbage fetches
     }

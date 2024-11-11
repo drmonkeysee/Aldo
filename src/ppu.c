@@ -386,6 +386,11 @@ static void write(struct aldo_rp2c02 *self)
  * +--------------- 0: Pattern table is at $0000-$1FFF
  */
 
+static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
+{
+    return 0x2000 | (self->v & ALDO_ADDRMASK_4KB);
+}
+
 static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
                              bool plane)
 {
@@ -408,12 +413,17 @@ static void incr_course_x(struct aldo_rp2c02 *self)
     }
 }
 
+static void incr_y(struct aldo_rp2c02 *self)
+{
+    self->v += 0x1000;
+}
+
 static void tile_read(struct aldo_rp2c02 *self)
 {
     switch (self->dot % 8) {
     case 1:
         // NT addr
-        addrbus(self, 0x2000 | (self->v & ALDO_ADDRMASK_4KB));
+        addrbus(self, nametable_addr(self));
         break;
     case 2:
         // NT data
@@ -454,7 +464,7 @@ static void tile_read(struct aldo_rp2c02 *self)
         self->bg[1] = self->vdatabus;
         incr_course_x(self);
         if (self->dot == DotSpriteFetch - 1) {
-            // inc vertical(v)
+            incr_y(self);
         }
         break;
     default:
@@ -468,19 +478,24 @@ static void sprite_read(struct aldo_rp2c02 *self)
     switch (self->dot % 8) {
     case 1:
         // garbage NT addr
+        addrbus(self, nametable_addr(self));
         if (self->dot == DotSpriteFetch) {
-            // horizontal(v) = horizontal(t)
+            // NOTE: copy t course-x and horizontal nametable to v
+            self->v = (self->v & 0xfbe0) | (self->t & 0x41f);
         }
         break;
     case 2:
         // garbage NT data
+        read(self);
         break;
     case 3:
         // garbage NT addr
+        addrbus(self, nametable_addr(self));
         // load sprite attribute
         break;
     case 4:
         // garbage NT data
+        read(self);
         // load sprite x
         break;
     case 5:

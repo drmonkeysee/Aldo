@@ -362,6 +362,90 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
     ct_assertfalse(ppu->signal.rd);
 }
 
+static void render_line_end(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    NameTables[0][3] = 0x99;
+    NameTables[0][6] = 0x77;
+    PatternTables[0][8] = 0x44;
+    ppu->v = 0x5;
+    ppu->t = 0x7b3;
+    ppu->dot = 255;
+    ppu->nt = 0x11;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(256u, ppu->dot);
+    ct_assertequal(0x5u, ppu->v);
+    ct_assertequal(0x0118u, ppu->vaddrbus);
+    ct_assertequal(0x0u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->nt);
+    ct_assertequal(0u, ppu->bg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(257u, ppu->dot);
+    ct_assertequal(0x1006u, ppu->v);
+    ct_assertequal(0x0118u, ppu->vaddrbus);
+    ct_assertequal(0x44u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->nt);
+    ct_assertequal(0x44u, ppu->bg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(258u, ppu->dot);
+    ct_assertequal(0x1413u, ppu->v);
+    ct_assertequal(0x2006u, ppu->vaddrbus);
+    ct_assertequal(0x44u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->nt);
+    ct_assertequal(0x44u, ppu->bg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(259u, ppu->dot);
+    ct_assertequal(0x1413u, ppu->v);
+    ct_assertequal(0x2006u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->nt);
+    ct_assertequal(0x44u, ppu->bg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(260u, ppu->dot);
+    ct_assertequal(0x1413u, ppu->v);
+    ct_assertequal(0x2413u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->nt);
+    ct_assertequal(0x44u, ppu->bg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(261u, ppu->dot);
+    ct_assertequal(0x1413u, ppu->v);
+    ct_assertequal(0x2413u, ppu->vaddrbus);
+    ct_assertequal(0x99u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->nt);
+    ct_assertequal(0x44u, ppu->bg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+}
+
 static void course_x_wraparound(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
@@ -384,6 +468,21 @@ static void course_x_wraparound(void *ctx)
     ct_assertequal(0x0u, ppu->v);
 }
 
+static void fine_y_wraparound(void *ctx)
+{
+    ct_assertfail("NOT IMPLEMENTED");
+}
+
+static void course_y_wraparound(void *ctx)
+{
+    ct_assertfail("NOT IMPLEMENTED");
+}
+
+static void course_y_overflow(void *ctx)
+{
+    ct_assertfail("NOT IMPLEMENTED");
+}
+
 //
 // MARK: - Test List
 //
@@ -395,7 +494,12 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(attributetable_fetch),
         ct_maketest(tile_fetch),
         ct_maketest(tile_fetch_higher_bits_sequence),
+        ct_maketest(render_line_end),
+
         ct_maketest(course_x_wraparound),
+        ct_maketest(fine_y_wraparound),
+        ct_maketest(course_y_wraparound),
+        ct_maketest(course_y_overflow),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

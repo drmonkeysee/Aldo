@@ -25,6 +25,11 @@ static const int
     LineVBlank = 241, LinePreRender = 261,
     DotSpriteFetch = 257, DotTilePrefetch = 321;
 
+// NOTE: helpers for manipulating v and t registers
+static const uint16_t
+    HNtBit = 0x400, VNtBit = 0x800, NtBits = VNtBit | HNtBit,
+    CourseXBits = 0x1f,
+    CourseYBits = 0x3e0, FineYBits = 0x7000;
 
 //
 // MARK: - Registers
@@ -245,7 +250,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
         if (ppu->rst != ALDO_SIG_SERVICED) {
             set_ctrl(ppu, ppu->regbus);
             // NOTE: set nametable-select
-            ppu->t = (uint16_t)((ppu->t & 0x73ff) | ppu->ctrl.nh << 11
+            ppu->t = (uint16_t)((ppu->t & ~NtBits) | ppu->ctrl.nh << 11
                                 | ppu->ctrl.nl << 10);
             // TODO: bit 0 race condition on dot 257
         }
@@ -276,12 +281,12 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
             static const uint8_t course = 0xf8, fine = 0x7;
             if (ppu->w) {
                 // NOTE: set course and fine y
-                ppu->t = (uint16_t)((ppu->t & 0xc1f)
+                ppu->t = (uint16_t)((ppu->t & ~(FineYBits | CourseYBits))
                                     | (ppu->regbus & fine) << 12
                                     | (ppu->regbus & course) << 2);
             } else {
                 // NOTE: set course and fine x
-                ppu->t = (ppu->t & 0x7fe0) | (ppu->regbus & course) >> 3;
+                ppu->t = (ppu->t & ~CourseXBits) | (ppu->regbus & course) >> 3;
                 ppu->x = ppu->regbus & fine;
             }
             ppu->w = !ppu->w;
@@ -396,18 +401,16 @@ static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
 {
     uint16_t
         tileidx = (uint16_t)(self->nt << 4),
-        pxrow = (self->v & 0x7000) >> 12;
+        pxrow = (self->v & FineYBits) >> 12;
     return (uint16_t)((table << 12) | tileidx | (plane << 3) | pxrow);
 }
 
 static void incr_course_x(struct aldo_rp2c02 *self)
 {
-    static const uint8_t max_course_x = 31;
-
     // NOTE: wraparound at x = 32, overflow to horizontal nametable bit
-    if ((self->v & max_course_x) == max_course_x) {
-        self->v &= ~max_course_x;
-        self->v ^= 0x400;
+    if ((self->v & CourseXBits) == CourseXBits) {
+        self->v &= ~CourseXBits;
+        self->v ^= HNtBit;
     } else {
         self->v += 1;
     }
@@ -415,7 +418,25 @@ static void incr_course_x(struct aldo_rp2c02 *self)
 
 static void incr_y(struct aldo_rp2c02 *self)
 {
-    self->v += 0x1000;
+    static const uint16_t max_course_y = 29 << 5;
+
+    // NOTE: fine y wraparound at y = 8, overflow into course y;
+    // course y wraparound at y = 30, overflow into vertical nametable bit;
+    // if course y > 29 then wraparound occurs without overflow.
+    if ((self->v & FineYBits) == FineYBits) {
+        self->v &= ~FineYBits;
+        uint16_t course_y = self->v & CourseYBits;
+        if (course_y >= max_course_y) {
+            self->v &= ~CourseYBits;
+            if (course_y == max_course_y) {
+                self->v ^= VNtBit;
+            }
+        } else {
+            self->v += 0x20;
+        }
+    } else {
+        self->v += 0x1000;
+    }
 }
 
 static void tile_read(struct aldo_rp2c02 *self)
@@ -434,7 +455,7 @@ static void tile_read(struct aldo_rp2c02 *self)
         // AT addr
         {
             uint16_t
-                ntselect = self->v & 0xc00,
+                ntselect = self->v & NtBits,
                 metatiley = (self->v & 0x380) >> 4,
                 metatilex = (self->v & 0x1c) >> 2;
             addrbus(self, 0x23c0 | ntselect | metatiley | metatilex);
@@ -480,8 +501,9 @@ static void sprite_read(struct aldo_rp2c02 *self)
         // garbage NT addr
         addrbus(self, nametable_addr(self));
         if (self->dot == DotSpriteFetch) {
+            static const uint16_t horiz_bits = HNtBit | CourseXBits;
             // NOTE: copy t course-x and horizontal nametable to v
-            self->v = (self->v & 0xfbe0) | (self->t & 0x41f);
+            self->v = (self->v & ~horiz_bits) | (self->t & horiz_bits);
         }
         break;
     case 2:

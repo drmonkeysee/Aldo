@@ -34,7 +34,7 @@ static bool vramread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     if (ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB) {
         // TODO: assume horizontal mirroring for now (Donkey Kong setting)
         size_t select = addr < 0x2800 ? 0 : 1;
-        *d = (addr & 0xff) < 0xc0
+        *d = (addr & 0x3ff) < 0x3c0
                 ? NameTables[select][addr % 0x8]
                 : AttributeTables[select][addr % 0x8];
         return true;
@@ -240,6 +240,128 @@ static void tile_fetch(void *ctx)
     ct_assertfalse(ppu->signal.rd);
 }
 
+static void tile_fetch_higher_bits_sequence(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    NameTables[1][2] = 0x11;
+    AttributeTables[1][2] = 0x22;
+    PatternTables[1][3] = 0x33;
+    PatternTables[1][11] = 0x44;
+    ppu->v = 0x3aea;
+    ppu->ctrl.b = true;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(1u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(2u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x2aeau, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(3u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x2aeau, ppu->vaddrbus);
+    ct_assertequal(0x11u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(4u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x2beau, ppu->vaddrbus);
+    ct_assertequal(0x11u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->at);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(5u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x2beau, ppu->vaddrbus);
+    ct_assertequal(0x22u, ppu->vdatabus);
+    ct_assertequal(0x22u, ppu->at);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(6u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x1113u, ppu->vaddrbus);
+    ct_assertequal(0x22u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->bg[0]);
+    ct_assertequal(0u, ppu->bg[1]);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(7u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x1113u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->bg[0]);
+    ct_assertequal(0u, ppu->bg[1]);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(8u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x111bu, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->bg[0]);
+    ct_assertequal(0u, ppu->bg[1]);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->line);
+    ct_assertequal(9u, ppu->dot);
+    ct_assertequal(0x3aebu, ppu->v);
+    ct_assertequal(0x111bu, ppu->vaddrbus);
+    ct_assertequal(0x44u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->bg[0]);
+    ct_assertequal(0x44u, ppu->bg[1]);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+}
+
 //
 // MARK: - Test List
 //
@@ -250,6 +372,7 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(nametable_fetch),
         ct_maketest(attributetable_fetch),
         ct_maketest(tile_fetch),
+        ct_maketest(tile_fetch_higher_bits_sequence),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

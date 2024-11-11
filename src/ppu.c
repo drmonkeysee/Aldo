@@ -471,7 +471,7 @@ static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
     uint16_t
         tileidx = (uint16_t)(self->nt << 4),
         pxrow = (self->v & 0x7000) >> 12;
-    return (uint16_t)((table << 13) | tileidx | (plane << 3) | pxrow);
+    return (uint16_t)((table << 12) | tileidx | (plane << 3) | pxrow);
 }
 
 static void tile_read(struct aldo_rp2c02 *self)
@@ -543,9 +543,11 @@ static void sprite_read(struct aldo_rp2c02 *self)
         break;
     case 3:
         // garbage NT addr
+        // load sprite attribute
         break;
     case 4:
         // garbage NT data
+        // load sprite x
         break;
     case 5:
         // FG low addr

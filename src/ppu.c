@@ -23,7 +23,7 @@
 static const int
     Dots = 341, Lines = 262,
     LineVBlank = 241, LinePreRender = 261,
-    DotSpriteFetch = 257, DotTilePrefetch = 321;
+    DotSpriteFetch = 257, DotTilePrefetch = 321, DotTilePrefetchEnd = 337;
 
 // NOTE: helpers for manipulating v and t registers
 static const uint16_t
@@ -112,7 +112,8 @@ static bool rendering_disabled(const struct aldo_rp2c02 *self)
 static bool tile_rendering(const struct aldo_rp2c02 *self)
 {
     return (0 < self->dot && self->dot < DotSpriteFetch)
-            || (DotTilePrefetch <= self->dot && self->dot < 337);
+            || (DotTilePrefetch <= self->dot
+                && self->dot < DotTilePrefetchEnd);
 }
 
 static bool sprite_fetch(const struct aldo_rp2c02 *self)
@@ -509,6 +510,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
     case 2:
         // garbage NT data
         read(self);
+        self->nt = self->vdatabus;
         break;
     case 3:
         // garbage NT addr
@@ -518,6 +520,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
     case 4:
         // garbage NT data
         read(self);
+        self->nt = self->vdatabus;
         // load sprite x
         break;
     case 5:
@@ -658,12 +661,20 @@ static int cycle(struct aldo_rp2c02 *self)
         // TODO: add odd dot skip when rendering enabled
     } else if (self->dot == 0) {
         // TODO: idle or skipped dot
+        // NOTE: BG low addr is put on bus but address latch is not signaled
+        self->vaddrbus = maskaddr(pattern_addr(self, self->ctrl.b, 0));
     } else if (tile_rendering(self)) {
         tile_read(self);
     } else if (sprite_fetch(self)) {
         sprite_read(self);
     } else {
-        // TODO: garbage fetches
+        assert(DotTilePrefetchEnd <= self->dot && self->dot < Dots);
+        if (self->dot % 2 == 1) {
+            addrbus(self, nametable_addr(self));
+        } else {
+            read(self);
+            self->nt = self->vdatabus;
+        }
     }
 
     // NOTE: dot advancement happens last, leaving PPU on next dot to be drawn;

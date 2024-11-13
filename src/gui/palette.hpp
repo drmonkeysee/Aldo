@@ -128,7 +128,7 @@ public:
         return std::holds_alternative<palette::datap>(colors);
     }
 
-    palette::datav getColor(palette::sz idx, palette::emphasis em = {}) const;
+    palette::datav getColor(palette::sz idx, palette::emphasis em) const;
 
     void load(const std::filesystem::path& filepath);
     void unload() noexcept

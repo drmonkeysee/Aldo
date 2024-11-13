@@ -1307,8 +1307,9 @@ protected:
                 palSelect < ALDO_PAL_SIZE
                 ? emu.snapshot().video->palettes.bg[palSelect]
                 : emu.snapshot().video->palettes.fg[palSelect - ALDO_PAL_SIZE];
-            left.draw(tables->left, colors, emu.palette());
-            right.draw(tables->right, colors, emu.palette());
+            auto em = emu.colorEmphasis();
+            left.draw(tables->left, colors, emu.palette(), em);
+            right.draw(tables->right, colors, emu.palette(), em);
         }
 
         widget_group([this] {
@@ -1340,6 +1341,7 @@ private:
         const auto* pals = fg
                             ? emu.snapshot().video->palettes.fg
                             : emu.snapshot().video->palettes.bg;
+        auto em = emu.colorEmphasis();
         for (auto row = 0; row < ALDO_PAL_SIZE; ++row) {
             if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols,
                                   flags)) {
@@ -1361,7 +1363,7 @@ private:
                         }
                     } else {
                         auto idx = pal[col - 1];
-                        auto color = emu.palette().getColor(idx);
+                        auto color = emu.palette().getColor(idx, em);
                         ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
                                                color);
                         std::snprintf(buf.data(), buf.size(), "%02X", idx);

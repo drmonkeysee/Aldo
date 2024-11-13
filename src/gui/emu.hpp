@@ -12,6 +12,7 @@
 #include "cart.h"
 #include "ctrlsignal.h"
 #include "debug.hpp"
+#include "emutypes.hpp"
 #include "error.hpp"
 #include "handle.hpp"
 #include "nes.h"
@@ -88,6 +89,16 @@ public:
         SDL_Point res;
         aldo_nes_screen_size(&res.x, &res.y);
         return res;
+    }
+    palette::emphasis colorEmphasis() const noexcept
+    {
+        et::byte mask = snapshot().ppu.mask;
+        return {
+            static_cast<bool>(mask & 0x20),
+            static_cast<bool>(mask & 0x40),
+            static_cast<bool>(mask & 0x80),
+            static_cast<bool>(mask & 0x1),
+        };
     }
     bool bcdSupport() const noexcept
     {

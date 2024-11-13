@@ -9,6 +9,7 @@
 
 #include "error.hpp"
 #include "mediaruntime.hpp"
+#include "palette.hpp"
 #include "viewstate.hpp"
 
 #include <concepts>
@@ -54,7 +55,8 @@ aldo::PatternTable::PatternTable(const aldo::MediaRuntime& mr)
 
 void aldo::PatternTable
 ::draw(const aldo::et::word table[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM],
-       const aldo::et::byte colors[ALDO_PAL_SIZE], const Palette& p) const
+       const aldo::et::byte colors[ALDO_PAL_SIZE], const Palette& p,
+       aldo::palette::emphasis em) const
 {
     auto data = tex.lock();
     for (auto tblRow = 0; tblRow < TableDim; ++tblRow) {
@@ -64,7 +66,7 @@ void aldo::PatternTable
                 auto rowOffset = (tblCol * ALDO_CHR_TILE_DIM)
                                     + ((tileRow + (tblRow * ALDO_CHR_TILE_DIM))
                                        * data.stride);
-                drawTableRow(tile[tileRow], colors, rowOffset, p, data);
+                drawTableRow(tile[tileRow], colors, rowOffset, p, data, em);
             }
         }
     }
@@ -100,7 +102,8 @@ void
 aldo::PatternTable::drawTableRow(aldo::et::word pixels,
                                  const aldo::et::byte colors[ALDO_PAL_SIZE],
                                  int texOffset, const aldo::Palette& p,
-                                 const aldo::texture::TextureData& data)
+                                 const aldo::texture::TextureData& data,
+                                 aldo::palette::emphasis em)
 {
     for (auto px = 0; px < ALDO_CHR_TILE_DIM; ++px) {
         auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
@@ -109,6 +112,6 @@ aldo::PatternTable::drawTableRow(aldo::et::word pixels,
         assert(texel < ALDO_PAL_SIZE);
         auto texidx = px + texOffset;
         assert(texidx < TextureDim * TextureDim);
-        data.pixels[texidx] = p.getColor(colors[texel]);
+        data.pixels[texidx] = p.getColor(colors[texel], em);
     }
 }

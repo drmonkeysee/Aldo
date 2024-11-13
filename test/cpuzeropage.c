@@ -8,6 +8,7 @@
 #include "ciny.h"
 #include "cpu.h"
 #include "cpuhelp.h"
+#include "snapshot.h"
 
 #include <stddef.h>
 #include <stdint.h>

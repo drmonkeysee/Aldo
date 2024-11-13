@@ -10,7 +10,6 @@
 #include "bytes.h"
 #include "cpu.h"
 #include "dis.h"
-#include "ppu.h"
 #include "snapshot.h"
 
 #include <assert.h>

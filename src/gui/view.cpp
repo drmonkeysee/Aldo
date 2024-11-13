@@ -1192,7 +1192,7 @@ private:
         std::array<char, 3> buf;
         ImGui::TableSetupColumn("Idx", ImGuiTableColumnFlags_WidthStretch);
         for (pal_sz col = 1; col < Cols; ++col) {
-            std::snprintf(buf.data(), buf.size(), " %01zX", col - 1);
+            std::snprintf(buf.data(), buf.size(), " %1zX", col - 1);
             ImGui::TableSetupColumn(buf.data());
         }
         ImGui::TableHeadersRow();
@@ -1525,7 +1525,7 @@ private:
         ImGui::TableSetupScrollFreeze(0, 1);
         ImGui::TableSetupColumn("Addr");
         for (auto i = 0; i < PageDim; ++i) {
-            std::snprintf(col.data(), col.size(), " %01X", i);
+            std::snprintf(col.data(), col.size(), " %1X", i);
             ImGui::TableSetupColumn(col.data());
         }
         ImGui::TableSetupColumn("ASCII");

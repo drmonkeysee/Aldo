@@ -515,7 +515,7 @@ static int draw_pregisters(const struct view *v, int cursor_y,
 static void draw_scroll_addr(const struct view *v, int y, int x, char label,
                              uint16_t val)
 {
-    mvwprintw(v->content, y, x, "%c: %04X (%01d,%01d,%02d,%02d)", label, val,
+    mvwprintw(v->content, y, x, "%c: %04X (%1d,%1d,%02d,%02d)", label, val,
               (val & 0x7000) >> 12, (val & 0xc00) >> 10, (val & 0x3e0) >> 5,
               val & 0x1f);
 }
@@ -536,7 +536,7 @@ static int draw_pdatapath(const struct view *v, int cursor_y, int w,
     draw_chip_hline(v, snp->ppu.lines.address_enable, cursor_y, buscol + 1,
                     "ALE", ArrowRight);
 
-    mvwprintw(v->content, ++cursor_y, 0, "x: %02X (%02d)",
+    mvwprintw(v->content, ++cursor_y, 0, "x: %02X (%1d)",
               snp->ppu.datapath.xfine, snp->ppu.datapath.xfine);
     draw_chip_hline(v, snp->ppu.lines.read, cursor_y, buscol + 3, "R\u0305",
                     ArrowRight);

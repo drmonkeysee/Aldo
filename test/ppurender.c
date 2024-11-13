@@ -105,7 +105,7 @@ static void ppu_render_setup(void **ctx)
 }
 
 //
-// MARK: - Tests
+// MARK: - Basic Tile Fetches
 //
 
 static void nametable_fetch(void *ctx)
@@ -349,6 +349,10 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
+
+//
+// MARK: - Line Edge Cases
+//
 
 static void render_line_end(void *ctx)
 {
@@ -776,6 +780,61 @@ static void prerender_end_odd_frame(void *ctx)
     ct_asserttrue(ppu->signal.rd);
 }
 
+static void prerender_set_vertical_coords(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->v = 0x5;
+    ppu->t = 0x5fba;
+    ppu->dot = 279;
+    ppu->line = 261;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(280u, ppu->dot);
+    ct_assertequal(0x5u, ppu->v);
+
+    while (ppu->dot < 305) {
+        aldo_ppu_cycle(ppu);
+
+        ct_assertequal(0x5ba5u, ppu->v);
+        ppu->v = 0x5;
+    }
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(306u, ppu->dot);
+    ct_assertequal(0x5u, ppu->v);
+}
+
+static void render_not_set_vertical_coords(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->v = 0x5;
+    ppu->t = 0x5fba;
+    ppu->dot = 279;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(280u, ppu->dot);
+    ct_assertequal(0x5u, ppu->v);
+
+    while (ppu->dot < 305) {
+        aldo_ppu_cycle(ppu);
+
+        ct_assertequal(0x5u, ppu->v);
+        ppu->v = 0x5;
+    }
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(306u, ppu->dot);
+    ct_assertequal(0x5u, ppu->v);
+}
+
+//
+// MARK: - Coordinate Behaviors
+//
+
 static void course_x_wraparound(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
@@ -849,6 +908,8 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(prerender_nametable_fetch),
         ct_maketest(prerender_end_even_frame),
         ct_maketest(prerender_end_odd_frame),
+        ct_maketest(prerender_set_vertical_coords),
+        ct_maketest(render_not_set_vertical_coords),
 
         ct_maketest(course_x_wraparound),
         ct_maketest(fine_y_wraparound),

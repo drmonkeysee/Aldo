@@ -502,6 +502,12 @@ static void tile_read(struct aldo_rp2c02 *self)
 
 static void sprite_read(struct aldo_rp2c02 *self)
 {
+    // NOTE: copy t course-y, fine-y, and vertical nametable to v
+    if (self->line == LinePreRender && 280 <= self->dot && self->dot < 305) {
+        static const uint16_t vert_bits = FineYBits | VNtBit | CourseYBits;
+        self->v = (self->v & ~vert_bits) | (self->t & vert_bits);
+    }
+
     switch (self->dot % 8) {
     case 1:
         // garbage NT addr

@@ -231,6 +231,13 @@ constexpr auto operator-(ImVec2 a, const ImVec2& b) noexcept
     return ImVec2{a.x - b.x, a.y - b.y};
 }
 
+constexpr auto textContrast(ImU32 fillColor) noexcept
+{
+    return aldo::colors::luminance(fillColor) < 0x80
+            ? IM_COL32_WHITE
+            : IM_COL32_BLACK;
+}
+
 auto keys_pressed(std::same_as<ImGuiKey> auto... keys) noexcept
 {
     return (ImGui::IsKeyPressed(keys, false) || ...);
@@ -1220,9 +1227,7 @@ private:
                     auto color = emu.palette().getColor(cell, colorEmphasis);
                     ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color);
                     ScopedColor indicatorColor{
-                        {ImGuiCol_Text, aldo::colors::luminance(color) < 0x80
-                                        ? IM_COL32_WHITE
-                                        : IM_COL32_BLACK},
+                        {ImGuiCol_Text, textContrast(color)},
                         cell == vs.colorSelection,
                     };
                     ScopedID id = static_cast<int>(cell);
@@ -1362,9 +1367,7 @@ private:
                         std::snprintf(buf.data(), buf.size(), "%02X", idx);
                         ScopedColor txtColor{{
                             ImGuiCol_Text,
-                            aldo::colors::luminance(color) < 0x80
-                                ? IM_COL32_WHITE
-                                : IM_COL32_BLACK,
+                            textContrast(color),
                         }};
                         ScopedID id = row << 3 | col << 1 | fg;
                         if (ImGui::Selectable(buf.data(), false,

@@ -113,7 +113,7 @@ static void nametable_fetch(void *ctx)
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     NameTables[0][5] = 0x11;
     ppu->v = 0x5;
-    ppu->line = 1;  // NOTE: avoid odd-frame skipped dot behavior on line 0
+    ppu->line = 1;  // NOTE: avoid odd-frame skipped-dot behavior on line 0
 
     aldo_ppu_cycle(ppu);
 
@@ -241,7 +241,339 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
     PatternTables[1][11] = 0x44;
     ppu->v = 0x3aea;
     ppu->ctrl.b = true;
-    ppu->line = 1;  // NOTE: avoid odd-frame skipped dot behavior on line 0
+    ppu->line = 1;  // NOTE: avoid odd-frame skipped-dot behavior on line 0
+
+    // Idle Cycle
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(1u, ppu->dot);
+    ct_assertequal(0x1003u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    // NT Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(2u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x2aeau, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x2aeau, ppu->vaddrbus);
+    ct_assertequal(0x11u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // AT Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(4u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x2beau, ppu->vaddrbus);
+    ct_assertequal(0x11u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->at);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(5u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x2beau, ppu->vaddrbus);
+    ct_assertequal(0x22u, ppu->vdatabus);
+    ct_assertequal(0x22u, ppu->at);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Tile Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(6u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x1113u, ppu->vaddrbus);
+    ct_assertequal(0x22u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->bg[0]);
+    ct_assertequal(0u, ppu->bg[1]);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(7u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x1113u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->bg[0]);
+    ct_assertequal(0u, ppu->bg[1]);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(8u, ppu->dot);
+    ct_assertequal(0x3aeau, ppu->v);
+    ct_assertequal(0x111bu, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->bg[0]);
+    ct_assertequal(0u, ppu->bg[1]);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(9u, ppu->dot);
+    ct_assertequal(0x3aebu, ppu->v);
+    ct_assertequal(0x111bu, ppu->vaddrbus);
+    ct_assertequal(0x44u, ppu->vdatabus);
+    ct_assertequal(0x33u, ppu->bg[0]);
+    ct_assertequal(0x44u, ppu->bg[1]);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+}
+
+static void tile_fetch_post_render_line(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    NameTables[1][2] = 0x11;
+    AttributeTables[1][2] = 0x22;
+    PatternTables[1][3] = 0x33;
+    PatternTables[1][11] = 0x44;
+    ppu->v = 0x3aea;
+    ppu->ctrl.b = true;
+    ppu->line = 240;
+
+    // Idle Cycle
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(1u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    // NT Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(2u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    // AT Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(4u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(5u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    // Tile Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(6u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(7u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(8u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(9u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+}
+
+static void tile_fetch_rendering_disabled(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    NameTables[1][2] = 0x11;
+    AttributeTables[1][2] = 0x22;
+    PatternTables[1][3] = 0x33;
+    PatternTables[1][11] = 0x44;
+    ppu->v = 0x3aea;
+    ppu->ctrl.b = true;
+    ppu->line = 1;  // NOTE: avoid odd-frame skipped-dot behavior on line 0
+    ppu->mask.b = ppu->mask.s = false;
+
+    // Idle Cycle
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(1u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    // NT Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(2u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    // AT Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(4u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(5u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    // Tile Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(6u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(7u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(8u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(9u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+}
+
+static void tile_fetch_tile_only_disabled(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    NameTables[1][2] = 0x11;
+    AttributeTables[1][2] = 0x22;
+    PatternTables[1][3] = 0x33;
+    PatternTables[1][11] = 0x44;
+    ppu->v = 0x3aea;
+    ppu->ctrl.b = true;
+    ppu->line = 1;  // NOTE: avoid odd-frame skipped-dot behavior on line 0
+    ppu->mask.b = false;
 
     // Idle Cycle
     aldo_ppu_cycle(ppu);
@@ -902,6 +1234,9 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(attributetable_fetch),
         ct_maketest(tile_fetch),
         ct_maketest(tile_fetch_higher_bits_sequence),
+        ct_maketest(tile_fetch_post_render_line),
+        ct_maketest(tile_fetch_rendering_disabled),
+        ct_maketest(tile_fetch_tile_only_disabled),
 
         ct_maketest(render_line_end),
         ct_maketest(render_line_prefetch),

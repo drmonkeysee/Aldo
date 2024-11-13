@@ -87,24 +87,20 @@ struct aldo_peekresult {
     bool busfault;
 };
 
-#include "bridgeopen.h"
-br_libexport
 extern const int Aldo_MaxTCycle;
 
-void aldo_cpu_powerup(struct aldo_mos6502 *self) br_nothrow;
+void aldo_cpu_powerup(struct aldo_mos6502 *self);
 
-int aldo_cpu_cycle(struct aldo_mos6502 *self) br_nothrow;
+int aldo_cpu_cycle(struct aldo_mos6502 *self);
 
-bool aldo_cpu_jammed(const struct aldo_mos6502 *self) br_nothrow;
+bool aldo_cpu_jammed(const struct aldo_mos6502 *self);
 void aldo_cpu_snapshot(const struct aldo_mos6502 *self,
-                       struct aldo_snapshot *snp) br_nothrow;
+                       struct aldo_snapshot *snp);
 
-void aldo_cpu_peek_start(struct aldo_mos6502 *br_noalias self,
-                         struct aldo_mos6502 *br_noalias restore) br_nothrow;
-struct aldo_peekresult aldo_cpu_peek(struct aldo_mos6502 *self,
-                                     uint16_t addr) br_nothrow;
-void aldo_cpu_peek_end(struct aldo_mos6502 *br_noalias self,
-                       struct aldo_mos6502 *br_noalias restore) br_nothrow;
-#include "bridgeclose.h"
+void aldo_cpu_peek_start(struct aldo_mos6502 *restrict self,
+                         struct aldo_mos6502 *restrict restore);
+struct aldo_peekresult aldo_cpu_peek(struct aldo_mos6502 *self, uint16_t addr);
+void aldo_cpu_peek_end(struct aldo_mos6502 *restrict self,
+                       struct aldo_mos6502 *restrict restore);
 
 #endif

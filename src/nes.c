@@ -345,6 +345,11 @@ void aldo_nes_powerdown(aldo_nes *self)
     disconnect_cart(self);
 }
 
+int aldo_nes_max_tcpu(void)
+{
+    return Aldo_MaxTCycle;
+}
+
 size_t aldo_nes_ram_size(aldo_nes *self)
 {
     assert(self != NULL);

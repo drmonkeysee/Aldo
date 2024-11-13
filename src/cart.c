@@ -7,6 +7,7 @@
 
 #include "cart.h"
 
+#include "bus.h"
 #include "bytes.h"
 #include "mappers.h"
 #include "snapshot.h"

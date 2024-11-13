@@ -33,6 +33,8 @@ void aldo_nes_powerup(aldo_nes *self, aldo_cart *c, bool zeroram) br_nothrow;
 br_libexport
 void aldo_nes_powerdown(aldo_nes *self) br_nothrow;
 
+br_libexport
+int aldo_nes_max_tcpu(void) br_nothrow;
 // NOTE: RAM and VRAM are the same size so one accessor for both
 br_libexport
 size_t aldo_nes_ram_size(aldo_nes *self) br_nothrow;

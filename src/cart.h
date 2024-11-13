@@ -8,7 +8,7 @@
 #ifndef Aldo_cart_h
 #define Aldo_cart_h
 
-#include "bus.h"
+#include "bustype.h"
 
 #include <stdbool.h>
 #include <stddef.h>

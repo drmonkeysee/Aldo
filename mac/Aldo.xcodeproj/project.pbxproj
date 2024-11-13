@@ -237,6 +237,7 @@
 		C80C9E1A277D648F000F2D8B /* debug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
 		C80C9E1B277D648F000F2D8B /* debug.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = debug.c; sourceTree = "<group>"; };
 		C80CCE052930495300664730 /* cycleclock.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cycleclock.c; sourceTree = "<group>"; };
+		C813BBD62CE53B7100781EF3 /* bustype.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bustype.h; sourceTree = "<group>"; };
 		C81680002BE6EEAB005A7905 /* ppu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ppu.h; sourceTree = "<group>"; };
 		C81680012BE6EEAB005A7905 /* ppu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ppu.c; sourceTree = "<group>"; };
 		C81680062BE70556005A7905 /* ppu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ppu.c; sourceTree = "<group>"; };
@@ -519,6 +520,7 @@
 				C88CABE428FA63E700551C65 /* bridgeclose.h */,
 				C8C706902751EEBA00B45785 /* bus.h */,
 				C8C706852751EEBA00B45785 /* bus.c */,
+				C813BBD62CE53B7100781EF3 /* bustype.h */,
 				C8C706882751EEBA00B45785 /* bytes.h */,
 				C8C7068F2751EEBA00B45785 /* bytes.c */,
 				C8C7068E2751EEBA00B45785 /* cart.h */,

@@ -8,6 +8,7 @@
 #include "argparse.h"
 
 #include "bytes.h"
+#include "cliargs.h"
 #include "debug.h"
 #include "dis.h"
 #include "haltexpr.h"

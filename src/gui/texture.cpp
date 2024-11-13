@@ -9,7 +9,6 @@
 
 #include "error.hpp"
 #include "mediaruntime.hpp"
-#include "palette.hpp"
 #include "viewstate.hpp"
 
 #include <concepts>

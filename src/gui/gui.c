@@ -8,6 +8,7 @@
 #include "gui.h"
 
 #include "debug.h"
+#include "guiplatform.h"
 #include "nes.h"
 #include "ui.h"
 #include "uisdl.hpp"

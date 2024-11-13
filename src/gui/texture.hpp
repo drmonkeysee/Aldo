@@ -10,6 +10,7 @@
 
 #include "attr.hpp"
 #include "emutypes.hpp"
+#include "palette.hpp"
 #include "snapshot.h"
 
 #include "imgui.h"
@@ -21,7 +22,6 @@ namespace aldo
 class MediaRuntime;
 class Palette;
 template<SDL_TextureAccess> class Texture;
-namespace palette { struct emphasis; }
 struct viewstate;
 
 namespace texture

@@ -8,7 +8,7 @@
 #ifndef Aldo_gui_gui_h
 #define Aldo_gui_gui_h
 
-#include "guiplatform.h"
+struct gui_platform;
 
 #include "bridgeopen.h"
 br_checkerror

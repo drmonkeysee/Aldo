@@ -113,6 +113,7 @@ static void nametable_fetch(void *ctx)
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     NameTables[0][5] = 0x11;
     ppu->v = 0x5;
+    ppu->line = 1;  // NOTE: avoid odd-frame skipped dot behavior on line 0
 
     aldo_ppu_cycle(ppu);
 
@@ -240,6 +241,7 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
     PatternTables[1][11] = 0x44;
     ppu->v = 0x3aea;
     ppu->ctrl.b = true;
+    ppu->line = 1;  // NOTE: avoid odd-frame skipped dot behavior on line 0
 
     // Idle Cycle
     aldo_ppu_cycle(ppu);
@@ -662,6 +664,118 @@ static void render_line_prefetch(void *ctx)
     ct_asserttrue(ppu->signal.rd);
 }
 
+static void prerender_nametable_fetch(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    NameTables[0][5] = 0x11;
+    ppu->v = 0x5;
+    ppu->line = 261;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(1u, ppu->dot);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(2u, ppu->dot);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3u, ppu->dot);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0x11u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->nt);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+}
+
+static void prerender_end_even_frame(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    NameTables[0][5] = 0x11;
+    ppu->v = 0x5;
+    ppu->line = 261;
+    ppu->dot = 339;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(340u, ppu->dot);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertfalse(ppu->odd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->dot);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0x11u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->nt);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+    ct_assertequal(0u, ppu->line);
+    ct_asserttrue(ppu->odd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(1u, ppu->dot);
+    ct_assertequal(0x0110u, ppu->vaddrbus);
+    ct_assertequal(0x11u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->nt);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+}
+
+static void prerender_end_odd_frame(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    NameTables[0][5] = 0x11;
+    ppu->v = 0x5;
+    ppu->line = 261;
+    ppu->dot = 339;
+    ppu->odd = true;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->dot);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->nt);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertfalse(ppu->odd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(1u, ppu->dot);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0x11u, ppu->vdatabus);
+    ct_assertequal(0x11u, ppu->nt);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+    ct_assertequal(0u, ppu->line);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(2u, ppu->dot);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0x11u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+}
+
 static void course_x_wraparound(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
@@ -729,8 +843,12 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(attributetable_fetch),
         ct_maketest(tile_fetch),
         ct_maketest(tile_fetch_higher_bits_sequence),
+
         ct_maketest(render_line_end),
         ct_maketest(render_line_prefetch),
+        ct_maketest(prerender_nametable_fetch),
+        ct_maketest(prerender_end_even_frame),
+        ct_maketest(prerender_end_odd_frame),
 
         ct_maketest(course_x_wraparound),
         ct_maketest(fine_y_wraparound),

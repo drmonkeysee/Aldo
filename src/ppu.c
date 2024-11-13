@@ -22,7 +22,7 @@
 // average cycle count of 89341.5 per frame.
 static const int
     Dots = 341, Lines = 262,
-    LineVBlank = 241, LinePreRender = 261,
+    LineVBlank = 241, LinePreRender = Lines - 1,
     DotSpriteFetch = 257, DotTilePrefetch = 321, DotTilePrefetchEnd = 337;
 
 // NOTE: helpers for manipulating v and t registers
@@ -406,6 +406,12 @@ static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
     return (uint16_t)((table << 12) | tileidx | (plane << 3) | pxrow);
 }
 
+static void read_nt(struct aldo_rp2c02 *self)
+{
+    read(self);
+    self->nt = self->vdatabus;
+}
+
 static void incr_course_x(struct aldo_rp2c02 *self)
 {
     // NOTE: wraparound at x = 32, overflow to horizontal nametable bit
@@ -449,8 +455,7 @@ static void tile_read(struct aldo_rp2c02 *self)
         break;
     case 2:
         // NT data
-        read(self);
-        self->nt = self->vdatabus;
+        read_nt(self);
         break;
     case 3:
         // AT addr
@@ -509,8 +514,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
         break;
     case 2:
         // garbage NT data
-        read(self);
-        self->nt = self->vdatabus;
+        read_nt(self);
         break;
     case 3:
         // garbage NT addr
@@ -519,8 +523,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
         break;
     case 4:
         // garbage NT data
-        read(self);
-        self->nt = self->vdatabus;
+        read_nt(self);
         // load sprite x
         break;
     case 5:
@@ -547,6 +550,11 @@ static void sprite_read(struct aldo_rp2c02 *self)
 
 static int nextdot(struct aldo_rp2c02 *self)
 {
+    // NOTE: skip the last dot on odd frames if rendering is enabled
+    if (self->line == LinePreRender && self->dot == Dots - 2 && self->odd
+        && !rendering_disabled(self)) {
+        ++self->dot;
+    }
     if (++self->dot >= Dots) {
         self->dot = 0;
         if (++self->line >= Lines) {
@@ -656,13 +664,15 @@ static int cycle(struct aldo_rp2c02 *self)
         if (self->cvp) {
             cpu_rw(self);
         }
-    } else if (self->line == LinePreRender) {
-        // TODO: prerender line
-        // TODO: add odd dot skip when rendering enabled
     } else if (self->dot == 0) {
         // TODO: idle or skipped dot
-        // NOTE: BG low addr is put on bus but address latch is not signaled
-        self->vaddrbus = maskaddr(pattern_addr(self, self->ctrl.b, 0));
+        if (self->line == 0 && !self->odd) {
+            read_nt(self);
+        } else {
+            // NOTE: BG low addr is put on bus but address latch is not
+            // signaled.
+            self->vaddrbus = maskaddr(pattern_addr(self, self->ctrl.b, 0));
+        }
     } else if (tile_rendering(self)) {
         tile_read(self);
     } else if (sprite_fetch(self)) {
@@ -672,8 +682,7 @@ static int cycle(struct aldo_rp2c02 *self)
         if (self->dot % 2 == 1) {
             addrbus(self, nametable_addr(self));
         } else {
-            read(self);
-            self->nt = self->vdatabus;
+            read_nt(self);
         }
     }
 

@@ -9,6 +9,7 @@
 
 #include "bytes.h"
 #include "cart.h"
+#include "snapshot.h"
 
 #include <assert.h>
 #include <stddef.h>

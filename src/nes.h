@@ -10,14 +10,14 @@
 
 #include "cart.h"
 #include "ctrlsignal.h"
-#include "cycleclock.h"
 #include "debug.h"
-#include "snapshot.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 
+struct aldo_clock;
+struct aldo_snapshot;
 typedef struct aldo_nes001 aldo_nes;
 
 #include "bridgeopen.h"

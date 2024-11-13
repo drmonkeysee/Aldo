@@ -10,7 +10,9 @@
 #include "bus.h"
 #include "bytes.h"
 #include "cpu.h"
+#include "cycleclock.h"
 #include "ppu.h"
+#include "snapshot.h"
 #include "trace.h"
 
 #include <assert.h>

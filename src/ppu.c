@@ -7,6 +7,8 @@
 
 #include "ppu.h"
 
+#include "snapshot.h"
+
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>

@@ -8,8 +8,10 @@
 #include "dis.h"
 
 #include "bytes.h"
+#include "cpu.h"
 #include "ctrlsignal.h"
 #include "haltexpr.h"
+#include "snapshot.h"
 
 #include <assert.h>
 #include <math.h>

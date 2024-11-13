@@ -11,10 +11,11 @@
 #include "bus.h"
 #include "ctrlsignal.h"
 #include "decode.h"
-#include "snapshot.h"
 
 #include <stdbool.h>
 #include <stdint.h>
+
+struct aldo_snapshot;
 
 // The MOS6502 processor is a little-endian
 // 8-bit CPU with a 16-bit addressing space.

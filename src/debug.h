@@ -8,12 +8,13 @@
 #ifndef Aldo_debug_h
 #define Aldo_debug_h
 
-#include "cpu.h"
-#include "cycleclock.h"
 #include "haltexpr.h"
 
 #include <stdbool.h>
 #include <stddef.h>
+
+struct aldo_clock;
+struct aldo_mos6502;
 
 struct aldo_breakpoint {
     struct aldo_haltexpr expr;

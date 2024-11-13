@@ -9,12 +9,13 @@
 #define Aldo_cart_h
 
 #include "bus.h"
-#include "snapshot.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+
+struct aldo_snapshot;
 
 // X(symbol, name)
 #define ALDO_CART_FORMAT_X \

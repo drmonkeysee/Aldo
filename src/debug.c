@@ -8,6 +8,8 @@
 #include "debug.h"
 
 #include "bytes.h"
+#include "cpu.h"
+#include "cycleclock.h"
 #include "tsutil.h"
 
 #include <assert.h>

@@ -10,7 +10,6 @@
 
 #include "bus.h"
 #include "cart.h"
-#include "snapshot.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -18,6 +17,7 @@
 #include <stdlib.h>
 
 struct aldo_mapper;
+struct aldo_snapshot;
 typedef bool aldo_busconn(struct aldo_mapper *, aldo_bus *);
 typedef void aldo_busdisconn(aldo_bus *);
 typedef const uint8_t *aldo_mapper_rom(const struct aldo_mapper *);

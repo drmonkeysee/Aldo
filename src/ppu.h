@@ -11,11 +11,12 @@
 #include "bus.h"
 #include "bytes.h"
 #include "ctrlsignal.h"
-#include "snapshot.h"
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+
+struct aldo_snapshot;
 
 // The Ricoh RP2C02 Picture Processing Unit (PPU) is a
 // fixed-function IC that generates the NES video signal.

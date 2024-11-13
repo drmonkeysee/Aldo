@@ -9,6 +9,7 @@
 
 #include "bytes.h"
 #include "mappers.h"
+#include "snapshot.h"
 
 #include <assert.h>
 #include <stdlib.h>

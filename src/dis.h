@@ -9,15 +9,16 @@
 #define Aldo_dis_h
 
 #include "cart.h"
-#include "cpu.h"
 #include "debug.h"
 #include "decode.h"
-#include "snapshot.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+
+struct aldo_mos6502;
+struct aldo_snapshot;
 
 // X(symbol, value, error string)
 #define ALDO_DIS_ERRCODE_X \

@@ -394,6 +394,16 @@ static void write(struct aldo_rp2c02 *self)
  * +--------------- 0: Pattern table is at $0000-$1FFF
  */
 
+static void latch_tile(uint16_t *latch, uint8_t val)
+{
+    *latch = (*latch & 0xff00) | val;
+}
+
+static void shift_tile(uint16_t *shift)
+{
+    *shift = (uint16_t)(*shift << 1) | 0x1;
+}
+
 static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
 {
     return 0x2000 | (self->v & ALDO_ADDRMASK_4KB);
@@ -445,6 +455,25 @@ static void incr_y(struct aldo_rp2c02 *self)
         }
     } else {
         self->v += 0x1000;
+    }
+}
+
+static void pixel_pipeline(struct aldo_rp2c02 *self)
+{
+    if (in_postrender(self)) return;
+
+    if (329 <= self->dot && self->dot < 338) {      // Tile Prefetch
+        shift_tile(self->pxpl.bgs);
+        shift_tile(self->pxpl.bgs + 1);
+        // TODO: shift AT bits
+        if (self->dot % 8 == 1) {
+            size_t idx = 0;
+            latch_tile(self->pxpl.bgs, self->pxpl.bg[idx++]);
+            latch_tile(self->pxpl.bgs + idx, self->pxpl.bg[idx]);
+            // TODO: latch AT bits
+        }
+    } else if (2 <= self->dot && self->dot < 261) { // Pixel Output
+        // TODO: generate pixel output
     }
 }
 
@@ -550,11 +579,6 @@ static void sprite_read(struct aldo_rp2c02 *self)
         assert(((void)"SPRITE RENDER UNREACHABLE CASE", false));
         break;
     }
-}
-
-static void pixel_pipeline(struct aldo_rp2c02 *self)
-{
-    (void)self;
 }
 
 //

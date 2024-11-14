@@ -1224,6 +1224,86 @@ static void course_y_overflow(void *ctx)
 }
 
 //
+// MARK: - Pixel Pipeline
+//
+
+static void prefetch_pipeline(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->pxpl.at = 0xaa;
+    ppu->pxpl.bg[0] = 0xbb;
+    ppu->pxpl.bg[1] = 0xcc;
+    ppu->line = 261;
+    ppu->dot = 329;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(330u, ppu->dot);
+    ct_assertequal(0x177u, ppu->pxpl.bgs[0]);
+    ct_assertequal(0x199u, ppu->pxpl.bgs[1]);
+    ct_assertfalse(ppu->signal.vout);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(331u, ppu->dot);
+    ct_assertequal(0x2efu, ppu->pxpl.bgs[0]);
+    ct_assertequal(0x333u, ppu->pxpl.bgs[1]);
+    ct_assertfalse(ppu->signal.vout);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(332u, ppu->dot);
+    ct_assertequal(0x5dfu, ppu->pxpl.bgs[0]);
+    ct_assertequal(0x667u, ppu->pxpl.bgs[1]);
+    ct_assertfalse(ppu->signal.vout);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(333u, ppu->dot);
+    ct_assertequal(0xbbfu, ppu->pxpl.bgs[0]);
+    ct_assertequal(0xccfu, ppu->pxpl.bgs[1]);
+    ct_assertfalse(ppu->signal.vout);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(334u, ppu->dot);
+    ct_assertequal(0x177fu, ppu->pxpl.bgs[0]);
+    ct_assertequal(0x199fu, ppu->pxpl.bgs[1]);
+    ct_assertfalse(ppu->signal.vout);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(335u, ppu->dot);
+    ct_assertequal(0x2effu, ppu->pxpl.bgs[0]);
+    ct_assertequal(0x333fu, ppu->pxpl.bgs[1]);
+    ct_assertfalse(ppu->signal.vout);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(336u, ppu->dot);
+    ct_assertequal(0x5dffu, ppu->pxpl.bgs[0]);
+    ct_assertequal(0x667fu, ppu->pxpl.bgs[1]);
+    ct_assertfalse(ppu->signal.vout);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(337u, ppu->dot);
+    ct_assertequal(0xbbffu, ppu->pxpl.bgs[0]);
+    ct_assertequal(0xccffu, ppu->pxpl.bgs[1]);
+    ct_assertfalse(ppu->signal.vout);
+
+    ppu->pxpl.at = 0x77;
+    ppu->pxpl.bg[0] = 0x66;
+    ppu->pxpl.bg[1] = 0x55;
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(338u, ppu->dot);
+    ct_assertequal(0xbb66u, ppu->pxpl.bgs[0]);
+    ct_assertequal(0xcc55u, ppu->pxpl.bgs[1]);
+    ct_assertfalse(ppu->signal.vout);
+}
+
+//
 // MARK: - Test List
 //
 
@@ -1250,6 +1330,8 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(fine_y_wraparound),
         ct_maketest(course_y_wraparound),
         ct_maketest(course_y_overflow),
+
+        ct_maketest(prefetch_pipeline),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

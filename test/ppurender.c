@@ -1239,57 +1239,57 @@ static void prefetch_pipeline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(330u, ppu->dot);
+    ct_assertequal(0xbbu, ppu->pxpl.bgs[0]);
+    ct_assertequal(0xccu, ppu->pxpl.bgs[1]);
+    ct_assertfalse(ppu->signal.vout);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(331u, ppu->dot);
     ct_assertequal(0x177u, ppu->pxpl.bgs[0]);
     ct_assertequal(0x199u, ppu->pxpl.bgs[1]);
     ct_assertfalse(ppu->signal.vout);
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(331u, ppu->dot);
+    ct_assertequal(332u, ppu->dot);
     ct_assertequal(0x2efu, ppu->pxpl.bgs[0]);
     ct_assertequal(0x333u, ppu->pxpl.bgs[1]);
     ct_assertfalse(ppu->signal.vout);
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(332u, ppu->dot);
+    ct_assertequal(333u, ppu->dot);
     ct_assertequal(0x5dfu, ppu->pxpl.bgs[0]);
     ct_assertequal(0x667u, ppu->pxpl.bgs[1]);
     ct_assertfalse(ppu->signal.vout);
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(333u, ppu->dot);
+    ct_assertequal(334u, ppu->dot);
     ct_assertequal(0xbbfu, ppu->pxpl.bgs[0]);
     ct_assertequal(0xccfu, ppu->pxpl.bgs[1]);
     ct_assertfalse(ppu->signal.vout);
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(334u, ppu->dot);
+    ct_assertequal(335u, ppu->dot);
     ct_assertequal(0x177fu, ppu->pxpl.bgs[0]);
     ct_assertequal(0x199fu, ppu->pxpl.bgs[1]);
     ct_assertfalse(ppu->signal.vout);
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(335u, ppu->dot);
+    ct_assertequal(336u, ppu->dot);
     ct_assertequal(0x2effu, ppu->pxpl.bgs[0]);
     ct_assertequal(0x333fu, ppu->pxpl.bgs[1]);
     ct_assertfalse(ppu->signal.vout);
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(336u, ppu->dot);
+    ct_assertequal(337u, ppu->dot);
     ct_assertequal(0x5dffu, ppu->pxpl.bgs[0]);
     ct_assertequal(0x667fu, ppu->pxpl.bgs[1]);
-    ct_assertfalse(ppu->signal.vout);
-
-    aldo_ppu_cycle(ppu);
-
-    ct_assertequal(337u, ppu->dot);
-    ct_assertequal(0xbbffu, ppu->pxpl.bgs[0]);
-    ct_assertequal(0xccffu, ppu->pxpl.bgs[1]);
     ct_assertfalse(ppu->signal.vout);
 
     ppu->pxpl.at = 0x77;

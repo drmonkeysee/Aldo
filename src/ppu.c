@@ -662,7 +662,7 @@ static void cpu_rw(struct aldo_rp2c02 *self)
     }
 }
 
-static void vram_bus(struct aldo_rp2c02 *self)
+static void vram_rw(struct aldo_rp2c02 *self)
 {
     if (in_postrender(self) || rendering_disabled(self)) {
         if (self->cvp) {
@@ -700,8 +700,8 @@ static int cycle(struct aldo_rp2c02 *self)
     self->signal.rd = self->signal.wr = true;
 
     vblank(self);
-    vram_bus(self);
     pixel_pipeline(self);
+    vram_rw(self);
 
     // NOTE: dot advancement happens last, leaving PPU on next dot to be drawn;
     // analogous to stack pointer always pointing at next byte to be written.

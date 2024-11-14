@@ -403,7 +403,7 @@ static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
                              bool plane)
 {
     uint16_t
-        tileidx = (uint16_t)(self->nt << 4),
+        tileidx = (uint16_t)(self->pxpl.nt << 4),
         pxrow = (self->v & FineYBits) >> 12;
     return (uint16_t)((table << 12) | tileidx | (plane << 3) | pxrow);
 }
@@ -411,7 +411,7 @@ static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
 static void read_nt(struct aldo_rp2c02 *self)
 {
     read(self);
-    self->nt = self->vdatabus;
+    self->pxpl.nt = self->vdatabus;
 }
 
 static void incr_course_x(struct aldo_rp2c02 *self)
@@ -472,7 +472,7 @@ static void tile_read(struct aldo_rp2c02 *self)
     case 4:
         // AT data
         read(self);
-        self->at = self->vdatabus;
+        self->pxpl.at = self->vdatabus;
         break;
     case 5:
         // BG low addr
@@ -481,7 +481,7 @@ static void tile_read(struct aldo_rp2c02 *self)
     case 6:
         // BG low data
         read(self);
-        self->bg[0] = self->vdatabus;
+        self->pxpl.bg[0] = self->vdatabus;
         break;
     case 7:
         // BG high addr
@@ -490,7 +490,7 @@ static void tile_read(struct aldo_rp2c02 *self)
     case 0:
         // BG high data
         read(self);
-        self->bg[1] = self->vdatabus;
+        self->pxpl.bg[1] = self->vdatabus;
         incr_course_x(self);
         if (self->dot == DotSpriteFetch - 1) {
             incr_y(self);
@@ -673,7 +673,6 @@ static int cycle(struct aldo_rp2c02 *self)
             cpu_rw(self);
         }
     } else if (self->dot == 0) {
-        // TODO: idle or skipped dot
         if (self->line == 0 && !self->odd) {
             read_nt(self);
         } else {

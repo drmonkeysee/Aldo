@@ -87,26 +87,30 @@ struct aldo_rp2c02 {
                             // when PPU is outputting a visible pixel.
     } signal;
 
-    // Internal Registers, Control Flags, and Render Pipeline
+    // Pixel Render Pipeline
+    struct {
+        uint16_t bgs[2];    // Background Tile Select/Shift
+        uint8_t at,         // Attribute Table Fetch
+                ats[2],     // Attribute Table Select/Shift
+                bg[2],      // Background Tile Fetch
+                nt;         // Nametable Fetch
+        bool atl[2];        // Attribute Table Latch (2 bits)
+        // TODO: 8 sprite select/shifts
+    } pxpl;
+
+    // Internal Registers and Control Flags
     uint16_t
-        bgs[2],             // Background Tile Select/Shift
         dot,                // Current Dot
         line,               // Current Scanline
         t,                  // Temp VRAM/Scrolling Address (15 bits)
         v;                  // Current VRAM/Scrolling Address (15 bits)
-    uint8_t at,             // Attribute Table Fetch
-            ats[2],         // Attribute Table Select/Shift
-            bg[2],          // Background Tile Fetch
-            nt,             // Nametable Fetch
-            rbuf,           // PPUDATA Read Buffer
+    uint8_t rbuf,           // PPUDATA Read Buffer
             x;              // Fine X Scroll (3 bits)
     bool
-        atl[2],             // Attribute Table Latch (2 bits)
         bflt,               // Bus fault
         cvp,                // Pending CPU VRAM Operation
         odd,                // Current frame is even or odd
         w;                  // Write latch for x2 registers
-    // TODO: 8 sprite select/shifts
 
     // Internal Memory
     uint8_t oam[256],       // Object Attribute Memory: internal storage

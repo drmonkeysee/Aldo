@@ -552,6 +552,11 @@ static void sprite_read(struct aldo_rp2c02 *self)
     }
 }
 
+static void pixel_pipeline(struct aldo_rp2c02 *self)
+{
+    (void)self;
+}
+
 //
 // MARK: - Other Internal Operations
 //
@@ -657,17 +662,8 @@ static void cpu_rw(struct aldo_rp2c02 *self)
     }
 }
 
-static int cycle(struct aldo_rp2c02 *self)
+static void vram_bus(struct aldo_rp2c02 *self)
 {
-    // NOTE: clear any databus signals from previous cycle; unlike the CPU,
-    // the PPU does not read/write on every cycle so these lines must be
-    // managed explicitly.
-    // TODO: does ale need clearing or is it enough to be handled on every
-    // read/write?
-    self->signal.rd = self->signal.wr = true;
-
-    vblank(self);
-
     if (in_postrender(self) || rendering_disabled(self)) {
         if (self->cvp) {
             cpu_rw(self);
@@ -692,6 +688,20 @@ static int cycle(struct aldo_rp2c02 *self)
             read_nt(self);
         }
     }
+}
+
+static int cycle(struct aldo_rp2c02 *self)
+{
+    // NOTE: clear any databus signals from previous cycle; unlike the CPU,
+    // the PPU does not read/write on every cycle so these lines must be
+    // managed explicitly.
+    // TODO: does ale need clearing or is it enough to be handled on every
+    // read/write?
+    self->signal.rd = self->signal.wr = true;
+
+    vblank(self);
+    vram_bus(self);
+    pixel_pipeline(self);
 
     // NOTE: dot advancement happens last, leaving PPU on next dot to be drawn;
     // analogous to stack pointer always pointing at next byte to be written.

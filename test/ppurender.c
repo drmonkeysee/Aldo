@@ -1373,7 +1373,7 @@ static void attribute_latch(void *ctx)
     ppu->pxpl.at = 0xe4;
     ppu->pxpl.atl[1] = ppu->pxpl.atl[0] = true;
 
-    for (int i = 0; i < 4; ++i) {
+    for (size_t i = 0; i < 4; ++i) {
         ppu->dot = 337;
         ppu->v = vs[i];
         aldo_ppu_cycle(ppu);

@@ -1341,6 +1341,47 @@ static void prefetch_pipeline(void *ctx)
     ct_assertfalse(ppu->signal.vout);
 }
 
+static void prefetch_postrender(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->pxpl.bgs[0] = 0x1111;
+    ppu->pxpl.bgs[1] = 0x2222;
+    ppu->line = 250;
+    ppu->dot = 329;
+    ppu->pxpl.atl[1] = ppu->pxpl.atl[0] = true;
+    ppu->pxpl.ats[0] = 0xee;
+    ppu->pxpl.ats[1] = 0xdd;
+
+    for (int i = 0; i < 9; ++i) {
+        aldo_ppu_cycle(ppu);
+
+        ct_assertequal((unsigned int)(329 + i + 1), ppu->dot);
+        ct_asserttrue(ppu->pxpl.atl[0]);
+        ct_asserttrue(ppu->pxpl.atl[1]);
+        ct_assertequal(0xeeu, ppu->pxpl.ats[0]);
+        ct_assertequal(0xddu, ppu->pxpl.ats[1]);
+        ct_assertequal(0x1111u, ppu->pxpl.bgs[0]);
+        ct_assertequal(0x2222u, ppu->pxpl.bgs[1]);
+        ct_assertfalse(ppu->signal.vout);
+    }
+}
+
+static void attribute_latch(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    uint16_t vs[] = {0x0, 0x2, 0x40, 0x42};
+    ppu->pxpl.at = 0xe4;
+    ppu->pxpl.atl[1] = ppu->pxpl.atl[0] = true;
+
+    for (int i = 0; i < 4; ++i) {
+        ppu->dot = 337;
+        ppu->v = vs[i];
+        aldo_ppu_cycle(ppu);
+        int val = ppu->pxpl.atl[1] << 1 | ppu->pxpl.atl[0];
+        ct_assertequal(i, val);
+    }
+}
+
 //
 // MARK: - Test List
 //
@@ -1370,6 +1411,8 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(course_y_overflow),
 
         ct_maketest(prefetch_pipeline),
+        ct_maketest(prefetch_postrender),
+        ct_maketest(attribute_latch),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

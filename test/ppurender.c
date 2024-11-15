@@ -1382,6 +1382,60 @@ static void attribute_latch(void *ctx)
     }
 }
 
+static void first_pixel(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->pxpl.bgs[0] = 0x3fff;
+    ppu->pxpl.bgs[1] = 0x6fff;
+    ppu->pxpl.ats[0] = 0x0;
+    ppu->pxpl.ats[1] = 0xff;
+
+    // Idle Cycle
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(1u, ppu->dot);
+    //ct_assertequal(0x0u, ppu->pxpl.mux);
+    //ct_assertequal(0x0u, ppu->pxpl.pal);
+    //ct_assertequal(0x0u, ppu->pxpl.px);
+    ct_assertfalse(ppu->signal.vout);
+
+    // Pipeline Idle
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(2u, ppu->dot);
+    //ct_assertequal(0x0u, ppu->pxpl.mux);
+    //ct_assertequal(0x0u, ppu->pxpl.pal);
+    //ct_assertequal(0x0u, ppu->pxpl.px);
+    ct_assertfalse(ppu->signal.vout);
+
+    // First Mux-and-Shift
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3u, ppu->dot);
+    //ct_assertequal(0xau, ppu->pxpl.mux);
+    //ct_assertequal(0x0u, ppu->pxpl.pal);
+    //ct_assertequal(0x0u, ppu->pxpl.px);
+    ct_assertfalse(ppu->signal.vout);
+
+    // Set Palette Address
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(4u, ppu->dot);
+    //ct_assertequal(0xbu, ppu->pxpl.mux);
+    //ct_assertequal(0xau, ppu->pxpl.pal);
+    //ct_assertequal(0x0u, ppu->pxpl.px);
+    ct_assertfalse(ppu->signal.vout);
+
+    // First Pixel Output
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(5u, ppu->dot);
+    //ct_assertequal(0x9u, ppu->pxpl.mux);
+    //ct_assertequal(0xbu, ppu->pxpl.pal);
+    //ct_assertequal(0x6u, ppu->pxpl.px);
+    ct_asserttrue(ppu->signal.vout);
+}
+
 //
 // MARK: - Test List
 //
@@ -1413,6 +1467,7 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(prefetch_pipeline),
         ct_maketest(prefetch_postrender),
         ct_maketest(attribute_latch),
+        ct_maketest(first_pixel),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

@@ -399,9 +399,40 @@ static void latch_tile(uint16_t *latch, uint8_t val)
     *latch = (*latch & 0xff00) | val;
 }
 
-static void shift_tile(uint16_t *shift)
+/*
+ * Attribute bit selection for pixel pipeline, taken mostly from:
+ * https://www.nesdev.org/wiki/PPU_attribute_tables
+ *
+ * Attribute table is 64 bytes arranged in the same 32x30 tile layout as the
+ * Nametables. An Attribute byte defines palette selection for 4x4 tiles
+ * (32x32 pixels), providing 4 possible palette options per each 2x2 tile
+ * (16x16 pixel) quadrant (2-bits):
+ *
+ * 7654 3210
+ * |||| ||++- Color bits 3-2 for top left quadrant of this byte
+ * |||| ++--- Color bits 3-2 for top right quadrant of this byte
+ * ||++------ Color bits 3-2 for bottom left quadrant of this byte
+ * ++-------- Color bits 3-2 for bottom right quadrant of this byte
+ *
+ * This means each quadrant starts at an X-offset of 0 or 2 and a Y-offset of
+ * 0 or 2 from the layout origin of the attribute; therefore the quadrant
+ * selection is determined by the 1st bit of course-x and course-y (recall
+ * course-x and course-y define the coordinates of each 8x8 tile).
+ *
+ * ,---+---+---+---.
+ * | X0,Y0 | X2,Y0 |
+ * +---+---+---+---+
+ * | X0,Y2 | X2,Y2 |
+ * `---+---+---+---'
+ *
+ * Since each quadrant is 2-bits the x,y coords select one of the 0th, 2nd,
+ * 4th, or 6th bits as the low-bit, the high-bit is the neighboring odd-bit.
+ */
+static void latch_attribute(struct aldo_rp2c02 *self)
 {
-    *shift = (uint16_t)(*shift << 1) | 0x1;
+    int bit = (self->v & 0x2) | ((self->v & 0x40) >> 4);
+    self->pxpl.atl[0] = aldo_byte_getbit(self->pxpl.at, bit);
+    self->pxpl.atl[1] = aldo_byte_getbit(self->pxpl.at, bit + 1);
 }
 
 static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
@@ -458,19 +489,24 @@ static void incr_y(struct aldo_rp2c02 *self)
     }
 }
 
+// TODO: replace t with c23 typeof
+#define pxshift(t, r, v) (*(r) = (t)(*(r) << 1) | (v))
+
 static void pixel_pipeline(struct aldo_rp2c02 *self)
 {
     if (in_postrender(self)) return;
 
+    size_t idx = 0;
     if (329 <= self->dot && self->dot < 338) {      // Tile Prefetch
-        shift_tile(self->pxpl.bgs);
-        shift_tile(self->pxpl.bgs + 1);
-        // TODO: shift AT bits
+        pxshift(uint16_t, self->pxpl.bgs, 1);
+        pxshift(uint8_t, self->pxpl.ats, self->pxpl.atl[idx++]);
+        pxshift(uint16_t, self->pxpl.bgs + idx, 1);
+        pxshift(uint8_t, self->pxpl.ats + idx, self->pxpl.atl[idx]);
         if (self->dot % 8 == 1) {
-            size_t idx = 0;
+            idx = 0;
             latch_tile(self->pxpl.bgs, self->pxpl.bg[idx++]);
             latch_tile(self->pxpl.bgs + idx, self->pxpl.bg[idx]);
-            // TODO: latch AT bits
+            latch_attribute(self);
         }
     } else if (2 <= self->dot && self->dot < 261) { // Pixel Output
         // TODO: generate pixel output

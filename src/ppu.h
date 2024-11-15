@@ -89,9 +89,9 @@ struct aldo_rp2c02 {
 
     // Pixel Render Pipeline
     struct {
-        uint16_t bgs[2];    // Background Tile Select/Shift
+        uint16_t bgs[2];    // Background Tile Shifter
         uint8_t at,         // Attribute Table Fetch
-                ats[2],     // Attribute Table Select/Shift
+                ats[2],     // Attribute Table Shifter
                 bg[2],      // Background Tile Fetch
                 nt;         // Nametable Fetch
         bool atl[2];        // Attribute Table Latch (2 bits)

@@ -1464,6 +1464,30 @@ static void last_pixel_bg(void *ctx)
     ct_assertfalse(ppu->signal.vout);
 }
 
+static void fine_x_select(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+
+    uint8_t bg0 = 0, bg1 = 0, at0 = 0, at1 = 0;
+    for (int i = 0; i < 8; ++i) {
+        ppu->dot = 70;
+        ppu->pxpl.bgs[0] = 0xcd00;
+        ppu->pxpl.bgs[1] = 0xa800;
+        ppu->pxpl.ats[0] = 0x73;
+        ppu->pxpl.ats[1] = 0x41;
+        ppu->x = (uint8_t)i;
+        aldo_ppu_cycle(ppu);
+        bg0 |= (aldo_byte_getbit(ppu->pxpl.mux, 0) << i);
+        bg1 |= (aldo_byte_getbit(ppu->pxpl.mux, 1) << i);
+        at0 |= (aldo_byte_getbit(ppu->pxpl.mux, 2) << i);
+        at1 |= (aldo_byte_getbit(ppu->pxpl.mux, 3) << i);
+    }
+    ct_assertequal(0xb3u, bg0);  // Reverse of 0xCD
+    ct_assertequal(0x15u, bg1);  // Reverse of 0xA8
+    ct_assertequal(0xceu, at0);  // Reverse of 0x73
+    ct_assertequal(0x82u, at1);  // Reverse of 0x41
+}
+
 //
 // MARK: - Test List
 //
@@ -1497,6 +1521,7 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(attribute_latch),
         ct_maketest(first_pixel_bg),
         ct_maketest(last_pixel_bg),
+        ct_maketest(fine_x_select),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

@@ -143,6 +143,7 @@ static bool in_vblank(const struct aldo_rp2c02 *self)
 
 static bool palette_addr(uint16_t addr)
 {
+    // NOTE: addr=[$3F00-$3FFF]
     return Aldo_PaletteStartAddr <= addr && addr < ALDO_MEMBLOCK_16KB;
 }
 
@@ -521,7 +522,7 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
     } else if (2 <= self->dot && self->dot < 261) {
         if (self->dot > 3) {
             assert((self->pxpl.pal & ~PaletteMask) == 0);
-            uint16_t pal_addr = 0x3f00 | self->pxpl.pal;
+            uint16_t pal_addr = Aldo_PaletteStartAddr | self->pxpl.pal;
             self->pxpl.px = palette_read(self, pal_addr);
             self->signal.vout = true;
         }

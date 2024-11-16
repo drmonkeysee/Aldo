@@ -1372,6 +1372,98 @@ static void first_pixel(void *ctx)
     ct_asserttrue(ppu->signal.vout);
 }
 
+static void last_pixel(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->dot = 257;
+    ppu->pxpl.bg[0] = 0x11;
+    ppu->pxpl.bg[1] = 0x22;
+    ppu->pxpl.at = 0x1;
+    ppu->pxpl.bgs[0] = 0xb7ff;
+    ppu->pxpl.bgs[1] = 0x67ff;
+    ppu->pxpl.atl[0] = false;
+    ppu->pxpl.atl[1] = true;
+    ppu->pxpl.ats[0] = 0x0;
+    ppu->pxpl.ats[1] = 0xff;
+    ppu->pxpl.mux = 0x1;
+    ppu->pxpl.pal = 0x3;
+
+    // Unused Tile Latch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(258u, ppu->dot);
+    ct_assertequal(0x6f11u, ppu->pxpl.bgs[0]);
+    ct_assertequal(0xcf22u, ppu->pxpl.bgs[1]);
+    ct_asserttrue(ppu->pxpl.atl[0]);
+    ct_assertfalse(ppu->pxpl.atl[1]);
+    ct_assertequal(0x0u, ppu->pxpl.ats[0]);
+    ct_assertequal(0xffu, ppu->pxpl.ats[1]);
+    ct_assertequal(0x9u, ppu->pxpl.mux);
+    ct_assertequal(0x1u, ppu->pxpl.pal);
+    ct_assertequal(0x2u, ppu->pxpl.px);
+    ct_asserttrue(ppu->signal.vout);
+
+    // Last Full Mux-and-Shift
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(259u, ppu->dot);
+    ct_assertequal(0xde23u, ppu->pxpl.bgs[0]);
+    ct_assertequal(0x9e45u, ppu->pxpl.bgs[1]);
+    ct_asserttrue(ppu->pxpl.atl[0]);
+    ct_assertfalse(ppu->pxpl.atl[1]);
+    ct_assertequal(0x1u, ppu->pxpl.ats[0]);
+    ct_assertequal(0xfeu, ppu->pxpl.ats[1]);
+    ct_assertequal(0xau, ppu->pxpl.mux);
+    ct_assertequal(0x9u, ppu->pxpl.pal);
+    ct_assertequal(0x0u, ppu->pxpl.px);
+    ct_asserttrue(ppu->signal.vout);
+
+    // Set Palette Address
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(260u, ppu->dot);
+    ct_assertequal(0xbc47u, ppu->pxpl.bgs[0]);
+    ct_assertequal(0x3c8bu, ppu->pxpl.bgs[1]);
+    ct_asserttrue(ppu->pxpl.atl[0]);
+    ct_assertfalse(ppu->pxpl.atl[1]);
+    ct_assertequal(0x3u, ppu->pxpl.ats[0]);
+    ct_assertequal(0xfcu, ppu->pxpl.ats[1]);
+    ct_assertequal(0xbu, ppu->pxpl.mux);
+    ct_assertequal(0xau, ppu->pxpl.pal);
+    ct_assertequal(0x5u, ppu->pxpl.px);
+    ct_asserttrue(ppu->signal.vout);
+
+    // Last Pixel Output
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(261u, ppu->dot);
+    ct_assertequal(0x788fu, ppu->pxpl.bgs[0]);
+    ct_assertequal(0x7917u, ppu->pxpl.bgs[1]);
+    ct_asserttrue(ppu->pxpl.atl[0]);
+    ct_assertfalse(ppu->pxpl.atl[1]);
+    ct_assertequal(0x7u, ppu->pxpl.ats[0]);
+    ct_assertequal(0xf8u, ppu->pxpl.ats[1]);
+    ct_assertequal(0x9u, ppu->pxpl.mux);
+    ct_assertequal(0xbu, ppu->pxpl.pal);
+    ct_assertequal(0x6u, ppu->pxpl.px);
+    ct_asserttrue(ppu->signal.vout);
+
+    // Video Out Stops, Pipeline Idle
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(262u, ppu->dot);
+    ct_assertequal(0x788fu, ppu->pxpl.bgs[0]);
+    ct_assertequal(0x7917u, ppu->pxpl.bgs[1]);
+    ct_asserttrue(ppu->pxpl.atl[0]);
+    ct_assertfalse(ppu->pxpl.atl[1]);
+    ct_assertequal(0x7u, ppu->pxpl.ats[0]);
+    ct_assertequal(0xf8u, ppu->pxpl.ats[1]);
+    ct_assertequal(0x9u, ppu->pxpl.mux);
+    ct_assertequal(0xbu, ppu->pxpl.pal);
+    ct_assertequal(0x6u, ppu->pxpl.px);
+    ct_assertfalse(ppu->signal.vout);
+}
+
 //
 // MARK: - Test List
 //
@@ -1404,6 +1496,7 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(prefetch_postrender),
         ct_maketest(attribute_latch),
         ct_maketest(first_pixel),
+        ct_maketest(last_pixel),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

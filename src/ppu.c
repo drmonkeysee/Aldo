@@ -432,8 +432,8 @@ static void latch_tile(uint16_t *latch, uint8_t val)
 static void latch_attribute(struct aldo_rp2c02 *self)
 {
     int bit = (self->v & 0x2) | ((self->v & 0x40) >> 4);
-    self->pxpl.atl[0] = aldo_byte_getbit(self->pxpl.at, bit);
-    self->pxpl.atl[1] = aldo_byte_getbit(self->pxpl.at, bit + 1);
+    self->pxpl.atl[0] = aldo_getbit(self->pxpl.at, bit);
+    self->pxpl.atl[1] = aldo_getbit(self->pxpl.at, bit + 1);
 }
 
 static void latch_inputs(struct aldo_rp2c02 *self)
@@ -534,10 +534,10 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
         // in addition, tile selection is from the left-most (upper) byte.
         int abit = 7 - self->x, tbit = abit + 8;
         self->pxpl.mux =
-            (uint8_t)((aldo_byte_getbit(self->pxpl.ats[1], abit) << 3)
-                      | (aldo_byte_getbit(self->pxpl.ats[0], abit) << 2)
-                      | (aldo_byte_getbit(self->pxpl.bgs[1], tbit) << 1)
-                      | aldo_byte_getbit(self->pxpl.bgs[0], tbit));
+            (uint8_t)((aldo_getbit(self->pxpl.ats[1], abit) << 3)
+                      | (aldo_getbit(self->pxpl.ats[0], abit) << 2)
+                      | (aldo_getbit(self->pxpl.bgs[1], tbit) << 1)
+                      | aldo_getbit(self->pxpl.bgs[0], tbit));
         // TODO: select sprite priority here
         pxshift(uint16_t, self->pxpl.bgs, 1);
         pxshift(uint8_t, self->pxpl.ats, self->pxpl.atl[0]);

@@ -923,7 +923,7 @@ static void ARR_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
     //      setting carry to held value from ADD/ADC step
     uint8_t and_result = self->a & self->databus;
     load_register(self, &self->a, and_result);
-    self->p.v = aldo_byte_getbit(self->a, 7) ^ aldo_byte_getbit(self->a, 6);
+    self->p.v = aldo_getbit(self->a, 7) ^ aldo_getbit(self->a, 6);
     bool c = self->a & 0x80;
     bitoperation(self, dec, BIT_RIGHT, (uint8_t)(self->p.c << 7));
     self->p.c = c;

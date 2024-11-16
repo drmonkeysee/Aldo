@@ -60,7 +60,7 @@ static bool trace_registers(FILE *tracelog, const struct aldo_snapshot *snp)
     if (err < 0) return false;
     for (size_t i = sizeof snp->cpu.status * 8; i > 0; --i) {
         size_t idx = i - 1;
-        bool bit = aldo_byte_getbit(snp->cpu.status, idx);
+        bool bit = aldo_getbit(snp->cpu.status, idx);
         if (fputc(flags[(idx * 2) + bit], tracelog) == EOF) return false;
     }
     return fprintf(tracelog, ") S:%02X", snp->cpu.stack_pointer) > 0;

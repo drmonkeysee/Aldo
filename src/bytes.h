@@ -47,8 +47,8 @@ enum {
     ALDO_CPU_VECTOR_IRQ = 0xfffe,
 };
 
-// Extract bit @pos from byte
-#define aldo_byte_getbit(byte, pos) (((byte) >> (pos)) & 0x1)
+// Extract bit @pos from unsigned value
+#define aldo_getbit(uval, pos) (((uval) >> (pos)) & 0x1)
 
 #include "bridgeopen.h"
 // NOTE: convert unsigned values into little-endian byte representations;

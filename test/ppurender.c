@@ -1477,10 +1477,10 @@ static void fine_x_select(void *ctx)
         ppu->pxpl.ats[1] = 0x41;
         ppu->x = (uint8_t)i;
         aldo_ppu_cycle(ppu);
-        bg0 |= (aldo_byte_getbit(ppu->pxpl.mux, 0) << i);
-        bg1 |= (aldo_byte_getbit(ppu->pxpl.mux, 1) << i);
-        at0 |= (aldo_byte_getbit(ppu->pxpl.mux, 2) << i);
-        at1 |= (aldo_byte_getbit(ppu->pxpl.mux, 3) << i);
+        bg0 |= (aldo_getbit(ppu->pxpl.mux, 0) << i);
+        bg1 |= (aldo_getbit(ppu->pxpl.mux, 1) << i);
+        at0 |= (aldo_getbit(ppu->pxpl.mux, 2) << i);
+        at1 |= (aldo_getbit(ppu->pxpl.mux, 3) << i);
     }
     ct_assertequal(0xb3u, bg0);  // Reverse of 0xCD
     ct_assertequal(0x15u, bg1);  // Reverse of 0xA8

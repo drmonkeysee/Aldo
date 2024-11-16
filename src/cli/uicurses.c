@@ -335,7 +335,7 @@ static int drawflags(const struct view *v, int cursor_y,
     mvwaddstr(v->content, cursor_y++, cursor_x, "N V - B D I Z C");
     for (size_t i = sizeof snp->cpu.status * 8; i > 0; --i) {
         mvwprintw(v->content, cursor_y, cursor_x, "%u",
-                  aldo_byte_getbit(snp->cpu.status, i - 1));
+                  aldo_getbit(snp->cpu.status, i - 1));
         cursor_x += 2;
     }
     return cursor_y;
@@ -482,8 +482,8 @@ static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
 {
     uint8_t sel = snp->ppu.datapath.register_select;
     char sel_buf[4];
-    sprintf(sel_buf, "%d%d%d", aldo_byte_getbit(sel, 2),
-            aldo_byte_getbit(sel, 1), aldo_byte_getbit(sel, 0));
+    sprintf(sel_buf, "%d%d%d", aldo_getbit(sel, 2), aldo_getbit(sel, 1),
+            aldo_getbit(sel, 0));
     draw_chip_vline(v, snp->ppu.lines.cpu_readwrite, cursor_y, line_x, 1,
                     ArrowDown, -1, sel_buf);
     draw_chip_vline(v, snp->ppu.lines.interrupt, cursor_y, line_x * 2, 1,
@@ -505,8 +505,8 @@ static int draw_pregisters(const struct view *v, int cursor_y,
 {
     uint8_t status = snp->ppu.status;
     mvwprintw(v->content, ++cursor_y, 0, "CONTROL: %02X  STATUS:  %d%d%d",
-              snp->ppu.ctrl, aldo_byte_getbit(status, 7),
-              aldo_byte_getbit(status, 6), aldo_byte_getbit(status, 5));
+              snp->ppu.ctrl, aldo_getbit(status, 7), aldo_getbit(status, 6),
+              aldo_getbit(status, 5));
     mvwprintw(v->content, ++cursor_y, 0, "MASK:    %02X  OAMADDR: %02X",
               snp->ppu.mask, snp->ppu.oamaddr);
     return cursor_y + 1;

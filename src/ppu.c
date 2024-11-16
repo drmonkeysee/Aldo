@@ -443,6 +443,21 @@ static void latch_inputs(struct aldo_rp2c02 *self)
     latch_attribute(self);
 }
 
+static void select_bg(struct aldo_rp2c02 *self)
+{
+    // NOTE: fine-x selects bit from the left: 0 = 7th bit, 7 = 0th bit
+    int abit = 7 - self->x;
+    self->pxpl.mux = (uint8_t)((aldo_getbit(self->pxpl.ats[1], abit) << 3)
+                               | (aldo_getbit(self->pxpl.ats[0], abit) << 2));
+    if (self->mask.b) {
+        // NOTE: tile selection is from the left-most (upper) byte
+        int tbit = abit + 8;
+        self->pxpl.mux |= (uint8_t)((aldo_getbit(self->pxpl.bgs[1], tbit) << 1)
+                                    | aldo_getbit(self->pxpl.bgs[0], tbit));
+    }
+    assert(self->pxpl.mux < 0x10);
+}
+
 static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
 {
     return 0x2000 | (self->v & ALDO_ADDRMASK_4KB);
@@ -535,16 +550,10 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
                 self->pxpl.pal = self->pxpl.mux;
             }
         }
-        // NOTE: fine-x selects bit from the left: 0 = 7th bit, 7 = 0th bit;
-        // in addition, tile selection is from the left-most (upper) byte.
-        int abit = 7 - self->x, tbit = abit + 8;
-        self->pxpl.mux =
-            (uint8_t)((aldo_getbit(self->pxpl.ats[1], abit) << 3)
-                      | (aldo_getbit(self->pxpl.ats[0], abit) << 2)
-                      | (aldo_getbit(self->pxpl.bgs[1], tbit) << 1)
-                      | aldo_getbit(self->pxpl.bgs[0], tbit));
-        assert(self->pxpl.mux < 0x10);
+
+        select_bg(self);
         // TODO: select sprite priority here
+
         pxshift(uint16_t, self->pxpl.bgs, 1);
         pxshift(uint8_t, self->pxpl.ats, self->pxpl.atl[0]);
         pxshift(uint16_t, self->pxpl.bgs + 1, 1);

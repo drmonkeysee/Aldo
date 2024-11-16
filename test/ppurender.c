@@ -1532,6 +1532,41 @@ static void pixel_transparent_bg(void *ctx)
     ct_assertequal(0x24u, ppu->pxpl.px);
 }
 
+static void pixel_disabled_bg(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->dot = 66;
+    ppu->pxpl.bgs[0] = 0xffff;
+    ppu->pxpl.bgs[1] = 0xffff;
+    ppu->pxpl.ats[0] = 0xff;
+    ppu->pxpl.ats[1] = 0xff;
+    ppu->mask.b = false;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0xcu, ppu->pxpl.mux);
+}
+
+static void left_mask_bg(void *ctx)
+{
+    ct_assertfail("not implemented");
+}
+
+static void rendering_disabled(void *ctx)
+{
+    ct_assertfail("not implemented");
+}
+
+static void rendering_disabled_explicit_palette(void *ctx)
+{
+    ct_assertfail("not implemented");
+}
+
+static void rendering_disabled_unused_palette(void *ctx)
+{
+    ct_assertfail("not implemented");
+}
+
 //
 // MARK: - Test List
 //
@@ -1567,6 +1602,11 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(last_pixel_bg),
         ct_maketest(fine_x_select),
         ct_maketest(pixel_transparent_bg),
+        ct_maketest(pixel_disabled_bg),
+        ct_maketest(left_mask_bg),
+        ct_maketest(rendering_disabled),
+        ct_maketest(rendering_disabled_explicit_palette),
+        ct_maketest(rendering_disabled_unused_palette),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

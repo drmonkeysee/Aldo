@@ -31,7 +31,7 @@ static const int
 static const uint16_t
     HNtBit = 0x400, VNtBit = 0x800, NtBits = VNtBit | HNtBit,
     CourseYBits = 0x3e0, FineYBits = 0x7000;
-static const uint8_t CourseXBits = 0x1f, PaletteMask = CourseXBits;
+static const uint8_t CourseXBits = 0x1f;
 
 //
 // MARK: - Registers
@@ -150,7 +150,7 @@ static bool palette_addr(uint16_t addr)
 static uint16_t mask_palette(uint16_t addr)
 {
     // NOTE: 32 addressable bytes, including mirrors
-    addr &= PaletteMask;
+    addr &= 0x1f;
     // NOTE: background has 16 allocated slots while sprites have 12, making
     // palette RAM only 28 bytes long; if the address points at a mirrored slot
     // then mask it down to the actual slots in the lower 16, otherwise adjust
@@ -334,8 +334,8 @@ static void addrbus(struct aldo_rp2c02 *self, uint16_t addr)
 
 static void read(struct aldo_rp2c02 *self)
 {
-    // NOTE: assert address bus is only 14-bits
-    assert((self->vaddrbus & 0xc000) == 0);
+    // NOTE: addr=[$0000-$3FFF]
+    assert(self->vaddrbus < ALDO_MEMBLOCK_16KB);
 
     self->signal.ale = self->signal.rd = false;
     self->bflt = !aldo_bus_read(self->vbus, self->vaddrbus, &self->vdatabus);
@@ -343,8 +343,8 @@ static void read(struct aldo_rp2c02 *self)
 
 static void write(struct aldo_rp2c02 *self)
 {
-    // NOTE: assert address bus is only 14-bits
-    assert((self->vaddrbus & 0xc000) == 0);
+    // NOTE: addr=[$0000-$3FFF]
+    assert(self->vaddrbus < ALDO_MEMBLOCK_16KB);
 
     self->signal.ale = false;
     self->vdatabus = self->regbus;
@@ -521,7 +521,7 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
         latch_inputs(self);
     } else if (2 <= self->dot && self->dot < 261) {
         if (self->dot > 3) {
-            assert((self->pxpl.pal & ~PaletteMask) == 0);
+            assert(self->pxpl.pal < 0x20);
             uint16_t pal_addr = Aldo_PaletteStartAddr | self->pxpl.pal;
             self->pxpl.px = palette_read(self, pal_addr);
             self->signal.vout = true;
@@ -543,7 +543,7 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
                       | (aldo_getbit(self->pxpl.ats[0], abit) << 2)
                       | (aldo_getbit(self->pxpl.bgs[1], tbit) << 1)
                       | aldo_getbit(self->pxpl.bgs[0], tbit));
-        assert((self->pxpl.mux & 0xf0) == 0);
+        assert(self->pxpl.mux < 0x10);
         // TODO: select sprite priority here
         pxshift(uint16_t, self->pxpl.bgs, 1);
         pxshift(uint8_t, self->pxpl.ats, self->pxpl.atl[0]);

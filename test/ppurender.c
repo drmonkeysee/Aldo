@@ -1227,7 +1227,7 @@ static void course_y_overflow(void *ctx)
 // MARK: - Pixel Pipeline
 //
 
-static void prefetch_pipeline(void *ctx)
+static void tile_prefetch_pipeline(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->pxpl.at = 0x56;
@@ -1277,7 +1277,7 @@ static void prefetch_pipeline(void *ctx)
     ct_assertfalse(ppu->signal.vout);
 }
 
-static void prefetch_postrender(void *ctx)
+static void tile_prefetch_postrender(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->pxpl.bgs[0] = 0x1111;
@@ -1318,7 +1318,7 @@ static void attribute_latch(void *ctx)
     }
 }
 
-static void first_pixel(void *ctx)
+static void first_pixel_bg(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->pxpl.bgs[0] = 0x6fff;
@@ -1372,7 +1372,7 @@ static void first_pixel(void *ctx)
     ct_asserttrue(ppu->signal.vout);
 }
 
-static void last_pixel(void *ctx)
+static void last_pixel_bg(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->dot = 257;
@@ -1492,11 +1492,11 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(course_y_wraparound),
         ct_maketest(course_y_overflow),
 
-        ct_maketest(prefetch_pipeline),
-        ct_maketest(prefetch_postrender),
+        ct_maketest(tile_prefetch_pipeline),
+        ct_maketest(tile_prefetch_postrender),
         ct_maketest(attribute_latch),
-        ct_maketest(first_pixel),
-        ct_maketest(last_pixel),
+        ct_maketest(first_pixel_bg),
+        ct_maketest(last_pixel_bg),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

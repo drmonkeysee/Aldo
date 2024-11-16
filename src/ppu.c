@@ -501,9 +501,10 @@ static void incr_y(struct aldo_rp2c02 *self)
 
 static void pixel_pipeline(struct aldo_rp2c02 *self)
 {
-    if (in_postrender(self)) return;
-
+    // NOTE: assume there is no video signal until we actually output a pixel
     self->signal.vout = false;
+
+    if (in_postrender(self)) return;
 
     // NOTE: prefetch likely runs the same hardware steps as normal pixel
     // selection, but since there are no side-effects outside of the pixel

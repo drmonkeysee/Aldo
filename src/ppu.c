@@ -508,15 +508,15 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
     // NOTE: prefetch likely runs the same hardware steps as normal pixel
     // selection, but since there are no side-effects outside of the pixel
     // pipeline it's easier to load the tiles at once.
-    if (self->dot == 329 || self->dot == 337) {
+    if (self->dot == 329) {
         latch_inputs(self);
         // NOTE: shift the first tile that occurs during dots 329-337
-        if (self->dot == 329) {
-            self->pxpl.bgs[0] <<= 8;
-            self->pxpl.ats[0] = self->pxpl.atl[0] ? 0xff : 0x0;
-            self->pxpl.bgs[1] <<= 8;
-            self->pxpl.ats[1] = self->pxpl.atl[1] ? 0xff : 0x0;
-        }
+        self->pxpl.bgs[0] <<= 8;
+        self->pxpl.ats[0] = -self->pxpl.atl[0];
+        self->pxpl.bgs[1] <<= 8;
+        self->pxpl.ats[1] = -self->pxpl.atl[1];
+    } else if (self->dot == 337) {
+        latch_inputs(self);
     } else if (2 <= self->dot && self->dot < 261) {
         if (self->dot > 3) {
             assert((self->pxpl.pal & ~PaletteMask) == 0);

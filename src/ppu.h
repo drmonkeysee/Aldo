@@ -93,7 +93,10 @@ struct aldo_rp2c02 {
         uint8_t at,         // Attribute Table Fetch
                 ats[2],     // Attribute Table Shifter
                 bg[2],      // Background Tile Fetch
-                nt;         // Nametable Fetch
+                mux,        // Multiplexed Pixel Selection
+                nt,         // Nametable Fetch
+                pal,        // Palette Index
+                px;         // Pixel Color Output
         bool atl[2];        // Attribute Table Latch (2 bits)
         // TODO: 8 sprite select/shifts
     } pxpl;

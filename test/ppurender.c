@@ -1243,89 +1243,25 @@ static void prefetch_pipeline(void *ctx)
     ct_assertequal(330u, ppu->dot);
     ct_assertfalse(ppu->pxpl.atl[0]);
     ct_asserttrue(ppu->pxpl.atl[1]);
-    ct_assertequal(0xffu, ppu->pxpl.ats[0]);
-    ct_assertequal(0x0u, ppu->pxpl.ats[1]);
-    ct_assertequal(0xbbu, ppu->pxpl.bgs[0]);
-    ct_assertequal(0xccu, ppu->pxpl.bgs[1]);
+    ct_assertequal(0x0u, ppu->pxpl.ats[0]);
+    ct_assertequal(0xffu, ppu->pxpl.ats[1]);
+    ct_assertequal(0xbb00u, ppu->pxpl.bgs[0]);
+    ct_assertequal(0xcc00u, ppu->pxpl.bgs[1]);
     ct_assertfalse(ppu->signal.vout);
 
     aldo_ppu_cycle(ppu);
 
+    // no changes because we don't emulate the prefetch shifts
     ct_assertequal(331u, ppu->dot);
     ct_assertfalse(ppu->pxpl.atl[0]);
     ct_asserttrue(ppu->pxpl.atl[1]);
-    ct_assertequal(0xfeu, ppu->pxpl.ats[0]);
-    ct_assertequal(0x1u, ppu->pxpl.ats[1]);
-    ct_assertequal(0x177u, ppu->pxpl.bgs[0]);
-    ct_assertequal(0x199u, ppu->pxpl.bgs[1]);
+    ct_assertequal(0x0u, ppu->pxpl.ats[0]);
+    ct_assertequal(0xffu, ppu->pxpl.ats[1]);
+    ct_assertequal(0xbb00u, ppu->pxpl.bgs[0]);
+    ct_assertequal(0xcc00u, ppu->pxpl.bgs[1]);
     ct_assertfalse(ppu->signal.vout);
 
-    aldo_ppu_cycle(ppu);
-
-    ct_assertequal(332u, ppu->dot);
-    ct_assertfalse(ppu->pxpl.atl[0]);
-    ct_asserttrue(ppu->pxpl.atl[1]);
-    ct_assertequal(0xfcu, ppu->pxpl.ats[0]);
-    ct_assertequal(0x3u, ppu->pxpl.ats[1]);
-    ct_assertequal(0x2efu, ppu->pxpl.bgs[0]);
-    ct_assertequal(0x333u, ppu->pxpl.bgs[1]);
-    ct_assertfalse(ppu->signal.vout);
-
-    aldo_ppu_cycle(ppu);
-
-    ct_assertequal(333u, ppu->dot);
-    ct_assertfalse(ppu->pxpl.atl[0]);
-    ct_asserttrue(ppu->pxpl.atl[1]);
-    ct_assertequal(0xf8u, ppu->pxpl.ats[0]);
-    ct_assertequal(0x7u, ppu->pxpl.ats[1]);
-    ct_assertequal(0x5dfu, ppu->pxpl.bgs[0]);
-    ct_assertequal(0x667u, ppu->pxpl.bgs[1]);
-    ct_assertfalse(ppu->signal.vout);
-
-    aldo_ppu_cycle(ppu);
-
-    ct_assertequal(334u, ppu->dot);
-    ct_assertfalse(ppu->pxpl.atl[0]);
-    ct_asserttrue(ppu->pxpl.atl[1]);
-    ct_assertequal(0xf0u, ppu->pxpl.ats[0]);
-    ct_assertequal(0xfu, ppu->pxpl.ats[1]);
-    ct_assertequal(0xbbfu, ppu->pxpl.bgs[0]);
-    ct_assertequal(0xccfu, ppu->pxpl.bgs[1]);
-    ct_assertfalse(ppu->signal.vout);
-
-    aldo_ppu_cycle(ppu);
-
-    ct_assertequal(335u, ppu->dot);
-    ct_assertfalse(ppu->pxpl.atl[0]);
-    ct_asserttrue(ppu->pxpl.atl[1]);
-    ct_assertequal(0xe0u, ppu->pxpl.ats[0]);
-    ct_assertequal(0x1fu, ppu->pxpl.ats[1]);
-    ct_assertequal(0x177fu, ppu->pxpl.bgs[0]);
-    ct_assertequal(0x199fu, ppu->pxpl.bgs[1]);
-    ct_assertfalse(ppu->signal.vout);
-
-    aldo_ppu_cycle(ppu);
-
-    ct_assertequal(336u, ppu->dot);
-    ct_assertfalse(ppu->pxpl.atl[0]);
-    ct_asserttrue(ppu->pxpl.atl[1]);
-    ct_assertequal(0xc0u, ppu->pxpl.ats[0]);
-    ct_assertequal(0x3fu, ppu->pxpl.ats[1]);
-    ct_assertequal(0x2effu, ppu->pxpl.bgs[0]);
-    ct_assertequal(0x333fu, ppu->pxpl.bgs[1]);
-    ct_assertfalse(ppu->signal.vout);
-
-    aldo_ppu_cycle(ppu);
-
-    ct_assertequal(337u, ppu->dot);
-    ct_assertfalse(ppu->pxpl.atl[0]);
-    ct_asserttrue(ppu->pxpl.atl[1]);
-    ct_assertequal(0x80u, ppu->pxpl.ats[0]);
-    ct_assertequal(0x7fu, ppu->pxpl.ats[1]);
-    ct_assertequal(0x5dffu, ppu->pxpl.bgs[0]);
-    ct_assertequal(0x667fu, ppu->pxpl.bgs[1]);
-    ct_assertfalse(ppu->signal.vout);
-
+    ppu->dot = 337;
     ppu->pxpl.at = 0xa9;
     ppu->pxpl.bg[0] = 0x66;
     ppu->pxpl.bg[1] = 0x55;
@@ -1378,15 +1314,15 @@ static void attribute_latch(void *ctx)
         ppu->v = vs[i];
         aldo_ppu_cycle(ppu);
         int val = ppu->pxpl.atl[1] << 1 | ppu->pxpl.atl[0];
-        ct_assertequal(i, val);
+        ct_assertequal((int)i, val);
     }
 }
 
 static void first_pixel(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
-    ppu->pxpl.bgs[0] = 0x3fff;
-    ppu->pxpl.bgs[1] = 0x6fff;
+    ppu->pxpl.bgs[0] = 0x6fff;
+    ppu->pxpl.bgs[1] = 0xcfff;
     ppu->pxpl.ats[0] = 0x0;
     ppu->pxpl.ats[1] = 0xff;
 
@@ -1394,45 +1330,45 @@ static void first_pixel(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(1u, ppu->dot);
-    //ct_assertequal(0x0u, ppu->pxpl.mux);
-    //ct_assertequal(0x0u, ppu->pxpl.pal);
-    //ct_assertequal(0x0u, ppu->pxpl.px);
+    ct_assertequal(0x0u, ppu->pxpl.mux);
+    ct_assertequal(0x0u, ppu->pxpl.pal);
+    ct_assertequal(0x0u, ppu->pxpl.px);
     ct_assertfalse(ppu->signal.vout);
 
     // Pipeline Idle
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(2u, ppu->dot);
-    //ct_assertequal(0x0u, ppu->pxpl.mux);
-    //ct_assertequal(0x0u, ppu->pxpl.pal);
-    //ct_assertequal(0x0u, ppu->pxpl.px);
+    ct_assertequal(0x0u, ppu->pxpl.mux);
+    ct_assertequal(0x0u, ppu->pxpl.pal);
+    ct_assertequal(0x0u, ppu->pxpl.px);
     ct_assertfalse(ppu->signal.vout);
 
     // First Mux-and-Shift
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(3u, ppu->dot);
-    //ct_assertequal(0xau, ppu->pxpl.mux);
-    //ct_assertequal(0x0u, ppu->pxpl.pal);
-    //ct_assertequal(0x0u, ppu->pxpl.px);
+    ct_assertequal(0xau, ppu->pxpl.mux);
+    ct_assertequal(0x0u, ppu->pxpl.pal);
+    ct_assertequal(0x0u, ppu->pxpl.px);
     ct_assertfalse(ppu->signal.vout);
 
     // Set Palette Address
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(4u, ppu->dot);
-    //ct_assertequal(0xbu, ppu->pxpl.mux);
-    //ct_assertequal(0xau, ppu->pxpl.pal);
-    //ct_assertequal(0x0u, ppu->pxpl.px);
+    ct_assertequal(0xbu, ppu->pxpl.mux);
+    ct_assertequal(0xau, ppu->pxpl.pal);
+    ct_assertequal(0x0u, ppu->pxpl.px);
     ct_assertfalse(ppu->signal.vout);
 
     // First Pixel Output
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(5u, ppu->dot);
-    //ct_assertequal(0x9u, ppu->pxpl.mux);
-    //ct_assertequal(0xbu, ppu->pxpl.pal);
-    //ct_assertequal(0x6u, ppu->pxpl.px);
+    ct_assertequal(0x9u, ppu->pxpl.mux);
+    ct_assertequal(0xbu, ppu->pxpl.pal);
+    ct_assertequal(0x6u, ppu->pxpl.px);
     ct_asserttrue(ppu->signal.vout);
 }
 

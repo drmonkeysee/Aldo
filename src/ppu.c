@@ -30,8 +30,8 @@ static const int
 // NOTE: helpers for manipulating v and t registers
 static const uint16_t
     HNtBit = 0x400, VNtBit = 0x800, NtBits = VNtBit | HNtBit,
-    CourseXBits = 0x1f,
     CourseYBits = 0x3e0, FineYBits = 0x7000;
+static const uint8_t CourseXBits = 0x1f, PaletteMask = CourseXBits;
 
 //
 // MARK: - Registers
@@ -143,13 +143,13 @@ static bool in_vblank(const struct aldo_rp2c02 *self)
 
 static bool palette_addr(uint16_t addr)
 {
-    return ALDO_MEMBLOCK_16KB - 256 <= addr && addr < ALDO_MEMBLOCK_16KB;
+    return Aldo_PaletteStartAddr <= addr && addr < ALDO_MEMBLOCK_16KB;
 }
 
 static uint16_t mask_palette(uint16_t addr)
 {
     // NOTE: 32 addressable bytes, including mirrors
-    addr &= 0x1f;
+    addr &= PaletteMask;
     // NOTE: background has 16 allocated slots while sprites have 12, making
     // palette RAM only 28 bytes long; if the address points at a mirrored slot
     // then mask it down to the actual slots in the lower 16, otherwise adjust
@@ -170,7 +170,7 @@ static uint16_t mask_palette(uint16_t addr)
 static uint8_t palette_read(const struct aldo_rp2c02 *self, uint16_t addr)
 {
     // NOTE: addr=[$3F00-$3FFF]
-    assert(Aldo_PaletteStartAddr <= addr && addr < ALDO_MEMBLOCK_16KB);
+    assert(palette_addr(addr));
 
     // NOTE: palette values are 6 bits wide
     return self->palette[mask_palette(addr)] & 0x3f;
@@ -179,7 +179,7 @@ static uint8_t palette_read(const struct aldo_rp2c02 *self, uint16_t addr)
 static void palette_write(struct aldo_rp2c02 *self, uint16_t addr, uint8_t d)
 {
     // NOTE: addr=[$3F00-$3FFF]
-    assert(Aldo_PaletteStartAddr <= addr && addr < ALDO_MEMBLOCK_16KB);
+    assert(palette_addr(addr));
 
     self->palette[mask_palette(addr)] = d;
 }
@@ -435,6 +435,13 @@ static void latch_attribute(struct aldo_rp2c02 *self)
     self->pxpl.atl[1] = aldo_byte_getbit(self->pxpl.at, bit + 1);
 }
 
+static void latch_inputs(struct aldo_rp2c02 *self)
+{
+    latch_tile(self->pxpl.bgs, self->pxpl.bg[0]);
+    latch_tile(self->pxpl.bgs + 1, self->pxpl.bg[1]);
+    latch_attribute(self);
+}
+
 static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
 {
     return 0x2000 | (self->v & ALDO_ADDRMASK_4KB);
@@ -496,20 +503,47 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
 {
     if (in_postrender(self)) return;
 
-    size_t idx = 0;
-    if (329 <= self->dot && self->dot < 338) {      // Tile Prefetch
-        pxshift(uint16_t, self->pxpl.bgs, 1);
-        pxshift(uint8_t, self->pxpl.ats, self->pxpl.atl[idx++]);
-        pxshift(uint16_t, self->pxpl.bgs + idx, 1);
-        pxshift(uint8_t, self->pxpl.ats + idx, self->pxpl.atl[idx]);
-        if (self->dot % 8 == 1) {
-            idx = 0;
-            latch_tile(self->pxpl.bgs, self->pxpl.bg[idx++]);
-            latch_tile(self->pxpl.bgs + idx, self->pxpl.bg[idx]);
-            latch_attribute(self);
+    self->signal.vout = false;
+
+    // NOTE: prefetch likely runs the same hardware steps as normal pixel
+    // selection, but since there are no side-effects outside of the pixel
+    // pipeline it's easier to load the tiles at once.
+    if (self->dot == 329 || self->dot == 337) {
+        latch_inputs(self);
+        // NOTE: shift the first tile that occurs during dots 329-337
+        if (self->dot == 329) {
+            self->pxpl.bgs[0] <<= 8;
+            self->pxpl.ats[0] = self->pxpl.atl[0] ? 0xff : 0x0;
+            self->pxpl.bgs[1] <<= 8;
+            self->pxpl.ats[1] = self->pxpl.atl[1] ? 0xff : 0x0;
         }
-    } else if (2 <= self->dot && self->dot < 261) { // Pixel Output
-        // TODO: generate pixel output
+    } else if (2 <= self->dot && self->dot < 261) {
+        if (self->dot > 3) {
+            assert((self->pxpl.pal & ~PaletteMask) == 0);
+            uint16_t pal_addr = 0x3f00 | self->pxpl.pal;
+            self->pxpl.px = palette_read(self, pal_addr);
+            self->signal.vout = true;
+        }
+        if (self->dot > 2) {
+            // TODO: account for rendering disabled and transparency
+            self->pxpl.pal = self->pxpl.mux;
+        }
+        // NOTE: fine-x selects bit from the left: 0 = 7th bit, 7 = 0th bit;
+        // in addition, tile selection is from the left-most (upper) byte.
+        int abit = 7 - self->x, tbit = abit + 8;
+        self->pxpl.mux =
+            (uint8_t)((aldo_byte_getbit(self->pxpl.ats[1], abit) << 3)
+                      | (aldo_byte_getbit(self->pxpl.ats[0], abit) << 2)
+                      | (aldo_byte_getbit(self->pxpl.bgs[1], tbit) << 1)
+                      | aldo_byte_getbit(self->pxpl.bgs[0], tbit));
+        // TODO: select sprite priority here
+        pxshift(uint16_t, self->pxpl.bgs, 1);
+        pxshift(uint8_t, self->pxpl.ats, self->pxpl.atl[0]);
+        pxshift(uint16_t, self->pxpl.bgs + 1, 1);
+        pxshift(uint8_t, self->pxpl.ats + 1, self->pxpl.atl[1]);
+        if (self->dot % 8 == 1) {
+            latch_inputs(self);
+        }
     }
 }
 

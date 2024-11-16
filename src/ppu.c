@@ -527,8 +527,13 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
             self->signal.vout = true;
         }
         if (self->dot > 2) {
-            // TODO: account for rendering disabled and transparency
-            self->pxpl.pal = self->pxpl.mux;
+            // TODO: handle rendering disabled
+            // NOTE: transparent pixels fall through to backdrop color
+            if ((self->pxpl.mux & 0x3) == 0) {
+                self->pxpl.pal = 0x0;
+            } else {
+                self->pxpl.pal = self->pxpl.mux;
+            }
         }
         // NOTE: fine-x selects bit from the left: 0 = 7th bit, 7 = 0th bit;
         // in addition, tile selection is from the left-most (upper) byte.
@@ -538,6 +543,7 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
                       | (aldo_getbit(self->pxpl.ats[0], abit) << 2)
                       | (aldo_getbit(self->pxpl.bgs[1], tbit) << 1)
                       | aldo_getbit(self->pxpl.bgs[0], tbit));
+        assert((self->pxpl.mux & 0xf0) == 0);
         // TODO: select sprite priority here
         pxshift(uint16_t, self->pxpl.bgs, 1);
         pxshift(uint8_t, self->pxpl.ats, self->pxpl.atl[0]);

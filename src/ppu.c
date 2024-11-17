@@ -25,7 +25,8 @@
 static const int
     Dots = 341, Lines = 262,
     LineVBlank = 241, LinePreRender = Lines - 1,
-    DotSpriteFetch = 257, DotTilePrefetch = 321, DotTilePrefetchEnd = 337;
+    DotPxStart = 2, DotSpriteFetch = 257, DotTilePrefetch = 321,
+    DotTilePrefetchEnd = 337;
 
 // NOTE: helpers for manipulating v and t registers
 static const uint16_t
@@ -445,11 +446,13 @@ static void latch_inputs(struct aldo_rp2c02 *self)
 
 static void select_bg(struct aldo_rp2c02 *self)
 {
+    static const int left_mask_end = DotPxStart + 8;
+
     // NOTE: fine-x selects bit from the left: 0 = 7th bit, 7 = 0th bit
     int abit = 7 - self->x;
     self->pxpl.mux = (uint8_t)((aldo_getbit(self->pxpl.ats[1], abit) << 3)
                                | (aldo_getbit(self->pxpl.ats[0], abit) << 2));
-    if (self->mask.b) {
+    if (self->mask.b && (self->mask.bm || self->dot >= left_mask_end)) {
         // NOTE: tile selection is from the left-most (upper) byte
         int tbit = abit + 8;
         self->pxpl.mux |= (uint8_t)((aldo_getbit(self->pxpl.bgs[1], tbit) << 1)
@@ -534,14 +537,14 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
         self->pxpl.ats[1] = -self->pxpl.atl[1];
     } else if (self->dot == 337) {
         latch_inputs(self);
-    } else if (2 <= self->dot && self->dot < 261) {
+    } else if (DotPxStart <= self->dot && self->dot < 261) {
         if (self->dot > 3) {
             assert(self->pxpl.pal < 0x20);
             uint16_t pal_addr = Aldo_PaletteStartAddr | self->pxpl.pal;
             self->pxpl.px = palette_read(self, pal_addr);
             self->signal.vout = true;
         }
-        if (self->dot > 2) {
+        if (self->dot > DotPxStart) {
             // TODO: handle rendering disabled
             // NOTE: transparent pixels fall through to backdrop color
             if ((self->pxpl.mux & 0x3) == 0) {

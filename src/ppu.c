@@ -560,6 +560,7 @@ static void incr_y(struct aldo_rp2c02 *self)
     }
 }
 
+// NOTE: based on PPU diagram: https://www.nesdev.org/wiki/PPU_rendering
 static void pixel_pipeline(struct aldo_rp2c02 *self)
 {
     // NOTE: assume there is no video signal until we actually output a pixel

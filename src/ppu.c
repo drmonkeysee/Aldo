@@ -396,7 +396,7 @@ static void write(struct aldo_rp2c02 *self)
  * +--------------- 0: Pattern table is at $0000-$1FFF
  */
 
-static void latch_tile(uint16_t *latch, uint8_t val)
+static void latch_pattern(uint16_t *latch, uint8_t val)
 {
     *latch = (*latch & 0xff00) | val;
 }
@@ -437,10 +437,10 @@ static void latch_attribute(struct aldo_rp2c02 *self)
     self->pxpl.atl[1] = aldo_getbit(self->pxpl.at, bit + 1);
 }
 
-static void latch_inputs(struct aldo_rp2c02 *self)
+static void latch_tile(struct aldo_rp2c02 *self)
 {
-    latch_tile(self->pxpl.bgs, self->pxpl.bg[0]);
-    latch_tile(self->pxpl.bgs + 1, self->pxpl.bg[1]);
+    latch_pattern(self->pxpl.bgs, self->pxpl.bg[0]);
+    latch_pattern(self->pxpl.bgs + 1, self->pxpl.bg[1]);
     latch_attribute(self);
 }
 
@@ -502,7 +502,7 @@ static void shift_tiles(struct aldo_rp2c02 *self)
     pxshift(uint16_t, self->pxpl.bgs + 1, 1);
     pxshift(uint8_t, self->pxpl.ats + 1, self->pxpl.atl[1]);
     if (self->dot % 8 == 1) {
-        latch_inputs(self);
+        latch_tile(self);
     }
 }
 
@@ -572,14 +572,14 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
     // selection, but since there are no side-effects outside of the pixel
     // pipeline it's easier to load the tiles at once.
     if (self->dot == 329) {
-        latch_inputs(self);
+        latch_tile(self);
         // NOTE: shift the first tile that occurs during dots 329-337
         self->pxpl.bgs[0] <<= 8;
         self->pxpl.ats[0] = -self->pxpl.atl[0];
         self->pxpl.bgs[1] <<= 8;
         self->pxpl.ats[1] = -self->pxpl.atl[1];
     } else if (self->dot == 337) {
-        latch_inputs(self);
+        latch_tile(self);
     } else if (DotPxStart <= self->dot && self->dot < 261) {
         if (self->dot > 3) {
             output_pixel(self);

@@ -36,11 +36,10 @@ struct aldo_rp2c02 {
             b: 1,           // Background Pattern Table Address;
                             // 0: $0000, 1: $1000.
             h: 1,           // Sprite Size (0: 8x8, 1: 8x16)
-            p: 1,           // PPU Master/Slave
+             : 1,           // PPU Master/Slave
                             // 0: read backdrop from EXT pins,
                             // 1: output color on EXT pins;
-                            // TODO: EXT pins are grounded on normal NES so
-                            // not clear there's anything to model.
+                            // grounded on normal NES so effectively unused.
             v: 1;           // NMI Enabled
     } ctrl;                 // PPUCTRL, write-only
     struct {

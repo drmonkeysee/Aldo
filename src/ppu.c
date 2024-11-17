@@ -47,7 +47,7 @@ static uint8_t get_ctrl(const struct aldo_rp2c02 *self)
          | self->ctrl.s << 3
          | self->ctrl.b << 4
          | self->ctrl.h << 5
-         | self->ctrl.p << 6
+         // NOTE: skip P
          | self->ctrl.v << 7);
 }
 
@@ -59,7 +59,7 @@ static void set_ctrl(struct aldo_rp2c02 *self, uint8_t v)
     self->ctrl.s = v & 0x8;
     self->ctrl.b = v & 0x10;
     self->ctrl.h = v & 0x20;
-    self->ctrl.p = 0;           // NOTE: p is always grounded
+    // NOTE: P is always grounded
     self->ctrl.v = v & 0x80;
 }
 
@@ -673,24 +673,24 @@ static void sprite_read(struct aldo_rp2c02 *self)
     case 3:
         // garbage NT addr
         addrbus(self, nametable_addr(self));
-        // load sprite attribute
+        // TODO: load sprite attribute
         break;
     case 4:
         // garbage NT data
         read_nt(self);
-        // load sprite x
+        // TODO: load sprite x
         break;
     case 5:
-        // FG low addr
+        // TODO: FG low addr
         break;
     case 6:
-        // FG low data
+        // TODO: FG low data
         break;
     case 7:
-        // FG high addr
+        // TODO: FG high addr
         break;
     case 0:
-        // FG high data
+        // TODO: FG high data
         break;
     default:
         assert(((void)"SPRITE RENDER UNREACHABLE CASE", false));

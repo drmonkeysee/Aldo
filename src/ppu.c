@@ -444,7 +444,7 @@ static void latch_inputs(struct aldo_rp2c02 *self)
     latch_attribute(self);
 }
 
-static void select_bg(struct aldo_rp2c02 *self)
+static void mux_bg(struct aldo_rp2c02 *self)
 {
     static const int left_mask_end = DotPxStart + 8;
 
@@ -459,6 +459,45 @@ static void select_bg(struct aldo_rp2c02 *self)
                                     | aldo_getbit(self->pxpl.bgs[0], tbit));
     }
     assert(self->pxpl.mux < 0x10);
+}
+
+static void mux_fg(struct aldo_rp2c02 *self)
+{
+    // TODO: select sprite priority here
+    assert(self->pxpl.mux < 0x10);
+}
+
+static void resolve_palette(struct aldo_rp2c02 *self)
+{
+    // TODO: handle rendering disabled
+    // NOTE: transparent pixels fall through to backdrop color
+    if ((self->pxpl.mux & 0x3) == 0) {
+        self->pxpl.pal = 0x0;
+    } else {
+        self->pxpl.pal = self->pxpl.mux;
+    }
+}
+
+static void output_pixel(struct aldo_rp2c02 *self)
+{
+    assert(self->pxpl.pal < 0x20);
+    uint16_t pal_addr = Aldo_PaletteStartAddr | self->pxpl.pal;
+    self->pxpl.px = palette_read(self, pal_addr);
+    self->signal.vout = true;
+}
+
+// TODO: replace t with c23 typeof
+#define pxshift(t, r, v) (*(r) = (t)(*(r) << 1) | (v))
+
+static void shift_tiles(struct aldo_rp2c02 *self)
+{
+    pxshift(uint16_t, self->pxpl.bgs, 1);
+    pxshift(uint8_t, self->pxpl.ats, self->pxpl.atl[0]);
+    pxshift(uint16_t, self->pxpl.bgs + 1, 1);
+    pxshift(uint8_t, self->pxpl.ats + 1, self->pxpl.atl[1]);
+    if (self->dot % 8 == 1) {
+        latch_inputs(self);
+    }
 }
 
 static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
@@ -515,9 +554,6 @@ static void incr_y(struct aldo_rp2c02 *self)
     }
 }
 
-// TODO: replace t with c23 typeof
-#define pxshift(t, r, v) (*(r) = (t)(*(r) << 1) | (v))
-
 static void pixel_pipeline(struct aldo_rp2c02 *self)
 {
     // NOTE: assume there is no video signal until we actually output a pixel
@@ -539,31 +575,15 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
         latch_inputs(self);
     } else if (DotPxStart <= self->dot && self->dot < 261) {
         if (self->dot > 3) {
-            assert(self->pxpl.pal < 0x20);
-            uint16_t pal_addr = Aldo_PaletteStartAddr | self->pxpl.pal;
-            self->pxpl.px = palette_read(self, pal_addr);
-            self->signal.vout = true;
+            output_pixel(self);
         }
         if (self->dot > DotPxStart) {
-            // TODO: handle rendering disabled
-            // NOTE: transparent pixels fall through to backdrop color
-            if ((self->pxpl.mux & 0x3) == 0) {
-                self->pxpl.pal = 0x0;
-            } else {
-                self->pxpl.pal = self->pxpl.mux;
-            }
+            resolve_palette(self);
         }
-
-        select_bg(self);
-        // TODO: select sprite priority here
-
-        pxshift(uint16_t, self->pxpl.bgs, 1);
-        pxshift(uint8_t, self->pxpl.ats, self->pxpl.atl[0]);
-        pxshift(uint16_t, self->pxpl.bgs + 1, 1);
-        pxshift(uint8_t, self->pxpl.ats + 1, self->pxpl.atl[1]);
-        if (self->dot % 8 == 1) {
-            latch_inputs(self);
-        }
+        mux_bg(self);
+        mux_fg(self);
+        shift_tiles(self);
+        // TODO: shift sprites
     }
 }
 

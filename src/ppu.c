@@ -162,8 +162,7 @@ static uint16_t mask_palette(uint16_t addr)
             addr &= 0xf;
         } else {
             // NOTE: 0x1-0x3 adjust down 1, 0x5-0x7 adjust down 2, etc...
-            uint16_t adj = ((addr & 0xc) >> 2) + 1;
-            addr -= adj;
+            addr -= (uint16_t)(((addr & 0xc) >> 2) + 1);
         }
     }
     return addr;
@@ -546,7 +545,7 @@ static void incr_y(struct aldo_rp2c02 *self)
     // if course y > 29 then wraparound occurs without overflow.
     if ((self->v & FineYBits) == FineYBits) {
         self->v &= ~FineYBits;
-        uint16_t course_y = self->v & CourseYBits;
+        int course_y = self->v & CourseYBits;
         if (course_y >= max_course_y) {
             self->v &= ~CourseYBits;
             if (course_y == max_course_y) {
@@ -796,8 +795,7 @@ static void cpu_rw(struct aldo_rp2c02 *self)
             write(self);
         }
         self->cvp = false;
-        uint16_t inc = self->ctrl.i ? 32 : 1;
-        self->v += inc;
+        self->v += (uint16_t)(1 << (self->ctrl.i * 5)); // NOTE: 1 or 32
     } else {
         addrbus(self, self->v);
     }

@@ -472,7 +472,7 @@ static void resolve_palette(struct aldo_rp2c02 *self)
     if (rendering_disabled(self)) {
         // NOTE: if v is pointing into palette memory then render that color
         if (palette_addr(self->v)) {
-            self->pxpl.pal = self->v & PaletteMask;
+            self->pxpl.pal = (uint8_t)(self->v & PaletteMask);
         } else {
             self->pxpl.pal = 0x0;
         }

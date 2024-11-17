@@ -32,7 +32,7 @@ static bool chrread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 static bool vramread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     if (ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB) {
-        // TODO: assume horizontal mirroring for now (Donkey Kong setting)
+        // NOTE: use horizontal mirroring for testing (Donkey Kong setting)
         size_t select = addr < 0x2800 ? 0 : 1;
         *d = (addr & 0x3ff) < 0x3c0
                 ? NameTables[select][addr % 0x8]

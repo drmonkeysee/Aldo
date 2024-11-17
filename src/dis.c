@@ -298,11 +298,11 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
                 // pixelidx is the 2-bit slice of pixelrow that maps to the
                 // packedpixel; BMP layout goes from left-to-right so pixelidx
                 // goes "backwards" from MSBs to LSBs.
-                size_t packedpixel = pixelx + (tilex * ALDO_CHR_TILE_DIM)
-                                        + (section * section_pxldim);
-                uint8_t pixelidx = (uint8_t)(ALDO_CHR_TILE_STRIDE
-                                             - ((pixelx + 1) * 2)),
-                        pixel = (uint8_t)((pixelrow & (0x3 << pixelidx))
+                size_t
+                    packedpixel = pixelx + (tilex * ALDO_CHR_TILE_DIM)
+                                    + (section * section_pxldim),
+                    pixelidx = ALDO_CHR_TILE_STRIDE - ((pixelx + 1) * 2);
+                uint8_t pixel = (uint8_t)((pixelrow & (0x3 << pixelidx))
                                           >> pixelidx);
                 assert(pixelidx < ALDO_CHR_TILE_STRIDE);
                 for (uint32_t scalex = 0; scalex < scale; ++scalex) {

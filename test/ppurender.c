@@ -1530,10 +1530,8 @@ static void pixel_disabled_bg(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->dot = 66;
-    ppu->pxpl.bgs[0] = 0xffff;
-    ppu->pxpl.bgs[1] = 0xffff;
-    ppu->pxpl.ats[0] = 0xff;
-    ppu->pxpl.ats[1] = 0xff;
+    ppu->pxpl.bgs[1] = ppu->pxpl.bgs[0] = 0xffff;
+    ppu->pxpl.ats[1] = ppu->pxpl.ats[0] = 0xff;
     ppu->mask.b = false;
 
     aldo_ppu_cycle(ppu);
@@ -1591,19 +1589,98 @@ static void fine_x_select(void *ctx)
     ct_assertequal(0x82u, at1);  // Reverse of 0x41
 }
 
+//
+// MARK: - Rendering Disabled
+//
+
 static void rendering_disabled(void *ctx)
 {
-    ct_assertfail("not implemented");
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->dot = 66;
+    ppu->pxpl.mux = 0xf;
+    ppu->mask.s = ppu->mask.b = false;
+    ppu->v = 0x20ff;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0x0u, ppu->pxpl.pal);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0x24u, ppu->pxpl.px);
+    ct_asserttrue(ppu->signal.vout);
 }
 
-static void rendering_disabled_explicit_palette(void *ctx)
+static void rendering_disabled_explicit_bg_palette(void *ctx)
 {
-    ct_assertfail("not implemented");
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->dot = 66;
+    ppu->pxpl.mux = 0xf;
+    ppu->mask.s = ppu->mask.b = false;
+    ppu->v = 0x3f09;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0x9u, ppu->pxpl.pal);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0x5u, ppu->pxpl.px);
+    ct_asserttrue(ppu->signal.vout);
 }
 
-static void rendering_disabled_unused_palette(void *ctx)
+static void rendering_disabled_unused_bg_palette(void *ctx)
 {
-    ct_assertfail("not implemented");
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->dot = 66;
+    ppu->pxpl.mux = 0xf;
+    ppu->mask.s = ppu->mask.b = false;
+    ppu->v = 0x3f0c;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0xcu, ppu->pxpl.pal);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0xdu, ppu->pxpl.px);
+    ct_asserttrue(ppu->signal.vout);
+}
+
+static void rendering_disabled_explicit_fg_palette(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->dot = 66;
+    ppu->pxpl.mux = 0xf;
+    ppu->mask.s = ppu->mask.b = false;
+    ppu->v = 0x3f19;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0x19u, ppu->pxpl.pal);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0x33u, ppu->pxpl.px);    // 0x3f19 points at pal[22];
+    ct_asserttrue(ppu->signal.vout);
+}
+
+static void rendering_disabled_unused_fg_palette(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->dot = 66;
+    ppu->pxpl.mux = 0xf;
+    ppu->mask.s = ppu->mask.b = false;
+    ppu->v = 0x3f1c;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0x1cu, ppu->pxpl.pal);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0xdu, ppu->pxpl.px);
+    ct_asserttrue(ppu->signal.vout);
 }
 
 //
@@ -1644,9 +1721,12 @@ struct ct_testsuite ppu_render_tests(void)
         ct_maketest(pixel_disabled_bg),
         ct_maketest(left_mask_bg),
         ct_maketest(fine_x_select),
+
         ct_maketest(rendering_disabled),
-        ct_maketest(rendering_disabled_explicit_palette),
-        ct_maketest(rendering_disabled_unused_palette),
+        ct_maketest(rendering_disabled_explicit_bg_palette),
+        ct_maketest(rendering_disabled_unused_bg_palette),
+        ct_maketest(rendering_disabled_explicit_fg_palette),
+        ct_maketest(rendering_disabled_unused_fg_palette),
     };
 
     return ct_makesuite_setup_teardown(tests, ppu_render_setup, ppu_teardown);

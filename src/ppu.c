@@ -32,7 +32,7 @@ static const int
 static const uint16_t
     HNtBit = 0x400, VNtBit = 0x800, NtBits = VNtBit | HNtBit,
     CourseYBits = 0x3e0, FineYBits = 0x7000;
-static const uint8_t CourseXBits = 0x1f;
+static const uint8_t CourseXBits = 0x1f, PaletteMask = CourseXBits;
 
 //
 // MARK: - Registers
@@ -151,7 +151,7 @@ static bool palette_addr(uint16_t addr)
 static uint16_t mask_palette(uint16_t addr)
 {
     // NOTE: 32 addressable bytes, including mirrors
-    addr &= 0x1f;
+    addr &= PaletteMask;
     // NOTE: background has 16 allocated slots while sprites have 12, making
     // palette RAM only 28 bytes long; if the address points at a mirrored slot
     // then mask it down to the actual slots in the lower 16, otherwise adjust
@@ -469,9 +469,15 @@ static void mux_fg(struct aldo_rp2c02 *self)
 
 static void resolve_palette(struct aldo_rp2c02 *self)
 {
-    // TODO: handle rendering disabled
-    // NOTE: transparent pixels fall through to backdrop color
-    if ((self->pxpl.mux & 0x3) == 0) {
+    if (rendering_disabled(self)) {
+        // NOTE: if v is pointing into palette memory then render that color
+        if (palette_addr(self->v)) {
+            self->pxpl.pal = self->v & PaletteMask;
+        } else {
+            self->pxpl.pal = 0x0;
+        }
+    } else if ((self->pxpl.mux & 0x3) == 0) {
+        // NOTE: transparent pixels fall through to backdrop color
         self->pxpl.pal = 0x0;
     } else {
         self->pxpl.pal = self->pxpl.mux;

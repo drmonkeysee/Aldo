@@ -448,7 +448,7 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
     mvwprintw(v->content, ++cursor_y, col1, "adc: %02X",
               snp->cpu.datapath.addrcarry_latch);
 
-    mvwprintw(v->content, ++cursor_y, col1, "%*sT%u",
+    mvwprintw(v->content, ++cursor_y, col1, "%*sT%d",
               snp->cpu.datapath.exec_cycle, "", snp->cpu.datapath.exec_cycle);
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);

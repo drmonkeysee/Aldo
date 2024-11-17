@@ -545,7 +545,7 @@ static void incr_y(struct aldo_rp2c02 *self)
     // if course y > 29 then wraparound occurs without overflow.
     if ((self->v & FineYBits) == FineYBits) {
         self->v &= ~FineYBits;
-        int course_y = self->v & CourseYBits;
+        uint16_t course_y = self->v & CourseYBits;
         if (course_y >= max_course_y) {
             self->v &= ~CourseYBits;
             if (course_y == max_course_y) {

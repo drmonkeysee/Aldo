@@ -33,10 +33,11 @@ struct aldo_snapshot {
             bool irq, nmi, readwrite, ready, reset, sync;
         } lines;
         struct {
+            int exec_cycle;
             enum aldo_sigstate irq, nmi, rst;
             uint16_t addressbus, current_instruction;
             uint8_t addrlow_latch, addrhigh_latch, addrcarry_latch, databus,
-                    exec_cycle, opcode;
+                    opcode;
             bool busfault, instdone, jammed;
         } datapath;
     } cpu;
@@ -49,8 +50,9 @@ struct aldo_snapshot {
                 video_out, write;
         } lines;
         struct {
+            int dot, line;
             enum aldo_sigstate rst;
-            uint16_t addressbus, scrolladdr, tempaddr, dot, line;
+            uint16_t addressbus, scrolladdr, tempaddr;
             uint8_t databus, readbuffer, register_databus, register_select,
                     xfine;
             bool busfault, cv_pending, oddframe, writelatch;

@@ -788,7 +788,7 @@ private:
         ImGui::TextUnformatted(display_signalstate(datapath.rst));
     }
 
-    static void renderCycleIndicator(aldo::et::byte cycle) noexcept
+    static void renderCycleIndicator(int cycle) noexcept
     {
         static constexpr auto radius = 5;
 

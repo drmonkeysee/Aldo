@@ -101,9 +101,10 @@ struct aldo_rp2c02 {
     } pxpl;
 
     // Internal Registers and Control Flags
-    uint16_t
+    int
         dot,                // Current Dot
-        line,               // Current Scanline
+        line;               // Current Scanline
+    uint16_t
         t,                  // Temp VRAM/Scrolling Address (15 bits)
         v;                  // Current VRAM/Scrolling Address (15 bits)
     uint8_t rbuf,           // PPUDATA Read Buffer

@@ -558,8 +558,8 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
 
     size_t
         max_offset = 1 + (inst.bv.size / 3),
-        displayidx = snp->cpu.datapath.exec_cycle < max_offset
-                        ? snp->cpu.datapath.exec_cycle
+        displayidx = (size_t)snp->cpu.datapath.exec_cycle < max_offset
+                        ? (size_t)snp->cpu.datapath.exec_cycle
                         : max_offset;
     const char *displaystr = StringTables[inst.d.mode][displayidx];
     switch (displayidx) {

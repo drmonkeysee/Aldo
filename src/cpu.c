@@ -867,7 +867,7 @@ static const uint8_t Magic = 0xee;
 static void store_unstable_addresshigh(struct aldo_mos6502 *self, uint8_t d)
 {
     // NOTE: if addr carry, +1 has already been stored into adh
-    uint8_t adrhi = self->adc ? self->adh : self->adh + 1;
+    uint8_t adrhi = (uint8_t)(self->adh + !self->adc);
     d &= adrhi;
     // NOTE: on page-cross boundary this *occasionally* throws the calculated
     // value into ADDR_HI; emulate that behavior consistently to emphasize the
@@ -1684,7 +1684,7 @@ int aldo_cpu_cycle(struct aldo_mos6502 *self)
     assert(self != NULL);
 
     // NOTE: sentinel value for cycle count denoting an imminent opcode fetch
-    static const int8_t prefetch = -1;
+    static const int prefetch = -1;
 
     if (!self->signal.rdy) return 0;
 
@@ -1742,7 +1742,7 @@ void aldo_cpu_snapshot(const struct aldo_mos6502 *self,
     snp->cpu.datapath.current_instruction = self->addrinst;
     snp->cpu.datapath.databus = self->databus;
     assert(self->t >= 0);
-    snp->cpu.datapath.exec_cycle = (uint8_t)self->t;
+    snp->cpu.datapath.exec_cycle = self->t;
     snp->cpu.datapath.instdone = self->presync;
     snp->cpu.datapath.irq = self->irq;
     snp->cpu.datapath.jammed = aldo_cpu_jammed(self);

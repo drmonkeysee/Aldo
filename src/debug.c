@@ -39,7 +39,7 @@ static void remove_reset_override(struct aldo_debugger_context *self)
 
     bool r = aldo_bus_set(self->cpu->mbus, ALDO_CPU_VECTOR_RST,
                           self->dec.inner);
-    assert(r);
+    (void)r, assert(r);
     self->dec = (struct resdecorator){0};
 }
 

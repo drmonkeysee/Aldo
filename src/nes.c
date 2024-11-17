@@ -139,7 +139,7 @@ static bool create_mbus(struct aldo_nes001 *self)
         ram_copy,
         self->ram,
     });
-    assert(r);
+    (void)r, assert(r);
     return true;
 }
 
@@ -162,7 +162,7 @@ static bool create_vbus(struct aldo_nes001 *self)
         vram_copy,
         self->vram,
     });
-    assert(r);
+    (void)r, assert(r);
     return true;
 }
 
@@ -170,7 +170,7 @@ static void connect_cart(struct aldo_nes001 *self, aldo_cart *c)
 {
     self->cart = c;
     bool r = aldo_cart_mbus_connect(self->cart, self->cpu.mbus);
-    assert(r);
+    (void)r, assert(r);
     aldo_cart_vbus_connect(self->cart, self->ppu.vbus);
     aldo_debug_sync_bus(self->dbg);
 }

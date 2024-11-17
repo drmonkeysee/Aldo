@@ -462,6 +462,7 @@ static void mux_bg(struct aldo_rp2c02 *self)
 
 static void mux_fg(struct aldo_rp2c02 *self)
 {
+    (void)self;
     // TODO: select sprite priority here
     assert(self->pxpl.mux < 0x10);
 }
@@ -864,7 +865,7 @@ void aldo_ppu_connect(struct aldo_rp2c02 *self, aldo_bus *mbus)
         .write = regwrite,
         .ctx = self,
     });
-    assert(r);
+    (void)r, assert(r);
 }
 
 void aldo_ppu_powerup(struct aldo_rp2c02 *self)

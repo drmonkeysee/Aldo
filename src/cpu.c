@@ -261,7 +261,7 @@ static void store_data(struct aldo_mos6502 *self, uint8_t d)
 static void binary_add(struct aldo_mos6502 *self, uint8_t a, uint8_t b,
                        uint8_t c)
 {
-    uint16_t sum = (uint16_t)(a + b + c);
+    int sum = a + b + c;
     self->p.c = sum & 0x100;
     uint8_t result = (uint8_t)sum;
     update_v(self, result, a, b);
@@ -271,43 +271,42 @@ static void binary_add(struct aldo_mos6502 *self, uint8_t a, uint8_t b,
 static void decimal_add(struct aldo_mos6502 *self, uint8_t alo, uint8_t blo,
                         uint8_t ahi, uint8_t bhi, bool c)
 {
-    uint8_t slo = (uint8_t)(alo + blo + c);
+    int slo = alo + blo + c;
     bool chi = slo > 0x9;
     if (chi) {
         slo += 0x6;
         slo &= 0xf;
     }
-    uint8_t shi = (uint8_t)(ahi + bhi + chi),
-            shinib = (uint8_t)(shi << 4);
+    int shi = ahi + bhi + chi, shinib = shi << 4;
     // NOTE: overflow and negative are set before decimal adjustment
-    update_v(self, shinib, (uint8_t)(ahi << 4), (uint8_t)(bhi << 4));
-    update_n(self, shinib);
+    update_v(self, (uint8_t)shinib, (uint8_t)(ahi << 4), (uint8_t)(bhi << 4));
+    update_n(self, (uint8_t)shinib);
     self->p.c = shi > 0x9;
     if (self->p.c) {
         shi += 0x6;
         shi &= 0xf;
     }
-    shinib = (uint8_t)(shi << 4);
-    self->a = shinib | slo;
+    shinib = shi << 4;
+    self->a = (uint8_t)(shinib | slo);
 }
 
 static void decimal_subtract(struct aldo_mos6502 *self, uint8_t alo,
                              uint8_t blo, uint8_t ahi, uint8_t bhi,
                              uint8_t brw)
 {
-    uint8_t dlo = (uint8_t)(alo - blo + brw);   // borrow is either 0 or -1
-    bool brwhi = dlo >= 0x80; // dlo < 0
+    int dlo = alo - blo + (int8_t)brw;  // borrow is either 0 or -1
+    bool brwhi = dlo < 0;
     if (brwhi) {
         dlo -= 0x6;
         dlo &= 0xf;
     }
-    uint8_t dhi = (uint8_t)(ahi - bhi - brwhi);
-    if (dhi >= 0x80) {  // dhi < 0
+    int dhi = ahi - bhi - brwhi;
+    if (dhi < 0) {
         dhi -= 0x6;
         dhi &= 0xf;
     }
     // NOTE: bcd subtract does not adjust flags from earlier binary op
-    self->a = (uint8_t)(dhi << 4) | dlo;
+    self->a = (uint8_t)((dhi << 4) | dlo);
 }
 
 enum arithmetic_operator {
@@ -333,8 +332,7 @@ static void arithmetic_operation(struct aldo_mos6502 *self,
         ahi = (a >> 4) & 0xf,
         bhi = (b >> 4) & 0xf;
     if (op == AOP_SUB) {
-        uint8_t borrow = c - 1;
-        decimal_subtract(self, alo, blo, ahi, bhi, borrow);
+        decimal_subtract(self, alo, blo, ahi, bhi, c - 1);
     } else {
         decimal_add(self, alo, blo, ahi, bhi, c);
     }
@@ -346,7 +344,7 @@ static void arithmetic_operation(struct aldo_mos6502 *self,
 static uint8_t compare_register(struct aldo_mos6502 *self, uint8_t r,
                                 uint8_t d)
 {
-    uint16_t cmp = (uint16_t)(r + (uint8_t)~d + 1);
+    int cmp = r + (uint8_t)~d + 1;
     self->p.c = cmp & 0x100;
     uint8_t result = (uint8_t)cmp;
     update_z(self, result);

@@ -48,8 +48,8 @@ static void reset_sequence(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(42u, ppu->line);
-    ct_assertequal(25u, ppu->dot);
+    ct_assertequal(42, ppu->line);
+    ct_assertequal(25, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -66,8 +66,8 @@ static void reset_sequence(void *ctx)
     ppu->signal.rst = false;
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(42u, ppu->line);
-    ct_assertequal(26u, ppu->dot);
+    ct_assertequal(42, ppu->line);
+    ct_assertequal(26, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -83,8 +83,8 @@ static void reset_sequence(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(42u, ppu->line);
-    ct_assertequal(27u, ppu->dot);
+    ct_assertequal(42, ppu->line);
+    ct_assertequal(27, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -100,8 +100,8 @@ static void reset_sequence(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(42u, ppu->line);
-    ct_assertequal(28u, ppu->dot);
+    ct_assertequal(42, ppu->line);
+    ct_assertequal(28, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -120,8 +120,8 @@ static void reset_sequence(void *ctx)
         aldo_ppu_cycle(ppu);
     }
 
-    ct_assertequal(42u, ppu->line);
-    ct_assertequal(33u, ppu->dot);
+    ct_assertequal(42, ppu->line);
+    ct_assertequal(33, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -138,8 +138,8 @@ static void reset_sequence(void *ctx)
     ppu->signal.rst = true;
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(0u, ppu->line);
-    ct_assertequal(1u, ppu->dot);
+    ct_assertequal(0, ppu->line);
+    ct_assertequal(1, ppu->dot);
     ct_asserttrue(ppu->signal.intr);
     ct_assertfalse(ppu->ctrl.b);
     ct_assertfalse(ppu->mask.b);
@@ -168,8 +168,8 @@ static void reset_too_short(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(42u, ppu->line);
-    ct_assertequal(25u, ppu->dot);
+    ct_assertequal(42, ppu->line);
+    ct_assertequal(25, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -186,8 +186,8 @@ static void reset_too_short(void *ctx)
     ppu->signal.rst = false;
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(42u, ppu->line);
-    ct_assertequal(26u, ppu->dot);
+    ct_assertequal(42, ppu->line);
+    ct_assertequal(26, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -204,8 +204,8 @@ static void reset_too_short(void *ctx)
     ppu->signal.rst = true;
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(42u, ppu->line);
-    ct_assertequal(27u, ppu->dot);
+    ct_assertequal(42, ppu->line);
+    ct_assertequal(27, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -233,7 +233,7 @@ static void vblank_prep(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(1u, ppu->dot);
+    ct_assertequal(1, ppu->dot);
     ct_asserttrue(ppu->status.v);
     ct_asserttrue(ppu->signal.intr);
 }
@@ -248,7 +248,7 @@ static void vblank_start(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(2u, ppu->dot);
+    ct_assertequal(2, ppu->dot);
     ct_asserttrue(ppu->status.v);
     ct_assertfalse(ppu->signal.intr);
 }
@@ -262,7 +262,7 @@ static void vblank_start_nmi_disabled(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(2u, ppu->dot);
+    ct_assertequal(2, ppu->dot);
     ct_asserttrue(ppu->status.v);
     ct_asserttrue(ppu->signal.intr);
 }
@@ -277,7 +277,7 @@ static void vblank_start_nmi_missed(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(2u, ppu->dot);
+    ct_assertequal(2, ppu->dot);
     ct_assertfalse(ppu->status.v);
     ct_asserttrue(ppu->signal.intr);
 }
@@ -293,21 +293,21 @@ static void vblank_nmi_toggle(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(41u, ppu->dot);
+    ct_assertequal(41, ppu->dot);
     ct_asserttrue(ppu->status.v);
     ct_assertfalse(ppu->signal.intr);
 
     ppu->ctrl.v = false;
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(42u, ppu->dot);
+    ct_assertequal(42, ppu->dot);
     ct_asserttrue(ppu->status.v);
     ct_asserttrue(ppu->signal.intr);
 
     ppu->ctrl.v = true;
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(43u, ppu->dot);
+    ct_assertequal(43, ppu->dot);
     ct_asserttrue(ppu->status.v);
     ct_assertfalse(ppu->signal.intr);
 }
@@ -323,20 +323,20 @@ static void vblank_nmi_clear(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(41u, ppu->dot);
+    ct_assertequal(41, ppu->dot);
     ct_asserttrue(ppu->status.v);
     ct_assertfalse(ppu->signal.intr);
 
     ppu->status.v = false;
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(42u, ppu->dot);
+    ct_assertequal(42, ppu->dot);
     ct_assertfalse(ppu->status.v);
     ct_asserttrue(ppu->signal.intr);
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(43u, ppu->dot);
+    ct_assertequal(43, ppu->dot);
     ct_assertfalse(ppu->status.v);
     ct_asserttrue(ppu->signal.intr);
 }
@@ -355,7 +355,7 @@ static void vblank_end(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(2u, ppu->dot);
+    ct_assertequal(2, ppu->dot);
     ct_assertfalse(ppu->status.v);
     ct_assertfalse(ppu->status.s);
     ct_assertfalse(ppu->status.o);
@@ -373,16 +373,16 @@ static void frame_toggle(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(0u, ppu->line);
-    ct_assertequal(0u, ppu->dot);
+    ct_assertequal(0, ppu->line);
+    ct_assertequal(0, ppu->dot);
     ct_asserttrue(ppu->odd);
 
     ppu->line = 261;
     ppu->dot = 340;
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(0u, ppu->line);
-    ct_assertequal(0u, ppu->dot);
+    ct_assertequal(0, ppu->line);
+    ct_assertequal(0, ppu->dot);
     ct_assertfalse(ppu->odd);
 }
 

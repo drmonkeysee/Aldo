@@ -25,13 +25,15 @@ size_t aldo_bytecopy_bank(const uint8_t *restrict bankmem, int bankwidth,
     assert(dest != NULL);
     assert(ALDO_BITWIDTH_1KB <= bankwidth && bankwidth <= ALDO_BITWIDTH_64KB);
 
-    size_t banksize = 1 << bankwidth;
-    // NOTE: addr -> index is always mask(banksize - 1)
-    // iff banksize is a power of 2
-    uint16_t start = addr & (uint16_t)(banksize - 1);
     size_t
-        bytesleft = banksize - start,
-        bytecount = count > bytesleft ? bytesleft : count;
+        banksize = 1 << bankwidth,
+        // NOTE: addr -> start is always mask(banksize - 1)
+        // iff banksize is a power of 2
+        start = addr & (banksize - 1);
+    ptrdiff_t bytesleft = (ptrdiff_t)(banksize - start);
+    size_t bytecount = (ptrdiff_t)count > bytesleft
+                        ? (size_t)bytesleft
+                        : count;
     memcpy(dest, bankmem + start, bytecount * sizeof *dest);
     return bytecount;
 }

@@ -290,7 +290,8 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
                                     | (ppu->regbus & course) << 2);
             } else {
                 // NOTE: set course and fine x
-                ppu->t = (ppu->t & ~CourseXBits) | (ppu->regbus & course) >> 3;
+                ppu->t = (uint16_t)((ppu->t & ~CourseXBits)
+                                    | (ppu->regbus & course) >> 3);
                 ppu->x = ppu->regbus & fine;
             }
             ppu->w = !ppu->w;
@@ -530,7 +531,7 @@ static void incr_course_x(struct aldo_rp2c02 *self)
 {
     // NOTE: wraparound at x = 32, overflow to horizontal nametable bit
     if ((self->v & CourseXBits) == CourseXBits) {
-        self->v &= ~CourseXBits;
+        self->v &= (uint16_t)~CourseXBits;
         self->v ^= HNtBit;
     } else {
         self->v += 1;
@@ -545,10 +546,10 @@ static void incr_y(struct aldo_rp2c02 *self)
     // course y wraparound at y = 30, overflow into vertical nametable bit;
     // if course y > 29 then wraparound occurs without overflow.
     if ((self->v & FineYBits) == FineYBits) {
-        self->v &= ~FineYBits;
+        self->v &= (uint16_t)~FineYBits;
         uint16_t course_y = self->v & CourseYBits;
         if (course_y >= max_course_y) {
-            self->v &= ~CourseYBits;
+            self->v &= (uint16_t)~CourseYBits;
             if (course_y == max_course_y) {
                 self->v ^= VNtBit;
             }
@@ -653,7 +654,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
     // NOTE: copy t course-y, fine-y, and vertical nametable to v
     if (self->line == LinePreRender && 280 <= self->dot && self->dot < 305) {
         static const uint16_t vert_bits = FineYBits | VNtBit | CourseYBits;
-        self->v = (self->v & ~vert_bits) | (self->t & vert_bits);
+        self->v = (uint16_t)((self->v & ~vert_bits) | (self->t & vert_bits));
     }
 
     switch (self->dot % 8) {
@@ -663,7 +664,8 @@ static void sprite_read(struct aldo_rp2c02 *self)
         if (self->dot == DotSpriteFetch) {
             static const uint16_t horiz_bits = HNtBit | CourseXBits;
             // NOTE: copy t course-x and horizontal nametable to v
-            self->v = (self->v & ~horiz_bits) | (self->t & horiz_bits);
+            self->v = (uint16_t)((self->v & ~horiz_bits)
+                                 | (self->t & horiz_bits));
         }
         break;
     case 2:

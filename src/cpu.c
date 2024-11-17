@@ -291,10 +291,9 @@ static void decimal_add(struct aldo_mos6502 *self, uint8_t alo, uint8_t blo,
 }
 
 static void decimal_subtract(struct aldo_mos6502 *self, uint8_t alo,
-                             uint8_t blo, uint8_t ahi, uint8_t bhi,
-                             uint8_t brw)
+                             uint8_t blo, uint8_t ahi, uint8_t bhi, int8_t brw)
 {
-    int dlo = alo - blo + (int8_t)brw;  // borrow is either 0 or -1
+    int dlo = alo - blo + brw;  // borrow is either 0 or -1
     bool brwhi = dlo < 0;
     if (brwhi) {
         dlo -= 0x6;

@@ -94,7 +94,7 @@ inline void aldo_wrtoba(uint16_t word, uint8_t bytes[br_csz(2)]) br_nothrow
 inline void aldo_dwtoba(uint32_t dword, uint8_t bytes[br_csz(4)]) br_nothrow
 {
     for (size_t i = 0; i < 4; ++i) {
-        bytes[i] = (dword >> (8 * i)) & 0xff;
+        bytes[i] = (uint8_t)(dword >> (8 * i));
     }
 }
 

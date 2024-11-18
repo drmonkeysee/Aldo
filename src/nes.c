@@ -148,7 +148,9 @@ static bool create_vbus(struct aldo_nes001 *self)
     // 14-bit Address Space = 16KB
     // * $0000 - $1FFF: 8KB CHR ROM/RAM, 2 pattern tables mapped to cartridge
     // * $2000 - $3FFF: 2KB RAM mirrored to 8KB, nametable-mirroring uses 4KB
-    //                  of address space; never writes to $3F00 - $3FFF
+    //                  of address space; never writes to $3F00 - $3FFF; uses
+    //                  nametable vertical-mirroring by default, though the
+    //                  cartridge may override this behavior.
     // * $3F00 - $3FFF: 32B Palette RAM mirrored to 256B; internal to the PPU
     //                  and thus not on the video bus, but reads do leak
     //                  through to the underlying VRAM.

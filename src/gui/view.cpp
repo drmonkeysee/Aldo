@@ -1662,8 +1662,16 @@ private:
                                : "Frames/Second");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(40);
-        ImGui::DragInt("##clockRate", &vs.clock.clock().rate, 1, Aldo_MinCps,
-                       Aldo_MaxCps, "%d", ImGuiSliderFlags_AlwaysClamp);
+        int min, max;
+        if (vs.clock.scale() == ALDO_CS_CYCLE) {
+            min = Aldo_MinCps;
+            max = Aldo_MaxCps;
+        } else {
+            min = Aldo_MinFps;
+            max = Aldo_MaxFps;
+        }
+        ImGui::DragInt("##clockRate", &vs.clock.clock().rate, 1, min, max,
+                       "%d", ImGuiSliderFlags_AlwaysClamp);
 
         if (ImGui::RadioButton("Cycles", vs.clock.scale() == ALDO_CS_CYCLE)) {
             vs.clock.setScale(ALDO_CS_CYCLE);

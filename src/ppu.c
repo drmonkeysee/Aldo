@@ -515,9 +515,7 @@ static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
 static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
                              bool plane)
 {
-    uint16_t
-        tileidx = (uint16_t)(self->pxpl.nt << 4),
-        pxrow = (self->v & FineYBits) >> 12;
+    int tileidx = self->pxpl.nt << 4, pxrow = (self->v & FineYBits) >> 12;
     return (uint16_t)((table << 12) | tileidx | (plane << 3) | pxrow);
 }
 
@@ -569,19 +567,7 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
 
     if (in_postrender(self)) return;
 
-    // NOTE: prefetch likely runs the same hardware steps as normal pixel
-    // selection, but since there are no side-effects outside of the pixel
-    // pipeline it's easier to load the tiles at once.
-    if (self->dot == 329) {
-        latch_tile(self);
-        // NOTE: shift the first tile that occurs during dots 329-337
-        self->pxpl.bgs[0] <<= 8;
-        self->pxpl.ats[0] = -self->pxpl.atl[0];
-        self->pxpl.bgs[1] <<= 8;
-        self->pxpl.ats[1] = -self->pxpl.atl[1];
-    } else if (self->dot == 337) {
-        latch_tile(self);
-    } else if (DotPxStart <= self->dot && self->dot < 261) {
+    if (DotPxStart <= self->dot && self->dot < 261) {
         if (self->dot > 3) {
             output_pixel(self);
         }
@@ -592,6 +578,18 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
         mux_fg(self);
         shift_tiles(self);
         // TODO: shift sprites
+    } else if (self->dot == 329) {
+        // NOTE: prefetch likely runs the same hardware steps as normal pixel
+        // selection, but since there are no side-effects outside of the pixel
+        // pipeline it's easier to load the tiles at once.
+        latch_tile(self);
+        // NOTE: shift the first tile that occurs during dots 329-337
+        self->pxpl.bgs[0] <<= 8;
+        self->pxpl.ats[0] = -self->pxpl.atl[0];
+        self->pxpl.bgs[1] <<= 8;
+        self->pxpl.ats[1] = -self->pxpl.atl[1];
+    } else if (self->dot == 337) {
+        latch_tile(self);
     }
 }
 

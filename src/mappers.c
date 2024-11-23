@@ -87,7 +87,7 @@ static void fill_pattern_table(size_t tile_count,
 // MARK: - Raw ROM Image Implementation
 //
 
-static bool raw_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
+static bool raw_prgr(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     // NOTE: addr=[$8000-$FFFF]
     assert(addr > ALDO_ADDRMASK_32KB);
@@ -96,7 +96,7 @@ static bool raw_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     return true;
 }
 
-static size_t raw_copy(const void *restrict ctx, uint16_t addr, size_t count,
+static size_t raw_prgc(const void *restrict ctx, uint16_t addr, size_t count,
                        uint8_t dest[restrict count])
 {
     // NOTE: addr=[$8000-$FFFF]
@@ -126,8 +126,8 @@ static bool raw_mbus_connect(struct aldo_mapper *self, aldo_bus *b)
     assert(self != NULL);
 
     return aldo_bus_set(b, ALDO_MEMBLOCK_32KB, (struct aldo_busdevice){
-        .read = raw_read,
-        .copy = raw_copy,
+        .read = raw_prgr,
+        .copy = raw_prgc,
         .ctx = ((struct raw_mapper *)self)->rom,
     });
 }
@@ -181,7 +181,7 @@ static bool ines_unimplemented_vbus_connect(struct aldo_mapper *self,
 // MARK: - iNES 000
 //
 
-static bool ines_000_read(void *restrict ctx, uint16_t addr,
+static bool ines_000_prgr(void *restrict ctx, uint16_t addr,
                           uint8_t *restrict d)
 {
     // NOTE: addr=[$8000-$FFFF]
@@ -191,11 +191,11 @@ static bool ines_000_read(void *restrict ctx, uint16_t addr,
     uint16_t mask = m->blockcount == 2
                     ? ALDO_ADDRMASK_32KB
                     : ALDO_ADDRMASK_16KB;
-    *d = m->super.prg[addr & mask];
+    mem_load(d, m->super.prg, addr, mask);
     return true;
 }
 
-static size_t ines_000_copy(const void *restrict ctx, uint16_t addr,
+static size_t ines_000_prgc(const void *restrict ctx, uint16_t addr,
                             size_t count, uint8_t dest[restrict count])
 {
     // NOTE: addr=[$8000-$FFFF]
@@ -208,7 +208,7 @@ static size_t ines_000_copy(const void *restrict ctx, uint16_t addr,
     return aldo_bytecopy_bank(m->super.prg, width, addr, count, dest);
 }
 
-static bool ines_000_vread(void *restrict ctx, uint16_t addr,
+static bool ines_000_chrr(void *restrict ctx, uint16_t addr,
                            uint8_t *restrict d)
 {
     // NOTE: addr=[$0000-$1FFF]
@@ -219,7 +219,7 @@ static bool ines_000_vread(void *restrict ctx, uint16_t addr,
     return true;
 }
 
-static bool ines_000_vwrite(void *ctx, uint16_t addr, uint8_t d)
+static bool ines_000_chrw(void *ctx, uint16_t addr, uint8_t d)
 {
     // NOTE: addr=[$0000-$1FFF]
     assert(addr < ALDO_MEMBLOCK_8KB);
@@ -239,8 +239,8 @@ static bool ines_000_mbus_connect(struct aldo_mapper *self, aldo_bus *b)
     assert(self != NULL);
 
     return aldo_bus_set(b, ALDO_MEMBLOCK_32KB, (struct aldo_busdevice){
-        .read = ines_000_read,
-        .copy = ines_000_copy,
+        .read = ines_000_prgr,
+        .copy = ines_000_prgc,
         .ctx = self,
     });
 }
@@ -251,8 +251,8 @@ static bool ines_000_vbus_connect(struct aldo_mapper *self, aldo_bus *b)
 
     struct ines_mapper *m = (struct ines_mapper *)self;
     return aldo_bus_set(b, 0, (struct aldo_busdevice){
-        .read = ines_000_vread,
-        .write = m->chrram ? ines_000_vwrite : NULL,
+        .read = ines_000_chrr,
+        .write = m->chrram ? ines_000_chrw : NULL,
         .ctx = m,
     });
 }

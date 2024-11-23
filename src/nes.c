@@ -173,7 +173,8 @@ static void connect_cart(struct aldo_nes001 *self, aldo_cart *c)
     self->cart = c;
     bool r = aldo_cart_mbus_connect(self->cart, self->cpu.mbus);
     (void)r, assert(r);
-    aldo_cart_vbus_connect(self->cart, self->ppu.vbus);
+    r = aldo_cart_vbus_connect(self->cart, self->ppu.vbus);
+    (void)r, assert(r);
     aldo_debug_sync_bus(self->dbg);
 }
 

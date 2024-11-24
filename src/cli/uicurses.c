@@ -565,7 +565,8 @@ static int draw_pdatapath(const struct view *v, int cursor_y, int w,
 static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
                               const struct aldo_snapshot *snp)
 {
-    mvwprintw(v->content, cursor_y, line_x - 2, "[%sXX]", DArrowDown);
+    mvwprintw(v->content, cursor_y, line_x - 2, "[%s%02X]", DArrowDown,
+              snp->ppu.datapath.pixel);
 
     // NOTE: some compilers are pickier about static size checks and insist the
     // buffer should be large enough to fit the theoretical max 5-digit length

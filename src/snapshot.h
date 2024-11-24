@@ -53,8 +53,8 @@ struct aldo_snapshot {
             int dot, line;
             enum aldo_sigstate rst;
             uint16_t addressbus, scrolladdr, tempaddr;
-            uint8_t databus, readbuffer, register_databus, register_select,
-                    xfine;
+            uint8_t databus, pixel, readbuffer, register_databus,
+                    register_select, xfine;
             bool busfault, cv_pending, oddframe, writelatch;
         } datapath;
     } ppu;

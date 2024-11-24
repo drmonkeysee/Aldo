@@ -488,6 +488,7 @@ static void resolve_palette(struct aldo_rp2c02 *self)
 static void output_pixel(struct aldo_rp2c02 *self)
 {
     assert(self->pxpl.pal < 0x20);
+
     uint16_t pal_addr = Aldo_PaletteStartAddr | self->pxpl.pal;
     self->pxpl.px = palette_read(self, pal_addr);
     self->signal.vout = true;
@@ -927,6 +928,7 @@ void aldo_ppu_bus_snapshot(const struct aldo_rp2c02 *self,
     snp->ppu.datapath.cv_pending = self->cvp;
     snp->ppu.datapath.oddframe = self->odd;
     snp->ppu.datapath.writelatch = self->w;
+    snp->ppu.datapath.pixel = self->pxpl.px;
 
     snp->ppu.lines.address_enable = self->signal.ale;
     snp->ppu.lines.cpu_readwrite = self->signal.rw;

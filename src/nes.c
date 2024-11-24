@@ -110,17 +110,6 @@ static bool vram_write(void *ctx, uint16_t addr, uint8_t d)
     return true;
 }
 
-static size_t vram_copy(const void *restrict ctx, uint16_t addr, size_t count,
-                        uint8_t dest[restrict count])
-{
-    // NOTE: addr=[$2000-$3FFF]
-    // NOTE: full 8KB range is valid input, see vram_read for reasons
-    assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
-
-    // NOTE: only 2KB of actual mem to copy
-    return aldo_bytecopy_bank(ctx, ALDO_BITWIDTH_2KB, addr, count, dest);
-}
-
 static bool create_mbus(struct aldo_nes001 *self)
 {
     // TODO: partitions so far:
@@ -159,10 +148,9 @@ static bool create_vbus(struct aldo_nes001 *self)
 
     bool r = aldo_bus_set(self->ppu.vbus, ALDO_MEMBLOCK_8KB,
                           (struct aldo_busdevice){
-        vram_read,
-        vram_write,
-        vram_copy,
-        self->vram,
+        .read = vram_read,
+        .write = vram_write,
+        .ctx = self->vram,
     });
     (void)r, assert(r);
     return true;

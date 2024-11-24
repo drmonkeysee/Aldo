@@ -9,6 +9,7 @@
 
 #include "bytes.h"
 #include "cart.h"
+#include "ppu.h"
 #include "snapshot.h"
 
 #include <assert.h>
@@ -28,7 +29,9 @@ struct ines_mapper {
 
 struct ines_000_mapper {
     struct ines_mapper super;
+    struct aldo_busdevice vrbd;
     size_t blockcount;
+    bool hmirroring;
 };
 
 static int load_blocks(uint8_t *restrict *mem, size_t size, FILE *f)
@@ -46,6 +49,16 @@ static int load_blocks(uint8_t *restrict *mem, size_t size, FILE *f)
 // MARK: - Common Implementation
 //
 
+// NOTE: shifting the high-nametable bit (11) right 1 position (10) effectively
+// divides the nametable selection in half, folding the two lower nametables
+// into [0x000-0x3FF] and the two upper nametables into [0x400-0x7FF], which is
+// the definition of horizontal mirroring once the 14-bit VRAM address is
+// masked down to the 2KB (0x800) of addressable VRAM.
+static uint16_t hmirror_addr(uint16_t addr)
+{
+    return (uint16_t)((addr & ~0xc00) | ((addr & 0x800) >> 1));
+}
+
 static void mem_load(uint8_t *restrict d, const uint8_t *restrict mem,
                      uint16_t addr, uint16_t mask)
 {
@@ -56,12 +69,14 @@ static void mem_load(uint8_t *restrict d, const uint8_t *restrict mem,
 // be so common anymore.
 static void clear_prg_device(aldo_bus *b)
 {
-    aldo_bus_clear(b, ALDO_MEMBLOCK_32KB);
+    bool r = aldo_bus_clear(b, ALDO_MEMBLOCK_32KB);
+    (void)r, assert(r);
 }
 
 static void clear_chr_device(aldo_bus *b)
 {
-    aldo_bus_clear(b, 0);
+    bool r = aldo_bus_clear(b, 0);
+    (void)r, assert(r);
 }
 
 static void fill_pattern_table(size_t tile_count,
@@ -230,6 +245,30 @@ static bool ines_000_chrw(void *ctx, uint16_t addr, uint8_t d)
     return true;
 }
 
+static bool ines_000_vrmr(void *restrict ctx, uint16_t addr,
+                          uint8_t *restrict d)
+{
+    // NOTE: addr=[$2000-$3FFF]
+    // NOTE: palette reads still hit the VRAM bus and affect internal PPU
+    // buffers, so the full 8KB range is valid input.
+    assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
+
+    const struct ines_000_mapper *m = ctx;
+    return m->vrbd.read(m->vrbd.ctx, m->hmirroring ? hmirror_addr(addr) : addr,
+                        d);
+}
+
+static bool ines_000_vrmw(void *ctx, uint16_t addr, uint8_t d)
+{
+    // NOTE: addr=[$2000-$3EFF]
+    // NOTE: writes to palette RAM should never hit the video bus
+    assert(ALDO_MEMBLOCK_8KB <= addr && addr < Aldo_PaletteStartAddr);
+
+    const struct ines_000_mapper *m = ctx;
+    return m->vrbd.write(m->vrbd.ctx,
+                         m->hmirroring ? hmirror_addr(addr) : addr, d);
+}
+
 // TODO: binding to $8000 is too simple; WRAM needs at least $6000, and the
 // CPU memory map defines start of cart mapping at $4020; the most complex
 // mappers need access to entire 64KB address space in order to snoop on
@@ -249,12 +288,32 @@ static bool ines_000_vbus_connect(struct aldo_mapper *self, aldo_bus *b)
 {
     assert(self != NULL);
 
-    struct ines_mapper *m = (struct ines_mapper *)self;
+    struct ines_000_mapper *m = (struct ines_000_mapper *)self;
     return aldo_bus_set(b, 0, (struct aldo_busdevice){
         .read = ines_000_chrr,
-        .write = m->chrram ? ines_000_chrw : NULL,
+        .write = m->super.chrram ? ines_000_chrw : NULL,
         .ctx = m,
-    });
+    })
+    // TODO: if this fails in release mode, assert won't stop it and disconnect
+    // will treat the base VRAM bus device as a mapper device and
+    // (probably... hopefully) crash.
+    && aldo_bus_swap(b, ALDO_MEMBLOCK_8KB, (struct aldo_busdevice){
+        .read = ines_000_vrmr,
+        .write = ines_000_vrmw,
+        .ctx = m,
+    }, &m->vrbd);
+}
+
+static void ines_000_vbus_disconnect(aldo_bus *b)
+{
+    struct aldo_busdevice bd;
+    bool r = aldo_bus_swap(b, ALDO_MEMBLOCK_8KB, (struct aldo_busdevice){0},
+                           &bd);
+    (void)r, assert(r);
+    r = aldo_bus_set(b, ALDO_MEMBLOCK_8KB,
+                     ((struct ines_000_mapper *)bd.ctx)->vrbd);
+    (void)r, assert(r);
+    clear_chr_device(b);
 }
 
 static void ines_000_snapshot(struct aldo_mapper *self,
@@ -327,11 +386,14 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
             .vtable = {
                 .extends = {.mbus_connect = ines_000_mbus_connect},
                 .vbus_connect = ines_000_vbus_connect,
+                .vbus_disconnect = ines_000_vbus_disconnect,
                 .snapshot = ines_000_snapshot,
             },
         };
         assert(header->prg_blocks <= 2);
-        ((struct ines_000_mapper *)self)->blockcount = header->prg_blocks;
+        struct ines_000_mapper *m = (struct ines_000_mapper *)self;
+        m->blockcount = header->prg_blocks;
+        m->hmirroring = header->mirror == ALDO_NTM_HORIZONTAL;
         header->mapper_implemented = true;
     } else {
         if (!(self = malloc(sizeof *self))) return ALDO_CART_ERR_ERNO;
@@ -340,6 +402,7 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
             .vtable = {
                 .extends = {.mbus_connect = ines_unimplemented_mbus_connect},
                 .vbus_connect = ines_unimplemented_vbus_connect,
+                .vbus_disconnect = clear_chr_device,
             },
         };
         header->mapper_implemented = false;
@@ -348,7 +411,6 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
     base->dtor = ines_dtor;
     base->prgrom = ines_prgrom;
     base->mbus_disconnect = clear_prg_device;
-    self->vtable.vbus_disconnect = clear_chr_device;
     if (header->chr_blocks > 0) {
         self->vtable.chrrom = ines_chrrom;
     }

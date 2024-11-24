@@ -568,10 +568,7 @@ static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
     mvwprintw(v->content, cursor_y, line_x - 2, "[%s%02X]", DArrowDown,
               snp->ppu.datapath.pixel);
 
-    // NOTE: some compilers are pickier about static size checks and insist the
-    // buffer should be large enough to fit the theoretical max 5-digit length
-    // of a u16; in practice line and dot are never longer than 3 digits.
-    char vbuf[14];
+    char vbuf[10];
     sprintf(vbuf, "(%3d,%3d)", snp->ppu.datapath.line, snp->ppu.datapath.dot);
     // NOTE: jump 2 rows as interrupts are drawn direction first
     cursor_y += 2;

@@ -205,12 +205,10 @@ static void set_ppu_pins(struct aldo_nes001 *self)
 
 static void set_screen_dot(struct aldo_nes001 *self)
 {
-    if (!self->ppu.signal.vout) return;
+    struct aldo_ppu_coord c = aldo_ppu_screendot(&self->ppu);
+    if (c.dot < 0) return;
 
-    assert(5 <= self->ppu.dot && self->ppu.dot < 261);
-    assert(self->ppu.line < 240);
-    size_t screendot = (size_t)((self->ppu.dot - 5)
-                                + (self->ppu.line * SCREEN_WIDTH));
+    size_t screendot = (size_t)(c.dot + (c.line * SCREEN_WIDTH));
     assert(screendot < memsz(self->screen));
     self->screen[screendot] = self->ppu.pxpl.px;
 }

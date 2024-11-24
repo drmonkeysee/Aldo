@@ -24,9 +24,10 @@
 // average cycle count of 89341.5 per frame.
 static const int
     Dots = 341, Lines = 262,
-    LineVBlank = 241, LinePreRender = Lines - 1,
-    DotPxStart = 2, DotSpriteFetch = 257, DotTilePrefetch = 321,
-    DotTilePrefetchEnd = 337;
+    LinePostRender = 240, LineVBlank = LinePostRender + 1,
+    LinePreRender = Lines - 1,
+    DotPxStart = 2, DotSpriteFetch = 257, DotPxEnd = 260,
+    DotTilePrefetch = 321, DotTilePrefetchEnd = 337;
 
 // NOTE: helpers for manipulating v and t registers
 static const uint16_t
@@ -126,9 +127,7 @@ static bool sprite_fetch(const struct aldo_rp2c02 *self)
 
 static bool in_postrender(const struct aldo_rp2c02 *self)
 {
-    static const int line_post_render = 240;
-
-    return line_post_render <= self->line && self->line < LinePreRender;
+    return LinePostRender <= self->line && self->line < LinePreRender;
 }
 
 static bool in_vblank(const struct aldo_rp2c02 *self)
@@ -568,7 +567,7 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
 
     if (in_postrender(self)) return;
 
-    if (DotPxStart <= self->dot && self->dot < 260
+    if (DotPxStart <= self->dot && self->dot < DotPxEnd
         && self->line != LinePreRender) {
         if (self->dot > DotPxStart + 1) {
             output_pixel(self);
@@ -981,4 +980,19 @@ struct aldo_ppu_coord aldo_ppu_trace(const struct aldo_rp2c02 *self,
         }
     }
     return c;
+}
+
+struct aldo_ppu_coord aldo_ppu_screendot(const struct aldo_rp2c02 *self)
+{
+    assert(self != NULL);
+
+    const static int dot_pxout = DotPxStart + 2;
+
+    if (!self->signal.vout) return (struct aldo_ppu_coord){-1, -1};
+
+    // NOTE: dot will be +1 past the most recent pixel output cycle
+    assert(dot_pxout < self->dot && self->dot <= DotPxEnd);
+    assert(self->line < LinePostRender);
+
+    return (struct aldo_ppu_coord){self->dot - (dot_pxout + 1), self->line};
 }

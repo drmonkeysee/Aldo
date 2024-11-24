@@ -568,8 +568,9 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
 
     if (in_postrender(self)) return;
 
-    if (DotPxStart <= self->dot && self->dot < 261) {
-        if (self->dot > 3) {
+    if (DotPxStart <= self->dot && self->dot < 260
+        && self->line != LinePreRender) {
+        if (self->dot > DotPxStart + 1) {
             output_pixel(self);
         }
         if (self->dot > DotPxStart) {

@@ -203,6 +203,18 @@ static void set_ppu_pins(struct aldo_nes001 *self)
     self->ppu.signal.rw |= self->cpu.signal.rw;
 }
 
+static void set_screen_dot(struct aldo_nes001 *self)
+{
+    if (!self->ppu.signal.vout) return;
+
+    assert(5 <= self->ppu.dot && self->ppu.dot < 261);
+    assert(self->ppu.line < 240);
+    size_t screendot = (size_t)((self->ppu.dot - 5)
+                                + (self->ppu.line * SCREEN_WIDTH));
+    assert(screendot < memsz(self->screen));
+    self->screen[screendot] = self->ppu.pxpl.px;
+}
+
 static void set_cpu_pins(struct aldo_nes001 *self)
 {
     // NOTE: interrupt lines are active low
@@ -242,6 +254,7 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
     clock->frames += (uint64_t)aldo_ppu_cycle(&self->ppu);
     --clock->budget;
     set_ppu_pins(self);
+    set_screen_dot(self);
     // TODO: ppu debug hook goes here
     if (++clock->subcycle < PpuRatio) {
         if (self->mode == ALDO_EXC_SUBCYCLE) {

@@ -35,6 +35,7 @@ struct aldo_nes001 {
     aldo_cart *cart;            // Game Cartridge; Non-owning Pointer
     aldo_debugger *dbg;         // Debugger Context; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
+    size_t vbuf;                // Current video buffer to fill
     struct aldo_mos6502 cpu;    // CPU Core of RP2A03 Chip
     struct aldo_rp2c02 ppu;     // RP2C02 PPU
     enum aldo_execmode mode;    // NES execution mode
@@ -47,7 +48,7 @@ struct aldo_nes001 {
     bool tracefailed;                   // Trace log I/O failed during run
     uint8_t ram[ALDO_MEMBLOCK_2KB],     // CPU Internal RAM
             vram[ALDO_MEMBLOCK_2KB],    // PPU Internal RAM
-            screen[SCREEN_WIDTH * SCREEN_HEIGHT];   // Video Buffer
+            vbufs[2][SCREEN_WIDTH * SCREEN_HEIGHT]; // Double-buffered Video
 };
 
 static void ram_load(uint8_t *restrict d, const uint8_t *restrict mem,
@@ -209,8 +210,8 @@ static void set_screen_dot(struct aldo_nes001 *self)
     if (c.dot < 0) return;
 
     size_t screendot = (size_t)(c.dot + (c.line * SCREEN_WIDTH));
-    assert(screendot < memsz(self->screen));
-    self->screen[screendot] = self->ppu.pxpl.px;
+    assert(screendot < memsz(self->vbufs[self->vbuf]));
+    self->vbufs[self->vbuf][screendot] = self->ppu.pxpl.px;
 }
 
 static void set_cpu_pins(struct aldo_nes001 *self)
@@ -249,10 +250,12 @@ static void instruction_trace(struct aldo_nes001 *self,
 
 static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
 {
-    clock->frames += (uint64_t)aldo_ppu_cycle(&self->ppu);
+    bool framedone = aldo_ppu_cycle(&self->ppu);
+    clock->frames += (uint64_t)framedone;
     --clock->budget;
     set_ppu_pins(self);
     set_screen_dot(self);
+    self->vbuf ^= framedone;
     // TODO: ppu debug hook goes here
     if (++clock->subcycle < PpuRatio) {
         if (self->mode == ALDO_EXC_SUBCYCLE) {
@@ -302,6 +305,7 @@ aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
     self->dbg = dbg;
     self->tracelog = tracelog;
     self->tracefailed = false;
+    self->vbuf = 0;
     // TODO: ditch this option when aldo can emulate more than just NES
     self->cpu.bcd = bcdsupport;
     self->probe.irq = self->probe.nmi = self->probe.rst = false;
@@ -468,6 +472,7 @@ void aldo_nes_snapshot(aldo_nes *self, struct aldo_snapshot *snp)
     assert(self != NULL);
     assert(snp != NULL);
     assert(snp->prg.curr != NULL);
+    assert(snp->video != NULL);
 
     bus_snapshot(self, snp);
     aldo_ppu_vid_snapshot(&self->ppu, snp);
@@ -479,6 +484,7 @@ void aldo_nes_snapshot(aldo_nes *self, struct aldo_snapshot *snp)
     snp->prg.curr->length =
         aldo_bus_copy(self->cpu.mbus, snp->cpu.datapath.current_instruction,
                       memsz(snp->prg.curr->pc), snp->prg.curr->pc);
+    snp->video->screen = self->vbufs[!self->vbuf];
 }
 
 void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3], bool errs[static 3])

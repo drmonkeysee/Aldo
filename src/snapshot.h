@@ -77,6 +77,7 @@ struct aldo_snapshot {
     } prg;
 
     struct {
+        uint8_t *screen;        // Non-owning Pointer
         // A Pattern Table is 256 tiles x 8 rows x 8 pixels x 2 bits.
         struct {
             uint16_t

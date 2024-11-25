@@ -703,7 +703,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
 // MARK: - Other Internal Operations
 //
 
-static int nextdot(struct aldo_rp2c02 *self)
+static bool nextdot(struct aldo_rp2c02 *self)
 {
     // NOTE: skip the last dot on odd frames if rendering is enabled
     if (self->line == LinePreRender && self->dot == Dots - 2 && self->odd
@@ -715,10 +715,10 @@ static int nextdot(struct aldo_rp2c02 *self)
         if (++self->line >= Lines) {
             self->line = 0;
             self->odd = !self->odd;
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 static void reset(struct aldo_rp2c02 *self)
@@ -831,7 +831,7 @@ static void vram_rw(struct aldo_rp2c02 *self)
     }
 }
 
-static int cycle(struct aldo_rp2c02 *self)
+static bool cycle(struct aldo_rp2c02 *self)
 {
     // NOTE: clear any databus signals from previous cycle; unlike the CPU,
     // the PPU does not read/write on every cycle so these lines must be
@@ -894,7 +894,7 @@ void aldo_ppu_zeroram(struct aldo_rp2c02 *self)
     memclr(self->palette);
 }
 
-int aldo_ppu_cycle(struct aldo_rp2c02 *self)
+bool aldo_ppu_cycle(struct aldo_rp2c02 *self)
 {
     assert(self != NULL);
 

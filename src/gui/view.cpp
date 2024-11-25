@@ -496,29 +496,6 @@ auto about_overlay(aldo::viewstate& vs) noexcept
 // MARK: - Concrete Views
 //
 
-class BouncerView final : public aldo::View {
-public:
-    BouncerView(aldo::viewstate& vs, const aldo::Emulator& emu,
-                const aldo::MediaRuntime& mr)
-    : View{"Bouncer", vs, emu, mr}, bouncer{emu.screenSize(), mr} {}
-    BouncerView(aldo::viewstate&, aldo::Emulator&&,
-                const aldo::MediaRuntime&) = delete;
-    BouncerView(aldo::viewstate&, const aldo::Emulator&,
-                aldo::MediaRuntime&&) = delete;
-    BouncerView(aldo::viewstate&, aldo::Emulator&&,
-                aldo::MediaRuntime&&) = delete;
-
-protected:
-    void renderContents() override
-    {
-        bouncer.draw(vs, mr);
-        bouncer.render();
-    }
-
-private:
-    aldo::BouncerScreen bouncer;
-};
-
 class CartInfoView final : public aldo::View {
 public:
     CartInfoView(aldo::viewstate& vs, const aldo::Emulator& emu,
@@ -1779,7 +1756,6 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
 : vs{vs}, emu{emu}, mr{mr}
 {
     add_views<
-        BouncerView,
         CartInfoView,
         CpuView,
         DebuggerView,

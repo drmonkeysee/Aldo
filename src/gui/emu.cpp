@@ -52,23 +52,6 @@ auto load_cart(const std::filesystem::path& filepath)
     return c;
 }
 
-auto update_bouncer(aldo::viewstate& vs, SDL_Point bounds,
-                    const aldo_snapshot& snp) noexcept
-{
-    if (!snp.cpu.lines.ready) return;
-
-    if (vs.bouncer.pos.x - vs.bouncer.halfdim < 0
-        || vs.bouncer.pos.x + vs.bouncer.halfdim > bounds.x) {
-        vs.bouncer.velocity.x *= -1;
-    }
-    if (vs.bouncer.pos.y - vs.bouncer.halfdim < 0
-        || vs.bouncer.pos.y + vs.bouncer.halfdim > bounds.y) {
-        vs.bouncer.velocity.y *= -1;
-    }
-    vs.bouncer.pos.x += vs.bouncer.velocity.x;
-    vs.bouncer.pos.y += vs.bouncer.velocity.y;
-}
-
 }
 
 //
@@ -113,7 +96,6 @@ void aldo::Emulator::update(aldo::viewstate& vs) noexcept
     auto timer = vs.clock.timeUpdate();
     aldo_nes_clock(consolep(), vs.clock.clockp());
     aldo_nes_snapshot(consolep(), snapshotp());
-    update_bouncer(vs, screenSize(), snapshot());
 }
 
 //

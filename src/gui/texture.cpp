@@ -9,7 +9,6 @@
 
 #include "error.hpp"
 #include "mediaruntime.hpp"
-#include "viewstate.hpp"
 
 #include <concepts>
 #include <cassert>
@@ -20,35 +19,6 @@ static_assert(std::same_as<Uint32, ImU32>,
 //
 // MARK: - Public Interface
 //
-
-aldo::BouncerScreen::BouncerScreen(SDL_Point resolution,
-                                   const aldo::MediaRuntime& mr)
-: tex{resolution, mr.renderer()} {}
-
-void aldo::BouncerScreen::draw(const aldo::viewstate& vs,
-                               const aldo::MediaRuntime& mr) const noexcept
-{
-    auto ren = mr.renderer();
-    auto target = tex.asTarget(ren);
-
-    SDL_SetRenderDrawColor(ren, 0x0, 0xff, 0xff, SDL_ALPHA_OPAQUE);
-    SDL_RenderClear(ren);
-
-    SDL_SetRenderDrawColor(ren, 0x0, 0x0, 0xff, SDL_ALPHA_OPAQUE);
-    SDL_RenderDrawLine(ren, 30, 7, 50, 200);
-
-    SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0x0, SDL_ALPHA_OPAQUE);
-
-    auto& bouncer = vs.bouncer;
-    auto fulldim = bouncer.halfdim * 2;
-    SDL_Rect pos{
-        bouncer.pos.x - bouncer.halfdim,
-        bouncer.pos.y - bouncer.halfdim,
-        fulldim,
-        fulldim,
-    };
-    SDL_RenderFillRect(ren, &pos);
-}
 
 aldo::VideoScreen::VideoScreen(SDL_Point resolution,
                                const aldo::MediaRuntime& mr)

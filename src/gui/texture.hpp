@@ -22,7 +22,6 @@ namespace aldo
 class MediaRuntime;
 class Palette;
 template<SDL_TextureAccess> class Texture;
-struct viewstate;
 
 namespace texture
 {
@@ -99,17 +98,6 @@ public:
 
 private:
     SDL_Texture* tex;
-};
-
-class BouncerScreen {
-public:
-    BouncerScreen(SDL_Point resolution, const MediaRuntime& mr);
-
-    void draw(const viewstate& vs, const MediaRuntime& mr) const noexcept;
-    void render() const noexcept { tex.render(); }
-
-private:
-    Texture<SDL_TEXTUREACCESS_TARGET> tex;
 };
 
 class VideoScreen {

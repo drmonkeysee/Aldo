@@ -14,8 +14,6 @@
 #include "palette.hpp"
 #include "runclock.hpp"
 
-#include <SDL2/SDL.h>
-
 #include <concepts>
 #include <queue>
 #include <utility>
@@ -73,10 +71,6 @@ struct viewstate {
     std::queue<command_state> commands;
     RunClock clock;
     palette::sz colorSelection = 0;
-    struct {
-        int halfdim = 25;
-        SDL_Point pos{halfdim, halfdim}, velocity{1, 1};
-    } bouncer;
     bool running = true, showAbout = false, showDemo = false;
 };
 

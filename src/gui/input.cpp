@@ -20,7 +20,6 @@
 #include <string>
 #include <type_traits>
 #include <variant>
-
 #include <cerrno>
 #include <cstring>
 

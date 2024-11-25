@@ -79,7 +79,9 @@ SDL_Texture* aldo::texture::create(SDL_Point size, SDL_TextureAccess access,
 
 aldo::texture::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 {
-    SDL_QueryTexture(&tex, nullptr, nullptr, &width, &height);
+    Uint32 pxfmt;
+    SDL_QueryTexture(&tex, &pxfmt, nullptr, &width, &height);
+    assert(SDL_PIXELTYPE(pxfmt) == SDL_PIXELTYPE_PACKED32);
 
     void* data;
     int pitch;

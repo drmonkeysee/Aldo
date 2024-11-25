@@ -64,6 +64,13 @@ private:
 
 class ALDO_SIDEFX Emulator {
 public:
+    static SDL_Point screenSize() noexcept
+    {
+        SDL_Point res;
+        aldo_nes_screen_size(&res.x, &res.y);
+        return res;
+    }
+
     Emulator(debug_handle d, console_handle n, const gui_platform& p);
     Emulator(const Emulator&) = delete;
     Emulator& operator=(const Emulator&) = delete;
@@ -83,12 +90,6 @@ public:
 
     void ready(bool ready) noexcept { aldo_nes_ready(consolep(), ready); }
     et::size ramSize() const noexcept { return aldo_nes_ram_size(consolep()); }
-    SDL_Point screenSize() const noexcept
-    {
-        SDL_Point res;
-        aldo_nes_screen_size(&res.x, &res.y);
-        return res;
-    }
     palette::emphasis colorEmphasis() const noexcept
     {
         et::byte mask = snapshot().ppu.mask;

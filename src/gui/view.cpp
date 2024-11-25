@@ -38,6 +38,7 @@
 #include <string_view>
 #include <type_traits>
 #include <unordered_set>
+#include <cassert>
 #include <cinttypes>
 #include <cstdio>
 
@@ -499,8 +500,7 @@ class BouncerView final : public aldo::View {
 public:
     BouncerView(aldo::viewstate& vs, const aldo::Emulator& emu,
                 const aldo::MediaRuntime& mr)
-    : View{"Bouncer", vs, emu, mr}, bouncer{emu.screenSize(), mr}
-    {}
+    : View{"Bouncer", vs, emu, mr}, bouncer{emu.screenSize(), mr} {}
     BouncerView(aldo::viewstate&, aldo::Emulator&&,
                 const aldo::MediaRuntime&) = delete;
     BouncerView(aldo::viewstate&, const aldo::Emulator&,
@@ -1733,6 +1733,30 @@ private:
     RefreshInterval statsInterval{250};
 };
 
+class VideoView final : public aldo::View {
+public:
+    VideoView(aldo::viewstate& vs, const aldo::Emulator& emu,
+              const aldo::MediaRuntime& mr)
+    : View{"Video", vs, emu, mr}, screen{emu.screenSize(), mr} {}
+    VideoView(aldo::viewstate&, aldo::Emulator&&,
+              const aldo::MediaRuntime&) = delete;
+    VideoView(aldo::viewstate&, const aldo::Emulator&,
+              aldo::MediaRuntime&&) = delete;
+    VideoView(aldo::viewstate&, aldo::Emulator&&,
+              aldo::MediaRuntime&&) = delete;
+
+protected:
+    void renderContents() override
+    {
+        screen.draw(emu.snapshot().video->screen, emu.palette(),
+                    emu.colorEmphasis());
+        screen.render();
+    }
+
+private:
+    aldo::VideoScreen screen;
+};
+
 }
 
 //
@@ -1763,7 +1787,8 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
         PatternTablesView,
         PrgAtPcView,
         RamView,
-        SystemView>(views, vs, emu, mr);
+        SystemView,
+        VideoView>(views, vs, emu, mr);
 }
 
 void aldo::Layout::render() const

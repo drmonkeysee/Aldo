@@ -12,6 +12,7 @@
 #include "viewstate.hpp"
 
 #include <concepts>
+#include <cassert>
 
 static_assert(std::same_as<Uint32, ImU32>,
               "SDL u32 type does not match ImGui u32 type");
@@ -49,14 +50,36 @@ void aldo::BouncerScreen::draw(const aldo::viewstate& vs,
     SDL_RenderFillRect(ren, &pos);
 }
 
+aldo::VideoScreen::VideoScreen(SDL_Point resolution,
+                               const aldo::MediaRuntime& mr)
+: tex{resolution, mr.renderer()} {}
+
+void aldo::VideoScreen::draw(const aldo::et::byte buf[],
+                             const aldo::Palette& p,
+                             aldo::palette::emphasis em) const
+{
+    assert(buf != nullptr);
+
+    auto data = tex.lock();
+    auto length = data.width * data.height;
+    // TODO: get these values from libaldo somehow
+    assert(length == 256 * 240);
+    for (auto i = 0; i < length; ++i) {
+        data.pixels[i] = p.getColor(buf[i], em);
+    }
+}
+
 aldo::PatternTable::PatternTable(const aldo::MediaRuntime& mr)
 : tex{{TextureDim, TextureDim}, mr.renderer()} {}
 
 void aldo::PatternTable
 ::draw(const aldo::et::word table[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM],
-       const aldo::et::byte colors[ALDO_PAL_SIZE], const Palette& p,
+       const aldo::et::byte colors[ALDO_PAL_SIZE], const aldo::Palette& p,
        aldo::palette::emphasis em) const
 {
+    assert(table != nullptr);
+    assert(colors != nullptr);
+
     auto data = tex.lock();
     for (auto tblRow = 0; tblRow < TableDim; ++tblRow) {
         for (auto tblCol = 0; tblCol < TableDim; ++tblCol) {
@@ -86,6 +109,8 @@ SDL_Texture* aldo::texture::create(SDL_Point size, SDL_TextureAccess access,
 
 aldo::texture::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 {
+    SDL_QueryTexture(&tex, nullptr, nullptr, &width, &height);
+
     void* data;
     int pitch;
     SDL_LockTexture(&tex, nullptr, &data, &pitch);

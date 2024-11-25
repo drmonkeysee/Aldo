@@ -59,7 +59,7 @@ public:
     ~TextureData() { SDL_UnlockTexture(&tex); }
 
     Uint32* pixels;
-    int stride;
+    int height, stride, width;
 
 private:
     friend Texture<SDL_TEXTUREACCESS_STREAMING>;
@@ -110,6 +110,18 @@ public:
 
 private:
     Texture<SDL_TEXTUREACCESS_TARGET> tex;
+};
+
+class VideoScreen {
+public:
+    VideoScreen(SDL_Point resolution, const MediaRuntime& mr);
+
+    void draw(const et::byte buf[], const Palette& p,
+              palette::emphasis em) const;
+    void render() const noexcept { tex.render(); }
+
+private:
+    Texture<SDL_TEXTUREACCESS_STREAMING> tex;
 };
 
 class PatternTable {

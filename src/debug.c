@@ -111,6 +111,12 @@ static bool halt_cycles(const struct aldo_breakpoint *bp,
     return clk->cycles == bp->expr.cycles;
 }
 
+static bool halt_frames(const struct aldo_breakpoint *bp,
+                        const struct aldo_clock *clk)
+{
+    return clk->frames == bp->expr.frames;
+}
+
 static bool halt_jammed(const struct aldo_mos6502 *cpu)
 {
     return aldo_cpu_jammed(cpu);
@@ -183,6 +189,9 @@ static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
             break;
         case ALDO_HLT_CYCLES:
             if (halt_cycles(bp, clk)) return i;
+            break;
+        case ALDO_HLT_FRAMES:
+            if (halt_frames(bp, clk)) return i;
             break;
         case ALDO_HLT_JAM:
             if (halt_jammed(cpu)) return i;

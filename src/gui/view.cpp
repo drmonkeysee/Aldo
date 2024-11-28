@@ -1010,9 +1010,10 @@ private:
             ImGui::InputFloat("Seconds", &currentHaltExpression.runtime);
             break;
         case ALDO_HLT_CYCLES:
-            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 18);
-            ImGui::InputScalar("Count", ImGuiDataType_U64,
-                               &currentHaltExpression.cycles);
+            u64Selection(currentHaltExpression.cycles);
+            break;
+        case ALDO_HLT_FRAMES:
+            u64Selection(currentHaltExpression.frames);
             break;
         case ALDO_HLT_JAM:
             ImGui::Dummy({0, ImGui::GetFrameHeight()});
@@ -1128,6 +1129,12 @@ private:
         if ((resetOverride = dbg.isVectorOverridden())) {
             resetAddr = static_cast<aldo::et::word>(dbg.vectorOverride());
         }
+    }
+
+    static void u64Selection(aldo::et::qword& input) noexcept
+    {
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 18);
+        ImGui::InputScalar("Count", ImGuiDataType_U64, &input);
     }
 
     bool detectedHalt = false, resetOverride = false;

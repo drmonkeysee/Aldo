@@ -16,6 +16,7 @@ X(HLT_NONE, "None") \
 X(HLT_ADDR, "Address") \
 X(HLT_TIME, "Time") \
 X(HLT_CYCLES, "Cycles") \
+X(HLT_FRAMES, "Frames") \
 X(HLT_JAM, "Jammed")
 
 enum aldo_haltcondition {
@@ -29,7 +30,7 @@ enum aldo_haltcondition {
 
 struct aldo_haltexpr {
     union {
-        uint64_t cycles;
+        uint64_t cycles, frames;
         float runtime;
         uint16_t address;
     };

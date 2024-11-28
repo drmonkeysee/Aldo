@@ -356,6 +356,88 @@ static void cycles_condition_malformed(void *ctx)
     ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
 
+static void frames_condition(void *ctx)
+{
+    const char *str = "42f";
+    struct aldo_haltexpr expr;
+
+    int result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.cond);
+    ct_assertequal(42u, expr.frames);
+}
+
+static void frames_condition_case_insensitive(void *ctx)
+{
+    const char *str = "42F";
+    struct aldo_haltexpr expr;
+
+    int result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.cond);
+    ct_assertequal(42u, expr.frames);
+}
+
+static void frames_condition_with_space(void *ctx)
+{
+    const char *str = "42   f";
+    struct aldo_haltexpr expr;
+
+    int result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.cond);
+    ct_assertequal(42u, expr.frames);
+}
+
+static void frames_condition_with_leading_space(void *ctx)
+{
+    const char *str = "   42f";
+    struct aldo_haltexpr expr;
+
+    int result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.cond);
+    ct_assertequal(42u, expr.frames);
+}
+
+static void frames_condition_with_trailing_space(void *ctx)
+{
+    const char *str = "42f   ";
+    struct aldo_haltexpr expr;
+
+    int result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.cond);
+    ct_assertequal(42u, expr.frames);
+}
+
+static void frames_condition_negative(void *ctx)
+{
+    const char *str = "-45f";
+    struct aldo_haltexpr expr;
+
+    int result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.cond);
+    ct_assertequal(18446744073709551571u, expr.frames);
+}
+
+static void frames_condition_malformed(void *ctx)
+{
+    const char *str = "hjklf";
+    struct aldo_haltexpr expr;
+
+    int result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
+}
+
 static void jam_condition(void *ctx)
 {
     const char *str = "jam";
@@ -672,6 +754,18 @@ static void print_cycles(void *ctx)
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
+static void print_frames(void *ctx)
+{
+    struct aldo_haltexpr expr = {.cond = ALDO_HLT_FRAMES, .cycles = 982423};
+    char buf[ALDO_HEXPR_FMT_SIZE];
+
+    int result = aldo_haltexpr_desc(&expr, buf);
+
+    const char *expected = "982423 frm";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
 static void print_jam(void *ctx)
 {
     struct aldo_haltexpr expr = {.cond = ALDO_HLT_JAM};
@@ -762,6 +856,21 @@ static void format_cycles(void *ctx)
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
+static void format_frames(void *ctx)
+{
+    struct aldo_debugexpr expr = {
+        .type = ALDO_DBG_EXPR_HALT,
+        .hexpr = {.cond = ALDO_HLT_FRAMES, .frames = 982423},
+    };
+    char buf[ALDO_HEXPR_FMT_SIZE];
+
+    int result = aldo_haltexpr_fmtdbg(&expr, buf);
+
+    const char *expected = "982423f";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
 static void format_jam(void *ctx)
 {
     struct aldo_debugexpr expr = {
@@ -818,6 +927,14 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(cycles_condition_negative),
         ct_maketest(cycles_condition_malformed),
 
+        ct_maketest(frames_condition),
+        ct_maketest(frames_condition_case_insensitive),
+        ct_maketest(frames_condition_with_space),
+        ct_maketest(frames_condition_with_leading_space),
+        ct_maketest(frames_condition_with_trailing_space),
+        ct_maketest(frames_condition_negative),
+        ct_maketest(frames_condition_malformed),
+
         ct_maketest(jam_condition),
         ct_maketest(jam_condition_uppercase),
         ct_maketest(jam_condition_mixedcase),
@@ -848,6 +965,7 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(print_runtime),
         ct_maketest(print_long_runtime),
         ct_maketest(print_cycles),
+        ct_maketest(print_frames),
         ct_maketest(print_jam),
 
         ct_maketest(format_reset),
@@ -855,6 +973,7 @@ struct ct_testsuite haltexpr_tests(void)
         ct_maketest(format_runtime),
         ct_maketest(format_long_runtime),
         ct_maketest(format_cycles),
+        ct_maketest(format_frames),
         ct_maketest(format_jam),
     };
 

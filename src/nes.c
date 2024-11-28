@@ -287,7 +287,6 @@ static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
     default:
         break;
     }
-    aldo_debug_check(self->dbg, clock);
 }
 
 //
@@ -454,6 +453,7 @@ void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
     while (self->cpu.signal.rdy && clock->budget > 0) {
         if (!clock_ppu(self, clock)) continue;
         clock_cpu(self, clock);
+        aldo_debug_check(self->dbg, clock);
     }
 }
 

@@ -103,6 +103,17 @@ int aldo_haltexpr_parse(const char *restrict str, struct aldo_haltexpr *expr)
                 };
             }
             break;
+        case ALDO_HLT_FRAMES:
+            {
+                uint64_t frames;
+                parsed = sscanf(str, "%" SCNu64 " %1[Ff]", &frames, u) == 2;
+                valid = true;
+                e = (struct aldo_haltexpr){
+                    .frames = frames,
+                    .cond = (enum aldo_haltcondition)i,
+                };
+            }
+            break;
         case ALDO_HLT_JAM:
             parsed = sscanf(str, " %1[Jj]%1[Aa]%1[Mm]", u, u, u) == 3;
             valid = true;
@@ -165,6 +176,9 @@ int aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
     case ALDO_HLT_CYCLES:
         count = sprintf(buf, "%" PRIu64 " cyc", expr->cycles);
         break;
+    case ALDO_HLT_FRAMES:
+        count = sprintf(buf, "%" PRIu64 " frm", expr->frames);
+        break;
     case ALDO_HLT_JAM:
         count = sprintf(buf, "CPU JAMMED");
         break;
@@ -199,6 +213,9 @@ int aldo_haltexpr_fmtdbg(const struct aldo_debugexpr *expr,
             break;
         case ALDO_HLT_CYCLES:
             count = sprintf(buf, "%" PRIu64 "c", hexpr->cycles);
+            break;
+        case ALDO_HLT_FRAMES:
+            count = sprintf(buf, "%" PRIu64 "f", hexpr->frames);
             break;
         case ALDO_HLT_JAM:
             count = sprintf(buf, "JAM");

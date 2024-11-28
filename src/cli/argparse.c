@@ -333,6 +333,7 @@ void argparse_usage(const char *me)
            "  %-*s  useful in batch mode as a fail-safe halt condition\n",
            spad, "N.Ns", spad, "");
     printf("  %-*s: halt after executing N cycles\n", spad, "Nc");
+    printf("  %-*s: halt after executing N frames\n", spad, "Nf");
     printf("  %-*s: halt when the CPU enters a jammed state\n", spad, "jam");
 
     puts("\nRESET vector override expression");

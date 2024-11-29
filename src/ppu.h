@@ -90,6 +90,7 @@ struct aldo_rp2c02 {
     struct {
         uint16_t bgs[2];    // Background Tile Shifter
         uint8_t at,         // Attribute Table Fetch
+                atb,        // Attribute Latch Bit (0, 2, 4, 6)
                 ats[2],     // Attribute Table Shifter
                 bg[2],      // Background Tile Fetch
                 mux,        // Multiplexed Pixel Selection

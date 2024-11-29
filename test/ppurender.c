@@ -1310,8 +1310,11 @@ static void attribute_latch(void *ctx)
     ppu->pxpl.atl[1] = ppu->pxpl.atl[0] = true;
 
     for (size_t i = 0; i < 4; ++i) {
-        ppu->dot = 337;
+        ppu->dot = 336;
         ppu->v = vs[i];
+        aldo_ppu_cycle(ppu);
+        ct_assertequal(i * 2, ppu->pxpl.atb);
+        ct_assertequal((unsigned int)(vs[i] + 1), ppu->v);
         aldo_ppu_cycle(ppu);
         int val = ppu->pxpl.atl[1] << 1 | ppu->pxpl.atl[0];
         ct_assertequal((int)i, val);

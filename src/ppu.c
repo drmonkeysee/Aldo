@@ -429,11 +429,21 @@ static void latch_pattern(uint16_t *latch, uint8_t val)
  * Since each quadrant is 2-bits the x,y coords select one of the 0th, 2nd,
  * 4th, or 6th bits as the low-bit, the high-bit is the neighboring odd-bit.
  */
+
+// NOTE: tile x-increment happens one dot before the new tile is latched into
+// the shift registers, so we need to determine the attribute byte quadrant
+// before the increment and remember it for the subsequent latch dot; otherwise
+// some of the tile attributes for the 4x4 metatile will be paired off with the
+// wrong quadrant bits due to erroneously looking one x-tile ahead.
+static void lock_attribute(struct aldo_rp2c02 *self)
+{
+    self->pxpl.atb = (self->v & 0x2) | ((self->v & 0x40) >> 4);
+}
+
 static void latch_attribute(struct aldo_rp2c02 *self)
 {
-    int bit = (self->v & 0x2) | ((self->v & 0x40) >> 4);
-    self->pxpl.atl[0] = aldo_getbit(self->pxpl.at, bit);
-    self->pxpl.atl[1] = aldo_getbit(self->pxpl.at, bit + 1);
+    self->pxpl.atl[0] = aldo_getbit(self->pxpl.at, self->pxpl.atb);
+    self->pxpl.atl[1] = aldo_getbit(self->pxpl.at, self->pxpl.atb + 1);
 }
 
 static void latch_tile(struct aldo_rp2c02 *self)
@@ -559,6 +569,15 @@ static void incr_y(struct aldo_rp2c02 *self)
     }
 }
 
+static void increment_tile(struct aldo_rp2c02 *self)
+{
+    lock_attribute(self);
+    incr_course_x(self);
+    if (self->dot == DotSpriteFetch - 1) {
+        incr_y(self);
+    }
+}
+
 // NOTE: based on PPU diagram: https://www.nesdev.org/wiki/PPU_rendering
 static void pixel_pipeline(struct aldo_rp2c02 *self)
 {
@@ -637,10 +656,7 @@ static void tile_read(struct aldo_rp2c02 *self)
         // BG high data
         read(self);
         self->pxpl.bg[1] = self->vdatabus;
-        incr_course_x(self);
-        if (self->dot == DotSpriteFetch - 1) {
-            incr_y(self);
-        }
+        increment_tile(self);
         break;
     default:
         assert(((void)"TILE RENDER UNREACHABLE CASE", false));

@@ -1002,7 +1002,7 @@ struct aldo_ppu_coord aldo_ppu_screendot(const struct aldo_rp2c02 *self)
 {
     assert(self != NULL);
 
-    const static int dot_pxout = DotPxStart + 2;
+    static const int dot_pxout = DotPxStart + 2;
 
     if (!self->signal.vout) return (struct aldo_ppu_coord){-1, -1};
 

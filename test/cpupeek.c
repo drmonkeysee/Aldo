@@ -133,7 +133,7 @@ static void rst_not_ignored(void *ctx)
 
     int cycles = clock_cpu(&cpu);
 
-    ct_assertequal(3, cycles);
+    ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
 }

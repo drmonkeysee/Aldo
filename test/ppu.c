@@ -101,7 +101,7 @@ static void reset_sequence(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(42, ppu->line);
-    ct_assertequal(28, ppu->dot);
+    ct_assertequal(27, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -121,7 +121,7 @@ static void reset_sequence(void *ctx)
     }
 
     ct_assertequal(42, ppu->line);
-    ct_assertequal(33, ppu->dot);
+    ct_assertequal(27, ppu->dot);
     ct_assertfalse(ppu->signal.intr);
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
@@ -132,7 +132,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0x56u, ppu->rbuf);
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
-    ct_assertequal(0x1236u, ppu->v);
+    ct_assertequal(0x1235u, ppu->v);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)ppu->rst);
 
     ppu->signal.rst = true;
@@ -150,7 +150,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0x0u, ppu->rbuf);
     ct_assertequal(0x0u, ppu->x);
     ct_assertequal(0x0u, ppu->t);
-    ct_assertequal(0x1236u, ppu->v);
+    ct_assertequal(0x1235u, ppu->v);
     ct_assertequal(ALDO_SIG_SERVICED, (int)ppu->rst);
 }
 

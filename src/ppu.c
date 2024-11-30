@@ -737,14 +737,19 @@ static bool nextdot(struct aldo_rp2c02 *self)
     return false;
 }
 
-static void reset(struct aldo_rp2c02 *self)
+static void reset_internals(struct aldo_rp2c02 *self)
 {
     // NOTE: t is cleared but NOT v
     self->dot = self->line = self->t = self->rbuf = self->x = 0;
     self->signal.intr = true;
-    self->signal.vout = self->cvp = self->odd = self->w = false;
+    self->signal.ale = self->cvp = self->odd = self->w = false;
     set_ctrl(self, 0);
     set_mask(self, 0);
+}
+
+static void reset(struct aldo_rp2c02 *self)
+{
+    reset_internals(self);
     self->rst = ALDO_SIG_SERVICED;
 }
 
@@ -891,12 +896,11 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
     assert(self != NULL);
     assert(self->vbus != NULL);
 
-    // NOTE: initialize ppu to known state; internal components affected by the
-    // reset sequence are deferred until that phase.
-    self->regsel = self->oamaddr = 0;
-    self->signal.intr = self->signal.rst = self->signal.rw = self->signal.rd =
-        self->signal.wr = true;
-    self->signal.ale = self->signal.vout = self->bflt = false;
+    // NOTE: initialize ppu to known state
+    self->oamaddr = 0;
+    self->signal.rst = self->signal.rw = self->signal.rd = self->signal.wr =
+        true;
+    self->signal.vout = self->bflt = false;
 
     // NOTE: according to https://www.nesdev.org/wiki/PPU_power_up_state, the
     // vblank flag is set on powerup more often than not, but at least with
@@ -916,6 +920,8 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
     // clearing the status register on powerup but letting its value float
     // on reset, making it possible to occasionally recreate this (real?) bug.
     set_status(self, 0);
+
+    reset_internals(self);
 
     // NOTE: simulate rst set on startup to engage reset sequence
     self->rst = ALDO_SIG_PENDING;

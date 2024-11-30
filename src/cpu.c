@@ -1667,11 +1667,8 @@ void aldo_cpu_powerup(struct aldo_mos6502 *self)
         self->signal.rw = self->detached = true;
     self->signal.rdy = self->signal.sync = self->bflt = self->presync = false;
 
-    // NOTE: initialize internal registers to known state
-    self->pc = self->addrinst = self->a = self->s = self->x = self->y =
-        self->opc = self->adl = self->adh = self->adc = 0;
-    // NOTE: some compilers don't like mixing signed and unsigned assignment
-    self->t = 0;
+    // NOTE: initialize registers to known state
+    self->t = self->pc = self->a = self->s = self->x = self->y = 0;
     set_p(self, 0x34);
 
     // TODO: simulate rst held low on startup to engage reset sequence

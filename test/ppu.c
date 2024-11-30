@@ -13,11 +13,14 @@
 static void powerup_initializes_ppu(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->oamaddr = 0x34;
+    ppu->signal.ale = true;
+    ppu->signal.vout = true;
+    ppu->bflt = true;
 
     aldo_ppu_powerup(ppu);
 
     ct_assertequal(ALDO_SIG_PENDING, (int)ppu->rst);
-    ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->oamaddr);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.intr);
@@ -26,7 +29,6 @@ static void powerup_initializes_ppu(void *ctx)
     ct_asserttrue(ppu->signal.rd);
     ct_asserttrue(ppu->signal.wr);
     ct_assertfalse(ppu->signal.vout);
-    ct_assertfalse(ppu->status.s);
     ct_assertfalse(ppu->bflt);
 }
 
@@ -99,6 +101,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(ALDO_SIG_PENDING, (int)ppu->rst);
 
     aldo_ppu_cycle(ppu);
+    ppu->signal.ale = true;
 
     ct_assertequal(42, ppu->line);
     ct_assertequal(27, ppu->dot);
@@ -113,6 +116,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
     ct_assertequal(0x1235u, ppu->v);
+    ct_asserttrue(ppu->signal.ale);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)ppu->rst);
 
     // NOTE: reset line held
@@ -133,6 +137,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0x78u, ppu->x);
     ct_assertequal(0x1234u, ppu->t);
     ct_assertequal(0x1235u, ppu->v);
+    ct_asserttrue(ppu->signal.ale);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)ppu->rst);
 
     ppu->signal.rst = true;
@@ -151,6 +156,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(0x0u, ppu->x);
     ct_assertequal(0x0u, ppu->t);
     ct_assertequal(0x1235u, ppu->v);
+    ct_assertfalse(ppu->signal.ale);
     ct_assertequal(ALDO_SIG_SERVICED, (int)ppu->rst);
 }
 

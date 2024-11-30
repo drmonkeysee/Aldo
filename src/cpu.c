@@ -1686,9 +1686,7 @@ int aldo_cpu_cycle(struct aldo_mos6502 *self)
     // NOTE: sentinel value for cycle count denoting an imminent opcode fetch
     static const int prefetch = -1;
 
-    if (!self->signal.rdy) return 0;
-
-    if (reset_held(self)) return 1;
+    if (!self->signal.rdy || reset_held(self)) return 0;
 
     if (self->presync) {
         self->presync = false;

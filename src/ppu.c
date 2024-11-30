@@ -748,10 +748,9 @@ static void reset(struct aldo_rp2c02 *self)
     self->rst = ALDO_SIG_SERVICED;
 }
 
-// NOTE: this follows the same sequence as CPU reset sequence and is checked
-// only on CPU-cycle boundaries rather than each PPU cycle; this keeps the two
-// chips in sync when handling the RESET signal.
-static void handle_reset(struct aldo_rp2c02 *self)
+// NOTE: this follows the same steps as CPU reset sequence and has the same
+// halting effect while rst line is held low, to keep the chips in sync.
+static bool reset_held(struct aldo_rp2c02 *self)
 {
     // NOTE: pending always proceeds to committed just like the CPU sequence
     if (self->rst == ALDO_SIG_PENDING) {
@@ -778,12 +777,14 @@ static void handle_reset(struct aldo_rp2c02 *self)
         case ALDO_SIG_DETECTED:
             self->rst = ALDO_SIG_PENDING;
             break;
+        case ALDO_SIG_COMMITTED:
+            // NOTE: halt PPU execution as long as reset is held
+            return true;
         default:
-            // NOTE: as long as reset line is held low there is no further
-            // effect on PPU execution.
             break;
         }
     }
+    return false;
 }
 
 static void vblank(struct aldo_rp2c02 *self)
@@ -914,7 +915,7 @@ bool aldo_ppu_cycle(struct aldo_rp2c02 *self)
 {
     assert(self != NULL);
 
-    handle_reset(self);
+    if (reset_held(self)) return false;
     return cycle(self);
 }
 

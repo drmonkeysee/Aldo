@@ -157,13 +157,22 @@ static bool create_vbus(struct aldo_nes001 *self)
     return true;
 }
 
+static bool assert_vbus(aldo_cart* cart, bool connected)
+{
+    if (connected) return true;
+
+    struct aldo_cartinfo info;
+    aldo_cart_getinfo(cart, &info);
+    return info.format != ALDO_CRTF_INES;
+}
+
 static void connect_cart(struct aldo_nes001 *self, aldo_cart *c)
 {
     self->cart = c;
     bool r = aldo_cart_mbus_connect(self->cart, self->cpu.mbus);
     (void)r, assert(r);
     r = aldo_cart_vbus_connect(self->cart, self->ppu.vbus);
-    (void)r, assert(r);
+    (void)r, assert(assert_vbus(self->cart, r));
     aldo_debug_sync_bus(self->dbg);
 }
 

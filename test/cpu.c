@@ -23,11 +23,11 @@ static void powerup_initializes_cpu(void *ctx)
     ct_asserttrue(cpu.signal.nmi);
     ct_asserttrue(cpu.signal.rst);
     ct_asserttrue(cpu.signal.rw);
-    ct_asserttrue(cpu.detached);
     ct_assertfalse(cpu.signal.rdy);
     ct_assertfalse(cpu.signal.sync);
     ct_assertfalse(cpu.bflt);
     ct_assertfalse(cpu.presync);
+    ct_assertfalse(cpu.detached);
 }
 
 static void data_fault(void *ctx)

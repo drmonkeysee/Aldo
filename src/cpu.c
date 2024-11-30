@@ -1664,8 +1664,9 @@ void aldo_cpu_powerup(struct aldo_mos6502 *self)
 
     // NOTE: initialize physical lines and control flags to known state
     self->signal.irq = self->signal.nmi = self->signal.rst =
-        self->signal.rw = self->detached = true;
-    self->signal.rdy = self->signal.sync = self->bflt = self->presync = false;
+        self->signal.rw = true;
+    self->signal.rdy = self->signal.sync = self->bflt = self->presync =
+        self->detached = false;
 
     // NOTE: initialize registers to known state
     self->t = self->pc = self->a = self->s = self->x = self->y = 0;

@@ -896,7 +896,26 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
     self->regsel = self->oamaddr = 0;
     self->signal.intr = self->signal.rst = self->signal.rw = self->signal.rd =
         self->signal.wr = true;
-    self->status.s = self->signal.ale = self->signal.vout = self->bflt = false;
+    self->signal.ale = self->signal.vout = self->bflt = false;
+
+    // NOTE: according to https://www.nesdev.org/wiki/PPU_power_up_state, the
+    // vblank flag is set on powerup more often than not, but at least with
+    // Aldo's timing this causes a 100% reproable visual glitch on Donkey Kong,
+    // due to only checking PPUSTATUS once on startup and attempting to clear
+    // the screen on the ppu's idle frame. Most other games handle this by
+    // checking vblank at least twice on startup. Somehow this is not a problem
+    // on real hardware, though according to
+    // https://forums.nesdev.org/viewtopic.php?t=19792 it CAN be reproed on
+    // some major emulators after modifying them to simulate the ppu idle frame
+    // and it CAN be reproed occasionally on reset or short power-cycles on
+    // real hardware.
+    // So... this seems like a legitimate startup bug in Donkey Kong that, for
+    // real hardware timing reasons, never seems to manifest on powerup but
+    // nevertheless is *possible*.
+    // I split the difference between wiki documentation and functionality by
+    // clearing the status register on powerup but letting its value float
+    // on reset, making it possible to occasionally recreate this (real?) bug.
+    set_status(self, 0);
 
     // NOTE: simulate rst set on startup to engage reset sequence
     self->rst = ALDO_SIG_PENDING;

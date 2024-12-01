@@ -50,7 +50,7 @@ auto is_free_key(const SDL_Event& ev, bool allowRepeat = false) noexcept
             && !ImGui::GetIO().WantCaptureKeyboard;
 }
 
-constexpr auto cyclerate_adjust(const SDL_Event& ev) noexcept
+constexpr auto rate_adjust(const SDL_Event& ev) noexcept
 {
     return shift_pressed(ev) ? 10 : 1;
 }
@@ -85,12 +85,12 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_EQUALS:
         if (is_free_key(ev, true)) {
-            vs.clock.adjustCycleRate(cyclerate_adjust(ev));
+            vs.clock.adjustRate(rate_adjust(ev));
         }
         break;
     case SDLK_MINUS:
         if (is_free_key(ev, true)) {
-            vs.clock.adjustCycleRate(-cyclerate_adjust(ev));
+            vs.clock.adjustRate(-rate_adjust(ev));
         }
         break;
     case SDLK_0:

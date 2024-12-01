@@ -311,9 +311,11 @@ auto file_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
 
 auto speed_menu_items(aldo::viewstate& vs) noexcept
 {
-    static constexpr auto multiplierLabel = " 10x";
+    static constexpr auto multiplierLabel = " 10x", labelBase = "Clock Rate ";
 
-    std::string incLabel = "Cycles +", decLabel = "Cycles -";
+    std::string incLabel = labelBase, decLabel = labelBase;
+    incLabel += "+";
+    decLabel += "-";
     const char* incKey, *decKey;
     int val;
     if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
@@ -328,13 +330,13 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
         val = 1;
     }
     {
-        DisabledIf dif = vs.clock.clock().rate == Aldo_MaxCps;
+        DisabledIf dif = vs.clock.atMaxRate();
         if (ImGui::MenuItem(incLabel.c_str(), incKey)) {
-            vs.clock.adjustCycleRate(val);
+            vs.clock.adjustRate(val);
         }
-        dif = vs.clock.clock().rate == Aldo_MinCps;
+        dif = vs.clock.atMinRate();
         if (ImGui::MenuItem(decLabel.c_str(), decKey)) {
-            vs.clock.adjustCycleRate(-val);
+            vs.clock.adjustRate(-val);
         }
     }
     if (ImGui::MenuItem("Clock Scale", "c")) {

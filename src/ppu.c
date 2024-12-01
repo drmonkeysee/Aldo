@@ -215,7 +215,6 @@ static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     ppu->regsel = addr & 0x7;
     switch (ppu->regsel) {
     case 2: // PPUSTATUS
-        // TODO: should this be an enum state instead
         // NOTE: NMI race condition; if status is read just before NMI is
         // fired, then vblank is cleared but returns false and NMI is missed.
         if (ppu->line == LineVBlank && ppu->dot == 1) {
@@ -858,8 +857,6 @@ static bool cycle(struct aldo_rp2c02 *self)
     // NOTE: clear any databus signals from previous cycle; unlike the CPU,
     // the PPU does not read/write on every cycle so these lines must be
     // managed explicitly.
-    // TODO: does ale need clearing or is it enough to be handled on every
-    // read/write?
     self->signal.rd = self->signal.wr = true;
 
     vblank(self);

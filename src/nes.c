@@ -340,8 +340,7 @@ void aldo_nes_powerup(aldo_nes *self, aldo_cart *c, bool zeroram)
     if (c) {
         connect_cart(self, c);
     }
-    // TODO: for now start in cycle-step mode
-    self->mode = ALDO_EXC_CYCLE;
+    self->mode = ALDO_EXC_RUN;
     if (zeroram) {
         memset(self->ram, 0, memsz(self->ram));
         memset(self->vram, 0, memsz(self->vram));

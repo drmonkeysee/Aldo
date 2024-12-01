@@ -92,12 +92,25 @@ private:
 
 class RunClock {
 public:
-    double dtInputMs() noexcept { return dtInput; }
-    double dtUpdateMs() noexcept { return dtUpdate; }
-    double dtRenderMs() noexcept { return dtRender; }
-    aldo_clockscale scale() noexcept { return currentScale; }
+    double dtInputMs() const noexcept { return dtInput; }
+    double dtUpdateMs() const noexcept { return dtUpdate; }
+    double dtRenderMs() const noexcept { return dtRender; }
+    aldo_clockscale scale() const noexcept { return currentScale; }
+    // TODO: use deducing this when it's finally supported
+    const aldo_clock& clock() const noexcept { return clk; }
+    const aldo_clock* clockp() const noexcept { return &clk; }
     aldo_clock& clock() noexcept { return clk; }
     aldo_clock* clockp() noexcept { return &clk; }
+
+    bool atMinRate() const noexcept
+    {
+        return atRateLimit(Aldo_MinCps, Aldo_MinFps);
+    }
+
+    bool atMaxRate() const noexcept
+    {
+        return atRateLimit(Aldo_MaxCps, Aldo_MaxFps);
+    }
 
     void start() noexcept { aldo_clock_start(clockp()); }
 
@@ -115,11 +128,18 @@ public:
     RunTimer timeUpdate() noexcept { return RunTimer{dtUpdate}; }
     RunTimer timeRender() noexcept { return RunTimer{dtRender}; }
 
-    void adjustCycleRate(int adjustment) noexcept
+    void adjustRate(int adjustment) noexcept
     {
         auto adjusted = clock().rate + adjustment;
-        clock().rate = std::max(Aldo_MinCps,
-                                  std::min(adjusted, Aldo_MaxCps));
+        int min, max;
+        if (currentScale == ALDO_CS_CYCLE) {
+            min = Aldo_MinCps;
+            max = Aldo_MaxCps;
+        } else {
+            min = Aldo_MinFps;
+            max = Aldo_MaxFps;
+        }
+        clock().rate = std::max(min, std::min(adjusted, max));
     }
 
     void setScale(aldo_clockscale s) noexcept
@@ -141,10 +161,20 @@ public:
     }
 
 private:
-    aldo_clock clk{.rate = 10, .rate_factor = aldo_nes_cycle_factor()};
+    bool atRateLimit(int cycleLimit, int frameLimit) const noexcept
+    {
+        return currentScale == ALDO_CS_CYCLE
+                ? clock().rate == cycleLimit
+                : clock().rate == frameLimit;
+    }
+
+    aldo_clock clk{
+        .rate = Aldo_MaxFps,
+        .rate_factor = aldo_nes_frame_factor(),
+    };
     double dtInput = 0, dtUpdate = 0, dtRender = 0;
-    aldo_clockscale currentScale = ALDO_CS_CYCLE;
-    int oldRate = Aldo_MinFps;
+    aldo_clockscale currentScale = ALDO_CS_FRAME;
+    int oldRate = 10;
 };
 
 }

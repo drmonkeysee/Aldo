@@ -10,7 +10,6 @@
 #include "argparse.h"
 #include "cart.h"
 #include "cliargs.h"
-#include "ctrlsignal.h"
 #include "debug.h"
 #include "dis.h"
 #include "emu.h"
@@ -200,8 +199,6 @@ static ui_loop *setup_ui(struct emulator *emu)
 {
     ui_loop *loop = ui_curses_loop;
     if (emu->args->batch) {
-        // NOTE: when in batch mode set NES to run immediately
-        aldo_nes_set_mode(emu->console, ALDO_EXC_RUN);
         aldo_nes_ready(emu->console, true);
         loop = ui_batch_loop;
     }

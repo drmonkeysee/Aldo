@@ -213,22 +213,24 @@ static bool reset_held(struct aldo_mos6502 *self)
 // MARK: - Instruction Execution
 //
 
-// NOTE: finish an instruction by polling for interrupts and signaling the
-// next cycle to be an opcode fetch; the order in which this is called
-// simulates the side-effects of 6502's pipelining behavior without actually
-// emulating the cycle timing, for example:
-//
-// SEI is setting the I flag from 0 to 1, disabling interrupts; SEI is a
-// 2-cycle instruction and therefore polls for interrupts on the T1 (final)
-// cycle, however the I flag is not actually set until T0 of the *next* cycle,
-// so if interrupt-polling finds an active interrupt it will insert a BRK at
-// the end of SEI and an interrupt will fire despite following the
-// "disable interrupt" instruction; correspondingly CLI will delay an
-// interrupt for an extra instruction for the same reason;
+/*
+ * Finish an instruction by polling for interrupts and signaling the next cycle
+ * to be an opcode fetch; the order in which this is called simulates the
+ * side-effects of 6502's pipelining behavior without actually emulating the
+ * cycle timing, for example:
 
-// committing the operation before executing the register side-effects will
-// emulate this pipeline timing with respect to interrupts without modelling
-// the actual cycle-delay of internal CPU operations.
+ * SEI is setting the I flag from 0 to 1, disabling interrupts; SEI is a
+ * 2-cycle instruction and therefore polls for interrupts on the T1 (final)
+ * cycle, however the I flag is not actually set until T0 of the *next* cycle,
+ * so if interrupt-polling finds an active interrupt it will insert a BRK at
+ * the end of SEI and an interrupt will fire despite following the
+ * "disable interrupt" instruction; correspondingly CLI will delay an
+ * interrupt for an extra instruction for the same reason;
+
+ * committing the operation before executing the register side-effects will
+ * emulate this pipeline timing with respect to interrupts without modelling
+ * the actual cycle-delay of internal CPU operations.
+ */
 static void conditional_commit(struct aldo_mos6502 *self, bool c)
 {
     // NOTE: interrupts are polled regardless of commit condition
@@ -1090,17 +1092,19 @@ static void dispatch_instruction(struct aldo_mos6502 *self,
 // MARK: - Addressing Mode Sequences
 //
 
-// NOTE: addressing sequences approximate the cycle-by-cycle behavior of the
-// 6502 processor; each cycle generally breaks down as follows:
-// 1. put current cycle's address on the addressbus (roughly ϕ1)
-// 2. perform internal addressing operations for next cycle
-//    (latching previous databus contents, adding address offsets, etc.)
-// 3. execute read/write/instruction, either reading data to databus
-//    or writing data from databus (roughly ϕ2)
-// Note that the actual 6502 executes instruction side-effects on T0/T1 of the
-// next instruction but we execute all side-effects within the current
-// instruction sequence (generally the last cycle); in other words we don't
-// emulate the 6502's simple pipelining.
+/*
+ * Addressing sequences approximate the cycle-by-cycle behavior of the
+ * 6502 processor; each cycle generally breaks down as follows:
+ * 1. put current cycle's address on the addressbus (roughly ϕ1)
+ * 2. perform internal addressing operations for next cycle
+ *    (latching previous databus contents, adding address offsets, etc.)
+ * 3. execute read/write/instruction, either reading data to databus
+ *    or writing data from databus (roughly ϕ2)
+ * Note that the actual 6502 executes instruction side-effects on T0/T1 of the
+ * next instruction but we execute all side-effects within the current
+ * instruction sequence (generally the last cycle); in other words we don't
+ * emulate the 6502's simple pipelining.
+ */
 
 #define BAD_ADDR_SEQ assert(((void)"BAD ADDRMODE SEQUENCE", false))
 
@@ -1403,6 +1407,7 @@ static void BCH_sequence(struct aldo_mos6502 *self, struct aldo_decoded dec)
     case 1:
         self->addrbus = self->pc++;
         read(self);
+        // NOTE: in peek mode branches are always taken
         if (!self->detached) {
             dispatch_instruction(self, dec);
         }

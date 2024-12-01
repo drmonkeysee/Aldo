@@ -769,19 +769,17 @@ private:
 
     static void renderCycleIndicator(int cycle) noexcept
     {
-        static constexpr auto radius = 5;
-
         ImGui::TextUnformatted("t:");
         ImGui::SameLine();
         auto pos = ImGui::GetCursorScreenPos();
         ImVec2 center{pos.x, pos.y + (ImGui::GetTextLineHeight() / 2) + 1};
         auto drawList = ImGui::GetWindowDrawList();
         for (auto i = 0; i < aldo_nes_max_tcpu(); ++i) {
-            drawList->AddCircleFilled(center, radius,
+            drawList->AddCircleFilled(center, aldo::style::SmallRadius,
                                       i == cycle
                                         ? aldo::colors::LedOn
                                         : aldo::colors::LedOff);
-            center.x += radius * 3;
+            center.x += aldo::style::SmallRadius * 3;
         }
         ImGui::Spacing();
     }
@@ -1310,6 +1308,7 @@ protected:
         widget_group([this] {
             this->renderPalettes(false);
             this->renderPalettes(true);
+            this->renderEmphasis();
         });
     }
 
@@ -1367,6 +1366,39 @@ private:
                 ImGui::EndTable();
             }
         }
+    }
+
+    void renderEmphasis() const noexcept
+    {
+        ImGui::TextUnformatted("Emphasis");
+
+        ImGui::TextUnformatted("Red: ");
+        ImGui::SameLine();
+        drawEmphasisLed(emu.snapshot().ppu.mask & 0x20);
+
+        ImGui::SameLine();
+        ImGui::TextUnformatted("Green:");
+        ImGui::SameLine();
+        drawEmphasisLed(emu.snapshot().ppu.mask & 0x40);
+
+        ImGui::TextUnformatted("Blue:");
+        ImGui::SameLine();
+        drawEmphasisLed(emu.snapshot().ppu.mask & 0x80);
+
+        ImGui::SameLine();
+        ImGui::TextUnformatted("Gray: ");
+        ImGui::SameLine();
+        drawEmphasisLed(emu.snapshot().ppu.mask & 0x1);
+    }
+
+    static void drawEmphasisLed(bool on) noexcept
+    {
+        auto pos = ImGui::GetCursorScreenPos();
+        ImVec2 center{pos.x, pos.y + (ImGui::GetTextLineHeight() / 2) + 1};
+        auto drawList = ImGui::GetWindowDrawList();
+        auto fill = on ? aldo::colors::LedOn : aldo::colors::LedOff;
+        drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
+        ImGui::Dummy(aldo::style::glyph_size());
     }
 
     aldo::PatternTable left, right;

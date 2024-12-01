@@ -334,7 +334,7 @@ static int drawflags(const struct view *v, int cursor_y,
     int cursor_x = 0;
     mvwaddstr(v->content, cursor_y++, cursor_x, "N V - B D I Z C");
     for (size_t i = sizeof snp->cpu.status * 8; i > 0; --i) {
-        mvwprintw(v->content, cursor_y, cursor_x, "%u",
+        mvwprintw(v->content, cursor_y, cursor_x, "%d",
                   aldo_getbit(snp->cpu.status, i - 1));
         cursor_x += 2;
     }

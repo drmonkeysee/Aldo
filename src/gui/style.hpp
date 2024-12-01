@@ -92,6 +92,8 @@ inline constexpr ImU32 luminance(ImU32 color)
 namespace style
 {
 
+inline constexpr float SmallRadius = 5;
+
 inline ImVec2 glyph_size() noexcept
 {
     return ImGui::CalcTextSize("A");

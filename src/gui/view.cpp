@@ -1409,6 +1409,64 @@ private:
     RefreshInterval drawInterval{250};
 };
 
+class PpuView final : public aldo::View {
+public:
+    PpuView(aldo::viewstate& vs, const aldo::Emulator& emu,
+            const aldo::MediaRuntime& mr) noexcept
+    : View{"PPU", vs, emu, mr} {}
+    PpuView(aldo::viewstate&, aldo::Emulator&&,
+            const aldo::MediaRuntime&) = delete;
+    PpuView(aldo::viewstate&, const aldo::Emulator&,
+            aldo::MediaRuntime&&) = delete;
+    PpuView(aldo::viewstate&, aldo::Emulator&&, aldo::MediaRuntime&&) = delete;
+
+protected:
+    void renderContents() override
+    {
+        if (ImGui::CollapsingHeader("Registers",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+            renderRegisters();
+        }
+        if (ImGui::CollapsingHeader("Datapath",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+            renderPipeline();
+        }
+    }
+
+private:
+    void renderRegisters() const
+    {
+        widget_group([] {
+            ImGui::TextUnformatted("CONTROL: XX");
+            ImGui::TextUnformatted("MASK:    XX");
+        });
+        ImGui::SameLine(0, 20);
+        widget_group([] {
+            ImGui::TextUnformatted("STATUS:  ddd");
+            ImGui::TextUnformatted("OAMADDR: XX");
+        });
+    }
+
+    void renderPipeline() const noexcept
+    {
+        ImGui::TextUnformatted("RegSel: ddd");
+        ImGui::TextUnformatted("RData R/W:  XX");
+        ImGui::TextUnformatted("VAddr R/W:  XXXX");
+        ImGui::TextUnformatted("VData R/W/0:  XX");
+        ImGui::Separator();
+        ImGui::TextUnformatted("v: XXXX (d,d,dd,dd)");
+        ImGui::TextUnformatted("t: XXXX (d,d,dd,dd)");
+        ImGui::TextUnformatted("x: XX (d)");
+        ImGui::TextUnformatted("(ddd,ddd): XX");
+        ImGui::Separator();
+        ImGui::TextUnformatted("r: XX");
+        ImGui::TextUnformatted("c: o o: o w: o");
+        ImGui::Separator();
+        ImGui::TextUnformatted("INT");
+        ImGui::TextUnformatted("RST");
+    }
+};
+
 class PrgAtPcView final : public aldo::View {
 public:
     PrgAtPcView(aldo::viewstate& vs, const aldo::Emulator& emu,
@@ -1805,6 +1863,7 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
         DebuggerView,
         PaletteView,
         PatternTablesView,
+        PpuView,
         PrgAtPcView,
         RamView,
         SystemView,

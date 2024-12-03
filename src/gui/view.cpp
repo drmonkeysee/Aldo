@@ -1370,22 +1370,26 @@ private:
 
     void renderEmphasis() const noexcept
     {
+        auto spacer = aldo::style::glyph_size().x * 3.5f;
+
         ImGui::TextUnformatted("Emphasis");
 
         ImGui::TextUnformatted("Red: ");
         ImGui::SameLine();
         drawEmphasisLed(emu.snapshot().ppu.mask & 0x20);
 
-        ImGui::SameLine();
+        ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted("Green:");
         ImGui::SameLine();
         drawEmphasisLed(emu.snapshot().ppu.mask & 0x40);
+
+        ImGui::Spacing();
 
         ImGui::TextUnformatted("Blue:");
         ImGui::SameLine();
         drawEmphasisLed(emu.snapshot().ppu.mask & 0x80);
 
-        ImGui::SameLine();
+        ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted("Gray: ");
         ImGui::SameLine();
         drawEmphasisLed(emu.snapshot().ppu.mask & 0x1);
@@ -1398,7 +1402,6 @@ private:
         auto drawList = ImGui::GetWindowDrawList();
         auto fill = on ? aldo::colors::LedOn : aldo::colors::LedOff;
         drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
-        ImGui::Dummy(aldo::style::glyph_size());
     }
 
     aldo::PatternTable left, right;

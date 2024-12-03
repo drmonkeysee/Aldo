@@ -119,7 +119,8 @@ public:
         return {clock(), resetBudget};
     }
 
-    void resetEmu() noexcept {
+    void resetEmu() noexcept
+    {
         clock().emutime = 0;
         clock().cycles = clock().frames = clock().subcycle = 0;
     }

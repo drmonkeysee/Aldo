@@ -1182,7 +1182,7 @@ private:
         std::array<char, 3> buf;
         ImGui::TableSetupColumn("Idx", ImGuiTableColumnFlags_WidthStretch);
         for (pal_sz col = 1; col < Cols; ++col) {
-            std::snprintf(buf.data(), buf.size(), " %1zX", col - 1);
+            std::snprintf(buf.data(), buf.size(), " %zX", col - 1);
             ImGui::TableSetupColumn(buf.data());
         }
         ImGui::TableHeadersRow();
@@ -1427,7 +1427,7 @@ protected:
                                     ImGuiTreeNodeFlags_DefaultOpen)) {
             renderRegisters();
         }
-        if (ImGui::CollapsingHeader("Datapath",
+        if (ImGui::CollapsingHeader("Pipeline",
                                     ImGuiTreeNodeFlags_DefaultOpen)) {
             renderPipeline();
         }
@@ -1436,34 +1436,118 @@ protected:
 private:
     void renderRegisters() const
     {
-        widget_group([] {
-            ImGui::TextUnformatted("CONTROL: XX");
-            ImGui::TextUnformatted("MASK:    XX");
+        auto& ppu = emu.snapshot().ppu;
+        widget_group([&ppu] {
+            ImGui::Text("CTRL: %02X", ppu.ctrl);
+            ImGui::Text("MASK: %02X", ppu.mask);
         });
         ImGui::SameLine(0, 20);
-        widget_group([] {
-            ImGui::TextUnformatted("STATUS:  ddd");
-            ImGui::TextUnformatted("OAMADDR: XX");
+        widget_group([&ppu] {
+            ImGui::Text("STATUS:  %d%d%d", aldo_getbit(ppu.status, 7),
+                        aldo_getbit(ppu.status, 6),
+                        aldo_getbit(ppu.status, 5));
+            ImGui::Text("OAMADDR: %02X", ppu.oamaddr);
         });
     }
 
     void renderPipeline() const noexcept
     {
-        ImGui::TextUnformatted("RegSel: ddd");
-        ImGui::TextUnformatted("RData R/W:  XX");
-        ImGui::TextUnformatted("VAddr R/W:  XXXX");
-        ImGui::TextUnformatted("VData R/W/0:  XX");
+        auto& pipeline = emu.snapshot().ppu.datapath;
+        auto& lines = emu.snapshot().ppu.lines;
+
+        {
+            ScopedColor color{{ImGuiCol_Text, aldo::colors::LineIn}};
+            ImGui::Text("RgSel: %d%d%d",
+                        aldo_getbit(pipeline.register_select, 2),
+                        aldo_getbit(pipeline.register_select, 1),
+                        aldo_getbit(pipeline.register_select, 0));
+        }
+        ImGui::SameLine(0, 27);
+        {
+            ScopedColor color{{
+                ImGuiCol_Text,
+                lines.cpu_readwrite
+                    ? aldo::colors::LineOut
+                    : aldo::colors::LineIn,
+            }};
+            ImGui::Text("RgVal: %02X", pipeline.register_databus);
+        }
+        {
+            DisabledIf dif = !lines.address_enable;
+            ScopedColor color{{ImGuiCol_Text, aldo::colors::LineOut}};
+            ImGui::Text("VAddr: %04X", pipeline.addressbus);
+        }
+        ImGui::SameLine(0, 20);
+        {
+            DisabledIf dif = lines.read && lines.write;
+            ScopedColor color{{
+                ImGuiCol_Text,
+                lines.read ? aldo::colors::LineOut : aldo::colors::LineIn,
+            }};
+            ImGui::Text("VData: %02X", pipeline.databus);
+        }
+
         ImGui::Separator();
-        ImGui::TextUnformatted("v: XXXX (d,d,dd,dd)");
-        ImGui::TextUnformatted("t: XXXX (d,d,dd,dd)");
-        ImGui::TextUnformatted("x: XX (d)");
-        ImGui::TextUnformatted("(ddd,ddd): XX");
+        ImGui::Spacing();
+        renderInterruptLine("RST", lines.reset);
+        ImGui::SameLine();
+        ImGui::TextUnformatted(display_signalstate(pipeline.rst));
+        ImGui::SameLine(0, 87);
+        renderInterruptLine("INT", lines.interrupt);
+
         ImGui::Separator();
-        ImGui::TextUnformatted("r: XX");
-        ImGui::TextUnformatted("c: o o: o w: o");
-        ImGui::Separator();
-        ImGui::TextUnformatted("INT");
-        ImGui::TextUnformatted("RST");
+        ImGui::Text("v: %04X (%d,%d,%02d,%02d)", pipeline.scrolladdr,
+                    (pipeline.scrolladdr & 0x7000) >> 12,
+                    (pipeline.scrolladdr & 0xc00) >> 10,
+                    (pipeline.scrolladdr & 0x3e0) >> 5,
+                    pipeline.scrolladdr & 0x1f);
+        ImGui::Text("t: %04X (%d,%d,%02d,%02d)", pipeline.tempaddr,
+                    (pipeline.tempaddr & 0x7000) >> 12,
+                    (pipeline.tempaddr & 0xc00) >> 10,
+                    (pipeline.tempaddr & 0x3e0) >> 5,
+                    pipeline.tempaddr & 0x1f);
+        ImGui::Text("x: %02X (%d)", pipeline.xfine, pipeline.xfine);
+        ImGui::SameLine(0, 28);
+        ImGui::Text("r: %02X", pipeline.readbuffer);
+        {
+            DisabledIf dif = !lines.video_out;
+            ImGui::Text("(%3d,%3d): %02X", pipeline.line, pipeline.dot,
+                        pipeline.pixel);
+        }
+        auto spacer = aldo::style::glyph_size().x * 3.5f;
+        ImGui::TextUnformatted("c:");
+        ImGui::SameLine();
+        drawFlagLed(pipeline.cv_pending);
+        ImGui::SameLine(0, spacer);
+        ImGui::TextUnformatted("o:");
+        ImGui::SameLine();
+        drawFlagLed(pipeline.oddframe);
+        ImGui::SameLine(0, spacer);
+        ImGui::TextUnformatted("w:");
+        ImGui::SameLine();
+        drawFlagLed(pipeline.writelatch);
+    }
+
+    // TODO: refactor these with duplicate functions
+    static void drawFlagLed(bool on) noexcept
+    {
+        auto pos = ImGui::GetCursorScreenPos();
+        ImVec2 center{pos.x, pos.y + (ImGui::GetTextLineHeight() / 2) + 1};
+        auto drawList = ImGui::GetWindowDrawList();
+        auto fill = on ? aldo::colors::LedOn : aldo::colors::LedOff;
+        drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
+    }
+
+    static void renderInterruptLine(const char* label, bool active) noexcept
+    {
+        DisabledIf dif = !active;
+        ImGui::TextUnformatted(label);
+        auto start = ImGui::GetItemRectMin();
+        ImVec2 end{
+            start.x + ImGui::GetItemRectSize().x, start.y,
+        };
+        auto drawlist = ImGui::GetWindowDrawList();
+        drawlist->AddLine(start, end, aldo::colors::white(active));
     }
 };
 
@@ -1608,7 +1692,7 @@ private:
         ImGui::TableSetupScrollFreeze(0, 1);
         ImGui::TableSetupColumn("Addr");
         for (auto i = 0; i < PageDim; ++i) {
-            std::snprintf(col.data(), col.size(), " %1X", i);
+            std::snprintf(col.data(), col.size(), " %X", i);
             ImGui::TableSetupColumn(col.data());
         }
         ImGui::TableSetupColumn("ASCII");

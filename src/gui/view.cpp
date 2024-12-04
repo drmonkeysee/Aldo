@@ -494,6 +494,28 @@ auto about_overlay(aldo::viewstate& vs) noexcept
     ImGui::End();
 }
 
+auto interrupt_line(const char* label, bool active) noexcept
+{
+    DisabledIf dif = !active;
+    ImGui::TextUnformatted(label);
+    auto start = ImGui::GetItemRectMin();
+    ImVec2 end{start.x + ImGui::GetItemRectSize().x, start.y};
+    auto drawlist = ImGui::GetWindowDrawList();
+    drawlist->AddLine(start, end, aldo::colors::white(active));
+}
+
+auto small_led(bool on, float xOffset = 0) noexcept
+{
+    auto pos = ImGui::GetCursorScreenPos();
+    ImVec2 center{
+        pos.x + xOffset,
+        pos.y + (ImGui::GetTextLineHeight() / 2) + 1,
+    };
+    auto drawList = ImGui::GetWindowDrawList();
+    auto fill = on ? aldo::colors::LedOn : aldo::colors::LedOff;
+    drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
+}
+
 //
 // MARK: - Concrete Views
 //
@@ -753,11 +775,11 @@ private:
         ImGui::Spacing();
 
         auto& lines = emu.snapshot().cpu.lines;
-        renderInterruptLine("IRQ", lines.irq);
+        interrupt_line("IRQ", lines.irq);
         ImGui::SameLine(0, spacer);
-        renderInterruptLine("NMI", lines.nmi);
+        interrupt_line("NMI", lines.nmi);
         ImGui::SameLine(0, spacer);
-        renderInterruptLine("RST", lines.reset);
+        interrupt_line("RST", lines.reset);
 
         auto& datapath = emu.snapshot().cpu.datapath;
         ImGui::TextUnformatted(display_signalstate(datapath.irq));
@@ -771,15 +793,8 @@ private:
     {
         ImGui::TextUnformatted("t:");
         ImGui::SameLine();
-        auto pos = ImGui::GetCursorScreenPos();
-        ImVec2 center{pos.x, pos.y + (ImGui::GetTextLineHeight() / 2) + 1};
-        auto drawList = ImGui::GetWindowDrawList();
         for (auto i = 0; i < aldo_nes_max_tcpu(); ++i) {
-            drawList->AddCircleFilled(center, aldo::style::SmallRadius,
-                                      i == cycle
-                                        ? aldo::colors::LedOn
-                                        : aldo::colors::LedOff);
-            center.x += aldo::style::SmallRadius * 3;
+            small_led(i == cycle, aldo::style::SmallRadius * 3 * i);
         }
         ImGui::Spacing();
     }
@@ -799,18 +814,6 @@ private:
             start{end.x - adjustW, end.y};
         auto drawList = ImGui::GetWindowDrawList();
         drawList->AddLine(start, end, aldo::colors::white(active));
-    }
-
-    static void renderInterruptLine(const char* label, bool active) noexcept
-    {
-        DisabledIf dif = !active;
-        ImGui::TextUnformatted(label);
-        auto start = ImGui::GetItemRectMin();
-        ImVec2 end{
-            start.x + ImGui::GetItemRectSize().x, start.y,
-        };
-        auto drawlist = ImGui::GetWindowDrawList();
-        drawlist->AddLine(start, end, aldo::colors::white(active));
     }
 };
 
@@ -1376,32 +1379,23 @@ private:
 
         ImGui::TextUnformatted("Red: ");
         ImGui::SameLine();
-        drawEmphasisLed(emu.snapshot().ppu.mask & 0x20);
+        small_led(emu.snapshot().ppu.mask & 0x20);
 
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted("Green:");
         ImGui::SameLine();
-        drawEmphasisLed(emu.snapshot().ppu.mask & 0x40);
+        small_led(emu.snapshot().ppu.mask & 0x40);
 
         ImGui::Spacing();
 
         ImGui::TextUnformatted("Blue:");
         ImGui::SameLine();
-        drawEmphasisLed(emu.snapshot().ppu.mask & 0x80);
+        small_led(emu.snapshot().ppu.mask & 0x80);
 
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted("Gray: ");
         ImGui::SameLine();
-        drawEmphasisLed(emu.snapshot().ppu.mask & 0x1);
-    }
-
-    static void drawEmphasisLed(bool on) noexcept
-    {
-        auto pos = ImGui::GetCursorScreenPos();
-        ImVec2 center{pos.x, pos.y + (ImGui::GetTextLineHeight() / 2) + 1};
-        auto drawList = ImGui::GetWindowDrawList();
-        auto fill = on ? aldo::colors::LedOn : aldo::colors::LedOff;
-        drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
+        small_led(emu.snapshot().ppu.mask & 0x1);
     }
 
     aldo::PatternTable left, right;
@@ -1452,6 +1446,15 @@ private:
 
     void renderPipeline() const noexcept
     {
+        renderDataLines();
+        ImGui::Separator();
+        renderSignals();
+        ImGui::Separator();
+        renderPixelProcessing();
+    }
+
+    void renderDataLines() const noexcept
+    {
         auto& pipeline = emu.snapshot().ppu.datapath;
         auto& lines = emu.snapshot().ppu.lines;
 
@@ -1486,16 +1489,26 @@ private:
             }};
             ImGui::Text("VData: %02X", pipeline.databus);
         }
+    }
 
-        ImGui::Separator();
+    void renderSignals() const noexcept
+    {
+        auto& pipeline = emu.snapshot().ppu.datapath;
+        auto& lines = emu.snapshot().ppu.lines;
+
         ImGui::Spacing();
-        renderInterruptLine("RST", lines.reset);
+        interrupt_line("RST", lines.reset);
         ImGui::SameLine();
         ImGui::TextUnformatted(display_signalstate(pipeline.rst));
         ImGui::SameLine(0, 87);
-        renderInterruptLine("INT", lines.interrupt);
+        interrupt_line("INT", lines.interrupt);
+    }
 
-        ImGui::Separator();
+    void renderPixelProcessing() const noexcept
+    {
+        auto& pipeline = emu.snapshot().ppu.datapath;
+        auto& lines = emu.snapshot().ppu.lines;
+
         ImGui::Text("v: %04X (%d,%d,%02d,%02d)", pipeline.scrolladdr,
                     (pipeline.scrolladdr & 0x7000) >> 12,
                     (pipeline.scrolladdr & 0xc00) >> 10,
@@ -1517,37 +1530,15 @@ private:
         auto spacer = aldo::style::glyph_size().x * 3.5f;
         ImGui::TextUnformatted("c:");
         ImGui::SameLine();
-        drawFlagLed(pipeline.cv_pending);
+        small_led(pipeline.cv_pending);
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted("o:");
         ImGui::SameLine();
-        drawFlagLed(pipeline.oddframe);
+        small_led(pipeline.oddframe);
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted("w:");
         ImGui::SameLine();
-        drawFlagLed(pipeline.writelatch);
-    }
-
-    // TODO: refactor these with duplicate functions
-    static void drawFlagLed(bool on) noexcept
-    {
-        auto pos = ImGui::GetCursorScreenPos();
-        ImVec2 center{pos.x, pos.y + (ImGui::GetTextLineHeight() / 2) + 1};
-        auto drawList = ImGui::GetWindowDrawList();
-        auto fill = on ? aldo::colors::LedOn : aldo::colors::LedOff;
-        drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
-    }
-
-    static void renderInterruptLine(const char* label, bool active) noexcept
-    {
-        DisabledIf dif = !active;
-        ImGui::TextUnformatted(label);
-        auto start = ImGui::GetItemRectMin();
-        ImVec2 end{
-            start.x + ImGui::GetItemRectSize().x, start.y,
-        };
-        auto drawlist = ImGui::GetWindowDrawList();
-        drawlist->AddLine(start, end, aldo::colors::white(active));
+        small_led(pipeline.writelatch);
     }
 };
 

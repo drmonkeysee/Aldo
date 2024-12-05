@@ -62,6 +62,8 @@ auto parse_colors(const pal_buf& buf)
 aldo::palette::datav aldo::Palette::getColor(aldo::palette::sz idx,
                                              aldo::palette::emphasis em) const
 {
+    assert(idx < aldo::palette::Size);
+
     if (em.gs) {
         idx &= 0x30;
     }

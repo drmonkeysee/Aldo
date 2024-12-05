@@ -1210,6 +1210,7 @@ private:
                     ImGui::Text(" %02zX", rowStart);
                 } else {
                     auto cell = rowStart + (col - 1);
+                    assert(cell < aldo::palette::Size);
                     auto color = emu.palette().getColor(cell, colorEmphasis);
                     ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color);
                     ScopedColor indicatorColor{

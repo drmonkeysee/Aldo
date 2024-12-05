@@ -1509,16 +1509,8 @@ private:
         auto& pipeline = emu.snapshot().ppu.datapath;
         auto& lines = emu.snapshot().ppu.lines;
 
-        ImGui::Text("v: %04X (%d,%d,%02d,%02d)", pipeline.scrolladdr,
-                    (pipeline.scrolladdr & 0x7000) >> 12,
-                    (pipeline.scrolladdr & 0xc00) >> 10,
-                    (pipeline.scrolladdr & 0x3e0) >> 5,
-                    pipeline.scrolladdr & 0x1f);
-        ImGui::Text("t: %04X (%d,%d,%02d,%02d)", pipeline.tempaddr,
-                    (pipeline.tempaddr & 0x7000) >> 12,
-                    (pipeline.tempaddr & 0xc00) >> 10,
-                    (pipeline.tempaddr & 0x3e0) >> 5,
-                    pipeline.tempaddr & 0x1f);
+        renderScrollAddr('v', pipeline.scrolladdr);
+        renderScrollAddr('t', pipeline.tempaddr);
         ImGui::Text("x: %02X (%d)", pipeline.xfine, pipeline.xfine);
         ImGui::SameLine(0, 28);
         ImGui::Text("r: %02X", pipeline.readbuffer);
@@ -1539,6 +1531,13 @@ private:
         ImGui::TextUnformatted("w:");
         ImGui::SameLine();
         small_led(pipeline.writelatch);
+    }
+
+    static void renderScrollAddr(char label, aldo::et::word addr) noexcept
+    {
+        ImGui::Text("%c: %04X (%d,%d,%02d,%02d)", label, addr,
+                    (addr & 0x7000) >> 12, (addr & 0xc00) >> 10,
+                    (addr & 0x3e0) >> 5, addr & 0x1f);
     }
 };
 

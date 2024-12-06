@@ -480,7 +480,7 @@ static void drawcpu(const struct view *v, const struct aldo_snapshot *snp)
 static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
                           int w, const struct aldo_snapshot *snp)
 {
-    uint8_t sel = snp->ppu.datapath.register_select;
+    uint8_t sel = snp->ppu.pipeline.register_select;
     char sel_buf[4];
     sprintf(sel_buf, "%d%d%d", aldo_getbit(sel, 2), aldo_getbit(sel, 1),
             aldo_getbit(sel, 0));
@@ -492,11 +492,11 @@ static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
                     ArrowDown, -1, "R\u0305S\u0305T\u0305");
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
-    draw_interrupt_latch(v, snp->ppu.datapath.rst, cursor_y, line_x * 3);
+    draw_interrupt_latch(v, snp->ppu.pipeline.rst, cursor_y, line_x * 3);
 
     mvwprintw(v->content, cursor_y, line_x - 2, "[%s%02X]",
               snp->ppu.lines.cpu_readwrite ? DArrowUp : DArrowDown,
-              snp->ppu.datapath.register_databus);
+              snp->ppu.pipeline.register_databus);
     return cursor_y;
 }
 
@@ -520,40 +520,40 @@ static void draw_scroll_addr(const struct view *v, int y, int x, char label,
               val & 0x1f);
 }
 
-static int draw_pdatapath(const struct view *v, int cursor_y, int w,
-                          const struct aldo_snapshot *snp)
+static int draw_pipeline(const struct view *v, int cursor_y, int w,
+                         const struct aldo_snapshot *snp)
 {
     static const int seph = 5, vsep = 19, buscol = vsep + 2;
 
     mvwvline(v->content, ++cursor_y, vsep, 0, seph);
 
-    draw_scroll_addr(v, cursor_y, 0, 'v', snp->ppu.datapath.scrolladdr);
+    draw_scroll_addr(v, cursor_y, 0, 'v', snp->ppu.pipeline.scrolladdr);
     mvwprintw(v->content, cursor_y, buscol, "%04X",
-              snp->ppu.datapath.addressbus);
+              snp->ppu.pipeline.addressbus);
     mvwaddstr(v->content, cursor_y, w - 1, DArrowRight);
 
-    draw_scroll_addr(v, ++cursor_y, 0, 't', snp->ppu.datapath.tempaddr);
+    draw_scroll_addr(v, ++cursor_y, 0, 't', snp->ppu.pipeline.tempaddr);
     draw_chip_hline(v, snp->ppu.lines.address_enable, cursor_y, buscol + 1,
                     "ALE", ArrowRight);
 
     mvwprintw(v->content, ++cursor_y, 0, "x: %02X (%d)",
-              snp->ppu.datapath.xfine, snp->ppu.datapath.xfine);
+              snp->ppu.pipeline.xfine, snp->ppu.pipeline.xfine);
     draw_chip_hline(v, snp->ppu.lines.read, cursor_y, buscol + 3, "R\u0305",
                     ArrowRight);
 
     mvwprintw(v->content, ++cursor_y, 0, "c: %d o: %d w: %d",
-              snp->ppu.datapath.cv_pending, snp->ppu.datapath.oddframe,
-              snp->ppu.datapath.writelatch);
+              snp->ppu.pipeline.cv_pending, snp->ppu.pipeline.oddframe,
+              snp->ppu.pipeline.writelatch);
     draw_chip_hline(v, snp->ppu.lines.write, cursor_y, buscol + 3, "W\u0305",
                     ArrowRight);
 
     mvwprintw(v->content, ++cursor_y, 0, "r: %02X",
-              snp->ppu.datapath.readbuffer);
-    if (snp->ppu.datapath.busfault) {
+              snp->ppu.pipeline.readbuffer);
+    if (snp->ppu.pipeline.busfault) {
         mvwaddstr(v->content, cursor_y, buscol + 1, "FLT");
     } else {
         mvwprintw(v->content, cursor_y, buscol + 1, " %02X",
-                  snp->ppu.datapath.databus);
+                  snp->ppu.pipeline.databus);
     }
     // NOTE: write line does not signal when writing to palette ram so use the
     // read signal to determine direction of databus flow.
@@ -566,10 +566,10 @@ static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
                               const struct aldo_snapshot *snp)
 {
     mvwprintw(v->content, cursor_y, line_x - 2, "[%s%02X]", DArrowDown,
-              snp->ppu.datapath.pixel);
+              snp->ppu.pipeline.pixel);
 
     char vbuf[10];
-    sprintf(vbuf, "(%3d,%3d)", snp->ppu.datapath.line, snp->ppu.datapath.dot);
+    sprintf(vbuf, "(%3d,%3d)", snp->ppu.pipeline.line, snp->ppu.pipeline.dot);
     // NOTE: jump 2 rows as interrupts are drawn direction first
     cursor_y += 2;
     draw_chip_vline(v, snp->ppu.lines.video_out, cursor_y, line_x, -1,
@@ -582,7 +582,7 @@ static void drawppu(const struct view *v, const struct aldo_snapshot *snp)
     int cursor_y = drawtop_plines(v, 0, line_x, w, snp);
     cursor_y = draw_pregisters(v, cursor_y, snp);
     mvwhline(v->content, ++cursor_y, 0, 0, w);
-    cursor_y = draw_pdatapath(v, cursor_y, w, snp);
+    cursor_y = draw_pipeline(v, cursor_y, w, snp);
     mvwhline(v->content, ++cursor_y, 0, 0, w);
     drawbottom_plines(v, cursor_y, line_x, snp);
 }

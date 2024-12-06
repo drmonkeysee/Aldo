@@ -1456,7 +1456,7 @@ private:
 
     void renderDataLines() const noexcept
     {
-        auto& pipeline = emu.snapshot().ppu.datapath;
+        auto& pipeline = emu.snapshot().ppu.pipeline;
         auto& lines = emu.snapshot().ppu.lines;
 
         {
@@ -1494,7 +1494,7 @@ private:
 
     void renderSignals() const noexcept
     {
-        auto& pipeline = emu.snapshot().ppu.datapath;
+        auto& pipeline = emu.snapshot().ppu.pipeline;
         auto& lines = emu.snapshot().ppu.lines;
 
         ImGui::Spacing();
@@ -1507,7 +1507,7 @@ private:
 
     void renderPixelProcessing() const noexcept
     {
-        auto& pipeline = emu.snapshot().ppu.datapath;
+        auto& pipeline = emu.snapshot().ppu.pipeline;
         auto& lines = emu.snapshot().ppu.lines;
 
         renderScrollAddr('v', pipeline.scrolladdr);

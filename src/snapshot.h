@@ -56,7 +56,7 @@ struct aldo_snapshot {
             uint8_t databus, pixel, readbuffer, register_databus,
                     register_select, xfine;
             bool busfault, cv_pending, oddframe, writelatch;
-        } datapath;
+        } pipeline;
     } ppu;
 
     struct {

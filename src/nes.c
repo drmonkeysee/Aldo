@@ -313,10 +313,14 @@ aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
     self->dbg = dbg;
     self->tracelog = tracelog;
     self->tracefailed = false;
-    self->vbuf = 0;
     // TODO: ditch this option when aldo can emulate more than just NES
     self->cpu.bcd = bcdsupport;
     self->probe.irq = self->probe.nmi = self->probe.rst = false;
+    self->vbuf = 0;
+    // NOTE: uninitialized vbuffer can have out-of-range palette values
+    for (size_t i = 0; i < memsz(self->vbufs); ++i) {
+        memset(self->vbufs[i], 0, memsz(self->vbufs[i]));
+    }
     if (!setup(self)) {
         aldo_nes_free(self);
         return NULL;
@@ -340,7 +344,6 @@ void aldo_nes_powerup(aldo_nes *self, aldo_cart *c, bool zeroram)
     if (c) {
         connect_cart(self, c);
     }
-    self->mode = ALDO_EXC_RUN;
     if (zeroram) {
         memset(self->ram, 0, memsz(self->ram));
         memset(self->vram, 0, memsz(self->vram));
@@ -348,6 +351,7 @@ void aldo_nes_powerup(aldo_nes *self, aldo_cart *c, bool zeroram)
     }
     aldo_cpu_powerup(&self->cpu);
     aldo_ppu_powerup(&self->ppu);
+    self->mode = ALDO_EXC_RUN;
 }
 
 void aldo_nes_powerdown(aldo_nes *self)

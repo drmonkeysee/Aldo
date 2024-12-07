@@ -45,10 +45,10 @@ public:
         };
         aldo_nes_snapshot(console, getp());
     }
-    Snapshot(const Snapshot&) = default;
-    Snapshot& operator=(const Snapshot&) = default;
-    Snapshot(Snapshot&&) = default;
-    Snapshot& operator=(Snapshot&&) = default;
+    Snapshot(const Snapshot&) = delete;
+    Snapshot& operator=(const Snapshot&) = delete;
+    Snapshot(Snapshot&&) = delete;
+    Snapshot& operator=(Snapshot&&) = delete;
     ~Snapshot() { aldo_snapshot_cleanup(getp()); }
 
     const aldo_snapshot& get() const noexcept { return snp; }

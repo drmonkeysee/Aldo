@@ -25,8 +25,7 @@ aldo::VideoScreen::VideoScreen(SDL_Point resolution,
 : tex{resolution, mr.renderer()} {}
 
 void aldo::VideoScreen::draw(const aldo::et::byte buf[],
-                             const aldo::Palette& p,
-                             aldo::palette::emphasis em) const
+                             const aldo::Palette& p) const
 {
     assert(buf != nullptr);
 
@@ -35,7 +34,7 @@ void aldo::VideoScreen::draw(const aldo::et::byte buf[],
     // TODO: get these values from libaldo somehow
     assert(length == 256 * 240);
     for (auto i = 0; i < length; ++i) {
-        data.pixels[i] = p.getColor(buf[i], em);
+        data.pixels[i] = p.getColor(buf[i]);
     }
 }
 
@@ -44,8 +43,8 @@ aldo::PatternTable::PatternTable(const aldo::MediaRuntime& mr)
 
 void aldo::PatternTable
 ::draw(const aldo::et::word table[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM],
-       const aldo::et::byte colors[ALDO_PAL_SIZE], const aldo::Palette& p,
-       aldo::palette::emphasis em) const
+       const aldo::et::byte colors[ALDO_PAL_SIZE],
+       const aldo::Palette& p) const
 {
     assert(table != nullptr);
     assert(colors != nullptr);
@@ -58,7 +57,7 @@ void aldo::PatternTable
                 auto rowOffset = (tblCol * ALDO_CHR_TILE_DIM)
                                     + ((tileRow + (tblRow * ALDO_CHR_TILE_DIM))
                                        * data.stride);
-                drawTableRow(tile[tileRow], colors, rowOffset, p, data, em);
+                drawTableRow(tile[tileRow], colors, rowOffset, p, data);
             }
         }
     }
@@ -98,8 +97,7 @@ void
 aldo::PatternTable::drawTableRow(aldo::et::word pixels,
                                  const aldo::et::byte colors[ALDO_PAL_SIZE],
                                  int texOffset, const aldo::Palette& p,
-                                 const aldo::texture::TextureData& data,
-                                 aldo::palette::emphasis em)
+                                 const aldo::texture::TextureData& data)
 {
     for (auto px = 0; px < ALDO_CHR_TILE_DIM; ++px) {
         auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
@@ -108,6 +106,6 @@ aldo::PatternTable::drawTableRow(aldo::et::word pixels,
         assert(texel < ALDO_PAL_SIZE);
         auto texidx = px + texOffset;
         assert(texidx < TextureDim * TextureDim);
-        data.pixels[texidx] = p.getColor(colors[texel], em);
+        data.pixels[texidx] = p.getColor(colors[texel]);
     }
 }

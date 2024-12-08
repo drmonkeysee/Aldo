@@ -1211,7 +1211,7 @@ private:
                 } else {
                     auto cell = rowStart + (col - 1);
                     assert(cell < aldo::palette::Size);
-                    auto color = emu.palette().getColor(cell, colorEmphasis);
+                    auto color = emu.palette().getColor(applyEmphasis(cell));
                     ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color);
                     ScopedColor indicatorColor{
                         {ImGuiCol_Text, textContrast(color)},
@@ -1238,18 +1238,18 @@ private:
     void renderColorMods()
     {
         widget_group([this] {
-            ImGui::Checkbox("Red Emphasis", &this->colorEmphasis.r);
-            ImGui::Checkbox("Green Emphasis", &this->colorEmphasis.g);
-            ImGui::Checkbox("Blue Emphasis", &this->colorEmphasis.b);
+            ImGui::Checkbox("Red Emphasis", &this->r);
+            ImGui::Checkbox("Green Emphasis", &this->g);
+            ImGui::Checkbox("Blue Emphasis", &this->b);
         });
         ImGui::SameLine();
-        ImGui::Checkbox("Grayscale", &colorEmphasis.gs);
+        ImGui::Checkbox("Grayscale", &gray);
     }
 
     void renderColorSelection() const
     {
         static constexpr auto selectedColorDim = 70;
-        auto color = emu.palette().getColor(vs.colorSelection, colorEmphasis);
+        auto color = emu.palette().getColor(applyEmphasis(vs.colorSelection));
         ImGui::ColorButton("Selected Color",
                            ImGui::ColorConvertU32ToFloat4(color),
                            ImGuiColorEditFlags_NoAlpha,
@@ -1267,7 +1267,12 @@ private:
         });
     }
 
-    aldo::palette::emphasis colorEmphasis{};
+    pal_sz applyEmphasis(pal_sz idx) const noexcept
+    {
+        return gray ? idx & 0x30 : idx;
+    }
+
+    bool gray, r, g, b;
 
     static constexpr pal_sz Cols = 17;
 };
@@ -1294,9 +1299,8 @@ protected:
                 palSelect < ALDO_PAL_SIZE
                 ? emu.snapshot().video->palettes.bg[palSelect]
                 : emu.snapshot().video->palettes.fg[palSelect - ALDO_PAL_SIZE];
-            auto em = emu.colorEmphasis();
-            left.draw(tables->left, colors, emu.palette(), em);
-            right.draw(tables->right, colors, emu.palette(), em);
+            left.draw(tables->left, colors, emu.palette());
+            right.draw(tables->right, colors, emu.palette());
         }
 
         widget_group([this] {
@@ -1329,7 +1333,6 @@ private:
         const auto* pals = fg
                             ? emu.snapshot().video->palettes.fg
                             : emu.snapshot().video->palettes.bg;
-        auto em = emu.colorEmphasis();
         for (auto row = 0; row < ALDO_PAL_SIZE; ++row) {
             if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols,
                                   flags)) {
@@ -1351,7 +1354,7 @@ private:
                         }
                     } else {
                         auto idx = pal[col - 1];
-                        auto color = emu.palette().getColor(idx, em);
+                        auto color = emu.palette().getColor(idx);
                         ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
                                                color);
                         std::snprintf(buf.data(), buf.size(), "%02X", idx);
@@ -1902,8 +1905,7 @@ public:
 protected:
     void renderContents() override
     {
-        screen.draw(emu.snapshot().video->screen, emu.palette(),
-                    emu.colorEmphasis());
+        screen.draw(emu.snapshot().video->screen, emu.palette());
         screen.render();
     }
 

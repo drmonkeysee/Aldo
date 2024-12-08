@@ -90,16 +90,6 @@ public:
 
     void ready(bool ready) noexcept { aldo_nes_ready(consolep(), ready); }
     et::size ramSize() const noexcept { return aldo_nes_ram_size(consolep()); }
-    palette::emphasis colorEmphasis() const noexcept
-    {
-        et::byte mask = snapshot().ppu.mask;
-        return {
-            static_cast<bool>(mask & 0x20),
-            static_cast<bool>(mask & 0x40),
-            static_cast<bool>(mask & 0x80),
-            static_cast<bool>(mask & 0x1),
-        };
-    }
     bool bcdSupport() const noexcept
     {
         return aldo_nes_bcd_support(consolep());

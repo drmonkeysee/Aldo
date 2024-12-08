@@ -11,9 +11,7 @@
 #include "imgui.h"
 #include <SDL2/SDL.h>
 
-#include <algorithm>
 #include <tuple>
-#include <cstdint>
 
 namespace aldo
 {
@@ -65,16 +63,6 @@ inline constexpr ImU32 bch(ImU32 color) noexcept
 inline constexpr std::tuple<ImU32, ImU32, ImU32> rgb(ImU32 color)
 {
     return {rch(color), gch(color), bch(color)};
-}
-
-inline constexpr std::tuple<ImU32, ImU32, ImU32> rgb_floor(ImU32 color,
-                                                           ImU32 floor)
-{
-    return {
-        std::max(floor, rch(color)),
-        std::max(floor, gch(color)),
-        std::max(floor, bch(color)),
-    };
 }
 
 // NOTE: relative luminance function

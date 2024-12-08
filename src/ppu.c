@@ -172,8 +172,10 @@ static uint8_t palette_read(const struct aldo_rp2c02 *self, uint16_t addr)
     // NOTE: addr=[$3F00-$3FFF]
     assert(palette_addr(addr));
 
-    // NOTE: palette values are 6 bits wide
-    return self->palette[mask_palette(addr)] & 0x3f;
+    uint8_t pal = self->palette[mask_palette(addr)];
+    // NOTE: palette values are 6 bits wide, grayscale additionally masks down
+    // to lowest palette column.
+    return pal & (self->mask.g ? 0x30 : 0x3f);
 }
 
 static void palette_write(struct aldo_rp2c02 *self, uint16_t addr, uint8_t d)

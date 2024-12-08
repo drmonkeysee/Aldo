@@ -21,10 +21,6 @@ namespace
 
 constexpr aldo::palette::sz
     Channels = 3, PalFileLength = aldo::palette::Size * Channels;
-constexpr float Attenuated = 0.816328f, Full = 1.0f;
-// NOTE: minimum channel value used for applying emphasis in order to get a
-// visible tint on colors that would otherwise round down to nearly zero.
-constexpr ImU32 EmphasisFloor = 0x10;
 
 using pal_buf = std::array<std::ifstream::char_type, PalFileLength>;
 
@@ -59,28 +55,11 @@ auto parse_colors(const pal_buf& buf)
 // MARK: - Public Interface
 //
 
-aldo::palette::datav aldo::Palette::getColor(aldo::palette::sz idx,
-                                             aldo::palette::emphasis em) const
+aldo::palette::datav aldo::Palette::getColor(aldo::palette::sz idx) const
 {
     assert(idx < aldo::palette::Size);
 
-    if (em.gs) {
-        idx &= 0x30;
-    }
-    auto color = std::visit([idx](auto&& c) { return c[idx]; }, colors);
-    if (em.any() && ((idx & 0xe) < 0xe)) {
-        auto [r, g, b] = aldo::colors::rgb_floor(color, EmphasisFloor);
-        auto [re, ge, be] = std::tuple{
-            em.g || em.b ? Attenuated : Full,
-            em.r || em.b ? Attenuated : Full,
-            em.r || em.g ? Attenuated : Full,
-        };
-        color = IM_COL32(static_cast<float>(r) * re,
-                         static_cast<float>(g) * ge,
-                         static_cast<float>(b) * be,
-                         SDL_ALPHA_OPAQUE);
-    }
-    return color;
+    return std::visit([idx](auto&& c) { return c[idx]; }, colors);
 }
 
 void aldo::Palette::load(const std::filesystem::path& filepath)

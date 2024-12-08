@@ -104,8 +104,7 @@ class VideoScreen {
 public:
     VideoScreen(SDL_Point resolution, const MediaRuntime& mr);
 
-    void draw(const et::byte buf[], const Palette& p,
-              palette::emphasis em) const;
+    void draw(const et::byte buf[], const Palette& p) const;
     void render() const noexcept { tex.render(); }
 
 private:
@@ -117,8 +116,7 @@ public:
     PatternTable(const MediaRuntime& mr);
 
     void draw(const et::word table[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM],
-              const et::byte colors[ALDO_PAL_SIZE], const Palette& p,
-              palette::emphasis em) const;
+              const et::byte colors[ALDO_PAL_SIZE], const Palette& p) const;
     void render() const noexcept { tex.render(2.0); }
 
 private:
@@ -131,8 +129,7 @@ private:
     static void drawTableRow(et::word pixels,
                              const et::byte colors[ALDO_PAL_SIZE],
                              int texOffset, const Palette& p,
-                             const texture::TextureData& data,
-                             palette::emphasis em);
+                             const texture::TextureData& data);
 
     Texture<SDL_TEXTUREACCESS_STREAMING> tex;
 };

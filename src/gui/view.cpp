@@ -36,6 +36,7 @@
 #include <locale>
 #include <span>
 #include <string_view>
+#include <tuple>
 #include <type_traits>
 #include <unordered_set>
 #include <cassert>

@@ -84,7 +84,9 @@ inline constexpr float SmallRadius = 5;
 
 inline ImVec2 glyph_size() noexcept
 {
-    return ImGui::CalcTextSize("A");
+    // TODO: loading fonts dynamically will break this
+    static const ImVec2 sz = ImGui::CalcTextSize("A");
+    return sz;
 }
 
 }

@@ -1906,11 +1906,20 @@ protected:
     void renderContents() override
     {
         screen.draw(emu.snapshot().video->screen, emu.palette());
-        screen.render();
+        screen.render((selectedScale / 2.0f) + 1, sdRatio);
+
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 10);
+        ImGui::Combo("Scale", &selectedScale, Scales.data(), Scales.size());
+        ImGui::SameLine();
+        ImGui::Checkbox("4:3 Ratio", &sdRatio);
     }
 
 private:
+    static constexpr std::array Scales{"1x", "1.5x", "2x", "2.5x"};
+
     aldo::VideoScreen screen;
+    int selectedScale = 0;
+    bool sdRatio = false;
 };
 
 }

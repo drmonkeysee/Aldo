@@ -89,10 +89,15 @@ public:
 
     void render(float scale = 1.0f) const noexcept
     {
+        render(scale, scale);
+    }
+
+    void render(float scalex, float scaley) const noexcept
+    {
         int w, h;
         SDL_QueryTexture(tex, nullptr, nullptr, &w, &h);
         ImGui::Image(tex, {
-            static_cast<float>(w) * scale, static_cast<float>(h) * scale,
+            static_cast<float>(w) * scalex, static_cast<float>(h) * scaley,
         });
     }
 
@@ -105,9 +110,15 @@ public:
     VideoScreen(SDL_Point resolution, const MediaRuntime& mr);
 
     void draw(const et::byte buf[], const Palette& p) const;
-    void render() const noexcept { tex.render(); }
+    void render(float scale, bool sdRatio) const noexcept
+    {
+        tex.render(sdRatio ? scale * TvXScale : scale, scale);
+    }
 
 private:
+    // NOTE: 4:3 SD TV ratio scales the x-axis by about 1.14 from square
+    static constexpr float TvXScale = 8.0f / 7.0f;
+
     Texture<SDL_TEXTUREACCESS_STREAMING> tex;
 };
 

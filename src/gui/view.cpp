@@ -1179,6 +1179,7 @@ protected:
 
 private:
     using pal_sz = aldo::palette::sz;
+    using pal_c = aldo::palette::datav;
 
     static void renderHeader() noexcept
     {
@@ -1211,7 +1212,7 @@ private:
                 } else {
                     auto cell = rowStart + (col - 1);
                     assert(cell < aldo::palette::Size);
-                    auto color = emu.palette().getColor(applyEmphasis(cell));
+                    auto color = lookupColor(cell);
                     ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color);
                     ScopedColor indicatorColor{
                         {ImGuiCol_Text, textContrast(color)},
@@ -1238,9 +1239,9 @@ private:
     void renderColorMods()
     {
         widget_group([this] {
-            ImGui::Checkbox("Red Emphasis", &this->r);
-            ImGui::Checkbox("Green Emphasis", &this->g);
-            ImGui::Checkbox("Blue Emphasis", &this->b);
+            ImGui::Checkbox("Red Emphasis", &this->emr);
+            ImGui::Checkbox("Green Emphasis", &this->emg);
+            ImGui::Checkbox("Blue Emphasis", &this->emb);
         });
         ImGui::SameLine();
         ImGui::Checkbox("Grayscale", &gray);
@@ -1249,7 +1250,7 @@ private:
     void renderColorSelection() const
     {
         static constexpr auto selectedColorDim = 70;
-        auto color = emu.palette().getColor(applyEmphasis(vs.colorSelection));
+        auto color = lookupColor(vs.colorSelection);
         ImGui::ColorButton("Selected Color",
                            ImGui::ColorConvertU32ToFloat4(color),
                            ImGuiColorEditFlags_NoAlpha,
@@ -1267,14 +1268,42 @@ private:
         });
     }
 
-    pal_sz applyEmphasis(pal_sz idx) const noexcept
+    pal_c lookupColor(pal_sz idx) const
+    {
+        auto color = emu.palette().getColor(adjustIdx(idx));
+        return applyEmphasis(color, idx);
+    }
+
+    pal_sz adjustIdx(pal_sz idx) const noexcept
     {
         return gray ? idx & 0x30 : idx;
     }
 
-    bool gray, r, g, b;
+    pal_c applyEmphasis(pal_c color, pal_sz idx) const
+    {
+        if ((emr || emg || emb) && ((idx & 0xe) < 0xe)) {
+            auto [r, g, b] = aldo::colors::rgb_floor(color, EmphasisFloor);
+            auto [re, ge, be] = std::tuple{
+                emg || emb ? Attenuated : Full,
+                emr || emb ? Attenuated : Full,
+                emr || emg ? Attenuated : Full,
+            };
+            color = IM_COL32(static_cast<float>(r) * re,
+                             static_cast<float>(g) * ge,
+                             static_cast<float>(b) * be,
+                             SDL_ALPHA_OPAQUE);
+
+        }
+        return color;
+    }
 
     static constexpr pal_sz Cols = 17;
+    static constexpr float Attenuated = 0.816328f, Full = 1.0f;
+    // NOTE: minimum channel value used for applying emphasis in order to get a
+    // visible tint on colors that would otherwise round down to nearly zero.
+    static constexpr ImU32 EmphasisFloor = 0x10;
+
+    bool gray, emr, emg, emb;
 };
 
 class PatternTablesView final : public aldo::View {

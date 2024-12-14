@@ -8,6 +8,8 @@
 #ifndef Aldo_gui_view_hpp
 #define Aldo_gui_view_hpp
 
+#include "imgui.h"
+
 #include <memory>
 #include <string>
 #include <utility>
@@ -47,11 +49,14 @@ public:
     };
 
     View(std::string title, viewstate& vs, const Emulator& emu,
-         const MediaRuntime& mr) noexcept
-    : vs{vs}, emu{emu}, mr{mr}, title{std::move(title)} {}
-    View(std::string, viewstate&, Emulator&&, const MediaRuntime&) = delete;
-    View(std::string, viewstate&, const Emulator&&, MediaRuntime&&) = delete;
-    View(std::string, viewstate&, Emulator&&, MediaRuntime&&) = delete;
+         const MediaRuntime& mr, ImGuiWindowFlags options = 0) noexcept
+    : vs{vs}, emu{emu}, mr{mr}, title{std::move(title)}, options{options} {}
+    View(std::string, viewstate&, Emulator&&, const MediaRuntime&,
+         ImGuiWindowFlags) = delete;
+    View(std::string, viewstate&, const Emulator&&, MediaRuntime&&,
+         ImGuiWindowFlags) = delete;
+    View(std::string, viewstate&, Emulator&&, MediaRuntime&&,
+         ImGuiWindowFlags) = delete;
     View(const View&) = delete;
     View& operator=(const View&) = delete;
     View(View&&) = delete;
@@ -76,6 +81,7 @@ private:
     void handleTransition() noexcept;
 
     std::string title;
+    ImGuiWindowFlags options;
     bool visible = true;    // TODO: get this from imgui settings
 };
 

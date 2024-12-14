@@ -24,7 +24,6 @@
 #include "version.h"
 #include "viewstate.hpp"
 
-#include "imgui.h"
 #include <SDL2/SDL.h>
 
 #include <algorithm>
@@ -1924,7 +1923,8 @@ class VideoView final : public aldo::View {
 public:
     VideoView(aldo::viewstate& vs, const aldo::Emulator& emu,
               const aldo::MediaRuntime& mr)
-    : View{"Video", vs, emu, mr}, screen{emu.screenSize(), mr} {}
+    : View{"Video", vs, emu, mr, ImGuiWindowFlags_AlwaysAutoResize},
+        screen{emu.screenSize(), mr} {}
     VideoView(aldo::viewstate&, aldo::Emulator&&,
               const aldo::MediaRuntime&) = delete;
     VideoView(aldo::viewstate&, const aldo::Emulator&,
@@ -1967,7 +1967,7 @@ void aldo::View::render()
     handleTransition();
     if (!visible) return;
 
-    if (ImGui::Begin(title.c_str(), visibility())) {
+    if (ImGui::Begin(title.c_str(), visibility(), options)) {
         renderContents();
     }
     ImGui::End();

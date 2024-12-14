@@ -89,6 +89,7 @@ struct aldo_snapshot {
             uint8_t bg[ALDO_PAL_SIZE][ALDO_PAL_SIZE],
                     fg[ALDO_PAL_SIZE][ALDO_PAL_SIZE];
         } palettes;
+        bool newframe;
     } *video;
 };
 

@@ -1937,7 +1937,9 @@ protected:
     {
         static constexpr std::array scales{"1x", "1.5x", "2x", "2.5x"};
 
-        screen.draw(emu.snapshot().video->screen, emu.palette());
+        if (emu.snapshot().video->newframe) {
+            screen.draw(emu.snapshot().video->screen, emu.palette());
+        }
         screen.render((scaleSelection / 2.0f) + 1, sdRatio);
 
         if (ImGui::CollapsingHeader("Controls",

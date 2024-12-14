@@ -113,6 +113,7 @@ struct aldo_rp2c02 {
     bool
         bflt,               // Bus fault
         cvp,                // Pending CPU VRAM Operation
+        fsr,                // Completed video frame ready for next snapshot
         odd,                // Current frame is even or odd
         w;                  // Write latch for x2 registers
 
@@ -138,7 +139,7 @@ bool aldo_ppu_cycle(struct aldo_rp2c02 *self);
 
 void aldo_ppu_bus_snapshot(const struct aldo_rp2c02 *self,
                            struct aldo_snapshot *snp);
-void aldo_ppu_vid_snapshot(const struct aldo_rp2c02 *self,
+void aldo_ppu_vid_snapshot(struct aldo_rp2c02 *self,
                            struct aldo_snapshot *snp);
 bool aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f);
 struct aldo_ppu_coord aldo_ppu_trace(const struct aldo_rp2c02 *self,

@@ -203,16 +203,32 @@ constexpr auto NoSelection = -1;
 constexpr auto display_signalstate(aldo_sigstate s) noexcept
 {
     switch (s) {
-    case ALDO_SIG_PENDING:
-        return "(P)";
     case ALDO_SIG_DETECTED:
         return "(D)";
+    case ALDO_SIG_PENDING:
+        return "(P)";
     case ALDO_SIG_COMMITTED:
         return "(C)";
     case ALDO_SIG_SERVICED:
         return "(S)";
     default:
         return "(O)";
+    }
+}
+
+constexpr auto signal_color(aldo_sigstate s) noexcept
+{
+    switch (s) {
+    case ALDO_SIG_DETECTED:
+        return aldo::colors::Attention;
+    case ALDO_SIG_PENDING:
+        return aldo::colors::LedOn;
+    case ALDO_SIG_COMMITTED:
+        return aldo::colors::LineOut;
+    case ALDO_SIG_SERVICED:
+        return aldo::colors::LineIn;
+    default:
+        return aldo::colors::LedOff;
     }
 }
 
@@ -494,6 +510,22 @@ auto about_overlay(aldo::viewstate& vs) noexcept
     ImGui::End();
 }
 
+auto small_led(ImU32 fill, float xOffset = 0) noexcept
+{
+    auto pos = ImGui::GetCursorScreenPos();
+    ImVec2 center{
+        pos.x + xOffset,
+        pos.y + (ImGui::GetTextLineHeight() / 2) + 1,
+    };
+    auto drawList = ImGui::GetWindowDrawList();
+    drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
+}
+
+auto small_led(bool on, float xOffset = 0) noexcept
+{
+    small_led(on ? aldo::colors::LedOn : aldo::colors::LedOff, xOffset);
+}
+
 auto interrupt_line(const char* label, bool active) noexcept
 {
     DisabledIf dif = !active;
@@ -504,16 +536,11 @@ auto interrupt_line(const char* label, bool active) noexcept
     drawlist->AddLine(start, end, aldo::colors::white(active));
 }
 
-auto small_led(bool on, float xOffset = 0) noexcept
+auto interrupt_line(const char* label, bool active, aldo_sigstate s) noexcept
 {
-    auto pos = ImGui::GetCursorScreenPos();
-    ImVec2 center{
-        pos.x + xOffset,
-        pos.y + (ImGui::GetTextLineHeight() / 2) + 1,
-    };
-    auto drawList = ImGui::GetWindowDrawList();
-    auto fill = on ? aldo::colors::LedOn : aldo::colors::LedOff;
-    drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
+    interrupt_line(label, active);
+    ImGui::SameLine();
+    small_led(signal_color(s), 2);
 }
 
 //
@@ -775,13 +802,14 @@ private:
         ImGui::Spacing();
 
         auto& lines = emu.snapshot().cpu.lines;
-        interrupt_line("IRQ", lines.irq);
-        ImGui::SameLine(0, spacer);
-        interrupt_line("NMI", lines.nmi);
-        ImGui::SameLine(0, spacer);
-        interrupt_line("RST", lines.reset);
-
         auto& datapath = emu.snapshot().cpu.datapath;
+        interrupt_line("IRQ", lines.irq, datapath.irq);
+        ImGui::SameLine(0, spacer);
+        interrupt_line("NMI", lines.nmi, datapath.nmi);
+        ImGui::SameLine(0, spacer);
+        interrupt_line("RST", lines.reset, datapath.rst);
+
+        ImGui::Spacing();
         ImGui::TextUnformatted(display_signalstate(datapath.irq));
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted(display_signalstate(datapath.nmi));
@@ -1412,23 +1440,23 @@ private:
 
         ImGui::TextUnformatted("Red: ");
         ImGui::SameLine();
-        small_led(emu.snapshot().ppu.mask & 0x20);
+        small_led(static_cast<bool>(emu.snapshot().ppu.mask & 0x20));
 
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted("Green:");
         ImGui::SameLine();
-        small_led(emu.snapshot().ppu.mask & 0x40);
+        small_led(static_cast<bool>(emu.snapshot().ppu.mask & 0x40));
 
         ImGui::Spacing();
 
         ImGui::TextUnformatted("Blue:");
         ImGui::SameLine();
-        small_led(emu.snapshot().ppu.mask & 0x80);
+        small_led(static_cast<bool>(emu.snapshot().ppu.mask & 0x80));
 
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted("Gray: ");
         ImGui::SameLine();
-        small_led(emu.snapshot().ppu.mask & 0x1);
+        small_led(static_cast<bool>(emu.snapshot().ppu.mask & 0x1));
     }
 
     aldo::PatternTable left, right;
@@ -1530,9 +1558,7 @@ private:
         auto& lines = emu.snapshot().ppu.lines;
 
         ImGui::Spacing();
-        interrupt_line("RST", lines.reset);
-        ImGui::SameLine();
-        ImGui::TextUnformatted(display_signalstate(pipeline.rst));
+        interrupt_line("RST", lines.reset, pipeline.rst);
         ImGui::SameLine(0, 87);
         interrupt_line("INT", lines.interrupt);
     }

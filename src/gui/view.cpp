@@ -200,19 +200,19 @@ using ScopedStyleVec = ScopedWidgetVars<scoped_style_vec>;
 
 constexpr auto NoSelection = -1;
 
-constexpr auto display_signalstate(aldo_sigstate s) noexcept
+constexpr auto signal_label(aldo_sigstate s) noexcept
 {
     switch (s) {
     case ALDO_SIG_DETECTED:
-        return "(D)";
+        return "D";
     case ALDO_SIG_PENDING:
-        return "(P)";
+        return "P";
     case ALDO_SIG_COMMITTED:
-        return "(C)";
+        return "C";
     case ALDO_SIG_SERVICED:
-        return "(S)";
+        return "S";
     default:
-        return "(O)";
+        return "O";
     }
 }
 
@@ -510,7 +510,7 @@ auto about_overlay(aldo::viewstate& vs) noexcept
     ImGui::End();
 }
 
-auto small_led(ImU32 fill, float xOffset = 0) noexcept
+auto small_led(bool on, float xOffset = 0) noexcept
 {
     auto pos = ImGui::GetCursorScreenPos();
     ImVec2 center{
@@ -518,12 +518,8 @@ auto small_led(ImU32 fill, float xOffset = 0) noexcept
         pos.y + (ImGui::GetTextLineHeight() / 2) + 1,
     };
     auto drawList = ImGui::GetWindowDrawList();
+    auto fill = on ? aldo::colors::LedOn : aldo::colors::LedOff;
     drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
-}
-
-auto small_led(bool on, float xOffset = 0) noexcept
-{
-    small_led(on ? aldo::colors::LedOn : aldo::colors::LedOff, xOffset);
 }
 
 auto interrupt_line(const char* label, bool active) noexcept
@@ -540,7 +536,17 @@ auto interrupt_line(const char* label, bool active, aldo_sigstate s) noexcept
 {
     interrupt_line(label, active);
     ImGui::SameLine();
-    small_led(signal_color(s), 2);
+    auto pos = ImGui::GetCursorScreenPos();
+    ImVec2 center{
+        pos.x + 5,
+        pos.y + (ImGui::GetTextLineHeight() / 2),
+    };
+    auto fontSz = ImGui::GetFontSize();
+    auto fontColor = s == ALDO_SIG_CLEAR ? IM_COL32_WHITE : IM_COL32_BLACK;
+    ImVec2 offset{fontSz / 4, fontSz / 2};
+    auto drawList = ImGui::GetWindowDrawList();
+    drawList->AddCircleFilled(center, offset.y + 1, signal_color(s));
+    drawList->AddText(center - offset, fontColor, signal_label(s));
 }
 
 //
@@ -808,13 +814,6 @@ private:
         interrupt_line("NMI", lines.nmi, datapath.nmi);
         ImGui::SameLine(0, spacer);
         interrupt_line("RST", lines.reset, datapath.rst);
-
-        ImGui::Spacing();
-        ImGui::TextUnformatted(display_signalstate(datapath.irq));
-        ImGui::SameLine(0, spacer);
-        ImGui::TextUnformatted(display_signalstate(datapath.nmi));
-        ImGui::SameLine(0, spacer);
-        ImGui::TextUnformatted(display_signalstate(datapath.rst));
     }
 
     static void renderCycleIndicator(int cycle) noexcept
@@ -1440,23 +1439,23 @@ private:
 
         ImGui::TextUnformatted("Red: ");
         ImGui::SameLine();
-        small_led(static_cast<bool>(emu.snapshot().ppu.mask & 0x20));
+        small_led(emu.snapshot().ppu.mask & 0x20);
 
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted("Green:");
         ImGui::SameLine();
-        small_led(static_cast<bool>(emu.snapshot().ppu.mask & 0x40));
+        small_led(emu.snapshot().ppu.mask & 0x40);
 
         ImGui::Spacing();
 
         ImGui::TextUnformatted("Blue:");
         ImGui::SameLine();
-        small_led(static_cast<bool>(emu.snapshot().ppu.mask & 0x80));
+        small_led(emu.snapshot().ppu.mask & 0x80);
 
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted("Gray: ");
         ImGui::SameLine();
-        small_led(static_cast<bool>(emu.snapshot().ppu.mask & 0x1));
+        small_led(emu.snapshot().ppu.mask & 0x1);
     }
 
     aldo::PatternTable left, right;
@@ -1559,7 +1558,7 @@ private:
 
         ImGui::Spacing();
         interrupt_line("RST", lines.reset, pipeline.rst);
-        ImGui::SameLine(0, 87);
+        ImGui::SameLine(0, 116);
         interrupt_line("INT", lines.interrupt);
     }
 

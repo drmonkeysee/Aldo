@@ -510,18 +510,6 @@ auto about_overlay(aldo::viewstate& vs) noexcept
     ImGui::End();
 }
 
-auto small_led(bool on, float xOffset = 0) noexcept
-{
-    auto pos = ImGui::GetCursorScreenPos();
-    ImVec2 center{
-        pos.x + xOffset,
-        pos.y + (ImGui::GetTextLineHeight() / 2) + 1,
-    };
-    auto drawList = ImGui::GetWindowDrawList();
-    auto fill = on ? aldo::colors::LedOn : aldo::colors::LedOff;
-    drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
-}
-
 auto interrupt_line(const char* label, bool active) noexcept
 {
     DisabledIf dif = !active;
@@ -547,6 +535,18 @@ auto interrupt_line(const char* label, bool active, aldo_sigstate s) noexcept
     auto drawList = ImGui::GetWindowDrawList();
     drawList->AddCircleFilled(center, offset.y + 1, signal_color(s));
     drawList->AddText(center - offset, fontColor, signal_label(s));
+}
+
+auto small_led(bool on, float xOffset = 0) noexcept
+{
+    auto pos = ImGui::GetCursorScreenPos();
+    ImVec2 center{
+        pos.x + xOffset,
+        pos.y + (ImGui::GetTextLineHeight() / 2) + 1,
+    };
+    auto drawList = ImGui::GetWindowDrawList();
+    auto fill = on ? aldo::colors::LedOn : aldo::colors::LedOff;
+    drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
 }
 
 //

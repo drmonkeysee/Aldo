@@ -7,6 +7,7 @@
 
 #include "texture.hpp"
 
+#include "emu.hpp"
 #include "error.hpp"
 #include "mediaruntime.hpp"
 
@@ -15,6 +16,17 @@
 
 static_assert(std::same_as<Uint32, ImU32>,
               "SDL u32 type does not match ImGui u32 type");
+
+namespace
+{
+
+auto screen_buffer_length() noexcept
+{
+    auto p = aldo::Emulator::screenSize();
+    return p.x * p.y;
+}
+
+}
 
 //
 // MARK: - Public Interface
@@ -31,8 +43,7 @@ void aldo::VideoScreen::draw(const aldo::et::byte buf[],
 
     auto data = tex.lock();
     auto length = data.width * data.height;
-    // TODO: get these values from libaldo somehow
-    assert(length == 256 * 240);
+    assert(length == screen_buffer_length());
     for (auto i = 0; i < length; ++i) {
         data.pixels[i] = p.getColor(buf[i]);
     }

@@ -247,7 +247,7 @@ constexpr auto operator-(ImVec2 a, const ImVec2& b) noexcept
     return ImVec2{a.x - b.x, a.y - b.y};
 }
 
-constexpr auto textContrast(ImU32 fillColor) noexcept
+constexpr auto text_contrast(ImU32 fillColor) noexcept
 {
     return aldo::colors::luminance(fillColor) < 0x80
             ? IM_COL32_WHITE
@@ -1242,7 +1242,7 @@ private:
                     auto color = lookupColor(cell);
                     ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color);
                     ScopedColor indicatorColor{
-                        {ImGuiCol_Text, textContrast(color)},
+                        {ImGuiCol_Text, text_contrast(color)},
                         cell == vs.colorSelection,
                     };
                     ScopedID id = static_cast<int>(cell);
@@ -1416,7 +1416,7 @@ private:
                         std::snprintf(buf.data(), buf.size(), "%02X", idx);
                         ScopedColor txtColor{{
                             ImGuiCol_Text,
-                            textContrast(color),
+                            text_contrast(color),
                         }};
                         ScopedID id = row << 3 | col << 1 | fg;
                         if (ImGui::Selectable(buf.data(), false,

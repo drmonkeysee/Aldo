@@ -7,6 +7,7 @@
 
 #include "mappers.h"
 
+#include "bus.h"
 #include "bytes.h"
 #include "cart.h"
 #include "ppu.h"

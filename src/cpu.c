@@ -7,6 +7,7 @@
 
 #include "cpu.h"
 
+#include "bus.h"
 #include "bytes.h"
 #include "snapshot.h"
 

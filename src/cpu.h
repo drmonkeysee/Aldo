@@ -8,7 +8,7 @@
 #ifndef Aldo_cpu_h
 #define Aldo_cpu_h
 
-#include "bus.h"
+#include "bustype.h"
 #include "ctrlsignal.h"
 #include "decode.h"
 

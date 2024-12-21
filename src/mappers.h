@@ -8,7 +8,7 @@
 #ifndef Aldo_mappers_h
 #define Aldo_mappers_h
 
-#include "bus.h"
+#include "bustype.h"
 #include "cart.h"
 
 #include <stdbool.h>

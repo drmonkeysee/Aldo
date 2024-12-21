@@ -8,7 +8,7 @@
 #ifndef Aldo_ppu_h
 #define Aldo_ppu_h
 
-#include "bus.h"
+#include "bustype.h"
 #include "bytes.h"
 #include "ctrlsignal.h"
 

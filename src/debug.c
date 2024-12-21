@@ -7,6 +7,7 @@
 
 #include "debug.h"
 
+#include "bus.h"
 #include "bytes.h"
 #include "cpu.h"
 #include "cycleclock.h"

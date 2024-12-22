@@ -1176,6 +1176,31 @@ private:
     SelectedBreakpoints bpSelections;
 };
 
+class NametablesView final : public aldo::View {
+public:
+    NametablesView(aldo::viewstate& vs, const aldo::Emulator& emu,
+                   const aldo::MediaRuntime& mr) noexcept
+    : View{"Nametables", vs, emu, mr} {}
+    NametablesView(aldo::viewstate&, aldo::Emulator&&,
+                   const aldo::MediaRuntime&) = delete;
+    NametablesView(aldo::viewstate&, const aldo::Emulator&,
+                   aldo::MediaRuntime&&) = delete;
+    NametablesView(aldo::viewstate&, aldo::Emulator&&,
+                   aldo::MediaRuntime&&) = delete;
+
+protected:
+    void renderContents() override
+    {
+        auto size = emu.screenSize();
+        auto pos = ImGui::GetCursorScreenPos();
+        auto drawList = ImGui::GetWindowDrawList();
+        drawList->AddRectFilled(pos, {pos.x + size.x, pos.y + size.y}, aldo::colors::LedOff);
+        drawList->AddRectFilled({pos.x + size.x, pos.y}, {pos.x + (size.x * 2), pos.y + size.y}, aldo::colors::LedOn);
+        drawList->AddRectFilled({pos.x, pos.y + size.y}, {pos.x + size.x, pos.y + (size.y * 2)}, aldo::colors::LedOn);
+        drawList->AddRectFilled({pos.x + size.x, pos.y + size.y}, {pos.x + (size.x * 2), pos.y + (size.y * 2)}, aldo::colors::LedOff);
+    }
+};
+
 class PaletteView final : public aldo::View {
 public:
     PaletteView(aldo::viewstate& vs, const aldo::Emulator& emu,
@@ -2024,6 +2049,7 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
         CartInfoView,
         CpuView,
         DebuggerView,
+        NametablesView,
         PaletteView,
         PatternTablesView,
         PpuView,

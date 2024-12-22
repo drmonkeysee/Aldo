@@ -236,6 +236,11 @@ constexpr auto boolstr(bool v) noexcept
     return v ? "yes" : "no";
 }
 
+constexpr auto operator*(SDL_Point p, int n) noexcept
+{
+    return SDL_Point{p.x * n, p.y * n};
+}
+
 constexpr auto operator+(ImVec2 v, float f) noexcept
 {
     return ImVec2{v.x + f, v.y + f};
@@ -1191,13 +1196,13 @@ public:
 protected:
     void renderContents() override
     {
-        auto size = emu.screenSize();
+        auto size = emu.screenSize(), dsize = size * 2;
         auto pos = ImGui::GetCursorScreenPos();
         auto drawList = ImGui::GetWindowDrawList();
         drawList->AddRectFilled(pos, {pos.x + size.x, pos.y + size.y}, aldo::colors::LedOff);
-        drawList->AddRectFilled({pos.x + size.x, pos.y}, {pos.x + (size.x * 2), pos.y + size.y}, aldo::colors::LedOn);
-        drawList->AddRectFilled({pos.x, pos.y + size.y}, {pos.x + size.x, pos.y + (size.y * 2)}, aldo::colors::LedOn);
-        drawList->AddRectFilled({pos.x + size.x, pos.y + size.y}, {pos.x + (size.x * 2), pos.y + (size.y * 2)}, aldo::colors::LedOff);
+        drawList->AddRectFilled({pos.x + size.x, pos.y}, {pos.x + dsize.x, pos.y + size.y}, aldo::colors::LedOn);
+        drawList->AddRectFilled({pos.x, pos.y + size.y}, {pos.x + size.x, pos.y + dsize.y}, aldo::colors::LedOn);
+        drawList->AddRectFilled({pos.x + size.x, pos.y + size.y}, {pos.x + dsize.x, pos.y + dsize.y}, aldo::colors::LedOff);
     }
 };
 

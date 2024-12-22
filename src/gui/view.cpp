@@ -35,7 +35,6 @@
 #include <locale>
 #include <span>
 #include <string_view>
-#include <tuple>
 #include <type_traits>
 #include <unordered_set>
 #include <cassert>
@@ -1266,9 +1265,12 @@ private:
     void renderColorMods()
     {
         widget_group([this] {
-            ImGui::Checkbox("Red Emphasis", &this->emr);
-            ImGui::Checkbox("Green Emphasis", &this->emg);
-            ImGui::Checkbox("Blue Emphasis", &this->emb);
+            bool chr = ImGui::Checkbox("Red Emphasis", &this->emr);
+            bool chg = ImGui::Checkbox("Green Emphasis", &this->emg);
+            bool chb = ImGui::Checkbox("Blue Emphasis", &this->emb);
+            if (chr || chg || chb) {
+                this->updateEmphasis();
+            }
         });
         ImGui::SameLine();
         ImGui::Checkbox("Grayscale", &gray);
@@ -1310,18 +1312,31 @@ private:
     {
         if ((emr || emg || emb) && ((idx & 0xe) < 0xe)) {
             auto [r, g, b] = aldo::colors::rgb_floor(color, EmphasisFloor);
-            auto [re, ge, be] = std::tuple{
-                emg || emb ? Attenuated : Full,
-                emr || emb ? Attenuated : Full,
-                emr || emg ? Attenuated : Full,
-            };
-            color = IM_COL32(static_cast<float>(r) * re,
-                             static_cast<float>(g) * ge,
-                             static_cast<float>(b) * be,
+            color = IM_COL32(static_cast<float>(r) * atr,
+                             static_cast<float>(g) * atg,
+                             static_cast<float>(b) * atb,
                              SDL_ALPHA_OPAQUE);
-
         }
         return color;
+    }
+
+    void updateEmphasis() noexcept
+    {
+        // NOTE: think of this as a bitmask of emphasis BGR where emphasis set
+        // means no attenuation and emphasis clear means attenuation except
+        // 000 and 111 mean the opposite.
+        if (emr && emg && emb) {
+            // NOTE: all emphasis attenuates all colors
+            atr = atg = atb = Attenuated;
+        } else if (!emr && !emg && !emb) {
+            // NOTE: no emphasis attenuates no colors
+            atr = atg = atb = Full;
+        } else {
+            // NOTE: otherwise emphasis applies no attenuation and vice-versa
+            atr = emr ? Full : Attenuated;
+            atg = emg ? Full : Attenuated;
+            atb = emb ? Full : Attenuated;
+        }
     }
 
     static constexpr pal_sz Cols = 17;
@@ -1330,7 +1345,8 @@ private:
     // visible tint on colors that would otherwise round down to nearly zero.
     static constexpr ImU32 EmphasisFloor = 0x10;
 
-    bool gray, emr, emg, emb;
+    bool gray = false, emr = false, emg = false, emb = false;
+    float atr = Full, atg = Full, atb = Full;
 };
 
 class PatternTablesView final : public aldo::View {

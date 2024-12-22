@@ -9,17 +9,17 @@
 #define Aldo_trace_h
 
 #include "debug.h"
-#include "ppu.h"
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
 struct aldo_mos6502;
+struct aldo_rp2c02;
 struct aldo_snapshot;
 
-bool aldo_trace_line(FILE *tracelog, uint64_t cycles,
-                     struct aldo_ppu_coord pixel, struct aldo_mos6502 *cpu,
+bool aldo_trace_line(FILE *tracelog, int adjustment, uint64_t cycles,
+                     struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
                      aldo_debugger *dbg, const struct aldo_snapshot *snp);
 
 #endif

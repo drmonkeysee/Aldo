@@ -18,6 +18,7 @@
 #include <stdio.h>
 
 struct aldo_mos6502;
+struct aldo_rp2c02;
 struct aldo_snapshot;
 
 // X(symbol, value, error string)
@@ -113,8 +114,8 @@ bool aldo_dis_inst_equal(const struct aldo_dis_instruction *lhs,
 // MARK: - Internal
 //
 
-int aldo_dis_peek(uint16_t addr, struct aldo_mos6502 *cpu, aldo_debugger *dbg,
-                  const struct aldo_snapshot *snp,
+int aldo_dis_peek(struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
+                  aldo_debugger *dbg, const struct aldo_snapshot *snp,
                   char dis[br_nacsz(ALDO_DIS_PEEK_SIZE)]) br_nothrow;
 #include "bridgeclose.h"
 

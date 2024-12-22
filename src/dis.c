@@ -11,6 +11,7 @@
 #include "cpu.h"
 #include "ctrlsignal.h"
 #include "haltexpr.h"
+#include "ppu.h"
 #include "snapshot.h"
 
 #include <assert.h>
@@ -721,11 +722,12 @@ bool aldo_dis_inst_equal(const struct aldo_dis_instruction *lhs,
 // MARK: - Internal Interface
 //
 
-int aldo_dis_peek(uint16_t addr, struct aldo_mos6502 *cpu, aldo_debugger *dbg,
-                  const struct aldo_snapshot *snp,
+int aldo_dis_peek(struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
+                  aldo_debugger *dbg, const struct aldo_snapshot *snp,
                   char dis[restrict static ALDO_DIS_PEEK_SIZE])
 {
     assert(cpu != NULL);
+    assert(ppu != NULL);
     assert(dbg != NULL);
     assert(snp != NULL);
     assert(dis != NULL);
@@ -751,10 +753,17 @@ int aldo_dis_peek(uint16_t addr, struct aldo_mos6502 *cpu, aldo_debugger *dbg,
         if (count < 0) return ALDO_DIS_ERR_FMT;
         total += count;
     } else {
-        struct aldo_mos6502 restore_point;
-        aldo_cpu_peek_start(cpu, &restore_point);
-        struct aldo_peekresult peek = aldo_cpu_peek(cpu, addr);
-        aldo_cpu_peek_end(cpu, &restore_point);
+        struct aldo_rp2c02 ppu_restore = *ppu;
+        struct aldo_mos6502 cpu_restore;
+        struct aldo_peekresult peek = aldo_cpu_peek_start(cpu, &cpu_restore);
+        do {
+            for (int i = 0; i < Aldo_PpuRatio; ++i) {
+                aldo_ppu_cycle(ppu);
+            }
+            aldo_cpu_peek(cpu, &peek);
+        } while (!peek.done);
+        aldo_cpu_peek_end(cpu, &cpu_restore);
+        *ppu = ppu_restore;
         switch (peek.mode) {
 #define XPEEK(...) sprintf(dis, __VA_ARGS__)
 #define X(s, b, n, p, ...) case ALDO_AM_LBL(s): total = p; break;

@@ -22,8 +22,6 @@
 
 #define memsz(mem) (sizeof (mem) / sizeof (mem)[0])
 
-static const int PpuRatio = 3;
-
 enum {
     SCREEN_WIDTH = 256,
     SCREEN_HEIGHT = 240,
@@ -248,13 +246,11 @@ static void instruction_trace(struct aldo_nes001 *self,
 
     struct aldo_snapshot snp = {0};
     bus_snapshot(self, &snp);
-    struct aldo_ppu_coord c = aldo_ppu_trace(&self->ppu,
-                                             adjustment * PpuRatio);
     // NOTE: trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
-    self->tracefailed = !aldo_trace_line(self->tracelog,
-                                         clock->cycles + (uint64_t)adjustment,
-                                         c, &self->cpu, self->dbg, &snp);
+    self->tracefailed = !aldo_trace_line(self->tracelog, adjustment,
+                                         clock->cycles, &self->cpu, &self->ppu,
+                                         self->dbg, &snp);
 }
 
 static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
@@ -266,7 +262,7 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
     set_screen_dot(self);
     self->vbuf ^= framedone;
     // TODO: ppu debug hook goes here
-    if (++clock->subcycle < PpuRatio) {
+    if (++clock->subcycle < Aldo_PpuRatio) {
         if (self->mode == ALDO_EXC_SUBCYCLE) {
             aldo_nes_ready(self, false);
         }
@@ -471,7 +467,7 @@ void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
 
 int aldo_nes_cycle_factor(void)
 {
-    return PpuRatio;
+    return Aldo_PpuRatio;
 }
 
 int aldo_nes_frame_factor(void)

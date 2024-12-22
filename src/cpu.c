@@ -1760,8 +1760,9 @@ void aldo_cpu_snapshot(const struct aldo_mos6502 *self,
     snp->cpu.lines.sync = self->signal.sync;
 }
 
-void aldo_cpu_peek_start(struct aldo_mos6502 *restrict self,
-                         struct aldo_mos6502 *restrict restore)
+struct aldo_peekresult
+aldo_cpu_peek_start(struct aldo_mos6502 *restrict self,
+                    struct aldo_mos6502 *restrict restore)
 {
     assert(self != NULL);
 
@@ -1775,41 +1776,42 @@ void aldo_cpu_peek_start(struct aldo_mos6502 *restrict self,
     self->irq = self->nmi = self->rst = ALDO_SIG_CLEAR;
     self->signal.irq = self->signal.nmi = self->signal.rst =
         self->signal.rdy = true;
+    return (struct aldo_peekresult){.mode = Aldo_Decode[self->opc].mode};
 }
 
-struct aldo_peekresult aldo_cpu_peek(struct aldo_mos6502 *self, uint16_t addr)
+void aldo_cpu_peek(struct aldo_mos6502 *self, struct aldo_peekresult *peek)
 {
     assert(self != NULL);
 
-    self->presync = true;
-    self->pc = addr;
-    aldo_cpu_cycle(self);
-    struct aldo_peekresult result = {.mode = Aldo_Decode[self->opc].mode};
     // NOTE: can't run the cpu to peek JAM or it'll jam the cpu!
     // Fortunately all we need is the addressing mode so return that.
-    if (result.mode == ALDO_AM_JAM) return result;
+    if (peek->mode == ALDO_AM_JAM) {
+        peek->done = true;
+        return;
+    }
 
-    do {
+    if (self->presync) {
+        peek->finaladdr = peek->mode == ALDO_AM_BCH
+                            || peek->mode == ALDO_AM_JIND
+                            ? self->pc
+                            : self->addrbus;
+        peek->data = self->databus;
+        peek->busfault = self->bflt;
+        peek->done = true;
+    } else {
         aldo_cpu_cycle(self);
-        if (self->t == 2 && result.mode == ALDO_AM_INDY) {
-            result.interaddr = aldo_bytowr(self->databus, 0x0);
+        if (self->t == 2 && peek->mode == ALDO_AM_INDY) {
+            peek->interaddr = aldo_bytowr(self->databus, 0x0);
         }
         else if (self->t == 3) {
-            if (result.mode == ALDO_AM_INDX) {
-                result.interaddr = self->addrbus;
-            } else if (result.mode == ALDO_AM_INDY) {
-                result.interaddr = aldo_bytowr((uint8_t)result.interaddr,
+            if (peek->mode == ALDO_AM_INDX) {
+                peek->interaddr = self->addrbus;
+            } else if (peek->mode == ALDO_AM_INDY) {
+                peek->interaddr = aldo_bytowr((uint8_t)peek->interaddr,
                                                self->databus);
             }
         }
-    } while (!self->presync);
-    result.finaladdr = result.mode == ALDO_AM_BCH
-                        || result.mode == ALDO_AM_JIND
-                        ? self->pc
-                        : self->addrbus;
-    result.data = self->databus;
-    result.busfault = self->bflt;
-    return result;
+    }
 }
 
 void aldo_cpu_peek_end(struct aldo_mos6502 *restrict self,

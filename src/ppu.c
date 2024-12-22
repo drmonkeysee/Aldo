@@ -877,7 +877,7 @@ static bool cycle(struct aldo_rp2c02 *self)
 //
 
 const uint16_t Aldo_PaletteStartAddr = ALDO_MEMBLOCK_16KB - 256;
-const int Aldo_DotsPerFrame = Dots * Lines;
+const int Aldo_DotsPerFrame = Dots * Lines, Aldo_PpuRatio = 3;
 
 void aldo_ppu_connect(struct aldo_rp2c02 *self, aldo_bus *mbus)
 {

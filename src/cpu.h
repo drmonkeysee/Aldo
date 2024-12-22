@@ -84,7 +84,7 @@ struct aldo_peekresult {
     enum aldo_addrmode mode;
     uint16_t interaddr, finaladdr;
     uint8_t data;
-    bool busfault;
+    bool busfault, done;
 };
 
 extern const int Aldo_MaxTCycle;
@@ -97,9 +97,10 @@ bool aldo_cpu_jammed(const struct aldo_mos6502 *self);
 void aldo_cpu_snapshot(const struct aldo_mos6502 *self,
                        struct aldo_snapshot *snp);
 
-void aldo_cpu_peek_start(struct aldo_mos6502 *restrict self,
-                         struct aldo_mos6502 *restrict restore);
-struct aldo_peekresult aldo_cpu_peek(struct aldo_mos6502 *self, uint16_t addr);
+struct aldo_peekresult
+aldo_cpu_peek_start(struct aldo_mos6502 *restrict self,
+                    struct aldo_mos6502 *restrict restore);
+void aldo_cpu_peek(struct aldo_mos6502 *self, struct aldo_peekresult *peek);
 void aldo_cpu_peek_end(struct aldo_mos6502 *restrict self,
                        struct aldo_mos6502 *restrict restore);
 

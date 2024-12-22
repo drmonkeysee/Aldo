@@ -129,7 +129,7 @@ struct aldo_rp2c02 {
 struct aldo_ppu_coord { int dot, line; };
 
 extern const uint16_t Aldo_PaletteStartAddr;
-extern const int Aldo_DotsPerFrame;
+extern const int Aldo_DotsPerFrame, Aldo_PpuRatio;
 
 void aldo_ppu_connect(struct aldo_rp2c02 *self, aldo_bus *mbus);
 void aldo_ppu_powerup(struct aldo_rp2c02 *self);

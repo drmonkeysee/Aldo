@@ -7,9 +7,11 @@
 
 #include "trace.h"
 
+#include "bus.h"
 #include "bytes.h"
 #include "cpu.h"
 #include "dis.h"
+#include "ppu.h"
 #include "snapshot.h"
 
 #include <assert.h>
@@ -37,12 +39,11 @@ static int trace_instruction(FILE *tracelog, const struct aldo_mos6502 *cpu,
 }
 
 static int trace_instruction_peek(FILE *tracelog, struct aldo_mos6502 *cpu,
-                                  aldo_debugger *dbg,
+                                  struct aldo_rp2c02 *ppu, aldo_debugger *dbg,
                                   const struct aldo_snapshot *snp)
 {
     char peek[ALDO_DIS_PEEK_SIZE];
-    int result = aldo_dis_peek(snp->cpu.datapath.current_instruction, cpu, dbg,
-                               snp, peek);
+    int result = aldo_dis_peek(cpu, ppu, dbg, snp, peek);
     return fprintf(tracelog, " %s",
                    result < 0 ? aldo_dis_errstr(result) : peek);
 }
@@ -70,12 +71,13 @@ static bool trace_registers(FILE *tracelog, const struct aldo_snapshot *snp)
 // MARK: - Public Interface
 //
 
-bool aldo_trace_line(FILE *tracelog, uint64_t cycles,
-                     struct aldo_ppu_coord pixel, struct aldo_mos6502 *cpu,
+bool aldo_trace_line(FILE *tracelog, int adjustment, uint64_t cycles,
+                     struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
                      aldo_debugger *dbg, const struct aldo_snapshot *snp)
 {
     assert(tracelog != NULL);
     assert(cpu != NULL);
+    assert(ppu != NULL);
     assert(dbg != NULL);
     assert(snp != NULL);
 
@@ -84,7 +86,7 @@ bool aldo_trace_line(FILE *tracelog, uint64_t cycles,
 
     int written = trace_instruction(tracelog, cpu, snp);
     if (written < 0) return false;
-    int peek = trace_instruction_peek(tracelog, cpu, dbg, snp);
+    int peek = trace_instruction_peek(tracelog, cpu, ppu, dbg, snp);
     if (peek < 0) {
         return false;
     } else {
@@ -94,6 +96,7 @@ bool aldo_trace_line(FILE *tracelog, uint64_t cycles,
     assert(written <= instw);
     if (fprintf(tracelog, "%*s", width, "") < 0) return false;
     if (!trace_registers(tracelog, snp)) return false;
-    return fprintf(tracelog, " PPU:%3d,%3d CPU:%" PRIu64 "\n", pixel.line,
-                   pixel.dot, cycles) > 0;
+    struct aldo_ppu_coord p = aldo_ppu_trace(ppu, adjustment * Aldo_PpuRatio);
+    return fprintf(tracelog, " PPU:%3d,%3d CPU:%" PRIu64 "\n", p.line,
+                   p.dot, cycles + (uint64_t)adjustment) > 0;
 }

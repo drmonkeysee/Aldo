@@ -452,6 +452,23 @@ static int write_chrblock(const struct aldo_blockview *bv, uint32_t scale,
     return err;
 }
 
+static struct aldo_peekresult run_peek(struct aldo_mos6502 *cpu,
+                                       struct aldo_rp2c02 *ppu)
+{
+    struct aldo_rp2c02 ppu_restore = *ppu;
+    struct aldo_mos6502 cpu_restore;
+    struct aldo_peekresult peek = aldo_cpu_peek_start(cpu, &cpu_restore);
+    do {
+        for (int i = 0; i < Aldo_PpuRatio; ++i) {
+            aldo_ppu_cycle(ppu);
+        }
+        aldo_cpu_peek(cpu, &peek);
+    } while (!peek.done);
+    aldo_cpu_peek_end(cpu, &cpu_restore);
+    *ppu = ppu_restore;
+    return peek;
+}
+
 //
 // MARK: - Public Interface
 //
@@ -753,17 +770,7 @@ int aldo_dis_peek(struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
         if (count < 0) return ALDO_DIS_ERR_FMT;
         total += count;
     } else {
-        struct aldo_rp2c02 ppu_restore = *ppu;
-        struct aldo_mos6502 cpu_restore;
-        struct aldo_peekresult peek = aldo_cpu_peek_start(cpu, &cpu_restore);
-        do {
-            for (int i = 0; i < Aldo_PpuRatio; ++i) {
-                aldo_ppu_cycle(ppu);
-            }
-            aldo_cpu_peek(cpu, &peek);
-        } while (!peek.done);
-        aldo_cpu_peek_end(cpu, &cpu_restore);
-        *ppu = ppu_restore;
+        struct aldo_peekresult peek = run_peek(cpu, ppu);
         switch (peek.mode) {
 #define XPEEK(...) sprintf(dis, __VA_ARGS__)
 #define X(s, b, n, p, ...) case ALDO_AM_LBL(s): total = p; break;

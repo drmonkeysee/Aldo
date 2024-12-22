@@ -12,11 +12,14 @@
 #include "debug.h"
 #include "decode.h"
 #include "dis.h"
+#include "ppu.h"
+#include "ppuhelp.h"
 #include "snapshot.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define makeinst(b) create_instruction(sizeof (b) / sizeof (b)[0], b)
@@ -2421,14 +2424,25 @@ static void datapath_rst_cycle_six(void *ctx)
 // MARK: - Disassemble Peek
 //
 
+struct peekctx {
+    aldo_debugger *dbg;
+    struct aldo_rp2c02 *ppu;
+};
+
 static void setup_peek(void **ctx)
 {
-    *ctx = aldo_debug_new();
+    struct peekctx *pctx = malloc(sizeof *ctx);
+    pctx->dbg = aldo_debug_new();
+    ppu_setup((void **)&pctx->ppu);
+    *ctx = pctx;
 }
 
 static void teardown_peek(void **ctx)
 {
-    aldo_debug_free(*ctx);
+    struct peekctx *pctx = *ctx;
+    ppu_teardown((void **)&pctx->ppu);
+    aldo_debug_free(pctx->dbg);
+    free(pctx);
 }
 
 static void peek_immediate(void *ctx)
@@ -2440,9 +2454,11 @@ static void peek_immediate(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     struct aldo_snapshot snp;
     cpu.a = 0x10;
+    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
+    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "";
     ct_assertequal((int)strlen(exp), written);
@@ -2459,9 +2475,11 @@ static void peek_zeropage(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     struct aldo_snapshot snp;
     cpu.a = 0x10;
+    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
+    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "= 20";
     ct_assertequal((int)strlen(exp), written);
@@ -2479,9 +2497,11 @@ static void peek_zp_indexed(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 2;
+    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
+    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "@ 05 = 30";
     ct_assertequal((int)strlen(exp), written);
@@ -2499,9 +2519,11 @@ static void peek_indexed_indirect(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 2;
+    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
+    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "@ 04 > 0102 = 40";
     ct_assertequal((int)strlen(exp), written);
@@ -2519,9 +2541,11 @@ static void peek_indirect_indexed(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.y = 5;
+    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
+    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "> 0102 @ 0107 = 60";
     ct_assertequal((int)strlen(exp), written);
@@ -2539,9 +2563,11 @@ static void peek_absolute_indexed(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 0xa;
+    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
+    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "@ 010C = 70";
     ct_assertequal((int)strlen(exp), written);
@@ -2558,9 +2584,11 @@ static void peek_branch(void *ctx)
     struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
+    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
+    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "@ 0007";
     ct_assertequal((int)strlen(exp), written);
@@ -2577,9 +2605,11 @@ static void peek_branch_forced(void *ctx)
     struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, NULL);
     cpu.p.z = false;
+    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
+    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "@ 0007";
     ct_assertequal((int)strlen(exp), written);
@@ -2597,9 +2627,11 @@ static void peek_absolute_indirect(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.x = 0xa;
+    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
+    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "> 0205";
     ct_assertequal((int)strlen(exp), written);
@@ -2617,13 +2649,15 @@ static void peek_interrupt(void *ctx)
     struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu.irq = ALDO_SIG_COMMITTED;
+    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
     aldo_cpu_snapshot(&cpu, &snp);
-    aldo_debugger *dbg = ctx;
+    struct peekctx *pctx = ctx;
+    aldo_debugger *dbg = pctx->dbg;
     aldo_debug_set_vector_override(dbg, Aldo_NoResetVector);
     snp.prg.vectors[4] = 0xbb;
     snp.prg.vectors[5] = 0xaa;
 
-    int written = aldo_dis_peek(0x0, &cpu, dbg, &snp, buf);
+    int written = aldo_dis_peek(&cpu, pctx->ppu, dbg, &snp, buf);
 
     const char *exp = "(IRQ) > AABB";
     ct_assertequal((int)strlen(exp), written);
@@ -2641,13 +2675,15 @@ static void peek_overridden_reset(void *ctx)
     struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu.rst = ALDO_SIG_COMMITTED;
+    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
     aldo_cpu_snapshot(&cpu, &snp);
-    aldo_debugger *dbg = ctx;
+    struct peekctx *pctx = ctx;
+    aldo_debugger *dbg = pctx->dbg;
     aldo_debug_set_vector_override(dbg, 0xccdd);
     snp.prg.vectors[2] = 0xbb;
     snp.prg.vectors[3] = 0xaa;
 
-    int written = aldo_dis_peek(0x0, &cpu, dbg, &snp, buf);
+    int written = aldo_dis_peek(&cpu, pctx->ppu, dbg, &snp, buf);
 
     const char *exp = "(RST) > !CCDD";
     ct_assertequal((int)strlen(exp), written);
@@ -2665,15 +2701,17 @@ static void peek_overridden_non_reset(void *ctx)
     struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu.nmi = ALDO_SIG_COMMITTED;
+    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
     aldo_cpu_snapshot(&cpu, &snp);
-    aldo_debugger *dbg = ctx;
+    struct peekctx *pctx = ctx;
+    aldo_debugger *dbg = pctx->dbg;
     aldo_debug_set_vector_override(dbg, 0xccdd);
     snp.prg.vectors[0] = 0xff;
     snp.prg.vectors[1] = 0xee;
     snp.prg.vectors[2] = 0xbb;
     snp.prg.vectors[3] = 0xaa;
 
-    int written = aldo_dis_peek(0x0, &cpu, dbg, &snp, buf);
+    int written = aldo_dis_peek(&cpu, pctx->ppu, dbg, &snp, buf);
 
     const char *exp = "(NMI) > EEFF";
     ct_assertequal((int)strlen(exp), written);
@@ -2691,9 +2729,11 @@ static void peek_busfault(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.a = 0x10;
     cpu.y = 5;
+    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
     aldo_cpu_snapshot(&cpu, &snp);
+    struct peekctx *pctx = ctx;
 
-    int written = aldo_dis_peek(0x0, &cpu, ctx, &snp, buf);
+    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "> 4002 @ 4007 = FLT";
     ct_assertequal((int)strlen(exp), written);

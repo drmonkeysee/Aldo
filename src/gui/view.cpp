@@ -1197,12 +1197,24 @@ protected:
     void renderContents() override
     {
         auto size = emu.screenSize(), dsize = size * 2;
+        auto xOffset = size.x + aldo::style::glyph_size().x + 1;
+
+        ImGui::TextUnformatted("Nametable $2000");
+        ImGui::SameLine(xOffset);
+        ImGui::TextUnformatted("Nametable $2400");
+
         auto pos = ImGui::GetCursorScreenPos();
         auto drawList = ImGui::GetWindowDrawList();
         drawList->AddRectFilled(pos, {pos.x + size.x, pos.y + size.y}, aldo::colors::LedOff);
         drawList->AddRectFilled({pos.x + size.x, pos.y}, {pos.x + dsize.x, pos.y + size.y}, aldo::colors::LedOn);
         drawList->AddRectFilled({pos.x, pos.y + size.y}, {pos.x + size.x, pos.y + dsize.y}, aldo::colors::LedOn);
         drawList->AddRectFilled({pos.x + size.x, pos.y + size.y}, {pos.x + dsize.x, pos.y + dsize.y}, aldo::colors::LedOff);
+
+        ImGui::Dummy({0, static_cast<float>(dsize.y)});
+
+        ImGui::TextUnformatted("Nametable $2C00");
+        ImGui::SameLine(xOffset);
+        ImGui::TextUnformatted("Nametable $2800");
     }
 };
 
@@ -1312,7 +1324,8 @@ private:
         auto color = lookupColor(vs.colorSelection);
         ImGui::ColorButton("Selected Color",
                            ImGui::ColorConvertU32ToFloat4(color),
-                           ImGuiColorEditFlags_NoAlpha,
+                           ImGuiColorEditFlags_NoAlpha
+                           | ImGuiColorEditFlags_NoTooltip,
                            {selectedColorDim, selectedColorDim});
         ImGui::SameLine();
         widget_group([color, &vs = vs] {

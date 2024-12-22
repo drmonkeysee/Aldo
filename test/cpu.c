@@ -36,7 +36,7 @@ static void data_fault(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -50,7 +50,7 @@ static void ram_mirroring(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);

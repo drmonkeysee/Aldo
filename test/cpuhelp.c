@@ -93,7 +93,7 @@ void enable_rom_wcapture(void)
     aldo_bus_set(TestBus, ALDO_MEMBLOCK_32KB, dv);
 }
 
-int clock_cpu(struct aldo_mos6502 *cpu)
+int exec_cpu(struct aldo_mos6502 *cpu)
 {
     int cycles = 0;
     do {

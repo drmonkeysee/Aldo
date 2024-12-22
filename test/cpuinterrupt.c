@@ -44,7 +44,7 @@ static void brk_handler(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu.s = 0xff;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(0xbbaau, cpu.pc);
@@ -69,13 +69,13 @@ static void irq_handler(void *ctx)
     cpu.p.i = false;
     cpu.signal.irq = false;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
-    cycles = clock_cpu(&cpu);
+    cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(0xbbaau, cpu.pc);
@@ -99,14 +99,14 @@ static void nmi_handler(void *ctx)
     cpu.s = 0xff;
     cpu.signal.nmi = false;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
 
     cpu.signal.nmi = true;
-    cycles = clock_cpu(&cpu);
+    cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(0x9977u, cpu.pc);
@@ -148,7 +148,7 @@ static void rst_handler(void *ctx)
     ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.rst);
 
     cpu.signal.rst = true;
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(0x8822u, cpu.pc);
@@ -171,7 +171,7 @@ static void rti_clear_irq_mask(void *ctx)
     cpu.s = 1;
     cpu.p.i = true;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(5u, cpu.pc);
@@ -193,7 +193,7 @@ static void rti_set_irq_mask(void *ctx)
     cpu.s = 1;
     cpu.p.i = false;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(5u, cpu.pc);
@@ -264,14 +264,14 @@ static void irq_ghost(void *ctx)
     cpu.p.i = false;
     cpu.signal.irq = false;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
     cpu.signal.irq = true;
-    cycles = clock_cpu(&cpu);
+    cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(0xbbaau, cpu.pc);
@@ -299,13 +299,13 @@ static void nmi_line_never_cleared(void *ctx)
     cpu.s = 0xff;
     cpu.signal.nmi = false;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
 
-    cycles = clock_cpu(&cpu);
+    cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(250u, cpu.pc);
@@ -493,7 +493,7 @@ static void nmi_hijacks_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -546,7 +546,7 @@ static void nmi_hijacks_and_loses_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -599,7 +599,7 @@ static void nmi_delayed_by_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -648,7 +648,7 @@ static void nmi_late_delayed_by_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -694,7 +694,7 @@ static void nmi_lost_during_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -749,7 +749,7 @@ static void rst_hijacks_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -809,7 +809,7 @@ static void rst_following_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -866,7 +866,7 @@ static void rst_late_on_irq(void *ctx)
     cpu.p.i = false;
 
     cpu.signal.irq = false;
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -916,7 +916,7 @@ static void rst_hijacks_nmi(void *ctx)
     cpu.s = 0xff;
 
     cpu.signal.nmi = false;
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -975,7 +975,7 @@ static void rst_following_nmi(void *ctx)
     cpu.s = 0xff;
 
     cpu.signal.nmi = false;
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1031,7 +1031,7 @@ static void rst_late_on_nmi(void *ctx)
     cpu.s = 0xff;
 
     cpu.signal.nmi = false;
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);

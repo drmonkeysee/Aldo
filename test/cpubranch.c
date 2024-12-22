@@ -25,7 +25,7 @@ static void bcc_nobranch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -37,7 +37,7 @@ static void bcc_positive(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -50,7 +50,7 @@ static void bcc_negative(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.pc = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(1u, cpu.pc);
@@ -63,7 +63,7 @@ static void bcc_positive_overflow(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.pc = 250;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(262u, cpu.pc);
@@ -79,7 +79,7 @@ static void bcc_positive_wraparound(void *ctx)
     setup_cpu(&cpu, NULL, rom);
     cpu.pc = 0xfffa;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     free(rom);
     ct_assertequal(4, cycles);
@@ -93,7 +93,7 @@ static void bcc_negative_overflow(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.pc = 256;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(248u, cpu.pc);
@@ -107,7 +107,7 @@ static void bcc_negative_wraparound(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, rom);
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     free(rom);
     ct_assertequal(4, cycles);
@@ -120,7 +120,7 @@ static void bcc_zero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -132,7 +132,7 @@ static void bcs_nobranch(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -145,7 +145,7 @@ static void bcs_branch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.c = true;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -157,7 +157,7 @@ static void beq_nobranch(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -170,7 +170,7 @@ static void beq_branch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -182,7 +182,7 @@ static void bmi_nobranch(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -195,7 +195,7 @@ static void bmi_branch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.n = true;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -208,7 +208,7 @@ static void bne_nobranch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.z = true;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -220,7 +220,7 @@ static void bne_branch(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -233,7 +233,7 @@ static void bpl_nobranch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.n = true;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -245,7 +245,7 @@ static void bpl_branch(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -258,7 +258,7 @@ static void bvc_nobranch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.v = true;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -270,7 +270,7 @@ static void bvc_branch(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);
@@ -282,7 +282,7 @@ static void bvs_nobranch(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, NULL);
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -295,7 +295,7 @@ static void bvs_branch(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.p.v = true;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(7u, cpu.pc);

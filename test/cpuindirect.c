@@ -25,7 +25,7 @@ static void adc_indx(void *ctx)
     cpu.a = 0xa;    // 10 + 6
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -46,7 +46,7 @@ static void adc_indx_pageoverflow(void *ctx)
     cpu.a = 0xa;    // 10 + 34
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -68,7 +68,7 @@ static void adc_indx_zp_wraparound(void *ctx)
     cpu.a = 0xa;    // 10 + 17
     cpu.x = 0xfd;   // Index to $00FF to fetch address $8002 across zp boundary
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -89,7 +89,7 @@ static void and_indx(void *ctx)
     cpu.a = 0xa;
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -108,7 +108,7 @@ static void and_indx_pageoverflow(void *ctx)
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -127,7 +127,7 @@ static void cmp_indx(void *ctx)
     cpu.a = 0x10;
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -147,7 +147,7 @@ static void cmp_indx_pageoverflow(void *ctx)
     cpu.a = 0x10;
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -167,7 +167,7 @@ static void eor_indx(void *ctx)
     cpu.a = 0xfa;
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -186,7 +186,7 @@ static void eor_indx_pageoverflow(void *ctx)
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -204,7 +204,7 @@ static void lda_indx(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -222,7 +222,7 @@ static void lda_indx_pageoverflow(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -241,7 +241,7 @@ static void ora_indx(void *ctx)
     cpu.a = 0xa;
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -260,7 +260,7 @@ static void ora_indx_pageoverflow(void *ctx)
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -280,7 +280,7 @@ static void sbc_indx(void *ctx)
     cpu.a = 0xa;    // 10 - 6
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -302,7 +302,7 @@ static void sbc_indx_pageoverflow(void *ctx)
     cpu.a = 0xa;    // 10 - 6
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -325,7 +325,7 @@ static void sta_indx(void *ctx)
     cpu.a = 0xa;
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -344,7 +344,7 @@ static void sta_indx_pageoverflow(void *ctx)
     cpu.a = 0xa;
     cpu.x = 0xff;   // Wrap around from $0008 -> $0007
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -365,7 +365,7 @@ static void adc_indy(void *ctx)
     cpu.a = 0xa;    // 10 + 6
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -385,7 +385,7 @@ static void adc_indy_pagecross(void *ctx)
     cpu.a = 0xa;    // 10 + 178
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -407,7 +407,7 @@ static void adc_indy_zp_wraparound(void *ctx)
     cpu.a = 0xa;    // 10 + 8
     cpu.y = 3;  // Index to $00FF to fetch address $8001 + 3 across zp boundary
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -428,7 +428,7 @@ static void and_indy(void *ctx)
     cpu.a = 0xa;
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -446,7 +446,7 @@ static void and_indy_pagecross(void *ctx)
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -465,7 +465,7 @@ static void cmp_indy(void *ctx)
     cpu.a = 0x10;
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -484,7 +484,7 @@ static void cmp_indy_pagecross(void *ctx)
     cpu.a = 0x10;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -504,7 +504,7 @@ static void eor_indy(void *ctx)
     cpu.a = 0xfa;
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -522,7 +522,7 @@ static void eor_indy_pagecross(void *ctx)
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -540,7 +540,7 @@ static void lda_indy(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -557,7 +557,7 @@ static void lda_indy_pagecross(void *ctx)
     setup_cpu(&cpu, mem, BigRom);
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -576,7 +576,7 @@ static void ora_indy(void *ctx)
     cpu.a = 0xa;
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -594,7 +594,7 @@ static void ora_indy_pagecross(void *ctx)
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -614,7 +614,7 @@ static void sbc_indy(void *ctx)
     cpu.a = 0xa;    // 10 - 6
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -635,7 +635,7 @@ static void sbc_indy_pagecross(void *ctx)
     cpu.a = 0xa;    // 10 - (-78)
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -658,7 +658,7 @@ static void sta_indy(void *ctx)
     cpu.a = 0xa;
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -677,7 +677,7 @@ static void sta_indy_pagecross(void *ctx)
     cpu.a = 0xa;
     cpu.y = 3;  // Cross boundary from $00FF -> $0102
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -699,7 +699,7 @@ static void dcp_indx(void *ctx)
     cpu.a = 0x10;
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -721,7 +721,7 @@ static void dcp_indx_pageoverflow(void *ctx)
     cpu.a = 0x10;
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -743,7 +743,7 @@ static void dcp_indy(void *ctx)
     cpu.a = 0x10;
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -764,7 +764,7 @@ static void dcp_indy_pagecross(void *ctx)
     cpu.a = 0x10;
     cpu.y = 4;  // Cross boundary from $80FF -> $8103
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -787,7 +787,7 @@ static void isc_indx(void *ctx)
     cpu.a = 0xa;    // 10 - 6
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -811,7 +811,7 @@ static void isc_indx_pageoverflow(void *ctx)
     cpu.a = 0xa;    // 10 - 6
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -835,7 +835,7 @@ static void isc_indy(void *ctx)
     cpu.a = 0xa;    // 10 - 6
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -858,7 +858,7 @@ static void isc_indy_pagecross(void *ctx)
     cpu.a = 0xa;    // 10 - (-78)
     cpu.y = 2;  // Cross boundary from $80FF -> $8101
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -879,7 +879,7 @@ static void lax_indx(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -898,7 +898,7 @@ static void lax_indx_pageoverflow(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -917,7 +917,7 @@ static void lax_indy(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -935,7 +935,7 @@ static void lax_indy_pagecross(void *ctx)
     setup_cpu(&cpu, mem, BigRom);
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -957,7 +957,7 @@ static void rla_indx(void *ctx)
     cpu.x = 4;
     cpu.p.c = true;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -980,7 +980,7 @@ static void rla_indx_pageoverflow(void *ctx)
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
     cpu.p.c = true;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1003,7 +1003,7 @@ static void rla_indy(void *ctx)
     cpu.y = 3;
     cpu.p.c = true;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1025,7 +1025,7 @@ static void rla_indy_pagecross(void *ctx)
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
     cpu.p.c = true;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1047,7 +1047,7 @@ static void rra_indx(void *ctx)
     cpu.a = 0xa;    // 10 + 6
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1070,7 +1070,7 @@ static void rra_indx_pageoverflow(void *ctx)
     cpu.a = 0xa;    // 10 + 34
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1093,7 +1093,7 @@ static void rra_indy(void *ctx)
     cpu.a = 0xa;    // 10 + 6
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1115,7 +1115,7 @@ static void rra_indy_pagecross(void *ctx)
     cpu.a = 0xa;    // 10 + 178
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1139,7 +1139,7 @@ static void sax_indx(void *ctx)
     cpu.a = 0xa;
     cpu.x = 6;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1158,7 +1158,7 @@ static void sax_indx_pageoverflow(void *ctx)
     cpu.a = 7;
     cpu.x = 0xfb;   // Wrap around from $0008 -> $0003
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1178,7 +1178,7 @@ static void sha_indy(void *ctx)
     cpu.x = 0xe;
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1197,7 +1197,7 @@ static void sha_indy_pagecross(void *ctx)
     cpu.x = 0xf8;
     cpu.y = 3;  // Cross boundary from $FEFF -> $FF02
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1219,7 +1219,7 @@ static void slo_indx(void *ctx)
     cpu.a = 0xa;
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1241,7 +1241,7 @@ static void slo_indx_pageoverflow(void *ctx)
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1263,7 +1263,7 @@ static void slo_indy(void *ctx)
     cpu.a = 0xa;
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1284,7 +1284,7 @@ static void slo_indy_pagecross(void *ctx)
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1306,7 +1306,7 @@ static void sre_indx(void *ctx)
     cpu.a = 0xa;
     cpu.x = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1328,7 +1328,7 @@ static void sre_indx_pageoverflow(void *ctx)
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0002 -> $0001
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1350,7 +1350,7 @@ static void sre_indy(void *ctx)
     cpu.a = 0xa;
     cpu.y = 3;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1371,7 +1371,7 @@ static void sre_indy_pagecross(void *ctx)
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);

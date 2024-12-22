@@ -23,7 +23,7 @@ static void jsr(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.s = 4;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(0x8005u, cpu.pc);
@@ -40,7 +40,7 @@ static void rts(void *ctx)
     setup_cpu(&cpu, mem, NULL);
     cpu.s = 2;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);

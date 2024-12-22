@@ -107,7 +107,7 @@ static void irq_ignored(void *ctx)
     cpu.p.i = false;
     cpu.signal.irq = false;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -125,7 +125,7 @@ static void nmi_ignored(void *ctx)
     cpu.s = 0xff;
     cpu.signal.nmi = false;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -143,7 +143,7 @@ static void rst_not_ignored(void *ctx)
     cpu.s = 0xff;
     cpu.signal.rst = false;
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -159,7 +159,7 @@ static void writes_ignored(void *ctx)
     cpu.a = 0x10;
     aldo_cpu_peek_start(&cpu, NULL);
 
-    int cycles = clock_cpu(&cpu);
+    int cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);

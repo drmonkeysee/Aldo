@@ -61,11 +61,9 @@ aldo::PatternTable::PatternTable(const aldo::MediaRuntime& mr)
 
 void aldo::PatternTable
 ::draw(const aldo::et::word table[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM],
-       const aldo::et::byte colors[ALDO_PAL_SIZE],
-       const aldo::Palette& p) const
+       aldo::color_span colors, const aldo::Palette& p) const
 {
     assert(table != nullptr);
-    assert(colors != nullptr);
 
     auto data = tex.lock();
     for (auto tblRow = 0; tblRow < TableDim; ++tblRow) {
@@ -85,16 +83,16 @@ aldo::Nametables::Nametables(SDL_Point nametableSize,
                              const aldo::MediaRuntime& mr)
 : ntSize{nametableSize}, tex{nametableSize * LayoutDim, mr.renderer()} {}
 
-void aldo::Nametables::draw(const aldo::et::byte colors[ALDO_PAL_SIZE],
-                            const aldo::Palette& p,
+void aldo::Nametables::draw(aldo::color_span colors, const aldo::Palette& p,
                             const aldo::MediaRuntime& mr) const
 {
-    static_assert(ALDO_PAL_SIZE == NtCount, "mismatched nt sizes");
+    static_assert(colors.size() == NtCount, "mismatched nt sizes");
 
     auto ren = mr.renderer();
     auto target = tex.asTarget(ren);
-    for (auto i = 0; i < NtCount; ++i) {
-        auto c = p.getColor(colors[i]);
+    auto i = 0;
+    for (auto cidx : colors) {
+        auto c = p.getColor(cidx);
         auto [r, g, b] = aldo::colors::rgb(c);
         SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r),
                                static_cast<Uint8>(g), static_cast<Uint8>(b),
@@ -104,6 +102,7 @@ void aldo::Nametables::draw(const aldo::et::byte colors[ALDO_PAL_SIZE],
             yOffset = i > 1 ? ntSize.y : 0;
         SDL_Rect nt{xOffset, yOffset, ntSize.x, ntSize.y};
         SDL_RenderFillRect(ren, &nt);
+        ++i;
     }
 }
 
@@ -139,14 +138,14 @@ aldo::texture::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 
 void
 aldo::PatternTable::drawTableRow(aldo::et::word pixels,
-                                 const aldo::et::byte colors[ALDO_PAL_SIZE],
-                                 int texOffset, const aldo::Palette& p,
+                                 aldo::color_span colors, int texOffset,
+                                 const aldo::Palette& p,
                                  const aldo::texture::TextureData& data)
 {
     for (auto px = 0; px < ALDO_CHR_TILE_DIM; ++px) {
         auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
         assert(0 <= pidx);
-        auto texel = (pixels & (0x3 << pidx)) >> pidx;
+        decltype(colors)::size_type texel = (pixels & (0x3 << pidx)) >> pidx;
         assert(texel < ALDO_PAL_SIZE);
         auto texidx = px + texOffset;
         assert(texidx < TextureDim * TextureDim);

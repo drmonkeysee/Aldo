@@ -1401,7 +1401,7 @@ protected:
         if (drawInterval.elapsed(vs.clock.clock())) {
             const auto* tables = &emu.snapshot().video->pattern_tables;
             assert(palSelect < ALDO_PAL_SIZE * 2);
-            const auto* colors =
+            aldo::color_span colors =
                 palSelect < ALDO_PAL_SIZE
                 ? emu.snapshot().video->palettes.bg[palSelect]
                 : emu.snapshot().video->palettes.fg[palSelect - ALDO_PAL_SIZE];
@@ -1445,7 +1445,7 @@ private:
                 ScopedStyleVec textAlign{{
                     ImGuiStyleVar_SelectableTextAlign, {center, center},
                 }};
-                auto pal = pals[row];
+                aldo::color_span pal = pals[row];
                 std::array<char, 3> buf;
                 for (auto col = 0; col < cols; ++col) {
                     ImGui::TableNextColumn();
@@ -1459,7 +1459,8 @@ private:
                             palSelect = palIdx;
                         }
                     } else {
-                        auto idx = pal[col - 1];
+                        using palsz = decltype(pal)::size_type;
+                        auto idx = pal[static_cast<palsz>(col - 1)];
                         auto color = emu.palette().getColor(idx);
                         ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
                                                color);

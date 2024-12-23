@@ -16,12 +16,16 @@
 #include "imgui.h"
 #include <SDL2/SDL.h>
 
+#include <span>
+
 namespace aldo
 {
 
 class MediaRuntime;
 class Palette;
 template<SDL_TextureAccess> class Texture;
+
+using color_span = std::span<const et::byte, ALDO_PAL_SIZE>;
 
 namespace texture
 {
@@ -127,7 +131,7 @@ public:
     PatternTable(const MediaRuntime& mr);
 
     void draw(const et::word table[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM],
-              const et::byte colors[ALDO_PAL_SIZE], const Palette& p) const;
+              color_span colors, const Palette& p) const;
     void render() const noexcept { tex.render(2.0); }
 
 private:
@@ -137,9 +141,8 @@ private:
     static_assert(TextureDim == TableDim * ALDO_CHR_TILE_DIM,
                   "Texture size does not match tile pixel count");
 
-    static void drawTableRow(et::word pixels,
-                             const et::byte colors[ALDO_PAL_SIZE],
-                             int texOffset, const Palette& p,
+    static void drawTableRow(et::word pixels, color_span colors, int texOffset,
+                             const Palette& p,
                              const texture::TextureData& data);
 
     Texture<SDL_TEXTUREACCESS_STREAMING> tex;
@@ -151,7 +154,7 @@ public:
 
     SDL_Point nametableSize() const noexcept { return ntSize; }
 
-    void draw(const et::byte colors[ALDO_PAL_SIZE], const Palette& p,
+    void draw(color_span colors, const Palette& p,
               const MediaRuntime& mr) const;
     void render() const noexcept { tex.render(); }
 

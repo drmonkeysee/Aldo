@@ -12,6 +12,7 @@
 #include "mediaruntime.hpp"
 #include "style.hpp"
 
+#include <array>
 #include <concepts>
 #include <cassert>
 
@@ -20,6 +21,11 @@ static_assert(std::same_as<Uint32, ImU32>,
 
 namespace
 {
+
+constexpr auto operator*(SDL_Point p, int n) noexcept
+{
+    return SDL_Point{p.x * n, p.y * n};
+}
 
 auto screen_buffer_length() noexcept
 {
@@ -75,20 +81,30 @@ void aldo::PatternTable
     }
 }
 
-aldo::Nametable::Nametable(SDL_Point size, const aldo::MediaRuntime& mr)
-: tex{size, mr.renderer()} {}
+aldo::Nametables::Nametables(SDL_Point nametableSize,
+                             const aldo::MediaRuntime& mr)
+: ntSize{nametableSize}, tex{nametableSize * LayoutDim, mr.renderer()} {}
 
-void aldo::Nametable::draw(const aldo::et::byte colors[ALDO_PAL_SIZE],
-                           const aldo::Palette& p,
-                           const aldo::MediaRuntime& mr) const
+void aldo::Nametables::draw(const aldo::et::byte colors[ALDO_PAL_SIZE],
+                            const aldo::Palette& p,
+                            const aldo::MediaRuntime& mr) const
 {
+    static_assert(ALDO_PAL_SIZE == NtCount, "mismatched nt sizes");
+
     auto ren = mr.renderer();
     auto target = tex.asTarget(ren);
-    auto c = p.getColor(colors[1]);
-    auto [r, g, b] = aldo::colors::rgb(c);
-    SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g),
-                           static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
-    SDL_RenderFillRect(ren, nullptr);
+    for (auto i = 0; i < NtCount; ++i) {
+        auto c = p.getColor(colors[i]);
+        auto [r, g, b] = aldo::colors::rgb(c);
+        SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r),
+                               static_cast<Uint8>(g), static_cast<Uint8>(b),
+                               SDL_ALPHA_OPAQUE);
+        auto
+            xOffset = i % 2 == 1 ? ntSize.x : 0,
+            yOffset = i > 1 ? ntSize.y : 0;
+        SDL_Rect nt{xOffset, yOffset, ntSize.x, ntSize.y};
+        SDL_RenderFillRect(ren, &nt);
+    }
 }
 
 //

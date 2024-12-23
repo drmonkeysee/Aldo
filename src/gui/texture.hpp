@@ -145,17 +145,20 @@ private:
     Texture<SDL_TEXTUREACCESS_STREAMING> tex;
 };
 
-class Nametable {
+class Nametables {
 public:
-    Nametable(SDL_Point size, const MediaRuntime& mr);
+    Nametables(SDL_Point nametableSize, const MediaRuntime& mr);
+
+    SDL_Point nametableSize() const noexcept { return ntSize; }
 
     void draw(const et::byte colors[ALDO_PAL_SIZE], const Palette& p,
               const MediaRuntime& mr) const;
     void render() const noexcept { tex.render(); }
 
 private:
-    static constexpr int TileCols = 32, TileRows = 30, MetaTileDim = 16;
+    static constexpr int LayoutDim = 2, NtCount = LayoutDim * LayoutDim;
 
+    SDL_Point ntSize;
     Texture<SDL_TEXTUREACCESS_TARGET> tex;
 };
 

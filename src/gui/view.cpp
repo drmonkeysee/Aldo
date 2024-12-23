@@ -1185,7 +1185,12 @@ class NametablesView final : public aldo::View {
 public:
     NametablesView(aldo::viewstate& vs, const aldo::Emulator& emu,
                    const aldo::MediaRuntime& mr) noexcept
-    : View{"Nametables", vs, emu, mr} {}
+    : View{"Nametables", vs, emu, mr}, nametables{
+        aldo::Nametable{emu.screenSize(), mr},
+        aldo::Nametable{emu.screenSize(), mr},
+        aldo::Nametable{emu.screenSize(), mr},
+        aldo::Nametable{emu.screenSize(), mr},
+    } {}
     NametablesView(aldo::viewstate&, aldo::Emulator&&,
                    const aldo::MediaRuntime&) = delete;
     NametablesView(aldo::viewstate&, const aldo::Emulator&,
@@ -1196,26 +1201,32 @@ public:
 protected:
     void renderContents() override
     {
-        auto size = emu.screenSize(), dsize = size * 2;
-        auto xOffset = size.x + aldo::style::glyph_size().x + 1;
+        static constexpr std::array ntaddrs{0x2000, 0x2400, 0x2c00, 0x2800};
+        static_assert(ntaddrs.size()
+                      == std::tuple_size_v<decltype(nametables)>,
+                      "ntaddrs size mismatch");
 
-        ImGui::TextUnformatted("Nametable $2000");
-        ImGui::SameLine(xOffset);
-        ImGui::TextUnformatted("Nametable $2400");
-
-        auto pos = ImGui::GetCursorScreenPos();
-        auto drawList = ImGui::GetWindowDrawList();
-        drawList->AddRectFilled(pos, {pos.x + size.x, pos.y + size.y}, aldo::colors::LedOff);
-        drawList->AddRectFilled({pos.x + size.x, pos.y}, {pos.x + dsize.x, pos.y + size.y}, aldo::colors::LedOn);
-        drawList->AddRectFilled({pos.x, pos.y + size.y}, {pos.x + size.x, pos.y + dsize.y}, aldo::colors::LedOn);
-        drawList->AddRectFilled({pos.x + size.x, pos.y + size.y}, {pos.x + dsize.x, pos.y + dsize.y}, aldo::colors::LedOff);
-
-        ImGui::Dummy({0, static_cast<float>(dsize.y)});
-
-        ImGui::TextUnformatted("Nametable $2C00");
-        ImGui::SameLine(xOffset);
-        ImGui::TextUnformatted("Nametable $2800");
+        decltype(ntaddrs)::size_type idx = 0;
+        for (const auto& nt : nametables) {
+            nt.draw(emu.snapshot().video->palettes.bg[idx], emu.palette(),
+                    mr);
+            widget_group([&nt, idx] {
+                if (idx < 2) {
+                    ImGui::Text("Nametable $%X", ntaddrs[idx]);
+                }
+                nt.render();
+                if (idx >= 2) {
+                    ImGui::Text("Nametable $%X", ntaddrs[idx]);
+                }
+            });
+            if (idx++ % 2 == 0) {
+                ImGui::SameLine();
+            }
+        }
     }
+
+private:
+    std::array<aldo::Nametable, 4> nametables;
 };
 
 class PaletteView final : public aldo::View {

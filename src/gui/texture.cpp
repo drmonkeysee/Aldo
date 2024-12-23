@@ -10,6 +10,7 @@
 #include "emu.hpp"
 #include "error.hpp"
 #include "mediaruntime.hpp"
+#include "style.hpp"
 
 #include <concepts>
 #include <cassert>
@@ -72,6 +73,22 @@ void aldo::PatternTable
             }
         }
     }
+}
+
+aldo::Nametable::Nametable(SDL_Point size, const aldo::MediaRuntime& mr)
+: tex{size, mr.renderer()} {}
+
+void aldo::Nametable::draw(const aldo::et::byte colors[ALDO_PAL_SIZE],
+                           const aldo::Palette& p,
+                           const aldo::MediaRuntime& mr) const
+{
+    auto ren = mr.renderer();
+    auto target = tex.asTarget(ren);
+    auto c = p.getColor(colors[1]);
+    auto [r, g, b] = aldo::colors::rgb(c);
+    SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g),
+                           static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
+    SDL_RenderFillRect(ren, nullptr);
 }
 
 //

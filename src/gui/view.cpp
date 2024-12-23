@@ -1200,9 +1200,9 @@ protected:
         nametables.draw(emu.snapshot().video->palettes.bg[0], emu.palette(),
                         mr);
         nametables.render();
-        ImGui::TextUnformatted("Nametable $2C00");
-        ImGui::SameLine(textOffset);
         ImGui::TextUnformatted("Nametable $2800");
+        ImGui::SameLine(textOffset);
+        ImGui::TextUnformatted("Nametable $2C00");
     }
 
 private:

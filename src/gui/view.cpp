@@ -1436,16 +1436,16 @@ private:
                                         | ImGuiTableFlags_SizingFixedFit;
 
         ImGui::TextUnformatted(fg ? "Sprites" : "Background");
-        const auto* pals = fg
+        std::span pals = fg
                             ? emu.snapshot().video->palettes.fg
                             : emu.snapshot().video->palettes.bg;
-        for (auto row = 0; row < ALDO_PAL_SIZE; ++row) {
+        auto row = 0;
+        for (aldo::color_span pal : pals) {
             if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols,
                                   flags)) {
                 ScopedStyleVec textAlign{{
                     ImGuiStyleVar_SelectableTextAlign, {center, center},
                 }};
-                aldo::color_span pal = pals[row];
                 std::array<char, 3> buf;
                 for (auto col = 0; col < cols; ++col) {
                     ImGui::TableNextColumn();
@@ -1479,6 +1479,7 @@ private:
                 }
                 ImGui::EndTable();
             }
+            ++row;
         }
     }
 

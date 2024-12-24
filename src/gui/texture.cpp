@@ -135,16 +135,15 @@ aldo::texture::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 // MARK: - Private Interface
 //
 
-void
-aldo::PatternTable::drawTableRow(aldo::et::word pixels,
-                                 aldo::color_span colors, int texOffset,
-                                 const aldo::Palette& p,
-                                 const aldo::texture::TextureData& data)
+void aldo::PatternTable::drawTableRow(aldo::et::word pxrow,
+                                      aldo::color_span colors,
+                                      int texOffset, const aldo::Palette& p,
+                                      const aldo::texture::TextureData& data)
 {
     for (auto px = 0; px < ALDO_CHR_TILE_DIM; ++px) {
         auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
         assert(0 <= pidx);
-        decltype(colors)::size_type texel = (pixels & (0x3 << pidx)) >> pidx;
+        decltype(colors)::size_type texel = (pxrow & (0x3 << pidx)) >> pidx;
         assert(texel < ALDO_PAL_SIZE);
         auto texidx = px + texOffset;
         assert(texidx < TextureDim * TextureDim);

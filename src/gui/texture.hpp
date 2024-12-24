@@ -10,7 +10,6 @@
 
 #include "attr.hpp"
 #include "emutypes.hpp"
-#include "palette.hpp"
 #include "snapshot.h"
 
 #include "imgui.h"

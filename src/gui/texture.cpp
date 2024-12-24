@@ -10,6 +10,7 @@
 #include "emu.hpp"
 #include "error.hpp"
 #include "mediaruntime.hpp"
+#include "palette.hpp"
 #include "style.hpp"
 
 #include <array>

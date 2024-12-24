@@ -26,6 +26,8 @@ class Palette;
 template<SDL_TextureAccess> class Texture;
 
 using color_span = std::span<const et::byte, ALDO_PAL_SIZE>;
+// TODO: use std::mdspan someday when they can be sliced?
+using pt_arr = const et::word[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM];
 
 namespace texture
 {
@@ -130,8 +132,7 @@ class PatternTable {
 public:
     PatternTable(const MediaRuntime& mr);
 
-    void draw(const et::word table[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM],
-              color_span colors, const Palette& p) const;
+    void draw(pt_arr table, color_span colors, const Palette& p) const;
     void render() const noexcept { tex.render(2.0); }
 
 private:

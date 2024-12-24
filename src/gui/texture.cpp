@@ -59,9 +59,8 @@ void aldo::VideoScreen::draw(const aldo::et::byte buf[],
 aldo::PatternTable::PatternTable(const aldo::MediaRuntime& mr)
 : tex{{TextureDim, TextureDim}, mr.renderer()} {}
 
-void aldo::PatternTable
-::draw(const aldo::et::word table[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM],
-       aldo::color_span colors, const aldo::Palette& p) const
+void aldo::PatternTable::draw(aldo::pt_arr table, aldo::color_span colors,
+                              const aldo::Palette& p) const
 {
     assert(table != nullptr);
 

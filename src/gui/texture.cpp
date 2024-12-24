@@ -43,16 +43,16 @@ aldo::VideoScreen::VideoScreen(SDL_Point resolution,
                                const aldo::MediaRuntime& mr)
 : tex{resolution, mr.renderer()} {}
 
-void aldo::VideoScreen::draw(const aldo::et::byte buf[],
+void aldo::VideoScreen::draw(const aldo::et::byte* vbuf,
                              const aldo::Palette& p) const
 {
-    assert(buf != nullptr);
+    assert(vbuf != nullptr);
 
     auto data = tex.lock();
     auto length = data.width * data.height;
     assert(length == screen_buffer_length());
     for (auto i = 0; i < length; ++i) {
-        data.pixels[i] = p.getColor(buf[i]);
+        data.pixels[i] = p.getColor(vbuf[i]);
     }
 }
 

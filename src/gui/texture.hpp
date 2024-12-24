@@ -115,7 +115,7 @@ class VideoScreen {
 public:
     VideoScreen(SDL_Point resolution, const MediaRuntime& mr);
 
-    void draw(const et::byte buf[], const Palette& p) const;
+    void draw(const et::byte* vbuf, const Palette& p) const;
     void render(float scale, bool sdRatio) const noexcept
     {
         tex.render(sdRatio ? scale * TvXScale : scale, scale);

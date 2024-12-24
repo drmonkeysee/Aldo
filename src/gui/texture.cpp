@@ -65,17 +65,17 @@ void aldo::PatternTable::draw(aldo::pt_span table, aldo::color_span colors,
     using pt_sz = decltype(table)::size_type;
 
     auto data = tex.lock();
-    for (auto tileRow = 0; tileRow < TableDim; ++tileRow) {
-        for (auto tileCol = 0; tileCol < TableDim; ++tileCol) {
-            auto tileIdx = static_cast<pt_sz>(tileCol + (tileRow * TableDim));
+    for (auto tblRow = 0; tblRow < TableDim; ++tblRow) {
+        for (auto tblCol = 0; tblCol < TableDim; ++tblCol) {
+            auto tileIdx = static_cast<pt_sz>(tblCol + (tblRow * TableDim));
             aldo::pt_tile tile = table[tileIdx];
-            auto rowIdx = 0;
-            for (auto pxrow : tile) {
-                auto rowOffset = (tileCol * ALDO_CHR_TILE_DIM)
-                                    + ((rowIdx++
-                                        + (tileRow * ALDO_CHR_TILE_DIM))
+            auto tileRow = 0;
+            for (auto row : tile) {
+                auto rowOffset = (tblCol * ALDO_CHR_TILE_DIM)
+                                    + ((tileRow++
+                                        + (tblRow * ALDO_CHR_TILE_DIM))
                                        * data.stride);
-                drawTableRow(pxrow, colors, rowOffset, p, data);
+                drawTileRow(row, colors, rowOffset, p, data);
             }
         }
     }
@@ -138,15 +138,15 @@ aldo::texture::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 // MARK: - Private Interface
 //
 
-void aldo::PatternTable::drawTableRow(aldo::et::word pxrow,
-                                      aldo::color_span colors,
-                                      int texOffset, const aldo::Palette& p,
-                                      const aldo::texture::TextureData& data)
+void aldo::PatternTable::drawTileRow(aldo::et::word row,
+                                     aldo::color_span colors,
+                                     int texOffset, const aldo::Palette& p,
+                                     const aldo::texture::TextureData& data)
 {
     for (auto px = 0; px < ALDO_CHR_TILE_DIM; ++px) {
         auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
         assert(0 <= pidx);
-        decltype(colors)::size_type texel = (pxrow & (0x3 << pidx)) >> pidx;
+        decltype(colors)::size_type texel = (row & (0x3 << pidx)) >> pidx;
         assert(texel < ALDO_PAL_SIZE);
         auto texidx = px + texOffset;
         assert(texidx < TextureDim * TextureDim);

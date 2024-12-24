@@ -144,9 +144,9 @@ private:
     static_assert(TextureDim == TableDim * ALDO_CHR_TILE_DIM,
                   "Texture size does not match tile pixel count");
 
-    static void drawTableRow(et::word pxrow, color_span colors, int texOffset,
-                             const Palette& p,
-                             const texture::TextureData& data);
+    static void drawTileRow(et::word row, color_span colors, int texOffset,
+                            const Palette& p,
+                            const texture::TextureData& data);
 
     Texture<SDL_TEXTUREACCESS_STREAMING> tex;
 };

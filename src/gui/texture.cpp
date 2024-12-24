@@ -59,20 +59,23 @@ void aldo::VideoScreen::draw(const aldo::et::byte* vbuf,
 aldo::PatternTable::PatternTable(const aldo::MediaRuntime& mr)
 : tex{{TextureDim, TextureDim}, mr.renderer()} {}
 
-void aldo::PatternTable::draw(aldo::pt_arr table, aldo::color_span colors,
+void aldo::PatternTable::draw(aldo::pt_span table, aldo::color_span colors,
                               const aldo::Palette& p) const
 {
-    assert(table != nullptr);
+    using pt_sz = decltype(table)::size_type;
 
     auto data = tex.lock();
-    for (auto tblRow = 0; tblRow < TableDim; ++tblRow) {
-        for (auto tblCol = 0; tblCol < TableDim; ++tblCol) {
-            const auto* tile = table[tblCol + (tblRow * TableDim)];
-            for (auto tileRow = 0; tileRow < ALDO_CHR_TILE_DIM; ++tileRow) {
-                auto rowOffset = (tblCol * ALDO_CHR_TILE_DIM)
-                                    + ((tileRow + (tblRow * ALDO_CHR_TILE_DIM))
+    for (auto tileRow = 0; tileRow < TableDim; ++tileRow) {
+        for (auto tileCol = 0; tileCol < TableDim; ++tileCol) {
+            auto tileIdx = static_cast<pt_sz>(tileCol + (tileRow * TableDim));
+            aldo::pt_tile tile = table[tileIdx];
+            auto rowIdx = 0;
+            for (auto pxrow : tile) {
+                auto rowOffset = (tileCol * ALDO_CHR_TILE_DIM)
+                                    + ((rowIdx++
+                                        + (tileRow * ALDO_CHR_TILE_DIM))
                                        * data.stride);
-                drawTableRow(tile[tileRow], colors, rowOffset, p, data);
+                drawTableRow(pxrow, colors, rowOffset, p, data);
             }
         }
     }

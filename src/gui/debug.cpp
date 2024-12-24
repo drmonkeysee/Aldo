@@ -23,7 +23,7 @@ namespace
 
 using hexpr_buffer = std::array<aldo::et::tchar, ALDO_HEXPR_FMT_SIZE>;
 using bp_it = aldo::Debugger::BreakpointIterator;
-using bp_size = aldo::Debugger::BpView::size_type;
+using bp_sz = aldo::Debugger::BpView::size_type;
 
 constexpr auto DebugFileErrorTitle = "Debug File Error";
 
@@ -70,7 +70,7 @@ auto format_debug_expr(const aldo_debugexpr& expr, hexpr_buffer& buf)
     };
 }
 
-auto fill_expr_buffers(bp_size exprCount, int resetvector, bool resOverride,
+auto fill_expr_buffers(bp_sz exprCount, int resetvector, bool resOverride,
                        bp_it first, bp_it last)
 {
     std::vector<hexpr_buffer> bufs(exprCount);
@@ -124,7 +124,7 @@ aldo::Debugger::exportBreakpoints(const std::filesystem::path& filepath) const
 {
     auto bpView = breakpoints();
     auto resOverride = isVectorOverridden();
-    auto exprCount = bpView.size() + static_cast<bp_size>(resOverride);
+    auto exprCount = bpView.size() + static_cast<bp_sz>(resOverride);
     if (exprCount == 0) return;
 
     auto bufs = fill_expr_buffers(exprCount, vectorOverride(), resOverride,

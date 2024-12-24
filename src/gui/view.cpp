@@ -1459,8 +1459,8 @@ private:
                             palSelect = palIdx;
                         }
                     } else {
-                        using palsz = decltype(pal)::size_type;
-                        auto idx = pal[static_cast<palsz>(col - 1)];
+                        using col_sz = decltype(pal)::size_type;
+                        auto idx = pal[static_cast<col_sz>(col - 1)];
                         auto color = emu.palette().getColor(idx);
                         ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
                                                color);

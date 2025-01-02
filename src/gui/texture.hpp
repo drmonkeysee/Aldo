@@ -22,7 +22,6 @@ namespace aldo
 
 class MediaRuntime;
 class Palette;
-template<SDL_TextureAccess> class Texture;
 
 using color_span = std::span<const et::byte, ALDO_PAL_SIZE>;
 // TODO: use std::mdspan someday when they can be sliced?
@@ -32,6 +31,8 @@ using pt_span = std::span<const et::word[ALDO_CHR_TILE_DIM],
 
 namespace texture
 {
+
+template<SDL_TextureAccess> class Texture;
 
 ALDO_OWN
 SDL_Texture* create(SDL_Point size, SDL_TextureAccess access,
@@ -75,23 +76,21 @@ private:
     SDL_Texture& tex;
 };
 
-}
-
 template<SDL_TextureAccess Access>
 class Texture {
 public:
     Texture(SDL_Point size, SDL_Renderer* ren)
-    : tex{texture::create(size, Access, ren)} {}
+    : tex{create(size, Access, ren)} {}
     Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;
     Texture(Texture&&) = delete;
     Texture& operator=(Texture&&) = delete;
     ~Texture() { SDL_DestroyTexture(tex); }
 
-    texture::TextureTarget asTarget(SDL_Renderer* ren) const noexcept
+    TextureTarget asTarget(SDL_Renderer* ren) const noexcept
     requires (Access == SDL_TEXTUREACCESS_TARGET) { return {*ren, *tex}; }
 
-    texture::TextureData lock() const noexcept
+    TextureData lock() const noexcept
     requires (Access == SDL_TEXTUREACCESS_STREAMING) { return *tex; }
 
     void render(float scale = 1.0f) const noexcept
@@ -112,6 +111,8 @@ private:
     SDL_Texture* tex;
 };
 
+}
+
 class VideoScreen {
 public:
     VideoScreen(SDL_Point resolution, const MediaRuntime& mr);
@@ -126,7 +127,7 @@ private:
     // NOTE: 4:3 SD TV ratio scales the x-axis by about 1.14 from square
     static constexpr float TvXScale = 8.0f / 7.0f;
 
-    Texture<SDL_TEXTUREACCESS_STREAMING> tex;
+    texture::Texture<SDL_TEXTUREACCESS_STREAMING> tex;
 };
 
 class PatternTable {
@@ -147,7 +148,7 @@ private:
                             const Palette& p,
                             const texture::TextureData& data);
 
-    Texture<SDL_TEXTUREACCESS_STREAMING> tex;
+    texture::Texture<SDL_TEXTUREACCESS_STREAMING> tex;
 };
 
 class Nametables {
@@ -164,7 +165,7 @@ private:
     static constexpr int LayoutDim = 2, NtCount = LayoutDim * LayoutDim;
 
     SDL_Point ntSize;
-    Texture<SDL_TEXTUREACCESS_TARGET> tex;
+    texture::Texture<SDL_TEXTUREACCESS_TARGET> tex;
 };
 
 }

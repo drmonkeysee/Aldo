@@ -43,7 +43,7 @@ public:
         if (!aldo_snapshot_extend(getp())) throw AldoError{
             "Unable to extend snapshot", "System error", errno,
         };
-        aldo_nes_snapshot(console, getp());
+        aldo_nes_set_snapshot(console, getp());
     }
     Snapshot(const Snapshot&) = delete;
     Snapshot& operator=(const Snapshot&) = delete;

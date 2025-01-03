@@ -81,12 +81,6 @@ static void tick_start(struct runclock *c, const struct aldo_snapshot *snp)
     }
 }
 
-static void emu_update(struct emulator *emu, struct runclock *c)
-{
-    aldo_nes_clock(emu->console, &c->clock);
-    aldo_nes_snapshot(emu->console, &emu->snapshot);
-}
-
 static void update_progress(const struct runclock *c)
 {
     static const char distractor[] = {'|', '/', '-', '\\'};
@@ -145,7 +139,7 @@ int ui_batch_loop(struct emulator *emu)
     aldo_clock_start(&clock.clock);
     do {
         tick_start(&clock, &emu->snapshot);
-        emu_update(emu, &clock);
+        aldo_nes_clock(emu->console, &clock.clock);
         update_progress(&clock);
         tick_end(&clock);
     } while (QuitSignal == 0);

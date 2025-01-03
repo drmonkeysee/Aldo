@@ -32,6 +32,7 @@ enum {
 struct aldo_nes001 {
     aldo_cart *cart;            // Game Cartridge; Non-owning Pointer
     aldo_debugger *dbg;         // Debugger Context; Non-owning Pointer
+    struct aldo_snapshot *snp;  // Console Snapshot; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
     size_t vbuf;                // Current video buffer to fill
     struct aldo_mos6502 cpu;    // CPU Core of RP2A03 Chip
@@ -236,6 +237,24 @@ static void bus_snapshot(const struct aldo_nes001 *self,
     aldo_ppu_bus_snapshot(&self->ppu, snp);
     aldo_bus_copy(self->cpu.mbus, ALDO_CPU_VECTOR_NMI, memsz(snp->prg.vectors),
                   snp->prg.vectors);
+}
+
+static void exec_snapshot(struct aldo_nes001 *self)
+{
+    if (!self->snp) return;
+
+    bus_snapshot(self, self->snp);
+    aldo_ppu_vid_snapshot(&self->ppu, self->snp);
+    if (self->cart) {
+        aldo_cart_snapshot(self->cart, self->snp);
+    }
+    self->snp->mem.ram = self->ram;
+    self->snp->mem.vram = self->vram;
+    self->snp->prg.curr->length =
+        aldo_bus_copy(self->cpu.mbus,
+                      self->snp->cpu.datapath.current_instruction,
+                      memsz(self->snp->prg.curr->pc), self->snp->prg.curr->pc);
+    self->snp->video->screen = self->vbufs[!self->vbuf];
 }
 
 // NOTE: trace the just-fetched instruction
@@ -463,6 +482,7 @@ void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
         clock_cpu(self, clock);
         aldo_debug_check(self->dbg, clock);
     }
+    exec_snapshot(self);
 }
 
 int aldo_nes_cycle_factor(void)
@@ -475,24 +495,12 @@ int aldo_nes_frame_factor(void)
     return Aldo_DotsPerFrame;
 }
 
-void aldo_nes_snapshot(aldo_nes *self, struct aldo_snapshot *snp)
+void aldo_nes_set_snapshot(aldo_nes *self, struct aldo_snapshot *snp)
 {
     assert(self != NULL);
-    assert(snp != NULL);
-    assert(snp->prg.curr != NULL);
-    assert(snp->video != NULL);
 
-    bus_snapshot(self, snp);
-    aldo_ppu_vid_snapshot(&self->ppu, snp);
-    if (self->cart) {
-        aldo_cart_snapshot(self->cart, snp);
-    }
-    snp->mem.ram = self->ram;
-    snp->mem.vram = self->vram;
-    snp->prg.curr->length =
-        aldo_bus_copy(self->cpu.mbus, snp->cpu.datapath.current_instruction,
-                      memsz(snp->prg.curr->pc), snp->prg.curr->pc);
-    snp->video->screen = self->vbufs[!self->vbuf];
+    self->snp = snp;
+    exec_snapshot(self);
 }
 
 void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3], bool errs[static 3])

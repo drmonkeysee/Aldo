@@ -899,12 +899,6 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
     }
 }
 
-static void emu_update(struct emulator *emu, struct viewstate *vs)
-{
-    aldo_nes_clock(emu->console, &vs->clock.clock);
-    aldo_nes_snapshot(emu->console, &emu->snapshot);
-}
-
 static void refresh_ui(const struct layout *l, const struct viewstate *vs,
                        const struct emulator *emu)
 {
@@ -962,7 +956,7 @@ int ui_curses_loop(struct emulator *emu)
         tick_start(&state, emu);
         handle_input(&state, emu);
         if (state.running) {
-            emu_update(emu, &state);
+            aldo_nes_clock(emu->console, &state.clock.clock);
             refresh_ui(&layout, &state, emu);
         }
         tick_end(&state.clock);

@@ -202,8 +202,7 @@ static ui_loop *setup_ui(struct emulator *emu)
         aldo_nes_ready(emu->console, true);
         loop = ui_batch_loop;
     }
-    // NOTE: initialize snapshot from console
-    aldo_nes_snapshot(emu->console, &emu->snapshot);
+    aldo_nes_set_snapshot(emu->console, &emu->snapshot);
     return loop;
 }
 

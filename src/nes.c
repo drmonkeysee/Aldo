@@ -477,6 +477,8 @@ void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
     assert(self != NULL);
     assert(clock != NULL);
 
+    if (!self->cpu.signal.rdy) return;
+
     while (self->cpu.signal.rdy && clock->budget > 0) {
         if (!clock_ppu(self, clock)) continue;
         clock_cpu(self, clock);

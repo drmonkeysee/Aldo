@@ -58,10 +58,12 @@ auto load_cart(const std::filesystem::path& filepath)
 // MARK: - Public Interface
 //
 
-aldo::Emulator::Emulator(aldo::debug_handle d, aldo::console_handle n,
+aldo::Emulator::Emulator(aldo::debug_handle d, aldo::console_handle c,
                          const gui_platform& p)
-: prefspath{get_prefspath(p)}, hdbg{std::move(d)}, hconsole{std::move(n)},
-    hsnp{consolep()} {}
+: prefspath{get_prefspath(p)}, hdbg{std::move(d)}, hconsole{std::move(c)}
+{
+    aldo_nes_set_snapshot(consolep(), snapshotp());
+}
 
 std::string_view aldo::Emulator::displayCartName() const noexcept
 {
@@ -124,4 +126,5 @@ void aldo::Emulator::cleanup() const noexcept
     } catch (...) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unknown Emu dtor error!");
     }
+    aldo_nes_set_snapshot(consolep(), nullptr);
 }

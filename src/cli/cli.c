@@ -292,6 +292,7 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
         result = EXIT_FAILURE;
     }
     dump_ram(&emu);
+    aldo_nes_set_snapshot(emu.console, NULL);
     aldo_snapshot_cleanup(&emu.snapshot);
 exit_console:
     if (aldo_nes_tracefailed(emu.console)) {

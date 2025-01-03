@@ -38,12 +38,11 @@ using console_handle = handle<aldo_nes, aldo_nes_free>;
 
 class Snapshot {
 public:
-    explicit Snapshot(aldo_nes* console)
+    Snapshot()
     {
         if (!aldo_snapshot_extend(getp())) throw AldoError{
             "Unable to extend snapshot", "System error", errno,
         };
-        aldo_nes_set_snapshot(console, getp());
     }
     Snapshot(const Snapshot&) = delete;
     Snapshot& operator=(const Snapshot&) = delete;
@@ -71,7 +70,7 @@ public:
         return res;
     }
 
-    Emulator(debug_handle d, console_handle n, const gui_platform& p);
+    Emulator(debug_handle d, console_handle c, const gui_platform& p);
     Emulator(const Emulator&) = delete;
     Emulator& operator=(const Emulator&) = delete;
     Emulator(Emulator&&) = delete;

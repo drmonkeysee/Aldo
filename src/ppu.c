@@ -204,6 +204,11 @@ snapshot_palette(const struct aldo_rp2c02 *self,
     }
 }
 
+static void snapshot_nametables(const struct aldo_rp2c02 *self)
+{
+    (void)self;
+}
+
 //
 // MARK: - Main Bus Device (PPU registers)
 //
@@ -993,6 +998,7 @@ void aldo_ppu_vid_snapshot(struct aldo_rp2c02 *self, struct aldo_snapshot *snp)
 
     snapshot_palette(self, snp->video->palettes.bg, 0);
     snapshot_palette(self, snp->video->palettes.fg, 0x10);
+    snapshot_nametables(self);
 }
 
 bool aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f)

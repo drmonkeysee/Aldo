@@ -234,7 +234,7 @@ static void set_cpu_pins(struct aldo_nes001 *self)
 // MARK: - Snapshotting
 //
 
-static void bus_snapshot(const struct aldo_nes001 *self,
+static void snapshot_bus(const struct aldo_nes001 *self,
                          struct aldo_snapshot *snp)
 {
     aldo_cpu_snapshot(&self->cpu, snp);
@@ -243,7 +243,7 @@ static void bus_snapshot(const struct aldo_nes001 *self,
                   snp->prg.vectors);
 }
 
-static void gfx_snapshot(struct aldo_nes001 *self)
+static void snapshot_gfx(struct aldo_nes001 *self)
 {
     if (!self->snp) return;
 
@@ -253,7 +253,7 @@ static void gfx_snapshot(struct aldo_nes001 *self)
     }
 }
 
-static void screen_snapshot(struct aldo_nes001 *self)
+static void snapshot_screen(struct aldo_nes001 *self)
 {
     if (!self->snp) return;
 
@@ -263,24 +263,24 @@ static void screen_snapshot(struct aldo_nes001 *self)
     self->snp->video->newframe = true;
 }
 
-static void video_snapshot(struct aldo_nes001 *self, bool framedone)
+static void snapshot_video(struct aldo_nes001 *self, bool framedone)
 {
     // TODO: wire this up to UI selection and remove magic numbers
     if (self->ppu.line == 241 && self->ppu.dot == 0) {
-        gfx_snapshot(self);
+        snapshot_gfx(self);
     }
     if (framedone) {
-        screen_snapshot(self);
+        snapshot_screen(self);
     }
 }
 
-static void clock_snapshot(struct aldo_nes001 *self)
+static void snapshot_sys(struct aldo_nes001 *self)
 {
     if (!self->snp) return;
 
     assert(self->snp->prg.curr != NULL);
 
-    bus_snapshot(self, self->snp);
+    snapshot_bus(self, self->snp);
     self->snp->mem.ram = self->ram;
     self->snp->mem.vram = self->vram;
     self->snp->prg.curr->length =
@@ -298,9 +298,9 @@ static void reset_snapshot(struct aldo_snapshot *snp)
 
 static void init_snapshot(struct aldo_nes001 *self)
 {
-    clock_snapshot(self);
-    gfx_snapshot(self);
-    screen_snapshot(self);
+    snapshot_sys(self);
+    snapshot_gfx(self);
+    snapshot_screen(self);
 }
 
 //
@@ -314,7 +314,7 @@ static void instruction_trace(struct aldo_nes001 *self,
     if (!self->tracelog || self->tracefailed || !self->cpu.signal.sync) return;
 
     struct aldo_snapshot snp = {0};
-    bus_snapshot(self, &snp);
+    snapshot_bus(self, &snp);
     // NOTE: trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
     self->tracefailed = !aldo_trace_line(self->tracelog, adjustment,
@@ -330,7 +330,7 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
     set_ppu_pins(self);
     set_screen_dot(self);
     self->vbuf ^= framedone;
-    video_snapshot(self, framedone);
+    snapshot_video(self, framedone);
     // TODO: ppu debug hook goes here
     if (++clock->subcycle < Aldo_PpuRatio) {
         if (self->mode == ALDO_EXC_SUBCYCLE) {
@@ -534,7 +534,7 @@ void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
         clock_cpu(self, clock);
         aldo_debug_check(self->dbg, clock);
     }
-    clock_snapshot(self);
+    snapshot_sys(self);
 }
 
 int aldo_nes_cycle_factor(void)

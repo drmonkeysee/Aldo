@@ -266,7 +266,7 @@ static void screen_snapshot(struct aldo_nes001 *self)
 static void video_snapshot(struct aldo_nes001 *self, bool framedone)
 {
     // TODO: wire this up to UI selection and remove magic numbers
-    if (self->ppu.line == 242 && self->ppu.dot == 0) {
+    if (self->ppu.line == 241 && self->ppu.dot == 0) {
         gfx_snapshot(self);
     }
     if (framedone) {

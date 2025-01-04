@@ -23,6 +23,8 @@ enum {
     ALDO_CHR_TILE_DIM = 8,
     ALDO_CHR_TILE_STRIDE = 2 * ALDO_CHR_TILE_DIM,
     ALDO_PT_TILE_COUNT = 256,
+    ALDO_NT_WIDTH = 32,
+    ALDO_NT_HEIGHT = 30,
 };
 
 struct aldo_snapshot {
@@ -78,6 +80,11 @@ struct aldo_snapshot {
 
     struct {
         uint8_t *screen;        // Non-owning Pointer
+        // TODO: include scroll position, attribute table?
+        struct {
+            uint8_t paletteid, tileid;
+            bool pt;
+        } nametables[2][ALDO_NT_WIDTH * ALDO_NT_HEIGHT];
         // A Pattern Table is 256 tiles x 8 rows x 8 pixels x 2 bits.
         struct {
             uint16_t

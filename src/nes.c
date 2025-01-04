@@ -260,6 +260,7 @@ static void screen_snapshot(struct aldo_nes001 *self)
     assert(self->snp->video != NULL);
 
     self->snp->video->screen = self->vbufs[!self->vbuf];
+    self->snp->video->newframe = true;
 }
 
 static void video_snapshot(struct aldo_nes001 *self, bool framedone)
@@ -286,6 +287,13 @@ static void clock_snapshot(struct aldo_nes001 *self)
         aldo_bus_copy(self->cpu.mbus,
                       self->snp->cpu.datapath.current_instruction,
                       memsz(self->snp->prg.curr->pc), self->snp->prg.curr->pc);
+}
+
+static void reset_snapshot(struct aldo_snapshot *snp)
+{
+    if (!snp) return;
+
+    snp->video->newframe = false;
 }
 
 static void init_snapshot(struct aldo_nes001 *self)
@@ -520,6 +528,7 @@ void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
     assert(self != NULL);
     assert(clock != NULL);
 
+    reset_snapshot(self->snp);
     while (self->cpu.signal.rdy && clock->budget > 0) {
         if (!clock_ppu(self, clock)) continue;
         clock_cpu(self, clock);

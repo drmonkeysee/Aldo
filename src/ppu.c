@@ -733,7 +733,6 @@ static bool nextdot(struct aldo_rp2c02 *self)
         if (++self->line >= Lines) {
             self->line = 0;
             self->odd = !self->odd;
-            self->fsr = true;
             return true;
         }
     }
@@ -745,7 +744,7 @@ static void reset_internals(struct aldo_rp2c02 *self)
     // NOTE: t is cleared but NOT v
     self->dot = self->line = self->t = self->rbuf = self->x = 0;
     self->signal.intr = true;
-    self->signal.ale = self->cvp = self->fsr = self->odd = self->w = false;
+    self->signal.ale = self->cvp = self->odd = self->w = false;
     set_ctrl(self, 0);
     set_mask(self, 0);
 }
@@ -994,8 +993,6 @@ void aldo_ppu_vid_snapshot(struct aldo_rp2c02 *self, struct aldo_snapshot *snp)
 
     snapshot_palette(self, snp->video->palettes.bg, 0);
     snapshot_palette(self, snp->video->palettes.fg, 0x10);
-    snp->video->newframe = self->fsr;
-    self->fsr = false;
 }
 
 bool aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f)

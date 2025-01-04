@@ -113,7 +113,6 @@ struct aldo_rp2c02 {
     bool
         bflt,               // Bus fault
         cvp,                // Pending CPU VRAM Operation
-        fsr,                // Completed video frame ready for next snapshot
         odd,                // Current frame is even or odd
         w;                  // Write latch for x2 registers
 

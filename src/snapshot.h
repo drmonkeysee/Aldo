@@ -23,10 +23,11 @@ enum {
     ALDO_CHR_TILE_DIM = 8,
     ALDO_CHR_TILE_STRIDE = 2 * ALDO_CHR_TILE_DIM,
     ALDO_PT_TILE_COUNT = 256,
+    ALDO_NT_COUNT = 2,
     ALDO_NT_WIDTH = 32,
     ALDO_NT_HEIGHT = 30,
-    ALDO_NT_COUNT = ALDO_NT_WIDTH * ALDO_NT_HEIGHT,
-    ALDO_ATTR_COUNT = 64,
+    ALDO_NT_TILE_COUNT = ALDO_NT_WIDTH * ALDO_NT_HEIGHT,
+    ALDO_NT_ATTR_COUNT = 64,
 };
 
 // TODO: add additional mirror types as we expand mapper support
@@ -92,10 +93,10 @@ struct aldo_snapshot {
         struct {
             enum aldo_ntmirror mirror;
             struct {
-                uint8_t attributes[ALDO_ATTR_COUNT],
-                        palettes[ALDO_NT_COUNT],
-                        tiles[ALDO_NT_COUNT];
-            } tables[2];
+                uint8_t attributes[ALDO_NT_ATTR_COUNT],
+                        palettes[ALDO_NT_TILE_COUNT],
+                        tiles[ALDO_NT_TILE_COUNT];
+            } tables[ALDO_NT_COUNT];
             bool pt;
         } nt;
         // A Pattern Table is 256 tiles x 8 rows x 8 pixels x 2 bits.

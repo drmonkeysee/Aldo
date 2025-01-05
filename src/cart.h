@@ -33,13 +33,13 @@ enum aldo_cartformat {
 
 // X(symbol, name)
 #define ALDO_CART_NTMIRROR_X \
-X(NTM_HORIZONTAL, "Horizontal") \
-X(NTM_VERTICAL, "Vertical") \
-X(NTM_1SCREEN, "Single-Screen") \
-X(NTM_4SCREEN, "4-Screen VRAM") \
-X(NTM_OTHER, "Mapper-Specific")
+X(CNTM_HORIZONTAL, "Horizontal") \
+X(CNTM_VERTICAL, "Vertical") \
+X(CNTM_1SCREEN, "Single-Screen") \
+X(CNTM_4SCREEN, "4-Screen VRAM") \
+X(CNTM_OTHER, "Mapper-Specific")
 
-enum aldo_nt_mirroring {
+enum aldo_cart_ntm {
 #define X(s, n) ALDO_##s,
     ALDO_CART_NTMIRROR_X
 #undef X
@@ -51,7 +51,7 @@ enum aldo_nt_mirroring {
 //  - TV System (PAL ROMs don't seem to set the flags so again who cares)
 //  - redundant indicators in byte 10
 struct aldo_ines_header {
-    enum aldo_nt_mirroring mirror;  // Nametable Mirroring
+    enum aldo_cart_ntm mirror;      // Nametable Mirroring Designation
     uint8_t chr_blocks,             // CHR ROM block count; 0 indicates CHR RAM
                                     //      1 block = 8KB
             mapper_id,              // Mapper ID
@@ -120,7 +120,7 @@ void aldo_cart_free(aldo_cart *self) br_nothrow;
 br_libexport
 const char *aldo_cart_formatname(enum aldo_cartformat format) br_nothrow;
 br_libexport
-const char *aldo_cart_mirrorname(enum aldo_nt_mirroring mirror) br_nothrow;
+const char *aldo_cart_mirrorname(enum aldo_cart_ntm mirror) br_nothrow;
 br_libexport br_checkerror
 int
 aldo_cart_format_extname(aldo_cart *self,

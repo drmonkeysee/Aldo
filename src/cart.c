@@ -75,10 +75,10 @@ static int parse_ines(struct aldo_cartridge *self, FILE *f)
 
     // NOTE: mapper may override these two fields
     info->ines_hdr.mirror = header[6] & 0x8
-                                ? ALDO_NTM_4SCREEN
+                                ? ALDO_CNTM_4SCREEN
                                 : (header[6] & 0x1
-                                   ? ALDO_NTM_VERTICAL
-                                   : ALDO_NTM_HORIZONTAL);
+                                   ? ALDO_CNTM_VERTICAL
+                                   : ALDO_CNTM_HORIZONTAL);
     info->ines_hdr.mapper_controlled = false;
 
     info->ines_hdr.trainer = header[6] & 0x4;
@@ -268,7 +268,7 @@ const char *aldo_cart_formatname(enum aldo_cartformat format)
     }
 }
 
-const char *aldo_cart_mirrorname(enum aldo_nt_mirroring mirror)
+const char *aldo_cart_mirrorname(enum aldo_cart_ntm mirror)
 {
     switch (mirror) {
 #define X(s, n) case ALDO_##s: return n;

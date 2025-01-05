@@ -204,11 +204,6 @@ snapshot_palette(const struct aldo_rp2c02 *self,
     }
 }
 
-static void snapshot_nametables(const struct aldo_rp2c02 *self)
-{
-    (void)self;
-}
-
 //
 // MARK: - Main Bus Device (PPU registers)
 //
@@ -362,6 +357,14 @@ static void write(struct aldo_rp2c02 *self)
         self->bflt = !aldo_bus_write(self->vbus, self->vaddrbus,
                                      self->vdatabus);
     }
+}
+
+static void snapshot_nametables(const struct aldo_rp2c02 *self)
+{
+    (void)self;
+    // bus copy into tiles and attributes?
+    // then calculate palette ids
+    // set mirroring
 }
 
 //

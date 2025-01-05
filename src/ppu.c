@@ -32,8 +32,8 @@ static const int
 
 // NOTE: helpers for manipulating v and t registers
 static const uint16_t
-    HNtBit = 0x400, VNtBit = 0x800, NtBits = VNtBit | HNtBit,
-    CourseYBits = 0x3e0, FineYBits = 0x7000;
+    BaseNtAddr = 0x2000, HNtBit = 0x400, VNtBit = 0x800,
+    NtBits = VNtBit | HNtBit, CourseYBits = 0x3e0, FineYBits = 0x7000;
 static const uint8_t CourseXBits = 0x1f, PaletteMask = CourseXBits;
 
 //
@@ -359,12 +359,20 @@ static void write(struct aldo_rp2c02 *self)
     }
 }
 
-static void snapshot_nametables(const struct aldo_rp2c02 *self)
+static void snapshot_nametables(const struct aldo_rp2c02 *self,
+                                struct aldo_snapshot *snp)
 {
-    (void)self;
-    // bus copy into tiles and attributes?
+    snp->video->nt.pt = self->ctrl.b;
     // then calculate palette ids
-    // set mirroring
+    size_t ntcount = sizeof snp->video->nt.tables
+                        / sizeof snp->video->nt.tables[0];
+    for (size_t i = 0; i < ntcount; ++i) {
+        uint16_t base_addr = BaseNtAddr + (HNtBit * (uint16_t)i);
+        aldo_bus_copy(self->vbus, base_addr, ALDO_NT_COUNT,
+                      snp->video->nt.tables[i].tiles);
+        aldo_bus_copy(self->vbus, base_addr + ALDO_NT_COUNT, ALDO_ATTR_COUNT,
+                      snp->video->nt.tables[i].attributes);
+    }
 }
 
 //
@@ -529,7 +537,7 @@ static void shift_tiles(struct aldo_rp2c02 *self)
 
 static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
 {
-    return 0x2000 | (self->v & ALDO_ADDRMASK_4KB);
+    return BaseNtAddr | (self->v & ALDO_ADDRMASK_4KB);
 }
 
 static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
@@ -1001,7 +1009,7 @@ void aldo_ppu_vid_snapshot(struct aldo_rp2c02 *self, struct aldo_snapshot *snp)
 
     snapshot_palette(self, snp->video->palettes.bg, 0);
     snapshot_palette(self, snp->video->palettes.fg, 0x10);
-    snapshot_nametables(self);
+    snapshot_nametables(self, snp);
 }
 
 bool aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f)

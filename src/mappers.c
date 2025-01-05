@@ -270,6 +270,16 @@ static bool ines_000_vrmw(void *ctx, uint16_t addr, uint8_t d)
                          m->hmirroring ? hmirror_addr(addr) : addr, d);
 }
 
+static size_t ines_000_vrmc(const void *restrict ctx, uint16_t addr,
+                            size_t count, uint8_t dest[restrict count])
+{
+    // NOTE: addr=[$2000-$3FFF]
+    assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
+
+    const struct ines_000_mapper *m = ctx;
+    return m->vrbd.copy(m->vrbd.ctx, addr, count, dest);
+}
+
 // TODO: binding to $8000 is too simple; WRAM needs at least $6000, and the
 // CPU memory map defines start of cart mapping at $4020; the most complex
 // mappers need access to entire 64KB address space in order to snoop on
@@ -299,9 +309,10 @@ static bool ines_000_vbus_connect(struct aldo_mapper *self, aldo_bus *b)
     // will treat the base VRAM bus device as a mapper device and
     // (probably... hopefully) crash.
     && aldo_bus_swap(b, ALDO_MEMBLOCK_8KB, (struct aldo_busdevice){
-        .read = ines_000_vrmr,
-        .write = ines_000_vrmw,
-        .ctx = m,
+        ines_000_vrmr,
+        ines_000_vrmw,
+        ines_000_vrmc,
+        m,
     }, &m->vrbd);
 }
 
@@ -324,11 +335,16 @@ static void ines_000_snapshot(struct aldo_mapper *self,
     assert(snp != NULL);
     assert(snp->video != NULL);
 
-    struct ines_mapper *m = (struct ines_mapper *)self;
-    if (!m->ptstale) return;
+    struct ines_000_mapper *m = (struct ines_000_mapper *)self;
+    snp->video->nt.mirror = m->hmirroring
+                            ? ALDO_NTM_HORIZONTAL
+                            : ALDO_NTM_VERTICAL;
+
+    struct ines_mapper *b = &m->super;
+    if (!b->ptstale) return;
 
     struct aldo_blockview bv = {
-        .mem = m->chr,
+        .mem = b->chr,
         .size = ALDO_MEMBLOCK_4KB,
     };
     fill_pattern_table(ALDO_PT_TILE_COUNT, snp->video->pattern_tables.left,
@@ -337,7 +353,7 @@ static void ines_000_snapshot(struct aldo_mapper *self,
     ++bv.ord;
     fill_pattern_table(ALDO_PT_TILE_COUNT, snp->video->pattern_tables.right,
                        &bv);
-    m->ptstale = false;
+    b->ptstale = false;
 }
 
 //

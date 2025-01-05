@@ -29,6 +29,12 @@ enum {
     ALDO_ATTR_COUNT = 64,
 };
 
+// TODO: add additional mirror types as we expand mapper support
+enum aldo_ntmirror {
+    ALDO_NTM_VERTICAL,
+    ALDO_NTM_HORIZONTAL,
+};
+
 struct aldo_snapshot {
     struct {
         uint16_t program_counter;
@@ -84,10 +90,14 @@ struct aldo_snapshot {
         uint8_t *screen;        // Non-owning Pointer
         // TODO: include scroll position?
         struct {
-            uint8_t attributes[ALDO_ATTR_COUNT],
-                    palettes[ALDO_NT_COUNT],
-                    tiles[ALDO_NT_COUNT];
-        } nametables[2];
+            enum aldo_ntmirror mirror;
+            struct {
+                uint8_t attributes[ALDO_ATTR_COUNT],
+                        palettes[ALDO_NT_COUNT],
+                        tiles[ALDO_NT_COUNT];
+            } tables[2];
+            bool pt;
+        } nt;
         // A Pattern Table is 256 tiles x 8 rows x 8 pixels x 2 bits.
         struct {
             uint16_t
@@ -99,7 +109,7 @@ struct aldo_snapshot {
             uint8_t bg[ALDO_PAL_SIZE][ALDO_PAL_SIZE],
                     fg[ALDO_PAL_SIZE][ALDO_PAL_SIZE];
         } palettes;
-        bool currpt, newframe;
+        bool newframe;
     } *video;
 };
 

@@ -50,15 +50,22 @@ struct aldo_nes001 {
             vbufs[2][SCREEN_WIDTH * SCREEN_HEIGHT]; // Double-buffered Video
 };
 
-static void ram_load(uint8_t *restrict d, const uint8_t *restrict mem,
+static void mem_load(uint8_t *restrict d, const uint8_t *restrict mem,
                      uint16_t addr)
 {
     *d = mem[addr & ALDO_ADDRMASK_2KB];
 }
 
-static void ram_store(uint8_t *mem, uint16_t addr, uint8_t d)
+static void mem_store(uint8_t *mem, uint16_t addr, uint8_t d)
 {
     mem[addr & ALDO_ADDRMASK_2KB] = d;
+}
+
+static size_t mem_copy(const void *restrict ctx, uint16_t addr, size_t count,
+                       uint8_t dest[restrict count])
+{
+    // NOTE: only 2KB of actual mem to copy
+    return aldo_bytecopy_bank(ctx, ALDO_BITWIDTH_2KB, addr, count, dest);
 }
 
 static bool ram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
@@ -66,7 +73,7 @@ static bool ram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     // NOTE: addr=[$0000-$1FFF]
     assert(addr < ALDO_MEMBLOCK_8KB);
 
-    ram_load(d, ctx, addr);
+    mem_load(d, ctx, addr);
     return true;
 }
 
@@ -75,7 +82,7 @@ static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
     // NOTE: addr=[$0000-$1FFF]
     assert(addr < ALDO_MEMBLOCK_8KB);
 
-    ram_store(ctx, addr, d);
+    mem_store(ctx, addr, d);
     return true;
 }
 
@@ -85,8 +92,7 @@ static size_t ram_copy(const void *restrict ctx, uint16_t addr, size_t count,
     // NOTE: addr=[$0000-$1FFF]
     assert(addr < ALDO_MEMBLOCK_8KB);
 
-    // NOTE: only 2KB of actual mem to copy
-    return aldo_bytecopy_bank(ctx, ALDO_BITWIDTH_2KB, addr, count, dest);
+    return mem_copy(ctx, addr, count, dest);
 }
 
 static bool vram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
@@ -96,7 +102,7 @@ static bool vram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     // buffers, so the full 8KB range is valid input.
     assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
 
-    ram_load(d, ctx, addr);
+    mem_load(d, ctx, addr);
     return true;
 }
 
@@ -106,8 +112,17 @@ static bool vram_write(void *ctx, uint16_t addr, uint8_t d)
     // NOTE: writes to palette RAM should never hit the video bus
     assert(ALDO_MEMBLOCK_8KB <= addr && addr < Aldo_PaletteStartAddr);
 
-    ram_store(ctx, addr, d);
+    mem_store(ctx, addr, d);
     return true;
+}
+
+static size_t vram_copy(const void *restrict ctx, uint16_t addr, size_t count,
+                        uint8_t dest[restrict count])
+{
+    // NOTE: addr=[$2000-$3FFF]
+    assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
+
+    return mem_copy(ctx, addr, count, dest);
 }
 
 static bool create_mbus(struct aldo_nes001 *self)
@@ -148,9 +163,10 @@ static bool create_vbus(struct aldo_nes001 *self)
 
     bool r = aldo_bus_set(self->ppu.vbus, ALDO_MEMBLOCK_8KB,
                           (struct aldo_busdevice){
-        .read = vram_read,
-        .write = vram_write,
-        .ctx = self->vram,
+        vram_read,
+        vram_write,
+        vram_copy,
+        self->vram,
     });
     (void)r, assert(r);
     return true;

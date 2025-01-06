@@ -392,7 +392,7 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
      */
     // NOTE: no fixed palette for tiles so use grayscale;
     // fun fact, this is the original Gameboy palette.
-    uint8_t palettes[BMP_PALETTE_SIZE] = {
+    static const uint8_t palettes[BMP_PALETTE_SIZE] = {
         0, 0, 0, 0,         // #000000
         103, 103, 103, 0,   // #676767
         182, 182, 182, 0,   // #b6b6b6

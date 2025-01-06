@@ -213,12 +213,12 @@ static void dump_ram(const struct emulator *emu)
         "vram.bin",
         "ppu.bin",
     };
-    // TODO: constexpr in c23 can get rid of redundant sizeof exprs here
+    // TODO: constexpr in c23 will remove the VLAs below
     static const size_t dmpcount = sizeof dmpfiles / sizeof dmpfiles[0];
 
     if (!emu->args->tron && !emu->args->batch) return;
 
-    FILE *fs[sizeof dmpfiles / sizeof dmpfiles[0]];
+    FILE *fs[dmpcount];
     for (size_t i = 0; i < dmpcount; ++i) {
         fs[i] = fopen(dmpfiles[i], "wb");
         if (!fs[i]) {
@@ -226,7 +226,7 @@ static void dump_ram(const struct emulator *emu)
             perror("Cannot open ramdump file");
         }
     }
-    bool errs[sizeof dmpfiles / sizeof dmpfiles[0]];
+    bool errs[dmpcount];
     aldo_nes_dumpram(emu->console, fs, errs);
     for (size_t i = 0; i < dmpcount; ++i) {
         if (fs[i]) {

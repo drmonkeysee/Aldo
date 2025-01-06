@@ -8,6 +8,7 @@
 #include "cli.h"
 
 #include "argparse.h"
+#include "bytes.h"
 #include "cart.h"
 #include "cliargs.h"
 #include "debug.h"
@@ -214,7 +215,7 @@ static void dump_ram(const struct emulator *emu)
         "ppu.bin",
     };
     // TODO: constexpr in c23 will remove the VLAs below
-    static const size_t dmpcount = sizeof dmpfiles / sizeof dmpfiles[0];
+    static const size_t dmpcount = aldo_arrsz(dmpfiles);
 
     if (!emu->args->tron && !emu->args->batch) return;
 

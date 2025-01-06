@@ -20,8 +20,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define memsz(mem) (sizeof (mem) / sizeof (mem)[0])
-
 enum {
     SCREEN_WIDTH = 256,
     SCREEN_HEIGHT = 240,
@@ -234,7 +232,7 @@ static void set_screen_dot(struct aldo_nes001 *self)
     if (c.dot < 0) return;
 
     size_t screendot = (size_t)(c.dot + (c.line * SCREEN_WIDTH));
-    assert(screendot < memsz(self->vbufs[self->vbuf]));
+    assert(screendot < aldo_arrsz(self->vbufs[self->vbuf]));
     self->vbufs[self->vbuf][screendot] = self->ppu.pxpl.px;
 }
 
@@ -255,8 +253,8 @@ static void snapshot_bus(const struct aldo_nes001 *self,
 {
     aldo_cpu_snapshot(&self->cpu, snp);
     aldo_ppu_bus_snapshot(&self->ppu, snp);
-    aldo_bus_copy(self->cpu.mbus, ALDO_CPU_VECTOR_NMI, memsz(snp->prg.vectors),
-                  snp->prg.vectors);
+    aldo_bus_copy(self->cpu.mbus, ALDO_CPU_VECTOR_NMI,
+                  aldo_arrsz(snp->prg.vectors), snp->prg.vectors);
 }
 
 static void snapshot_gfx(struct aldo_nes001 *self)
@@ -302,7 +300,8 @@ static void snapshot_sys(struct aldo_nes001 *self)
     self->snp->prg.curr->length =
         aldo_bus_copy(self->cpu.mbus,
                       self->snp->cpu.datapath.current_instruction,
-                      memsz(self->snp->prg.curr->pc), self->snp->prg.curr->pc);
+                      aldo_arrsz(self->snp->prg.curr->pc),
+                      self->snp->prg.curr->pc);
 }
 
 static void reset_snapshot(struct aldo_snapshot *snp)
@@ -400,8 +399,8 @@ aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
     self->probe.irq = self->probe.nmi = self->probe.rst = false;
     self->vbuf = 0;
     // NOTE: uninitialized vbuffer can have out-of-range palette values
-    for (size_t i = 0; i < memsz(self->vbufs); ++i) {
-        memset(self->vbufs[i], 0, memsz(self->vbufs[i]));
+    for (size_t i = 0; i < aldo_arrsz(self->vbufs); ++i) {
+        memset(self->vbufs[i], 0, aldo_arrsz(self->vbufs[i]));
     }
     if (!setup(self)) {
         aldo_nes_free(self);
@@ -427,8 +426,8 @@ void aldo_nes_powerup(aldo_nes *self, aldo_cart *c, bool zeroram)
         connect_cart(self, c);
     }
     if (zeroram) {
-        memset(self->ram, 0, memsz(self->ram));
-        memset(self->vram, 0, memsz(self->vram));
+        memset(self->ram, 0, aldo_arrsz(self->ram));
+        memset(self->vram, 0, aldo_arrsz(self->vram));
         aldo_ppu_zeroram(&self->ppu);
     }
     aldo_cpu_powerup(&self->cpu);
@@ -453,7 +452,7 @@ size_t aldo_nes_ram_size(aldo_nes *self)
 {
     assert(self != NULL);
 
-    return memsz(self->ram);
+    return aldo_arrsz(self->ram);
 }
 
 void aldo_nes_screen_size(int *width, int *height)
@@ -580,12 +579,12 @@ void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3], bool errs[static 3])
     FILE *f;
     size_t witems, wcount;
     if ((f = fs[0])) {
-        witems = memsz(self->ram);
+        witems = aldo_arrsz(self->ram);
         wcount = fwrite(self->ram, sizeof self->ram[0], witems, f);
         errs[0] = wcount < witems;
     }
     if ((f = fs[1])) {
-        witems = memsz(self->vram);
+        witems = aldo_arrsz(self->vram);
         wcount = fwrite(self->vram, sizeof self->vram[0], witems, f);
         errs[1] = wcount < witems;
     }

@@ -49,6 +49,8 @@ enum {
 
 // Extract bit @pos from unsigned value
 #define aldo_getbit(uval, pos) (((uval) >> (pos)) & 0x1)
+// Size from array expression
+#define aldo_arrsz(arr) (sizeof (arr) / sizeof (arr)[0])
 
 #include "bridgeopen.h"
 // NOTE: convert unsigned values into little-endian byte representations;

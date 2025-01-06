@@ -7,6 +7,8 @@
 
 #include "decode.h"
 
+#include "bytes.h"
+
 #include <assert.h>
 
 #define N {0}
@@ -312,5 +314,4 @@ const struct aldo_decoded Aldo_Decode[] = {
     UP(IN_ISC, AM_ABSX, APM, CY(7)),    // FF - *ISC (ISB, INS) abs,X
 };
 
-static_assert(sizeof Aldo_Decode / sizeof Aldo_Decode[0] == 256,
-              "Incorrect decode table size!");
+static_assert(aldo_arrsz(Aldo_Decode) == 256, "Incorrect decode table size!");

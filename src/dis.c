@@ -65,26 +65,28 @@ static const char *const restrict *const StringTables[] = {
 
 static const char *mnemonic(enum aldo_inst in)
 {
-    static const size_t sz = sizeof Mnemonics / sizeof Mnemonics[0];
-    return 0 <= in && in < sz ? Mnemonics[in] : Mnemonics[ALDO_IN_UDF];
+    return 0 <= in && in < aldo_arrsz(Mnemonics)
+            ? Mnemonics[in]
+            : Mnemonics[ALDO_IN_UDF];
 }
 
 static const char *description(enum aldo_inst in)
 {
-    static const size_t sz = sizeof Descriptions / sizeof Descriptions[0];
-    return 0 <= in && in < sz ? Descriptions[in] : Descriptions[ALDO_IN_UDF];
+    return 0 <= in && in < aldo_arrsz(Descriptions)
+            ? Descriptions[in]
+            : Descriptions[ALDO_IN_UDF];
 }
 
 static const char *modename(enum aldo_addrmode am)
 {
-    static const size_t sz = sizeof ModeNames / sizeof ModeNames[0];
-    return 0 <= am && am < sz ? ModeNames[am] : ModeNames[ALDO_AM_IMP];
+    return 0 <= am && am < aldo_arrsz(ModeNames)
+            ? ModeNames[am]
+            : ModeNames[ALDO_AM_IMP];
 }
 
 static uint8_t flags(enum aldo_inst in)
 {
-    static const size_t sz = sizeof Flags / sizeof Flags[0];
-    return 0 <= in && in < sz ? Flags[in] : Flags[ALDO_IN_UDF];
+    return 0 <= in && in < aldo_arrsz(Flags) ? Flags[in] : Flags[ALDO_IN_UDF];
 }
 
 static const char *interrupt_display(const struct aldo_snapshot *snp)
@@ -349,7 +351,7 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
                 fileheader + 2);
     aldo_dwtoba(BMP_HEADER_SIZE, fileheader + 10);          // bfOffBits
     size_t
-        witems = sizeof fileheader / sizeof fileheader[0],
+        witems = aldo_arrsz(fileheader),
         wcount = fwrite(fileheader, sizeof fileheader[0], witems, bmpfile);
     if (wcount < witems) return ALDO_DIS_ERR_IO;
 
@@ -377,7 +379,7 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
     };
     aldo_dwtoba(bmpw, infoheader + 4);   // biWidth
     aldo_dwtoba(bmph, infoheader + 8);   // biHeight
-    witems = sizeof infoheader / sizeof infoheader[0];
+    witems = aldo_arrsz(infoheader);
     wcount = fwrite(infoheader, sizeof infoheader[0], witems, bmpfile);
     if (wcount < witems) return ALDO_DIS_ERR_IO;
 
@@ -398,7 +400,7 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
         182, 182, 182, 0,   // #b6b6b6
         255, 255, 255, 0,   // #ffffff
     };
-    witems = sizeof palettes / sizeof palettes[0];
+    witems = aldo_arrsz(palettes);
     wcount = fwrite(palettes, sizeof palettes[0], witems, bmpfile);
     if (wcount < witems) return ALDO_DIS_ERR_IO;
 

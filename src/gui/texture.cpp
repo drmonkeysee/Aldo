@@ -144,7 +144,7 @@ void aldo::PatternTable::drawTileRow(aldo::et::word row,
                                      int texOffset, const aldo::Palette& p,
                                      const aldo::tex::TextureData& data)
 {
-    for (auto px = 0; px < ALDO_CHR_TILE_DIM; ++px) {
+    for (auto px = 0; px < static_cast<int>(pt_tile::extent); ++px) {
         auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
         assert(0 <= pidx);
         decltype(colors)::size_type texel = (row & (0x3 << pidx)) >> pidx;

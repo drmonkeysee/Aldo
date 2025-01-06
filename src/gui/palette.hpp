@@ -23,9 +23,7 @@ namespace aldo
 namespace palette
 {
 
-inline constexpr const char
-    * FileExtension = "pal",
-    * Name = "Default";
+inline constexpr const char* FileExtension = "pal", * Name = "Default";
 
 // NOTE: 2C02 palette from https://www.nesdev.org/wiki/PPU_palettes
 inline constexpr std::array Default {

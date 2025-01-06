@@ -36,7 +36,7 @@ auto create_window(SDL_Point windowSize, const gui_platform& p)
 }
 
 ALDO_OWN
-auto create_renderer(const aldo::win_handle& hwin, const gui_platform& p)
+auto create_renderer(const aldo::mr::win_handle& hwin, const gui_platform& p)
 {
     auto ren = SDL_CreateRenderer(hwin.get(), -1, SDL_RENDERER_PRESENTVSYNC);
     if (!ren) throw aldo::SdlError{"SDL renderer creation failure"};
@@ -56,19 +56,19 @@ auto create_renderer(const aldo::win_handle& hwin, const gui_platform& p)
 // MARK: - Public Interface
 //
 
-aldo::SdlLib::SdlLib()
+aldo::mr::SdlLib::SdlLib()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
         throw aldo::SdlError{"SDL initialization failure"};
 }
 
-aldo::SdlLib::~SdlLib()
+aldo::mr::SdlLib::~SdlLib()
 {
     SDL_Quit();
 }
 
-aldo::DearImGuiLib::DearImGuiLib(const aldo::win_handle& hwin,
-                                 const aldo::ren_handle& hren)
+aldo::mr::DearImGuiLib::DearImGuiLib(const aldo::mr::win_handle& hwin,
+                                     const aldo::mr::ren_handle& hren)
 {
     if (!IMGUI_CHECKVERSION())
         throw std::runtime_error{"DearImGui initialization failure"};
@@ -80,7 +80,7 @@ aldo::DearImGuiLib::DearImGuiLib(const aldo::win_handle& hwin,
     ImGui::StyleColorsDark();
 }
 
-aldo::DearImGuiLib::~DearImGuiLib()
+aldo::mr::DearImGuiLib::~DearImGuiLib()
 {
     ImGui_ImplSDLRenderer2_Shutdown();
     ImGui_ImplSDL2_Shutdown();

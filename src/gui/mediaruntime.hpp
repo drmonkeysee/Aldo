@@ -18,6 +18,9 @@ struct gui_platform;
 namespace aldo
 {
 
+namespace mr
+{
+
 using win_handle = handle<SDL_Window, SDL_DestroyWindow>;
 using ren_handle = handle<SDL_Renderer, SDL_DestroyRenderer>;
 
@@ -41,6 +44,8 @@ public:
     ~DearImGuiLib();
 };
 
+}
+
 class ALDO_SIDEFX MediaRuntime {
 public:
     [[nodiscard("check error")]]
@@ -57,10 +62,10 @@ private:
     inline static int InitStatus;
 
     const gui_platform& p;
-    SdlLib sdl;
-    win_handle hwin;
-    ren_handle hren;
-    DearImGuiLib imgui;
+    mr::SdlLib sdl;
+    mr::win_handle hwin;
+    mr::ren_handle hren;
+    mr::DearImGuiLib imgui;
 };
 
 }

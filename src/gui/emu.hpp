@@ -31,10 +31,14 @@ struct gui_platform;
 namespace aldo
 {
 
+class Emulator;
 struct viewstate;
+using console_handle = handle<aldo_nes, aldo_nes_free>;
+
+namespace emu
+{
 
 using cart_handle = handle<aldo_cart, aldo_cart_free>;
-using console_handle = handle<aldo_nes, aldo_nes_free>;
 
 class Snapshot {
 public:
@@ -54,12 +58,14 @@ public:
     const aldo_snapshot* getp() const noexcept { return &snp; }
 
 private:
-    friend class Emulator;
+    friend class aldo::Emulator;
 
     aldo_snapshot* getp() noexcept { return &snp; }
 
     aldo_snapshot snp{};
 };
+
+}
 
 class ALDO_SIDEFX Emulator {
 public:
@@ -125,10 +131,10 @@ private:
     void cleanup() const noexcept;
 
     std::filesystem::path cartname, cartpath, prefspath;
-    cart_handle hcart;
+    emu::cart_handle hcart;
     Debugger hdbg;
     console_handle hconsole;
-    Snapshot hsnp;
+    emu::Snapshot hsnp;
     Palette hpalette;
 };
 

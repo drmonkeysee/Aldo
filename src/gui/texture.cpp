@@ -89,7 +89,7 @@ aldo::Nametables::Nametables(SDL_Point nametableSize,
 void aldo::Nametables::draw(aldo::color_span colors, const aldo::Palette& p,
                             const aldo::MediaRuntime& mr) const
 {
-    static_assert(colors.size() == NtCount, "mismatched nt sizes");
+    static_assert(colors.size() == NtDisplayCount, "mismatched nt sizes");
 
     auto ren = mr.renderer();
     auto target = tex.asTarget(ren);
@@ -113,8 +113,8 @@ void aldo::Nametables::draw(aldo::color_span colors, const aldo::Palette& p,
 // MARK: - Internal Interface
 //
 
-SDL_Texture* aldo::texture::create(SDL_Point size, SDL_TextureAccess access,
-                                   SDL_Renderer* ren)
+SDL_Texture* aldo::tex::create(SDL_Point size, SDL_TextureAccess access,
+                               SDL_Renderer* ren)
 {
     auto tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA32, access, size.x,
                                  size.y);
@@ -122,7 +122,7 @@ SDL_Texture* aldo::texture::create(SDL_Point size, SDL_TextureAccess access,
     return tex;
 }
 
-aldo::texture::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
+aldo::tex::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 {
     Uint32 pxfmt;
     SDL_QueryTexture(&tex, &pxfmt, nullptr, &width, &height);
@@ -142,7 +142,7 @@ aldo::texture::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 void aldo::PatternTable::drawTileRow(aldo::et::word row,
                                      aldo::color_span colors,
                                      int texOffset, const aldo::Palette& p,
-                                     const aldo::texture::TextureData& data)
+                                     const aldo::tex::TextureData& data)
 {
     for (auto px = 0; px < ALDO_CHR_TILE_DIM; ++px) {
         auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);

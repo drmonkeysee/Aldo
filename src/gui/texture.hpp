@@ -22,14 +22,13 @@ namespace aldo
 
 class MediaRuntime;
 class Palette;
-
 using color_span = std::span<const et::byte, ALDO_PAL_SIZE>;
 // TODO: use std::mdspan someday when they can be sliced?
 using pt_tile = std::span<const et::word, ALDO_CHR_TILE_DIM>;
 using pt_span = std::span<const et::word[ALDO_CHR_TILE_DIM],
                             ALDO_PT_TILE_COUNT>;
 
-namespace texture
+namespace tex
 {
 
 template<SDL_TextureAccess> class Texture;
@@ -127,7 +126,7 @@ private:
     // NOTE: 4:3 SD TV ratio scales the x-axis by about 1.14 from square
     static constexpr float TvXScale = 8.0f / 7.0f;
 
-    texture::Texture<SDL_TEXTUREACCESS_STREAMING> tex;
+    tex::Texture<SDL_TEXTUREACCESS_STREAMING> tex;
 };
 
 class PatternTable {
@@ -145,10 +144,9 @@ private:
                   "Texture size does not match tile pixel count");
 
     static void drawTileRow(et::word row, color_span colors, int texOffset,
-                            const Palette& p,
-                            const texture::TextureData& data);
+                            const Palette& p, const tex::TextureData& data);
 
-    texture::Texture<SDL_TEXTUREACCESS_STREAMING> tex;
+    tex::Texture<SDL_TEXTUREACCESS_STREAMING> tex;
 };
 
 class Nametables {
@@ -162,10 +160,11 @@ public:
     void render() const noexcept { tex.render(); }
 
 private:
-    static constexpr int LayoutDim = 2, NtCount = LayoutDim * LayoutDim;
+    static constexpr int
+        LayoutDim = ALDO_NT_COUNT, NtDisplayCount = LayoutDim * LayoutDim;
 
     SDL_Point ntSize;
-    texture::Texture<SDL_TEXTUREACCESS_TARGET> tex;
+    tex::Texture<SDL_TEXTUREACCESS_TARGET> tex;
 };
 
 }

@@ -148,7 +148,7 @@ void aldo::PatternTable::drawTileRow(aldo::et::word row,
         auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
         assert(0 <= pidx);
         decltype(colors)::size_type texel = (row & (0x3 << pidx)) >> pidx;
-        assert(texel < ALDO_PAL_SIZE);
+        assert(texel < color_span::extent);
         auto texidx = px + texOffset;
         assert(texidx < TextureDim * TextureDim);
         data.pixels[texidx] = p.getColor(colors[texel]);

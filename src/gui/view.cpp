@@ -1398,13 +1398,15 @@ public:
 protected:
     void renderContents() override
     {
+        static constexpr auto palSize = aldo::color_span::extent;
+
         if (drawInterval.elapsed(vs.clock.clock())) {
             const auto* tables = &emu.snapshot().video->pattern_tables;
-            assert(palSelect < ALDO_PAL_SIZE * 2);
+            assert(palSelect < palSize * 2);
             aldo::color_span colors =
-                palSelect < ALDO_PAL_SIZE
+                palSelect < palSize
                 ? emu.snapshot().video->palettes.bg[palSelect]
-                : emu.snapshot().video->palettes.fg[palSelect - ALDO_PAL_SIZE];
+                : emu.snapshot().video->palettes.fg[palSelect - palSize];
             left.draw(tables->left, colors, emu.palette());
             right.draw(tables->right, colors, emu.palette());
         }
@@ -1430,7 +1432,8 @@ private:
     void renderPalettes(bool fg)
     {
         static constexpr auto cellDim = 15;
-        static constexpr auto cols = ALDO_PAL_SIZE + 1;
+        static constexpr auto cols = static_cast<int>(aldo::color_span::extent
+                                                      + 1);
         static constexpr auto center = 0.5f;
         static constexpr auto flags = ImGuiTableFlags_BordersInner
                                         | ImGuiTableFlags_SizingFixedFit;

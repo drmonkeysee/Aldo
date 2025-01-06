@@ -347,12 +347,14 @@ static void ines_000_snapshot(struct aldo_mapper *self,
         .mem = b->chr,
         .size = ALDO_MEMBLOCK_4KB,
     };
-    fill_pattern_table(ALDO_PT_TILE_COUNT, snp->video->pattern_tables.left,
-                       &bv);
+    fill_pattern_table(sizeof snp->video->pattern_tables.left
+                       / sizeof snp->video->pattern_tables.left[0],
+                       snp->video->pattern_tables.left, &bv);
     bv.mem += bv.size;
     ++bv.ord;
-    fill_pattern_table(ALDO_PT_TILE_COUNT, snp->video->pattern_tables.right,
-                       &bv);
+    fill_pattern_table(sizeof snp->video->pattern_tables.right
+                       / sizeof snp->video->pattern_tables.right[0],
+                       snp->video->pattern_tables.right, &bv);
     b->ptstale = false;
 }
 

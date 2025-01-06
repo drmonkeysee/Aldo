@@ -139,9 +139,9 @@ public:
 
 private:
     static constexpr int TableDim = 16, TextureDim = 128;
-    static_assert(TableDim * TableDim == ALDO_PT_TILE_COUNT,
+    static_assert(TableDim * TableDim == pt_span::extent,
                   "Table size does not match tile count");
-    static_assert(TextureDim == TableDim * ALDO_CHR_TILE_DIM,
+    static_assert(TextureDim == TableDim * pt_tile::extent,
                   "Texture size does not match tile pixel count");
 
     static void drawTileRow(et::word row, color_span colors, int texOffset,

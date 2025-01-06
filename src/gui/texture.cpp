@@ -70,11 +70,11 @@ void aldo::PatternTable::draw(aldo::pt_span table, aldo::color_span colors,
         for (auto tblCol = 0; tblCol < TableDim; ++tblCol) {
             auto tileIdx = static_cast<pt_sz>(tblCol + (tblRow * TableDim));
             aldo::pt_tile tile = table[tileIdx];
+            auto tileDim = static_cast<int>(tile.size());
             auto tileRow = 0;
             for (auto row : tile) {
-                auto rowOffset = (tblCol * ALDO_CHR_TILE_DIM)
-                                    + ((tileRow++
-                                        + (tblRow * ALDO_CHR_TILE_DIM))
+                auto rowOffset = (tblCol * tileDim)
+                                    + ((tileRow++ + (tblRow * tileDim))
                                        * data.stride);
                 drawTileRow(row, colors, rowOffset, p, data);
             }

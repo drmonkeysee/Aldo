@@ -25,11 +25,11 @@ struct viewstate;
 class View {
 public:
     enum class Transition {
-        None,
-        Open,
-        Close,
-        Expand,
-        Collapse,
+        none,
+        open,
+        close,
+        expand,
+        collapse,
     };
 
     class TransitionLatch {
@@ -41,11 +41,11 @@ public:
         // but exchanging an enum won't throw anyway.
         Transition reset() noexcept
         {
-            return std::exchange(transition, Transition::None);
+            return std::exchange(transition, Transition::none);
         }
 
     private:
-        Transition transition = Transition::None;
+        Transition transition = Transition::none;
     };
 
     View(std::string title, viewstate& vs, const Emulator& emu,

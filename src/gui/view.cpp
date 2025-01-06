@@ -411,7 +411,7 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
 
 auto windows_menu(view_span views)
 {
-    auto viewTransition = aldo::View::Transition::None;
+    auto viewTransition = aldo::View::Transition::none;
     if (ImGui::BeginMenu("Windows")) {
         for (auto& v : views) {
             ImGui::MenuItem(v->windowTitle().c_str(), nullptr,
@@ -419,20 +419,20 @@ auto windows_menu(view_span views)
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Open all")) {
-            viewTransition = aldo::View::Transition::Open;
+            viewTransition = aldo::View::Transition::open;
         }
         if (ImGui::MenuItem("Close all")) {
-            viewTransition = aldo::View::Transition::Close;
+            viewTransition = aldo::View::Transition::close;
         }
         if (ImGui::MenuItem("Expand all")) {
-            viewTransition = aldo::View::Transition::Expand;
+            viewTransition = aldo::View::Transition::expand;
         }
         if (ImGui::MenuItem("Collapse all")) {
-            viewTransition = aldo::View::Transition::Collapse;
+            viewTransition = aldo::View::Transition::collapse;
         }
         ImGui::EndMenu();
     }
-    if (viewTransition != aldo::View::Transition::None) {
+    if (viewTransition != aldo::View::Transition::none) {
         for (auto& v : views) {
             v->transition = viewTransition;
         }
@@ -849,16 +849,15 @@ public:
                  const aldo::MediaRuntime& mr)
     : View{"Debugger", vs, emu, mr}
     {
-        using halt_val = halt_array::value_type;
-        using halt_integral = std::underlying_type_t<halt_val::first_type>;
-
+        using halt_integral =
+            std::underlying_type_t<halt_selection::first_type>;
         std::ranges::generate(haltConditions,
             [h = static_cast<halt_integral>(ALDO_HLT_NONE)] mutable
-                              -> halt_val {
-                auto cond = static_cast<halt_val::first_type>(++h);
+                              -> halt_selection {
+                auto cond = static_cast<halt_selection::first_type>(++h);
                 return {cond, aldo_haltcond_description(cond)};
             });
-        resetHaltExpression(haltConditions.cbegin());
+        resetHaltExpression(haltConditions.front());
     }
     DebuggerView(aldo::viewstate&, aldo::Emulator&&,
                  const aldo::MediaRuntime&) = delete;
@@ -882,11 +881,9 @@ protected:
     }
 
 private:
+    using halt_selection = std::pair<aldo_haltcondition, aldo::et::str>;
     // NOTE: does not include first enum value HLT_NONE
-    using halt_array = std::array<
-                        std::pair<aldo_haltcondition, aldo::et::str>,
-                        ALDO_HLT_COUNT - 1>;
-    using halt_it = halt_array::const_iterator;
+    using halt_array = std::array<halt_selection, ALDO_HLT_COUNT - 1>;
     using bp_sz = aldo::Debugger::BpView::size_type;
     using bp_diff = aldo::Debugger::BreakpointIterator::difference_type;
 
@@ -1008,19 +1005,14 @@ private:
         ImGui::SameLine();
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 12);
         auto setFocus = false;
-        if (ImGui::BeginCombo("##haltconditions", selectedCondition->second)) {
-            for (auto it = haltConditions.cbegin();
-                 it != haltConditions.cend();
-                 ++it) {
-                auto current = it == selectedCondition;
-                if (ImGui::Selectable(it->second, current)) {
+        if (ImGui::BeginCombo("##haltconditions", selectedCondition.second)) {
+            for (const auto& hc : haltConditions) {
+                auto current = hc == selectedCondition;
+                if (ImGui::Selectable(hc.second, current)) {
                     setFocus = true;
                     if (!current) {
-                        resetHaltExpression(it);
+                        resetHaltExpression(hc);
                     }
-                }
-                if (current) {
-                    ImGui::SetItemDefaultFocus();
                 }
             }
             ImGui::EndCombo();
@@ -1050,7 +1042,7 @@ private:
         default:
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
                         "Invalid halt condition selection: %d",
-                        selectedCondition->first);
+                        selectedCondition.first);
             break;
         }
         if (setFocus) {
@@ -1142,10 +1134,10 @@ private:
         }
     }
 
-    void resetHaltExpression(halt_it selection) noexcept
+    void resetHaltExpression(halt_selection selection) noexcept
     {
         selectedCondition = selection;
-        currentHaltExpression = {.cond = selectedCondition->first};
+        currentHaltExpression = {.cond = selectedCondition.first};
     }
 
     void syncWithOverrideState() noexcept
@@ -1169,9 +1161,7 @@ private:
     bool detectedHalt = false, resetOverride = false;
     aldo::et::word resetAddr = 0x0;
     halt_array haltConditions;
-    // NOTE: storing iterator is safe as haltConditions
-    // is immutable for the life of this instance.
-    halt_it selectedCondition;
+    halt_selection selectedCondition;
     aldo_haltexpr currentHaltExpression;
     SelectedBreakpoints bpSelections;
 };
@@ -1191,22 +1181,61 @@ public:
 protected:
     void renderContents() override
     {
+        ImGui::TextUnformatted("Mirroring: <placeholder>");
+
         auto textOffset = nametables.nametableSize().x
                             + aldo::style::glyph_size().x + 1;
-
-        ImGui::TextUnformatted("Nametable $2000");
+        tableLabel(0);
         ImGui::SameLine(textOffset);
-        ImGui::TextUnformatted("Nametable $2400");
+        tableLabel(1);
         nametables.draw(emu.snapshot().video->palettes.bg[0], emu.palette(),
                         mr);
         nametables.render();
-        ImGui::TextUnformatted("Nametable $2800");
+        tableLabel(2);
         ImGui::SameLine(textOffset);
-        ImGui::TextUnformatted("Nametable $2C00");
+        tableLabel(3);
+
+        if (ImGui::CollapsingHeader("Controls",
+                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 20);
+            if (ImGui::BeginCombo("##displayMode", displayMode.second)) {
+                for (const auto& m : modes) {
+                    auto current = m == displayMode;
+                    if (ImGui::Selectable(m.second, current)) {
+                        displayMode = m;
+                    }
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 5);
+            ImGui::DragInt("Scanline", &scanline, 1, 0, 261, "%d",
+                           ImGuiSliderFlags_AlwaysClamp);
+        }
     }
 
 private:
+    enum class DisplayMode {
+        nametables,
+        attributeTables,
+    };
+    using mode_selection = std::pair<DisplayMode, const char*>;
+    static constexpr std::array modes{
+        mode_selection{DisplayMode::nametables, "Nametables"},
+        mode_selection{DisplayMode::attributeTables, "Attribute Tables"},
+    };
+
+    void tableLabel(int table) const noexcept
+    {
+        auto attr = displayMode.first == DisplayMode::attributeTables;
+        ImGui::Text("%s $%4X", attr ? "Attribute Table" : "Nametable",
+                    0x2000 + (table * ALDO_MEMBLOCK_1KB)
+                    + (attr * ALDO_NT_TILE_COUNT));
+    }
+
     aldo::Nametables nametables;
+    mode_selection displayMode = modes.front();
+    int scanline = 241;
 };
 
 class PaletteView final : public aldo::View {
@@ -1722,7 +1751,7 @@ private:
         auto
             lo = prg.vectors[0],
             hi = prg.vectors[1];
-        ImGui::Text("%04X: %02X %02X     NMI $%04X", ALDO_CPU_VECTOR_NMI, lo,
+        ImGui::Text("%4X: %02X %02X     NMI $%04X", ALDO_CPU_VECTOR_NMI, lo,
                     hi, aldo_bytowr(lo, hi));
 
         lo = prg.vectors[2];
@@ -1737,12 +1766,12 @@ private:
             indicator = "";
             resVector = aldo_bytowr(lo, hi);
         }
-        ImGui::Text("%04X: %02X %02X     RST %s$%04X", ALDO_CPU_VECTOR_RST, lo,
+        ImGui::Text("%4X: %02X %02X     RST %s$%04X", ALDO_CPU_VECTOR_RST, lo,
                     hi, indicator, resVector);
 
         lo = prg.vectors[4];
         hi = prg.vectors[5];
-        ImGui::Text("%04X: %02X %02X     IRQ $%04X", ALDO_CPU_VECTOR_IRQ, lo,
+        ImGui::Text("%4X: %02X %02X     IRQ $%04X", ALDO_CPU_VECTOR_IRQ, lo,
                     hi, aldo_bytowr(lo, hi));
     }
 
@@ -1927,7 +1956,7 @@ private:
                                ? "Cycles/Second"
                                : "Frames/Second");
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(40);
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 6);
         int min, max;
         if (vs.clock.scale() == ALDO_CS_CYCLE) {
             min = Aldo_MinCps;
@@ -2095,18 +2124,18 @@ void aldo::View::handleTransition() noexcept
 {
     auto t = transition.reset();
     switch (t) {
-    case aldo::View::Transition::Open:
+    case aldo::View::Transition::open:
         visible = true;
         break;
-    case aldo::View::Transition::Close:
+    case aldo::View::Transition::close:
         visible = false;
         break;
-    case aldo::View::Transition::Expand:
+    case aldo::View::Transition::expand:
         if (visible) {
             ImGui::SetNextWindowCollapsed(false);
         }
         break;
-    case aldo::View::Transition::Collapse:
+    case aldo::View::Transition::collapse:
         if (visible) {
             ImGui::SetNextWindowCollapsed(true);
         }

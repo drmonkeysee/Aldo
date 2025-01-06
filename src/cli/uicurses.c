@@ -284,12 +284,12 @@ static void drawvecs(const struct view *v, int h, int w, int y,
     const uint8_t *vectors = emu->snapshot.prg.vectors;
     uint8_t lo = vectors[0],
             hi = vectors[1];
-    mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     NMI $%04X",
+    mvwprintw(v->content, h - y--, 0, "%4X: %02X %02X     NMI $%04X",
               ALDO_CPU_VECTOR_NMI, lo, hi, aldo_bytowr(lo, hi));
 
     lo = vectors[2];
     hi = vectors[3];
-    mvwprintw(v->content, h - y--, 0, "%04X: %02X %02X     RST",
+    mvwprintw(v->content, h - y--, 0, "%4X: %02X %02X     RST",
               ALDO_CPU_VECTOR_RST, lo, hi);
     int resetvector = aldo_debug_vector_override(emu->debugger);
     if (resetvector == Aldo_NoResetVector) {
@@ -300,7 +300,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
 
     lo = vectors[4];
     hi = vectors[5];
-    mvwprintw(v->content, h - y, 0, "%04X: %02X %02X     IRQ $%04X",
+    mvwprintw(v->content, h - y, 0, "%4X: %02X %02X     IRQ $%04X",
               ALDO_CPU_VECTOR_IRQ, lo, hi, aldo_bytowr(lo, hi));
 }
 

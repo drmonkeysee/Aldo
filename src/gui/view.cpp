@@ -1181,8 +1181,6 @@ public:
 protected:
     void renderContents() override
     {
-        ImGui::TextUnformatted("Mirroring: <placeholder>");
-
         auto textOffset = nametables.nametableSize().x
                             + aldo::style::glyph_size().x + 1;
         tableLabel(0);
@@ -1194,27 +1192,39 @@ protected:
         tableLabel(2);
         ImGui::SameLine(textOffset);
         tableLabel(3);
+        ImGui::TextUnformatted("Mirroring: <placeholder>");
 
-        if (ImGui::CollapsingHeader("Controls",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
-            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 20);
-            if (ImGui::BeginCombo("##displayMode", displayMode.second)) {
-                for (const auto& m : modes) {
-                    auto current = m == displayMode;
-                    if (ImGui::Selectable(m.second, current)) {
-                        displayMode = m;
-                    }
+        ImGui::Separator();
+
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 15);
+        if (ImGui::BeginCombo("##displayMode", displayMode.second)) {
+            for (const auto& m : modes) {
+                auto current = m == displayMode;
+                if (ImGui::Selectable(m.second, current)) {
+                    displayMode = m;
                 }
-                ImGui::EndCombo();
             }
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 5);
-            ImGui::DragInt("Scanline", &scanline, 1, 0, 261, "%d",
-                           ImGuiSliderFlags_AlwaysClamp);
+            ImGui::EndCombo();
         }
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 19);
+        if (ImGui::BeginCombo("##gridOverlay", grid.second)) {
+            for (const auto& m : grids) {
+                auto current = m == grid;
+                if (ImGui::Selectable(m.second, current)) {
+                    grid = m;
+                }
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 5);
+        ImGui::DragInt("Scanline", &scanline, 1, 0, 261, "%d",
+                       ImGuiSliderFlags_AlwaysClamp);
     }
 
 private:
+    // TODO: could this all be templated into a Combo helper?
     enum class DisplayMode {
         nametables,
         attributeTables,
@@ -1222,7 +1232,18 @@ private:
     using mode_selection = std::pair<DisplayMode, const char*>;
     static constexpr std::array modes{
         mode_selection{DisplayMode::nametables, "Nametables"},
-        mode_selection{DisplayMode::attributeTables, "Attribute Tables"},
+        mode_selection{DisplayMode::attributeTables, "Attributes"},
+    };
+    enum class GridOverlay {
+        none,
+        tiles,
+        attributes,
+    };
+    using grid_selection = std::pair<GridOverlay, const char*>;
+    static constexpr std::array grids{
+        grid_selection{GridOverlay::none, "No Grid"},
+        grid_selection{GridOverlay::tiles, "Tile Grid"},
+        grid_selection{GridOverlay::attributes, "Attribute Grid"},
     };
 
     void tableLabel(int table) const noexcept
@@ -1235,6 +1256,7 @@ private:
 
     aldo::Nametables nametables;
     mode_selection displayMode = modes.front();
+    grid_selection grid = grids.front();
     int scanline = 241;
 };
 

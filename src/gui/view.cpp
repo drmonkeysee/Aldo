@@ -1250,7 +1250,7 @@ private:
     {
         auto attr = displayMode.first == DisplayMode::attributeTables;
         ImGui::Text("%s $%4X", attr ? "Attribute Table" : "Nametable",
-                    0x2000 + (table * ALDO_MEMBLOCK_1KB)
+                    ALDO_MEMBLOCK_8KB + (table * ALDO_MEMBLOCK_1KB)
                     + (attr * ALDO_NT_TILE_COUNT));
     }
 

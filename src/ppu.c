@@ -31,7 +31,8 @@ static const int
 
 // NOTE: helpers for manipulating v and t registers
 static const uint16_t
-    BaseNtAddr = 0x2000, HNtBit = 0x400, VNtBit = 0x800,
+    BaseNtAddr = ALDO_MEMBLOCK_8KB,
+    HNtBit = ALDO_MEMBLOCK_1KB, VNtBit = ALDO_MEMBLOCK_2KB,
     NtBits = VNtBit | HNtBit, CourseYBits = 0x3e0, FineYBits = 0x7000;
 static const uint8_t CourseXBits = 0x1f, PaletteMask = CourseXBits;
 
@@ -582,7 +583,7 @@ static void incr_y(struct aldo_rp2c02 *self)
             self->v += 0x20;
         }
     } else {
-        self->v += 0x1000;
+        self->v += ALDO_MEMBLOCK_4KB;
     }
 }
 

@@ -57,7 +57,7 @@ static int load_blocks(uint8_t *restrict *mem, size_t size, FILE *f)
 // masked down to the 2KB (0x800) of addressable VRAM.
 static uint16_t hmirror_addr(uint16_t addr)
 {
-    return (uint16_t)((addr & ~0xc00) | ((addr & 0x800) >> 1));
+    return (uint16_t)((addr & ~0xc00) | ((addr & ALDO_MEMBLOCK_2KB) >> 1));
 }
 
 static void mem_load(uint8_t *restrict d, const uint8_t *restrict mem,

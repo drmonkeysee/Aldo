@@ -276,10 +276,10 @@ auto add_views(aldo::Layout::view_list& vl, aldo::viewstate& vs,
 
 using view_span = std::span<const std::unique_ptr<aldo::View>>;
 
-template<typename V, typename L = const char*>
+template<typename V>
 class ComboList {
 public:
-    using option = std::pair<V, L>;
+    using option = std::pair<V, const char*>;
 
     ComboList(const char* label, std::initializer_list<option> options)
     : label{label}, options{options},

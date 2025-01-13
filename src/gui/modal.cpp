@@ -74,7 +74,7 @@ auto file_modal(modal_launch open, modal_operation op, aldo::Emulator& emu,
 
 bool aldo::modal::loadROM(aldo::Emulator& emu, const aldo::MediaRuntime& mr)
 {
-    auto open = [](const gui_platform& p) {
+    auto open = [](const gui_platform& p) static {
         return open_file(p, "Choose a ROM file");
     };
     auto op = [&emu](const std::filesystem::path& fp) { emu.loadCart(fp); };
@@ -84,7 +84,7 @@ bool aldo::modal::loadROM(aldo::Emulator& emu, const aldo::MediaRuntime& mr)
 bool aldo::modal::loadBreakpoints(aldo::Emulator& emu,
                                   const aldo::MediaRuntime& mr)
 {
-    auto open = [](const gui_platform& p) {
+    auto open = [](const gui_platform& p) static {
         return open_file(p, "Choose a Breakpoints file",
                          {aldo::debug::BreakFileExtension, nullptr});
     };
@@ -112,7 +112,7 @@ bool aldo::modal::exportBreakpoints(aldo::Emulator& emu,
 bool aldo::modal::loadPalette(aldo::Emulator& emu,
                               const aldo::MediaRuntime& mr)
 {
-    auto open = [](const gui_platform& p) {
+    auto open = [](const gui_platform& p) static {
         return open_file(p, "Choose a Palette",
                          {aldo::palette::FileExtension, nullptr});
     };

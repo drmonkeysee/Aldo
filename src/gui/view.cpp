@@ -276,6 +276,36 @@ auto add_views(aldo::Layout::view_list& vl, aldo::viewstate& vs,
 
 using view_span = std::span<const std::unique_ptr<aldo::View>>;
 
+template<typename V, typename L = const char*>
+class ComboList {
+public:
+    using option = std::pair<V, L>;
+
+    ComboList(const char* label, std::initializer_list<option> options)
+    : label{label}, options{options},
+    selectedOption{this->options.front()} {}
+
+    void render() noexcept
+    {
+        if (ImGui::BeginCombo(label, selectedOption.second)) {
+            for (const auto& option : options) {
+                auto current = option == selectedOption;
+                if (ImGui::Selectable(option.second, current)) {
+                    selectedOption = option;
+                }
+            }
+            ImGui::EndCombo();
+        }
+    }
+
+    V selection() const noexcept { return selectedOption.first; }
+
+private:
+    const char* label;
+    std::vector<option> options;
+    option selectedOption;
+};
+
 auto widget_group(std::invocable auto f)
 {
     ImGui::BeginGroup();
@@ -1170,7 +1200,22 @@ class NametablesView final : public aldo::View {
 public:
     NametablesView(aldo::viewstate& vs, const aldo::Emulator& emu,
                    const aldo::MediaRuntime& mr) noexcept
-    : View{"Nametables", vs, emu, mr}, nametables{emu.screenSize(), mr} {}
+    : View{"Nametables", vs, emu, mr}, nametables{emu.screenSize(), mr},
+    displayMode{
+        "##displayMode",
+        {
+            {DisplayMode::nametables, "Nametables"},
+            {DisplayMode::attributeTables, "Attributes"},
+        },
+    },
+    displayGrid{
+        "##gridOverlay",
+        {
+            {GridOverlay::none, "No Grid"},
+            {GridOverlay::tiles, "Tile Grid"},
+            {GridOverlay::attributes, "Attribute Grid"},
+        },
+    } {}
     NametablesView(aldo::viewstate&, aldo::Emulator&&,
                    const aldo::MediaRuntime&) = delete;
     NametablesView(aldo::viewstate&, const aldo::Emulator&,
@@ -1197,26 +1242,9 @@ protected:
         ImGui::Separator();
 
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 15);
-        if (ImGui::BeginCombo("##displayMode", displayMode.second)) {
-            for (const auto& m : modes) {
-                auto current = m == displayMode;
-                if (ImGui::Selectable(m.second, current)) {
-                    displayMode = m;
-                }
-            }
-            ImGui::EndCombo();
-        }
+        displayMode.render();
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 19);
-        if (ImGui::BeginCombo("##gridOverlay", grid.second)) {
-            for (const auto& m : grids) {
-                auto current = m == grid;
-                if (ImGui::Selectable(m.second, current)) {
-                    grid = m;
-                }
-            }
-            ImGui::EndCombo();
-        }
+        displayGrid.render();
         ImGui::SameLine();
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 5);
         ImGui::DragInt("Scanline", &scanline, 1, 0, 261, "%d",
@@ -1224,39 +1252,27 @@ protected:
     }
 
 private:
-    // TODO: could this all be templated into a Combo helper?
     enum class DisplayMode {
         nametables,
         attributeTables,
-    };
-    using mode_selection = std::pair<DisplayMode, const char*>;
-    static constexpr std::array modes{
-        mode_selection{DisplayMode::nametables, "Nametables"},
-        mode_selection{DisplayMode::attributeTables, "Attributes"},
     };
     enum class GridOverlay {
         none,
         tiles,
         attributes,
     };
-    using grid_selection = std::pair<GridOverlay, const char*>;
-    static constexpr std::array grids{
-        grid_selection{GridOverlay::none, "No Grid"},
-        grid_selection{GridOverlay::tiles, "Tile Grid"},
-        grid_selection{GridOverlay::attributes, "Attribute Grid"},
-    };
 
     void tableLabel(int table) const noexcept
     {
-        auto attr = displayMode.first == DisplayMode::attributeTables;
+        auto attr = displayMode.selection() == DisplayMode::attributeTables;
         ImGui::Text("%s $%4X", attr ? "Attribute Table" : "Nametable",
                     ALDO_MEMBLOCK_8KB + (table * ALDO_MEMBLOCK_1KB)
                     + (attr * ALDO_NT_TILE_COUNT));
     }
 
     aldo::Nametables nametables;
-    mode_selection displayMode = modes.front();
-    grid_selection grid = grids.front();
+    ComboList<DisplayMode> displayMode;
+    ComboList<GridOverlay> displayGrid;
     int scanline = 241;
 };
 

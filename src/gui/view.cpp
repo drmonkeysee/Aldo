@@ -284,6 +284,10 @@ public:
     ComboList(const char* label, std::initializer_list<option> options)
     : label{label}, options{options},
     selectedOption{this->options.front()} {}
+    ComboList(const ComboList&) = delete;
+    ComboList& operator=(const ComboList&) = delete;
+    ComboList(ComboList&&) = delete;
+    ComboList& operator=(ComboList&&) = delete;
 
     void render() noexcept
     {

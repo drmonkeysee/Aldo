@@ -21,8 +21,8 @@ enum {
 };
 
 #include "bridgeopen.h"
-br_libexport
-const char *aldo_ui_errstr(int err) br_nothrow;
+aldo_export
+const char *aldo_ui_errstr(int err) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

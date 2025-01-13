@@ -26,16 +26,16 @@ struct aldo_clock {
 };
 
 #include "bridgeopen.h"
-br_libexport
+aldo_export
 extern const int Aldo_MinCps, Aldo_MaxCps, Aldo_MinFps, Aldo_MaxFps;
 
-br_libexport
-void aldo_clock_start(struct aldo_clock *self) br_nothrow;
-br_libexport
+aldo_export
+void aldo_clock_start(struct aldo_clock *self) aldo_nothrow;
+aldo_export
 void aldo_clock_tickstart(struct aldo_clock *self,
-                          bool reset_budget) br_nothrow;
-br_libexport
-void aldo_clock_tickend(struct aldo_clock *self) br_nothrow;
+                          bool reset_budget) aldo_nothrow;
+aldo_export
+void aldo_clock_tickend(struct aldo_clock *self) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

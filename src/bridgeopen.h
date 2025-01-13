@@ -8,32 +8,32 @@
 #ifdef __APPLE__
 // NOTE: Swift 6 calling convention for main UI thread platform calls;
 // [[...]] syntax not supported for swift_attr.
-#define br_pcallc __attribute__((swift_attr("@MainActor")))
+#define aldo_pcallc __attribute__((swift_attr("@MainActor")))
 #else
-#define br_pcallc
+#define aldo_pcallc
 #endif
 
 // NOTE: open block for c/c++ bridge headers
 #ifdef __cplusplus
-#define br_libexport [[gnu::visibility("default")]]
-#define br_checkerror [[nodiscard("check error")]]
-#define br_ownresult [[nodiscard("take ownership")]]
-#define br_noalias
-#define br_csz(val)
-#define br_nasz(var)
-#define br_nacsz(val)
-#define br_nothrow noexcept
-#define br_empty(T) {}
+#define aldo_export [[gnu::visibility("default")]]
+#define aldo_checkerr [[nodiscard("check error")]]
+#define aldo_ownresult [[nodiscard("take ownership")]]
+#define aldo_noalias
+#define aldo_cz(val)
+#define aldo_naz(var)
+#define aldo_nacz(val)
+#define aldo_nothrow noexcept
+#define aldo_empty(T) {}
 extern "C"
 {
 #else
-#define br_libexport __attribute__((visibility("default")))
-#define br_checkerror
-#define br_ownresult
-#define br_noalias restrict
-#define br_csz(val) static val
-#define br_nasz(var) restrict var
-#define br_nacsz(val) restrict static val
-#define br_nothrow
-#define br_empty(T) (T){0}
+#define aldo_export __attribute__((visibility("default")))
+#define aldo_checkerr
+#define aldo_ownresult
+#define aldo_noalias restrict
+#define aldo_cz(val) static val
+#define aldo_naz(var) restrict var
+#define aldo_nacz(val) restrict static val
+#define aldo_nothrow
+#define aldo_empty(T) (T){0}
 #endif

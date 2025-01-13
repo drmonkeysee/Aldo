@@ -17,17 +17,17 @@ enum {
 };
 
 #include "bridgeopen.h"
-br_libexport
-inline double aldo_timespec_to_ms(const struct timespec *ts) br_nothrow
+aldo_export
+inline double aldo_timespec_to_ms(const struct timespec *ts) aldo_nothrow
 {
     return (double)(ts->tv_sec * ALDO_MS_PER_S)
                     + ((double)ts->tv_nsec / (double)ALDO_NS_PER_MS);
 }
 
-br_libexport
-struct timespec aldo_elapsed(const struct timespec *from) br_nothrow;
-br_libexport
-void aldo_sleep(struct timespec duration) br_nothrow;
+aldo_export
+struct timespec aldo_elapsed(const struct timespec *from) aldo_nothrow;
+aldo_export
+void aldo_sleep(struct timespec duration) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

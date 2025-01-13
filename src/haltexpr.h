@@ -66,24 +66,26 @@ enum {
 };
 
 #include "bridgeopen.h"
-br_libexport
-const char *aldo_haltexpr_errstr(int err) br_nothrow;
-br_libexport
-const char *aldo_haltcond_description(enum aldo_haltcondition cond) br_nothrow;
+aldo_export
+const char *aldo_haltexpr_errstr(int err) aldo_nothrow;
+aldo_export
+const char *aldo_haltcond_description(enum aldo_haltcondition
+                                      cond) aldo_nothrow;
 
 // NOTE: if returns non-zero error code, *expr is unmodified
-br_libexport br_checkerror
-int aldo_haltexpr_parse(const char *br_noalias str,
-                        struct aldo_haltexpr *expr) br_nothrow;
-br_libexport br_checkerror
-int aldo_haltexpr_parse_dbg(const char *br_noalias str,
-                            struct aldo_debugexpr *expr) br_nothrow;
-br_libexport br_checkerror
+aldo_export aldo_checkerr
+int aldo_haltexpr_parse(const char *aldo_noalias str,
+                        struct aldo_haltexpr *expr) aldo_nothrow;
+aldo_export aldo_checkerr
+int aldo_haltexpr_parse_dbg(const char *aldo_noalias str,
+                            struct aldo_debugexpr *expr) aldo_nothrow;
+aldo_export aldo_checkerr
 int aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
-                       char buf[br_nacsz(ALDO_HEXPR_FMT_SIZE)]) br_nothrow;
-br_libexport br_checkerror
+                       char buf[aldo_nacz(ALDO_HEXPR_FMT_SIZE)]) aldo_nothrow;
+aldo_export aldo_checkerr
 int aldo_haltexpr_fmtdbg(const struct aldo_debugexpr *expr,
-                         char buf[br_nacsz(ALDO_HEXPR_FMT_SIZE)]) br_nothrow;
+                         char
+                         buf[aldo_nacz(ALDO_HEXPR_FMT_SIZE)]) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

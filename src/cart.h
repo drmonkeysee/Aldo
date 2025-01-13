@@ -108,46 +108,50 @@ typedef struct aldo_cartridge aldo_cart;
 // MARK: - Export
 //
 
-br_libexport
-const char *aldo_cart_errstr(int err) br_nothrow;
+aldo_export
+const char *aldo_cart_errstr(int err) aldo_nothrow;
 
 // NOTE: if returns non-zero error code, *c is unmodified
-br_libexport br_checkerror
-int aldo_cart_create(aldo_cart **c, FILE *f) br_nothrow;
-br_libexport
-void aldo_cart_free(aldo_cart *self) br_nothrow;
+aldo_export aldo_checkerr
+int aldo_cart_create(aldo_cart **c, FILE *f) aldo_nothrow;
+aldo_export
+void aldo_cart_free(aldo_cart *self) aldo_nothrow;
 
-br_libexport
-const char *aldo_cart_formatname(enum aldo_cartformat format) br_nothrow;
-br_libexport
-const char *aldo_cart_mirrorname(enum aldo_cart_ntm mirror) br_nothrow;
-br_libexport br_checkerror
+aldo_export
+const char *aldo_cart_formatname(enum aldo_cartformat format) aldo_nothrow;
+aldo_export
+const char *aldo_cart_mirrorname(enum aldo_cart_ntm mirror) aldo_nothrow;
+aldo_export aldo_checkerr
 int
 aldo_cart_format_extname(aldo_cart *self,
-                         char buf[br_nacsz(ALDO_CART_FMT_SIZE)]) br_nothrow;
-br_libexport
-int aldo_cart_write_info(aldo_cart *self, const char *br_noalias name,
-                         bool verbose, FILE *f) br_nothrow;
-br_libexport
-void aldo_cart_getinfo(aldo_cart *self, struct aldo_cartinfo *info) br_nothrow;
+                         char buf[aldo_nacz(ALDO_CART_FMT_SIZE)]) aldo_nothrow;
+aldo_export
+int aldo_cart_write_info(aldo_cart *self, const char *aldo_noalias name,
+                         bool verbose, FILE *f) aldo_nothrow;
+aldo_export
+void aldo_cart_getinfo(aldo_cart *self,
+                       struct aldo_cartinfo *info) aldo_nothrow;
 
-br_libexport
-struct aldo_blockview aldo_cart_prgblock(aldo_cart *self, size_t i) br_nothrow;
-br_libexport
-struct aldo_blockview aldo_cart_chrblock(aldo_cart *self, size_t i) br_nothrow;
+aldo_export
+struct aldo_blockview aldo_cart_prgblock(aldo_cart *self,
+                                         size_t i) aldo_nothrow;
+aldo_export
+struct aldo_blockview aldo_cart_chrblock(aldo_cart *self,
+                                         size_t i) aldo_nothrow;
 
 //
 // MARK: - Internal
 //
 
-bool aldo_cart_mbus_connect(aldo_cart *self, aldo_bus *b) br_nothrow;
-void aldo_cart_mbus_disconnect(aldo_cart *self, aldo_bus *b) br_nothrow;
-bool aldo_cart_vbus_connect(aldo_cart *self, aldo_bus *b) br_nothrow;
-void aldo_cart_vbus_disconnect(aldo_cart *self, aldo_bus *b) br_nothrow;
+bool aldo_cart_mbus_connect(aldo_cart *self, aldo_bus *b) aldo_nothrow;
+void aldo_cart_mbus_disconnect(aldo_cart *self, aldo_bus *b) aldo_nothrow;
+bool aldo_cart_vbus_connect(aldo_cart *self, aldo_bus *b) aldo_nothrow;
+void aldo_cart_vbus_disconnect(aldo_cart *self, aldo_bus *b) aldo_nothrow;
 
-int aldo_cart_write_dis_header(aldo_cart *self, const char *br_noalias name,
-                               FILE *f) br_nothrow;
-void aldo_cart_snapshot(aldo_cart *self, struct aldo_snapshot *snp) br_nothrow;
+int aldo_cart_write_dis_header(aldo_cart *self, const char *aldo_noalias name,
+                               FILE *f) aldo_nothrow;
+void aldo_cart_snapshot(aldo_cart *self,
+                        struct aldo_snapshot *snp) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

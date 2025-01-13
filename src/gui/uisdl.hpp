@@ -19,9 +19,9 @@ namespace aldo
 #endif
 
 #include "bridgeopen.h"
-br_checkerror
+aldo_checkerr
 int ui_sdl_runloop(const struct gui_platform* platform, aldo_debugger* debug,
-                   aldo_nes* console) br_nothrow;
+                   aldo_nes* console) aldo_nothrow;
 #include "bridgeclose.h"
 
 #ifdef __cplusplus

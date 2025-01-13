@@ -28,56 +28,56 @@ typedef struct aldo_debugger_context aldo_debugger;
 // MARK: - Export
 //
 
-br_libexport
+aldo_export
 extern const int Aldo_NoResetVector;
-br_libexport
+aldo_export
 extern const ptrdiff_t Aldo_NoBreakpoint;
 
 // NOTE: if returns NULL then errno is set due to failed allocation
-br_libexport br_ownresult
-aldo_debugger *aldo_debug_new(void) br_nothrow;
-br_libexport
-void aldo_debug_free(aldo_debugger *self) br_nothrow;
+aldo_export aldo_ownresult
+aldo_debugger *aldo_debug_new(void) aldo_nothrow;
+aldo_export
+void aldo_debug_free(aldo_debugger *self) aldo_nothrow;
 
-br_libexport
-int aldo_debug_vector_override(aldo_debugger *self) br_nothrow;
-br_libexport
+aldo_export
+int aldo_debug_vector_override(aldo_debugger *self) aldo_nothrow;
+aldo_export
 void aldo_debug_set_vector_override(aldo_debugger *self,
-                                    int resetvector) br_nothrow;
+                                    int resetvector) aldo_nothrow;
 // NOTE: if returns false then errno is set due to failed allocation
-br_libexport br_checkerror
+aldo_export aldo_checkerr
 bool aldo_debug_bp_add(aldo_debugger *self,
-                       struct aldo_haltexpr expr) br_nothrow;
-br_libexport
+                       struct aldo_haltexpr expr) aldo_nothrow;
+aldo_export
 const struct aldo_breakpoint *aldo_debug_bp_at(aldo_debugger *self,
-                                               ptrdiff_t at) br_nothrow;
-br_libexport
+                                               ptrdiff_t at) aldo_nothrow;
+aldo_export
 void aldo_debug_bp_enable(aldo_debugger *self, ptrdiff_t at,
-                          bool enabled) br_nothrow;
-br_libexport
+                          bool enabled) aldo_nothrow;
+aldo_export
 const struct aldo_breakpoint *
-aldo_debug_halted(aldo_debugger *self) br_nothrow;
-br_libexport
-ptrdiff_t aldo_debug_halted_at(aldo_debugger *self) br_nothrow;
-br_libexport
-void aldo_debug_bp_remove(aldo_debugger *self, ptrdiff_t at) br_nothrow;
-br_libexport
-void aldo_debug_bp_clear(aldo_debugger *self) br_nothrow;
-br_libexport
-size_t aldo_debug_bp_count(aldo_debugger *self) br_nothrow;
-br_libexport
-void aldo_debug_reset(aldo_debugger *self) br_nothrow;
+aldo_debug_halted(aldo_debugger *self) aldo_nothrow;
+aldo_export
+ptrdiff_t aldo_debug_halted_at(aldo_debugger *self) aldo_nothrow;
+aldo_export
+void aldo_debug_bp_remove(aldo_debugger *self, ptrdiff_t at) aldo_nothrow;
+aldo_export
+void aldo_debug_bp_clear(aldo_debugger *self) aldo_nothrow;
+aldo_export
+size_t aldo_debug_bp_count(aldo_debugger *self) aldo_nothrow;
+aldo_export
+void aldo_debug_reset(aldo_debugger *self) aldo_nothrow;
 
 //
 // MARK: - Internal
 //
 
 void aldo_debug_cpu_connect(aldo_debugger *self,
-                            struct aldo_mos6502 *cpu) br_nothrow;
-void aldo_debug_cpu_disconnect(aldo_debugger *self) br_nothrow;
-void aldo_debug_sync_bus(aldo_debugger *self) br_nothrow;
+                            struct aldo_mos6502 *cpu) aldo_nothrow;
+void aldo_debug_cpu_disconnect(aldo_debugger *self) aldo_nothrow;
+void aldo_debug_sync_bus(aldo_debugger *self) aldo_nothrow;
 void aldo_debug_check(aldo_debugger *self,
-                      const struct aldo_clock *clk) br_nothrow;
+                      const struct aldo_clock *clk) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

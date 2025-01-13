@@ -61,15 +61,15 @@ enum {
 //
 
 // Bytes to Word
-br_libexport
-inline uint16_t aldo_bytowr(uint8_t lo, uint8_t hi) br_nothrow
+aldo_export
+inline uint16_t aldo_bytowr(uint8_t lo, uint8_t hi) aldo_nothrow
 {
     return (uint16_t)(lo | hi << 8);
 }
 
 // Byte Array to Word
-br_libexport
-inline uint16_t aldo_batowr(const uint8_t bytes[br_csz(2)]) br_nothrow
+aldo_export
+inline uint16_t aldo_batowr(const uint8_t bytes[aldo_cz(2)]) aldo_nothrow
 {
     return aldo_bytowr(bytes[0], bytes[1]);
 }
@@ -79,21 +79,21 @@ inline uint16_t aldo_batowr(const uint8_t bytes[br_csz(2)]) br_nothrow
 //
 
 // Word to Bytes
-inline void aldo_wrtoby(uint16_t word, uint8_t *br_noalias lo,
-                        uint8_t *br_noalias hi) br_nothrow
+inline void aldo_wrtoby(uint16_t word, uint8_t *aldo_noalias lo,
+                        uint8_t *aldo_noalias hi) aldo_nothrow
 {
     *lo = (uint8_t)word;
     *hi = (uint8_t)(word >> 8);
 }
 
 // Word to Byte Array
-inline void aldo_wrtoba(uint16_t word, uint8_t bytes[br_csz(2)]) br_nothrow
+inline void aldo_wrtoba(uint16_t word, uint8_t bytes[aldo_cz(2)]) aldo_nothrow
 {
     aldo_wrtoby(word, bytes, bytes + 1);
 }
 
 // DWord to Byte Array
-inline void aldo_dwtoba(uint32_t dword, uint8_t bytes[br_csz(4)]) br_nothrow
+inline void aldo_dwtoba(uint32_t dword, uint8_t bytes[aldo_cz(4)]) aldo_nothrow
 {
     for (size_t i = 0; i < 4; ++i) {
         bytes[i] = (uint8_t)(dword >> (8 * i));
@@ -104,7 +104,7 @@ inline void aldo_dwtoba(uint32_t dword, uint8_t bytes[br_csz(4)]) br_nothrow
 // Outer Perfect Shuffle algorithm taken from Hacker's Delight 2nd Edition §7-2
 // and adapted to 16-bits; I *think* this is related to Morton Codes but
 // I'm not entirely sure: https://en.wikipedia.org/wiki/Z-order_curve
-inline uint16_t aldo_byteshuffle(uint8_t lo, uint8_t hi) br_nothrow
+inline uint16_t aldo_byteshuffle(uint8_t lo, uint8_t hi) aldo_nothrow
 {
     // NOTE: magic shuffle numbers
     static const uint16_t m[] = {
@@ -119,9 +119,9 @@ inline uint16_t aldo_byteshuffle(uint8_t lo, uint8_t hi) br_nothrow
 
 // Copy single bank @addr into destination buffer, assumes bank is sized to
 // power-of-2 KB boundary between [1, 64].
-size_t aldo_bytecopy_bank(const uint8_t *br_noalias bankmem, int bankwidth,
+size_t aldo_bytecopy_bank(const uint8_t *aldo_noalias bankmem, int bankwidth,
                           uint16_t addr, size_t count,
-                          uint8_t dest[br_nasz(count)]) br_nothrow;
+                          uint8_t dest[aldo_naz(count)]) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

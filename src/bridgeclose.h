@@ -9,14 +9,14 @@
 #ifdef __cplusplus
 }   // NOTE: end extern "C"
 #endif
-#undef br_empty
-#undef br_nothrow
-#undef br_nacsz
-#undef br_nasz
-#undef br_csz
-#undef br_noalias
-#undef br_ownresult
-#undef br_checkerror
-#undef br_libexport
+#undef aldo_empty
+#undef aldo_nothrow
+#undef aldo_nacz
+#undef aldo_naz
+#undef aldo_cz
+#undef aldo_noalias
+#undef aldo_ownresult
+#undef aldo_checkerr
+#undef aldo_export
 
-#undef br_pcallc
+#undef aldo_pcallc

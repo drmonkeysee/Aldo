@@ -9,8 +9,8 @@
 #define Aldo_version_h
 
 #include "bridgeopen.h"
-br_libexport
-extern const char *const br_noalias Aldo_Version;
+aldo_export
+extern const char *const aldo_noalias Aldo_Version;
 #include "bridgeclose.h"
 
 #endif

@@ -282,8 +282,7 @@ public:
     using option = std::pair<V, const char*>;
 
     ComboList(const char* label, std::initializer_list<option> options)
-    : label{label}, options{options},
-    selectedOption{this->options.front()} {}
+    : label{label}, options{options}, selected{this->options.front()} {}
     ComboList(const ComboList&) = delete;
     ComboList& operator=(const ComboList&) = delete;
     ComboList(ComboList&&) = delete;
@@ -291,23 +290,23 @@ public:
 
     void render() noexcept
     {
-        if (ImGui::BeginCombo(label, selectedOption.second)) {
+        if (ImGui::BeginCombo(label, selected.second)) {
             for (const auto& option : options) {
-                auto current = option == selectedOption;
+                auto current = option == selected;
                 if (ImGui::Selectable(option.second, current)) {
-                    selectedOption = option;
+                    selected = option;
                 }
             }
             ImGui::EndCombo();
         }
     }
 
-    V selection() const noexcept { return selectedOption.first; }
+    V selection() const noexcept { return selected.first; }
 
 private:
     const char* label;
     std::vector<option> options;
-    option selectedOption;
+    option selected;
 };
 
 auto widget_group(std::invocable auto f)
@@ -1248,6 +1247,7 @@ protected:
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 15);
         displayMode.render();
         ImGui::SameLine();
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 19);
         displayGrid.render();
         ImGui::SameLine();
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 5);

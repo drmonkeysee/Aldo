@@ -724,13 +724,13 @@ private:
     void renderRegisters() const
     {
         auto& cpu = emu.snapshot().cpu;
-        widget_group([&cpu] {
+        widget_group([&cpu] noexcept {
             ImGui::Text("A: %02X", cpu.accumulator);
             ImGui::Text("X: %02X", cpu.xindex);
             ImGui::Text("Y: %02X", cpu.yindex);
         });
         ImGui::SameLine(0, 90);
-        widget_group([&cpu] {
+        widget_group([&cpu] noexcept {
             ImGui::Text("PC: %04X", cpu.program_counter);
             ImGui::Text(" S: %02X", cpu.stack_pointer);
             ImGui::Text(" P: %02X", cpu.status);
@@ -1031,7 +1031,7 @@ private:
                 vs.commands.emplace(aldo::Command::resetVectorClear);
             }
         }
-        DisabledIf dif = [this] {
+        DisabledIf dif = [this] noexcept {
             if (this->resetOverride) return false;
             // NOTE: +2 = start of reset vector
             this->resetAddr = aldo_batowr(this->emu.snapshot().prg.vectors
@@ -1372,7 +1372,7 @@ private:
 
     void renderColorMods()
     {
-        widget_group([this] {
+        widget_group([this] noexcept {
             bool chr = ImGui::Checkbox("Red Emphasis", &this->emr);
             bool chg = ImGui::Checkbox("Green Emphasis", &this->emg);
             bool chb = ImGui::Checkbox("Blue Emphasis", &this->emb);
@@ -1486,12 +1486,12 @@ protected:
             right.draw(tables->right, colors, emu.palette());
         }
 
-        widget_group([this] {
+        widget_group([this] noexcept {
             ImGui::TextUnformatted("Pattern Table $0000");
             this->left.render();
         });
         ImGui::SameLine(0, 10);
-        widget_group([this] {
+        widget_group([this] noexcept {
             ImGui::TextUnformatted("Pattern Table $1000");
             this->right.render();
         });
@@ -1621,12 +1621,12 @@ private:
     void renderRegisters() const
     {
         auto& ppu = emu.snapshot().ppu;
-        widget_group([&ppu] {
+        widget_group([&ppu] noexcept {
             ImGui::Text("CTRL: %02X", ppu.ctrl);
             ImGui::Text("MASK: %02X", ppu.mask);
         });
         ImGui::SameLine(0, 20);
-        widget_group([&ppu] {
+        widget_group([&ppu] noexcept {
             ImGui::Text("STATUS:  %d%d%d", aldo_getbit(ppu.status, 7),
                         aldo_getbit(ppu.status, 6),
                         aldo_getbit(ppu.status, 5));

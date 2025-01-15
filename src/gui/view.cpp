@@ -33,6 +33,7 @@
 #include <iterator>
 #include <limits>
 #include <locale>
+#include <ranges>
 #include <span>
 #include <string_view>
 #include <type_traits>
@@ -280,13 +281,15 @@ template<typename V>
 class ComboList {
 public:
     using option = std::pair<V, const char*>;
+    using callback = std::function<void (V, bool)>;
+
+    template<std::ranges::range C>
+    ComboList(const char* label, C options, callback cb)
+    : label{label}, options{std::ranges::to<decltype(this->options)>(options)},
+    selected{this->options.front()}, onSelected{cb} {}
 
     ComboList(const char* label, std::initializer_list<option> options)
     : label{label}, options{options}, selected{this->options.front()} {}
-    ComboList(const ComboList&) = delete;
-    ComboList& operator=(const ComboList&) = delete;
-    ComboList(ComboList&&) = delete;
-    ComboList& operator=(ComboList&&) = delete;
 
     void render() noexcept
     {
@@ -295,6 +298,7 @@ public:
                 auto current = option == selected;
                 if (ImGui::Selectable(option.second, current)) {
                     selected = option;
+                    onSelected(selected.first, !current);
                 }
             }
             ImGui::EndCombo();
@@ -307,6 +311,7 @@ private:
     const char* label;
     std::vector<option> options;
     option selected;
+    callback onSelected = [](V, bool) static constexpr noexcept {};
 };
 
 auto widget_group(std::invocable auto f)
@@ -880,18 +885,8 @@ class DebuggerView final : public aldo::View {
 public:
     DebuggerView(aldo::viewstate& vs, const aldo::Emulator& emu,
                  const aldo::MediaRuntime& mr)
-    : View{"Debugger", vs, emu, mr}
-    {
-        using halt_integral =
-            std::underlying_type_t<halt_selection::first_type>;
-        std::ranges::generate(haltConditions,
-            [h = static_cast<halt_integral>(ALDO_HLT_NONE)] mutable
-                              -> halt_selection {
-                auto cond = static_cast<halt_selection::first_type>(++h);
-                return {cond, aldo_haltcond_description(cond)};
-            });
-        resetHaltExpression(haltConditions.front());
-    }
+    : View{"Debugger", vs, emu, mr}, haltConditions{createCombo()}
+    {}
     DebuggerView(aldo::viewstate&, aldo::Emulator&&,
                  const aldo::MediaRuntime&) = delete;
     DebuggerView(aldo::viewstate&, const aldo::Emulator&,
@@ -914,11 +909,12 @@ protected:
     }
 
 private:
-    using halt_selection = std::pair<aldo_haltcondition, aldo::et::str>;
-    // NOTE: does not include first enum value HLT_NONE
-    using halt_array = std::array<halt_selection, ALDO_HLT_COUNT - 1>;
+    using HaltCombo = ComboList<aldo_haltcondition>;
     using bp_sz = aldo::Debugger::BpView::size_type;
     using bp_diff = aldo::Debugger::BreakpointIterator::difference_type;
+
+    static_assert(std::same_as<HaltCombo::option::second_type, aldo::et::str>,
+                  "HaltCombo label type does not match emulator string type");
 
     class SelectedBreakpoints {
     public:
@@ -996,6 +992,33 @@ private:
         std::vector<bp_diff> selections;
     };
 
+    HaltCombo createCombo()
+    {
+        using halt_option = HaltCombo::option;
+        using halt_selection = halt_option::first_type;
+        using halt_integral = std::underlying_type_t<halt_selection>;
+
+        // NOTE: does not include first enum value HLT_NONE
+        std::array<halt_option, ALDO_HLT_COUNT - 1> conditions;
+        std::ranges::generate(conditions,
+            [h = static_cast<halt_integral>(ALDO_HLT_NONE)] mutable noexcept
+                              -> halt_option {
+                auto cond = static_cast<halt_selection>(++h);
+                return {cond, aldo_haltcond_description(cond)};
+            });
+
+        auto cb = [this](halt_selection v, bool changed) noexcept {
+            this->setFocus = true;
+            if (changed) {
+                this->currentHaltExpression = {.cond = v};
+            }
+        };
+
+        HaltCombo combo{"##haltconditions", conditions, cb};
+        cb(combo.selection(), true);
+        return combo;
+    }
+
     void renderVectorOverride()
     {
         syncWithOverrideState();
@@ -1023,37 +1046,25 @@ private:
 
     void renderBreakpoints()
     {
-        auto setFocus = renderConditionCombo();
+        setFocus = false;
+        renderConditionCombo();
         ImGui::Separator();
-        renderBreakpointAdd(setFocus);
+        renderBreakpointAdd();
         ImGui::Separator();
         renderBreakpointList();
         detectedHalt = emu.debugger().halted();
     }
 
-    bool renderConditionCombo() noexcept
+    void renderConditionCombo() noexcept
     {
         ImGui::AlignTextToFramePadding();
         ImGui::TextUnformatted("Halt on");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 12);
-        auto setFocus = false;
-        if (ImGui::BeginCombo("##haltconditions", selectedCondition.second)) {
-            for (const auto& hc : haltConditions) {
-                auto current = hc == selectedCondition;
-                if (ImGui::Selectable(hc.second, current)) {
-                    setFocus = true;
-                    if (!current) {
-                        resetHaltExpression(hc);
-                    }
-                }
-            }
-            ImGui::EndCombo();
-        }
-        return setFocus;
+        haltConditions.render();
     }
 
-    void renderBreakpointAdd(bool setFocus)
+    void renderBreakpointAdd()
     {
         switch (currentHaltExpression.cond) {
         case ALDO_HLT_ADDR:
@@ -1075,7 +1086,7 @@ private:
         default:
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
                         "Invalid halt condition selection: %d",
-                        selectedCondition.first);
+                        haltConditions.selection());
             break;
         }
         if (setFocus) {
@@ -1167,12 +1178,6 @@ private:
         }
     }
 
-    void resetHaltExpression(halt_selection selection) noexcept
-    {
-        selectedCondition = selection;
-        currentHaltExpression = {.cond = selectedCondition.first};
-    }
-
     void syncWithOverrideState() noexcept
     {
         // NOTE: if view flag doesn't match debugger state then debugger
@@ -1191,10 +1196,9 @@ private:
         ImGui::InputScalar("Count", ImGuiDataType_U64, &input);
     }
 
-    bool detectedHalt = false, resetOverride = false;
+    bool detectedHalt = false, resetOverride = false, setFocus = false;
     aldo::et::word resetAddr = 0x0;
-    halt_array haltConditions;
-    halt_selection selectedCondition;
+    HaltCombo haltConditions;
     aldo_haltexpr currentHaltExpression;
     SelectedBreakpoints bpSelections;
 };

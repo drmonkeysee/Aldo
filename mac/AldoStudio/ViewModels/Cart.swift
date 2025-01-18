@@ -192,7 +192,7 @@ fileprivate final class CartHandle {
             return .iNes(
                 .init(cString: aldo_cart_formatname(info.format)),
                 info.ines_hdr,
-                .init(cString: aldo_cart_mirrorname(info.ines_hdr.mirror)))
+                .init(cString: aldo_ntmirror_name(info.ines_hdr.mirror)))
         default:
             return .unknown
         }

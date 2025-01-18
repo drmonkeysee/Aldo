@@ -31,6 +31,9 @@
 		C830036728DEDDD200480F29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C830036628DEDDD200480F29 /* Assets.xcassets */; };
 		C830036C28DEDDD200480F29 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C830036B28DEDDD200480F29 /* main.m */; };
 		C838F8572936FC9800D52004 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C80C9E1B277D648F000F2D8B /* debug.c */; };
+		C8395D452D3B5CD00046F2D8 /* ctrlsignal.c in Sources */ = {isa = PBXBuildFile; fileRef = C8395D432D3B5CD00046F2D8 /* ctrlsignal.c */; };
+		C8395D462D3B5CD00046F2D8 /* ctrlsignal.c in Sources */ = {isa = PBXBuildFile; fileRef = C8395D432D3B5CD00046F2D8 /* ctrlsignal.c */; };
+		C8395D472D3B5E140046F2D8 /* ctrlsignal.c in Sources */ = {isa = PBXBuildFile; fileRef = C8395D432D3B5CD00046F2D8 /* ctrlsignal.c */; };
 		C83A30772904987F00749A17 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C83A307A2904A2B000749A17 /* version.c in Sources */ = {isa = PBXBuildFile; fileRef = C83A30792904A2B000749A17 /* version.c */; };
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
@@ -266,6 +269,7 @@
 		C830036D28DEDDD200480F29 /* Aldo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Aldo.entitlements; sourceTree = "<group>"; };
 		C838D3B427D5DA4400468FDB /* CartInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartInfoView.swift; sourceTree = "<group>"; };
 		C838D3B627D5DB0300468FDB /* CartChrView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartChrView.swift; sourceTree = "<group>"; };
+		C8395D432D3B5CD00046F2D8 /* ctrlsignal.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ctrlsignal.c; sourceTree = "<group>"; };
 		C83965E927810D4300E1E28E /* tsutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tsutil.h; sourceTree = "<group>"; };
 		C83A30782904A2B000749A17 /* version.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
 		C83A30792904A2B000749A17 /* version.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = version.c; sourceTree = "<group>"; };
@@ -528,6 +532,7 @@
 				C8C706842751EEBA00B45785 /* cpu.h */,
 				C8C706892751EEBA00B45785 /* cpu.c */,
 				C8E9478128FE45EA0073D1AA /* ctrlsignal.h */,
+				C8395D432D3B5CD00046F2D8 /* ctrlsignal.c */,
 				C848C1B228FB9D630025ABD2 /* cycleclock.h */,
 				C80CCE052930495300664730 /* cycleclock.c */,
 				C80C9E1A277D648F000F2D8B /* debug.h */,
@@ -945,6 +950,7 @@
 				C81680072BE70556005A7905 /* ppu.c in Sources */,
 				C8C706B62751F0BA00B45785 /* bus.c in Sources */,
 				C8C706B12751EF8D00B45785 /* cpuimplied.c in Sources */,
+				C8395D472D3B5E140046F2D8 /* ctrlsignal.c in Sources */,
 				C8C706A82751EF8D00B45785 /* bytes.c in Sources */,
 				C8C706B22751EF8D00B45785 /* cpusubroutine.c in Sources */,
 				C8C706B72751F0BD00B45785 /* bytes.c in Sources */,
@@ -990,6 +996,7 @@
 				C8557B2F25C661660090296D /* ui.c in Sources */,
 				C8D8FDA82792691B0073639B /* tsutil.c in Sources */,
 				C8186495277EB0F700CA4AC0 /* uicurses.c in Sources */,
+				C8395D452D3B5CD00046F2D8 /* ctrlsignal.c in Sources */,
 				C8C706942751EEBA00B45785 /* cpu.c in Sources */,
 				C820E6CB25A97A4E006A7AB1 /* cli.c in Sources */,
 				C8A13C822C81559B00F61389 /* snapshot.c in Sources */,
@@ -1051,6 +1058,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8395D462D3B5CD00046F2D8 /* ctrlsignal.c in Sources */,
 				C80265122957B5060040CE17 /* version.c in Sources */,
 				C8B88AB029062B0200B7CB23 /* mappers.c in Sources */,
 				C8B88AB429062B1300B7CB23 /* tsutil.c in Sources */,

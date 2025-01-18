@@ -410,7 +410,7 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
         assert(header->prg_blocks <= 2);
         struct ines_000_mapper *m = (struct ines_000_mapper *)self;
         m->blockcount = header->prg_blocks;
-        m->hmirroring = header->mirror == ALDO_CNTM_HORIZONTAL;
+        m->hmirroring = header->mirror == ALDO_NTM_HORIZONTAL;
         header->mapper_implemented = true;
     } else {
         if (!(self = malloc(sizeof *self))) return ALDO_CART_ERR_ERNO;

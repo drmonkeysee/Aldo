@@ -678,7 +678,7 @@ private:
         }
 
         ImGui::Text("NT-Mirroring: %s",
-                    aldo_cart_mirrorname(info.ines_hdr.mirror));
+                    aldo_ntmirror_name(info.ines_hdr.mirror));
         ImGui::Text("Mapper-Ctrl: %s",
                     boolstr(info.ines_hdr.mapper_controlled));
         ImGui::Separator();
@@ -1233,18 +1233,18 @@ public:
 protected:
     void renderContents() override
     {
+        const auto* vsnp = emu.snapshot().video;
         auto textOffset = nametables.nametableSize().x
                             + aldo::style::glyph_size().x + 1;
         tableLabel(0);
         ImGui::SameLine(textOffset);
         tableLabel(1);
-        nametables.draw(emu.snapshot().video->palettes.bg[0], emu.palette(),
-                        mr);
+        nametables.draw(vsnp->palettes.bg[0], emu.palette(), mr);
         nametables.render();
         tableLabel(2);
         ImGui::SameLine(textOffset);
         tableLabel(3);
-        ImGui::TextUnformatted("Mirroring: <placeholder>");
+        ImGui::Text("Mirroring: %s", aldo_ntmirror_name(vsnp->nt.mirror));
 
         ImGui::Separator();
 

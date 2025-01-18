@@ -9,6 +9,7 @@
 #define Aldo_cart_h
 
 #include "bustype.h"
+#include "ctrlsignal.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -31,27 +32,13 @@ enum aldo_cartformat {
 #undef X
 };
 
-// X(symbol, name)
-#define ALDO_CART_NTMIRROR_X \
-X(CNTM_HORIZONTAL, "Horizontal") \
-X(CNTM_VERTICAL, "Vertical") \
-X(CNTM_1SCREEN, "Single-Screen") \
-X(CNTM_4SCREEN, "4-Screen VRAM") \
-X(CNTM_OTHER, "Mapper-Specific")
-
-enum aldo_cart_ntm {
-#define X(s, n) ALDO_##s,
-    ALDO_CART_NTMIRROR_X
-#undef X
-};
-
 // iNES File Header
 // TODO: ignoring following fields for now:
 //  - VS/Playchoice system indicator (does anyone care?)
 //  - TV System (PAL ROMs don't seem to set the flags so again who cares)
 //  - redundant indicators in byte 10
 struct aldo_ines_header {
-    enum aldo_cart_ntm mirror;      // Nametable Mirroring Designation
+    enum aldo_ntmirror mirror;      // Nametable Mirroring Designation
     uint8_t chr_blocks,             // CHR ROM block count; 0 indicates CHR RAM
                                     //      1 block = 8KB
             mapper_id,              // Mapper ID
@@ -119,8 +106,6 @@ void aldo_cart_free(aldo_cart *self) aldo_nothrow;
 
 aldo_export
 const char *aldo_cart_formatname(enum aldo_cartformat format) aldo_nothrow;
-aldo_export
-const char *aldo_cart_mirrorname(enum aldo_cart_ntm mirror) aldo_nothrow;
 aldo_export aldo_checkerr
 int
 aldo_cart_format_extname(aldo_cart *self,

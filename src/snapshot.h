@@ -30,12 +30,6 @@ enum {
     ALDO_NT_ATTR_COUNT = 64,
 };
 
-// TODO: add additional mirror types as we expand mapper support
-enum aldo_ntmirror {
-    ALDO_NTM_VERTICAL,
-    ALDO_NTM_HORIZONTAL,
-};
-
 struct aldo_snapshot {
     struct {
         uint16_t program_counter;

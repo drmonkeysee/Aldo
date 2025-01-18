@@ -38,6 +38,7 @@
 #include <string_view>
 #include <type_traits>
 #include <unordered_set>
+#include <utility>
 #include <cassert>
 #include <cinttypes>
 #include <cstdio>
@@ -284,8 +285,10 @@ public:
     using callback = std::function<void (V, bool)>;
 
     template<std::ranges::range C>
-    ComboList(const char* label, C options, callback cb)
-    : label{label}, options{std::ranges::to<decltype(this->options)>(options)},
+    ComboList(const char* label, C&& options, callback cb)
+    : label{label}, options{
+        std::ranges::to<decltype(this->options)>(std::forward<C>(options)),
+    },
     selected{this->options.front()}, onSelected{cb} {}
 
     ComboList(const char* label, std::initializer_list<option> options)

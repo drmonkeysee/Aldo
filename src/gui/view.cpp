@@ -885,7 +885,7 @@ class DebuggerView final : public aldo::View {
 public:
     DebuggerView(aldo::viewstate& vs, const aldo::Emulator& emu,
                  const aldo::MediaRuntime& mr)
-    : View{"Debugger", vs, emu, mr}, haltConditions{createCombo()}
+    : View{"Debugger", vs, emu, mr}, conditionsCombo{createCombo()}
     {}
     DebuggerView(aldo::viewstate&, aldo::Emulator&&,
                  const aldo::MediaRuntime&) = delete;
@@ -1061,7 +1061,7 @@ private:
         ImGui::TextUnformatted("Halt on");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 12);
-        haltConditions.render();
+        conditionsCombo.render();
     }
 
     void renderBreakpointAdd()
@@ -1086,7 +1086,7 @@ private:
         default:
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
                         "Invalid halt condition selection: %d",
-                        haltConditions.selection());
+                        conditionsCombo.selection());
             break;
         }
         if (setFocus) {
@@ -1198,7 +1198,7 @@ private:
 
     bool detectedHalt = false, resetOverride = false, setFocus = false;
     aldo::et::word resetAddr = 0x0;
-    HaltCombo haltConditions;
+    HaltCombo conditionsCombo;
     aldo_haltexpr currentHaltExpression;
     SelectedBreakpoints bpSelections;
 };
@@ -1208,14 +1208,14 @@ public:
     NametablesView(aldo::viewstate& vs, const aldo::Emulator& emu,
                    const aldo::MediaRuntime& mr) noexcept
     : View{"Nametables", vs, emu, mr}, nametables{emu.screenSize(), mr},
-    displayMode{
+    modeCombo{
         "##displayMode",
         {
             {DisplayMode::nametables, "Nametables"},
             {DisplayMode::attributeTables, "Attributes"},
         },
     },
-    displayGrid{
+    gridCombo{
         "##gridOverlay",
         {
             {GridOverlay::none, "No Grid"},
@@ -1249,10 +1249,10 @@ protected:
         ImGui::Separator();
 
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 15);
-        displayMode.render();
+        modeCombo.render();
         ImGui::SameLine();
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 19);
-        displayGrid.render();
+        gridCombo.render();
         ImGui::SameLine();
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 5);
         ImGui::DragInt("Scanline", &scanline, 1, 0, 261, "%d",
@@ -1272,15 +1272,15 @@ private:
 
     void tableLabel(int table) const noexcept
     {
-        auto attr = displayMode.selection() == DisplayMode::attributeTables;
+        auto attr = modeCombo.selection() == DisplayMode::attributeTables;
         ImGui::Text("%s $%4X", attr ? "Attribute Table" : "Nametable",
                     ALDO_MEMBLOCK_8KB + (table * ALDO_MEMBLOCK_1KB)
                     + (attr * ALDO_NT_TILE_COUNT));
     }
 
     aldo::Nametables nametables;
-    ComboList<DisplayMode> displayMode;
-    ComboList<GridOverlay> displayGrid;
+    ComboList<DisplayMode> modeCombo;
+    ComboList<GridOverlay> gridCombo;
     int scanline = 241;
 };
 

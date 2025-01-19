@@ -20,6 +20,7 @@
 namespace aldo
 {
 
+class Emulator;
 class MediaRuntime;
 class Palette;
 using color_span = std::span<const et::byte, ALDO_PAL_SIZE>;
@@ -155,8 +156,8 @@ public:
 
     SDL_Point nametableSize() const noexcept { return ntSize; }
 
-    void draw(color_span colors, const Palette& p,
-              const MediaRuntime& mr) const;
+    void drawNametables(const Emulator& emu, const MediaRuntime& mr) const;
+    void drawAttributes(const Emulator& emu, const MediaRuntime& mr) const;
     void render() const noexcept { tex.render(); }
 
 private:

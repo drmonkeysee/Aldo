@@ -484,6 +484,7 @@ auto tools_menu(aldo::viewstate& vs)
 {
     if (ImGui::BeginMenu("Tools")) {
         ImGui::MenuItem("ImGui Demo", "Cmd+D", &vs.showDemo);
+        ImGui::MenuItem("Design Palette", nullptr, &vs.showDesignPalette);
         if (ImGui::MenuItem("Aldo Studio...")) {
             vs.commands.emplace(aldo::Command::launchStudio);
         }
@@ -546,6 +547,35 @@ auto about_overlay(aldo::viewstate& vs) noexcept
                 && !ImGui::IsWindowHovered())) {
             vs.showAbout = false;
         }
+    }
+    ImGui::End();
+}
+
+auto design_palette(aldo::viewstate& vs) noexcept
+{
+    if (!vs.showDesignPalette) return;
+
+    auto cbutton = [](const char* lbl, ImU32 c) static noexcept {
+        ImGui::ColorButton(lbl, ImGui::ColorConvertU32ToFloat4(c),
+                           ImGuiColorEditFlags_NoDragDrop);
+        ImGui::SameLine();
+        ImGui::TextUnformatted(lbl);
+    };
+
+    if (ImGui::Begin("Design Palette", &vs.showDesignPalette)) {
+        auto screenFill = IM_COL32(aldo::colors::ScreenFill,
+                                   aldo::colors::ScreenFill,
+                                   aldo::colors::ScreenFill,
+                                   SDL_ALPHA_OPAQUE);
+        cbutton("Screen Fill", screenFill);
+        cbutton("Attention", aldo::colors::Attention);
+        cbutton("Destructive", aldo::colors::Destructive);
+        cbutton("Destructive Active", aldo::colors::DestructiveActive);
+        cbutton("Destructive Hover", aldo::colors::DestructiveHover);
+        cbutton("Led Off", aldo::colors::LedOff);
+        cbutton("Led On", aldo::colors::LedOn);
+        cbutton("Line In", aldo::colors::LineIn);
+        cbutton("Line Out", aldo::colors::LineOut);
     }
     ImGui::End();
 }
@@ -1398,7 +1428,8 @@ private:
         ImGui::ColorButton("Selected Color",
                            ImGui::ColorConvertU32ToFloat4(color),
                            ImGuiColorEditFlags_NoAlpha
-                           | ImGuiColorEditFlags_NoTooltip,
+                           | ImGuiColorEditFlags_NoTooltip
+                           | ImGuiColorEditFlags_NoDragDrop,
                            {selectedColorDim, selectedColorDim});
         ImGui::SameLine();
         widget_group([color, &vs = vs] {
@@ -2164,6 +2195,7 @@ void aldo::Layout::render() const
         v->render();
     }
     about_overlay(vs);
+    design_palette(vs);
     if (vs.showDemo) {
         ImGui::ShowDemoWindow();
     }

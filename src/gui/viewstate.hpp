@@ -71,7 +71,9 @@ struct viewstate {
     std::queue<command_state> commands;
     RunClock clock;
     palette::sz colorSelection = 0;
-    bool running = true, showAbout = false, showDemo = false;
+    bool
+        running = true, showAbout = false, showDemo = false,
+        showDesignPalette = false;
 };
 
 }

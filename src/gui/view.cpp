@@ -238,12 +238,17 @@ constexpr auto boolstr(bool v) noexcept
     return v ? "yes" : "no";
 }
 
-constexpr auto operator+(ImVec2 v, float f) noexcept
+constexpr auto operator+(const ImVec2& v, float f) noexcept
 {
     return ImVec2{v.x + f, v.y + f};
 }
 
-constexpr auto operator-(ImVec2 a, const ImVec2& b) noexcept
+constexpr auto operator+(const ImVec2& a, const ImVec2& b) noexcept
+{
+    return ImVec2{a.x + b.x, a.y + b.y};
+}
+
+constexpr auto operator-(const ImVec2& a, const ImVec2& b) noexcept
 {
     return ImVec2{a.x - b.x, a.y - b.y};
 }
@@ -1271,12 +1276,14 @@ protected:
         tableLabel(0);
         ImGui::SameLine(textOffset);
         tableLabel(1);
+        auto ntDrawOrigin = ImGui::GetCursorScreenPos();
         if (modeCombo.selection() == DisplayMode::nametables) {
             nametables.drawNametables(emu, mr);
         } else {
             nametables.drawAttributes(emu, mr);
         }
         nametables.render();
+        renderGrid(ntDrawOrigin);
         tableLabel(2);
         ImGui::SameLine(textOffset);
         tableLabel(3);
@@ -1306,6 +1313,51 @@ private:
         tiles,
         attributes,
     };
+
+    void renderGrid(const ImVec2& origin) const noexcept
+    {
+        static constexpr auto tileStep = 8, attrStep = 32;
+
+        auto drawList = ImGui::GetWindowDrawList();
+        auto [w, h] = nametables.totalSize();
+        ImVec2
+            extent{static_cast<float>(w) + 1, static_cast<float>(h) + 1},
+            hor{extent.x - 1, 0}, ver{0, extent.y - 1};
+
+        if (gridCombo.selection() == GridOverlay::tiles) {
+            for (auto start = origin;
+                 start.x - origin.x < extent.x;
+                 start.x += tileStep) {
+                drawList->AddLine(start, start + ver, aldo::colors::Attention);
+            }
+            for (auto start = origin;
+                 start.y - origin.y < extent.y;
+                 start.y += tileStep) {
+                drawList->AddLine(start, start + hor, aldo::colors::Attention);
+            }
+        }
+
+        if (gridCombo.selection() == GridOverlay::attributes) {
+            auto ntHeight = nametables.nametableSize().y;
+            for (auto start = origin;
+                 start.x - origin.x < extent.x;
+                 start.x += attrStep) {
+                drawList->AddLine(start, start + ver, aldo::colors::LedOn);
+            }
+            for (auto start = origin;
+                 start.y - origin.y < ntHeight;
+                 start.y += attrStep) {
+                drawList->AddLine(start, start + hor, aldo::colors::LedOn);
+            }
+            for (ImVec2 start{origin.x, origin.y + ntHeight};
+                 start.y - origin.y < extent.y;
+                 start.y += attrStep) {
+                drawList->AddLine(start, start + hor, aldo::colors::LedOn);
+            }
+            ImVec2 lastLine{origin.x, origin.y + (extent.y - 1)};
+            drawList->AddLine(lastLine, lastLine + hor, aldo::colors::LedOn);
+        }
+    }
 
     void tableLabel(int table) const noexcept
     {

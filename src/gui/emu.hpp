@@ -77,10 +77,6 @@ public:
     }
 
     Emulator(debug_handle d, console_handle c, const gui_platform& p);
-    Emulator(const Emulator&) = delete;
-    Emulator& operator=(const Emulator&) = delete;
-    Emulator(Emulator&&) = delete;
-    Emulator& operator=(Emulator&&) = delete;
     ~Emulator() { cleanup(); }
 
     const std::filesystem::path& cartName() const noexcept { return cartname; }

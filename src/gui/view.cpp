@@ -1270,10 +1270,12 @@ protected:
         ImGui::SameLine(textOffset);
         tableLabel(1);
         auto ntDrawOrigin = ImGui::GetCursorScreenPos();
-        if (modeCombo.selection() == DisplayMode::nametables) {
-            nametables.drawNametables(emu, mr);
-        } else {
-            nametables.drawAttributes(emu, mr);
+        if (drawInterval.elapsed(vs.clock.clock())) {
+            if (modeCombo.selection() == DisplayMode::attributeTables) {
+                nametables.drawAttributes(emu, mr);
+            } else {
+                nametables.drawNametables(emu, mr);
+            }
         }
         nametables.render();
         if (tileGrid) {
@@ -1371,6 +1373,7 @@ private:
 
     aldo::Nametables nametables;
     ComboList<DisplayMode> modeCombo;
+    RefreshInterval drawInterval{250};
     int scanline = 241;
     bool attributeGrid = false, tileGrid = false;
 };

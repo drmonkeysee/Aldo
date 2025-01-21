@@ -145,7 +145,7 @@ public:
 
     void setScale(aldo_clockscale s) noexcept
     {
-        if (s == scale()) return;
+        if (s == currentScale) return;
 
         auto prev = oldRate;
         oldRate = clock().rate;
@@ -158,7 +158,7 @@ public:
 
     void toggleScale() noexcept
     {
-        setScale(static_cast<aldo_clockscale>(!scale()));
+        setScale(static_cast<aldo_clockscale>(!currentScale));
     }
 
 private:

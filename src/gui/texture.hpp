@@ -87,7 +87,7 @@ public:
     Texture& operator=(Texture&&) = delete;
     ~Texture() { SDL_DestroyTexture(tex); }
 
-    SDL_Point size() const noexcept
+    SDL_Point getSize() const noexcept
     {
         SDL_Point p;
         SDL_QueryTexture(tex, nullptr, nullptr, &p.x, &p.y);
@@ -107,7 +107,7 @@ public:
 
     void render(float scalex, float scaley) const noexcept
     {
-        auto [w, h] = size();
+        auto [w, h] = getSize();
         ImGui::Image(tex, {
             static_cast<float>(w) * scalex, static_cast<float>(h) * scaley,
         });
@@ -165,7 +165,7 @@ public:
     Nametables(SDL_Point nametableSize, const MediaRuntime& mr);
 
     SDL_Point nametableSize() const noexcept { return ntSize; }
-    SDL_Point totalSize() const noexcept { return tex.size(); };
+    SDL_Point totalSize() const noexcept { return tex.getSize(); };
 
     void drawNametables(const Emulator& emu, const MediaRuntime& mr) const;
     void drawAttributes(const Emulator& emu, const MediaRuntime& mr) const;

@@ -1511,8 +1511,13 @@ private:
 
     pal_c applyEmphasis(pal_c color, pal_sz idx) const
     {
+        // NOTE: minimum channel value used for applying emphasis in order to
+        // get a visible tint on colors that would otherwise round down to
+        // nearly zero.
+        static constexpr auto emFloor = 0x10;
+
         if ((emr || emg || emb) && ((idx & 0xe) < 0xe)) {
-            auto [r, g, b] = aldo::colors::rgb_floor(color, EmphasisFloor);
+            auto [r, g, b] = aldo::colors::rgb_floor(color, emFloor);
             color = IM_COL32(static_cast<float>(r) * atr,
                              static_cast<float>(g) * atg,
                              static_cast<float>(b) * atb,
@@ -1542,9 +1547,6 @@ private:
 
     static constexpr pal_sz Cols = 17;
     static constexpr float Attenuated = 0.816328f, Full = 1.0f;
-    // NOTE: minimum channel value used for applying emphasis in order to get a
-    // visible tint on colors that would otherwise round down to nearly zero.
-    static constexpr ImU32 EmphasisFloor = 0x10;
 
     bool gray = false, emr = false, emg = false, emb = false;
     float atr = Full, atg = Full, atb = Full;

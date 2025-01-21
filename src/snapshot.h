@@ -28,6 +28,7 @@ enum {
     ALDO_NT_HEIGHT = 30,
     ALDO_NT_TILE_COUNT = ALDO_NT_WIDTH * ALDO_NT_HEIGHT,
     ALDO_NT_ATTR_COUNT = 64,
+    ALDO_METATILE_DIM = 2,
 };
 
 struct aldo_snapshot {

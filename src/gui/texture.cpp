@@ -91,7 +91,7 @@ aldo::Nametables::Nametables(SDL_Point nametableSize,
 void aldo::Nametables::drawNametables(const aldo::Emulator& emu,
                                       const aldo::MediaRuntime& mr) const
 {
-    static_assert(aldo::color_span::extent == NtDisplayCount,
+    static_assert(aldo::color_span::extent == LayoutDim * LayoutDim,
                   "mismatched nt sizes");
 
     auto ren = mr.renderer();
@@ -117,8 +117,9 @@ void aldo::Nametables::drawAttributes(const aldo::Emulator& emu,
                                       const aldo::MediaRuntime& mr) const
 {
     static constexpr auto
-        metatileFactor = 2, metatileCount = metatileFactor * metatileFactor,
-        attrDim = 8, attrStride = ALDO_CHR_TILE_STRIDE * metatileFactor;
+        metatileCount = ALDO_METATILE_DIM * ALDO_METATILE_DIM,
+        metatileStride = ALDO_METATILE_DIM * TileDim,
+        attrDim = 8;
 
     const auto* vsp = emu.snapshot().video;
     int ntXOffset = 0, ntYOffset = 0, mirXOffset = 0, mirYOffset = 0;
@@ -141,7 +142,9 @@ void aldo::Nametables::drawAttributes(const aldo::Emulator& emu,
         auto col = 0, row = 0;
         for (auto attr : attributes) {
             // NOTE: last row only uses the top half of attributes
-            auto mtCount = row == attrDim - 1 ? metatileFactor : metatileCount;
+            auto mtCount = row == attrDim - 1
+                            ? ALDO_METATILE_DIM
+                            : metatileCount;
             for (auto m = 0; m < mtCount; ++m) {
                 aldo::color_span::size_type pidx = (attr >> (m * 2)) & 0x3;
                 assert(pidx < aldo::color_span::extent);
@@ -152,15 +155,15 @@ void aldo::Nametables::drawAttributes(const aldo::Emulator& emu,
                 auto c = emu.palette().getColor(cidx);
                 auto [r, g, b] = aldo::colors::rgb(c);
                 auto
-                    mtX = m % 2 == 1 ? ALDO_CHR_TILE_STRIDE : 0,
-                    mtY = m > 1 ? ALDO_CHR_TILE_STRIDE : 0,
-                    xOffset = (i * ntXOffset) + (col * attrStride) + mtX,
-                    yOffset = (i * ntYOffset) + (row * attrStride) + mtY;
+                    mtX = m % 2 == 1 ? metatileStride : 0,
+                    mtY = m > 1 ? metatileStride : 0,
+                    xOffset = (i * ntXOffset) + (col * AttributeDim) + mtX,
+                    yOffset = (i * ntYOffset) + (row * AttributeDim) + mtY;
                 SDL_Rect metatile{
                     xOffset,
                     yOffset,
-                    ALDO_CHR_TILE_STRIDE,
-                    ALDO_CHR_TILE_STRIDE,
+                    metatileStride,
+                    metatileStride,
                 };
                 SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r),
                                        static_cast<Uint8>(g),

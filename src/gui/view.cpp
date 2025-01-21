@@ -36,6 +36,7 @@
 #include <ranges>
 #include <span>
 #include <string_view>
+#include <tuple>
 #include <type_traits>
 #include <unordered_set>
 #include <utility>
@@ -1252,14 +1253,6 @@ public:
             {DisplayMode::nametables, "Nametables"},
             {DisplayMode::attributeTables, "Attributes"},
         },
-    },
-    gridCombo{
-        "##gridOverlay",
-        {
-            {GridOverlay::none, "No Grid"},
-            {GridOverlay::tiles, "Tile Grid"},
-            {GridOverlay::attributes, "Attribute Grid"},
-        },
     } {}
     NametablesView(aldo::viewstate&, aldo::Emulator&&,
                    const aldo::MediaRuntime&) = delete;
@@ -1283,7 +1276,12 @@ protected:
             nametables.drawAttributes(emu, mr);
         }
         nametables.render();
-        renderGrid(ntDrawOrigin);
+        if (tileGrid) {
+            renderTileGrid(ntDrawOrigin);
+        }
+        if (attributeGrid) {
+            renderAttributeGrid(ntDrawOrigin);
+        }
         tableLabel(2);
         ImGui::SameLine(textOffset);
         tableLabel(3);
@@ -1295,8 +1293,9 @@ protected:
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 15);
         modeCombo.render();
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 19);
-        gridCombo.render();
+        ImGui::Checkbox("Tile Grid", &tileGrid);
+        ImGui::SameLine();
+        ImGui::Checkbox("Attribute Grid", &attributeGrid);
         ImGui::SameLine();
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 5);
         ImGui::DragInt("Scanline", &scanline, 1, 0, 261, "%d",
@@ -1308,55 +1307,51 @@ private:
         nametables,
         attributeTables,
     };
-    enum class GridOverlay {
-        none,
-        tiles,
-        attributes,
-    };
 
-    void renderGrid(const ImVec2& origin) const noexcept
+    void renderTileGrid(const ImVec2& origin) const noexcept
     {
-        static constexpr auto tileStep = 8, attrStep = 32;
+        static constexpr auto step = decltype(nametables)::TileDim;
+
+        auto [extent, hor, ver] = gridDims();
 
         auto drawList = ImGui::GetWindowDrawList();
-        auto [w, h] = nametables.totalSize();
-        ImVec2
-            extent{static_cast<float>(w) + 1, static_cast<float>(h) + 1},
-            hor{extent.x - 1, 0}, ver{0, extent.y - 1};
-
-        if (gridCombo.selection() == GridOverlay::tiles) {
-            for (auto start = origin;
-                 start.x - origin.x < extent.x;
-                 start.x += tileStep) {
-                drawList->AddLine(start, start + ver, aldo::colors::Attention);
-            }
-            for (auto start = origin;
-                 start.y - origin.y < extent.y;
-                 start.y += tileStep) {
-                drawList->AddLine(start, start + hor, aldo::colors::Attention);
-            }
+        for (auto start = origin;
+             start.x - origin.x < extent.x;
+             start.x += step) {
+            drawList->AddLine(start, start + ver, aldo::colors::Attention);
         }
-
-        if (gridCombo.selection() == GridOverlay::attributes) {
-            auto ntHeight = nametables.nametableSize().y;
-            for (auto start = origin;
-                 start.x - origin.x < extent.x;
-                 start.x += attrStep) {
-                drawList->AddLine(start, start + ver, aldo::colors::LedOn);
-            }
-            for (auto start = origin;
-                 start.y - origin.y < ntHeight;
-                 start.y += attrStep) {
-                drawList->AddLine(start, start + hor, aldo::colors::LedOn);
-            }
-            for (ImVec2 start{origin.x, origin.y + ntHeight};
-                 start.y - origin.y < extent.y;
-                 start.y += attrStep) {
-                drawList->AddLine(start, start + hor, aldo::colors::LedOn);
-            }
-            ImVec2 lastLine{origin.x, origin.y + (extent.y - 1)};
-            drawList->AddLine(lastLine, lastLine + hor, aldo::colors::LedOn);
+        for (auto start = origin;
+             start.y - origin.y < extent.y;
+             start.y += step) {
+            drawList->AddLine(start, start + hor, aldo::colors::Attention);
         }
+    }
+
+    void renderAttributeGrid(const ImVec2& origin) const
+    {
+        static constexpr auto step = decltype(nametables)::AttributeDim;
+
+        auto [extent, hor, ver] = gridDims();
+        auto ntHeight = nametables.nametableSize().y;
+
+        auto drawList = ImGui::GetWindowDrawList();
+        for (auto start = origin;
+             start.x - origin.x < extent.x;
+             start.x += step) {
+            drawList->AddLine(start, start + ver, aldo::colors::LedOn);
+        }
+        for (auto start = origin;
+             start.y - origin.y < ntHeight;
+             start.y += step) {
+            drawList->AddLine(start, start + hor, aldo::colors::LedOn);
+        }
+        for (ImVec2 start{origin.x, origin.y + ntHeight};
+             start.y - origin.y < extent.y;
+             start.y += step) {
+            drawList->AddLine(start, start + hor, aldo::colors::LedOn);
+        }
+        ImVec2 lastLine{origin.x, origin.y + (extent.y - 1)};
+        drawList->AddLine(lastLine, lastLine + hor, aldo::colors::LedOn);
     }
 
     void tableLabel(int table) const noexcept
@@ -1367,10 +1362,17 @@ private:
                     + (attr * ALDO_NT_TILE_COUNT));
     }
 
+    std::tuple<ImVec2, ImVec2, ImVec2> gridDims() const
+    {
+        auto [w, h] = nametables.totalSize();
+        ImVec2 extent{static_cast<float>(w) + 1, static_cast<float>(h) + 1};
+        return{extent, {extent.x - 1, 0}, {0, extent.y - 1}};
+    }
+
     aldo::Nametables nametables;
     ComboList<DisplayMode> modeCombo;
-    ComboList<GridOverlay> gridCombo;
     int scanline = 241;
+    bool attributeGrid = false, tileGrid = false;
 };
 
 class PaletteView final : public aldo::View {
@@ -2011,7 +2013,9 @@ private:
             if (page == 1 && ramIdx % PageSize == sp) {
                 ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
                                        aldo::colors::LedOn);
-                ImGui::TextColored(SpHighlight, "%02X", val);
+                ImVec4 highlight =
+                    ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
+                ImGui::TextColored(highlight, "%02X", val);
             } else {
                 ImGui::Text("%02X", val);
             }
@@ -2030,8 +2034,6 @@ private:
         using ascii_sz = decltype(ascii)::size_type;
         using ascii_val = decltype(ascii)::value_type;
         static constexpr ascii_val Placeholder = '.';
-        inline static const ImVec4 SpHighlight =
-            ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
     };
 
     static constexpr int

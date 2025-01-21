@@ -126,13 +126,13 @@ public:
     void draw(const et::byte* vbuf, const Palette& p) const;
     void render(float scale, bool sdRatio) const noexcept
     {
-        tex.render(sdRatio ? scale * TvXScale : scale, scale);
+        // NOTE: 4:3 SD TV ratio scales the x-axis by about 1.14 from square
+        static constexpr auto tvXScale = 8.0f / 7.0f;
+
+        tex.render(sdRatio ? scale * tvXScale : scale, scale);
     }
 
 private:
-    // NOTE: 4:3 SD TV ratio scales the x-axis by about 1.14 from square
-    static constexpr float TvXScale = 8.0f / 7.0f;
-
     tex::Texture<SDL_TEXTUREACCESS_STREAMING> tex;
 };
 
@@ -158,6 +158,10 @@ private:
 
 class Nametables {
 public:
+    static constexpr int
+        TileDim = ALDO_CHR_TILE_DIM,
+        AttributeDim = TileDim * ALDO_METATILE_DIM * ALDO_METATILE_DIM;
+
     Nametables(SDL_Point nametableSize, const MediaRuntime& mr);
 
     SDL_Point nametableSize() const noexcept { return ntSize; }
@@ -168,8 +172,7 @@ public:
     void render() const noexcept { tex.render(); }
 
 private:
-    static constexpr int
-        LayoutDim = ALDO_NT_COUNT, NtDisplayCount = LayoutDim * LayoutDim;
+    static constexpr int LayoutDim = ALDO_NT_COUNT;
 
     SDL_Point ntSize;
     tex::Texture<SDL_TEXTUREACCESS_TARGET> tex;

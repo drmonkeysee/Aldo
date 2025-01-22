@@ -290,15 +290,17 @@ public:
     using option = std::pair<V, const char*>;
     using callback = std::function<void (V, bool)>;
 
-    template<std::ranges::range C>
-    ComboList(const char* label, C&& options, callback cb)
+    ComboList(const char* label, std::ranges::range auto&& opts, callback cb)
     : label{label}, options{
-        std::ranges::to<decltype(this->options)>(std::forward<C>(options)),
+        std::ranges::to<
+            decltype(this->options)>(std::forward<decltype(opts)>(opts)),
     },
     selected{this->options.front()}, onSelected{cb} {}
 
-    ComboList(const char* label, std::initializer_list<option> options)
-    : label{label}, options{options}, selected{this->options.front()} {}
+    ComboList(const char* label, std::initializer_list<option> opts,
+              callback cb)
+    : label{label}, options{opts}, selected{this->options.front()},
+    onSelected{cb} {}
 
     void render() noexcept
     {
@@ -320,7 +322,7 @@ private:
     const char* label;
     std::vector<option> options;
     option selected;
-    callback onSelected = [](V, bool) static constexpr noexcept {};
+    callback onSelected;
 };
 
 auto widget_group(std::invocable auto f)
@@ -1251,8 +1253,9 @@ public:
         "##displayMode",
         {
             {DisplayMode::nametables, "Nametables"},
-            {DisplayMode::attributeTables, "Attributes"},
+            {DisplayMode::attributes, "Attributes"},
         },
+        [this](DisplayMode v, bool) { this->nametables.mode = v; },
     } {}
     NametablesView(aldo::viewstate&, aldo::Emulator&&,
                    const aldo::MediaRuntime&) = delete;
@@ -1271,11 +1274,7 @@ protected:
         tableLabel(1);
         auto ntDrawOrigin = ImGui::GetCursorScreenPos();
         if (drawInterval.elapsed(vs.clock.clock())) {
-            if (modeCombo.selection() == DisplayMode::attributeTables) {
-                nametables.drawAttributes(emu, mr);
-            } else {
-                nametables.drawNametables(emu, mr);
-            }
+            nametables.draw(emu, mr);
         }
         nametables.render();
         if (tileGrid) {
@@ -1305,11 +1304,6 @@ protected:
     }
 
 private:
-    enum class DisplayMode {
-        nametables,
-        attributeTables,
-    };
-
     void renderTileGrid(const ImVec2& origin) const noexcept
     {
         static constexpr auto step = decltype(nametables)::TileDim;
@@ -1358,7 +1352,7 @@ private:
 
     void tableLabel(int table) const noexcept
     {
-        auto attr = modeCombo.selection() == DisplayMode::attributeTables;
+        auto attr = modeCombo.selection() == DisplayMode::attributes;
         ImGui::Text("%s $%4X", attr ? "Attribute Table" : "Nametable",
                     ALDO_MEMBLOCK_8KB + (table * ALDO_MEMBLOCK_1KB)
                     + (attr * ALDO_NT_TILE_COUNT));
@@ -1372,6 +1366,7 @@ private:
     }
 
     aldo::Nametables nametables;
+    using DisplayMode = decltype(nametables)::DrawMode;
     ComboList<DisplayMode> modeCombo;
     RefreshInterval drawInterval{250};
     int scanline = 241;

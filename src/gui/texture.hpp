@@ -87,13 +87,6 @@ public:
     Texture& operator=(Texture&&) = delete;
     ~Texture() { SDL_DestroyTexture(tex); }
 
-    SDL_Point getSize() const noexcept
-    {
-        SDL_Point p;
-        SDL_QueryTexture(tex, nullptr, nullptr, &p.x, &p.y);
-        return p;
-    }
-
     TextureTarget asTarget(SDL_Renderer* ren) const noexcept
     requires (Access == SDL_TEXTUREACCESS_TARGET) { return {*ren, *tex}; }
 
@@ -107,9 +100,10 @@ public:
 
     void render(float scalex, float scaley) const noexcept
     {
-        auto [w, h] = getSize();
+        SDL_Point p;
+        SDL_QueryTexture(tex, nullptr, nullptr, &p.x, &p.y);
         ImGui::Image(tex, {
-            static_cast<float>(w) * scalex, static_cast<float>(h) * scaley,
+            static_cast<float>(p.x) * scalex, static_cast<float>(p.y) * scaley,
         });
     }
 
@@ -162,20 +156,37 @@ public:
         TileDim = ALDO_CHR_TILE_DIM,
         AttributeDim = TileDim * ALDO_METATILE_DIM * ALDO_METATILE_DIM;
 
+    enum class DrawMode {
+        nametables,
+        attributes,
+    };
+
     Nametables(SDL_Point nametableSize, const MediaRuntime& mr);
 
     SDL_Point nametableSize() const noexcept { return ntSize; }
-    SDL_Point totalSize() const noexcept { return tex.getSize(); };
+    SDL_Point totalSize() const noexcept { return texSize; };
 
-    void drawNametables(const Emulator& emu, const MediaRuntime& mr) const;
-    void drawAttributes(const Emulator& emu, const MediaRuntime& mr) const;
-    void render() const noexcept { tex.render(); }
+    void draw(const Emulator& emu, const MediaRuntime& mr) const;
+    void render() const noexcept
+    {
+        if (mode == DrawMode::attributes) {
+            atTex.render();
+        } else {
+            ntTex.render();
+        }
+    }
+
+    DrawMode mode;
 
 private:
     static constexpr int LayoutDim = ALDO_NT_COUNT;
 
-    SDL_Point ntSize;
-    tex::Texture<SDL_TEXTUREACCESS_TARGET> tex;
+    void drawNametables(const Emulator& emu, const MediaRuntime& mr) const;
+    void drawAttributes(const Emulator& emu, const MediaRuntime& mr) const;
+
+    SDL_Point ntSize, texSize;
+    tex::Texture<SDL_TEXTUREACCESS_TARGET> ntTex;
+    tex::Texture<SDL_TEXTUREACCESS_TARGET> atTex;
 };
 
 }

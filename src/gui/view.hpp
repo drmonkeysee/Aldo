@@ -50,8 +50,8 @@ public:
 
     View(std::string title, viewstate& vs, const Emulator& emu,
          const MediaRuntime& mr,
-         ImGuiWindowFlags options = ImGuiWindowFlags_None) noexcept
-    : vs{vs}, emu{emu}, mr{mr}, title{std::move(title)}, options{options} {}
+         ImGuiWindowFlags opts = ImGuiWindowFlags_None) noexcept
+    : vs{vs}, emu{emu}, mr{mr}, title{std::move(title)}, options{opts} {}
     View(std::string, viewstate&, Emulator&&, const MediaRuntime&,
          ImGuiWindowFlags) = delete;
     View(std::string, viewstate&, const Emulator&&, MediaRuntime&&,

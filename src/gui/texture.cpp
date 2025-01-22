@@ -86,103 +86,15 @@ void aldo::PatternTable::draw(aldo::pt_span table, aldo::color_span colors,
 
 aldo::Nametables::Nametables(SDL_Point nametableSize,
                              const aldo::MediaRuntime& mr)
-: ntSize{nametableSize}, tex{nametableSize * LayoutDim, mr.renderer()} {}
+: ntSize{nametableSize}, texSize{nametableSize * LayoutDim},
+ntTex{texSize, mr.renderer()}, atTex{texSize, mr.renderer()} {}
 
-void aldo::Nametables::drawNametables(const aldo::Emulator& emu,
-                                      const aldo::MediaRuntime& mr) const
+void aldo::Nametables::draw(const Emulator& emu, const MediaRuntime& mr) const
 {
-    static_assert(aldo::color_span::extent == LayoutDim * LayoutDim,
-                  "mismatched nt sizes");
-
-    auto ren = mr.renderer();
-    auto target = tex.asTarget(ren);
-    auto i = 0;
-    aldo::color_span colors = emu.snapshot().video->palettes.bg[0];
-    for (auto cidx : colors) {
-        auto c = emu.palette().getColor(cidx);
-        auto [r, g, b] = aldo::colors::rgb(c);
-        SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r),
-                               static_cast<Uint8>(g), static_cast<Uint8>(b),
-                               SDL_ALPHA_OPAQUE);
-        auto
-            xOffset = i % 2 == 1 ? ntSize.x : 0,
-            yOffset = i > 1 ? ntSize.y : 0;
-        SDL_Rect nt{xOffset, yOffset, ntSize.x, ntSize.y};
-        SDL_RenderFillRect(ren, &nt);
-        ++i;
-    }
-}
-
-void aldo::Nametables::drawAttributes(const aldo::Emulator& emu,
-                                      const aldo::MediaRuntime& mr) const
-{
-    static constexpr auto
-        metatileCount = ALDO_METATILE_DIM * ALDO_METATILE_DIM,
-        metatileStride = ALDO_METATILE_DIM * TileDim,
-        attrDim = 8;
-
-    const auto* vsp = emu.snapshot().video;
-    int ntXOffset = 0, ntYOffset = 0, mirXOffset = 0, mirYOffset = 0;
-    switch (vsp->nt.mirror) {
-    case ALDO_NTM_HORIZONTAL:
-        ntYOffset = ntSize.y;
-        mirXOffset = ntSize.x;
-        break;
-    case ALDO_NTM_VERTICAL:
-        ntXOffset = ntSize.x;
-        mirYOffset = ntSize.y;
-        break;
-    default:
-        return;
-    }
-    auto ren = mr.renderer();
-    auto target = tex.asTarget(ren);
-    for (auto i = 0; i < LayoutDim; ++i) {
-        attr_span attributes = vsp->nt.tables[i].attributes;
-        auto col = 0, row = 0;
-        for (auto attr : attributes) {
-            // NOTE: last row only uses the top half of attributes
-            auto mtCount = row == attrDim - 1
-                            ? ALDO_METATILE_DIM
-                            : metatileCount;
-            for (auto m = 0; m < mtCount; ++m) {
-                aldo::color_span::size_type pidx = (attr >> (m * 2)) & 0x3;
-                assert(pidx < aldo::color_span::extent);
-                auto colors = vsp->palettes.bg[pidx];
-                // NOTE: use 3rd color in the palette to represent the
-                // attribute metatile, similar to nesdev wiki example.
-                auto cidx = colors[2];
-                auto c = emu.palette().getColor(cidx);
-                auto [r, g, b] = aldo::colors::rgb(c);
-                auto
-                    mtX = m % 2 == 1 ? metatileStride : 0,
-                    mtY = m > 1 ? metatileStride : 0,
-                    xOffset = (i * ntXOffset) + (col * AttributeDim) + mtX,
-                    yOffset = (i * ntYOffset) + (row * AttributeDim) + mtY;
-                SDL_Rect metatile{
-                    xOffset,
-                    yOffset,
-                    metatileStride,
-                    metatileStride,
-                };
-                SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r),
-                                       static_cast<Uint8>(g),
-                                       static_cast<Uint8>(b),
-                                       SDL_ALPHA_OPAQUE);
-                SDL_RenderFillRect(ren, &metatile);
-                if (mirXOffset > 0) {
-                    metatile.x += mirXOffset;
-                    SDL_RenderFillRect(ren, &metatile);
-                } else if (mirYOffset > 0) {
-                    metatile.y += mirYOffset;
-                    SDL_RenderFillRect(ren, &metatile);
-                }
-            }
-            if (++col >= attrDim) {
-                col = 0;
-                ++row;
-            }
-        }
+    if (mode == aldo::Nametables::DrawMode::attributes) {
+        drawAttributes(emu, mr);
+    } else {
+        drawNametables(emu, mr);
     }
 }
 
@@ -229,5 +141,103 @@ void aldo::PatternTable::drawTileRow(aldo::et::word row,
         auto texidx = px + texOffset;
         assert(texidx < TextureDim * TextureDim);
         data.pixels[texidx] = p.getColor(colors[texel]);
+    }
+}
+
+void aldo::Nametables::drawNametables(const aldo::Emulator& emu,
+                                      const aldo::MediaRuntime& mr) const
+{
+    static_assert(aldo::color_span::extent == LayoutDim * LayoutDim,
+                  "mismatched nt sizes");
+
+    auto ren = mr.renderer();
+    auto target = ntTex.asTarget(ren);
+    auto i = 0;
+    aldo::color_span colors = emu.snapshot().video->palettes.bg[0];
+    for (auto cidx : colors) {
+        auto c = emu.palette().getColor(cidx);
+        auto [r, g, b] = aldo::colors::rgb(c);
+        SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r),
+                               static_cast<Uint8>(g), static_cast<Uint8>(b),
+                               SDL_ALPHA_OPAQUE);
+        auto
+            xOffset = i % 2 == 1 ? ntSize.x : 0,
+            yOffset = i > 1 ? ntSize.y : 0;
+        SDL_Rect nt{xOffset, yOffset, ntSize.x, ntSize.y};
+        SDL_RenderFillRect(ren, &nt);
+        ++i;
+    }
+}
+
+void aldo::Nametables::drawAttributes(const aldo::Emulator& emu,
+                                      const aldo::MediaRuntime& mr) const
+{
+    static constexpr auto
+        metatileCount = ALDO_METATILE_DIM * ALDO_METATILE_DIM,
+        metatileStride = ALDO_METATILE_DIM * TileDim,
+        attrDim = 8;
+
+    const auto* vsp = emu.snapshot().video;
+    int ntXOffset = 0, ntYOffset = 0, mirXOffset = 0, mirYOffset = 0;
+    switch (vsp->nt.mirror) {
+    case ALDO_NTM_HORIZONTAL:
+        ntYOffset = ntSize.y;
+        mirXOffset = ntSize.x;
+        break;
+    case ALDO_NTM_VERTICAL:
+        ntXOffset = ntSize.x;
+        mirYOffset = ntSize.y;
+        break;
+    default:
+        return;
+    }
+    auto ren = mr.renderer();
+    auto target = atTex.asTarget(ren);
+    for (auto i = 0; i < LayoutDim; ++i) {
+        attr_span attributes = vsp->nt.tables[i].attributes;
+        auto col = 0, row = 0;
+        for (auto attr : attributes) {
+            // NOTE: last row only uses the top half of attributes
+            auto mtCount = row == attrDim - 1
+                            ? ALDO_METATILE_DIM
+                            : metatileCount;
+            for (auto m = 0; m < mtCount; ++m) {
+                aldo::color_span::size_type pidx = (attr >> (m * 2)) & 0x3;
+                assert(pidx < aldo::color_span::extent);
+                auto colors = vsp->palettes.bg[pidx];
+                // NOTE: use 3rd color in the palette to represent the
+                // attribute metatile, similar to nesdev wiki example.
+                auto cidx = colors[2];
+                auto c = emu.palette().getColor(cidx);
+                auto [r, g, b] = aldo::colors::rgb(c);
+                auto
+                    mtX = m % 2 == 1 ? metatileStride : 0,
+                    mtY = m > 1 ? metatileStride : 0,
+                    xOffset = (i * ntXOffset) + (col * AttributeDim) + mtX,
+                    yOffset = (i * ntYOffset) + (row * AttributeDim) + mtY;
+                SDL_Rect metatile{
+                    xOffset,
+                    yOffset,
+                    metatileStride,
+                    metatileStride,
+                };
+                SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r),
+                                       static_cast<Uint8>(g),
+                                       static_cast<Uint8>(b),
+                                       SDL_ALPHA_OPAQUE);
+                SDL_RenderFillRect(ren, &metatile);
+                if (mirXOffset > 0) {
+                    metatile.x += mirXOffset;
+                    SDL_RenderFillRect(ren, &metatile);
+                } else if (mirYOffset > 0) {
+                    metatile.y += mirYOffset;
+                    SDL_RenderFillRect(ren, &metatile);
+                }
+            }
+            if (++col >= attrDim) {
+                col = 0;
+                ++row;
+            }
+        }
     }
 }

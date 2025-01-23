@@ -185,7 +185,7 @@ private:
     void drawAttributes(const Emulator& emu, const MediaRuntime& mr) const;
 
     SDL_Point ntSize, texSize;
-    tex::Texture<SDL_TEXTUREACCESS_TARGET> ntTex;
+    tex::Texture<SDL_TEXTUREACCESS_STREAMING> ntTex;
     tex::Texture<SDL_TEXTUREACCESS_TARGET> atTex;
 };
 

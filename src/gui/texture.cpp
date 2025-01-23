@@ -13,6 +13,7 @@
 #include "palette.hpp"
 #include "style.hpp"
 
+#include <algorithm>
 #include <array>
 #include <concepts>
 #include <cassert>
@@ -24,6 +25,7 @@ namespace
 {
 
 using attr_span = std::span<const aldo::et::byte, ALDO_NT_ATTR_COUNT>;
+using nt_span = std::span<const aldo::et::byte, ALDO_NT_TILE_COUNT>;
 
 constexpr auto operator*(SDL_Point p, int n) noexcept
 {
@@ -150,6 +152,7 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu,
     static_assert(aldo::color_span::extent == LayoutDim * LayoutDim,
                   "mismatched nt sizes");
 
+    /*
     auto ren = mr.renderer();
     auto target = ntTex.asTarget(ren);
     auto i = 0;
@@ -166,6 +169,74 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu,
         SDL_Rect nt{xOffset, yOffset, ntSize.x, ntSize.y};
         SDL_RenderFillRect(ren, &nt);
         ++i;
+    }
+     */
+
+    const auto* vsp = emu.snapshot().video;
+    pt_span chrs = vsp->nt.pt
+                    ? vsp->pattern_tables.right
+                    : vsp->pattern_tables.left;
+    color_span colors = vsp->palettes.bg[0];
+
+    // TODO: copied from drawAttributes
+    int ntXOffset = 0, ntYOffset = 0, mirXOffset = 0, mirYOffset = 0;
+    switch (vsp->nt.mirror) {
+    case ALDO_NTM_HORIZONTAL:
+        ntYOffset = ntSize.y;
+        mirXOffset = ntSize.x;
+        break;
+    case ALDO_NTM_VERTICAL:
+        ntXOffset = ntSize.x;
+        mirYOffset = ntSize.y;
+        break;
+    default:
+        return;
+    }
+
+    auto data = ntTex.lock();
+    for (auto i = 0; i < ALDO_NT_COUNT; ++i) {
+        nt_span tiles = vsp->nt.tables[i].tiles;
+        for (auto col = 0; col < ALDO_NT_WIDTH; ++col) {
+            for (auto row = 0; row < ALDO_NT_HEIGHT; ++row) {
+                auto tile = tiles[static_cast<decltype(tiles)::size_type>(col + (row * ALDO_NT_WIDTH))];
+                pt_tile chr = chrs[tile];
+
+                // TODO: look up attribute somewhere
+
+                // TODO: copied from PatternTable
+                auto chrDim = static_cast<int>(chr.size());
+                auto chrRow = 0;
+                for (auto pxRow : chr) {
+                    auto texOffset = (col * chrDim)
+                    + ((chrRow++ + (row * chrDim))
+                       * data.stride);
+                    texOffset += (i * ntXOffset);
+                    texOffset += (i * ntYOffset * data.stride);
+
+                    for (auto px = 0; px < static_cast<int>(pt_tile::extent); ++px) {
+                        auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
+                        assert(0 <= pidx);
+                        decltype(colors)::size_type texel = (pxRow & (0x3 << pidx)) >> pidx;
+                        assert(texel < color_span::extent);
+                        auto texidx = px + texOffset;
+                        assert(texidx < texSize.x * texSize.y);
+                        data.pixels[texidx] = emu.palette().getColor(colors[texel]);
+                    }
+                }
+            }
+        }
+    }
+    if (mirXOffset > 0) {
+        for (auto row = 0; row < texSize.y; ++row) {
+            auto origin = data.pixels + (row * data.stride);
+            std::copy(origin, origin + ntSize.x, origin + mirXOffset);
+        }
+    }
+    if (mirYOffset > 0) {
+        for (auto row = 0; row < ntSize.y; ++row) {
+            auto origin = data.pixels + (row * data.stride);
+            std::copy(origin, origin + texSize.x, origin + (mirYOffset * data.stride));
+        }
     }
 }
 

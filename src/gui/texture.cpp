@@ -201,7 +201,8 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
     if (offsets.mirrorY > 0) {
         for (auto row = 0; row < ntSize.y; ++row) {
             auto origin = data.pixels + (row * data.stride);
-            std::copy(origin, origin + texSize.x, origin + (offsets.mirrorY * data.stride));
+            std::copy(origin, origin + texSize.x,
+                      origin + (offsets.mirrorY * data.stride));
         }
     }
 }

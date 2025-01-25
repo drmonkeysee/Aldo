@@ -151,7 +151,7 @@ private:
 class Nametables {
 public:
     static constexpr int
-        TilePxDim = ALDO_CHR_TILE_DIM,
+        TilePxDim = pt_tile::extent,
         MetatileCount = ALDO_METATILE_DIM * ALDO_METATILE_DIM,
         AttributePxDim = TilePxDim * MetatileCount;
 

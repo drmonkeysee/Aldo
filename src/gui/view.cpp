@@ -1362,7 +1362,7 @@ private:
     {
         auto [w, h] = nametables.totalSize();
         ImVec2 extent{static_cast<float>(w) + 1, static_cast<float>(h) + 1};
-        return{extent, {extent.x - 1, 0}, {0, extent.y - 1}};
+        return {extent, {extent.x - 1, 0}, {0, extent.y - 1}};
     }
 
     aldo::Nametables nametables;

@@ -178,8 +178,6 @@ public:
     DrawMode mode = DrawMode::nametables;
 
 private:
-    static constexpr int AttributeDim = 8;
-
     struct nt_offsets {
         int upperX = 0, upperY = 0, mirrorX = 0, mirrorY = 0;
     };

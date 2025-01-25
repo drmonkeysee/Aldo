@@ -26,6 +26,9 @@ namespace
 
 using attr_span = std::span<const aldo::et::byte, ALDO_NT_ATTR_COUNT>;
 using nt_span = std::span<const aldo::et::byte, ALDO_NT_TILE_COUNT>;
+using pal_span = std::span<const aldo::et::byte[ALDO_PAL_SIZE], ALDO_PAL_SIZE>;
+
+constexpr int AttributeDim = 8;
 
 constexpr auto operator*(SDL_Point p, int n) noexcept
 {
@@ -65,6 +68,25 @@ auto draw_tile(aldo::pt_tile chr, int col, int row, aldo::color_span colors,
         texOffset += offsetAdjustment;
         draw_tile_row(pxRow, colors, texOffset, p, data);
     }
+}
+
+auto lookup_tile_palette(attr_span attrs, int tileCol, int tileRow,
+                         pal_span palettes) noexcept
+{
+    using ps_sz = decltype(palettes)::size_type;
+
+    auto attrIdx = static_cast<
+        decltype(attrs)::size_type>((tileCol >> ALDO_METATILE_DIM)
+                                    + ((tileRow >> ALDO_METATILE_DIM)
+                                       * AttributeDim));
+    auto attr = attrs[attrIdx];
+    auto mtIdx = static_cast<ps_sz>(((tileCol >> 1) % ALDO_METATILE_DIM)
+                                    + (((tileRow >> 1) % ALDO_METATILE_DIM)
+                                       * ALDO_METATILE_DIM));
+    assert(mtIdx < palettes.size());
+    ps_sz palIdx = (attr >> (mtIdx * 2)) & 0x3;
+    assert(palIdx < palettes.size());
+    return aldo::color_span{palettes[palIdx]};
 }
 
 }
@@ -152,8 +174,6 @@ aldo::tex::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 
 void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
 {
-    using pal_sz = aldo::color_span::size_type;
-
     const auto* vsp = emu.snapshot().video;
     aldo::pt_span chrs = vsp->nt.pt
                             ? vsp->pattern_tables.right
@@ -169,21 +189,8 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
                 auto tileIdx = static_cast<
                     decltype(tiles)::size_type>(col + (row * ALDO_NT_WIDTH));
                 auto tile = tiles[tileIdx];
-
-                auto attrIdx = static_cast<
-                    decltype(attrs)::size_type>((col >> ALDO_METATILE_DIM)
-                                                + ((row >> ALDO_METATILE_DIM)
-                                                   * AttributeDim));
-                auto attr = attrs[attrIdx];
-                auto mtIdx =
-                    static_cast<pal_sz>(((col >> 1) % ALDO_METATILE_DIM)
-                                        + (((row >> 1) % ALDO_METATILE_DIM)
-                                           * ALDO_METATILE_DIM));
-                assert(mtIdx < aldo::color_span::extent);
-                pal_sz palIdx = (attr >> (mtIdx * 2)) & 0x3;
-                assert(palIdx < aldo::color_span::extent);
-                aldo::color_span colors = vsp->palettes.bg[palIdx];
-
+                auto colors = lookup_tile_palette(attrs, col, row,
+                                                  vsp->palettes.bg);
                 // NOTE: account for upper NT bank X/Y offset for tiles
                 auto offsetAdj = (i * offsets.upperX)
                                     + (i * offsets.upperY * data.stride);

@@ -1306,7 +1306,7 @@ protected:
 private:
     void renderTileGrid(const ImVec2& origin) const noexcept
     {
-        static constexpr auto step = decltype(nametables)::TileDim;
+        static constexpr auto step = decltype(nametables)::TilePxDim;
 
         auto [extent, hor, ver] = gridDims();
 
@@ -1325,7 +1325,7 @@ private:
 
     void renderAttributeGrid(const ImVec2& origin) const
     {
-        static constexpr auto step = decltype(nametables)::AttributeDim;
+        static constexpr auto step = decltype(nametables)::AttributePxDim;
 
         auto [extent, hor, ver] = gridDims();
         auto ntHeight = nametables.nametableSize().y;

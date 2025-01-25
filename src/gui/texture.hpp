@@ -9,6 +9,7 @@
 #define Aldo_gui_texture_hpp
 
 #include "attr.hpp"
+#include "ctrlsignal.h"
 #include "emutypes.hpp"
 #include "snapshot.h"
 
@@ -153,8 +154,9 @@ private:
 class Nametables {
 public:
     static constexpr int
-        TileDim = ALDO_CHR_TILE_DIM,
-        AttributeDim = TileDim * ALDO_METATILE_DIM * ALDO_METATILE_DIM;
+        TilePxDim = ALDO_CHR_TILE_DIM,
+        MetatileCount = ALDO_METATILE_DIM * ALDO_METATILE_DIM,
+        AttributePxDim = TilePxDim * MetatileCount;
 
     enum class DrawMode {
         nametables,
@@ -179,10 +181,15 @@ public:
     DrawMode mode = DrawMode::nametables;
 
 private:
-    static constexpr int LayoutDim = ALDO_NT_COUNT;
+    static constexpr int AttributeDim = 8;
+
+    struct nt_offsets {
+        int upperX = 0, upperY = 0, mirrorX = 0, mirrorY = 0;
+    };
 
     void drawNametables(const Emulator& emu) const;
     void drawAttributes(const Emulator& emu, const MediaRuntime& mr) const;
+    nt_offsets getOffsets(aldo_ntmirror m) const noexcept;
 
     SDL_Point ntSize, texSize;
     tex::Texture<SDL_TEXTUREACCESS_STREAMING> ntTex;

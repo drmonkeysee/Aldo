@@ -88,7 +88,7 @@ void aldo::PatternTable::draw(aldo::pt_span table, aldo::color_span colors,
 
 aldo::Nametables::Nametables(SDL_Point nametableSize,
                              const aldo::MediaRuntime& mr)
-: ntSize{nametableSize}, texSize{nametableSize * LayoutDim},
+: ntSize{nametableSize}, texSize{nametableSize * ALDO_NT_COUNT},
 ntTex{texSize, mr.renderer()}, atTex{texSize, mr.renderer()} {}
 
 void aldo::Nametables::draw(const Emulator& emu, const MediaRuntime& mr) const
@@ -139,7 +139,7 @@ void aldo::PatternTable::drawTileRow(aldo::et::word row,
         auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
         assert(0 <= pidx);
         decltype(colors)::size_type texel = (row & (0x3 << pidx)) >> pidx;
-        assert(texel < color_span::extent);
+        assert(texel < aldo::color_span::extent);
         auto texidx = px + texOffset;
         assert(texidx < TextureDim * TextureDim);
         data.pixels[texidx] = p.getColor(colors[texel]);
@@ -148,24 +148,13 @@ void aldo::PatternTable::drawTileRow(aldo::et::word row,
 
 void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
 {
+    using pal_sz = aldo::color_span::size_type;
+
     const auto* vsp = emu.snapshot().video;
-    pt_span chrs = vsp->nt.pt
-                    ? vsp->pattern_tables.right
-                    : vsp->pattern_tables.left;
-    // TODO: copied from drawAttributes
-    int ntXOffset = 0, ntYOffset = 0, mirXOffset = 0, mirYOffset = 0;
-    switch (vsp->nt.mirror) {
-    case ALDO_NTM_HORIZONTAL:
-        ntYOffset = ntSize.y;
-        mirXOffset = ntSize.x;
-        break;
-    case ALDO_NTM_VERTICAL:
-        ntXOffset = ntSize.x;
-        mirYOffset = ntSize.y;
-        break;
-    default:
-        return;
-    }
+    aldo::pt_span chrs = vsp->nt.pt
+                            ? vsp->pattern_tables.right
+                            : vsp->pattern_tables.left;
+    auto offsets = getOffsets(vsp->nt.mirror);
 
     auto data = ntTex.lock();
     for (auto i = 0; i < ALDO_NT_COUNT; ++i) {
@@ -173,17 +162,23 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
         attr_span attrs = vsp->nt.tables[i].attributes;
         for (auto row = 0; row < ALDO_NT_HEIGHT; ++row) {
             for (auto col = 0; col < ALDO_NT_WIDTH; ++col) {
-                auto tileIdx = static_cast<decltype(tiles)::size_type>(col + (row * ALDO_NT_WIDTH));
+                auto tileIdx = static_cast<
+                    decltype(tiles)::size_type>(col + (row * ALDO_NT_WIDTH));
                 auto tile = tiles[tileIdx];
 
-                // TODO: look up attribute somewhere
-                auto attrIdx = static_cast<decltype(attrs)::size_type>((col >> ALDO_METATILE_DIM) + ((row >> ALDO_METATILE_DIM) * 8));
+                auto attrIdx = static_cast<
+                    decltype(attrs)::size_type>((col >> ALDO_METATILE_DIM)
+                                                + ((row >> ALDO_METATILE_DIM)
+                                                   * AttributeDim));
                 auto attr = attrs[attrIdx];
-                auto metatileIdx = ((col >> 1) % ALDO_METATILE_DIM) + (((row >> 1) % ALDO_METATILE_DIM) * ALDO_METATILE_DIM);
-                assert(metatileIdx < ALDO_PAL_SIZE);
-                auto palIdx = (attr >> (metatileIdx * 2)) & 0x3;
-                assert(palIdx < ALDO_PAL_SIZE);
-                color_span colors = vsp->palettes.bg[palIdx];
+                auto mtIdx =
+                    static_cast<pal_sz>(((col >> 1) % ALDO_METATILE_DIM)
+                                        + (((row >> 1) % ALDO_METATILE_DIM)
+                                           * ALDO_METATILE_DIM));
+                assert(mtIdx < aldo::color_span::extent);
+                pal_sz palIdx = (attr >> (mtIdx * 2)) & 0x3;
+                assert(palIdx < aldo::color_span::extent);
+                aldo::color_span colors = vsp->palettes.bg[palIdx];
 
                 // TODO: copied from PatternTable
                 pt_tile chr = chrs[tile];
@@ -193,14 +188,14 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
                     auto texOffset = (col * chrDim)
                     + ((chrRow++ + (row * chrDim))
                        * data.stride);
-                    texOffset += (i * ntXOffset);
-                    texOffset += (i * ntYOffset * data.stride);
+                    texOffset += (i * offsets.upperX);
+                    texOffset += (i * offsets.upperY * data.stride);
 
                     for (auto px = 0; px < static_cast<int>(pt_tile::extent); ++px) {
                         auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
                         assert(0 <= pidx);
                         decltype(colors)::size_type texel = (pxRow & (0x3 << pidx)) >> pidx;
-                        assert(texel < color_span::extent);
+                        assert(texel < aldo::color_span::extent);
                         auto texidx = px + texOffset;
                         assert(texidx < texSize.x * texSize.y);
                         data.pixels[texidx] = emu.palette().getColor(colors[texel]);
@@ -209,16 +204,16 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
             }
         }
     }
-    if (mirXOffset > 0) {
+    if (offsets.mirrorX > 0) {
         for (auto row = 0; row < texSize.y; ++row) {
             auto origin = data.pixels + (row * data.stride);
-            std::copy(origin, origin + ntSize.x, origin + mirXOffset);
+            std::copy(origin, origin + ntSize.x, origin + offsets.mirrorX);
         }
     }
-    if (mirYOffset > 0) {
+    if (offsets.mirrorY > 0) {
         for (auto row = 0; row < ntSize.y; ++row) {
             auto origin = data.pixels + (row * data.stride);
-            std::copy(origin, origin + texSize.x, origin + (mirYOffset * data.stride));
+            std::copy(origin, origin + texSize.x, origin + (offsets.mirrorY * data.stride));
         }
     }
 }
@@ -226,35 +221,20 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
 void aldo::Nametables::drawAttributes(const aldo::Emulator& emu,
                                       const aldo::MediaRuntime& mr) const
 {
-    static constexpr auto
-        metatileCount = ALDO_METATILE_DIM * ALDO_METATILE_DIM,
-        metatileStride = ALDO_METATILE_DIM * TileDim,
-        attrDim = 8;
+    static constexpr auto metatileStride = ALDO_METATILE_DIM * TilePxDim;
 
     const auto* vsp = emu.snapshot().video;
-    int ntXOffset = 0, ntYOffset = 0, mirXOffset = 0, mirYOffset = 0;
-    switch (vsp->nt.mirror) {
-    case ALDO_NTM_HORIZONTAL:
-        ntYOffset = ntSize.y;
-        mirXOffset = ntSize.x;
-        break;
-    case ALDO_NTM_VERTICAL:
-        ntXOffset = ntSize.x;
-        mirYOffset = ntSize.y;
-        break;
-    default:
-        return;
-    }
+    auto offsets = getOffsets(vsp->nt.mirror);
     auto ren = mr.renderer();
     auto target = atTex.asTarget(ren);
-    for (auto i = 0; i < LayoutDim; ++i) {
+    for (auto i = 0; i < ALDO_NT_COUNT; ++i) {
         attr_span attributes = vsp->nt.tables[i].attributes;
         auto col = 0, row = 0;
         for (auto attr : attributes) {
             // NOTE: last row only uses the top half of attributes
-            auto mtCount = row == attrDim - 1
+            auto mtCount = row == AttributeDim - 1
                             ? ALDO_METATILE_DIM
-                            : metatileCount;
+                            : MetatileCount;
             for (auto m = 0; m < mtCount; ++m) {
                 aldo::color_span::size_type pidx = (attr >> (m * 2)) & 0x3;
                 assert(pidx < aldo::color_span::extent);
@@ -267,8 +247,8 @@ void aldo::Nametables::drawAttributes(const aldo::Emulator& emu,
                 auto
                     mtX = m % 2 == 1 ? metatileStride : 0,
                     mtY = m > 1 ? metatileStride : 0,
-                    xOffset = (i * ntXOffset) + (col * AttributeDim) + mtX,
-                    yOffset = (i * ntYOffset) + (row * AttributeDim) + mtY;
+                    xOffset = (i * offsets.upperX) + (col * AttributePxDim) + mtX,
+                    yOffset = (i * offsets.upperY) + (row * AttributePxDim) + mtY;
                 SDL_Rect metatile{
                     xOffset,
                     yOffset,
@@ -280,18 +260,37 @@ void aldo::Nametables::drawAttributes(const aldo::Emulator& emu,
                                        static_cast<Uint8>(b),
                                        SDL_ALPHA_OPAQUE);
                 SDL_RenderFillRect(ren, &metatile);
-                if (mirXOffset > 0) {
-                    metatile.x += mirXOffset;
+                if (offsets.mirrorX > 0) {
+                    metatile.x += offsets.mirrorX;
                     SDL_RenderFillRect(ren, &metatile);
-                } else if (mirYOffset > 0) {
-                    metatile.y += mirYOffset;
+                } else if (offsets.mirrorY > 0) {
+                    metatile.y += offsets.mirrorY;
                     SDL_RenderFillRect(ren, &metatile);
                 }
             }
-            if (++col >= attrDim) {
+            if (++col >= AttributeDim) {
                 col = 0;
                 ++row;
             }
         }
     }
+}
+
+aldo::Nametables::nt_offsets
+aldo::Nametables::getOffsets(aldo_ntmirror m) const noexcept
+{
+    nt_offsets offsets;
+    switch (m) {
+    case ALDO_NTM_HORIZONTAL:
+        offsets.upperY = ntSize.y;
+        offsets.mirrorX = ntSize.x;
+        break;
+    case ALDO_NTM_VERTICAL:
+        offsets.upperX = ntSize.x;
+        offsets.mirrorY = ntSize.y;
+        break;
+    default:
+        break;
+    }
+    return offsets;
 }

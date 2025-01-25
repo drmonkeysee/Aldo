@@ -178,6 +178,11 @@ public:
     DrawMode mode = DrawMode::nametables;
 
 private:
+    static constexpr int AttributeDim = 8;
+
+    using attr_span = std::span<const aldo::et::byte, ALDO_NT_ATTR_COUNT>;
+    using pal_span = std::span<const aldo::et::byte[ALDO_PAL_SIZE],
+                                ALDO_PAL_SIZE>;
     struct nt_offsets {
         int upperX = 0, upperY = 0, mirrorX = 0, mirrorY = 0;
     };
@@ -185,6 +190,11 @@ private:
     void drawNametables(const Emulator& emu) const;
     void drawAttributes(const Emulator& emu, const MediaRuntime& mr) const;
     nt_offsets getOffsets(aldo_ntmirror m) const noexcept;
+    color_span lookupTilePalette(attr_span attrs, int tileCol, int tileRow,
+                                 pal_span palettes) const noexcept;
+    void drawAttribute(attr_span attrs, int ntIdx, int col, int row,
+                       const nt_offsets& offsets, pal_span bg,
+                       const aldo::Palette& p, SDL_Renderer* ren) const;
 
     SDL_Point ntSize, texSize;
     tex::Texture<SDL_TEXTUREACCESS_STREAMING> ntTex;

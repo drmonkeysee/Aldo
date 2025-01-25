@@ -96,7 +96,7 @@ void aldo::Nametables::draw(const Emulator& emu, const MediaRuntime& mr) const
     if (mode == aldo::Nametables::DrawMode::attributes) {
         drawAttributes(emu, mr);
     } else {
-        drawNametables(emu, mr);
+        drawNametables(emu);
     }
 }
 
@@ -146,38 +146,12 @@ void aldo::PatternTable::drawTileRow(aldo::et::word row,
     }
 }
 
-void aldo::Nametables::drawNametables(const aldo::Emulator& emu,
-                                      const aldo::MediaRuntime& mr) const
+void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
 {
-    static_assert(aldo::color_span::extent == LayoutDim * LayoutDim,
-                  "mismatched nt sizes");
-
-    /*
-    auto ren = mr.renderer();
-    auto target = ntTex.asTarget(ren);
-    auto i = 0;
-    aldo::color_span colors = emu.snapshot().video->palettes.bg[0];
-    for (auto cidx : colors) {
-        auto c = emu.palette().getColor(cidx);
-        auto [r, g, b] = aldo::colors::rgb(c);
-        SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r),
-                               static_cast<Uint8>(g), static_cast<Uint8>(b),
-                               SDL_ALPHA_OPAQUE);
-        auto
-            xOffset = i % 2 == 1 ? ntSize.x : 0,
-            yOffset = i > 1 ? ntSize.y : 0;
-        SDL_Rect nt{xOffset, yOffset, ntSize.x, ntSize.y};
-        SDL_RenderFillRect(ren, &nt);
-        ++i;
-    }
-     */
-
     const auto* vsp = emu.snapshot().video;
     pt_span chrs = vsp->nt.pt
                     ? vsp->pattern_tables.right
                     : vsp->pattern_tables.left;
-    color_span colors = vsp->palettes.bg[0];
-
     // TODO: copied from drawAttributes
     int ntXOffset = 0, ntYOffset = 0, mirXOffset = 0, mirYOffset = 0;
     switch (vsp->nt.mirror) {
@@ -196,14 +170,23 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu,
     auto data = ntTex.lock();
     for (auto i = 0; i < ALDO_NT_COUNT; ++i) {
         nt_span tiles = vsp->nt.tables[i].tiles;
-        for (auto col = 0; col < ALDO_NT_WIDTH; ++col) {
-            for (auto row = 0; row < ALDO_NT_HEIGHT; ++row) {
-                auto tile = tiles[static_cast<decltype(tiles)::size_type>(col + (row * ALDO_NT_WIDTH))];
-                pt_tile chr = chrs[tile];
+        attr_span attrs = vsp->nt.tables[i].attributes;
+        for (auto row = 0; row < ALDO_NT_HEIGHT; ++row) {
+            for (auto col = 0; col < ALDO_NT_WIDTH; ++col) {
+                auto tileIdx = static_cast<decltype(tiles)::size_type>(col + (row * ALDO_NT_WIDTH));
+                auto tile = tiles[tileIdx];
 
                 // TODO: look up attribute somewhere
+                auto attrIdx = static_cast<decltype(attrs)::size_type>((col >> ALDO_METATILE_DIM) + ((row >> ALDO_METATILE_DIM) * 8));
+                auto attr = attrs[attrIdx];
+                auto metatileIdx = ((col >> 1) % ALDO_METATILE_DIM) + (((row >> 1) % ALDO_METATILE_DIM) * ALDO_METATILE_DIM);
+                assert(metatileIdx < ALDO_PAL_SIZE);
+                auto palIdx = (attr >> (metatileIdx * 2)) & 0x3;
+                assert(palIdx < ALDO_PAL_SIZE);
+                color_span colors = vsp->palettes.bg[palIdx];
 
                 // TODO: copied from PatternTable
+                pt_tile chr = chrs[tile];
                 auto chrDim = static_cast<int>(chr.size());
                 auto chrRow = 0;
                 for (auto pxRow : chr) {

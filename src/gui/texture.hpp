@@ -176,12 +176,12 @@ public:
         }
     }
 
-    DrawMode mode;
+    DrawMode mode = DrawMode::nametables;
 
 private:
     static constexpr int LayoutDim = ALDO_NT_COUNT;
 
-    void drawNametables(const Emulator& emu, const MediaRuntime& mr) const;
+    void drawNametables(const Emulator& emu) const;
     void drawAttributes(const Emulator& emu, const MediaRuntime& mr) const;
 
     SDL_Point ntSize, texSize;

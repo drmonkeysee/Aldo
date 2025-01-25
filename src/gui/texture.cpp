@@ -38,6 +38,35 @@ auto screen_buffer_length() noexcept
     return p.x * p.y;
 }
 
+auto draw_tile_row(aldo::et::word pxRow, aldo::color_span colors,
+                   int texOffset, const aldo::Palette& p,
+                   const aldo::tex::TextureData& data)
+{
+    for (auto px = 0; px < static_cast<int>(aldo::pt_tile::extent); ++px) {
+        auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
+        assert(0 <= pidx);
+        decltype(colors)::size_type texel = (pxRow & (0x3 << pidx)) >> pidx;
+        assert(texel < colors.size());
+        auto texidx = px + texOffset;
+        assert(texidx < data.width * data.height);
+        data.pixels[texidx] = p.getColor(colors[texel]);
+    }
+}
+
+auto draw_tile(aldo::pt_tile chr, int col, int row, aldo::color_span colors,
+               const aldo::Palette& p, const aldo::tex::TextureData& data,
+               int offsetAdjustment = 0)
+{
+    auto chrDim = static_cast<int>(chr.size());
+    auto chrRow = 0;
+    for (auto pxRow : chr) {
+        auto texOffset = (col * chrDim) + ((chrRow++ + (row * chrDim))
+                                           * data.stride);
+        texOffset += offsetAdjustment;
+        draw_tile_row(pxRow, colors, texOffset, p, data);
+    }
+}
+
 }
 
 //
@@ -67,21 +96,12 @@ aldo::PatternTable::PatternTable(const aldo::MediaRuntime& mr)
 void aldo::PatternTable::draw(aldo::pt_span table, aldo::color_span colors,
                               const aldo::Palette& p) const
 {
-    using pt_sz = decltype(table)::size_type;
-
     auto data = tex.lock();
-    for (auto tblRow = 0; tblRow < TableDim; ++tblRow) {
-        for (auto tblCol = 0; tblCol < TableDim; ++tblCol) {
-            auto tileIdx = static_cast<pt_sz>(tblCol + (tblRow * TableDim));
-            aldo::pt_tile tile = table[tileIdx];
-            auto tileDim = static_cast<int>(tile.size());
-            auto tileRow = 0;
-            for (auto row : tile) {
-                auto rowOffset = (tblCol * tileDim)
-                                    + ((tileRow++ + (tblRow * tileDim))
-                                       * data.stride);
-                drawTileRow(row, colors, rowOffset, p, data);
-            }
+    for (auto row = 0; row < TableDim; ++row) {
+        for (auto col = 0; col < TableDim; ++col) {
+            auto tileIdx = static_cast<
+                decltype(table)::size_type>(col + (row * TableDim));
+            draw_tile(table[tileIdx], col, row, colors, p, data);
         }
     }
 }
@@ -130,22 +150,6 @@ aldo::tex::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 // MARK: - Private Interface
 //
 
-void aldo::PatternTable::drawTileRow(aldo::et::word row,
-                                     aldo::color_span colors,
-                                     int texOffset, const aldo::Palette& p,
-                                     const aldo::tex::TextureData& data)
-{
-    for (auto px = 0; px < static_cast<int>(pt_tile::extent); ++px) {
-        auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
-        assert(0 <= pidx);
-        decltype(colors)::size_type texel = (row & (0x3 << pidx)) >> pidx;
-        assert(texel < aldo::color_span::extent);
-        auto texidx = px + texOffset;
-        assert(texidx < TextureDim * TextureDim);
-        data.pixels[texidx] = p.getColor(colors[texel]);
-    }
-}
-
 void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
 {
     using pal_sz = aldo::color_span::size_type;
@@ -180,27 +184,11 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
                 assert(palIdx < aldo::color_span::extent);
                 aldo::color_span colors = vsp->palettes.bg[palIdx];
 
-                // TODO: copied from PatternTable
-                pt_tile chr = chrs[tile];
-                auto chrDim = static_cast<int>(chr.size());
-                auto chrRow = 0;
-                for (auto pxRow : chr) {
-                    auto texOffset = (col * chrDim)
-                    + ((chrRow++ + (row * chrDim))
-                       * data.stride);
-                    texOffset += (i * offsets.upperX);
-                    texOffset += (i * offsets.upperY * data.stride);
-
-                    for (auto px = 0; px < static_cast<int>(pt_tile::extent); ++px) {
-                        auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
-                        assert(0 <= pidx);
-                        decltype(colors)::size_type texel = (pxRow & (0x3 << pidx)) >> pidx;
-                        assert(texel < aldo::color_span::extent);
-                        auto texidx = px + texOffset;
-                        assert(texidx < texSize.x * texSize.y);
-                        data.pixels[texidx] = emu.palette().getColor(colors[texel]);
-                    }
-                }
+                // NOTE: account for upper NT bank X/Y offset for tiles
+                auto offsetAdj = (i * offsets.upperX)
+                                    + (i * offsets.upperY * data.stride);
+                draw_tile(chrs[tile], col, row, colors, emu.palette(), data,
+                          offsetAdj);
             }
         }
     }

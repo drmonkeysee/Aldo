@@ -145,9 +145,6 @@ private:
     static_assert(TextureDim == TableDim * pt_tile::extent,
                   "Texture size does not match tile pixel count");
 
-    static void drawTileRow(et::word row, color_span colors, int texOffset,
-                            const Palette& p, const tex::TextureData& data);
-
     tex::Texture<SDL_TEXTUREACCESS_STREAMING> tex;
 };
 

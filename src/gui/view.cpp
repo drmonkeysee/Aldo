@@ -1167,7 +1167,7 @@ private:
         if (bpBreak && !detectedHalt) {
             bpSelections.select(idx);
         }
-        std::array<aldo::et::tchar, ALDO_HEXPR_FMT_SIZE> fmt;
+        aldo::hexpr_buffer fmt;
         auto err = aldo_haltexpr_desc(&bp.expr, fmt.data());
         ScopedStyleFlt style{
             {ImGuiStyleVar_Alpha, ImGui::GetStyle().DisabledAlpha},

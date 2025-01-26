@@ -11,7 +11,6 @@
 
 #include <SDL2/SDL.h>
 
-#include <array>
 #include <fstream>
 #include <span>
 #include <string_view>
@@ -21,7 +20,6 @@
 namespace
 {
 
-using hexpr_buffer = std::array<aldo::et::tchar, ALDO_HEXPR_FMT_SIZE>;
 using bp_it = aldo::Debugger::BreakpointIterator;
 using bp_sz = aldo::Debugger::BpView::size_type;
 
@@ -32,7 +30,7 @@ auto read_brkfile(const std::filesystem::path& filepath)
     std::ifstream f{filepath};
     if (!f) throw aldo::AldoError{"Cannot open breakpoints file", filepath};
 
-    hexpr_buffer buf;
+    aldo::hexpr_buffer buf;
     std::vector<aldo_debugexpr> exprs;
     while (f.getline(buf.data(), buf.size())) {
         aldo_debugexpr expr;
@@ -62,7 +60,7 @@ auto set_debug_state(aldo_debugger* dbg, std::span<const aldo_debugexpr> exprs)
     }
 }
 
-auto format_debug_expr(const aldo_debugexpr& expr, hexpr_buffer& buf)
+auto format_debug_expr(const aldo_debugexpr& expr, aldo::hexpr_buffer& buf)
 {
     auto err = aldo_haltexpr_fmtdbg(&expr, buf.data());
     if (err < 0) throw aldo::AldoError{
@@ -73,7 +71,7 @@ auto format_debug_expr(const aldo_debugexpr& expr, hexpr_buffer& buf)
 auto fill_expr_buffers(bp_sz exprCount, int resetvector, bool resOverride,
                        bp_it first, bp_it last)
 {
-    std::vector<hexpr_buffer> bufs(exprCount);
+    std::vector<aldo::hexpr_buffer> bufs(exprCount);
     aldo_debugexpr expr;
     for (auto it = bufs.begin(); first != last; ++first, ++it) {
         expr = {
@@ -92,7 +90,7 @@ auto fill_expr_buffers(bp_sz exprCount, int resetvector, bool resOverride,
     return bufs;
 }
 
-auto write_brkline(const hexpr_buffer& buf, std::ofstream& f)
+auto write_brkline(const aldo::hexpr_buffer& buf, std::ofstream& f)
 {
     std::string_view str{buf.data()};
     f.write(str.data(), static_cast<std::streamsize>(str.length()));
@@ -103,7 +101,7 @@ auto write_brkline(const hexpr_buffer& buf, std::ofstream& f)
 }
 
 auto write_brkfile(const std::filesystem::path& filepath,
-                   std::span<const hexpr_buffer> bufs)
+                   std::span<const aldo::hexpr_buffer> bufs)
 {
     std::ofstream f{filepath};
     if (!f) throw aldo::AldoError{"Cannot create breakpoints file", filepath};

@@ -66,6 +66,8 @@ public:
     TextureData& operator=(TextureData&&) = delete;
     ~TextureData() { SDL_UnlockTexture(&tex); }
 
+    int size() const noexcept { return width * height; }
+
     Uint32* pixels;
     int height, stride, width;
 

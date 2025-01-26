@@ -47,7 +47,7 @@ auto draw_tile_row(aldo::et::word pxRow, aldo::color_span colors,
         decltype(colors)::size_type texel = (pxRow & (0x3 << pidx)) >> pidx;
         assert(texel < colors.size());
         auto texidx = px + texOffset;
-        assert(texidx < data.width * data.height);
+        assert(texidx < data.size());
         data.pixels[texidx] = p.getColor(colors[texel]);
     }
 }
@@ -82,9 +82,8 @@ void aldo::VideoScreen::draw(const aldo::et::byte* vbuf,
     assert(vbuf != nullptr);
 
     auto data = tex.lock();
-    auto length = data.width * data.height;
-    assert(length == screen_buffer_length());
-    for (auto i = 0; i < length; ++i) {
+    assert(data.size() == screen_buffer_length());
+    for (auto i = 0; i < data.size(); ++i) {
         data.pixels[i] = p.getColor(vbuf[i]);
     }
 }

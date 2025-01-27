@@ -295,12 +295,18 @@ public:
         std::ranges::to<
             decltype(this->options)>(std::forward<decltype(opts)>(opts)),
     },
-    selected{this->options.front()}, onSelected{cb} {}
+    selected{this->options.front()}, onSelected{cb}
+    {
+        onSelected(selection(), true);
+    }
 
     ComboList(const char* label, std::initializer_list<option> opts,
               callback cb)
     : label{label}, options{opts}, selected{this->options.front()},
-    onSelected{cb} {}
+    onSelected{cb}
+    {
+        onSelected(selection(), true);
+    }
 
     void render() noexcept
     {
@@ -1056,7 +1062,6 @@ private:
         };
 
         HaltCombo combo{"##haltconditions", conditions, cb};
-        cb(combo.selection(), true);
         return combo;
     }
 

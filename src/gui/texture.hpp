@@ -165,7 +165,7 @@ public:
     Nametables(SDL_Point nametableSize, const MediaRuntime& mr);
 
     SDL_Point nametableSize() const noexcept { return ntSize; }
-    SDL_Point totalSize() const noexcept { return texSize; };
+    SDL_Point nametableExtent() const noexcept { return texSize; };
 
     void draw(const Emulator& emu, const MediaRuntime& mr) const;
     void render() const noexcept

@@ -331,7 +331,7 @@ private:
     callback onSelected;
 };
 
-auto widget_group(std::invocable auto f)
+auto widget_group(std::invocable auto f) noexcept(noexcept(f()))
 {
     ImGui::BeginGroup();
     f();
@@ -1288,6 +1288,9 @@ protected:
         if (attributeGrid) {
             renderAttributeGrid(ntDrawOrigin);
         }
+        if (screenPosition) {
+            renderScreenPosition(ntDrawOrigin);
+        }
         tableLabel(2);
         ImGui::SameLine(textOffset);
         tableLabel(3);
@@ -1296,16 +1299,20 @@ protected:
 
         ImGui::Separator();
 
-        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 15);
-        modeCombo.render();
+        widget_group([this] noexcept {
+            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 15);
+            this->modeCombo.render();
+            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 5);
+            ImGui::DragInt("Scanline", &this->scanline, 1, 0, 261, "%d",
+                           ImGuiSliderFlags_AlwaysClamp);
+        });
         ImGui::SameLine();
-        ImGui::Checkbox("Tile Grid", &tileGrid);
+        widget_group([this] noexcept {
+            ImGui::Checkbox("Tile Grid", &this->tileGrid);
+            ImGui::Checkbox("Attribute Grid", &this->attributeGrid);
+        });
         ImGui::SameLine();
-        ImGui::Checkbox("Attribute Grid", &attributeGrid);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 5);
-        ImGui::DragInt("Scanline", &scanline, 1, 0, 261, "%d",
-                       ImGuiSliderFlags_AlwaysClamp);
+        ImGui::Checkbox("Screen Position", &screenPosition);
     }
 
 private:
@@ -1313,16 +1320,16 @@ private:
     {
         static constexpr auto step = decltype(nametables)::TilePxDim;
 
-        auto [extent, hor, ver] = gridDims();
+        auto [_, max, hor, ver] = gridDims();
 
         auto drawList = ImGui::GetWindowDrawList();
         for (auto start = origin;
-             start.x - origin.x < extent.x;
+             start.x - origin.x < max.x;
              start.x += step) {
             drawList->AddLine(start, start + ver, aldo::colors::Attention);
         }
         for (auto start = origin;
-             start.y - origin.y < extent.y;
+             start.y - origin.y < max.y;
              start.y += step) {
             drawList->AddLine(start, start + hor, aldo::colors::Attention);
         }
@@ -1332,12 +1339,12 @@ private:
     {
         static constexpr auto step = decltype(nametables)::AttributePxDim;
 
-        auto [extent, hor, ver] = gridDims();
+        auto [extent, max, hor, ver] = gridDims();
         auto ntHeight = nametables.nametableSize().y;
 
         auto drawList = ImGui::GetWindowDrawList();
         for (auto start = origin;
-             start.x - origin.x < extent.x;
+             start.x - origin.x < max.x;
              start.x += step) {
             drawList->AddLine(start, start + ver, aldo::colors::LedOn);
         }
@@ -1347,12 +1354,34 @@ private:
             drawList->AddLine(start, start + hor, aldo::colors::LedOn);
         }
         for (ImVec2 start{origin.x, origin.y + ntHeight};
-             start.y - origin.y < extent.y;
+             start.y - origin.y < max.y;
              start.y += step) {
             drawList->AddLine(start, start + hor, aldo::colors::LedOn);
         }
-        ImVec2 lastLine{origin.x, origin.y + (extent.y - 1)};
+        ImVec2 lastLine{origin.x, origin.y + extent.y};
         drawList->AddLine(lastLine, lastLine + hor, aldo::colors::LedOn);
+    }
+
+    void renderScreenPosition(const ImVec2& origin)
+    {
+        auto drawList = ImGui::GetWindowDrawList();
+        auto [w, h] = nametables.nametableSize();
+        auto [mx, my] = nametables.nametableExtent();
+        ImVec2
+            ntSize{static_cast<float>(w), static_cast<float>(h)},
+            ntExtent{static_cast<float>(mx), static_cast<float>(my)};
+        if (screenInterval.elapsed(vs.clock.clock())) {
+            ++screenPos %= mx;
+        }
+        drawList->PushClipRect(origin, origin + ntExtent);
+        auto start = origin;
+        start.x += screenPos;
+        drawList->AddRect(start, start + ntSize, aldo::colors::LineIn, 0.0f,
+                          ImDrawFlags_None, 2.0f);
+        start.x -= ntExtent.x;
+        drawList->AddRect(start, start + ntSize, aldo::colors::LineOut, 0.0f,
+                          ImDrawFlags_None, 2.0f);
+        drawList->PopClipRect();
     }
 
     void tableLabel(int table) const noexcept
@@ -1363,19 +1392,24 @@ private:
                     + (attr * ALDO_NT_TILE_COUNT));
     }
 
-    std::tuple<ImVec2, ImVec2, ImVec2> gridDims() const
+    ImVec2 ntExtent() const noexcept
     {
-        auto [w, h] = nametables.totalSize();
-        ImVec2 extent{static_cast<float>(w) + 1, static_cast<float>(h) + 1};
-        return {extent, {extent.x - 1, 0}, {0, extent.y - 1}};
+        auto [w, h] = nametables.nametableExtent();
+        return {static_cast<float>(w), static_cast<float>(h)};
+    }
+
+    std::tuple<ImVec2, ImVec2, ImVec2, ImVec2> gridDims() const
+    {
+        auto extent = ntExtent();
+        return {extent, extent + 1, {extent.x, 0}, {0, extent.y}};
     }
 
     aldo::Nametables nametables;
     using DisplayMode = decltype(nametables)::DrawMode;
     ComboList<DisplayMode> modeCombo;
-    RefreshInterval drawInterval{250};
-    int scanline = 241;
-    bool attributeGrid = false, tileGrid = false;
+    RefreshInterval drawInterval{250}, screenInterval{50};
+    int scanline = 241, screenPos = 0;
+    bool attributeGrid = false, screenPosition = false, tileGrid = false;
 };
 
 class PaletteView final : public aldo::View {

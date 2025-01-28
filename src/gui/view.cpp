@@ -254,6 +254,12 @@ constexpr auto operator-(const ImVec2& a, const ImVec2& b) noexcept
     return ImVec2{a.x - b.x, a.y - b.y};
 }
 
+// TODO: do i need this? and is float == good enough?
+constexpr auto operator==(const ImVec2& a, const ImVec2& b) noexcept
+{
+    return a.x == b.x && a.y == b.y;
+}
+
 constexpr auto text_contrast(ImU32 fillColor) noexcept
 {
     return aldo::colors::luminance(fillColor) < 0x80
@@ -1372,15 +1378,43 @@ private:
             ntExtent{static_cast<float>(mx), static_cast<float>(my)};
         if (screenInterval.elapsed(vs.clock.clock())) {
             ++screenPos %= mx;
+            /*
+            --screenPos;
+            if (screenPos < -w) {
+                screenPos = w - 1;
+            }
+             */
+            //++screenPos %= my;
+            /*
+            --screenPos;
+            if (screenPos < -h) {
+                screenPos = h - 1;
+            }
+             */
         }
         drawList->PushClipRect(origin, origin + ntExtent);
         auto start = origin;
-        start.x += screenPos;
+        start = start + screenPos;
+        //start.x += screenPos;
+        //start.y += screenPos;
         drawList->AddRect(start, start + ntSize, aldo::colors::LineIn, 0.0f,
                           ImDrawFlags_None, 2.0f);
-        start.x -= ntExtent.x;
-        drawList->AddRect(start, start + ntSize, aldo::colors::LineOut, 0.0f,
-                          ImDrawFlags_None, 2.0f);
+        auto offset = start - origin;
+        float offScreen;
+        start = origin;
+        if ((offScreen = offset.x - ntSize.x) > 0) {
+            start.x -= ntSize.x - offScreen;
+        } else if ((offScreen = offset.x) < 0) {
+            start.x += ntExtent.x + offScreen;
+        }
+        if ((offScreen = offset.y - ntSize.y) > 0) {
+            start.y -= ntSize.y - offScreen;
+        } else if ((offScreen = offset.y) < 0) {
+            start.y += ntExtent.y + offScreen;
+        }
+        if (start != origin) {
+            drawList->AddRect(start, start + ntSize, aldo::colors::LineOut, 0.0f, ImDrawFlags_None, 2.0f);
+        }
         drawList->PopClipRect();
     }
 

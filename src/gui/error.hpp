@@ -30,8 +30,7 @@ class AldoError final : public std::runtime_error {
 public:
     AldoError(std::string title, std::string message);
     AldoError(std::string title, std::string label, int errnoVal);
-    template<ErrResolver F>
-    AldoError(std::string title, int err, F errRes)
+    AldoError(std::string title, int err, ErrResolver auto errRes)
     : AldoError{std::move(title), errMessage(err, errRes(err))} {}
 
     const char* what() const noexcept override { return wht.c_str(); }

@@ -1400,21 +1400,43 @@ private:
         drawList->AddRect(start, start + ntSize, aldo::colors::LineIn, 0.0f,
                           ImDrawFlags_None, 2.0f);
         auto offset = start - origin;
-        float offScreen;
-        start = origin;
+        bool clipped = offset.x - ntSize.x > 0 || offset.x < 0;
+        /*start = origin;
         if ((offScreen = offset.x - ntSize.x) > 0) {
             start.x -= ntSize.x - offScreen;
         } else if ((offScreen = offset.x) < 0) {
             start.x += ntExtent.x + offScreen;
+        }*/
+        //start.x = ((start.x + 512) % 768) - 256;
+        auto mirrOffset = offset;
+        mirrOffset.x += ntExtent.x + ntSize.x;
+        mirrOffset.x = static_cast<int>(mirrOffset.x) % static_cast<int>(ntExtent.x * 2);
+        mirrOffset.x -= ntSize.x;
+        start = origin + mirrOffset;
+
+        if (clipped) {
+            drawList->AddRect(start, start + ntSize, aldo::colors::LineOut, 0.0f, ImDrawFlags_None, 2.0f);
         }
+
+        clipped = offset.y - ntSize.y > 0 || offset.y < 0;
+        mirrOffset = offset;
+        mirrOffset.y += ntExtent.y + ntSize.y;
+        mirrOffset.y = static_cast<int>(mirrOffset.y) % static_cast<int>(ntExtent.y * 2);
+        mirrOffset.y -= ntSize.y;
+        start = origin + mirrOffset;
+
+        if (clipped) {
+            drawList->AddRect(start, start + ntSize, aldo::colors::Attention, 0.0f, ImDrawFlags_None, 2.0f);
+        }
+
+        /*
+        float offScreen;
         if ((offScreen = offset.y - ntSize.y) > 0) {
             start.y -= ntSize.y - offScreen;
         } else if ((offScreen = offset.y) < 0) {
             start.y += ntExtent.y + offScreen;
         }
-        if (start != origin) {
-            drawList->AddRect(start, start + ntSize, aldo::colors::LineOut, 0.0f, ImDrawFlags_None, 2.0f);
-        }
+         */
         drawList->PopClipRect();
     }
 

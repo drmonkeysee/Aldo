@@ -254,12 +254,6 @@ constexpr auto operator-(const ImVec2& a, const ImVec2& b) noexcept
     return ImVec2{a.x - b.x, a.y - b.y};
 }
 
-// TODO: do i need this? and is float == good enough?
-constexpr auto operator==(const ImVec2& a, const ImVec2& b) noexcept
-{
-    return a.x == b.x && a.y == b.y;
-}
-
 constexpr auto text_contrast(ImU32 fillColor) noexcept
 {
     return aldo::colors::luminance(fillColor) < 0x80
@@ -1372,12 +1366,12 @@ private:
     {
         auto drawList = ImGui::GetWindowDrawList();
         auto [w, h] = nametables.nametableSize();
-        auto [mx, my] = nametables.nametableExtent();
+        auto [ex, ey] = nametables.nametableExtent();
         ImVec2
             ntSize{static_cast<float>(w), static_cast<float>(h)},
-            ntExtent{static_cast<float>(mx), static_cast<float>(my)};
+            ntExtent{static_cast<float>(ex), static_cast<float>(ey)};
         if (screenInterval.elapsed(vs.clock.clock())) {
-            ++screenPos %= mx;
+            ++screenPos %= ex;
             /*
             --screenPos;
             if (screenPos < -w) {
@@ -1400,43 +1394,35 @@ private:
         drawList->AddRect(start, start + ntSize, aldo::colors::LineIn, 0.0f,
                           ImDrawFlags_None, 2.0f);
         auto offset = start - origin;
-        bool clipped = offset.x - ntSize.x > 0 || offset.x < 0;
-        /*start = origin;
-        if ((offScreen = offset.x - ntSize.x) > 0) {
-            start.x -= ntSize.x - offScreen;
-        } else if ((offScreen = offset.x) < 0) {
-            start.x += ntExtent.x + offScreen;
-        }*/
-        //start.x = ((start.x + 512) % 768) - 256;
-        auto mirrOffset = offset;
-        mirrOffset.x += ntExtent.x + ntSize.x;
-        mirrOffset.x = static_cast<int>(mirrOffset.x) % static_cast<int>(ntExtent.x * 2);
-        mirrOffset.x -= ntSize.x;
-        start = origin + mirrOffset;
 
-        if (clipped) {
+        bool hClipped = offset.x - ntSize.x > 0 || offset.x < 0;
+        auto hOverflow = offset;
+        hOverflow.x += ntExtent.x + ntSize.x;
+        hOverflow.x = static_cast<int>(hOverflow.x) % (ex * 2);
+        hOverflow.x -= ntSize.x;
+        start = origin + hOverflow;
+
+        if (hClipped) {
             drawList->AddRect(start, start + ntSize, aldo::colors::LineOut, 0.0f, ImDrawFlags_None, 2.0f);
         }
 
-        clipped = offset.y - ntSize.y > 0 || offset.y < 0;
-        mirrOffset = offset;
-        mirrOffset.y += ntExtent.y + ntSize.y;
-        mirrOffset.y = static_cast<int>(mirrOffset.y) % static_cast<int>(ntExtent.y * 2);
-        mirrOffset.y -= ntSize.y;
-        start = origin + mirrOffset;
+        bool vClipped = offset.y - ntSize.y > 0 || offset.y < 0;
+        auto vOverflow = offset;
+        vOverflow.y += ntExtent.y + ntSize.y;
+        vOverflow.y = static_cast<int>(vOverflow.y) % (ey * 2);
+        vOverflow.y -= ntSize.y;
+        start = origin + vOverflow;
 
-        if (clipped) {
+        if (vClipped) {
             drawList->AddRect(start, start + ntSize, aldo::colors::Attention, 0.0f, ImDrawFlags_None, 2.0f);
         }
 
-        /*
-        float offScreen;
-        if ((offScreen = offset.y - ntSize.y) > 0) {
-            start.y -= ntSize.y - offScreen;
-        } else if ((offScreen = offset.y) < 0) {
-            start.y += ntExtent.y + offScreen;
+        ImVec2 overflow{hOverflow.x, vOverflow.y};
+        start = origin + overflow;
+        if (hClipped && vClipped) {
+            drawList->AddRect(start, start + ntSize, aldo::colors::Destructive, 0.0f, ImDrawFlags_None, 2.0f);
         }
-         */
+
         drawList->PopClipRect();
     }
 

@@ -51,6 +51,21 @@ namespace
 // MARK: - Helpers
 //
 
+constexpr auto operator+(const ImVec2& v, float f) noexcept
+{
+    return ImVec2{v.x + f, v.y + f};
+}
+
+constexpr auto operator+(const ImVec2& a, const ImVec2& b) noexcept
+{
+    return ImVec2{a.x + b.x, a.y + b.y};
+}
+
+constexpr auto operator-(const ImVec2& a, const ImVec2& b) noexcept
+{
+    return ImVec2{a.x - b.x, a.y - b.y};
+}
+
 // TODO: make interval a double template parameter once Apple clang supports it
 class RefreshInterval {
 public:
@@ -127,6 +142,23 @@ public:
     ScopedID(ScopedID&&) = delete;
     ScopedID& operator=(ScopedID&&) = delete;
     ~ScopedID() { ImGui::PopID(); }
+};
+
+class ALDO_SIDEFX ClipRect {
+public:
+    ClipRect(const ImVec2& origin, const ImVec2& size) noexcept
+    : drawList{ImGui::GetWindowDrawList()}
+    {
+        drawList->PushClipRect(origin, origin + size);
+    }
+    ClipRect(const ClipRect&) = delete;
+    ClipRect& operator=(const ClipRect&) = delete;
+    ClipRect(ClipRect&&) = delete;
+    ClipRect& operator=(ClipRect&&) = delete;
+    ~ClipRect() { drawList->PopClipRect(); }
+
+private:
+    ImDrawList* drawList;
 };
 
 using scoped_color_int = std::pair<ImGuiCol, ImU32>;
@@ -237,21 +269,6 @@ constexpr auto signal_color(aldo_sigstate s) noexcept
 constexpr auto boolstr(bool v) noexcept
 {
     return v ? "yes" : "no";
-}
-
-constexpr auto operator+(const ImVec2& v, float f) noexcept
-{
-    return ImVec2{v.x + f, v.y + f};
-}
-
-constexpr auto operator+(const ImVec2& a, const ImVec2& b) noexcept
-{
-    return ImVec2{a.x + b.x, a.y + b.y};
-}
-
-constexpr auto operator-(const ImVec2& a, const ImVec2& b) noexcept
-{
-    return ImVec2{a.x - b.x, a.y - b.y};
 }
 
 constexpr auto text_contrast(ImU32 fillColor) noexcept
@@ -628,8 +645,8 @@ auto small_led(bool on, float xOffset = 0) noexcept
         pos.x + xOffset,
         pos.y + (ImGui::GetTextLineHeight() / 2) + 1,
     };
-    auto drawList = ImGui::GetWindowDrawList();
     auto fill = on ? aldo::colors::LedOn : aldo::colors::LedOff;
+    auto drawList = ImGui::GetWindowDrawList();
     drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
 }
 
@@ -1277,20 +1294,9 @@ protected:
         tableLabel(0);
         ImGui::SameLine(textOffset);
         tableLabel(1);
-        auto ntDrawOrigin = ImGui::GetCursorScreenPos();
-        if (drawInterval.elapsed(vs.clock.clock())) {
-            nametables.draw(emu, mr);
-        }
-        nametables.render();
-        if (tileGrid) {
-            renderTileGrid(ntDrawOrigin);
-        }
-        if (attributeGrid) {
-            renderAttributeGrid(ntDrawOrigin);
-        }
-        if (screenPosition) {
-            renderScreenPosition(ntDrawOrigin);
-        }
+
+        renderVisualizations();
+
         tableLabel(2);
         ImGui::SameLine(textOffset);
         tableLabel(3);
@@ -1316,57 +1322,72 @@ protected:
     }
 
 private:
-    void renderTileGrid(const ImVec2& origin) const noexcept
+    void renderVisualizations()
+    {
+        setDrawState();
+
+        if (drawInterval.elapsed(vs.clock.clock())) {
+            nametables.draw(emu, mr);
+        }
+        nametables.render();
+
+        if (tileGrid) {
+            renderTileGrid();
+        }
+        if (attributeGrid) {
+            renderAttributeGrid();
+        }
+        if (screenPosition) {
+            renderScreenPosition();
+        }
+    }
+
+    void renderTileGrid() const
     {
         static constexpr auto step = decltype(nametables)::TilePxDim;
 
         auto [_, max, hor, ver] = gridDims();
-
-        auto drawList = ImGui::GetWindowDrawList();
-        for (auto start = origin;
-             start.x - origin.x < max.x;
+        for (auto start = ntOrigin;
+             start.x - ntOrigin.x < max.x;
              start.x += step) {
-            drawList->AddLine(start, start + ver, aldo::colors::Attention);
+            currDrawList->AddLine(start, start + ver, aldo::colors::Attention);
         }
-        for (auto start = origin;
-             start.y - origin.y < max.y;
+        for (auto start = ntOrigin;
+             start.y - ntOrigin.y < max.y;
              start.y += step) {
-            drawList->AddLine(start, start + hor, aldo::colors::Attention);
+            currDrawList->AddLine(start, start + hor, aldo::colors::Attention);
         }
     }
 
-    void renderAttributeGrid(const ImVec2& origin) const
+    void renderAttributeGrid() const
     {
         static constexpr auto step = decltype(nametables)::AttributePxDim;
 
         auto [extent, max, hor, ver] = gridDims();
         auto ntHeight = nametables.nametableSize().y;
-
-        auto drawList = ImGui::GetWindowDrawList();
-        for (auto start = origin;
-             start.x - origin.x < max.x;
+        for (auto start = ntOrigin;
+             start.x - ntOrigin.x < max.x;
              start.x += step) {
-            drawList->AddLine(start, start + ver, aldo::colors::LedOn);
+            currDrawList->AddLine(start, start + ver, aldo::colors::LedOn);
         }
-        for (auto start = origin;
-             start.y - origin.y < ntHeight;
+        for (auto start = ntOrigin;
+             start.y - ntOrigin.y < ntHeight;
              start.y += step) {
-            drawList->AddLine(start, start + hor, aldo::colors::LedOn);
+            currDrawList->AddLine(start, start + hor, aldo::colors::LedOn);
         }
-        for (ImVec2 start{origin.x, origin.y + ntHeight};
-             start.y - origin.y < max.y;
+        for (ImVec2 start{ntOrigin.x, ntOrigin.y + ntHeight};
+             start.y - ntOrigin.y < max.y;
              start.y += step) {
-            drawList->AddLine(start, start + hor, aldo::colors::LedOn);
+            currDrawList->AddLine(start, start + hor, aldo::colors::LedOn);
         }
-        ImVec2 lastLine{origin.x, origin.y + extent.y};
-        drawList->AddLine(lastLine, lastLine + hor, aldo::colors::LedOn);
+        ImVec2 lastLine{ntOrigin.x, ntOrigin.y + extent.y};
+        currDrawList->AddLine(lastLine, lastLine + hor, aldo::colors::LedOn);
     }
 
-    void renderScreenPosition(const ImVec2& origin) noexcept
+    void renderScreenPosition() noexcept
     {
-        auto drawList = ImGui::GetWindowDrawList();
         auto [w, h] = nametables.nametableSize();
-        ImVec2 ntSize{static_cast<float>(w), static_cast<float>(h)};
+        ImVec2 scrSize{static_cast<float>(w), static_cast<float>(h)};
         auto ntExt = ntExtent();
         if (screenInterval.elapsed(vs.clock.clock())) {
             ++screenPos %= static_cast<int>(ntExt.x);
@@ -1378,30 +1399,27 @@ private:
             static_cast<float>(screenPos),
         };
 
-        drawList->PushClipRect(origin, origin + ntExt);
+        ClipRect clip{ntOrigin, ntExt};
+        drawScreenIndicator(ntOrigin + screenPos, scrSize);
 
-        drawScreenIndicator(origin + screenPos, ntSize, drawList);
-
-        bool hClipped = offset.x < 0 || offset.x - ntSize.x > 0;
+        bool hClipped = clipped(offset.x, scrSize.x);
         auto hOverflow = offset;
         if (hClipped) {
-            calculateOverflow(hOverflow.x, ntSize.x, ntExt.x);
-            drawScreenIndicator(origin + hOverflow, ntSize, drawList);
+            calculateOverflow(hOverflow.x, scrSize.x, ntExt.x);
+            drawScreenIndicator(ntOrigin + hOverflow, scrSize);
         }
 
-        bool vClipped = offset.y < 0 || offset.y - ntSize.y > 0;
+        bool vClipped = clipped(offset.y, scrSize.y);
         auto vOverflow = offset;
         if (vClipped) {
-            calculateOverflow(vOverflow.y, ntSize.y, ntExt.y);
-            drawScreenIndicator(origin + vOverflow, ntSize, drawList);
+            calculateOverflow(vOverflow.y, scrSize.y, ntExt.y);
+            drawScreenIndicator(ntOrigin + vOverflow, scrSize);
         }
 
         if (hClipped && vClipped) {
             ImVec2 overflow{hOverflow.x, vOverflow.y};
-            drawScreenIndicator(origin + overflow, ntSize, drawList);
+            drawScreenIndicator(ntOrigin + overflow, scrSize);
         }
-
-        drawList->PopClipRect();
     }
 
     void tableLabel(int table) const noexcept
@@ -1410,6 +1428,19 @@ private:
         ImGui::Text("%s $%4X", attr ? "Attribute Table" : "Nametable",
                     ALDO_MEMBLOCK_8KB + (table * ALDO_MEMBLOCK_1KB)
                     + (attr * ALDO_NT_TILE_COUNT));
+    }
+
+    void setDrawState() noexcept
+    {
+        ntOrigin = ImGui::GetCursorScreenPos();
+        currDrawList = ImGui::GetWindowDrawList();
+    }
+
+    void drawScreenIndicator(const ImVec2& start,
+                             const ImVec2& size) const noexcept
+    {
+        currDrawList->AddRect(start, start + size, aldo::colors::LineIn, 0.0f,
+                              ImDrawFlags_None, 2.0f);
     }
 
     ImVec2 ntExtent() const noexcept
@@ -1424,15 +1455,12 @@ private:
         return {extent, extent + 1, {extent.x, 0}, {0, extent.y}};
     }
 
-    static void drawScreenIndicator(const ImVec2& start, const ImVec2& size,
-                                    ImDrawList* drawList) noexcept
+    static bool clipped(float offset, float size) noexcept
     {
-        drawList->AddRect(start, start + size, aldo::colors::LineIn, 0.0f,
-                          ImDrawFlags_None, 2.0f);
+        return offset < 0 || offset - size > 0;
     }
 
-    static void calculateOverflow(float& axis, const float& size,
-                                  const float& max) noexcept
+    static void calculateOverflow(float& axis, float size, float max) noexcept
     {
         axis += size + max;
         axis = static_cast<int>(axis) % (static_cast<int>(max) * 2);
@@ -1443,6 +1471,8 @@ private:
     using DisplayMode = decltype(nametables)::DrawMode;
     ComboList<DisplayMode> modeCombo;
     RefreshInterval drawInterval{250}, screenInterval{50};
+    ImDrawList* currDrawList = nullptr;
+    ImVec2 ntOrigin{};
     int scanline = 241, screenPos = 0;
     bool attributeGrid = false, screenPosition = false, tileGrid = false;
 };

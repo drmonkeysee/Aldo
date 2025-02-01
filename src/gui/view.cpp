@@ -1362,65 +1362,43 @@ private:
         drawList->AddLine(lastLine, lastLine + hor, aldo::colors::LedOn);
     }
 
-    void renderScreenPosition(const ImVec2& origin)
+    void renderScreenPosition(const ImVec2& origin) noexcept
     {
         auto drawList = ImGui::GetWindowDrawList();
         auto [w, h] = nametables.nametableSize();
-        auto [ex, ey] = nametables.nametableExtent();
-        ImVec2
-            ntSize{static_cast<float>(w), static_cast<float>(h)},
-            ntExtent{static_cast<float>(ex), static_cast<float>(ey)};
+        ImVec2 ntSize{static_cast<float>(w), static_cast<float>(h)};
+        auto ntExt = ntExtent();
         if (screenInterval.elapsed(vs.clock.clock())) {
-            ++screenPos %= ex;
-            /*
-            --screenPos;
-            if (screenPos < -w) {
-                screenPos = w - 1;
-            }
-             */
-            //++screenPos %= my;
-            /*
-            --screenPos;
-            if (screenPos < -h) {
-                screenPos = h - 1;
-            }
-             */
+            ++screenPos %= static_cast<int>(ntExt.x);
+            //--screenPos %= static_cast<int>(ntExt.y);
         }
-        drawList->PushClipRect(origin, origin + ntExtent);
-        auto start = origin;
-        start = start + screenPos;
-        //start.x += screenPos;
-        //start.y += screenPos;
-        drawList->AddRect(start, start + ntSize, aldo::colors::LineIn, 0.0f,
-                          ImDrawFlags_None, 2.0f);
-        auto offset = start - origin;
+        // TODO: this would be the ppu screen position
+        ImVec2 offset{
+            static_cast<float>(screenPos),
+            static_cast<float>(screenPos),
+        };
 
-        bool hClipped = offset.x - ntSize.x > 0 || offset.x < 0;
+        drawList->PushClipRect(origin, origin + ntExt);
+
+        drawScreenIndicator(origin + screenPos, ntSize, drawList);
+
+        bool hClipped = offset.x < 0 || offset.x - ntSize.x > 0;
         auto hOverflow = offset;
-        hOverflow.x += ntExtent.x + ntSize.x;
-        hOverflow.x = static_cast<int>(hOverflow.x) % (ex * 2);
-        hOverflow.x -= ntSize.x;
-        start = origin + hOverflow;
-
         if (hClipped) {
-            drawList->AddRect(start, start + ntSize, aldo::colors::LineOut, 0.0f, ImDrawFlags_None, 2.0f);
+            calculateOverflow(hOverflow.x, ntSize.x, ntExt.x);
+            drawScreenIndicator(origin + hOverflow, ntSize, drawList);
         }
 
-        bool vClipped = offset.y - ntSize.y > 0 || offset.y < 0;
+        bool vClipped = offset.y < 0 || offset.y - ntSize.y > 0;
         auto vOverflow = offset;
-        vOverflow.y += ntExtent.y + ntSize.y;
-        vOverflow.y = static_cast<int>(vOverflow.y) % (ey * 2);
-        vOverflow.y -= ntSize.y;
-        start = origin + vOverflow;
-
         if (vClipped) {
-            drawList->AddRect(start, start + ntSize, aldo::colors::Attention, 0.0f, ImDrawFlags_None, 2.0f);
+            calculateOverflow(vOverflow.y, ntSize.y, ntExt.y);
+            drawScreenIndicator(origin + vOverflow, ntSize, drawList);
         }
 
-        ImVec2 overflow{hOverflow.x, vOverflow.y};
-        start = origin + overflow;
         if (hClipped && vClipped) {
-            drawList->AddRect(start, start + ntSize, aldo::colors::Destructive, 0.0f, ImDrawFlags_None, 2.0f);
+            ImVec2 overflow{hOverflow.x, vOverflow.y};
+            drawScreenIndicator(origin + overflow, ntSize, drawList);
         }
 
         drawList->PopClipRect();
@@ -1444,6 +1422,21 @@ private:
     {
         auto extent = ntExtent();
         return {extent, extent + 1, {extent.x, 0}, {0, extent.y}};
+    }
+
+    static void drawScreenIndicator(const ImVec2& start, const ImVec2& size,
+                                    ImDrawList* drawList) noexcept
+    {
+        drawList->AddRect(start, start + size, aldo::colors::LineIn, 0.0f,
+                          ImDrawFlags_None, 2.0f);
+    }
+
+    static void calculateOverflow(float& axis, const float& size,
+                                  const float& max) noexcept
+    {
+        axis += size + max;
+        axis = static_cast<int>(axis) % (static_cast<int>(max) * 2);
+        axis -= size;
     }
 
     aldo::Nametables nametables;

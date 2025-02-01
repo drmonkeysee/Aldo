@@ -1462,6 +1462,40 @@ private:
 
     static void calculateOverflow(float& axis, float size, float max) noexcept
     {
+        /*
+         * to simulate screen indicator wrap-around we're drawing duplicate
+         * rects off-screen that are moved in sync with the screen indicator
+         * and offset to enter the clip rect exactly when the screen indicator
+         * exits it; for the horizontal case consider:
+         * - if the screen is at x = 0 (the nametable x-origin) the overflow
+         *   rect starts at x = 512 (the nametable x-width); any leftward
+         *   movement will bring the overflow rect into view on the
+         *   right-hand side
+         * - if the screen is at x = 256 (the right-hand NT x-origin), the
+         *   overflow rect starts at x = -256; any rightward movement will
+         *   bring the overflow rect into view on the left-hand side
+         * the same logic applies in the vertical direction, and finally a
+         * third overflow rect for diagonal movement that combines the
+         * horizontal and vertical overflows covers all possible wrapping;
+         * the calculation for horizontal overflow is thus:
+         * - the overflow rect is offset from the screen rect by the width of
+         *   the nametables: 512 pixels
+         * - the overflow rect wraps around at a maximum distance of 768 pixels
+         *   from the origin, this is the offset 512 pixels + the 256 pixels of
+         *   possible rightward travel before the screen would begin clipping
+         * - BUT the wraparound can't start at 0, that will render the overflow
+         *   rect one screen width too early, so the wraparound must be moved
+         *   one screen width past the origin: -256 pixels
+         * - FINALLY that -256 pixel adjustment must be accounted for in the
+         *   intial offset and the wraparound or all the positive x-axis
+         *   calculations will be off by -256; think of this as moving the
+         *   origin of this entire formula leftward 256 pixels to a position
+         *   off-screen; this adds an extra 256 to all previous steps giving an
+         *   offset of 512 + 256 (e.g. screen size + nametable width) and a
+         *   modulus of 768 + 256 (e.g. 1024 or 2 * nametable width)
+         * the vertical calculation is identical, with appropriate adjustments
+         * for the shorter screen height.
+         */
         axis += size + max;
         axis = static_cast<int>(axis) % (static_cast<int>(max) * 2);
         axis -= size;

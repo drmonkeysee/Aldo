@@ -1317,7 +1317,8 @@ private:
     class ALDO_SIDEFX NtOverlays {
     public:
         NtOverlays(ImDrawListSplitter& s, const aldo::Nametables& nt,
-                   const aldo_snapshot& snp, bool tg, bool ag, bool si)
+                   const aldo_snapshot& snp, bool tg, bool ag,
+                   bool si) noexcept
         : splitter{s}, drawList{ImGui::GetWindowDrawList()},
         ntOrigin{ImGui::GetCursorScreenPos()},
         ntExtent{point_to_vec(nt.nametableExtent())},
@@ -1371,7 +1372,7 @@ private:
     private:
         class ALDO_SIDEFX BackChannel {
         public:
-            BackChannel(ImDrawListSplitter& s, ImDrawList* dl)
+            BackChannel(ImDrawListSplitter& s, ImDrawList* dl) noexcept
             : splitter{s}, drawList{dl}
             { splitter.SetCurrentChannel(drawList, 0); }
             BackChannel(const BackChannel&) = delete;
@@ -1531,7 +1532,7 @@ private:
     {
         NtOverlays ov{
             splitter, nametables, emu.snapshot(), tileGrid, attributeGrid,
-            screenPosition,
+            screenIndicator,
         };
         if (drawInterval.elapsed(vs.clock.clock())) {
             nametables.draw(emu, mr);
@@ -1556,7 +1557,7 @@ private:
             ImGui::Checkbox("Attribute Grid", &this->attributeGrid);
         });
         ImGui::SameLine();
-        ImGui::Checkbox("Screen Position", &screenPosition);
+        ImGui::Checkbox("Screen Indicator", &screenIndicator);
     }
 
     void tableLabel(int table) const noexcept
@@ -1573,7 +1574,7 @@ private:
     ComboList<DisplayMode> modeCombo;
     RefreshInterval drawInterval{250};
     int scanline = 241;
-    bool attributeGrid = false, screenPosition = false, tileGrid = false;
+    bool attributeGrid = false, screenIndicator = false, tileGrid = false;
 
     RefreshInterval screenInterval{50};
     SDL_Point screenPos{};

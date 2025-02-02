@@ -1310,20 +1310,7 @@ protected:
 
         ImGui::Separator();
 
-        widget_group([this] noexcept {
-            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 15);
-            this->modeCombo.render();
-            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 5);
-            ImGui::DragInt("Scanline", &this->scanline, 1, 0, 261, "%d",
-                           ImGuiSliderFlags_AlwaysClamp);
-        });
-        ImGui::SameLine();
-        widget_group([this] noexcept {
-            ImGui::Checkbox("Tile Grid", &this->tileGrid);
-            ImGui::Checkbox("Attribute Grid", &this->attributeGrid);
-        });
-        ImGui::SameLine();
-        ImGui::Checkbox("Screen Position", &screenPosition);
+        renderControls();
     }
 
 private:
@@ -1334,8 +1321,8 @@ private:
         : splitter{s}, drawList{ImGui::GetWindowDrawList()},
         ntOrigin{ImGui::GetCursorScreenPos()},
         ntExtent{point_to_vec(nt.nametableExtent())},
-        scrSize{point_to_vec(nt.nametableSize())}, tileGrid{tg}, attrGrid{ag},
-        scrInd{si}
+        scrSize{point_to_vec(nt.nametableSize())}, attrGrid{ag}, scrInd{si},
+        tileGrid{tg}
         {
             const auto& emuPos = snp.video->nt.pos;
             scrPos = {
@@ -1382,6 +1369,22 @@ private:
         }
 
     private:
+        class ALDO_SIDEFX BackChannel {
+        public:
+            BackChannel(ImDrawListSplitter& s, ImDrawList* dl)
+            : splitter{s}, drawList{dl}
+            { splitter.SetCurrentChannel(drawList, 0); }
+            BackChannel(const BackChannel&) = delete;
+            BackChannel& operator=(const BackChannel&) = delete;
+            BackChannel(BackChannel&&) = delete;
+            BackChannel& operator=(BackChannel&&) = delete;
+            ~BackChannel() { splitter.SetCurrentChannel(drawList, 1); }
+
+        private:
+            ImDrawListSplitter& splitter;
+            ImDrawList* drawList;
+        };
+
         void renderTileGrid() const
         {
             static constexpr auto step = decltype(nametables)::TilePxDim;
@@ -1426,30 +1429,33 @@ private:
         void renderScreenIndicator() const noexcept
         {
             ClipRect clip{ntOrigin, ntExtent};
+            renderScreenHighlight();
+            renderScreenPosition();
+        }
 
-            ImColor c{IM_COL32_BLACK};
-            c.Value.w = 0.5f;
+        void renderScreenHighlight() const noexcept
+        {
+            BackChannel useBackChannel{splitter, drawList};
 
-            splitter.SetCurrentChannel(drawList, 0);
             // Top Left
             auto start = scrPos, end = scrPos;
             start.x -= scrSize.x;
             start.y -= ntExtent.y;
             end.y -= scrSize.y;
-            drawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+            drawScreenOverlay(start, end);
 
             // Mid Left
             start = end = scrPos;
             start.x -= scrSize.x;
             end.y += scrSize.y;
-            drawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+            drawScreenOverlay(start, end);
 
             // Upper Row
             start = end = scrPos;
             start.x -= ntExtent.x;
             start.y -= scrSize.y;
             end.x += scrSize.x;
-            drawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+            drawScreenOverlay(start, end);
 
             // Bottom Row
             start = end = scrPos;
@@ -1457,42 +1463,52 @@ private:
             start.y += scrSize.y;
             end.x += scrSize.x;
             end.y += ntExtent.y;
-            drawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+            drawScreenOverlay(start, end);
 
             // Right Column
             start = end = scrPos;
             start.x += scrSize.x;
             start.y -= ntExtent.y;
             end = end + ntExtent;
-            drawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+            drawScreenOverlay(start, end);
+        }
 
-            splitter.SetCurrentChannel(drawList, 1);
-            drawScreenIndicator(ntOrigin + scrPos, scrSize);
+        void renderScreenPosition() const noexcept
+        {
+            drawScreenIndicator(scrPos, scrSize);
 
             bool hClipped = clipped(scrPos.x, scrSize.x);
             if (hClipped) {
                 auto hOverflow = scrPos;
                 hOverflow.x -= ntExtent.x;
-                drawScreenIndicator(ntOrigin + hOverflow, scrSize);
+                drawScreenIndicator(hOverflow, scrSize);
             }
 
             bool vClipped = clipped(scrPos.y, scrSize.y);
             if (vClipped) {
                 auto vOverflow = scrPos;
                 vOverflow.y -= ntExtent.y;
-                drawScreenIndicator(ntOrigin + vOverflow, scrSize);
+                drawScreenIndicator(vOverflow, scrSize);
             }
 
             if (hClipped && vClipped) {
-                drawScreenIndicator(ntOrigin + scrPos - ntExtent, scrSize);
+                drawScreenIndicator(scrPos - ntExtent, scrSize);
             }
         }
 
         void drawScreenIndicator(const ImVec2& start,
                                  const ImVec2& size) const noexcept
         {
-            drawList->AddRect(start, start + size, aldo::colors::LineIn, 0.0f,
+            auto orig = ntOrigin + start;
+            drawList->AddRect(orig, orig + size, aldo::colors::LineIn, 0.0f,
                               ImDrawFlags_None, 2.0f);
+        }
+
+        void drawScreenOverlay(const ImVec2& start,
+                               const ImVec2& end) const noexcept
+        {
+            drawList->AddRectFilled(ntOrigin + start, ntOrigin + end,
+                                    aldo::colors::DarkOverlay);
         }
 
         std::tuple<ImVec2, ImVec2, ImVec2, ImVec2> gridDims() const
@@ -1508,7 +1524,7 @@ private:
         ImDrawListSplitter& splitter;
         ImDrawList* drawList;
         ImVec2 ntOrigin, ntExtent, scrPos, scrSize;
-        bool tileGrid, attrGrid, scrInd;
+        bool attrGrid, scrInd, tileGrid;
     };
 
     void renderNametables()
@@ -1523,6 +1539,24 @@ private:
         nametables.render();
         ov.render();
         //ov.render(screenInterval, screenPos, vs);
+    }
+
+    void renderControls() noexcept
+    {
+        widget_group([this] noexcept {
+            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 15);
+            this->modeCombo.render();
+            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 5);
+            ImGui::DragInt("Scanline", &this->scanline, 1, 0, 261, "%d",
+                           ImGuiSliderFlags_AlwaysClamp);
+        });
+        ImGui::SameLine();
+        widget_group([this] noexcept {
+            ImGui::Checkbox("Tile Grid", &this->tileGrid);
+            ImGui::Checkbox("Attribute Grid", &this->attributeGrid);
+        });
+        ImGui::SameLine();
+        ImGui::Checkbox("Screen Position", &screenPosition);
     }
 
     void tableLabel(int table) const noexcept

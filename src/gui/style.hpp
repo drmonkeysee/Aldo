@@ -27,6 +27,7 @@ inline constexpr ImU32
     Destructive = IM_COL32(0x8b, 0x0, 0x0, SDL_ALPHA_OPAQUE),
     DestructiveActive = IM_COL32(0xb2, 0x22, 0x22, SDL_ALPHA_OPAQUE),
     DestructiveHover = IM_COL32(0xdc, 0x14, 0x3c, SDL_ALPHA_OPAQUE),
+    DarkOverlay = IM_COL32(0x0, 0x0, 0x0, 0x80),
     LedOff = IM_COL32(0x43, 0x39, 0x36, SDL_ALPHA_OPAQUE),
     LedOn = IM_COL32(0xff, 0xfc, 0x53, SDL_ALPHA_OPAQUE),
     LineIn = IM_COL32(0x87, 0xce, 0xfa, SDL_ALPHA_OPAQUE),

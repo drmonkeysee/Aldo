@@ -105,9 +105,7 @@ public:
     {
         SDL_Point p;
         SDL_QueryTexture(tex, nullptr, nullptr, &p.x, &p.y);
-        ImGui::Image(tex, {
-            static_cast<float>(p.x) * scalex, static_cast<float>(p.y) * scaley,
-        });
+        ImGui::Image(tex, {p.x * scalex, p.y * scaley});
     }
 
 private:

@@ -66,6 +66,11 @@ constexpr auto operator-(const ImVec2& a, const ImVec2& b) noexcept
     return ImVec2{a.x - b.x, a.y - b.y};
 }
 
+constexpr auto point_to_vec(const SDL_Point& p) noexcept
+{
+    return ImVec2{static_cast<float>(p.x), static_cast<float>(p.y)};
+}
+
 // TODO: make interval a double template parameter once Apple clang supports it
 class RefreshInterval {
 public:
@@ -1295,7 +1300,7 @@ protected:
         ImGui::SameLine(textOffset);
         tableLabel(1);
 
-        renderVisualizations();
+        renderNametables();
 
         tableLabel(2);
         ImGui::SameLine(textOffset);
@@ -1319,159 +1324,205 @@ protected:
         });
         ImGui::SameLine();
         ImGui::Checkbox("Screen Position", &screenPosition);
-        ImGui::DragFloat("Alpha", &this->alpha, 0.01f, 0.0f, 1.0f, "%.3f",
-                       ImGuiSliderFlags_AlwaysClamp);
     }
 
 private:
-    void renderVisualizations()
-    {
-        setDrawState();
+    class ALDO_SIDEFX NtOverlays {
+    public:
+        NtOverlays(ImDrawListSplitter& s, const aldo::Nametables& nt,
+                   const aldo_snapshot& snp, bool tg, bool ag, bool si)
+        : splitter{s}, drawList{ImGui::GetWindowDrawList()},
+        ntOrigin{ImGui::GetCursorScreenPos()},
+        ntExtent{point_to_vec(nt.nametableExtent())},
+        scrSize{point_to_vec(nt.nametableSize())}, tileGrid{tg}, attrGrid{ag},
+        scrInd{si}
+        {
+            const auto& emuPos = snp.video->nt.pos;
+            scrPos = {
+                emuPos.x + (emuPos.h * scrSize.x),
+                emuPos.y + (emuPos.v * scrSize.y),
+            };
+            splitter.Split(drawList, 2);
+        }
+        NtOverlays(const NtOverlays&) = delete;
+        NtOverlays& operator=(const NtOverlays&) = delete;
+        NtOverlays(NtOverlays&&) = delete;
+        NtOverlays& operator=(NtOverlays&&) = delete;
+        ~NtOverlays() { splitter.Merge(drawList); }
 
+        void render() const
+        {
+            splitter.SetCurrentChannel(drawList, 1);
+            if (tileGrid) {
+                renderTileGrid();
+            }
+            if (attrGrid) {
+                renderAttributeGrid();
+            }
+            if (scrInd) {
+                renderScreenIndicator();
+            }
+        }
+
+        void render(RefreshInterval& interval, SDL_Point& refreshPos, const aldo::viewstate& vs)
+        {
+            if (!scrInd) return;
+            if (interval.elapsed(vs.clock.clock())) {
+                ++refreshPos.x %= 512;
+                ++refreshPos.y %= 480;
+                //if (--refreshPos.x < 0) {
+                //    refreshPos.x = 511;
+                //}
+                //if (--refreshPos.y < 0) {
+                //    refreshPos.y = 479;
+                //}
+            }
+            scrPos = point_to_vec(refreshPos);
+            render();
+        }
+
+    private:
+        void renderTileGrid() const
+        {
+            static constexpr auto step = decltype(nametables)::TilePxDim;
+
+            auto [_, max, hor, ver] = gridDims();
+            for (auto start = ntOrigin;
+                 start.x - ntOrigin.x < max.x;
+                 start.x += step) {
+                drawList->AddLine(start, start + ver, aldo::colors::Attention);
+            }
+            for (auto start = ntOrigin;
+                 start.y - ntOrigin.y < max.y;
+                 start.y += step) {
+                drawList->AddLine(start, start + hor, aldo::colors::Attention);
+            }
+        }
+
+        void renderAttributeGrid() const
+        {
+            static constexpr auto step = decltype(nametables)::AttributePxDim;
+
+            auto [extent, max, hor, ver] = gridDims();
+            for (auto start = ntOrigin;
+                 start.x - ntOrigin.x < max.x;
+                 start.x += step) {
+                drawList->AddLine(start, start + ver, aldo::colors::LedOn);
+            }
+            for (auto start = ntOrigin;
+                 start.y - ntOrigin.y < scrSize.y;
+                 start.y += step) {
+                drawList->AddLine(start, start + hor, aldo::colors::LedOn);
+            }
+            for (ImVec2 start{ntOrigin.x, ntOrigin.y + scrSize.y};
+                 start.y - ntOrigin.y < max.y;
+                 start.y += step) {
+                drawList->AddLine(start, start + hor, aldo::colors::LedOn);
+            }
+            ImVec2 lastLine{ntOrigin.x, ntOrigin.y + extent.y};
+            drawList->AddLine(lastLine, lastLine + hor, aldo::colors::LedOn);
+        }
+
+        void renderScreenIndicator() const noexcept
+        {
+            ClipRect clip{ntOrigin, ntExtent};
+
+            ImColor c{IM_COL32_BLACK};
+            c.Value.w = 0.5f;
+
+            splitter.SetCurrentChannel(drawList, 0);
+            // Top Left
+            auto start = scrPos, end = scrPos;
+            start.x -= scrSize.x;
+            start.y -= ntExtent.y;
+            end.y -= scrSize.y;
+            drawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+
+            // Mid Left
+            start = end = scrPos;
+            start.x -= scrSize.x;
+            end.y += scrSize.y;
+            drawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+
+            // Upper Row
+            start = end = scrPos;
+            start.x -= ntExtent.x;
+            start.y -= scrSize.y;
+            end.x += scrSize.x;
+            drawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+
+            // Bottom Row
+            start = end = scrPos;
+            start.x -= ntExtent.x;
+            start.y += scrSize.y;
+            end.x += scrSize.x;
+            end.y += ntExtent.y;
+            drawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+
+            // Right Column
+            start = end = scrPos;
+            start.x += scrSize.x;
+            start.y -= ntExtent.y;
+            end = end + ntExtent;
+            drawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+
+            splitter.SetCurrentChannel(drawList, 1);
+            drawScreenIndicator(ntOrigin + scrPos, scrSize);
+
+            bool hClipped = clipped(scrPos.x, scrSize.x);
+            if (hClipped) {
+                auto hOverflow = scrPos;
+                hOverflow.x -= ntExtent.x;
+                drawScreenIndicator(ntOrigin + hOverflow, scrSize);
+            }
+
+            bool vClipped = clipped(scrPos.y, scrSize.y);
+            if (vClipped) {
+                auto vOverflow = scrPos;
+                vOverflow.y -= ntExtent.y;
+                drawScreenIndicator(ntOrigin + vOverflow, scrSize);
+            }
+
+            if (hClipped && vClipped) {
+                drawScreenIndicator(ntOrigin + scrPos - ntExtent, scrSize);
+            }
+        }
+
+        void drawScreenIndicator(const ImVec2& start,
+                                 const ImVec2& size) const noexcept
+        {
+            drawList->AddRect(start, start + size, aldo::colors::LineIn, 0.0f,
+                              ImDrawFlags_None, 2.0f);
+        }
+
+        std::tuple<ImVec2, ImVec2, ImVec2, ImVec2> gridDims() const
+        {
+            return {ntExtent, ntExtent + 1, {ntExtent.x, 0}, {0, ntExtent.y}};
+        }
+
+        static bool clipped(float offset, float size) noexcept
+        {
+            return offset - size > 0;
+        }
+
+        ImDrawListSplitter& splitter;
+        ImDrawList* drawList;
+        ImVec2 ntOrigin, ntExtent, scrPos, scrSize;
+        bool tileGrid, attrGrid, scrInd;
+    };
+
+    void renderNametables()
+    {
+        NtOverlays ov{
+            splitter, nametables, emu.snapshot(), tileGrid, attributeGrid,
+            screenPosition,
+        };
         if (drawInterval.elapsed(vs.clock.clock())) {
             nametables.draw(emu, mr);
         }
         nametables.render();
-
-        if (tileGrid) {
-            renderTileGrid();
-        }
-        if (attributeGrid) {
-            renderAttributeGrid();
-        }
-        if (screenPosition) {
-            renderScreenPosition();
-        }
-    }
-
-    void renderTileGrid() const
-    {
-        static constexpr auto step = decltype(nametables)::TilePxDim;
-
-        auto [_, max, hor, ver] = gridDims();
-        for (auto start = ntOrigin;
-             start.x - ntOrigin.x < max.x;
-             start.x += step) {
-            currDrawList->AddLine(start, start + ver, aldo::colors::Attention);
-        }
-        for (auto start = ntOrigin;
-             start.y - ntOrigin.y < max.y;
-             start.y += step) {
-            currDrawList->AddLine(start, start + hor, aldo::colors::Attention);
-        }
-    }
-
-    void renderAttributeGrid() const
-    {
-        static constexpr auto step = decltype(nametables)::AttributePxDim;
-
-        auto [extent, max, hor, ver] = gridDims();
-        auto ntHeight = nametables.nametableSize().y;
-        for (auto start = ntOrigin;
-             start.x - ntOrigin.x < max.x;
-             start.x += step) {
-            currDrawList->AddLine(start, start + ver, aldo::colors::LedOn);
-        }
-        for (auto start = ntOrigin;
-             start.y - ntOrigin.y < ntHeight;
-             start.y += step) {
-            currDrawList->AddLine(start, start + hor, aldo::colors::LedOn);
-        }
-        for (ImVec2 start{ntOrigin.x, ntOrigin.y + ntHeight};
-             start.y - ntOrigin.y < max.y;
-             start.y += step) {
-            currDrawList->AddLine(start, start + hor, aldo::colors::LedOn);
-        }
-        ImVec2 lastLine{ntOrigin.x, ntOrigin.y + extent.y};
-        currDrawList->AddLine(lastLine, lastLine + hor, aldo::colors::LedOn);
-    }
-
-    void renderScreenPosition() noexcept
-    {
-        auto [w, h] = nametables.nametableSize();
-        const auto& scrPos = emu.snapshot().video->nt.pos;
-        auto
-            scrX = scrPos.x + (scrPos.h * w),
-            scrY = scrPos.y + (scrPos.v * h);
-
-        ImVec2 screen{static_cast<float>(scrX), static_cast<float>(scrY)};
-
-        auto ntExt = ntExtent();
-        ImVec2 scrSize{static_cast<float>(w), static_cast<float>(h)};
-
-        /*
-        if (screenInterval.elapsed(vs.clock.clock())) {
-            ++screenPos.x %= 512;
-            ++screenPos.y %= 480;
-            //if (--screenPos.x < 0) {
-            //    screenPos.x = 511;
-            //}
-            //if (--screenPos.y < 0) {
-            //    screenPos.y = 479;
-            //}
-        }
-        ImVec2 screen{static_cast<float>(screenPos.x), static_cast<float>(screenPos.y)};
-         */
-
-        ClipRect clip{ntOrigin, ntExt};
-
-        ImColor c{IM_COL32_BLACK};
-        c.Value.w = alpha;
-
-        // Top Left
-        auto start = screen, end = screen;
-        start.x -= scrSize.x;
-        start.y -= ntExt.y;
-        end.y -= scrSize.y;
-        currDrawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
-
-        // Mid Left
-        start = end = screen;
-        start.x -= scrSize.x;
-        end.y += scrSize.y;
-        currDrawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
-
-        // Upper Row
-        start = end = screen;
-        start.x -= ntExt.x;
-        start.y -= scrSize.y;
-        end.x += scrSize.x;
-        currDrawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
-
-        // Bottom Row
-        start = end = screen;
-        start.x -= ntExt.x;
-        start.y += scrSize.y;
-        end.x += scrSize.x;
-        end.y += ntExt.y;
-        currDrawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
-
-        // Right Column
-        start = end = screen;
-        start.x += scrSize.x;
-        start.y -= ntExt.y;
-        end = end + ntExt;
-        currDrawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
-
-        drawScreenIndicator(ntOrigin + screen, scrSize);
-
-        bool hClipped = clipped(screen.x, scrSize.x);
-        if (hClipped) {
-            auto hOverflow = screen;
-            hOverflow.x -= ntExt.x;
-            drawScreenIndicator(ntOrigin + hOverflow, scrSize);
-        }
-
-        bool vClipped = clipped(screen.y, scrSize.y);
-        if (vClipped) {
-            auto vOverflow = screen;
-            vOverflow.y -= ntExt.y;
-            drawScreenIndicator(ntOrigin + vOverflow, scrSize);
-        }
-
-        if (hClipped && vClipped) {
-            drawScreenIndicator(ntOrigin + screen - ntExt, scrSize);
-        }
+        ov.render();
+        //ov.render(screenInterval, screenPos, vs);
     }
 
     void tableLabel(int table) const noexcept
@@ -1482,45 +1533,15 @@ private:
                     + (attr * ALDO_NT_TILE_COUNT));
     }
 
-    void setDrawState() noexcept
-    {
-        ntOrigin = ImGui::GetCursorScreenPos();
-        currDrawList = ImGui::GetWindowDrawList();
-    }
-
-    void drawScreenIndicator(const ImVec2& start,
-                             const ImVec2& size) const noexcept
-    {
-        currDrawList->AddRect(start, start + size, aldo::colors::LineIn, 0.0f,
-                              ImDrawFlags_None, 2.0f);
-    }
-
-    ImVec2 ntExtent() const noexcept
-    {
-        auto [w, h] = nametables.nametableExtent();
-        return {static_cast<float>(w), static_cast<float>(h)};
-    }
-
-    std::tuple<ImVec2, ImVec2, ImVec2, ImVec2> gridDims() const
-    {
-        auto extent = ntExtent();
-        return {extent, extent + 1, {extent.x, 0}, {0, extent.y}};
-    }
-
-    static bool clipped(float offset, float size) noexcept
-    {
-        return offset - size > 0;
-    }
-
     aldo::Nametables nametables;
+    ImDrawListSplitter splitter;
     using DisplayMode = decltype(nametables)::DrawMode;
     ComboList<DisplayMode> modeCombo;
-    RefreshInterval drawInterval{250}, screenInterval{50};
-    ImDrawList* currDrawList = nullptr;
-    ImVec2 ntOrigin{};
+    RefreshInterval drawInterval{250};
     int scanline = 241;
     bool attributeGrid = false, screenPosition = false, tileGrid = false;
-    float alpha = 0.5f;
+
+    RefreshInterval screenInterval{50};
     SDL_Point screenPos{};
 };
 

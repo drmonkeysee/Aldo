@@ -1319,6 +1319,8 @@ protected:
         });
         ImGui::SameLine();
         ImGui::Checkbox("Screen Position", &screenPosition);
+        ImGui::DragFloat("Alpha", &this->alpha, 0.01f, 0.0f, 1.0f, "%.3f",
+                       ImGuiSliderFlags_AlwaysClamp);
     }
 
 private:
@@ -1384,37 +1386,91 @@ private:
         currDrawList->AddLine(lastLine, lastLine + hor, aldo::colors::LedOn);
     }
 
-    void renderScreenPosition() const noexcept
+    void renderScreenPosition() noexcept
     {
         auto [w, h] = nametables.nametableSize();
         const auto& scrPos = emu.snapshot().video->nt.pos;
         auto
             scrX = scrPos.x + (scrPos.h * w),
             scrY = scrPos.y + (scrPos.v * h);
+
         ImVec2 screen{static_cast<float>(scrX), static_cast<float>(scrY)};
 
         auto ntExt = ntExtent();
         ImVec2 scrSize{static_cast<float>(w), static_cast<float>(h)};
+
+        /*
+        if (screenInterval.elapsed(vs.clock.clock())) {
+            ++screenPos.x %= 512;
+            ++screenPos.y %= 480;
+            //if (--screenPos.x < 0) {
+            //    screenPos.x = 511;
+            //}
+            //if (--screenPos.y < 0) {
+            //    screenPos.y = 479;
+            //}
+        }
+        ImVec2 screen{static_cast<float>(screenPos.x), static_cast<float>(screenPos.y)};
+         */
+
         ClipRect clip{ntOrigin, ntExt};
+
+        ImColor c{IM_COL32_BLACK};
+        c.Value.w = alpha;
+
+        // Top Left
+        auto start = screen, end = screen;
+        start.x -= scrSize.x;
+        start.y -= ntExt.y;
+        end.y -= scrSize.y;
+        currDrawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+
+        // Mid Left
+        start = end = screen;
+        start.x -= scrSize.x;
+        end.y += scrSize.y;
+        currDrawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+
+        // Upper Row
+        start = end = screen;
+        start.x -= ntExt.x;
+        start.y -= scrSize.y;
+        end.x += scrSize.x;
+        currDrawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+
+        // Bottom Row
+        start = end = screen;
+        start.x -= ntExt.x;
+        start.y += scrSize.y;
+        end.x += scrSize.x;
+        end.y += ntExt.y;
+        currDrawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+
+        // Right Column
+        start = end = screen;
+        start.x += scrSize.x;
+        start.y -= ntExt.y;
+        end = end + ntExt;
+        currDrawList->AddRectFilled(ntOrigin + start, ntOrigin + end, c);
+
         drawScreenIndicator(ntOrigin + screen, scrSize);
 
         bool hClipped = clipped(screen.x, scrSize.x);
-        auto hOverflow = screen;
         if (hClipped) {
-            calculateOverflow(hOverflow.x, scrSize.x, ntExt.x);
+            auto hOverflow = screen;
+            hOverflow.x -= ntExt.x;
             drawScreenIndicator(ntOrigin + hOverflow, scrSize);
         }
 
         bool vClipped = clipped(screen.y, scrSize.y);
-        auto vOverflow = screen;
         if (vClipped) {
-            calculateOverflow(vOverflow.y, scrSize.y, ntExt.y);
+            auto vOverflow = screen;
+            vOverflow.y -= ntExt.y;
             drawScreenIndicator(ntOrigin + vOverflow, scrSize);
         }
 
         if (hClipped && vClipped) {
-            ImVec2 overflow{hOverflow.x, vOverflow.y};
-            drawScreenIndicator(ntOrigin + overflow, scrSize);
+            drawScreenIndicator(ntOrigin + screen - ntExt, scrSize);
         }
     }
 
@@ -1453,58 +1509,19 @@ private:
 
     static bool clipped(float offset, float size) noexcept
     {
-        return offset < 0 || offset - size > 0;
-    }
-
-    static void calculateOverflow(float& axis, float size, float max) noexcept
-    {
-        /*
-         * to simulate screen indicator wrap-around we're drawing duplicate
-         * rects off-screen that are moved in sync with the screen indicator
-         * and offset to enter the clip rect exactly when the screen indicator
-         * exits it; for the horizontal case consider:
-         * - if the screen is at x = 0 (the nametable x-origin) the overflow
-         *   rect starts at x = 512 (the nametable x-width); any leftward
-         *   movement will bring the overflow rect into view on the
-         *   right-hand side
-         * - if the screen is at x = 256 (the right-hand NT x-origin), the
-         *   overflow rect starts at x = -256; any rightward movement will
-         *   bring the overflow rect into view on the left-hand side
-         * the same logic applies in the vertical direction, and finally a
-         * third overflow rect for diagonal movement that combines the
-         * horizontal and vertical overflows covers all possible wrapping;
-         * the calculation for horizontal overflow is thus:
-         * - the overflow rect is offset from the screen rect by the width of
-         *   the nametables: 512 pixels
-         * - the overflow rect wraps around at a maximum distance of 768 pixels
-         *   from the origin, this is the offset 512 pixels + the 256 pixels of
-         *   possible rightward travel before the screen would begin clipping
-         * - BUT the wraparound can't start at 0, that will render the overflow
-         *   rect one screen width too early, so the wraparound must be moved
-         *   one screen width past the origin: -256 pixels
-         * - FINALLY that -256 pixel adjustment must be accounted for in the
-         *   intial offset and the wraparound or all the positive x-axis
-         *   calculations will be off by -256; think of this as moving the
-         *   origin of this entire formula leftward 256 pixels to a position
-         *   off-screen; this adds an extra 256 to all previous steps giving an
-         *   offset of 512 + 256 (e.g. screen size + nametable width) and a
-         *   modulus of 768 + 256 (e.g. 1024 or 2 * nametable width)
-         * the vertical calculation is identical, with appropriate adjustments
-         * for the shorter screen height.
-         */
-        axis += size + max;
-        axis = static_cast<int>(axis) % (static_cast<int>(max) * 2);
-        axis -= size;
+        return offset - size > 0;
     }
 
     aldo::Nametables nametables;
     using DisplayMode = decltype(nametables)::DrawMode;
     ComboList<DisplayMode> modeCombo;
-    RefreshInterval drawInterval{250};
+    RefreshInterval drawInterval{250}, screenInterval{50};
     ImDrawList* currDrawList = nullptr;
     ImVec2 ntOrigin{};
     int scanline = 241;
     bool attributeGrid = false, screenPosition = false, tileGrid = false;
+    float alpha = 0.5f;
+    SDL_Point screenPos{};
 };
 
 class PaletteView final : public aldo::View {

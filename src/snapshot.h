@@ -84,14 +84,16 @@ struct aldo_snapshot {
 
     struct {
         uint8_t *screen;        // Non-owning Pointer
-        // TODO: include scroll position?
         struct {
             enum aldo_ntmirror mirror;
             struct {
                 uint8_t attributes[ALDO_NT_ATTR_COUNT],
-                        palettes[ALDO_NT_TILE_COUNT],
                         tiles[ALDO_NT_TILE_COUNT];
             } tables[ALDO_NT_COUNT];
+            struct {
+                uint8_t x, y;
+                bool h, v;
+            } pos;
             bool pt;
         } nt;
         // A Pattern Table is 256 tiles x 8 rows x 8 pixels x 2 bits.

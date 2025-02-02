@@ -1384,33 +1384,29 @@ private:
         currDrawList->AddLine(lastLine, lastLine + hor, aldo::colors::LedOn);
     }
 
-    void renderScreenPosition() noexcept
+    void renderScreenPosition() const noexcept
     {
         auto [w, h] = nametables.nametableSize();
-        ImVec2 scrSize{static_cast<float>(w), static_cast<float>(h)};
+        const auto& scrPos = emu.snapshot().video->nt.pos;
+        auto
+            scrX = scrPos.x + (scrPos.h * w),
+            scrY = scrPos.y + (scrPos.v * h);
+        ImVec2 screen{static_cast<float>(scrX), static_cast<float>(scrY)};
+
         auto ntExt = ntExtent();
-        if (screenInterval.elapsed(vs.clock.clock())) {
-            ++screenPos %= static_cast<int>(ntExt.x);
-            //--screenPos %= static_cast<int>(ntExt.y);
-        }
-        // TODO: this would be the ppu screen position
-        ImVec2 offset{
-            static_cast<float>(screenPos),
-            static_cast<float>(screenPos),
-        };
-
+        ImVec2 scrSize{static_cast<float>(w), static_cast<float>(h)};
         ClipRect clip{ntOrigin, ntExt};
-        drawScreenIndicator(ntOrigin + screenPos, scrSize);
+        drawScreenIndicator(ntOrigin + screen, scrSize);
 
-        bool hClipped = clipped(offset.x, scrSize.x);
-        auto hOverflow = offset;
+        bool hClipped = clipped(screen.x, scrSize.x);
+        auto hOverflow = screen;
         if (hClipped) {
             calculateOverflow(hOverflow.x, scrSize.x, ntExt.x);
             drawScreenIndicator(ntOrigin + hOverflow, scrSize);
         }
 
-        bool vClipped = clipped(offset.y, scrSize.y);
-        auto vOverflow = offset;
+        bool vClipped = clipped(screen.y, scrSize.y);
+        auto vOverflow = screen;
         if (vClipped) {
             calculateOverflow(vOverflow.y, scrSize.y, ntExt.y);
             drawScreenIndicator(ntOrigin + vOverflow, scrSize);
@@ -1504,10 +1500,10 @@ private:
     aldo::Nametables nametables;
     using DisplayMode = decltype(nametables)::DrawMode;
     ComboList<DisplayMode> modeCombo;
-    RefreshInterval drawInterval{250}, screenInterval{50};
+    RefreshInterval drawInterval{250};
     ImDrawList* currDrawList = nullptr;
     ImVec2 ntOrigin{};
-    int scanline = 241, screenPos = 0;
+    int scanline = 241;
     bool attributeGrid = false, screenPosition = false, tileGrid = false;
 };
 

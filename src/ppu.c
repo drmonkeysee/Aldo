@@ -363,7 +363,14 @@ static void snapshot_nametables(const struct aldo_rp2c02 *self,
                                 struct aldo_snapshot *snp)
 {
     snp->video->nt.pt = self->ctrl.b;
-    // then calculate palette ids
+
+    snp->video->nt.pos.h = self->t & HNtBit;
+    snp->video->nt.pos.v = self->t & VNtBit;
+    snp->video->nt.pos.x = ((self->t & CourseXBits) * ALDO_CHR_TILE_DIM)
+                            + self->x;
+    snp->video->nt.pos.y = (((self->t & CourseYBits) >> 5) * ALDO_CHR_TILE_DIM)
+                            + ((self->t & FineYBits) >> 12);
+
     for (size_t i = 0; i < aldo_arrsz(snp->video->nt.tables); ++i) {
         uint16_t base_addr = BaseNtAddr + (HNtBit * (uint16_t)i);
         size_t tile_count = aldo_arrsz(snp->video->nt.tables[i].tiles);

@@ -134,6 +134,8 @@ void aldo_ppu_connect(struct aldo_rp2c02 *self, aldo_bus *mbus);
 void aldo_ppu_powerup(struct aldo_rp2c02 *self);
 void aldo_ppu_zeroram(struct aldo_rp2c02 *self);
 
+bool aldo_ppu_should_snapshot_gfx(const struct aldo_rp2c02 *self);
+
 bool aldo_ppu_cycle(struct aldo_rp2c02 *self);
 
 void aldo_ppu_bus_snapshot(const struct aldo_rp2c02 *self,

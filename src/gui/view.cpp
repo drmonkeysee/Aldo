@@ -1390,7 +1390,7 @@ private:
         {
             static constexpr auto step = decltype(nametables)::TilePxDim;
 
-            auto [_, max, hor, ver] = gridDims();
+            auto [max, hor, ver] = gridDims();
             for (auto start = ntOrigin;
                  start.x - ntOrigin.x < max.x;
                  start.x += step) {
@@ -1407,7 +1407,7 @@ private:
         {
             static constexpr auto step = decltype(nametables)::AttributePxDim;
 
-            auto [extent, max, hor, ver] = gridDims();
+            auto [max, hor, ver] = gridDims();
             for (auto start = ntOrigin;
                  start.x - ntOrigin.x < max.x;
                  start.x += step) {
@@ -1423,7 +1423,7 @@ private:
                  start.y += step) {
                 drawList->AddLine(start, start + hor, aldo::colors::LedOn);
             }
-            ImVec2 lastLine{ntOrigin.x, ntOrigin.y + extent.y};
+            ImVec2 lastLine{ntOrigin.x, ntOrigin.y + ntExtent.y};
             drawList->AddLine(lastLine, lastLine + hor, aldo::colors::LedOn);
         }
 
@@ -1476,32 +1476,31 @@ private:
 
         void renderScreenPosition() const noexcept
         {
-            drawScreenIndicator(scrPos, scrSize);
+            drawScreenIndicator(scrPos);
 
             bool hClipped = clipped(scrPos.x, scrSize.x);
             if (hClipped) {
                 auto hOverflow = scrPos;
                 hOverflow.x -= ntExtent.x;
-                drawScreenIndicator(hOverflow, scrSize);
+                drawScreenIndicator(hOverflow);
             }
 
             bool vClipped = clipped(scrPos.y, scrSize.y);
             if (vClipped) {
                 auto vOverflow = scrPos;
                 vOverflow.y -= ntExtent.y;
-                drawScreenIndicator(vOverflow, scrSize);
+                drawScreenIndicator(vOverflow);
             }
 
             if (hClipped && vClipped) {
-                drawScreenIndicator(scrPos - ntExtent, scrSize);
+                drawScreenIndicator(scrPos - ntExtent);
             }
         }
 
-        void drawScreenIndicator(const ImVec2& start,
-                                 const ImVec2& size) const noexcept
+        void drawScreenIndicator(const ImVec2& start) const noexcept
         {
             auto orig = ntOrigin + start;
-            drawList->AddRect(orig, orig + size, aldo::colors::LineIn, 0.0f,
+            drawList->AddRect(orig, orig + scrSize, aldo::colors::LineIn, 0.0f,
                               ImDrawFlags_None, 2.0f);
         }
 
@@ -1512,9 +1511,9 @@ private:
                                     aldo::colors::DarkOverlay);
         }
 
-        std::tuple<ImVec2, ImVec2, ImVec2, ImVec2> gridDims() const
+        std::tuple<ImVec2, ImVec2, ImVec2> gridDims() const
         {
-            return {ntExtent, ntExtent + 1, {ntExtent.x, 0}, {0, ntExtent.y}};
+            return {ntExtent + 1, {ntExtent.x, 0}, {0, ntExtent.y}};
         }
 
         static bool clipped(float offset, float size) noexcept
@@ -1544,13 +1543,8 @@ private:
 
     void renderControls() noexcept
     {
-        widget_group([this] noexcept {
-            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 15);
-            this->modeCombo.render();
-            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 5);
-            ImGui::DragInt("Scanline", &this->scanline, 1, 0, 261, "%d",
-                           ImGuiSliderFlags_AlwaysClamp);
-        });
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 15);
+        modeCombo.render();
         ImGui::SameLine();
         widget_group([this] noexcept {
             ImGui::Checkbox("Tile Grid", &this->tileGrid);
@@ -1573,7 +1567,6 @@ private:
     using DisplayMode = decltype(nametables)::DrawMode;
     ComboList<DisplayMode> modeCombo;
     RefreshInterval drawInterval{250};
-    int scanline = 241;
     bool attributeGrid = false, screenIndicator = false, tileGrid = false;
 
     RefreshInterval screenInterval{50};

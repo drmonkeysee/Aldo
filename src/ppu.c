@@ -959,6 +959,12 @@ void aldo_ppu_zeroram(struct aldo_rp2c02 *self)
     memclr(self->palette);
 }
 
+bool aldo_ppu_should_snapshot_gfx(const struct aldo_rp2c02 *self)
+{
+    // TODO: wire this up to UI at some point
+    return self->line == 241 && self->dot == 0;
+}
+
 bool aldo_ppu_cycle(struct aldo_rp2c02 *self)
 {
     assert(self != NULL);

@@ -279,7 +279,7 @@ static void snapshot_screen(struct aldo_nes001 *self)
 
 static void snapshot_video(struct aldo_nes001 *self, bool framedone)
 {
-    if (aldo_ppu_should_snapshot_gfx(&self->ppu)) {
+    if (aldo_ppu_gfxsnp_dot(&self->ppu)) {
         snapshot_gfx(self);
     }
     if (framedone) {

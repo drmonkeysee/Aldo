@@ -1529,6 +1529,7 @@ private:
 
     void renderNametables()
     {
+        // TODO: include tooltip hover for tiles
         NtOverlays ov{
             splitter, nametables, emu.snapshot(), tileGrid, attributeGrid,
             screenIndicator,

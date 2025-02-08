@@ -233,6 +233,8 @@ static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
         ppu->cvp = true;
         uint16_t addr = maskaddr(ppu->v);
         ppu->regbus = palette_addr(addr) ? palette_read(ppu, addr) : ppu->rbuf;
+        // TODO: there is a read conflict with APU interrupts:
+        // https://www.nesdev.org/wiki/PPU_registers#Read_conflict_with_DPCM_samples
         break;
     default:
         break;

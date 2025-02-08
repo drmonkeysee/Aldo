@@ -425,7 +425,6 @@ void aldo_cart_snapshot(aldo_cart *self, struct aldo_snapshot *snp)
     assert(self->mapper != NULL);
     assert(snp != NULL);
 
-    // TODO: zero out pattern tables if not nes?
     if (is_nes(self) && as_nesmap(self)->snapshot) {
         as_nesmap(self)->snapshot(self->mapper, snp);
     }

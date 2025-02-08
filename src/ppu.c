@@ -257,7 +257,9 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
             // NOTE: set nametable-select
             ppu->t = (uint16_t)((ppu->t & ~NtBits) | ppu->ctrl.nh << 11
                                 | ppu->ctrl.nl << 10);
-            // TODO: bit 0 race condition on dot 257
+            // NOTE: there is a dot 257 race condition with horizontal
+            // nametable selection that is not modelled (see note below):
+            // https://www.nesdev.org/wiki/PPU_registers#Bit_0_race_condition
         }
         break;
     case 1: // PPUMASK
@@ -267,8 +269,8 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
         break;
     case 3: // OAMADDR
         ppu->oamaddr = ppu->regbus;
-        // TODO: there are some OAM corruption effects here that I don't
-        // understand yet.
+        // NOTE: there is OAM corruption that is not modelled (see note below):
+        // https://www.nesdev.org/wiki/PPU_registers#OAMADDR_precautions
         break;
     case 4: // OAMDATA
         // TODO: this logic is shared by OAMDMA
@@ -307,8 +309,9 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
                 ppu->t = aldo_bytowr((uint8_t)ppu->t, ppu->regbus & 0x3f);
             }
             ppu->w = !ppu->w;
-            // TODO: there is some kind of bus conflict behavior i don't
-            // understand yet, as well as palette corruption.
+            // NOTE: there is palette corruption as well as bus conflicts
+            // affecting scroll-position that is not modelled (see note below):
+            // https://www.nesdev.org/wiki/PPU_registers#Palette_corruption
         }
         break;
     case 7: // PPUDATA
@@ -323,6 +326,12 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
     }
     return true;
 }
+
+// NOTE: there are a handful of PPU errata listed above that don't have any
+// side-effects beyond causing graphical glitches and are either corrected
+// on the next writes to affected memory or are actively avoided by most
+// developers; since they seem to have no visible impact to other components
+// and no obvious utility for any games, I have chosen not to model them.
 
 //
 // MARK: - PPU Bus Device (Pattern Tables, Nametables, Palette)

@@ -582,19 +582,20 @@ static void incr_course_x(struct aldo_rp2c02 *self)
 
 static void incr_y(struct aldo_rp2c02 *self)
 {
-    static const uint16_t max_course_y = 29 << 5;
+    static const uint16_t max_course_y = 29 << 5, overflow_y = 31 << 5;
 
-    // NOTE: fine y wraparound at y = 8, overflow into course y;
-    // course y wraparound at y = 30, overflow into vertical nametable bit;
-    // if course y > 29 then wraparound occurs without overflow.
+    // NOTE: fine-y wraparound at y = 7, overflow into course-y;
+    // course-y wraparound at y = 29, overflow into vertical nametable bit;
+    // if course-y > 29, then wraparound occurs at 31 without nametable
+    // overflow; some games use this as a "negative" y-offset.
     if ((self->v & FineYBits) == FineYBits) {
         self->v &= (uint16_t)~FineYBits;
         uint16_t course_y = self->v & CourseYBits;
-        if (course_y >= max_course_y) {
+        if (course_y == max_course_y) {
             self->v &= (uint16_t)~CourseYBits;
-            if (course_y == max_course_y) {
-                self->v ^= VNtBit;
-            }
+            self->v ^= VNtBit;
+        } else if (course_y == overflow_y) {
+            self->v &= (uint16_t)~CourseYBits;
         } else {
             self->v += 0x20;
         }

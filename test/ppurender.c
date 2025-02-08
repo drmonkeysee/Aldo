@@ -1249,15 +1249,25 @@ static void course_y_wraparound(void *ctx)
 static void course_y_overflow(void *ctx)
 {
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
-    ppu->v = 0x73c5;                // 111 00 11110 00101
+    ppu->v = 0x73c5;                    // 111 00 11110 00101
     ppu->dot = 256;
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(257, ppu->dot);
-    ct_assertequal(0x6u, ppu->v);   // 000 00 00000 00110
+    ct_assertequal(0x3e6u, ppu->v);    // 000 00 11111 00110
     // NOTE: atb set to previous course-x/y selection
     ct_assertequal(4u, ppu->pxpl.atb);
+
+    ppu->v = 0x73e6;                    // 111 00 11111 00110
+    ppu->dot = 256;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(257, ppu->dot);
+    ct_assertequal(0x7u, ppu->v);       // 000 00 00000 00111
+    // NOTE: atb set to previous course-x/y selection
+    ct_assertequal(6u, ppu->pxpl.atb);
 }
 
 //

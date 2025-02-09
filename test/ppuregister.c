@@ -1695,7 +1695,164 @@ static void ppudata_write_palette_unused_mirrored(void *ctx)
 
 static void ppudata_write_during_rendering(void *ctx)
 {
-    ct_ignore("implement test");
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 42;
+    ppu->dot = 12;
+    ppu->v = 0x13a5;    // 001 00 11101 00101
+
+    aldo_bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x77u, ppu->regbus);
+    ct_assertfalse(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x13a5u, ppu->v);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x13a5u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x13a5u, ppu->v);
+    ct_assertequal(13, ppu->dot);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x13a5u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.wr);
+    ct_assertequal(0x77u, VRam[2]);
+    // PPUDATA write during rendering triggers course-x and y increment
+    ct_assertequal(0x23a6u, ppu->v);    // 010 00 11101 00110
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x13a5u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x77u, VRam[2]);
+    ct_assertequal(0x23a6u, ppu->v);
+}
+
+static void ppudata_write_during_rendering_on_x_increment(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 42;
+    ppu->dot = 15;
+    ppu->v = 0x13a5;    // 001 00 11101 00101
+
+    aldo_bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x77u, ppu->regbus);
+    ct_assertfalse(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x13a5u, ppu->v);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x13a5u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x13a5u, ppu->v);
+    ct_assertequal(16, ppu->dot);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x13a5u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.wr);
+    ct_assertequal(0x77u, VRam[2]);
+    // PPUDATA write during rendering triggers course-x and y increment
+    ct_assertequal(0x23a6u, ppu->v);    // 010 00 11101 00110
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x13a5u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x77u, VRam[2]);
+    ct_assertequal(0x23a6u, ppu->v);
+}
+
+static void ppudata_write_during_rendering_on_row_increment(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 42;
+    ppu->dot = 255;
+    ppu->v = 0x73a5;    // 111 00 11101 00101
+
+    aldo_bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x77u, ppu->regbus);
+    ct_assertfalse(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x73a5u, ppu->v);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x73a5u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x73a5u, ppu->v);
+    ct_assertequal(256, ppu->dot);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x73a5u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.wr);
+    ct_assertequal(0x77u, VRam[2]);
+    // PPUDATA write does not cause double-increment
+    ct_assertequal(0x3c6u, ppu->v);    // 000 00 11110 00110
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x73a5u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x77u, VRam[2]);
+    ct_assertequal(0x3c6u, ppu->v);
 }
 
 static void ppudata_read_in_vblank(void *ctx)
@@ -2626,7 +2783,191 @@ static void ppudata_read_palette_unused_mirrored(void *ctx)
 
 static void ppudata_read_during_rendering(void *ctx)
 {
-    ct_ignore("implement test");
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 42;
+    ppu->dot = 12;
+    ppu->v = 0x13a5;    // 001 00 11101 00101
+    ppu->rbuf = 0xaa;
+
+    uint8_t d;
+    aldo_bus_read(ppt_get_mbus(ctx), 0x2007, &d);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0xaau, ppu->regbus);
+    ct_assertequal(0xaau, d);
+    ct_asserttrue(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertequal(0xaau, ppu->rbuf);
+    ct_assertequal(0x13a5u, ppu->v);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x13a5u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertequal(0xaau, ppu->rbuf);
+    ct_assertequal(0x13a5u, ppu->v);
+    ct_assertequal(13, ppu->dot);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x13a5u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+    ct_assertequal(0x33u, ppu->rbuf);
+    // PPUDATA read during rendering triggers course-x and y increment
+    ct_assertequal(0x23a6u, ppu->v);    // 010 00 11101 00110
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x13a5u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x23a6u, ppu->v);
+
+    aldo_bus_read(ppt_get_mbus(ctx), 0x2007, &d);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x33u, ppu->regbus);
+    ct_assertequal(0x33u, d);
+}
+
+static void ppudata_read_during_rendering_on_x_increment(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 42;
+    ppu->dot = 15;
+    ppu->v = 0x13a5;    // 001 00 11101 00101
+    ppu->rbuf = 0xaa;
+
+    uint8_t d;
+    aldo_bus_read(ppt_get_mbus(ctx), 0x2007, &d);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0xaau, ppu->regbus);
+    ct_assertequal(0xaau, d);
+    ct_asserttrue(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertequal(0xaau, ppu->rbuf);
+    ct_assertequal(0x13a5u, ppu->v);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x13a5u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertequal(0xaau, ppu->rbuf);
+    ct_assertequal(0x13a5u, ppu->v);
+    ct_assertequal(16, ppu->dot);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x13a5u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+    ct_assertequal(0x33u, ppu->rbuf);
+    // PPUDATA read does not cause double-increment
+    ct_assertequal(0x23a6u, ppu->v);    // 010 00 11101 00110
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x13a5u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x23a6u, ppu->v);
+
+    aldo_bus_read(ppt_get_mbus(ctx), 0x2007, &d);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x33u, ppu->regbus);
+    ct_assertequal(0x33u, d);
+}
+
+static void ppudata_read_during_rendering_on_row_increment(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 42;
+    ppu->dot = 255;
+    ppu->v = 0x73a5;    // 111 00 11101 00101
+    ppu->rbuf = 0xaa;
+
+    uint8_t d;
+    aldo_bus_read(ppt_get_mbus(ctx), 0x2007, &d);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0xaau, ppu->regbus);
+    ct_assertequal(0xaau, d);
+    ct_asserttrue(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertequal(0xaau, ppu->rbuf);
+    ct_assertequal(0x73a5u, ppu->v);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0x73a5u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertequal(0xaau, ppu->rbuf);
+    ct_assertequal(0x73a5u, ppu->v);
+    ct_assertequal(256, ppu->dot);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x73a5u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+    ct_assertequal(0x33u, ppu->rbuf);
+    // PPUDATA read does not cause double-increment
+    ct_assertequal(0x3c6u, ppu->v);    // 000 00 11110 00110
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x73a5u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x3c6u, ppu->v);
+
+    aldo_bus_read(ppt_get_mbus(ctx), 0x2007, &d);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x33u, ppu->regbus);
+    ct_assertequal(0x33u, d);
 }
 
 static void ppudata_read_vram_behind_palette(void *ctx)
@@ -2734,6 +3075,8 @@ struct ct_testsuite ppu_register_tests(void)
         ct_maketest(ppudata_write_palette_last_sprite),
         ct_maketest(ppudata_write_palette_unused_mirrored),
         ct_maketest(ppudata_write_during_rendering),
+        ct_maketest(ppudata_write_during_rendering_on_x_increment),
+        ct_maketest(ppudata_write_during_rendering_on_row_increment),
         ct_maketest(ppudata_read_in_vblank),
         ct_maketest(ppudata_read_with_row_increment),
         ct_maketest(ppudata_read_rendering_disabled),
@@ -2751,6 +3094,8 @@ struct ct_testsuite ppu_register_tests(void)
         ct_maketest(ppudata_read_palette_last_sprite),
         ct_maketest(ppudata_read_palette_unused_mirrored),
         ct_maketest(ppudata_read_during_rendering),
+        ct_maketest(ppudata_read_during_rendering_on_x_increment),
+        ct_maketest(ppudata_read_during_rendering_on_row_increment),
         ct_maketest(ppudata_read_vram_behind_palette),
     };
 

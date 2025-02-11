@@ -1711,7 +1711,7 @@ static void ppudata_write_during_rendering(void *ctx)
     ct_assertequal(0u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x44u, VRam[3]);
     ct_assertequal(0x13a3u, ppu->v);
 
     aldo_ppu_cycle(ppu);
@@ -1721,7 +1721,7 @@ static void ppudata_write_during_rendering(void *ctx)
     ct_assertequal(0u, ppu->vdatabus);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x44u, VRam[3]);
     ct_assertequal(0x13a3u, ppu->v);
     ct_assertequal(13, ppu->dot);
     ct_assertequal(0u, ppu->pxpl.atb);
@@ -1733,7 +1733,7 @@ static void ppudata_write_during_rendering(void *ctx)
     ct_assertequal(0x77u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[2]);
+    ct_assertequal(0x77u, VRam[3]);
     // PPUDATA write during rendering triggers course-x and y increment
     ct_assertequal(0x23a4u, ppu->v);    // 010 00 11101 00100
     ct_assertequal(0x1u, ppu->pxpl.atb);
@@ -1745,7 +1745,7 @@ static void ppudata_write_during_rendering(void *ctx)
     ct_assertequal(0x77u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[2]);
+    ct_assertequal(0x77u, VRam[3]);
     ct_assertequal(0x23a4u, ppu->v);
 }
 
@@ -1767,7 +1767,7 @@ static void ppudata_write_during_rendering_on_x_increment(void *ctx)
     ct_assertequal(0u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x44u, VRam[3]);
     ct_assertequal(0x13a3u, ppu->v);
 
     aldo_ppu_cycle(ppu);
@@ -1777,7 +1777,7 @@ static void ppudata_write_during_rendering_on_x_increment(void *ctx)
     ct_assertequal(0u, ppu->vdatabus);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x44u, VRam[3]);
     ct_assertequal(0x13a3u, ppu->v);
     ct_assertequal(16, ppu->dot);
     ct_assertequal(0u, ppu->pxpl.atb);
@@ -1789,7 +1789,7 @@ static void ppudata_write_during_rendering_on_x_increment(void *ctx)
     ct_assertequal(0x77u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[2]);
+    ct_assertequal(0x77u, VRam[3]);
     // PPUDATA write during rendering triggers course-x and y increment
     ct_assertequal(0x23a4u, ppu->v);    // 010 00 11101 00100
     ct_assertequal(0x1u, ppu->pxpl.atb);
@@ -1801,7 +1801,7 @@ static void ppudata_write_during_rendering_on_x_increment(void *ctx)
     ct_assertequal(0x77u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[2]);
+    ct_assertequal(0x77u, VRam[3]);
     ct_assertequal(0x23a4u, ppu->v);
 }
 
@@ -1823,7 +1823,7 @@ static void ppudata_write_during_rendering_on_row_increment(void *ctx)
     ct_assertequal(0u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x44u, VRam[3]);
     ct_assertequal(0x73a3u, ppu->v);
 
     aldo_ppu_cycle(ppu);
@@ -1833,7 +1833,7 @@ static void ppudata_write_during_rendering_on_row_increment(void *ctx)
     ct_assertequal(0u, ppu->vdatabus);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x44u, VRam[3]);
     ct_assertequal(0x73a3u, ppu->v);
     ct_assertequal(256, ppu->dot);
     ct_assertequal(0u, ppu->pxpl.atb);
@@ -1845,7 +1845,7 @@ static void ppudata_write_during_rendering_on_row_increment(void *ctx)
     ct_assertequal(0x77u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[2]);
+    ct_assertequal(0x77u, VRam[3]);
     // PPUDATA write does not cause double-increment
     ct_assertequal(0x3c4u, ppu->v);    // 000 00 11110 00100
     ct_assertequal(0x1u, ppu->pxpl.atb);
@@ -1857,7 +1857,7 @@ static void ppudata_write_during_rendering_on_row_increment(void *ctx)
     ct_assertequal(0x77u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[2]);
+    ct_assertequal(0x77u, VRam[3]);
     ct_assertequal(0x3c4u, ppu->v);
 }
 
@@ -1879,7 +1879,7 @@ static void ppudata_write_during_sprite_rendering(void *ctx)
     ct_assertequal(0u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x44u, VRam[3]);
     ct_assertequal(0x13a3u, ppu->v);
 
     aldo_ppu_cycle(ppu);
@@ -1889,7 +1889,7 @@ static void ppudata_write_during_sprite_rendering(void *ctx)
     ct_assertequal(0u, ppu->vdatabus);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x33u, VRam[2]);
+    ct_assertequal(0x44u, VRam[3]);
     ct_assertequal(0x13a3u, ppu->v);
     ct_assertequal(271, ppu->dot);
     ct_assertequal(0u, ppu->pxpl.atb);
@@ -1901,7 +1901,7 @@ static void ppudata_write_during_sprite_rendering(void *ctx)
     ct_assertequal(0x77u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[2]);
+    ct_assertequal(0x77u, VRam[3]);
     // PPUDATA write during rendering triggers course-x and y increment
     ct_assertequal(0x23a4u, ppu->v);    // 010 00 11101 00100
     ct_assertequal(0x1u, ppu->pxpl.atb);
@@ -1913,7 +1913,7 @@ static void ppudata_write_during_sprite_rendering(void *ctx)
     ct_assertequal(0x77u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[2]);
+    ct_assertequal(0x77u, VRam[3]);
     ct_assertequal(0x23a4u, ppu->v);
 }
 
@@ -2883,10 +2883,10 @@ static void ppudata_read_during_rendering(void *ctx)
 
     ct_assertfalse(ppu->cvp);
     ct_assertequal(0x13a3u, ppu->vaddrbus);
-    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x44u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
-    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x44u, ppu->rbuf);
     // PPUDATA read during rendering triggers course-x and y increment
     ct_assertequal(0x23a4u, ppu->v);    // 010 00 11101 00100
     ct_assertequal(0x1u, ppu->pxpl.atb);
@@ -2895,17 +2895,17 @@ static void ppudata_read_during_rendering(void *ctx)
 
     ct_assertfalse(ppu->cvp);
     ct_assertequal(0x13a3u, ppu->vaddrbus);
-    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x44u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
-    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x44u, ppu->rbuf);
     ct_assertequal(0x23a4u, ppu->v);
 
     aldo_bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x33u, ppu->regbus);
-    ct_assertequal(0x33u, d);
+    ct_assertequal(0x44u, ppu->regbus);
+    ct_assertequal(0x44u, d);
 }
 
 static void ppudata_read_during_rendering_on_x_increment(void *ctx)
@@ -2948,10 +2948,10 @@ static void ppudata_read_during_rendering_on_x_increment(void *ctx)
 
     ct_assertfalse(ppu->cvp);
     ct_assertequal(0x13a3u, ppu->vaddrbus);
-    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x44u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
-    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x44u, ppu->rbuf);
     // PPUDATA read does not cause double-increment
     ct_assertequal(0x23a4u, ppu->v);    // 010 00 11101 00100
     ct_assertequal(0x1u, ppu->pxpl.atb);
@@ -2960,17 +2960,17 @@ static void ppudata_read_during_rendering_on_x_increment(void *ctx)
 
     ct_assertfalse(ppu->cvp);
     ct_assertequal(0x13a3u, ppu->vaddrbus);
-    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x44u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
-    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x44u, ppu->rbuf);
     ct_assertequal(0x23a4u, ppu->v);
 
     aldo_bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x33u, ppu->regbus);
-    ct_assertequal(0x33u, d);
+    ct_assertequal(0x44u, ppu->regbus);
+    ct_assertequal(0x44u, d);
 }
 
 static void ppudata_read_during_rendering_on_row_increment(void *ctx)
@@ -3013,10 +3013,10 @@ static void ppudata_read_during_rendering_on_row_increment(void *ctx)
 
     ct_assertfalse(ppu->cvp);
     ct_assertequal(0x73a3u, ppu->vaddrbus);
-    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x44u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
-    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x44u, ppu->rbuf);
     // PPUDATA read does not cause double-increment
     ct_assertequal(0x3c4u, ppu->v);    // 000 00 11110 00100
     ct_assertequal(0x1u, ppu->pxpl.atb);
@@ -3025,17 +3025,17 @@ static void ppudata_read_during_rendering_on_row_increment(void *ctx)
 
     ct_assertfalse(ppu->cvp);
     ct_assertequal(0x73a3u, ppu->vaddrbus);
-    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x44u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
-    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x44u, ppu->rbuf);
     ct_assertequal(0x3c4u, ppu->v);
 
     aldo_bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x33u, ppu->regbus);
-    ct_assertequal(0x33u, d);
+    ct_assertequal(0x44u, ppu->regbus);
+    ct_assertequal(0x44u, d);
 }
 
 static void ppudata_read_during_sprite_rendering(void *ctx)
@@ -3078,10 +3078,10 @@ static void ppudata_read_during_sprite_rendering(void *ctx)
 
     ct_assertfalse(ppu->cvp);
     ct_assertequal(0x13a3u, ppu->vaddrbus);
-    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x44u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
-    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x44u, ppu->rbuf);
     // PPUDATA read during rendering triggers course-x and y increment
     ct_assertequal(0x23a4u, ppu->v);    // 010 00 11101 00100
     ct_assertequal(0x1u, ppu->pxpl.atb);
@@ -3090,17 +3090,17 @@ static void ppudata_read_during_sprite_rendering(void *ctx)
 
     ct_assertfalse(ppu->cvp);
     ct_assertequal(0x13a3u, ppu->vaddrbus);
-    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0x44u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
-    ct_assertequal(0x33u, ppu->rbuf);
+    ct_assertequal(0x44u, ppu->rbuf);
     ct_assertequal(0x23a4u, ppu->v);
 
     aldo_bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x33u, ppu->regbus);
-    ct_assertequal(0x33u, d);
+    ct_assertequal(0x44u, ppu->regbus);
+    ct_assertequal(0x44u, d);
 }
 
 static void ppudata_read_vram_behind_palette(void *ctx)

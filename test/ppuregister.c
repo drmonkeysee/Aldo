@@ -1698,8 +1698,8 @@ static void ppudata_write_during_rendering(void *ctx)
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
-    ppu->dot = 12;
-    ppu->v = 0x13a3;    // 001 00 11101 00011
+    ppu->dot = 9;       // ppudata ALE cycle starts on tile ALE
+    ppu->v = 0x43a3;    // 100 00 11101 00011
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
@@ -1712,41 +1712,89 @@ static void ppudata_write_during_rendering(void *ctx)
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
     ct_assertequal(0x44u, VRam[3]);
-    ct_assertequal(0x13a3u, ppu->v);
+    ct_assertequal(0x43a3u, ppu->v);
 
     aldo_ppu_cycle(ppu);
 
     ct_asserttrue(ppu->cvp);
-    ct_assertequal(0x13a3u, ppu->vaddrbus);
+    ct_assertequal(0x23a3u, ppu->vaddrbus); // Tile NT address put on bus
     ct_assertequal(0u, ppu->vdatabus);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
     ct_assertequal(0x44u, VRam[3]);
-    ct_assertequal(0x13a3u, ppu->v);
-    ct_assertequal(13, ppu->dot);
+    ct_assertequal(0x43a3u, ppu->v);
+    ct_assertequal(10, ppu->dot);
     ct_assertequal(0u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x13a3u, ppu->vaddrbus);
+    ct_assertequal(0x23a3u, ppu->vaddrbus);
     ct_assertequal(0x77u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.wr);
     ct_assertequal(0x77u, VRam[3]);
     // PPUDATA write during rendering triggers course-x and y increment
-    ct_assertequal(0x23a4u, ppu->v);    // 010 00 11101 00100
-    ct_assertequal(0x1u, ppu->pxpl.atb);
+    ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
+    ct_assertequal(0x2u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x13a3u, ppu->vaddrbus);
+    ct_assertequal(0x23f9u, ppu->vaddrbus);  // Tile AT address put on bus
     ct_assertequal(0x77u, ppu->vdatabus);
-    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
     ct_assertequal(0x77u, VRam[3]);
-    ct_assertequal(0x23a4u, ppu->v);
+    ct_assertequal(0x53a4u, ppu->v);
+}
+
+static void ppudata_write_during_rendering_off_sync(void *ctx)
+{
+    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    ppu->mask.b = ppu->mask.s = true;
+    ppu->line = 42;
+    ppu->dot = 10;      // ppudata ALE cycle starts on tile read
+    ppu->v = 0x43a3;    // 100 00 11101 00011
+
+    aldo_bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
+
+    ct_assertequal(7u, ppu->regsel);
+    ct_assertequal(0x77u, ppu->regbus);
+    ct_assertfalse(ppu->signal.rw);
+    ct_asserttrue(ppu->cvp);
+    ct_assertequal(0u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x22u, VRam[1]);
+    ct_assertequal(0x43a3u, ppu->v);
+
+    // simulate the pipeline putting something on the addrbus
+    ppu->vaddrbus = 0x3235;
+    aldo_ppu_cycle(ppu);
+
+    // ALE latch cycle is skipped, write wherever addrbus is pointing
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x3235u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.wr);
+    ct_assertequal(0x77u, VRam[1]);
+    // PPUDATA write during rendering triggers course-x and y increment
+    ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
+    ct_assertequal(11, ppu->dot);
+    ct_assertequal(0x2u, ppu->pxpl.atb);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->cvp);
+    ct_assertequal(0x23f9u, ppu->vaddrbus);  // Tile AT address put on bus
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.wr);
+    ct_assertequal(0x77u, VRam[1]);
+    ct_assertequal(0x53a4u, ppu->v);
 }
 
 static void ppudata_write_during_rendering_on_x_increment(void *ctx)
@@ -1754,8 +1802,8 @@ static void ppudata_write_during_rendering_on_x_increment(void *ctx)
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
-    ppu->dot = 15;
-    ppu->v = 0x13a3;    // 001 00 11101 00011
+    ppu->dot = 15;      // ppudata ALE cycle starts on tile BGH ALE
+    ppu->v = 0x43a3;    // 100 00 11101 00011
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
@@ -1767,42 +1815,39 @@ static void ppudata_write_during_rendering_on_x_increment(void *ctx)
     ct_assertequal(0u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x44u, VRam[3]);
-    ct_assertequal(0x13a3u, ppu->v);
+    ct_assertequal(0x43a3u, ppu->v);
 
     aldo_ppu_cycle(ppu);
 
     ct_asserttrue(ppu->cvp);
-    ct_assertequal(0x13a3u, ppu->vaddrbus);
+    ct_assertequal(0xcu, ppu->vaddrbus); // Tile BGH address put on bus
     ct_assertequal(0u, ppu->vdatabus);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x44u, VRam[3]);
-    ct_assertequal(0x13a3u, ppu->v);
+    ct_assertequal(0x43a3u, ppu->v);
     ct_assertequal(16, ppu->dot);
     ct_assertequal(0u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x13a3u, ppu->vaddrbus);
+    ct_assertequal(0xcu, ppu->vaddrbus);
     ct_assertequal(0x77u, ppu->vdatabus);
+    ct_asserttrue(ppu->bflt);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[3]);
-    // PPUDATA write during rendering triggers course-x and y increment
-    ct_assertequal(0x23a4u, ppu->v);    // 010 00 11101 00100
-    ct_assertequal(0x1u, ppu->pxpl.atb);
+    // PPUDATA write during rendering doesn't increment x twice
+    ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
+    ct_assertequal(0x2u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x13a3u, ppu->vaddrbus);
+    ct_assertequal(0x23a4u, ppu->vaddrbus);  // Tile NT address put on bus
     ct_assertequal(0x77u, ppu->vdatabus);
-    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[3]);
-    ct_assertequal(0x23a4u, ppu->v);
+    ct_assertequal(0x53a4u, ppu->v);
 }
 
 static void ppudata_write_during_rendering_on_row_increment(void *ctx)
@@ -1810,8 +1855,8 @@ static void ppudata_write_during_rendering_on_row_increment(void *ctx)
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
-    ppu->dot = 255;
-    ppu->v = 0x73a3;    // 111 00 11101 00011
+    ppu->dot = 255;     // ppudata ALE cycle starts on tile BGH ALE
+    ppu->v = 0x43a3;    // 100 00 11101 00011
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
@@ -1823,51 +1868,50 @@ static void ppudata_write_during_rendering_on_row_increment(void *ctx)
     ct_assertequal(0u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x44u, VRam[3]);
-    ct_assertequal(0x73a3u, ppu->v);
+    ct_assertequal(0x43a3u, ppu->v);
 
     aldo_ppu_cycle(ppu);
 
     ct_asserttrue(ppu->cvp);
-    ct_assertequal(0x73a3u, ppu->vaddrbus);
+    ct_assertequal(0xcu, ppu->vaddrbus); // Tile BGH address put on bus
     ct_assertequal(0u, ppu->vdatabus);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x44u, VRam[3]);
-    ct_assertequal(0x73a3u, ppu->v);
+    ct_assertequal(0x43a3u, ppu->v);
     ct_assertequal(256, ppu->dot);
     ct_assertequal(0u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x73a3u, ppu->vaddrbus);
+    ct_assertequal(0xcu, ppu->vaddrbus);
     ct_assertequal(0x77u, ppu->vdatabus);
+    ct_asserttrue(ppu->bflt);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[3]);
-    // PPUDATA write does not cause double-increment
-    ct_assertequal(0x3c4u, ppu->v);    // 000 00 11110 00100
-    ct_assertequal(0x1u, ppu->pxpl.atb);
+    // PPUDATA write during rendering doesn't increment x and y twice
+    ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
+    ct_assertequal(0x2u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x73a3u, ppu->vaddrbus);
+    ct_assertequal(0x23a4u, ppu->vaddrbus);  // Tile NT address put on bus
     ct_assertequal(0x77u, ppu->vdatabus);
-    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[3]);
-    ct_assertequal(0x3c4u, ppu->v);
+    ct_assertequal(0x53a0u, ppu->v);    // t(x) copied to v
 }
 
 static void ppudata_write_during_sprite_rendering(void *ctx)
 {
+    ct_ignore("not implemented");
+
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
-    ppu->dot = 270;
-    ppu->v = 0x13a3;    // 001 00 11101 00011
+    ppu->dot = 270;     // ppudata ALE cycle starts on sprite FGL read
+    ppu->v = 0x43a3;    // 100 00 11101 00011
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
@@ -1879,42 +1923,34 @@ static void ppudata_write_during_sprite_rendering(void *ctx)
     ct_assertequal(0u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x44u, VRam[3]);
-    ct_assertequal(0x13a3u, ppu->v);
+    ct_assertequal(0x22u, VRam[1]);
+    ct_assertequal(0x43a3u, ppu->v);
 
+    // simulate the pipeline putting something on the addrbus
+    ppu->vaddrbus = 0x3235;
     aldo_ppu_cycle(ppu);
 
-    ct_asserttrue(ppu->cvp);
-    ct_assertequal(0x13a3u, ppu->vaddrbus);
-    ct_assertequal(0u, ppu->vdatabus);
-    ct_asserttrue(ppu->signal.ale);
-    ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x44u, VRam[3]);
-    ct_assertequal(0x13a3u, ppu->v);
-    ct_assertequal(271, ppu->dot);
-    ct_assertequal(0u, ppu->pxpl.atb);
-
-    aldo_ppu_cycle(ppu);
-
+    // ALE latch cycle is skipped, write wherever addrbus is pointing
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x13a3u, ppu->vaddrbus);
+    ct_assertequal(0x3235u, ppu->vaddrbus);
     ct_assertequal(0x77u, ppu->vdatabus);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[3]);
+    ct_assertequal(0x77u, VRam[1]);
     // PPUDATA write during rendering triggers course-x and y increment
-    ct_assertequal(0x23a4u, ppu->v);    // 010 00 11101 00100
-    ct_assertequal(0x1u, ppu->pxpl.atb);
+    ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
+    ct_assertequal(11, ppu->dot);
+    ct_assertequal(0x2u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x13a3u, ppu->vaddrbus);
+    ct_assertequal(0x23f9u, ppu->vaddrbus);  // Tile AT address put on bus
     ct_assertequal(0x77u, ppu->vdatabus);
-    ct_assertfalse(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
-    ct_assertequal(0x77u, VRam[3]);
-    ct_assertequal(0x23a4u, ppu->v);
+    ct_assertequal(0x77u, VRam[1]);
+    ct_assertequal(0x53a4u, ppu->v);
 }
 
 static void ppudata_read_in_vblank(void *ctx)
@@ -3106,7 +3142,6 @@ static void ppudata_read_during_sprite_rendering(void *ctx)
 {
     ct_ignore("not implemented");
 
-    // TODO: sprite rendering not implemented yet
     struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
@@ -3275,6 +3310,7 @@ struct ct_testsuite ppu_register_tests(void)
         ct_maketest(ppudata_write_palette_last_sprite),
         ct_maketest(ppudata_write_palette_unused_mirrored),
         ct_maketest(ppudata_write_during_rendering),
+        ct_maketest(ppudata_write_during_rendering_off_sync),
         ct_maketest(ppudata_write_during_rendering_on_x_increment),
         ct_maketest(ppudata_write_during_rendering_on_row_increment),
         ct_maketest(ppudata_write_during_sprite_rendering),

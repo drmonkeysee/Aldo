@@ -606,11 +606,11 @@ static void incr_y(struct aldo_rp2c02 *self)
     }
 }
 
-static void increment_tile(struct aldo_rp2c02 *self)
+static void increment_tile(struct aldo_rp2c02 *self, bool force_y)
 {
     lock_attribute(self);
     incr_course_x(self);
-    if (self->dot == DotSpriteFetch - 1) {
+    if (self->dot == DotSpriteFetch - 1 || force_y) {
         incr_y(self);
     }
 }
@@ -693,7 +693,9 @@ static void tile_read(struct aldo_rp2c02 *self)
         // BG high data
         read(self);
         self->pxpl.bg[1] = self->vdatabus;
-        increment_tile(self);
+        if (!self->cvp) {
+            increment_tile(self, false);
+        }
         break;
     default:
         assert(((void)"TILE RENDER UNREACHABLE CASE", false));
@@ -846,7 +848,7 @@ static void vblank(struct aldo_rp2c02 *self)
     }
 }
 
-static void cpu_rw(struct aldo_rp2c02 *self)
+static void ppudata_rw(struct aldo_rp2c02 *self)
 {
     if (self->signal.ale) {
         if (self->signal.rw) {
@@ -862,13 +864,38 @@ static void cpu_rw(struct aldo_rp2c02 *self)
     }
 }
 
-static void vram_rw(struct aldo_rp2c02 *self)
+/*
+ * The nesdev wiki is pretty vague about what happens when PPUDATA reads or
+ * writes during rendering other than the weirdo v-increment, which is the only
+ * side-effect games rely on.
+ *
+ * I've opted for a fairly simple approach where the PPUDATA read or write
+ * syncs with the rendering pipeline read or write and the initial latching of
+ * the address bus basically is ignored in favor of whatever the pipeline
+ * latched instead.
+ *
+ * This *probably* doesn't reflect what actually happens in hardware but it
+ * will definitely glitch the graphics in a similar way so I'm gonna say it's
+ * close enough until proven otherwise; this does mean, depending on how the
+ * PPUDATA r/w syncs with the rendering pipeline, the register operation may
+ * complete in one dot, rather than two.
+ */
+static void ppudata_rw_rendering(struct aldo_rp2c02 *self)
 {
-    if (in_postrender(self) || rendering_disabled(self)) {
-        if (self->cvp) {
-            cpu_rw(self);
-        }
-    } else if (self->dot == 0) {
+    if (!self->cvp || self->dot % 2 != 0) return;
+
+    if (self->signal.rw) {
+        self->rbuf = self->vdatabus;
+    } else {
+        write(self);
+    }
+    self->cvp = false;
+    increment_tile(self, true);
+}
+
+static void vram_render(struct aldo_rp2c02 *self)
+{
+    if (self->dot == 0) {
         if (self->line == 0 && !self->odd) {
             read_nt(self);
         } else {
@@ -890,6 +917,18 @@ static void vram_rw(struct aldo_rp2c02 *self)
     }
 }
 
+static void vram_pipeline(struct aldo_rp2c02 *self)
+{
+    if (in_postrender(self) || rendering_disabled(self)) {
+        if (self->cvp) {
+            ppudata_rw(self);
+        }
+        return;
+    }
+    vram_render(self);
+    ppudata_rw_rendering(self);
+}
+
 static bool cycle(struct aldo_rp2c02 *self)
 {
     // NOTE: clear any databus signals from previous cycle; unlike the CPU,
@@ -899,7 +938,7 @@ static bool cycle(struct aldo_rp2c02 *self)
 
     vblank(self);
     pixel_pipeline(self);
-    vram_rw(self);
+    vram_pipeline(self);
 
     // NOTE: dot advancement happens last, leaving PPU on next dot to be drawn;
     // analogous to stack pointer always pointing at next byte to be written.

@@ -87,8 +87,7 @@ static bool bcd_mode(struct aldo_mos6502 *self)
 // NOTE: signed overflow happens when positive + positive = negative
 // or negative + negative = positive, i.e. the sign of A does not match
 // the sign of S and the sign of B does not match the sign of S:
-// (Sign A ^ Sign S) & (Sign B ^ Sign S) or
-// (A ^ S) & (B ^ S) & SignMask
+// (Sign A ^ Sign S) & (Sign B ^ Sign S) => (A ^ S) & (B ^ S) & SignMask
 static void update_v(struct aldo_mos6502 *self, uint8_t s, uint8_t a,
                      uint8_t b)
 {
@@ -909,18 +908,20 @@ static void ARR_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
 {
     read(self);
     commit_operation(self);
-    // NOTE: not sure this is entirely correct, community docs do not
-    // completely agree on exact sequence of side-effects, but the main
-    // operations are AND + ROR while the invocation of the adder
-    // causes the overflow and carry flags to act strangely;
-    // https://csdb.dk/release/?id=212346 has the clearest description:
-    //  A := A AND operand
-    //  set overflow to xor of bit 7 and bit 6 of A (side-effect of adder)
-    //  set carry to bit 7 of A (side-effect of adder)
-    //      but hold the value until after rotate
-    //  rotate A right but leave carry unaffected
-    //      implemented as a standard ROR and then
-    //      setting carry to held value from ADD/ADC step
+    /*
+     * Not sure this is entirely correct, community docs do not
+     * completely agree on exact sequence of side-effects, but the main
+     * operations are AND + ROR while the invocation of the adder
+     * causes the overflow and carry flags to act strangely;
+     * https://csdb.dk/release/?id=212346 has the clearest description:
+     *   A := A AND operand
+     *   set overflow to xor of bit 7 and bit 6 of A (side-effect of adder)
+     *   set carry to bit 7 of A (side-effect of adder)
+     *       but hold the value until after rotate
+     *   rotate A right but leave carry unaffected
+     *       implemented as a standard ROR and then
+     *       setting carry to held value from ADD/ADC step
+     */
     uint8_t and_result = self->a & self->databus;
     load_register(self, &self->a, and_result);
     self->p.v = aldo_getbit(self->a, 7) ^ aldo_getbit(self->a, 6);
@@ -930,12 +931,14 @@ static void ARR_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
 
     if (!bcd_mode(self)) return;
 
-    // NOTE: once again https://csdb.dk/release/?id=212346 has the best
-    // description of how BCD affects the final result:
-    //  if low nibble of AND result + lsb of low nibble > 0x5,
-    //      adjust A by 0x6 but throw away carry
-    //  if high nibble of AND result + lsb of high nibble > 0x50,
-    //      adjust A by 0x60 and set carry flag
+    /*
+     * Once again https://csdb.dk/release/?id=212346 has the best
+     * description of how BCD affects the final result:
+     *   if low nibble of AND result + lsb of low nibble > 0x5,
+     *       adjust A by 0x6 but throw away carry
+     *   if high nibble of AND result + lsb of high nibble > 0x50,
+     *       adjust A by 0x60 and set carry flag
+     */
     if ((and_result & 0xf) + (and_result & 0x1) > 0x5) {
         self->a = (uint8_t)((self->a & 0xf0) | ((self->a + 0x6) & 0xf));
     }
@@ -1176,14 +1179,16 @@ static void absolute_indexed(struct aldo_mos6502 *self,
 static void branch_displacement(struct aldo_mos6502 *self)
 {
     self->adl = (uint8_t)self->pc + self->databus;
-    // NOTE: branch uses signed displacement so there are three overflow cases:
-    // no overflow = no adjustment to pc-high;
-    // positive overflow = carry-in to pc-high => pch + 1;
-    // negative overflow = borrow-out from pc-high => pch - 1;
-    // subtracting -overflow condition from +overflow condition results in:
-    // no overflow = 0 - 0 => pch + 0,
-    // +overflow = 1 - 0 => pch + 1,
-    // -overflow = 0 - 1 => pch - 1 => pch + 2sComplement(1) => pch + 0xff.
+    /*
+     * Branch uses signed displacement so there are three overflow cases:
+     *   no overflow = no adjustment to pc-high;
+     *   positive overflow = carry-in to pc-high => pch + 1;
+     *   negative overflow = borrow-out from pc-high => pch - 1;
+     *   subtracting -overflow condition from +overflow condition results in:
+     *     no overflow = 0 - 0 => pch + 0,
+     *     +overflow = 1 - 0 => pch + 1,
+     *     -overflow = 0 - 1 => pch - 1 => pch + 2sComplement(1) => pch + 0xff
+     */
     bool
         negative_offset = self->databus & 0x80,
         positive_overflow = self->adl < self->databus && !negative_offset,

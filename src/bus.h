@@ -21,12 +21,14 @@ struct aldo_busdevice {
     void *ctx;  // Non-owning Pointer
 };
 
-// NOTE: n is partition count, while variadic arguments specify where the
-// partition divisions are; thus variadic argument count is n - 1;
-// e.g. (16, 4, 0x2000, 0x4000, 0x8000) ->
-// - 16-bit address space
-// - 4 partitions
-// - mapped as [$0000 - $1FFF, $2000 - $3FFF, $4000 - $7FFF, $8000 - $FFFF]
+/*
+ * n is partition count, while variadic arguments specify where the
+ * partition divisions are; thus variadic argument count is n - 1;
+ * e.g. (16, 4, 0x2000, 0x4000, 0x8000) ->
+ *   16-bit address space
+ *   4 partitions
+ *   mapped as [$0000 - $1FFF, $2000 - $3FFF, $4000 - $7FFF, $8000 - $FFFF]
+ */
 aldo_bus *aldo_bus_new(int bitwidth, size_t n, ...);
 void aldo_bus_free(aldo_bus *self);
 

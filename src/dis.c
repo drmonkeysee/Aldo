@@ -231,12 +231,15 @@ static const int ScaleGuard = 20;
 static int measure_tile_sheet(size_t banksize, uint32_t *restrict dim,
                               uint32_t *restrict sections)
 {
-    // NOTE: display CHR tiles as 8x8 or 16x16 tile sections
-    // labeled "Left" and "Right" containing the lower- and upper-half of
-    // tiles respectively;
-    // e.g. for an 8KB bank, Left: tiles 0-255, Right: tiles 256-511
-    // in PPU address space this would correspond to
-    // pattern tables $0000-$0FFF, $1000-$1FFF.
+    /*
+     * Display CHR tiles as 8x8 or 16x16 tile sections
+     * labeled "Left" and "Right" containing the lower- and upper-half of
+     * tiles respectively.
+     *
+     * e.g. for an 8KB bank, Left: tiles 0-255, Right: tiles 256-511
+     * in PPU address space this would correspond to
+     * pattern tables $0000-$0FFF, $1000-$1FFF.
+     */
     *sections = 1;
     switch (banksize) {
     case ALDO_MEMBLOCK_2KB:

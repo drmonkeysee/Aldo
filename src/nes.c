@@ -126,11 +126,13 @@ static size_t vram_copy(const void *restrict ctx, uint16_t addr, size_t count,
 static bool create_mbus(struct aldo_nes001 *self)
 {
     // TODO: partitions so far:
-    // 16-bit Address Space = 64KB
-    // * $0000 - $1FFF: 2KB RAM mirrored to 8KB
-    // * $2000 - $3FFF: 8 PPU registers mirrored to 8KB
-    // * $4000 - $7FFF: unmapped
-    // * $8000 - $FFFF: 32KB Cart
+    /*
+     * 16-bit Address Space = 64KB
+     *   $0000 - $1FFF: 2KB RAM mirrored to 8KB
+     *   $2000 - $3FFF: 8 PPU registers mirrored to 8KB
+     *   $4000 - $7FFF: unmapped
+     *   $8000 - $FFFF: 32KB Cart
+     */
     self->cpu.mbus = aldo_bus_new(ALDO_BITWIDTH_64KB, 4, ALDO_MEMBLOCK_8KB,
                                   ALDO_MEMBLOCK_16KB, ALDO_MEMBLOCK_32KB);
     if (!self->cpu.mbus) return false;
@@ -147,15 +149,17 @@ static bool create_mbus(struct aldo_nes001 *self)
 
 static bool create_vbus(struct aldo_nes001 *self)
 {
-    // 14-bit Address Space = 16KB
-    // * $0000 - $1FFF: 8KB CHR ROM/RAM, 2 pattern tables mapped to cartridge
-    // * $2000 - $3FFF: 2KB RAM mirrored to 8KB, nametable-mirroring uses 4KB
-    //                  of address space; never writes to $3F00 - $3FFF; uses
-    //                  nametable vertical-mirroring by default, though the
-    //                  cartridge may override this behavior.
-    // * $3F00 - $3FFF: 32B Palette RAM mirrored to 256B; internal to the PPU
-    //                  and thus not on the video bus, but reads do leak
-    //                  through to the underlying VRAM.
+    /*
+     * 14-bit Address Space = 16KB
+     *   $0000 - $1FFF: 8KB CHR ROM/RAM, 2 pattern tables mapped to cartridge
+     *   $2000 - $3FFF: 2KB RAM mirrored to 8KB, nametable-mirroring uses 4KB
+     *                  of address space; never writes to $3F00 - $3FFF; uses
+     *                  nametable vertical-mirroring by default, though the
+     *                  cartridge may override this behavior.
+     *   $3F00 - $3FFF: 32B Palette RAM mirrored to 256B; internal to the PPU
+     *                  and thus not on the video bus, but reads do leak
+     *                  through to the underlying VRAM.
+     */
     self->ppu.vbus = aldo_bus_new(ALDO_BITWIDTH_16KB, 2, ALDO_MEMBLOCK_8KB);
     if (!self->ppu.vbus) return false;
 

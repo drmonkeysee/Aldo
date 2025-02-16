@@ -329,11 +329,13 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
     return true;
 }
 
-// NOTE: there are a handful of PPU errata listed above that don't have any
-// side-effects beyond causing graphical glitches and are either corrected
-// on the next writes to affected memory or are actively avoided by most
-// developers; since they seem to have no visible impact to other components
-// and no obvious utility for any games, I have chosen not to model them.
+/*
+ * There are a handful of PPU errata listed above that don't have any
+ * side-effects beyond causing graphical glitches and are either corrected
+ * on the next writes to affected memory or are actively avoided by most
+ * developers; since they seem to have no visible impact to other components
+ * and no obvious utility for any games, I have chosen not to model them.
+ */
 
 //
 // MARK: - PPU Bus Device (Pattern Tables, Nametables, Palette)
@@ -873,8 +875,7 @@ static void ppudata_rw(struct aldo_rp2c02 *self)
  *
  * I've opted for a fairly simple approach where the PPUDATA read or write
  * syncs with the rendering pipeline read or write and the initial latching of
- * the address bus basically is ignored in favor of whatever the pipeline
- * latched instead.
+ * the address bus is ignored in favor of whatever the pipeline latched instead.
  *
  * This *probably* doesn't reflect what actually happens in hardware but it
  * will definitely glitch the graphics in a similar way so I'm gonna say it's
@@ -976,23 +977,26 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
         true;
     self->signal.vout = self->bflt = false;
 
-    // NOTE: according to https://www.nesdev.org/wiki/PPU_power_up_state, the
-    // vblank flag is set on powerup more often than not, but at least with
-    // Aldo's timing this causes a 100% reproable visual glitch on Donkey Kong,
-    // due to only checking PPUSTATUS once on startup and attempting to clear
-    // the screen on the ppu's idle frame. Most other games handle this by
-    // checking vblank at least twice on startup. Somehow this is not a problem
-    // on real hardware, though according to
-    // https://forums.nesdev.org/viewtopic.php?t=19792 it CAN be reproed on
-    // some major emulators after modifying them to simulate the ppu idle frame
-    // and it CAN be reproed occasionally on reset or short power-cycles on
-    // real hardware.
-    // So... this seems like a legitimate startup bug in Donkey Kong that, for
-    // real hardware timing reasons, never seems to manifest on powerup but
-    // nevertheless is *possible*.
-    // I split the difference between wiki documentation and functionality by
-    // clearing the status register on powerup but letting its value float
-    // on reset, making it possible to occasionally recreate this (real?) bug.
+    /*
+     * According to https://www.nesdev.org/wiki/PPU_power_up_state, the vblank
+     * flag is set on powerup more often than not, but at least with Aldo's
+     * timing this causes a 100% reproable visual glitch on Donkey Kong, due to
+     * only checking PPUSTATUS once on startup and attempting to clear the
+     * screen on the ppu's idle frame. Most other games handle this by checking
+     * vblank at least twice on startup. Somehow this is not a problem on real
+     * hardware, though according to https://forums.nesdev.org/viewtopic.php?t=19792
+     * it CAN be reproed on some major emulators after modifying them to simulate
+     * the ppu idle frame and it CAN be reproed occasionally on reset or short
+     * power-cycles on real hardware.
+     *
+     * So... this seems like a legitimate startup bug in Donkey Kong that, for
+     * real hardware timing reasons, never seems to manifest on powerup but
+     * nevertheless is *possible*.
+     *
+     * I split the difference between wiki documentation and functionality by
+     * clearing the status register on powerup but letting its value float
+     * on reset, making it possible to occasionally recreate this (real?) bug.
+     */
     set_status(self, 0);
 
     reset_internals(self);

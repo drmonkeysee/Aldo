@@ -1250,7 +1250,7 @@ private:
     {
         // NOTE: if view flag doesn't match debugger state then debugger
         // state was changed under the hood (e.g. by loading a brk file).
-        // NOTE: if another case like this comes up it may be worth coming up
+        // TODO: if another case like this comes up it may be worth coming up
         // with a model -> view notification system.
         auto& dbg = emu.debugger();
         if ((resetOverride = dbg.isVectorOverridden())) {

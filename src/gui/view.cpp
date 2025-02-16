@@ -1883,7 +1883,7 @@ private:
 
     aldo::PatternTable left, right;
     aldo::et::size palSelect = 0;
-    RefreshInterval drawInterval{250};
+    RefreshInterval drawInterval{500};
 };
 
 class PpuView final : public aldo::View {
@@ -2214,9 +2214,8 @@ private:
             if (page == 1 && ramIdx % PageSize == sp) {
                 ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
                                        aldo::colors::LedOn);
-                ImVec4 highlight =
-                    ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK);
-                ImGui::TextColored(highlight, "%02X", val);
+                ScopedColor highlight{{ImGuiCol_Text, IM_COL32_BLACK}};
+                ImGui::Text("%02X", val);
             } else {
                 ImGui::Text("%02X", val);
             }
@@ -2278,8 +2277,14 @@ private:
         ImGui::Text("Update dT: %.3f", dispDtUpdate);
         ImGui::Text("Render dT: %.3f", dispDtRender);
         ImGui::Text("Elapsed dT: %.3f", dispDtElapsed);
-        ImGui::Text("Tick dT: %.3f (%+.3f)", dispDtTick,
-                    dispDtTick - dispDtElapsed);
+        {
+            auto dtDiff = dispDtTick - dispDtElapsed;
+            ScopedColor warn{
+                {ImGuiCol_Text, aldo::colors::Attention},
+                dtDiff < 0,
+            };
+            ImGui::Text("Tick dT: %.3f (%+.3f)", dispDtTick, dtDiff);
+        }
         ImGui::Text("Ticks: %" PRIu64, clock.ticks);
         ImGui::Text("Emutime: %.3f", clock.emutime);
         ImGui::Text("Runtime: %.3f", clock.runtime);
@@ -2364,7 +2369,7 @@ private:
     double
         dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0, dispDtElapsed = 0,
         dispDtTick = 0;
-    RefreshInterval statsInterval{250};
+    RefreshInterval statsInterval{200};
 };
 
 class VideoView final : public aldo::View {

@@ -850,6 +850,8 @@ static void vblank(struct aldo_rp2c02 *self)
 
 static void ppudata_rw(struct aldo_rp2c02 *self)
 {
+    if (!self->cvp) return;
+
     if (self->signal.ale) {
         if (self->signal.rw) {
             read(self);
@@ -920,9 +922,7 @@ static void vram_render(struct aldo_rp2c02 *self)
 static void vram_pipeline(struct aldo_rp2c02 *self)
 {
     if (in_postrender(self) || rendering_disabled(self)) {
-        if (self->cvp) {
-            ppudata_rw(self);
-        }
+        ppudata_rw(self);
         return;
     }
     vram_render(self);

@@ -1571,7 +1571,7 @@ private:
     bool attributeGrid = false, screenIndicator = false, tileGrid = false;
 
     RefreshInterval screenInterval{50};
-    SDL_Point screenPos{};
+    [[maybe_unused]] SDL_Point screenPos{};
 };
 
 class PaletteView final : public aldo::View {

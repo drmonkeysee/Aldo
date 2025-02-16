@@ -721,8 +721,8 @@ static void sprite_read(struct aldo_rp2c02 *self)
         if (self->dot == DotSpriteFetch) {
             static const uint16_t horiz_bits = HNtBit | CourseXBits;
             // NOTE: copy t course-x and horizontal nametable to v
-            self->v = (uint16_t)((self->v & ~horiz_bits)
-                                 | (self->t & horiz_bits));
+            self->v =
+                (uint16_t)((self->v & ~horiz_bits) | (self->t & horiz_bits));
         }
         break;
     case 2:

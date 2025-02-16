@@ -308,8 +308,8 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
                     packedpixel = pixelx + (tilex * ALDO_CHR_TILE_DIM)
                                     + (section * section_pxldim),
                     pixelidx = ALDO_CHR_TILE_STRIDE - ((pixelx + 1) * 2);
-                uint8_t pixel = (uint8_t)((pixelrow & (0x3 << pixelidx))
-                                          >> pixelidx);
+                uint8_t pixel =
+                    (uint8_t)((pixelrow & (0x3 << pixelidx)) >> pixelidx);
                 assert(pixelidx < ALDO_CHR_TILE_STRIDE);
                 for (uint32_t scalex = 0; scalex < scale; ++scalex) {
                     size_t scaledpixel = scalex + (packedpixel * scale);

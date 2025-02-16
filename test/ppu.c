@@ -42,8 +42,7 @@ static void reset_sequence(void *ctx)
     ppu->line = 42;
     ppu->dot = 24;
     ppu->signal.intr = false;
-    ppu->ctrl.b = ppu->mask.b = ppu->signal.vout = ppu->cvp = ppu->odd =
-        ppu->w = true;
+    ppu->ctrl.b = ppu->mask.b = ppu->signal.vout = ppu->odd = ppu->w = true;
     ppu->rbuf = 0x56;
     ppu->x = 0x78;
     ppu->t = ppu->v = 0x1234;
@@ -56,7 +55,6 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);
@@ -74,7 +72,6 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);
@@ -91,7 +88,6 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);
@@ -101,7 +97,7 @@ static void reset_sequence(void *ctx)
     ct_assertequal(ALDO_SIG_PENDING, (int)ppu->rst);
 
     aldo_ppu_cycle(ppu);
-    ppu->signal.ale = true;
+    ppu->signal.ale = ppu->cvp = true;
 
     ct_assertequal(42, ppu->line);
     ct_assertequal(27, ppu->dot);
@@ -166,8 +162,7 @@ static void reset_too_short(void *ctx)
     ppu->line = 42;
     ppu->dot = 24;
     ppu->signal.intr = false;
-    ppu->ctrl.b = ppu->mask.b = ppu->signal.vout = ppu->cvp = ppu->odd =
-        ppu->w = true;
+    ppu->ctrl.b = ppu->mask.b = ppu->signal.vout = ppu->odd = ppu->w = true;
     ppu->rbuf = 0x56;
     ppu->x = 0x78;
     ppu->t = ppu->v = 0x1234;
@@ -180,7 +175,6 @@ static void reset_too_short(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);
@@ -198,7 +192,6 @@ static void reset_too_short(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);
@@ -216,7 +209,6 @@ static void reset_too_short(void *ctx)
     ct_asserttrue(ppu->ctrl.b);
     ct_asserttrue(ppu->mask.b);
     ct_asserttrue(ppu->signal.vout);
-    ct_asserttrue(ppu->cvp);
     ct_asserttrue(ppu->odd);
     ct_asserttrue(ppu->w);
     ct_assertequal(0x56u, ppu->rbuf);

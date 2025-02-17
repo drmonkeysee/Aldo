@@ -140,8 +140,14 @@ static int drawstats(const struct view *v, int cursor_y,
 
     mvwprintw(v->content, cursor_y++, 0, "Display Hz: %d (%.2f)", DisplayHz,
               (double)clock->ticks / clock->runtime);
+    if (display_tickleft < 0) {
+        wattron(v->content, A_STANDOUT);
+    }
     mvwprintw(v->content, cursor_y++, 0, "\u0394T: %.3f (%+.3f)",
               display_ticktime, display_tickleft);
+    if (display_tickleft < 0) {
+        wattroff(v->content, A_STANDOUT);
+    }
     mvwprintw(v->content, cursor_y++, 0, "Ticks: %" PRIu64, clock->ticks);
     mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f", clock->runtime);
     mvwprintw(v->content, cursor_y++, 0, "Emutime: %.3f", clock->emutime);

@@ -22,7 +22,7 @@ build_no=$(date "${input_date[@]}" '+%Y.%j')
 
 echo "Setting version $ver (${build_no}) (lib-compat: ${major_ver})..."
 
-sed -i .bak "s/\(AldoVersion = \)\".*\"/\1\"${ver} (${build_no})\"/" ${PWD}/src/version.c
+sed -i .bak "s/\(Aldo_Version = \)\".*\"/\1\"${ver} (${build_no})\"/" ${PWD}/src/version.c
 echo 'Updated c-src version'
 
 sed -i .bak -E \

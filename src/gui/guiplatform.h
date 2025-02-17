@@ -19,7 +19,6 @@ struct gui_platform {
     char *(*aldo_pcallc open_file)(const char*,
                                    const char* const[]) aldo_nothrow;
     char *(*aldo_pcallc save_file)(const char*, const char*) aldo_nothrow;
-    void (*launch_studio)(void) aldo_nothrow;
     void (*free_buffer)(char *) aldo_nothrow;
 };
 #include "bridgeclose.h"

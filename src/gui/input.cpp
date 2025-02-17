@@ -190,9 +190,6 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
     case aldo::Command::breakpointsOpen:
         aldo::modal::loadBreakpoints(emu, mr);
         break;
-    case aldo::Command::launchStudio:
-        mr.platform().launch_studio();
-        break;
     case aldo::Command::mode:
         emu.runMode(std::get<aldo_execmode>(cs.value));
         break;

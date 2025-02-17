@@ -30,7 +30,6 @@ enum class Command {
     breakpointsClear,
     breakpointsExport,
     breakpointsOpen,
-    launchStudio,
     mode,
     openROM,
     paletteLoad,

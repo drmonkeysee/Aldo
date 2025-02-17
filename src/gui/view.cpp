@@ -521,9 +521,6 @@ auto tools_menu(aldo::viewstate& vs)
     if (ImGui::BeginMenu("Tools")) {
         ImGui::MenuItem("ImGui Demo", "Cmd+D", &vs.showDemo);
         ImGui::MenuItem("Design Palette", nullptr, &vs.showDesignPalette);
-        if (ImGui::MenuItem("Aldo Studio...")) {
-            vs.commands.emplace(aldo::Command::launchStudio);
-        }
         ImGui::EndMenu();
     }
 }

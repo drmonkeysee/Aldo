@@ -30,7 +30,6 @@ final class MacPlatform: NSObject {
                 render_scale_factor: withScaleFunc,
                 open_file: { openFile(title: $0, filter: $1) },
                 save_file: { saveFile(title: $0, suggestedName: $1) },
-                launch_studio: launchStudio,
                 free_buffer: freeBuffer)
             return true
     }
@@ -117,46 +116,11 @@ fileprivate func saveFile(title: CString?,
     return urlToCBuffer(path)
 }
 
-fileprivate let openStudioErrorTitle = "Open Studio Error"
-
-fileprivate func launchStudio() {
-    guard let studioUrl = Bundle.main.url(
-            forAuxiliaryExecutable: "AldoStudio.app") else {
-        let msg = "Unable to find Aldo Studio app bundle"
-        aldoLog.error("Studio URL Error: \(msg)")
-        Task { @MainActor in
-            let _ = aldoAlert(title: openStudioErrorTitle, message: msg)
-        }
-        return
-    }
-    aldoLog.debug("Studio bundle located at \(studioUrl)")
-    let config = NSWorkspace.OpenConfiguration()
-    config.promptsUserIfNeeded = false
-    NSWorkspace.shared.openApplication(at: studioUrl,
-                                       configuration: config) { _, err in
-        guard let err else { return }
-        aldoLog.error("Aldo Studio Launch Error: \(err.localizedDescription)")
-        Task { @MainActor in
-            let _ = aldoAlert(title: openStudioErrorTitle,
-                              message: err.localizedDescription)
-        }
-    }
-}
-
 fileprivate func freeBuffer(_ buffer: CBuffer?) { buffer?.deallocate() }
 
 //
 // MARK: - Helpers
 //
-
-@MainActor
-fileprivate func aldoAlert(title: String, message: String) -> Bool {
-    let modal = NSAlert()
-    modal.messageText = title
-    modal.informativeText = message
-    modal.alertStyle = .critical
-    return modal.runModal() == .OK
-}
 
 fileprivate func bundleName() -> String? {
     Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String

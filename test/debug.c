@@ -71,7 +71,7 @@ static void add_breakpoint(void *ctx)
     aldo_debugger *dbg = ctx;
     struct aldo_haltexpr expr = {.cond = ALDO_HLT_ADDR, .address = 0x4321};
 
-    aldo_debug_bp_add(dbg, expr);
+    (void)aldo_debug_bp_add(dbg, expr);
 
     ct_assertequal(1u, aldo_debug_bp_count(dbg));
     const struct aldo_breakpoint *bp = aldo_debug_bp_at(dbg, 0);
@@ -86,7 +86,7 @@ static void enable_disable_breakpoint(void *ctx)
     aldo_debugger *dbg = ctx;
     struct aldo_haltexpr expr = {.cond = ALDO_HLT_ADDR, .address = 0x4321};
 
-    aldo_debug_bp_add(dbg, expr);
+    (void)aldo_debug_bp_add(dbg, expr);
     aldo_debug_bp_enable(dbg, 0, false);
 
     ct_assertequal(1u, aldo_debug_bp_count(dbg));
@@ -110,7 +110,7 @@ static void multiple_breakpoints(void *ctx)
     size_t len = sizeof exprs / sizeof exprs[0];
 
     for (size_t i = 0; i < len; ++i) {
-        aldo_debug_bp_add(dbg, exprs[i]);
+        (void)aldo_debug_bp_add(dbg, exprs[i]);
     }
 
     ct_assertequal(3u, aldo_debug_bp_count(dbg));
@@ -133,7 +133,7 @@ static void out_of_range(void *ctx)
     size_t len = sizeof exprs / sizeof exprs[0];
 
     for (size_t i = 0; i < len; ++i) {
-        aldo_debug_bp_add(dbg, exprs[i]);
+        (void)aldo_debug_bp_add(dbg, exprs[i]);
     }
 
     ct_assertequal(3u, aldo_debug_bp_count(dbg));
@@ -151,7 +151,7 @@ static void delete_breakpoint(void *ctx)
     size_t len = sizeof exprs / sizeof exprs[0];
 
     for (size_t i = 0; i < len; ++i) {
-        aldo_debug_bp_add(dbg, exprs[i]);
+        (void)aldo_debug_bp_add(dbg, exprs[i]);
     }
 
     ct_assertequal(3u, aldo_debug_bp_count(dbg));
@@ -181,7 +181,7 @@ static void clear_breakpoints(void *ctx)
     size_t len = sizeof exprs / sizeof exprs[0];
 
     for (size_t i = 0; i < len; ++i) {
-        aldo_debug_bp_add(dbg, exprs[i]);
+        (void)aldo_debug_bp_add(dbg, exprs[i]);
     }
     aldo_debug_set_vector_override(dbg, 0x1234);
 
@@ -213,7 +213,7 @@ static void reset_debugger(void *ctx)
     size_t len = sizeof exprs / sizeof exprs[0];
 
     for (size_t i = 0; i < len; ++i) {
-        aldo_debug_bp_add(dbg, exprs[i]);
+        (void)aldo_debug_bp_add(dbg, exprs[i]);
     }
     aldo_debug_set_vector_override(dbg, 0x1234);
 

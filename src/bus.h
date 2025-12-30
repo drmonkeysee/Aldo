@@ -41,7 +41,7 @@ inline bool aldo_bus_set(aldo_bus *self, uint16_t addr,
 }
 inline bool aldo_bus_clear(aldo_bus *self, uint16_t addr)
 {
-    return aldo_bus_set(self, addr, (struct aldo_busdevice){0});
+    return aldo_bus_set(self, addr, (struct aldo_busdevice){});
 }
 
 bool aldo_bus_read(aldo_bus *self, uint16_t addr, uint8_t *restrict d);

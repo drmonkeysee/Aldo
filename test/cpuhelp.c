@@ -71,10 +71,10 @@ void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
 {
     cpu->mbus = TestBus;
     Ram.ctx = ram;
-    aldo_bus_set(TestBus, 0x0, ram ? Ram : (struct aldo_busdevice){0});
+    aldo_bus_set(TestBus, 0x0, ram ? Ram : (struct aldo_busdevice){});
     Rom.ctx = rom;
     aldo_bus_set(TestBus, ALDO_MEMBLOCK_32KB,
-                 rom ? Rom : (struct aldo_busdevice){0});
+                 rom ? Rom : (struct aldo_busdevice){});
     RomWriteCapture = -1;
     aldo_cpu_powerup(cpu);
     cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bcd =

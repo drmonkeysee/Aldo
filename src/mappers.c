@@ -315,7 +315,7 @@ static bool ines_000_vbus_connect(struct aldo_mapper *self, aldo_bus *b)
 static void ines_000_vbus_disconnect(aldo_bus *b)
 {
     struct aldo_busdevice bd;
-    bool r = aldo_bus_swap(b, ALDO_MEMBLOCK_8KB, (struct aldo_busdevice){0},
+    bool r = aldo_bus_swap(b, ALDO_MEMBLOCK_8KB, (struct aldo_busdevice){},
                            &bd);
     (void)r, assert(r);
     r = aldo_bus_set(b, ALDO_MEMBLOCK_8KB,

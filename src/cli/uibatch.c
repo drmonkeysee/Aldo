@@ -133,7 +133,7 @@ int ui_batch_loop(struct emulator *emu)
     int err = init_ui();
     if (err < 0) return err;
 
-    struct runclock clock = {0};
+    struct runclock clock = {};
     aldo_clock_start(&clock.clock);
     do {
         tick_start(&clock, &emu->snapshot);

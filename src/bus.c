@@ -48,7 +48,7 @@ aldo_bus *aldo_bus_new(int bitwidth, size_t n, ...)
         .count = n,
         .maxaddr = (uint16_t)((1 << bitwidth) - 1),
     };
-    self->partitions[0] = (struct partition){0};
+    self->partitions[0] = (struct partition){};
     va_list args;
     va_start(args, n);
     for (size_t i = 1; i < n; ++i) {

@@ -56,7 +56,7 @@ static void errstr_returns_unknown_err(void *ctx)
 
 static void parse_inst_empty_bankview(void *ctx)
 {
-    struct aldo_blockview bv = {.size = 0};
+    struct aldo_blockview bv = {};
     struct aldo_dis_instruction inst;
 
     int result = aldo_dis_parse_inst(&bv, 0, &inst);
@@ -300,7 +300,7 @@ static void parsemem_inst_out_of_bounds(void *ctx)
 static void mnemonic_valid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {ALDO_IN_ADC, ALDO_AM_IMM, {0}, {0}, false},
+        .d = {ALDO_IN_ADC, ALDO_AM_IMM, {}, {}, false},
     };
 
     const char *result = aldo_dis_inst_mnemonic(&inst);
@@ -311,7 +311,7 @@ static void mnemonic_valid(void *ctx)
 static void mnemonic_unofficial(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {ALDO_IN_ANC, ALDO_AM_IMM, {0}, {0}, true},
+        .d = {ALDO_IN_ANC, ALDO_AM_IMM, {}, {}, true},
     };
 
     const char *result = aldo_dis_inst_mnemonic(&inst);
@@ -322,7 +322,7 @@ static void mnemonic_unofficial(void *ctx)
 static void mnemonic_invalid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {(enum aldo_inst)-4, ALDO_AM_IMM, {0}, {0}, false},
+        .d = {(enum aldo_inst)-4, ALDO_AM_IMM, {}, {}, false},
     };
 
     const char *result = aldo_dis_inst_mnemonic(&inst);
@@ -337,7 +337,7 @@ static void mnemonic_invalid(void *ctx)
 static void description_valid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {ALDO_IN_ADC, ALDO_AM_IMM, {0}, {0}, false},
+        .d = {ALDO_IN_ADC, ALDO_AM_IMM, {}, {}, false},
     };
 
     const char *result = aldo_dis_inst_description(&inst);
@@ -348,7 +348,7 @@ static void description_valid(void *ctx)
 static void description_unofficial(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {ALDO_IN_ANC, ALDO_AM_IMM, {0}, {0}, true},
+        .d = {ALDO_IN_ANC, ALDO_AM_IMM, {}, {}, true},
     };
 
     const char *result = aldo_dis_inst_description(&inst);
@@ -359,7 +359,7 @@ static void description_unofficial(void *ctx)
 static void description_invalid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {(enum aldo_inst)-4, ALDO_AM_IMM, {0}, {0}, false},
+        .d = {(enum aldo_inst)-4, ALDO_AM_IMM, {}, {}, false},
     };
 
     const char *result = aldo_dis_inst_description(&inst);
@@ -374,7 +374,7 @@ static void description_invalid(void *ctx)
 static void modename_valid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {ALDO_IN_ADC, ALDO_AM_ZP, {0}, {0}, false},
+        .d = {ALDO_IN_ADC, ALDO_AM_ZP, {}, {}, false},
     };
 
     const char *result = aldo_dis_inst_addrmode(&inst);
@@ -385,7 +385,7 @@ static void modename_valid(void *ctx)
 static void modename_unofficial(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {ALDO_IN_ADC, ALDO_AM_JAM, {0}, {0}, true},
+        .d = {ALDO_IN_ADC, ALDO_AM_JAM, {}, {}, true},
     };
 
     const char *result = aldo_dis_inst_addrmode(&inst);
@@ -396,7 +396,7 @@ static void modename_unofficial(void *ctx)
 static void modename_invalid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {ALDO_IN_ADC, (enum aldo_addrmode)-4, {0}, {0}, false},
+        .d = {ALDO_IN_ADC, (enum aldo_addrmode)-4, {}, {}, false},
     };
 
     const char *result = aldo_dis_inst_addrmode(&inst);
@@ -411,7 +411,7 @@ static void modename_invalid(void *ctx)
 static void flags_valid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {ALDO_IN_ADC, ALDO_AM_IMM, {0}, {0}, false},
+        .d = {ALDO_IN_ADC, ALDO_AM_IMM, {}, {}, false},
     };
 
     uint8_t result = aldo_dis_inst_flags(&inst);
@@ -422,7 +422,7 @@ static void flags_valid(void *ctx)
 static void flags_unofficial(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {ALDO_IN_ANC, ALDO_AM_IMM, {0}, {0}, true},
+        .d = {ALDO_IN_ANC, ALDO_AM_IMM, {}, {}, true},
     };
 
     uint8_t result = aldo_dis_inst_flags(&inst);
@@ -433,7 +433,7 @@ static void flags_unofficial(void *ctx)
 static void flags_invalid(void *ctx)
 {
     struct aldo_dis_instruction inst = {
-        .d = {(enum aldo_inst)-4, ALDO_AM_IMM, {0}, {0}, false},
+        .d = {(enum aldo_inst)-4, ALDO_AM_IMM, {}, {}, false},
     };
 
     uint8_t result = aldo_dis_inst_flags(&inst);
@@ -447,7 +447,7 @@ static void flags_invalid(void *ctx)
 
 static void inst_operand_empty_instruction(void *ctx)
 {
-    struct aldo_dis_instruction inst = {0};
+    struct aldo_dis_instruction inst = {};
     char buf[ALDO_DIS_OPERAND_SIZE];
 
     int length = aldo_dis_inst_operand(&inst, buf);
@@ -574,7 +574,7 @@ static void inst_eq_same_object(void *ctx)
 static void inst_does_nothing_if_no_bytes(void *ctx)
 {
     uint16_t a = 0x1234;
-    struct aldo_dis_instruction inst = {0};
+    struct aldo_dis_instruction inst = {};
     char buf[ALDO_DIS_INST_SIZE] = {'\0'};
 
     int length = aldo_dis_inst(a, &inst, buf);

@@ -259,7 +259,7 @@ static void drawcart(const struct view *v, const struct emulator *emu)
 static void drawinstructions(const struct view *v, int h, int y,
                              const struct aldo_snapshot *snp)
 {
-    struct aldo_dis_instruction inst = {0};
+    struct aldo_dis_instruction inst = {};
     uint16_t addr = snp->cpu.datapath.current_instruction;
     char disassembly[ALDO_DIS_INST_SIZE];
     for (int i = 0; i < h - y; ++i) {
@@ -747,7 +747,7 @@ static void vcleanup(struct view *v)
     delwin(v->content);
     del_panel(v->outer);
     delwin(v->win);
-    *v = (struct view){0};
+    *v = (struct view){};
 }
 
 static void ramrefresh(const struct view *v, const struct viewstate *vs)

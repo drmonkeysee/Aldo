@@ -9,7 +9,7 @@
 
 #include "bytes.h"
 
-#define N {0}
+#define N {}
 #define AXP {.a = true, .x = true, .p = true}
 #define AXPS {.a = true, .x = true, .p = true, .s = true}
 #define AP {.a = true, .p = true}

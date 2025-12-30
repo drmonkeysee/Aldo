@@ -9,7 +9,6 @@
 #ifdef __cplusplus
 }   // NOTE: end extern "C"
 #endif
-#undef aldo_empty
 #undef aldo_nothrow
 #undef aldo_nacz
 #undef aldo_naz

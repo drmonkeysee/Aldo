@@ -200,7 +200,7 @@ static int print_prgblock(const struct aldo_blockview *bv, bool verbose,
     if (io_err < 0) return ALDO_DIS_ERR_IO;
     if (fputs("--------\n", f) == EOF) return ALDO_DIS_ERR_IO;
 
-    struct repeat_condition repeat = {0};
+    struct repeat_condition repeat = {};
     struct aldo_dis_instruction inst;
     char dis[ALDO_DIS_INST_SIZE];
     // NOTE: by convention, count backwards from CPU vector locations
@@ -497,7 +497,7 @@ int aldo_dis_parse_inst(const struct aldo_blockview *bv, size_t at,
     assert(bv != NULL);
     assert(parsed != NULL);
 
-    *parsed = (struct aldo_dis_instruction){0};
+    *parsed = (struct aldo_dis_instruction){};
     if (!bv->mem) return ALDO_DIS_ERR_PRGROM;
     if (at >= bv->size) return 0;
 

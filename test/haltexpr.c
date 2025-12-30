@@ -140,7 +140,7 @@ static void address_condition_short(void *ctx)
 static void address_condition_too_large(void *ctx)
 {
     const char *str = "@12345";
-    struct aldo_haltexpr expr = {0};
+    struct aldo_haltexpr expr = {};
 
     int result = aldo_haltexpr_parse(str, &expr);
 
@@ -151,7 +151,7 @@ static void address_condition_too_large(void *ctx)
 static void address_condition_negative_overflow(void *ctx)
 {
     const char *str = "@-asdf";
-    struct aldo_haltexpr expr = {0};
+    struct aldo_haltexpr expr = {};
 
     int result = aldo_haltexpr_parse(str, &expr);
 
@@ -256,7 +256,7 @@ static void runtime_condition_no_decimal(void *ctx)
 static void runtime_condition_negative(void *ctx)
 {
     const char *str = "-20.4s";
-    struct aldo_haltexpr expr = {0};
+    struct aldo_haltexpr expr = {};
 
     int result = aldo_haltexpr_parse(str, &expr);
 
@@ -691,7 +691,7 @@ static void dbgexpr_malformed(void *ctx)
 
 static void print_none(void *ctx)
 {
-    struct aldo_haltexpr expr = {0};
+    struct aldo_haltexpr expr = {};
     char buf[ALDO_HEXPR_FMT_SIZE];
 
     int result = aldo_haltexpr_desc(&expr, buf);

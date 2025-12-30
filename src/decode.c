@@ -9,8 +9,6 @@
 
 #include "bytes.h"
 
-#include <assert.h>
-
 #define N {0}
 #define AXP {.a = true, .x = true, .p = true}
 #define AXPS {.a = true, .x = true, .p = true, .s = true}

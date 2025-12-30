@@ -177,18 +177,14 @@ static const uint8_t *ines_chrrom(const struct aldo_mapper *self)
     return ((const struct ines_mapper *)self)->chr;
 }
 
-static bool ines_unimplemented_mbus_connect(struct aldo_mapper *self,
-                                            aldo_bus *b)
+static bool ines_unimplemented_mbus_connect(struct aldo_mapper *, aldo_bus *b)
 {
-    (void)self;
     clear_prg_device(b);
     return true;
 }
 
-static bool ines_unimplemented_vbus_connect(struct aldo_mapper *self,
-                                            aldo_bus *b)
+static bool ines_unimplemented_vbus_connect(struct aldo_mapper *, aldo_bus *b)
 {
-    (void)self;
     clear_chr_device(b);
     return true;
 }

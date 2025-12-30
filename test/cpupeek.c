@@ -375,7 +375,7 @@ static void peek_busfault(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite cpu_peek_tests(void)
+struct ct_testsuite cpu_peek_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(end_restores_state),

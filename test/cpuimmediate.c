@@ -3468,7 +3468,7 @@ static void usbc_bcd_not_supported(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite cpu_immediate_tests(void)
+struct ct_testsuite cpu_immediate_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(adc),

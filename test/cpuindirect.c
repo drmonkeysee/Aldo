@@ -1387,7 +1387,7 @@ static void sre_indy_pagecross(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite cpu_indirect_tests(void)
+struct ct_testsuite cpu_indirect_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(adc_indx),

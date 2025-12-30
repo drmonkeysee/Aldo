@@ -4,4 +4,4 @@
 
 #include <stddef.h>
 
-size_t swift_runner(void);
+size_t swift_runner();

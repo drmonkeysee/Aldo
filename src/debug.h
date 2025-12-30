@@ -35,7 +35,7 @@ extern const ptrdiff_t Aldo_NoBreakpoint;
 
 // NOTE: if returns NULL then errno is set due to failed allocation
 aldo_export aldo_ownresult
-aldo_debugger *aldo_debug_new(void) aldo_nothrow;
+aldo_debugger *aldo_debug_new() aldo_nothrow;
 aldo_export
 void aldo_debug_free(aldo_debugger *self) aldo_nothrow;
 

@@ -52,7 +52,7 @@ static void rts(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite cpu_subroutine_tests(void)
+struct ct_testsuite cpu_subroutine_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(jsr),

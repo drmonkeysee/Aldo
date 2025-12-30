@@ -30,7 +30,7 @@ struct runclock {
     double avg_ticktime_ms;
 };
 
-static void clearline(void)
+static void clearline()
 {
     size_t linelength = strlen(DistractorFormat) * 2;
     for (size_t i = 0; i < linelength; ++i) {
@@ -40,9 +40,8 @@ static void clearline(void)
 
 static volatile sig_atomic_t QuitSignal;
 
-static void handle_sigint(int sig, siginfo_t *info, void *uap)
+static void handle_sigint(int, siginfo_t *, void *)
 {
-    (void)sig, (void)info, (void)uap;
     QuitSignal = 1;
 }
 
@@ -50,7 +49,7 @@ static void handle_sigint(int sig, siginfo_t *info, void *uap)
 // MARK: - UI Loop Implementation
 //
 
-static int init_ui(void)
+static int init_ui()
 {
     struct sigaction act = {
         .sa_sigaction = handle_sigint,

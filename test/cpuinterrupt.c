@@ -2162,7 +2162,7 @@ static void rst_too_short(void *ctx)
 // MARK: - Test Lists
 //
 
-struct ct_testsuite cpu_interrupt_handler_tests(void)
+struct ct_testsuite cpu_interrupt_handler_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(brk_handler),
@@ -2198,7 +2198,7 @@ struct ct_testsuite cpu_interrupt_handler_tests(void)
                                        interrupt_handler_teardown);
 }
 
-struct ct_testsuite cpu_interrupt_signal_tests(void)
+struct ct_testsuite cpu_interrupt_signal_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(clear_on_startup),

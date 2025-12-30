@@ -236,7 +236,7 @@ static void plp_wraparound(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite cpu_stack_tests(void)
+struct ct_testsuite cpu_stack_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(pha),

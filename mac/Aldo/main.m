@@ -38,7 +38,7 @@ static float render_scale_factor(void *sdlwindow)
     return 1.0f;
 }
 
-static int run_app(void)
+static int run_app()
 {
     struct gui_platform platform;
     if (![MacPlatform setup:&platform withScaleFunc:render_scale_factor]) {
@@ -53,9 +53,8 @@ static int run_app(void)
 // MARK: - App Entrypoint
 //
 
-int main(int argc, char *argv[argc+1])
+int main(int, char *[])
 {
-    (void)argv;
     SDL_Log("Aldo GUI started...");
 
     @autoreleasepool {

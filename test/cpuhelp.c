@@ -36,9 +36,8 @@ static bool test_write(void *ctx, uint16_t addr, uint8_t d)
     return false;
 }
 
-static bool capture_rom_write(void *ctx, uint16_t addr, uint8_t d)
+static bool capture_rom_write(void *, uint16_t, uint8_t d)
 {
-    (void)ctx, (void)addr;
     RomWriteCapture = d;
     return false;
 }
@@ -58,13 +57,13 @@ uint8_t BigRom[] = {
 };
 int RomWriteCapture = -1;
 
-void setup_testbus(void)
+void setup_testbus()
 {
     TestBus = aldo_bus_new(ALDO_BITWIDTH_64KB, 3, ALDO_MEMBLOCK_8KB,
                            ALDO_MEMBLOCK_32KB);
 }
 
-void teardown_testbus(void)
+void teardown_testbus()
 {
     aldo_bus_free(TestBus);
 }
@@ -86,7 +85,7 @@ void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
     cpu->rst = ALDO_SIG_CLEAR;
 }
 
-void enable_rom_wcapture(void)
+void enable_rom_wcapture()
 {
     struct aldo_busdevice dv = Rom;
     dv.write = capture_rom_write;

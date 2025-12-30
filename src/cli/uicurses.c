@@ -972,7 +972,7 @@ int ui_curses_loop(struct emulator *emu)
     return 0;
 }
 
-const char *ui_curses_version(void)
+const char *ui_curses_version()
 {
     return curses_version();
 }

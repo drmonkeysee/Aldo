@@ -3428,7 +3428,7 @@ static void sre_zpx_pageoverflow(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite cpu_zeropage_tests(void)
+struct ct_testsuite cpu_zeropage_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(adc_zp),

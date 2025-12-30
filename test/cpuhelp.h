@@ -17,7 +17,7 @@ extern int RomWriteCapture;
 
 void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
                uint8_t *restrict rom);
-void enable_rom_wcapture(void);
+void enable_rom_wcapture();
 int exec_cpu(struct aldo_mos6502 *cpu);
 
 #endif

@@ -468,7 +468,7 @@ static void copy_zero_count(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite bus_tests(void)
+struct ct_testsuite bus_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(empty_device),

@@ -2745,7 +2745,7 @@ static void peek_busfault(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite dis_tests(void)
+struct ct_testsuite dis_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(errstr_returns_known_err),
@@ -2917,7 +2917,7 @@ struct ct_testsuite dis_tests(void)
     return ct_makesuite(tests);
 }
 
-struct ct_testsuite dis_peek_tests(void)
+struct ct_testsuite dis_peek_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(peek_immediate),

@@ -2449,7 +2449,7 @@ static void tas_absy_pagecross(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite cpu_absolute_tests(void)
+struct ct_testsuite cpu_absolute_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(adc_abs),

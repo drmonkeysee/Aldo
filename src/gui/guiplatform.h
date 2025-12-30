@@ -12,9 +12,9 @@
 
 #include "bridgeopen.h"
 struct gui_platform {
-    char *(*appname)(void) aldo_nothrow;
-    char *(*orgname)(void) aldo_nothrow;
-    bool (*is_hidpi)(void) aldo_nothrow;
+    char *(*appname)() aldo_nothrow;
+    char *(*orgname)() aldo_nothrow;
+    bool (*is_hidpi)() aldo_nothrow;
     float (*render_scale_factor)(void *) aldo_nothrow;
     char *(*aldo_pcallc open_file)(const char*,
                                    const char* const[]) aldo_nothrow;

@@ -28,12 +28,12 @@
 typedef int ui_loop(struct emulator *);
 ui_loop ui_batch_loop;
 ui_loop ui_curses_loop;
-const char *ui_curses_version(void);
+const char *ui_curses_version();
 
 static const char *const restrict ResetOverrideFmt =
     "RESET Override: " ALDO_HEXPR_RST_IND "%04X\n";
 
-static void print_version(void)
+static void print_version()
 {
     printf("Aldo %s", Aldo_Version);
 #ifdef __VERSION__

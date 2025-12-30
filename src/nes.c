@@ -447,7 +447,7 @@ void aldo_nes_powerdown(aldo_nes *self)
     disconnect_cart(self);
 }
 
-int aldo_nes_max_tcpu(void)
+int aldo_nes_max_tcpu()
 {
     return Aldo_MaxTCycle;
 }
@@ -556,12 +556,12 @@ void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
     snapshot_sys(self);
 }
 
-int aldo_nes_cycle_factor(void)
+int aldo_nes_cycle_factor()
 {
     return Aldo_PpuRatio;
 }
 
-int aldo_nes_frame_factor(void)
+int aldo_nes_frame_factor()
 {
     return Aldo_DotsPerFrame;
 }

@@ -64,7 +64,7 @@ static void ram_mirroring(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite cpu_tests(void)
+struct ct_testsuite cpu_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(powerup_initializes_cpu),

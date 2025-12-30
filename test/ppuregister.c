@@ -3249,7 +3249,7 @@ static void ppudata_read_vram_behind_palette(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite ppu_register_tests(void)
+struct ct_testsuite ppu_register_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(ppuctrl_write),

@@ -1277,7 +1277,7 @@ static void jam(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite cpu_implied_tests(void)
+struct ct_testsuite cpu_implied_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(asl),

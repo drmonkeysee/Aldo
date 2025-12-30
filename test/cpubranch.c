@@ -305,7 +305,7 @@ static void bvs_branch(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite cpu_branch_tests(void)
+struct ct_testsuite cpu_branch_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(bcc_nobranch),

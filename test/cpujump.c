@@ -60,7 +60,7 @@ static void jmp_indirect_pageboundary_bug(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite cpu_jump_tests(void)
+struct ct_testsuite cpu_jump_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(jmp),

@@ -237,7 +237,7 @@ static void bpvector_free(struct breakpoint_vector *vec)
 const int Aldo_NoResetVector = -1;
 const ptrdiff_t Aldo_NoBreakpoint = -1;
 
-aldo_debugger *aldo_debug_new(void)
+aldo_debugger *aldo_debug_new()
 {
     struct aldo_debugger_context *self = malloc(sizeof *self);
     if (!self) return self;

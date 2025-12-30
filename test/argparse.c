@@ -873,7 +873,7 @@ static void double_dash_ends_option_parsing_unordered(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite argparse_tests(void)
+struct ct_testsuite argparse_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(init_control_zero_args),

@@ -34,7 +34,7 @@ aldo_export
 void aldo_nes_powerdown(aldo_nes *self) aldo_nothrow;
 
 aldo_export
-int aldo_nes_max_tcpu(void) aldo_nothrow;
+int aldo_nes_max_tcpu() aldo_nothrow;
 // NOTE: RAM and VRAM are the same size so one accessor for both
 aldo_export
 size_t aldo_nes_ram_size(aldo_nes *self) aldo_nothrow;
@@ -59,9 +59,9 @@ void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal,
 aldo_export
 void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock) aldo_nothrow;
 aldo_export
-int aldo_nes_cycle_factor(void) aldo_nothrow;
+int aldo_nes_cycle_factor() aldo_nothrow;
 aldo_export
-int aldo_nes_frame_factor(void) aldo_nothrow;
+int aldo_nes_frame_factor() aldo_nothrow;
 
 aldo_export
 void aldo_nes_set_snapshot(aldo_nes *self,

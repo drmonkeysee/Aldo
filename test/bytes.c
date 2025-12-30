@@ -172,7 +172,7 @@ static void bank_copy_address_beyond_range(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite bytes_tests(void)
+struct ct_testsuite bytes_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(shuffle_zeros),

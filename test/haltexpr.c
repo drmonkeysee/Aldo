@@ -889,7 +889,7 @@ static void format_jam(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite haltexpr_tests(void)
+struct ct_testsuite haltexpr_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(errstr_returns_known_err),

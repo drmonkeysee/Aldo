@@ -230,7 +230,7 @@ static void reset_debugger(void *ctx)
 // MARK: - Test List
 //
 
-struct ct_testsuite debug_tests(void)
+struct ct_testsuite debug_tests()
 {
     static const struct ct_testcase tests[] = {
         ct_maketest(new_debugger),

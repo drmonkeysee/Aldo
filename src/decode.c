@@ -50,8 +50,9 @@ const uint8_t Aldo_BrkOpcode = 0x0;
  * nesdev.org states that $82, $C2, and $E2 (NOP imm) will
  * occasionally jam the cpu but other sources don't mention it or
  * are skeptical, so emulate them as stable NOPs.
- *   (?) = rumored to jam by older docs but unproven and emulated as stable
- *   (!) = unstable
+ *    *   = unofficial opcode
+ *   (?)  = rumored to jam by older docs but unproven and emulated as stable
+ *   (!)  = unstable
  *   (!!) = extremely unstable
  */
 

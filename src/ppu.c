@@ -956,8 +956,8 @@ const int Aldo_DotsPerFrame = Dots * Lines, Aldo_PpuRatio = 3;
 
 void aldo_ppu_connect(struct aldo_rp2c02 *self, aldo_bus *mbus)
 {
-    assert(self != NULL);
-    assert(mbus != NULL);
+    assert(self != nullptr);
+    assert(mbus != nullptr);
 
     bool r = aldo_bus_set(mbus, ALDO_MEMBLOCK_8KB, (struct aldo_busdevice){
         .read = regread,
@@ -969,8 +969,8 @@ void aldo_ppu_connect(struct aldo_rp2c02 *self, aldo_bus *mbus)
 
 void aldo_ppu_powerup(struct aldo_rp2c02 *self)
 {
-    assert(self != NULL);
-    assert(self->vbus != NULL);
+    assert(self != nullptr);
+    assert(self->vbus != nullptr);
 
     // NOTE: initialize ppu to known state
     self->oamaddr = 0;
@@ -1008,7 +1008,7 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
 
 void aldo_ppu_zeroram(struct aldo_rp2c02 *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     memclr(self->oam);
     memclr(self->soam);
@@ -1023,7 +1023,7 @@ bool aldo_ppu_gfxsnp_dot(const struct aldo_rp2c02 *self)
 
 bool aldo_ppu_cycle(struct aldo_rp2c02 *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     if (reset_held(self)) return false;
     return cycle(self);
@@ -1032,8 +1032,8 @@ bool aldo_ppu_cycle(struct aldo_rp2c02 *self)
 void aldo_ppu_bus_snapshot(const struct aldo_rp2c02 *self,
                            struct aldo_snapshot *snp)
 {
-    assert(self != NULL);
-    assert(snp != NULL);
+    assert(self != nullptr);
+    assert(snp != nullptr);
 
     snp->ppu.ctrl = get_ctrl(self);
     snp->ppu.mask = get_mask(self);
@@ -1072,9 +1072,9 @@ void aldo_ppu_bus_snapshot(const struct aldo_rp2c02 *self,
 
 void aldo_ppu_vid_snapshot(struct aldo_rp2c02 *self, struct aldo_snapshot *snp)
 {
-    assert(self != NULL);
-    assert(snp != NULL);
-    assert(snp->video != NULL);
+    assert(self != nullptr);
+    assert(snp != nullptr);
+    assert(snp->video != nullptr);
 
     snapshot_palette(self, snp->video->palettes.bg, 0);
     snapshot_palette(self, snp->video->palettes.fg, 0x10);
@@ -1083,8 +1083,8 @@ void aldo_ppu_vid_snapshot(struct aldo_rp2c02 *self, struct aldo_snapshot *snp)
 
 bool aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f)
 {
-    assert(self != NULL);
-    assert(f != NULL);
+    assert(self != nullptr);
+    assert(f != nullptr);
 
     return memdump(self->oam, f)
             && memdump(self->soam, f)
@@ -1094,7 +1094,7 @@ bool aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f)
 struct aldo_ppu_coord aldo_ppu_trace(const struct aldo_rp2c02 *self,
                                      int adjustment)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     struct aldo_ppu_coord c = {
         self->dot + adjustment,
@@ -1111,7 +1111,7 @@ struct aldo_ppu_coord aldo_ppu_trace(const struct aldo_rp2c02 *self,
 
 struct aldo_ppu_coord aldo_ppu_screendot(const struct aldo_rp2c02 *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     static const int dot_pxout = DotPxStart + 2;
 

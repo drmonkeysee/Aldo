@@ -12,7 +12,6 @@
 #include "snapshot.h"
 
 #include <assert.h>
-#include <stddef.h>
 
 //
 // MARK: - State Management
@@ -1670,8 +1669,8 @@ const int Aldo_MaxTCycle = 8;
 
 void aldo_cpu_powerup(struct aldo_mos6502 *self)
 {
-    assert(self != NULL);
-    assert(self->mbus != NULL);
+    assert(self != nullptr);
+    assert(self->mbus != nullptr);
 
     // NOTE: initialize physical lines and control flags to known state
     self->signal.irq = self->signal.nmi = self->signal.rst =
@@ -1690,7 +1689,7 @@ void aldo_cpu_powerup(struct aldo_mos6502 *self)
 
 int aldo_cpu_cycle(struct aldo_mos6502 *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     // NOTE: sentinel value for cycle count denoting an imminent opcode fetch
     static const int prefetch = -1;
@@ -1731,8 +1730,8 @@ bool aldo_cpu_jammed(const struct aldo_mos6502 *self)
 void aldo_cpu_snapshot(const struct aldo_mos6502 *self,
                        struct aldo_snapshot *snp)
 {
-    assert(self != NULL);
-    assert(snp != NULL);
+    assert(self != nullptr);
+    assert(snp != nullptr);
 
     snp->cpu.program_counter = self->pc;
     snp->cpu.accumulator = self->a;
@@ -1769,7 +1768,7 @@ struct aldo_peekresult
 aldo_cpu_peek_start(struct aldo_mos6502 *restrict self,
                     struct aldo_mos6502 *restrict restore)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     if (restore) {
         *restore = *self;
@@ -1786,7 +1785,7 @@ aldo_cpu_peek_start(struct aldo_mos6502 *restrict self,
 
 void aldo_cpu_peek(struct aldo_mos6502 *self, struct aldo_peekresult *peek)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     // NOTE: can't run the cpu to peek JAM or it'll jam the cpu!
     // Fortunately all we need is the addressing mode so return that.
@@ -1822,7 +1821,7 @@ void aldo_cpu_peek(struct aldo_mos6502 *self, struct aldo_peekresult *peek)
 void aldo_cpu_peek_end(struct aldo_mos6502 *restrict self,
                        struct aldo_mos6502 *restrict restore)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     if (!restore) return;
 

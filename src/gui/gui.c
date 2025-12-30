@@ -17,7 +17,6 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -33,7 +32,7 @@ static int run_emu(const struct gui_platform *platform)
         return EXIT_FAILURE;
     }
 
-    aldo_nes *console = aldo_nes_new(dbg, false, NULL);
+    aldo_nes *console = aldo_nes_new(dbg, false, nullptr);
     if (!console) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "Unable to initialize console (%d): %s", errno,
@@ -41,13 +40,13 @@ static int run_emu(const struct gui_platform *platform)
         aldo_debug_free(dbg);
         return EXIT_FAILURE;
     }
-    aldo_nes_powerup(console, NULL, false);
+    aldo_nes_powerup(console, nullptr, false);
 
     int err = ui_sdl_runloop(platform, dbg, console);
     // NOTE: ui loop takes ownership of these two,
     // even in the event of UI init failure.
-    console = NULL;
-    dbg = NULL;
+    console = nullptr;
+    dbg = nullptr;
     if (err < 0) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "UI run failure (%d): %s", err, aldo_ui_errstr(err));
@@ -62,7 +61,7 @@ static int run_emu(const struct gui_platform *platform)
 
 int gui_run(const struct gui_platform *platform)
 {
-    assert(platform != NULL);
+    assert(platform != nullptr);
 
     return run_emu(platform);
 }

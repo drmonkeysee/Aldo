@@ -216,8 +216,8 @@ const char *aldo_cart_errstr(int err)
 
 int aldo_cart_create(aldo_cart **c, FILE *f)
 {
-    assert(c != NULL);
-    assert(f != NULL);
+    assert(c != nullptr);
+    assert(f != nullptr);
 
     struct aldo_cartridge *self = malloc(sizeof *self);
     if (!self) return ALDO_CART_ERR_ERNO;
@@ -249,7 +249,7 @@ int aldo_cart_create(aldo_cart **c, FILE *f)
 
 void aldo_cart_free(aldo_cart *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     if (self->mapper) {
         self->mapper->dtor(self->mapper);
@@ -271,7 +271,7 @@ const char *aldo_cart_formatname(enum aldo_cartformat format)
 int aldo_cart_format_extname(aldo_cart *self,
                              char buf[restrict static ALDO_CART_FMT_SIZE])
 {
-    assert(buf != NULL);
+    assert(buf != nullptr);
 
     if (!self) return ALDO_CART_ERR_NOCART;
 
@@ -293,9 +293,9 @@ int aldo_cart_format_extname(aldo_cart *self,
 int aldo_cart_write_info(aldo_cart *self, const char *restrict name,
                          bool verbose, FILE *f)
 {
-    assert(self != NULL);
-    assert(name != NULL);
-    assert(f != NULL);
+    assert(self != nullptr);
+    assert(name != nullptr);
+    assert(f != nullptr);
 
     int err = fprintf(f, "File\t\t: %s\n", name);
     if (err < 0) return ALDO_CART_ERR_IO;
@@ -311,16 +311,16 @@ int aldo_cart_write_info(aldo_cart *self, const char *restrict name,
 
 void aldo_cart_getinfo(aldo_cart *self, struct aldo_cartinfo *info)
 {
-    assert(self != NULL);
-    assert(info != NULL);
+    assert(self != nullptr);
+    assert(info != nullptr);
 
     *info = self->info;
 }
 
 struct aldo_blockview aldo_cart_prgblock(aldo_cart *self, size_t i)
 {
-    assert(self != NULL);
-    assert(self->mapper != NULL);
+    assert(self != nullptr);
+    assert(self->mapper != nullptr);
 
     struct aldo_blockview bv = {.ord = i};
     const uint8_t *prg = self->mapper->prgrom(self->mapper);
@@ -338,8 +338,8 @@ struct aldo_blockview aldo_cart_prgblock(aldo_cart *self, size_t i)
 
 struct aldo_blockview aldo_cart_chrblock(aldo_cart *self, size_t i)
 {
-    assert(self != NULL);
-    assert(self->mapper != NULL);
+    assert(self != nullptr);
+    assert(self->mapper != nullptr);
 
     struct aldo_blockview bv = {.ord = i};
     if (!is_nes(self)) return bv;
@@ -358,27 +358,27 @@ struct aldo_blockview aldo_cart_chrblock(aldo_cart *self, size_t i)
 
 bool aldo_cart_mbus_connect(aldo_cart *self, aldo_bus *b)
 {
-    assert(self != NULL);
-    assert(self->mapper != NULL);
-    assert(b != NULL);
+    assert(self != nullptr);
+    assert(self->mapper != nullptr);
+    assert(b != nullptr);
 
     return self->mapper->mbus_connect(self->mapper, b);
 }
 
 void aldo_cart_mbus_disconnect(aldo_cart *self, aldo_bus *b)
 {
-    assert(self != NULL);
-    assert(self->mapper != NULL);
-    assert(b != NULL);
+    assert(self != nullptr);
+    assert(self->mapper != nullptr);
+    assert(b != nullptr);
 
     self->mapper->mbus_disconnect(b);
 }
 
 bool aldo_cart_vbus_connect(aldo_cart *self, aldo_bus *b)
 {
-    assert(self != NULL);
-    assert(self->mapper != NULL);
-    assert(b != NULL);
+    assert(self != nullptr);
+    assert(self->mapper != nullptr);
+    assert(b != nullptr);
 
     if (is_nes(self)) {
         return as_nesmap(self)->vbus_connect(self->mapper, b);
@@ -388,9 +388,9 @@ bool aldo_cart_vbus_connect(aldo_cart *self, aldo_bus *b)
 
 void aldo_cart_vbus_disconnect(aldo_cart *self, aldo_bus *b)
 {
-    assert(self != NULL);
-    assert(self->mapper != NULL);
-    assert(b != NULL);
+    assert(self != nullptr);
+    assert(self->mapper != nullptr);
+    assert(b != nullptr);
 
     if (is_nes(self)) {
         as_nesmap(self)->vbus_disconnect(b);
@@ -400,9 +400,9 @@ void aldo_cart_vbus_disconnect(aldo_cart *self, aldo_bus *b)
 int aldo_cart_write_dis_header(aldo_cart *self, const char *restrict name,
                                FILE *f)
 {
-    assert(self != NULL);
-    assert(name != NULL);
-    assert(f != NULL);
+    assert(self != nullptr);
+    assert(name != nullptr);
+    assert(f != nullptr);
 
     int err = fprintf(f, "%s\n", name);
     if (err < 0) return ALDO_CART_ERR_IO;
@@ -421,9 +421,9 @@ int aldo_cart_write_dis_header(aldo_cart *self, const char *restrict name,
 
 void aldo_cart_snapshot(aldo_cart *self, struct aldo_snapshot *snp)
 {
-    assert(self != NULL);
-    assert(self->mapper != NULL);
-    assert(snp != NULL);
+    assert(self != nullptr);
+    assert(self->mapper != nullptr);
+    assert(snp != nullptr);
 
     if (is_nes(self) && as_nesmap(self)->snapshot) {
         as_nesmap(self)->snapshot(self->mapper, snp);

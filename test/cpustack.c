@@ -10,7 +10,6 @@
 #include "cpuhelp.h"
 #include "snapshot.h"
 
-#include <stddef.h>
 #include <stdint.h>
 
 //
@@ -21,7 +20,7 @@ static void pha(void *ctx)
 {
     uint8_t mem[] = {0x48, [260] = 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x20;
     cpu.s = 4;
 
@@ -38,7 +37,7 @@ static void pha_wraparound(void *ctx)
 {
     uint8_t mem[] = {0x48, [256] = 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x20;
     cpu.s = 0;
 
@@ -55,7 +54,7 @@ static void php(void *ctx)
 {
     uint8_t mem[] = {0x8, [260] = 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.n = true;
     cpu.p.z = true;
     cpu.s = 4;
@@ -73,7 +72,7 @@ static void php_wraparound(void *ctx)
 {
     uint8_t mem[] = {0x8, [256] = 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.n = true;
     cpu.p.z = true;
     cpu.s = 0;
@@ -91,7 +90,7 @@ static void pla(void *ctx)
 {
     uint8_t mem[] = {0x68, [260] = 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.s = 3;
 
     int cycles = exec_cpu(&cpu);
@@ -109,7 +108,7 @@ static void pla_zero(void *ctx)
 {
     uint8_t mem[] = {0x68, [260] = 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
     cpu.s = 3;
 
@@ -128,7 +127,7 @@ static void pla_negative(void *ctx)
 {
     uint8_t mem[] = {0x68, [260] = 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.s = 3;
 
     int cycles = exec_cpu(&cpu);
@@ -146,7 +145,7 @@ static void pla_wraparound(void *ctx)
 {
     uint8_t mem[] = {0x68, [256] = 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.s = 0xff;
 
     int cycles = exec_cpu(&cpu);
@@ -164,7 +163,7 @@ static void plp(void *ctx)
 {
     uint8_t mem[] = {0x28, [260] = 0xaa};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.s = 3;
 
     int cycles = exec_cpu(&cpu);
@@ -182,7 +181,7 @@ static void plp_zero(void *ctx)
 {
     uint8_t mem[] = {0x28, [260] = 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.s = 3;
 
     int cycles = exec_cpu(&cpu);
@@ -200,7 +199,7 @@ static void plp_ones(void *ctx)
 {
     uint8_t mem[] = {0x28, [260] = 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.s = 3;
 
     int cycles = exec_cpu(&cpu);
@@ -218,7 +217,7 @@ static void plp_wraparound(void *ctx)
 {
     uint8_t mem[] = {0x28, [256] = 0x25};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.s = 0xff;
 
     int cycles = exec_cpu(&cpu);

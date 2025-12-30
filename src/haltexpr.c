@@ -11,7 +11,6 @@
 
 #include <assert.h>
 #include <inttypes.h>
-#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -60,7 +59,7 @@ const char *aldo_haltcond_description(enum aldo_haltcondition cond)
 
 int aldo_haltexpr_parse(const char *restrict str, struct aldo_haltexpr *expr)
 {
-    assert(expr != NULL);
+    assert(expr != nullptr);
 
     if (!str) return ALDO_HEXPR_ERR_SCAN;
 
@@ -134,7 +133,7 @@ int aldo_haltexpr_parse(const char *restrict str, struct aldo_haltexpr *expr)
 int aldo_haltexpr_parse_dbg(const char *restrict str,
                             struct aldo_debugexpr *expr)
 {
-    assert(expr != NULL);
+    assert(expr != nullptr);
 
     struct aldo_haltexpr hexpr;
     int err = aldo_haltexpr_parse(str, &hexpr);
@@ -158,8 +157,8 @@ int aldo_haltexpr_parse_dbg(const char *restrict str,
 int aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
                        char buf[restrict static ALDO_HEXPR_FMT_SIZE])
 {
-    assert(expr != NULL);
-    assert(buf != NULL);
+    assert(expr != nullptr);
+    assert(buf != nullptr);
 
     int count;
     switch (expr->cond) {
@@ -195,8 +194,8 @@ int aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
 int aldo_haltexpr_fmtdbg(const struct aldo_debugexpr *expr,
                          char buf[restrict static ALDO_HEXPR_FMT_SIZE])
 {
-    assert(expr != NULL);
-    assert(buf != NULL);
+    assert(expr != nullptr);
+    assert(buf != nullptr);
 
     int count;
     if (expr->type == ALDO_DBG_EXPR_RESET) {

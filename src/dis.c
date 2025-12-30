@@ -494,8 +494,8 @@ const char *aldo_dis_errstr(int err)
 int aldo_dis_parse_inst(const struct aldo_blockview *bv, size_t at,
                         struct aldo_dis_instruction *parsed)
 {
-    assert(bv != NULL);
-    assert(parsed != NULL);
+    assert(bv != nullptr);
+    assert(parsed != nullptr);
 
     *parsed = (struct aldo_dis_instruction){};
     if (!bv->mem) return ALDO_DIS_ERR_PRGROM;
@@ -527,8 +527,8 @@ int aldo_dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
 int aldo_dis_inst(uint16_t addr, const struct aldo_dis_instruction *inst,
                   char dis[restrict static ALDO_DIS_INST_SIZE])
 {
-    assert(inst != NULL);
-    assert(dis != NULL);
+    assert(inst != nullptr);
+    assert(dis != nullptr);
 
     if (!inst->bv.mem) {
         dis[0] = '\0';
@@ -559,8 +559,8 @@ int aldo_dis_inst(uint16_t addr, const struct aldo_dis_instruction *inst,
 int aldo_dis_datapath(const struct aldo_snapshot *snp,
                       char dis[restrict static ALDO_DIS_DATAP_SIZE])
 {
-    assert(snp != NULL);
-    assert(dis != NULL);
+    assert(snp != nullptr);
+    assert(dis != nullptr);
 
     struct aldo_dis_instruction inst;
     int err = aldo_dis_parsemem_inst(snp->prg.curr->length, snp->prg.curr->pc,
@@ -612,9 +612,9 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
 int aldo_dis_cart_prg(aldo_cart *cart, const char *restrict name, bool verbose,
                       bool unified_output, FILE *f)
 {
-    assert(cart != NULL);
-    assert(name != NULL);
-    assert(f != NULL);
+    assert(cart != nullptr);
+    assert(name != nullptr);
+    assert(f != nullptr);
 
     struct aldo_blockview bv = aldo_cart_prgblock(cart, 0);
     if (!bv.mem) return ALDO_DIS_ERR_PRGROM;
@@ -640,8 +640,8 @@ int aldo_dis_cart_prg(aldo_cart *cart, const char *restrict name, bool verbose,
 int aldo_dis_cart_chr(aldo_cart *cart, int chrscale,
                       const char *restrict chrdecode_prefix, FILE *output)
 {
-    assert(cart != NULL);
-    assert(output != NULL);
+    assert(cart != nullptr);
+    assert(output != nullptr);
 
     if (chrscale <= 0 || chrscale > ScaleGuard) return ALDO_DIS_ERR_CHRSCL;
 
@@ -675,8 +675,8 @@ int aldo_dis_cart_chr(aldo_cart *cart, int chrscale,
 
 int aldo_dis_cart_chrblock(const struct aldo_blockview *bv, int scale, FILE *f)
 {
-    assert(bv != NULL);
-    assert(f != NULL);
+    assert(bv != nullptr);
+    assert(f != nullptr);
 
     if (!bv->mem) return ALDO_DIS_ERR_CHRROM;
     if (scale <= 0 || scale > ScaleGuard) return ALDO_DIS_ERR_CHRSCL;
@@ -690,28 +690,28 @@ int aldo_dis_cart_chrblock(const struct aldo_blockview *bv, int scale, FILE *f)
 
 const char *aldo_dis_inst_mnemonic(const struct aldo_dis_instruction *inst)
 {
-    assert(inst != NULL);
+    assert(inst != nullptr);
 
     return mnemonic(inst->d.instruction);
 }
 
 const char *aldo_dis_inst_description(const struct aldo_dis_instruction *inst)
 {
-    assert(inst != NULL);
+    assert(inst != nullptr);
 
     return description(inst->d.instruction);
 }
 
 const char *aldo_dis_inst_addrmode(const struct aldo_dis_instruction *inst)
 {
-    assert(inst != NULL);
+    assert(inst != nullptr);
 
     return modename(inst->d.mode);
 }
 
 uint8_t aldo_dis_inst_flags(const struct aldo_dis_instruction *inst)
 {
-    assert(inst != NULL);
+    assert(inst != nullptr);
 
     return flags(inst->d.instruction);
 }
@@ -719,8 +719,8 @@ uint8_t aldo_dis_inst_flags(const struct aldo_dis_instruction *inst)
 int aldo_dis_inst_operand(const struct aldo_dis_instruction *inst,
                           char dis[restrict static ALDO_DIS_OPERAND_SIZE])
 {
-    assert(inst != NULL);
-    assert(dis != NULL);
+    assert(inst != nullptr);
+    assert(dis != nullptr);
 
     if (!inst->bv.mem) {
         dis[0] = '\0';
@@ -748,11 +748,11 @@ int aldo_dis_peek(struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
                   aldo_debugger *dbg, const struct aldo_snapshot *snp,
                   char dis[restrict static ALDO_DIS_PEEK_SIZE])
 {
-    assert(cpu != NULL);
-    assert(ppu != NULL);
-    assert(dbg != NULL);
-    assert(snp != NULL);
-    assert(dis != NULL);
+    assert(cpu != nullptr);
+    assert(ppu != nullptr);
+    assert(dbg != nullptr);
+    assert(snp != nullptr);
+    assert(dis != nullptr);
 
     int total = 0;
     const char *interrupt = interrupt_display(snp);

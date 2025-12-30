@@ -37,7 +37,7 @@ bool aldo_bus_swap(aldo_bus *self, uint16_t addr, struct aldo_busdevice bd,
 inline bool aldo_bus_set(aldo_bus *self, uint16_t addr,
                          struct aldo_busdevice bd)
 {
-    return aldo_bus_swap(self, addr, bd, NULL);
+    return aldo_bus_swap(self, addr, bd, nullptr);
 }
 inline bool aldo_bus_clear(aldo_bus *self, uint16_t addr)
 {

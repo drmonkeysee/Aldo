@@ -10,14 +10,13 @@
 #include "cpuhelp.h"
 #include "ctrlsignal.h"
 
-#include <stddef.h>
 #include <stdint.h>
 
 static struct aldo_peekresult run_peek(struct aldo_mos6502 *cpu)
 {
     // NOTE: run opcode fetch
     aldo_cpu_cycle(cpu);
-    struct aldo_peekresult result = aldo_cpu_peek_start(cpu, NULL);
+    struct aldo_peekresult result = aldo_cpu_peek_start(cpu, nullptr);
     do {
         aldo_cpu_peek(cpu, &result);
     } while (!result.done);
@@ -28,7 +27,7 @@ static struct aldo_peekresult run_peek(struct aldo_mos6502 *cpu)
 static void end_restores_state(void *ctx)
 {
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, NULL, NULL);
+    setup_cpu(&cpu, nullptr, nullptr);
     cpu.pc = 0x8000;
     cpu.a = 5;
     cpu.x = 1;
@@ -80,7 +79,7 @@ static void end_restores_state(void *ctx)
 static void end_retains_detached_state(void *ctx)
 {
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, NULL, NULL);
+    setup_cpu(&cpu, nullptr, nullptr);
     cpu.detached = true;
 
     ct_asserttrue(cpu.detached);
@@ -102,7 +101,7 @@ static void irq_ignored(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
 
-    aldo_cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, nullptr);
     cpu.s = 0xff;
     cpu.p.i = false;
     cpu.signal.irq = false;
@@ -121,7 +120,7 @@ static void nmi_ignored(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
 
-    aldo_cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, nullptr);
     cpu.s = 0xff;
     cpu.signal.nmi = false;
 
@@ -139,7 +138,7 @@ static void rst_not_ignored(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
 
-    aldo_cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, nullptr);
     cpu.s = 0xff;
     cpu.signal.rst = false;
 
@@ -157,7 +156,7 @@ static void writes_ignored(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
-    aldo_cpu_peek_start(&cpu, NULL);
+    aldo_cpu_peek_start(&cpu, nullptr);
 
     int cycles = exec_cpu(&cpu);
 

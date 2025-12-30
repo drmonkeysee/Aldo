@@ -202,7 +202,7 @@ static void disconnect_cart(struct aldo_nes001 *self)
     if (!self->cart) return;
     aldo_cart_vbus_disconnect(self->cart, self->ppu.vbus);
     aldo_cart_mbus_disconnect(self->cart, self->cpu.mbus);
-    self->cart = NULL;
+    self->cart = nullptr;
 }
 
 static bool setup(struct aldo_nes001 *self)
@@ -276,7 +276,7 @@ static void snapshot_screen(struct aldo_nes001 *self)
 {
     if (!self->snp) return;
 
-    assert(self->snp->video != NULL);
+    assert(self->snp->video != nullptr);
 
     self->snp->video->screen = self->vbufs[!self->vbuf];
     self->snp->video->newframe = true;
@@ -296,7 +296,7 @@ static void snapshot_sys(struct aldo_nes001 *self)
 {
     if (!self->snp) return;
 
-    assert(self->snp->prg.curr != NULL);
+    assert(self->snp->prg.curr != nullptr);
 
     snapshot_bus(self, self->snp);
     self->snp->mem.ram = self->ram;
@@ -389,12 +389,12 @@ static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
 
 aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
 {
-    assert(dbg != NULL);
+    assert(dbg != nullptr);
 
     struct aldo_nes001 *self = malloc(sizeof *self);
     if (!self) return self;
 
-    self->cart = NULL;
+    self->cart = nullptr;
     self->dbg = dbg;
     self->tracelog = tracelog;
     self->tracefailed = false;
@@ -408,14 +408,14 @@ aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
     }
     if (!setup(self)) {
         aldo_nes_free(self);
-        return NULL;
+        return nullptr;
     }
     return self;
 }
 
 void aldo_nes_free(aldo_nes *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     teardown(self);
     free(self);
@@ -423,8 +423,8 @@ void aldo_nes_free(aldo_nes *self)
 
 void aldo_nes_powerup(aldo_nes *self, aldo_cart *c, bool zeroram)
 {
-    assert(self != NULL);
-    assert(self->cart == NULL);
+    assert(self != nullptr);
+    assert(self->cart == nullptr);
 
     if (c) {
         connect_cart(self, c);
@@ -441,7 +441,7 @@ void aldo_nes_powerup(aldo_nes *self, aldo_cart *c, bool zeroram)
 
 void aldo_nes_powerdown(aldo_nes *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     aldo_nes_ready(self, false);
     disconnect_cart(self);
@@ -454,15 +454,15 @@ int aldo_nes_max_tcpu()
 
 size_t aldo_nes_ram_size(aldo_nes *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return aldo_arrsz(self->ram);
 }
 
 void aldo_nes_screen_size(int *width, int *height)
 {
-    assert(width != NULL);
-    assert(height != NULL);
+    assert(width != nullptr);
+    assert(height != nullptr);
 
     *width = SCREEN_WIDTH;
     *height = SCREEN_HEIGHT;
@@ -470,28 +470,28 @@ void aldo_nes_screen_size(int *width, int *height)
 
 bool aldo_nes_bcd_support(aldo_nes *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return self->cpu.bcd;
 }
 
 bool aldo_nes_tracefailed(aldo_nes *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return self->tracefailed;
 }
 
 enum aldo_execmode aldo_nes_mode(aldo_nes *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return self->mode;
 }
 
 void aldo_nes_set_mode(aldo_nes *self, enum aldo_execmode mode)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     // NOTE: force signed to check < 0 (underlying type may be uint)
     self->mode = (int)mode < 0 ? ALDO_EXC_COUNT - 1 : mode % ALDO_EXC_COUNT;
@@ -499,14 +499,14 @@ void aldo_nes_set_mode(aldo_nes *self, enum aldo_execmode mode)
 
 void aldo_nes_ready(aldo_nes *self, bool ready)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     self->cpu.signal.rdy = ready;
 }
 
 bool aldo_nes_probe(aldo_nes *self, enum aldo_interrupt signal)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     switch (signal) {
     case ALDO_INT_IRQ:
@@ -524,7 +524,7 @@ bool aldo_nes_probe(aldo_nes *self, enum aldo_interrupt signal)
 void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal,
                         bool active)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     switch (signal) {
     case ALDO_INT_IRQ:
@@ -544,8 +544,8 @@ void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal,
 
 void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
 {
-    assert(self != NULL);
-    assert(clock != NULL);
+    assert(self != nullptr);
+    assert(clock != nullptr);
 
     reset_snapshot(self->snp);
     while (self->cpu.signal.rdy && clock->budget > 0) {
@@ -568,7 +568,7 @@ int aldo_nes_frame_factor()
 
 void aldo_nes_set_snapshot(aldo_nes *self, struct aldo_snapshot *snp)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     self->snp = snp;
     init_snapshot(self);
@@ -576,9 +576,9 @@ void aldo_nes_set_snapshot(aldo_nes *self, struct aldo_snapshot *snp)
 
 void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3], bool errs[static 3])
 {
-    assert(self != NULL);
-    assert(fs != NULL);
-    assert(errs != NULL);
+    assert(self != nullptr);
+    assert(fs != nullptr);
+    assert(errs != nullptr);
 
     FILE *f;
     size_t witems, wcount;

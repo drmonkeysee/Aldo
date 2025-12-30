@@ -71,7 +71,7 @@ extern inline bool aldo_bus_clear(aldo_bus *, uint16_t);
 bool aldo_bus_swap(aldo_bus *self, uint16_t addr, struct aldo_busdevice bd,
                    struct aldo_busdevice *prev)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     if (addr > self->maxaddr) return false;
 
@@ -85,8 +85,8 @@ bool aldo_bus_swap(aldo_bus *self, uint16_t addr, struct aldo_busdevice bd,
 
 bool aldo_bus_read(aldo_bus *self, uint16_t addr, uint8_t *restrict d)
 {
-    assert(self != NULL);
-    assert(d != NULL);
+    assert(self != nullptr);
+    assert(d != nullptr);
 
     if (addr > self->maxaddr) return false;
 
@@ -98,7 +98,7 @@ bool aldo_bus_read(aldo_bus *self, uint16_t addr, uint8_t *restrict d)
 
 bool aldo_bus_write(aldo_bus *self, uint16_t addr, uint8_t d)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     if (addr > self->maxaddr) return false;
 
@@ -111,8 +111,8 @@ bool aldo_bus_write(aldo_bus *self, uint16_t addr, uint8_t d)
 size_t aldo_bus_copy(aldo_bus *self, uint16_t addr, size_t count,
                      uint8_t dest[restrict count])
 {
-    assert(self != NULL);
-    assert(dest != NULL);
+    assert(self != nullptr);
+    assert(dest != nullptr);
     assert(count < ALDO_MEMBLOCK_64KB);
 
     if (addr > self->maxaddr || count == 0) return 0;

@@ -123,7 +123,7 @@ static size_t raw_prgc(const void *restrict ctx, uint16_t addr, size_t count,
 
 static void raw_dtor(struct aldo_mapper *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     struct raw_mapper *m = (struct raw_mapper *)self;
     free(m->rom);
@@ -132,14 +132,14 @@ static void raw_dtor(struct aldo_mapper *self)
 
 static const uint8_t *raw_prgrom(const struct aldo_mapper *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return ((const struct raw_mapper *)self)->rom;
 }
 
 static bool raw_mbus_connect(struct aldo_mapper *self, aldo_bus *b)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return aldo_bus_set(b, ALDO_MEMBLOCK_32KB, (struct aldo_busdevice){
         .read = raw_prgr,
@@ -154,7 +154,7 @@ static bool raw_mbus_connect(struct aldo_mapper *self, aldo_bus *b)
 
 static void ines_dtor(struct aldo_mapper *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     struct ines_mapper *m = (struct ines_mapper *)self;
     free(m->chr);
@@ -165,14 +165,14 @@ static void ines_dtor(struct aldo_mapper *self)
 
 static const uint8_t *ines_prgrom(const struct aldo_mapper *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return ((const struct ines_mapper *)self)->prg;
 }
 
 static const uint8_t *ines_chrrom(const struct aldo_mapper *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return ((const struct ines_mapper *)self)->chr;
 }
@@ -282,7 +282,7 @@ static size_t ines_000_vrmc(const void *restrict ctx, uint16_t addr,
 // all CPU activity. Similar rules hold for PPU.
 static bool ines_000_mbus_connect(struct aldo_mapper *self, aldo_bus *b)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return aldo_bus_set(b, ALDO_MEMBLOCK_32KB, (struct aldo_busdevice){
         .read = ines_000_prgr,
@@ -293,12 +293,12 @@ static bool ines_000_mbus_connect(struct aldo_mapper *self, aldo_bus *b)
 
 static bool ines_000_vbus_connect(struct aldo_mapper *self, aldo_bus *b)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     struct ines_000_mapper *m = (struct ines_000_mapper *)self;
     return aldo_bus_set(b, 0, (struct aldo_busdevice){
         .read = ines_000_chrr,
-        .write = m->super.chrram ? ines_000_chrw : NULL,
+        .write = m->super.chrram ? ines_000_chrw : nullptr,
         .ctx = m,
     })
     // TODO: if this fails in release mode, assert won't stop it and disconnect
@@ -327,9 +327,9 @@ static void ines_000_vbus_disconnect(aldo_bus *b)
 static void ines_000_snapshot(struct aldo_mapper *self,
                               struct aldo_snapshot *snp)
 {
-    assert(self != NULL);
-    assert(snp != NULL);
-    assert(snp->video != NULL);
+    assert(self != nullptr);
+    assert(snp != nullptr);
+    assert(snp->video != nullptr);
 
     struct ines_000_mapper *m = (struct ines_000_mapper *)self;
     snp->video->nt.mirror = m->hmirroring
@@ -358,8 +358,8 @@ static void ines_000_snapshot(struct aldo_mapper *self,
 
 int aldo_mapper_raw_create(struct aldo_mapper **m, FILE *f)
 {
-    assert(m != NULL);
-    assert(f != NULL);
+    assert(m != nullptr);
+    assert(f != nullptr);
 
     struct raw_mapper *self = malloc(sizeof *self);
     if (!self) return ALDO_CART_ERR_ERNO;
@@ -386,9 +386,9 @@ int aldo_mapper_raw_create(struct aldo_mapper **m, FILE *f)
 int aldo_mapper_ines_create(struct aldo_mapper **m,
                             struct aldo_ines_header *header, FILE *f)
 {
-    assert(m != NULL);
-    assert(header != NULL);
-    assert(f != NULL);
+    assert(m != nullptr);
+    assert(header != nullptr);
+    assert(f != nullptr);
 
     struct ines_mapper *self;
     if (header->mapper_id == 0) {

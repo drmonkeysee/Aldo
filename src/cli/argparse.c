@@ -130,7 +130,7 @@ static bool parse_halt(const char *arg, int *restrict argi, int argc,
                        char *argv[argc+1], struct cliargs *restrict args)
 {
     size_t optlen = strlen(HaltLong);
-    const char *expr = NULL;
+    const char *expr = nullptr;
     if (arg[1] == HaltShort && arg[2] != '\0') {
         expr = arg + 2;
     } else if (strncmp(arg, HaltLong, optlen) == 0) {
@@ -217,7 +217,7 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
     SETFLAG(args->help, arg, HelpShort, HelpLong);
     SETFLAG(args->info, arg, InfoShort, InfoLong);
     SETFLAG(args->tron, arg, TraceShort, TraceLong);
-    SETFLAG(args->verbose, arg, VerboseShort, NULL);
+    SETFLAG(args->verbose, arg, VerboseShort, nullptr);
     SETFLAG(args->version, arg, VersionShort, VersionLong);
     SETFLAG(args->zeroram, arg, ZeroRamShort, ZeroRamLong);
 
@@ -233,8 +233,8 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
 bool argparse_parse(struct cliargs *restrict args, int argc,
                     char *argv[argc+1])
 {
-    assert(args != NULL);
-    assert(argc > 0 ? argv != NULL : true);
+    assert(args != nullptr);
+    assert(argc > 0 ? argv != nullptr : true);
 
     init_cliargs(args);
     args->me = argc > 0 && strlen(argv[0]) > 0 ? argv[0] : "aldo";
@@ -263,7 +263,7 @@ bool argparse_parse(struct cliargs *restrict args, int argc,
 
 const char *argparse_filename(const char *filepath)
 {
-    if (!filepath) return NULL;
+    if (!filepath) return nullptr;
 
     const char *last_slash = strrchr(filepath, '/');
     return last_slash ? last_slash + 1 : filepath;
@@ -344,7 +344,7 @@ void argparse_usage(const char *me)
 
 void argparse_cleanup(struct cliargs *args)
 {
-    assert(args != NULL);
+    assert(args != nullptr);
 
     for (struct haltarg *curr;
          args->haltlist;

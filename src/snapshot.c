@@ -17,7 +17,7 @@ static_assert(ALDO_PT_TILE_COUNT * ALDO_CHR_TILE_STRIDE == ALDO_MEMBLOCK_4KB,
 
 bool aldo_snapshot_extend(struct aldo_snapshot *snp)
 {
-    assert(snp != NULL);
+    assert(snp != nullptr);
 
     if (!(snp->prg.curr = malloc(sizeof *snp->prg.curr))) return false;
     if (!(snp->video = malloc(sizeof *snp->video))) {
@@ -29,7 +29,7 @@ bool aldo_snapshot_extend(struct aldo_snapshot *snp)
 
 void aldo_snapshot_cleanup(struct aldo_snapshot *snp)
 {
-    assert(snp != NULL);
+    assert(snp != nullptr);
 
     free(snp->video);
     free(snp->prg.curr);

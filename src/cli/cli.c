@@ -43,7 +43,7 @@ static void print_version()
 
 static aldo_cart *load_cart(const char *filename)
 {
-    aldo_cart *c = NULL;
+    aldo_cart *c = nullptr;
     FILE *f = fopen(filename, "rb");
     if (f) {
         int err = aldo_cart_create(&c, f);
@@ -192,7 +192,7 @@ static aldo_debugger *create_debugger(const struct cliargs *args)
     return dbg;
 exit_dbg:
     aldo_debug_free(dbg);
-    return NULL;
+    return nullptr;
 }
 
 static ui_loop *setup_ui(struct emulator *emu)
@@ -260,7 +260,7 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
     }
 
     int result = EXIT_SUCCESS;
-    FILE *tracelog = NULL;
+    FILE *tracelog = nullptr;
     if (emu.args->tron) {
         if (!(tracelog = fopen(tracefile, "w"))) {
             fprintf(stderr, "%s: ", tracefile);
@@ -292,7 +292,7 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
         result = EXIT_FAILURE;
     }
     dump_ram(&emu);
-    aldo_nes_set_snapshot(emu.console, NULL);
+    aldo_nes_set_snapshot(emu.console, nullptr);
     aldo_snapshot_cleanup(&emu.snapshot);
 exit_console:
     if (aldo_nes_tracefailed(emu.console)) {

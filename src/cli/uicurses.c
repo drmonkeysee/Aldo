@@ -731,9 +731,9 @@ static void raminit(struct view *v, int h, int w, int y, int x, int ramsheets)
 {
     static const int toprail_start = 7;
 
-    createwin(v, h, w, y, x, NULL);
+    createwin(v, h, w, y, x, nullptr);
     v->content = newpad((h - 4) * ramsheets, w - 2);
-    v->inner = NULL;
+    v->inner = nullptr;
 
     for (int col = 0; col < RamDim; ++col) {
         mvwprintw(v->win, 1, toprail_start + (col * RamColWidth), "%X", col);
@@ -939,7 +939,7 @@ static void cleanup_ui(struct layout *l)
 
 int ui_curses_loop(struct emulator *emu)
 {
-    assert(emu != NULL);
+    assert(emu != nullptr);
 
     static const int sheet_size = RamPageSize * 2;
 

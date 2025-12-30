@@ -32,7 +32,7 @@ extern const int Aldo_NoResetVector;
 aldo_export
 extern const ptrdiff_t Aldo_NoBreakpoint;
 
-// NOTE: if returns NULL then errno is set due to failed allocation
+// NOTE: if returns null then errno is set due to failed allocation
 aldo_export aldo_ownresult
 aldo_debugger *aldo_debug_new() aldo_nothrow;
 aldo_export

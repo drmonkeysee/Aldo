@@ -10,7 +10,6 @@
 #include "cpu.h"
 #include "cpuhelp.h"
 
-#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -22,7 +21,7 @@ static void bcc_nobranch(void *ctx)
 {
     uint8_t mem[] = {0x90, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
     int cycles = exec_cpu(&cpu);
@@ -35,7 +34,7 @@ static void bcc_positive(void *ctx)
 {
     uint8_t mem[] = {0x90, 0x5};    // $0002 + 5
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -47,7 +46,7 @@ static void bcc_negative(void *ctx)
 {
     uint8_t mem[] = {0xff, 0xff, 0xff, 0xff, 0x90, 0xfb};   // $0006 - 5
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.pc = 4;
 
     int cycles = exec_cpu(&cpu);
@@ -60,7 +59,7 @@ static void bcc_positive_overflow(void *ctx)
 {
     uint8_t mem[] = {[250] = 0x90, 0xa};    // $00FD + 10
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.pc = 250;
 
     int cycles = exec_cpu(&cpu);
@@ -76,7 +75,7 @@ static void bcc_positive_wraparound(void *ctx)
     rom[0xfffa & ALDO_ADDRMASK_32KB] = 0x90;
     rom[0xfffb & ALDO_ADDRMASK_32KB] = 0xa;
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, NULL, rom);
+    setup_cpu(&cpu, nullptr, rom);
     cpu.pc = 0xfffa;
 
     int cycles = exec_cpu(&cpu);
@@ -90,7 +89,7 @@ static void bcc_negative_overflow(void *ctx)
 {
     uint8_t mem[] = {[256] = 0x90, 0xf6};   // $0102 - 10
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.pc = 256;
 
     int cycles = exec_cpu(&cpu);
@@ -118,7 +117,7 @@ static void bcc_zero(void *ctx)
 {
     uint8_t mem[] = {0x90, 0x0};    // $0002 + 0
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -130,7 +129,7 @@ static void bcs_nobranch(void *ctx)
 {
     uint8_t mem[] = {0xb0, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -142,7 +141,7 @@ static void bcs_branch(void *ctx)
 {
     uint8_t mem[] = {0xb0, 0x5};    // $0002 + 5
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
     int cycles = exec_cpu(&cpu);
@@ -155,7 +154,7 @@ static void beq_nobranch(void *ctx)
 {
     uint8_t mem[] = {0xf0, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -167,7 +166,7 @@ static void beq_branch(void *ctx)
 {
     uint8_t mem[] = {0xf0, 0x5};    // $0002 + 5
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = true;
 
     int cycles = exec_cpu(&cpu);
@@ -180,7 +179,7 @@ static void bmi_nobranch(void *ctx)
 {
     uint8_t mem[] = {0x30, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -192,7 +191,7 @@ static void bmi_branch(void *ctx)
 {
     uint8_t mem[] = {0x30, 0x5};    // $0002 + 5
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.n = true;
 
     int cycles = exec_cpu(&cpu);
@@ -205,7 +204,7 @@ static void bne_nobranch(void *ctx)
 {
     uint8_t mem[] = {0xd0, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = true;
 
     int cycles = exec_cpu(&cpu);
@@ -218,7 +217,7 @@ static void bne_branch(void *ctx)
 {
     uint8_t mem[] = {0xd0, 0x5};    // $0002 + 5
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -230,7 +229,7 @@ static void bpl_nobranch(void *ctx)
 {
     uint8_t mem[] = {0x10, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.n = true;
 
     int cycles = exec_cpu(&cpu);
@@ -243,7 +242,7 @@ static void bpl_branch(void *ctx)
 {
     uint8_t mem[] = {0x10, 0x5};    // $0002 + 5
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -255,7 +254,7 @@ static void bvc_nobranch(void *ctx)
 {
     uint8_t mem[] = {0x50, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.v = true;
 
     int cycles = exec_cpu(&cpu);
@@ -268,7 +267,7 @@ static void bvc_branch(void *ctx)
 {
     uint8_t mem[] = {0x50, 0x5};    // $0002 + 5
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -280,7 +279,7 @@ static void bvs_nobranch(void *ctx)
 {
     uint8_t mem[] = {0x70, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -292,7 +291,7 @@ static void bvs_branch(void *ctx)
 {
     uint8_t mem[] = {0x70, 0x5};    // $0002 + 5
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.v = true;
 
     int cycles = exec_cpu(&cpu);

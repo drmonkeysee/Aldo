@@ -11,7 +11,6 @@
 #include "cpuhelp.h"
 #include "ctrlsignal.h"
 
-#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -1078,7 +1077,7 @@ static void clear_on_startup(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.irq);
     ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.nmi);
@@ -1090,7 +1089,7 @@ static void irq_poll_sequence(void *ctx)
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.i = false;
 
     cpu.signal.irq = false;
@@ -1120,7 +1119,7 @@ static void irq_short_sequence(void *ctx)
     // NOTE: LDA #$20
     uint8_t mem[] = {0xa9, 0x20, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.i = false;
 
     cpu.signal.irq = false;
@@ -1140,7 +1139,7 @@ static void irq_long_sequence(void *ctx)
     // NOTE: DEC $0004 (0x20)
     uint8_t mem[] = {0xce, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.i = false;
 
     cpu.signal.irq = false;
@@ -1180,7 +1179,7 @@ static void irq_branch_not_taken(void *ctx)
     // NOTE: BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = false;
     cpu.p.i = false;
 
@@ -1201,7 +1200,7 @@ static void irq_on_branch_taken_if_early_signal(void *ctx)
     // NOTE: BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = true;
     cpu.p.i = false;
 
@@ -1227,7 +1226,7 @@ static void irq_delayed_on_branch_taken_if_late_signal(void *ctx)
     // NOTE: BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = true;
     cpu.p.i = false;
 
@@ -1263,7 +1262,7 @@ static void irq_delayed_on_infinite_branch(void *ctx)
     // NOTE: BEQ -2 jump to itself
     uint8_t mem[] = {0xf0, 0xfe, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = true;
     cpu.p.i = false;
 
@@ -1304,7 +1303,7 @@ static void irq_on_branch_page_boundary(void *ctx)
     // NOTE: BEQ +5 -> $0101
     uint8_t mem[] = {[250] = 0xf0, 0x5, 0xff, [257] = 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = true;
     cpu.p.i = false;
     cpu.pc = 250;
@@ -1335,7 +1334,7 @@ static void irq_just_in_time(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.i = false;
 
     aldo_cpu_cycle(&cpu);
@@ -1365,7 +1364,7 @@ static void irq_too_late(void *ctx)
     // NOTE: LDA $0006 (0x99), LDA #$20
     uint8_t mem[] = {0xad, 0x6, 0x0, 0xa9, 0x20, 0xff, 0x99};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.i = false;
 
     aldo_cpu_cycle(&cpu);
@@ -1404,7 +1403,7 @@ static void irq_too_short(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     cpu.signal.irq = false;
     aldo_cpu_cycle(&cpu);
@@ -1423,7 +1422,7 @@ static void irq_level_dependent(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     cpu.signal.irq = false;
     aldo_cpu_cycle(&cpu);
@@ -1447,7 +1446,7 @@ static void irq_masked(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     cpu.signal.irq = false;
     aldo_cpu_cycle(&cpu);
@@ -1476,7 +1475,7 @@ static void irq_missed_by_sei(void *ctx)
     // NOTE: SEI
     uint8_t mem[] = {0x78, 0xff, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.i = false;
 
     cpu.signal.irq = false;
@@ -1498,7 +1497,7 @@ static void irq_missed_by_plp_set_mask(void *ctx)
     // NOTE: PLP (@ $0101)
     uint8_t mem[] = {0x28, 0xff, 0xff, 0xff, 0xff, [257] = 0x4};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.i = false;
 
     cpu.signal.irq = false;
@@ -1534,7 +1533,7 @@ static void irq_stopped_by_rti_set_mask(void *ctx)
         0x40, 0xff, 0xff, 0xff, 0xff, [257] = 0x4, [258] = 0x5, [259] = 0x0,
     };
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.i = false;
 
     cpu.signal.irq = false;
@@ -1580,7 +1579,7 @@ static void irq_missed_by_cli(void *ctx)
     // NOTE: CLI, LDA #$20
     uint8_t mem[] = {0x58, 0xa9, 0x20, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.i = true;
 
     cpu.signal.irq = false;
@@ -1614,7 +1613,7 @@ static void irq_missed_by_plp_clear_mask(void *ctx)
     // NOTE: PLP (@ $0101), LDA #$20
     uint8_t mem[] = {0x28, 0xa9, 0x20, 0xff, 0xff, [257] = 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.i = true;
 
     cpu.signal.irq = false;
@@ -1662,7 +1661,7 @@ static void irq_allowed_by_rti_clear_mask(void *ctx)
         0x40, 0xff, 0xff, 0xff, 0xff, [257] = 0x0, [258] = 0x5, [259] = 0x0,
     };
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.i = true;
 
     cpu.signal.irq = false;
@@ -1707,7 +1706,7 @@ static void irq_detect_duplicate(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     // NOTE: simulate irq held active during and after servicing interrupt
     cpu.signal.irq = false;
@@ -1736,7 +1735,7 @@ static void nmi_poll_sequence(void *ctx)
     // NOTE: LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     cpu.signal.nmi = false;
     aldo_cpu_cycle(&cpu);
@@ -1765,7 +1764,7 @@ static void nmi_short_sequence(void *ctx)
     // NOTE: LDA #$20
     uint8_t mem[] = {0xa9, 0x20, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     cpu.signal.nmi = false;
     aldo_cpu_cycle(&cpu);
@@ -1784,7 +1783,7 @@ static void nmi_long_sequence(void *ctx)
     // NOTE: DEC $0004 (0x20)
     uint8_t mem[] = {0xce, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     cpu.signal.nmi = false;
     aldo_cpu_cycle(&cpu);
@@ -1823,7 +1822,7 @@ static void nmi_branch_not_taken(void *ctx)
     // NOTE: BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = false;
 
     cpu.signal.nmi = false;
@@ -1843,7 +1842,7 @@ static void nmi_on_branch_taken_if_early_signal(void *ctx)
     // NOTE: BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = true;
 
     cpu.signal.nmi = false;
@@ -1868,7 +1867,7 @@ static void nmi_delayed_on_branch_taken_if_late_signal(void *ctx)
     // NOTE: BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = true;
 
     aldo_cpu_cycle(&cpu);
@@ -1903,7 +1902,7 @@ static void nmi_delayed_on_infinite_branch(void *ctx)
     // NOTE: BEQ -2 jump to itself
     uint8_t mem[] = {0xf0, 0xfe, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = true;
 
     aldo_cpu_cycle(&cpu);
@@ -1943,7 +1942,7 @@ static void nmi_on_branch_page_boundary(void *ctx)
     // NOTE: BEQ +5 -> $0101
     uint8_t mem[] = {[250] = 0xf0, 0x5, 0xff, [257] = 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = true;
     cpu.pc = 250;
 
@@ -1973,7 +1972,7 @@ static void nmi_just_in_time(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     aldo_cpu_cycle(&cpu);
 
@@ -2002,7 +2001,7 @@ static void nmi_too_late(void *ctx)
     // NOTE: LDA $0006 (0x99), LDA #$20
     uint8_t mem[] = {0xad, 0x6, 0x0, 0xa9, 0x20, 0xff, 0x99};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     aldo_cpu_cycle(&cpu);
 
@@ -2040,7 +2039,7 @@ static void nmi_too_short(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     cpu.signal.nmi = false;
     aldo_cpu_cycle(&cpu);
@@ -2059,7 +2058,7 @@ static void nmi_edge_persist(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     cpu.signal.nmi = false;
     aldo_cpu_cycle(&cpu);
@@ -2083,7 +2082,7 @@ static void nmi_serviced_only_clears_on_inactive(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     // NOTE: simulate nmi held active during and after servicing interrupt
     cpu.signal.nmi = false;
@@ -2115,7 +2114,7 @@ static void rst_detected_and_cpu_held(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     cpu.signal.rst = false;
     aldo_cpu_cycle(&cpu);
@@ -2143,7 +2142,7 @@ static void rst_too_short(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     cpu.signal.rst = false;
     aldo_cpu_cycle(&cpu);

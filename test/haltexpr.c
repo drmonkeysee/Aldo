@@ -8,7 +8,6 @@
 #include "ciny.h"
 #include "haltexpr.h"
 
-#include <stddef.h>
 #include <string.h>
 
 //
@@ -35,7 +34,7 @@ static void errstr_returns_unknown_err(void *ctx)
 
 static void null_string(void *ctx)
 {
-    const char *str = NULL;
+    const char *str = nullptr;
     struct aldo_haltexpr expr;
 
     int result = aldo_haltexpr_parse(str, &expr);
@@ -530,7 +529,7 @@ static void expr_missing_unit(void *ctx)
 
 static void null_resetvector_string(void *ctx)
 {
-    const char *str = NULL;
+    const char *str = nullptr;
     struct aldo_debugexpr vector;
 
     int result = aldo_haltexpr_parse_dbg(str, &vector);

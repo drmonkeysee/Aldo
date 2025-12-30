@@ -9,7 +9,6 @@
 #include "cpu.h"
 #include "cpuhelp.h"
 
-#include <stddef.h>
 #include <stdint.h>
 
 //
@@ -20,7 +19,7 @@ static void jmp(void *ctx)
 {
     uint8_t mem[] = {0x4c, 0x1, 0x80};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 

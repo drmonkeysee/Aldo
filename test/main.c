@@ -80,7 +80,7 @@ static size_t testrunner(int argc, char *argv[argc+1])
 
 size_t swift_runner()
 {
-    char *args[] = {"swift-tests", "--ct-colorized=no", NULL};
+    char *args[] = {"swift-tests", "--ct-colorized=no", nullptr};
     return testrunner((sizeof args / sizeof args[0]) - 1, args);
 }
 

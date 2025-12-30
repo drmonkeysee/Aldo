@@ -9,13 +9,12 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stddef.h>
 
 extern inline double aldo_timespec_to_ms(const struct timespec *);
 
 struct timespec aldo_elapsed(const struct timespec *from)
 {
-    assert(from != NULL);
+    assert(from != nullptr);
 
     struct timespec now, elapsed;
     clock_gettime(CLOCK_MONOTONIC, &now);

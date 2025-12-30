@@ -21,8 +21,8 @@ size_t aldo_bytecopy_bank(const uint8_t *restrict bankmem, int bankwidth,
                           uint16_t addr, size_t count,
                           uint8_t dest[restrict count])
 {
-    assert(bankmem != NULL);
-    assert(dest != NULL);
+    assert(bankmem != nullptr);
+    assert(dest != nullptr);
     assert(ALDO_BITWIDTH_1KB <= bankwidth && bankwidth <= ALDO_BITWIDTH_64KB);
 
     size_t

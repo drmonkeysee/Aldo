@@ -140,14 +140,14 @@ static bool bpvector_init(struct breakpoint_vector *vec)
         .capacity = initial_capacity,
         .items = calloc(initial_capacity, sizeof *vec->items),
     };
-    return vec->items != NULL;
+    return vec->items != nullptr;
 }
 
 static struct aldo_breakpoint *bpvector_at(const struct breakpoint_vector *vec,
                                            ptrdiff_t at)
 {
     if (bpvector_valid_index(vec, at)) return vec->items + at;
-    return NULL;
+    return nullptr;
 }
 
 static bool bpvector_resize(struct breakpoint_vector *vec)
@@ -159,7 +159,7 @@ static bool bpvector_resize(struct breakpoint_vector *vec)
     if (bpv) {
         vec->items = bpv;
     }
-    return bpv != NULL;
+    return bpv != nullptr;
 }
 
 static bool bpvector_insert(struct breakpoint_vector *vec,
@@ -248,14 +248,14 @@ aldo_debugger *aldo_debug_new()
     };
     if (!bpvector_init(&self->breakpoints)) {
         aldo_debug_free(self);
-        return NULL;
+        return nullptr;
     }
     return self;
 }
 
 void aldo_debug_free(aldo_debugger *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     bpvector_free(&self->breakpoints);
     free(self);
@@ -263,14 +263,14 @@ void aldo_debug_free(aldo_debugger *self)
 
 int aldo_debug_vector_override(aldo_debugger *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return self->resetvector;
 }
 
 void aldo_debug_set_vector_override(aldo_debugger *self, int resetvector)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     self->resetvector = resetvector;
     update_reset_override(self);
@@ -278,7 +278,7 @@ void aldo_debug_set_vector_override(aldo_debugger *self, int resetvector)
 
 bool aldo_debug_bp_add(aldo_debugger *self, struct aldo_haltexpr expr)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
     assert(ALDO_HLT_NONE < expr.cond && expr.cond < ALDO_HLT_COUNT);
 
     return bpvector_insert(&self->breakpoints, expr);
@@ -287,14 +287,14 @@ bool aldo_debug_bp_add(aldo_debugger *self, struct aldo_haltexpr expr)
 const struct aldo_breakpoint *aldo_debug_bp_at(aldo_debugger *self,
                                                ptrdiff_t at)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return bpvector_at(&self->breakpoints, at);
 }
 
 void aldo_debug_bp_enable(aldo_debugger *self, ptrdiff_t at, bool enabled)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     struct aldo_breakpoint *bp = bpvector_at(&self->breakpoints, at);
     if (bp) {
@@ -304,23 +304,23 @@ void aldo_debug_bp_enable(aldo_debugger *self, ptrdiff_t at, bool enabled)
 
 const struct aldo_breakpoint *aldo_debug_halted(aldo_debugger *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return self->halted == Aldo_NoBreakpoint
-            ? NULL
+            ? nullptr
             : aldo_debug_bp_at(self, self->halted);
 }
 
 ptrdiff_t aldo_debug_halted_at(aldo_debugger *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return self->halted;
 }
 
 void aldo_debug_bp_remove(aldo_debugger *self, ptrdiff_t at)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     if (!bpvector_remove(&self->breakpoints, at)) return;
 
@@ -336,7 +336,7 @@ void aldo_debug_bp_remove(aldo_debugger *self, ptrdiff_t at)
 
 void aldo_debug_bp_clear(aldo_debugger *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     bpvector_clear(&self->breakpoints);
     self->halted = Aldo_NoBreakpoint;
@@ -344,14 +344,14 @@ void aldo_debug_bp_clear(aldo_debugger *self)
 
 size_t aldo_debug_bp_count(aldo_debugger *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     return self->breakpoints.size;
 }
 
 void aldo_debug_reset(aldo_debugger *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     aldo_debug_set_vector_override(self, Aldo_NoResetVector);
     aldo_debug_bp_clear(self);
@@ -363,22 +363,22 @@ void aldo_debug_reset(aldo_debugger *self)
 
 void aldo_debug_cpu_connect(aldo_debugger *self, struct aldo_mos6502 *cpu)
 {
-    assert(self != NULL);
-    assert(cpu != NULL);
+    assert(self != nullptr);
+    assert(cpu != nullptr);
 
     self->cpu = cpu;
 }
 
 void aldo_debug_cpu_disconnect(aldo_debugger *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
-    self->cpu = NULL;
+    self->cpu = nullptr;
 }
 
 void aldo_debug_sync_bus(aldo_debugger *self)
 {
-    assert(self != NULL);
+    assert(self != nullptr);
 
     if (self->resetvector == Aldo_NoResetVector || !self->cpu) return;
 
@@ -397,8 +397,8 @@ void aldo_debug_sync_bus(aldo_debugger *self)
 
 void aldo_debug_check(aldo_debugger *self, const struct aldo_clock *clk)
 {
-    assert(self != NULL);
-    assert(clk != NULL);
+    assert(self != nullptr);
+    assert(clk != nullptr);
 
     if (!self->cpu) return;
 

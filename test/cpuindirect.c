@@ -9,7 +9,6 @@
 #include "cpu.h"
 #include "cpuhelp.h"
 
-#include <stddef.h>
 #include <stdint.h>
 
 //
@@ -321,7 +320,7 @@ static void sta_indx(void *ctx)
         0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
     cpu.x = 4;
 
@@ -340,7 +339,7 @@ static void sta_indx_pageoverflow(void *ctx)
         0x0, 0x0, 0x0, 0x0, 0x0,
     };
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
     cpu.x = 0xff;   // Wrap around from $0008 -> $0007
 
@@ -654,7 +653,7 @@ static void sta_indy(void *ctx)
         0x0, 0x0, 0x0, 0x0, 0x0
     };
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
     cpu.y = 3;
 
@@ -1135,7 +1134,7 @@ static void sax_indx(void *ctx)
         0xb, 0x0, 0x0, 0x0, 0x0, 0x0,
     };
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
     cpu.x = 6;
 
@@ -1154,7 +1153,7 @@ static void sax_indx_pageoverflow(void *ctx)
         0x0, 0x0, 0x0, 0x0, 0x0,
     };
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 7;
     cpu.x = 0xfb;   // Wrap around from $0008 -> $0003
 
@@ -1173,7 +1172,7 @@ static void sha_indy(void *ctx)
         [256] = 0xff, 0xff, 0xff, 0xee,
     };
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
     cpu.x = 0xe;
     cpu.y = 3;
@@ -1192,7 +1191,7 @@ static void sha_indy_pagecross(void *ctx)
 {
     uint8_t mem[] = {0x93, 0x2, 0xff, 0xfe};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xea;
     cpu.x = 0xf8;
     cpu.y = 3;  // Cross boundary from $FEFF -> $FF02

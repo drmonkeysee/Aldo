@@ -21,7 +21,7 @@ static void adc_zp(void *ctx)
 {
     uint8_t mem[] = {0x65, 0x4, 0xff, 0xff, 0x6};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 + 6
 
     int cycles = exec_cpu(&cpu);
@@ -40,7 +40,7 @@ static void and_zp(void *ctx)
 {
     uint8_t mem[] = {0x25, 0x4, 0xff, 0xff, 0xc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
 
     int cycles = exec_cpu(&cpu);
@@ -57,7 +57,7 @@ static void asl_zp(void *ctx)
 {
     uint8_t mem[] = {0x6, 0x4, 0xff, 0xff, 0x1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -74,7 +74,7 @@ static void asl_zp_carry(void *ctx)
 {
     uint8_t mem[] = {0x6, 0x4, 0xff, 0xff, 0x81};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -91,7 +91,7 @@ static void asl_zp_zero(void *ctx)
 {
     uint8_t mem[] = {0x6, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -108,7 +108,7 @@ static void asl_zp_carryzero(void *ctx)
 {
     uint8_t mem[] = {0x6, 0x4, 0xff, 0xff, 0x80};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -125,7 +125,7 @@ static void asl_zp_negative(void *ctx)
 {
     uint8_t mem[] = {0x6, 0x4, 0xff, 0xff, 0x40};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -142,7 +142,7 @@ static void asl_zp_carrynegative(void *ctx)
 {
     uint8_t mem[] = {0x6, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -159,7 +159,7 @@ static void asl_zp_all_ones(void *ctx)
 {
     uint8_t mem[] = {0x6, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
     int cycles = exec_cpu(&cpu);
@@ -177,7 +177,7 @@ static void bit_zp_maskset(void *ctx)
 {
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0x6};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 2;
 
     int cycles = exec_cpu(&cpu);
@@ -195,7 +195,7 @@ static void bit_zp_maskclear(void *ctx)
 {
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 2;
 
     int cycles = exec_cpu(&cpu);
@@ -213,7 +213,7 @@ static void bit_zp_highmaskset(void *ctx)
 {
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0x3f};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x20;
 
     int cycles = exec_cpu(&cpu);
@@ -231,7 +231,7 @@ static void bit_zp_highmaskclear(void *ctx)
 {
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0x1f};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x20;
 
     int cycles = exec_cpu(&cpu);
@@ -249,7 +249,7 @@ static void bit_zp_sixmaskset(void *ctx)
 {
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0x6f};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x40;
 
     int cycles = exec_cpu(&cpu);
@@ -267,7 +267,7 @@ static void bit_zp_sixmaskclear(void *ctx)
 {
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0x3f};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x40;
 
     int cycles = exec_cpu(&cpu);
@@ -285,7 +285,7 @@ static void bit_zp_sevenmaskset(void *ctx)
 {
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0xbf};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;
 
     int cycles = exec_cpu(&cpu);
@@ -303,7 +303,7 @@ static void bit_zp_sevenmaskclear(void *ctx)
 {
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0x3f};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;
 
     int cycles = exec_cpu(&cpu);
@@ -321,7 +321,7 @@ static void bit_zp_set_high(void *ctx)
 {
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0xc2};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 2;
 
     int cycles = exec_cpu(&cpu);
@@ -339,7 +339,7 @@ static void bit_zp_zero_set_high(void *ctx)
 {
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0xc2};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
     int cycles = exec_cpu(&cpu);
@@ -357,7 +357,7 @@ static void bit_zp_max_set_high(void *ctx)
 {
     uint8_t mem[] = {0x24, 0x4, 0xff, 0xff, 0xc2};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;
 
     int cycles = exec_cpu(&cpu);
@@ -375,7 +375,7 @@ static void cmp_zp(void *ctx)
 {
     uint8_t mem[] = {0xc5, 0x4, 0xff, 0xff, 0x10};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
 
     int cycles = exec_cpu(&cpu);
@@ -393,7 +393,7 @@ static void cpx_zp(void *ctx)
 {
     uint8_t mem[] = {0xe4, 0x4, 0xff, 0xff, 0x10};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0x10;
 
     int cycles = exec_cpu(&cpu);
@@ -411,7 +411,7 @@ static void cpy_zp(void *ctx)
 {
     uint8_t mem[] = {0xc4, 0x4, 0xff, 0xff, 0x10};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0x10;
 
     int cycles = exec_cpu(&cpu);
@@ -429,7 +429,7 @@ static void dec_zp(void *ctx)
 {
     uint8_t mem[] = {0xc6, 0x4, 0xff, 0xff, 0x10};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -445,7 +445,7 @@ static void dec_zp_zero(void *ctx)
 {
     uint8_t mem[] = {0xc6, 0x4, 0xff, 0xff, 0x1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -461,7 +461,7 @@ static void dec_zp_negative(void *ctx)
 {
     uint8_t mem[] = {0xc6, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -477,7 +477,7 @@ static void eor_zp(void *ctx)
 {
     uint8_t mem[] = {0x45, 0x4, 0xff, 0xff, 0xfc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xfa;
 
     int cycles = exec_cpu(&cpu);
@@ -494,7 +494,7 @@ static void inc_zp(void *ctx)
 {
     uint8_t mem[] = {0xe6, 0x4, 0xff, 0xff, 0x10};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -510,7 +510,7 @@ static void inc_zp_zero(void *ctx)
 {
     uint8_t mem[] = {0xe6, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -526,7 +526,7 @@ static void inc_zp_negative(void *ctx)
 {
     uint8_t mem[] = {0xe6, 0x4, 0xff, 0xff, 0x7f};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -542,7 +542,7 @@ static void lda_zp(void *ctx)
 {
     uint8_t mem[] = {0xa5, 0x4, 0xff, 0xff, 0x45};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -558,7 +558,7 @@ static void ldx_zp(void *ctx)
 {
     uint8_t mem[] = {0xa6, 0x4, 0xff, 0xff, 0x45};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -574,7 +574,7 @@ static void ldy_zp(void *ctx)
 {
     uint8_t mem[] = {0xa4, 0x4, 0xff, 0xff, 0x45};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -590,7 +590,7 @@ static void lsr_zp(void *ctx)
 {
     uint8_t mem[] = {0x46, 0x4, 0xff, 0xff, 0x2};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -607,7 +607,7 @@ static void lsr_zp_carry(void *ctx)
 {
     uint8_t mem[] = {0x46, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -624,7 +624,7 @@ static void lsr_zp_zero(void *ctx)
 {
     uint8_t mem[] = {0x46, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -641,7 +641,7 @@ static void lsr_zp_carryzero(void *ctx)
 {
     uint8_t mem[] = {0x46, 0x4, 0xff, 0xff, 0x1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -658,7 +658,7 @@ static void lsr_zp_negative_to_positive(void *ctx)
 {
     uint8_t mem[] = {0x46, 0x4, 0xff, 0xff, 0x80};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -675,7 +675,7 @@ static void lsr_zp_all_ones(void *ctx)
 {
     uint8_t mem[] = {0x46, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -692,7 +692,7 @@ static void ora_zp(void *ctx)
 {
     uint8_t mem[] = {0x5, 0x4, 0xff, 0xff, 0xc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
 
     int cycles = exec_cpu(&cpu);
@@ -709,7 +709,7 @@ static void rol_zp(void *ctx)
 {
     uint8_t mem[] = {0x26, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
     int cycles = exec_cpu(&cpu);
@@ -727,7 +727,7 @@ static void rol_zp_carry(void *ctx)
 {
     uint8_t mem[] = {0x26, 0x4, 0xff, 0xff, 0x81};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -744,7 +744,7 @@ static void rol_zp_zero(void *ctx)
 {
     uint8_t mem[] = {0x26, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -761,7 +761,7 @@ static void rol_zp_carryzero(void *ctx)
 {
     uint8_t mem[] = {0x26, 0x4, 0xff, 0xff, 0x80};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -778,7 +778,7 @@ static void rol_zp_negative(void *ctx)
 {
     uint8_t mem[] = {0x26, 0x4, 0xff, 0xff, 0x40};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
     int cycles = exec_cpu(&cpu);
@@ -796,7 +796,7 @@ static void rol_zp_carrynegative(void *ctx)
 {
     uint8_t mem[] = {0x26, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -813,7 +813,7 @@ static void rol_zp_all_ones(void *ctx)
 {
     uint8_t mem[] = {0x26, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
     int cycles = exec_cpu(&cpu);
@@ -831,7 +831,7 @@ static void ror_zp(void *ctx)
 {
     uint8_t mem[] = {0x66, 0x4, 0xff, 0xff, 0x2};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -848,7 +848,7 @@ static void ror_zp_carry(void *ctx)
 {
     uint8_t mem[] = {0x66, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -865,7 +865,7 @@ static void ror_zp_zero(void *ctx)
 {
     uint8_t mem[] = {0x66, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -882,7 +882,7 @@ static void ror_zp_carryzero(void *ctx)
 {
     uint8_t mem[] = {0x66, 0x4, 0xff, 0xff, 0x1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -899,7 +899,7 @@ static void ror_zp_negative(void *ctx)
 {
     uint8_t mem[] = {0x66, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
     int cycles = exec_cpu(&cpu);
@@ -917,7 +917,7 @@ static void ror_zp_carrynegative(void *ctx)
 {
     uint8_t mem[] = {0x66, 0x4, 0xff, 0xff, 0x1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
     int cycles = exec_cpu(&cpu);
@@ -935,7 +935,7 @@ static void ror_zp_all_ones(void *ctx)
 {
     uint8_t mem[] = {0x66, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
     int cycles = exec_cpu(&cpu);
@@ -953,7 +953,7 @@ static void sbc_zp(void *ctx)
 {
     uint8_t mem[] = {0xe5, 0x4, 0xff, 0xff, 0x6};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
 
@@ -973,7 +973,7 @@ static void sta_zp(void *ctx)
 {
     uint8_t mem[] = {0x85, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
 
     int cycles = exec_cpu(&cpu);
@@ -988,7 +988,7 @@ static void stx_zp(void *ctx)
 {
     uint8_t mem[] = {0x86, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xf1;
 
     int cycles = exec_cpu(&cpu);
@@ -1003,7 +1003,7 @@ static void sty_zp(void *ctx)
 {
     uint8_t mem[] = {0x84, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0x84;
 
     int cycles = exec_cpu(&cpu);
@@ -1022,7 +1022,7 @@ static void adc_zpx(void *ctx)
 {
     uint8_t mem[] = {0x75, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x6};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 + 6
     cpu.x = 4;
 
@@ -1042,7 +1042,7 @@ static void adc_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x75, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x6};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 + 34
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
@@ -1062,7 +1062,7 @@ static void and_zpx(void *ctx)
 {
     uint8_t mem[] = {0x35, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
     cpu.x = 4;
 
@@ -1080,7 +1080,7 @@ static void and_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x35, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0xfc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
@@ -1098,7 +1098,7 @@ static void asl_zpx(void *ctx)
 {
     uint8_t mem[] = {0x16, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
 
     int cycles = exec_cpu(&cpu);
@@ -1116,7 +1116,7 @@ static void asl_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x16, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0xfc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
     int cycles = exec_cpu(&cpu);
@@ -1134,7 +1134,7 @@ static void cmp_zpx(void *ctx)
 {
     uint8_t mem[] = {0xd5, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x10};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
     cpu.x = 4;
 
@@ -1153,7 +1153,7 @@ static void cmp_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xd5, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x10};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
@@ -1172,7 +1172,7 @@ static void dec_zpx(void *ctx)
 {
     uint8_t mem[] = {0xd6, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x10};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
 
     int cycles = exec_cpu(&cpu);
@@ -1189,7 +1189,7 @@ static void dec_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xd6, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x10};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
     int cycles = exec_cpu(&cpu);
@@ -1206,7 +1206,7 @@ static void eor_zpx(void *ctx)
 {
     uint8_t mem[] = {0x55, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xfa;
     cpu.x = 4;
 
@@ -1224,7 +1224,7 @@ static void eor_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x55, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0xfc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
@@ -1242,7 +1242,7 @@ static void inc_zpx(void *ctx)
 {
     uint8_t mem[] = {0xf6, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x10};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
 
     int cycles = exec_cpu(&cpu);
@@ -1259,7 +1259,7 @@ static void inc_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xf6, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x10};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
     int cycles = exec_cpu(&cpu);
@@ -1276,7 +1276,7 @@ static void lda_zpx(void *ctx)
 {
     uint8_t mem[] = {0xb5, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x56};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
 
     int cycles = exec_cpu(&cpu);
@@ -1293,7 +1293,7 @@ static void lda_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xb5, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x56};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
     int cycles = exec_cpu(&cpu);
@@ -1310,7 +1310,7 @@ static void ldy_zpx(void *ctx)
 {
     uint8_t mem[] = {0xb4, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x56};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
 
     int cycles = exec_cpu(&cpu);
@@ -1327,7 +1327,7 @@ static void ldy_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xb4, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x56};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
     int cycles = exec_cpu(&cpu);
@@ -1344,7 +1344,7 @@ static void lsr_zpx(void *ctx)
 {
     uint8_t mem[] = {0x56, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x2};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
 
     int cycles = exec_cpu(&cpu);
@@ -1362,7 +1362,7 @@ static void lsr_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x56, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0xfc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
     int cycles = exec_cpu(&cpu);
@@ -1380,7 +1380,7 @@ static void ora_zpx(void *ctx)
 {
     uint8_t mem[] = {0x15, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
     cpu.x = 4;
 
@@ -1398,7 +1398,7 @@ static void ora_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x15, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0xfc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
@@ -1416,7 +1416,7 @@ static void rol_zpx(void *ctx)
 {
     uint8_t mem[] = {0x36, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
     cpu.p.c = true;
 
@@ -1435,7 +1435,7 @@ static void rol_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x36, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0xfc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
     int cycles = exec_cpu(&cpu);
@@ -1453,7 +1453,7 @@ static void ror_zpx(void *ctx)
 {
     uint8_t mem[] = {0x76, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
     cpu.p.c = true;
 
@@ -1472,7 +1472,7 @@ static void ror_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x76, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0xfc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
     int cycles = exec_cpu(&cpu);
@@ -1490,7 +1490,7 @@ static void sbc_zpx(void *ctx)
 {
     uint8_t mem[] = {0xf5, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x6};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
     cpu.x = 4;
@@ -1511,7 +1511,7 @@ static void sbc_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xf5, 0x3, 0x8, 0xff, 0xff, 0xff, 0xff, 0x6};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 8
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
@@ -1532,7 +1532,7 @@ static void sta_zpx(void *ctx)
 {
     uint8_t mem[] = {0x95, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
     cpu.x = 4;
 
@@ -1548,7 +1548,7 @@ static void sta_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x95, 0x3, 0x8, 0xff, 0xff, 0xff, 0xff, 0x6};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
@@ -1564,7 +1564,7 @@ static void sty_zpx(void *ctx)
 {
     uint8_t mem[] = {0x94, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0x84;
     cpu.x = 4;
 
@@ -1580,7 +1580,7 @@ static void sty_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x94, 0x3, 0x8, 0xff, 0xff, 0xff, 0xff, 0x6};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0x84;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
@@ -1600,7 +1600,7 @@ static void ldx_zpy(void *ctx)
 {
     uint8_t mem[] = {0xb6, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x56};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.y = 4;
 
     int cycles = exec_cpu(&cpu);
@@ -1617,7 +1617,7 @@ static void ldx_zpy_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xb6, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x56};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0xff;   // Wrap around from $0003 -> $0002
 
     int cycles = exec_cpu(&cpu);
@@ -1634,7 +1634,7 @@ static void stx_zpy(void *ctx)
 {
     uint8_t mem[] = {0x96, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xf1;
     cpu.y = 4;
 
@@ -1650,7 +1650,7 @@ static void stx_zpy_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x96, 0x3, 0x8, 0xff, 0xff, 0xff, 0xff, 0x6};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xf1;
     cpu.y = 0xff;   // Wrap around from $0003 -> $0002
 
@@ -1670,7 +1670,7 @@ static void dcp_zp_equal(void *ctx)
 {
     uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x11};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
 
     int cycles = exec_cpu(&cpu);
@@ -1689,7 +1689,7 @@ static void dcp_zp_lt(void *ctx)
 {
     uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x41};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
 
     int cycles = exec_cpu(&cpu);
@@ -1708,7 +1708,7 @@ static void dcp_zp_gt(void *ctx)
 {
     uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x7};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
 
     int cycles = exec_cpu(&cpu);
@@ -1727,7 +1727,7 @@ static void dcp_zp_max_to_min(void *ctx)
 {
     uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;
 
     int cycles = exec_cpu(&cpu);
@@ -1746,7 +1746,7 @@ static void dcp_zp_max_to_max(void *ctx)
 {
     uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;
 
     int cycles = exec_cpu(&cpu);
@@ -1765,7 +1765,7 @@ static void dcp_zp_min_to_max(void *ctx)
 {
     uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
     int cycles = exec_cpu(&cpu);
@@ -1784,7 +1784,7 @@ static void dcp_zp_min_to_min(void *ctx)
 {
     uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
     int cycles = exec_cpu(&cpu);
@@ -1803,7 +1803,7 @@ static void dcp_zp_neg_equal(void *ctx)
 {
     uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0xa1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa0;
 
     int cycles = exec_cpu(&cpu);
@@ -1822,7 +1822,7 @@ static void dcp_zp_neg_lt(void *ctx)
 {
     uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa0;
 
     int cycles = exec_cpu(&cpu);
@@ -1841,7 +1841,7 @@ static void dcp_zp_neg_gt(void *ctx)
 {
     uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x91};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa0;
 
     int cycles = exec_cpu(&cpu);
@@ -1860,7 +1860,7 @@ static void dcp_zp_negative_to_positive(void *ctx)
 {
     uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x2};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;    // Effectively -128 - 1 = 127
 
     int cycles = exec_cpu(&cpu);
@@ -1880,7 +1880,7 @@ static void dcp_zp_positive_to_negative(void *ctx)
 {
     uint8_t mem[] = {0xc7, 0x4, 0xff, 0xff, 0x2};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;  // Effectively 0 - 1 = -1
 
     int cycles = exec_cpu(&cpu);
@@ -1900,7 +1900,7 @@ static void dcp_zpx(void *ctx)
 {
     uint8_t mem[] = {0xd7, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x11};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
     cpu.x = 4;
 
@@ -1920,7 +1920,7 @@ static void dcp_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xd7, 0x3, 0x23, 0xff, 0xff, 0xff, 0xff, 0x10};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
@@ -1940,7 +1940,7 @@ static void isc_zp(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
 
@@ -1961,7 +1961,7 @@ static void isc_zp_borrowout(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 - 6 - B
 
     int cycles = exec_cpu(&cpu);
@@ -1981,7 +1981,7 @@ static void isc_zp_borrow(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0xfd};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0xa;   // 10 - (-2)
 
@@ -2002,7 +2002,7 @@ static void isc_zp_zero(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0;
 
@@ -2023,7 +2023,7 @@ static void isc_zp_negative(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0xff;    // -1 - 1
 
@@ -2044,7 +2044,7 @@ static void isc_zp_borrow_negative(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0;  // 0 - 1
 
@@ -2065,7 +2065,7 @@ static void isc_zp_overflow_to_negative(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0xfe};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0x7f;   // 127 - (-1)
 
@@ -2086,7 +2086,7 @@ static void isc_zp_overflow_to_positive(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0x80;   // (-128) - 1
 
@@ -2107,7 +2107,7 @@ static void isc_zp_borrowout_causes_overflow(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;   // (-128) - 0 - B
 
     int cycles = exec_cpu(&cpu);
@@ -2127,7 +2127,7 @@ static void isc_zp_borrowout_avoids_overflow(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0xfe};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x7f;   // 127 - (-1) - B
 
     int cycles = exec_cpu(&cpu);
@@ -2148,7 +2148,7 @@ static void isc_zp_overflow_without_borrow(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x7f};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0x7f;   // 127 - (-128)
 
@@ -2169,7 +2169,7 @@ static void isc_bcd_zp(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.bcd = true;
     cpu.p.d = true;
     cpu.p.c = true;
@@ -2191,7 +2191,7 @@ static void isc_bcd_zp_digit_rollover(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.bcd = true;
     cpu.p.d = true;
     cpu.p.c = true;
@@ -2213,7 +2213,7 @@ static void isc_bcd_zp_not_supported(void *ctx)
 {
     uint8_t mem[] = {0xe7, 0x4, 0xff, 0xff, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.bcd = false;
     cpu.p.d = true;
     cpu.p.c = true;
@@ -2235,7 +2235,7 @@ static void isc_zpx(void *ctx)
 {
     uint8_t mem[] = {0xf7, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x5};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
     cpu.x = 4;
@@ -2257,7 +2257,7 @@ static void isc_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xf7, 0x3, 0x7, 0xff, 0xff, 0xff, 0xff, 0x6};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 8
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
@@ -2279,7 +2279,7 @@ static void lax_zp(void *ctx)
 {
     uint8_t mem[] = {0xa7, 0x4, 0xff, 0xff, 0x45};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -2296,7 +2296,7 @@ static void lax_zp_zero(void *ctx)
 {
     uint8_t mem[] = {0xa7, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -2313,7 +2313,7 @@ static void lax_zp_negative(void *ctx)
 {
     uint8_t mem[] = {0xa7, 0x4, 0xff, 0xff, 0x80};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -2330,7 +2330,7 @@ static void lax_zpy(void *ctx)
 {
     uint8_t mem[] = {0xb7, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x56};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.y = 4;
 
     int cycles = exec_cpu(&cpu);
@@ -2348,7 +2348,7 @@ static void lax_zpy_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0xb7, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0x56};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0xff;   // Wrap around from $0003 -> $0002
 
     int cycles = exec_cpu(&cpu);
@@ -2369,7 +2369,7 @@ static void nop_zp(void *ctx)
         uint8_t opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x4, 0xff, 0xff, 0xc};
         struct aldo_mos6502 cpu;
-        setup_cpu(&cpu, mem, NULL);
+        setup_cpu(&cpu, mem, nullptr);
 
         int cycles = exec_cpu(&cpu);
 
@@ -2395,7 +2395,7 @@ static void nop_zpx(void *ctx)
         uint8_t opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xb};
         struct aldo_mos6502 cpu;
-        setup_cpu(&cpu, mem, NULL);
+        setup_cpu(&cpu, mem, nullptr);
         cpu.x = 4;
 
         int cycles = exec_cpu(&cpu);
@@ -2422,7 +2422,7 @@ static void nop_zpx_pageoverflow(void *ctx)
         uint8_t opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x3, 0x6, 0xff, 0xff, 0xff, 0xff, 0xb};
         struct aldo_mos6502 cpu;
-        setup_cpu(&cpu, mem, NULL);
+        setup_cpu(&cpu, mem, nullptr);
         cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
         int cycles = exec_cpu(&cpu);
@@ -2446,7 +2446,7 @@ static void rla_zp(void *ctx)
 {
     uint8_t mem[] = {0x27, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 3;
 
@@ -2466,7 +2466,7 @@ static void rla_zp_carry(void *ctx)
 {
     uint8_t mem[] = {0x27, 0x4, 0xff, 0xff, 0x81};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
 
     int cycles = exec_cpu(&cpu);
@@ -2485,7 +2485,7 @@ static void rla_zp_zero(void *ctx)
 {
     uint8_t mem[] = {0x27, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 5;
 
     int cycles = exec_cpu(&cpu);
@@ -2504,7 +2504,7 @@ static void rla_zp_carryzero(void *ctx)
 {
     uint8_t mem[] = {0x27, 0x4, 0xff, 0xff, 0x80};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 5;
 
     int cycles = exec_cpu(&cpu);
@@ -2523,7 +2523,7 @@ static void rla_zp_negative(void *ctx)
 {
     uint8_t mem[] = {0x27, 0x4, 0xff, 0xff, 0x40};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0xff;
 
@@ -2543,7 +2543,7 @@ static void rla_zp_carrynegative(void *ctx)
 {
     uint8_t mem[] = {0x27, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;
 
     int cycles = exec_cpu(&cpu);
@@ -2562,7 +2562,7 @@ static void rla_zp_all_ones(void *ctx)
 {
     uint8_t mem[] = {0x27, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0x80;
 
@@ -2582,7 +2582,7 @@ static void rla_zp_and_sets_zero_and_clears_negative(void *ctx)
 {
     uint8_t mem[] = {0x27, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0;
 
@@ -2602,7 +2602,7 @@ static void rla_zpx(void *ctx)
 {
     uint8_t mem[] = {0x37, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
     cpu.x = 4;
     cpu.p.c = true;
@@ -2623,7 +2623,7 @@ static void rla_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x37, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0xfc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xf;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
@@ -2643,7 +2643,7 @@ static void rra_zp(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0xc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 + 6
 
     int cycles = exec_cpu(&cpu);
@@ -2663,7 +2663,7 @@ static void rra_zp_carryin(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0xd};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 + (6 + C)
 
     int cycles = exec_cpu(&cpu);
@@ -2683,7 +2683,7 @@ static void rra_zp_carry(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0xc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;   // (-1) + 6
 
     int cycles = exec_cpu(&cpu);
@@ -2703,7 +2703,7 @@ static void rra_zp_zero(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
     int cycles = exec_cpu(&cpu);
@@ -2723,7 +2723,7 @@ static void rra_zp_negative(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0xfe};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0;  // 0 + (-1)
 
@@ -2744,7 +2744,7 @@ static void rra_zp_carry_zero(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0xfe};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x81;   // (-127) + 127
 
     int cycles = exec_cpu(&cpu);
@@ -2764,7 +2764,7 @@ static void rra_zp_carry_negative(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0xfe};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0xff;   // (-1) + (-1)
 
@@ -2785,7 +2785,7 @@ static void rra_zp_overflow_to_negative(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0x2};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x7f;   // 127 + 1
 
     int cycles = exec_cpu(&cpu);
@@ -2805,7 +2805,7 @@ static void rra_zp_overflow_to_positive(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0xfe};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0x80;   // (-128) + (-1)
 
@@ -2826,7 +2826,7 @@ static void rra_zp_carryin_causes_overflow(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0x1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x7f;   // 127 + (0 + C)
 
     int cycles = exec_cpu(&cpu);
@@ -2846,7 +2846,7 @@ static void rra_zp_carryin_avoids_overflow(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 0x80;   // (-128) + (-1 + C)
 
@@ -2868,7 +2868,7 @@ static void rra_zp_overflow_with_carry(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x7f;   // 127 + 127 + C
 
     int cycles = exec_cpu(&cpu);
@@ -2888,7 +2888,7 @@ static void rra_bcd_zp(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0x2};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.bcd = true;
     cpu.p.d = true;
     cpu.a = 1;  // 1 + 1
@@ -2909,7 +2909,7 @@ static void rra_bcd_zp_digit_rollover(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0xc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.bcd = true;
     cpu.p.d = true;
     cpu.a = 9;  // 9 + 6
@@ -2930,7 +2930,7 @@ static void rra_bcd_zp_not_supported(void *ctx)
 {
     uint8_t mem[] = {0x67, 0x4, 0xff, 0xff, 0xc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.bcd = false;
     cpu.p.d = true;
     cpu.a = 9;  // 9 + 6
@@ -2951,7 +2951,7 @@ static void rra_zpx(void *ctx)
 {
     uint8_t mem[] = {0x77, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 + 6
     cpu.x = 4;
 
@@ -2972,7 +2972,7 @@ static void rra_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x77, 0x3, 0x44, 0xff, 0xff, 0xff, 0xff, 0x6};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 + 34
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
@@ -2993,7 +2993,7 @@ static void sax_zp(void *ctx)
 {
     uint8_t mem[] = {0x87, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa5;
     cpu.x = 0x3c;
 
@@ -3009,7 +3009,7 @@ static void sax_zpy(void *ctx)
 {
     uint8_t mem[] = {0x97, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa5;
     cpu.x = 0x3c;
     cpu.y = 4;
@@ -3026,7 +3026,7 @@ static void sax_zpy_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x97, 0x3, 0x8, 0xff, 0xff, 0xff, 0xff, 0x6};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa5;
     cpu.x = 0x3c;
     cpu.y = 0xff;   // Wrap around from $0003 -> $0002
@@ -3043,7 +3043,7 @@ static void slo_zp(void *ctx)
 {
     uint8_t mem[] = {0x7, 0x4, 0xff, 0xff, 0x1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 1;
 
     int cycles = exec_cpu(&cpu);
@@ -3062,7 +3062,7 @@ static void slo_zp_carry(void *ctx)
 {
     uint8_t mem[] = {0x7, 0x4, 0xff, 0xff, 0x81};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 1;
 
     int cycles = exec_cpu(&cpu);
@@ -3081,7 +3081,7 @@ static void slo_zp_zero(void *ctx)
 {
     uint8_t mem[] = {0x7, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
     int cycles = exec_cpu(&cpu);
@@ -3100,7 +3100,7 @@ static void slo_zp_carryzero(void *ctx)
 {
     uint8_t mem[] = {0x7, 0x4, 0xff, 0xff, 0x80};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
     int cycles = exec_cpu(&cpu);
@@ -3119,7 +3119,7 @@ static void slo_zp_negative(void *ctx)
 {
     uint8_t mem[] = {0x7, 0x4, 0xff, 0xff, 0x40};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 1;
 
     int cycles = exec_cpu(&cpu);
@@ -3138,7 +3138,7 @@ static void slo_zp_carrynegative(void *ctx)
 {
     uint8_t mem[] = {0x7, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 1;
 
     int cycles = exec_cpu(&cpu);
@@ -3157,7 +3157,7 @@ static void slo_zp_all_ones(void *ctx)
 {
     uint8_t mem[] = {0x7, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
     cpu.a = 1;
 
@@ -3177,7 +3177,7 @@ static void slo_zp_or_clears_zero_and_sets_negative(void *ctx)
 {
     uint8_t mem[] = {0x7, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;
 
     int cycles = exec_cpu(&cpu);
@@ -3196,7 +3196,7 @@ static void slo_zpx(void *ctx)
 {
     uint8_t mem[] = {0x17, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 1;
     cpu.x = 4;
 
@@ -3216,7 +3216,7 @@ static void slo_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x17, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0xfc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 1;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
@@ -3236,7 +3236,7 @@ static void sre_zp(void *ctx)
 {
     uint8_t mem[] = {0x47, 0x4, 0xff, 0xff, 0x2};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
 
     int cycles = exec_cpu(&cpu);
@@ -3255,7 +3255,7 @@ static void sre_zp_carry(void *ctx)
 {
     uint8_t mem[] = {0x47, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
 
     int cycles = exec_cpu(&cpu);
@@ -3274,7 +3274,7 @@ static void sre_zp_zero(void *ctx)
 {
     uint8_t mem[] = {0x47, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
     int cycles = exec_cpu(&cpu);
@@ -3293,7 +3293,7 @@ static void sre_zp_carryzero(void *ctx)
 {
     uint8_t mem[] = {0x47, 0x4, 0xff, 0xff, 0x1};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
     int cycles = exec_cpu(&cpu);
@@ -3312,7 +3312,7 @@ static void sre_zp_negative_to_positive(void *ctx)
 {
     uint8_t mem[] = {0x47, 0x4, 0xff, 0xff, 0x80};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
 
     int cycles = exec_cpu(&cpu);
@@ -3331,7 +3331,7 @@ static void sre_zp_all_ones(void *ctx)
 {
     uint8_t mem[] = {0x47, 0x4, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
 
     int cycles = exec_cpu(&cpu);
@@ -3350,7 +3350,7 @@ static void sre_zp_eor_clears_zero_sets_negative(void *ctx)
 {
     uint8_t mem[] = {0x47, 0x4, 0xff, 0xff, 0x0};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;
 
     int cycles = exec_cpu(&cpu);
@@ -3369,7 +3369,7 @@ static void sre_zp_eor_sets_zero(void *ctx)
 {
     uint8_t mem[] = {0x47, 0x4, 0xff, 0xff, 0x2};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 1;
 
     int cycles = exec_cpu(&cpu);
@@ -3388,7 +3388,7 @@ static void sre_zpx(void *ctx)
 {
     uint8_t mem[] = {0x57, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0x2};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
     cpu.x = 4;
 
@@ -3408,7 +3408,7 @@ static void sre_zpx_pageoverflow(void *ctx)
 {
     uint8_t mem[] = {0x57, 0x3, 0x22, 0xff, 0xff, 0xff, 0xff, 0xfc};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 

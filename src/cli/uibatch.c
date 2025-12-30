@@ -54,7 +54,7 @@ static int init_ui()
         .sa_sigaction = handle_sigint,
         .sa_flags = SA_SIGINFO,
     };
-    return sigaction(SIGINT, &act, NULL) == 0 ? 0 : ALDO_UI_ERR_ERNO;
+    return sigaction(SIGINT, &act, nullptr) == 0 ? 0 : ALDO_UI_ERR_ERNO;
 }
 
 static void tick_start(struct runclock *c, const struct aldo_snapshot *snp)
@@ -128,7 +128,7 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
 
 int ui_batch_loop(struct emulator *emu)
 {
-    assert(emu != NULL);
+    assert(emu != nullptr);
 
     int err = init_ui();
     if (err < 0) return err;

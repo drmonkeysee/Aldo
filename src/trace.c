@@ -75,11 +75,11 @@ bool aldo_trace_line(FILE *tracelog, int adjustment, uint64_t cycles,
                      struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
                      aldo_debugger *dbg, const struct aldo_snapshot *snp)
 {
-    assert(tracelog != NULL);
-    assert(cpu != NULL);
-    assert(ppu != NULL);
-    assert(dbg != NULL);
-    assert(snp != NULL);
+    assert(tracelog != nullptr);
+    assert(cpu != nullptr);
+    assert(ppu != nullptr);
+    assert(dbg != nullptr);
+    assert(snp != nullptr);
 
     // NOTE: does not include leading space in trace_registers
     static const int instw = 47;

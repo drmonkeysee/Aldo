@@ -9,13 +9,12 @@
 #include "cpu.h"
 #include "cpuhelp.h"
 
-#include <stddef.h>
 #include <stdint.h>
 
 static void powerup_initializes_cpu(void *ctx)
 {
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, NULL, NULL);
+    setup_cpu(&cpu, nullptr, nullptr);
 
     aldo_cpu_powerup(&cpu);
 
@@ -34,7 +33,7 @@ static void data_fault(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x1f, 0x40};
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 
@@ -48,7 +47,7 @@ static void ram_mirroring(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x3, 0x8, 0x45}; // $0803 -> $0003
     struct aldo_mos6502 cpu;
-    setup_cpu(&cpu, mem, NULL);
+    setup_cpu(&cpu, mem, nullptr);
 
     int cycles = exec_cpu(&cpu);
 

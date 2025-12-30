@@ -10,7 +10,6 @@
 #include "bytes.h"
 #include "ctrlsignal.h"
 
-#include <stdbool.h>
 #include <stdlib.h>
 
 static bool test_vread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)

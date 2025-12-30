@@ -9,7 +9,6 @@
 #include "ciny.h"
 #include "cliargs.h"
 
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 

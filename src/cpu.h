@@ -12,7 +12,6 @@
 #include "ctrlsignal.h"
 #include "decode.h"
 
-#include <stdbool.h>
 #include <stdint.h>
 
 struct aldo_snapshot;

@@ -8,7 +8,6 @@
 #ifndef Aldo_decode_h
 #define Aldo_decode_h
 
-#include <stdbool.h>
 #include <stdint.h>
 
 // 6502 Instructions

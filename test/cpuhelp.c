@@ -12,8 +12,6 @@
 #include "ciny.h"
 #include "ctrlsignal.h"
 
-#include <stdbool.h>
-
 static bool test_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     if (addr < ALDO_MEMBLOCK_8KB) {

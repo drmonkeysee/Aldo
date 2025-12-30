@@ -8,8 +8,6 @@
 #ifndef Aldo_gui_guiplatform_h
 #define Aldo_gui_guiplatform_h
 
-#include <stdbool.h>
-
 #include "bridgeopen.h"
 struct gui_platform {
     char *(*appname)() aldo_nothrow;

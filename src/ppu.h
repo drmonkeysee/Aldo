@@ -12,7 +12,6 @@
 #include "bytes.h"
 #include "ctrlsignal.h"
 
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 

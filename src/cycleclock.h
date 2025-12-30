@@ -8,7 +8,6 @@
 #ifndef Aldo_cycleclock_h
 #define Aldo_cycleclock_h
 
-#include <stdbool.h>
 #include <stdint.h>
 #include <time.h>
 

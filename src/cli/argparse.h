@@ -8,8 +8,6 @@
 #ifndef Aldo_cli_argparse_h
 #define Aldo_cli_argparse_h
 
-#include <stdbool.h>
-
 struct cliargs;
 
 bool argparse_parse(struct cliargs *restrict args, int argc,

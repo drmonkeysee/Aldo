@@ -10,7 +10,6 @@
 
 #include "haltexpr.h"
 
-#include <stdbool.h>
 #include <stddef.h>
 
 struct aldo_clock;

@@ -232,7 +232,7 @@ static void reset_debugger(void *ctx)
 
 struct ct_testsuite debug_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(new_debugger),
         ct_maketest(set_reset_vector),
 

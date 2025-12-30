@@ -863,7 +863,7 @@ static void TYA_exec(struct aldo_mos6502 *self)
 // chip manufacture, temperature, state of chip control signals,
 // and maybe other unknown factors;
 // https://csdb.dk/release/?id=212346 recommends using EE.
-static const uint8_t Magic = 0xee;
+constexpr uint8_t Magic = 0xee;
 
 static void store_unstable_addresshigh(struct aldo_mos6502 *self, uint8_t d)
 {
@@ -1692,7 +1692,7 @@ int aldo_cpu_cycle(struct aldo_mos6502 *self)
     assert(self != nullptr);
 
     // NOTE: sentinel value for cycle count denoting an imminent opcode fetch
-    static const int prefetch = -1;
+    static constexpr int prefetch = -1;
 
     if (!self->signal.rdy || reset_held(self)) return 0;
 

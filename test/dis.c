@@ -2746,7 +2746,7 @@ static void peek_busfault(void *ctx)
 
 struct ct_testsuite dis_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(errstr_returns_known_err),
         ct_maketest(errstr_returns_unknown_err),
 
@@ -2918,7 +2918,7 @@ struct ct_testsuite dis_tests()
 
 struct ct_testsuite dis_peek_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(peek_immediate),
         ct_maketest(peek_zeropage),
         ct_maketest(peek_zp_indexed),

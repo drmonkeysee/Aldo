@@ -174,7 +174,7 @@ static void bank_copy_address_beyond_range(void *ctx)
 
 struct ct_testsuite bytes_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(shuffle_zeros),
         ct_maketest(shuffle_ones),
         ct_maketest(shuffle_low_ones),

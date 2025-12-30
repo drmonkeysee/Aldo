@@ -107,7 +107,7 @@ inline void aldo_dwtoba(uint32_t dword, uint8_t bytes[aldo_cz(4)]) aldo_nothrow
 inline uint16_t aldo_byteshuffle(uint8_t lo, uint8_t hi) aldo_nothrow
 {
     // NOTE: magic shuffle numbers
-    static const uint16_t m[] = {
+    static constexpr uint16_t m[] = {
         0x00f0, 0xf00f, 0x0c0c, 0xc3c3, 0x2222, 0x9999,
     };
     uint16_t x = aldo_bytowr(lo, hi);

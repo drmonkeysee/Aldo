@@ -2163,7 +2163,7 @@ static void rst_too_short(void *ctx)
 
 struct ct_testsuite cpu_interrupt_handler_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(brk_handler),
         ct_maketest(irq_handler),
         ct_maketest(nmi_handler),
@@ -2199,7 +2199,7 @@ struct ct_testsuite cpu_interrupt_handler_tests()
 
 struct ct_testsuite cpu_interrupt_signal_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(clear_on_startup),
 
         ct_maketest(irq_poll_sequence),

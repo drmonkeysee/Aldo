@@ -376,7 +376,7 @@ static void peek_busfault(void *ctx)
 
 struct ct_testsuite cpu_peek_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(end_restores_state),
         ct_maketest(end_retains_detached_state),
         ct_maketest(irq_ignored),

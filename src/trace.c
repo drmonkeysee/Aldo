@@ -50,7 +50,7 @@ static int trace_instruction_peek(FILE *tracelog, struct aldo_mos6502 *cpu,
 
 static bool trace_registers(FILE *tracelog, const struct aldo_snapshot *snp)
 {
-    static const char flags[] = {
+    static constexpr char flags[] = {
         'c', 'C', 'z', 'Z', 'i', 'I', 'd', 'D',
         'b', 'B', '-', '-', 'v', 'V', 'n', 'N',
     };
@@ -82,7 +82,7 @@ bool aldo_trace_line(FILE *tracelog, int adjustment, uint64_t cycles,
     assert(snp != nullptr);
 
     // NOTE: does not include leading space in trace_registers
-    static const int instw = 47;
+    static constexpr int instw = 47;
 
     int written = trace_instruction(tracelog, cpu, snp);
     if (written < 0) return false;

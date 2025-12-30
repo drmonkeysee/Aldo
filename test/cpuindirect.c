@@ -1388,7 +1388,7 @@ static void sre_indy_pagecross(void *ctx)
 
 struct ct_testsuite cpu_indirect_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(adc_indx),
         ct_maketest(adc_indx_pageoverflow),
         ct_maketest(adc_indx_zp_wraparound),

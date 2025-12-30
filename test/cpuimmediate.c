@@ -3470,7 +3470,7 @@ static void usbc_bcd_not_supported(void *ctx)
 
 struct ct_testsuite cpu_immediate_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(adc),
         ct_maketest(adc_carryin),
         ct_maketest(adc_carry),

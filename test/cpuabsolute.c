@@ -2451,7 +2451,7 @@ static void tas_absy_pagecross(void *ctx)
 
 struct ct_testsuite cpu_absolute_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(adc_abs),
         ct_maketest(and_abs),
         ct_maketest(asl_abs),

@@ -31,13 +31,13 @@ static const char *const restrict Descriptions[] = {
 #undef X
 };
 
-static const uint8_t Flags[] = {
+constexpr uint8_t Flags[] = {
 #define X(s, d, f, ...) f,
     ALDO_DEC_INST_X
 #undef X
 };
 
-static const int InstLens[] = {
+constexpr int InstLens[] = {
 #define X(s, b, n, p, ...) b,
     ALDO_DEC_ADDRMODE_X
 #undef X
@@ -226,7 +226,7 @@ static int print_prgblock(const struct aldo_blockview *bv, bool verbose,
 }
 
 // NOTE: hardcode max scale to ~7MB bmp file size
-static const int ScaleGuard = 20;
+constexpr int ScaleGuard = 20;
 
 static int measure_tile_sheet(size_t banksize, uint32_t *restrict dim,
                               uint32_t *restrict sections)
@@ -397,7 +397,7 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
      */
     // NOTE: no fixed palette for tiles so use grayscale;
     // fun fact, this is the original Gameboy palette.
-    static const uint8_t palettes[BMP_PALETTE_SIZE] = {
+    static constexpr uint8_t palettes[BMP_PALETTE_SIZE] = {
         0, 0, 0, 0,         // #000000
         103, 103, 103, 0,   // #676767
         182, 182, 182, 0,   // #b6b6b6

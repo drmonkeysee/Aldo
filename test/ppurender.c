@@ -1739,7 +1739,7 @@ static void rendering_disabled_unused_fg_palette(void *ctx)
 
 struct ct_testsuite ppu_render_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(nametable_fetch),
         ct_maketest(attributetable_fetch),
         ct_maketest(tile_fetch),

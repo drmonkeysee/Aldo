@@ -469,7 +469,7 @@ static void copy_zero_count(void *ctx)
 
 struct ct_testsuite bus_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(empty_device),
         ct_maketest(read_device),
         ct_maketest(read_device_at_high_partition),

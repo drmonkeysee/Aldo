@@ -890,7 +890,7 @@ static void format_jam(void *ctx)
 
 struct ct_testsuite haltexpr_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(errstr_returns_known_err),
         ct_maketest(errstr_returns_unknown_err),
 

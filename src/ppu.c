@@ -22,7 +22,7 @@
 // v-blank, overscan, etc; nominally 1 frame is 262 * 341 = 89342 ppu cycles;
 // however with rendering enabled the odd frames skip a dot for an overall
 // average cycle count of 89341.5 per frame.
-static const int
+constexpr int
     Dots = 341, Lines = 262,
     LinePostRender = 240, LineVBlank = LinePostRender + 1,
     LinePreRender = Lines - 1,
@@ -30,11 +30,11 @@ static const int
     DotTilePrefetch = 321, DotTilePrefetchEnd = 337;
 
 // NOTE: helpers for manipulating v and t registers
-static const uint16_t
+constexpr uint16_t
     BaseNtAddr = ALDO_MEMBLOCK_8KB,
     HNtBit = ALDO_MEMBLOCK_1KB, VNtBit = ALDO_MEMBLOCK_2KB,
     NtBits = VNtBit | HNtBit, CourseYBits = 0x3e0, FineYBits = 0x7000;
-static const uint8_t CourseXBits = 0x1f, PaletteMask = CourseXBits;
+constexpr uint8_t CourseXBits = 0x1f, PaletteMask = CourseXBits;
 
 //
 // MARK: - Registers
@@ -287,7 +287,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
         break;
     case 5: // PPUSCROLL
         if (ppu->rst != ALDO_SIG_SERVICED) {
-            static const uint8_t course = 0xf8, fine = 0x7;
+            static constexpr uint8_t course = 0xf8, fine = 0x7;
             if (ppu->w) {
                 // NOTE: set course and fine y
                 ppu->t = (uint16_t)((ppu->t & ~(FineYBits | CourseYBits))
@@ -494,7 +494,7 @@ static void latch_tile(struct aldo_rp2c02 *self)
 
 static void mux_bg(struct aldo_rp2c02 *self)
 {
-    static const int left_mask_end = DotPxStart + 8;
+    static constexpr int left_mask_end = DotPxStart + 8;
 
     // NOTE: fine-x selects bit from the left: 0 = 7th bit, 7 = 0th bit
     int abit = 7 - self->x;
@@ -587,7 +587,7 @@ static void incr_course_x(struct aldo_rp2c02 *self)
 
 static void incr_y(struct aldo_rp2c02 *self)
 {
-    static const uint16_t max_course_y = 29 << 5, overflow_y = 31 << 5;
+    static constexpr uint16_t max_course_y = 29 << 5, overflow_y = 31 << 5;
 
     // NOTE: fine-y wraparound at y = 7, overflow into course-y;
     // course-y wraparound at y = 29, overflow into vertical nametable bit;
@@ -710,7 +710,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
 {
     // NOTE: copy t course-y, fine-y, and vertical nametable to v
     if (self->line == LinePreRender && 280 <= self->dot && self->dot < 305) {
-        static const uint16_t vert_bits = FineYBits | VNtBit | CourseYBits;
+        static constexpr uint16_t vert_bits = FineYBits | VNtBit | CourseYBits;
         self->v = (uint16_t)((self->v & ~vert_bits) | (self->t & vert_bits));
     }
 
@@ -719,7 +719,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
         // garbage NT addr
         addrbus(self, nametable_addr(self));
         if (self->dot == DotSpriteFetch) {
-            static const uint16_t horiz_bits = HNtBit | CourseXBits;
+            static constexpr uint16_t horiz_bits = HNtBit | CourseXBits;
             // NOTE: copy t course-x and horizontal nametable to v
             self->v =
                 (uint16_t)((self->v & ~horiz_bits) | (self->t & horiz_bits));
@@ -1113,7 +1113,7 @@ struct aldo_ppu_coord aldo_ppu_screendot(const struct aldo_rp2c02 *self)
 {
     assert(self != nullptr);
 
-    static const int dot_pxout = DotPxStart + 2;
+    static constexpr int dot_pxout = DotPxStart + 2;
 
     if (!self->signal.vout) return (struct aldo_ppu_coord){-1, -1};
 

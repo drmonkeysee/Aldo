@@ -306,7 +306,7 @@ static void bvs_branch(void *ctx)
 
 struct ct_testsuite cpu_branch_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(bcc_nobranch),
         ct_maketest(bcc_positive),
         ct_maketest(bcc_negative),

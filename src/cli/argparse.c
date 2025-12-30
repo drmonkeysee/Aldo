@@ -36,7 +36,7 @@ static const char
     *const restrict VersionLong = "--version",
     *const restrict ZeroRamLong = "--zero-ram";
 
-static const char
+constexpr char
     BatchShort = 'b',
     BcdShort = 'D',
     ChrDecodeShort = 'c',
@@ -52,7 +52,7 @@ static const char
     VersionShort = 'V',
     ZeroRamShort = 'z';
 
-static const int MinAddress = 0, MaxAddress = ALDO_ADDRMASK_64KB;
+constexpr int MinAddress = 0, MaxAddress = ALDO_ADDRMASK_64KB;
 
 static void init_cliargs(struct cliargs *args)
 {

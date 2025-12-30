@@ -213,8 +213,7 @@ static void dump_ram(const struct emulator *emu)
         "vram.bin",
         "ppu.bin",
     };
-    // TODO: constexpr in c23 will remove the VLAs below
-    static const size_t dmpcount = aldo_arrsz(dmpfiles);
+    static constexpr size_t dmpcount = aldo_arrsz(dmpfiles);
 
     if (!emu->args->tron && !emu->args->batch) return;
 

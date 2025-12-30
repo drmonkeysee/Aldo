@@ -1279,7 +1279,7 @@ static void jam(void *ctx)
 
 struct ct_testsuite cpu_implied_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(asl),
         ct_maketest(asl_carry),
         ct_maketest(asl_zero),

@@ -35,7 +35,7 @@
 // MARK: - Run Loop Clock
 //
 
-static const int
+constexpr int
     DisplayHz = 60, RamColWidth = 3, RamDim = 16,
     RamPageSize = RamDim * RamDim;
 
@@ -60,7 +60,7 @@ struct viewstate {
 
 static void tick_sleep(struct runclock *c)
 {
-    static const struct timespec vsync = {
+    static constexpr struct timespec vsync = {
         .tv_nsec = ALDO_NS_PER_S / DisplayHz,
     };
 
@@ -127,7 +127,7 @@ static int drawstats(const struct view *v, int cursor_y,
                      const struct viewstate *vs, const struct cliargs *args)
 {
     // NOTE: update timing metrics on a readable interval
-    static const double refresh_interval_ms = 250;
+    static constexpr double refresh_interval_ms = 250;
     static double display_tickleft, display_ticktime, refreshdt;
 
     const struct aldo_clock *clock = &vs->clock.clock;
@@ -213,7 +213,7 @@ static void drawsystem(const struct view *v, const struct viewstate *vs,
 
 static void drawdebugger(const struct view *v, const struct emulator *emu)
 {
-    static const struct aldo_haltexpr empty = {.cond = ALDO_HLT_NONE};
+    static constexpr struct aldo_haltexpr empty = {.cond = ALDO_HLT_NONE};
 
     int cursor_y = 0;
     werase(v->content);
@@ -311,7 +311,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
 
 static void drawprg(const struct view *v, const struct emulator *emu)
 {
-    static const int vector_offset = 4;
+    static constexpr int vector_offset = 4;
 
     int h, w;
     getmaxyx(v->content, h, w);
@@ -407,7 +407,7 @@ static void draw_interrupt_latch(const struct view *v,
 static void drawdatapath(const struct view *v, int cursor_y, int w,
                          const struct aldo_snapshot *snp)
 {
-    static const int
+    static constexpr int
         seph = 5, vsep1 = 7, vsep2 = 21, col1 = vsep1 + 2, col2 = vsep2 + 2;
 
     int line_x = (w / 4) + 1;
@@ -528,7 +528,7 @@ static void draw_scroll_addr(const struct view *v, int y, int x, char label,
 static int draw_pipeline(const struct view *v, int cursor_y, int w,
                          const struct aldo_snapshot *snp)
 {
-    static const int seph = 5, vsep = 19, buscol = vsep + 2;
+    static constexpr int seph = 5, vsep = 19, buscol = vsep + 2;
 
     mvwvline(v->content, ++cursor_y, vsep, 0, seph);
 
@@ -594,7 +594,7 @@ static void drawppu(const struct view *v, const struct aldo_snapshot *snp)
 
 static void drawramtitle(const struct view *v, const struct viewstate *vs)
 {
-    static const int titlew = 16, offsets[] = {2, 7, 13};
+    static constexpr int titlew = 16, offsets[] = {2, 7, 13};
     static const char *const restrict labels[] = {"RAM", "VRAM", "PPU"};
 
     mvwhline(v->win, 0, 1, 0, titlew);
@@ -676,7 +676,7 @@ static void draw_membanks(const struct view *v, const struct viewstate *vs,
 static void draw_ppumem(const struct view *v, const struct emulator *emu,
                         int start_x)
 {
-    static const int sheeth = (RamDim * 2) + 1;
+    static constexpr int sheeth = (RamDim * 2) + 1;
 
     const struct aldo_snapshot *snp = &emu->snapshot;
     int cursor_y = draw_mempage(v, emu, snp->mem.oam, RSEL_PPU, start_x, 0, 0,
@@ -697,7 +697,7 @@ static void draw_ppumem(const struct view *v, const struct emulator *emu,
 static void drawram(const struct view *v, const struct viewstate *vs,
                     const struct emulator *emu)
 {
-    static const int start_x = 5;
+    static constexpr int start_x = 5;
 
     drawramtitle(v, vs);
 
@@ -729,7 +729,7 @@ static void vinit(struct view *v, int h, int w, int y, int x,
 
 static void raminit(struct view *v, int h, int w, int y, int x, int ramsheets)
 {
-    static const int toprail_start = 7;
+    static constexpr int toprail_start = 7;
 
     createwin(v, h, w, y, x, nullptr);
     v->content = newpad((h - 4) * ramsheets, w - 2);
@@ -766,7 +766,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 
 static void init_ui(struct layout *l, int ramsheets)
 {
-    static const int
+    static constexpr int
         col1w = 30, col2w = 29, col3w = 29, col4w = 54, sysh = 25, crth = 4,
         cpuh = 20, maxh = 37, maxw = col1w + col2w + col3w + col4w;
 
@@ -941,7 +941,7 @@ int ui_curses_loop(struct emulator *emu)
 {
     assert(emu != nullptr);
 
-    static const int sheet_size = RamPageSize * 2;
+    static constexpr int sheet_size = RamPageSize * 2;
 
     struct viewstate state = {
         .clock = {

@@ -461,7 +461,7 @@ static void trace_at_line_boundary(void *ctx)
 
 struct ct_testsuite ppu_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(powerup_initializes_ppu),
 
         ct_maketest(reset_sequence),

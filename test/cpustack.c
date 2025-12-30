@@ -237,7 +237,7 @@ static void plp_wraparound(void *ctx)
 
 struct ct_testsuite cpu_stack_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(pha),
         ct_maketest(pha_wraparound),
 

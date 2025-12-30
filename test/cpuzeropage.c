@@ -3430,7 +3430,7 @@ static void sre_zpx_pageoverflow(void *ctx)
 
 struct ct_testsuite cpu_zeropage_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(adc_zp),
         ct_maketest(and_zp),
         ct_maketest(asl_zp),

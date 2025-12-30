@@ -81,9 +81,9 @@ static void tick_start(struct runclock *c, const struct aldo_snapshot *snp)
 
 static void update_progress(const struct runclock *c)
 {
-    static const char distractor[] = {'|', '/', '-', '\\'};
-    static const double display_wait = 2000,
-                        refresh_interval_ms = display_wait + 100;
+    static constexpr char distractor[] = {'|', '/', '-', '\\'};
+    static constexpr double display_wait = 2000,
+                            refresh_interval_ms = display_wait + 100;
     static double refreshdt;
     static size_t distractor_frame;
 

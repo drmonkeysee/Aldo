@@ -65,7 +65,7 @@ static void ram_mirroring(void *ctx)
 
 struct ct_testsuite cpu_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(powerup_initializes_cpu),
         ct_maketest(data_fault),
         ct_maketest(ram_mirroring),

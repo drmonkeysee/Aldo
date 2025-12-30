@@ -53,7 +53,7 @@ static void rts(void *ctx)
 
 struct ct_testsuite cpu_subroutine_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(jsr),
         ct_maketest(rts),
     };

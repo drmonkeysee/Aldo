@@ -135,7 +135,7 @@ static bool bpvector_valid_index(const struct breakpoint_vector *vec,
 
 static bool bpvector_init(struct breakpoint_vector *vec)
 {
-    static const size_t initial_capacity = 2;
+    static constexpr size_t initial_capacity = 2;
     *vec = (struct breakpoint_vector){
         .capacity = initial_capacity,
         .items = calloc(initial_capacity, sizeof *vec->items),

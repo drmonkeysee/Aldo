@@ -3251,7 +3251,7 @@ static void ppudata_read_vram_behind_palette(void *ctx)
 
 struct ct_testsuite ppu_register_tests()
 {
-    static const struct ct_testcase tests[] = {
+    static constexpr struct ct_testcase tests[] = {
         ct_maketest(ppuctrl_write),
         ct_maketest(ppuctrl_write_mirrored),
         ct_maketest(ppuctrl_write_during_reset),

@@ -14,8 +14,9 @@
 #undef aldo_naz
 #undef aldo_cz
 #undef aldo_noalias
+#undef aldo_export
+
 #undef aldo_ownresult
 #undef aldo_checkerr
-#undef aldo_export
 
 #undef aldo_pcallc

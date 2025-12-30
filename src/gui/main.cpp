@@ -14,7 +14,8 @@
 namespace
 {
 
-[[maybe_unused]] auto run_app() noexcept
+[[maybe_unused]]
+auto run_app() noexcept
 {
     // TODO: fill this out with Linux-specific platform functions
     gui_platform platform{};

@@ -13,11 +13,12 @@
 #define aldo_pcallc
 #endif
 
+#define aldo_checkerr [[nodiscard("check error")]]
+#define aldo_ownresult [[nodiscard("take ownership")]]
+
 // NOTE: open block for c/c++ bridge headers
 #ifdef __cplusplus
 #define aldo_export [[gnu::visibility("default")]]
-#define aldo_checkerr [[nodiscard("check error")]]
-#define aldo_ownresult [[nodiscard("take ownership")]]
 #define aldo_noalias
 #define aldo_cz(val)
 #define aldo_naz(var)
@@ -27,8 +28,6 @@ extern "C"
 {
 #else
 #define aldo_export __attribute__((visibility("default")))
-#define aldo_checkerr
-#define aldo_ownresult
 #define aldo_noalias restrict
 #define aldo_cz(val) static val
 #define aldo_naz(var) restrict var

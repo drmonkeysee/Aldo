@@ -130,7 +130,8 @@ private:
     bool condition;
 };
 
-[[maybe_unused]] void swap(DisabledIf& a, DisabledIf& b) noexcept
+[[maybe_unused]]
+void swap(DisabledIf& a, DisabledIf& b) noexcept
 {
     a.swap(b);
 }
@@ -1568,7 +1569,8 @@ private:
     bool attributeGrid = false, screenIndicator = false, tileGrid = false;
 
     RefreshInterval screenInterval{50};
-    [[maybe_unused]] SDL_Point screenPos{};
+    [[maybe_unused]]
+    SDL_Point screenPos{};
 };
 
 class PaletteView final : public aldo::View {

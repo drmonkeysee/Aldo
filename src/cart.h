@@ -78,10 +78,6 @@ enum {
 #undef X
 };
 
-enum {
-    ALDO_CART_FMT_SIZE = 17,
-};
-
 struct aldo_blockview {
     size_t ord, size;
     const uint8_t *mem; // Non-owning Pointer
@@ -93,6 +89,8 @@ typedef struct aldo_cartridge aldo_cart;
 //
 // MARK: - Export
 //
+
+aldo_const size_t AldoCartFmtSize = 17;
 
 aldo_export
 const char *aldo_cart_errstr(int err) aldo_nothrow;
@@ -108,7 +106,7 @@ const char *aldo_cart_formatname(enum aldo_cartformat format) aldo_nothrow;
 aldo_export aldo_checkerr
 int
 aldo_cart_format_extname(aldo_cart *self,
-                         char buf[aldo_nacz(ALDO_CART_FMT_SIZE)]) aldo_nothrow;
+                         char buf[aldo_nacz(AldoCartFmtSize)]) aldo_nothrow;
 aldo_export
 int aldo_cart_write_info(aldo_cart *self, const char *aldo_noalias name,
                          bool verbose, FILE *f) aldo_nothrow;

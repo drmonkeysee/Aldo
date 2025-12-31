@@ -38,7 +38,7 @@ inline std::filesystem::path breakfile_path_from(std::filesystem::path path)
 }
 
 using debug_handle = handle<aldo_debugger, aldo_debug_free>;
-using hexpr_buffer = std::array<aldo::et::tchar, ALDO_HEXPR_FMT_SIZE>;
+using hexpr_buffer = std::array<aldo::et::tchar, AldoHexprFmtSize>;
 
 class Debugger {
 public:

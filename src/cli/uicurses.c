@@ -227,7 +227,7 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
         wprintw(v->content, "$%04X", resetvector);
     }
     auto bp = aldo_debug_halted(emu->debugger);
-    char break_desc[ALDO_HEXPR_FMT_SIZE];
+    char break_desc[AldoHexprFmtSize];
     int err = aldo_haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
     mvwprintw(v->content, cursor_y, 0, "Break: %s",
               err < 0 ? aldo_haltexpr_errstr(err) : break_desc);
@@ -250,7 +250,7 @@ static void drawcart(const struct view *v, const struct emulator *emu)
     // NOTE: ellipsis is one glyph wide despite being > 1 byte long
     wprintw(v->content, "%.*s%s", (int)(longname ? maxwidth - 1 : namelen),
             cn, longname ? "\u2026" : "");
-    char fmtd[ALDO_CART_FMT_SIZE];
+    char fmtd[AldoCartFmtSize];
     int err = aldo_cart_format_extname(emu->cart, fmtd);
     mvwprintw(v->content, ++cursor_y, 0, "Format: %s",
               err < 0 ? aldo_cart_errstr(err) : fmtd);
@@ -261,7 +261,7 @@ static void drawinstructions(const struct view *v, int h, int y,
 {
     struct aldo_dis_instruction inst = {};
     uint16_t addr = snp->cpu.datapath.current_instruction;
-    char disassembly[ALDO_DIS_INST_SIZE];
+    char disassembly[AldoDisInstSize];
     for (int i = 0; i < h - y; ++i) {
         int result = aldo_dis_parsemem_inst(snp->prg.curr->length,
                                             snp->prg.curr->pc,
@@ -428,7 +428,7 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
         mvwaddstr(v->content, cursor_y, col1, " JAMMED ");
         wattroff(v->content, A_STANDOUT);
     } else {
-        char buf[ALDO_DIS_DATAP_SIZE];
+        char buf[AldoDisDatapSize];
         int wlen = aldo_dis_datapath(snp, buf);
         const char *mnemonic = wlen < 0 ? aldo_dis_errstr(wlen) : buf;
         mvwaddstr(v->content, cursor_y, col1, mnemonic);

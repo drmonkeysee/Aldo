@@ -155,7 +155,7 @@ int aldo_haltexpr_parse_dbg(const char *restrict str,
 }
 
 int aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
-                       char buf[restrict static ALDO_HEXPR_FMT_SIZE])
+                       char buf[restrict static AldoHexprFmtSize])
 {
     assert(expr != nullptr);
     assert(buf != nullptr);
@@ -187,12 +187,12 @@ int aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
 
     if (count < 0) return ALDO_HEXPR_ERR_FMT;
 
-    assert(count < ALDO_HEXPR_FMT_SIZE);
+    assert(count < (int)AldoHexprFmtSize);
     return count;
 }
 
 int aldo_haltexpr_fmtdbg(const struct aldo_debugexpr *expr,
-                         char buf[restrict static ALDO_HEXPR_FMT_SIZE])
+                         char buf[restrict static AldoHexprFmtSize])
 {
     assert(expr != nullptr);
     assert(buf != nullptr);
@@ -226,7 +226,7 @@ int aldo_haltexpr_fmtdbg(const struct aldo_debugexpr *expr,
 
     if (count < 0) return ALDO_HEXPR_ERR_FMT;
 
-    assert(count < ALDO_HEXPR_FMT_SIZE);
+    assert(count < (int)AldoHexprFmtSize);
     return count;
 }
 

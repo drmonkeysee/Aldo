@@ -269,7 +269,7 @@ const char *aldo_cart_formatname(enum aldo_cartformat format)
 }
 
 int aldo_cart_format_extname(aldo_cart *self,
-                             char buf[restrict static ALDO_CART_FMT_SIZE])
+                             char buf[restrict static AldoCartFmtSize])
 {
     assert(buf != nullptr);
 
@@ -286,7 +286,7 @@ int aldo_cart_format_extname(aldo_cart *self,
         total += count;
     }
 
-    assert(total < ALDO_CART_FMT_SIZE);
+    assert(total < (int)AldoCartFmtSize);
     return total;
 }
 
@@ -407,7 +407,7 @@ int aldo_cart_write_dis_header(aldo_cart *self, const char *restrict name,
     int err = fprintf(f, "%s\n", name);
     if (err < 0) return ALDO_CART_ERR_IO;
 
-    char fmtd[ALDO_CART_FMT_SIZE];
+    char fmtd[AldoCartFmtSize];
     err = aldo_cart_format_extname(self, fmtd);
     if (fputs(err < 0 ? aldo_cart_errstr(err) : fmtd, f) == EOF)
         return ALDO_CART_ERR_IO;

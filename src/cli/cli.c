@@ -123,7 +123,7 @@ static bool parse_dbg_expression(aldo_debugger *dbg,
                 return false;
             }
             if (verbose) {
-                char buf[ALDO_HEXPR_FMT_SIZE];
+                char buf[AldoHexprFmtSize];
                 err = aldo_haltexpr_desc(&expr.hexpr, buf);
                 if (err < 0) {
                     fprintf(stderr, "Halt expr display error (%d): %s\n", err,
@@ -145,7 +145,7 @@ static bool parse_dbg_expression(aldo_debugger *dbg,
 static bool parse_debug_file(aldo_debugger *dbg, FILE *f,
                              const struct cliargs *args)
 {
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
     while (fgets(buf, sizeof buf, f)) {
         if (!parse_dbg_expression(dbg, buf, args->verbose)) {
             return false;

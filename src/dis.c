@@ -109,7 +109,7 @@ static uint16_t interrupt_vector(const struct aldo_snapshot *snp)
 }
 
 static int print_raw(uint16_t addr, const struct aldo_dis_instruction *inst,
-                     char dis[restrict static ALDO_DIS_INST_SIZE])
+                     char dis[restrict static AldoDisInstSize])
 {
     int total, count;
     total = count = sprintf(dis, "%04X: ", addr);
@@ -202,7 +202,7 @@ static int print_prgblock(const struct aldo_blockview *bv, bool verbose,
 
     struct repeat_condition repeat = {};
     struct aldo_dis_instruction inst;
-    char dis[ALDO_DIS_INST_SIZE];
+    char dis[AldoDisInstSize];
     // NOTE: by convention, count backwards from CPU vector locations
     assert(bv->size <= ALDO_MEMBLOCK_64KB);
     uint16_t addr = (uint16_t)(ALDO_MEMBLOCK_64KB - bv->size);
@@ -263,20 +263,19 @@ static int measure_tile_sheet(size_t banksize, uint32_t *restrict dim,
 
 // NOTE: BMP details from:
 // https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-storage
-enum {
-    // NOTE: color depth and palette sizes; NES tiles are actually 2 bpp but
-    // the closest the standard BMP format gets is 4; BMP palette size is also
-    // 4, as are the number of colors representable at 2 bpp so conveniently
-    // all color constants collapse into one value.
-    BMP_BITS_PER_PIXEL = 4,
-    BMP_PALETTE_SIZE = BMP_BITS_PER_PIXEL * BMP_BITS_PER_PIXEL,
+
+// NOTE: color depth and palette sizes; NES tiles are actually 2 bpp but
+// the closest the standard BMP format gets is 4; BMP palette size is also
+// 4, as are the number of colors representable at 2 bpp so conveniently
+// all color constants collapse into one value.
+constexpr uint8_t BmpBitsPerPixel = 4;
+constexpr size_t
+    BmpPaletteSize = BmpBitsPerPixel * BmpBitsPerPixel,
 
     // NOTE: bmp header sizes
-    BMP_FILEHEADER_SIZE = 14,
-    BMP_INFOHEADER_SIZE = 40,
-    BMP_HEADER_SIZE = BMP_FILEHEADER_SIZE + BMP_INFOHEADER_SIZE
-                        + BMP_PALETTE_SIZE,
-};
+    BmpFileHeaderSize = 14,
+    BmpInfoHeaderSize = 40,
+    BmpHeaderSize = BmpFileHeaderSize + BmpInfoHeaderSize + BmpPaletteSize;
 
 static void fill_tile_sheet_row(uint8_t *restrict packedrow,
                                 uint32_t tiley, uint32_t pixely,
@@ -315,7 +314,7 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
                     size_t scaledpixel = scalex + (packedpixel * scale);
                     if (scaledpixel % 2 == 0) {
                         packedrow[scaledpixel / 2] =
-                            (uint8_t)(pixel << BMP_BITS_PER_PIXEL);
+                            (uint8_t)(pixel << BmpBitsPerPixel);
                     } else {
                         packedrow[scaledpixel / 2] |= pixel;
                     }
@@ -349,10 +348,10 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
         DWORD bfOffBits;
      };
      */
-    uint8_t fileheader[BMP_FILEHEADER_SIZE] = {'B', 'M'};   // bfType
-    aldo_dwtoba(BMP_HEADER_SIZE + (bmph * packedrow_size),  // bfSize
+    uint8_t fileheader[BmpFileHeaderSize] = {'B', 'M'};   // bfType
+    aldo_dwtoba(BmpHeaderSize + (bmph * packedrow_size),  // bfSize
                 fileheader + 2);
-    aldo_dwtoba(BMP_HEADER_SIZE, fileheader + 10);          // bfOffBits
+    aldo_dwtoba(BmpHeaderSize, fileheader + 10);          // bfOffBits
     size_t
         witems = aldo_arrsz(fileheader),
         wcount = fwrite(fileheader, sizeof fileheader[0], witems, bmpfile);
@@ -374,11 +373,11 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
         DWORD biClrImportant;
      };
      */
-    uint8_t infoheader[BMP_INFOHEADER_SIZE] = {
-        BMP_INFOHEADER_SIZE,        // biSize
-        [12] = 1,                   // biPlanes
-        [14] = BMP_BITS_PER_PIXEL,  // biBitCount
-        [32] = BMP_BITS_PER_PIXEL,  // biClrUsed
+    uint8_t infoheader[BmpInfoHeaderSize] = {
+        BmpInfoHeaderSize,      // biSize
+        [12] = 1,               // biPlanes
+        [14] = BmpBitsPerPixel, // biBitCount
+        [32] = BmpBitsPerPixel, // biClrUsed
     };
     aldo_dwtoba(bmpw, infoheader + 4);   // biWidth
     aldo_dwtoba(bmph, infoheader + 8);   // biHeight
@@ -397,7 +396,7 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
      */
     // NOTE: no fixed palette for tiles so use grayscale;
     // fun fact, this is the original Gameboy palette.
-    static constexpr uint8_t palettes[BMP_PALETTE_SIZE] = {
+    static constexpr uint8_t palettes[BmpPaletteSize] = {
         0, 0, 0, 0,         // #000000
         103, 103, 103, 0,   // #676767
         182, 182, 182, 0,   // #b6b6b6
@@ -525,7 +524,7 @@ int aldo_dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
 }
 
 int aldo_dis_inst(uint16_t addr, const struct aldo_dis_instruction *inst,
-                  char dis[restrict static ALDO_DIS_INST_SIZE])
+                  char dis[restrict static AldoDisInstSize])
 {
     assert(inst != nullptr);
     assert(dis != nullptr);
@@ -552,12 +551,12 @@ int aldo_dis_inst(uint16_t addr, const struct aldo_dis_instruction *inst,
     }
     total += count;
 
-    assert((unsigned int)total < ALDO_DIS_INST_SIZE);
+    assert(total < (int)AldoDisInstSize);
     return total;
 }
 
 int aldo_dis_datapath(const struct aldo_snapshot *snp,
-                      char dis[restrict static ALDO_DIS_DATAP_SIZE])
+                      char dis[restrict static AldoDisDatapSize])
 {
     assert(snp != nullptr);
     assert(dis != nullptr);
@@ -605,7 +604,7 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
     if (count < 0) return ALDO_DIS_ERR_FMT;
     total += count;
 
-    assert((unsigned int)total < ALDO_DIS_DATAP_SIZE);
+    assert(total < (int)AldoDisDatapSize);
     return total;
 }
 
@@ -717,7 +716,7 @@ uint8_t aldo_dis_inst_flags(const struct aldo_dis_instruction *inst)
 }
 
 int aldo_dis_inst_operand(const struct aldo_dis_instruction *inst,
-                          char dis[restrict static ALDO_DIS_OPERAND_SIZE])
+                          char dis[restrict static AldoDisOperandSize])
 {
     assert(inst != nullptr);
     assert(dis != nullptr);
@@ -729,7 +728,7 @@ int aldo_dis_inst_operand(const struct aldo_dis_instruction *inst,
 
     int count = print_operand(inst, dis);
 
-    assert((unsigned int)count < ALDO_DIS_OPERAND_SIZE);
+    assert(count < (int)AldoDisOperandSize);
     return count;
 }
 
@@ -746,7 +745,7 @@ bool aldo_dis_inst_equal(const struct aldo_dis_instruction *lhs,
 
 int aldo_dis_peek(struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
                   aldo_debugger *dbg, const struct aldo_snapshot *snp,
-                  char dis[restrict static ALDO_DIS_PEEK_SIZE])
+                  char dis[restrict static AldoDisPeekSize])
 {
     assert(cpu != nullptr);
     assert(ppu != nullptr);
@@ -791,13 +790,13 @@ int aldo_dis_peek(struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
             char *data = strrchr(dis, '=');
             if (data) {
                 // NOTE: verify last '=' leaves enough space for "FLT"
-                assert(dis + ALDO_DIS_PEEK_SIZE - data >= 6);
+                assert(dis + AldoDisPeekSize - data >= 6);
                 strcpy(data + 2, "FLT");
                 ++total;
             }
         }
     }
 
-    assert((unsigned int)total < ALDO_DIS_PEEK_SIZE);
+    assert(total < (int)AldoDisPeekSize);
     return total;
 }

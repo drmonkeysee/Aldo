@@ -8,6 +8,7 @@
 #ifndef Aldo_haltexpr_h
 #define Aldo_haltexpr_h
 
+#include <stddef.h>
 #include <stdint.h>
 
 // X(symbol, description)
@@ -48,10 +49,6 @@ struct aldo_debugexpr {
     } type;
 };
 
-enum {
-    ALDO_HEXPR_FMT_SIZE = 25,
-};
-
 // X(symbol, value, error string)
 #define ALDO_HEXPR_ERRCODE_X \
 X(HEXPR_ERR_SCAN, -1, "FORMATTED INPUT FAILURE") \
@@ -66,6 +63,8 @@ enum {
 };
 
 #include "bridgeopen.h"
+aldo_const size_t AldoHexprFmtSize = 25;
+
 aldo_export
 const char *aldo_haltexpr_errstr(int err) aldo_nothrow;
 aldo_export
@@ -81,11 +80,11 @@ int aldo_haltexpr_parse_dbg(const char *aldo_noalias str,
                             struct aldo_debugexpr *expr) aldo_nothrow;
 aldo_export aldo_checkerr
 int aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
-                       char buf[aldo_nacz(ALDO_HEXPR_FMT_SIZE)]) aldo_nothrow;
+                       char buf[aldo_nacz(AldoHexprFmtSize)]) aldo_nothrow;
 aldo_export aldo_checkerr
 int aldo_haltexpr_fmtdbg(const struct aldo_debugexpr *expr,
                          char
-                         buf[aldo_nacz(ALDO_HEXPR_FMT_SIZE)]) aldo_nothrow;
+                         buf[aldo_nacz(AldoHexprFmtSize)]) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

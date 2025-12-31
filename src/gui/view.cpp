@@ -896,7 +896,7 @@ private:
             ScopedColor color{{ImGuiCol_Text, aldo::colors::DestructiveHover}};
             ImGui::TextUnformatted("Decode: JAMMED");
         } else {
-            std::array<aldo::et::tchar, ALDO_DIS_DATAP_SIZE> buf;
+            std::array<aldo::et::tchar, AldoDisDatapSize> buf;
             auto err = aldo_dis_datapath(emu.snapshotp(), buf.data());
             ImGui::Text("Decode: %s",
                         err < 0 ? aldo_dis_errstr(err) : buf.data());
@@ -2051,7 +2051,7 @@ private:
         const auto* curr = emu.snapshot().prg.curr;
         auto addr = emu.snapshot().cpu.datapath.current_instruction;
         aldo_dis_instruction inst{};
-        std::array<aldo::et::tchar, ALDO_DIS_INST_SIZE> disasm;
+        std::array<aldo::et::tchar, AldoDisInstSize> disasm;
         for (int i = 0; i < instCount; ++i) {
             auto result = aldo_dis_parsemem_inst(curr->length, curr->pc,
                                                  inst.offset + inst.bv.size,

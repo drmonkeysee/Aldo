@@ -20,10 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-enum {
-    SCREEN_WIDTH = 256,
-    SCREEN_HEIGHT = 240,
-};
+constexpr int ScreenWidth = 256, ScreenHeight = 240;
 
 // The NES-001 NTSC Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
@@ -45,7 +42,7 @@ struct aldo_nes001 {
     bool tracefailed;                   // Trace log I/O failed during run
     uint8_t ram[ALDO_MEMBLOCK_2KB],     // CPU Internal RAM
             vram[ALDO_MEMBLOCK_2KB],    // PPU Internal RAM
-            vbufs[2][SCREEN_WIDTH * SCREEN_HEIGHT]; // Double-buffered Video
+            vbufs[2][ScreenWidth * ScreenHeight];   // Double-buffered Video
 };
 
 static void mem_load(uint8_t *restrict d, const uint8_t *restrict mem,
@@ -236,7 +233,7 @@ static void set_screen_dot(struct aldo_nes001 *self)
     auto c = aldo_ppu_screendot(&self->ppu);
     if (c.dot < 0) return;
 
-    size_t screendot = (size_t)(c.dot + (c.line * SCREEN_WIDTH));
+    size_t screendot = (size_t)(c.dot + (c.line * ScreenWidth));
     assert(screendot < aldo_arrsz(self->vbufs[self->vbuf]));
     self->vbufs[self->vbuf][screendot] = self->ppu.pxpl.px;
 }
@@ -464,8 +461,8 @@ void aldo_nes_screen_size(int *width, int *height)
     assert(width != nullptr);
     assert(height != nullptr);
 
-    *width = SCREEN_WIDTH;
-    *height = SCREEN_HEIGHT;
+    *width = ScreenWidth;
+    *height = ScreenHeight;
 }
 
 bool aldo_nes_bcd_support(aldo_nes *self)

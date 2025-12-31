@@ -27,7 +27,7 @@ static int trace_instruction(FILE *tracelog, const struct aldo_mos6502 *cpu,
                                    aldo_arrsz(bytes), bytes);
     struct aldo_dis_instruction inst;
     int result = aldo_dis_parsemem_inst(instlen, bytes, 0, &inst);
-    char disinst[ALDO_DIS_INST_SIZE];
+    char disinst[AldoDisInstSize];
     if (result > 0) {
         result = aldo_dis_inst(snp->cpu.datapath.current_instruction, &inst,
                                disinst);
@@ -42,7 +42,7 @@ static int trace_instruction_peek(FILE *tracelog, struct aldo_mos6502 *cpu,
                                   struct aldo_rp2c02 *ppu, aldo_debugger *dbg,
                                   const struct aldo_snapshot *snp)
 {
-    char peek[ALDO_DIS_PEEK_SIZE];
+    char peek[AldoDisPeekSize];
     int result = aldo_dis_peek(cpu, ppu, dbg, snp, peek);
     return fprintf(tracelog, " %s",
                    result < 0 ? aldo_dis_errstr(result) : peek);

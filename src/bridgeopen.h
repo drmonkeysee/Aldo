@@ -24,6 +24,7 @@
 #define aldo_naz(var)
 #define aldo_nacz(val)
 #define aldo_nothrow noexcept
+#define aldo_const inline constexpr
 extern "C"
 {
 #else
@@ -32,4 +33,5 @@ extern "C"
 #define aldo_naz(var) restrict var
 #define aldo_nacz(val) restrict static val
 #define aldo_nothrow
+#define aldo_const constexpr
 #endif

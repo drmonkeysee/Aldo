@@ -38,13 +38,6 @@ enum {
 #undef X
 };
 
-enum {
-    ALDO_DIS_OPERAND_SIZE = 8,
-    ALDO_DIS_DATAP_SIZE = 12,
-    ALDO_DIS_INST_SIZE = 28,
-    ALDO_DIS_PEEK_SIZE = 20,
-};
-
 struct aldo_dis_instruction {
     size_t offset;
     struct aldo_blockview bv;
@@ -55,6 +48,11 @@ struct aldo_dis_instruction {
 //
 // MARK: - Export
 //
+
+aldo_const size_t
+    AldoDisOperandSize = 8,
+    AldoDisDatapSize = 12,
+    AldoDisInstSize = 28;
 
 aldo_export
 extern const int Aldo_MinChrScale, Aldo_MaxChrScale;
@@ -73,10 +71,10 @@ int aldo_dis_parsemem_inst(size_t size, const uint8_t mem[aldo_naz(size)],
 // NOTE: functions w/buffer params leave buffer untouched when returning <= 0
 aldo_export aldo_checkerr
 int aldo_dis_inst(uint16_t addr, const struct aldo_dis_instruction *inst,
-                  char dis[aldo_nacz(ALDO_DIS_INST_SIZE)]) aldo_nothrow;
+                  char dis[aldo_nacz(AldoDisInstSize)]) aldo_nothrow;
 aldo_export aldo_checkerr
 int aldo_dis_datapath(const struct aldo_snapshot *snp,
-                      char dis[aldo_nacz(ALDO_DIS_DATAP_SIZE)]) aldo_nothrow;
+                      char dis[aldo_nacz(AldoDisDatapSize)]) aldo_nothrow;
 
 aldo_export aldo_checkerr
 int aldo_dis_cart_prg(aldo_cart *cart, const char *aldo_noalias name,
@@ -105,7 +103,7 @@ aldo_dis_inst_flags(const struct aldo_dis_instruction *inst) aldo_nothrow;
 aldo_export aldo_checkerr
 int
 aldo_dis_inst_operand(const struct aldo_dis_instruction *inst,
-                      char dis[aldo_nacz(ALDO_DIS_OPERAND_SIZE)]) aldo_nothrow;
+                      char dis[aldo_nacz(AldoDisOperandSize)]) aldo_nothrow;
 aldo_export
 bool aldo_dis_inst_equal(const struct aldo_dis_instruction *lhs,
                          const struct aldo_dis_instruction *rhs) aldo_nothrow;
@@ -113,10 +111,11 @@ bool aldo_dis_inst_equal(const struct aldo_dis_instruction *lhs,
 //
 // MARK: - Internal
 //
+aldo_const size_t AldoDisPeekSize = 20;
 
 int aldo_dis_peek(struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
                   aldo_debugger *dbg, const struct aldo_snapshot *snp,
-                  char dis[aldo_nacz(ALDO_DIS_PEEK_SIZE)]) aldo_nothrow;
+                  char dis[aldo_nacz(AldoDisPeekSize)]) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

@@ -115,7 +115,7 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
            (double)c->clock.cycles / c->clock.runtime);
     auto bp = aldo_debug_halted(emu->debugger);
     if (bp) {
-        char break_desc[ALDO_HEXPR_FMT_SIZE];
+        char break_desc[AldoHexprFmtSize];
         int err = aldo_haltexpr_desc(&bp->expr, break_desc);
         printf("Break: %s\n",
                err < 0 ? aldo_haltexpr_errstr(err) : break_desc);

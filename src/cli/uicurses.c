@@ -61,7 +61,7 @@ struct viewstate {
 static void tick_sleep(struct runclock *c)
 {
     static constexpr struct timespec vsync = {
-        .tv_nsec = ALDO_NS_PER_S / DisplayHz,
+        .tv_nsec = AldoNsPerS / DisplayHz,
     };
 
     auto elapsed = aldo_elapsed(&c->clock.current);

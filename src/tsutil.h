@@ -10,18 +10,16 @@
 
 #include <time.h>
 
-enum {
-    ALDO_MS_PER_S = 1000,
-    ALDO_NS_PER_MS = (int)1e6,
-    ALDO_NS_PER_S = ALDO_MS_PER_S * ALDO_NS_PER_MS,
-};
+#define ALDO_MS_PER_S 1e3
+#define ALDO_NS_PER_MS 1e6
 
 #include "bridgeopen.h"
+aldo_const int AldoNsPerS = (int)(ALDO_MS_PER_S * ALDO_NS_PER_MS);
+
 aldo_export
 inline double aldo_timespec_to_ms(const struct timespec *ts) aldo_nothrow
 {
-    return (double)(ts->tv_sec * ALDO_MS_PER_S)
-                    + ((double)ts->tv_nsec / (double)ALDO_NS_PER_MS);
+    return (ts->tv_sec * ALDO_MS_PER_S) + (ts->tv_nsec / ALDO_NS_PER_MS);
 }
 
 aldo_export

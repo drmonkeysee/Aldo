@@ -64,7 +64,7 @@ static void tick_sleep(struct runclock *c)
         .tv_nsec = ALDO_NS_PER_S / DisplayHz,
     };
 
-    struct timespec elapsed = aldo_elapsed(&c->clock.current);
+    auto elapsed = aldo_elapsed(&c->clock.current);
 
     // NOTE: if elapsed nanoseconds is greater than vsync we're over
     // our time budget; if elapsed *seconds* is greater than vsync
@@ -130,7 +130,7 @@ static int drawstats(const struct view *v, int cursor_y,
     static constexpr double refresh_interval_ms = 250;
     static double display_tickleft, display_ticktime, refreshdt;
 
-    const struct aldo_clock *clock = &vs->clock.clock;
+    auto clock = &vs->clock.clock;
     if ((refreshdt += clock->ticktime_ms) >= refresh_interval_ms) {
         display_tickleft = vs->clock.tickleft_ms;
         display_ticktime = clock->ticktime_ms;
@@ -226,7 +226,7 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
     } else {
         wprintw(v->content, "$%04X", resetvector);
     }
-    const struct aldo_breakpoint *bp = aldo_debug_halted(emu->debugger);
+    auto bp = aldo_debug_halted(emu->debugger);
     char break_desc[ALDO_HEXPR_FMT_SIZE];
     int err = aldo_haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
     mvwprintw(v->content, cursor_y, 0, "Break: %s",
@@ -678,7 +678,7 @@ static void draw_ppumem(const struct view *v, const struct emulator *emu,
 {
     static constexpr int sheeth = (RamDim * 2) + 1;
 
-    const struct aldo_snapshot *snp = &emu->snapshot;
+    auto snp = &emu->snapshot;
     int cursor_y = draw_mempage(v, emu, snp->mem.oam, RSEL_PPU, start_x, 0, 0,
                                 0, RamDim);
     wclrtoeol(v->content);

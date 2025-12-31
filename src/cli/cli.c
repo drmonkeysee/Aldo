@@ -44,7 +44,7 @@ static void print_version()
 static aldo_cart *load_cart(const char *filename)
 {
     aldo_cart *c = nullptr;
-    FILE *f = fopen(filename, "rb");
+    auto f = fopen(filename, "rb");
     if (f) {
         int err = aldo_cart_create(&c, f);
         if (err < 0) {
@@ -161,13 +161,13 @@ static bool parse_debug_file(aldo_debugger *dbg, FILE *f,
 
 static aldo_debugger *create_debugger(const struct cliargs *args)
 {
-    aldo_debugger *dbg = aldo_debug_new();
+    auto dbg = aldo_debug_new();
     if (!dbg) {
         perror("Unable to initialize debugger");
         return dbg;
     }
     if (args->dbgfilepath) {
-        FILE *f = fopen(args->dbgfilepath, "r");
+        auto f = fopen(args->dbgfilepath, "r");
         if (f) {
             bool success = parse_debug_file(dbg, f, args);
             fclose(f);
@@ -178,9 +178,7 @@ static aldo_debugger *create_debugger(const struct cliargs *args)
             goto exit_dbg;
         }
     } else {
-        for (const struct haltarg *arg = args->haltlist;
-             arg;
-             arg = arg->next) {
+        for (auto arg = args->haltlist; arg; arg = arg->next) {
             if (!parse_dbg_expression(dbg, arg->expr, args->verbose))
                 goto exit_dbg;
         }
@@ -197,7 +195,7 @@ exit_dbg:
 
 static ui_loop *setup_ui(struct emulator *emu)
 {
-    ui_loop *loop = ui_curses_loop;
+    auto loop = ui_curses_loop;
     if (emu->args->batch) {
         aldo_nes_ready(emu->console, true);
         loop = ui_batch_loop;
@@ -281,7 +279,7 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
     }
     aldo_nes_powerup(emu.console, c, emu.args->zeroram);
 
-    ui_loop *run_loop = setup_ui(&emu);
+    auto run_loop = setup_ui(&emu);
     int err = run_loop(&emu);
     if (err < 0) {
         fprintf(stderr, "UI run failure (%d): %s\n", err, aldo_ui_errstr(err));
@@ -334,7 +332,7 @@ static int run_with_args(const struct cliargs *args)
         return EXIT_FAILURE;
     }
 
-    aldo_cart *cart = load_cart(args->filepath);
+    auto cart = load_cart(args->filepath);
     if (!cart) return EXIT_FAILURE;
 
     int result = run_cart(args, cart);

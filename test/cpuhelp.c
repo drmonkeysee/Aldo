@@ -85,7 +85,7 @@ void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
 
 void enable_rom_wcapture()
 {
-    struct aldo_busdevice dv = Rom;
+    auto dv = Rom;
     dv.write = capture_rom_write;
     aldo_bus_set(TestBus, ALDO_MEMBLOCK_32KB, dv);
 }

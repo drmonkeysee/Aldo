@@ -20,7 +20,7 @@
 
 static void ppuctrl_write(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
 
     aldo_ppu_bus_snapshot(ppu, &snp);
@@ -40,7 +40,7 @@ static void ppuctrl_write(void *ctx)
 
 static void ppuctrl_write_mirrored(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
     ppu->t = 0x7fff;
     ppu->ctrl.nh = ppu->ctrl.nl = true;
@@ -62,7 +62,7 @@ static void ppuctrl_write_mirrored(void *ctx)
 
 static void ppuctrl_write_during_reset(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
     ppu->rst = ALDO_SIG_SERVICED;
 
@@ -83,7 +83,7 @@ static void ppuctrl_write_during_reset(void *ctx)
 
 static void ppuctrl_read(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->regbus = 0x5a;
 
     uint8_t d;
@@ -99,7 +99,7 @@ static void ppuctrl_read(void *ctx)
 
 static void ppumask_write(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
 
     aldo_ppu_bus_snapshot(ppu, &snp);
@@ -117,7 +117,7 @@ static void ppumask_write(void *ctx)
 
 static void ppumask_write_mirrored(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
 
     aldo_ppu_bus_snapshot(ppu, &snp);
@@ -135,7 +135,7 @@ static void ppumask_write_mirrored(void *ctx)
 
 static void ppumask_write_during_reset(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
     ppu->rst = ALDO_SIG_SERVICED;
 
@@ -154,7 +154,7 @@ static void ppumask_write_during_reset(void *ctx)
 
 static void ppumask_read(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->regbus = 0x5a;
 
     uint8_t d;
@@ -170,7 +170,7 @@ static void ppumask_read(void *ctx)
 
 static void ppustatus_read_when_clear(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
     ppu->regbus = 0x5a;
     ppu->status.v = ppu->status.s = ppu->status.o = false;
@@ -188,7 +188,7 @@ static void ppustatus_read_when_clear(void *ctx)
 
 static void ppustatus_read_when_set(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
     ppu->regbus = 0x5a;
     ppu->w = ppu->status.v = ppu->status.s = ppu->status.o = true;
@@ -206,7 +206,7 @@ static void ppustatus_read_when_set(void *ctx)
 
 static void ppustatus_read_on_nmi_race_condition(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
     ppu->regbus = 0x5a;
     ppu->status.v = ppu->status.s = ppu->status.o = true;
@@ -225,7 +225,7 @@ static void ppustatus_read_on_nmi_race_condition(void *ctx)
 
 static void ppustatus_read_during_reset(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
     ppu->regbus = 0x5a;
     ppu->w = ppu->status.v = ppu->status.s = ppu->status.o = true;
@@ -244,7 +244,7 @@ static void ppustatus_read_during_reset(void *ctx)
 
 static void ppustatus_read_mirrored(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
     ppu->regbus = 0x5a;
 
@@ -261,7 +261,7 @@ static void ppustatus_read_mirrored(void *ctx)
 
 static void ppustatus_write(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
     ppu->w = true;
 
@@ -280,7 +280,7 @@ static void ppustatus_write(void *ctx)
 
 static void oamaddr_write(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
 
     ct_assertequal(0u, ppu->oamaddr);
     ct_assertequal(0u, ppu->regsel);
@@ -295,7 +295,7 @@ static void oamaddr_write(void *ctx)
 
 static void oamaddr_write_mirrored(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
 
     ct_assertequal(0u, ppu->oamaddr);
     ct_assertequal(0u, ppu->regsel);
@@ -310,7 +310,7 @@ static void oamaddr_write_mirrored(void *ctx)
 
 static void oamaddr_write_during_reset(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->rst = ALDO_SIG_SERVICED;
 
     ct_assertequal(0u, ppu->oamaddr);
@@ -326,7 +326,7 @@ static void oamaddr_write_during_reset(void *ctx)
 
 static void oamaddr_read(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->regbus = 0x5a;
 
     uint8_t d;
@@ -342,7 +342,7 @@ static void oamaddr_read(void *ctx)
 
 static void oamdata_write(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
     ppu->mask.s = true;
@@ -382,7 +382,7 @@ static void oamdata_write(void *ctx)
 
 static void oamdata_write_during_rendering(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->line = 24;
     ppu->dot = 5;
     ppu->mask.s = true;
@@ -422,7 +422,7 @@ static void oamdata_write_during_rendering(void *ctx)
 
 static void oamdata_write_during_rendering_disabled(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->line = 24;
     ppu->dot = 5;
     ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
@@ -461,7 +461,7 @@ static void oamdata_write_during_rendering_disabled(void *ctx)
 
 static void oamdata_write_mirrored(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
     ppu->mask.s = true;
@@ -501,7 +501,7 @@ static void oamdata_write_mirrored(void *ctx)
 
 static void oamdata_write_during_reset(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
     ppu->mask.s = true;
@@ -542,7 +542,7 @@ static void oamdata_write_during_reset(void *ctx)
 
 static void oamdata_read(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
     ppu->mask.s = true;
@@ -562,7 +562,7 @@ static void oamdata_read(void *ctx)
 
 static void oamdata_read_mirrored(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->line = 240;
     ppu->dot = 5;
     ppu->mask.s = true;
@@ -586,7 +586,7 @@ static void oamdata_read_mirrored(void *ctx)
 
 static void ppuscroll_write(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
 
     ct_assertequal(0u, ppu->t);
     ct_assertequal(0u, ppu->x);
@@ -613,7 +613,7 @@ static void ppuscroll_write(void *ctx)
 
 static void ppuscroll_write_mirrored(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->t = 0x7fff;
     ppu->x = 0xff;
 
@@ -642,7 +642,7 @@ static void ppuscroll_write_mirrored(void *ctx)
 
 static void ppuscroll_write_during_reset(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->rst = ALDO_SIG_SERVICED;
 
     ct_assertequal(0u, ppu->t);
@@ -670,7 +670,7 @@ static void ppuscroll_write_during_reset(void *ctx)
 
 static void ppuscroll_read(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->regbus = 0x5a;
 
     uint8_t d;
@@ -686,7 +686,7 @@ static void ppuscroll_read(void *ctx)
 
 static void ppuaddr_write(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->t = 0x4000;
 
     ct_assertequal(0x4000u, ppu->t);
@@ -714,7 +714,7 @@ static void ppuaddr_write(void *ctx)
 
 static void ppuaddr_write_mirrored(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->t = 0x4fff;
 
     ct_assertequal(0x4fffu, ppu->t);
@@ -742,7 +742,7 @@ static void ppuaddr_write_mirrored(void *ctx)
 
 static void ppuaddr_write_during_reset(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->t = 0x4fff;
     ppu->rst = ALDO_SIG_SERVICED;
 
@@ -771,7 +771,7 @@ static void ppuaddr_write_during_reset(void *ctx)
 
 static void ppuaddr_read(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->regbus = 0x5a;
 
     uint8_t d;
@@ -785,7 +785,7 @@ static void ppuaddr_read(void *ctx)
 // https://www.nesdev.org/wiki/PPU_scrolling#Details
 static void ppu_addr_scroll_interleave(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->t = 0x4000;
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2006, 0x4);
@@ -823,7 +823,7 @@ static void ppu_addr_scroll_interleave(void *ctx)
 
 static void ppudata_write_in_vblank(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -875,7 +875,7 @@ static void ppudata_write_in_vblank(void *ctx)
 
 static void ppudata_write_with_row_increment(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = ppu->ctrl.i = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -927,7 +927,7 @@ static void ppudata_write_with_row_increment(void *ctx)
 
 static void ppudata_write_rendering_disabled(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->line = 42;
     ppu->dot = 24;
     ppu->v = 0x2002;
@@ -978,7 +978,7 @@ static void ppudata_write_rendering_disabled(void *ctx)
 
 static void ppudata_write_mirrored(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1030,7 +1030,7 @@ static void ppudata_write_mirrored(void *ctx)
 
 static void ppudata_write_during_reset(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1083,7 +1083,7 @@ static void ppudata_write_during_reset(void *ctx)
 
 static void ppudata_write_ignores_high_v_bits(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1135,7 +1135,7 @@ static void ppudata_write_ignores_high_v_bits(void *ctx)
 
 static void ppudata_write_palette_backdrop(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1191,7 +1191,7 @@ static void ppudata_write_palette_backdrop(void *ctx)
 
 static void ppudata_write_palette_background(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1247,7 +1247,7 @@ static void ppudata_write_palette_background(void *ctx)
 
 static void ppudata_write_palette_last_background(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1303,7 +1303,7 @@ static void ppudata_write_palette_last_background(void *ctx)
 
 static void ppudata_write_palette_unused(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1359,7 +1359,7 @@ static void ppudata_write_palette_unused(void *ctx)
 
 static void ppudata_write_palette_backdrop_mirror(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1415,7 +1415,7 @@ static void ppudata_write_palette_backdrop_mirror(void *ctx)
 
 static void ppudata_write_palette_backdrop_high_mirror(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1471,7 +1471,7 @@ static void ppudata_write_palette_backdrop_high_mirror(void *ctx)
 
 static void ppudata_write_palette_high_bits(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.g = ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1527,7 +1527,7 @@ static void ppudata_write_palette_high_bits(void *ctx)
 
 static void ppudata_write_palette_sprite(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1583,7 +1583,7 @@ static void ppudata_write_palette_sprite(void *ctx)
 
 static void ppudata_write_palette_last_sprite(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1639,7 +1639,7 @@ static void ppudata_write_palette_last_sprite(void *ctx)
 
 static void ppudata_write_palette_unused_mirrored(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -1695,7 +1695,7 @@ static void ppudata_write_palette_unused_mirrored(void *ctx)
 
 static void ppudata_write_during_rendering(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
     ppu->dot = 9;       // ppudata ALE cycle starts on tile ALE
@@ -1751,7 +1751,7 @@ static void ppudata_write_during_rendering(void *ctx)
 
 static void ppudata_write_during_rendering_off_sync(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
     ppu->dot = 10;      // ppudata ALE cycle starts on tile read
@@ -1799,7 +1799,7 @@ static void ppudata_write_during_rendering_off_sync(void *ctx)
 
 static void ppudata_write_during_rendering_on_x_increment(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
     ppu->dot = 15;      // ppudata ALE cycle starts on tile BGH ALE
@@ -1852,7 +1852,7 @@ static void ppudata_write_during_rendering_on_x_increment(void *ctx)
 
 static void ppudata_write_during_rendering_on_row_increment(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
     ppu->dot = 255;     // ppudata ALE cycle starts on tile BGH ALE
@@ -1907,7 +1907,7 @@ static void ppudata_write_during_sprite_rendering(void *ctx)
 {
     ct_ignore("not implemented");
 
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
     ppu->dot = 270;     // ppudata ALE cycle starts on sprite FGL read
@@ -1955,7 +1955,7 @@ static void ppudata_write_during_sprite_rendering(void *ctx)
 
 static void ppudata_read_in_vblank(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2016,7 +2016,7 @@ static void ppudata_read_in_vblank(void *ctx)
 
 static void ppudata_read_with_row_increment(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = ppu->ctrl.i = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2077,7 +2077,7 @@ static void ppudata_read_with_row_increment(void *ctx)
 
 static void ppudata_read_rendering_disabled(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->line = 42;
     ppu->dot = 24;
     ppu->v = 0x2002;
@@ -2137,7 +2137,7 @@ static void ppudata_read_rendering_disabled(void *ctx)
 
 static void ppudata_read_mirrored(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2198,7 +2198,7 @@ static void ppudata_read_mirrored(void *ctx)
 
 static void ppudata_read_during_reset(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2260,7 +2260,7 @@ static void ppudata_read_during_reset(void *ctx)
 
 static void ppudata_read_ignores_high_v_bits(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2321,7 +2321,7 @@ static void ppudata_read_ignores_high_v_bits(void *ctx)
 
 static void ppudata_read_palette_backdrop(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2377,7 +2377,7 @@ static void ppudata_read_palette_backdrop(void *ctx)
 
 static void ppudata_read_palette_background(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2433,7 +2433,7 @@ static void ppudata_read_palette_background(void *ctx)
 
 static void ppudata_read_palette_last_background(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2489,7 +2489,7 @@ static void ppudata_read_palette_last_background(void *ctx)
 
 static void ppudata_read_palette_unused(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2545,7 +2545,7 @@ static void ppudata_read_palette_unused(void *ctx)
 
 static void ppudata_read_palette_backdrop_mirror(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2601,7 +2601,7 @@ static void ppudata_read_palette_backdrop_mirror(void *ctx)
 
 static void ppudata_read_palette_backdrop_high_mirror(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2657,7 +2657,7 @@ static void ppudata_read_palette_backdrop_high_mirror(void *ctx)
 
 static void ppudata_read_palette_with_high_bits(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.g = ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2713,7 +2713,7 @@ static void ppudata_read_palette_with_high_bits(void *ctx)
 
 static void ppudata_read_palette_sprite(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2769,7 +2769,7 @@ static void ppudata_read_palette_sprite(void *ctx)
 
 static void ppudata_read_palette_last_sprite(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2825,7 +2825,7 @@ static void ppudata_read_palette_last_sprite(void *ctx)
 
 static void ppudata_read_palette_unused_mirrored(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;
@@ -2881,7 +2881,7 @@ static void ppudata_read_palette_unused_mirrored(void *ctx)
 
 static void ppudata_read_during_rendering(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
     ppu->dot = 9;       // ppudata ALE cycle starts on tile ALE
@@ -2946,7 +2946,7 @@ static void ppudata_read_during_rendering(void *ctx)
 
 static void ppudata_read_during_rendering_off_sync(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
     ppu->dot = 10;      // ppudata ALE cycle starts on tile read
@@ -3004,7 +3004,7 @@ static void ppudata_read_during_rendering_off_sync(void *ctx)
 
 static void ppudata_read_during_rendering_on_x_increment(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
     ppu->dot = 15;      // ppudata ALE cycle starts on tile BGH ALE
@@ -3072,7 +3072,7 @@ static void ppudata_read_during_rendering_on_x_increment(void *ctx)
 
 static void ppudata_read_during_rendering_on_row_increment(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
     ppu->dot = 255;     // ppudata ALE cycle starts on tile BGH ALE
@@ -3142,7 +3142,7 @@ static void ppudata_read_during_sprite_rendering(void *ctx)
 {
     ct_ignore("not implemented");
 
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
     ppu->dot = 270;     // ppudata ALE cycle starts on sprite FGL read
@@ -3207,7 +3207,7 @@ static void ppudata_read_during_sprite_rendering(void *ctx)
 
 static void ppudata_read_vram_behind_palette(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 242;
     ppu->dot = 24;

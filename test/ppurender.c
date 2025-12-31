@@ -109,7 +109,7 @@ static void ppu_render_setup(void **ctx)
 
 static void nametable_fetch(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     NameTables[0][5] = 0x11;
     ppu->v = 0x5;
     ppu->line = 1;  // NOTE: avoid odd-frame skipped-dot behavior on line 0
@@ -147,7 +147,7 @@ static void nametable_fetch(void *ctx)
 
 static void attributetable_fetch(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     AttributeTables[0][1] = 0x22;
     ppu->v = 0x5;
     ppu->dot = 3;
@@ -175,7 +175,7 @@ static void attributetable_fetch(void *ctx)
 
 static void tile_fetch(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     PatternTables[0][0] = 0x33;
     PatternTables[0][8] = 0x44;
     ppu->v = 0x5;
@@ -238,7 +238,7 @@ static void tile_fetch(void *ctx)
 
 static void tile_fetch_higher_bits_sequence(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     NameTables[1][2] = 0x11;
     AttributeTables[1][2] = 0x22;
     PatternTables[1][3] = 0x33;
@@ -364,7 +364,7 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
 
 static void tile_fetch_post_render_line(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     NameTables[1][2] = 0x11;
     AttributeTables[1][2] = 0x22;
     PatternTables[1][3] = 0x33;
@@ -470,7 +470,7 @@ static void tile_fetch_post_render_line(void *ctx)
 
 static void tile_fetch_rendering_disabled(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     NameTables[1][2] = 0x11;
     AttributeTables[1][2] = 0x22;
     PatternTables[1][3] = 0x33;
@@ -577,7 +577,7 @@ static void tile_fetch_rendering_disabled(void *ctx)
 
 static void tile_fetch_tile_only_disabled(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     NameTables[1][2] = 0x11;
     AttributeTables[1][2] = 0x22;
     PatternTables[1][3] = 0x33;
@@ -708,7 +708,7 @@ static void tile_fetch_tile_only_disabled(void *ctx)
 
 static void render_line_end(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     NameTables[0][3] = 0x99;
     NameTables[0][6] = 0x77;
     PatternTables[0][8] = 0x44;
@@ -791,7 +791,7 @@ static void render_line_end(void *ctx)
 
 static void render_line_prefetch(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     NameTables[0][5] = 0x11;
     NameTables[0][6] = 0xaa;
     NameTables[0][7] = 0xee;
@@ -1028,7 +1028,7 @@ static void render_line_prefetch(void *ctx)
 
 static void prerender_nametable_fetch(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     NameTables[0][5] = 0x11;
     ppu->v = 0x5;
     ppu->line = 261;
@@ -1063,7 +1063,7 @@ static void prerender_nametable_fetch(void *ctx)
 
 static void prerender_end_even_frame(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     NameTables[0][5] = 0x11;
     ppu->v = 0x5;
     ppu->line = 261;
@@ -1102,7 +1102,7 @@ static void prerender_end_even_frame(void *ctx)
 
 static void prerender_end_odd_frame(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     NameTables[0][5] = 0x11;
     ppu->v = 0x5;
     ppu->line = 261;
@@ -1140,7 +1140,7 @@ static void prerender_end_odd_frame(void *ctx)
 
 static void prerender_set_vertical_coords(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->v = 0x5;
     ppu->t = 0x5fba;
     ppu->dot = 279;
@@ -1166,7 +1166,7 @@ static void prerender_set_vertical_coords(void *ctx)
 
 static void render_not_set_vertical_coords(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->v = 0x5;
     ppu->t = 0x5fba;
     ppu->dot = 279;
@@ -1195,7 +1195,7 @@ static void render_not_set_vertical_coords(void *ctx)
 
 static void course_x_wraparound(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->v = 0x1f;                  // 000 00 00000 11111
     ppu->dot = 8;
 
@@ -1219,7 +1219,7 @@ static void course_x_wraparound(void *ctx)
 
 static void fine_y_wraparound(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->v = 0x7065;                // 111 00 00011 00101
     ppu->dot = 256;
 
@@ -1233,7 +1233,7 @@ static void fine_y_wraparound(void *ctx)
 
 static void course_y_wraparound(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->v = 0x73a5;                // 111 00 11101 00101
     ppu->dot = 256;
 
@@ -1247,7 +1247,7 @@ static void course_y_wraparound(void *ctx)
 
 static void course_y_overflow(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->v = 0x73c5;                    // 111 00 11110 00101
     ppu->dot = 256;
 
@@ -1275,7 +1275,7 @@ static void course_y_overflow(void *ctx)
 
 static void tile_prefetch_pipeline(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->pxpl.at = 0x56;
     ppu->pxpl.bg[0] = 0xbb;
     ppu->pxpl.bg[1] = 0xcc;
@@ -1325,7 +1325,7 @@ static void tile_prefetch_pipeline(void *ctx)
 
 static void tile_prefetch_postrender(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->pxpl.bgs[0] = 0x1111;
     ppu->pxpl.bgs[1] = 0x2222;
     ppu->line = 250;
@@ -1350,7 +1350,7 @@ static void tile_prefetch_postrender(void *ctx)
 
 static void attribute_latch(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     uint16_t vs[] = {0x0, 0x2, 0x40, 0x42};
     ppu->pxpl.at = 0xe4;
     ppu->pxpl.atl[1] = ppu->pxpl.atl[0] = true;
@@ -1369,7 +1369,7 @@ static void attribute_latch(void *ctx)
 
 static void first_pixel_bg(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->pxpl.bgs[0] = 0x6fff;
     ppu->pxpl.bgs[1] = 0xcfff;
     ppu->pxpl.ats[0] = 0x0;
@@ -1423,7 +1423,7 @@ static void first_pixel_bg(void *ctx)
 
 static void last_pixel_bg(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 256;
     ppu->pxpl.bgs[0] = 0xb7ff;
     ppu->pxpl.bgs[1] = 0x67ff;
@@ -1516,7 +1516,7 @@ static void last_pixel_bg(void *ctx)
 
 static void pixel_postrender_bg(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->line = 250;
     ppu->dot = 10;
     ppu->pxpl.mux = 0x4;
@@ -1536,7 +1536,7 @@ static void pixel_postrender_bg(void *ctx)
 
 static void pixel_transparent_bg(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 66;
     ppu->pxpl.bgs[0] = 0x1fff;
     ppu->pxpl.bgs[1] = 0x1fff;
@@ -1578,7 +1578,7 @@ static void pixel_transparent_bg(void *ctx)
 
 static void pixel_disabled_bg(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 66;
     ppu->pxpl.bgs[1] = ppu->pxpl.bgs[0] = 0xffff;
     ppu->pxpl.ats[1] = ppu->pxpl.ats[0] = 0xff;
@@ -1591,7 +1591,7 @@ static void pixel_disabled_bg(void *ctx)
 
 static void left_mask_bg(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->line = 10;
     ppu->dot = 2;
     ppu->pxpl.atl[1] = ppu->pxpl.atl[0] = true;
@@ -1615,7 +1615,7 @@ static void left_mask_bg(void *ctx)
 
 static void fine_x_select(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
 
     uint8_t bg0 = 0, bg1 = 0, at0 = 0, at1 = 0;
     for (uint8_t i = 0; i < 8; ++i) {
@@ -1645,7 +1645,7 @@ static void fine_x_select(void *ctx)
 
 static void rendering_disabled(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 66;
     ppu->pxpl.mux = 0xf;
     ppu->mask.s = ppu->mask.b = false;
@@ -1663,7 +1663,7 @@ static void rendering_disabled(void *ctx)
 
 static void rendering_disabled_explicit_bg_palette(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 66;
     ppu->pxpl.mux = 0xf;
     ppu->mask.s = ppu->mask.b = false;
@@ -1681,7 +1681,7 @@ static void rendering_disabled_explicit_bg_palette(void *ctx)
 
 static void rendering_disabled_unused_bg_palette(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 66;
     ppu->pxpl.mux = 0xf;
     ppu->mask.s = ppu->mask.b = false;
@@ -1699,7 +1699,7 @@ static void rendering_disabled_unused_bg_palette(void *ctx)
 
 static void rendering_disabled_explicit_fg_palette(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 66;
     ppu->pxpl.mux = 0xf;
     ppu->mask.s = ppu->mask.b = false;
@@ -1717,7 +1717,7 @@ static void rendering_disabled_explicit_fg_palette(void *ctx)
 
 static void rendering_disabled_unused_fg_palette(void *ctx)
 {
-    struct aldo_rp2c02 *ppu = ppt_get_ppu(ctx);
+    auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 66;
     ppu->pxpl.mux = 0xf;
     ppu->mask.s = ppu->mask.b = false;

@@ -74,7 +74,7 @@ static void add_breakpoint(void *ctx)
     (void)aldo_debug_bp_add(dbg, expr);
 
     ct_assertequal(1u, aldo_debug_bp_count(dbg));
-    const struct aldo_breakpoint *bp = aldo_debug_bp_at(dbg, 0);
+    auto bp = aldo_debug_bp_at(dbg, 0);
     ct_assertnotnull(bp);
     ct_asserttrue(bp->enabled);
     ct_assertequal(expr.cond, bp->expr.cond);
@@ -91,7 +91,7 @@ static void enable_disable_breakpoint(void *ctx)
 
     ct_assertequal(1u, aldo_debug_bp_count(dbg));
 
-    const struct aldo_breakpoint *bp = aldo_debug_bp_at(dbg, 0);
+    auto bp = aldo_debug_bp_at(dbg, 0);
     ct_assertnotnull(bp);
     ct_assertfalse(bp->enabled);
 
@@ -115,7 +115,7 @@ static void multiple_breakpoints(void *ctx)
 
     ct_assertequal(3u, aldo_debug_bp_count(dbg));
     for (size_t i = 0; i < len; ++i) {
-        const struct aldo_breakpoint *bp = aldo_debug_bp_at(dbg, (ptrdiff_t)i);
+        auto bp = aldo_debug_bp_at(dbg, (ptrdiff_t)i);
         ct_assertnotnull(bp);
         ct_asserttrue(bp->enabled);
         verify_haltexpr(exprs + i, bp);
@@ -159,7 +159,7 @@ static void delete_breakpoint(void *ctx)
     aldo_debug_bp_remove(dbg, 1);
     ct_assertequal(2u, aldo_debug_bp_count(dbg));
 
-    const struct aldo_breakpoint *bp = aldo_debug_bp_at(dbg, 0);
+    auto bp = aldo_debug_bp_at(dbg, 0);
     ct_assertnotnull(bp);
     ct_asserttrue(bp->enabled);
     verify_haltexpr(exprs, bp);

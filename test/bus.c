@@ -93,7 +93,7 @@ static void teardown(void **ctx)
 
 static void empty_device(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
 
     uint8_t d = 0xa;
 
@@ -104,7 +104,7 @@ static void empty_device(void *ctx)
 
 static void read_device(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
     struct aldo_busdevice bd = {
         .read = test_read,
@@ -129,7 +129,7 @@ static void read_device(void *ctx)
 
 static void read_device_at_high_partition(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t memlow[] = {0x9, 0x8, 0x7, 0x6},
             memhigh[] = {0xa, 0xb, [30] = 0xc, [31] = 0xd};
     struct aldo_busdevice bd = {
@@ -158,7 +158,7 @@ static void read_device_at_high_partition(void *ctx)
 
 static void write_device(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t mem[] = {0xff, 0xff, 0xff, 0xff};
     struct aldo_busdevice bd = {
         .write = test_write,
@@ -180,7 +180,7 @@ static void write_device(void *ctx)
 
 static void write_device_at_high_partition(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t memlow[] = {0xff, 0xff, 0xff, 0xff},
             memhigh[] = {0xff, 0xff, [30] = 0xff, [31] = 0xff};
     struct aldo_busdevice bd = {
@@ -207,7 +207,7 @@ static void write_device_at_high_partition(void *ctx)
 
 static void set_device_within_partition_bounds(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t mem[] = {0xff, 0xff, 0xff, 0xff};
     struct aldo_busdevice bd = {
         .read = test_high_read,
@@ -222,7 +222,7 @@ static void set_device_within_partition_bounds(void *ctx)
 
 static void set_device_too_high(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t mem[] = {0xff, 0xff, 0xff, 0xff};
     struct aldo_busdevice bd = {
         .read = test_read,
@@ -236,7 +236,7 @@ static void set_device_too_high(void *ctx)
 
 static void device_swap(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t mem1[] = {0xff, 0xff, 0xff, 0xff},
             mem2[] = {0xff, 0xff, 0xff, 0xff};
     struct aldo_busdevice bd1 = {
@@ -265,7 +265,7 @@ static void device_swap(void *ctx)
 
 static void device_clear(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t mem[] = {0xff, 0xff, 0xff, 0xff};
     struct aldo_busdevice bd1 = {
         .read = test_read,
@@ -291,7 +291,7 @@ static void smallest_bus(void *ctx)
 {
     struct test_context *c = ctx;
     aldo_bus_free(c->b);
-    aldo_bus *b = c->b = aldo_bus_new(1, 1);
+    auto b = c->b = aldo_bus_new(1, 1);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
     struct aldo_busdevice bd = {
         .read = test_read,
@@ -324,7 +324,7 @@ static void largest_bus(void *ctx)
 {
     struct test_context *c = ctx;
     aldo_bus_free(c->b);
-    aldo_bus *b = c->b = aldo_bus_new(ALDO_BITWIDTH_64KB, 2, 0x8000);
+    auto b = c->b = aldo_bus_new(ALDO_BITWIDTH_64KB, 2, 0x8000);
     uint8_t memlow[] = {0xa, 0xb, 0xc, 0xd},
             memhigh[] = {0x9, 0x8, 0x7, 0x6};
     struct aldo_busdevice bd = {
@@ -358,7 +358,7 @@ static void largest_bus(void *ctx)
 
 static void copy(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
     struct aldo_busdevice bd = {
         .copy = test_copy,
@@ -378,7 +378,7 @@ static void copy(void *ctx)
 
 static void copy_partial_bank(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
     struct aldo_busdevice bd = {
         .copy = test_copy,
@@ -397,7 +397,7 @@ static void copy_partial_bank(void *ctx)
 
 static void copy_end_of_bank(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
     struct aldo_busdevice bd = {
         .copy = test_copy,
@@ -414,7 +414,7 @@ static void copy_end_of_bank(void *ctx)
 
 static void copy_past_bank(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
     struct aldo_busdevice bd = {
         .copy = test_copy,
@@ -431,7 +431,7 @@ static void copy_past_bank(void *ctx)
 
 static void copy_wrong_addr(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
     struct aldo_busdevice bd = {
         .copy = test_copy,
@@ -448,7 +448,7 @@ static void copy_wrong_addr(void *ctx)
 
 static void copy_zero_count(void *ctx)
 {
-    aldo_bus *b = get_bus(ctx);
+    auto b = get_bus(ctx);
     uint8_t mem[] = {0xa, 0xb, 0xc, 0xd};
     struct aldo_busdevice bd = {
         .copy = test_copy,

@@ -16,7 +16,7 @@ static struct aldo_peekresult run_peek(struct aldo_mos6502 *cpu)
 {
     // NOTE: run opcode fetch
     aldo_cpu_cycle(cpu);
-    struct aldo_peekresult result = aldo_cpu_peek_start(cpu, nullptr);
+    auto result = aldo_cpu_peek_start(cpu, nullptr);
     do {
         aldo_cpu_peek(cpu, &result);
     } while (!result.done);
@@ -175,7 +175,7 @@ static void peek_immediate(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
 
-    struct aldo_peekresult result = run_peek(&cpu);
+    auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_IMM, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -192,7 +192,7 @@ static void peek_zeropage(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
 
-    struct aldo_peekresult result = run_peek(&cpu);
+    auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_ZP, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -210,7 +210,7 @@ static void peek_zp_indexed(void *ctx)
     cpu.a = 0x10;
     cpu.x = 2;
 
-    struct aldo_peekresult result = run_peek(&cpu);
+    auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_ZPX, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -228,7 +228,7 @@ static void peek_indexed_indirect(void *ctx)
     cpu.a = 0x10;
     cpu.x = 2;
 
-    struct aldo_peekresult result = run_peek(&cpu);
+    auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_INDX, (int)result.mode);
     ct_assertequal(0x4u, result.interaddr);
@@ -246,7 +246,7 @@ static void peek_indirect_indexed(void *ctx)
     cpu.a = 0x10;
     cpu.y = 5;
 
-    struct aldo_peekresult result = run_peek(&cpu);
+    auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_INDY, (int)result.mode);
     ct_assertequal(0x102u, result.interaddr);
@@ -263,7 +263,7 @@ static void peek_absolute(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
 
-    struct aldo_peekresult result = run_peek(&cpu);
+    auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_ABS, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -281,7 +281,7 @@ static void peek_absolute_indexed(void *ctx)
     cpu.a = 0x10;
     cpu.x = 0xa;
 
-    struct aldo_peekresult result = run_peek(&cpu);
+    auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_ABSX, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -298,7 +298,7 @@ static void peek_branch(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu.p.z = true;
 
-    struct aldo_peekresult result = run_peek(&cpu);
+    auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_BCH, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -315,7 +315,7 @@ static void peek_branch_forced(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu.p.z = false;
 
-    struct aldo_peekresult result = run_peek(&cpu);
+    auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_BCH, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -333,7 +333,7 @@ static void peek_absolute_indirect(void *ctx)
     cpu.a = 0x10;
     cpu.x = 0xa;
 
-    struct aldo_peekresult result = run_peek(&cpu);
+    auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_JIND, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);
@@ -349,7 +349,7 @@ static void peek_jam(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
 
-    struct aldo_peekresult result = run_peek(&cpu);
+    auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_JAM, (int)result.mode);
 }
@@ -362,7 +362,7 @@ static void peek_busfault(void *ctx)
     setup_cpu(&cpu, mem, ctx);
     cpu.a = 0x10;
 
-    struct aldo_peekresult result = run_peek(&cpu);
+    auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_ABS, (int)result.mode);
     ct_assertequal(0x0u, result.interaddr);

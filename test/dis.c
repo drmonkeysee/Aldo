@@ -460,7 +460,7 @@ static void inst_operand_empty_instruction(void *ctx)
 static void inst_operand_no_operand(void *ctx)
 {
     uint8_t mem[] = {0xea};
-    struct aldo_dis_instruction inst = makeinst(mem);
+    auto inst = makeinst(mem);
     char buf[ALDO_DIS_OPERAND_SIZE];
 
     int length = aldo_dis_inst_operand(&inst, buf);
@@ -473,7 +473,7 @@ static void inst_operand_no_operand(void *ctx)
 static void inst_operand_one_byte_operand(void *ctx)
 {
     uint8_t mem[] = {0x65, 0x6};
-    struct aldo_dis_instruction inst = makeinst(mem);
+    auto inst = makeinst(mem);
     char buf[ALDO_DIS_OPERAND_SIZE];
 
     int length = aldo_dis_inst_operand(&inst, buf);
@@ -486,7 +486,7 @@ static void inst_operand_one_byte_operand(void *ctx)
 static void inst_operand_two_byte_operand(void *ctx)
 {
     uint8_t mem[] = {0xad, 0x34, 0x4c};
-    struct aldo_dis_instruction inst = makeinst(mem);
+    auto inst = makeinst(mem);
     char buf[ALDO_DIS_OPERAND_SIZE];
 
     int length = aldo_dis_inst_operand(&inst, buf);
@@ -510,7 +510,7 @@ static void inst_eq_both_are_null(void *ctx)
 static void inst_eq_rhs_is_null(void *ctx)
 {
     uint8_t a[] = {0xea};
-    struct aldo_dis_instruction lhs = makeinst(a);
+    auto lhs = makeinst(a);
 
     bool result = aldo_dis_inst_equal(&lhs, nullptr);
 
@@ -520,7 +520,7 @@ static void inst_eq_rhs_is_null(void *ctx)
 static void inst_eq_lhs_is_null(void *ctx)
 {
     uint8_t b[] = {0xad, 0x34, 0x4c};
-    struct aldo_dis_instruction rhs = makeinst(b);
+    auto rhs = makeinst(b);
 
     bool result = aldo_dis_inst_equal(nullptr, &rhs);
 
@@ -530,7 +530,8 @@ static void inst_eq_lhs_is_null(void *ctx)
 static void inst_eq_different_lengths(void *ctx)
 {
     uint8_t a[] = {0xea}, b[] = {0xad, 0x34, 0x4c};
-    struct aldo_dis_instruction lhs = makeinst(a), rhs = makeinst(b);
+    auto lhs = makeinst(a);
+    auto rhs = makeinst(b);
 
     bool result = aldo_dis_inst_equal(&lhs, &rhs);
 
@@ -540,7 +541,8 @@ static void inst_eq_different_lengths(void *ctx)
 static void inst_eq_different_bytes(void *ctx)
 {
     uint8_t a[] = {0xad, 0x44, 0x80}, b[] = {0xad, 0x34, 0x4c};
-    struct aldo_dis_instruction lhs = makeinst(a), rhs = makeinst(b);
+    auto lhs = makeinst(a);
+    auto rhs = makeinst(b);
 
     bool result = aldo_dis_inst_equal(&lhs, &rhs);
 
@@ -550,7 +552,8 @@ static void inst_eq_different_bytes(void *ctx)
 static void inst_eq_same_bytes(void *ctx)
 {
     uint8_t a[] = {0xad, 0x34, 0x4c}, b[] = {0xad, 0x34, 0x4c};
-    struct aldo_dis_instruction lhs = makeinst(a), rhs = makeinst(b);
+    auto lhs = makeinst(a);
+    auto rhs = makeinst(b);
 
     bool result = aldo_dis_inst_equal(&lhs, &rhs);
 
@@ -560,7 +563,7 @@ static void inst_eq_same_bytes(void *ctx)
 static void inst_eq_same_object(void *ctx)
 {
     uint8_t a[] = {0xad, 0x44, 0x80};
-    struct aldo_dis_instruction lhs = makeinst(a);
+    auto lhs = makeinst(a);
 
     bool result = aldo_dis_inst_equal(&lhs, &lhs);
 
@@ -588,7 +591,7 @@ static void inst_disassembles_implied(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0xea};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -602,7 +605,7 @@ static void inst_disassembles_immediate(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0xa9, 0x34};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -616,7 +619,7 @@ static void inst_disassembles_zeropage(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0xa5, 0x34};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -630,7 +633,7 @@ static void inst_disassembles_zeropage_x(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0xb5, 0x34};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -644,7 +647,7 @@ static void inst_disassembles_zeropage_y(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0xb6, 0x34};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -658,7 +661,7 @@ static void inst_disassembles_indirect_x(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0xa1, 0x34};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -672,7 +675,7 @@ static void inst_disassembles_indirect_y(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0xb1, 0x34};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -686,7 +689,7 @@ static void inst_disassembles_absolute(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0xad, 0x34, 0x6};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -700,7 +703,7 @@ static void inst_disassembles_absolute_x(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0xbd, 0x34, 0x6};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -714,7 +717,7 @@ static void inst_disassembles_absolute_y(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0xb9, 0x34, 0x6};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -728,7 +731,7 @@ static void inst_disassembles_jmp_absolute(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0x4c, 0x34, 0x6};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -742,7 +745,7 @@ static void inst_disassembles_jmp_indirect(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0x6c, 0x34, 0x6};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -756,7 +759,7 @@ static void inst_disassembles_branch_positive(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0x90, 0xa};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -770,7 +773,7 @@ static void inst_disassembles_branch_negative(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0x90, 0xf6};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -784,7 +787,7 @@ static void inst_disassembles_branch_zero(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0x90, 0x0};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -798,7 +801,7 @@ static void inst_disassembles_push(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0x48};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -812,7 +815,7 @@ static void inst_disassembles_pull(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0x68};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -826,7 +829,7 @@ static void inst_disassembles_jsr(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0x20, 0x34, 0x6};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -840,7 +843,7 @@ static void inst_disassembles_rts(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0x60};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -854,7 +857,7 @@ static void inst_disassembles_brk(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0x0};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -868,7 +871,7 @@ static void inst_disassembles_unofficial(void *ctx)
 {
     uint16_t a = 0x1234;
     uint8_t bytes[] = {0x2};
-    struct aldo_dis_instruction inst = makeinst(bytes);
+    auto inst = makeinst(bytes);
     char buf[ALDO_DIS_INST_SIZE];
 
     int length = aldo_dis_inst(a, &inst, buf);
@@ -2651,7 +2654,7 @@ static void peek_interrupt(void *ctx)
     aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
     aldo_cpu_snapshot(&cpu, &snp);
     struct peekctx *pctx = ctx;
-    aldo_debugger *dbg = pctx->dbg;
+    auto dbg = pctx->dbg;
     aldo_debug_set_vector_override(dbg, Aldo_NoResetVector);
     snp.prg.vectors[4] = 0xbb;
     snp.prg.vectors[5] = 0xaa;
@@ -2677,7 +2680,7 @@ static void peek_overridden_reset(void *ctx)
     aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
     aldo_cpu_snapshot(&cpu, &snp);
     struct peekctx *pctx = ctx;
-    aldo_debugger *dbg = pctx->dbg;
+    auto dbg = pctx->dbg;
     aldo_debug_set_vector_override(dbg, 0xccdd);
     snp.prg.vectors[2] = 0xbb;
     snp.prg.vectors[3] = 0xaa;
@@ -2703,7 +2706,7 @@ static void peek_overridden_non_reset(void *ctx)
     aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
     aldo_cpu_snapshot(&cpu, &snp);
     struct peekctx *pctx = ctx;
-    aldo_debugger *dbg = pctx->dbg;
+    auto dbg = pctx->dbg;
     aldo_debug_set_vector_override(dbg, 0xccdd);
     snp.prg.vectors[0] = 0xff;
     snp.prg.vectors[1] = 0xee;

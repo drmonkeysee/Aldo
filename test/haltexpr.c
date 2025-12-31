@@ -691,7 +691,7 @@ static void dbgexpr_malformed(void *ctx)
 static void print_none(void *ctx)
 {
     struct aldo_haltexpr expr = {};
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_desc(&expr, buf);
 
@@ -703,7 +703,7 @@ static void print_none(void *ctx)
 static void print_addr(void *ctx)
 {
     struct aldo_haltexpr expr = {.cond = ALDO_HLT_ADDR, .address = 0x1234};
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_desc(&expr, buf);
 
@@ -718,7 +718,7 @@ static void print_runtime(void *ctx)
         .cond = ALDO_HLT_TIME,
         .runtime = 4.36532245f,
     };
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_desc(&expr, buf);
 
@@ -732,7 +732,7 @@ static void print_long_runtime(void *ctx)
     struct aldo_haltexpr expr = {
         .cond = ALDO_HLT_TIME, .runtime = 12312423242344.234f,
     };
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_desc(&expr, buf);
 
@@ -744,7 +744,7 @@ static void print_long_runtime(void *ctx)
 static void print_cycles(void *ctx)
 {
     struct aldo_haltexpr expr = {.cond = ALDO_HLT_CYCLES, .cycles = 982423};
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_desc(&expr, buf);
 
@@ -756,7 +756,7 @@ static void print_cycles(void *ctx)
 static void print_frames(void *ctx)
 {
     struct aldo_haltexpr expr = {.cond = ALDO_HLT_FRAMES, .cycles = 982423};
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_desc(&expr, buf);
 
@@ -768,7 +768,7 @@ static void print_frames(void *ctx)
 static void print_jam(void *ctx)
 {
     struct aldo_haltexpr expr = {.cond = ALDO_HLT_JAM};
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_desc(&expr, buf);
 
@@ -786,7 +786,7 @@ static void format_reset(void *ctx)
     struct aldo_debugexpr expr = {
         .type = ALDO_DBG_EXPR_RESET, .resetvector = 0x1234,
     };
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_fmtdbg(&expr, buf);
 
@@ -801,7 +801,7 @@ static void format_addr(void *ctx)
         .type = ALDO_DBG_EXPR_HALT,
         .hexpr = {.cond = ALDO_HLT_ADDR, .address = 0x1234},
     };
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_fmtdbg(&expr, buf);
 
@@ -816,7 +816,7 @@ static void format_runtime(void *ctx)
         .type = ALDO_DBG_EXPR_HALT,
         .hexpr = {.cond = ALDO_HLT_TIME, .runtime = 4.36532245f},
     };
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_fmtdbg(&expr, buf);
 
@@ -831,7 +831,7 @@ static void format_long_runtime(void *ctx)
         .type = ALDO_DBG_EXPR_HALT,
         .hexpr = {.cond = ALDO_HLT_TIME, .runtime = 12312423242344.234f},
     };
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_fmtdbg(&expr, buf);
 
@@ -846,7 +846,7 @@ static void format_cycles(void *ctx)
         .type = ALDO_DBG_EXPR_HALT,
         .hexpr = {.cond = ALDO_HLT_CYCLES, .cycles = 982423},
     };
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_fmtdbg(&expr, buf);
 
@@ -861,7 +861,7 @@ static void format_frames(void *ctx)
         .type = ALDO_DBG_EXPR_HALT,
         .hexpr = {.cond = ALDO_HLT_FRAMES, .frames = 982423},
     };
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_fmtdbg(&expr, buf);
 
@@ -875,7 +875,7 @@ static void format_jam(void *ctx)
     struct aldo_debugexpr expr = {
         .type = ALDO_DBG_EXPR_HALT, .hexpr = {.cond = ALDO_HLT_JAM},
     };
-    char buf[ALDO_HEXPR_FMT_SIZE];
+    char buf[AldoHexprFmtSize];
 
     int result = aldo_haltexpr_fmtdbg(&expr, buf);
 

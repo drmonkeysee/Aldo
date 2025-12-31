@@ -411,7 +411,7 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
     decLabel += "-";
     const char* incKey, *decKey;
     int val;
-    if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
+    if (ImGui::IsKeyDown(ImGuiMod_Shift)) {
         incLabel += multiplierLabel;
         decLabel += multiplierLabel;
         incKey = "+";
@@ -442,7 +442,7 @@ auto mode_menu_item(aldo::viewstate& vs, const aldo::Emulator& emu)
     std::string label = "Run Mode";
     const char* mnemonic;
     int modeAdjust;
-    if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
+    if (ImGui::IsKeyDown(ImGuiMod_Shift)) {
         label += " (R)";
         mnemonic = "M";
         modeAdjust = -1;
@@ -1204,9 +1204,9 @@ private:
         ScopedID id = static_cast<int>(idx);
         if (ImGui::Selectable(err < 0 ? aldo_haltexpr_errstr(err) : fmt.data(),
                               bpSelections.selected(idx))) {
-            if (ImGui::IsKeyDown(ImGuiKey_ModShift)) {
+            if (ImGui::IsKeyDown(ImGuiMod_Shift)) {
                 bpSelections.rangeSelect(idx);
-            } else if (ImGui::IsKeyDown(ImGuiKey_ModSuper)) {
+            } else if (ImGui::IsKeyDown(ImGuiMod_Super)) {
                 bpSelections.multiSelect(idx);
             } else {
                 bpSelections.select(idx);

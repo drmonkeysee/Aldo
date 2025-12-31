@@ -3,11 +3,11 @@ ifneq ($(OS), Darwin)
 SHELL := $(shell which bash)
 endif
 
-SDL_VERSION := 2.30.1
+SDL_VERSION := 2.32.10
 SDL_DMG := SDL2-$(SDL_VERSION).dmg
 SDL_HTTP := https://github.com/libsdl-org/SDL/releases/download/release-$(SDL_VERSION)
 
-IMGUI_VERSION := 1.90.4
+IMGUI_VERSION := 1.92.5
 IMGUI_TARGET := imgui
 IMGUI_HTTP := https://github.com/ocornut/imgui/archive/refs/tags/v$(IMGUI_VERSION).tar.gz
 IMGUI_SRC := $(IMGUI_TARGET)-$(IMGUI_VERSION)

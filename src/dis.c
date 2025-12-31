@@ -437,7 +437,7 @@ static int write_chrblock(const struct aldo_blockview *bv, uint32_t scale,
     int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
     if (err < 0) return err;
 
-    FILE *bmpfile = fopen(bmpfilename, "wb");
+    auto bmpfile = fopen(bmpfilename, "wb");
     if (!bmpfile) return ALDO_DIS_ERR_ERNO;
 
     err = write_chrtiles(bv, tilesdim, tile_sections, scale, bmpfile);
@@ -460,9 +460,9 @@ static int write_chrblock(const struct aldo_blockview *bv, uint32_t scale,
 static struct aldo_peekresult run_peek(struct aldo_mos6502 *cpu,
                                        struct aldo_rp2c02 *ppu)
 {
-    struct aldo_rp2c02 ppu_restore = *ppu;
+    auto ppu_restore = *ppu;
     struct aldo_mos6502 cpu_restore;
-    struct aldo_peekresult peek = aldo_cpu_peek_start(cpu, &cpu_restore);
+    auto peek = aldo_cpu_peek_start(cpu, &cpu_restore);
     do {
         for (int i = 0; i < Aldo_PpuRatio; ++i) {
             aldo_ppu_cycle(ppu);
@@ -502,7 +502,7 @@ int aldo_dis_parse_inst(const struct aldo_blockview *bv, size_t at,
     if (at >= bv->size) return 0;
 
     uint8_t opcode = bv->mem[at];
-    struct aldo_decoded dec = Aldo_Decode[opcode];
+    auto dec = Aldo_Decode[opcode];
     int instlen = InstLens[dec.mode];
     if ((size_t)instlen > bv->size - at) return ALDO_DIS_ERR_EOF;
 
@@ -616,7 +616,7 @@ int aldo_dis_cart_prg(aldo_cart *cart, const char *restrict name, bool verbose,
     assert(name != nullptr);
     assert(f != nullptr);
 
-    struct aldo_blockview bv = aldo_cart_prgblock(cart, 0);
+    auto bv = aldo_cart_prgblock(cart, 0);
     if (!bv.mem) return ALDO_DIS_ERR_PRGROM;
 
     if (aldo_cart_write_dis_header(cart, name, f) < 0) return ALDO_DIS_ERR_IO;
@@ -645,7 +645,7 @@ int aldo_dis_cart_chr(aldo_cart *cart, int chrscale,
 
     if (chrscale <= 0 || chrscale > ScaleGuard) return ALDO_DIS_ERR_CHRSCL;
 
-    struct aldo_blockview bv = aldo_cart_chrblock(cart, 0);
+    auto bv = aldo_cart_chrblock(cart, 0);
     if (!bv.mem) return ALDO_DIS_ERR_CHRROM;
 
     const char *prefix = chrdecode_prefix && chrdecode_prefix[0] != '\0'
@@ -775,7 +775,7 @@ int aldo_dis_peek(struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
         if (count < 0) return ALDO_DIS_ERR_FMT;
         total += count;
     } else {
-        struct aldo_peekresult peek = run_peek(cpu, ppu);
+        auto peek = run_peek(cpu, ppu);
         switch (peek.mode) {
 #define XPEEK(...) sprintf(dis, __VA_ARGS__)
 #define X(s, b, n, p, ...) case ALDO_AM_LBL(s): total = p; break;

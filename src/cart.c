@@ -68,7 +68,7 @@ static int parse_ines(struct aldo_cartridge *self, FILE *f)
     memcpy(&tail, header + 12, sizeof tail);
     if (tail != 0) return ALDO_CART_ERR_OBSOLETE;
 
-    struct aldo_cartinfo *info = &self->info;
+    auto info = &self->info;
     info->ines_hdr.prg_blocks = header[4];
     info->ines_hdr.chr_blocks = header[5];
     info->ines_hdr.wram = header[6] & 0x2;

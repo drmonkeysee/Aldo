@@ -233,7 +233,7 @@ static void set_ppu_pins(struct aldo_nes001 *self)
 
 static void set_screen_dot(struct aldo_nes001 *self)
 {
-    struct aldo_ppu_coord c = aldo_ppu_screendot(&self->ppu);
+    auto c = aldo_ppu_screendot(&self->ppu);
     if (c.dot < 0) return;
 
     size_t screendot = (size_t)(c.dot + (c.line * SCREEN_WIDTH));

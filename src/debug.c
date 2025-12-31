@@ -168,7 +168,7 @@ static bool bpvector_insert(struct breakpoint_vector *vec,
     if (vec->size == vec->capacity) {
         if (!bpvector_resize(vec)) return false;
     }
-    struct aldo_breakpoint *slot = vec->items + vec->size;
+    auto slot = vec->items + vec->size;
     *slot = (struct aldo_breakpoint){expr, true};
     ++vec->size;
     return true;
@@ -179,7 +179,7 @@ static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
                                 const struct aldo_mos6502 *cpu)
 {
     for (ptrdiff_t i = 0; i < (ptrdiff_t)vec->size; ++i) {
-        const struct aldo_breakpoint *bp = vec->items + i;
+        auto bp = vec->items + i;
         if (!bp->enabled) continue;
         switch (bp->expr.cond) {
         case ALDO_HLT_ADDR:
@@ -296,7 +296,7 @@ void aldo_debug_bp_enable(aldo_debugger *self, ptrdiff_t at, bool enabled)
 {
     assert(self != nullptr);
 
-    struct aldo_breakpoint *bp = bpvector_at(&self->breakpoints, at);
+    auto bp = bpvector_at(&self->breakpoints, at);
     if (bp) {
         bp->enabled = enabled;
     }

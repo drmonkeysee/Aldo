@@ -125,7 +125,7 @@ static void raw_dtor(struct aldo_mapper *self)
 {
     assert(self != nullptr);
 
-    struct raw_mapper *m = (struct raw_mapper *)self;
+    auto m = (struct raw_mapper *)self;
     free(m->rom);
     free(m);
 }
@@ -156,7 +156,7 @@ static void ines_dtor(struct aldo_mapper *self)
 {
     assert(self != nullptr);
 
-    struct ines_mapper *m = (struct ines_mapper *)self;
+    auto m = (struct ines_mapper *)self;
     free(m->chr);
     free(m->prg);
     free(m->wram);
@@ -295,7 +295,7 @@ static bool ines_000_vbus_connect(struct aldo_mapper *self, aldo_bus *b)
 {
     assert(self != nullptr);
 
-    struct ines_000_mapper *m = (struct ines_000_mapper *)self;
+    auto m = (struct ines_000_mapper *)self;
     return aldo_bus_set(b, 0, (struct aldo_busdevice){
         .read = ines_000_chrr,
         .write = m->super.chrram ? ines_000_chrw : nullptr,
@@ -331,12 +331,12 @@ static void ines_000_snapshot(struct aldo_mapper *self,
     assert(snp != nullptr);
     assert(snp->video != nullptr);
 
-    struct ines_000_mapper *m = (struct ines_000_mapper *)self;
+    auto m = (struct ines_000_mapper *)self;
     snp->video->nt.mirror = m->hmirroring
                             ? ALDO_NTM_HORIZONTAL
                             : ALDO_NTM_VERTICAL;
 
-    struct ines_mapper *b = &m->super;
+    auto b = &m->super;
     if (!b->ptstale) return;
 
     struct aldo_blockview bv = {
@@ -404,7 +404,7 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
             },
         };
         assert(header->prg_blocks <= 2);
-        struct ines_000_mapper *m = (struct ines_000_mapper *)self;
+        auto m = (struct ines_000_mapper *)self;
         m->blockcount = header->prg_blocks;
         m->hmirroring = header->mirror == ALDO_NTM_HORIZONTAL;
         header->mapper_implemented = true;
@@ -420,7 +420,7 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
         };
         header->mapper_implemented = false;
     }
-    struct aldo_mapper *base = &self->vtable.extends;
+    auto base = &self->vtable.extends;
     base->dtor = ines_dtor;
     base->prgrom = ines_prgrom;
     base->mbus_disconnect = clear_prg_device;

@@ -96,7 +96,7 @@ bool aldo_trace_line(FILE *tracelog, int adjustment, uint64_t cycles,
     assert(written <= instw);
     if (fprintf(tracelog, "%*s", width, "") < 0) return false;
     if (!trace_registers(tracelog, snp)) return false;
-    struct aldo_ppu_coord p = aldo_ppu_trace(ppu, adjustment * Aldo_PpuRatio);
+    auto p = aldo_ppu_trace(ppu, adjustment * Aldo_PpuRatio);
     return fprintf(tracelog, " PPU:%3d,%3d CPU:%" PRIu64 "\n", p.line,
                    p.dot, cycles + (uint64_t)adjustment) > 0;
 }

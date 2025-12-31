@@ -201,7 +201,7 @@ int aldo_haltexpr_fmtdbg(const struct aldo_debugexpr *expr,
     if (expr->type == ALDO_DBG_EXPR_RESET) {
         count = sprintf(buf, ALDO_HEXPR_RST_IND "%04X", expr->resetvector);
     } else {
-        const struct aldo_haltexpr *hexpr = &expr->hexpr;
+        auto hexpr = &expr->hexpr;
         switch (hexpr->cond) {
         case ALDO_HLT_ADDR:
             count = sprintf(buf, "@%04X", hexpr->address);

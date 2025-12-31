@@ -75,7 +75,7 @@ bool aldo_bus_swap(aldo_bus *self, uint16_t addr, struct aldo_busdevice bd,
 
     if (addr > self->maxaddr) return false;
 
-    struct partition *target = find(self, addr);
+    auto target = find(self, addr);
     if (prev) {
         *prev = target->device;
     }
@@ -90,7 +90,7 @@ bool aldo_bus_read(aldo_bus *self, uint16_t addr, uint8_t *restrict d)
 
     if (addr > self->maxaddr) return false;
 
-    struct partition *target = find(self, addr);
+    auto target = find(self, addr);
     return target->device.read
             ? target->device.read(target->device.ctx, addr, d)
             : false;
@@ -102,7 +102,7 @@ bool aldo_bus_write(aldo_bus *self, uint16_t addr, uint8_t d)
 
     if (addr > self->maxaddr) return false;
 
-    struct partition *target = find(self, addr);
+    auto target = find(self, addr);
     return target->device.write
             ? target->device.write(target->device.ctx, addr, d)
             : false;
@@ -117,7 +117,7 @@ size_t aldo_bus_copy(aldo_bus *self, uint16_t addr, size_t count,
 
     if (addr > self->maxaddr || count == 0) return 0;
 
-    struct partition *target = find(self, addr);
+    auto target = find(self, addr);
     return target->device.copy
             ? target->device.copy(target->device.ctx, addr, count, dest)
             : 0;

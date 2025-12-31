@@ -189,13 +189,13 @@ static void palette_write(struct aldo_rp2c02 *self, uint16_t addr, uint8_t d)
 
 static void
 snapshot_palette(const struct aldo_rp2c02 *self,
-                 uint8_t palsnp[static ALDO_PAL_SIZE][ALDO_PAL_SIZE],
+                 uint8_t palsnp[static AldoPalSize][AldoPalSize],
                  uint16_t offset)
 {
     uint16_t base = Aldo_PaletteStartAddr + offset;
-    for (size_t i = 0; i < ALDO_PAL_SIZE; ++i) {
+    for (size_t i = 0; i < AldoPalSize; ++i) {
         uint8_t *p = palsnp[i];
-        uint16_t addr = base + (uint16_t)(ALDO_PAL_SIZE * i);
+        uint16_t addr = base + (uint16_t)(AldoPalSize * i);
         // NOTE: 1st color is always the backdrop
         p[0] = palette_read(self, base);
         p[1] = palette_read(self, addr + 1);
@@ -380,9 +380,9 @@ static void snapshot_nametables(const struct aldo_rp2c02 *self,
     snp->video->nt.pos.h = self->t & HNtBit;
     snp->video->nt.pos.v = self->t & VNtBit;
     snp->video->nt.pos.x =
-        (uint8_t)(((self->t & CourseXBits) * ALDO_CHR_TILE_DIM) + self->x);
+        (uint8_t)(((self->t & CourseXBits) * AldoChrTileDim) + self->x);
     snp->video->nt.pos.y =
-        (uint8_t)((((self->t & CourseYBits) >> 5) * ALDO_CHR_TILE_DIM)
+        (uint8_t)((((self->t & CourseYBits) >> 5) * AldoChrTileDim)
                   + ((self->t & FineYBits) >> 12));
 
     for (size_t i = 0; i < aldo_arrsz(snp->video->nt.tables); ++i) {

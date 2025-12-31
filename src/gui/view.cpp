@@ -1558,7 +1558,7 @@ private:
         auto attr = modeCombo.selection() == DisplayMode::attributes;
         ImGui::Text("%s $%4X", attr ? "Attribute Table" : "Nametable",
                     ALDO_MEMBLOCK_8KB + (table * ALDO_MEMBLOCK_1KB)
-                    + (attr * ALDO_NT_TILE_COUNT));
+                    + (attr * AldoNtTileCount));
     }
 
     aldo::Nametables nametables;

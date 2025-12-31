@@ -81,19 +81,19 @@ static void clear_chr_device(aldo_bus *b)
 }
 
 static void fill_pattern_table(size_t tile_count,
-                               uint16_t table[tile_count][ALDO_CHR_TILE_DIM],
+                               uint16_t table[tile_count][AldoChrTileDim],
                                const struct aldo_blockview *bv)
 {
-    assert(tile_count <= ALDO_PT_TILE_COUNT);
-    assert(bv->size >= tile_count * ALDO_CHR_TILE_STRIDE);
+    assert(tile_count <= AldoPtTileCount);
+    assert(bv->size >= tile_count * AldoChrTileStride);
 
     for (size_t tile = 0; tile < tile_count; ++tile) {
-        for (size_t row = 0; row < ALDO_CHR_TILE_DIM; ++row) {
-            size_t idx = row + (tile * ALDO_CHR_TILE_STRIDE);
-            assert(idx < bv->size - ALDO_CHR_TILE_DIM);
+        for (size_t row = 0; row < AldoChrTileDim; ++row) {
+            size_t idx = row + (tile * AldoChrTileStride);
+            assert(idx < bv->size - AldoChrTileDim);
             uint8_t
                 plane0 = bv->mem[idx],
-                plane1 = bv->mem[idx + ALDO_CHR_TILE_DIM];
+                plane1 = bv->mem[idx + AldoChrTileDim];
             table[tile][row] = aldo_byteshuffle(plane0, plane1);
         }
     }

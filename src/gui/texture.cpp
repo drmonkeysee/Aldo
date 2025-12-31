@@ -24,7 +24,7 @@ static_assert(std::same_as<Uint32, ImU32>,
 namespace
 {
 
-using nt_span = std::span<const aldo::et::byte, ALDO_NT_TILE_COUNT>;
+using nt_span = std::span<const aldo::et::byte, AldoNtTileCount>;
 
 constexpr auto operator*(SDL_Point p, int n) noexcept
 {
@@ -42,7 +42,7 @@ auto draw_tile_row(aldo::et::word pxRow, aldo::color_span colors,
                    const aldo::tex::TextureData& data)
 {
     for (auto px = 0; px < static_cast<int>(aldo::pt_tile::extent); ++px) {
-        auto pidx = ALDO_CHR_TILE_STRIDE - ((px + 1) * 2);
+        auto pidx = AldoChrTileStride - ((px + 1) * 2);
         assert(0 <= pidx);
         decltype(colors)::size_type texel = (pxRow & (0x3 << pidx)) >> pidx;
         assert(texel < colors.size());
@@ -106,7 +106,7 @@ void aldo::PatternTable::draw(aldo::pt_span table, aldo::color_span colors,
 
 aldo::Nametables::Nametables(SDL_Point nametableSize,
                              const aldo::MediaRuntime& mr)
-: ntSize{nametableSize}, texSize{nametableSize * ALDO_NT_COUNT},
+: ntSize{nametableSize}, texSize{nametableSize * AldoNtCount},
 ntTex{texSize, mr.renderer()}, atTex{texSize, mr.renderer()} {}
 
 void aldo::Nametables::draw(const Emulator& emu, const MediaRuntime& mr) const
@@ -157,13 +157,13 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
     auto offsets = getOffsets(vsp->nt.mirror);
 
     auto data = ntTex.lock();
-    for (auto i = 0; i < ALDO_NT_COUNT; ++i) {
+    for (auto i = 0; i < AldoNtCount; ++i) {
         nt_span tiles = vsp->nt.tables[i].tiles;
         attr_span attrs = vsp->nt.tables[i].attributes;
-        for (auto row = 0; row < ALDO_NT_HEIGHT; ++row) {
-            for (auto col = 0; col < ALDO_NT_WIDTH; ++col) {
+        for (auto row = 0; row < AldoNtHeight; ++row) {
+            for (auto col = 0; col < AldoNtWidth; ++col) {
                 auto tileIdx = static_cast<
-                    decltype(tiles)::size_type>(col + (row * ALDO_NT_WIDTH));
+                    decltype(tiles)::size_type>(col + (row * AldoNtWidth));
                 auto tile = tiles[tileIdx];
                 auto colors = lookupTilePalette(attrs, col, row,
                                                 vsp->palettes.bg);
@@ -197,7 +197,7 @@ void aldo::Nametables::drawAttributes(const aldo::Emulator& emu,
     auto offsets = getOffsets(vsp->nt.mirror);
     auto ren = mr.renderer();
     auto target = atTex.asTarget(ren);
-    for (auto i = 0; i < ALDO_NT_COUNT; ++i) {
+    for (auto i = 0; i < AldoNtCount; ++i) {
         attr_span attrs = vsp->nt.tables[i].attributes;
         for (auto row = 0; row < AttributeDim; ++row) {
             for (auto col = 0; col < AttributeDim; ++col) {
@@ -234,13 +234,13 @@ aldo::Nametables::lookupTilePalette(attr_span attrs, int tileCol, int tileRow,
     using ps_sz = decltype(palettes)::size_type;
 
     auto attrIdx = static_cast<
-        decltype(attrs)::size_type>((tileCol >> ALDO_METATILE_DIM)
-                                    + ((tileRow >> ALDO_METATILE_DIM)
+        decltype(attrs)::size_type>((tileCol >> AldoMetatileDim)
+                                    + ((tileRow >> AldoMetatileDim)
                                        * AttributeDim));
     auto attr = attrs[attrIdx];
-    auto mtIdx = static_cast<ps_sz>(((tileCol >> 1) % ALDO_METATILE_DIM)
-                                    + (((tileRow >> 1) % ALDO_METATILE_DIM)
-                                       * ALDO_METATILE_DIM));
+    auto mtIdx = static_cast<ps_sz>(((tileCol >> 1) % AldoMetatileDim)
+                                    + (((tileRow >> 1) % AldoMetatileDim)
+                                       * AldoMetatileDim));
     assert(mtIdx < palettes.size());
     ps_sz palIdx = (attr >> (mtIdx * 2)) & 0x3;
     assert(palIdx < palettes.size());
@@ -256,7 +256,7 @@ void aldo::Nametables::drawAttribute(attr_span attrs, int ntIdx, int col,
         decltype(attrs)::size_type>(col + (row * AttributeDim));
     auto attr = attrs[attrIdx];
     // NOTE: last row only uses the top half of attributes
-    auto mtCount = row == AttributeDim - 1 ? ALDO_METATILE_DIM : MetatileCount;
+    auto mtCount = row == AttributeDim - 1 ? AldoMetatileDim : MetatileCount;
     for (auto m = 0; m < mtCount; ++m) {
         drawMetatile(attr, ntIdx, col, row, m, offsets, bg, p, ren);
     }
@@ -267,7 +267,7 @@ void aldo::Nametables::drawMetatile(aldo::et::byte attr, int ntIdx, int col,
                                     const nt_offsets& offsets, pal_span bg,
                                     const aldo::Palette& p, SDL_Renderer* ren)
 {
-    static constexpr auto metatileStride = ALDO_METATILE_DIM * TilePxDim;
+    static constexpr auto metatileStride = AldoMetatileDim * TilePxDim;
 
     aldo::color_span::size_type pidx = (attr >> (metaTile * 2)) & 0x3;
     assert(pidx < aldo::color_span::extent);

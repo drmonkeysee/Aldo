@@ -24,11 +24,10 @@ namespace aldo
 class Emulator;
 class MediaRuntime;
 class Palette;
-using color_span = std::span<const et::byte, ALDO_PAL_SIZE>;
+using color_span = std::span<const et::byte, AldoPalSize>;
 // TODO: use std::mdspan someday when they can be sliced?
-using pt_tile = std::span<const et::word, ALDO_CHR_TILE_DIM>;
-using pt_span = std::span<const et::word[ALDO_CHR_TILE_DIM],
-                            ALDO_PT_TILE_COUNT>;
+using pt_tile = std::span<const et::word, AldoChrTileDim>;
+using pt_span = std::span<const et::word[AldoChrTileDim], AldoPtTileCount>;
 
 namespace tex
 {
@@ -152,7 +151,7 @@ class Nametables {
 public:
     static constexpr int
         TilePxDim = pt_tile::extent,
-        MetatileCount = ALDO_METATILE_DIM * ALDO_METATILE_DIM,
+        MetatileCount = AldoMetatileDim * AldoMetatileDim,
         AttributePxDim = TilePxDim * MetatileCount;
 
     enum class DrawMode {
@@ -180,8 +179,8 @@ public:
 private:
     static constexpr int AttributeDim = 8;
 
-    using attr_span = std::span<const et::byte, ALDO_NT_ATTR_COUNT>;
-    using pal_span = std::span<const et::byte[ALDO_PAL_SIZE], ALDO_PAL_SIZE>;
+    using attr_span = std::span<const et::byte, AldoNtAttrCount>;
+    using pal_span = std::span<const et::byte[AldoPalSize], AldoPalSize>;
     struct nt_offsets {
         int upperX = 0, upperY = 0, mirrorX = 0, mirrorY = 0;
     };

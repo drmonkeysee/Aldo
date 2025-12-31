@@ -13,22 +13,22 @@
 #include <stddef.h>
 #include <stdint.h>
 
-enum {
-    ALDO_PAL_SIZE = 4,
+#include "bridgeopen.h"
+aldo_const size_t AldoPalSize = 4;
+aldo_const int
     // NOTE: CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is a
     // 16-byte array of 2-bit palette-indexed pixels composed of two bit-planes
     // where the first plane specifies the pixel low bit and the second plane
     // specifies the pixel high bit.
-    ALDO_CHR_TILE_DIM = 8,
-    ALDO_CHR_TILE_STRIDE = 2 * ALDO_CHR_TILE_DIM,
-    ALDO_PT_TILE_COUNT = 256,
-    ALDO_NT_COUNT = 2,
-    ALDO_NT_WIDTH = 32,
-    ALDO_NT_HEIGHT = 30,
-    ALDO_NT_TILE_COUNT = ALDO_NT_WIDTH * ALDO_NT_HEIGHT,
-    ALDO_NT_ATTR_COUNT = 64,
-    ALDO_METATILE_DIM = 2,
-};
+    AldoChrTileDim = 8,
+    AldoChrTileStride = 2 * AldoChrTileDim,
+    AldoPtTileCount = 256,
+    AldoNtCount = 2,
+    AldoNtWidth = 32,
+    AldoNtHeight = 30,
+    AldoNtTileCount = AldoNtWidth * AldoNtHeight,
+    AldoNtAttrCount = 64,
+    AldoMetatileDim = 2;
 
 struct aldo_snapshot {
     struct {
@@ -86,9 +86,9 @@ struct aldo_snapshot {
         struct {
             enum aldo_ntmirror mirror;
             struct {
-                uint8_t attributes[ALDO_NT_ATTR_COUNT],
-                        tiles[ALDO_NT_TILE_COUNT];
-            } tables[ALDO_NT_COUNT];
+                uint8_t attributes[AldoNtAttrCount],
+                        tiles[AldoNtTileCount];
+            } tables[AldoNtCount];
             struct {
                 uint8_t x, y;
                 bool h, v;
@@ -98,19 +98,18 @@ struct aldo_snapshot {
         // A Pattern Table is 256 tiles x 8 rows x 8 pixels x 2 bits.
         struct {
             uint16_t
-                left[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM],
-                right[ALDO_PT_TILE_COUNT][ALDO_CHR_TILE_DIM];
+                left[AldoPtTileCount][AldoChrTileDim],
+                right[AldoPtTileCount][AldoChrTileDim];
         } pattern_tables;
         // Background/Foreground, 4 Palettes, 4 Colors, 6 Bits
         struct {
-            uint8_t bg[ALDO_PAL_SIZE][ALDO_PAL_SIZE],
-                    fg[ALDO_PAL_SIZE][ALDO_PAL_SIZE];
+            uint8_t bg[AldoPalSize][AldoPalSize],
+                    fg[AldoPalSize][AldoPalSize];
         } palettes;
         bool newframe;
     } *video;
 };
 
-#include "bridgeopen.h"
 // NOTE: if returns false then errno is set due to failed allocation
 aldo_export aldo_checkerr
 bool aldo_snapshot_extend(struct aldo_snapshot *snp) aldo_nothrow;

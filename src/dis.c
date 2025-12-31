@@ -290,26 +290,26 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
             size_t
                 tileidx = tilex + (tiley * tilesdim)
                             + (section * tilesdim * tilesdim),
-                chr_row = (tileidx * ALDO_CHR_TILE_STRIDE) + pixely;
+                chr_row = (tileidx * AldoChrTileStride) + pixely;
             uint8_t
                 plane0 = bv->mem[chr_row],
-                plane1 = bv->mem[chr_row + ALDO_CHR_TILE_DIM];
+                plane1 = bv->mem[chr_row + AldoChrTileDim];
             // NOTE: 8 2-bit pixels make a single CHR tile row; each 2-bit
             // pixel will be expanded to 4-bits and packed 2 pixels per byte
             // for a 4 bpp BMP.
             uint16_t pixelrow = aldo_byteshuffle(plane0, plane1);
-            for (size_t pixelx = 0; pixelx < ALDO_CHR_TILE_DIM; ++pixelx) {
+            for (size_t pixelx = 0; pixelx < AldoChrTileDim; ++pixelx) {
                 // NOTE: packedpixel is the pixel in (prescaled) bmp-row space;
                 // pixelidx is the 2-bit slice of pixelrow that maps to the
                 // packedpixel; BMP layout goes from left-to-right so pixelidx
                 // goes "backwards" from MSBs to LSBs.
                 size_t
-                    packedpixel = pixelx + (tilex * ALDO_CHR_TILE_DIM)
+                    packedpixel = pixelx + (tilex * AldoChrTileDim)
                                     + (section * section_pxldim),
-                    pixelidx = ALDO_CHR_TILE_STRIDE - ((pixelx + 1) * 2);
+                    pixelidx = AldoChrTileStride - ((pixelx + 1) * 2);
                 uint8_t pixel =
                     (uint8_t)((pixelrow & (0x3 << pixelidx)) >> pixelidx);
-                assert(pixelidx < ALDO_CHR_TILE_STRIDE);
+                assert(pixelidx < AldoChrTileStride);
                 for (uint32_t scalex = 0; scalex < scale; ++scalex) {
                     size_t scaledpixel = scalex + (packedpixel * scale);
                     if (scaledpixel % 2 == 0) {
@@ -329,7 +329,7 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
                           FILE *bmpfile)
 {
     uint32_t
-        section_pxldim = tilesdim * ALDO_CHR_TILE_DIM,
+        section_pxldim = tilesdim * AldoChrTileDim,
         bmph = section_pxldim * scale,
         bmpw = section_pxldim * tile_sections * scale,
         // NOTE: 4 bpp equals 8 pixels per 4 bytes; bmp pixel rows must then
@@ -411,7 +411,7 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
     if (!packedrow) return ALDO_DIS_ERR_ERNO;
 
     for (int32_t tiley = (int32_t)(tilesdim - 1); tiley >= 0; --tiley) {
-        for (int32_t pixely = (int32_t)(ALDO_CHR_TILE_DIM - 1);
+        for (int32_t pixely = (int32_t)(AldoChrTileDim - 1);
              pixely >= 0;
              --pixely) {
             for (uint32_t scaley = 0; scaley < scale; ++scaley) {

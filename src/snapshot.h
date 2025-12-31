@@ -15,20 +15,19 @@
 
 #include "bridgeopen.h"
 aldo_const size_t AldoPalSize = 4;
-aldo_const int
-    // NOTE: CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is a
-    // 16-byte array of 2-bit palette-indexed pixels composed of two bit-planes
-    // where the first plane specifies the pixel low bit and the second plane
-    // specifies the pixel high bit.
-    AldoChrTileDim = 8,
-    AldoChrTileStride = 2 * AldoChrTileDim,
-    AldoPtTileCount = 256,
-    AldoNtCount = 2,
-    AldoNtWidth = 32,
-    AldoNtHeight = 30,
-    AldoNtTileCount = AldoNtWidth * AldoNtHeight,
-    AldoNtAttrCount = 64,
-    AldoMetatileDim = 2;
+// NOTE: CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is a
+// 16-byte array of 2-bit palette-indexed pixels composed of two bit-planes
+// where the first plane specifies the pixel low bit and the second plane
+// specifies the pixel high bit.
+aldo_const int AldoChrTileDim = 8;
+aldo_const int AldoChrTileStride = 2 * AldoChrTileDim;
+aldo_const int AldoPtTileCount = 256;
+aldo_const int AldoNtCount = 2;
+aldo_const int AldoNtWidth = 32;
+aldo_const int AldoNtHeight = 30;
+aldo_const int AldoNtTileCount = AldoNtWidth * AldoNtHeight;
+aldo_const int AldoNtAttrCount = 64;
+aldo_const int AldoMetatileDim = 2;
 
 struct aldo_snapshot {
     struct {

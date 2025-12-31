@@ -35,9 +35,10 @@
 // MARK: - Run Loop Clock
 //
 
-constexpr int
-    DisplayHz = 60, RamColWidth = 3, RamDim = 16,
-    RamPageSize = RamDim * RamDim;
+constexpr int DisplayHz = 60;
+constexpr int RamColWidth = 3;
+constexpr int RamDim = 16;
+constexpr int RamPageSize = RamDim * RamDim;
 
 enum ram_selection {
     RSEL_RAM,
@@ -407,8 +408,11 @@ static void draw_interrupt_latch(const struct view *v,
 static void drawdatapath(const struct view *v, int cursor_y, int w,
                          const struct aldo_snapshot *snp)
 {
-    static constexpr int
-        seph = 5, vsep1 = 7, vsep2 = 21, col1 = vsep1 + 2, col2 = vsep2 + 2;
+    static constexpr int seph = 5;
+    static constexpr int vsep1 = 7;
+    static constexpr int vsep2 = 21;
+    static constexpr int col1 = vsep1 + 2;
+    static constexpr int col2 = vsep2 + 2;
 
     int line_x = (w / 4) + 1;
     draw_chip_vline(v, snp->cpu.lines.ready, cursor_y, line_x, 1, ArrowDown,
@@ -528,7 +532,9 @@ static void draw_scroll_addr(const struct view *v, int y, int x, char label,
 static int draw_pipeline(const struct view *v, int cursor_y, int w,
                          const struct aldo_snapshot *snp)
 {
-    static constexpr int seph = 5, vsep = 19, buscol = vsep + 2;
+    static constexpr int seph = 5;
+    static constexpr int vsep = 19;
+    static constexpr int buscol = vsep + 2;
 
     mvwvline(v->content, ++cursor_y, vsep, 0, seph);
 
@@ -594,7 +600,8 @@ static void drawppu(const struct view *v, const struct aldo_snapshot *snp)
 
 static void drawramtitle(const struct view *v, const struct viewstate *vs)
 {
-    static constexpr int titlew = 16, offsets[] = {2, 7, 13};
+    static constexpr int titlew = 16;
+    static constexpr int offsets[] = {2, 7, 13};
     static const char *const restrict labels[] = {"RAM", "VRAM", "PPU"};
 
     mvwhline(v->win, 0, 1, 0, titlew);
@@ -766,9 +773,15 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 
 static void init_ui(struct layout *l, int ramsheets)
 {
-    static constexpr int
-        col1w = 30, col2w = 29, col3w = 29, col4w = 54, sysh = 25, crth = 4,
-        cpuh = 20, maxh = 37, maxw = col1w + col2w + col3w + col4w;
+    static constexpr int col1w = 30;
+    static constexpr int col2w = 29;
+    static constexpr int col3w = 29;
+    static constexpr int col4w = 54;
+    static constexpr int sysh = 25;
+    static constexpr int crth = 4;
+    static constexpr int cpuh = 20;
+    static constexpr int maxh = 37;
+    static constexpr int maxw = col1w + col2w + col3w + col4w;
 
     setlocale(LC_ALL, "");
     initscr();

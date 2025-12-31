@@ -2433,7 +2433,7 @@ struct peekctx {
 
 static void setup_peek(void **ctx)
 {
-    struct peekctx *pctx = malloc(sizeof *ctx);
+    struct peekctx *pctx = malloc(sizeof *pctx);
     pctx->dbg = aldo_debug_new();
     ppu_setup((void **)&pctx->ppu);
     *ctx = pctx;

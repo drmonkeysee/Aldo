@@ -36,23 +36,23 @@ static const char
     *const restrict VersionLong = "--version",
     *const restrict ZeroRamLong = "--zero-ram";
 
-constexpr char
-    BatchShort = 'b',
-    BcdShort = 'D',
-    ChrDecodeShort = 'c',
-    ChrScaleShort = 's',
-    DebugFileShort = 'g',
-    DisassembleShort = 'd',
-    HaltShort = 'H',
-    HelpShort = 'h',
-    InfoShort = 'i',
-    ResVectorShort = 'r',
-    TraceShort = 't',
-    VerboseShort = 'v',
-    VersionShort = 'V',
-    ZeroRamShort = 'z';
+constexpr char BatchShort = 'b';
+constexpr char BcdShort = 'D';
+constexpr char ChrDecodeShort = 'c';
+constexpr char ChrScaleShort = 's';
+constexpr char DebugFileShort = 'g';
+constexpr char DisassembleShort = 'd';
+constexpr char HaltShort = 'H';
+constexpr char HelpShort = 'h';
+constexpr char InfoShort = 'i';
+constexpr char ResVectorShort = 'r';
+constexpr char TraceShort = 't';
+constexpr char VerboseShort = 'v';
+constexpr char VersionShort = 'V';
+constexpr char ZeroRamShort = 'z';
 
-constexpr int MinAddress = 0, MaxAddress = ALDO_ADDRMASK_64KB;
+constexpr int MinAddress = 0;
+constexpr int MaxAddress = ALDO_ADDRMASK_64KB;
 
 static void init_cliargs(struct cliargs *args)
 {

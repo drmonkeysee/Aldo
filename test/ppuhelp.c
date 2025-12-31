@@ -38,7 +38,7 @@ uint8_t VRam[4];
 
 void ppu_setup(void **ctx)
 {
-    struct ppu_test_context *c = calloc(sizeof *c, 1);
+    struct ppu_test_context *c = calloc(1, sizeof *c);
     // NOTE: enough main bus to map $2000 - $3FFF for ppu registers
     c->mbus = aldo_bus_new(ALDO_BITWIDTH_16KB, 2, ALDO_MEMBLOCK_8KB);
     VRam[0] = 0x11;

@@ -49,10 +49,9 @@ struct aldo_dis_instruction {
 // MARK: - Export
 //
 
-aldo_const size_t
-    AldoDisOperandSize = 8,
-    AldoDisDatapSize = 12,
-    AldoDisInstSize = 28;
+aldo_const size_t AldoDisOperandSize = 8;
+aldo_const size_t AldoDisDatapSize = 12;
+aldo_const size_t AldoDisInstSize = 28;
 
 aldo_export
 extern const int Aldo_MinChrScale, Aldo_MaxChrScale;

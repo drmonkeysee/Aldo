@@ -22,19 +22,27 @@
 // v-blank, overscan, etc; nominally 1 frame is 262 * 341 = 89342 ppu cycles;
 // however with rendering enabled the odd frames skip a dot for an overall
 // average cycle count of 89341.5 per frame.
-constexpr int
-    Dots = 341, Lines = 262,
-    LinePostRender = 240, LineVBlank = LinePostRender + 1,
-    LinePreRender = Lines - 1,
-    DotPxStart = 2, DotSpriteFetch = 257, DotPxEnd = 260,
-    DotTilePrefetch = 321, DotTilePrefetchEnd = 337;
+constexpr int Dots = 341;
+constexpr int Lines = 262;
+constexpr int LinePostRender = 240;
+constexpr int LineVBlank = LinePostRender + 1;
+constexpr int LinePreRender = Lines - 1;
+constexpr int DotPxStart = 2;
+constexpr int DotSpriteFetch = 257;
+constexpr int DotPxEnd = 260;
+constexpr int DotTilePrefetch = 321;
+constexpr int DotTilePrefetchEnd = 337;
 
 // NOTE: helpers for manipulating v and t registers
-constexpr uint16_t
-    BaseNtAddr = ALDO_MEMBLOCK_8KB,
-    HNtBit = ALDO_MEMBLOCK_1KB, VNtBit = ALDO_MEMBLOCK_2KB,
-    NtBits = VNtBit | HNtBit, CourseYBits = 0x3e0, FineYBits = 0x7000;
-constexpr uint8_t CourseXBits = 0x1f, PaletteMask = CourseXBits;
+constexpr uint16_t BaseNtAddr = ALDO_MEMBLOCK_8KB;
+constexpr uint16_t HNtBit = ALDO_MEMBLOCK_1KB;
+constexpr uint16_t VNtBit = ALDO_MEMBLOCK_2KB;
+constexpr uint16_t NtBits = VNtBit | HNtBit;
+constexpr uint16_t CourseYBits = 0x3e0;
+constexpr uint16_t FineYBits = 0x7000;
+
+constexpr uint8_t CourseXBits = 0x1f;
+constexpr uint8_t PaletteMask = CourseXBits;
 
 //
 // MARK: - Registers
@@ -287,7 +295,8 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
         break;
     case 5: // PPUSCROLL
         if (ppu->rst != ALDO_SIG_SERVICED) {
-            static constexpr uint8_t course = 0xf8, fine = 0x7;
+            static constexpr uint8_t course = 0xf8;
+            static constexpr uint8_t fine = 0x7;
             if (ppu->w) {
                 // NOTE: set course and fine y
                 ppu->t = (uint16_t)((ppu->t & ~(FineYBits | CourseYBits))
@@ -587,7 +596,8 @@ static void incr_course_x(struct aldo_rp2c02 *self)
 
 static void incr_y(struct aldo_rp2c02 *self)
 {
-    static constexpr uint16_t max_course_y = 29 << 5, overflow_y = 31 << 5;
+    static constexpr uint16_t max_course_y = 29 << 5;
+    static constexpr uint16_t overflow_y = 31 << 5;
 
     // NOTE: fine-y wraparound at y = 7, overflow into course-y;
     // course-y wraparound at y = 29, overflow into vertical nametable bit;

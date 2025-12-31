@@ -20,7 +20,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-constexpr int ScreenWidth = 256, ScreenHeight = 240;
+constexpr int ScreenWidth = 256;
+constexpr int ScreenHeight = 240;
 
 // The NES-001 NTSC Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.

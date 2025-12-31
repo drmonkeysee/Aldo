@@ -269,13 +269,13 @@ static int measure_tile_sheet(size_t banksize, uint32_t *restrict dim,
 // 4, as are the number of colors representable at 2 bpp so conveniently
 // all color constants collapse into one value.
 constexpr uint8_t BmpBitsPerPixel = 4;
-constexpr size_t
-    BmpPaletteSize = BmpBitsPerPixel * BmpBitsPerPixel,
+constexpr size_t BmpPaletteSize = BmpBitsPerPixel * BmpBitsPerPixel;
 
-    // NOTE: bmp header sizes
-    BmpFileHeaderSize = 14,
-    BmpInfoHeaderSize = 40,
-    BmpHeaderSize = BmpFileHeaderSize + BmpInfoHeaderSize + BmpPaletteSize;
+// NOTE: bmp header sizes
+constexpr size_t BmpFileHeaderSize = 14;
+constexpr size_t BmpInfoHeaderSize = 40;
+constexpr size_t BmpHeaderSize = BmpFileHeaderSize + BmpInfoHeaderSize
+                                    + BmpPaletteSize;
 
 static void fill_tile_sheet_row(uint8_t *restrict packedrow,
                                 uint32_t tiley, uint32_t pixely,

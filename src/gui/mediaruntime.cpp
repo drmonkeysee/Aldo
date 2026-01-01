@@ -13,10 +13,11 @@
 #include "ui.h"
 
 #include "imgui.h"
-#include "imgui_impl_sdl2.h"
-#include "imgui_impl_sdlrenderer2.h"
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_sdlrenderer3.h"
 
 #include <stdexcept>
+#include <cinttypes>
 
 namespace
 {
@@ -28,9 +29,8 @@ auto create_window(SDL_Point windowSize, const gui_platform& p)
     SDL_Log("HIDPI: %d", hidpi);
     aldo::platform_buffer name{p.appname(), p.free_buffer};
     auto win = SDL_CreateWindow(name ? name.get() : "DisplayNameErr",
-                                SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                 windowSize.x, windowSize.y,
-                                hidpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0);
+                                hidpi ? SDL_WINDOW_HIGH_PIXEL_DENSITY : 0);
     if (!win) throw aldo::SdlError{"SDL window creation failure"};
     return win;
 }
@@ -38,15 +38,23 @@ auto create_window(SDL_Point windowSize, const gui_platform& p)
 ALDO_OWN
 auto create_renderer(const aldo::mr::win_handle& hwin, const gui_platform& p)
 {
-    auto ren = SDL_CreateRenderer(hwin.get(), -1, SDL_RENDERER_PRESENTVSYNC);
+    auto props = SDL_CreateProperties();
+    SDL_SetPointerProperty(props, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER,
+                           hwin.get());
+    SDL_SetNumberProperty(props, SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER,
+                          1);
+    auto ren = SDL_CreateRendererWithProperties(props);
+    SDL_DestroyProperties(props);
     if (!ren) throw aldo::SdlError{"SDL renderer creation failure"};
 
     auto render_scale_factor = p.render_scale_factor(hwin.get());
-    SDL_RenderSetScale(ren, render_scale_factor, render_scale_factor);
-    SDL_RendererInfo info;
-    SDL_GetRendererInfo(ren, &info);
-    SDL_Log("Render info: %s (%#x) (x%.1f)", info.name, info.flags,
-            render_scale_factor);
+    SDL_SetRenderScale(ren, render_scale_factor, render_scale_factor);
+    props = SDL_GetRendererProperties(ren);
+    auto vsync = SDL_GetNumberProperty(props, SDL_PROP_RENDERER_VSYNC_NUMBER,
+                                       0);
+    SDL_DestroyProperties(props);
+    SDL_Log("Render info: %s (%" PRId64 ") (x%.1f)", SDL_GetRendererName(ren),
+            vsync, render_scale_factor);
     return ren;
 }
 
@@ -58,7 +66,7 @@ auto create_renderer(const aldo::mr::win_handle& hwin, const gui_platform& p)
 
 aldo::mr::SdlLib::SdlLib()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (!SDL_Init(SDL_INIT_VIDEO))
         throw aldo::SdlError{"SDL initialization failure"};
 }
 
@@ -74,16 +82,16 @@ aldo::mr::DearImGuiLib::DearImGuiLib(const aldo::mr::win_handle& hwin,
         throw std::runtime_error{"DearImGui initialization failure"};
 
     ImGui::CreateContext();
-    ImGui_ImplSDL2_InitForSDLRenderer(hwin.get(), hren.get());
-    ImGui_ImplSDLRenderer2_Init(hren.get());
+    ImGui_ImplSDL3_InitForSDLRenderer(hwin.get(), hren.get());
+    ImGui_ImplSDLRenderer3_Init(hren.get());
 
     ImGui::StyleColorsDark();
 }
 
 aldo::mr::DearImGuiLib::~DearImGuiLib()
 {
-    ImGui_ImplSDLRenderer2_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
+    ImGui_ImplSDLRenderer3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 }
 

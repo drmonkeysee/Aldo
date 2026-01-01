@@ -11,9 +11,9 @@
 #include "style.hpp"
 
 #include "imgui.h"
-#include "imgui_impl_sdl2.h"
-#include "imgui_impl_sdlrenderer2.h"
-#include <SDL2/SDL.h>
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_sdlrenderer3.h"
+#include <SDL3/SDL.h>
 
 #include <utility>
 
@@ -21,20 +21,20 @@ aldo::RenderFrame::RenderFrame(const aldo::MediaRuntime& r,
                                aldo::RunTimer t) noexcept
 : r{r}, t{std::move(t)}
 {
-    ImGui_ImplSDLRenderer2_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
+    ImGui_ImplSDLRenderer3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 }
 
 aldo::RenderFrame::~RenderFrame()
 {
-    auto ren = r.renderer();
     ImGui::Render();
+    auto ren = r.renderer();
     SDL_SetRenderDrawColor(ren, aldo::colors::ScreenFill,
                            aldo::colors::ScreenFill, aldo::colors::ScreenFill,
                            SDL_ALPHA_OPAQUE);
     SDL_RenderClear(ren);
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), ren);
+    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), ren);
     // NOTE: record render timing here, otherwise we're just measuring VSYNC
     t.record();
     SDL_RenderPresent(ren);

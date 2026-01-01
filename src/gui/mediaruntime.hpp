@@ -14,7 +14,6 @@
 #include <SDL3/SDL.h>
 
 #include <functional>
-#include <utility>
 
 struct gui_platform;
 
@@ -51,19 +50,10 @@ public:
 
 class ALDO_SIDEFX SdlProperties {
 public:
-    static SdlProperties renderer(SDL_Renderer* ren) noexcept
-    {
-        return SdlProperties{SDL_GetRendererProperties(ren)};
-    }
-    static SdlProperties texture(SDL_Texture* tex) noexcept
-    {
-        return SdlProperties{SDL_GetTextureProperties(tex)};
-    }
+    static SdlProperties renderer(SDL_Renderer* ren) noexcept;
+    static SdlProperties texture(SDL_Texture* tex) noexcept;
 
-    SdlProperties() noexcept : SdlProperties{SDL_CreateProperties()}
-    {
-        cleanup = [this] noexcept { SDL_DestroyProperties(this->props); };
-    }
+    SdlProperties() noexcept;
     explicit SdlProperties(SDL_PropertiesID pid) noexcept : props{pid} {}
     SdlProperties(const SdlProperties&) = delete;
     SdlProperties& operator=(const SdlProperties&) = delete;
@@ -79,27 +69,11 @@ public:
 
     SDL_PropertiesID get() const noexcept { return props; }
 
-    Sint64 number(const char* name, Sint64 defaultVal = 0) const noexcept
-    {
-        return SDL_GetNumberProperty(props, name, defaultVal);
-    }
-    void setNumber(const char* name, Sint64 val) noexcept
-    {
-        SDL_SetNumberProperty(props, name, val);
-    }
+    Sint64 number(const char* name, Sint64 defaultVal = 0) const noexcept;
+    void setNumber(const char* name, Sint64 val) noexcept;
+    void setPointer(const char* name, void* val) noexcept;
 
-    void setPointer(const char* name, void* val) noexcept
-    {
-        SDL_SetPointerProperty(props, name, val);
-    }
-
-    void swap(SdlProperties& that) noexcept
-    {
-        using std::swap;
-
-        swap(props, that.props);
-        swap(cleanup, that.cleanup);
-    }
+    void swap(SdlProperties& that) noexcept;
 
 private:
     using dtor = std::function<void()>;

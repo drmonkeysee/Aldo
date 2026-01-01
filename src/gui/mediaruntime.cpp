@@ -17,6 +17,7 @@
 #include "imgui_impl_sdlrenderer3.h"
 
 #include <stdexcept>
+#include <utility>
 
 namespace
 {
@@ -58,6 +59,57 @@ auto create_renderer(const aldo::mr::win_handle& hwin, const gui_platform& p)
 // MARK: - Public Interface
 //
 
+aldo::SdlProperties aldo::SdlProperties::renderer(SDL_Renderer* ren) noexcept
+{
+    return aldo::SdlProperties{SDL_GetRendererProperties(ren)};
+}
+
+aldo::SdlProperties aldo::SdlProperties::texture(SDL_Texture* tex) noexcept
+{
+    return aldo::SdlProperties{SDL_GetTextureProperties(tex)};
+}
+
+aldo::SdlProperties::SdlProperties() noexcept
+: aldo::SdlProperties{SDL_CreateProperties()}
+{
+    cleanup = [this] noexcept { SDL_DestroyProperties(this->props); };
+}
+
+Sint64 aldo::SdlProperties::number(const char* name,
+                                   Sint64 defaultVal) const noexcept
+{
+    return SDL_GetNumberProperty(props, name, defaultVal);
+}
+
+void aldo::SdlProperties::setNumber(const char* name, Sint64 val) noexcept
+{
+    SDL_SetNumberProperty(props, name, val);
+}
+
+void aldo::SdlProperties::setPointer(const char* name, void* val) noexcept
+{
+    SDL_SetPointerProperty(props, name, val);
+}
+
+void aldo::SdlProperties::swap(aldo::SdlProperties& that) noexcept
+{
+    using std::swap;
+
+    swap(props, that.props);
+    swap(cleanup, that.cleanup);
+}
+
+aldo::MediaRuntime::MediaRuntime(SDL_Point windowSize, const gui_platform& p)
+try : p{p}, hwin{create_window(windowSize, p)}, hren{create_renderer(hwin, p)},
+        imgui{hwin, hren} {}
+catch (...) {
+    InitStatus = ALDO_UI_ERR_LIBINIT;
+}
+
+//
+// MARK: - Internal Interface
+//
+
 aldo::mr::SdlLib::SdlLib()
 {
     if (!SDL_Init(SDL_INIT_VIDEO))
@@ -87,11 +139,4 @@ aldo::mr::DearImGuiLib::~DearImGuiLib()
     ImGui_ImplSDLRenderer3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
-}
-
-aldo::MediaRuntime::MediaRuntime(SDL_Point windowSize, const gui_platform& p)
-try : p{p}, hwin{create_window(windowSize, p)}, hren{create_renderer(hwin, p)},
-        imgui{hwin, hren} {}
-catch (...) {
-    InitStatus = ALDO_UI_ERR_LIBINIT;
 }

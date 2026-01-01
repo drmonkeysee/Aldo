@@ -14,6 +14,7 @@
 #include <SDL3/SDL.h>
 
 #include <functional>
+#include <utility>
 
 struct gui_platform;
 
@@ -67,7 +68,13 @@ public:
     SdlProperties(const SdlProperties&) = delete;
     SdlProperties& operator=(const SdlProperties&) = delete;
     SdlProperties(SdlProperties&&) noexcept = default;
-    SdlProperties& operator=(SdlProperties&&) noexcept = default;
+    SdlProperties& operator=(SdlProperties&& that) noexcept
+    {
+        if (this == &that) return *this;
+
+        swap(that);
+        return *this;
+    }
     ~SdlProperties() { cleanup(); }
 
     SDL_PropertiesID get() const noexcept { return props; }
@@ -84,6 +91,14 @@ public:
     void setPointer(const char* name, void* val) noexcept
     {
         SDL_SetPointerProperty(props, name, val);
+    }
+
+    void swap(SdlProperties& that) noexcept
+    {
+        using std::swap;
+
+        swap(props, that.props);
+        swap(cleanup, that.cleanup);
     }
 
 private:
@@ -114,6 +129,11 @@ private:
     mr::ren_handle hren;
     mr::DearImGuiLib imgui;
 };
+
+inline void swap(SdlProperties& a, SdlProperties& b) noexcept
+{
+    a.swap(b);
+}
 
 }
 

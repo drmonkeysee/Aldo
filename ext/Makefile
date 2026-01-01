@@ -3,7 +3,7 @@ ifneq ($(OS), Darwin)
 SHELL := $(shell which bash)
 endif
 
-SDL_VERSION := 3.2.28
+SDL_VERSION := 3.4.0
 SDL_DMG := SDL3-$(SDL_VERSION).dmg
 SDL_HTTP := https://github.com/libsdl-org/SDL/releases/download/release-$(SDL_VERSION)
 

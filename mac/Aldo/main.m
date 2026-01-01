@@ -18,13 +18,10 @@
 
 static float render_scale_factor(void *sdlwindow)
 {
-    auto props = SDL_GetWindowProperties(sdlwindow);
-    auto cocoa_win = (__bridge NSWindow *)SDL_GetPointerProperty(
-         props,
-         SDL_PROP_WINDOW_COCOA_WINDOW_POINTER,
-         nullptr
-    );
-    SDL_DestroyProperties(props);
+    auto cocoa_win = (__bridge NSWindow *)
+        SDL_GetPointerProperty(SDL_GetWindowProperties(sdlwindow),
+                               SDL_PROP_WINDOW_COCOA_WINDOW_POINTER,
+                               nullptr);
     if (cocoa_win) {
         return (float)cocoa_win.backingScaleFactor;
     } else {

@@ -48,12 +48,11 @@ auto create_renderer(const aldo::mr::win_handle& hwin, const gui_platform& p)
 
     auto render_scale_factor = p.render_scale_factor(hwin.get());
     SDL_SetRenderScale(ren, render_scale_factor, render_scale_factor);
-    props = SDL_GetRendererProperties(ren);
-    auto vsync = SDL_GetNumberProperty(props, SDL_PROP_RENDERER_VSYNC_NUMBER,
-                                       0);
-    SDL_DestroyProperties(props);
     SDL_Log("Renderer - %s vsync: %" SDL_PRIs64 " scale: x%.1f",
-            SDL_GetRendererName(ren), vsync, render_scale_factor);
+            SDL_GetRendererName(ren),
+            SDL_GetNumberProperty(SDL_GetRendererProperties(ren),
+                                  SDL_PROP_RENDERER_VSYNC_NUMBER, 0),
+            render_scale_factor);
     return ren;
 }
 

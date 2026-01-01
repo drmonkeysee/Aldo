@@ -139,7 +139,6 @@ aldo::tex::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
     assert(SDL_PIXELTYPE(pxfmt) == SDL_PIXELTYPE_PACKED32);
     width = SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_WIDTH_NUMBER, 0);
     height = SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_HEIGHT_NUMBER, 0);
-    SDL_DestroyProperties(props);
 
     void* data;
     int pitch;

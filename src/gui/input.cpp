@@ -13,8 +13,8 @@
 #include "viewstate.hpp"
 
 #include "imgui.h"
-#include "imgui_impl_sdl2.h"
-#include <SDL2/SDL.h>
+#include "imgui_impl_sdl3.h"
+#include <SDL3/SDL.h>
 
 #include <stdexcept>
 #include <string>
@@ -36,12 +36,12 @@ auto invalid_command(aldo::Command c)
 
 constexpr auto shift_pressed(const SDL_Event& ev) noexcept
 {
-    return ev.key.keysym.mod & KMOD_SHIFT;
+    return ev.key.mod & SDL_KMOD_SHIFT;
 }
 
 constexpr auto is_menu_command(const SDL_Event& ev) noexcept
 {
-    return (ev.key.keysym.mod & KMOD_GUI) && !ev.key.repeat;
+    return (ev.key.mod & SDL_KMOD_GUI) && !ev.key.repeat;
 }
 
 auto is_free_key(const SDL_Event& ev, bool allowRepeat = false) noexcept
@@ -77,7 +77,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
                     aldo::viewstate& vs)
 {
     auto& lines = emu.snapshot().cpu.lines;
-    switch (ev.key.keysym.sym) {
+    switch (ev.key.key) {
     case SDLK_SPACE:
         if (is_free_key(ev)) {
             vs.commands.emplace(aldo::Command::ready, !lines.ready);
@@ -98,9 +98,9 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
             vs.commands.emplace(aldo::Command::zeroRamOnPowerup, !emu.zeroRam);
         }
         break;
-    case SDLK_b:
+    case SDLK_B:
         if (is_menu_command(ev)) {
-            if (ev.key.keysym.mod & KMOD_ALT) {
+            if (ev.key.mod & SDL_KMOD_ALT) {
                 if (emu.debugger().isActive()) {
                     vs.commands.emplace(aldo::Command::breakpointsExport);
                 }
@@ -109,41 +109,41 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
             }
         }
         break;
-    case SDLK_c:
+    case SDLK_C:
         if (is_free_key(ev)) {
             vs.clock.toggleScale();
         }
         break;
-    case SDLK_d:
+    case SDLK_D:
         if (is_menu_command(ev)) {
             vs.showDemo = !vs.showDemo;
         }
         break;
-    case SDLK_i:
+    case SDLK_I:
         if (is_free_key(ev)) {
             vs.addProbeCommand(ALDO_INT_IRQ, !emu.probe(ALDO_INT_IRQ));
         }
         break;
-    case SDLK_m:
+    case SDLK_M:
         if (is_free_key(ev)) {
             auto mode = emu.runMode() + mode_change(ev);
             vs.commands.emplace(aldo::Command::mode,
                                 static_cast<aldo_execmode>(mode));
         }
         break;
-    case SDLK_n:
+    case SDLK_N:
         if (is_free_key(ev)) {
             vs.addProbeCommand(ALDO_INT_NMI, !emu.probe(ALDO_INT_NMI));
         }
         break;
-    case SDLK_o:
+    case SDLK_O:
         if (is_menu_command(ev)) {
             vs.commands.emplace(aldo::Command::openROM);
         }
         break;
-    case SDLK_p:
+    case SDLK_P:
         if (is_menu_command(ev)) {
-            if (ev.key.keysym.mod & KMOD_ALT) {
+            if (ev.key.mod & SDL_KMOD_ALT) {
                 if (!emu.palette().isDefault()) {
                     vs.commands.emplace(aldo::Command::paletteUnload);
                 }
@@ -152,7 +152,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
             }
         }
         break;
-    case SDLK_s:
+    case SDLK_S:
         if (is_free_key(ev)) {
             vs.addProbeCommand(ALDO_INT_RST, !emu.probe(ALDO_INT_RST));
         }
@@ -239,12 +239,12 @@ void aldo::input::handle(aldo::Emulator& emu, aldo::viewstate& vs,
     auto timer = vs.clock.timeInput();
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
-        ImGui_ImplSDL2_ProcessEvent(&ev);
+        ImGui_ImplSDL3_ProcessEvent(&ev);
         switch (ev.type) {
-        case SDL_KEYDOWN:
+        case SDL_EVENT_KEY_DOWN:
             handle_keydown(ev, emu, vs);
             break;
-        case SDL_QUIT:
+        case SDL_EVENT_QUIT:
             vs.commands.emplace(aldo::Command::quit);
             break;
         }

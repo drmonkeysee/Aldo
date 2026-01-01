@@ -9,7 +9,7 @@
 #define Aldo_gui_style_hpp
 
 #include "imgui.h"
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include <algorithm>
 #include <tuple>

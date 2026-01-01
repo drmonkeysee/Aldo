@@ -11,7 +11,7 @@
 #include "attr.hpp"
 #include "handle.hpp"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 struct gui_platform;
 

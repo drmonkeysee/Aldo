@@ -14,7 +14,7 @@
 #include "handle.hpp"
 #include "mediaruntime.hpp"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include <filesystem>
 #include <functional>

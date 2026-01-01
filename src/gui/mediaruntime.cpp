@@ -53,8 +53,8 @@ auto create_renderer(const aldo::mr::win_handle& hwin, const gui_platform& p)
     auto vsync = SDL_GetNumberProperty(props, SDL_PROP_RENDERER_VSYNC_NUMBER,
                                        0);
     SDL_DestroyProperties(props);
-    SDL_Log("Render info: %s (%" PRId64 ") (x%.1f)", SDL_GetRendererName(ren),
-            vsync, render_scale_factor);
+    SDL_Log("Renderer - %s vsync: %" PRId64 " scale: x%.1f",
+            SDL_GetRendererName(ren), vsync, render_scale_factor);
     return ren;
 }
 

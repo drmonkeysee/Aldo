@@ -37,22 +37,18 @@ auto create_window(SDL_Point windowSize, const gui_platform& p)
 ALDO_OWN
 auto create_renderer(const aldo::mr::win_handle& hwin, const gui_platform& p)
 {
-    auto props = SDL_CreateProperties();
-    SDL_SetPointerProperty(props, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER,
-                           hwin.get());
-    SDL_SetNumberProperty(props, SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER,
-                          1);
-    auto ren = SDL_CreateRendererWithProperties(props);
-    SDL_DestroyProperties(props);
+    aldo::SdlProperties props;
+    props.setPointer(SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, hwin.get());
+    props.setNumber(SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER, 1);
+    auto ren = SDL_CreateRendererWithProperties(props.get());
     if (!ren) throw aldo::SdlError{"SDL renderer creation failure"};
 
     auto render_scale_factor = p.render_scale_factor(hwin.get());
     SDL_SetRenderScale(ren, render_scale_factor, render_scale_factor);
+    props = aldo::SdlProperties::renderer(ren);
     SDL_Log("Renderer - %s vsync: %" SDL_PRIs64 " scale: x%.1f",
             SDL_GetRendererName(ren),
-            SDL_GetNumberProperty(SDL_GetRendererProperties(ren),
-                                  SDL_PROP_RENDERER_VSYNC_NUMBER, 0),
-            render_scale_factor);
+            props.number(SDL_PROP_RENDERER_VSYNC_NUMBER), render_scale_factor);
     return ren;
 }
 

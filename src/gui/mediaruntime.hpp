@@ -13,6 +13,8 @@
 
 #include <SDL3/SDL.h>
 
+#include <functional>
+
 struct gui_platform;
 
 namespace aldo
@@ -45,6 +47,51 @@ public:
 };
 
 }
+
+class ALDO_SIDEFX SdlProperties {
+public:
+    static SdlProperties renderer(SDL_Renderer* ren) noexcept
+    {
+        return SdlProperties{SDL_GetRendererProperties(ren)};
+    }
+    static SdlProperties texture(SDL_Texture* tex) noexcept
+    {
+        return SdlProperties{SDL_GetTextureProperties(tex)};
+    }
+
+    SdlProperties() noexcept : SdlProperties{SDL_CreateProperties()}
+    {
+        cleanup = [this] noexcept { SDL_DestroyProperties(this->props); };
+    }
+    explicit SdlProperties(SDL_PropertiesID pid) noexcept : props{pid} {}
+    SdlProperties(const SdlProperties&) = delete;
+    SdlProperties& operator=(const SdlProperties&) = delete;
+    SdlProperties(SdlProperties&&) noexcept = default;
+    SdlProperties& operator=(SdlProperties&&) noexcept = default;
+    ~SdlProperties() { cleanup(); }
+
+    SDL_PropertiesID get() const noexcept { return props; }
+
+    Sint64 number(const char* name, Sint64 defaultVal = 0) const noexcept
+    {
+        return SDL_GetNumberProperty(props, name, defaultVal);
+    }
+    void setNumber(const char* name, Sint64 val) noexcept
+    {
+        SDL_SetNumberProperty(props, name, val);
+    }
+
+    void setPointer(const char* name, void* val) noexcept
+    {
+        SDL_SetPointerProperty(props, name, val);
+    }
+
+private:
+    using dtor = std::function<void()>;
+
+    SDL_PropertiesID props;
+    dtor cleanup = [] static noexcept {};
+};
 
 class ALDO_SIDEFX MediaRuntime {
 public:

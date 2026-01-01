@@ -311,7 +311,7 @@ template<typename V>
 class ComboList {
 public:
     using option = std::pair<V, const char*>;
-    using callback = std::function<void (V, bool)>;
+    using callback = std::function<void(V, bool)>;
 
     ComboList(const char* label, std::ranges::range auto&& opts, callback cb)
     : label{label}, options{

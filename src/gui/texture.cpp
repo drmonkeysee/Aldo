@@ -134,9 +134,10 @@ SDL_Texture* aldo::tex::create(SDL_Point size, SDL_TextureAccess access,
 aldo::tex::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 {
     auto props = SDL_GetTextureProperties(&tex);
-    auto pxfmt = SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_FORMAT_NUMBER,
-                                       0);
-    assert(SDL_PIXELTYPE(pxfmt) == SDL_PIXELTYPE_PACKED32);
+    assert(SDL_PIXELTYPE(SDL_GetNumberProperty(props,
+                                               SDL_PROP_TEXTURE_FORMAT_NUMBER,
+                                               0))
+           == SDL_PIXELTYPE_PACKED32);
     width = SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_WIDTH_NUMBER, 0);
     height = SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_HEIGHT_NUMBER, 0);
 

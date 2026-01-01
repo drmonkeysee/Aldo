@@ -24,7 +24,7 @@
 #include "version.h"
 #include "viewstate.hpp"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include <algorithm>
 #include <array>
@@ -567,9 +567,10 @@ auto about_overlay(aldo::viewstate& vs) noexcept
     #ifdef __VERSION__
         ImGui::TextUnformatted(__VERSION__);
     #endif
-        SDL_version v;
-        SDL_VERSION(&v);
-        ImGui::Text("SDL %u.%u.%u", v.major, v.minor, v.patch);
+        auto v = SDL_GetVersion();
+        ImGui::Text("SDL %u.%u.%u (%s)", SDL_VERSIONNUM_MAJOR(v),
+                    SDL_VERSIONNUM_MINOR(v), SDL_VERSIONNUM_MICRO(v),
+                    SDL_GetRevision());
         ImGui::Text("Dear ImGui %s", ImGui::GetVersion());
         ImGui::LogFinish();
 

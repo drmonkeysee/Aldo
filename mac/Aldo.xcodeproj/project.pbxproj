@@ -43,6 +43,8 @@
 		C8702CF9278A58C900725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C8702CF8278A58C900725690 /* haltexpr.c */; };
 		C8702CFA278A598A00725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C808BA6727893976001FDE39 /* haltexpr.c */; };
 		C879D27A29A1740000FCD963 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = C879D27929A1740000FCD963 /* debug.c */; };
+		C87C27492F060A9E0066D0A1 /* SDL3.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = C87C27482F060A9E0066D0A1 /* SDL3.xcframework */; };
+		C87C274A2F060A9E0066D0A1 /* SDL3.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C87C27482F060A9E0066D0A1 /* SDL3.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C882854829403C2100BAC249 /* error.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C882854629403C2100BAC249 /* error.cpp */; };
 		C88CABDE28FA4DDD00551C65 /* uisdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C88CABDC28FA4DDD00551C65 /* uisdl.cpp */; };
 		C894F0EF2945850E00C6575F /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C894F0ED2945850E00C6575F /* view.cpp */; };
@@ -132,8 +134,6 @@
 		C8D3CA0A2904E50F0087316F /* aldoc in Embed Cli */ = {isa = PBXBuildFile; fileRef = C8D3CA002904E1BD0087316F /* aldoc */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		C8D44BDD2786B571005AB586 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D44BDC2786B571005AB586 /* argparse.c */; };
 		C8D8FDA82792691B0073639B /* tsutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C8D8FDA72792691B0073639B /* tsutil.c */; };
-		C8DC9CB428DFD5BA000D8D97 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; };
-		C8DC9CB528DFD5BA000D8D97 /* SDL2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C8DC9CB228DFD57B000D8D97 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C8E7A29C2980F46D00AAB2A4 /* modal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8E7A29A2980F32400AAB2A4 /* modal.cpp */; };
 		C8EC72202916150700DF750A /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8EC721E2916150700DF750A /* render.cpp */; };
 		C8ED81B52C3B88EB00C8F518 /* ppuhelp.c in Sources */ = {isa = PBXBuildFile; fileRef = C8ED81B42C3B88EB00C8F518 /* ppuhelp.c */; };
@@ -204,7 +204,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				C8B88ABC29062D6E00B7CB23 /* libaldo.dylib in Embed Frameworks */,
-				C8DC9CB528DFD5BA000D8D97 /* SDL2.framework in Embed Frameworks */,
+				C87C274A2F060A9E0066D0A1 /* SDL3.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -266,6 +266,7 @@
 		C867F802295E9BA700ABEB3B /* style.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = style.hpp; sourceTree = "<group>"; };
 		C8702CF8278A58C900725690 /* haltexpr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = haltexpr.c; sourceTree = "<group>"; };
 		C879D27929A1740000FCD963 /* debug.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = debug.c; sourceTree = "<group>"; };
+		C87C27482F060A9E0066D0A1 /* SDL3.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SDL3.xcframework; path = ../ext/SDL3.xcframework; sourceTree = "<group>"; };
 		C882854629403C2100BAC249 /* error.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = error.cpp; sourceTree = "<group>"; };
 		C882854729403C2100BAC249 /* error.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = error.hpp; sourceTree = "<group>"; };
 		C88949B02813B2DB00795CC0 /* ChrSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChrSheet.swift; sourceTree = "<group>"; };
@@ -352,7 +353,6 @@
 		C8D428E8296A15E500824248 /* emutypes.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = emutypes.hpp; sourceTree = "<group>"; };
 		C8D44BDC2786B571005AB586 /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8D8FDA72792691B0073639B /* tsutil.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tsutil.c; sourceTree = "<group>"; };
-		C8DC9CB228DFD57B000D8D97 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../ext/SDL2.framework; sourceTree = "<group>"; };
 		C8DC9CB828DFE5B4000D8D97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C8E76BA9285985CE004C1479 /* Commands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Commands.swift; sourceTree = "<group>"; };
 		C8E7A29A2980F32400AAB2A4 /* modal.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = modal.cpp; sourceTree = "<group>"; };
@@ -398,7 +398,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8B88ABB29062D6E00B7CB23 /* libaldo.dylib in Frameworks */,
-				C8DC9CB428DFD5BA000D8D97 /* SDL2.framework in Frameworks */,
+				C87C27492F060A9E0066D0A1 /* SDL3.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -548,7 +548,7 @@
 		C820E6DD25A982A5006A7AB1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C8DC9CB228DFD57B000D8D97 /* SDL2.framework */,
+				C87C27482F060A9E0066D0A1 /* SDL3.xcframework */,
 				C8184D6F25E750E0002B3100 /* libcinytest.dylib */,
 				C820E6DE25A982A5006A7AB1 /* libncurses.tbd */,
 				C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */,

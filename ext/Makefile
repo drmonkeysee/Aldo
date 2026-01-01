@@ -3,8 +3,8 @@ ifneq ($(OS), Darwin)
 SHELL := $(shell which bash)
 endif
 
-SDL_VERSION := 2.32.10
-SDL_DMG := SDL2-$(SDL_VERSION).dmg
+SDL_VERSION := 3.2.28
+SDL_DMG := SDL3-$(SDL_VERSION).dmg
 SDL_HTTP := https://github.com/libsdl-org/SDL/releases/download/release-$(SDL_VERSION)
 
 IMGUI_VERSION := 1.92.5
@@ -31,9 +31,7 @@ $(IMGUI_TARGET):
 	curl -L -O '$(IMGUI_HTTP)' && \
 	tar -xzf $(notdir $(IMGUI_HTTP)) && \
 	cp -v $(IMGUI_SRC)/*.{h,cpp} . && \
-	for impl in sdl2 sdlrenderer2; do \
-		cp -v $(IMGUI_SRC)/backends/imgui_impl_$${impl}.h . && \
-		sed 's/\(#include <SDL\)/\12\/SDL/' $(IMGUI_SRC)/backends/imgui_impl_$${impl}.cpp \
-			> imgui_impl_$${impl}.cpp; \
+	for impl in sdl3 sdlrenderer3; do \
+		cp -v $(IMGUI_SRC)/backends/imgui_impl_$${impl}.h .; \
 	done && \
 	$(RM) -r $(IMGUI_SRC)

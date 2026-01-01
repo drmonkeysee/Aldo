@@ -133,9 +133,13 @@ SDL_Texture* aldo::tex::create(SDL_Point size, SDL_TextureAccess access,
 
 aldo::tex::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 {
-    Uint32 pxfmt;
-    SDL_QueryTexture(&tex, &pxfmt, nullptr, &width, &height);
+    auto props = SDL_GetTextureProperties(&tex);
+    auto pxfmt = SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_FORMAT_NUMBER,
+                                       0);
     assert(SDL_PIXELTYPE(pxfmt) == SDL_PIXELTYPE_PACKED32);
+    width = SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_WIDTH_NUMBER, 0);
+    height = SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_HEIGHT_NUMBER, 0);
+    SDL_DestroyProperties(props);
 
     void* data;
     int pitch;
@@ -283,7 +287,12 @@ void aldo::Nametables::drawMetatile(aldo::et::byte attr, int ntIdx, int col,
         xOffset = (ntIdx * offsets.upperX) + (col * AttributePxDim) + mtX,
         yOffset = (ntIdx * offsets.upperY) + (row * AttributePxDim) + mtY;
 
-    SDL_Rect metatile{xOffset, yOffset, metatileStride, metatileStride};
+    SDL_FRect metatile{
+        static_cast<float>(xOffset),
+        static_cast<float>(yOffset),
+        metatileStride,
+        metatileStride,
+    };
     SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g),
                            static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(ren, &metatile);

@@ -14,7 +14,7 @@
 #include "snapshot.h"
 
 #include "imgui.h"
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include <span>
 
@@ -65,10 +65,11 @@ public:
     TextureData& operator=(TextureData&&) = delete;
     ~TextureData() { SDL_UnlockTexture(&tex); }
 
-    int size() const noexcept { return width * height; }
+    Sint64 size() const noexcept { return width * height; }
 
     Uint32* pixels;
-    int height, stride, width;
+    Sint64 height, width;
+    int stride;
 
 private:
     friend Texture<SDL_TEXTUREACCESS_STREAMING>;
@@ -102,9 +103,9 @@ public:
 
     void render(float scalex, float scaley) const noexcept
     {
-        SDL_Point p;
-        SDL_QueryTexture(tex, nullptr, nullptr, &p.x, &p.y);
-        ImGui::Image(tex, {p.x * scalex, p.y * scaley});
+        float w, h;
+        SDL_GetTextureSize(tex, &w, &h);
+        ImGui::Image(tex, {w * scalex, h * scaley});
     }
 
 private:

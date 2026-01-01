@@ -32,6 +32,6 @@ $(IMGUI_TARGET):
 	tar -xzf $(notdir $(IMGUI_HTTP)) && \
 	cp -v $(IMGUI_SRC)/*.{h,cpp} . && \
 	for impl in sdl3 sdlrenderer3; do \
-		cp -v $(IMGUI_SRC)/backends/imgui_impl_$${impl}.h .; \
+		cp -v $(IMGUI_SRC)/backends/imgui_impl_$${impl}.* .; \
 	done && \
 	$(RM) -r $(IMGUI_SRC)

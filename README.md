@@ -91,7 +91,7 @@ Dependencies needed to build and run Aldo components.
 
 ### GUI
 
-- [SDL2](https://www.libsdl.org) (Simple Directmedia Layer)
+- [SDL3](https://www.libsdl.org) (Simple Directmedia Layer)
 - [Dear ImGui](https://github.com/ocornut/imgui)
 
 ## Resources

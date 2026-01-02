@@ -156,7 +156,7 @@ ifeq ($(OS), Darwin)
 $(GUI_TARGET):
 	$(error Make target not supported on macOS; use Xcode project instead)
 else
-$(GUI_TARGET): LDLIBS += -lSDL2
+$(GUI_TARGET): LDLIBS += -lSDL3
 $(GUI_TARGET): $(GUI_OBJ) $(IMGUI_OBJ) $(LIB_TARGET)
 	$(CXX) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 endif

@@ -82,6 +82,11 @@ private:
     dtor cleanup = [] static noexcept {};
 };
 
+inline void swap(SdlProperties& a, SdlProperties& b) noexcept
+{
+    a.swap(b);
+}
+
 class ALDO_SIDEFX MediaRuntime {
 public:
     [[nodiscard("check error")]]
@@ -103,11 +108,6 @@ private:
     mr::ren_handle hren;
     mr::DearImGuiLib imgui;
 };
-
-inline void swap(SdlProperties& a, SdlProperties& b) noexcept
-{
-    a.swap(b);
-}
 
 }
 

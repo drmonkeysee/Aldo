@@ -2270,26 +2270,27 @@ private:
             dispDtInput = vs.clock.dtInputMs();
             dispDtUpdate = vs.clock.dtUpdateMs();
             dispDtRender = vs.clock.dtRenderMs();
-            dispDtElapsed = dispDtInput + dispDtUpdate + dispDtRender;
+            dispDtElapsed = vs.clock.dtTotalMs();
             dispDtTick = clock.ticktime_ms;
+            dispDtLeft = vs.clock.tickLeft();
         }
         ImGui::Text("Input dT: %.3f", dispDtInput);
         ImGui::Text("Update dT: %.3f", dispDtUpdate);
         ImGui::Text("Render dT: %.3f", dispDtRender);
         ImGui::Text("Elapsed dT: %.3f", dispDtElapsed);
         {
-            auto dtDiff = dispDtTick - dispDtElapsed;
             ScopedColor warn{
                 {ImGuiCol_Text, aldo::colors::Attention},
-                dtDiff < 0,
+                dispDtLeft < 0,
             };
-            ImGui::Text("Tick dT: %.3f (%+.3f)", dispDtTick, dtDiff);
+            ImGui::Text("Tick dT: %.3f (%+.3f)", dispDtTick, dispDtLeft);
         }
         ImGui::Text("Ticks: %" PRIu64, clock.ticks);
         ImGui::Text("Emutime: %.3f", clock.emutime);
         ImGui::Text("Runtime: %.3f", clock.runtime);
         ImGui::Text("Cycles: %" PRIu64, clock.cycles);
         ImGui::Text("Frames: %" PRIu64, clock.frames);
+        ImGui::Text("Missed: %" PRIu64, vs.clock.missedTicks());
         ImGui::Text("BCD Support: %s", boolstr(emu.bcdSupport()));
     }
 
@@ -2368,7 +2369,7 @@ private:
 
     double
         dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0, dispDtElapsed = 0,
-        dispDtTick = 0;
+        dispDtTick = 0, dispDtLeft = 0;
     RefreshInterval statsInterval{200};
 };
 

@@ -10,6 +10,7 @@
 
 #include "attr.hpp"
 #include "cycleclock.h"
+#include "emutypes.hpp"
 #include "nes.h"
 
 #include <algorithm>
@@ -19,6 +20,8 @@
 
 namespace aldo
 {
+
+class RunClock;
 
 class ALDO_SIDEFX RunTimer {
 public:
@@ -76,18 +79,15 @@ inline void swap(RunTimer& a, RunTimer& b) noexcept
 
 class ALDO_SIDEFX RunTick {
 public:
-    RunTick(aldo_clock& c, bool resetBudget) noexcept : clock{c}
-    {
-        aldo_clock_tickstart(&clock, resetBudget);
-    }
+    RunTick(RunClock& c, bool resetBudget) noexcept;
     RunTick(const RunTick&) = delete;
     RunTick& operator=(const RunTick&) = delete;
     RunTick(RunTick&&) = delete;
     RunTick& operator=(RunTick&&) = delete;
-    ~RunTick() { aldo_clock_tickend(&clock); }
+    ~RunTick();
 
 private:
-    aldo_clock& clock;
+    RunClock& rc;
 };
 
 class RunClock {
@@ -95,6 +95,12 @@ public:
     double dtInputMs() const noexcept { return dtInput; }
     double dtUpdateMs() const noexcept { return dtUpdate; }
     double dtRenderMs() const noexcept { return dtRender; }
+    double dtTotalMs() const noexcept { return dtInput + dtUpdate + dtRender; }
+    double tickLeft() const noexcept
+    {
+        return clock().ticktime_ms - dtTotalMs();
+    }
+    et::qword missedTicks() const noexcept { return missed; }
     aldo_clockscale scale() const noexcept { return currentScale; }
     // TODO: use deducing this when it's finally supported
     const aldo_clock& clock() const noexcept { return clk; }
@@ -116,13 +122,13 @@ public:
 
     RunTick startTick(bool resetBudget) noexcept
     {
-        return {clock(), resetBudget};
+        return {*this, resetBudget};
     }
 
     void resetEmu() noexcept
     {
         clock().emutime = 0;
-        clock().cycles = clock().frames = clock().subcycle = 0;
+        missed = clock().cycles = clock().frames = clock().subcycle = 0;
     }
 
     RunTimer timeInput() noexcept { return RunTimer{dtInput}; }
@@ -162,6 +168,8 @@ public:
     }
 
 private:
+    friend RunTick;
+
     bool atRateLimit(int cycleLimit, int frameLimit) const noexcept
     {
         return currentScale == ALDO_CS_CYCLE
@@ -169,14 +177,39 @@ private:
                 : clock().rate == frameLimit;
     }
 
+    void tickStart(bool resetBudget) noexcept
+    {
+        aldo_clock_tickstart(clockp(), resetBudget);
+    }
+
+    void tickEnd() noexcept
+    {
+        aldo_clock_tickend(clockp());
+        if (clock().ticktime_ms < dtTotalMs()) {
+            ++missed;
+        }
+    }
+
     aldo_clock clk{
         .rate = Aldo_MaxFps,
         .rate_factor = aldo_nes_frame_factor(),
     };
+    et::qword missed = 0;
     double dtInput = 0, dtUpdate = 0, dtRender = 0;
     aldo_clockscale currentScale = ALDO_CS_FRAME;
     int oldRate = 10;
 };
+
+// NOTE: inlined here to avoid circular type resolution with RunClock
+inline RunTick::RunTick(RunClock& c, bool resetBudget) noexcept : rc{c}
+{
+    rc.tickStart(resetBudget);
+}
+
+inline RunTick::~RunTick()
+{
+    rc.tickEnd();
+}
 
 }
 

@@ -71,15 +71,12 @@ constexpr auto point_to_vec(const SDL_Point& p) noexcept
     return ImVec2{static_cast<float>(p.x), static_cast<float>(p.y)};
 }
 
-// TODO: make interval a double template parameter once Apple clang supports it
+template<double Interval>
 class RefreshInterval {
 public:
-    explicit RefreshInterval(double intervalMs) noexcept
-    : interval{intervalMs} {}
-
     bool elapsed(const aldo_clock& clock) noexcept
     {
-        if ((dt += clock.ticktime_ms) >= interval) {
+        if ((dt += clock.ticktime_ms) >= Interval) {
             dt = 0;
             return true;
         }
@@ -87,7 +84,7 @@ public:
     }
 
 private:
-    double dt = 0, interval;
+    double dt = 0;
 };
 
 class ALDO_SIDEFX DisabledIf {
@@ -1351,7 +1348,8 @@ private:
             }
         }
 
-        void render(RefreshInterval& interval, SDL_Point& refreshPos, const aldo::viewstate& vs)
+        void render(const auto& interval, SDL_Point& refreshPos,
+                    const aldo::viewstate& vs)
         {
             if (!scrInd) return;
             if (interval.elapsed(vs.clock.clock())) {
@@ -1566,10 +1564,10 @@ private:
     ImDrawListSplitter splitter;
     using DisplayMode = decltype(nametables)::DrawMode;
     ComboList<DisplayMode> modeCombo;
-    RefreshInterval drawInterval{250};
+    RefreshInterval<250.0> drawInterval;
     bool attributeGrid = false, screenIndicator = false, tileGrid = false;
 
-    RefreshInterval screenInterval{50};
+    RefreshInterval<50.0> screenInterval;
     [[maybe_unused]]
     SDL_Point screenPos{};
 };
@@ -1883,7 +1881,7 @@ private:
 
     aldo::PatternTable left, right;
     aldo::et::size palSelect = 0;
-    RefreshInterval drawInterval{500};
+    RefreshInterval<500.0> drawInterval;
 };
 
 class PpuView final : public aldo::View {
@@ -2370,7 +2368,7 @@ private:
     double
         dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0, dispDtElapsed = 0,
         dispDtTick = 0, dispDtLeft = 0;
-    RefreshInterval statsInterval{200};
+    RefreshInterval<200.0> statsInterval;
 };
 
 class VideoView final : public aldo::View {

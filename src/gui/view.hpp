@@ -34,7 +34,7 @@ public:
 
     class TransitionLatch {
     public:
-        TransitionLatch() noexcept {}
+        TransitionLatch() noexcept = default;
         TransitionLatch(Transition t) noexcept : transition{t} {}
 
         // NOTE: exchange is becoming noexcept in C++23

@@ -551,15 +551,14 @@ static void output_pixel(struct aldo_rp2c02 *self)
     self->signal.vout = true;
 }
 
-// TODO: replace t with c23 typeof
-#define pxshift(t, r, v) (*(r) = (t)(*(r) << 1) | (v))
+#define pxshift(r, v) (*(r) = (typeof(*(r)))(*(r) << 1) | (v))
 
 static void shift_tiles(struct aldo_rp2c02 *self)
 {
-    pxshift(uint16_t, self->pxpl.bgs, 1);
-    pxshift(uint8_t, self->pxpl.ats, self->pxpl.atl[0]);
-    pxshift(uint16_t, self->pxpl.bgs + 1, 1);
-    pxshift(uint8_t, self->pxpl.ats + 1, self->pxpl.atl[1]);
+    pxshift(self->pxpl.bgs, 1);
+    pxshift(self->pxpl.ats, self->pxpl.atl[0]);
+    pxshift(self->pxpl.bgs + 1, 1);
+    pxshift(self->pxpl.ats + 1, self->pxpl.atl[1]);
     if (self->dot % 8 == 1) {
         latch_tile(self);
     }

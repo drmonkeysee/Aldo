@@ -92,6 +92,17 @@ private:
 
 class RunClock {
 public:
+    template<class Self>
+    auto&& clock(this Self&& self) noexcept
+    {
+        return std::forward<Self>(self).clk;
+    }
+    template<class Self>
+    auto* clockp(this Self&& self) noexcept
+    {
+        return &std::forward<Self>(self).clk;
+    }
+
     double dtInputMs() const noexcept { return dtInput; }
     double dtUpdateMs() const noexcept { return dtUpdate; }
     double dtRenderMs() const noexcept { return dtRender; }
@@ -102,11 +113,6 @@ public:
     }
     et::qword missedTicks() const noexcept { return missed; }
     aldo_clockscale scale() const noexcept { return currentScale; }
-    // TODO: use deducing this when it's finally supported
-    const aldo_clock& clock() const noexcept { return clk; }
-    const aldo_clock* clockp() const noexcept { return &clk; }
-    aldo_clock& clock() noexcept { return clk; }
-    aldo_clock* clockp() noexcept { return &clk; }
 
     bool atMinRate() const noexcept
     {

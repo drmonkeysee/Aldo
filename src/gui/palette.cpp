@@ -30,7 +30,7 @@ auto parse_colors(const pal_buf& buf)
         std::make_unique<aldo::palette::datav[]>(aldo::palette::Size);
     aldo::palette::sz idx = 0;
 
-    // TODO: replace this with views::chunk in c++23
+    // TODO: replace this with views::adjacent in c++23
     auto end = buf.cend();
     for (auto it = buf.cbegin();
          it != end;

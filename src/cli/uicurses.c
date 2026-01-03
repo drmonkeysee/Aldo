@@ -50,6 +50,7 @@ enum ram_selection {
 struct viewstate {
     struct runclock {
         struct aldo_clock clock;
+        uint64_t missed;
         double tickleft_ms;
         int oldrate;
         enum aldo_clockscale scale;
@@ -75,6 +76,7 @@ static void tick_sleep(struct runclock *c)
         // to milliseconds to make the math easier.
         c->tickleft_ms = aldo_timespec_to_ms(&vsync)
                             - aldo_timespec_to_ms(&elapsed);
+        ++c->missed;
         return;
     }
 
@@ -152,6 +154,7 @@ static int drawstats(const struct view *v, int cursor_y,
     mvwprintw(v->content, cursor_y++, 0, "Runtime: %.3f", clock->runtime);
     mvwprintw(v->content, cursor_y++, 0, "Emutime: %.3f", clock->emutime);
     mvwprintw(v->content, cursor_y++, 0, "Frames: %" PRIu64, clock->frames);
+    mvwprintw(v->content, cursor_y++, 0, "Missed: %" PRIu64, vs->clock.missed);
     mvwprintw(v->content, cursor_y++, 0, "Cycles: %" PRIu64, clock->cycles);
     mvwprintw(v->content, cursor_y++, 0, "%s: %d",
               vs->clock.scale == ALDO_CS_CYCLE
@@ -777,7 +780,7 @@ static void init_ui(struct layout *l, int ramsheets)
     static constexpr int col2w = 29;
     static constexpr int col3w = 29;
     static constexpr int col4w = 54;
-    static constexpr int sysh = 25;
+    static constexpr int sysh = 26;
     static constexpr int crth = 4;
     static constexpr int cpuh = 20;
     static constexpr int maxh = 37;

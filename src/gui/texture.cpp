@@ -31,6 +31,7 @@ constexpr auto operator*(SDL_Point p, int n) noexcept
     return SDL_Point{p.x * n, p.y * n};
 }
 
+[[maybe_unused]]
 auto screen_buffer_length() noexcept
 {
     auto p = aldo::Emulator::screenSize();

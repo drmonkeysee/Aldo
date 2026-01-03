@@ -172,8 +172,8 @@ static bool create_vbus(struct aldo_nes001 *self)
     return true;
 }
 
-// TODO: use c23 attributes when available
-__attribute__((unused)) static bool assert_vbus(aldo_cart* cart, bool connected)
+[[maybe_unused]]
+static bool assert_vbus(aldo_cart* cart, bool connected)
 {
     if (connected) return true;
 

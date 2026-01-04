@@ -129,6 +129,7 @@ SDL_Texture* aldo::tex::create(SDL_Point size, SDL_TextureAccess access,
     auto tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA32, access, size.x,
                                  size.y);
     if (!tex) throw aldo::SdlError{"SDL texture creation failure"};
+    SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_PIXELART);
     return tex;
 }
 

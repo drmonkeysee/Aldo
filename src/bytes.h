@@ -10,6 +10,8 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 // Memory-related Constants
 enum {
@@ -49,8 +51,13 @@ enum {
 
 // Extract bit @pos from unsigned value
 #define aldo_getbit(uval, pos) (((uval) >> (pos)) & 0x1)
-// Size from array expression
+
+// NOTE: all mem macros require array expressions, not pointers
 #define aldo_arrsz(arr) (sizeof (arr) / sizeof (arr)[0])
+#define aldo_memclr(mem) memset(mem, 0, aldo_arrsz(mem))
+#define aldo_memfill(mem) memset(mem, 0xff, aldo_arrsz(mem))
+#define aldo_memdump(mem, f) \
+(fwrite(mem, sizeof (mem)[0], aldo_arrsz(mem), f) == aldo_arrsz(mem))
 
 #include "bridgeopen.h"
 // NOTE: convert unsigned values into little-endian byte representations;

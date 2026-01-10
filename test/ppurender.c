@@ -1271,6 +1271,53 @@ static void course_y_overflow(void *ctx)
 }
 
 //
+// MARK: - Sprite Fetches
+//
+
+static void secondary_oam_clear(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 63;
+    for (size_t i = 0; i < aldo_arrsz(ppu->soam); ++i) {
+        ppu->soam[i] = (uint8_t)(i + 1);
+    }
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(64, ppu->dot);
+    ct_assertequal(0x1u, ppu->soam[0]);
+    ct_assertequal(0x20u, ppu->soam[31]);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(65, ppu->dot);
+    ct_assertequal(0xffu, ppu->soam[0]);
+    ct_assertequal(0xffu, ppu->soam[31]);
+}
+
+static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->line = 261;
+    ppu->dot = 63;
+    for (size_t i = 0; i < aldo_arrsz(ppu->soam); ++i) {
+        ppu->soam[i] = (uint8_t)(i + 1);
+    }
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(64, ppu->dot);
+    ct_assertequal(0x1u, ppu->soam[0]);
+    ct_assertequal(0x20u, ppu->soam[31]);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(65, ppu->dot);
+    ct_assertequal(0x1u, ppu->soam[0]);
+    ct_assertequal(0x20u, ppu->soam[31]);
+}
+
+//
 // MARK: - Pixel Pipeline
 //
 
@@ -1760,6 +1807,9 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(fine_y_wraparound),
         ct_maketest(course_y_wraparound),
         ct_maketest(course_y_overflow),
+
+        ct_maketest(secondary_oam_clear),
+        ct_maketest(secondary_oam_does_not_clear_on_prerender_line),
 
         ct_maketest(tile_prefetch_pipeline),
         ct_maketest(tile_prefetch_postrender),

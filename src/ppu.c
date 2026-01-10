@@ -8,15 +8,11 @@
 #include "ppu.h"
 
 #include "bus.h"
+#include "bytes.h"
 #include "snapshot.h"
 
 #include <assert.h>
 #include <stddef.h>
-#include <string.h>
-
-#define memclr(mem) memset(mem, 0, aldo_arrsz(mem))
-#define memdump(mem, f) \
-(fwrite(mem, sizeof (mem)[0], aldo_arrsz(mem), f) == aldo_arrsz(mem))
 
 // NOTE: a single NTSC frame is 262 scanlines of 341 dots, counting h-blank,
 // v-blank, overscan, etc; nominally 1 frame is 262 * 341 = 89342 ppu cycles;
@@ -708,6 +704,14 @@ static void tile_read(struct aldo_rp2c02 *self)
         if (!self->cvp) {
             increment_tile(self, false);
         }
+        // NOTE: the actual PPU clears secondary oam over the course of 64 dots,
+        // taking 2 dots to clear each byte (presumably); however secondary oam
+        // is inaccessible to the rest of the system so there are no side-effects
+        // to clearing it all at once at dot 64.
+        if (self->dot == 64 && self->line != LinePreRender) {
+            // NOTE: "clearing" soam actually means setting everything high
+            aldo_memfill(self->soam);
+        }
         break;
     default:
         assert(((void)"TILE RENDER UNREACHABLE CASE", false));
@@ -722,6 +726,8 @@ static void sprite_read(struct aldo_rp2c02 *self)
         static constexpr uint16_t vert_bits = FineYBits | VNtBit | CourseYBits;
         self->v = (uint16_t)((self->v & ~vert_bits) | (self->t & vert_bits));
     }
+
+    // TODO: clear OAMADDR on every tick
 
     switch (self->dot % 8) {
     case 1:
@@ -1018,9 +1024,9 @@ void aldo_ppu_zeroram(struct aldo_rp2c02 *self)
 {
     assert(self != nullptr);
 
-    memclr(self->oam);
-    memclr(self->soam);
-    memclr(self->palette);
+    aldo_memclr(self->oam);
+    aldo_memclr(self->soam);
+    aldo_memclr(self->palette);
 }
 
 bool aldo_ppu_gfxsnp_dot(const struct aldo_rp2c02 *self)
@@ -1094,9 +1100,9 @@ bool aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f)
     assert(self != nullptr);
     assert(f != nullptr);
 
-    return memdump(self->oam, f)
-            && memdump(self->soam, f)
-            && memdump(self->palette, f);
+    return aldo_memdump(self->oam, f)
+            && aldo_memdump(self->soam, f)
+            && aldo_memdump(self->palette, f);
 }
 
 struct aldo_ppu_coord aldo_ppu_trace(const struct aldo_rp2c02 *self,

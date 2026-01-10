@@ -18,7 +18,6 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
 
 constexpr int ScreenWidth = 256;
 constexpr int ScreenHeight = 240;
@@ -402,7 +401,7 @@ aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
     self->vbuf = 0;
     // NOTE: uninitialized vbuffer can have out-of-range palette values
     for (size_t i = 0; i < aldo_arrsz(self->vbufs); ++i) {
-        memset(self->vbufs[i], 0, aldo_arrsz(self->vbufs[i]));
+        aldo_memclr(self->vbufs[i]);
     }
     if (!setup(self)) {
         aldo_nes_free(self);
@@ -428,8 +427,8 @@ void aldo_nes_powerup(aldo_nes *self, aldo_cart *c, bool zeroram)
         connect_cart(self, c);
     }
     if (zeroram) {
-        memset(self->ram, 0, aldo_arrsz(self->ram));
-        memset(self->vram, 0, aldo_arrsz(self->vram));
+        aldo_memclr(self->ram);
+        aldo_memclr(self->vram);
         aldo_ppu_zeroram(&self->ppu);
     }
     aldo_cpu_powerup(&self->cpu);
@@ -579,16 +578,11 @@ void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3], bool errs[static 3])
     assert(errs != nullptr);
 
     FILE *f;
-    size_t witems, wcount;
     if ((f = fs[0])) {
-        witems = aldo_arrsz(self->ram);
-        wcount = fwrite(self->ram, sizeof self->ram[0], witems, f);
-        errs[0] = wcount < witems;
+        errs[0] = !aldo_memdump(self->ram, f);
     }
     if ((f = fs[1])) {
-        witems = aldo_arrsz(self->vram);
-        wcount = fwrite(self->vram, sizeof self->vram[0], witems, f);
-        errs[1] = wcount < witems;
+        errs[1] = !aldo_memdump(self->vram, f);
     }
     if ((f = fs[2])) {
         errs[2] = !aldo_ppu_dumpram(&self->ppu, f);

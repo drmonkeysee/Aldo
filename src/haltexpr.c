@@ -12,7 +12,6 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <stdio.h>
-#include <string.h>
 
 static int parse_resetvector(const char *restrict str, int *resetvector)
 {

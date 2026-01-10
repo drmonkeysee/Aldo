@@ -15,7 +15,6 @@
 
 #include <assert.h>
 #include <stddef.h>
-#include <string.h>
 
 struct raw_mapper {
     struct aldo_mapper vtable;

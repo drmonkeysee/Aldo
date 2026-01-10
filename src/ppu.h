@@ -9,7 +9,6 @@
 #define Aldo_ppu_h
 
 #include "bustype.h"
-#include "bytes.h"
 #include "ctrlsignal.h"
 
 #include <stdint.h>

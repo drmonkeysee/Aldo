@@ -117,7 +117,7 @@ struct aldo_rp2c02 {
 
     // Internal Memory
     uint8_t oam[256],       // Object Attribute Memory: internal storage
-                            // for sprite attributes.
+                            // for sprite attributes; 64 sprites at 4 bytes each.
             soam[32],       // Secondary OAM: up to 8 active sprites for
                             // current scanline.
             palette[28];    // Palette indices: 1 backdrop, 3 unused,

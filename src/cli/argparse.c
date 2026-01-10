@@ -274,8 +274,7 @@ void argparse_usage(const char *me)
     static const char
         *const restrict main_arg = "file",
         *const restrict program = "Aldo",
-        *const restrict addr_desc =
-            "address is a 1- or 2-byte hexadecimal number";
+        *const restrict addr_desc = "address is a 1- or 2-byte hexadecimal number";
 
     char buf[5];
     int cpad = sizeof buf, spad = cpad + 1;

@@ -111,15 +111,12 @@ aldo_export
 int aldo_cart_write_info(aldo_cart *self, const char *aldo_noalias name,
                          bool verbose, FILE *f) aldo_nothrow;
 aldo_export
-void aldo_cart_getinfo(aldo_cart *self,
-                       struct aldo_cartinfo *info) aldo_nothrow;
+void aldo_cart_getinfo(aldo_cart *self, struct aldo_cartinfo *info) aldo_nothrow;
 
 aldo_export
-struct aldo_blockview aldo_cart_prgblock(aldo_cart *self,
-                                         size_t i) aldo_nothrow;
+struct aldo_blockview aldo_cart_prgblock(aldo_cart *self, size_t i) aldo_nothrow;
 aldo_export
-struct aldo_blockview aldo_cart_chrblock(aldo_cart *self,
-                                         size_t i) aldo_nothrow;
+struct aldo_blockview aldo_cart_chrblock(aldo_cart *self, size_t i) aldo_nothrow;
 
 //
 // MARK: - Internal

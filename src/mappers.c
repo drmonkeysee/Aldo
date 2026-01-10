@@ -251,8 +251,7 @@ static bool ines_000_vrmr(void *restrict ctx, uint16_t addr,
     assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
 
     const struct ines_000_mapper *m = ctx;
-    return m->vrbd.read(m->vrbd.ctx, m->hmirroring ? hmirror_addr(addr) : addr,
-                        d);
+    return m->vrbd.read(m->vrbd.ctx, m->hmirroring ? hmirror_addr(addr) : addr, d);
 }
 
 static bool ines_000_vrmw(void *ctx, uint16_t addr, uint8_t d)
@@ -460,8 +459,7 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
         }
         self->chrram = true;
     } else {
-        err = load_blocks(&self->chr, header->chr_blocks * ALDO_MEMBLOCK_8KB,
-                          f);
+        err = load_blocks(&self->chr, header->chr_blocks * ALDO_MEMBLOCK_8KB, f);
     }
 
 cleanup:

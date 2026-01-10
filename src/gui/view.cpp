@@ -134,8 +134,7 @@ void swap(DisabledIf& a, DisabledIf& b) noexcept
 }
 
 template<typename T>
-concept ScopedIDVal =
-    std::convertible_to<T, void*> || std::convertible_to<T, int>;
+concept ScopedIDVal = std::convertible_to<T, void*> || std::convertible_to<T, int>;
 
 class ALDO_SIDEFX ScopedID {
 public:
@@ -772,15 +771,13 @@ public:
 protected:
     void renderContents() override
     {
-        if (ImGui::CollapsingHeader("Registers",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Registers", ImGuiTreeNodeFlags_DefaultOpen)) {
             renderRegisters();
         }
         if (ImGui::CollapsingHeader("Flags", ImGuiTreeNodeFlags_DefaultOpen)) {
             renderFlags();
         }
-        if (ImGui::CollapsingHeader("Datapath",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Datapath", ImGuiTreeNodeFlags_DefaultOpen)) {
             renderDatapath();
         }
     }
@@ -962,13 +959,11 @@ public:
 protected:
     void renderContents() override
     {
-        if (ImGui::CollapsingHeader("Reset Vector",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Reset Vector", ImGuiTreeNodeFlags_DefaultOpen)) {
             renderVectorOverride();
         }
 
-        if (ImGui::CollapsingHeader("Breakpoints",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Breakpoints", ImGuiTreeNodeFlags_DefaultOpen)) {
             renderBreakpoints();
         }
     }
@@ -1810,8 +1805,7 @@ private:
                             : emu.snapshot().video->palettes.bg;
         auto row = 0;
         for (aldo::color_span pal : pals) {
-            if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols,
-                                  flags)) {
+            if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols, flags)) {
                 ScopedStyleVec textAlign{{
                     ImGuiStyleVar_SelectableTextAlign, {center, center},
                 }};
@@ -1831,8 +1825,7 @@ private:
                         using col_sz = decltype(pal)::size_type;
                         auto idx = pal[static_cast<col_sz>(col - 1)];
                         auto color = emu.palette().getColor(idx);
-                        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
-                                               color);
+                        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color);
                         std::snprintf(buf.data(), buf.size(), "%02X", idx);
                         ScopedColor txtColor{{
                             ImGuiCol_Text,
@@ -1898,12 +1891,10 @@ public:
 protected:
     void renderContents() override
     {
-        if (ImGui::CollapsingHeader("Registers",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Registers", ImGuiTreeNodeFlags_DefaultOpen)) {
             renderRegisters();
         }
-        if (ImGui::CollapsingHeader("Pipeline",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Pipeline", ImGuiTreeNodeFlags_DefaultOpen)) {
             renderPipeline();
         }
     }
@@ -2036,8 +2027,7 @@ protected:
     void renderContents() override
     {
         renderPrg();
-        if (ImGui::CollapsingHeader("Vectors",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Vectors", ImGuiTreeNodeFlags_DefaultOpen)) {
             renderVectors();
         }
     }
@@ -2066,8 +2056,7 @@ private:
                             auto expr = aldo_haltexpr{
                                 .address = addr, .cond = ALDO_HLT_ADDR,
                             };
-                            vs.commands.emplace(aldo::Command::breakpointAdd,
-                                                expr);
+                            vs.commands.emplace(aldo::Command::breakpointAdd, expr);
                         }
                         ImGui::EndPopup();
                     }
@@ -2218,8 +2207,7 @@ private:
                 ImGui::Text("%02X", val);
             }
             if (std::isprint(static_cast<char>(val), lcl)) {
-                ascii[static_cast<ascii_sz>(ramCol)] =
-                    static_cast<ascii_val>(val);
+                ascii[static_cast<ascii_sz>(ramCol)] = static_cast<ascii_val>(val);
             }
         }
 
@@ -2394,8 +2382,7 @@ protected:
         }
         screen.render((scaleSelection / 2.0f) + 1, sdRatio);
 
-        if (ImGui::CollapsingHeader("Controls",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Controls", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 10);
             ImGui::Combo("Scale", &scaleSelection, scales.data(),
                          scales.size());

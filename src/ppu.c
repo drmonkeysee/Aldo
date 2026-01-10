@@ -730,8 +730,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
         if (self->dot == DotSpriteFetch) {
             static constexpr uint16_t horiz_bits = HNtBit | CourseXBits;
             // NOTE: copy t course-x and horizontal nametable to v
-            self->v =
-                (uint16_t)((self->v & ~horiz_bits) | (self->t & horiz_bits));
+            self->v = (uint16_t)((self->v & ~horiz_bits) | (self->t & horiz_bits));
         }
         break;
     case 2:
@@ -983,8 +982,7 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
 
     // NOTE: initialize ppu to known state
     self->oamaddr = 0;
-    self->signal.rst = self->signal.rw = self->signal.rd = self->signal.wr =
-        true;
+    self->signal.rst = self->signal.rw = self->signal.rd = self->signal.wr = true;
     self->signal.vout = self->bflt = false;
 
     /*

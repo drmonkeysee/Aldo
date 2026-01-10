@@ -26,8 +26,7 @@ using pal_buf = std::array<std::ifstream::char_type, PalFileLength>;
 
 auto parse_colors(const pal_buf& buf)
 {
-    auto newColors =
-        std::make_unique<aldo::palette::datav[]>(aldo::palette::Size);
+    auto newColors = std::make_unique<aldo::palette::datav[]>(aldo::palette::Size);
     aldo::palette::sz idx = 0;
 
     // TODO: replace this with views::adjacent in c++23

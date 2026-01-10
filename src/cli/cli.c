@@ -93,8 +93,7 @@ static int disassemble_cart_prg(const struct cliargs *args, aldo_cart *c)
 
 static int decode_cart_chr(const struct cliargs *args, aldo_cart *c)
 {
-    int err = aldo_dis_cart_chr(c, args->chrscale, args->chrdecode_prefix,
-                                stdout);
+    int err = aldo_dis_cart_chr(c, args->chrscale, args->chrdecode_prefix, stdout);
     if (err < 0) {
         fprintf(stderr, "CHR decode error (%d): %s\n", err,
                 aldo_dis_errstr(err));

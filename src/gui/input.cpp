@@ -206,8 +206,7 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
         break;
     case aldo::Command::probe:
         {
-            auto [signal, active] =
-                std::get<aldo::command_state::probe>(cs.value);
+            auto [signal, active] = std::get<aldo::command_state::probe>(cs.value);
             emu.probe(signal, active);
         }
         break;

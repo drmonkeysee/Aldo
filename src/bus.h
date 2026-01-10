@@ -34,8 +34,7 @@ void aldo_bus_free(aldo_bus *self);
 // NOTE: addr can be anywhere in the range of the target device's partition
 bool aldo_bus_swap(aldo_bus *self, uint16_t addr, struct aldo_busdevice bd,
                    struct aldo_busdevice *prev);
-inline bool aldo_bus_set(aldo_bus *self, uint16_t addr,
-                         struct aldo_busdevice bd)
+inline bool aldo_bus_set(aldo_bus *self, uint16_t addr, struct aldo_busdevice bd)
 {
     return aldo_bus_swap(self, addr, bd, nullptr);
 }

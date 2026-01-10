@@ -1727,8 +1727,7 @@ bool aldo_cpu_jammed(const struct aldo_mos6502 *self)
     return self->t == 4 && Aldo_Decode[self->opc].mode == ALDO_AM_JAM;
 }
 
-void aldo_cpu_snapshot(const struct aldo_mos6502 *self,
-                       struct aldo_snapshot *snp)
+void aldo_cpu_snapshot(const struct aldo_mos6502 *self, struct aldo_snapshot *snp)
 {
     assert(self != nullptr);
     assert(snp != nullptr);
@@ -1778,8 +1777,7 @@ aldo_cpu_peek_start(struct aldo_mos6502 *restrict self,
         detach(self);
     }
     self->irq = self->nmi = self->rst = ALDO_SIG_CLEAR;
-    self->signal.irq = self->signal.nmi = self->signal.rst =
-        self->signal.rdy = true;
+    self->signal.irq = self->signal.nmi = self->signal.rst = self->signal.rdy = true;
     return (struct aldo_peekresult){.mode = Aldo_Decode[self->opc].mode};
 }
 

@@ -68,8 +68,7 @@ aldo_const size_t AldoHexprFmtSize = 25;
 aldo_export
 const char *aldo_haltexpr_errstr(int err) aldo_nothrow;
 aldo_export
-const char *aldo_haltcond_description(enum aldo_haltcondition
-                                      cond) aldo_nothrow;
+const char *aldo_haltcond_description(enum aldo_haltcondition cond) aldo_nothrow;
 
 // NOTE: if returns non-zero error code, *expr is unmodified
 aldo_export aldo_checkerr
@@ -83,8 +82,7 @@ int aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
                        char buf[aldo_nacz(AldoHexprFmtSize)]) aldo_nothrow;
 aldo_export aldo_checkerr
 int aldo_haltexpr_fmtdbg(const struct aldo_debugexpr *expr,
-                         char
-                         buf[aldo_nacz(AldoHexprFmtSize)]) aldo_nothrow;
+                         char buf[aldo_nacz(AldoHexprFmtSize)]) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

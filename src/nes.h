@@ -63,8 +63,7 @@ aldo_export
 int aldo_nes_frame_factor() aldo_nothrow;
 
 aldo_export
-void aldo_nes_set_snapshot(aldo_nes *self,
-                           struct aldo_snapshot *snp) aldo_nothrow;
+void aldo_nes_set_snapshot(aldo_nes *self, struct aldo_snapshot *snp) aldo_nothrow;
 aldo_export
 void aldo_nes_dumpram(aldo_nes *self, FILE *fs[aldo_cz(3)],
                       bool errs[aldo_cz(3)]) aldo_nothrow;

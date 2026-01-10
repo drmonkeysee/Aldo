@@ -1595,8 +1595,7 @@ static void left_mask_bg(void *ctx)
     ppu->line = 10;
     ppu->dot = 2;
     ppu->pxpl.atl[1] = ppu->pxpl.atl[0] = true;
-    ppu->pxpl.ats[1] = ppu->pxpl.ats[0] = ppu->pxpl.bg[1] = ppu->pxpl.bg[0] =
-        0xff;
+    ppu->pxpl.ats[1] = ppu->pxpl.ats[0] = ppu->pxpl.bg[1] = ppu->pxpl.bg[0] = 0xff;
     ppu->pxpl.bgs[1] = ppu->pxpl.bgs[0] = 0xffff;
     ppu->mask.bm = false;
 

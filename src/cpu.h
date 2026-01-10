@@ -93,8 +93,7 @@ void aldo_cpu_powerup(struct aldo_mos6502 *self);
 int aldo_cpu_cycle(struct aldo_mos6502 *self);
 
 bool aldo_cpu_jammed(const struct aldo_mos6502 *self);
-void aldo_cpu_snapshot(const struct aldo_mos6502 *self,
-                       struct aldo_snapshot *snp);
+void aldo_cpu_snapshot(const struct aldo_mos6502 *self, struct aldo_snapshot *snp);
 
 struct aldo_peekresult
 aldo_cpu_peek_start(struct aldo_mos6502 *restrict self,

@@ -91,8 +91,7 @@ const char *
 aldo_dis_inst_mnemonic(const struct aldo_dis_instruction *inst) aldo_nothrow;
 aldo_export
 const char *
-aldo_dis_inst_description(const struct aldo_dis_instruction *
-                          inst) aldo_nothrow;
+aldo_dis_inst_description(const struct aldo_dis_instruction *inst) aldo_nothrow;
 aldo_export
 const char *
 aldo_dis_inst_addrmode(const struct aldo_dis_instruction *inst) aldo_nothrow;

@@ -31,8 +31,7 @@ extern const int Aldo_MinCps, Aldo_MaxCps, Aldo_MinFps, Aldo_MaxFps;
 aldo_export
 void aldo_clock_start(struct aldo_clock *self) aldo_nothrow;
 aldo_export
-void aldo_clock_tickstart(struct aldo_clock *self,
-                          bool reset_budget) aldo_nothrow;
+void aldo_clock_tickstart(struct aldo_clock *self, bool reset_budget) aldo_nothrow;
 aldo_export
 void aldo_clock_tickend(struct aldo_clock *self) aldo_nothrow;
 #include "bridgeclose.h"

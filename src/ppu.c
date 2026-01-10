@@ -725,7 +725,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
 
     switch (self->dot % 8) {
     case 1:
-        // garbage NT addr
+        // unused NT addr
         addrbus(self, nametable_addr(self));
         if (self->dot == DotSpriteFetch) {
             static constexpr uint16_t horiz_bits = HNtBit | CourseXBits;
@@ -734,17 +734,18 @@ static void sprite_read(struct aldo_rp2c02 *self)
         }
         break;
     case 2:
-        // garbage NT data
+        // unused NT data
         read_nt(self);
         break;
     case 3:
-        // garbage NT addr
+        // ignored NT addr
         addrbus(self, nametable_addr(self));
         // TODO: load sprite attribute
         break;
     case 4:
-        // garbage NT data
-        read_nt(self);
+        // ignored NT data; a normal memory cycle still executes but
+        // the nt register is not updated.
+        read(self);
         // TODO: load sprite x
         break;
     case 5:

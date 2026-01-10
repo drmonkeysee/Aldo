@@ -743,7 +743,7 @@ static void render_line_end(void *ctx)
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
-    // Garbage NT Fetches
+    // Unused NT Fetch
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(258, ppu->dot);
@@ -766,6 +766,7 @@ static void render_line_end(void *ctx)
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
+    // Ignored NT Fetch
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(260, ppu->dot);
@@ -783,7 +784,7 @@ static void render_line_end(void *ctx)
     ct_assertequal(0x1413u, ppu->v);
     ct_assertequal(0x2413u, ppu->vaddrbus);
     ct_assertequal(0x99u, ppu->vdatabus);
-    ct_assertequal(0x99u, ppu->pxpl.nt);
+    ct_assertequal(0x77u, ppu->pxpl.nt);
     ct_assertequal(0x44u, ppu->pxpl.bg[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);

@@ -346,7 +346,7 @@ static void oamdata_write(void *ctx)
     ppu->line = 240;
     ppu->dot = 5;
     ppu->mask.s = true;
-    ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
+    ppu->spr.oam[0] = ppu->spr.oam[1] = ppu->spr.oam[2] = ppu->spr.oam[3] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
@@ -356,28 +356,28 @@ static void oamdata_write(void *ctx)
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
     ct_assertequal(0x1u, ppu->oamaddr);
-    ct_assertequal(0x11u, ppu->oam[0]);
+    ct_assertequal(0x11u, ppu->spr.oam[0]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x22);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
     ct_assertequal(0x2u, ppu->oamaddr);
-    ct_assertequal(0x22u, ppu->oam[1]);
+    ct_assertequal(0x22u, ppu->spr.oam[1]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x33);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
     ct_assertequal(0x3u, ppu->oamaddr);
-    ct_assertequal(0x33u, ppu->oam[2]);
+    ct_assertequal(0x33u, ppu->spr.oam[2]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x44);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
     ct_assertequal(0x4u, ppu->oamaddr);
-    ct_assertequal(0x44u, ppu->oam[3]);
+    ct_assertequal(0x44u, ppu->spr.oam[3]);
 }
 
 static void oamdata_write_during_rendering(void *ctx)
@@ -386,7 +386,7 @@ static void oamdata_write_during_rendering(void *ctx)
     ppu->line = 24;
     ppu->dot = 5;
     ppu->mask.s = true;
-    ppu->oam[0] = ppu->oam[4] = ppu->oam[8] = ppu->oam[12] = 0xff;
+    ppu->spr.oam[0] = ppu->spr.oam[4] = ppu->spr.oam[8] = ppu->spr.oam[12] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
@@ -396,28 +396,28 @@ static void oamdata_write_during_rendering(void *ctx)
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
     ct_assertequal(0x4u, ppu->oamaddr);
-    ct_assertequal(0xffu, ppu->oam[0]);
+    ct_assertequal(0xffu, ppu->spr.oam[0]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x22);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
     ct_assertequal(0x8u, ppu->oamaddr);
-    ct_assertequal(0xffu, ppu->oam[4]);
+    ct_assertequal(0xffu, ppu->spr.oam[4]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x33);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
     ct_assertequal(0xcu, ppu->oamaddr);
-    ct_assertequal(0xffu, ppu->oam[8]);
+    ct_assertequal(0xffu, ppu->spr.oam[8]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x44);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
     ct_assertequal(0x10u, ppu->oamaddr);
-    ct_assertequal(0xffu, ppu->oam[12]);
+    ct_assertequal(0xffu, ppu->spr.oam[12]);
 }
 
 static void oamdata_write_during_rendering_disabled(void *ctx)
@@ -425,7 +425,7 @@ static void oamdata_write_during_rendering_disabled(void *ctx)
     auto ppu = ppt_get_ppu(ctx);
     ppu->line = 24;
     ppu->dot = 5;
-    ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
+    ppu->spr.oam[0] = ppu->spr.oam[1] = ppu->spr.oam[2] = ppu->spr.oam[3] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
@@ -435,28 +435,28 @@ static void oamdata_write_during_rendering_disabled(void *ctx)
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
     ct_assertequal(0x1u, ppu->oamaddr);
-    ct_assertequal(0x11u, ppu->oam[0]);
+    ct_assertequal(0x11u, ppu->spr.oam[0]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x22);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
     ct_assertequal(0x2u, ppu->oamaddr);
-    ct_assertequal(0x22u, ppu->oam[1]);
+    ct_assertequal(0x22u, ppu->spr.oam[1]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x33);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
     ct_assertequal(0x3u, ppu->oamaddr);
-    ct_assertequal(0x33u, ppu->oam[2]);
+    ct_assertequal(0x33u, ppu->spr.oam[2]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x44);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
     ct_assertequal(0x4u, ppu->oamaddr);
-    ct_assertequal(0x44u, ppu->oam[3]);
+    ct_assertequal(0x44u, ppu->spr.oam[3]);
 }
 
 static void oamdata_write_mirrored(void *ctx)
@@ -465,7 +465,7 @@ static void oamdata_write_mirrored(void *ctx)
     ppu->line = 240;
     ppu->dot = 5;
     ppu->mask.s = true;
-    ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
+    ppu->spr.oam[0] = ppu->spr.oam[1] = ppu->spr.oam[2] = ppu->spr.oam[3] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
@@ -475,28 +475,28 @@ static void oamdata_write_mirrored(void *ctx)
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
     ct_assertequal(0x1u, ppu->oamaddr);
-    ct_assertequal(0x11u, ppu->oam[0]);
+    ct_assertequal(0x11u, ppu->spr.oam[0]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x3214, 0x22);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
     ct_assertequal(0x2u, ppu->oamaddr);
-    ct_assertequal(0x22u, ppu->oam[1]);
+    ct_assertequal(0x22u, ppu->spr.oam[1]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x3214, 0x33);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
     ct_assertequal(0x3u, ppu->oamaddr);
-    ct_assertequal(0x33u, ppu->oam[2]);
+    ct_assertequal(0x33u, ppu->spr.oam[2]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x3214, 0x44);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
     ct_assertequal(0x4u, ppu->oamaddr);
-    ct_assertequal(0x44u, ppu->oam[3]);
+    ct_assertequal(0x44u, ppu->spr.oam[3]);
 }
 
 static void oamdata_write_during_reset(void *ctx)
@@ -505,7 +505,7 @@ static void oamdata_write_during_reset(void *ctx)
     ppu->line = 240;
     ppu->dot = 5;
     ppu->mask.s = true;
-    ppu->oam[0] = ppu->oam[1] = ppu->oam[2] = ppu->oam[3] = 0xff;
+    ppu->spr.oam[0] = ppu->spr.oam[1] = ppu->spr.oam[2] = ppu->spr.oam[3] = 0xff;
     ppu->rst = ALDO_SIG_SERVICED;
 
     ct_assertequal(0u, ppu->regsel);
@@ -516,28 +516,28 @@ static void oamdata_write_during_reset(void *ctx)
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
     ct_assertequal(0x1u, ppu->oamaddr);
-    ct_assertequal(0x11u, ppu->oam[0]);
+    ct_assertequal(0x11u, ppu->spr.oam[0]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x22);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
     ct_assertequal(0x2u, ppu->oamaddr);
-    ct_assertequal(0x22u, ppu->oam[1]);
+    ct_assertequal(0x22u, ppu->spr.oam[1]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x33);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
     ct_assertequal(0x3u, ppu->oamaddr);
-    ct_assertequal(0x33u, ppu->oam[2]);
+    ct_assertequal(0x33u, ppu->spr.oam[2]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x44);
 
     ct_assertequal(0x4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
     ct_assertequal(0x4u, ppu->oamaddr);
-    ct_assertequal(0x44u, ppu->oam[3]);
+    ct_assertequal(0x44u, ppu->spr.oam[3]);
 }
 
 static void oamdata_read(void *ctx)
@@ -546,10 +546,10 @@ static void oamdata_read(void *ctx)
     ppu->line = 240;
     ppu->dot = 5;
     ppu->mask.s = true;
-    ppu->oam[0] = 0x11;
-    ppu->oam[1] = 0x22;
-    ppu->oam[2] = 0x33;
-    ppu->oam[3] = 0x44;
+    ppu->spr.oam[0] = 0x11;
+    ppu->spr.oam[1] = 0x22;
+    ppu->spr.oam[2] = 0x33;
+    ppu->spr.oam[3] = 0x44;
 
     uint8_t d;
     aldo_bus_read(ppt_get_mbus(ctx), 0x2004, &d);
@@ -566,13 +566,59 @@ static void oamdata_read_mirrored(void *ctx)
     ppu->line = 240;
     ppu->dot = 5;
     ppu->mask.s = true;
-    ppu->oam[0] = 0x11;
-    ppu->oam[1] = 0x22;
-    ppu->oam[2] = 0x33;
-    ppu->oam[3] = 0x44;
+    ppu->spr.oam[0] = 0x11;
+    ppu->spr.oam[1] = 0x22;
+    ppu->spr.oam[2] = 0x33;
+    ppu->spr.oam[3] = 0x44;
 
     uint8_t d;
     aldo_bus_read(ppt_get_mbus(ctx), 0x3214, &d);
+
+    ct_assertequal(4u, ppu->regsel);
+    ct_assertequal(0x11u, d);
+    ct_assertequal(0x11u, ppu->regbus);
+    ct_assertequal(0u, ppu->oamaddr);
+}
+
+static void oamdata_read_during_soam_clear(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 0;
+    ppu->mask.s = true;
+    ppu->spr.oam[0] = 0x11;
+    ppu->spr.oam[1] = 0x22;
+    ppu->spr.oam[2] = 0x33;
+    ppu->spr.oam[3] = 0x44;
+
+    uint8_t d;
+    aldo_bus_read(ppt_get_mbus(ctx), 0x2004, &d);
+
+    ct_assertequal(4u, ppu->regsel);
+    ct_assertequal(0x11u, d);
+    ct_assertequal(0x11u, ppu->regbus);
+    ct_assertequal(0u, ppu->oamaddr);
+
+    ppu->dot = 1;
+
+    aldo_bus_read(ppt_get_mbus(ctx), 0x2004, &d);
+
+    ct_assertequal(4u, ppu->regsel);
+    ct_assertequal(0xffu, d);
+    ct_assertequal(0xffu, ppu->regbus);
+    ct_assertequal(0u, ppu->oamaddr);
+
+    ppu->dot = 64;
+
+    aldo_bus_read(ppt_get_mbus(ctx), 0x2004, &d);
+
+    ct_assertequal(4u, ppu->regsel);
+    ct_assertequal(0xffu, d);
+    ct_assertequal(0xffu, ppu->regbus);
+    ct_assertequal(0u, ppu->oamaddr);
+
+    ppu->dot = 65;
+
+    aldo_bus_read(ppt_get_mbus(ctx), 0x2004, &d);
 
     ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x11u, d);
@@ -3281,6 +3327,7 @@ struct ct_testsuite ppu_register_tests()
         ct_maketest(oamdata_write_during_reset),
         ct_maketest(oamdata_read),
         ct_maketest(oamdata_read_mirrored),
+        ct_maketest(oamdata_read_during_soam_clear),
 
         ct_maketest(ppuscroll_write),
         ct_maketest(ppuscroll_write_mirrored),

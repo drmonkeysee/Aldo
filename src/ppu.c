@@ -24,6 +24,7 @@ constexpr int LinePostRender = 240;
 constexpr int LineVBlank = LinePostRender + 1;
 constexpr int LinePreRender = Lines - 1;
 constexpr int DotPxStart = 2;
+constexpr int DotSpriteEvaluation = 65;
 constexpr int DotSpriteFetch = 257;
 constexpr int DotPxEnd = 260;
 constexpr int DotTilePrefetch = 321;
@@ -120,14 +121,22 @@ static bool rendering_disabled(const struct aldo_rp2c02 *self)
 
 static bool tile_rendering(const struct aldo_rp2c02 *self)
 {
-    return (0 < self->dot && self->dot < DotSpriteFetch)
-            || (DotTilePrefetch <= self->dot
-                && self->dot < DotTilePrefetchEnd);
+    // NOTE: 0 is not checked as vram_render already handles this
+    return self->dot < DotSpriteFetch
+            || (DotTilePrefetch <= self->dot && self->dot < DotTilePrefetchEnd);
 }
 
 static bool sprite_fetch(const struct aldo_rp2c02 *self)
 {
     return DotSpriteFetch <= self->dot && self->dot < DotTilePrefetch;
+}
+
+// NOTE: in_visible_frame and in_postrender can both be false:
+// specifically during the pre-render line; this distinction matters for sprite
+// vs tile evaluation, where tiles are evaluated in pre-render but sprites are not.
+static bool in_visible_frame(const struct aldo_rp2c02 *self)
+{
+    return 0 <= self->line && self->line < LinePostRender;
 }
 
 static bool in_postrender(const struct aldo_rp2c02 *self)
@@ -140,6 +149,42 @@ static bool in_vblank(const struct aldo_rp2c02 *self)
     return (self->line == LineVBlank && self->dot >= 1)
             || (LineVBlank < self->line && self->line < LinePreRender)
             || (self->line == LinePreRender && self->dot == 0);
+}
+
+//
+// MARK: - OAM
+//
+
+static uint8_t oam_read(const struct aldo_rp2c02 *self)
+{
+    // NOTE: during secondary oam clear, OAMDATA always returns 0xff
+    if (0 < self->dot && self->dot < DotSpriteEvaluation && in_visible_frame(self)) {
+        return 0xff;
+    }
+    return self->spr.oam[self->oamaddr];
+}
+
+static void sprite_evaluation(struct aldo_rp2c02 *self)
+{
+    // NOTE: sprite evaluation is not done on the prerender line
+    if (self->line == LinePreRender) return;
+
+    // NOTE: the actual PPU clears secondary oam over the course of 64 dots,
+    // taking 2 dots to clear each byte (presumably); however secondary oam
+    // is inaccessible to the rest of the system so there are no side-effects
+    // to clearing it all at once at dot 64.
+    if (self->dot == DotSpriteEvaluation - 1) {
+        // NOTE: "clearing" soam actually means setting everything high
+        aldo_memfill(self->spr.soam);
+        return;
+    }
+
+    /*
+     * on odd dots: read oam[oamaddr] into internal register
+     * on even dots:
+     *  if clear: write reg to soam and increment soam addr
+     *  if evaluation: read reg and evaluate sprite position - state machine
+     */
 }
 
 //
@@ -231,7 +276,7 @@ static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
         ppu->w = ppu->status.v = false;
         break;
     case 4: // OAMDATA
-        ppu->regbus = ppu->oam[ppu->oamaddr];
+        ppu->regbus = oam_read(ppu);
         break;
     case 7: // PPUDATA
         ppu->cvp = true;
@@ -281,7 +326,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
     case 4: // OAMDATA
         // TODO: this logic is shared by OAMDMA
         if (in_postrender(ppu) || rendering_disabled(ppu)) {
-            ppu->oam[ppu->oamaddr++] = ppu->regbus;
+            ppu->spr.oam[ppu->oamaddr++] = ppu->regbus;
         } else {
             // NOTE: during rendering, writing to OAMDATA does not change OAM
             // but it does increment oamaddr by one object attribute (4-bytes),
@@ -704,19 +749,13 @@ static void tile_read(struct aldo_rp2c02 *self)
         if (!self->cvp) {
             increment_tile(self, false);
         }
-        // NOTE: the actual PPU clears secondary oam over the course of 64 dots,
-        // taking 2 dots to clear each byte (presumably); however secondary oam
-        // is inaccessible to the rest of the system so there are no side-effects
-        // to clearing it all at once at dot 64.
-        if (self->dot == 64 && self->line != LinePreRender) {
-            // NOTE: "clearing" soam actually means setting everything high
-            aldo_memfill(self->soam);
-        }
         break;
     default:
         assert(((void)"TILE RENDER UNREACHABLE CASE", false));
         break;
     }
+
+    sprite_evaluation(self);
 }
 
 static void sprite_read(struct aldo_rp2c02 *self)
@@ -927,6 +966,7 @@ static void vram_render(struct aldo_rp2c02 *self)
     } else if (sprite_fetch(self)) {
         sprite_read(self);
     } else {
+        // NOTE: Unused NT fetches at end of each scanline
         assert(DotTilePrefetchEnd <= self->dot && self->dot < Dots);
         if (self->dot % 2 == 1) {
             addrbus(self, nametable_addr(self));
@@ -1024,8 +1064,8 @@ void aldo_ppu_zeroram(struct aldo_rp2c02 *self)
 {
     assert(self != nullptr);
 
-    aldo_memclr(self->oam);
-    aldo_memclr(self->soam);
+    aldo_memclr(self->spr.oam);
+    aldo_memclr(self->spr.soam);
     aldo_memclr(self->palette);
 }
 
@@ -1079,8 +1119,8 @@ void aldo_ppu_bus_snapshot(const struct aldo_rp2c02 *self,
     snp->ppu.lines.video_out = self->signal.vout;
     snp->ppu.lines.write = self->signal.wr;
 
-    snp->mem.oam = self->oam;
-    snp->mem.secondary_oam = self->soam;
+    snp->mem.oam = self->spr.oam;
+    snp->mem.secondary_oam = self->spr.soam;
     snp->mem.palette = self->palette;
 }
 
@@ -1100,8 +1140,8 @@ bool aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f)
     assert(self != nullptr);
     assert(f != nullptr);
 
-    return aldo_memdump(self->oam, f)
-            && aldo_memdump(self->soam, f)
+    return aldo_memdump(self->spr.oam, f)
+            && aldo_memdump(self->spr.soam, f)
             && aldo_memdump(self->palette, f);
 }
 

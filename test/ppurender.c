@@ -1278,21 +1278,21 @@ static void secondary_oam_clear(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 63;
-    for (size_t i = 0; i < aldo_arrsz(ppu->soam); ++i) {
-        ppu->soam[i] = (uint8_t)(i + 1);
+    for (size_t i = 0; i < aldo_arrsz(ppu->spr.soam); ++i) {
+        ppu->spr.soam[i] = (uint8_t)(i + 1);
     }
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(64, ppu->dot);
-    ct_assertequal(0x1u, ppu->soam[0]);
-    ct_assertequal(0x20u, ppu->soam[31]);
+    ct_assertequal(0x1u, ppu->spr.soam[0]);
+    ct_assertequal(0x20u, ppu->spr.soam[31]);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(65, ppu->dot);
-    ct_assertequal(0xffu, ppu->soam[0]);
-    ct_assertequal(0xffu, ppu->soam[31]);
+    ct_assertequal(0xffu, ppu->spr.soam[0]);
+    ct_assertequal(0xffu, ppu->spr.soam[31]);
 }
 
 static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
@@ -1300,21 +1300,21 @@ static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
     auto ppu = ppt_get_ppu(ctx);
     ppu->line = 261;
     ppu->dot = 63;
-    for (size_t i = 0; i < aldo_arrsz(ppu->soam); ++i) {
-        ppu->soam[i] = (uint8_t)(i + 1);
+    for (size_t i = 0; i < aldo_arrsz(ppu->spr.soam); ++i) {
+        ppu->spr.soam[i] = (uint8_t)(i + 1);
     }
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(64, ppu->dot);
-    ct_assertequal(0x1u, ppu->soam[0]);
-    ct_assertequal(0x20u, ppu->soam[31]);
+    ct_assertequal(0x1u, ppu->spr.soam[0]);
+    ct_assertequal(0x20u, ppu->spr.soam[31]);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(65, ppu->dot);
-    ct_assertequal(0x1u, ppu->soam[0]);
-    ct_assertequal(0x20u, ppu->soam[31]);
+    ct_assertequal(0x1u, ppu->spr.soam[0]);
+    ct_assertequal(0x20u, ppu->spr.soam[31]);
 }
 
 //

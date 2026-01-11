@@ -84,6 +84,14 @@ struct aldo_rp2c02 {
                             // when PPU is outputting a visible pixel.
     } signal;
 
+    // Sprite Evaluation
+    struct {
+        uint8_t oam[256],       // Object Attribute Memory: internal storage
+                                // for sprite attributes; 64 sprites at 4 bytes each.
+                soam[32];       // Secondary OAM: up to 8 active sprites for
+                                // current scanline.
+    } spr;
+
     // Pixel Render Pipeline
     struct {
         uint16_t bgs[2];    // Background Tile Shifter
@@ -115,11 +123,7 @@ struct aldo_rp2c02 {
         w;                  // Write latch for x2 registers
 
     // Internal Memory
-    uint8_t oam[256],       // Object Attribute Memory: internal storage
-                            // for sprite attributes; 64 sprites at 4 bytes each.
-            soam[32],       // Secondary OAM: up to 8 active sprites for
-                            // current scanline.
-            palette[28];    // Palette indices: 1 backdrop, 3 unused,
+    uint8_t palette[28];    // Palette indices: 1 backdrop, 3 unused,
                             // 12 background, 12 sprite.
 };
 

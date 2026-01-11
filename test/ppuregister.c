@@ -346,7 +346,8 @@ static void oamdata_write(void *ctx)
     ppu->line = 240;
     ppu->dot = 5;
     ppu->mask.s = true;
-    ppu->spr.oam[0] = ppu->spr.oam[1] = ppu->spr.oam[2] = ppu->spr.oam[3] = 0xff;
+    auto spr = &ppu->spr;
+    spr->oam[0] = spr->oam[1] = spr->oam[2] = spr->oam[3] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
@@ -425,7 +426,8 @@ static void oamdata_write_during_rendering_disabled(void *ctx)
     auto ppu = ppt_get_ppu(ctx);
     ppu->line = 24;
     ppu->dot = 5;
-    ppu->spr.oam[0] = ppu->spr.oam[1] = ppu->spr.oam[2] = ppu->spr.oam[3] = 0xff;
+    auto spr = &ppu->spr;
+    spr->oam[0] = spr->oam[1] = spr->oam[2] = spr->oam[3] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
@@ -465,7 +467,8 @@ static void oamdata_write_mirrored(void *ctx)
     ppu->line = 240;
     ppu->dot = 5;
     ppu->mask.s = true;
-    ppu->spr.oam[0] = ppu->spr.oam[1] = ppu->spr.oam[2] = ppu->spr.oam[3] = 0xff;
+    auto spr = &ppu->spr;
+    spr->oam[0] = spr->oam[1] = spr->oam[2] = spr->oam[3] = 0xff;
 
     ct_assertequal(0u, ppu->regsel);
     ct_assertequal(0u, ppu->regbus);
@@ -505,7 +508,8 @@ static void oamdata_write_during_reset(void *ctx)
     ppu->line = 240;
     ppu->dot = 5;
     ppu->mask.s = true;
-    ppu->spr.oam[0] = ppu->spr.oam[1] = ppu->spr.oam[2] = ppu->spr.oam[3] = 0xff;
+    auto spr = &ppu->spr;
+    spr->oam[0] = spr->oam[1] = spr->oam[2] = spr->oam[3] = 0xff;
     ppu->rst = ALDO_SIG_SERVICED;
 
     ct_assertequal(0u, ppu->regsel);

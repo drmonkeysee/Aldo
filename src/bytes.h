@@ -55,7 +55,6 @@ enum {
 // NOTE: all mem macros require array expressions, not pointers
 #define aldo_arrsz(arr) (sizeof (arr) / sizeof (arr)[0])
 #define aldo_memclr(mem) memset(mem, 0, aldo_arrsz(mem))
-#define aldo_memfill(mem) memset(mem, 0xff, aldo_arrsz(mem))
 #define aldo_memdump(mem, f) \
 (fwrite(mem, sizeof (mem)[0], aldo_arrsz(mem), f) == aldo_arrsz(mem))
 

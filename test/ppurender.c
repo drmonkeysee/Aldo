@@ -1277,44 +1277,136 @@ static void course_y_overflow(void *ctx)
 static void secondary_oam_clear(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
-    ppu->dot = 63;
-    for (size_t i = 0; i < aldo_arrsz(ppu->spr.soam); ++i) {
-        ppu->spr.soam[i] = (uint8_t)(i + 1);
+    auto spr = &ppu->spr;
+    ppu->dot = spr->oamd = 0;
+    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
+        spr->soam[i] = (uint8_t)(i + 1);
     }
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(64, ppu->dot);
-    ct_assertequal(0x1u, ppu->spr.soam[0]);
-    ct_assertequal(0x20u, ppu->spr.soam[31]);
+    ct_assertequal(1, ppu->dot);
+    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(0x20u, spr->soam[31]);
+    ct_assertequal(0x0u, spr->soama);
 
     aldo_ppu_cycle(ppu);
 
+    ct_assertequal(2, ppu->dot);
+    ct_assertequal(0xffu, spr->oamd);
+    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(0x20u, spr->soam[31]);
+    ct_assertequal(0x0u, spr->soama);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3, ppu->dot);
+    ct_assertequal(0xffu, spr->oamd);
+    ct_assertequal(0xffu, spr->soam[0]);
+    ct_assertequal(0x20u, spr->soam[31]);
+    ct_assertequal(0x1u, spr->soama);
+
+    for (auto i = 3; i < 65; ++i) {
+        aldo_ppu_cycle(ppu);
+    }
     ct_assertequal(65, ppu->dot);
-    ct_assertequal(0xffu, ppu->spr.soam[0]);
-    ct_assertequal(0xffu, ppu->spr.soam[31]);
+    ct_assertequal(0xffu, spr->oamd);
+    ct_assertequal(0xffu, spr->soam[0]);
+    ct_assertequal(0xffu, spr->soam[31]);
+    ct_assertequal(0x0u, spr->soama);
+}
+
+static void secondary_oam_clear_with_offset_soam_addr(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    auto spr = &ppu->spr;
+    ppu->dot = spr->oamd = 0;
+    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
+        spr->soam[i] = (uint8_t)(i + 1);
+    }
+    spr->soama = 0x10;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(1, ppu->dot);
+    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(0x11u, spr->soam[16]);
+    ct_assertequal(0x20u, spr->soam[31]);
+    ct_assertequal(0x10u, spr->soama);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(2, ppu->dot);
+    ct_assertequal(0xffu, spr->oamd);
+    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(0x11u, spr->soam[16]);
+    ct_assertequal(0x20u, spr->soam[31]);
+    ct_assertequal(0x10u, spr->soama);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3, ppu->dot);
+    ct_assertequal(0xffu, spr->oamd);
+    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(0xffu, spr->soam[16]);
+    ct_assertequal(0x20u, spr->soam[31]);
+    ct_assertequal(0x11u, spr->soama);
+
+    for (auto i = 3; i < 65; ++i) {
+        aldo_ppu_cycle(ppu);
+    }
+    ct_assertequal(65, ppu->dot);
+    ct_assertequal(0xffu, spr->oamd);
+    ct_assertequal(0xffu, spr->soam[0]);
+    ct_assertequal(0xffu, spr->soam[16]);
+    ct_assertequal(0xffu, spr->soam[31]);
+    ct_assertequal(0x0u, spr->soama);
 }
 
 static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
+    auto spr = &ppu->spr;
     ppu->line = 261;
-    ppu->dot = 63;
-    for (size_t i = 0; i < aldo_arrsz(ppu->spr.soam); ++i) {
-        ppu->spr.soam[i] = (uint8_t)(i + 1);
+    ppu->dot = spr->oamd = 0;
+    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
+        spr->soam[i] = (uint8_t)(i + 1);
     }
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(64, ppu->dot);
-    ct_assertequal(0x1u, ppu->spr.soam[0]);
-    ct_assertequal(0x20u, ppu->spr.soam[31]);
+    ct_assertequal(1, ppu->dot);
+    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(0x20u, spr->soam[31]);
+    ct_assertequal(0x0u, spr->soama);
 
     aldo_ppu_cycle(ppu);
 
+    ct_assertequal(2, ppu->dot);
+    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(0x20u, spr->soam[31]);
+    ct_assertequal(0x0u, spr->soama);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3, ppu->dot);
+    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(0x20u, spr->soam[31]);
+    ct_assertequal(0x0u, spr->soama);
+
+    for (auto i = 3; i < 65; ++i) {
+        aldo_ppu_cycle(ppu);
+    }
     ct_assertequal(65, ppu->dot);
-    ct_assertequal(0x1u, ppu->spr.soam[0]);
-    ct_assertequal(0x20u, ppu->spr.soam[31]);
+    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(0x20u, spr->soam[31]);
+    ct_assertequal(0x0u, spr->soama);
 }
 
 //
@@ -1809,6 +1901,7 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(course_y_overflow),
 
         ct_maketest(secondary_oam_clear),
+        ct_maketest(secondary_oam_clear_with_offset_soam_addr),
         ct_maketest(secondary_oam_does_not_clear_on_prerender_line),
 
         ct_maketest(tile_prefetch_pipeline),

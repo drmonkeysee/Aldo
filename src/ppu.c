@@ -787,7 +787,8 @@ static void sprite_read(struct aldo_rp2c02 *self)
         self->v = (uint16_t)((self->v & ~vert_bits) | (self->t & vert_bits));
     }
 
-    // TODO: clear OAMADDR on every tick
+    // NOTE: OAMADDR is cleared on every sprite-loading dot
+    self->oamaddr = 0;
 
     switch (self->dot % 8) {
     case 1:

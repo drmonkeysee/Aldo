@@ -1317,7 +1317,7 @@ static void secondary_oam_clear(void *ctx)
     ct_assertequal(0x0u, spr->soama);
 }
 
-static void secondary_oam_clear_with_offset_soam_addr(void *ctx)
+static void secondary_oam_clear_with_offset_soamaddr(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
     auto spr = &ppu->spr;
@@ -1407,6 +1407,90 @@ static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
     ct_assertequal(0x1u, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x0u, spr->soama);
+}
+
+static void oamaddr_cleared_during_sprite_fetch(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 256;
+    ppu->oamaddr = 0x22;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(257, ppu->dot);
+    ct_assertequal(0x22u, ppu->oamaddr);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(258, ppu->dot);
+    ct_assertequal(0x0u, ppu->oamaddr);
+
+    ppu->oamaddr = 0x33;
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(259, ppu->dot);
+    ct_assertequal(0x0u, ppu->oamaddr);
+
+    ppu->oamaddr = 0x44;
+    ppu->dot = 321;
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(322, ppu->dot);
+    ct_assertequal(0x44u, ppu->oamaddr);
+}
+
+static void oamaddr_cleared_during_sprite_fetch_on_prerender(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 256;
+    ppu->line = 261;
+    ppu->oamaddr = 0x22;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(257, ppu->dot);
+    ct_assertequal(0x22u, ppu->oamaddr);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(258, ppu->dot);
+    ct_assertequal(0x0u, ppu->oamaddr);
+
+    ppu->oamaddr = 0x33;
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(259, ppu->dot);
+    ct_assertequal(0x0u, ppu->oamaddr);
+
+    ppu->oamaddr = 0x44;
+    ppu->dot = 321;
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(322, ppu->dot);
+    ct_assertequal(0x44u, ppu->oamaddr);
+}
+
+static void oamaddr_not_cleared_during_postrender(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 256;
+    ppu->line = 240;
+    ppu->oamaddr = 0x22;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(257, ppu->dot);
+    ct_assertequal(0x22u, ppu->oamaddr);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(258, ppu->dot);
+    ct_assertequal(0x22u, ppu->oamaddr);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(259, ppu->dot);
+    ct_assertequal(0x22u, ppu->oamaddr);
 }
 
 //
@@ -1901,8 +1985,11 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(course_y_overflow),
 
         ct_maketest(secondary_oam_clear),
-        ct_maketest(secondary_oam_clear_with_offset_soam_addr),
+        ct_maketest(secondary_oam_clear_with_offset_soamaddr),
         ct_maketest(secondary_oam_does_not_clear_on_prerender_line),
+        ct_maketest(oamaddr_cleared_during_sprite_fetch),
+        ct_maketest(oamaddr_cleared_during_sprite_fetch_on_prerender),
+        ct_maketest(oamaddr_not_cleared_during_postrender),
 
         ct_maketest(tile_prefetch_pipeline),
         ct_maketest(tile_prefetch_postrender),

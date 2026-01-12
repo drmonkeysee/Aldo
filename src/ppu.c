@@ -444,24 +444,24 @@ static void write(struct aldo_rp2c02 *self)
 static void snapshot_nametables(const struct aldo_rp2c02 *self,
                                 struct aldo_snapshot *snp)
 {
-    snp->video->nt.pt = self->ctrl.b;
+    auto video = snp->video;
+    video->nt.pt = self->ctrl.b;
 
-    snp->video->nt.pos.h = self->t & HNtBit;
-    snp->video->nt.pos.v = self->t & VNtBit;
-    snp->video->nt.pos.x =
+    video->nt.pos.h = self->t & HNtBit;
+    video->nt.pos.v = self->t & VNtBit;
+    video->nt.pos.x =
         (uint8_t)(((self->t & CourseXBits) * AldoChrTileDim) + self->x);
-    snp->video->nt.pos.y =
-        (uint8_t)((((self->t & CourseYBits) >> 5) * AldoChrTileDim)
-                  + ((self->t & FineYBits) >> 12));
+    video->nt.pos.y = (uint8_t)((((self->t & CourseYBits) >> 5) * AldoChrTileDim)
+                                + ((self->t & FineYBits) >> 12));
 
-    for (size_t i = 0; i < aldo_arrsz(snp->video->nt.tables); ++i) {
+    for (size_t i = 0; i < aldo_arrsz(video->nt.tables); ++i) {
         uint16_t base_addr = (uint16_t)(BaseNtAddr + (HNtBit * (uint16_t)i));
-        size_t tile_count = aldo_arrsz(snp->video->nt.tables[i].tiles);
+        size_t tile_count = aldo_arrsz(video->nt.tables[i].tiles);
         aldo_bus_copy(self->vbus, base_addr, tile_count,
-                      snp->video->nt.tables[i].tiles);
+                      video->nt.tables[i].tiles);
         aldo_bus_copy(self->vbus, base_addr + (uint16_t)tile_count,
-                      aldo_arrsz(snp->video->nt.tables[i].attributes),
-                      snp->video->nt.tables[i].attributes);
+                      aldo_arrsz(video->nt.tables[i].attributes),
+                      video->nt.tables[i].attributes);
     }
 }
 
@@ -550,14 +550,16 @@ static void lock_attribute(struct aldo_rp2c02 *self)
 
 static void latch_attribute(struct aldo_rp2c02 *self)
 {
-    self->pxpl.atl[0] = aldo_getbit(self->pxpl.at, self->pxpl.atb);
-    self->pxpl.atl[1] = aldo_getbit(self->pxpl.at, self->pxpl.atb + 1);
+    auto pxpl = &self->pxpl;
+    pxpl->atl[0] = aldo_getbit(pxpl->at, pxpl->atb);
+    pxpl->atl[1] = aldo_getbit(pxpl->at, pxpl->atb + 1);
 }
 
 static void latch_tile(struct aldo_rp2c02 *self)
 {
-    latch_pattern(self->pxpl.bgs, self->pxpl.bg[0]);
-    latch_pattern(self->pxpl.bgs + 1, self->pxpl.bg[1]);
+    auto pxpl = &self->pxpl;
+    latch_pattern(pxpl->bgs, pxpl->bg[0]);
+    latch_pattern(pxpl->bgs + 1, pxpl->bg[1]);
     latch_attribute(self);
 }
 
@@ -565,17 +567,18 @@ static void mux_bg(struct aldo_rp2c02 *self)
 {
     static constexpr int left_mask_end = DotPxStart + 8;
 
+    auto pxpl = &self->pxpl;
     // NOTE: fine-x selects bit from the left: 0 = 7th bit, 7 = 0th bit
     int abit = 7 - self->x;
-    self->pxpl.mux = (uint8_t)((aldo_getbit(self->pxpl.ats[1], abit) << 3)
-                               | (aldo_getbit(self->pxpl.ats[0], abit) << 2));
+    pxpl->mux = (uint8_t)((aldo_getbit(pxpl->ats[1], abit) << 3)
+                          | (aldo_getbit(pxpl->ats[0], abit) << 2));
     if (self->mask.b && (self->mask.bm || self->dot >= left_mask_end)) {
         // NOTE: tile selection is from the left-most (upper) byte
         int tbit = abit + 8;
-        self->pxpl.mux |= (uint8_t)((aldo_getbit(self->pxpl.bgs[1], tbit) << 1)
-                                    | aldo_getbit(self->pxpl.bgs[0], tbit));
+        pxpl->mux |= (uint8_t)((aldo_getbit(pxpl->bgs[1], tbit) << 1)
+                               | aldo_getbit(pxpl->bgs[0], tbit));
     }
-    assert(self->pxpl.mux < 0x10);
+    assert(pxpl->mux < 0x10);
 }
 
 static void mux_fg(struct aldo_rp2c02 *self)
@@ -587,27 +590,29 @@ static void mux_fg(struct aldo_rp2c02 *self)
 
 static void resolve_palette(struct aldo_rp2c02 *self)
 {
+    auto pxpl = &self->pxpl;
     if (rendering_disabled(self)) {
         // NOTE: if v is pointing into palette memory then render that color
         if (palette_addr(self->v)) {
-            self->pxpl.pal = (uint8_t)(self->v & PaletteMask);
+            pxpl->pal = (uint8_t)(self->v & PaletteMask);
         } else {
-            self->pxpl.pal = 0x0;
+            pxpl->pal = 0x0;
         }
-    } else if ((self->pxpl.mux & 0x3) == 0) {
+    } else if ((pxpl->mux & 0x3) == 0) {
         // NOTE: transparent pixels fall through to backdrop color
-        self->pxpl.pal = 0x0;
+        pxpl->pal = 0x0;
     } else {
-        self->pxpl.pal = self->pxpl.mux;
+        pxpl->pal = pxpl->mux;
     }
 }
 
 static void output_pixel(struct aldo_rp2c02 *self)
 {
-    assert(self->pxpl.pal < 0x20);
+    auto pxpl = &self->pxpl;
+    assert(pxpl->pal < 0x20);
 
-    uint16_t pal_addr = Aldo_PaletteStartAddr | self->pxpl.pal;
-    self->pxpl.px = palette_read(self, pal_addr);
+    uint16_t pal_addr = Aldo_PaletteStartAddr | pxpl->pal;
+    pxpl->px = palette_read(self, pal_addr);
     self->signal.vout = true;
 }
 
@@ -615,10 +620,11 @@ static void output_pixel(struct aldo_rp2c02 *self)
 
 static void shift_tiles(struct aldo_rp2c02 *self)
 {
-    pxshift(self->pxpl.bgs, 1);
-    pxshift(self->pxpl.ats, self->pxpl.atl[0]);
-    pxshift(self->pxpl.bgs + 1, 1);
-    pxshift(self->pxpl.ats + 1, self->pxpl.atl[1]);
+    auto pxpl = &self->pxpl;
+    pxshift(pxpl->bgs, 1);
+    pxshift(pxpl->ats, pxpl->atl[0]);
+    pxshift(pxpl->bgs + 1, 1);
+    pxshift(pxpl->ats + 1, pxpl->atl[1]);
     if (self->dot % 8 == 1) {
         latch_tile(self);
     }
@@ -713,10 +719,11 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
         // pipeline it's easier to load the tiles at once.
         latch_tile(self);
         // NOTE: shift the first tile that occurs during dots 329-337
-        self->pxpl.bgs[0] <<= 8;
-        self->pxpl.ats[0] = -self->pxpl.atl[0];
-        self->pxpl.bgs[1] <<= 8;
-        self->pxpl.ats[1] = -self->pxpl.atl[1];
+        auto pxpl = &self->pxpl;
+        pxpl->bgs[0] <<= 8;
+        pxpl->ats[0] = -pxpl->atl[0];
+        pxpl->bgs[1] <<= 8;
+        pxpl->ats[1] = -pxpl->atl[1];
     } else if (self->dot == 337) {
         latch_tile(self);
     }
@@ -1111,35 +1118,36 @@ void aldo_ppu_bus_snapshot(const struct aldo_rp2c02 *self,
     assert(self != nullptr);
     assert(snp != nullptr);
 
-    snp->ppu.ctrl = get_ctrl(self);
-    snp->ppu.mask = get_mask(self);
-    snp->ppu.oamaddr = self->oamaddr;
-    snp->ppu.status = get_status(self);
+    auto ppu = &snp->ppu;
+    ppu->ctrl = get_ctrl(self);
+    ppu->mask = get_mask(self);
+    ppu->oamaddr = self->oamaddr;
+    ppu->status = get_status(self);
 
-    snp->ppu.pipeline.rst = self->rst;
-    snp->ppu.pipeline.addressbus = self->vaddrbus;
-    snp->ppu.pipeline.scrolladdr = self->v;
-    snp->ppu.pipeline.tempaddr = self->t;
-    snp->ppu.pipeline.dot = self->dot;
-    snp->ppu.pipeline.line = self->line;
-    snp->ppu.pipeline.databus = self->vdatabus;
-    snp->ppu.pipeline.readbuffer = self->rbuf;
-    snp->ppu.pipeline.register_databus = self->regbus;
-    snp->ppu.pipeline.register_select = self->regsel;
-    snp->ppu.pipeline.xfine = self->x;
-    snp->ppu.pipeline.busfault = self->bflt;
-    snp->ppu.pipeline.cv_pending = self->cvp;
-    snp->ppu.pipeline.oddframe = self->odd;
-    snp->ppu.pipeline.writelatch = self->w;
-    snp->ppu.pipeline.pixel = self->pxpl.px;
+    ppu->pipeline.rst = self->rst;
+    ppu->pipeline.addressbus = self->vaddrbus;
+    ppu->pipeline.scrolladdr = self->v;
+    ppu->pipeline.tempaddr = self->t;
+    ppu->pipeline.dot = self->dot;
+    ppu->pipeline.line = self->line;
+    ppu->pipeline.databus = self->vdatabus;
+    ppu->pipeline.readbuffer = self->rbuf;
+    ppu->pipeline.register_databus = self->regbus;
+    ppu->pipeline.register_select = self->regsel;
+    ppu->pipeline.xfine = self->x;
+    ppu->pipeline.busfault = self->bflt;
+    ppu->pipeline.cv_pending = self->cvp;
+    ppu->pipeline.oddframe = self->odd;
+    ppu->pipeline.writelatch = self->w;
+    ppu->pipeline.pixel = self->pxpl.px;
 
-    snp->ppu.lines.address_enable = self->signal.ale;
-    snp->ppu.lines.cpu_readwrite = self->signal.rw;
-    snp->ppu.lines.interrupt = self->signal.intr;
-    snp->ppu.lines.read = self->signal.rd;
-    snp->ppu.lines.reset = self->signal.rst;
-    snp->ppu.lines.video_out = self->signal.vout;
-    snp->ppu.lines.write = self->signal.wr;
+    ppu->lines.address_enable = self->signal.ale;
+    ppu->lines.cpu_readwrite = self->signal.rw;
+    ppu->lines.interrupt = self->signal.intr;
+    ppu->lines.read = self->signal.rd;
+    ppu->lines.reset = self->signal.rst;
+    ppu->lines.video_out = self->signal.vout;
+    ppu->lines.write = self->signal.wr;
 
     snp->mem.oam = self->spr.oam;
     snp->mem.secondary_oam = self->spr.soam;

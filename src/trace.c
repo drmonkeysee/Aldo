@@ -55,16 +55,16 @@ static bool trace_registers(FILE *tracelog, const struct aldo_snapshot *snp)
         'b', 'B', '-', '-', 'v', 'V', 'n', 'N',
     };
 
+    auto cpu = &snp->cpu;
     int err = fprintf(tracelog, " A:%02X X:%02X Y:%02X P:%02X (",
-                      snp->cpu.accumulator, snp->cpu.xindex, snp->cpu.yindex,
-                      snp->cpu.status);
+                      cpu->accumulator, cpu->xindex, cpu->yindex, cpu->status);
     if (err < 0) return false;
-    for (size_t i = sizeof snp->cpu.status * 8; i > 0; --i) {
+    for (size_t i = sizeof cpu->status * 8; i > 0; --i) {
         size_t idx = i - 1;
-        bool bit = aldo_getbit(snp->cpu.status, idx);
+        bool bit = aldo_getbit(cpu->status, idx);
         if (fputc(flags[(idx * 2) + bit], tracelog) == EOF) return false;
     }
-    return fprintf(tracelog, ") S:%02X", snp->cpu.stack_pointer) > 0;
+    return fprintf(tracelog, ") S:%02X", cpu->stack_pointer) > 0;
 }
 
 //

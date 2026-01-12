@@ -291,18 +291,18 @@ static void snapshot_video(struct aldo_nes001 *self, bool framedone)
 
 static void snapshot_sys(struct aldo_nes001 *self)
 {
-    if (!self->snp) return;
+    auto snp = self->snp;
+    if (!snp) return;
 
-    assert(self->snp->prg.curr != nullptr);
+    auto prg = &snp->prg;
+    assert(prg->curr != nullptr);
 
-    snapshot_bus(self, self->snp);
-    self->snp->mem.ram = self->ram;
-    self->snp->mem.vram = self->vram;
-    self->snp->prg.curr->length =
-        aldo_bus_copy(self->cpu.mbus,
-                      self->snp->cpu.datapath.current_instruction,
-                      aldo_arrsz(self->snp->prg.curr->pc),
-                      self->snp->prg.curr->pc);
+    snapshot_bus(self, snp);
+    snp->mem.ram = self->ram;
+    snp->mem.vram = self->vram;
+    prg->curr->length = aldo_bus_copy(self->cpu.mbus,
+                                      snp->cpu.datapath.current_instruction,
+                                      aldo_arrsz(prg->curr->pc), prg->curr->pc);
 }
 
 static void reset_snapshot(struct aldo_snapshot *snp)

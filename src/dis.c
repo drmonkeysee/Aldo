@@ -91,11 +91,12 @@ static uint8_t flags(enum aldo_inst in)
 
 static const char *interrupt_display(const struct aldo_snapshot *snp)
 {
-    if (snp->cpu.datapath.opcode != Aldo_BrkOpcode) return "";
-    if (snp->cpu.datapath.exec_cycle == 6) return "CLR";
-    if (snp->cpu.datapath.rst == ALDO_SIG_COMMITTED) return "(RST)";
-    if (snp->cpu.datapath.nmi == ALDO_SIG_COMMITTED) return "(NMI)";
-    if (snp->cpu.datapath.irq == ALDO_SIG_COMMITTED) return "(IRQ)";
+    auto cpu = &snp->cpu;
+    if (cpu->datapath.opcode != Aldo_BrkOpcode) return "";
+    if (cpu->datapath.exec_cycle == 6) return "CLR";
+    if (cpu->datapath.rst == ALDO_SIG_COMMITTED) return "(RST)";
+    if (cpu->datapath.nmi == ALDO_SIG_COMMITTED) return "(NMI)";
+    if (cpu->datapath.irq == ALDO_SIG_COMMITTED) return "(IRQ)";
     return "";
 }
 
@@ -566,11 +567,12 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
                                      0, &inst);
     if (err < 0) return err;
 
+    auto cpu = &snp->cpu;
     // NOTE: we're in an interrupt state so adjust the instruction to render
     // the datapath correctly.
-    if (snp->cpu.datapath.opcode == Aldo_BrkOpcode
+    if (cpu->datapath.opcode == Aldo_BrkOpcode
         && inst.d.instruction != ALDO_IN_BRK) {
-        inst.d = Aldo_Decode[snp->cpu.datapath.opcode];
+        inst.d = Aldo_Decode[cpu->datapath.opcode];
         inst.bv.size = (size_t)InstLens[inst.d.mode];
     }
 
@@ -580,8 +582,8 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
 
     size_t
         max_offset = 1 + (inst.bv.size / 3),
-        displayidx = (size_t)snp->cpu.datapath.exec_cycle < max_offset
-                        ? (size_t)snp->cpu.datapath.exec_cycle
+        displayidx = (size_t)cpu->datapath.exec_cycle < max_offset
+                        ? (size_t)cpu->datapath.exec_cycle
                         : max_offset;
     const char *displaystr = StringTables[inst.d.mode][displayidx];
     switch (displayidx) {
@@ -589,7 +591,7 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
         count = sprintf(dis + total, "%s", displaystr);
         break;
     case 1:
-        count = snp->cpu.datapath.opcode == Aldo_BrkOpcode
+        count = cpu->datapath.opcode == Aldo_BrkOpcode
                     ? sprintf(dis + total, displaystr, interrupt_display(snp))
                     : sprintf(dis + total, displaystr,
                               strlen(displaystr) > 0 ? inst.bv.mem[1] : 0);

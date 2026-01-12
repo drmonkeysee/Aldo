@@ -1732,35 +1732,36 @@ void aldo_cpu_snapshot(const struct aldo_mos6502 *self, struct aldo_snapshot *sn
     assert(self != nullptr);
     assert(snp != nullptr);
 
-    snp->cpu.program_counter = self->pc;
-    snp->cpu.accumulator = self->a;
-    snp->cpu.stack_pointer = self->s;
-    snp->cpu.status = get_p(self, false);
-    snp->cpu.xindex = self->x;
-    snp->cpu.yindex = self->y;
+    auto cpu = &snp->cpu;
+    cpu->program_counter = self->pc;
+    cpu->accumulator = self->a;
+    cpu->stack_pointer = self->s;
+    cpu->status = get_p(self, false);
+    cpu->xindex = self->x;
+    cpu->yindex = self->y;
 
-    snp->cpu.datapath.addressbus = self->addrbus;
-    snp->cpu.datapath.addrlow_latch = self->adl;
-    snp->cpu.datapath.addrhigh_latch = self->adh;
-    snp->cpu.datapath.addrcarry_latch = self->adc;
-    snp->cpu.datapath.busfault = self->bflt;
-    snp->cpu.datapath.current_instruction = self->addrinst;
-    snp->cpu.datapath.databus = self->databus;
+    cpu->datapath.addressbus = self->addrbus;
+    cpu->datapath.addrlow_latch = self->adl;
+    cpu->datapath.addrhigh_latch = self->adh;
+    cpu->datapath.addrcarry_latch = self->adc;
+    cpu->datapath.busfault = self->bflt;
+    cpu->datapath.current_instruction = self->addrinst;
+    cpu->datapath.databus = self->databus;
     assert(self->t >= 0);
-    snp->cpu.datapath.exec_cycle = self->t;
-    snp->cpu.datapath.instdone = self->presync;
-    snp->cpu.datapath.irq = self->irq;
-    snp->cpu.datapath.jammed = aldo_cpu_jammed(self);
-    snp->cpu.datapath.nmi = self->nmi;
-    snp->cpu.datapath.opcode = self->opc;
-    snp->cpu.datapath.rst = self->rst;
+    cpu->datapath.exec_cycle = self->t;
+    cpu->datapath.instdone = self->presync;
+    cpu->datapath.irq = self->irq;
+    cpu->datapath.jammed = aldo_cpu_jammed(self);
+    cpu->datapath.nmi = self->nmi;
+    cpu->datapath.opcode = self->opc;
+    cpu->datapath.rst = self->rst;
 
-    snp->cpu.lines.irq = self->signal.irq;
-    snp->cpu.lines.nmi = self->signal.nmi;
-    snp->cpu.lines.readwrite = self->signal.rw;
-    snp->cpu.lines.ready = self->signal.rdy;
-    snp->cpu.lines.reset = self->signal.rst;
-    snp->cpu.lines.sync = self->signal.sync;
+    cpu->lines.irq = self->signal.irq;
+    cpu->lines.nmi = self->signal.nmi;
+    cpu->lines.readwrite = self->signal.rw;
+    cpu->lines.ready = self->signal.rdy;
+    cpu->lines.reset = self->signal.rst;
+    cpu->lines.sync = self->signal.sync;
 }
 
 struct aldo_peekresult

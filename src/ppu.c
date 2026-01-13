@@ -97,8 +97,7 @@ static void set_mask(struct aldo_rp2c02 *self, uint8_t v)
 
 static uint8_t get_status(const struct aldo_rp2c02 *self)
 {
-    return (uint8_t)
-        (self->status.o << 5 | self->status.s << 6 | self->status.v << 7);
+    return (uint8_t)(self->status.o << 5 | self->status.s << 6 | self->status.v << 7);
 }
 
 static void set_status(struct aldo_rp2c02 *self, uint8_t v)
@@ -187,17 +186,13 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
     // NOTE: every odd dot is a read from whereever OAMADDR points
     if (self->dot % 2 == 1) {
         self->spr.oamd = oam_read(self);
-        return;
-    }
-
-    // NOTE: every even dot before sprite evaluation clears secondary OAM.
-    if (self->dot < DotSpriteEvaluation) {
+    } else if (self->dot < DotSpriteEvaluation) {
+        // NOTE: every even dot before sprite evaluation clears secondary OAM.
         soam_write(self);
         if (self->dot == DotSpriteEvaluation - 1) {
             self->spr.soama = 0;
             assert(assert_cleared_soam(self));
         }
-        return;
     }
 
     /*
@@ -255,10 +250,9 @@ static void palette_write(struct aldo_rp2c02 *self, uint16_t addr, uint8_t d)
     self->palette[mask_palette(addr)] = d;
 }
 
-static void
-snapshot_palette(const struct aldo_rp2c02 *self,
-                 uint8_t palsnp[static AldoPalSize][AldoPalSize],
-                 uint16_t offset)
+static void snapshot_palette(const struct aldo_rp2c02 *self,
+                             uint8_t palsnp[static AldoPalSize][AldoPalSize],
+                             uint16_t offset)
 {
     uint16_t base = Aldo_PaletteStartAddr + offset;
     for (size_t i = 0; i < AldoPalSize; ++i) {

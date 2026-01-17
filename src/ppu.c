@@ -166,8 +166,14 @@ static uint8_t oam_read(const struct aldo_rp2c02 *self)
 static void soam_write(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
-    sprites->soam[sprites->soama++] = sprites->oamd;
-    sprites->soama %= aldo_arrsz(sprites->soam);
+    sprites->soam[sprites->soama] = sprites->oamd;
+    sprites->soama = ++sprites->soama % aldo_arrsz(sprites->soam);
+}
+
+static void soam_revert(struct aldo_rp2c02 *self)
+{
+    auto sprites = &self->spr;
+    sprites->soama = --sprites->soama % aldo_arrsz(sprites->soam);
 }
 
 [[maybe_unused]]
@@ -181,24 +187,52 @@ static bool assert_cleared_soam(struct aldo_rp2c02 *self)
     return true;
 }
 
+static void sprite_skip(struct aldo_rp2c02 *self)
+{
+    self->oamaddr += 0x4;
+}
+
+static void sprite_reset(struct aldo_rp2c02 *self)
+{
+    auto sprites = &self->spr;
+    sprites->soama = 0x0;
+    sprites->fill = false;
+    assert(assert_cleared_soam(self));
+}
+
 static void sprite_evaluation(struct aldo_rp2c02 *self)
 {
-    // NOTE: every odd dot is a read from whereever OAMADDR points
+    auto sprites = &self->spr;
     if (self->dot % 2 == 1) {
-        self->spr.oamd = oam_read(self);
+        // NOTE: every odd dot is a read from whereever OAMADDR points
+        sprites->oamd = oam_read(self);
     } else if (self->dot < DotSpriteEvaluation) {
         // NOTE: every even dot before sprite evaluation clears secondary OAM.
         soam_write(self);
         if (self->dot == DotSpriteEvaluation - 1) {
-            self->spr.soama = 0;
-            assert(assert_cleared_soam(self));
+            sprite_reset(self);
+        }
+    } else if (sprites->fill) {
+        // NOTE: fill secondary OAM with the evaluated sprite
+        soam_write(self);
+        ++self->oamaddr;
+        sprites->fill = sprites->soama % 4;
+    } else {
+        // NOTE: evaluate sprites for the current scanline; sprites are not
+        // drawn until the next scanline, leading to a +1 y-offset of the
+        // actual on-screen position.
+        // TODO: 8x16 sprites
+        soam_write(self);
+        if ((uint8_t)(self->line - sprites->oamd) < 8) {
+            // NOTE: sprite height is within current scanline
+            ++self->oamaddr;
+            sprites->fill = true;
+        } else {
+            sprite_skip(self);
+            // NOTE: back up secondary oam address to undo previous write
+            soam_revert(self);
         }
     }
-
-    /*
-     * on even dots:
-     *  if evaluation: read reg and evaluate sprite position - state machine
-     */
 }
 
 //
@@ -344,7 +378,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
             // NOTE: during rendering, writing to OAMDATA does not change OAM
             // but it does increment oamaddr by one object attribute (4-bytes),
             // corrupting sprite evaluation.
-            ppu->oamaddr += 0x4;
+            sprite_skip(ppu);
         }
         break;
     case 5: // PPUSCROLL
@@ -789,7 +823,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
     }
 
     // NOTE: OAMADDR is cleared on every sprite-loading dot
-    self->oamaddr = 0;
+    self->oamaddr = 0x0;
 
     switch (self->dot % 8) {
     case 1:
@@ -1053,7 +1087,7 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
     // NOTE: initialize ppu to known state
     self->oamaddr = self->spr.soama = 0;
     self->signal.rst = self->signal.rw = self->signal.rd = self->signal.wr = true;
-    self->signal.vout = self->bflt = false;
+    self->signal.vout = self->bflt = self->spr.fill = false;
 
     /*
      * According to https://www.nesdev.org/wiki/PPU_power_up_state, the vblank

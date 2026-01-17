@@ -200,6 +200,7 @@ static void sprite_reset(struct aldo_rp2c02 *self)
     assert(assert_cleared_soam(self));
 }
 
+// NOTE: runs on lines 0-239; dots 1-256
 static void sprite_evaluation(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
@@ -757,6 +758,7 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
     }
 }
 
+// NOTE: runs on lines 0-239, 261; dots 1-256, 321-336
 static void tile_read(struct aldo_rp2c02 *self)
 {
     switch (self->dot % 8) {
@@ -814,6 +816,7 @@ static void tile_read(struct aldo_rp2c02 *self)
     }
 }
 
+// NOTE: runs on lines 0-239, 261; dots 257-320
 static void sprite_read(struct aldo_rp2c02 *self)
 {
     // NOTE: copy t course-y, fine-y, and vertical nametable to v
@@ -1008,6 +1011,7 @@ static void ppudata_rw_rendering(struct aldo_rp2c02 *self)
     increment_tile(self, true);
 }
 
+// NOTE: runs on lines 0-239, 261
 static void vram_render(struct aldo_rp2c02 *self)
 {
     if (self->dot == 0) {

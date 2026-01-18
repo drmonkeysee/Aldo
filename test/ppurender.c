@@ -2015,6 +2015,88 @@ static void sprite_evaluation_empty_scanline(void *ctx)
     ct_asserttrue(spr->done);
 }
 
+static void sprite_evaluation_partial_scanline(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    auto spr = &ppu->spr;
+    ppu->line = 12;
+    ppu->dot = 65;
+    spr->oamd = 0;
+    for (size_t i = 0; i < aldo_arrsz(spr->oam); ++i) {
+        spr->oam[i] = 0x0;
+    }
+    // NOTE: add 4 sprites to this scanline
+    spr->oam[4] = 12;
+    spr->oam[5] = 0x10;
+    spr->oam[6] = 0x11;
+    spr->oam[7] = 0x12;
+    spr->oam[12] = 10;
+    spr->oam[13] = 0x20;
+    spr->oam[14] = 0x21;
+    spr->oam[15] = 0x22;
+    spr->oam[32] = 8;
+    spr->oam[33] = 0x30;
+    spr->oam[34] = 0x31;
+    spr->oam[35] = 0x32;
+    spr->oam[40] = 11;
+    spr->oam[41] = 0x40;
+    spr->oam[42] = 0x41;
+    spr->oam[43] = 0x42;
+    spr->oam[63 * 4] = 80;  // unique y-coordinate of last sprite
+    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
+        spr->soam[i] = 0xff;
+    }
+
+    ct_assertfalse(spr->done);
+
+    // NOTE: this should run through all 64 sprites, copying 4 sprites into SOAM
+    while (!spr->done) {
+        aldo_ppu_cycle(ppu);
+    }
+
+    // NOTE: 128 dots + (2 dots for 3 attributes * 4 sprites = 24) = 152 dots
+    ct_assertequal(217, ppu->dot);
+    ct_assertequal(12u, spr->soam[0]);
+    ct_assertequal(0x10u, spr->soam[1]);
+    ct_assertequal(0x11u, spr->soam[2]);
+    ct_assertequal(0x12u, spr->soam[3]);
+    ct_assertequal(10u, spr->soam[4]);
+    ct_assertequal(0x20u, spr->soam[5]);
+    ct_assertequal(0x21u, spr->soam[6]);
+    ct_assertequal(0x22u, spr->soam[7]);
+    ct_assertequal(8u, spr->soam[8]);
+    ct_assertequal(0x30u, spr->soam[9]);
+    ct_assertequal(0x31u, spr->soam[10]);
+    ct_assertequal(0x32u, spr->soam[11]);
+    ct_assertequal(11u, spr->soam[12]);
+    ct_assertequal(0x40u, spr->soam[13]);
+    ct_assertequal(0x41u, spr->soam[14]);
+    ct_assertequal(0x42u, spr->soam[15]);
+    ct_assertequal(80u, spr->soam[16]);
+    for (size_t i = 17; i < aldo_arrsz(spr->soam); ++i) {
+        ct_assertequal(0xffu, spr->soam[i], "unexpected value at soam idx %lu", i);
+    }
+    ct_assertequal(0x10u, spr->soama);
+    ct_assertequal(0x0u, ppu->oamaddr);
+    ct_assertequal(80u, spr->oamd);
+    ct_asserttrue(spr->done);
+
+    // NOTE: run the rest of the sprite evaluation window
+    while (ppu->dot < 257) {
+        aldo_ppu_cycle(ppu);
+    }
+
+    ct_assertequal(257, ppu->dot);
+    ct_assertequal(80u, spr->soam[16]);
+    for (size_t i = 17; i < aldo_arrsz(spr->soam); ++i) {
+        ct_assertequal(0xffu, spr->soam[i], "unexpected value at soam idx %lu", i);
+    }
+    ct_assertequal(0x10u, spr->soama);
+    ct_assertequal(0x50u, ppu->oamaddr);    // ends up on the 20th sprite
+    ct_assertequal(0u, spr->oamd);
+    ct_asserttrue(spr->done);
+}
+
 static void oamaddr_cleared_during_sprite_fetch(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
@@ -2601,6 +2683,7 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(sprite_sixteen_bottom_scanline),
         ct_maketest(sprite_sixteen_above_scanline),
         ct_maketest(sprite_evaluation_empty_scanline),
+        ct_maketest(sprite_evaluation_partial_scanline),
         ct_maketest(oamaddr_cleared_during_sprite_fetch),
         ct_maketest(oamaddr_cleared_during_sprite_fetch_on_prerender),
         ct_maketest(oamaddr_not_cleared_during_postrender),

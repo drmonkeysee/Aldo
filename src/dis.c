@@ -464,7 +464,7 @@ static struct aldo_peekresult run_peek(struct aldo_mos6502 *cpu,
     struct aldo_mos6502 cpu_restore;
     auto peek = aldo_cpu_peek_start(cpu, &cpu_restore);
     do {
-        for (int i = 0; i < Aldo_PpuRatio; ++i) {
+        for (auto i = 0; i < Aldo_PpuRatio; ++i) {
             aldo_ppu_cycle(ppu);
         }
         aldo_cpu_peek(cpu, &peek);
@@ -755,7 +755,7 @@ int aldo_dis_peek(struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
     assert(snp != nullptr);
     assert(dis != nullptr);
 
-    int total = 0;
+    auto total = 0;
     const char *interrupt = interrupt_display(snp);
     if (strlen(interrupt) > 0) {
         int count = total = sprintf(dis, "%s > ", interrupt);

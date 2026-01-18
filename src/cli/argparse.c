@@ -240,7 +240,7 @@ bool argparse_parse(struct cliargs *restrict args, int argc,
     args->me = argc > 0 && strlen(argv[0]) > 0 ? argv[0] : "aldo";
     bool opt_parse = true;
     if (argc > 1) {
-        for (int i = 1; i < argc; ++i) {
+        for (auto i = 1; i < argc; ++i) {
             const char *arg = argv[i];
             if (arg[0] == '-') {
                 if (!opt_parse) {

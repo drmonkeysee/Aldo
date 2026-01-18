@@ -219,7 +219,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         // drawn until the next scanline, leading to a +1 y-offset of the
         // actual on-screen position.
         soam_write(self);
-        int in_range = self->ctrl.h ? 16 : 8;
+        auto in_range = self->ctrl.h ? 16 : 8;
         if ((uint8_t)(self->line - sprites->oamd) < in_range) {
             // NOTE: sprite height is within current scanline
             ++self->oamaddr;

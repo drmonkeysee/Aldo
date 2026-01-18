@@ -219,7 +219,7 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
 {
     static constexpr struct aldo_haltexpr empty = {.cond = ALDO_HLT_NONE};
 
-    int cursor_y = 0;
+    auto cursor_y = 0;
     werase(v->content);
     mvwprintw(v->content, cursor_y++, 0, "Tracing: %s",
               emu->args->tron ? "On" : "Off");
@@ -266,7 +266,7 @@ static void drawinstructions(const struct view *v, int h, int y,
     struct aldo_dis_instruction inst = {};
     uint16_t addr = snp->cpu.datapath.current_instruction;
     char disassembly[AldoDisInstSize];
-    for (int i = 0; i < h - y; ++i) {
+    for (auto i = 0; i < h - y; ++i) {
         int result = aldo_dis_parsemem_inst(snp->prg.curr->length,
                                             snp->prg.curr->pc,
                                             inst.offset + inst.bv.size, &inst);
@@ -341,7 +341,7 @@ static int drawregisters(const struct view *v, int cursor_y,
 static int drawflags(const struct view *v, int cursor_y,
                      const struct aldo_snapshot *snp)
 {
-    int cursor_x = 0;
+    auto cursor_x = 0;
     mvwaddstr(v->content, cursor_y++, cursor_x, "N V - B D I Z C");
     for (size_t i = sizeof snp->cpu.status * 8; i > 0; --i) {
         mvwprintw(v->content, cursor_y, cursor_x, "%d",
@@ -627,14 +627,14 @@ static int draw_mempage(const struct view *v, const struct emulator *emu,
 {
     int cursor_x = start_x;
     size_t skipped = 0;
-    for (int page_row = 0; page_row < page_rows; ++page_row) {
+    for (auto page_row = 0; page_row < page_rows; ++page_row) {
         if (sel != RSEL_PPU && page == 1) {
             // NOTE: clear any leftover PPU diagrams
             wclrtoeol(v->content);
         }
         mvwprintw(v->content, cursor_y, 0, "%02X%X0", page + page_offset,
                   page_row);
-        for (int page_col = 0; page_col < RamDim; ++page_col) {
+        for (auto page_col = 0; page_col < RamDim; ++page_col) {
             size_t ramidx = (size_t)((page * RamPageSize) + (page_row * RamDim)
                                      + page_col);
             // NOTE: skip over palette's mirrored addresses
@@ -679,7 +679,7 @@ static void draw_membanks(const struct view *v, const struct viewstate *vs,
         mem = emu->snapshot.mem.ram;
     }
     int page_count = vs->total_ramsheets * 2;
-    for (int page = 0; page < page_count; ++page) {
+    for (auto page = 0; page < page_count; ++page) {
         cursor_y = draw_mempage(v, emu, mem, vs->ramselect, start_x, cursor_y,
                                 page, page_offset, RamDim);
     }
@@ -748,7 +748,7 @@ static void raminit(struct view *v, int h, int w, int y, int x, int ramsheets)
     v->content = newpad((h - 4) * ramsheets, w - 2);
     v->inner = nullptr;
 
-    for (int col = 0; col < RamDim; ++col) {
+    for (auto col = 0; col < RamDim; ++col) {
         mvwprintw(v->win, 1, toprail_start + (col * RamColWidth), "%X", col);
     }
     mvwhline(v->win, 2, toprail_start - 1, 0, getmaxx(v->win) - toprail_start);

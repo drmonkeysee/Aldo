@@ -65,7 +65,7 @@ int aldo_haltexpr_parse(const char *restrict str, struct aldo_haltexpr *expr)
     bool parsed = false, valid = false;
     char u[2];
     struct aldo_haltexpr e;
-    for (int i = ALDO_HLT_NONE + 1; i < ALDO_HLT_COUNT; ++i) {
+    for (auto i = ALDO_HLT_NONE + 1; i < ALDO_HLT_COUNT; ++i) {
         switch (i) {
         case ALDO_HLT_ADDR:
             {

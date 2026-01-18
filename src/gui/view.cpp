@@ -2041,7 +2041,7 @@ private:
         auto addr = emu.snapshot().cpu.datapath.current_instruction;
         aldo_dis_instruction inst{};
         std::array<aldo::et::tchar, AldoDisInstSize> disasm;
-        for (int i = 0; i < instCount; ++i) {
+        for (auto i = 0; i < instCount; ++i) {
             auto result = aldo_dis_parsemem_inst(curr->length, curr->pc,
                                                  inst.offset + inst.bv.size,
                                                  &inst);

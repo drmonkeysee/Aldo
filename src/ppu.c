@@ -166,6 +166,9 @@ static uint8_t oam_read(const struct aldo_rp2c02 *self)
 static void soam_write(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
+    // NOTE: secondary OAM writes are ignored if sprite evaluation is finished
+    if (sprites->done && self->dot >= DotSpriteEvaluation) return;
+
     sprites->soam[sprites->soama++] = sprites->oamd;
     sprites->soama %= aldo_arrsz(sprites->soam);
 }
@@ -181,7 +184,7 @@ static void soam_revert(struct aldo_rp2c02 *self)
 static bool assert_cleared_soam(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
-    assert(sprites->soama == 0x0);
+    assert(sprites->soama == 0);
     for (size_t i = 0; i < aldo_arrsz(sprites->soam); ++i) {
         if (sprites->soam[i] != 0xff) return false;
     }
@@ -197,7 +200,7 @@ static void sprite_reset(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
     sprites->soama = 0x0;
-    sprites->fill = false;
+    sprites->fill = sprites->done = false;
     assert(assert_cleared_soam(self));
 }
 
@@ -233,6 +236,10 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
             sprite_skip(self);
             // NOTE: back up secondary oam address to undo previous write
             soam_revert(self);
+        }
+        // NOTE: we've checked all 64 sprites
+        if (self->oamaddr == 0) {
+            sprites->done = true;
         }
     }
 }
@@ -1092,7 +1099,7 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
     // NOTE: initialize ppu to known state
     self->oamaddr = self->spr.soama = 0;
     self->signal.rst = self->signal.rw = self->signal.rd = self->signal.wr = true;
-    self->signal.vout = self->bflt = self->spr.fill = false;
+    self->signal.vout = self->bflt = self->spr.fill = self->spr.done = false;
 
     /*
      * According to https://www.nesdev.org/wiki/PPU_power_up_state, the vblank

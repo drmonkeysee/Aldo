@@ -1282,6 +1282,7 @@ static void secondary_oam_clear(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         spr->soam[i] = (uint8_t)(i + 1);
     }
+    spr->fill = spr->done = true;
 
     aldo_ppu_cycle(ppu);
 
@@ -1290,6 +1291,8 @@ static void secondary_oam_clear(void *ctx)
     ct_assertequal(0x1u, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x0u, spr->soama);
+    ct_asserttrue(spr->fill);
+    ct_asserttrue(spr->done);
 
     aldo_ppu_cycle(ppu);
 
@@ -1298,6 +1301,8 @@ static void secondary_oam_clear(void *ctx)
     ct_assertequal(0x1u, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x0u, spr->soama);
+    ct_asserttrue(spr->fill);
+    ct_asserttrue(spr->done);
 
     aldo_ppu_cycle(ppu);
 
@@ -1306,6 +1311,8 @@ static void secondary_oam_clear(void *ctx)
     ct_assertequal(0xffu, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x1u, spr->soama);
+    ct_asserttrue(spr->fill);
+    ct_asserttrue(spr->done);
 
     for (auto i = 3; i < 65; ++i) {
         aldo_ppu_cycle(ppu);
@@ -1315,6 +1322,8 @@ static void secondary_oam_clear(void *ctx)
     ct_assertequal(0xffu, spr->soam[0]);
     ct_assertequal(0xffu, spr->soam[31]);
     ct_assertequal(0x0u, spr->soama);
+    ct_assertfalse(spr->fill);
+    ct_assertfalse(spr->done);
 }
 
 static void secondary_oam_clear_with_offset_soamaddr(void *ctx)
@@ -1325,6 +1334,7 @@ static void secondary_oam_clear_with_offset_soamaddr(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         spr->soam[i] = (uint8_t)(i + 1);
     }
+    spr->fill = spr->done = true;
     spr->soama = 0x10;
 
     aldo_ppu_cycle(ppu);
@@ -1335,6 +1345,8 @@ static void secondary_oam_clear_with_offset_soamaddr(void *ctx)
     ct_assertequal(0x11u, spr->soam[16]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x10u, spr->soama);
+    ct_asserttrue(spr->fill);
+    ct_asserttrue(spr->done);
 
     aldo_ppu_cycle(ppu);
 
@@ -1344,6 +1356,8 @@ static void secondary_oam_clear_with_offset_soamaddr(void *ctx)
     ct_assertequal(0x11u, spr->soam[16]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x10u, spr->soama);
+    ct_asserttrue(spr->fill);
+    ct_asserttrue(spr->done);
 
     aldo_ppu_cycle(ppu);
 
@@ -1353,6 +1367,8 @@ static void secondary_oam_clear_with_offset_soamaddr(void *ctx)
     ct_assertequal(0xffu, spr->soam[16]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x11u, spr->soama);
+    ct_asserttrue(spr->fill);
+    ct_asserttrue(spr->done);
 
     for (auto i = 3; i < 65; ++i) {
         aldo_ppu_cycle(ppu);
@@ -1363,6 +1379,8 @@ static void secondary_oam_clear_with_offset_soamaddr(void *ctx)
     ct_assertequal(0xffu, spr->soam[16]);
     ct_assertequal(0xffu, spr->soam[31]);
     ct_assertequal(0x0u, spr->soama);
+    ct_assertfalse(spr->fill);
+    ct_assertfalse(spr->done);
 }
 
 static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
@@ -1374,6 +1392,7 @@ static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         spr->soam[i] = (uint8_t)(i + 1);
     }
+    spr->fill = spr->done = true;
 
     aldo_ppu_cycle(ppu);
 
@@ -1382,6 +1401,8 @@ static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
     ct_assertequal(0x1u, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x0u, spr->soama);
+    ct_asserttrue(spr->fill);
+    ct_asserttrue(spr->done);
 
     aldo_ppu_cycle(ppu);
 
@@ -1390,6 +1411,8 @@ static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
     ct_assertequal(0x1u, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x0u, spr->soama);
+    ct_asserttrue(spr->fill);
+    ct_asserttrue(spr->done);
 
     aldo_ppu_cycle(ppu);
 
@@ -1398,6 +1421,8 @@ static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
     ct_assertequal(0x1u, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x0u, spr->soama);
+    ct_asserttrue(spr->fill);
+    ct_asserttrue(spr->done);
 
     for (auto i = 3; i < 65; ++i) {
         aldo_ppu_cycle(ppu);
@@ -1407,6 +1432,8 @@ static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
     ct_assertequal(0x1u, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x0u, spr->soama);
+    ct_asserttrue(spr->fill);
+    ct_asserttrue(spr->done);
 }
 
 static void sprite_below_scanline(void *ctx)
@@ -1934,6 +1961,58 @@ static void sprite_sixteen_above_scanline(void *ctx)
     ct_assertequal(0x0u, spr->soama);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertfalse(spr->fill);
+}
+
+static void sprite_evaluation_empty_scanline(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    auto spr = &ppu->spr;
+    ppu->line = 12;
+    ppu->dot = 65;
+    spr->oamd = 0;
+    for (size_t i = 0; i < aldo_arrsz(spr->oam) / 4; ++i) {
+        // NOTE: set last sprite's y-coordinate uniquely to assert below that it
+        // ends up in secondary OAM at the end.
+        spr->oam[i * 4] = i == 63 ? 30 : 20;
+    }
+    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
+        spr->soam[i] = 0xff;
+    }
+
+    ct_assertfalse(spr->done);
+
+    // NOTE: this should run through all 64 sprites, copying nothing but the
+    // last sprite's Y coordinate to secondary OAM.
+    while (!spr->done) {
+        aldo_ppu_cycle(ppu);
+    }
+
+    ct_assertequal(193, ppu->dot); // 2 dots per sprite = 128 dots
+    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
+        ct_assertequal(i == 0 ? 30u : 0xffu, spr->soam[i],
+                       "unexpected value at soam idx %lu", i);
+    }
+    ct_assertequal(0x0u, spr->soama);
+    ct_assertequal(0x0u, ppu->oamaddr);
+    ct_assertequal(30u, spr->oamd);
+    ct_asserttrue(spr->done);
+
+    // NOTE: run the rest of the sprite evaluation window
+    while (ppu->dot < 257) {
+        aldo_ppu_cycle(ppu);
+    }
+
+    ct_assertequal(257, ppu->dot);
+    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
+        ct_assertequal(i == 0 ? 30u : 0xffu, spr->soam[i],
+                       "unexpected value at soam idx %lu", i);
+    }
+    ct_assertequal(0x0u, spr->soama);
+    // NOTE: for a completely missed scanline looks like oamaddr happens to
+    // end up on the 32nd sprite at the end.
+    ct_assertequal(0x80u, ppu->oamaddr);
+    ct_assertequal(20u, spr->oamd);
+    ct_asserttrue(spr->done);
 }
 
 static void oamaddr_cleared_during_sprite_fetch(void *ctx)
@@ -2521,6 +2600,7 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(sprite_sixteen_within_scanline),
         ct_maketest(sprite_sixteen_bottom_scanline),
         ct_maketest(sprite_sixteen_above_scanline),
+        ct_maketest(sprite_evaluation_empty_scanline),
         ct_maketest(oamaddr_cleared_during_sprite_fetch),
         ct_maketest(oamaddr_cleared_during_sprite_fetch_on_prerender),
         ct_maketest(oamaddr_not_cleared_during_postrender),

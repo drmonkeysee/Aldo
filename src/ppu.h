@@ -92,7 +92,10 @@ struct aldo_rp2c02 {
                                 // for sprite attributes; 64 sprites at 4 bytes each.
                 soam[32];       // Secondary OAM: up to 8 active sprites for
                                 // current scanline.
-        bool fill;              // Currently filling secondary OAM with a detected
+        bool
+            done,               // Sprite evaluation is complete; either 8 sprites
+                                // have been found or 64 have been checked.
+            fill;               // Currently filling secondary OAM with a detected
                                 // sprite, vs evaluating sprite positions.
     } spr;
 

@@ -166,14 +166,15 @@ static uint8_t oam_read(const struct aldo_rp2c02 *self)
 static void soam_write(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
-    sprites->soam[sprites->soama] = sprites->oamd;
-    sprites->soama = ++sprites->soama % aldo_arrsz(sprites->soam);
+    sprites->soam[sprites->soama++] = sprites->oamd;
+    sprites->soama %= aldo_arrsz(sprites->soam);
 }
 
 static void soam_revert(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
-    sprites->soama = --sprites->soama % aldo_arrsz(sprites->soam);
+    --sprites->soama;
+    sprites->soama %= aldo_arrsz(sprites->soam);
 }
 
 [[maybe_unused]]
@@ -222,9 +223,9 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         // NOTE: evaluate sprites for the current scanline; sprites are not
         // drawn until the next scanline, leading to a +1 y-offset of the
         // actual on-screen position.
-        // TODO: 8x16 sprites
         soam_write(self);
-        if ((uint8_t)(self->line - sprites->oamd) < 8) {
+        int in_range = self->ctrl.h ? 16 : 8;
+        if ((uint8_t)(self->line - sprites->oamd) < in_range) {
             // NOTE: sprite height is within current scanline
             ++self->oamaddr;
             sprites->fill = true;

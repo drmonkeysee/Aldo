@@ -1691,6 +1691,251 @@ static void sprite_bottom_on_scanline(void *ctx)
     ct_assertfalse(spr->fill);
 }
 
+static void sprite_sixteen_within_scanline(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    auto spr = &ppu->spr;
+
+    ppu->line = 28;
+    ppu->dot = 65;
+    spr->oamd = 0;
+    spr->oam[0] = 20;
+    spr->oam[1] = 0x22;
+    spr->oam[2] = 0x33;
+    spr->oam[3] = 32;
+    spr->oam[4] = 50;
+    spr->soam[0] = spr->soam[1] = spr->soam[2] = spr->soam[3] = 0xff;
+    ppu->ctrl.h = true;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(66, ppu->dot);
+    ct_assertequal(0x0u, ppu->oamaddr);
+    ct_assertequal(20u, spr->oamd);
+    ct_assertequal(0x0u, spr->soama);
+    ct_assertequal(0xffu, spr->soam[0]);
+    ct_assertfalse(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(67, ppu->dot);
+    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(20u, spr->oamd);
+    ct_assertequal(0x1u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_asserttrue(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(68, ppu->dot);
+    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(0x22u, spr->oamd);
+    ct_assertequal(0x1u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertequal(0xffu, spr->soam[1]);
+    ct_asserttrue(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(69, ppu->dot);
+    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(0x22u, spr->oamd);
+    ct_assertequal(0x2u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertequal(0x22u, spr->soam[1]);
+    ct_asserttrue(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(70, ppu->dot);
+    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(0x33u, spr->oamd);
+    ct_assertequal(0x2u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertequal(0x22u, spr->soam[1]);
+    ct_assertequal(0xffu, spr->soam[2]);
+    ct_asserttrue(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(71, ppu->dot);
+    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(0x33u, spr->oamd);
+    ct_assertequal(0x3u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertequal(0x22u, spr->soam[1]);
+    ct_assertequal(0x33u, spr->soam[2]);
+    ct_asserttrue(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(72, ppu->dot);
+    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(32u, spr->oamd);
+    ct_assertequal(0x3u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertequal(0x22u, spr->soam[1]);
+    ct_assertequal(0x33u, spr->soam[2]);
+    ct_assertequal(0xffu, spr->soam[3]);
+    ct_asserttrue(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(73, ppu->dot);
+    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(32u, spr->oamd);
+    ct_assertequal(0x4u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertequal(0x22u, spr->soam[1]);
+    ct_assertequal(0x33u, spr->soam[2]);
+    ct_assertequal(32u, spr->soam[3]);
+    ct_assertfalse(spr->fill);
+}
+
+static void sprite_sixteen_bottom_scanline(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    auto spr = &ppu->spr;
+
+    ppu->line = 35;
+    ppu->dot = 65;
+    spr->oamd = 0;
+    spr->oam[0] = 20;
+    spr->oam[1] = 0x22;
+    spr->oam[2] = 0x33;
+    spr->oam[3] = 32;
+    spr->oam[4] = 50;
+    spr->soam[0] = spr->soam[1] = spr->soam[2] = spr->soam[3] = 0xff;
+    ppu->ctrl.h = true;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(66, ppu->dot);
+    ct_assertequal(0x0u, ppu->oamaddr);
+    ct_assertequal(20u, spr->oamd);
+    ct_assertequal(0x0u, spr->soama);
+    ct_assertequal(0xffu, spr->soam[0]);
+    ct_assertfalse(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(67, ppu->dot);
+    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(20u, spr->oamd);
+    ct_assertequal(0x1u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_asserttrue(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(68, ppu->dot);
+    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(0x22u, spr->oamd);
+    ct_assertequal(0x1u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertequal(0xffu, spr->soam[1]);
+    ct_asserttrue(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(69, ppu->dot);
+    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(0x22u, spr->oamd);
+    ct_assertequal(0x2u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertequal(0x22u, spr->soam[1]);
+    ct_asserttrue(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(70, ppu->dot);
+    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(0x33u, spr->oamd);
+    ct_assertequal(0x2u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertequal(0x22u, spr->soam[1]);
+    ct_assertequal(0xffu, spr->soam[2]);
+    ct_asserttrue(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(71, ppu->dot);
+    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(0x33u, spr->oamd);
+    ct_assertequal(0x3u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertequal(0x22u, spr->soam[1]);
+    ct_assertequal(0x33u, spr->soam[2]);
+    ct_asserttrue(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(72, ppu->dot);
+    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(32u, spr->oamd);
+    ct_assertequal(0x3u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertequal(0x22u, spr->soam[1]);
+    ct_assertequal(0x33u, spr->soam[2]);
+    ct_assertequal(0xffu, spr->soam[3]);
+    ct_asserttrue(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(73, ppu->dot);
+    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(32u, spr->oamd);
+    ct_assertequal(0x4u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertequal(0x22u, spr->soam[1]);
+    ct_assertequal(0x33u, spr->soam[2]);
+    ct_assertequal(32u, spr->soam[3]);
+    ct_assertfalse(spr->fill);
+}
+
+static void sprite_sixteen_above_scanline(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    auto spr = &ppu->spr;
+    ppu->line = 36;
+    ppu->dot = 65;
+    spr->oamd = 0;
+    spr->oam[0] = 20;
+    spr->oam[1] = 0x22;
+    spr->oam[2] = 0x33;
+    spr->oam[3] = 32;
+    spr->oam[4] = 50;
+    spr->soam[0] = spr->soam[1] = spr->soam[2] = spr->soam[3] = 0xff;
+    ppu->ctrl.h = true;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(66, ppu->dot);
+    ct_assertequal(0x0u, ppu->oamaddr);
+    ct_assertequal(20u, spr->oamd);
+    ct_assertequal(0x0u, spr->soama);
+    ct_assertequal(0xffu, spr->soam[0]);
+    ct_assertfalse(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(67, ppu->dot);
+    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(20u, spr->oamd);
+    ct_assertequal(0x0u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertfalse(spr->fill);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(68, ppu->dot);
+    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(50u, spr->oamd);
+    ct_assertequal(0x0u, spr->soama);
+    ct_assertequal(20u, spr->soam[0]);
+    ct_assertfalse(spr->fill);
+}
+
 static void oamaddr_cleared_during_sprite_fetch(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
@@ -2273,6 +2518,9 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(sprite_above_scanline),
         ct_maketest(sprite_top_on_scanline),
         ct_maketest(sprite_bottom_on_scanline),
+        ct_maketest(sprite_sixteen_within_scanline),
+        ct_maketest(sprite_sixteen_bottom_scanline),
+        ct_maketest(sprite_sixteen_above_scanline),
         ct_maketest(oamaddr_cleared_during_sprite_fetch),
         ct_maketest(oamaddr_cleared_during_sprite_fetch_on_prerender),
         ct_maketest(oamaddr_not_cleared_during_postrender),

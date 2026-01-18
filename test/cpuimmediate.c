@@ -24,7 +24,7 @@ static void adc(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 + 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -44,7 +44,7 @@ static void adc_carryin(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 + (6 + C)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -63,7 +63,7 @@ static void adc_carry(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;   // (-1) + 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -82,7 +82,7 @@ static void adc_zero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -101,7 +101,7 @@ static void adc_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;  // 0 + (-1)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -120,7 +120,7 @@ static void adc_carry_zero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x81;   // (-127) + 127
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -139,7 +139,7 @@ static void adc_carry_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;   // (-1) + (-1)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -158,7 +158,7 @@ static void adc_overflow_to_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x7f;   // 127 + 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -177,7 +177,7 @@ static void adc_overflow_to_positive(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;   // (-128) + (-1)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -197,7 +197,7 @@ static void adc_carryin_causes_overflow(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x7f;   // 127 + (0 + C)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -217,7 +217,7 @@ static void adc_carryin_avoids_overflow(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x80;   // (-128) + (-1 + C)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -239,7 +239,7 @@ static void adc_overflow_does_not_include_carry(void *ctx)
     cpu.pc = 0;
     cpu.a = 0x7f;   // 127 + 127
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -292,7 +292,7 @@ static void adc_bcd(void *ctx)
     cpu.p.d = true;
     cpu.a = 1;  // 1 + 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -313,7 +313,7 @@ static void adc_bcd_digit_rollover(void *ctx)
     cpu.p.d = true;
     cpu.a = 9;  // 9 + 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -334,7 +334,7 @@ static void adc_bcd_not_supported(void *ctx)
     cpu.p.d = true;
     cpu.a = 9;  // 9 + 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -356,7 +356,7 @@ static void adc_bcd_carryin(void *ctx)
     cpu.p.d = true;
     cpu.a = 9;  // 9 + (6 + C)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -377,7 +377,7 @@ static void adc_bcd_carry(void *ctx)
     cpu.p.d = true;
     cpu.a = 0x98;   // 98 + 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -398,7 +398,7 @@ static void adc_bcd_zero(void *ctx)
     cpu.p.d = true;
     cpu.a = 0;  // 0 + 0
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -419,7 +419,7 @@ static void adc_bcd_missed_zero(void *ctx)
     cpu.p.d = true;
     cpu.a = 0x99;   // 99 + 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -440,7 +440,7 @@ static void adc_bcd_negative(void *ctx)
     cpu.p.d = true;
     cpu.a = 0x80;   // 80 + 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -461,7 +461,7 @@ static void adc_bcd_overflow_to_negative(void *ctx)
     cpu.p.d = true;
     cpu.a = 0x50;   // 50 + 30
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -482,7 +482,7 @@ static void adc_bcd_overflow_to_positive(void *ctx)
     cpu.p.d = true;
     cpu.a = 0x89;   // 89 + 90
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -503,7 +503,7 @@ static void adc_bcd_carry_overflow(void *ctx)
     cpu.p.d = true;
     cpu.a = 0x90;   // 90 + 90
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -525,7 +525,7 @@ static void adc_bcd_carryin_causes_overflow(void *ctx)
     cpu.p.d = true;
     cpu.a = 0x50;   // 50 + 29 + C
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -548,7 +548,7 @@ static void adc_bcd_overflow_does_not_include_carry(void *ctx)
     cpu.pc = 0;
     cpu.a = 0x79;   // 79 + 79
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -601,7 +601,7 @@ static void adc_bcd_max(void *ctx)
     cpu.p.d = true;
     cpu.a = 0x99;   // 99 + 99
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -622,7 +622,7 @@ static void adc_bcd_hex(void *ctx)
     cpu.p.d = true;
     cpu.a = 0xa;    // 10 + 1 so far so good
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -643,7 +643,7 @@ static void adc_bcd_high_hex(void *ctx)
     cpu.p.d = true;
     cpu.a = 0xf;    // 15 + 15 uh oh the lower digit adjustment acts strangely
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -665,7 +665,7 @@ static void adc_bcd_max_hex(void *ctx)
     cpu.a = 0xff;   // 30 + 30? 165 + 165??
                     // who knows, this is undocumented behavior
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -706,7 +706,7 @@ static void adc_bcd_visual6502_cases(void *ctx)
         mem[1] = testcase[1];
         cpu.p.c = testcase[2];
 
-        int cycles = exec_cpu(&cpu);
+        auto cycles = exec_cpu(&cpu);
 
         ct_assertequal(2, cycles, "Failed on case %zu", i);
         ct_assertequal(2u, cpu.pc, "Failed on case %zu", i);
@@ -726,7 +726,7 @@ static void and(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -743,7 +743,7 @@ static void and_zero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xaa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -760,7 +760,7 @@ static void and_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xfa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -777,7 +777,7 @@ static void cmp_equal(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -795,7 +795,7 @@ static void cmp_lt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -813,7 +813,7 @@ static void cmp_gt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -831,7 +831,7 @@ static void cmp_max_to_min(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -849,7 +849,7 @@ static void cmp_max_to_max(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -867,7 +867,7 @@ static void cmp_min_to_max(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -885,7 +885,7 @@ static void cmp_min_to_min(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -903,7 +903,7 @@ static void cmp_neg_equal(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -921,7 +921,7 @@ static void cmp_neg_lt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -939,7 +939,7 @@ static void cmp_neg_gt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -957,7 +957,7 @@ static void cmp_negative_to_positive(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;    // Effectively -128 - 1 = 127
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -976,7 +976,7 @@ static void cmp_positive_to_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;  // Effectively 0 - 1 = -1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -995,7 +995,7 @@ static void cpx_equal(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1013,7 +1013,7 @@ static void cpx_lt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1031,7 +1031,7 @@ static void cpx_gt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1049,7 +1049,7 @@ static void cpx_max_to_min(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1067,7 +1067,7 @@ static void cpx_max_to_max(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1085,7 +1085,7 @@ static void cpx_min_to_max(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1103,7 +1103,7 @@ static void cpx_min_to_min(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1121,7 +1121,7 @@ static void cpx_neg_equal(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1139,7 +1139,7 @@ static void cpx_neg_lt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1157,7 +1157,7 @@ static void cpx_neg_gt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1175,7 +1175,7 @@ static void cpx_negative_to_positive(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0x80;    // Effectively -128 - 1 = 127
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1194,7 +1194,7 @@ static void cpx_positive_to_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0;  // Effectively 0 - 1 = -1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1213,7 +1213,7 @@ static void cpy_equal(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1231,7 +1231,7 @@ static void cpy_lt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1249,7 +1249,7 @@ static void cpy_gt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1267,7 +1267,7 @@ static void cpy_max_to_min(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1285,7 +1285,7 @@ static void cpy_max_to_max(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1303,7 +1303,7 @@ static void cpy_min_to_max(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1321,7 +1321,7 @@ static void cpy_min_to_min(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1339,7 +1339,7 @@ static void cpy_neg_equal(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1357,7 +1357,7 @@ static void cpy_neg_lt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1375,7 +1375,7 @@ static void cpy_neg_gt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1393,7 +1393,7 @@ static void cpy_negative_to_positive(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0x80;    // Effectively -128 - 1 = 127
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1412,7 +1412,7 @@ static void cpy_positive_to_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0;  // Effectively 0 - 1 = -1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1431,7 +1431,7 @@ static void eor(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xfa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1448,7 +1448,7 @@ static void eor_zero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xaa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1465,7 +1465,7 @@ static void eor_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xfa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1481,7 +1481,7 @@ static void lda(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1497,7 +1497,7 @@ static void lda_zero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1513,7 +1513,7 @@ static void lda_negative(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1529,7 +1529,7 @@ static void ldx(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1545,7 +1545,7 @@ static void ldx_zero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1561,7 +1561,7 @@ static void ldx_negative(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1577,7 +1577,7 @@ static void ldy(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1593,7 +1593,7 @@ static void ldy_zero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1609,7 +1609,7 @@ static void ldy_negative(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1626,7 +1626,7 @@ static void ora(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1643,7 +1643,7 @@ static void ora_zero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1660,7 +1660,7 @@ static void ora_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x45;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1678,7 +1678,7 @@ static void sbc(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1697,7 +1697,7 @@ static void sbc_borrowout(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 - 6 - B
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1717,7 +1717,7 @@ static void sbc_borrow(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;   // 10 - (-2)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1737,7 +1737,7 @@ static void sbc_zero(void *ctx)
     cpu.p.c = true;
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1757,7 +1757,7 @@ static void sbc_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xff;    // -1 - 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1777,7 +1777,7 @@ static void sbc_borrow_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0;  // 0 - 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1797,7 +1797,7 @@ static void sbc_overflow_to_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x7f;   // 127 - (-1)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1817,7 +1817,7 @@ static void sbc_overflow_to_positive(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x80;   // (-128) - 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1836,7 +1836,7 @@ static void sbc_borrowout_causes_overflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;   // (-128) - 0 - B
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1855,7 +1855,7 @@ static void sbc_borrowout_avoids_overflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x7f;   // 127 - (-1) - B
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1877,7 +1877,7 @@ static void sbc_overflow_does_not_include_borrow(void *ctx)
     cpu.pc = 0;
     cpu.a = 0x80;   // (-128) - (-128)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1931,7 +1931,7 @@ static void sbc_bcd(void *ctx)
     cpu.p.c = true;
     cpu.a = 4;  // 4 - 2
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1953,7 +1953,7 @@ static void sbc_bcd_digit_rollover(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x10;   // 10 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1975,7 +1975,7 @@ static void sbc_bcd_not_supported(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x10;   // 16 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1996,7 +1996,7 @@ static void sbc_bcd_borrowout(void *ctx)
     cpu.p.d = true;
     cpu.a = 0x10;   // 10 - 6 - B
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2018,7 +2018,7 @@ static void sbc_bcd_borrow(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x10;    // 10 - 79
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2040,7 +2040,7 @@ static void sbc_bcd_zero(void *ctx)
     cpu.p.c = true;
     cpu.a = 6;  // 6 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2062,7 +2062,7 @@ static void sbc_bcd_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x90;   // 90 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2084,7 +2084,7 @@ static void sbc_bcd_borrow_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0;  // 0 - 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2106,7 +2106,7 @@ static void sbc_bcd_overflow_to_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x79;   // 79 - 90
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2128,7 +2128,7 @@ static void sbc_bcd_overflow_to_positive(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x80;   // 80 - 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2150,7 +2150,7 @@ static void sbc_bcd_borrowout_causes_overflow(void *ctx)
     cpu.p.c = false;
     cpu.a = 0x80;   // 80 - 0 - B
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2173,7 +2173,7 @@ static void sbc_bcd_overflow_does_not_include_borrow(void *ctx)
     cpu.pc = 0;
     cpu.a = 0x80;   // 80 - 80
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2227,7 +2227,7 @@ static void sbc_bcd_min(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x0;    // 0 - 0
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2249,7 +2249,7 @@ static void sbc_bcd_max(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x99;   // 99 - 99
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2271,7 +2271,7 @@ static void sbc_bcd_hex(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 + 1 so far so good
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2293,7 +2293,7 @@ static void sbc_bcd_high_hex(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xf;    // 15 - 10 = 90,15... 105?
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2316,7 +2316,7 @@ static void sbc_bcd_max_hex(void *ctx)
     cpu.pc = 0;
     cpu.a = 0xff;   // 165? - 99 = 66.. this actually works
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2369,7 +2369,7 @@ static void sbc_bcd_visual6502_cases(void *ctx)
         mem[1] = testcase[1];
         cpu.p.c = testcase[2];
 
-        int cycles = exec_cpu(&cpu);
+        auto cycles = exec_cpu(&cpu);
 
         ct_assertequal(2, cycles, "Failed on case %zu", i);
         ct_assertequal(2u, cpu.pc, "Failed on case %zu", i);
@@ -2393,7 +2393,7 @@ static void alr(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2411,7 +2411,7 @@ static void alr_carry(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2429,7 +2429,7 @@ static void alr_zero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2447,7 +2447,7 @@ static void alr_carryzero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2465,7 +2465,7 @@ static void alr_negative_to_positive(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2484,7 +2484,7 @@ static void alr_all_ones(void *ctx)
     cpu.a = 0xff;
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2499,13 +2499,13 @@ static void anc(void *ctx)
 {
     uint8_t nopcodes[] = {0x0b, 0x2b};
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
-        uint8_t opc = nopcodes[c];
+        auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0xc};
         struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, nullptr);
         cpu.a = 0xa;
 
-        int cycles = exec_cpu(&cpu);
+        auto cycles = exec_cpu(&cpu);
 
         ct_assertequal(2, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
@@ -2521,13 +2521,13 @@ static void anc_zero(void *ctx)
 {
     uint8_t nopcodes[] = {0x0b, 0x2b};
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
-        uint8_t opc = nopcodes[c];
+        auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x0};
         struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, nullptr);
         cpu.a = 0xaa;
 
-        int cycles = exec_cpu(&cpu);
+        auto cycles = exec_cpu(&cpu);
 
         ct_assertequal(2, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
@@ -2543,13 +2543,13 @@ static void anc_negative(void *ctx)
 {
     uint8_t nopcodes[] = {0x0b, 0x2b};
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
-        uint8_t opc = nopcodes[c];
+        auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0xfc};
         struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, nullptr);
         cpu.a = 0xfa;
 
-        int cycles = exec_cpu(&cpu);
+        auto cycles = exec_cpu(&cpu);
 
         ct_assertequal(2, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
@@ -2569,7 +2569,7 @@ static void ane(void *ctx)
     cpu.a = 0x5a;
     cpu.x = 0x3f;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2587,7 +2587,7 @@ static void ane_zero(void *ctx)
     cpu.a = 0x5a;
     cpu.x = 0x3f;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2605,7 +2605,7 @@ static void ane_negative(void *ctx)
     cpu.a = 0xa5;
     cpu.x = 0xf3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2622,7 +2622,7 @@ static void arr(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2641,7 +2641,7 @@ static void arr_zero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2660,7 +2660,7 @@ static void arr_negative_exchanges_with_carry(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xfa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2679,7 +2679,7 @@ static void arr_overflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x40;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2699,7 +2699,7 @@ static void arr_loses_carry(void *ctx)
     cpu.a = 0x20;
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2719,7 +2719,7 @@ static void arr_negative_overflow_and_carry(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x80;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2740,7 +2740,7 @@ static void arr_bcd(void *ctx)
     cpu.p.d = true;
     cpu.a = 0xa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2761,7 +2761,7 @@ static void arr_bcd_low_adjustment(void *ctx)
     cpu.p.d = true;
     cpu.a = 0xf;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2782,7 +2782,7 @@ static void arr_bcd_low_adjustment_lost_carry(void *ctx)
     cpu.p.d = true;
     cpu.a = 0x1f;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2803,7 +2803,7 @@ static void arr_bcd_high_adjustment(void *ctx)
     cpu.p.d = true;
     cpu.a = 0xf0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2824,7 +2824,7 @@ static void arr_bcd_not_supported(void *ctx)
     cpu.p.d = true;
     cpu.a = 0xf0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2843,7 +2843,7 @@ static void lxa(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2862,7 +2862,7 @@ static void lxa_zero(void *ctx)
     cpu.a = 0x5a;
     cpu.x = 1;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2880,7 +2880,7 @@ static void lxa_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2895,12 +2895,12 @@ static void nop(void *ctx)
 {
     uint8_t nopcodes[] = {0x80, 0x82, 0x89, 0xc2, 0xe2};
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
-        uint8_t opc = nopcodes[c];
+        auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x10};
         struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, nullptr);
 
-        int cycles = exec_cpu(&cpu);
+        auto cycles = exec_cpu(&cpu);
 
         ct_assertequal(2, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
@@ -2925,7 +2925,7 @@ static void sbx_equal(void *ctx)
     cpu.a = 0x11;
     cpu.x = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2944,7 +2944,7 @@ static void sbx_lt(void *ctx)
     cpu.a = 0x11;
     cpu.x = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2963,7 +2963,7 @@ static void sbx_gt(void *ctx)
     cpu.a = 0x11;
     cpu.x = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2982,7 +2982,7 @@ static void sbx_max_to_min(void *ctx)
     cpu.a = 0xff;
     cpu.x = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3001,7 +3001,7 @@ static void sbx_max_to_max(void *ctx)
     cpu.a = 0xff;
     cpu.x = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3020,7 +3020,7 @@ static void sbx_min_to_max(void *ctx)
     cpu.a = 0xa;
     cpu.x = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3039,7 +3039,7 @@ static void sbx_min_to_min(void *ctx)
     cpu.a = 0xa;
     cpu.x = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3058,7 +3058,7 @@ static void sbx_neg_equal(void *ctx)
     cpu.a = 0xaf;
     cpu.x = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3077,7 +3077,7 @@ static void sbx_neg_lt(void *ctx)
     cpu.a = 0xaf;
     cpu.x = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3096,7 +3096,7 @@ static void sbx_neg_gt(void *ctx)
     cpu.a = 0xaf;
     cpu.x = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3115,7 +3115,7 @@ static void sbx_negative_to_positive(void *ctx)
     cpu.a = 0x8f;
     cpu.x = 0x80;    // Effectively -128 - 1 = 127
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3135,7 +3135,7 @@ static void sbx_positive_to_negative(void *ctx)
     cpu.a = 0xa;
     cpu.x = 0;  // Effectively 0 - 1 = -1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3155,7 +3155,7 @@ static void usbc(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3174,7 +3174,7 @@ static void usbc_borrowout(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 - 6 - B
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3194,7 +3194,7 @@ static void usbc_borrow(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;   // 10 - (-2)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3214,7 +3214,7 @@ static void usbc_zero(void *ctx)
     cpu.p.c = true;
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3234,7 +3234,7 @@ static void usbc_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xff;    // -1 - 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3254,7 +3254,7 @@ static void usbc_borrow_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0;  // 0 - 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3274,7 +3274,7 @@ static void usbc_overflow_to_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x7f;   // 127 - (-1)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3294,7 +3294,7 @@ static void usbc_overflow_to_positive(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x80;   // (-128) - 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3313,7 +3313,7 @@ static void usbc_borrowout_causes_overflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;   // (-128) - 0 - B
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3332,7 +3332,7 @@ static void usbc_borrowout_avoids_overflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x7f;   // 127 - (-1) - B
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3354,7 +3354,7 @@ static void usbc_overflow_does_not_include_borrow(void *ctx)
     cpu.pc = 0;
     cpu.a = 0x7f;   // 127 - (-128) - B
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3408,7 +3408,7 @@ static void usbc_bcd(void *ctx)
     cpu.p.c = true;
     cpu.a = 4;  // 4 - 2
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3430,7 +3430,7 @@ static void usbc_bcd_digit_rollover(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x10;   // 10 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3452,7 +3452,7 @@ static void usbc_bcd_not_supported(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x10;   // 16 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);

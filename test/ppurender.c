@@ -2246,7 +2246,7 @@ static void tile_prefetch_postrender(void *ctx)
     ppu->pxpl.ats[0] = 0xee;
     ppu->pxpl.ats[1] = 0xdd;
 
-    for (int i = 0; i < 9; ++i) {
+    for (auto i = 0; i < 9; ++i) {
         aldo_ppu_cycle(ppu);
 
         ct_assertequal(329 + i + 1, ppu->dot);
@@ -2274,7 +2274,7 @@ static void attribute_latch(void *ctx)
         ct_assertequal(i * 2, ppu->pxpl.atb);
         ct_assertequal((unsigned int)(vs[i] + 1), ppu->v);
         aldo_ppu_cycle(ppu);
-        int val = ppu->pxpl.atl[1] << 1 | ppu->pxpl.atl[0];
+        auto val = ppu->pxpl.atl[1] << 1 | ppu->pxpl.atl[0];
         ct_assertequal((int)i, val);
     }
 }
@@ -2435,7 +2435,7 @@ static void pixel_postrender_bg(void *ctx)
     ppu->pxpl.pal = 0x5;
     ppu->pxpl.px = 0x7;
 
-    for (int i = 0; i < 9; ++i) {
+    for (auto i = 0; i < 9; ++i) {
         aldo_ppu_cycle(ppu);
 
         ct_assertequal(10 + i + 1, ppu->dot);
@@ -2511,7 +2511,7 @@ static void left_mask_bg(void *ctx)
     ppu->pxpl.bgs[1] = ppu->pxpl.bgs[0] = 0xffff;
     ppu->mask.bm = false;
 
-    for (int i = 0; i < 8; ++i) {
+    for (auto i = 0; i < 8; ++i) {
         aldo_ppu_cycle(ppu);
 
         ct_assertequal(2 + i + 1, ppu->dot);

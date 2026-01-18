@@ -69,7 +69,7 @@ static size_t testrunner(int argc, char *argv[argc+1])
         ppu_render_tests(),
     };
     setup_testbus();
-    size_t result = ct_run_withargs(suites, argc, argv);
+    auto result = ct_run_withargs(suites, argc, argv);
     teardown_testbus();
     return result;
 }
@@ -86,6 +86,6 @@ size_t swift_runner()
 
 int main(int argc, char *argv[argc+1])
 {
-    size_t failed = testrunner(argc, argv);
+    auto failed = testrunner(argc, argv);
     return failed != 0;
 }

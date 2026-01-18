@@ -92,7 +92,7 @@ void enable_rom_wcapture()
 
 int exec_cpu(struct aldo_mos6502 *cpu)
 {
-    int cycles = 0;
+    auto cycles = 0;
     do {
         cycles += aldo_cpu_cycle(cpu);
         // NOTE: catch instructions that run longer than possible

@@ -24,7 +24,7 @@ static void adc_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 + 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -43,7 +43,7 @@ static void and_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -59,7 +59,7 @@ static void asl_zp(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -76,7 +76,7 @@ static void asl_zp_carry(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -93,7 +93,7 @@ static void asl_zp_zero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -110,7 +110,7 @@ static void asl_zp_carryzero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -127,7 +127,7 @@ static void asl_zp_negative(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -144,7 +144,7 @@ static void asl_zp_carrynegative(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -162,7 +162,7 @@ static void asl_zp_all_ones(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -180,7 +180,7 @@ static void bit_zp_maskset(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 2;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -198,7 +198,7 @@ static void bit_zp_maskclear(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 2;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -216,7 +216,7 @@ static void bit_zp_highmaskset(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x20;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -234,7 +234,7 @@ static void bit_zp_highmaskclear(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x20;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -252,7 +252,7 @@ static void bit_zp_sixmaskset(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x40;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -270,7 +270,7 @@ static void bit_zp_sixmaskclear(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x40;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -288,7 +288,7 @@ static void bit_zp_sevenmaskset(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -306,7 +306,7 @@ static void bit_zp_sevenmaskclear(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -324,7 +324,7 @@ static void bit_zp_set_high(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 2;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -342,7 +342,7 @@ static void bit_zp_zero_set_high(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -360,7 +360,7 @@ static void bit_zp_max_set_high(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -378,7 +378,7 @@ static void cmp_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -396,7 +396,7 @@ static void cpx_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -414,7 +414,7 @@ static void cpy_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -431,7 +431,7 @@ static void dec_zp(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -447,7 +447,7 @@ static void dec_zp_zero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -463,7 +463,7 @@ static void dec_zp_negative(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -480,7 +480,7 @@ static void eor_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xfa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -496,7 +496,7 @@ static void inc_zp(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -512,7 +512,7 @@ static void inc_zp_zero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -528,7 +528,7 @@ static void inc_zp_negative(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -544,7 +544,7 @@ static void lda_zp(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -560,7 +560,7 @@ static void ldx_zp(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -576,7 +576,7 @@ static void ldy_zp(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -592,7 +592,7 @@ static void lsr_zp(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -609,7 +609,7 @@ static void lsr_zp_carry(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -626,7 +626,7 @@ static void lsr_zp_zero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -643,7 +643,7 @@ static void lsr_zp_carryzero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -660,7 +660,7 @@ static void lsr_zp_negative_to_positive(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -677,7 +677,7 @@ static void lsr_zp_all_ones(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -695,7 +695,7 @@ static void ora_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -712,7 +712,7 @@ static void rol_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -729,7 +729,7 @@ static void rol_zp_carry(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -746,7 +746,7 @@ static void rol_zp_zero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -763,7 +763,7 @@ static void rol_zp_carryzero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -781,7 +781,7 @@ static void rol_zp_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -798,7 +798,7 @@ static void rol_zp_carrynegative(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -816,7 +816,7 @@ static void rol_zp_all_ones(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -833,7 +833,7 @@ static void ror_zp(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -850,7 +850,7 @@ static void ror_zp_carry(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -867,7 +867,7 @@ static void ror_zp_zero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -884,7 +884,7 @@ static void ror_zp_carryzero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -902,7 +902,7 @@ static void ror_zp_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -920,7 +920,7 @@ static void ror_zp_carrynegative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -938,7 +938,7 @@ static void ror_zp_all_ones(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -957,7 +957,7 @@ static void sbc_zp(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -976,7 +976,7 @@ static void sta_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -991,7 +991,7 @@ static void stx_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xf1;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1006,7 +1006,7 @@ static void sty_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0x84;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1026,7 +1026,7 @@ static void adc_zpx(void *ctx)
     cpu.a = 0xa;    // 10 + 6
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1046,7 +1046,7 @@ static void adc_zpx_pageoverflow(void *ctx)
     cpu.a = 0xa;    // 10 + 34
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1066,7 +1066,7 @@ static void and_zpx(void *ctx)
     cpu.a = 0xa;
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1084,7 +1084,7 @@ static void and_zpx_pageoverflow(void *ctx)
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1101,7 +1101,7 @@ static void asl_zpx(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1119,7 +1119,7 @@ static void asl_zpx_pageoverflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1138,7 +1138,7 @@ static void cmp_zpx(void *ctx)
     cpu.a = 0x10;
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1157,7 +1157,7 @@ static void cmp_zpx_pageoverflow(void *ctx)
     cpu.a = 0x10;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1175,7 +1175,7 @@ static void dec_zpx(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1192,7 +1192,7 @@ static void dec_zpx_pageoverflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1210,7 +1210,7 @@ static void eor_zpx(void *ctx)
     cpu.a = 0xfa;
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1228,7 +1228,7 @@ static void eor_zpx_pageoverflow(void *ctx)
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1245,7 +1245,7 @@ static void inc_zpx(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1262,7 +1262,7 @@ static void inc_zpx_pageoverflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1279,7 +1279,7 @@ static void lda_zpx(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1296,7 +1296,7 @@ static void lda_zpx_pageoverflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1313,7 +1313,7 @@ static void ldy_zpx(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1330,7 +1330,7 @@ static void ldy_zpx_pageoverflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1347,7 +1347,7 @@ static void lsr_zpx(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1365,7 +1365,7 @@ static void lsr_zpx_pageoverflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1384,7 +1384,7 @@ static void ora_zpx(void *ctx)
     cpu.a = 0xa;
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1402,7 +1402,7 @@ static void ora_zpx_pageoverflow(void *ctx)
     cpu.a = 0xfa;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1420,7 +1420,7 @@ static void rol_zpx(void *ctx)
     cpu.x = 4;
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1438,7 +1438,7 @@ static void rol_zpx_pageoverflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1457,7 +1457,7 @@ static void ror_zpx(void *ctx)
     cpu.x = 4;
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1475,7 +1475,7 @@ static void ror_zpx_pageoverflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1495,7 +1495,7 @@ static void sbc_zpx(void *ctx)
     cpu.a = 0xa;    // 10 - 6
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1516,7 +1516,7 @@ static void sbc_zpx_pageoverflow(void *ctx)
     cpu.a = 0xa;    // 10 - 8
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1536,7 +1536,7 @@ static void sta_zpx(void *ctx)
     cpu.a = 0xa;
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1552,7 +1552,7 @@ static void sta_zpx_pageoverflow(void *ctx)
     cpu.a = 0xa;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1568,7 +1568,7 @@ static void sty_zpx(void *ctx)
     cpu.y = 0x84;
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1584,7 +1584,7 @@ static void sty_zpx_pageoverflow(void *ctx)
     cpu.y = 0x84;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1603,7 +1603,7 @@ static void ldx_zpy(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1620,7 +1620,7 @@ static void ldx_zpy_pageoverflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1638,7 +1638,7 @@ static void stx_zpy(void *ctx)
     cpu.x = 0xf1;
     cpu.y = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1654,7 +1654,7 @@ static void stx_zpy_pageoverflow(void *ctx)
     cpu.x = 0xf1;
     cpu.y = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1673,7 +1673,7 @@ static void dcp_zp_equal(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1692,7 +1692,7 @@ static void dcp_zp_lt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1711,7 +1711,7 @@ static void dcp_zp_gt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1730,7 +1730,7 @@ static void dcp_zp_max_to_min(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1749,7 +1749,7 @@ static void dcp_zp_max_to_max(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1768,7 +1768,7 @@ static void dcp_zp_min_to_max(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1787,7 +1787,7 @@ static void dcp_zp_min_to_min(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1806,7 +1806,7 @@ static void dcp_zp_neg_equal(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1825,7 +1825,7 @@ static void dcp_zp_neg_lt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1844,7 +1844,7 @@ static void dcp_zp_neg_gt(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1863,7 +1863,7 @@ static void dcp_zp_negative_to_positive(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;    // Effectively -128 - 1 = 127
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1883,7 +1883,7 @@ static void dcp_zp_positive_to_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;  // Effectively 0 - 1 = -1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1904,7 +1904,7 @@ static void dcp_zpx(void *ctx)
     cpu.a = 0x10;
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1924,7 +1924,7 @@ static void dcp_zpx_pageoverflow(void *ctx)
     cpu.a = 0x10;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1944,7 +1944,7 @@ static void isc_zp(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1964,7 +1964,7 @@ static void isc_zp_borrowout(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 - 6 - B
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -1985,7 +1985,7 @@ static void isc_zp_borrow(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;   // 10 - (-2)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2006,7 +2006,7 @@ static void isc_zp_zero(void *ctx)
     cpu.p.c = true;
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2027,7 +2027,7 @@ static void isc_zp_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xff;    // -1 - 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2048,7 +2048,7 @@ static void isc_zp_borrow_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0;  // 0 - 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2069,7 +2069,7 @@ static void isc_zp_overflow_to_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x7f;   // 127 - (-1)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2090,7 +2090,7 @@ static void isc_zp_overflow_to_positive(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x80;   // (-128) - 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2110,7 +2110,7 @@ static void isc_zp_borrowout_causes_overflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;   // (-128) - 0 - B
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2130,7 +2130,7 @@ static void isc_zp_borrowout_avoids_overflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x7f;   // 127 - (-1) - B
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2152,7 +2152,7 @@ static void isc_zp_overflow_without_borrow(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x7f;   // 127 - (-128)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2175,7 +2175,7 @@ static void isc_bcd_zp(void *ctx)
     cpu.p.c = true;
     cpu.a = 4;  // 4 - 2
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2197,7 +2197,7 @@ static void isc_bcd_zp_digit_rollover(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x10;   // 10 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2219,7 +2219,7 @@ static void isc_bcd_zp_not_supported(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x10;   // 16 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2240,7 +2240,7 @@ static void isc_zpx(void *ctx)
     cpu.a = 0xa;    // 10 - 6
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2262,7 +2262,7 @@ static void isc_zpx_pageoverflow(void *ctx)
     cpu.a = 0xa;    // 10 - 8
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2281,7 +2281,7 @@ static void lax_zp(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2298,7 +2298,7 @@ static void lax_zp_zero(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2315,7 +2315,7 @@ static void lax_zp_negative(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2333,7 +2333,7 @@ static void lax_zpy(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2351,7 +2351,7 @@ static void lax_zpy_pageoverflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2366,12 +2366,12 @@ static void nop_zp(void *ctx)
 {
     uint8_t nopcodes[] = {0x4, 0x44, 0x64};
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
-        uint8_t opc = nopcodes[c];
+        auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x4, 0xff, 0xff, 0xc};
         struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, nullptr);
 
-        int cycles = exec_cpu(&cpu);
+        auto cycles = exec_cpu(&cpu);
 
         ct_assertequal(3, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
@@ -2392,13 +2392,13 @@ static void nop_zpx(void *ctx)
 {
     uint8_t nopcodes[] = {0x14, 0x34, 0x54, 0x74, 0xd4, 0xf4};
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
-        uint8_t opc = nopcodes[c];
+        auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xb};
         struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, nullptr);
         cpu.x = 4;
 
-        int cycles = exec_cpu(&cpu);
+        auto cycles = exec_cpu(&cpu);
 
         ct_assertequal(4, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
@@ -2419,13 +2419,13 @@ static void nop_zpx_pageoverflow(void *ctx)
 {
     uint8_t nopcodes[] = {0x14, 0x34, 0x54, 0x74, 0xd4, 0xf4};
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
-        uint8_t opc = nopcodes[c];
+        auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x3, 0x6, 0xff, 0xff, 0xff, 0xff, 0xb};
         struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, nullptr);
         cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-        int cycles = exec_cpu(&cpu);
+        auto cycles = exec_cpu(&cpu);
 
         ct_assertequal(4, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
@@ -2450,7 +2450,7 @@ static void rla_zp(void *ctx)
     cpu.p.c = true;
     cpu.a = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2469,7 +2469,7 @@ static void rla_zp_carry(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2488,7 +2488,7 @@ static void rla_zp_zero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 5;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2507,7 +2507,7 @@ static void rla_zp_carryzero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 5;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2527,7 +2527,7 @@ static void rla_zp_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2546,7 +2546,7 @@ static void rla_zp_carrynegative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2566,7 +2566,7 @@ static void rla_zp_all_ones(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x80;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2586,7 +2586,7 @@ static void rla_zp_and_sets_zero_and_clears_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2607,7 +2607,7 @@ static void rla_zpx(void *ctx)
     cpu.x = 4;
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2627,7 +2627,7 @@ static void rla_zpx_pageoverflow(void *ctx)
     cpu.a = 0xf;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2646,7 +2646,7 @@ static void rra_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 + 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2666,7 +2666,7 @@ static void rra_zp_carryin(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;    // 10 + (6 + C)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2686,7 +2686,7 @@ static void rra_zp_carry(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xff;   // (-1) + 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2706,7 +2706,7 @@ static void rra_zp_zero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2727,7 +2727,7 @@ static void rra_zp_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0;  // 0 + (-1)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2747,7 +2747,7 @@ static void rra_zp_carry_zero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x81;   // (-127) + 127
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2768,7 +2768,7 @@ static void rra_zp_carry_negative(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xff;   // (-1) + (-1)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2788,7 +2788,7 @@ static void rra_zp_overflow_to_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x7f;   // 127 + 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2809,7 +2809,7 @@ static void rra_zp_overflow_to_positive(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x80;   // (-128) + (-1)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2829,7 +2829,7 @@ static void rra_zp_carryin_causes_overflow(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x7f;   // 127 + (0 + C)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2850,7 +2850,7 @@ static void rra_zp_carryin_avoids_overflow(void *ctx)
     cpu.p.c = true;
     cpu.a = 0x80;   // (-128) + (-1 + C)
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2871,7 +2871,7 @@ static void rra_zp_overflow_with_carry(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x7f;   // 127 + 127 + C
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2893,7 +2893,7 @@ static void rra_bcd_zp(void *ctx)
     cpu.p.d = true;
     cpu.a = 1;  // 1 + 1
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2914,7 +2914,7 @@ static void rra_bcd_zp_digit_rollover(void *ctx)
     cpu.p.d = true;
     cpu.a = 9;  // 9 + 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2935,7 +2935,7 @@ static void rra_bcd_zp_not_supported(void *ctx)
     cpu.p.d = true;
     cpu.a = 9;  // 9 + 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2955,7 +2955,7 @@ static void rra_zpx(void *ctx)
     cpu.a = 0xa;    // 10 + 6
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2976,7 +2976,7 @@ static void rra_zpx_pageoverflow(void *ctx)
     cpu.a = 0xa;    // 10 + 34
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -2997,7 +2997,7 @@ static void sax_zp(void *ctx)
     cpu.a = 0xa5;
     cpu.x = 0x3c;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3014,7 +3014,7 @@ static void sax_zpy(void *ctx)
     cpu.x = 0x3c;
     cpu.y = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3031,7 +3031,7 @@ static void sax_zpy_pageoverflow(void *ctx)
     cpu.x = 0x3c;
     cpu.y = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3046,7 +3046,7 @@ static void slo_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 1;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3065,7 +3065,7 @@ static void slo_zp_carry(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 1;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3084,7 +3084,7 @@ static void slo_zp_zero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3103,7 +3103,7 @@ static void slo_zp_carryzero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3122,7 +3122,7 @@ static void slo_zp_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 1;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3141,7 +3141,7 @@ static void slo_zp_carrynegative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 1;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3161,7 +3161,7 @@ static void slo_zp_all_ones(void *ctx)
     cpu.p.c = true;
     cpu.a = 1;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3180,7 +3180,7 @@ static void slo_zp_or_clears_zero_and_sets_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3200,7 +3200,7 @@ static void slo_zpx(void *ctx)
     cpu.a = 1;
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3220,7 +3220,7 @@ static void slo_zpx_pageoverflow(void *ctx)
     cpu.a = 1;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3239,7 +3239,7 @@ static void sre_zp(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3258,7 +3258,7 @@ static void sre_zp_carry(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3277,7 +3277,7 @@ static void sre_zp_zero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3296,7 +3296,7 @@ static void sre_zp_carryzero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3315,7 +3315,7 @@ static void sre_zp_negative_to_positive(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3334,7 +3334,7 @@ static void sre_zp_all_ones(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3353,7 +3353,7 @@ static void sre_zp_eor_clears_zero_sets_negative(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x80;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3372,7 +3372,7 @@ static void sre_zp_eor_sets_zero(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 1;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3392,7 +3392,7 @@ static void sre_zpx(void *ctx)
     cpu.a = 3;
     cpu.x = 4;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
@@ -3412,7 +3412,7 @@ static void sre_zpx_pageoverflow(void *ctx)
     cpu.a = 3;
     cpu.x = 0xff;   // Wrap around from $0003 -> $0002
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);

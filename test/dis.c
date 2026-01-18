@@ -27,7 +27,7 @@ static struct aldo_dis_instruction create_instruction(size_t sz,
 {
     struct aldo_blockview bv = {.mem = bytes, .size = sz};
     struct aldo_dis_instruction inst;
-    int err = aldo_dis_parse_inst(&bv, 0, &inst);
+    auto err = aldo_dis_parse_inst(&bv, 0, &inst);
     ct_asserttrue(err > 0);
     return inst;
 }
@@ -59,7 +59,7 @@ static void parse_inst_empty_bankview(void *ctx)
     struct aldo_blockview bv = {};
     struct aldo_dis_instruction inst;
 
-    int result = aldo_dis_parse_inst(&bv, 0, &inst);
+    auto result = aldo_dis_parse_inst(&bv, 0, &inst);
 
     ct_assertequal(ALDO_DIS_ERR_PRGROM, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -81,7 +81,7 @@ static void parse_inst_at_start(void *ctx)
     };
     struct aldo_dis_instruction inst;
 
-    int result = aldo_dis_parse_inst(&bv, 0, &inst);
+    auto result = aldo_dis_parse_inst(&bv, 0, &inst);
 
     ct_assertequal(1, result);
     ct_assertequal(bv.ord, inst.bv.ord);
@@ -103,7 +103,7 @@ static void parse_inst_in_middle(void *ctx)
     };
     struct aldo_dis_instruction inst;
 
-    int result = aldo_dis_parse_inst(&bv, 3, &inst);
+    auto result = aldo_dis_parse_inst(&bv, 3, &inst);
 
     ct_assertequal(3, result);
     ct_assertequal(bv.ord, inst.bv.ord);
@@ -127,7 +127,7 @@ static void parse_inst_unofficial(void *ctx)
     };
     struct aldo_dis_instruction inst;
 
-    int result = aldo_dis_parse_inst(&bv, 2, &inst);
+    auto result = aldo_dis_parse_inst(&bv, 2, &inst);
 
     ct_assertequal(2, result);
     ct_assertequal(bv.ord, inst.bv.ord);
@@ -150,7 +150,7 @@ static void parse_inst_eof(void *ctx)
     };
     struct aldo_dis_instruction inst;
 
-    int result = aldo_dis_parse_inst(&bv, 5, &inst);
+    auto result = aldo_dis_parse_inst(&bv, 5, &inst);
 
     ct_assertequal(ALDO_DIS_ERR_EOF, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -172,7 +172,7 @@ static void parse_inst_out_of_bounds(void *ctx)
     };
     struct aldo_dis_instruction inst;
 
-    int result = aldo_dis_parse_inst(&bv, 10, &inst);
+    auto result = aldo_dis_parse_inst(&bv, 10, &inst);
 
     ct_assertequal(0, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -188,7 +188,7 @@ static void parsemem_inst_empty_blockview(void *ctx)
 {
     struct aldo_dis_instruction inst;
 
-    int result = aldo_dis_parsemem_inst(0, nullptr, 0, &inst);
+    auto result = aldo_dis_parsemem_inst(0, nullptr, 0, &inst);
 
     ct_assertequal(ALDO_DIS_ERR_PRGROM, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -205,8 +205,8 @@ static void parsemem_inst_at_start(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    int result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 0,
-                                        &inst);
+    auto result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 0,
+                                         &inst);
 
     ct_assertequal(1, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -223,8 +223,8 @@ static void parsemem_inst_in_middle(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    int result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 3,
-                                        &inst);
+    auto result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 3,
+                                         &inst);
 
     ct_assertequal(3, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -243,8 +243,8 @@ static void parsemem_inst_unofficial(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    int result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 2,
-                                        &inst);
+    auto result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 2,
+                                         &inst);
 
     ct_assertequal(2, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -262,8 +262,8 @@ static void parsemem_inst_eof(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    int result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 5,
-                                        &inst);
+    auto result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 5,
+                                         &inst);
 
     ct_assertequal(ALDO_DIS_ERR_EOF, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -280,8 +280,8 @@ static void parsemem_inst_out_of_bounds(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    int result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 10,
-                                        &inst);
+    auto result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 10,
+                                         &inst);
 
     ct_assertequal(0, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -414,7 +414,7 @@ static void flags_valid(void *ctx)
         .d = {ALDO_IN_ADC, ALDO_AM_IMM, {}, {}, false},
     };
 
-    uint8_t result = aldo_dis_inst_flags(&inst);
+    auto result = aldo_dis_inst_flags(&inst);
 
     ct_assertequal(0xe3u, result);
 }
@@ -425,7 +425,7 @@ static void flags_unofficial(void *ctx)
         .d = {ALDO_IN_ANC, ALDO_AM_IMM, {}, {}, true},
     };
 
-    uint8_t result = aldo_dis_inst_flags(&inst);
+    auto result = aldo_dis_inst_flags(&inst);
 
     ct_assertequal(0xa3u, result);
 }
@@ -436,7 +436,7 @@ static void flags_invalid(void *ctx)
         .d = {(enum aldo_inst)-4, ALDO_AM_IMM, {}, {}, false},
     };
 
-    uint8_t result = aldo_dis_inst_flags(&inst);
+    auto result = aldo_dis_inst_flags(&inst);
 
     ct_assertequal(0x20u, result);
 }
@@ -450,7 +450,7 @@ static void inst_operand_empty_instruction(void *ctx)
     struct aldo_dis_instruction inst = {};
     char buf[AldoDisOperandSize];
 
-    int length = aldo_dis_inst_operand(&inst, buf);
+    auto length = aldo_dis_inst_operand(&inst, buf);
 
     const char *exp = "";
     ct_assertequal((int)strlen(exp), length);
@@ -463,7 +463,7 @@ static void inst_operand_no_operand(void *ctx)
     auto inst = makeinst(mem);
     char buf[AldoDisOperandSize];
 
-    int length = aldo_dis_inst_operand(&inst, buf);
+    auto length = aldo_dis_inst_operand(&inst, buf);
 
     const char *exp = "";
     ct_assertequal((int)strlen(exp), length);
@@ -476,7 +476,7 @@ static void inst_operand_one_byte_operand(void *ctx)
     auto inst = makeinst(mem);
     char buf[AldoDisOperandSize];
 
-    int length = aldo_dis_inst_operand(&inst, buf);
+    auto length = aldo_dis_inst_operand(&inst, buf);
 
     const char *exp = "$06";
     ct_assertequal((int)strlen(exp), length);
@@ -489,7 +489,7 @@ static void inst_operand_two_byte_operand(void *ctx)
     auto inst = makeinst(mem);
     char buf[AldoDisOperandSize];
 
-    int length = aldo_dis_inst_operand(&inst, buf);
+    auto length = aldo_dis_inst_operand(&inst, buf);
 
     const char *exp = "$4C34";
     ct_assertequal((int)strlen(exp), length);
@@ -502,7 +502,7 @@ static void inst_operand_two_byte_operand(void *ctx)
 
 static void inst_eq_both_are_null(void *ctx)
 {
-    bool result = aldo_dis_inst_equal(nullptr, nullptr);
+    auto result = aldo_dis_inst_equal(nullptr, nullptr);
 
     ct_assertfalse(result);
 }
@@ -512,7 +512,7 @@ static void inst_eq_rhs_is_null(void *ctx)
     uint8_t a[] = {0xea};
     auto lhs = makeinst(a);
 
-    bool result = aldo_dis_inst_equal(&lhs, nullptr);
+    auto result = aldo_dis_inst_equal(&lhs, nullptr);
 
     ct_assertfalse(result);
 }
@@ -522,7 +522,7 @@ static void inst_eq_lhs_is_null(void *ctx)
     uint8_t b[] = {0xad, 0x34, 0x4c};
     auto rhs = makeinst(b);
 
-    bool result = aldo_dis_inst_equal(nullptr, &rhs);
+    auto result = aldo_dis_inst_equal(nullptr, &rhs);
 
     ct_assertfalse(result);
 }
@@ -533,7 +533,7 @@ static void inst_eq_different_lengths(void *ctx)
     auto lhs = makeinst(a);
     auto rhs = makeinst(b);
 
-    bool result = aldo_dis_inst_equal(&lhs, &rhs);
+    auto result = aldo_dis_inst_equal(&lhs, &rhs);
 
     ct_assertfalse(result);
 }
@@ -544,7 +544,7 @@ static void inst_eq_different_bytes(void *ctx)
     auto lhs = makeinst(a);
     auto rhs = makeinst(b);
 
-    bool result = aldo_dis_inst_equal(&lhs, &rhs);
+    auto result = aldo_dis_inst_equal(&lhs, &rhs);
 
     ct_assertfalse(result);
 }
@@ -555,7 +555,7 @@ static void inst_eq_same_bytes(void *ctx)
     auto lhs = makeinst(a);
     auto rhs = makeinst(b);
 
-    bool result = aldo_dis_inst_equal(&lhs, &rhs);
+    auto result = aldo_dis_inst_equal(&lhs, &rhs);
 
     ct_asserttrue(result);
 }
@@ -565,7 +565,7 @@ static void inst_eq_same_object(void *ctx)
     uint8_t a[] = {0xad, 0x44, 0x80};
     auto lhs = makeinst(a);
 
-    bool result = aldo_dis_inst_equal(&lhs, &lhs);
+    auto result = aldo_dis_inst_equal(&lhs, &lhs);
 
     ct_asserttrue(result);
 }
@@ -580,7 +580,7 @@ static void inst_does_nothing_if_no_bytes(void *ctx)
     struct aldo_dis_instruction inst = {};
     char buf[AldoDisInstSize] = {'\0'};
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "";
     ct_assertequal((int)strlen(exp), length);
@@ -594,7 +594,7 @@ static void inst_disassembles_implied(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: EA        NOP";
     ct_assertequal((int)strlen(exp), length);
@@ -608,7 +608,7 @@ static void inst_disassembles_immediate(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: A9 34     LDA #$34";
     ct_assertequal((int)strlen(exp), length);
@@ -622,7 +622,7 @@ static void inst_disassembles_zeropage(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: A5 34     LDA $34";
     ct_assertequal((int)strlen(exp), length);
@@ -636,7 +636,7 @@ static void inst_disassembles_zeropage_x(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: B5 34     LDA $34,X";
     ct_assertequal((int)strlen(exp), length);
@@ -650,7 +650,7 @@ static void inst_disassembles_zeropage_y(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: B6 34     LDX $34,Y";
     ct_assertequal((int)strlen(exp), length);
@@ -664,7 +664,7 @@ static void inst_disassembles_indirect_x(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: A1 34     LDA ($34,X)";
     ct_assertequal((int)strlen(exp), length);
@@ -678,7 +678,7 @@ static void inst_disassembles_indirect_y(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: B1 34     LDA ($34),Y";
     ct_assertequal((int)strlen(exp), length);
@@ -692,7 +692,7 @@ static void inst_disassembles_absolute(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: AD 34 06  LDA $0634";
     ct_assertequal((int)strlen(exp), length);
@@ -706,7 +706,7 @@ static void inst_disassembles_absolute_x(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: BD 34 06  LDA $0634,X";
     ct_assertequal((int)strlen(exp), length);
@@ -720,7 +720,7 @@ static void inst_disassembles_absolute_y(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: B9 34 06  LDA $0634,Y";
     ct_assertequal((int)strlen(exp), length);
@@ -734,7 +734,7 @@ static void inst_disassembles_jmp_absolute(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: 4C 34 06  JMP $0634";
     ct_assertequal((int)strlen(exp), length);
@@ -748,7 +748,7 @@ static void inst_disassembles_jmp_indirect(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: 6C 34 06  JMP ($0634)";
     ct_assertequal((int)strlen(exp), length);
@@ -762,7 +762,7 @@ static void inst_disassembles_branch_positive(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: 90 0A     BCC +10";
     ct_assertequal((int)strlen(exp), length);
@@ -776,7 +776,7 @@ static void inst_disassembles_branch_negative(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: 90 F6     BCC -10";
     ct_assertequal((int)strlen(exp), length);
@@ -790,7 +790,7 @@ static void inst_disassembles_branch_zero(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: 90 00     BCC +0";
     ct_assertequal((int)strlen(exp), length);
@@ -804,7 +804,7 @@ static void inst_disassembles_push(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: 48        PHA";
     ct_assertequal((int)strlen(exp), length);
@@ -818,7 +818,7 @@ static void inst_disassembles_pull(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: 68        PLA";
     ct_assertequal((int)strlen(exp), length);
@@ -832,7 +832,7 @@ static void inst_disassembles_jsr(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: 20 34 06  JSR $0634";
     ct_assertequal((int)strlen(exp), length);
@@ -846,7 +846,7 @@ static void inst_disassembles_rts(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: 60        RTS";
     ct_assertequal((int)strlen(exp), length);
@@ -860,7 +860,7 @@ static void inst_disassembles_brk(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: 00        BRK";
     ct_assertequal((int)strlen(exp), length);
@@ -874,7 +874,7 @@ static void inst_disassembles_unofficial(void *ctx)
     auto inst = makeinst(bytes);
     char buf[AldoDisInstSize];
 
-    int length = aldo_dis_inst(a, &inst, buf);
+    auto length = aldo_dis_inst(a, &inst, buf);
 
     const char *exp = "1234: 02       *JAM";
     ct_assertequal((int)strlen(exp), length);
@@ -898,7 +898,7 @@ static void datapath_end_of_rom(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "NOP ";
     ct_assertequal((int)strlen(exp), written);
@@ -919,7 +919,7 @@ static void datapath_unexpected_end_of_rom(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize] = {'\0'};
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "";
     ct_assertequal(ALDO_DIS_ERR_EOF, written);
@@ -939,7 +939,7 @@ static void datapath_implied_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "NOP imp";
     ct_assertequal((int)strlen(exp), written);
@@ -959,7 +959,7 @@ static void datapath_implied_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "NOP ";
     ct_assertequal((int)strlen(exp), written);
@@ -979,7 +979,7 @@ static void datapath_implied_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "NOP ";
     ct_assertequal((int)strlen(exp), written);
@@ -999,7 +999,7 @@ static void datapath_immediate_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA imm";
     ct_assertequal((int)strlen(exp), written);
@@ -1019,7 +1019,7 @@ static void datapath_immediate_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA #$43";
     ct_assertequal((int)strlen(exp), written);
@@ -1039,7 +1039,7 @@ static void datapath_immediate_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA #$43";
     ct_assertequal((int)strlen(exp), written);
@@ -1059,7 +1059,7 @@ static void datapath_zeropage_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA zp";
     ct_assertequal((int)strlen(exp), written);
@@ -1079,7 +1079,7 @@ static void datapath_zeropage_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA $43";
     ct_assertequal((int)strlen(exp), written);
@@ -1099,7 +1099,7 @@ static void datapath_zeropage_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA $43";
     ct_assertequal((int)strlen(exp), written);
@@ -1119,7 +1119,7 @@ static void datapath_zeropage_x_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA zp,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1139,7 +1139,7 @@ static void datapath_zeropage_x_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA $43,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1159,7 +1159,7 @@ static void datapath_zeropage_x_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA $43,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1179,7 +1179,7 @@ static void datapath_zeropage_y_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDX zp,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1199,7 +1199,7 @@ static void datapath_zeropage_y_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDX $43,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1219,7 +1219,7 @@ static void datapath_zeropage_y_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDX $43,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1239,7 +1239,7 @@ static void datapath_indirect_x_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA (zp,X)";
     ct_assertequal((int)strlen(exp), written);
@@ -1259,7 +1259,7 @@ static void datapath_indirect_x_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA ($43,X)";
     ct_assertequal((int)strlen(exp), written);
@@ -1279,7 +1279,7 @@ static void datapath_indirect_x_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA ($43,X)";
     ct_assertequal((int)strlen(exp), written);
@@ -1299,7 +1299,7 @@ static void datapath_indirect_y_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA (zp),Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1319,7 +1319,7 @@ static void datapath_indirect_y_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA ($43),Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1339,7 +1339,7 @@ static void datapath_indirect_y_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA ($43),Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1359,7 +1359,7 @@ static void datapath_absolute_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA abs";
     ct_assertequal((int)strlen(exp), written);
@@ -1379,7 +1379,7 @@ static void datapath_absolute_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA $??43";
     ct_assertequal((int)strlen(exp), written);
@@ -1399,7 +1399,7 @@ static void datapath_absolute_cycle_two(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA $2143";
     ct_assertequal((int)strlen(exp), written);
@@ -1419,7 +1419,7 @@ static void datapath_absolute_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA $2143";
     ct_assertequal((int)strlen(exp), written);
@@ -1439,7 +1439,7 @@ static void datapath_absolute_x_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA abs,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1459,7 +1459,7 @@ static void datapath_absolute_x_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA $??43,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1479,7 +1479,7 @@ static void datapath_absolute_x_cycle_two(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA $2143,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1499,7 +1499,7 @@ static void datapath_absolute_x_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA $2143,X";
     ct_assertequal((int)strlen(exp), written);
@@ -1519,7 +1519,7 @@ static void datapath_absolute_y_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA abs,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1539,7 +1539,7 @@ static void datapath_absolute_y_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA $??43,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1559,7 +1559,7 @@ static void datapath_absolute_y_cycle_two(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA $2143,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1579,7 +1579,7 @@ static void datapath_absolute_y_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "LDA $2143,Y";
     ct_assertequal((int)strlen(exp), written);
@@ -1599,7 +1599,7 @@ static void datapath_jmp_absolute_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "JMP abs";
     ct_assertequal((int)strlen(exp), written);
@@ -1619,7 +1619,7 @@ static void datapath_jmp_absolute_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "JMP $??43";
     ct_assertequal((int)strlen(exp), written);
@@ -1639,7 +1639,7 @@ static void datapath_jmp_absolute_cycle_two(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "JMP $2143";
     ct_assertequal((int)strlen(exp), written);
@@ -1659,7 +1659,7 @@ static void datapath_jmp_absolute_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "JMP $2143";
     ct_assertequal((int)strlen(exp), written);
@@ -1679,7 +1679,7 @@ static void datapath_jmp_indirect_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "JMP (abs)";
     ct_assertequal((int)strlen(exp), written);
@@ -1699,7 +1699,7 @@ static void datapath_jmp_indirect_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "JMP ($??43)";
     ct_assertequal((int)strlen(exp), written);
@@ -1719,7 +1719,7 @@ static void datapath_jmp_indirect_cycle_two(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "JMP ($2143)";
     ct_assertequal((int)strlen(exp), written);
@@ -1739,7 +1739,7 @@ static void datapath_jmp_indirect_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "JMP ($2143)";
     ct_assertequal((int)strlen(exp), written);
@@ -1759,7 +1759,7 @@ static void datapath_bch_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BCC rel";
     ct_assertequal((int)strlen(exp), written);
@@ -1779,7 +1779,7 @@ static void datapath_bch_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BCC +2";
     ct_assertequal((int)strlen(exp), written);
@@ -1799,7 +1799,7 @@ static void datapath_bch_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BCC +2";
     ct_assertequal((int)strlen(exp), written);
@@ -1819,7 +1819,7 @@ static void datapath_push_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "PHA imp";
     ct_assertequal((int)strlen(exp), written);
@@ -1839,7 +1839,7 @@ static void datapath_push_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "PHA ";
     ct_assertequal((int)strlen(exp), written);
@@ -1859,7 +1859,7 @@ static void datapath_push_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "PHA ";
     ct_assertequal((int)strlen(exp), written);
@@ -1879,7 +1879,7 @@ static void datapath_pull_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "PLA imp";
     ct_assertequal((int)strlen(exp), written);
@@ -1899,7 +1899,7 @@ static void datapath_pull_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "PLA ";
     ct_assertequal((int)strlen(exp), written);
@@ -1919,7 +1919,7 @@ static void datapath_pull_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "PLA ";
     ct_assertequal((int)strlen(exp), written);
@@ -1939,7 +1939,7 @@ static void datapath_jsr_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "JSR abs";
     ct_assertequal((int)strlen(exp), written);
@@ -1959,7 +1959,7 @@ static void datapath_jsr_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "JSR $??43";
     ct_assertequal((int)strlen(exp), written);
@@ -1979,7 +1979,7 @@ static void datapath_jsr_cycle_two(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "JSR $2143";
     ct_assertequal((int)strlen(exp), written);
@@ -1999,7 +1999,7 @@ static void datapath_jsr_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "JSR $2143";
     ct_assertequal((int)strlen(exp), written);
@@ -2019,7 +2019,7 @@ static void datapath_rts_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "RTS imp";
     ct_assertequal((int)strlen(exp), written);
@@ -2039,7 +2039,7 @@ static void datapath_rts_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "RTS ";
     ct_assertequal((int)strlen(exp), written);
@@ -2059,7 +2059,7 @@ static void datapath_rts_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "RTS ";
     ct_assertequal((int)strlen(exp), written);
@@ -2079,7 +2079,7 @@ static void datapath_brk_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK imp";
     ct_assertequal((int)strlen(exp), written);
@@ -2099,7 +2099,7 @@ static void datapath_brk_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK ";
     ct_assertequal((int)strlen(exp), written);
@@ -2119,7 +2119,7 @@ static void datapath_brk_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK ";
     ct_assertequal((int)strlen(exp), written);
@@ -2139,7 +2139,7 @@ static void datapath_brk_cycle_six(void *ctx)
     snp.cpu.datapath.opcode = snp.prg.curr->pc[0];
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK CLR";
     ct_assertequal((int)strlen(exp), written);
@@ -2162,7 +2162,7 @@ static void datapath_irq_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK imp";
     ct_assertequal((int)strlen(exp), written);
@@ -2185,7 +2185,7 @@ static void datapath_irq_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK (IRQ)";
     ct_assertequal((int)strlen(exp), written);
@@ -2208,7 +2208,7 @@ static void datapath_irq_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK (IRQ)";
     ct_assertequal((int)strlen(exp), written);
@@ -2231,7 +2231,7 @@ static void datapath_irq_cycle_six(void *ctx)
     snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK CLR";
     ct_assertequal((int)strlen(exp), written);
@@ -2254,7 +2254,7 @@ static void datapath_nmi_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK imp";
     ct_assertequal((int)strlen(exp), written);
@@ -2277,7 +2277,7 @@ static void datapath_nmi_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK (NMI)";
     ct_assertequal((int)strlen(exp), written);
@@ -2300,7 +2300,7 @@ static void datapath_nmi_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK (NMI)";
     ct_assertequal((int)strlen(exp), written);
@@ -2323,7 +2323,7 @@ static void datapath_nmi_cycle_six(void *ctx)
     snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK CLR";
     ct_assertequal((int)strlen(exp), written);
@@ -2346,7 +2346,7 @@ static void datapath_rst_cycle_zero(void *ctx)
     snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK imp";
     ct_assertequal((int)strlen(exp), written);
@@ -2369,7 +2369,7 @@ static void datapath_rst_cycle_one(void *ctx)
     snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK (RST)";
     ct_assertequal((int)strlen(exp), written);
@@ -2392,7 +2392,7 @@ static void datapath_rst_cycle_n(void *ctx)
     snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK (RST)";
     ct_assertequal((int)strlen(exp), written);
@@ -2415,7 +2415,7 @@ static void datapath_rst_cycle_six(void *ctx)
     snp.cpu.datapath.opcode = Aldo_BrkOpcode;
     char buf[AldoDisDatapSize];
 
-    int written = aldo_dis_datapath(&snp, buf);
+    auto written = aldo_dis_datapath(&snp, buf);
 
     const char *exp = "BRK CLR";
     ct_assertequal((int)strlen(exp), written);
@@ -2460,7 +2460,7 @@ static void peek_immediate(void *ctx)
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
+    auto written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "";
     ct_assertequal((int)strlen(exp), written);
@@ -2481,7 +2481,7 @@ static void peek_zeropage(void *ctx)
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
+    auto written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "= 20";
     ct_assertequal((int)strlen(exp), written);
@@ -2503,7 +2503,7 @@ static void peek_zp_indexed(void *ctx)
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
+    auto written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "@ 05 = 30";
     ct_assertequal((int)strlen(exp), written);
@@ -2525,7 +2525,7 @@ static void peek_indexed_indirect(void *ctx)
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
+    auto written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "@ 04 > 0102 = 40";
     ct_assertequal((int)strlen(exp), written);
@@ -2547,7 +2547,7 @@ static void peek_indirect_indexed(void *ctx)
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
+    auto written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "> 0102 @ 0107 = 60";
     ct_assertequal((int)strlen(exp), written);
@@ -2569,7 +2569,7 @@ static void peek_absolute_indexed(void *ctx)
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
+    auto written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "@ 010C = 70";
     ct_assertequal((int)strlen(exp), written);
@@ -2590,7 +2590,7 @@ static void peek_branch(void *ctx)
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
+    auto written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "@ 0007";
     ct_assertequal((int)strlen(exp), written);
@@ -2611,7 +2611,7 @@ static void peek_branch_forced(void *ctx)
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
+    auto written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "@ 0007";
     ct_assertequal((int)strlen(exp), written);
@@ -2633,7 +2633,7 @@ static void peek_absolute_indirect(void *ctx)
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
-    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
+    auto written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "> 0205";
     ct_assertequal((int)strlen(exp), written);
@@ -2659,7 +2659,7 @@ static void peek_interrupt(void *ctx)
     snp.prg.vectors[4] = 0xbb;
     snp.prg.vectors[5] = 0xaa;
 
-    int written = aldo_dis_peek(&cpu, pctx->ppu, dbg, &snp, buf);
+    auto written = aldo_dis_peek(&cpu, pctx->ppu, dbg, &snp, buf);
 
     const char *exp = "(IRQ) > AABB";
     ct_assertequal((int)strlen(exp), written);
@@ -2685,7 +2685,7 @@ static void peek_overridden_reset(void *ctx)
     snp.prg.vectors[2] = 0xbb;
     snp.prg.vectors[3] = 0xaa;
 
-    int written = aldo_dis_peek(&cpu, pctx->ppu, dbg, &snp, buf);
+    auto written = aldo_dis_peek(&cpu, pctx->ppu, dbg, &snp, buf);
 
     const char *exp = "(RST) > !CCDD";
     ct_assertequal((int)strlen(exp), written);
@@ -2713,7 +2713,7 @@ static void peek_overridden_non_reset(void *ctx)
     snp.prg.vectors[2] = 0xbb;
     snp.prg.vectors[3] = 0xaa;
 
-    int written = aldo_dis_peek(&cpu, pctx->ppu, dbg, &snp, buf);
+    auto written = aldo_dis_peek(&cpu, pctx->ppu, dbg, &snp, buf);
 
     const char *exp = "(NMI) > EEFF";
     ct_assertequal((int)strlen(exp), written);
@@ -2735,7 +2735,7 @@ static void peek_busfault(void *ctx)
     aldo_cpu_snapshot(&cpu, &snp);
     struct peekctx *pctx = ctx;
 
-    int written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
+    auto written = aldo_dis_peek(&cpu, pctx->ppu, pctx->dbg, &snp, buf);
 
     const char *exp = "> 4002 @ 4007 = FLT";
     ct_assertequal((int)strlen(exp), written);

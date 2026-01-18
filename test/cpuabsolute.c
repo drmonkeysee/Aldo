@@ -25,7 +25,7 @@ static void adc_abs(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;    // 10 + 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -45,7 +45,7 @@ static void and_abs(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -64,7 +64,7 @@ static void asl_abs(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -83,7 +83,7 @@ static void bit_abs(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.a = 2;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -102,7 +102,7 @@ static void cmp_abs(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -121,7 +121,7 @@ static void cpx_abs(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.x = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -140,7 +140,7 @@ static void cpy_abs(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.y = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -160,7 +160,7 @@ static void dec_abs(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -178,7 +178,7 @@ static void eor_abs(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xfa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -197,7 +197,7 @@ static void inc_abs(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -214,7 +214,7 @@ static void lda_abs(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -231,7 +231,7 @@ static void ldx_abs(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -248,7 +248,7 @@ static void ldy_abs(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -267,7 +267,7 @@ static void lsr_abs(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -286,7 +286,7 @@ static void ora_abs(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.a = 0xa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -306,7 +306,7 @@ static void rol_abs(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -327,7 +327,7 @@ static void ror_abs(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -347,7 +347,7 @@ static void sbc_abs(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -369,7 +369,7 @@ static void sta_abs(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0xa;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -387,7 +387,7 @@ static void stx_abs(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 0xf1;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -405,7 +405,7 @@ static void sty_abs(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.y = 0x84;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -426,7 +426,7 @@ static void adc_absx(void *ctx)
     cpu.a = 0xa;    // 10 + 6
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -446,7 +446,7 @@ static void adc_absx_pagecross(void *ctx)
     cpu.a = 0xa;    // 10 + 178
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -467,7 +467,7 @@ static void and_absx(void *ctx)
     cpu.a = 0xa;
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -485,7 +485,7 @@ static void and_absx_pagecross(void *ctx)
     cpu.a = 0xea;
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -505,7 +505,7 @@ static void asl_absx(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -526,7 +526,7 @@ static void asl_absx_pagecross(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -546,7 +546,7 @@ static void cmp_absx(void *ctx)
     cpu.a = 0x10;
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -565,7 +565,7 @@ static void cmp_absx_pagecross(void *ctx)
     cpu.a = 0x10;
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -586,7 +586,7 @@ static void dec_absx(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -606,7 +606,7 @@ static void dec_absx_pagecross(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -625,7 +625,7 @@ static void eor_absx(void *ctx)
     cpu.a = 0xfa;
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -643,7 +643,7 @@ static void eor_absx_pagecross(void *ctx)
     cpu.a = 0xea;
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -663,7 +663,7 @@ static void inc_absx(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -683,7 +683,7 @@ static void inc_absx_pagecross(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -701,7 +701,7 @@ static void lda_absx(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -718,7 +718,7 @@ static void lda_absx_pagecross(void *ctx)
     setup_cpu(&cpu, mem, BigRom);
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -736,7 +736,7 @@ static void ldy_absx(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -753,7 +753,7 @@ static void ldy_absx_pagecross(void *ctx)
     setup_cpu(&cpu, mem, BigRom);
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -773,7 +773,7 @@ static void lsr_absx(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -794,7 +794,7 @@ static void lsr_absx_pagecross(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -814,7 +814,7 @@ static void ora_absx(void *ctx)
     cpu.a = 0xa;
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -832,7 +832,7 @@ static void ora_absx_pagecross(void *ctx)
     cpu.a = 0xea;
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -853,7 +853,7 @@ static void rol_absx(void *ctx)
     cpu.x = 3;
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -875,7 +875,7 @@ static void rol_absx_pagecross(void *ctx)
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -897,7 +897,7 @@ static void ror_absx(void *ctx)
     cpu.x = 3;
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -919,7 +919,7 @@ static void ror_absx_pagecross(void *ctx)
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -940,7 +940,7 @@ static void sbc_absx(void *ctx)
     cpu.a = 0xa;    // 10 - 6
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -961,7 +961,7 @@ static void sbc_absx_pagecross(void *ctx)
     cpu.a = 0xa;    // 10 - (-78)
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -984,7 +984,7 @@ static void sta_absx(void *ctx)
     cpu.a = 0xa;
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1003,7 +1003,7 @@ static void sta_absx_pagecross(void *ctx)
     cpu.a = 0xa;
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1024,7 +1024,7 @@ static void adc_absy(void *ctx)
     cpu.a = 0xa;    // 10 + 6
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1044,7 +1044,7 @@ static void adc_absy_pagecross(void *ctx)
     cpu.a = 0xa;    // 10 + 178
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1065,7 +1065,7 @@ static void and_absy(void *ctx)
     cpu.a = 0xa;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1083,7 +1083,7 @@ static void and_absy_pagecross(void *ctx)
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1102,7 +1102,7 @@ static void cmp_absy(void *ctx)
     cpu.a = 0x10;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1121,7 +1121,7 @@ static void cmp_absy_pagecross(void *ctx)
     cpu.a = 0x10;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1141,7 +1141,7 @@ static void eor_absy(void *ctx)
     cpu.a = 0xfa;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1159,7 +1159,7 @@ static void eor_absy_pagecross(void *ctx)
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1177,7 +1177,7 @@ static void lda_absy(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1194,7 +1194,7 @@ static void lda_absy_pagecross(void *ctx)
     setup_cpu(&cpu, mem, BigRom);
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1212,7 +1212,7 @@ static void ldx_absy(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1229,7 +1229,7 @@ static void ldx_absy_pagecross(void *ctx)
     setup_cpu(&cpu, mem, BigRom);
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1248,7 +1248,7 @@ static void ora_absy(void *ctx)
     cpu.a = 0xa;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1266,7 +1266,7 @@ static void ora_absy_pagecross(void *ctx)
     cpu.a = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1286,7 +1286,7 @@ static void sbc_absy(void *ctx)
     cpu.a = 0xa;    // 10 - 6
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1307,7 +1307,7 @@ static void sbc_absy_pagecross(void *ctx)
     cpu.a = 0xa;    // 10 - (-78)
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1330,7 +1330,7 @@ static void sta_absy(void *ctx)
     cpu.a = 0xa;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1349,7 +1349,7 @@ static void sta_absy_pagecross(void *ctx)
     cpu.a = 0xa;
     cpu.y = 3;  // Cross boundary from $01FF -> $0202
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1370,7 +1370,7 @@ static void dcp_abs(void *ctx)
     enable_rom_wcapture();
     cpu.a = 0x10;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1392,7 +1392,7 @@ static void dcp_absx(void *ctx)
     cpu.a = 0x10;
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1413,7 +1413,7 @@ static void dcp_absx_pagecross(void *ctx)
     cpu.a = 0x10;
     cpu.x = 4;  // Cross boundary from $80FF -> $8103
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1435,7 +1435,7 @@ static void dcp_absy(void *ctx)
     cpu.a = 0x10;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1456,7 +1456,7 @@ static void dcp_absy_pagecross(void *ctx)
     cpu.a = 0x10;
     cpu.y = 4;  // Cross boundary from $80FF -> $8103
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1478,7 +1478,7 @@ static void isc_abs(void *ctx)
     cpu.p.c = true;
     cpu.a = 0xa;    // 10 - 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1502,7 +1502,7 @@ static void isc_absx(void *ctx)
     cpu.a = 0xa;    // 10 - 6
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1525,7 +1525,7 @@ static void isc_absx_pagecross(void *ctx)
     cpu.a = 0xa;    // 10 - (-78)
     cpu.x = 2;  // Cross boundary from $80FF -> $8101
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1549,7 +1549,7 @@ static void isc_absy(void *ctx)
     cpu.a = 0xa;    // 10 - 6
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1572,7 +1572,7 @@ static void isc_absy_pagecross(void *ctx)
     cpu.a = 0xa;    // 10 - (-78)
     cpu.y = 2;  // Cross boundary from $80FF -> $8101
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1594,7 +1594,7 @@ static void las_absy(void *ctx)
     cpu.s = 0xa;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1615,7 +1615,7 @@ static void las_absy_zero(void *ctx)
     cpu.s = 0xa;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1636,7 +1636,7 @@ static void las_absy_negative(void *ctx)
     cpu.s = 0xfa;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1656,7 +1656,7 @@ static void las_absy_pagecross(void *ctx)
     cpu.s = 0xea;
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1675,7 +1675,7 @@ static void lax_abs(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1694,7 +1694,7 @@ static void lax_absy(void *ctx)
     setup_cpu(&cpu, mem, abs);
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1712,7 +1712,7 @@ static void lax_absy_pagecross(void *ctx)
     setup_cpu(&cpu, mem, BigRom);
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1730,7 +1730,7 @@ static void nop_abs(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, abs);
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1750,14 +1750,14 @@ static void nop_absx(void *ctx)
 {
     uint8_t nopcodes[] = {0x1c, 0x3c, 0x5c, 0x7c, 0xdc, 0xfc};
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
-        uint8_t opc = nopcodes[c];
+        auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x1, 0x80},
                 abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
         struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, abs);
         cpu.x = 3;
 
-        int cycles = exec_cpu(&cpu);
+        auto cycles = exec_cpu(&cpu);
 
         ct_assertequal(4, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(3u, cpu.pc, "Failed on opcode %02x", opc);
@@ -1778,13 +1778,13 @@ static void nop_absx_pagecross(void *ctx)
 {
     uint8_t nopcodes[] = {0x1c, 0x3c, 0x5c, 0x7c, 0xdc, 0xfc};
     for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
-        uint8_t opc = nopcodes[c];
+        auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0xff, 0x80};
         struct aldo_mos6502 cpu;
         setup_cpu(&cpu, mem, BigRom);
         cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
-        int cycles = exec_cpu(&cpu);
+        auto cycles = exec_cpu(&cpu);
 
         ct_assertequal(5, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(3u, cpu.pc, "Failed on opcode %02x", opc);
@@ -1812,7 +1812,7 @@ static void rla_abs(void *ctx)
     cpu.a = 3;
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1836,7 +1836,7 @@ static void rla_absx(void *ctx)
     cpu.x = 3;
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1860,7 +1860,7 @@ static void rla_absx_pagecross(void *ctx)
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1884,7 +1884,7 @@ static void rla_absy(void *ctx)
     cpu.y = 3;
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1908,7 +1908,7 @@ static void rla_absy_pagecross(void *ctx)
     cpu.y = 3;  // Cross boundary from $01FF -> $0202
     cpu.p.c = true;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1929,7 +1929,7 @@ static void rra_abs(void *ctx)
     enable_rom_wcapture();
     cpu.a = 0xa;    // 10 + 6
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1952,7 +1952,7 @@ static void rra_absx(void *ctx)
     cpu.a = 0xa;    // 10 + 6
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1974,7 +1974,7 @@ static void rra_absx_pagecross(void *ctx)
     cpu.a = 0xa;    // 10 + 178
     cpu.x = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -1997,7 +1997,7 @@ static void rra_absy(void *ctx)
     cpu.a = 0xa;    // 10 + 6
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2019,7 +2019,7 @@ static void rra_absy_pagecross(void *ctx)
     cpu.a = 0xa;    // 10 + 178
     cpu.y = 3;  // Cross boundary from $80FF -> $8102
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2043,7 +2043,7 @@ static void sax_abs(void *ctx)
     cpu.a = 0xa5;
     cpu.x = 0x3c;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2063,7 +2063,7 @@ static void sha_absy(void *ctx)
     cpu.x = 0xe;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2082,7 +2082,7 @@ static void sha_absy_pagecross(void *ctx)
     cpu.x = 0xf8;
     cpu.y = 3;  // Cross boundary from $FEFF -> $FF02
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2105,7 +2105,7 @@ static void shx_absy(void *ctx)
     cpu.x = 0xe;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2122,7 +2122,7 @@ static void shx_absy_pagecross(void *ctx)
     cpu.x = 0xe1;
     cpu.y = 3;  // Cross boundary from $FEFF -> $FF02
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2144,7 +2144,7 @@ static void shy_absx(void *ctx)
     cpu.x = 3;
     cpu.y = 0xe;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2161,7 +2161,7 @@ static void shy_absx_pagecross(void *ctx)
     cpu.x = 3;  // Cross boundary from $FEFF -> $FF02
     cpu.y = 0xe1;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2182,7 +2182,7 @@ static void slo_abs(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 1;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2205,7 +2205,7 @@ static void slo_absx(void *ctx)
     cpu.a = 1;
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2228,7 +2228,7 @@ static void slo_absx_pagecross(void *ctx)
     cpu.a = 1;
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2251,7 +2251,7 @@ static void slo_absy(void *ctx)
     cpu.a = 1;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2274,7 +2274,7 @@ static void slo_absy_pagecross(void *ctx)
     cpu.a = 1;
     cpu.y = 3;  // Cross boundary from $01FF -> $0202
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2296,7 +2296,7 @@ static void sre_abs(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2319,7 +2319,7 @@ static void sre_absx(void *ctx)
     cpu.a = 3;
     cpu.x = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2342,7 +2342,7 @@ static void sre_absx_pagecross(void *ctx)
     cpu.a = 3;
     cpu.x = 3;  // Cross boundary from $01FF -> $0202
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2365,7 +2365,7 @@ static void sre_absy(void *ctx)
     cpu.a = 3;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2388,7 +2388,7 @@ static void sre_absy_pagecross(void *ctx)
     cpu.a = 3;
     cpu.y = 3;  // Cross boundary from $01FF -> $0202
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2412,7 +2412,7 @@ static void tas_absy(void *ctx)
     cpu.x = 0xee;
     cpu.y = 3;
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);
@@ -2432,7 +2432,7 @@ static void tas_absy_pagecross(void *ctx)
     cpu.x = 0xf8;
     cpu.y = 3;  // Cross boundary from $CEFF -> $CF02
 
-    int cycles = exec_cpu(&cpu);
+    auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
     ct_assertequal(3u, cpu.pc);

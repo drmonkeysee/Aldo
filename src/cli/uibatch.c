@@ -63,7 +63,7 @@ static void tick_start(struct runclock *c, const struct aldo_snapshot *snp)
 
     // NOTE: cumulative moving average:
     // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-    double ticks = (double)c->clock.ticks;
+    auto ticks = (double)c->clock.ticks;
     c->avg_ticktime_ms = (c->clock.ticktime_ms + (ticks * c->avg_ticktime_ms))
                             / (ticks + 1);
 

@@ -485,7 +485,7 @@ static void snapshot_nametables(const struct aldo_rp2c02 *self,
                                 + ((self->t & FineYBits) >> 12));
 
     for (size_t i = 0; i < aldo_arrsz(video->nt.tables); ++i) {
-        uint16_t base_addr = (uint16_t)(BaseNtAddr + (HNtBit * (uint16_t)i));
+        auto base_addr = (uint16_t)(BaseNtAddr + (HNtBit * (uint16_t)i));
         size_t tile_count = aldo_arrsz(video->nt.tables[i].tiles);
         aldo_bus_copy(self->vbus, base_addr, tile_count,
                       video->nt.tables[i].tiles);

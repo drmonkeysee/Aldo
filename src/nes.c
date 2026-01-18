@@ -233,7 +233,7 @@ static void set_screen_dot(struct aldo_nes001 *self)
     auto c = aldo_ppu_screendot(&self->ppu);
     if (c.dot < 0) return;
 
-    size_t screendot = (size_t)(c.dot + (c.line * ScreenWidth));
+    auto screendot = (size_t)(c.dot + (c.line * ScreenWidth));
     assert(screendot < aldo_arrsz(self->vbufs[self->vbuf]));
     self->vbufs[self->vbuf][screendot] = self->ppu.pxpl.px;
 }

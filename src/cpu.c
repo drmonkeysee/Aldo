@@ -264,7 +264,7 @@ static void binary_add(struct aldo_mos6502 *self, uint8_t a, uint8_t b,
 {
     int sum = a + b + c;
     self->p.c = sum & 0x100;
-    uint8_t result = (uint8_t)sum;
+    auto result = (uint8_t)sum;
     update_v(self, result, a, b);
     load_register(self, &self->a, result);
 }
@@ -346,7 +346,7 @@ static uint8_t compare_register(struct aldo_mos6502 *self, uint8_t r,
 {
     int cmp = r + (uint8_t)~d + 1;
     self->p.c = cmp & 0x100;
-    uint8_t result = (uint8_t)cmp;
+    auto result = (uint8_t)cmp;
     update_z(self, result);
     update_n(self, result);
     return result;
@@ -868,7 +868,7 @@ constexpr uint8_t Magic = 0xee;
 static void store_unstable_addresshigh(struct aldo_mos6502 *self, uint8_t d)
 {
     // NOTE: if addr carry, +1 has already been stored into adh
-    uint8_t adrhi = (uint8_t)(self->adh + !self->adc);
+    auto adrhi = (uint8_t)(self->adh + !self->adc);
     d &= adrhi;
     // NOTE: on page-cross boundary this *occasionally* throws the calculated
     // value into ADDR_HI; emulate that behavior consistently to emphasize the

@@ -38,7 +38,7 @@ void aldo_clock_tickstart(struct aldo_clock *self, bool reset_budget)
     }
 
     double cycles_per_ms = (self->rate * self->rate_factor) / ALDO_MS_PER_S;
-    int new_cycles = (int)(self->timebudget_ms * cycles_per_ms);
+    auto new_cycles = (int)(self->timebudget_ms * cycles_per_ms);
     self->budget += new_cycles;
     self->timebudget_ms -= new_cycles / cycles_per_ms;
 }

@@ -635,8 +635,8 @@ static int draw_mempage(const struct view *v, const struct emulator *emu,
         mvwprintw(v->content, cursor_y, 0, "%02X%X0", page + page_offset,
                   page_row);
         for (auto page_col = 0; page_col < RamDim; ++page_col) {
-            size_t ramidx = (size_t)((page * RamPageSize) + (page_row * RamDim)
-                                     + page_col);
+            auto ramidx = (size_t)((page * RamPageSize) + (page_row * RamDim)
+                                    + page_col);
             // NOTE: skip over palette's mirrored addresses
             if (sel == RSEL_PPU && page_offset == 0x3f
                 && (ramidx & 0x13) == 0x10) {

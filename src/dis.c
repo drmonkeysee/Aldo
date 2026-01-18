@@ -206,7 +206,7 @@ static int print_prgblock(const struct aldo_blockview *bv, bool verbose,
     char dis[AldoDisInstSize];
     // NOTE: by convention, count backwards from CPU vector locations
     assert(bv->size <= ALDO_MEMBLOCK_64KB);
-    uint16_t addr = (uint16_t)(ALDO_MEMBLOCK_64KB - bv->size);
+    auto addr = (uint16_t)(ALDO_MEMBLOCK_64KB - bv->size);
 
     int result;
     for (result = aldo_dis_parse_inst(bv, 0, &inst);
@@ -411,8 +411,8 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
     uint8_t *packedrow = calloc(packedrow_size, sizeof *packedrow);
     if (!packedrow) return ALDO_DIS_ERR_ERNO;
 
-    for (int32_t tiley = (int32_t)(tilesdim - 1); tiley >= 0; --tiley) {
-        for (int32_t pixely = (int32_t)(AldoChrTileDim - 1);
+    for (auto tiley = (int32_t)(tilesdim - 1); tiley >= 0; --tiley) {
+        for (auto pixely = (int32_t)(AldoChrTileDim - 1);
              pixely >= 0;
              --pixely) {
             for (uint32_t scaley = 0; scaley < scale; ++scaley) {

@@ -30,8 +30,8 @@ size_t aldo_bytecopy_bank(const uint8_t *restrict bankmem, int bankwidth,
         // NOTE: addr -> start is always mask(banksize - 1)
         // iff banksize is a power of 2
         start = addr & (banksize - 1);
-    ptrdiff_t bytesleft = (ptrdiff_t)(banksize - start);
-    size_t bytecount = (ptrdiff_t)count > bytesleft
+    auto bytesleft = (ptrdiff_t)(banksize - start);
+    auto bytecount = (ptrdiff_t)count > bytesleft
                         ? (size_t)bytesleft
                         : count;
     memcpy(dest, bankmem + start, bytecount * sizeof *dest);

@@ -166,17 +166,7 @@ static uint8_t oam_read(const struct aldo_rp2c02 *self)
 static void soam_write(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
-    // NOTE: secondary OAM writes are ignored if sprite evaluation is finished
-    if (sprites->done && self->dot >= DotSpriteEvaluation) return;
-
     sprites->soam[sprites->soama++] = sprites->oamd;
-    sprites->soama %= aldo_arrsz(sprites->soam);
-}
-
-static void soam_revert(struct aldo_rp2c02 *self)
-{
-    auto sprites = &self->spr;
-    --sprites->soama;
     sprites->soama %= aldo_arrsz(sprites->soam);
 }
 
@@ -222,6 +212,8 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         soam_write(self);
         ++self->oamaddr;
         sprites->fill = sprites->soama % 4;
+    } else if (sprites->done) {
+        sprite_skip(self);
     } else {
         // NOTE: evaluate sprites for the current scanline; sprites are not
         // drawn until the next scanline, leading to a +1 y-offset of the
@@ -234,8 +226,9 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
             sprites->fill = true;
         } else {
             sprite_skip(self);
-            // NOTE: back up secondary oam address to undo previous write
-            soam_revert(self);
+            // NOTE: back up secondary oam address to un-commit previous write
+            assert(sprites->soama > 0);
+            --sprites->soama;
         }
         // NOTE: we've checked all 64 sprites
         if (self->oamaddr == 0) {

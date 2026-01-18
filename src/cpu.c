@@ -262,7 +262,7 @@ static void store_data(struct aldo_mos6502 *self, uint8_t d)
 static void binary_add(struct aldo_mos6502 *self, uint8_t a, uint8_t b,
                        uint8_t c)
 {
-    int sum = a + b + c;
+    auto sum = a + b + c;
     self->p.c = sum & 0x100;
     auto result = (uint8_t)sum;
     update_v(self, result, a, b);
@@ -272,13 +272,14 @@ static void binary_add(struct aldo_mos6502 *self, uint8_t a, uint8_t b,
 static void decimal_add(struct aldo_mos6502 *self, uint8_t alo, uint8_t blo,
                         uint8_t ahi, uint8_t bhi, bool c)
 {
-    int slo = alo + blo + c;
+    auto slo = alo + blo + c;
     bool chi = slo > 0x9;
     if (chi) {
         slo += 0x6;
         slo &= 0xf;
     }
-    int shi = ahi + bhi + chi, shinib = shi << 4;
+    auto shi = ahi + bhi + chi;
+    auto shinib = shi << 4;
     // NOTE: overflow and negative are set before decimal adjustment
     update_v(self, (uint8_t)shinib, (uint8_t)(ahi << 4), (uint8_t)(bhi << 4));
     update_n(self, (uint8_t)shinib);
@@ -294,13 +295,13 @@ static void decimal_add(struct aldo_mos6502 *self, uint8_t alo, uint8_t blo,
 static void decimal_subtract(struct aldo_mos6502 *self, uint8_t alo,
                              uint8_t blo, uint8_t ahi, uint8_t bhi, int8_t brw)
 {
-    int dlo = alo - blo + brw;  // borrow is either 0 or -1
+    auto dlo = alo - blo + brw;  // borrow is either 0 or -1
     bool brwhi = dlo < 0;
     if (brwhi) {
         dlo -= 0x6;
         dlo &= 0xf;
     }
-    int dhi = ahi - bhi - brwhi;
+    auto dhi = ahi - bhi - brwhi;
     if (dhi < 0) {
         dhi -= 0x6;
         dhi &= 0xf;
@@ -344,7 +345,7 @@ static void arithmetic_operation(struct aldo_mos6502 *self,
 static uint8_t compare_register(struct aldo_mos6502 *self, uint8_t r,
                                 uint8_t d)
 {
-    int cmp = r + (uint8_t)~d + 1;
+    auto cmp = r + (uint8_t)~d + 1;
     self->p.c = cmp & 0x100;
     auto result = (uint8_t)cmp;
     update_z(self, result);
@@ -1003,7 +1004,7 @@ static void RLA_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
-    uint8_t d = bitoperation(self, dec, BIT_LEFT, self->p.c);
+    auto d = bitoperation(self, dec, BIT_LEFT, self->p.c);
     load_register(self, &self->a, self->a & d);
 }
 
@@ -1011,7 +1012,7 @@ static void RRA_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
-    uint8_t d = bitoperation(self, dec, BIT_RIGHT, (uint8_t)(self->p.c << 7));
+    auto d = bitoperation(self, dec, BIT_RIGHT, (uint8_t)(self->p.c << 7));
     arithmetic_operation(self, AOP_ADD, d);
 }
 
@@ -1025,7 +1026,7 @@ static void SBX_exec(struct aldo_mos6502 *self)
 {
     read(self);
     commit_operation(self);
-    uint8_t cmp = compare_register(self, self->a & self->x, self->databus);
+    auto cmp = compare_register(self, self->a & self->x, self->databus);
     load_register(self, &self->x, cmp);
 }
 
@@ -1054,7 +1055,7 @@ static void SLO_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
-    uint8_t d = bitoperation(self, dec, BIT_LEFT, 0x0);
+    auto d = bitoperation(self, dec, BIT_LEFT, 0x0);
     load_register(self, &self->a, self->a | d);
 }
 
@@ -1062,7 +1063,7 @@ static void SRE_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
 {
     if (read_delayed(self, dec, true) || write_delayed(self, dec)) return;
     commit_operation(self);
-    uint8_t d = bitoperation(self, dec, BIT_RIGHT, 0x0);
+    auto d = bitoperation(self, dec, BIT_RIGHT, 0x0);
     load_register(self, &self->a, self->a ^ d);
 }
 
@@ -1692,7 +1693,7 @@ int aldo_cpu_cycle(struct aldo_mos6502 *self)
     assert(self != nullptr);
 
     // NOTE: sentinel value for cycle count denoting an imminent opcode fetch
-    static constexpr int prefetch = -1;
+    static constexpr auto prefetch = -1;
 
     if (!self->signal.rdy || reset_held(self)) return 0;
 

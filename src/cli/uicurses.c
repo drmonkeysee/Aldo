@@ -35,10 +35,10 @@
 // MARK: - Run Loop Clock
 //
 
-constexpr int DisplayHz = 60;
-constexpr int RamColWidth = 3;
-constexpr int RamDim = 16;
-constexpr int RamPageSize = RamDim * RamDim;
+constexpr auto DisplayHz = 60;
+constexpr auto RamColWidth = 3;
+constexpr auto RamDim = 16;
+constexpr auto RamPageSize = RamDim * RamDim;
 
 enum ram_selection {
     RSEL_RAM,
@@ -130,7 +130,7 @@ static int drawstats(const struct view *v, int cursor_y,
                      const struct viewstate *vs, const struct cliargs *args)
 {
     // NOTE: update timing metrics on a readable interval
-    static constexpr double refresh_interval_ms = 250;
+    static constexpr auto refresh_interval_ms = 250.0;
     static double display_tickleft, display_ticktime, refreshdt;
 
     auto clock = &vs->clock.clock;
@@ -172,7 +172,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
 
     wmove(v->content, cursor_y, 0);
 
-    double center_offset = (w - (int)strlen(halt)) / 2.0;
+    auto center_offset = (w - (int)strlen(halt)) / 2.0;
     assert(center_offset > 0);
     char halt_label[w + 1];
     snprintf(halt_label, sizeof halt_label, "%*s%s%*s",
@@ -181,7 +181,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     drawtoggle(v, halt_label, !emu->snapshot.cpu.lines.ready);
 
     cursor_y += 2;
-    enum aldo_execmode mode = aldo_nes_mode(emu->console);
+    auto mode = aldo_nes_mode(emu->console);
     mvwaddstr(v->content, cursor_y, 0, "Mode:");
     drawtoggle(v, " Sub ", mode == ALDO_EXC_SUBCYCLE);
     drawtoggle(v, " Cycle ", mode == ALDO_EXC_CYCLE);
@@ -208,9 +208,9 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
 static void drawsystem(const struct view *v, const struct viewstate *vs,
                        const struct emulator *emu)
 {
-    int w = getmaxx(v->content);
+    auto w = getmaxx(v->content);
     werase(v->content);
-    int cursor_y = drawstats(v, 0, vs, emu->args);
+    auto cursor_y = drawstats(v, 0, vs, emu->args);
     mvwhline(v->content, cursor_y++, 0, 0, w);
     drawcontrols(v, emu, w, cursor_y);
 }
@@ -224,7 +224,7 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
     mvwprintw(v->content, cursor_y++, 0, "Tracing: %s",
               emu->args->tron ? "On" : "Off");
     mvwaddstr(v->content, cursor_y++, 0, "Reset Override: ");
-    int resetvector = aldo_debug_vector_override(emu->debugger);
+    auto resetvector = aldo_debug_vector_override(emu->debugger);
     if (resetvector == Aldo_NoResetVector) {
         waddstr(v->content, "None");
     } else {
@@ -232,7 +232,7 @@ static void drawdebugger(const struct view *v, const struct emulator *emu)
     }
     auto bp = aldo_debug_halted(emu->debugger);
     char break_desc[AldoHexprFmtSize];
-    int err = aldo_haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
+    auto err = aldo_haltexpr_desc(bp ? &bp->expr : &empty, break_desc);
     mvwprintw(v->content, cursor_y, 0, "Break: %s",
               err < 0 ? aldo_haltexpr_errstr(err) : break_desc);
 }
@@ -241,7 +241,8 @@ static void drawcart(const struct view *v, const struct emulator *emu)
 {
     static const char *const restrict namelabel = "Name: ";
 
-    int maxwidth = getmaxx(v->content) - (int)strlen(namelabel), cursor_y = 0;
+    auto maxwidth = getmaxx(v->content) - (int)strlen(namelabel);
+    auto cursor_y = 0;
     mvwaddstr(v->content, cursor_y, 0, namelabel);
     const char
         *cn = argparse_filename(emu->args->filepath),
@@ -255,7 +256,7 @@ static void drawcart(const struct view *v, const struct emulator *emu)
     wprintw(v->content, "%.*s%s", (int)(longname ? maxwidth - 1 : namelen),
             cn, longname ? "\u2026" : "");
     char fmtd[AldoCartFmtSize];
-    int err = aldo_cart_format_extname(emu->cart, fmtd);
+    auto err = aldo_cart_format_extname(emu->cart, fmtd);
     mvwprintw(v->content, ++cursor_y, 0, "Format: %s",
               err < 0 ? aldo_cart_errstr(err) : fmtd);
 }
@@ -264,12 +265,12 @@ static void drawinstructions(const struct view *v, int h, int y,
                              const struct aldo_snapshot *snp)
 {
     struct aldo_dis_instruction inst = {};
-    uint16_t addr = snp->cpu.datapath.current_instruction;
+    auto addr = snp->cpu.datapath.current_instruction;
     char disassembly[AldoDisInstSize];
     for (auto i = 0; i < h - y; ++i) {
-        int result = aldo_dis_parsemem_inst(snp->prg.curr->length,
-                                            snp->prg.curr->pc,
-                                            inst.offset + inst.bv.size, &inst);
+        auto result = aldo_dis_parsemem_inst(snp->prg.curr->length,
+                                             snp->prg.curr->pc,
+                                             inst.offset + inst.bv.size, &inst);
         if (result > 0) {
             result = aldo_dis_inst(addr, &inst, disassembly);
             if (result > 0) {
@@ -291,8 +292,8 @@ static void drawvecs(const struct view *v, int h, int w, int y,
     mvwhline(v->content, h - y--, 0, 0, w);
 
     const uint8_t *vectors = emu->snapshot.prg.vectors;
-    uint8_t lo = vectors[0],
-            hi = vectors[1];
+    auto lo = vectors[0];
+    auto hi = vectors[1];
     mvwprintw(v->content, h - y--, 0, "%4X: %02X %02X     NMI $%04X",
               ALDO_CPU_VECTOR_NMI, lo, hi, aldo_bytowr(lo, hi));
 
@@ -300,7 +301,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
     hi = vectors[3];
     mvwprintw(v->content, h - y--, 0, "%4X: %02X %02X     RST",
               ALDO_CPU_VECTOR_RST, lo, hi);
-    int resetvector = aldo_debug_vector_override(emu->debugger);
+    auto resetvector = aldo_debug_vector_override(emu->debugger);
     if (resetvector == Aldo_NoResetVector) {
         wprintw(v->content, " $%04X", aldo_bytowr(lo, hi));
     } else {
@@ -315,7 +316,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
 
 static void drawprg(const struct view *v, const struct emulator *emu)
 {
-    static constexpr int vector_offset = 4;
+    static constexpr auto vector_offset = 4;
 
     int h, w;
     getmaxyx(v->content, h, w);
@@ -412,14 +413,14 @@ static void draw_interrupt_latch(const struct view *v,
 static void drawdatapath(const struct view *v, int cursor_y, int w,
                          const struct aldo_snapshot *snp)
 {
-    static constexpr int seph = 5;
-    static constexpr int vsep1 = 7;
-    static constexpr int vsep2 = 21;
-    static constexpr int col1 = vsep1 + 2;
-    static constexpr int col2 = vsep2 + 2;
+    static constexpr auto seph = 5;
+    static constexpr auto vsep1 = 7;
+    static constexpr auto vsep2 = 21;
+    static constexpr auto col1 = vsep1 + 2;
+    static constexpr auto col2 = vsep2 + 2;
 
     auto cpu = &snp->cpu;
-    int line_x = (w / 4) + 1;
+    auto line_x = (w / 4) + 1;
     draw_chip_vline(v, cpu->lines.ready, cursor_y, line_x, 1, ArrowDown,
                     -1, "RDY");
     draw_chip_vline(v, cpu->lines.sync, cursor_y, line_x * 2, 1, ArrowUp,
@@ -438,7 +439,7 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
         wattroff(v->content, A_STANDOUT);
     } else {
         char buf[AldoDisDatapSize];
-        int wlen = aldo_dis_datapath(snp, buf);
+        auto wlen = aldo_dis_datapath(snp, buf);
         const char *mnemonic = wlen < 0 ? aldo_dis_errstr(wlen) : buf;
         mvwaddstr(v->content, cursor_y, col1, mnemonic);
     }
@@ -481,9 +482,9 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
 
 static void drawcpu(const struct view *v, const struct aldo_snapshot *snp)
 {
-    int w = getmaxx(v->content);
+    auto w = getmaxx(v->content);
     werase(v->content);
-    int cursor_y = drawregisters(v, 0, snp);
+    auto cursor_y = drawregisters(v, 0, snp);
     mvwhline(v->content, cursor_y++, 0, 0, w);
     cursor_y = drawflags(v, cursor_y, snp);
     mvwhline(v->content, ++cursor_y, 0, 0, w);
@@ -494,7 +495,7 @@ static int drawtop_plines(const struct view *v, int cursor_y, int line_x,
                           int w, const struct aldo_snapshot *snp)
 {
     auto ppu = &snp->ppu;
-    uint8_t sel = ppu->pipeline.register_select;
+    auto sel = ppu->pipeline.register_select;
     char sel_buf[4];
     sprintf(sel_buf, "%d%d%d", aldo_getbit(sel, 2), aldo_getbit(sel, 1),
             aldo_getbit(sel, 0));
@@ -518,7 +519,7 @@ static int draw_pregisters(const struct view *v, int cursor_y,
                            const struct aldo_snapshot *snp)
 {
     auto ppu = &snp->ppu;
-    uint8_t status = ppu->status;
+    auto status = ppu->status;
     mvwprintw(v->content, ++cursor_y, 0, "CONTROL: %02X  STATUS:  %d%d%d",
               ppu->ctrl, aldo_getbit(status, 7), aldo_getbit(status, 6),
               aldo_getbit(status, 5));
@@ -538,9 +539,9 @@ static void draw_scroll_addr(const struct view *v, int y, int x, char label,
 static int draw_pipeline(const struct view *v, int cursor_y, int w,
                          const struct aldo_snapshot *snp)
 {
-    static constexpr int seph = 5;
-    static constexpr int vsep = 19;
-    static constexpr int buscol = vsep + 2;
+    static constexpr auto seph = 5;
+    static constexpr auto vsep = 19;
+    static constexpr auto buscol = vsep + 2;
 
     mvwvline(v->content, ++cursor_y, vsep, 0, seph);
 
@@ -595,8 +596,9 @@ static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
 
 static void drawppu(const struct view *v, const struct aldo_snapshot *snp)
 {
-    int w = getmaxx(v->content), line_x = (w / 4) + 1;
-    int cursor_y = drawtop_plines(v, 0, line_x, w, snp);
+    auto w = getmaxx(v->content);
+    auto line_x = (w / 4) + 1;
+    auto cursor_y = drawtop_plines(v, 0, line_x, w, snp);
     cursor_y = draw_pregisters(v, cursor_y, snp);
     mvwhline(v->content, ++cursor_y, 0, 0, w);
     cursor_y = draw_pipeline(v, cursor_y, w, snp);
@@ -606,7 +608,7 @@ static void drawppu(const struct view *v, const struct aldo_snapshot *snp)
 
 static void drawramtitle(const struct view *v, const struct viewstate *vs)
 {
-    static constexpr int titlew = 16;
+    static constexpr auto titlew = 16;
     static constexpr int offsets[] = {2, 7, 13};
     static const char *const restrict labels[] = {"RAM", "VRAM", "PPU"};
 
@@ -625,7 +627,7 @@ static int draw_mempage(const struct view *v, const struct emulator *emu,
                         int start_x, int cursor_y, int page, int page_offset,
                         int page_rows)
 {
-    int cursor_x = start_x;
+    auto cursor_x = start_x;
     size_t skipped = 0;
     for (auto page_row = 0; page_row < page_rows; ++page_row) {
         if (sel != RSEL_PPU && page == 1) {
@@ -678,7 +680,7 @@ static void draw_membanks(const struct view *v, const struct viewstate *vs,
         page_offset = 0;
         mem = emu->snapshot.mem.ram;
     }
-    int page_count = vs->total_ramsheets * 2;
+    auto page_count = vs->total_ramsheets * 2;
     for (auto page = 0; page < page_count; ++page) {
         cursor_y = draw_mempage(v, emu, mem, vs->ramselect, start_x, cursor_y,
                                 page, page_offset, RamDim);
@@ -689,11 +691,11 @@ static void draw_membanks(const struct view *v, const struct viewstate *vs,
 static void draw_ppumem(const struct view *v, const struct emulator *emu,
                         int start_x)
 {
-    static constexpr int sheeth = (RamDim * 2) + 1;
+    static constexpr auto sheeth = (RamDim * 2) + 1;
 
     auto snp = &emu->snapshot;
-    int cursor_y = draw_mempage(v, emu, snp->mem.oam, RSEL_PPU, start_x, 0, 0,
-                                0, RamDim);
+    auto cursor_y = draw_mempage(v, emu, snp->mem.oam, RSEL_PPU, start_x, 0, 0,
+                                 0, RamDim);
     wclrtoeol(v->content);
     cursor_y = draw_mempage(v, emu, snp->mem.secondary_oam, RSEL_PPU, start_x,
                             cursor_y, 0, 0, 2);
@@ -710,7 +712,7 @@ static void draw_ppumem(const struct view *v, const struct emulator *emu,
 static void drawram(const struct view *v, const struct viewstate *vs,
                     const struct emulator *emu)
 {
-    static constexpr int start_x = 5;
+    static constexpr auto start_x = 5;
 
     drawramtitle(v, vs);
 
@@ -742,7 +744,7 @@ static void vinit(struct view *v, int h, int w, int y, int x,
 
 static void raminit(struct view *v, int h, int w, int y, int x, int ramsheets)
 {
-    static constexpr int toprail_start = 7;
+    static constexpr auto toprail_start = 7;
 
     createwin(v, h, w, y, x, nullptr);
     v->content = newpad((h - 4) * ramsheets, w - 2);
@@ -768,7 +770,7 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
     int ram_x, ram_y, ram_w, ram_h;
     getbegyx(v->win, ram_y, ram_x);
     getmaxyx(v->win, ram_h, ram_w);
-    int sheet = vs->ramselect == RSEL_PPU ? 0 : vs->ramsheet;
+    auto sheet = vs->ramselect == RSEL_PPU ? 0 : vs->ramsheet;
     pnoutrefresh(v->content, (ram_h - 4) * sheet, 0, ram_y + 3, ram_x + 1,
                  ram_y + ram_h - 2, ram_x + ram_w - 1);
 }
@@ -779,15 +781,15 @@ static void ramrefresh(const struct view *v, const struct viewstate *vs)
 
 static void init_ui(struct layout *l, int ramsheets)
 {
-    static constexpr int col1w = 30;
-    static constexpr int col2w = 29;
-    static constexpr int col3w = 29;
-    static constexpr int col4w = 54;
-    static constexpr int sysh = 26;
-    static constexpr int crth = 4;
-    static constexpr int cpuh = 20;
-    static constexpr int maxh = 37;
-    static constexpr int maxw = col1w + col2w + col3w + col4w;
+    static constexpr auto col1w = 30;
+    static constexpr auto col2w = 29;
+    static constexpr auto col3w = 29;
+    static constexpr auto col4w = 54;
+    static constexpr auto sysh = 26;
+    static constexpr auto crth = 4;
+    static constexpr auto cpuh = 20;
+    static constexpr auto maxh = 37;
+    static constexpr auto maxw = col1w + col2w + col3w + col4w;
 
     setlocale(LC_ALL, "");
     initscr();
@@ -799,7 +801,8 @@ static void init_ui(struct layout *l, int ramsheets)
 
     int scrh, scrw;
     getmaxyx(stdscr, scrh, scrw);
-    int yoffset = (scrh - maxh) / 2, xoffset = (scrw - maxw) / 2;
+    auto yoffset = (scrh - maxh) / 2;
+    auto xoffset = (scrw - maxw) / 2;
     vinit(&l->system, sysh, col1w, yoffset, xoffset, "System");
     vinit(&l->debugger, maxh - sysh, col1w, yoffset + sysh, xoffset,
           "Debugger");
@@ -848,7 +851,7 @@ static void adjustrate(struct viewstate *vs, int adjustment)
 
 static void selectrate(struct runclock *clock)
 {
-    int prev = clock->oldrate;
+    auto prev = clock->oldrate;
     clock->oldrate = clock->clock.rate;
     clock->clock.rate = prev;
     clock->scale = !clock->scale;
@@ -859,7 +862,7 @@ static void selectrate(struct runclock *clock)
 
 static void handle_input(struct viewstate *vs, const struct emulator *emu)
 {
-    int input = getch();
+    auto input = getch();
     switch (input) {
     case ' ':
         aldo_nes_ready(emu->console, !emu->snapshot.cpu.lines.ready);
@@ -960,7 +963,7 @@ int ui_curses_loop(struct emulator *emu)
 {
     assert(emu != nullptr);
 
-    static constexpr int sheet_size = RamPageSize * 2;
+    static constexpr auto sheet_size = RamPageSize * 2;
 
     struct viewstate state = {
         .clock = {

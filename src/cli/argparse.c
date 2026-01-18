@@ -51,8 +51,8 @@ constexpr char VerboseShort = 'v';
 constexpr char VersionShort = 'V';
 constexpr char ZeroRamShort = 'z';
 
-constexpr int MinAddress = 0;
-constexpr int MaxAddress = ALDO_ADDRMASK_64KB;
+constexpr auto MinAddress = 0;
+constexpr auto MaxAddress = ALDO_ADDRMASK_64KB;
 
 static void init_cliargs(struct cliargs *args)
 {
@@ -93,7 +93,7 @@ static bool parse_number(const char *arg, int *restrict argi, int argc,
                          char *argv[argc+1], int base, long *restrict number)
 {
     // NOTE: first try -sN format
-    bool result = convert_num(arg + 2, base, number);
+    auto result = convert_num(arg + 2, base, number);
     // NOTE: then try --long-name=N format
     if (!result && arg[1] == '-') {
         const char *opt = strchr(arg, '=');
@@ -115,7 +115,7 @@ static bool parse_address(const char *arg, int *restrict argi, int argc,
                           int *restrict parsed)
 {
     long addr;
-    bool result = parse_number(arg, argi, argc, argv, 16, &addr);
+    auto result = parse_number(arg, argi, argc, argv, 16, &addr);
     if (result && MinAddress <= addr && addr <= MaxAddress) {
         *parsed = (int)addr;
     } else {
@@ -129,7 +129,7 @@ static bool parse_address(const char *arg, int *restrict argi, int argc,
 static bool parse_halt(const char *arg, int *restrict argi, int argc,
                        char *argv[argc+1], struct cliargs *restrict args)
 {
-    size_t optlen = strlen(HaltLong);
+    auto optlen = strlen(HaltLong);
     const char *expr = nullptr;
     if (arg[1] == HaltShort && arg[2] != '\0') {
         expr = arg + 2;
@@ -157,7 +157,7 @@ static bool parse_halt(const char *arg, int *restrict argi, int argc,
 static bool parse_dbgfile(const char *arg, int *restrict argi, int argc,
                           char *argv[argc+1], struct cliargs *restrict args)
 {
-    size_t optlen = strlen(DebugFileLong);
+    auto optlen = strlen(DebugFileLong);
     if (arg[1] == DebugFileShort && arg[2] != '\0') {
         args->dbgfilepath = arg + 2;
     } else if (strncmp(arg, DebugFileLong, optlen) == 0) {
@@ -179,7 +179,7 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
 
     if (parse_flag(arg, ChrScaleShort, true, ChrScaleLong)) {
         long scale;
-        bool result = parse_number(arg, argi, argc, argv, 10, &scale);
+        auto result = parse_number(arg, argi, argc, argv, 10, &scale);
         if (result && Aldo_MinChrScale <= scale && scale <= Aldo_MaxChrScale) {
             args->chrscale = (int)scale;
             return true;
@@ -203,7 +203,7 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
     }
 
     SETFLAG(args->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);
-    size_t chroptlen = strlen(ChrDecodeLong);
+    auto chroptlen = strlen(ChrDecodeLong);
     if (strncmp(arg, ChrDecodeLong, chroptlen) == 0) {
         const char *opt = strchr(arg, '=');
         if (opt && opt - arg == (ptrdiff_t)chroptlen) {
@@ -238,7 +238,7 @@ bool argparse_parse(struct cliargs *restrict args, int argc,
 
     init_cliargs(args);
     args->me = argc > 0 && strlen(argv[0]) > 0 ? argv[0] : "aldo";
-    bool opt_parse = true;
+    auto opt_parse = true;
     if (argc > 1) {
         for (auto i = 1; i < argc; ++i) {
             const char *arg = argv[i];

@@ -82,8 +82,8 @@ static void tick_start(struct runclock *c, const struct aldo_snapshot *snp)
 static void update_progress(const struct runclock *c)
 {
     static constexpr char distractor[] = {'|', '/', '-', '\\'};
-    static constexpr double display_wait = 2000;
-    static constexpr double refresh_interval_ms = display_wait + 100;
+    static constexpr auto display_wait = 2000.0;
+    static constexpr auto refresh_interval_ms = display_wait + 100.0;
     static double refreshdt;
     static size_t distractor_frame;
 
@@ -116,7 +116,7 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
     auto bp = aldo_debug_halted(emu->debugger);
     if (bp) {
         char break_desc[AldoHexprFmtSize];
-        int err = aldo_haltexpr_desc(&bp->expr, break_desc);
+        auto err = aldo_haltexpr_desc(&bp->expr, break_desc);
         printf("Break: %s\n",
                err < 0 ? aldo_haltexpr_errstr(err) : break_desc);
     }
@@ -130,7 +130,7 @@ int ui_batch_loop(struct emulator *emu)
 {
     assert(emu != nullptr);
 
-    int err = init_ui();
+    auto err = init_ui();
     if (err < 0) return err;
 
     struct runclock clock = {};

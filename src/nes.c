@@ -19,8 +19,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-constexpr int ScreenWidth = 256;
-constexpr int ScreenHeight = 240;
+constexpr auto ScreenWidth = 256;
+constexpr auto ScreenHeight = 240;
 
 // The NES-001 NTSC Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
@@ -134,7 +134,7 @@ static bool create_mbus(struct aldo_nes001 *self)
                                   ALDO_MEMBLOCK_16KB, ALDO_MEMBLOCK_32KB);
     if (!self->cpu.mbus) return false;
 
-    bool r = aldo_bus_set(self->cpu.mbus, 0, (struct aldo_busdevice){
+    auto r = aldo_bus_set(self->cpu.mbus, 0, (struct aldo_busdevice){
         ram_read,
         ram_write,
         ram_copy,
@@ -160,7 +160,7 @@ static bool create_vbus(struct aldo_nes001 *self)
     self->ppu.vbus = aldo_bus_new(ALDO_BITWIDTH_16KB, 2, ALDO_MEMBLOCK_8KB);
     if (!self->ppu.vbus) return false;
 
-    bool r = aldo_bus_set(self->ppu.vbus, ALDO_MEMBLOCK_8KB,
+    auto r = aldo_bus_set(self->ppu.vbus, ALDO_MEMBLOCK_8KB,
                           (struct aldo_busdevice){
         vram_read,
         vram_write,
@@ -184,7 +184,7 @@ static bool assert_vbus(aldo_cart* cart, bool connected)
 static void connect_cart(struct aldo_nes001 *self, aldo_cart *c)
 {
     self->cart = c;
-    bool r = aldo_cart_mbus_connect(self->cart, self->cpu.mbus);
+    auto r = aldo_cart_mbus_connect(self->cart, self->cpu.mbus);
     (void)r, assert(r);
     r = aldo_cart_vbus_connect(self->cart, self->ppu.vbus);
     (void)r, assert(assert_vbus(self->cart, r));
@@ -340,7 +340,7 @@ static void instruction_trace(struct aldo_nes001 *self,
 
 static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
 {
-    bool framedone = aldo_ppu_cycle(&self->ppu);
+    auto framedone = aldo_ppu_cycle(&self->ppu);
     clock->frames += (uint64_t)framedone;
     --clock->budget;
     set_ppu_pins(self);
@@ -359,7 +359,7 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
 
 static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
 {
-    int cycles = aldo_cpu_cycle(&self->cpu);
+    auto cycles = aldo_cpu_cycle(&self->cpu);
     set_cpu_pins(self);
     clock->subcycle = 0;
     clock->cycles += (uint64_t)cycles;

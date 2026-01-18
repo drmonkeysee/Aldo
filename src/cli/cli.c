@@ -46,7 +46,7 @@ static aldo_cart *load_cart(const char *filename)
     aldo_cart *c = nullptr;
     auto f = fopen(filename, "rb");
     if (f) {
-        int err = aldo_cart_create(&c, f);
+        auto err = aldo_cart_create(&c, f);
         if (err < 0) {
             fprintf(stderr, "Cart load failure (%d): %s\n", err,
                     aldo_cart_errstr(err));
@@ -70,7 +70,7 @@ static int print_cart_info(const struct cliargs *args, aldo_cart *c)
     const char *name = args->verbose
                         ? args->filepath
                         : argparse_filename(args->filepath);
-    int err = aldo_cart_write_info(c, name, args->verbose, stdout);
+    auto err = aldo_cart_write_info(c, name, args->verbose, stdout);
     if (err < 0) {
         fprintf(stderr, "Cart info print failure (%d): %s\n", err,
                 aldo_cart_errstr(err));
@@ -81,8 +81,8 @@ static int print_cart_info(const struct cliargs *args, aldo_cart *c)
 
 static int disassemble_cart_prg(const struct cliargs *args, aldo_cart *c)
 {
-    int err = aldo_dis_cart_prg(c, argparse_filename(args->filepath),
-                                args->verbose, false, stdout);
+    auto err = aldo_dis_cart_prg(c, argparse_filename(args->filepath),
+                                 args->verbose, false, stdout);
     if (err < 0) {
         fprintf(stderr, "PRG decode error (%d): %s\n", err,
                 aldo_dis_errstr(err));
@@ -93,7 +93,7 @@ static int disassemble_cart_prg(const struct cliargs *args, aldo_cart *c)
 
 static int decode_cart_chr(const struct cliargs *args, aldo_cart *c)
 {
-    int err = aldo_dis_cart_chr(c, args->chrscale, args->chrdecode_prefix, stdout);
+    auto err = aldo_dis_cart_chr(c, args->chrscale, args->chrdecode_prefix, stdout);
     if (err < 0) {
         fprintf(stderr, "CHR decode error (%d): %s\n", err,
                 aldo_dis_errstr(err));
@@ -109,7 +109,7 @@ static bool parse_dbg_expression(aldo_debugger *dbg,
                                  const char *restrict exprstr, bool verbose)
 {
     struct aldo_debugexpr expr;
-    int err = aldo_haltexpr_parse_dbg(exprstr, &expr);
+    auto err = aldo_haltexpr_parse_dbg(exprstr, &expr);
     if (err < 0) {
         fprintf(stderr,
                 "Debug expression parse failure (%d): %s > \"%s\"\n", err,
@@ -168,7 +168,7 @@ static aldo_debugger *create_debugger(const struct cliargs *args)
     if (args->dbgfilepath) {
         auto f = fopen(args->dbgfilepath, "r");
         if (f) {
-            bool success = parse_debug_file(dbg, f, args);
+            auto success = parse_debug_file(dbg, f, args);
             fclose(f);
             if (!success) goto exit_dbg;
         } else {
@@ -251,11 +251,11 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
               " with batch mode but specified no halt conditions;\n"
               "this can result in a very large trace file very quickly!\n"
               "Continue? [yN] ", stderr);
-        int input = getchar();
+        auto input = getchar();
         if (input != 'y' && input != 'Y') return EXIT_FAILURE;
     }
 
-    int result = EXIT_SUCCESS;
+    auto result = EXIT_SUCCESS;
     FILE *tracelog = nullptr;
     if (emu.args->tron) {
         if (!(tracelog = fopen(tracefile, "w"))) {
@@ -279,7 +279,7 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
     aldo_nes_powerup(emu.console, c, emu.args->zeroram);
 
     auto run_loop = setup_ui(&emu);
-    int err = run_loop(&emu);
+    auto err = run_loop(&emu);
     if (err < 0) {
         fprintf(stderr, "UI run failure (%d): %s\n", err, aldo_ui_errstr(err));
         if (err == ALDO_UI_ERR_ERNO) {
@@ -334,7 +334,7 @@ static int run_with_args(const struct cliargs *args)
     auto cart = load_cart(args->filepath);
     if (!cart) return EXIT_FAILURE;
 
-    int result = run_cart(args, cart);
+    auto result = run_cart(args, cart);
     aldo_cart_free(cart);
     return result;
 }
@@ -348,7 +348,7 @@ int cli_run(int argc, char *argv[argc+1])
     struct cliargs args;
     if (!argparse_parse(&args, argc, argv)) return EXIT_FAILURE;
 
-    int result = run_with_args(&args);
+    auto result = run_with_args(&args);
     argparse_cleanup(&args);
     return result;
 }

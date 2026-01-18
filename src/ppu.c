@@ -18,17 +18,17 @@
 // v-blank, overscan, etc; nominally 1 frame is 262 * 341 = 89342 ppu cycles;
 // however with rendering enabled the odd frames skip a dot for an overall
 // average cycle count of 89341.5 per frame.
-constexpr int Dots = 341;
-constexpr int Lines = 262;
-constexpr int LinePostRender = 240;
-constexpr int LineVBlank = LinePostRender + 1;
-constexpr int LinePreRender = Lines - 1;
-constexpr int DotPxStart = 2;
-constexpr int DotSpriteEvaluation = 65;
-constexpr int DotSpriteFetch = 257;
-constexpr int DotPxEnd = 260;
-constexpr int DotTilePrefetch = 321;
-constexpr int DotTilePrefetchEnd = 337;
+constexpr auto Dots = 341;
+constexpr auto Lines = 262;
+constexpr auto LinePostRender = 240;
+constexpr auto LineVBlank = LinePostRender + 1;
+constexpr auto LinePreRender = Lines - 1;
+constexpr auto DotPxStart = 2;
+constexpr auto DotSpriteEvaluation = 65;
+constexpr auto DotSpriteFetch = 257;
+constexpr auto DotPxEnd = 260;
+constexpr auto DotTilePrefetch = 321;
+constexpr auto DotTilePrefetchEnd = 337;
 
 // NOTE: helpers for manipulating v and t registers
 constexpr uint16_t BaseNtAddr = ALDO_MEMBLOCK_8KB;
@@ -272,7 +272,7 @@ static uint8_t palette_read(const struct aldo_rp2c02 *self, uint16_t addr)
     // NOTE: addr=[$3F00-$3FFF]
     assert(palette_addr(addr));
 
-    uint8_t pal = self->palette[mask_palette(addr)];
+    auto pal = self->palette[mask_palette(addr)];
     // NOTE: palette values are 6 bits wide, grayscale additionally masks down
     // to lowest palette column.
     return pal & (self->mask.g ? 0x30 : 0x3f);
@@ -329,7 +329,7 @@ static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
         break;
     case 7: // PPUDATA
         ppu->cvp = true;
-        uint16_t addr = maskaddr(ppu->v);
+        auto addr = maskaddr(ppu->v);
         ppu->regbus = palette_addr(addr) ? palette_read(ppu, addr) : ppu->rbuf;
         // TODO: there is a read conflict with APU interrupts:
         // https://www.nesdev.org/wiki/PPU_registers#Read_conflict_with_DPCM_samples
@@ -417,7 +417,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
         break;
     case 7: // PPUDATA
         ppu->cvp = true;
-        uint16_t addr = maskaddr(ppu->v);
+        auto addr = maskaddr(ppu->v);
         if (palette_addr(addr)) {
             palette_write(ppu, addr, ppu->regbus);
         }
@@ -595,16 +595,16 @@ static void latch_tile(struct aldo_rp2c02 *self)
 
 static void mux_bg(struct aldo_rp2c02 *self)
 {
-    static constexpr int left_mask_end = DotPxStart + 8;
+    static constexpr auto left_mask_end = DotPxStart + 8;
 
     auto pxpl = &self->pxpl;
     // NOTE: fine-x selects bit from the left: 0 = 7th bit, 7 = 0th bit
-    int abit = 7 - self->x;
+    auto abit = 7 - self->x;
     pxpl->mux = (uint8_t)((aldo_getbit(pxpl->ats[1], abit) << 3)
                           | (aldo_getbit(pxpl->ats[0], abit) << 2));
     if (self->mask.b && (self->mask.bm || self->dot >= left_mask_end)) {
         // NOTE: tile selection is from the left-most (upper) byte
-        int tbit = abit + 8;
+        auto tbit = abit + 8;
         pxpl->mux |= (uint8_t)((aldo_getbit(pxpl->bgs[1], tbit) << 1)
                                | aldo_getbit(pxpl->bgs[0], tbit));
     }
@@ -668,7 +668,8 @@ static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
 static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
                              bool plane)
 {
-    int tileidx = self->pxpl.nt << 4, pxrow = (self->v & FineYBits) >> 12;
+    auto tileidx = self->pxpl.nt << 4;
+    auto pxrow = (self->v & FineYBits) >> 12;
     return (uint16_t)((table << 12) | tileidx | (plane << 3) | pxrow);
 }
 
@@ -1076,7 +1077,7 @@ void aldo_ppu_connect(struct aldo_rp2c02 *self, aldo_bus *mbus)
     assert(self != nullptr);
     assert(mbus != nullptr);
 
-    bool r = aldo_bus_set(mbus, ALDO_MEMBLOCK_8KB, (struct aldo_busdevice){
+    auto r = aldo_bus_set(mbus, ALDO_MEMBLOCK_8KB, (struct aldo_busdevice){
         .read = regread,
         .write = regwrite,
         .ctx = self,
@@ -1230,7 +1231,7 @@ struct aldo_ppu_coord aldo_ppu_screendot(const struct aldo_rp2c02 *self)
 {
     assert(self != nullptr);
 
-    static constexpr int dot_pxout = DotPxStart + 2;
+    static constexpr auto dot_pxout = DotPxStart + 2;
 
     if (!self->signal.vout) return (struct aldo_ppu_coord){-1, -1};
 

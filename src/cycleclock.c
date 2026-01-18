@@ -20,7 +20,7 @@ void aldo_clock_start(struct aldo_clock *self)
 void aldo_clock_tickstart(struct aldo_clock *self, bool reset_budget)
 {
     clock_gettime(CLOCK_MONOTONIC, &self->current);
-    double currentms = aldo_timespec_to_ms(&self->current);
+    auto currentms = aldo_timespec_to_ms(&self->current);
     self->ticktime_ms = currentms - aldo_timespec_to_ms(&self->previous);
     self->runtime = (currentms - aldo_timespec_to_ms(&self->start))
                     / ALDO_MS_PER_S;
@@ -37,7 +37,7 @@ void aldo_clock_tickstart(struct aldo_clock *self, bool reset_budget)
         self->timebudget_ms = ALDO_MS_PER_S;
     }
 
-    double cycles_per_ms = (self->rate * self->rate_factor) / ALDO_MS_PER_S;
+    auto cycles_per_ms = (self->rate * self->rate_factor) / ALDO_MS_PER_S;
     auto new_cycles = (int)(self->timebudget_ms * cycles_per_ms);
     self->budget += new_cycles;
     self->timebudget_ms -= new_cycles / cycles_per_ms;

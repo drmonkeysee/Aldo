@@ -22,11 +22,11 @@ static int trace_instruction(FILE *tracelog, const struct aldo_mos6502 *cpu,
                              const struct aldo_snapshot *snp)
 {
     uint8_t bytes[3];
-    size_t instlen = aldo_bus_copy(cpu->mbus,
-                                   snp->cpu.datapath.current_instruction,
-                                   aldo_arrsz(bytes), bytes);
+    auto instlen = aldo_bus_copy(cpu->mbus,
+                                 snp->cpu.datapath.current_instruction,
+                                 aldo_arrsz(bytes), bytes);
     struct aldo_dis_instruction inst;
-    int result = aldo_dis_parsemem_inst(instlen, bytes, 0, &inst);
+    auto result = aldo_dis_parsemem_inst(instlen, bytes, 0, &inst);
     char disinst[AldoDisInstSize];
     if (result > 0) {
         result = aldo_dis_inst(snp->cpu.datapath.current_instruction, &inst,
@@ -43,7 +43,7 @@ static int trace_instruction_peek(FILE *tracelog, struct aldo_mos6502 *cpu,
                                   const struct aldo_snapshot *snp)
 {
     char peek[AldoDisPeekSize];
-    int result = aldo_dis_peek(cpu, ppu, dbg, snp, peek);
+    auto result = aldo_dis_peek(cpu, ppu, dbg, snp, peek);
     return fprintf(tracelog, " %s",
                    result < 0 ? aldo_dis_errstr(result) : peek);
 }
@@ -56,8 +56,8 @@ static bool trace_registers(FILE *tracelog, const struct aldo_snapshot *snp)
     };
 
     auto cpu = &snp->cpu;
-    int err = fprintf(tracelog, " A:%02X X:%02X Y:%02X P:%02X (",
-                      cpu->accumulator, cpu->xindex, cpu->yindex, cpu->status);
+    auto err = fprintf(tracelog, " A:%02X X:%02X Y:%02X P:%02X (",
+                       cpu->accumulator, cpu->xindex, cpu->yindex, cpu->status);
     if (err < 0) return false;
     for (size_t i = sizeof cpu->status * 8; i > 0; --i) {
         size_t idx = i - 1;
@@ -82,17 +82,17 @@ bool aldo_trace_line(FILE *tracelog, int adjustment, uint64_t cycles,
     assert(snp != nullptr);
 
     // NOTE: does not include leading space in trace_registers
-    static constexpr int instw = 47;
+    static constexpr auto instw = 47;
 
-    int written = trace_instruction(tracelog, cpu, snp);
+    auto written = trace_instruction(tracelog, cpu, snp);
     if (written < 0) return false;
-    int peek = trace_instruction_peek(tracelog, cpu, ppu, dbg, snp);
+    auto peek = trace_instruction_peek(tracelog, cpu, ppu, dbg, snp);
     if (peek < 0) {
         return false;
     } else {
         written += peek;
     }
-    int width = written <= instw ? instw - written : 0;
+    auto width = written <= instw ? instw - written : 0;
     assert(written <= instw);
     if (fprintf(tracelog, "%*s", width, "") < 0) return false;
     if (!trace_registers(tracelog, snp)) return false;

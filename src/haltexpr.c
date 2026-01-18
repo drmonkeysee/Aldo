@@ -62,7 +62,8 @@ int aldo_haltexpr_parse(const char *restrict str, struct aldo_haltexpr *expr)
 
     if (!str) return ALDO_HEXPR_ERR_SCAN;
 
-    bool parsed = false, valid = false;
+    auto parsed = false;
+    auto valid = false;
     char u[2];
     struct aldo_haltexpr e;
     for (auto i = ALDO_HLT_NONE + 1; i < ALDO_HLT_COUNT; ++i) {
@@ -135,7 +136,7 @@ int aldo_haltexpr_parse_dbg(const char *restrict str,
     assert(expr != nullptr);
 
     struct aldo_haltexpr hexpr;
-    int err = aldo_haltexpr_parse(str, &hexpr);
+    auto err = aldo_haltexpr_parse(str, &hexpr);
     if (err == 0) {
         *expr = (struct aldo_debugexpr){
             .hexpr = hexpr,

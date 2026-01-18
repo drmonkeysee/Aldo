@@ -41,7 +41,7 @@ auto load_cart(const std::filesystem::path& filepath)
     file_handle f{std::fopen(filepath.c_str(), "rb")};
     if (!f) throw aldo::AldoError{"Cannot open cart file", filepath, errno};
 
-    int err = aldo_cart_create(&c, f.get());
+    auto err = aldo_cart_create(&c, f.get());
     if (err < 0) {
         if (err == ALDO_CART_ERR_ERNO) throw aldo::AldoError{
             CartLoadFailure, "System error", errno,

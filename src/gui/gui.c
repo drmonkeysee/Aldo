@@ -42,7 +42,7 @@ static int run_emu(const struct gui_platform *platform)
     }
     aldo_nes_powerup(console, nullptr, false);
 
-    int err = ui_sdl_runloop(platform, dbg, console);
+    auto err = ui_sdl_runloop(platform, dbg, console);
     // NOTE: ui loop takes ownership of these two,
     // even in the event of UI init failure.
     console = nullptr;

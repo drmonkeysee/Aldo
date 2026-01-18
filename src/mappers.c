@@ -69,13 +69,13 @@ static void mem_load(uint8_t *restrict d, const uint8_t *restrict mem,
 // be so common anymore.
 static void clear_prg_device(aldo_bus *b)
 {
-    bool r = aldo_bus_clear(b, ALDO_MEMBLOCK_32KB);
+    auto r = aldo_bus_clear(b, ALDO_MEMBLOCK_32KB);
     (void)r, assert(r);
 }
 
 static void clear_chr_device(aldo_bus *b)
 {
-    bool r = aldo_bus_clear(b, 0);
+    auto r = aldo_bus_clear(b, 0);
     (void)r, assert(r);
 }
 
@@ -313,8 +313,7 @@ static bool ines_000_vbus_connect(struct aldo_mapper *self, aldo_bus *b)
 static void ines_000_vbus_disconnect(aldo_bus *b)
 {
     struct aldo_busdevice bd;
-    bool r = aldo_bus_swap(b, ALDO_MEMBLOCK_8KB, (struct aldo_busdevice){},
-                           &bd);
+    auto r = aldo_bus_swap(b, ALDO_MEMBLOCK_8KB, (struct aldo_busdevice){}, &bd);
     (void)r, assert(r);
     r = aldo_bus_set(b, ALDO_MEMBLOCK_8KB,
                      ((struct ines_000_mapper *)bd.ctx)->vrbd);
@@ -372,7 +371,7 @@ int aldo_mapper_raw_create(struct aldo_mapper **m, FILE *f)
     };
 
     // TODO: assume a 32KB ROM file (can i do mirroring later?)
-    int err = load_blocks(&self->rom, ALDO_MEMBLOCK_32KB, f);
+    auto err = load_blocks(&self->rom, ALDO_MEMBLOCK_32KB, f);
     if (err == 0) {
         *m = (struct aldo_mapper *)self;
     } else {

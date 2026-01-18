@@ -86,7 +86,7 @@ static int parse_ines(struct aldo_cartridge *self, FILE *f)
     info->ines_hdr.wram_blocks = header[8];
     info->ines_hdr.bus_conflicts = header[10] & 0x20;
 
-    int err = aldo_mapper_ines_create(&self->mapper, &info->ines_hdr, f);
+    auto err = aldo_mapper_ines_create(&self->mapper, &info->ines_hdr, f);
     if (err == 0) {
         // TODO: we've found a ROM with extra bytes after CHR data
         assert(fgetc(f) == EOF && feof(f));
@@ -98,7 +98,7 @@ static int parse_ines(struct aldo_cartridge *self, FILE *f)
 // header; if format cannot be determined, this is the default.
 static int parse_raw(struct aldo_cartridge *self, FILE *f)
 {
-    int err = aldo_mapper_raw_create(&self->mapper, f);
+    auto err = aldo_mapper_raw_create(&self->mapper, f);
     // NOTE: ROM file is too big for prg address space (no bank-switching)
     if (err == 0 && !(fgetc(f) == EOF && feof(f))) {
         err = ALDO_CART_ERR_IMG_SIZE;
@@ -127,8 +127,8 @@ static int write_ines_info(const struct aldo_cartinfo *info, FILE *f,
         *const restrict chrramlbl = "CHR RAM\t\t: ";
 
 
-    int err = fprintf(f, "Mapper\t\t: %03u%s\n", info->ines_hdr.mapper_id,
-                      info->ines_hdr.mapper_implemented
+    auto err = fprintf(f, "Mapper\t\t: %03u%s\n", info->ines_hdr.mapper_id,
+                       info->ines_hdr.mapper_implemented
                           ? ""
                           : " (Not Implemented)");
     if (err < 0) goto io_failure;
@@ -221,7 +221,7 @@ int aldo_cart_create(aldo_cart **c, FILE *f)
     struct aldo_cartridge *self = malloc(sizeof *self);
     if (!self) return ALDO_CART_ERR_ERNO;
 
-    int err = detect_format(self, f);
+    auto err = detect_format(self, f);
     if (err == 0) {
         switch (self->info.format) {
         case ALDO_CRTF_INES:
@@ -296,7 +296,7 @@ int aldo_cart_write_info(aldo_cart *self, const char *restrict name,
     assert(name != nullptr);
     assert(f != nullptr);
 
-    int err = fprintf(f, "File\t\t: %s\n", name);
+    auto err = fprintf(f, "File\t\t: %s\n", name);
     if (err < 0) return ALDO_CART_ERR_IO;
     err = fprintf(f, "Format\t\t: %s\n",
                   aldo_cart_formatname(self->info.format));
@@ -403,7 +403,7 @@ int aldo_cart_write_dis_header(aldo_cart *self, const char *restrict name,
     assert(name != nullptr);
     assert(f != nullptr);
 
-    int err = fprintf(f, "%s\n", name);
+    auto err = fprintf(f, "%s\n", name);
     if (err < 0) return ALDO_CART_ERR_IO;
 
     char fmtd[AldoCartFmtSize];

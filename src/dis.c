@@ -153,10 +153,10 @@ static int print_operand(const struct aldo_dis_instruction *inst,
 static int print_instruction(const struct aldo_dis_instruction *inst,
                              char dis[restrict])
 {
-    int operation = sprintf(dis, "%s ", mnemonic(inst->d.instruction));
+    auto operation = sprintf(dis, "%s ", mnemonic(inst->d.instruction));
     if (operation < 0) return ALDO_DIS_ERR_FMT;
 
-    int operand = print_operand(inst, dis + operation);
+    auto operand = print_operand(inst, dis + operation);
     if (operand < 0) return ALDO_DIS_ERR_FMT;
     if (operand == 0) {
         // NOTE: no operand to print, trim the trailing space
@@ -196,8 +196,8 @@ io_failure:
 static int print_prgblock(const struct aldo_blockview *bv, bool verbose,
                           FILE *f)
 {
-    int io_err = fprintf(f, "Block %zu (%zuKB)\n", bv->ord,
-                         bv->size >> ALDO_BITWIDTH_1KB);
+    auto io_err = fprintf(f, "Block %zu (%zuKB)\n", bv->ord,
+                          bv->size >> ALDO_BITWIDTH_1KB);
     if (io_err < 0) return ALDO_DIS_ERR_IO;
     if (fputs("--------\n", f) == EOF) return ALDO_DIS_ERR_IO;
 
@@ -227,7 +227,7 @@ static int print_prgblock(const struct aldo_blockview *bv, bool verbose,
 }
 
 // NOTE: hardcode max scale to ~7MB bmp file size
-constexpr int ScaleGuard = 20;
+constexpr auto ScaleGuard = 20;
 
 static int measure_tile_sheet(size_t banksize, uint32_t *restrict dim,
                               uint32_t *restrict sections)
@@ -298,7 +298,7 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
             // NOTE: 8 2-bit pixels make a single CHR tile row; each 2-bit
             // pixel will be expanded to 4-bits and packed 2 pixels per byte
             // for a 4 bpp BMP.
-            uint16_t pixelrow = aldo_byteshuffle(plane0, plane1);
+            auto pixelrow = aldo_byteshuffle(plane0, plane1);
             for (size_t pixelx = 0; pixelx < AldoChrTileDim; ++pixelx) {
                 // NOTE: packedpixel is the pixel in (prescaled) bmp-row space;
                 // pixelidx is the 2-bit slice of pixelrow that maps to the
@@ -434,7 +434,7 @@ static int write_chrblock(const struct aldo_blockview *bv, uint32_t scale,
                           const char *restrict bmpfilename, FILE *output)
 {
     uint32_t tilesdim, tile_sections;
-    int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
+    auto err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
     if (err < 0) return err;
 
     auto bmpfile = fopen(bmpfilename, "wb");
@@ -501,9 +501,9 @@ int aldo_dis_parse_inst(const struct aldo_blockview *bv, size_t at,
     if (!bv->mem) return ALDO_DIS_ERR_PRGROM;
     if (at >= bv->size) return 0;
 
-    uint8_t opcode = bv->mem[at];
+    auto opcode = bv->mem[at];
     auto dec = Aldo_Decode[opcode];
-    int instlen = InstLens[dec.mode];
+    auto instlen = InstLens[dec.mode];
     if ((size_t)instlen > bv->size - at) return ALDO_DIS_ERR_EOF;
 
     *parsed = (struct aldo_dis_instruction){
@@ -563,8 +563,8 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
     assert(dis != nullptr);
 
     struct aldo_dis_instruction inst;
-    int err = aldo_dis_parsemem_inst(snp->prg.curr->length, snp->prg.curr->pc,
-                                     0, &inst);
+    auto err = aldo_dis_parsemem_inst(snp->prg.curr->length, snp->prg.curr->pc,
+                                      0, &inst);
     if (err < 0) return err;
 
     auto cpu = &snp->cpu;
@@ -624,7 +624,7 @@ int aldo_dis_cart_prg(aldo_cart *cart, const char *restrict name, bool verbose,
 
     do {
         if (fputc('\n', f) == EOF) return ALDO_DIS_ERR_IO;
-        int err = print_prgblock(&bv, verbose, f);
+        auto err = print_prgblock(&bv, verbose, f);
         // NOTE: disassembly errors may occur normally if data bytes are
         // interpreted as instructions so note the result and continue.
         if (err < 0) {
@@ -683,7 +683,7 @@ int aldo_dis_cart_chrblock(const struct aldo_blockview *bv, int scale, FILE *f)
     if (scale <= 0 || scale > ScaleGuard) return ALDO_DIS_ERR_CHRSCL;
 
     uint32_t tilesdim, tile_sections;
-    int err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
+    auto err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
     if (err < 0) return err;
 
     return write_chrtiles(bv, tilesdim, tile_sections, (uint32_t)scale, f);
@@ -728,7 +728,7 @@ int aldo_dis_inst_operand(const struct aldo_dis_instruction *inst,
         return 0;
     }
 
-    int count = print_operand(inst, dis);
+    auto count = print_operand(inst, dis);
 
     assert(count < (int)AldoDisOperandSize);
     return count;
@@ -758,7 +758,7 @@ int aldo_dis_peek(struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
     auto total = 0;
     const char *interrupt = interrupt_display(snp);
     if (strlen(interrupt) > 0) {
-        int count = total = sprintf(dis, "%s > ", interrupt);
+        auto count = total = sprintf(dis, "%s > ", interrupt);
         if (count < 0) return ALDO_DIS_ERR_FMT;
         const char *fmt;
         uint16_t vector;

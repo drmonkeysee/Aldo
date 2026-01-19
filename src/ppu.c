@@ -25,7 +25,7 @@ constexpr auto LineVBlank = LinePostRender + 1;
 constexpr auto LinePreRender = Lines - 1;
 constexpr auto DotPxStart = 2;
 constexpr auto DotSpriteEvaluation = 65;
-constexpr auto DotSpriteFetch = 257;
+constexpr auto DotHBlank = 257;
 constexpr auto DotPxEnd = 260;
 constexpr auto DotTilePrefetch = 321;
 constexpr auto DotTilePrefetchEnd = 337;
@@ -121,13 +121,13 @@ static bool rendering_disabled(const struct aldo_rp2c02 *self)
 static bool tile_rendering(const struct aldo_rp2c02 *self)
 {
     // NOTE: 0 is not checked as vram_render already handles this
-    return self->dot < DotSpriteFetch
+    return self->dot < DotHBlank
             || (DotTilePrefetch <= self->dot && self->dot < DotTilePrefetchEnd);
 }
 
 static bool sprite_fetch(const struct aldo_rp2c02 *self)
 {
-    return DotSpriteFetch <= self->dot && self->dot < DotTilePrefetch;
+    return DotHBlank <= self->dot && self->dot < DotTilePrefetch;
 }
 
 // NOTE: in_visible_frame and in_postrender can both be false:
@@ -254,6 +254,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         // TODO: sprite overflow checks
         break;
     case ALDO_PPU_SPR_DONE:
+        // all 64 sprites have been scanned, continue to advance OAMADDR until HBLANK
         sprite_skip(self);
         break;
     default:
@@ -744,7 +745,7 @@ static void increment_tile(struct aldo_rp2c02 *self, bool force_y)
 {
     lock_attribute(self);
     incr_course_x(self);
-    if (self->dot == DotSpriteFetch - 1 || force_y) {
+    if (self->dot == DotHBlank - 1 || force_y) {
         incr_y(self);
     }
 }
@@ -838,7 +839,7 @@ static void tile_read(struct aldo_rp2c02 *self)
         break;
     }
 
-    if (self->line != LinePreRender && self->dot < DotSpriteFetch) {
+    if (self->line != LinePreRender && self->dot < DotHBlank) {
         sprite_evaluation(self);
     }
 }
@@ -859,7 +860,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
     case 1:
         // unused NT addr
         addrbus(self, nametable_addr(self));
-        if (self->dot == DotSpriteFetch) {
+        if (self->dot == DotHBlank) {
             static constexpr uint16_t horiz_bits = HNtBit | CourseXBits;
             // NOTE: copy t course-x and horizontal nametable to v
             self->v = (uint16_t)((self->v & ~horiz_bits) | (self->t & horiz_bits));

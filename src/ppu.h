@@ -86,17 +86,19 @@ struct aldo_rp2c02 {
 
     // Sprite Evaluation
     struct {
+        enum {
+            ALDO_PPU_SPR_SCAN,  // Scan for sprites on the current scanline
+            ALDO_PPU_SPR_FILL,  // Fill a sprite into secondary OAM
+            ALDO_PPU_SPR_FULL,  // Secondary OAM is full
+            ALDO_PPU_SPR_DONE,  // OAM scanning is complete
+        } s;                    // Sprite evaluation state; does not include idle
+                                // or clear which are handled as dot checks.
         uint8_t oamd,           // Internal latch for most recent oam read
                 soama,          // Internal address of secondary OAM: $00-$20
                 oam[256],       // Object Attribute Memory: internal storage
                                 // for sprite attributes; 64 sprites at 4 bytes each.
                 soam[32];       // Secondary OAM: up to 8 active sprites for
                                 // current scanline.
-        bool
-            done,               // Sprite evaluation is complete; either 8 sprites
-                                // have been found or 64 have been checked.
-            fill;               // Currently filling secondary OAM with a detected
-                                // sprite, vs evaluating sprite positions.
     } spr;
 
     // Pixel Render Pipeline

@@ -190,7 +190,7 @@ static void sprite_reset(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
     sprites->soama = 0x0;
-    sprites->fill = sprites->done = false;
+    sprites->s = ALDO_PPU_SPR_SCAN;
     assert(assert_cleared_soam(self));
 }
 
@@ -198,42 +198,67 @@ static void sprite_reset(struct aldo_rp2c02 *self)
 static void sprite_evaluation(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
+
+    // every odd dot is a read from whereever OAMADDR points
     if (self->dot % 2 == 1) {
-        // NOTE: every odd dot is a read from whereever OAMADDR points
         sprites->oamd = oam_read(self);
-    } else if (self->dot < DotSpriteEvaluation) {
-        // NOTE: every even dot before sprite evaluation clears secondary OAM.
+        return;
+    }
+
+    // Secondary OAM clear
+    if (self->dot < DotSpriteEvaluation) {
         soam_write(self);
         if (self->dot == DotSpriteEvaluation - 1) {
             sprite_reset(self);
         }
-    } else if (sprites->fill) {
-        // NOTE: fill secondary OAM with the evaluated sprite
+        return;
+    }
+
+    switch (sprites->s) {
+    case ALDO_PPU_SPR_SCAN:
+        {
+            // evaluate sprites for the current scanline; sprites are not
+            // drawn until the next scanline, leading to a +1 y-offset of the
+            // actual on-screen position.
+            soam_write(self);
+            auto in_range = self->ctrl.h ? 16 : 8;
+            if ((uint8_t)(self->line - sprites->oamd) < in_range) {
+                // sprite height is within current scanline
+                ++self->oamaddr;
+                sprites->s = ALDO_PPU_SPR_FILL;
+            } else {
+                sprite_skip(self);
+                // back up secondary oam address to un-commit previous write
+                assert(sprites->soama > 0);
+                --sprites->soama;
+            }
+            // we've checked all 64 sprites
+            if (self->oamaddr == 0) {
+                sprites->s = ALDO_PPU_SPR_DONE;
+            }
+        }
+        break;
+    case ALDO_PPU_SPR_FILL:
+        // fill secondary OAM with the evaluated sprite
         soam_write(self);
         ++self->oamaddr;
-        sprites->fill = sprites->soama % 4;
-    } else if (sprites->done) {
-        sprite_skip(self);
-    } else {
-        // NOTE: evaluate sprites for the current scanline; sprites are not
-        // drawn until the next scanline, leading to a +1 y-offset of the
-        // actual on-screen position.
-        soam_write(self);
-        auto in_range = self->ctrl.h ? 16 : 8;
-        if ((uint8_t)(self->line - sprites->oamd) < in_range) {
-            // NOTE: sprite height is within current scanline
-            ++self->oamaddr;
-            sprites->fill = true;
-        } else {
-            sprite_skip(self);
-            // NOTE: back up secondary oam address to un-commit previous write
-            assert(sprites->soama > 0);
-            --sprites->soama;
-        }
-        // NOTE: we've checked all 64 sprites
         if (self->oamaddr == 0) {
-            sprites->done = true;
+            sprites->s = ALDO_PPU_SPR_DONE;
+        } else if (sprites->soama == 0) {
+            sprites->s = ALDO_PPU_SPR_FULL;
+        } else if (sprites->soama % 4 == 0) {
+            sprites->s = ALDO_PPU_SPR_SCAN;
         }
+        break;
+    case ALDO_PPU_SPR_FULL:
+        // TODO: sprite overflow checks
+        break;
+    case ALDO_PPU_SPR_DONE:
+        sprite_skip(self);
+        break;
+    default:
+        assert(((void)"SPRITE EVALUATION UNREACHABLE CASE", false));
+        break;
     }
 }
 
@@ -1091,9 +1116,9 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
     assert(self->vbus != nullptr);
 
     // NOTE: initialize ppu to known state
-    self->oamaddr = self->spr.soama = 0;
+    self->oamaddr = 0x0;
     self->signal.rst = self->signal.rw = self->signal.rd = self->signal.wr = true;
-    self->signal.vout = self->bflt = self->spr.fill = self->spr.done = false;
+    self->signal.vout = self->bflt = false;
 
     /*
      * According to https://www.nesdev.org/wiki/PPU_power_up_state, the vblank

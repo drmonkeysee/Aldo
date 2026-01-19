@@ -22,7 +22,7 @@ struct timespec aldo_elapsed(const struct timespec *from)
     elapsed = (struct timespec){.tv_sec = now.tv_sec - from->tv_sec};
 
     if (from->tv_nsec > now.tv_nsec) {
-        // NOTE: subtract with borrow
+        // subtract with borrow
         --elapsed.tv_sec;
         elapsed.tv_nsec = AldoNsPerS - (from->tv_nsec - now.tv_nsec);
     } else {

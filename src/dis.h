@@ -59,7 +59,7 @@ extern const int Aldo_MinChrScale, Aldo_MaxChrScale;
 aldo_export
 const char *aldo_dis_errstr(int err) aldo_nothrow;
 
-// NOTE: parsed will be zeroed-out if return value is <= 0
+// parsed will be zeroed-out if return value is <= 0
 aldo_export aldo_checkerr
 int aldo_dis_parse_inst(const struct aldo_blockview *bv, size_t at,
                         struct aldo_dis_instruction *parsed) aldo_nothrow;
@@ -67,7 +67,7 @@ aldo_export aldo_checkerr
 int aldo_dis_parsemem_inst(size_t size, const uint8_t mem[aldo_naz(size)],
                            size_t at,
                            struct aldo_dis_instruction *parsed) aldo_nothrow;
-// NOTE: functions w/buffer params leave buffer untouched when returning <= 0
+// functions w/buffer params leave buffer untouched when returning <= 0
 aldo_export aldo_checkerr
 int aldo_dis_inst(uint16_t addr, const struct aldo_dis_instruction *inst,
                   char dis[aldo_nacz(AldoDisInstSize)]) aldo_nothrow;

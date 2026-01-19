@@ -179,7 +179,7 @@ final class BlockCache<T> {
 }
 
 fileprivate final class CartHandle {
-    // NOTE: init won't let a live instance ever have a nil reference
+    // init won't let a live instance ever have a nil reference
     var unwrapped: OpaquePointer { cartRef! }
 
     var cartFormat: CartFormat {

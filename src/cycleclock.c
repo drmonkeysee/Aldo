@@ -32,7 +32,7 @@ void aldo_clock_tickstart(struct aldo_clock *self, bool reset_budget)
 
     self->emutime += self->ticktime_ms / ALDO_MS_PER_S;
     self->timebudget_ms += self->ticktime_ms;
-    // NOTE: accumulate at most a second of banked cycle time
+    // accumulate at most a second of banked cycle time
     if (self->timebudget_ms >= ALDO_MS_PER_S) {
         self->timebudget_ms = ALDO_MS_PER_S;
     }

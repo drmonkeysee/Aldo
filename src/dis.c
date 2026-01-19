@@ -159,7 +159,7 @@ static int print_instruction(const struct aldo_dis_instruction *inst,
     auto operand = print_operand(inst, dis + operation);
     if (operand < 0) return ALDO_DIS_ERR_FMT;
     if (operand == 0) {
-        // NOTE: no operand to print, trim the trailing space
+        // no operand to print, trim the trailing space
         dis[--operation] = '\0';
     }
     return operation + operand;
@@ -177,7 +177,7 @@ static int print_prg_line(const char *restrict dis, bool verbose,
     if (verbose && fprintf(f, "%s\n", dis) < 0) goto io_failure;
 
     if (aldo_dis_inst_equal(curr_inst, &repeat->prev_inst)) {
-        // NOTE: only print placeholder on first duplicate seen
+        // only print placeholder on first duplicate seen
         if (!repeat->skip) {
             repeat->skip = true;
             if (fputs("*\n", f) == EOF) goto io_failure;
@@ -204,7 +204,7 @@ static int print_prgblock(const struct aldo_blockview *bv, bool verbose,
     struct repeat_condition repeat = {};
     struct aldo_dis_instruction inst;
     char dis[AldoDisInstSize];
-    // NOTE: by convention, count backwards from CPU vector locations
+    // by convention, count backwards from CPU vector locations
     assert(bv->size <= ALDO_MEMBLOCK_64KB);
     auto addr = (uint16_t)(ALDO_MEMBLOCK_64KB - bv->size);
 
@@ -221,12 +221,12 @@ static int print_prgblock(const struct aldo_blockview *bv, bool verbose,
     if (result < 0) return result;
     if (io_err < 0) return io_err;
 
-    // NOTE: always print the last line even if it would normally be skipped
+    // always print the last line even if it would normally be skipped
     if (repeat.skip && fprintf(f, "%s\n", dis) < 0) return ALDO_DIS_ERR_IO;
     return 0;
 }
 
-// NOTE: hardcode max scale to ~7MB bmp file size
+// hardcode max scale to ~7MB bmp file size
 constexpr auto ScaleGuard = 20;
 
 static int measure_tile_sheet(size_t banksize, uint32_t *restrict dim,
@@ -262,17 +262,17 @@ static int measure_tile_sheet(size_t banksize, uint32_t *restrict dim,
     return 0;
 }
 
-// NOTE: BMP details from:
+// BMP details from:
 // https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-storage
 
-// NOTE: color depth and palette sizes; NES tiles are actually 2 bpp but
+// Color depth and palette sizes; NES tiles are actually 2 bpp but
 // the closest the standard BMP format gets is 4; BMP palette size is also
 // 4, as are the number of colors representable at 2 bpp so conveniently
 // all color constants collapse into one value.
 constexpr uint8_t BmpBitsPerPixel = 4;
 constexpr size_t BmpPaletteSize = BmpBitsPerPixel * BmpBitsPerPixel;
 
-// NOTE: bmp header sizes
+// bmp header sizes
 constexpr size_t BmpFileHeaderSize = 14;
 constexpr size_t BmpInfoHeaderSize = 40;
 constexpr size_t BmpHeaderSize = BmpFileHeaderSize + BmpInfoHeaderSize
@@ -286,7 +286,7 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
 {
     for (uint32_t section = 0; section < tile_sections; ++section) {
         for (uint32_t tilex = 0; tilex < tilesdim; ++tilex) {
-            // NOTE: get the index in tile space first, then calculate the
+            // Get the index in tile space first, then calculate the
             // byte index in CHR space for the given tile's current row.
             size_t
                 tileidx = tilex + (tiley * tilesdim)
@@ -295,12 +295,12 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
             uint8_t
                 plane0 = bv->mem[chr_row],
                 plane1 = bv->mem[chr_row + AldoChrTileDim];
-            // NOTE: 8 2-bit pixels make a single CHR tile row; each 2-bit
+            // 8 2-bit pixels make a single CHR tile row; each 2-bit
             // pixel will be expanded to 4-bits and packed 2 pixels per byte
             // for a 4 bpp BMP.
             auto pixelrow = aldo_byteshuffle(plane0, plane1);
             for (size_t pixelx = 0; pixelx < AldoChrTileDim; ++pixelx) {
-                // NOTE: packedpixel is the pixel in (prescaled) bmp-row space;
+                // packedpixel is the pixel in (prescaled) bmp-row space;
                 // pixelidx is the 2-bit slice of pixelrow that maps to the
                 // packedpixel; BMP layout goes from left-to-right so pixelidx
                 // goes "backwards" from MSBs to LSBs.
@@ -333,11 +333,11 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
         section_pxldim = tilesdim * AldoChrTileDim,
         bmph = section_pxldim * scale,
         bmpw = section_pxldim * tile_sections * scale,
-        // NOTE: 4 bpp equals 8 pixels per 4 bytes; bmp pixel rows must then
+        // 4 bpp equals 8 pixels per 4 bytes; bmp pixel rows must then
         // be padded to the nearest 4-byte boundary.
         packedrow_size = (uint32_t)(ceil(bmpw / 8.0) * 4);
 
-    // NOTE: write BMP header fields; BMP format is little-endian so use
+    // Write BMP header fields; BMP format is little-endian so use
     // byte arrays rather than structs to avoid arch-specific endianness.
     /*
      File Header
@@ -395,7 +395,7 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
         BYTE rgbReserved;
      }[BMP_BITS_PER_PIXEL];
      */
-    // NOTE: no fixed palette for tiles so use grayscale;
+    // No fixed palette for tiles so use grayscale;
     // fun fact, this is the original Gameboy palette.
     static constexpr uint8_t palettes[BmpPaletteSize] = {
         0, 0, 0, 0,         // #000000
@@ -407,7 +407,7 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
     wcount = fwrite(palettes, sizeof palettes[0], witems, bmpfile);
     if (wcount < witems) return ALDO_DIS_ERR_IO;
 
-    // NOTE: BMP pixels are written bottom-row first
+    // BMP pixels are written bottom-row first
     uint8_t *packedrow = calloc(packedrow_size, sizeof *packedrow);
     if (!packedrow) return ALDO_DIS_ERR_ERNO;
 
@@ -539,7 +539,7 @@ int aldo_dis_inst(uint16_t addr, const struct aldo_dis_instruction *inst,
     total = count = print_raw(addr, inst, dis);
     if (count < 0) return count;
 
-    // NOTE: padding between raw bytes and disassembled instruction
+    // padding between raw bytes and disassembled instruction
     count = sprintf(dis + total, "%*s", ((3 - (int)inst->bv.size) * 3) + 1,
                     "");
     if (count < 0) return ALDO_DIS_ERR_FMT;
@@ -568,7 +568,7 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
     if (err < 0) return err;
 
     auto cpu = &snp->cpu;
-    // NOTE: we're in an interrupt state so adjust the instruction to render
+    // We're in an interrupt state so adjust the instruction to render
     // the datapath correctly.
     if (cpu->datapath.opcode == Aldo_BrkOpcode
         && inst.d.instruction != ALDO_IN_BRK) {
@@ -625,7 +625,7 @@ int aldo_dis_cart_prg(aldo_cart *cart, const char *restrict name, bool verbose,
     do {
         if (fputc('\n', f) == EOF) return ALDO_DIS_ERR_IO;
         auto err = print_prgblock(&bv, verbose, f);
-        // NOTE: disassembly errors may occur normally if data bytes are
+        // Disassembly errors may occur normally if data bytes are
         // interpreted as instructions so note the result and continue.
         if (err < 0) {
             err = fprintf(unified_output ? f : stderr,
@@ -654,7 +654,7 @@ int aldo_dis_cart_chr(aldo_cart *cart, int chrscale,
                             : "chr";
     size_t
         prefixlen = strlen(prefix),
-        namesize = prefixlen + 8;   // NOTE: prefix + nnn.bmp + nul
+        namesize = prefixlen + 8;   // prefix + nnn.bmp + nul
     char *bmpfilename = malloc(namesize);
     if (!bmpfilename) return ALDO_DIS_ERR_ERNO;
 
@@ -791,7 +791,7 @@ int aldo_dis_peek(struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
         if (peek.busfault) {
             auto data = strrchr(dis, '=');
             if (data) {
-                // NOTE: verify last '=' leaves enough space for "FLT"
+                // verify last '=' leaves enough space for "FLT"
                 assert(dis + AldoDisPeekSize - data >= 6);
                 strcpy(data + 2, "FLT");
                 ++total;

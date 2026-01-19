@@ -20,7 +20,7 @@ struct aldo_snapshot;
 typedef struct aldo_nes001 aldo_nes;
 
 #include "bridgeopen.h"
-// NOTE: if returns null then errno is set due to failed allocation
+// if returns null then errno is set due to failed allocation
 aldo_export aldo_ownresult
 aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport,
                        FILE *tracelog) aldo_nothrow;
@@ -34,7 +34,7 @@ void aldo_nes_powerdown(aldo_nes *self) aldo_nothrow;
 
 aldo_export
 int aldo_nes_max_tcpu() aldo_nothrow;
-// NOTE: RAM and VRAM are the same size so one accessor for both
+// RAM and VRAM are the same size so one accessor for both
 aldo_export
 size_t aldo_nes_ram_size(aldo_nes *self) aldo_nothrow;
 aldo_export

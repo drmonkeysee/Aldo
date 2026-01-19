@@ -88,20 +88,20 @@ static bool convert_num(const char *restrict arg, int base, long *result)
     return true;
 }
 
-// NOTE: value of number is undefined if return value is false
+// value of number is undefined if return value is false
 static bool parse_number(const char *arg, int *restrict argi, int argc,
                          char *argv[argc+1], int base, long *restrict number)
 {
-    // NOTE: first try -sN format
+    // first try -sN format
     auto result = convert_num(arg + 2, base, number);
-    // NOTE: then try --long-name=N format
+    // then try --long-name=N format
     if (!result && arg[1] == '-') {
         const char *opt = strchr(arg, '=');
         if (opt) {
             result = convert_num(opt + 1, base, number);
         }
     }
-    // NOTE: finally try parsing next argument
+    // finally try parsing next argument
     if (!result) {
         result = ++*argi < argc
                     ? convert_num(argv[*argi], base, number)

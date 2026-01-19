@@ -6,7 +6,7 @@
 //
 
 #ifdef __APPLE__
-// NOTE: Swift 6 calling convention for main UI thread platform calls;
+// Swift 6 calling convention for main UI thread platform calls;
 // [[...]] syntax not supported for swift_attr.
 #define aldo_pcallc __attribute__((swift_attr("@MainActor")))
 #else
@@ -17,7 +17,7 @@
 #define aldo_ownresult [[nodiscard("take ownership")]]
 #define aldo_export [[gnu::visibility("default")]]
 
-// NOTE: open block for c/c++ bridge headers
+// open block for c/c++ bridge headers
 #ifdef __cplusplus
 #define aldo_noalias
 #define aldo_cz(val)

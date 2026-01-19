@@ -5,9 +5,9 @@
 //  Created by Brandon Stansbury on 10/14/22.
 //
 
-// NOTE: close block for c/c++ bridge headers
+// close block for c/c++ bridge headers
 #ifdef __cplusplus
-}   // NOTE: end extern "C"
+}   // end extern "C"
 #endif
 #undef aldo_const
 #undef aldo_nothrow

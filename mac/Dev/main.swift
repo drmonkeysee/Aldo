@@ -7,7 +7,7 @@
 
 import Foundation
 
-// NOTE: dev target used for IDE editor support
+// dev target used for IDE editor support
 
 print("Aldo Dev started...")
 let result = cli_run(CommandLine.argc, CommandLine.unsafeArgv)

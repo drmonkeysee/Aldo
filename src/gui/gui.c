@@ -22,7 +22,7 @@
 
 static int run_emu(const struct gui_platform *platform)
 {
-    // NOTE: create initial debugger and console objects before launching
+    // Create initial debugger and console objects before launching
     // UI loop cuz if we can't get this far then bail immediately.
     auto dbg = aldo_debug_new();
     if (!dbg) {
@@ -43,8 +43,7 @@ static int run_emu(const struct gui_platform *platform)
     aldo_nes_powerup(console, nullptr, false);
 
     auto err = ui_sdl_runloop(platform, dbg, console);
-    // NOTE: ui loop takes ownership of these two,
-    // even in the event of UI init failure.
+    // ui loop takes ownership of these two, even in the event of UI init failure
     console = nullptr;
     dbg = nullptr;
     if (err < 0) {

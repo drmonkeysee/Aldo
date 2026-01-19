@@ -27,7 +27,7 @@ size_t aldo_bytecopy_bank(const uint8_t *restrict bankmem, int bankwidth,
 
     size_t
         banksize = 1 << bankwidth,
-        // NOTE: addr -> start is always mask(banksize - 1)
+        // addr -> start is always mask(banksize - 1)
         // iff banksize is a power of 2
         start = addr & (banksize - 1);
     auto bytesleft = (ptrdiff_t)(banksize - start);

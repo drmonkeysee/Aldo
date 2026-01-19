@@ -168,7 +168,7 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
     switch (cs.cmd) {
     case aldo::Command::breakpointAdd:
         if (!breakpoints.append(std::get<aldo_haltexpr>(cs.value))) {
-            // NOTE: breakpoint append can fail to allocate new memory
+            // breakpoint append can fail to allocate new memory
             breakpoint_add_failed();
         }
         break;

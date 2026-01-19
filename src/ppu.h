@@ -57,7 +57,7 @@ struct aldo_rp2c02 {
             s: 1,           // (6) Sprite 0 Hit
             v: 1;           // (7) VBlank
     } status;               // PPUSTATUS, read-only
-    // NOTE: OAMDATA, PPUSCROLL, PPUADDR, and PPUDATA are ports to internal
+    // OAMDATA, PPUSCROLL, PPUADDR, and PPUDATA are ports to internal
     // components like OAM, t, and x, so are not modeled as storage locations.
     uint8_t oamaddr;        // OAMADDR: OAM Data Address, write-only
 

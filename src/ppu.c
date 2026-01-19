@@ -14,7 +14,7 @@
 #include <assert.h>
 #include <stddef.h>
 
-// NOTE: a single NTSC frame is 262 scanlines of 341 dots, counting h-blank,
+// A single NTSC frame is 262 scanlines of 341 dots, counting h-blank,
 // v-blank, overscan, etc; nominally 1 frame is 262 * 341 = 89342 ppu cycles;
 // however with rendering enabled the odd frames skip a dot for an overall
 // average cycle count of 89341.5 per frame.
@@ -30,7 +30,7 @@ constexpr auto DotPxEnd = 260;
 constexpr auto DotTilePrefetch = 321;
 constexpr auto DotTilePrefetchEnd = 337;
 
-// NOTE: helpers for manipulating v and t registers
+// helpers for manipulating v and t registers
 constexpr uint16_t BaseNtAddr = ALDO_MEMBLOCK_8KB;
 constexpr uint16_t HNtBit = ALDO_MEMBLOCK_1KB;
 constexpr uint16_t VNtBit = ALDO_MEMBLOCK_2KB;
@@ -54,7 +54,7 @@ static uint8_t get_ctrl(const struct aldo_rp2c02 *self)
          | self->ctrl.s << 3
          | self->ctrl.b << 4
          | self->ctrl.h << 5
-         // NOTE: skip P
+         // skip P
          | self->ctrl.v << 7);
 }
 
@@ -66,7 +66,7 @@ static void set_ctrl(struct aldo_rp2c02 *self, uint8_t v)
     self->ctrl.s = v & 0x8;
     self->ctrl.b = v & 0x10;
     self->ctrl.h = v & 0x20;
-    // NOTE: P is always grounded
+    // P is always grounded
     self->ctrl.v = v & 0x80;
 }
 
@@ -107,7 +107,7 @@ static void set_status(struct aldo_rp2c02 *self, uint8_t v)
     self->status.v = v & 0x80;
 }
 
-// NOTE: address bus is 14 bits wide
+// address bus is 14 bits wide
 static uint16_t maskaddr(uint16_t addr)
 {
     return addr & ALDO_ADDRMASK_16KB;
@@ -120,7 +120,7 @@ static bool rendering_disabled(const struct aldo_rp2c02 *self)
 
 static bool tile_rendering(const struct aldo_rp2c02 *self)
 {
-    // NOTE: 0 is not checked as vram_render already handles this
+    // 0 is not checked as vram_render already handles this
     return self->dot < DotHBlank
             || (DotTilePrefetch <= self->dot && self->dot < DotTilePrefetchEnd);
 }
@@ -130,7 +130,7 @@ static bool sprite_fetch(const struct aldo_rp2c02 *self)
     return DotHBlank <= self->dot && self->dot < DotTilePrefetch;
 }
 
-// NOTE: in_visible_frame and in_postrender can both be false:
+// in_visible_frame and in_postrender can both be false:
 // specifically during the pre-render line; this distinction matters for sprite
 // vs tile evaluation, where tiles are evaluated in pre-render but sprites are not.
 static bool in_visible_frame(const struct aldo_rp2c02 *self)
@@ -156,7 +156,7 @@ static bool in_vblank(const struct aldo_rp2c02 *self)
 
 static uint8_t oam_read(const struct aldo_rp2c02 *self)
 {
-    // NOTE: during secondary oam clear, OAMDATA always returns 0xff
+    // during secondary oam clear, OAMDATA always returns 0xff
     if (0 < self->dot && self->dot < DotSpriteEvaluation
         && in_visible_frame(self)) return 0xff;
 
@@ -194,7 +194,7 @@ static void sprite_reset(struct aldo_rp2c02 *self)
     assert(assert_cleared_soam(self));
 }
 
-// NOTE: runs on lines 0-239; dots 1-256
+// runs on lines 0-239; dots 1-256
 static void sprite_evaluation(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
@@ -217,7 +217,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
     switch (sprites->s) {
     case ALDO_PPU_SPR_SCAN:
         {
-            // evaluate sprites for the current scanline; sprites are not
+            // Evaluate sprites for the current scanline; sprites are not
             // drawn until the next scanline, leading to a +1 y-offset of the
             // actual on-screen position.
             soam_write(self);
@@ -269,15 +269,15 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
 
 static bool palette_addr(uint16_t addr)
 {
-    // NOTE: addr=[$3F00-$3FFF]
+    // addr=[$3F00-$3FFF]
     return Aldo_PaletteStartAddr <= addr && addr < ALDO_MEMBLOCK_16KB;
 }
 
 static uint16_t mask_palette(uint16_t addr)
 {
-    // NOTE: 32 addressable bytes, including mirrors
+    // 32 addressable bytes, including mirrors
     addr &= PaletteMask;
-    // NOTE: background has 16 allocated slots while sprites have 12, making
+    // Background has 16 allocated slots while sprites have 12, making
     // palette RAM only 28 bytes long; if the address points at a mirrored slot
     // then mask it down to the actual slots in the lower 16, otherwise adjust
     // the palette address down to the "real" sprite slot, accounting for the
@@ -286,7 +286,7 @@ static uint16_t mask_palette(uint16_t addr)
         if ((addr & 0x3) == 0) {
             addr &= 0xf;
         } else {
-            // NOTE: 0x1-0x3 adjust down 1, 0x5-0x7 adjust down 2, etc...
+            // 0x1-0x3 adjust down 1, 0x5-0x7 adjust down 2, etc...
             addr -= (uint16_t)(((addr & 0xc) >> 2) + 1);
         }
     }
@@ -295,18 +295,18 @@ static uint16_t mask_palette(uint16_t addr)
 
 static uint8_t palette_read(const struct aldo_rp2c02 *self, uint16_t addr)
 {
-    // NOTE: addr=[$3F00-$3FFF]
+    // addr=[$3F00-$3FFF]
     assert(palette_addr(addr));
 
     auto pal = self->palette[mask_palette(addr)];
-    // NOTE: palette values are 6 bits wide, grayscale additionally masks down
+    // Palette values are 6 bits wide, grayscale additionally masks down
     // to lowest palette column.
     return pal & (self->mask.g ? 0x30 : 0x3f);
 }
 
 static void palette_write(struct aldo_rp2c02 *self, uint16_t addr, uint8_t d)
 {
-    // NOTE: addr=[$3F00-$3FFF]
+    // addr=[$3F00-$3FFF]
     assert(palette_addr(addr));
 
     self->palette[mask_palette(addr)] = d;
@@ -320,7 +320,7 @@ static void snapshot_palette(const struct aldo_rp2c02 *self,
     for (size_t i = 0; i < AldoPalSize; ++i) {
         auto p = palsnp[i];
         uint16_t addr = base + (uint16_t)(AldoPalSize * i);
-        // NOTE: 1st color is always the backdrop
+        // 1st color is always the backdrop
         p[0] = palette_read(self, base);
         p[1] = palette_read(self, addr + 1);
         p[2] = palette_read(self, addr + 2);
@@ -334,7 +334,7 @@ static void snapshot_palette(const struct aldo_rp2c02 *self,
 
 static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
-    // NOTE: addr=[$2000-$3FFF]
+    // addr=[$2000-$3FFF]
     assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
 
     struct aldo_rp2c02 *ppu = ctx;
@@ -342,7 +342,7 @@ static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
     ppu->regsel = addr & 0x7;
     switch (ppu->regsel) {
     case 2: // PPUSTATUS
-        // NOTE: NMI race condition; if status is read just before NMI is
+        // NMI race condition; if status is read just before NMI is
         // fired, then vblank is cleared but returns false and NMI is missed.
         if (ppu->line == LineVBlank && ppu->dot == 1) {
             ppu->status.v = false;
@@ -369,7 +369,7 @@ static bool regread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 
 static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
 {
-    // NOTE: addr=[$2000-$3FFF]
+    // addr=[$2000-$3FFF]
     assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
 
     struct aldo_rp2c02 *ppu = ctx;
@@ -380,10 +380,10 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
     case 0: // PPUCTRL
         if (ppu->rst != ALDO_SIG_SERVICED) {
             set_ctrl(ppu, ppu->regbus);
-            // NOTE: set nametable-select
+            // set nametable-select
             ppu->t = (uint16_t)((ppu->t & ~NtBits) | ppu->ctrl.nh << 11
                                 | ppu->ctrl.nl << 10);
-            // NOTE: there is a dot 257 race condition with horizontal
+            // there is a dot 257 race condition with horizontal
             // nametable selection that is not modelled (see note below):
             // https://www.nesdev.org/wiki/PPU_registers#Bit_0_race_condition
         }
@@ -395,7 +395,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
         break;
     case 3: // OAMADDR
         ppu->oamaddr = ppu->regbus;
-        // NOTE: there is OAM corruption that is not modelled (see note below):
+        // there is OAM corruption that is not modelled (see note below):
         // https://www.nesdev.org/wiki/PPU_registers#OAMADDR_precautions
         break;
     case 4: // OAMDATA
@@ -403,7 +403,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
         if (in_postrender(ppu) || rendering_disabled(ppu)) {
             ppu->spr.oam[ppu->oamaddr++] = ppu->regbus;
         } else {
-            // NOTE: during rendering, writing to OAMDATA does not change OAM
+            // During rendering, writing to OAMDATA does not change OAM
             // but it does increment oamaddr by one object attribute (4-bytes),
             // corrupting sprite evaluation.
             sprite_skip(ppu);
@@ -414,12 +414,12 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
             static constexpr uint8_t course = 0xf8;
             static constexpr uint8_t fine = 0x7;
             if (ppu->w) {
-                // NOTE: set course and fine y
+                // set course and fine y
                 ppu->t = (uint16_t)((ppu->t & ~(FineYBits | CourseYBits))
                                     | (ppu->regbus & fine) << 12
                                     | (ppu->regbus & course) << 2);
             } else {
-                // NOTE: set course and fine x
+                // set course and fine x
                 ppu->t = (uint16_t)((ppu->t & ~CourseXBits)
                                     | (ppu->regbus & course) >> 3);
                 ppu->x = ppu->regbus & fine;
@@ -436,7 +436,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
                 ppu->t = aldo_bytowr((uint8_t)ppu->t, ppu->regbus & 0x3f);
             }
             ppu->w = !ppu->w;
-            // NOTE: there is palette corruption as well as bus conflicts
+            // there is palette corruption as well as bus conflicts
             // affecting scroll-position that is not modelled (see note below):
             // https://www.nesdev.org/wiki/PPU_registers#Palette_corruption
         }
@@ -474,7 +474,7 @@ static void addrbus(struct aldo_rp2c02 *self, uint16_t addr)
 
 static void read(struct aldo_rp2c02 *self)
 {
-    // NOTE: addr=[$0000-$3FFF]
+    // addr=[$0000-$3FFF]
     assert(self->vaddrbus < ALDO_MEMBLOCK_16KB);
 
     self->signal.ale = self->signal.rd = false;
@@ -483,7 +483,7 @@ static void read(struct aldo_rp2c02 *self)
 
 static void write(struct aldo_rp2c02 *self)
 {
-    // NOTE: addr=[$0000-$3FFF]
+    // addr=[$0000-$3FFF]
     assert(self->vaddrbus < ALDO_MEMBLOCK_16KB);
 
     self->signal.ale = false;
@@ -594,7 +594,7 @@ static void latch_pattern(uint16_t *latch, uint8_t val)
  * 4th, or 6th bits as the low-bit, the high-bit is the neighboring odd-bit.
  */
 
-// NOTE: tile x-increment happens one dot before the new tile is latched into
+// Tile x-increment happens one dot before the new tile is latched into
 // the shift registers, so we need to determine the attribute byte quadrant
 // before the increment and remember it for the subsequent latch dot; otherwise
 // some of the tile attributes for the 4x4 metatile will be paired off with the
@@ -624,12 +624,12 @@ static void mux_bg(struct aldo_rp2c02 *self)
     static constexpr auto left_mask_end = DotPxStart + 8;
 
     auto pxpl = &self->pxpl;
-    // NOTE: fine-x selects bit from the left: 0 = 7th bit, 7 = 0th bit
+    // fine-x selects bit from the left: 0 = 7th bit, 7 = 0th bit
     auto abit = 7 - self->x;
     pxpl->mux = (uint8_t)((aldo_getbit(pxpl->ats[1], abit) << 3)
                           | (aldo_getbit(pxpl->ats[0], abit) << 2));
     if (self->mask.b && (self->mask.bm || self->dot >= left_mask_end)) {
-        // NOTE: tile selection is from the left-most (upper) byte
+        // tile selection is from the left-most (upper) byte
         auto tbit = abit + 8;
         pxpl->mux |= (uint8_t)((aldo_getbit(pxpl->bgs[1], tbit) << 1)
                                | aldo_getbit(pxpl->bgs[0], tbit));
@@ -648,14 +648,14 @@ static void resolve_palette(struct aldo_rp2c02 *self)
 {
     auto pxpl = &self->pxpl;
     if (rendering_disabled(self)) {
-        // NOTE: if v is pointing into palette memory then render that color
+        // if v is pointing into palette memory then render that color
         if (palette_addr(self->v)) {
             pxpl->pal = (uint8_t)(self->v & PaletteMask);
         } else {
             pxpl->pal = 0x0;
         }
     } else if ((pxpl->mux & 0x3) == 0) {
-        // NOTE: transparent pixels fall through to backdrop color
+        // transparent pixels fall through to backdrop color
         pxpl->pal = 0x0;
     } else {
         pxpl->pal = pxpl->mux;
@@ -707,7 +707,7 @@ static void read_nt(struct aldo_rp2c02 *self)
 
 static void incr_course_x(struct aldo_rp2c02 *self)
 {
-    // NOTE: wraparound at x = 32, overflow to horizontal nametable bit
+    // wraparound at x = 32, overflow to horizontal nametable bit
     if ((self->v & CourseXBits) == CourseXBits) {
         self->v &= (uint16_t)~CourseXBits;
         self->v ^= HNtBit;
@@ -721,7 +721,7 @@ static void incr_y(struct aldo_rp2c02 *self)
     static constexpr uint16_t max_course_y = 29 << 5;
     static constexpr uint16_t overflow_y = 31 << 5;
 
-    // NOTE: fine-y wraparound at y = 7, overflow into course-y;
+    // fine-y wraparound at y = 7, overflow into course-y;
     // course-y wraparound at y = 29, overflow into vertical nametable bit;
     // if course-y > 29, then wraparound occurs at 31 without nametable
     // overflow; some games use this as a "negative" y-offset.
@@ -750,10 +750,10 @@ static void increment_tile(struct aldo_rp2c02 *self, bool force_y)
     }
 }
 
-// NOTE: based on PPU diagram: https://www.nesdev.org/wiki/PPU_rendering
+// based on PPU diagram: https://www.nesdev.org/wiki/PPU_rendering
 static void pixel_pipeline(struct aldo_rp2c02 *self)
 {
-    // NOTE: assume there is no video signal until we actually output a pixel
+    // assume there is no video signal until we actually output a pixel
     self->signal.vout = false;
 
     if (in_postrender(self)) return;
@@ -771,11 +771,11 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
         shift_tiles(self);
         // TODO: shift sprites
     } else if (self->dot == 329) {
-        // NOTE: prefetch likely runs the same hardware steps as normal pixel
+        // Prefetch likely runs the same hardware steps as normal pixel
         // selection, but since there are no side-effects outside of the pixel
         // pipeline it's easier to load the tiles at once.
         latch_tile(self);
-        // NOTE: shift the first tile that occurs during dots 329-337
+        // shift the first tile that occurs during dots 329-337
         auto pxpl = &self->pxpl;
         pxpl->bgs[0] <<= 8;
         pxpl->ats[0] = -pxpl->atl[0];
@@ -786,7 +786,7 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
     }
 }
 
-// NOTE: runs on lines 0-239, 261; dots 1-256, 321-336
+// runs on lines 0-239, 261; dots 1-256, 321-336
 static void tile_read(struct aldo_rp2c02 *self)
 {
     switch (self->dot % 8) {
@@ -844,16 +844,16 @@ static void tile_read(struct aldo_rp2c02 *self)
     }
 }
 
-// NOTE: runs on lines 0-239, 261; dots 257-320
+// runs on lines 0-239, 261; dots 257-320
 static void sprite_read(struct aldo_rp2c02 *self)
 {
-    // NOTE: copy t course-y, fine-y, and vertical nametable to v
+    // copy t course-y, fine-y, and vertical nametable to v
     if (self->line == LinePreRender && 280 <= self->dot && self->dot < 305) {
         static constexpr uint16_t vert_bits = FineYBits | VNtBit | CourseYBits;
         self->v = (uint16_t)((self->v & ~vert_bits) | (self->t & vert_bits));
     }
 
-    // NOTE: OAMADDR is cleared on every sprite-loading dot
+    // OAMADDR is cleared on every sprite-loading dot
     self->oamaddr = 0x0;
 
     switch (self->dot % 8) {
@@ -862,7 +862,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
         addrbus(self, nametable_addr(self));
         if (self->dot == DotHBlank) {
             static constexpr uint16_t horiz_bits = HNtBit | CourseXBits;
-            // NOTE: copy t course-x and horizontal nametable to v
+            // copy t course-x and horizontal nametable to v
             self->v = (uint16_t)((self->v & ~horiz_bits) | (self->t & horiz_bits));
         }
         break;
@@ -876,7 +876,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
         // TODO: load sprite attribute
         break;
     case 4:
-        // ignored NT data; a normal memory cycle still executes but
+        // Ignored NT data; a normal memory cycle still executes but
         // the nt register is not updated.
         read(self);
         // TODO: load sprite x
@@ -905,7 +905,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
 
 static bool nextdot(struct aldo_rp2c02 *self)
 {
-    // NOTE: skip the last dot on odd frames if rendering is enabled
+    // skip the last dot on odd frames if rendering is enabled
     if (self->line == LinePreRender && self->dot == Dots - 2 && self->odd
         && !rendering_disabled(self)) {
         ++self->dot;
@@ -923,7 +923,7 @@ static bool nextdot(struct aldo_rp2c02 *self)
 
 static void reset_internals(struct aldo_rp2c02 *self)
 {
-    // NOTE: t is cleared but NOT v
+    // t is cleared but NOT v
     self->dot = self->line = self->t = self->rbuf = self->x = 0;
     self->signal.intr = true;
     self->signal.ale = self->cvp = self->odd = self->w = false;
@@ -937,11 +937,11 @@ static void reset(struct aldo_rp2c02 *self)
     self->rst = ALDO_SIG_SERVICED;
 }
 
-// NOTE: this follows the same steps as CPU reset sequence and has the same
+// This follows the same steps as CPU reset sequence and has the same
 // halting effect while rst line is held low, to keep the chips in sync.
 static bool reset_held(struct aldo_rp2c02 *self)
 {
-    // NOTE: pending always proceeds to committed just like the CPU sequence
+    // pending always proceeds to committed just like the CPU sequence
     if (self->rst == ALDO_SIG_PENDING) {
         self->rst = ALDO_SIG_COMMITTED;
     }
@@ -967,7 +967,7 @@ static bool reset_held(struct aldo_rp2c02 *self)
             self->rst = ALDO_SIG_PENDING;
             break;
         case ALDO_SIG_COMMITTED:
-            // NOTE: halt PPU execution as long as reset is held
+            // halt PPU execution as long as reset is held
             return true;
         default:
             break;
@@ -979,12 +979,12 @@ static bool reset_held(struct aldo_rp2c02 *self)
 static void vblank(struct aldo_rp2c02 *self)
 {
     if (self->line == LineVBlank && self->dot == 0) {
-        // NOTE: set vblank status 1 dot early to account for race-condition
+        // Set vblank status 1 dot early to account for race-condition
         // that will suppress NMI if status.v is read (and cleared) right
         // before NMI is signaled on 241,1.
         self->status.v = true;
     } else if (in_vblank(self)) {
-        // NOTE: NMI active within vblank if ctrl.v and status.v are set
+        // NMI active within vblank if ctrl.v and status.v are set
         self->signal.intr = !self->ctrl.v || !self->status.v;
     } else if (self->line == LinePreRender && self->dot == 1) {
         self->signal.intr = true;
@@ -1005,7 +1005,7 @@ static void ppudata_rw(struct aldo_rp2c02 *self)
             write(self);
         }
         self->cvp = false;
-        self->v += (uint16_t)(1 << (self->ctrl.i * 5)); // NOTE: 1 or 32
+        self->v += (uint16_t)(1 << (self->ctrl.i * 5)); // 1 or 32
     } else {
         addrbus(self, self->v);
     }
@@ -1039,14 +1039,14 @@ static void ppudata_rw_rendering(struct aldo_rp2c02 *self)
     increment_tile(self, true);
 }
 
-// NOTE: runs on lines 0-239, 261
+// runs on lines 0-239, 261
 static void vram_render(struct aldo_rp2c02 *self)
 {
     if (self->dot == 0) {
         if (self->line == 0 && !self->odd) {
             read_nt(self);
         } else {
-            // NOTE: BG low addr is put on bus but address latch is not
+            // BG low addr is put on bus but address latch is not
             // signaled.
             self->vaddrbus = maskaddr(pattern_addr(self, self->ctrl.b, 0));
         }
@@ -1055,7 +1055,7 @@ static void vram_render(struct aldo_rp2c02 *self)
     } else if (sprite_fetch(self)) {
         sprite_read(self);
     } else {
-        // NOTE: Unused NT fetches at end of each scanline
+        // Unused NT fetches at end of each scanline
         assert(DotTilePrefetchEnd <= self->dot && self->dot < Dots);
         if (self->dot % 2 == 1) {
             addrbus(self, nametable_addr(self));
@@ -1077,7 +1077,7 @@ static void vram_pipeline(struct aldo_rp2c02 *self)
 
 static bool cycle(struct aldo_rp2c02 *self)
 {
-    // NOTE: clear any databus signals from previous cycle; unlike the CPU,
+    // Clear any databus signals from previous cycle; unlike the CPU,
     // the PPU does not read/write on every cycle so these lines must be
     // managed explicitly.
     self->signal.rd = self->signal.wr = true;
@@ -1086,7 +1086,7 @@ static bool cycle(struct aldo_rp2c02 *self)
     pixel_pipeline(self);
     vram_pipeline(self);
 
-    // NOTE: dot advancement happens last, leaving PPU on next dot to be drawn;
+    // Dot advancement happens last, leaving PPU on next dot to be drawn;
     // analogous to stack pointer always pointing at next byte to be written.
     return nextdot(self);
 }
@@ -1116,7 +1116,7 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
     assert(self != nullptr);
     assert(self->vbus != nullptr);
 
-    // NOTE: initialize ppu to known state
+    // initialize ppu to known state
     self->oamaddr = 0x0;
     self->signal.rst = self->signal.rw = self->signal.rd = self->signal.wr = true;
     self->signal.vout = self->bflt = false;
@@ -1145,7 +1145,7 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
 
     reset_internals(self);
 
-    // NOTE: simulate rst set on startup to engage reset sequence
+    // simulate rst set on startup to engage reset sequence
     self->rst = ALDO_SIG_PENDING;
 }
 
@@ -1261,7 +1261,7 @@ struct aldo_ppu_coord aldo_ppu_screendot(const struct aldo_rp2c02 *self)
 
     if (!self->signal.vout) return (struct aldo_ppu_coord){-1, -1};
 
-    // NOTE: dot will be +1 past the most recent pixel output cycle
+    // dot will be +1 past the most recent pixel output cycle
     assert(dot_pxout < self->dot && self->dot <= DotPxEnd);
     assert(self->line < LinePostRender);
 

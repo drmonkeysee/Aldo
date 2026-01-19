@@ -27,7 +27,7 @@ static struct partition *find(struct aldo_hardwarebus *self, uint16_t addr)
     for (size_t i = self->count - 1; i > 0; --i) {
         if (addr >= self->partitions[i].start) return self->partitions + i;
     }
-    // NOTE: return the first partition if we got this far
+    // return the first partition if we got this far
     return self->partitions;
 }
 

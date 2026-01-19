@@ -29,7 +29,7 @@ static int detect_format(struct aldo_cartridge *self, FILE *f)
         *const restrict nesmagic = "NES\x1a",
         *const restrict nsfmagic = "NESM\x1a";
 
-    // NOTE: grab first 8 bytes as a string to check file format
+    // grab first 8 bytes as a string to check file format
     char format[9];
 
     if (!fgets(format, sizeof format, f)) {
@@ -41,7 +41,7 @@ static int detect_format(struct aldo_cartridge *self, FILE *f)
     if (strncmp(nsfmagic, format, strlen(nsfmagic)) == 0) {
         self->info.format = ALDO_CRTF_NSF;
     } else if (strncmp(nesmagic, format, strlen(nesmagic)) == 0) {
-        // NOTE: NES 2.0 byte 7 matches pattern 0bxxxx10xx
+        // NES 2.0 byte 7 matches pattern 0bxxxx10xx
         self->info.format = ((unsigned char)format[7] & 0xc) == 0x8
                                 ? ALDO_CRTF_NES20
                                 : ALDO_CRTF_INES;
@@ -49,7 +49,7 @@ static int detect_format(struct aldo_cartridge *self, FILE *f)
         self->info.format = ALDO_CRTF_RAW;
     }
 
-    // NOTE: reset back to beginning of file to fully parse detected format
+    // reset back to beginning of file to fully parse detected format
     return fseek(f, 0, SEEK_SET) == 0 ? 0 : ALDO_CART_ERR_IO;
 }
 
@@ -63,7 +63,7 @@ static int parse_ines(struct aldo_cartridge *self, FILE *f)
         return ALDO_CART_ERR_UNKNOWN;
     }
 
-    // NOTE: if last 4 bytes of header aren't 0 this is a very old format
+    // if last 4 bytes of header aren't 0 this is a very old format
     uint32_t tail;
     memcpy(&tail, header + 12, sizeof tail);
     if (tail != 0) return ALDO_CART_ERR_OBSOLETE;
@@ -73,7 +73,7 @@ static int parse_ines(struct aldo_cartridge *self, FILE *f)
     info->ines_hdr.chr_blocks = header[5];
     info->ines_hdr.wram = header[6] & 0x2;
 
-    // NOTE: mapper may override these two fields
+    // mapper may override these two fields
     info->ines_hdr.mirror = header[6] & 0x8
                                 ? ALDO_NTM_4SCREEN
                                 : (header[6] & 0x1
@@ -94,12 +94,12 @@ static int parse_ines(struct aldo_cartridge *self, FILE *f)
     return err;
 }
 
-// NOTE: a raw ROM image is just a stream of bytes and has no identifying
+// A raw ROM image is just a stream of bytes and has no identifying
 // header; if format cannot be determined, this is the default.
 static int parse_raw(struct aldo_cartridge *self, FILE *f)
 {
     auto err = aldo_mapper_raw_create(&self->mapper, f);
-    // NOTE: ROM file is too big for prg address space (no bank-switching)
+    // ROM file is too big for prg address space (no bank-switching)
     if (err == 0 && !(fgetc(f) == EOF && feof(f))) {
         err = ALDO_CART_ERR_IMG_SIZE;
     }

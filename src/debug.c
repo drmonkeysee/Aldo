@@ -152,7 +152,7 @@ static struct aldo_breakpoint *bpvector_at(const struct breakpoint_vector *vec,
 
 static bool bpvector_resize(struct breakpoint_vector *vec)
 {
-    // NOTE: growth factor K = 1.5
+    // growth factor K = 1.5
     vec->capacity += vec->capacity / 2;
     struct aldo_breakpoint *bpv = realloc(vec->items,
                                           vec->capacity * sizeof *vec->items);
@@ -324,7 +324,7 @@ void aldo_debug_bp_remove(aldo_debugger *self, ptrdiff_t at)
 
     if (!bpvector_remove(&self->breakpoints, at)) return;
 
-    // NOTE: if we removed the currently halted breakpoint we need to clear
+    // If we removed the currently halted breakpoint we need to clear
     // the halt flag; if we removed a breakpoint before the currently halted
     // breakpoint we need to adjust the flag back one.
     if (self->halted == at) {

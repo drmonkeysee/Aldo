@@ -34,7 +34,7 @@ struct CopyToClipboardView: TimedFeedbackCommandView {
         }
         .alert("Clipboard Copy Failure", isPresented: $command.failed,
                presenting: command.currentError) { _ in
-            // NOTE: default action
+            // default action
         } message: {
             Text($0.message)
         }
@@ -74,7 +74,7 @@ struct ChrExportView: TimedFeedbackCommandView {
         }
         .alert("CHR Export Failure", isPresented: $command.failed,
                presenting: command.currentError) { _ in
-            // NOTE: default action
+            // default action
         } message: {
             Text($0.message)
         }

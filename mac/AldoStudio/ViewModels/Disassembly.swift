@@ -194,7 +194,7 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
     init?(_ prgblock: aldo_blockview?) {
         guard let prgblock, prgblock.size > 0 else { return nil }
         bv = prgblock
-        // NOTE: by convention, count backwards from CPU vector locations
+        // by convention, count backwards from CPU vector locations
         addr = .init(ALDO_MEMBLOCK_64KB - bv.size)
     }
 
@@ -216,10 +216,10 @@ fileprivate struct PrgLines: Sequence, IteratorProtocol {
             return .failure(addr, .wrapDisError(code: err))
         } else if err == 0 {
             done = true
-            // NOTE: always print the last line even if it would
+            // Always print the last line even if it would
             // normally be skipped.
             if skip {
-                // NOTE: back up address to the last line
+                // back up address to the last line
                 addr &-= .init(prevInstruction.bv.size)
                 return .disassembled(addr, .parse(prevInstruction))
             }

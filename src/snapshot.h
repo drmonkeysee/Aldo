@@ -15,7 +15,7 @@
 
 #include "bridgeopen.h"
 aldo_const size_t AldoPalSize = 4;
-// NOTE: CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is a
+// CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is a
 // 16-byte array of 2-bit palette-indexed pixels composed of two bit-planes
 // where the first plane specifies the pixel low bit and the second plane
 // specifies the pixel high bit.
@@ -70,7 +70,7 @@ struct aldo_snapshot {
             *palette;
     } mem;
 
-    // NOTE: large fields below this point are managed via setup/cleanup to
+    // Large fields below this point are managed via setup/cleanup to
     // avoid ending up on the stack.
     struct {
         uint8_t vectors[6];
@@ -109,7 +109,7 @@ struct aldo_snapshot {
     } *video;
 };
 
-// NOTE: if returns false then errno is set due to failed allocation
+// if returns false then errno is set due to failed allocation
 aldo_export aldo_checkerr
 bool aldo_snapshot_extend(struct aldo_snapshot *snp) aldo_nothrow;
 aldo_export

@@ -90,7 +90,7 @@ fileprivate func openFile(title: CString?, filter: CStringArray?) -> CBuffer? {
     let panel = NSOpenPanel()
     if let title { panel.message = .init(cString: title) }
     let fileFilter = OpenFileFilter(filter)
-    // NOTE: empty filter causes an ugly disable->enable flash of all files in
+    // Empty filter causes an ugly disable->enable flash of all files in
     // the dialog so only assign delegate if there's an actual filter.
     if !fileFilter.isEmpty { panel.delegate = fileFilter }
     guard panel.runModal() == .OK, let path = panel.url else { return nil }

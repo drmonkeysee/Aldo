@@ -42,7 +42,7 @@ static void jmp_indirect(void *ctx)
 
 static void jmp_indirect_pageboundary_bug(void *ctx)
 {
-    // *supposed* to read from $80FF, $8100
+    // *Supposed* to read from $80FF, $8100
     // but actually ignores the carry and reads from $80FF, $8000.
     uint8_t mem[] = {0x6c, 0xff, 0x80};
     struct aldo_mos6502 cpu;

@@ -100,7 +100,7 @@ public:
     {
         that.condition = false;
     }
-    // NOTE: this works because internally ImGui::Disabled is a stack, so the
+    // This works because internally ImGui::Disabled is a stack, so the
     // order of Begin/End pairs doesn't matter as long as the stack is empty
     // at the end of an ImGui window scope.
     DisabledIf& operator=(DisabledIf&& that) noexcept
@@ -852,7 +852,7 @@ private:
         renderControlLine("RDY", lines.ready);
         ImGui::SameLine(0, spacer);
         renderControlLine("SYNC", lines.sync);
-        // NOTE: adjust spacer width for SYNC's extra letter
+        // adjust spacer width for SYNC's extra letter
         ImGui::SameLine(0, spacer - adjustW);
         renderRWLine(lines.readwrite, adjustW);
     }
@@ -1012,7 +1012,7 @@ private:
                 for (auto i = low; i <= high; ++i) {
                     selections.push_back(i);
                 }
-                // NOTE: add current idx last to mark it as the
+                // Add current idx last to mark it as the
                 // most recent selection.
                 selections.push_back(idx);
             }
@@ -1030,14 +1030,14 @@ private:
         }
         void queueRemovals(aldo::viewstate& vs) const
         {
-            // NOTE: queue remove commands in descending order to avoid
+            // Queue remove commands in descending order to avoid
             // invalidating bp indices during removal.
             decltype(selections) sorted(selections.size());
             std::ranges::partial_sort_copy(selections, sorted,
                                            std::ranges::greater{});
             std::unordered_set<bp_diff> removed(sorted.size());
             for (auto idx : sorted) {
-                // NOTE: here's where duplicate selections bite us
+                // here's where duplicate selections bite us
                 if (removed.contains(idx)) continue;
                 vs.commands.emplace(aldo::Command::breakpointRemove, idx);
                 removed.insert(idx);
@@ -1045,7 +1045,7 @@ private:
         }
 
     private:
-        // NOTE: arguably this should be a set but the ordered property of
+        // Arguably this should be a set but the ordered property of
         // vector gives saner multi-select behavior when mixing shift and cmd
         // clicks where the last element can be treated as the most recent
         // selection; duplicates are handled properly with std::erase.
@@ -1058,7 +1058,7 @@ private:
         using halt_selection = halt_option::first_type;
         using halt_integral = std::underlying_type_t<halt_selection>;
 
-        // NOTE: does not include first enum value HLT_NONE
+        // does not include first enum value HLT_NONE
         std::array<halt_option, ALDO_HLT_COUNT - 1> conditions;
         std::ranges::generate(conditions,
             [h = static_cast<halt_integral>(ALDO_HLT_NONE)] mutable noexcept
@@ -1092,7 +1092,7 @@ private:
         }
         DisabledIf dif = [this] noexcept {
             if (this->resetOverride) return false;
-            // NOTE: +2 = start of reset vector
+            // +2 = start of reset vector
             this->resetAddr = aldo_batowr(this->emu.snapshot().prg.vectors
                                           + 2);
             return true;
@@ -1239,7 +1239,7 @@ private:
 
     void syncWithOverrideState() noexcept
     {
-        // NOTE: if view flag doesn't match debugger state then debugger
+        // If view flag doesn't match debugger state then debugger
         // state was changed under the hood (e.g. by loading a brk file).
         // TODO: if another case like this comes up it may be worth coming up
         // with a model -> view notification system.
@@ -1703,7 +1703,7 @@ private:
 
     pal_c applyEmphasis(pal_c color, pal_sz idx) const
     {
-        // NOTE: minimum channel value used for applying emphasis in order to
+        // Minimum channel value used for applying emphasis in order to
         // get a visible tint on colors that would otherwise round down to
         // nearly zero.
         static constexpr auto emFloor = 0x10;
@@ -1720,17 +1720,17 @@ private:
 
     void updateEmphasis() noexcept
     {
-        // NOTE: think of this as a bitmask of emphasis BGR where emphasis set
+        // Think of this as a bitmask of emphasis BGR where emphasis set
         // means no attenuation and emphasis clear means attenuation except
         // 000 and 111 mean the opposite.
         if (emr && emg && emb) {
-            // NOTE: all emphasis attenuates all colors
+            // all emphasis attenuates all colors
             atr = atg = atb = Attenuated;
         } else if (!emr && !emg && !emb) {
-            // NOTE: no emphasis attenuates no colors
+            // no emphasis attenuates no colors
             atr = atg = atb = Full;
         } else {
-            // NOTE: otherwise emphasis applies no attenuation and vice-versa
+            // otherwise emphasis applies no attenuation and vice-versa
             atr = emr ? Full : Attenuated;
             atg = emg ? Full : Attenuated;
             atb = emb ? Full : Attenuated;
@@ -2133,7 +2133,7 @@ protected:
         if (ImGui::BeginTable("ram", Cols, tableConfig, tableSize)) {
             renderHeader();
             ImGuiListClipper clip;
-            // NOTE: account for up to 2 page-break rows per screen
+            // account for up to 2 page-break rows per screen
             clip.Begin(rowCount + 2);
             RamTable tbl{emu, rowCount};
             while(clip.Step()) {
@@ -2175,7 +2175,7 @@ private:
                         ImGui::Dummy({0, ImGui::GetTextLineHeight()});
                     }
                 }
-                // NOTE: since the clipper has some extra padding for the
+                // Since the clipper has some extra padding for the
                 // page-breaks, it's possible row can go past the end of
                 // ram, so guard that here.
                 if (row >= totalRows) break;

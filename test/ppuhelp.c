@@ -53,7 +53,7 @@ void ppu_setup(void **ctx)
         .ctx = VRam,
     });
     aldo_ppu_connect(&c->ppu, c->mbus);
-    // run powerup and reset sequence and then force internal state
+    // Run powerup and reset sequence and then force internal state
     // to a known zero-value.
     aldo_ppu_powerup(&c->ppu);
     aldo_ppu_cycle(&c->ppu);

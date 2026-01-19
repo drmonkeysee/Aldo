@@ -70,7 +70,7 @@ const char *aldo_haltexpr_errstr(int err) aldo_nothrow;
 aldo_export
 const char *aldo_haltcond_description(enum aldo_haltcondition cond) aldo_nothrow;
 
-// NOTE: if returns non-zero error code, *expr is unmodified
+// if returns non-zero error code, *expr is unmodified
 aldo_export aldo_checkerr
 int aldo_haltexpr_parse(const char *aldo_noalias str,
                         struct aldo_haltexpr *expr) aldo_nothrow;

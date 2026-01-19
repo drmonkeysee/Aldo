@@ -1723,7 +1723,7 @@ static void irq_detect_duplicate(void *ctx)
     cpu.presync = true;
     aldo_cpu_cycle(&cpu);
 
-    // if irq is still held active after servicing it'll
+    // If irq is still held active after servicing it'll
     // be detected again.
     ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
 

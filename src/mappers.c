@@ -49,7 +49,7 @@ static int load_blocks(uint8_t *restrict *mem, size_t size, FILE *f)
 // MARK: - Common Implementation
 //
 
-// NOTE: shifting the high-nametable bit (11) right 1 position (10) effectively
+// Shifting the high-nametable bit (11) right 1 position (10) effectively
 // divides the nametable selection in half, folding the two lower nametables
 // into [0x000-0x3FF] and the two upper nametables into [0x400-0x7FF], which is
 // the definition of horizontal mirroring once the 14-bit VRAM address is
@@ -104,7 +104,7 @@ static void fill_pattern_table(size_t tile_count,
 
 static bool raw_prgr(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
-    // NOTE: addr=[$8000-$FFFF]
+    // addr=[$8000-$FFFF]
     assert(addr > ALDO_ADDRMASK_32KB);
 
     mem_load(d, ctx, addr, ALDO_ADDRMASK_32KB);
@@ -114,7 +114,7 @@ static bool raw_prgr(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 static size_t raw_prgc(const void *restrict ctx, uint16_t addr, size_t count,
                        uint8_t dest[restrict count])
 {
-    // NOTE: addr=[$8000-$FFFF]
+    // addr=[$8000-$FFFF]
     assert(addr > ALDO_ADDRMASK_32KB);
 
     return aldo_bytecopy_bank(ctx, ALDO_BITWIDTH_32KB, addr, count, dest);
@@ -195,7 +195,7 @@ static bool ines_unimplemented_vbus_connect(struct aldo_mapper *, aldo_bus *b)
 static bool ines_000_prgr(void *restrict ctx, uint16_t addr,
                           uint8_t *restrict d)
 {
-    // NOTE: addr=[$8000-$FFFF]
+    // addr=[$8000-$FFFF]
     assert(addr > ALDO_ADDRMASK_32KB);
 
     const struct ines_000_mapper *m = ctx;
@@ -209,7 +209,7 @@ static bool ines_000_prgr(void *restrict ctx, uint16_t addr,
 static size_t ines_000_prgc(const void *restrict ctx, uint16_t addr,
                             size_t count, uint8_t dest[restrict count])
 {
-    // NOTE: addr=[$8000-$FFFF]
+    // addr=[$8000-$FFFF]
     assert(addr > ALDO_ADDRMASK_32KB);
 
     const struct ines_000_mapper *m = ctx;
@@ -222,7 +222,7 @@ static size_t ines_000_prgc(const void *restrict ctx, uint16_t addr,
 static bool ines_000_chrr(void *restrict ctx, uint16_t addr,
                            uint8_t *restrict d)
 {
-    // NOTE: addr=[$0000-$1FFF]
+    // addr=[$0000-$1FFF]
     assert(addr < ALDO_MEMBLOCK_8KB);
 
     mem_load(d, ((const struct ines_mapper *)ctx)->chr, addr,
@@ -232,7 +232,7 @@ static bool ines_000_chrr(void *restrict ctx, uint16_t addr,
 
 static bool ines_000_chrw(void *ctx, uint16_t addr, uint8_t d)
 {
-    // NOTE: addr=[$0000-$1FFF]
+    // addr=[$0000-$1FFF]
     assert(addr < ALDO_MEMBLOCK_8KB);
 
     struct ines_mapper *m = ctx;
@@ -244,8 +244,8 @@ static bool ines_000_chrw(void *ctx, uint16_t addr, uint8_t d)
 static bool ines_000_vrmr(void *restrict ctx, uint16_t addr,
                           uint8_t *restrict d)
 {
-    // NOTE: addr=[$2000-$3FFF]
-    // NOTE: palette reads still hit the VRAM bus and affect internal PPU
+    // addr=[$2000-$3FFF]
+    // Palette reads still hit the VRAM bus and affect internal PPU
     // buffers, so the full 8KB range is valid input.
     assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
 
@@ -255,8 +255,8 @@ static bool ines_000_vrmr(void *restrict ctx, uint16_t addr,
 
 static bool ines_000_vrmw(void *ctx, uint16_t addr, uint8_t d)
 {
-    // NOTE: addr=[$2000-$3EFF]
-    // NOTE: writes to palette RAM should never hit the video bus
+    // addr=[$2000-$3EFF]
+    // writes to palette RAM should never hit the video bus
     assert(ALDO_MEMBLOCK_8KB <= addr && addr < Aldo_PaletteStartAddr);
 
     const struct ines_000_mapper *m = ctx;
@@ -267,7 +267,7 @@ static bool ines_000_vrmw(void *ctx, uint16_t addr, uint8_t d)
 static size_t ines_000_vrmc(const void *restrict ctx, uint16_t addr,
                             size_t count, uint8_t dest[restrict count])
 {
-    // NOTE: addr=[$2000-$3FFF]
+    // addr=[$2000-$3FFF]
     assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
 
     const struct ines_000_mapper *m = ctx;
@@ -429,7 +429,7 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
 
     int err;
     if (header->trainer) {
-        // NOTE: skip 512 bytes of trainer data
+        // skip 512 bytes of trainer data
         if (fseek(f, 512, SEEK_CUR) != 0) {
             err = ALDO_CART_ERR_ERNO;
             goto cleanup;

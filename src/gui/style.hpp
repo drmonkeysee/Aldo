@@ -77,7 +77,7 @@ inline constexpr std::tuple<ImU32, ImU32, ImU32> rgb_floor(ImU32 color,
     };
 }
 
-// NOTE: relative luminance function
+// relative luminance function
 // https://en.wikipedia.org/wiki/Relative_luminance
 inline constexpr ImU32 luminance(ImU32 color)
 {

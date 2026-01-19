@@ -61,19 +61,19 @@ static void tick_start(struct runclock *c, const struct aldo_snapshot *snp)
 {
     aldo_clock_tickstart(&c->clock, true);
 
-    // NOTE: cumulative moving average:
+    // cumulative moving average:
     // https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
     auto ticks = (double)c->clock.ticks;
     c->avg_ticktime_ms = (c->clock.ticktime_ms + (ticks * c->avg_ticktime_ms))
                             / (ticks + 1);
 
-    // NOTE: arbitrary per-tick budget, 6502s often ran at 1 MHz so a million
+    // Arbitrary per-tick budget, 6502s often ran at 1 MHz so a million
     // cycles per tick seems as good a number as any.
     c->clock.budget = 1e6;
-    // NOTE: app runtime and emulator time are equivalent in batch mode
+    // app runtime and emulator time are equivalent in batch mode
     c->clock.emutime = c->clock.runtime;
 
-    // NOTE: exit batch mode if cpu is not running
+    // exit batch mode if cpu is not running
     if (!snp->cpu.lines.ready) {
         QuitSignal = 1;
     }

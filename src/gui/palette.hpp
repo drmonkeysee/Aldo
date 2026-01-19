@@ -25,7 +25,7 @@ namespace palette
 
 inline constexpr const char* FileExtension = "pal", * Name = "Default";
 
-// NOTE: 2C02 palette from https://www.nesdev.org/wiki/PPU_palettes
+// 2C02 palette from https://www.nesdev.org/wiki/PPU_palettes
 inline constexpr std::array Default {
     // 0x00
     IM_COL32(0x62, 0x62, 0x62, SDL_ALPHA_OPAQUE),   // #626262

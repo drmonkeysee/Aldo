@@ -35,7 +35,7 @@ auto parse_colors(const pal_buf& buf)
          it != end;
          std::advance(it, Channels)) {
         auto t = std::views::take(std::ranges::subrange{it, end}, Channels);
-        // NOTE: t yields possibly signed chars; cast to unsigned, because int
+        // t yields possibly signed chars; cast to unsigned, because int
         // auto-promotion in IM_COL32 will sign-extend and mess up the shifts.
         auto [r, g, b] = std::tuple{
             static_cast<unsigned char>(t[0]),

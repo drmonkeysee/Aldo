@@ -35,7 +35,7 @@ aldo::RenderFrame::~RenderFrame()
                            SDL_ALPHA_OPAQUE);
     SDL_RenderClear(ren);
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), ren);
-    // NOTE: record render timing here, otherwise we're just measuring VSYNC
+    // record render timing here, otherwise we're just measuring VSYNC
     t.record();
     SDL_RenderPresent(ren);
 }

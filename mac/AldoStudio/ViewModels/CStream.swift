@@ -16,7 +16,7 @@ enum CStreamResult {
 func readCStream(binary: Bool = false,
                  operation: CStreamOp) async -> CStreamResult {
     let p = Pipe()
-    // NOTE: when reading multiple async cstreams Swift and C don't seem to
+    // When reading multiple async cstreams Swift and C don't seem to
     // agree on when a file descriptor is available and FDs will be recycled
     // for new Pipes before fclose frees them, causing a read-after-close
     // error; handing C a duplicate FD solves this problem as long as both

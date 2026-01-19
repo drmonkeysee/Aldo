@@ -81,7 +81,7 @@ bool aldo_trace_line(FILE *tracelog, int adjustment, uint64_t cycles,
     assert(dbg != nullptr);
     assert(snp != nullptr);
 
-    // NOTE: does not include leading space in trace_registers
+    // does not include leading space in trace_registers
     static constexpr auto instw = 47;
 
     auto written = trace_instruction(tracelog, cpu, snp);

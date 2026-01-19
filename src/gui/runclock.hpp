@@ -50,7 +50,7 @@ public:
         if (recorded) return;
 
         auto elapsed = clock_type::now() - start;
-        // NOTE: duration_cast is not noexcept but i don't see how converting
+        // duration_cast is not noexcept but i don't see how converting
         // to a double would ever throw; i'll assume it's noexcept in practice.
         auto converted = std::chrono::duration_cast<duration_type>(elapsed);
         result = converted.count();
@@ -206,7 +206,7 @@ private:
     int oldRate = 10;
 };
 
-// NOTE: inlined here to avoid circular type resolution with RunClock
+// inlined here to avoid circular type resolution with RunClock
 inline RunTick::RunTick(RunClock& c, bool resetBudget) noexcept : rc{c}
 {
     rc.tickStart(resetBudget);

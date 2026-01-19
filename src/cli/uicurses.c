@@ -68,11 +68,11 @@ static void tick_sleep(struct runclock *c)
 
     auto elapsed = aldo_elapsed(&c->clock.current);
 
-    // NOTE: if elapsed nanoseconds is greater than vsync we're over
+    // If elapsed nanoseconds is greater than vsync we're over
     // our time budget; if elapsed *seconds* is greater than vsync
     // we've BLOWN AWAY our time budget; either way don't sleep.
     if (elapsed.tv_nsec > vsync.tv_nsec || elapsed.tv_sec > vsync.tv_sec) {
-        // NOTE: we've already blown the tick time, so convert everything
+        // We've already blown the tick time, so convert everything
         // to milliseconds to make the math easier.
         c->tickleft_ms = aldo_timespec_to_ms(&vsync)
                             - aldo_timespec_to_ms(&elapsed);
@@ -129,7 +129,7 @@ static void drawtoggle(const struct view *v, const char *label, bool selected)
 static int drawstats(const struct view *v, int cursor_y,
                      const struct viewstate *vs, const struct cliargs *args)
 {
-    // NOTE: update timing metrics on a readable interval
+    // update timing metrics on a readable interval
     static constexpr auto refresh_interval_ms = 250.0;
     static double display_tickleft, display_ticktime, refreshdt;
 
@@ -252,7 +252,7 @@ static void drawcart(const struct view *v, const struct emulator *emu)
     }
     ptrdiff_t namelen = endofname - cn;
     bool longname = namelen > maxwidth;
-    // NOTE: ellipsis is one glyph wide despite being > 1 byte long
+    // ellipsis is one glyph wide despite being > 1 byte long
     wprintw(v->content, "%.*s%s", (int)(longname ? maxwidth - 1 : namelen),
             cn, longname ? "\u2026" : "");
     char fmtd[AldoCartFmtSize];
@@ -385,7 +385,7 @@ static void draw_interrupt_latch(const struct view *v,
     attr_t style = A_NORMAL;
     switch (interrupt) {
     case ALDO_SIG_CLEAR:
-        // NOTE: draw nothing for CLEAR state
+        // draw nothing for CLEAR state
         return;
     case ALDO_SIG_DETECTED:
         style = A_DIM;
@@ -470,7 +470,7 @@ static void drawdatapath(const struct view *v, int cursor_y, int w,
     draw_interrupt_latch(v, cpu->datapath.irq, cursor_y, line_x);
     draw_interrupt_latch(v, cpu->datapath.nmi, cursor_y, line_x * 2);
     draw_interrupt_latch(v, cpu->datapath.rst, cursor_y, line_x * 3);
-    // NOTE: jump 2 rows as interrupts are drawn direction first
+    // jump 2 rows as interrupts are drawn direction first
     cursor_y += 2;
     draw_chip_vline(v, cpu->lines.irq, cursor_y, line_x, -1, ArrowUp, -1,
                     "I\u0305R\u0305Q\u0305");
@@ -572,7 +572,7 @@ static int draw_pipeline(const struct view *v, int cursor_y, int w,
         mvwprintw(v->content, cursor_y, buscol + 1, " %02X",
                   ppu->pipeline.databus);
     }
-    // NOTE: write line does not signal when writing to palette ram so use the
+    // Write line does not signal when writing to palette ram so use the
     // read signal to determine direction of databus flow.
     mvwaddstr(v->content, cursor_y, w - 1,
               ppu->lines.read ? DArrowRight : DArrowLeft);
@@ -588,7 +588,7 @@ static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
 
     char vbuf[10];
     sprintf(vbuf, "(%3d,%3d)", ppu->pipeline.line, ppu->pipeline.dot);
-    // NOTE: jump 2 rows as interrupts are drawn direction first
+    // jump 2 rows as interrupts are drawn direction first
     cursor_y += 2;
     draw_chip_vline(v, ppu->lines.video_out, cursor_y, line_x, -1,
                     ArrowDown, -4, vbuf);
@@ -631,7 +631,7 @@ static int draw_mempage(const struct view *v, const struct emulator *emu,
     size_t skipped = 0;
     for (auto page_row = 0; page_row < page_rows; ++page_row) {
         if (sel != RSEL_PPU && page == 1) {
-            // NOTE: clear any leftover PPU diagrams
+            // clear any leftover PPU diagrams
             wclrtoeol(v->content);
         }
         mvwprintw(v->content, cursor_y, 0, "%02X%X0", page + page_offset,
@@ -639,7 +639,7 @@ static int draw_mempage(const struct view *v, const struct emulator *emu,
         for (auto page_col = 0; page_col < RamDim; ++page_col) {
             auto ramidx = (size_t)((page * RamPageSize) + (page_row * RamDim)
                                     + page_col);
-            // NOTE: skip over palette's mirrored addresses
+            // skip over palette's mirrored addresses
             if (sel == RSEL_PPU && page_offset == 0x3f
                 && (ramidx & 0x13) == 0x10) {
                 mvwaddstr(v->content, cursor_y, cursor_x, "--");

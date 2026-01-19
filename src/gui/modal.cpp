@@ -49,12 +49,12 @@ auto save_file(const gui_platform& p, const char* title,
 auto file_modal(modal_launch open, modal_operation op, aldo::Emulator& emu,
                 const aldo::MediaRuntime& mr)
 {
-    // NOTE: halt emulator to prevent time-jump from modal delay
+    // halt emulator to prevent time-jump from modal delay
     // TODO: does this make sense long-term?
     emu.ready(false);
 
     auto filepath = open(mr.platform());
-    // NOTE: at least on macOS main window doesn't auto-focus back from modal
+    // at least on macOS main window doesn't auto-focus back from modal
     SDL_RaiseWindow(mr.window());
     if (filepath.empty()) return false;
 

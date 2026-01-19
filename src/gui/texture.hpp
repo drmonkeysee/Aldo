@@ -121,7 +121,7 @@ public:
     void draw(const et::byte* vbuf, const Palette& p) const;
     void render(float scale, bool sdRatio) const noexcept
     {
-        // NOTE: 4:3 SD TV ratio scales the x-axis by about 1.14 from square
+        // 4:3 SD TV ratio scales the x-axis by about 1.14 from square
         static constexpr auto tvXScale = 8.0f / 7.0f;
 
         tex.render(sdRatio ? scale * tvXScale : scale, scale);

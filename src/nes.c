@@ -59,13 +59,13 @@ static void mem_store(uint8_t *mem, uint16_t addr, uint8_t d)
 static size_t mem_copy(const void *restrict ctx, uint16_t addr, size_t count,
                        uint8_t dest[restrict count])
 {
-    // NOTE: only 2KB of actual mem to copy
+    // only 2KB of actual mem to copy
     return aldo_bytecopy_bank(ctx, ALDO_BITWIDTH_2KB, addr, count, dest);
 }
 
 static bool ram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
-    // NOTE: addr=[$0000-$1FFF]
+    // addr=[$0000-$1FFF]
     assert(addr < ALDO_MEMBLOCK_8KB);
 
     mem_load(d, ctx, addr);
@@ -74,7 +74,7 @@ static bool ram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 
 static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    // NOTE: addr=[$0000-$1FFF]
+    // addr=[$0000-$1FFF]
     assert(addr < ALDO_MEMBLOCK_8KB);
 
     mem_store(ctx, addr, d);
@@ -84,7 +84,7 @@ static bool ram_write(void *ctx, uint16_t addr, uint8_t d)
 static size_t ram_copy(const void *restrict ctx, uint16_t addr, size_t count,
                        uint8_t dest[restrict count])
 {
-    // NOTE: addr=[$0000-$1FFF]
+    // addr=[$0000-$1FFF]
     assert(addr < ALDO_MEMBLOCK_8KB);
 
     return mem_copy(ctx, addr, count, dest);
@@ -92,8 +92,8 @@ static size_t ram_copy(const void *restrict ctx, uint16_t addr, size_t count,
 
 static bool vram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
-    // NOTE: addr=[$2000-$3FFF]
-    // NOTE: palette reads still hit the VRAM bus and affect internal PPU
+    // addr=[$2000-$3FFF]
+    // Palette reads still hit the VRAM bus and affect internal PPU
     // buffers, so the full 8KB range is valid input.
     assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
 
@@ -103,8 +103,8 @@ static bool vram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 
 static bool vram_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    // NOTE: addr=[$2000-$3EFF]
-    // NOTE: writes to palette RAM should never hit the video bus
+    // addr=[$2000-$3EFF]
+    // writes to palette RAM should never hit the video bus
     assert(ALDO_MEMBLOCK_8KB <= addr && addr < Aldo_PaletteStartAddr);
 
     mem_store(ctx, addr, d);
@@ -114,7 +114,7 @@ static bool vram_write(void *ctx, uint16_t addr, uint8_t d)
 static size_t vram_copy(const void *restrict ctx, uint16_t addr, size_t count,
                         uint8_t dest[restrict count])
 {
-    // NOTE: addr=[$2000-$3FFF]
+    // addr=[$2000-$3FFF]
     assert(ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB);
 
     return mem_copy(ctx, addr, count, dest);
@@ -193,7 +193,7 @@ static void connect_cart(struct aldo_nes001 *self, aldo_cart *c)
 
 static void disconnect_cart(struct aldo_nes001 *self)
 {
-    // NOTE: debugger may have been attached to a cart-less CPU bus so reset
+    // Debugger may have been attached to a cart-less CPU bus so reset
     // debugger even if there is no existing cart.
     aldo_debug_reset(self->dbg);
     if (!self->cart) return;
@@ -221,9 +221,9 @@ static void teardown(struct aldo_nes001 *self)
 
 static void set_ppu_pins(struct aldo_nes001 *self)
 {
-    // NOTE: interrupt lines are active low
+    // interrupt lines are active low
     self->ppu.signal.rst = !self->probe.rst;
-    // NOTE: pull PPU's CPU R/W signal back up if CPU is no longer pulling it
+    // Pull PPU's CPU R/W signal back up if CPU is no longer pulling it
     // low (pulled low by PPU register writes).
     self->ppu.signal.rw |= self->cpu.signal.rw;
 }
@@ -240,7 +240,7 @@ static void set_screen_dot(struct aldo_nes001 *self)
 
 static void set_cpu_pins(struct aldo_nes001 *self)
 {
-    // NOTE: interrupt lines are active low
+    // interrupt lines are active low
     self->cpu.signal.irq = !self->probe.irq;
     self->cpu.signal.nmi = !self->probe.nmi && self->ppu.signal.intr;
     self->cpu.signal.rst = !self->probe.rst;
@@ -323,7 +323,7 @@ static void init_snapshot(struct aldo_nes001 *self)
 // MARK: - Clocking
 //
 
-// NOTE: trace the just-fetched instruction
+// trace the just-fetched instruction
 static void instruction_trace(struct aldo_nes001 *self,
                               const struct aldo_clock *clock, int adjustment)
 {
@@ -331,7 +331,7 @@ static void instruction_trace(struct aldo_nes001 *self,
 
     struct aldo_snapshot snp = {};
     snapshot_bus(self, &snp);
-    // NOTE: trace the cycle/pixel count up to the current instruction so
+    // Trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
     self->tracefailed = !aldo_trace_line(self->tracelog, adjustment,
                                          clock->cycles, &self->cpu, &self->ppu,
@@ -366,7 +366,7 @@ static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
     instruction_trace(self, clock, -cycles);
 
     switch (self->mode) {
-    // NOTE: both cases are possible on cycle-boundary
+    // both cases are possible on cycle-boundary
     case ALDO_EXC_SUBCYCLE:
     case ALDO_EXC_CYCLE:
         aldo_nes_ready(self, false);
@@ -399,7 +399,7 @@ aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
     self->cpu.bcd = bcdsupport;
     self->probe.irq = self->probe.nmi = self->probe.rst = false;
     self->vbuf = 0;
-    // NOTE: uninitialized vbuffer can have out-of-range palette values
+    // uninitialized vbuffer can have out-of-range palette values
     for (size_t i = 0; i < aldo_arrsz(self->vbufs); ++i) {
         aldo_memclr(self->vbufs[i]);
     }
@@ -490,7 +490,7 @@ void aldo_nes_set_mode(aldo_nes *self, enum aldo_execmode mode)
 {
     assert(self != nullptr);
 
-    // NOTE: force signed to check < 0 (underlying type may be uint)
+    // force signed to check < 0 (underlying type may be uint)
     self->mode = (int)mode < 0 ? ALDO_EXC_COUNT - 1 : mode % ALDO_EXC_COUNT;
 }
 

@@ -78,8 +78,7 @@ public:
     void loadCartState(const std::filesystem::path& prefCartPath);
     void saveCartState(const std::filesystem::path& prefCartPath) const;
 
-    // NOTE: as usual an iterator is invalidated if the underlying
-    // collection is modified.
+    // as usual an iterator is invalidated if the underlying collection is modified
     class BreakpointIterator {
     public:
         using difference_type = et::diff;
@@ -127,7 +126,7 @@ public:
         difference_type count = 0, idx = 0;
     };
 
-    // NOTE: non-owning view over the debugger's breakpoints collection;
+    // Non-owning view over the debugger's breakpoints collection;
     // uses mutability template to allow value semantics without inadvertently
     // violating const-correctness of the underlying breakpoints C API.
     template<bool Mutable = false>
@@ -153,7 +152,7 @@ public:
 
         const_iterator cbegin() const noexcept
         {
-            // NOTE: ssize is not noexcept but all it does is delegate to
+            // ssize is not noexcept but all it does is delegate to
             // this->size() which in this case is noexcept.
             return {dbgp, std::ssize(*this)};
         }

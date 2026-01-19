@@ -68,7 +68,7 @@ static void set_p(struct aldo_mos6502 *self, uint8_t p)
     self->p.z = p & 0x2;
     self->p.i = p & 0x4;
     self->p.d = p & 0x8;
-    // NOTE: skip B and unused flags, they cannot be set explicitly
+    // skip B and unused flags, they cannot be set explicitly
     self->p.v = p & 0x40;
     self->p.n = p & 0x80;
 }
@@ -83,7 +83,7 @@ static bool bcd_mode(struct aldo_mos6502 *self)
     return self->bcd && self->p.d;
 }
 
-// NOTE: signed overflow happens when positive + positive = negative
+// signed overflow happens when positive + positive = negative
 // or negative + negative = positive, i.e. the sign of A does not match
 // the sign of S and the sign of B does not match the sign of S:
 // (Sign A ^ Sign S) & (Sign B ^ Sign S) => (A ^ S) & (B ^ S) & SignMask
@@ -102,11 +102,11 @@ static void update_n(struct aldo_mos6502 *self, uint8_t d)
 // MARK: - Interrupt Detection
 //
 
-// NOTE: check interrupt lines (active low) on ϕ2 to
+// Check interrupt lines (active low) on ϕ2 to
 // initiate interrupt detection.
 static void check_interrupts(struct aldo_mos6502 *self)
 {
-    // NOTE: serviced state is only for assisting in nmi edge detection
+    // serviced state is only for assisting in nmi edge detection
     assert(self->rst != ALDO_SIG_SERVICED);
     assert(self->irq != ALDO_SIG_SERVICED);
 
@@ -114,7 +114,7 @@ static void check_interrupts(struct aldo_mos6502 *self)
         self->rst = ALDO_SIG_DETECTED;
     }
 
-    // NOTE: final cycle of BRK sequence holds interrupt latching low,
+    // Final cycle of BRK sequence holds interrupt latching low,
     // delaying detection of any still-active interrupt signals by one cycle
     // (except RST which is all-powerful).
     if (self->opc == Aldo_BrkOpcode && self->t == 6) return;
@@ -132,11 +132,11 @@ static void check_interrupts(struct aldo_mos6502 *self)
     }
 }
 
-// NOTE: check persistence of interrupt lines (active low) on ϕ1
+// Check persistence of interrupt lines (active low) on ϕ1
 // of following cycle to latch interrupt detection and make polling possible.
 static void latch_interrupts(struct aldo_mos6502 *self)
 {
-    // NOTE: rst is level-detected but unlike irq it takes effect at
+    // rst is level-detected but unlike irq it takes effect at
     // end of this cycle's ϕ2 so it moves directly from pending in this cycle
     // to committed in the next cycle.
     if (self->signal.rst) {
@@ -147,7 +147,7 @@ static void latch_interrupts(struct aldo_mos6502 *self)
         self->rst = ALDO_SIG_PENDING;
     }
 
-    // NOTE: nmi is edge-detected so once it has latched in it remains
+    // nmi is edge-detected so once it has latched in it remains
     // set until serviced by a handler or reset.
     if (self->signal.nmi) {
         if (self->nmi == ALDO_SIG_DETECTED) {
@@ -157,7 +157,7 @@ static void latch_interrupts(struct aldo_mos6502 *self)
         self->nmi = ALDO_SIG_PENDING;
     }
 
-    // NOTE: irq is level-detected so must remain low until polled
+    // irq is level-detected so must remain low until polled
     // or the interrupt is lost.
     if (self->signal.irq) {
         if (self->irq == ALDO_SIG_DETECTED || self->irq == ALDO_SIG_PENDING) {
@@ -195,7 +195,7 @@ static uint16_t interrupt_vector(struct aldo_mos6502 *self)
     return ALDO_CPU_VECTOR_IRQ;
 }
 
-// NOTE: rst takes effect after two cycles and immediately resets/halts
+// rst takes effect after two cycles and immediately resets/halts
 // the cpu until the rst line goes high again (this isn't strictly true
 // but the real cpu complexity isn't necessary here).
 static bool reset_held(struct aldo_mos6502 *self)
@@ -232,7 +232,7 @@ static bool reset_held(struct aldo_mos6502 *self)
  */
 static void conditional_commit(struct aldo_mos6502 *self, bool c)
 {
-    // NOTE: interrupts are polled regardless of commit condition
+    // interrupts are polled regardless of commit condition
     poll_interrupts(self);
     self->presync = c;
 }
@@ -255,7 +255,7 @@ static void store_data(struct aldo_mos6502 *self, uint8_t d)
     write(self);
 }
 
-// NOTE: add with carry-in: A + B + C and subtract with carry-in: A - B - ~C,
+// Add with carry-in: A + B + C and subtract with carry-in: A - B - ~C,
 // where ~carry indicates borrow-out, are equivalent in binary mode:
 //  A - B => A + (-B) => A + 2sComplement(B) => A + (~B + 1) when C = 1;
 //  C = 0 is thus a borrow-out; A + (~B + 0) => A + ~B => A - B - 1.
@@ -280,7 +280,7 @@ static void decimal_add(struct aldo_mos6502 *self, uint8_t alo, uint8_t blo,
     }
     auto shi = ahi + bhi + chi;
     auto shinib = shi << 4;
-    // NOTE: overflow and negative are set before decimal adjustment
+    // overflow and negative are set before decimal adjustment
     update_v(self, (uint8_t)shinib, (uint8_t)(ahi << 4), (uint8_t)(bhi << 4));
     update_n(self, (uint8_t)shinib);
     self->p.c = shi > 0x9;
@@ -306,7 +306,7 @@ static void decimal_subtract(struct aldo_mos6502 *self, uint8_t alo,
         dhi -= 0x6;
         dhi &= 0xf;
     }
-    // NOTE: bcd subtract does not adjust flags from earlier binary op
+    // bcd subtract does not adjust flags from earlier binary op
     self->a = (uint8_t)((dhi << 4) | dlo);
 }
 
@@ -320,13 +320,13 @@ static void arithmetic_operation(struct aldo_mos6502 *self,
 {
     uint8_t a = self->a;
     bool c = self->p.c;
-    // NOTE: even in BCD mode some flags are set as if in binary mode
+    // Even in BCD mode some flags are set as if in binary mode
     // so always do binary op regardless of BCD flag.
     binary_add(self, a, op == AOP_SUB ? ~b : b, c);
 
     if (!bcd_mode(self)) return;
 
-    // NOTE: decimal mode is 4-bit nibble arithmetic with carry/borrow
+    // decimal mode is 4-bit nibble arithmetic with carry/borrow
     uint8_t
         alo = a & 0xf,
         blo = b & 0xf,
@@ -339,7 +339,7 @@ static void arithmetic_operation(struct aldo_mos6502 *self,
     }
 }
 
-// NOTE: compare is effectively R - D; modeling the subtraction as
+// Compare is effectively R - D; modeling the subtraction as
 // R + 2sComplement(D) gets us all the flags for free;
 // see binary_add for why this works.
 static uint8_t compare_register(struct aldo_mos6502 *self, uint8_t r,
@@ -368,7 +368,7 @@ enum bitdirection {
 static uint8_t bitoperation(struct aldo_mos6502 *self, struct aldo_decoded dec,
                             enum bitdirection bd, uint8_t carryin_mask)
 {
-    // NOTE: some unofficial shift/rotate opcodes use immediate mode
+    // Some unofficial shift/rotate opcodes use immediate mode
     // to operate on the accumulator.
     bool acc_operand = dec.mode == ALDO_AM_IMP || dec.mode == ALDO_AM_IMM;
     uint8_t d = acc_operand ? self->a : self->databus;
@@ -407,7 +407,7 @@ static void stack_push(struct aldo_mos6502 *self, uint8_t d)
     store_data(self, d);
 }
 
-// NOTE: all 6502 cycles are either a read or a write, some of them discarded
+// All 6502 cycles are either a read or a write, some of them discarded
 // depending on the instruction and addressing-mode timing; these extra reads
 // and writes are all modeled below to help verify cycle-accurate behavior.
 
@@ -493,7 +493,7 @@ static void ASL_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
     bitoperation(self, dec, BIT_LEFT, 0x0);
 }
 
-// NOTE: branch instructions do not branch if the opposite condition is TRUE;
+// Branch instructions do not branch if the opposite condition is TRUE;
 // e.g. BCC (branch on carry clear) will NOT branch if carry is SET;
 // i.e. NOT(Condition) => commit instruction.
 
@@ -539,7 +539,7 @@ static void BPL_exec(struct aldo_mos6502 *self)
 
 static void BRK_exec(struct aldo_mos6502 *self)
 {
-    // NOTE: rst is only cleared by its own handler;
+    // rst is only cleared by its own handler;
     // nmi is serviced by its own handler (for edge detection)
     // but cleared by all others;
     // irq is cleared by all handlers.
@@ -705,7 +705,7 @@ static void LSR_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
 
 static void NOP_exec(struct aldo_mos6502 *self, struct aldo_decoded dec)
 {
-    // NOTE: unofficial NOPs have reads triggered by
+    // Unofficial NOPs have reads triggered by
     // non-implied addressing modes.
     if (read_delayed(self, dec, self->adc)) return;
     if (dec.mode != ALDO_AM_IMP) {
@@ -860,7 +860,7 @@ static void TYA_exec(struct aldo_mos6502 *self)
 // MARK: - Unofficial Instructions
 //
 
-// NOTE: magic constant that interferes with accumulator varies based on
+// Magic constant that interferes with accumulator varies based on
 // chip manufacture, temperature, state of chip control signals,
 // and maybe other unknown factors;
 // https://csdb.dk/release/?id=212346 recommends using EE.
@@ -868,10 +868,10 @@ constexpr uint8_t Magic = 0xee;
 
 static void store_unstable_addresshigh(struct aldo_mos6502 *self, uint8_t d)
 {
-    // NOTE: if addr carry, +1 has already been stored into adh
+    // if addr carry, +1 has already been stored into adh
     auto adrhi = (uint8_t)(self->adh + !self->adc);
     d &= adrhi;
-    // NOTE: on page-cross boundary this *occasionally* throws the calculated
+    // On page-cross boundary this *occasionally* throws the calculated
     // value into ADDR_HI; emulate that behavior consistently to emphasize the
     // instability of these instructions.
     if (self->adc) {
@@ -1278,7 +1278,7 @@ static void INDX_sequence(struct aldo_mos6502 *self, struct aldo_decoded dec)
         dispatch_instruction(self, dec);
         break;
     case 6:
-        // NOTE: some unofficial RMW opcodes use this addressing mode and
+        // Some unofficial RMW opcodes use this addressing mode and
         // introduce write-delayed cycles similar to zp-indexed
         // or absolute-indexed.
         write(self);
@@ -1320,7 +1320,7 @@ static void INDY_sequence(struct aldo_mos6502 *self, struct aldo_decoded dec)
         dispatch_instruction(self, dec);
         break;
     case 6:
-        // NOTE: some unofficial RMW opcodes use this addressing mode and
+        // Some unofficial RMW opcodes use this addressing mode and
         // introduce write-delayed cycles similar to zp-indexed
         // or absolute-indexed.
         write(self);
@@ -1413,7 +1413,7 @@ static void BCH_sequence(struct aldo_mos6502 *self, struct aldo_decoded dec)
     case 1:
         self->addrbus = self->pc++;
         read(self);
-        // NOTE: in peek mode branches are always taken
+        // in peek mode branches are always taken
         if (!self->detached) {
             dispatch_instruction(self, dec);
         }
@@ -1422,7 +1422,7 @@ static void BCH_sequence(struct aldo_mos6502 *self, struct aldo_decoded dec)
         self->addrbus = self->pc;
         branch_displacement(self);
         read(self);
-        // NOTE: interrupt polling does not happen on this cycle!
+        // Interrupt polling does not happen on this cycle!
         // branch instructions only poll on branch-not-taken and
         // branch-with-page-crossing cycles.
         self->presync = !self->adc;
@@ -1564,7 +1564,7 @@ static void BRK_sequence(struct aldo_mos6502 *self, struct aldo_decoded dec)
         stack_push(self, get_p(self, service_interrupt(self)));
         break;
     case 5:
-        // NOTE: higher priority interrupts can hijack this break sequence if
+        // Higher priority interrupts can hijack this break sequence if
         // latched in by this cycle.
         poll_interrupts(self);
         self->addrbus = interrupt_vector(self);
@@ -1628,7 +1628,7 @@ static void JAM_sequence(struct aldo_mos6502 *self, struct aldo_decoded dec)
     case 4:
         break;
     case 5:
-        // NOTE: forever instructions have 5 time states (T0-T4)
+        // Forever instructions have 5 time states (T0-T4)
         // so use T5 to rewind time back to T4, jamming the processor.
         // http://visual6502.org/wiki/index.php?title=6502_Timing_States#Forever_Instructions
         --self->t;
@@ -1662,7 +1662,7 @@ static void dispatch_addrmode(struct aldo_mos6502 *self,
 // MARK: - Public Interface
 //
 
-// NOTE: all official opcodes max out at 7 cycles but a handful of
+// all official opcodes max out at 7 cycles but a handful of
 // unofficial RMW opcodes have 8 cycles when using indirect-addressing modes;
 // a full breakdown of official instruction timing states can be found at:
 // http://visual6502.org/wiki/index.php?title=6502_Timing_States
@@ -1673,13 +1673,13 @@ void aldo_cpu_powerup(struct aldo_mos6502 *self)
     assert(self != nullptr);
     assert(self->mbus != nullptr);
 
-    // NOTE: initialize physical lines and control flags to known state
+    // initialize physical lines and control flags to known state
     self->signal.irq = self->signal.nmi = self->signal.rst =
         self->signal.rw = true;
     self->signal.rdy = self->signal.sync = self->bflt = self->presync =
         self->detached = false;
 
-    // NOTE: initialize registers to known state
+    // initialize registers to known state
     self->t = self->pc = self->a = self->s = self->x = self->y = 0;
     set_p(self, 0x34);
 
@@ -1692,7 +1692,7 @@ int aldo_cpu_cycle(struct aldo_mos6502 *self)
 {
     assert(self != nullptr);
 
-    // NOTE: sentinel value for cycle count denoting an imminent opcode fetch
+    // sentinel value for cycle count denoting an imminent opcode fetch
     static constexpr auto prefetch = -1;
 
     if (!self->signal.rdy || reset_held(self)) return 0;
@@ -1704,7 +1704,7 @@ int aldo_cpu_cycle(struct aldo_mos6502 *self)
 
     latch_interrupts(self);
     if (++self->t == 0) {
-        // NOTE: T0 is always an opcode fetch
+        // T0 is always an opcode fetch
         self->signal.sync = true;
         self->addrbus = self->pc;
         read(self);
@@ -1774,7 +1774,7 @@ aldo_cpu_peek_start(struct aldo_mos6502 *restrict self,
     if (restore) {
         *restore = *self;
     }
-    // NOTE: set to read-only and reset all signals to ready cpu
+    // set to read-only and reset all signals to ready cpu
     if (!self->detached) {
         detach(self);
     }
@@ -1787,7 +1787,7 @@ void aldo_cpu_peek(struct aldo_mos6502 *self, struct aldo_peekresult *peek)
 {
     assert(self != nullptr);
 
-    // NOTE: can't run the cpu to peek JAM or it'll jam the cpu!
+    // Can't run the cpu to peek JAM or it'll jam the cpu!
     // Fortunately all we need is the addressing mode so return that.
     if (peek->mode == ALDO_AM_JAM) {
         peek->done = true;

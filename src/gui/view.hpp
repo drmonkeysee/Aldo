@@ -37,7 +37,7 @@ public:
         TransitionLatch() noexcept = default;
         TransitionLatch(Transition t) noexcept : transition{t} {}
 
-        // NOTE: exchange is becoming noexcept in C++23
+        // Exchange is becoming noexcept in C++23
         // but exchanging an enum won't throw anyway.
         Transition reset() noexcept
         {

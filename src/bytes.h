@@ -52,14 +52,14 @@ enum {
 // Extract bit @pos from unsigned value
 #define aldo_getbit(uval, pos) (((uval) >> (pos)) & 0x1)
 
-// NOTE: all mem macros require array expressions, not pointers
+// all mem macros require array expressions, not pointers
 #define aldo_arrsz(arr) (sizeof (arr) / sizeof (arr)[0])
 #define aldo_memclr(mem) memset(mem, 0, aldo_arrsz(mem))
 #define aldo_memdump(mem, f) \
 (fwrite(mem, sizeof (mem)[0], aldo_arrsz(mem), f) == aldo_arrsz(mem))
 
 #include "bridgeopen.h"
-// NOTE: convert unsigned values into little-endian byte representations;
+// Convert unsigned values into little-endian byte representations;
 // undefined behavior if any pointer/array arguments are null.
 
 //
@@ -112,7 +112,7 @@ inline void aldo_dwtoba(uint32_t dword, uint8_t bytes[aldo_cz(4)]) aldo_nothrow
 // I'm not entirely sure: https://en.wikipedia.org/wiki/Z-order_curve
 inline uint16_t aldo_byteshuffle(uint8_t lo, uint8_t hi) aldo_nothrow
 {
-    // NOTE: magic shuffle numbers
+    // magic shuffle numbers
     static constexpr uint16_t m[] = {
         0x00f0, 0xf00f, 0x0c0c, 0xc3c3, 0x2222, 0x9999,
     };

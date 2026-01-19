@@ -1967,7 +1967,7 @@ static void sprite_evaluation_empty_scanline(void *ctx)
     spr->oamd = spr->soama = 0;
     spr->s = ALDO_PPU_SPR_SCAN;
     for (size_t i = 0; i < aldo_arrsz(spr->oam) / 4; ++i) {
-        // set last sprite's y-coordinate uniquely to assert below that it
+        // Set last sprite's y-coordinate uniquely to assert below that it
         // ends up in secondary OAM at the end.
         spr->oam[i * 4] = i == 63 ? 30 : 20;
     }
@@ -1975,7 +1975,7 @@ static void sprite_evaluation_empty_scanline(void *ctx)
         spr->soam[i] = 0xff;
     }
 
-    // this should run through all 64 sprites, copying nothing but the
+    // This should run through all 64 sprites, copying nothing but the
     // last sprite's Y coordinate to secondary OAM.
     while (spr->s != ALDO_PPU_SPR_DONE) {
         aldo_ppu_cycle(ppu);
@@ -2002,7 +2002,7 @@ static void sprite_evaluation_empty_scanline(void *ctx)
                        "unexpected value at soam idx %zu", i);
     }
     ct_assertequal(0x0u, spr->soama);
-    // for a completely missed scanline looks like oamaddr happens to
+    // For a completely missed scanline looks like oamaddr happens to
     // end up on the 33rd sprite at the end.
     ct_assertequal(0x80u, ppu->oamaddr);
     ct_assertequal(20u, spr->oamd);

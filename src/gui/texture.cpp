@@ -171,7 +171,7 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
                 auto tile = tiles[tileIdx];
                 auto colors = lookupTilePalette(attrs, col, row,
                                                 vsp->palettes.bg);
-                // NOTE: account for upper NT bank X/Y offset for tiles
+                // account for upper NT bank X/Y offset for tiles
                 auto offsetAdj = (i * offsets.upperX)
                                     + (i * offsets.upperY * data.stride);
                 draw_tile(chrs[tile], col, row, colors, emu.palette(), data,
@@ -259,7 +259,7 @@ void aldo::Nametables::drawAttribute(attr_span attrs, int ntIdx, int col,
     auto attrIdx = static_cast<
         decltype(attrs)::size_type>(col + (row * AttributeDim));
     auto attr = attrs[attrIdx];
-    // NOTE: last row only uses the top half of attributes
+    // last row only uses the top half of attributes
     auto mtCount = row == AttributeDim - 1 ? AldoMetatileDim : MetatileCount;
     for (auto m = 0; m < mtCount; ++m) {
         drawMetatile(attr, ntIdx, col, row, m, offsets, bg, p, ren);
@@ -276,7 +276,7 @@ void aldo::Nametables::drawMetatile(aldo::et::byte attr, int ntIdx, int col,
     aldo::color_span::size_type pidx = (attr >> (metaTile * 2)) & 0x3;
     assert(pidx < aldo::color_span::extent);
     aldo::color_span colors = bg[pidx];
-    // NOTE: use 3rd color in the palette to represent the
+    // Use 3rd color in the palette to represent the
     // attribute metatile, similar to nesdev wiki example.
     auto cidx = colors[2];
     auto c = p.getColor(cidx);

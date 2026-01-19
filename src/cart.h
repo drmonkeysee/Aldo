@@ -95,7 +95,7 @@ aldo_const size_t AldoCartFmtSize = 17;
 aldo_export
 const char *aldo_cart_errstr(int err) aldo_nothrow;
 
-// NOTE: if returns non-zero error code, *c is unmodified
+// if returns non-zero error code, *c is unmodified
 aldo_export aldo_checkerr
 int aldo_cart_create(aldo_cart **c, FILE *f) aldo_nothrow;
 aldo_export

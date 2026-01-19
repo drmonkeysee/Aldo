@@ -40,6 +40,7 @@ constexpr uint16_t FineYBits = 0x7000;
 
 constexpr uint8_t CourseXBits = 0x1f;
 constexpr uint8_t PaletteMask = CourseXBits;
+constexpr uint8_t DWordMask = 0x3;
 
 //
 // MARK: - Registers
@@ -251,7 +252,20 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         }
         break;
     case ALDO_PPU_SPR_FULL:
-        // TODO: sprite overflow checks
+        // TODO: sprite overflow hit
+        sprite_skip(self);
+        // During sprite overflow scan, misses cause a glitchy "diagonal" walk
+        // of OAM where both the sprite index (OAMADDR & ~0x3) and the attribute
+        // index (OAMADDR & 0x3) are incremented (without carry); this completely
+        // undermines overflow as many of these checks end up comparing scanline
+        // position with a sprite's tile, attributes, or x-coordinate instead of
+        // the correct y-coordinate.
+        self->oamaddr = (self->oamaddr & ~DWordMask)
+                            | ((self->oamaddr + 1) & DWordMask);
+        // sprite index has overflowed, scanning is done
+        if ((self->oamaddr & ~DWordMask) == 0) {
+            sprites->s = ALDO_PPU_SPR_DONE;
+        }
         break;
     case ALDO_PPU_SPR_DONE:
         // all 64 sprites have been scanned, continue to advance OAMADDR until HBLANK
@@ -283,7 +297,7 @@ static uint16_t mask_palette(uint16_t addr)
     // the palette address down to the "real" sprite slot, accounting for the
     // 4 missing entries at $3F10, $3F14, $3F18, and $3F1C.
     if (addr & 0x10) {
-        if ((addr & 0x3) == 0) {
+        if ((addr & DWordMask) == 0) {
             addr &= 0xf;
         } else {
             // 0x1-0x3 adjust down 1, 0x5-0x7 adjust down 2, etc...
@@ -654,7 +668,7 @@ static void resolve_palette(struct aldo_rp2c02 *self)
         } else {
             pxpl->pal = 0x0;
         }
-    } else if ((pxpl->mux & 0x3) == 0) {
+    } else if ((pxpl->mux & DWordMask) == 0) {
         // transparent pixels fall through to backdrop color
         pxpl->pal = 0x0;
     } else {

@@ -12,6 +12,9 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
+
+#define memfill(mem) memset(mem, 0xff, aldo_arrsz(mem))
 
 static uint8_t
         NameTables[2][8],
@@ -1971,9 +1974,7 @@ static void sprite_evaluation_empty_scanline(void *ctx)
         // ends up in secondary OAM at the end.
         spr->oam[i * 4] = i == 63 ? 30 : 20;
     }
-    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
-        spr->soam[i] = 0xff;
-    }
+    memfill(spr->soam);
 
     // This should run through all 64 sprites, copying nothing but the
     // last sprite's Y coordinate to secondary OAM.
@@ -2036,9 +2037,7 @@ static void sprite_evaluation_partial_scanline(void *ctx)
     spr->oam[42] = 0x41;
     spr->oam[43] = 0x42;
     spr->oam[63 * 4] = 80;  // unique y-coordinate of last sprite
-    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
-        spr->soam[i] = 0xff;
-    }
+    memfill(spr->soam);
 
     // this should run through all 64 sprites, copying 4 sprites into SOAM
     while (spr->s != ALDO_PPU_SPR_DONE) {
@@ -2121,9 +2120,67 @@ static void sprite_evaluation_last_sprite_fills_scanline(void *ctx)
     spr->oam[253] = sprites[29];
     spr->oam[254] = sprites[30];
     spr->oam[255] = sprites[31];
-    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
-        spr->soam[i] = 0xff;
+    memfill(spr->soam);
+
+    // this should run through all 64 sprites, copying 8 sprites into SOAM
+    while (spr->s != ALDO_PPU_SPR_DONE) {
+        aldo_ppu_cycle(ppu);
     }
+
+    // 128 dots + (2 dots for 3 attributes * 8 sprites = 48) = 176 dots
+    ct_assertequal(241, ppu->dot);
+    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
+        ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
+    }
+    ct_assertequal(0x0u, spr->soama);
+    ct_assertequal(0x0u, ppu->oamaddr);
+    ct_assertequal(0x82u, spr->oamd);
+    ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
+
+    // run the rest of the sprite evaluation window
+    while (ppu->dot < 257) {
+        aldo_ppu_cycle(ppu);
+    }
+
+    ct_assertequal(257, ppu->dot);
+    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
+        ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
+    }
+    ct_assertequal(0x0u, spr->soama);
+    ct_assertequal(0x20u, ppu->oamaddr);    // ends up on the 9th sprite
+    ct_assertequal(0u, spr->oamd);
+    ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
+}
+
+static void sprite_evaluation_fill_with_no_overflows(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    auto spr = &ppu->spr;
+    ppu->line = 12;
+    ppu->dot = 65;
+    spr->oamd = spr->soama = 0;
+    spr->s = ALDO_PPU_SPR_SCAN;
+    aldo_memclr(spr->oam);
+    uint8_t sprites[] = {
+        12, 0x10, 0x11, 0x12,
+        10, 0x20, 0x21, 0x22,
+        8, 0x30, 0x31, 0x32,
+        11, 0x40, 0x41, 0x42,
+        7, 0x50, 0x51, 0x52,
+        6, 0x60, 0x61, 0x62,
+        9, 0x70, 0x71, 0x72,
+        12, 0x80, 0x81, 0x82,
+    };
+    ct_assertequal(aldo_arrsz(sprites), aldo_arrsz(spr->soam));
+
+    // add 8 sprites to oam
+    for (size_t i = 0; i < 8; ++i) {
+        for (size_t j = 0; j < 4; ++j) {
+            size_t idx = (i * 4) + j;
+            spr->oam[idx] = sprites[idx];
+        }
+    }
+    memfill(spr->soam);
 
     // this should run through all 64 sprites, copying 8 sprites into SOAM
     while (spr->s != ALDO_PPU_SPR_DONE) {

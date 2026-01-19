@@ -291,7 +291,7 @@ static void drawvecs(const struct view *v, int h, int w, int y,
 {
     mvwhline(v->content, h - y--, 0, 0, w);
 
-    const uint8_t *vectors = emu->snapshot.prg.vectors;
+    auto vectors = emu->snapshot.prg.vectors;
     auto lo = vectors[0];
     auto hi = vectors[1];
     mvwprintw(v->content, h - y--, 0, "%4X: %02X %02X     NMI $%04X",

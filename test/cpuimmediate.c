@@ -700,7 +700,7 @@ static void adc_bcd_visual6502_cases(void *ctx)
     };
 
     for (size_t i = 0; i < sizeof cases / sizeof cases[0]; ++i) {
-        const uint8_t *testcase = cases[i];
+        auto testcase = cases[i];
         cpu.pc = 0;
         cpu.a = testcase[0];
         mem[1] = testcase[1];
@@ -2363,7 +2363,7 @@ static void sbc_bcd_visual6502_cases(void *ctx)
     };
 
     for (size_t i = 0; i < sizeof cases / sizeof cases[0]; ++i) {
-        const uint8_t *testcase = cases[i];
+        auto testcase = cases[i];
         cpu.pc = 0;
         cpu.a = testcase[0];
         mem[1] = testcase[1];

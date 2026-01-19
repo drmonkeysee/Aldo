@@ -128,7 +128,7 @@ static int print_raw(uint16_t addr, const struct aldo_dis_instruction *inst,
 static int print_operand(const struct aldo_dis_instruction *inst,
                          char dis[restrict])
 {
-    const char *const restrict *strtable = StringTables[inst->d.mode];
+    auto strtable = StringTables[inst->d.mode];
     int count;
     switch (inst->bv.size) {
     case 1:
@@ -585,7 +585,7 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
         displayidx = (size_t)cpu->datapath.exec_cycle < max_offset
                         ? (size_t)cpu->datapath.exec_cycle
                         : max_offset;
-    const char *displaystr = StringTables[inst.d.mode][displayidx];
+    auto displaystr = StringTables[inst.d.mode][displayidx];
     switch (displayidx) {
     case 0:
         count = sprintf(dis + total, "%s", displaystr);
@@ -756,7 +756,7 @@ int aldo_dis_peek(struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
     assert(dis != nullptr);
 
     auto total = 0;
-    const char *interrupt = interrupt_display(snp);
+    auto interrupt = interrupt_display(snp);
     if (strlen(interrupt) > 0) {
         auto count = total = sprintf(dis, "%s > ", interrupt);
         if (count < 0) return ALDO_DIS_ERR_FMT;
@@ -789,7 +789,7 @@ int aldo_dis_peek(struct aldo_mos6502 *cpu, struct aldo_rp2c02 *ppu,
         }
         if (total < 0) return ALDO_DIS_ERR_FMT;
         if (peek.busfault) {
-            char *data = strrchr(dis, '=');
+            auto data = strrchr(dis, '=');
             if (data) {
                 // NOTE: verify last '=' leaves enough space for "FLT"
                 assert(dis + AldoDisPeekSize - data >= 6);

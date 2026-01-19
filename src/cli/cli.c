@@ -67,9 +67,7 @@ static int print_cart_info(const struct cliargs *args, aldo_cart *c)
     if (args->verbose) {
         puts("---=== Cart Info ===---");
     }
-    const char *name = args->verbose
-                        ? args->filepath
-                        : argparse_filename(args->filepath);
+    auto name = args->verbose ? args->filepath : argparse_filename(args->filepath);
     auto err = aldo_cart_write_info(c, name, args->verbose, stdout);
     if (err < 0) {
         fprintf(stderr, "Cart info print failure (%d): %s\n", err,

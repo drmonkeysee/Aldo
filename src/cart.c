@@ -322,7 +322,7 @@ struct aldo_blockview aldo_cart_prgblock(aldo_cart *self, size_t i)
     assert(self->mapper != nullptr);
 
     struct aldo_blockview bv = {.ord = i};
-    const uint8_t *prg = self->mapper->prgrom(self->mapper);
+    auto prg = self->mapper->prgrom(self->mapper);
     if (is_nes(self)) {
         if (i < self->info.ines_hdr.prg_blocks) {
             bv.size = ALDO_MEMBLOCK_16KB;
@@ -343,7 +343,7 @@ struct aldo_blockview aldo_cart_chrblock(aldo_cart *self, size_t i)
     struct aldo_blockview bv = {.ord = i};
     if (!is_nes(self)) return bv;
 
-    const uint8_t *chr = as_nesmap(self)->chrrom(self->mapper);
+    auto chr = as_nesmap(self)->chrrom(self->mapper);
     if (i < self->info.ines_hdr.chr_blocks) {
         bv.size = ALDO_MEMBLOCK_8KB;
         bv.mem = chr + (i * bv.size);

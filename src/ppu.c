@@ -292,7 +292,7 @@ static void snapshot_palette(const struct aldo_rp2c02 *self,
 {
     uint16_t base = Aldo_PaletteStartAddr + offset;
     for (size_t i = 0; i < AldoPalSize; ++i) {
-        uint8_t *p = palsnp[i];
+        auto p = palsnp[i];
         uint16_t addr = base + (uint16_t)(AldoPalSize * i);
         // NOTE: 1st color is always the backdrop
         p[0] = palette_read(self, base);

@@ -21,7 +21,7 @@ static uint8_t
 static bool chrread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     if (addr < ALDO_MEMBLOCK_8KB) {
-        uint8_t *ptable = addr < 0x1000 ? PatternTables[0] : PatternTables[1];
+        auto ptable = addr < 0x1000 ? PatternTables[0] : PatternTables[1];
         *d = ptable[addr % 0x10];
         return true;
     }

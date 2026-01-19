@@ -38,14 +38,14 @@ static struct aldo_dis_instruction create_instruction(size_t sz,
 
 static void errstr_returns_known_err(void *ctx)
 {
-    const char *err = aldo_dis_errstr(ALDO_DIS_ERR_FMT);
+    auto err = aldo_dis_errstr(ALDO_DIS_ERR_FMT);
 
     ct_assertequalstr("FORMATTED OUTPUT FAILURE", err);
 }
 
 static void errstr_returns_unknown_err(void *ctx)
 {
-    const char *err = aldo_dis_errstr(10);
+    auto err = aldo_dis_errstr(10);
 
     ct_assertequalstr("UNKNOWN ERR", err);
 }
@@ -303,7 +303,7 @@ static void mnemonic_valid(void *ctx)
         .d = {ALDO_IN_ADC, ALDO_AM_IMM, {}, {}, false},
     };
 
-    const char *result = aldo_dis_inst_mnemonic(&inst);
+    auto result = aldo_dis_inst_mnemonic(&inst);
 
     ct_assertequalstr("ADC", result);
 }
@@ -314,7 +314,7 @@ static void mnemonic_unofficial(void *ctx)
         .d = {ALDO_IN_ANC, ALDO_AM_IMM, {}, {}, true},
     };
 
-    const char *result = aldo_dis_inst_mnemonic(&inst);
+    auto result = aldo_dis_inst_mnemonic(&inst);
 
     ct_assertequalstr("ANC", result);
 }
@@ -325,7 +325,7 @@ static void mnemonic_invalid(void *ctx)
         .d = {(enum aldo_inst)-4, ALDO_AM_IMM, {}, {}, false},
     };
 
-    const char *result = aldo_dis_inst_mnemonic(&inst);
+    auto result = aldo_dis_inst_mnemonic(&inst);
 
     ct_assertequalstr("UDF", result);
 }
@@ -340,7 +340,7 @@ static void description_valid(void *ctx)
         .d = {ALDO_IN_ADC, ALDO_AM_IMM, {}, {}, false},
     };
 
-    const char *result = aldo_dis_inst_description(&inst);
+    auto result = aldo_dis_inst_description(&inst);
 
     ct_assertequalstr("Add with carry", result);
 }
@@ -351,7 +351,7 @@ static void description_unofficial(void *ctx)
         .d = {ALDO_IN_ANC, ALDO_AM_IMM, {}, {}, true},
     };
 
-    const char *result = aldo_dis_inst_description(&inst);
+    auto result = aldo_dis_inst_description(&inst);
 
     ct_assertequalstr("AND + set carry as if ASL or ROL", result);
 }
@@ -362,7 +362,7 @@ static void description_invalid(void *ctx)
         .d = {(enum aldo_inst)-4, ALDO_AM_IMM, {}, {}, false},
     };
 
-    const char *result = aldo_dis_inst_description(&inst);
+    auto result = aldo_dis_inst_description(&inst);
 
     ct_assertequalstr("Undefined", result);
 }
@@ -377,7 +377,7 @@ static void modename_valid(void *ctx)
         .d = {ALDO_IN_ADC, ALDO_AM_ZP, {}, {}, false},
     };
 
-    const char *result = aldo_dis_inst_addrmode(&inst);
+    auto result = aldo_dis_inst_addrmode(&inst);
 
     ct_assertequalstr("Zero-Page", result);
 }
@@ -388,7 +388,7 @@ static void modename_unofficial(void *ctx)
         .d = {ALDO_IN_ADC, ALDO_AM_JAM, {}, {}, true},
     };
 
-    const char *result = aldo_dis_inst_addrmode(&inst);
+    auto result = aldo_dis_inst_addrmode(&inst);
 
     ct_assertequalstr("Implied", result);
 }
@@ -399,7 +399,7 @@ static void modename_invalid(void *ctx)
         .d = {ALDO_IN_ADC, (enum aldo_addrmode)-4, {}, {}, false},
     };
 
-    const char *result = aldo_dis_inst_addrmode(&inst);
+    auto result = aldo_dis_inst_addrmode(&inst);
 
     ct_assertequalstr("Implied", result);
 }

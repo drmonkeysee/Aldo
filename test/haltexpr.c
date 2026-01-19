@@ -16,14 +16,14 @@
 
 static void errstr_returns_known_err(void *ctx)
 {
-    const char *err = aldo_haltexpr_errstr(ALDO_HEXPR_ERR_FMT);
+    auto err = aldo_haltexpr_errstr(ALDO_HEXPR_ERR_FMT);
 
     ct_assertequalstr("FORMATTED OUTPUT FAILURE", err);
 }
 
 static void errstr_returns_unknown_err(void *ctx)
 {
-    const char *err = aldo_haltexpr_errstr(10);
+    auto err = aldo_haltexpr_errstr(10);
 
     ct_assertequalstr("UNKNOWN ERR", err);
 }

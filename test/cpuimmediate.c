@@ -662,8 +662,7 @@ static void adc_bcd_max_hex(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.bcd = true;
     cpu.p.d = true;
-    cpu.a = 0xff;   // 30 + 30? 165 + 165??
-                    // who knows, this is undocumented behavior
+    cpu.a = 0xff;   // 30 + 30? 165 + 165?? who knows, this is undocumented behavior
 
     auto cycles = exec_cpu(&cpu);
 
@@ -962,7 +961,7 @@ static void cmp_negative_to_positive(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    // NOTE: negative to positive always implies A > M
+    // negative to positive always implies A > M
     ct_assertequal(0x80u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
@@ -981,7 +980,7 @@ static void cmp_positive_to_negative(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    // NOTE: positive to negative always implies A < M
+    // positive to negative always implies A < M
     ct_assertequal(0x0u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
@@ -1180,7 +1179,7 @@ static void cpx_negative_to_positive(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    // NOTE: negative to positive always implies X > M
+    // negative to positive always implies X > M
     ct_assertequal(0x80u, cpu.x);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
@@ -1199,7 +1198,7 @@ static void cpx_positive_to_negative(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    // NOTE: positive to negative always implies X < M
+    // positive to negative always implies X < M
     ct_assertequal(0x0u, cpu.x);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
@@ -1398,7 +1397,7 @@ static void cpy_negative_to_positive(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    // NOTE: negative to positive always implies Y > M
+    // negative to positive always implies Y > M
     ct_assertequal(0x80u, cpu.y);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
@@ -1417,7 +1416,7 @@ static void cpy_positive_to_negative(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    // NOTE: positive to negative always implies Y < M
+    // positive to negative always implies Y < M
     ct_assertequal(0x0u, cpu.y);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
@@ -2906,7 +2905,7 @@ static void nop(void *ctx)
         ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
         ct_assertequal(0x10u, cpu.databus, "Failed on opcode %02x", opc);
 
-        // NOTE: verify NOP did nothing
+        // verify NOP did nothing
         struct aldo_snapshot snp;
         aldo_cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
@@ -3120,7 +3119,7 @@ static void sbx_negative_to_positive(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    // NOTE: negative to positive always implies X > M
+    // negative to positive always implies X > M
     ct_assertequal(0x7fu, cpu.x);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
@@ -3140,7 +3139,7 @@ static void sbx_positive_to_negative(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    // NOTE: positive to negative always implies X < M
+    // positive to negative always implies X < M
     ct_assertequal(0xffu, cpu.x);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);

@@ -20,7 +20,7 @@
 
 static void interrupt_handler_setup(void **ctx)
 {
-    // NOTE: 32k rom, starting at $8000, for interrupt vectors
+    // 32k rom, starting at $8000, for interrupt vectors
     uint8_t *rom = calloc(ALDO_MEMBLOCK_32KB, sizeof *rom);
     rom[ALDO_CPU_VECTOR_IRQ & ALDO_ADDRMASK_32KB] = 0xaa;
     rom[(ALDO_CPU_VECTOR_IRQ + 1) & ALDO_ADDRMASK_32KB] = 0xbb;
@@ -60,7 +60,7 @@ static void brk_handler(void *ctx)
 
 static void irq_handler(void *ctx)
 {
-    // NOTE: LDA $0004 (0x20)
+    // LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20, [511] = 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -91,7 +91,7 @@ static void irq_handler(void *ctx)
 
 static void nmi_handler(void *ctx)
 {
-    // NOTE: LDA $0004 (0x20)
+    // LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20, [511] = 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -122,7 +122,7 @@ static void nmi_handler(void *ctx)
 
 static void rst_handler(void *ctx)
 {
-    // NOTE: LDA $0004 (0x20)
+    // LDA $0004 (0x20)
     uint8_t mem[] = {
         0xad, 0x4, 0x0, 0xff, 0x20, [509] = 0xdd, [510] = 0xee, [511] = 0xff,
     };
@@ -206,7 +206,7 @@ static void rti_set_irq_mask(void *ctx)
     ct_assertfalse(cpu.p.n);
 }
 
-// NOTE: IRQ latched after soft BRK started;
+// IRQ latched after soft BRK started;
 // IRQ handler will see IRQ line active but B flag set
 // and PC advanced past BRK instruction.
 static void brk_masks_irq(void *ctx)
@@ -242,7 +242,7 @@ static void brk_masks_irq(void *ctx)
     ct_assertequal(0x2u, mem[510]);
     ct_assertequal(0x0u, mem[511]);
 
-    // NOTE: IRQ seen active again after first instruction
+    // IRQ seen active again after first instruction
     aldo_cpu_cycle(&cpu);
     ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
 
@@ -251,11 +251,11 @@ static void brk_masks_irq(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: IRQ causes interrupt but line clears before sequence completes
+// IRQ causes interrupt but line clears before sequence completes
 // leading to an IRQ handler with nothing to service.
 static void irq_ghost(void *ctx)
 {
-    // NOTE: LDA $0004 (0x20)
+    // LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20, [511] = 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, ctx);
@@ -285,11 +285,11 @@ static void irq_ghost(void *ctx)
     ct_assertequal(ALDO_SIG_CLEAR, (int)cpu.rst);
 }
 
-// NOTE: NMI triggered and handler called but line never goes inactive
+// NMI triggered and handler called but line never goes inactive
 // to reset edge detection, so NMI latch never clears.
 static void nmi_line_never_cleared(void *ctx)
 {
-    // NOTE: LDA $0004 (0x20)
+    // LDA $0004 (0x20)
     ((uint8_t *)ctx)[ALDO_CPU_VECTOR_NMI & ALDO_ADDRMASK_32KB] = 0xfa;
     ((uint8_t *)ctx)[(ALDO_CPU_VECTOR_NMI + 1) & ALDO_ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
@@ -326,7 +326,7 @@ static void nmi_line_never_cleared(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: NMI latched after soft BRK started;
+// NMI latched after soft BRK started;
 // jumps to NMI handler but with B flag set
 // and PC advanced beyond BRK instruction;
 // BRK is lost if handler does not account for this case.
@@ -362,7 +362,7 @@ static void nmi_hijacks_brk(void *ctx)
     ct_assertequal(0x0u, mem[511]);
 }
 
-// NOTE: NMI goes active on vector fetch cycle, delaying NMI detection until
+// NMI goes active on vector fetch cycle, delaying NMI detection until
 // after first instruction of BRK handler.
 static void nmi_delayed_by_brk(void *ctx)
 {
@@ -393,7 +393,7 @@ static void nmi_delayed_by_brk(void *ctx)
     ct_assertequal(0x2u, mem[510]);
     ct_assertequal(0x0u, mem[511]);
 
-    // NOTE: NMI detected and handled after first instruction of BRK handler
+    // NMI detected and handled after first instruction of BRK handler
     aldo_cpu_cycle(&cpu);
     ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
@@ -402,7 +402,7 @@ static void nmi_delayed_by_brk(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: NMI goes active on final BRK cycle, delaying NMI detection until
+// NMI goes active on final BRK cycle, delaying NMI detection until
 // after first instruction of BRK handler.
 static void nmi_late_delayed_by_brk(void *ctx)
 {
@@ -429,7 +429,7 @@ static void nmi_late_delayed_by_brk(void *ctx)
     ct_assertequal(0x2u, mem[510]);
     ct_assertequal(0x0u, mem[511]);
 
-    // NOTE: NMI detected and handled after first instruction of BRK handler
+    // NMI detected and handled after first instruction of BRK handler
     aldo_cpu_cycle(&cpu);
     ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
@@ -438,7 +438,7 @@ static void nmi_late_delayed_by_brk(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: NMI goes active on vector fetch cycle, delaying NMI detection until
+// NMI goes active on vector fetch cycle, delaying NMI detection until
 // after BRK sequence, but NMI goes inactive after first cycle of next
 // instruction, losing the NMI.
 static void nmi_lost_during_brk(void *ctx)
@@ -479,10 +479,10 @@ static void nmi_lost_during_brk(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: NMI latched after IRQ started, jumps to NMI handler instead
+// NMI latched after IRQ started, jumps to NMI handler instead
 static void nmi_hijacks_irq(void *ctx)
 {
-    // NOTE: LDA $0004 (0x20)
+    // LDA $0004 (0x20)
     ((uint8_t *)ctx)[ALDO_CPU_VECTOR_NMI & ALDO_ADDRMASK_32KB] = 0xfa;
     ((uint8_t *)ctx)[(ALDO_CPU_VECTOR_NMI + 1) & ALDO_ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
@@ -531,11 +531,11 @@ static void nmi_hijacks_irq(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: NMI latched after IRQ started, jumps to NMI handler instead,
+// NMI latched after IRQ started, jumps to NMI handler instead,
 // IRQ signal goes inactive too early and IRQ is lost.
 static void nmi_hijacks_and_loses_irq(void *ctx)
 {
-    // NOTE: LDA $0004 (0x20)
+    // LDA $0004 (0x20)
     ((uint8_t *)ctx)[ALDO_CPU_VECTOR_NMI & ALDO_ADDRMASK_32KB] = 0xfa;
     ((uint8_t *)ctx)[(ALDO_CPU_VECTOR_NMI + 1) & ALDO_ADDRMASK_32KB] = 0x0;
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xea, 0x20, [250] = 0xea, [511] = 0xff};
@@ -585,7 +585,7 @@ static void nmi_hijacks_and_loses_irq(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: NMI goes active on vector fetch cycle, delaying NMI detection until
+// NMI goes active on vector fetch cycle, delaying NMI detection until
 // after first instruction of IRQ handler.
 static void nmi_delayed_by_irq(void *ctx)
 {
@@ -625,7 +625,7 @@ static void nmi_delayed_by_irq(void *ctx)
     ct_assertequal(0x3u, mem[510]);
     ct_assertequal(0x0u, mem[511]);
 
-    // NOTE: NMI detected and handled after first instruction of BRK handler
+    // NMI detected and handled after first instruction of BRK handler
     aldo_cpu_cycle(&cpu);
     ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
@@ -634,7 +634,7 @@ static void nmi_delayed_by_irq(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: NMI goes active on final IRQ cycle, delaying NMI detection until
+// NMI goes active on final IRQ cycle, delaying NMI detection until
 // after first instruction of IRQ handler.
 static void nmi_late_delayed_by_irq(void *ctx)
 {
@@ -670,7 +670,7 @@ static void nmi_late_delayed_by_irq(void *ctx)
     ct_assertequal(0x3u, mem[510]);
     ct_assertequal(0x0u, mem[511]);
 
-    // NOTE: NMI detected and handled after first instruction of BRK handler
+    // NMI detected and handled after first instruction of BRK handler
     aldo_cpu_cycle(&cpu);
     ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
@@ -679,7 +679,7 @@ static void nmi_late_delayed_by_irq(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: NMI goes active on vector fetch cycle, delaying NMI detection until
+// NMI goes active on vector fetch cycle, delaying NMI detection until
 // after IRQ sequence, but NMI goes inactive after first cycle of next
 // instruction, losing the NMI.
 static void nmi_lost_during_irq(void *ctx)
@@ -720,7 +720,7 @@ static void nmi_lost_during_irq(void *ctx)
     ct_assertequal(0x3u, mem[510]);
     ct_assertequal(0x0u, mem[511]);
 
-    // NOTE: NMI detected and handled after first instruction of BRK handler
+    // NMI detected and handled after first instruction of BRK handler
     aldo_cpu_cycle(&cpu);
     ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
 
@@ -730,13 +730,15 @@ static void nmi_lost_during_irq(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: these tests do not reflect actual 6502 behavior, called
-// "RESET half-hijacks", which exhibit all kinds of glitchy effects;
-// however since no legit software would ever rely on this behavior and it is
-// essentially impossible to recreate these conditions on functioning consumer
-// hardware, it's easier to implement simpler logic that behaves consistently.
+/*
+ * These tests do not reflect actual 6502 behavior, called
+ * "RESET half-hijacks", which exhibit all kinds of glitchy effects;
+ * however since no legit software would ever rely on this behavior and it is
+ * essentially impossible to recreate these conditions on functioning consumer
+ * hardware, it's easier to implement simpler logic that behaves consistently.
+ */
 
-// NOTE: set RST on T4 prevents IRQ from finishing
+// set RST on T4 prevents IRQ from finishing
 static void rst_hijacks_irq(void *ctx)
 {
     ((uint8_t *)ctx)[ALDO_CPU_VECTOR_IRQ & ALDO_ADDRMASK_32KB] = 0xfa;
@@ -794,7 +796,7 @@ static void rst_hijacks_irq(void *ctx)
     ct_assertequal(0u, cpu.opc);
 }
 
-// NOTE: set RST on T5 triggers RST sequence immediately after IRQ sequence
+// set RST on T5 triggers RST sequence immediately after IRQ sequence
 static void rst_following_irq(void *ctx)
 {
     ((uint8_t *)ctx)[ALDO_CPU_VECTOR_IRQ & ALDO_ADDRMASK_32KB] = 0xfa;
@@ -851,7 +853,7 @@ static void rst_following_irq(void *ctx)
     ct_assertequal(250u, cpu.pc);
 }
 
-// NOTE: set RST on T6 still triggers reset immediately after IRQ sequence
+// set RST on T6 still triggers reset immediately after IRQ sequence
 static void rst_late_on_irq(void *ctx)
 {
     ((uint8_t *)ctx)[ALDO_CPU_VECTOR_IRQ & ALDO_ADDRMASK_32KB] = 0xfa;
@@ -904,7 +906,7 @@ static void rst_late_on_irq(void *ctx)
     ct_assertequal(251u, cpu.pc);
 }
 
-// NOTE: set RST on T4 prevents NMI from finishing
+// set RST on T4 prevents NMI from finishing
 static void rst_hijacks_nmi(void *ctx)
 {
     ((uint8_t *)ctx)[ALDO_CPU_VECTOR_NMI & ALDO_ADDRMASK_32KB] = 0xfa;
@@ -961,7 +963,7 @@ static void rst_hijacks_nmi(void *ctx)
     ct_assertequal(0u, cpu.opc);
 }
 
-// NOTE: set RST on T5 triggers RST sequence immediately after NMI sequence
+// set RST on T5 triggers RST sequence immediately after NMI sequence
 static void rst_following_nmi(void *ctx)
 {
     ((uint8_t *)ctx)[ALDO_CPU_VECTOR_NMI & ALDO_ADDRMASK_32KB] = 0xfa;
@@ -1017,7 +1019,7 @@ static void rst_following_nmi(void *ctx)
     ct_assertequal(250u, cpu.pc);
 }
 
-// NOTE: set RST on T6 still triggers reset immediately after NMI sequence
+// set RST on T6 still triggers reset immediately after NMI sequence
 static void rst_late_on_nmi(void *ctx)
 {
     ((uint8_t *)ctx)[ALDO_CPU_VECTOR_NMI & ALDO_ADDRMASK_32KB] = 0xfa;
@@ -1086,7 +1088,7 @@ static void clear_on_startup(void *ctx)
 
 static void irq_poll_sequence(void *ctx)
 {
-    // NOTE: LDA $0004 (0x20)
+    // LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1116,7 +1118,7 @@ static void irq_poll_sequence(void *ctx)
 
 static void irq_short_sequence(void *ctx)
 {
-    // NOTE: LDA #$20
+    // LDA #$20
     uint8_t mem[] = {0xa9, 0x20, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1136,7 +1138,7 @@ static void irq_short_sequence(void *ctx)
 
 static void irq_long_sequence(void *ctx)
 {
-    // NOTE: DEC $0004 (0x20)
+    // DEC $0004 (0x20)
     uint8_t mem[] = {0xce, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1176,7 +1178,7 @@ static void irq_long_sequence(void *ctx)
 
 static void irq_branch_not_taken(void *ctx)
 {
-    // NOTE: BEQ +3 jump to SEC
+    // BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1197,7 +1199,7 @@ static void irq_branch_not_taken(void *ctx)
 
 static void irq_on_branch_taken_if_early_signal(void *ctx)
 {
-    // NOTE: BEQ +3 jump to SEC
+    // BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1223,7 +1225,7 @@ static void irq_on_branch_taken_if_early_signal(void *ctx)
 
 static void irq_delayed_on_branch_taken_if_late_signal(void *ctx)
 {
-    // NOTE: BEQ +3 jump to SEC
+    // BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1259,7 +1261,7 @@ static void irq_delayed_on_branch_taken_if_late_signal(void *ctx)
 
 static void irq_delayed_on_infinite_branch(void *ctx)
 {
-    // NOTE: BEQ -2 jump to itself
+    // BEQ -2 jump to itself
     uint8_t mem[] = {0xf0, 0xfe, 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1300,7 +1302,7 @@ static void irq_delayed_on_infinite_branch(void *ctx)
 
 static void irq_on_branch_page_boundary(void *ctx)
 {
-    // NOTE: BEQ +5 -> $0101
+    // BEQ +5 -> $0101
     uint8_t mem[] = {[250] = 0xf0, 0x5, 0xff, [257] = 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1361,7 +1363,7 @@ static void irq_just_in_time(void *ctx)
 
 static void irq_too_late(void *ctx)
 {
-    // NOTE: LDA $0006 (0x99), LDA #$20
+    // LDA $0006 (0x99), LDA #$20
     uint8_t mem[] = {0xad, 0x6, 0x0, 0xa9, 0x20, 0xff, 0x99};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1472,7 +1474,7 @@ static void irq_masked(void *ctx)
 
 static void irq_missed_by_sei(void *ctx)
 {
-    // NOTE: SEI
+    // SEI
     uint8_t mem[] = {0x78, 0xff, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1494,7 +1496,7 @@ static void irq_missed_by_sei(void *ctx)
 
 static void irq_missed_by_plp_set_mask(void *ctx)
 {
-    // NOTE: PLP (@ $0101)
+    // PLP (@ $0101)
     uint8_t mem[] = {0x28, 0xff, 0xff, 0xff, 0xff, [257] = 0x4};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1528,7 +1530,7 @@ static void irq_missed_by_plp_set_mask(void *ctx)
 
 static void irq_stopped_by_rti_set_mask(void *ctx)
 {
-    // NOTE: RTI (P @ $0101)
+    // RTI (P @ $0101)
     uint8_t mem[] = {
         0x40, 0xff, 0xff, 0xff, 0xff, [257] = 0x4, [258] = 0x5, [259] = 0x0,
     };
@@ -1576,7 +1578,7 @@ static void irq_stopped_by_rti_set_mask(void *ctx)
 
 static void irq_missed_by_cli(void *ctx)
 {
-    // NOTE: CLI, LDA #$20
+    // CLI, LDA #$20
     uint8_t mem[] = {0x58, 0xa9, 0x20, 0xff, 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1610,7 +1612,7 @@ static void irq_missed_by_cli(void *ctx)
 
 static void irq_missed_by_plp_clear_mask(void *ctx)
 {
-    // NOTE: PLP (@ $0101), LDA #$20
+    // PLP (@ $0101), LDA #$20
     uint8_t mem[] = {0x28, 0xa9, 0x20, 0xff, 0xff, [257] = 0x0};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1656,7 +1658,7 @@ static void irq_missed_by_plp_clear_mask(void *ctx)
 
 static void irq_allowed_by_rti_clear_mask(void *ctx)
 {
-    // NOTE: RTI (P @ $0101)
+    // RTI (P @ $0101)
     uint8_t mem[] = {
         0x40, 0xff, 0xff, 0xff, 0xff, [257] = 0x0, [258] = 0x5, [259] = 0x0,
     };
@@ -1708,20 +1710,20 @@ static void irq_detect_duplicate(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    // NOTE: simulate irq held active during and after servicing interrupt
+    // simulate irq held active during and after servicing interrupt
     cpu.signal.irq = false;
     cpu.irq = ALDO_SIG_COMMITTED;
     aldo_cpu_cycle(&cpu);
 
     ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.irq);
 
-    // NOTE: reset cpu to simulate interrupt has been serviced
+    // reset cpu to simulate interrupt has been serviced
     cpu.irq = ALDO_SIG_CLEAR;
     cpu.pc = 0;
     cpu.presync = true;
     aldo_cpu_cycle(&cpu);
 
-    // NOTE: if irq is still held active after servicing it'll
+    // if irq is still held active after servicing it'll
     // be detected again.
     ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
 
@@ -1732,7 +1734,7 @@ static void irq_detect_duplicate(void *ctx)
 
 static void nmi_poll_sequence(void *ctx)
 {
-    // NOTE: LDA $0004 (0x20)
+    // LDA $0004 (0x20)
     uint8_t mem[] = {0xad, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1761,7 +1763,7 @@ static void nmi_poll_sequence(void *ctx)
 
 static void nmi_short_sequence(void *ctx)
 {
-    // NOTE: LDA #$20
+    // LDA #$20
     uint8_t mem[] = {0xa9, 0x20, 0xff, 0xff, 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1780,7 +1782,7 @@ static void nmi_short_sequence(void *ctx)
 
 static void nmi_long_sequence(void *ctx)
 {
-    // NOTE: DEC $0004 (0x20)
+    // DEC $0004 (0x20)
     uint8_t mem[] = {0xce, 0x4, 0x0, 0xff, 0x20};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1819,7 +1821,7 @@ static void nmi_long_sequence(void *ctx)
 
 static void nmi_branch_not_taken(void *ctx)
 {
-    // NOTE: BEQ +3 jump to SEC
+    // BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1839,7 +1841,7 @@ static void nmi_branch_not_taken(void *ctx)
 
 static void nmi_on_branch_taken_if_early_signal(void *ctx)
 {
-    // NOTE: BEQ +3 jump to SEC
+    // BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1864,7 +1866,7 @@ static void nmi_on_branch_taken_if_early_signal(void *ctx)
 
 static void nmi_delayed_on_branch_taken_if_late_signal(void *ctx)
 {
-    // NOTE: BEQ +3 jump to SEC
+    // BEQ +3 jump to SEC
     uint8_t mem[] = {0xf0, 0x3, 0xff, 0xff, 0xff, 0x38, 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1899,7 +1901,7 @@ static void nmi_delayed_on_branch_taken_if_late_signal(void *ctx)
 
 static void nmi_delayed_on_infinite_branch(void *ctx)
 {
-    // NOTE: BEQ -2 jump to itself
+    // BEQ -2 jump to itself
     uint8_t mem[] = {0xf0, 0xfe, 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1939,7 +1941,7 @@ static void nmi_delayed_on_infinite_branch(void *ctx)
 
 static void nmi_on_branch_page_boundary(void *ctx)
 {
-    // NOTE: BEQ +5 -> $0101
+    // BEQ +5 -> $0101
     uint8_t mem[] = {[250] = 0xf0, 0x5, 0xff, [257] = 0xff};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -1998,7 +2000,7 @@ static void nmi_just_in_time(void *ctx)
 
 static void nmi_too_late(void *ctx)
 {
-    // NOTE: LDA $0006 (0x99), LDA #$20
+    // LDA $0006 (0x99), LDA #$20
     uint8_t mem[] = {0xad, 0x6, 0x0, 0xa9, 0x20, 0xff, 0x99};
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
@@ -2084,14 +2086,14 @@ static void nmi_serviced_only_clears_on_inactive(void *ctx)
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, nullptr);
 
-    // NOTE: simulate nmi held active during and after servicing interrupt
+    // simulate nmi held active during and after servicing interrupt
     cpu.signal.nmi = false;
     cpu.nmi = ALDO_SIG_COMMITTED;
     aldo_cpu_cycle(&cpu);
 
     ct_assertequal(ALDO_SIG_COMMITTED, (int)cpu.nmi);
 
-    // NOTE: reset cpu to simulate interrupt has been serviced
+    // reset cpu to simulate interrupt has been serviced
     cpu.nmi = ALDO_SIG_SERVICED;
     cpu.pc = 0;
     cpu.presync = true;
@@ -2103,7 +2105,7 @@ static void nmi_serviced_only_clears_on_inactive(void *ctx)
 
     ct_assertequal(ALDO_SIG_SERVICED, (int)cpu.nmi);
 
-    // NOTE: nmi cannot be detected again until line goes inactive
+    // nmi cannot be detected again until line goes inactive
     cpu.signal.nmi = true;
     aldo_cpu_cycle(&cpu);
 

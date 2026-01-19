@@ -70,7 +70,7 @@ static void bcc_positive_overflow(void *ctx)
 
 static void bcc_positive_wraparound(void *ctx)
 {
-    // NOTE: 32k rom, starting at $8000 to set up $FFFC + 10
+    // 32k rom, starting at $8000 to set up $FFFC + 10
     uint8_t *rom = calloc(0x8000, sizeof *rom);
     rom[0xfffa & ALDO_ADDRMASK_32KB] = 0x90;
     rom[0xfffb & ALDO_ADDRMASK_32KB] = 0xa;
@@ -101,7 +101,7 @@ static void bcc_negative_overflow(void *ctx)
 static void bcc_negative_wraparound(void *ctx)
 {
     uint8_t mem[] = {0x90, 0xf6};   // $0002 - 10
-    // NOTE: 32k rom, starting at $8000 to allow reads of wraparound addresses
+    // 32k rom, starting at $8000 to allow reads of wraparound addresses
     uint8_t *rom = calloc(0x8000, sizeof *rom);
     struct aldo_mos6502 cpu;
     setup_cpu(&cpu, mem, rom);

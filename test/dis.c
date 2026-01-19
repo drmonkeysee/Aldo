@@ -907,7 +907,7 @@ static void datapath_end_of_rom(void *ctx)
 
 static void datapath_unexpected_end_of_rom(void *ctx)
 {
-    // NOTE: LDA imm with missing 2nd byte
+    // LDA imm with missing 2nd byte
     struct aldo_snpprg curr = {
         .pc = {0xa9},
         .length = 1,
@@ -2449,14 +2449,14 @@ static void teardown_peek(void **ctx)
 
 static void peek_immediate(void *ctx)
 {
-    // NOTE: LDA #$10
+    // LDA #$10
     uint8_t mem[] = {0xa9, 0x10};
     struct aldo_mos6502 cpu;
     char buf[AldoDisPeekSize];
     setup_cpu(&cpu, mem, nullptr);
     struct aldo_snapshot snp;
     cpu.a = 0x10;
-    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    aldo_cpu_cycle(&cpu);   // run opcode fetch
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
@@ -2470,14 +2470,14 @@ static void peek_immediate(void *ctx)
 
 static void peek_zeropage(void *ctx)
 {
-    // NOTE: LDA $04
+    // LDA $04
     uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
     struct aldo_mos6502 cpu;
     char buf[AldoDisPeekSize];
     setup_cpu(&cpu, mem, nullptr);
     struct aldo_snapshot snp;
     cpu.a = 0x10;
-    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    aldo_cpu_cycle(&cpu);   // run opcode fetch
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
@@ -2491,7 +2491,7 @@ static void peek_zeropage(void *ctx)
 
 static void peek_zp_indexed(void *ctx)
 {
-    // NOTE: LDA $03,X
+    // LDA $03,X
     uint8_t mem[] = {0xb5, 0x3, 0x0, 0x0, 0x0, 0x30};
     struct aldo_mos6502 cpu;
     char buf[AldoDisPeekSize];
@@ -2499,7 +2499,7 @@ static void peek_zp_indexed(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
     cpu.x = 2;
-    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    aldo_cpu_cycle(&cpu);   // run opcode fetch
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
@@ -2513,7 +2513,7 @@ static void peek_zp_indexed(void *ctx)
 
 static void peek_indexed_indirect(void *ctx)
 {
-    // NOTE: LDA ($02,X)
+    // LDA ($02,X)
     uint8_t mem[] = {0xa1, 0x2, 0x0, 0x0, 0x2, 0x1, [258] = 0x40};
     struct aldo_mos6502 cpu;
     char buf[AldoDisPeekSize];
@@ -2521,7 +2521,7 @@ static void peek_indexed_indirect(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
     cpu.x = 2;
-    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    aldo_cpu_cycle(&cpu);   // run opcode fetch
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
@@ -2535,7 +2535,7 @@ static void peek_indexed_indirect(void *ctx)
 
 static void peek_indirect_indexed(void *ctx)
 {
-    // NOTE: LDA ($02),Y
+    // LDA ($02),Y
     uint8_t mem[] = {0xb1, 0x2, 0x2, 0x1, [263] = 0x60};
     struct aldo_mos6502 cpu;
     char buf[AldoDisPeekSize];
@@ -2543,7 +2543,7 @@ static void peek_indirect_indexed(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
     cpu.y = 5;
-    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    aldo_cpu_cycle(&cpu);   // run opcode fetch
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
@@ -2557,7 +2557,7 @@ static void peek_indirect_indexed(void *ctx)
 
 static void peek_absolute_indexed(void *ctx)
 {
-    // NOTE: LDA $0102,X
+    // LDA $0102,X
     uint8_t mem[] = {0xbd, 0x2, 0x1, [268] = 0x70};
     struct aldo_mos6502 cpu;
     char buf[AldoDisPeekSize];
@@ -2565,7 +2565,7 @@ static void peek_absolute_indexed(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
     cpu.x = 0xa;
-    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    aldo_cpu_cycle(&cpu);   // run opcode fetch
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
@@ -2579,14 +2579,14 @@ static void peek_absolute_indexed(void *ctx)
 
 static void peek_branch(void *ctx)
 {
-    // NOTE: BEQ +5
+    // BEQ +5
     uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
     struct aldo_mos6502 cpu;
     char buf[AldoDisPeekSize];
     struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = true;
-    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    aldo_cpu_cycle(&cpu);   // run opcode fetch
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
@@ -2600,14 +2600,14 @@ static void peek_branch(void *ctx)
 
 static void peek_branch_forced(void *ctx)
 {
-    // NOTE: BEQ +5
+    // BEQ +5
     uint8_t mem[] = {0xf0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55};
     struct aldo_mos6502 cpu;
     char buf[AldoDisPeekSize];
     struct aldo_snapshot snp;
     setup_cpu(&cpu, mem, nullptr);
     cpu.p.z = false;
-    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    aldo_cpu_cycle(&cpu);   // run opcode fetch
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
@@ -2621,7 +2621,7 @@ static void peek_branch_forced(void *ctx)
 
 static void peek_absolute_indirect(void *ctx)
 {
-    // NOTE: LDA ($0102)
+    // LDA ($0102)
     uint8_t mem[] = {0x6c, 0x2, 0x1, [258] = 0x5, 0x2, [517] = 80};
     struct aldo_mos6502 cpu;
     char buf[AldoDisPeekSize];
@@ -2629,7 +2629,7 @@ static void peek_absolute_indirect(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
     cpu.x = 0xa;
-    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    aldo_cpu_cycle(&cpu);   // run opcode fetch
     struct peekctx *pctx = ctx;
     aldo_cpu_snapshot(&cpu, &snp);
 
@@ -2643,7 +2643,7 @@ static void peek_absolute_indirect(void *ctx)
 
 static void peek_interrupt(void *ctx)
 {
-    // NOTE: LDA $04
+    // LDA $04
     uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
     struct aldo_mos6502 cpu;
     char buf[AldoDisPeekSize];
@@ -2651,7 +2651,7 @@ static void peek_interrupt(void *ctx)
     struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu.irq = ALDO_SIG_COMMITTED;
-    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    aldo_cpu_cycle(&cpu);   // run opcode fetch
     aldo_cpu_snapshot(&cpu, &snp);
     struct peekctx *pctx = ctx;
     auto dbg = pctx->dbg;
@@ -2669,7 +2669,7 @@ static void peek_interrupt(void *ctx)
 
 static void peek_overridden_reset(void *ctx)
 {
-    // NOTE: LDA $04
+    // LDA $04
     uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
     struct aldo_mos6502 cpu;
     char buf[AldoDisPeekSize];
@@ -2677,7 +2677,7 @@ static void peek_overridden_reset(void *ctx)
     struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu.rst = ALDO_SIG_COMMITTED;
-    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    aldo_cpu_cycle(&cpu);   // run opcode fetch
     aldo_cpu_snapshot(&cpu, &snp);
     struct peekctx *pctx = ctx;
     auto dbg = pctx->dbg;
@@ -2695,7 +2695,7 @@ static void peek_overridden_reset(void *ctx)
 
 static void peek_overridden_non_reset(void *ctx)
 {
-    // NOTE: LDA $04
+    // LDA $04
     uint8_t mem[] = {0xa5, 0x4, 0x0, 0x0, 0x20};
     struct aldo_mos6502 cpu;
     char buf[AldoDisPeekSize];
@@ -2703,7 +2703,7 @@ static void peek_overridden_non_reset(void *ctx)
     struct aldo_snapshot snp;
     cpu.a = 0x10;
     cpu.nmi = ALDO_SIG_COMMITTED;
-    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    aldo_cpu_cycle(&cpu);   // run opcode fetch
     aldo_cpu_snapshot(&cpu, &snp);
     struct peekctx *pctx = ctx;
     auto dbg = pctx->dbg;
@@ -2723,7 +2723,7 @@ static void peek_overridden_non_reset(void *ctx)
 
 static void peek_busfault(void *ctx)
 {
-    // NOTE: LDA ($02),Y
+    // LDA ($02),Y
     uint8_t mem[] = {0xb1, 0x2, 0x2, 0x40};
     struct aldo_mos6502 cpu;
     char buf[AldoDisPeekSize];
@@ -2731,7 +2731,7 @@ static void peek_busfault(void *ctx)
     setup_cpu(&cpu, mem, nullptr);
     cpu.a = 0x10;
     cpu.y = 5;
-    aldo_cpu_cycle(&cpu);   // NOTE: run opcode fetch
+    aldo_cpu_cycle(&cpu);   // run opcode fetch
     aldo_cpu_snapshot(&cpu, &snp);
     struct peekctx *pctx = ctx;
 

@@ -48,7 +48,7 @@ static struct aldo_busdevice
 // MARK: - Public Interface
 //
 
-// NOTE: one page of rom + extra to test page boundary addressing
+// one page of rom + extra to test page boundary addressing
 uint8_t BigRom[] = {
     0xca,
     [255] = 0xfe, 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7,
@@ -95,7 +95,7 @@ int exec_cpu(struct aldo_mos6502 *cpu)
     auto cycles = 0;
     do {
         cycles += aldo_cpu_cycle(cpu);
-        // NOTE: catch instructions that run longer than possible
+        // catch instructions that run longer than possible
         ct_asserttrue(cycles <= Aldo_MaxTCycle);
     } while (!cpu->presync);
     return cycles;

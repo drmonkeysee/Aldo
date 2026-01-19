@@ -831,7 +831,7 @@ static void ppuaddr_read(void *ctx)
     ct_assertequal(0x5au, d);
 }
 
-// NOTE: recreates example from
+// recreates example from
 // https://www.nesdev.org/wiki/PPU_scrolling#Details
 static void ppu_addr_scroll_interleave(void *ctx)
 {

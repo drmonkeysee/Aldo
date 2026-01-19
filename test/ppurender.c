@@ -31,7 +31,7 @@ static bool chrread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 static bool vramread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
     if (ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB) {
-        // NOTE: use horizontal mirroring for testing (Donkey Kong setting)
+        // use horizontal mirroring for testing (Donkey Kong setting)
         size_t select = addr < 0x2800 ? 0 : 1;
         *d = (addr & 0x3ff) < 0x3c0
                 ? NameTables[select][addr % 0x8]
@@ -98,7 +98,7 @@ static void ppu_render_setup(void **ctx)
         .read = vramread,
     });
     init_palette(&c->ppu);
-    // NOTE: turn on rendering and turn left-column mask off
+    // turn on rendering and turn left-column mask off
     c->ppu.mask.b = c->ppu.mask.s = c->ppu.mask.bm = c->ppu.mask.sm = true;
     *ctx = v;
 }
@@ -112,7 +112,7 @@ static void nametable_fetch(void *ctx)
     auto ppu = ppt_get_ppu(ctx);
     NameTables[0][5] = 0x11;
     ppu->v = 0x5;
-    ppu->line = 1;  // NOTE: avoid odd-frame skipped-dot behavior on line 0
+    ppu->line = 1;  // avoid odd-frame skipped-dot behavior on line 0
 
     aldo_ppu_cycle(ppu);
 
@@ -245,7 +245,7 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
     PatternTables[1][11] = 0x44;
     ppu->v = 0x3aea;
     ppu->ctrl.b = true;
-    ppu->line = 1;  // NOTE: avoid odd-frame skipped-dot behavior on line 0
+    ppu->line = 1;  // avoid odd-frame skipped-dot behavior on line 0
 
     // Idle Cycle
     aldo_ppu_cycle(ppu);
@@ -477,7 +477,7 @@ static void tile_fetch_rendering_disabled(void *ctx)
     PatternTables[1][11] = 0x44;
     ppu->v = 0x3aea;
     ppu->ctrl.b = true;
-    ppu->line = 1;  // NOTE: avoid odd-frame skipped-dot behavior on line 0
+    ppu->line = 1;  // avoid odd-frame skipped-dot behavior on line 0
     ppu->mask.b = ppu->mask.s = false;
 
     // Idle Cycle
@@ -584,7 +584,7 @@ static void tile_fetch_tile_only_disabled(void *ctx)
     PatternTables[1][11] = 0x44;
     ppu->v = 0x3aea;
     ppu->ctrl.b = true;
-    ppu->line = 1;  // NOTE: avoid odd-frame skipped-dot behavior on line 0
+    ppu->line = 1;  // avoid odd-frame skipped-dot behavior on line 0
     ppu->mask.b = false;
 
     // Idle Cycle
@@ -928,7 +928,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertfalse(ppu->signal.rd);
 
     // Tile Fetch
-    // NOTE: simulate getting a different tile
+    // simulate getting a different tile
     PatternTables[0][0] = 0xbb;
     PatternTables[0][8] = 0xcc;
 
@@ -1204,7 +1204,7 @@ static void course_x_wraparound(void *ctx)
 
     ct_assertequal(9, ppu->dot);
     ct_assertequal(0x400u, ppu->v); // 000 01 00000 00000
-    // NOTE: atb set to previous course-x selection
+    // atb set to previous course-x selection
     ct_assertequal(2u, ppu->pxpl.atb);
 
     ppu->v = 0x41f;                 // 000 01 00000 11111
@@ -1214,7 +1214,7 @@ static void course_x_wraparound(void *ctx)
 
     ct_assertequal(9, ppu->dot);
     ct_assertequal(0x0u, ppu->v);   // 000 00 00000 00000
-    // NOTE: atb set to previous course-x selection
+    // atb set to previous course-x selection
     ct_assertequal(2u, ppu->pxpl.atb);
 }
 
@@ -1228,7 +1228,7 @@ static void fine_y_wraparound(void *ctx)
 
     ct_assertequal(257, ppu->dot);
     ct_assertequal(0x86u, ppu->v);  // 000 00 00100 00110
-    // NOTE: atb set to previous course-x/y selection
+    // atb set to previous course-x/y selection
     ct_assertequal(4u, ppu->pxpl.atb);
 }
 
@@ -1242,7 +1242,7 @@ static void course_y_wraparound(void *ctx)
 
     ct_assertequal(257, ppu->dot);
     ct_assertequal(0x806u, ppu->v); // 000 10 00000 00110
-    // NOTE: atb set to previous course-x/y selection
+    // atb set to previous course-x/y selection
     ct_assertequal(0u, ppu->pxpl.atb);
 }
 
@@ -1256,7 +1256,7 @@ static void course_y_overflow(void *ctx)
 
     ct_assertequal(257, ppu->dot);
     ct_assertequal(0x3e6u, ppu->v);    // 000 00 11111 00110
-    // NOTE: atb set to previous course-x/y selection
+    // atb set to previous course-x/y selection
     ct_assertequal(4u, ppu->pxpl.atb);
 
     ppu->v = 0x73e6;                    // 111 00 11111 00110
@@ -1266,7 +1266,7 @@ static void course_y_overflow(void *ctx)
 
     ct_assertequal(257, ppu->dot);
     ct_assertequal(0x7u, ppu->v);       // 000 00 00000 00111
-    // NOTE: atb set to previous course-x/y selection
+    // atb set to previous course-x/y selection
     ct_assertequal(6u, ppu->pxpl.atb);
 }
 
@@ -1967,7 +1967,7 @@ static void sprite_evaluation_empty_scanline(void *ctx)
     spr->oamd = spr->soama = 0;
     spr->s = ALDO_PPU_SPR_SCAN;
     for (size_t i = 0; i < aldo_arrsz(spr->oam) / 4; ++i) {
-        // NOTE: set last sprite's y-coordinate uniquely to assert below that it
+        // set last sprite's y-coordinate uniquely to assert below that it
         // ends up in secondary OAM at the end.
         spr->oam[i * 4] = i == 63 ? 30 : 20;
     }
@@ -1975,7 +1975,7 @@ static void sprite_evaluation_empty_scanline(void *ctx)
         spr->soam[i] = 0xff;
     }
 
-    // NOTE: this should run through all 64 sprites, copying nothing but the
+    // this should run through all 64 sprites, copying nothing but the
     // last sprite's Y coordinate to secondary OAM.
     while (spr->s != ALDO_PPU_SPR_DONE) {
         aldo_ppu_cycle(ppu);
@@ -1991,7 +1991,7 @@ static void sprite_evaluation_empty_scanline(void *ctx)
     ct_assertequal(30u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
 
-    // NOTE: run the rest of the sprite evaluation window
+    // run the rest of the sprite evaluation window
     while (ppu->dot < 257) {
         aldo_ppu_cycle(ppu);
     }
@@ -2002,7 +2002,7 @@ static void sprite_evaluation_empty_scanline(void *ctx)
                        "unexpected value at soam idx %zu", i);
     }
     ct_assertequal(0x0u, spr->soama);
-    // NOTE: for a completely missed scanline looks like oamaddr happens to
+    // for a completely missed scanline looks like oamaddr happens to
     // end up on the 33rd sprite at the end.
     ct_assertequal(0x80u, ppu->oamaddr);
     ct_assertequal(20u, spr->oamd);
@@ -2018,7 +2018,7 @@ static void sprite_evaluation_partial_scanline(void *ctx)
     spr->oamd = spr->soama = 0;
     spr->s = ALDO_PPU_SPR_SCAN;
     aldo_memclr(spr->oam);
-    // NOTE: add 4 sprites to this scanline
+    // add 4 sprites to this scanline
     spr->oam[4] = 12;
     spr->oam[5] = 0x10;
     spr->oam[6] = 0x11;
@@ -2040,12 +2040,12 @@ static void sprite_evaluation_partial_scanline(void *ctx)
         spr->soam[i] = 0xff;
     }
 
-    // NOTE: this should run through all 64 sprites, copying 4 sprites into SOAM
+    // this should run through all 64 sprites, copying 4 sprites into SOAM
     while (spr->s != ALDO_PPU_SPR_DONE) {
         aldo_ppu_cycle(ppu);
     }
 
-    // NOTE: 128 dots + (2 dots for 3 attributes * 4 sprites = 24) = 152 dots
+    // 128 dots + (2 dots for 3 attributes * 4 sprites = 24) = 152 dots
     ct_assertequal(217, ppu->dot);
     ct_assertequal(12u, spr->soam[0]);
     ct_assertequal(0x10u, spr->soam[1]);
@@ -2072,7 +2072,7 @@ static void sprite_evaluation_partial_scanline(void *ctx)
     ct_assertequal(80u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
 
-    // NOTE: run the rest of the sprite evaluation window
+    // run the rest of the sprite evaluation window
     while (ppu->dot < 257) {
         aldo_ppu_cycle(ppu);
     }

@@ -1736,7 +1736,7 @@ static void nop_abs(void *ctx)
     ct_assertequal(3u, cpu.pc);
     ct_assertequal(0x6u, cpu.databus);
 
-    // NOTE: verify NOP did nothing
+    // verify NOP did nothing
     struct aldo_snapshot snp;
     aldo_cpu_snapshot(&cpu, &snp);
     ct_assertequal(0u, cpu.a);
@@ -1763,7 +1763,7 @@ static void nop_absx(void *ctx)
         ct_assertequal(3u, cpu.pc, "Failed on opcode %02x", opc);
         ct_assertequal(0x6u, cpu.databus, "Failed on opcode %02x", opc);
 
-        // NOTE: verify NOP did nothing
+        // verify NOP did nothing
         struct aldo_snapshot snp;
         aldo_cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
@@ -1790,7 +1790,7 @@ static void nop_absx_pagecross(void *ctx)
         ct_assertequal(3u, cpu.pc, "Failed on opcode %02x", opc);
         ct_assertequal(0xb2u, cpu.databus, "Failed on opcode %02x", opc);
 
-        // NOTE: verify NOP did nothing
+        // verify NOP did nothing
         struct aldo_snapshot snp;
         aldo_cpu_snapshot(&cpu, &snp);
         ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);

@@ -42,7 +42,7 @@ static void jmp_indirect(void *ctx)
 
 static void jmp_indirect_pageboundary_bug(void *ctx)
 {
-    // NOTE: *supposed* to read from $80FF, $8100
+    // *supposed* to read from $80FF, $8100
     // but actually ignores the carry and reads from $80FF, $8000.
     uint8_t mem[] = {0x6c, 0xff, 0x80};
     struct aldo_mos6502 cpu;
@@ -51,7 +51,7 @@ static void jmp_indirect_pageboundary_bug(void *ctx)
     auto cycles = exec_cpu(&cpu);
 
     ct_assertequal(5, cycles);
-    // NOTE: pc ends up pointing at address built from $80FF, $8000
+    // pc ends up pointing at address built from $80FF, $8000
     ct_assertequal(0xcafeu, cpu.pc);
 }
 

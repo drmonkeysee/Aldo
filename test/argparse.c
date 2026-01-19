@@ -427,7 +427,7 @@ static void flags_and_values_do_not_combine(void *ctx)
 
     ct_asserttrue(result);
 
-    // NOTE: 's' param is skipped so '5' is misparsed as the cart file
+    // 's' param is skipped so '5' is misparsed as the cart file
     ct_asserttrue(args->disassemble);
     ct_assertequal(1, args->chrscale);
     ct_assertequalstr("5", args->filepath);

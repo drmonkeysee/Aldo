@@ -115,7 +115,7 @@ static void reset_sequence(void *ctx)
     ct_asserttrue(ppu->signal.ale);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)ppu->rst);
 
-    // NOTE: reset line held
+    // reset line held
     for (auto i = 0; i < 5; ++i) {
         aldo_ppu_cycle(ppu);
     }

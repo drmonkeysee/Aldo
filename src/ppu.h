@@ -88,7 +88,7 @@ struct aldo_rp2c02 {
     struct {
         enum {
             ALDO_PPU_SPR_SCAN,  // Scan for sprites on the current scanline
-            ALDO_PPU_SPR_FILL,  // Fill a sprite into secondary OAM
+            ALDO_PPU_SPR_COPY,  // Copy a sprite into secondary OAM
             ALDO_PPU_SPR_FULL,  // Secondary OAM is full
             ALDO_PPU_SPR_DONE,  // OAM scanning is complete
         } s;                    // Sprite evaluation state; does not include idle

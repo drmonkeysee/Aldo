@@ -225,7 +225,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
             if ((uint8_t)(self->line - sprites->oamd) < in_range) {
                 // sprite height is within current scanline
                 ++self->oamaddr;
-                sprites->s = ALDO_PPU_SPR_FILL;
+                sprites->s = ALDO_PPU_SPR_COPY;
             } else {
                 sprite_skip(self);
                 // back up secondary oam address to un-commit previous write
@@ -238,7 +238,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
             }
         }
         break;
-    case ALDO_PPU_SPR_FILL:
+    case ALDO_PPU_SPR_COPY:
         // fill secondary OAM with the evaluated sprite
         soam_write(self);
         ++self->oamaddr;

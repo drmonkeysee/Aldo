@@ -1544,7 +1544,7 @@ static void sprite_top_on_scanline(void *ctx)
     ct_assertequal(20u, spr->oamd);
     ct_assertequal(0x1u, spr->soama);
     ct_assertequal(20u, spr->soam[0]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1554,7 +1554,7 @@ static void sprite_top_on_scanline(void *ctx)
     ct_assertequal(0x1u, spr->soama);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0xffu, spr->soam[1]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1564,7 +1564,7 @@ static void sprite_top_on_scanline(void *ctx)
     ct_assertequal(0x2u, spr->soama);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1575,7 +1575,7 @@ static void sprite_top_on_scanline(void *ctx)
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0xffu, spr->soam[2]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1586,7 +1586,7 @@ static void sprite_top_on_scanline(void *ctx)
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x33u, spr->soam[2]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1598,7 +1598,7 @@ static void sprite_top_on_scanline(void *ctx)
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x33u, spr->soam[2]);
     ct_assertequal(0xffu, spr->soam[3]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1644,7 +1644,7 @@ static void sprite_bottom_on_scanline(void *ctx)
     ct_assertequal(20u, spr->oamd);
     ct_assertequal(0x1u, spr->soama);
     ct_assertequal(20u, spr->soam[0]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1654,7 +1654,7 @@ static void sprite_bottom_on_scanline(void *ctx)
     ct_assertequal(0x1u, spr->soama);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0xffu, spr->soam[1]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1664,7 +1664,7 @@ static void sprite_bottom_on_scanline(void *ctx)
     ct_assertequal(0x2u, spr->soama);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1675,7 +1675,7 @@ static void sprite_bottom_on_scanline(void *ctx)
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0xffu, spr->soam[2]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1686,7 +1686,7 @@ static void sprite_bottom_on_scanline(void *ctx)
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x33u, spr->soam[2]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1698,7 +1698,7 @@ static void sprite_bottom_on_scanline(void *ctx)
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x33u, spr->soam[2]);
     ct_assertequal(0xffu, spr->soam[3]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1746,7 +1746,7 @@ static void sprite_sixteen_within_scanline(void *ctx)
     ct_assertequal(20u, spr->oamd);
     ct_assertequal(0x1u, spr->soama);
     ct_assertequal(20u, spr->soam[0]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1756,7 +1756,7 @@ static void sprite_sixteen_within_scanline(void *ctx)
     ct_assertequal(0x1u, spr->soama);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0xffu, spr->soam[1]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1766,7 +1766,7 @@ static void sprite_sixteen_within_scanline(void *ctx)
     ct_assertequal(0x2u, spr->soama);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1777,7 +1777,7 @@ static void sprite_sixteen_within_scanline(void *ctx)
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0xffu, spr->soam[2]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1788,7 +1788,7 @@ static void sprite_sixteen_within_scanline(void *ctx)
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x33u, spr->soam[2]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1800,7 +1800,7 @@ static void sprite_sixteen_within_scanline(void *ctx)
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x33u, spr->soam[2]);
     ct_assertequal(0xffu, spr->soam[3]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1848,7 +1848,7 @@ static void sprite_sixteen_bottom_scanline(void *ctx)
     ct_assertequal(20u, spr->oamd);
     ct_assertequal(0x1u, spr->soama);
     ct_assertequal(20u, spr->soam[0]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1858,7 +1858,7 @@ static void sprite_sixteen_bottom_scanline(void *ctx)
     ct_assertequal(0x1u, spr->soama);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0xffu, spr->soam[1]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1868,7 +1868,7 @@ static void sprite_sixteen_bottom_scanline(void *ctx)
     ct_assertequal(0x2u, spr->soama);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1879,7 +1879,7 @@ static void sprite_sixteen_bottom_scanline(void *ctx)
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0xffu, spr->soam[2]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1890,7 +1890,7 @@ static void sprite_sixteen_bottom_scanline(void *ctx)
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x33u, spr->soam[2]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -1902,7 +1902,7 @@ static void sprite_sixteen_bottom_scanline(void *ctx)
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x33u, spr->soam[2]);
     ct_assertequal(0xffu, spr->soam[3]);
-    ct_assertequal(ALDO_PPU_SPR_FILL, (int)spr->s);
+    ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
@@ -2173,11 +2173,11 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
     };
     ct_assertequal(aldo_arrsz(sprites), aldo_arrsz(spr->soam));
 
-    // add 8 sprites to oam
+    // add 8 sprites in a row to some arbitrary aligned point in oam
     for (size_t i = 0; i < 8; ++i) {
         for (size_t j = 0; j < 4; ++j) {
             size_t idx = (i * 4) + j;
-            spr->oam[idx] = sprites[idx];
+            spr->oam[idx + (6 * 4)] = sprites[idx];
         }
     }
     memfill(spr->soam);
@@ -2800,6 +2800,7 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(sprite_evaluation_empty_scanline),
         ct_maketest(sprite_evaluation_partial_scanline),
         ct_maketest(sprite_evaluation_last_sprite_fills_scanline),
+        ct_maketest(sprite_evaluation_fill_with_no_overflows),
         ct_maketest(oamaddr_cleared_during_sprite_fetch),
         ct_maketest(oamaddr_cleared_during_sprite_fetch_on_prerender),
         ct_maketest(oamaddr_not_cleared_during_postrender),

@@ -175,7 +175,7 @@ static bool parse_dbgfile(const char *arg, int *restrict argi, int argc,
 static bool parse_arg(const char *arg, int *restrict argi, int argc,
                       char *argv[argc+1], struct cliargs *restrict args)
 {
-#define SETFLAG(f, a, s, l) ((f) = (f) || parse_flag(a, s, false, l))
+#define setflag(f, a, s, l) ((f) = (f) || parse_flag(a, s, false, l))
 
     if (parse_flag(arg, ChrScaleShort, true, ChrScaleLong)) {
         long scale;
@@ -202,7 +202,7 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
         return parse_dbgfile(arg, argi, argc, argv, args);
     }
 
-    SETFLAG(args->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);
+    setflag(args->chrdecode, arg, ChrDecodeShort, ChrDecodeLong);
     auto chroptlen = strlen(ChrDecodeLong);
     if (strncmp(arg, ChrDecodeLong, chroptlen) == 0) {
         const char *opt = strchr(arg, '=');
@@ -211,19 +211,19 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
         }
     }
 
-    SETFLAG(args->batch, arg, BatchShort, BatchLong);
-    SETFLAG(args->bcdsupport, arg, BcdShort, BcdLong);
-    SETFLAG(args->disassemble, arg, DisassembleShort, DisassembleLong);
-    SETFLAG(args->help, arg, HelpShort, HelpLong);
-    SETFLAG(args->info, arg, InfoShort, InfoLong);
-    SETFLAG(args->tron, arg, TraceShort, TraceLong);
-    SETFLAG(args->verbose, arg, VerboseShort, nullptr);
-    SETFLAG(args->version, arg, VersionShort, VersionLong);
-    SETFLAG(args->zeroram, arg, ZeroRamShort, ZeroRamLong);
+    setflag(args->batch, arg, BatchShort, BatchLong);
+    setflag(args->bcdsupport, arg, BcdShort, BcdLong);
+    setflag(args->disassemble, arg, DisassembleShort, DisassembleLong);
+    setflag(args->help, arg, HelpShort, HelpLong);
+    setflag(args->info, arg, InfoShort, InfoLong);
+    setflag(args->tron, arg, TraceShort, TraceLong);
+    setflag(args->verbose, arg, VerboseShort, nullptr);
+    setflag(args->version, arg, VersionShort, VersionLong);
+    setflag(args->zeroram, arg, ZeroRamShort, ZeroRamLong);
 
     return true;
 
-#undef SETFLAG
+#undef setflag
 }
 
 //

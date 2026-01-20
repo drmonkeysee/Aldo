@@ -273,7 +273,6 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         // the correct y-coordinate.
         self->oamaddr = (self->oamaddr & ~DWordMask)
                             | ((self->oamaddr + 1) & DWordMask);
-        // sprite index has overflowed, scanning is done
         if (oam_overflow(self, sprite_idx)) {
             sprites->s = ALDO_PPU_SPR_DONE;
         }

@@ -2109,12 +2109,7 @@ static void sprite_evaluation_last_sprite_fills_scanline(void *ctx)
     ct_assertequal(aldo_arrsz(sprites), aldo_arrsz(spr->soam));
 
     // add first seven sprites to oam
-    for (size_t i = 0; i < 7; ++i) {
-        for (size_t j = 0; j < 4; ++j) {
-            size_t idx = (i * 4) + j;
-            spr->oam[idx] = sprites[idx];
-        }
-    }
+    memcpy(spr->oam, sprites, aldo_arrsz(sprites) - 4);
     // add last sprite to last oam slot
     spr->oam[252] = sprites[28];
     spr->oam[253] = sprites[29];
@@ -2175,12 +2170,7 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
 
     // Add 8 sprites in a row to some arbitrary aligned point in oam;
     // in this case the 7th sprite.
-    for (size_t i = 0; i < 8; ++i) {
-        for (size_t j = 0; j < 4; ++j) {
-            size_t idx = (i * 4) + j;
-            spr->oam[idx + (6 * 4)] = sprites[idx];
-        }
-    }
+    memcpy(spr->oam + (6 * 4), sprites, aldo_arrsz(sprites));
     memfill(spr->soam);
 
     // stop after filling secondary OAM
@@ -2330,12 +2320,7 @@ static void sprite_evaluation_oamaddr_offset(void *ctx)
     };
     ct_assertequal(aldo_arrsz(sprites), aldo_arrsz(spr->soam));
 
-    for (size_t i = 0; i < 8; ++i) {
-        for (size_t j = 0; j < 4; ++j) {
-            size_t idx = (i * 4) + j;
-            spr->oam[idx] = sprites[idx];
-        }
-    }
+    memcpy(spr->oam, sprites, aldo_arrsz(sprites));
     memfill(spr->soam);
     ppu->oamaddr = 0xc;    // start at OAM[3][0];
 
@@ -2382,12 +2367,7 @@ static void sprite_evaluation_oamaddr_misaligned(void *ctx)
     };
     ct_assertequal(aldo_arrsz(sprites), aldo_arrsz(spr->soam));
 
-    for (size_t i = 0; i < 8; ++i) {
-        for (size_t j = 0; j < 4; ++j) {
-            size_t idx = (i * 4) + j;
-            spr->oam[idx] = sprites[idx];
-        }
-    }
+    memcpy(spr->oam, sprites, aldo_arrsz(sprites));
     memfill(spr->soam);
     ppu->oamaddr = 0x2;    // start at OAM[0][2];
 

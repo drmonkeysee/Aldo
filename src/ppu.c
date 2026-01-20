@@ -164,6 +164,13 @@ static uint8_t oam_read(const struct aldo_rp2c02 *self)
     return self->spr.oam[self->oamaddr];
 }
 
+// OAMADDR may be misaligned to 4-byte sprite boundaries, so checking
+// OAMADDR == 0 after incrementing is not sufficient to detect overflow.
+static bool oam_overflow(const struct aldo_rp2c02 *self, uint8_t prev_sprite)
+{
+    return prev_sprite != 0 && (self->oamaddr & ~DWordMask) == 0;
+}
+
 static void soam_write(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
@@ -215,6 +222,10 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         return;
     }
 
+    // Capture current sprite index value to properly detect OAMADDR overflow
+    // even when OAMADDR is misaligned.
+    uint8_t sprite_idx = self->oamaddr & ~DWordMask;
+
     switch (sprites->s) {
     case ALDO_PPU_SPR_SCAN:
         {
@@ -234,7 +245,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
                 --sprites->soama;
             }
             // we've checked all 64 sprites
-            if (self->oamaddr == 0) {
+            if (oam_overflow(self, sprite_idx)) {
                 sprites->s = ALDO_PPU_SPR_DONE;
             }
         }
@@ -243,7 +254,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         // fill secondary OAM with the evaluated sprite
         soam_write(self);
         ++self->oamaddr;
-        if (self->oamaddr == 0) {
+        if (oam_overflow(self, sprite_idx)) {
             sprites->s = ALDO_PPU_SPR_DONE;
         } else if (sprites->soama == 0) {
             sprites->s = ALDO_PPU_SPR_FULL;
@@ -263,7 +274,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         self->oamaddr = (self->oamaddr & ~DWordMask)
                             | ((self->oamaddr + 1) & DWordMask);
         // sprite index has overflowed, scanning is done
-        if ((self->oamaddr & ~DWordMask) == 0) {
+        if (oam_overflow(self, sprite_idx)) {
             sprites->s = ALDO_PPU_SPR_DONE;
         }
         break;
@@ -686,10 +697,10 @@ static void output_pixel(struct aldo_rp2c02 *self)
     self->signal.vout = true;
 }
 
-#define pxshift(r, v) (*(r) = (typeof(*(r)))(*(r) << 1) | (v))
-
 static void shift_tiles(struct aldo_rp2c02 *self)
 {
+#define pxshift(r, v) (*(r) = (typeof(*(r)))(*(r) << 1) | (v))
+
     auto pxpl = &self->pxpl;
     pxshift(pxpl->bgs, 1);
     pxshift(pxpl->ats, pxpl->atl[0]);
@@ -698,6 +709,8 @@ static void shift_tiles(struct aldo_rp2c02 *self)
     if (self->dot % 8 == 1) {
         latch_tile(self);
     }
+
+#undef pxshift
 }
 
 static uint16_t nametable_addr(const struct aldo_rp2c02 *self)

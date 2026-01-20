@@ -2309,6 +2309,109 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
     ct_assertfalse(ppu->status.o);  // no overflow found
 }
 
+static void sprite_evaluation_oamaddr_offset(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    auto spr = &ppu->spr;
+    ppu->line = 12;
+    ppu->dot = 65;
+    spr->oamd = spr->soama = 0;
+    spr->s = ALDO_PPU_SPR_SCAN;
+    aldo_memclr(spr->oam);
+    uint8_t sprites[] = {
+        12, 0x10, 0x11, 0x12,
+        10, 0x20, 0x21, 0x22,
+        8, 0x30, 0x31, 0x32,
+        11, 0x40, 0x41, 0x42,
+        7, 0x50, 0x51, 0x52,
+        6, 0x60, 0x61, 0x62,
+        9, 0x70, 0x71, 0x72,
+        12, 0x80, 0x81, 0x82,
+    };
+    ct_assertequal(aldo_arrsz(sprites), aldo_arrsz(spr->soam));
+
+    for (size_t i = 0; i < 8; ++i) {
+        for (size_t j = 0; j < 4; ++j) {
+            size_t idx = (i * 4) + j;
+            spr->oam[idx] = sprites[idx];
+        }
+    }
+    memfill(spr->soam);
+    ppu->oamaddr = 0xc;    // start at OAM[3][0];
+
+    while (spr->s != ALDO_PPU_SPR_DONE) {
+        aldo_ppu_cycle(ppu);
+    }
+
+    ct_assertequal(217, ppu->dot);
+    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
+        if (i < 20) {
+            // first 3 sprites skipped by OAMADDR offset
+            ct_assertequal(sprites[i + 12], spr->soam[i], "unexpected soam value at %zu", i);
+        } else if (i == 20) {
+            // last OAM read/write
+            ct_assertequal(0x0u, spr->soam[i]);
+        } else {
+            ct_assertequal(0xffu, spr->soam[i]);
+        }
+    }
+    ct_assertequal(0x14u, spr->soama);  // secondary OAM contains 5 sprites
+    ct_assertequal(0x0u, ppu->oamaddr);
+    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
+}
+
+static void sprite_evaluation_oamaddr_misaligned(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    auto spr = &ppu->spr;
+    ppu->line = 20;
+    ppu->dot = 65;
+    spr->oamd = spr->soama = 0;
+    spr->s = ALDO_PPU_SPR_SCAN;
+    aldo_memclr(spr->oam);
+    uint8_t sprites[] = {
+        12, 0x10, 0x11, 0x12,
+        10, 0x20, 0x21, 0x22,
+        8, 0x30, 0x31, 0x32,
+        11, 0x40, 0x41, 0x42,
+        7, 0x50, 0x51, 0x52,
+        6, 0x60, 0x61, 0x62,
+        9, 0x70, 0x71, 0x72,
+        12, 0x80, 0x81, 0x82,
+    };
+    ct_assertequal(aldo_arrsz(sprites), aldo_arrsz(spr->soam));
+
+    for (size_t i = 0; i < 8; ++i) {
+        for (size_t j = 0; j < 4; ++j) {
+            size_t idx = (i * 4) + j;
+            spr->oam[idx] = sprites[idx];
+        }
+    }
+    memfill(spr->soam);
+    ppu->oamaddr = 0x2;    // start at OAM[0][2];
+
+    while (spr->s != ALDO_PPU_SPR_DONE) {
+        aldo_ppu_cycle(ppu);
+    }
+
+    ct_assertequal(199, ppu->dot);
+    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
+        if (i < 4) {
+            ct_assertequal(sprites[i + 2], spr->soam[i], "unexpected soam value at %zu", i);
+        } else if (i == 4) {
+            // last OAM read/write
+            ct_assertequal(0x0u, spr->soam[i]);
+        } else {
+            ct_assertequal(0xffu, spr->soam[i]);
+        }
+    }
+    ct_assertequal(0x4u, spr->soama);  // secondary OAM contains 1 sprite
+    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
+}
+
 static void oamaddr_cleared_during_sprite_fetch(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
@@ -2898,6 +3001,8 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(sprite_evaluation_partial_scanline),
         ct_maketest(sprite_evaluation_last_sprite_fills_scanline),
         ct_maketest(sprite_evaluation_fill_with_no_overflows),
+        ct_maketest(sprite_evaluation_oamaddr_offset),
+        ct_maketest(sprite_evaluation_oamaddr_misaligned),
         ct_maketest(oamaddr_cleared_during_sprite_fetch),
         ct_maketest(oamaddr_cleared_during_sprite_fetch_on_prerender),
         ct_maketest(oamaddr_not_cleared_during_postrender),

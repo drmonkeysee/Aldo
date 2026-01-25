@@ -1155,12 +1155,12 @@ static void prerender_set_vertical_coords(void *ctx)
     ct_assertequal(280, ppu->dot);
     ct_assertequal(0x5u, ppu->v);
 
-    while (ppu->dot < 305) {
+    do {
         aldo_ppu_cycle(ppu);
 
         ct_assertequal(0x5ba5u, ppu->v);
         ppu->v = 0x5;
-    }
+    } while (ppu->dot < 305);
 
     aldo_ppu_cycle(ppu);
 
@@ -1180,12 +1180,12 @@ static void render_not_set_vertical_coords(void *ctx)
     ct_assertequal(280, ppu->dot);
     ct_assertequal(0x5u, ppu->v);
 
-    while (ppu->dot < 305) {
+    do {
         aldo_ppu_cycle(ppu);
 
         ct_assertequal(0x5u, ppu->v);
         ppu->v = 0x5;
-    }
+    } while (ppu->dot < 305);
 
     aldo_ppu_cycle(ppu);
 
@@ -1978,9 +1978,9 @@ static void sprite_evaluation_empty_scanline(void *ctx)
 
     // This should run through all 64 sprites, copying nothing but the
     // last sprite's Y coordinate to secondary OAM.
-    while (spr->s != ALDO_PPU_SPR_DONE) {
+    do {
         aldo_ppu_cycle(ppu);
-    }
+    } while (spr->s != ALDO_PPU_SPR_DONE);
 
     ct_assertequal(193, ppu->dot); // 2 dots per sprite = 128 dots
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
@@ -1993,9 +1993,9 @@ static void sprite_evaluation_empty_scanline(void *ctx)
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
 
     // run the rest of the sprite evaluation window
-    while (ppu->dot < 257) {
+    do {
         aldo_ppu_cycle(ppu);
-    }
+    } while (ppu->dot < 257);
 
     ct_assertequal(257, ppu->dot);
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
@@ -2040,9 +2040,9 @@ static void sprite_evaluation_partial_scanline(void *ctx)
     memfill(spr->soam);
 
     // this should run through all 64 sprites, copying 4 sprites into SOAM
-    while (spr->s != ALDO_PPU_SPR_DONE) {
+    do {
         aldo_ppu_cycle(ppu);
-    }
+    } while (spr->s != ALDO_PPU_SPR_DONE);
 
     // 128 dots + (2 dots for 3 attributes * 4 sprites = 24) = 152 dots
     ct_assertequal(217, ppu->dot);
@@ -2072,9 +2072,9 @@ static void sprite_evaluation_partial_scanline(void *ctx)
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
 
     // run the rest of the sprite evaluation window
-    while (ppu->dot < 257) {
+    do {
         aldo_ppu_cycle(ppu);
-    }
+    } while (ppu->dot < 257);
 
     ct_assertequal(257, ppu->dot);
     ct_assertequal(80u, spr->soam[16]);
@@ -2118,9 +2118,9 @@ static void sprite_evaluation_last_sprite_fills_scanline(void *ctx)
     memfill(spr->soam);
 
     // this should run through all 64 sprites, copying 8 sprites into SOAM
-    while (spr->s != ALDO_PPU_SPR_DONE) {
+    do {
         aldo_ppu_cycle(ppu);
-    }
+    } while (spr->s != ALDO_PPU_SPR_DONE);
 
     // 128 dots + (2 dots for 3 attributes * 8 sprites = 48) = 176 dots
     ct_assertequal(241, ppu->dot);
@@ -2133,9 +2133,9 @@ static void sprite_evaluation_last_sprite_fills_scanline(void *ctx)
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
 
     // run the rest of the sprite evaluation window
-    while (ppu->dot < 257) {
+    do {
         aldo_ppu_cycle(ppu);
-    }
+    } while (ppu->dot < 257);
 
     ct_assertequal(257, ppu->dot);
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
@@ -2174,9 +2174,9 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
     memfill(spr->soam);
 
     // stop after filling secondary OAM
-    while (spr->s != ALDO_PPU_SPR_FULL) {
+    do {
         aldo_ppu_cycle(ppu);
-    }
+    } while (spr->s != ALDO_PPU_SPR_FULL);
 
     // 6 sprite misses * 2 dots + 8 sprite hits * 8 dots = 76 dots
     ct_assertequal(141, ppu->dot);
@@ -2269,9 +2269,9 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
     ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
     ct_assertfalse(ppu->status.o);
 
-    while (spr->s != ALDO_PPU_SPR_DONE) {
+    do {
         aldo_ppu_cycle(ppu);
-    }
+    } while (spr->s != ALDO_PPU_SPR_DONE);
 
     ct_assertequal(241, ppu->dot);
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
@@ -2284,9 +2284,9 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
     ct_assertfalse(ppu->status.o);
 
     // run the rest of the sprite evaluation window
-    while (ppu->dot < 257) {
+    do {
         aldo_ppu_cycle(ppu);
-    }
+    } while (ppu->dot < 257);
 
     ct_assertequal(257, ppu->dot);
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
@@ -2324,9 +2324,9 @@ static void sprite_evaluation_oamaddr_offset(void *ctx)
     memfill(spr->soam);
     ppu->oamaddr = 0xc;    // start at OAM[3][0];
 
-    while (spr->s != ALDO_PPU_SPR_DONE) {
+    do {
         aldo_ppu_cycle(ppu);
-    }
+    } while (spr->s != ALDO_PPU_SPR_DONE);
 
     ct_assertequal(217, ppu->dot);
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
@@ -2371,9 +2371,9 @@ static void sprite_evaluation_oamaddr_misaligned(void *ctx)
     memfill(spr->soam);
     ppu->oamaddr = 0x2;    // start at OAM[0][2];
 
-    while (spr->s != ALDO_PPU_SPR_DONE) {
+    do {
         aldo_ppu_cycle(ppu);
-    }
+    } while (spr->s != ALDO_PPU_SPR_DONE);
 
     ct_assertequal(199, ppu->dot);
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {

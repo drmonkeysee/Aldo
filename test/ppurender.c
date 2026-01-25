@@ -2006,7 +2006,7 @@ static void sprite_evaluation_empty_scanline(void *ctx)
     // For a completely missed scanline looks like oamaddr happens to
     // end up on the 33rd sprite at the end.
     ct_assertequal(0x80u, ppu->oamaddr);
-    ct_assertequal(20u, spr->oamd);
+    ct_assertequal(30u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
 }
 
@@ -2083,7 +2083,7 @@ static void sprite_evaluation_partial_scanline(void *ctx)
     }
     ct_assertequal(0x10u, spr->soama);
     ct_assertequal(0x50u, ppu->oamaddr);    // ends up on the 21st sprite
-    ct_assertequal(0u, spr->oamd);
+    ct_assertequal(80u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
 }
 
@@ -2143,7 +2143,7 @@ static void sprite_evaluation_last_sprite_fills_scanline(void *ctx)
     }
     ct_assertequal(0x0u, spr->soama);
     ct_assertequal(0x20u, ppu->oamaddr);    // ends up on the 9th sprite
-    ct_assertequal(0u, spr->oamd);
+    ct_assertequal(12u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
 }
 
@@ -2198,7 +2198,7 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
     }
     ct_assertequal(0x0u, spr->soama);
     ct_assertequal(0x38u, ppu->oamaddr);    // OAM[56][0]
-    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(0x0u, spr->oamd);        // value from OAM
     ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
@@ -2210,7 +2210,7 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
     }
     ct_assertequal(0x0u, spr->soama);
     ct_assertequal(0x3du, ppu->oamaddr);    // OAM[60][1]
-    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(12u, spr->oamd);         // value replaced by SOAM read
     ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
     ct_assertfalse(ppu->status.o);
 
@@ -2224,7 +2224,7 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
     }
     ct_assertequal(0x0u, spr->soama);
     ct_assertequal(0x42u, ppu->oamaddr);    // OAM[64][2]
-    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(12u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
     ct_assertfalse(ppu->status.o);
 
@@ -2237,7 +2237,7 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
     }
     ct_assertequal(0x0u, spr->soama);
     ct_assertequal(0x47u, ppu->oamaddr);    // OAM[68][3]
-    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(12u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
     ct_assertfalse(ppu->status.o);
 
@@ -2251,7 +2251,7 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
     }
     ct_assertequal(0x0u, spr->soama);
     ct_assertequal(0x48u, ppu->oamaddr);    // OAM[72][0]
-    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(12u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
     ct_assertfalse(ppu->status.o);
 
@@ -2265,7 +2265,7 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
     }
     ct_assertequal(0x0u, spr->soama);
     ct_assertequal(0x4du, ppu->oamaddr);    // OAM[76][1]
-    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(12u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
     ct_assertfalse(ppu->status.o);
 
@@ -2279,7 +2279,7 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
     }
     ct_assertequal(0x0u, spr->soama);
     ct_assertequal(0x2u, ppu->oamaddr);     // OAM[0][2]
-    ct_assertequal(0x0u, spr->oamd);
+    ct_assertequal(12u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
     ct_assertfalse(ppu->status.o);
 
@@ -2294,7 +2294,7 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
     }
     ct_assertequal(0x0u, spr->soama);
     ct_assertequal(0x22u, ppu->oamaddr);    // ends up on the 9th sprite, attribute byte
-    ct_assertequal(0x21u, spr->oamd);       // last read was 8th sprite, attribute byte
+    ct_assertequal(12u, spr->oamd);         // last read is whatever last write to secondary oam was
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
     ct_assertfalse(ppu->status.o);  // no overflow found
 }

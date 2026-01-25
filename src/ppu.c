@@ -171,6 +171,12 @@ static bool oam_overflow(const struct aldo_rp2c02 *self, uint8_t prev_sprite)
     return prev_sprite != 0 && (self->oamaddr & ~DWordMask) == 0;
 }
 
+static void soam_read(struct aldo_rp2c02 *self)
+{
+    auto sprites = &self->spr;
+    sprites->oamd = sprites->soam[sprites->soama];
+}
+
 static void soam_write(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
@@ -265,6 +271,8 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
     case ALDO_PPU_SPR_FULL:
         // TODO: sprite overflow hit
         sprite_skip(self);
+        // once secondary OAM is full, soam writes are replaced with unused reads
+        soam_read(self);
         // During sprite overflow scan, misses cause a glitchy "diagonal" walk
         // of OAM where both the sprite index (OAMADDR & ~0x3) and the attribute
         // index (OAMADDR & 0x3) are incremented (without carry); this completely
@@ -280,6 +288,8 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
     case ALDO_PPU_SPR_DONE:
         // all 64 sprites have been scanned, continue to advance OAMADDR until HBLANK
         sprite_skip(self);
+        // once secondary OAM is full, soam writes are replaced with unused reads
+        soam_read(self);
         break;
     default:
         assert(((void)"SPRITE EVALUATION UNREACHABLE CASE", false));

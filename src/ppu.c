@@ -195,6 +195,12 @@ static bool assert_cleared_soam(struct aldo_rp2c02 *self)
     return true;
 }
 
+static bool sprite_in_range(struct aldo_rp2c02 *self)
+{
+    auto in_range = self->ctrl.h ? 16 : 8;
+    return (uint8_t)(self->line - self->spr.oamd) < in_range;
+}
+
 static void sprite_skip(struct aldo_rp2c02 *self)
 {
     self->oamaddr += 0x4;
@@ -234,26 +240,23 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
 
     switch (sprites->s) {
     case ALDO_PPU_SPR_SCAN:
-        {
-            // Evaluate sprites for the current scanline; sprites are not
-            // drawn until the next scanline, leading to a +1 y-offset of the
-            // actual on-screen position.
-            soam_write(self);
-            auto in_range = self->ctrl.h ? 16 : 8;
-            if ((uint8_t)(self->line - sprites->oamd) < in_range) {
-                // sprite height is within current scanline
-                ++self->oamaddr;
-                sprites->s = ALDO_PPU_SPR_COPY;
-            } else {
-                sprite_skip(self);
-                // back up secondary oam address to un-commit previous write
-                assert(sprites->soama > 0);
-                --sprites->soama;
-            }
-            // we've checked all 64 sprites
-            if (oam_overflow(self, sprite_idx)) {
-                sprites->s = ALDO_PPU_SPR_DONE;
-            }
+        // Evaluate sprites for the current scanline; sprites are not
+        // drawn until the next scanline, leading to a +1 y-offset of the
+        // actual on-screen position.
+        soam_write(self);
+        if (sprite_in_range(self)) {
+            // sprite height is within current scanline
+            ++self->oamaddr;
+            sprites->s = ALDO_PPU_SPR_COPY;
+        } else {
+            sprite_skip(self);
+            // back up secondary oam address to un-commit previous write
+            assert(sprites->soama > 0);
+            --sprites->soama;
+        }
+        // we've checked all 64 sprites
+        if (oam_overflow(self, sprite_idx)) {
+            sprites->s = ALDO_PPU_SPR_DONE;
         }
         break;
     case ALDO_PPU_SPR_COPY:
@@ -268,19 +271,34 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
             sprites->s = ALDO_PPU_SPR_SCAN;
         }
         break;
+    case ALDO_PPU_SPR_OVR1:
+    case ALDO_PPU_SPR_OVR2:
+    case ALDO_PPU_SPR_OVR3:
+        ++self->oamaddr;
+        soam_read(self);
+        ++sprites->s;
+        if (oam_overflow(self, sprite_idx)) {
+            sprites->s = ALDO_PPU_SPR_DONE;
+        }
+        break;
     case ALDO_PPU_SPR_FULL:
-        // TODO: sprite overflow hit
-        sprite_skip(self);
+        if (sprite_in_range(self)) {
+            self->status.o = true;
+            ++self->oamaddr;
+            sprites->s = ALDO_PPU_SPR_OVR1;
+        } else {
+            sprite_skip(self);
+            // During sprite overflow scan, misses cause a glitchy "diagonal" walk
+            // of OAM where both the sprite index (OAMADDR & ~0x3) and the attribute
+            // index (OAMADDR & 0x3) are incremented (without carry); this completely
+            // undermines overflow as many of these checks end up comparing scanline
+            // position with a sprite's tile, attributes, or x-coordinate instead of
+            // the correct y-coordinate.
+            self->oamaddr = (self->oamaddr & ~DWordMask)
+                                | ((self->oamaddr + 1) & DWordMask);
+        }
         // once secondary OAM is full, soam writes are replaced with unused reads
         soam_read(self);
-        // During sprite overflow scan, misses cause a glitchy "diagonal" walk
-        // of OAM where both the sprite index (OAMADDR & ~0x3) and the attribute
-        // index (OAMADDR & 0x3) are incremented (without carry); this completely
-        // undermines overflow as many of these checks end up comparing scanline
-        // position with a sprite's tile, attributes, or x-coordinate instead of
-        // the correct y-coordinate.
-        self->oamaddr = (self->oamaddr & ~DWordMask)
-                            | ((self->oamaddr + 1) & DWordMask);
         if (oam_overflow(self, sprite_idx)) {
             sprites->s = ALDO_PPU_SPR_DONE;
         }
@@ -288,7 +306,6 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
     case ALDO_PPU_SPR_DONE:
         // all 64 sprites have been scanned, continue to advance OAMADDR until HBLANK
         sprite_skip(self);
-        // once secondary OAM is full, soam writes are replaced with unused reads
         soam_read(self);
         break;
     default:

@@ -266,17 +266,22 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         }
         goto oam_overflow_check;
     case ALDO_PPU_SPR_FULL:
-        // check sprite range before dummy soam read overwrites the eval register
-        auto in_range = sprite_in_range(self);
         // once secondary OAM is full, soam writes are replaced with unused reads
-        soam_read(self);
-        if (in_range) {
+        if (self->status.o) {
+            soam_read(self);
+            sprite_skip(self);
+        } else if (sprite_in_range(self)) {
             self->status.o = true;
-            // advance soama during overflow reads to track when 4 reads are done
+            soam_read(self);
+            // Advance soama during overflow reads to track when 4 reads are done;
+            // i think this deviates from actual hardware but it has no external
+            // side-effects, as soama is reset before sprite tile fetch and i can
+            // avoid a dedicated flag for tracking the overflow reads.
             ++sprites->soama;
             ++self->oamaddr;
             sprites->s = ALDO_PPU_SPR_OVER;
         } else {
+            soam_read(self);
             sprite_skip(self);
             // During sprite overflow scan, misses cause a glitchy "diagonal" walk
             // of OAM where both the sprite index (OAMADDR & ~0x3) and the attribute

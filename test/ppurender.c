@@ -2445,8 +2445,19 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
     ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
     ct_asserttrue(ppu->status.o);
 
-    // overflow miss, start glitchy diagonal walk
+    // overflow found, start idle scan of rest of sprites
     aldo_ppu_cycle(ppu);
+
+    ct_assertequal(138, ppu->dot);
+    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
+        ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
+    }
+    ct_assertequal(0x4u, spr->soama);
+    ct_assertequal(0x24u, ppu->oamaddr);    // OAM[9][0]
+    ct_assertequal(0x0u, spr->oamd);        // value from OAM
+    ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
+    ct_asserttrue(ppu->status.o);
+
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(139, ppu->dot);
@@ -2454,24 +2465,12 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
     ct_assertequal(0x4u, spr->soama);
-    ct_assertequal(0x29u, ppu->oamaddr);    // OAM[10][1]
-    ct_assertequal(10u, spr->oamd);
+    ct_assertequal(0x28u, ppu->oamaddr);    // OAM[10][0]
+    ct_assertequal(10u, spr->oamd);         // value replaced by SOAM read
     ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
     ct_asserttrue(ppu->status.o);
 
-    aldo_ppu_cycle(ppu);
-    aldo_ppu_cycle(ppu);
-
-    ct_assertequal(141, ppu->dot);
-    for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
-        ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
-    }
-    ct_assertequal(0x4u, spr->soama);
-    ct_assertequal(0x2eu, ppu->oamaddr);    // OAM[11][2]
-    ct_assertequal(10u, spr->oamd);
-    ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
-    ct_asserttrue(ppu->status.o);
-
+    // finish scanning the sprites
     do {
         aldo_ppu_cycle(ppu);
     } while (spr->s != ALDO_PPU_SPR_DONE);
@@ -2481,7 +2480,7 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
     ct_assertequal(0x4u, spr->soama);
-    ct_assertequal(0x3u, ppu->oamaddr);     // OAM[0][3]
+    ct_assertequal(0x0u, ppu->oamaddr);     // OAM[0][0]
     ct_assertequal(10u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
     ct_asserttrue(ppu->status.o);
@@ -2496,8 +2495,8 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
     ct_assertequal(0x4u, spr->soama);
-    ct_assertequal(0x17u, ppu->oamaddr);    // ends up on the 4th sprite, x-coordinate byte
-    ct_assertequal(10u, spr->oamd);         // last read is beginning of secondary oam
+    ct_assertequal(0x14u, ppu->oamaddr);    // ends up on the 5th sprite
+    ct_assertequal(10u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
     ct_asserttrue(ppu->status.o);
 }

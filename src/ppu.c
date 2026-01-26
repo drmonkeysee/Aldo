@@ -225,7 +225,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         return;
     }
 
-    // Secondary OAM clear
+    // secondary OAM clear
     if (self->dot < DotSpriteEvaluation) {
         soam_write(self);
         if (self->dot == DotSpriteEvaluation - 1) {
@@ -236,7 +236,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
 
     // Capture current sprite index value to properly detect OAMADDR overflow
     // even when OAMADDR is misaligned.
-    uint8_t sprite_idx = self->oamaddr & ~DWordMask;
+    uint8_t sprite_idx = (uint8_t)(self->oamaddr & ~DWordMask);
 
     switch (sprites->s) {
     case ALDO_PPU_SPR_SCAN:
@@ -254,38 +254,28 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
             assert(sprites->soama > 0);
             --sprites->soama;
         }
-        // we've checked all 64 sprites
-        if (oam_overflow(self, sprite_idx)) {
-            sprites->s = ALDO_PPU_SPR_DONE;
-        }
-        break;
+        goto oam_overflow_check;
     case ALDO_PPU_SPR_COPY:
         // fill secondary OAM with the evaluated sprite
         soam_write(self);
         ++self->oamaddr;
-        if (oam_overflow(self, sprite_idx)) {
-            sprites->s = ALDO_PPU_SPR_DONE;
-        } else if (sprites->soama == 0) {
+        if (sprites->soama == 0) {
             sprites->s = ALDO_PPU_SPR_FULL;
         } else if (sprites->soama % 4 == 0) {
             sprites->s = ALDO_PPU_SPR_SCAN;
         }
-        break;
-    case ALDO_PPU_SPR_OVR1:
-    case ALDO_PPU_SPR_OVR2:
-    case ALDO_PPU_SPR_OVR3:
-        ++self->oamaddr;
-        soam_read(self);
-        ++sprites->s;
-        if (oam_overflow(self, sprite_idx)) {
-            sprites->s = ALDO_PPU_SPR_DONE;
-        }
-        break;
+        goto oam_overflow_check;
     case ALDO_PPU_SPR_FULL:
-        if (sprite_in_range(self)) {
+        // check sprite range before dummy soam read overwrites the eval register
+        auto in_range = sprite_in_range(self);
+        // once secondary OAM is full, soam writes are replaced with unused reads
+        soam_read(self);
+        if (in_range) {
             self->status.o = true;
+            // advance soama during overflow reads to track when 4 reads are done
+            ++sprites->soama;
             ++self->oamaddr;
-            sprites->s = ALDO_PPU_SPR_OVR1;
+            sprites->s = ALDO_PPU_SPR_OVER;
         } else {
             sprite_skip(self);
             // During sprite overflow scan, misses cause a glitchy "diagonal" walk
@@ -294,23 +284,33 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
             // undermines overflow as many of these checks end up comparing scanline
             // position with a sprite's tile, attributes, or x-coordinate instead of
             // the correct y-coordinate.
-            self->oamaddr = (self->oamaddr & ~DWordMask)
-                                | ((self->oamaddr + 1) & DWordMask);
+            self->oamaddr = (uint8_t)((self->oamaddr & ~DWordMask)
+                                      | ((self->oamaddr + 1) & DWordMask));
         }
-        // once secondary OAM is full, soam writes are replaced with unused reads
+        goto oam_overflow_check;
+    case ALDO_PPU_SPR_OVER:
         soam_read(self);
-        if (oam_overflow(self, sprite_idx)) {
-            sprites->s = ALDO_PPU_SPR_DONE;
+        ++self->oamaddr;
+        ++sprites->soama;
+        if (sprites->soama % 4 == 0) {
+            sprites->s = ALDO_PPU_SPR_FULL;
         }
-        break;
+        goto oam_overflow_check;
     case ALDO_PPU_SPR_DONE:
         // all 64 sprites have been scanned, continue to advance OAMADDR until HBLANK
-        sprite_skip(self);
         soam_read(self);
-        break;
+        sprite_skip(self);
+        return;
     default:
         assert(((void)"SPRITE EVALUATION UNREACHABLE CASE", false));
         break;
+    }
+
+    // every state except DONE needs to check OAM overflow so stash it here
+oam_overflow_check:
+    // we've run through all 64 sprites one way or another
+    if (oam_overflow(self, sprite_idx)) {
+        sprites->s = ALDO_PPU_SPR_DONE;
     }
 }
 

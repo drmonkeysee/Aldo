@@ -89,10 +89,8 @@ struct aldo_rp2c02 {
         enum {
             ALDO_PPU_SPR_SCAN,  // Scan for sprites on the current scanline
             ALDO_PPU_SPR_COPY,  // Copy a sprite into secondary OAM
-            ALDO_PPU_SPR_OVR1,  // Read an overflow sprite's tile
-            ALDO_PPU_SPR_OVR2,  // Read an overflow sprite's attributes
-            ALDO_PPU_SPR_OVR3,  // Read an overflow sprite's x-coordinate
             ALDO_PPU_SPR_FULL,  // Secondary OAM is full
+            ALDO_PPU_SPR_OVER,  // Sprite overflow attribute read
             ALDO_PPU_SPR_DONE,  // OAM scanning is complete
         } s;                    // Sprite evaluation state; does not include idle
                                 // or clear which are handled as dot checks.

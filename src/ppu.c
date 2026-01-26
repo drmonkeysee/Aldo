@@ -291,8 +291,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
     case ALDO_PPU_SPR_OVER:
         soam_read(self);
         ++self->oamaddr;
-        ++sprites->soama;
-        if (sprites->soama % 4 == 0) {
+        if (++sprites->soama % 4 == 0) {
             sprites->s = ALDO_PPU_SPR_FULL;
         }
         goto oam_overflow_check;

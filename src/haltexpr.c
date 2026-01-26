@@ -69,48 +69,40 @@ int aldo_haltexpr_parse(const char *restrict str, struct aldo_haltexpr *expr)
     for (auto i = ALDO_HLT_NONE + 1; i < ALDO_HLT_COUNT; ++i) {
         switch (i) {
         case ALDO_HLT_ADDR:
-            {
-                unsigned int addr;
-                parsed = sscanf(str, " %1[@]%X", u, &addr) == 2;
-                valid = addr < ALDO_MEMBLOCK_64KB;
-                e = (struct aldo_haltexpr){
-                    .address = (uint16_t)addr,
-                    .cond = (enum aldo_haltcondition)i,
-                };
-            }
+            unsigned int addr;
+            parsed = sscanf(str, " %1[@]%X", u, &addr) == 2;
+            valid = addr < ALDO_MEMBLOCK_64KB;
+            e = (struct aldo_haltexpr){
+                .address = (uint16_t)addr,
+                .cond = (enum aldo_haltcondition)i,
+            };
             break;
         case ALDO_HLT_TIME:
-            {
-                float time;
-                parsed = sscanf(str, "%f %1[Ss]", &time, u) == 2;
-                valid = time >= 0;
-                e = (struct aldo_haltexpr){
-                    .runtime = time,
-                    .cond = (enum aldo_haltcondition)i,
-                };
-            }
+            float time;
+            parsed = sscanf(str, "%f %1[Ss]", &time, u) == 2;
+            valid = time >= 0;
+            e = (struct aldo_haltexpr){
+                .runtime = time,
+                .cond = (enum aldo_haltcondition)i,
+            };
             break;
         case ALDO_HLT_CYCLES:
-            {
-                uint64_t cycles;
-                parsed = sscanf(str, "%" SCNu64 " %1[Cc]", &cycles, u) == 2;
-                valid = true;
-                e = (struct aldo_haltexpr){
-                    .cycles = cycles,
-                    .cond = (enum aldo_haltcondition)i,
-                };
-            }
+            uint64_t cycles;
+            parsed = sscanf(str, "%" SCNu64 " %1[Cc]", &cycles, u) == 2;
+            valid = true;
+            e = (struct aldo_haltexpr){
+                .cycles = cycles,
+                .cond = (enum aldo_haltcondition)i,
+            };
             break;
         case ALDO_HLT_FRAMES:
-            {
-                uint64_t frames;
-                parsed = sscanf(str, "%" SCNu64 " %1[Ff]", &frames, u) == 2;
-                valid = true;
-                e = (struct aldo_haltexpr){
-                    .frames = frames,
-                    .cond = (enum aldo_haltcondition)i,
-                };
-            }
+            uint64_t frames;
+            parsed = sscanf(str, "%" SCNu64 " %1[Ff]", &frames, u) == 2;
+            valid = true;
+            e = (struct aldo_haltexpr){
+                .frames = frames,
+                .cond = (enum aldo_haltcondition)i,
+            };
             break;
         case ALDO_HLT_JAM:
             parsed = sscanf(str, " %1[Jj]%1[Aa]%1[Mm]", u, u, u) == 3;

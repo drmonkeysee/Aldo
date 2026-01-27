@@ -180,12 +180,18 @@ static void soam_read(struct aldo_rp2c02 *self)
 static void soam_write(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
-    sprites->soam[sprites->soama++] = sprites->oamd;
+    sprites->soam[sprites->soama] = sprites->oamd;
+}
+
+static void soam_advance(struct aldo_rp2c02 *self)
+{
+    auto sprites = &self->spr;
+    ++sprites->soama;
     sprites->soama %= aldo_arrsz(sprites->soam);
 }
 
 [[maybe_unused]]
-static bool assert_cleared_soam(struct aldo_rp2c02 *self)
+static bool assert_cleared_soam(const struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
     assert(sprites->soama == 0);
@@ -195,7 +201,7 @@ static bool assert_cleared_soam(struct aldo_rp2c02 *self)
     return true;
 }
 
-static bool sprite_in_range(struct aldo_rp2c02 *self)
+static bool sprite_in_range(const struct aldo_rp2c02 *self)
 {
     auto in_range = self->ctrl.h ? 16 : 8;
     return (uint8_t)(self->line - self->spr.oamd) < in_range;
@@ -204,6 +210,12 @@ static bool sprite_in_range(struct aldo_rp2c02 *self)
 static void sprite_skip(struct aldo_rp2c02 *self)
 {
     self->oamaddr += 0x4;
+}
+
+static void sprite_idle(struct aldo_rp2c02 *self)
+{
+    soam_read(self);
+    sprite_skip(self);
 }
 
 static void sprite_reset(struct aldo_rp2c02 *self)
@@ -228,6 +240,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
     // secondary OAM clear
     if (self->dot < DotSpriteEvaluation) {
         soam_write(self);
+        soam_advance(self);
         if (self->dot == DotSpriteEvaluation - 1) {
             sprite_reset(self);
         }
@@ -246,18 +259,17 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         soam_write(self);
         if (sprite_in_range(self)) {
             // sprite height is within current scanline
+            soam_advance(self);
             ++self->oamaddr;
             sprites->s = ALDO_PPU_SPR_COPY;
         } else {
             sprite_skip(self);
-            // back up secondary oam address to un-commit previous write
-            assert(sprites->soama > 0);
-            --sprites->soama;
         }
         goto oam_overflow_check;
     case ALDO_PPU_SPR_COPY:
         // fill secondary OAM with the evaluated sprite
         soam_write(self);
+        soam_advance(self);
         ++self->oamaddr;
         if (sprites->soama == 0) {
             sprites->s = ALDO_PPU_SPR_FULL;
@@ -268,8 +280,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
     case ALDO_PPU_SPR_FULL:
         // once secondary OAM is full, soam writes are replaced with unused reads
         if (self->status.o) {
-            soam_read(self);
-            sprite_skip(self);
+            sprite_idle(self);
         } else if (sprite_in_range(self)) {
             self->status.o = true;
             soam_read(self);
@@ -277,12 +288,11 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
             // i think this deviates from actual hardware but it has no external
             // side-effects, as soama is reset before sprite tile fetch and i can
             // avoid a dedicated flag for tracking the overflow reads.
-            ++sprites->soama;
+            soam_advance(self);
             ++self->oamaddr;
             sprites->s = ALDO_PPU_SPR_OVER;
         } else {
-            soam_read(self);
-            sprite_skip(self);
+            sprite_idle(self);
             // During sprite overflow scan, misses cause a glitchy "diagonal" walk
             // of OAM where both the sprite index (OAMADDR & ~0x3) and the attribute
             // index (OAMADDR & 0x3) are incremented (without carry); this completely
@@ -295,15 +305,15 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         goto oam_overflow_check;
     case ALDO_PPU_SPR_OVER:
         soam_read(self);
+        soam_advance(self);
         ++self->oamaddr;
-        if (++sprites->soama % 4 == 0) {
+        if (sprites->soama % 4 == 0) {
             sprites->s = ALDO_PPU_SPR_FULL;
         }
         goto oam_overflow_check;
     case ALDO_PPU_SPR_DONE:
         // all 64 sprites have been scanned, continue to advance OAMADDR until HBLANK
-        soam_read(self);
-        sprite_skip(self);
+        sprite_idle(self);
         return;
     default:
         assert(((void)"SPRITE EVALUATION UNREACHABLE CASE", false));

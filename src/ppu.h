@@ -95,7 +95,7 @@ struct aldo_rp2c02 {
         } s;                    // Sprite evaluation state; does not include idle
                                 // or clear which are handled as dot checks.
         uint8_t oamd,           // Internal latch for most recent oam read
-                soama,          // Internal address of secondary OAM: $00-$20
+                soaddr,         // Internal address of secondary OAM: $00-$20
                 oam[256],       // Object Attribute Memory: internal storage
                                 // for sprite attributes; 64 sprites at 4 bytes each.
                 soam[32];       // Secondary OAM: up to 8 active sprites for

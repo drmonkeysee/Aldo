@@ -174,27 +174,27 @@ static bool oam_overflow(const struct aldo_rp2c02 *self, uint8_t prev_sprite)
 static void soam_read(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
-    sprites->oamd = sprites->soam[sprites->soama];
+    sprites->oamd = sprites->soam[sprites->soaddr];
 }
 
 static void soam_write(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
-    sprites->soam[sprites->soama] = sprites->oamd;
+    sprites->soam[sprites->soaddr] = sprites->oamd;
 }
 
 static void soam_advance(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
-    ++sprites->soama;
-    sprites->soama %= aldo_arrsz(sprites->soam);
+    ++sprites->soaddr;
+    sprites->soaddr %= aldo_arrsz(sprites->soam);
 }
 
 [[maybe_unused]]
 static bool assert_cleared_soam(const struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
-    assert(sprites->soama == 0);
+    assert(sprites->soaddr == 0);
     for (size_t i = 0; i < aldo_arrsz(sprites->soam); ++i) {
         if (sprites->soam[i] != 0xff) return false;
     }
@@ -221,7 +221,7 @@ static void sprite_idle(struct aldo_rp2c02 *self)
 static void sprite_reset(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
-    sprites->soama = 0x0;
+    sprites->soaddr = 0x0;
     sprites->s = ALDO_PPU_SPR_SCAN;
     assert(assert_cleared_soam(self));
 }
@@ -271,9 +271,9 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         soam_write(self);
         soam_advance(self);
         ++self->oamaddr;
-        if (sprites->soama == 0) {
+        if (sprites->soaddr == 0) {
             sprites->s = ALDO_PPU_SPR_FULL;
-        } else if (sprites->soama % 4 == 0) {
+        } else if (sprites->soaddr % 4 == 0) {
             sprites->s = ALDO_PPU_SPR_SCAN;
         }
         goto oam_overflow_check;
@@ -307,7 +307,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         soam_read(self);
         soam_advance(self);
         ++self->oamaddr;
-        if (sprites->soama % 4 == 0) {
+        if (sprites->soaddr % 4 == 0) {
             sprites->s = ALDO_PPU_SPR_FULL;
         }
         goto oam_overflow_check;

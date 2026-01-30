@@ -867,13 +867,11 @@ static void tile_read(struct aldo_rp2c02 *self)
         break;
     case 3:
         // AT addr
-        {
-            uint16_t
-                ntselect = self->v & NtBits,
-                metatiley = (self->v & 0x380) >> 4,
-                metatilex = (self->v & 0x1c) >> 2;
-            addrbus(self, 0x23c0 | ntselect | metatiley | metatilex);
-        }
+        uint16_t
+            ntselect = self->v & NtBits,
+            metatiley = (self->v & 0x380) >> 4,
+            metatilex = (self->v & 0x1c) >> 2;
+        addrbus(self, 0x23c0 | ntselect | metatiley | metatilex);
         break;
     case 4:
         // AT data

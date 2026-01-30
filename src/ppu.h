@@ -68,7 +68,7 @@ struct aldo_rp2c02 {
                             // wired to lowest 3 bits of CPU address bus.
             regbus,         // Register Data Bus
             vdatabus,       // VRAM Data Bus (actually shared with lower
-            video;          // Video Signal (6 bits)
+            video;          // Video Signal (6 bits))
     struct {                // 8-bits of vaddrbus but this is not modeled
         bool                // to avoid storing an extra latch).
             ale: 1,         // Address Latch Signal (output)

@@ -161,7 +161,13 @@ static uint8_t oam_read(const struct aldo_rp2c02 *self)
     if (0 < self->dot && self->dot < DotSpriteEvaluation
         && in_visible_frame(self)) return 0xff;
 
-    return self->spr.oam[self->oamaddr];
+    auto d = self->spr.oam[self->oamaddr];
+    if (self->oamaddr % 4 == 2) {
+        // Every 3rd OAM cell has bits 4-2 hardwired to zero, affecting the
+        // object attribute byte during (correctly aligned) sprite evaluation.
+        d &= 0xe3;
+    }
+    return d;
 }
 
 // OAMADDR may be misaligned to 4-byte sprite boundaries, so checking
@@ -469,7 +475,7 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
             ppu->spr.oam[ppu->oamaddr++] = ppu->regbus;
         } else {
             // During rendering, writing to OAMDATA does not change OAM
-            // but it does increment oamaddr by one object attribute (4-bytes),
+            // but it does increment oamaddr by one object (4-bytes),
             // corrupting sprite evaluation.
             sprite_skip(ppu);
         }

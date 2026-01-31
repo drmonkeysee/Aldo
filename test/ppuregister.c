@@ -584,6 +584,28 @@ static void oamdata_read_mirrored(void *ctx)
     ct_assertequal(0u, ppu->oamaddr);
 }
 
+static void oamdata_read_attribute_byte(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->line = 240;
+    ppu->dot = 5;
+    ppu->mask.s = true;
+    ppu->spr.oam[0] = 0x11;
+    ppu->spr.oam[1] = 0x22;
+    ppu->spr.oam[2] = 0xff;
+    ppu->spr.oam[3] = 0x44;
+    ppu->oamaddr = 0x2;
+
+    uint8_t d;
+    aldo_bus_read(ppt_get_mbus(ctx), 0x2004, &d);
+
+    ct_assertequal(4u, ppu->regsel);
+    // bits 4-2 always return 0 on attribute bytes
+    ct_assertequal(0xe3u, d);
+    ct_assertequal(0xe3u, ppu->regbus);
+    ct_assertequal(0x2u, ppu->oamaddr);
+}
+
 static void oamdata_read_during_soam_clear(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
@@ -3331,6 +3353,7 @@ struct ct_testsuite ppu_register_tests()
         ct_maketest(oamdata_write_during_reset),
         ct_maketest(oamdata_read),
         ct_maketest(oamdata_read_mirrored),
+        ct_maketest(oamdata_read_attribute_byte),
         ct_maketest(oamdata_read_during_soam_clear),
 
         ct_maketest(ppuscroll_write),

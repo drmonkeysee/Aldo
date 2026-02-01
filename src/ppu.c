@@ -835,7 +835,7 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
         // selection, but since there are no side-effects outside of the pixel
         // pipeline it's easier to load the tiles at once.
         latch_tile(self);
-        // shift the first tile that occurs during dots 329-337
+        // perform first tile pixel shifts that normally occur on dots 329-337
         auto pxpl = &self->pxpl;
         pxpl->bgs[0] <<= 8;
         pxpl->ats[0] = -pxpl->atl[0];

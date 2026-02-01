@@ -28,7 +28,7 @@ static void jsr(void *ctx)
     ct_assertequal(0x8005u, cpu.pc);
 
     ct_assertequal(0x2u, mem[259]);
-    ct_assertequal(0x0u, mem[260]);
+    ct_assertequal(0u, mem[260]);
     ct_assertequal(2u, cpu.s);
 }
 

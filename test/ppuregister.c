@@ -725,7 +725,7 @@ static void ppuscroll_write_during_reset(void *ctx)
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2005, 0xaf);
 
-    ct_assertequal(0x0u, ppu->t);
+    ct_assertequal(0u, ppu->t);
     ct_assertequal(0u, ppu->x);
     ct_assertfalse(ppu->w);
     ct_assertequal(5u, ppu->regsel);
@@ -733,7 +733,7 @@ static void ppuscroll_write_during_reset(void *ctx)
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2005, 0xab);
 
-    ct_assertequal(0x0u, ppu->t);
+    ct_assertequal(0u, ppu->t);
     ct_assertequal(0u, ppu->x);
     ct_assertfalse(ppu->w);
     ct_assertequal(5u, ppu->regsel);

@@ -117,7 +117,7 @@ static void pla_zero(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(1u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_assertequal(4u, cpu.s);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);

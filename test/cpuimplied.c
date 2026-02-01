@@ -68,7 +68,7 @@ static void asl_zero(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -87,7 +87,7 @@ static void asl_carryzero(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -486,7 +486,7 @@ static void lsr_zero(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -505,7 +505,7 @@ static void lsr_carryzero(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -633,7 +633,7 @@ static void rol_zero(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -652,7 +652,7 @@ static void rol_carryzero(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -768,7 +768,7 @@ static void ror_zero(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -787,7 +787,7 @@ static void ror_carryzero(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);

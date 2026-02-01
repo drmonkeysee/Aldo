@@ -240,7 +240,7 @@ static void brk_masks_irq(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x30u, mem[509]);
     ct_assertequal(0x2u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 
     // IRQ seen active again after first instruction
     aldo_cpu_cycle(&cpu);
@@ -359,7 +359,7 @@ static void nmi_hijacks_brk(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x34u, mem[509]);
     ct_assertequal(0x2u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 }
 
 // NMI goes active on vector fetch cycle, delaying NMI detection until
@@ -391,7 +391,7 @@ static void nmi_delayed_by_brk(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x34u, mem[509]);
     ct_assertequal(0x2u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 
     // NMI detected and handled after first instruction of BRK handler
     aldo_cpu_cycle(&cpu);
@@ -427,7 +427,7 @@ static void nmi_late_delayed_by_brk(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x34u, mem[509]);
     ct_assertequal(0x2u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 
     // NMI detected and handled after first instruction of BRK handler
     aldo_cpu_cycle(&cpu);
@@ -468,7 +468,7 @@ static void nmi_lost_during_brk(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x34u, mem[509]);
     ct_assertequal(0x2u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 
     aldo_cpu_cycle(&cpu);
     ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.nmi);
@@ -521,7 +521,7 @@ static void nmi_hijacks_irq(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x20u, mem[509]);
     ct_assertequal(0x3u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 
     aldo_cpu_cycle(&cpu);
     ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
@@ -574,7 +574,7 @@ static void nmi_hijacks_and_loses_irq(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x20u, mem[509]);
     ct_assertequal(0x3u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 
     aldo_cpu_cycle(&cpu);
     ct_assertequal(ALDO_SIG_DETECTED, (int)cpu.irq);
@@ -623,7 +623,7 @@ static void nmi_delayed_by_irq(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x20u, mem[509]);
     ct_assertequal(0x3u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 
     // NMI detected and handled after first instruction of BRK handler
     aldo_cpu_cycle(&cpu);
@@ -668,7 +668,7 @@ static void nmi_late_delayed_by_irq(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x20u, mem[509]);
     ct_assertequal(0x3u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 
     // NMI detected and handled after first instruction of BRK handler
     aldo_cpu_cycle(&cpu);
@@ -718,7 +718,7 @@ static void nmi_lost_during_irq(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x20u, mem[509]);
     ct_assertequal(0x3u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 
     // NMI detected and handled after first instruction of BRK handler
     aldo_cpu_cycle(&cpu);
@@ -778,7 +778,7 @@ static void rst_hijacks_irq(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x20u, mem[509]);
     ct_assertequal(0x3u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
     ct_asserttrue(cpu.presync);
 
     aldo_cpu_cycle(&cpu);
@@ -834,7 +834,7 @@ static void rst_following_irq(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x20u, mem[509]);
     ct_assertequal(0x3u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 
     aldo_cpu_cycle(&cpu);
 
@@ -887,7 +887,7 @@ static void rst_late_on_irq(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x20u, mem[509]);
     ct_assertequal(0x3u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 
     aldo_cpu_cycle(&cpu);
 
@@ -945,7 +945,7 @@ static void rst_hijacks_nmi(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x24u, mem[509]);
     ct_assertequal(0x3u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
     ct_asserttrue(cpu.presync);
 
     aldo_cpu_cycle(&cpu);
@@ -1000,7 +1000,7 @@ static void rst_following_nmi(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x24u, mem[509]);
     ct_assertequal(0x3u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 
     aldo_cpu_cycle(&cpu);
 
@@ -1052,7 +1052,7 @@ static void rst_late_on_nmi(void *ctx)
     ct_assertequal(0xfcu, cpu.s);
     ct_assertequal(0x24u, mem[509]);
     ct_assertequal(0x3u, mem[510]);
-    ct_assertequal(0x0u, mem[511]);
+    ct_assertequal(0u, mem[511]);
 
     aldo_cpu_cycle(&cpu);
 

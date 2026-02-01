@@ -51,7 +51,7 @@ constexpr char VerboseShort = 'v';
 constexpr char VersionShort = 'V';
 constexpr char ZeroRamShort = 'z';
 
-constexpr auto MinAddress = 0;
+constexpr auto MinAddress = 0x0;
 constexpr auto MaxAddress = ALDO_ADDRMASK_64KB;
 
 static void init_cliargs(struct cliargs *args)

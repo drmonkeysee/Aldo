@@ -178,7 +178,7 @@ static void peek_immediate(void *ctx)
     auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_IMM, (int)result.mode);
-    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0u, result.interaddr);
     ct_assertequal(0x1u, result.finaladdr);
     ct_assertequal(0x10u, result.data);
     ct_assertfalse(result.busfault);
@@ -195,7 +195,7 @@ static void peek_zeropage(void *ctx)
     auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_ZP, (int)result.mode);
-    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0u, result.interaddr);
     ct_assertequal(0x4u, result.finaladdr);
     ct_assertequal(0x20u, result.data);
     ct_assertfalse(result.busfault);
@@ -213,7 +213,7 @@ static void peek_zp_indexed(void *ctx)
     auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_ZPX, (int)result.mode);
-    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0u, result.interaddr);
     ct_assertequal(0x5u, result.finaladdr);
     ct_assertequal(0x30u, result.data);
     ct_assertfalse(result.busfault);
@@ -266,7 +266,7 @@ static void peek_absolute(void *ctx)
     auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_ABS, (int)result.mode);
-    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0u, result.interaddr);
     ct_assertequal(0x102u, result.finaladdr);
     ct_assertequal(0x70u, result.data);
     ct_assertfalse(result.busfault);
@@ -284,7 +284,7 @@ static void peek_absolute_indexed(void *ctx)
     auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_ABSX, (int)result.mode);
-    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0u, result.interaddr);
     ct_assertequal(0x10cu, result.finaladdr);
     ct_assertequal(0x70u, result.data);
     ct_assertfalse(result.busfault);
@@ -301,9 +301,9 @@ static void peek_branch(void *ctx)
     auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_BCH, (int)result.mode);
-    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0u, result.interaddr);
     ct_assertequal(0x7u, result.finaladdr);
-    ct_assertequal(0x0u, result.data);
+    ct_assertequal(0u, result.data);
     ct_assertfalse(result.busfault);
 }
 
@@ -318,9 +318,9 @@ static void peek_branch_forced(void *ctx)
     auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_BCH, (int)result.mode);
-    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0u, result.interaddr);
     ct_assertequal(0x7u, result.finaladdr);
-    ct_assertequal(0x0u, result.data);
+    ct_assertequal(0u, result.data);
     ct_assertfalse(result.busfault);
 }
 
@@ -336,7 +336,7 @@ static void peek_absolute_indirect(void *ctx)
     auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_JIND, (int)result.mode);
-    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0u, result.interaddr);
     ct_assertequal(0x205u, result.finaladdr);
     ct_assertequal(0x2u, result.data);
     ct_assertfalse(result.busfault);
@@ -365,7 +365,7 @@ static void peek_busfault(void *ctx)
     auto result = run_peek(&cpu);
 
     ct_assertequal(ALDO_AM_ABS, (int)result.mode);
-    ct_assertequal(0x0u, result.interaddr);
+    ct_assertequal(0u, result.interaddr);
     ct_assertequal(0x4002u, result.finaladdr);
     ct_asserttrue(result.busfault);
 }

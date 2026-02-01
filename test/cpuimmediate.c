@@ -87,7 +87,7 @@ static void adc_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -125,7 +125,7 @@ static void adc_carry_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -403,7 +403,7 @@ static void adc_bcd_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -424,7 +424,7 @@ static void adc_bcd_missed_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -747,7 +747,7 @@ static void and_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -871,7 +871,7 @@ static void cmp_min_to_max(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -889,7 +889,7 @@ static void cmp_min_to_min(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -981,7 +981,7 @@ static void cmp_positive_to_negative(void *ctx)
     ct_assertequal(2u, cpu.pc);
 
     // positive to negative always implies A < M
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
@@ -1089,7 +1089,7 @@ static void cpx_min_to_max(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.x);
+    ct_assertequal(0u, cpu.x);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1107,7 +1107,7 @@ static void cpx_min_to_min(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.x);
+    ct_assertequal(0u, cpu.x);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1199,7 +1199,7 @@ static void cpx_positive_to_negative(void *ctx)
     ct_assertequal(2u, cpu.pc);
 
     // positive to negative always implies X < M
-    ct_assertequal(0x0u, cpu.x);
+    ct_assertequal(0u, cpu.x);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
@@ -1307,7 +1307,7 @@ static void cpy_min_to_max(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.y);
+    ct_assertequal(0u, cpu.y);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1325,7 +1325,7 @@ static void cpy_min_to_min(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.y);
+    ct_assertequal(0u, cpu.y);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1417,7 +1417,7 @@ static void cpy_positive_to_negative(void *ctx)
     ct_assertequal(2u, cpu.pc);
 
     // positive to negative always implies Y < M
-    ct_assertequal(0x0u, cpu.y);
+    ct_assertequal(0u, cpu.y);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
@@ -1452,7 +1452,7 @@ static void eor_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -1501,7 +1501,7 @@ static void lda_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -1549,7 +1549,7 @@ static void ldx_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.x);
+    ct_assertequal(0u, cpu.x);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -1597,7 +1597,7 @@ static void ldy_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.y);
+    ct_assertequal(0u, cpu.y);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -1647,7 +1647,7 @@ static void ora_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -1741,7 +1741,7 @@ static void sbc_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -1881,7 +1881,7 @@ static void sbc_overflow_does_not_include_borrow(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2044,7 +2044,7 @@ static void sbc_bcd_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2177,7 +2177,7 @@ static void sbc_bcd_overflow_does_not_include_borrow(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2231,7 +2231,7 @@ static void sbc_bcd_min(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2253,7 +2253,7 @@ static void sbc_bcd_max(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2433,7 +2433,7 @@ static void alr_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2451,7 +2451,7 @@ static void alr_carryzero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2531,7 +2531,7 @@ static void anc_zero(void *ctx)
         ct_assertequal(2, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
 
-        ct_assertequal(0x0u, cpu.a, "Failed on opcode %02x", opc);
+        ct_assertequal(0u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertfalse(cpu.p.c, "Failed on opcode %02x", opc);
         ct_asserttrue(cpu.p.z, "Failed on opcode %02x", opc);
         ct_assertfalse(cpu.p.n, "Failed on opcode %02x", opc);
@@ -2591,7 +2591,7 @@ static void ane_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -2645,7 +2645,7 @@ static void arr_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2866,8 +2866,8 @@ static void lxa_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
-    ct_assertequal(0x0u, cpu.x);
+    ct_assertequal(0u, cpu.a);
+    ct_assertequal(0u, cpu.x);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -2929,7 +2929,7 @@ static void sbx_equal(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.x);
+    ct_assertequal(0u, cpu.x);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -3005,7 +3005,7 @@ static void sbx_max_to_max(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.x);
+    ct_assertequal(0u, cpu.x);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -3043,7 +3043,7 @@ static void sbx_min_to_min(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.x);
+    ct_assertequal(0u, cpu.x);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -3062,7 +3062,7 @@ static void sbx_neg_equal(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.x);
+    ct_assertequal(0u, cpu.x);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -3218,7 +3218,7 @@ static void usbc_zero(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
+    ct_assertequal(0u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);

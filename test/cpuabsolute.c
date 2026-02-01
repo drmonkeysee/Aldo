@@ -1620,9 +1620,9 @@ static void las_absy_zero(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x0u, cpu.a);
-    ct_assertequal(0x0u, cpu.x);
-    ct_assertequal(0x0u, cpu.s);
+    ct_assertequal(0u, cpu.a);
+    ct_assertequal(0u, cpu.x);
+    ct_assertequal(0u, cpu.s);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }

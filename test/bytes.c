@@ -142,8 +142,8 @@ static void bank_copy_fit_end_of_bank(void *ctx)
                                      sizeof dest / sizeof dest[0], dest);
 
     ct_assertequal(5u, result);
-    ct_assertequal(0x0u, dest[0]);
-    ct_assertequal(0x0u, dest[1]);
+    ct_assertequal(0u, dest[0]);
+    ct_assertequal(0u, dest[1]);
     ct_assertequal(0xffu, dest[2]);
     ct_assertequal(0xffu, dest[3]);
     ct_assertequal(0xeeu, dest[4]);

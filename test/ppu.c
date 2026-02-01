@@ -148,9 +148,9 @@ static void reset_sequence(void *ctx)
     ct_assertfalse(ppu->cvp);
     ct_assertfalse(ppu->odd);
     ct_assertfalse(ppu->w);
-    ct_assertequal(0x0u, ppu->rbuf);
-    ct_assertequal(0x0u, ppu->x);
-    ct_assertequal(0x0u, ppu->t);
+    ct_assertequal(0u, ppu->rbuf);
+    ct_assertequal(0u, ppu->x);
+    ct_assertequal(0u, ppu->t);
     ct_assertequal(0x1235u, ppu->v);
     ct_assertfalse(ppu->signal.ale);
     ct_assertequal(ALDO_SIG_SERVICED, (int)ppu->rst);

@@ -204,6 +204,20 @@ private:
     tex::Texture<SDL_TEXTUREACCESS_TARGET> atTex;
 };
 
+class Sprites {
+public:
+    explicit Sprites(const aldo::MediaRuntime& mr);
+
+    void draw(const MediaRuntime& mr) const;
+    void render() const noexcept
+    {
+        placeholder.render();
+    }
+
+private:
+    tex::Texture<SDL_TEXTUREACCESS_TARGET> placeholder;
+};
+
 }
 
 #endif

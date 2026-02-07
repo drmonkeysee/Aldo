@@ -2226,6 +2226,29 @@ private:
         PageDim = 16, PageSize = PageDim * PageDim, Cols = PageDim + 2;
 };
 
+class SpritesView final : public aldo::View {
+public:
+    SpritesView(aldo::viewstate& vs, const aldo::Emulator& emu,
+                const aldo::MediaRuntime& mr) noexcept
+    : View{"Sprites", vs, emu, mr}, sprites{mr} {}
+    SpritesView(aldo::viewstate&, aldo::Emulator&&,
+                const aldo::MediaRuntime&) = delete;
+    SpritesView(aldo::viewstate&, const aldo::Emulator&,
+                aldo::MediaRuntime&&) = delete;
+    SpritesView(aldo::viewstate&, aldo::Emulator&&,
+                aldo::MediaRuntime&&) = delete;
+
+protected:
+    void renderContents() override
+    {
+        sprites.draw(mr);
+        sprites.render();
+    }
+
+private:
+    aldo::Sprites sprites;
+};
+
 class SystemView final : public aldo::View {
 public:
     SystemView(aldo::viewstate& vs, const aldo::Emulator& emu,
@@ -2428,6 +2451,7 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
         PpuView,
         PrgAtPcView,
         RamView,
+        SpritesView,
         SystemView,
         VideoView>(views, vs, emu, mr);
 }

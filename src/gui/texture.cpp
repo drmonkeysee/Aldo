@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <array>
 #include <concepts>
+#include <limits>
 #include <cassert>
 
 static_assert(std::same_as<Uint32, ImU32>,
@@ -25,6 +26,8 @@ namespace
 {
 
 using nt_span = std::span<const aldo::et::byte, AldoNtTileCount>;
+
+constexpr auto SpriteDim = std::numeric_limits<aldo::et::byte>::max();
 
 constexpr auto operator*(SDL_Point p, int n) noexcept
 {
@@ -117,6 +120,19 @@ void aldo::Nametables::draw(const Emulator& emu, const MediaRuntime& mr) const
     } else {
         drawNametables(emu);
     }
+}
+
+aldo::Sprites::Sprites(const aldo::MediaRuntime& mr)
+: placeholder{{SpriteDim, SpriteDim}, mr.renderer()} {}
+
+void aldo::Sprites::draw(const MediaRuntime& mr) const
+{
+    auto ren = mr.renderer();
+    auto [r, g, b] = aldo::colors::rgb(aldo::colors::LedOff);
+    auto target = placeholder.asTarget(mr.renderer());
+    SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g),
+                           static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
+    SDL_RenderClear(ren);
 }
 
 //

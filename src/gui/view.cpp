@@ -1536,7 +1536,7 @@ private:
 
     void renderControls() noexcept
     {
-        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 15);
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * aldo::style::CellDim);
         modeCombo.render();
         ImGui::SameLine();
         widget_group([this] noexcept {
@@ -1611,14 +1611,11 @@ private:
 
     void renderBody()
     {
-        static constexpr auto cellDim = 15;
-        static constexpr pal_sz rows = 4,
-                                paletteDim = aldo::palette::Size / rows;
-        static constexpr auto center = 0.5f;
+        static constexpr pal_sz rows = 4, paletteDim = aldo::palette::Size / rows;
 
         ScopedStyleVec textAlign{{
             ImGuiStyleVar_SelectableTextAlign,
-            {center, center},
+            aldo::style::AlignCenter,
         }};
         for (pal_sz row = 0; row < rows; ++row) {
             for (pal_sz col = 0; col < Cols; ++col) {
@@ -1638,7 +1635,7 @@ private:
                     ScopedID id = static_cast<int>(cell);
                     if (ImGui::Selectable(cell == vs.colorSelection ? "x" : "",
                                           false, ImGuiSelectableFlags_None,
-                                          {cellDim, cellDim})) {
+                                          aldo::style::CellSz)) {
                         vs.colorSelection = cell;
                     }
                 }
@@ -1792,10 +1789,8 @@ protected:
 private:
     void renderPalettes(bool fg)
     {
-        static constexpr auto cellDim = 15;
         static constexpr auto cols = static_cast<int>(aldo::color_span::extent
                                                       + 1);
-        static constexpr auto center = 0.5f;
         static constexpr auto flags = ImGuiTableFlags_BordersInner
                                         | ImGuiTableFlags_SizingFixedFit;
 
@@ -1807,18 +1802,18 @@ private:
         for (aldo::color_span pal : pals) {
             if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols, flags)) {
                 ScopedStyleVec textAlign{{
-                    ImGuiStyleVar_SelectableTextAlign, {center, center},
+                    ImGuiStyleVar_SelectableTextAlign,
+                    aldo::style::AlignCenter,
                 }};
                 std::array<char, 3> buf;
                 for (auto col = 0; col < cols; ++col) {
                     ImGui::TableNextColumn();
                     if (col == 0) {
                         std::snprintf(buf.data(), buf.size(), "%d", row + 1);
-                        auto palIdx
-                            = static_cast<aldo::et::size>(row + (fg << 2));
+                        auto palIdx = static_cast<aldo::et::size>(row + (fg << 2));
                         if (ImGui::Selectable(buf.data(), palSelect == palIdx,
                                               ImGuiSelectableFlags_None,
-                                              {cellDim, cellDim})) {
+                                              aldo::style::CellSz)) {
                             palSelect = palIdx;
                         }
                     } else {
@@ -1834,7 +1829,7 @@ private:
                         ScopedID id = row << 3 | col << 1 | fg;
                         if (ImGui::Selectable(buf.data(), false,
                                               ImGuiSelectableFlags_None,
-                                              {cellDim, cellDim})) {
+                                              aldo::style::CellSz)) {
                             vs.colorSelection = idx;
                         }
                     }
@@ -2259,15 +2254,15 @@ private:
 
     void renderSpriteSelect() noexcept
     {
-        static constexpr auto tblDim = 8, cellDim = 15;
-        static constexpr auto center = 0.5f;
+        static constexpr auto tblDim = 8;
         static constexpr auto flags = ImGuiTableFlags_Borders
                                         | ImGuiTableFlags_SizingFixedFit;
 
         if (ImGui::BeginTable("Select", tblDim, flags)) {
             std::array<char, 3> buf;
             ScopedStyleVec textAlign{{
-                ImGuiStyleVar_SelectableTextAlign, {center, center},
+                ImGuiStyleVar_SelectableTextAlign,
+                aldo::style::AlignCenter,
             }};
             for (auto r = 0; r < tblDim; ++r) {
                 for (auto c = 0; c < tblDim; ++c) {
@@ -2277,7 +2272,7 @@ private:
                     ScopedID id = idx;
                     if (ImGui::Selectable(buf.data(), this->selected == idx,
                                           ImGuiSelectableFlags_None,
-                                          {cellDim, cellDim})) {
+                                          aldo::style::CellSz)) {
                         selected = idx;
                     }
                 }

@@ -92,7 +92,9 @@ inline constexpr ImU32 luminance(ImU32 color)
 namespace style
 {
 
+inline constexpr int CellDim = 15;
 inline constexpr float SmallRadius = 5;
+inline constexpr ImVec2 CellSz{CellDim, CellDim}, AlignCenter{0.5f, 0.5f};
 
 inline ImVec2 glyph_size() noexcept
 {

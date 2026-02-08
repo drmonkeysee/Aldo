@@ -2274,7 +2274,6 @@ private:
                     auto idx = c + (r * tblDim);
                     ImGui::TableNextColumn();
                     std::snprintf(buf.data(), buf.size(), "%02d", idx);
-                    ScopedID id = idx;
                     if (ImGui::Selectable(buf.data(), this->selected == idx,
                                           ImGuiSelectableFlags_None,
                                           aldo::style::CellSz)) {

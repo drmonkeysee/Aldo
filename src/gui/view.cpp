@@ -2241,16 +2241,22 @@ public:
 protected:
     void renderContents() override
     {
-        sprites.draw(mr);
-        sprites.render();
+        renderSpriteScreen();
         ImGui::SameLine();
         widget_group([this] noexcept {
             this->renderSpriteSelect();
             this->renderSpriteDetails();
         });
+        renderSpriteControls();
     }
 
 private:
+    void renderSpriteScreen() const
+    {
+        sprites.draw(mr);
+        sprites.render();
+    }
+
     void renderSpriteSelect() noexcept
     {
         static constexpr auto tblDim = 8, cellDim = 15;
@@ -2280,18 +2286,28 @@ private:
         }
     }
 
-    void renderSpriteDetails() noexcept
+    void renderSpriteDetails() const noexcept
     {
         ImGui::TextUnformatted("Position: (xxx, yyy)");
-        ImGui::TextUnformatted("Tile ID: 0x22");
+        ImGui::TextUnformatted("Tile: 0x22 ($1000)");
+
         ImGui::TextUnformatted("Palette: 5");
-        ImGui::TextUnformatted("Priority: 1");
-        ImGui::TextUnformatted("V-Flip: true");
-        ImGui::TextUnformatted("H-Flip: false");
+        ImGui::TextUnformatted("Priority: FG");
+
+        ImGui::TextUnformatted("H-Flip: true");
+        ImGui::TextUnformatted("V-Flip: false");
+    }
+
+    void renderSpriteControls() noexcept
+    {
+        ImGui::Checkbox("Screen Indicator", &screenIndicator);
+        ImGui::SameLine(0, screenIndicator ? 51 : 58);
+        ImGui::Text("Size: 8x%d", screenIndicator ? 16 : 8);
     }
 
     aldo::Sprites sprites;
     int selected = 0;
+    bool screenIndicator = false;
 };
 
 class SystemView final : public aldo::View {

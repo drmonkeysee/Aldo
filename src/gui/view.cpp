@@ -1809,7 +1809,8 @@ private:
                 for (auto col = 0; col < cols; ++col) {
                     ImGui::TableNextColumn();
                     if (col == 0) {
-                        std::snprintf(buf.data(), buf.size(), "%d", row + 1);
+                        std::snprintf(buf.data(), buf.size(), "%d",
+                                      fg ? row + 4 : row);
                         auto palIdx = static_cast<aldo::et::size>(row + (fg << 2));
                         if (ImGui::Selectable(buf.data(), palSelect == palIdx,
                                               ImGuiSelectableFlags_None,
@@ -2287,14 +2288,19 @@ private:
 
     void renderSpriteDetails() const noexcept
     {
-        ImGui::TextUnformatted("Position: (xxx, yyy)");
-        ImGui::TextUnformatted("Tile: 0x22 ($1000)");
+        assert(0 <= selected && static_cast<aldo::et::size>(selected)
+               < aldo_arrsz(emu.snapshot().video->objects));
 
-        ImGui::TextUnformatted("Palette: 5");
-        ImGui::TextUnformatted("Priority: FG");
+        const auto& obj = emu.snapshot().video->objects[selected];
 
-        ImGui::TextUnformatted("H-Flip: true");
-        ImGui::TextUnformatted("V-Flip: false");
+        ImGui::Text("Position: (%03d, %03d)", obj.x, obj.y);
+        ImGui::Text("Tile: %02x ($1000)", obj.tile);
+
+        ImGui::Text("Palette: %d", obj.palette);
+        ImGui::Text("Priority: %s", obj.priority ? "FG" : "BG");
+
+        ImGui::Text("H-Flip: %s", boolstr(obj.hflip));
+        ImGui::Text("V-Flip: %s", boolstr(obj.vflip));
     }
 
     void renderSpriteControls() noexcept

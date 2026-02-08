@@ -41,7 +41,7 @@ static void remove_reset_override(struct aldo_debugger_context *self)
     auto r = aldo_bus_set(self->cpu->mbus, ALDO_CPU_VECTOR_RST,
                           self->dec.inner);
     (void)r, assert(r);
-    self->dec = (struct resdecorator){};
+    self->dec = (typeof(self->dec)){};
 }
 
 static void update_reset_override(struct aldo_debugger_context *self)
@@ -136,7 +136,7 @@ static bool bpvector_valid_index(const struct breakpoint_vector *vec,
 static bool bpvector_init(struct breakpoint_vector *vec)
 {
     static constexpr size_t initial_capacity = 2;
-    *vec = (struct breakpoint_vector){
+    *vec = (typeof(*vec)){
         .capacity = initial_capacity,
         .items = calloc(initial_capacity, sizeof *vec->items),
     };
@@ -169,7 +169,7 @@ static bool bpvector_insert(struct breakpoint_vector *vec,
         if (!bpvector_resize(vec)) return false;
     }
     auto slot = vec->items + vec->size;
-    *slot = (struct aldo_breakpoint){expr, true};
+    *slot = (typeof(*slot)){expr, true};
     ++vec->size;
     return true;
 }
@@ -242,7 +242,7 @@ aldo_debugger *aldo_debug_new()
     struct aldo_debugger_context *self = malloc(sizeof *self);
     if (!self) return self;
 
-    *self = (struct aldo_debugger_context){
+    *self = (typeof(*self)){
         .halted = Aldo_NoBreakpoint,
         .resetvector = Aldo_NoResetVector,
     };
@@ -387,7 +387,7 @@ void aldo_debug_sync_bus(aldo_debugger *self)
         return;
     }
 
-    self->dec = (struct resdecorator){.vector = (uint16_t)self->resetvector};
+    self->dec = (typeof(self->dec)){.vector = (uint16_t)self->resetvector};
     struct aldo_busdevice resetaddr_device = {
         resetaddr_read, resetaddr_write, resetaddr_copy, &self->dec,
     };

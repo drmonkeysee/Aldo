@@ -44,15 +44,15 @@ aldo_bus *aldo_bus_new(int bitwidth, size_t n, ...)
     struct aldo_hardwarebus *self = malloc(sizeof *self + psize);
     if (!self) return self;
 
-    *self = (struct aldo_hardwarebus){
+    *self = (typeof(*self)){
         .count = n,
         .maxaddr = (uint16_t)((1 << bitwidth) - 1),
     };
-    self->partitions[0] = (struct partition){};
+    self->partitions[0] = (typeof(self->partitions[0])){};
     va_list args;
     va_start(args, n);
     for (size_t i = 1; i < n; ++i) {
-        self->partitions[i] = (struct partition){
+        self->partitions[i] = (typeof(self->partitions[i])){
             .start = (uint16_t)va_arg(args, unsigned int),
         };
     }

@@ -497,7 +497,7 @@ int aldo_dis_parse_inst(const struct aldo_blockview *bv, size_t at,
     assert(bv != nullptr);
     assert(parsed != nullptr);
 
-    *parsed = (struct aldo_dis_instruction){};
+    *parsed = (typeof(*parsed)){};
     if (!bv->mem) return ALDO_DIS_ERR_PRGROM;
     if (at >= bv->size) return 0;
 
@@ -506,7 +506,7 @@ int aldo_dis_parse_inst(const struct aldo_blockview *bv, size_t at,
     auto instlen = InstLens[dec.mode];
     if ((size_t)instlen > bv->size - at) return ALDO_DIS_ERR_EOF;
 
-    *parsed = (struct aldo_dis_instruction){
+    *parsed = (typeof(*parsed)){
         at,
         {bv->ord, (size_t)instlen, bv->mem + at},
         dec,

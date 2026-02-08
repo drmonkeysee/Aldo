@@ -56,7 +56,7 @@ constexpr auto MaxAddress = ALDO_ADDRMASK_64KB;
 
 static void init_cliargs(struct cliargs *args)
 {
-    *args = (struct cliargs){
+    *args = (typeof(*args)){
         .chrscale = Aldo_MinChrScale,
         .resetvector = Aldo_NoResetVector,
     };
@@ -146,7 +146,7 @@ static bool parse_halt(const char *arg, int *restrict argi, int argc,
         struct haltarg **tail;
         for (tail = &args->haltlist; *tail; tail = &(*tail)->next);
         if ((*tail = malloc(sizeof **tail))) {
-            **tail = (struct haltarg){.expr = expr};
+            **tail = (typeof(**tail)){.expr = expr};
             return true;
         }
         perror("Halt expression parse failed");

@@ -762,7 +762,7 @@ static void vcleanup(struct view *v)
     delwin(v->content);
     del_panel(v->outer);
     delwin(v->win);
-    *v = (struct view){};
+    *v = (typeof(*v)){};
 }
 
 static void ramrefresh(const struct view *v, const struct viewstate *vs)

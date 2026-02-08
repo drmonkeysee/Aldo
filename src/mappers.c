@@ -361,7 +361,7 @@ int aldo_mapper_raw_create(struct aldo_mapper **m, FILE *f)
     struct raw_mapper *self = malloc(sizeof *self);
     if (!self) return ALDO_CART_ERR_ERNO;
 
-    *self = (struct raw_mapper){
+    *self = (typeof(*self)){
         .vtable = {
             .dtor = raw_dtor,
             .prgrom = raw_prgrom,
@@ -392,7 +392,7 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
         if (!(self = malloc(sizeof(struct ines_000_mapper))))
             return ALDO_CART_ERR_ERNO;
 
-        *self = (struct ines_mapper){
+        *self = (typeof(*self)){
             .vtable = {
                 .extends = {.mbus_connect = ines_000_mbus_connect},
                 .vbus_connect = ines_000_vbus_connect,
@@ -408,7 +408,7 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
     } else {
         if (!(self = malloc(sizeof *self))) return ALDO_CART_ERR_ERNO;
 
-        *self = (struct ines_mapper){
+        *self = (typeof(*self)){
             .vtable = {
                 .extends = {.mbus_connect = ines_unimplemented_mbus_connect},
                 .vbus_connect = ines_unimplemented_vbus_connect,

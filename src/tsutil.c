@@ -19,7 +19,7 @@ struct timespec aldo_elapsed(const struct timespec *from)
     struct timespec now, elapsed;
     clock_gettime(CLOCK_MONOTONIC, &now);
 
-    elapsed = (struct timespec){.tv_sec = now.tv_sec - from->tv_sec};
+    elapsed = (typeof(elapsed)){.tv_sec = now.tv_sec - from->tv_sec};
 
     if (from->tv_nsec > now.tv_nsec) {
         // subtract with borrow

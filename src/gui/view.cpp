@@ -2243,10 +2243,55 @@ protected:
     {
         sprites.draw(mr);
         sprites.render();
+        ImGui::SameLine();
+        widget_group([this] noexcept {
+            this->renderSpriteSelect();
+            this->renderSpriteDetails();
+        });
     }
 
 private:
+    void renderSpriteSelect() noexcept
+    {
+        static constexpr auto tblDim = 8, cellDim = 15;
+        static constexpr auto center = 0.5f;
+        static constexpr auto flags = ImGuiTableFlags_Borders
+                                        | ImGuiTableFlags_SizingFixedFit;
+
+        if (ImGui::BeginTable("Select", tblDim, flags)) {
+            std::array<char, 3> buf;
+            ScopedStyleVec textAlign{{
+                ImGuiStyleVar_SelectableTextAlign, {center, center},
+            }};
+            for (auto r = 0; r < tblDim; ++r) {
+                for (auto c = 0; c < tblDim; ++c) {
+                    auto idx = c + (r * tblDim);
+                    ImGui::TableNextColumn();
+                    std::snprintf(buf.data(), buf.size(), "%02d", idx);
+                    ScopedID id = idx;
+                    if (ImGui::Selectable(buf.data(), this->selected == idx,
+                                          ImGuiSelectableFlags_None,
+                                          {cellDim, cellDim})) {
+                        selected = idx;
+                    }
+                }
+            }
+            ImGui::EndTable();
+        }
+    }
+
+    void renderSpriteDetails() noexcept
+    {
+        ImGui::TextUnformatted("Position: (xxx, yyy)");
+        ImGui::TextUnformatted("Tile ID: 0x22");
+        ImGui::TextUnformatted("Palette: 5");
+        ImGui::TextUnformatted("Priority: 1");
+        ImGui::TextUnformatted("V-Flip: true");
+        ImGui::TextUnformatted("H-Flip: false");
+    }
+
     aldo::Sprites sprites;
+    int selected = 0;
 };
 
 class SystemView final : public aldo::View {

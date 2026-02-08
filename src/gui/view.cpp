@@ -2248,8 +2248,12 @@ protected:
 private:
     void renderSpriteScreen() const
     {
+        auto pos = ImGui::GetCursorScreenPos();
         sprites.draw(mr);
         sprites.render();
+        if (screenIndicator) {
+            drawScreenIndicator(pos);
+        }
     }
 
     void renderSpriteSelect() noexcept
@@ -2298,6 +2302,13 @@ private:
         ImGui::Checkbox("Screen Indicator", &screenIndicator);
         ImGui::SameLine(0, screenIndicator ? 51 : 58);
         ImGui::Text("Size: 8x%d", screenIndicator ? 16 : 8);
+    }
+
+    void drawScreenIndicator(const ImVec2& orig) const noexcept
+    {
+        auto drawList = ImGui::GetWindowDrawList();
+        drawList->AddRect(orig, orig + point_to_vec(emu.screenSize()),
+                          aldo::colors::LineIn, 0.0f, ImDrawFlags_None, 2.0f);
     }
 
     aldo::Sprites sprites;

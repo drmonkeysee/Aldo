@@ -29,6 +29,7 @@ constexpr auto DotHBlank = 257;
 constexpr auto DotPxEnd = 260;
 constexpr auto DotTilePrefetch = 321;
 constexpr auto DotTilePrefetchEnd = 337;
+constexpr auto SpriteSize = 4;
 
 // helpers for manipulating v and t registers
 constexpr uint16_t BaseNtAddr = ALDO_MEMBLOCK_8KB;
@@ -162,7 +163,7 @@ static uint8_t oam_read(const struct aldo_rp2c02 *self)
         && in_visible_frame(self)) return 0xff;
 
     auto d = self->spr.oam[self->oamaddr];
-    if (self->oamaddr % 4 == 2) {
+    if (self->oamaddr % SpriteSize == 2) {
         // Every 3rd OAM cell has bits 4-2 hardwired to zero, affecting the
         // object attribute byte during (correctly aligned) sprite evaluation.
         d &= 0xe3;
@@ -209,7 +210,7 @@ static bool sprite_in_range(const struct aldo_rp2c02 *self)
 
 static void sprite_skip(struct aldo_rp2c02 *self)
 {
-    self->oamaddr += 0x4;
+    self->oamaddr += SpriteSize;
 }
 
 static void sprite_reset(struct aldo_rp2c02 *self)
@@ -267,7 +268,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         ++self->oamaddr;
         if (sprites->soaddr == 0) {
             sprites->s = ALDO_PPU_SPR_FULL;
-        } else if (sprites->soaddr % 4 == 0) {
+        } else if (sprites->soaddr % SpriteSize == 0) {
             sprites->s = ALDO_PPU_SPR_SCAN;
         }
         goto oam_overflow_check;
@@ -300,7 +301,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
     case ALDO_PPU_SPR_OVER:
         soam_advance(self);
         ++self->oamaddr;
-        if (sprites->soaddr % 4 == 0) {
+        if (sprites->soaddr % SpriteSize == 0) {
             sprites->s = ALDO_PPU_SPR_FULL;
         }
         goto oam_overflow_check;
@@ -318,6 +319,28 @@ oam_overflow_check:
     // we've run through all 64 sprites one way or another
     if (oam_overflow(self, sprite_idx)) {
         sprites->s = ALDO_PPU_SPR_DONE;
+    }
+}
+
+static void snapshot_objects(const struct aldo_rp2c02 *self,
+                             struct aldo_snapshot *snp)
+{
+    auto video = snp->video;
+
+    assert(aldo_arrsz(self->spr.oam) == (aldo_arrsz(video->objects) * SpriteSize));
+
+    for (size_t i = 0; i < aldo_arrsz(video->objects); ++i) {
+        auto obj = snp->video->objects + i;
+        auto bytes = self->spr.oam + (i * SpriteSize);
+        *obj = (typeof(*obj)){
+            bytes[0],               // y coordinate
+            bytes[1],               // tile ID
+            bytes[2] & DWordMask,   // palette ID
+            bytes[2] & 0x20,        // priority (bg/fg)
+            bytes[2] & 0x40,        // horizontal flip
+            bytes[2] & 0x80,        // vertical flip
+            bytes[3],               // x coordinate
+        };
     }
 }
 
@@ -1283,6 +1306,7 @@ void aldo_ppu_vid_snapshot(struct aldo_rp2c02 *self, struct aldo_snapshot *snp)
     snapshot_palette(self, snp->video->palettes.bg, 0);
     snapshot_palette(self, snp->video->palettes.fg, 0x10);
     snapshot_nametables(self, snp);
+    snapshot_objects(self, snp);
 }
 
 bool aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f)

@@ -105,6 +105,10 @@ struct aldo_snapshot {
             uint8_t bg[AldoPalSize][AldoPalSize],
                     fg[AldoPalSize][AldoPalSize];
         } palettes;
+        struct {
+            uint8_t x, y, tile, palette;
+            bool priority, hflip, vflip;
+        } objects[64];
         bool newframe;
     } *video;
 };

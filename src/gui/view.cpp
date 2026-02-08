@@ -2259,7 +2259,7 @@ private:
 
     void renderSpriteSelect() noexcept
     {
-        static constexpr auto tblDim = 8;
+        static constexpr auto tblDim = AldoSpriteCount / 8;
         static constexpr auto flags = ImGuiTableFlags_Borders
                                         | ImGuiTableFlags_SizingFixedFit;
 

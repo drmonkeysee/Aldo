@@ -27,6 +27,7 @@ aldo_const int AldoNtWidth = 32;
 aldo_const int AldoNtHeight = 30;
 aldo_const int AldoNtTileCount = AldoNtWidth * AldoNtHeight;
 aldo_const int AldoNtAttrCount = 64;
+aldo_const int AldoSpriteCount = AldoNtAttrCount;
 aldo_const int AldoMetatileDim = 2;
 
 struct aldo_snapshot {
@@ -108,7 +109,7 @@ struct aldo_snapshot {
         struct {
             uint8_t x, y, tile, palette;
             bool priority, hflip, vflip;
-        } objects[64];
+        } objects[AldoSpriteCount];
         bool newframe;
     } *video;
 };

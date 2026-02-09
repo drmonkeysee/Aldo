@@ -2288,12 +2288,12 @@ private:
     void renderSpriteDetails() const noexcept
     {
         assert(0 <= selected && static_cast<aldo::et::size>(selected)
-               < aldo_arrsz(emu.snapshot().video->objects));
+               < aldo_arrsz(emu.snapshot().video->sprites.objects));
 
-        const auto& obj = emu.snapshot().video->objects[selected];
+        const auto& obj = emu.snapshot().video->sprites.objects[selected];
 
         ImGui::Text("Position: (%03d, %03d)", obj.x, obj.y);
-        ImGui::Text("Tile: %02x ($1000)", obj.tile);
+        ImGui::Text("Tile: %02X ($%1d000)", obj.tile, obj.pt);
 
         ImGui::Text("Palette: %d", obj.palette);
         ImGui::Text("Priority: %s", obj.priority ? "FG" : "BG");
@@ -2305,8 +2305,9 @@ private:
     void renderSpriteControls() noexcept
     {
         ImGui::Checkbox("Screen Indicator", &screenIndicator);
-        ImGui::SameLine(0, screenIndicator ? 51 : 58);
-        ImGui::Text("Size: 8x%d", screenIndicator ? 16 : 8);
+        auto doubleHeight = emu.snapshot().video->sprites.double_height;
+        ImGui::SameLine(0, doubleHeight ? 51 : 58);
+        ImGui::Text("Size: 8x%d", doubleHeight ? 16 : 8);
     }
 
     void drawScreenIndicator(const ImVec2& orig) const noexcept

@@ -96,9 +96,12 @@ struct aldo_snapshot {
             bool pt;
         } nt;
         struct {
-            uint8_t x, y, tile, palette;
-            bool priority, hflip, vflip;
-        } objects[AldoSpriteCount];
+            struct {
+                uint8_t x, y, tile, palette;
+                bool pt, priority, hflip, vflip;
+            } objects[AldoSpriteCount];
+            bool double_height;
+        } sprites;
         // A Pattern Table is 256 tiles x 8 rows x 8 pixels x 2 bits.
         struct {
             uint16_t

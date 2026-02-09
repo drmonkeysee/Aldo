@@ -322,24 +322,28 @@ oam_overflow_check:
     }
 }
 
-static void snapshot_objects(const struct aldo_rp2c02 *self,
+static void snapshot_sprites(const struct aldo_rp2c02 *self,
                              struct aldo_snapshot *snp)
 {
-    auto video = snp->video;
+    auto sprites = &snp->video->sprites;
 
-    assert(aldo_arrsz(self->spr.oam) == (aldo_arrsz(video->objects) * SpriteSize));
+    assert(aldo_arrsz(self->spr.oam) == (aldo_arrsz(sprites->objects) * SpriteSize));
 
-    for (size_t i = 0; i < aldo_arrsz(video->objects); ++i) {
-        auto obj = snp->video->objects + i;
+    sprites->double_height = self->ctrl.h;
+    for (size_t i = 0; i < aldo_arrsz(sprites->objects); ++i) {
+        auto obj = sprites->objects + i;
         auto bytes = self->spr.oam + (i * SpriteSize);
+        uint8_t tileId = sprites->double_height ? bytes[1] >> 1 : bytes[1];
+        bool pt = sprites->double_height ? bytes[1] & 0x1 : self->ctrl.s;
         *obj = (typeof(*obj)){
+            bytes[3],               // x coordinate
             bytes[0],               // y coordinate
-            bytes[1],               // tile ID
+            tileId,                 // tile ID
             bytes[2] & DWordMask,   // palette ID
+            pt,                     // pattern table bank
             bytes[2] & 0x20,        // priority (bg/fg)
             bytes[2] & 0x40,        // horizontal flip
             bytes[2] & 0x80,        // vertical flip
-            bytes[3],               // x coordinate
         };
     }
 }
@@ -1306,7 +1310,7 @@ void aldo_ppu_vid_snapshot(struct aldo_rp2c02 *self, struct aldo_snapshot *snp)
     snapshot_palette(self, snp->video->palettes.bg, 0);
     snapshot_palette(self, snp->video->palettes.fg, 0x10);
     snapshot_nametables(self, snp);
-    snapshot_objects(self, snp);
+    snapshot_sprites(self, snp);
 }
 
 bool aldo_ppu_dumpram(const struct aldo_rp2c02 *self, FILE *f)

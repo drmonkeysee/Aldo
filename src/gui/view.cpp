@@ -1759,14 +1759,14 @@ protected:
         static constexpr auto palSize = aldo::color_span::extent;
 
         if (drawInterval.elapsed(vs.clock.clock())) {
-            const auto* tables = &emu.snapshot().video->pattern_tables;
+            const auto& tables = emu.snapshot().video->pattern_tables;
             assert(palSelect < palSize * 2);
             aldo::color_span colors =
                 palSelect < palSize
                 ? emu.snapshot().video->palettes.bg[palSelect]
                 : emu.snapshot().video->palettes.fg[palSelect - palSize];
-            left.draw(tables->left, colors, emu.palette());
-            right.draw(tables->right, colors, emu.palette());
+            left.draw(tables.left, colors, emu.palette());
+            right.draw(tables.right, colors, emu.palette());
         }
 
         widget_group([this] noexcept {
@@ -2033,7 +2033,7 @@ private:
     {
         static constexpr auto instCount = 16;
 
-        const auto* curr = emu.snapshot().prg.curr;
+        auto curr = emu.snapshot().prg.curr;
         auto addr = emu.snapshot().cpu.datapath.current_instruction;
         aldo_dis_instruction inst{};
         std::array<aldo::et::tchar, AldoDisInstSize> disasm;

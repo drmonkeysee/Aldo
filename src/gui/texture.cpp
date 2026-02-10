@@ -170,7 +170,7 @@ aldo::tex::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 
 void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
 {
-    const auto* vsp = emu.snapshot().video;
+    auto vsp = emu.snapshot().video;
     aldo::pt_span chrs = vsp->nt.pt
                             ? vsp->pattern_tables.right
                             : vsp->pattern_tables.left;
@@ -213,7 +213,7 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
 void aldo::Nametables::drawAttributes(const aldo::Emulator& emu,
                                       const aldo::MediaRuntime& mr) const
 {
-    const auto* vsp = emu.snapshot().video;
+    auto vsp = emu.snapshot().video;
     auto offsets = getOffsets(vsp->nt.mirror);
     auto ren = mr.renderer();
     auto target = atTex.asTarget(ren);

@@ -62,7 +62,7 @@ constexpr auto mode_change(const SDL_Event& ev) noexcept
 
 auto breakpoint_add_failed()
 {
-    const auto* errMsg = std::strerror(errno);
+    auto errMsg = std::strerror(errno);
     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                  "Add breakpoint error (%d): (%s)", errno, errMsg);
     std::string msg = "Unable to add breakpoint (";

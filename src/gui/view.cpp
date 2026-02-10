@@ -2293,7 +2293,14 @@ private:
         const auto& obj = emu.snapshot().video->sprites.objects[selected];
 
         ImGui::Text("Position: (%03d, %03d)", obj.x, obj.y);
-        ImGui::Text("Tile: %02X ($%1d000)", obj.tile, obj.pt);
+        std::array<char, 6> buf;
+        if (emu.snapshot().video->sprites.double_height) {
+            std::snprintf(buf.data(), buf.size(), "%02X+%02X", obj.tile,
+                          static_cast<aldo::et::byte>(obj.tile + 1));
+        } else {
+            std::snprintf(buf.data(), buf.size(), "%02X", obj.tile);
+        }
+        ImGui::Text("Tile: %s ($%1d000)", buf.data(), obj.pt);
 
         ImGui::Text("Palette: %d", obj.palette);
         ImGui::Text("Priority: %s", obj.priority ? "FG" : "BG");

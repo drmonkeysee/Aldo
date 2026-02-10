@@ -333,7 +333,7 @@ static void snapshot_sprites(const struct aldo_rp2c02 *self,
     for (size_t i = 0; i < aldo_arrsz(sprites->objects); ++i) {
         auto obj = sprites->objects + i;
         auto bytes = self->spr.oam + (i * SpriteSize);
-        uint8_t tileId = sprites->double_height ? bytes[1] >> 1 : bytes[1];
+        uint8_t tileId = sprites->double_height ? bytes[1] & 0xfe : bytes[1];
         bool pt = sprites->double_height ? bytes[1] & 0x1 : self->ctrl.s;
         *obj = (typeof(*obj)){
             bytes[3],               // x coordinate

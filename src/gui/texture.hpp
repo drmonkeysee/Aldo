@@ -206,16 +206,24 @@ private:
 
 class Sprites {
 public:
+    enum class Priority {
+        all,
+        fg,
+        bg,
+    };
+
     explicit Sprites(const aldo::MediaRuntime& mr);
 
-    void draw(const MediaRuntime& mr) const;
+    void draw() const;
     void render() const noexcept
     {
-        placeholder.render();
+        sprTex.render();
     }
 
+    Priority priority = Priority::all;
+
 private:
-    tex::Texture<SDL_TEXTUREACCESS_TARGET> placeholder;
+    tex::Texture<SDL_TEXTUREACCESS_STREAMING> sprTex;
 };
 
 }

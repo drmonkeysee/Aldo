@@ -319,8 +319,7 @@ public:
         onSelected(selection(), true);
     }
 
-    ComboList(const char* label, std::initializer_list<option> opts,
-              callback cb)
+    ComboList(const char* label, std::initializer_list<option> opts, callback cb)
     : label{label}, options{opts}, selected{this->options.front()},
     onSelected{cb}
     {
@@ -1536,7 +1535,7 @@ private:
 
     void renderControls() noexcept
     {
-        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * aldo::style::CellDim);
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 15);
         modeCombo.render();
         ImGui::SameLine();
         widget_group([this] noexcept {
@@ -2226,7 +2225,16 @@ class SpritesView final : public aldo::View {
 public:
     SpritesView(aldo::viewstate& vs, const aldo::Emulator& emu,
                 const aldo::MediaRuntime& mr) noexcept
-    : View{"Sprites", vs, emu, mr}, sprites{mr} {}
+    : View{"Sprites", vs, emu, mr}, sprites{mr},
+    priorityCombo {
+        "Priority",
+        {
+            {PriorityMode::all, "All"},
+            {PriorityMode::fg, "FG Only"},
+            {PriorityMode::bg, "BG Only"},
+        },
+        [this](PriorityMode v, bool) { this->sprites.priority = v; },
+    } {}
     SpritesView(aldo::viewstate&, aldo::Emulator&&,
                 const aldo::MediaRuntime&) = delete;
     SpritesView(aldo::viewstate&, const aldo::Emulator&,
@@ -2250,7 +2258,7 @@ private:
     void renderSpriteScreen() const
     {
         auto pos = ImGui::GetCursorScreenPos();
-        sprites.draw(mr);
+        sprites.draw();
         sprites.render();
         if (screenIndicator) {
             drawScreenIndicator(pos);
@@ -2315,6 +2323,8 @@ private:
         auto doubleHeight = emu.snapshot().video->sprites.double_height;
         ImGui::SameLine(0, doubleHeight ? 51 : 58);
         ImGui::Text("Size: 8x%d", doubleHeight ? 16 : 8);
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 12);
+        priorityCombo.render();
     }
 
     void drawScreenIndicator(const ImVec2& orig) const noexcept
@@ -2325,6 +2335,8 @@ private:
     }
 
     aldo::Sprites sprites;
+    using PriorityMode = decltype(sprites)::Priority;
+    ComboList<PriorityMode> priorityCombo;
     int selected = 0;
     bool screenIndicator = false;
 };

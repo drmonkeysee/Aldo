@@ -123,16 +123,13 @@ void aldo::Nametables::draw(const Emulator& emu, const MediaRuntime& mr) const
 }
 
 aldo::Sprites::Sprites(const aldo::MediaRuntime& mr)
-: placeholder{{SpriteDim, SpriteDim}, mr.renderer()} {}
+: sprTex{{SpriteDim, SpriteDim}, mr.renderer()} {}
 
-void aldo::Sprites::draw(const MediaRuntime& mr) const
+void aldo::Sprites::draw() const
 {
-    auto ren = mr.renderer();
-    auto [r, g, b] = aldo::colors::rgb(aldo::colors::LedOff);
-    auto target = placeholder.asTarget(mr.renderer());
-    SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g),
-                           static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
-    SDL_RenderClear(ren);
+    auto data = sprTex.lock();
+    auto mem = std::span{data.pixels, static_cast<size_t>(data.size())};
+    std::ranges::fill(mem, aldo::colors::LedOff);
 }
 
 //

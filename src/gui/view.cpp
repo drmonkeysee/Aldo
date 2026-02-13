@@ -2258,7 +2258,7 @@ private:
     void renderSpriteScreen() const
     {
         auto pos = ImGui::GetCursorScreenPos();
-        sprites.draw();
+        sprites.draw(emu.snapshot().video->sprites.objects);
         sprites.render();
         if (screenIndicator) {
             drawScreenIndicator(pos);

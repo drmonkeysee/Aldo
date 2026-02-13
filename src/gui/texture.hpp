@@ -17,6 +17,8 @@
 #include <SDL3/SDL.h>
 
 #include <span>
+#include <type_traits>
+#include <utility>
 
 namespace aldo
 {
@@ -28,6 +30,9 @@ using color_span = std::span<const et::byte, AldoPalSize>;
 // TODO: use std::mdspan someday when they can be sliced?
 using pt_tile = std::span<const et::word, AldoChrTileDim>;
 using pt_span = std::span<const et::word[AldoChrTileDim], AldoPtTileCount>;
+using sprite_obj = std::remove_extent_t<
+                    decltype(std::declval<aldo_snapshot>().video->sprites.objects)>;
+using sprite_span = std::span<const sprite_obj, AldoSpriteCount>;
 
 namespace tex
 {
@@ -214,7 +219,7 @@ public:
 
     explicit Sprites(const aldo::MediaRuntime& mr);
 
-    void draw() const;
+    void draw(sprite_span objects) const;
     void render() const noexcept
     {
         sprTex.render();

@@ -77,8 +77,7 @@ auto draw_tile(aldo::pt_tile chr, int col, int row, aldo::color_span colors,
 // MARK: - Public Interface
 //
 
-aldo::VideoScreen::VideoScreen(SDL_Point resolution,
-                               const aldo::MediaRuntime& mr)
+aldo::VideoScreen::VideoScreen(SDL_Point resolution, const aldo::MediaRuntime& mr)
 : tex{resolution, mr.renderer()} {}
 
 void aldo::VideoScreen::draw(const aldo::et::byte* vbuf,
@@ -126,11 +125,14 @@ void aldo::Nametables::draw(const Emulator& emu, const MediaRuntime& mr) const
 aldo::Sprites::Sprites(const aldo::MediaRuntime& mr)
 : sprTex{{SpriteDim, SpriteDim}, mr.renderer()} {}
 
-void aldo::Sprites::draw() const
+void aldo::Sprites::draw(aldo::sprite_span objects) const
 {
     auto data = sprTex.lock();
     auto mem = px_span{data.pixels, static_cast<px_span::size_type>(data.size())};
     std::ranges::fill(mem, aldo::colors::LedOff);
+
+    const auto& obj = *objects.begin();
+    // TODO: draw single sprite using chr and palette
 }
 
 //

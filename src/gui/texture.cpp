@@ -26,6 +26,7 @@ namespace
 {
 
 using nt_span = std::span<const aldo::et::byte, AldoNtTileCount>;
+using px_span = std::span<Uint32>;
 
 constexpr auto SpriteDim = std::numeric_limits<aldo::et::byte>::max();
 
@@ -128,7 +129,7 @@ aldo::Sprites::Sprites(const aldo::MediaRuntime& mr)
 void aldo::Sprites::draw() const
 {
     auto data = sprTex.lock();
-    auto mem = std::span{data.pixels, static_cast<size_t>(data.size())};
+    auto mem = px_span{data.pixels, static_cast<px_span::size_type>(data.size())};
     std::ranges::fill(mem, aldo::colors::LedOff);
 }
 

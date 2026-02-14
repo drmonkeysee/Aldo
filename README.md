@@ -46,7 +46,7 @@ ln -s /Applications/Aldo.app/Contents/MacOS/Cli/aldoc /usr/local/bin/aldoc
 
 This build is best done with GCC-12+ as earlier versions have some bugs around how C++ concepts are applied. Follow steps 1-3 of the CLI build above. Then:
 
-4. `[sudo] apt install -y curl libsdl2-dev`
+4. `[sudo] apt install -y curl libsdl3-dev`
 5. Run `make ext`
 6. `make debug-gui`
 

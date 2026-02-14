@@ -68,7 +68,7 @@ public:
 private:
     void drawRow(aldo::et::word pxRow, int rowOrigin) const
     {
-        for (auto px = 0; px < static_cast<int>(aldo::pt_tile::extent); ++px) {
+        for (auto px = 0; px < static_cast<int>(decltype(chrTile)::extent); ++px) {
             auto pidx = AldoChrTileStride - ((px + 1) * 2);
             assert(0 <= pidx);
             decltype(colors)::size_type texel = (pxRow & (0x3 << pidx)) >> pidx;
@@ -166,7 +166,7 @@ void aldo::Sprites::draw(const aldo::Emulator& emu) const
     // Clamp uninitialized data within palette range; note that sprite palette
     // index is always in the upper half of the 8 available palettes.
     auto palidx = std::max(palMin, std::min(obj.palette, palMax));
-    aldo::color_span colors = video->palettes.fg[palidx - aldo::color_span::extent];
+    aldo::color_span colors = video->palettes.fg[palidx - decltype(colors)::extent];
     // TODO: clamp during initial testing
     auto x = std::min(static_cast<aldo::et::byte>(248), obj.x);
     auto y = std::min(static_cast<aldo::et::byte>(248), obj.y);

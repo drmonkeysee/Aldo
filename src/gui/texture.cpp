@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <array>
 #include <concepts>
+#include <type_traits>
 #include <cassert>
 
 static_assert(std::same_as<Uint32, ImU32>,
@@ -124,6 +125,9 @@ aldo::Sprites::Sprites(const aldo::MediaRuntime& mr)
 void aldo::Sprites::draw(const aldo::Emulator& emu) const
 {
     using px_span = std::span<Uint32>;
+    using sprite_obj = std::remove_extent_t<
+                        decltype(emu.snapshot().video->sprites.objects)>;
+    using sprite_span = std::span<const sprite_obj, AldoSpriteCount>;
 
     static constexpr auto
         palMin = static_cast<aldo::et::byte>(aldo::color_span::extent),
@@ -135,7 +139,7 @@ void aldo::Sprites::draw(const aldo::Emulator& emu) const
     std::ranges::fill(mem, aldo::colors::LedOff);
 
     auto video = emu.snapshot().video;
-    aldo::sprite_span objects = video->sprites.objects;
+    sprite_span objects = video->sprites.objects;
     const auto& obj = *objects.begin();
     aldo::pt_span table = obj.pt
                             ? video->pattern_tables.right

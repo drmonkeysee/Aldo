@@ -28,7 +28,6 @@ aldo_const int AldoNtHeight = 30;
 aldo_const int AldoNtTileCount = AldoNtWidth * AldoNtHeight;
 aldo_const int AldoNtAttrCount = 64;
 aldo_const int AldoSpriteCount = AldoNtAttrCount;
-aldo_const int AldoMetatileDim = 2;
 
 struct aldo_snapshot {
     struct {

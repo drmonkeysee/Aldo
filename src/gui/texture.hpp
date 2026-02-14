@@ -152,7 +152,8 @@ class Nametables {
 public:
     static constexpr int
         TilePxDim = pt_tile::extent,
-        MetatileCount = AldoMetatileDim * AldoMetatileDim,
+        MetatileDim = 2,
+        MetatileCount = MetatileDim * MetatileDim,
         AttributePxDim = TilePxDim * MetatileCount;
 
     enum class DrawMode {

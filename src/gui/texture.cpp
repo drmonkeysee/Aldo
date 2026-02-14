@@ -312,13 +312,13 @@ aldo::Nametables::lookupTilePalette(attr_span attrs, int tileCol, int tileRow,
     using ps_sz = decltype(palettes)::size_type;
 
     auto attrIdx = static_cast<
-        decltype(attrs)::size_type>((tileCol >> AldoMetatileDim)
-                                    + ((tileRow >> AldoMetatileDim)
+        decltype(attrs)::size_type>((tileCol >> MetatileDim)
+                                    + ((tileRow >> MetatileDim)
                                        * AttributeDim));
     auto attr = attrs[attrIdx];
-    auto mtIdx = static_cast<ps_sz>(((tileCol >> 1) % AldoMetatileDim)
-                                    + (((tileRow >> 1) % AldoMetatileDim)
-                                       * AldoMetatileDim));
+    auto mtIdx = static_cast<ps_sz>(((tileCol >> 1) % MetatileDim)
+                                    + (((tileRow >> 1) % MetatileDim)
+                                       * MetatileDim));
     assert(mtIdx < palettes.size());
     ps_sz palIdx = (attr >> (mtIdx * 2)) & 0x3;
     assert(palIdx < palettes.size());
@@ -334,7 +334,7 @@ void aldo::Nametables::drawAttribute(attr_span attrs, int ntIdx, int col,
         decltype(attrs)::size_type>(col + (row * AttributeDim));
     auto attr = attrs[attrIdx];
     // last row only uses the top half of attributes
-    auto mtCount = row == AttributeDim - 1 ? AldoMetatileDim : MetatileCount;
+    auto mtCount = row == AttributeDim - 1 ? MetatileDim : MetatileCount;
     for (auto m = 0; m < mtCount; ++m) {
         drawMetatile(attr, ntIdx, col, row, m, offsets, bg, p, ren);
     }
@@ -345,7 +345,7 @@ void aldo::Nametables::drawMetatile(aldo::et::byte attr, int ntIdx, int col,
                                     const nt_offsets& offsets, pal_span bg,
                                     const aldo::Palette& p, SDL_Renderer* ren)
 {
-    static constexpr auto metatileStride = AldoMetatileDim * TilePxDim;
+    static constexpr auto metatileStride = MetatileDim * TilePxDim;
 
     aldo::color_span::size_type pidx = (attr >> (metaTile * 2)) & 0x3;
     assert(pidx < aldo::color_span::extent);

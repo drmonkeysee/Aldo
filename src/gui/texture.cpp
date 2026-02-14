@@ -56,6 +56,10 @@ public:
          const aldo::Palette&, aldo::tex::TextureData&&) = delete;
     Tile(aldo::pt_tile, int, int, aldo::color_span,
          aldo::Palette&&, aldo::tex::TextureData&&) = delete;
+    Tile(const Tile&) = delete;
+    Tile& operator=(const Tile&) = delete;
+    Tile(Tile&&) = delete;
+    Tile& operator=(Tile&&) = delete;
 
     void draw() const
     {

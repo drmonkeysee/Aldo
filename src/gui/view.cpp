@@ -1561,6 +1561,7 @@ private:
     RefreshInterval<250.0> drawInterval;
     bool attributeGrid = false, screenIndicator = false, tileGrid = false;
 
+    [[maybe_unused]]
     RefreshInterval<50.0> screenInterval;
     [[maybe_unused]]
     SDL_Point screenPos{};

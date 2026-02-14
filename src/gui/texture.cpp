@@ -24,8 +24,7 @@ static_assert(std::same_as<Uint32, ImU32>,
 namespace
 {
 
-using nt_span = std::span<const aldo::et::byte, AldoNtTileCount>;
-using px_span = std::span<Uint32>;
+constexpr auto SpriteDim = 256;
 
 constexpr auto operator*(SDL_Point p, int n) noexcept
 {
@@ -120,10 +119,12 @@ void aldo::Nametables::draw(const Emulator& emu, const MediaRuntime& mr) const
 }
 
 aldo::Sprites::Sprites(const aldo::MediaRuntime& mr)
-: sprTex{{AldoPtTileCount, AldoPtTileCount}, mr.renderer()} {}
+: sprTex{{SpriteDim, SpriteDim}, mr.renderer()} {}
 
 void aldo::Sprites::draw(const aldo::Emulator& emu) const
 {
+    using px_span = std::span<Uint32>;
+
     static constexpr auto
         palMin = static_cast<aldo::et::byte>(aldo::color_span::extent),
         palMax = static_cast<aldo::et::byte>((aldo::color_span::extent * 2) - 1);
@@ -189,6 +190,8 @@ aldo::tex::TextureData::TextureData(SDL_Texture& tex) noexcept : tex{tex}
 
 void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
 {
+    using nt_span = std::span<const aldo::et::byte, AldoNtTileCount>;
+
     auto vsp = emu.snapshot().video;
     aldo::pt_span chrs = vsp->nt.pt
                             ? vsp->pattern_tables.right

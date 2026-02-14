@@ -17,6 +17,7 @@
 #include <array>
 #include <concepts>
 #include <type_traits>
+#include <utility>
 #include <cassert>
 
 static_assert(std::same_as<Uint32, ImU32>,
@@ -24,6 +25,11 @@ static_assert(std::same_as<Uint32, ImU32>,
 
 namespace
 {
+
+using snp_video = decltype(std::declval<aldo_snapshot>().video);
+using sprite_obj = std::remove_extent_t<
+                    decltype(std::declval<snp_video>()->sprites.objects)>;
+using sprite_span = std::span<const sprite_obj, AldoSpriteCount>;
 
 constexpr auto SpriteDim = 256;
 
@@ -86,6 +92,34 @@ private:
     int gridX, gridY;
 };
 
+auto draw_object(const sprite_obj& obj, snp_video v, const aldo::Palette& p,
+                 const aldo::tex::TextureData& data)
+{
+    static constexpr auto
+        palMin = static_cast<aldo::et::byte>(aldo::color_span::extent),
+        palMax = static_cast<aldo::et::byte>((aldo::color_span::extent * 2) - 1);
+    static constexpr int tileDim = aldo::pt_tile::extent;
+
+    // Clamp uninitialized data within palette range; note that sprite palette
+    // index is always in the upper half of the 8 available palettes.
+    auto palidx = std::max(palMin, std::min(obj.palette, palMax));
+    aldo::color_span colors = v->palettes.fg[palidx - decltype(colors)::extent];
+
+    // TODO: clamp during initial testing
+    auto x = std::min(static_cast<aldo::et::byte>(248), obj.x);
+    auto y = std::min(static_cast<aldo::et::byte>(248), obj.y);
+    auto gridCol = x / tileDim;
+    auto gridRow = y / tileDim;
+    auto gridXOffset = x % tileDim;
+    auto gridYOffset = y % tileDim;
+    auto offset = gridXOffset + (gridYOffset * data.stride);
+
+    aldo::pt_span table = obj.pt ? v->pattern_tables.right : v->pattern_tables.left;
+    Tile tile{table[obj.tile], gridCol, gridRow, colors, p, data};
+    tile.origin = offset;
+    tile.draw();
+}
+
 }
 
 //
@@ -144,14 +178,6 @@ aldo::Sprites::Sprites(const aldo::MediaRuntime& mr)
 void aldo::Sprites::draw(const aldo::Emulator& emu) const
 {
     using px_span = std::span<Uint32>;
-    using sprite_obj = std::remove_extent_t<
-                        decltype(emu.snapshot().video->sprites.objects)>;
-    using sprite_span = std::span<const sprite_obj, AldoSpriteCount>;
-
-    static constexpr auto
-        palMin = static_cast<aldo::et::byte>(aldo::color_span::extent),
-        palMax = static_cast<aldo::et::byte>((aldo::color_span::extent * 2) - 1);
-    static constexpr int tileDim = aldo::pt_tile::extent;
 
     auto data = sprTex.lock();
     auto mem = px_span{data.pixels, static_cast<px_span::size_type>(data.size())};
@@ -159,25 +185,9 @@ void aldo::Sprites::draw(const aldo::Emulator& emu) const
 
     auto video = emu.snapshot().video;
     sprite_span objects = video->sprites.objects;
-    const auto& obj = *objects.begin();
-    aldo::pt_span table = obj.pt
-                            ? video->pattern_tables.right
-                            : video->pattern_tables.left;
-    // Clamp uninitialized data within palette range; note that sprite palette
-    // index is always in the upper half of the 8 available palettes.
-    auto palidx = std::max(palMin, std::min(obj.palette, palMax));
-    aldo::color_span colors = video->palettes.fg[palidx - decltype(colors)::extent];
-    // TODO: clamp during initial testing
-    auto x = std::min(static_cast<aldo::et::byte>(248), obj.x);
-    auto y = std::min(static_cast<aldo::et::byte>(248), obj.y);
-    auto gridCol = x / tileDim;
-    auto gridRow = y / tileDim;
-    auto gridXOffset = x % tileDim;
-    auto gridYOffset = y % tileDim;
-    auto offset = gridXOffset + (gridYOffset * data.stride);
-    Tile tile{table[obj.tile], gridCol, gridRow, colors, emu.palette(), data};
-    tile.origin = offset;
-    tile.draw();
+    for (const auto& obj : objects) {
+        draw_object(obj, video, emu.palette(), data);
+    }
 }
 
 //

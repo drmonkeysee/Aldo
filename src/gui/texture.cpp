@@ -26,9 +26,9 @@ static_assert(std::same_as<Uint32, ImU32>,
 namespace
 {
 
-using snp_video = decltype(std::declval<aldo_snapshot>().video);
+using video_snp = decltype(std::declval<aldo_snapshot>().video);
 using sprite_obj = std::remove_extent_t<
-                    decltype(std::declval<snp_video>()->sprites.objects)>;
+                    decltype(std::declval<video_snp>()->sprites.objects)>;
 using sprite_span = std::span<const sprite_obj, AldoSpriteCount>;
 
 constexpr auto SpriteDim = 256;
@@ -92,7 +92,7 @@ private:
     int gridX, gridY;
 };
 
-auto draw_object(const sprite_obj& obj, snp_video v, const aldo::Palette& p,
+auto draw_object(const sprite_obj& obj, video_snp v, const aldo::Palette& p,
                  const aldo::tex::TextureData& data)
 {
     static constexpr auto
@@ -184,14 +184,14 @@ void aldo::Sprites::draw(const aldo::Emulator& emu) const
     auto mem = px_span{data.pixels, static_cast<px_span::size_type>(data.size())};
     std::ranges::fill(mem, aldo::colors::LedOff);
 
-    auto video = emu.snapshot().video;
-    sprite_span objects = video->sprites.objects;
+    auto vsp = emu.snapshot().video;
+    sprite_span objects = vsp->sprites.objects;
     for (const auto& obj : objects) {
         if ((priority == Priority::front && obj.priority)
             || (priority == Priority::back && !obj.priority)) {
             continue;
         }
-        draw_object(obj, video, emu.palette(), data);
+        draw_object(obj, vsp, emu.palette(), data);
     }
 }
 

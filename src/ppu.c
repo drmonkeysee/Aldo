@@ -585,24 +585,22 @@ static void write(struct aldo_rp2c02 *self)
 static void snapshot_nametables(const struct aldo_rp2c02 *self,
                                 struct aldo_snapshot *snp)
 {
-    auto video = snp->video;
-    video->nt.pt = self->ctrl.b;
+    auto vsp = snp->video;
+    vsp->nt.pt = self->ctrl.b;
 
-    video->nt.pos.h = self->t & HNtBit;
-    video->nt.pos.v = self->t & VNtBit;
-    video->nt.pos.x =
-        (uint8_t)(((self->t & CourseXBits) * AldoChrTileDim) + self->x);
-    video->nt.pos.y = (uint8_t)((((self->t & CourseYBits) >> 5) * AldoChrTileDim)
+    vsp->nt.pos.h = self->t & HNtBit;
+    vsp->nt.pos.v = self->t & VNtBit;
+    vsp->nt.pos.x = (uint8_t)(((self->t & CourseXBits) * AldoChrTileDim) + self->x);
+    vsp->nt.pos.y = (uint8_t)((((self->t & CourseYBits) >> 5) * AldoChrTileDim)
                                 + ((self->t & FineYBits) >> 12));
 
-    for (size_t i = 0; i < aldo_arrsz(video->nt.tables); ++i) {
+    for (size_t i = 0; i < aldo_arrsz(vsp->nt.tables); ++i) {
         auto base_addr = (uint16_t)(BaseNtAddr + (HNtBit * (uint16_t)i));
-        size_t tile_count = aldo_arrsz(video->nt.tables[i].tiles);
-        aldo_bus_copy(self->vbus, base_addr, tile_count,
-                      video->nt.tables[i].tiles);
+        size_t tile_count = aldo_arrsz(vsp->nt.tables[i].tiles);
+        aldo_bus_copy(self->vbus, base_addr, tile_count, vsp->nt.tables[i].tiles);
         aldo_bus_copy(self->vbus, base_addr + (uint16_t)tile_count,
-                      aldo_arrsz(video->nt.tables[i].attributes),
-                      video->nt.tables[i].attributes);
+                      aldo_arrsz(vsp->nt.tables[i].attributes),
+                      vsp->nt.tables[i].attributes);
     }
 }
 

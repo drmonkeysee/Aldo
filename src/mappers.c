@@ -327,11 +327,11 @@ static void ines_000_snapshot(struct aldo_mapper *self,
     assert(self != nullptr);
     assert(snp != nullptr);
 
-    auto video = snp->video;
-    assert(video != nullptr);
+    auto vsp = snp->video;
+    assert(vsp != nullptr);
 
     auto m = (struct ines_000_mapper *)self;
-    video->nt.mirror = m->hmirroring ? ALDO_NTM_HORIZONTAL : ALDO_NTM_VERTICAL;
+    vsp->nt.mirror = m->hmirroring ? ALDO_NTM_HORIZONTAL : ALDO_NTM_VERTICAL;
 
     auto b = &m->super;
     if (!b->ptstale) return;
@@ -340,12 +340,12 @@ static void ines_000_snapshot(struct aldo_mapper *self,
         .mem = b->chr,
         .size = ALDO_MEMBLOCK_4KB,
     };
-    fill_pattern_table(aldo_arrsz(video->pattern_tables.left),
-                       video->pattern_tables.left, &bv);
+    fill_pattern_table(aldo_arrsz(vsp->pattern_tables.left),
+                       vsp->pattern_tables.left, &bv);
     bv.mem += bv.size;
     ++bv.ord;
-    fill_pattern_table(aldo_arrsz(video->pattern_tables.right),
-                       video->pattern_tables.right, &bv);
+    fill_pattern_table(aldo_arrsz(vsp->pattern_tables.right),
+                       vsp->pattern_tables.right, &bv);
     b->ptstale = false;
 }
 

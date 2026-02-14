@@ -110,9 +110,10 @@ auto draw_object(const sprite_obj& obj, snp_video v, const aldo::Palette& p,
     auto y = std::min(static_cast<aldo::et::byte>(248), obj.y);
     auto gridCol = x / tileDim;
     auto gridRow = y / tileDim;
-    auto gridXOffset = x % tileDim;
-    auto gridYOffset = y % tileDim;
-    auto offset = gridXOffset + (gridYOffset * data.stride);
+    auto spriteXOffset = x % tileDim;
+    auto spriteYOffset = y % tileDim;
+    // pixel-perfect offset of sprite within the screen-space tile grid
+    auto offset = spriteXOffset + (spriteYOffset * data.stride);
 
     aldo::pt_span table = obj.pt ? v->pattern_tables.right : v->pattern_tables.left;
     Tile tile{table[obj.tile], gridCol, gridRow, colors, p, data};

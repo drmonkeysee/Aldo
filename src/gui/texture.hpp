@@ -219,7 +219,7 @@ public:
 
     explicit Sprites(const aldo::MediaRuntime& mr);
 
-    void draw(sprite_span objects) const;
+    void draw(const Emulator& emu) const;
     void render() const noexcept
     {
         sprTex.render();

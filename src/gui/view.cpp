@@ -2258,7 +2258,7 @@ private:
     void renderSpriteScreen() const
     {
         auto pos = ImGui::GetCursorScreenPos();
-        sprites.draw(emu.snapshot().video->sprites.objects);
+        sprites.draw(emu);
         sprites.render();
         if (screenIndicator) {
             drawScreenIndicator(pos);
@@ -2321,7 +2321,7 @@ private:
     {
         ImGui::Checkbox("Screen Indicator", &screenIndicator);
         auto doubleHeight = emu.snapshot().video->sprites.double_height;
-        ImGui::SameLine(0, doubleHeight ? 51 : 58);
+        ImGui::SameLine(0, doubleHeight ? 52 : 59);
         ImGui::Text("Size: 8x%d", doubleHeight ? 16 : 8);
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 12);
         priorityCombo.render();

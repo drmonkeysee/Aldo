@@ -16,7 +16,6 @@
 #include <algorithm>
 #include <array>
 #include <concepts>
-#include <limits>
 #include <cassert>
 
 static_assert(std::same_as<Uint32, ImU32>,
@@ -27,8 +26,6 @@ namespace
 
 using nt_span = std::span<const aldo::et::byte, AldoNtTileCount>;
 using px_span = std::span<Uint32>;
-
-constexpr auto SpriteDim = std::numeric_limits<aldo::et::byte>::max();
 
 constexpr auto operator*(SDL_Point p, int n) noexcept
 {
@@ -43,7 +40,7 @@ auto screen_buffer_length() noexcept
 }
 
 auto draw_tile_row(aldo::et::word pxRow, aldo::color_span colors,
-                   int texOffset, const aldo::Palette& p,
+                   int origin, const aldo::Palette& p,
                    const aldo::tex::TextureData& data)
 {
     for (auto px = 0; px < static_cast<int>(aldo::pt_tile::extent); ++px) {
@@ -51,7 +48,7 @@ auto draw_tile_row(aldo::et::word pxRow, aldo::color_span colors,
         assert(0 <= pidx);
         decltype(colors)::size_type texel = (pxRow & (0x3 << pidx)) >> pidx;
         assert(texel < colors.size());
-        auto texidx = px + texOffset;
+        auto texidx = px + origin;
         assert(texidx < data.size());
         data.pixels[texidx] = p.getColor(colors[texel]);
     }
@@ -59,15 +56,15 @@ auto draw_tile_row(aldo::et::word pxRow, aldo::color_span colors,
 
 auto draw_tile(aldo::pt_tile chr, int col, int row, aldo::color_span colors,
                const aldo::Palette& p, const aldo::tex::TextureData& data,
-               int offsetAdjustment = 0)
+               int origin = 0)
 {
     auto chrDim = static_cast<int>(chr.size());
     auto chrRow = 0;
     for (auto pxRow : chr) {
-        auto texOffset = (col * chrDim) + ((chrRow++ + (row * chrDim))
-                                           * data.stride);
-        texOffset += offsetAdjustment;
-        draw_tile_row(pxRow, colors, texOffset, p, data);
+        auto rowOrigin = origin
+                            + (col * chrDim)
+                            + ((chrRow++ + (row * chrDim)) * data.stride);
+        draw_tile_row(pxRow, colors, rowOrigin, p, data);
     }
 }
 
@@ -123,16 +120,38 @@ void aldo::Nametables::draw(const Emulator& emu, const MediaRuntime& mr) const
 }
 
 aldo::Sprites::Sprites(const aldo::MediaRuntime& mr)
-: sprTex{{SpriteDim, SpriteDim}, mr.renderer()} {}
+: sprTex{{AldoPtTileCount, AldoPtTileCount}, mr.renderer()} {}
 
-void aldo::Sprites::draw(aldo::sprite_span objects) const
+void aldo::Sprites::draw(const aldo::Emulator& emu) const
 {
+    static constexpr auto
+        palMin = static_cast<aldo::et::byte>(aldo::color_span::extent),
+        palMax = static_cast<aldo::et::byte>((aldo::color_span::extent * 2) - 1);
+    static constexpr int tileDim = aldo::pt_tile::extent;
+
     auto data = sprTex.lock();
     auto mem = px_span{data.pixels, static_cast<px_span::size_type>(data.size())};
     std::ranges::fill(mem, aldo::colors::LedOff);
 
+    auto video = emu.snapshot().video;
+    aldo::sprite_span objects = video->sprites.objects;
     const auto& obj = *objects.begin();
-    // TODO: draw single sprite using chr and palette
+    aldo::pt_span table = obj.pt
+                            ? video->pattern_tables.right
+                            : video->pattern_tables.left;
+    // Clamp uninitialized data within palette range; note that sprite palette
+    // index is always in the upper half of the 8 available palettes.
+    auto palidx = std::max(palMin, std::min(obj.palette, palMax));
+    aldo::color_span colors = video->palettes.fg[palidx - aldo::color_span::extent];
+    // TODO: clamp during initial testing
+    auto x = std::min(static_cast<aldo::et::byte>(248), obj.x);
+    auto y = std::min(static_cast<aldo::et::byte>(248), obj.y);
+    auto gridCol = x / tileDim;
+    auto gridRow = y / tileDim;
+    auto gridXOffset = x % tileDim;
+    auto gridYOffset = y % tileDim;
+    auto offset = gridXOffset + (gridYOffset * data.stride);
+    draw_tile(table[obj.tile], gridCol, gridRow, colors, emu.palette(), data, offset);
 }
 
 //
@@ -188,10 +207,10 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
                 auto colors = lookupTilePalette(attrs, col, row,
                                                 vsp->palettes.bg);
                 // account for upper NT bank X/Y offset for tiles
-                auto offsetAdj = (i * offsets.upperX)
+                auto bankOrigin = (i * offsets.upperX)
                                     + (i * offsets.upperY * data.stride);
                 draw_tile(chrs[tile], col, row, colors, emu.palette(), data,
-                          offsetAdj);
+                          bankOrigin);
             }
         }
     }

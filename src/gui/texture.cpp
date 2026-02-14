@@ -112,7 +112,7 @@ auto draw_object(const sprite_obj& obj, video_snp v, const aldo::Palette& p,
     auto gridRow = y / tileDim;
     auto spriteXOffset = x % tileDim;
     auto spriteYOffset = y % tileDim;
-    // pixel-perfect offset of sprite within the screen-space tile grid
+    // pixel-perfect offset of sprite within the namespace tile grid cell
     auto offset = spriteXOffset + (spriteYOffset * data.stride);
 
     aldo::pt_span table = obj.pt ? v->pattern_tables.right : v->pattern_tables.left;

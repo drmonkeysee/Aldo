@@ -187,6 +187,10 @@ void aldo::Sprites::draw(const aldo::Emulator& emu) const
     auto video = emu.snapshot().video;
     sprite_span objects = video->sprites.objects;
     for (const auto& obj : objects) {
+        if ((priority == Priority::front && obj.priority)
+            || (priority == Priority::back && !obj.priority)) {
+            continue;
+        }
         draw_object(obj, video, emu.palette(), data);
     }
 }

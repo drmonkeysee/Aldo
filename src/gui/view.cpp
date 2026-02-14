@@ -2229,8 +2229,8 @@ public:
         "Priority",
         {
             {PriorityMode::all, "All"},
-            {PriorityMode::fg, "FG Only"},
-            {PriorityMode::bg, "BG Only"},
+            {PriorityMode::front, "Front Only"},
+            {PriorityMode::back, "Back Only"},
         },
         [this](PriorityMode v, bool) { this->sprites.priority = v; },
     } {}
@@ -2310,7 +2310,7 @@ private:
         ImGui::Text("Tile: %s ($%1d000)", buf.data(), obj.pt);
 
         ImGui::Text("Palette: %d", obj.palette);
-        ImGui::Text("Priority: %s", obj.priority ? "FG" : "BG");
+        ImGui::Text("Priority: %s", obj.priority ? "Back" : "Front");
 
         ImGui::Text("H-Flip: %s", boolstr(obj.hflip));
         ImGui::Text("V-Flip: %s", boolstr(obj.vflip));
@@ -2322,7 +2322,7 @@ private:
         auto doubleHeight = emu.snapshot().video->sprites.double_height;
         ImGui::SameLine(0, doubleHeight ? 52 : 59);
         ImGui::Text("Size: 8x%d", doubleHeight ? 16 : 8);
-        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 12);
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 14);
         priorityCombo.render();
     }
 

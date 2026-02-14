@@ -209,8 +209,8 @@ class Sprites {
 public:
     enum class Priority {
         all,
-        fg,
-        bg,
+        front,
+        back,
     };
 
     explicit Sprites(const aldo::MediaRuntime& mr);

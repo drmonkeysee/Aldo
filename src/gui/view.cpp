@@ -1817,8 +1817,7 @@ private:
                             palSelect = palIdx;
                         }
                     } else {
-                        using col_sz = decltype(pal)::size_type;
-                        auto idx = pal[static_cast<col_sz>(col - 1)];
+                        auto idx = pal[static_cast<decltype(pal)::size_type>(col - 1)];
                         auto color = emu.palette().getColor(idx);
                         ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color);
                         std::snprintf(buf.data(), buf.size(), "%02X", idx);

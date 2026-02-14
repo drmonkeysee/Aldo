@@ -97,7 +97,7 @@ auto draw_object(const sprite_obj& obj, snp_video v, const aldo::Palette& p,
 {
     static constexpr auto
         palMin = static_cast<aldo::et::byte>(aldo::color_span::extent),
-        palMax = static_cast<aldo::et::byte>((aldo::color_span::extent * 2) - 1);
+        palMax = static_cast<aldo::et::byte>((palMin * 2) - 1);
     static constexpr int tileDim = aldo::pt_tile::extent;
 
     // Clamp uninitialized data within palette range; note that sprite palette

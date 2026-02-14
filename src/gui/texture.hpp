@@ -17,6 +17,8 @@
 #include <SDL3/SDL.h>
 
 #include <span>
+#include <type_traits>
+#include <utility>
 
 namespace aldo
 {
@@ -28,6 +30,8 @@ using color_span = std::span<const et::byte, AldoPalSize>;
 // TODO: use std::mdspan someday when they can be sliced?
 using pt_tile = std::span<const et::word, AldoChrTileDim>;
 using pt_span = std::span<const et::word[AldoChrTileDim], AldoPtTileCount>;
+using sprite_obj = std::remove_extent_t<
+                    decltype(std::declval<aldo_snapshot>().video->sprites.objects)>;
 
 namespace tex
 {
@@ -35,8 +39,7 @@ namespace tex
 template<SDL_TextureAccess> class Texture;
 
 ALDO_OWN
-SDL_Texture* create(SDL_Point size, SDL_TextureAccess access,
-                    SDL_Renderer* ren);
+SDL_Texture* create(SDL_Point size, SDL_TextureAccess access, SDL_Renderer* ren);
 
 class ALDO_SIDEFX TextureTarget {
 public:

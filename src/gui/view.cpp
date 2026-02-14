@@ -2245,24 +2245,59 @@ public:
 protected:
     void renderContents() override
     {
+        auto obj = selectedSprite();
+        auto ov = SpriteOverlay{emu.screenSize(), screenIndicator};
         renderSpriteScreen();
+        ov.render(obj);
         ImGui::SameLine();
-        widget_group([this] noexcept {
+        widget_group([this, obj] noexcept {
             this->renderSpriteSelect();
-            this->renderSpriteDetails();
+            this->renderSpriteDetails(obj);
         });
         renderSpriteControls();
     }
 
 private:
+    class SpriteOverlay {
+    public:
+        SpriteOverlay(const SDL_Point& s, bool si) noexcept
+        : drawList{ImGui::GetWindowDrawList()}, origin{ImGui::GetCursorScreenPos()},
+        scrSize{point_to_vec(s)}, screenIndicator{si} {}
+
+        void render(const aldo::sprite_obj* obj) const noexcept
+        {
+            drawScreenIndicator();
+            drawSpriteSelection(obj);
+        }
+
+    private:
+        void drawScreenIndicator() const noexcept
+        {
+            if (!screenIndicator) return;
+
+            drawList->AddRect(origin, origin + scrSize, aldo::colors::LineIn,
+                              0.0f, ImDrawFlags_None, 2.0f);
+        }
+
+        void drawSpriteSelection(const aldo::sprite_obj* obj) const noexcept
+        {
+            if (!obj) return;
+
+            auto spriteOrigin = origin + ImVec2{
+                static_cast<float>(obj->x), static_cast<float>(obj->y),
+            };
+            drawList->AddRect(spriteOrigin, spriteOrigin + 8, aldo::colors::LedOn);
+        }
+
+        ImDrawList* drawList;
+        ImVec2 origin, scrSize;
+        bool screenIndicator;
+    };
+
     void renderSpriteScreen() const
     {
-        auto pos = ImGui::GetCursorScreenPos();
         sprites.draw(emu);
         sprites.render();
-        if (screenIndicator) {
-            drawScreenIndicator(pos);
-        }
     }
 
     void renderSpriteSelect() noexcept
@@ -2293,28 +2328,25 @@ private:
         }
     }
 
-    void renderSpriteDetails() const noexcept
+    void renderSpriteDetails(const aldo::sprite_obj* obj) const noexcept
     {
-        assert(0 <= selected && static_cast<aldo::et::size>(selected)
-               < aldo_arrsz(emu.snapshot().video->sprites.objects));
+        if (!obj) return;
 
-        const auto& obj = emu.snapshot().video->sprites.objects[selected];
-
-        ImGui::Text("Position: (%03d, %03d)", obj.x, obj.y);
+        ImGui::Text("Position: (%03d, %03d)", obj->x, obj->y);
         std::array<char, 6> buf;
         if (emu.snapshot().video->sprites.double_height) {
-            std::snprintf(buf.data(), buf.size(), "%02X+%02X", obj.tile,
-                          static_cast<aldo::et::byte>(obj.tile + 1));
+            std::snprintf(buf.data(), buf.size(), "%02X+%02X", obj->tile,
+                          static_cast<aldo::et::byte>(obj->tile + 1));
         } else {
-            std::snprintf(buf.data(), buf.size(), "%02X", obj.tile);
+            std::snprintf(buf.data(), buf.size(), "%02X", obj->tile);
         }
-        ImGui::Text("Tile: %s ($%1d000)", buf.data(), obj.pt);
+        ImGui::Text("Tile: %s ($%1d000)", buf.data(), obj->pt);
 
-        ImGui::Text("Palette: %d", obj.palette);
-        ImGui::Text("Priority: %s", obj.priority ? "Back" : "Front");
+        ImGui::Text("Palette: %d", obj->palette);
+        ImGui::Text("Priority: %s", obj->priority ? "Back" : "Front");
 
-        ImGui::Text("H-Flip: %s", boolstr(obj.hflip));
-        ImGui::Text("V-Flip: %s", boolstr(obj.vflip));
+        ImGui::Text("H-Flip: %s", boolstr(obj->hflip));
+        ImGui::Text("V-Flip: %s", boolstr(obj->vflip));
     }
 
     void renderSpriteControls() noexcept
@@ -2327,17 +2359,20 @@ private:
         priorityCombo.render();
     }
 
-    void drawScreenIndicator(const ImVec2& orig) const noexcept
+    const aldo::sprite_obj* selectedSprite() const noexcept
     {
-        auto drawList = ImGui::GetWindowDrawList();
-        drawList->AddRect(orig, orig + point_to_vec(emu.screenSize()),
-                          aldo::colors::LineIn, 0.0f, ImDrawFlags_None, 2.0f);
+        if (selected == NoSelection) return nullptr;
+
+        assert(0 <= selected && static_cast<aldo::et::size>(selected)
+               < aldo_arrsz(emu.snapshot().video->sprites.objects));
+
+        return emu.snapshot().video->sprites.objects + selected;
     }
 
     aldo::Sprites sprites;
     using PriorityMode = decltype(sprites)::Priority;
     ComboList<PriorityMode> priorityCombo;
-    int selected = 0;
+    int selected = NoSelection;
     bool screenIndicator = false;
 };
 

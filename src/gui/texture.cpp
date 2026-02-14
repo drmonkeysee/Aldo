@@ -247,8 +247,7 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
                 auto tileIdx = static_cast<
                     decltype(tiles)::size_type>(col + (row * AldoNtWidth));
                 auto tileId = tiles[tileIdx];
-                auto colors = lookupTilePalette(attrs, col, row,
-                                                vsp->palettes.bg);
+                auto colors = lookupTilePalette(attrs, col, row, vsp->palettes.bg);
                 Tile tile{chrs[tileId], col, row, colors, emu.palette(), data};
                 // account for upper NT bank X/Y offset for tiles
                 tile.origin = (i * offsets.upperX)

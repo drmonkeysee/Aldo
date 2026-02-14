@@ -190,8 +190,7 @@ private:
     void drawNametables(const Emulator& emu) const;
     void drawAttributes(const Emulator& emu, const MediaRuntime& mr) const;
     nt_offsets getOffsets(aldo_ntmirror m) const noexcept;
-    static color_span lookupTilePalette(attr_span attrs, int tileCol,
-                                        int tileRow,
+    static color_span lookupTilePalette(attr_span attrs, int tileCol, int tileRow,
                                         pal_span palettes) noexcept;
     static void drawAttribute(attr_span attrs, int ntIdx, int col, int row,
                               const nt_offsets& offsets, pal_span bg,

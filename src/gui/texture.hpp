@@ -209,6 +209,8 @@ private:
 
 class Sprites {
 public:
+    static constexpr int SpritePxDim = pt_tile::extent;
+
     enum class Priority {
         all,
         front,
@@ -226,6 +228,9 @@ public:
     Priority priority = Priority::all;
 
 private:
+    void drawObject(const sprite_obj& obj, const Emulator& emu,
+                    const tex::TextureData& data) const;
+
     tex::Texture<SDL_TEXTUREACCESS_STREAMING> sprTex;
 };
 

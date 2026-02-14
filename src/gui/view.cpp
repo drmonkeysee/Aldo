@@ -1759,12 +1759,12 @@ protected:
         static constexpr auto palSize = aldo::color_span::extent;
 
         if (drawInterval.elapsed(vs.clock.clock())) {
-            const auto& tables = emu.snapshot().video->pattern_tables;
+            auto vsp = emu.snapshot().video;
+            const auto& tables = vsp->pattern_tables;
             assert(palSelect < palSize * 2);
-            aldo::color_span colors =
-                palSelect < palSize
-                ? emu.snapshot().video->palettes.bg[palSelect]
-                : emu.snapshot().video->palettes.fg[palSelect - palSize];
+            aldo::color_span colors = palSelect < palSize
+                                        ? vsp->palettes.bg[palSelect]
+                                        : vsp->palettes.fg[palSelect - palSize];
             left.draw(tables.left, colors, emu.palette());
             right.draw(tables.right, colors, emu.palette());
         }
@@ -1846,25 +1846,26 @@ private:
 
         ImGui::TextUnformatted("Emphasis");
 
+        auto mask = emu.snapshot().ppu.mask;
         ImGui::TextUnformatted("Red: ");
         ImGui::SameLine();
-        small_led(emu.snapshot().ppu.mask & 0x20);
+        small_led(mask & 0x20);
 
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted("Green:");
         ImGui::SameLine();
-        small_led(emu.snapshot().ppu.mask & 0x40);
+        small_led(mask & 0x40);
 
         ImGui::Spacing();
 
         ImGui::TextUnformatted("Blue:");
         ImGui::SameLine();
-        small_led(emu.snapshot().ppu.mask & 0x80);
+        small_led(mask & 0x80);
 
         ImGui::SameLine(0, spacer);
         ImGui::TextUnformatted("Gray: ");
         ImGui::SameLine();
-        small_led(emu.snapshot().ppu.mask & 0x1);
+        small_led(mask & 0x1);
     }
 
     aldo::PatternTable left, right;
@@ -2048,7 +2049,7 @@ private:
                     } else if (ImGui::BeginPopupContextItem()) {
                         selected = i;
                         if (ImGui::Selectable("Add breakpoint...")) {
-                            auto expr = aldo_haltexpr{
+                            aldo_haltexpr expr{
                                 .address = addr, .cond = ALDO_HLT_ADDR,
                             };
                             vs.commands.emplace(aldo::Command::breakpointAdd, expr);
@@ -2246,7 +2247,11 @@ protected:
     void renderContents() override
     {
         auto obj = selectedSprite();
-        auto ov = SpriteOverlay{emu.screenSize(), screenIndicator};
+        SDL_Point sprExtent{sprites.SpritePxDim, sprites.SpritePxDim};
+        if (emu.snapshot().video->sprites.double_height) {
+            sprExtent.y *= 2;
+        }
+        SpriteOverlay ov{emu.screenSize(), sprExtent, screenIndicator};
         renderSpriteScreen();
         ov.render(obj);
         ImGui::SameLine();
@@ -2260,9 +2265,9 @@ protected:
 private:
     class SpriteOverlay {
     public:
-        SpriteOverlay(const SDL_Point& s, bool si) noexcept
+        SpriteOverlay(const SDL_Point& s, const SDL_Point& se, bool si) noexcept
         : drawList{ImGui::GetWindowDrawList()}, origin{ImGui::GetCursorScreenPos()},
-        scrSize{point_to_vec(s)}, screenIndicator{si} {}
+        scrSize{point_to_vec(s)}, sprExtent{point_to_vec(se)}, screenIndicator{si} {}
 
         void render(const aldo::sprite_obj* obj) const noexcept
         {
@@ -2286,11 +2291,11 @@ private:
             auto spriteOrigin = origin + ImVec2{
                 static_cast<float>(obj->x), static_cast<float>(obj->y),
             };
-            drawList->AddRect(spriteOrigin, spriteOrigin + 8, aldo::colors::LedOn);
+            drawList->AddRect(spriteOrigin, spriteOrigin + sprExtent, aldo::colors::LedOn);
         }
 
         ImDrawList* drawList;
-        ImVec2 origin, scrSize;
+        ImVec2 origin, scrSize, sprExtent;
         bool screenIndicator;
     };
 

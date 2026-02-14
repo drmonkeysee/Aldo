@@ -91,38 +91,6 @@ private:
     int gridX, gridY;
 };
 
-auto draw_object(const aldo::sprite_obj& obj, const aldo::Emulator& emu,
-                 const aldo::tex::TextureData& data)
-{
-    static constexpr auto
-        palMin = static_cast<aldo::et::byte>(aldo::color_span::extent),
-        palMax = static_cast<aldo::et::byte>((palMin * 2) - 1);
-    static constexpr int tileDim = aldo::pt_tile::extent;
-
-    auto vsp = emu.snapshot().video;
-
-    // Clamp uninitialized data within palette range; note that sprite palette
-    // index is always in the upper half of the 8 available palettes.
-    auto palidx = std::max(palMin, std::min(obj.palette, palMax));
-    aldo::color_span colors = vsp->palettes.fg[palidx - decltype(colors)::extent];
-
-    // TODO: clamp during initial testing
-    auto x = std::min(static_cast<aldo::et::byte>(248), obj.x);
-    auto y = std::min(static_cast<aldo::et::byte>(248), obj.y);
-    auto gridCol = x / tileDim;
-    auto gridRow = y / tileDim;
-
-    aldo::pt_span table = obj.pt ? vsp->pattern_tables.right : vsp->pattern_tables.left;
-    Tile tile{table[obj.tile], gridCol, gridRow, colors, emu.palette(), data};
-
-    // pixel-perfect offset of sprite within the namespace tile grid cell
-    auto spriteXOffset = x % tileDim;
-    auto spriteYOffset = y % tileDim;
-    tile.origin = spriteXOffset + (spriteYOffset * data.stride);
-
-    tile.draw();
-}
-
 }
 
 //
@@ -183,7 +151,7 @@ void aldo::Sprites::draw(const aldo::Emulator& emu) const
     using px_span = std::span<Uint32>;
 
     auto data = sprTex.lock();
-    auto mem = px_span{data.pixels, static_cast<px_span::size_type>(data.size())};
+    px_span mem{data.pixels, static_cast<decltype(mem)::size_type>(data.size())};
     std::ranges::fill(mem, aldo::colors::LedOff);
 
     sprite_span objects = emu.snapshot().video->sprites.objects;
@@ -192,7 +160,7 @@ void aldo::Sprites::draw(const aldo::Emulator& emu) const
             || (priority == Priority::back && !obj.priority)) {
             continue;
         }
-        draw_object(obj, emu, data);
+        drawObject(obj, emu, data);
     }
 }
 
@@ -381,4 +349,36 @@ void aldo::Nametables::drawMetatile(aldo::et::byte attr, int ntIdx, int col,
         metatile.y += offsets.mirrorY;
         SDL_RenderFillRect(ren, &metatile);
     }
+}
+
+void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
+                               const aldo::Emulator& emu,
+                               const aldo::tex::TextureData& data) const
+{
+    static constexpr auto
+        palMin = static_cast<aldo::et::byte>(aldo::color_span::extent),
+        palMax = static_cast<aldo::et::byte>((palMin * 2) - 1);
+
+    auto vsp = emu.snapshot().video;
+
+    // Clamp uninitialized data within palette range; note that sprite palette
+    // index is always in the upper half of the 8 available palettes.
+    auto palidx = std::max(palMin, std::min(obj.palette, palMax));
+    aldo::color_span colors = vsp->palettes.fg[palidx - decltype(colors)::extent];
+
+    // TODO: clamp during initial testing
+    auto x = std::min(static_cast<aldo::et::byte>(248), obj.x);
+    auto y = std::min(static_cast<aldo::et::byte>(248), obj.y);
+    auto gridCol = x / SpritePxDim;
+    auto gridRow = y / SpritePxDim;
+
+    aldo::pt_span table = obj.pt ? vsp->pattern_tables.right : vsp->pattern_tables.left;
+    Tile tile{table[obj.tile], gridCol, gridRow, colors, emu.palette(), data};
+
+    // pixel-perfect offset of sprite within the namespace tile grid cell
+    auto spriteXOffset = x % SpritePxDim;
+    auto spriteYOffset = y % SpritePxDim;
+    tile.origin = spriteXOffset + (spriteYOffset * data.stride);
+
+    tile.draw();
 }

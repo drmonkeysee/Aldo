@@ -1771,15 +1771,13 @@ public:
 protected:
     void renderContents() override
     {
-        static constexpr auto palSize = aldo::color_span::extent;
-
         if (drawInterval.elapsed(vs.clock.clock())) {
             auto vsp = emu.snapshot().video;
             const auto& tables = vsp->pattern_tables;
-            assert(palSelect < palSize * 2);
-            aldo::color_span colors = palSelect < palSize
-                                        ? vsp->palettes.bg[palSelect]
-                                        : vsp->palettes.fg[palSelect - palSize];
+            assert(palSelect < PalSize * 2);
+            colspan colors = palSelect < PalSize
+                                ? vsp->palettes.bg[palSelect]
+                                : vsp->palettes.fg[palSelect - PalSize];
             left.draw(tables.left, colors, emu.palette());
             right.draw(tables.right, colors, emu.palette());
         }
@@ -1802,10 +1800,11 @@ protected:
     }
 
 private:
+    using colspan = aldo::color_span;
+
     void renderPalettes(bool fg)
     {
-        static constexpr auto cols = static_cast<int>(aldo::color_span::extent
-                                                      + 1);
+        static constexpr auto cols = static_cast<int>(PalSize + 1);
         static constexpr auto flags = ImGuiTableFlags_BordersInner
                                         | ImGuiTableFlags_SizingFixedFit;
 
@@ -1814,7 +1813,7 @@ private:
                             ? emu.snapshot().video->palettes.fg
                             : emu.snapshot().video->palettes.bg;
         auto row = 0;
-        for (aldo::color_span pal : pals) {
+        for (colspan pal : pals) {
             if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols, flags)) {
                 ScopedStyleVec textAlign{{
                     ImGuiStyleVar_SelectableTextAlign,
@@ -1882,6 +1881,8 @@ private:
         ImGui::SameLine();
         small_led(mask & 0x1);
     }
+
+    static constexpr colspan::size_type PalSize = colspan::extent;
 
     aldo::PatternTable left, right;
     RefreshInterval<500.0> drawInterval;

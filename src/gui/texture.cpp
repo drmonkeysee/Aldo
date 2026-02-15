@@ -69,7 +69,7 @@ public:
 private:
     void drawRow(aldo::et::word pxRow, int rowOrigin) const
     {
-        for (auto px = 0; px < static_cast<int>(decltype(chrTile)::extent); ++px) {
+        for (auto px = 0; px < static_cast<int>(chrTile.size()); ++px) {
             auto pidx = AldoChrTileStride - ((px + 1) * 2);
             assert(0 <= pidx);
             decltype(colors)::size_type texel = (pxRow & (0x3 << pidx)) >> pidx;
@@ -360,7 +360,7 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
     // Clamp uninitialized data within palette range; note that sprite palette
     // index is always in the upper half of the 8 available palettes.
     auto palidx = std::max(palMin, std::min(obj.palette, palMax));
-    aldo::color_span colors = vsp->palettes.fg[palidx - decltype(colors)::extent];
+    aldo::color_span colors = vsp->palettes.fg[palidx - palMin];
 
     // TODO: clamp during initial testing
     auto x = std::min(static_cast<aldo::et::byte>(248), obj.x);

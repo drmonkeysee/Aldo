@@ -26,8 +26,6 @@ namespace
 
 using sprite_span = std::span<const aldo::sprite_obj, AldoSpriteCount>;
 
-constexpr auto SpriteDim = 256;
-
 constexpr auto operator*(SDL_Point p, int n) noexcept
 {
     return SDL_Point{p.x * n, p.y * n};
@@ -144,7 +142,7 @@ void aldo::Nametables::draw(const Emulator& emu, const MediaRuntime& mr) const
 }
 
 aldo::Sprites::Sprites(const aldo::MediaRuntime& mr)
-: sprTex{{SpriteDim, SpriteDim}, mr.renderer()} {}
+: sprTex{{SpritesDim, SpritesDim}, mr.renderer()} {}
 
 void aldo::Sprites::draw(const aldo::Emulator& emu) const
 {

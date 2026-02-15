@@ -2247,11 +2247,13 @@ protected:
     void renderContents() override
     {
         auto obj = selectedSprite();
-        SDL_Point sprExtent{sprites.SpritePxDim, sprites.SpritePxDim};
+        SDL_Point
+            sprExtent{sprites.SpritePxDim, sprites.SpritePxDim},
+            ovDim{sprites.SpritesDim, sprites.SpritesDim};
         if (emu.snapshot().video->sprites.double_height) {
             sprExtent.y *= 2;
         }
-        SpriteOverlay ov{emu.screenSize(), sprExtent, screenIndicator};
+        SpriteOverlay ov{emu.screenSize(), sprExtent, ovDim, screenIndicator};
         renderSpriteScreen();
         ov.render(obj);
         ImGui::SameLine();
@@ -2265,9 +2267,11 @@ protected:
 private:
     class SpriteOverlay {
     public:
-        SpriteOverlay(const SDL_Point& s, const SDL_Point& se, bool si) noexcept
+        SpriteOverlay(const SDL_Point& s, const SDL_Point& se,
+                      const SDL_Point& sd, bool si) noexcept
         : drawList{ImGui::GetWindowDrawList()}, origin{ImGui::GetCursorScreenPos()},
-        scrSize{point_to_vec(s)}, sprExtent{point_to_vec(se)}, screenIndicator{si} {}
+        scrSize{point_to_vec(s)}, sprExtent{point_to_vec(se)},
+        overlayDim{point_to_vec(sd)}, screenIndicator{si} {}
 
         void render(const aldo::sprite_obj* obj) const noexcept
         {
@@ -2288,14 +2292,16 @@ private:
         {
             if (!obj) return;
 
+            ClipRect cr{origin, overlayDim};
             auto spriteOrigin = origin + ImVec2{
                 static_cast<float>(obj->x), static_cast<float>(obj->y),
             };
-            drawList->AddRect(spriteOrigin, spriteOrigin + sprExtent, aldo::colors::LedOn);
+            drawList->AddRect(spriteOrigin, spriteOrigin + sprExtent,
+                              aldo::colors::LedOn);
         }
 
         ImDrawList* drawList;
-        ImVec2 origin, scrSize, sprExtent;
+        ImVec2 origin, scrSize, sprExtent, overlayDim;
         bool screenIndicator;
     };
 

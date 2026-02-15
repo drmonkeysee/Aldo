@@ -209,7 +209,7 @@ private:
 
 class Sprites {
 public:
-    static constexpr int SpritePxDim = pt_tile::extent;
+    static constexpr int SpritePxDim = pt_tile::extent, SpritesDim = 256;
 
     enum class Priority {
         all,

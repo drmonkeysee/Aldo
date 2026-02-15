@@ -41,7 +41,7 @@ class Tile {
 public:
     Tile(aldo::pt_tile chr, int col, int row, aldo::color_span c,
          const aldo::Palette& p, const aldo::tex::TextureData& d)
-    : chrTile{chr}, colors{c}, palette{p}, data{d}, gridX{col}, gridY{row} {}
+    : chrTile{chr}, colors{c}, palette{p}, data{d}, grid{col, row} {}
     Tile(aldo::pt_tile, int, int, aldo::color_span,
          aldo::Palette&&, const aldo::tex::TextureData&) = delete;
     Tile(aldo::pt_tile, int, int, aldo::color_span,
@@ -53,22 +53,31 @@ public:
     Tile(Tile&&) = delete;
     Tile& operator=(Tile&&) = delete;
 
+    void setClipRect(int cols, int rows) noexcept
+    {
+        clip = {
+            std::min(std::max(0, NoClip.x - cols), NoClip.x),
+            std::min(std::max(0, NoClip.y - rows), NoClip.y),
+        };
+    }
+
     void draw() const
     {
         auto chrDim = static_cast<int>(chrTile.size());
         auto chrRow = 0;
         for (auto pxRow : chrTile | std::views::take(clip.y)) {
             auto rowOrigin = origin
-                                + (gridX * chrDim)
-                                + ((chrRow++ + (gridY * chrDim)) * data.stride);
+                                + (grid.x * chrDim)
+                                + ((chrRow++ + (grid.y * chrDim)) * data.stride);
             drawRow(pxRow, rowOrigin);
         }
     }
 
-    SDL_Point clip{aldo::pt_tile::extent, aldo::pt_tile::extent};
     int origin = 0;
 
 private:
+    static constexpr SDL_Point NoClip{aldo::pt_tile::extent, aldo::pt_tile::extent};
+
     void drawRow(aldo::et::word pxRow, int rowOrigin) const
     {
         auto rowLen = std::min(clip.x, static_cast<int>(chrTile.size()));
@@ -87,7 +96,7 @@ private:
     aldo::color_span colors;
     const aldo::Palette& palette;
     const aldo::tex::TextureData& data;
-    int gridX, gridY;
+    SDL_Point clip = NoClip, grid;
 };
 
 }
@@ -380,13 +389,7 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
     tile.origin = spriteXOffset + (spriteYOffset * data.stride);
 
     // clip sprites at the right/bottom edges of the screen
-    auto xClip = obj.x - clipRange, yClip = obj.y - clipRange;
-    if (xClip > 0) {
-        tile.clip.x = SpritePxDim - xClip;
-    }
-    if (yClip > 0) {
-        tile.clip.y = SpritePxDim - yClip;
-    }
+    tile.setClipRect(obj.x - clipRange, obj.y - clipRange);
 
     tile.draw();
 }

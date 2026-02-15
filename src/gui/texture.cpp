@@ -65,6 +65,7 @@ public:
     {
         auto chrDim = static_cast<int>(chrTile.size());
         auto chrRow = 0;
+        // TODO: use std::views::enumerate once that exists
         for (auto pxRow : chrTile | std::views::take(clip.y)) {
             auto rowOrigin = origin
                                 + (grid.x * chrDim)

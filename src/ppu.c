@@ -244,7 +244,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
 
     // Capture current sprite index value to properly detect OAMADDR overflow
     // even when OAMADDR is misaligned.
-    uint8_t sprite_idx = (uint8_t)(self->oamaddr & ~DWordMask);
+    auto sprite_idx = (uint8_t)(self->oamaddr & ~DWordMask);
 
     switch (sprites->s) {
     case ALDO_PPU_SPR_SCAN:

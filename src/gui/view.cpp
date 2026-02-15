@@ -2385,10 +2385,10 @@ private:
         ImGui::Text("Position: (%03d, %03d)", obj->x, obj->y);
         std::array<char, 6> buf;
         if (emu.snapshot().video->sprites.double_height) {
-            std::snprintf(buf.data(), buf.size(), "%02X+%02X", obj->tile,
-                          static_cast<aldo::et::byte>(obj->tile + 1));
+            std::snprintf(buf.data(), buf.size(), "%02X+%02X", obj->tiles[0],
+                          obj->tiles[1]);
         } else {
-            std::snprintf(buf.data(), buf.size(), "%02X", obj->tile);
+            std::snprintf(buf.data(), buf.size(), "%02X", obj->tiles[0]);
         }
         ImGui::Text("Tile: %s ($%1d000)", buf.data(), obj->pt);
 

@@ -333,17 +333,26 @@ static void snapshot_sprites(const struct aldo_rp2c02 *self,
     for (size_t i = 0; i < aldo_arrsz(sprites->objects); ++i) {
         auto obj = sprites->objects + i;
         auto bytes = self->spr.oam + (i * SpriteSize);
-        uint8_t tileId = sprites->double_height ? bytes[1] & 0xfe : bytes[1];
-        bool pt = sprites->double_height ? bytes[1] & 0x1 : self->ctrl.s;
+        uint8_t top_tile, bottom_tile;
+        bool pt;
+        if (sprites->double_height) {
+            top_tile = bytes[1] & 0xfe;
+            bottom_tile = top_tile + 1;
+            pt = bytes[1] & 0x1;
+        } else {
+            top_tile = bytes[1];
+            bottom_tile = 0x0;
+            pt = self->ctrl.s;
+        }
         *obj = (typeof(*obj)){
-            bytes[3],               // x coordinate
-            bytes[0],               // y coordinate
-            tileId,                 // tile ID
-            bytes[2] & DWordMask,   // palette ID
-            pt,                     // pattern table bank
-            bytes[2] & 0x20,        // priority (bg/fg)
-            bytes[2] & 0x40,        // horizontal flip
-            bytes[2] & 0x80,        // vertical flip
+            bytes[3],                   // x coordinate
+            bytes[0],                   // y coordinate
+            bytes[2] & DWordMask,       // palette ID
+            {top_tile, bottom_tile},    // tile IDs, bottom unused for 8x8 sprites
+            pt,                         // pattern table bank
+            bytes[2] & 0x20,            // priority (bg/fg)
+            bytes[2] & 0x40,            // horizontal flip
+            bytes[2] & 0x80,            // vertical flip
         };
     }
 }

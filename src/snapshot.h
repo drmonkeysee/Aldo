@@ -96,7 +96,7 @@ struct aldo_snapshot {
         } nt;
         struct {
             struct {
-                uint8_t x, y, tile, palette;
+                uint8_t x, y, palette, tiles[2];
                 bool pt, priority, hflip, vflip;
             } objects[AldoSpriteCount];
             bool double_height;

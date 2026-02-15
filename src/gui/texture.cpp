@@ -382,7 +382,9 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
     auto gridRow = obj.y / SpritePxDim;
 
     aldo::pt_span table = obj.pt ? vsp->pattern_tables.right : vsp->pattern_tables.left;
-    Tile tile{table[obj.tile], gridCol, gridRow, colors, emu.palette(), data};
+    Tile tile{
+        table[obj.tiles[0]], gridCol, gridRow, colors, emu.palette(), data,
+    };
 
     // pixel-perfect offset of sprite within the namespace tile grid cell
     auto spriteXOffset = obj.x % SpritePxDim;

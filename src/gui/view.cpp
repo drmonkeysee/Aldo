@@ -2429,6 +2429,7 @@ private:
             }
             --idx;
         }
+        assert(idx == NoSelection);
     }
 
     const aldo::sprite_obj* selectedSprite() const noexcept

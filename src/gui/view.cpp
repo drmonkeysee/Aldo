@@ -1884,8 +1884,8 @@ private:
     }
 
     aldo::PatternTable left, right;
-    aldo::et::size palSelect = 0;
     RefreshInterval<500.0> drawInterval;
+    aldo::et::size palSelect = 0;
 };
 
 class PpuView final : public aldo::View {
@@ -2341,9 +2341,11 @@ private:
         ov.render(obj);
     }
 
-    void renderSpriteScreen() const
+    void renderSpriteScreen()
     {
-        sprites.draw(emu);
+        if (drawInterval.elapsed(vs.clock.clock())) {
+            sprites.draw(emu);
+        }
         sprites.render();
     }
 
@@ -2442,6 +2444,7 @@ private:
     aldo::Sprites sprites;
     using PriorityMode = decltype(sprites)::Priority;
     ComboList<PriorityMode> priorityCombo;
+    RefreshInterval<250.0> drawInterval;
     int selected = NoSelection;
     bool screenIndicator = false;
 };
@@ -2573,10 +2576,10 @@ private:
         }
     }
 
+    RefreshInterval<200.0> statsInterval;
     double
         dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0, dispDtElapsed = 0,
         dispDtTick = 0, dispDtLeft = 0;
-    RefreshInterval<200.0> statsInterval;
 };
 
 class VideoView final : public aldo::View {

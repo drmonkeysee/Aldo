@@ -63,21 +63,32 @@ public:
 
     void draw() const
     {
+        if (verticalFlip) {
+            drawRows(chrTile | std::views::reverse);
+        } else {
+            drawRows(chrTile);
+        }
+    }
+
+    int origin = 0;
+    bool verticalFlip = false;
+
+private:
+    static constexpr SDL_Point NoClip{aldo::pt_tile::extent, aldo::pt_tile::extent};
+
+    // template helper to handle different views on tile rows
+    void drawRows(auto&& rows) const
+    {
         auto chrDim = static_cast<int>(chrTile.size());
         auto chrRow = 0;
         // TODO: use std::views::enumerate once that exists
-        for (auto pxRow : chrTile | std::views::take(clip.y)) {
+        for (auto pxRow : rows | std::views::take(clip.y)) {
             auto rowOrigin = origin
                                 + (grid.x * chrDim)
                                 + ((chrRow++ + (grid.y * chrDim)) * data.stride);
             drawRow(pxRow, rowOrigin);
         }
     }
-
-    int origin = 0;
-
-private:
-    static constexpr SDL_Point NoClip{aldo::pt_tile::extent, aldo::pt_tile::extent};
 
     void drawRow(aldo::et::word pxRow, int rowOrigin) const
     {
@@ -390,6 +401,7 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
     auto spriteXOffset = obj.x % SpritePxDim;
     auto spriteYOffset = obj.y % SpritePxDim;
     tile.origin = spriteXOffset + (spriteYOffset * data.stride);
+    tile.verticalFlip = obj.vflip;
 
     // clip sprites at the right/bottom edges of the screen
     tile.setClipRect(obj.x - clipRange, obj.y - clipRange);
@@ -404,6 +416,7 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
         };
         // bottom tile has same relative origin to its grid cell
         bottomTile.origin = tile.origin;
+        bottomTile.verticalFlip = tile.verticalFlip;
 
         // adjust clip rect down by one tile
         bottomTile.setClipRect(obj.x - clipRange, (obj.y + SpritePxDim) - clipRange);

@@ -395,4 +395,19 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
     tile.setClipRect(obj.x - clipRange, obj.y - clipRange);
 
     tile.draw();
+
+    if (vsp->sprites.double_height) {
+        // bottom tile is one grid row lower than the top
+        ++gridRow;
+        Tile bottomTile{
+            table[obj.tiles[1]], gridCol, gridRow, colors, emu.palette(), data,
+        };
+        // bottom tile has same relative origin to its grid cell
+        bottomTile.origin = tile.origin;
+
+        // adjust clip rect down by one tile
+        bottomTile.setClipRect(obj.x - clipRange, (obj.y + SpritePxDim) - clipRange);
+
+        bottomTile.draw();
+    }
 }

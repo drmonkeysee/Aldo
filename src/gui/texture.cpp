@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <array>
 #include <concepts>
+#include <ranges>
 #include <cassert>
 
 static_assert(std::same_as<Uint32, ImU32>,
@@ -56,7 +57,7 @@ public:
     {
         auto chrDim = static_cast<int>(chrTile.size());
         auto chrRow = 0;
-        for (auto pxRow : chrTile) {
+        for (auto pxRow : chrTile | std::views::take(clip.y)) {
             auto rowOrigin = origin
                                 + (gridX * chrDim)
                                 + ((chrRow++ + (gridY * chrDim)) * data.stride);
@@ -64,12 +65,14 @@ public:
         }
     }
 
+    SDL_Point clip{aldo::pt_tile::extent, aldo::pt_tile::extent};
     int origin = 0;
 
 private:
     void drawRow(aldo::et::word pxRow, int rowOrigin) const
     {
-        for (auto px = 0; px < static_cast<int>(chrTile.size()); ++px) {
+        auto rowLen = std::min(clip.x, static_cast<int>(chrTile.size()));
+        for (auto px = 0; px < rowLen; ++px) {
             auto pidx = AldoChrTileStride - ((px + 1) * 2);
             assert(0 <= pidx);
             decltype(colors)::size_type texel = (pxRow & (0x3 << pidx)) >> pidx;
@@ -354,6 +357,9 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
     static constexpr auto
         palMin = static_cast<aldo::et::byte>(aldo::color_span::extent),
         palMax = static_cast<aldo::et::byte>((palMin * 2) - 1);
+    // The range in the right/bottom of the screen where we need to clip sprite
+    // rows and columns to avoid running off the edge of the texture pixels.
+    static constexpr auto clipRange = SpritesDim - SpritePxDim;
 
     auto vsp = emu.snapshot().video;
 
@@ -362,19 +368,25 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
     auto palidx = std::max(palMin, std::min(obj.palette, palMax));
     aldo::color_span colors = vsp->palettes.fg[palidx - palMin];
 
-    // TODO: clamp during initial testing
-    auto x = std::min(static_cast<aldo::et::byte>(248), obj.x);
-    auto y = std::min(static_cast<aldo::et::byte>(248), obj.y);
-    auto gridCol = x / SpritePxDim;
-    auto gridRow = y / SpritePxDim;
+    auto gridCol = obj.x / SpritePxDim;
+    auto gridRow = obj.y / SpritePxDim;
 
     aldo::pt_span table = obj.pt ? vsp->pattern_tables.right : vsp->pattern_tables.left;
     Tile tile{table[obj.tile], gridCol, gridRow, colors, emu.palette(), data};
 
     // pixel-perfect offset of sprite within the namespace tile grid cell
-    auto spriteXOffset = x % SpritePxDim;
-    auto spriteYOffset = y % SpritePxDim;
+    auto spriteXOffset = obj.x % SpritePxDim;
+    auto spriteYOffset = obj.y % SpritePxDim;
     tile.origin = spriteXOffset + (spriteYOffset * data.stride);
+
+    // clip sprites at the right/bottom edges of the screen
+    auto xClip = obj.x - clipRange, yClip = obj.y - clipRange;
+    if (xClip > 0) {
+        tile.clip.x = SpritePxDim - xClip;
+    }
+    if (yClip > 0) {
+        tile.clip.y = SpritePxDim - yClip;
+    }
 
     tile.draw();
 }

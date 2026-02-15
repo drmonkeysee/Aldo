@@ -24,9 +24,7 @@ static_assert(std::same_as<Uint32, ImU32>,
 namespace
 {
 
-using sprite_span = std::span<const aldo::sprite_obj, AldoSpriteCount>;
-
-constexpr auto operator*(SDL_Point p, int n) noexcept
+constexpr auto operator*(const SDL_Point& p, int n) noexcept
 {
     return SDL_Point{p.x * n, p.y * n};
 }
@@ -152,7 +150,7 @@ void aldo::Sprites::draw(const aldo::Emulator& emu) const
     px_span mem{data.pixels, static_cast<decltype(mem)::size_type>(data.size())};
     std::ranges::fill(mem, aldo::colors::LedOff);
 
-    sprite_span objects = emu.snapshot().video->sprites.objects;
+    aldo::sprite_span objects = emu.snapshot().video->sprites.objects;
     for (const auto& obj : objects) {
         if ((priority == Priority::front && obj.priority)
             || (priority == Priority::back && !obj.priority)) {

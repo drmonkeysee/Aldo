@@ -32,6 +32,7 @@ using pt_tile = std::span<const et::word, AldoChrTileDim>;
 using pt_span = std::span<const et::word[AldoChrTileDim], AldoPtTileCount>;
 using sprite_obj = std::remove_extent_t<
                     decltype(std::declval<aldo_snapshot>().video->sprites.objects)>;
+using sprite_span = std::span<const aldo::sprite_obj, AldoSpriteCount>;
 
 namespace tex
 {

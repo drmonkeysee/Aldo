@@ -33,13 +33,13 @@
 #include <iterator>
 #include <limits>
 #include <locale>
+#include <optional>
 #include <ranges>
 #include <span>
 #include <string_view>
 #include <tuple>
 #include <type_traits>
 #include <unordered_set>
-#include <utility>
 #include <cassert>
 #include <cinttypes>
 #include <cstdio>
@@ -69,6 +69,21 @@ constexpr auto operator-(const ImVec2& a, const ImVec2& b) noexcept
 constexpr auto point_to_vec(const SDL_Point& p) noexcept
 {
     return ImVec2{static_cast<float>(p.x), static_cast<float>(p.y)};
+}
+
+constexpr auto vec_to_pointf(const ImVec2& v) noexcept
+{
+    return SDL_FPoint{v.x, v.y};
+}
+
+constexpr auto vecs_to_rectf(const ImVec2& point, const ImVec2& size) noexcept
+{
+    return SDL_FRect{point.x, point.y, size.x, size.y};
+}
+
+constexpr auto operator-(const SDL_FPoint& p, const ImVec2& v) noexcept
+{
+    return SDL_FPoint{p.x - v.x, p.y - v.y};
 }
 
 template<double Interval>
@@ -2247,15 +2262,7 @@ protected:
     void renderContents() override
     {
         auto obj = selectedSprite();
-        SDL_Point
-            sprExtent{sprites.SpritePxDim, sprites.SpritePxDim},
-            ovDim{sprites.SpritesDim, sprites.SpritesDim};
-        if (emu.snapshot().video->sprites.double_height) {
-            sprExtent.y *= 2;
-        }
-        SpriteOverlay ov{emu.screenSize(), sprExtent, ovDim, screenIndicator};
-        renderSpriteScreen();
-        ov.render(obj);
+        renderSpriteSpace(obj);
         ImGui::SameLine();
         widget_group([this, obj] noexcept {
             this->renderSpriteSelect();
@@ -2272,6 +2279,21 @@ private:
         : drawList{ImGui::GetWindowDrawList()}, origin{ImGui::GetCursorScreenPos()},
         scrSize{point_to_vec(s)}, sprExtent{point_to_vec(se)},
         overlayDim{point_to_vec(sd)}, screenIndicator{si} {}
+
+        const ImVec2& spriteSize() const noexcept { return sprExtent; }
+
+        std::optional<SDL_FPoint> getMouseClick() const noexcept
+        {
+            if (ImGui::IsMousePosValid()) {
+                auto r = vecs_to_rectf(origin, overlayDim);
+                auto p = vec_to_pointf(ImGui::GetMousePos());
+                if (SDL_PointInRectFloat(&p, &r)
+                    && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+                    return p - origin;
+                }
+            }
+            return {};
+        }
 
         void render(const aldo::sprite_obj* obj) const noexcept
         {
@@ -2304,6 +2326,20 @@ private:
         ImVec2 origin, scrSize, sprExtent, overlayDim;
         bool screenIndicator;
     };
+
+    void renderSpriteSpace(const aldo::sprite_obj* obj)
+    {
+        SDL_Point
+            sprExtent{sprites.SpritePxDim, sprites.SpritePxDim},
+            ovDim{sprites.SpritesDim, sprites.SpritesDim};
+        if (emu.snapshot().video->sprites.double_height) {
+            sprExtent.y *= 2;
+        }
+        SpriteOverlay ov{emu.screenSize(), sprExtent, ovDim, screenIndicator};
+        handleOverlayClick(ov);
+        renderSpriteScreen();
+        ov.render(obj);
+    }
 
     void renderSpriteScreen() const
     {
@@ -2368,6 +2404,29 @@ private:
         ImGui::Text("Size: 8x%d", doubleHeight ? 16 : 8);
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 14);
         priorityCombo.render();
+    }
+
+    void handleOverlayClick(const SpriteOverlay& ov) noexcept
+    {
+        auto mouse = ov.getMouseClick();
+        if (!mouse) return;
+
+        selected = NoSelection;
+        aldo::sprite_span objs = emu.snapshot().video->sprites.objects;
+        // TODO: add std::views::enumerate when this exists
+        auto idx = static_cast<int>(objs.size() - 1);
+        // sprites are drawn first-to-last, so z-order for mouse hit is in reverse
+        for (const auto& obj : objs | std::views::reverse) {
+            SDL_FRect hit{
+                static_cast<float>(obj.x), static_cast<float>(obj.y),
+                ov.spriteSize().x, ov.spriteSize().y,
+            };
+            if (SDL_PointInRectFloat(&mouse.value(), &hit)) {
+                selected = idx;
+                return;
+            }
+            --idx;
+        }
     }
 
     const aldo::sprite_obj* selectedSprite() const noexcept

@@ -41,7 +41,7 @@ auto read_brkfile(const std::filesystem::path& filepath)
         exprs.push_back(expr);
     }
     if (f.bad() || (f.fail() && !f.eof())) throw aldo::AldoError{
-        DebugFileErrorTitle, "Error reading breakpoints file"
+        DebugFileErrorTitle, "Error reading breakpoints file",
     };
     return exprs;
 }

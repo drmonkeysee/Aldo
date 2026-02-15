@@ -354,10 +354,8 @@ void aldo::Nametables::drawMetatile(aldo::et::byte attr, int ntIdx, int col,
         yOffset = (ntIdx * offsets.upperY) + (row * AttributePxDim) + mtY;
 
     SDL_FRect metatile{
-        static_cast<float>(xOffset),
-        static_cast<float>(yOffset),
-        metatileStride,
-        metatileStride,
+        static_cast<float>(xOffset), static_cast<float>(yOffset),
+        metatileStride, metatileStride,
     };
     SDL_SetRenderDrawColor(ren, static_cast<Uint8>(r), static_cast<Uint8>(g),
                            static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
@@ -393,8 +391,10 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
     auto gridRow = obj.y / SpritePxDim;
 
     aldo::pt_span table = obj.pt ? vsp->pattern_tables.right : vsp->pattern_tables.left;
+    // tile ID is inverted if v-flip and 8x16 mode
+    auto tileIdx = vsp->sprites.double_height && obj.vflip;
     Tile tile{
-        table[obj.tiles[0]], gridCol, gridRow, colors, emu.palette(), data,
+        table[obj.tiles[tileIdx]], gridCol, gridRow, colors, emu.palette(), data,
     };
 
     // pixel-perfect offset of sprite within the namespace tile grid cell
@@ -411,8 +411,10 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
     if (vsp->sprites.double_height) {
         // bottom tile is one grid row lower than the top
         ++gridRow;
+        // tile ID is inverted if vertical flip is true
         Tile bottomTile{
-            table[obj.tiles[1]], gridCol, gridRow, colors, emu.palette(), data,
+            table[obj.tiles[!obj.vflip]], gridCol, gridRow, colors,
+            emu.palette(), data,
         };
         // bottom tile has same relative origin to its grid cell
         bottomTile.origin = tile.origin;

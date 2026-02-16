@@ -2412,7 +2412,8 @@ private:
     void handleOverlayClick(const SpriteOverlay& ov) noexcept
     {
         auto mouse = ov.getMouseClick();
-        if (!mouse) return;
+        // check for mouse click and priority dropdown not overlapping
+        if (!mouse || ImGui::IsAnyItemHovered()) return;
 
         selected = NoSelection;
         aldo::sprite_span objs = emu.snapshot().video->sprites.objects;

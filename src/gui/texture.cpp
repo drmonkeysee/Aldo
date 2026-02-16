@@ -71,7 +71,7 @@ public:
     }
 
     int origin = 0;
-    bool verticalFlip = false;
+    bool horizontalFlip = false, verticalFlip = false;
 
 private:
     static constexpr SDL_Point NoClip{aldo::pt_tile::extent, aldo::pt_tile::extent};
@@ -86,19 +86,20 @@ private:
             auto rowOrigin = origin
                                 + (grid.x * chrDim)
                                 + ((chrRow++ + (grid.y * chrDim)) * data.stride);
-            drawRow(pxRow, rowOrigin);
+            drawRow(pxRow, rowOrigin, chrDim);
         }
     }
 
-    void drawRow(aldo::et::word pxRow, int rowOrigin) const
+    void drawRow(aldo::et::word pxRow, int rowOrigin, int chrDim) const
     {
-        auto rowLen = std::min(clip.x, static_cast<int>(chrTile.size()));
-        for (auto px = 0; px < rowLen; ++px) {
+        auto rowLen = std::min(clip.x, chrDim);
+        for (auto col = 0; col < rowLen; ++col) {
+            auto px = horizontalFlip ? chrDim - 1 - col : col;
             auto pidx = AldoChrTileStride - ((px + 1) * 2);
             assert(0 <= pidx);
             decltype(colors)::size_type texel = (pxRow & (0x3 << pidx)) >> pidx;
             assert(texel < colors.size());
-            auto texidx = px + rowOrigin;
+            auto texidx = col + rowOrigin;
             assert(texidx < data.size());
             data.pixels[texidx] = palette.getColor(colors[texel]);
         }
@@ -401,6 +402,7 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
     auto spriteXOffset = obj.x % SpritePxDim;
     auto spriteYOffset = obj.y % SpritePxDim;
     tile.origin = spriteXOffset + (spriteYOffset * data.stride);
+    tile.horizontalFlip = obj.hflip;
     tile.verticalFlip = obj.vflip;
 
     // clip sprites at the right/bottom edges of the screen
@@ -418,6 +420,7 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
         };
         // bottom tile has same relative origin to its grid cell
         bottomTile.origin = tile.origin;
+        bottomTile.horizontalFlip = tile.horizontalFlip;
         bottomTile.verticalFlip = tile.verticalFlip;
 
         // adjust clip rect down by one tile

@@ -79,7 +79,7 @@ void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
     aldo_cpu_powerup(cpu);
     cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bcd =
         cpu->bflt = cpu->detached = false;
-    cpu->p.i = cpu->signal.rdy = cpu->presync = true;
+    cpu->p.i = cpu->presync = true;
     cpu->rst = ALDO_SIG_CLEAR;
 }
 

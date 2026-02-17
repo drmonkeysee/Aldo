@@ -89,7 +89,8 @@ public:
     const Palette& palette() const noexcept { return hpalette; }
     Palette& palette() noexcept { return hpalette; }
 
-    void ready(bool ready) noexcept { aldo_nes_ready(consolep(), ready); }
+    bool halted() const noexcept { return aldo_nes_halted(consolep()); }
+    void halt(bool halt) noexcept { aldo_nes_halt(consolep(), halt); }
     et::size ramSize() const noexcept { return aldo_nes_ram_size(consolep()); }
     bool bcdSupport() const noexcept
     {

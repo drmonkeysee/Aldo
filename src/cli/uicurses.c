@@ -178,7 +178,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     snprintf(halt_label, sizeof halt_label, "%*s%s%*s",
              (int)round(center_offset), "", halt,
              (int)floor(center_offset), "");
-    drawtoggle(v, halt_label, !emu->snapshot.cpu.lines.ready);
+    drawtoggle(v, halt_label, aldo_nes_halted(emu->console));
 
     cursor_y += 2;
     auto mode = aldo_nes_mode(emu->console);
@@ -817,7 +817,7 @@ static void init_ui(struct layout *l, int ramsheets)
 
 static void tick_start(struct viewstate *vs, const struct emulator *emu)
 {
-    aldo_clock_tickstart(&vs->clock.clock, !emu->snapshot.cpu.lines.ready);
+    aldo_clock_tickstart(&vs->clock.clock, aldo_nes_halted(emu->console));
 }
 
 static void tick_end(struct runclock *c)
@@ -865,7 +865,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
     auto input = getch();
     switch (input) {
     case ' ':
-        aldo_nes_ready(emu->console, !emu->snapshot.cpu.lines.ready);
+        aldo_nes_halt(emu->console, !aldo_nes_halted(emu->console));
         break;
     case '=':   // "Lowercase" +
         adjustrate(vs, 1);

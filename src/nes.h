@@ -48,7 +48,9 @@ enum aldo_execmode aldo_nes_mode(aldo_nes *self) aldo_nothrow;
 aldo_export
 void aldo_nes_set_mode(aldo_nes *self, enum aldo_execmode mode) aldo_nothrow;
 aldo_export
-void aldo_nes_ready(aldo_nes *self, bool ready) aldo_nothrow;
+bool aldo_nes_halted(aldo_nes *self) aldo_nothrow;
+aldo_export
+void aldo_nes_halt(aldo_nes *self, bool halt) aldo_nothrow;
 aldo_export
 bool aldo_nes_probe(aldo_nes *self, enum aldo_interrupt signal) aldo_nothrow;
 aldo_export

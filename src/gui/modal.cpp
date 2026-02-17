@@ -51,7 +51,7 @@ auto file_modal(modal_launch open, modal_operation op, aldo::Emulator& emu,
 {
     // halt emulator to prevent time-jump from modal delay
     // TODO: does this make sense long-term?
-    emu.ready(false);
+    emu.halt(true);
 
     auto filepath = open(mr.platform());
     // at least on macOS main window doesn't auto-focus back from modal

@@ -194,7 +194,7 @@ static ui_loop *setup_ui(struct emulator *emu)
 {
     auto loop = ui_curses_loop;
     if (emu->args->batch) {
-        aldo_nes_ready(emu->console, true);
+        aldo_nes_halt(emu->console, false);
         loop = ui_batch_loop;
     }
     aldo_nes_set_snapshot(emu->console, &emu->snapshot);

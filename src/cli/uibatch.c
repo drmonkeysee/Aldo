@@ -57,7 +57,7 @@ static int init_ui()
     return sigaction(SIGINT, &act, nullptr) == 0 ? 0 : ALDO_UI_ERR_ERNO;
 }
 
-static void tick_start(struct runclock *c, const struct aldo_snapshot *snp)
+static void tick_start(struct runclock *c, const struct emulator *emu)
 {
     aldo_clock_tickstart(&c->clock, true);
 
@@ -73,8 +73,8 @@ static void tick_start(struct runclock *c, const struct aldo_snapshot *snp)
     // app runtime and emulator time are equivalent in batch mode
     c->clock.emutime = c->clock.runtime;
 
-    // exit batch mode if cpu is not running
-    if (!snp->cpu.lines.ready) {
+    // exit batch mode if emulator is halted
+    if (aldo_nes_halted(emu->console)) {
         QuitSignal = 1;
     }
 }
@@ -136,7 +136,7 @@ int ui_batch_loop(struct emulator *emu)
     struct runclock clock = {};
     aldo_clock_start(&clock.clock);
     do {
-        tick_start(&clock, &emu->snapshot);
+        tick_start(&clock, emu);
         aldo_nes_clock(emu->console, &clock.clock);
         update_progress(&clock);
         tick_end(&clock);

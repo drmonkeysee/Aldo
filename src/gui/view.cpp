@@ -470,9 +470,8 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
 {
     if (ImGui::BeginMenu("Controls")) {
         speed_menu_items(vs);
-        auto& lines = emu.snapshot().cpu.lines;
-        if (ImGui::MenuItem(lines.ready ? "Halt" : "Run", "<Space>")) {
-            vs.commands.emplace(aldo::Command::ready, !lines.ready);
+        if (ImGui::MenuItem(emu.halted() ? "Run" : "Halt", "<Space>")) {
+            vs.commands.emplace(aldo::Command::halt, !emu.halted());
         }
         mode_menu_item(vs, emu);
         ImGui::Separator();
@@ -2536,10 +2535,9 @@ private:
 
     void renderRunControls() const
     {
-        auto& lines = emu.snapshot().cpu.lines;
-        auto halt = !lines.ready;
+        auto halt = emu.halted();
         if (ImGui::Checkbox("HALT", &halt)) {
-            vs.commands.emplace(aldo::Command::ready, !halt);
+            vs.commands.emplace(aldo::Command::halt, halt);
         };
 
         auto mode = emu.runMode();

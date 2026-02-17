@@ -39,8 +39,7 @@ auto runloop(const gui_platform& p, aldo_debugger* debug, aldo_nes* console)
             sizeof emu + sizeof state + sizeof runtime + sizeof layout);
     state.clock.start();
     do {
-        auto reset = !emu.snapshot().cpu.lines.ready;
-        auto tick = state.clock.startTick(reset);
+        auto tick = state.clock.startTick(emu.halted());
         aldo::input::handle(emu, state, runtime);
         if (state.running) {
             emu.update(state);

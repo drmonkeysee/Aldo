@@ -76,11 +76,10 @@ auto breakpoint_add_failed()
 auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
                     aldo::viewstate& vs)
 {
-    auto& lines = emu.snapshot().cpu.lines;
     switch (ev.key.key) {
     case SDLK_SPACE:
         if (is_free_key(ev)) {
-            vs.commands.emplace(aldo::Command::ready, !lines.ready);
+            vs.commands.emplace(aldo::Command::halt, !emu.halted());
         }
         break;
     case SDLK_EQUALS:
@@ -190,6 +189,9 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
     case aldo::Command::breakpointsOpen:
         aldo::modal::loadBreakpoints(emu, mr);
         break;
+    case aldo::Command::halt:
+        emu.halt(std::get<bool>(cs.value));
+        break;
     case aldo::Command::mode:
         emu.runMode(std::get<aldo_execmode>(cs.value));
         break;
@@ -209,9 +211,6 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
             auto [signal, active] = std::get<aldo::command_state::probe>(cs.value);
             emu.probe(signal, active);
         }
-        break;
-    case aldo::Command::ready:
-        emu.ready(std::get<bool>(cs.value));
         break;
     case aldo::Command::resetVectorClear:
         debugger.vectorClear();

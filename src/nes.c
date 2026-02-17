@@ -39,7 +39,9 @@ struct aldo_nes001 {
             nmi: 1,                     // NMI Probe
             rst: 1;                     // RESET Probe
     } probe;                            // Interrupt Input Probes (active high)
-    bool tracefailed;                   // Trace log I/O failed during run
+    bool
+        halted,                         // Whether the emulator is suspended
+        tracefailed;                    // Trace log I/O failed during run
     uint8_t ram[ALDO_MEMBLOCK_2KB],     // CPU Internal RAM
             vram[ALDO_MEMBLOCK_2KB],    // PPU Internal RAM
             vbufs[2][ScreenWidth * ScreenHeight];   // Double-buffered Video
@@ -350,7 +352,7 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
     // TODO: ppu debug hook goes here
     if (++clock->subcycle < Aldo_PpuRatio) {
         if (self->mode == ALDO_EXC_SUBCYCLE) {
-            aldo_nes_ready(self, false);
+            aldo_nes_halt(self, true);
         }
         return false;
     }
@@ -369,10 +371,10 @@ static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
     // both cases are possible on cycle-boundary
     case ALDO_EXC_SUBCYCLE:
     case ALDO_EXC_CYCLE:
-        aldo_nes_ready(self, false);
+        aldo_nes_halt(self, true);
         break;
     case ALDO_EXC_STEP:
-        aldo_nes_ready(self, !self->cpu.signal.sync);
+        aldo_nes_halt(self, self->cpu.signal.sync);
         break;
     case ALDO_EXC_RUN:
     default:
@@ -394,10 +396,10 @@ aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
     self->cart = nullptr;
     self->dbg = dbg;
     self->tracelog = tracelog;
-    self->tracefailed = false;
     // TODO: ditch this option when aldo can emulate more than just NES
     self->cpu.bcd = bcdsupport;
-    self->probe.irq = self->probe.nmi = self->probe.rst = false;
+    self->halted = true;
+    self->tracefailed = self->probe.irq = self->probe.nmi = self->probe.rst = false;
     self->vbuf = 0;
     // uninitialized vbuffer can have out-of-range palette values
     for (size_t i = 0; i < aldo_arrsz(self->vbufs); ++i) {
@@ -440,7 +442,7 @@ void aldo_nes_powerdown(aldo_nes *self)
 {
     assert(self != nullptr);
 
-    aldo_nes_ready(self, false);
+    aldo_nes_halt(self, true);
     disconnect_cart(self);
 }
 
@@ -494,11 +496,18 @@ void aldo_nes_set_mode(aldo_nes *self, enum aldo_execmode mode)
     self->mode = (int)mode < 0 ? ALDO_EXC_COUNT - 1 : mode % ALDO_EXC_COUNT;
 }
 
-void aldo_nes_ready(aldo_nes *self, bool ready)
+bool aldo_nes_halted(aldo_nes *self)
 {
     assert(self != nullptr);
 
-    self->cpu.signal.rdy = ready;
+    return self->halted;
+}
+
+void aldo_nes_halt(aldo_nes *self, bool halt)
+{
+    assert(self != nullptr);
+
+    self->halted = halt;
 }
 
 bool aldo_nes_probe(aldo_nes *self, enum aldo_interrupt signal)
@@ -544,8 +553,10 @@ void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
     assert(self != nullptr);
     assert(clock != nullptr);
 
+    if (aldo_nes_halted(self)) return;
+
     reset_snapshot(self->snp);
-    while (self->cpu.signal.rdy && clock->budget > 0) {
+    while (clock->budget > 0) {
         if (!clock_ppu(self, clock)) continue;
         clock_cpu(self, clock);
         aldo_debug_check(self->dbg, clock);

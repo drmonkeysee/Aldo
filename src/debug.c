@@ -395,19 +395,18 @@ void aldo_debug_sync_bus(aldo_debugger *self)
                                      resetaddr_device, &self->dec.inner);
 }
 
-void aldo_debug_check(aldo_debugger *self, const struct aldo_clock *clk)
+bool aldo_debug_break(aldo_debugger *self, const struct aldo_clock *clk)
 {
     assert(self != nullptr);
     assert(clk != nullptr);
 
-    if (!self->cpu) return;
+    if (!self->cpu) return false;
 
     if (self->halted == Aldo_NoBreakpoint
         && (self->halted = bpvector_break(&self->breakpoints, clk, self->cpu))
             != Aldo_NoBreakpoint) {
-        // TODO: this should halt the emulator instead of setting the cpu line
-        self->cpu->signal.rdy = false;
-    } else {
-        self->halted = Aldo_NoBreakpoint;
+        return true;
     }
+    self->halted = Aldo_NoBreakpoint;
+    return false;
 }

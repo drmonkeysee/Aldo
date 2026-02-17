@@ -75,7 +75,7 @@ void aldo_debug_cpu_connect(aldo_debugger *self,
                             struct aldo_mos6502 *cpu) aldo_nothrow;
 void aldo_debug_cpu_disconnect(aldo_debugger *self) aldo_nothrow;
 void aldo_debug_sync_bus(aldo_debugger *self) aldo_nothrow;
-void aldo_debug_check(aldo_debugger *self,
+bool aldo_debug_break(aldo_debugger *self,
                       const struct aldo_clock *clk) aldo_nothrow;
 #include "bridgeclose.h"
 

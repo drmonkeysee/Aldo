@@ -559,7 +559,9 @@ void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
     while (clock->budget > 0) {
         if (!clock_ppu(self, clock)) continue;
         clock_cpu(self, clock);
-        aldo_debug_check(self->dbg, clock);
+        if (aldo_debug_break(self->dbg, clock)) {
+            aldo_nes_halt(self, true);
+        }
     }
     snapshot_sys(self);
 }

@@ -1694,8 +1694,13 @@ int aldo_cpu_cycle(struct aldo_mos6502 *self)
     // sentinel value for cycle count denoting an imminent opcode fetch
     static constexpr auto prefetch = -1;
 
-    // TODO: rework this so rdy low runs the same cycle over and over
-    if (!self->signal.rdy || reset_held(self)) return 0;
+    if (reset_held(self)) return 0;
+
+    // if RDY low and last cycle was a read, perform the read until RDY is high
+    if (!self->signal.rdy && self->signal.rw) {
+        read(self);
+        return 1;
+    }
 
     if (self->presync) {
         self->presync = false;

@@ -116,6 +116,8 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
     case SDLK_D:
         if (is_menu_command(ev)) {
             vs.showDemo = !vs.showDemo;
+        } else {
+            vs.addProbeCommand(ALDO_INT_RDY, !emu.probe(ALDO_INT_RDY));
         }
         break;
     case SDLK_I:

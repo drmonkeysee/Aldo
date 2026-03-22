@@ -476,9 +476,13 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
         mode_menu_item(vs, emu);
         ImGui::Separator();
         auto
+            rdy = emu.probe(ALDO_INT_RDY),
             irq = emu.probe(ALDO_INT_IRQ),
             nmi = emu.probe(ALDO_INT_NMI),
             rst = emu.probe(ALDO_INT_RST);
+        if (ImGui::MenuItem("RDY", "d", &rdy)) {
+            vs.addProbeCommand(ALDO_INT_RDY, rdy);
+        }
         if (ImGui::MenuItem("IRQ", "i", &irq)) {
             vs.addProbeCommand(ALDO_INT_IRQ, irq);
         }
@@ -2561,13 +2565,17 @@ private:
         }
 
         auto
+            rdy = emu.probe(ALDO_INT_RDY),
             irq = emu.probe(ALDO_INT_IRQ),
             nmi = emu.probe(ALDO_INT_NMI),
             rst = emu.probe(ALDO_INT_RST);
+        if (ImGui::Checkbox("RDY", &rdy)) {
+            vs.addProbeCommand(ALDO_INT_RDY, rdy);
+        }
+        ImGui::SameLine();
         if (ImGui::Checkbox("IRQ", &irq)) {
             vs.addProbeCommand(ALDO_INT_IRQ, irq);
         }
-        ImGui::SameLine();
         if (ImGui::Checkbox("NMI", &nmi)) {
             vs.addProbeCommand(ALDO_INT_NMI, nmi);
         }

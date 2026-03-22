@@ -190,6 +190,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
 
     cursor_y += 2;
     mvwaddstr(v->content, cursor_y, 0, "Signal:");
+    drawtoggle(v, " RDY ", aldo_nes_probe(emu->console, ALDO_INT_RDY));
     drawtoggle(v, " IRQ ", aldo_nes_probe(emu->console, ALDO_INT_IRQ));
     drawtoggle(v, " NMI ", aldo_nes_probe(emu->console, ALDO_INT_NMI));
     drawtoggle(v, " RST ", aldo_nes_probe(emu->console, ALDO_INT_RST));
@@ -197,7 +198,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     mvwhline(v->content, ++cursor_y, 0, 0, w);
     mvwaddstr(v->content, ++cursor_y, 0, "Halt/Run: <Space>");
     mvwaddstr(v->content, ++cursor_y, 0, "Run Mode: m/M");
-    mvwaddstr(v->content, ++cursor_y, 0, "Signal: i, n, s");
+    mvwaddstr(v->content, ++cursor_y, 0, "Signal: d, i, n, s");
     mvwaddstr(v->content, ++cursor_y, 0,
               "Speed \u00b11 (\u00b110): -/= (_/+)");
     mvwaddstr(v->content, ++cursor_y, 0, "Clock Scale: c");
@@ -888,6 +889,10 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         break;
     case 'c':
         selectrate(&vs->clock);
+        break;
+    case 'd':
+        aldo_nes_set_probe(emu->console, ALDO_INT_RDY,
+                           !aldo_nes_probe(emu->console, ALDO_INT_RDY));
         break;
     case 'f':
         if (vs->ramselect != RSEL_PPU) {

@@ -19,6 +19,7 @@ enum aldo_execmode {
 enum aldo_interrupt {
     ALDO_INT_IRQ,
     ALDO_INT_NMI,
+    ALDO_INT_RDY,
     ALDO_INT_RST,
 };
 

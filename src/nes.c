@@ -37,6 +37,7 @@ struct aldo_nes001 {
         bool
             irq: 1,                     // IRQ Probe
             nmi: 1,                     // NMI Probe
+            rdy: 1,                     // RDY Probe
             rst: 1;                     // RESET Probe
     } probe;                            // Interrupt Input Probes (active high)
     bool
@@ -242,6 +243,7 @@ static void set_screen_dot(struct aldo_nes001 *self)
 
 static void set_cpu_pins(struct aldo_nes001 *self)
 {
+    self->cpu.signal.rdy = self->probe.rdy;
     // interrupt lines are active low
     self->cpu.signal.irq = !self->probe.irq;
     self->cpu.signal.nmi = !self->probe.nmi && self->ppu.signal.intr;
@@ -398,7 +400,7 @@ aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
     self->tracelog = tracelog;
     // TODO: ditch this option when aldo can emulate more than just NES
     self->cpu.bcd = bcdsupport;
-    self->halted = true;
+    self->halted = self->probe.rdy = true;
     self->tracefailed = self->probe.irq = self->probe.nmi = self->probe.rst = false;
     self->vbuf = 0;
     // uninitialized vbuffer can have out-of-range palette values
@@ -519,6 +521,8 @@ bool aldo_nes_probe(aldo_nes *self, enum aldo_interrupt signal)
         return self->probe.irq;
     case ALDO_INT_NMI:
         return self->probe.nmi;
+    case ALDO_INT_RDY:
+        return self->probe.rdy;
     case ALDO_INT_RST:
         return self->probe.rst;
     default:
@@ -527,8 +531,7 @@ bool aldo_nes_probe(aldo_nes *self, enum aldo_interrupt signal)
     }
 }
 
-void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal,
-                        bool active)
+void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal, bool active)
 {
     assert(self != nullptr);
 
@@ -538,6 +541,9 @@ void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal,
         break;
     case ALDO_INT_NMI:
         self->probe.nmi = active;
+        break;
+    case ALDO_INT_RDY:
+        self->probe.rdy = active;
         break;
     case ALDO_INT_RST:
         self->probe.rst = active;

@@ -77,8 +77,7 @@ void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
                  rom ? Rom : (struct aldo_busdevice){});
     RomWriteCapture = -1;
     aldo_cpu_powerup(cpu);
-    cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bcd =
-        cpu->bflt = cpu->detached = false;
+    cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bcd = false;
     cpu->p.i = cpu->presync = true;
     cpu->rst = ALDO_SIG_CLEAR;
 }

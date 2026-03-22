@@ -64,6 +64,10 @@ struct aldo_snapshot {
     } ppu;
 
     struct {
+        bool put;
+    } apu;
+
+    struct {
         const uint8_t           // Non-owning Pointers
             *ram, *vram,
             *oam, *secondary_oam,

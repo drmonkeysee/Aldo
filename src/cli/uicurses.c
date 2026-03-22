@@ -57,7 +57,7 @@ struct viewstate {
     } clock;
     enum ram_selection ramselect;
     int ramsheet, total_ramsheets;
-    bool running;
+    bool chipselect, running;
 };
 
 static void tick_sleep(struct runclock *c)
@@ -111,7 +111,7 @@ struct layout {
         cart,
         prg,
         cpu,
-        ppu,
+        chip,
         ram;
 };
 
@@ -123,6 +123,20 @@ static void drawtoggle(const struct view *v, const char *label, bool selected)
     waddstr(v->content, label);
     if (selected) {
         wattroff(v->content, A_STANDOUT);
+    }
+}
+
+static void draw_tab_bar(const struct view *v, size_t selection, int barw,
+                         size_t tab_count, const int offsets[tab_count],
+                         const char *const restrict labels[tab_count])
+{
+    mvwhline(v->win, 0, 1, 0, barw);
+    for (size_t i = 0; i < tab_count; ++i) {
+        if (i == selection) {
+            mvwprintw(v->win, 0, offsets[i] - 1, "[%s]", labels[i]);
+        } else {
+            mvwaddstr(v->win, 0, offsets[i], labels[i]);
+        }
     }
 }
 
@@ -595,6 +609,14 @@ static void drawbottom_plines(const struct view *v, int cursor_y, int line_x,
                     ArrowDown, -4, vbuf);
 }
 
+static void draw_chip_tabs(const struct view *v, const struct viewstate *vs)
+{
+    static constexpr int offsets[] = {2, 7};
+    static const char *const restrict labels[] = {"PPU", "APU"};
+
+    draw_tab_bar(v, vs->chipselect, 10, aldo_arrsz(offsets), offsets, labels);
+}
+
 static void drawppu(const struct view *v, const struct aldo_snapshot *snp)
 {
     auto w = getmaxx(v->content);
@@ -607,20 +629,31 @@ static void drawppu(const struct view *v, const struct aldo_snapshot *snp)
     drawbottom_plines(v, cursor_y, line_x, snp);
 }
 
-static void drawramtitle(const struct view *v, const struct viewstate *vs)
+static void drawapu(const struct view *v, const struct aldo_snapshot *snp)
 {
-    static constexpr auto titlew = 16;
+    auto apu = &snp->apu;
+    mvwprintw(v->content, 0, 0, "p: %d", apu->put);
+}
+
+static void drawchip(const struct view *v, const struct viewstate *vs,
+                     const struct aldo_snapshot *snp)
+{
+    draw_chip_tabs(v, vs);
+
+    werase(v->content);
+    if (vs->chipselect) {
+        drawapu(v, snp);
+    } else {
+        drawppu(v, snp);
+    }
+}
+
+static void drawramtabs(const struct view *v, const struct viewstate *vs)
+{
     static constexpr int offsets[] = {2, 7, 13};
     static const char *const restrict labels[] = {"RAM", "VRAM", "PPU"};
 
-    mvwhline(v->win, 0, 1, 0, titlew);
-    for (size_t i = 0; i < RSEL_COUNT; ++i) {
-        if (i == vs->ramselect) {
-            mvwprintw(v->win, 0, offsets[i] - 1, "[%s]", labels[i]);
-        } else {
-            mvwaddstr(v->win, 0, offsets[i], labels[i]);
-        }
-    }
+    draw_tab_bar(v, vs->ramselect, 16, aldo_arrsz(offsets), offsets, labels);
 }
 
 static int draw_mempage(const struct view *v, const struct emulator *emu,
@@ -715,7 +748,7 @@ static void drawram(const struct view *v, const struct viewstate *vs,
 {
     static constexpr auto start_x = 5;
 
-    drawramtitle(v, vs);
+    drawramtabs(v, vs);
 
     if (vs->ramselect == RSEL_PPU) {
         draw_ppumem(v, emu, start_x);
@@ -810,8 +843,8 @@ static void init_ui(struct layout *l, int ramsheets)
     vinit(&l->cart, crth, col2w, yoffset, xoffset + col1w, "Cart");
     vinit(&l->prg, maxh - crth, col2w, yoffset + crth, xoffset + col1w, "PRG");
     vinit(&l->cpu, cpuh, col3w, yoffset, xoffset + col1w + col2w, "CPU");
-    vinit(&l->ppu, maxh - cpuh, col3w, yoffset + cpuh, xoffset + col1w + col2w,
-          "PPU");
+    vinit(&l->chip, maxh - cpuh, col3w, yoffset + cpuh, xoffset + col1w + col2w,
+          nullptr);
     raminit(&l->ram, maxh, col4w, yoffset, xoffset + col1w + col2w + col3w,
             ramsheets);
 }
@@ -913,6 +946,9 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         aldo_nes_set_probe(emu->console, ALDO_INT_NMI,
                            !aldo_nes_probe(emu->console, ALDO_INT_NMI));
         break;
+    case 'p':
+        vs->chipselect = !vs->chipselect;
+        break;
     case 'q':
         vs->running = false;
         break;
@@ -939,7 +975,7 @@ static void refresh_ui(const struct layout *l, const struct viewstate *vs,
     drawcart(&l->cart, emu);
     drawprg(&l->prg, emu);
     drawcpu(&l->cpu, &emu->snapshot);
-    drawppu(&l->ppu, &emu->snapshot);
+    drawchip(&l->chip, vs, &emu->snapshot);
     drawram(&l->ram, vs, emu);
 
     update_panels();
@@ -950,7 +986,7 @@ static void refresh_ui(const struct layout *l, const struct viewstate *vs,
 static void cleanup_ui(struct layout *l)
 {
     vcleanup(&l->ram);
-    vcleanup(&l->ppu);
+    vcleanup(&l->chip);
     vcleanup(&l->cpu);
     vcleanup(&l->prg);
     vcleanup(&l->cart);

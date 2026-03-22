@@ -10,6 +10,8 @@
 
 #include "cpu.h"
 
+struct aldo_snapshot;
+
 // The Ricoh RP2A03 Microprocessor; includes the 6502 CPU,
 // Audio Processing Unit (APU), Direct Memory Access (DMA) units,
 // and Joypad control.
@@ -22,5 +24,9 @@ struct aldo_rp2a03 {
 };
 
 void aldo_proc_powerup(struct aldo_rp2a03 *self);
+
+int aldo_proc_cycle(struct aldo_rp2a03 *self);
+
+void aldo_proc_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp);
 
 #endif

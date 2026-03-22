@@ -258,7 +258,7 @@ static void set_cpu_pins(struct aldo_nes001 *self)
 static void snapshot_bus(const struct aldo_nes001 *self,
                          struct aldo_snapshot *snp)
 {
-    aldo_cpu_snapshot(&self->proc.cpu, snp);
+    aldo_proc_snapshot(&self->proc, snp);
     aldo_ppu_bus_snapshot(&self->ppu, snp);
     aldo_bus_copy(self->proc.cpu.mbus, ALDO_CPU_VECTOR_NMI,
                   aldo_arrsz(snp->prg.vectors), snp->prg.vectors);
@@ -365,7 +365,7 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
 
 static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
 {
-    auto cycles = aldo_cpu_cycle(&self->proc.cpu);
+    auto cycles = aldo_proc_cycle(&self->proc);
     set_cpu_pins(self);
     clock->subcycle = 0;
     clock->cycles += (uint64_t)cycles;

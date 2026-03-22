@@ -38,6 +38,8 @@
 		C83A307A2904A2B000749A17 /* version.c in Sources */ = {isa = PBXBuildFile; fileRef = C83A30792904A2B000749A17 /* version.c */; };
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
 		C8561A0C29149EA600290B53 /* mediaruntime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8561A0A29149EA600290B53 /* mediaruntime.cpp */; };
+		C856A1C32F70789100F51C0B /* apu.c in Sources */ = {isa = PBXBuildFile; fileRef = C856A1C12F70789100F51C0B /* apu.c */; };
+		C856A1C52F70789100F51C0B /* apu.c in Sources */ = {isa = PBXBuildFile; fileRef = C856A1C12F70789100F51C0B /* apu.c */; };
 		C85C8DC625BD29AC00611D19 /* dis.c in Sources */ = {isa = PBXBuildFile; fileRef = C85C8DC525BD29AC00611D19 /* dis.c */; };
 		C86030782761A51100F1B27D /* cpupeek.c in Sources */ = {isa = PBXBuildFile; fileRef = C86030772761A51100F1B27D /* cpupeek.c */; };
 		C8702CF9278A58C900725690 /* haltexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = C8702CF8278A58C900725690 /* haltexpr.c */; };
@@ -260,6 +262,8 @@
 		C8557B2E25C661660090296D /* ui.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ui.c; sourceTree = "<group>"; };
 		C8561A0A29149EA600290B53 /* mediaruntime.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mediaruntime.cpp; sourceTree = "<group>"; };
 		C8561A0B29149EA600290B53 /* mediaruntime.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = mediaruntime.hpp; sourceTree = "<group>"; };
+		C856A1C02F70789100F51C0B /* apu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = apu.h; sourceTree = "<group>"; };
+		C856A1C12F70789100F51C0B /* apu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = apu.c; sourceTree = "<group>"; };
 		C85C8DC425BD29AC00611D19 /* dis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dis.h; sourceTree = "<group>"; };
 		C85C8DC525BD29AC00611D19 /* dis.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dis.c; sourceTree = "<group>"; };
 		C86030772761A51100F1B27D /* cpupeek.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpupeek.c; sourceTree = "<group>"; };
@@ -501,6 +505,8 @@
 			children = (
 				C83A30742904973F00749A17 /* cli */,
 				C8B0E66728E01B3E0054547D /* gui */,
+				C856A1C02F70789100F51C0B /* apu.h */,
+				C856A1C12F70789100F51C0B /* apu.c */,
 				C88CABE328FA63DD00551C65 /* bridgeopen.h */,
 				C88CABE428FA63E700551C65 /* bridgeclose.h */,
 				C8C706902751EEBA00B45785 /* bus.h */,
@@ -968,6 +974,7 @@
 				C80CCE062930495300664730 /* cycleclock.c in Sources */,
 				C81680042BE6EEAB005A7905 /* ppu.c in Sources */,
 				C8C706972751EEBA00B45785 /* bytes.c in Sources */,
+				C856A1C32F70789100F51C0B /* apu.c in Sources */,
 				C8C706982751EEBA00B45785 /* mappers.c in Sources */,
 				C8B4664527755790000576EE /* argparse.c in Sources */,
 				C8C706952751EEBA00B45785 /* cart.c in Sources */,
@@ -1039,6 +1046,7 @@
 			files = (
 				C8395D462D3B5CD00046F2D8 /* ctrlsignal.c in Sources */,
 				C80265122957B5060040CE17 /* version.c in Sources */,
+				C856A1C52F70789100F51C0B /* apu.c in Sources */,
 				C8B88AB029062B0200B7CB23 /* mappers.c in Sources */,
 				C8B88AB429062B1300B7CB23 /* tsutil.c in Sources */,
 				C8B88AA829062ADC00B7CB23 /* bus.c in Sources */,

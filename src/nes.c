@@ -7,6 +7,7 @@
 
 #include "nes.h"
 
+#include "apu.h"
 #include "bus.h"
 #include "bytes.h"
 #include "cpu.h"
@@ -22,12 +23,6 @@
 constexpr auto ScreenWidth = 256;
 constexpr auto ScreenHeight = 240;
 
-// The Nintendo RP2A03 Chip; includes the 6502 CPU, Audio Processing Unit (APU),
-// Direct Memory Access (DMA) units, and Joypad control.
-struct rp2a03 {
-    struct aldo_mos6502 cpu;
-};
-
 // The NES-001 NTSC Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
 struct aldo_nes001 {
@@ -36,7 +31,7 @@ struct aldo_nes001 {
     struct aldo_snapshot *snp;  // Console Snapshot; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
     size_t vbuf;                // Current video buffer to fill
-    struct rp2a03 core;         // RP2A03 Core
+    struct aldo_rp2a03 core;    // RP2A03 Core
     struct aldo_rp2c02 ppu;     // RP2C02 PPU
     enum aldo_execmode mode;    // NES execution mode
     struct {

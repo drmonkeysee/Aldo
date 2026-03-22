@@ -1,12 +1,12 @@
 //
-//  proc.h
+//  chip.h
 //  Aldo
 //
 //  Created by Brandon Stansbury on 3/22/26.
 //
 
-#ifndef Aldo_proc_h
-#define Aldo_proc_h
+#ifndef Aldo_chip_h
+#define Aldo_chip_h
 
 #include "cpu.h"
 
@@ -23,10 +23,10 @@ struct aldo_rp2a03 {
                                 // 2 CPU Cycles = 1 APU Cycle.
 };
 
-void aldo_proc_powerup(struct aldo_rp2a03 *self);
+void aldo_chip_powerup(struct aldo_rp2a03 *self);
 
-int aldo_proc_cycle(struct aldo_rp2a03 *self);
+int aldo_chip_cycle(struct aldo_rp2a03 *self);
 
-void aldo_proc_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp);
+void aldo_chip_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp);
 
 #endif

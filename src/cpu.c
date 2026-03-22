@@ -205,7 +205,7 @@ static bool reset_held(struct aldo_mos6502 *self)
         detach(self);
         self->presync = true;
     }
-    return self->rst == ALDO_SIG_COMMITTED && !self->signal.rst;
+    return aldo_cpu_reset_pending(self);
 }
 
 //
@@ -1726,6 +1726,12 @@ int aldo_cpu_cycle(struct aldo_mos6502 *self)
     }
     check_interrupts(self);
     return 1;
+}
+
+bool aldo_cpu_reset_pending(const struct aldo_mos6502 *self)
+{
+    return (self->rst == ALDO_SIG_COMMITTED && !self->signal.rst)
+            || self->rst == ALDO_SIG_PENDING;
 }
 
 bool aldo_cpu_jammed(const struct aldo_mos6502 *self)

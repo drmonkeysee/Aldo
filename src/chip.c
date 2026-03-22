@@ -31,7 +31,9 @@ int aldo_chip_cycle(struct aldo_rp2a03 *self)
     assert(self != nullptr);
 
     // TODO: run apu/dma/etc
-    self->put = !self->put;
+    if (!aldo_cpu_reset_pending(&self->cpu)) {
+        self->put = !self->put;
+    }
     return aldo_cpu_cycle(&self->cpu);
 }
 

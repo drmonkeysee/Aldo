@@ -9,7 +9,9 @@
 
 #include "bus.h"
 #include "bytes.h"
+#include "chip.h"
 #include "ciny.h"
+#include "cpu.h"
 #include "ctrlsignal.h"
 
 static bool test_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
@@ -44,6 +46,25 @@ static aldo_bus *restrict TestBus;
 static struct aldo_busdevice
     Ram = {.read = test_read, .write = test_write}, Rom = {.read = test_read};
 
+static void connect_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
+                        uint8_t *restrict rom)
+{
+    cpu->mbus = TestBus;
+    Ram.ctx = ram;
+    aldo_bus_set(TestBus, 0x0, ram ? Ram : (struct aldo_busdevice){});
+    Rom.ctx = rom;
+    aldo_bus_set(TestBus, ALDO_MEMBLOCK_32KB,
+                 rom ? Rom : (struct aldo_busdevice){});
+    RomWriteCapture = -1;
+}
+
+static void reset_cpu(struct aldo_mos6502 *cpu)
+{
+    cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bcd = false;
+    cpu->p.i = cpu->presync = true;
+    cpu->rst = ALDO_SIG_CLEAR;
+}
+
 //
 // MARK: - Public Interface
 //
@@ -69,17 +90,9 @@ void teardown_testbus()
 void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
                uint8_t *restrict rom)
 {
-    cpu->mbus = TestBus;
-    Ram.ctx = ram;
-    aldo_bus_set(TestBus, 0x0, ram ? Ram : (struct aldo_busdevice){});
-    Rom.ctx = rom;
-    aldo_bus_set(TestBus, ALDO_MEMBLOCK_32KB,
-                 rom ? Rom : (struct aldo_busdevice){});
-    RomWriteCapture = -1;
+    connect_cpu(cpu, ram, rom);
     aldo_cpu_powerup(cpu);
-    cpu->p.c = cpu->p.z = cpu->p.d = cpu->p.v = cpu->p.n = cpu->bcd = false;
-    cpu->p.i = cpu->presync = true;
-    cpu->rst = ALDO_SIG_CLEAR;
+    reset_cpu(cpu);
 }
 
 void enable_rom_wcapture()
@@ -98,4 +111,12 @@ int exec_cpu(struct aldo_mos6502 *cpu)
         ct_asserttrue(cycles <= Aldo_MaxTCycle);
     } while (!cpu->presync);
     return cycles;
+}
+
+void setup_chip(struct aldo_rp2a03 *chip, uint8_t *restrict ram,
+                uint8_t *restrict rom)
+{
+    connect_cpu(&chip->cpu, ram, rom);
+    aldo_chip_powerup(chip);
+    reset_cpu(&chip->cpu);
 }

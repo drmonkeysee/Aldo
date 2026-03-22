@@ -8,16 +8,20 @@
 #ifndef AldoTests_cpuhelp_h
 #define AldoTests_cpuhelp_h
 
-#include "cpu.h"
-
 #include <stdint.h>
 
 extern uint8_t BigRom[];
 extern int RomWriteCapture;
 
+struct aldo_mos6502;
+struct aldo_rp2a03;
+
 void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
                uint8_t *restrict rom);
 void enable_rom_wcapture();
 int exec_cpu(struct aldo_mos6502 *cpu);
+
+void setup_chip(struct aldo_rp2a03 *chip, uint8_t *restrict ram,
+                uint8_t *restrict rom);
 
 #endif

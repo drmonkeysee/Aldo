@@ -15,8 +15,8 @@ static void powerup_initializes_chip(void *ctx)
 
     aldo_chip_powerup(&chip);
 
-    ct_assertequal(0, chip.oam.dma);
-    ct_assertequal(0, chip.oam.low);
+    ct_assertequal(0u, chip.oam.dma);
+    ct_assertequal(0u, chip.oam.low);
     ct_assertfalse(chip.oam.active);
     ct_asserttrue(chip.signal.rdy);
     ct_assertfalse(chip.put);

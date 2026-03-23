@@ -30,7 +30,7 @@ static void asl(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -49,7 +49,7 @@ static void asl_carry(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -448,7 +448,7 @@ static void lsr(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -595,7 +595,7 @@ static void rol(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -614,7 +614,7 @@ static void rol_carry(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -730,7 +730,7 @@ static void ror(void *ctx)
     ct_assertequal(1u, cpu.pc);
     ct_assertequal(0xffu, cpu.databus);
 
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);

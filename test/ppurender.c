@@ -189,7 +189,7 @@ static void tile_fetch(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(6, ppu->dot);
-    ct_assertequal(0x5u, ppu->v);
+    ct_assertequal(5u, ppu->v);
     ct_assertequal(4u, ppu->pxpl.atb);
     ct_assertequal(0x0110u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
@@ -202,7 +202,7 @@ static void tile_fetch(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(7, ppu->dot);
-    ct_assertequal(0x5u, ppu->v);
+    ct_assertequal(5u, ppu->v);
     ct_assertequal(4u, ppu->pxpl.atb);
     ct_assertequal(0x0110u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
@@ -215,7 +215,7 @@ static void tile_fetch(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(8, ppu->dot);
-    ct_assertequal(0x5u, ppu->v);
+    ct_assertequal(5u, ppu->v);
     ct_assertequal(4u, ppu->pxpl.atb);
     ct_assertequal(0x0118u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
@@ -228,7 +228,7 @@ static void tile_fetch(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(9, ppu->dot);
-    ct_assertequal(0x6u, ppu->v);
+    ct_assertequal(6u, ppu->v);
     ct_assertequal(0u, ppu->pxpl.atb);
     ct_assertequal(0x0118u, ppu->vaddrbus);
     ct_assertequal(0x44u, ppu->vdatabus);
@@ -725,7 +725,7 @@ static void render_line_end(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(256, ppu->dot);
-    ct_assertequal(0x5u, ppu->v);
+    ct_assertequal(5u, ppu->v);
     ct_assertequal(4u, ppu->pxpl.atb);
     ct_assertequal(0x0118u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
@@ -849,7 +849,7 @@ static void render_line_prefetch(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(326, ppu->dot);
-    ct_assertequal(0x5u, ppu->v);
+    ct_assertequal(5u, ppu->v);
     ct_assertequal(0x0110u, ppu->vaddrbus);
     ct_assertequal(0x22u, ppu->vdatabus);
     ct_assertequal(0u, ppu->pxpl.bg[0]);
@@ -860,7 +860,7 @@ static void render_line_prefetch(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(327, ppu->dot);
-    ct_assertequal(0x5u, ppu->v);
+    ct_assertequal(5u, ppu->v);
     ct_assertequal(0x0110u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
     ct_assertequal(0x33u, ppu->pxpl.bg[0]);
@@ -871,7 +871,7 @@ static void render_line_prefetch(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(328, ppu->dot);
-    ct_assertequal(0x5u, ppu->v);
+    ct_assertequal(5u, ppu->v);
     ct_assertequal(0x0118u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
     ct_assertequal(0x33u, ppu->pxpl.bg[0]);
@@ -882,7 +882,7 @@ static void render_line_prefetch(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(329, ppu->dot);
-    ct_assertequal(0x6u, ppu->v);
+    ct_assertequal(6u, ppu->v);
     ct_assertequal(0u, ppu->pxpl.atb);
     ct_assertequal(0x0118u, ppu->vaddrbus);
     ct_assertequal(0x44u, ppu->vdatabus);
@@ -938,7 +938,7 @@ static void render_line_prefetch(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(334, ppu->dot);
-    ct_assertequal(0x6u, ppu->v);
+    ct_assertequal(6u, ppu->v);
     ct_assertequal(0x0aa0u, ppu->vaddrbus);
     ct_assertequal(0x22u, ppu->vdatabus);
     ct_assertequal(0x33u, ppu->pxpl.bg[0]);
@@ -949,7 +949,7 @@ static void render_line_prefetch(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(335, ppu->dot);
-    ct_assertequal(0x6u, ppu->v);
+    ct_assertequal(6u, ppu->v);
     ct_assertequal(0x0aa0u, ppu->vaddrbus);
     ct_assertequal(0xbbu, ppu->vdatabus);
     ct_assertequal(0xbbu, ppu->pxpl.bg[0]);
@@ -960,7 +960,7 @@ static void render_line_prefetch(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(336, ppu->dot);
-    ct_assertequal(0x6u, ppu->v);
+    ct_assertequal(6u, ppu->v);
     ct_assertequal(0x0aa8u, ppu->vaddrbus);
     ct_assertequal(0xbbu, ppu->vdatabus);
     ct_assertequal(0xbbu, ppu->pxpl.bg[0]);
@@ -971,7 +971,7 @@ static void render_line_prefetch(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(337, ppu->dot);
-    ct_assertequal(0x7u, ppu->v);
+    ct_assertequal(7u, ppu->v);
     ct_assertequal(2u, ppu->pxpl.atb);
     ct_assertequal(0x0aa8u, ppu->vaddrbus);
     ct_assertequal(0xccu, ppu->vdatabus);
@@ -1022,7 +1022,7 @@ static void render_line_prefetch(void *ctx)
 
     ct_assertequal(1, ppu->line);
     ct_assertequal(1, ppu->dot);
-    ct_assertequal(0x7u, ppu->v);
+    ct_assertequal(7u, ppu->v);
     ct_assertequal(0x0ee0u, ppu->vaddrbus);
     ct_assertequal(0xeeu, ppu->vdatabus);
     ct_assertequal(0xbbu, ppu->pxpl.bg[0]);
@@ -1153,7 +1153,7 @@ static void prerender_set_vertical_coords(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(280, ppu->dot);
-    ct_assertequal(0x5u, ppu->v);
+    ct_assertequal(5u, ppu->v);
 
     do {
         aldo_ppu_cycle(ppu);
@@ -1165,7 +1165,7 @@ static void prerender_set_vertical_coords(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(306, ppu->dot);
-    ct_assertequal(0x5u, ppu->v);
+    ct_assertequal(5u, ppu->v);
 }
 
 static void render_not_set_vertical_coords(void *ctx)
@@ -1178,19 +1178,19 @@ static void render_not_set_vertical_coords(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(280, ppu->dot);
-    ct_assertequal(0x5u, ppu->v);
+    ct_assertequal(5u, ppu->v);
 
     do {
         aldo_ppu_cycle(ppu);
 
-        ct_assertequal(0x5u, ppu->v);
+        ct_assertequal(5u, ppu->v);
         ppu->v = 0x5;
     } while (ppu->dot < 305);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(306, ppu->dot);
-    ct_assertequal(0x5u, ppu->v);
+    ct_assertequal(5u, ppu->v);
 }
 
 //
@@ -1258,7 +1258,7 @@ static void course_y_overflow(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(257, ppu->dot);
-    ct_assertequal(0x3e6u, ppu->v);    // 000 00 11111 00110
+    ct_assertequal(0x3e6u, ppu->v);     // 000 00 11111 00110
     // atb set to previous course-x/y selection
     ct_assertequal(4u, ppu->pxpl.atb);
 
@@ -1268,7 +1268,7 @@ static void course_y_overflow(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(257, ppu->dot);
-    ct_assertequal(0x7u, ppu->v);       // 000 00 00000 00111
+    ct_assertequal(7u, ppu->v);         // 000 00 00000 00111
     // atb set to previous course-x/y selection
     ct_assertequal(6u, ppu->pxpl.atb);
 }
@@ -1291,7 +1291,7 @@ static void secondary_oam_clear(void *ctx)
 
     ct_assertequal(1, ppu->dot);
     ct_assertequal(0u, spr->oamd);
-    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(1u, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0u, spr->soaddr);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
@@ -1300,7 +1300,7 @@ static void secondary_oam_clear(void *ctx)
 
     ct_assertequal(2, ppu->dot);
     ct_assertequal(0xffu, spr->oamd);
-    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(1u, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0u, spr->soaddr);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
@@ -1311,7 +1311,7 @@ static void secondary_oam_clear(void *ctx)
     ct_assertequal(0xffu, spr->oamd);
     ct_assertequal(0xffu, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
 
     for (auto i = 3; i < 65; ++i) {
@@ -1340,7 +1340,7 @@ static void secondary_oam_clear_with_offset_soamaddr(void *ctx)
 
     ct_assertequal(1, ppu->dot);
     ct_assertequal(0u, spr->oamd);
-    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(1u, spr->soam[0]);
     ct_assertequal(0x11u, spr->soam[16]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x10u, spr->soaddr);
@@ -1350,7 +1350,7 @@ static void secondary_oam_clear_with_offset_soamaddr(void *ctx)
 
     ct_assertequal(2, ppu->dot);
     ct_assertequal(0xffu, spr->oamd);
-    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(1u, spr->soam[0]);
     ct_assertequal(0x11u, spr->soam[16]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x10u, spr->soaddr);
@@ -1360,7 +1360,7 @@ static void secondary_oam_clear_with_offset_soamaddr(void *ctx)
 
     ct_assertequal(3, ppu->dot);
     ct_assertequal(0xffu, spr->oamd);
-    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(1u, spr->soam[0]);
     ct_assertequal(0xffu, spr->soam[16]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0x11u, spr->soaddr);
@@ -1393,7 +1393,7 @@ static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
 
     ct_assertequal(1, ppu->dot);
     ct_assertequal(0u, spr->oamd);
-    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(1u, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0u, spr->soaddr);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
@@ -1402,7 +1402,7 @@ static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
 
     ct_assertequal(2, ppu->dot);
     ct_assertequal(0u, spr->oamd);
-    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(1u, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0u, spr->soaddr);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
@@ -1411,7 +1411,7 @@ static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
 
     ct_assertequal(3, ppu->dot);
     ct_assertequal(0u, spr->oamd);
-    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(1u, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0u, spr->soaddr);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
@@ -1421,7 +1421,7 @@ static void secondary_oam_does_not_clear_on_prerender_line(void *ctx)
     }
     ct_assertequal(65, ppu->dot);
     ct_assertequal(0u, spr->oamd);
-    ct_assertequal(0x1u, spr->soam[0]);
+    ct_assertequal(1u, spr->soam[0]);
     ct_assertequal(0x20u, spr->soam[31]);
     ct_assertequal(0u, spr->soaddr);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
@@ -1454,7 +1454,7 @@ static void sprite_below_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(67, ppu->dot);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(20u, spr->oamd);
     ct_assertequal(0u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
@@ -1463,7 +1463,7 @@ static void sprite_below_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(68, ppu->dot);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(50u, spr->oamd);
     ct_assertequal(0u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
@@ -1497,7 +1497,7 @@ static void sprite_above_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(67, ppu->dot);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(20u, spr->oamd);
     ct_assertequal(0u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
@@ -1506,7 +1506,7 @@ static void sprite_above_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(68, ppu->dot);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(50u, spr->oamd);
     ct_assertequal(0u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
@@ -1540,18 +1540,18 @@ static void sprite_top_on_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(67, ppu->dot);
-    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(1u, ppu->oamaddr);
     ct_assertequal(20u, spr->oamd);
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(68, ppu->dot);
-    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(1u, ppu->oamaddr);
     ct_assertequal(0x22u, spr->oamd);
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0xffu, spr->soam[1]);
     ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
@@ -1559,9 +1559,9 @@ static void sprite_top_on_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(69, ppu->dot);
-    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(2u, ppu->oamaddr);
     ct_assertequal(0x22u, spr->oamd);
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
@@ -1569,9 +1569,9 @@ static void sprite_top_on_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(70, ppu->dot);
-    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(2u, ppu->oamaddr);
     ct_assertequal(0x23u, spr->oamd);
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0xffu, spr->soam[2]);
@@ -1580,9 +1580,9 @@ static void sprite_top_on_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(71, ppu->dot);
-    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(3u, ppu->oamaddr);
     ct_assertequal(0x23u, spr->oamd);
-    ct_assertequal(0x3u, spr->soaddr);
+    ct_assertequal(3u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x23u, spr->soam[2]);
@@ -1591,9 +1591,9 @@ static void sprite_top_on_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(72, ppu->dot);
-    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(3u, ppu->oamaddr);
     ct_assertequal(32u, spr->oamd);
-    ct_assertequal(0x3u, spr->soaddr);
+    ct_assertequal(3u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x23u, spr->soam[2]);
@@ -1603,9 +1603,9 @@ static void sprite_top_on_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(73, ppu->dot);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(32u, spr->oamd);
-    ct_assertequal(0x4u, spr->soaddr);
+    ct_assertequal(4u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x23u, spr->soam[2]);
@@ -1640,18 +1640,18 @@ static void sprite_bottom_on_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(67, ppu->dot);
-    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(1u, ppu->oamaddr);
     ct_assertequal(20u, spr->oamd);
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(68, ppu->dot);
-    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(1u, ppu->oamaddr);
     ct_assertequal(0x22u, spr->oamd);
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0xffu, spr->soam[1]);
     ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
@@ -1659,9 +1659,9 @@ static void sprite_bottom_on_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(69, ppu->dot);
-    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(2u, ppu->oamaddr);
     ct_assertequal(0x22u, spr->oamd);
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
@@ -1669,9 +1669,9 @@ static void sprite_bottom_on_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(70, ppu->dot);
-    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(2u, ppu->oamaddr);
     ct_assertequal(0x23u, spr->oamd);
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0xffu, spr->soam[2]);
@@ -1680,9 +1680,9 @@ static void sprite_bottom_on_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(71, ppu->dot);
-    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(3u, ppu->oamaddr);
     ct_assertequal(0x23u, spr->oamd);
-    ct_assertequal(0x3u, spr->soaddr);
+    ct_assertequal(3u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x23u, spr->soam[2]);
@@ -1691,9 +1691,9 @@ static void sprite_bottom_on_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(72, ppu->dot);
-    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(3u, ppu->oamaddr);
     ct_assertequal(32u, spr->oamd);
-    ct_assertequal(0x3u, spr->soaddr);
+    ct_assertequal(3u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x23u, spr->soam[2]);
@@ -1703,9 +1703,9 @@ static void sprite_bottom_on_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(73, ppu->dot);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(32u, spr->oamd);
-    ct_assertequal(0x4u, spr->soaddr);
+    ct_assertequal(4u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x23u, spr->soam[2]);
@@ -1742,18 +1742,18 @@ static void sprite_sixteen_within_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(67, ppu->dot);
-    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(1u, ppu->oamaddr);
     ct_assertequal(20u, spr->oamd);
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(68, ppu->dot);
-    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(1u, ppu->oamaddr);
     ct_assertequal(0x22u, spr->oamd);
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0xffu, spr->soam[1]);
     ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
@@ -1761,9 +1761,9 @@ static void sprite_sixteen_within_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(69, ppu->dot);
-    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(2u, ppu->oamaddr);
     ct_assertequal(0x22u, spr->oamd);
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
@@ -1771,9 +1771,9 @@ static void sprite_sixteen_within_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(70, ppu->dot);
-    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(2u, ppu->oamaddr);
     ct_assertequal(0x23u, spr->oamd);
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0xffu, spr->soam[2]);
@@ -1782,9 +1782,9 @@ static void sprite_sixteen_within_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(71, ppu->dot);
-    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(3u, ppu->oamaddr);
     ct_assertequal(0x23u, spr->oamd);
-    ct_assertequal(0x3u, spr->soaddr);
+    ct_assertequal(3u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x23u, spr->soam[2]);
@@ -1793,9 +1793,9 @@ static void sprite_sixteen_within_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(72, ppu->dot);
-    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(3u, ppu->oamaddr);
     ct_assertequal(32u, spr->oamd);
-    ct_assertequal(0x3u, spr->soaddr);
+    ct_assertequal(3u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x23u, spr->soam[2]);
@@ -1805,9 +1805,9 @@ static void sprite_sixteen_within_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(73, ppu->dot);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(32u, spr->oamd);
-    ct_assertequal(0x4u, spr->soaddr);
+    ct_assertequal(4u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x23u, spr->soam[2]);
@@ -1844,18 +1844,18 @@ static void sprite_sixteen_bottom_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(67, ppu->dot);
-    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(1u, ppu->oamaddr);
     ct_assertequal(20u, spr->oamd);
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(68, ppu->dot);
-    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(1u, ppu->oamaddr);
     ct_assertequal(0x22u, spr->oamd);
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0xffu, spr->soam[1]);
     ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
@@ -1863,9 +1863,9 @@ static void sprite_sixteen_bottom_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(69, ppu->dot);
-    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(2u, ppu->oamaddr);
     ct_assertequal(0x22u, spr->oamd);
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(ALDO_PPU_SPR_COPY, (int)spr->s);
@@ -1873,9 +1873,9 @@ static void sprite_sixteen_bottom_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(70, ppu->dot);
-    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(2u, ppu->oamaddr);
     ct_assertequal(0x23u, spr->oamd);
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0xffu, spr->soam[2]);
@@ -1884,9 +1884,9 @@ static void sprite_sixteen_bottom_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(71, ppu->dot);
-    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(3u, ppu->oamaddr);
     ct_assertequal(0x23u, spr->oamd);
-    ct_assertequal(0x3u, spr->soaddr);
+    ct_assertequal(3u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x23u, spr->soam[2]);
@@ -1895,9 +1895,9 @@ static void sprite_sixteen_bottom_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(72, ppu->dot);
-    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(3u, ppu->oamaddr);
     ct_assertequal(32u, spr->oamd);
-    ct_assertequal(0x3u, spr->soaddr);
+    ct_assertequal(3u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x23u, spr->soam[2]);
@@ -1907,9 +1907,9 @@ static void sprite_sixteen_bottom_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(73, ppu->dot);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(32u, spr->oamd);
-    ct_assertequal(0x4u, spr->soaddr);
+    ct_assertequal(4u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
     ct_assertequal(0x22u, spr->soam[1]);
     ct_assertequal(0x23u, spr->soam[2]);
@@ -1945,7 +1945,7 @@ static void sprite_sixteen_above_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(67, ppu->dot);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(20u, spr->oamd);
     ct_assertequal(0u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
@@ -1954,7 +1954,7 @@ static void sprite_sixteen_above_scanline(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(68, ppu->dot);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(50u, spr->oamd);
     ct_assertequal(0u, spr->soaddr);
     ct_assertequal(20u, spr->soam[0]);
@@ -2050,7 +2050,7 @@ static void sprite_evaluation_partial_scanline(void *ctx)
     ct_assertequal(12, ppu->line);
     ct_assertequal(12u, spr->soam[0]);
     ct_assertequal(0x10u, spr->soam[1]);
-    ct_assertequal(0x3u, spr->soam[2]);
+    ct_assertequal(3u, spr->soam[2]);
     ct_assertequal(0x12u, spr->soam[3]);
     ct_assertequal(10u, spr->soam[4]);
     ct_assertequal(0x20u, spr->soam[5]);
@@ -2284,7 +2284,7 @@ static void sprite_evaluation_fill_with_no_overflows(void *ctx)
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
     ct_assertequal(0u, spr->soaddr);
-    ct_assertequal(0x2u, ppu->oamaddr);     // OAM[0][2]
+    ct_assertequal(2u, ppu->oamaddr);       // OAM[0][2]
     ct_assertequal(0u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
     ct_assertfalse(ppu->status.o);
@@ -2367,7 +2367,7 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(0x21u, ppu->oamaddr);    // OAM[8][1]
     ct_assertequal(10u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2380,7 +2380,7 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(0x21u, ppu->oamaddr);    // OAM[8][1]
     ct_assertequal(0x90u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2393,7 +2393,7 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(0x22u, ppu->oamaddr);    // OAM[8][2]
     ct_assertequal(0x90u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2406,7 +2406,7 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(0x22u, ppu->oamaddr);    // OAM[8][2]
     ct_assertequal(0x81u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2419,7 +2419,7 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x3u, spr->soaddr);
+    ct_assertequal(3u, spr->soaddr);
     ct_assertequal(0x23u, ppu->oamaddr);    // OAM[8][3]
     ct_assertequal(0x81u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2432,7 +2432,7 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x3u, spr->soaddr);
+    ct_assertequal(3u, spr->soaddr);
     ct_assertequal(0x23u, ppu->oamaddr);    // OAM[8][3]
     ct_assertequal(0x92u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2445,7 +2445,7 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x4u, spr->soaddr);
+    ct_assertequal(4u, spr->soaddr);
     ct_assertequal(0x24u, ppu->oamaddr);    // OAM[9][0]
     ct_assertequal(0x92u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
@@ -2458,7 +2458,7 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x4u, spr->soaddr);
+    ct_assertequal(4u, spr->soaddr);
     ct_assertequal(0x24u, ppu->oamaddr);    // OAM[9][0]
     ct_assertequal(0u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
@@ -2470,7 +2470,7 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x4u, spr->soaddr);
+    ct_assertequal(4u, spr->soaddr);
     ct_assertequal(0x28u, ppu->oamaddr);    // OAM[10][0]
     ct_assertequal(0u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
@@ -2486,7 +2486,7 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x4u, spr->soaddr);
+    ct_assertequal(4u, spr->soaddr);
     ct_assertequal(0u, ppu->oamaddr);       // OAM[0][0]
     ct_assertequal(0u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
@@ -2501,7 +2501,7 @@ static void sprite_evaluation_next_sprite_overflows(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x4u, spr->soaddr);
+    ct_assertequal(4u, spr->soaddr);
     ct_assertequal(0x14u, ppu->oamaddr);    // ends up on the 6th sprite
     ct_assertequal(7u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
@@ -2588,7 +2588,7 @@ static void sprite_evaluation_overflow_false_positive(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(0x26u, ppu->oamaddr);    // OAM[9][2]
     ct_assertequal(9u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2601,7 +2601,7 @@ static void sprite_evaluation_overflow_false_positive(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(0x26u, ppu->oamaddr);    // OAM[9][2]
     ct_assertequal(0x81u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2614,7 +2614,7 @@ static void sprite_evaluation_overflow_false_positive(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(0x27u, ppu->oamaddr);    // OAM[9][3]
     ct_assertequal(0x81u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2627,7 +2627,7 @@ static void sprite_evaluation_overflow_false_positive(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(0x27u, ppu->oamaddr);    // OAM[9][3]
     ct_assertequal(0x92u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2640,7 +2640,7 @@ static void sprite_evaluation_overflow_false_positive(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x3u, spr->soaddr);
+    ct_assertequal(3u, spr->soaddr);
     ct_assertequal(0x28u, ppu->oamaddr);    // OAM[10][0]
     ct_assertequal(0x92u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2653,7 +2653,7 @@ static void sprite_evaluation_overflow_false_positive(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x3u, spr->soaddr);
+    ct_assertequal(3u, spr->soaddr);
     ct_assertequal(0x28u, ppu->oamaddr);    // OAM[10][0]
     ct_assertequal(0u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2666,7 +2666,7 @@ static void sprite_evaluation_overflow_false_positive(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x4u, spr->soaddr);
+    ct_assertequal(4u, spr->soaddr);
     ct_assertequal(0x29u, ppu->oamaddr);    // OAM[10][1]
     ct_assertequal(0u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_FULL, (int)spr->s);
@@ -2681,7 +2681,7 @@ static void sprite_evaluation_overflow_false_positive(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x4u, spr->soaddr);
+    ct_assertequal(4u, spr->soaddr);
     ct_assertequal(0x15u, ppu->oamaddr);    // ends up on the 6th sprite, tile attribute
     ct_assertequal(0x50u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
@@ -2873,7 +2873,7 @@ static void sprite_evaluation_oam_overflow_during_sprite_overflow(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(0xffu, ppu->oamaddr);    // OAM[63][3]
     ct_assertequal(35u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2886,7 +2886,7 @@ static void sprite_evaluation_oam_overflow_during_sprite_overflow(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x1u, spr->soaddr);
+    ct_assertequal(1u, spr->soaddr);
     ct_assertequal(0xffu, ppu->oamaddr);    // OAM[63][3]
     ct_assertequal(0x92u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_OVER, (int)spr->s);
@@ -2899,7 +2899,7 @@ static void sprite_evaluation_oam_overflow_during_sprite_overflow(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(0u, ppu->oamaddr);       // OAM[0][0]
     ct_assertequal(0x92u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
@@ -2914,7 +2914,7 @@ static void sprite_evaluation_oam_overflow_during_sprite_overflow(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(spr->soam); ++i) {
         ct_assertequal(sprites[i], spr->soam[i], "unexpected soam value at %zu", i);
     }
-    ct_assertequal(0x2u, spr->soaddr);
+    ct_assertequal(2u, spr->soaddr);
     ct_assertequal(0x1cu, ppu->oamaddr);    // ends up on the 8th sprite
     ct_assertequal(31u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
@@ -3010,8 +3010,8 @@ static void sprite_evaluation_oamaddr_misaligned(void *ctx)
             ct_assertequal(0xffu, spr->soam[i]);
         }
     }
-    ct_assertequal(0x4u, spr->soaddr);  // secondary OAM contains 1 sprite
-    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(4u, spr->soaddr);    // secondary OAM contains 1 sprite
+    ct_assertequal(3u, ppu->oamaddr);
     ct_assertequal(0u, spr->oamd);
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
 }
@@ -3246,9 +3246,9 @@ static void first_pixel_bg(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(5, ppu->dot);
-    ct_assertequal(0x9u, ppu->pxpl.mux);
+    ct_assertequal(9u, ppu->pxpl.mux);
     ct_assertequal(0xbu, ppu->pxpl.pal);
-    ct_assertequal(0x6u, ppu->pxpl.px);
+    ct_assertequal(6u, ppu->pxpl.px);
     ct_asserttrue(ppu->signal.vout);
 }
 
@@ -3275,9 +3275,9 @@ static void last_pixel_bg(void *ctx)
     ct_asserttrue(ppu->pxpl.atl[1]);
     ct_assertequal(0u, ppu->pxpl.ats[0]);
     ct_assertequal(0xffu, ppu->pxpl.ats[1]);
-    ct_assertequal(0x9u, ppu->pxpl.mux);
-    ct_assertequal(0x1u, ppu->pxpl.pal);
-    ct_assertequal(0x2u, ppu->pxpl.px);
+    ct_assertequal(9u, ppu->pxpl.mux);
+    ct_assertequal(1u, ppu->pxpl.pal);
+    ct_assertequal(2u, ppu->pxpl.px);
     ct_asserttrue(ppu->signal.vout);
 
     ppu->pxpl.bg[0] = 0x11;
@@ -3295,7 +3295,7 @@ static void last_pixel_bg(void *ctx)
     ct_assertequal(0u, ppu->pxpl.ats[0]);
     ct_assertequal(0xffu, ppu->pxpl.ats[1]);
     ct_assertequal(0xau, ppu->pxpl.mux);
-    ct_assertequal(0x9u, ppu->pxpl.pal);
+    ct_assertequal(9u, ppu->pxpl.pal);
     ct_assertequal(0u, ppu->pxpl.px);
     ct_asserttrue(ppu->signal.vout);
 
@@ -3307,11 +3307,11 @@ static void last_pixel_bg(void *ctx)
     ct_assertequal(0x3e45u, ppu->pxpl.bgs[1]);
     ct_asserttrue(ppu->pxpl.atl[0]);
     ct_assertfalse(ppu->pxpl.atl[1]);
-    ct_assertequal(0x1u, ppu->pxpl.ats[0]);
+    ct_assertequal(1u, ppu->pxpl.ats[0]);
     ct_assertequal(0xfeu, ppu->pxpl.ats[1]);
     ct_assertequal(0xbu, ppu->pxpl.mux);
     ct_assertequal(0xau, ppu->pxpl.pal);
-    ct_assertequal(0x5u, ppu->pxpl.px);
+    ct_assertequal(5u, ppu->pxpl.px);
     ct_asserttrue(ppu->signal.vout);
 
     // Last Pixel Output
@@ -3322,11 +3322,11 @@ static void last_pixel_bg(void *ctx)
     ct_assertequal(0x7c8bu, ppu->pxpl.bgs[1]);
     ct_asserttrue(ppu->pxpl.atl[0]);
     ct_assertfalse(ppu->pxpl.atl[1]);
-    ct_assertequal(0x3u, ppu->pxpl.ats[0]);
+    ct_assertequal(3u, ppu->pxpl.ats[0]);
     ct_assertequal(0xfcu, ppu->pxpl.ats[1]);
-    ct_assertequal(0x9u, ppu->pxpl.mux);
+    ct_assertequal(9u, ppu->pxpl.mux);
     ct_assertequal(0xbu, ppu->pxpl.pal);
-    ct_assertequal(0x6u, ppu->pxpl.px);
+    ct_assertequal(6u, ppu->pxpl.px);
     ct_asserttrue(ppu->signal.vout);
 
     // Video Out Stops, Pipeline Idle
@@ -3337,11 +3337,11 @@ static void last_pixel_bg(void *ctx)
     ct_assertequal(0x7c8bu, ppu->pxpl.bgs[1]);
     ct_asserttrue(ppu->pxpl.atl[0]);
     ct_assertfalse(ppu->pxpl.atl[1]);
-    ct_assertequal(0x3u, ppu->pxpl.ats[0]);
+    ct_assertequal(3u, ppu->pxpl.ats[0]);
     ct_assertequal(0xfcu, ppu->pxpl.ats[1]);
-    ct_assertequal(0x9u, ppu->pxpl.mux);
+    ct_assertequal(9u, ppu->pxpl.mux);
     ct_assertequal(0xbu, ppu->pxpl.pal);
-    ct_assertequal(0x6u, ppu->pxpl.px);
+    ct_assertequal(6u, ppu->pxpl.px);
     ct_assertfalse(ppu->signal.vout);
 }
 
@@ -3358,9 +3358,9 @@ static void pixel_postrender_bg(void *ctx)
         aldo_ppu_cycle(ppu);
 
         ct_assertequal(10 + i + 1, ppu->dot);
-        ct_assertequal(0x4u, ppu->pxpl.mux);
-        ct_assertequal(0x5u, ppu->pxpl.pal);
-        ct_assertequal(0x7u, ppu->pxpl.px);
+        ct_assertequal(4u, ppu->pxpl.mux);
+        ct_assertequal(5u, ppu->pxpl.pal);
+        ct_assertequal(7u, ppu->pxpl.px);
         ct_assertfalse(ppu->signal.vout);
     }
 }
@@ -3378,13 +3378,13 @@ static void pixel_transparent_bg(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(0x4u, ppu->pxpl.mux);
+    ct_assertequal(4u, ppu->pxpl.mux);
     ct_assertequal(0u, ppu->pxpl.pal);
     ct_assertequal(0x11u, ppu->pxpl.px);
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(0x8u, ppu->pxpl.mux);
+    ct_assertequal(8u, ppu->pxpl.mux);
     ct_assertequal(0u, ppu->pxpl.pal);
     ct_assertequal(0x24u, ppu->pxpl.px);
 
@@ -3501,11 +3501,11 @@ static void rendering_disabled_explicit_bg_palette(void *ctx)
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(0x9u, ppu->pxpl.pal);
+    ct_assertequal(9u, ppu->pxpl.pal);
 
     aldo_ppu_cycle(ppu);
 
-    ct_assertequal(0x5u, ppu->pxpl.px);
+    ct_assertequal(5u, ppu->pxpl.px);
     ct_asserttrue(ppu->signal.vout);
 }
 

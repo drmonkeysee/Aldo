@@ -50,7 +50,7 @@ static void and_abs(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x8u, cpu.a);
+    ct_assertequal(8u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -69,7 +69,7 @@ static void asl_abs(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[516]);
+    ct_assertequal(2u, mem[516]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -88,7 +88,7 @@ static void bit_abs(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
     ct_assertfalse(cpu.p.n);
@@ -183,7 +183,7 @@ static void eor_abs(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x6u, cpu.a);
+    ct_assertequal(6u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -202,7 +202,7 @@ static void inc_abs(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[516]);
+    ct_assertequal(1u, mem[516]);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -272,7 +272,7 @@ static void lsr_abs(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[516]);
+    ct_assertequal(1u, mem[516]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -311,7 +311,7 @@ static void rol_abs(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[516]);
+    ct_assertequal(1u, mem[516]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -352,7 +352,7 @@ static void sbc_abs(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -472,7 +472,7 @@ static void and_absx(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x8u, cpu.a);
+    ct_assertequal(8u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -510,7 +510,7 @@ static void asl_absx(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[519]);
+    ct_assertequal(2u, mem[519]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -531,7 +531,7 @@ static void asl_absx_pagecross(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[514]);
+    ct_assertequal(2u, mem[514]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -630,7 +630,7 @@ static void eor_absx(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x6u, cpu.a);
+    ct_assertequal(6u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -668,7 +668,7 @@ static void inc_absx(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[519]);
+    ct_assertequal(1u, mem[519]);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -688,7 +688,7 @@ static void inc_absx_pagecross(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[514]);
+    ct_assertequal(1u, mem[514]);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -778,7 +778,7 @@ static void lsr_absx(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[519]);
+    ct_assertequal(1u, mem[519]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -799,7 +799,7 @@ static void lsr_absx_pagecross(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[514]);
+    ct_assertequal(1u, mem[514]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -858,7 +858,7 @@ static void rol_absx(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[519]);
+    ct_assertequal(1u, mem[519]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -880,7 +880,7 @@ static void rol_absx_pagecross(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[514]);
+    ct_assertequal(1u, mem[514]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -945,7 +945,7 @@ static void sbc_absx(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -1070,7 +1070,7 @@ static void and_absy(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x8u, cpu.a);
+    ct_assertequal(8u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -1146,7 +1146,7 @@ static void eor_absy(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x6u, cpu.a);
+    ct_assertequal(6u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -1291,7 +1291,7 @@ static void sbc_absy(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -1483,7 +1483,7 @@ static void isc_abs(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -1507,7 +1507,7 @@ static void isc_absx(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -1554,7 +1554,7 @@ static void isc_absy(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -1599,9 +1599,9 @@ static void las_absy(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x8u, cpu.a);
-    ct_assertequal(0x8u, cpu.x);
-    ct_assertequal(0x8u, cpu.s);
+    ct_assertequal(8u, cpu.a);
+    ct_assertequal(8u, cpu.x);
+    ct_assertequal(8u, cpu.s);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -1734,7 +1734,7 @@ static void nop_abs(void *ctx)
 
     ct_assertequal(4, cycles);
     ct_assertequal(3u, cpu.pc);
-    ct_assertequal(0x6u, cpu.databus);
+    ct_assertequal(6u, cpu.databus);
 
     // verify NOP did nothing
     struct aldo_snapshot snp;
@@ -1761,7 +1761,7 @@ static void nop_absx(void *ctx)
 
         ct_assertequal(4, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(3u, cpu.pc, "Failed on opcode %02x", opc);
-        ct_assertequal(0x6u, cpu.databus, "Failed on opcode %02x", opc);
+        ct_assertequal(6u, cpu.databus, "Failed on opcode %02x", opc);
 
         // verify NOP did nothing
         struct aldo_snapshot snp;
@@ -1817,8 +1817,8 @@ static void rla_abs(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[516]);
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, mem[516]);
+    ct_assertequal(1u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1841,8 +1841,8 @@ static void rla_absx(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[519]);
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, mem[519]);
+    ct_assertequal(1u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1865,8 +1865,8 @@ static void rla_absx_pagecross(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[514]);
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, mem[514]);
+    ct_assertequal(1u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1889,8 +1889,8 @@ static void rla_absy(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[519]);
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, mem[519]);
+    ct_assertequal(1u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1913,8 +1913,8 @@ static void rla_absy_pagecross(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[514]);
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, mem[514]);
+    ct_assertequal(1u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2070,7 +2070,7 @@ static void sha_absy(void *ctx)
 
     ct_assertequal(0xau, cpu.a);
     ct_assertequal(0xeu, cpu.x);
-    ct_assertequal(0x2u, mem[259]);
+    ct_assertequal(2u, mem[259]);
 }
 
 static void sha_absy_pagecross(void *ctx)
@@ -2111,7 +2111,7 @@ static void shx_absy(void *ctx)
     ct_assertequal(3u, cpu.pc);
 
     ct_assertequal(0xeu, cpu.x);
-    ct_assertequal(0x2u, mem[259]);
+    ct_assertequal(2u, mem[259]);
 }
 
 static void shx_absy_pagecross(void *ctx)
@@ -2150,7 +2150,7 @@ static void shy_absx(void *ctx)
     ct_assertequal(3u, cpu.pc);
 
     ct_assertequal(0xeu, cpu.y);
-    ct_assertequal(0x2u, mem[259]);
+    ct_assertequal(2u, mem[259]);
 }
 
 static void shy_absx_pagecross(void *ctx)
@@ -2187,8 +2187,8 @@ static void slo_abs(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[516]);
-    ct_assertequal(0x3u, cpu.a);
+    ct_assertequal(2u, mem[516]);
+    ct_assertequal(3u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2210,8 +2210,8 @@ static void slo_absx(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[519]);
-    ct_assertequal(0x3u, cpu.a);
+    ct_assertequal(2u, mem[519]);
+    ct_assertequal(3u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2233,8 +2233,8 @@ static void slo_absx_pagecross(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[514]);
-    ct_assertequal(0x3u, cpu.a);
+    ct_assertequal(2u, mem[514]);
+    ct_assertequal(3u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2256,8 +2256,8 @@ static void slo_absy(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[519]);
-    ct_assertequal(0x3u, cpu.a);
+    ct_assertequal(2u, mem[519]);
+    ct_assertequal(3u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2279,8 +2279,8 @@ static void slo_absy_pagecross(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[514]);
-    ct_assertequal(0x3u, cpu.a);
+    ct_assertequal(2u, mem[514]);
+    ct_assertequal(3u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2301,8 +2301,8 @@ static void sre_abs(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[516]);
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(1u, mem[516]);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2324,8 +2324,8 @@ static void sre_absx(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[519]);
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(1u, mem[519]);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2347,8 +2347,8 @@ static void sre_absx_pagecross(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[514]);
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(1u, mem[514]);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2370,8 +2370,8 @@ static void sre_absy(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[519]);
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(1u, mem[519]);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2393,8 +2393,8 @@ static void sre_absy_pagecross(void *ctx)
     ct_assertequal(7, cycles);
     ct_assertequal(3u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[514]);
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(1u, mem[514]);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2420,7 +2420,7 @@ static void tas_absy(void *ctx)
     ct_assertequal(0x5au, cpu.a);
     ct_assertequal(0xeeu, cpu.x);
     ct_assertequal(0x4au, cpu.s);
-    ct_assertequal(0x2u, mem[259]);
+    ct_assertequal(2u, mem[259]);
 }
 
 static void tas_absy_pagecross(void *ctx)

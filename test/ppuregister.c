@@ -354,30 +354,30 @@ static void oamdata_write(void *ctx)
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x11);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
-    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(1u, ppu->oamaddr);
     ct_assertequal(0x11u, ppu->spr.oam[0]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x22);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
-    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(2u, ppu->oamaddr);
     ct_assertequal(0x22u, ppu->spr.oam[1]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x33);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
-    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(3u, ppu->oamaddr);
     ct_assertequal(0x33u, ppu->spr.oam[2]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x44);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(0x44u, ppu->spr.oam[3]);
 }
 
@@ -394,28 +394,28 @@ static void oamdata_write_during_rendering(void *ctx)
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x11);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(0xffu, ppu->spr.oam[0]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x22);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
-    ct_assertequal(0x8u, ppu->oamaddr);
+    ct_assertequal(8u, ppu->oamaddr);
     ct_assertequal(0xffu, ppu->spr.oam[4]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x33);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
     ct_assertequal(0xcu, ppu->oamaddr);
     ct_assertequal(0xffu, ppu->spr.oam[8]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x44);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
     ct_assertequal(0x10u, ppu->oamaddr);
     ct_assertequal(0xffu, ppu->spr.oam[12]);
@@ -434,30 +434,30 @@ static void oamdata_write_during_rendering_disabled(void *ctx)
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x11);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
-    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(1u, ppu->oamaddr);
     ct_assertequal(0x11u, ppu->spr.oam[0]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x22);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
-    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(2u, ppu->oamaddr);
     ct_assertequal(0x22u, ppu->spr.oam[1]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x33);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
-    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(3u, ppu->oamaddr);
     ct_assertequal(0x33u, ppu->spr.oam[2]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x44);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(0x44u, ppu->spr.oam[3]);
 }
 
@@ -475,30 +475,30 @@ static void oamdata_write_mirrored(void *ctx)
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x3214, 0x11);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
-    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(1u, ppu->oamaddr);
     ct_assertequal(0x11u, ppu->spr.oam[0]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x3214, 0x22);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
-    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(2u, ppu->oamaddr);
     ct_assertequal(0x22u, ppu->spr.oam[1]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x3214, 0x33);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
-    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(3u, ppu->oamaddr);
     ct_assertequal(0x33u, ppu->spr.oam[2]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x3214, 0x44);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(0x44u, ppu->spr.oam[3]);
 }
 
@@ -517,30 +517,30 @@ static void oamdata_write_during_reset(void *ctx)
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x11);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x11u, ppu->regbus);
-    ct_assertequal(0x1u, ppu->oamaddr);
+    ct_assertequal(1u, ppu->oamaddr);
     ct_assertequal(0x11u, ppu->spr.oam[0]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x22);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x22u, ppu->regbus);
-    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(2u, ppu->oamaddr);
     ct_assertequal(0x22u, ppu->spr.oam[1]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x33);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x33u, ppu->regbus);
-    ct_assertequal(0x3u, ppu->oamaddr);
+    ct_assertequal(3u, ppu->oamaddr);
     ct_assertequal(0x33u, ppu->spr.oam[2]);
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2004, 0x44);
 
-    ct_assertequal(0x4u, ppu->regsel);
+    ct_assertequal(4u, ppu->regsel);
     ct_assertequal(0x44u, ppu->regbus);
-    ct_assertequal(0x4u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->oamaddr);
     ct_assertequal(0x44u, ppu->spr.oam[3]);
 }
 
@@ -603,7 +603,7 @@ static void oamdata_read_attribute_byte(void *ctx)
     // bits 4-2 always return 0 on attribute bytes
     ct_assertequal(0xe3u, d);
     ct_assertequal(0xe3u, ppu->regbus);
-    ct_assertequal(0x2u, ppu->oamaddr);
+    ct_assertequal(2u, ppu->oamaddr);
 }
 
 static void oamdata_read_during_soam_clear(void *ctx)
@@ -1808,7 +1808,7 @@ static void ppudata_write_during_rendering(void *ctx)
     ct_assertequal(0x77u, VRam[3]);
     // PPUDATA write during rendering triggers course-x and y increment
     ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
-    ct_assertequal(0x2u, ppu->pxpl.atb);
+    ct_assertequal(2u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
@@ -1856,7 +1856,7 @@ static void ppudata_write_during_rendering_off_sync(void *ctx)
     // PPUDATA write during rendering triggers course-x and y increment
     ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
     ct_assertequal(11, ppu->dot);
-    ct_assertequal(0x2u, ppu->pxpl.atb);
+    ct_assertequal(2u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
@@ -1910,7 +1910,7 @@ static void ppudata_write_during_rendering_on_x_increment(void *ctx)
     ct_assertfalse(ppu->signal.wr);
     // PPUDATA write during rendering doesn't increment x twice
     ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
-    ct_assertequal(0x2u, ppu->pxpl.atb);
+    ct_assertequal(2u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
@@ -1963,7 +1963,7 @@ static void ppudata_write_during_rendering_on_row_increment(void *ctx)
     ct_assertfalse(ppu->signal.wr);
     // PPUDATA write during rendering doesn't increment x and y twice
     ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
-    ct_assertequal(0x2u, ppu->pxpl.atb);
+    ct_assertequal(2u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
@@ -2012,7 +2012,7 @@ static void ppudata_write_during_sprite_rendering(void *ctx)
     // PPUDATA write during rendering triggers course-x and y increment
     ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
     ct_assertequal(11, ppu->dot);
-    ct_assertequal(0x2u, ppu->pxpl.atb);
+    ct_assertequal(2u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
@@ -2997,7 +2997,7 @@ static void ppudata_read_during_rendering(void *ctx)
     ct_assertequal(0x44u, ppu->rbuf);
     // PPUDATA read during rendering triggers course-x and y increment
     ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
-    ct_assertequal(0x2u, ppu->pxpl.atb);
+    ct_assertequal(2u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
@@ -3055,7 +3055,7 @@ static void ppudata_read_during_rendering_off_sync(void *ctx)
     // PPUDATA read during rendering triggers course-x and y increment
     ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
     ct_assertequal(11, ppu->dot);
-    ct_assertequal(0x2u, ppu->pxpl.atb);
+    ct_assertequal(2u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
@@ -3123,7 +3123,7 @@ static void ppudata_read_during_rendering_on_x_increment(void *ctx)
     ct_assertequal(0xeeu, ppu->rbuf);
     // PPUDATA read during rendering doesn't increment x twice
     ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
-    ct_assertequal(0x2u, ppu->pxpl.atb);
+    ct_assertequal(2u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
@@ -3191,7 +3191,7 @@ static void ppudata_read_during_rendering_on_row_increment(void *ctx)
     ct_assertequal(0xeeu, ppu->rbuf);
     // PPUDATA read during rendering doesn't increment x and y twice
     ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
-    ct_assertequal(0x2u, ppu->pxpl.atb);
+    ct_assertequal(2u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 
@@ -3258,7 +3258,7 @@ static void ppudata_read_during_sprite_rendering(void *ctx)
     ct_assertequal(0x44u, ppu->rbuf);
     // PPUDATA read during rendering triggers course-x and y increment
     ct_assertequal(0x23a4u, ppu->v);    // 010 00 11101 00100
-    ct_assertequal(0x1u, ppu->pxpl.atb);
+    ct_assertequal(1u, ppu->pxpl.atb);
 
     aldo_ppu_cycle(ppu);
 

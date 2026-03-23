@@ -70,7 +70,7 @@ static void ready_low_on_read(void *ctx)
     ct_assertequal(1, cycle);
     ct_assertequal(0x69u, cpu.opc);
     ct_assertequal(0x69u, cpu.databus);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0u, cpu.addrbus);
     ct_asserttrue(cpu.signal.rw);
 
@@ -81,7 +81,7 @@ static void ready_low_on_read(void *ctx)
     ct_assertequal(1, cycle);
     ct_assertequal(0x69u, cpu.opc);
     ct_assertequal(0x69u, cpu.databus);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0u, cpu.addrbus);
     ct_asserttrue(cpu.signal.rw);
 
@@ -90,7 +90,7 @@ static void ready_low_on_read(void *ctx)
     ct_assertequal(1, cycle);
     ct_assertequal(0x69u, cpu.opc);
     ct_assertequal(0x69u, cpu.databus);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0u, cpu.addrbus);
     ct_asserttrue(cpu.signal.rw);
 
@@ -100,9 +100,9 @@ static void ready_low_on_read(void *ctx)
 
     ct_assertequal(1, cycle);
     ct_assertequal(0x69u, cpu.opc);
-    ct_assertequal(0x6u, cpu.databus);
-    ct_assertequal(0x2u, cpu.pc);
-    ct_assertequal(0x1u, cpu.addrbus);
+    ct_assertequal(6u, cpu.databus);
+    ct_assertequal(2u, cpu.pc);
+    ct_assertequal(1u, cpu.addrbus);
     ct_asserttrue(cpu.signal.rw);
 }
 
@@ -122,7 +122,7 @@ static void ready_low_on_write(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(0x8du, cpu.opc);
     ct_assertequal(0xcu, cpu.databus);
-    ct_assertequal(0x3u, cpu.pc);
+    ct_assertequal(3u, cpu.pc);
     ct_assertequal(0x204u, cpu.addrbus);
     ct_assertequal(0xcu, mem[516]);
     ct_assertfalse(cpu.signal.rw);
@@ -135,8 +135,8 @@ static void ready_low_on_write(void *ctx)
     ct_assertequal(1, cycles);
     ct_assertequal(0x69u, cpu.opc);
     ct_assertequal(0x69u, cpu.databus);
-    ct_assertequal(0x4u, cpu.pc);
-    ct_assertequal(0x3u, cpu.addrbus);
+    ct_assertequal(4u, cpu.pc);
+    ct_assertequal(3u, cpu.addrbus);
     ct_asserttrue(cpu.signal.rw);
 
     cycles = aldo_cpu_cycle(&cpu);
@@ -144,8 +144,8 @@ static void ready_low_on_write(void *ctx)
     ct_assertequal(1, cycles);
     ct_assertequal(0x69u, cpu.opc);
     ct_assertequal(0x69u, cpu.databus);
-    ct_assertequal(0x4u, cpu.pc);
-    ct_assertequal(0x3u, cpu.addrbus);
+    ct_assertequal(4u, cpu.pc);
+    ct_assertequal(3u, cpu.addrbus);
     ct_asserttrue(cpu.signal.rw);
 
     cpu.signal.rdy = true;
@@ -154,9 +154,9 @@ static void ready_low_on_write(void *ctx)
 
     ct_assertequal(1, cycles);
     ct_assertequal(0x69u, cpu.opc);
-    ct_assertequal(0x6u, cpu.databus);
-    ct_assertequal(0x5u, cpu.pc);
-    ct_assertequal(0x4u, cpu.addrbus);
+    ct_assertequal(6u, cpu.databus);
+    ct_assertequal(5u, cpu.pc);
+    ct_assertequal(4u, cpu.addrbus);
     ct_asserttrue(cpu.signal.rw);
 }
 
@@ -195,7 +195,7 @@ static void ready_low_on_init(void *ctx)
     ct_assertequal(1, cycle);
     ct_assertequal(0x69u, cpu.opc);
     ct_assertequal(0x69u, cpu.databus);
-    ct_assertequal(0x1u, cpu.pc);
+    ct_assertequal(1u, cpu.pc);
     ct_assertequal(0u, cpu.addrbus);
     ct_asserttrue(cpu.signal.rw);
     ct_assertfalse(cpu.presync);

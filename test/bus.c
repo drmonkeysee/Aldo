@@ -312,10 +312,10 @@ static void smallest_bus(void *ctx)
     ct_assertequal(0xbu, d);
 
     ct_asserttrue(aldo_bus_write(b, 0x0, 0x9));
-    ct_assertequal(0x9u, mem[0]);
+    ct_assertequal(9u, mem[0]);
 
     ct_asserttrue(aldo_bus_write(b, 0x1, 0x8));
-    ct_assertequal(0x8u, mem[1]);
+    ct_assertequal(8u, mem[1]);
 
     ct_assertfalse(aldo_bus_write(b, 0x2, 0x7));
 }
@@ -344,16 +344,16 @@ static void largest_bus(void *ctx)
 
     uint8_t d = 0xff;
     ct_asserttrue(aldo_bus_read(b, 0xffff, &d));
-    ct_assertequal(0x6u, d);
+    ct_assertequal(6u, d);
 
     ct_asserttrue(aldo_bus_read(b, 0x0, &d));
     ct_assertequal(0xau, d);
 
     ct_asserttrue(aldo_bus_write(b, 0xffff, 0x5));
-    ct_assertequal(0x5u, memhigh[3]);
+    ct_assertequal(5u, memhigh[3]);
 
     ct_asserttrue(aldo_bus_write(b, 0x0, 0x4));
-    ct_assertequal(0x4u, memlow[0]);
+    ct_assertequal(4u, memlow[0]);
 }
 
 static void copy(void *ctx)

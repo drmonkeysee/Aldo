@@ -109,7 +109,7 @@ static void parse_inst_in_middle(void *ctx)
     ct_assertequal(bv.ord, inst.bv.ord);
     ct_assertequal(0x4cu, inst.bv.mem[0]);
     ct_assertequal(0x34u, inst.bv.mem[1]);
-    ct_assertequal(0x6u, inst.bv.mem[2]);
+    ct_assertequal(6u, inst.bv.mem[2]);
     ct_assertequal(3u, inst.bv.size);
     ct_assertequal(3u, inst.offset);
     ct_assertequal(ALDO_IN_JMP, (int)inst.d.instruction);
@@ -230,7 +230,7 @@ static void parsemem_inst_in_middle(void *ctx)
     ct_assertequal(0u, inst.bv.ord);
     ct_assertequal(0x4cu, inst.bv.mem[0]);
     ct_assertequal(0x34u, inst.bv.mem[1]);
-    ct_assertequal(0x6u, inst.bv.mem[2]);
+    ct_assertequal(6u, inst.bv.mem[2]);
     ct_assertequal(3u, inst.bv.size);
     ct_assertequal(3u, inst.offset);
     ct_assertequal(ALDO_IN_JMP, (int)inst.d.instruction);

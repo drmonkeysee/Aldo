@@ -68,7 +68,7 @@ static void adc_carry(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x5u, cpu.a);
+    ct_assertequal(5u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -297,7 +297,7 @@ static void adc_bcd(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -382,7 +382,7 @@ static void adc_bcd_carry(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -730,7 +730,7 @@ static void and(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x8u, cpu.a);
+    ct_assertequal(8u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -1435,7 +1435,7 @@ static void eor(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x6u, cpu.a);
+    ct_assertequal(6u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -1682,7 +1682,7 @@ static void sbc(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -1701,7 +1701,7 @@ static void sbc_borrowout(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x3u, cpu.a);
+    ct_assertequal(3u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -1897,7 +1897,7 @@ static void sbc_overflow_does_not_include_borrow(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.v);
@@ -1935,7 +1935,7 @@ static void sbc_bcd(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -1957,7 +1957,7 @@ static void sbc_bcd_digit_rollover(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2000,7 +2000,7 @@ static void sbc_bcd_borrowout(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x3u, cpu.a);
+    ct_assertequal(3u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2193,7 +2193,7 @@ static void sbc_bcd_overflow_does_not_include_borrow(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.v);
@@ -2275,7 +2275,7 @@ static void sbc_bcd_hex(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x9u, cpu.a);
+    ct_assertequal(9u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2397,7 +2397,7 @@ static void alr(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2509,7 +2509,7 @@ static void anc(void *ctx)
         ct_assertequal(2, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
 
-        ct_assertequal(0x8u, cpu.a, "Failed on opcode %02x", opc);
+        ct_assertequal(8u, cpu.a, "Failed on opcode %02x", opc);
         ct_assertfalse(cpu.p.c, "Failed on opcode %02x", opc);
         ct_assertfalse(cpu.p.z, "Failed on opcode %02x", opc);
         ct_assertfalse(cpu.p.n, "Failed on opcode %02x", opc);
@@ -2626,7 +2626,7 @@ static void arr(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2744,7 +2744,7 @@ static void arr_bcd(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2765,7 +2765,7 @@ static void arr_bcd_low_adjustment(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x8u, cpu.a);
+    ct_assertequal(8u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2786,7 +2786,7 @@ static void arr_bcd_low_adjustment_lost_carry(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x5u, cpu.a);
+    ct_assertequal(5u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -3024,7 +3024,7 @@ static void sbx_min_to_max(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, cpu.x);
+    ct_assertequal(1u, cpu.x);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -3159,7 +3159,7 @@ static void usbc(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -3178,7 +3178,7 @@ static void usbc_borrowout(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x3u, cpu.a);
+    ct_assertequal(3u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -3412,7 +3412,7 @@ static void usbc_bcd(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -3434,7 +3434,7 @@ static void usbc_bcd_digit_rollover(void *ctx)
     ct_assertequal(2, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);

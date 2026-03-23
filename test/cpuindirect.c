@@ -93,7 +93,7 @@ static void and_indx(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x8u, cpu.a);
+    ct_assertequal(8u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -171,7 +171,7 @@ static void eor_indx(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x6u, cpu.a);
+    ct_assertequal(6u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -190,7 +190,7 @@ static void eor_indx_pageoverflow(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x6u, cpu.a);
+    ct_assertequal(6u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -284,7 +284,7 @@ static void sbc_indx(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -306,7 +306,7 @@ static void sbc_indx_pageoverflow(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -432,7 +432,7 @@ static void and_indy(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x8u, cpu.a);
+    ct_assertequal(8u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -508,7 +508,7 @@ static void eor_indy(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x6u, cpu.a);
+    ct_assertequal(6u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -618,7 +618,7 @@ static void sbc_indy(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -791,7 +791,7 @@ static void isc_indx(void *ctx)
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -815,7 +815,7 @@ static void isc_indx_pageoverflow(void *ctx)
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -839,7 +839,7 @@ static void isc_indy(void *ctx)
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -961,7 +961,7 @@ static void rla_indx(void *ctx)
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x8u, cpu.a);
+    ct_assertequal(8u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1007,7 +1007,7 @@ static void rla_indy(void *ctx)
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x8u, cpu.a);
+    ct_assertequal(8u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1143,7 +1143,7 @@ static void sax_indx(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[11]);
+    ct_assertequal(2u, mem[11]);
 }
 
 static void sax_indx_pageoverflow(void *ctx)
@@ -1162,7 +1162,7 @@ static void sax_indx_pageoverflow(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x3u, mem[10]);
+    ct_assertequal(3u, mem[10]);
 }
 
 static void sha_indy(void *ctx)
@@ -1184,7 +1184,7 @@ static void sha_indy(void *ctx)
 
     ct_assertequal(0xau, cpu.a);
     ct_assertequal(0xeu, cpu.x);
-    ct_assertequal(0x2u, mem[259]);
+    ct_assertequal(2u, mem[259]);
 }
 
 static void sha_indy_pagecross(void *ctx)
@@ -1310,7 +1310,7 @@ static void sre_indx(void *ctx)
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x9u, cpu.a);
+    ct_assertequal(9u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1354,7 +1354,7 @@ static void sre_indy(void *ctx)
     ct_assertequal(8, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x9u, cpu.a);
+    ct_assertequal(9u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);

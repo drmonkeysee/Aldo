@@ -48,7 +48,7 @@ static void and_zp(void *ctx)
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x8u, cpu.a);
+    ct_assertequal(8u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -64,7 +64,7 @@ static void asl_zp(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[4]);
+    ct_assertequal(2u, mem[4]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -81,7 +81,7 @@ static void asl_zp_carry(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[4]);
+    ct_assertequal(2u, mem[4]);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -185,7 +185,7 @@ static void bit_zp_maskset(void *ctx)
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
     ct_assertfalse(cpu.p.n);
@@ -203,7 +203,7 @@ static void bit_zp_maskclear(void *ctx)
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_asserttrue(cpu.p.z);
     ct_assertfalse(cpu.p.v);
     ct_assertfalse(cpu.p.n);
@@ -329,7 +329,7 @@ static void bit_zp_set_high(void *ctx)
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.v);
     ct_asserttrue(cpu.p.n);
@@ -485,7 +485,7 @@ static void eor_zp(void *ctx)
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x6u, cpu.a);
+    ct_assertequal(6u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -597,7 +597,7 @@ static void lsr_zp(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[4]);
+    ct_assertequal(1u, mem[4]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -717,7 +717,7 @@ static void rol_zp(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[4]);
+    ct_assertequal(1u, mem[4]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -734,7 +734,7 @@ static void rol_zp_carry(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[4]);
+    ct_assertequal(2u, mem[4]);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -838,7 +838,7 @@ static void ror_zp(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[4]);
+    ct_assertequal(1u, mem[4]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -962,7 +962,7 @@ static void sbc_zp(void *ctx)
     ct_assertequal(3, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -1071,7 +1071,7 @@ static void and_zpx(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x8u, cpu.a);
+    ct_assertequal(8u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -1106,7 +1106,7 @@ static void asl_zpx(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[7]);
+    ct_assertequal(2u, mem[7]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1215,7 +1215,7 @@ static void eor_zpx(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x6u, cpu.a);
+    ct_assertequal(6u, cpu.a);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
 }
@@ -1352,7 +1352,7 @@ static void lsr_zpx(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[7]);
+    ct_assertequal(1u, mem[7]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1425,7 +1425,7 @@ static void rol_zpx(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[7]);
+    ct_assertequal(1u, mem[7]);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -1500,7 +1500,7 @@ static void sbc_zpx(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -1521,7 +1521,7 @@ static void sbc_zpx_pageoverflow(void *ctx)
     ct_assertequal(4, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -1720,7 +1720,7 @@ static void dcp_zp_gt(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0x6u, mem[4]);
+    ct_assertequal(6u, mem[4]);
 }
 
 static void dcp_zp_max_to_min(void *ctx)
@@ -1873,7 +1873,7 @@ static void dcp_zp_negative_to_positive(void *ctx)
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0x1u, mem[4]);
+    ct_assertequal(1u, mem[4]);
 }
 
 static void dcp_zp_positive_to_negative(void *ctx)
@@ -1893,7 +1893,7 @@ static void dcp_zp_positive_to_negative(void *ctx)
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.n);
-    ct_assertequal(0x1u, mem[4]);
+    ct_assertequal(1u, mem[4]);
 }
 
 static void dcp_zpx(void *ctx)
@@ -1949,12 +1949,12 @@ static void isc_zp(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0x6u, mem[4]);
+    ct_assertequal(6u, mem[4]);
 }
 
 static void isc_zp_borrowout(void *ctx)
@@ -1969,12 +1969,12 @@ static void isc_zp_borrowout(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x3u, cpu.a);
+    ct_assertequal(3u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0x6u, mem[4]);
+    ct_assertequal(6u, mem[4]);
 }
 
 static void isc_zp_borrow(void *ctx)
@@ -2037,7 +2037,7 @@ static void isc_zp_negative(void *ctx)
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
     ct_asserttrue(cpu.p.n);
-    ct_assertequal(0x1u, mem[4]);
+    ct_assertequal(1u, mem[4]);
 }
 
 static void isc_zp_borrow_negative(void *ctx)
@@ -2058,7 +2058,7 @@ static void isc_zp_borrow_negative(void *ctx)
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
     ct_asserttrue(cpu.p.n);
-    ct_assertequal(0x1u, mem[4]);
+    ct_assertequal(1u, mem[4]);
 }
 
 static void isc_zp_overflow_to_negative(void *ctx)
@@ -2100,7 +2100,7 @@ static void isc_zp_overflow_to_positive(void *ctx)
     ct_assertfalse(cpu.p.z);
     ct_asserttrue(cpu.p.v);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0x1u, mem[4]);
+    ct_assertequal(1u, mem[4]);
 }
 
 static void isc_zp_borrowout_causes_overflow(void *ctx)
@@ -2180,7 +2180,7 @@ static void isc_bcd_zp(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2202,7 +2202,7 @@ static void isc_bcd_zp_digit_rollover(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2245,12 +2245,12 @@ static void isc_zpx(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0x6u, mem[7]);
+    ct_assertequal(6u, mem[7]);
 }
 
 static void isc_zpx_pageoverflow(void *ctx)
@@ -2267,12 +2267,12 @@ static void isc_zpx_pageoverflow(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
     ct_assertfalse(cpu.p.n);
-    ct_assertequal(0x8u, mem[2]);
+    ct_assertequal(8u, mem[2]);
 }
 
 static void lax_zp(void *ctx)
@@ -2429,7 +2429,7 @@ static void nop_zpx_pageoverflow(void *ctx)
 
         ct_assertequal(4, cycles, "Failed on opcode %02x", opc);
         ct_assertequal(2u, cpu.pc, "Failed on opcode %02x", opc);
-        ct_assertequal(0x6u, cpu.databus, "Failed on opcode %02x", opc);
+        ct_assertequal(6u, cpu.databus, "Failed on opcode %02x", opc);
 
         // verify NOP did nothing
         struct aldo_snapshot snp;
@@ -2455,8 +2455,8 @@ static void rla_zp(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[4]);
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, mem[4]);
+    ct_assertequal(1u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2474,8 +2474,8 @@ static void rla_zp_carry(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[4]);
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, mem[4]);
+    ct_assertequal(2u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2612,8 +2612,8 @@ static void rla_zpx(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[7]);
-    ct_assertequal(0x1u, cpu.a);
+    ct_assertequal(1u, mem[7]);
+    ct_assertequal(1u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2633,7 +2633,7 @@ static void rla_zpx_pageoverflow(void *ctx)
     ct_assertequal(2u, cpu.pc);
 
     ct_assertequal(0x44u, mem[2]);
-    ct_assertequal(0x4u, cpu.a);
+    ct_assertequal(4u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -2651,7 +2651,7 @@ static void rra_zp(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x6u, mem[4]);
+    ct_assertequal(6u, mem[4]);
     ct_assertequal(0x10u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
@@ -2671,7 +2671,7 @@ static void rra_zp_carryin(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x6u, mem[4]);
+    ct_assertequal(6u, mem[4]);
     ct_assertequal(0x11u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
@@ -2691,8 +2691,8 @@ static void rra_zp_carry(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x6u, mem[4]);
-    ct_assertequal(0x5u, cpu.a);
+    ct_assertequal(6u, mem[4]);
+    ct_assertequal(5u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2793,7 +2793,7 @@ static void rra_zp_overflow_to_negative(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[4]);
+    ct_assertequal(1u, mem[4]);
     ct_assertequal(0x80u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
@@ -2898,7 +2898,7 @@ static void rra_bcd_zp(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.v);
@@ -2960,7 +2960,7 @@ static void rra_zpx(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x6u, mem[7]);
+    ct_assertequal(6u, mem[7]);
     ct_assertequal(0x10u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
@@ -3051,8 +3051,8 @@ static void slo_zp(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[4]);
-    ct_assertequal(0x3u, cpu.a);
+    ct_assertequal(2u, mem[4]);
+    ct_assertequal(3u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -3070,8 +3070,8 @@ static void slo_zp_carry(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[4]);
-    ct_assertequal(0x3u, cpu.a);
+    ct_assertequal(2u, mem[4]);
+    ct_assertequal(3u, cpu.a);
     ct_asserttrue(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -3205,8 +3205,8 @@ static void slo_zpx(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x2u, mem[7]);
-    ct_assertequal(0x3u, cpu.a);
+    ct_assertequal(2u, mem[7]);
+    ct_assertequal(3u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -3244,8 +3244,8 @@ static void sre_zp(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[4]);
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(1u, mem[4]);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);
@@ -3377,7 +3377,7 @@ static void sre_zp_eor_sets_zero(void *ctx)
     ct_assertequal(5, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[4]);
+    ct_assertequal(1u, mem[4]);
     ct_assertequal(0u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_asserttrue(cpu.p.z);
@@ -3397,8 +3397,8 @@ static void sre_zpx(void *ctx)
     ct_assertequal(6, cycles);
     ct_assertequal(2u, cpu.pc);
 
-    ct_assertequal(0x1u, mem[7]);
-    ct_assertequal(0x2u, cpu.a);
+    ct_assertequal(1u, mem[7]);
+    ct_assertequal(2u, cpu.a);
     ct_assertfalse(cpu.p.c);
     ct_assertfalse(cpu.p.z);
     ct_assertfalse(cpu.p.n);

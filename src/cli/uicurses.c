@@ -632,7 +632,17 @@ static void drawppu(const struct view *v, const struct aldo_snapshot *snp)
 static void drawapu(const struct view *v, const struct aldo_snapshot *snp)
 {
     auto apu = &snp->apu;
-    mvwprintw(v->content, 0, 0, "p: %d", apu->put);
+    auto w = getmaxx(v->content);
+    auto line_x = (w / 2) + 1;
+    auto cursor_y = 0;
+    draw_chip_vline(v, apu->lines.ready, cursor_y, line_x, 1, ArrowUp, -1, "RDY");
+    cursor_y += 2;
+    mvwhline(v->content, cursor_y++, 0, 0, w);
+    mvwprintw(v->content, cursor_y++, 0, "OAMDMA: %02X  active: %d",
+              apu->oam.dmahigh, apu->oam.dmalow);
+    mvwprintw(v->content, cursor_y++, 0, "low:    %02X", apu->oam.active);
+    mvwhline(v->content, cursor_y++, 0, 0, w);
+    mvwprintw(v->content, cursor_y, 0, "p: %d", apu->put);
 }
 
 static void drawchip(const struct view *v, const struct viewstate *vs,

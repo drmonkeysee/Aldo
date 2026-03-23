@@ -64,6 +64,13 @@ struct aldo_snapshot {
     } ppu;
 
     struct {
+        struct {
+            bool ready;
+        } lines;
+        struct {
+            uint8_t dmahigh, dmalow;
+            bool active;
+        } oam;
         bool put;
     } apu;
 

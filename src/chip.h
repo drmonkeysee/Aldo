@@ -18,6 +18,16 @@ struct aldo_snapshot;
 struct aldo_rp2a03 {
     struct aldo_mos6502 cpu;    // 6502 CPU Core
 
+    struct {
+        uint8_t dma,            // OAMDMA register; DMA high address byte
+                low;            // DMA low address byte
+        bool active;            // OAM DMA currently running
+    } oam;
+
+    struct {
+        bool rdy;               // Ready Signal (output); wired to CPU RDY
+    } signal;
+
     bool put;                   // Whether the current cycle is a DMA get or put;
                                 // also used to count APU cycles per CPU cycles,
                                 // 2 CPU Cycles = 1 APU Cycle.

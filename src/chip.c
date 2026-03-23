@@ -11,6 +11,14 @@
 
 #include <assert.h>
 
+static int cycle_chip(struct aldo_rp2a03 *self)
+{
+    if (aldo_cpu_reset_pending(&self->cpu)) return 0;
+
+    self->put = !self->put;
+    return 0;
+}
+
 //
 // MARK: - Public Interface
 //
@@ -30,11 +38,8 @@ int aldo_chip_cycle(struct aldo_rp2a03 *self)
 {
     assert(self != nullptr);
 
-    // TODO: run apu/dma/etc
-    if (!aldo_cpu_reset_pending(&self->cpu)) {
-        self->put = !self->put;
-    }
-    return aldo_cpu_cycle(&self->cpu);
+    // cycle will return non-zero if DMA is running, which suspends the cpu
+    return cycle_chip(self) || aldo_cpu_cycle(&self->cpu);
 }
 
 void aldo_chip_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp)

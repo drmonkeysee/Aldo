@@ -12,10 +12,9 @@
 
 struct aldo_snapshot;
 
-// The Ricoh RP2A03 Microprocessor; includes the 6502 CPU core and auxiliary
-// functionality specific to the NES, the bulk of which is the
-// Audio Processing Unit (APU), but also includes Direct Memory Access (DMA)
-// units and Joypad control.
+// The Ricoh RP2A03 Microprocessor; includes the 6502 CPU and auxiliary functions
+// specific to the NES, the bulk of which is the Audio Processing Unit (APU),
+// but also includes Direct Memory Access (DMA) units and Joypad control.
 struct aldo_rp2a03 {
     struct aldo_mos6502 cpu;    // 6502 CPU Core
 

@@ -7,9 +7,9 @@
 
 #include "nes.h"
 
+#include "apu.h"
 #include "bus.h"
 #include "bytes.h"
-#include "chip.h"
 #include "cpu.h"
 #include "cycleclock.h"
 #include "ppu.h"

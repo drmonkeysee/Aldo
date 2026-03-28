@@ -1,11 +1,11 @@
 //
-//  chip.c
+//  apu.c
 //  Aldo-Tests
 //
 //  Created by Brandon Stansbury on 3/22/26.
 //
 
-#include "chip.h"
+#include "apu.h"
 #include "ciny.h"
 #include "cpuhelp.h"
 

@@ -1,12 +1,12 @@
 //
-//  chip.h
+//  apu.h
 //  Aldo
 //
 //  Created by Brandon Stansbury on 3/22/26.
 //
 
-#ifndef Aldo_chip_h
-#define Aldo_chip_h
+#ifndef Aldo_apu_h
+#define Aldo_apu_h
 
 #include "cpu.h"
 

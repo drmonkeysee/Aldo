@@ -937,7 +937,8 @@ private:
         ImGui::TextUnformatted("t:");
         ImGui::SameLine();
         for (auto i = 0; i < aldo_nes_max_tcpu(); ++i) {
-            small_led(i == cycle, aldo::style::SmallRadius * 3 * i);
+            small_led(i == cycle, aldo::style::SmallRadius * 3
+                      * static_cast<float>(i));
         }
         ImGui::Spacing();
     }
@@ -1302,7 +1303,7 @@ public:
 protected:
     void renderContents() override
     {
-        auto textOffset = nametables.nametableSize().x
+        auto textOffset = static_cast<float>(nametables.nametableSize().x)
                             + aldo::style::glyph_size().x + 1;
         tableLabel(0);
         ImGui::SameLine(textOffset);
@@ -2613,7 +2614,7 @@ protected:
         if (emu.snapshot().video->newframe) {
             screen.draw(emu.snapshot().video->screen, emu.palette());
         }
-        screen.render((scaleSelection / 2.0f) + 1, sdRatio);
+        screen.render((static_cast<float>(scaleSelection) / 2.0f) + 1, sdRatio);
 
         if (ImGui::CollapsingHeader("Controls", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 10);

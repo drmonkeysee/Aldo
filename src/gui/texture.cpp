@@ -362,10 +362,10 @@ void aldo::Nametables::drawMetatile(aldo::et::byte attr, int ntIdx, int col,
                            static_cast<Uint8>(b), SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(ren, &metatile);
     if (offsets.mirrorX > 0) {
-        metatile.x += offsets.mirrorX;
+        metatile.x += static_cast<float>(offsets.mirrorX);
         SDL_RenderFillRect(ren, &metatile);
     } else if (offsets.mirrorY > 0) {
-        metatile.y += offsets.mirrorY;
+        metatile.y += static_cast<float>(offsets.mirrorY);
         SDL_RenderFillRect(ren, &metatile);
     }
 }

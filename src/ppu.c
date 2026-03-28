@@ -872,9 +872,9 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
         // perform first tile pixel shifts that normally occur on dots 329-337
         auto pxpl = &self->pxpl;
         pxpl->bgs[0] <<= 8;
-        pxpl->ats[0] = -pxpl->atl[0];
+        pxpl->ats[0] = (uint8_t)-pxpl->atl[0];
         pxpl->bgs[1] <<= 8;
-        pxpl->ats[1] = -pxpl->atl[1];
+        pxpl->ats[1] = (uint8_t)-pxpl->atl[1];
     } else if (self->dot == 337) {
         latch_tile(self);
     }

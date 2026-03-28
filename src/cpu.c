@@ -322,7 +322,7 @@ static void arithmetic_operation(struct aldo_mos6502 *self,
     bool c = self->p.c;
     // Even in BCD mode some flags are set as if in binary mode
     // so always do binary op regardless of BCD flag.
-    binary_add(self, a, op == AOP_SUB ? ~b : b, c);
+    binary_add(self, a, op == AOP_SUB ? (uint8_t)~b : b, c);
 
     if (!bcd_mode(self)) return;
 

@@ -34,10 +34,10 @@ struct aldo_rp2a03 {
                                 // 2 CPU Cycles = 1 APU Cycle.
 };
 
-void aldo_chip_powerup(struct aldo_rp2a03 *self);
+void aldo_apu_powerup(struct aldo_rp2a03 *self);
 
-int aldo_chip_cycle(struct aldo_rp2a03 *self);
+int aldo_apu_cycle(struct aldo_rp2a03 *self);
 
-void aldo_chip_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp);
+void aldo_apu_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp);
 
 #endif

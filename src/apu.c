@@ -42,7 +42,7 @@ static int cycle_chip(struct aldo_rp2a03 *self)
 // MARK: - Public Interface
 //
 
-void aldo_chip_powerup(struct aldo_rp2a03 *self)
+void aldo_apu_powerup(struct aldo_rp2a03 *self)
 {
     assert(self != nullptr);
 
@@ -54,7 +54,7 @@ void aldo_chip_powerup(struct aldo_rp2a03 *self)
     reset(self);
 }
 
-int aldo_chip_cycle(struct aldo_rp2a03 *self)
+int aldo_apu_cycle(struct aldo_rp2a03 *self)
 {
     assert(self != nullptr);
 
@@ -62,7 +62,7 @@ int aldo_chip_cycle(struct aldo_rp2a03 *self)
     return cycle_chip(self) || aldo_cpu_cycle(&self->cpu);
 }
 
-void aldo_chip_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp)
+void aldo_apu_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp)
 {
     assert(self != nullptr);
     assert(snp != nullptr);

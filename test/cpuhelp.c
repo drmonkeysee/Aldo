@@ -7,9 +7,9 @@
 
 #include "cpuhelp.h"
 
+#include "apu.h"
 #include "bus.h"
 #include "bytes.h"
-#include "chip.h"
 #include "ciny.h"
 #include "cpu.h"
 #include "ctrlsignal.h"
@@ -113,10 +113,10 @@ int exec_cpu(struct aldo_mos6502 *cpu)
     return cycles;
 }
 
-void setup_chip(struct aldo_rp2a03 *chip, uint8_t *restrict ram,
-                uint8_t *restrict rom)
+void setup_apu(struct aldo_rp2a03 *apu, uint8_t *restrict ram,
+               uint8_t *restrict rom)
 {
-    connect_cpu(&chip->cpu, ram, rom);
-    aldo_chip_powerup(chip);
-    reset_cpu(&chip->cpu);
+    connect_cpu(&apu->cpu, ram, rom);
+    aldo_apu_powerup(apu);
+    reset_cpu(&apu->cpu);
 }

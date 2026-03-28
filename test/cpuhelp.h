@@ -21,7 +21,7 @@ void setup_cpu(struct aldo_mos6502 *cpu, uint8_t *restrict ram,
 void enable_rom_wcapture();
 int exec_cpu(struct aldo_mos6502 *cpu);
 
-void setup_chip(struct aldo_rp2a03 *chip, uint8_t *restrict ram,
-                uint8_t *restrict rom);
+void setup_apu(struct aldo_rp2a03 *apu, uint8_t *restrict ram,
+               uint8_t *restrict rom);
 
 #endif

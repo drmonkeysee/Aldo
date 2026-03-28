@@ -10,6 +10,8 @@
 
 #include "cpu.h"
 
+#include <stdint.h>
+
 struct aldo_snapshot;
 
 // The Ricoh RP2A03 Microprocessor; includes the 6502 CPU and auxiliary functions
@@ -33,6 +35,7 @@ struct aldo_rp2a03 {
                                 // 2 CPU Cycles = 1 APU Cycle.
 };
 
+void aldo_apu_connect(struct aldo_rp2a03 *self);
 void aldo_apu_powerup(struct aldo_rp2a03 *self);
 
 int aldo_apu_cycle(struct aldo_rp2a03 *self);

@@ -95,6 +95,17 @@ static void rst_too_short(void *ctx)
 }
 
 //
+// MARK: - OAM DMA
+//
+
+static void basic_oam_sequence(void *ctx)
+{
+    struct aldo_rp2a03 apu;
+
+    ct_ignore("not implemented");
+}
+
+//
 // MARK: - Test List
 //
 
@@ -104,6 +115,8 @@ struct ct_testsuite apu_tests()
         ct_maketest(powerup_initializes_apu),
         ct_maketest(rst_detected_held_and_released),
         ct_maketest(rst_too_short),
+
+        ct_maketest(basic_oam_sequence),
     };
 
     return ct_makesuite(tests);

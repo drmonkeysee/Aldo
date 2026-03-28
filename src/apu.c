@@ -7,10 +7,36 @@
 
 #include "apu.h"
 
+#include "bus.h"
+#include "bytes.h"
 #include "ctrlsignal.h"
 #include "snapshot.h"
 
 #include <assert.h>
+
+//
+// MARK: - Main Bus Device (APU/DMA/Joypad registers)
+//
+
+static bool read([[maybe_unused]] void *restrict ctx, uint16_t addr, [[maybe_unused]] uint8_t *restrict d)
+{
+    // addr=[$4000-$401F]
+    assert(ALDO_MEMBLOCK_16KB <= addr && addr < ALDO_MEMBLOCK_16KB + 0x20);
+
+    return false;
+}
+
+static bool write([[maybe_unused]] void *ctx, uint16_t addr, [[maybe_unused]] uint8_t d)
+{
+    // addr=[$4000-$401F]
+    assert(ALDO_MEMBLOCK_16KB <= addr && addr < ALDO_MEMBLOCK_16KB + 0x20);
+
+    return false;
+}
+
+//
+// MARK: - Internal Operations
+//
 
 static void reset(struct aldo_rp2a03 *self)
 {
@@ -41,6 +67,19 @@ static int cycle_chip(struct aldo_rp2a03 *self)
 //
 // MARK: - Public Interface
 //
+
+void aldo_apu_connect(struct aldo_rp2a03 *self)
+{
+    assert(self != nullptr);
+    assert(self->cpu.mbus != nullptr);
+
+    auto r = aldo_bus_set(self->cpu.mbus, ALDO_MEMBLOCK_16KB, (struct aldo_busdevice){
+        .read = read,
+        .write = write,
+        .ctx = self,
+    });
+    (void)r, assert(r);
+}
 
 void aldo_apu_powerup(struct aldo_rp2a03 *self)
 {

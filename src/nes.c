@@ -131,11 +131,15 @@ static bool create_mbus(struct aldo_nes001 *self)
      * 16-bit Address Space = 64KB
      *   $0000 - $1FFF: 2KB RAM mirrored to 8KB
      *   $2000 - $3FFF: 8 PPU registers mirrored to 8KB
-     *   $4000 - $7FFF: unmapped
+     *   $4000 - $401F: APU, DMA, Joypads, unused processor test functionality
+     *   $4020 - $7FFF: unmapped
      *   $8000 - $FFFF: 32KB Cart
      */
-    self->apu.cpu.mbus = aldo_bus_new(ALDO_BITWIDTH_64KB, 4, ALDO_MEMBLOCK_8KB,
-                                      ALDO_MEMBLOCK_16KB, ALDO_MEMBLOCK_32KB);
+    self->apu.cpu.mbus = aldo_bus_new(ALDO_BITWIDTH_64KB, 5,
+                                      ALDO_MEMBLOCK_8KB,
+                                      ALDO_MEMBLOCK_16KB,
+                                      ALDO_MEMBLOCK_16KB + 0x20,
+                                      ALDO_MEMBLOCK_32KB);
     if (!self->apu.cpu.mbus) return false;
 
     auto r = aldo_bus_set(self->apu.cpu.mbus, 0, (struct aldo_busdevice){
@@ -145,6 +149,7 @@ static bool create_mbus(struct aldo_nes001 *self)
         self->ram,
     });
     (void)r, assert(r);
+    aldo_apu_connect(&self->apu);
     return true;
 }
 

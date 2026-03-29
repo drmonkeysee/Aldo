@@ -16,7 +16,7 @@ static void powerup_initializes_apu(void *ctx)
 {
     struct aldo_rp2a03 apu;
 
-    aldo_apu_powerup(&apu);
+    setup_apu(&apu, nullptr, nullptr);
 
     ct_assertequal(0u, apu.oam.dma);
     ct_assertequal(0u, apu.oam.low);

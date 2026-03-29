@@ -9,7 +9,6 @@
 
 #include "bus.h"
 #include "bytes.h"
-#include "ctrlsignal.h"
 #include "snapshot.h"
 
 #include <assert.h>
@@ -26,12 +25,21 @@ static bool read([[maybe_unused]] void *restrict ctx, uint16_t addr, [[maybe_unu
     return false;
 }
 
-static bool write([[maybe_unused]] void *ctx, uint16_t addr, [[maybe_unused]] uint8_t d)
+static bool write(void *ctx, uint16_t addr, uint8_t d)
 {
     // addr=[$4000-$401F]
     assert(ALDO_MEMBLOCK_16KB <= addr && addr < ALDO_MEMBLOCK_16KB + 0x20);
 
-    return false;
+    struct aldo_rp2a03 *apu = ctx;
+    switch (addr & 0x1f) {
+    case 0x14:  // OAMDMA
+        apu->oam = (typeof(apu->oam)){.s = ALDO_SIG_DETECTED, .dma = d};
+        break;
+    default:    // Unimplemented test functionality
+        return false;
+    }
+
+    return true;
 }
 
 //
@@ -41,7 +49,7 @@ static bool write([[maybe_unused]] void *ctx, uint16_t addr, [[maybe_unused]] ui
 static void reset(struct aldo_rp2a03 *self)
 {
     self->oam.low = 0x0;
-    self->oam.active = false;
+    self->oam.s = ALDO_SIG_CLEAR;
     self->signal.rdy = true;
 }
 
@@ -110,7 +118,7 @@ void aldo_apu_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp
 
     apu->lines.ready = self->signal.rdy;
 
-    apu->oam.active = self->oam.active;
+    apu->oam.state = self->oam.s;
     apu->oam.dmahigh = self->oam.dma;
     apu->oam.dmalow = self->oam.low;
 

@@ -68,8 +68,8 @@ struct aldo_snapshot {
             bool ready;
         } lines;
         struct {
+            enum aldo_sigstate state;
             uint8_t dmahigh, dmalow;
-            bool active;
         } oam;
         bool put;
     } apu;

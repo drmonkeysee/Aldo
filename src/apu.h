@@ -9,6 +9,7 @@
 #define Aldo_apu_h
 
 #include "cpu.h"
+#include "ctrlsignal.h"
 
 #include <stdint.h>
 
@@ -21,9 +22,9 @@ struct aldo_rp2a03 {
     struct aldo_mos6502 cpu;    // 6502 CPU Core
 
     struct {
+        enum aldo_sigstate s;   // OAM DMA state
         uint8_t dma,            // OAMDMA register; DMA high address byte
                 low;            // DMA low address byte
-        bool active;            // OAM DMA currently running
     } oam;
 
     struct {

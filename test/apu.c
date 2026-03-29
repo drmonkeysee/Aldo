@@ -8,6 +8,7 @@
 #include "apu.h"
 #include "ciny.h"
 #include "cpuhelp.h"
+#include "ctrlsignal.h"
 
 #include <stddef.h>
 
@@ -19,7 +20,7 @@ static void powerup_initializes_apu(void *ctx)
 
     ct_assertequal(0u, apu.oam.dma);
     ct_assertequal(0u, apu.oam.low);
-    ct_assertfalse(apu.oam.active);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)apu.oam.s);
     ct_asserttrue(apu.signal.rdy);
     ct_assertfalse(apu.put);
 }
@@ -111,6 +112,7 @@ static void synced_oam_sequence(void *ctx)
     };
     struct aldo_rp2a03 apu;
     setup_apu(&apu, mem, nullptr);
+    apu.oam.low = 0xff;
     apu.cpu.a = 0x2;    // copy page $0200 to DMA
     // add values for OAM DMA, counting down from 0xff to 0x0
     for (auto i = 0; i < 256; ++i) {
@@ -125,9 +127,9 @@ static void synced_oam_sequence(void *ctx)
 
     ct_asserttrue(apu.put);
     ct_asserttrue(apu.signal.rdy);
-    ct_assertfalse(apu.oam.active);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)apu.oam.s);
     ct_assertequal(0u, apu.oam.dma);
-    ct_assertequal(0u, apu.oam.low);
+    ct_assertequal(0xffu, apu.oam.low);
     ct_assertequal(3u, apu.cpu.pc);
     ct_assertequal(0x8du, apu.cpu.opc);
     ct_assertequal(2u, apu.cpu.addrbus);
@@ -140,7 +142,7 @@ static void synced_oam_sequence(void *ctx)
 
     ct_assertfalse(apu.put);
     ct_asserttrue(apu.signal.rdy);
-    ct_asserttrue(apu.oam.active);
+    ct_assertequal(ALDO_SIG_DETECTED, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
     ct_assertequal(0u, apu.oam.low);
     ct_assertequal(3u, apu.cpu.pc);
@@ -155,7 +157,7 @@ static void synced_oam_sequence(void *ctx)
 
     ct_asserttrue(apu.put);
     ct_assertfalse(apu.signal.rdy);
-    ct_asserttrue(apu.oam.active);
+    ct_assertequal(ALDO_SIG_PENDING, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
     ct_assertequal(0u, apu.oam.low);
     ct_assertequal(4u, apu.cpu.pc);
@@ -170,7 +172,7 @@ static void synced_oam_sequence(void *ctx)
 
     ct_assertfalse(apu.put);
     ct_assertfalse(apu.signal.rdy);
-    ct_asserttrue(apu.oam.active);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
     ct_assertequal(0u, apu.oam.low);
     ct_assertequal(4u, apu.cpu.pc);
@@ -186,7 +188,7 @@ static void synced_oam_sequence(void *ctx)
 
     ct_asserttrue(apu.put);
     ct_assertfalse(apu.signal.rdy);
-    ct_asserttrue(apu.oam.active);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
     ct_assertequal(0u, apu.oam.low);
     ct_assertequal(4u, apu.cpu.pc);
@@ -202,7 +204,7 @@ static void synced_oam_sequence(void *ctx)
 
     ct_assertfalse(apu.put);
     ct_assertfalse(apu.signal.rdy);
-    ct_asserttrue(apu.oam.active);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
     ct_assertequal(1u, apu.oam.low);
     ct_assertequal(4u, apu.cpu.pc);
@@ -218,7 +220,7 @@ static void synced_oam_sequence(void *ctx)
 
     ct_asserttrue(apu.put);
     ct_assertfalse(apu.signal.rdy);
-    ct_asserttrue(apu.oam.active);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
     ct_assertequal(1u, apu.oam.low);
     ct_assertequal(4u, apu.cpu.pc);
@@ -238,7 +240,7 @@ static void synced_oam_sequence(void *ctx)
     ct_assertequal(513, cycles);
     ct_asserttrue(apu.put);
     ct_assertfalse(apu.signal.rdy);
-    ct_asserttrue(apu.oam.active);
+    ct_assertequal(ALDO_SIG_COMMITTED, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
     ct_assertequal(0xffu, apu.oam.low);
     ct_assertequal(4u, apu.cpu.pc);
@@ -254,7 +256,7 @@ static void synced_oam_sequence(void *ctx)
 
     ct_assertfalse(apu.put);
     ct_asserttrue(apu.signal.rdy);
-    ct_assertfalse(apu.oam.active);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
     ct_assertequal(0u, apu.oam.low);
     ct_assertequal(4u, apu.cpu.pc);
@@ -269,7 +271,7 @@ static void synced_oam_sequence(void *ctx)
 
     ct_asserttrue(apu.put);
     ct_asserttrue(apu.signal.rdy);
-    ct_assertfalse(apu.oam.active);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
     ct_assertequal(0u, apu.oam.low);
     ct_assertequal(5u, apu.cpu.pc);

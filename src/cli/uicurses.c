@@ -115,6 +115,22 @@ struct layout {
         ram;
 };
 
+static const char *signal_label(enum aldo_sigstate s)
+{
+    switch (s) {
+    case ALDO_SIG_DETECTED:
+        return "D";
+    case ALDO_SIG_PENDING:
+        return "P";
+    case ALDO_SIG_COMMITTED:
+        return "C";
+    case ALDO_SIG_SERVICED:
+        return "S";
+    default:
+        return "O";
+    }
+}
+
 static void drawtoggle(const struct view *v, const char *label, bool selected)
 {
     if (selected) {
@@ -638,9 +654,9 @@ static void drawapu(const struct view *v, const struct aldo_snapshot *snp)
     draw_chip_vline(v, apu->lines.ready, cursor_y, line_x, 1, ArrowUp, -1, "RDY");
     cursor_y += 2;
     mvwhline(v->content, cursor_y++, 0, 0, w);
-    mvwprintw(v->content, cursor_y++, 0, "OAMDMA: %02X  active: %d",
-              apu->oam.dmahigh, apu->oam.dmalow);
-    mvwprintw(v->content, cursor_y++, 0, "low:    %02X", apu->oam.active);
+    mvwprintw(v->content, cursor_y++, 0, "OAMDMA: %02X  state: %s",
+              apu->oam.dmahigh, signal_label(apu->oam.state));
+    mvwprintw(v->content, cursor_y++, 0, "low:    %02X", apu->oam.dmalow);
     mvwhline(v->content, cursor_y++, 0, 0, w);
     mvwprintw(v->content, cursor_y, 0, "p: %d", apu->put);
 }

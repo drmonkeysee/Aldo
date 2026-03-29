@@ -122,3 +122,11 @@ void setup_apu(struct aldo_rp2a03 *apu, uint8_t *restrict ram,
     aldo_apu_powerup(apu);
     reset_cpu(&apu->cpu);
 }
+
+int cycle_sync_apu(struct aldo_rp2a03 *apu)
+{
+    auto cycle = aldo_apu_cycle(apu);
+    // simulate nes.c setting cpu pins
+    apu->cpu.signal.rdy = apu->signal.rdy;
+    return cycle;
+}

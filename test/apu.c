@@ -11,14 +11,6 @@
 
 #include <stddef.h>
 
-static int cycle_sync_apu(struct aldo_rp2a03 *apu)
-{
-    auto cycle = aldo_apu_cycle(apu);
-    // simulate nes.c setting cpu pins
-    apu->cpu.signal.rdy = apu->signal.rdy;
-    return cycle;
-}
-
 static void powerup_initializes_apu(void *ctx)
 {
     struct aldo_rp2a03 apu;

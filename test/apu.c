@@ -108,7 +108,7 @@ static void rst_too_short(void *ctx)
 // MARK: - OAM DMA
 //
 
-static void basic_oam_sequence(void *ctx)
+static void synced_oam_sequence(void *ctx)
 {
     // STA $4014    ; start OAM DMA
     // LDA #??      ; give the CPU something to do next
@@ -300,7 +300,7 @@ struct ct_testsuite apu_tests()
         ct_maketest(rst_detected_held_and_released),
         ct_maketest(rst_too_short),
 
-        ct_maketest(basic_oam_sequence),
+        ct_maketest(synced_oam_sequence),
     };
 
     return ct_makesuite(tests);

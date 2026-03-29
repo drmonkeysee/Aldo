@@ -78,8 +78,9 @@ int RomWriteCapture = -1;
 
 void setup_testbus()
 {
-    TestBus = aldo_bus_new(ALDO_BITWIDTH_64KB, 3, ALDO_MEMBLOCK_8KB,
-                           ALDO_MEMBLOCK_32KB);
+    // basic RAM space, APU registers, and ROM space
+    TestBus = aldo_bus_new(ALDO_BITWIDTH_64KB, 4, ALDO_MEMBLOCK_8KB,
+                           ALDO_MEMBLOCK_16KB, ALDO_MEMBLOCK_32KB);
 }
 
 void teardown_testbus()
@@ -117,6 +118,7 @@ void setup_apu(struct aldo_rp2a03 *apu, uint8_t *restrict ram,
                uint8_t *restrict rom)
 {
     connect_cpu(&apu->cpu, ram, rom);
+    aldo_apu_connect(apu);
     aldo_apu_powerup(apu);
     reset_cpu(&apu->cpu);
 }

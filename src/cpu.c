@@ -1697,7 +1697,7 @@ int aldo_cpu_cycle(struct aldo_mos6502 *self)
     if (reset_held(self)) return 0;
 
     // if RDY low and last cycle was a read, perform the read until RDY is high
-    if (!self->signal.rdy && self->signal.rw) {
+    if (aldo_cpu_suspended(self)) {
         read(self);
         return 1;
     }
@@ -1730,12 +1730,23 @@ int aldo_cpu_cycle(struct aldo_mos6502 *self)
 
 bool aldo_cpu_reset_pending(const struct aldo_mos6502 *self)
 {
+    assert(self != nullptr);
+
     return (self->rst == ALDO_SIG_COMMITTED && !self->signal.rst)
             || self->rst == ALDO_SIG_PENDING;
 }
 
+bool aldo_cpu_suspended(const struct aldo_mos6502 *self)
+{
+    assert(self != nullptr);
+
+    return !self->signal.rdy && self->signal.rw;
+}
+
 bool aldo_cpu_jammed(const struct aldo_mos6502 *self)
 {
+    assert(self != nullptr);
+
     return self->t == 4 && Aldo_Decode[self->opc].mode == ALDO_AM_JAM;
 }
 

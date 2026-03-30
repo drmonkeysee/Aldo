@@ -6,11 +6,22 @@
 //
 
 #include "apu.h"
+#include "bus.h"
+#include "bytes.h"
 #include "ciny.h"
 #include "cpuhelp.h"
 #include "ctrlsignal.h"
 
 #include <stddef.h>
+#include <stdint.h>
+
+static bool oamwrite(void *ctx, uint16_t addr, uint8_t d)
+{
+    ct_assertequal(0x2004u, addr);
+    uint8_t *oamdata = ctx;
+    *oamdata = d;
+    return true;
+}
 
 static void powerup_initializes_apu(void *ctx)
 {
@@ -104,14 +115,20 @@ static void rst_too_short(void *ctx)
 static void synced_oam_sequence(void *ctx)
 {
     // STA $4014    ; start OAM DMA
-    // LDA #??      ; give the CPU something to do next
+    // LDA #$BB     ; give the CPU something to do next
     // + 256 bytes at address $0200 to copy to OAM
     uint8_t mem[0x300] = {
         0x8d, 0x14, 0x40,
-        0xa9, // $2004 will write here (mem[4]) due to cpuhelp write mask
+        0xa9, 0xbb,
     };
     struct aldo_rp2a03 apu;
     setup_apu(&apu, mem, nullptr);
+    // mock PPU bus device for OAMDATA
+    uint8_t oamdata = 0;
+    aldo_bus_set(apu.cpu.mbus, ALDO_MEMBLOCK_8KB,
+                 (struct aldo_busdevice){.write = oamwrite, .ctx = &oamdata});
+    // set put high to avoid dma sync cycle for this test
+    apu.put = true;
     apu.oam.low = 0xff;
     apu.cpu.a = 0x2;    // copy page $0200 to DMA
     // add values for OAM DMA, counting down from 0xff to 0x0
@@ -125,7 +142,7 @@ static void synced_oam_sequence(void *ctx)
     cycle_sync_apu(&apu);
     cycle_sync_apu(&apu);
 
-    ct_asserttrue(apu.put);
+    ct_assertfalse(apu.put);
     ct_asserttrue(apu.signal.rdy);
     ct_assertequal(ALDO_SIG_CLEAR, (int)apu.oam.s);
     ct_assertequal(0u, apu.oam.dma);
@@ -140,9 +157,9 @@ static void synced_oam_sequence(void *ctx)
     // write 0x2 to $4014, starting OAM DMA sequence
     cycle_sync_apu(&apu);
 
-    ct_assertfalse(apu.put);
+    ct_asserttrue(apu.put);
     ct_asserttrue(apu.signal.rdy);
-    ct_assertequal(ALDO_SIG_DETECTED, (int)apu.oam.s);
+    ct_assertequal(ALDO_SIG_PENDING, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
     ct_assertequal(0u, apu.oam.low);
     ct_assertequal(3u, apu.cpu.pc);
@@ -155,14 +172,14 @@ static void synced_oam_sequence(void *ctx)
     // DMA halts cpu, cpu executes read cycle
     cycles += cycle_sync_apu(&apu);
 
-    ct_asserttrue(apu.put);
+    ct_assertfalse(apu.put);
     ct_assertfalse(apu.signal.rdy);
     ct_assertequal(ALDO_SIG_PENDING, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
     ct_assertequal(0u, apu.oam.low);
     ct_assertequal(4u, apu.cpu.pc);
     ct_assertequal(0xa9u, apu.cpu.opc);
-    ct_assertequal(4u, apu.cpu.addrbus);
+    ct_assertequal(3u, apu.cpu.addrbus);
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
@@ -170,7 +187,7 @@ static void synced_oam_sequence(void *ctx)
     // DMA reads on get cycle, cpu idle
     cycles += cycle_sync_apu(&apu);
 
-    ct_assertfalse(apu.put);
+    ct_asserttrue(apu.put);
     ct_assertfalse(apu.signal.rdy);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
@@ -181,28 +198,28 @@ static void synced_oam_sequence(void *ctx)
     ct_assertequal(0xffu, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(0u, mem[4]);
+    ct_assertequal(0u, oamdata);
 
     // DMA writes on put cycle, cpu idle
     cycles += cycle_sync_apu(&apu);
 
-    ct_asserttrue(apu.put);
+    ct_assertfalse(apu.put);
     ct_assertfalse(apu.signal.rdy);
-    ct_assertequal(ALDO_SIG_COMMITTED, (int)apu.oam.s);
+    ct_assertequal(ALDO_SIG_PENDING, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
-    ct_assertequal(0u, apu.oam.low);
+    ct_assertequal(1u, apu.oam.low);
     ct_assertequal(4u, apu.cpu.pc);
     ct_assertequal(0xa9u, apu.cpu.opc);
     ct_assertequal(0x2004u, apu.cpu.addrbus);
     ct_assertequal(0xffu, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(0xffu, mem[4]);
+    ct_assertequal(0xffu, oamdata);
 
     // next DMA read
     cycles += cycle_sync_apu(&apu);
 
-    ct_assertfalse(apu.put);
+    ct_asserttrue(apu.put);
     ct_assertfalse(apu.signal.rdy);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
@@ -213,31 +230,30 @@ static void synced_oam_sequence(void *ctx)
     ct_assertequal(0xfeu, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(0xffu, mem[4]);
+    ct_assertequal(0xffu, oamdata);
 
     // next write
     cycles += cycle_sync_apu(&apu);
 
-    ct_asserttrue(apu.put);
+    ct_assertfalse(apu.put);
     ct_assertfalse(apu.signal.rdy);
-    ct_assertequal(ALDO_SIG_COMMITTED, (int)apu.oam.s);
+    ct_assertequal(ALDO_SIG_PENDING, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
-    ct_assertequal(1u, apu.oam.low);
+    ct_assertequal(2u, apu.oam.low);
     ct_assertequal(4u, apu.cpu.pc);
     ct_assertequal(0xa9u, apu.cpu.opc);
     ct_assertequal(0x2004u, apu.cpu.addrbus);
     ct_assertequal(0xfeu, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(0xfeu, mem[4]);
+    ct_assertequal(0xfeu, oamdata);
 
     // run the rest of the DMA sequence
     do {
         cycles += cycle_sync_apu(&apu);
-    } while (cycles < 513);
+    } while (cycles < 512);
 
-    // final DMA put cycle
-    ct_assertequal(513, cycles);
+    ct_assertequal(512, cycles);
     ct_asserttrue(apu.put);
     ct_assertfalse(apu.signal.rdy);
     ct_assertequal(ALDO_SIG_COMMITTED, (int)apu.oam.s);
@@ -245,16 +261,33 @@ static void synced_oam_sequence(void *ctx)
     ct_assertequal(0xffu, apu.oam.low);
     ct_assertequal(4u, apu.cpu.pc);
     ct_assertequal(0xa9u, apu.cpu.opc);
-    ct_assertequal(0x2004u, apu.cpu.addrbus);
+    ct_assertequal(0x2ffu, apu.cpu.addrbus);
     ct_assertequal(0u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(0u, mem[4]);
+    ct_assertequal(1u, oamdata);
+
+    // final DMA put cycle
+    cycles += cycle_sync_apu(&apu);
+
+    ct_assertequal(513, cycles);
+    ct_assertfalse(apu.put);
+    ct_asserttrue(apu.signal.rdy);
+    ct_assertequal(ALDO_SIG_CLEAR, (int)apu.oam.s);
+    ct_assertequal(2u, apu.oam.dma);
+    ct_assertequal(0u, apu.oam.low);
+    ct_assertequal(4u, apu.cpu.pc);
+    ct_assertequal(0xa9u, apu.cpu.opc);
+    ct_assertequal(0x2004u, apu.cpu.addrbus);
+    ct_assertequal(0u, apu.cpu.databus);
+    ct_asserttrue(apu.cpu.signal.rw);
+    ct_asserttrue(apu.cpu.signal.rdy);
+    ct_assertequal(0u, oamdata);
 
     // DMA over, cpu resumes and reruns last read cycle
     cycle_sync_apu(&apu);
 
-    ct_assertfalse(apu.put);
+    ct_asserttrue(apu.put);
     ct_asserttrue(apu.signal.rdy);
     ct_assertequal(ALDO_SIG_CLEAR, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
@@ -269,7 +302,7 @@ static void synced_oam_sequence(void *ctx)
     // next cpu cycle
     cycle_sync_apu(&apu);
 
-    ct_asserttrue(apu.put);
+    ct_assertfalse(apu.put);
     ct_asserttrue(apu.signal.rdy);
     ct_assertequal(ALDO_SIG_CLEAR, (int)apu.oam.s);
     ct_assertequal(2u, apu.oam.dma);
@@ -277,8 +310,8 @@ static void synced_oam_sequence(void *ctx)
     ct_assertequal(5u, apu.cpu.pc);
     ct_assertequal(0xa9u, apu.cpu.opc);
     ct_assertequal(5u, apu.cpu.addrbus);
-    ct_assertequal(0u, apu.cpu.databus);
-    ct_assertequal(0u, apu.cpu.a);
+    ct_assertequal(0xbbu, apu.cpu.databus);
+    ct_assertequal(0xbbu, apu.cpu.a);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_asserttrue(apu.cpu.signal.rdy);
 }

@@ -13,9 +13,21 @@
 
 #include <assert.h>
 
+constexpr uint16_t OamData = 0x2004;
+
 //
 // MARK: - Main Bus Device (APU/DMA/Joypad registers)
 //
+
+static bool mbus_read(struct aldo_mos6502 *cpu)
+{
+    return aldo_bus_read(cpu->mbus, cpu->addrbus, &cpu->databus);
+}
+
+static bool mbus_write(struct aldo_mos6502 *cpu)
+{
+    return aldo_bus_write(cpu->mbus, cpu->addrbus, cpu->databus);
+}
 
 static bool read([[maybe_unused]] void *restrict ctx, uint16_t addr, [[maybe_unused]] uint8_t *restrict d)
 {
@@ -33,7 +45,7 @@ static bool write(void *ctx, uint16_t addr, uint8_t d)
     struct aldo_rp2a03 *apu = ctx;
     switch (addr & 0x1f) {
     case 0x14:  // OAMDMA
-        apu->oam = (typeof(apu->oam)){.s = ALDO_SIG_DETECTED, .dma = d};
+        apu->oam = (typeof(apu->oam)){.s = ALDO_SIG_PENDING, .dma = d};
         break;
     default:    // Unimplemented test functionality
         return false;
@@ -68,8 +80,37 @@ static int cycle_chip(struct aldo_rp2a03 *self)
 {
     if (reset_held(self)) return 0;
 
+    auto cycle = 0;
+    switch (self->oam.s) {
+    case ALDO_SIG_PENDING:
+        if (aldo_cpu_suspended(&self->cpu)) {
+            if (!self->put) {
+                self->cpu.addrbus = aldo_bytowr(self->oam.low, self->oam.dma);
+                mbus_read(&self->cpu);
+                self->oam.s = ALDO_SIG_COMMITTED;
+            }
+            ++cycle;
+        }
+        break;
+    case ALDO_SIG_COMMITTED:
+        if (aldo_cpu_suspended(&self->cpu)) {
+            if (self->put) {
+                self->cpu.addrbus = OamData;
+                mbus_write(&self->cpu);
+                self->oam.s = ++self->oam.low
+                                ? ALDO_SIG_PENDING
+                                : ALDO_SIG_CLEAR;
+            }
+            ++cycle;
+        }
+        break;
+    default:
+        break;
+    }
+
+    self->signal.rdy = self->oam.s == ALDO_SIG_CLEAR;
     self->put = !self->put;
-    return 0;
+    return cycle;
 }
 
 //

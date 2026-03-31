@@ -27,6 +27,12 @@ struct aldo_rp2a03 {
                 low;            // DMA low address byte
     } oam;
 
+    // The RP2A03 has its own bus lines distinct from the 6502 core,
+    // used by the DMA units.
+    // TODO: there are bus conflicts involving DMC DMA and the CPU
+    uint16_t addrbus;
+    uint8_t databus;
+
     struct {
         bool rdy;               // Ready Signal (output); wired to CPU RDY
     } signal;

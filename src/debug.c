@@ -74,7 +74,7 @@ static bool resetaddr_read(void *restrict ctx, uint16_t addr,
 
 static bool resetaddr_write(void *ctx, uint16_t addr, uint8_t d)
 {
-    struct resdecorator *dec = ctx;
+    const struct resdecorator *dec = ctx;
     return dec->inner.write
             ? dec->inner.write(dec->inner.ctx, addr, d)
             : false;

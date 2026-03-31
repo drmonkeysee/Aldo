@@ -65,12 +65,14 @@ struct aldo_snapshot {
 
     struct {
         struct {
-            bool ready;
-        } lines;
-        struct {
             enum aldo_sigstate state;
             uint8_t dmahigh, dmalow;
         } oam;
+        uint16_t addressbus;
+        uint8_t databus;
+        struct {
+            bool ready;
+        } lines;
         bool put;
     } apu;
 

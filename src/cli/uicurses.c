@@ -646,7 +646,8 @@ static void drawppu(const struct view *v, const struct aldo_snapshot *snp)
     drawbottom_plines(v, cursor_y, line_x, snp);
 }
 
-static void drawapu(const struct view *v, const struct aldo_snapshot *snp)
+static int draw_apu_dma(const struct view *v, const struct aldo_snapshot *snp,
+                        int w, int cursor_y)
 {
     static constexpr auto seph = 3;
     static constexpr auto vsep1 = 7;
@@ -655,26 +656,50 @@ static void drawapu(const struct view *v, const struct aldo_snapshot *snp)
     static constexpr auto col2 = vsep2 + 2;
 
     auto apu = &snp->apu;
+
+    mvwhline(v->content, cursor_y++, 0, 0, w);
+    mvwvline(v->content, cursor_y, vsep1, 0, seph);
+    mvwvline(v->content, cursor_y, vsep2, 0, seph);
+
+    bool dma_active = apu->oam.state != ALDO_SIG_CLEAR;
+
+    mvwprintw(v->content, cursor_y++, col1, "OAMDMA: %02X", apu->oam.dmahigh);
+    if (!dma_active) {
+        wattron(v->content, A_DIM);
+    }
+    mvwaddstr(v->content, cursor_y, 0, DArrowLeft);
+    mvwprintw(v->content, cursor_y, 2, "%04X", apu->addressbus);
+    if (!dma_active) {
+        wattroff(v->content, A_DIM);
+    }
+
+    mvwprintw(v->content, cursor_y, col1, "low:    %02X", apu->oam.dmalow);
+    if (!dma_active) {
+        wattron(v->content, A_DIM);
+    }
+    mvwprintw(v->content, cursor_y, col2, "%02X", apu->databus);
+    mvwaddstr(v->content, cursor_y, w - 1, apu->put ? DArrowRight : DArrowLeft);
+    if (!dma_active) {
+        wattroff(v->content, A_DIM);
+    }
+
+    mvwprintw(v->content, ++cursor_y, col1, "state:  %s",
+              signal_label(apu->oam.state));
+
+    mvwhline(v->content, ++cursor_y, 0, 0, w);
+
+    return cursor_y;
+}
+
+static void drawapu(const struct view *v, const struct aldo_snapshot *snp)
+{
+    auto apu = &snp->apu;
     auto w = getmaxx(v->content);
     auto line_x = (w / 2) + 1;
     auto cursor_y = 0;
     draw_chip_vline(v, apu->lines.ready, cursor_y, line_x, 1, ArrowUp, -1, "RDY");
 
-    cursor_y += 2;
-    mvwhline(v->content, cursor_y++, 0, 0, w);
-    mvwvline(v->content, cursor_y, vsep1, 0, seph);
-    mvwvline(v->content, cursor_y, vsep2, 0, seph);
-
-    mvwprintw(v->content, cursor_y++, col1, "OAMDMA: %02X", apu->oam.dmahigh);
-    mvwaddstr(v->content, cursor_y, 0, DArrowLeft);
-    mvwprintw(v->content, cursor_y, 2, "%04X", apu->addressbus);
-    mvwprintw(v->content, cursor_y, col1, "low:    %02X", apu->oam.dmalow);
-    mvwprintw(v->content, cursor_y, col2, "%02X", apu->databus);
-    mvwaddstr(v->content, cursor_y, w - 1, apu->put ? DArrowRight : DArrowLeft);
-    mvwprintw(v->content, ++cursor_y, col1, "state:  %s",
-              signal_label(apu->oam.state));
-
-    mvwhline(v->content, ++cursor_y, 0, 0, w);
+    cursor_y = draw_apu_dma(v, snp, w, cursor_y + 2);
 
     mvwprintw(v->content, ++cursor_y, 0, "p: %d", apu->put);
 }

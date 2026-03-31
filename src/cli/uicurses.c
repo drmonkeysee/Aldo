@@ -232,6 +232,7 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     mvwaddstr(v->content, ++cursor_y, 0,
               "Speed \u00b11 (\u00b110): -/= (_/+)");
     mvwaddstr(v->content, ++cursor_y, 0, "Clock Scale: c");
+    mvwaddstr(v->content, ++cursor_y, 0, "Component Select: p");
     mvwaddstr(v->content, ++cursor_y, 0, "Ram: r/R  Fwd/Bck: f/b");
     mvwaddstr(v->content, ++cursor_y, 0, "Quit: q");
 }
@@ -647,18 +648,35 @@ static void drawppu(const struct view *v, const struct aldo_snapshot *snp)
 
 static void drawapu(const struct view *v, const struct aldo_snapshot *snp)
 {
+    static constexpr auto seph = 3;
+    static constexpr auto vsep1 = 7;
+    static constexpr auto vsep2 = 21;
+    static constexpr auto col1 = vsep1 + 2;
+    static constexpr auto col2 = vsep2 + 2;
+
     auto apu = &snp->apu;
     auto w = getmaxx(v->content);
     auto line_x = (w / 2) + 1;
     auto cursor_y = 0;
     draw_chip_vline(v, apu->lines.ready, cursor_y, line_x, 1, ArrowUp, -1, "RDY");
+
     cursor_y += 2;
     mvwhline(v->content, cursor_y++, 0, 0, w);
-    mvwprintw(v->content, cursor_y++, 0, "OAMDMA: %02X  state: %s",
-              apu->oam.dmahigh, signal_label(apu->oam.state));
-    mvwprintw(v->content, cursor_y++, 0, "low:    %02X", apu->oam.dmalow);
-    mvwhline(v->content, cursor_y++, 0, 0, w);
-    mvwprintw(v->content, cursor_y, 0, "p: %d", apu->put);
+    mvwvline(v->content, cursor_y, vsep1, 0, seph);
+    mvwvline(v->content, cursor_y, vsep2, 0, seph);
+
+    mvwprintw(v->content, cursor_y++, col1, "OAMDMA: %02X", apu->oam.dmahigh);
+    mvwaddstr(v->content, cursor_y, 0, DArrowLeft);
+    mvwprintw(v->content, cursor_y, 2, "%04X", apu->addressbus);
+    mvwprintw(v->content, cursor_y, col1, "low:    %02X", apu->oam.dmalow);
+    mvwprintw(v->content, cursor_y, col2, "%02X", apu->databus);
+    mvwaddstr(v->content, cursor_y, w - 1, apu->put ? DArrowRight : DArrowLeft);
+    mvwprintw(v->content, ++cursor_y, col1, "state:  %s",
+              signal_label(apu->oam.state));
+
+    mvwhline(v->content, ++cursor_y, 0, 0, w);
+
+    mvwprintw(v->content, ++cursor_y, 0, "p: %d", apu->put);
 }
 
 static void drawchip(const struct view *v, const struct viewstate *vs,
@@ -845,7 +863,7 @@ static void init_ui(struct layout *l, int ramsheets)
     static constexpr auto col2w = 29;
     static constexpr auto col3w = 29;
     static constexpr auto col4w = 54;
-    static constexpr auto sysh = 26;
+    static constexpr auto sysh = 27;
     static constexpr auto crth = 4;
     static constexpr auto cpuh = 20;
     static constexpr auto maxh = 37;

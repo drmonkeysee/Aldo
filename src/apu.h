@@ -23,8 +23,8 @@ struct aldo_rp2a03 {
 
     struct {
         enum aldo_sigstate s;   // OAM DMA state
-        uint8_t dma,            // OAMDMA register; DMA high address byte
-                low;            // DMA low address byte
+        uint8_t hi,             // OAMDMA register; DMA high address byte
+                lo;             // DMA low address byte
     } oam;
 
     // The RP2A03 has its own bus lines distinct from the 6502 core,

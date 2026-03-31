@@ -45,7 +45,7 @@ static bool write(void *ctx, uint16_t addr, uint8_t d)
     struct aldo_rp2a03 *apu = ctx;
     switch (addr & 0x1f) {
     case 0x14:  // OAMDMA
-        apu->oam = (typeof(apu->oam)){.s = ALDO_SIG_PENDING, .dma = d};
+        apu->oam = (typeof(apu->oam)){.s = ALDO_SIG_PENDING, .hi = d};
         break;
     default:    // Unimplemented test functionality
         return false;
@@ -55,12 +55,49 @@ static bool write(void *ctx, uint16_t addr, uint8_t d)
 }
 
 //
+// MARK: - DMA
+//
+
+static int oam_dma(struct aldo_rp2a03 *self)
+{
+    if (!aldo_cpu_suspended(&self->cpu)) return 0;
+
+    switch (self->oam.s) {
+    case ALDO_SIG_PENDING:
+        if (!self->put) {
+            self->addrbus = aldo_bytowr(self->oam.lo, self->oam.hi);
+            mbus_read(self);
+            self->oam.s = ALDO_SIG_COMMITTED;
+        }
+        return 1;
+    case ALDO_SIG_COMMITTED:
+        if (self->put) {
+            self->addrbus = OamData;
+            mbus_write(self);
+            self->oam.s = ++self->oam.lo
+                            ? ALDO_SIG_PENDING
+                            : ALDO_SIG_SERVICED;
+        }
+        return 1;
+    case ALDO_SIG_SERVICED:
+        // Extra state in order to set RDY *after* the last DMA write, so CPU
+        // resumption repeats its last read on this cycle.
+        self->oam.s = ALDO_SIG_CLEAR;
+        break;
+    default:
+        break;
+    }
+
+    return 0;
+}
+
+//
 // MARK: - Internal Operations
 //
 
 static void reset(struct aldo_rp2a03 *self)
 {
-    self->oam.low = 0x0;
+    self->oam.lo = 0x0;
     self->oam.s = ALDO_SIG_CLEAR;
     self->signal.rdy = true;
 }
@@ -80,40 +117,7 @@ static int cycle_chip(struct aldo_rp2a03 *self)
 {
     if (reset_held(self)) return 0;
 
-    auto cycle = 0;
-    switch (self->oam.s) {
-    case ALDO_SIG_PENDING:
-        if (aldo_cpu_suspended(&self->cpu)) {
-            if (!self->put) {
-                self->addrbus = aldo_bytowr(self->oam.low, self->oam.dma);
-                mbus_read(self);
-                self->oam.s = ALDO_SIG_COMMITTED;
-            }
-            ++cycle;
-        }
-        break;
-    case ALDO_SIG_COMMITTED:
-        if (aldo_cpu_suspended(&self->cpu)) {
-            if (self->put) {
-                self->addrbus = OamData;
-                mbus_write(self);
-                self->oam.s = ++self->oam.low
-                                ? ALDO_SIG_PENDING
-                                : ALDO_SIG_SERVICED;
-            }
-            ++cycle;
-        }
-        break;
-    case ALDO_SIG_SERVICED:
-        // Extra state in order to set RDY *after* the last DMA write, so CPU
-        // resumption repeats its last read on this cycle.
-        if (aldo_cpu_suspended(&self->cpu)) {
-            self->oam.s = ALDO_SIG_CLEAR;
-        }
-        break;
-    default:
-        break;
-    }
+    auto cycle = oam_dma(self);
 
     self->signal.rdy = self->oam.s == ALDO_SIG_CLEAR;
     self->put = !self->put;
@@ -145,7 +149,7 @@ void aldo_apu_powerup(struct aldo_rp2a03 *self)
 
     // powerup on a get cycle (in real hardware, put/get cycle is random)
     self->put = false;
-    self->oam.dma = 0x0;
+    self->oam.hi = 0x0;
     reset(self);
 }
 
@@ -165,8 +169,8 @@ void aldo_apu_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp
     auto apu = &snp->apu;
 
     apu->oam.state = self->oam.s;
-    apu->oam.dmahigh = self->oam.dma;
-    apu->oam.dmalow = self->oam.low;
+    apu->oam.dmahigh = self->oam.hi;
+    apu->oam.dmalow = self->oam.lo;
 
     apu->addressbus = self->addrbus;
     apu->databus = self->databus;

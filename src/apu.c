@@ -13,8 +13,6 @@
 
 #include <assert.h>
 
-constexpr uint16_t OamData = 0x2004;
-
 //
 // MARK: - Main Bus Device (APU/DMA/Joypad registers)
 //
@@ -60,6 +58,8 @@ static bool write(void *ctx, uint16_t addr, uint8_t d)
 
 static int oam_dma(struct aldo_rp2a03 *self)
 {
+    static constexpr uint16_t oamdata = 0x2004;
+
     if (!aldo_cpu_suspended(&self->cpu)) return 0;
 
     switch (self->oam.s) {
@@ -72,11 +72,9 @@ static int oam_dma(struct aldo_rp2a03 *self)
         return 1;
     case ALDO_SIG_COMMITTED:
         if (self->put) {
-            self->addrbus = OamData;
+            self->addrbus = oamdata;
             mbus_write(self);
-            self->oam.s = ++self->oam.lo
-                            ? ALDO_SIG_PENDING
-                            : ALDO_SIG_SERVICED;
+            self->oam.s = ++self->oam.lo ? ALDO_SIG_PENDING : ALDO_SIG_SERVICED;
         }
         return 1;
     case ALDO_SIG_SERVICED:

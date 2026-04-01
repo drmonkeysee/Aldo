@@ -677,7 +677,11 @@ static int draw_apu_dma(const struct view *v, const struct aldo_snapshot *snp,
     if (!dma_active) {
         wattron(v->content, A_DIM);
     }
-    mvwprintw(v->content, cursor_y, col2, "%02X", apu->databus);
+    if (apu->busfault) {
+        mvwaddstr(v->content, cursor_y, col2, "FLT");
+    } else {
+        mvwprintw(v->content, cursor_y, col2, "%02X", apu->databus);
+    }
     mvwaddstr(v->content, cursor_y, w - 1, apu->put ? DArrowRight : DArrowLeft);
     if (!dma_active) {
         wattroff(v->content, A_DIM);

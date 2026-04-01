@@ -37,7 +37,9 @@ struct aldo_rp2a03 {
         bool rdy;               // Ready Signal (output); wired to CPU RDY
     } signal;
 
-    bool put;                   // Whether the current cycle is a DMA get or put;
+    bool
+        bflt,                   // Bus fault; read/write to unmapped or invalid address
+        put;                    // Whether the current cycle is a DMA get or put;
                                 // also used to count APU cycles per CPU cycles,
                                 // 2 CPU Cycles = 1 APU Cycle.
 };

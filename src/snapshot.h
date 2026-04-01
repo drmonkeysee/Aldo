@@ -73,7 +73,7 @@ struct aldo_snapshot {
         struct {
             bool ready;
         } lines;
-        bool put;
+        bool busfault, put;
     } apu;
 
     struct {

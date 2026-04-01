@@ -17,14 +17,14 @@
 // MARK: - Main Bus Device (APU/DMA/Joypad registers)
 //
 
-static bool mbus_read(struct aldo_rp2a03 *self)
+static void mbus_read(struct aldo_rp2a03 *self)
 {
-    return aldo_bus_read(self->cpu.mbus, self->addrbus, &self->databus);
+    self->bflt = !aldo_bus_read(self->cpu.mbus, self->addrbus, &self->databus);
 }
 
-static bool mbus_write(struct aldo_rp2a03 *self)
+static void mbus_write(struct aldo_rp2a03 *self)
 {
-    return aldo_bus_write(self->cpu.mbus, self->addrbus, self->databus);
+    self->bflt = !aldo_bus_write(self->cpu.mbus, self->addrbus, self->databus);
 }
 
 static bool read([[maybe_unused]] void *restrict ctx, uint16_t addr, [[maybe_unused]] uint8_t *restrict d)
@@ -146,7 +146,7 @@ void aldo_apu_powerup(struct aldo_rp2a03 *self)
     aldo_cpu_powerup(&self->cpu);
 
     // powerup on a get cycle (in real hardware, put/get cycle is random)
-    self->put = false;
+    self->bflt = self->put = false;
     self->oam.hi = 0x0;
     reset(self);
 }
@@ -175,6 +175,7 @@ void aldo_apu_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp
 
     apu->lines.ready = self->signal.rdy;
 
+    apu->busfault = self->bflt;
     apu->put = self->put;
 
     aldo_cpu_snapshot(&self->cpu, snp);

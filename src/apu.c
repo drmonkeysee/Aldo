@@ -64,22 +64,20 @@ static int oam_dma(struct aldo_rp2a03 *self)
 
     switch (self->oam.s) {
     case ALDO_SIG_PENDING:
-        if (!self->put) {
-            self->addrbus = aldo_bytowr(self->oam.lo, self->oam.hi);
-            mbus_read(self);
-            self->oam.s = ALDO_SIG_COMMITTED;
-        }
+        if (self->put) break;
+        self->addrbus = aldo_bytowr(self->oam.lo, self->oam.hi);
+        mbus_read(self);
+        self->oam.s = ALDO_SIG_COMMITTED;
         return 1;
     case ALDO_SIG_COMMITTED:
-        if (self->put) {
-            self->addrbus = oamdata;
-            mbus_write(self);
-            self->oam.s = ++self->oam.lo ? ALDO_SIG_PENDING : ALDO_SIG_SERVICED;
-        }
+        if (!self->put) break;
+        self->addrbus = oamdata;
+        mbus_write(self);
+        self->oam.s = ++self->oam.lo ? ALDO_SIG_PENDING : ALDO_SIG_SERVICED;
         return 1;
     case ALDO_SIG_SERVICED:
-        // Extra state in order to set RDY *after* the last DMA write, so CPU
-        // resumption repeats its last read on this cycle.
+        // Extra state to set RDY *after* the last DMA write, so CPU resumption
+        // repeats its last read on *this* cycle.
         self->oam.s = ALDO_SIG_CLEAR;
         break;
     default:

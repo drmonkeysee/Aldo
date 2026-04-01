@@ -119,7 +119,7 @@ static void rst_detected_held_and_released(void *ctx)
     ct_assertequal(2u, apu.cpu.pc);
     ct_asserttrue(apu.put);
     ct_assertequal(0xau, apu.oam.hi);
-    ct_assertequal(0u, apu.oam.lo);
+    ct_assertequal(0xcu, apu.oam.lo);
 }
 
 static void rst_too_short(void *ctx)

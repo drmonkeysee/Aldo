@@ -95,7 +95,6 @@ static int oam_dma(struct aldo_rp2a03 *self)
 
 static void reset(struct aldo_rp2a03 *self)
 {
-    self->oam.lo = 0x0;
     self->oam.s = ALDO_SIG_CLEAR;
     self->signal.rdy = true;
 }
@@ -147,7 +146,7 @@ void aldo_apu_powerup(struct aldo_rp2a03 *self)
 
     // powerup on a get cycle (in real hardware, put/get cycle is random)
     self->bflt = self->put = false;
-    self->oam.hi = 0x0;
+    self->oam.hi = self->oam.lo = 0x0;
     reset(self);
 }
 

@@ -249,7 +249,7 @@ static void set_screen_dot(struct aldo_nes001 *self)
 
 static void set_cpu_pins(struct aldo_nes001 *self)
 {
-    self->apu.cpu.signal.rdy = self->probe.rdy;
+    self->apu.cpu.signal.rdy = self->probe.rdy && self->apu.signal.rdy;
     // interrupt lines are active low
     self->apu.cpu.signal.irq = !self->probe.irq;
     self->apu.cpu.signal.nmi = !self->probe.nmi && self->ppu.signal.intr;
@@ -379,9 +379,11 @@ static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
     // both cases are possible on cycle-boundary
     case ALDO_EXC_SUBCYCLE:
     case ALDO_EXC_CYCLE:
+        // TODO: what should these settings do in frame mode?
         aldo_nes_halt(self, true);
         break;
     case ALDO_EXC_STEP:
+        // TODO: make this work frame-by-frame in frame mode?
         aldo_nes_halt(self, self->apu.cpu.signal.sync);
         break;
     case ALDO_EXC_RUN:

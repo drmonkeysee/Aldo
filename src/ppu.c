@@ -1076,7 +1076,7 @@ static void vblank(struct aldo_rp2c02 *self)
         // before NMI is signaled on 241,1.
         self->status.v = true;
     } else if (in_vblank(self)) {
-        // NMI active within vblank if ctrl.v and status.v are set
+        // NMI active (low) within vblank if ctrl.v and status.v are set
         self->signal.intr = !self->ctrl.v || !self->status.v;
     } else if (self->line == LinePreRender && self->dot == 1) {
         self->signal.intr = true;

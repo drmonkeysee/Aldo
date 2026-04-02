@@ -43,7 +43,8 @@ static void record_cpu_reads(struct readctx *ctx, aldo_bus *bus)
     aldo_bus_swap(bus, 0, (struct aldo_busdevice){
         .read = count_cpu_reads,
         .write = wrap_write,
-        .ctx = ctx}, &ctx->inner);
+        .ctx = ctx,
+    }, &ctx->inner);
 }
 
 static bool oamwrite(void *ctx, uint16_t addr, uint8_t d)

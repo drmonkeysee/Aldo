@@ -374,19 +374,16 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
                                const aldo::Emulator& emu,
                                const aldo::tex::TextureData& data) const
 {
-    static constexpr auto
-        palMin = static_cast<aldo::et::byte>(aldo::color_span::extent),
-        palMax = static_cast<aldo::et::byte>((palMin * 2) - 1);
+    static constexpr auto palMax = static_cast<aldo::et::byte>(aldo::color_span::extent);
     // The range in the right/bottom of the screen where we need to clip sprite
     // rows and columns to avoid running off the edge of the texture pixels.
     static constexpr auto clipRange = SpritesDim - SpritePxDim;
 
     auto vsp = emu.snapshot().video;
 
-    // Clamp uninitialized data within palette range; note that sprite palette
-    // index is always in the upper half of the 8 available palettes.
-    auto palidx = std::max(palMin, std::min(obj.palette, palMax));
-    aldo::color_span colors = vsp->palettes.fg[palidx - palMin];
+    // clamp uninitialized data within palette range
+    auto palidx = std::min(obj.palette, palMax);
+    aldo::color_span colors = vsp->palettes.fg[palidx];
 
     auto gridCol = obj.x / SpritePxDim;
     auto gridRow = obj.y / SpritePxDim;

@@ -374,7 +374,8 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
                                const aldo::Emulator& emu,
                                const aldo::tex::TextureData& data) const
 {
-    static constexpr auto palMax = static_cast<aldo::et::byte>(aldo::color_span::extent);
+    static constexpr auto palMax =
+        static_cast<aldo::et::byte>(aldo::color_span::extent - 1);
     // The range in the right/bottom of the screen where we need to clip sprite
     // rows and columns to avoid running off the edge of the texture pixels.
     static constexpr auto clipRange = SpritesDim - SpritePxDim;

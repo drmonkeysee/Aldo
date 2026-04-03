@@ -13,10 +13,17 @@
 #include "ctrlsignal.h"
 
 #include <stdint.h>
+#include <stdlib.h>
 
 struct readctx {
     struct aldo_busdevice inner;
     int count;
+};
+
+struct testctx {
+    struct readctx apu, cpu;
+    aldo_bus *bus;
+    uint8_t oamdata;
 };
 
 static bool count_cpu_reads(void *restrict ctx, uint16_t addr,
@@ -31,20 +38,18 @@ static bool count_cpu_reads(void *restrict ctx, uint16_t addr,
     return result;
 }
 
+static bool fake_oamdma_read(void *restrict, uint16_t addr, uint8_t *restrict d)
+{
+    ct_assertequal(0x4014, addr);
+    // return 1 so it gets incremented to 2 to match test expectation
+    *d = 1;
+    return true;
+}
+
 static bool wrap_write(void *ctx, uint16_t addr, uint8_t d)
 {
     const struct readctx *rc = ctx;
     return rc->inner.write(rc->inner.ctx, addr, d);
-}
-
-static void record_cpu_reads(struct readctx *ctx, aldo_bus *bus)
-{
-    *ctx = (typeof(*ctx)){};
-    aldo_bus_swap(bus, 0, (struct aldo_busdevice){
-        .read = count_cpu_reads,
-        .write = wrap_write,
-        .ctx = ctx,
-    }, &ctx->inner);
 }
 
 static bool oamwrite(void *ctx, uint16_t addr, uint8_t d)
@@ -53,6 +58,50 @@ static bool oamwrite(void *ctx, uint16_t addr, uint8_t d)
     uint8_t *oamdata = ctx;
     *oamdata = d;
     return true;
+}
+
+static void record_cpu_reads(struct readctx *ctx, aldo_bus *bus)
+{
+    aldo_bus_swap(bus, 0, (struct aldo_busdevice){
+        .read = count_cpu_reads,
+        .write = wrap_write,
+        .ctx = ctx,
+    }, &ctx->inner);
+}
+
+static void mock_ppu_oamdata(struct testctx *tc)
+{
+    aldo_bus_set(tc->bus, ALDO_MEMBLOCK_8KB,
+                 (struct aldo_busdevice){.write = oamwrite, .ctx = &tc->oamdata});
+}
+
+static void mock_oamdma_read(struct readctx *ctx, aldo_bus *bus)
+{
+    aldo_bus_swap(bus, ALDO_MEMBLOCK_16KB, (struct aldo_busdevice){
+        .read = fake_oamdma_read,
+        .write = wrap_write,
+        .ctx = ctx,
+    }, &ctx->inner);
+}
+
+static void apu_setup(void **ctx)
+{
+    *ctx = calloc(1, sizeof(struct testctx));
+}
+
+static void apu_teardown(void **ctx)
+{
+    struct testctx *tc = *ctx;
+    if (tc->bus) {
+        if (tc->cpu.inner.ctx) {
+            aldo_bus_set(tc->bus, 0, tc->cpu.inner);
+        }
+        aldo_bus_clear(tc->bus, ALDO_MEMBLOCK_8KB);
+        if (tc->apu.inner.ctx) {
+            aldo_bus_set(tc->bus, ALDO_MEMBLOCK_16KB, tc->apu.inner);
+        }
+    }
+    free(*ctx);
 }
 
 //
@@ -159,12 +208,10 @@ static void aligned_oam_sequence(void *ctx)
     };
     struct aldo_rp2a03 apu;
     setup_apu(&apu, mem, nullptr);
-    // mock PPU bus device for OAMDATA
-    uint8_t oamdata = 0;
-    aldo_bus_set(apu.cpu.mbus, ALDO_MEMBLOCK_8KB,
-                 (struct aldo_busdevice){.write = oamwrite, .ctx = &oamdata});
-    struct readctx rc;
-    record_cpu_reads(&rc, apu.cpu.mbus);
+    struct testctx *tc = ctx;
+    tc->bus = apu.cpu.mbus;
+    mock_ppu_oamdata(tc);
+    record_cpu_reads(&tc->cpu, apu.cpu.mbus);
     // set put high to avoid dma sync cycle for this test
     apu.put = true;
     apu.oam.lo = 0xff;
@@ -191,7 +238,7 @@ static void aligned_oam_sequence(void *ctx)
     ct_assertequal(0x40u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_asserttrue(apu.cpu.signal.rdy);
-    ct_assertequal(3, rc.count);
+    ct_assertequal(3, tc->cpu.count);
 
     // write 0x2 to $4014, starting OAM DMA sequence
     cycle_sync_apu(&apu);
@@ -207,7 +254,7 @@ static void aligned_oam_sequence(void *ctx)
     ct_assertequal(2u, apu.cpu.databus);
     ct_assertfalse(apu.cpu.signal.rw);
     ct_asserttrue(apu.cpu.signal.rdy);
-    ct_assertequal(3, rc.count);
+    ct_assertequal(3, tc->cpu.count);
 
     // DMA halts cpu, cpu executes read cycle
     cycles += cycle_sync_apu(&apu);
@@ -223,7 +270,7 @@ static void aligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(4, rc.count);
+    ct_assertequal(4, tc->cpu.count);
 
     // DMA reads on get cycle, cpu idle
     cycles += cycle_sync_apu(&apu);
@@ -241,8 +288,8 @@ static void aligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(4, rc.count);
-    ct_assertequal(0u, oamdata);
+    ct_assertequal(4, tc->cpu.count);
+    ct_assertequal(0u, tc->oamdata);
 
     // DMA writes on put cycle, cpu idle
     cycles += cycle_sync_apu(&apu);
@@ -260,8 +307,8 @@ static void aligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(4, rc.count);
-    ct_assertequal(0xffu, oamdata);
+    ct_assertequal(4, tc->cpu.count);
+    ct_assertequal(0xffu, tc->oamdata);
 
     // next DMA read
     cycles += cycle_sync_apu(&apu);
@@ -279,8 +326,8 @@ static void aligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(4, rc.count);
-    ct_assertequal(0xffu, oamdata);
+    ct_assertequal(4, tc->cpu.count);
+    ct_assertequal(0xffu, tc->oamdata);
 
     // next write
     cycles += cycle_sync_apu(&apu);
@@ -298,8 +345,8 @@ static void aligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(4, rc.count);
-    ct_assertequal(0xfeu, oamdata);
+    ct_assertequal(4, tc->cpu.count);
+    ct_assertequal(0xfeu, tc->oamdata);
 
     // run the rest of the DMA sequence
     do {
@@ -320,8 +367,8 @@ static void aligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(4, rc.count);
-    ct_assertequal(1u, oamdata);
+    ct_assertequal(4, tc->cpu.count);
+    ct_assertequal(1u, tc->oamdata);
 
     // final DMA put cycle
     cycles += cycle_sync_apu(&apu);
@@ -340,8 +387,8 @@ static void aligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(4, rc.count);
-    ct_assertequal(0u, oamdata);
+    ct_assertequal(4, tc->cpu.count);
+    ct_assertequal(0u, tc->oamdata);
 
     // DMA over, cpu resumes and reruns last read cycle
     cycle_sync_apu(&apu);
@@ -359,7 +406,7 @@ static void aligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_asserttrue(apu.cpu.signal.rdy);
-    ct_assertequal(5, rc.count);
+    ct_assertequal(5, tc->cpu.count);
 
     // next cpu cycle
     cycle_sync_apu(&apu);
@@ -378,7 +425,7 @@ static void aligned_oam_sequence(void *ctx)
     ct_assertequal(0xbbu, apu.cpu.a);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_asserttrue(apu.cpu.signal.rdy);
-    ct_assertequal(6, rc.count);
+    ct_assertequal(6, tc->cpu.count);
 }
 
 static void unaligned_oam_sequence(void *ctx)
@@ -392,12 +439,10 @@ static void unaligned_oam_sequence(void *ctx)
     };
     struct aldo_rp2a03 apu;
     setup_apu(&apu, mem, nullptr);
-    // mock PPU bus device for OAMDATA
-    uint8_t oamdata = 0;
-    aldo_bus_set(apu.cpu.mbus, ALDO_MEMBLOCK_8KB,
-                 (struct aldo_busdevice){.write = oamwrite, .ctx = &oamdata});
-    struct readctx rc;
-    record_cpu_reads(&rc, apu.cpu.mbus);
+    struct testctx *tc = ctx;
+    tc->bus = apu.cpu.mbus;
+    mock_ppu_oamdata(tc);
+    record_cpu_reads(&tc->cpu, apu.cpu.mbus);
     apu.oam.lo = 0xff;
     apu.cpu.a = 0x2;    // copy page $0200 to DMA
     // add values for OAM DMA, counting down from 0xff to 0x0
@@ -422,7 +467,7 @@ static void unaligned_oam_sequence(void *ctx)
     ct_assertequal(0x40u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_asserttrue(apu.cpu.signal.rdy);
-    ct_assertequal(3, rc.count);
+    ct_assertequal(3, tc->cpu.count);
 
     // write 0x2 to $4014, starting OAM DMA sequence
     cycle_sync_apu(&apu);
@@ -438,7 +483,7 @@ static void unaligned_oam_sequence(void *ctx)
     ct_assertequal(2u, apu.cpu.databus);
     ct_assertfalse(apu.cpu.signal.rw);
     ct_asserttrue(apu.cpu.signal.rdy);
-    ct_assertequal(3, rc.count);
+    ct_assertequal(3, tc->cpu.count);
 
     // DMA halts cpu, cpu executes read cycle
     cycles += cycle_sync_apu(&apu);
@@ -454,7 +499,7 @@ static void unaligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(4, rc.count);
+    ct_assertequal(4, tc->cpu.count);
 
     // DMA alignment cycle, cpu reads again
     cycles += cycle_sync_apu(&apu);
@@ -470,7 +515,7 @@ static void unaligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(5, rc.count);
+    ct_assertequal(5, tc->cpu.count);
 
     // DMA reads on get cycle, cpu idle
     cycles += cycle_sync_apu(&apu);
@@ -488,8 +533,8 @@ static void unaligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(5, rc.count);
-    ct_assertequal(0u, oamdata);
+    ct_assertequal(5, tc->cpu.count);
+    ct_assertequal(0u, tc->oamdata);
 
     // DMA writes on put cycle, cpu idle
     cycles += cycle_sync_apu(&apu);
@@ -507,8 +552,8 @@ static void unaligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(5, rc.count);
-    ct_assertequal(0xffu, oamdata);
+    ct_assertequal(5, tc->cpu.count);
+    ct_assertequal(0xffu, tc->oamdata);
 
     // next DMA read
     cycles += cycle_sync_apu(&apu);
@@ -526,8 +571,8 @@ static void unaligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(5, rc.count);
-    ct_assertequal(0xffu, oamdata);
+    ct_assertequal(5, tc->cpu.count);
+    ct_assertequal(0xffu, tc->oamdata);
 
     // next write
     cycles += cycle_sync_apu(&apu);
@@ -545,8 +590,8 @@ static void unaligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(5, rc.count);
-    ct_assertequal(0xfeu, oamdata);
+    ct_assertequal(5, tc->cpu.count);
+    ct_assertequal(0xfeu, tc->oamdata);
 
     // run the rest of the DMA sequence
     do {
@@ -567,8 +612,8 @@ static void unaligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(5, rc.count);
-    ct_assertequal(1u, oamdata);
+    ct_assertequal(5, tc->cpu.count);
+    ct_assertequal(1u, tc->oamdata);
 
     // final DMA put cycle
     cycles += cycle_sync_apu(&apu);
@@ -587,8 +632,8 @@ static void unaligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_assertfalse(apu.cpu.signal.rdy);
-    ct_assertequal(5, rc.count);
-    ct_assertequal(0u, oamdata);
+    ct_assertequal(5, tc->cpu.count);
+    ct_assertequal(0u, tc->oamdata);
 
     // DMA over, cpu resumes and reruns last read cycle
     cycle_sync_apu(&apu);
@@ -606,7 +651,7 @@ static void unaligned_oam_sequence(void *ctx)
     ct_assertequal(0xa9u, apu.cpu.databus);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_asserttrue(apu.cpu.signal.rdy);
-    ct_assertequal(6, rc.count);
+    ct_assertequal(6, tc->cpu.count);
 
     // next cpu cycle
     cycle_sync_apu(&apu);
@@ -625,7 +670,12 @@ static void unaligned_oam_sequence(void *ctx)
     ct_assertequal(0xbbu, apu.cpu.a);
     ct_asserttrue(apu.cpu.signal.rw);
     ct_asserttrue(apu.cpu.signal.rdy);
-    ct_assertequal(7, rc.count);
+    ct_assertequal(7, tc->cpu.count);
+}
+
+static void write_delayed_oam_sequence(void *ctx)
+{
+    // stub
 }
 
 //
@@ -641,7 +691,8 @@ struct ct_testsuite apu_tests()
 
         ct_maketest(aligned_oam_sequence),
         ct_maketest(unaligned_oam_sequence),
+        //ct_maketest(write_delayed_oam_sequence),
     };
 
-    return ct_makesuite(tests);
+    return ct_makesuite_setup_teardown(tests, apu_setup, apu_teardown);
 }

@@ -104,7 +104,7 @@ struct aldo_rp2c02 {
 
     // Pixel Render Pipeline
     struct {
-        uint16_t bgs[2];    // Background Tile Shifter
+        uint16_t bgs[2];    // Background Tile Shifter (low, high planes)
         uint8_t at,         // Attribute Table Fetch
                 atb,        // Attribute Latch Bit [0, 2, 4, 6]
                 ats[2],     // Attribute Table Shifter
@@ -114,7 +114,13 @@ struct aldo_rp2c02 {
                 pal,        // Palette Index
                 px;         // Pixel Color Output
         bool atl[2];        // Attribute Table Latch (2 bits)
-        // TODO: 8 sprite select/shifts
+        struct {
+            uint8_t
+                a,          // Sprite Attribute
+                fg[2],      // Foreground Tile Shifter (low, high planes)
+                x;          // Sprite X-Coordinate
+            // TODO: need any latches based on timing?
+        } spr[8];           // Sprite Shift Units
     } pxpl;
 
     // Internal Registers and Control Flags

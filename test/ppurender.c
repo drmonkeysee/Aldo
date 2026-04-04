@@ -122,7 +122,7 @@ static void nametable_fetch(void *ctx)
     ct_assertequal(1, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -132,7 +132,7 @@ static void nametable_fetch(void *ctx)
     ct_assertequal(2, ppu->dot);
     ct_assertequal(0x2005u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -142,7 +142,7 @@ static void nametable_fetch(void *ctx)
     ct_assertequal(3, ppu->dot);
     ct_assertequal(0x2005u, ppu->vaddrbus);
     ct_assertequal(0x11u, ppu->vdatabus);
-    ct_assertequal(0x11u, ppu->pxpl.nt);
+    ct_assertequal(0x11u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
@@ -160,7 +160,7 @@ static void attributetable_fetch(void *ctx)
     ct_assertequal(4, ppu->dot);
     ct_assertequal(0x23c1u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.at);
+    ct_assertequal(0u, ppu->pxpl.tlu.at);
     ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -170,7 +170,7 @@ static void attributetable_fetch(void *ctx)
     ct_assertequal(5, ppu->dot);
     ct_assertequal(0x23c1u, ppu->vaddrbus);
     ct_assertequal(0x22u, ppu->vdatabus);
-    ct_assertequal(0x22u, ppu->pxpl.at);
+    ct_assertequal(0x22u, ppu->pxpl.tlu.at);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
@@ -183,18 +183,18 @@ static void tile_fetch(void *ctx)
     PatternTables[0][8] = 0x44;
     ppu->v = 0x5;
     ppu->dot = 5;
-    ppu->pxpl.nt = 0x11;
-    ppu->pxpl.atb = 4;
+    ppu->pxpl.tlu.nt = 0x11;
+    ppu->pxpl.tlu.atb = 4;
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(6, ppu->dot);
     ct_assertequal(5u, ppu->v);
-    ct_assertequal(4u, ppu->pxpl.atb);
+    ct_assertequal(4u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x0110u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.bg[0]);
-    ct_assertequal(0u, ppu->pxpl.bg[1]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[1]);
     ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -203,11 +203,11 @@ static void tile_fetch(void *ctx)
 
     ct_assertequal(7, ppu->dot);
     ct_assertequal(5u, ppu->v);
-    ct_assertequal(4u, ppu->pxpl.atb);
+    ct_assertequal(4u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x0110u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
-    ct_assertequal(0x33u, ppu->pxpl.bg[0]);
-    ct_assertequal(0u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[1]);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
@@ -216,11 +216,11 @@ static void tile_fetch(void *ctx)
 
     ct_assertequal(8, ppu->dot);
     ct_assertequal(5u, ppu->v);
-    ct_assertequal(4u, ppu->pxpl.atb);
+    ct_assertequal(4u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x0118u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
-    ct_assertequal(0x33u, ppu->pxpl.bg[0]);
-    ct_assertequal(0u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[1]);
     ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -229,11 +229,11 @@ static void tile_fetch(void *ctx)
 
     ct_assertequal(9, ppu->dot);
     ct_assertequal(6u, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x0118u, ppu->vaddrbus);
     ct_assertequal(0x44u, ppu->vdatabus);
-    ct_assertequal(0x33u, ppu->pxpl.bg[0]);
-    ct_assertequal(0x44u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0x44u, ppu->pxpl.tlu.bg[1]);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
@@ -256,7 +256,7 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
     ct_assertequal(1, ppu->dot);
     ct_assertequal(0x1003u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -266,10 +266,10 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
 
     ct_assertequal(2, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x2aeau, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -278,10 +278,10 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
 
     ct_assertequal(3, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x2aeau, ppu->vaddrbus);
     ct_assertequal(0x11u, ppu->vdatabus);
-    ct_assertequal(0x11u, ppu->pxpl.nt);
+    ct_assertequal(0x11u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
@@ -291,10 +291,10 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
 
     ct_assertequal(4, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x2beau, ppu->vaddrbus);
     ct_assertequal(0x11u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.at);
+    ct_assertequal(0u, ppu->pxpl.tlu.at);
     ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -303,10 +303,10 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
 
     ct_assertequal(5, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x2beau, ppu->vaddrbus);
     ct_assertequal(0x22u, ppu->vdatabus);
-    ct_assertequal(0x22u, ppu->pxpl.at);
+    ct_assertequal(0x22u, ppu->pxpl.tlu.at);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
@@ -316,11 +316,11 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
 
     ct_assertequal(6, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x1113u, ppu->vaddrbus);
     ct_assertequal(0x22u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.bg[0]);
-    ct_assertequal(0u, ppu->pxpl.bg[1]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[1]);
     ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -329,11 +329,11 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
 
     ct_assertequal(7, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x1113u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
-    ct_assertequal(0x33u, ppu->pxpl.bg[0]);
-    ct_assertequal(0u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[1]);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
@@ -342,11 +342,11 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
 
     ct_assertequal(8, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x111bu, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
-    ct_assertequal(0x33u, ppu->pxpl.bg[0]);
-    ct_assertequal(0u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[1]);
     ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -355,11 +355,11 @@ static void tile_fetch_higher_bits_sequence(void *ctx)
 
     ct_assertequal(9, ppu->dot);
     ct_assertequal(0x3aebu, ppu->v);
-    ct_assertequal(6u, ppu->pxpl.atb);
+    ct_assertequal(6u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x111bu, ppu->vaddrbus);
     ct_assertequal(0x44u, ppu->vdatabus);
-    ct_assertequal(0x33u, ppu->pxpl.bg[0]);
-    ct_assertequal(0x44u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0x44u, ppu->pxpl.tlu.bg[1]);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
@@ -382,7 +382,7 @@ static void tile_fetch_post_render_line(void *ctx)
     ct_assertequal(1, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -393,7 +393,7 @@ static void tile_fetch_post_render_line(void *ctx)
     ct_assertequal(2, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -403,7 +403,7 @@ static void tile_fetch_post_render_line(void *ctx)
     ct_assertequal(3, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -414,7 +414,7 @@ static void tile_fetch_post_render_line(void *ctx)
     ct_assertequal(4, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -424,7 +424,7 @@ static void tile_fetch_post_render_line(void *ctx)
     ct_assertequal(5, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -435,7 +435,7 @@ static void tile_fetch_post_render_line(void *ctx)
     ct_assertequal(6, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -445,7 +445,7 @@ static void tile_fetch_post_render_line(void *ctx)
     ct_assertequal(7, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -455,7 +455,7 @@ static void tile_fetch_post_render_line(void *ctx)
     ct_assertequal(8, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -465,7 +465,7 @@ static void tile_fetch_post_render_line(void *ctx)
     ct_assertequal(9, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -489,7 +489,7 @@ static void tile_fetch_rendering_disabled(void *ctx)
     ct_assertequal(1, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -500,7 +500,7 @@ static void tile_fetch_rendering_disabled(void *ctx)
     ct_assertequal(2, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -510,7 +510,7 @@ static void tile_fetch_rendering_disabled(void *ctx)
     ct_assertequal(3, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -521,7 +521,7 @@ static void tile_fetch_rendering_disabled(void *ctx)
     ct_assertequal(4, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -531,7 +531,7 @@ static void tile_fetch_rendering_disabled(void *ctx)
     ct_assertequal(5, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -542,7 +542,7 @@ static void tile_fetch_rendering_disabled(void *ctx)
     ct_assertequal(6, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -552,7 +552,7 @@ static void tile_fetch_rendering_disabled(void *ctx)
     ct_assertequal(7, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -562,7 +562,7 @@ static void tile_fetch_rendering_disabled(void *ctx)
     ct_assertequal(8, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -572,7 +572,7 @@ static void tile_fetch_rendering_disabled(void *ctx)
     ct_assertequal(9, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -596,7 +596,7 @@ static void tile_fetch_tile_only_disabled(void *ctx)
     ct_assertequal(1, ppu->dot);
     ct_assertequal(0x1003u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -606,10 +606,10 @@ static void tile_fetch_tile_only_disabled(void *ctx)
 
     ct_assertequal(2, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x2aeau, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -618,10 +618,10 @@ static void tile_fetch_tile_only_disabled(void *ctx)
 
     ct_assertequal(3, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x2aeau, ppu->vaddrbus);
     ct_assertequal(0x11u, ppu->vdatabus);
-    ct_assertequal(0x11u, ppu->pxpl.nt);
+    ct_assertequal(0x11u, ppu->pxpl.tlu.nt);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
@@ -631,10 +631,10 @@ static void tile_fetch_tile_only_disabled(void *ctx)
 
     ct_assertequal(4, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x2beau, ppu->vaddrbus);
     ct_assertequal(0x11u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.at);
+    ct_assertequal(0u, ppu->pxpl.tlu.at);
     ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -643,10 +643,10 @@ static void tile_fetch_tile_only_disabled(void *ctx)
 
     ct_assertequal(5, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x2beau, ppu->vaddrbus);
     ct_assertequal(0x22u, ppu->vdatabus);
-    ct_assertequal(0x22u, ppu->pxpl.at);
+    ct_assertequal(0x22u, ppu->pxpl.tlu.at);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
@@ -656,11 +656,11 @@ static void tile_fetch_tile_only_disabled(void *ctx)
 
     ct_assertequal(6, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x1113u, ppu->vaddrbus);
     ct_assertequal(0x22u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.bg[0]);
-    ct_assertequal(0u, ppu->pxpl.bg[1]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[1]);
     ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -669,11 +669,11 @@ static void tile_fetch_tile_only_disabled(void *ctx)
 
     ct_assertequal(7, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x1113u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
-    ct_assertequal(0x33u, ppu->pxpl.bg[0]);
-    ct_assertequal(0u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[1]);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
@@ -682,11 +682,11 @@ static void tile_fetch_tile_only_disabled(void *ctx)
 
     ct_assertequal(8, ppu->dot);
     ct_assertequal(0x3aeau, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x111bu, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
-    ct_assertequal(0x33u, ppu->pxpl.bg[0]);
-    ct_assertequal(0u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[1]);
     ct_assertequal(0u, ppu->rbuf);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
@@ -695,11 +695,11 @@ static void tile_fetch_tile_only_disabled(void *ctx)
 
     ct_assertequal(9, ppu->dot);
     ct_assertequal(0x3aebu, ppu->v);
-    ct_assertequal(6u, ppu->pxpl.atb);
+    ct_assertequal(6u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x111bu, ppu->vaddrbus);
     ct_assertequal(0x44u, ppu->vdatabus);
-    ct_assertequal(0x33u, ppu->pxpl.bg[0]);
-    ct_assertequal(0x44u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0x44u, ppu->pxpl.tlu.bg[1]);
     ct_assertequal(0u, ppu->rbuf);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
@@ -718,19 +718,19 @@ static void render_line_end(void *ctx)
     ppu->v = 0x5;
     ppu->t = 0x7b3;
     ppu->dot = 255;
-    ppu->pxpl.nt = 0x11;
-    ppu->pxpl.atb = 4;
+    ppu->pxpl.tlu.nt = 0x11;
+    ppu->pxpl.tlu.atb = 4;
 
     // Tile Fetch
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(256, ppu->dot);
     ct_assertequal(5u, ppu->v);
-    ct_assertequal(4u, ppu->pxpl.atb);
+    ct_assertequal(4u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x0118u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0x11u, ppu->pxpl.nt);
-    ct_assertequal(0u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x11u, ppu->pxpl.tlu.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -738,11 +738,11 @@ static void render_line_end(void *ctx)
 
     ct_assertequal(257, ppu->dot);
     ct_assertequal(0x1006u, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x0118u, ppu->vaddrbus);
     ct_assertequal(0x44u, ppu->vdatabus);
-    ct_assertequal(0x11u, ppu->pxpl.nt);
-    ct_assertequal(0x44u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x11u, ppu->pxpl.tlu.nt);
+    ct_assertequal(0x44u, ppu->pxpl.tlu.bg[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -753,8 +753,8 @@ static void render_line_end(void *ctx)
     ct_assertequal(0x1413u, ppu->v);
     ct_assertequal(0x2006u, ppu->vaddrbus);
     ct_assertequal(0x44u, ppu->vdatabus);
-    ct_assertequal(0x11u, ppu->pxpl.nt);
-    ct_assertequal(0x44u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x11u, ppu->pxpl.tlu.nt);
+    ct_assertequal(0x44u, ppu->pxpl.tlu.bg[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -764,8 +764,8 @@ static void render_line_end(void *ctx)
     ct_assertequal(0x1413u, ppu->v);
     ct_assertequal(0x2006u, ppu->vaddrbus);
     ct_assertequal(0x77u, ppu->vdatabus);
-    ct_assertequal(0x77u, ppu->pxpl.nt);
-    ct_assertequal(0x44u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x77u, ppu->pxpl.tlu.nt);
+    ct_assertequal(0x44u, ppu->pxpl.tlu.bg[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -776,8 +776,8 @@ static void render_line_end(void *ctx)
     ct_assertequal(0x1413u, ppu->v);
     ct_assertequal(0x2413u, ppu->vaddrbus);
     ct_assertequal(0x77u, ppu->vdatabus);
-    ct_assertequal(0x77u, ppu->pxpl.nt);
-    ct_assertequal(0x44u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x77u, ppu->pxpl.tlu.nt);
+    ct_assertequal(0x44u, ppu->pxpl.tlu.bg[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -787,8 +787,8 @@ static void render_line_end(void *ctx)
     ct_assertequal(0x1413u, ppu->v);
     ct_assertequal(0x2413u, ppu->vaddrbus);
     ct_assertequal(0x99u, ppu->vdatabus);
-    ct_assertequal(0x77u, ppu->pxpl.nt);
-    ct_assertequal(0x44u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x77u, ppu->pxpl.tlu.nt);
+    ct_assertequal(0x44u, ppu->pxpl.tlu.bg[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -804,7 +804,7 @@ static void render_line_prefetch(void *ctx)
     PatternTables[0][8] = 0x44;
     ppu->v = 0x5;
     ppu->dot = 321;
-    ppu->pxpl.atb = 4;
+    ppu->pxpl.tlu.atb = 4;
 
     // Tile Fetch 1
     // NT Fetch
@@ -813,7 +813,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(322, ppu->dot);
     ct_assertequal(0x2005u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -822,7 +822,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(323, ppu->dot);
     ct_assertequal(0x2005u, ppu->vaddrbus);
     ct_assertequal(0x11u, ppu->vdatabus);
-    ct_assertequal(0x11u, ppu->pxpl.nt);
+    ct_assertequal(0x11u, ppu->pxpl.tlu.nt);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -832,7 +832,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(324, ppu->dot);
     ct_assertequal(0x23c1u, ppu->vaddrbus);
     ct_assertequal(0x11u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.at);
+    ct_assertequal(0u, ppu->pxpl.tlu.at);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -841,7 +841,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(325, ppu->dot);
     ct_assertequal(0x23c1u, ppu->vaddrbus);
     ct_assertequal(0x22u, ppu->vdatabus);
-    ct_assertequal(0x22u, ppu->pxpl.at);
+    ct_assertequal(0x22u, ppu->pxpl.tlu.at);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -852,8 +852,8 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(5u, ppu->v);
     ct_assertequal(0x0110u, ppu->vaddrbus);
     ct_assertequal(0x22u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.bg[0]);
-    ct_assertequal(0u, ppu->pxpl.bg[1]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -863,8 +863,8 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(5u, ppu->v);
     ct_assertequal(0x0110u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
-    ct_assertequal(0x33u, ppu->pxpl.bg[0]);
-    ct_assertequal(0u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -874,8 +874,8 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(5u, ppu->v);
     ct_assertequal(0x0118u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
-    ct_assertequal(0x33u, ppu->pxpl.bg[0]);
-    ct_assertequal(0u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0u, ppu->pxpl.tlu.bg[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -883,11 +883,11 @@ static void render_line_prefetch(void *ctx)
 
     ct_assertequal(329, ppu->dot);
     ct_assertequal(6u, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x0118u, ppu->vaddrbus);
     ct_assertequal(0x44u, ppu->vdatabus);
-    ct_assertequal(0x33u, ppu->pxpl.bg[0]);
-    ct_assertequal(0x44u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0x44u, ppu->pxpl.tlu.bg[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -898,7 +898,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(330, ppu->dot);
     ct_assertequal(0x2006u, ppu->vaddrbus);
     ct_assertequal(0x44u, ppu->vdatabus);
-    ct_assertequal(0x11u, ppu->pxpl.nt);
+    ct_assertequal(0x11u, ppu->pxpl.tlu.nt);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -907,7 +907,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(331, ppu->dot);
     ct_assertequal(0x2006u, ppu->vaddrbus);
     ct_assertequal(0xaau, ppu->vdatabus);
-    ct_assertequal(0xaau, ppu->pxpl.nt);
+    ct_assertequal(0xaau, ppu->pxpl.tlu.nt);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -917,7 +917,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(332, ppu->dot);
     ct_assertequal(0x23c1u, ppu->vaddrbus);
     ct_assertequal(0xaau, ppu->vdatabus);
-    ct_assertequal(0x22u, ppu->pxpl.at);
+    ct_assertequal(0x22u, ppu->pxpl.tlu.at);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -926,7 +926,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(333, ppu->dot);
     ct_assertequal(0x23c1u, ppu->vaddrbus);
     ct_assertequal(0x22u, ppu->vdatabus);
-    ct_assertequal(0x22u, ppu->pxpl.at);
+    ct_assertequal(0x22u, ppu->pxpl.tlu.at);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -941,8 +941,8 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(6u, ppu->v);
     ct_assertequal(0x0aa0u, ppu->vaddrbus);
     ct_assertequal(0x22u, ppu->vdatabus);
-    ct_assertequal(0x33u, ppu->pxpl.bg[0]);
-    ct_assertequal(0x44u, ppu->pxpl.bg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0x44u, ppu->pxpl.tlu.bg[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -952,8 +952,8 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(6u, ppu->v);
     ct_assertequal(0x0aa0u, ppu->vaddrbus);
     ct_assertequal(0xbbu, ppu->vdatabus);
-    ct_assertequal(0xbbu, ppu->pxpl.bg[0]);
-    ct_assertequal(0x44u, ppu->pxpl.bg[1]);
+    ct_assertequal(0xbbu, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0x44u, ppu->pxpl.tlu.bg[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -963,8 +963,8 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(6u, ppu->v);
     ct_assertequal(0x0aa8u, ppu->vaddrbus);
     ct_assertequal(0xbbu, ppu->vdatabus);
-    ct_assertequal(0xbbu, ppu->pxpl.bg[0]);
-    ct_assertequal(0x44u, ppu->pxpl.bg[1]);
+    ct_assertequal(0xbbu, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0x44u, ppu->pxpl.tlu.bg[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -972,11 +972,11 @@ static void render_line_prefetch(void *ctx)
 
     ct_assertequal(337, ppu->dot);
     ct_assertequal(7u, ppu->v);
-    ct_assertequal(2u, ppu->pxpl.atb);
+    ct_assertequal(2u, ppu->pxpl.tlu.atb);
     ct_assertequal(0x0aa8u, ppu->vaddrbus);
     ct_assertequal(0xccu, ppu->vdatabus);
-    ct_assertequal(0xbbu, ppu->pxpl.bg[0]);
-    ct_assertequal(0xccu, ppu->pxpl.bg[1]);
+    ct_assertequal(0xbbu, ppu->pxpl.tlu.bg[0]);
+    ct_assertequal(0xccu, ppu->pxpl.tlu.bg[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -986,7 +986,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(338, ppu->dot);
     ct_assertequal(0x2007u, ppu->vaddrbus);
     ct_assertequal(0xccu, ppu->vdatabus);
-    ct_assertequal(0xaau, ppu->pxpl.nt);
+    ct_assertequal(0xaau, ppu->pxpl.tlu.nt);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -995,7 +995,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(339, ppu->dot);
     ct_assertequal(0x2007u, ppu->vaddrbus);
     ct_assertequal(0xeeu, ppu->vdatabus);
-    ct_assertequal(0xeeu, ppu->pxpl.nt);
+    ct_assertequal(0xeeu, ppu->pxpl.tlu.nt);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1004,7 +1004,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(340, ppu->dot);
     ct_assertequal(0x2007u, ppu->vaddrbus);
     ct_assertequal(0xeeu, ppu->vdatabus);
-    ct_assertequal(0xeeu, ppu->pxpl.nt);
+    ct_assertequal(0xeeu, ppu->pxpl.tlu.nt);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1013,7 +1013,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(0, ppu->dot);
     ct_assertequal(0x2007u, ppu->vaddrbus);
     ct_assertequal(0xeeu, ppu->vdatabus);
-    ct_assertequal(0xeeu, ppu->pxpl.nt);
+    ct_assertequal(0xeeu, ppu->pxpl.tlu.nt);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1025,7 +1025,7 @@ static void render_line_prefetch(void *ctx)
     ct_assertequal(7u, ppu->v);
     ct_assertequal(0x0ee0u, ppu->vaddrbus);
     ct_assertequal(0xeeu, ppu->vdatabus);
-    ct_assertequal(0xbbu, ppu->pxpl.bg[0]);
+    ct_assertequal(0xbbu, ppu->pxpl.tlu.bg[0]);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 }
@@ -1042,7 +1042,7 @@ static void prerender_nametable_fetch(void *ctx)
     ct_assertequal(1, ppu->dot);
     ct_assertequal(0u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1051,7 +1051,7 @@ static void prerender_nametable_fetch(void *ctx)
     ct_assertequal(2, ppu->dot);
     ct_assertequal(0x2005u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1060,7 +1060,7 @@ static void prerender_nametable_fetch(void *ctx)
     ct_assertequal(3, ppu->dot);
     ct_assertequal(0x2005u, ppu->vaddrbus);
     ct_assertequal(0x11u, ppu->vdatabus);
-    ct_assertequal(0x11u, ppu->pxpl.nt);
+    ct_assertequal(0x11u, ppu->pxpl.tlu.nt);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -1078,7 +1078,7 @@ static void prerender_end_even_frame(void *ctx)
     ct_assertequal(340, ppu->dot);
     ct_assertequal(0x2005u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
     ct_assertfalse(ppu->odd);
@@ -1088,7 +1088,7 @@ static void prerender_end_even_frame(void *ctx)
     ct_assertequal(0, ppu->dot);
     ct_assertequal(0x2005u, ppu->vaddrbus);
     ct_assertequal(0x11u, ppu->vdatabus);
-    ct_assertequal(0x11u, ppu->pxpl.nt);
+    ct_assertequal(0x11u, ppu->pxpl.tlu.nt);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
     ct_assertequal(0, ppu->line);
@@ -1099,7 +1099,7 @@ static void prerender_end_even_frame(void *ctx)
     ct_assertequal(1, ppu->dot);
     ct_assertequal(0x0110u, ppu->vaddrbus);
     ct_assertequal(0x11u, ppu->vdatabus);
-    ct_assertequal(0x11u, ppu->pxpl.nt);
+    ct_assertequal(0x11u, ppu->pxpl.tlu.nt);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 }
@@ -1118,7 +1118,7 @@ static void prerender_end_odd_frame(void *ctx)
     ct_assertequal(0, ppu->dot);
     ct_assertequal(0x2005u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
-    ct_assertequal(0u, ppu->pxpl.nt);
+    ct_assertequal(0u, ppu->pxpl.tlu.nt);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
     ct_assertfalse(ppu->odd);
@@ -1128,7 +1128,7 @@ static void prerender_end_odd_frame(void *ctx)
     ct_assertequal(1, ppu->dot);
     ct_assertequal(0x2005u, ppu->vaddrbus);
     ct_assertequal(0x11u, ppu->vdatabus);
-    ct_assertequal(0x11u, ppu->pxpl.nt);
+    ct_assertequal(0x11u, ppu->pxpl.tlu.nt);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
     ct_assertequal(0, ppu->line);
@@ -1208,7 +1208,7 @@ static void course_x_wraparound(void *ctx)
     ct_assertequal(9, ppu->dot);
     ct_assertequal(0x400u, ppu->v); // 000 01 00000 00000
     // atb set to previous course-x selection
-    ct_assertequal(2u, ppu->pxpl.atb);
+    ct_assertequal(2u, ppu->pxpl.tlu.atb);
 
     ppu->v = 0x41f;                 // 000 01 00000 11111
     ppu->dot = 8;
@@ -1218,7 +1218,7 @@ static void course_x_wraparound(void *ctx)
     ct_assertequal(9, ppu->dot);
     ct_assertequal(0u, ppu->v);     // 000 00 00000 00000
     // atb set to previous course-x selection
-    ct_assertequal(2u, ppu->pxpl.atb);
+    ct_assertequal(2u, ppu->pxpl.tlu.atb);
 }
 
 static void fine_y_wraparound(void *ctx)
@@ -1232,7 +1232,7 @@ static void fine_y_wraparound(void *ctx)
     ct_assertequal(257, ppu->dot);
     ct_assertequal(0x86u, ppu->v);  // 000 00 00100 00110
     // atb set to previous course-x/y selection
-    ct_assertequal(4u, ppu->pxpl.atb);
+    ct_assertequal(4u, ppu->pxpl.tlu.atb);
 }
 
 static void course_y_wraparound(void *ctx)
@@ -1246,7 +1246,7 @@ static void course_y_wraparound(void *ctx)
     ct_assertequal(257, ppu->dot);
     ct_assertequal(0x806u, ppu->v); // 000 10 00000 00110
     // atb set to previous course-x/y selection
-    ct_assertequal(0u, ppu->pxpl.atb);
+    ct_assertequal(0u, ppu->pxpl.tlu.atb);
 }
 
 static void course_y_overflow(void *ctx)
@@ -1260,7 +1260,7 @@ static void course_y_overflow(void *ctx)
     ct_assertequal(257, ppu->dot);
     ct_assertequal(0x3e6u, ppu->v);     // 000 00 11111 00110
     // atb set to previous course-x/y selection
-    ct_assertequal(4u, ppu->pxpl.atb);
+    ct_assertequal(4u, ppu->pxpl.tlu.atb);
 
     ppu->v = 0x73e6;                    // 111 00 11111 00110
     ppu->dot = 256;
@@ -1270,7 +1270,7 @@ static void course_y_overflow(void *ctx)
     ct_assertequal(257, ppu->dot);
     ct_assertequal(7u, ppu->v);         // 000 00 00000 00111
     // atb set to previous course-x/y selection
-    ct_assertequal(6u, ppu->pxpl.atb);
+    ct_assertequal(6u, ppu->pxpl.tlu.atb);
 }
 
 //
@@ -3107,74 +3107,74 @@ static void oamaddr_not_cleared_during_postrender(void *ctx)
 static void tile_prefetch_pipeline(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
-    ppu->pxpl.at = 0x56;
-    ppu->pxpl.bg[0] = 0xbb;
-    ppu->pxpl.bg[1] = 0xcc;
+    ppu->pxpl.tlu.at = 0x56;
+    ppu->pxpl.tlu.bg[0] = 0xbb;
+    ppu->pxpl.tlu.bg[1] = 0xcc;
     ppu->line = 261;
     ppu->dot = 329;
-    ppu->pxpl.atl[0] = true;
-    ppu->pxpl.ats[0] = 0xff;
+    ppu->pxpl.tlu.atl[0] = true;
+    ppu->pxpl.tlu.ats[0] = 0xff;
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(330, ppu->dot);
-    ct_assertfalse(ppu->pxpl.atl[0]);
-    ct_asserttrue(ppu->pxpl.atl[1]);
-    ct_assertequal(0u, ppu->pxpl.ats[0]);
-    ct_assertequal(0xffu, ppu->pxpl.ats[1]);
-    ct_assertequal(0xbb00u, ppu->pxpl.bgs[0]);
-    ct_assertequal(0xcc00u, ppu->pxpl.bgs[1]);
+    ct_assertfalse(ppu->pxpl.tlu.atl[0]);
+    ct_asserttrue(ppu->pxpl.tlu.atl[1]);
+    ct_assertequal(0u, ppu->pxpl.tlu.ats[0]);
+    ct_assertequal(0xffu, ppu->pxpl.tlu.ats[1]);
+    ct_assertequal(0xbb00u, ppu->pxpl.tlu.bgs[0]);
+    ct_assertequal(0xcc00u, ppu->pxpl.tlu.bgs[1]);
     ct_assertfalse(ppu->signal.vout);
 
     aldo_ppu_cycle(ppu);
 
     // no changes because we don't emulate the prefetch shifts
     ct_assertequal(331, ppu->dot);
-    ct_assertfalse(ppu->pxpl.atl[0]);
-    ct_asserttrue(ppu->pxpl.atl[1]);
-    ct_assertequal(0u, ppu->pxpl.ats[0]);
-    ct_assertequal(0xffu, ppu->pxpl.ats[1]);
-    ct_assertequal(0xbb00u, ppu->pxpl.bgs[0]);
-    ct_assertequal(0xcc00u, ppu->pxpl.bgs[1]);
+    ct_assertfalse(ppu->pxpl.tlu.atl[0]);
+    ct_asserttrue(ppu->pxpl.tlu.atl[1]);
+    ct_assertequal(0u, ppu->pxpl.tlu.ats[0]);
+    ct_assertequal(0xffu, ppu->pxpl.tlu.ats[1]);
+    ct_assertequal(0xbb00u, ppu->pxpl.tlu.bgs[0]);
+    ct_assertequal(0xcc00u, ppu->pxpl.tlu.bgs[1]);
     ct_assertfalse(ppu->signal.vout);
 
     ppu->dot = 337;
-    ppu->pxpl.at = 0xa9;
-    ppu->pxpl.bg[0] = 0x66;
-    ppu->pxpl.bg[1] = 0x55;
+    ppu->pxpl.tlu.at = 0xa9;
+    ppu->pxpl.tlu.bg[0] = 0x66;
+    ppu->pxpl.tlu.bg[1] = 0x55;
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(338, ppu->dot);
-    ct_asserttrue(ppu->pxpl.atl[0]);
-    ct_assertfalse(ppu->pxpl.atl[1]);
-    ct_assertequal(0u, ppu->pxpl.ats[0]);
-    ct_assertequal(0xffu, ppu->pxpl.ats[1]);
-    ct_assertequal(0xbb66u, ppu->pxpl.bgs[0]);
-    ct_assertequal(0xcc55u, ppu->pxpl.bgs[1]);
+    ct_asserttrue(ppu->pxpl.tlu.atl[0]);
+    ct_assertfalse(ppu->pxpl.tlu.atl[1]);
+    ct_assertequal(0u, ppu->pxpl.tlu.ats[0]);
+    ct_assertequal(0xffu, ppu->pxpl.tlu.ats[1]);
+    ct_assertequal(0xbb66u, ppu->pxpl.tlu.bgs[0]);
+    ct_assertequal(0xcc55u, ppu->pxpl.tlu.bgs[1]);
     ct_assertfalse(ppu->signal.vout);
 }
 
 static void tile_prefetch_postrender(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
-    ppu->pxpl.bgs[0] = 0x1111;
-    ppu->pxpl.bgs[1] = 0x2222;
+    ppu->pxpl.tlu.bgs[0] = 0x1111;
+    ppu->pxpl.tlu.bgs[1] = 0x2222;
     ppu->line = 250;
     ppu->dot = 329;
-    ppu->pxpl.atl[1] = ppu->pxpl.atl[0] = true;
-    ppu->pxpl.ats[0] = 0xee;
-    ppu->pxpl.ats[1] = 0xdd;
+    ppu->pxpl.tlu.atl[1] = ppu->pxpl.tlu.atl[0] = true;
+    ppu->pxpl.tlu.ats[0] = 0xee;
+    ppu->pxpl.tlu.ats[1] = 0xdd;
 
     for (auto i = 0; i < 9; ++i) {
         aldo_ppu_cycle(ppu);
 
         ct_assertequal(329 + i + 1, ppu->dot);
-        ct_asserttrue(ppu->pxpl.atl[0]);
-        ct_asserttrue(ppu->pxpl.atl[1]);
-        ct_assertequal(0xeeu, ppu->pxpl.ats[0]);
-        ct_assertequal(0xddu, ppu->pxpl.ats[1]);
-        ct_assertequal(0x1111u, ppu->pxpl.bgs[0]);
-        ct_assertequal(0x2222u, ppu->pxpl.bgs[1]);
+        ct_asserttrue(ppu->pxpl.tlu.atl[0]);
+        ct_asserttrue(ppu->pxpl.tlu.atl[1]);
+        ct_assertequal(0xeeu, ppu->pxpl.tlu.ats[0]);
+        ct_assertequal(0xddu, ppu->pxpl.tlu.ats[1]);
+        ct_assertequal(0x1111u, ppu->pxpl.tlu.bgs[0]);
+        ct_assertequal(0x2222u, ppu->pxpl.tlu.bgs[1]);
         ct_assertfalse(ppu->signal.vout);
     }
 }
@@ -3183,17 +3183,17 @@ static void attribute_latch(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
     uint16_t vs[] = {0x0, 0x2, 0x40, 0x42};
-    ppu->pxpl.at = 0xe4;
-    ppu->pxpl.atl[1] = ppu->pxpl.atl[0] = true;
+    ppu->pxpl.tlu.at = 0xe4;
+    ppu->pxpl.tlu.atl[1] = ppu->pxpl.tlu.atl[0] = true;
 
     for (size_t i = 0; i < 4; ++i) {
         ppu->dot = 336;
         ppu->v = vs[i];
         aldo_ppu_cycle(ppu);
-        ct_assertequal(i * 2, ppu->pxpl.atb);
+        ct_assertequal(i * 2, ppu->pxpl.tlu.atb);
         ct_assertequal((unsigned int)(vs[i] + 1), ppu->v);
         aldo_ppu_cycle(ppu);
-        auto val = ppu->pxpl.atl[1] << 1 | ppu->pxpl.atl[0];
+        auto val = ppu->pxpl.tlu.atl[1] << 1 | ppu->pxpl.tlu.atl[0];
         ct_assertequal((int)i, val);
     }
 }
@@ -3201,10 +3201,10 @@ static void attribute_latch(void *ctx)
 static void first_pixel_bg(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
-    ppu->pxpl.bgs[0] = 0x6fff;
-    ppu->pxpl.bgs[1] = 0xcfff;
-    ppu->pxpl.ats[0] = 0x0;
-    ppu->pxpl.ats[1] = 0xff;
+    ppu->pxpl.tlu.bgs[0] = 0x6fff;
+    ppu->pxpl.tlu.bgs[1] = 0xcfff;
+    ppu->pxpl.tlu.ats[0] = 0x0;
+    ppu->pxpl.tlu.ats[1] = 0xff;
 
     // Idle Cycle
     aldo_ppu_cycle(ppu);
@@ -3256,12 +3256,12 @@ static void last_pixel_bg(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 256;
-    ppu->pxpl.bgs[0] = 0xb7ff;
-    ppu->pxpl.bgs[1] = 0x67ff;
-    ppu->pxpl.atl[0] = false;
-    ppu->pxpl.atl[1] = true;
-    ppu->pxpl.ats[0] = 0x0;
-    ppu->pxpl.ats[1] = 0xff;
+    ppu->pxpl.tlu.bgs[0] = 0xb7ff;
+    ppu->pxpl.tlu.bgs[1] = 0x67ff;
+    ppu->pxpl.tlu.atl[0] = false;
+    ppu->pxpl.tlu.atl[1] = true;
+    ppu->pxpl.tlu.ats[0] = 0x0;
+    ppu->pxpl.tlu.ats[1] = 0xff;
     ppu->pxpl.mux = 0x1;
     ppu->pxpl.pal = 0x3;
 
@@ -3269,31 +3269,31 @@ static void last_pixel_bg(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(257, ppu->dot);
-    ct_assertequal(0x6fffu, ppu->pxpl.bgs[0]);
-    ct_assertequal(0xcfffu, ppu->pxpl.bgs[1]);
-    ct_assertfalse(ppu->pxpl.atl[0]);
-    ct_asserttrue(ppu->pxpl.atl[1]);
-    ct_assertequal(0u, ppu->pxpl.ats[0]);
-    ct_assertequal(0xffu, ppu->pxpl.ats[1]);
+    ct_assertequal(0x6fffu, ppu->pxpl.tlu.bgs[0]);
+    ct_assertequal(0xcfffu, ppu->pxpl.tlu.bgs[1]);
+    ct_assertfalse(ppu->pxpl.tlu.atl[0]);
+    ct_asserttrue(ppu->pxpl.tlu.atl[1]);
+    ct_assertequal(0u, ppu->pxpl.tlu.ats[0]);
+    ct_assertequal(0xffu, ppu->pxpl.tlu.ats[1]);
     ct_assertequal(9u, ppu->pxpl.mux);
     ct_assertequal(1u, ppu->pxpl.pal);
     ct_assertequal(2u, ppu->pxpl.px);
     ct_asserttrue(ppu->signal.vout);
 
-    ppu->pxpl.bg[0] = 0x11;
-    ppu->pxpl.bg[1] = 0x22;
-    ppu->pxpl.at = 0x1;
+    ppu->pxpl.tlu.bg[0] = 0x11;
+    ppu->pxpl.tlu.bg[1] = 0x22;
+    ppu->pxpl.tlu.at = 0x1;
 
     // Last Full Mux-and-Shift
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(258, ppu->dot);
-    ct_assertequal(0xdf11u, ppu->pxpl.bgs[0]);
-    ct_assertequal(0x9f22u, ppu->pxpl.bgs[1]);
-    ct_asserttrue(ppu->pxpl.atl[0]);
-    ct_assertfalse(ppu->pxpl.atl[1]);
-    ct_assertequal(0u, ppu->pxpl.ats[0]);
-    ct_assertequal(0xffu, ppu->pxpl.ats[1]);
+    ct_assertequal(0xdf11u, ppu->pxpl.tlu.bgs[0]);
+    ct_assertequal(0x9f22u, ppu->pxpl.tlu.bgs[1]);
+    ct_asserttrue(ppu->pxpl.tlu.atl[0]);
+    ct_assertfalse(ppu->pxpl.tlu.atl[1]);
+    ct_assertequal(0u, ppu->pxpl.tlu.ats[0]);
+    ct_assertequal(0xffu, ppu->pxpl.tlu.ats[1]);
     ct_assertequal(0xau, ppu->pxpl.mux);
     ct_assertequal(9u, ppu->pxpl.pal);
     ct_assertequal(0u, ppu->pxpl.px);
@@ -3303,12 +3303,12 @@ static void last_pixel_bg(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(259, ppu->dot);
-    ct_assertequal(0xbe23u, ppu->pxpl.bgs[0]);
-    ct_assertequal(0x3e45u, ppu->pxpl.bgs[1]);
-    ct_asserttrue(ppu->pxpl.atl[0]);
-    ct_assertfalse(ppu->pxpl.atl[1]);
-    ct_assertequal(1u, ppu->pxpl.ats[0]);
-    ct_assertequal(0xfeu, ppu->pxpl.ats[1]);
+    ct_assertequal(0xbe23u, ppu->pxpl.tlu.bgs[0]);
+    ct_assertequal(0x3e45u, ppu->pxpl.tlu.bgs[1]);
+    ct_asserttrue(ppu->pxpl.tlu.atl[0]);
+    ct_assertfalse(ppu->pxpl.tlu.atl[1]);
+    ct_assertequal(1u, ppu->pxpl.tlu.ats[0]);
+    ct_assertequal(0xfeu, ppu->pxpl.tlu.ats[1]);
     ct_assertequal(0xbu, ppu->pxpl.mux);
     ct_assertequal(0xau, ppu->pxpl.pal);
     ct_assertequal(5u, ppu->pxpl.px);
@@ -3318,12 +3318,12 @@ static void last_pixel_bg(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(260, ppu->dot);
-    ct_assertequal(0x7c47u, ppu->pxpl.bgs[0]);
-    ct_assertequal(0x7c8bu, ppu->pxpl.bgs[1]);
-    ct_asserttrue(ppu->pxpl.atl[0]);
-    ct_assertfalse(ppu->pxpl.atl[1]);
-    ct_assertequal(3u, ppu->pxpl.ats[0]);
-    ct_assertequal(0xfcu, ppu->pxpl.ats[1]);
+    ct_assertequal(0x7c47u, ppu->pxpl.tlu.bgs[0]);
+    ct_assertequal(0x7c8bu, ppu->pxpl.tlu.bgs[1]);
+    ct_asserttrue(ppu->pxpl.tlu.atl[0]);
+    ct_assertfalse(ppu->pxpl.tlu.atl[1]);
+    ct_assertequal(3u, ppu->pxpl.tlu.ats[0]);
+    ct_assertequal(0xfcu, ppu->pxpl.tlu.ats[1]);
     ct_assertequal(9u, ppu->pxpl.mux);
     ct_assertequal(0xbu, ppu->pxpl.pal);
     ct_assertequal(6u, ppu->pxpl.px);
@@ -3333,12 +3333,12 @@ static void last_pixel_bg(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(261, ppu->dot);
-    ct_assertequal(0x7c47u, ppu->pxpl.bgs[0]);
-    ct_assertequal(0x7c8bu, ppu->pxpl.bgs[1]);
-    ct_asserttrue(ppu->pxpl.atl[0]);
-    ct_assertfalse(ppu->pxpl.atl[1]);
-    ct_assertequal(3u, ppu->pxpl.ats[0]);
-    ct_assertequal(0xfcu, ppu->pxpl.ats[1]);
+    ct_assertequal(0x7c47u, ppu->pxpl.tlu.bgs[0]);
+    ct_assertequal(0x7c8bu, ppu->pxpl.tlu.bgs[1]);
+    ct_asserttrue(ppu->pxpl.tlu.atl[0]);
+    ct_assertfalse(ppu->pxpl.tlu.atl[1]);
+    ct_assertequal(3u, ppu->pxpl.tlu.ats[0]);
+    ct_assertequal(0xfcu, ppu->pxpl.tlu.ats[1]);
     ct_assertequal(9u, ppu->pxpl.mux);
     ct_assertequal(0xbu, ppu->pxpl.pal);
     ct_assertequal(6u, ppu->pxpl.px);
@@ -3369,10 +3369,10 @@ static void pixel_transparent_bg(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 66;
-    ppu->pxpl.bgs[0] = 0x1fff;
-    ppu->pxpl.bgs[1] = 0x1fff;
-    ppu->pxpl.ats[0] = 0xbf;
-    ppu->pxpl.ats[1] = 0x7f;
+    ppu->pxpl.tlu.bgs[0] = 0x1fff;
+    ppu->pxpl.tlu.bgs[1] = 0x1fff;
+    ppu->pxpl.tlu.ats[0] = 0xbf;
+    ppu->pxpl.tlu.ats[1] = 0x7f;
     ppu->pxpl.mux = 0x0;
     ppu->pxpl.pal = 0x6;
 
@@ -3411,8 +3411,8 @@ static void pixel_disabled_bg(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 66;
-    ppu->pxpl.bgs[1] = ppu->pxpl.bgs[0] = 0xffff;
-    ppu->pxpl.ats[1] = ppu->pxpl.ats[0] = 0xff;
+    ppu->pxpl.tlu.bgs[1] = ppu->pxpl.tlu.bgs[0] = 0xffff;
+    ppu->pxpl.tlu.ats[1] = ppu->pxpl.tlu.ats[0] = 0xff;
     ppu->mask.b = false;
 
     aldo_ppu_cycle(ppu);
@@ -3425,9 +3425,10 @@ static void left_mask_bg(void *ctx)
     auto ppu = ppt_get_ppu(ctx);
     ppu->line = 10;
     ppu->dot = 2;
-    ppu->pxpl.atl[1] = ppu->pxpl.atl[0] = true;
-    ppu->pxpl.ats[1] = ppu->pxpl.ats[0] = ppu->pxpl.bg[1] = ppu->pxpl.bg[0] = 0xff;
-    ppu->pxpl.bgs[1] = ppu->pxpl.bgs[0] = 0xffff;
+    ppu->pxpl.tlu.atl[1] = ppu->pxpl.tlu.atl[0] = true;
+    ppu->pxpl.tlu.ats[1] = ppu->pxpl.tlu.ats[0] = ppu->pxpl.tlu.bg[1] =
+        ppu->pxpl.tlu.bg[0] = 0xff;
+    ppu->pxpl.tlu.bgs[1] = ppu->pxpl.tlu.bgs[0] = 0xffff;
     ppu->mask.bm = false;
 
     for (auto i = 0; i < 8; ++i) {
@@ -3450,10 +3451,10 @@ static void fine_x_select(void *ctx)
     uint8_t bg0 = 0, bg1 = 0, at0 = 0, at1 = 0;
     for (uint8_t i = 0; i < 8; ++i) {
         ppu->dot = 70;
-        ppu->pxpl.bgs[0] = 0xcd00;
-        ppu->pxpl.bgs[1] = 0xa800;
-        ppu->pxpl.ats[0] = 0x73;
-        ppu->pxpl.ats[1] = 0x41;
+        ppu->pxpl.tlu.bgs[0] = 0xcd00;
+        ppu->pxpl.tlu.bgs[1] = 0xa800;
+        ppu->pxpl.tlu.ats[0] = 0x73;
+        ppu->pxpl.tlu.ats[1] = 0x41;
         ppu->x = i;
 
         aldo_ppu_cycle(ppu);

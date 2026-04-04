@@ -693,21 +693,21 @@ static void latch_pattern(uint16_t *latch, uint8_t val)
 // wrong quadrant bits due to erroneously looking one x-tile ahead.
 static void lock_attribute(struct aldo_rp2c02 *self)
 {
-    self->pxpl.atb = (self->v & 0x2) | ((self->v & 0x40) >> 4);
+    self->pxpl.tlu.atb = (self->v & 0x2) | ((self->v & 0x40) >> 4);
 }
 
 static void latch_attribute(struct aldo_rp2c02 *self)
 {
-    auto pxpl = &self->pxpl;
-    pxpl->atl[0] = aldo_getbit(pxpl->at, pxpl->atb);
-    pxpl->atl[1] = aldo_getbit(pxpl->at, pxpl->atb + 1);
+    auto tlu = &self->pxpl.tlu;
+    tlu->atl[0] = aldo_getbit(tlu->at, tlu->atb);
+    tlu->atl[1] = aldo_getbit(tlu->at, tlu->atb + 1);
 }
 
 static void latch_tile(struct aldo_rp2c02 *self)
 {
-    auto pxpl = &self->pxpl;
-    latch_pattern(pxpl->bgs, pxpl->bg[0]);
-    latch_pattern(pxpl->bgs + 1, pxpl->bg[1]);
+    auto tlu = &self->pxpl.tlu;
+    latch_pattern(tlu->bgs, tlu->bg[0]);
+    latch_pattern(tlu->bgs + 1, tlu->bg[1]);
     latch_attribute(self);
 }
 
@@ -716,15 +716,16 @@ static void mux_bg(struct aldo_rp2c02 *self)
     static constexpr auto left_mask_end = DotPxStart + 8;
 
     auto pxpl = &self->pxpl;
+    auto tlu = &pxpl->tlu;
     // fine-x selects bit from the left: 0 = 7th bit, 7 = 0th bit
     auto abit = 7 - self->x;
-    pxpl->mux = (uint8_t)((aldo_getbit(pxpl->ats[1], abit) << 3)
-                          | (aldo_getbit(pxpl->ats[0], abit) << 2));
+    pxpl->mux = (uint8_t)((aldo_getbit(tlu->ats[1], abit) << 3)
+                          | (aldo_getbit(tlu->ats[0], abit) << 2));
     if (self->mask.b && (self->mask.bm || self->dot >= left_mask_end)) {
         // tile selection is from the left-most (upper) byte
         auto tbit = abit + 8;
-        pxpl->mux |= (uint8_t)((aldo_getbit(pxpl->bgs[1], tbit) << 1)
-                               | aldo_getbit(pxpl->bgs[0], tbit));
+        pxpl->mux |= (uint8_t)((aldo_getbit(tlu->bgs[1], tbit) << 1)
+                               | aldo_getbit(tlu->bgs[0], tbit));
     }
     assert(pxpl->mux < 0x10);
 }
@@ -768,11 +769,11 @@ static void shift_tiles(struct aldo_rp2c02 *self)
 {
 #define pxshift(r, v) (*(r) = (typeof(*(r)))(*(r) << 1) | (v))
 
-    auto pxpl = &self->pxpl;
-    pxshift(pxpl->bgs, 1);
-    pxshift(pxpl->ats, pxpl->atl[0]);
-    pxshift(pxpl->bgs + 1, 1);
-    pxshift(pxpl->ats + 1, pxpl->atl[1]);
+    auto tlu = &self->pxpl.tlu;
+    pxshift(tlu->bgs, 1);
+    pxshift(tlu->ats, tlu->atl[0]);
+    pxshift(tlu->bgs + 1, 1);
+    pxshift(tlu->ats + 1, tlu->atl[1]);
     if (self->dot % 8 == 1) {
         latch_tile(self);
     }
@@ -788,7 +789,7 @@ static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
 static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
                              bool plane)
 {
-    auto tileidx = self->pxpl.nt << 4;
+    auto tileidx = self->pxpl.tlu.nt << 4;
     auto pxrow = (self->v & FineYBits) >> 12;
     return (uint16_t)((table << 12) | tileidx | (plane << 3) | pxrow);
 }
@@ -796,7 +797,7 @@ static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
 static void read_nt(struct aldo_rp2c02 *self)
 {
     read(self);
-    self->pxpl.nt = self->vdatabus;
+    self->pxpl.tlu.nt = self->vdatabus;
 }
 
 static void incr_course_x(struct aldo_rp2c02 *self)
@@ -870,11 +871,11 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
         // pipeline it's easier to load the tiles at once.
         latch_tile(self);
         // perform first tile pixel shifts that normally occur on dots 329-337
-        auto pxpl = &self->pxpl;
-        pxpl->bgs[0] <<= 8;
-        pxpl->ats[0] = (uint8_t)-pxpl->atl[0];
-        pxpl->bgs[1] <<= 8;
-        pxpl->ats[1] = (uint8_t)-pxpl->atl[1];
+        auto tlu = &self->pxpl.tlu;
+        tlu->bgs[0] <<= 8;
+        tlu->ats[0] = (uint8_t)-tlu->atl[0];
+        tlu->bgs[1] <<= 8;
+        tlu->ats[1] = (uint8_t)-tlu->atl[1];
     } else if (self->dot == 337) {
         latch_tile(self);
     }
@@ -903,7 +904,7 @@ static void tile_read(struct aldo_rp2c02 *self)
     case 4:
         // AT data
         read(self);
-        self->pxpl.at = self->vdatabus;
+        self->pxpl.tlu.at = self->vdatabus;
         break;
     case 5:
         // BG low addr
@@ -912,7 +913,7 @@ static void tile_read(struct aldo_rp2c02 *self)
     case 6:
         // BG low data
         read(self);
-        self->pxpl.bg[0] = self->vdatabus;
+        self->pxpl.tlu.bg[0] = self->vdatabus;
         break;
     case 7:
         // BG high addr
@@ -921,7 +922,7 @@ static void tile_read(struct aldo_rp2c02 *self)
     case 0:
         // BG high data
         read(self);
-        self->pxpl.bg[1] = self->vdatabus;
+        self->pxpl.tlu.bg[1] = self->vdatabus;
         if (!self->cvp) {
             increment_tile(self, false);
         }

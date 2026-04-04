@@ -2451,7 +2451,8 @@ private:
     aldo::Sprites sprites;
     using PriorityMode = decltype(sprites)::Priority;
     ComboList<PriorityMode> priorityCombo;
-    RefreshInterval<250.0> drawInterval;
+    // draw every other frame or so
+    RefreshInterval<1000.0/30.0> drawInterval;
     int selected = NoSelection;
     bool screenIndicator = false;
 };

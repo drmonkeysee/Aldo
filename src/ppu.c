@@ -493,7 +493,6 @@ static bool regwrite(void *ctx, uint16_t addr, uint8_t d)
         // https://www.nesdev.org/wiki/PPU_registers#OAMADDR_precautions
         break;
     case 4: // OAMDATA
-        // TODO: this logic is shared by OAMDMA
         if (in_postrender(ppu) || rendering_disabled(ppu)) {
             ppu->spr.oam[ppu->oamaddr++] = ppu->regbus;
         } else {

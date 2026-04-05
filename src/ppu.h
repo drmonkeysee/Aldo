@@ -11,6 +11,7 @@
 #include "bustype.h"
 #include "ctrlsignal.h"
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -104,6 +105,7 @@ struct aldo_rp2c02 {
 
     // Pixel Render Pipeline
     struct {
+        size_t spuidx;          // Current Sprite Unit Fetch
         struct {
             uint16_t bgs[2];    // Background Tile Shifter (low, high planes)
             uint8_t at,         // Attribute Table Fetch
@@ -115,15 +117,14 @@ struct aldo_rp2c02 {
         } tlu;                  // Tile Rendering Unit (2 Tiles)
         struct {
             uint8_t
-                a,          // Sprite Attribute
-                fg[2],      // Foreground Tile Shifter (low, high planes)
-                x;          // Sprite X-Coordinate
+                a,              // Sprite Attribute
+                fg[2],          // Foreground Tile Shifter (low, high planes)
+                x;              // Sprite X-Coordinate
             // TODO: need any latches based on timing?
-        } spu[8];           // Sprite Rendering Units
-        uint8_t mux,        // Multiplexed Pixel Selection
-                pal,        // Palette Index
-                px,         // Pixel Color Output
-                spuidx;     // Current Sprite Unit Fetch
+        } spu[8];               // Sprite Rendering Units
+        uint8_t mux,            // Multiplexed Pixel Selection
+                pal,            // Palette Index
+                px;             // Pixel Color Output
     } pxpl;
 
     // Internal Registers and Control Flags

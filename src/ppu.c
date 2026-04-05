@@ -12,7 +12,6 @@
 #include "snapshot.h"
 
 #include <assert.h>
-#include <stddef.h>
 
 // A single NTSC frame is 262 scanlines of 341 dots, counting h-blank,
 // v-blank, overscan, etc; nominally 1 frame is 262 * 341 = 89342 ppu cycles;
@@ -183,10 +182,10 @@ static bool oam_overflow(const struct aldo_rp2c02 *self, uint8_t prev_sprite)
     return prev_sprite != 0 && (self->oamaddr & ~DWordMask) == 0;
 }
 
-static struct sprite_obj soam_get_obj(const struct aldo_rp2c02 *self, uint8_t idx)
+static struct sprite_obj soam_get_obj(const struct aldo_rp2c02 *self, size_t idx)
 {
     auto sprites = &self->spr;
-    uint8_t addr = idx * SpriteSize;
+    auto addr = idx * SpriteSize;
 
     assert(addr < aldo_arrsz(sprites->soam));
     const uint8_t *obj = sprites->soam + addr;
@@ -636,7 +635,7 @@ static void snapshot_nametables(const struct aldo_rp2c02 *self,
 
     for (size_t i = 0; i < aldo_arrsz(vsp->nt.tables); ++i) {
         auto base_addr = (uint16_t)(BaseNtAddr + (HNtBit * (uint16_t)i));
-        size_t tile_count = aldo_arrsz(vsp->nt.tables[i].tiles);
+        auto tile_count = aldo_arrsz(vsp->nt.tables[i].tiles);
         aldo_bus_copy(self->vbus, base_addr, tile_count, vsp->nt.tables[i].tiles);
         aldo_bus_copy(self->vbus, base_addr + (uint16_t)tile_count,
                       aldo_arrsz(vsp->nt.tables[i].attributes),

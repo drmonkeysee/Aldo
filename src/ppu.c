@@ -881,14 +881,6 @@ static void increment_tile(struct aldo_rp2c02 *self, bool force_y)
     }
 }
 
-static size_t curr_sprite_unit(const struct aldo_rp2c02 *self)
-{
-    auto sprites = &self->spr;
-    size_t spu_addr = sprites->soaddr % SpriteSize;
-    assert(spu_addr < aldo_arrsz(self->pxpl.spu));
-    return spu_addr;
-}
-
 static uint16_t sprite_pattern_addr(const struct aldo_rp2c02 *self,
                                     const struct sprite_obj *obj, bool plane)
 {

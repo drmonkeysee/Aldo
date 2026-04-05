@@ -43,6 +43,11 @@ constexpr uint8_t CourseXBits = 0x1f;
 constexpr uint8_t PaletteMask = CourseXBits;
 constexpr uint8_t DWordMask = 0x3;
 
+struct sprite_obj {
+    uint8_t y, tile, attr, x;
+    bool active;
+};
+
 //
 // MARK: - Registers
 //
@@ -178,14 +183,20 @@ static bool oam_overflow(const struct aldo_rp2c02 *self, uint8_t prev_sprite)
     return prev_sprite != 0 && (self->oamaddr & ~DWordMask) == 0;
 }
 
-static const uint8_t *soam_read_obj(const struct aldo_rp2c02 *self)
+static struct sprite_obj soam_get_obj(const struct aldo_rp2c02 *self, uint8_t idx)
 {
     auto sprites = &self->spr;
+    uint8_t addr = idx * SpriteSize;
 
-    assert(sprites->soaddr < aldo_arrsz(sprites->soam));
-    assert(sprites->soaddr % SpriteSize == 0);
-
-    return sprites->soam + sprites->soaddr;
+    assert(addr < aldo_arrsz(sprites->soam));
+    const uint8_t *obj = sprites->soam + addr;
+    // If sprite is not active (past the selected sprites for this scanline)
+    // return a "transparent" set of values that still has enough data to run
+    // a dummy CHR tile lookup.
+    // TODO: should x be min or max?
+    return addr < sprites->soaddr
+        ? (struct sprite_obj){obj[0], obj[1], obj[2], obj[3], true}
+        : (struct sprite_obj){.tile = obj[1], .x = 0xff};
 }
 
 static void soam_write(struct aldo_rp2c02 *self)
@@ -201,7 +212,12 @@ static void soam_advance(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
     ++sprites->soaddr;
-    sprites->soaddr %= aldo_arrsz(sprites->soam);
+}
+
+static bool soam_full(const struct aldo_rp2c02 *self)
+{
+    auto sprites = &self->spr;
+    return sprites->soaddr >= aldo_arrsz(sprites->soam);
 }
 
 [[maybe_unused]]
@@ -247,6 +263,9 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
 
     // secondary OAM clear
     if (self->dot < DotSpriteEvaluation) {
+        // Clamp address during soam clear so it can recover from random values
+        // or leftover overflows during sprite selection.
+        self->spr.soaddr %= aldo_arrsz(self->spr.soam);
         soam_write(self);
         soam_advance(self);
         if (self->dot == DotSpriteEvaluation - 1) {
@@ -279,7 +298,7 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         soam_write(self);
         soam_advance(self);
         ++self->oamaddr;
-        if (sprites->soaddr == 0) {
+        if (soam_full(self)) {
             sprites->s = ALDO_PPU_SPR_FULL;
         } else if (sprites->soaddr % SpriteSize == 0) {
             sprites->s = ALDO_PPU_SPR_SCAN;
@@ -870,11 +889,12 @@ static size_t curr_sprite_unit(const struct aldo_rp2c02 *self)
     return spu_addr;
 }
 
-static uint16_t sprite_pattern_addr(const struct aldo_rp2c02 *self, uint8_t tile,
-                                    bool plane, uint8_t y)
+static uint16_t sprite_pattern_addr(const struct aldo_rp2c02 *self,
+                                    const struct sprite_obj *obj, bool plane)
 {
     // TODO: handle 8x16 self->ctrl.h
-    return pattern_addr(self->ctrl.s, tile, plane, self->line - y);
+    auto fine_y = obj->active ? self->line - obj->y : 0;
+    return pattern_addr(self->ctrl.s, obj->tile, plane, fine_y);
 }
 
 // based on PPU diagram: https://www.nesdev.org/wiki/PPU_rendering
@@ -980,10 +1000,15 @@ static void sprite_read(struct aldo_rp2c02 *self)
 
     // OAMADDR is cleared on every sprite-loading dot
     self->oamaddr = 0x0;
+    // Reset to first sprite unit at start of sprite read sequence
+    if (self->dot == DotHBlank) {
+        self->pxpl.spuidx = 0;
+    }
 
-    // TODO: i can't use soaddr for this as it doesn't reset at end of sprite evaluation
-    auto spu = self->pxpl.spu + curr_sprite_unit(self);
-    auto obj = soam_read_obj(self);
+    assert(self->pxpl.spuidx < aldo_arrsz(self->pxpl.spu));
+    auto spu = self->pxpl.spu + self->pxpl.spuidx;
+    auto obj = soam_get_obj(self, self->pxpl.spuidx);
+
     switch (self->dot % 8) {
     case 1:
         // unused NT addr
@@ -1001,39 +1026,34 @@ static void sprite_read(struct aldo_rp2c02 *self)
     case 3:
         // ignored NT addr
         addrbus(self, nametable_addr(self));
-        spu->a = obj[2];
+        spu->a = obj.attr;
         break;
     case 4:
         // Ignored NT data; a normal memory cycle still executes but
         // the nt register is not updated.
         read(self);
-        spu->x = obj[3];
+        spu->x = obj.x;
         break;
     case 5:
         // FG low addr
-        addrbus(self, sprite_pattern_addr(self, obj[1], 0, obj[0]));
+        addrbus(self, sprite_pattern_addr(self, &obj, 0));
         break;
     case 6:
         // FG low data
         // TODO: h/vflip
         read(self);
-        spu->fg[0] = self->vdatabus;
+        spu->fg[0] = obj.active ? self->vdatabus : 0;
         break;
     case 7:
         // FG high addr
-        addrbus(self, sprite_pattern_addr(self, obj[1], 1, obj[0]));
+        addrbus(self, sprite_pattern_addr(self, &obj, 1));
         break;
     case 0:
         // FG high data
-        // TODO: discard sprite if inactive
         // TODO: h/vflip
         read(self);
-        spu->fg[1] = self->vdatabus;
-        /*
-         * if (spr.soaddr >= end-of-soam) clear current spu
-         * else
-         */
-        self->spr.soaddr += SpriteSize;
+        spu->fg[1] = obj.active ? self->vdatabus : 0;
+        ++self->pxpl.spuidx;
         break;
     default:
         assert(((void)"SPRITE RENDER UNREACHABLE CASE", false));

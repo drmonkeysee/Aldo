@@ -122,7 +122,8 @@ struct aldo_rp2c02 {
         } spu[8];           // Sprite Rendering Units
         uint8_t mux,        // Multiplexed Pixel Selection
                 pal,        // Palette Index
-                px;         // Pixel Color Output
+                px,         // Pixel Color Output
+                spuidx;     // Current Sprite Unit Fetch
     } pxpl;
 
     // Internal Registers and Control Flags

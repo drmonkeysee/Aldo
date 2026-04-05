@@ -23,9 +23,11 @@ static uint8_t
 
 static bool chrread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
+    static constexpr auto ptsz = aldo_arrsz(PatternTables[0]);
+
     if (addr < ALDO_MEMBLOCK_8KB) {
         auto ptable = addr < 0x1000 ? PatternTables[0] : PatternTables[1];
-        *d = ptable[addr % 0x10];
+        *d = ptable[addr % ptsz];
         return true;
     }
     return false;
@@ -33,12 +35,15 @@ static bool chrread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 
 static bool vramread(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
+    static constexpr auto ntsz = aldo_arrsz(NameTables[0]);
+    static constexpr auto atsz = aldo_arrsz(AttributeTables[0]);
+
     if (ALDO_MEMBLOCK_8KB <= addr && addr < ALDO_MEMBLOCK_16KB) {
         // use horizontal mirroring for testing (Donkey Kong setting)
         size_t select = addr < 0x2800 ? 0 : 1;
         *d = (addr & 0x3ff) < 0x3c0
-                ? NameTables[select][addr % 0x8]
-                : AttributeTables[select][addr % 0x8];
+                ? NameTables[select][addr % ntsz]
+                : AttributeTables[select][addr % atsz];
         return true;
     }
     return false;
@@ -1202,14 +1207,13 @@ static void sprite_fetch_sequence(void *ctx)
     auto ppu = ppt_get_ppu(ctx);
     NameTables[0][3] = 0x99;
     NameTables[0][5] = 0x77;
-    PatternTables[0][3] = 0x33;
-    PatternTables[0][11] = 0x44;
+    PatternTables[0][0] = 0x33;
+    PatternTables[0][8] = 0x44;
     ppu->v = 0x5;
     ppu->t = 0x7b3;
-    ppu->line = 1;
     ppu->dot = 257;
     ppu->pxpl.spuidx = 72;
-    ppu->spr.soam[1] = 0;       // y-coord (ppu line - 1)
+    ppu->spr.soam[1] = 0;       // y-coord
     ppu->spr.soam[1] = 0x3;     // tile id
     ppu->spr.soam[2] = 0x2;     // fv:0, hv:0, pri:fg, pal:2
     ppu->spr.soam[3] = 43;      // x-coord
@@ -1288,7 +1292,7 @@ static void sprite_fetch_sequence(void *ctx)
 
     ct_assertequal(262, ppu->dot);
     ct_assertequal(0x413u, ppu->v);
-    ct_assertequal(3u, ppu->vaddrbus);
+    ct_assertequal(0x30u, ppu->vaddrbus);
     ct_assertequal(0x99u, ppu->vdatabus);
     ct_assertequal(0u, ppu->oamaddr);
     ct_assertequal(4u, ppu->spr.soaddr);
@@ -1304,7 +1308,7 @@ static void sprite_fetch_sequence(void *ctx)
 
     ct_assertequal(263, ppu->dot);
     ct_assertequal(0x413u, ppu->v);
-    ct_assertequal(3u, ppu->vaddrbus);
+    ct_assertequal(0x30u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
     ct_assertequal(0u, ppu->oamaddr);
     ct_assertequal(4u, ppu->spr.soaddr);
@@ -1321,7 +1325,7 @@ static void sprite_fetch_sequence(void *ctx)
 
     ct_assertequal(264, ppu->dot);
     ct_assertequal(0x413u, ppu->v);
-    ct_assertequal(0xbu, ppu->vaddrbus);
+    ct_assertequal(0x38u, ppu->vaddrbus);
     ct_assertequal(0x33u, ppu->vdatabus);
     ct_assertequal(0u, ppu->oamaddr);
     ct_assertequal(4u, ppu->spr.soaddr);
@@ -1337,7 +1341,7 @@ static void sprite_fetch_sequence(void *ctx)
 
     ct_assertequal(265, ppu->dot);
     ct_assertequal(0x413u, ppu->v);
-    ct_assertequal(0xbu, ppu->vaddrbus);
+    ct_assertequal(0x38u, ppu->vaddrbus);
     ct_assertequal(0x44u, ppu->vdatabus);
     ct_assertequal(0u, ppu->oamaddr);
     ct_assertequal(4u, ppu->spr.soaddr);

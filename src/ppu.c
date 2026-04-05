@@ -178,17 +178,22 @@ static bool oam_overflow(const struct aldo_rp2c02 *self, uint8_t prev_sprite)
     return prev_sprite != 0 && (self->oamaddr & ~DWordMask) == 0;
 }
 
-static uint8_t soam_read_field(const struct aldo_rp2c02 *self, uint8_t offset)
+static const uint8_t *soam_read_obj(const struct aldo_rp2c02 *self)
 {
-    assert(offset < SpriteSize);
-
     auto sprites = &self->spr;
-    return sprites->soam[sprites->soaddr + offset];
+
+    assert(sprites->soaddr < aldo_arrsz(sprites->soam));
+    assert(sprites->soaddr % SpriteSize == 0);
+
+    return sprites->soam + sprites->soaddr;
 }
 
 static void soam_write(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
+
+    assert(sprites->soaddr < aldo_arrsz(sprites->soam));
+
     sprites->soam[sprites->soaddr] = sprites->oamd;
 }
 
@@ -793,12 +798,17 @@ static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
     return BaseNtAddr | (self->v & ALDO_ADDRMASK_4KB);
 }
 
-static uint16_t pattern_addr(const struct aldo_rp2c02 *self, bool table,
-                             bool plane)
+static uint16_t pattern_addr(bool table, uint8_t tile, bool plane, int row)
 {
-    auto tileidx = self->pxpl.tlu.nt << 4;
-    auto pxrow = (self->v & FineYBits) >> 12;
-    return (uint16_t)((table << 12) | tileidx | (plane << 3) | pxrow);
+    assert(0 <= row && row < 8);
+
+    return (uint16_t)((table << 12) | (tile << 4) | (plane << 3) | row);
+}
+
+static uint16_t tile_pattern_addr(const struct aldo_rp2c02 *self, bool plane)
+{
+    return pattern_addr(self->ctrl.b, self->pxpl.tlu.nt, plane,
+                        (self->v & FineYBits) >> 12);
 }
 
 static void read_nt(struct aldo_rp2c02 *self)
@@ -860,16 +870,11 @@ static size_t curr_sprite_unit(const struct aldo_rp2c02 *self)
     return spu_addr;
 }
 
-static void latch_sprite_attribute(struct aldo_rp2c02 *self)
+static uint16_t sprite_pattern_addr(const struct aldo_rp2c02 *self, uint8_t tile,
+                                    bool plane, uint8_t y)
 {
-    auto spu = self->pxpl.spu + curr_sprite_unit(self);
-    spu->a = soam_read_field(self, 2);
-}
-
-static void latch_sprite_x(struct aldo_rp2c02 *self)
-{
-    auto spu = self->pxpl.spu + curr_sprite_unit(self);
-    spu->x = soam_read_field(self, 3);
+    // TODO: handle 8x16 self->ctrl.h
+    return pattern_addr(self->ctrl.s, tile, plane, self->line - y);
 }
 
 // based on PPU diagram: https://www.nesdev.org/wiki/PPU_rendering
@@ -935,7 +940,7 @@ static void tile_read(struct aldo_rp2c02 *self)
         break;
     case 5:
         // BG low addr
-        addrbus(self, pattern_addr(self, self->ctrl.b, 0));
+        addrbus(self, tile_pattern_addr(self, 0));
         break;
     case 6:
         // BG low data
@@ -944,7 +949,7 @@ static void tile_read(struct aldo_rp2c02 *self)
         break;
     case 7:
         // BG high addr
-        addrbus(self, pattern_addr(self, self->ctrl.b, 1));
+        addrbus(self, tile_pattern_addr(self, 1));
         break;
     case 0:
         // BG high data
@@ -976,6 +981,9 @@ static void sprite_read(struct aldo_rp2c02 *self)
     // OAMADDR is cleared on every sprite-loading dot
     self->oamaddr = 0x0;
 
+    // TODO: i can't use soaddr for this as it doesn't reset at end of sprite evaluation
+    auto spu = self->pxpl.spu + curr_sprite_unit(self);
+    auto obj = soam_read_obj(self);
     switch (self->dot % 8) {
     case 1:
         // unused NT addr
@@ -993,25 +1001,39 @@ static void sprite_read(struct aldo_rp2c02 *self)
     case 3:
         // ignored NT addr
         addrbus(self, nametable_addr(self));
-        latch_sprite_attribute(self);
+        spu->a = obj[2];
         break;
     case 4:
         // Ignored NT data; a normal memory cycle still executes but
         // the nt register is not updated.
         read(self);
-        latch_sprite_x(self);
+        spu->x = obj[3];
         break;
     case 5:
-        // TODO: FG low addr
+        // FG low addr
+        addrbus(self, sprite_pattern_addr(self, obj[1], 0, obj[0]));
         break;
     case 6:
-        // TODO: FG low data
+        // FG low data
+        // TODO: h/vflip
+        read(self);
+        spu->fg[0] = self->vdatabus;
         break;
     case 7:
-        // TODO: FG high addr
+        // FG high addr
+        addrbus(self, sprite_pattern_addr(self, obj[1], 1, obj[0]));
         break;
     case 0:
-        // TODO: FG high data, next soam sprite, discard sprite if inactive
+        // FG high data
+        // TODO: discard sprite if inactive
+        // TODO: h/vflip
+        read(self);
+        spu->fg[1] = self->vdatabus;
+        /*
+         * if (spr.soaddr >= end-of-soam) clear current spu
+         * else
+         */
+        self->spr.soaddr += SpriteSize;
         break;
     default:
         assert(((void)"SPRITE RENDER UNREACHABLE CASE", false));
@@ -1168,7 +1190,7 @@ static void vram_render(struct aldo_rp2c02 *self)
         } else {
             // BG low addr is put on bus but address latch is not
             // signaled.
-            self->vaddrbus = maskaddr(pattern_addr(self, self->ctrl.b, 0));
+            self->vaddrbus = maskaddr(tile_pattern_addr(self, 0));
         }
     } else if (tile_rendering(self)) {
         tile_read(self);

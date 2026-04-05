@@ -77,7 +77,7 @@ static int oam_dma(struct aldo_rp2a03 *self)
         return 1;
     case ALDO_SIG_SERVICED:
         // Extra state to set RDY *after* the last DMA write, so CPU resumption
-        // repeats its last read on *this* cycle.
+        // repeats its previous read on *this* cycle.
         self->oam.s = ALDO_SIG_CLEAR;
         break;
     default:

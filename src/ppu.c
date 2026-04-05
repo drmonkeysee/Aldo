@@ -178,6 +178,14 @@ static bool oam_overflow(const struct aldo_rp2c02 *self, uint8_t prev_sprite)
     return prev_sprite != 0 && (self->oamaddr & ~DWordMask) == 0;
 }
 
+static uint8_t soam_read_field(const struct aldo_rp2c02 *self, uint8_t offset)
+{
+    assert(offset < SpriteSize);
+
+    auto sprites = &self->spr;
+    return sprites->soam[sprites->soaddr + offset];
+}
+
 static void soam_write(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
@@ -844,6 +852,26 @@ static void increment_tile(struct aldo_rp2c02 *self, bool force_y)
     }
 }
 
+static size_t curr_sprite_unit(const struct aldo_rp2c02 *self)
+{
+    auto sprites = &self->spr;
+    size_t spu_addr = sprites->soaddr % SpriteSize;
+    assert(spu_addr < aldo_arrsz(self->pxpl.spu));
+    return spu_addr;
+}
+
+static void latch_sprite_attribute(struct aldo_rp2c02 *self)
+{
+    auto spu = self->pxpl.spu + curr_sprite_unit(self);
+    spu->a = soam_read_field(self, 2);
+}
+
+static void latch_sprite_x(struct aldo_rp2c02 *self)
+{
+    auto spu = self->pxpl.spu + curr_sprite_unit(self);
+    spu->x = soam_read_field(self, 3);
+}
+
 // based on PPU diagram: https://www.nesdev.org/wiki/PPU_rendering
 static void pixel_pipeline(struct aldo_rp2c02 *self)
 {
@@ -965,13 +993,13 @@ static void sprite_read(struct aldo_rp2c02 *self)
     case 3:
         // ignored NT addr
         addrbus(self, nametable_addr(self));
-        // TODO: load sprite attribute
+        latch_sprite_attribute(self);
         break;
     case 4:
         // Ignored NT data; a normal memory cycle still executes but
         // the nt register is not updated.
         read(self);
-        // TODO: load sprite x
+        latch_sprite_x(self);
         break;
     case 5:
         // TODO: FG low addr
@@ -983,7 +1011,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
         // TODO: FG high addr
         break;
     case 0:
-        // TODO: FG high data
+        // TODO: FG high data, next soam sprite, discard sprite if inactive
         break;
     default:
         assert(((void)"SPRITE RENDER UNREACHABLE CASE", false));

@@ -288,31 +288,27 @@ static void fill_tile_sheet_row(uint8_t *restrict packedrow,
         for (uint32_t tilex = 0; tilex < tilesdim; ++tilex) {
             // Get the index in tile space first, then calculate the
             // byte index in CHR space for the given tile's current row.
-            size_t
-                tileidx = tilex + (tiley * tilesdim)
-                            + (section * tilesdim * tilesdim),
-                chr_row = (tileidx * AldoChrTileStride) + pixely;
-            uint8_t
-                plane0 = bv->mem[chr_row],
-                plane1 = bv->mem[chr_row + AldoChrTileDim];
+            auto tileidx = tilex + (tiley * tilesdim)
+                            + (section * tilesdim * tilesdim);
+            auto chr_row = (tileidx * AldoChrTileStride) + pixely;
+            auto plane0 = bv->mem[chr_row];
+            auto plane1 = bv->mem[chr_row + AldoChrTileDim];
             // 8 2-bit pixels make a single CHR tile row; each 2-bit
             // pixel will be expanded to 4-bits and packed 2 pixels per byte
             // for a 4 bpp BMP.
             auto pixelrow = aldo_byteshuffle(plane0, plane1);
-            for (size_t pixelx = 0; pixelx < AldoChrTileDim; ++pixelx) {
+            for (uint32_t pixelx = 0; pixelx < AldoChrTileDim; ++pixelx) {
                 // packedpixel is the pixel in (prescaled) bmp-row space;
                 // pixelidx is the 2-bit slice of pixelrow that maps to the
                 // packedpixel; BMP layout goes from left-to-right so pixelidx
                 // goes "backwards" from MSBs to LSBs.
-                size_t
-                    packedpixel = pixelx + (tilex * AldoChrTileDim)
-                                    + (section * section_pxldim),
-                    pixelidx = AldoChrTileStride - ((pixelx + 1) * 2);
-                uint8_t pixel =
-                    (uint8_t)((pixelrow & (0x3 << pixelidx)) >> pixelidx);
+                auto packedpixel = pixelx + (tilex * AldoChrTileDim)
+                                    + (section * section_pxldim);
+                auto pixelidx = AldoChrTileStride - ((pixelx + 1) * 2);
+                auto pixel = (uint8_t)((pixelrow & (0x3 << pixelidx)) >> pixelidx);
                 assert(pixelidx < AldoChrTileStride);
                 for (uint32_t scalex = 0; scalex < scale; ++scalex) {
-                    size_t scaledpixel = scalex + (packedpixel * scale);
+                    auto scaledpixel = scalex + (packedpixel * scale);
                     if (scaledpixel % 2 == 0) {
                         packedrow[scaledpixel / 2] =
                             (uint8_t)(pixel << BmpBitsPerPixel);
@@ -353,9 +349,8 @@ static int write_chrtiles(const struct aldo_blockview *bv, uint32_t tilesdim,
     aldo_dwtoba(BmpHeaderSize + (bmph * packedrow_size),  // bfSize
                 fileheader + 2);
     aldo_dwtoba(BmpHeaderSize, fileheader + 10);          // bfOffBits
-    size_t
-        witems = aldo_arrsz(fileheader),
-        wcount = fwrite(fileheader, sizeof fileheader[0], witems, bmpfile);
+    auto witems = aldo_arrsz(fileheader);
+    auto wcount = fwrite(fileheader, sizeof fileheader[0], witems, bmpfile);
     if (wcount < witems) return ALDO_DIS_ERR_IO;
 
     /*
@@ -580,9 +575,8 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
     total = count = sprintf(dis, "%s ", mnemonic(inst.d.instruction));
     if (count < 0) return ALDO_DIS_ERR_FMT;
 
-    size_t
-        max_offset = 1 + (inst.bv.size / 3),
-        displayidx = (size_t)cpu->datapath.exec_cycle < max_offset
+    auto max_offset = 1 + (inst.bv.size / 3);
+    auto displayidx = (size_t)cpu->datapath.exec_cycle < max_offset
                         ? (size_t)cpu->datapath.exec_cycle
                         : max_offset;
     auto displaystr = StringTables[inst.d.mode][displayidx];
@@ -652,9 +646,8 @@ int aldo_dis_cart_chr(aldo_cart *cart, int chrscale,
     const char *prefix = chrdecode_prefix && chrdecode_prefix[0] != '\0'
                             ? chrdecode_prefix
                             : "chr";
-    size_t
-        prefixlen = strlen(prefix),
-        namesize = prefixlen + 8;   // prefix + nnn.bmp + nul
+    auto prefixlen = strlen(prefix);
+    auto namesize = prefixlen + 8;  // prefix + nnn.bmp + nul
     char *bmpfilename = malloc(namesize);
     if (!bmpfilename) return ALDO_DIS_ERR_ERNO;
 

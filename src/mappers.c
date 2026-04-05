@@ -88,11 +88,10 @@ static void fill_pattern_table(size_t tile_count,
 
     for (size_t tile = 0; tile < tile_count; ++tile) {
         for (size_t row = 0; row < AldoChrTileDim; ++row) {
-            size_t idx = row + (tile * AldoChrTileStride);
+            auto idx = row + (tile * AldoChrTileStride);
             assert(idx < bv->size - AldoChrTileDim);
-            uint8_t
-                plane0 = bv->mem[idx],
-                plane1 = bv->mem[idx + AldoChrTileDim];
+            auto plane0 = bv->mem[idx];
+            auto plane1 = bv->mem[idx + AldoChrTileDim];
             table[tile][row] = aldo_byteshuffle(plane0, plane1);
         }
     }

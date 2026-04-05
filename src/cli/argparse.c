@@ -64,7 +64,7 @@ static void init_cliargs(struct cliargs *args)
 
 static bool parse_flag(const char *arg, char shrt, bool exact, const char *lng)
 {
-    size_t lnglen = lng ? strlen(lng) : 0;
+    auto lnglen = lng ? strlen(lng) : 0;
     return (strlen(arg) > 1
                 && exact
                     ? arg[1] == shrt

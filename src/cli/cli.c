@@ -208,7 +208,7 @@ static void dump_ram(const struct emulator *emu)
         "vram.bin",
         "ppu.bin",
     };
-    static constexpr size_t dmpcount = aldo_arrsz(dmpfiles);
+    static constexpr auto dmpcount = aldo_arrsz(dmpfiles);
 
     if (!emu->args->tron && !emu->args->batch) return;
 

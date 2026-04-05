@@ -31,7 +31,7 @@ struct runclock {
 
 static void clearline()
 {
-    size_t linelength = strlen(DistractorFormat) * 2;
+    auto linelength = strlen(DistractorFormat) * 2;
     for (size_t i = 0; i < linelength; ++i) {
         fputc('\b', stderr);
     }

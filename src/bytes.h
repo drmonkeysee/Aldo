@@ -101,7 +101,7 @@ inline void aldo_wrtoba(uint16_t word, uint8_t bytes[aldo_cz(2)]) aldo_nothrow
 // DWord to Byte Array
 inline void aldo_dwtoba(uint32_t dword, uint8_t bytes[aldo_cz(4)]) aldo_nothrow
 {
-    for (size_t i = 0; i < 4; ++i) {
+    for (auto i = 0; i < 4; ++i) {
         bytes[i] = (uint8_t)(dword >> (8 * i));
     }
 }

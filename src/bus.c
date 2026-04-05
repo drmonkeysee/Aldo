@@ -24,7 +24,7 @@ struct aldo_hardwarebus {
 
 static struct partition *find(struct aldo_hardwarebus *self, uint16_t addr)
 {
-    for (size_t i = self->count - 1; i > 0; --i) {
+    for (auto i = self->count - 1; i > 0; --i) {
         if (addr >= self->partitions[i].start) return self->partitions + i;
     }
     // return the first partition if we got this far
@@ -40,7 +40,7 @@ aldo_bus *aldo_bus_new(int bitwidth, size_t n, ...)
     assert(0 < bitwidth && bitwidth <= ALDO_BITWIDTH_64KB);
     assert(0 < n);
 
-    size_t psize = sizeof(struct partition) * n;
+    auto psize = sizeof(struct partition) * n;
     struct aldo_hardwarebus *self = malloc(sizeof *self + psize);
     if (!self) return self;
 

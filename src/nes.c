@@ -570,7 +570,7 @@ void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
     if (aldo_nes_halted(self)) return;
 
     reset_snapshot(self->snp);
-    while (clock->budget > 0) {
+    while (clock->budget > 0 && !aldo_nes_halted(self)) {
         if (!clock_ppu(self, clock)) continue;
         clock_cpu(self, clock);
         if (aldo_debug_break(self->dbg, clock)) {

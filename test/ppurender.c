@@ -3969,6 +3969,61 @@ static void sprite_fetch_sprite_only_disabled(void *ctx)
     ct_assertfalse(ppu->signal.rd);
 }
 
+static void sprite_fetch_full_line_sequence(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 257;
+    ppu->pxpl.spuidx = 72;
+    ppu->oamaddr = 0xab;
+    for (size_t i = 0; i < aldo_arrsz(ppu->spr.soam); i += 4) {
+        ppu->spr.soam[i] = 0;                       // y-coord
+        ppu->spr.soam[i + 1] = (uint8_t)(i + 4);    // arbitrary tile id
+        ppu->spr.soam[i + 2] = 0x2;                 // fv:0, hv:0, pri:fg, pal:2
+        ppu->spr.soam[i + 3] = (uint8_t)(i + 23);   // arbitrary x-coord
+    }
+    // 8 active sprites in secondary OAM
+    ppu->spr.soaddr = aldo_arrsz(ppu->spr.soam);
+
+    // run entire sprite fetch sequence
+    auto tile = 0;
+    for (int i = 0; i < 64; ++i) {
+        aldo_ppu_cycle(ppu);
+        if (ppu->dot % 8 == 6) {
+            // check set low pattern addr which is -1 from current ppu->dot value
+            // set unique test patterns for each sprite unit
+            PatternTables[0][0] = (uint8_t)i;
+            PatternTables[0][8] = (uint8_t)(0x80 | i);
+            tile += 4;  // capture i as tile ID for pattern asserts
+            // assert low pattern addr
+            auto expected = (uint16_t)(tile << 4);
+            ct_assertequal(expected, ppu->vaddrbus,
+                           "unexpected low fetch addr for sprite unit %d (%d)",
+                           i / 8, i);
+        } else if (ppu->dot % 8 == 0) {
+            // check set high pattern addr which is -1 from current ppu->dot value
+            // assert high pattern addr
+            auto expected = (uint16_t)((tile << 4) | (1 << 3));
+            ct_assertequal(expected, ppu->vaddrbus,
+                           "unexpected high fetch addr for sprite unit %d (%d)",
+                           i / 8, i);
+        }
+    }
+
+    ct_assertequal(321, ppu->dot);
+    ct_assertequal(8u, ppu->pxpl.spuidx);
+    ct_assertequal(0x20u, ppu->spr.soaddr);
+
+    for (size_t i = 0, chr = 4, x = 0;
+         i < aldo_arrsz(ppu->pxpl.spu);
+         ++i, chr += 8, x += 4) {
+        auto spu = ppu->pxpl.spu + i;
+        ct_assertequal(0x2u, spu->a, "unexpected attribute value for spu %d", i);
+        ct_assertequal(chr, spu->fg[0], "unexpected lo plane for spu %d", i);
+        ct_assertequal(0x80 | chr, spu->fg[1], "unexpected hi plane for spu %d", i);
+        ct_assertequal(x + 23, spu->x, "unexpected x-coord for spu %d", i);
+    }
+}
+
 //
 // MARK: - Coordinate Behaviors
 //
@@ -6466,6 +6521,7 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(sprite_fetch_inactive_sprite),
         ct_maketest(sprite_fetch_rendering_disabled),
         ct_maketest(sprite_fetch_sprite_only_disabled),
+        ct_maketest(sprite_fetch_full_line_sequence),
 
         ct_maketest(course_x_wraparound),
         ct_maketest(fine_y_wraparound),

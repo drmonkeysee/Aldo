@@ -889,6 +889,7 @@ static uint16_t sprite_pattern_addr(const struct aldo_rp2c02 *self,
 }
 
 // based on PPU diagram: https://www.nesdev.org/wiki/PPU_rendering
+// runs on lines 0-239, 261 (prefetch dots); dots 2-259, 329, 337
 static void pixel_pipeline(struct aldo_rp2c02 *self)
 {
     // assume there is no video signal until we actually output a pixel

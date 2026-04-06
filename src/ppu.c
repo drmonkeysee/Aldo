@@ -1030,7 +1030,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
 
     // OAMADDR is cleared on every sprite-loading dot
     self->oamaddr = 0x0;
-    // Reset to first sprite unit at start of sprite read sequence
+    // reset to first sprite unit at start of sprite read sequence
     if (self->dot == DotHBlank) {
         self->pxpl.spuidx = 0;
     }

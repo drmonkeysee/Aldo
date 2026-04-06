@@ -897,7 +897,7 @@ static uint16_t sprite_pattern_addr(const struct aldo_rp2c02 *self,
         tile = obj->tile & 0xfe;
         // If current line is below top tile or vertically flipped and "above"
         // top tile then we should be looking at the bottom tile.
-        if (fine_y < SpriteHeight == vertical_flip) {
+        if ((fine_y < SpriteHeight) == vertical_flip) {
             ++tile;
         }
         // Now that we've picked either top or bottom tile,

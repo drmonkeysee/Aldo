@@ -195,7 +195,7 @@ static struct sprite_obj soam_get_obj(const struct aldo_rp2c02 *self, size_t idx
     // TODO: should x be min or max?
     return addr < sprites->soaddr
         ? (struct sprite_obj){obj[0], obj[1], obj[2], obj[3], true}
-        : (struct sprite_obj){.tile = obj[1], .x = 0xff};
+        : (struct sprite_obj){.tile = obj[1]};
 }
 
 static void soam_write(struct aldo_rp2c02 *self)
@@ -885,7 +885,24 @@ static uint16_t sprite_pattern_addr(const struct aldo_rp2c02 *self,
 {
     // TODO: handle 8x16 self->ctrl.h
     auto fine_y = obj->active ? self->line - obj->y : 0;
+    // vertical flip
+    if (obj->attr & 0x80) {
+        fine_y = 7 - fine_y;
+    }
     return pattern_addr(self->ctrl.s, obj->tile, plane, fine_y);
+}
+
+static uint8_t sprite_pattern_data(const struct aldo_rp2c02 *self,
+                                   const struct sprite_obj *obj)
+{
+    if (!obj->active) return 0;
+
+    auto d = self->vdatabus;
+    // horizontal flip
+    if (obj->attr & 0x40) {
+        d = aldo_bitreverse(d);
+    }
+    return d;
 }
 
 // based on PPU diagram: https://www.nesdev.org/wiki/PPU_rendering
@@ -1032,9 +1049,8 @@ static void sprite_read(struct aldo_rp2c02 *self)
         break;
     case 6:
         // FG low data
-        // TODO: h/vflip
         read(self);
-        spu->fg[0] = obj.active ? self->vdatabus : 0;
+        spu->fg[0] = sprite_pattern_data(self, &obj);
         break;
     case 7:
         // FG high addr
@@ -1042,9 +1058,8 @@ static void sprite_read(struct aldo_rp2c02 *self)
         break;
     case 0:
         // FG high data
-        // TODO: h/vflip
         read(self);
-        spu->fg[1] = obj.active ? self->vdatabus : 0;
+        spu->fg[1] = sprite_pattern_data(self, &obj);
         ++self->pxpl.spuidx;
         break;
     default:

@@ -8,8 +8,43 @@
 #include "bytes.h"
 #include "ciny.h"
 
-#include <stddef.h>
 #include <stdint.h>
+
+static void reverse_zeros(void *ctx)
+{
+    uint8_t b = 0x0;
+
+    auto s = aldo_bitreverse(b);
+
+    ct_assertequal(0u, s);
+}
+
+static void reverse_ones(void *ctx)
+{
+    uint8_t b = 0xff;
+
+    auto s = aldo_bitreverse(b);
+
+    ct_assertequal(0xffu, s);
+}
+
+static void reverse_mixed(void *ctx)
+{
+    uint8_t b = 0x55;
+
+    auto s = aldo_bitreverse(b);
+
+    ct_assertequal(0xaau, s);
+}
+
+static void reverse_arbitrary(void *ctx)
+{
+    uint8_t b = 0xbe;
+
+    auto s = aldo_bitreverse(b);
+
+    ct_assertequal(0x7du, s);
+}
 
 static void shuffle_zeros(void *ctx)
 {
@@ -175,6 +210,11 @@ static void bank_copy_address_beyond_range(void *ctx)
 struct ct_testsuite bytes_tests()
 {
     static constexpr struct ct_testcase tests[] = {
+        ct_maketest(reverse_zeros),
+        ct_maketest(reverse_ones),
+        ct_maketest(reverse_mixed),
+        ct_maketest(reverse_arbitrary),
+
         ct_maketest(shuffle_zeros),
         ct_maketest(shuffle_ones),
         ct_maketest(shuffle_low_ones),

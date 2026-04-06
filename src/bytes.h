@@ -106,6 +106,16 @@ inline void aldo_dwtoba(uint32_t dword, uint8_t bytes[aldo_cz(4)]) aldo_nothrow
     }
 }
 
+// Reverse the bits of b;
+// Taken from Hacker's Delight 2nd Edition §7-1 and adapted to 8-bits.
+inline uint8_t aldo_bitreverse(uint8_t b) aldo_nothrow
+{
+    b = (uint8_t)(((b & 0x55) << 1) | ((b & 0xaa) >> 1));
+    b = (uint8_t)(((b & 0x33) << 2) | ((b & 0xcc) >> 2));
+    b = (uint8_t)(((b & 0x0f) << 4) | ((b & 0xf0) >> 4));
+    return b;
+}
+
 // Interleave the bits of lo and hi bytes together;
 // Outer Perfect Shuffle algorithm taken from Hacker's Delight 2nd Edition §7-2
 // and adapted to 16-bits; I *think* this is related to Morton Codes but
@@ -117,9 +127,9 @@ inline uint16_t aldo_byteshuffle(uint8_t lo, uint8_t hi) aldo_nothrow
         0x00f0, 0xf00f, 0x0c0c, 0xc3c3, 0x2222, 0x9999,
     };
     auto x = aldo_bytowr(lo, hi);
-    x = (uint16_t)((x & m[0]) << 4 | ((x >> 4) & m[0]) | (x & m[1]));
-    x = (uint16_t)((x & m[2]) << 2 | ((x >> 2) & m[2]) | (x & m[3]));
-    x = (uint16_t)((x & m[4]) << 1 | ((x >> 1) & m[4]) | (x & m[5]));
+    x = (uint16_t)(((x & m[0]) << 4) | ((x >> 4) & m[0]) | (x & m[1]));
+    x = (uint16_t)(((x & m[2]) << 2) | ((x >> 2) & m[2]) | (x & m[3]));
+    x = (uint16_t)(((x & m[4]) << 1) | ((x >> 1) & m[4]) | (x & m[5]));
     return x;
 }
 

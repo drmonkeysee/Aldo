@@ -1507,6 +1507,614 @@ static void sprite_fetch_last_row(void *ctx)
     ct_assertfalse(ppu->signal.rd);
 }
 
+static void sprite_fetch_vertical_flip(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    NameTables[0][3] = 0x99;
+    NameTables[0][5] = 0x77;
+    PatternTables[0][7] = 0xaa;
+    PatternTables[0][15] = 0xbb;
+    ppu->v = 0x5;
+    ppu->t = 0x7b3;
+    ppu->dot = 257;
+    ppu->pxpl.spuidx = 72;
+    ppu->spr.soam[1] = 0;       // y-coord
+    ppu->spr.soam[1] = 0x3;     // tile id
+    ppu->spr.soam[2] = 0x82;    // fv:1, hv:0, pri:fg, pal:2
+    ppu->spr.soam[3] = 43;      // x-coord
+    ppu->spr.soaddr = 0x4;      // 1 active sprite in secondary OAM
+    ppu->oamaddr = 0xab;
+
+    // Unused NT Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(258, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(259, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Ignored NT Fetch + Latch Sprite Attribute
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(260, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2413u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    // Latch Sprite X-Coord
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(261, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2413u, ppu->vaddrbus);
+    ct_assertequal(0x99u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Sprite Fetch Low
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(262, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x37u, ppu->vaddrbus);
+    ct_assertequal(0x99u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(263, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x37u, ppu->vaddrbus);
+    ct_assertequal(0xaau, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Sprite Fetch High
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(264, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x3fu, ppu->vaddrbus);
+    ct_assertequal(0xaau, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(265, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x3fu, ppu->vaddrbus);
+    ct_assertequal(0xbbu, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(1u, ppu->pxpl.spuidx);
+    ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0xbbu, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+}
+
+static void sprite_fetch_horizontal_flip(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    NameTables[0][3] = 0x99;
+    NameTables[0][5] = 0x77;
+    PatternTables[0][0] = 0x33;
+    PatternTables[0][8] = 0x44;
+    ppu->v = 0x5;
+    ppu->t = 0x7b3;
+    ppu->dot = 257;
+    ppu->pxpl.spuidx = 72;
+    ppu->spr.soam[1] = 0;       // y-coord
+    ppu->spr.soam[1] = 0x3;     // tile id
+    ppu->spr.soam[2] = 0x42;    // fv:0, hv:1, pri:fg, pal:2
+    ppu->spr.soam[3] = 43;      // x-coord
+    ppu->spr.soaddr = 0x4;      // 1 active sprite in secondary OAM
+    ppu->oamaddr = 0xab;
+
+    // Unused NT Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(258, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(259, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Ignored NT Fetch + Latch Sprite Attribute
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(260, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2413u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0x42u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    // Latch Sprite X-Coord
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(261, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2413u, ppu->vaddrbus);
+    ct_assertequal(0x99u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0x42u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Sprite Fetch Low
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(262, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x30u, ppu->vaddrbus);
+    ct_assertequal(0x99u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0x42u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(263, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x30u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0x42u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0xccu, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Sprite Fetch High
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(264, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x38u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0x42u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0xccu, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(265, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x38u, ppu->vaddrbus);
+    ct_assertequal(0x44u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(1u, ppu->pxpl.spuidx);
+    ct_assertequal(0x42u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0xccu, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0x22u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+}
+
+static void sprite_fetch_vertical_and_horizontal_flip(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    NameTables[0][3] = 0x99;
+    NameTables[0][5] = 0x77;
+    PatternTables[0][7] = 0xaa;
+    PatternTables[0][15] = 0xbb;
+    ppu->v = 0x5;
+    ppu->t = 0x7b3;
+    ppu->dot = 257;
+    ppu->pxpl.spuidx = 72;
+    ppu->spr.soam[1] = 0;       // y-coord
+    ppu->spr.soam[1] = 0x3;     // tile id
+    ppu->spr.soam[2] = 0xc2;    // fv:1, hv:1, pri:fg, pal:2
+    ppu->spr.soam[3] = 43;      // x-coord
+    ppu->spr.soaddr = 0x4;      // 1 active sprite in secondary OAM
+    ppu->oamaddr = 0xab;
+
+    // Unused NT Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(258, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(259, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Ignored NT Fetch + Latch Sprite Attribute
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(260, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2413u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0xc2u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    // Latch Sprite X-Coord
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(261, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2413u, ppu->vaddrbus);
+    ct_assertequal(0x99u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0xc2u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Sprite Fetch Low
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(262, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x37u, ppu->vaddrbus);
+    ct_assertequal(0x99u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0xc2u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(263, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x37u, ppu->vaddrbus);
+    ct_assertequal(0xaau, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0xc2u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0x55u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Sprite Fetch High
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(264, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x3fu, ppu->vaddrbus);
+    ct_assertequal(0xaau, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0xc2u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0x55u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(265, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x3fu, ppu->vaddrbus);
+    ct_assertequal(0xbbu, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(1u, ppu->pxpl.spuidx);
+    ct_assertequal(0xc2u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0x55u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0xddu, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+}
+
+static void sprite_fetch_inactive_sprite(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    NameTables[0][3] = 0x99;
+    NameTables[0][5] = 0x77;
+    PatternTables[0][0] = 0x33;
+    PatternTables[0][8] = 0x44;
+    ppu->v = 0x5;
+    ppu->t = 0x7b3;
+    ppu->dot = 257;
+    ppu->pxpl.spuidx = 72;
+    ppu->spr.soam[1] = 0;       // y-coord
+    ppu->spr.soam[1] = 0x3;     // tile id
+    ppu->spr.soam[2] = 0x2;     // fv:0, hv:0, pri:fg, pal:2
+    ppu->spr.soam[3] = 43;      // x-coord
+    ppu->spr.soaddr = 0x0;      // 0 active sprites in secondary OAM
+    ppu->oamaddr = 0xab;
+
+    // Unused NT Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(258, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(0u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(259, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(0u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Ignored NT Fetch + Latch Sprite Attribute
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(260, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2413u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(0u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    // Latch Sprite X-Coord
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(261, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2413u, ppu->vaddrbus);
+    ct_assertequal(0x99u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(0u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Sprite Fetch Low
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(262, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x30u, ppu->vaddrbus);
+    ct_assertequal(0x99u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(0u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(263, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x30u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(0u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Sprite Fetch High
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(264, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x38u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(0u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(265, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x38u, ppu->vaddrbus);
+    ct_assertequal(0x44u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(0u, ppu->spr.soaddr);
+    ct_assertequal(1u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+}
+
 //
 // MARK: - Coordinate Behaviors
 //
@@ -3903,6 +4511,10 @@ struct ct_testsuite ppu_render_tests()
 
         ct_maketest(sprite_fetch_first_row),
         ct_maketest(sprite_fetch_last_row),
+        ct_maketest(sprite_fetch_vertical_flip),
+        ct_maketest(sprite_fetch_horizontal_flip),
+        ct_maketest(sprite_fetch_vertical_and_horizontal_flip),
+        ct_maketest(sprite_fetch_inactive_sprite),
 
         ct_maketest(course_x_wraparound),
         ct_maketest(fine_y_wraparound),

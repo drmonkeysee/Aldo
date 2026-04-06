@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <string.h>
 
+extern inline uint8_t aldo_bitreverse(uint8_t);
 extern inline uint16_t aldo_bytowr(uint8_t, uint8_t),
                        aldo_batowr(const uint8_t[static 2]),
                        aldo_byteshuffle(uint8_t, uint8_t);

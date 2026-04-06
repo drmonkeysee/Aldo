@@ -29,6 +29,7 @@ constexpr auto DotPxEnd = 260;
 constexpr auto DotTilePrefetch = 321;
 constexpr auto DotTilePrefetchEnd = 337;
 constexpr auto SpriteSize = 4;
+constexpr auto SpriteHeight = 8;
 
 // helpers for manipulating v and t registers
 constexpr uint16_t BaseNtAddr = ALDO_MEMBLOCK_8KB;
@@ -232,7 +233,7 @@ static bool assert_cleared_soam(const struct aldo_rp2c02 *self)
 
 static bool sprite_in_range(const struct aldo_rp2c02 *self)
 {
-    auto in_range = self->ctrl.h ? 16 : 8;
+    auto in_range = self->ctrl.h ? (SpriteHeight * 2) : SpriteHeight;
     return (uint8_t)(self->line - self->spr.oamd) < in_range;
 }
 
@@ -818,7 +819,7 @@ static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
 
 static uint16_t pattern_addr(bool table, uint8_t tile, bool plane, int row)
 {
-    assert(0 <= row && row < 8);
+    assert(0 <= row && row < SpriteHeight);
 
     return (uint16_t)((table << 12) | (tile << 4) | (plane << 3) | row);
 }
@@ -883,13 +884,32 @@ static void increment_tile(struct aldo_rp2c02 *self, bool force_y)
 static uint16_t sprite_pattern_addr(const struct aldo_rp2c02 *self,
                                     const struct sprite_obj *obj, bool plane)
 {
-    // TODO: handle 8x16 self->ctrl.h
+    static constexpr auto max_row = SpriteHeight - 1;
+
+    bool bank, vertical_flip = obj->attr & 0x80;
+    uint8_t tile;
     auto fine_y = obj->active ? self->line - obj->y : 0;
-    // vertical flip
-    if (obj->attr & 0x80) {
-        fine_y = 7 - fine_y;
+    if (self->ctrl.h) { // 8x16 sprites
+        bank = aldo_getbit(obj->tile, 1);
+        // 8x16 tile bytes always specify the top tile which are even-numbered
+        // pattern addresses; the bottom tile is the following odd address.
+        tile = obj->tile & 0xfe;
+        // If current line is below top tile or vertically flipped and "above"
+        // top tile then we should be looking at the bottom tile.
+        if (fine_y >= SpriteHeight || (vertical_flip && fine_y < SpriteHeight)) {
+            ++tile;
+        }
+        // Now that we've picked either top or bottom tile,
+        // adjust fine_y to within single sprite tile height.
+        fine_y &= max_row;
+    } else {
+        bank = self->ctrl.s;
+        tile = obj->tile;
     }
-    return pattern_addr(self->ctrl.s, obj->tile, plane, fine_y);
+    if (vertical_flip) {
+        fine_y = max_row - fine_y;
+    }
+    return pattern_addr(bank, tile, plane, fine_y);
 }
 
 static uint8_t sprite_pattern_data(const struct aldo_rp2c02 *self,

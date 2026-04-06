@@ -370,7 +370,7 @@ static void snapshot_sprites(const struct aldo_rp2c02 *self,
         if (sprites->double_height) {
             top_tile = bytes[1] & 0xfe;
             bottom_tile = top_tile + 1;
-            pt = bytes[1] & 0x1;
+            pt = aldo_getbit(bytes[1], 0);
         } else {
             top_tile = bytes[1];
             bottom_tile = 0x0;
@@ -890,7 +890,7 @@ static uint16_t sprite_pattern_addr(const struct aldo_rp2c02 *self,
     uint8_t tile;
     auto fine_y = obj->active ? self->line - obj->y : 0;
     if (self->ctrl.h) { // 8x16 sprites
-        bank = aldo_getbit(obj->tile, 1);
+        bank = aldo_getbit(obj->tile, 0);
         // 8x16 tile bytes always specify the top tile which are even-numbered
         // pattern addresses; the bottom tile is the following odd address.
         tile = obj->tile & 0xfe;

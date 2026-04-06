@@ -3358,6 +3358,159 @@ static void sprite_dh_fetch_vertical_flip_bottom_last_row(void *ctx)
     ct_assertfalse(ppu->signal.rd);
 }
 
+static void sprite_dh_fetch_upper_bank(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    NameTables[0][3] = 0x99;
+    NameTables[0][5] = 0x77;
+    PatternTables[1][0] = 0x33;
+    PatternTables[1][8] = 0x44;
+    ppu->v = 0x5;
+    ppu->t = 0x7b3;
+    ppu->dot = 257;
+    ppu->pxpl.spuidx = 72;
+    ppu->spr.soam[1] = 0;       // y-coord
+    ppu->spr.soam[1] = 0x5;     // tile id, upper bank
+    ppu->spr.soam[2] = 0x2;     // fv:0, hv:0, pri:fg, pal:2
+    ppu->spr.soam[3] = 43;      // x-coord
+    ppu->spr.soaddr = 0x4;      // 1 active sprite in secondary OAM
+    ppu->oamaddr = 0xab;
+    ppu->ctrl.h = true;         // 8x16 sprites
+
+    // Unused NT Fetch
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(258, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(259, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2005u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(0u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Ignored NT Fetch + Latch Sprite Attribute
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(260, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2413u, ppu->vaddrbus);
+    ct_assertequal(0x77u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(2u, ppu->pxpl.spu[0].a);
+    ct_assertequal(0u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    // Latch Sprite X-Coord
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(261, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x2413u, ppu->vaddrbus);
+    ct_assertequal(0x99u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(2u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Sprite Fetch Low
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(262, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x1040u, ppu->vaddrbus);
+    ct_assertequal(0x99u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(2u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(263, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x1040u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(2u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+
+    // Sprite Fetch High
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(264, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x1048u, ppu->vaddrbus);
+    ct_assertequal(0x33u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(0u, ppu->pxpl.spuidx);
+    ct_assertequal(2u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_asserttrue(ppu->signal.ale);
+    ct_asserttrue(ppu->signal.rd);
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(265, ppu->dot);
+    ct_assertequal(0x413u, ppu->v);
+    ct_assertequal(0x1048u, ppu->vaddrbus);
+    ct_assertequal(0x44u, ppu->vdatabus);
+    ct_assertequal(0u, ppu->oamaddr);
+    ct_assertequal(4u, ppu->spr.soaddr);
+    ct_assertequal(1u, ppu->pxpl.spuidx);
+    ct_assertequal(2u, ppu->pxpl.spu[0].a);
+    ct_assertequal(43u, ppu->pxpl.spu[0].x);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0x44u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertfalse(ppu->signal.ale);
+    ct_assertfalse(ppu->signal.rd);
+}
+
 static void sprite_fetch_inactive_sprite(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
@@ -6224,6 +6377,7 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(sprite_dh_fetch_vertical_flip_top_last_row),
         ct_maketest(sprite_dh_fetch_vertical_flip_bottom_first_row),
         ct_maketest(sprite_dh_fetch_vertical_flip_bottom_last_row),
+        ct_maketest(sprite_dh_fetch_upper_bank),
         ct_maketest(sprite_fetch_inactive_sprite),
         ct_maketest(sprite_fetch_rendering_disabled),
         ct_maketest(sprite_fetch_sprite_only_disabled),

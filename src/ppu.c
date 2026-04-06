@@ -234,7 +234,8 @@ static bool assert_cleared_soam(const struct aldo_rp2c02 *self)
 static bool sprite_in_range(const struct aldo_rp2c02 *self)
 {
     auto in_range = self->ctrl.h ? (SpriteHeight * 2) : SpriteHeight;
-    return (uint8_t)(self->line - self->spr.oamd) < in_range;
+    auto offset = self->line - self->spr.oamd;
+    return 0 <= offset && offset < in_range;
 }
 
 static void sprite_skip(struct aldo_rp2c02 *self)

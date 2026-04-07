@@ -1977,13 +1977,14 @@ static void ppudata_write_during_rendering_on_row_increment(void *ctx)
 
 static void ppudata_write_during_sprite_rendering(void *ctx)
 {
-    ct_ignore("not implemented");
-
     auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
     ppu->dot = 270;     // ppudata ALE cycle starts on sprite FGL read
     ppu->v = 0x43a3;    // 100 00 11101 00011
+    ppu->spr.soam[0] = 42;      // y-coord
+    ppu->spr.soam[1] = 0x3;     // tile id
+    ppu->spr.soaddr = 4;
 
     aldo_bus_write(ppt_get_mbus(ctx), 0x2007, 0x77);
 
@@ -1997,6 +1998,7 @@ static void ppudata_write_during_sprite_rendering(void *ctx)
     ct_asserttrue(ppu->signal.wr);
     ct_assertequal(0x22u, VRam[1]);
     ct_assertequal(0x43a3u, ppu->v);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
 
     // simulate the pipeline putting something on the addrbus
     ppu->vaddrbus = 0x3235;
@@ -2011,13 +2013,13 @@ static void ppudata_write_during_sprite_rendering(void *ctx)
     ct_assertequal(0x77u, VRam[1]);
     // PPUDATA write during rendering triggers course-x and y increment
     ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
-    ct_assertequal(11, ppu->dot);
-    ct_assertequal(2u, ppu->pxpl.tlu.atb);
+    ct_assertequal(271, ppu->dot);
+    ct_assertequal(0x22u, ppu->pxpl.spu[0].fg[0]);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x23f9u, ppu->vaddrbus);  // Tile AT address put on bus
+    ct_assertequal(0x38u, ppu->vaddrbus);   // Sprite FGH address put on bus
     ct_assertequal(0x77u, ppu->vdatabus);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.wr);
@@ -3212,13 +3214,14 @@ static void ppudata_read_during_rendering_on_row_increment(void *ctx)
 
 static void ppudata_read_during_sprite_rendering(void *ctx)
 {
-    ct_ignore("not implemented");
-
     auto ppu = ppt_get_ppu(ctx);
     ppu->mask.b = ppu->mask.s = true;
     ppu->line = 42;
-    ppu->dot = 270;     // ppudata ALE cycle starts on sprite FGL read
+    ppu->dot = 269;     // ppudata ALE cycle starts on sprite FGL address put
     ppu->v = 0x43a3;    // 100 00 11101 00011
+    ppu->spr.soam[0] = 42;      // y-coord
+    ppu->spr.soam[1] = 0x3;     // tile id
+    ppu->spr.soaddr = 4;
     ppu->rbuf = 0xaa;
 
     uint8_t d;
@@ -3234,47 +3237,53 @@ static void ppudata_read_during_sprite_rendering(void *ctx)
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
     ct_assertequal(0xaau, ppu->rbuf);
-    ct_assertequal(0x13a3u, ppu->v);
+    ct_assertequal(0x43a3u, ppu->v);
 
     aldo_ppu_cycle(ppu);
 
     ct_asserttrue(ppu->cvp);
-    ct_assertequal(0x13a3u, ppu->vaddrbus);
+    ct_assertequal(0x30u, ppu->vaddrbus);
     ct_assertequal(0u, ppu->vdatabus);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
     ct_assertequal(0xaau, ppu->rbuf);
-    ct_assertequal(0x13a3u, ppu->v);
-    ct_assertequal(271, ppu->dot);
-    ct_assertequal(0u, ppu->pxpl.tlu.atb);
+    ct_assertequal(0x43a3u, ppu->v);
+    ct_assertequal(270, ppu->dot);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
 
+    // ppuregister is only mocked for NT reads and it's too
+    // big a PITA to fix this for PT reads so simulate the
+    // read putting something on the databus.
+    ppu->vdatabus = 0x55;
     aldo_ppu_cycle(ppu);
 
+    // ALE latch cycle is skipped, whatever's on the databus is read to rbuf
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x13a3u, ppu->vaddrbus);
-    ct_assertequal(0x44u, ppu->vdatabus);
+    ct_assertequal(0x30u, ppu->vaddrbus);
+    ct_assertequal(0x55u, ppu->vdatabus);
+    ct_asserttrue(ppu->bflt);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
-    ct_assertequal(0x44u, ppu->rbuf);
+    ct_assertequal(0x55u, ppu->rbuf);
     // PPUDATA read during rendering triggers course-x and y increment
-    ct_assertequal(0x23a4u, ppu->v);    // 010 00 11101 00100
-    ct_assertequal(1u, ppu->pxpl.tlu.atb);
+    ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
+    ct_assertequal(0x55u, ppu->pxpl.spu[0].fg[0]);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertfalse(ppu->cvp);
-    ct_assertequal(0x13a3u, ppu->vaddrbus);
-    ct_assertequal(0x44u, ppu->vdatabus);
-    ct_assertfalse(ppu->signal.ale);
+    ct_assertequal(0x38u, ppu->vaddrbus);
+    ct_assertequal(0x55u, ppu->vdatabus);
+    ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
-    ct_assertequal(0x44u, ppu->rbuf);
-    ct_assertequal(0x23a4u, ppu->v);
+    ct_assertequal(0x55u, ppu->rbuf);
+    ct_assertequal(0x53a4u, ppu->v);
 
     aldo_bus_read(ppt_get_mbus(ctx), 0x2007, &d);
 
     ct_assertequal(7u, ppu->regsel);
-    ct_assertequal(0x44u, ppu->regbus);
-    ct_assertequal(0x44u, d);
+    ct_assertequal(0x55u, ppu->regbus);
+    ct_assertequal(0x55u, d);
 }
 
 static void ppudata_read_vram_behind_palette(void *ctx)

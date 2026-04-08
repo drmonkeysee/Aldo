@@ -371,9 +371,10 @@ oam_overflow_check:
 static void snapshot_sprites(const struct aldo_rp2c02 *self,
                              struct aldo_snapshot *snp)
 {
-    auto sprites = &snp->video->sprites;
+    static_assert(aldo_arrsz(self->spr.oam)
+                  == (aldo_arrsz(snp->video->sprites.objects) * SpriteSize));
 
-    assert(aldo_arrsz(self->spr.oam) == (aldo_arrsz(sprites->objects) * SpriteSize));
+    auto sprites = &snp->video->sprites;
 
     sprites->double_height = self->ctrl.h;
     for (size_t i = 0; i < aldo_arrsz(sprites->objects); ++i) {

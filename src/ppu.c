@@ -196,9 +196,12 @@ static struct sprite_obj soam_get_obj(const struct aldo_rp2c02 *self, size_t idx
     assert(addr < aldo_arrsz(sprites->soam));
     const uint8_t *bytes = sprites->soam + addr;
 
-    // TODO: on prerender line sprite fetch replays the last render line's accesses
-    // TODO: only 8bits of line is considered so 261 => 5
-    auto pxrow = self->line - bytes[0];
+    // Range checks only consider lower 8-bits of line counter so 261 => 5;
+    // this can lead to visual glitches if SOAM happens to contain sprite data
+    // with y-coord in range of line 5 during the prerender line; see discussion
+    // here: https://forums.nesdev.org/viewtopic.php?t=26291 and repo here:
+    // https://github.com/emu-russia/breaks/tree/master/BreakingNESWiki_DeepL/PPU
+    auto pxrow = (self->line & 0xff) - bytes[0];
 
     // All objects have enough data to do CHR tile fetches; even when out of
     // range of current scanline.

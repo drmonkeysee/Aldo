@@ -1049,12 +1049,10 @@ static void sprite_read(struct aldo_rp2c02 *self)
 
     // OAMADDR is cleared on every sprite-loading dot
     self->oamaddr = 0x0;
-    // reset to first sprite unit at start of sprite read sequence
-    if (self->dot == DotHBlank) {
-        self->pxpl.spuidx = 0;
-    }
+    // Wrap sprite unit idx around; because rendering can be enabled/disabled
+    // at any point there's no guarantee spuidx is any particular value.
+    self->pxpl.spuidx %= aldo_arrsz(self->pxpl.spu);
 
-    assert(self->pxpl.spuidx < aldo_arrsz(self->pxpl.spu));
     auto spu = self->pxpl.spu + self->pxpl.spuidx;
     auto obj = soam_get_obj(self, self->pxpl.spuidx);
 

@@ -6577,6 +6577,262 @@ static void pixel_fg_sprite_transparent_bg(void *ctx)
     ct_asserttrue(ppu->signal.vout);
 }
 
+static void pixel_fg_sprite_opaque_bg(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 2;
+    auto tlu = &ppu->pxpl.tlu;
+    // transparent bg, palette 2
+    tlu->bgs[0] = 0xffff;
+    tlu->bgs[1] = 0xffff;
+    tlu->ats[0] = 0x0;
+    tlu->ats[1] = 0xff;
+    auto spu = ppu->pxpl.spu;
+    spu->fgs[0] = 0x6f;
+    spu->fgs[1] = 0xcf;
+    spu->a = 0x3;   // priority: front, palette: 7
+    spu->x = 0;
+
+    // First Mux-and-Shift
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3, ppu->dot);
+    ct_assertequal(0x1eu, ppu->pxpl.mux);   // 1 11 10
+    ct_assertequal(0u, ppu->pxpl.pal);
+    ct_assertequal(0u, ppu->pxpl.px);
+    ct_assertequal(0xdeu, spu->fgs[0]);
+    ct_assertequal(0x9eu, spu->fgs[1]);
+    ct_asserttrue(ppu->status.s);   // sprite-0 hit for opaque-on-opaque pixel
+    ct_assertfalse(ppu->signal.vout);
+
+    // Set Palette Address
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(4, ppu->dot);
+    ct_assertequal(0x1fu, ppu->pxpl.mux);   // 1 11 11
+    ct_assertequal(0x1eu, ppu->pxpl.pal);
+    ct_assertequal(0u, ppu->pxpl.px);
+    ct_assertequal(0xbcu, spu->fgs[0]);
+    ct_assertequal(0x3cu, spu->fgs[1]);
+    ct_asserttrue(ppu->status.s);
+    ct_assertfalse(ppu->signal.vout);
+
+    // First Pixel Output
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(5, ppu->dot);
+    ct_assertequal(0x1du, ppu->pxpl.mux);   // 1 11 01
+    ct_assertequal(0x1fu, ppu->pxpl.pal);
+    ct_assertequal(0x39u, ppu->pxpl.px);
+    ct_assertequal(0x78u, spu->fgs[0]);
+    ct_assertequal(0x78u, spu->fgs[1]);
+    ct_asserttrue(ppu->status.s);
+    ct_asserttrue(ppu->signal.vout);
+}
+
+static void pixel_bg_sprite_transparent_bg(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 2;
+    auto tlu = &ppu->pxpl.tlu;
+    // transparent bg, palette 2
+    tlu->bgs[0] = 0x0;
+    tlu->bgs[1] = 0x0;
+    tlu->ats[0] = 0x0;
+    tlu->ats[1] = 0xff;
+    auto spu = ppu->pxpl.spu;
+    spu->fgs[0] = 0x6f;
+    spu->fgs[1] = 0xcf;
+    spu->a = 0x23;  // priority: back, palette: 7
+    spu->x = 0;
+
+    // First Mux-and-Shift
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3, ppu->dot);
+    ct_assertequal(0x1eu, ppu->pxpl.mux);   // 1 11 10
+    ct_assertequal(0u, ppu->pxpl.pal);
+    ct_assertequal(0u, ppu->pxpl.px);
+    ct_assertequal(0xdeu, spu->fgs[0]);
+    ct_assertequal(0x9eu, spu->fgs[1]);
+    ct_assertfalse(ppu->status.s);  // no sprite-0 hit for transparent bg
+    ct_assertfalse(ppu->signal.vout);
+
+    // Set Palette Address
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(4, ppu->dot);
+    ct_assertequal(0x1fu, ppu->pxpl.mux);   // 1 11 11
+    ct_assertequal(0x1eu, ppu->pxpl.pal);
+    ct_assertequal(0u, ppu->pxpl.px);
+    ct_assertequal(0xbcu, spu->fgs[0]);
+    ct_assertequal(0x3cu, spu->fgs[1]);
+    ct_assertfalse(ppu->status.s);
+    ct_assertfalse(ppu->signal.vout);
+
+    // First Pixel Output
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(5, ppu->dot);
+    ct_assertequal(0x1du, ppu->pxpl.mux);   // 1 11 01
+    ct_assertequal(0x1fu, ppu->pxpl.pal);
+    ct_assertequal(0x39u, ppu->pxpl.px);
+    ct_assertequal(0x78u, spu->fgs[0]);
+    ct_assertequal(0x78u, spu->fgs[1]);
+    ct_assertfalse(ppu->status.s);
+    ct_asserttrue(ppu->signal.vout);
+}
+
+static void pixel_bg_sprite_opaque_bg(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 2;
+    auto tlu = &ppu->pxpl.tlu;
+    // transparent bg, palette 2
+    tlu->bgs[0] = 0x5fff;
+    tlu->bgs[1] = 0xefff;
+    tlu->ats[0] = 0x0;
+    tlu->ats[1] = 0xff;
+    auto spu = ppu->pxpl.spu;
+    spu->fgs[0] = 0x6f;
+    spu->fgs[1] = 0xcf;
+    spu->a = 0x23;  // priority: back, palette: 7
+    spu->x = 0;
+
+    // First Mux-and-Shift
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3, ppu->dot);
+    ct_assertequal(0xau, ppu->pxpl.mux);    // 0 10 10
+    ct_assertequal(0u, ppu->pxpl.pal);
+    ct_assertequal(0u, ppu->pxpl.px);
+    ct_assertequal(0xdeu, spu->fgs[0]);
+    ct_assertequal(0x9eu, spu->fgs[1]);
+    ct_asserttrue(ppu->status.s);   // sprite-0 hit on opaque bg even with back priority
+    ct_assertfalse(ppu->signal.vout);
+
+    // Set Palette Address
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(4, ppu->dot);
+    ct_assertequal(0xbu, ppu->pxpl.mux);    // 0 10 11
+    ct_assertequal(0xau, ppu->pxpl.pal);
+    ct_assertequal(0u, ppu->pxpl.px);
+    ct_assertequal(0xbcu, spu->fgs[0]);
+    ct_assertequal(0x3cu, spu->fgs[1]);
+    ct_asserttrue(ppu->status.s);
+    ct_assertfalse(ppu->signal.vout);
+
+    // First Pixel Output
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(5, ppu->dot);
+    ct_assertequal(0xau, ppu->pxpl.mux);    // 0 10 10
+    ct_assertequal(0xbu, ppu->pxpl.pal);
+    ct_assertequal(6u, ppu->pxpl.px);
+    ct_assertequal(0x78u, spu->fgs[0]);
+    ct_assertequal(0x78u, spu->fgs[1]);
+    ct_asserttrue(ppu->status.s);
+    ct_asserttrue(ppu->signal.vout);
+}
+
+static void pixel_fg_x_decrement(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 2;
+    auto tlu = &ppu->pxpl.tlu;
+    // transparent bg, palette 2
+    tlu->bgs[0] = 0x0;
+    tlu->bgs[1] = 0x0;
+    tlu->ats[0] = 0x0;
+    tlu->ats[1] = 0xff;
+    auto spu = ppu->pxpl.spu;
+    spu->fgs[0] = 0x6f;
+    spu->fgs[1] = 0xcf;
+    spu->a = 0x3;   // priority: front, palette: 7
+    spu->x = 2;
+
+    // First Mux-and-Shift
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3, ppu->dot);
+    ct_assertequal(0x8u, ppu->pxpl.mux);   // 0 10 00
+    ct_assertequal(0u, ppu->pxpl.pal);
+    ct_assertequal(0u, ppu->pxpl.px);
+    ct_assertequal(0x6fu, spu->fgs[0]);
+    ct_assertequal(0xcfu, spu->fgs[1]);
+    ct_assertequal(1u, spu->x);
+    ct_assertfalse(ppu->status.s);
+    ct_assertfalse(ppu->signal.vout);
+
+    // Set Palette Address
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(4, ppu->dot);
+    ct_assertequal(0x8u, ppu->pxpl.mux);   // 0 10 00
+    ct_assertequal(0u, ppu->pxpl.pal);
+    ct_assertequal(0u, ppu->pxpl.px);
+    ct_assertequal(0x6fu, spu->fgs[0]);
+    ct_assertequal(0xcfu, spu->fgs[1]);
+    ct_assertequal(0u, spu->x);
+    ct_assertfalse(ppu->status.s);
+    ct_assertfalse(ppu->signal.vout);
+
+    // First Pixel Output
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(5, ppu->dot);
+    ct_assertequal(0x1eu, ppu->pxpl.mux);   // 1 11 10
+    ct_assertequal(0u, ppu->pxpl.pal);
+    ct_assertequal(0x24u, ppu->pxpl.px);
+    ct_assertequal(0xdeu, spu->fgs[0]);
+    ct_assertequal(0x9eu, spu->fgs[1]);
+    ct_assertequal(0u, spu->x);
+    ct_assertfalse(ppu->status.s);
+    ct_asserttrue(ppu->signal.vout);
+}
+
+static void pixel_disabled_fg(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 66;
+    auto spu = ppu->pxpl.spu;
+    spu->fgs[0] = 0xff;
+    spu->fgs[1] = 0xff;
+    spu->a = 0x3;   // priority: front, palette: 7
+    spu->x = 0;
+    ppu->mask.s = false;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(0u, ppu->pxpl.mux);
+}
+
+static void left_mask_fg(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->line = 10;
+    ppu->dot = 2;
+    auto spu = ppu->pxpl.spu;
+    spu->fgs[0] = 0xff;
+    spu->fgs[1] = 0xff;
+    spu->a = 0x3;   // priority: front, palette: 7
+    spu->x = 1;
+    ppu->mask.sm = false;
+
+    for (auto i = 0; i < 8; ++i) {
+        aldo_ppu_cycle(ppu);
+
+        ct_assertequal(2 + i + 1, ppu->dot);
+        ct_assertequal(0u, ppu->pxpl.mux);
+    }
+
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(11, ppu->dot);
+    ct_assertequal(0x1fu, ppu->pxpl.mux);
+}
+
 //
 // MARK: - Rendering Disabled
 //
@@ -6761,6 +7017,12 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(left_mask_bg),
         ct_maketest(fine_x_select),
         ct_maketest(pixel_fg_sprite_transparent_bg),
+        ct_maketest(pixel_fg_sprite_opaque_bg),
+        ct_maketest(pixel_bg_sprite_transparent_bg),
+        ct_maketest(pixel_bg_sprite_opaque_bg),
+        ct_maketest(pixel_fg_x_decrement),
+        ct_maketest(pixel_disabled_fg),
+        ct_maketest(left_mask_fg),
 
         ct_maketest(rendering_disabled),
         ct_maketest(rendering_disabled_explicit_bg_palette),

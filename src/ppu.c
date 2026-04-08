@@ -801,9 +801,10 @@ static void mux_fg(struct aldo_rp2c02 *self)
     if (!self->mask.s || (!self->mask.sm && self->dot < DotLeftMaskEnd)) return;
 
     uint8_t spmux = 0;
-    bool back_priority = false;
+    bool back_priority = false, sprite0 = false;
     for (size_t i = 0; i < aldo_arrsz(self->pxpl.spu); ++i) {
         auto spu = self->pxpl.spu + i;
+        sprite0 = i == 0;
         if (spu->x > 0) continue;
         // pixel selection is always from the left
         spmux = (uint8_t)((aldo_getbit(spu->fgs[1], 7) << 1)
@@ -817,10 +818,15 @@ static void mux_fg(struct aldo_rp2c02 *self)
     }
     if (spmux == 0) return;
 
-    // TODO: sprite-0 hit
+    // sprite-0 hit (note that sprite priority does not matter)
+    bool transparent_bg = (self->pxpl.mux & DWordMask) == 0;
+    // TODO: no sprite-0 on x=255
+    if (sprite0 && !transparent_bg) {
+        self->status.s = true;
+    }
 
     // sprite wins if it is front priority or bg is transparent
-    if (!back_priority || (back_priority && self->pxpl.mux == 0)) {
+    if (!back_priority || (back_priority && transparent_bg)) {
         assert(spmux < 0x10);
         // high 5th bit indexes into the upper sprite palettes
         self->pxpl.mux = 0x10 | spmux;

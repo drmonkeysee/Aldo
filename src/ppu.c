@@ -158,7 +158,7 @@ static bool in_vblank(const struct aldo_rp2c02 *self)
 }
 
 //
-// MARK: - OAM
+// MARK: - Sprite Evaluation
 //
 
 static int sprite_height(const struct aldo_rp2c02 *self)
@@ -243,17 +243,6 @@ static bool soam_full(const struct aldo_rp2c02 *self)
     return sprites->soaddr >= aldo_arrsz(sprites->soam);
 }
 
-[[maybe_unused]]
-static bool assert_cleared_soam(const struct aldo_rp2c02 *self)
-{
-    auto sprites = &self->spr;
-    assert(sprites->soaddr == 0);
-    for (size_t i = 0; i < aldo_arrsz(sprites->soam); ++i) {
-        if (sprites->soam[i] != 0xff) return false;
-    }
-    return true;
-}
-
 static bool sprite_in_range(const struct aldo_rp2c02 *self)
 {
     auto in_range = sprite_height(self);
@@ -271,7 +260,6 @@ static void sprite_reset(struct aldo_rp2c02 *self)
     auto sprites = &self->spr;
     sprites->soaddr = 0x0;
     sprites->s = ALDO_PPU_SPR_SCAN;
-    assert(assert_cleared_soam(self));
 }
 
 // runs on lines 0-239; dots 1-256
@@ -287,11 +275,13 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
 
     // secondary OAM clear
     if (self->dot < DotSpriteEvaluation) {
-        // Clamp address during soam clear so it can recover from random values
-        // or leftover overflows during sprite selection.
+        // Clamp address during soam clear so it can recover from rendering
+        // disabled or leftover overflows during sprite selection.
         self->spr.soaddr %= aldo_arrsz(self->spr.soam);
         soam_write(self);
         soam_advance(self);
+        // *WARNING*: this may be skipped by rendering disabled and will likely
+        // result in glitchy sprite evaluation.
         if (self->dot == DotSpriteEvaluation - 1) {
             sprite_reset(self);
         }

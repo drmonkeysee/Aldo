@@ -23,6 +23,7 @@ constexpr auto LinePostRender = 240;
 constexpr auto LineVBlank = LinePostRender + 1;
 constexpr auto LinePreRender = Lines - 1;
 constexpr auto DotPxStart = 2;
+constexpr auto DotLeftMaskEnd = DotPxStart + 8;
 constexpr auto DotSpriteEvaluation = 65;
 constexpr auto DotHBlank = 257;
 constexpr auto DotPxEnd = 260;
@@ -759,15 +760,13 @@ static void latch_tile(struct aldo_rp2c02 *self)
 
 static void mux_bg(struct aldo_rp2c02 *self)
 {
-    static constexpr auto left_mask_end = DotPxStart + 8;
-
     auto pxpl = &self->pxpl;
     auto tlu = &pxpl->tlu;
     // fine-x selects bit from the left: 0 = 7th bit, 7 = 0th bit
     auto abit = 7 - self->x;
     pxpl->mux = (uint8_t)((aldo_getbit(tlu->ats[1], abit) << 3)
                           | (aldo_getbit(tlu->ats[0], abit) << 2));
-    if (self->mask.b && (self->mask.bm || self->dot >= left_mask_end)) {
+    if (self->mask.b && (self->mask.bm || self->dot >= DotLeftMaskEnd)) {
         // tile selection is from the left-most (upper) byte
         auto tbit = abit + 8;
         pxpl->mux |= (uint8_t)((aldo_getbit(tlu->bgs[1], tbit) << 1)
@@ -776,9 +775,9 @@ static void mux_bg(struct aldo_rp2c02 *self)
     assert(pxpl->mux < 0x10);
 }
 
+// precondition: self->pxpl.mux contains the bg tile pixel selection
 static void mux_fg(struct aldo_rp2c02 *self)
 {
-    (void)self;
     /*
      for each spu where x == 0
         if fgs[1]:7 << 1 | fgs[0]:7 > 0
@@ -796,7 +795,36 @@ static void mux_fg(struct aldo_rp2c02 *self)
      */
     // TODO: select sprite priority here
     // if sprite selected assert(0x10 <= self->pxpl.mux && self->pxpl.mux < 0x20);
-    assert(self->pxpl.mux < 0x10);
+
+    // Sprite rendering disabled or sprite left-column masked,
+    // use whatever bg tile selected.
+    if (!self->mask.s || (!self->mask.sm && self->dot < DotLeftMaskEnd)) return;
+
+    uint8_t spmux = 0;
+    bool back_priority = false;
+    for (size_t i = 0; i < aldo_arrsz(self->pxpl.spu); ++i) {
+        auto spu = self->pxpl.spu + i;
+        if (spu->x > 0) continue;
+        // pixel selection is always from the left
+        spmux = (uint8_t)((aldo_getbit(spu->fgs[1], 7) << 1)
+                          | aldo_getbit(spu->fgs[0], 7));
+        if (spmux > 0) {
+            spmux |= ((aldo_getbit(spu->a, 1) << 3)
+                      | (aldo_getbit(spu->a, 0) << 2));
+            back_priority = aldo_getbit(spu->a, 5);
+            break;
+        }
+    }
+    if (spmux == 0) return;
+
+    // TODO: sprite-0 hit
+
+    // sprite wins if it is front priority or bg is transparent
+    if (!back_priority || (back_priority && self->pxpl.mux == 0)) {
+        assert(spmux < 0x10);
+        // high 5th bit indexes into the upper sprite palettes
+        self->pxpl.mux = 0x10 | spmux;
+    }
 }
 
 static void resolve_palette(struct aldo_rp2c02 *self)
@@ -827,9 +855,9 @@ static void output_pixel(struct aldo_rp2c02 *self)
     self->signal.vout = true;
 }
 
+#define pxshift(r, v) (*(r) = (typeof(*(r)))(*(r) << 1) | (v))
 static void shift_tiles(struct aldo_rp2c02 *self)
 {
-#define pxshift(r, v) (*(r) = (typeof(*(r)))(*(r) << 1) | (v))
     // tile low plane shifts in 0, high plane shifts in 1
     auto tlu = &self->pxpl.tlu;
     pxshift(tlu->bgs, 0);
@@ -839,19 +867,21 @@ static void shift_tiles(struct aldo_rp2c02 *self)
     if (self->dot % 8 == 1) {
         latch_tile(self);
     }
-#undef pxshift
 }
 
 static void shift_sprites(struct aldo_rp2c02 *self)
 {
-    /*
-     for each spu
-        if x == 0
-            fg[0] and fg[1] << 1
-        else
-            --x
-     */
+    for (size_t i = 0; i < aldo_arrsz(self->pxpl.spu); ++i) {
+        auto spu = self->pxpl.spu + i;
+        if (spu->x == 0) {
+            pxshift(spu->fgs, 0);
+            pxshift(spu->fgs + 1, 0);
+        } else {
+            --spu->x;
+        }
+    }
 }
+#undef pxshift
 
 static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
 {
@@ -1110,7 +1140,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
     case 6:
         // FG low data
         read(self);
-        spu->fg[0] = sprite_pattern_data(self, &obj);
+        spu->fgs[0] = sprite_pattern_data(self, &obj);
         break;
     case 7:
         // FG high addr
@@ -1119,7 +1149,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
     case 0:
         // FG high data
         read(self);
-        spu->fg[1] = sprite_pattern_data(self, &obj);
+        spu->fgs[1] = sprite_pattern_data(self, &obj);
         ++self->pxpl.spuidx;
         break;
     default:

@@ -1998,7 +1998,7 @@ static void ppudata_write_during_sprite_rendering(void *ctx)
     ct_asserttrue(ppu->signal.wr);
     ct_assertequal(0x22u, VRam[1]);
     ct_assertequal(0x43a3u, ppu->v);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
 
     // simulate the pipeline putting something on the addrbus
     ppu->vaddrbus = 0x3235;
@@ -2014,7 +2014,7 @@ static void ppudata_write_during_sprite_rendering(void *ctx)
     // PPUDATA write during rendering triggers course-x and y increment
     ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
     ct_assertequal(271, ppu->dot);
-    ct_assertequal(0x22u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0x22u, ppu->pxpl.spu[0].fgs[0]);
 
     aldo_ppu_cycle(ppu);
 
@@ -3249,7 +3249,7 @@ static void ppudata_read_during_sprite_rendering(void *ctx)
     ct_assertequal(0xaau, ppu->rbuf);
     ct_assertequal(0x43a3u, ppu->v);
     ct_assertequal(270, ppu->dot);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
 
     // ppuregister is only mocked for NT reads and it's too
     // big a PITA to fix this for PT reads so simulate the
@@ -3267,7 +3267,7 @@ static void ppudata_read_during_sprite_rendering(void *ctx)
     ct_assertequal(0x55u, ppu->rbuf);
     // PPUDATA read during rendering triggers course-x and y increment
     ct_assertequal(0x53a4u, ppu->v);    // 101 00 11101 00100
-    ct_assertequal(0x55u, ppu->pxpl.spu[0].fg[0]);
+    ct_assertequal(0x55u, ppu->pxpl.spu[0].fgs[0]);
 
     aldo_ppu_cycle(ppu);
 

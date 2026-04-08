@@ -1242,8 +1242,8 @@ static void sprite_fetch_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1257,8 +1257,8 @@ static void sprite_fetch_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1273,8 +1273,8 @@ static void sprite_fetch_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1289,8 +1289,8 @@ static void sprite_fetch_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1305,8 +1305,8 @@ static void sprite_fetch_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1320,8 +1320,8 @@ static void sprite_fetch_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1336,8 +1336,8 @@ static void sprite_fetch_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1351,8 +1351,8 @@ static void sprite_fetch_first_row(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0x44u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0x44u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -1386,8 +1386,8 @@ static void sprite_fetch_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1401,8 +1401,8 @@ static void sprite_fetch_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1417,8 +1417,8 @@ static void sprite_fetch_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1433,8 +1433,8 @@ static void sprite_fetch_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1449,8 +1449,8 @@ static void sprite_fetch_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1464,8 +1464,8 @@ static void sprite_fetch_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1480,8 +1480,8 @@ static void sprite_fetch_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1495,8 +1495,8 @@ static void sprite_fetch_last_row(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0xbbu, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0xbbu, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -1529,8 +1529,8 @@ static void sprite_fetch_vertical_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1544,8 +1544,8 @@ static void sprite_fetch_vertical_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1560,8 +1560,8 @@ static void sprite_fetch_vertical_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1576,8 +1576,8 @@ static void sprite_fetch_vertical_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1592,8 +1592,8 @@ static void sprite_fetch_vertical_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1607,8 +1607,8 @@ static void sprite_fetch_vertical_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1623,8 +1623,8 @@ static void sprite_fetch_vertical_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1638,8 +1638,8 @@ static void sprite_fetch_vertical_flip(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0xbbu, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0xbbu, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -1672,8 +1672,8 @@ static void sprite_fetch_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1687,8 +1687,8 @@ static void sprite_fetch_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1703,8 +1703,8 @@ static void sprite_fetch_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x42u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1719,8 +1719,8 @@ static void sprite_fetch_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x42u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1735,8 +1735,8 @@ static void sprite_fetch_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x42u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1750,8 +1750,8 @@ static void sprite_fetch_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x42u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xccu, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xccu, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1766,8 +1766,8 @@ static void sprite_fetch_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x42u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xccu, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xccu, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1781,8 +1781,8 @@ static void sprite_fetch_horizontal_flip(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(0x42u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xccu, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0x22u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xccu, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0x22u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -1815,8 +1815,8 @@ static void sprite_fetch_vertical_and_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1830,8 +1830,8 @@ static void sprite_fetch_vertical_and_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1846,8 +1846,8 @@ static void sprite_fetch_vertical_and_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0xc2u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1862,8 +1862,8 @@ static void sprite_fetch_vertical_and_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0xc2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1878,8 +1878,8 @@ static void sprite_fetch_vertical_and_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0xc2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1893,8 +1893,8 @@ static void sprite_fetch_vertical_and_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0xc2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x55u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x55u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1909,8 +1909,8 @@ static void sprite_fetch_vertical_and_horizontal_flip(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0xc2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x55u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x55u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1924,8 +1924,8 @@ static void sprite_fetch_vertical_and_horizontal_flip(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(0xc2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x55u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0xddu, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x55u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0xddu, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -1959,8 +1959,8 @@ static void sprite_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -1974,8 +1974,8 @@ static void sprite_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -1990,8 +1990,8 @@ static void sprite_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2006,8 +2006,8 @@ static void sprite_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2022,8 +2022,8 @@ static void sprite_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2037,8 +2037,8 @@ static void sprite_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x66u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x66u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2053,8 +2053,8 @@ static void sprite_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x66u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x66u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2068,8 +2068,8 @@ static void sprite_fetch_upper_bank(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x66u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0x88u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x66u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0x88u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -2103,8 +2103,8 @@ static void sprite_dh_fetch_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2118,8 +2118,8 @@ static void sprite_dh_fetch_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2134,8 +2134,8 @@ static void sprite_dh_fetch_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2150,8 +2150,8 @@ static void sprite_dh_fetch_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2166,8 +2166,8 @@ static void sprite_dh_fetch_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2181,8 +2181,8 @@ static void sprite_dh_fetch_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2197,8 +2197,8 @@ static void sprite_dh_fetch_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2212,8 +2212,8 @@ static void sprite_dh_fetch_top_first_row(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0x44u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0x44u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -2248,8 +2248,8 @@ static void sprite_dh_fetch_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2263,8 +2263,8 @@ static void sprite_dh_fetch_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2279,8 +2279,8 @@ static void sprite_dh_fetch_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2295,8 +2295,8 @@ static void sprite_dh_fetch_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2311,8 +2311,8 @@ static void sprite_dh_fetch_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2326,8 +2326,8 @@ static void sprite_dh_fetch_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2342,8 +2342,8 @@ static void sprite_dh_fetch_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2357,8 +2357,8 @@ static void sprite_dh_fetch_top_last_row(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0xbbu, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0xbbu, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -2393,8 +2393,8 @@ static void sprite_dh_fetch_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2408,8 +2408,8 @@ static void sprite_dh_fetch_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2424,8 +2424,8 @@ static void sprite_dh_fetch_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2440,8 +2440,8 @@ static void sprite_dh_fetch_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2456,8 +2456,8 @@ static void sprite_dh_fetch_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2471,8 +2471,8 @@ static void sprite_dh_fetch_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x11u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x11u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2487,8 +2487,8 @@ static void sprite_dh_fetch_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x11u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x11u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2502,8 +2502,8 @@ static void sprite_dh_fetch_bottom_first_row(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x11u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0x22u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x11u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0x22u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -2538,8 +2538,8 @@ static void sprite_dh_fetch_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2553,8 +2553,8 @@ static void sprite_dh_fetch_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2569,8 +2569,8 @@ static void sprite_dh_fetch_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2585,8 +2585,8 @@ static void sprite_dh_fetch_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2601,8 +2601,8 @@ static void sprite_dh_fetch_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2616,8 +2616,8 @@ static void sprite_dh_fetch_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xccu, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xccu, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2632,8 +2632,8 @@ static void sprite_dh_fetch_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xccu, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xccu, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2647,8 +2647,8 @@ static void sprite_dh_fetch_bottom_last_row(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xccu, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0xddu, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xccu, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0xddu, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -2682,8 +2682,8 @@ static void sprite_dh_fetch_vertical_flip_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2697,8 +2697,8 @@ static void sprite_dh_fetch_vertical_flip_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2713,8 +2713,8 @@ static void sprite_dh_fetch_vertical_flip_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2729,8 +2729,8 @@ static void sprite_dh_fetch_vertical_flip_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2745,8 +2745,8 @@ static void sprite_dh_fetch_vertical_flip_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2760,8 +2760,8 @@ static void sprite_dh_fetch_vertical_flip_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xccu, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xccu, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2776,8 +2776,8 @@ static void sprite_dh_fetch_vertical_flip_top_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xccu, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xccu, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2791,8 +2791,8 @@ static void sprite_dh_fetch_vertical_flip_top_first_row(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xccu, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0xddu, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xccu, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0xddu, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -2827,8 +2827,8 @@ static void sprite_dh_fetch_vertical_flip_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2842,8 +2842,8 @@ static void sprite_dh_fetch_vertical_flip_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2858,8 +2858,8 @@ static void sprite_dh_fetch_vertical_flip_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2874,8 +2874,8 @@ static void sprite_dh_fetch_vertical_flip_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2890,8 +2890,8 @@ static void sprite_dh_fetch_vertical_flip_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2905,8 +2905,8 @@ static void sprite_dh_fetch_vertical_flip_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x11u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x11u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -2921,8 +2921,8 @@ static void sprite_dh_fetch_vertical_flip_top_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x11u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x11u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2936,8 +2936,8 @@ static void sprite_dh_fetch_vertical_flip_top_last_row(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x11u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0x22u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x11u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0x22u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -2972,8 +2972,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -2987,8 +2987,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3003,8 +3003,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3019,8 +3019,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3035,8 +3035,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3050,8 +3050,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3066,8 +3066,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_first_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3081,8 +3081,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_first_row(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0xaau, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0xbbu, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0xaau, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0xbbu, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -3117,8 +3117,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3132,8 +3132,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3148,8 +3148,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3164,8 +3164,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3180,8 +3180,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3195,8 +3195,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3211,8 +3211,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_last_row(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3226,8 +3226,8 @@ static void sprite_dh_fetch_vertical_flip_bottom_last_row(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(0x82u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0x44u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0x44u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -3261,8 +3261,8 @@ static void sprite_dh_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3276,8 +3276,8 @@ static void sprite_dh_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3292,8 +3292,8 @@ static void sprite_dh_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3308,8 +3308,8 @@ static void sprite_dh_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3324,8 +3324,8 @@ static void sprite_dh_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3339,8 +3339,8 @@ static void sprite_dh_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3355,8 +3355,8 @@ static void sprite_dh_fetch_upper_bank(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3370,8 +3370,8 @@ static void sprite_dh_fetch_upper_bank(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0x44u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0x44u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -3404,8 +3404,8 @@ static void sprite_fetch_out_of_range_sprite(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3419,8 +3419,8 @@ static void sprite_fetch_out_of_range_sprite(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3435,8 +3435,8 @@ static void sprite_fetch_out_of_range_sprite(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3451,8 +3451,8 @@ static void sprite_fetch_out_of_range_sprite(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3467,8 +3467,8 @@ static void sprite_fetch_out_of_range_sprite(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3482,8 +3482,8 @@ static void sprite_fetch_out_of_range_sprite(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3498,8 +3498,8 @@ static void sprite_fetch_out_of_range_sprite(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3513,8 +3513,8 @@ static void sprite_fetch_out_of_range_sprite(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -3548,8 +3548,8 @@ static void sprite_fetch_rendering_disabled(void *ctx)
     ct_assertequal(72u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3563,8 +3563,8 @@ static void sprite_fetch_rendering_disabled(void *ctx)
     ct_assertequal(72u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3579,8 +3579,8 @@ static void sprite_fetch_rendering_disabled(void *ctx)
     ct_assertequal(72u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3595,8 +3595,8 @@ static void sprite_fetch_rendering_disabled(void *ctx)
     ct_assertequal(72u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3611,8 +3611,8 @@ static void sprite_fetch_rendering_disabled(void *ctx)
     ct_assertequal(72u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3626,8 +3626,8 @@ static void sprite_fetch_rendering_disabled(void *ctx)
     ct_assertequal(72u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3642,8 +3642,8 @@ static void sprite_fetch_rendering_disabled(void *ctx)
     ct_assertequal(72u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3657,8 +3657,8 @@ static void sprite_fetch_rendering_disabled(void *ctx)
     ct_assertequal(72u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 }
@@ -3692,8 +3692,8 @@ static void sprite_fetch_sprite_only_disabled(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3707,8 +3707,8 @@ static void sprite_fetch_sprite_only_disabled(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(0u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3723,8 +3723,8 @@ static void sprite_fetch_sprite_only_disabled(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(0u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3739,8 +3739,8 @@ static void sprite_fetch_sprite_only_disabled(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3755,8 +3755,8 @@ static void sprite_fetch_sprite_only_disabled(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3770,8 +3770,8 @@ static void sprite_fetch_sprite_only_disabled(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 
@@ -3786,8 +3786,8 @@ static void sprite_fetch_sprite_only_disabled(void *ctx)
     ct_assertequal(0u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0u, ppu->pxpl.spu[0].fgs[1]);
     ct_asserttrue(ppu->signal.ale);
     ct_asserttrue(ppu->signal.rd);
 
@@ -3801,8 +3801,8 @@ static void sprite_fetch_sprite_only_disabled(void *ctx)
     ct_assertequal(1u, ppu->pxpl.spuidx);
     ct_assertequal(2u, ppu->pxpl.spu[0].a);
     ct_assertequal(43u, ppu->pxpl.spu[0].x);
-    ct_assertequal(0x33u, ppu->pxpl.spu[0].fg[0]);
-    ct_assertequal(0x44u, ppu->pxpl.spu[0].fg[1]);
+    ct_assertequal(0x33u, ppu->pxpl.spu[0].fgs[0]);
+    ct_assertequal(0x44u, ppu->pxpl.spu[0].fgs[1]);
     ct_assertfalse(ppu->signal.ale);
     ct_assertfalse(ppu->signal.rd);
 }
@@ -3853,8 +3853,8 @@ static void sprite_fetch_full_line_sequence(void *ctx)
          ++i, chr += 8, x += 4) {
         auto spu = ppu->pxpl.spu + i;
         ct_assertequal(0x2u, spu->a, "unexpected attribute value for spu %d", i);
-        ct_assertequal(chr, spu->fg[0], "unexpected lo plane for spu %d", i);
-        ct_assertequal(0x80 | chr, spu->fg[1], "unexpected hi plane for spu %d", i);
+        ct_assertequal(chr, spu->fgs[0], "unexpected lo plane for spu %d", i);
+        ct_assertequal(0x80 | chr, spu->fgs[1], "unexpected hi plane for spu %d", i);
         ct_assertequal(x + 23, spu->x, "unexpected x-coord for spu %d", i);
     }
 }
@@ -3903,8 +3903,8 @@ static void sprite_fetch_empty_line_sequence(void *ctx)
     for (size_t i = 0; i < aldo_arrsz(ppu->pxpl.spu); ++i) {
         auto spu = ppu->pxpl.spu + i;
         ct_assertequal(0u, spu->a, "unexpected attribute value for spu %d", i);
-        ct_assertequal(0u, spu->fg[0], "unexpected lo plane for spu %d", i);
-        ct_assertequal(0u, spu->fg[1], "unexpected hi plane for spu %d", i);
+        ct_assertequal(0u, spu->fgs[0], "unexpected lo plane for spu %d", i);
+        ct_assertequal(0u, spu->fgs[1], "unexpected hi plane for spu %d", i);
         ct_assertequal(0u, spu->x, "unexpected x-coord for spu %d", i);
     }
 }
@@ -3963,8 +3963,8 @@ static void sprite_fetch_partial_line_sequence(void *ctx)
             xcoord = (uint8_t)(x + 23);
         }
         ct_assertequal(attr, spu->a, "unexpected attribute value for spu %d", i);
-        ct_assertequal(plane0, spu->fg[0], "unexpected lo plane for spu %d", i);
-        ct_assertequal(plane1, spu->fg[1], "unexpected hi plane for spu %d", i);
+        ct_assertequal(plane0, spu->fgs[0], "unexpected lo plane for spu %d", i);
+        ct_assertequal(plane1, spu->fgs[1], "unexpected hi plane for spu %d", i);
         ct_assertequal(xcoord, spu->x, "unexpected x-coord for spu %d", i);
     }
 }
@@ -4023,8 +4023,8 @@ static void sprite_fetch_starts_late(void *ctx)
             xcoord = (uint8_t)(x + 23);
         }
         ct_assertequal(attr, spu->a, "unexpected attribute value for spu %d", i);
-        ct_assertequal(plane0, spu->fg[0], "unexpected lo plane for spu %d", i);
-        ct_assertequal(plane1, spu->fg[1], "unexpected hi plane for spu %d", i);
+        ct_assertequal(plane0, spu->fgs[0], "unexpected lo plane for spu %d", i);
+        ct_assertequal(plane1, spu->fgs[1], "unexpected hi plane for spu %d", i);
         ct_assertequal(xcoord, spu->x, "unexpected x-coord for spu %d", i);
     }
 }
@@ -4084,8 +4084,8 @@ static void sprite_fetch_prerender_line(void *ctx)
             xcoord = (uint8_t)(x + 23);
         }
         ct_assertequal(attr, spu->a, "unexpected attribute value for spu %d", i);
-        ct_assertequal(plane0, spu->fg[0], "unexpected lo plane for spu %d", i);
-        ct_assertequal(plane1, spu->fg[1], "unexpected hi plane for spu %d", i);
+        ct_assertequal(plane0, spu->fgs[0], "unexpected lo plane for spu %d", i);
+        ct_assertequal(plane1, spu->fgs[1], "unexpected hi plane for spu %d", i);
         ct_assertequal(xcoord, spu->x, "unexpected x-coord for spu %d", i);
     }
 }
@@ -6524,6 +6524,59 @@ static void fine_x_select(void *ctx)
     ct_assertequal(0x82u, at1);  // Reverse of 0x41
 }
 
+static void pixel_fg_sprite_transparent_bg(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 2;
+    auto tlu = &ppu->pxpl.tlu;
+    // transparent bg, palette 2
+    tlu->bgs[0] = 0x0;
+    tlu->bgs[1] = 0x0;
+    tlu->ats[0] = 0x0;
+    tlu->ats[1] = 0xff;
+    auto spu = ppu->pxpl.spu;
+    spu->fgs[0] = 0x6f;
+    spu->fgs[1] = 0xcf;
+    spu->a = 0x3;   // priority: front, palette: 7
+    spu->x = 0;
+
+    // First Mux-and-Shift
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3, ppu->dot);
+    ct_assertequal(0x1eu, ppu->pxpl.mux);   // 1 11 10
+    ct_assertequal(0u, ppu->pxpl.pal);
+    ct_assertequal(0u, ppu->pxpl.px);
+    ct_assertequal(0xdeu, spu->fgs[0]);
+    ct_assertequal(0x9eu, spu->fgs[1]);
+    ct_assertfalse(ppu->status.s);  // no sprite-0 hit for transparent bg
+    ct_assertfalse(ppu->signal.vout);
+
+    // Set Palette Address
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(4, ppu->dot);
+    ct_assertequal(0x1fu, ppu->pxpl.mux);   // 1 11 11
+    ct_assertequal(0x1eu, ppu->pxpl.pal);
+    ct_assertequal(0u, ppu->pxpl.px);
+    ct_assertequal(0xbcu, spu->fgs[0]);
+    ct_assertequal(0x3cu, spu->fgs[1]);
+    ct_assertfalse(ppu->status.s);
+    ct_assertfalse(ppu->signal.vout);
+
+    // First Pixel Output
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(5, ppu->dot);
+    ct_assertequal(0x1du, ppu->pxpl.mux);   // 1 11 01
+    ct_assertequal(0x1fu, ppu->pxpl.pal);
+    ct_assertequal(0x39u, ppu->pxpl.px);
+    ct_assertequal(0x78u, spu->fgs[0]);
+    ct_assertequal(0x78u, spu->fgs[1]);
+    ct_assertfalse(ppu->status.s);
+    ct_asserttrue(ppu->signal.vout);
+}
+
 //
 // MARK: - Rendering Disabled
 //
@@ -6707,6 +6760,7 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(pixel_disabled_bg),
         ct_maketest(left_mask_bg),
         ct_maketest(fine_x_select),
+        ct_maketest(pixel_fg_sprite_transparent_bg),
 
         ct_maketest(rendering_disabled),
         ct_maketest(rendering_disabled_explicit_bg_palette),

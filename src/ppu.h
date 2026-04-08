@@ -118,7 +118,7 @@ struct aldo_rp2c02 {
         struct {
             uint8_t
                 a,              // Sprite Attribute
-                fg[2],          // Foreground Tile Shifter (low, high planes)
+                fgs[2],         // Foreground Tile Shifter (low, high planes)
                 x;              // Sprite X-Coordinate
             // TODO: need any latches based on timing?
         } spu[8];               // Sprite Rendering Units

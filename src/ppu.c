@@ -779,7 +779,23 @@ static void mux_bg(struct aldo_rp2c02 *self)
 static void mux_fg(struct aldo_rp2c02 *self)
 {
     (void)self;
+    /*
+     for each spu where x == 0
+        if fgs[1]:7 << 1 | fgs[0]:7 > 0
+            pick sprite
+     else
+        return use bg pixel
+     add attr[1] << 3 | attr[0] << 2
+     check left-side mask and sprite rendering flag
+     if spu[0] and bg !0 and !sprite-0-hit and x!=255 (dot check) -> sprite 0 hit
+     if attr[5] == 0 || (attr[5] == 1 && bg is 0)
+        use fg pixel
+        & 0x10
+     else
+        return use bg pixel
+     */
     // TODO: select sprite priority here
+    // if sprite selected assert(0x10 <= self->pxpl.mux && self->pxpl.mux < 0x20);
     assert(self->pxpl.mux < 0x10);
 }
 
@@ -824,6 +840,17 @@ static void shift_tiles(struct aldo_rp2c02 *self)
         latch_tile(self);
     }
 #undef pxshift
+}
+
+static void shift_sprites(struct aldo_rp2c02 *self)
+{
+    /*
+     for each spu
+        if x == 0
+            fg[0] and fg[1] << 1
+        else
+            --x
+     */
 }
 
 static uint16_t nametable_addr(const struct aldo_rp2c02 *self)
@@ -958,7 +985,7 @@ static void pixel_pipeline(struct aldo_rp2c02 *self)
         mux_bg(self);
         mux_fg(self);
         shift_tiles(self);
-        // TODO: shift sprites
+        shift_sprites(self);
     } else if (self->dot == 329) {
         // Prefetch likely runs the same hardware steps as normal pixel
         // selection, but since there are no side-effects outside of the pixel
@@ -1066,6 +1093,8 @@ static void sprite_read(struct aldo_rp2c02 *self)
     case 3:
         // ignored NT addr
         addrbus(self, nametable_addr(self));
+        // On dot 259 this overlaps the final sprite shift for the current line
+        // but since the pixel pipeline is executed first it shouldn't interfere.
         spu->a = obj.attr;
         break;
     case 4:

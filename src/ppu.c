@@ -44,8 +44,8 @@ constexpr uint8_t PaletteMask = CourseXBits;
 constexpr uint8_t DWordMask = 0x3;
 
 struct sprite_obj {
-    uint8_t y, tile, attr, x;
-    bool active;
+    uint8_t pxrow, tile, attr, x;
+    bool dh, ir;
 };
 
 //
@@ -161,6 +161,11 @@ static bool in_vblank(const struct aldo_rp2c02 *self)
 // MARK: - OAM
 //
 
+static int sprite_height(const struct aldo_rp2c02 *self)
+{
+    return self->ctrl.h ? SpriteHeight * 2 : SpriteHeight;
+}
+
 static uint8_t oam_read(const struct aldo_rp2c02 *self)
 {
     // during secondary oam clear, OAMDATA always returns 0xff
@@ -189,14 +194,29 @@ static struct sprite_obj soam_get_obj(const struct aldo_rp2c02 *self, size_t idx
     auto addr = idx * SpriteSize;
 
     assert(addr < aldo_arrsz(sprites->soam));
-    const uint8_t *obj = sprites->soam + addr;
-    // If sprite is not active (past the selected sprites for this scanline)
-    // return a "transparent" set of values that still has enough data to run
-    // a dummy CHR tile lookup.
+    const uint8_t *bytes = sprites->soam + addr;
+
+    // TODO: on prerender line sprite fetch replays the last render line's accesses
+    // TODO: only 8bits of line is considered so 261 => 5
+    auto pxrow = self->line - bytes[0];
+
+    // All objects have enough data to do CHR tile fetches; even when out of
+    // range of current scanline.
     // TODO: should x be min or max?
-    return addr < sprites->soaddr
-        ? (struct sprite_obj){obj[0], obj[1], obj[2], obj[3], true}
-        : (struct sprite_obj){.tile = obj[1]};
+    struct sprite_obj obj = {
+        .tile = bytes[1],
+        .dh = self->ctrl.h,
+        .ir = 0 <= pxrow && pxrow < sprite_height(self),
+    };
+
+    // fill out the rest of the object if it is in range
+    if (obj.ir) {
+        obj.pxrow = (uint8_t)pxrow;
+        obj.attr = bytes[2];
+        obj.x = bytes[3];
+    }
+
+    return obj;
 }
 
 static void soam_write(struct aldo_rp2c02 *self)
@@ -233,7 +253,7 @@ static bool assert_cleared_soam(const struct aldo_rp2c02 *self)
 
 static bool sprite_in_range(const struct aldo_rp2c02 *self)
 {
-    auto in_range = self->ctrl.h ? (SpriteHeight * 2) : SpriteHeight;
+    auto in_range = sprite_height(self);
     auto offset = self->line - self->spr.oamd;
     return 0 <= offset && offset < in_range;
 }
@@ -882,41 +902,40 @@ static void increment_tile(struct aldo_rp2c02 *self, bool force_y)
     }
 }
 
-static uint16_t sprite_pattern_addr(const struct aldo_rp2c02 *self,
-                                    const struct sprite_obj *obj, bool plane)
+static uint16_t sprite_pattern_addr(const struct sprite_obj *obj, bool bank,
+                                    bool plane)
 {
     static constexpr auto max_row = SpriteHeight - 1;
 
-    bool bank, vertical_flip = obj->attr & 0x80;
-    uint8_t tile;
-    auto fine_y = obj->active ? self->line - obj->y : 0;
-    if (self->ctrl.h) { // 8x16 sprites
+    bool vertical_flip = obj->attr & 0x80;
+    uint8_t tileid;
+    auto fine_y = obj->pxrow;
+    if (obj->dh) { // 8x16 sprites
         bank = aldo_getbit(obj->tile, 0);
         // 8x16 tile bytes always specify the top tile which are even-numbered
         // pattern addresses; the bottom tile is the following odd address.
-        tile = obj->tile & 0xfe;
+        tileid = obj->tile & 0xfe;
         // If current line is below top tile or vertically flipped and "above"
         // top tile then we should be looking at the bottom tile.
         if ((fine_y < SpriteHeight) == vertical_flip) {
-            ++tile;
+            ++tileid;
         }
         // Now that we've picked either top or bottom tile,
         // adjust fine_y to within single sprite tile height.
         fine_y &= max_row;
     } else {
-        bank = self->ctrl.s;
-        tile = obj->tile;
+        tileid = obj->tile;
     }
     if (vertical_flip) {
         fine_y = max_row - fine_y;
     }
-    return pattern_addr(bank, tile, plane, fine_y);
+    return pattern_addr(bank, tileid, plane, fine_y);
 }
 
 static uint8_t sprite_pattern_data(const struct aldo_rp2c02 *self,
                                    const struct sprite_obj *obj)
 {
-    if (!obj->active) return 0;
+    if (!obj->ir) return 0;
 
     auto d = self->vdatabus;
     // horizontal flip
@@ -1066,7 +1085,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
         break;
     case 5:
         // FG low addr
-        addrbus(self, sprite_pattern_addr(self, &obj, 0));
+        addrbus(self, sprite_pattern_addr(&obj, self->ctrl.s, 0));
         break;
     case 6:
         // FG low data
@@ -1075,7 +1094,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
         break;
     case 7:
         // FG high addr
-        addrbus(self, sprite_pattern_addr(self, &obj, 1));
+        addrbus(self, sprite_pattern_addr(&obj, self->ctrl.s, 1));
         break;
     case 0:
         // FG high data

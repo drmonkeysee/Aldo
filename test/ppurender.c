@@ -6323,7 +6323,7 @@ static void last_pixel_bg(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(257, ppu->dot);
-    ct_assertequal(0x6fffu, ppu->pxpl.tlu.bgs[0]);
+    ct_assertequal(0x6ffeu, ppu->pxpl.tlu.bgs[0]);
     ct_assertequal(0xcfffu, ppu->pxpl.tlu.bgs[1]);
     ct_assertfalse(ppu->pxpl.tlu.atl[0]);
     ct_asserttrue(ppu->pxpl.tlu.atl[1]);
@@ -6357,7 +6357,7 @@ static void last_pixel_bg(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(259, ppu->dot);
-    ct_assertequal(0xbe23u, ppu->pxpl.tlu.bgs[0]);
+    ct_assertequal(0xbe22u, ppu->pxpl.tlu.bgs[0]);
     ct_assertequal(0x3e45u, ppu->pxpl.tlu.bgs[1]);
     ct_asserttrue(ppu->pxpl.tlu.atl[0]);
     ct_assertfalse(ppu->pxpl.tlu.atl[1]);
@@ -6372,7 +6372,7 @@ static void last_pixel_bg(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(260, ppu->dot);
-    ct_assertequal(0x7c47u, ppu->pxpl.tlu.bgs[0]);
+    ct_assertequal(0x7c44u, ppu->pxpl.tlu.bgs[0]);
     ct_assertequal(0x7c8bu, ppu->pxpl.tlu.bgs[1]);
     ct_asserttrue(ppu->pxpl.tlu.atl[0]);
     ct_assertfalse(ppu->pxpl.tlu.atl[1]);
@@ -6387,7 +6387,7 @@ static void last_pixel_bg(void *ctx)
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(261, ppu->dot);
-    ct_assertequal(0x7c47u, ppu->pxpl.tlu.bgs[0]);
+    ct_assertequal(0x7c44u, ppu->pxpl.tlu.bgs[0]);
     ct_assertequal(0x7c8bu, ppu->pxpl.tlu.bgs[1]);
     ct_asserttrue(ppu->pxpl.tlu.atl[0]);
     ct_assertfalse(ppu->pxpl.tlu.atl[1]);

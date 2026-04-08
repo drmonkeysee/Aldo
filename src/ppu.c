@@ -814,16 +814,15 @@ static void output_pixel(struct aldo_rp2c02 *self)
 static void shift_tiles(struct aldo_rp2c02 *self)
 {
 #define pxshift(r, v) (*(r) = (typeof(*(r)))(*(r) << 1) | (v))
-
+    // tile low plane shifts in 0, high plane shifts in 1
     auto tlu = &self->pxpl.tlu;
-    pxshift(tlu->bgs, 1);
+    pxshift(tlu->bgs, 0);
     pxshift(tlu->ats, tlu->atl[0]);
     pxshift(tlu->bgs + 1, 1);
     pxshift(tlu->ats + 1, tlu->atl[1]);
     if (self->dot % 8 == 1) {
         latch_tile(self);
     }
-
 #undef pxshift
 }
 

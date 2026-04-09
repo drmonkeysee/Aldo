@@ -358,6 +358,10 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
     self->vbuf ^= framedone;
     snapshot_video(self, framedone);
     // TODO: ppu debug hook goes here
+    if (self->mode == ALDO_EXC_STEP
+        && clock->rate_factor == aldo_nes_frame_factor()) {
+        aldo_nes_halt(self, framedone);
+    }
     if (++clock->subcycle < Aldo_PpuRatio) {
         if (self->mode == ALDO_EXC_SUBCYCLE) {
             aldo_nes_halt(self, true);
@@ -383,8 +387,9 @@ static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
         aldo_nes_halt(self, true);
         break;
     case ALDO_EXC_STEP:
-        // TODO: make this work frame-by-frame in frame mode?
-        aldo_nes_halt(self, self->apu.cpu.signal.sync);
+        if (clock->rate_factor == aldo_nes_cycle_factor()) {
+            aldo_nes_halt(self, self->apu.cpu.signal.sync);
+        }
         break;
     case ALDO_EXC_RUN:
     default:

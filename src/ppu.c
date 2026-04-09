@@ -259,6 +259,7 @@ static void sprite_skip(struct aldo_rp2c02 *self)
 static void sprite_reset(struct aldo_rp2c02 *self)
 {
     auto sprites = &self->spr;
+    sprites->sprite0 = false;
     sprites->soaddr = 0x0;
     sprites->s = ALDO_PPU_SPR_SCAN;
 }
@@ -300,6 +301,9 @@ static void sprite_evaluation(struct aldo_rp2c02 *self)
         // actual on-screen position.
         soam_write(self);
         if (sprite_in_range(self)) {
+            if (sprite_idx == 0) {
+                sprites->sprite0 = true;
+            }
             // sprite height is within current scanline
             soam_advance(self);
             ++self->oamaddr;

@@ -101,6 +101,7 @@ struct aldo_rp2c02 {
                                 // for sprite attributes; 64 sprites at 4 bytes each.
                 soam[32];       // Secondary OAM: up to 8 active sprites for
                                 // current scanline.
+        bool sprite0;           // Sprite-0 was in range during evaluation
     } spr;
 
     // Pixel Render Pipeline

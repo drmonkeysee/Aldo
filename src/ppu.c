@@ -818,10 +818,18 @@ static void mux_fg(struct aldo_rp2c02 *self)
     }
     if (spmux == 0) return;
 
-    // sprite-0 hit (note that sprite priority does not matter)
+    /*
+     * sprite-0 hit flag is hit when an opaque pixel from sprite 0
+     * (the first sprite in OAM) overlaps with an opaque background pixel,
+     * regardless of sprite priority (e.g. a back-plane sprite still "overlaps"
+     * a background pixel); there is a PPU bug that fails to set the flag if
+     * sprite 0's x-position is 255, due to pipeline timing that means the
+     * sprite-0 check landing on dot 257 (note that this is also the last time
+     * sprite-0 hit could possibly occur on a scanline).
+     */
+    // TODO: need to check OAM sprite 0, not SOAM sprite 0
     bool transparent_bg = (self->pxpl.mux & DWordMask) == 0;
-    // TODO: no sprite-0 on x=255
-    if (sprite0 && !transparent_bg) {
+    if (sprite0 && !transparent_bg && self->dot < 257) {
         self->status.s = true;
     }
 

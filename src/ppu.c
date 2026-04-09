@@ -206,7 +206,6 @@ static struct sprite_obj soam_get_obj(const struct aldo_rp2c02 *self, size_t idx
 
     // All objects have enough data to do CHR tile fetches; even when out of
     // range of current scanline.
-    // TODO: should x be min or max?
     struct sprite_obj obj = {
         .tile = bytes[1],
         .dh = self->ctrl.h,

@@ -42,6 +42,7 @@ constexpr uint16_t FineYBits = 0x7000;
 
 constexpr uint8_t CourseXBits = 0x1f;
 constexpr uint8_t PaletteMask = CourseXBits;
+// mask for clipping an address or index to nearest 4-byte boundary
 constexpr uint8_t DWordMask = 0x3;
 
 struct sprite_obj {

@@ -3807,6 +3807,23 @@ static void sprite_fetch_sprite_only_disabled(void *ctx)
     ct_assertfalse(ppu->signal.rd);
 }
 
+static void sprite_fetch_copies_sprite0_flag(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 257;
+    ppu->spr.sprite0 = true;
+    ppu->pxpl.sprite0 = false;
+
+    aldo_ppu_cycle(ppu);
+
+    ct_asserttrue(ppu->pxpl.sprite0);
+
+    ppu->spr.sprite0 = false;
+    aldo_ppu_cycle(ppu);
+
+    ct_assertfalse(ppu->pxpl.sprite0);
+}
+
 static void sprite_fetch_full_line_sequence(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
@@ -7361,6 +7378,7 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(sprite_fetch_out_of_range_sprite),
         ct_maketest(sprite_fetch_rendering_disabled),
         ct_maketest(sprite_fetch_sprite_only_disabled),
+        ct_maketest(sprite_fetch_copies_sprite0_flag),
         ct_maketest(sprite_fetch_full_line_sequence),
         ct_maketest(sprite_fetch_empty_line_sequence),
         ct_maketest(sprite_fetch_partial_line_sequence),

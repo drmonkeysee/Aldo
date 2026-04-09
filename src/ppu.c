@@ -782,33 +782,15 @@ static void mux_bg(struct aldo_rp2c02 *self)
 // precondition: self->pxpl.mux contains the bg tile pixel selection
 static void mux_fg(struct aldo_rp2c02 *self)
 {
-    /*
-     for each spu where x == 0
-        if fgs[1]:7 << 1 | fgs[0]:7 > 0
-            pick sprite
-     else
-        return use bg pixel
-     add attr[1] << 3 | attr[0] << 2
-     check left-side mask and sprite rendering flag
-     if spu[0] and bg !0 and !sprite-0-hit and x!=255 (dot check) -> sprite 0 hit
-     if attr[5] == 0 || (attr[5] == 1 && bg is 0)
-        use fg pixel
-        & 0x10
-     else
-        return use bg pixel
-     */
-    // TODO: select sprite priority here
-    // if sprite selected assert(0x10 <= self->pxpl.mux && self->pxpl.mux < 0x20);
-
     // Sprite rendering disabled or sprite left-column masked,
     // use whatever bg tile selected.
     if (!self->mask.s || (!self->mask.sm && self->dot < DotLeftMaskEnd)) return;
 
     uint8_t spmux = 0;
-    bool back_priority = false, sprite0 = false;
+    bool back_priority = false, unit0 = false;
     for (size_t i = 0; i < aldo_arrsz(self->pxpl.spu); ++i) {
         auto spu = self->pxpl.spu + i;
-        sprite0 = i == 0;
+        unit0 = i == 0;
         if (spu->x > 0) continue;
         // pixel selection is always from the left
         spmux = (uint8_t)((aldo_getbit(spu->fgs[1], 7) << 1)
@@ -823,17 +805,21 @@ static void mux_fg(struct aldo_rp2c02 *self)
     if (spmux == 0) return;
 
     /*
-     * sprite-0 hit flag is hit when an opaque pixel from sprite 0
+     * sprite-0 hit flag is set when an opaque pixel from sprite 0
      * (the first sprite in OAM) overlaps with an opaque background pixel,
      * regardless of sprite priority (e.g. a back-plane sprite still "overlaps"
-     * a background pixel); there is a PPU bug that fails to set the flag if
-     * sprite 0's x-position is 255, due to pipeline timing that means the
-     * sprite-0 check landing on dot 257 (note that this is also the last time
-     * sprite-0 hit could possibly occur on a scanline).
+     * a background pixel).
+     *
+     * Note that the hardware also checks that the opaque pixel is output by the
+     * first sprite unit; in normal timing, the OAM sprite 0 is always the SOAM
+     * sprite 0, but with glitchy render-disable/enable timing this may not be true.
+     *
+     * There is a PPU bug that fails to set the flag if sprite 0's x-position
+     * is 255; due to pipeline timing this check lands on dot 257 (this is also
+     * the last time a sprite-0 hit could possibly occur on a scanline).
      */
-    // TODO: need to check OAM sprite 0, not SOAM sprite 0
     bool transparent_bg = (self->pxpl.mux & DWordMask) == 0;
-    if (sprite0 && !transparent_bg && self->dot < 257) {
+    if (self->pxpl.sprite0 && unit0 && !transparent_bg && self->dot < DotHBlank) {
         self->status.s = true;
     }
 
@@ -1117,6 +1103,8 @@ static void sprite_read(struct aldo_rp2c02 *self)
 
     // OAMADDR is cleared on every sprite-loading dot
     self->oamaddr = 0x0;
+    // copy evaluation sprite0 flag over to rendering sprite0 flag on every dot
+    self->pxpl.sprite0 = self->spr.sprite0;
     // Wrap sprite unit idx around; because rendering can be enabled/disabled
     // at any point there's no guarantee spuidx is any particular value.
     self->pxpl.spuidx %= aldo_arrsz(self->pxpl.spu);
@@ -1417,6 +1405,9 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
      * I split the difference between wiki documentation and functionality by
      * clearing the status register on powerup but letting its value float
      * on reset, making it possible to occasionally recreate this (real?) bug.
+     *
+     * Have you noticed there's a lot of errata comments in this file?
+     * The PPU is a bit of a glitchy mess, isn't it?
      */
     set_status(self, 0);
 

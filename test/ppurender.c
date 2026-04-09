@@ -6674,6 +6674,7 @@ static void pixel_fg_sprite_transparent_bg(void *ctx)
     spu->fgs[1] = 0xcf;
     spu->a = 0x3;   // priority: front, palette: 7
     spu->x = 0;
+    ppu->pxpl.sprite0 = true;
 
     // First Mux-and-Shift
     aldo_ppu_cycle(ppu);
@@ -6727,6 +6728,7 @@ static void pixel_fg_sprite_opaque_bg(void *ctx)
     spu->fgs[1] = 0xcf;
     spu->a = 0x3;   // priority: front, palette: 7
     spu->x = 0;
+    ppu->pxpl.sprite0 = true;
 
     // First Mux-and-Shift
     aldo_ppu_cycle(ppu);
@@ -6780,6 +6782,7 @@ static void pixel_bg_sprite_transparent_bg(void *ctx)
     spu->fgs[1] = 0xcf;
     spu->a = 0x23;  // priority: back, palette: 7
     spu->x = 0;
+    ppu->pxpl.sprite0 = true;
 
     // First Mux-and-Shift
     aldo_ppu_cycle(ppu);
@@ -6833,6 +6836,7 @@ static void pixel_bg_sprite_opaque_bg(void *ctx)
     spu->fgs[1] = 0xcf;
     spu->a = 0x23;  // priority: back, palette: 7
     spu->x = 0;
+    ppu->pxpl.sprite0 = true;
 
     // First Mux-and-Shift
     aldo_ppu_cycle(ppu);
@@ -7041,6 +7045,7 @@ static void pixel_bg_ahead_of_fg_picks_bg(void *ctx)
     spu_fg->fgs[1] = 0xaf;
     spu_fg->a = 0x3;    // priority: front, palette: 7
     spu_fg->x = 0;
+    ppu->pxpl.sprite0 = true;
 
     // First Mux-and-Shift
     aldo_ppu_cycle(ppu);
@@ -7094,6 +7099,7 @@ static void pixel_fg_rightmost_sprite_zero_hit(void *ctx)
     spu->fgs[1] = 0xcf;
     spu->a = 0x3;   // priority: front, palette: 7
     spu->x = 254;
+    ppu->pxpl.sprite0 = true;
 
     do {
         aldo_ppu_cycle(ppu);
@@ -7170,7 +7176,7 @@ static void pixel_fg_rightmost_sprite_zero_hit(void *ctx)
     ct_assertfalse(ppu->signal.vout);
 }
 
-static void pixel_fg_rightmost_sprite_zero_hit_failure(void *ctx)
+static void pixel_fg_rightmost_sprite_zero_hit_bug(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 2;
@@ -7179,6 +7185,7 @@ static void pixel_fg_rightmost_sprite_zero_hit_failure(void *ctx)
     spu->fgs[1] = 0xcf;
     spu->a = 0x3;   // priority: front, palette: 7
     spu->x = 255;   // sprite-0 hit does not work at x=255 for whatever reason
+    ppu->pxpl.sprite0 = true;
 
     do {
         aldo_ppu_cycle(ppu);
@@ -7241,6 +7248,61 @@ static void pixel_fg_rightmost_sprite_zero_hit_failure(void *ctx)
     ct_assertequal(0x78u, spu->fgs[1]);
     ct_assertfalse(ppu->status.s);
     ct_assertfalse(ppu->signal.vout);
+}
+
+static void pixel_sprite_zero_nohit_if_not_set_by_evaluation(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    ppu->dot = 2;
+    auto tlu = &ppu->pxpl.tlu;
+    // opaque bg, palette 2
+    tlu->bgs[0] = 0xffff;
+    tlu->bgs[1] = 0xffff;
+    tlu->ats[0] = 0x0;
+    tlu->ats[1] = 0xff;
+    auto spu = ppu->pxpl.spu;
+    spu->fgs[0] = 0x6f;
+    spu->fgs[1] = 0xcf;
+    spu->a = 0x3;   // priority: front, palette: 7
+    spu->x = 0;
+    ppu->pxpl.sprite0 = false;
+
+    // First Mux-and-Shift
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(3, ppu->dot);
+    ct_assertequal(0x1eu, ppu->pxpl.mux);   // 1 11 10
+    ct_assertequal(0u, ppu->pxpl.pal);
+    ct_assertequal(0u, ppu->pxpl.px);
+    ct_assertequal(0xdeu, spu->fgs[0]);
+    ct_assertequal(0x9eu, spu->fgs[1]);
+    // not sprite-0 hit if flag not set by earlier scanline
+    ct_assertfalse(ppu->status.s);
+    ct_assertfalse(ppu->signal.vout);
+
+    // Set Palette Address
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(4, ppu->dot);
+    ct_assertequal(0x1fu, ppu->pxpl.mux);   // 1 11 11
+    ct_assertequal(0x1eu, ppu->pxpl.pal);
+    ct_assertequal(0u, ppu->pxpl.px);
+    ct_assertequal(0xbcu, spu->fgs[0]);
+    ct_assertequal(0x3cu, spu->fgs[1]);
+    ct_assertfalse(ppu->status.s);
+    ct_assertfalse(ppu->signal.vout);
+
+    // First Pixel Output
+    aldo_ppu_cycle(ppu);
+
+    ct_assertequal(5, ppu->dot);
+    ct_assertequal(0x1du, ppu->pxpl.mux);   // 1 11 01
+    ct_assertequal(0x1fu, ppu->pxpl.pal);
+    ct_assertequal(0x39u, ppu->pxpl.px);
+    ct_assertequal(0x78u, spu->fgs[0]);
+    ct_assertequal(0x78u, spu->fgs[1]);
+    ct_assertfalse(ppu->status.s);
+    ct_asserttrue(ppu->signal.vout);
 }
 
 //
@@ -7436,7 +7498,8 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(pixel_fg_no_sprite_zero_for_later_sprites),
         ct_maketest(pixel_bg_ahead_of_fg_picks_bg),
         ct_maketest(pixel_fg_rightmost_sprite_zero_hit),
-        ct_maketest(pixel_fg_rightmost_sprite_zero_hit_failure),
+        ct_maketest(pixel_fg_rightmost_sprite_zero_hit_bug),
+        ct_maketest(pixel_sprite_zero_nohit_if_not_set_by_evaluation),
 
         ct_maketest(rendering_disabled),
         ct_maketest(rendering_disabled_explicit_bg_palette),

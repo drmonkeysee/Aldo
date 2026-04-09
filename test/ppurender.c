@@ -3807,23 +3807,6 @@ static void sprite_fetch_sprite_only_disabled(void *ctx)
     ct_assertfalse(ppu->signal.rd);
 }
 
-static void sprite_fetch_copies_sprite0_flag(void *ctx)
-{
-    auto ppu = ppt_get_ppu(ctx);
-    ppu->dot = 257;
-    ppu->spr.sprite0 = true;
-    ppu->pxpl.sprite0 = false;
-
-    aldo_ppu_cycle(ppu);
-
-    ct_asserttrue(ppu->pxpl.sprite0);
-
-    ppu->spr.sprite0 = false;
-    aldo_ppu_cycle(ppu);
-
-    ct_assertfalse(ppu->pxpl.sprite0);
-}
-
 static void sprite_fetch_full_line_sequence(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
@@ -6205,47 +6188,56 @@ static void sprite_evaluation_soamaddr_offset(void *ctx)
     ct_assertequal(ALDO_PPU_SPR_DONE, (int)spr->s);
 }
 
-static void oamaddr_cleared_during_sprite_fetch(void *ctx)
+static void oamaddr_sprite0_set_during_sprite_fetch(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 256;
     ppu->oamaddr = 0x22;
+    ppu->spr.sprite0 = true;
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(257, ppu->dot);
     ct_assertequal(0x23u, ppu->oamaddr);
+    ct_assertfalse(ppu->pxpl.sprite0);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(258, ppu->dot);
     ct_assertequal(0u, ppu->oamaddr);
+    ct_asserttrue(ppu->pxpl.sprite0);
 
     ppu->oamaddr = 0x33;
+    ppu->spr.sprite0 = false;
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(259, ppu->dot);
     ct_assertequal(0u, ppu->oamaddr);
+    ct_assertfalse(ppu->pxpl.sprite0);
 
     ppu->oamaddr = 0x44;
+    ppu->spr.sprite0 = true;
     ppu->dot = 321;
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(322, ppu->dot);
     ct_assertequal(0x44u, ppu->oamaddr);
+    ct_assertfalse(ppu->pxpl.sprite0);
 }
 
-static void oamaddr_cleared_during_sprite_fetch_on_prerender(void *ctx)
+static void oamaddr_sprite0_set_during_sprite_fetch_on_prerender(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 256;
     ppu->line = 261;
     ppu->oamaddr = 0x22;
+    ppu->spr.sprite0 = true;
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(257, ppu->dot);
     ct_assertequal(0x22u, ppu->oamaddr);
+    ct_assertfalse(ppu->pxpl.sprite0);
 
     aldo_ppu_cycle(ppu);
 
@@ -6253,40 +6245,48 @@ static void oamaddr_cleared_during_sprite_fetch_on_prerender(void *ctx)
     ct_assertequal(0u, ppu->oamaddr);
 
     ppu->oamaddr = 0x33;
+    ppu->spr.sprite0 = false;
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(259, ppu->dot);
     ct_assertequal(0u, ppu->oamaddr);
+    ct_assertfalse(ppu->pxpl.sprite0);
 
     ppu->oamaddr = 0x44;
+    ppu->spr.sprite0 = true;
     ppu->dot = 321;
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(322, ppu->dot);
     ct_assertequal(0x44u, ppu->oamaddr);
+    ct_assertfalse(ppu->pxpl.sprite0);
 }
 
-static void oamaddr_not_cleared_during_postrender(void *ctx)
+static void oamaddr_sprite0_not_set_during_postrender(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
     ppu->dot = 256;
     ppu->line = 240;
     ppu->oamaddr = 0x22;
+    ppu->spr.sprite0 = true;
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(257, ppu->dot);
     ct_assertequal(0x22u, ppu->oamaddr);
+    ct_assertfalse(ppu->pxpl.sprite0);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(258, ppu->dot);
     ct_assertequal(0x22u, ppu->oamaddr);
+    ct_assertfalse(ppu->pxpl.sprite0);
 
     aldo_ppu_cycle(ppu);
 
     ct_assertequal(259, ppu->dot);
     ct_assertequal(0x22u, ppu->oamaddr);
+    ct_assertfalse(ppu->pxpl.sprite0);
 }
 
 //
@@ -7378,7 +7378,6 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(sprite_fetch_out_of_range_sprite),
         ct_maketest(sprite_fetch_rendering_disabled),
         ct_maketest(sprite_fetch_sprite_only_disabled),
-        ct_maketest(sprite_fetch_copies_sprite0_flag),
         ct_maketest(sprite_fetch_full_line_sequence),
         ct_maketest(sprite_fetch_empty_line_sequence),
         ct_maketest(sprite_fetch_partial_line_sequence),
@@ -7413,9 +7412,9 @@ struct ct_testsuite ppu_render_tests()
         ct_maketest(sprite_evaluation_oamaddr_offset),
         ct_maketest(sprite_evaluation_soamaddr_offset),
         ct_maketest(sprite_evaluation_oamaddr_misaligned),
-        ct_maketest(oamaddr_cleared_during_sprite_fetch),
-        ct_maketest(oamaddr_cleared_during_sprite_fetch_on_prerender),
-        ct_maketest(oamaddr_not_cleared_during_postrender),
+        ct_maketest(oamaddr_sprite0_set_during_sprite_fetch),
+        ct_maketest(oamaddr_sprite0_set_during_sprite_fetch_on_prerender),
+        ct_maketest(oamaddr_sprite0_not_set_during_postrender),
 
         ct_maketest(tile_prefetch_pipeline),
         ct_maketest(tile_prefetch_postrender),

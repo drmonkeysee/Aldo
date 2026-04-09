@@ -241,3 +241,4 @@ cython_debug/
 *.pal
 *.rom
 ext/
+test/nes-test-roms/

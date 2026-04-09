@@ -37,16 +37,15 @@ CLI_TARGET := $(BUILD_DIR)/$(PRODUCT)c
 GUI_TARGET := $(BUILD_DIR)/$(PRODUCT)gui
 TESTS_TARGET := $(BUILD_DIR)/$(PRODUCT)tests
 
-NESTEST_HTTP := https://github.com/drmonkeysee/nes-test-roms/raw/refs/heads/master/other/nestest.nes
-NESTEST_ROM := $(TEST_DIR)/nestest.nes
-NESTEST_LOG := $(TEST_DIR)/nestest.log
+TEST_ROMS := $(TEST_DIR)/nes-test-roms
+NESTEST_ROM := $(TEST_ROMS)/other/nestest.nes
+NESTEST_LOG := $(TEST_ROMS)/other/nestest.log
 NESTEST_CMP := $(TEST_DIR)/nestest-cmp.log
 NESTEST_DIFF := $(TEST_DIR)/nestest.diff
 TRACE_LOG := trace.log
 TRACE_CMP := $(TEST_DIR)/trace-cmp.log
 BCDTEST_ROM := $(TEST_DIR)/bcdtest.rom
-PURGE_ASSETS := $(NESTEST_ROM) $(NESTEST_LOG) $(NESTEST_CMP) $(NESTEST_DIFF) \
-		$(TRACE_CMP) $(BCDTEST_ROM) *.bin *.log
+PURGE_ASSETS := *.bin *.log $(TEST_DIR)/*.diff $(TEST_DIR)/*.log $(TEST_DIR)/*.rom
 
 CFLAGS := -Wall -Wextra -Wconversion -std=c23 -iquote$(SRC_DIR)
 CXXFLAGS := -Wall -Wextra -pedantic -std=c++23
@@ -138,6 +137,7 @@ clean:
 
 purge: clean
 	$(RM) $(PURGE_ASSETS)
+	$(RM) -r $(TEST_ROMS)
 
 $(LIB_TARGET): $(LIB_OBJ)
 	$(AR) $(ARFLAGS) $@ $?
@@ -192,8 +192,10 @@ $(TEST_OBJ_PATH)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJ_PATH)
 $(OBJ_PATHS):
 	mkdir -p $@
 
-$(NESTEST_ROM) $(NESTEST_LOG):
-	cd $(TEST_DIR) && curl -O '$(NESTEST_HTTP)/$(@F)'
+$(TEST_ROMS):
+	cd $(TEST_DIR) && git clone https://github.com/drmonkeysee/nes-test-roms.git
+
+$(NESTEST_ROM) $(NESTEST_LOG): $(TEST_ROMS)
 
 $(NESTEST_CMP): $(NESTEST_LOG)
 	# NOTE: strip out Accumulator cue (implied)

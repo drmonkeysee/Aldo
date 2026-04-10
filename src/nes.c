@@ -30,7 +30,6 @@ struct aldo_nes001 {
     aldo_debugger *dbg;         // Debugger Context; Non-owning Pointer
     struct aldo_snapshot *snp;  // Console Snapshot; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
-    size_t vbuf;                // Current video buffer to fill
     struct aldo_rp2a03 apu;     // RP2A03 Microprocessor
     struct aldo_rp2c02 ppu;     // RP2C02 PPU
     enum aldo_execmode mode;    // NES execution mode
@@ -43,7 +42,8 @@ struct aldo_nes001 {
     } probe;                            // Interrupt Input Probes (active high)
     bool
         halted,                         // Whether the emulator is suspended
-        tracefailed;                    // Trace log I/O failed during run
+        tracefailed,                    // Trace log I/O failed during run
+        vbuf;                           // Current video buffer to fill
     uint8_t ram[ALDO_MEMBLOCK_2KB],     // CPU Internal RAM
             vram[ALDO_MEMBLOCK_2KB],    // PPU Internal RAM
             vbufs[2][ScreenWidth * ScreenHeight];   // Double-buffered Video
@@ -243,7 +243,7 @@ static void set_screen_dot(struct aldo_nes001 *self)
     if (c.dot < 0) return;
 
     auto screendot = (size_t)(c.dot + (c.line * ScreenWidth));
-    assert(screendot < aldo_arrsz(self->vbufs[self->vbuf]));
+    assert(screendot < aldo_arrsz(self->vbufs[0]));
     self->vbufs[self->vbuf][screendot] = self->ppu.pxpl.px;
 }
 
@@ -414,8 +414,8 @@ aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
     // TODO: ditch this option when aldo can emulate more than just NES
     self->apu.cpu.bcd = bcdsupport;
     self->halted = self->probe.rdy = true;
-    self->tracefailed = self->probe.irq = self->probe.nmi = self->probe.rst = false;
-    self->vbuf = 0;
+    self->tracefailed = self->vbuf = self->probe.irq = self->probe.nmi =
+        self->probe.rst = false;
     // uninitialized vbuffer can have out-of-range palette values
     for (size_t i = 0; i < aldo_arrsz(self->vbufs); ++i) {
         aldo_memclr(self->vbufs[i]);

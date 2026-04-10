@@ -37,7 +37,7 @@ struct aldo_nes001 {
         bool
             irq: 1,                     // IRQ Probe
             nmi: 1,                     // NMI Probe
-            rdy: 1,                     // RDY Probe
+            rdy: 1,                     // READY Probe
             rst: 1;                     // RESET Probe
     } probe;                            // Interrupt Input Probes (active high)
     bool

@@ -8,4 +8,6 @@
 #ifndef Aldo_aldo8_h
 #define Aldo_aldo8_h
 
+typedef struct aldo_aldo8_computer aldo_aldo8;
+
 #endif

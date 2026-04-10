@@ -646,10 +646,10 @@ static void drawppu(const struct view *v, const struct aldo_snapshot *snp)
     drawbottom_plines(v, cursor_y, line_x, snp);
 }
 
-static int draw_apu_dma(const struct view *v, const struct aldo_snapshot *snp,
+static void draw_apu_dma(const struct view *v, const struct aldo_snapshot *snp,
                         int w, int cursor_y)
 {
-    static constexpr auto seph = 3;
+    static constexpr auto seph = 4;
     static constexpr auto vsep1 = 7;
     static constexpr auto vsep2 = 21;
     static constexpr auto col1 = vsep1 + 2;
@@ -661,20 +661,20 @@ static int draw_apu_dma(const struct view *v, const struct aldo_snapshot *snp,
     mvwvline(v->content, cursor_y, vsep1, 0, seph);
     mvwvline(v->content, cursor_y, vsep2, 0, seph);
 
-    bool dma_active = apu->oam.state != ALDO_SIG_CLEAR;
+    bool dma_inactive = apu->oam.state == ALDO_SIG_CLEAR;
 
     mvwprintw(v->content, cursor_y++, col1, "OAMDMA: %02X", apu->oam.dmahigh);
-    if (!dma_active) {
+    if (!dma_inactive) {
         wattron(v->content, A_DIM);
     }
     mvwaddstr(v->content, cursor_y, 0, DArrowLeft);
     mvwprintw(v->content, cursor_y, 2, "%04X", apu->addressbus);
-    if (!dma_active) {
+    if (!dma_inactive) {
         wattroff(v->content, A_DIM);
     }
 
     mvwprintw(v->content, cursor_y, col1, "low:    %02X", apu->oam.dmalow);
-    if (!dma_active) {
+    if (!dma_inactive) {
         wattron(v->content, A_DIM);
     }
     if (apu->busfault) {
@@ -683,16 +683,15 @@ static int draw_apu_dma(const struct view *v, const struct aldo_snapshot *snp,
         mvwprintw(v->content, cursor_y, col2, "%02X", apu->databus);
     }
     mvwaddstr(v->content, cursor_y, w - 1, apu->put ? DArrowRight : DArrowLeft);
-    if (!dma_active) {
+    if (!dma_inactive) {
         wattroff(v->content, A_DIM);
     }
 
     mvwprintw(v->content, ++cursor_y, col1, "state:  %s",
               signal_label(apu->oam.state));
+    mvwprintw(v->content, ++cursor_y, col1, "put:    %d", apu->put);
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
-
-    return cursor_y;
 }
 
 static void drawapu(const struct view *v, const struct aldo_snapshot *snp)
@@ -702,10 +701,7 @@ static void drawapu(const struct view *v, const struct aldo_snapshot *snp)
     auto line_x = (w / 2) + 1;
     auto cursor_y = 0;
     draw_chip_vline(v, apu->lines.ready, cursor_y, line_x, 1, ArrowUp, -1, "RDY");
-
-    cursor_y = draw_apu_dma(v, snp, w, cursor_y + 2);
-
-    mvwprintw(v->content, ++cursor_y, 0, "p: %d", apu->put);
+    draw_apu_dma(v, snp, w, cursor_y + 2);
 }
 
 static void drawchip(const struct view *v, const struct viewstate *vs,

@@ -34,6 +34,8 @@
 		C8395D452D3B5CD00046F2D8 /* ctrlsignal.c in Sources */ = {isa = PBXBuildFile; fileRef = C8395D432D3B5CD00046F2D8 /* ctrlsignal.c */; };
 		C8395D462D3B5CD00046F2D8 /* ctrlsignal.c in Sources */ = {isa = PBXBuildFile; fileRef = C8395D432D3B5CD00046F2D8 /* ctrlsignal.c */; };
 		C8395D472D3B5E140046F2D8 /* ctrlsignal.c in Sources */ = {isa = PBXBuildFile; fileRef = C8395D432D3B5CD00046F2D8 /* ctrlsignal.c */; };
+		C83961A62F89B8D700C5FA39 /* aldo8.c in Sources */ = {isa = PBXBuildFile; fileRef = C83961A52F89B8D700C5FA39 /* aldo8.c */; };
+		C83961A92F89B8D700C5FA39 /* aldo8.c in Sources */ = {isa = PBXBuildFile; fileRef = C83961A52F89B8D700C5FA39 /* aldo8.c */; };
 		C83A30772904987F00749A17 /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C83A307A2904A2B000749A17 /* version.c in Sources */ = {isa = PBXBuildFile; fileRef = C83A30792904A2B000749A17 /* version.c */; };
 		C8557B2F25C661660090296D /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C8557B2E25C661660090296D /* ui.c */; };
@@ -255,6 +257,8 @@
 		C838D3B427D5DA4400468FDB /* CartInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartInfoView.swift; sourceTree = "<group>"; };
 		C838D3B627D5DB0300468FDB /* CartChrView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartChrView.swift; sourceTree = "<group>"; };
 		C8395D432D3B5CD00046F2D8 /* ctrlsignal.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ctrlsignal.c; sourceTree = "<group>"; };
+		C83961A42F89B8D700C5FA39 /* aldo8.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aldo8.h; sourceTree = "<group>"; };
+		C83961A52F89B8D700C5FA39 /* aldo8.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aldo8.c; sourceTree = "<group>"; };
 		C83965E927810D4300E1E28E /* tsutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tsutil.h; sourceTree = "<group>"; };
 		C83A30782904A2B000749A17 /* version.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
 		C83A30792904A2B000749A17 /* version.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = version.c; sourceTree = "<group>"; };
@@ -509,6 +513,8 @@
 			children = (
 				C83A30742904973F00749A17 /* cli */,
 				C8B0E66728E01B3E0054547D /* gui */,
+				C83961A42F89B8D700C5FA39 /* aldo8.h */,
+				C83961A52F89B8D700C5FA39 /* aldo8.c */,
 				C856A1C02F70789100F51C0B /* apu.h */,
 				C856A1C12F70789100F51C0B /* apu.c */,
 				C88CABE328FA63DD00551C65 /* bridgeopen.h */,
@@ -976,6 +982,7 @@
 				C8C706932751EEBA00B45785 /* bus.c in Sources */,
 				C808BA6827893976001FDE39 /* haltexpr.c in Sources */,
 				C8C706962751EEBA00B45785 /* decode.c in Sources */,
+				C83961A92F89B8D700C5FA39 /* aldo8.c in Sources */,
 				C80C9E1C277D648F000F2D8B /* debug.c in Sources */,
 				C80CCE062930495300664730 /* cycleclock.c in Sources */,
 				C81680042BE6EEAB005A7905 /* ppu.c in Sources */,
@@ -1058,6 +1065,7 @@
 				C8B88AA829062ADC00B7CB23 /* bus.c in Sources */,
 				C8B88AB529062B1800B7CB23 /* ui.c in Sources */,
 				C81680032BE6EEAB005A7905 /* ppu.c in Sources */,
+				C83961A62F89B8D700C5FA39 /* aldo8.c in Sources */,
 				C8B88AB129062B0600B7CB23 /* nes.c in Sources */,
 				C8B88AB329062B0F00B7CB23 /* trace.c in Sources */,
 				C8B88AAD29062AF500B7CB23 /* decode.c in Sources */,

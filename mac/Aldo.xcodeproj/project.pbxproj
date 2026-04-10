@@ -263,6 +263,7 @@
 		C83961A52F89B8D700C5FA39 /* aldo8.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aldo8.c; sourceTree = "<group>"; };
 		C83961AA2F89BE0200C5FA39 /* console.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = console.h; sourceTree = "<group>"; };
 		C83961AB2F89BE0200C5FA39 /* console.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = console.c; sourceTree = "<group>"; };
+		C83961B12F89C04800C5FA39 /* consoledef.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = consoledef.h; sourceTree = "<group>"; };
 		C83965E927810D4300E1E28E /* tsutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tsutil.h; sourceTree = "<group>"; };
 		C83A30782904A2B000749A17 /* version.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
 		C83A30792904A2B000749A17 /* version.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = version.c; sourceTree = "<group>"; };
@@ -535,6 +536,7 @@
 				C8E9478128FE45EA0073D1AA /* ctrlsignal.h */,
 				C8395D432D3B5CD00046F2D8 /* ctrlsignal.c */,
 				C83961AA2F89BE0200C5FA39 /* console.h */,
+				C83961B12F89C04800C5FA39 /* consoledef.h */,
 				C83961AB2F89BE0200C5FA39 /* console.c */,
 				C848C1B228FB9D630025ABD2 /* cycleclock.h */,
 				C80CCE052930495300664730 /* cycleclock.c */,

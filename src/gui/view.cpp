@@ -638,10 +638,8 @@ auto interrupt_line(const char* label, bool active) noexcept
     drawlist->AddLine(start, end, aldo::colors::white(active));
 }
 
-auto interrupt_line(const char* label, bool active, aldo_sigstate s) noexcept
+auto signal_state(aldo_sigstate s) noexcept
 {
-    interrupt_line(label, active);
-    ImGui::SameLine();
     auto pos = ImGui::GetCursorScreenPos();
     ImVec2 center{
         pos.x + 5,
@@ -653,6 +651,13 @@ auto interrupt_line(const char* label, bool active, aldo_sigstate s) noexcept
     auto drawList = ImGui::GetWindowDrawList();
     drawList->AddCircleFilled(center, offset.y + 1, signal_color(s));
     drawList->AddText(center - offset, fontColor, signal_label(s));
+}
+
+auto interrupt_line(const char* label, bool active, aldo_sigstate s) noexcept
+{
+    interrupt_line(label, active);
+    ImGui::SameLine();
+    signal_state(s);
 }
 
 auto small_led(bool on, float xOffset = 0) noexcept
@@ -670,6 +675,87 @@ auto small_led(bool on, float xOffset = 0) noexcept
 //
 // MARK: - Concrete Views
 //
+
+class ApuView final : public aldo::View {
+public:
+    ApuView(aldo::viewstate& vs, const aldo::Emulator& emu,
+            const aldo::MediaRuntime& mr) noexcept
+    : View{"APU", vs, emu, mr} {}
+    ApuView(aldo::viewstate&, aldo::Emulator&&,
+            const aldo::MediaRuntime&) = delete;
+    ApuView(aldo::viewstate&, const aldo::Emulator&,
+            aldo::MediaRuntime&&) = delete;
+    ApuView(aldo::viewstate&, aldo::Emulator&&, aldo::MediaRuntime&&) = delete;
+
+protected:
+    void renderContents() override
+    {
+        if (ImGui::CollapsingHeader("DMA", ImGuiTreeNodeFlags_DefaultOpen)) {
+            renderDma();
+        }
+    }
+
+private:
+    void renderDma() noexcept
+    {
+        renderLines();
+        ImGui::Separator();
+        renderDmaState();
+        ImGui::Separator();
+        renderBusLines();
+    }
+
+    void renderLines() noexcept
+    {
+        auto& apu = emu.snapshot().apu;
+        DisabledIf dif = !apu.lines.ready;
+        ImGui::TextUnformatted("RDY");
+    }
+
+    void renderDmaState() noexcept
+    {
+        auto& apu = emu.snapshot().apu;
+        widget_group([&apu] noexcept {
+            ImGui::Text("OAMDMA: %02X", apu.oam.dmahigh);
+            ImGui::TextUnformatted("   put: ");
+            ImGui::SameLine(0, 5);
+            small_led(apu.put);
+        });
+        ImGui::SameLine(0, 20);
+        widget_group([&apu] noexcept {
+            ImGui::Text("  low: %02X", apu.oam.dmalow);
+            ImGui::Text("state:");
+            ImGui::SameLine();
+            signal_state(apu.oam.state);
+        });
+    }
+
+    void renderBusLines() noexcept
+    {
+        auto& apu = emu.snapshot().apu;
+        DisabledIf dif = apu.oam.state == ALDO_SIG_CLEAR;
+        {
+            ScopedColor color{{ImGuiCol_Text, aldo::colors::LineOut}};
+            ImGui::Text("Addr: %04X", apu.addressbus);
+        };
+        ImGui::SameLine(0, 20);
+        if (apu.busfault) {
+            ScopedColor color{
+                {ImGuiCol_Text, aldo::colors::DestructiveHover},
+            };
+            ImGui::TextUnformatted("Data: FLT");
+        } else {
+            std::array<char, 3> dataHex;
+            std::snprintf(dataHex.data(), dataHex.size(), "%02X", apu.databus);
+            ScopedColor color{{
+                ImGuiCol_Text,
+                // invert the colors for off-by-one (see apu.c::cycle_chip)
+                apu.put ? aldo::colors::LineIn : aldo::colors::LineOut,
+            }};
+            ImGui::Text("Data: %s", dataHex.data());
+        }
+    }
+};
 
 class CartInfoView final : public aldo::View {
 public:
@@ -2654,6 +2740,7 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
 : vs{vs}, emu{emu}, mr{mr}
 {
     add_views<
+        ApuView,
         CartInfoView,
         CpuView,
         DebuggerView,

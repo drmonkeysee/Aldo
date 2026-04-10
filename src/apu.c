@@ -115,6 +115,10 @@ static int cycle_chip(struct aldo_rp2a03 *self)
     auto cycle = oam_dma(self);
 
     self->signal.rdy = self->oam.s == ALDO_SIG_CLEAR;
+    // APU cycle flag advances at the end, so the first cycle after reset/powerup
+    // is a GET, similar to how the PPU starts at dot 0 so the first cycle lands
+    // on dot 1; this can make visualization confusing as a GET cycle will
+    // end with PUT set.
     self->put = !self->put;
     return cycle;
 }

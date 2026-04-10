@@ -1165,7 +1165,7 @@ static void sprite_read(struct aldo_rp2c02 *self)
 }
 
 //
-// MARK: - Other Internal Operations
+// MARK: - Pipeline Operations
 //
 
 static bool nextdot(struct aldo_rp2c02 *self)

@@ -88,7 +88,7 @@ static int oam_dma(struct aldo_rp2a03 *self)
 }
 
 //
-// MARK: - Internal Operations
+// MARK: - Pipeline Operations
 //
 
 static void reset(struct aldo_rp2a03 *self)

@@ -298,7 +298,7 @@ static void snapshot_video(struct aldo_nes001 *self, bool framedone)
     }
 }
 
-static void snapshot_sys(struct aldo_nes001 *self)
+static void snapshot_core(struct aldo_nes001 *self)
 {
     auto snp = self->snp;
     if (!snp) return;
@@ -323,7 +323,7 @@ static void reset_snapshot(struct aldo_snapshot *snp)
 
 static void init_snapshot(struct aldo_nes001 *self)
 {
-    snapshot_sys(self);
+    snapshot_core(self);
     snapshot_gfx(self);
     snapshot_screen(self);
 }
@@ -582,7 +582,7 @@ void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
             aldo_nes_halt(self, true);
         }
     }
-    snapshot_sys(self);
+    snapshot_core(self);
 }
 
 int aldo_nes_cycle_factor()

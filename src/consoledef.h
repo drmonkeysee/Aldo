@@ -9,6 +9,7 @@
 #define Aldo_consoledef_h
 
 #include "console.h"
+#include "cpu.h"
 
 // Console Base Definition, providing a common interface and data type for
 // emulation of all supported Aldo consoles.
@@ -18,6 +19,7 @@ struct aldo_console_base {
     aldo_debugger *dbg;         // Debugger Context; Non-owning Pointer
     struct aldo_snapshot *snp;  // Console Snapshot; Non-owning Pointer
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
+    struct aldo_mos6502 cpu;    // MOS 6502 CPU Core
     enum aldo_execmode mode;    // Console execution mode
     struct {
         bool
@@ -30,10 +32,5 @@ struct aldo_console_base {
         halted,                         // Whether the emulator is suspended
         tracefailed;                    // Trace log I/O failed during run
 };
-
-// Internal Console Base Operations
-
-void aldo_base_init(struct aldo_console_base *self, aldo_debugger *dbg,
-                    FILE *tracelog);
 
 #endif

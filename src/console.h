@@ -46,7 +46,8 @@ int aldo_console_max_tcpu() aldo_nothrow;
 aldo_export
 size_t aldo_console_ram_size(aldo_console *self) aldo_nothrow;
 aldo_export
-void aldo_console_screen_size(int *width, int *height) aldo_nothrow;
+void aldo_console_screen_size(aldo_console *self, int *width,
+                              int *height) aldo_nothrow;
 aldo_export
 bool aldo_console_bcd_support(aldo_console *self) aldo_nothrow;
 aldo_export
@@ -71,9 +72,9 @@ aldo_export
 void aldo_console_clock(aldo_console *self,
                         struct aldo_clock *clock) aldo_nothrow;
 aldo_export
-int aldo_console_cycle_factor() aldo_nothrow;
+int aldo_console_cycle_factor(aldo_console *self) aldo_nothrow;
 aldo_export
-int aldo_console_frame_factor() aldo_nothrow;
+int aldo_console_frame_factor(aldo_console *self) aldo_nothrow;
 
 aldo_export
 void aldo_console_set_snapshot(aldo_console *self,

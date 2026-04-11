@@ -29,7 +29,8 @@ typedef struct aldo_console_base aldo_console;
 #include "bridgeopen.h"
 aldo_export aldo_ownresult
 // if returns null then errno is set due to failed allocation
-aldo_console *aldo_console_new(aldo_debugger *dbg, FILE *tracelog) aldo_nothrow;
+aldo_console *aldo_console_new(enum aldo_console_type type, aldo_debugger *dbg,
+                               FILE *tracelog) aldo_nothrow;
 aldo_export
 void aldo_console_free(aldo_console *self) aldo_nothrow;
 

@@ -114,19 +114,19 @@ int exec_cpu(struct aldo_mos6502 *cpu)
     return cycles;
 }
 
-void setup_apu(struct aldo_rp2a03 *apu, uint8_t *restrict ram,
-               uint8_t *restrict rom)
+void setup_apu(struct aldo_rp2a03 *apu, struct aldo_mos6502 *cpu,
+               uint8_t *restrict ram, uint8_t *restrict rom)
 {
-    connect_cpu(&apu->cpu, ram, rom);
-    aldo_apu_connect(apu);
+    connect_cpu(cpu, ram, rom);
+    aldo_apu_connect(apu, cpu);
     aldo_apu_powerup(apu);
-    reset_cpu(&apu->cpu);
+    reset_cpu(apu->cpu);
 }
 
 int cycle_sync_apu(struct aldo_rp2a03 *apu)
 {
     auto cycle = aldo_apu_cycle(apu);
     // simulate nes.c setting cpu pins
-    apu->cpu.signal.rdy = apu->signal.rdy;
+    apu->cpu->signal.rdy = apu->signal.rdy;
     return cycle;
 }

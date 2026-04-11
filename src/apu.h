@@ -8,18 +8,18 @@
 #ifndef Aldo_apu_h
 #define Aldo_apu_h
 
-#include "cpu.h"
 #include "ctrlsignal.h"
 
 #include <stdint.h>
 
+struct aldo_mos6502;
 struct aldo_snapshot;
 
 // The Ricoh RP2A03 Microprocessor; includes the 6502 CPU and auxiliary functions
 // specific to the NES, the bulk of which is the Audio Processing Unit (APU),
 // but also includes Direct Memory Access (DMA) units and Joypad control.
 struct aldo_rp2a03 {
-    struct aldo_mos6502 cpu;    // 6502 CPU Core
+    struct aldo_mos6502 *cpu;   // Non-owning Pointer
 
     struct {
         enum aldo_sigstate s;   // OAM DMA state
@@ -44,7 +44,7 @@ struct aldo_rp2a03 {
                                 // 2 CPU Cycles = 1 APU Cycle.
 };
 
-void aldo_apu_connect(struct aldo_rp2a03 *self);
+void aldo_apu_connect(struct aldo_rp2a03 *self, struct aldo_mos6502 *cpu);
 void aldo_apu_powerup(struct aldo_rp2a03 *self);
 
 int aldo_apu_cycle(struct aldo_rp2a03 *self);

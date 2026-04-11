@@ -9,6 +9,7 @@
 
 #include "bus.h"
 #include "bytes.h"
+#include "cpu.h"
 #include "snapshot.h"
 
 #include <assert.h>
@@ -19,12 +20,12 @@
 
 static void mbus_read(struct aldo_rp2a03 *self)
 {
-    self->bflt = !aldo_bus_read(self->cpu.mbus, self->addrbus, &self->databus);
+    self->bflt = !aldo_bus_read(self->cpu->mbus, self->addrbus, &self->databus);
 }
 
 static void mbus_write(struct aldo_rp2a03 *self)
 {
-    self->bflt = !aldo_bus_write(self->cpu.mbus, self->addrbus, self->databus);
+    self->bflt = !aldo_bus_write(self->cpu->mbus, self->addrbus, self->databus);
 }
 
 static bool read([[maybe_unused]] void *restrict ctx, uint16_t addr, [[maybe_unused]] uint8_t *restrict d)
@@ -60,7 +61,7 @@ static int oam_dma(struct aldo_rp2a03 *self)
 {
     static constexpr uint16_t oamdata = 0x2004;
 
-    if (!aldo_cpu_suspended(&self->cpu)) return 0;
+    if (!aldo_cpu_suspended(self->cpu)) return 0;
 
     switch (self->oam.s) {
     case ALDO_SIG_PENDING:
@@ -99,10 +100,10 @@ static void reset(struct aldo_rp2a03 *self)
 
 static bool reset_held(struct aldo_rp2a03 *self)
 {
-    if (aldo_cpu_reset_pending(&self->cpu)) return true;
+    if (aldo_cpu_reset_pending(self->cpu)) return true;
 
     // CPU is actively resetting
-    if (self->cpu.rst == ALDO_SIG_COMMITTED) {
+    if (self->cpu->rst == ALDO_SIG_COMMITTED) {
         reset(self);
     }
     return false;
@@ -127,12 +128,16 @@ static int cycle_chip(struct aldo_rp2a03 *self)
 // MARK: - Public Interface
 //
 
-void aldo_apu_connect(struct aldo_rp2a03 *self)
+void aldo_apu_connect(struct aldo_rp2a03 *self, struct aldo_mos6502 *cpu)
 {
     assert(self != nullptr);
-    assert(self->cpu.mbus != nullptr);
+    assert(cpu != nullptr);
+    assert(cpu->mbus != nullptr);
 
-    auto r = aldo_bus_set(self->cpu.mbus, ALDO_MEMBLOCK_16KB, (struct aldo_busdevice){
+    // Technically the CPU core is part of the RP2A03 microprocessor but it is
+    // easier to define the cpu in the NES struct directly and reference it here.
+    self->cpu = cpu;
+    auto r = aldo_bus_set(self->cpu->mbus, ALDO_MEMBLOCK_16KB, (struct aldo_busdevice){
         .read = read,
         .write = write,
         .ctx = self,
@@ -144,7 +149,7 @@ void aldo_apu_powerup(struct aldo_rp2a03 *self)
 {
     assert(self != nullptr);
 
-    aldo_cpu_powerup(&self->cpu);
+    aldo_cpu_powerup(self->cpu);
 
     // powerup on a get cycle (in real hardware, put/get cycle is random)
     self->bflt = self->put = false;
@@ -155,9 +160,10 @@ void aldo_apu_powerup(struct aldo_rp2a03 *self)
 int aldo_apu_cycle(struct aldo_rp2a03 *self)
 {
     assert(self != nullptr);
+    assert(self->cpu != nullptr);
 
     // cycle will return non-zero if DMA is running, which suspends the cpu
-    return cycle_chip(self) || aldo_cpu_cycle(&self->cpu);
+    return cycle_chip(self) || aldo_cpu_cycle(self->cpu);
 }
 
 void aldo_apu_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp)
@@ -179,5 +185,5 @@ void aldo_apu_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp
     apu->busfault = self->bflt;
     apu->put = self->put;
 
-    aldo_cpu_snapshot(&self->cpu, snp);
+    aldo_cpu_snapshot(self->cpu, snp);
 }

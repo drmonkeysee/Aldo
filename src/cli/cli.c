@@ -274,7 +274,7 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
         result = EXIT_FAILURE;
         goto exit_console;
     }
-    aldo_nes_powerup(emu.console, c, emu.args->zeroram);
+    aldo_nes_powerupold(emu.console, c, emu.args->zeroram);
 
     auto run_loop = setup_ui(&emu);
     auto err = run_loop(&emu);
@@ -293,7 +293,7 @@ exit_console:
         fputs("Trace file I/O failure\n", stderr);
         result = EXIT_FAILURE;
     }
-    aldo_nes_free(emu.console);
+    aldo_nes_freeold(emu.console);
 exit_trace:
     if (tracelog) {
         fclose(tracelog);

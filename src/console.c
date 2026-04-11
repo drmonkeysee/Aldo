@@ -11,6 +11,7 @@
 #include "bus.h"
 #include "bytes.h"
 #include "cycleclock.h"
+#include "nes.h"
 #include "snapshot.h"
 
 #include <assert.h>
@@ -128,6 +129,9 @@ static void connect_cart(struct aldo_console_base *self, aldo_cart *c)
 
 static void disconnect_cart(struct aldo_console_base *self)
 {
+    if (self->dconn) {
+        self->dconn(self);
+    }
     // Debugger may have been attached to a cart-less CPU bus so reset
     // debugger even if there is no existing cart.
     aldo_debug_reset(self->dbg);
@@ -136,11 +140,14 @@ static void disconnect_cart(struct aldo_console_base *self)
     self->cart = nullptr;
 }
 
-static void init(struct aldo_console_base *self, aldo_debugger *dbg, FILE *tracelog)
+static void setup(struct aldo_console_base *self, aldo_debugger *dbg,
+                  FILE *tracelog)
 {
     assert(self != nullptr);
     assert(dbg != nullptr);
 
+    self->dconn = nullptr;
+    self->dtor = nullptr;
     self->cart = nullptr;
     self->dbg = dbg;
     self->tracelog = tracelog;
@@ -153,6 +160,10 @@ static void teardown(struct aldo_console_base *self)
 {
     disconnect_cart(self);
     aldo_debug_cpu_disconnect(self->dbg);
+
+    if (self->dtor) {
+        self->dtor(self);
+    }
     aldo_bus_free(self->cpu.mbus);
 }
 
@@ -161,13 +172,31 @@ static aldo_console *new_aldo8(aldo_debugger *dbg, FILE *tracelog)
     aldo_console *c = malloc(Aldo_Aldo8Size);
     if (!c) return nullptr;
 
-    init(c, dbg, tracelog);
+    setup(c, dbg, tracelog);
     c->type = ALDO_CONSOLE_ALDO8;
 
     if (aldo_aldo8_init((aldo_aldo8 *)c)) {
-        return (struct aldo_console_base *)c;
+        return c;
     } else {
-        aldo_console_free((struct aldo_console_base *)c);
+        aldo_console_free(c);
+        return nullptr;
+    }
+}
+
+static aldo_console *new_nes(aldo_debugger *dbg, FILE *tracelog)
+{
+    aldo_console *c = malloc(Aldo_NesSize);
+    if (!c) return nullptr;
+
+    setup(c, dbg, tracelog);
+    c->type = ALDO_CONSOLE_NES;
+    c->dconn = aldo_nes_disconnect;
+    c->dtor = aldo_nes_free;
+
+    if (aldo_nes_init((aldo_nes *)c)) {
+        return c;
+    } else {
+        aldo_console_free(c);
         return nullptr;
     }
 }
@@ -212,12 +241,13 @@ void aldo_console_powerup(aldo_console *self, aldo_cart *c, bool zeroram)
         connect_cart(self, c);
     }
     self->mode = ALDO_EXC_RUN;
+
     switch (self->type) {
     case ALDO_CONSOLE_ALDO8:
         aldo_aldo8_powerup((aldo_aldo8 *)self, zeroram);
         break;
     case ALDO_CONSOLE_NES:
-        // TODO: implement
+        aldo_nes_powerup((aldo_nes *)self, zeroram);
         break;
     default:
         assert(((void)"INVALID CONSOLE TYPE", false));
@@ -244,8 +274,7 @@ size_t aldo_console_ram_size(enum aldo_console_type t)
     case ALDO_CONSOLE_ALDO8:
         return Aldo_Aldo8RamSize;
     case ALDO_CONSOLE_NES:
-        // TODO: implement
-        break;
+        return Aldo_NesRamSize;
     default:
         assert(((void)"INVALID CONSOLE TYPE", false));
         break;

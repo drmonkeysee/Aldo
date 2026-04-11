@@ -14,7 +14,12 @@
 // Console Base Definition, providing a common interface and data type for
 // emulation of all supported Aldo consoles.
 struct aldo_console_base {
+    // Console Type Header
     enum aldo_console_type type;
+    void (*dconn)(aldo_console *);  // Optional type-specific disconnect
+    void (*dtor)(aldo_console *);   // Optional type-specific cleanup
+
+    // Console Components
     aldo_cart *cart;            // Program Cartridge; Non-owning Pointer
     aldo_debugger *dbg;         // Debugger Context; Non-owning Pointer
     struct aldo_snapshot *snp;  // Console Snapshot; Non-owning Pointer

@@ -8,8 +8,6 @@
 #ifndef Aldo_aldo8_h
 #define Aldo_aldo8_h
 
-#include "console.h"
-
 #include <stddef.h>
 
 struct aldo_clock;

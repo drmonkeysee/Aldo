@@ -10,7 +10,6 @@
 #include "bus.h"
 #include "bytes.h"
 #include "consoledef.h"
-#include "cpu.h"
 #include "snapshot.h"
 
 #include <assert.h>

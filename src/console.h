@@ -42,11 +42,10 @@ void aldo_console_powerdown(aldo_console *self) aldo_nothrow;
 
 aldo_export
 int aldo_console_max_tcpu() aldo_nothrow;
-// RAM and VRAM are the same size so one accessor for both
 aldo_export
-size_t aldo_console_ram_size(aldo_console *self) aldo_nothrow;
+size_t aldo_console_ram_size(enum aldo_console_type t) aldo_nothrow;
 aldo_export
-void aldo_console_screen_size(aldo_console *self, int *width,
+void aldo_console_screen_size(enum aldo_console_type t, int *width,
                               int *height) aldo_nothrow;
 aldo_export
 bool aldo_console_bcd_support(aldo_console *self) aldo_nothrow;

@@ -238,13 +238,11 @@ int aldo_console_max_tcpu()
     return Aldo_MaxTCycle;
 }
 
-size_t aldo_console_ram_size(aldo_console *self)
+size_t aldo_console_ram_size(enum aldo_console_type t)
 {
-    assert(self != nullptr);
-
-    switch (self->type) {
+    switch (t) {
     case ALDO_CONSOLE_ALDO8:
-        return aldo_aldo8_ram_size((aldo_aldo8 *)self);
+        return Aldo_Aldo8RamSize;
     case ALDO_CONSOLE_NES:
         // TODO: implement
         break;
@@ -255,13 +253,12 @@ size_t aldo_console_ram_size(aldo_console *self)
     return 0;
 }
 
-void aldo_console_screen_size(aldo_console *self, int *width, int *height)
+void aldo_console_screen_size(enum aldo_console_type t, int *width, int *height)
 {
-    assert(self != nullptr);
     assert(width != nullptr);
     assert(height != nullptr);
 
-    if (self->type == ALDO_CONSOLE_NES) {
+    if (t == ALDO_CONSOLE_NES) {
         // TODO: implement
     } else {
         *width = 0;

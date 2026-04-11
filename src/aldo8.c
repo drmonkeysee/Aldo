@@ -76,7 +76,9 @@ static bool create_mbus(struct aldo_aldo8_console *self)
 // MARK: - Public Interface
 //
 
-const size_t Aldo_Aldo8Size = sizeof(struct aldo_aldo8_console);
+const size_t
+    Aldo_Aldo8Size = sizeof(struct aldo_aldo8_console),
+    Aldo_Aldo8RamSize = aldo_arrsz(((struct aldo_aldo8_console *)nullptr)->ram);
 
 bool aldo_aldo8_init(aldo_aldo8 *self)
 {
@@ -94,14 +96,6 @@ void aldo_aldo8_powerup(aldo_aldo8 *self, bool zeroram)
     if (zeroram) {
         aldo_memclr(self->ram);
     }
-}
-
-size_t aldo_aldo8_ram_size(aldo_aldo8 *self)
-{
-    assert(self != nullptr);
-    assert(self->extends.type == ALDO_CONSOLE_ALDO8);
-
-    return aldo_arrsz(self->ram);
 }
 
 void aldo_aldo8_snapshot_core(aldo_aldo8 *self, struct aldo_snapshot *snp)

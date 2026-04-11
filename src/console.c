@@ -40,13 +40,10 @@ static void clock_cpu(struct aldo_console_base *self, struct aldo_clock *clock)
 
 static void clock_system(struct aldo_console_base *self, struct aldo_clock *clock)
 {
-    switch (self->type) {
-    case ALDO_CONSOLE_NES:
+    if (self->type == ALDO_CONSOLE_NES) {
         // TODO: implement
-        break;
-    default:
+    } else {
         clock_cpu(self, clock);
-        break;
     }
 
     switch (self->mode) {
@@ -75,13 +72,8 @@ static void reset_snapshot(struct aldo_console_base *self)
 {
     if (!self->snp) return;
 
-    switch (self->type) {
-    case ALDO_CONSOLE_NES:
+    if (self->type == ALDO_CONSOLE_NES) {
         // TODO: implement
-        break;
-    default:
-        // do nothing
-        break;
     }
 }
 
@@ -117,13 +109,8 @@ static void init_snapshot(struct aldo_console_base *self)
     if (!self->snp) return;
 
     snapshot_core(self);
-
-    switch (self->type) {
-    case ALDO_CONSOLE_NES:
+    if (self->type == ALDO_CONSOLE_NES) {
         // TODO: implement
-        break;
-    default:
-        break;
     }
 }
 
@@ -274,14 +261,11 @@ void aldo_console_screen_size(aldo_console *self, int *width, int *height)
     assert(width != nullptr);
     assert(height != nullptr);
 
-    switch (self->type) {
-    case ALDO_CONSOLE_NES:
+    if (self->type == ALDO_CONSOLE_NES) {
         // TODO: implement
-        break;
-    default:
+    } else {
         *width = 0;
         *height = 0;
-        break;
     }
 }
 
@@ -392,28 +376,24 @@ int aldo_console_cycle_factor(aldo_console *self)
 {
     assert(self != nullptr);
 
-    switch (self->type) {
-    case ALDO_CONSOLE_NES:
+    if (self->type == ALDO_CONSOLE_NES) {
         // TODO: implement
         return 0;
-        break;
-    default:
-        return 1;
     }
+
+    return 1;
 }
 
 int aldo_console_frame_factor(aldo_console *self)
 {
     assert(self != nullptr);
 
-    switch (self->type) {
-    case ALDO_CONSOLE_NES:
+    if (self->type == ALDO_CONSOLE_NES) {
         // TODO: implement
         return 0;
-        break;
-    default:
-        return 0;
     }
+
+    return 0;
 }
 
 void aldo_console_set_snapshot(aldo_console *self, struct aldo_snapshot *snp)

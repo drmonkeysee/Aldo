@@ -93,7 +93,7 @@ static void snapshot_core(struct aldo_console_base *self)
                                       aldo_arrsz(prg->curr->pc), prg->curr->pc);
     switch (self->type) {
     case ALDO_CONSOLE_ALDO8:
-        aldo_aldo8_snapshot_core((const struct aldo_aldo8 *)self, snp);
+        aldo_aldo8_snapshot_core((aldo_aldo8 *)self, snp);
         break;
     case ALDO_CONSOLE_NES:
         // TODO: implement
@@ -158,13 +158,13 @@ static void teardown(struct aldo_console_base *self)
 
 static aldo_console *new_aldo8(aldo_debugger *dbg, FILE *tracelog)
 {
-    struct aldo_aldo8 *c = malloc(sizeof *c);
+    aldo_console *c = malloc(Aldo_Aldo8Size);
     if (!c) return nullptr;
 
-    init(&c->extends, dbg, tracelog);
-    c->extends.type = ALDO_CONSOLE_ALDO8;
+    init(c, dbg, tracelog);
+    c->type = ALDO_CONSOLE_ALDO8;
 
-    if (aldo_aldo8_init(c)) {
+    if (aldo_aldo8_init((aldo_aldo8 *)c)) {
         return (struct aldo_console_base *)c;
     } else {
         aldo_console_free((struct aldo_console_base *)c);
@@ -214,7 +214,7 @@ void aldo_console_powerup(aldo_console *self, aldo_cart *c, bool zeroram)
     self->mode = ALDO_EXC_RUN;
     switch (self->type) {
     case ALDO_CONSOLE_ALDO8:
-        aldo_aldo8_powerup((struct aldo_aldo8 *)self, zeroram);
+        aldo_aldo8_powerup((aldo_aldo8 *)self, zeroram);
         break;
     case ALDO_CONSOLE_NES:
         // TODO: implement
@@ -244,7 +244,7 @@ size_t aldo_console_ram_size(aldo_console *self)
 
     switch (self->type) {
     case ALDO_CONSOLE_ALDO8:
-        return aldo_aldo8_ram_size((struct aldo_aldo8 *)self);
+        return aldo_aldo8_ram_size((aldo_aldo8 *)self);
     case ALDO_CONSOLE_NES:
         // TODO: implement
         break;

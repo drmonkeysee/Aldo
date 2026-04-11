@@ -8,10 +8,21 @@
 #include "aldo8.h"
 
 #include "bus.h"
-#include "cycleclock.h"
+#include "bytes.h"
+#include "consoledef.h"
+#include "cpu.h"
 #include "snapshot.h"
 
 #include <assert.h>
+#include <stdint.h>
+
+// The Aldo-8 fictional 8-bit console, useful for testing and tinkering with
+// emulating a generic 6502-based system.
+struct aldo_aldo8_console {
+    struct aldo_console_base extends;
+
+    uint8_t ram[ALDO_MEMBLOCK_32KB];    // Internal RAM
+};
 
 static bool ram_read(void *restrict ctx, uint16_t addr, uint8_t *restrict d)
 {
@@ -40,7 +51,7 @@ static size_t ram_copy(const void *restrict ctx, uint16_t addr, size_t count,
     return aldo_bytecopy_bank(ctx, ALDO_BITWIDTH_32KB, addr, count, dest);
 }
 
-static bool create_mbus(struct aldo_aldo8 *self)
+static bool create_mbus(struct aldo_aldo8_console *self)
 {
     /*
      * Memory Map
@@ -65,7 +76,9 @@ static bool create_mbus(struct aldo_aldo8 *self)
 // MARK: - Public Interface
 //
 
-bool aldo_aldo8_init(struct aldo_aldo8 *self)
+const size_t Aldo_Aldo8Size = sizeof(struct aldo_aldo8_console);
+
+bool aldo_aldo8_init(aldo_aldo8 *self)
 {
     assert(self != nullptr);
     assert(self->extends.type == ALDO_CONSOLE_ALDO8);
@@ -73,7 +86,7 @@ bool aldo_aldo8_init(struct aldo_aldo8 *self)
     return create_mbus(self);
 }
 
-void aldo_aldo8_powerup(struct aldo_aldo8 *self, bool zeroram)
+void aldo_aldo8_powerup(aldo_aldo8 *self, bool zeroram)
 {
     assert(self != nullptr);
     assert(self->extends.type == ALDO_CONSOLE_ALDO8);
@@ -83,7 +96,7 @@ void aldo_aldo8_powerup(struct aldo_aldo8 *self, bool zeroram)
     }
 }
 
-size_t aldo_aldo8_ram_size(const struct aldo_aldo8 *self)
+size_t aldo_aldo8_ram_size(aldo_aldo8 *self)
 {
     assert(self != nullptr);
     assert(self->extends.type == ALDO_CONSOLE_ALDO8);
@@ -91,8 +104,7 @@ size_t aldo_aldo8_ram_size(const struct aldo_aldo8 *self)
     return aldo_arrsz(self->ram);
 }
 
-void aldo_aldo8_snapshot_core(const struct aldo_aldo8 *self,
-                              struct aldo_snapshot *snp)
+void aldo_aldo8_snapshot_core(aldo_aldo8 *self, struct aldo_snapshot *snp)
 {
     assert(self != nullptr);
     assert(snp != nullptr);

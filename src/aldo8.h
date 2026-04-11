@@ -8,34 +8,22 @@
 #ifndef Aldo_aldo8_h
 #define Aldo_aldo8_h
 
-#include "bytes.h"
-#include "consoledef.h"
-#include "cpu.h"
-#include "debug.h"
+#include "console.h"
 
 #include <stddef.h>
-#include <stdint.h>
 
 struct aldo_clock;
 struct aldo_snapshot;
+typedef struct aldo_aldo8_console aldo_aldo8;
 
-// The Aldo-8 fictional 8-bit console, useful for testing and tinkering with
-// emulating a generic 6502-based system.
-struct aldo_aldo8 {
-    struct aldo_console_base extends;
+extern const size_t Aldo_Aldo8Size;
 
-    uint8_t ram[ALDO_MEMBLOCK_32KB];    // Internal RAM
-};
+bool aldo_aldo8_init(aldo_aldo8 *self);
+void aldo_aldo8_powerup(aldo_aldo8 *self, bool zeroram);
 
-bool aldo_aldo8_init(struct aldo_aldo8 *self);
+size_t aldo_aldo8_ram_size(aldo_aldo8 *self);
 
-void aldo_aldo8_powerup(struct aldo_aldo8 *self, bool zeroram);
-
-size_t aldo_aldo8_ram_size(const struct aldo_aldo8 *self);
-
-void aldo_aldo8_clock(struct aldo_aldo8 *self, struct aldo_clock *clock);
-
-void aldo_aldo8_snapshot_core(const struct aldo_aldo8 *self,
-                              struct aldo_snapshot *snp);
+void aldo_aldo8_clock(aldo_aldo8 *self, struct aldo_clock *clock);
+void aldo_aldo8_snapshot_core(aldo_aldo8 *self, struct aldo_snapshot *snp);
 
 #endif

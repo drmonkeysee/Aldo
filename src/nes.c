@@ -339,8 +339,9 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
         aldo_console_halt(&self->extends, true);
         break;
     case ALDO_EXC_STEP:
-        aldo_console_halt(&self->extends, framedone
-                          && clock->rate_factor == aldo_nes_frame_factor());
+        if (clock->rate_factor == aldo_nes_frame_factor()) {
+            aldo_console_halt(&self->extends, framedone);
+        }
         break;
     default:
         break;

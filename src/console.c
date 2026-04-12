@@ -52,8 +52,9 @@ static void clock_system(struct aldo_console_base *self, struct aldo_clock *cloc
         aldo_console_halt(self, cputick);
         break;
     case ALDO_EXC_STEP:
-        aldo_console_halt(self, self->cpu.signal.sync
-                          && clock->rate_factor == aldo_console_cycle_factor(self));
+        if (clock->rate_factor == aldo_console_cycle_factor(self)) {
+            aldo_console_halt(self, cputick && self->cpu.signal.sync);
+        }
         break;
     case ALDO_EXC_RUN:
     default:

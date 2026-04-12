@@ -463,7 +463,7 @@ void aldo_nes_snapshot_reset(aldo_nes *self, struct aldo_snapshot *snp)
 //
 // MARK: - Old
 //
-
+/*
 aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
 {
     assert(dbg != nullptr);
@@ -683,3 +683,4 @@ void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3], bool errs[static 3])
         errs[2] = !aldo_ppu_dumpram(&self->ppu, f);
     }
 }
+*/

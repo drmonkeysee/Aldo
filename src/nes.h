@@ -32,7 +32,7 @@ void aldo_nes_snapshot_init(aldo_nes *self, struct aldo_snapshot *snp);
 void aldo_nes_snapshot_core(aldo_nes *self, struct aldo_snapshot *snp);
 void aldo_nes_snapshot_reset(aldo_nes *self, struct aldo_snapshot *snp);
 
-
+/*
 #include "bridgeopen.h"
 // if returns null then errno is set due to failed allocation
 aldo_export aldo_ownresult
@@ -84,5 +84,5 @@ aldo_export
 void aldo_nes_dumpram(aldo_nes *self, FILE *fs[aldo_cz(3)],
                       bool errs[aldo_cz(3)]) aldo_nothrow;
 #include "bridgeclose.h"
-
+*/
 #endif

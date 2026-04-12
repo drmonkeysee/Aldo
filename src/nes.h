@@ -20,6 +20,7 @@ extern const size_t Aldo_NesSize;
 
 bool aldo_nes_init(aldo_nes *self);
 void aldo_nes_powerup(aldo_nes *self, bool zeroram);
+void aldo_nes_connect(aldo_console *self);
 void aldo_nes_disconnect(aldo_console *self);
 void aldo_nes_free(aldo_console *self);
 

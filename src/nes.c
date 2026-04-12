@@ -401,14 +401,25 @@ void aldo_nes_powerup(aldo_nes *self, bool zeroram)
     aldo_ppu_powerup(&self->ppu);
 }
 
+void aldo_nes_connect(aldo_console *self)
+{
+    assert(self != nullptr);
+    assert(self->type == ALDO_CONSOLE_NES);
+    assert(self->cart != nullptr);
+
+    auto r = aldo_cart_vbus_connect(self->cart,
+                                    ((struct aldo_nes001 *)self)->ppu.vbus);
+    (void)r, assert(assert_vbus(self->cart, r));
+}
+
 void aldo_nes_disconnect(aldo_console *self)
 {
     assert(self != nullptr);
     assert(self->type == ALDO_CONSOLE_NES);
+    assert(self->cart != nullptr);
 
-    if (!self->cart) return;
-
-    aldo_cart_vbus_disconnect(self->cart, ((struct aldo_nes001 *)self)->ppu.vbus);
+    aldo_cart_vbus_disconnect(self->cart,
+                              ((struct aldo_nes001 *)self)->ppu.vbus);
 }
 
 void aldo_nes_free(aldo_console *self)

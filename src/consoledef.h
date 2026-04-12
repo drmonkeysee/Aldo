@@ -16,8 +16,10 @@
 struct aldo_console_base {
     // Console Type Header
     enum aldo_console_type type;
-    void (*dconn)(aldo_console *);  // Optional type-specific disconnect
-    void (*dtor)(aldo_console *);   // Optional type-specific cleanup
+    // Optional callbaks for type-specific functionality
+    void (*conn)(aldo_console *);   // Cart Connect
+    void (*dconn)(aldo_console *);  // Cart Disconnect
+    void (*dtor)(aldo_console *);   // Console Cleanup
 
     // Console System Parameters
     struct {

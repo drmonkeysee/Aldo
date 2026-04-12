@@ -125,18 +125,21 @@ static void connect_cart(struct aldo_console_base *self, aldo_cart *c)
     self->cart = c;
     auto r = aldo_cart_mbus_connect(self->cart, self->cpu.mbus);
     (void)r, assert(r);
+    if (self->conn) {
+        self->conn(self);
+    }
     aldo_debug_sync_bus(self->dbg);
 }
 
 static void disconnect_cart(struct aldo_console_base *self)
 {
-    if (self->dconn) {
-        self->dconn(self);
-    }
     // Debugger may have been attached to a cart-less CPU bus so reset
     // debugger even if there is no existing cart.
     aldo_debug_reset(self->dbg);
     if (!self->cart) return;
+    if (self->dconn) {
+        self->dconn(self);
+    }
     aldo_cart_mbus_disconnect(self->cart, self->cpu.mbus);
     self->cart = nullptr;
 }
@@ -192,6 +195,7 @@ static aldo_console *new_nes(aldo_debugger *dbg, FILE *tracelog)
 
     setup(c, dbg, tracelog);
     c->type = ALDO_CONSOLE_NES;
+    c->conn = aldo_nes_connect;
     c->dconn = aldo_nes_disconnect;
     c->dtor = aldo_nes_free;
 

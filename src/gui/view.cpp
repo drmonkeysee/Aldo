@@ -412,7 +412,7 @@ auto file_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
     }
 }
 
-auto speed_menu_items(aldo::viewstate& vs) noexcept
+auto speed_menu_items(aldo::viewstate& vs, const aldo::Emulator& emu) noexcept
 {
     static constexpr auto multiplierLabel = " 10x", labelBase = "Clock Rate ";
 
@@ -443,7 +443,7 @@ auto speed_menu_items(aldo::viewstate& vs) noexcept
         }
     }
     if (ImGui::MenuItem("Clock Scale", "c")) {
-        vs.clock.toggleScale();
+        vs.clock.toggleScale(emu);
     }
 }
 
@@ -469,7 +469,7 @@ auto mode_menu_item(aldo::viewstate& vs, const aldo::Emulator& emu)
 auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
 {
     if (ImGui::BeginMenu("Controls")) {
-        speed_menu_items(vs);
+        speed_menu_items(vs, emu);
         if (ImGui::MenuItem(emu.halted() ? "Run" : "Halt", "<Space>")) {
             vs.commands.emplace(aldo::Command::halt, !emu.halted());
         }
@@ -1022,9 +1022,9 @@ private:
     {
         ImGui::TextUnformatted("t:");
         ImGui::SameLine();
-        for (auto i = 0; i < aldo_nes_max_tcpu(); ++i) {
-            small_led(i == cycle, aldo::style::SmallRadius * 3
-                      * static_cast<float>(i));
+        for (auto i = 0; i < aldo::Emulator::maxTCpu(); ++i) {
+            small_led(i == cycle,
+                      aldo::style::SmallRadius * 3 * static_cast<float>(i));
         }
         ImGui::Spacing();
     }
@@ -2617,11 +2617,11 @@ private:
                        "%d", ImGuiSliderFlags_AlwaysClamp);
 
         if (ImGui::RadioButton("Cycles", vs.clock.scale() == ALDO_CS_CYCLE)) {
-            vs.clock.setScale(ALDO_CS_CYCLE);
+            vs.clock.setScale(ALDO_CS_CYCLE, emu);
         }
         ImGui::SameLine();
         if (ImGui::RadioButton("Frames", vs.clock.scale() == ALDO_CS_FRAME)) {
-            vs.clock.setScale(ALDO_CS_FRAME);
+            vs.clock.setScale(ALDO_CS_FRAME, emu);
         }
     }
 

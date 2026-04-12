@@ -62,7 +62,7 @@ aldo::Emulator::Emulator(aldo::debug_handle d, aldo::console_handle c,
                          const gui_platform& p)
 : prefspath{get_prefspath(p)}, hdbg{std::move(d)}, hconsole{std::move(c)}
 {
-    aldo_nes_set_snapshot(consolep(), snapshotp());
+    aldo_console_set_snapshot(consolep(), snapshotp());
 }
 
 std::string_view aldo::Emulator::displayCartName() const noexcept
@@ -85,9 +85,9 @@ void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
 {
     auto c = load_cart(filepath);
     saveCartState();
-    aldo_nes_powerdown(consolep());
+    aldo_console_powerdown(consolep());
     hcart.reset(c);
-    aldo_nes_powerup(consolep(), cartp(), zeroRam);
+    aldo_console_powerup(consolep(), cartp(), zeroRam);
     cartpath = filepath;
     cartname = cartpath.stem();
     loadCartState();
@@ -96,7 +96,7 @@ void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
 void aldo::Emulator::update(aldo::viewstate& vs) noexcept
 {
     auto timer = vs.clock.timeUpdate();
-    aldo_nes_clock(consolep(), vs.clock.clockp());
+    aldo_console_clock(consolep(), vs.clock.clockp());
 }
 
 //
@@ -126,5 +126,5 @@ void aldo::Emulator::cleanup() const noexcept
     } catch (...) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unknown Emu dtor error!");
     }
-    aldo_nes_set_snapshot(consolep(), nullptr);
+    aldo_console_set_snapshot(consolep(), nullptr);
 }

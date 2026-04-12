@@ -110,7 +110,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_C:
         if (is_free_key(ev)) {
-            vs.clock.toggleScale();
+            vs.clock.toggleScale(emu);
         }
         break;
     case SDLK_D:

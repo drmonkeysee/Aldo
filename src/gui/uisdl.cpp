@@ -23,12 +23,12 @@
 namespace
 {
 
-auto runloop(const gui_platform& p, aldo_debugger* debug, aldo_nes* console)
+auto runloop(const gui_platform& p, aldo_debugger* debug, aldo_console* console)
 {
     aldo::Emulator emu{
         aldo::debug_handle{debug}, aldo::console_handle{console}, p,
     };
-    aldo::viewstate state;
+    aldo::viewstate state{.clock{emu}};
     aldo::MediaRuntime runtime{{1280, 800}, p};
     aldo::Layout layout{state, emu, runtime};
     SDL_Log("emu: %zu", sizeof emu);
@@ -55,7 +55,7 @@ auto runloop(const gui_platform& p, aldo_debugger* debug, aldo_nes* console)
 //
 
 int aldo::ui_sdl_runloop(const gui_platform* platform, aldo_debugger* debug,
-                         aldo_nes* console) noexcept
+                         aldo_console* console) noexcept
 {
     assert(platform != nullptr);
     assert(debug != nullptr);

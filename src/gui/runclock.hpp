@@ -10,8 +10,8 @@
 
 #include "attr.hpp"
 #include "cycleclock.h"
+#include "emu.hpp"
 #include "emutypes.hpp"
-#include "nes.h"
 
 #include <algorithm>
 #include <chrono>
@@ -92,6 +92,10 @@ private:
 
 class RunClock {
 public:
+    // TODO: figure out how to propagate console type changes to here
+    explicit RunClock(const Emulator& emu)
+    : clk{.rate = Aldo_MaxFps, .rate_factor = getFactor(emu)} {}
+
     template<class Self>
     auto&& clock(this Self&& self) noexcept
     {
@@ -155,7 +159,7 @@ public:
         clock().rate = std::max(min, std::min(adjusted, max));
     }
 
-    void setScale(aldo_clockscale s) noexcept
+    void setScale(aldo_clockscale s, const Emulator& emu) noexcept
     {
         if (s == currentScale) return;
 
@@ -163,14 +167,13 @@ public:
         oldRate = clock().rate;
         clock().rate = prev;
         currentScale = s;
-        clock().rate_factor = currentScale == ALDO_CS_CYCLE
-                                ? aldo_nes_cycle_factor()
-                                : aldo_nes_frame_factor();
+        // TODO: figure out how to propagate console type changes to here
+        clock().rate_factor = getFactor(emu);
     }
 
-    void toggleScale() noexcept
+    void toggleScale(const Emulator& emu) noexcept
     {
-        setScale(static_cast<aldo_clockscale>(!currentScale));
+        setScale(static_cast<aldo_clockscale>(!currentScale), emu);
     }
 
 private:
@@ -181,6 +184,13 @@ private:
         return currentScale == ALDO_CS_CYCLE
                 ? clock().rate == cycleLimit
                 : clock().rate == frameLimit;
+    }
+
+    int getFactor(const Emulator& emu) const noexcept
+    {
+        return currentScale == ALDO_CS_CYCLE
+                ? emu.cycleFactor()
+                : emu.frameFactor();
     }
 
     void tickStart(bool resetBudget) noexcept
@@ -196,13 +206,10 @@ private:
         }
     }
 
-    aldo_clock clk{
-        .rate = Aldo_MaxFps,
-        .rate_factor = aldo_nes_frame_factor(),
-    };
+    aldo_clockscale currentScale = ALDO_CS_FRAME;
+    aldo_clock clk;
     et::qword missed = 0;
     double dtInput = 0, dtUpdate = 0, dtRender = 0;
-    aldo_clockscale currentScale = ALDO_CS_FRAME;
     int oldRate = 10;
 };
 

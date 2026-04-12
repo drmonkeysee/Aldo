@@ -10,12 +10,12 @@
 
 #include "attr.hpp"
 #include "cart.h"
+#include "console.h"
 #include "ctrlsignal.h"
 #include "debug.hpp"
 #include "emutypes.hpp"
 #include "error.hpp"
 #include "handle.hpp"
-#include "nes.h"
 #include "palette.hpp"
 #include "snapshot.h"
 
@@ -33,7 +33,7 @@ namespace aldo
 
 class Emulator;
 struct viewstate;
-using console_handle = handle<aldo_nes, aldo_nes_free>;
+using console_handle = handle<aldo_console, aldo_console_free>;
 
 namespace emu
 {
@@ -71,9 +71,15 @@ class ALDO_SIDEFX Emulator {
 public:
     static SDL_Point screenSize() noexcept
     {
-        SDL_Point res;
-        aldo_nes_screen_size(&res.x, &res.y);
+        // TODO: figure out how to propagate console type changes to here
+        SDL_Point res{256, 240};
+        //aldo_console_screen_size(&res.x, &res.y);
         return res;
+    }
+
+    static int maxTCpu() noexcept
+    {
+        return aldo_console_max_tcpu();
     }
 
     Emulator(debug_handle d, console_handle c, const gui_platform& p);
@@ -89,28 +95,30 @@ public:
     const Palette& palette() const noexcept { return hpalette; }
     Palette& palette() noexcept { return hpalette; }
 
-    bool halted() const noexcept { return aldo_nes_halted(consolep()); }
-    void halt(bool halt) noexcept { aldo_nes_halt(consolep(), halt); }
-    et::size ramSize() const noexcept { return aldo_nes_ram_size(consolep()); }
+    bool halted() const noexcept { return aldo_console_halted(consolep()); }
+    void halt(bool halt) noexcept { aldo_console_halt(consolep(), halt); }
+    et::size ramSize() const noexcept { return aldo_console_ram_size(consolep()); }
+    int cycleFactor() const noexcept { return aldo_console_cycle_factor(consolep()); }
+    int frameFactor() const noexcept { return aldo_console_frame_factor(consolep()); }
     bool bcdSupport() const noexcept
     {
-        return aldo_nes_bcd_support(consolep());
+        return aldo_console_bcd_support(consolep());
     }
     aldo_execmode runMode() const noexcept
     {
-        return aldo_nes_mode(consolep());
+        return aldo_console_mode(consolep());
     }
     void runMode(aldo_execmode mode) noexcept
     {
-        aldo_nes_set_mode(consolep(), mode);
+        aldo_console_set_mode(consolep(), mode);
     }
     bool probe(aldo_interrupt signal) const noexcept
     {
-        return aldo_nes_probe(consolep(), signal);
+        return aldo_console_probe(consolep(), signal);
     }
     void probe(aldo_interrupt signal, bool active) noexcept
     {
-        aldo_nes_set_probe(consolep(), signal, active);
+        aldo_console_set_probe(consolep(), signal, active);
     }
 
     void loadCart(const std::filesystem::path& filepath);
@@ -120,7 +128,7 @@ public:
 
 private:
     aldo_cart* cartp() const noexcept { return hcart.get(); }
-    aldo_nes* consolep() const noexcept { return hconsole.get(); }
+    aldo_console* consolep() const noexcept { return hconsole.get(); }
     aldo_snapshot* snapshotp() noexcept { return hsnp.getp(); }
 
     void loadCartState();

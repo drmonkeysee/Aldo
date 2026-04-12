@@ -7,9 +7,9 @@
 
 #include "gui.h"
 
+#include "console.h"
 #include "debug.h"
 #include "guiplatform.h"
-#include "nes.h"
 #include "ui.h"
 #include "uisdl.hpp"
 
@@ -32,7 +32,7 @@ static int run_emu(const struct gui_platform *platform)
         return EXIT_FAILURE;
     }
 
-    auto console = aldo_nes_new(dbg, false, nullptr);
+    auto console = aldo_console_new(ALDO_CONSOLE_NES, dbg, nullptr);
     if (!console) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
                         "Unable to initialize console (%d): %s", errno,
@@ -40,7 +40,7 @@ static int run_emu(const struct gui_platform *platform)
         aldo_debug_free(dbg);
         return EXIT_FAILURE;
     }
-    aldo_nes_powerup(console, nullptr, false);
+    aldo_console_powerup(console, nullptr, false);
 
     auto err = ui_sdl_runloop(platform, dbg, console);
     // ui loop takes ownership of these two, even in the event of UI init failure

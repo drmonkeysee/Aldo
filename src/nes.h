@@ -8,13 +8,9 @@
 #ifndef Aldo_nes_h
 #define Aldo_nes_h
 
-#include "cart.h"
 #include "console.h"
-#include "ctrlsignal.h"
-#include "debug.h"
 
 #include <stddef.h>
-#include <stdio.h>
 
 struct aldo_clock;
 struct aldo_snapshot;

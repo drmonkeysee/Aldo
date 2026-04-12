@@ -10,16 +10,17 @@
 #include "apu.h"
 #include "bus.h"
 #include "bytes.h"
+#include "cart.h"
 #include "consoledef.h"
 #include "cpu.h"
 #include "cycleclock.h"
+#include "debug.h"
 #include "ppu.h"
 #include "snapshot.h"
 #include "trace.h"
 
 #include <assert.h>
 #include <stdint.h>
-#include <stdlib.h>
 
 constexpr auto ScreenWidth = 256;
 constexpr auto ScreenHeight = 240;
@@ -28,6 +29,7 @@ constexpr auto ScreenHeight = 240;
 // Cartridge RAM/ROM and Controller Input.
 struct aldo_nes001 {
     struct aldo_console_base extends;
+
     struct aldo_rp2a03 apu;             // RP2A03 Microprocessor
     struct aldo_rp2c02 ppu;             // RP2C02 PPU
     bool vbuf;                          // Current video buffer to fill
@@ -264,7 +266,8 @@ static void snapshot_screen(struct aldo_nes001 *self, struct aldo_snapshot *snp)
     snp->video->newframe = true;
 }
 
-static void snapshot_video(struct aldo_nes001 *self, struct aldo_snapshot *snp, bool framedone)
+static void snapshot_video(struct aldo_nes001 *self, struct aldo_snapshot *snp,
+                           bool framedone)
 {
     if (aldo_ppu_gfxsnp_dot(&self->ppu)) {
         snapshot_gfx(self, snp);

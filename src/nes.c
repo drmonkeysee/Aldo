@@ -314,7 +314,8 @@ static void instruction_trace(struct aldo_nes001 *self,
         || !self->extends.cpu.signal.sync) return;
 
     struct aldo_snapshot snp = {};
-    snapshot_bus(self, &snp);
+    aldo_cpu_snapshot(&self->extends.cpu, &snp);
+    aldo_ppu_bus_snapshot(&self->ppu, &snp);
     // Trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
     self->extends.tracefailed = !aldo_trace_line(self->extends.tracelog,

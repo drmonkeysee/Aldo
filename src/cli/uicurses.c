@@ -157,7 +157,7 @@ static void draw_tab_bar(const struct view *v, size_t selection, int barw,
 }
 
 static int drawstats(const struct view *v, int cursor_y,
-                     const struct viewstate *vs, const struct cliargs *args)
+                     const struct viewstate *vs, const struct emulator *emu)
 {
     // update timing metrics on a readable interval
     static constexpr auto refresh_interval_ms = 250.0;
@@ -170,6 +170,8 @@ static int drawstats(const struct view *v, int cursor_y,
         refreshdt = 0;
     }
 
+    mvwprintw(v->content, cursor_y++, 0, "Name: %s",
+              aldo_console_name(emu->console));
     mvwprintw(v->content, cursor_y++, 0, "Display Hz: %d (%.2f)", DisplayHz,
               (double)clock->ticks / clock->runtime);
     if (display_tickleft < 0) {
@@ -191,7 +193,7 @@ static int drawstats(const struct view *v, int cursor_y,
                 ? "Cycles per Second"
                 : "Frames per Second", clock->rate);
     mvwprintw(v->content, cursor_y++, 0, "BCD Supported: %s",
-              args->bcdsupport ? "Yes" : "No");
+              emu->args->bcdsupport ? "Yes" : "No");
     return cursor_y;
 }
 
@@ -242,7 +244,7 @@ static void drawsystem(const struct view *v, const struct viewstate *vs,
 {
     auto w = getmaxx(v->content);
     werase(v->content);
-    auto cursor_y = drawstats(v, 0, vs, emu->args);
+    auto cursor_y = drawstats(v, 0, vs, emu);
     mvwhline(v->content, cursor_y++, 0, 0, w);
     drawcontrols(v, emu, w, cursor_y);
 }
@@ -888,7 +890,7 @@ static void init_ui(struct layout *l, int ramsheets)
     static constexpr auto col2w = 29;
     static constexpr auto col3w = 29;
     static constexpr auto col4w = 54;
-    static constexpr auto sysh = 27;
+    static constexpr auto sysh = 28;
     static constexpr auto crth = 4;
     static constexpr auto cpuh = 20;
     static constexpr auto maxh = 37;

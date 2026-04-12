@@ -8,13 +8,13 @@
 #include "argparse.h"
 #include "bytes.h"
 #include "cart.h"
+#include "console.h"
 #include "ctrlsignal.h"
 #include "cycleclock.h"
 #include "debug.h"
 #include "dis.h"
 #include "emu.h"
 #include "haltexpr.h"
-#include "nes.h"
 #include "snapshot.h"
 #include "tsutil.h"
 
@@ -208,10 +208,10 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
     snprintf(halt_label, sizeof halt_label, "%*s%s%*s",
              (int)round(center_offset), "", halt,
              (int)floor(center_offset), "");
-    drawtoggle(v, halt_label, aldo_nes_halted(emu->console));
+    drawtoggle(v, halt_label, aldo_console_halted(emu->console));
 
     cursor_y += 2;
-    auto mode = aldo_nes_mode(emu->console);
+    auto mode = aldo_console_mode(emu->console);
     mvwaddstr(v->content, cursor_y, 0, "Mode:");
     drawtoggle(v, " Sub ", mode == ALDO_EXC_SUBCYCLE);
     drawtoggle(v, " Cycle ", mode == ALDO_EXC_CYCLE);
@@ -220,10 +220,10 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
 
     cursor_y += 2;
     mvwaddstr(v->content, cursor_y, 0, "Signal:");
-    drawtoggle(v, " RDY ", aldo_nes_probe(emu->console, ALDO_INT_RDY));
-    drawtoggle(v, " IRQ ", aldo_nes_probe(emu->console, ALDO_INT_IRQ));
-    drawtoggle(v, " NMI ", aldo_nes_probe(emu->console, ALDO_INT_NMI));
-    drawtoggle(v, " RST ", aldo_nes_probe(emu->console, ALDO_INT_RST));
+    drawtoggle(v, " RDY ", aldo_console_probe(emu->console, ALDO_INT_RDY));
+    drawtoggle(v, " IRQ ", aldo_console_probe(emu->console, ALDO_INT_IRQ));
+    drawtoggle(v, " NMI ", aldo_console_probe(emu->console, ALDO_INT_NMI));
+    drawtoggle(v, " RST ", aldo_console_probe(emu->console, ALDO_INT_RST));
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
     mvwaddstr(v->content, ++cursor_y, 0, "Halt/Run: <Space>");
@@ -920,7 +920,7 @@ static void init_ui(struct layout *l, int ramsheets)
 
 static void tick_start(struct viewstate *vs, const struct emulator *emu)
 {
-    aldo_clock_tickstart(&vs->clock.clock, aldo_nes_halted(emu->console));
+    aldo_clock_tickstart(&vs->clock.clock, aldo_console_halted(emu->console));
 }
 
 static void tick_end(struct runclock *c)
@@ -952,15 +952,15 @@ static void adjustrate(struct viewstate *vs, int adjustment)
     applyrate(&vs->clock.clock.rate, adjustment, min, max);
 }
 
-static void selectrate(struct runclock *clock)
+static void selectrate(struct runclock *clock, const struct emulator *emu)
 {
     auto prev = clock->oldrate;
     clock->oldrate = clock->clock.rate;
     clock->clock.rate = prev;
     clock->scale = !clock->scale;
     clock->clock.rate_factor = clock->scale == ALDO_CS_CYCLE
-                                ? aldo_nes_cycle_factor()
-                                : aldo_nes_frame_factor();
+                                ? aldo_console_cycle_factor(emu->console)
+                                : aldo_console_frame_factor(emu->console);
 }
 
 static void handle_input(struct viewstate *vs, const struct emulator *emu)
@@ -968,7 +968,7 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
     auto input = getch();
     switch (input) {
     case ' ':
-        aldo_nes_halt(emu->console, !aldo_nes_halted(emu->console));
+        aldo_console_halt(emu->console, !aldo_console_halted(emu->console));
         break;
     case '=':   // "Lowercase" +
         adjustrate(vs, 1);
@@ -990,11 +990,11 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 'c':
-        selectrate(&vs->clock);
+        selectrate(&vs->clock, emu);
         break;
     case 'd':
-        aldo_nes_set_probe(emu->console, ALDO_INT_RDY,
-                           !aldo_nes_probe(emu->console, ALDO_INT_RDY));
+        aldo_console_set_probe(emu->console, ALDO_INT_RDY,
+                               !aldo_console_probe(emu->console, ALDO_INT_RDY));
         break;
     case 'f':
         if (vs->ramselect != RSEL_PPU) {
@@ -1002,18 +1002,18 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 'i':
-        aldo_nes_set_probe(emu->console, ALDO_INT_IRQ,
-                           !aldo_nes_probe(emu->console, ALDO_INT_IRQ));
+        aldo_console_set_probe(emu->console, ALDO_INT_IRQ,
+                               !aldo_console_probe(emu->console, ALDO_INT_IRQ));
         break;
     case 'm':
-        aldo_nes_set_mode(emu->console, aldo_nes_mode(emu->console) + 1);
+        aldo_console_set_mode(emu->console, aldo_console_mode(emu->console) + 1);
         break;
     case 'M':
-        aldo_nes_set_mode(emu->console, aldo_nes_mode(emu->console) - 1);
+        aldo_console_set_mode(emu->console, aldo_console_mode(emu->console) - 1);
         break;
     case 'n':
-        aldo_nes_set_probe(emu->console, ALDO_INT_NMI,
-                           !aldo_nes_probe(emu->console, ALDO_INT_NMI));
+        aldo_console_set_probe(emu->console, ALDO_INT_NMI,
+                               !aldo_console_probe(emu->console, ALDO_INT_NMI));
         break;
     case 'p':
         vs->chipselect = !vs->chipselect;
@@ -1030,8 +1030,8 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 's':
-        aldo_nes_set_probe(emu->console, ALDO_INT_RST,
-                           !aldo_nes_probe(emu->console, ALDO_INT_RST));
+        aldo_console_set_probe(emu->console, ALDO_INT_RST,
+                               !aldo_console_probe(emu->console, ALDO_INT_RST));
         break;
     }
 }
@@ -1077,11 +1077,14 @@ int ui_curses_loop(struct emulator *emu)
 
     struct viewstate state = {
         .clock = {
-            .clock = {.rate = 10, .rate_factor = aldo_nes_cycle_factor()},
+            .clock = {
+                .rate = 10,
+                .rate_factor = aldo_console_cycle_factor(emu->console),
+            },
             .oldrate = Aldo_MinFps,
         },
         .running = true,
-        .total_ramsheets = (int)aldo_nes_ram_size(emu->console) / sheet_size,
+        .total_ramsheets = (int)aldo_console_ram_size(emu->console) / sheet_size,
     };
     struct layout layout;
     printf("Stack Usage\nemu: %zu\nstate: %zu\nlayout: %zu\ntotal: %zu\n",
@@ -1093,7 +1096,7 @@ int ui_curses_loop(struct emulator *emu)
         tick_start(&state, emu);
         handle_input(&state, emu);
         if (state.running) {
-            aldo_nes_clock(emu->console, &state.clock.clock);
+            aldo_console_clock(emu->console, &state.clock.clock);
             refresh_ui(&layout, &state, emu);
         }
         tick_end(&state.clock);

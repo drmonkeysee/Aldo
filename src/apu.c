@@ -184,6 +184,4 @@ void aldo_apu_snapshot(const struct aldo_rp2a03 *self, struct aldo_snapshot *snp
 
     apu->busfault = self->bflt;
     apu->put = self->put;
-
-    aldo_cpu_snapshot(self->cpu, snp);
 }

@@ -30,38 +30,38 @@ static void set_cpu_pins(struct aldo_console_base *self)
     self->cpu.signal.rst = !self->probe.rst;
 }
 
-static void clock_cpu(struct aldo_console_base *self, struct aldo_clock *clock)
+static bool clock_cpu(struct aldo_console_base *self, struct aldo_clock *clock)
 {
     auto cycles = aldo_cpu_cycle(&self->cpu);
     set_cpu_pins(self);
     clock->cycles += (uint64_t)cycles;
     // TODO: trace
     //instruction_trace(self, clock, -cycles);
+    return true;
 }
 
 static void clock_system(struct aldo_console_base *self, struct aldo_clock *clock)
 {
-    if (self->type == ALDO_CONSOLE_NES) {
-        // TODO: implement
-    } else {
-        clock_cpu(self, clock);
-    }
+    bool cputick = self->type == ALDO_CONSOLE_NES
+                    ? aldo_nes_clock((aldo_nes *)self, clock)
+                    : clock_cpu(self, clock);
 
     switch (self->mode) {
-    // both cases are possible on cycle-boundary
-    case ALDO_EXC_SUBCYCLE:
     case ALDO_EXC_CYCLE:
         // TODO: what should these settings do in frame mode?
-        aldo_console_halt(self, true);
+        aldo_console_halt(self, cputick);
         break;
     case ALDO_EXC_STEP:
-        if (clock->rate_factor == aldo_console_cycle_factor(self)) {
-            aldo_console_halt(self, self->cpu.signal.sync);
-        }
+        aldo_console_halt(self, self->cpu.signal.sync
+                          && clock->rate_factor == aldo_console_cycle_factor(self));
         break;
     case ALDO_EXC_RUN:
     default:
         break;
+    }
+
+    if (aldo_debug_break(self->dbg, clock)) {
+        aldo_console_halt(self, true);
     }
 }
 
@@ -74,7 +74,7 @@ static void reset_snapshot(struct aldo_console_base *self)
     if (!self->snp) return;
 
     if (self->type == ALDO_CONSOLE_NES) {
-        // TODO: implement
+        aldo_nes_snapshot_reset((aldo_nes *)self, self->snp);
     }
 }
 
@@ -97,7 +97,7 @@ static void snapshot_core(struct aldo_console_base *self)
         aldo_aldo8_snapshot_core((aldo_aldo8 *)self, snp);
         break;
     case ALDO_CONSOLE_NES:
-        // TODO: implement
+        aldo_nes_snapshot_core((aldo_nes *)self, snp);
         break;
     default:
         assert(((void)"INVALID CONSOLE TYPE", false));
@@ -111,7 +111,7 @@ static void init_snapshot(struct aldo_console_base *self)
 
     snapshot_core(self);
     if (self->type == ALDO_CONSOLE_NES) {
-        // TODO: implement
+        aldo_nes_snapshot_init((aldo_nes *)self, self->snp);
     }
 }
 
@@ -215,7 +215,7 @@ aldo_console *aldo_console_new(enum aldo_console_type type, aldo_debugger *dbg,
     case ALDO_CONSOLE_ALDO8:
         return new_aldo8(dbg, tracelog);
     case ALDO_CONSOLE_NES:
-        // TODO: implement
+        return new_nes(dbg, tracelog);
         break;
     default:
         assert(((void)"INVALID CONSOLE TYPE", false));
@@ -268,9 +268,11 @@ int aldo_console_max_tcpu()
     return Aldo_MaxTCycle;
 }
 
-size_t aldo_console_ram_size(enum aldo_console_type t)
+size_t aldo_console_ram_size(aldo_console *self)
 {
-    switch (t) {
+    assert(self != nullptr);
+
+    switch (self->type) {
     case ALDO_CONSOLE_ALDO8:
         return Aldo_Aldo8RamSize;
     case ALDO_CONSOLE_NES:
@@ -282,13 +284,15 @@ size_t aldo_console_ram_size(enum aldo_console_type t)
     return 0;
 }
 
-void aldo_console_screen_size(enum aldo_console_type t, int *width, int *height)
+void aldo_console_screen_size(aldo_console *self, int *width, int *height)
 {
+    assert(self != nullptr);
     assert(width != nullptr);
     assert(height != nullptr);
 
-    if (t == ALDO_CONSOLE_NES) {
-        // TODO: implement
+    if (self->type == ALDO_CONSOLE_NES) {
+        *width = Aldo_NesScreenWidth;
+        *height = Aldo_NesScreenHeight;
     } else {
         *width = 0;
         *height = 0;
@@ -391,9 +395,6 @@ void aldo_console_clock(aldo_console *self, struct aldo_clock *clock)
     reset_snapshot(self);
     while (clock->budget > 0 && !aldo_console_halted(self)) {
         clock_system(self, clock);
-        if (aldo_debug_break(self->dbg, clock)) {
-            aldo_console_halt(self, true);
-        }
     }
     snapshot_core(self);
 }
@@ -403,8 +404,7 @@ int aldo_console_cycle_factor(aldo_console *self)
     assert(self != nullptr);
 
     if (self->type == ALDO_CONSOLE_NES) {
-        // TODO: implement
-        return 0;
+        return aldo_nes_cycle_factor();
     }
 
     return 1;
@@ -415,8 +415,7 @@ int aldo_console_frame_factor(aldo_console *self)
     assert(self != nullptr);
 
     if (self->type == ALDO_CONSOLE_NES) {
-        // TODO: implement
-        return 0;
+        return aldo_nes_frame_factor();
     }
 
     return 0;
@@ -436,4 +435,6 @@ void aldo_console_dumpram(aldo_console *self, FILE *fs[static 3],
     assert(self != nullptr);
     assert(fs != nullptr);
     assert(errs != nullptr);
+
+    // TODO: dump ram
 }

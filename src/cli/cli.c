@@ -11,11 +11,11 @@
 #include "bytes.h"
 #include "cart.h"
 #include "cliargs.h"
+#include "console.h"
 #include "debug.h"
 #include "dis.h"
 #include "emu.h"
 #include "haltexpr.h"
-#include "nes.h"
 #include "snapshot.h"
 #include "ui.h"
 #include "version.h"
@@ -194,10 +194,10 @@ static ui_loop *setup_ui(struct emulator *emu)
 {
     auto loop = ui_curses_loop;
     if (emu->args->batch) {
-        aldo_nes_halt(emu->console, false);
+        aldo_console_halt(emu->console, false);
         loop = ui_batch_loop;
     }
-    aldo_nes_set_snapshot(emu->console, &emu->snapshot);
+    aldo_console_set_snapshot(emu->console, &emu->snapshot);
     return loop;
 }
 
@@ -221,7 +221,7 @@ static void dump_ram(const struct emulator *emu)
         }
     }
     bool errs[dmpcount];
-    aldo_nes_dumpram(emu->console, fs, errs);
+    aldo_console_dumpram(emu->console, fs, errs);
     for (size_t i = 0; i < dmpcount; ++i) {
         if (fs[i]) {
             if (errs[i]) {
@@ -263,7 +263,7 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
             goto exit_debug;
         }
     }
-    emu.console = aldo_nes_new(emu.debugger, emu.args->bcdsupport, tracelog);
+    emu.console = aldo_console_new(ALDO_CONSOLE_NES, emu.debugger, tracelog);
     if (!emu.console) {
         perror("Unable to initialize console");
         result = EXIT_FAILURE;
@@ -274,7 +274,7 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
         result = EXIT_FAILURE;
         goto exit_console;
     }
-    aldo_nes_powerupold(emu.console, c, emu.args->zeroram);
+    aldo_console_powerup(emu.console, c, emu.args->zeroram);
 
     auto run_loop = setup_ui(&emu);
     auto err = run_loop(&emu);
@@ -286,14 +286,14 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
         result = EXIT_FAILURE;
     }
     dump_ram(&emu);
-    aldo_nes_set_snapshot(emu.console, nullptr);
+    aldo_console_set_snapshot(emu.console, nullptr);
     aldo_snapshot_cleanup(&emu.snapshot);
 exit_console:
-    if (aldo_nes_tracefailed(emu.console)) {
+    if (aldo_console_tracefailed(emu.console)) {
         fputs("Trace file I/O failure\n", stderr);
         result = EXIT_FAILURE;
     }
-    aldo_nes_freeold(emu.console);
+    aldo_console_free(emu.console);
 exit_trace:
     if (tracelog) {
         fclose(tracelog);

@@ -21,9 +21,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-constexpr auto ScreenWidth = 256;
-constexpr auto ScreenHeight = 240;
-
 // The NES-001 NTSC Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
 struct aldo_nes001 {
@@ -33,7 +30,8 @@ struct aldo_nes001 {
     bool vbuf;                          // Current video buffer to fill
     uint8_t ram[ALDO_MEMBLOCK_2KB],     // CPU Internal RAM
             vram[ALDO_MEMBLOCK_2KB],    // PPU Internal RAM
-            vbufs[2][ScreenWidth * ScreenHeight];   // Double-buffered Video
+                                        // Double-buffered Video
+            vbufs[2][Aldo_NesScreenWidth * Aldo_NesScreenHeight];
 };
 
 static void mem_load(uint8_t *restrict d, const uint8_t *restrict mem,
@@ -230,7 +228,7 @@ static void set_screen_dot(struct aldo_nes001 *self)
     auto c = aldo_ppu_screendot(&self->ppu);
     if (c.dot < 0) return;
 
-    auto screendot = (size_t)(c.dot + (c.line * ScreenWidth));
+    auto screendot = (size_t)(c.dot + (c.line * Aldo_NesScreenWidth));
     assert(screendot < aldo_arrsz(self->vbufs[0]));
     self->vbufs[self->vbuf][screendot] = self->ppu.pxpl.px;
 }
@@ -252,54 +250,42 @@ static void snapshot_bus(const struct aldo_nes001 *self, struct aldo_snapshot *s
 {
     aldo_apu_snapshot(&self->apu, snp);
     aldo_ppu_bus_snapshot(&self->ppu, snp);
-    aldo_bus_copy(self->extends.cpu.mbus, ALDO_CPU_VECTOR_NMI,
-                  aldo_arrsz(snp->prg.vectors), snp->prg.vectors);
 }
 
-static void snapshot_gfx(struct aldo_nes001 *self)
+static void snapshot_gfx(struct aldo_nes001 *self, struct aldo_snapshot *snp)
 {
-    if (!self->extends.snp) return;
-
-    aldo_ppu_vid_snapshot(&self->ppu, self->extends.snp);
+    aldo_ppu_vid_snapshot(&self->ppu, snp);
     if (self->extends.cart) {
-        aldo_cart_snapshot(self->extends.cart, self->extends.snp);
+        aldo_cart_snapshot(self->extends.cart, snp);
     }
 }
 
-static void snapshot_screen(struct aldo_nes001 *self)
+static void snapshot_screen(struct aldo_nes001 *self, struct aldo_snapshot *snp)
 {
-    if (!self->extends.snp) return;
+    assert(snp->video != nullptr);
 
-    assert(self->extends.snp->video != nullptr);
-
-    self->extends.snp->video->screen = self->vbufs[!self->vbuf];
-    self->extends.snp->video->newframe = true;
+    snp->video->screen = self->vbufs[!self->vbuf];
+    snp->video->newframe = true;
 }
 
-static void snapshot_video(struct aldo_nes001 *self, bool framedone)
+static void snapshot_video(struct aldo_nes001 *self, struct aldo_snapshot *snp, bool framedone)
 {
     if (aldo_ppu_gfxsnp_dot(&self->ppu)) {
-        snapshot_gfx(self);
+        snapshot_gfx(self, snp);
     }
     if (framedone) {
-        snapshot_screen(self);
+        snapshot_screen(self, snp);
     }
 }
 
-static void snapshot_core(struct aldo_nes001 *self)
+static void snapshot_core(struct aldo_nes001 *self, struct aldo_snapshot *snp)
 {
-    auto snp = self->extends.snp;
     if (!snp) return;
 
-    auto prg = &snp->prg;
-    assert(prg->curr != nullptr);
-
-    snapshot_bus(self, snp);
+    aldo_apu_snapshot(&self->apu, snp);
+    aldo_ppu_bus_snapshot(&self->ppu, snp);
     snp->mem.ram = self->ram;
     snp->mem.vram = self->vram;
-    prg->curr->length = aldo_bus_copy(self->extends.cpu.mbus,
-                                      snp->cpu.datapath.current_instruction,
-                                      aldo_arrsz(prg->curr->pc), prg->curr->pc);
 }
 
 static void reset_snapshot(struct aldo_snapshot *snp)
@@ -309,11 +295,11 @@ static void reset_snapshot(struct aldo_snapshot *snp)
     snp->video->newframe = false;
 }
 
-static void init_snapshot(struct aldo_nes001 *self)
+static void init_snapshot(struct aldo_nes001 *self, struct aldo_snapshot *snp)
 {
-    snapshot_core(self);
-    snapshot_gfx(self);
-    snapshot_screen(self);
+    snapshot_core(self, snp);
+    snapshot_gfx(self, snp);
+    snapshot_screen(self, snp);
 }
 
 //
@@ -346,19 +332,21 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
     set_ppu_pins(self);
     set_screen_dot(self);
     self->vbuf ^= framedone;
-    snapshot_video(self, framedone);
-    // TODO: ppu debug hook goes here
-    if (self->extends.mode == ALDO_EXC_STEP
-        && clock->rate_factor == aldo_nes_frame_factor()) {
-        aldo_nes_halt(self, framedone);
+    snapshot_video(self, self->extends.snp, framedone);
+
+    switch (self->extends.mode) {
+    case ALDO_EXC_SUBCYCLE:
+        aldo_console_halt(&self->extends, true);
+        break;
+    case ALDO_EXC_STEP:
+        aldo_console_halt(&self->extends, framedone
+                          && clock->rate_factor == aldo_nes_frame_factor());
+        break;
+    default:
+        break;
     }
-    if (++clock->subcycle < Aldo_PpuRatio) {
-        if (self->extends.mode == ALDO_EXC_SUBCYCLE) {
-            aldo_nes_halt(self, true);
-        }
-        return false;
-    }
-    return true;
+
+    return ++clock->subcycle >= Aldo_PpuRatio;
 }
 
 static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
@@ -368,23 +356,6 @@ static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
     clock->subcycle = 0;
     clock->cycles += (uint64_t)cycles;
     instruction_trace(self, clock, -cycles);
-
-    switch (self->extends.mode) {
-    // both cases are possible on cycle-boundary
-    case ALDO_EXC_SUBCYCLE:
-    case ALDO_EXC_CYCLE:
-        // TODO: what should these settings do in frame mode?
-        aldo_nes_halt(self, true);
-        break;
-    case ALDO_EXC_STEP:
-        if (clock->rate_factor == aldo_nes_cycle_factor()) {
-            aldo_nes_halt(self, self->extends.cpu.signal.sync);
-        }
-        break;
-    case ALDO_EXC_RUN:
-    default:
-        break;
-    }
 }
 
 //
@@ -442,16 +413,58 @@ void aldo_nes_free(aldo_console *self)
     aldo_bus_free(((struct aldo_nes001 *)self)->ppu.vbus);
 }
 
-void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
+int aldo_nes_cycle_factor()
+{
+    return Aldo_PpuRatio;
+}
+
+int aldo_nes_frame_factor()
+{
+    return Aldo_DotsPerFrame;
+}
+
+bool aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
 {
     assert(self != nullptr);
     assert(self->extends.type == ALDO_CONSOLE_NES);
+
+    if (clock_ppu(self, clock)) {
+        clock_cpu(self, clock);
+        return true;
+    }
+    return false;
+}
+
+void aldo_nes_snapshot_init(aldo_nes *self, struct aldo_snapshot *snp)
+{
+    assert(self != nullptr);
+    assert(self->extends.type == ALDO_CONSOLE_NES);
+    assert(snp != nullptr);
+
+    aldo_nes_snapshot_core(self, snp);
+    snapshot_gfx(self, snp);
+    snapshot_screen(self, snp);
 }
 
 void aldo_nes_snapshot_core(aldo_nes *self, struct aldo_snapshot *snp)
 {
     assert(self != nullptr);
     assert(self->extends.type == ALDO_CONSOLE_NES);
+    assert(snp != nullptr);
+
+    aldo_apu_snapshot(&self->apu, snp);
+    aldo_ppu_bus_snapshot(&self->ppu, snp);
+    snp->mem.ram = self->ram;
+    snp->mem.vram = self->vram;
+}
+
+void aldo_nes_snapshot_reset(aldo_nes *self, struct aldo_snapshot *snp)
+{
+    assert(self != nullptr);
+    assert(self->extends.type == ALDO_CONSOLE_NES);
+    assert(snp != nullptr);
+
+    snp->video->newframe = false;
 }
 
 //
@@ -535,8 +548,8 @@ void aldo_nes_screen_size(int *width, int *height)
     assert(width != nullptr);
     assert(height != nullptr);
 
-    *width = ScreenWidth;
-    *height = ScreenHeight;
+    *width = Aldo_NesScreenWidth;
+    *height = Aldo_NesScreenHeight;
 }
 
 bool aldo_nes_bcd_support(aldo_nes *self)
@@ -639,15 +652,15 @@ void aldo_nes_clockold(aldo_nes *self, struct aldo_clock *clock)
             aldo_nes_halt(self, true);
         }
     }
-    snapshot_core(self);
+    snapshot_core(self, self->extends.snp);
 }
 
-int aldo_nes_cycle_factor()
+int aldo_nes_cycle_factorold()
 {
     return Aldo_PpuRatio;
 }
 
-int aldo_nes_frame_factor()
+int aldo_nes_frame_factorold()
 {
     return Aldo_DotsPerFrame;
 }
@@ -657,7 +670,7 @@ void aldo_nes_set_snapshot(aldo_nes *self, struct aldo_snapshot *snp)
     assert(self != nullptr);
 
     self->extends.snp = snp;
-    init_snapshot(self);
+    init_snapshot(self, snp);
 }
 
 void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3], bool errs[static 3])

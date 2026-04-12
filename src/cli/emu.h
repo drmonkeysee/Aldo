@@ -11,14 +11,14 @@
 #include "debug.h"
 #include "cart.h"
 #include "cliargs.h"
-#include "nes.h"
+#include "console.h"
 #include "snapshot.h"
 
 struct emulator {
     const struct cliargs *args; // Non-owning Pointer
     aldo_cart *cart;            // Non-owning Pointer
     aldo_debugger *debugger;
-    aldo_nes *console;
+    aldo_console *console;
     struct aldo_snapshot snapshot;
 };
 

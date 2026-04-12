@@ -6,11 +6,11 @@
 //
 
 #include "argparse.h"
+#include "console.h"
 #include "cycleclock.h"
 #include "debug.h"
 #include "emu.h"
 #include "haltexpr.h"
-#include "nes.h"
 #include "tsutil.h"
 #include "ui.h"
 
@@ -74,7 +74,7 @@ static void tick_start(struct runclock *c, const struct emulator *emu)
     c->clock.emutime = c->clock.runtime;
 
     // exit batch mode if emulator is halted
-    if (aldo_nes_halted(emu->console)) {
+    if (aldo_console_halted(emu->console)) {
         QuitSignal = 1;
     }
 }
@@ -137,7 +137,7 @@ int ui_batch_loop(struct emulator *emu)
     aldo_clock_start(&clock.clock);
     do {
         tick_start(&clock, emu);
-        aldo_nes_clock(emu->console, &clock.clock);
+        aldo_console_clock(emu->console, &clock.clock);
         update_progress(&clock);
         tick_end(&clock);
     } while (QuitSignal == 0);

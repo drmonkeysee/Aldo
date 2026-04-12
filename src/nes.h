@@ -20,6 +20,8 @@ struct aldo_clock;
 struct aldo_snapshot;
 typedef struct aldo_nes001 aldo_nes;
 
+constexpr int Aldo_NesScreenWidth = 256;
+constexpr int Aldo_NesScreenHeight = 240;
 extern const size_t Aldo_NesSize, Aldo_NesRamSize;
 
 bool aldo_nes_init(aldo_nes *self);
@@ -27,8 +29,14 @@ void aldo_nes_powerup(aldo_nes *self, bool zeroram);
 void aldo_nes_disconnect(aldo_console *self);
 void aldo_nes_free(aldo_console *self);
 
-void aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock);
+int aldo_nes_cycle_factor();
+int aldo_nes_frame_factor();
+
+bool aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock);
+void aldo_nes_snapshot_init(aldo_nes *self, struct aldo_snapshot *snp);
 void aldo_nes_snapshot_core(aldo_nes *self, struct aldo_snapshot *snp);
+void aldo_nes_snapshot_reset(aldo_nes *self, struct aldo_snapshot *snp);
+
 
 #include "bridgeopen.h"
 // if returns null then errno is set due to failed allocation
@@ -71,9 +79,9 @@ void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal,
 aldo_export
 void aldo_nes_clockold(aldo_nes *self, struct aldo_clock *clock) aldo_nothrow;
 aldo_export
-int aldo_nes_cycle_factor() aldo_nothrow;
+int aldo_nes_cycle_factorold() aldo_nothrow;
 aldo_export
-int aldo_nes_frame_factor() aldo_nothrow;
+int aldo_nes_frame_factorold() aldo_nothrow;
 
 aldo_export
 void aldo_nes_set_snapshot(aldo_nes *self, struct aldo_snapshot *snp) aldo_nothrow;

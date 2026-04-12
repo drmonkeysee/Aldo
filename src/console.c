@@ -154,6 +154,7 @@ static void setup(struct aldo_console_base *self, aldo_debugger *dbg,
     self->tracelog = tracelog;
     self->halted = self->cpu.bcd = self->probe.rdy = true;
     self->tracefailed = self->probe.irq = self->probe.nmi = self->probe.rst = false;
+    self->params = (typeof(self->params)){.cyclefactor = 1};
     aldo_debug_cpu_connect(self->dbg, &self->cpu);
 }
 
@@ -273,16 +274,7 @@ size_t aldo_console_ram_size(aldo_console *self)
 {
     assert(self != nullptr);
 
-    switch (self->type) {
-    case ALDO_CONSOLE_ALDO8:
-        return Aldo_Aldo8RamSize;
-    case ALDO_CONSOLE_NES:
-        return Aldo_NesRamSize;
-    default:
-        assert(((void)"INVALID CONSOLE TYPE", false));
-        break;
-    }
-    return 0;
+    return self->params.ramsize;
 }
 
 void aldo_console_screen_size(aldo_console *self, int *width, int *height)
@@ -291,13 +283,22 @@ void aldo_console_screen_size(aldo_console *self, int *width, int *height)
     assert(width != nullptr);
     assert(height != nullptr);
 
-    if (self->type == ALDO_CONSOLE_NES) {
-        *width = Aldo_NesScreenWidth;
-        *height = Aldo_NesScreenHeight;
-    } else {
-        *width = 0;
-        *height = 0;
-    }
+    *width = self->params.screenw;
+    *height = self->params.screenh;
+}
+
+int aldo_console_cycle_factor(aldo_console *self)
+{
+    assert(self != nullptr);
+
+    return self->params.cyclefactor;
+}
+
+int aldo_console_frame_factor(aldo_console *self)
+{
+    assert(self != nullptr);
+
+    return self->params.framefactor;
 }
 
 bool aldo_console_bcd_support(aldo_console *self)
@@ -398,28 +399,6 @@ void aldo_console_clock(aldo_console *self, struct aldo_clock *clock)
         clock_system(self, clock);
     }
     snapshot_core(self);
-}
-
-int aldo_console_cycle_factor(aldo_console *self)
-{
-    assert(self != nullptr);
-
-    if (self->type == ALDO_CONSOLE_NES) {
-        return aldo_nes_cycle_factor();
-    }
-
-    return 1;
-}
-
-int aldo_console_frame_factor(aldo_console *self)
-{
-    assert(self != nullptr);
-
-    if (self->type == ALDO_CONSOLE_NES) {
-        return aldo_nes_frame_factor();
-    }
-
-    return 0;
 }
 
 void aldo_console_set_snapshot(aldo_console *self, struct aldo_snapshot *snp)

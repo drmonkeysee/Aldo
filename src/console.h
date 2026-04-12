@@ -48,6 +48,10 @@ aldo_export
 void aldo_console_screen_size(aldo_console *self, int *width,
                               int *height) aldo_nothrow;
 aldo_export
+int aldo_console_cycle_factor(aldo_console *self) aldo_nothrow;
+aldo_export
+int aldo_console_frame_factor(aldo_console *self) aldo_nothrow;
+aldo_export
 bool aldo_console_bcd_support(aldo_console *self) aldo_nothrow;
 aldo_export
 bool aldo_console_tracefailed(aldo_console *self) aldo_nothrow;
@@ -70,10 +74,6 @@ void aldo_console_set_probe(aldo_console *self, enum aldo_interrupt signal,
 aldo_export
 void aldo_console_clock(aldo_console *self,
                         struct aldo_clock *clock) aldo_nothrow;
-aldo_export
-int aldo_console_cycle_factor(aldo_console *self) aldo_nothrow;
-aldo_export
-int aldo_console_frame_factor(aldo_console *self) aldo_nothrow;
 
 aldo_export
 void aldo_console_set_snapshot(aldo_console *self,

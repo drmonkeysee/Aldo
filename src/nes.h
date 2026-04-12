@@ -20,17 +20,12 @@ struct aldo_clock;
 struct aldo_snapshot;
 typedef struct aldo_nes001 aldo_nes;
 
-constexpr int Aldo_NesScreenWidth = 256;
-constexpr int Aldo_NesScreenHeight = 240;
-extern const size_t Aldo_NesSize, Aldo_NesRamSize;
+extern const size_t Aldo_NesSize;
 
 bool aldo_nes_init(aldo_nes *self);
 void aldo_nes_powerup(aldo_nes *self, bool zeroram);
 void aldo_nes_disconnect(aldo_console *self);
 void aldo_nes_free(aldo_console *self);
-
-int aldo_nes_cycle_factor();
-int aldo_nes_frame_factor();
 
 bool aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock);
 void aldo_nes_snapshot_init(aldo_nes *self, struct aldo_snapshot *snp);

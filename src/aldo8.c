@@ -75,15 +75,14 @@ static bool create_mbus(struct aldo_aldo8_console *self)
 // MARK: - Public Interface
 //
 
-const size_t
-    Aldo_Aldo8Size = sizeof(struct aldo_aldo8_console),
-    Aldo_Aldo8RamSize = aldo_arrsz(((struct aldo_aldo8_console *)nullptr)->ram);
+const size_t Aldo_Aldo8Size = sizeof(struct aldo_aldo8_console);
 
 bool aldo_aldo8_init(aldo_aldo8 *self)
 {
     assert(self != nullptr);
     assert(self->extends.type == ALDO_CONSOLE_ALDO8);
 
+    self->extends.params.ramsize = aldo_arrsz(self->ram);
     return create_mbus(self);
 }
 

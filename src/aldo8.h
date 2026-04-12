@@ -14,7 +14,7 @@ struct aldo_clock;
 struct aldo_snapshot;
 typedef struct aldo_aldo8_console aldo_aldo8;
 
-extern const size_t Aldo_Aldo8Size, Aldo_Aldo8RamSize;
+extern const size_t Aldo_Aldo8Size;
 
 bool aldo_aldo8_init(aldo_aldo8 *self);
 void aldo_aldo8_powerup(aldo_aldo8 *self, bool zeroram);

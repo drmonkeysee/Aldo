@@ -21,6 +21,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+constexpr auto ScreenWidth = 256;
+constexpr auto ScreenHeight = 240;
+
 // The NES-001 NTSC Motherboard including the CPU/APU, PPU, RAM, VRAM,
 // Cartridge RAM/ROM and Controller Input.
 struct aldo_nes001 {
@@ -30,8 +33,7 @@ struct aldo_nes001 {
     bool vbuf;                          // Current video buffer to fill
     uint8_t ram[ALDO_MEMBLOCK_2KB],     // CPU Internal RAM
             vram[ALDO_MEMBLOCK_2KB],    // PPU Internal RAM
-                                        // Double-buffered Video
-            vbufs[2][Aldo_NesScreenWidth * Aldo_NesScreenHeight];
+            vbufs[2][ScreenWidth * ScreenHeight];   // Double-buffered Video
 };
 
 static void mem_load(uint8_t *restrict d, const uint8_t *restrict mem,
@@ -228,7 +230,7 @@ static void set_screen_dot(struct aldo_nes001 *self)
     auto c = aldo_ppu_screendot(&self->ppu);
     if (c.dot < 0) return;
 
-    auto screendot = (size_t)(c.dot + (c.line * Aldo_NesScreenWidth));
+    auto screendot = (size_t)(c.dot + (c.line * ScreenWidth));
     assert(screendot < aldo_arrsz(self->vbufs[0]));
     self->vbufs[self->vbuf][screendot] = self->ppu.pxpl.px;
 }
@@ -245,12 +247,6 @@ static void set_cpu_pins(struct aldo_nes001 *self)
 //
 // MARK: - Snapshotting
 //
-
-static void snapshot_bus(const struct aldo_nes001 *self, struct aldo_snapshot *snp)
-{
-    aldo_apu_snapshot(&self->apu, snp);
-    aldo_ppu_bus_snapshot(&self->ppu, snp);
-}
 
 static void snapshot_gfx(struct aldo_nes001 *self, struct aldo_snapshot *snp)
 {
@@ -340,7 +336,7 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
         aldo_console_halt(&self->extends, true);
         break;
     case ALDO_EXC_STEP:
-        if (clock->rate_factor == aldo_nes_frame_factor()) {
+        if (clock->rate_factor == self->extends.params.framefactor) {
             aldo_console_halt(&self->extends, framedone);
         }
         break;
@@ -364,9 +360,7 @@ static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
 // MARK: - Public Interface
 //
 
-const size_t
-    Aldo_NesSize = sizeof(struct aldo_nes001),
-    Aldo_NesRamSize = aldo_arrsz(((struct aldo_nes001 *)nullptr)->ram);
+const size_t Aldo_NesSize = sizeof(struct aldo_nes001);
 
 bool aldo_nes_init(aldo_nes *self)
 {
@@ -375,6 +369,13 @@ bool aldo_nes_init(aldo_nes *self)
 
     // NES does not support Binary-Coded Decimal mode
     self->vbuf = self->extends.cpu.bcd = false;
+    self->extends.params = (typeof(self->extends.params)){
+        aldo_arrsz(self->ram),
+        Aldo_PpuRatio,
+        Aldo_DotsPerFrame,
+        ScreenHeight,
+        ScreenWidth,
+    };
 
     // uninitialized vbuffer can have out-of-range palette values
     for (size_t i = 0; i < aldo_arrsz(self->vbufs); ++i) {
@@ -413,16 +414,6 @@ void aldo_nes_free(aldo_console *self)
     assert(self->type == ALDO_CONSOLE_NES);
 
     aldo_bus_free(((struct aldo_nes001 *)self)->ppu.vbus);
-}
-
-int aldo_nes_cycle_factor()
-{
-    return Aldo_PpuRatio;
-}
-
-int aldo_nes_frame_factor()
-{
-    return Aldo_DotsPerFrame;
 }
 
 bool aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
@@ -550,8 +541,8 @@ void aldo_nes_screen_size(int *width, int *height)
     assert(width != nullptr);
     assert(height != nullptr);
 
-    *width = Aldo_NesScreenWidth;
-    *height = Aldo_NesScreenHeight;
+    *width = ScreenWidth;
+    *height = ScreenHeight;
 }
 
 bool aldo_nes_bcd_support(aldo_nes *self)

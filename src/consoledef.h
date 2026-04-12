@@ -19,6 +19,12 @@ struct aldo_console_base {
     void (*dconn)(aldo_console *);  // Optional type-specific disconnect
     void (*dtor)(aldo_console *);   // Optional type-specific cleanup
 
+    // Console System Parameters
+    struct {
+        size_t ramsize;
+        int cyclefactor, framefactor, screenh, screenw;
+    } params;
+
     // Console Components
     aldo_cart *cart;            // Program Cartridge; Non-owning Pointer
     aldo_debugger *dbg;         // Debugger Context; Non-owning Pointer

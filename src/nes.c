@@ -14,7 +14,6 @@
 #include "consoledef.h"
 #include "cpu.h"
 #include "cycleclock.h"
-#include "debug.h"
 #include "ppu.h"
 #include "snapshot.h"
 #include "trace.h"
@@ -181,41 +180,12 @@ static bool assert_vbus(aldo_cart* cart, bool connected)
     return info.format != ALDO_CRTF_INES;
 }
 
-static void connect_cart(struct aldo_nes001 *self, aldo_cart *c)
-{
-    self->extends.cart = c;
-    auto r = aldo_cart_mbus_connect(self->extends.cart, self->extends.cpu.mbus);
-    (void)r, assert(r);
-    r = aldo_cart_vbus_connect(self->extends.cart, self->ppu.vbus);
-    (void)r, assert(assert_vbus(self->extends.cart, r));
-    aldo_debug_sync_bus(self->extends.dbg);
-}
-
-static void disconnect_cart(struct aldo_nes001 *self)
-{
-    // Debugger may have been attached to a cart-less CPU bus so reset
-    // debugger even if there is no existing cart.
-    aldo_debug_reset(self->extends.dbg);
-    if (!self->extends.cart) return;
-    aldo_cart_vbus_disconnect(self->extends.cart, self->ppu.vbus);
-    aldo_cart_mbus_disconnect(self->extends.cart, self->extends.cpu.mbus);
-    self->extends.cart = nullptr;
-}
-
 static bool setup(struct aldo_nes001 *self)
 {
     if (!create_mbus(self)) return false;
     if (!create_vbus(self)) return false;
     aldo_ppu_connect(&self->ppu, self->extends.cpu.mbus);
     return true;
-}
-
-static void teardown(struct aldo_nes001 *self)
-{
-    disconnect_cart(self);
-    aldo_debug_cpu_disconnect(self->extends.dbg);
-    aldo_bus_free(self->ppu.vbus);
-    aldo_bus_free(self->extends.cpu.mbus);
 }
 
 static void set_ppu_pins(struct aldo_nes001 *self)
@@ -277,30 +247,6 @@ static void snapshot_video(struct aldo_nes001 *self, struct aldo_snapshot *snp,
     }
 }
 
-static void snapshot_core(struct aldo_nes001 *self, struct aldo_snapshot *snp)
-{
-    if (!snp) return;
-
-    aldo_apu_snapshot(&self->apu, snp);
-    aldo_ppu_bus_snapshot(&self->ppu, snp);
-    snp->mem.ram = self->ram;
-    snp->mem.vram = self->vram;
-}
-
-static void reset_snapshot(struct aldo_snapshot *snp)
-{
-    if (!snp) return;
-
-    snp->video->newframe = false;
-}
-
-static void init_snapshot(struct aldo_nes001 *self, struct aldo_snapshot *snp)
-{
-    snapshot_core(self, snp);
-    snapshot_gfx(self, snp);
-    snapshot_screen(self, snp);
-}
-
 //
 // MARK: - Clocking
 //
@@ -309,19 +255,17 @@ static void init_snapshot(struct aldo_nes001 *self, struct aldo_snapshot *snp)
 static void instruction_trace(struct aldo_nes001 *self,
                               const struct aldo_clock *clock, int adjustment)
 {
-    if (!self->extends.tracelog || self->extends.tracefailed
-        || !self->extends.cpu.signal.sync) return;
+    auto super = &self->extends;
+    if (!super->tracelog || super->tracefailed || !super->cpu.signal.sync) return;
 
     struct aldo_snapshot snp = {};
-    aldo_cpu_snapshot(&self->extends.cpu, &snp);
+    aldo_cpu_snapshot(&super->cpu, &snp);
     aldo_ppu_bus_snapshot(&self->ppu, &snp);
     // Trace the cycle/pixel count up to the current instruction so
     // do NOT count the just-executed instruction fetch cycle.
-    self->extends.tracefailed = !aldo_trace_line(self->extends.tracelog,
-                                                 adjustment,
-                                                 clock->cycles, &self->extends.cpu,
-                                                 &self->ppu, self->extends.dbg,
-                                                 &snp);
+    super->tracefailed = !aldo_trace_line(super->tracelog, adjustment,
+                                          clock->cycles, &super->cpu,
+                                          &self->ppu, super->dbg, &snp);
 }
 
 static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
@@ -465,221 +409,6 @@ void aldo_nes_snapshot_core(aldo_nes *self, struct aldo_snapshot *snp)
     snp->mem.vram = self->vram;
 }
 
-void aldo_nes_snapshot_reset(aldo_nes *self, struct aldo_snapshot *snp)
-{
-    assert(self != nullptr);
-    assert(self->extends.type == ALDO_CONSOLE_NES);
-    assert(snp != nullptr);
-
-    snp->video->newframe = false;
-}
-
-//
-// MARK: - Old
-//
-/*
-aldo_nes *aldo_nes_new(aldo_debugger *dbg, bool bcdsupport, FILE *tracelog)
-{
-    assert(dbg != nullptr);
-
-    struct aldo_nes001 *self = malloc(sizeof *self);
-    if (!self) return self;
-
-    self->extends.cart = nullptr;
-    self->extends.dbg = dbg;
-    self->extends.tracelog = tracelog;
-    // TODO: ditch this option when aldo can emulate more than just NES
-    self->extends.cpu.bcd = bcdsupport;
-    self->extends.halted = self->extends.probe.rdy = true;
-    self->extends.tracefailed = self->vbuf = self->extends.probe.irq = self->extends.probe.nmi =
-        self->extends.probe.rst = false;
-    // uninitialized vbuffer can have out-of-range palette values
-    for (size_t i = 0; i < aldo_arrsz(self->vbufs); ++i) {
-        aldo_memclr(self->vbufs[i]);
-    }
-    if (!setup(self)) {
-        aldo_nes_freeold(self);
-        return nullptr;
-    }
-    return self;
-}
-
-void aldo_nes_freeold(aldo_nes *self)
-{
-    assert(self != nullptr);
-
-    teardown(self);
-    free(self);
-}
-
-void aldo_nes_powerupold(aldo_nes *self, aldo_cart *c, bool zeroram)
-{
-    assert(self != nullptr);
-    assert(self->extends.cart == nullptr);
-
-    if (c) {
-        connect_cart(self, c);
-    }
-    if (zeroram) {
-        aldo_memclr(self->ram);
-        aldo_memclr(self->vram);
-        aldo_ppu_zeroram(&self->ppu);
-    }
-    aldo_apu_powerup(&self->apu);
-    aldo_ppu_powerup(&self->ppu);
-    self->extends.mode = ALDO_EXC_RUN;
-}
-
-void aldo_nes_powerdown(aldo_nes *self)
-{
-    assert(self != nullptr);
-
-    aldo_nes_halt(self, true);
-    disconnect_cart(self);
-}
-
-int aldo_nes_max_tcpu()
-{
-    return Aldo_MaxTCycle;
-}
-
-size_t aldo_nes_ram_size(aldo_nes *self)
-{
-    assert(self != nullptr);
-
-    return aldo_arrsz(self->ram);
-}
-
-void aldo_nes_screen_size(int *width, int *height)
-{
-    assert(width != nullptr);
-    assert(height != nullptr);
-
-    *width = ScreenWidth;
-    *height = ScreenHeight;
-}
-
-bool aldo_nes_bcd_support(aldo_nes *self)
-{
-    assert(self != nullptr);
-
-    return self->extends.cpu.bcd;
-}
-
-bool aldo_nes_tracefailed(aldo_nes *self)
-{
-    assert(self != nullptr);
-
-    return self->extends.tracefailed;
-}
-
-enum aldo_execmode aldo_nes_mode(aldo_nes *self)
-{
-    assert(self != nullptr);
-
-    return self->extends.mode;
-}
-
-void aldo_nes_set_mode(aldo_nes *self, enum aldo_execmode mode)
-{
-    assert(self != nullptr);
-
-    // force signed to check < 0 (underlying type may be uint)
-    self->extends.mode = (int)mode < 0 ? ALDO_EXC_COUNT - 1 : mode % ALDO_EXC_COUNT;
-}
-
-bool aldo_nes_halted(aldo_nes *self)
-{
-    assert(self != nullptr);
-
-    return self->extends.halted;
-}
-
-void aldo_nes_halt(aldo_nes *self, bool halt)
-{
-    assert(self != nullptr);
-
-    self->extends.halted = halt;
-}
-
-bool aldo_nes_probe(aldo_nes *self, enum aldo_interrupt signal)
-{
-    assert(self != nullptr);
-
-    switch (signal) {
-    case ALDO_INT_IRQ:
-        return self->extends.probe.irq;
-    case ALDO_INT_NMI:
-        return self->extends.probe.nmi;
-    case ALDO_INT_RDY:
-        return self->extends.probe.rdy;
-    case ALDO_INT_RST:
-        return self->extends.probe.rst;
-    default:
-        assert(((void)"INVALID NES PROBE", false));
-        return false;
-    }
-}
-
-void aldo_nes_set_probe(aldo_nes *self, enum aldo_interrupt signal, bool active)
-{
-    assert(self != nullptr);
-
-    switch (signal) {
-    case ALDO_INT_IRQ:
-        self->extends.probe.irq = active;
-        break;
-    case ALDO_INT_NMI:
-        self->extends.probe.nmi = active;
-        break;
-    case ALDO_INT_RDY:
-        self->extends.probe.rdy = active;
-        break;
-    case ALDO_INT_RST:
-        self->extends.probe.rst = active;
-        break;
-    default:
-        assert(((void)"INVALID NES PROBE", false));
-        break;
-    }
-}
-
-void aldo_nes_clockold(aldo_nes *self, struct aldo_clock *clock)
-{
-    assert(self != nullptr);
-    assert(clock != nullptr);
-
-    if (aldo_nes_halted(self)) return;
-
-    reset_snapshot(self->extends.snp);
-    while (clock->budget > 0 && !aldo_nes_halted(self)) {
-        if (!clock_ppu(self, clock)) continue;
-        clock_cpu(self, clock);
-        if (aldo_debug_break(self->extends.dbg, clock)) {
-            aldo_nes_halt(self, true);
-        }
-    }
-    snapshot_core(self, self->extends.snp);
-}
-
-int aldo_nes_cycle_factorold()
-{
-    return Aldo_PpuRatio;
-}
-
-int aldo_nes_frame_factorold()
-{
-    return Aldo_DotsPerFrame;
-}
-
-void aldo_nes_set_snapshot(aldo_nes *self, struct aldo_snapshot *snp)
-{
-    assert(self != nullptr);
-
-    self->extends.snp = snp;
-    init_snapshot(self, snp);
-}
-
 void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3], bool errs[static 3])
 {
     assert(self != nullptr);
@@ -697,4 +426,3 @@ void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3], bool errs[static 3])
         errs[2] = !aldo_ppu_dumpram(&self->ppu, f);
     }
 }
-*/

@@ -85,9 +85,8 @@ static void reset_snapshot(struct aldo_console_base *self)
 {
     if (!self->snp) return;
 
-    if (self->type == ALDO_CONSOLE_NES) {
-        aldo_nes_snapshot_reset((aldo_nes *)self, self->snp);
-    }
+    assert(self->snp->video != nullptr);
+    self->snp->video->newframe = false;
 }
 
 static void snapshot_core(struct aldo_console_base *self)
@@ -438,5 +437,7 @@ void aldo_console_dumpram(aldo_console *self, FILE *fs[static 3],
     assert(fs != nullptr);
     assert(errs != nullptr);
 
-    // TODO: dump ram
+    // TODO: dump ram for all types
+    assert(self->type == ALDO_CONSOLE_NES);
+    aldo_nes_dumpram((aldo_nes *)self, fs, errs);
 }

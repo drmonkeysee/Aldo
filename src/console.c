@@ -18,6 +18,17 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+static const char *typename(enum aldo_console_type t)
+{
+    switch (t) {
+#define X(s, n) case ALDO_##s: return n;
+        ALDO_CONSOLE_TYPE_X
+#undef X
+    default:
+        return "UNKNOWN CONSOLE TYPE";
+    }
+}
+
 //
 // MARK: System Clocking
 
@@ -274,29 +285,11 @@ int aldo_console_max_tcpu()
     return Aldo_MaxTCycle;
 }
 
-const char *aldo_console_typename(enum aldo_console_type t)
-{
-    switch (t) {
-#define X(s, n) case ALDO_##s: return n;
-        ALDO_CONSOLE_TYPE_X
-#undef X
-    default:
-        return "UNKNOWN CONSOLE TYPE";
-    }
-}
-
-enum aldo_console_type aldo_console_type(aldo_console *self)
-{
-    assert(self != nullptr);
-
-    return self->type;
-}
-
 const char *aldo_console_name(aldo_console *self)
 {
     assert(self != nullptr);
 
-    return aldo_console_typename(aldo_console_type(self));
+    return typename(self->type);
 }
 
 size_t aldo_console_ram_size(aldo_console *self)

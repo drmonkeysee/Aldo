@@ -85,6 +85,7 @@ public:
     Emulator(debug_handle d, console_handle c, const gui_platform& p);
     ~Emulator() { cleanup(); }
 
+    std::string_view name() const noexcept { return aldo_console_name(consolep()); }
     const std::filesystem::path& cartName() const noexcept { return cartname; }
     std::string_view displayCartName() const noexcept;
     std::optional<aldo_cartinfo> cartInfo() const;

@@ -2577,6 +2577,7 @@ private:
             dispDtTick = clock.ticktime_ms;
             dispDtLeft = vs.clock.tickLeft();
         }
+        ImGui::Text("Name: %s", emu.name().data());
         ImGui::Text("Input dT: %.3f", dispDtInput);
         ImGui::Text("Update dT: %.3f", dispDtUpdate);
         ImGui::Text("Render dT: %.3f", dispDtRender);

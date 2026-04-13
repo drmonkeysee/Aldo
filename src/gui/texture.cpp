@@ -30,13 +30,6 @@ constexpr auto operator*(const SDL_Point& p, int n) noexcept
     return SDL_Point{p.x * n, p.y * n};
 }
 
-[[maybe_unused]]
-auto screen_buffer_length() noexcept
-{
-    auto p = aldo::Emulator::screenSize();
-    return p.x * p.y;
-}
-
 class Tile {
 public:
     Tile(aldo::pt_tile chr, int col, int row, aldo::color_span c,
@@ -127,7 +120,6 @@ void aldo::VideoScreen::draw(const aldo::et::byte* vbuf,
     assert(vbuf != nullptr);
 
     auto data = tex.lock();
-    assert(data.size() == screen_buffer_length());
     for (auto i = 0; i < data.size(); ++i) {
         data.pixels[i] = p.getColor(vbuf[i]);
     }

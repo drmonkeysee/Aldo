@@ -65,22 +65,6 @@ aldo::Emulator::Emulator(aldo::debug_handle d, aldo::console_handle c,
     aldo_console_set_snapshot(consolep(), snapshotp());
 }
 
-std::string_view aldo::Emulator::displayCartName() const noexcept
-{
-    if (cartName().empty()) return aldo_cart_errstr(ALDO_CART_ERR_NOCART);
-
-    return cartName().native();
-}
-
-std::optional<aldo_cartinfo> aldo::Emulator::cartInfo() const
-{
-    if (!hcart) return {};
-
-    aldo_cartinfo info;
-    aldo_cart_getinfo(cartp(), &info);
-    return info;
-}
-
 void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
 {
     auto c = load_cart(filepath);

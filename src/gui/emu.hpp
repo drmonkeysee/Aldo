@@ -69,26 +69,25 @@ private:
 
 class ALDO_SIDEFX Emulator {
 public:
-    static SDL_Point screenSize() noexcept
-    {
-        // TODO: figure out how to propagate console type changes to here
-        SDL_Point res{256, 240};
-        //aldo_console_screen_size(&res.x, &res.y);
-        return res;
-    }
-
-    static int maxTCpu() noexcept
-    {
-        return aldo_console_max_tcpu();
-    }
+    static int maxTCpu() noexcept { return aldo_console_max_tcpu(); }
 
     Emulator(debug_handle d, console_handle c, const gui_platform& p);
     ~Emulator() { cleanup(); }
 
     std::string_view name() const noexcept { return aldo_console_name(consolep()); }
     const std::filesystem::path& cartName() const noexcept { return cartname; }
-    std::string_view displayCartName() const noexcept;
-    std::optional<aldo_cartinfo> cartInfo() const;
+    std::string_view displayCartName() const noexcept
+    {
+        if (cartName().empty()) return aldo_cart_errstr(ALDO_CART_ERR_NOCART);
+        return cartName().native();
+    }
+    std::optional<aldo_cartinfo> cartInfo() const
+    {
+        if (!hcart) return {};
+        aldo_cartinfo info;
+        aldo_cart_getinfo(cartp(), &info);
+        return info;
+    }
     const Debugger& debugger() const noexcept { return hdbg; }
     Debugger& debugger() noexcept { return hdbg; }
     const aldo_snapshot& snapshot() const noexcept { return hsnp.get(); }
@@ -99,6 +98,12 @@ public:
     bool halted() const noexcept { return aldo_console_halted(consolep()); }
     void halt(bool halt) noexcept { aldo_console_halt(consolep(), halt); }
     et::size ramSize() const noexcept { return aldo_console_ram_size(consolep()); }
+    SDL_Point screenSize() const noexcept
+    {
+        SDL_Point res;
+        aldo_console_screen_size(consolep(), &res.x, &res.y);
+        return res;
+    }
     int cycleFactor() const noexcept { return aldo_console_cycle_factor(consolep()); }
     int frameFactor() const noexcept { return aldo_console_frame_factor(consolep()); }
     bool bcdSupport() const noexcept

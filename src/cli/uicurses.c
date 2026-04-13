@@ -192,8 +192,8 @@ static int drawstats(const struct view *v, int cursor_y,
               vs->clock.scale == ALDO_CS_CYCLE
                 ? "Cycles per Second"
                 : "Frames per Second", clock->rate);
-    mvwprintw(v->content, cursor_y++, 0, "BCD Supported: %s",
-              emu->args->bcdsupport ? "Yes" : "No");
+    mvwprintw(v->content, cursor_y++, 0, "BCD Support: %s",
+              aldo_console_bcd_support(emu->console) ? "Yes" : "No");
     return cursor_y;
 }
 

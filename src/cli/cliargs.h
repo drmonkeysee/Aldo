@@ -16,9 +16,7 @@ struct cliargs {
     const char                  // Non-owning Pointers
         *chrdecode_prefix, *dbgfilepath, *filepath, *me;
     int chrscale, resetvector;
-    bool
-        batch, bcdsupport, chrdecode, disassemble, help, info, tron, verbose,
-        version, zeroram;
+    bool batch, chrdecode, disassemble, help, info, tron, verbose, version, zeroram;
 };
 
 #endif

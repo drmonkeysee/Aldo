@@ -23,7 +23,6 @@
 
 static const char
     *const restrict BatchLong = "--batch",
-    *const restrict BcdLong = "--bcd",
     *const restrict ChrDecodeLong = "--chr-decode",
     *const restrict ChrScaleLong = "--chr-scale",
     *const restrict DebugFileLong = "--dbg-file",
@@ -37,7 +36,6 @@ static const char
     *const restrict ZeroRamLong = "--zero-ram";
 
 constexpr char BatchShort = 'b';
-constexpr char BcdShort = 'D';
 constexpr char ChrDecodeShort = 'c';
 constexpr char ChrScaleShort = 's';
 constexpr char DebugFileShort = 'g';
@@ -212,7 +210,6 @@ static bool parse_arg(const char *arg, int *restrict argi, int argc,
     }
 
     setflag(args->batch, arg, BatchShort, BatchLong);
-    setflag(args->bcdsupport, arg, BcdShort, BcdLong);
     setflag(args->disassemble, arg, DisassembleShort, DisassembleLong);
     setflag(args->help, arg, HelpShort, HelpLong);
     setflag(args->info, arg, InfoShort, InfoLong);
@@ -285,8 +282,6 @@ void argparse_usage(const char *me)
     puts("\noptions (--alt)");
     printf("  -%-*c: run program in batch mode (%s)\n", cpad, BatchShort,
            BatchLong);
-    printf("  -%-*c: enable BCD (binary-coded decimal) support (%s)\n", cpad,
-           BcdShort, BcdLong);
     sprintf(buf, "-%c f", DebugFileShort);
     printf("  %-*s: line-delimited debugger file containing halt conditions\n"
            "  %-*s  and/or RESET vector override (%s f)\n", spad, buf, spad,

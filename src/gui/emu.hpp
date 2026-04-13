@@ -106,14 +106,8 @@ public:
     }
     int cycleFactor() const noexcept { return aldo_console_cycle_factor(consolep()); }
     int frameFactor() const noexcept { return aldo_console_frame_factor(consolep()); }
-    bool bcdSupport() const noexcept
-    {
-        return aldo_console_bcd_support(consolep());
-    }
-    aldo_execmode runMode() const noexcept
-    {
-        return aldo_console_mode(consolep());
-    }
+    bool bcdSupport() const noexcept { return aldo_console_bcd_support(consolep()); }
+    aldo_execmode runMode() const noexcept { return aldo_console_mode(consolep()); }
     void runMode(aldo_execmode mode) noexcept
     {
         aldo_console_set_mode(consolep(), mode);

@@ -94,6 +94,7 @@ void aldo_aldo8_powerup(aldo_aldo8 *self, bool zeroram)
     if (zeroram) {
         aldo_memclr(self->ram);
     }
+    aldo_cpu_powerup(&self->extends.cpu);
 }
 
 void aldo_aldo8_snapshot_core(aldo_aldo8 *self, struct aldo_snapshot *snp)

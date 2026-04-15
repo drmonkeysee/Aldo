@@ -217,9 +217,54 @@ static aldo_console *new_nes(aldo_debugger *dbg, FILE *tracelog)
     }
 }
 
+static bool swap_console(enum aldo_console_type t, enum aldo_cartformat f)
+{
+    switch (t) {
+    case ALDO_CONSOLE_NES:
+        return f != ALDO_CRTF_INES;
+    case ALDO_CONSOLE_ALDO8:
+        return f != ALDO_CRTF_RAW;
+    default:
+        assert(((void)"INVALID CONSOLE TYPE", false));
+        return true;
+    }
+}
+
 //
 // MARK: - Public Interface
 //
+
+bool aldo_console_poweron(aldo_console **cn, aldo_cart *c, aldo_debugger *dbg,
+                          struct aldo_snapshot *snp, FILE *tracelog, bool zeroram)
+{
+    assert(cn != nullptr);
+    assert(c != nullptr);
+    assert(dbg != nullptr);
+    assert(snp != nullptr);
+
+    struct aldo_cartinfo info;
+    aldo_cart_getinfo(c, &info);
+    aldo_console *self = *cn;
+    // TODO: add snapshot before powerup, add init snapshot to power up
+    if (!self || swap_console(self->type, info.format)) {
+        aldo_console *newcn = info.format == ALDO_CRTF_INES
+                                ? new_nes(dbg, tracelog)
+                                : new_aldo8(dbg, tracelog);
+        if (!newcn) return false;
+
+        if (self) {
+            aldo_console_powerdown(self);
+            aldo_console_free(self);
+        }
+        self = newcn;
+    } else {
+        aldo_console_powerdown(self);
+    }
+    aldo_console_powerup(self, c, zeroram);
+    aldo_console_set_snapshot(self, snp);
+    *cn = self;
+    return true;
+}
 
 //  TODO: combine with powerup and return error code
 aldo_console *aldo_console_new(enum aldo_console_type type, aldo_debugger *dbg,

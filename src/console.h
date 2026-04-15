@@ -33,6 +33,12 @@ struct aldo_snapshot;
 typedef struct aldo_console_base aldo_console;
 
 #include "bridgeopen.h"
+// if returns false then errno is set due to failed allocation and *cn is unchanged
+aldo_export aldo_checkerr
+bool aldo_console_poweron(aldo_console **cn, aldo_cart *c, aldo_debugger *dbg,
+                         struct aldo_snapshot *snp, FILE *tracelog,
+                         bool zeroram) aldo_nothrow;
+
 aldo_export aldo_ownresult
 // if returns null then errno is set due to failed allocation
 aldo_console *aldo_console_new(enum aldo_console_type type, aldo_debugger *dbg,

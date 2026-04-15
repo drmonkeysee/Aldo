@@ -303,6 +303,7 @@ void aldo_console_powerup(aldo_console *self, aldo_cart *c, bool zeroram)
     }
     self->mode = ALDO_EXC_RUN;
 
+    aldo_cpu_powerup(&self->cpu);
     switch (self->type) {
     case ALDO_CONSOLE_ALDO8:
         aldo_aldo8_powerup((aldo_aldo8 *)self, zeroram);

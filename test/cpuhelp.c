@@ -119,6 +119,7 @@ void setup_apu(struct aldo_rp2a03 *apu, struct aldo_mos6502 *cpu,
 {
     connect_cpu(cpu, ram, rom);
     aldo_apu_connect(apu, cpu);
+    aldo_cpu_powerup(cpu);
     aldo_apu_powerup(apu);
     reset_cpu(apu->cpu);
 }

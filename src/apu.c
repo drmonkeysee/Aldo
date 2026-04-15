@@ -149,8 +149,6 @@ void aldo_apu_powerup(struct aldo_rp2a03 *self)
 {
     assert(self != nullptr);
 
-    aldo_cpu_powerup(self->cpu);
-
     // powerup on a get cycle (in real hardware, put/get cycle is random)
     self->bflt = self->put = false;
     self->oam.hi = self->oam.lo = 0x0;

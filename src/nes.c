@@ -271,12 +271,11 @@ static void instruction_trace(struct aldo_nes001 *self,
 static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
 {
     auto framedone = aldo_ppu_cycle(&self->ppu);
-    clock->frames += (uint64_t)framedone;
-    --clock->budget;
     set_ppu_pins(self);
     set_screen_dot(self);
     self->vbuf ^= framedone;
-    snapshot_video(self, self->extends.snp, framedone);
+    --clock->budget;
+    clock->frames += (uint64_t)framedone;
 
     switch (self->extends.mode) {
     case ALDO_EXC_SUBCYCLE:
@@ -291,6 +290,7 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
         break;
     }
 
+    snapshot_video(self, self->extends.snp, framedone);
     return ++clock->subcycle >= Aldo_PpuRatio;
 }
 

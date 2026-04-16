@@ -45,6 +45,7 @@ static bool clock_cpu(struct aldo_console_base *self, struct aldo_clock *clock)
 {
     auto cycles = aldo_cpu_cycle(&self->cpu);
     set_cpu_pins(self);
+    --clock->budget;
     clock->cycles += (uint64_t)cycles;
     // TODO: trace
     //instruction_trace(self, clock, -cycles);

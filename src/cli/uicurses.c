@@ -57,7 +57,7 @@ struct viewstate {
     } clock;
     enum ram_selection ramselect;
     int ramsheet, total_ramsheets;
-    bool chipselect, running;
+    bool chipselect, multiram, running;
 };
 
 static void tick_sleep(struct runclock *c)
@@ -819,7 +819,9 @@ static void drawram(const struct view *v, const struct viewstate *vs,
 {
     static constexpr auto start_x = 5;
 
-    drawramtabs(v, vs);
+    if (vs->multiram) {
+        drawramtabs(v, vs);
+    }
 
     if (vs->ramselect == RSEL_PPU) {
         draw_ppumem(v, emu, start_x);
@@ -1024,11 +1026,15 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         vs->running = false;
         break;
     case 'r':
-        vs->ramselect = (vs->ramselect + 1) % RSEL_COUNT;
+        if (vs->multiram) {
+            vs->ramselect = (vs->ramselect + 1) % RSEL_COUNT;
+        }
         break;
     case 'R':
-        if ((int)--vs->ramselect < 0) {
-            vs->ramselect = RSEL_COUNT - 1;
+        if (vs->multiram) {
+            if ((int)--vs->ramselect < 0) {
+                vs->ramselect = RSEL_COUNT - 1;
+            }
         }
         break;
     case 's':
@@ -1085,6 +1091,7 @@ int ui_curses_loop(struct emulator *emu)
             },
             .oldrate = Aldo_MinFps,
         },
+        .multiram = aldo_console_type(emu->console) == ALDO_CONSOLE_NES,
         .running = true,
         .total_ramsheets = (int)aldo_console_ram_size(emu->console) / sheet_size,
     };

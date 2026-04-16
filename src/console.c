@@ -330,11 +330,18 @@ int aldo_console_max_tcpu()
     return Aldo_MaxTCycle;
 }
 
+enum aldo_console_type aldo_console_type(aldo_console *self)
+{
+    assert(self != nullptr);
+
+    return self->type;
+}
+
 const char *aldo_console_name(aldo_console *self)
 {
     assert(self != nullptr);
 
-    return typename(self->type);
+    return typename(aldo_console_type(self));
 }
 
 size_t aldo_console_ram_size(aldo_console *self)

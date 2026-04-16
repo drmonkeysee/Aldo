@@ -55,6 +55,8 @@ void aldo_console_powerdown(aldo_console *self) aldo_nothrow;
 aldo_export
 int aldo_console_max_tcpu() aldo_nothrow;
 aldo_export
+enum aldo_console_type aldo_console_type(aldo_console *self) aldo_nothrow;
+aldo_export
 const char *aldo_console_name(aldo_console *self) aldo_nothrow;
 aldo_export
 size_t aldo_console_ram_size(aldo_console *self) aldo_nothrow;

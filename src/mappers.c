@@ -34,10 +34,10 @@ struct ines_000_mapper {
     bool hmirroring;
 };
 
-static int load_blocks(uint8_t *restrict *mem, size_t size, FILE *f)
+static int load_blocks(uint8_t **mem, size_t size, FILE *f)
 {
     if (!(*mem = calloc(size, sizeof **mem))) return ALDO_CART_ERR_ERNO;
-    if (fread(*mem, sizeof **mem, size, f) < size) {
+    if (f && fread(*mem, sizeof **mem, size, f) < size) {
         if (feof(f)) return ALDO_CART_ERR_EOF;
         if (ferror(f)) return ALDO_CART_ERR_IO;
         return ALDO_CART_ERR_UNKNOWN;
@@ -355,7 +355,7 @@ static void ines_000_snapshot(struct aldo_mapper *self,
 int aldo_mapper_raw_create(struct aldo_mapper **m, FILE *f)
 {
     assert(m != nullptr);
-    assert(f != nullptr);
+    // if f is missing an empty ROM will be allocated
 
     struct raw_mapper *self = malloc(sizeof *self);
     if (!self) return ALDO_CART_ERR_ERNO;
@@ -371,6 +371,11 @@ int aldo_mapper_raw_create(struct aldo_mapper **m, FILE *f)
 
     // TODO: assume a 32KB ROM file (can i do mirroring later?)
     auto err = load_blocks(&self->rom, ALDO_MEMBLOCK_32KB, f);
+    // file was too big for prg address space (no bank-switching)
+    if (err == 0 && f && !(fgetc(f) == EOF && feof(f))) {
+        err = ALDO_CART_ERR_IMG_SIZE;
+    }
+
     if (err == 0) {
         *m = (struct aldo_mapper *)self;
     } else {
@@ -427,12 +432,10 @@ int aldo_mapper_ines_create(struct aldo_mapper **m,
     self->id = header->mapper_id;
 
     int err;
-    if (header->trainer) {
-        // skip 512 bytes of trainer data
-        if (fseek(f, 512, SEEK_CUR) != 0) {
-            err = ALDO_CART_ERR_ERNO;
-            goto cleanup;
-        }
+    // skip 512 bytes of trainer data
+    if (header->trainer && fseek(f, 512, SEEK_CUR) != 0) {
+        err = ALDO_CART_ERR_ERNO;
+        goto cleanup;
     }
 
     if (header->wram) {

@@ -29,6 +29,11 @@ static int detect_format(struct aldo_cartridge *self, FILE *f)
         *const restrict nesmagic = "NES\x1a",
         *const restrict nsfmagic = "NESM\x1a";
 
+    if (!f) {
+        self->info.format = ALDO_CRTF_RAW;
+        return 0;
+    }
+
     // grab first 8 bytes as a string to check file format
     char format[9];
 
@@ -98,12 +103,7 @@ static int parse_ines(struct aldo_cartridge *self, FILE *f)
 // header; if format cannot be determined, this is the default.
 static int parse_raw(struct aldo_cartridge *self, FILE *f)
 {
-    auto err = aldo_mapper_raw_create(&self->mapper, f);
-    // ROM file is too big for prg address space (no bank-switching)
-    if (err == 0 && !(fgetc(f) == EOF && feof(f))) {
-        err = ALDO_CART_ERR_IMG_SIZE;
-    }
-    return err;
+    return aldo_mapper_raw_create(&self->mapper, f);
 }
 
 static bool hr(FILE *f)
@@ -216,7 +216,6 @@ const char *aldo_cart_errstr(int err)
 int aldo_cart_create(aldo_cart **c, FILE *f)
 {
     assert(c != nullptr);
-    assert(f != nullptr);
 
     struct aldo_cartridge *self = malloc(sizeof *self);
     if (!self) return ALDO_CART_ERR_ERNO;

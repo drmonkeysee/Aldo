@@ -254,7 +254,6 @@ bool aldo_console_poweron(aldo_console **cn, aldo_cart *c, aldo_debugger *dbg,
         if (!newcn) return false;
 
         if (self) {
-            aldo_console_powerdown(self);
             aldo_console_free(self);
         }
         self = newcn;

@@ -197,7 +197,6 @@ static ui_loop *setup_ui(struct emulator *emu)
         aldo_console_halt(emu->console, false);
         loop = ui_batch_loop;
     }
-    aldo_console_set_snapshot(emu->console, &emu->snapshot);
     return loop;
 }
 
@@ -263,18 +262,17 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
             goto exit_debug;
         }
     }
-    emu.console = aldo_console_new(ALDO_CONSOLE_NES, emu.debugger, tracelog);
-    if (!emu.console) {
-        perror("Unable to initialize console");
-        result = EXIT_FAILURE;
-        goto exit_trace;
-    }
     if (!aldo_snapshot_extend(&emu.snapshot)) {
         perror("Unable to extend snapshot");
         result = EXIT_FAILURE;
-        goto exit_console;
+        goto exit_trace;
     }
-    aldo_console_powerup(emu.console, c, emu.args->zeroram);
+    if (!aldo_console_poweron(&emu.console, c, emu.debugger, &emu.snapshot,
+                              tracelog, emu.args->zeroram)) {
+        perror("Unable to initialize console");
+        result = EXIT_FAILURE;
+        goto exit_snapshot;
+    }
 
     auto run_loop = setup_ui(&emu);
     auto err = run_loop(&emu);
@@ -286,14 +284,13 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
         result = EXIT_FAILURE;
     }
     dump_ram(&emu);
-    aldo_console_set_snapshot(emu.console, nullptr);
-    aldo_snapshot_cleanup(&emu.snapshot);
-exit_console:
     if (aldo_console_tracefailed(emu.console)) {
         fputs("Trace file I/O failure\n", stderr);
         result = EXIT_FAILURE;
     }
     aldo_console_free(emu.console);
+exit_snapshot:
+    aldo_snapshot_cleanup(&emu.snapshot);
 exit_trace:
     if (tracelog) {
         fclose(tracelog);

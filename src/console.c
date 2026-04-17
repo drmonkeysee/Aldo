@@ -198,9 +198,6 @@ static aldo_console *new_nes(aldo_debugger *dbg, FILE *tracelog)
 
     setup(c, dbg, tracelog);
     c->type = ALDO_CONSOLE_NES;
-    c->conn = aldo_nes_cart_connect;
-    c->dconn = aldo_nes_cart_disconnect;
-    c->dtor = aldo_nes_cleanup;
 
     if (aldo_nes_init((aldo_nes *)c)) {
         return c;

@@ -180,14 +180,6 @@ static bool assert_vbus(aldo_cart* cart, bool connected)
     return info.format != ALDO_CRTF_INES;
 }
 
-static bool setup(struct aldo_nes001 *self)
-{
-    if (!create_mbus(self)) return false;
-    if (!create_vbus(self)) return false;
-    aldo_ppu_connect(&self->ppu, self->extends.cpu.mbus);
-    return true;
-}
-
 static void set_ppu_pins(struct aldo_nes001 *self)
 {
     // interrupt lines are active low
@@ -302,6 +294,52 @@ static void clock_cpu(struct aldo_nes001 *self, struct aldo_clock *clock)
 }
 
 //
+// MARK: - Lifecycle
+//
+
+static void cart_connect(aldo_console *self)
+{
+    assert(self != nullptr);
+    assert(self->type == ALDO_CONSOLE_NES);
+    assert(self->cart != nullptr);
+
+    auto r = aldo_cart_vbus_connect(self->cart,
+                                    ((struct aldo_nes001 *)self)->ppu.vbus);
+    (void)r, assert(assert_vbus(self->cart, r));
+}
+
+static void cart_disconnect(aldo_console *self)
+{
+    assert(self != nullptr);
+    assert(self->type == ALDO_CONSOLE_NES);
+    assert(self->cart != nullptr);
+
+    aldo_cart_vbus_disconnect(self->cart,
+                              ((struct aldo_nes001 *)self)->ppu.vbus);
+}
+
+static void cleanup(aldo_console *self)
+{
+    assert(self != nullptr);
+    assert(self->type == ALDO_CONSOLE_NES);
+
+    aldo_bus_free(((struct aldo_nes001 *)self)->ppu.vbus);
+}
+
+static bool setup(struct aldo_nes001 *self)
+{
+    if (!create_mbus(self)) return false;
+    if (!create_vbus(self)) return false;
+
+    self->extends.conn = cart_connect;
+    self->extends.dconn = cart_disconnect;
+    self->extends.dtor = cleanup;
+
+    aldo_ppu_connect(&self->ppu, self->extends.cpu.mbus);
+    return true;
+}
+
+//
 // MARK: - Public Interface
 //
 
@@ -341,35 +379,6 @@ void aldo_nes_powerup(aldo_nes *self, bool zeroram)
     }
     aldo_apu_powerup(&self->apu);
     aldo_ppu_powerup(&self->ppu);
-}
-
-void aldo_nes_cart_connect(aldo_console *self)
-{
-    assert(self != nullptr);
-    assert(self->type == ALDO_CONSOLE_NES);
-    assert(self->cart != nullptr);
-
-    auto r = aldo_cart_vbus_connect(self->cart,
-                                    ((struct aldo_nes001 *)self)->ppu.vbus);
-    (void)r, assert(assert_vbus(self->cart, r));
-}
-
-void aldo_nes_cart_disconnect(aldo_console *self)
-{
-    assert(self != nullptr);
-    assert(self->type == ALDO_CONSOLE_NES);
-    assert(self->cart != nullptr);
-
-    aldo_cart_vbus_disconnect(self->cart,
-                              ((struct aldo_nes001 *)self)->ppu.vbus);
-}
-
-void aldo_nes_cleanup(aldo_console *self)
-{
-    assert(self != nullptr);
-    assert(self->type == ALDO_CONSOLE_NES);
-
-    aldo_bus_free(((struct aldo_nes001 *)self)->ppu.vbus);
 }
 
 bool aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)

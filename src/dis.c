@@ -558,7 +558,7 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
     assert(dis != nullptr);
 
     struct aldo_dis_instruction inst;
-    auto err = aldo_dis_parsemem_inst(snp->prg.curr->length, snp->prg.curr->pc,
+    auto err = aldo_dis_parsemem_inst(snp->prg.curr.length, snp->prg.curr.pc,
                                       0, &inst);
     if (err < 0) return err;
 

@@ -302,8 +302,8 @@ static void drawinstructions(const struct view *v, int h, int y,
     auto addr = snp->cpu.datapath.current_instruction;
     char disassembly[AldoDisInstSize];
     for (auto i = 0; i < h - y; ++i) {
-        auto result = aldo_dis_parsemem_inst(snp->prg.curr->length,
-                                             snp->prg.curr->pc,
+        auto result = aldo_dis_parsemem_inst(snp->prg.curr.length,
+                                             snp->prg.curr.pc,
                                              inst.offset + inst.bv.size, &inst);
         if (result > 0) {
             result = aldo_dis_inst(addr, &inst, disassembly);
@@ -321,11 +321,11 @@ static void drawinstructions(const struct view *v, int h, int y,
 }
 
 static void drawvecs(const struct view *v, int h, int w, int y,
-                     const struct emulator *emu)
+                     const struct emulator *emu, const struct aldo_snapshot *snp)
 {
     mvwhline(v->content, h - y--, 0, 0, w);
 
-    auto vectors = emu->snapshot.prg.vectors;
+    auto vectors = snp->prg.vectors;
     auto lo = vectors[0];
     auto hi = vectors[1];
     mvwprintw(v->content, h - y--, 0, "%4X: %02X %02X     NMI $%04X",
@@ -348,7 +348,8 @@ static void drawvecs(const struct view *v, int h, int w, int y,
               ALDO_CPU_VECTOR_IRQ, lo, hi, aldo_bytowr(lo, hi));
 }
 
-static void drawprg(const struct view *v, const struct emulator *emu)
+static void drawprg(const struct view *v, const struct emulator *emu,
+                    const struct aldo_snapshot *snp)
 {
     static constexpr auto vector_offset = 4;
 
@@ -356,8 +357,8 @@ static void drawprg(const struct view *v, const struct emulator *emu)
     getmaxyx(v->content, h, w);
     werase(v->content);
 
-    drawinstructions(v, h, vector_offset, &emu->snapshot);
-    drawvecs(v, h, w, vector_offset, emu);
+    drawinstructions(v, h, vector_offset, snp);
+    drawvecs(v, h, w, vector_offset, emu, snp);
 }
 
 static int drawregisters(const struct view *v, int cursor_y,
@@ -727,7 +728,7 @@ static void drawramtabs(const struct view *v, const struct viewstate *vs)
     draw_tab_bar(v, vs->ramselect, 16, aldo_arrsz(offsets), offsets, labels);
 }
 
-static int draw_mempage(const struct view *v, const struct emulator *emu,
+static int draw_mempage(const struct view *v, uint8_t stack_pointer,
                         const uint8_t *mem, enum ram_selection sel,
                         int start_x, int cursor_y, int page, int page_offset,
                         int page_rows)
@@ -751,8 +752,7 @@ static int draw_mempage(const struct view *v, const struct emulator *emu,
                 ++skipped;
             } else {
                 bool sp = sel == RSEL_RAM && page == 1
-                            && ramidx % (size_t)RamPageSize
-                                == emu->snapshot.cpu.stack_pointer;
+                            && ramidx % (size_t)RamPageSize == stack_pointer;
                 if (sp) {
                     wattron(v->content, A_STANDOUT);
                 }
@@ -774,39 +774,38 @@ static int draw_mempage(const struct view *v, const struct emulator *emu,
 }
 
 static void draw_membanks(const struct view *v, const struct viewstate *vs,
-                          const struct emulator *emu, int start_x)
+                          const struct aldo_snapshot *snp, int start_x)
 {
     int cursor_y = 0, page_offset;
     const uint8_t *mem;
     if (vs->ramselect == RSEL_VRAM) {
         page_offset = 0x20;
-        mem = emu->snapshot.mem.vram;
+        mem = snp->mem.vram;
     } else {
         page_offset = 0;
-        mem = emu->snapshot.mem.ram;
+        mem = snp->mem.ram;
     }
     auto page_count = vs->total_ramsheets * 2;
     for (auto page = 0; page < page_count; ++page) {
-        cursor_y = draw_mempage(v, emu, mem, vs->ramselect, start_x, cursor_y,
-                                page, page_offset, RamDim);
+        cursor_y = draw_mempage(v, snp->cpu.stack_pointer, mem, vs->ramselect,
+                                start_x, cursor_y, page, page_offset, RamDim);
     }
     mvwvline(v->content, 0, start_x - 1, 0, getmaxy(v->content));
 }
 
-static void draw_ppumem(const struct view *v, const struct emulator *emu,
+static void draw_ppumem(const struct view *v, const struct aldo_snapshot *snp,
                         int start_x)
 {
     static constexpr auto sheeth = (RamDim * 2) + 1;
 
-    auto snp = &emu->snapshot;
-    auto cursor_y = draw_mempage(v, emu, snp->mem.oam, RSEL_PPU, start_x, 0, 0,
-                                 0, RamDim);
+    auto cursor_y = draw_mempage(v, snp->cpu.stack_pointer, snp->mem.oam,
+                                 RSEL_PPU, start_x, 0, 0, 0, RamDim);
     wclrtoeol(v->content);
-    cursor_y = draw_mempage(v, emu, snp->mem.secondary_oam, RSEL_PPU, start_x,
-                            cursor_y, 0, 0, 2);
+    cursor_y = draw_mempage(v, snp->cpu.stack_pointer, snp->mem.secondary_oam,
+                            RSEL_PPU, start_x, cursor_y, 0, 0, 2);
     wclrtoeol(v->content);
-    cursor_y = draw_mempage(v, emu, snp->mem.palette, RSEL_PPU, start_x,
-                            cursor_y, 0, 0x3f, 2);
+    cursor_y = draw_mempage(v, snp->cpu.stack_pointer, snp->mem.palette,
+                            RSEL_PPU, start_x, cursor_y, 0, 0x3f, 2);
     mvwhline(v->content, cursor_y - 1, 0, 0, getmaxx(v->content));
     do {
         wmove(v->content, cursor_y, 0);
@@ -815,7 +814,7 @@ static void draw_ppumem(const struct view *v, const struct emulator *emu,
 }
 
 static void drawram(const struct view *v, const struct viewstate *vs,
-                    const struct emulator *emu)
+                    const struct aldo_snapshot *snp)
 {
     static constexpr auto start_x = 5;
 
@@ -824,9 +823,9 @@ static void drawram(const struct view *v, const struct viewstate *vs,
     }
 
     if (vs->ramselect == RSEL_PPU) {
-        draw_ppumem(v, emu, start_x);
+        draw_ppumem(v, snp, start_x);
     } else {
-        draw_membanks(v, vs, emu, start_x);
+        draw_membanks(v, vs, snp, start_x);
     }
 }
 
@@ -1047,13 +1046,14 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
 static void refresh_ui(const struct layout *l, const struct viewstate *vs,
                        const struct emulator *emu)
 {
+    auto snp = aldo_console_snapshot(emu->console);
     drawsystem(&l->system, vs, emu);
     drawdebugger(&l->debugger, emu);
     drawcart(&l->cart, emu);
-    drawprg(&l->prg, emu);
-    drawcpu(&l->cpu, &emu->snapshot);
-    drawchip(&l->chip, vs, &emu->snapshot);
-    drawram(&l->ram, vs, emu);
+    drawprg(&l->prg, emu, snp);
+    drawcpu(&l->cpu, snp);
+    drawchip(&l->chip, vs, snp);
+    drawram(&l->ram, vs, snp);
 
     update_panels();
     ramrefresh(&l->ram, vs);

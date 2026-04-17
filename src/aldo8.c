@@ -96,11 +96,10 @@ void aldo_aldo8_powerup(aldo_aldo8 *self, bool zeroram)
     }
 }
 
-void aldo_aldo8_snapshot_core(aldo_aldo8 *self, struct aldo_snapshot *snp)
+void aldo_aldo8_snapshot_core(aldo_aldo8 *self)
 {
     assert(self != nullptr);
     assert(self->extends.type == ALDO_CONSOLE_ALDO8);
-    assert(snp != nullptr);
 
-    snp->mem.ram = self->ram;
+    self->extends.snp->mem.ram = self->ram;
 }

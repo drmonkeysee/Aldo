@@ -36,8 +36,7 @@ typedef struct aldo_console_base aldo_console;
 // if returns false then errno is set due to failed allocation and *cn is unchanged
 aldo_export aldo_checkerr
 bool aldo_console_poweron(aldo_console **cn, aldo_cart *c, aldo_debugger *dbg,
-                         struct aldo_snapshot *snp, FILE *tracelog,
-                         bool zeroram) aldo_nothrow;
+                         FILE *tracelog, bool zeroram) aldo_nothrow;
 aldo_export
 void aldo_console_free(aldo_console *self) aldo_nothrow;
 
@@ -80,6 +79,8 @@ aldo_export
 void aldo_console_clock(aldo_console *self,
                         struct aldo_clock *clock) aldo_nothrow;
 
+aldo_export
+const struct aldo_snapshot *aldo_console_snapshot(aldo_console *self) aldo_nothrow;
 aldo_export
 // TODO: need to query for buffer count
 void aldo_console_dumpram(aldo_console *self, FILE *fs[aldo_cz(3)],

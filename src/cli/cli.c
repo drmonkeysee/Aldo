@@ -16,7 +16,6 @@
 #include "dis.h"
 #include "emu.h"
 #include "haltexpr.h"
-#include "snapshot.h"
 #include "ui.h"
 #include "version.h"
 
@@ -262,16 +261,11 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
             goto exit_debug;
         }
     }
-    if (!aldo_snapshot_extend(&emu.snapshot)) {
-        perror("Unable to extend snapshot");
-        result = EXIT_FAILURE;
-        goto exit_trace;
-    }
-    if (!aldo_console_poweron(&emu.console, c, emu.debugger, &emu.snapshot,
-                              tracelog, emu.args->zeroram)) {
+    if (!aldo_console_poweron(&emu.console, c, emu.debugger, tracelog,
+                              emu.args->zeroram)) {
         perror("Unable to initialize console");
         result = EXIT_FAILURE;
-        goto exit_snapshot;
+        goto exit_trace;
     }
 
     auto run_loop = setup_ui(&emu);
@@ -289,8 +283,6 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
         result = EXIT_FAILURE;
     }
     aldo_console_free(emu.console);
-exit_snapshot:
-    aldo_snapshot_cleanup(&emu.snapshot);
 exit_trace:
     if (tracelog) {
         fclose(tracelog);

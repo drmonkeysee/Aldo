@@ -220,30 +220,28 @@ static void set_cpu_pins(struct aldo_nes001 *self)
 // MARK: - Snapshotting
 //
 
-static void snapshot_gfx(struct aldo_nes001 *self, struct aldo_snapshot *snp)
+static void snapshot_gfx(struct aldo_nes001 *self)
 {
-    aldo_ppu_vid_snapshot(&self->ppu, snp);
+    aldo_ppu_vid_snapshot(&self->ppu, self->extends.snp);
     if (self->extends.cart) {
-        aldo_cart_snapshot(self->extends.cart, snp);
+        aldo_cart_snapshot(self->extends.cart, self->extends.snp);
     }
 }
 
-static void snapshot_screen(struct aldo_nes001 *self, struct aldo_snapshot *snp)
+static void snapshot_screen(struct aldo_nes001 *self)
 {
-    assert(snp->video != nullptr);
-
-    snp->video->screen = self->vbufs[!self->vbuf];
-    snp->video->newframe = true;
+    auto video = &self->extends.snp->video;
+    video->screen = self->vbufs[!self->vbuf];
+    video->newframe = true;
 }
 
-static void snapshot_video(struct aldo_nes001 *self, struct aldo_snapshot *snp,
-                           bool framedone)
+static void snapshot_video(struct aldo_nes001 *self, bool framedone)
 {
     if (aldo_ppu_gfxsnp_dot(&self->ppu)) {
-        snapshot_gfx(self, snp);
+        snapshot_gfx(self);
     }
     if (framedone) {
-        snapshot_screen(self, snp);
+        snapshot_screen(self);
     }
 }
 
@@ -290,7 +288,7 @@ static bool clock_ppu(struct aldo_nes001 *self, struct aldo_clock *clock)
         break;
     }
 
-    snapshot_video(self, self->extends.snp, framedone);
+    snapshot_video(self, framedone);
     return ++clock->subcycle >= Aldo_PpuRatio;
 }
 
@@ -386,27 +384,25 @@ bool aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
     return false;
 }
 
-void aldo_nes_snapshot_init(aldo_nes *self, struct aldo_snapshot *snp)
+void aldo_nes_snapshot_init(aldo_nes *self)
 {
     assert(self != nullptr);
     assert(self->extends.type == ALDO_CONSOLE_NES);
-    assert(snp != nullptr);
 
-    aldo_nes_snapshot_core(self, snp);
-    snapshot_gfx(self, snp);
-    snapshot_screen(self, snp);
+    aldo_nes_snapshot_core(self);
+    snapshot_gfx(self);
+    snapshot_screen(self);
 }
 
-void aldo_nes_snapshot_core(aldo_nes *self, struct aldo_snapshot *snp)
+void aldo_nes_snapshot_core(aldo_nes *self)
 {
     assert(self != nullptr);
     assert(self->extends.type == ALDO_CONSOLE_NES);
-    assert(snp != nullptr);
 
-    aldo_apu_snapshot(&self->apu, snp);
-    aldo_ppu_bus_snapshot(&self->ppu, snp);
-    snp->mem.ram = self->ram;
-    snp->mem.vram = self->vram;
+    aldo_apu_snapshot(&self->apu, self->extends.snp);
+    aldo_ppu_bus_snapshot(&self->ppu, self->extends.snp);
+    self->extends.snp->mem.ram = self->ram;
+    self->extends.snp->mem.vram = self->vram;
 }
 
 void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3], bool errs[static 3])

@@ -320,14 +320,12 @@ static void ines_000_vbus_disconnect(aldo_bus *b)
     clear_chr_device(b);
 }
 
-static void ines_000_snapshot(struct aldo_mapper *self,
-                              struct aldo_snapshot *snp)
+static void ines_000_snapshot(struct aldo_mapper *self, struct aldo_snapshot *snp)
 {
     assert(self != nullptr);
     assert(snp != nullptr);
 
-    auto vsp = snp->video;
-    assert(vsp != nullptr);
+    auto vsp = &snp->video;
 
     auto m = (struct ines_000_mapper *)self;
     vsp->nt.mirror = m->hmirroring ? ALDO_NTM_HORIZONTAL : ALDO_NTM_VERTICAL;

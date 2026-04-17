@@ -30,7 +30,7 @@ struct aldo_console_base {
     // Console Components
     aldo_cart *cart;            // Program Cartridge; Non-owning Pointer
     aldo_debugger *dbg;         // Debugger Context; Non-owning Pointer
-    struct aldo_snapshot *snp;  // Console Snapshot; Non-owning Pointer
+    struct aldo_snapshot *snp;  // Console Snapshot
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
     struct aldo_mos6502 cpu;    // MOS 6502 CPU Core
     enum aldo_execmode mode;    // Console execution mode

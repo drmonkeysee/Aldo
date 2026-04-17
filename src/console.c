@@ -64,7 +64,7 @@ static void clock_system(struct aldo_console_base *self, struct aldo_clock *cloc
         aldo_console_halt(self, cputick);
         break;
     case ALDO_EXC_STEP:
-        if (clock->rate_factor == aldo_console_cycle_factor(self)) {
+        if (clock->rate_factor == self->params.cyclefactor) {
             aldo_console_halt(self, cputick && self->cpu.signal.sync);
         }
         break;
@@ -84,32 +84,27 @@ static void clock_system(struct aldo_console_base *self, struct aldo_clock *cloc
 
 static void reset_snapshot(struct aldo_console_base *self)
 {
-    if (!self->snp) return;
-
-    assert(self->snp->video != nullptr);
-    self->snp->video->newframe = false;
+    self->snp->video.newframe = false;
 }
 
 static void snapshot_core(struct aldo_console_base *self)
 {
     auto snp = self->snp;
-    if (!snp) return;
 
     aldo_cpu_snapshot(&self->cpu, self->snp);
     aldo_bus_copy(self->cpu.mbus, ALDO_CPU_VECTOR_NMI,
                   aldo_arrsz(snp->prg.vectors), snp->prg.vectors);
 
     auto prg = &snp->prg;
-    assert(prg->curr != nullptr);
-    prg->curr->length = aldo_bus_copy(self->cpu.mbus,
-                                      snp->cpu.datapath.current_instruction,
-                                      aldo_arrsz(prg->curr->pc), prg->curr->pc);
+    prg->curr.length = aldo_bus_copy(self->cpu.mbus,
+                                     snp->cpu.datapath.current_instruction,
+                                     aldo_arrsz(prg->curr.pc), prg->curr.pc);
     switch (self->type) {
     case ALDO_CONSOLE_ALDO8:
-        aldo_aldo8_snapshot_core((aldo_aldo8 *)self, snp);
+        aldo_aldo8_snapshot_core((aldo_aldo8 *)self);
         break;
     case ALDO_CONSOLE_NES:
-        aldo_nes_snapshot_core((aldo_nes *)self, snp);
+        aldo_nes_snapshot_core((aldo_nes *)self);
         break;
     default:
         assert(((void)"INVALID CONSOLE TYPE", false));
@@ -119,11 +114,10 @@ static void snapshot_core(struct aldo_console_base *self)
 
 static void init_snapshot(struct aldo_console_base *self)
 {
-    if (!self->snp) return;
-
+    aldo_snapshot_clear(self->snp);
     snapshot_core(self);
     if (self->type == ALDO_CONSOLE_NES) {
-        aldo_nes_snapshot_init((aldo_nes *)self, self->snp);
+        aldo_nes_snapshot_init((aldo_nes *)self);
     }
 }
 
@@ -158,9 +152,6 @@ static void disconnect_cart(struct aldo_console_base *self)
 static void setup(struct aldo_console_base *self, aldo_debugger *dbg,
                   FILE *tracelog)
 {
-    assert(self != nullptr);
-    assert(dbg != nullptr);
-
     self->dconn = nullptr;
     self->dtor = nullptr;
     self->cart = nullptr;
@@ -181,6 +172,7 @@ static void teardown(struct aldo_console_base *self)
         self->dtor(self);
     }
     aldo_bus_free(self->cpu.mbus);
+    free(self->snp);
 }
 
 static aldo_console *new_aldo8(aldo_debugger *dbg, FILE *tracelog)
@@ -263,17 +255,15 @@ void powerdown(struct aldo_console_base *self)
 //
 
 bool aldo_console_poweron(aldo_console **cn, aldo_cart *c, aldo_debugger *dbg,
-                          struct aldo_snapshot *snp, FILE *tracelog, bool zeroram)
+                          FILE *tracelog, bool zeroram)
 {
     assert(cn != nullptr);
     assert(c != nullptr);
     assert(dbg != nullptr);
-    assert(snp != nullptr);
 
     struct aldo_cartinfo info;
     aldo_cart_getinfo(c, &info);
     aldo_console *self = *cn;
-    // TODO: add snapshot before powerup, add init snapshot to power up
     if (!self || swap_console(self->type, info.format)) {
         aldo_console *newcn = info.format == ALDO_CRTF_INES
                                 ? new_nes(dbg, tracelog)
@@ -281,36 +271,23 @@ bool aldo_console_poweron(aldo_console **cn, aldo_cart *c, aldo_debugger *dbg,
         if (!newcn) return false;
 
         if (self) {
+            newcn->snp = self->snp;
+            self->snp = nullptr;
             aldo_console_free(self);
+        } else {
+            if (!(newcn->snp = calloc(1, sizeof *newcn->snp))) {
+                aldo_console_free(newcn);
+                return false;
+            }
         }
         self = newcn;
     } else {
         powerdown(self);
     }
     powerup(self, c, zeroram);
-    self->snp = snp;
     init_snapshot(self);
     *cn = self;
     return true;
-}
-
-//  TODO: combine with powerup and return error code
-aldo_console *aldo_console_new(enum aldo_console_type type, aldo_debugger *dbg,
-                               FILE *tracelog)
-{
-    assert(dbg != nullptr);
-
-    switch (type) {
-    case ALDO_CONSOLE_ALDO8:
-        return new_aldo8(dbg, tracelog);
-    case ALDO_CONSOLE_NES:
-        return new_nes(dbg, tracelog);
-        break;
-    default:
-        assert(((void)"INVALID CONSOLE TYPE", false));
-        break;
-    }
-    return nullptr;
 }
 
 void aldo_console_free(aldo_console *self)
@@ -469,6 +446,14 @@ void aldo_console_clock(aldo_console *self, struct aldo_clock *clock)
         clock_system(self, clock);
     }
     snapshot_core(self);
+}
+
+const struct aldo_snapshot *aldo_console_snapshot(aldo_console *self)
+{
+    assert(self != nullptr);
+    assert(self->snp != nullptr);
+
+    return self->snp;
 }
 
 void aldo_console_dumpram(aldo_console *self, FILE *fs[static 3],

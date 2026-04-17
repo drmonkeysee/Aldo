@@ -14,6 +14,10 @@
 #include <stdint.h>
 
 #include "bridgeopen.h"
+//
+// MARK: - Export
+//
+
 aldo_const size_t AldoPalSize = 4;
 // CHR bit-planes are 8 bits wide and 8 bytes tall; a CHR tile is a
 // 16-byte array of 2-bit palette-indexed pixels composed of two bit-planes
@@ -83,18 +87,16 @@ struct aldo_snapshot {
             *palette;
     } mem;
 
-    // Large fields below this point are managed via setup/cleanup to
-    // avoid ending up on the stack.
     struct {
         uint8_t vectors[6];
-        struct aldo_snpprg {
+        struct {
             size_t length;      // Number of bytes copied to pc
             uint8_t pc[96];     // 32 lines @ max 3-byte instructions
-        } *curr;
+        } curr;
     } prg;
 
     struct {
-        uint8_t *screen;        // Non-owning Pointer
+        const uint8_t *screen;  // Non-owning Pointer
         struct {
             enum aldo_ntmirror mirror;
             struct {
@@ -126,14 +128,14 @@ struct aldo_snapshot {
                     fg[AldoPalSize][AldoPalSize];
         } palettes;
         bool newframe;
-    } *video;
+    } video;
 };
 
-// if returns false then errno is set due to failed allocation
-aldo_export aldo_checkerr
-bool aldo_snapshot_extend(struct aldo_snapshot *snp) aldo_nothrow;
-aldo_export
-void aldo_snapshot_cleanup(struct aldo_snapshot *snp) aldo_nothrow;
+//
+// MARK: - Internal
+//
+
+void aldo_snapshot_clear(struct aldo_snapshot *snp) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

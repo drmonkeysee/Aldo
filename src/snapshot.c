@@ -10,27 +10,14 @@
 #include "bytes.h"
 
 #include <assert.h>
-#include <stdlib.h>
 
 static_assert(AldoPtTileCount * AldoChrTileStride == ALDO_MEMBLOCK_4KB,
               "Pattern table size mismatch");
 
-bool aldo_snapshot_extend(struct aldo_snapshot *snp)
+void aldo_snapshot_clear(struct aldo_snapshot *snp)
 {
     assert(snp != nullptr);
 
-    if (!(snp->prg.curr = malloc(sizeof *snp->prg.curr))) return false;
-    if (!(snp->video = malloc(sizeof *snp->video))) {
-        aldo_snapshot_cleanup(snp);
-        return false;
-    }
-    return true;
-}
-
-void aldo_snapshot_cleanup(struct aldo_snapshot *snp)
-{
-    assert(snp != nullptr);
-
-    free(snp->video);
-    free(snp->prg.curr);
+    snp->mem = (typeof(snp->mem)){};
+    snp->video.screen = nullptr;
 }

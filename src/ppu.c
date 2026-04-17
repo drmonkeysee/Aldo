@@ -377,9 +377,9 @@ static void snapshot_sprites(const struct aldo_rp2c02 *self,
                              struct aldo_snapshot *snp)
 {
     static_assert(aldo_arrsz(self->spr.oam)
-                  == (aldo_arrsz(snp->video->sprites.objects) * SpriteSize));
+                  == (aldo_arrsz(snp->video.sprites.objects) * SpriteSize));
 
-    auto sprites = &snp->video->sprites;
+    auto sprites = &snp->video.sprites;
 
     sprites->double_height = self->ctrl.h;
     for (size_t i = 0; i < aldo_arrsz(sprites->objects); ++i) {
@@ -645,7 +645,7 @@ static void write(struct aldo_rp2c02 *self)
 static void snapshot_nametables(const struct aldo_rp2c02 *self,
                                 struct aldo_snapshot *snp)
 {
-    auto vsp = snp->video;
+    auto vsp = &snp->video;
     vsp->nt.pt = self->ctrl.b;
 
     vsp->nt.pos.h = self->t & HNtBit;
@@ -1488,10 +1488,9 @@ void aldo_ppu_vid_snapshot(struct aldo_rp2c02 *self, struct aldo_snapshot *snp)
 {
     assert(self != nullptr);
     assert(snp != nullptr);
-    assert(snp->video != nullptr);
 
-    snapshot_palette(self, snp->video->palettes.bg, 0);
-    snapshot_palette(self, snp->video->palettes.fg, 0x10);
+    snapshot_palette(self, snp->video.palettes.bg, 0);
+    snapshot_palette(self, snp->video.palettes.fg, 0x10);
     snapshot_nametables(self, snp);
     snapshot_sprites(self, snp);
 }

@@ -38,19 +38,8 @@ aldo_export aldo_checkerr
 bool aldo_console_poweron(aldo_console **cn, aldo_cart *c, aldo_debugger *dbg,
                          struct aldo_snapshot *snp, FILE *tracelog,
                          bool zeroram) aldo_nothrow;
-
-aldo_export aldo_ownresult
-// if returns null then errno is set due to failed allocation
-aldo_console *aldo_console_new(enum aldo_console_type type, aldo_debugger *dbg,
-                               FILE *tracelog) aldo_nothrow;
 aldo_export
 void aldo_console_free(aldo_console *self) aldo_nothrow;
-
-aldo_export
-void aldo_console_powerup(aldo_console *self, aldo_cart *c,
-                          bool zeroram) aldo_nothrow;
-aldo_export
-void aldo_console_powerdown(aldo_console *self) aldo_nothrow;
 
 aldo_export
 int aldo_console_max_tcpu() aldo_nothrow;
@@ -91,9 +80,6 @@ aldo_export
 void aldo_console_clock(aldo_console *self,
                         struct aldo_clock *clock) aldo_nothrow;
 
-aldo_export
-void aldo_console_set_snapshot(aldo_console *self,
-                               struct aldo_snapshot *snp) aldo_nothrow;
 aldo_export
 // TODO: need to query for buffer count
 void aldo_console_dumpram(aldo_console *self, FILE *fs[aldo_cz(3)],

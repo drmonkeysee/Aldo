@@ -231,6 +231,33 @@ static bool swap_console(enum aldo_console_type t, enum aldo_cartformat f)
     }
 }
 
+void powerup(struct aldo_console_base *self, aldo_cart *c, bool zeroram)
+{
+    if (c) {
+        connect_cart(self, c);
+    }
+    self->mode = ALDO_EXC_RUN;
+
+    aldo_cpu_powerup(&self->cpu);
+    switch (self->type) {
+    case ALDO_CONSOLE_ALDO8:
+        aldo_aldo8_powerup((aldo_aldo8 *)self, zeroram);
+        break;
+    case ALDO_CONSOLE_NES:
+        aldo_nes_powerup((aldo_nes *)self, zeroram);
+        break;
+    default:
+        assert(((void)"INVALID CONSOLE TYPE", false));
+        break;
+    }
+}
+
+void powerdown(struct aldo_console_base *self)
+{
+    aldo_console_halt(self, true);
+    disconnect_cart(self);
+}
+
 //
 // MARK: - Public Interface
 //
@@ -258,10 +285,11 @@ bool aldo_console_poweron(aldo_console **cn, aldo_cart *c, aldo_debugger *dbg,
         }
         self = newcn;
     } else {
-        aldo_console_powerdown(self);
+        powerdown(self);
     }
-    aldo_console_powerup(self, c, zeroram);
-    aldo_console_set_snapshot(self, snp);
+    powerup(self, c, zeroram);
+    self->snp = snp;
+    init_snapshot(self);
     *cn = self;
     return true;
 }
@@ -291,38 +319,6 @@ void aldo_console_free(aldo_console *self)
 
     teardown(self);
     free(self);
-}
-
-void aldo_console_powerup(aldo_console *self, aldo_cart *c, bool zeroram)
-{
-    assert(self != nullptr);
-    assert(self->cart == nullptr);
-
-    if (c) {
-        connect_cart(self, c);
-    }
-    self->mode = ALDO_EXC_RUN;
-
-    aldo_cpu_powerup(&self->cpu);
-    switch (self->type) {
-    case ALDO_CONSOLE_ALDO8:
-        aldo_aldo8_powerup((aldo_aldo8 *)self, zeroram);
-        break;
-    case ALDO_CONSOLE_NES:
-        aldo_nes_powerup((aldo_nes *)self, zeroram);
-        break;
-    default:
-        assert(((void)"INVALID CONSOLE TYPE", false));
-        break;
-    }
-}
-
-void aldo_console_powerdown(aldo_console *self)
-{
-    assert(self != nullptr);
-
-    aldo_console_halt(self, true);
-    disconnect_cart(self);
 }
 
 int aldo_console_max_tcpu()
@@ -473,14 +469,6 @@ void aldo_console_clock(aldo_console *self, struct aldo_clock *clock)
         clock_system(self, clock);
     }
     snapshot_core(self);
-}
-
-void aldo_console_set_snapshot(aldo_console *self, struct aldo_snapshot *snp)
-{
-    assert(self != nullptr);
-
-    self->snp = snp;
-    init_snapshot(self);
 }
 
 void aldo_console_dumpram(aldo_console *self, FILE *fs[static 3],

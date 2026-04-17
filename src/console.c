@@ -311,7 +311,7 @@ const char *aldo_console_name(aldo_console *self)
 {
     assert(self != nullptr);
 
-    return typename(aldo_console_type(self));
+    return typename(self->type);
 }
 
 size_t aldo_console_ram_size(aldo_console *self)

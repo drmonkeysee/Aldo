@@ -414,6 +414,15 @@ void aldo_nes_snapshot_core(aldo_nes *self)
     self->extends.snp->mem.vram = self->vram;
 }
 
+void aldo_nes_screen_size(int *width, int *height)
+{
+    assert(width != nullptr);
+    assert(height != nullptr);
+
+    *width = ScreenWidth;
+    *height = ScreenHeight;
+}
+
 void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3], bool errs[static 3])
 {
     assert(self != nullptr);

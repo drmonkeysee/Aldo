@@ -25,6 +25,9 @@ bool aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock);
 void aldo_nes_snapshot_init(aldo_nes *self);
 void aldo_nes_snapshot_core(aldo_nes *self);
 
+// TODO: remove this when no longer needed
+void aldo_nes_screen_size(int *width, int *height);
+
 void aldo_nes_dumpram(aldo_nes *self, FILE *fs[static 3], bool errs[static 3]);
 
 #endif

@@ -325,8 +325,12 @@ void aldo_console_screen_size(aldo_console *self, int *width, int *height)
     assert(width != nullptr);
     assert(height != nullptr);
 
+    // TODO: figure out how to make this work with aldo8 and gui refresh
+    /*
     *width = self->params.screenw;
     *height = self->params.screenh;
+     */
+    aldo_nes_screen_size(width, height);
 }
 
 int aldo_console_cycle_factor(aldo_console *self)

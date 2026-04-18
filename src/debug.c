@@ -255,7 +255,7 @@ aldo_debugger *aldo_debug_new()
 
 void aldo_debug_free(aldo_debugger *self)
 {
-    assert(self != nullptr);
+    if (!self) return;
 
     bpvector_free(&self->breakpoints);
     free(self);

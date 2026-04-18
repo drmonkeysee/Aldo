@@ -247,7 +247,7 @@ int aldo_cart_create(aldo_cart **c, FILE *f)
 
 void aldo_cart_free(aldo_cart *self)
 {
-    assert(self != nullptr);
+    if (!self) return;
 
     if (self->mapper) {
         self->mapper->dtor(self->mapper);

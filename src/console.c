@@ -289,7 +289,7 @@ bool aldo_console_poweron(aldo_console **cn, aldo_cart *c, aldo_debugger *dbg,
 
 void aldo_console_free(aldo_console *self)
 {
-    assert(self != nullptr);
+    if (!self) return;
 
     teardown(self);
     free(self);

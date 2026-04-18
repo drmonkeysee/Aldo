@@ -142,10 +142,9 @@ void aldo::PatternTable::draw(aldo::pt_span table, aldo::color_span colors,
     }
 }
 
-aldo::Nametables::Nametables(SDL_Point nametableSize,
-                             const aldo::MediaRuntime& mr)
+aldo::Nametables::Nametables(SDL_Point nametableSize, const aldo::MediaRuntime& mr)
 : ntSize{nametableSize}, texSize{nametableSize * AldoNtCount},
-ntTex{texSize, mr.renderer()}, atTex{texSize, mr.renderer()} {}
+    ntTex{texSize, mr.renderer()}, atTex{texSize, mr.renderer()} {}
 
 void aldo::Nametables::draw(const Emulator& emu, const MediaRuntime& mr) const
 {

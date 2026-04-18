@@ -127,6 +127,8 @@ static void init_snapshot(struct aldo_console_base *self)
 
 static void connect_cart(struct aldo_console_base *self, aldo_cart *c)
 {
+    assert(self->cart == nullptr);
+
     self->cart = c;
     auto r = aldo_cart_mbus_connect(self->cart, self->cpu.mbus);
     (void)r, assert(r);
@@ -141,7 +143,6 @@ static void disconnect_cart(struct aldo_console_base *self)
     // Debugger may have been attached to a cart-less CPU bus so reset
     // debugger even if there is no existing cart.
     aldo_debug_reset(self->dbg);
-    if (!self->cart) return;
     if (self->vtable.dconn) {
         self->vtable.dconn(self);
     }
@@ -177,32 +178,32 @@ static void teardown(struct aldo_console_base *self)
 
 static aldo_console *new_aldo8(aldo_debugger *dbg, FILE *tracelog)
 {
-    aldo_console *c = malloc(Aldo_Aldo8Size);
-    if (!c) return nullptr;
+    aldo_console *cn = malloc(Aldo_Aldo8Size);
+    if (!cn) return nullptr;
 
-    setup(c, dbg, tracelog);
-    c->type = ALDO_CONSOLE_ALDO8;
+    setup(cn, dbg, tracelog);
+    cn->type = ALDO_CONSOLE_ALDO8;
 
-    if (aldo_aldo8_init((aldo_aldo8 *)c)) {
-        return c;
+    if (aldo_aldo8_init((aldo_aldo8 *)cn)) {
+        return cn;
     } else {
-        aldo_console_free(c);
+        aldo_console_free(cn);
         return nullptr;
     }
 }
 
 static aldo_console *new_nes(aldo_debugger *dbg, FILE *tracelog)
 {
-    aldo_console *c = malloc(Aldo_NesSize);
-    if (!c) return nullptr;
+    aldo_console *cn = malloc(Aldo_NesSize);
+    if (!cn) return nullptr;
 
-    setup(c, dbg, tracelog);
-    c->type = ALDO_CONSOLE_NES;
+    setup(cn, dbg, tracelog);
+    cn->type = ALDO_CONSOLE_NES;
 
-    if (aldo_nes_init((aldo_nes *)c)) {
-        return c;
+    if (aldo_nes_init((aldo_nes *)cn)) {
+        return cn;
     } else {
-        aldo_console_free(c);
+        aldo_console_free(cn);
         return nullptr;
     }
 }

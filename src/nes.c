@@ -331,9 +331,9 @@ static bool setup(struct aldo_nes001 *self)
     if (!create_mbus(self)) return false;
     if (!create_vbus(self)) return false;
 
-    self->extends.conn = cart_connect;
-    self->extends.dconn = cart_disconnect;
-    self->extends.dtor = cleanup;
+    self->extends.vtable.conn = cart_connect;
+    self->extends.vtable.dconn = cart_disconnect;
+    self->extends.vtable.dtor = cleanup;
 
     aldo_ppu_connect(&self->ppu, self->extends.cpu.mbus);
     return true;

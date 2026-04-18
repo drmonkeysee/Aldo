@@ -17,9 +17,11 @@ struct aldo_console_base {
     // Console Type Header
     enum aldo_console_type type;
     // Optional callbacks for type-specific functionality
-    void (*conn)(aldo_console *);   // Cart Connect
-    void (*dconn)(aldo_console *);  // Cart Disconnect
-    void (*dtor)(aldo_console *);   // Console Cleanup
+    struct {
+        void (*conn)(aldo_console *);   // Cart Connect
+        void (*dconn)(aldo_console *);  // Cart Disconnect
+        void (*dtor)(aldo_console *);   // Console Cleanup
+    } vtable;
 
     // Console System Parameters
     struct {
@@ -28,8 +30,8 @@ struct aldo_console_base {
     } params;
 
     // Console Components
-    aldo_cart *cart;            // Program Cartridge; Non-owning Pointer
     aldo_debugger *dbg;         // Debugger Context; Non-owning Pointer
+    aldo_cart *cart;            // Program Cartridge; Non-owning Pointer
     struct aldo_snapshot *snp;  // Console Snapshot
     FILE *tracelog;             // Optional trace log; Non-owning Pointer
     struct aldo_mos6502 cpu;    // MOS 6502 CPU Core

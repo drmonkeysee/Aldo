@@ -130,8 +130,8 @@ static void connect_cart(struct aldo_console_base *self, aldo_cart *c)
     self->cart = c;
     auto r = aldo_cart_mbus_connect(self->cart, self->cpu.mbus);
     (void)r, assert(r);
-    if (self->conn) {
-        self->conn(self);
+    if (self->vtable.conn) {
+        self->vtable.conn(self);
     }
     aldo_debug_sync_bus(self->dbg);
 }
@@ -142,8 +142,8 @@ static void disconnect_cart(struct aldo_console_base *self)
     // debugger even if there is no existing cart.
     aldo_debug_reset(self->dbg);
     if (!self->cart) return;
-    if (self->dconn) {
-        self->dconn(self);
+    if (self->vtable.dconn) {
+        self->vtable.dconn(self);
     }
     aldo_cart_mbus_disconnect(self->cart, self->cpu.mbus);
     self->cart = nullptr;
@@ -152,10 +152,10 @@ static void disconnect_cart(struct aldo_console_base *self)
 static void setup(struct aldo_console_base *self, aldo_debugger *dbg,
                   FILE *tracelog)
 {
-    self->dconn = nullptr;
-    self->dtor = nullptr;
-    self->cart = nullptr;
+    self->vtable = (typeof(self->vtable)){};
     self->dbg = dbg;
+    self->cart = nullptr;
+    self->snp = nullptr;
     self->tracelog = tracelog;
     self->halted = self->cpu.bcd = self->probe.rdy = true;
     self->tracefailed = self->probe.irq = self->probe.nmi = self->probe.rst = false;
@@ -168,8 +168,8 @@ static void teardown(struct aldo_console_base *self)
     disconnect_cart(self);
     aldo_debug_cpu_disconnect(self->dbg);
 
-    if (self->dtor) {
-        self->dtor(self);
+    if (self->vtable.dtor) {
+        self->vtable.dtor(self);
     }
     aldo_bus_free(self->cpu.mbus);
     free(self->snp);
@@ -222,9 +222,7 @@ static bool swap_console(enum aldo_console_type t, enum aldo_cartformat f)
 
 void powerup(struct aldo_console_base *self, aldo_cart *c, bool zeroram)
 {
-    if (c) {
-        connect_cart(self, c);
-    }
+    connect_cart(self, c);
     self->mode = ALDO_EXC_RUN;
 
     aldo_cpu_powerup(&self->cpu);

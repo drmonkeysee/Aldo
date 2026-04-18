@@ -107,7 +107,8 @@ static void write_summary(const struct emulator *emu, const struct runclock *c)
     if (!emu->args->verbose) return;
 
     bool scale_ms = c->clock.runtime < 1;
-    printf("---=== %s ===---\n", argparse_filename(emu->args->filepath));
+    printf("---=== %s: %s ===---\n", aldo_console_name(emu->console),
+           argparse_filename(emu->args->filepath));
     printf("Runtime (%ssec): %.3f\n", scale_ms ? "m" : "",
            scale_ms ? c->clock.runtime * ALDO_MS_PER_S : c->clock.runtime);
     printf("Avg Tick Time (msec): %.3f\n", c->avg_ticktime_ms);

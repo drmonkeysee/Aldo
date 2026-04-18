@@ -20,6 +20,7 @@
 // open block for c/c++ bridge headers
 #ifdef __cplusplus
 #define aldo_noalias
+#define aldo_sz(var)
 #define aldo_cz(val)
 #define aldo_naz(var)
 #define aldo_nacz(val)
@@ -29,6 +30,7 @@ extern "C"
 {
 #else
 #define aldo_noalias restrict
+#define aldo_sz(var) var
 #define aldo_cz(val) static val
 #define aldo_naz(var) restrict var
 #define aldo_nacz(val) restrict static val

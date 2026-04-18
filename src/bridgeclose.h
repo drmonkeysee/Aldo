@@ -14,6 +14,7 @@
 #undef aldo_nacz
 #undef aldo_naz
 #undef aldo_cz
+#undef aldo_sz
 #undef aldo_noalias
 
 #undef aldo_export

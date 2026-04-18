@@ -84,8 +84,8 @@ const struct aldo_snapshot *aldo_console_snapshot(aldo_console *self) aldo_nothr
 aldo_export
 size_t aldo_console_dumpcount(aldo_console *self) aldo_nothrow;
 aldo_export
-void aldo_console_dumpram(aldo_console *self, size_t count, FILE *fs[count],
-                          bool errs[count]) aldo_nothrow;
+void aldo_console_dumpram(aldo_console *self, size_t count, FILE *fs[aldo_sz(count)],
+                          bool errs[aldo_sz(count)]) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

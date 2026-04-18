@@ -128,6 +128,20 @@ static void init_snapshot(struct aldo_console_base *self)
 // MARK: Init/Cleanup
 //
 
+static void connect_debug(struct aldo_console_base *self, aldo_debugger *dbg)
+{
+    assert(self->dbg == nullptr);
+
+    self->dbg = dbg;
+    aldo_debug_cpu_connect(self->dbg, &self->cpu);
+}
+
+static void disconnect_debug(struct aldo_console_base *self)
+{
+    aldo_debug_cpu_disconnect(self->dbg);
+    self->dbg = nullptr;
+}
+
 static void connect_cart(struct aldo_console_base *self, aldo_cart *c)
 {
     assert(self->cart == nullptr);
@@ -143,8 +157,6 @@ static void connect_cart(struct aldo_console_base *self, aldo_cart *c)
 
 static void disconnect_cart(struct aldo_console_base *self)
 {
-    // Debugger may have been attached to a cart-less CPU bus so reset
-    // debugger even if there is no existing cart.
     aldo_debug_reset(self->dbg);
     if (self->vtable.dconn) {
         self->vtable.dconn(self);
@@ -153,24 +165,49 @@ static void disconnect_cart(struct aldo_console_base *self)
     self->cart = nullptr;
 }
 
-static void setup(struct aldo_console_base *self, aldo_debugger *dbg,
-                  FILE *tracelog)
+static void powerup(struct aldo_console_base *self, aldo_cart *c,
+                    aldo_debugger *dbg, bool zeroram)
+{
+    connect_debug(self, dbg);
+    connect_cart(self, c);
+    self->mode = ALDO_EXC_RUN;
+
+    aldo_cpu_powerup(&self->cpu);
+    switch (self->type) {
+    case ALDO_CONSOLE_ALDO8:
+        aldo_aldo8_powerup((aldo_aldo8 *)self, zeroram);
+        break;
+    case ALDO_CONSOLE_NES:
+        aldo_nes_powerup((aldo_nes *)self, zeroram);
+        break;
+    default:
+        INVALID_CONSOLE;
+        break;
+    }
+}
+
+static void powerdown(struct aldo_console_base *self)
+{
+    aldo_console_halt(self, true);
+    disconnect_cart(self);
+    disconnect_debug(self);
+}
+
+static void setup(struct aldo_console_base *self, FILE *tracelog)
 {
     self->vtable = (typeof(self->vtable)){};
-    self->dbg = dbg;
+    self->dbg = nullptr;
     self->cart = nullptr;
     self->snp = nullptr;
     self->tracelog = tracelog;
     self->halted = self->cpu.bcd = self->probe.rdy = true;
     self->tracefailed = self->probe.irq = self->probe.nmi = self->probe.rst = false;
     self->params = (typeof(self->params)){.cyclefactor = 1};
-    aldo_debug_cpu_connect(self->dbg, &self->cpu);
 }
 
 static void teardown(struct aldo_console_base *self)
 {
-    disconnect_cart(self);
-    aldo_debug_cpu_disconnect(self->dbg);
+    powerdown(self);
 
     if (self->vtable.dtor) {
         self->vtable.dtor(self);
@@ -179,12 +216,12 @@ static void teardown(struct aldo_console_base *self)
     free(self->snp);
 }
 
-static aldo_console *new_aldo8(aldo_debugger *dbg, FILE *tracelog)
+static aldo_console *new_aldo8(FILE *tracelog)
 {
     aldo_console *cn = malloc(Aldo_Aldo8Size);
     if (!cn) return nullptr;
 
-    setup(cn, dbg, tracelog);
+    setup(cn, tracelog);
     cn->type = ALDO_CONSOLE_ALDO8;
 
     if (aldo_aldo8_init((aldo_aldo8 *)cn)) {
@@ -195,12 +232,12 @@ static aldo_console *new_aldo8(aldo_debugger *dbg, FILE *tracelog)
     }
 }
 
-static aldo_console *new_nes(aldo_debugger *dbg, FILE *tracelog)
+static aldo_console *new_nes(FILE *tracelog)
 {
     aldo_console *cn = malloc(Aldo_NesSize);
     if (!cn) return nullptr;
 
-    setup(cn, dbg, tracelog);
+    setup(cn, tracelog);
     cn->type = ALDO_CONSOLE_NES;
 
     if (aldo_nes_init((aldo_nes *)cn)) {
@@ -224,31 +261,6 @@ static bool swap_console(enum aldo_console_type t, enum aldo_cartformat f)
     }
 }
 
-void powerup(struct aldo_console_base *self, aldo_cart *c, bool zeroram)
-{
-    connect_cart(self, c);
-    self->mode = ALDO_EXC_RUN;
-
-    aldo_cpu_powerup(&self->cpu);
-    switch (self->type) {
-    case ALDO_CONSOLE_ALDO8:
-        aldo_aldo8_powerup((aldo_aldo8 *)self, zeroram);
-        break;
-    case ALDO_CONSOLE_NES:
-        aldo_nes_powerup((aldo_nes *)self, zeroram);
-        break;
-    default:
-        INVALID_CONSOLE;
-        break;
-    }
-}
-
-void powerdown(struct aldo_console_base *self)
-{
-    aldo_console_halt(self, true);
-    disconnect_cart(self);
-}
-
 //
 // MARK: - Public Interface
 //
@@ -265,8 +277,8 @@ bool aldo_console_poweron(aldo_console **cn, aldo_cart *c, aldo_debugger *dbg,
     aldo_console *self = *cn;
     if (!self || swap_console(self->type, info.format)) {
         aldo_console *newcn = info.format == ALDO_CRTF_INES
-                                ? new_nes(dbg, tracelog)
-                                : new_aldo8(dbg, tracelog);
+                                ? new_nes(tracelog)
+                                : new_aldo8(tracelog);
         if (!newcn) return false;
 
         if (self) {
@@ -283,7 +295,7 @@ bool aldo_console_poweron(aldo_console **cn, aldo_cart *c, aldo_debugger *dbg,
     } else {
         powerdown(self);
     }
-    powerup(self, c, zeroram);
+    powerup(self, c, dbg, zeroram);
     init_snapshot(self);
     *cn = self;
     return true;

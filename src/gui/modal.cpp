@@ -98,7 +98,7 @@ bool aldo::modal::exportBreakpoints(aldo::Emulator& emu,
                                     const aldo::MediaRuntime& mr)
 {
     auto open =
-        [n = aldo::debug::breakfile_path_from(emu.cartName())]
+        [n = aldo::debug::breakfile_name_from(emu.cartName())]
         (const gui_platform& p) {
             return save_file(p, "Export Breakpoints", n);
         };

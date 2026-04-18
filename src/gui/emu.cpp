@@ -85,13 +85,13 @@ void aldo::Emulator::update(aldo::viewstate& vs) noexcept
 
 void aldo::Emulator::loadCartState()
 {
-    debugger().loadCartState(prefspath / cartName());
+    debugger().loadCartState(prefspath, cartName());
 }
 
 
 void aldo::Emulator::saveCartState() const
 {
-    debugger().saveCartState(prefspath / cartName());
+    debugger().saveCartState(prefspath, cartName());
 }
 
 void aldo::Emulator::reloadConsole(aldo_cart* c)

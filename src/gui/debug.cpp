@@ -130,18 +130,22 @@ aldo::Debugger::exportBreakpoints(const std::filesystem::path& filepath) const
     write_brkfile(filepath, bufs);
 }
 
-void aldo::Debugger::loadCartState(const std::filesystem::path& prefCartPath)
+void aldo::Debugger::loadCartState(const std::filesystem::path& prefPath,
+                                   const std::filesystem::path& cartName)
 {
-    auto brkpath = aldo::debug::breakfile_path_from(prefCartPath);
+    auto brkname = aldo::debug::breakfile_name_from(cartName);
+    auto brkpath = prefPath / brkname;
     if (!std::filesystem::exists(brkpath)) return;
     loadBreakpoints(brkpath);
     SDL_Log("Breakpoints file loaded: %s", brkpath.c_str());
 }
 
 void
-aldo::Debugger::saveCartState(const std::filesystem::path& prefCartPath) const
+aldo::Debugger::saveCartState(const std::filesystem::path& prefPath,
+                              const std::filesystem::path& cartName) const
 {
-    auto brkpath = aldo::debug::breakfile_path_from(prefCartPath);
+    auto brkname = aldo::debug::breakfile_name_from(cartName);
+    auto brkpath = prefPath / brkname;
     if (isActive()) {
         exportBreakpoints(brkpath);
         SDL_Log("Breakpoints file saved: %s", brkpath.c_str());

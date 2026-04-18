@@ -27,12 +27,12 @@ namespace debug
 
 inline constexpr const char* BreakFileExtension = "brk";
 
-inline std::filesystem::path breakfile_path_from(std::filesystem::path path)
+inline std::filesystem::path breakfile_name_from(std::filesystem::path name)
 {
-    if (path.empty()) {
-        path = "breakpoints";
+    if (name.empty()) {
+        name = "breakpoints";
     }
-    return path.replace_extension(BreakFileExtension);
+    return name.replace_extension(BreakFileExtension);
 }
 
 }
@@ -75,8 +75,10 @@ public:
 
     void loadBreakpoints(const std::filesystem::path& filepath);
     void exportBreakpoints(const std::filesystem::path& filepath) const;
-    void loadCartState(const std::filesystem::path& prefCartPath);
-    void saveCartState(const std::filesystem::path& prefCartPath) const;
+    void loadCartState(const std::filesystem::path& prefPath,
+                       const std::filesystem::path& cartName);
+    void saveCartState(const std::filesystem::path& prefPath,
+                       const std::filesystem::path& cartName) const;
 
     // as usual an iterator is invalidated if the underlying collection is modified
     class BreakpointIterator {

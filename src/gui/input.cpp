@@ -199,7 +199,7 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
         break;
     case aldo::Command::openROM:
         if (aldo::modal::loadROM(emu, mr)) {
-            vs.clock.resetEmu();
+            vs.clock.reset(emu);
         }
         break;
     case aldo::Command::paletteLoad:

@@ -92,7 +92,6 @@ private:
 
 class RunClock {
 public:
-    // TODO: figure out how to propagate console type changes to here
     explicit RunClock(const Emulator& emu)
     : clk{.rate = Aldo_MaxFps, .rate_factor = getFactor(emu)} {}
 
@@ -135,10 +134,11 @@ public:
         return {*this, resetBudget};
     }
 
-    void resetEmu() noexcept
+    void reset(const Emulator& emu) noexcept
     {
         clock().emutime = 0;
         missed = clock().cycles = clock().frames = clock().subcycle = 0;
+        clock().rate_factor = getFactor(emu);
     }
 
     RunTimer timeInput() noexcept { return RunTimer{dtInput}; }
@@ -167,7 +167,6 @@ public:
         oldRate = clock().rate;
         clock().rate = prev;
         currentScale = s;
-        // TODO: figure out how to propagate console type changes to here
         clock().rate_factor = getFactor(emu);
     }
 

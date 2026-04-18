@@ -8,6 +8,7 @@
 #ifndef Aldo_gui_uisdl_hpp
 #define Aldo_gui_uisdl_hpp
 
+#include "cart.h"
 #include "console.h"
 #include "debug.h"
 
@@ -21,7 +22,7 @@ namespace aldo
 #include "bridgeopen.h"
 aldo_checkerr
 int ui_sdl_runloop(const struct gui_platform* platform, aldo_debugger* debug,
-                   aldo_console* console) aldo_nothrow;
+                   aldo_cart* cart, aldo_console* console) aldo_nothrow;
 #include "bridgeclose.h"
 
 #ifdef __cplusplus

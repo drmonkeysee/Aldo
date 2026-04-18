@@ -32,7 +32,6 @@ auto get_prefspath(const gui_platform& p)
     return std::filesystem::path{path.get()};
 }
 
-ALDO_OWN
 auto load_cart(const std::filesystem::path& filepath)
 {
     using file_handle = aldo::handle<std::FILE, std::fclose>;
@@ -49,7 +48,7 @@ auto load_cart(const std::filesystem::path& filepath)
         throw aldo::AldoError{CartLoadFailure, err, aldo_cart_errstr};
     };
 
-    return c;
+    return aldo::cart_handle{c};
 }
 
 }
@@ -58,20 +57,17 @@ auto load_cart(const std::filesystem::path& filepath)
 // MARK: - Public Interface
 //
 
-aldo::Emulator::Emulator(aldo::debug_handle d, aldo::console_handle c,
-                         const gui_platform& p)
-: prefspath{get_prefspath(p)}, hdbg{std::move(d)}, hconsole{std::move(c)}
-{
-    aldo_console_set_snapshot(consolep(), snapshotp());
-}
+aldo::Emulator::Emulator(aldo::debug_handle d, aldo::cart_handle c,
+                         aldo::console_handle cn, const gui_platform& p)
+: prefspath{get_prefspath(p)}, hdbg{std::move(d)}, hcart{std::move(c)},
+    hconsole{std::move(cn)} {}
 
 void aldo::Emulator::loadCart(const std::filesystem::path& filepath)
 {
     auto c = load_cart(filepath);
     saveCartState();
-    aldo_console_powerdown(consolep());
-    hcart.reset(c);
-    aldo_console_powerup(consolep(), cartp(), zeroRam);
+    reloadConsole(c.get());
+    hcart.swap(c);
     cartpath = filepath;
     cartname = cartpath.stem();
     loadCartState();
@@ -95,9 +91,17 @@ void aldo::Emulator::loadCartState()
 
 void aldo::Emulator::saveCartState() const
 {
-    if (!hcart) return;
-
     debugger().saveCartState(prefspath / cartName());
+}
+
+void aldo::Emulator::reloadConsole(aldo_cart* c)
+{
+    auto cn = hconsole.release();
+    auto success = aldo_console_poweron(&cn, c, hdbg.dbgp(), nullptr, false);
+    hconsole.reset(cn);
+    if (!success) throw aldo::AldoError{
+        "Console load failure", "System error", errno,
+    };
 }
 
 void aldo::Emulator::cleanup() const noexcept
@@ -110,5 +114,4 @@ void aldo::Emulator::cleanup() const noexcept
     } catch (...) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unknown Emu dtor error!");
     }
-    aldo_console_set_snapshot(consolep(), nullptr);
 }

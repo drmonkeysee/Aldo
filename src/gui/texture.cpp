@@ -167,7 +167,7 @@ void aldo::Sprites::draw(const aldo::Emulator& emu) const
     px_span mem{data.pixels, static_cast<decltype(mem)::size_type>(data.size())};
     std::ranges::fill(mem, aldo::colors::LedOff);
 
-    aldo::sprite_span objects = emu.snapshot().video->sprites.objects;
+    aldo::sprite_span objects = emu.snapshot().video.sprites.objects;
     for (const auto& obj : objects) {
         if ((priority == Priority::front && obj.priority)
             || (priority == Priority::back && !obj.priority)) {
@@ -214,22 +214,22 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
 {
     using nt_span = std::span<const aldo::et::byte, AldoNtTileCount>;
 
-    auto vsp = emu.snapshot().video;
-    aldo::pt_span chrs = vsp->nt.pt
-                            ? vsp->pattern_tables.right
-                            : vsp->pattern_tables.left;
-    auto offsets = getOffsets(vsp->nt.mirror);
+    const auto& vsp = emu.snapshot().video;
+    aldo::pt_span chrs = vsp.nt.pt
+                            ? vsp.pattern_tables.right
+                            : vsp.pattern_tables.left;
+    auto offsets = getOffsets(vsp.nt.mirror);
 
     auto data = ntTex.lock();
     for (auto i = 0; i < AldoNtCount; ++i) {
-        nt_span tiles = vsp->nt.tables[i].tiles;
-        attr_span attrs = vsp->nt.tables[i].attributes;
+        nt_span tiles = vsp.nt.tables[i].tiles;
+        attr_span attrs = vsp.nt.tables[i].attributes;
         for (auto row = 0; row < AldoNtHeight; ++row) {
             for (auto col = 0; col < AldoNtWidth; ++col) {
                 auto tileIdx = static_cast<
                     decltype(tiles)::size_type>(col + (row * AldoNtWidth));
                 auto tileId = tiles[tileIdx];
-                auto colors = lookupTilePalette(attrs, col, row, vsp->palettes.bg);
+                auto colors = lookupTilePalette(attrs, col, row, vsp.palettes.bg);
                 Tile tile{chrs[tileId], col, row, colors, emu.palette(), data};
                 // account for upper NT bank X/Y offset for tiles
                 tile.origin = (i * offsets.upperX)
@@ -256,15 +256,15 @@ void aldo::Nametables::drawNametables(const aldo::Emulator& emu) const
 void aldo::Nametables::drawAttributes(const aldo::Emulator& emu,
                                       const aldo::MediaRuntime& mr) const
 {
-    auto vsp = emu.snapshot().video;
-    auto offsets = getOffsets(vsp->nt.mirror);
+    const auto& vsp = emu.snapshot().video;
+    auto offsets = getOffsets(vsp.nt.mirror);
     auto ren = mr.renderer();
     auto target = atTex.asTarget(ren);
     for (auto i = 0; i < AldoNtCount; ++i) {
-        attr_span attrs = vsp->nt.tables[i].attributes;
+        attr_span attrs = vsp.nt.tables[i].attributes;
         for (auto row = 0; row < AttributeDim; ++row) {
             for (auto col = 0; col < AttributeDim; ++col) {
-                drawAttribute(attrs, i, col, row, offsets, vsp->palettes.bg,
+                drawAttribute(attrs, i, col, row, offsets, vsp.palettes.bg,
                               emu.palette(), ren);
             }
         }
@@ -372,18 +372,18 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
     // rows and columns to avoid running off the edge of the texture pixels.
     static constexpr auto clipRange = SpritesDim - SpritePxDim;
 
-    auto vsp = emu.snapshot().video;
+    const auto& vsp = emu.snapshot().video;
 
     // clamp uninitialized data within palette range
     auto palidx = std::min(obj.palette, palMax);
-    aldo::color_span colors = vsp->palettes.fg[palidx];
+    aldo::color_span colors = vsp.palettes.fg[palidx];
 
     auto gridCol = obj.x / SpritePxDim;
     auto gridRow = obj.y / SpritePxDim;
 
-    aldo::pt_span table = obj.pt ? vsp->pattern_tables.right : vsp->pattern_tables.left;
+    aldo::pt_span table = obj.pt ? vsp.pattern_tables.right : vsp.pattern_tables.left;
     // tile ID is inverted if v-flip and 8x16 mode
-    auto tileIdx = vsp->sprites.double_height && obj.vflip;
+    auto tileIdx = vsp.sprites.double_height && obj.vflip;
     Tile tile{
         table[obj.tiles[tileIdx]], gridCol, gridRow, colors, emu.palette(), data,
     };
@@ -400,7 +400,7 @@ void aldo::Sprites::drawObject(const aldo::sprite_obj& obj,
 
     tile.draw();
 
-    if (vsp->sprites.double_height) {
+    if (vsp.sprites.double_height) {
         // bottom tile is one grid row lower than the top
         ++gridRow;
         // tile ID is inverted if vertical flip is true

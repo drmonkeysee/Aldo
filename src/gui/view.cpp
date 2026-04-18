@@ -1401,7 +1401,7 @@ protected:
         ImGui::SameLine(textOffset);
         tableLabel(3);
         ImGui::Text("Mirroring: %s",
-                    aldo_ntmirror_name(emu.snapshot().video->nt.mirror));
+                    aldo_ntmirror_name(emu.snapshot().video.nt.mirror));
 
         ImGui::Separator();
 
@@ -1420,7 +1420,7 @@ private:
         scrSize{point_to_vec(nt.nametableSize())}, attrGrid{ag}, scrInd{si},
         tileGrid{tg}
         {
-            const auto& emuPos = snp.video->nt.pos;
+            const auto& emuPos = snp.video.nt.pos;
             scrPos = {
                 emuPos.x + (emuPos.h * scrSize.x),
                 emuPos.y + (emuPos.v * scrSize.y),
@@ -1862,12 +1862,12 @@ protected:
     void renderContents() override
     {
         if (drawInterval.elapsed(vs.clock.clock())) {
-            auto vsp = emu.snapshot().video;
-            const auto& tables = vsp->pattern_tables;
+            const auto& vsp = emu.snapshot().video;
+            const auto& tables = vsp.pattern_tables;
             assert(palSelect < PalSize * 2);
             colspan colors = palSelect < PalSize
-                                ? vsp->palettes.bg[palSelect]
-                                : vsp->palettes.fg[palSelect - PalSize];
+                                ? vsp.palettes.bg[palSelect]
+                                : vsp.palettes.fg[palSelect - PalSize];
             left.draw(tables.left, colors, emu.palette());
             right.draw(tables.right, colors, emu.palette());
         }
@@ -1900,8 +1900,8 @@ private:
 
         ImGui::TextUnformatted(fg ? "Sprites" : "Background");
         std::span pals = fg
-                            ? emu.snapshot().video->palettes.fg
-                            : emu.snapshot().video->palettes.bg;
+                            ? emu.snapshot().video.palettes.fg
+                            : emu.snapshot().video.palettes.bg;
         auto row = 0;
         for (colspan pal : pals) {
             if (ImGui::BeginTable(fg ? "FgPalettes" : "BgPalettes", cols, flags)) {
@@ -2139,12 +2139,12 @@ private:
     {
         static constexpr auto instCount = 16;
 
-        auto curr = emu.snapshot().prg.curr;
+        const auto& curr = emu.snapshot().prg.curr;
         auto addr = emu.snapshot().cpu.datapath.current_instruction;
         aldo_dis_instruction inst{};
         std::array<aldo::et::tchar, AldoDisInstSize> disasm;
         for (auto i = 0; i < instCount; ++i) {
-            auto result = aldo_dis_parsemem_inst(curr->length, curr->pc,
+            auto result = aldo_dis_parsemem_inst(curr.length, curr.pc,
                                                  inst.offset + inst.bv.size,
                                                  &inst);
             if (result > 0) {
@@ -2423,7 +2423,7 @@ private:
         SDL_Point
             sprExtent{sprites.SpritePxDim, sprites.SpritePxDim},
             ovDim{sprites.SpritesDim, sprites.SpritesDim};
-        if (emu.snapshot().video->sprites.double_height) {
+        if (emu.snapshot().video.sprites.double_height) {
             sprExtent.y *= 2;
         }
         SpriteOverlay ov{emu.screenSize(), sprExtent, ovDim, screenIndicator};
@@ -2474,7 +2474,7 @@ private:
 
         ImGui::Text("Position: (%03d, %03d)", obj->x, obj->y);
         std::array<char, 6> buf;
-        if (emu.snapshot().video->sprites.double_height) {
+        if (emu.snapshot().video.sprites.double_height) {
             std::snprintf(buf.data(), buf.size(), "%02X+%02X", obj->tiles[0],
                           obj->tiles[1]);
         } else {
@@ -2492,7 +2492,7 @@ private:
     void renderSpriteControls() noexcept
     {
         ImGui::Checkbox("Screen Indicator", &screenIndicator);
-        auto doubleHeight = emu.snapshot().video->sprites.double_height;
+        auto doubleHeight = emu.snapshot().video.sprites.double_height;
         ImGui::SameLine(0, doubleHeight ? 52 : 59);
         ImGui::Text("Size: 8x%d", doubleHeight ? 16 : 8);
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 14);
@@ -2506,7 +2506,7 @@ private:
         if (!mouse || ImGui::IsAnyItemHovered()) return;
 
         selected = NoSelection;
-        aldo::sprite_span objs = emu.snapshot().video->sprites.objects;
+        aldo::sprite_span objs = emu.snapshot().video.sprites.objects;
         // TODO: add std::views::enumerate when this exists
         auto idx = static_cast<int>(objs.size() - 1);
         // sprites are drawn first-to-last, so z-order for mouse hit is in reverse
@@ -2529,9 +2529,9 @@ private:
         if (selected == NoSelection) return nullptr;
 
         assert(0 <= selected && static_cast<aldo::et::size>(selected)
-               < aldo_arrsz(emu.snapshot().video->sprites.objects));
+               < aldo_arrsz(emu.snapshot().video.sprites.objects));
 
-        return emu.snapshot().video->sprites.objects + selected;
+        return emu.snapshot().video.sprites.objects + selected;
     }
 
     aldo::Sprites sprites;
@@ -2699,8 +2699,8 @@ protected:
     {
         static constexpr std::array scales{"1x", "1.5x", "2x", "2.5x"};
 
-        if (emu.snapshot().video->newframe) {
-            screen.draw(emu.snapshot().video->screen, emu.palette());
+        if (emu.snapshot().video.newframe) {
+            screen.draw(emu.snapshot().video.screen, emu.palette());
         }
         screen.render((static_cast<float>(scaleSelection) / 2.0f) + 1, sdRatio);
 

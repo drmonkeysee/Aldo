@@ -23,10 +23,14 @@
 namespace
 {
 
-auto runloop(const gui_platform& p, aldo_debugger* debug, aldo_console* console)
+auto runloop(const gui_platform& p, aldo_debugger* debug, aldo_cart* cart,
+             aldo_console* console)
 {
     aldo::Emulator emu{
-        aldo::debug_handle{debug}, aldo::console_handle{console}, p,
+        aldo::debug_handle{debug},
+        aldo::cart_handle{cart},
+        aldo::console_handle{console},
+        p,
     };
     aldo::viewstate state{.clock{emu}};
     aldo::MediaRuntime runtime{{1280, 800}, p};
@@ -55,14 +59,15 @@ auto runloop(const gui_platform& p, aldo_debugger* debug, aldo_console* console)
 //
 
 int aldo::ui_sdl_runloop(const gui_platform* platform, aldo_debugger* debug,
-                         aldo_console* console) noexcept
+                         aldo_cart* cart, aldo_console* console) noexcept
 {
     assert(platform != nullptr);
     assert(debug != nullptr);
+    assert(cart != nullptr);
     assert(console != nullptr);
 
     try {
-        runloop(*platform, debug, console);
+        runloop(*platform, debug, cart, console);
         return 0;
     } catch (const std::exception& ex) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,

@@ -17,7 +17,6 @@
 #include "error.hpp"
 #include "handle.hpp"
 #include "palette.hpp"
-#include "snapshot.h"
 
 #include <SDL3/SDL.h>
 
@@ -33,45 +32,14 @@ namespace aldo
 
 class Emulator;
 struct viewstate;
-using console_handle = handle<aldo_console, aldo_console_free>;
-
-namespace emu
-{
-
 using cart_handle = handle<aldo_cart, aldo_cart_free>;
-
-class Snapshot {
-public:
-    Snapshot()
-    {
-        if (!aldo_snapshot_extend(getp())) throw AldoError{
-            "Unable to extend snapshot", "System error", errno,
-        };
-    }
-    Snapshot(const Snapshot&) = delete;
-    Snapshot& operator=(const Snapshot&) = delete;
-    Snapshot(Snapshot&&) = delete;
-    Snapshot& operator=(Snapshot&&) = delete;
-    ~Snapshot() { aldo_snapshot_cleanup(getp()); }
-
-    const aldo_snapshot& get() const noexcept { return snp; }
-    const aldo_snapshot* getp() const noexcept { return &snp; }
-
-private:
-    friend class aldo::Emulator;
-
-    aldo_snapshot* getp() noexcept { return &snp; }
-
-    aldo_snapshot snp{};
-};
-
-}
+using console_handle = handle<aldo_console, aldo_console_free>;
 
 class ALDO_SIDEFX Emulator {
 public:
     static int maxTCpu() noexcept { return aldo_console_max_tcpu(); }
 
-    Emulator(debug_handle d, console_handle c, const gui_platform& p);
+    Emulator(debug_handle d, cart_handle c, console_handle cn, const gui_platform& p);
     ~Emulator() { cleanup(); }
 
     std::string_view name() const noexcept { return aldo_console_name(consolep()); }
@@ -83,15 +51,14 @@ public:
     }
     std::optional<aldo_cartinfo> cartInfo() const
     {
-        if (!hcart) return {};
         aldo_cartinfo info;
         aldo_cart_getinfo(cartp(), &info);
         return info;
     }
     const Debugger& debugger() const noexcept { return hdbg; }
     Debugger& debugger() noexcept { return hdbg; }
-    const aldo_snapshot& snapshot() const noexcept { return hsnp.get(); }
-    const aldo_snapshot* snapshotp() const noexcept { return hsnp.getp(); }
+    const aldo_snapshot& snapshot() const noexcept { return *snapshotp(); }
+    const aldo_snapshot* snapshotp() const noexcept { return aldo_console_snapshot(hconsole.get()); }
     const Palette& palette() const noexcept { return hpalette; }
     Palette& palette() noexcept { return hpalette; }
 
@@ -129,17 +96,16 @@ public:
 private:
     aldo_cart* cartp() const noexcept { return hcart.get(); }
     aldo_console* consolep() const noexcept { return hconsole.get(); }
-    aldo_snapshot* snapshotp() noexcept { return hsnp.getp(); }
 
     void loadCartState();
     void saveCartState() const;
+    void reloadConsole(aldo_cart* c);
     void cleanup() const noexcept;
 
     std::filesystem::path cartname, cartpath, prefspath;
-    emu::cart_handle hcart;
     Debugger hdbg;
+    cart_handle hcart;
     console_handle hconsole;
-    emu::Snapshot hsnp;
     Palette hpalette;
 };
 

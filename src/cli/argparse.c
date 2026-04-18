@@ -329,6 +329,8 @@ void argparse_usage(const char *me)
     printf("  %-*s: halt after executing N cycles\n", spad, "Nc");
     printf("  %-*s: halt after executing N frames\n", spad, "Nf");
     printf("  %-*s: halt when the CPU enters a jammed state\n", spad, "jam");
+    printf("  %-*s: halt when the CPU reads/writes on an unmapped address\n",
+           spad, "flt");
 
     puts("\nRESET vector override expression");
     printf("  %-*s: set RESET vector to address XXXX;\n"

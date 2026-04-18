@@ -28,8 +28,8 @@ ui_loop ui_batch_loop;
 ui_loop ui_curses_loop;
 const char *ui_curses_version();
 
-static const char *const restrict ResetOverrideFmt =
-    "RESET Override: " ALDO_HEXPR_RST_IND "%04X\n";
+static const char
+    *const restrict ResetOverrideFmt = "RESET Override: " ALDO_HEXPR_RST_IND "%04X\n";
 
 static void print_version()
 {
@@ -241,6 +241,8 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
     };
     if (!emu.debugger) return EXIT_FAILURE;
 
+    auto result = EXIT_SUCCESS;
+    FILE *tracelog = nullptr;
     if (emu.args->batch && emu.args->tron
         && aldo_debug_bp_count(emu.debugger) == 0) {
         fputs("*** WARNING ***\nYou have turned on trace-logging"
@@ -248,24 +250,26 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
               "this can result in a very large trace file very quickly!\n"
               "Continue? [yN] ", stderr);
         auto input = getchar();
-        if (input != 'y' && input != 'Y') return EXIT_FAILURE;
+        if (input != 'y' && input != 'Y') {
+            result = EXIT_FAILURE;
+            goto cleanup;
+        };
     }
 
-    auto result = EXIT_SUCCESS;
-    FILE *tracelog = nullptr;
     if (emu.args->tron) {
         if (!(tracelog = fopen(tracefile, "w"))) {
             fprintf(stderr, "%s: ", tracefile);
             perror("Cannot open trace file");
             result = EXIT_FAILURE;
-            goto exit_debug;
+            goto cleanup;
         }
     }
+
     if (!aldo_console_poweron(&emu.console, c, emu.debugger, tracelog,
                               emu.args->zeroram)) {
         perror("Unable to initialize console");
         result = EXIT_FAILURE;
-        goto exit_trace;
+        goto cleanup;
     }
 
     auto run_loop = setup_ui(&emu);
@@ -282,12 +286,11 @@ static int run_emu(const struct cliargs *args, aldo_cart *c)
         fputs("Trace file I/O failure\n", stderr);
         result = EXIT_FAILURE;
     }
+cleanup:
     aldo_console_free(emu.console);
-exit_trace:
     if (tracelog) {
         fclose(tracelog);
     }
-exit_debug:
     aldo_debug_free(emu.debugger);
     return result;
 }

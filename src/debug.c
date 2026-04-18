@@ -123,6 +123,11 @@ static bool halt_jammed(const struct aldo_mos6502 *cpu)
     return aldo_cpu_jammed(cpu);
 }
 
+static bool halt_bus_fault(const struct aldo_mos6502 *cpu)
+{
+    return cpu->bflt;
+}
+
 //
 // MARK: - Breakpoint Vector
 //
@@ -196,6 +201,9 @@ static ptrdiff_t bpvector_break(const struct breakpoint_vector *vec,
             break;
         case ALDO_HLT_JAM:
             if (halt_jammed(cpu)) return i;
+            break;
+        case ALDO_HLT_FAULT:
+            if (halt_bus_fault(cpu)) return i;
             break;
         default:
             break;

@@ -513,6 +513,82 @@ static void jam_condition_malformed(void *ctx)
     ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
 
+static void fault_condition(void *ctx)
+{
+    const char *str = "flt";
+    struct aldo_haltexpr expr;
+
+    auto result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(ALDO_HLT_FAULT, (int)expr.cond);
+}
+
+static void fault_condition_uppercase(void *ctx)
+{
+    const char *str = "FLT";
+    struct aldo_haltexpr expr;
+
+    auto result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(ALDO_HLT_FAULT, (int)expr.cond);
+}
+
+static void fault_condition_mixedcase(void *ctx)
+{
+    const char *str = "FlT";
+    struct aldo_haltexpr expr;
+
+    auto result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(ALDO_HLT_FAULT, (int)expr.cond);
+}
+
+static void fault_condition_with_leading_space(void *ctx)
+{
+    const char *str = "   flt";
+    struct aldo_haltexpr expr;
+
+    auto result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(ALDO_HLT_FAULT, (int)expr.cond);
+}
+
+static void fault_condition_with_trailing_space(void *ctx)
+{
+    const char *str = "flt   ";
+    struct aldo_haltexpr expr;
+
+    auto result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(ALDO_HLT_FAULT, (int)expr.cond);
+}
+
+static void fault_condition_underparse(void *ctx)
+{
+    const char *str = "flting";
+    struct aldo_haltexpr expr;
+
+    auto result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(0, result);
+    ct_assertequal(ALDO_HLT_FAULT, (int)expr.cond);
+}
+
+static void fault_condition_malformed(void *ctx)
+{
+    const char *str = "tlf";
+    struct aldo_haltexpr expr;
+
+    auto result = aldo_haltexpr_parse(str, &expr);
+
+    ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
+}
+
 static void expr_missing_unit(void *ctx)
 {
     const char *str = "1234";
@@ -777,6 +853,18 @@ static void print_jam(void *ctx)
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
+static void print_fault(void *ctx)
+{
+    struct aldo_haltexpr expr = {.cond = ALDO_HLT_FAULT};
+    char buf[AldoHexprFmtSize];
+
+    auto result = aldo_haltexpr_desc(&expr, buf);
+
+    const char *expected = "CPU BUS FAULT";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
 //
 // MARK: - Debug Expression Serialization
 //
@@ -884,6 +972,20 @@ static void format_jam(void *ctx)
     ct_assertequalstrn(expected, buf, sizeof expected);
 }
 
+static void format_fault(void *ctx)
+{
+    struct aldo_debugexpr expr = {
+        .type = ALDO_DBG_EXPR_HALT, .hexpr = {.cond = ALDO_HLT_FAULT},
+    };
+    char buf[AldoHexprFmtSize];
+
+    auto result = aldo_haltexpr_fmtdbg(&expr, buf);
+
+    const char *expected = "FLT";
+    ct_assertequal((int)strlen(expected), result);
+    ct_assertequalstrn(expected, buf, sizeof expected);
+}
+
 //
 // MARK: - Test List
 //
@@ -942,6 +1044,14 @@ struct ct_testsuite haltexpr_tests()
         ct_maketest(jam_condition_underparse),
         ct_maketest(jam_condition_malformed),
 
+        ct_maketest(fault_condition),
+        ct_maketest(fault_condition_uppercase),
+        ct_maketest(fault_condition_mixedcase),
+        ct_maketest(fault_condition_with_leading_space),
+        ct_maketest(fault_condition_with_trailing_space),
+        ct_maketest(fault_condition_underparse),
+        ct_maketest(fault_condition_malformed),
+
         ct_maketest(expr_missing_unit),
 
         ct_maketest(null_resetvector_string),
@@ -966,6 +1076,7 @@ struct ct_testsuite haltexpr_tests()
         ct_maketest(print_cycles),
         ct_maketest(print_frames),
         ct_maketest(print_jam),
+        ct_maketest(print_fault),
 
         ct_maketest(format_reset),
         ct_maketest(format_addr),
@@ -974,6 +1085,7 @@ struct ct_testsuite haltexpr_tests()
         ct_maketest(format_cycles),
         ct_maketest(format_frames),
         ct_maketest(format_jam),
+        ct_maketest(format_fault),
     };
 
     return ct_makesuite(tests);

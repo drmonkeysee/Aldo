@@ -1244,6 +1244,7 @@ private:
             u64Selection(currentHaltExpression.frames);
             break;
         case ALDO_HLT_JAM:
+        case ALDO_HLT_FAULT:
             ImGui::Dummy({0, ImGui::GetFrameHeight()});
             break;
         default:

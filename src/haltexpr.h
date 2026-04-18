@@ -18,7 +18,8 @@ X(HLT_ADDR, "Address") \
 X(HLT_TIME, "Time") \
 X(HLT_CYCLES, "Cycles") \
 X(HLT_FRAMES, "Frames") \
-X(HLT_JAM, "Jammed")
+X(HLT_JAM, "Jammed") \
+X(HLT_FAULT, "Fault")   // TODO: handle PPU bus faults as well
 
 enum aldo_haltcondition {
 #define X(s, d) ALDO_##s,

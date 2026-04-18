@@ -13,6 +13,8 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+#define INVALID_CONDITION assert(((void)"INVALID HALT CONDITION", false))
+
 static int parse_resetvector(const char *restrict str, int *resetvector)
 {
     if (!str) return ALDO_HEXPR_ERR_SCAN;
@@ -109,8 +111,13 @@ int aldo_haltexpr_parse(const char *restrict str, struct aldo_haltexpr *expr)
             valid = true;
             e = (typeof(e)){.cond = (enum aldo_haltcondition)i};
             break;
+        case ALDO_HLT_FAULT:
+            parsed = sscanf(str, " %1[Ff]%1[Ll]%1[Tt]", u, u, u) == 3;
+            valid = true;
+            e = (typeof(e)){.cond = (enum aldo_haltcondition)i};
+            break;
         default:
-            assert(((void)"INVALID HALT CONDITION", false));
+            INVALID_CONDITION;
             return ALDO_HEXPR_ERR_COND;
         }
         if (parsed) {
@@ -172,8 +179,11 @@ int aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
     case ALDO_HLT_JAM:
         count = sprintf(buf, "CPU JAMMED");
         break;
+    case ALDO_HLT_FAULT:
+        count = sprintf(buf, "CPU BUS FAULT");
+        break;
     default:
-        assert(((void)"INVALID HALT CONDITION", false));
+        INVALID_CONDITION;
         return ALDO_HEXPR_ERR_COND;
     }
 
@@ -210,8 +220,11 @@ int aldo_haltexpr_fmtdbg(const struct aldo_debugexpr *expr,
         case ALDO_HLT_JAM:
             count = sprintf(buf, "JAM");
             break;
+        case ALDO_HLT_FAULT:
+            count = sprintf(buf, "FLT");
+            break;
         default:
-            assert(((void)"INVALID HALT CONDITION", false));
+            INVALID_CONDITION;
             return ALDO_HEXPR_ERR_COND;
         }
     }

@@ -10,8 +10,9 @@
 
 #include "debug.h"
 #include "cart.h"
-#include "cliargs.h"
 #include "console.h"
+
+struct cliargs;
 
 struct emulator {
     const struct cliargs *args; // Non-owning Pointer

@@ -6,6 +6,7 @@
 //
 
 #include "argparse.h"
+#include "cliargs.h"
 #include "console.h"
 #include "cycleclock.h"
 #include "debug.h"

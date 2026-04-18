@@ -8,6 +8,7 @@
 #include "argparse.h"
 #include "bytes.h"
 #include "cart.h"
+#include "cliargs.h"
 #include "console.h"
 #include "ctrlsignal.h"
 #include "cycleclock.h"

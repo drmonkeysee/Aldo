@@ -18,6 +18,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define INVALID_CONSOLE assert(((void)"INVALID CONSOLE TYPE", false))
+#define INVALID_PROBE assert(((void)"INVALID NES PROBE", false))
+
 static const char *typename(enum aldo_console_type t)
 {
     switch (t) {
@@ -107,7 +110,7 @@ static void snapshot_core(struct aldo_console_base *self)
         aldo_nes_snapshot_core((aldo_nes *)self);
         break;
     default:
-        assert(((void)"INVALID CONSOLE TYPE", false));
+        INVALID_CONSOLE;
         break;
     }
 }
@@ -216,7 +219,7 @@ static bool swap_console(enum aldo_console_type t, enum aldo_cartformat f)
     case ALDO_CONSOLE_ALDO8:
         return f != ALDO_CRTF_RAW;
     default:
-        assert(((void)"INVALID CONSOLE TYPE", false));
+        INVALID_CONSOLE;
         return true;
     }
 }
@@ -235,7 +238,7 @@ void powerup(struct aldo_console_base *self, aldo_cart *c, bool zeroram)
         aldo_nes_powerup((aldo_nes *)self, zeroram);
         break;
     default:
-        assert(((void)"INVALID CONSOLE TYPE", false));
+        INVALID_CONSOLE;
         break;
     }
 }
@@ -405,7 +408,7 @@ bool aldo_console_probe(aldo_console *self, enum aldo_interrupt signal)
     case ALDO_INT_RST:
         return self->probe.rst;
     default:
-        assert(((void)"INVALID NES PROBE", false));
+        INVALID_PROBE;
         return false;
     }
 }
@@ -429,7 +432,7 @@ void aldo_console_set_probe(aldo_console *self, enum aldo_interrupt signal,
         self->probe.rst = active;
         break;
     default:
-        assert(((void)"INVALID NES PROBE", false));
+        INVALID_PROBE;
         break;
     }
 }
@@ -456,14 +459,31 @@ const struct aldo_snapshot *aldo_console_snapshot(aldo_console *self)
     return self->snp;
 }
 
-void aldo_console_dumpram(aldo_console *self, FILE *fs[static 3],
-                          bool errs[static 3])
+size_t aldo_console_dumpcount(aldo_console *self)
 {
     assert(self != nullptr);
+
+    return self->type == ALDO_CONSOLE_NES ? 3 : 1;
+}
+
+void aldo_console_dumpram(aldo_console *self, size_t count, FILE *fs[count],
+                          bool errs[count])
+{
+    assert(self != nullptr);
+    assert(count > 0);
     assert(fs != nullptr);
     assert(errs != nullptr);
 
-    // TODO: dump ram for all types
-    assert(self->type == ALDO_CONSOLE_NES);
-    aldo_nes_dumpram((aldo_nes *)self, fs, errs);
+    switch (self->type) {
+    case ALDO_CONSOLE_ALDO8:
+        aldo_aldo8_dumpram((aldo_aldo8 *)self, fs[0], errs);
+        break;
+    case ALDO_CONSOLE_NES:
+        aldo_nes_dumpram((aldo_nes *)self, fs, errs);
+        break;
+    default:
+        INVALID_CONSOLE;
+        errs[0] = true;
+        break;
+    }
 }

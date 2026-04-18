@@ -9,6 +9,7 @@
 #define Aldo_aldo8_h
 
 #include <stddef.h>
+#include <stdio.h>
 
 typedef struct aldo_aldo8_console aldo_aldo8;
 
@@ -18,5 +19,7 @@ bool aldo_aldo8_init(aldo_aldo8 *self);
 void aldo_aldo8_powerup(aldo_aldo8 *self, bool zeroram);
 
 void aldo_aldo8_snapshot_core(aldo_aldo8 *self);
+
+void aldo_aldo8_dumpram(aldo_aldo8 *self, FILE *f, bool *err);
 
 #endif

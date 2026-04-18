@@ -82,9 +82,10 @@ void aldo_console_clock(aldo_console *self,
 aldo_export
 const struct aldo_snapshot *aldo_console_snapshot(aldo_console *self) aldo_nothrow;
 aldo_export
-// TODO: need to query for buffer count
-void aldo_console_dumpram(aldo_console *self, FILE *fs[aldo_cz(3)],
-                          bool errs[aldo_cz(3)]) aldo_nothrow;
+size_t aldo_console_dumpcount(aldo_console *self) aldo_nothrow;
+aldo_export
+void aldo_console_dumpram(aldo_console *self, size_t count, FILE *fs[count],
+                          bool errs[count]) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

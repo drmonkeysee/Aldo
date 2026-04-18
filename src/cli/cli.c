@@ -19,6 +19,7 @@
 #include "ui.h"
 #include "version.h"
 
+#include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -206,9 +207,11 @@ static void dump_ram(const struct emulator *emu)
         "vram.bin",
         "ppu.bin",
     };
-    static constexpr auto dmpcount = aldo_arrsz(dmpfiles);
 
     if (!emu->args->tron && !emu->args->batch) return;
+
+    auto dmpcount = aldo_console_dumpcount(emu->console);
+    assert(dmpcount <= aldo_arrsz(dmpfiles));
 
     FILE *fs[dmpcount];
     for (size_t i = 0; i < dmpcount; ++i) {
@@ -219,7 +222,7 @@ static void dump_ram(const struct emulator *emu)
         }
     }
     bool errs[dmpcount];
-    aldo_console_dumpram(emu->console, fs, errs);
+    aldo_console_dumpram(emu->console, dmpcount, fs, errs);
     for (size_t i = 0; i < dmpcount; ++i) {
         if (fs[i]) {
             if (errs[i]) {

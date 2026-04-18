@@ -103,3 +103,12 @@ void aldo_aldo8_snapshot_core(aldo_aldo8 *self)
 
     self->extends.snp->mem.ram = self->ram;
 }
+
+void aldo_aldo8_dumpram(aldo_aldo8 *self, FILE *f, bool *err)
+{
+    assert(self != nullptr);
+    assert(f != nullptr);
+    assert(err != nullptr);
+
+    *err = !aldo_memdump(self->ram, f);
+}

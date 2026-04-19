@@ -690,14 +690,6 @@ public:
 protected:
     void renderContents() override
     {
-        if (ImGui::CollapsingHeader("DMA", ImGuiTreeNodeFlags_DefaultOpen)) {
-            renderDma();
-        }
-    }
-
-private:
-    void renderDma() noexcept
-    {
         renderLines();
         ImGui::Separator();
         renderDmaState();
@@ -705,6 +697,7 @@ private:
         renderBusLines();
     }
 
+private:
     void renderLines() noexcept
     {
         auto& apu = emu.snapshot().apu;
@@ -973,15 +966,11 @@ public:
 protected:
     void renderContents() override
     {
-        if (ImGui::CollapsingHeader("Registers", ImGuiTreeNodeFlags_DefaultOpen)) {
-            renderRegisters();
-        }
-        if (ImGui::CollapsingHeader("Flags", ImGuiTreeNodeFlags_DefaultOpen)) {
-            renderFlags();
-        }
-        if (ImGui::CollapsingHeader("Datapath", ImGuiTreeNodeFlags_DefaultOpen)) {
-            renderDatapath();
-        }
+        renderRegisters();
+        ImGui::Separator();
+        renderFlags();
+        ImGui::Separator();
+        renderDatapath();
     }
 
 private:
@@ -1038,7 +1027,7 @@ private:
 
     void renderDatapath() const noexcept
     {
-        auto glyphW = aldo::style::glyph_size().x, lineSpacer = glyphW * 8;
+        auto glyphW = aldo::style::glyph_size().x, lineSpacer = glyphW * 7.5f;
         renderControlLines(lineSpacer, glyphW);
         ImGui::Separator();
         renderBusLines();
@@ -2093,12 +2082,9 @@ public:
 protected:
     void renderContents() override
     {
-        if (ImGui::CollapsingHeader("Registers", ImGuiTreeNodeFlags_DefaultOpen)) {
-            renderRegisters();
-        }
-        if (ImGui::CollapsingHeader("Pipeline", ImGuiTreeNodeFlags_DefaultOpen)) {
-            renderPipeline();
-        }
+        renderRegisters();
+        ImGui::Separator();
+        renderPipeline();
     }
 
 private:
@@ -2718,13 +2704,11 @@ protected:
         }
         screen.render((static_cast<float>(scaleSelection) / 2.0f) + 1, sdRatio);
 
-        if (ImGui::CollapsingHeader("Controls", ImGuiTreeNodeFlags_DefaultOpen)) {
-            ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 10);
-            ImGui::Combo("Scale", &scaleSelection, scales.data(),
-                         scales.size());
-            ImGui::SameLine();
-            ImGui::Checkbox("4:3 Ratio", &sdRatio);
-        }
+        ImGui::Separator();
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 10);
+        ImGui::Combo("Scale", &scaleSelection, scales.data(), scales.size());
+        ImGui::SameLine();
+        ImGui::Checkbox("4:3 Ratio", &sdRatio);
     }
 
 private:

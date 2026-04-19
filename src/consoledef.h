@@ -16,6 +16,7 @@
 struct aldo_console_base {
     // Console Type Header
     enum aldo_console_type type;
+
     // Optional callbacks for type-specific functionality
     struct {
         void (*conn)(aldo_console *);   // Cart Connect

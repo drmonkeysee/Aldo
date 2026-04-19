@@ -860,6 +860,105 @@ private:
     }
 };
 
+class ControlsView final : public aldo::View {
+public:
+    ControlsView(aldo::viewstate& vs, const aldo::Emulator& emu,
+                 const aldo::MediaRuntime& mr) noexcept
+    : View{"Controls", vs, emu, mr} {}
+    ControlsView(aldo::viewstate&, aldo::Emulator&&,
+                 const aldo::MediaRuntime&) = delete;
+    ControlsView(aldo::viewstate&, const aldo::Emulator&,
+                 aldo::MediaRuntime&&) = delete;
+    ControlsView(aldo::viewstate&, aldo::Emulator&&,
+                 aldo::MediaRuntime&&) = delete;
+
+protected:
+    void renderContents() override
+    {
+        renderSpeedControls();
+        ImGui::Separator();
+        renderRunControls();
+    }
+
+private:
+    void renderSpeedControls() const noexcept
+    {
+        ImGui::AlignTextToFramePadding();
+        ImGui::TextUnformatted(vs.clock.scale() == ALDO_CS_CYCLE
+                               ? "Cycles/Second"
+                               : "Frames/Second");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 6);
+        int min, max;
+        if (vs.clock.scale() == ALDO_CS_CYCLE) {
+            min = Aldo_MinCps;
+            max = Aldo_MaxCps;
+        } else {
+            min = Aldo_MinFps;
+            max = Aldo_MaxFps;
+        }
+        ImGui::DragInt("##clockRate", &vs.clock.clock().rate, 1, min, max,
+                       "%d", ImGuiSliderFlags_AlwaysClamp);
+
+        if (ImGui::RadioButton("Cycles", vs.clock.scale() == ALDO_CS_CYCLE)) {
+            vs.clock.setScale(ALDO_CS_CYCLE, emu);
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Frames", vs.clock.scale() == ALDO_CS_FRAME)) {
+            vs.clock.setScale(ALDO_CS_FRAME, emu);
+        }
+    }
+
+    void renderRunControls() const
+    {
+        auto halt = emu.halted();
+        if (ImGui::Checkbox("HALT", &halt)) {
+            vs.commands.emplace(aldo::Command::halt, halt);
+        };
+        ImGui::SameLine();
+        auto rdy = emu.probe(ALDO_INT_RDY);
+        if (ImGui::Checkbox("RDY", &rdy)) {
+            vs.addProbeCommand(ALDO_INT_RDY, rdy);
+        }
+
+        auto mode = emu.runMode();
+        if (ImGui::RadioButton("Sub ", mode == ALDO_EXC_SUBCYCLE)
+            && mode != ALDO_EXC_SUBCYCLE) {
+            vs.commands.emplace(aldo::Command::mode, ALDO_EXC_SUBCYCLE);
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Cycle", mode == ALDO_EXC_CYCLE)
+            && mode != ALDO_EXC_CYCLE) {
+            vs.commands.emplace(aldo::Command::mode, ALDO_EXC_CYCLE);
+        }
+        if (ImGui::RadioButton("Step", mode == ALDO_EXC_STEP)
+            && mode != ALDO_EXC_STEP) {
+            vs.commands.emplace(aldo::Command::mode, ALDO_EXC_STEP);
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Run", mode == ALDO_EXC_RUN)
+            && mode != ALDO_EXC_RUN) {
+            vs.commands.emplace(aldo::Command::mode, ALDO_EXC_RUN);
+        }
+
+        auto
+            irq = emu.probe(ALDO_INT_IRQ),
+            nmi = emu.probe(ALDO_INT_NMI),
+            rst = emu.probe(ALDO_INT_RST);
+        if (ImGui::Checkbox("IRQ", &irq)) {
+            vs.addProbeCommand(ALDO_INT_IRQ, irq);
+        }
+        ImGui::SameLine();
+        if (ImGui::Checkbox("NMI", &nmi)) {
+            vs.addProbeCommand(ALDO_INT_NMI, nmi);
+        }
+        ImGui::SameLine();
+        if (ImGui::Checkbox("RST", &rst)) {
+            vs.addProbeCommand(ALDO_INT_RST, rst);
+        }
+    }
+};
+
 class CpuView final : public aldo::View {
 public:
     CpuView(aldo::viewstate& vs, const aldo::Emulator& emu,
@@ -2559,16 +2658,6 @@ public:
 protected:
     void renderContents() override
     {
-        renderStats();
-        ImGui::Separator();
-        renderSpeedControls();
-        ImGui::Separator();
-        renderRunControls();
-    }
-
-private:
-    void renderStats() noexcept
-    {
         const auto& clock = vs.clock.clock();
         if (statsInterval.elapsed(clock)) {
             dispDtInput = vs.clock.dtInputMs();
@@ -2599,83 +2688,7 @@ private:
         ImGui::Text("BCD Support: %s", boolstr(emu.bcdSupport()));
     }
 
-    void renderSpeedControls() const noexcept
-    {
-        ImGui::AlignTextToFramePadding();
-        ImGui::TextUnformatted(vs.clock.scale() == ALDO_CS_CYCLE
-                               ? "Cycles/Second"
-                               : "Frames/Second");
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 6);
-        int min, max;
-        if (vs.clock.scale() == ALDO_CS_CYCLE) {
-            min = Aldo_MinCps;
-            max = Aldo_MaxCps;
-        } else {
-            min = Aldo_MinFps;
-            max = Aldo_MaxFps;
-        }
-        ImGui::DragInt("##clockRate", &vs.clock.clock().rate, 1, min, max,
-                       "%d", ImGuiSliderFlags_AlwaysClamp);
-
-        if (ImGui::RadioButton("Cycles", vs.clock.scale() == ALDO_CS_CYCLE)) {
-            vs.clock.setScale(ALDO_CS_CYCLE, emu);
-        }
-        ImGui::SameLine();
-        if (ImGui::RadioButton("Frames", vs.clock.scale() == ALDO_CS_FRAME)) {
-            vs.clock.setScale(ALDO_CS_FRAME, emu);
-        }
-    }
-
-    void renderRunControls() const
-    {
-        auto halt = emu.halted();
-        if (ImGui::Checkbox("HALT", &halt)) {
-            vs.commands.emplace(aldo::Command::halt, halt);
-        };
-        ImGui::SameLine();
-        auto rdy = emu.probe(ALDO_INT_RDY);
-        if (ImGui::Checkbox("RDY", &rdy)) {
-            vs.addProbeCommand(ALDO_INT_RDY, rdy);
-        }
-
-        auto mode = emu.runMode();
-        if (ImGui::RadioButton("Sub ", mode == ALDO_EXC_SUBCYCLE)
-            && mode != ALDO_EXC_SUBCYCLE) {
-            vs.commands.emplace(aldo::Command::mode, ALDO_EXC_SUBCYCLE);
-        }
-        ImGui::SameLine();
-        if (ImGui::RadioButton("Cycle", mode == ALDO_EXC_CYCLE)
-            && mode != ALDO_EXC_CYCLE) {
-            vs.commands.emplace(aldo::Command::mode, ALDO_EXC_CYCLE);
-        }
-        if (ImGui::RadioButton("Step", mode == ALDO_EXC_STEP)
-            && mode != ALDO_EXC_STEP) {
-            vs.commands.emplace(aldo::Command::mode, ALDO_EXC_STEP);
-        }
-        ImGui::SameLine();
-        if (ImGui::RadioButton("Run", mode == ALDO_EXC_RUN)
-            && mode != ALDO_EXC_RUN) {
-            vs.commands.emplace(aldo::Command::mode, ALDO_EXC_RUN);
-        }
-
-        auto
-            irq = emu.probe(ALDO_INT_IRQ),
-            nmi = emu.probe(ALDO_INT_NMI),
-            rst = emu.probe(ALDO_INT_RST);
-        if (ImGui::Checkbox("IRQ", &irq)) {
-            vs.addProbeCommand(ALDO_INT_IRQ, irq);
-        }
-        ImGui::SameLine();
-        if (ImGui::Checkbox("NMI", &nmi)) {
-            vs.addProbeCommand(ALDO_INT_NMI, nmi);
-        }
-        ImGui::SameLine();
-        if (ImGui::Checkbox("RST", &rst)) {
-            vs.addProbeCommand(ALDO_INT_RST, rst);
-        }
-    }
-
+private:
     RefreshInterval<200.0> statsInterval;
     double
         dispDtInput = 0, dispDtUpdate = 0, dispDtRender = 0, dispDtElapsed = 0,
@@ -2744,6 +2757,7 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
     add_views<
         ApuView,
         CartInfoView,
+        ControlsView,
         CpuView,
         DebuggerView,
         NametablesView,

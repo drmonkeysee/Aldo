@@ -15,6 +15,7 @@
 #include "runclock.hpp"
 
 #include <concepts>
+#include <optional>
 #include <queue>
 #include <utility>
 #include <variant>
@@ -70,6 +71,7 @@ struct viewstate {
     std::queue<command_state> commands;
     RunClock clock;
     palette::sz colorSelection = 0;
+    std::optional<et::size> selectedInstruction;
     bool
         running = true, showAbout = false, showDemo = false,
         showDesignPalette = false;

@@ -672,6 +672,40 @@ auto small_led(bool on, float xOffset = 0) noexcept
     drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
 }
 
+auto cpu_flag_leds(aldo::et::byte status, bool includeNullLine) noexcept
+{
+    static constexpr std::array flags{
+        'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
+    };
+    static constexpr auto textOn = IM_COL32_BLACK, textOff = IM_COL32_WHITE;
+
+    auto textSz = aldo::style::glyph_size();
+    auto radius = (textSz.x + textSz.y) / 2;
+    auto pos = ImGui::GetCursorScreenPos();
+    ImVec2 center = pos + radius;
+
+    auto fontSz = ImGui::GetFontSize();
+    ImVec2 offset{fontSz / 4, fontSz / 2};
+    auto drawList = ImGui::GetWindowDrawList();
+
+    for (auto it = flags.cbegin(); it != flags.cend(); ++it) {
+        if (*it == '-' && !includeNullLine) continue;
+        auto bitpos = std::distance(it, flags.cend()) - 1;
+        ImU32 fillColor, textColor;
+        if (status & (1 << bitpos)) {
+            fillColor = aldo::colors::LedOn;
+            textColor = textOn;
+        } else {
+            fillColor = aldo::colors::LedOff;
+            textColor = textOff;
+        }
+        drawList->AddCircleFilled(center, radius, fillColor);
+        drawList->AddText(center - offset, textColor, it, it + 1);
+        center.x += radius * 2.5f;
+    }
+    ImGui::Dummy({0, radius * 2});
+}
+
 //
 // MARK: - Concrete Views
 //
@@ -968,7 +1002,7 @@ protected:
     {
         renderRegisters();
         ImGui::Separator();
-        renderFlags();
+        cpu_flag_leds(emu.snapshot().cpu.status, true);
         ImGui::Separator();
         renderDatapath();
     }
@@ -988,41 +1022,6 @@ private:
             ImGui::Text(" S: %02X", cpu.stack_pointer);
             ImGui::Text(" P: %02X", cpu.status);
         });
-    }
-
-    void renderFlags() const
-    {
-        static constexpr std::array flags{
-            'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
-        };
-        static constexpr auto
-            textOn = IM_COL32_BLACK,
-            textOff = IM_COL32_WHITE;
-
-        auto textSz = aldo::style::glyph_size();
-        auto radius = (textSz.x + textSz.y) / 2;
-        auto pos = ImGui::GetCursorScreenPos();
-        ImVec2 center = pos + radius;
-
-        auto fontSz = ImGui::GetFontSize();
-        ImVec2 offset{fontSz / 4, fontSz / 2};
-        auto drawList = ImGui::GetWindowDrawList();
-
-        for (auto it = flags.cbegin(); it != flags.cend(); ++it) {
-            auto bitpos = std::distance(it, flags.cend()) - 1;
-            ImU32 fillColor, textColor;
-            if (emu.snapshot().cpu.status & (1 << bitpos)) {
-                fillColor = aldo::colors::LedOn;
-                textColor = textOn;
-            } else {
-                fillColor = aldo::colors::LedOff;
-                textColor = textOff;
-            }
-            drawList->AddCircleFilled(center, radius, fillColor);
-            drawList->AddText(center - offset, textColor, it, it + 1);
-            center.x += radius * 2.5f;
-        }
-        ImGui::Dummy({0, radius * 2});
     }
 
     void renderDatapath() const noexcept
@@ -1453,6 +1452,173 @@ private:
     HaltCombo conditionsCombo;
     aldo_haltexpr currentHaltExpression;
     SelectedBreakpoints bpSelections;
+};
+
+class InstructionView final : public aldo::View {
+public:
+    InstructionView(aldo::viewstate& vs, const aldo::Emulator& emu,
+                    const aldo::MediaRuntime& mr) noexcept
+    : View{"Selected Instruction", vs, emu, mr} {}
+    InstructionView(aldo::viewstate&, aldo::Emulator&&,
+                    const aldo::MediaRuntime&) = delete;
+    InstructionView(aldo::viewstate&, const aldo::Emulator&,
+                    aldo::MediaRuntime&&) = delete;
+    InstructionView(aldo::viewstate&, aldo::Emulator&&,
+                    aldo::MediaRuntime&&) = delete;
+
+protected:
+    void renderContents() override
+    {
+        if (vs.selectedInstruction) {
+            const auto& curr = emu.snapshot().prg.curr;
+            aldo_dis_instruction inst{};
+            auto result = aldo_dis_parsemem_inst(curr.length, curr.pc,
+                                                 vs.selectedInstruction.value(),
+                                                 &inst);
+            if (result > 0) {
+                renderInstructionDetails(inst);
+            } else if (result < 0) {
+                ImGui::TextUnformatted(aldo_dis_errstr(result));
+            } else {
+                ImGui::TextUnformatted("No valid instruction found");
+            }
+        } else {
+            ImGui::TextUnformatted("No selected instruction");
+        }
+    }
+
+private:
+    void renderInstructionDetails(const aldo_dis_instruction& inst) const noexcept
+    {
+        renderMnemonic(inst);
+        ImGui::Separator();
+        renderDescription(inst);
+        ImGui::Separator();
+        renderCycles(inst);
+        ImGui::Separator();
+        cpu_flag_leds(aldo_dis_inst_flags(&inst), false);
+        renderDataCells(inst);
+    }
+
+    void renderMnemonic(const aldo_dis_instruction& inst) const noexcept
+    {
+        widget_group([&inst] noexcept {
+            ImGui::TextUnformatted(aldo_dis_inst_mnemonic(&inst));
+            ImGui::Text("(%02X)", inst.bv.mem[0]);
+        });
+        ImGui::SameLine();
+        widget_group([&inst] noexcept {
+            // make buffer large enough for operand and raw byte display
+            std::array<char, AldoDisOperandSize + 1> buf;
+            auto result = aldo_dis_inst_operand(&inst, buf.data());
+            ImGui::TextUnformatted(result < 0 ? "ERR" : buf.data());
+            result = 0;
+            if (inst.bv.size > 1) {
+                result = std::snprintf(buf.data(), buf.size(),
+                                       "(%02X)", inst.bv.mem[1]);
+            }
+            if (result > 0 && inst.bv.size > 2) {
+                result = std::snprintf(buf.data() + result, buf.size(),
+                                       "(%02X)", inst.bv.mem[2]);
+            }
+            if (result > 0) {
+                ImGui::TextUnformatted(buf.data());
+            }
+        });
+    }
+
+    void renderDescription(const aldo_dis_instruction& inst) const noexcept
+    {
+        ImGui::Text("%s %s", aldo_dis_inst_description(&inst),
+                    inst.d.unofficial ? "(Unofficial)" : "");
+        ImGui::TextUnformatted(aldo_dis_inst_addrmode(&inst));
+    }
+
+    void renderCycles(const aldo_dis_instruction& inst) const noexcept
+    {
+        if (inst.d.cycles.count < 0) {
+            ImGui::TextUnformatted("\u221e cycles");
+        } else {
+            ImGui::Text("%d cycles", inst.d.cycles.count);
+        }
+        if (inst.d.cycles.branch_taken) {
+            ImGui::TextUnformatted("(+1 branch taken)");
+        }
+        if (inst.d.cycles.page_boundary) {
+            ImGui::TextUnformatted("(+1 page-boundary crossed)");
+        }
+    }
+
+    void renderDataCells(const aldo_dis_instruction& inst) const noexcept
+    {
+        static constexpr std::array registers{
+            std::pair{'M', "Main Memory"},
+            std::pair{'I', "Instruction Register (Program Counter)"},
+            std::pair{'S', "Stack Pointer"},
+            std::pair{'P', "Processor Status"},
+            std::pair{'Y', "Y-Index"},
+            std::pair{'X', "X-Index"},
+            std::pair{'A', "Accumulator"},
+        };
+        static constexpr auto cellSet = [](const auto& cells,
+                                           char label) static constexpr noexcept {
+            switch (label) {
+            case 'M':
+                return cells.m;
+            case 'I':
+                return cells.pc;
+            case 'S':
+                return cells.s;
+            case 'P':
+                return cells.p;
+            case 'Y':
+                return cells.y;
+            case 'X':
+                return cells.x;
+            case 'A':
+                return cells.a;
+            default:
+                return false;
+            }
+        };
+        static constexpr auto textOn = IM_COL32_BLACK, textOff = IM_COL32_WHITE;
+
+        auto textSz = aldo::style::glyph_size();
+        auto dim = textSz.x + textSz.y;
+        // create a single character string buffer for button labels
+        std::string lblBuf(2, '\0');
+
+        for (auto it = registers.cbegin(); it != registers.cend(); ++it) {
+            auto [label, tooltip] = *it;
+            ImU32 fillColor, textColor;
+            if (cellSet(inst.d.datacells, label)) {
+                fillColor = aldo::colors::LedOn;
+                textColor = textOn;
+            } else {
+                fillColor = aldo::colors::LedOff;
+                textColor = textOff;
+            }
+            lblBuf[0] = label;
+            {
+                ScopedColor colors{
+                    {ImGuiCol_Button, fillColor},
+                    {ImGuiCol_ButtonHovered, fillColor},
+                    {ImGuiCol_ButtonActive, fillColor},
+                    {ImGuiCol_Text, textColor},
+                };
+                ImGui::Button(lblBuf.c_str(), {dim, dim});
+            }
+            // ::SetItemTooltip warns that tooltip is not a string literal
+            if (ImGui::BeginItemTooltip()) {
+                ImGui::TextUnformatted(tooltip);
+                ImGui::EndTooltip();
+            }
+            // TODO: replace this check with std::views::enumerate when available
+            if (it + 1 < registers.cend()) {
+                ImGui::SameLine(0, 5);
+            }
+        }
+    }
 };
 
 class NametablesView final : public aldo::View {
@@ -2230,16 +2396,15 @@ private:
         aldo_dis_instruction inst{};
         std::array<aldo::et::tchar, AldoDisInstSize> disasm;
         for (auto i = 0; i < instCount; ++i) {
-            auto result = aldo_dis_parsemem_inst(curr.length, curr.pc,
-                                                 inst.offset + inst.bv.size,
-                                                 &inst);
+            auto at = inst.offset + inst.bv.size;
+            auto result = aldo_dis_parsemem_inst(curr.length, curr.pc, at, &inst);
             if (result > 0) {
                 result = aldo_dis_inst(addr, &inst, disasm.data());
                 if (result > 0) {
                     if (ImGui::Selectable(disasm.data(), selected == i)) {
-                        selected = i;
+                        setSelected(i, at);
                     } else if (ImGui::BeginPopupContextItem()) {
-                        selected = i;
+                        setSelected(i, at);
                         if (ImGui::Selectable("Add breakpoint...")) {
                             aldo_haltexpr expr{
                                 .address = addr, .cond = ALDO_HLT_ADDR,
@@ -2287,6 +2452,16 @@ private:
         hi = prg.vectors[5];
         ImGui::Text("%4X: %02X %02X     IRQ $%04X", ALDO_CPU_VECTOR_IRQ, lo,
                     hi, aldo_bytowr(lo, hi));
+    }
+
+    void setSelected(int i, aldo::et::size at) noexcept
+    {
+        selected = i;
+        if (i == NoSelection) {
+            vs.selectedInstruction.reset();
+        } else {
+            vs.selectedInstruction = at;
+        }
     }
 
     int selected = NoSelection;
@@ -2744,6 +2919,7 @@ aldo::Layout::Layout(aldo::viewstate& vs, const aldo::Emulator& emu,
         ControlsView,
         CpuView,
         DebuggerView,
+        InstructionView,
         NametablesView,
         PaletteView,
         PatternTablesView,

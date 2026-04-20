@@ -42,6 +42,7 @@
 #include <unordered_set>
 #include <cassert>
 #include <cinttypes>
+#include <cmath>
 #include <cstdio>
 
 namespace
@@ -1536,11 +1537,8 @@ private:
 
     void renderCycles(const aldo_dis_instruction& inst) const noexcept
     {
-        if (inst.d.cycles.count < 0) {
-            ImGui::TextUnformatted("\u221e cycles");
-        } else {
-            ImGui::Text("%d cycles", inst.d.cycles.count);
-        }
+        ImGui::Text("%.0f cycles",
+                    inst.d.cycles.count < 0 ? INFINITY : inst.d.cycles.count);
         if (inst.d.cycles.branch_taken) {
             ImGui::TextUnformatted("(+1 branch taken)");
         }

@@ -413,7 +413,7 @@ auto file_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
     }
 }
 
-auto speed_menu_items(aldo::viewstate& vs, const aldo::Emulator& emu) noexcept
+auto speed_menu_items(aldo::viewstate& vs, const aldo::Emulator& emu)
 {
     static constexpr auto multiplierLabel = " 10x", labelBase = "Clock Rate ";
 
@@ -673,15 +673,22 @@ auto small_led(bool on, float xOffset = 0) noexcept
     drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
 }
 
-auto cpu_flag_leds(aldo::et::byte status, bool includeNullLine) noexcept
+auto cpu_flag_leds(aldo::et::byte status, bool unmappedLine)
 {
     static constexpr std::array flags{
-        'N', 'V', '-', 'B', 'D', 'I', 'Z', 'C',
+        std::pair{'N', "Negative"},
+        std::pair{'V', "Overflow"},
+        std::pair{'-', "Unmapped"},
+        std::pair{'B', "Soft-Break"},
+        std::pair{'D', "Decimal Mode"},
+        std::pair{'I', "Interrupts Disabled"},
+        std::pair{'Z', "Zero"},
+        std::pair{'C', "Carry"},
     };
     static constexpr auto textOn = IM_COL32_BLACK, textOff = IM_COL32_WHITE;
 
     auto textSz = aldo::style::glyph_size();
-    auto radius = (textSz.x + textSz.y) / 2;
+    auto dim = textSz.x + textSz.y, radius = dim / 2;
     auto pos = ImGui::GetCursorScreenPos();
     ImVec2 center = pos + radius;
 
@@ -689,8 +696,10 @@ auto cpu_flag_leds(aldo::et::byte status, bool includeNullLine) noexcept
     ImVec2 offset{fontSz / 4, fontSz / 2};
     auto drawList = ImGui::GetWindowDrawList();
 
+    std::string idBuf(3, '#');
     for (auto it = flags.cbegin(); it != flags.cend(); ++it) {
-        if (*it == '-' && !includeNullLine) continue;
+        auto [label, tooltip] = *it;
+        if (label == '-' && !unmappedLine) continue;
         auto bitpos = std::distance(it, flags.cend()) - 1;
         ImU32 fillColor, textColor;
         if (status & (1 << bitpos)) {
@@ -701,10 +710,20 @@ auto cpu_flag_leds(aldo::et::byte status, bool includeNullLine) noexcept
             textColor = textOff;
         }
         drawList->AddCircleFilled(center, radius, fillColor);
-        drawList->AddText(center - offset, textColor, it, it + 1);
+        idBuf[2] = label;
+        drawList->AddText(center - offset, textColor, idBuf.c_str() + 2);
         center.x += radius * 2.5f;
+        ImGui::InvisibleButton(idBuf.c_str(), {dim, dim});
+        // ImGui::SetItemTooltip warns that tooltip is not a string literal
+        if (ImGui::BeginItemTooltip()) {
+            ImGui::TextUnformatted(tooltip);
+            ImGui::EndTooltip();
+        }
+        // TODO: replace this check with std::views::enumerate when available
+        if (it + 1 < flags.cend()) {
+            ImGui::SameLine(0, 5);
+        }
     }
-    ImGui::Dummy({0, radius * 2});
 }
 
 //
@@ -1489,7 +1508,7 @@ protected:
     }
 
 private:
-    void renderInstructionDetails(const aldo_dis_instruction& inst) const noexcept
+    void renderInstructionDetails(const aldo_dis_instruction& inst) const
     {
         renderMnemonic(inst);
         ImGui::Separator();
@@ -1547,7 +1566,7 @@ private:
         }
     }
 
-    void renderDataCells(const aldo_dis_instruction& inst) const noexcept
+    void renderDataCells(const aldo_dis_instruction& inst) const
     {
         static constexpr std::array registers{
             std::pair{'M', "Main Memory"},
@@ -1606,7 +1625,7 @@ private:
                 };
                 ImGui::Button(lblBuf.c_str(), {dim, dim});
             }
-            // ::SetItemTooltip warns that tooltip is not a string literal
+            // ImGui::SetItemTooltip warns that tooltip is not a string literal
             if (ImGui::BeginItemTooltip()) {
                 ImGui::TextUnformatted(tooltip);
                 ImGui::EndTooltip();

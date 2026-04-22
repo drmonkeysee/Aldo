@@ -1471,7 +1471,7 @@ enum aldo_probe_value aldo_ppu_probe(const struct aldo_rp2c02 *self,
         return aldo_lnptoprb(self->mprbh.be, self->mprbl.be);
     default:
         INVALID_PROBE;
-        return ALDO_PRBV_DISABLED;
+        return ALDO_PRBV_DIS;
     }
 }
 
@@ -1482,6 +1482,7 @@ void aldo_ppu_set_probe(struct aldo_rp2c02 *self, enum aldo_probe probe,
 
     bool hi, lo;
     aldo_prbtolnp(val, &hi, &lo);
+
     switch (probe) {
     case ALDO_PRB_PPU_GRAY:
         self->mprbh.g = hi;
@@ -1519,6 +1520,7 @@ void aldo_ppu_set_probe(struct aldo_rp2c02 *self, enum aldo_probe probe,
         INVALID_PROBE;
         break;
     }
+
     // refresh the register with the latest probe lines
     set_mask(self, get_mask(self));
 }

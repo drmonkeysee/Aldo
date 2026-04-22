@@ -89,7 +89,7 @@ inline enum aldo_probe_value aldo_lnptoprb(bool hi, bool lo) aldo_nothrow
 {
     if (hi) return ALDO_PRBV_ON;
     if (lo) return ALDO_PRBV_OFF;
-    return ALDO_PRBV_DISABLED;
+    return ALDO_PRBV_DIS;
 }
 
 // Probe Value to Line-Pair

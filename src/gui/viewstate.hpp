@@ -44,7 +44,7 @@ enum class Command {
 };
 
 struct command_state {
-    using probe = std::pair<aldo_interrupt, bool>;
+    using probe = std::pair<aldo_probe, bool>;
     using payload =
         std::variant<
             std::monostate,
@@ -63,7 +63,7 @@ struct command_state {
 };
 
 struct viewstate {
-    void addProbeCommand(aldo_interrupt signal, bool active)
+    void addProbeCommand(aldo_probe signal, bool active)
     {
         commands.emplace(Command::probe, command_state::probe{signal, active});
     }

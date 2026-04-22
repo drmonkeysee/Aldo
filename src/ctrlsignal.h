@@ -16,11 +16,11 @@ enum aldo_execmode {
     ALDO_EXC_COUNT,
 };
 
-enum aldo_interrupt {
-    ALDO_INT_IRQ,
-    ALDO_INT_NMI,
-    ALDO_INT_RDY,
-    ALDO_INT_RST,
+enum aldo_probe {
+    ALDO_PRB_IRQ,
+    ALDO_PRB_NMI,
+    ALDO_PRB_RDY,
+    ALDO_PRB_RST,
 };
 
 enum aldo_sigstate {

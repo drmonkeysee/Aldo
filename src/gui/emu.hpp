@@ -79,11 +79,11 @@ public:
     {
         aldo_console_set_mode(consolep(), mode);
     }
-    bool probe(aldo_interrupt signal) const noexcept
+    bool probe(aldo_probe signal) const noexcept
     {
         return aldo_console_probe(consolep(), signal);
     }
-    void probe(aldo_interrupt signal, bool active) noexcept
+    void probe(aldo_probe signal, bool active) noexcept
     {
         aldo_console_set_probe(consolep(), signal, active);
     }

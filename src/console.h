@@ -69,15 +69,13 @@ bool aldo_console_halted(aldo_console *self) aldo_nothrow;
 aldo_export
 void aldo_console_halt(aldo_console *self, bool halt) aldo_nothrow;
 aldo_export
-bool aldo_console_probe(aldo_console *self,
-                        enum aldo_interrupt signal) aldo_nothrow;
+bool aldo_console_probe(aldo_console *self, enum aldo_probe signal) aldo_nothrow;
 aldo_export
-void aldo_console_set_probe(aldo_console *self, enum aldo_interrupt signal,
+void aldo_console_set_probe(aldo_console *self, enum aldo_probe signal,
                             bool active) aldo_nothrow;
 
 aldo_export
-void aldo_console_clock(aldo_console *self,
-                        struct aldo_clock *clock) aldo_nothrow;
+void aldo_console_clock(aldo_console *self, struct aldo_clock *clock) aldo_nothrow;
 
 aldo_export
 const struct aldo_snapshot *aldo_console_snapshot(aldo_console *self) aldo_nothrow;

@@ -477,21 +477,21 @@ auto controls_menu(aldo::viewstate& vs, const aldo::Emulator& emu)
         mode_menu_item(vs, emu);
         ImGui::Separator();
         auto
-            rdy = emu.probe(ALDO_INT_RDY),
-            irq = emu.probe(ALDO_INT_IRQ),
-            nmi = emu.probe(ALDO_INT_NMI),
-            rst = emu.probe(ALDO_INT_RST);
+            rdy = emu.probe(ALDO_PRB_RDY),
+            irq = emu.probe(ALDO_PRB_IRQ),
+            nmi = emu.probe(ALDO_PRB_NMI),
+            rst = emu.probe(ALDO_PRB_RST);
         if (ImGui::MenuItem("RDY", "d", &rdy)) {
-            vs.addProbeCommand(ALDO_INT_RDY, rdy);
+            vs.addProbeCommand(ALDO_PRB_RDY, rdy);
         }
         if (ImGui::MenuItem("IRQ", "i", &irq)) {
-            vs.addProbeCommand(ALDO_INT_IRQ, irq);
+            vs.addProbeCommand(ALDO_PRB_IRQ, irq);
         }
         if (ImGui::MenuItem("NMI", "n", &nmi)) {
-            vs.addProbeCommand(ALDO_INT_NMI, nmi);
+            vs.addProbeCommand(ALDO_PRB_NMI, nmi);
         }
         if (ImGui::MenuItem("RST", "s", &rst)) {
-            vs.addProbeCommand(ALDO_INT_RST, rst);
+            vs.addProbeCommand(ALDO_PRB_RST, rst);
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Clear RAM", "Cmd+0", emu.zeroRam)) {
@@ -963,9 +963,9 @@ private:
             vs.commands.emplace(aldo::Command::halt, halt);
         };
         ImGui::SameLine();
-        auto rdy = emu.probe(ALDO_INT_RDY);
+        auto rdy = emu.probe(ALDO_PRB_RDY);
         if (ImGui::Checkbox("RDY", &rdy)) {
-            vs.addProbeCommand(ALDO_INT_RDY, rdy);
+            vs.addProbeCommand(ALDO_PRB_RDY, rdy);
         }
 
         auto mode = emu.runMode();
@@ -989,19 +989,19 @@ private:
         }
 
         auto
-            irq = emu.probe(ALDO_INT_IRQ),
-            nmi = emu.probe(ALDO_INT_NMI),
-            rst = emu.probe(ALDO_INT_RST);
+            irq = emu.probe(ALDO_PRB_IRQ),
+            nmi = emu.probe(ALDO_PRB_NMI),
+            rst = emu.probe(ALDO_PRB_RST);
         if (ImGui::Checkbox("IRQ", &irq)) {
-            vs.addProbeCommand(ALDO_INT_IRQ, irq);
+            vs.addProbeCommand(ALDO_PRB_IRQ, irq);
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("NMI", &nmi)) {
-            vs.addProbeCommand(ALDO_INT_NMI, nmi);
+            vs.addProbeCommand(ALDO_PRB_NMI, nmi);
         }
         ImGui::SameLine();
         if (ImGui::Checkbox("RST", &rst)) {
-            vs.addProbeCommand(ALDO_INT_RST, rst);
+            vs.addProbeCommand(ALDO_PRB_RST, rst);
         }
     }
 };

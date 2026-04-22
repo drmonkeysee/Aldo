@@ -223,10 +223,10 @@ static void drawcontrols(const struct view *v, const struct emulator *emu,
 
     cursor_y += 2;
     mvwaddstr(v->content, cursor_y, 0, "Signal:");
-    drawtoggle(v, " RDY ", aldo_console_probe(emu->console, ALDO_INT_RDY));
-    drawtoggle(v, " IRQ ", aldo_console_probe(emu->console, ALDO_INT_IRQ));
-    drawtoggle(v, " NMI ", aldo_console_probe(emu->console, ALDO_INT_NMI));
-    drawtoggle(v, " RST ", aldo_console_probe(emu->console, ALDO_INT_RST));
+    drawtoggle(v, " RDY ", aldo_console_probe(emu->console, ALDO_PRB_RDY));
+    drawtoggle(v, " IRQ ", aldo_console_probe(emu->console, ALDO_PRB_IRQ));
+    drawtoggle(v, " NMI ", aldo_console_probe(emu->console, ALDO_PRB_NMI));
+    drawtoggle(v, " RST ", aldo_console_probe(emu->console, ALDO_PRB_RST));
 
     mvwhline(v->content, ++cursor_y, 0, 0, w);
     mvwaddstr(v->content, ++cursor_y, 0, "Halt/Run: <Space>");
@@ -997,8 +997,8 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         selectrate(&vs->clock, emu);
         break;
     case 'd':
-        aldo_console_set_probe(emu->console, ALDO_INT_RDY,
-                               !aldo_console_probe(emu->console, ALDO_INT_RDY));
+        aldo_console_set_probe(emu->console, ALDO_PRB_RDY,
+                               !aldo_console_probe(emu->console, ALDO_PRB_RDY));
         break;
     case 'f':
         if (vs->ramselect != RSEL_PPU) {
@@ -1006,8 +1006,8 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 'i':
-        aldo_console_set_probe(emu->console, ALDO_INT_IRQ,
-                               !aldo_console_probe(emu->console, ALDO_INT_IRQ));
+        aldo_console_set_probe(emu->console, ALDO_PRB_IRQ,
+                               !aldo_console_probe(emu->console, ALDO_PRB_IRQ));
         break;
     case 'm':
         aldo_console_set_mode(emu->console, aldo_console_mode(emu->console) + 1);
@@ -1016,8 +1016,8 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         aldo_console_set_mode(emu->console, aldo_console_mode(emu->console) - 1);
         break;
     case 'n':
-        aldo_console_set_probe(emu->console, ALDO_INT_NMI,
-                               !aldo_console_probe(emu->console, ALDO_INT_NMI));
+        aldo_console_set_probe(emu->console, ALDO_PRB_NMI,
+                               !aldo_console_probe(emu->console, ALDO_PRB_NMI));
         break;
     case 'p':
         vs->chipselect = !vs->chipselect;
@@ -1038,8 +1038,8 @@ static void handle_input(struct viewstate *vs, const struct emulator *emu)
         }
         break;
     case 's':
-        aldo_console_set_probe(emu->console, ALDO_INT_RST,
-                               !aldo_console_probe(emu->console, ALDO_INT_RST));
+        aldo_console_set_probe(emu->console, ALDO_PRB_RST,
+                               !aldo_console_probe(emu->console, ALDO_PRB_RST));
         break;
     }
 }

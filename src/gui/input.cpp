@@ -117,12 +117,12 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         if (is_menu_command(ev)) {
             vs.showDemo = !vs.showDemo;
         } else {
-            vs.addProbeCommand(ALDO_INT_RDY, !emu.probe(ALDO_INT_RDY));
+            vs.addProbeCommand(ALDO_PRB_RDY, !emu.probe(ALDO_PRB_RDY));
         }
         break;
     case SDLK_I:
         if (is_free_key(ev)) {
-            vs.addProbeCommand(ALDO_INT_IRQ, !emu.probe(ALDO_INT_IRQ));
+            vs.addProbeCommand(ALDO_PRB_IRQ, !emu.probe(ALDO_PRB_IRQ));
         }
         break;
     case SDLK_M:
@@ -134,7 +134,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_N:
         if (is_free_key(ev)) {
-            vs.addProbeCommand(ALDO_INT_NMI, !emu.probe(ALDO_INT_NMI));
+            vs.addProbeCommand(ALDO_PRB_NMI, !emu.probe(ALDO_PRB_NMI));
         }
         break;
     case SDLK_O:
@@ -155,7 +155,7 @@ auto handle_keydown(const SDL_Event& ev, const aldo::Emulator& emu,
         break;
     case SDLK_S:
         if (is_free_key(ev)) {
-            vs.addProbeCommand(ALDO_INT_RST, !emu.probe(ALDO_INT_RST));
+            vs.addProbeCommand(ALDO_PRB_RST, !emu.probe(ALDO_PRB_RST));
         }
         break;
     }

@@ -406,18 +406,18 @@ void aldo_console_halt(aldo_console *self, bool halt)
     self->halted = halt;
 }
 
-bool aldo_console_probe(aldo_console *self, enum aldo_interrupt signal)
+bool aldo_console_probe(aldo_console *self, enum aldo_probe signal)
 {
     assert(self != nullptr);
 
     switch (signal) {
-    case ALDO_INT_IRQ:
+    case ALDO_PRB_IRQ:
         return self->probe.irq;
-    case ALDO_INT_NMI:
+    case ALDO_PRB_NMI:
         return self->probe.nmi;
-    case ALDO_INT_RDY:
+    case ALDO_PRB_RDY:
         return self->probe.rdy;
-    case ALDO_INT_RST:
+    case ALDO_PRB_RST:
         return self->probe.rst;
     default:
         INVALID_PROBE;
@@ -425,22 +425,22 @@ bool aldo_console_probe(aldo_console *self, enum aldo_interrupt signal)
     }
 }
 
-void aldo_console_set_probe(aldo_console *self, enum aldo_interrupt signal,
+void aldo_console_set_probe(aldo_console *self, enum aldo_probe signal,
                             bool active)
 {
     assert(self != nullptr);
 
     switch (signal) {
-    case ALDO_INT_IRQ:
+    case ALDO_PRB_IRQ:
         self->probe.irq = active;
         break;
-    case ALDO_INT_NMI:
+    case ALDO_PRB_NMI:
         self->probe.nmi = active;
         break;
-    case ALDO_INT_RDY:
+    case ALDO_PRB_RDY:
         self->probe.rdy = active;
         break;
-    case ALDO_INT_RST:
+    case ALDO_PRB_RST:
         self->probe.rst = active;
         break;
     default:

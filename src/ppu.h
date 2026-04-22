@@ -54,7 +54,7 @@ struct aldo_rp2c02 {
     }
         mask,               // PPUMASK, write-only
         mprbh,              // PPUMASK high-signal probe
-        mprgl;              // PPUMASK low-signal probe
+        mprbl;              // PPUMASK low-signal probe
     struct {
         bool
             o: 1,           // (5) Sprite Overflow
@@ -164,6 +164,10 @@ bool aldo_ppu_gfxsnp_dot(const struct aldo_rp2c02 *self);
 
 bool aldo_ppu_cycle(struct aldo_rp2c02 *self);
 
+enum aldo_probe_value aldo_ppu_probe(const struct aldo_rp2c02 *self,
+                                     enum aldo_probe probe);
+void aldo_ppu_set_probe(struct aldo_rp2c02 *self, enum aldo_probe probe,
+                        enum aldo_probe_value val);
 void aldo_ppu_bus_snapshot(const struct aldo_rp2c02 *self,
                            struct aldo_snapshot *snp);
 void aldo_ppu_vid_snapshot(struct aldo_rp2c02 *self, struct aldo_snapshot *snp);

@@ -13,6 +13,8 @@
 
 #include <assert.h>
 
+#define INVALID_PROBE assert(((void)"INVALID PPU PROBE", false))
+
 // A single NTSC frame is 262 scanlines of 341 dots, counting h-blank,
 // v-blank, overscan, etc; nominally 1 frame is 262 * 341 = 89342 ppu cycles;
 // however with rendering enabled the odd frames skip a dot for an overall
@@ -94,14 +96,16 @@ static uint8_t get_mask(const struct aldo_rp2c02 *self)
 
 static void set_mask(struct aldo_rp2c02 *self, uint8_t v)
 {
-    self->mask.g = v & 0x1;
-    self->mask.bm = v & 0x2;
-    self->mask.sm = v & 0x4;
-    self->mask.b = v & 0x8;
-    self->mask.s = v & 0x10;
-    self->mask.re = v & 0x20;
-    self->mask.ge = v & 0x40;
-    self->mask.be = v & 0x80;
+    // Mask lines are pulled up by the high probe or down by the the low probe,
+    // otherwise the true value passes through.
+    self->mask.g = (self->mprbh.g || v & 0x1) && !self->mprbl.g;
+    self->mask.bm = (self->mprbh.bm || v & 0x2) && !self->mprbl.bm;
+    self->mask.sm = (self->mprbh.sm || v & 0x4) && !self->mprbl.sm;
+    self->mask.b = (self->mprbh.b || v & 0x8) && !self->mprbl.b;
+    self->mask.s = (self->mprbh.s || v & 0x10) && !self->mprbl.s;
+    self->mask.re = (self->mprbh.re || v & 0x20) && !self->mprbl.re;
+    self->mask.ge = (self->mprbh.ge || v & 0x40) && !self->mprbl.ge;
+    self->mask.be = (self->mprbh.be || v & 0x80) && !self->mprbl.be;
 }
 
 static uint8_t get_status(const struct aldo_rp2c02 *self)
@@ -1385,7 +1389,7 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
     self->oamaddr = 0x0;
     self->signal.rst = self->signal.rw = self->signal.rd = self->signal.wr = true;
     self->signal.vout = self->bflt = false;
-    self->mprbh = self->mprgl = (typeof(self->mask)){};
+    self->mprbh = self->mprbl = (typeof(self->mask)){};
 
     /*
      * According to https://www.nesdev.org/wiki/PPU_power_up_state, the vblank
@@ -1441,6 +1445,82 @@ bool aldo_ppu_cycle(struct aldo_rp2c02 *self)
 
     if (reset_held(self)) return false;
     return cycle(self);
+}
+
+enum aldo_probe_value aldo_ppu_probe(const struct aldo_rp2c02 *self,
+                                     enum aldo_probe probe)
+{
+    assert(self != nullptr);
+
+    switch (probe) {
+    case ALDO_PRB_PPU_GRAY:
+        return aldo_lnptoprb(self->mprbh.g, self->mprbl.g);
+    case ALDO_PRB_PPU_TLFT:
+        return aldo_lnptoprb(self->mprbh.bm, self->mprbl.bm);
+    case ALDO_PRB_PPU_SLFT:
+        return aldo_lnptoprb(self->mprbh.sm, self->mprbl.sm);
+    case ALDO_PRB_PPU_TILE:
+        return aldo_lnptoprb(self->mprbh.b, self->mprbl.b);
+    case ALDO_PRB_PPU_SPR:
+        return aldo_lnptoprb(self->mprbh.s, self->mprbl.s);
+    case ALDO_PRB_PPU_RED:
+        return aldo_lnptoprb(self->mprbh.re, self->mprbl.re);
+    case ALDO_PRB_PPU_GRN:
+        return aldo_lnptoprb(self->mprbh.ge, self->mprbl.ge);
+    case ALDO_PRB_PPU_BLU:
+        return aldo_lnptoprb(self->mprbh.be, self->mprbl.be);
+    default:
+        INVALID_PROBE;
+        return ALDO_PRBV_DISABLED;
+    }
+}
+
+void aldo_ppu_set_probe(struct aldo_rp2c02 *self, enum aldo_probe probe,
+                        enum aldo_probe_value val)
+{
+    assert(self != nullptr);
+
+    bool hi, lo;
+    aldo_prbtolnp(val, &hi, &lo);
+    switch (probe) {
+    case ALDO_PRB_PPU_GRAY:
+        self->mprbh.g = hi;
+        self->mprbl.g = lo;
+        break;
+    case ALDO_PRB_PPU_TLFT:
+        self->mprbh.bm = hi;
+        self->mprbl.bm = lo;
+        break;
+    case ALDO_PRB_PPU_SLFT:
+        self->mprbh.sm = hi;
+        self->mprbl.sm = lo;
+        break;
+    case ALDO_PRB_PPU_TILE:
+        self->mprbh.b = hi;
+        self->mprbl.b = lo;
+        break;
+    case ALDO_PRB_PPU_SPR:
+        self->mprbh.s = hi;
+        self->mprbl.s = lo;
+        break;
+    case ALDO_PRB_PPU_RED:
+        self->mprbh.re = hi;
+        self->mprbl.re = lo;
+        break;
+    case ALDO_PRB_PPU_GRN:
+        self->mprbh.ge = hi;
+        self->mprbl.ge = lo;
+        break;
+    case ALDO_PRB_PPU_BLU:
+        self->mprbh.be = hi;
+        self->mprbl.be = lo;
+        break;
+    default:
+        INVALID_PROBE;
+        break;
+    }
+    // refresh the register with the latest probe lines
+    set_mask(self, get_mask(self));
 }
 
 void aldo_ppu_bus_snapshot(const struct aldo_rp2c02 *self,

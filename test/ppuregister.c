@@ -168,7 +168,7 @@ static void ppumask_probe_high(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
     struct aldo_snapshot snp;
-    // TODO: set probe grayfield ppu->probeh.g = true;
+    aldo_ppu_set_probe(ppu, ALDO_PRB_PPU_GRAY, ALDO_PRBV_ON);
 
     aldo_ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0x1u, snp.ppu.mask);
@@ -182,8 +182,9 @@ static void ppumask_probe_high(void *ctx)
 static void ppumask_probe_low(void *ctx)
 {
     auto ppu = ppt_get_ppu(ctx);
+    ppu->mask.g = true;
     struct aldo_snapshot snp;
-    // TODO: set probe grayfield ppu->probel.g = true;
+    aldo_ppu_set_probe(ppu, ALDO_PRB_PPU_GRAY, ALDO_PRBV_OFF);
 
     aldo_ppu_bus_snapshot(ppu, &snp);
     ct_assertequal(0x0u, snp.ppu.mask);

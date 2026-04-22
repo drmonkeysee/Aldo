@@ -1385,6 +1385,7 @@ void aldo_ppu_powerup(struct aldo_rp2c02 *self)
     self->oamaddr = 0x0;
     self->signal.rst = self->signal.rw = self->signal.rd = self->signal.wr = true;
     self->signal.vout = self->bflt = false;
+    self->mprbh = self->mprgl = (typeof(self->mask)){};
 
     /*
      * According to https://www.nesdev.org/wiki/PPU_power_up_state, the vblank

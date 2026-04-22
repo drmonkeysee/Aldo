@@ -51,7 +51,10 @@ struct aldo_rp2c02 {
             re: 1,          // Red Emphasis
             ge: 1,          // Green Emphasis
             be: 1;          // Blue Emphasis
-    } mask;                 // PPUMASK, write-only
+    }
+        mask,               // PPUMASK, write-only
+        mprbh,              // PPUMASK high-signal probe
+        mprgl;              // PPUMASK low-signal probe
     struct {
         bool
             o: 1,           // (5) Sprite Overflow

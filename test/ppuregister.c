@@ -164,6 +164,36 @@ static void ppumask_read(void *ctx)
     ct_assertequal(0x5au, d);
 }
 
+static void ppumask_probe_high(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    struct aldo_snapshot snp;
+    // TODO: set probe grayfield ppu->probeh.g = true;
+
+    aldo_ppu_bus_snapshot(ppu, &snp);
+    ct_assertequal(0x1u, snp.ppu.mask);
+
+    aldo_bus_write(ppt_get_mbus(ctx), 0x2001, 0x0);
+
+    aldo_ppu_bus_snapshot(ppu, &snp);
+    ct_assertequal(0x1u, snp.ppu.mask);
+}
+
+static void ppumask_probe_low(void *ctx)
+{
+    auto ppu = ppt_get_ppu(ctx);
+    struct aldo_snapshot snp;
+    // TODO: set probe grayfield ppu->probel.g = true;
+
+    aldo_ppu_bus_snapshot(ppu, &snp);
+    ct_assertequal(0x0u, snp.ppu.mask);
+
+    aldo_bus_write(ppt_get_mbus(ctx), 0x2001, 0xff);
+
+    aldo_ppu_bus_snapshot(ppu, &snp);
+    ct_assertequal(0xfeu, snp.ppu.mask);
+}
+
 //
 // MARK: - PPUSTATUS
 //
@@ -3342,6 +3372,8 @@ struct ct_testsuite ppu_register_tests()
         ct_maketest(ppumask_write_mirrored),
         ct_maketest(ppumask_write_during_reset),
         ct_maketest(ppumask_read),
+        ct_maketest(ppumask_probe_high),
+        ct_maketest(ppumask_probe_low),
 
         ct_maketest(ppustatus_read_when_clear),
         ct_maketest(ppustatus_read_when_set),

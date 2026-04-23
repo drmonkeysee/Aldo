@@ -1447,41 +1447,41 @@ bool aldo_ppu_cycle(struct aldo_rp2c02 *self)
     return cycle(self);
 }
 
-enum aldo_probe_value aldo_ppu_probe(const struct aldo_rp2c02 *self,
-                                     enum aldo_probe probe)
+enum aldo_trivalue aldo_ppu_probe(const struct aldo_rp2c02 *self,
+                                  enum aldo_probe probe)
 {
     assert(self != nullptr);
 
     switch (probe) {
     case ALDO_PRB_PPU_GRAY:
-        return aldo_lnptoprb(self->mprbh.g, self->mprbl.g);
+        return aldo_lnptotriv(self->mprbh.g, self->mprbl.g);
     case ALDO_PRB_PPU_TLFT:
-        return aldo_lnptoprb(self->mprbh.bm, self->mprbl.bm);
+        return aldo_lnptotriv(self->mprbh.bm, self->mprbl.bm);
     case ALDO_PRB_PPU_SLFT:
-        return aldo_lnptoprb(self->mprbh.sm, self->mprbl.sm);
+        return aldo_lnptotriv(self->mprbh.sm, self->mprbl.sm);
     case ALDO_PRB_PPU_TILE:
-        return aldo_lnptoprb(self->mprbh.b, self->mprbl.b);
+        return aldo_lnptotriv(self->mprbh.b, self->mprbl.b);
     case ALDO_PRB_PPU_SPR:
-        return aldo_lnptoprb(self->mprbh.s, self->mprbl.s);
+        return aldo_lnptotriv(self->mprbh.s, self->mprbl.s);
     case ALDO_PRB_PPU_RED:
-        return aldo_lnptoprb(self->mprbh.re, self->mprbl.re);
+        return aldo_lnptotriv(self->mprbh.re, self->mprbl.re);
     case ALDO_PRB_PPU_GRN:
-        return aldo_lnptoprb(self->mprbh.ge, self->mprbl.ge);
+        return aldo_lnptotriv(self->mprbh.ge, self->mprbl.ge);
     case ALDO_PRB_PPU_BLU:
-        return aldo_lnptoprb(self->mprbh.be, self->mprbl.be);
+        return aldo_lnptotriv(self->mprbh.be, self->mprbl.be);
     default:
         INVALID_PROBE;
-        return ALDO_PRBV_DIS;
+        return ALDO_TRIV_NULL;
     }
 }
 
 void aldo_ppu_set_probe(struct aldo_rp2c02 *self, enum aldo_probe probe,
-                        enum aldo_probe_value val)
+                        enum aldo_trivalue val)
 {
     assert(self != nullptr);
 
     bool hi, lo;
-    aldo_prbtolnp(val, &hi, &lo);
+    aldo_trivtolnp(val, &hi, &lo);
 
     switch (probe) {
     case ALDO_PRB_PPU_GRAY:

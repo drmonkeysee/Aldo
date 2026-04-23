@@ -34,28 +34,27 @@ enum aldo_probe {
 };
 
 /*
- * The values disabled/off/on refer to the state of the probe, a device may
- * translate these semantics in counter-intuitive ways based on the most useful
- * test behavior to model;
+ * A device is free to translate tri-value semantics in counter-intuitive ways
+ * based on the most useful test behavior to model;
  *
  * CPU IRQ:
- *  - disabled/off = irq line pulled high = no active interrupt
+ *  - null/false = irq line pulled high = no active interrupt
  *      - other hardware connected to IRQ line can still initiate interrupts
- *  - on = irq line pulled low = active interrupt
+ *  - true = irq line pulled low = active interrupt
  *
  * PPU Grayscale:
- *  - disabled = no effect, game determines flag
- *  - off = game cannot turn on grayscale
- *  - on = game cannot turn off grayscale
+ *  - null = no effect, game determines flag
+ *  - false = game cannot turn on grayscale
+ *  - true = game cannot turn off grayscale
  *
  * note in the above the IRQ probe acts as a peer device on the interrupt line
  * and can be overridden by other devices on the same line; the PPU probe is a
  * hard override, when active the PPU cannot affect its own register lines.
  */
-enum aldo_probe_value {
-    ALDO_PRBV_DIS = -1,
-    ALDO_PRBV_OFF,
-    ALDO_PRBV_ON,
+enum aldo_trivalue {
+    ALDO_TRIV_NULL = -1,
+    ALDO_TRIV_FALSE,
+    ALDO_TRIV_TRUE,
 };
 
 enum aldo_sigstate {
@@ -83,22 +82,22 @@ enum aldo_ntmirror {
 
 #include "bridgeopen.h"
 // TODO: are these export or internal
-// Line-Pair to Probe Value
+// Line-Pair to Tri-Value
 aldo_export
-inline enum aldo_probe_value aldo_lnptoprb(bool hi, bool lo) aldo_nothrow
+inline enum aldo_trivalue aldo_lnptotriv(bool hi, bool lo) aldo_nothrow
 {
-    if (hi) return ALDO_PRBV_ON;
-    if (lo) return ALDO_PRBV_OFF;
-    return ALDO_PRBV_DIS;
+    if (hi) return ALDO_TRIV_TRUE;
+    if (lo) return ALDO_TRIV_FALSE;
+    return ALDO_TRIV_NULL;
 }
 
-// Probe Value to Line-Pair
+// Tri-Value to Line-Pair
 aldo_export
-inline void aldo_prbtolnp(enum aldo_probe_value v, bool *aldo_noalias hi,
-                          bool *aldo_noalias lo) aldo_nothrow
+inline void aldo_trivtolnp(enum aldo_trivalue v, bool *aldo_noalias hi,
+                           bool *aldo_noalias lo) aldo_nothrow
 {
-    *hi = v == ALDO_PRBV_ON;
-    *lo = v == ALDO_PRBV_OFF;
+    *hi = v == ALDO_TRIV_TRUE;
+    *lo = v == ALDO_TRIV_FALSE;
 }
 
 // Boolean to Line-Pair

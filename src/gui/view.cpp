@@ -683,10 +683,10 @@ concept LedFactory = std::invocable<F, ImVec2, float>;
 
 class CpuStatusIndicator {
 public:
-    static std::string_view idTemplate() noexcept
+    static std::string_view lblTemplate() noexcept
     {
         using namespace std::string_view_literals;
-        return "##Nstatus"sv;
+        return "##Xstatus"sv;
     }
 
     CpuStatusIndicator(aldo::et::byte status, bool unmappedLine, ImVec2 pos,
@@ -727,10 +727,10 @@ class CpuMemoryCellIndicator {
 public:
     using cells_type = decltype(std::declval<aldo_dis_instruction>().d.datacells);
 
-    static std::string_view idTemplate() noexcept
+    static std::string_view lblTemplate() noexcept
     {
         using namespace std::string_view_literals;
-        return "##Nmemcell"sv;
+        return "##Xmemcell"sv;
     }
 
     CpuMemoryCellIndicator(cells_type cells, ImVec2 pos, float dim) noexcept
@@ -786,7 +786,11 @@ auto led_indicator_bank(LedIndicatorRange auto indicators,
 
     auto dim = aldo::style::glyph_indicator_dim();
     auto led = ledFactory(ImGui::GetCursorScreenPos(), dim);
-    std::string idBuf{led.idTemplate()};
+
+    std::string lblBuf{led.lblTemplate()};
+    decltype(lblBuf)::size_type lblIdx = lblBuf.find('X');
+    assert(lblIdx != decltype(lblBuf)::npos);
+
     for (auto it = std::cbegin(indicators); it != std::cend(indicators); ++it) {
         auto [label, tooltip] = *it;
         ImU32 fillColor, textColor;
@@ -797,9 +801,9 @@ auto led_indicator_bank(LedIndicatorRange auto indicators,
             fillColor = aldo::colors::LedOff;
             textColor = textOff;
         }
-        idBuf[2] = label;
-        led.draw(fillColor, textColor, idBuf);
-        ImGui::InvisibleButton(idBuf.c_str(), {dim, dim});
+        lblBuf[lblIdx] = label;
+        led.draw(fillColor, textColor, lblBuf);
+        ImGui::InvisibleButton(lblBuf.c_str(), {dim, dim});
         if (ImGui::BeginItemTooltip()) {
             ImGui::TextUnformatted(tooltip);
             ImGui::EndTooltip();

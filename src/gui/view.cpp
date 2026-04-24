@@ -673,6 +673,147 @@ auto small_led(bool on, float xOffset = 0) noexcept
     drawList->AddCircleFilled(center, aldo::style::SmallRadius, fill);
 }
 
+template<typename C>
+concept LedIndicatorRange =
+    std::ranges::input_range<C> &&
+    std::same_as<std::ranges::range_value_t<C>, std::pair<char, const char*>>;
+
+template<typename F>
+concept LedFactory = std::invocable<F, ImVec2, float>;
+
+class CpuStatusIndicator {
+public:
+    static std::string_view idTemplate() noexcept
+    {
+        using namespace std::string_view_literals;
+        return "##Nstatus"sv;
+    }
+
+    CpuStatusIndicator(aldo::et::byte status, bool unmappedLine, ImVec2 pos,
+                       float dim) noexcept
+    : radius{dim / 2}, pos{pos}, center{pos + radius}, status{status},
+    unmappedLine{unmappedLine}
+    {
+        auto fontSz = ImGui::GetFontSize();
+        txtOffset = {fontSz / 4, fontSz / 2};
+    }
+
+    bool skip(char label) const noexcept { return label == '-' && !unmappedLine; }
+
+    template<LedIndicatorRange R>
+    bool on(std::ranges::iterator_t<const R&> curr, const R& coll, char) const
+    {
+        auto bitpos = std::distance(curr, std::cend(coll)) - 1;
+        return status & (1 << bitpos);
+    }
+
+    void draw(ImU32 fillColor, ImU32 txtColor, std::string_view label) noexcept
+    {
+        drawList->AddCircleFilled(center, radius, fillColor);
+        drawList->AddText(center - txtOffset, txtColor, label.data() + 2,
+                          label.data() + 3);
+        center.x += radius * 2.5f;
+    }
+
+private:
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    float radius;
+    ImVec2 txtOffset, pos, center;
+    aldo::et::byte status;
+    bool unmappedLine;
+};
+
+class CpuMemoryCellIndicator {
+public:
+    using cells_type = decltype(std::declval<aldo_dis_instruction>().d.datacells);
+
+    static std::string_view idTemplate() noexcept
+    {
+        using namespace std::string_view_literals;
+        return "##Nmemcell"sv;
+    }
+
+    CpuMemoryCellIndicator(cells_type cells, ImVec2 pos, float dim) noexcept
+    : dim{dim}, pos{pos}, cells{cells}
+    {
+        auto fontSz = ImGui::GetFontSize();
+        txtOffset = {fontSz / 2, fontSz / 4};
+    }
+
+    bool skip(char) const noexcept { return false; }
+
+    template<LedIndicatorRange R>
+    bool on(std::ranges::iterator_t<const R&>, const R&,
+            char label) const noexcept
+    {
+        switch (label) {
+        case 'M':
+            return cells.m;
+        case 'I':
+            return cells.pc;
+        case 'S':
+            return cells.s;
+        case 'P':
+            return cells.p;
+        case 'Y':
+            return cells.y;
+        case 'X':
+            return cells.x;
+        case 'A':
+            return cells.a;
+        default:
+            return false;
+        }
+    }
+
+    void draw(ImU32 fillColor, ImU32 txtColor, std::string_view label) noexcept
+    {
+        drawList->AddRectFilled(pos, pos + dim, fillColor, 5);
+        drawList->AddText(pos + txtOffset, txtColor, label.data() + 2,
+                          label.data() + 3);
+        pos.x += dim * 1.25f;
+    }
+
+private:
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    float dim;
+    ImVec2 txtOffset, pos;
+    cells_type cells;
+};
+
+auto led_indicator_bank(LedIndicatorRange auto indicators,
+                        LedFactory auto ledFactory)
+{
+    static constexpr auto textOn = IM_COL32_BLACK, textOff = IM_COL32_WHITE;
+
+    auto dim = aldo::style::glyph_indicator_dim();
+    auto led = ledFactory(ImGui::GetCursorScreenPos(), dim);
+    std::string idBuf{led.idTemplate()};
+    for (auto it = std::cbegin(indicators); it != std::cend(indicators); ++it) {
+        auto [label, tooltip] = *it;
+        if (led.skip(label)) continue;
+        ImU32 fillColor, textColor;
+        if (led.on(it, indicators, label)) {
+            fillColor = aldo::colors::LedOn;
+            textColor = textOn;
+        } else {
+            fillColor = aldo::colors::LedOff;
+            textColor = textOff;
+        }
+        idBuf[2] = label;
+        led.draw(fillColor, textColor, idBuf);
+        ImGui::InvisibleButton(idBuf.c_str(), {dim, dim});
+        if (ImGui::BeginItemTooltip()) {
+            ImGui::TextUnformatted(tooltip);
+            ImGui::EndTooltip();
+        }
+        // TODO: replace this check with std::views::enumerate when available
+        if (it + 1 < std::cend(indicators)) {
+            ImGui::SameLine(0, 5);
+        }
+    }
+}
+
 auto cpu_flag_leds(aldo::et::byte status, bool unmappedLine)
 {
     static constexpr std::array flags{
@@ -685,45 +826,10 @@ auto cpu_flag_leds(aldo::et::byte status, bool unmappedLine)
         std::pair{'Z', "Zero"},
         std::pair{'C', "Carry"},
     };
-    static constexpr auto textOn = IM_COL32_BLACK, textOff = IM_COL32_WHITE;
 
-    auto textSz = aldo::style::glyph_size();
-    auto dim = textSz.x + textSz.y, radius = dim / 2;
-    auto pos = ImGui::GetCursorScreenPos();
-    ImVec2 center = pos + radius;
-
-    auto fontSz = ImGui::GetFontSize();
-    ImVec2 offset{fontSz / 4, fontSz / 2};
-    auto drawList = ImGui::GetWindowDrawList();
-
-    std::string idBuf(3, '#');
-    for (auto it = flags.cbegin(); it != flags.cend(); ++it) {
-        auto [label, tooltip] = *it;
-        if (label == '-' && !unmappedLine) continue;
-        auto bitpos = std::distance(it, flags.cend()) - 1;
-        ImU32 fillColor, textColor;
-        if (status & (1 << bitpos)) {
-            fillColor = aldo::colors::LedOn;
-            textColor = textOn;
-        } else {
-            fillColor = aldo::colors::LedOff;
-            textColor = textOff;
-        }
-        drawList->AddCircleFilled(center, radius, fillColor);
-        idBuf[2] = label;
-        drawList->AddText(center - offset, textColor, idBuf.c_str() + 2);
-        center.x += radius * 2.5f;
-        ImGui::InvisibleButton(idBuf.c_str(), {dim, dim});
-        // ImGui::SetItemTooltip warns that tooltip is not a string literal
-        if (ImGui::BeginItemTooltip()) {
-            ImGui::TextUnformatted(tooltip);
-            ImGui::EndTooltip();
-        }
-        // TODO: replace this check with std::views::enumerate when available
-        if (it + 1 < flags.cend()) {
-            ImGui::SameLine(0, 5);
-        }
-    }
+    led_indicator_bank(flags, [status, unmappedLine](ImVec2 pos, float dim) {
+        return CpuStatusIndicator{status, unmappedLine, pos, dim};
+    });
 }
 
 //
@@ -1577,64 +1683,10 @@ private:
             std::pair{'X', "X-Index"},
             std::pair{'A', "Accumulator"},
         };
-        static constexpr auto cellSet = [](const auto& cells,
-                                           char label) static constexpr noexcept {
-            switch (label) {
-            case 'M':
-                return cells.m;
-            case 'I':
-                return cells.pc;
-            case 'S':
-                return cells.s;
-            case 'P':
-                return cells.p;
-            case 'Y':
-                return cells.y;
-            case 'X':
-                return cells.x;
-            case 'A':
-                return cells.a;
-            default:
-                return false;
-            }
-        };
-        static constexpr auto textOn = IM_COL32_BLACK, textOff = IM_COL32_WHITE;
 
-        auto textSz = aldo::style::glyph_size();
-        auto dim = textSz.x + textSz.y;
-        // create a single character string buffer for button labels
-        std::string lblBuf(2, '\0');
-
-        for (auto it = registers.cbegin(); it != registers.cend(); ++it) {
-            auto [label, tooltip] = *it;
-            ImU32 fillColor, textColor;
-            if (cellSet(inst.d.datacells, label)) {
-                fillColor = aldo::colors::LedOn;
-                textColor = textOn;
-            } else {
-                fillColor = aldo::colors::LedOff;
-                textColor = textOff;
-            }
-            lblBuf[0] = label;
-            {
-                ScopedColor colors{
-                    {ImGuiCol_Button, fillColor},
-                    {ImGuiCol_ButtonHovered, fillColor},
-                    {ImGuiCol_ButtonActive, fillColor},
-                    {ImGuiCol_Text, textColor},
-                };
-                ImGui::Button(lblBuf.c_str(), {dim, dim});
-            }
-            // ImGui::SetItemTooltip warns that tooltip is not a string literal
-            if (ImGui::BeginItemTooltip()) {
-                ImGui::TextUnformatted(tooltip);
-                ImGui::EndTooltip();
-            }
-            // TODO: replace this check with std::views::enumerate when available
-            if (it + 1 < registers.cend()) {
-                ImGui::SameLine(0, 5);
-            }
-        }
+        led_indicator_bank(registers, [inst](ImVec2 pos, float dim) {
+            return CpuMemoryCellIndicator{inst.d.datacells, pos, dim};
+        });
     }
 };
 

@@ -99,8 +99,14 @@ inline constexpr ImVec2 CellSz{CellDim, CellDim}, AlignCenter{0.5f, 0.5f};
 inline ImVec2 glyph_size() noexcept
 {
     // TODO: loading fonts dynamically will break this
-    static const ImVec2 sz = ImGui::CalcTextSize("A");
+    static const auto sz = ImGui::CalcTextSize("A");
     return sz;
+}
+
+inline float glyph_indicator_dim() noexcept
+{
+    static const auto dim = glyph_size().x + glyph_size().y;
+    return dim;
 }
 
 }

@@ -365,6 +365,80 @@ private:
     callback onSelected;
 };
 
+class TriButton {
+public:
+    TriButton(char lbl, std::string_view desc)
+    : lbl{lbl}, lblStr{lbl}, description{desc} {}
+
+    bool clicked() noexcept
+    {
+        static constexpr auto textOn = IM_COL32_BLACK, textOff = IM_COL32_WHITE;
+
+        ImU32 fillColor, activeColor, hoverColor, textColor;
+        switch (val) {
+        case ALDO_TRIV_NULL:
+            fillColor = aldo::colors::LedOff;
+            activeColor = aldo::colors::LedOffActive;
+            hoverColor = aldo::colors::LedOffHover;
+            textColor = textOff;
+            break;
+        case ALDO_TRIV_FALSE:
+            fillColor = aldo::colors::Destructive;
+            activeColor = aldo::colors::DestructiveActive;
+            hoverColor = aldo::colors::DestructiveHover;
+            textColor = textOff;
+            break;
+        case ALDO_TRIV_TRUE:
+            fillColor = aldo::colors::LedOn;
+            activeColor = aldo::colors::LedOnActive;
+            hoverColor = aldo::colors::LedOnHover;
+            textColor = textOn;
+            break;
+        default:
+            break;
+        }
+
+        auto result = false;
+        {
+            ScopedColor c{
+                {ImGuiCol_Button, fillColor},
+                {ImGuiCol_ButtonActive, activeColor},
+                {ImGuiCol_ButtonHovered, hoverColor},
+                {ImGuiCol_Text, textColor},
+            };
+            auto dim = aldo::style::glyph_indicator_dim();
+            if ((result = ImGui::Button(lblStr.c_str(), {dim, dim}))) {
+                switch (val) {
+                case ALDO_TRIV_NULL:
+                    val = ALDO_TRIV_TRUE;
+                    break;
+                case ALDO_TRIV_FALSE:
+                    val = ALDO_TRIV_NULL;
+                    break;
+                case ALDO_TRIV_TRUE:
+                    val = ALDO_TRIV_FALSE;
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+        if (ImGui::BeginItemTooltip()) {
+            ImGui::TextUnformatted(description.c_str());
+            ImGui::EndTooltip();
+        }
+        return result;
+    }
+
+    char label() const noexcept { return lbl; }
+    aldo_trivalue value() const noexcept { return val; }
+
+private:
+    char lbl;
+    std::string lblStr, description;
+    aldo_trivalue val = ALDO_TRIV_NULL;
+};
+
 auto widget_group(std::invocable auto f) noexcept(noexcept(f()))
 {
     ImGui::BeginGroup();
@@ -782,8 +856,6 @@ private:
 auto led_indicator_bank(LedIndicatorRange auto indicators,
                         LedFactory auto ledFactory)
 {
-    static constexpr auto textOn = IM_COL32_BLACK, textOff = IM_COL32_WHITE;
-
     auto dim = aldo::style::glyph_indicator_dim();
     auto led = ledFactory(ImGui::GetCursorScreenPos(), dim);
 
@@ -796,10 +868,10 @@ auto led_indicator_bank(LedIndicatorRange auto indicators,
         ImU32 fillColor, textColor;
         if (led.on(it, indicators, label)) {
             fillColor = aldo::colors::LedOn;
-            textColor = textOn;
+            textColor = IM_COL32_BLACK;
         } else {
             fillColor = aldo::colors::LedOff;
-            textColor = textOff;
+            textColor = IM_COL32_WHITE;
         }
         lblBuf[lblIdx] = label;
         led.draw(fillColor, textColor, lblBuf);
@@ -1032,6 +1104,9 @@ protected:
         renderSpeedControls();
         ImGui::Separator();
         renderRunControls();
+        if (ImGui::CollapsingHeader("PPU Mask", ImGuiTreeNodeFlags_DefaultOpen)) {
+            renderPpuMask();
+        }
     }
 
 private:
@@ -1111,6 +1186,81 @@ private:
             vs.addProbeCommand(ALDO_PRB_RST, rst);
         }
     }
+
+    void renderPpuMask()
+    {
+        using sz_type = decltype(colorMasks)::size_type;
+
+        ImGui::TextUnformatted("Color: ");
+        ImGui::SameLine();
+        auto buttonId = 0;
+        for (auto& button : colorMasks) {
+            ScopedID id = buttonId;
+            if (button.clicked()) {
+                dispatchColor(button.label(), button.value());
+            }
+            if (static_cast<sz_type>(++buttonId) < colorMasks.size()) {
+                ImGui::SameLine(0, 5);
+            }
+        }
+        ImGui::TextUnformatted("Render:");
+        ImGui::SameLine();
+        for (auto& button : renderMasks) {
+            ScopedID id = buttonId;
+            if (button.clicked()) {
+                dispatchRender(button.label(), button.value());
+            }
+            if (static_cast<sz_type>(++buttonId)
+                < colorMasks.size() + renderMasks.size()) {
+                ImGui::SameLine(0, 5);
+            }
+        }
+    }
+
+    void dispatchColor(char label, aldo_trivalue value)
+    {
+        switch (label) {
+        case 'Y':
+            break;
+        case 'R':
+            break;
+        case 'G':
+            break;
+        case 'B':
+            break;
+        default:
+            break;
+        }
+    }
+
+    void dispatchRender(char label, aldo_trivalue value)
+    {
+        switch (label) {
+        case 'B':
+            break;
+        case 'S':
+            break;
+        case 'L':
+            break;
+        case 'C':
+            break;
+        default:
+            break;
+        }
+    }
+
+    std::array<TriButton, 4> colorMasks{
+        TriButton{'Y', "Grayscale"},
+        TriButton{'R', "Red Emphasis"},
+        TriButton{'G', "Green Emphasis"},
+        TriButton{'B', "Blue Emphasis"},
+    };
+    std::array<TriButton, 4> renderMasks {
+        TriButton{'B', "Background Rendering"},
+        TriButton{'S', "Sprite Rendering"},
+        TriButton{'L', "Background Left Column"},
+        TriButton{'C', "Sprite Left Column"},
+    };
 };
 
 class CpuView final : public aldo::View {

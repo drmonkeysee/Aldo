@@ -1868,8 +1868,8 @@ private:
         void drawScreenIndicator(const ImVec2& start) const noexcept
         {
             auto orig = ntOrigin + start;
-            drawList->AddRect(orig, orig + scrSize, aldo::colors::LineIn, 0.0f,
-                              ImDrawFlags_None, 2.0f);
+            drawList->AddRect(orig, orig + scrSize, aldo::colors::LineIn, 0,
+                              ImDrawFlags_None, 2);
         }
 
         void drawScreenOverlay(const ImVec2& start,
@@ -2112,7 +2112,7 @@ private:
     }
 
     static constexpr pal_sz Cols = 17;
-    static constexpr float Attenuated = 0.816328f, Full = 1.0f;
+    static constexpr float Attenuated = 0.816328f, Full = 1;
 
     bool gray = false, emr = false, emg = false, emb = false;
     float atr = Full, atg = Full, atb = Full;
@@ -2676,7 +2676,7 @@ private:
             if (!screenIndicator) return;
 
             drawList->AddRect(origin, origin + scrSize, aldo::colors::LineIn,
-                              0.0f, ImDrawFlags_None, 2.0f);
+                              0, ImDrawFlags_None, 2);
         }
 
         void drawSpriteSelection(const aldo::sprite_obj* obj) const noexcept
@@ -2894,7 +2894,7 @@ protected:
         if (emu.snapshot().video.newframe) {
             screen.draw(emu.snapshot().video.screen, emu.palette());
         }
-        screen.render((static_cast<float>(scaleSelection) / 2.0f) + 1, sdRatio);
+        screen.render((static_cast<float>(scaleSelection) / 2) + 1, sdRatio);
 
         ImGui::Separator();
         ImGui::SetNextItemWidth(aldo::style::glyph_size().x * 10);

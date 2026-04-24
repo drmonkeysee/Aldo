@@ -698,8 +698,6 @@ public:
         txtOffset = {fontSz / 4, fontSz / 2};
     }
 
-    bool skip(char label) const noexcept { return label == '-' && !unmappedLine; }
-
     template<LedIndicatorRange R>
     bool on(std::ranges::iterator_t<const R&> curr, const R& coll, char) const
     {
@@ -709,6 +707,8 @@ public:
 
     void draw(ImU32 fillColor, ImU32 txtColor, std::string_view label) noexcept
     {
+        if (label.contains('-') && !unmappedLine) return;
+
         drawList->AddCircleFilled(center, radius, fillColor);
         drawList->AddText(center - txtOffset, txtColor, label.data() + 2,
                           label.data() + 3);
@@ -739,8 +739,6 @@ public:
         auto fontSz = ImGui::GetFontSize();
         txtOffset = {fontSz / 2, fontSz / 4};
     }
-
-    bool skip(char) const noexcept { return false; }
 
     template<LedIndicatorRange R>
     bool on(std::ranges::iterator_t<const R&>, const R&,
@@ -791,7 +789,6 @@ auto led_indicator_bank(LedIndicatorRange auto indicators,
     std::string idBuf{led.idTemplate()};
     for (auto it = std::cbegin(indicators); it != std::cend(indicators); ++it) {
         auto [label, tooltip] = *it;
-        if (led.skip(label)) continue;
         ImU32 fillColor, textColor;
         if (led.on(it, indicators, label)) {
             fillColor = aldo::colors::LedOn;

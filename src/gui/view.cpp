@@ -696,7 +696,11 @@ auto design_palette(aldo::viewstate& vs) noexcept
         cbutton("Destructive Active", aldo::colors::DestructiveActive);
         cbutton("Destructive Hover", aldo::colors::DestructiveHover);
         cbutton("Led Off", aldo::colors::LedOff);
+        cbutton("Led Off Active", aldo::colors::LedOffActive);
+        cbutton("Led Off Hover", aldo::colors::LedOffHover);
         cbutton("Led On", aldo::colors::LedOn);
+        cbutton("Led On Active", aldo::colors::LedOnActive);
+        cbutton("Led On Hover", aldo::colors::LedOnHover);
         cbutton("Line In", aldo::colors::LineIn);
         cbutton("Line Out", aldo::colors::LineOut);
     }
@@ -838,7 +842,8 @@ public:
 
     void draw(ImU32 fillColor, ImU32 txtColor, std::string_view label) noexcept
     {
-        drawList->AddRectFilled(pos, pos + dim, fillColor, 5);
+        drawList->AddRectFilled(pos, pos + dim, fillColor,
+                                aldo::style::SmallRadius);
         drawList->AddText(pos + txtOffset, txtColor, label.data() + 2,
                           label.data() + 3);
         pos.x += dim * 1.25f;
@@ -880,7 +885,7 @@ auto led_indicator_bank(LedIndicatorRange auto indicators,
             ImGui::EndTooltip();
         }
         if (it + 1 < std::cend(indicators)) {
-            ImGui::SameLine(0, 5);
+            ImGui::SameLine(0, aldo::style::SmallRadius);
         }
     }
 }
@@ -942,10 +947,10 @@ private:
         widget_group([&apu] noexcept {
             ImGui::Text("OAMDMA: %02X", apu.oam.dmahigh);
             ImGui::TextUnformatted("   put: ");
-            ImGui::SameLine(0, 5);
+            ImGui::SameLine(0, aldo::style::SmallRadius);
             small_led(apu.put);
         });
-        ImGui::SameLine(0, 20);
+        ImGui::SameLine(0, aldo::style::WideSpacer);
         widget_group([&apu] noexcept {
             ImGui::Text("  low: %02X", apu.oam.dmalow);
             ImGui::Text("state:");
@@ -962,7 +967,7 @@ private:
             ScopedColor color{{ImGuiCol_Text, aldo::colors::LineOut}};
             ImGui::Text("Addr: %04X", apu.addressbus);
         };
-        ImGui::SameLine(0, 20);
+        ImGui::SameLine(0, aldo::style::WideSpacer);
         if (apu.busfault) {
             ScopedColor color{
                 {ImGuiCol_Text, aldo::colors::DestructiveHover},
@@ -1224,7 +1229,7 @@ private:
             vs.addTprobeCommand(button.probe(), val);
         }
         if (static_cast<sz_type>(++buttonId) < guard) {
-            ImGui::SameLine(0, 5);
+            ImGui::SameLine(0, aldo::style::SmallRadius);
         }
     }
 };
@@ -1297,7 +1302,7 @@ private:
             ScopedColor color{{ImGuiCol_Text, aldo::colors::LineOut}};
             ImGui::Text("Addr: %04X", datapath.addressbus);
         };
-        ImGui::SameLine(0, 20);
+        ImGui::SameLine(0, aldo::style::WideSpacer);
         if (datapath.busfault) {
             ScopedColor color{
                 {ImGuiCol_Text, aldo::colors::DestructiveHover},
@@ -2447,7 +2452,7 @@ private:
             ImGui::Text("CTRL: %02X", ppu.ctrl);
             ImGui::Text("MASK: %02X", ppu.mask);
         });
-        ImGui::SameLine(0, 20);
+        ImGui::SameLine(0, aldo::style::WideSpacer);
         widget_group([&ppu] noexcept {
             ImGui::Text("STATUS:  %d%d%d", aldo_getbit(ppu.status, 7),
                         aldo_getbit(ppu.status, 6),
@@ -2492,7 +2497,7 @@ private:
             ScopedColor color{{ImGuiCol_Text, aldo::colors::LineOut}};
             ImGui::Text("VAddr: %04X", pipeline.addressbus);
         }
-        ImGui::SameLine(0, 20);
+        ImGui::SameLine(0, aldo::style::WideSpacer);
         {
             DisabledIf dif = lines.read && lines.write;
             ScopedColor color{{

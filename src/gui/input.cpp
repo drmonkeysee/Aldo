@@ -214,14 +214,20 @@ auto process_command(const aldo::command_state& cs, aldo::Emulator& emu,
             emu.probe(signal, active);
         }
         break;
+    case aldo::Command::quit:
+        vs.running = false;
+        break;
     case aldo::Command::resetVectorClear:
         debugger.vectorClear();
         break;
     case aldo::Command::resetVectorOverride:
         debugger.vectorOverride(std::get<int>(cs.value));
         break;
-    case aldo::Command::quit:
-        vs.running = false;
+    case aldo::Command::tprobe:
+        {
+            auto [signal, val] = std::get<aldo::command_state::tprobe>(cs.value);
+            emu.tprobe(signal, val);
+        }
         break;
     case aldo::Command::zeroRamOnPowerup:
         emu.zeroRam = std::get<bool>(cs.value);

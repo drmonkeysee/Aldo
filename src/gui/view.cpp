@@ -369,10 +369,10 @@ private:
 
 class TriButton {
 public:
-    TriButton(char lbl, std::string_view desc)
-    : lbl{lbl}, lblStr{lbl}, description{desc} {}
+    TriButton(char lbl, std::string_view desc, aldo_probe probe)
+    : lblStr{lbl}, description{desc}, prb{probe} {}
 
-    bool clicked() noexcept
+    bool clicked(aldo_trivalue& val) noexcept
     {
         static constexpr auto textOn = IM_COL32_BLACK, textOff = IM_COL32_WHITE;
 
@@ -432,13 +432,11 @@ public:
         return result;
     }
 
-    char label() const noexcept { return lbl; }
-    aldo_trivalue value() const noexcept { return val; }
+    aldo_probe probe() const noexcept { return prb; }
 
 private:
-    char lbl;
     std::string lblStr, description;
-    aldo_trivalue val = ALDO_TRIV_NULL;
+    aldo_probe prb;
 };
 
 auto widget_group(std::invocable auto f) noexcept(noexcept(f()))
@@ -1195,8 +1193,9 @@ private:
         auto buttonId = 0;
         for (auto& button : colorMasks) {
             ScopedID id = buttonId;
-            if (button.clicked()) {
-                dispatchColor(button.label(), button.value());
+            auto val = emu.tprobe(button.probe());
+            if (button.clicked(val)) {
+                vs.addTprobeCommand(button.probe(), val);
             }
             if (static_cast<sz_type>(++buttonId) < colorMasks.size()) {
                 ImGui::SameLine(0, 5);
@@ -1206,8 +1205,9 @@ private:
         ImGui::SameLine();
         for (auto& button : renderMasks) {
             ScopedID id = buttonId;
-            if (button.clicked()) {
-                dispatchRender(button.label(), button.value());
+            auto val = emu.tprobe(button.probe());
+            if (button.clicked(val)) {
+                vs.addTprobeCommand(button.probe(), val);
             }
             if (static_cast<sz_type>(++buttonId)
                 < colorMasks.size() + renderMasks.size()) {
@@ -1216,49 +1216,17 @@ private:
         }
     }
 
-    void dispatchColor(char label, aldo_trivalue value)
-    {
-        switch (label) {
-        case 'Y':
-            break;
-        case 'R':
-            break;
-        case 'G':
-            break;
-        case 'B':
-            break;
-        default:
-            break;
-        }
-    }
-
-    void dispatchRender(char label, aldo_trivalue value)
-    {
-        switch (label) {
-        case 'B':
-            break;
-        case 'S':
-            break;
-        case 'L':
-            break;
-        case 'C':
-            break;
-        default:
-            break;
-        }
-    }
-
     std::array<TriButton, 4> colorMasks{
-        TriButton{'Y', "Grayscale"},
-        TriButton{'R', "Red Emphasis"},
-        TriButton{'G', "Green Emphasis"},
-        TriButton{'B', "Blue Emphasis"},
+        TriButton{'Y', "Grayscale", ALDO_PRB_PPU_GRAY},
+        TriButton{'R', "Red Emphasis", ALDO_PRB_PPU_RED},
+        TriButton{'G', "Green Emphasis", ALDO_PRB_PPU_GRN},
+        TriButton{'B', "Blue Emphasis", ALDO_PRB_PPU_BLU},
     };
     std::array<TriButton, 4> renderMasks {
-        TriButton{'B', "Background Rendering"},
-        TriButton{'S', "Sprite Rendering"},
-        TriButton{'L', "Background Left Column"},
-        TriButton{'C', "Sprite Left Column"},
+        TriButton{'B', "Background Rendering", ALDO_PRB_PPU_BG},
+        TriButton{'S', "Sprite Rendering", ALDO_PRB_PPU_FG},
+        TriButton{'L', "Background Left Column", ALDO_PRB_PPU_BCOL},
+        TriButton{'C', "Sprite Left Column", ALDO_PRB_PPU_FCOL},
     };
 };
 

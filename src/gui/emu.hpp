@@ -87,6 +87,14 @@ public:
     {
         aldo_console_set_probe(consolep(), signal, active);
     }
+    aldo_trivalue tprobe(aldo_probe signal) const noexcept
+    {
+        return aldo_console_tprobe(consolep(), signal);
+    }
+    void tprobe(aldo_probe signal, aldo_trivalue val) noexcept
+    {
+        aldo_console_set_tprobe(consolep(), signal, val);
+    }
 
     void loadCart(const std::filesystem::path& filepath);
     void update(viewstate& vs) noexcept;

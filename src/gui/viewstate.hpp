@@ -37,14 +37,16 @@ enum class Command {
     paletteLoad,
     paletteUnload,
     probe,
+    quit,
     resetVectorClear,
     resetVectorOverride,
-    quit,
+    tprobe,
     zeroRamOnPowerup,
 };
 
 struct command_state {
     using probe = std::pair<aldo_probe, bool>;
+    using tprobe = std::pair<aldo_probe, aldo_trivalue>;
     using payload =
         std::variant<
             std::monostate,
@@ -53,7 +55,8 @@ struct command_state {
             et::diff,
             aldo_haltexpr,
             int,
-            probe>;
+            probe,
+            tprobe>;
 
     template<std::convertible_to<payload> T = std::monostate>
     constexpr command_state(Command c, T v = {}) noexcept : cmd{c}, value{v} {}
@@ -66,6 +69,10 @@ struct viewstate {
     void addProbeCommand(aldo_probe signal, bool active)
     {
         commands.emplace(Command::probe, command_state::probe{signal, active});
+    }
+    void addTprobeCommand(aldo_probe signal, aldo_trivalue val)
+    {
+        commands.emplace(Command::tprobe, command_state::tprobe{signal, val});
     }
 
     std::queue<command_state> commands;

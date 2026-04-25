@@ -25,9 +25,8 @@
 static struct aldo_dis_instruction create_instruction(size_t sz,
                                                       const uint8_t bytes[sz])
 {
-    struct aldo_blockview bv = {.mem = bytes, .size = sz};
     struct aldo_dis_instruction inst;
-    auto err = aldo_dis_parse_inst(&bv, 0, &inst);
+    auto err = aldo_dis_parse_inst(sz, bytes, 0, &inst);
     ct_asserttrue(err > 0);
     return inst;
 }
@@ -54,141 +53,11 @@ static void errstr_returns_unknown_err(void *ctx)
 // MARK: - Parse Instructions
 //
 
-static void parse_inst_empty_bankview(void *ctx)
-{
-    struct aldo_blockview bv = {};
-    struct aldo_dis_instruction inst;
-
-    auto result = aldo_dis_parse_inst(&bv, 0, &inst);
-
-    ct_assertequal(ALDO_DIS_ERR_PRGROM, result);
-    ct_assertequal(0u, inst.bv.ord);
-    ct_assertnull(inst.bv.mem);
-    ct_assertequal(0u, inst.bv.size);
-    ct_assertequal(0u, inst.offset);
-    ct_assertequal(ALDO_IN_UDF, (int)inst.d.instruction);
-    ct_assertequal(ALDO_AM_IMP, (int)inst.d.mode);
-    ct_assertfalse(inst.d.unofficial);
-}
-
-static void parse_inst_at_start(void *ctx)
-{
-    uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct aldo_blockview bv = {
-        .mem = mem,
-        .size = sizeof mem / sizeof mem[0],
-        .ord = 1,
-    };
-    struct aldo_dis_instruction inst;
-
-    auto result = aldo_dis_parse_inst(&bv, 0, &inst);
-
-    ct_assertequal(1, result);
-    ct_assertequal(bv.ord, inst.bv.ord);
-    ct_assertequal(0xeau, inst.bv.mem[0]);
-    ct_assertequal(1u, inst.bv.size);
-    ct_assertequal(0u, inst.offset);
-    ct_assertequal(ALDO_IN_NOP, (int)inst.d.instruction);
-    ct_assertequal(ALDO_AM_IMP, (int)inst.d.mode);
-    ct_assertfalse(inst.d.unofficial);
-}
-
-static void parse_inst_in_middle(void *ctx)
-{
-    uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct aldo_blockview bv = {
-        .mem = mem,
-        .size = sizeof mem / sizeof mem[0],
-        .ord = 1,
-    };
-    struct aldo_dis_instruction inst;
-
-    auto result = aldo_dis_parse_inst(&bv, 3, &inst);
-
-    ct_assertequal(3, result);
-    ct_assertequal(bv.ord, inst.bv.ord);
-    ct_assertequal(0x4cu, inst.bv.mem[0]);
-    ct_assertequal(0x34u, inst.bv.mem[1]);
-    ct_assertequal(6u, inst.bv.mem[2]);
-    ct_assertequal(3u, inst.bv.size);
-    ct_assertequal(3u, inst.offset);
-    ct_assertequal(ALDO_IN_JMP, (int)inst.d.instruction);
-    ct_assertequal(ALDO_AM_JABS, (int)inst.d.mode);
-    ct_assertfalse(inst.d.unofficial);
-}
-
-static void parse_inst_unofficial(void *ctx)
-{
-    uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct aldo_blockview bv = {
-        .mem = mem,
-        .size = sizeof mem / sizeof mem[0],
-        .ord = 1,
-    };
-    struct aldo_dis_instruction inst;
-
-    auto result = aldo_dis_parse_inst(&bv, 2, &inst);
-
-    ct_assertequal(2, result);
-    ct_assertequal(bv.ord, inst.bv.ord);
-    ct_assertequal(0x34u, inst.bv.mem[0]);
-    ct_assertequal(0x4cu, inst.bv.mem[1]);
-    ct_assertequal(2u, inst.bv.size);
-    ct_assertequal(2u, inst.offset);
-    ct_assertequal(ALDO_IN_NOP, (int)inst.d.instruction);
-    ct_assertequal(ALDO_AM_ZPX, (int)inst.d.mode);
-    ct_asserttrue(inst.d.unofficial);
-}
-
-static void parse_inst_eof(void *ctx)
-{
-    uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct aldo_blockview bv = {
-        .mem = mem,
-        .size = sizeof mem / sizeof mem[0],
-        .ord = 1,
-    };
-    struct aldo_dis_instruction inst;
-
-    auto result = aldo_dis_parse_inst(&bv, 5, &inst);
-
-    ct_assertequal(ALDO_DIS_ERR_EOF, result);
-    ct_assertequal(0u, inst.bv.ord);
-    ct_assertnull(inst.bv.mem);
-    ct_assertequal(0u, inst.bv.size);
-    ct_assertequal(0u, inst.offset);
-    ct_assertequal(ALDO_IN_UDF, (int)inst.d.instruction);
-    ct_assertequal(ALDO_AM_IMP, (int)inst.d.mode);
-    ct_assertfalse(inst.d.unofficial);
-}
-
-static void parse_inst_out_of_bounds(void *ctx)
-{
-    uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
-    struct aldo_blockview bv = {
-        .mem = mem,
-        .size = sizeof mem / sizeof mem[0],
-        .ord = 1,
-    };
-    struct aldo_dis_instruction inst;
-
-    auto result = aldo_dis_parse_inst(&bv, 10, &inst);
-
-    ct_assertequal(0, result);
-    ct_assertequal(0u, inst.bv.ord);
-    ct_assertnull(inst.bv.mem);
-    ct_assertequal(0u, inst.bv.size);
-    ct_assertequal(0u, inst.offset);
-    ct_assertequal(ALDO_IN_UDF, (int)inst.d.instruction);
-    ct_assertequal(ALDO_AM_IMP, (int)inst.d.mode);
-    ct_assertfalse(inst.d.unofficial);
-}
-
 static void parsemem_inst_empty_blockview(void *ctx)
 {
     struct aldo_dis_instruction inst;
 
-    auto result = aldo_dis_parsemem_inst(0, nullptr, 0, &inst);
+    auto result = aldo_dis_parse_inst(0, nullptr, 0, &inst);
 
     ct_assertequal(ALDO_DIS_ERR_PRGROM, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -205,8 +74,7 @@ static void parsemem_inst_at_start(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    auto result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 0,
-                                         &inst);
+    auto result = aldo_dis_parse_inst(sizeof mem / sizeof mem[0], mem, 0, &inst);
 
     ct_assertequal(1, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -223,8 +91,7 @@ static void parsemem_inst_in_middle(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    auto result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 3,
-                                         &inst);
+    auto result = aldo_dis_parse_inst(sizeof mem / sizeof mem[0], mem, 3, &inst);
 
     ct_assertequal(3, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -243,8 +110,7 @@ static void parsemem_inst_unofficial(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    auto result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 2,
-                                         &inst);
+    auto result = aldo_dis_parse_inst(sizeof mem / sizeof mem[0], mem, 2, &inst);
 
     ct_assertequal(2, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -262,8 +128,7 @@ static void parsemem_inst_eof(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    auto result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 5,
-                                         &inst);
+    auto result = aldo_dis_parse_inst(sizeof mem / sizeof mem[0], mem, 5, &inst);
 
     ct_assertequal(ALDO_DIS_ERR_EOF, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -280,8 +145,7 @@ static void parsemem_inst_out_of_bounds(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    auto result = aldo_dis_parsemem_inst(sizeof mem / sizeof mem[0], mem, 10,
-                                         &inst);
+    auto result = aldo_dis_parse_inst(sizeof mem / sizeof mem[0], mem, 10, &inst);
 
     ct_assertequal(0, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -494,80 +358,6 @@ static void inst_operand_two_byte_operand(void *ctx)
     const char *exp = "$4C34";
     ct_assertequal((int)strlen(exp), length);
     ct_assertequalstrn(exp, buf, sizeof exp);
-}
-
-//
-// MARK: - Instruction Equality
-//
-
-static void inst_eq_both_are_null(void *ctx)
-{
-    auto result = aldo_dis_inst_equal(nullptr, nullptr);
-
-    ct_assertfalse(result);
-}
-
-static void inst_eq_rhs_is_null(void *ctx)
-{
-    uint8_t a[] = {0xea};
-    auto lhs = makeinst(a);
-
-    auto result = aldo_dis_inst_equal(&lhs, nullptr);
-
-    ct_assertfalse(result);
-}
-
-static void inst_eq_lhs_is_null(void *ctx)
-{
-    uint8_t b[] = {0xad, 0x34, 0x4c};
-    auto rhs = makeinst(b);
-
-    auto result = aldo_dis_inst_equal(nullptr, &rhs);
-
-    ct_assertfalse(result);
-}
-
-static void inst_eq_different_lengths(void *ctx)
-{
-    uint8_t a[] = {0xea}, b[] = {0xad, 0x34, 0x4c};
-    auto lhs = makeinst(a);
-    auto rhs = makeinst(b);
-
-    auto result = aldo_dis_inst_equal(&lhs, &rhs);
-
-    ct_assertfalse(result);
-}
-
-static void inst_eq_different_bytes(void *ctx)
-{
-    uint8_t a[] = {0xad, 0x44, 0x80}, b[] = {0xad, 0x34, 0x4c};
-    auto lhs = makeinst(a);
-    auto rhs = makeinst(b);
-
-    auto result = aldo_dis_inst_equal(&lhs, &rhs);
-
-    ct_assertfalse(result);
-}
-
-static void inst_eq_same_bytes(void *ctx)
-{
-    uint8_t a[] = {0xad, 0x34, 0x4c}, b[] = {0xad, 0x34, 0x4c};
-    auto lhs = makeinst(a);
-    auto rhs = makeinst(b);
-
-    auto result = aldo_dis_inst_equal(&lhs, &rhs);
-
-    ct_asserttrue(result);
-}
-
-static void inst_eq_same_object(void *ctx)
-{
-    uint8_t a[] = {0xad, 0x44, 0x80};
-    auto lhs = makeinst(a);
-
-    auto result = aldo_dis_inst_equal(&lhs, &lhs);
-
-    ct_asserttrue(result);
 }
 
 //
@@ -2678,12 +2468,6 @@ struct ct_testsuite dis_tests()
         ct_maketest(errstr_returns_known_err),
         ct_maketest(errstr_returns_unknown_err),
 
-        ct_maketest(parse_inst_empty_bankview),
-        ct_maketest(parse_inst_at_start),
-        ct_maketest(parse_inst_in_middle),
-        ct_maketest(parse_inst_unofficial),
-        ct_maketest(parse_inst_eof),
-        ct_maketest(parse_inst_out_of_bounds),
         ct_maketest(parsemem_inst_empty_blockview),
         ct_maketest(parsemem_inst_at_start),
         ct_maketest(parsemem_inst_in_middle),
@@ -2711,14 +2495,6 @@ struct ct_testsuite dis_tests()
         ct_maketest(inst_operand_no_operand),
         ct_maketest(inst_operand_one_byte_operand),
         ct_maketest(inst_operand_two_byte_operand),
-
-        ct_maketest(inst_eq_both_are_null),
-        ct_maketest(inst_eq_rhs_is_null),
-        ct_maketest(inst_eq_lhs_is_null),
-        ct_maketest(inst_eq_different_lengths),
-        ct_maketest(inst_eq_different_bytes),
-        ct_maketest(inst_eq_same_bytes),
-        ct_maketest(inst_eq_same_object),
 
         ct_maketest(inst_does_nothing_if_no_bytes),
         ct_maketest(inst_disassembles_implied),

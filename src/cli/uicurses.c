@@ -303,9 +303,8 @@ static void drawinstructions(const struct view *v, int h, int y,
     auto addr = snp->cpu.datapath.current_instruction;
     char disassembly[AldoDisInstSize];
     for (auto i = 0; i < h - y; ++i) {
-        auto result = aldo_dis_parsemem_inst(snp->prg.curr.length,
-                                             snp->prg.curr.pc,
-                                             inst.offset + inst.bv.size, &inst);
+        auto result = aldo_dis_parse_inst(snp->prg.curr.length, snp->prg.curr.pc,
+                                          inst.offset + inst.bv.size, &inst);
         if (result > 0) {
             result = aldo_dis_inst(addr, &inst, disassembly);
             if (result > 0) {

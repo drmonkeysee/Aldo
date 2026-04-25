@@ -109,6 +109,33 @@ static uint16_t interrupt_vector(const struct aldo_snapshot *snp)
     return aldo_batowr(snp->prg.vectors + 4);
 }
 
+static bool inst_equal(const struct aldo_dis_instruction *lhs,
+                       const struct aldo_dis_instruction *rhs)
+{
+    return lhs && rhs && lhs->bv.size == rhs->bv.size
+            && memcmp(lhs->bv.mem, rhs->bv.mem, lhs->bv.size) == 0;
+}
+
+static int parse_inst(const struct aldo_blockview *bv, size_t at,
+                      struct aldo_dis_instruction *parsed)
+{
+    *parsed = (typeof(*parsed)){};
+    if (!bv->mem) return ALDO_DIS_ERR_PRGROM;
+    if (at >= bv->size) return 0;
+
+    auto opcode = bv->mem[at];
+    auto dec = Aldo_Decode[opcode];
+    auto instlen = InstLens[dec.mode];
+    if ((size_t)instlen > bv->size - at) return ALDO_DIS_ERR_EOF;
+
+    *parsed = (typeof(*parsed)){
+        at,
+        {bv->ord, (size_t)instlen, bv->mem + at},
+        dec,
+    };
+    return instlen;
+}
+
 static int print_raw(uint16_t addr, const struct aldo_dis_instruction *inst,
                      char dis[restrict static AldoDisInstSize])
 {
@@ -176,7 +203,7 @@ static int print_prg_line(const char *restrict dis, bool verbose,
 {
     if (verbose && fprintf(f, "%s\n", dis) < 0) goto io_failure;
 
-    if (aldo_dis_inst_equal(curr_inst, &repeat->prev_inst)) {
+    if (inst_equal(curr_inst, &repeat->prev_inst)) {
         // only print placeholder on first duplicate seen
         if (!repeat->skip) {
             repeat->skip = true;
@@ -209,9 +236,9 @@ static int print_prgblock(const struct aldo_blockview *bv, bool verbose,
     auto addr = (uint16_t)(ALDO_MEMBLOCK_64KB - bv->size);
 
     int result;
-    for (result = aldo_dis_parse_inst(bv, 0, &inst);
+    for (result = parse_inst(bv, 0, &inst);
          result > 0;
-         result = aldo_dis_parse_inst(bv, inst.offset + inst.bv.size, &inst)) {
+         result = parse_inst(bv, inst.offset + inst.bv.size, &inst)) {
         result = aldo_dis_inst(addr, &inst, dis);
         if (result <= 0) break;
         io_err = print_prg_line(dis, verbose, &inst, &repeat, f);
@@ -486,37 +513,16 @@ const char *aldo_dis_errstr(int err)
     }
 }
 
-int aldo_dis_parse_inst(const struct aldo_blockview *bv, size_t at,
-                        struct aldo_dis_instruction *parsed)
+int aldo_dis_parse_inst(size_t size, const uint8_t mem[restrict size],
+                        size_t at, struct aldo_dis_instruction *parsed)
 {
-    assert(bv != nullptr);
     assert(parsed != nullptr);
 
-    *parsed = (typeof(*parsed)){};
-    if (!bv->mem) return ALDO_DIS_ERR_PRGROM;
-    if (at >= bv->size) return 0;
-
-    auto opcode = bv->mem[at];
-    auto dec = Aldo_Decode[opcode];
-    auto instlen = InstLens[dec.mode];
-    if ((size_t)instlen > bv->size - at) return ALDO_DIS_ERR_EOF;
-
-    *parsed = (typeof(*parsed)){
-        at,
-        {bv->ord, (size_t)instlen, bv->mem + at},
-        dec,
-    };
-    return instlen;
-}
-
-int aldo_dis_parsemem_inst(size_t size, const uint8_t mem[restrict size],
-                           size_t at, struct aldo_dis_instruction *parsed)
-{
     struct aldo_blockview bv = {
         .mem = mem,
         .size = size,
     };
-    return aldo_dis_parse_inst(&bv, at, parsed);
+    return parse_inst(&bv, at, parsed);
 }
 
 int aldo_dis_inst(uint16_t addr, const struct aldo_dis_instruction *inst,
@@ -558,8 +564,8 @@ int aldo_dis_datapath(const struct aldo_snapshot *snp,
     assert(dis != nullptr);
 
     struct aldo_dis_instruction inst;
-    auto err = aldo_dis_parsemem_inst(snp->prg.curr.length, snp->prg.curr.pc,
-                                      0, &inst);
+    auto err = aldo_dis_parse_inst(snp->prg.curr.length, snp->prg.curr.pc, 0,
+                                   &inst);
     if (err < 0) return err;
 
     auto cpu = &snp->cpu;
@@ -710,13 +716,6 @@ int aldo_dis_inst_operand(const struct aldo_dis_instruction *inst,
 
     assert(count < (int)AldoDisOperandSize);
     return count;
-}
-
-bool aldo_dis_inst_equal(const struct aldo_dis_instruction *lhs,
-                         const struct aldo_dis_instruction *rhs)
-{
-    return lhs && rhs && lhs->bv.size == rhs->bv.size
-            && memcmp(lhs->bv.mem, rhs->bv.mem, lhs->bv.size) == 0;
 }
 
 //

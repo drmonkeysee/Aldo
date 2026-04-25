@@ -61,12 +61,9 @@ const char *aldo_dis_errstr(int err) aldo_nothrow;
 
 // parsed will be zeroed-out if return value is <= 0
 aldo_export aldo_checkerr
-int aldo_dis_parse_inst(const struct aldo_blockview *bv, size_t at,
+int aldo_dis_parse_inst(size_t size, const uint8_t mem[aldo_naz(size)],
+                        size_t at,
                         struct aldo_dis_instruction *parsed) aldo_nothrow;
-aldo_export aldo_checkerr
-int aldo_dis_parsemem_inst(size_t size, const uint8_t mem[aldo_naz(size)],
-                           size_t at,
-                           struct aldo_dis_instruction *parsed) aldo_nothrow;
 // functions w/buffer params leave buffer untouched when returning <= 0
 aldo_export aldo_checkerr
 int aldo_dis_inst(uint16_t addr, const struct aldo_dis_instruction *inst,
@@ -99,9 +96,6 @@ aldo_export aldo_checkerr
 int
 aldo_dis_inst_operand(const struct aldo_dis_instruction *inst,
                       char dis[aldo_nacz(AldoDisOperandSize)]) aldo_nothrow;
-aldo_export
-bool aldo_dis_inst_equal(const struct aldo_dis_instruction *lhs,
-                         const struct aldo_dis_instruction *rhs) aldo_nothrow;
 
 //
 // MARK: - Internal

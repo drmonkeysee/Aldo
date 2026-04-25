@@ -26,7 +26,7 @@ static int trace_instruction(FILE *tracelog, const struct aldo_mos6502 *cpu,
                                  snp->cpu.datapath.current_instruction,
                                  aldo_arrsz(bytes), bytes);
     struct aldo_dis_instruction inst;
-    auto result = aldo_dis_parsemem_inst(instlen, bytes, 0, &inst);
+    auto result = aldo_dis_parse_inst(instlen, bytes, 0, &inst);
     char disinst[AldoDisInstSize];
     if (result > 0) {
         result = aldo_dis_inst(snp->cpu.datapath.current_instruction, &inst,

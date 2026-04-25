@@ -1720,9 +1720,9 @@ protected:
         if (vs.selectedInstruction) {
             const auto& curr = emu.snapshot().prg.curr;
             aldo_dis_instruction inst{};
-            auto result = aldo_dis_parsemem_inst(curr.length, curr.pc,
-                                                 vs.selectedInstruction.value(),
-                                                 &inst);
+            auto result = aldo_dis_parse_inst(curr.length, curr.pc,
+                                              vs.selectedInstruction.value(),
+                                              &inst);
             if (result > 0) {
                 renderInstructionDetails(inst);
             } else if (result < 0) {
@@ -2588,7 +2588,7 @@ private:
         std::array<aldo::et::tchar, AldoDisInstSize> disasm;
         for (auto i = 0; i < instCount; ++i) {
             auto at = inst.offset + inst.bv.size;
-            auto result = aldo_dis_parsemem_inst(curr.length, curr.pc, at, &inst);
+            auto result = aldo_dis_parse_inst(curr.length, curr.pc, at, &inst);
             if (result > 0) {
                 result = aldo_dis_inst(addr, &inst, disasm.data());
                 if (result > 0) {

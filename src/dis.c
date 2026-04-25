@@ -667,21 +667,6 @@ int aldo_dis_cart_chr(aldo_cart *cart, int chrscale,
     return err;
 }
 
-int aldo_dis_cart_chrblock(const struct aldo_blockview *bv, int scale, FILE *f)
-{
-    assert(bv != nullptr);
-    assert(f != nullptr);
-
-    if (!bv->mem) return ALDO_DIS_ERR_CHRROM;
-    if (scale <= 0 || scale > ScaleGuard) return ALDO_DIS_ERR_CHRSCL;
-
-    uint32_t tilesdim, tile_sections;
-    auto err = measure_tile_sheet(bv->size, &tilesdim, &tile_sections);
-    if (err < 0) return err;
-
-    return write_chrtiles(bv, tilesdim, tile_sections, (uint32_t)scale, f);
-}
-
 const char *aldo_dis_inst_mnemonic(const struct aldo_dis_instruction *inst)
 {
     assert(inst != nullptr);

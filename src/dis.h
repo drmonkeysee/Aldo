@@ -82,9 +82,6 @@ aldo_export aldo_checkerr
 int aldo_dis_cart_chr(aldo_cart *cart, int chrscale,
                       const char *aldo_noalias chrdecode_prefix,
                       FILE *output) aldo_nothrow;
-aldo_export aldo_checkerr
-int aldo_dis_cart_chrblock(const struct aldo_blockview *bv, int scale,
-                           FILE *f) aldo_nothrow;
 
 aldo_export
 const char *

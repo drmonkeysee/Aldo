@@ -60,23 +60,6 @@
 		C894F0EF2945850E00C6575F /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C894F0ED2945850E00C6575F /* view.cpp */; };
 		C8A13C812C81559B00F61389 /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C8A13C802C81559B00F61389 /* snapshot.c */; };
 		C8A13C822C81559B00F61389 /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = C8A13C802C81559B00F61389 /* snapshot.c */; };
-		C8B3A9BD295535F3009C1770 /* AldoStudioApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B3A9BC295535F3009C1770 /* AldoStudioApp.swift */; };
-		C8B3A9BF295535F3009C1770 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B3A9BE295535F3009C1770 /* ContentView.swift */; };
-		C8B3A9C1295535F4009C1770 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8B3A9C0295535F4009C1770 /* Assets.xcassets */; };
-		C8B3A9C929553A55009C1770 /* CartFocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B5303A2801300C00576D9F /* CartFocusView.swift */; };
-		C8B3A9CA29553A55009C1770 /* CartInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B427D5DA4400468FDB /* CartInfoView.swift */; };
-		C8B3A9CB29553A55009C1770 /* CartChrView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C838D3B627D5DB0300468FDB /* CartChrView.swift */; };
-		C8B3A9CC29553A59009C1770 /* CartInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88A5E8427F6A1750039382D /* CartInspectorView.swift */; };
-		C8B3A9CD29553A59009C1770 /* CommandViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B87D46285E82BD000E0D2E /* CommandViews.swift */; };
-		C8B3A9CE29553A59009C1770 /* CartPrgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89D714F27D4758900C9177A /* CartPrgView.swift */; };
-		C8B3A9CF29553BC0009C1770 /* Disassembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8497E3F2822015100F4952E /* Disassembly.swift */; };
-		C8B3A9D029553BC3009C1770 /* CStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F2985A2810ECEF00ECFD7E /* CStream.swift */; };
-		C8B3A9D129553BC6009C1770 /* Commands.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E76BA9285985CE004C1479 /* Commands.swift */; };
-		C8B3A9D229553BCA009C1770 /* ChrSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88949B02813B2DB00795CC0 /* ChrSheet.swift */; };
-		C8B3A9D329553BCD009C1770 /* Cart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A5B77A27DD79AE00A4DD5E /* Cart.swift */; };
-		C8B3A9D429553BD0009C1770 /* AldoError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8FB31D02803D6EC00E6B0EF /* AldoError.swift */; };
-		C8B3A9D929553D23009C1770 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B3A9D829553D23009C1770 /* Common.swift */; };
-		C8B3A9DD295540B4009C1770 /* libaldo.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B88AA42906277800B7CB23 /* libaldo.dylib */; };
 		C8B4664527755790000576EE /* argparse.c in Sources */ = {isa = PBXBuildFile; fileRef = C8B4664427755790000576EE /* argparse.c */; };
 		C8B4E7F029ADA78C00B5033C /* imgui_widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8B4E7E329ADA78C00B5033C /* imgui_widgets.cpp */; };
 		C8B4E7F429ADA78C00B5033C /* imgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8B4E7EA29ADA78C00B5033C /* imgui.cpp */; };
@@ -256,8 +239,6 @@
 		C830036628DEDDD200480F29 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C830036B28DEDDD200480F29 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C830036D28DEDDD200480F29 /* Aldo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Aldo.entitlements; sourceTree = "<group>"; };
-		C838D3B427D5DA4400468FDB /* CartInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartInfoView.swift; sourceTree = "<group>"; };
-		C838D3B627D5DB0300468FDB /* CartChrView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartChrView.swift; sourceTree = "<group>"; };
 		C8395D432D3B5CD00046F2D8 /* ctrlsignal.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ctrlsignal.c; sourceTree = "<group>"; };
 		C83961A42F89B8D700C5FA39 /* aldo8.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aldo8.h; sourceTree = "<group>"; };
 		C83961A52F89B8D700C5FA39 /* aldo8.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aldo8.c; sourceTree = "<group>"; };
@@ -268,7 +249,6 @@
 		C83A30782904A2B000749A17 /* version.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
 		C83A30792904A2B000749A17 /* version.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = version.c; sourceTree = "<group>"; };
 		C848C1B228FB9D630025ABD2 /* cycleclock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cycleclock.h; sourceTree = "<group>"; };
-		C8497E3F2822015100F4952E /* Disassembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disassembly.swift; sourceTree = "<group>"; };
 		C8557B2D25C661660090296D /* ui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ui.h; sourceTree = "<group>"; };
 		C8557B2E25C661660090296D /* ui.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ui.c; sourceTree = "<group>"; };
 		C8561A0A29149EA600290B53 /* mediaruntime.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mediaruntime.cpp; sourceTree = "<group>"; };
@@ -289,8 +269,6 @@
 		C87C274E2F0610850066D0A1 /* imgui_impl_sdlrenderer3.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = imgui_impl_sdlrenderer3.cpp; sourceTree = "<group>"; };
 		C882854629403C2100BAC249 /* error.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = error.cpp; sourceTree = "<group>"; };
 		C882854729403C2100BAC249 /* error.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = error.hpp; sourceTree = "<group>"; };
-		C88949B02813B2DB00795CC0 /* ChrSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChrSheet.swift; sourceTree = "<group>"; };
-		C88A5E8427F6A1750039382D /* CartInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartInspectorView.swift; sourceTree = "<group>"; };
 		C88CABDC28FA4DDD00551C65 /* uisdl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = uisdl.cpp; sourceTree = "<group>"; };
 		C88CABDD28FA4DDD00551C65 /* uisdl.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = uisdl.hpp; sourceTree = "<group>"; };
 		C88CABE328FA63DD00551C65 /* bridgeopen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bridgeopen.h; sourceTree = "<group>"; };
@@ -298,17 +276,8 @@
 		C894F0EC2945732800C6575F /* emu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = emu.h; sourceTree = "<group>"; };
 		C894F0ED2945850E00C6575F /* view.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = view.cpp; sourceTree = "<group>"; };
 		C894F0EE2945850E00C6575F /* view.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = view.hpp; sourceTree = "<group>"; };
-		C89D714F27D4758900C9177A /* CartPrgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartPrgView.swift; sourceTree = "<group>"; };
 		C8A13C802C81559B00F61389 /* snapshot.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = snapshot.c; sourceTree = "<group>"; };
-		C8A5B77A27DD79AE00A4DD5E /* Cart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cart.swift; sourceTree = "<group>"; };
 		C8ACDEA629AC492E0058A6F8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		C8B3A9BA295535F3009C1770 /* AldoStudio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AldoStudio.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C8B3A9BC295535F3009C1770 /* AldoStudioApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoStudioApp.swift; sourceTree = "<group>"; };
-		C8B3A9BE295535F3009C1770 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		C8B3A9C0295535F4009C1770 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		C8B3A9C5295535F4009C1770 /* AldoStudio.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AldoStudio.entitlements; sourceTree = "<group>"; };
-		C8B3A9D829553D23009C1770 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
-		C8B3A9DA29553F4C009C1770 /* AldoStudio-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AldoStudio-Bridging-Header.h"; sourceTree = "<group>"; };
 		C8B4664327755790000576EE /* argparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = argparse.h; sourceTree = "<group>"; };
 		C8B4664427755790000576EE /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8B4E7E029ADA78C00B5033C /* imgui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imgui.h; sourceTree = "<group>"; };
@@ -322,11 +291,9 @@
 		C8B4E7ED29ADA78C00B5033C /* imgui_tables.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imgui_tables.cpp; sourceTree = "<group>"; };
 		C8B4E7EE29ADA78C00B5033C /* imgui_demo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imgui_demo.cpp; sourceTree = "<group>"; };
 		C8B4E7EF29ADA78C00B5033C /* imgui_draw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imgui_draw.cpp; sourceTree = "<group>"; };
-		C8B5303A2801300C00576D9F /* CartFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartFocusView.swift; sourceTree = "<group>"; };
 		C8B77FA62975FD7A0020692C /* emutypes.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = emutypes.cpp; sourceTree = "<group>"; };
 		C8B79ED02C93D126003D5012 /* texture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = texture.cpp; sourceTree = "<group>"; };
 		C8B79ED12C93D126003D5012 /* texture.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = texture.hpp; sourceTree = "<group>"; };
-		C8B87D46285E82BD000E0D2E /* CommandViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandViews.swift; sourceTree = "<group>"; };
 		C8B88AA42906277800B7CB23 /* libaldo.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libaldo.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8BB4C262CC88C7700153E1E /* ppurender.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ppurender.c; sourceTree = "<group>"; };
 		C8C4B48C25ABBFA3006A98BB /* libpanel.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpanel.tbd; path = usr/lib/libpanel.tbd; sourceTree = SDKROOT; };
@@ -370,7 +337,6 @@
 		C8D44BDC2786B571005AB586 /* argparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = argparse.c; sourceTree = "<group>"; };
 		C8D8FDA72792691B0073639B /* tsutil.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tsutil.c; sourceTree = "<group>"; };
 		C8DC9CB828DFE5B4000D8D97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		C8E76BA9285985CE004C1479 /* Commands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Commands.swift; sourceTree = "<group>"; };
 		C8E7A29A2980F32400AAB2A4 /* modal.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = modal.cpp; sourceTree = "<group>"; };
 		C8E7A29B2980F32400AAB2A4 /* modal.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = modal.hpp; sourceTree = "<group>"; };
 		C8E9478128FE45EA0073D1AA /* ctrlsignal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ctrlsignal.h; sourceTree = "<group>"; };
@@ -385,10 +351,8 @@
 		C8F1A38D297FA5400005EB8B /* emu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = emu.hpp; sourceTree = "<group>"; };
 		C8F1A38F297FA8AA0005EB8B /* input.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = input.cpp; sourceTree = "<group>"; };
 		C8F1A390297FA8AA0005EB8B /* input.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = input.hpp; sourceTree = "<group>"; };
-		C8F2985A2810ECEF00ECFD7E /* CStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CStream.swift; sourceTree = "<group>"; };
 		C8F87DBA2984D64F00B8FAFD /* debug.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = debug.cpp; sourceTree = "<group>"; };
 		C8F87DBB2984D64F00B8FAFD /* debug.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = debug.hpp; sourceTree = "<group>"; };
-		C8FB31D02803D6EC00E6B0EF /* AldoError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AldoError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -415,14 +379,6 @@
 			files = (
 				C8B88ABB29062D6E00B7CB23 /* libaldo.dylib in Frameworks */,
 				C87C27492F060A9E0066D0A1 /* SDL3.xcframework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C8B3A9B7295535F3009C1770 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C8B3A9DD295540B4009C1770 /* libaldo.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -499,7 +455,6 @@
 				C830036128DEDDD100480F29 /* Aldo.app */,
 				C8D3CA002904E1BD0087316F /* aldoc */,
 				C8B88AA42906277800B7CB23 /* libaldo.dylib */,
-				C8B3A9BA295535F3009C1770 /* AldoStudio.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -580,19 +535,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		C8264C5A294FF4DE004CD6A5 /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				C8FB31D02803D6EC00E6B0EF /* AldoError.swift */,
-				C8A5B77A27DD79AE00A4DD5E /* Cart.swift */,
-				C88949B02813B2DB00795CC0 /* ChrSheet.swift */,
-				C8E76BA9285985CE004C1479 /* Commands.swift */,
-				C8F2985A2810ECEF00ECFD7E /* CStream.swift */,
-				C8497E3F2822015100F4952E /* Disassembly.swift */,
-			);
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
 		C830036228DEDDD100480F29 /* Aldo */ = {
 			isa = PBXGroup;
 			children = (
@@ -638,7 +580,6 @@
 				C820E6C625A97A2F006A7AB1 /* src */,
 				C8184D4E25E74A9F002B3100 /* test */,
 				C830036228DEDDD100480F29 /* Aldo */,
-				C8B3A9BB295535F3009C1770 /* AldoStudio */,
 				C820E6BE25A9759A006A7AB1 /* Dev */,
 				C8184D3C25E7496B002B3100 /* Tests */,
 				C820E6DD25A982A5006A7AB1 /* Frameworks */,
@@ -684,26 +625,6 @@
 				C8EC7222291615AB00DF750A /* viewstate.hpp */,
 			);
 			path = gui;
-			sourceTree = "<group>";
-		};
-		C8B3A9BB295535F3009C1770 /* AldoStudio */ = {
-			isa = PBXGroup;
-			children = (
-				C8264C5A294FF4DE004CD6A5 /* ViewModels */,
-				C8B3A9DA29553F4C009C1770 /* AldoStudio-Bridging-Header.h */,
-				C8B3A9BC295535F3009C1770 /* AldoStudioApp.swift */,
-				C838D3B627D5DB0300468FDB /* CartChrView.swift */,
-				C8B5303A2801300C00576D9F /* CartFocusView.swift */,
-				C838D3B427D5DA4400468FDB /* CartInfoView.swift */,
-				C89D714F27D4758900C9177A /* CartPrgView.swift */,
-				C88A5E8427F6A1750039382D /* CartInspectorView.swift */,
-				C8B87D46285E82BD000E0D2E /* CommandViews.swift */,
-				C8B3A9D829553D23009C1770 /* Common.swift */,
-				C8B3A9BE295535F3009C1770 /* ContentView.swift */,
-				C8B3A9C0295535F4009C1770 /* Assets.xcassets */,
-				C8B3A9C5295535F4009C1770 /* AldoStudio.entitlements */,
-			);
-			path = AldoStudio;
 			sourceTree = "<group>";
 		};
 		C8B4E7DF29ADA78C00B5033C /* imgui */ = {
@@ -796,23 +717,6 @@
 			productReference = C830036128DEDDD100480F29 /* Aldo.app */;
 			productType = "com.apple.product-type.application";
 		};
-		C8B3A9B9295535F3009C1770 /* AldoStudio */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = C8B3A9C8295535F4009C1770 /* Build configuration list for PBXNativeTarget "AldoStudio" */;
-			buildPhases = (
-				C8B3A9B6295535F3009C1770 /* Sources */,
-				C8B3A9B7295535F3009C1770 /* Frameworks */,
-				C8B3A9B8295535F3009C1770 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = AldoStudio;
-			productName = AldoStudio;
-			productReference = C8B3A9BA295535F3009C1770 /* AldoStudio.app */;
-			productType = "com.apple.product-type.application";
-		};
 		C8B88AA32906277800B7CB23 /* Lib */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C8B88AA52906277800B7CB23 /* Build configuration list for PBXNativeTarget "Lib" */;
@@ -870,10 +774,6 @@
 						CreatedOnToolsVersion = 14.0;
 						LastSwiftMigration = 1420;
 					};
-					C8B3A9B9295535F3009C1770 = {
-						CreatedOnToolsVersion = 14.2;
-						LastSwiftMigration = 1420;
-					};
 					C8B88AA32906277800B7CB23 = {
 						CreatedOnToolsVersion = 14.0.1;
 					};
@@ -896,7 +796,6 @@
 			projectRoot = "";
 			targets = (
 				C830036028DEDDD100480F29 /* Aldo */,
-				C8B3A9B9295535F3009C1770 /* AldoStudio */,
 				C8D3C9FF2904E1BD0087316F /* Cli */,
 				C8B88AA32906277800B7CB23 /* Lib */,
 				C820E6BB25A9759A006A7AB1 /* Dev */,
@@ -918,14 +817,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C830036728DEDDD200480F29 /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C8B3A9B8295535F3009C1770 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C8B3A9C1295535F4009C1770 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1037,28 +928,6 @@
 				C882854829403C2100BAC249 /* error.cpp in Sources */,
 				C8B4E7F029ADA78C00B5033C /* imgui_widgets.cpp in Sources */,
 				C8B79ED22C93D126003D5012 /* texture.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C8B3A9B6295535F3009C1770 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C8B3A9CF29553BC0009C1770 /* Disassembly.swift in Sources */,
-				C8B3A9CC29553A59009C1770 /* CartInspectorView.swift in Sources */,
-				C8B3A9BF295535F3009C1770 /* ContentView.swift in Sources */,
-				C8B3A9D329553BCD009C1770 /* Cart.swift in Sources */,
-				C8B3A9D429553BD0009C1770 /* AldoError.swift in Sources */,
-				C8B3A9CE29553A59009C1770 /* CartPrgView.swift in Sources */,
-				C8B3A9C929553A55009C1770 /* CartFocusView.swift in Sources */,
-				C8B3A9CA29553A55009C1770 /* CartInfoView.swift in Sources */,
-				C8B3A9D129553BC6009C1770 /* Commands.swift in Sources */,
-				C8B3A9BD295535F3009C1770 /* AldoStudioApp.swift in Sources */,
-				C8B3A9D029553BC3009C1770 /* CStream.swift in Sources */,
-				C8B3A9CB29553A55009C1770 /* CartChrView.swift in Sources */,
-				C8B3A9CD29553A59009C1770 /* CommandViews.swift in Sources */,
-				C8B3A9D929553D23009C1770 /* Common.swift in Sources */,
-				C8B3A9D229553BCA009C1770 /* ChrSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1432,80 +1301,6 @@
 			};
 			name = Release;
 		};
-		C8B3A9C6295535F4009C1770 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CODE_SIGN_ENTITLEMENTS = AldoStudio/AldoStudio.entitlements;
-				CODE_SIGN_IDENTITY = "-";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2025.047;
-				DEVELOPMENT_TEAM = PC9FS9P8R2;
-				ENABLE_APP_SANDBOX = YES;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_USER_SELECTED_FILES = readwrite;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Aldo Studio";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Brandon Stansbury";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-				);
-				MARKETING_VERSION = 0.6.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.AldoStudio;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/AldoStudio-Bridging-Header.h";
-			};
-			name = Debug;
-		};
-		C8B3A9C7295535F4009C1770 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CODE_SIGN_ENTITLEMENTS = AldoStudio/AldoStudio.entitlements;
-				CODE_SIGN_IDENTITY = "-";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2025.047;
-				DEVELOPMENT_TEAM = PC9FS9P8R2;
-				ENABLE_APP_SANDBOX = YES;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_USER_SELECTED_FILES = readwrite;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Aldo Studio";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Brandon Stansbury";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-				);
-				MARKETING_VERSION = 0.6.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.drmonkeysee.AldoStudio;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/AldoStudio-Bridging-Header.h";
-			};
-			name = Release;
-		};
 		C8B88AA62906277800B7CB23 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1629,15 +1424,6 @@
 			buildConfigurations = (
 				C85E8ADE25A9747800FF0025 /* Debug */,
 				C85E8ADF25A9747800FF0025 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		C8B3A9C8295535F4009C1770 /* Build configuration list for PBXNativeTarget "AldoStudio" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C8B3A9C6295535F4009C1770 /* Debug */,
-				C8B3A9C7295535F4009C1770 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

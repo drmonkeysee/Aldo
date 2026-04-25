@@ -73,6 +73,12 @@ bool aldo_console_probe(aldo_console *self, enum aldo_probe signal) aldo_nothrow
 aldo_export
 void aldo_console_set_probe(aldo_console *self, enum aldo_probe signal,
                             bool active) aldo_nothrow;
+aldo_export
+enum aldo_trivalue aldo_console_tprobe(aldo_console *self,
+                                       enum aldo_probe signal) aldo_nothrow;
+aldo_export
+void aldo_console_set_tprobe(aldo_console *self, enum aldo_probe signal,
+                             enum aldo_trivalue val) aldo_nothrow;
 
 aldo_export
 void aldo_console_clock(aldo_console *self, struct aldo_clock *clock) aldo_nothrow;

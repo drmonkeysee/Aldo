@@ -393,6 +393,23 @@ bool aldo_nes_clock(aldo_nes *self, struct aldo_clock *clock)
     return false;
 }
 
+enum aldo_trivalue aldo_nes_probe(aldo_nes *self, enum aldo_probe probe)
+{
+    assert(self != nullptr);
+    assert(self->extends.type == ALDO_CONSOLE_NES);
+
+    return aldo_ppu_probe(&self->ppu, probe);
+}
+
+void aldo_nes_set_probe(aldo_nes *self, enum aldo_probe probe,
+                        enum aldo_trivalue val)
+{
+    assert(self != nullptr);
+    assert(self->extends.type == ALDO_CONSOLE_NES);
+
+    aldo_ppu_set_probe(&self->ppu, probe, val);
+}
+
 void aldo_nes_snapshot_init(aldo_nes *self)
 {
     assert(self != nullptr);

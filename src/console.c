@@ -449,6 +449,25 @@ void aldo_console_set_probe(aldo_console *self, enum aldo_probe signal,
     }
 }
 
+enum aldo_trivalue aldo_console_tprobe(aldo_console *self, enum aldo_probe signal)
+{
+    assert(self != nullptr);
+
+    return self->type == ALDO_CONSOLE_NES
+            ? aldo_nes_probe((aldo_nes *)self, signal)
+            : ALDO_TRIV_NULL;
+}
+
+void aldo_console_set_tprobe(aldo_console *self, enum aldo_probe signal,
+                             enum aldo_trivalue val)
+{
+    assert(self != nullptr);
+
+    if (self->type == ALDO_CONSOLE_NES) {
+        aldo_nes_set_probe((aldo_nes *)self, signal, val);
+    }
+}
+
 void aldo_console_clock(aldo_console *self, struct aldo_clock *clock)
 {
     assert(self != nullptr);

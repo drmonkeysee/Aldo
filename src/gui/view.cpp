@@ -45,6 +45,8 @@
 #include <cmath>
 #include <cstdio>
 
+using namespace std::literals::string_view_literals;
+
 namespace
 {
 
@@ -759,7 +761,6 @@ class CpuStatusIndicator {
 public:
     static std::string_view lblTemplate() noexcept
     {
-        using namespace std::string_view_literals;
         return "##Xstatus"sv;
     }
 
@@ -776,7 +777,7 @@ public:
     bool on(std::ranges::iterator_t<const R&> curr, const R& coll, char) const
     {
         auto bitpos = std::distance(curr, std::cend(coll)) - 1;
-        return status & (1 << bitpos);
+        return aldo_getbit(status, bitpos);
     }
 
     void draw(ImU32 fillColor, ImU32 txtColor, std::string_view label) noexcept
@@ -803,7 +804,6 @@ public:
 
     static std::string_view lblTemplate() noexcept
     {
-        using namespace std::string_view_literals;
         return "##Xmemcell"sv;
     }
 
@@ -863,6 +863,7 @@ auto led_indicator_bank(LedIndicatorRange auto indicators,
     decltype(lblBuf)::size_type lblIdx = lblBuf.find('X');
     assert(lblIdx != decltype(lblBuf)::npos);
 
+    // TODO: replace with std::views::enumerate when available?
     for (auto it = std::cbegin(indicators); it != std::cend(indicators); ++it) {
         auto [label, tooltip] = *it;
         ImU32 fillColor, textColor;
@@ -880,7 +881,6 @@ auto led_indicator_bank(LedIndicatorRange auto indicators,
             ImGui::TextUnformatted(tooltip);
             ImGui::EndTooltip();
         }
-        // TODO: replace this check with std::views::enumerate when available
         if (it + 1 < std::cend(indicators)) {
             ImGui::SameLine(0, 5);
         }
@@ -998,7 +998,6 @@ public:
 protected:
     void renderContents() override
     {
-        using namespace std::literals::string_view_literals;
         static constexpr auto label = "Name: "sv;
 
         auto

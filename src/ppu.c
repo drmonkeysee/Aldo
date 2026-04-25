@@ -1455,13 +1455,13 @@ enum aldo_trivalue aldo_ppu_probe(const struct aldo_rp2c02 *self,
     switch (probe) {
     case ALDO_PRB_PPU_GRAY:
         return aldo_lnptotriv(self->mprbh.g, self->mprbl.g);
-    case ALDO_PRB_PPU_TLFT:
+    case ALDO_PRB_PPU_BCOL:
         return aldo_lnptotriv(self->mprbh.bm, self->mprbl.bm);
-    case ALDO_PRB_PPU_SLFT:
+    case ALDO_PRB_PPU_FCOL:
         return aldo_lnptotriv(self->mprbh.sm, self->mprbl.sm);
-    case ALDO_PRB_PPU_TILE:
+    case ALDO_PRB_PPU_BG:
         return aldo_lnptotriv(self->mprbh.b, self->mprbl.b);
-    case ALDO_PRB_PPU_SPR:
+    case ALDO_PRB_PPU_FG:
         return aldo_lnptotriv(self->mprbh.s, self->mprbl.s);
     case ALDO_PRB_PPU_RED:
         return aldo_lnptotriv(self->mprbh.re, self->mprbl.re);
@@ -1488,19 +1488,19 @@ void aldo_ppu_set_probe(struct aldo_rp2c02 *self, enum aldo_probe probe,
         self->mprbh.g = hi;
         self->mprbl.g = lo;
         break;
-    case ALDO_PRB_PPU_TLFT:
+    case ALDO_PRB_PPU_BCOL:
         self->mprbh.bm = hi;
         self->mprbl.bm = lo;
         break;
-    case ALDO_PRB_PPU_SLFT:
+    case ALDO_PRB_PPU_FCOL:
         self->mprbh.sm = hi;
         self->mprbl.sm = lo;
         break;
-    case ALDO_PRB_PPU_TILE:
+    case ALDO_PRB_PPU_BG:
         self->mprbh.b = hi;
         self->mprbl.b = lo;
         break;
-    case ALDO_PRB_PPU_SPR:
+    case ALDO_PRB_PPU_FG:
         self->mprbh.s = hi;
         self->mprbl.s = lo;
         break;

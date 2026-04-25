@@ -24,10 +24,10 @@ enum aldo_probe {
     ALDO_PRB_RST,       // CPU RESET Line
 
     ALDO_PRB_PPU_GRAY,  // PPU Grayscale
-    ALDO_PRB_PPU_TLFT,  // PPU Background Left-Column Enabled
-    ALDO_PRB_PPU_SLFT,  // PPU Sprite Left-Column Enabled
-    ALDO_PRB_PPU_TILE,  // PPU Background Rendering
-    ALDO_PRB_PPU_SPR,   // PPU Sprite Rendering
+    ALDO_PRB_PPU_BCOL,  // PPU Background Left-Column Enabled
+    ALDO_PRB_PPU_FCOL,  // PPU Sprite Left-Column Enabled
+    ALDO_PRB_PPU_BG,    // PPU Background Rendering
+    ALDO_PRB_PPU_FG,    // PPU Sprite Rendering
     ALDO_PRB_PPU_RED,   // PPU Red Emphasis
     ALDO_PRB_PPU_GRN,   // PPU Green Emphasis
     ALDO_PRB_PPU_BLU,   // PPU Blue Emphasis
@@ -81,9 +81,18 @@ enum aldo_ntmirror {
 };
 
 #include "bridgeopen.h"
-// TODO: are these export or internal
-// Line-Pair to Tri-Value
+//
+// MARK: - Export
+//
+
 aldo_export
+const char *aldo_ntmirror_name(enum aldo_ntmirror m) aldo_nothrow;
+
+//
+// MARK: - Internal
+//
+
+// Line-Pair to Tri-Value
 inline enum aldo_trivalue aldo_lnptotriv(bool hi, bool lo) aldo_nothrow
 {
     if (hi) return ALDO_TRIV_TRUE;
@@ -92,25 +101,12 @@ inline enum aldo_trivalue aldo_lnptotriv(bool hi, bool lo) aldo_nothrow
 }
 
 // Tri-Value to Line-Pair
-aldo_export
-inline void aldo_trivtolnp(enum aldo_trivalue v, bool *aldo_noalias hi,
+inline void aldo_trivtolnp(enum aldo_trivalue val, bool *aldo_noalias hi,
                            bool *aldo_noalias lo) aldo_nothrow
 {
-    *hi = v == ALDO_TRIV_TRUE;
-    *lo = v == ALDO_TRIV_FALSE;
+    *hi = val == ALDO_TRIV_TRUE;
+    *lo = val == ALDO_TRIV_FALSE;
 }
-
-// Boolean to Line-Pair
-aldo_export
-inline void aldo_booltolnp(bool v, bool *aldo_noalias hi,
-                           bool *aldo_noalias lo) aldo_nothrow
-{
-    *hi = v;
-    *lo = !v;
-}
-
-aldo_export
-const char *aldo_ntmirror_name(enum aldo_ntmirror m) aldo_nothrow;
 #include "bridgeclose.h"
 
 #endif

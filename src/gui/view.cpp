@@ -1184,38 +1184,6 @@ private:
         }
     }
 
-    void renderPpuMask()
-    {
-        using sz_type = decltype(colorMasks)::size_type;
-
-        ImGui::TextUnformatted("Color: ");
-        ImGui::SameLine();
-        auto buttonId = 0;
-        for (auto& button : colorMasks) {
-            ScopedID id = buttonId;
-            auto val = emu.tprobe(button.probe());
-            if (button.clicked(val)) {
-                vs.addTprobeCommand(button.probe(), val);
-            }
-            if (static_cast<sz_type>(++buttonId) < colorMasks.size()) {
-                ImGui::SameLine(0, 5);
-            }
-        }
-        ImGui::TextUnformatted("Render:");
-        ImGui::SameLine();
-        for (auto& button : renderMasks) {
-            ScopedID id = buttonId;
-            auto val = emu.tprobe(button.probe());
-            if (button.clicked(val)) {
-                vs.addTprobeCommand(button.probe(), val);
-            }
-            if (static_cast<sz_type>(++buttonId)
-                < colorMasks.size() + renderMasks.size()) {
-                ImGui::SameLine(0, 5);
-            }
-        }
-    }
-
     std::array<TriButton, 4> colorMasks{
         TriButton{'Y', "Grayscale", ALDO_PRB_PPU_GRAY},
         TriButton{'R', "Red Emphasis", ALDO_PRB_PPU_RED},
@@ -1228,6 +1196,37 @@ private:
         TriButton{'L', "Background Left Column", ALDO_PRB_PPU_BCOL},
         TriButton{'C', "Sprite Left Column", ALDO_PRB_PPU_FCOL},
     };
+    using sz_type = decltype(colorMasks)::size_type;
+
+    void renderPpuMask()
+    {
+        ImGui::TextUnformatted("Color: ");
+        ImGui::SameLine();
+        auto buttonId = 0;
+        auto guard = colorMasks.size();
+        for (auto& button : colorMasks) {
+            handleMaskButton(button, buttonId, guard);
+        }
+
+        ImGui::TextUnformatted("Render:");
+        ImGui::SameLine();
+        guard += renderMasks.size();
+        for (auto& button : renderMasks) {
+            handleMaskButton(button, buttonId, guard);
+        }
+    }
+
+    void handleMaskButton(TriButton& button, int& buttonId, sz_type guard) const
+    {
+        ScopedID id = buttonId;
+        auto val = emu.tprobe(button.probe());
+        if (button.clicked(val)) {
+            vs.addTprobeCommand(button.probe(), val);
+        }
+        if (static_cast<sz_type>(++buttonId) < guard) {
+            ImGui::SameLine(0, 5);
+        }
+    }
 };
 
 class CpuView final : public aldo::View {

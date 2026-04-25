@@ -5,6 +5,7 @@
 //  Created by Brandon Stansbury on 2/24/21.
 //
 
+#include "bytes.h"
 #include "ciny.h"
 #include "cpu.h"
 #include "cpuhelp.h"
@@ -74,7 +75,7 @@ static void parsemem_inst_at_start(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    auto result = aldo_dis_parse_inst(sizeof mem / sizeof mem[0], mem, 0, &inst);
+    auto result = aldo_dis_parse_inst(aldo_arrsz(mem), mem, 0, &inst);
 
     ct_assertequal(1, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -91,7 +92,7 @@ static void parsemem_inst_in_middle(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    auto result = aldo_dis_parse_inst(sizeof mem / sizeof mem[0], mem, 3, &inst);
+    auto result = aldo_dis_parse_inst(aldo_arrsz(mem), mem, 3, &inst);
 
     ct_assertequal(3, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -110,7 +111,7 @@ static void parsemem_inst_unofficial(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    auto result = aldo_dis_parse_inst(sizeof mem / sizeof mem[0], mem, 2, &inst);
+    auto result = aldo_dis_parse_inst(aldo_arrsz(mem), mem, 2, &inst);
 
     ct_assertequal(2, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -128,7 +129,7 @@ static void parsemem_inst_eof(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    auto result = aldo_dis_parse_inst(sizeof mem / sizeof mem[0], mem, 5, &inst);
+    auto result = aldo_dis_parse_inst(aldo_arrsz(mem), mem, 5, &inst);
 
     ct_assertequal(ALDO_DIS_ERR_EOF, result);
     ct_assertequal(0u, inst.bv.ord);
@@ -145,7 +146,7 @@ static void parsemem_inst_out_of_bounds(void *ctx)
     uint8_t mem[] = {0xea, 0xa5, 0x34, 0x4c, 0x34, 0x6};
     struct aldo_dis_instruction inst;
 
-    auto result = aldo_dis_parse_inst(sizeof mem / sizeof mem[0], mem, 10, &inst);
+    auto result = aldo_dis_parse_inst(aldo_arrsz(mem), mem, 10, &inst);
 
     ct_assertequal(0, result);
     ct_assertequal(0u, inst.bv.ord);

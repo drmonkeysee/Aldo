@@ -5,6 +5,7 @@
 //  Created by Brandon Stansbury on 3/7/21.
 //
 
+#include "bytes.h"
 #include "ciny.h"
 #include "cpu.h"
 #include "cpuhelp.h"
@@ -558,7 +559,7 @@ static void nop(void *ctx)
         // Unofficial
         0x1a, 0x3a, 0x5a, 0x7a, 0xda, 0xfa,
     };
-    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+    for (size_t c = 0; c < aldo_arrsz(nopcodes); ++c) {
         auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0xff};
         struct aldo_mos6502 cpu;
@@ -1252,7 +1253,7 @@ static void jam(void *ctx)
     uint8_t jamcodes[] = {
         0x02, 0x12, 0x22, 0x32, 0x42, 0x52, 0x62, 0x72, 0x92, 0xb2, 0xd2, 0xf2,
     };
-    for (size_t c = 0; c < sizeof jamcodes / sizeof jamcodes[0]; ++c) {
+    for (size_t c = 0; c < aldo_arrsz(jamcodes); ++c) {
         auto opc = jamcodes[c];
         uint8_t mem[] = {opc, 0x00};
         struct aldo_mos6502 cpu;

@@ -5,6 +5,7 @@
 //  Created by Brandon Stansbury on 3/7/21.
 //
 
+#include "bytes.h"
 #include "ciny.h"
 #include "cpu.h"
 #include "cpuhelp.h"
@@ -1749,7 +1750,7 @@ static void nop_abs(void *ctx)
 static void nop_absx(void *ctx)
 {
     uint8_t nopcodes[] = {0x1c, 0x3c, 0x5c, 0x7c, 0xdc, 0xfc};
-    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+    for (size_t c = 0; c < aldo_arrsz(nopcodes); ++c) {
         auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x1, 0x80},
                 abs[] = {0xff, 0xff, 0xff, 0xff, 0x6};
@@ -1777,7 +1778,7 @@ static void nop_absx(void *ctx)
 static void nop_absx_pagecross(void *ctx)
 {
     uint8_t nopcodes[] = {0x1c, 0x3c, 0x5c, 0x7c, 0xdc, 0xfc};
-    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+    for (size_t c = 0; c < aldo_arrsz(nopcodes); ++c) {
         auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0xff, 0x80};
         struct aldo_mos6502 cpu;

@@ -368,7 +368,7 @@ static void copy(void *ctx)
     ct_asserttrue(aldo_bus_set(b, 0x0, bd));
 
     uint8_t dest[4];
-    auto count = aldo_bus_copy(b, 0x0, sizeof dest / sizeof dest[0], dest);
+    auto count = aldo_bus_copy(b, 0x0, aldo_arrsz(dest), dest);
     ct_assertequal(4u, count);
     ct_assertequal(mem[0], dest[0]);
     ct_assertequal(mem[1], dest[1]);
@@ -388,7 +388,7 @@ static void copy_partial_bank(void *ctx)
     ct_asserttrue(aldo_bus_set(b, 0x0, bd));
 
     uint8_t dest[4];
-    auto count = aldo_bus_copy(b, 0x1, sizeof dest / sizeof dest[0], dest);
+    auto count = aldo_bus_copy(b, 0x1, aldo_arrsz(dest), dest);
     ct_assertequal(3u, count);
     ct_assertequal(mem[1], dest[0]);
     ct_assertequal(mem[2], dest[1]);
@@ -407,7 +407,7 @@ static void copy_end_of_bank(void *ctx)
     ct_asserttrue(aldo_bus_set(b, 0x0, bd));
 
     uint8_t dest[4];
-    auto count = aldo_bus_copy(b, 0x3, sizeof dest / sizeof dest[0], dest);
+    auto count = aldo_bus_copy(b, 0x3, aldo_arrsz(dest), dest);
     ct_assertequal(1u, count);
     ct_assertequal(mem[3], dest[0]);
 }
@@ -424,7 +424,7 @@ static void copy_past_bank(void *ctx)
     ct_asserttrue(aldo_bus_set(b, 0x0, bd));
 
     uint8_t dest[] = {0xff, 0xff, 0xff, 0xff};
-    auto count = aldo_bus_copy(b, 0x4, sizeof dest / sizeof dest[0], dest);
+    auto count = aldo_bus_copy(b, 0x4, aldo_arrsz(dest), dest);
     ct_assertequal(0u, count);
     ct_assertequal(0xffu, dest[0]);
 }
@@ -441,7 +441,7 @@ static void copy_wrong_addr(void *ctx)
     ct_asserttrue(aldo_bus_set(b, 0x0, bd));
 
     uint8_t dest[] = {0xff, 0xff, 0xff, 0xff};
-    auto count = aldo_bus_copy(b, 0x40, sizeof dest / sizeof dest[0], dest);
+    auto count = aldo_bus_copy(b, 0x40, aldo_arrsz(dest), dest);
     ct_assertequal(0u, count);
     ct_assertequal(0xffu, dest[0]);
 }

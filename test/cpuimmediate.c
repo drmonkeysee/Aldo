@@ -5,6 +5,7 @@
 //  Created by Brandon Stansbury on 3/7/21.
 //
 
+#include "bytes.h"
 #include "ciny.h"
 #include "cpu.h"
 #include "cpuhelp.h"
@@ -698,7 +699,7 @@ static void adc_bcd_visual6502_cases(void *ctx)
         {0x6f, 0x00, 1, 0x76, 0, 0, 0, 0},  // 615? + 0 + C
     };
 
-    for (size_t i = 0; i < sizeof cases / sizeof cases[0]; ++i) {
+    for (size_t i = 0; i < aldo_arrsz(cases); ++i) {
         auto testcase = cases[i];
         cpu.pc = 0;
         cpu.a = testcase[0];
@@ -2361,7 +2362,7 @@ static void sbc_bcd_visual6502_cases(void *ctx)
         {0x9b, 0x00, 0, 0x9a, 1, 0, 0, 1},  // 101? - 0 - B
     };
 
-    for (size_t i = 0; i < sizeof cases / sizeof cases[0]; ++i) {
+    for (size_t i = 0; i < aldo_arrsz(cases); ++i) {
         auto testcase = cases[i];
         cpu.pc = 0;
         cpu.a = testcase[0];
@@ -2497,7 +2498,7 @@ static void alr_all_ones(void *ctx)
 static void anc(void *ctx)
 {
     uint8_t nopcodes[] = {0x0b, 0x2b};
-    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+    for (size_t c = 0; c < aldo_arrsz(nopcodes); ++c) {
         auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0xc};
         struct aldo_mos6502 cpu;
@@ -2519,7 +2520,7 @@ static void anc(void *ctx)
 static void anc_zero(void *ctx)
 {
     uint8_t nopcodes[] = {0x0b, 0x2b};
-    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+    for (size_t c = 0; c < aldo_arrsz(nopcodes); ++c) {
         auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x0};
         struct aldo_mos6502 cpu;
@@ -2541,7 +2542,7 @@ static void anc_zero(void *ctx)
 static void anc_negative(void *ctx)
 {
     uint8_t nopcodes[] = {0x0b, 0x2b};
-    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+    for (size_t c = 0; c < aldo_arrsz(nopcodes); ++c) {
         auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0xfc};
         struct aldo_mos6502 cpu;
@@ -2893,7 +2894,7 @@ static void lxa_negative(void *ctx)
 static void nop(void *ctx)
 {
     uint8_t nopcodes[] = {0x80, 0x82, 0x89, 0xc2, 0xe2};
-    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+    for (size_t c = 0; c < aldo_arrsz(nopcodes); ++c) {
         auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x10};
         struct aldo_mos6502 cpu;

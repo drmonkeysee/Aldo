@@ -5,6 +5,7 @@
 //  Created by Brandon Stansbury on 3/7/21.
 //
 
+#include "bytes.h"
 #include "ciny.h"
 #include "cpu.h"
 #include "cpuhelp.h"
@@ -2365,7 +2366,7 @@ static void lax_zpy_pageoverflow(void *ctx)
 static void nop_zp(void *ctx)
 {
     uint8_t nopcodes[] = {0x4, 0x44, 0x64};
-    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+    for (size_t c = 0; c < aldo_arrsz(nopcodes); ++c) {
         auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x4, 0xff, 0xff, 0xc};
         struct aldo_mos6502 cpu;
@@ -2391,7 +2392,7 @@ static void nop_zp(void *ctx)
 static void nop_zpx(void *ctx)
 {
     uint8_t nopcodes[] = {0x14, 0x34, 0x54, 0x74, 0xd4, 0xf4};
-    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+    for (size_t c = 0; c < aldo_arrsz(nopcodes); ++c) {
         auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xb};
         struct aldo_mos6502 cpu;
@@ -2418,7 +2419,7 @@ static void nop_zpx(void *ctx)
 static void nop_zpx_pageoverflow(void *ctx)
 {
     uint8_t nopcodes[] = {0x14, 0x34, 0x54, 0x74, 0xd4, 0xf4};
-    for (size_t c = 0; c < sizeof nopcodes / sizeof nopcodes[0]; ++c) {
+    for (size_t c = 0; c < aldo_arrsz(nopcodes); ++c) {
         auto opc = nopcodes[c];
         uint8_t mem[] = {opc, 0x3, 0x6, 0xff, 0xff, 0xff, 0xff, 0xb};
         struct aldo_mos6502 cpu;

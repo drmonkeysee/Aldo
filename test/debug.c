@@ -5,6 +5,7 @@
 //  Created by Brandon Stansbury on 2/18/23.
 //
 
+#include "bytes.h"
 #include "ciny.h"
 #include "debug.h"
 #include "haltexpr.h"
@@ -107,7 +108,7 @@ static void multiple_breakpoints(void *ctx)
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
         {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
     };
-    size_t len = sizeof exprs / sizeof exprs[0];
+    size_t len = aldo_arrsz(exprs);
 
     for (size_t i = 0; i < len; ++i) {
         (void)aldo_debug_bp_add(dbg, exprs[i]);
@@ -130,7 +131,7 @@ static void out_of_range(void *ctx)
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
         {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
     };
-    size_t len = sizeof exprs / sizeof exprs[0];
+    size_t len = aldo_arrsz(exprs);
 
     for (size_t i = 0; i < len; ++i) {
         (void)aldo_debug_bp_add(dbg, exprs[i]);
@@ -148,7 +149,7 @@ static void delete_breakpoint(void *ctx)
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
         {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
     };
-    size_t len = sizeof exprs / sizeof exprs[0];
+    size_t len = aldo_arrsz(exprs);
 
     for (size_t i = 0; i < len; ++i) {
         (void)aldo_debug_bp_add(dbg, exprs[i]);
@@ -178,7 +179,7 @@ static void clear_breakpoints(void *ctx)
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
         {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
     };
-    size_t len = sizeof exprs / sizeof exprs[0];
+    size_t len = aldo_arrsz(exprs);
 
     for (size_t i = 0; i < len; ++i) {
         (void)aldo_debug_bp_add(dbg, exprs[i]);
@@ -210,7 +211,7 @@ static void reset_debugger(void *ctx)
         {.cond = ALDO_HLT_TIME, .runtime = 34.5},
         {.cond = ALDO_HLT_CYCLES, .cycles = 3000},
     };
-    size_t len = sizeof exprs / sizeof exprs[0];
+    size_t len = aldo_arrsz(exprs);
 
     for (size_t i = 0; i < len; ++i) {
         (void)aldo_debug_bp_add(dbg, exprs[i]);

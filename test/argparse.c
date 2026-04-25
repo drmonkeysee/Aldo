@@ -6,6 +6,7 @@
 //
 
 #include "argparse.h"
+#include "bytes.h"
 #include "ciny.h"
 #include "cliargs.h"
 
@@ -27,7 +28,7 @@ static void init_control_zero_args(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -56,7 +57,7 @@ static void cli_zero_args(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -70,7 +71,7 @@ static void single_arg(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "test.rom", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -86,7 +87,7 @@ static void full_filepath(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "/foo/bar/test.rom", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -102,7 +103,7 @@ static void flag_short(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-b", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -116,7 +117,7 @@ static void flag_long(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--batch", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -130,7 +131,7 @@ static void multiple_flags(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-d", "-v", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -144,7 +145,7 @@ static void mix_long_and_short(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--disassemble", "-v", "--trace", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -159,7 +160,7 @@ static void combined_flags(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-dvt", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -174,7 +175,7 @@ static void chr_scale_short(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-s", "5", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -187,7 +188,7 @@ static void chr_scale_short_no_space(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-s5", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -200,7 +201,7 @@ static void chr_scale_short_does_not_support_equals(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-s=5", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -213,7 +214,7 @@ static void chr_scale_short_out_of_range(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-s", "20", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -226,7 +227,7 @@ static void chr_scale_short_malformed(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-s", "abc", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -239,7 +240,7 @@ static void chr_scale_short_missing(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-s", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -252,7 +253,7 @@ static void chr_scale_long(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--chr-scale", "5", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -265,7 +266,7 @@ static void chr_scale_long_with_equals(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--chr-scale=5", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -278,7 +279,7 @@ static void chr_scale_long_out_of_range(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--chr-scale", "20", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -291,7 +292,7 @@ static void chr_scale_long_malformed(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--chr-scale", "abc", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -304,7 +305,7 @@ static void chr_scale_long_missing(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--chr-scale", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -317,7 +318,7 @@ static void chr_scale_long_does_not_overparse(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--chr-scalefoobar", "5", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -330,7 +331,7 @@ static void chr_decode_short(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-c", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -343,7 +344,7 @@ static void chr_decode_short_does_not_support_prefix(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-c=myrom", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -357,7 +358,7 @@ static void chr_decode_long_no_prefix(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--chr-decode", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -371,7 +372,7 @@ static void chr_decode_long_with_prefix(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--chr-decode=myrom", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -385,7 +386,7 @@ static void chr_decode_long_does_not_overparse(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--chr-decodefoobar=myrom", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -402,7 +403,7 @@ static void both_flags_and_values(void *ctx)
         "testaldo", "-dv", "-s", "5", "--chr-decode=myrom", "test.rom",
         nullptr,
     };
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -421,7 +422,7 @@ static void flags_and_values_do_not_combine(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-ds", "5", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -438,7 +439,7 @@ static void reset_override_short(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-r", "abcd", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -451,7 +452,7 @@ static void reset_override_short_no_space(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-rabcd", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -464,7 +465,7 @@ static void reset_override_short_out_of_range(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-r", "12345", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -477,7 +478,7 @@ static void reset_override_short_malformed(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-r", "notahexnum", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -490,7 +491,7 @@ static void reset_override_short_missing(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-r", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -503,7 +504,7 @@ static void reset_override_long(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--reset-vector", "abcd", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -516,7 +517,7 @@ static void reset_override_long_with_equals(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--reset-vector=abcd", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -529,7 +530,7 @@ static void reset_override_long_out_of_range(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--reset-vector", "98765", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -542,7 +543,7 @@ static void reset_override_long_malformed(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--reset-vector", "nothex", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -555,7 +556,7 @@ static void reset_override_long_missing(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--reset-vector", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -568,7 +569,7 @@ static void reset_override_long_does_not_overparse(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--reset-vectorfoobar", "98765", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -581,7 +582,7 @@ static void halt_short(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-H", "foo", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -596,7 +597,7 @@ static void halt_short_no_space(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-Hfoo", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -611,7 +612,7 @@ static void halt_short_multiple(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-H", "foo", "-H", "bar", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -628,7 +629,7 @@ static void halt_short_missing(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-H", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -641,7 +642,7 @@ static void halt_long(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--halt", "foo", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -656,7 +657,7 @@ static void halt_long_with_equals(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--halt=foo", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -671,7 +672,7 @@ static void halt_long_multiple(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--halt", "foo", "--halt", "bar", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -688,7 +689,7 @@ static void halt_long_missing(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--halt", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -701,7 +702,7 @@ static void halt_long_does_not_overparse(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--haltfoobar", "baz", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -714,7 +715,7 @@ static void debug_file_short(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-g", "my/debug/file", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -728,7 +729,7 @@ static void debug_file_short_no_space(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-gmy/debug/file", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -742,7 +743,7 @@ static void debug_file_short_missing(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-g", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -755,7 +756,7 @@ static void debug_file_long(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--dbg-file", "my/debug/file", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -769,7 +770,7 @@ static void debug_file_long_with_equals(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--dbg-file=my/debug/file", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -783,7 +784,7 @@ static void debug_file_long_missing(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--dbg-file", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -796,7 +797,7 @@ static void debug_file_long_does_not_overparse(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "--dbg-filemy/debug/file", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -809,7 +810,7 @@ static void option_does_not_trigger_flag(void *ctx)
 {
     struct cliargs *args = ctx;
     char *argv[] = {"testaldo", "-Hdv", nullptr};
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -830,7 +831,7 @@ static void double_dash_ends_option_parsing(void *ctx)
         "-dv", "--", "-b", "-s", "5", "--chr-decode=myrom", "test.rom",
         nullptr,
     };
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 
@@ -853,7 +854,7 @@ static void double_dash_ends_option_parsing_unordered(void *ctx)
         "testaldo",
         "-dv", "--", "-b", "test.rom", "-s5", "--chr-decode=myrom", nullptr,
     };
-    int argc = (sizeof argv / sizeof argv[0]) - 1;
+    int argc = aldo_arrsz(argv) - 1;
 
     bool result = argparse_parse(args, argc, argv);
 

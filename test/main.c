@@ -5,6 +5,7 @@
 //  Created by Brandon Stansbury on 2/24/21.
 //
 
+#include "bytes.h"
 #include "ciny.h"
 
 #include <stddef.h>
@@ -83,7 +84,7 @@ static size_t testrunner(int argc, char *argv[argc+1])
 size_t swift_runner()
 {
     char *args[] = {"swift-tests", "--ct-colorized=no", nullptr};
-    return testrunner((sizeof args / sizeof args[0]) - 1, args);
+    return testrunner(aldo_arrsz(args) - 1, args);
 }
 
 int main(int argc, char *argv[argc+1])

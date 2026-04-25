@@ -139,7 +139,7 @@ static void bank_copy(void *ctx)
     uint8_t dest[5];
 
     auto result = aldo_bytecopy_bank(bank, ALDO_BITWIDTH_1KB, 0x0,
-                                     sizeof dest / sizeof dest[0], dest);
+                                     aldo_arrsz(dest), dest);
 
     ct_assertequal(5u, result);
     ct_assertequal(0xaau, dest[0]);
@@ -158,7 +158,7 @@ static void bank_copy_end_of_bank(void *ctx)
     uint8_t dest[5] = {[1] = 0x11};
 
     auto result = aldo_bytecopy_bank(bank, ALDO_BITWIDTH_1KB, 0x3ff,
-                                     sizeof dest / sizeof dest[0], dest);
+                                     aldo_arrsz(dest), dest);
 
     ct_assertequal(1u, result);
     ct_assertequal(0xffu, dest[0]);
@@ -174,7 +174,7 @@ static void bank_copy_fit_end_of_bank(void *ctx)
     uint8_t dest[] = {0x11, 0x11, 0x11, 0x11, 0x11};
 
     auto result = aldo_bytecopy_bank(bank, ALDO_BITWIDTH_1KB, 0x3fb,
-                                     sizeof dest / sizeof dest[0], dest);
+                                     aldo_arrsz(dest), dest);
 
     ct_assertequal(5u, result);
     ct_assertequal(0u, dest[0]);
@@ -193,7 +193,7 @@ static void bank_copy_address_beyond_range(void *ctx)
     uint8_t dest[5];
 
     auto result = aldo_bytecopy_bank(bank, ALDO_BITWIDTH_1KB, 0x401,
-                                     sizeof dest / sizeof dest[0], dest);
+                                     aldo_arrsz(dest), dest);
 
     ct_assertequal(5u, result);
     ct_assertequal(0x99u, dest[0]);

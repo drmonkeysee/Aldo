@@ -107,7 +107,7 @@ static bool parse_dbg_expression(aldo_debugger *dbg,
                                  const char *restrict exprstr, bool verbose)
 {
     struct aldo_debugexpr expr;
-    auto err = aldo_haltexpr_parse_dbg(exprstr, &expr);
+    auto err = aldo_haltexpr_parse(exprstr, &expr);
     if (err < 0) {
         fprintf(stderr,
                 "Debug expression parse failure (%d): %s > \"%s\"\n", err,

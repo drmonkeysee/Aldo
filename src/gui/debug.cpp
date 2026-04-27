@@ -34,7 +34,7 @@ auto read_brkfile(const std::filesystem::path& filepath)
     std::vector<aldo_debugexpr> exprs;
     while (f.getline(buf.data(), buf.size())) {
         aldo_debugexpr expr;
-        auto err = aldo_haltexpr_parse_dbg(buf.data(), &expr);
+        auto err = aldo_haltexpr_parse(buf.data(), &expr);
         if (err < 0) throw aldo::AldoError{
             "Breakpoints parse failure", err, aldo_haltexpr_errstr,
         };

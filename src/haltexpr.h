@@ -74,10 +74,7 @@ const char *aldo_haltcond_description(enum aldo_haltcondition cond) aldo_nothrow
 // if returns non-zero error code, *expr is unmodified
 aldo_export aldo_checkerr
 int aldo_haltexpr_parse(const char *aldo_noalias str,
-                        struct aldo_haltexpr *expr) aldo_nothrow;
-aldo_export aldo_checkerr
-int aldo_haltexpr_parse_dbg(const char *aldo_noalias str,
-                            struct aldo_debugexpr *expr) aldo_nothrow;
+                        struct aldo_debugexpr *expr) aldo_nothrow;
 aldo_export aldo_checkerr
 int aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
                        char buf[aldo_nacz(AldoHexprFmtSize)]) aldo_nothrow;

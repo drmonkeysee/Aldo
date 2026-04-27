@@ -35,7 +35,7 @@ static void errstr_returns_unknown_err(void *ctx)
 static void null_string(void *ctx)
 {
     const char *str = nullptr;
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
@@ -45,7 +45,7 @@ static void null_string(void *ctx)
 static void empty_string(void *ctx)
 {
     const char *str = "";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
@@ -55,113 +55,120 @@ static void empty_string(void *ctx)
 static void address_condition(void *ctx)
 {
     const char *str = "@ab12";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0xab12u, expr.address);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.hexpr.cond);
+    ct_assertequal(0xab12u, expr.hexpr.address);
 }
 
 static void address_condition_with_space(void *ctx)
 {
     const char *str = "@   ab12";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0xab12u, expr.address);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.hexpr.cond);
+    ct_assertequal(0xab12u, expr.hexpr.address);
 }
 
 static void address_condition_with_leading_space(void *ctx)
 {
     const char *str = "   @ab12";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0xab12u, expr.address);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.hexpr.cond);
+    ct_assertequal(0xab12u, expr.hexpr.address);
 }
 
 static void address_condition_with_trailing_space(void *ctx)
 {
     const char *str = "@ab12   ";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0xab12u, expr.address);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.hexpr.cond);
+    ct_assertequal(0xab12u, expr.hexpr.address);
 }
 
 static void address_condition_caps(void *ctx)
 {
     const char *str = "@AB12";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0xab12u, expr.address);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.hexpr.cond);
+    ct_assertequal(0xab12u, expr.hexpr.address);
 }
 
 static void address_condition_with_prefix(void *ctx)
 {
     const char *str = "@0xab12";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0xab12u, expr.address);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.hexpr.cond);
+    ct_assertequal(0xab12u, expr.hexpr.address);
 }
 
 static void address_condition_short(void *ctx)
 {
     const char *str = "@1f";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_ADDR, (int)expr.cond);
-    ct_assertequal(0x001fu, expr.address);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_ADDR, (int)expr.hexpr.cond);
+    ct_assertequal(0x001fu, expr.hexpr.address);
 }
 
 static void address_condition_too_large(void *ctx)
 {
     const char *str = "@12345";
-    struct aldo_haltexpr expr = {};
+    struct aldo_debugexpr expr = {};
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(ALDO_HEXPR_ERR_VALUE, result);
-    ct_assertequal(ALDO_HLT_NONE, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_NONE, (int)expr.hexpr.cond);
 }
 
 static void address_condition_negative_overflow(void *ctx)
 {
     const char *str = "@-asdf";
-    struct aldo_haltexpr expr = {};
+    struct aldo_debugexpr expr = {};
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(ALDO_HEXPR_ERR_VALUE, result);
-    ct_assertequal(ALDO_HLT_NONE, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_NONE, (int)expr.hexpr.cond);
 }
 
 static void address_condition_malformed(void *ctx)
 {
     const char *str = "@hjkl";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
@@ -171,102 +178,109 @@ static void address_condition_malformed(void *ctx)
 static void runtime_condition(void *ctx)
 {
     const char *str = "1.2s";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
-    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.hexpr.cond);
+    ct_assertaboutequal(1.2f, expr.hexpr.runtime, 0.001);
 }
 
 static void runtime_condition_zero(void *ctx)
 {
     const char *str = "0s";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
-    ct_assertaboutequal(0.0f, expr.runtime, 0.001);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.hexpr.cond);
+    ct_assertaboutequal(0.0f, expr.hexpr.runtime, 0.001);
 }
 
 static void runtime_condition_case_insensitive(void *ctx)
 {
     const char *str = "1.2S";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
-    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.hexpr.cond);
+    ct_assertaboutequal(1.2f, expr.hexpr.runtime, 0.001);
 }
 
 static void runtime_condition_with_space(void *ctx)
 {
     const char *str = "1.2   s";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
-    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.hexpr.cond);
+    ct_assertaboutequal(1.2f, expr.hexpr.runtime, 0.001);
 }
 
 static void runtime_condition_with_leading_space(void *ctx)
 {
     const char *str = "   1.2s";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
-    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.hexpr.cond);
+    ct_assertaboutequal(1.2f, expr.hexpr.runtime, 0.001);
 }
 
 static void runtime_condition_with_trailing_space(void *ctx)
 {
     const char *str = "1.2s   ";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
-    ct_assertaboutequal(1.2f, expr.runtime, 0.001);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.hexpr.cond);
+    ct_assertaboutequal(1.2f, expr.hexpr.runtime, 0.001);
 }
 
 static void runtime_condition_no_decimal(void *ctx)
 {
     const char *str = "5s";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_TIME, (int)expr.cond);
-    ct_assertaboutequal(5.0f, expr.runtime, 0.001);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_TIME, (int)expr.hexpr.cond);
+    ct_assertaboutequal(5.0f, expr.hexpr.runtime, 0.001);
 }
 
 static void runtime_condition_negative(void *ctx)
 {
     const char *str = "-20.4s";
-    struct aldo_haltexpr expr = {};
+    struct aldo_debugexpr expr = {};
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(ALDO_HEXPR_ERR_VALUE, result);
-    ct_assertequal(ALDO_HLT_NONE, (int)expr.cond);
+    ct_assertequal(ALDO_HLT_NONE, (int)expr.hexpr.cond);
 }
 
 static void runtime_condition_malformed(void *ctx)
 {
     const char *str = "hjkls";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
@@ -276,79 +290,85 @@ static void runtime_condition_malformed(void *ctx)
 static void cycles_condition(void *ctx)
 {
     const char *str = "42c";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.cond);
-    ct_assertequal(42u, expr.cycles);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.hexpr.cond);
+    ct_assertequal(42u, expr.hexpr.cycles);
 }
 
 static void cycles_condition_case_insensitive(void *ctx)
 {
     const char *str = "42C";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.cond);
-    ct_assertequal(42u, expr.cycles);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.hexpr.cond);
+    ct_assertequal(42u, expr.hexpr.cycles);
 }
 
 static void cycles_condition_with_space(void *ctx)
 {
     const char *str = "42   c";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.cond);
-    ct_assertequal(42u, expr.cycles);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.hexpr.cond);
+    ct_assertequal(42u, expr.hexpr.cycles);
 }
 
 static void cycles_condition_with_leading_space(void *ctx)
 {
     const char *str = "   42c";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.cond);
-    ct_assertequal(42u, expr.cycles);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.hexpr.cond);
+    ct_assertequal(42u, expr.hexpr.cycles);
 }
 
 static void cycles_condition_with_trailing_space(void *ctx)
 {
     const char *str = "42c   ";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.cond);
-    ct_assertequal(42u, expr.cycles);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.hexpr.cond);
+    ct_assertequal(42u, expr.hexpr.cycles);
 }
 
 static void cycles_condition_negative(void *ctx)
 {
     const char *str = "-45c";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.cond);
-    ct_assertequal(18446744073709551571u, expr.cycles);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_CYCLES, (int)expr.hexpr.cond);
+    ct_assertequal(18446744073709551571u, expr.hexpr.cycles);
 }
 
 static void cycles_condition_malformed(void *ctx)
 {
     const char *str = "hjklc";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
@@ -358,79 +378,85 @@ static void cycles_condition_malformed(void *ctx)
 static void frames_condition(void *ctx)
 {
     const char *str = "42f";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.cond);
-    ct_assertequal(42u, expr.frames);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.hexpr.cond);
+    ct_assertequal(42u, expr.hexpr.frames);
 }
 
 static void frames_condition_case_insensitive(void *ctx)
 {
     const char *str = "42F";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.cond);
-    ct_assertequal(42u, expr.frames);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.hexpr.cond);
+    ct_assertequal(42u, expr.hexpr.frames);
 }
 
 static void frames_condition_with_space(void *ctx)
 {
     const char *str = "42   f";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.cond);
-    ct_assertequal(42u, expr.frames);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.hexpr.cond);
+    ct_assertequal(42u, expr.hexpr.frames);
 }
 
 static void frames_condition_with_leading_space(void *ctx)
 {
     const char *str = "   42f";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.cond);
-    ct_assertequal(42u, expr.frames);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.hexpr.cond);
+    ct_assertequal(42u, expr.hexpr.frames);
 }
 
 static void frames_condition_with_trailing_space(void *ctx)
 {
     const char *str = "42f   ";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.cond);
-    ct_assertequal(42u, expr.frames);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.hexpr.cond);
+    ct_assertequal(42u, expr.hexpr.frames);
 }
 
 static void frames_condition_negative(void *ctx)
 {
     const char *str = "-45f";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.cond);
-    ct_assertequal(18446744073709551571u, expr.frames);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_FRAMES, (int)expr.hexpr.cond);
+    ct_assertequal(18446744073709551571u, expr.hexpr.frames);
 }
 
 static void frames_condition_malformed(void *ctx)
 {
     const char *str = "hjklf";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
@@ -440,73 +466,79 @@ static void frames_condition_malformed(void *ctx)
 static void jam_condition(void *ctx)
 {
     const char *str = "jam";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_JAM, (int)expr.cond);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_JAM, (int)expr.hexpr.cond);
 }
 
 static void jam_condition_uppercase(void *ctx)
 {
     const char *str = "JAM";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_JAM, (int)expr.cond);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_JAM, (int)expr.hexpr.cond);
 }
 
 static void jam_condition_mixedcase(void *ctx)
 {
     const char *str = "JaM";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_JAM, (int)expr.cond);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_JAM, (int)expr.hexpr.cond);
 }
 
 static void jam_condition_with_leading_space(void *ctx)
 {
     const char *str = "   jam";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_JAM, (int)expr.cond);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_JAM, (int)expr.hexpr.cond);
 }
 
 static void jam_condition_with_trailing_space(void *ctx)
 {
     const char *str = "jam   ";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_JAM, (int)expr.cond);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_JAM, (int)expr.hexpr.cond);
 }
 
 static void jam_condition_underparse(void *ctx)
 {
     const char *str = "jamming";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_JAM, (int)expr.cond);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_JAM, (int)expr.hexpr.cond);
 }
 
 static void jam_condition_malformed(void *ctx)
 {
     const char *str = "maj";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
@@ -516,73 +548,79 @@ static void jam_condition_malformed(void *ctx)
 static void fault_condition(void *ctx)
 {
     const char *str = "flt";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_FAULT, (int)expr.cond);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_FAULT, (int)expr.hexpr.cond);
 }
 
 static void fault_condition_uppercase(void *ctx)
 {
     const char *str = "FLT";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_FAULT, (int)expr.cond);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_FAULT, (int)expr.hexpr.cond);
 }
 
 static void fault_condition_mixedcase(void *ctx)
 {
     const char *str = "FlT";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_FAULT, (int)expr.cond);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_FAULT, (int)expr.hexpr.cond);
 }
 
 static void fault_condition_with_leading_space(void *ctx)
 {
     const char *str = "   flt";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_FAULT, (int)expr.cond);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_FAULT, (int)expr.hexpr.cond);
 }
 
 static void fault_condition_with_trailing_space(void *ctx)
 {
     const char *str = "flt   ";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_FAULT, (int)expr.cond);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_FAULT, (int)expr.hexpr.cond);
 }
 
 static void fault_condition_underparse(void *ctx)
 {
     const char *str = "flting";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
-    ct_assertequal(ALDO_HLT_FAULT, (int)expr.cond);
+    ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
+    ct_assertequal(ALDO_HLT_FAULT, (int)expr.hexpr.cond);
 }
 
 static void fault_condition_malformed(void *ctx)
 {
     const char *str = "tlf";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
@@ -592,7 +630,7 @@ static void fault_condition_malformed(void *ctx)
 static void expr_missing_unit(void *ctx)
 {
     const char *str = "1234";
-    struct aldo_haltexpr expr;
+    struct aldo_debugexpr expr;
 
     auto result = aldo_haltexpr_parse(str, &expr);
 
@@ -608,7 +646,7 @@ static void null_resetvector_string(void *ctx)
     const char *str = nullptr;
     struct aldo_debugexpr vector;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &vector);
+    auto result = aldo_haltexpr_parse(str, &vector);
 
     ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
@@ -618,7 +656,7 @@ static void empty_resetvector_string(void *ctx)
     const char *str = "";
     struct aldo_debugexpr vector;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &vector);
+    auto result = aldo_haltexpr_parse(str, &vector);
 
     ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
@@ -628,7 +666,7 @@ static void resetvector(void *ctx)
     const char *str = "!ab12";
     struct aldo_debugexpr vector;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &vector);
+    auto result = aldo_haltexpr_parse(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
@@ -640,7 +678,7 @@ static void resetvector_with_space(void *ctx)
     const char *str = "!   ab12";
     struct aldo_debugexpr vector;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &vector);
+    auto result = aldo_haltexpr_parse(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
@@ -652,7 +690,7 @@ static void resetvector_with_leading_space(void *ctx)
     const char *str = "   !ab12";
     struct aldo_debugexpr vector;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &vector);
+    auto result = aldo_haltexpr_parse(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
@@ -664,7 +702,7 @@ static void resetvector_with_trailing_space(void *ctx)
     const char *str = "!ab12   ";
     struct aldo_debugexpr vector;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &vector);
+    auto result = aldo_haltexpr_parse(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
@@ -676,7 +714,7 @@ static void resetvector_caps(void *ctx)
     const char *str = "!AB12";
     struct aldo_debugexpr vector;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &vector);
+    auto result = aldo_haltexpr_parse(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
@@ -688,7 +726,7 @@ static void resetvector_with_prefix(void *ctx)
     const char *str = "!0xab12";
     struct aldo_debugexpr vector;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &vector);
+    auto result = aldo_haltexpr_parse(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
@@ -700,7 +738,7 @@ static void resetvector_short(void *ctx)
     const char *str = "!1f";
     struct aldo_debugexpr vector;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &vector);
+    auto result = aldo_haltexpr_parse(str, &vector);
 
     ct_assertequal(0, result);
     ct_assertequal(ALDO_DBG_EXPR_RESET, (int)vector.type);
@@ -712,7 +750,7 @@ static void resetvector_too_large(void *ctx)
     const char *str = "!12345";
     struct aldo_debugexpr vector;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &vector);
+    auto result = aldo_haltexpr_parse(str, &vector);
 
     ct_assertequal(ALDO_HEXPR_ERR_VALUE, result);
 }
@@ -722,7 +760,7 @@ static void resetvector_negative_overflow(void *ctx)
     const char *str = "!-asdf";
     struct aldo_debugexpr vector;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &vector);
+    auto result = aldo_haltexpr_parse(str, &vector);
 
     ct_assertequal(ALDO_HEXPR_ERR_VALUE, result);
 }
@@ -732,7 +770,7 @@ static void resetvector_malformed(void *ctx)
     const char *str = "!hjkl";
     struct aldo_debugexpr vector;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &vector);
+    auto result = aldo_haltexpr_parse(str, &vector);
 
     ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }
@@ -742,7 +780,7 @@ static void dbgexpr_parses_halt_condition(void *ctx)
     const char *str = "@ab12";
     struct aldo_debugexpr expr;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &expr);
+    auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(0, result);
     ct_assertequal(ALDO_DBG_EXPR_HALT, (int)expr.type);
@@ -755,7 +793,7 @@ static void dbgexpr_malformed(void *ctx)
     const char *str = "badexpr";
     struct aldo_debugexpr expr;
 
-    auto result = aldo_haltexpr_parse_dbg(str, &expr);
+    auto result = aldo_haltexpr_parse(str, &expr);
 
     ct_assertequal(ALDO_HEXPR_ERR_SCAN, result);
 }

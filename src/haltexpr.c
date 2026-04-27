@@ -15,50 +15,7 @@
 
 #define INVALID_CONDITION assert(((void)"INVALID HALT CONDITION", false))
 
-static int parse_resetvector(const char *restrict str, int *resetvector)
-{
-    if (!str) return ALDO_HEXPR_ERR_SCAN;
-
-    char u[2];
-    unsigned int addr;
-    bool
-        parsed = sscanf(str, " %1[" ALDO_HEXPR_RST_IND "]%X", u, &addr) == 2,
-        valid = addr < ALDO_MEMBLOCK_64KB;
-    if (parsed) {
-        if (!valid) return ALDO_HEXPR_ERR_VALUE;
-        *resetvector = (int)addr;
-        return 0;
-    }
-    return ALDO_HEXPR_ERR_SCAN;
-}
-
-//
-// MARK: - Public Interface
-//
-
-const char *aldo_haltexpr_errstr(int err)
-{
-    switch (err) {
-#define X(s, v, e) case ALDO_##s: return e;
-        ALDO_HEXPR_ERRCODE_X
-#undef X
-    default:
-        return "UNKNOWN ERR";
-    }
-}
-
-const char *aldo_haltcond_description(enum aldo_haltcondition cond)
-{
-    switch (cond) {
-#define X(s, d) case ALDO_##s: return d;
-        ALDO_HEXPR_COND_X
-#undef X
-    default:
-        return "INVALID CONDITION";
-    }
-}
-
-int aldo_haltexpr_parse(const char *restrict str, struct aldo_haltexpr *expr)
+static int parse_expr(const char *restrict str, struct aldo_haltexpr *expr)
 {
     assert(expr != nullptr);
 
@@ -129,28 +86,71 @@ int aldo_haltexpr_parse(const char *restrict str, struct aldo_haltexpr *expr)
     return ALDO_HEXPR_ERR_SCAN;
 }
 
-int aldo_haltexpr_parse_dbg(const char *restrict str,
-                            struct aldo_debugexpr *expr)
+static int parse_resetvector(const char *restrict str, int *resetvector)
+{
+    if (!str) return ALDO_HEXPR_ERR_SCAN;
+
+    char u[2];
+    unsigned int addr;
+    bool
+        parsed = sscanf(str, " %1[" ALDO_HEXPR_RST_IND "]%X", u, &addr) == 2,
+        valid = addr < ALDO_MEMBLOCK_64KB;
+    if (parsed) {
+        if (!valid) return ALDO_HEXPR_ERR_VALUE;
+        *resetvector = (int)addr;
+        return 0;
+    }
+    return ALDO_HEXPR_ERR_SCAN;
+}
+
+//
+// MARK: - Public Interface
+//
+
+const char *aldo_haltexpr_errstr(int err)
+{
+    switch (err) {
+#define X(s, v, e) case ALDO_##s: return e;
+        ALDO_HEXPR_ERRCODE_X
+#undef X
+    default:
+        return "UNKNOWN ERR";
+    }
+}
+
+const char *aldo_haltcond_description(enum aldo_haltcondition cond)
+{
+    switch (cond) {
+#define X(s, d) case ALDO_##s: return d;
+        ALDO_HEXPR_COND_X
+#undef X
+    default:
+        return "INVALID CONDITION";
+    }
+}
+
+int aldo_haltexpr_parse(const char *restrict str, struct aldo_debugexpr *expr)
 {
     assert(expr != nullptr);
 
     struct aldo_haltexpr hexpr;
-    auto err = aldo_haltexpr_parse(str, &hexpr);
+    auto err = parse_expr(str, &hexpr);
     if (err == 0) {
         *expr = (typeof(*expr)){
             .hexpr = hexpr,
             .type = ALDO_DBG_EXPR_HALT,
         };
-    } else {
+    } else if (err == ALDO_HEXPR_ERR_SCAN) {
         int resetvector;
         err = parse_resetvector(str, &resetvector);
-        if (err < 0) return err;
-        *expr = (typeof(*expr)){
-            .resetvector = resetvector,
-            .type = ALDO_DBG_EXPR_RESET,
-        };
+        if (err == 0) {
+            *expr = (typeof(*expr)){
+                .resetvector = resetvector,
+                .type = ALDO_DBG_EXPR_RESET,
+            };
+        }
     }
-    return 0;
+    return err;
 }
 
 int aldo_haltexpr_desc(const struct aldo_haltexpr *expr,
